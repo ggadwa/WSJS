@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+
+<html>
+
+<head>
+<meta charset="utf-8">
+
+<!-- the scripts -->
+
+<script type="text/javascript" src="lib/gl-matrix.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/defs.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/gl.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/shader.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/bitmap.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/lightmap.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/mesh.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_random.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_bitmap_util.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_bitmap.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_mesh_util.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_map_util.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_map_pieces.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_map.js" charset="utf-8"></script>
+<script type="text/javascript" src="generate/gen_light_map.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/canvas.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/input.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/debug.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/main.js" charset="utf-8"></script>
+</head>
+
+<body onload="wsInit()">
+    
+<!-- the shaders -->
+
+<iframe id="wsVertDebugShader" src="shaders/vert_debug.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
+<iframe id="wsFragDebugShader" src="shaders/frag_debug.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
+<iframe id="wsVertTextureShader" src="shaders/vert_texture.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
+<iframe id="wsFragTextureShader" src="shaders/frag_texture.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
+
+<!-- the drawing canvas -->
+
+<canvas id="wsCanvas" style="position:absolute;left:0px;top:0px;border:1px solid black" width="800" height="500"></canvas>
+
+<!-- the status -->
+
+<div id="wsStatus" style="position:absolute;left:810px;top:2px;width:300px;height:350px;font-family:arial;font-size:16px"></div>
+
+<!-- settings -->
+
+<input id="wsBitmapRandom" type="text" name="wsBitmapRandom" value="" style="position:absolute;left:810px;top:410px;width:150px;height:20px;font-family:arial;font-size:16px">
+<div style="position:absolute;left:970px;top:410px;width:300px;height:20px;font-family:arial;font-size:16px">Bitmap Random Seed</div>
+
+<input id="wsMapRandom" type="text" name="wsMapRandom" value="" style="position:absolute;left:810px;top:440px;width:150px;height:20px;font-family:arial;font-size:16px">
+<div style="position:absolute;left:970px;top:440px;width:300px;height:20px;font-family:arial;font-size:16px">Map Random Seed</div>
+
+<input id="wsRefresh" type="button" value="Refresh" onClick="wsRefresh()" style="position:absolute;left:810px;top:470px;width:100px;height:30px;font-family:arial;font-size:16px">
+
+</body>
+</html>

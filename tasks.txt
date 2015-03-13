@@ -1,0 +1,28 @@
+
+
+- move to typed arrays
+- map pieces
+
+Int32Array
+Uint16Array
+Float32Array
+Uint32Array
+
+
+- reduce number of varrying to get more lights
+
+- light maps?
+
+
+
+- generator
+    - ? randomize vertices
+    - do random inside version (so it's a O)
+
+
+
+
+
+-- will need start and stop
+    - close meshes
+    - close gl
