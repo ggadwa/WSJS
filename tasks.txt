@@ -1,13 +1,19 @@
 
 
-- move to typed arrays
-- map pieces
+
+- map pieces to typed arrays
 
 
 
 - reduce number of varrying to get more lights
 
-- light maps?
+- light maps
+    - need to be done by timer
+    - light maps need all black, all white spots
+       - pre-determine so we can reduce light map usage
+    - need smear and smooth
+    - precalc all the triangle vertexes, store in parallel mesh object
+
 
 
 

@@ -206,7 +206,7 @@ shader.drawStart=function(view)
                 gl.uniform3f(shaderLight.colorUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b);
             }
             gl.uniform1f(shaderLight.intensityUniform,viewLight.intensity);
-            gl.uniform1f(shaderLight.invertIntensityUniform,(1.0/viewLight.intensity));
+            gl.uniform1f(shaderLight.invertIntensityUniform,viewLight.invertIntensity);
             gl.uniform1f(shaderLight.exponentUniform,viewLight.exponent);
         }
     }

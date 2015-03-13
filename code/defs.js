@@ -50,18 +50,18 @@ function wsPoint(x,y,z)
 
 function ws2DPoint(x,y)
 {
-    this.x=x;
-    this.y=y;
+    this.x=Math.floor(x);
+    this.y=Math.floor(y);
     
     this.set=function(xSet,ySet)
                 {
-                    this.x=xSet;
-                    this.y=ySet;
+                    this.x=Math.floor(xSet);
+                    this.y=Math.floor(ySet);
                 }
     
     this.copy=function()
                 {
-                    return(new wsPoint(this.x,this.y));
+                    return(new ws2DPoint(this.x,this.y));
                 };
 }
 
@@ -167,6 +167,28 @@ function wsColor(r,g,b)
                     this.g=g;
                     this.b=b;
                 };
+                
+    this.add=function(col)
+                {
+                    this.r+=col.r;
+                    this.g+=col.g;
+                    this.b+=col.b;
+                };
+    
+    this.attenuate=function(att)
+                {
+                    return(new wsColor((this.r*att),(this.g*att),(this.b*att)));
+                };
+                
+    this.fixOverflow=function()
+                {
+                    if (this.r>1.0) this.r=1.0;
+                    if (this.r<0.0) this.r=0.0;
+                    if (this.g>1.0) this.g=1.0;
+                    if (this.g<0.0) this.g=0.0;
+                    if (this.b>1.0) this.b=1.0;
+                    if (this.b<0.0) this.b=0.0;
+                };
 }
 
 //
@@ -178,6 +200,7 @@ function wsLight(position,color,inLightmap,intensity,exponent)
     this.position=position;     // should be wsPoint
     this.color=color;           // should be wsColor
     this.intensity=intensity;
+    this.invertIntensity=1.0/intensity;
     this.exponent=exponent;
     
     this.inLightmap=inLightmap; // if used to generate the light map (color component ignored in shaders)

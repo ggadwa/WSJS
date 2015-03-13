@@ -156,8 +156,10 @@ function wsInit()
 {
         // setup the random numbers
     
-    document.getElementById('wsBitmapRandom').value=123456789; // Math.floor(Math.random()*0xFFFFFFFF); // supergumba--testing
-    document.getElementById('wsMapRandom').value=123456789; // Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+//    document.getElementById('wsBitmapRandom').value=123456789; // a version to create the same map everytime for speed testing
+//    document.getElementById('wsMapRandom').value=123456789;
     
         // no timer yet
         

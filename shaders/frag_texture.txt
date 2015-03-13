@@ -164,7 +164,8 @@ void main(void)
         // sure it's never less than 10% of the
         // ambient
 
-    pixelAmbient=max((pixelAmbient*bump),(ambient*0.9));
+    bump=max(bump,(((ambient.r+ambient.g+ambient.b)*0.33)*0.90));
+    pixelAmbient*=bump;
 
         // finally create the pixel
 

@@ -180,7 +180,7 @@ genMap.addLight=function(map,xBound,yBound,zBound)
     
         // light
         
-    var intensity=(xBound.max-xBound.min)*0.5;//0.95; //supergumba -- for testing
+    var intensity=(xBound.max-xBound.min)*0.95;
     map.addLight(new wsLight(new wsPoint(lightX,(yBound.min+1200),lightZ),new wsColor(red,green,blue),true,intensity,1.0));
 };
 

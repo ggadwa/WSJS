@@ -161,305 +161,214 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,v)
 {
     var n,nLight;
     var light;
+    var k,p,hit,mesh,nMesh,tIdx;
+    var v0Idx,v1Idx,v2Idx,lightVector;
+    var tv0,tv1,tv2;
+    var dist,att;
+    var col=new wsColor(0.0,0.0,0.0);
     
+    nMesh=map.meshes.length;
     nLight=map.lights.length;
     
     for (n=0;n!==nLight;n++) {
         light=map.lights[n];
-        if (!light.withinLightRadius(v)) continue;  //supergumba--do by intensity here and exponent
         
-        return(true);
-    }
-    
-    
-    
-    return(false);
-};
-
-
-//
-// get 3D vertexes for triangle to render
-// 
-// this routine determines the hypotenuse and gets
-// the central vertex with will form the two legs
-// that the vertexes to ray trace from will be calculated
-//
-
-genLightmap.getVertexesForTriangle=function(map,meshIdx,trigIdx,wallLike)
-{
-    var v0Idx,v1Idx,v2Idx;
-    var mesh=map.meshes[meshIdx];
-    
-        // get the points
-        
-    v0Idx=mesh.indexes[trigIdx*3]*3;
-    var v0=new wsPoint(mesh.vertices[v0Idx],mesh.vertices[v0Idx+1],mesh.vertices[v0Idx+2]);
-
-    v1Idx=mesh.indexes[(trigIdx*3)+1]*3;
-    var v1=new wsPoint(mesh.vertices[v1Idx],mesh.vertices[v1Idx+1],mesh.vertices[v1Idx+2]);
-
-    v2Idx=mesh.indexes[(trigIdx*3)+2]*3;
-    var v2=new wsPoint(mesh.vertices[v2Idx],mesh.vertices[v2Idx+1],mesh.vertices[v2Idx+2]);
-    
-        // find the vertex opposite the hypotenuse
-        // we use this to form the two legs that will
-        // be used to build the points to ray trace from
-        // since the 2D version traces down the two legs
-        // of a right triangle
-        
-        // the return is
-        // 1st element = opposite vertex
-        // 2nd element = vertex changing on the 2D Y during render
-        // 3rd element = vertex changing on the 2D X during render
-    
-    var v0v1dist=v0.noSquareDistance(v1);
-    var v0v2dist=v0.noSquareDistance(v2);
-    var v1v2dist=v1.noSquareDistance(v2);
-    
-    if ((v1v2dist>v0v1dist) && (v1v2dist>v0v2dist)) {
-        
-            // v0 is opposite
+            // light within light range?
             
-        if (wallLike) {
-            if (Math.abs(v0.y-v1.y)>Math.abs(v0.y-v2.y)) return([v0,v1,v2]);
-            return([v0,v2,v1]);
-        }
-        if (Math.abs(v0.z-v1.z)>Math.abs(v0.z-v2.z)) return([v0,v1,v2]);
-        return([v0,v2,v1]);
-    }
-    else {
+        dist=light.distance(v);
+        if (dist>light.intensity) continue;
         
-            // v1 is opposite
+            // light vector
             
-        if ((v0v2dist>v0v1dist) && (v0v2dist>v1v2dist)) {
-            if (wallLike) {
-                if (Math.abs(v1.y-v0.y)>Math.abs(v1.y-v2.y)) return([v1,v0,v2]);
-                return([v1,v2,v0]);
+        lightVector=new wsPoint((light.position.x-v.x),(light.position.y-v.y),(light.position.z-v.z));
+        
+            // any hits?
+/*            
+        hit=false;
+        
+        for (k=0;k!==nMesh;k++) {
+            mesh=map.meshes[k];
+            
+            tIdx=0;
+            
+            for (p=0;p!==mesh.trigCount;p++) {
+                
+                if ((k===meshIdx) && (p===trigIdx)) {
+                    tIdx+=3;
+                    continue;
+                }
+                
+                v0Idx=mesh.indexes[tIdx++]*3;       // supergumba -- precalc all this
+                v1Idx=mesh.indexes[tIdx++]*3;
+                v2Idx=mesh.indexes[tIdx++]*3;
+                
+                tv0=new wsPoint(mesh.vertices[v0Idx],mesh.vertices[v0Idx+1],mesh.vertices[v0Idx+2]);
+                tv1=new wsPoint(mesh.vertices[v1Idx],mesh.vertices[v1Idx+1],mesh.vertices[v1Idx+2]);
+                tv2=new wsPoint(mesh.vertices[v2Idx],mesh.vertices[v2Idx+1],mesh.vertices[v2Idx+2]);
+                
+                if (genLightmap.rayTraceCollision(v,lightVector,tv0,tv1,tv2)) {
+                    hit=true;
+                    break;
+                }
             }
-            if (Math.abs(v1.z-v0.z)>Math.abs(v1.z-v2.z)) return([v1,v0,v2]);
-            return([v1,v2,v0]);
+            
+            if (hit) break;
         }
         
-            // v2 is opposite
+            // if a hit, don't add in light
             
-        else {
-            if (wallLike) {
-                if (Math.abs(v2.y-v0.y)>Math.abs(v2.y-v1.y)) return([v2,v0,v1]);
-                return([v2,v1,v0]);
-            }
-            if (Math.abs(v2.z-v0.z)>Math.abs(v2.z-v1.z)) return([v2,v0,v1]);
-            return([v2,v1,v0]);
-        }
+        if (hit) continue;
+*/        
+            // get the color, attenuate
+            // it and add it to base color
+        
+        att=1.0-(dist*light.invertIntensity);
+        att+=Math.pow(att,light.exponent);
+        col.add(light.color.attenuate(att));
     }
+    
+    col.fixOverflow();
+    
+    return(col);
 };
 
 //
 // render a triangle
 //
 
-genLightmap.renderTopTriangle=function(map,meshIdx,trigIdx,bitmapCTX,lft,top,rgt,bot,wallLike,trigPt0,trigPt1,trigPt2)
+genLightmap.renderTriangle=function(map,meshIdx,trigIdx,ctx,pts,vs,lft,top,rgt,bot)
 {
-    var x,y,lx,idx;
+    var x,y,lx,rx,tempX,ty,by,idx;
+    var lxFactor,rxFactor,vFactor;
     var v=new wsPoint(0,0,0);
+    var vlx=new wsPoint(0,0,0);
+    var vrx=new wsPoint(0,0,0);
+    var col;
     
     var wid=rgt-lft;
     var high=bot-top;
     
+    if ((wid<=0) || (high<=0)) return;
+    
         // get the image data to render to
         
-    var imgData=bitmapCTX.getImageData(lft,top,wid,high);
+    var imgData=ctx.getImageData(lft,top,wid,high);
     var data=imgData.data;
     
-        // render the triangle
-    
-    for (y=0;y!==high;y++) {
+        // find the top and bottom points
         
-            // get vertical line and
-            // bitmap index
+    var topPtIdx=0;
+    if (pts[1].y<pts[topPtIdx].y) topPtIdx=1;
+    if (pts[2].y<pts[topPtIdx].y) topPtIdx=2;
+   
+    var botPtIdx=0;
+    if (pts[1].y>pts[botPtIdx].y) botPtIdx=1;
+    if (pts[2].y>pts[botPtIdx].y) botPtIdx=2;
+    
+        // find the current lines to
+        // scan against
+    
+    var l1StartPtIdx=topPtIdx;
+    var l1EndPtIdx=topPtIdx-1;
+    if (l1EndPtIdx===-1) l1EndPtIdx=2;
+    
+    var l2StartPtIdx=topPtIdx;
+    var l2EndPtIdx=topPtIdx+1;
+    if (l2EndPtIdx===3) l2EndPtIdx=0;
+    
+        // render the triangle by scan
+        // lines from top to bottom
+    
+    ty=pts[topPtIdx].y;
+    by=pts[botPtIdx].y;
+    if (ty>=by) return;
+
+    for (y=ty;y!==by;y++) {
+        
+            // time to switch lines?
+        
+        if (y>=pts[l1EndPtIdx].y) {
+            l1StartPtIdx=l1EndPtIdx;
+            l1EndPtIdx--;
+            if (l1EndPtIdx===-1) l1EndPtIdx=2;
+        }
+        
+        if (y>=pts[l2EndPtIdx].y) {
+            l2StartPtIdx=l2EndPtIdx;
+            l2EndPtIdx++;
+            if (l2EndPtIdx===3) l2EndPtIdx=0;
+        }
+        
+            // get the left right
+        
+        lxFactor=(y-pts[l1StartPtIdx].y)/(pts[l1EndPtIdx].y-pts[l1StartPtIdx].y);
+        lx=pts[l1StartPtIdx].x+Math.floor((pts[l1EndPtIdx].x-pts[l1StartPtIdx].x)*lxFactor);
+        
+        rxFactor=(y-pts[l2StartPtIdx].y)/(pts[l2EndPtIdx].y-pts[l2StartPtIdx].y);
+        rx=pts[l2StartPtIdx].x+Math.floor((pts[l2EndPtIdx].x-pts[l2StartPtIdx].x)*rxFactor);
+        
+            // get the vertex left and right
             
-        lx=Math.floor(wid*((y+1)/high));
+        vlx.x=vs[l1StartPtIdx].x+((vs[l1EndPtIdx].x-vs[l1StartPtIdx].x)*lxFactor);
+        vlx.y=vs[l1StartPtIdx].y+((vs[l1EndPtIdx].y-vs[l1StartPtIdx].y)*lxFactor);
+        vlx.z=vs[l1StartPtIdx].z+((vs[l1EndPtIdx].z-vs[l1StartPtIdx].z)*lxFactor);
+        
+        vrx.x=vs[l2StartPtIdx].x+((vs[l2EndPtIdx].x-vs[l2StartPtIdx].x)*rxFactor);
+        vrx.y=vs[l2StartPtIdx].y+((vs[l2EndPtIdx].y-vs[l2StartPtIdx].y)*rxFactor);
+        vrx.z=vs[l2StartPtIdx].z+((vs[l2EndPtIdx].z-vs[l2StartPtIdx].z)*rxFactor);
+        
+            // sometimes we need to swap
+            // left and right
+            
+        if (lx>rx) {
+            tempX=lx;
+            lx=rx;
+            rx=tempX;
+            
+            tempX=vlx;
+            vlx=vrx;
+            vrx=tempX;
+        }
+        
+            // get the bitmap data index
+            
         idx=((y*wid)+lx)*4;
         
-            // one direction for ray trace
-            // vertex
+            // render the scan line
             
-        if (wallLike) {
-            v.y=trigPt0.y+((trigPt1.y-trigPt0.y)*((y+1)/high));
-        }
-        else {
-            v.y=trigPt0.y;
-            v.z=trigPt0.z+((trigPt1.z-trigPt0.z)*((y+1)/high));
-        }
-        
-            // render the lines
+        for (x=lx;x!==rx;x++) {
             
-        for (x=lx;x<wid;x++) {
+                // get the ray trace vetex
             
-                // get the other direction
-                
-            if (wallLike) {
-                v.x=trigPt0.x+((trigPt2.x-trigPt0.x)*((x+1)/wid));
-                v.z=trigPt0.z+((trigPt2.z-trigPt0.z)*((x+1)/wid));
-            }
-            else {
-                v.x=trigPt0.x+((trigPt2.x-trigPt0.x)*((x+1)/wid));
-            }
+            vFactor=(x-lx)/(rx-lx);
+            v.x=vlx.x+((vrx.x-vlx.x)*vFactor);
+            v.y=vlx.y+((vrx.y-vlx.y)*vFactor);
+            v.z=vlx.z+((vrx.z-vlx.z)*vFactor);
             
                 // write the pixel
-            
-            if (this.rayTraceVertex(map,meshIdx,trigIdx,v)) {
-                data[idx++]=255;
-                data[idx++]=255;
-                data[idx++]=255;
-                data[idx++]=255;
-            }
-            else {
-                data[idx++]=0;
-                data[idx++]=0;
-                data[idx++]=0;
-                data[idx++]=255;
-            }
+                
+            col=this.rayTraceVertex(map,meshIdx,trigIdx,v);
+            data[idx++]=Math.floor(col.r*255.0);
+            data[idx++]=Math.floor(col.g*255.0);
+            data[idx++]=Math.floor(col.b*255.0);
+            data[idx++]=255;
         }
     }
-    
-        // replace image data
-        
-    bitmapCTX.putImageData(imgData,lft,top);
-};
 
-genLightmap.renderBottomTriangle=function(map,meshIdx,trigIdx,bitmapCTX,lft,top,rgt,bot,wallLike,trigPt0,trigPt1,trigPt2)
-{
-    var x,y,rx,idx;
-    var v=new wsPoint(0,0,0);
-    
-    var wid=rgt-lft;
-    var high=bot-top;
-    
-        // get the image data to render to
-        
-    var imgData=bitmapCTX.getImageData(lft,top,wid,high);
-    var data=imgData.data;
-    
-        // render the triangle
-    
-    for (y=0;y!==high;y++) {
-        
-            // get vertical line and
-            // bitmap index
-            
-        rx=Math.floor(wid*(y/high));
-        idx=(y*wid)*4;
-        
-            // one direction for ray trace
-            // vertex
-            
-        if (wallLike) {
-            v.y=trigPt0.y+((trigPt1.y-trigPt0.y)*((y+1)/high));
-        }
-        else {
-            v.y=trigPt0.y;
-            v.z=trigPt0.z+((trigPt1.z-trigPt0.z)*((y+1)/high));
-        }
-        
-        for (x=0;x<rx;x++) {
-            
-                // get the other direction
-                
-            if (wallLike) {
-                v.x=trigPt0.x+((trigPt2.x-trigPt0.x)*((x+1)/wid));
-                v.z=trigPt0.z+((trigPt2.z-trigPt0.z)*((x+1)/wid));
-            }
-            else {
-                v.x=trigPt0.x+((trigPt2.x-trigPt0.x)*((x+1)/wid));
-            }
-            
-                // write the pixel
-            
-            if (this.rayTraceVertex(map,meshIdx,trigIdx,v)) {
-                data[idx++]=255;
-                data[idx++]=255;
-                data[idx++]=255;
-                data[idx++]=255;
-            }
-            else {
-                data[idx++]=0;
-                data[idx++]=0;
-                data[idx++]=0;
-                data[idx++]=255;
-            }
-        }
-    }
-    
         // replace image data
         
-    bitmapCTX.putImageData(imgData,lft,top);
+    ctx.putImageData(imgData,lft,top);
 };
 
 //
 // build light map in chunk
 //
 
-genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,top,rgt,bot,lightmapUVs)
+genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,top,chunkSize,lightmapUVs)
 {
-    var n;
     var mesh=map.meshes[meshIdx];
-    
-        // size
-        
-    var chunkWid=rgt-lft;
-    var chunkHigh=bot-top;
-  /*  
-        // find out how many squares we need
-        // to render each trig
-        
-    var trigCount=mesh.trigCount;
-        
-    var squareCount=Math.floor(trigCount/2);
-    if ((trigCount%2)!==0) squareCount++;
-    var squareXCount=Math.floor(Math.sqrt(mesh.trigCount));
-    var squareYCount=Math.floor(Math.sqrt(mesh.trigCount));
-    while ((squareXCount*squareYCount)<squareCount) {
-        squareXCount++;
-        squareYCount++;
-    }
-    var squareWid=Math.floor(chunkWid/squareXCount);
-    var squareHigh=Math.floor(chunkHigh/squareYCount);
-    
-        // light map packed UV array
-        
-    var lightmapUVs=new Float32Array(mesh.vertexCount*2);
-    
-        // render the triangles
-    
-    var uvIdx,squareIdx,topTrig,wallLike;
-    var marginLft,marginTop,marginRgt,marginBot;
-    var IndexIdx,v0Idx,v1Idx,v2Idx;
-    var uvLft,uvTop,uvRgt,uvBot;
-    var vertexList;
-    
-    for (n=0;n!==trigCount;n++) {
-        
-        
-        
-
-        
-        
-        
-        // vertex indexes
-
-    IndexIdx=n*3;
-    v0Idx=mesh.indexes[IndexIdx];
-    v1Idx=mesh.indexes[IndexIdx+1];
-    v2Idx=mesh.indexes[IndexIdx+2];
-    */
-   
-   
-   
-   
-   
     var vIdx,uvIdx;
     var pt0,pt1,pt2;
-   
     
         // get the vertexes for the triangle
         
@@ -475,72 +384,85 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,to
         // look at one of the normal to determine if it's
         // wall or floor like
 
-    var wallLike=(Math.abs(mesh.normals[(vIdx*3)+1])<=0.3);
+    var wallLike=(Math.abs(mesh.normals[vIdx+1])<=0.3);
     
         // get the bounds of the 3D point
         
-    var xBound=new wsBound(v0.x,v1.x);
+    var xBound=new wsBound(v0.x,v0.x);
     xBound.adjust(v1.x);
     xBound.adjust(v2.x);
     
-    var yBound=new wsBound(v0.y,v1.y);
+    var yBound=new wsBound(v0.y,v0.y);
     yBound.adjust(v1.y);
     yBound.adjust(v2.y);
     
-    var zBound=new wsBound(v0.z,v1.z);
+    var zBound=new wsBound(v0.z,v0.z);
     zBound.adjust(v1.z);
     zBound.adjust(v2.z);
     
         // 2D reduction factors
+        
+    var renderSize=chunkSize-(this.RENDER_MARGIN*2);
 
-    var xFactor=chunkWid/(xBound.max-xBound.min);
-    var yFactor=chunkWid/(yBound.max-yBound.min);
-    var zFactor=chunkWid/(zBound.max-zBound.min);
+    var sz=xBound.max-xBound.min;
+    var xFactor=(sz===0)?0:renderSize/sz;
+    
+    var sz=yBound.max-yBound.min;
+    var yFactor=(sz===0)?0:renderSize/sz;
+    
+    var sz=zBound.max-zBound.min;
+    var zFactor=(sz===0)?0:renderSize/sz
+    
+    var renderLft=lft+this.RENDER_MARGIN;
+    var renderTop=top+this.RENDER_MARGIN;
+    var renderRgt=lft+renderSize;
+    var renderBot=top+renderSize;
 
         // now create the 2D version of it
+        // these points are offsets WITHIN the margin box
         
     if (wallLike) {
         if (xBound.getSize()>zBound.getSize()) {
-            pt0=new ws2DPoint((lft+((v0.x-xBound.min)*xFactor)),(top+((v0.y-yBound.min)*yFactor)));
-            pt1=new ws2DPoint((lft+((v1.x-xBound.min)*xFactor)),(top+((v1.y-yBound.min)*yFactor)));
-            pt2=new ws2DPoint((lft+((v2.x-xBound.min)*xFactor)),(top+((v2.y-yBound.min)*yFactor)));
+            pt0=new ws2DPoint(((v0.x-xBound.min)*xFactor),((v0.y-yBound.min)*yFactor));
+            pt1=new ws2DPoint(((v1.x-xBound.min)*xFactor),((v1.y-yBound.min)*yFactor));
+            pt2=new ws2DPoint(((v2.x-xBound.min)*xFactor),((v2.y-yBound.min)*yFactor));
         }
         else {
-            pt0=new ws2DPoint((lft+((v0.z-zBound.min)*zFactor)),(top+((v0.y-yBound.min)*yFactor)));
-            pt1=new ws2DPoint((lft+((v1.z-zBound.min)*zFactor)),(top+((v1.y-yBound.min)*yFactor)));
-            pt2=new ws2DPoint((lft+((v2.z-zBound.min)*zFactor)),(top+((v2.y-yBound.min)*yFactor)));
+            pt0=new ws2DPoint(((v0.z-zBound.min)*zFactor),((v0.y-yBound.min)*yFactor));
+            pt1=new ws2DPoint(((v1.z-zBound.min)*zFactor),((v1.y-yBound.min)*yFactor));
+            pt2=new ws2DPoint(((v2.z-zBound.min)*zFactor),((v2.y-yBound.min)*yFactor));
         }
     }
     else {
-        pt0=new ws2DPoint((lft+((v0.x-xBound.min)*xFactor)),(top+((v0.z-zBound.min)*zFactor)));
-        pt1=new ws2DPoint((lft+((v1.x-xBound.min)*xFactor)),(top+((v1.z-zBound.min)*zFactor)));
-        pt2=new ws2DPoint((lft+((v2.x-xBound.min)*xFactor)),(top+((v2.z-zBound.min)*zFactor)));
+        pt0=new ws2DPoint(((v0.x-xBound.min)*xFactor),((v0.z-zBound.min)*zFactor));
+        pt1=new ws2DPoint(((v1.x-xBound.min)*xFactor),((v1.z-zBound.min)*zFactor));
+        pt2=new ws2DPoint(((v2.x-xBound.min)*xFactor),((v2.z-zBound.min)*zFactor));
     }
-        
+    
         // ray trace the triangle
        
-//    this.renderTriangle(map,meshIdx,trigIdx,ctx,(lft+this.RENDER_MARGIN),(top+this.RENDER_MARGIN),(rgt-this.RENDER_MARGIN),(bot-this.RENDER_MARGIN));
+    this.renderTriangle(map,meshIdx,trigIdx,ctx,[pt0,pt1,pt2],[v0,v1,v2],renderLft,renderTop,renderRgt,renderBot);
 
         // add the UV
 
     uvIdx=mesh.indexes[trigIdx*3]*2;
-    lightmapUVs[uvIdx]=pt0.x/genLightmap.TEXTURE_SIZE;
-    lightmapUVs[uvIdx+1]=pt0.y/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx]=(pt0.x+renderLft)/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=(pt0.y+renderTop)/genLightmap.TEXTURE_SIZE;
     
-    uvIdx=mesh.indexes[(trigIdx*3)+1]*3;
-    lightmapUVs[uvIdx]=pt1.x/genLightmap.TEXTURE_SIZE;
-    lightmapUVs[uvIdx+1]=pt1.y/genLightmap.TEXTURE_SIZE;
+    uvIdx=mesh.indexes[(trigIdx*3)+1]*2;
+    lightmapUVs[uvIdx]=(pt1.x+renderLft)/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=(pt1.y+renderTop)/genLightmap.TEXTURE_SIZE;
     
-    uvIdx=mesh.indexes[(trigIdx*3)+2]*3;
-    lightmapUVs[uvIdx]=pt2.x/genLightmap.TEXTURE_SIZE;
-    lightmapUVs[uvIdx+1]=pt2.y/genLightmap.TEXTURE_SIZE;
+    uvIdx=mesh.indexes[(trigIdx*3)+2]*2;
+    lightmapUVs[uvIdx]=(pt2.x+renderLft)/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=(pt2.y+renderTop)/genLightmap.TEXTURE_SIZE;
 };
     
 //
 // create lightmap
 //
 
-genLightmap.create=function(map)
+genLightmap.createTimer=function(map)
 {
     var n,k,nMesh,nTrig,lightmapIdx,chunkIdx;
     var lft,top;
@@ -550,10 +472,8 @@ genLightmap.create=function(map)
         // chunks are one part of the
         // lightmap used to store one triangle
         
-    var chunkXCount=Math.floor(Math.sqrt(genLightmap.TRIG_PER_TEXTURE));
-    var meshChunkWid=Math.floor(genLightmap.TEXTURE_SIZE/chunkXCount);
-    var chunkYCount=Math.floor(Math.sqrt(genLightmap.TRIG_PER_TEXTURE));
-    var meshChunkHigh=Math.floor(genLightmap.TEXTURE_SIZE/chunkYCount);
+    var chunkCount=Math.floor(Math.sqrt(genLightmap.TRIG_PER_TEXTURE));
+    var chunkSize=Math.floor(genLightmap.TEXTURE_SIZE/chunkCount);
     
         // first light map
         
@@ -597,10 +517,10 @@ genLightmap.create=function(map)
             
         for (k=0;k!==nTrig;k++) {
         
-            lft=(chunkIdx%chunkXCount)*meshChunkWid;
-            top=Math.floor(chunkIdx/chunkYCount)*meshChunkHigh;
+            lft=(chunkIdx%chunkCount)*chunkSize;
+            top=Math.floor(chunkIdx/chunkCount)*chunkSize;
 
-            genLightmap.writePolyToChunk(map,n,k,lightmapIdx,bitmapCTX,lft,top,(lft+meshChunkWid),(top+meshChunkHigh),lightmapUVs);
+            genLightmap.writePolyToChunk(map,n,k,lightmapIdx,bitmapCTX,lft,top,chunkSize,lightmapUVs);
         
             chunkIdx++;
         }
@@ -613,4 +533,17 @@ genLightmap.create=function(map)
         // save any current bitmap
         
     if (bitmapCanvas!==null) genLightmap.finishBitmap(lightmapIdx,bitmapCanvas);
+};
+
+//
+// create lightmap
+// creation has to be done by a timer because this
+// is too slow and browsers will bounce the script
+//
+
+genLightmap.create=function(map)
+{
+
+    this.createTimer(map);
+
 };
