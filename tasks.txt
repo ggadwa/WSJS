@@ -3,10 +3,6 @@
 - move to typed arrays
 - map pieces
 
-Int32Array
-Uint16Array
-Float32Array
-Uint32Array
 
 
 - reduce number of varrying to get more lights

@@ -100,6 +100,11 @@ function wsBound(min,max)
                     return((this.max+this.min)/2);
                 };
                 
+    this.getSize=function()
+                {
+                    return(this.max-this.min);
+                };
+                
     this.adjust=function(value)
                 {
                     if (value<this.min) this.min=value;

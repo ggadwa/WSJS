@@ -11,7 +11,7 @@ var genLightmap={};
 //
 
 genLightmap.TEXTURE_SIZE=512;
-genLightmap.MESH_PER_TEXTURE=16;            // must be square
+genLightmap.TRIG_PER_TEXTURE=64;            // must be square
 genLightmap.RENDER_MARGIN=2;                // margin around each light map triangle
 
 //
@@ -399,17 +399,16 @@ genLightmap.renderBottomTriangle=function(map,meshIdx,trigIdx,bitmapCTX,lft,top,
 // build light map in chunk
 //
 
-genLightmap.writeMeshToChunk=function(map,meshIdx,lightmapIdx,bitmapCanvas,lft,top,rgt,bot)
+genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,top,rgt,bot,lightmapUVs)
 {
     var n;
     var mesh=map.meshes[meshIdx];
-    var bitmapCTX=bitmapCanvas.getContext('2d');
     
         // size
         
     var chunkWid=rgt-lft;
     var chunkHigh=bot-top;
-    
+  /*  
         // find out how many squares we need
         // to render each trig
         
@@ -440,76 +439,101 @@ genLightmap.writeMeshToChunk=function(map,meshIdx,lightmapIdx,bitmapCanvas,lft,t
     
     for (n=0;n!==trigCount;n++) {
         
-            // vertex indexes
         
-        IndexIdx=n*3;
-        v0Idx=mesh.indexes[IndexIdx];
-        v1Idx=mesh.indexes[IndexIdx+1];
-        v2Idx=mesh.indexes[IndexIdx+2];
         
-            // look at the normal to determine if it's
-            // wall or floor like
+
         
-        wallLike=(Math.abs(mesh.normals[(v0Idx*3)+1])<=0.3);
         
-            // get the triangle 3D bounds
-            
-        vertexList=this.getVertexesForTriangle(map,meshIdx,n,wallLike);
         
-            // get square
-            
-        squareIdx=Math.floor(n/2);
-        topTrig=((n&0x1)===0);
+        // vertex indexes
+
+    IndexIdx=n*3;
+    v0Idx=mesh.indexes[IndexIdx];
+    v1Idx=mesh.indexes[IndexIdx+1];
+    v2Idx=mesh.indexes[IndexIdx+2];
+    */
+   
+   
+   
+   
+   
+    var vIdx,uvIdx;
+    var pt0,pt1,pt2;
+   
+    
+        // get the vertexes for the triangle
         
-        marginLft=(lft+((squareIdx%squareXCount)*squareWid))+this.RENDER_MARGIN;
-        marginRgt=(marginLft+squareWid)-(this.RENDER_MARGIN*2);
+    vIdx=mesh.indexes[trigIdx*3]*3;
+    var v0=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
+
+    vIdx=mesh.indexes[(trigIdx*3)+1]*3;
+    var v1=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
+
+    vIdx=mesh.indexes[(trigIdx*3)+2]*3;
+    var v2=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
+
+        // look at one of the normal to determine if it's
+        // wall or floor like
+
+    var wallLike=(Math.abs(mesh.normals[(vIdx*3)+1])<=0.3);
+    
+        // get the bounds of the 3D point
         
-        marginTop=(top+(Math.floor(squareIdx/squareYCount)*squareHigh))+this.RENDER_MARGIN;
-        marginBot=(marginTop+squareHigh)-(this.RENDER_MARGIN*2);
+    var xBound=new wsBound(v0.x,v1.x);
+    xBound.adjust(v1.x);
+    xBound.adjust(v2.x);
+    
+    var yBound=new wsBound(v0.y,v1.y);
+    yBound.adjust(v1.y);
+    yBound.adjust(v2.y);
+    
+    var zBound=new wsBound(v0.z,v1.z);
+    zBound.adjust(v1.z);
+    zBound.adjust(v2.z);
+    
+        // 2D reduction factors
+
+    var xFactor=chunkWid/(xBound.max-xBound.min);
+    var yFactor=chunkWid/(yBound.max-yBound.min);
+    var zFactor=chunkWid/(zBound.max-zBound.min);
+
+        // now create the 2D version of it
         
-            // draw the triangle
-            
-        if (topTrig) {
-            this.renderTopTriangle(map,meshIdx,n,bitmapCTX,marginLft,marginTop,marginRgt,marginBot,wallLike,vertexList[0],vertexList[1],vertexList[2]);
+    if (wallLike) {
+        if (xBound.getSize()>zBound.getSize()) {
+            pt0=new ws2DPoint((lft+((v0.x-xBound.min)*xFactor)),(top+((v0.y-yBound.min)*yFactor)));
+            pt1=new ws2DPoint((lft+((v1.x-xBound.min)*xFactor)),(top+((v1.y-yBound.min)*yFactor)));
+            pt2=new ws2DPoint((lft+((v2.x-xBound.min)*xFactor)),(top+((v2.y-yBound.min)*yFactor)));
         }
         else {
-            this.renderBottomTriangle(map,meshIdx,n,bitmapCTX,marginLft,marginTop,marginRgt,marginBot,wallLike,vertexList[0],vertexList[1],vertexList[2]);
-        }
-        
-            // add the UV
-            
-        uvLft=marginLft/genLightmap.TEXTURE_SIZE;
-        uvRgt=marginRgt/genLightmap.TEXTURE_SIZE;
-        uvTop=marginTop/genLightmap.TEXTURE_SIZE;
-        uvBot=marginBot/genLightmap.TEXTURE_SIZE;
-        
-        if (topTrig) {
-            uvIdx=v0Idx*2;
-            lightmapUVs[uvIdx]=uvLft;
-            lightmapUVs[uvIdx+1]=uvTop;
-            uvIdx=v1Idx*2;
-            lightmapUVs[uvIdx]=uvRgt;
-            lightmapUVs[uvIdx+1]=uvTop;
-            uvIdx=v2Idx*2;
-            lightmapUVs[uvIdx]=uvRgt;
-            lightmapUVs[uvIdx+1]=uvBot;
-        }
-        else {
-            uvIdx=v0Idx*2;
-            lightmapUVs[uvIdx]=uvLft;
-            lightmapUVs[uvIdx+1]=uvTop;
-            uvIdx=v1Idx*2;
-            lightmapUVs[uvIdx]=uvRgt;
-            lightmapUVs[uvIdx+1]=uvBot;
-            uvIdx=v2Idx*2;
-            lightmapUVs[uvIdx]=uvLft;
-            lightmapUVs[uvIdx+1]=uvBot;
+            pt0=new ws2DPoint((lft+((v0.z-zBound.min)*zFactor)),(top+((v0.y-yBound.min)*yFactor)));
+            pt1=new ws2DPoint((lft+((v1.z-zBound.min)*zFactor)),(top+((v1.y-yBound.min)*yFactor)));
+            pt2=new ws2DPoint((lft+((v2.z-zBound.min)*zFactor)),(top+((v2.y-yBound.min)*yFactor)));
         }
     }
-    
-        // finally set the UVs in the mesh
+    else {
+        pt0=new ws2DPoint((lft+((v0.x-xBound.min)*xFactor)),(top+((v0.z-zBound.min)*zFactor)));
+        pt1=new ws2DPoint((lft+((v1.x-xBound.min)*xFactor)),(top+((v1.z-zBound.min)*zFactor)));
+        pt2=new ws2DPoint((lft+((v2.x-xBound.min)*xFactor)),(top+((v2.z-zBound.min)*zFactor)));
+    }
         
-    mesh.setLightmapUVs(lightmapIdx,lightmapUVs);
+        // ray trace the triangle
+       
+//    this.renderTriangle(map,meshIdx,trigIdx,ctx,(lft+this.RENDER_MARGIN),(top+this.RENDER_MARGIN),(rgt-this.RENDER_MARGIN),(bot-this.RENDER_MARGIN));
+
+        // add the UV
+
+    uvIdx=mesh.indexes[trigIdx*3]*2;
+    lightmapUVs[uvIdx]=pt0.x/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=pt0.y/genLightmap.TEXTURE_SIZE;
+    
+    uvIdx=mesh.indexes[(trigIdx*3)+1]*3;
+    lightmapUVs[uvIdx]=pt1.x/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=pt1.y/genLightmap.TEXTURE_SIZE;
+    
+    uvIdx=mesh.indexes[(trigIdx*3)+2]*3;
+    lightmapUVs[uvIdx]=pt2.x/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=pt2.y/genLightmap.TEXTURE_SIZE;
 };
     
 //
@@ -518,30 +542,46 @@ genLightmap.writeMeshToChunk=function(map,meshIdx,lightmapIdx,bitmapCanvas,lft,t
 
 genLightmap.create=function(map)
 {
-    var n,nMesh,lightmapIdx,chunkIdx;
+    var n,k,nMesh,nTrig,lightmapIdx,chunkIdx;
     var lft,top;
-    var bitmapCanvas;
+    var mesh,bitmapCanvas,bitmapCTX;
+    var lightmapUVs;
     
         // chunks are one part of the
-        // lightmap used to store one meshes
-        // triangles
+        // lightmap used to store one triangle
         
-    var chunkXCount=Math.floor(Math.sqrt(genLightmap.MESH_PER_TEXTURE));
+    var chunkXCount=Math.floor(Math.sqrt(genLightmap.TRIG_PER_TEXTURE));
     var meshChunkWid=Math.floor(genLightmap.TEXTURE_SIZE/chunkXCount);
-    var chunkYCount=Math.floor(Math.sqrt(genLightmap.MESH_PER_TEXTURE));
+    var chunkYCount=Math.floor(Math.sqrt(genLightmap.TRIG_PER_TEXTURE));
     var meshChunkHigh=Math.floor(genLightmap.TEXTURE_SIZE/chunkYCount);
     
+        // first light map
+        
     lightmapIdx=0;
-    chunkIdx=genLightmap.MESH_PER_TEXTURE;
-    bitmapCanvas=null;
-    nMesh=map.meshes.length;
     
+    bitmapCanvas=genLightmap.startBitmap();
+    bitmapCTX=bitmapCanvas.getContext('2d');
+    
+    chunkIdx=0;
+    
+        // run through the meshes and trigs
+        
+    nMesh=map.meshes.length;
+        
     for (n=0;n!==nMesh;n++) {
         
-            // time for a new chunk?
-            // if so, finish old one and start new one
+        mesh=map.meshes[n];
+        nTrig=mesh.trigCount;
+        
+            // UVs for this mesh
             
-        if (chunkIdx===genLightmap.MESH_PER_TEXTURE) {
+        var lightmapUVs=new Float32Array(mesh.vertexCount*2);
+        
+            // can this meshes trigs fit into
+            // this chunk?  if not, time for new
+            // texture
+            
+        if ((chunkIdx+nTrig)>genLightmap.TRIG_PER_TEXTURE) {
             
             if (bitmapCanvas!==null) {
                 genLightmap.finishBitmap(lightmapIdx,bitmapCanvas);
@@ -549,19 +589,25 @@ genLightmap.create=function(map)
             }
                 
             bitmapCanvas=genLightmap.startBitmap();
+            bitmapCTX=bitmapCanvas.getContext('2d');
             chunkIdx=0;
         }
         
-            // write mesh to chunk
-        
-        lft=(chunkIdx%chunkXCount)*meshChunkWid;
-        top=Math.floor(chunkIdx/chunkYCount)*meshChunkHigh;
-
-        genLightmap.writeMeshToChunk(map,n,lightmapIdx,bitmapCanvas,lft,top,(lft+meshChunkWid),(top+meshChunkHigh));
-        
-            // next chunk
+            // write polys to chunk
             
-        chunkIdx++;
+        for (k=0;k!==nTrig;k++) {
+        
+            lft=(chunkIdx%chunkXCount)*meshChunkWid;
+            top=Math.floor(chunkIdx/chunkYCount)*meshChunkHigh;
+
+            genLightmap.writePolyToChunk(map,n,k,lightmapIdx,bitmapCTX,lft,top,(lft+meshChunkWid),(top+meshChunkHigh),lightmapUVs);
+        
+            chunkIdx++;
+        }
+        
+            // set the lightmap UVs in the mesh
+            
+        mesh.setLightmapUVs(lightmapIdx,lightmapUVs);
     }
     
         // save any current bitmap
