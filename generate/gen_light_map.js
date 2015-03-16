@@ -7,6 +7,18 @@
 var genLightmap={};
 
 //
+// lightmap bitmap object
+// records each generated lightmap
+// canvas and the last chunk written to
+//
+
+function genLightmapBitmapObject(canvas)
+{
+    this.chunkIdx=0;
+    this.canvas=canvas;
+}
+
+//
 // constants
 //
 
@@ -25,11 +37,11 @@ genLightmap.startBitmap=function()
     var bitmapCanvas=document.createElement('canvas');
     bitmapCanvas.width=this.TEXTURE_SIZE;
     bitmapCanvas.height=this.TEXTURE_SIZE;
-    var bitmapCTX=bitmapCanvas.getContext('2d');
+    var ctx=bitmapCanvas.getContext('2d');
     
         // clear to black
     
-    genBitmapUtility.drawRect(bitmapCTX,0,0,bitmapCanvas.width,bitmapCanvas.height,'000000');
+    genBitmapUtility.drawRect(ctx,0,0,bitmapCanvas.width,bitmapCanvas.height,'#000000');
     
     return(bitmapCanvas);
 };
@@ -462,77 +474,75 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,to
 // create lightmap
 //
 
-genLightmap.createTimer=function(map)
+genLightmap.createLightmapForMesh=function(map,meshIdx,chunkCount,chunkSize,lightmapList)
 {
-    var n,k,nMesh,nTrig,lightmapIdx,chunkIdx;
+    var n,lightmapIdx,chunkIdx,nTrig;
     var lft,top;
-    var mesh,bitmapCanvas,bitmapCTX;
+    var mesh,ctx;
     var lightmapUVs;
     
-        // chunks are one part of the
-        // lightmap used to store one triangle
-        
-    var chunkCount=Math.floor(Math.sqrt(genLightmap.TRIG_PER_TEXTURE));
-    var chunkSize=Math.floor(genLightmap.TEXTURE_SIZE/chunkCount);
-    
-        // first light map
-        
-    lightmapIdx=0;
-    
-    bitmapCanvas=genLightmap.startBitmap();
-    bitmapCTX=bitmapCanvas.getContext('2d');
-    
-    chunkIdx=0;
-    
-        // run through the meshes and trigs
-        
-    nMesh=map.meshes.length;
-        
-    for (n=0;n!==nMesh;n++) {
-        
-        mesh=map.meshes[n];
-        nTrig=mesh.trigCount;
-        
-            // UVs for this mesh
-            
-        var lightmapUVs=new Float32Array(mesh.vertexCount*2);
-        
-            // can this meshes trigs fit into
-            // this chunk?  if not, time for new
-            // texture
-            
-        if ((chunkIdx+nTrig)>genLightmap.TRIG_PER_TEXTURE) {
-            
-            if (bitmapCanvas!==null) {
-                genLightmap.finishBitmap(lightmapIdx,bitmapCanvas);
-                lightmapIdx++;
-            }
-                
-            bitmapCanvas=genLightmap.startBitmap();
-            bitmapCTX=bitmapCanvas.getContext('2d');
-            chunkIdx=0;
-        }
-        
-            // write polys to chunk
-            
-        for (k=0;k!==nTrig;k++) {
-        
-            lft=(chunkIdx%chunkCount)*chunkSize;
-            top=Math.floor(chunkIdx/chunkCount)*chunkSize;
+    mesh=map.meshes[meshIdx];
+    nTrig=mesh.trigCount;
 
-            genLightmap.writePolyToChunk(map,n,k,lightmapIdx,bitmapCTX,lft,top,chunkSize,lightmapUVs);
-        
-            chunkIdx++;
+        // find a lightmap to put mesh into
+
+    lightmapIdx=-1;
+
+    for (n=0;n!==lightmapList.length;n++) {
+
+            // check to see if we can fit
+
+        if ((this.TRIG_PER_TEXTURE-lightmapList[n].chunkIdx)>nTrig) {
+            lightmapIdx=n;
+            break;
         }
+    }
+
+        // if we didn't find a lightmap, make a new one
+
+    if (lightmapIdx===-1) {
+        lightmapIdx=lightmapList.length;
+        lightmapList[lightmapIdx]=new genLightmapBitmapObject(this.startBitmap());
+    }
+
+        // UVs for this mesh
+
+    lightmapUVs=new Float32Array(mesh.vertexCount*2);
+
+        // write polys to chunk
+
+    chunkIdx=lightmapList[lightmapIdx].chunkIdx;
+    ctx=lightmapList[lightmapIdx].canvas.getContext('2d');
+
+    for (n=0;n!==nTrig;n++) {
+
+        lft=(chunkIdx%chunkCount)*chunkSize;
+        top=Math.floor(chunkIdx/chunkCount)*chunkSize;
+
+        this.writePolyToChunk(map,meshIdx,n,lightmapIdx,ctx,lft,top,chunkSize,lightmapUVs);
+
+        chunkIdx++;
+    }
+
+    lightmapList[lightmapIdx].chunkIdx=chunkIdx;
+
+        // set the lightmap UVs in the mesh
+
+    mesh.setLightmapUVs(lightmapIdx,lightmapUVs);
+    
+        // move on to next mesh
+        // if out of mesh, finish up creation
+        // by saving the light maps
         
-            // set the lightmap UVs in the mesh
-            
-        mesh.setLightmapUVs(lightmapIdx,lightmapUVs);
+    meshIdx++;
+    if (meshIdx>=map.meshes.length) {
+        this.createFinish(lightmapList);
+        return;
     }
     
-        // save any current bitmap
+        // next mesh
         
-    if (bitmapCanvas!==null) genLightmap.finishBitmap(lightmapIdx,bitmapCanvas);
+    this.createLightmapForMesh(map,meshIdx,chunkCount,chunkSize,lightmapList);
 };
 
 //
@@ -543,7 +553,34 @@ genLightmap.createTimer=function(map)
 
 genLightmap.create=function(map)
 {
-
-    this.createTimer(map);
-
+        // chunks are one part of the
+        // lightmap used to store one triangle
+        
+    var chunkCount=Math.floor(Math.sqrt(genLightmap.TRIG_PER_TEXTURE));
+    var chunkSize=Math.floor(genLightmap.TEXTURE_SIZE/chunkCount);
+    
+        // array of bitmaps that make up the lightmap
+        // each is an object with a canvas and the last chunk
+        // drawn to (the chunkIdx)
+        
+    var lightmapList=[];
+    
+        // run through the meshes
+        // by a timer so we don't trigger the
+        // script time out problem
+    
+    //setTimeout(function() { wsInitFinish(); },10);
+    this.createLightmapForMesh(map,0,chunkCount,chunkSize,lightmapList);
+};
+    
+genLightmap.createFinish=function(lightmapList)
+{
+    var n;
+    
+        // load all the bitmaps into
+        // webgl
+        
+    for (n=0;n!==lightmapList.length;n++) {
+        this.finishBitmap(n,lightmapList[n].canvas);
+    }
 };

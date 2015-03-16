@@ -142,7 +142,7 @@ function wsRefresh()
         // start at the texture generating step
         
     wsStageStatus('Generating Dynamic Textures');
-    setTimeout(wsInitBuildTextures,100);
+    setTimeout(function() { wsInitBuildTextures(); },10);
 }
 
 //
@@ -156,10 +156,10 @@ function wsInit()
 {
         // setup the random numbers
     
-    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-//    document.getElementById('wsBitmapRandom').value=123456789; // a version to create the same map everytime for speed testing
-//    document.getElementById('wsMapRandom').value=123456789;
+//    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+//    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsBitmapRandom').value=123456789; // a version to create the same map everytime for speed testing
+    document.getElementById('wsMapRandom').value=123456789;
     
         // no timer yet
         
@@ -168,7 +168,7 @@ function wsInit()
         // start the initialization
         
     wsStageStatus('Initializing WebGL');
-    setTimeout(wsInitWebGL,100);
+    setTimeout(function() { wsInitWebGL(); },10);
 }
     
 function wsInitWebGL()
@@ -185,7 +185,7 @@ function wsInitWebGL()
     
     wsUpdateStatus();
     wsStageStatus('Loading Shaders');
-    setTimeout(wsInitLoadShaders,100);
+    setTimeout(function() { wsInitLoadShaders(); },10);
 }
     
 function wsInitLoadShaders()
@@ -199,7 +199,7 @@ function wsInitLoadShaders()
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Textures');
-    setTimeout(wsInitBuildTextures,100);
+    setTimeout(function() { wsInitBuildTextures(); },10);
 }
 
 function wsInitBuildTextures()
@@ -222,7 +222,7 @@ function wsInitBuildTextures()
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Map');
-    setTimeout(wsInitBuildMap,100);
+    setTimeout(function() { wsInitBuildMap(); },10);
 }
 
 function wsInitBuildMap()
@@ -239,7 +239,7 @@ function wsInitBuildMap()
     
     wsUpdateStatus();
     wsStageStatus('Building Light Map');
-    setTimeout(wsInitBuildLightmap,100);
+    setTimeout(function() { wsInitBuildLightmap(); },10);
 }
 
 function wsInitBuildLightmap()
@@ -252,7 +252,7 @@ function wsInitBuildLightmap()
     
     wsUpdateStatus();
     wsStageStatus('Running');
-    setTimeout(wsInitFinish,100);
+    setTimeout(function() { wsInitFinish(); },10);
 }
 
 function wsInitFinish()
@@ -280,7 +280,7 @@ function wsInitFinish()
         // run the main interval
         // do set this up if we already have one
         
-    if (timer===null) timer=setInterval(wsLoop,WS_FPS_TIMER_MSECS);
+    if (timer===null) timer=setInterval(function() { wsLoop(); },WS_FPS_TIMER_MSECS);
 }
 
 

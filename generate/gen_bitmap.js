@@ -271,7 +271,7 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
     
         // clear canvases
         
-    genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,'FFFFFF');
+    genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,'#FFFFFF');
     genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
     
         // regular wood planking
