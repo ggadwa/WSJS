@@ -24,6 +24,21 @@ var AMBIENT_G=0.3;
 var AMBIENT_B=0.3;
 
 //
+// textures to build
+//
+
+var wsTextureBuildList=
+    [
+        [BITMAP_BRICK_STACK,genBitmap.TYPE_BRICK_STACK],
+        [BITMAP_BRICK_RANDOM,genBitmap.TYPE_BRICK_RANDOM],
+        [BITMAP_TILE,genBitmap.TYPE_TILE],
+        [BITMAP_METAL,genBitmap.TYPE_METAL],
+        [BITMAP_CONCRETE,genBitmap.TYPE_CONCRETE],
+        [BITMAP_WOOD_PLANK,genBitmap.TYPE_WOOD_PLANK],
+        [BITMAP_WOOD_BOX,genBitmap.TYPE_WOOD_BOX]
+    ];
+
+//
 // global objects
 //
 
@@ -110,7 +125,7 @@ var statusStartMS;
 
 function wsStageStatus(status)
 {
-    var elem=document.getElementById('wsStatus');
+    var elem=document.getElementById('wsStatusText');
     
     oldStatusStr=elem.innerHTML;
     oldStatusStr+=status;
@@ -122,11 +137,28 @@ function wsStageStatus(status)
 
 function wsUpdateStatus()
 {
-    var elem=document.getElementById('wsStatus');
+    var elem=document.getElementById('wsStatusText');
 
     var completeMS=Date.now()-statusStartMS;
     
     elem.innerHTML=(oldStatusStr+' '+completeMS+'ms<br>');
+}
+
+var wsStatusBarCount;
+var wsStatusBarMaxCount;
+
+function wsStartStatusBar(maxCount)
+{
+    wsStatusBarCount=-1;
+    wsStatusBarMaxCount=maxCount;
+    wsNextStatusBar();
+}
+
+function wsNextStatusBar()
+{
+    wsStatusBarCount++;
+    if (wsStatusBarCount>wsStatusBarMaxCount) wsStatusBarCount=wsStatusBarMaxCount;
+    document.getElementById('wsStatusBarFill').style.width=((wsStatusBarCount/wsStatusBarMaxCount)*100.0)+'%';
 }
 
 //
@@ -142,7 +174,7 @@ function wsRefresh()
         // start at the texture generating step
         
     wsStageStatus('Generating Dynamic Textures');
-    setTimeout(function() { wsInitBuildTextures(); },10);
+    setTimeout(wsInitBuildTextures,10);
 }
 
 //
@@ -168,7 +200,7 @@ function wsInit()
         // start the initialization
         
     wsStageStatus('Initializing WebGL');
-    setTimeout(function() { wsInitWebGL(); },10);
+    setTimeout(wsInitWebGL,10);
 }
     
 function wsInitWebGL()
@@ -185,7 +217,7 @@ function wsInitWebGL()
     
     wsUpdateStatus();
     wsStageStatus('Loading Shaders');
-    setTimeout(function() { wsInitLoadShaders(); },10);
+    setTimeout(wsInitLoadShaders,10);
 }
     
 function wsInitLoadShaders()
@@ -199,30 +231,40 @@ function wsInitLoadShaders()
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Textures');
-    setTimeout(function() { wsInitBuildTextures(); },10);
+    setTimeout(function() { wsInitBuildTextures(0); },10);
 }
 
-function wsInitBuildTextures()
+function wsInitBuildTextures(idx)
 {
+    var bitmapCount=wsTextureBuildList.length;
+    
         // random seed
 
-    genRandom.setSeed(parseInt(document.getElementById('wsBitmapRandom').value));
+    if (idx==0) {
+        wsStartStatusBar(bitmapCount);
+        genRandom.setSeed(parseInt(document.getElementById('wsBitmapRandom').value));
+    }
     
-        // generate the bitmaps
+        // generate the bitmap
+    
+    var setup=wsTextureBuildList[idx];
+    
+    genBitmap.generate(setup[0],setup[1],null);
+    wsNextStatusBar();
+    
+        // if more textures, then loop back around
         
-    genBitmap.generate(BITMAP_BRICK_STACK,genBitmap.TYPE_BRICK_STACK,null /*[810,30]*/);
-    genBitmap.generate(BITMAP_BRICK_RANDOM,genBitmap.TYPE_BRICK_RANDOM,null);
-    genBitmap.generate(BITMAP_TILE,genBitmap.TYPE_TILE,null);
-    genBitmap.generate(BITMAP_METAL,genBitmap.TYPE_METAL,null);
-    genBitmap.generate(BITMAP_CONCRETE,genBitmap.TYPE_CONCRETE,null);
-    genBitmap.generate(BITMAP_WOOD_PLANK,genBitmap.TYPE_WOOD_PLANK,null);
-    genBitmap.generate(BITMAP_WOOD_BOX,genBitmap.TYPE_WOOD_BOX,null);
+    idx++;
+    if (idx<wsTextureBuildList.length) {
+        setTimeout(function() { wsInitBuildTextures(idx); },10);
+        return;
+    }
     
         // next step
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Map');
-    setTimeout(function() { wsInitBuildMap(); },10);
+    setTimeout(wsInitBuildMap,10);
 }
 
 function wsInitBuildMap()
@@ -233,26 +275,31 @@ function wsInitBuildMap()
 
         // build the map
         
-    genMap.build(map,new buildMapSetupObject(3,[18000,5000,18000],3,0.25,0.8));
+    genMap.build(map,new buildMapSetupObject(4,3,[18000,5000,18000],3,0.25,0.8));
+    
+    alert(map.meshes.length);
     
         // next step
     
     wsUpdateStatus();
     wsStageStatus('Building Light Map');
-    setTimeout(function() { wsInitBuildLightmap(); },10);
+    setTimeout(wsInitBuildLightmap,10);
 }
 
 function wsInitBuildLightmap()
 {
         // build the light map
+        // light maps are a long running
+        // process so we need a callback
         
-    genLightmap.create(map);
-    
-        // next step
-    
+    genLightmap.create(map,wsInitBuildLightmapFinish);
+}
+
+function wsInitBuildLightmapFinish()
+{
     wsUpdateStatus();
     wsStageStatus('Running');
-    setTimeout(function() { wsInitFinish(); },10);
+    setTimeout(wsInitFinish,10);
 }
 
 function wsInitFinish()
@@ -280,7 +327,7 @@ function wsInitFinish()
         // run the main interval
         // do set this up if we already have one
         
-    if (timer===null) timer=setInterval(function() { wsLoop(); },WS_FPS_TIMER_MSECS);
+    if (timer===null) timer=setInterval(wsLoop,WS_FPS_TIMER_MSECS);
 }
 
 

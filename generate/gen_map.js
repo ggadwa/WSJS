@@ -22,8 +22,9 @@ genMap.STAIR_LENGTH=5000;
 // setup
 //
 
-function buildMapSetupObject(maxRecurseCount,maxRoomSize,maxStoryCount,connectionPercentage,storyChangePercentage)
+function buildMapSetupObject(maxRoom,maxRecurseCount,maxRoomSize,maxStoryCount,connectionPercentage,storyChangePercentage)
 {
+    this.maxRoom=maxRoom;
     this.maxRecurseCount=maxRecurseCount;
     this.maxRoomSize=maxRoomSize;
     this.maxStoryCount=maxStoryCount;
@@ -165,6 +166,9 @@ genMap.addLight=function(map,xBound,yBound,zBound)
     var lightX=xBound.getMidPoint();
     var lightZ=zBound.getMidPoint();
     
+//    lightX=xBound.min+2000; // supergumba -- testing
+//    if (map.lights.length>0) return;    // supergumba -- testing
+
         // light fixture
         
     var xLightBound=new wsBound((lightX-400),(lightX+400));
@@ -335,6 +339,10 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
         if (forceConnectLineIdx===nConnectLine) forceConnectLineIdx=0;
     }
     
+        // bail if we've reach max room count
+        
+    if (map.countMeshByFlag(this.MESH_FLAG_ROOM_WALL)>=setup.maxRoom) return;
+    
         // run through connections
         // if a random boolean flag is true,
         // than try to connect another room
@@ -387,16 +395,18 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
 
 genMap.build=function(map,setup)
 {
-    var n,nMesh;
+    wsStartStatusBar(2);
     
         // start the recursive
         // room adding
-        
+    
     this.buildMapRecursiveRoom(map,setup,0,-1,-1,-1,false,null,null,null,BITMAP_BRICK_RANDOM);
+    wsNextStatusBar();
     
         // delete any shared triangles
-        
+    
     this.removeSharedTriangles(map);
+    wsNextStatusBar();
 };
 
 

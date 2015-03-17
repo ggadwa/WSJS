@@ -66,6 +66,26 @@ function mapBoxMeshCollision(checkMesh,onlyFlag)
 }
 
 //
+// flag counts
+//
+
+function mapCountMeshByFlag(onlyFlag)
+{
+    var n;
+    var nMesh=this.meshes.length;
+    
+    if (onlyFlag===null) return(nMesh);
+    
+    var count=0;
+    
+    for (n=0;n!==nMesh;n++) {
+        if (this.meshes[n].flag===onlyFlag) count++;
+    }
+    
+    return(count);
+}
+
+//
 // map light utilities
 //
 
@@ -119,6 +139,12 @@ function mapCreateViewLightsFromMapLights(view,camera)
             view.lights.splice(idx,0,light);
             if (view.lights.length>shader.LIGHT_COUNT) view.lights.pop();
         }
+    }
+    
+        // fill in any missing lights
+        
+    while (view.lights.length<shader.LIGHT_COUNT) {
+        view.lights.push(null);
     }
 }
 
@@ -179,6 +205,8 @@ function mapObject()
     
     this.addMesh=mapAddMesh;
     this.addLight=mapAddLight;
+    
+    this.countMeshByFlag=mapCountMeshByFlag;
     
     this.boxBoundCollision=mapBoxBoundCollision;
     this.boxMeshCollision=mapBoxMeshCollision;

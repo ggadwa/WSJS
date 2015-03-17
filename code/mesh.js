@@ -91,6 +91,30 @@ function meshRemoveTriangle(trigIdx)
 }
 
 //
+// special caches
+//
+
+function meshBuildTrigPointCache()
+{
+    var n,tIdx;
+    var v0Idx,v1Idx,v2Idx;
+    
+    this.trigPointCache=[];
+    
+    tIdx=0;
+    
+    for (n=0;n!==this.trigCount;n++) {
+        v0Idx=this.indexes[tIdx++]*3;
+        v1Idx=this.indexes[tIdx++]*3;
+        v2Idx=this.indexes[tIdx++]*3;
+
+        this.trigPointCache.push(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]));
+        this.trigPointCache.push(new wsPoint(this.vertices[v1Idx],this.vertices[v1Idx+1],this.vertices[v1Idx+2]));
+        this.trigPointCache.push(new wsPoint(this.vertices[v2Idx],this.vertices[v2Idx+1],this.vertices[v2Idx+2])); 
+    }
+}
+
+//
 // UVs
 //
 
@@ -278,6 +302,10 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     this.vertexAndLightmapUVAttribute=null;
     this.indexBuffer=null;
     
+        // special caches for light map building
+        
+    this.trigPointCache=null;
+    
         // get center and bounds of box
         
     this.center=new wsPoint(this.vertices[0],this.vertices[1],this.vertices[2]);
@@ -321,6 +349,10 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     this.getTriangleVertex=meshGetTriangleVertex;
     this.getTriangleBounds=meshGetTriangleBounds;
     this.removeTriangle=meshRemoveTriangle;
+    
+        // special caches
+        
+    this.buildTrigPointCache=meshBuildTrigPointCache;
     
         // UVs
     

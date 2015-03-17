@@ -84,10 +84,16 @@ function wsAngle(x,y,z)
                 };
 }
 
-function wsBound(min,max)
+function wsBound(value1,value2)
 {
-    this.min=min;
-    this.max=max;
+    if (value1<value2) {
+        this.min=value1;
+        this.max=value2;
+    }
+    else {
+        this.min=value2;
+        this.max=value1;
+    }
     
     this.add=function(addValue)
                 {
