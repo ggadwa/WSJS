@@ -16,146 +16,173 @@ genMapUtil.STAIR_COUNT=10;
 // create cube
 //
 
-genMapUtil.createMeshCube=function(shaderIdx,bitmapIdx,xBound,yBound,zBound,flags)
+genMapUtil.createMeshCube=function(shaderIdx,bitmapIdx,xBound,yBound,zBound,left,right,front,back,top,bottom,flags)
 {
-    var vertices=new Float32Array(108);
+        // get cube size
+        
+    var count=0;
+    if (left) count+=18;
+    if (right) count+=18;
+    if (front) count+=18;
+    if (back) count+=18;
+    if (top) count+=18;
+    if (bottom) count+=18;
+    if (count===0) return(null);
+   
+    var vertices=new Float32Array(count);
     
         // left
-        
-    vertices[0]=xBound.min;
-    vertices[1]=yBound.min;
-    vertices[2]=zBound.min;
-    vertices[3]=xBound.min;
-    vertices[4]=yBound.min;
-    vertices[5]=zBound.max;
-    vertices[6]=xBound.min;
-    vertices[7]=yBound.max;
-    vertices[8]=zBound.max;
-
-    vertices[9]=xBound.min;
-    vertices[10]=yBound.min;
-    vertices[11]=zBound.min;
-    vertices[12]=xBound.min;
-    vertices[13]=yBound.max;
-    vertices[14]=zBound.max;
-    vertices[15]=xBound.min;
-    vertices[16]=yBound.max;
-    vertices[17]=zBound.min;
     
-         // left
-        
-    vertices[18]=xBound.max;
-    vertices[19]=yBound.min;
-    vertices[20]=zBound.min;
-    vertices[21]=xBound.max;
-    vertices[22]=yBound.min;
-    vertices[23]=zBound.max;
-    vertices[24]=xBound.max;
-    vertices[25]=yBound.max;
-    vertices[26]=zBound.max;
+    var idx=0;
+    
+    if (left) {
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
 
-    vertices[27]=xBound.max;
-    vertices[28]=yBound.min;
-    vertices[29]=zBound.min;
-    vertices[30]=xBound.max;
-    vertices[31]=yBound.max;
-    vertices[32]=zBound.max;
-    vertices[33]=xBound.max;
-    vertices[34]=yBound.max;
-    vertices[35]=zBound.min;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
+    }
+    
+         // right
+        
+    if (right) {
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
+    }
     
         // front
-        
-    vertices[36]=xBound.min;
-    vertices[37]=yBound.min;
-    vertices[38]=zBound.min;
-    vertices[39]=xBound.max;
-    vertices[40]=yBound.min;
-    vertices[41]=zBound.min;
-    vertices[42]=xBound.max;
-    vertices[43]=yBound.max;
-    vertices[44]=zBound.min;
+    
+    if (front) {
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
 
-    vertices[45]=xBound.min;
-    vertices[46]=yBound.min;
-    vertices[47]=zBound.min;
-    vertices[48]=xBound.max;
-    vertices[49]=yBound.max;
-    vertices[50]=zBound.min;
-    vertices[51]=xBound.min;
-    vertices[52]=yBound.max;
-    vertices[53]=zBound.min;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
+    }
     
         // back
-        
-    vertices[54]=xBound.min;
-    vertices[55]=yBound.min;
-    vertices[56]=zBound.max;
-    vertices[57]=xBound.max;
-    vertices[58]=yBound.min;
-    vertices[59]=zBound.max;
-    vertices[60]=xBound.max;
-    vertices[61]=yBound.max;
-    vertices[62]=zBound.max;
-
-    vertices[63]=xBound.min;
-    vertices[64]=yBound.min;
-    vertices[65]=zBound.max;
-    vertices[66]=xBound.max;
-    vertices[67]=yBound.max;
-    vertices[68]=zBound.max;
-    vertices[69]=xBound.min;
-    vertices[70]=yBound.max;
-    vertices[71]=zBound.max;
-   
-        // top
-        
-    vertices[72]=xBound.min;
-    vertices[73]=yBound.min;
-    vertices[74]=zBound.min;
-    vertices[75]=xBound.max;
-    vertices[76]=yBound.min;
-    vertices[77]=zBound.min;
-    vertices[78]=xBound.max;
-    vertices[79]=yBound.min;
-    vertices[80]=zBound.max;
-
-    vertices[81]=xBound.min;
-    vertices[82]=yBound.min;
-    vertices[83]=zBound.min;
-    vertices[84]=xBound.max;
-    vertices[85]=yBound.min;
-    vertices[86]=zBound.max;    
-    vertices[87]=xBound.min;
-    vertices[88]=yBound.min;
-    vertices[89]=zBound.max;
-     
-        // bottom
-        
-    vertices[90]=xBound.min;
-    vertices[91]=yBound.max;
-    vertices[92]=zBound.min;
-    vertices[93]=xBound.max;
-    vertices[94]=yBound.max;
-    vertices[95]=zBound.min;
-    vertices[96]=xBound.max;
-    vertices[97]=yBound.max;
-    vertices[98]=zBound.max;
-
-    vertices[99]=xBound.min;
-    vertices[100]=yBound.max;
-    vertices[101]=zBound.min;
-    vertices[102]=xBound.max;
-    vertices[103]=yBound.max;
-    vertices[104]=zBound.max;
-    vertices[105]=xBound.min;
-    vertices[106]=yBound.max;
-    vertices[107]=zBound.max;
-
-    var n;
-    var indexes=new Uint16Array(36);
     
-    for (n=0;n!==36;n++) {
+    if (back) {
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+    }
+    
+        // top
+    
+    if (top) {
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;
+
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;    
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.min;
+        vertices[idx++]=zBound.max;
+    }
+    
+        // bottom
+    
+    if (bottom) {
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.min;
+        vertices[idx++]=xBound.max;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+        vertices[idx++]=xBound.min;
+        vertices[idx++]=yBound.max;
+        vertices[idx++]=zBound.max;
+    }
+    
+    var n;
+    var iCount=Math.floor(count/3);
+    
+    var indexes=new Uint16Array(iCount);
+    
+    for (n=0;n!==iCount;n++) {
         indexes[n]=n;
     }
     
@@ -249,7 +276,7 @@ genMapUtil.createMeshPryamid=function(shaderIdx,bitmapIdx,xBound,yBound,zBound,f
 
 genMapUtil.createStairsPosX=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
 {
-    var n;
+    var n,mesh,mesh2;
     var stepAdd=(xBound.max-xBound.min)/this.STAIR_COUNT;
     var stepDrop=(yBound.max-yBound.min)/(this.STAIR_COUNT+1);
     var xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
@@ -257,14 +284,22 @@ genMapUtil.createStairsPosX=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBoun
     
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
-        map.addMesh(this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,genMap.MESH_FLAG_STAIR));
+        if (n===0) {
+            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,false,true,true,true,true,false,genMap.MESH_FLAG_STAIR);
+        }
+        else {
+            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,false,true,true,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh.combineMesh(mesh2);
+        }
         xStepBound.add(stepAdd);
     }
+    
+    map.addMesh(mesh);
 };
 
 genMapUtil.createStairsPosZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
 {
-    var n;
+    var n,mesh,mesh2;
     var stepAdd=(zBound.max-zBound.min)/this.STAIR_COUNT;
     var stepDrop=(yBound.max-yBound.min)/(this.STAIR_COUNT+1);
     var zStepBound=new wsBound(zBound.min,zBound.min+stepAdd);
@@ -272,14 +307,22 @@ genMapUtil.createStairsPosZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBoun
     
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
-        map.addMesh(this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,genMap.MESH_FLAG_STAIR));
+        if (n===0) {
+            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,true,true,false,true,true,false,genMap.MESH_FLAG_STAIR);
+        }
+        else {
+            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,true,true,false,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh.combineMesh(mesh2);
+        }
         zStepBound.add(stepAdd);
     }
+    
+    map.addMesh(mesh);
 };
 
 genMapUtil.createStairsNegX=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
 {
-    var n;
+    var n,mesh,mesh2;
     var stepAdd=(xBound.max-xBound.min)/this.STAIR_COUNT;
     var stepDrop=(yBound.max-yBound.min)/(this.STAIR_COUNT+1);
     var xStepBound=new wsBound((xBound.max-stepAdd),xBound.max);
@@ -287,14 +330,22 @@ genMapUtil.createStairsNegX=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBoun
     
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
-        map.addMesh(this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,genMap.MESH_FLAG_STAIR));
+        if (n===0) {
+            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,true,false,true,true,true,false,genMap.MESH_FLAG_STAIR);
+        }
+        else {
+            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,true,false,true,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh.combineMesh(mesh2);
+        }
         xStepBound.add(-stepAdd);
     }
+    
+    map.addMesh(mesh);
 };
 
 genMapUtil.createStairsNegZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
 {
-    var n;
+    var n,mesh,mesh2;
     var stepAdd=(zBound.max-zBound.min)/this.STAIR_COUNT;
     var stepDrop=(yBound.max-yBound.min)/(this.STAIR_COUNT+1);
     var zStepBound=new wsBound((zBound.max-stepAdd),zBound.max);
@@ -302,7 +353,15 @@ genMapUtil.createStairsNegZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBoun
     
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
-        map.addMesh(this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,genMap.MESH_FLAG_STAIR));
+        if (n===0) {
+            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,true,true,true,false,true,false,genMap.MESH_FLAG_STAIR);
+        }
+        else {
+            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,true,true,true,false,true,false,genMap.MESH_FLAG_STAIR);
+            mesh.combineMesh(mesh2);
+        }
         zStepBound.add(-stepAdd);
     }
+    
+    map.addMesh(mesh);
 };

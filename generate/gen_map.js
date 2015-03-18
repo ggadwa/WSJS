@@ -122,16 +122,33 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,nextWallBi
 {
     var n;
     
+        // floor
+        
     map.addMesh(piece.createMeshFloor(SHADER_NORMAL,BITMAP_TILE,xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
     
+        // walls
+        // combine into a single mesh
+        
     var yStoryAdd=yBound.max-yBound.min;
     var yStoryBound=yBound.copy();
     
-    for (n=0;n!==storyCount;n++) {
-        if (n!==0) yStoryBound.add(-yStoryAdd);
-        map.addMesh(piece.createMeshWalls(SHADER_NORMAL,nextWallBitmap,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL));
-    }
+    var mesh,mesh2;
     
+    for (n=0;n!==storyCount;n++) {
+        if (n===0) {
+            mesh=piece.createMeshWalls(SHADER_NORMAL,nextWallBitmap,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+        }
+        else {
+            yStoryBound.add(-yStoryAdd);
+            mesh2=piece.createMeshWalls(SHADER_NORMAL,nextWallBitmap,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh.combineMesh(mesh2);
+        }
+    }
+
+    map.addMesh(mesh);
+    
+        // ceiling
+        
     map.addMesh(piece.createMeshCeiling(SHADER_NORMAL,BITMAP_WOOD_PLANK,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_CEILING));
 
     return(yStoryBound);

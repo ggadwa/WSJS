@@ -1,12 +1,5 @@
 
 
-- need mesh.combine(mesh)
-   - mesh story walls need to be one mesh
-   - stairs need to be one mesh
-
-
-
-
 
 - map pieces to typed arrays
 

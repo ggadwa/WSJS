@@ -275,9 +275,7 @@ function wsInitBuildMap()
 
         // build the map
         
-    genMap.build(map,new buildMapSetupObject(4,3,[18000,5000,18000],3,0.25,0.8));
-    
-    alert(map.meshes.length);
+    genMap.build(map,new buildMapSetupObject(2,3,[18000,5000,18000],3,0.25,0.8));
     
         // next step
     

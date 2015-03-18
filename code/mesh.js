@@ -1,6 +1,74 @@
 "use strict";
 
 //
+// combine two meshes
+//
+
+function meshCombineMesh(mesh)
+{
+        // change the data
+        
+    var vertices2=new Float32Array(this.vertices.length+mesh.vertices.length);
+    vertices2.set(this.vertices,0);
+    vertices2.set(mesh.vertices,this.vertices.length);
+    this.vertices=vertices2;
+    
+    var normals2=new Float32Array(this.normals.length+mesh.normals.length);
+    normals2.set(this.normals,0);
+    normals2.set(mesh.normals,this.normals.length);
+    this.normals=normals2;
+    
+    var tangents2=new Float32Array(this.tangents.length+mesh.tangents.length);
+    tangents2.set(this.tangents,0);
+    tangents2.set(mesh.tangents,this.tangents.length);
+    this.tangents=tangents2;
+    
+    var vertexUVs2=new Float32Array(this.vertexUVs.length+mesh.vertexUVs.length);
+    vertexUVs2.set(this.vertexUVs,0);
+    vertexUVs2.set(mesh.vertexUVs,this.vertexUVs.length);
+    this.vertexUVs=vertexUVs2;
+    
+    if ((this.lightmapUVs!==null) && (mesh.lightmapUVs!==null)) {
+        var lightmapUVs2=new Float32Array(this.lightmapUVs.length+mesh.lightmapUVs.length);
+        lightmapUVs2.set(this.lightmapUVs,0);
+        lightmapUVs2.set(mesh.lightmapUVs,this.lightmapUVs.length);
+        this.lightmapUVs=lightmapUVs2;
+    }
+    else {
+        this.lightmapUVs=null;
+    }
+    
+        // indexes need to be moved
+        
+    var indexes2=new Uint16Array(this.indexes.length+mesh.indexes.length);
+    indexes2.set(this.indexes,0);
+    
+    var n;
+    var iAdd=this.indexes.length;
+    
+    for (n=0;n!==mesh.indexes.length;n++) {
+        indexes2[n+iAdd]=mesh.indexes[n]+iAdd;
+    }
+
+    this.indexes=indexes2;
+    
+        // reset counts
+        
+    this.vertexCount=Math.floor(this.vertices.length/3);
+    this.indexCount=this.indexes.length;
+    this.trigCount=Math.floor(this.indexCount/3);
+    
+        // setup bounds
+        
+    this.setupBounds();
+    
+        // UV and light map UVs are packed
+        // so we need to build this buffer
+        
+    this.rebuildPackedUVBuffer();
+}
+
+//
 // mesh box collision
 //
 
@@ -88,6 +156,44 @@ function meshRemoveTriangle(trigIdx)
     
     this.indexCount-=3;
     this.trigCount--;
+}
+
+//
+// setup mesh boxes and bounds
+//
+
+function meshSetupBounds()
+{
+    this.center=new wsPoint(this.vertices[0],this.vertices[1],this.vertices[2]);
+    this.xBound=new wsBound(this.vertices[0],this.vertices[0]);
+    this.yBound=new wsBound(this.vertices[1],this.vertices[1]);
+    this.zBound=new wsBound(this.vertices[2],this.vertices[2]);
+    
+    var n,x,y,z;
+    var idx=3;
+    
+    for (n=1;n<this.vertexCount;n++) {
+        x=this.vertices[idx];
+        y=this.vertices[idx+1];
+        z=this.vertices[idx+2];
+        
+        this.center.x+=x;
+        this.center.y+=y;
+        this.center.z+=z;
+        
+        if (x<this.xBound.min) this.xBound.min=x;
+        if (x>this.xBound.max) this.xBound.max=x;
+        if (y<this.yBound.min) this.yBound.min=y;
+        if (y>this.yBound.max) this.yBound.max=y;
+        if (z<this.zBound.min) this.zBound.min=z;
+        if (z>this.zBound.max) this.zBound.max=z;
+        
+        idx+=3;
+    }
+    
+    this.center.x/=this.vertexCount;
+    this.center.y/=this.vertexCount;
+    this.center.z/=this.vertexCount;
 }
 
 //
@@ -291,7 +397,7 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     this.flag=flag;
     
     this.vertexCount=Math.floor(this.vertices.length/3);
-    this.indexCount=indexes.length;
+    this.indexCount=this.indexes.length;
     this.trigCount=Math.floor(this.indexCount/3);
     
         // null buffers
@@ -306,40 +412,11 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
         
     this.trigPointCache=null;
     
-        // get center and bounds of box
+        // mesh alterations
         
-    this.center=new wsPoint(this.vertices[0],this.vertices[1],this.vertices[2]);
-    this.xBound=new wsBound(this.vertices[0],this.vertices[0]);
-    this.yBound=new wsBound(this.vertices[1],this.vertices[1]);
-    this.zBound=new wsBound(this.vertices[2],this.vertices[2]);
-    
-    var n,x,y,z;
-    var idx=3;
-    
-    for (n=1;n<this.vertexCount;n++) {
-        x=this.vertices[idx];
-        y=this.vertices[idx+1];
-        z=this.vertices[idx+2];
-        
-        this.center.x+=x;
-        this.center.y+=y;
-        this.center.z+=z;
-        
-        if (x<this.xBound.min) this.xBound.min=x;
-        if (x>this.xBound.max) this.xBound.max=x;
-        if (y<this.yBound.min) this.yBound.min=y;
-        if (y>this.yBound.max) this.yBound.max=y;
-        if (z<this.zBound.min) this.zBound.min=z;
-        if (z>this.zBound.max) this.zBound.max=z;
-        
-        idx+=3;
-    }
-    
-    this.center.x/=this.vertexCount;
-    this.center.y/=this.vertexCount;
-    this.center.z/=this.vertexCount;
+    this.combineMesh=meshCombineMesh;
 
-        // utility functions
+        // collision functions
         
     this.boxBoundCollision=meshBoxBoundCollision;
     this.boxMeshCollision=meshBoxMeshCollision;
@@ -349,6 +426,10 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     this.getTriangleVertex=meshGetTriangleVertex;
     this.getTriangleBounds=meshGetTriangleBounds;
     this.removeTriangle=meshRemoveTriangle;
+    
+        // setup
+        
+    this.setupBounds=meshSetupBounds;
     
         // special caches
         
@@ -371,6 +452,10 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
         // close functions
         
     this.close=meshClose;
+    
+        // setup bounds
+        
+    this.setupBounds();
     
         // UV and light map UVs are packed
         // so we need to build this buffer
