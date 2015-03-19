@@ -119,12 +119,9 @@ function meshGetTriangleBounds(trigIdx)
     
     for (var n=1;n!==3;n++) {
         v=this.getTriangleVertex(trigIdx,n);
-        if (v[0]<xBound.min) xBound.min=v[0];
-        if (v[0]>xBound.max) xBound.max=v[0];
-        if (v[1]<yBound.min) yBound.min=v[1];
-        if (v[1]>yBound.max) yBound.max=v[1];
-        if (v[2]<zBound.min) zBound.min=v[2];
-        if (v[2]>zBound.max) zBound.max=v[2];
+        xBound.adjust(v[0]);
+        yBound.adjust(v[1]);
+        zBound.adjust(v[2]);
     }
     
     return([xBound,yBound,zBound]);
@@ -181,12 +178,9 @@ function meshSetupBounds()
         this.center.y+=y;
         this.center.z+=z;
         
-        if (x<this.xBound.min) this.xBound.min=x;
-        if (x>this.xBound.max) this.xBound.max=x;
-        if (y<this.yBound.min) this.yBound.min=y;
-        if (y>this.yBound.max) this.yBound.max=y;
-        if (z<this.zBound.min) this.zBound.min=z;
-        if (z>this.zBound.max) this.zBound.max=z;
+        this.xBound.adjust(x);
+        this.yBound.adjust(y);
+        this.zBound.adjust(z);
         
         idx+=3;
     }
@@ -200,23 +194,52 @@ function meshSetupBounds()
 // special caches
 //
 
-function meshBuildTrigPointCache()
+function meshBuildTrigRayTraceCache()
 {
-    var n,tIdx;
+    var n,tIdx,cIdx;
     var v0Idx,v1Idx,v2Idx;
     
-    this.trigPointCache=[];
+        // this builds a specialized cache to
+        // speed up ray tracing.  For each triangle
+        // in the mesh it builds this packed array
+        
+        // X of point 0
+        // Y of point 0
+        // Z of point 0
+        // vector X of point 1-point 0
+        // vector Y of point 1-point 0
+        // vector Z of point 1-point 0
+        // vector X of point 2-point 0
+        // vector Y of point 2-point 0
+        // vector Z of point 2-point 0
+    
+    this.trigRayTraceCache=new Float32Array(this.trigCount*9);
     
     tIdx=0;
+    cIdx=0;
     
     for (n=0;n!==this.trigCount;n++) {
         v0Idx=this.indexes[tIdx++]*3;
         v1Idx=this.indexes[tIdx++]*3;
         v2Idx=this.indexes[tIdx++]*3;
+        
+            // point 0 of the triangle
+            
+        this.trigRayTraceCache[cIdx++]=this.vertices[v0Idx];
+        this.trigRayTraceCache[cIdx++]=this.vertices[v0Idx+1];
+        this.trigRayTraceCache[cIdx++]=this.vertices[v0Idx+2];
+        
+            // vector of point 1-point 0
+            
+        this.trigRayTraceCache[cIdx++]=this.vertices[v1Idx]-this.vertices[v0Idx];    
+        this.trigRayTraceCache[cIdx++]=this.vertices[v1Idx+1]-this.vertices[v0Idx+1];    
+        this.trigRayTraceCache[cIdx++]=this.vertices[v1Idx+2]-this.vertices[v0Idx+2];    
 
-        this.trigPointCache.push(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]));
-        this.trigPointCache.push(new wsPoint(this.vertices[v1Idx],this.vertices[v1Idx+1],this.vertices[v1Idx+2]));
-        this.trigPointCache.push(new wsPoint(this.vertices[v2Idx],this.vertices[v2Idx+1],this.vertices[v2Idx+2])); 
+            // vector of point 2-point 0
+            
+        this.trigRayTraceCache[cIdx++]=this.vertices[v2Idx]-this.vertices[v0Idx];    
+        this.trigRayTraceCache[cIdx++]=this.vertices[v2Idx+1]-this.vertices[v0Idx+1];    
+        this.trigRayTraceCache[cIdx++]=this.vertices[v2Idx+2]-this.vertices[v0Idx+2];    
     }
 }
 
@@ -410,7 +433,7 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     
         // special caches for light map building
         
-    this.trigPointCache=null;
+    this.trigRayTracecache=null;
     
         // mesh alterations
         
@@ -433,7 +456,7 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     
         // special caches
         
-    this.buildTrigPointCache=meshBuildTrigPointCache;
+    this.buildTrigRayTraceCache=meshBuildTrigRayTraceCache;
     
         // UVs
     

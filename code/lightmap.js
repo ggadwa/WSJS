@@ -35,6 +35,21 @@ lightmap.load=function(lightmapIndex,bitmapCanvas)
 };
 
 //
+// close all lightmaps
+//
+
+lightmap.close=function()
+{
+    var n;
+    
+    for (n=0;n!==this.lightmapList.length;n++) {
+        if (this.lightmapList[n]!==null) gl.deleteTexture(this.lightmapList[n]);
+    }
+    
+    this.lightmapList=[];
+};
+
+//
 // drawing bitmaps start/stop/set
 //
 

@@ -150,7 +150,14 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,nextWallBi
         // ceiling
         
     map.addMesh(piece.createMeshCeiling(SHADER_NORMAL,BITMAP_WOOD_PLANK,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_CEILING));
-
+    
+        // supergumba -- testing, box in middle
+ /*   
+    var boxBoundX=new wsBound(xBound.getMidPoint()-1000,xBound.getMidPoint()+1000);
+    var boxBoundY=new wsBound(yBound.max-2000,yBound.max);
+    var boxBoundZ=new wsBound(zBound.getMidPoint()-1000,zBound.getMidPoint()+1000);
+    map.addMesh(genMapUtil.createMeshCube(SHADER_NORMAL,BITMAP_WOOD_PLANK,boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,false,0));
+*/
     return(yStoryBound);
 };
 
@@ -183,9 +190,6 @@ genMap.addLight=function(map,xBound,yBound,zBound)
     var lightX=xBound.getMidPoint();
     var lightZ=zBound.getMidPoint();
     
-//    lightX=xBound.min+2000; // supergumba -- testing
-//    if (map.lights.length>0) return;    // supergumba -- testing
-
         // light fixture
         
     var xLightBound=new wsBound((lightX-400),(lightX+400));
@@ -194,7 +198,7 @@ genMap.addLight=function(map,xBound,yBound,zBound)
     map.addMesh(genMapUtil.createMeshPryamid(SHADER_NORMAL,BITMAP_METAL,xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
     
         // the color
-        // 
+
     var red=0.8+(genRandom.random()*0.2);
     var green=0.8+(genRandom.random()*0.2);
     var blue=0.8+(genRandom.random()*0.2);
@@ -202,7 +206,7 @@ genMap.addLight=function(map,xBound,yBound,zBound)
         // light
         
     var intensity=(xBound.max-xBound.min)*0.95;
-    map.addLight(new wsLight(new wsPoint(lightX,(yBound.min+1200),lightZ),new wsColor(red,green,blue),true,intensity,1.0));
+    map.addLight(new wsLight(new wsPoint(lightX,(yLightBound.max+1000),lightZ),new wsColor(red,green,blue),true,intensity,1.0));
 };
 
 //

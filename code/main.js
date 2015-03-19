@@ -135,6 +135,11 @@ function wsStageStatus(status)
     statusStartMS=Date.now();
 }
 
+function wsClearStatus()
+{
+    document.getElementById('wsStatusText').innerHTML='';
+}
+
 function wsUpdateStatus()
 {
     var elem=document.getElementById('wsStatusText');
@@ -170,11 +175,14 @@ function wsRefresh()
         // close old map
         
     map.close();
+    lightmap.close();
+    bitmap.close();
     
         // start at the texture generating step
-        
+    
+    wsClearStatus();
     wsStageStatus('Generating Dynamic Textures');
-    setTimeout(wsInitBuildTextures,10);
+    setTimeout(function() { wsInitBuildTextures(0); },10);
 }
 
 //
@@ -188,10 +196,10 @@ function wsInit()
 {
         // setup the random numbers
     
-//    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-//    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsBitmapRandom').value=123456789; // a version to create the same map everytime for speed testing
-    document.getElementById('wsMapRandom').value=123456789;
+    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
+    //document.getElementById('wsMapRandom').value=123456789;
     
         // no timer yet
         
@@ -275,7 +283,7 @@ function wsInitBuildMap()
 
         // build the map
         
-    genMap.build(map,new buildMapSetupObject(2,3,[18000,5000,18000],3,0.25,0.8));
+    genMap.build(map,new buildMapSetupObject(3,3,[18000,5000,18000],3,0.25,0.8));
     
         // next step
     

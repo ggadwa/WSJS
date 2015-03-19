@@ -55,6 +55,25 @@ bitmap.load=function(bitmapIndex,bitmapCanvas,normalMapCanvas,specularMapCanvas,
 };
 
 //
+// close all bitmaps
+//
+
+bitmap.close=function()
+{
+    var n;
+    
+    for (n=0;n!==this.bitmapList.length;n++) {
+        if (this.bitmapList[n]!==null) {
+            gl.deleteTexture(this.bitmapList[n].texture);
+            gl.deleteTexture(this.bitmapList[n].normalMap);
+            gl.deleteTexture(this.bitmapList[n].specularMap);
+        }
+    }
+    
+    this.bitmapList=[];
+};
+
+//
 // misc getters
 //
 

@@ -77,19 +77,23 @@ genLightmap.finishBitmap=function(lightmapIdx,bitmapCanvas)
 // ray tracing
 //
 
-genLightmap.rayTraceCollision=function(v,vector,trigPt0,trigPt1,trigPt2)
+genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,tv1y,tv1z,tv2x,tv2y,tv2z)
 {
-		// get triangle vectors
-        
-    var v1=vec3.fromValues((trigPt1.x-trigPt0.x),(trigPt1.y-trigPt0.y),(trigPt1.z-trigPt0.z));
-    var v2=vec3.fromValues((trigPt2.x-trigPt0.x),(trigPt2.y-trigPt0.y),(trigPt2.z-trigPt0.z));
+		// we pass in a single vertex (t0x,t0y,t0z) and
+        // these pre-calculated vectors for the other
+        // sides of the triangle
+        // tv1[x,y,z]=t1[x,y,z]-t0[x,y,z]
+        // tv2[x,y,z]=t2[x,y,z]-t0[x,y,z]
 	
 		// calculate the determinate
         // perpVector is cross(vector,v2)
         // det is dot(v1,perpVector)
         
-    var perpVector=new wsPoint(((vector.y*v2.z)-(vector.z*v2.y)),((vector.z*v2.x)-(vector.x*v2.z)),((vector.x*v2.y)-(vector.y*v2.x)));
-    var det=(v1.x*perpVector.x)+(v1.y*perpVector.y)+(v1.z*perpVector.z);
+    var perpVectorX=(vctY*tv2z)-(vctZ*tv2y);
+    var perpVectorY=(vctZ*tv2x)-(vctX*tv2z);
+    var perpVectorZ=(vctX*tv2y)-(vctY*tv2x);
+
+    var det=(tv1x*perpVectorX)+(tv1y*perpVectorY)+(tv1z*perpVectorZ);
 
 		// is line on the same plane as triangle?
 		
@@ -103,16 +107,22 @@ genLightmap.rayTraceCollision=function(v,vector,trigPt0,trigPt1,trigPt2)
         // lineToTrigPointVector is vector from vertex to triangle point 0
         // u is invDet * dot(lineToTrigPointVector,perpVector)
         
-    var lineToTrigPointVector=new wsPoint((v.x-trigPt0.x),(v.y-trigPt0.y),(v.z-trigPt0.z));
-    var u=invDet*((lineToTrigPointVector.x*perpVector.x)+(lineToTrigPointVector.y*perpVector.y)+(lineToTrigPointVector.z*perpVector.z));
+    var lineToTrigPointVectorX=vx-t0x;
+    var lineToTrigPointVectorY=vy-t0y;
+    var lineToTrigPointVectorZ=vz-t0z;
+
+    var u=invDet*((lineToTrigPointVectorX*perpVectorX)+(lineToTrigPointVectorY*perpVectorY)+(lineToTrigPointVectorZ*perpVectorZ));
 	if ((u<0.0) || (u>1.0)) return(false);
 	
 		// calculate triangle V and test
         // lineToTrigPerpVector is cross(lineToTrigPointVector,v1)
         // v is invDet * dot(vector,lineToTrigPerpVector)
         
-    var lineToTrigPerpVector=new wsPoint(((lineToTrigPointVector.y*v1.z)-(lineToTrigPointVector.z*v1.y)),((lineToTrigPointVector.z*v1.x)-(lineToTrigPointVector.x*v1.z)),((lineToTrigPointVector.x*v1.y)-(lineToTrigPointVector.y*v1.x)));
-    var v=invDet*((vector.x*lineToTrigPerpVector.x)+(vector.y*lineToTrigPerpVector.y)+(vector.z*lineToTrigPerpVector.z));
+    var lineToTrigPerpVectorX=(lineToTrigPointVectorY*tv1z)-(lineToTrigPointVectorZ*tv1y);
+    var lineToTrigPerpVectorY=(lineToTrigPointVectorZ*tv1x)-(lineToTrigPointVectorX*tv1z);
+    var lineToTrigPerpVectorZ=(lineToTrigPointVectorX*tv1y)-(lineToTrigPointVectorY*tv1x);
+
+    var v=invDet*((vctX*lineToTrigPerpVectorX)+(vctY*lineToTrigPerpVectorY)+(vctZ*lineToTrigPerpVectorZ));
 	if ((v<0.0) || ((u+v)>1.0)) return(false);
 	
 		// t is the point on the line, from the
@@ -122,72 +132,17 @@ genLightmap.rayTraceCollision=function(v,vector,trigPt0,trigPt1,trigPt2)
 		// hits, we add in an extra 0.01f slop so polygons that are
 		// touching each other don't have edges grayed in
 
-    var t=invDet*((v2.x*lineToTrigPerpVector.x)+(v2.y*lineToTrigPerpVector.y)+(v2.z*lineToTrigPerpVector.z));
-	return(t>0.01);
+    var t=invDet*((tv2x*lineToTrigPerpVectorX)+(tv2y*lineToTrigPerpVectorY)+(tv2z*lineToTrigPerpVectorZ));
+	return((t>0.01)&&(t<1.0));
 };
 
-/*
- 
-float light_map_ray_trace_triangle(d3pnt *spt,d3vct *vct,int *x,int *y,int *z)
-{
-	float				det,invDet,t,u,v;
-	d3vct				perpVector,lineToTrigPointVector,lineToTrigPerpVector,v1,v2;
-	
-		// get triangle vectors
-		
-	ray_trace_create_vector_from_points(&v1,x[1],y[1],z[1],x[0],y[0],z[0]);
-	ray_trace_create_vector_from_points(&v2,x[2],y[2],z[2],x[0],y[0],z[0]);
-	
-		// calculate the determinate
-
-	ray_trace_vector_cross_product(&perpVector,vct,&v2);
-	det=ray_trace_vector_inner_product(&v1,&perpVector);
-	
-		// is line on the same plane as triangle?
-		
-	if ((det>-0.00001f) && (det<0.00001f)) return(-1.0f);
-
-		// get the inverse determinate
-
-	invDet=1.0f/det;
-
-		// calculate triangle U and test
-	
-	ray_trace_create_vector_from_points(&lineToTrigPointVector,spt->x,spt->y,spt->z,x[0],y[0],z[0]);
-	u=invDet*ray_trace_vector_inner_product(&lineToTrigPointVector,&perpVector);
-	if ((u<0.0f) || (u>1.0f)) return(-1.0f);
-	
-		// calculate triangle V and test
-
-	ray_trace_vector_cross_product(&lineToTrigPerpVector,&lineToTrigPointVector,&v1);
-	v=invDet*ray_trace_vector_inner_product(vct,&lineToTrigPerpVector);
-	if ((v<0.0f) || ((u+v)>1.0f)) return(-1.0f);
-	
-		// get line T for point(t) =  start_point + (vector*t)
-		// -t are on the negative vector behind the point, so ignore
-		
-		// this is a little different then normal ray trace
-		// hits, we add in an extra 0.01f slop so polygons that are
-		// touching each other don't have edges grayed in
-
-	t=invDet*ray_trace_vector_inner_product(&v2,&lineToTrigPerpVector);
-	if (t<=0.01f) return(-1.0f);
-	
-		// a hit!
-		
-	return(t);
-}
-
- */
-
-
-genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,v)
+genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,vx,vy,vz)
 {
     var n,nLight,trigCount;
     var light;
-    var k,p,hit,mesh,nMesh,tIdx;
-    var trigPointCache;
-    var lightVector;
+    var k,p,hit,mesh,nMesh,cIdx;
+    var trigRayTraceCache;
+    var lightVectorX,lightVectorY,lightVectorZ;
     var lightBoundX,lightBoundY,lightBoundZ;
     var dist,att;
     var col=new wsColor(0.0,0.0,0.0);
@@ -195,46 +150,50 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,v)
     nMesh=map.meshes.length;
     nLight=map.lights.length;
     
+        // NOTE: we precalculated a list of a single point on the
+        // triangle and two vectors for each side around that point
+        // to speed this up.  That's what the trigRayTraceCache is for
+    
     for (n=0;n!==nLight;n++) {
         light=map.lights[n];
         
             // light within light range?
             
-        dist=light.distance(v);
+        dist=light.distanceByTriplet(vx,vy,vz);
         if (dist>light.intensity) continue;
         
             // light vector
+            // break this up into X,Y,Z to avoid
+            // lookup penalities for this code
             
-        lightVector=new wsPoint((light.position.x-v.x),(light.position.y-v.y),(light.position.z-v.z));
-        lightBoundX=new wsBound(v.x,light.position.x);
-        lightBoundY=new wsBound(v.y,light.position.y);
-        lightBoundZ=new wsBound(v.z,light.position.z);
+        lightVectorX=light.position.x-vx;
+        lightVectorY=light.position.y-vy;
+        lightVectorZ=light.position.z-vz;
         
+        lightBoundX=new wsBound(vx,light.position.x);
+        lightBoundY=new wsBound(vy,light.position.y);
+        lightBoundZ=new wsBound(vz,light.position.z);
+            
             // any hits?
-/*         
+        
         hit=false;
         
         for (k=0;k!==nMesh;k++) {
             mesh=map.meshes[k];
             if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
             
-            tIdx=0;
+            cIdx=0;
             trigCount=mesh.trigCount;
-            trigPointCache=mesh.trigPointCache;
+            trigRayTraceCache=mesh.trigRayTraceCache;
             
             for (p=0;p!==trigCount;p++) {
                 
-                if ((k===meshIdx) && (p===trigIdx)) {
-                    tIdx+=3;
-                    continue;
-                }
-                
-                if (genLightmap.rayTraceCollision(v,lightVector,trigPointCache[tIdx],trigPointCache[tIdx+1],trigPointCache[tIdx+2])) {
+                if (genLightmap.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
                     hit=true;
                     break;
                 }
                 
-                tIdx+=3;
+                cIdx+=9;
             }
             
             if (hit) break;
@@ -243,7 +202,7 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,v)
             // if a hit, don't add in light
             
         if (hit) continue;
-*/    
+   
             // get the color, attenuate
             // it and add it to base color
         
@@ -265,7 +224,7 @@ genLightmap.renderTriangle=function(map,meshIdx,trigIdx,ctx,pts,vs,lft,top,rgt,b
 {
     var x,y,lx,rx,tempX,ty,by,idx;
     var lxFactor,rxFactor,vFactor;
-    var v=new wsPoint(0,0,0);
+    var vx,vy,vz;
     var vlx=new wsPoint(0,0,0);
     var vrx=new wsPoint(0,0,0);
     var col;
@@ -366,13 +325,13 @@ genLightmap.renderTriangle=function(map,meshIdx,trigIdx,ctx,pts,vs,lft,top,rgt,b
                 // get the ray trace vetex
             
             vFactor=(x-lx)/(rx-lx);
-            v.x=vlx.x+((vrx.x-vlx.x)*vFactor);
-            v.y=vlx.y+((vrx.y-vlx.y)*vFactor);
-            v.z=vlx.z+((vrx.z-vlx.z)*vFactor);
+            vx=vlx.x+((vrx.x-vlx.x)*vFactor);
+            vy=vlx.y+((vrx.y-vlx.y)*vFactor);
+            vz=vlx.z+((vrx.z-vlx.z)*vFactor);
             
                 // write the pixel
                 
-            col=genLightmap.rayTraceVertex(map,meshIdx,trigIdx,v);
+            col=genLightmap.rayTraceVertex(map,meshIdx,trigIdx,vx,vy,vz);
             data[idx++]=Math.floor(col.r*255.0);
             data[idx++]=Math.floor(col.g*255.0);
             data[idx++]=Math.floor(col.b*255.0);
@@ -551,13 +510,13 @@ genLightmap.createLightmapForMesh=function(map,meshIdx,lightmapList,callbackFunc
         
     meshIdx++;
     if (meshIdx>=map.meshes.length) {
-        setTimeout(function() { genLightmap.createFinish(lightmapList,callbackFunc); },genLightmap.IMEOUT_MSEC);
+        setTimeout(function() { genLightmap.createFinish(lightmapList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
         return;
     }
     
         // next mesh
     
-    setTimeout(function() { genLightmap.createLightmapForMesh(map,meshIdx,lightmapList,callbackFunc); },genLightmap.IMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(map,meshIdx,lightmapList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
 };
 
 //
@@ -579,13 +538,12 @@ genLightmap.create=function(map,callbackFunc)
     var lightmapList=[];
     
         // run through the meshes and build
-        // point lists for all of them to speed up
-        // triangle collisions
+        // cahce to speed up ray tracing
     
     nMesh=map.meshes.length;
     
     for (n=0;n!==nMesh;n++) {
-        map.meshes[n].buildTrigPointCache();
+        map.meshes[n].buildTrigRayTraceCache();
     }
     
     wsNextStatusBar();
@@ -594,7 +552,7 @@ genLightmap.create=function(map,callbackFunc)
         // by a timer so we don't trigger the
         // script time out problem
         
-    setTimeout(function() { genLightmap.createLightmapForMesh(map,0,lightmapList,callbackFunc); },genLightmap.IMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(map,0,lightmapList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
 };
     
 genLightmap.createFinish=function(lightmapList,callbackFunc)

@@ -8,12 +8,14 @@
 - reduce number of varrying to get more lights
 
 - light maps
+    - need smear and smooth
+    - need a no collision mesh (like lights) so they can be highlighted
     - precalc meshes within light range, only search those meshes for collisions
     - light maps need all black, all white spots
        - pre-determine so we can reduce light map usage
-    - need smear and smooth
     - need simple lighting flag
-
+    - need diffuse calcs
+    - need to avoid by reversed normals
 
 
 

@@ -32,9 +32,22 @@ function wsPoint(x,y,z)
                     return((px*px)+(py*py)+(pz*pz));
                 };
                 
+    this.noSquareDistanceByTriplet=function(kx,ky,kz)
+                {
+                    var px=this.x-kx;
+                    var py=this.y-ky;
+                    var pz=this.z-kz;
+                    return((px*px)+(py*py)+(pz*pz));
+                };
+                
     this.distance=function(pt)
                 {
                     return(Math.sqrt(this.noSquareDistance(pt)));
+                };
+                
+    this.distanceByTriplet=function(kx,ky,kz)
+                {
+                    return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
                 };
     
     this.toVec3=function()
@@ -217,6 +230,11 @@ function wsLight(position,color,inLightmap,intensity,exponent)
     this.distance=function(pt)
                 {
                     return(this.position.distance(pt));
+                };
+                
+    this.distanceByTriplet=function(x,y,z)
+                {
+                    return(this.position.distanceByTriplet(x,y,z));
                 };
                 
     this.withinLightRadius=function(pt)

@@ -169,7 +169,7 @@ void main(void)
 
         // finally create the pixel
 
-    //gl_FragColor.rgb=(tex.rgb*pixelAmbient)+spec;
-    gl_FragColor.rgb=texture2D(lightmapTex,fragUV.zw).rgb;
+    gl_FragColor.rgb=(tex.rgb*pixelAmbient)+spec;
+    //gl_FragColor.rgb=texture2D(lightmapTex,fragUV.zw).rgb;//supergumba--testing light maps
     gl_FragColor.a=tex.a;
 }
