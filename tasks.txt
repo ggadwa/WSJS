@@ -8,9 +8,8 @@
 - reduce number of varrying to get more lights
 
 - light maps
-    - need smear and smooth
-    - need a no collision mesh (like lights) so they can be highlighted
     - precalc meshes within light range, only search those meshes for collisions
+    - need a no collision mesh (like lights) so they can be highlighted
     - light maps need all black, all white spots
        - pre-determine so we can reduce light map usage
     - need simple lighting flag
@@ -20,6 +19,7 @@
 
 
 - generator
+    - add a circle piece
     - ? randomize vertices
     - do random inside version (so it's a O)
 

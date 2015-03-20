@@ -70,7 +70,13 @@ function ws2DPoint(x,y)
                 {
                     this.x=Math.floor(xSet);
                     this.y=Math.floor(ySet);
-                }
+                };
+                
+    this.move=function(xAdd,yAdd)
+                {
+                    this.x+=xAdd;
+                    this.y+=yAdd;
+                };
     
     this.copy=function()
                 {

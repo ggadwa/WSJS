@@ -23,6 +23,9 @@ var AMBIENT_R=0.3;
 var AMBIENT_G=0.3;
 var AMBIENT_B=0.3;
 
+var MAX_ROOM=3;
+var SIMPLE_LIGHTMAP=false;
+
 //
 // textures to build
 //
@@ -283,7 +286,7 @@ function wsInitBuildMap()
 
         // build the map
         
-    genMap.build(map,new buildMapSetupObject(3,3,[18000,5000,18000],3,0.25,0.8));
+    genMap.build(map,new buildMapSetupObject(this.MAX_ROOM,3,[18000,5000,18000],3,0.25,0.8));
     
         // next step
     
@@ -298,7 +301,7 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
         
-    genLightmap.create(map,wsInitBuildLightmapFinish);
+    genLightmap.create(map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
 }
 
 function wsInitBuildLightmapFinish()

@@ -37,6 +37,8 @@ genLightmap.CHUNK_PER_TEXTURE=(genLightmap.CHUNK_SPLIT*genLightmap.CHUNK_SPLIT);
 
 genLightmap.RENDER_MARGIN=2;                // margin around each light map triangle
 
+genLightmap.BLUR_COUNT=3;
+
 //
 // start and finish light map bitmaps
 //
@@ -50,9 +52,29 @@ genLightmap.startBitmap=function()
     bitmapCanvas.height=genLightmap.TEXTURE_SIZE;
     var ctx=bitmapCanvas.getContext('2d');
     
-        // clear to black
+        // clear to black with
+        // open alpha (we use this later
+        // for smearing)
+        
+    var imgData=ctx.getImageData(0,0,genLightmap.TEXTURE_SIZE,genLightmap.TEXTURE_SIZE);
+    var data=imgData.data;
     
-    genBitmapUtility.drawRect(ctx,0,0,bitmapCanvas.width,bitmapCanvas.height,'#000000');
+    var n;
+    var pixelCount=genLightmap.TEXTURE_SIZE*genLightmap.TEXTURE_SIZE;
+    var idx=0;
+    
+    for (n=0;n!==pixelCount;n++) {
+        data[idx++]=0;
+        data[idx++]=0;
+        data[idx++]=0;
+        data[idx++]=0;
+    }
+    
+        // replace image data
+        
+    ctx.putImageData(imgData,0,0);
+    
+        // return new canvas
     
     return(bitmapCanvas);
 };
@@ -66,11 +88,186 @@ genLightmap.finishBitmap=function(lightmapIdx,bitmapCanvas)
         // debugging code
 /*   
     if (lightmapIdx<6) {
-        var x=810+((lightmapIdx%3)*205);
-        var y=100+(Math.floor(lightmapIdx/3)*205);
-        debug.displayCanvasData(bitmapCanvas,x,y,200,200);
+        var x=810+((lightmapIdx%3)*305);
+        var y=100+(Math.floor(lightmapIdx/3)*305);
+        debug.displayCanvasData(bitmapCanvas,x,y,300,300);
     }
 */
+};
+
+//
+// border and smear polygons
+//
+
+genLightmap.smudgeChunk=function(data,wid,high)
+{
+    var x,y,cx,cy,cxs,cxe,cys,cye;
+    var idx,idx2;
+    var colCount,r,g,b;
+	var noFill;
+    
+		// we constantly add and re-add
+		// the pixel border until the entire
+		// block is filled.  we use the
+        // alpha channel to determine this
+		
+	while (true) {
+	
+		noFill=true;
+        
+		for (y=0;y!==high;y++) {
+            
+            cys=y-1;
+            if (cys<0) cys=0;
+            cye=y+2;
+            if (cye>=high) cye=high-1;
+	
+			for (x=0;x!==wid;x++) {
+                
+                idx=((y*wid)+x)*4;
+                
+                    // already touched then
+                    // ignore
+                    
+                if (data[idx+3]!==0) continue;
+						
+					// find all the touched pixels around
+                    // it to make the new border
+                    // smear pixel
+					
+				colCount=0;
+				r=g=b=0;
+                
+                cxs=x-1;
+                if (cxs<0) cxs=0;
+                cxe=x+2;
+                if (cxe>=wid) cxe=wid-1;
+				
+				for (cy=cys;cy!==cye;cy++) {
+					for (cx=cxs;cx!==cxe;cx++) {
+                        
+                            // only use touched pixels
+                            
+                        idx2=((cy*wid)+cx)*4;
+                        if (data[idx2+3]===0) continue;
+                        
+                            // add in the color
+					
+						r+=data[idx2];
+						g+=data[idx2+1];
+						b+=data[idx2+2];
+						colCount++;
+					}
+				}
+				
+                    // if we had a pixel to smear
+                    // with, then add the smear
+                    
+				if (colCount!==0) {
+					r/=colCount;
+					if (r>255) r=255;
+					
+					g/=colCount;
+					if (g>255) g=255;
+					
+					b/=colCount;
+					if (b>255) b=255;
+                    
+                    data[idx]=r;
+                    data[idx+1]=g;
+                    data[idx+2]=b;
+					data[idx+3]=255;		// next time this is part of the smear
+					
+                    noFill=false;
+				}
+			}
+		}
+				
+			// have we filled everything?
+			
+		if (noFill) break;
+	}
+};
+
+genLightmap.blurChunk=function(data,wid,high)
+{
+    var n,k,idx,pixelCount;
+    var x,y,cx,cy,cxs,cxe,cys,cye;
+    var colCount,r,g,b;
+    var backData;
+    
+        // create a copy of the data
+        
+    var backData=new Uint8ClampedArray(data);
+    
+		// blur pixels to count
+		
+	for (n=0;n!==genLightmap.BLUR_COUNT;n++) {
+	
+		for (y=0;y!==high;y++) {
+            
+            cys=y-1;
+            if (cys<0) cys=0;
+            cye=y+2;
+            if (cye>=high) cye=high-1;
+	
+			for (x=0;x!==wid;x++) {
+										
+					// get blur from 8 surrounding pixels
+					
+				colCount=0;
+				r=g=b=0;
+                
+                cxs=x-1;
+                if (cxs<0) cxs=0;
+                cxe=x+2;
+                if (cxe>=wid) cxe=wid-1;
+				
+				for (cy=cys;cy!==cye;cy++) {
+					for (cx=cxs;cx!==cxe;cx++) {
+						if ((cy===y) && (cx===x)) continue;       // ignore self
+						
+							// add up blur from the
+                            // original pixels
+                            
+                        idx=((cy*wid)+cx)*4;
+							
+						r+=data[idx];
+						b+=data[idx+1];
+						g+=data[idx+2];
+						colCount++;
+					}
+				}
+				
+                r/=colCount;
+                if (r>255) r=255;
+
+                g/=colCount;
+                if (g>255) g=255;
+
+                b/=colCount;
+                if (b>255) b=255;
+                
+                idx=((y*wid)+x)*4;
+                
+                backData[idx]=r;
+                backData[idx+1]=g;
+                backData[idx+2]=b;
+			}
+		}
+
+			// transfer over the changed pixels
+            
+        pixelCount=wid*high;
+        idx=0;
+        
+        for (k=0;k!==pixelCount;k++) {
+            data[idx]=backData[idx];
+            data[idx+1]=backData[idx+1];
+            data[idx+2]=backData[idx+2];
+            idx+=4;
+        }
+	} 
 };
 
 //
@@ -136,7 +333,7 @@ genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,
 	return((t>0.01)&&(t<1.0));
 };
 
-genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,vx,vy,vz)
+genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz)
 {
     var n,nLight,trigCount;
     var light;
@@ -174,35 +371,41 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,vx,vy,vz)
         lightBoundY=new wsBound(vy,light.position.y);
         lightBoundZ=new wsBound(vz,light.position.z);
             
-            // any hits?
+            // if simple light map, don't
+            // ray trace, only light by attenuation
         
-        hit=false;
-        
-        for (k=0;k!==nMesh;k++) {
-            mesh=map.meshes[k];
-            if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
+        if (!simpleLightmap) {
             
-            cIdx=0;
-            trigCount=mesh.trigCount;
-            trigRayTraceCache=mesh.trigRayTraceCache;
-            
-            for (p=0;p!==trigCount;p++) {
-                
-                if (genLightmap.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
-                    hit=true;
-                    break;
+                // any hits?
+
+            hit=false;
+
+            for (k=0;k!==nMesh;k++) {
+                mesh=map.meshes[k];
+                if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
+
+                cIdx=0;
+                trigCount=mesh.trigCount;
+                trigRayTraceCache=mesh.trigRayTraceCache;
+
+                for (p=0;p!==trigCount;p++) {
+
+                    if (genLightmap.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
+                        hit=true;
+                        break;
+                    }
+
+                    cIdx+=9;
                 }
-                
-                cIdx+=9;
+
+                if (hit) break;
             }
-            
-            if (hit) break;
+
+                // if a hit, don't add in light
+
+            if (hit) continue;
         }
         
-            // if a hit, don't add in light
-            
-        if (hit) continue;
-   
             // get the color, attenuate
             // it and add it to base color
         
@@ -220,7 +423,7 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,vx,vy,vz)
 // render a triangle
 //
 
-genLightmap.renderTriangle=function(map,meshIdx,trigIdx,ctx,pts,vs,lft,top,rgt,bot)
+genLightmap.renderTriangle=function(map,meshIdx,trigIdx,simpleLightmap,ctx,pts,vs,lft,top,rgt,bot)
 {
     var x,y,lx,rx,tempX,ty,by,idx;
     var lxFactor,rxFactor,vFactor;
@@ -331,13 +534,18 @@ genLightmap.renderTriangle=function(map,meshIdx,trigIdx,ctx,pts,vs,lft,top,rgt,b
             
                 // write the pixel
                 
-            col=genLightmap.rayTraceVertex(map,meshIdx,trigIdx,vx,vy,vz);
+            col=genLightmap.rayTraceVertex(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz);
             data[idx++]=Math.floor(col.r*255.0);
             data[idx++]=Math.floor(col.g*255.0);
             data[idx++]=Math.floor(col.b*255.0);
             data[idx++]=255;
         }
     }
+    
+        // smear and blur chunk
+        
+    genLightmap.smudgeChunk(data,wid,high);
+    genLightmap.blurChunk(data,wid,high);
 
         // replace image data
         
@@ -348,7 +556,7 @@ genLightmap.renderTriangle=function(map,meshIdx,trigIdx,ctx,pts,vs,lft,top,rgt,b
 // build light map in chunk
 //
 
-genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,top,lightmapUVs)
+genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightmapIdx,ctx,lft,top,lightmapUVs)
 {
     var mesh=map.meshes[meshIdx];
     var vIdx,uvIdx;
@@ -396,11 +604,6 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,to
     
     var sz=zBound.max-zBound.min;
     var zFactor=(sz===0)?0:renderSize/sz;
-    
-    var renderLft=lft+genLightmap.RENDER_MARGIN;
-    var renderTop=top+genLightmap.RENDER_MARGIN;
-    var renderRgt=lft+renderSize;
-    var renderBot=top+renderSize;
 
         // now create the 2D version of it
         // these points are offsets WITHIN the margin box
@@ -423,11 +626,21 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,to
         pt2=new ws2DPoint(((v2.x-xBound.min)*xFactor),((v2.z-zBound.min)*zFactor));
     }
     
+        // move so the triangle renders within
+        // the margins so we have area to smear
+        
+    pt0.move(genLightmap.RENDER_MARGIN,genLightmap.RENDER_MARGIN);
+    pt1.move(genLightmap.RENDER_MARGIN,genLightmap.RENDER_MARGIN);
+    pt2.move(genLightmap.RENDER_MARGIN,genLightmap.RENDER_MARGIN);
+    
         // ray trace the triangle
        
-    genLightmap.renderTriangle(map,meshIdx,trigIdx,ctx,[pt0,pt1,pt2],[v0,v1,v2],renderLft,renderTop,renderRgt,renderBot);
+    genLightmap.renderTriangle(map,meshIdx,trigIdx,simpleLightmap,ctx,[pt0,pt1,pt2],[v0,v1,v2],lft,top,(lft+genLightmap.CHUNK_SIZE),(top+genLightmap.CHUNK_SIZE));
 
         // add the UV
+    
+    var renderLft=lft+genLightmap.RENDER_MARGIN;
+    var renderTop=top+genLightmap.RENDER_MARGIN;
 
     uvIdx=mesh.indexes[trigIdx*3]*2;
     lightmapUVs[uvIdx]=(pt0.x+renderLft)/genLightmap.TEXTURE_SIZE;
@@ -446,7 +659,7 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,lightmapIdx,ctx,lft,to
 // create lightmap
 //
 
-genLightmap.createLightmapForMesh=function(map,meshIdx,lightmapList,callbackFunc)
+genLightmap.createLightmapForMesh=function(map,meshIdx,simpleLightmap,lightmapList,callbackFunc)
 {
     var n,lightmapIdx,chunkIdx,nTrig;
     var lft,top;
@@ -493,7 +706,7 @@ genLightmap.createLightmapForMesh=function(map,meshIdx,lightmapList,callbackFunc
         lft=(chunkIdx%genLightmap.CHUNK_SPLIT)*genLightmap.CHUNK_SIZE;
         top=Math.floor(chunkIdx/genLightmap.CHUNK_SPLIT)*genLightmap.CHUNK_SIZE;
 
-        genLightmap.writePolyToChunk(map,meshIdx,n,lightmapIdx,ctx,lft,top,lightmapUVs);
+        genLightmap.writePolyToChunk(map,meshIdx,n,simpleLightmap,lightmapIdx,ctx,lft,top,lightmapUVs);
 
         chunkIdx++;
     }
@@ -516,7 +729,7 @@ genLightmap.createLightmapForMesh=function(map,meshIdx,lightmapList,callbackFunc
     
         // next mesh
     
-    setTimeout(function() { genLightmap.createLightmapForMesh(map,meshIdx,lightmapList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(map,meshIdx,simpleLightmap,lightmapList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
 };
 
 //
@@ -525,7 +738,7 @@ genLightmap.createLightmapForMesh=function(map,meshIdx,lightmapList,callbackFunc
 // is too slow and browsers will bounce the script
 //
 
-genLightmap.create=function(map,callbackFunc)
+genLightmap.create=function(map,simpleLightmap,callbackFunc)
 {
     var n,nMesh;
     
@@ -552,7 +765,7 @@ genLightmap.create=function(map,callbackFunc)
         // by a timer so we don't trigger the
         // script time out problem
         
-    setTimeout(function() { genLightmap.createLightmapForMesh(map,0,lightmapList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(map,0,simpleLightmap,lightmapList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
 };
     
 genLightmap.createFinish=function(lightmapList,callbackFunc)

@@ -360,10 +360,6 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
         if (forceConnectLineIdx===nConnectLine) forceConnectLineIdx=0;
     }
     
-        // bail if we've reach max room count
-        
-    if (map.countMeshByFlag(this.MESH_FLAG_ROOM_WALL)>=setup.maxRoom) return;
-    
         // run through connections
         // if a random boolean flag is true,
         // than try to connect another room
@@ -372,6 +368,10 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
     var yStoryAdd=yBound.max-yBound.min;
 
     for (n=0;n!==nConnectLine;n++) {
+    
+            // bail if we've reach max room count
+
+        if (map.countMeshByFlag(this.MESH_FLAG_ROOM_WALL)>=setup.maxRoom) return;
         
             // determine if this line will go off
             // on another recursion
