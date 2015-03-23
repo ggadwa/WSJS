@@ -23,7 +23,7 @@ var AMBIENT_R=0.3;
 var AMBIENT_G=0.3;
 var AMBIENT_B=0.3;
 
-var MAX_ROOM=3;
+var MAX_ROOM=15;
 var SIMPLE_LIGHTMAP=false;
 
 //
