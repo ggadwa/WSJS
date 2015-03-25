@@ -2,7 +2,8 @@
 
 
 - map pieces to typed arrays
-
+   - need "flipped" version of pieces
+   - automatically make 4 versions -- duplicateFlip, duplicateRotate
 
 
 - reduce number of varrying to get more lights

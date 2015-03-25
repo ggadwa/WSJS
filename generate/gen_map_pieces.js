@@ -238,6 +238,34 @@ function mapPieceCreateMeshWalls(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
 }
 
 //
+// build connection line list
+//
+// any line that is straight, 20 in length, and either X
+// or Z is at 0 or 1 can connect to another mesh
+//
+
+function mapPieceBuildConnectLines()
+{
+    var n,k,pt1,pt2;
+    var nPoint=this.points.length;
+    
+    for (n=0;n!==nPoint;n++) {
+        k=n+1;
+        if (k===nPoint) k=0;
+        
+        pt1=this.points[n];
+        pt2=this.points[k];
+        
+        if (((pt1[0]===0.0) && (pt2[0]===0.0)) || ((pt1[0]===1.0) && (pt2[0]===1.0))) {
+            if (Math.floor(Math.abs((pt1[1]*100)-(pt2[1]*100)))==20) this.connectLines.push([n,k]);
+        }
+        if (((pt1[1]===0.0) && (pt2[1]===0.0)) || ((pt1[1]===1.0) && (pt2[1]===1.0))) {
+            if (Math.floor(Math.abs((pt1[0]*100)-(pt2[0]*100)))===20) this.connectLines.push([n,k]);
+        }
+   }
+}
+
+//
 // main piece object
 //
 
@@ -251,6 +279,8 @@ function mapPieceObject(isRoom)
     this.CONNECT_TYPE_TOP=1;
     this.CONNECT_TYPE_RIGHT=2;
     this.CONNECT_TYPE_BOTTOM=3;
+    
+    this.buildConnectLines=mapPieceBuildConnectLines;
     
     this.getConnectType=mapPieceGetConnectType;
     this.isConnectTypeOpposite=mapPieceIsConnectTypeOpposite;
@@ -291,28 +321,64 @@ mapPiece.points.push([0.0,0.60]);
 mapPiece.points.push([0.0,0.40]);
 mapPiece.points.push([0.0,0.20]);
 
-mapPiece.connectLines.push([0,1]);
-mapPiece.connectLines.push([1,2]);
-mapPiece.connectLines.push([2,3]);
-mapPiece.connectLines.push([3,4]);
-mapPiece.connectLines.push([4,5]);
-mapPiece.connectLines.push([5,6]);
-mapPiece.connectLines.push([6,7]);
-mapPiece.connectLines.push([7,8]);
-mapPiece.connectLines.push([8,9]);
-mapPiece.connectLines.push([9,10]);
-mapPiece.connectLines.push([10,11]);
-mapPiece.connectLines.push([11,12]);
-mapPiece.connectLines.push([12,13]);
-mapPiece.connectLines.push([13,14]);
-mapPiece.connectLines.push([14,15]);
-mapPiece.connectLines.push([15,16]);
-mapPiece.connectLines.push([16,17]);
-mapPiece.connectLines.push([17,18]);
-mapPiece.connectLines.push([18,19]);
-mapPiece.connectLines.push([19,0]);
-
+mapPiece.buildConnectLines();
 genMapPieces.push(mapPiece);
+
+// top circle
+
+var mapPiece=new mapPieceObject(true);
+
+mapPiece.points.push([0.0,0.40]);
+mapPiece.points.push([0.10,0.20]);
+mapPiece.points.push([0.20,0.10]);
+mapPiece.points.push([0.40,0.0]);
+mapPiece.points.push([0.60,0.0]);
+mapPiece.points.push([0.8,0.10]);
+mapPiece.points.push([0.9,0.20]);
+mapPiece.points.push([1.0,0.40]);
+mapPiece.points.push([1.0,0.60]);
+mapPiece.points.push([1.0,0.80]);
+mapPiece.points.push([1.0,1.0]);
+mapPiece.points.push([0.80,1.0]);
+mapPiece.points.push([0.60,1.0]);
+mapPiece.points.push([0.40,1.0]);
+mapPiece.points.push([0.20,1.0]);
+mapPiece.points.push([0.0,1.0]);
+mapPiece.points.push([0.0,0.80]);
+mapPiece.points.push([0.0,0.60]);
+
+mapPiece.buildConnectLines();
+genMapPieces.push(mapPiece);
+
+// bottom circle
+
+var mapPiece=new mapPieceObject(true);
+
+mapPiece.points.push([0.0,0.60]);
+mapPiece.points.push([0.10,0.80]);
+mapPiece.points.push([0.20,0.90]);
+mapPiece.points.push([0.40,1.0]);
+mapPiece.points.push([0.60,1.0]);
+mapPiece.points.push([0.8,0.90]);
+mapPiece.points.push([0.9,0.80]);
+mapPiece.points.push([1.0,0.60]);
+mapPiece.points.push([1.0,0.40]);
+mapPiece.points.push([1.0,0.20]);
+mapPiece.points.push([1.0,0.0]);
+mapPiece.points.push([0.80,0.0]);
+mapPiece.points.push([0.60,0.0]);
+mapPiece.points.push([0.40,0.0]);
+mapPiece.points.push([0.20,0.0]);
+mapPiece.points.push([0.0,0.0]);
+mapPiece.points.push([0.0,0.20]);
+mapPiece.points.push([0.0,0.40]);
+
+mapPiece.buildConnectLines();
+genMapPieces.push(mapPiece);
+
+
+
+
 
 // plus
 
@@ -331,11 +397,7 @@ mapPiece.points.push([0.0,0.6]);
 mapPiece.points.push([0.0,0.4]);
 mapPiece.points.push([0.4,0.4]);
 
-mapPiece.connectLines.push([0,1]);
-mapPiece.connectLines.push([3,4]);
-mapPiece.connectLines.push([6,7]);
-mapPiece.connectLines.push([9,10]);
-
+mapPiece.buildConnectLines();
 genMapPieces.push(mapPiece);
 
 // X
@@ -363,13 +425,5 @@ mapPiece.points.push([0.20,0.60]);
 mapPiece.points.push([0.20,0.40]);
 mapPiece.points.push([0.0,0.20]);
 
-mapPiece.connectLines.push([0,1]);
-mapPiece.connectLines.push([4,5]);
-mapPiece.connectLines.push([5,6]);
-mapPiece.connectLines.push([9,10]);
-mapPiece.connectLines.push([10,11]);
-mapPiece.connectLines.push([14,15]);
-mapPiece.connectLines.push([15,16]);
-mapPiece.connectLines.push([19,0]);
-
+mapPiece.buildConnectLines();
 genMapPieces.push(mapPiece);
