@@ -127,6 +127,21 @@ function meshGetTriangleBounds(trigIdx)
     return([xBound,yBound,zBound]);
 }
 
+function meshIsTriangleStraightWall(trigIdx)
+{
+    var v0=this.getTriangleVertex(trigIdx,0);
+    var v1=this.getTriangleVertex(trigIdx,0);
+    var v2=this.getTriangleVertex(trigIdx,0);
+    
+        // if all the Xs of Zs are equal,
+        // consider it a straight wall
+        
+    if ((v0[0]===v1[0]) && (v0[0]===v2[0])) return(true);
+    if ((v0[1]===v1[1]) && (v0[1]===v2[1])) return(true);
+    
+    return(false);
+}
+
 function meshRemoveTriangle(trigIdx)
 {
     if (this.indexCount===0) return;
@@ -448,6 +463,7 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     
     this.getTriangleVertex=meshGetTriangleVertex;
     this.getTriangleBounds=meshGetTriangleBounds;
+    this.isTriangleStraightWall=meshIsTriangleStraightWall;
     this.removeTriangle=meshRemoveTriangle;
     
         // setup

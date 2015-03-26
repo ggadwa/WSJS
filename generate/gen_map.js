@@ -55,6 +55,10 @@ genMap.removeSharedTriangles=function(map)
         // compare the bounds, equal bounds
         // means overlapping
         
+        // skip any trigs that aren't straight walls
+        // so slanted walls don't get erased (only
+        // straight walls are connected)
+        
     nMesh=map.meshes.length;
     
     for (n=0;n!==nMesh;n++) {
@@ -63,6 +67,7 @@ genMap.removeSharedTriangles=function(map)
     
         for (t1=0;t1!==mesh.trigCount;t1++) {
             
+            if (!mesh.isTriangleStraightWall(t1)) continue;
             bounds=mesh.getTriangleBounds(t1);
             
             hit=false;
@@ -73,6 +78,7 @@ genMap.removeSharedTriangles=function(map)
             
                 for (t2=0;t2!==otherMesh.trigCount;t2++) {
                     
+                    if (!otherMesh.isTriangleStraightWall(t2)) continue;
                     otherBounds=otherMesh.getTriangleBounds(t2);
                     
                     if ((bounds[0].min===otherBounds[0].min) && (bounds[0].max===otherBounds[0].max) && (bounds[1].min===otherBounds[1].min) && (bounds[1].max===otherBounds[1].max) && (bounds[2].min===otherBounds[2].min) && (bounds[2].max===otherBounds[2].max)) {
@@ -183,7 +189,7 @@ genMap.addStairMesh=function(map,piece,connectType,xStairBound,yStairBound,zStai
     }
 };
 
-genMap.addLight=function(map,xBound,yBound,zBound)
+genMap.addLight=function(map,piece,xBound,yBound,zBound)
 {
         // light point
         
@@ -218,8 +224,17 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
     var n;
     
         // get random piece
+        // unless recurse count is 0, then always
+        // start with square
         
-    var pieceIdx=Math.floor(genMapPieces.length*genRandom.random());
+    var pieceIdx;
+    if (recurseCount===0) {
+        pieceIdx=0;
+    }
+    else {       
+        pieceIdx=Math.floor(genMapPieces.length*genRandom.random());
+    }
+    
     var piece=genMapPieces[pieceIdx];
     
     var nConnectLine=piece.connectLines.length;
@@ -344,7 +359,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
 
         // add the light
         
-    this.addLight(map,xBound,yStoryBound,zBound);
+    this.addLight(map,piece,xBound,yStoryBound,zBound);
     
         // have we recursed too far?
         
@@ -416,7 +431,13 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
 
 genMap.build=function(map,setup)
 {
-    wsStartStatusBar(2);
+    wsStartStatusBar(3);
+    
+        // setup the pieces that
+        // create the map
+        
+    mapPieceSetup();
+    wsNextStatusBar();
     
         // start the recursive
         // room adding

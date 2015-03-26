@@ -1,10 +1,9 @@
 
 
 
-- map pieces to typed arrays
-   - need "flipped" version of pieces
-   - automatically make 4 versions -- duplicateFlip, duplicateRotate
-
+- need a way to scatter the lights better
+    - give each piece # of light spots
+    - pick light spots in grid from available spots
 
 - reduce number of varrying to get more lights
 
@@ -16,14 +15,6 @@
     - need simple lighting flag
     - need diffuse calcs
     - need to avoid by reversed normals
-
-
-
-- generator
-    - add a circle piece
-    - ? randomize vertices
-    - do random inside version (so it's a O)
-
 
 
 

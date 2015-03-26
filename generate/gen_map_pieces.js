@@ -17,11 +17,11 @@ function mapPieceGetConnectType(connectLineIdx)
     var pt2=this.points[connectLine[1]];
     
     if (pt1[0]===pt2[0]) {
-        if (pt1[0]===0.0) return(this.CONNECT_TYPE_LEFT);
+        if (pt1[0]===0) return(this.CONNECT_TYPE_LEFT);
         return(this.CONNECT_TYPE_RIGHT);
     }
     
-    if (pt1[1]===0.0) return(this.CONNECT_TYPE_TOP);
+    if (pt1[1]===0) return(this.CONNECT_TYPE_TOP);
     return(this.CONNECT_TYPE_BOTTOM);
 }
 
@@ -52,10 +52,10 @@ function mapPieceGetConnectTypeOffset(connectLineIdx,xBound,zBound)
     var pt2=this.points[connectLine[1]];
     
     var x=(pt1[0]<pt2[0])?pt1[0]:pt2[0];
-    offset[0]=Math.floor((xBound.max-xBound.min)*x);
+    offset[0]=Math.floor((xBound.max-xBound.min)*(x*0.01));
     
     var z=(pt1[1]<pt2[1])?pt1[1]:pt2[1];
-    offset[1]=Math.floor((zBound.max-zBound.min)*z);
+    offset[1]=Math.floor((zBound.max-zBound.min)*(z*0.01));
     
     return(offset);
 }
@@ -66,11 +66,11 @@ function mapPieceGetConnectTypeLength(connectLineIdx,xBound,zBound)
     var pt1=this.points[connectLine[0]];
     var pt2=this.points[connectLine[1]];
     
-    var x1=Math.floor((xBound.max-xBound.min)*pt1[0]);
-    var x2=Math.floor((xBound.max-xBound.min)*pt2[0]);
+    var x1=Math.floor((xBound.max-xBound.min)*(pt1[0]*0.01));
+    var x2=Math.floor((xBound.max-xBound.min)*(pt2[0]*0.01));
     
-    var z1=Math.floor((zBound.max-zBound.min)*pt1[1]);
-    var z2=Math.floor((zBound.max-zBound.min)*pt2[1]);
+    var z1=Math.floor((zBound.max-zBound.min)*(pt1[1]*0.01));
+    var z2=Math.floor((zBound.max-zBound.min)*(pt2[1]*0.01));
     
     return([Math.abs(x2-x1),Math.abs(z2-z1)]);
 }
@@ -188,12 +188,12 @@ function mapPieceCreateMeshWalls(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
         if (k===nPoint) k=0;
         
         pt=this.points[n];
-        x1=xBound.min+Math.floor((xBound.max-xBound.min)*pt[0]);
-        z1=zBound.min+Math.floor((zBound.max-zBound.min)*pt[1]);
+        x1=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
+        z1=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
         
         pt=this.points[k];
-        x2=xBound.min+Math.floor((xBound.max-xBound.min)*pt[0]);
-        z2=zBound.min+Math.floor((zBound.max-zBound.min)*pt[1]);
+        x2=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
+        z2=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
         
         vertices[vArrIdx++]=x1;
         vertices[vArrIdx++]=yBound.min;
@@ -256,11 +256,11 @@ function mapPieceBuildConnectLines()
         pt1=this.points[n];
         pt2=this.points[k];
         
-        if (((pt1[0]===0.0) && (pt2[0]===0.0)) || ((pt1[0]===1.0) && (pt2[0]===1.0))) {
-            if (Math.floor(Math.abs((pt1[1]*100)-(pt2[1]*100)))==20) this.connectLines.push([n,k]);
+        if (((pt1[0]===0) && (pt2[0]===0)) || ((pt1[0]===100) && (pt2[0]===100))) {
+            if (Math.abs(pt1[1]-pt2[1])===20) this.connectLines.push([n,k]);
         }
-        if (((pt1[1]===0.0) && (pt2[1]===0.0)) || ((pt1[1]===1.0) && (pt2[1]===1.0))) {
-            if (Math.floor(Math.abs((pt1[0]*100)-(pt2[0]*100)))===20) this.connectLines.push([n,k]);
+        if (((pt1[1]===0) && (pt2[1]===0)) || ((pt1[1]===100) && (pt2[1]===100))) {
+            if (Math.abs(pt1[0]-pt2[0])===20) this.connectLines.push([n,k]);
         }
    }
 }
@@ -293,137 +293,210 @@ function mapPieceObject(isRoom)
 }
 
 //
-// pieces
+// add to pieces array
 //
 
-// box
+function mapPieceClone(mapPiece)
+{
+    var mapPiece2=new mapPieceObject(mapPiece.isRoom);
+    mapPiece2.points=JSON.parse(JSON.stringify(mapPiece.points));
+    mapPiece2.connectLines=JSON.parse(JSON.stringify(mapPiece.connectLines));
+    return(mapPiece2);
+}
 
-var mapPiece=new mapPieceObject(true);
+function mapPieceMirror(mapPiece)
+{
+    var n,nPoint,pt;
+    
+    nPoint=mapPiece.points.length;
+    
+    for (n=0;n!==nPoint;n++) {
+        pt=mapPiece.points[n];
+        pt[1]=100-pt[1];
+    }
+}
 
-mapPiece.points.push([0.0,0.0]);
-mapPiece.points.push([0.20,0.0]);
-mapPiece.points.push([0.40,0.0]);
-mapPiece.points.push([0.60,0.0]);
-mapPiece.points.push([0.80,0.0]);
-mapPiece.points.push([1.0,0.0]);
-mapPiece.points.push([1.0,0.20]);
-mapPiece.points.push([1.0,0.40]);
-mapPiece.points.push([1.0,0.60]);
-mapPiece.points.push([1.0,0.80]);
-mapPiece.points.push([1.0,1.0]);
-mapPiece.points.push([0.80,1.0]);
-mapPiece.points.push([0.60,1.0]);
-mapPiece.points.push([0.40,1.0]);
-mapPiece.points.push([0.20,1.0]);
-mapPiece.points.push([0.0,1.0]);
-mapPiece.points.push([0.0,0.80]);
-mapPiece.points.push([0.0,0.60]);
-mapPiece.points.push([0.0,0.40]);
-mapPiece.points.push([0.0,0.20]);
+function mapPieceRotate(mapPiece)
+{
+    var n,k,nPoint,pt;
+    
+    nPoint=mapPiece.points.length;
+    
+    for (n=0;n!==nPoint;n++) {
+        pt=mapPiece.points[n];
+        k=pt[0];
+        pt[0]=pt[1];
+        pt[1]=k;
+    }
+}
 
-mapPiece.buildConnectLines();
-genMapPieces.push(mapPiece);
+function mapPieceAdd(mapPiece)
+{
+        // build the connection
+        // line cache
+        
+    mapPiece.buildConnectLines();
+    
+        // push a regular version
+        // into the arrays
+        
+    genMapPieces.push(mapPiece);
+    
+        // now a mirrored version
+        
+    var mapPiece2=mapPieceClone(mapPiece);
+    mapPieceMirror(mapPiece2);    
+    genMapPieces.push(mapPiece2);
+    
+        // rotated version
+        
+    mapPiece2=mapPieceClone(mapPiece);
+    mapPieceRotate(mapPiece2);    
+    genMapPieces.push(mapPiece2);
+        
+        // rotated and mirrored version
+        
+    mapPiece2=mapPieceClone(mapPiece);
+    mapPieceMirror(mapPiece2);    
+    mapPieceRotate(mapPiece2);
+    genMapPieces.push(mapPiece2);
+}
 
-// top circle
+//
+// setup map pieces
+//
 
-var mapPiece=new mapPieceObject(true);
+function mapPieceSetup()
+{
+    var mapPiece;
+    
+        // clear pieces
+        
+    genMapPieces=[];
+    
+        // box
 
-mapPiece.points.push([0.0,0.40]);
-mapPiece.points.push([0.10,0.20]);
-mapPiece.points.push([0.20,0.10]);
-mapPiece.points.push([0.40,0.0]);
-mapPiece.points.push([0.60,0.0]);
-mapPiece.points.push([0.8,0.10]);
-mapPiece.points.push([0.9,0.20]);
-mapPiece.points.push([1.0,0.40]);
-mapPiece.points.push([1.0,0.60]);
-mapPiece.points.push([1.0,0.80]);
-mapPiece.points.push([1.0,1.0]);
-mapPiece.points.push([0.80,1.0]);
-mapPiece.points.push([0.60,1.0]);
-mapPiece.points.push([0.40,1.0]);
-mapPiece.points.push([0.20,1.0]);
-mapPiece.points.push([0.0,1.0]);
-mapPiece.points.push([0.0,0.80]);
-mapPiece.points.push([0.0,0.60]);
+    mapPiece=new mapPieceObject(true);
 
-mapPiece.buildConnectLines();
-genMapPieces.push(mapPiece);
+    mapPiece.points.push([0,0]);
+    mapPiece.points.push([20,0]);
+    mapPiece.points.push([40,0]);
+    mapPiece.points.push([60,0]);
+    mapPiece.points.push([80,0]);
+    mapPiece.points.push([100,0]);
+    mapPiece.points.push([100,20]);
+    mapPiece.points.push([100,40]);
+    mapPiece.points.push([100,60]);
+    mapPiece.points.push([100,80]);
+    mapPiece.points.push([100,100]);
+    mapPiece.points.push([80,100]);
+    mapPiece.points.push([60,100]);
+    mapPiece.points.push([40,100]);
+    mapPiece.points.push([20,100]);
+    mapPiece.points.push([0,100]);
+    mapPiece.points.push([0,80]);
+    mapPiece.points.push([0,60]);
+    mapPiece.points.push([0,40]);
+    mapPiece.points.push([0,20]);
 
-// bottom circle
+    mapPieceAdd(mapPiece);
 
-var mapPiece=new mapPieceObject(true);
+        // half circle
 
-mapPiece.points.push([0.0,0.60]);
-mapPiece.points.push([0.10,0.80]);
-mapPiece.points.push([0.20,0.90]);
-mapPiece.points.push([0.40,1.0]);
-mapPiece.points.push([0.60,1.0]);
-mapPiece.points.push([0.8,0.90]);
-mapPiece.points.push([0.9,0.80]);
-mapPiece.points.push([1.0,0.60]);
-mapPiece.points.push([1.0,0.40]);
-mapPiece.points.push([1.0,0.20]);
-mapPiece.points.push([1.0,0.0]);
-mapPiece.points.push([0.80,0.0]);
-mapPiece.points.push([0.60,0.0]);
-mapPiece.points.push([0.40,0.0]);
-mapPiece.points.push([0.20,0.0]);
-mapPiece.points.push([0.0,0.0]);
-mapPiece.points.push([0.0,0.20]);
-mapPiece.points.push([0.0,0.40]);
+    mapPiece=new mapPieceObject(true);
 
-mapPiece.buildConnectLines();
-genMapPieces.push(mapPiece);
+    mapPiece.points.push([0,40]);
+    mapPiece.points.push([10,20]);
+    mapPiece.points.push([20,10]);
+    mapPiece.points.push([40,0]);
+    mapPiece.points.push([60,0]);
+    mapPiece.points.push([8,10]);
+    mapPiece.points.push([9,20]);
+    mapPiece.points.push([100,40]);
+    mapPiece.points.push([100,60]);
+    mapPiece.points.push([100,80]);
+    mapPiece.points.push([100,100]);
+    mapPiece.points.push([80,100]);
+    mapPiece.points.push([60,100]);
+    mapPiece.points.push([40,100]);
+    mapPiece.points.push([20,100]);
+    mapPiece.points.push([0,100]);
+    mapPiece.points.push([0,80]);
+    mapPiece.points.push([0,60]);
 
+    mapPieceAdd(mapPiece);
 
+        // plus
 
+    mapPiece=new mapPieceObject(false);
 
+    mapPiece.points.push([4,0]);
+    mapPiece.points.push([6,0]);
+    mapPiece.points.push([6,4]);
+    mapPiece.points.push([100,4]);
+    mapPiece.points.push([100,6]);
+    mapPiece.points.push([6,6]);
+    mapPiece.points.push([6,100]);
+    mapPiece.points.push([4,100]);
+    mapPiece.points.push([4,6]);
+    mapPiece.points.push([0,6]);
+    mapPiece.points.push([0,4]);
+    mapPiece.points.push([4,4]);
 
-// plus
+    mapPieceAdd(mapPiece);
 
-var mapPiece=new mapPieceObject(false);
+        // X
 
-mapPiece.points.push([0.4,0.0]);
-mapPiece.points.push([0.6,0.0]);
-mapPiece.points.push([0.6,0.4]);
-mapPiece.points.push([1.0,0.4]);
-mapPiece.points.push([1.0,0.6]);
-mapPiece.points.push([0.6,0.6]);
-mapPiece.points.push([0.6,1.0]);
-mapPiece.points.push([0.4,1.0]);
-mapPiece.points.push([0.4,0.6]);
-mapPiece.points.push([0.0,0.6]);
-mapPiece.points.push([0.0,0.4]);
-mapPiece.points.push([0.4,0.4]);
+    mapPiece=new mapPieceObject(false);
 
-mapPiece.buildConnectLines();
-genMapPieces.push(mapPiece);
+    mapPiece.points.push([0,0]);
+    mapPiece.points.push([20,0]);
+    mapPiece.points.push([40,20]);
+    mapPiece.points.push([60,20]);
+    mapPiece.points.push([80,0]);
+    mapPiece.points.push([100,0]);
+    mapPiece.points.push([100,20]);
+    mapPiece.points.push([80,40]);
+    mapPiece.points.push([80,60]);
+    mapPiece.points.push([100,80]);
+    mapPiece.points.push([100,100]);
+    mapPiece.points.push([80,100]);
+    mapPiece.points.push([60,80]);
+    mapPiece.points.push([40,80]);
+    mapPiece.points.push([20,100]);
+    mapPiece.points.push([0,100]);
+    mapPiece.points.push([0,80]);
+    mapPiece.points.push([20,60]);
+    mapPiece.points.push([20,40]);
+    mapPiece.points.push([0,20]);
 
-// X
+    mapPieceAdd(mapPiece);
 
-var mapPiece=new mapPieceObject(false);
+        // U
 
-mapPiece.points.push([0.0,0.0]);
-mapPiece.points.push([0.20,0.0]);
-mapPiece.points.push([0.40,0.20]);
-mapPiece.points.push([0.60,0.20]);
-mapPiece.points.push([0.80,0.0]);
-mapPiece.points.push([1.0,0.0]);
-mapPiece.points.push([1.0,0.20]);
-mapPiece.points.push([0.80,0.40]);
-mapPiece.points.push([0.80,0.60]);
-mapPiece.points.push([1.0,0.80]);
-mapPiece.points.push([1.0,1.0]);
-mapPiece.points.push([0.80,1.0]);
-mapPiece.points.push([0.60,0.80]);
-mapPiece.points.push([0.40,0.80]);
-mapPiece.points.push([0.20,1.0]);
-mapPiece.points.push([0.0,1.0]);
-mapPiece.points.push([0.0,0.80]);
-mapPiece.points.push([0.20,0.60]);
-mapPiece.points.push([0.20,0.40]);
-mapPiece.points.push([0.0,0.20]);
+    mapPiece=new mapPieceObject(false);
 
-mapPiece.buildConnectLines();
-genMapPieces.push(mapPiece);
+    mapPiece.points.push([0,0]);
+    mapPiece.points.push([20,0]);
+    mapPiece.points.push([40,0]);
+    mapPiece.points.push([40,40]);
+    mapPiece.points.push([60,40]);
+    mapPiece.points.push([60,0]);
+    mapPiece.points.push([80,0]);
+    mapPiece.points.push([100,0]);
+    mapPiece.points.push([100,20]);
+    mapPiece.points.push([100,40]);
+    mapPiece.points.push([100,60]);
+    mapPiece.points.push([100,80]);
+    mapPiece.points.push([80,100]);
+    mapPiece.points.push([60,100]);
+    mapPiece.points.push([40,100]);
+    mapPiece.points.push([20,100]);
+    mapPiece.points.push([0,80]);
+    mapPiece.points.push([0,60]);
+    mapPiece.points.push([0,40]);
+    mapPiece.points.push([0,20]);
+
+    mapPieceAdd(mapPiece);
+}
+    

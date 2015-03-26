@@ -19,9 +19,9 @@ var BITMAP_WOOD_BOX=6;
 // constants
 //
 
-var AMBIENT_R=0.3;
-var AMBIENT_G=0.3;
-var AMBIENT_B=0.3;
+var AMBIENT_R=0.4;
+var AMBIENT_G=0.4;
+var AMBIENT_B=0.4;
 
 var MAX_ROOM=15;
 var SIMPLE_LIGHTMAP=true;
