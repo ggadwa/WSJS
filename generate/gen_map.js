@@ -203,16 +203,26 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
     var zLightBound=new wsBound((lightZ-400),(lightZ+400));
     map.addMesh(genMapUtil.createMeshPryamid(SHADER_NORMAL,BITMAP_METAL,xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
     
+        // don't add a light if it's already
+        // within the light cone of another
+    
+    var pt=new wsPoint(lightX,(yLightBound.max+1000),lightZ);
+    if (map.pointInLight(pt)) return;
+    
+        // the intensity, rooms get
+        // bigger lights, corridors smaller
+        
+    var intensity=(xBound.max-xBound.min)*(piece.isRoom?1.3:0.95);
+    
         // the color
 
     var red=0.8+(genRandom.random()*0.2);
     var green=0.8+(genRandom.random()*0.2);
     var blue=0.8+(genRandom.random()*0.2);
     
-        // light
+        // add light to map
         
-    var intensity=(xBound.max-xBound.min)*0.95;
-    map.addLight(new wsLight(new wsPoint(lightX,(yLightBound.max+1000),lightZ),new wsColor(red,green,blue),true,intensity,1.0));
+    map.addLight(new wsLight(pt,new wsColor(red,green,blue),true,intensity,1.0));
 };
 
 //

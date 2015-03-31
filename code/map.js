@@ -86,6 +86,22 @@ function mapCountMeshByFlag(onlyFlag)
 }
 
 //
+// check if point is in light
+//
+
+function mapPointInLight(pt)
+{
+    var n;
+    var nLight=this.lights.length;
+    
+    for (n=0;n!==nLight;n++) {
+        if (this.lights[n].position.distance(pt)<this.lights[n].intensity) return(true);
+    }
+    
+    return(false);
+}
+
+//
 // map light utilities
 //
 
@@ -210,6 +226,8 @@ function mapObject()
     
     this.boxBoundCollision=mapBoxBoundCollision;
     this.boxMeshCollision=mapBoxMeshCollision;
+    
+    this.pointInLight=mapPointInLight;
     
     this.createViewLightsFromMapLights=mapCreateViewLightsFromMapLights;
     this.setupBuffers=mapSetupBuffers;

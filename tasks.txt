@@ -1,9 +1,7 @@
 
 
 
-- need a way to scatter the lights better
-    - give each piece # of light spots
-    - pick light spots in grid from available spots
+
 
 - reduce number of varrying to get more lights
 
