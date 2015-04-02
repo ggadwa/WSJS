@@ -221,12 +221,12 @@ genBitmapUtility.normalToRGBColor=function(normal)
 genBitmapUtility.createRandomColorStripeArray=function(factor,baseColor)
 {
     var n,f,count;
-    var redCol,greenCol,blueCol,col;
-    col=new Float32Array(3);
-    var colors=[];
+    var redCol,greenCol,blueCol,cIdx;
+    var colors=new Float32Array(100*3);
     
         // make stripes of varying sizes and colors
 
+    cIdx=0;
     count=0;
     
     for (n=0;n!==100;n++) {
@@ -248,13 +248,11 @@ genBitmapUtility.createRandomColorStripeArray=function(factor,baseColor)
             blueCol=baseColor[2]*f;
             if (blueCol<0.0) blueCol=0.0;
             if (blueCol>1.0) blueCol=1.0;
-            
-            col[0]=redCol;
-            col[1]=greenCol;
-            col[2]=blueCol;
         }
         
-        colors.push(col);
+        colors[cIdx++]=redCol;
+        colors[cIdx++]=greenCol;
+        colors[cIdx++]=blueCol;
     }    
         
     return(colors);
@@ -388,7 +386,7 @@ genBitmapUtility.createSpecularMap=function(bitmapCTX,specularCTX,wid,high,specu
 // high level drawing routines
 //
 
-genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor,addNoise)
+genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
 {
     var n,lx,rx,ty,by;
     var darkenFactor;
@@ -471,10 +469,6 @@ genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSiz
     
     normal=vec3.fromValues(-1.0,-1.0,1.0);
     this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor(normal));
-    
-        // add some noise
-        
-    if (addNoise) this.addNoiseRect(bitmapCTX,lft,top,rgt,bot,0.9,0.95,0.2);
 };
 
 genBitmapUtility.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
@@ -633,9 +627,8 @@ genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,lft,top,rgt,bot,ringC
 
 genBitmapUtility.drawColorStripeHorizontal=function(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
 {
-    var x,y,idx;
+    var x,y,idx,cIdx;
     var redByte,greenByte,blueByte;
-    var col=new Float32Array(3);
     var colors=this.createRandomColorStripeArray(factor,baseColor);
     
         // get the image data
@@ -651,16 +644,18 @@ genBitmapUtility.drawColorStripeHorizontal=function(bitmapCTX,lft,top,rgt,bot,fa
         
     for (y=0;y!==high;y++) {
         
-        col=colors[y%100];
-        redByte=Math.floor(col[0]*256.0);
-        greenByte=Math.floor(col[1]*256.0);
-        blueByte=Math.floor(col[2]*256.0);
+        cIdx=(y%100)*3;
+        redByte=Math.floor(colors[cIdx]*256.0);
+        greenByte=Math.floor(colors[cIdx+1]*256.0);
+        blueByte=Math.floor(colors[cIdx+2]*256.0);
+        
+        idx=(y*wid)*4;
         
         for (x=0;x!==wid;x++) {
-            idx=((y*wid)+x)*4;
             bitmapData[idx]=redByte;
             bitmapData[idx+1]=greenByte;
             bitmapData[idx+2]=blueByte;
+            idx+=4;
         }
     }
     
@@ -671,9 +666,8 @@ genBitmapUtility.drawColorStripeHorizontal=function(bitmapCTX,lft,top,rgt,bot,fa
 
 genBitmapUtility.drawColorStripeVertical=function(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
 {
-    var x,y,idx;
+    var x,y,idx,cIdx;
     var redByte,greenByte,blueByte;
-    var col=new Float32Array(3);
     var colors=this.createRandomColorStripeArray(factor,baseColor);
     
         // get the image data
@@ -689,10 +683,10 @@ genBitmapUtility.drawColorStripeVertical=function(bitmapCTX,lft,top,rgt,bot,fact
         
 	for (x=0;x!==wid;x++) {
         
-        col=colors[x%100];
-        redByte=Math.floor(col[0]*256.0);
-        greenByte=Math.floor(col[1]*256.0);
-        blueByte=Math.floor(col[2]*256.0);
+        cIdx=(x%100)*3;
+        redByte=Math.floor(colors[cIdx]*256.0);
+        greenByte=Math.floor(colors[cIdx+1]*256.0);
+        blueByte=Math.floor(colors[cIdx+2]*256.0);
         
         for (y=0;y!==high;y++) {
             idx=((y*wid)+x)*4;
@@ -709,8 +703,7 @@ genBitmapUtility.drawColorStripeVertical=function(bitmapCTX,lft,top,rgt,bot,fact
     
 genBitmapUtility.drawColorStripeSlant=function(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
 {
-    var x,y,idx;
-    var col=new Float32Array(3);
+    var x,y,idx,cIdx;
     var colors=this.createRandomColorStripeArray(factor,baseColor);
     
         // get the image data
@@ -726,13 +719,13 @@ genBitmapUtility.drawColorStripeSlant=function(bitmapCTX,lft,top,rgt,bot,factor,
         
     for (y=0;y!==high;y++) {
         for (x=0;x!==wid;x++) {
-        
-            col=colors[(x+y)%100];
+            
+            cIdx=((x+y)%100)*3;
             idx=((y*wid)+x)*4;
             
-            bitmapData[idx]=Math.floor(col[0]*256.0);
-            bitmapData[idx+1]=Math.floor(col[1]*256.0);
-            bitmapData[idx+2]=Math.floor(col[2]*256.0);
+            bitmapData[idx]=Math.floor(colors[cIdx]*256.0);
+            bitmapData[idx+1]=Math.floor(colors[cIdx+1]*256.0);
+            bitmapData[idx+2]=Math.floor(colors[cIdx+2]*256.0);
         }
     }
     

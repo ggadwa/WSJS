@@ -35,3 +35,9 @@ genRandom.randomInt=function(startInt,extraInt)
 {
     return(startInt+Math.floor(genRandom.random()*extraInt));
 };
+
+genRandom.randomInBetween=function(startInt,endInt)
+{
+    return(this.randomInt(startInt,(endInt-startInt)));
+};
+

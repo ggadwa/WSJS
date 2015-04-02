@@ -157,13 +157,12 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,nextWallBi
         
     map.addMesh(piece.createMeshCeiling(SHADER_NORMAL,BITMAP_WOOD_PLANK,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_CEILING));
     
-        // supergumba -- testing, box in middle
- /*   
-    var boxBoundX=new wsBound(xBound.getMidPoint()-1000,xBound.getMidPoint()+1000);
-    var boxBoundY=new wsBound(yBound.max-2000,yBound.max);
-    var boxBoundZ=new wsBound(zBound.getMidPoint()-1000,zBound.getMidPoint()+1000);
-    map.addMesh(genMapUtil.createMeshCube(SHADER_NORMAL,BITMAP_WOOD_PLANK,boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,false,0));
-*/
+        // decorations
+        
+    if (piece.isRoom) {
+        this.addDecoration(map,piece,xBound,new wsBound(yStoryBound.min,yBound.max),zBound);
+    }
+
     return(yStoryBound);
 };
 
@@ -203,16 +202,13 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
     var zLightBound=new wsBound((lightZ-400),(lightZ+400));
     map.addMesh(genMapUtil.createMeshPryamid(SHADER_NORMAL,BITMAP_METAL,xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
     
-        // don't add a light if it's already
-        // within the light cone of another
-    
-    var pt=new wsPoint(lightX,(yLightBound.max+1000),lightZ);
-    if (map.pointInLight(pt)) return;
-    
-        // the intensity, rooms get
-        // bigger lights, corridors smaller
+        // reduce light if already in the
+        // path of another light
         
-    var intensity=(xBound.max-xBound.min)*(piece.isRoom?1.3:0.95);
+    var intensity=xBound.max-xBound.min*0.95;
+    
+    var pt=new wsPoint(lightX,(yLightBound.max+100),lightZ);
+    if (map.pointInLight(pt)) intensity*=0.8;
     
         // the color
 

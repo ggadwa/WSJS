@@ -28,18 +28,16 @@ genBitmap.TYPE_WOOD_BOX=6;
 // brick/rock bitmaps
 //
 
-genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,segments)
+genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSize,paddingSize,darkenFactor,segments)
 {
     var n,rect;
+    var drawBrickColor,f;
     
         // some random values
     
     var groutColor=genBitmapUtility.getRandomGreyColor(0.6,0.7);
     var brickColor=genBitmapUtility.getRandomColor([0.3,0.2,0.2],[1.0,0.8,0.8]);
     var edgeColor=genBitmapUtility.darkenColor(brickColor,0.8);
-    
-    var edgeSize=genRandom.randomInt(2,5);
-    var paddingSize=genRandom.randomInt(1,3);
     
         // clear canvases
         
@@ -52,7 +50,13 @@ genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,segmen
         
     for (n=0;n!==segments.length;n++) {
         rect=segments[n];
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,brickColor,edgeColor,true);
+        
+        f=genRandom.random()+darkenFactor;
+        if (f>1.0) f=1.0;
+        drawBrickColor=genBitmapUtility.darkenColor(brickColor,f);
+
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,edgeColor,true);
+        genBitmapUtility.addNoiseRect(bitmapCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),darkenFactor,1.0,0.4);
     }
     
         // finish with the specular
@@ -125,7 +129,7 @@ genBitmap.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileCol
 
             }
 
-            genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,5,col,[0.0,0.0,0.0],false);
+            genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,5,col,[0.0,0.0,0.0]);
 
                 // possible design
 
@@ -193,7 +197,8 @@ genBitmap.generateMetal=function(bitmapCTX,normalCTX,specularCTX,wid,high)
         plateX=(n%2)*halfWid;
         plateY=Math.floor(n/2)*halfHigh;
 
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,plateX,plateY,(plateX+halfWid),(plateY+halfHigh),5,metalColor,edgeColor,true);
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,plateX,plateY,(plateX+halfWid),(plateY+halfHigh),5,metalColor,edgeColor);
+        genBitmapUtility.addNoiseRect(bitmapCTX,plateX,plateY,(plateX+halfWid),(plateY+halfHigh),0.9,0.95,0.2);
 
             // particles
 
@@ -283,7 +288,7 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
         
         while (lft<wid) {
             woodFactor=0.8+((1.0-(genRandom.random()*2.0))*0.1);
-            genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,-3,(lft+boardSize),(high+3),3,woodColor,[0.0,0.0,0.0],false); // -3 to get around outside borders
+            genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,-3,(lft+boardSize),(high+3),3,woodColor,[0.0,0.0,0.0]); // -3 to get around outside borders
             genBitmapUtility.drawColorStripeVertical(bitmapCTX,(lft+3),0,((lft+boardSize)-3),high,0.1,woodColor);
             genBitmapUtility.addNoiseRect(bitmapCTX,(lft+3),0,((lft+boardSize)-3),high,0.9,0.95,woodFactor);
             lft+=boardSize;
@@ -296,19 +301,19 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
     
             // outside boards
 
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,[0.0,0.0,0.0],false);
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,[0.0,0.0,0.0]);
         genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,3,3,(wid-3),(boardSize-3),0.1,woodColor);
         genBitmapUtility.addNoiseRect(bitmapCTX,0,0,wid,boardSize,0.9,0.95,0.8);
-        
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,[0.0,0.0,0.0],false);
+
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,[0.0,0.0,0.0]);
         genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,3,((high-boardSize)+3),(wid-3),(high-3),0.1,woodColor);
         genBitmapUtility.addNoiseRect(bitmapCTX,0,(high-boardSize),wid,high,0.9,0.95,0.8);
     
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,[0.0,0.0,0.0],false);
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,[0.0,0.0,0.0]);
         genBitmapUtility.drawColorStripeVertical(bitmapCTX,3,3,(boardSize-3),(high-3),0.1,woodColor);
         genBitmapUtility.addNoiseRect(bitmapCTX,0,0,boardSize,high,0.9,0.95,0.8);
         
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,[0.0,0.0,0.0],false);
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,[0.0,0.0,0.0]);
         genBitmapUtility.drawColorStripeVertical(bitmapCTX,((wid-boardSize)+3),3,(wid-3),(high-3),0.1,woodColor);
         genBitmapUtility.addNoiseRect(bitmapCTX,(wid-boardSize),0,wid,high,0.9,0.95,0.8);
         
@@ -321,15 +326,15 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
         
         var y=Math.floor(high/2)-Math.floor(boardSize/2);
         
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),3,woodColor,[0.0,0.0,0.0],false);
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),3,woodColor,[0.0,0.0,0.0]);
         genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,(boardSize+3),(y+3),((wid-boardSize)-3),((y+boardSize)-3),0.2,woodColor);
         genBitmapUtility.addNoiseRect(bitmapCTX,boardSize,y,(wid-boardSize),(y+boardSize),0.9,0.95,0.8);
         
         var x=Math.floor(wid/2)-Math.floor(boardSize/2);
         
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),3,woodColor,[0.0,0.0,0.0],false);
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),3,woodColor,[0.0,0.0,0.0]);
         genBitmapUtility.drawColorStripeVertical(bitmapCTX,(x+3),(boardSize+3),((x+boardSize)-3),((high-boardSize)-3),0.2,woodColor);
-        genBitmapUtility.addNoiseRect(bitmapCTX,x,boardSize,(x+boardSize),(high-boardSize),0.9,0.95,0.8);            
+        genBitmapUtility.addNoiseRect(bitmapCTX,x,boardSize,(x+boardSize),(high-boardSize),0.9,0.95,0.8);
     }
     
         // finish with the specular
@@ -343,7 +348,7 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
 
 genBitmap.generate=function(bitmapIndex,generateType,debugPos)
 {
-    var segments;
+    var edgeSize,paddingSize,segments;
     
         // setup the canvas
         
@@ -373,13 +378,17 @@ genBitmap.generate=function(bitmapIndex,generateType,debugPos)
         
         case this.TYPE_BRICK_STACK:
             segments=genBitmapUtility.createStackedSegments(wid,high);
-            this.generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high,segments);
+            edgeSize=genRandom.randomInt(2,5);
+            paddingSize=genRandom.randomInt(1,3);
+            this.generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSize,paddingSize,0.8,segments);
             shineFactor=5.0;
             break;
             
         case this.TYPE_BRICK_RANDOM:
             segments=genBitmapUtility.createRandomSegments(wid,high);
-            this.generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high,segments);
+            edgeSize=genRandom.randomInt(5,10);
+            paddingSize=genRandom.randomInt(3,5);
+            this.generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSize,paddingSize,0.5,segments);
             shineFactor=5.0;
             break;
             
