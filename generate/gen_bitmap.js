@@ -18,11 +18,12 @@ genBitmap.TEXTURE_SIZE=512;
 
 genBitmap.TYPE_BRICK_STACK=0;
 genBitmap.TYPE_BRICK_RANDOM=1;
-genBitmap.TYPE_TILE=2;
-genBitmap.TYPE_METAL=3;
-genBitmap.TYPE_CONCRETE=4;
-genBitmap.TYPE_WOOD_PLANK=5;
-genBitmap.TYPE_WOOD_BOX=6;
+genBitmap.TYPE_TILE_SIMPLE=2;
+genBitmap.TYPE_TILE_COMPLEX=3;
+genBitmap.TYPE_METAL=4;
+genBitmap.TYPE_CONCRETE=5;
+genBitmap.TYPE_WOOD_PLANK=6;
+genBitmap.TYPE_WOOD_BOX=7;
 
 //
 // brick/rock bitmaps
@@ -140,7 +141,7 @@ genBitmap.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileCol
     }
 };
 
-genBitmap.generateTile=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+genBitmap.generateTile=function(bitmapCTX,normalCTX,specularCTX,wid,high,complex)
 {
         // some random values
     
@@ -157,7 +158,7 @@ genBitmap.generateTile=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     
 		// original splits
         
-    this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,splitCount,true);
+    this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,splitCount,complex);
 
 		// tile noise
         
@@ -392,8 +393,13 @@ genBitmap.generate=function(bitmapIndex,generateType,debugPos)
             shineFactor=5.0;
             break;
             
-        case this.TYPE_TILE:
-            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high);
+        case this.TYPE_TILE_SIMPLE:
+            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,false);
+            shineFactor=10.0;
+            break;
+            
+        case this.TYPE_TILE_COMPLEX:
+            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,true);
             shineFactor=10.0;
             break;
             

@@ -124,13 +124,13 @@ genMap.removeSharedTriangles=function(map)
 // map parts
 //
 
-genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,nextWallBitmap)
+genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,secondaryBitmap)
 {
     var n;
     
         // floor
         
-    map.addMesh(piece.createMeshFloor(SHADER_NORMAL,BITMAP_TILE,xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
+    map.addMesh(piece.createMeshFloor(SHADER_NORMAL,(secondaryBitmap?BITMAP_TILE:BITMAP_TILE_2),xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
     
         // walls
         // combine into a single mesh
@@ -142,11 +142,11 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,nextWallBi
     
     for (n=0;n!==storyCount;n++) {
         if (n===0) {
-            mesh=piece.createMeshWalls(SHADER_NORMAL,nextWallBitmap,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh=piece.createMeshWalls(SHADER_NORMAL,(secondaryBitmap?BITMAP_BRICK_STACK:BITMAP_BRICK_RANDOM),xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
         }
         else {
             yStoryBound.add(-yStoryAdd);
-            mesh2=piece.createMeshWalls(SHADER_NORMAL,nextWallBitmap,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh2=piece.createMeshWalls(SHADER_NORMAL,(secondaryBitmap?BITMAP_BRICK_STACK:BITMAP_BRICK_RANDOM),xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
             mesh.combineMesh(mesh2);
         }
     }
@@ -225,7 +225,7 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
 // build map recursive room
 //
 
-genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,connectLineIdx,connectStoryCount,needStairs,xConnectBound,yConnectBound,zConnectBound,nextWallBitmap)
+genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,connectLineIdx,connectStoryCount,needStairs,xConnectBound,yConnectBound,zConnectBound,secondaryBitmap)
 {
     var n;
     
@@ -361,7 +361,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
 
         // add the room mesh
         
-    var yStoryBound=genMap.addRoomMesh(map,piece,storyCount,xBound,yBound,zBound,nextWallBitmap);
+    var yStoryBound=genMap.addRoomMesh(map,piece,storyCount,xBound,yBound,zBound,secondaryBitmap);
 
         // add the light
         
@@ -416,7 +416,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
                     // and switch bitmap
                     
                 yStoryBound.add(-yStoryAdd);
-                nextWallBitmap=(nextWallBitmap===BITMAP_BRICK_RANDOM)?BITMAP_BRICK_STACK:BITMAP_BRICK_RANDOM;
+                secondaryBitmap=!secondaryBitmap;
                 
                     // and tell next room that
                     // we might need stairs to it
@@ -427,7 +427,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
         
             // recurse on to build the new room
             
-        this.buildMapRecursiveRoom(map,setup,(recurseCount+1),pieceIdx,n,storyCount,nextNeedStairs,xBound,yStoryBound,zBound,nextWallBitmap);
+        this.buildMapRecursiveRoom(map,setup,(recurseCount+1),pieceIdx,n,storyCount,nextNeedStairs,xBound,yStoryBound,zBound,secondaryBitmap);
     }
 };
 
@@ -437,7 +437,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
 
 genMap.build=function(map,setup)
 {
-    wsStartStatusBar(3);
+    wsStartStatusBar(4);
     
         // setup the pieces that
         // create the map
@@ -448,12 +448,17 @@ genMap.build=function(map,setup)
         // start the recursive
         // room adding
     
-    this.buildMapRecursiveRoom(map,setup,0,-1,-1,-1,false,null,null,null,BITMAP_BRICK_RANDOM);
+    this.buildMapRecursiveRoom(map,setup,0,-1,-1,-1,false,null,null,null,false);
     wsNextStatusBar();
     
         // delete any shared triangles
     
     this.removeSharedTriangles(map);
+    wsNextStatusBar();
+    
+        // build the light/mesh intersection lists
+        
+    map.buildLightMeshIntersectLists();
     wsNextStatusBar();
 };
 

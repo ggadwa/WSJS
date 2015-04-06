@@ -410,8 +410,8 @@ function mapPieceSetup()
     mapPiece.points.push([20,10]);
     mapPiece.points.push([40,0]);
     mapPiece.points.push([60,0]);
-    mapPiece.points.push([8,10]);
-    mapPiece.points.push([9,20]);
+    mapPiece.points.push([80,10]);
+    mapPiece.points.push([90,20]);
     mapPiece.points.push([100,40]);
     mapPiece.points.push([100,60]);
     mapPiece.points.push([100,80]);
@@ -445,7 +445,7 @@ function mapPieceSetup()
 
     mapPieceAdd(mapPiece);
 
-        // X
+        // Half X
 
     mapPiece=new mapPieceObject(false);
 
@@ -458,18 +458,16 @@ function mapPieceSetup()
     mapPiece.points.push([100,20]);
     mapPiece.points.push([80,40]);
     mapPiece.points.push([80,60]);
-    mapPiece.points.push([100,80]);
-    mapPiece.points.push([100,100]);
+    mapPiece.points.push([80,80]);
     mapPiece.points.push([80,100]);
-    mapPiece.points.push([60,80]);
-    mapPiece.points.push([40,80]);
+    mapPiece.points.push([60,100]);
+    mapPiece.points.push([40,100]);
     mapPiece.points.push([20,100]);
-    mapPiece.points.push([0,100]);
-    mapPiece.points.push([0,80]);
+    mapPiece.points.push([20,80]); 
     mapPiece.points.push([20,60]);
     mapPiece.points.push([20,40]);
     mapPiece.points.push([0,20]);
-
+    
     mapPieceAdd(mapPiece);
 
         // U

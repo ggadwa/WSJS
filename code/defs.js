@@ -233,6 +233,8 @@ function wsLight(position,color,inLightmap,intensity,exponent)
     this.origIndex=0;           // used to sort lights
     this.dist=0.0;
     
+    this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
+    
     this.distance=function(pt)
                 {
                     return(this.position.distance(pt));

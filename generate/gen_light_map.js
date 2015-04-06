@@ -104,89 +104,80 @@ genLightmap.smudgeChunk=function(data,wid,high)
     var x,y,cx,cy,cxs,cxe,cys,cye;
     var idx,idx2;
     var colCount,r,g,b;
-	var noFill;
-    
-		// we constantly add and re-add
-		// the pixel border until the entire
-		// block is filled.  we use the
+    var noFill;
+
+        // we constantly add and re-add
+        // the pixel border until the entire
+        // block is filled.  we use the
         // alpha channel to determine this
 		
-	while (true) {
+    while (true) {
 	
-		noFill=true;
-        
-		for (y=0;y!==high;y++) {
+        noFill=true;
+
+        for (y=0;y!==high;y++) {
             
             cys=y-1;
             if (cys<0) cys=0;
             cye=y+2;
             if (cye>=high) cye=high-1;
-	
-			for (x=0;x!==wid;x++) {
-                
+
+            for (x=0;x!==wid;x++) {
+
                 idx=((y*wid)+x)*4;
-                
+
                     // already touched then
                     // ignore
-                    
+
                 if (data[idx+3]!==0) continue;
-						
-					// find all the touched pixels around
+
+                    // find all the touched pixels around
                     // it to make the new border
                     // smear pixel
-					
-				colCount=0;
-				r=g=b=0;
-                
+
+                colCount=0;
+                r=g=b=0;
+
                 cxs=x-1;
                 if (cxs<0) cxs=0;
                 cxe=x+2;
                 if (cxe>=wid) cxe=wid-1;
-				
-				for (cy=cys;cy!==cye;cy++) {
-					for (cx=cxs;cx!==cxe;cx++) {
-                        
+
+                for (cy=cys;cy!==cye;cy++) {
+                    for (cx=cxs;cx!==cxe;cx++) {
+
                             // only use touched pixels
-                            
+
                         idx2=((cy*wid)+cx)*4;
                         if (data[idx2+3]===0) continue;
-                        
+
                             // add in the color
-					
-						r+=data[idx2];
-						g+=data[idx2+1];
-						b+=data[idx2+2];
-						colCount++;
-					}
-				}
-				
+
+                        r+=data[idx2];
+                        g+=data[idx2+1];
+                        b+=data[idx2+2];
+                        colCount++;
+                    }
+                }
+
                     // if we had a pixel to smear
                     // with, then add the smear
-                    
-				if (colCount!==0) {
-					r/=colCount;
-					if (r>255) r=255;
-					
-					g/=colCount;
-					if (g>255) g=255;
-					
-					b/=colCount;
-					if (b>255) b=255;
-                    
-                    data[idx]=r;
-                    data[idx+1]=g;
-                    data[idx+2]=b;
-					data[idx+3]=255;		// next time this is part of the smear
-					
+
+                if (colCount!==0) {
+                    data[idx]=Math.floor(r/colCount);
+                    data[idx+1]=Math.floor(g/colCount);
+                    data[idx+2]=Math.floor(b/colCount);
+                    data[idx+3]=255;		// next time this is part of the smear
+
                     noFill=false;
-				}
-			}
-		}
+                }
+            }
+        }
 				
-			// have we filled everything?
-			
-		if (noFill) break;
-	}
+            // have we filled everything?
+
+        if (noFill) break;
+    }
 };
 
 genLightmap.blurChunk=function(data,wid,high)
@@ -200,44 +191,44 @@ genLightmap.blurChunk=function(data,wid,high)
         
     var backData=new Uint8ClampedArray(data);
     
-		// blur pixels to count
+        // blur pixels to count
 		
-	for (n=0;n!==genLightmap.BLUR_COUNT;n++) {
-	
-		for (y=0;y!==high;y++) {
+    for (n=0;n!==genLightmap.BLUR_COUNT;n++) {
+
+        for (y=0;y!==high;y++) {
             
             cys=y-1;
             if (cys<0) cys=0;
             cye=y+2;
             if (cye>=high) cye=high-1;
 	
-			for (x=0;x!==wid;x++) {
-										
-					// get blur from 8 surrounding pixels
-					
-				colCount=0;
-				r=g=b=0;
+            for (x=0;x!==wid;x++) {
+
+                    // get blur from 8 surrounding pixels
+
+                colCount=0;
+                r=g=b=0;
                 
                 cxs=x-1;
                 if (cxs<0) cxs=0;
                 cxe=x+2;
                 if (cxe>=wid) cxe=wid-1;
 				
-				for (cy=cys;cy!==cye;cy++) {
-					for (cx=cxs;cx!==cxe;cx++) {
-						if ((cy===y) && (cx===x)) continue;       // ignore self
-						
-							// add up blur from the
+                for (cy=cys;cy!==cye;cy++) {
+                    for (cx=cxs;cx!==cxe;cx++) {
+                        if ((cy===y) && (cx===x)) continue;       // ignore self
+
+                            // add up blur from the
                             // original pixels
-                            
+
                         idx=((cy*wid)+cx)*4;
-							
-						r+=data[idx];
-						b+=data[idx+1];
-						g+=data[idx+2];
-						colCount++;
-					}
-				}
+
+                        r+=data[idx];
+                        b+=data[idx+1];
+                        g+=data[idx+2];
+                        colCount++;
+                    }
+                }
 				
                 r/=colCount;
                 if (r>255) r=255;
@@ -253,21 +244,21 @@ genLightmap.blurChunk=function(data,wid,high)
                 backData[idx]=r;
                 backData[idx+1]=g;
                 backData[idx+2]=b;
-			}
-		}
+            }
+        }
 
-			// transfer over the changed pixels
-            
+            // transfer over the changed pixels
+
         pixelCount=wid*high;
         idx=0;
-        
+
         for (k=0;k!==pixelCount;k++) {
             data[idx]=backData[idx];
             data[idx+1]=backData[idx+1];
             data[idx+2]=backData[idx+2];
             idx+=4;
         }
-	} 
+    } 
 };
 
 //
@@ -276,13 +267,13 @@ genLightmap.blurChunk=function(data,wid,high)
 
 genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,tv1y,tv1z,tv2x,tv2y,tv2z)
 {
-		// we pass in a single vertex (t0x,t0y,t0z) and
+        // we pass in a single vertex (t0x,t0y,t0z) and
         // these pre-calculated vectors for the other
         // sides of the triangle
         // tv1[x,y,z]=t1[x,y,z]-t0[x,y,z]
         // tv2[x,y,z]=t2[x,y,z]-t0[x,y,z]
 	
-		// calculate the determinate
+        // calculate the determinate
         // perpVector is cross(vector,v2)
         // det is dot(v1,perpVector)
         
@@ -292,15 +283,15 @@ genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,
 
     var det=(tv1x*perpVectorX)+(tv1y*perpVectorY)+(tv1z*perpVectorZ);
 
-		// is line on the same plane as triangle?
-		
-	if ((det>-0.00001) && (det<0.00001)) return(false);
+        // is line on the same plane as triangle?
 
-		// get the inverse determinate
+    if ((det>-0.00001) && (det<0.00001)) return(false);
 
-	var invDet=1.0/det;
+        // get the inverse determinate
 
-		// calculate triangle U and test
+    var invDet=1.0/det;
+
+        // calculate triangle U and test
         // lineToTrigPointVector is vector from vertex to triangle point 0
         // u is invDet * dot(lineToTrigPointVector,perpVector)
         
@@ -309,9 +300,9 @@ genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,
     var lineToTrigPointVectorZ=vz-t0z;
 
     var u=invDet*((lineToTrigPointVectorX*perpVectorX)+(lineToTrigPointVectorY*perpVectorY)+(lineToTrigPointVectorZ*perpVectorZ));
-	if ((u<0.0) || (u>1.0)) return(false);
+    if ((u<0.0) || (u>1.0)) return(false);
 	
-		// calculate triangle V and test
+        // calculate triangle V and test
         // lineToTrigPerpVector is cross(lineToTrigPointVector,v1)
         // v is invDet * dot(vector,lineToTrigPerpVector)
         
@@ -320,39 +311,43 @@ genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,
     var lineToTrigPerpVectorZ=(lineToTrigPointVectorX*tv1y)-(lineToTrigPointVectorY*tv1x);
 
     var v=invDet*((vctX*lineToTrigPerpVectorX)+(vctY*lineToTrigPerpVectorY)+(vctZ*lineToTrigPerpVectorZ));
-	if ((v<0.0) || ((u+v)>1.0)) return(false);
+    if ((v<0.0) || ((u+v)>1.0)) return(false);
 	
-		// t is the point on the line, from the
+        // t is the point on the line, from the
         // invDet*dot(v2,lineToTrigPerpVector)
 		
-		// this is a little different then normal ray trace
-		// hits, we add in an extra 0.01f slop so polygons that are
-		// touching each other don't have edges grayed in
+        // this is a little different then normal ray trace
+        // hits, we add in an extra 0.01f slop so polygons that are
+        // touching each other don't have edges grayed in
 
     var t=invDet*((tv2x*lineToTrigPerpVectorX)+(tv2y*lineToTrigPerpVectorY)+(tv2z*lineToTrigPerpVectorZ));
-	return((t>0.01)&&(t<1.0));
+    return((t>0.01)&&(t<1.0));
 };
 
 genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz)
 {
     var n,nLight,trigCount;
     var light;
-    var k,p,hit,mesh,nMesh,cIdx;
+    var k,p,hit,lightMesh,mesh,nMesh,cIdx;
     var trigRayTraceCache;
     var lightVectorX,lightVectorY,lightVectorZ;
     var lightBoundX,lightBoundY,lightBoundZ;
     var dist,att;
     var col=new wsColor(0.0,0.0,0.0);
     
-    nMesh=map.meshes.length;
-    nLight=map.lights.length;
+        // we have a list of mesh/light intersections we
+        // use to reduce the number of lights we check for
+        // a mesh
     
-        // NOTE: we precalculated a list of a single point on the
+        // we precalculated a list of a single point on the
         // triangle and two vectors for each side around that point
         // to speed this up.  That's what the trigRayTraceCache is for
     
+    lightMesh=map.meshes[meshIdx];
+    nLight=lightMesh.lightIntersectList.length;
+    
     for (n=0;n!==nLight;n++) {
-        light=map.lights[n];
+        light=map.lights[lightMesh.lightIntersectList[n]];
         
             // light within light range?
             
@@ -376,12 +371,18 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz)
         
         if (!simpleLightmap) {
             
+                // each light has a list of meshes within
+                // it's light cone, these are the only meshes
+                // that can block
+                
+            nMesh=light.meshIntersectList.length;
+            
                 // any hits?
 
             hit=false;
 
             for (k=0;k!==nMesh;k++) {
-                mesh=map.meshes[k];
+                mesh=map.meshes[light.meshIntersectList[k]];
                 if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
 
                 cIdx=0;

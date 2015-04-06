@@ -1,16 +1,12 @@
 
 
-
-- bit random stripe is broken
-
+- bricks don't darken split bricks
+- need font bitmap/fps
 - reduce number of varrying to get more lights
 
 - light maps
-    - precalc meshes within light range, only search those meshes for collisions
-    - need a no collision mesh (like lights) so they can be highlighted
     - light maps need all black, all white spots
        - pre-determine so we can reduce light map usage
-    - need simple lighting flag
     - need diffuse calcs
     - need to avoid by reversed normals
 

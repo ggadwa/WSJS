@@ -10,20 +10,21 @@ var SHADER_NORMAL=1;
 var BITMAP_BRICK_STACK=0;
 var BITMAP_BRICK_RANDOM=1;
 var BITMAP_TILE=2;
-var BITMAP_METAL=3;
-var BITMAP_CONCRETE=4;
-var BITMAP_WOOD_PLANK=5;
-var BITMAP_WOOD_BOX=6;
+var BITMAP_TILE_2=3;
+var BITMAP_METAL=4;
+var BITMAP_CONCRETE=5;
+var BITMAP_WOOD_PLANK=6;
+var BITMAP_WOOD_BOX=7;
 
 //
 // constants
 //
 
-var AMBIENT_R=0.5;
-var AMBIENT_G=0.5;
-var AMBIENT_B=0.5;
+var AMBIENT_R=0.35;
+var AMBIENT_G=0.35;
+var AMBIENT_B=0.35;
 
-var MAX_ROOM=15;
+var MAX_ROOM=25;
 var SIMPLE_LIGHTMAP=false;
 
 //
@@ -34,7 +35,8 @@ var wsTextureBuildList=
     [
         [BITMAP_BRICK_STACK,genBitmap.TYPE_BRICK_STACK],
         [BITMAP_BRICK_RANDOM,genBitmap.TYPE_BRICK_RANDOM],
-        [BITMAP_TILE,genBitmap.TYPE_TILE],
+        [BITMAP_TILE,genBitmap.TYPE_TILE_SIMPLE],
+        [BITMAP_TILE_2,genBitmap.TYPE_TILE_COMPLEX],
         [BITMAP_METAL,genBitmap.TYPE_METAL],
         [BITMAP_CONCRETE,genBitmap.TYPE_CONCRETE],
         [BITMAP_WOOD_PLANK,genBitmap.TYPE_WOOD_PLANK],
@@ -199,10 +201,10 @@ function wsInit()
 {
         // setup the random numbers
     
-    //document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    //document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
-    document.getElementById('wsMapRandom').value=123456789;
+    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
+    //document.getElementById('wsMapRandom').value=123456789;
     
         // no timer yet
         

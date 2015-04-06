@@ -101,6 +101,109 @@ function mapPointInLight(pt)
     return(false);
 }
 
+function mapPointInSingleLight(light,pt)
+{
+    return(light.position.distance(pt)<light.intensity);
+}
+
+//
+// build list of meshes that intersect with
+// light and a list of lights that intersect with
+// meshes
+//
+
+function mapBuildLightMeshIntersectLists()
+{
+    var n,k,i,nIntersect,light,mesh,pt;
+    var meshIndexes,lightIndexes;
+    var nLight=this.lights.length;
+    var nMesh=this.meshes.length;
+    
+        // build the meshes intersecting lights
+        // list
+        
+    for (n=0;n!==nLight;n++) {
+        light=this.lights[n];
+        
+        meshIndexes=[];
+        
+            // check the 8 corners of the cube
+            
+        for (k=0;k!==nMesh;k++) {
+            mesh=this.meshes[k];
+            
+            pt=new wsPoint(mesh.xBound.min,mesh.yBound.min,mesh.zBound.min);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            pt=new wsPoint(mesh.xBound.min,mesh.yBound.min,mesh.zBound.max);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            pt=new wsPoint(mesh.xBound.max,mesh.yBound.min,mesh.zBound.min);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            pt=new wsPoint(mesh.xBound.max,mesh.yBound.min,mesh.zBound.max);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            pt=new wsPoint(mesh.xBound.min,mesh.yBound.max,mesh.zBound.min);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            pt=new wsPoint(mesh.xBound.min,mesh.yBound.max,mesh.zBound.max);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            pt=new wsPoint(mesh.xBound.max,mesh.yBound.max,mesh.zBound.min);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            pt=new wsPoint(mesh.xBound.max,mesh.yBound.max,mesh.zBound.max);
+            if (this.pointInSingleLight(light,pt)) {
+                meshIndexes.push(k);
+                continue;
+            }
+            
+        }
+        
+            // add to the list
+            
+        light.meshIntersectList=new Uint16Array(meshIndexes);
+    }
+    
+        // now reverse the list for lights
+        // intersecting meshes list
+        
+    for (n=0;n!==nMesh;n++) {
+        mesh=this.meshes[n];
+        
+        lightIndexes=[];
+        
+        for (k=0;k!==nLight;k++) {
+            light=this.lights[k];
+            
+            nIntersect=light.meshIntersectList.length;
+            for (i=0;i!==nIntersect;i++) {
+                if (light.meshIntersectList[i]===n) {
+                    lightIndexes.push(k);
+                    break;
+                }
+            }
+        }
+        
+        mesh.lightIntersectList=new Uint16Array(lightIndexes);
+    }
+}
+
 //
 // map light utilities
 //
@@ -228,6 +331,8 @@ function mapObject()
     this.boxMeshCollision=mapBoxMeshCollision;
     
     this.pointInLight=mapPointInLight;
+    this.pointInSingleLight=mapPointInSingleLight;
+    this.buildLightMeshIntersectLists=mapBuildLightMeshIntersectLists;
     
     this.createViewLightsFromMapLights=mapCreateViewLightsFromMapLights;
     this.setupBuffers=mapSetupBuffers;
