@@ -52,8 +52,11 @@ genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSi
     for (n=0;n!==segments.length;n++) {
         rect=segments[n];
         
-        f=genRandom.random()+darkenFactor;
-        if (f>1.0) f=1.0;
+        f=1.0;
+        if ((rect.lft>=0) && (rect.top>=0) && (rect.rgt<=wid) && (rect.bot<=high)) {        // don't darken bricks that fall off edges
+            f=genRandom.random()+darkenFactor;
+            if (f>1.0) f=1.0;
+        }
         drawBrickColor=genBitmapUtility.darkenColor(brickColor,f);
 
         genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,edgeColor,true);

@@ -1,6 +1,5 @@
 
 
-- bricks don't darken split bricks
 - need font bitmap/fps
 - reduce number of varrying to get more lights
 
@@ -16,3 +15,4 @@
 -- will need start and stop
     - close meshes
     - close gl
+    - text.release()

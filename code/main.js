@@ -25,7 +25,7 @@ var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
 var MAX_ROOM=25;
-var SIMPLE_LIGHTMAP=false;
+var SIMPLE_LIGHTMAP=true;
 
 //
 // textures to build
@@ -243,8 +243,22 @@ function wsInitLoadShaders()
         // next step
     
     wsUpdateStatus();
+    wsStageStatus('Initializing Misc Data');
+    setTimeout(function() { wsInitMiscData(0); },10);
+}
+
+function wsInitMiscData()
+{
+        // text texture
+        
+    text.initialize();
+    
+        // next step
+    
+    wsUpdateStatus();
     wsStageStatus('Generating Dynamic Textures');
     setTimeout(function() { wsInitBuildTextures(0); },10);
+    
 }
 
 function wsInitBuildTextures(idx)
