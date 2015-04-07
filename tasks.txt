@@ -3,6 +3,7 @@
 - need font bitmap/fps
 - reduce number of varrying to get more lights
 
+
 - light maps
     - light maps need all black, all white spots
        - pre-determine so we can reduce light map usage

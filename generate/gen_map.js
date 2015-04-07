@@ -124,13 +124,15 @@ genMap.removeSharedTriangles=function(map)
 // map parts
 //
 
-genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,secondaryBitmap)
+genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,levelCount)
 {
     var n;
+    var floorTextures=[BITMAP_CONCRETE,BITMAP_TILE,BITMAP_TILE_2];
+    var wallTextures=[BITMAP_STONE,BITMAP_BRICK_RANDOM,BITMAP_BRICK_STACK];
     
         // floor
         
-    map.addMesh(piece.createMeshFloor(SHADER_NORMAL,(secondaryBitmap?BITMAP_TILE:BITMAP_TILE_2),xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
+    map.addMesh(piece.createMeshFloor(SHADER_NORMAL,floorTextures[levelCount%3],xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
     
         // walls
         // combine into a single mesh
@@ -142,11 +144,11 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,secondaryB
     
     for (n=0;n!==storyCount;n++) {
         if (n===0) {
-            mesh=piece.createMeshWalls(SHADER_NORMAL,(secondaryBitmap?BITMAP_BRICK_STACK:BITMAP_BRICK_RANDOM),xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh=piece.createMeshWalls(SHADER_NORMAL,wallTextures[levelCount%3],xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
         }
         else {
             yStoryBound.add(-yStoryAdd);
-            mesh2=piece.createMeshWalls(SHADER_NORMAL,(secondaryBitmap?BITMAP_BRICK_STACK:BITMAP_BRICK_RANDOM),xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh2=piece.createMeshWalls(SHADER_NORMAL,wallTextures[levelCount%3],xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
             mesh.combineMesh(mesh2);
         }
     }
@@ -174,16 +176,16 @@ genMap.addStairMesh=function(map,piece,connectType,xStairBound,yStairBound,zStai
 
     switch (connectType) {
         case piece.CONNECT_TYPE_LEFT:
-            genMapUtil.createStairsPosX(map,SHADER_NORMAL,BITMAP_CONCRETE,xStairBound,yStairBound,zStairBound);
+            genMapUtil.createStairsPosX(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
         case piece.CONNECT_TYPE_TOP:
-            genMapUtil.createStairsPosZ(map,SHADER_NORMAL,BITMAP_CONCRETE,xStairBound,yStairBound,zStairBound);
+            genMapUtil.createStairsPosZ(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
         case piece.CONNECT_TYPE_RIGHT:
-            genMapUtil.createStairsNegX(map,SHADER_NORMAL,BITMAP_CONCRETE,xStairBound,yStairBound,zStairBound);
+            genMapUtil.createStairsNegX(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
         case piece.CONNECT_TYPE_BOTTOM:
-            genMapUtil.createStairsNegZ(map,SHADER_NORMAL,BITMAP_CONCRETE,xStairBound,yStairBound,zStairBound);
+            genMapUtil.createStairsNegZ(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
     }
 };
@@ -225,7 +227,7 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
 // build map recursive room
 //
 
-genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,connectLineIdx,connectStoryCount,needStairs,xConnectBound,yConnectBound,zConnectBound,secondaryBitmap)
+genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,connectLineIdx,connectStoryCount,needStairs,xConnectBound,yConnectBound,zConnectBound,levelCount)
 {
     var n;
     
@@ -361,7 +363,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
 
         // add the room mesh
         
-    var yStoryBound=genMap.addRoomMesh(map,piece,storyCount,xBound,yBound,zBound,secondaryBitmap);
+    var yStoryBound=genMap.addRoomMesh(map,piece,storyCount,xBound,yBound,zBound,levelCount);
 
         // add the light
         
@@ -413,10 +415,10 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
             if (genRandom.random()<setup.storyChangePercentage) {
                 
                     // move new room up
-                    // and switch bitmap
+                    // and switch level
                     
                 yStoryBound.add(-yStoryAdd);
-                secondaryBitmap=!secondaryBitmap;
+                levelCount++;
                 
                     // and tell next room that
                     // we might need stairs to it
@@ -427,7 +429,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
         
             // recurse on to build the new room
             
-        this.buildMapRecursiveRoom(map,setup,(recurseCount+1),pieceIdx,n,storyCount,nextNeedStairs,xBound,yStoryBound,zBound,secondaryBitmap);
+        this.buildMapRecursiveRoom(map,setup,(recurseCount+1),pieceIdx,n,storyCount,nextNeedStairs,xBound,yStoryBound,zBound,levelCount);
     }
 };
 
@@ -448,7 +450,7 @@ genMap.build=function(map,setup)
         // start the recursive
         // room adding
     
-    this.buildMapRecursiveRoom(map,setup,0,-1,-1,-1,false,null,null,null,false);
+    this.buildMapRecursiveRoom(map,setup,0,-1,-1,-1,false,null,null,null,0);
     wsNextStatusBar();
     
         // delete any shared triangles

@@ -9,12 +9,14 @@ var SHADER_NORMAL=1;
 
 var BITMAP_BRICK_STACK=0;
 var BITMAP_BRICK_RANDOM=1;
-var BITMAP_TILE=2;
-var BITMAP_TILE_2=3;
-var BITMAP_METAL=4;
-var BITMAP_CONCRETE=5;
-var BITMAP_WOOD_PLANK=6;
-var BITMAP_WOOD_BOX=7;
+var BITMAP_STONE=2;
+var BITMAP_TILE=3;
+var BITMAP_TILE_2=4;
+var BITMAP_STAIR_TILE=5;
+var BITMAP_METAL=6;
+var BITMAP_CONCRETE=7;
+var BITMAP_WOOD_PLANK=8;
+var BITMAP_WOOD_BOX=9;
 
 //
 // constants
@@ -25,7 +27,7 @@ var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
 var MAX_ROOM=25;
-var SIMPLE_LIGHTMAP=true;
+var SIMPLE_LIGHTMAP=false;
 
 //
 // textures to build
@@ -35,8 +37,10 @@ var wsTextureBuildList=
     [
         [BITMAP_BRICK_STACK,genBitmap.TYPE_BRICK_STACK],
         [BITMAP_BRICK_RANDOM,genBitmap.TYPE_BRICK_RANDOM],
+        [BITMAP_STONE,genBitmap.TYPE_STONE],
         [BITMAP_TILE,genBitmap.TYPE_TILE_SIMPLE],
         [BITMAP_TILE_2,genBitmap.TYPE_TILE_COMPLEX],
+        [BITMAP_STAIR_TILE,genBitmap.TYPE_TILE_SMALL],
         [BITMAP_METAL,genBitmap.TYPE_METAL],
         [BITMAP_CONCRETE,genBitmap.TYPE_CONCRETE],
         [BITMAP_WOOD_PLANK,genBitmap.TYPE_WOOD_PLANK],
@@ -276,7 +280,7 @@ function wsInitBuildTextures(idx)
     
     var setup=wsTextureBuildList[idx];
     
-    genBitmap.generate(setup[0],setup[1],null);
+    genBitmap.generate(setup[0],setup[1]);
     wsNextStatusBar();
     
         // if more textures, then loop back around

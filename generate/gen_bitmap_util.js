@@ -390,7 +390,6 @@ genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSiz
 {
     var n,lx,rx,ty,by;
     var darkenFactor;
-    var normal=vec3.create();
     
         // draw the edges
     
@@ -427,29 +426,25 @@ genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSiz
         
             // the normal
             
-        normal=vec3.fromValues(0.89,0.0,-0.44);
-        normalCTX.strokeStyle=this.normalToRGBColor(normal);
+        normalCTX.strokeStyle=this.normalToRGBColor([0.89,0.0,-0.44]);
         normalCTX.beginPath();
         normalCTX.moveTo(lx,ty);
         normalCTX.lineTo(lx,by);
         normalCTX.stroke();
         
-        normal=vec3.fromValues(-0.89,0.0,-0.44);
-        normalCTX.strokeStyle=this.normalToRGBColor(normal);
+        normalCTX.strokeStyle=this.normalToRGBColor([-0.89,0.0,-0.44]);
         normalCTX.beginPath();
         normalCTX.moveTo(rx,ty);
         normalCTX.lineTo(rx,by);
         normalCTX.stroke();
         
-        normal=vec3.fromValues(0.0,0.89,-0.44);
-        normalCTX.strokeStyle=this.normalToRGBColor(normal);
+        normalCTX.strokeStyle=this.normalToRGBColor([0.0,0.89,-0.44]);
         normalCTX.beginPath();
         normalCTX.moveTo(lx,ty);
         normalCTX.lineTo(rx,ty);
         normalCTX.stroke();
             
-        normal=vec3.fromValues(0.0,-0.89,-0.44);
-        normalCTX.strokeStyle=this.normalToRGBColor(normal);
+        normalCTX.strokeStyle=this.normalToRGBColor([0.0,-0.89,-0.44]);
         normalCTX.beginPath();
         normalCTX.moveTo(lx,by);
         normalCTX.lineTo(rx,by);
@@ -467,8 +462,141 @@ genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSiz
     
     this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.colorToRGBColor(fillRGBColor,1.0));
     
-    normal=vec3.fromValues(-1.0,-1.0,1.0);
-    this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor(normal));
+    this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor([-1.0,-1.0,1.0]));
+};
+
+genBitmapUtility.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+{
+    var n,k,k2,add,darkenFactor;
+    
+    var wid=rgt-lft;
+    var high=bot-top;
+    
+    var mx=Math.floor((lft+rgt)/2);
+    var my=Math.floor((top+bot)/2);
+
+        // build the polygon
+    
+    var x=new Uint16Array(40);
+    var y=new Uint16Array(40);
+    
+    for (n=0;n!==10;n++) {
+        add=Math.floor((wid/10)*n);
+        x[n]=lft+add;
+        y[n]=top;
+        x[n+20]=rgt-add
+        y[n+20]=bot;
+    }
+    
+    for (n=0;n!==10;n++) {
+        add=Math.floor((high/10)*n);
+        x[n+10]=rgt;
+        y[n+10]=top+add;
+        x[n+30]=lft;
+        y[n+30]=bot-add;
+    }
+    
+        // randomize it
+        
+    for (n=0;n!==40;n++) {
+        add=genRandom.randomInt(0,10);
+        x[n]+=(x[n]<mx)?add:-add;
+        add=genRandom.randomInt(0,10);
+        y[n]+=(y[n]<my)?add:-add;
+    }
+
+        // draw the edges
+        
+    bitmapCTX.lineWidth=2;
+    normalCTX.lineWidth=2;
+    
+    for (n=0;n!==edgeSize;n++) {
+        
+            // the color outline
+            
+        darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
+        bitmapCTX.strokeStyle=this.colorToRGBColor(edgeRGBColor,darkenFactor);
+
+        bitmapCTX.beginPath();
+        bitmapCTX.moveTo(x[0],y[0]);
+        
+        for (k=1;k!==40;k++) {
+            bitmapCTX.lineTo(x[k],y[k]);
+        }
+        
+        bitmapCTX.lineTo(x[0],y[0]);
+        bitmapCTX.stroke();
+        
+            // the normals
+        
+        normalCTX.strokeStyle=this.normalToRGBColor([0.0,0.89,-0.44]);
+        normalCTX.beginPath();
+        
+        for (k=0;k!==10;k++) {
+            normalCTX.moveTo(x[k],y[k]);
+            k2=k+1;
+            normalCTX.lineTo(x[k2],y[k2]);
+        }
+        
+        normalCTX.stroke();
+        
+        normalCTX.strokeStyle=this.normalToRGBColor([0.89,0.0,-0.44]);
+        normalCTX.beginPath();
+
+        for (k=10;k!==20;k++) {
+            normalCTX.moveTo(x[k],y[k]);
+            k2=k+1;
+            normalCTX.lineTo(x[k2],y[k2]);
+        }
+        
+        normalCTX.stroke();
+            
+        normalCTX.strokeStyle=this.normalToRGBColor([0.0,-0.89,-0.44]);
+        normalCTX.beginPath();
+
+        for (k=20;k!==30;k++) {
+            normalCTX.moveTo(x[k],y[k]);
+            k2=k+1;
+            normalCTX.lineTo(x[k2],y[k2]);
+        }
+        
+        normalCTX.stroke();
+        
+        normalCTX.strokeStyle=this.normalToRGBColor([-0.89,0.0,-0.44]);
+        normalCTX.beginPath();
+
+        for (k=30;k!==40;k++) {
+            normalCTX.moveTo(x[k],y[k]);
+            k2=k+1;
+            if (k2===40) k2=0;
+            normalCTX.lineTo(x[k2],y[k2]);
+        }
+        
+        normalCTX.stroke();
+        
+            // reduce polygon
+            
+        for (k=0;k!==40;k++) {
+            x[k]+=(x[k]<mx)?1:-1;
+            y[k]+=(y[k]<my)?1:-1;
+        }
+    }
+    
+    bitmapCTX.lineWidth=1;
+    normalCTX.lineWidth=1;
+    
+        // and the fill
+        
+    bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor,1.0);
+    
+    bitmapCTX.beginPath();
+    bitmapCTX.moveTo(x[0],y[0]);
+
+    for (k=1;k!==40;k++) {
+        bitmapCTX.lineTo(x[k],y[k]);
+    }
+    
+    bitmapCTX.fill();
 };
 
 genBitmapUtility.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
@@ -539,7 +667,7 @@ genBitmapUtility.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSiz
     normalCTX.putImageData(normalImgData,lft,top);
 };
 
-genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity)
+genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
 {
     if ((lft>=rgt) || (top>=bot)) return;
 
@@ -548,22 +676,24 @@ genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,lft,top,rgt,bot,ringC
     var col;
     
         // get the image data
+        // note - particles always get the entire image
+        // because they might need to wrap around edges
         
     var wid=rgt-lft;
     var high=bot-top;
         
-    var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+    var bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
     var bitmapData=bitmapImgData.data;
     
-    var normalImgData=normalCTX.getImageData(lft,top,wid,high);
+    var normalImgData=normalCTX.getImageData(0,0,imgWid,imgHigh);
     var normalData=normalImgData.data;
     
         // get the center
         // remember this is a clip so
         // it always starts at 0,0
     
-    var mx=Math.floor(wid/2);
-    var my=Math.floor(high/2);
+    var mx=lft+Math.floor(wid/2);
+    var my=top+Math.floor(high/2);
 
         // create the rings of
         // particles
@@ -589,10 +719,17 @@ genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,lft,top,rgt,bot,ringC
             fsz=genRandom.random();
             px=mx+Math.floor((fsz*ringWid)*fx);
             py=my-Math.floor((fsz*ringHigh)*fy);
+            
+                // this can wrap
+                
+            if (px<0) px+=imgWid;
+            if (px>=imgWid) px-=imgWid;
+            if (py<0) py+=imgHigh;
+            if (py>=imgHigh) py-=imgHigh;
 
                 // read the pixel and darken it
 
-            idx=((py*wid)+px)*4;
+            idx=((py*imgWid)+px)*4;
             
             col=(bitmapData[idx]/255.0)*darkenFactor;
             if (col>1.0) col=1.0;
@@ -607,9 +744,15 @@ genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,lft,top,rgt,bot,ringC
             bitmapData[idx+2]=Math.floor(col*255.0);
 
                 // get a normal for the pixel change
-                
-            normalData[idx]=(fx+1.0)*127.0;
-            normalData[idx+1]=(fy+1.0)*127.0;
+            
+            if (!flipNormals) {
+                normalData[idx]=(fx+1.0)*127.0;
+                normalData[idx+1]=(fy+1.0)*127.0;
+            }
+            else {
+                normalData[idx]=(fy+1.0)*127.0;
+                normalData[idx+1]=(fx+1.0)*127.0;
+            }
             normalData[idx+2]=(0.5+1.0)*127.0;        // just so we remember that we are focing the Z back to top
         }
 		
@@ -621,8 +764,8 @@ genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,lft,top,rgt,bot,ringC
 
         // write all the data back
 
-    bitmapCTX.putImageData(bitmapImgData,lft,top);
-    normalCTX.putImageData(normalImgData,lft,top);
+    bitmapCTX.putImageData(bitmapImgData,0,0);
+    normalCTX.putImageData(normalImgData,0,0);
 };
 
 genBitmapUtility.drawColorStripeHorizontal=function(bitmapCTX,lft,top,rgt,bot,factor,baseColor)

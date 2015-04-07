@@ -18,12 +18,14 @@ genBitmap.TEXTURE_SIZE=512;
 
 genBitmap.TYPE_BRICK_STACK=0;
 genBitmap.TYPE_BRICK_RANDOM=1;
-genBitmap.TYPE_TILE_SIMPLE=2;
-genBitmap.TYPE_TILE_COMPLEX=3;
-genBitmap.TYPE_METAL=4;
-genBitmap.TYPE_CONCRETE=5;
-genBitmap.TYPE_WOOD_PLANK=6;
-genBitmap.TYPE_WOOD_BOX=7;
+genBitmap.TYPE_STONE=2;
+genBitmap.TYPE_TILE_SIMPLE=3;
+genBitmap.TYPE_TILE_COMPLEX=4;
+genBitmap.TYPE_TILE_SMALL=5;
+genBitmap.TYPE_METAL=6;
+genBitmap.TYPE_CONCRETE=7;
+genBitmap.TYPE_WOOD_PLANK=8;
+genBitmap.TYPE_WOOD_BOX=9;
 
 //
 // brick/rock bitmaps
@@ -69,16 +71,77 @@ genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSi
 };
 
 //
+// stone bitmaps
+//
+
+genBitmap.generateStone=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+{
+    var n,rect,edgeSize;
+    var drawStoneColor,f;
+    var x,y,particleWid,particleHigh,particleDensity;
+    
+        // some random values
+    
+    var groutColor=genBitmapUtility.getRandomGreyColor(0.3,0.4);
+    var stoneColor=genBitmapUtility.getRandomColor([0.5,0.4,0.3],[0.8,0.5,0.4]);
+    var edgeColor=genBitmapUtility.darkenColor(stoneColor,0.9);
+    
+    var segments=genBitmapUtility.createRandomSegments(wid,high);
+    var darkenFactor=0.5;
+    
+        // clear canvases
+        
+    genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,genBitmapUtility.colorToRGBColor(groutColor,1.0));
+    genBitmapUtility.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
+    
+    genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+
+        // draw the stones
+        
+    for (n=0;n!==segments.length;n++) {
+        rect=segments[n];
+        
+        f=1.0;
+        if ((rect.lft>=0) && (rect.top>=0) && (rect.rgt<=wid) && (rect.bot<=high)) {        // don't darken stones that fall off edges
+            f=genRandom.random()+darkenFactor;
+            if (f>1.0) f=1.0;
+        }
+        drawStoneColor=genBitmapUtility.darkenColor(stoneColor,f);
+    
+        edgeSize=genRandom.randomInt(5,12);     // new edge size as stones aren't the same
+
+        genBitmapUtility.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,rect.rgt,rect.bot,edgeSize,drawStoneColor,edgeColor,true);
+        genBitmapUtility.addNoiseRect(bitmapCTX,rect.lft,rect.top,rect.rgt,rect.bot,darkenFactor,1.0,0.4);
+        
+            // possible marks
+        
+        if (genRandom.randomInt(0,100)>50) {
+            particleWid=genRandom.randomInt(50,30);
+            particleHigh=genRandom.randomInt(50,30);
+            particleDensity=genRandom.randomInt(150,50);
+
+            x=genRandom.randomInt((rect.lft+edgeSize),((rect.rgt-rect.lft)-(edgeSize*2)));
+            y=genRandom.randomInt((rect.top+edgeSize),((rect.bot-rect.top)-(edgeSize*2)));
+
+            genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.8,particleDensity,true);
+        }
+    }
+    
+        // finish with the specular
+        
+    genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.3);
+}
+
+//
 // tile bitmaps
 //
 
-genBitmap.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,splitCount,complex)
-{
-    var TILE_STYLE_BORDER=0;
-    var TILE_STYLE_CHECKER=1;
-    var TILE_STYLE_STRIPE=2;
+genBitmap.TILE_STYLE_BORDER=0;
+genBitmap.TILE_STYLE_CHECKER=1;
+genBitmap.TILE_STYLE_STRIPE=2;
     
-    var tileStyle;
+genBitmap.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,complex)
+{
     var x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh;
     var col;
 
@@ -99,7 +162,7 @@ genBitmap.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileCol
 
         dLft=lft;
 
-	for (x=0;x!==splitCount;x++) {
+        for (x=0;x!==splitCount;x++) {
             
             dLft=lft+(tileWid*x);
             dRgt=dLft+tileWid;
@@ -109,7 +172,8 @@ genBitmap.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileCol
                 // another tile set
 
             if ((complex) && (genRandom.random()<0.25)) {
-                this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,2,false);
+                tileStyle=genRandom.randomInt(0,3);
+                this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,false);
                 continue;
             }
 
@@ -119,40 +183,50 @@ genBitmap.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileCol
 
             switch (tileStyle) {
 
-                case TILE_STYLE_BORDER:
+                case this.TILE_STYLE_BORDER:
                     if ((x!==0) && (y!==0)) col=tileColor[1];
                     break;
 
-                case TILE_STYLE_CHECKER:
+                case this.TILE_STYLE_CHECKER:
                     col=tileColor[(x+y)&0x1];
                     break;
 
-                case TILE_STYLE_STRIPE:
+                case this.TILE_STYLE_STRIPE:
                     if ((x&0x1)!==0) col=tileColor[1];
                     break;
 
             }
 
-            genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,5,col,[0.0,0.0,0.0]);
+            genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col,[0.0,0.0,0.0]);
 
                 // possible design
 
             if ((complex) && (genRandom.random()<0.25)) {
-                genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+5),(dTop+5),(dRgt-5),(dBot-5),5,null,[0.0,0.0,0.0]);
+                genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),5,null,[0.0,0.0,0.0]);
             }
         }
     }
 };
 
-genBitmap.generateTile=function(bitmapCTX,normalCTX,specularCTX,wid,high,complex)
+genBitmap.generateTile=function(bitmapCTX,normalCTX,specularCTX,wid,high,complex,small)
 {
         // some random values
     
+    var splitCount,tileStyle;
     var tileColor=[];
-    tileColor[0]=genBitmapUtility.getRandomColor([0.3,0.25,0.4],[0.6,0.5,0.7]);
-    tileColor[1]=genBitmapUtility.darkenColor(tileColor[0],0.8);
     
-    var splitCount=genRandom.randomInt(2,2);
+    if (!small) {
+        splitCount=genRandom.randomInt(2,2);
+        tileStyle=genRandom.randomInt(0,3);
+        tileColor[0]=genBitmapUtility.getRandomColor([0.3,0.3,0.4],[0.6,0.6,0.7]);
+        tileColor[1]=genBitmapUtility.darkenColor(tileColor[0],0.8);
+    }
+    else {
+        splitCount=8;
+        tileStyle=this.TILE_STYLE_CHECKER;
+        tileColor[0]=genBitmapUtility.getRandomColor([0.5,0.3,0.3],[0.8,0.6,0.6]);
+        tileColor[1]=genBitmapUtility.darkenColor(tileColor[0],0.9);
+    }
     
         // clear canvases
         
@@ -161,7 +235,7 @@ genBitmap.generateTile=function(bitmapCTX,normalCTX,specularCTX,wid,high,complex
     
 		// original splits
         
-    this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,splitCount,complex);
+    this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,tileStyle,splitCount,(small?2:5),complex);
 
 		// tile noise
         
@@ -215,10 +289,10 @@ genBitmap.generateMetal=function(bitmapCTX,normalCTX,specularCTX,wid,high)
             y=genRandom.randomInt(plateY,(halfHigh-particleHigh));
 
             if ((k&0x1)===0) {
-                genBitmapUtility.drawParticle(bitmapCTX,normalCTX,x,y,(x+particleWid),(y+particleHigh),10,0.8,particleDensity);
+                genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.8,particleDensity,true);
             }
             else {
-                genBitmapUtility.drawParticle(bitmapCTX,normalCTX,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity);
+                genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity,false);
             }
         }
     }
@@ -256,10 +330,10 @@ genBitmap.generateConcrete=function(bitmapCTX,normalCTX,specularCTX,wid,high)
         particleHigh=genRandom.randomInt(100,100);
         particleDensity=genRandom.randomInt(150,150);
         
-        x=genRandom.randomInt(0,(wid-particleWid));
-        y=genRandom.randomInt(0,(high-particleHigh));
+        x=genRandom.randomInt(0,wid);
+        y=genRandom.randomInt(0,high);
         
-        genBitmapUtility.drawParticle(bitmapCTX,normalCTX,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity);
+        genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity,true);
     }
     
         // finish with the specular
@@ -350,7 +424,7 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
 // create bitmap
 //
 
-genBitmap.generate=function(bitmapIndex,generateType,debugPos)
+genBitmap.generate=function(bitmapIndex,generateType)
 {
     var edgeSize,paddingSize,segments;
     
@@ -396,13 +470,23 @@ genBitmap.generate=function(bitmapIndex,generateType,debugPos)
             shineFactor=5.0;
             break;
             
+        case this.TYPE_STONE:
+            this.generateStone(bitmapCTX,normalCTX,specularCTX,wid,high);
+            shineFactor=8.0;
+            break;
+            
         case this.TYPE_TILE_SIMPLE:
-            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,false);
+            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,false,false);
             shineFactor=10.0;
             break;
             
         case this.TYPE_TILE_COMPLEX:
-            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,true);
+            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,true,false);
+            shineFactor=10.0;
+            break;
+            
+        case this.TYPE_TILE_SMALL:
+            this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,false,true);
             shineFactor=10.0;
             break;
             
@@ -432,15 +516,14 @@ genBitmap.generate=function(bitmapIndex,generateType,debugPos)
 
     bitmap.load(bitmapIndex,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor);
     
-        // if there's a debug pos, then display the
-        // canvas on the page for debug purposes
-        
-    if (debugPos!==null) {
-        var x=debugPos[0];
-        var y=debugPos[1];
-        debug.displayCanvasData(bitmapCanvas,x,y,100,100);
-        debug.displayCanvasData(normalCanvas,(x+105),y,100,100);
-        debug.displayCanvasData(specularCanvas,(x+210),y,100,100);
+        // debugging
+
+/*
+    if (generateType==this.TYPE_STONE) {
+        debug.displayCanvasData(bitmapCanvas,810,10,400,400);
+        debug.displayCanvasData(normalCanvas,810,410,400,400);
+        debug.displayCanvasData(specularCanvas,810,820,400,400);
     }
+*/
     
 };
