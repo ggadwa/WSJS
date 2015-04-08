@@ -1,0 +1,80 @@
+attribute highp vec3 vertexPosition;
+attribute highp vec3 vertexNormal;
+attribute highp vec3 vertexTangent;
+attribute highp vec4 vertexAndLightmapUV;
+
+uniform highp mat4 perspectiveMatrix;
+uniform highp mat4 modelMatrix;
+uniform highp mat3 normalMatrix;
+
+struct lightType {
+    highp vec3 position;
+    lowp vec3 color;
+    mediump float intensity;
+    mediump float invertIntensity;
+    mediump float exponent;
+};
+
+uniform lightType light_0;
+uniform lightType light_1;
+uniform lightType light_2;
+uniform lightType light_3;
+
+varying highp vec3 eyeVector;
+varying highp vec4 fragUV;
+
+varying highp vec3 lightVertexVector_0;
+varying highp vec3 lightVertexVector_1;
+varying highp vec3 lightVertexVector_2;
+varying highp vec3 lightVertexVector_3;
+
+void main(void)
+{
+    gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
+
+        // get the tangent space
+
+    highp vec3 vtx=vec3(modelMatrix*vec4(vertexPosition,1.0));
+
+    mediump vec3 tangentSpaceTangent=normalize(normalMatrix*vertexTangent);
+    mediump vec3 tangentSpaceBinormal=normalize(normalMatrix*cross(vertexNormal,vertexTangent));
+    mediump vec3 tangentSpaceNormal=normalize(normalMatrix*vertexNormal);
+
+        // translate the eye vector
+
+    eyeVector.x=dot(-vtx,tangentSpaceTangent);
+    eyeVector.y=dot(-vtx,tangentSpaceBinormal);
+    eyeVector.z=dot(-vtx,tangentSpaceNormal);
+
+        // translate the light 0 vector
+
+    highp vec3 lvct=light_0.position-vertexPosition;
+    lightVertexVector_0.x=dot(lvct,tangentSpaceTangent);
+    lightVertexVector_0.y=dot(lvct,tangentSpaceBinormal);
+    lightVertexVector_0.z=dot(lvct,tangentSpaceNormal);
+
+        // translate the light 1 vector
+
+    lvct=light_1.position-vertexPosition;
+    lightVertexVector_1.x=dot(lvct,tangentSpaceTangent);
+    lightVertexVector_1.y=dot(lvct,tangentSpaceBinormal);
+    lightVertexVector_1.z=dot(lvct,tangentSpaceNormal);
+
+        // translate the light 2 vector
+
+    lvct=light_2.position-vertexPosition;
+    lightVertexVector_2.x=dot(lvct,tangentSpaceTangent);
+    lightVertexVector_2.y=dot(lvct,tangentSpaceBinormal);
+    lightVertexVector_2.z=dot(lvct,tangentSpaceNormal);
+
+        // translate the light 3 vector
+
+    lvct=light_3.position-vertexPosition;
+    lightVertexVector_3.x=dot(lvct,tangentSpaceTangent);
+    lightVertexVector_3.y=dot(lvct,tangentSpaceBinormal);
+    lightVertexVector_3.z=dot(lvct,tangentSpaceNormal);
+
+        // the varying uv
+    
+    fragUV=vertexAndLightmapUV;
+}

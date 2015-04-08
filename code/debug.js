@@ -79,14 +79,14 @@ debug.drawMeshNormals=function(shaderIdx,mesh)
     
     var vertexPosBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
     
     gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
     gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
     var indexBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
     
         // draw the lines
     

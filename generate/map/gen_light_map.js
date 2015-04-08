@@ -324,7 +324,7 @@ genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,
     return((t>0.01)&&(t<1.0));
 };
 
-genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz)
+genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,normal)
 {
     var n,nLight,trigCount;
     var light;
@@ -334,6 +334,7 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz)
     var lightBoundX,lightBoundY,lightBoundZ;
     var dist,att;
     var col=new wsColor(0.0,0.0,0.0);
+    var lightVectorNormal=vec3.create();
     
         // we have a list of mesh/light intersections we
         // use to reduce the number of lights we check for
@@ -361,6 +362,15 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz)
         lightVectorX=light.position.x-vx;
         lightVectorY=light.position.y-vy;
         lightVectorZ=light.position.z-vz;
+        
+            // ignore all triangles that are facing
+            // away from the light
+        
+        lightVectorNormal=vec3.fromValues(lightVectorX,lightVectorY,lightVectorZ);
+        vec3.normalize(lightVectorNormal,lightVectorNormal);
+        if (vec3.dot(lightVectorNormal,normal)<0.0) continue;
+        
+            // light bounding
         
         lightBoundX=new wsBound(vx,light.position.x);
         lightBoundY=new wsBound(vy,light.position.y);
@@ -424,7 +434,7 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz)
 // render a triangle
 //
 
-genLightmap.renderTriangle=function(map,meshIdx,trigIdx,simpleLightmap,ctx,pts,vs,lft,top,rgt,bot)
+genLightmap.renderTriangle=function(map,meshIdx,trigIdx,simpleLightmap,ctx,pts,vs,normal,lft,top,rgt,bot)
 {
     var x,y,lx,rx,tempX,ty,by,idx;
     var lxFactor,rxFactor,vFactor;
@@ -535,7 +545,7 @@ genLightmap.renderTriangle=function(map,meshIdx,trigIdx,simpleLightmap,ctx,pts,v
             
                 // write the pixel
                 
-            col=genLightmap.rayTraceVertex(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz);
+            col=genLightmap.rayTraceVertex(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,normal);
             data[idx++]=Math.floor(col.r*255.0);
             data[idx++]=Math.floor(col.g*255.0);
             data[idx++]=Math.floor(col.b*255.0);
@@ -564,9 +574,11 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightma
     var pt0,pt1,pt2;
     
         // get the vertexes for the triangle
+        // and one normal
         
     vIdx=mesh.indexes[trigIdx*3]*3;
     var v0=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
+    var normal=vec3.fromValues(mesh.normals[vIdx],mesh.normals[vIdx+1],mesh.normals[vIdx+2]);
 
     vIdx=mesh.indexes[(trigIdx*3)+1]*3;
     var v1=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
@@ -636,7 +648,7 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightma
     
         // ray trace the triangle
        
-    genLightmap.renderTriangle(map,meshIdx,trigIdx,simpleLightmap,ctx,[pt0,pt1,pt2],[v0,v1,v2],lft,top,(lft+genLightmap.CHUNK_SIZE),(top+genLightmap.CHUNK_SIZE));
+    genLightmap.renderTriangle(map,meshIdx,trigIdx,simpleLightmap,ctx,[pt0,pt1,pt2],[v0,v1,v2],normal,lft,top,(lft+genLightmap.CHUNK_SIZE),(top+genLightmap.CHUNK_SIZE));
 
         // add the UV
     

@@ -172,7 +172,7 @@ meshUVTangents.buildMeshUVs=function(bitmapIdx,vertices,normals)
     var normal=vec3.create();
     var mapUp=vec3.fromValues(0.0,-1.0,0.0);
     
-        // run through the vertices\
+        // run through the vertices
         // remember, both this and normals
         // are packed arrays
         
@@ -184,10 +184,16 @@ meshUVTangents.buildMeshUVs=function(bitmapIdx,vertices,normals)
         ang=vec3.dot(mapUp,normal);
         
             // wall like
-            // use combined x/z coordinates + Y coordinates of vertex
+            // use longest of x/z coordinates + Y coordinates of vertex
             
         if (Math.abs(ang)<=0.4) {
-            x=vertices[vIdx]+vertices[vIdx+2];
+            if (Math.abs(normal[0])<Math.abs(normal[2])) {
+                x=vertices[vIdx];
+            }
+            else {
+                x=vertices[vIdx+2];
+            }
+            //x=vertices[vIdx]+vertices[vIdx+2];
             y=vertices[vIdx+1];
         }
         

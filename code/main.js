@@ -5,7 +5,8 @@
 //
 
 var SHADER_DEBUG=0;
-var SHADER_NORMAL=1;
+var SHADER_MAP=1;
+var SHADER_TEXT=2;
 
 var BITMAP_BRICK_STACK=0;
 var BITMAP_BRICK_RANDOM=1;
@@ -205,10 +206,10 @@ function wsInit()
 {
         // setup the random numbers
     
-    //document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    //document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
-    document.getElementById('wsMapRandom').value=123456789;
+    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
+    //document.getElementById('wsMapRandom').value=123456789;
     
         // no timer yet
         
@@ -241,8 +242,9 @@ function wsInitLoadShaders()
 {
         // load the shaders
         
-    if (!shader.load(SHADER_DEBUG,'wsVertDebugShader','wsFragDebugShader')) return;
-    if (!shader.load(SHADER_NORMAL,'wsVertTextureShader','wsFragTextureShader')) return;
+    if (!shader.load(SHADER_DEBUG,'wsDebugVertShader','wsDebugFragShader')) return;
+    if (!shader.load(SHADER_MAP,'wsMapVertShader','wsMapFragShader')) return;
+    //if (!shader.load(SHADER_TEXT,'wsTextVertShader','wsTextFragShader')) return;
     
         // next step
     

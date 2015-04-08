@@ -132,7 +132,7 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,levelCount
     
         // floor
         
-    map.addMesh(piece.createMeshFloor(SHADER_NORMAL,floorTextures[levelCount%3],xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
+    map.addMesh(piece.createMeshFloor(SHADER_MAP,floorTextures[levelCount%3],xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
     
         // walls
         // combine into a single mesh
@@ -144,11 +144,11 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,levelCount
     
     for (n=0;n!==storyCount;n++) {
         if (n===0) {
-            mesh=piece.createMeshWalls(SHADER_NORMAL,wallTextures[levelCount%3],xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh=piece.createMeshWalls(SHADER_MAP,wallTextures[levelCount%3],xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
         }
         else {
             yStoryBound.add(-yStoryAdd);
-            mesh2=piece.createMeshWalls(SHADER_NORMAL,wallTextures[levelCount%3],xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh2=piece.createMeshWalls(SHADER_MAP,wallTextures[levelCount%3],xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
             mesh.combineMesh(mesh2);
         }
     }
@@ -157,7 +157,7 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,levelCount
     
         // ceiling
         
-    map.addMesh(piece.createMeshCeiling(SHADER_NORMAL,BITMAP_WOOD_PLANK,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_CEILING));
+    map.addMesh(piece.createMeshCeiling(SHADER_MAP,BITMAP_WOOD_PLANK,xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_CEILING));
     
         // decorations
         
@@ -176,16 +176,16 @@ genMap.addStairMesh=function(map,piece,connectType,xStairBound,yStairBound,zStai
 
     switch (connectType) {
         case piece.CONNECT_TYPE_LEFT:
-            meshPrimitives.createStairsPosX(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
+            meshPrimitives.createStairsPosX(map,SHADER_MAP,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
         case piece.CONNECT_TYPE_TOP:
-            meshPrimitives.createStairsPosZ(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
+            meshPrimitives.createStairsPosZ(map,SHADER_MAP,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
         case piece.CONNECT_TYPE_RIGHT:
-            meshPrimitives.createStairsNegX(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
+            meshPrimitives.createStairsNegX(map,SHADER_MAP,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
         case piece.CONNECT_TYPE_BOTTOM:
-            meshPrimitives.createStairsNegZ(map,SHADER_NORMAL,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
+            meshPrimitives.createStairsNegZ(map,SHADER_MAP,BITMAP_STAIR_TILE,xStairBound,yStairBound,zStairBound);
             break;
     }
 };
@@ -202,7 +202,7 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
     var xLightBound=new wsBound((lightX-400),(lightX+400));
     var yLightBound=new wsBound(yBound.min,(yBound.min+1000));
     var zLightBound=new wsBound((lightZ-400),(lightZ+400));
-    map.addMesh(meshPrimitives.createMeshPryamid(SHADER_NORMAL,BITMAP_METAL,xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
+    map.addMesh(meshPrimitives.createMeshPryamid(SHADER_MAP,BITMAP_METAL,xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
     
         // reduce light if already in the
         // path of another light

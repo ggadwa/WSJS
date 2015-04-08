@@ -16,6 +16,10 @@ text.TEXTURE_CHAR_WIDTH=21;
 text.TEXTURE_FONT_SIZE=18;
 text.TEXTURE_FONT_NAME='Arial';
 
+text.ALIGN_LEFT=0;
+text.ALIGN_CENTER=1;
+text.ALIGN_RIGHT=2;
+
 //
 // variables
 //
@@ -77,3 +81,117 @@ text.release=function()
 // draw bitmap
 //
 
+text.draw=function(shaderIdx,x,y,wid,high,str,align)
+{
+    var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
+    var cx,gx,gx2;
+    
+        // figure out the size
+        // and alignment
+        
+    var len=str.length;
+    if (len==0) return;
+        
+    var drawWid=wid*len;
+    
+    switch (align) {
+        case this.ALIGN_CENTER:
+            x-=Math.floor(drawWid/2);
+            break;
+        case this.ALIGN_RIGHT:
+            x-=drawWid;
+            break;
+    }
+    
+        // the y
+        
+    ty=y-Math.floor(high/2);
+    by=y+high;
+    
+        // build the vertices
+    
+    var nVertex=len*4;          // 4 vertices for every character
+    var nTrig=len*2;            // 2 triangles for every character
+    
+    var vertices=new Float32Array(nVertex*2);
+    var uvs=new Float32Array(nVertex*2);
+    var indexes=new Uint16Array(nTrig*3);
+    
+    vIdx=0;
+    uvIdx=0;
+    iIdx=0;
+    elementIdx=0;
+        
+    for (n=0;n!==len;n++) {
+        x2=x+wid;
+        
+        vertices[vIdx++]=x;
+        vertices[vIdx++]=ty;
+        vertices[vIdx++]=x2;
+        vertices[vIdx++]=ty;
+        vertices[vIdx++]=x2;
+        vertices[vIdx++]=by;
+        vertices[vIdx++]=x;
+        vertices[vIdx++]=by;
+        
+        cx=(str.charAt(n)-32)*this.TEXTURE_CHAR_WIDTH;
+        gx=cx/this.TEXTURE_WIDTH;
+        gx2=(cx+this.TEXTURE_CHAR_WIDTH)/this.TEXTURE_WIDTH;
+        
+        uvs[uvIdx++]=gx;
+        uvs[uvIdx++]=0.0;
+        uvs[uvIdx++]=gx2;
+        uvs[uvIdx++]=0.0;
+        uvs[uvIdx++]=gx2;
+        uvs[uvIdx++]=1.0;
+        uvs[uvIdx++]=gx;
+        uvs[uvIdx++]=1.0;
+        
+        indexes[iIdx++]=elementIdx;     // triangle 1
+        indexes[iIdx++]=elementIdx+1;
+        indexes[iIdx++]=elementIdx+2;
+        
+        indexes[iIdx++]=elementIdx;     // triangle 2
+        indexes[iIdx++]=elementIdx+2;
+        indexes[iIdx++]=elementIdx+3;
+        
+        elementIdx+=4;
+    }
+    
+        // set the shader
+        
+    var shaderProgram=shader.drawSet(shaderIdx);
+    
+        // setup the buffers
+    
+    var vertexPosBuffer=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+    
+    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+    
+    var uvPosBuffer=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,uvPosBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER,uvPosBuffer,gl.STREAM_DRAW);
+   
+    gl.enableVertexAttribArray(shaderProgram.vertexAndLightmapUVAttribute);
+    gl.vertexAttribPointer(shaderProgram.vertexAndLightmapUVAttribute,2,gl.FLOAT,false,0,0);
+
+    var indexBuffer=gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
+    
+        // draw the indexes
+        
+    gl.drawElements(gl.TRIANGLES,(trigCount*3),gl.UNSIGNED_SHORT,0);
+    
+        // remove the buffers
+        
+    gl.bindBuffer(gl.ARRAY_BUFFER,null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+    
+    gl.deleteBuffer(vertexPosBuffer);
+    gl.deleteBuffer(uvPosBuffer);
+    gl.deleteBuffer(indexBuffer);
+};

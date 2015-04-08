@@ -1,28 +1,22 @@
 
 
 
-1. fix map uv problem
-2. reverse normals on light mapping
-3. fix specular math
-4. obscuring by view port of meshes
-5. start skeleton work (always start with single, vertical line)
-6. move around some of the code into more folders
+- obscuring by view port of meshes
+- start skeleton work (always start with single, vertical line)
+- move around some of the code into more folders
+- when building view light list, ignore ones behind the player (pick better lights)
 
 
-- need font bitmap/fps
-- reduce number of varrying to get more lights
+- need font bitmap/fps/drawing routines
+   - precreate the text vertex buffer
 
 
 - light maps
     - light maps need all black, all white spots
        - pre-determine so we can reduce light map usage
     - need diffuse calcs
-    - need to avoid by reversed normals
 
-
-
-
--- will need start and stop
+- will need start and stop
     - close meshes
     - close gl
     - text.release()

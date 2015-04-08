@@ -1,0 +1,13 @@
+attribute highp vec3 vertexPosition;
+attribute highp vec4 vertexAndLightmapUV;
+
+uniform highp mat4 perspectiveMatrix;
+uniform highp mat4 modelMatrix;
+
+varying highp vec2 fragUV;      // we only use the xy of this as there's no lightmap
+
+void main(void)
+{
+    gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
+    fragUV=vertexAndLightmapUV.xy;
+}

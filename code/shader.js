@@ -10,7 +10,7 @@ var shader={};
 // constants
 //
 
-shader.LIGHT_COUNT=3;           // webgl has pretty limited varrying sometimes
+shader.LIGHT_COUNT=4;
 
 //
 // shader globals
@@ -41,7 +41,7 @@ shader.errorAlert=function(vertFrameId,fragFrameId,errStr)
 shader.loadVertexShader=function(frameId)
 {
     var shader=gl.createShader(gl.VERTEX_SHADER);
-
+    
     var frame=document.getElementById(frameId);
     var sourceStr=frame.contentWindow.document.body.firstChild.textContent;
     
@@ -183,7 +183,7 @@ shader.drawStart=function(view)
             shaderLight=shaderProgram.lights[k];
             if (shaderLight.positionUniform===-1) continue;
             
-             viewLight=view.lights[k];
+            viewLight=view.lights[k];
             
                 // no light sets everything to 0
                 
@@ -198,7 +198,7 @@ shader.drawStart=function(view)
 
                 // otherwise setup the light
                 
-            gl.uniform3f(shaderLight.positionUniform,viewLight.position.x,viewLight.position.y,viewLight.position.z);
+            gl.uniform3f(shaderLight.positionUniform,viewLight.position.x,viewLight.position.y,viewLight.position.z);            
             if (viewLight.inLightmap) {
                 gl.uniform3f(shaderLight.colorUniform,0.0,0.0,0.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
             }

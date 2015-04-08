@@ -314,7 +314,7 @@ genBitmap.generateConcrete=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     
     var concreteColor=genBitmapUtility.getRandomGreyColor(0.4,0.6);
     
-    var markCount=genRandom.randomInt(20,20);
+    var markCount=genRandom.randomInt(30,20);
     
         // clear canvases
         
@@ -328,12 +328,12 @@ genBitmap.generateConcrete=function(bitmapCTX,normalCTX,specularCTX,wid,high)
 	for (n=0;n!==markCount;n++) {
         particleWid=genRandom.randomInt(100,100);
         particleHigh=genRandom.randomInt(100,100);
-        particleDensity=genRandom.randomInt(150,150);
+        particleDensity=genRandom.randomInt(250,150);
         
         x=genRandom.randomInt(0,wid);
         y=genRandom.randomInt(0,high);
         
-        genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity,true);
+        genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
     }
     
         // finish with the specular
@@ -519,7 +519,7 @@ genBitmap.generate=function(bitmapIndex,generateType)
         // debugging
 
 /*
-    if (generateType==this.TYPE_STONE) {
+    if (generateType==this.TYPE_CONCRETE) {
         debug.displayCanvasData(bitmapCanvas,810,10,400,400);
         debug.displayCanvasData(normalCanvas,810,410,400,400);
         debug.displayCanvasData(specularCanvas,810,820,400,400);

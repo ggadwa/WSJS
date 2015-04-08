@@ -216,7 +216,7 @@ meshPrimitives.createMeshCube=function(shaderIdx,bitmapIdx,xBound,yBound,zBound,
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
         
-    var normals=meshUVTangents.buildMeshNormals(vertices,indexes,true);
+    var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
     if (!wholeUV) uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
@@ -287,7 +287,7 @@ meshPrimitives.createMeshPryamid=function(shaderIdx,bitmapIdx,xBound,yBound,zBou
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
         
-    var normals=meshUVTangents.buildMeshNormals(vertices,indexes,true);
+    var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
     var uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
