@@ -4,9 +4,9 @@
 // resource IDs
 //
 
-var SHADER_DEBUG=0;
-var SHADER_MAP=1;
-var SHADER_TEXT=2;
+var SHADER_MAP=0;
+var SHADER_TEXT=1;
+var SHADER_DEBUG=2;
 
 var BITMAP_BRICK_STACK=0;
 var BITMAP_BRICK_RANDOM=1;
@@ -242,9 +242,9 @@ function wsInitLoadShaders()
 {
         // load the shaders
         
-    if (!shader.load(SHADER_DEBUG,'wsDebugVertShader','wsDebugFragShader')) return;
     if (!shader.load(SHADER_MAP,'wsMapVertShader','wsMapFragShader')) return;
-    //if (!shader.load(SHADER_TEXT,'wsTextVertShader','wsTextFragShader')) return;
+    if (!shader.load(SHADER_TEXT,'wsTextVertShader','wsTextFragShader')) return;
+    if (!shader.load(SHADER_DEBUG,'wsDebugVertShader','wsDebugFragShader')) return;
     
         // next step
     
