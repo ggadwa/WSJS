@@ -1,5 +1,14 @@
 
 
+
+1. fix map uv problem
+2. reverse normals on light mapping
+3. fix specular math
+4. obscuring by view port of meshes
+5. start skeleton work (always start with single, vertical line)
+6. move around some of the code into more folders
+
+
 - need font bitmap/fps
 - reduce number of varrying to get more lights
 
