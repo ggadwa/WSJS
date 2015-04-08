@@ -17,7 +17,7 @@ genMap.addDecorationPillar=function(map,xBound,yBound,zBound)
 
         boxBoundX=new wsBound(x-1000,x+1000);
         boxBoundZ=new wsBound(z-1000,z+1000);
-        map.addMesh(genMapUtil.createMeshCube(SHADER_NORMAL,BITMAP_CONCRETE,boxBoundX,yBound,boxBoundZ,false,true,true,true,true,false,false,0));
+        map.addMesh(meshPrimitives.createMeshCube(SHADER_NORMAL,BITMAP_CONCRETE,boxBoundX,yBound,boxBoundZ,false,true,true,true,true,false,false,0));
     }
 }
 
@@ -40,7 +40,7 @@ genMap.addDecorationBox=function(map,xBound,yBound,zBound)
 
         boxBoundX=new wsBound(x-1000,x+1000);
         boxBoundZ=new wsBound(z-1000,z+1000);
-        map.addMesh(genMapUtil.createMeshCube(SHADER_NORMAL,BITMAP_WOOD_BOX,boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,0));
+        map.addMesh(meshPrimitives.createMeshCube(SHADER_NORMAL,BITMAP_WOOD_BOX,boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,0));
     }
 };
 
