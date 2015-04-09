@@ -29,19 +29,334 @@
 <script type="text/javascript" src="code/main/canvas.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/main/debug.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/main/main.js" charset="utf-8"></script>
+
+<!-- the shaders -->
+<!-- I hate doing it this way, but origin security stops me from using iframes for this -->
+<!-- otherwise I'd just make an iframe, load the source from file, and read it contentWindow.document.etc -->
+
+<script id="wsMapVertShader" type="x-shader/x-vertex">    
+    attribute highp vec3 vertexPosition;
+    attribute highp vec3 vertexNormal;
+    attribute highp vec3 vertexTangent;
+    attribute highp vec4 vertexAndLightmapUV;
+
+    uniform highp mat4 perspectiveMatrix;
+    uniform highp mat4 modelMatrix;
+    uniform highp mat3 normalMatrix;
+
+    struct lightType {
+        highp vec3 position;
+        lowp vec3 color;
+        mediump float intensity;
+        mediump float invertIntensity;
+        mediump float exponent;
+    };
+
+    uniform lightType light_0;
+    uniform lightType light_1;
+    uniform lightType light_2;
+    uniform lightType light_3;
+
+    varying highp vec3 eyeVector;
+    varying highp vec4 fragUV;
+
+    varying highp float lightDistance_0;
+    varying highp float lightDistance_1;
+    varying highp float lightDistance_2;
+    varying highp float lightDistance_3;
+
+    varying highp vec3 lightVertexVector_0;
+    varying highp vec3 lightVertexVector_1;
+    varying highp vec3 lightVertexVector_2;
+    varying highp vec3 lightVertexVector_3;
+
+    void main(void)
+    {
+        highp vec3 lvct;
+
+        gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
+
+            // get the tangent space
+
+        highp vec3 vtx=vec3(modelMatrix*vec4(vertexPosition,1.0));
+
+        mediump vec3 tangentSpaceTangent=normalize(normalMatrix*vertexTangent);
+        mediump vec3 tangentSpaceBinormal=normalize(normalMatrix*cross(vertexNormal,vertexTangent));
+        mediump vec3 tangentSpaceNormal=normalize(normalMatrix*vertexNormal);
+
+            // translate the eye vector
+
+        eyeVector.x=dot(-vtx,tangentSpaceTangent);
+        eyeVector.y=dot(-vtx,tangentSpaceBinormal);
+        eyeVector.z=dot(-vtx,tangentSpaceNormal);
+
+            // translate the light 0 vector
+
+        lvct=light_0.position-vertexPosition;
+        lightDistance_0=length(lvct);
+
+        lightVertexVector_0.x=dot(lvct,tangentSpaceTangent);
+        lightVertexVector_0.y=dot(lvct,tangentSpaceBinormal);
+        lightVertexVector_0.z=dot(lvct,tangentSpaceNormal);
+
+            // translate the light 1 vector
+
+        lvct=light_1.position-vertexPosition;
+        lightDistance_1=length(lvct);
+
+        lightVertexVector_1.x=dot(lvct,tangentSpaceTangent);
+        lightVertexVector_1.y=dot(lvct,tangentSpaceBinormal);
+        lightVertexVector_1.z=dot(lvct,tangentSpaceNormal);
+
+            // translate the light 2 vector
+
+        lvct=light_2.position-vertexPosition;
+        lightDistance_2=length(lvct);
+
+        lightVertexVector_2.x=dot(lvct,tangentSpaceTangent);
+        lightVertexVector_2.y=dot(lvct,tangentSpaceBinormal);
+        lightVertexVector_2.z=dot(lvct,tangentSpaceNormal);
+
+            // translate the light 3 vector
+
+        lvct=light_3.position-vertexPosition;
+        lightDistance_3=length(lvct);
+
+        lightVertexVector_3.x=dot(lvct,tangentSpaceTangent);
+        lightVertexVector_3.y=dot(lvct,tangentSpaceBinormal);
+        lightVertexVector_3.z=dot(lvct,tangentSpaceNormal);
+
+            // the varying uv
+
+        fragUV=vertexAndLightmapUV;
+    }
+</script>
+
+<script id="wsMapFragShader" type="x-shader/x-fragment">
+    uniform lowp sampler2D baseTex;
+    uniform lowp sampler2D normalTex;
+    uniform lowp sampler2D specularTex;
+    uniform lowp sampler2D lightmapTex;
+
+    uniform lowp vec3 ambient;
+    uniform mediump float shineFactor;
+
+    struct lightType {
+        highp vec3 position;
+        lowp vec3 color;
+        mediump float intensity;
+        mediump float invertIntensity;
+        mediump float exponent;
+    };
+
+    uniform lightType light_0;
+    uniform lightType light_1;
+    uniform lightType light_2;
+    uniform lightType light_3;
+
+    varying highp vec3 eyeVector;
+    varying highp vec4 fragUV;
+
+    varying highp float lightDistance_0;
+    varying highp float lightDistance_1;
+    varying highp float lightDistance_2;
+    varying highp float lightDistance_3;
+
+    varying highp vec3 lightVertexVector_0;
+    varying highp vec3 lightVertexVector_1;
+    varying highp vec3 lightVertexVector_2;
+    varying highp vec3 lightVertexVector_3;
+
+    void main(void)
+    {
+        lowp float att;
+
+            // the ambient plus the
+            // light map
+
+        lowp vec3 pixelAmbient=texture2D(lightmapTex,fragUV.zw).rgb+ambient;
+
+            // the texture fragment
+
+        lowp vec4 tex=texture2D(baseTex,fragUV.xy);
+
+            // the starting bump map
+            // since it will be created by going through the
+            // lights, we need a default value
+
+        highp vec3 bumpLightVertexVector;
+        lowp vec3 bumpMap=normalize((texture2D(normalTex,fragUV.xy).rgb*2.0)-1.0);
+        lowp float bump=dot(vec3(0.33,0.33,0.33),bumpMap);
+
+            // the starting spec map
+
+        lowp vec3 spec=vec3(0.0,0.0,0.0),specHalfVector;
+        lowp vec3 specMap=texture2D(specularTex,fragUV.xy).rgb;
+        lowp float specFactor;
+
+            // light 0
+
+        if (lightDistance_0<light_0.intensity) {
+
+                // the lighting attenuation
+
+            att=1.0-(lightDistance_0*light_0.invertIntensity);
+            att+=pow(att,light_0.exponent);
+            pixelAmbient+=(light_0.color*att);
+
+                // per-light bump calc
+
+            bumpLightVertexVector=normalize(lightVertexVector_0);
+            bump+=(dot(bumpLightVertexVector,bumpMap)*att);
+
+                // per-light spec count
+
+            specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+            specFactor=max(dot(bumpMap,specHalfVector),0.0);
+            spec+=((specMap*pow(specFactor,shineFactor))*att);
+        }
+
+            // light 1
+
+        if (lightDistance_1<light_1.intensity) {
+
+                // the lighting attenuation
+
+            att=1.0-(lightDistance_1*light_1.invertIntensity);
+            att+=pow(att,light_1.exponent);
+            pixelAmbient+=(light_1.color*att);
+
+                // per-light bump calc
+
+            bumpLightVertexVector=normalize(lightVertexVector_1);
+            bump+=(dot(bumpLightVertexVector,bumpMap)*att);
+
+                // per-light spec count
+
+            specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+            specFactor=max(dot(bumpMap,specHalfVector),0.0);
+            spec+=((specMap*pow(specFactor,shineFactor))*att);
+        }
+
+            // light 2
+
+        if (lightDistance_2<light_2.intensity) {
+
+                // the lighting attenuation
+
+            att=1.0-(lightDistance_2*light_2.invertIntensity);
+            att+=pow(att,light_2.exponent);
+            pixelAmbient+=(light_2.color*att);
+
+                // per-light bump calc
+
+            bumpLightVertexVector=normalize(lightVertexVector_2);
+            bump+=(dot(bumpLightVertexVector,bumpMap)*att);
+
+                // per-light spec count
+
+            specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+            specFactor=max(dot(bumpMap,specHalfVector),0.0);
+            spec+=((specMap*pow(specFactor,shineFactor))*att);
+        }
+
+            // light 3
+
+        if (lightDistance_3<light_3.intensity) {
+
+                // the lighting attenuation
+
+            att=1.0-(lightDistance_3*light_3.invertIntensity);
+            att+=pow(att,light_3.exponent);
+            pixelAmbient+=(light_3.color*att);
+
+                // per-light bump calc
+
+            bumpLightVertexVector=normalize(lightVertexVector_3);
+            bump+=(dot(bumpLightVertexVector,bumpMap)*att);
+
+                // per-light spec count
+
+            specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+            specFactor=max(dot(bumpMap,specHalfVector),0.0);
+            spec+=((specMap*pow(specFactor,shineFactor))*att);
+        }
+
+            // finish the spec by making sure
+            // it's dimmed in dark areas
+
+        spec=min(spec,1.0)*((pixelAmbient.r+pixelAmbient.g+pixelAmbient.b)*0.33);
+
+            // add bump into the ambient and make
+            // sure it's never less than 10% of the
+            // ambient
+
+        pixelAmbient=max((pixelAmbient*bump),(ambient*0.9));
+
+            // finally create the pixel
+
+        gl_FragColor.rgb=(tex.rgb*pixelAmbient);+spec;
+        //gl_FragColor.rgb=pixelAmbient*0.5;
+        gl_FragColor.a=tex.a;
+    }
+</script>
+
+<script id="wsTextVertShader" type="x-shader/x-vertex">    
+    attribute highp vec3 vertexPosition;
+    attribute highp vec4 vertexAndLightmapUV;
+
+    uniform highp mat4 perspectiveMatrix;
+    uniform highp mat4 modelMatrix;
+
+    varying highp vec2 fragUV;      // we only use the xy of this as there's no lightmap
+
+    void main(void)
+    {
+        gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
+        fragUV=vertexAndLightmapUV.xy;
+    }
+</script>
+
+<script id="wsTextFragShader" type="x-shader/x-fragment">
+    uniform lowp sampler2D baseTex;
+    uniform lowp vec3 ambient;
+
+    varying highp vec2 fragUV;
+
+    void main(void)
+    {
+        lowp vec4 tex=texture2D(baseTex,fragUV);
+
+        gl_FragColor.rgb=tex.rgb*ambient;       // use the ambient to color the text
+        gl_FragColor.a=tex.a;
+    }
+</script>
+
+<script id="wsDebugVertShader" type="x-shader/x-vertex">    
+    attribute highp vec3 vertexPosition;
+
+    uniform highp mat4 perspectiveMatrix;
+    uniform highp mat4 modelMatrix;
+
+    void main(void)
+    {
+        gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
+    }
+</script>
+
+<script id="wsDebugFragShader" type="x-shader/x-fragment">
+    void main(void)
+    {
+        gl_FragColor=vec4(1.0,0.0,0.5,1.0);
+    }
+</script>
+
 </head>
+
+<!-- the body -->
 
 <body onload="wsInit()">
     
-<!-- the shaders -->
-
-<iframe id="wsDebugVertShader" src="shaders/debug_vert.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
-<iframe id="wsDebugFragShader" src="shaders/debug_frag.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
-<iframe id="wsMapVertShader" src="shaders/map_vert.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
-<iframe id="wsMapFragShader" src="shaders/map_frag.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
-<iframe id="wsTextVertShader" src="shaders/text_vert.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
-<iframe id="wsTextFragShader" src="shaders/text_frag.txt" style="position:absolute;left:0px;top:0px;width:0px;height:0px;display:none"></iframe>
-
 <!-- the drawing canvas -->
 
 <canvas id="wsCanvas" style="position:absolute;left:0px;top:0px;border:1px solid black" width="800" height="500"></canvas>

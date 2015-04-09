@@ -23,11 +23,11 @@ shader.shaderCurrentIdx=-1;
 // shader errors
 //
 
-shader.errorAlert=function(vertFrameId,fragFrameId,errStr)
+shader.errorAlert=function(vertScriptId,fragScriptId,errStr)
 {
     var str='Shader Error\n';
-    if (vertFrameId!==-1) str+=('Vert Shader:'+vertFrameId+'\n');
-    if (fragFrameId!==-1) str+=('Frag Shader:'+fragFrameId+'\n');
+    if (vertScriptId!==-1) str+=('Vert Shader:'+vertScriptId+'\n');
+    if (fragScriptId!==-1) str+=('Frag Shader:'+fragScriptId+'\n');
     str+='-----------------------\n';
     str+=errStr;
     
@@ -38,46 +38,44 @@ shader.errorAlert=function(vertFrameId,fragFrameId,errStr)
 // load shaders
 //
 
-shader.loadVertexShader=function(frameId)
+shader.loadVertexShader=function(vertScriptId)
 {
     var shader=gl.createShader(gl.VERTEX_SHADER);
     
-    var frame=document.getElementById(frameId);
-    var sourceStr=frame.contentWindow.document.body.firstChild.textContent;
+    var script=document.getElementById(vertScriptId);
     
-    gl.shaderSource(shader,sourceStr);
+    gl.shaderSource(shader,script.text);
     gl.compileShader(shader);
 
     if (gl.getShaderParameter(shader,gl.COMPILE_STATUS)) return(shader);
 
-    this.errorAlert(frameId,-1,gl.getShaderInfoLog(shader));
+    this.errorAlert(vertScriptId,-1,gl.getShaderInfoLog(shader));
     return(null);
 };
 
-shader.loadFragmentShader=function(frameId)
+shader.loadFragmentShader=function(fragScriptId)
 {
     var shader=gl.createShader(gl.FRAGMENT_SHADER);
     
-    var frame=document.getElementById(frameId);
-    var sourceStr=frame.contentWindow.document.body.firstChild.textContent;
-
-    gl.shaderSource(shader,sourceStr);
+    var script=document.getElementById(fragScriptId);
+    
+    gl.shaderSource(shader,script.text);
     gl.compileShader(shader);
 
     if (gl.getShaderParameter(shader,gl.COMPILE_STATUS)) return(shader);
 
-    this.errorAlert(-1,frameId,gl.getShaderInfoLog(shader));
+    this.errorAlert(-1,fragScriptId,gl.getShaderInfoLog(shader));
     return(null);
 };
 
-shader.load=function(shaderIndex,vertFrameId,fragFrameId)
+shader.load=function(shaderIndex,vertScriptId,fragScriptId)
 {
         // get the shaders from iframes
         
-    var vertexShader=this.loadVertexShader(vertFrameId);
+    var vertexShader=this.loadVertexShader(vertScriptId);
     if (vertexShader===null) return(false);
     
-    var fragmentShader=this.loadFragmentShader(fragFrameId);
+    var fragmentShader=this.loadFragmentShader(fragScriptId);
     if (fragmentShader===null) return(false);
 
         // compile the program
@@ -88,7 +86,7 @@ shader.load=function(shaderIndex,vertFrameId,fragFrameId)
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program,gl.LINK_STATUS)) {
-        this.errorAlert(vertFrameId,fragFrameId,gl.getProgramInfoLog(program));
+        this.errorAlert(vertScriptId,fragScriptId,gl.getProgramInfoLog(program));
         return(false);
     }
     

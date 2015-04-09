@@ -1,5 +1,6 @@
 
 
+- fix firefox uniform bug whatever it is
 
 - obscuring by view port of meshes
 - start skeleton work (always start with single, vertical line)

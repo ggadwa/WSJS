@@ -27,8 +27,8 @@ var AMBIENT_R=0.35;
 var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
-var MAX_ROOM=25;
-var SIMPLE_LIGHTMAP=false;
+var MAX_ROOM=15;
+var SIMPLE_LIGHTMAP=true;
 
 //
 // textures to build
@@ -206,10 +206,10 @@ function wsInit()
 {
         // setup the random numbers
     
-    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
-    //document.getElementById('wsMapRandom').value=123456789;
+    //document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    //document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
+    document.getElementById('wsMapRandom').value=123456789;
     
         // no timer yet
         
@@ -250,7 +250,7 @@ function wsInitLoadShaders()
     
     wsUpdateStatus();
     wsStageStatus('Initializing Misc Data');
-    setTimeout(function() { wsInitMiscData(0); },10);
+    setTimeout(function() { wsInitMiscData(); },10);
 }
 
 function wsInitMiscData()
@@ -273,7 +273,7 @@ function wsInitBuildTextures(idx)
     
         // random seed
 
-    if (idx==0) {
+    if (idx===0) {
         wsStartStatusBar(bitmapCount);
         genRandom.setSeed(parseInt(document.getElementById('wsBitmapRandom').value));
     }

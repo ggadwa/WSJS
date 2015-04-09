@@ -61,11 +61,6 @@ function meshCombineMesh(mesh)
         // setup bounds
         
     this.setupBounds();
-    
-        // UV and light map UVs are packed
-        // so we need to build this buffer
-        
-    this.rebuildPackedUVBuffer();
 }
 
 //
@@ -145,6 +140,7 @@ function meshIsTriangleStraightWall(trigIdx)
 function meshRemoveTriangle(trigIdx)
 {
     if (this.indexCount===0) return;
+    if ((trigIdx<0) || (trigIdx>=this.trigCount)) return;
     
         // rebuild the array
         
@@ -165,9 +161,9 @@ function meshRemoveTriangle(trigIdx)
     this.indexes=newIndexes;
     
         // fix a couple counts
-    
-    this.indexCount-=3;
-    this.trigCount--;
+        
+    this.indexCount=this.indexes.length;
+    this.trigCount=Math.floor(this.indexCount/3);
 }
 
 //
@@ -300,7 +296,6 @@ function meshSetLightmapUVs(lightmapIdx,lightmapUVs)
 {
     this.lightmapIdx=lightmapIdx;
     this.lightmapUVs=lightmapUVs;
-    this.rebuildPackedUVBuffer();
 }
 
 //
@@ -320,6 +315,11 @@ function meshSetupShader()
 
 function meshSetupBuffers()
 {
+        // need to build the combined texture and
+        // light map uv buffer
+        
+    this.rebuildPackedUVBuffer();
+    
         // create all the buffers
         // expects buffers to already be Float32Array
         // or Uint16Array
@@ -448,7 +448,7 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     
         // special caches for light map building
         
-    this.trigRayTracecache=null;
+    this.trigRayTraceCache=null;
     
         // mesh alterations
         
@@ -495,11 +495,6 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
         // setup bounds
         
     this.setupBounds();
-    
-        // UV and light map UVs are packed
-        // so we need to build this buffer
-        
-    this.rebuildPackedUVBuffer();
 }
 
 

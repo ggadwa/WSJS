@@ -110,11 +110,20 @@ function mapPieceCreateMeshFloor(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
         indexes[n]=n;
     }
     
-        // calculate the normals, then use those to
+        // always force normals up
+        
+    var nIdx=0;
+    var normals=new Float32Array(18);
+    
+    for (n=0;n!==6;n++) {
+        normals[nIdx++]=0.0;
+        normals[nIdx++]=-1.0;
+        normals[nIdx++]=0.0;
+    }
+    
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
         
-    var normals=meshUVTangents.buildMeshNormals(vertices,indexes,true);
     var uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
@@ -154,11 +163,20 @@ function mapPieceCreateMeshCeiling(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag
         indexes[n]=n;
     }
     
-        // calculate the normals, then use those to
+        // always force normals down
+        
+    var nIdx=0;
+    var normals=new Float32Array(18);
+    
+    for (n=0;n!==6;n++) {
+        normals[nIdx++]=0.0;
+        normals[nIdx++]=1.0;
+        normals[nIdx++]=0.0;
+    }
+    
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
         
-    var normals=meshUVTangents.buildMeshNormals(vertices,indexes,true);
     var uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
