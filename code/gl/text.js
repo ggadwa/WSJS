@@ -81,7 +81,7 @@ text.release=function()
 // draw bitmap
 //
 
-text.draw=function(shaderIdx,x,y,wid,high,str,align)
+text.draw=function(shaderIdx,x,y,wid,high,str,align,color)
 {
     var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
     var cx,gx,gx2;
@@ -90,7 +90,7 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align)
         // and alignment
         
     var len=str.length;
-    if (len==0) return;
+    if (len===0) return;
         
     var drawWid=wid*len;
     
@@ -158,9 +158,15 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align)
         elementIdx+=4;
     }
     
-        // set the shader
+        // set the shader and bitmap
         
     var shaderProgram=shader.drawSet(shaderIdx);
+    
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D,fontTexture);
+    gl.uniform1i(shaderProgram.baseTexUniform,0);
+    
+    if (shaderProgram.ambientUniform!==-1) gl.uniform3f(shaderProgram.ambientUniform,color.r,color.g,color.b);
     
         // setup the buffers
     
@@ -184,7 +190,7 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align)
     
         // draw the indexes
         
-    gl.drawElements(gl.TRIANGLES,(trigCount*3),gl.UNSIGNED_SHORT,0);
+    gl.drawElements(gl.TRIANGLES,(nTrig*3),gl.UNSIGNED_SHORT,0);
     
         // remove the buffers
         

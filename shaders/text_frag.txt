@@ -1,8 +1,12 @@
 uniform lowp sampler2D baseTex;
+uniform lowp vec3 ambient;
 
 varying highp vec2 fragUV;
 
 void main(void)
 {
-    gl_FragColor=texture2D(baseTex,fragUV);
+    lowp vec4 tex=texture2D(baseTex,fragUV);
+
+    gl_FragColor.rgb=tex.rgb*ambient;       // use the ambient to color the text
+    gl_FragColor.a=tex.a;
 }

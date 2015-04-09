@@ -34,7 +34,7 @@ genBitmap.TYPE_WOOD_BOX=9;
 genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSize,paddingSize,darkenFactor,segments)
 {
     var n,rect;
-    var drawBrickColor,f;
+    var drawBrickColor,drawEdgeColor,f;
     
         // some random values
     
@@ -59,9 +59,11 @@ genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSi
             f=genRandom.random()+darkenFactor;
             if (f>1.0) f=1.0;
         }
+        
         drawBrickColor=genBitmapUtility.darkenColor(brickColor,f);
+        drawEdgeColor=genBitmapUtility.darkenColor(edgeColor,f);
 
-        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,edgeColor,true);
+        genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,drawEdgeColor,true);
         genBitmapUtility.addNoiseRect(bitmapCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),darkenFactor,1.0,0.4);
     }
     
@@ -77,7 +79,7 @@ genBitmap.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSi
 genBitmap.generateStone=function(bitmapCTX,normalCTX,specularCTX,wid,high)
 {
     var n,rect,edgeSize;
-    var drawStoneColor,f;
+    var drawStoneColor,drawEdgeColor,f;
     var x,y,particleWid,particleHigh,particleDensity;
     
         // some random values
@@ -106,11 +108,13 @@ genBitmap.generateStone=function(bitmapCTX,normalCTX,specularCTX,wid,high)
             f=genRandom.random()+darkenFactor;
             if (f>1.0) f=1.0;
         }
+        
         drawStoneColor=genBitmapUtility.darkenColor(stoneColor,f);
+        drawEdgeColor=genBitmapUtility.darkenColor(edgeColor,f);
     
         edgeSize=genRandom.randomInt(5,12);     // new edge size as stones aren't the same
 
-        genBitmapUtility.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,rect.rgt,rect.bot,edgeSize,drawStoneColor,edgeColor,true);
+        genBitmapUtility.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,rect.rgt,rect.bot,edgeSize,drawStoneColor,drawEdgeColor,true);
         genBitmapUtility.addNoiseRect(bitmapCTX,rect.lft,rect.top,rect.rgt,rect.bot,darkenFactor,1.0,0.4);
         
             // possible marks
