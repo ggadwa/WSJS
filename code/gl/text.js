@@ -44,7 +44,7 @@ text.initialize=function()
         // background is black, text is white
         // so it can be colored
         
-    genBitmapUtility.drawRect(ctx,0,0,this.TEXTURE_WIDTH,this.TEXTURE_HEIGHT,'#000000');
+    genBitmapUtility.drawRect(ctx,0,0,this.TEXTURE_WIDTH,this.TEXTURE_HEIGHT,'#FF0000');
     
         // draw the text
         
@@ -156,6 +156,8 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align,color)
         indexes[iIdx++]=elementIdx+3;
         
         elementIdx+=4;
+        
+        x=x2;
     }
     
         // set the shader and bitmap
@@ -163,10 +165,10 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align,color)
     var shaderProgram=shader.drawSet(shaderIdx);
     
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D,fontTexture);
+    gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
     gl.uniform1i(shaderProgram.baseTexUniform,0);
     
-    if (shaderProgram.ambientUniform!==-1) gl.uniform3f(shaderProgram.ambientUniform,color.r,color.g,color.b);
+    if (shaderProgram.ambientUniform!==null) gl.uniform3f(shaderProgram.ambientUniform,color.r,color.g,color.b);
     
         // setup the buffers
     
@@ -179,7 +181,7 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align,color)
     
     var uvPosBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,uvPosBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER,uvPosBuffer,gl.STREAM_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER,uvs,gl.STREAM_DRAW);
    
     gl.enableVertexAttribArray(shaderProgram.vertexAndLightmapUVAttribute);
     gl.vertexAttribPointer(shaderProgram.vertexAndLightmapUVAttribute,2,gl.FLOAT,false,0,0);

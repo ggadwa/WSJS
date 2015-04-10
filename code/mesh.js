@@ -292,21 +292,10 @@ function meshRebuildPackedUVBuffer()
     }
 }
 
-function meshSetLightmapUVs(lightmapIdx,lightmapUVs)
+function meshSetLightmap(lightmap,lightmapUVs)
 {
-    this.lightmapIdx=lightmapIdx;
+    this.lightmap=lightmap;
     this.lightmapUVs=lightmapUVs;
-}
-
-//
-// shader setup
-//
-
-function meshSetupShader()
-{
-    shader.drawSet(this.shaderIdx);
-    lightmap.drawSet(this.shaderIdx,this.lightmapIdx);
-    bitmap.drawSet(this.shaderIdx,this.bitmapIdx);
 }
 
 //
@@ -345,47 +334,35 @@ function meshSetupBuffers()
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    
 }
 
-function meshEnableBuffers()
+function meshEnableBuffers(shader)
 {
-    var shaderProgram=shader.drawSet(this.shaderIdx);
-
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    if (shaderProgram.vertexNormalAttribute!==-1) gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
-    if (shaderProgram.vertexTangentAttribute!==-1) gl.enableVertexAttribArray(shaderProgram.vertexTangentAttribute);
-    if (shaderProgram.vertexAndLightmapUVAttribute!==-1) gl.enableVertexAttribArray(shaderProgram.vertexAndLightmapUVAttribute);
+    gl.enableVertexAttribArray(shader.vertexPositionAttribute);
+    gl.enableVertexAttribArray(shader.vertexNormalAttribute);
+    gl.enableVertexAttribArray(shader.vertexTangentAttribute);
+    gl.enableVertexAttribArray(shader.vertexAndLightmapUVAttribute);
 }
 
-function meshDisableBuffers()
+function meshDisableBuffers(shader)
 {
-    var shaderProgram=shader.drawSet(this.shaderIdx);
-
-    gl.disableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    if (shaderProgram.vertexNormalAttribute!==-1) gl.disableVertexAttribArray(shaderProgram.vertexNormalAttribute);
-    if (shaderProgram.vertexTangentAttribute!==-1) gl.disableVertexAttribArray(shaderProgram.vertexTangentAttribute);
-    if (shaderProgram.vertexAndLightmapUVAttribute!==-1) gl.disableVertexAttribArray(shaderProgram.vertexAndLightmapUVAttribute);
+    gl.disableVertexAttribArray(shader.vertexPositionAttribute);
+    gl.disableVertexAttribArray(shader.vertexNormalAttribute);
+    gl.disableVertexAttribArray(shader.vertexTangentAttribute);
+    gl.disableVertexAttribArray(shader.vertexAndLightmapUVAttribute);
 }
 
-function meshBindBuffers()
+function meshBindBuffers(shader)
 {
-    var shaderProgram=shader.drawSet(this.shaderIdx);
-
     gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+    gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
  
-    if (shaderProgram.vertexNormalAttribute!==-1) {
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
-    }
+    gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
+    gl.vertexAttribPointer(shader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
     
-    if (shaderProgram.vertexTangentAttribute!==-1) {
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
-    }
+    gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
+    gl.vertexAttribPointer(shader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
     
-    if (shaderProgram.vertexAndLightmapUVAttribute!==-1) {
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
-        gl.vertexAttribPointer(shaderProgram.vertexAndLightmapUVAttribute,4,gl.FLOAT,false,0,0);
-    }
+    gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
+    gl.vertexAttribPointer(shader.vertexAndLightmapUVAttribute,4,gl.FLOAT,false,0,0);
     
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
 }
@@ -420,11 +397,10 @@ function meshClose()
 // mesh object
 //
 
-function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,indexes,flag)
+function meshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
 {
-    this.shaderIdx=shaderIdx;
-    this.bitmapIdx=bitmapIdx;
-    this.lightmapIdx=-1;
+    this.bitmap=bitmap;
+    this.lightmap=null;
     this.vertices=vertices;
     this.normals=normals;
     this.tangents=tangents;
@@ -481,7 +457,6 @@ function meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,vertexUVs,inde
     
         // draw functions
         
-    this.setupShader=meshSetupShader;
     this.setupBuffers=meshSetupBuffers;
     this.enableBuffers=meshEnableBuffers;
     this.disableBuffers=meshDisableBuffers;

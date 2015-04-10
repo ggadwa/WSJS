@@ -28,7 +28,9 @@ function initGL(canvas)
     gl.enable(gl.DEPTH_TEST);
     
         // cache some values
-        
+    
+    view.wid=canvas.width;
+    view.high=canvas.height;
     view.aspect=canvas.width/canvas.height;
     
     return(true);

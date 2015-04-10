@@ -79,7 +79,7 @@ function mapPieceGetConnectTypeLength(connectLineIdx,xBound,zBound)
 // piece object mesh creation
 //
 
-function mapPieceCreateMeshFloor(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
+function mapPieceCreateMeshFloor(bitmap,xBound,yBound,zBound,flag)
 {
     var vertices=new Float32Array(18);
      
@@ -124,15 +124,15 @@ function mapPieceCreateMeshFloor(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
         
-    var uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
+    var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
         // finally create the mesh
         
-    return(new meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,uvs,indexes,flag));
+    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
 }
 
-function mapPieceCreateMeshCeiling(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
+function mapPieceCreateMeshCeiling(bitmap,xBound,yBound,zBound,flag)
 {
     var vertices=new Float32Array(18);
      
@@ -177,15 +177,15 @@ function mapPieceCreateMeshCeiling(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
         
-    var uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
+    var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
         // finally create the mesh
         
-    return(new meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,uvs,indexes,flag));
+    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
 }
 
-function mapPieceCreateMeshWalls(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
+function mapPieceCreateMeshWalls(bitmap,xBound,yBound,zBound,flag)
 {
     var n,k,nPoint,x1,x2,z1,z2,vIdx,vArrIdx,iArrIdx;
     var pt;
@@ -247,12 +247,12 @@ function mapPieceCreateMeshWalls(shaderIdx,bitmapIdx,xBound,yBound,zBound,flag)
         // calculate the tangents
         
     var normals=meshUVTangents.buildMeshNormals(vertices,indexes,true);
-    var uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
+    var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
         // finally create the mesh
         
-    return(new meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,uvs,indexes,flag));
+    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
 }
 
 //

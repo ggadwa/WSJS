@@ -64,8 +64,6 @@ var timer=null;
 
 function drawView()
 {
-    //gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-    
         // convert view lights to shader lights
         
     map.createViewLightsFromMapLights(view,camera);
@@ -97,23 +95,19 @@ function drawView()
     
     mat3.fromMat4(view.normalMatrix,normal4x4Mat);
     
-        // start the shaders
-        // and bitmaps
+        // the 2D ortho matrix
         
-    shader.drawStart(view);
-    bitmap.drawStart();
-    lightmap.drawStart();
-
+    mat4.ortho(view.orthoMatrix,0.0,view.wid,view.high,0.0,-1.0,1.0);
+    
         // draw the map
         
-    map.draw();
-
-        // unbind the shaders
-        // and bitmaps
+    map.draw(view);
     
-    lightmap.drawEnd();
-    bitmap.drawEnd();
-    shader.drawEnd();
+        // overlays
+        
+    //text.draw(SHADER_TEXT,10,50,25,20,"Blech!",text.ALIGN_LEFT,new wsColor(1.0,1.0,0.0));
+    
+
 }
 
 //
@@ -186,7 +180,6 @@ function wsRefresh()
         
     map.close();
     lightmap.close();
-    bitmap.close();
     
         // start at the texture generating step
     
@@ -206,10 +199,10 @@ function wsInit()
 {
         // setup the random numbers
     
-    //document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    //document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
-    document.getElementById('wsMapRandom').value=123456789;
+    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
+    //document.getElementById('wsMapRandom').value=123456789;
     
         // no timer yet
         
@@ -240,11 +233,7 @@ function wsInitWebGL()
     
 function wsInitLoadShaders()
 {
-        // load the shaders
-        
-    if (!shader.load(SHADER_MAP,'wsMapVertShader','wsMapFragShader')) return;
-    if (!shader.load(SHADER_TEXT,'wsTextVertShader','wsTextFragShader')) return;
-    if (!shader.load(SHADER_DEBUG,'wsDebugVertShader','wsDebugFragShader')) return;
+    mapShader.initialize();
     
         // next step
     
@@ -282,7 +271,7 @@ function wsInitBuildTextures(idx)
     
     var setup=wsTextureBuildList[idx];
     
-    genBitmap.generate(setup[0],setup[1]);
+    map.addBitmap(genBitmap.generate(setup[0],setup[1]));
     wsNextStatusBar();
     
         // if more textures, then loop back around

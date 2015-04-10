@@ -276,6 +276,7 @@ function wsShaderProgramObject(program)
     this.perspectiveMatrixUniform=null;
     this.modelMatrixUniform=null;
     this.normalMatrixUniform=null;
+    this.orthoMatrixUniform=null;
     
     this.shineFactorUniform=null;
     
@@ -292,19 +293,6 @@ function wsShaderProgramObject(program)
 }
 
 //
-// bitmap objects
-//
-
-function wsBitmapObject(texture,normalMap,specularMap,uvScale,shineFactor)
-{
-    this.texture=texture;
-    this.normalMap=normalMap;
-    this.specularMap=specularMap;
-    this.uvScale=uvScale;
-    this.shineFactor=shineFactor;
-}
-
-//
 // view rendering
 //
 
@@ -314,12 +302,15 @@ function wsViewObject()
     this.OPENGL_NEAR_Z=500;
     this.OPENGL_FAR_Z=300000;
 
+    this.wid=0;
+    this.high=0;
     this.aspect=0.0;
     this.lookAtUpVector=vec3.fromValues(0.0,1.0,0.0);
 
     this.perspectiveMatrix=mat4.create();
     this.modelMatrix=mat4.create();
     this.normalMatrix=mat3.create();
+    this.orthoMatrix=mat4.create();
     
     this.ambient=new wsColor(0.0,0.0,0.0);
     

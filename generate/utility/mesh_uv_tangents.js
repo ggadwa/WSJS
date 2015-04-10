@@ -150,7 +150,7 @@ meshUVTangents.buildMeshNormals=function(vertices,indexes,normalsIn)
 // create UVs from vertices and normals
 //
 
-meshUVTangents.buildMeshUVs=function(bitmapIdx,vertices,normals)
+meshUVTangents.buildMeshUVs=function(bitmap,vertices,normals)
 {
     var n,nVertex,vIdx,arrIdx;
     var x,y,ang;
@@ -160,10 +160,10 @@ meshUVTangents.buildMeshUVs=function(bitmapIdx,vertices,normals)
     
     arrIdx=0;
     
-        // get the texture map until
-        // to uv scale
+        // get the UV scale for this
+        // bitmap
         
-    var uvScale=bitmap.getUVScale(bitmapIdx);
+    var uvScale=bitmap.uvScale;
     
         // determine floor/wall like by
         // the dot product of the normal

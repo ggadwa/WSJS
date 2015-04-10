@@ -83,6 +83,7 @@ genLightmap.finishBitmap=function(lightmapIdx,bitmapCanvas)
 {
         // load the bitmap into webGL
 
+    //map.addLightmap(new lightmap(bitmapCanvas));      // need to redo all of this
     lightmap.load(lightmapIdx,bitmapCanvas);
     
         // debugging code

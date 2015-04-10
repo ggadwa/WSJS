@@ -16,7 +16,7 @@ meshPrimitives.STAIR_COUNT=10;
 // create cube
 //
 
-meshPrimitives.createMeshCube=function(shaderIdx,bitmapIdx,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,flags)
+meshPrimitives.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,flags)
 {
         // get cube size
         
@@ -217,19 +217,19 @@ meshPrimitives.createMeshCube=function(shaderIdx,bitmapIdx,xBound,yBound,zBound,
         // calculate the tangents
         
     var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
-    if (!wholeUV) uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
+    if (!wholeUV) uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
         // finally create the mesh
         
-    return(new meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,uvs,indexes,flags));
+    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
 };
 
 //
 // create pryamid
 //
 
-meshPrimitives.createMeshPryamid=function(shaderIdx,bitmapIdx,xBound,yBound,zBound,flags)
+meshPrimitives.createMeshPryamid=function(bitmap,xBound,yBound,zBound,flags)
 {
     var x=xBound.getMidPoint();
     var z=zBound.getMidPoint();
@@ -288,19 +288,19 @@ meshPrimitives.createMeshPryamid=function(shaderIdx,bitmapIdx,xBound,yBound,zBou
         // calculate the tangents
         
     var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
-    var uvs=meshUVTangents.buildMeshUVs(bitmapIdx,vertices,normals);
+    var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
         // finally create the mesh
         
-    return(new meshObject(shaderIdx,bitmapIdx,vertices,normals,tangents,uvs,indexes,flags));
+    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
 };
 
 //
 // create stairs
 //
 
-meshPrimitives.createStairsPosX=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
+meshPrimitives.createStairsPosX=function(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(xBound.max-xBound.min)/this.STAIR_COUNT;
@@ -311,10 +311,10 @@ meshPrimitives.createStairsPosX=function(map,shaderIdx,bitmapIdx,xBound,yBound,z
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
         if (n===0) {
-            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,false,false,true,true,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,false,true,true,true,true,false,genMap.MESH_FLAG_STAIR);
         }
         else {
-            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,false,false,true,true,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,false,true,true,true,true,false,genMap.MESH_FLAG_STAIR);
             mesh.combineMesh(mesh2);
         }
         xStepBound.add(stepAdd);
@@ -323,7 +323,7 @@ meshPrimitives.createStairsPosX=function(map,shaderIdx,bitmapIdx,xBound,yBound,z
     map.addMesh(mesh);
 };
 
-meshPrimitives.createStairsPosZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
+meshPrimitives.createStairsPosZ=function(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(zBound.max-zBound.min)/this.STAIR_COUNT;
@@ -334,10 +334,10 @@ meshPrimitives.createStairsPosZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,z
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
         if (n===0) {
-            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,false,true,true,false,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,false,true,true,false,genMap.MESH_FLAG_STAIR);
         }
         else {
-            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,false,true,true,false,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,false,true,true,false,genMap.MESH_FLAG_STAIR);
             mesh.combineMesh(mesh2);
         }
         zStepBound.add(stepAdd);
@@ -346,7 +346,7 @@ meshPrimitives.createStairsPosZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,z
     map.addMesh(mesh);
 };
 
-meshPrimitives.createStairsNegX=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
+meshPrimitives.createStairsNegX=function(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(xBound.max-xBound.min)/this.STAIR_COUNT;
@@ -357,10 +357,10 @@ meshPrimitives.createStairsNegX=function(map,shaderIdx,bitmapIdx,xBound,yBound,z
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
         if (n===0) {
-            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,false,true,false,true,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,true,false,true,true,true,false,genMap.MESH_FLAG_STAIR);
         }
         else {
-            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xStepBound,yStepBound,zBound,false,true,false,true,true,true,false,genMap.MESH_FLAG_STAIR);
+            mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,true,false,true,true,true,false,genMap.MESH_FLAG_STAIR);
             mesh.combineMesh(mesh2);
         }
         xStepBound.add(-stepAdd);
@@ -369,7 +369,7 @@ meshPrimitives.createStairsNegX=function(map,shaderIdx,bitmapIdx,xBound,yBound,z
     map.addMesh(mesh);
 };
 
-meshPrimitives.createStairsNegZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,zBound)
+meshPrimitives.createStairsNegZ=function(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(zBound.max-zBound.min)/this.STAIR_COUNT;
@@ -380,10 +380,10 @@ meshPrimitives.createStairsNegZ=function(map,shaderIdx,bitmapIdx,xBound,yBound,z
     for (n=0;n!==this.STAIR_COUNT;n++) {
         yStepBound.min+=stepDrop;
         if (n===0) {
-            mesh=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,false,true,true,true,false,true,false,genMap.MESH_FLAG_STAIR);
+            mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,true,false,true,false,genMap.MESH_FLAG_STAIR);
         }
         else {
-            mesh2=this.createMeshCube(shaderIdx,bitmapIdx,xBound,yStepBound,zStepBound,false,true,true,true,false,true,false,genMap.MESH_FLAG_STAIR);
+            mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,true,false,true,false,genMap.MESH_FLAG_STAIR);
             mesh.combineMesh(mesh2);
         }
         zStepBound.add(-stepAdd);

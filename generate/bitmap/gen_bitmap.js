@@ -127,7 +127,7 @@ genBitmap.generateStone=function(bitmapCTX,normalCTX,specularCTX,wid,high)
             x=genRandom.randomInt((rect.lft+edgeSize),((rect.rgt-rect.lft)-(edgeSize*2)));
             y=genRandom.randomInt((rect.top+edgeSize),((rect.bot-rect.top)-(edgeSize*2)));
 
-            genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.8,particleDensity,true);
+            genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.6,particleDensity,true);
         }
     }
     
@@ -428,7 +428,7 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
 // create bitmap
 //
 
-genBitmap.generate=function(bitmapIndex,generateType)
+genBitmap.generate=function(bitmapId,generateType)
 {
     var edgeSize,paddingSize,segments;
     
@@ -516,10 +516,6 @@ genBitmap.generate=function(bitmapIndex,generateType)
 
     }
     
-        // finally load into webGL
-
-    bitmap.load(bitmapIndex,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor);
-    
         // debugging
 
 /*
@@ -529,5 +525,9 @@ genBitmap.generate=function(bitmapIndex,generateType)
         debug.displayCanvasData(specularCanvas,810,820,400,400);
     }
 */
-    
+
+        // finally create the bitmap
+        // object and load into WebGL
+
+    return(new bitmapObject(bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
 };

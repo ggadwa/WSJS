@@ -12,10 +12,11 @@
 <script type="text/javascript" src="code/gl/gl.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/gl/shader.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/gl/text.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/gl/bitmap.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/gl/lightmap.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/mesh.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map/map.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map/map_shader.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map/map_bitmap.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/random.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/mesh_uv_tangents.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/mesh_primitives.js" charset="utf-8"></script>
@@ -34,6 +35,8 @@
 <!-- I hate doing it this way, but origin security stops me from using iframes for this -->
 <!-- otherwise I'd just make an iframe, load the source from file, and read it contentWindow.document.etc -->
 
+<!-- NOTE!  lightType has two vec4 instead of vec3, this is to work around a windows bug.  Fix later when bug is fixed -->
+
 <script id="wsMapVertShader" type="x-shader/x-vertex">    
     attribute highp vec3 vertexPosition;
     attribute highp vec3 vertexNormal;
@@ -45,8 +48,8 @@
     uniform highp mat3 normalMatrix;
 
     struct lightType {
-        highp vec3 position;
-        lowp vec3 color;
+        highp vec4 position;
+        lowp vec4 color;
         mediump float intensity;
         mediump float invertIntensity;
         mediump float exponent;
@@ -92,7 +95,7 @@
 
             // translate the light 0 vector
 
-        lvct=light_0.position-vertexPosition;
+        lvct=light_0.position.xyz-vertexPosition;
         lightDistance_0=length(lvct);
 
         lightVertexVector_0.x=dot(lvct,tangentSpaceTangent);
@@ -101,7 +104,7 @@
 
             // translate the light 1 vector
 
-        lvct=light_1.position-vertexPosition;
+        lvct=light_1.position.xyz-vertexPosition;
         lightDistance_1=length(lvct);
 
         lightVertexVector_1.x=dot(lvct,tangentSpaceTangent);
@@ -110,7 +113,7 @@
 
             // translate the light 2 vector
 
-        lvct=light_2.position-vertexPosition;
+        lvct=light_2.position.xyz-vertexPosition;
         lightDistance_2=length(lvct);
 
         lightVertexVector_2.x=dot(lvct,tangentSpaceTangent);
@@ -119,7 +122,7 @@
 
             // translate the light 3 vector
 
-        lvct=light_3.position-vertexPosition;
+        lvct=light_3.position.xyz-vertexPosition;
         lightDistance_3=length(lvct);
 
         lightVertexVector_3.x=dot(lvct,tangentSpaceTangent);
@@ -142,8 +145,8 @@
     uniform mediump float shineFactor;
 
     struct lightType {
-        highp vec3 position;
-        lowp vec3 color;
+        highp vec4 position;
+        lowp vec4 color;
         mediump float intensity;
         mediump float invertIntensity;
         mediump float exponent;
@@ -202,7 +205,7 @@
 
             att=1.0-(lightDistance_0*light_0.invertIntensity);
             att+=pow(att,light_0.exponent);
-            pixelAmbient+=(light_0.color*att);
+            pixelAmbient+=(light_0.color.rgb*att);
 
                 // per-light bump calc
 
@@ -224,7 +227,7 @@
 
             att=1.0-(lightDistance_1*light_1.invertIntensity);
             att+=pow(att,light_1.exponent);
-            pixelAmbient+=(light_1.color*att);
+            pixelAmbient+=(light_1.color.rgb*att);
 
                 // per-light bump calc
 
@@ -246,7 +249,7 @@
 
             att=1.0-(lightDistance_2*light_2.invertIntensity);
             att+=pow(att,light_2.exponent);
-            pixelAmbient+=(light_2.color*att);
+            pixelAmbient+=(light_2.color.rgb*att);
 
                 // per-light bump calc
 
@@ -268,7 +271,7 @@
 
             att=1.0-(lightDistance_3*light_3.invertIntensity);
             att+=pow(att,light_3.exponent);
-            pixelAmbient+=(light_3.color*att);
+            pixelAmbient+=(light_3.color.rgb*att);
 
                 // per-light bump calc
 
@@ -295,25 +298,23 @@
 
             // finally create the pixel
 
-        gl_FragColor.rgb=(tex.rgb*pixelAmbient);+spec;
-        //gl_FragColor.rgb=pixelAmbient*0.5;
+        gl_FragColor.rgb=(tex.rgb*pixelAmbient)+spec;
         gl_FragColor.a=tex.a;
     }
 </script>
 
 <script id="wsTextVertShader" type="x-shader/x-vertex">    
     attribute highp vec3 vertexPosition;
-    attribute highp vec4 vertexAndLightmapUV;
+    attribute highp vec2 vertexAndLightmapUV;      // we only use the xy of this as there's no lightmap
 
-    uniform highp mat4 perspectiveMatrix;
-    uniform highp mat4 modelMatrix;
+    uniform highp mat4 orthoMatrix;
 
-    varying highp vec2 fragUV;      // we only use the xy of this as there's no lightmap
+    varying highp vec2 fragUV;
 
     void main(void)
     {
-        gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
-        fragUV=vertexAndLightmapUV.xy;
+        gl_Position=orthoMatrix*vec4(vertexPosition,1.0);
+        fragUV=vertexAndLightmapUV;
     }
 </script>
 
@@ -327,8 +328,8 @@
     {
         lowp vec4 tex=texture2D(baseTex,fragUV);
 
-        gl_FragColor.rgb=tex.rgb*ambient;       // use the ambient to color the text
-        gl_FragColor.a=tex.a;
+        gl_FragColor.rgb=tex.rgb;//*ambient;       // use the ambient to color the text
+        gl_FragColor.a=1.0;//tex.a;
     }
 </script>
 

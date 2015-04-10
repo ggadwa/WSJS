@@ -107,6 +107,7 @@ shader.load=function(shaderIndex,vertScriptId,fragScriptId)
     shaderProgram.perspectiveMatrixUniform=gl.getUniformLocation(program,'perspectiveMatrix');
     shaderProgram.modelMatrixUniform=gl.getUniformLocation(program,'modelMatrix');
     shaderProgram.normalMatrixUniform=gl.getUniformLocation(program,'normalMatrix');
+    shaderProgram.orthoMatrixUniform=gl.getUniformLocation(program,'orthoMatrix');
     
     shaderProgram.shineFactorUniform=gl.getUniformLocation(program,'shineFactor');
     
@@ -160,48 +161,55 @@ shader.drawStart=function(view)
             // the last shader so we don't
             // have to reset if it's the first draw
             
+            // SUPERGUMBA -- NOTE!!!!
+            // windows has a dumb bug where two vec3 in a struct
+            // will stomp on each other.  The work-around is to use
+            // a vec4.  This is ugly. FIX LATER
+            
         gl.useProgram(shaderProgram.program);
         
         this.shaderCurrentIdx=n;
         
             // matrix
         
-        gl.uniformMatrix4fv(shaderProgram.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-        gl.uniformMatrix4fv(shaderProgram.modelMatrixUniform,false,view.modelMatrix);
-        if (shaderProgram.normalMatrixUniform!==-1) gl.uniformMatrix3fv(shaderProgram.normalMatrixUniform,false,view.normalMatrix);
+        if (shaderProgram.perspectiveMatrixUniform!==null) gl.uniformMatrix4fv(shaderProgram.perspectiveMatrixUniform,false,view.perspectiveMatrix);
+        if (shaderProgram.modelMatrixUniform!==null) gl.uniformMatrix4fv(shaderProgram.modelMatrixUniform,false,view.modelMatrix);
+        if (shaderProgram.normalMatrixUniform!==null) gl.uniformMatrix3fv(shaderProgram.normalMatrixUniform,false,view.normalMatrix);
+        if (shaderProgram.orthoMatrixUniform!==null) gl.uniformMatrix4fv(shaderProgram.orthoMatrixUniform,false,view.orthoMatrix);
     
             // lighting
         
-        if (shaderProgram.ambientUniform!==-1) gl.uniform3f(shaderProgram.ambientUniform,view.ambient.r,view.ambient.g,view.ambient.b);
+        if (shaderProgram.ambientUniform!==null) gl.uniform3f(shaderProgram.ambientUniform,view.ambient.r,view.ambient.g,view.ambient.b);
         
         var n,shaderLight,viewLight;
 
         for (k=0;k!==this.LIGHT_COUNT;k++) {
             
             shaderLight=shaderProgram.lights[k];
-            if (shaderLight.positionUniform===-1) continue;
+            if (shaderLight.positionUniform===null) continue;
             
             viewLight=view.lights[k];
             
                 // no light sets everything to 0
                 
             if (viewLight===null) {
-                gl.uniform3f(shaderLight.positionUniform,0.0,0.0,0.0);
-                gl.uniform3f(shaderLight.colorUniform,0.0,0.0,0.0);
+                gl.uniform4f(shaderLight.positionUniform,0.0,0.0,0.0,1.0);
+                gl.uniform4f(shaderLight.colorUniform,1.0,1.0,0.0,0.0);
                 gl.uniform1f(shaderLight.intensityUniform,0.0);
                 gl.uniform1f(shaderLight.invertIntensityUniform,0.0);
                 gl.uniform1f(shaderLight.exponentUniform,1.0);
                 continue;
             }
+            
 
                 // otherwise setup the light
-                
-            gl.uniform3f(shaderLight.positionUniform,viewLight.position.x,viewLight.position.y,viewLight.position.z);            
+
+            gl.uniform4f(shaderLight.positionUniform,viewLight.position.x,viewLight.position.y,viewLight.position.z,1.0);
             if (viewLight.inLightmap) {
-                gl.uniform3f(shaderLight.colorUniform,0.0,0.0,0.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
+                gl.uniform4f(shaderLight.colorUniform,0.0,0.0,0.0,0.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
             }
             else {
-                gl.uniform3f(shaderLight.colorUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b);
+                gl.uniform4f(shaderLight.colorUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,0.0);
             }
             gl.uniform1f(shaderLight.intensityUniform,viewLight.intensity);
             gl.uniform1f(shaderLight.invertIntensityUniform,viewLight.invertIntensity);

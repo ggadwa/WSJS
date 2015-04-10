@@ -1,10 +1,16 @@
 
 
-- fix firefox uniform bug whatever it is
+- !!!NOTE!!! eventually move back to vec3 in lighting structure (sigh, windows bug)
+
+--> bunch of defs.js that can be deleted
+--> map has shader code in it (never call it alone in main.js)
+
+--> hand separate the shaders, map, text, etc.  Setup, draw, take down, repeat.  No list of shaders.  Loading is utility
+
+--> text bitmap needs to deal with .r (count as grayscale) * ambient
 
 - obscuring by view port of meshes
 - start skeleton work (always start with single, vertical line)
-- move around some of the code into more folders
 - when building view light list, ignore ones behind the player (pick better lights)
 
 
