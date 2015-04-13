@@ -2,10 +2,6 @@
 
 - !!!NOTE!!! eventually move back to vec3 in lighting structure (sigh, windows bug)
 
---> bunch of defs.js that can be deleted
---> map has shader code in it (never call it alone in main.js)
-
---> hand separate the shaders, map, text, etc.  Setup, draw, take down, repeat.  No list of shaders.  Loading is utility
 
 --> text bitmap needs to deal with .r (count as grayscale) * ambient
 
@@ -24,6 +20,6 @@
     - need diffuse calcs
 
 - will need start and stop
-    - close meshes
     - close gl
+    - map.release()
     - text.release()

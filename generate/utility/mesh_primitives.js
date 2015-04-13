@@ -222,7 +222,7 @@ meshPrimitives.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,
     
         // finally create the mesh
         
-    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
+    return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
 };
 
 //
@@ -293,7 +293,7 @@ meshPrimitives.createMeshPryamid=function(bitmap,xBound,yBound,zBound,flags)
     
         // finally create the mesh
         
-    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
+    return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
 };
 
 //

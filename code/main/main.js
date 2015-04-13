@@ -4,10 +4,6 @@
 // resource IDs
 //
 
-var SHADER_MAP=0;
-var SHADER_TEXT=1;
-var SHADER_DEBUG=2;
-
 var BITMAP_BRICK_STACK=0;
 var BITMAP_BRICK_RANDOM=1;
 var BITMAP_STONE=2;
@@ -27,7 +23,7 @@ var AMBIENT_R=0.35;
 var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
-var MAX_ROOM=15;
+var MAX_ROOM=5;
 var SIMPLE_LIGHTMAP=true;
 
 //
@@ -100,12 +96,16 @@ function drawView()
     mat4.ortho(view.orthoMatrix,0.0,view.wid,view.high,0.0,-1.0,1.0);
     
         // draw the map
-        
-    map.draw(view);
+    
+    map.drawStart(view);
+    map.draw();
+    map.drawEnd();
     
         // overlays
-        
-    //text.draw(SHADER_TEXT,10,50,25,20,"Blech!",text.ALIGN_LEFT,new wsColor(1.0,1.0,0.0));
+    
+    text.drawStart(view);
+    text.draw(10,50,25,20,"Blech!",text.ALIGN_LEFT,new wsColor(1.0,1.0,0.0));
+    text.drawEnd();
     
 
 }
@@ -178,8 +178,7 @@ function wsRefresh()
 {
         // close old map
         
-    map.close();
-    lightmap.close();
+    map.clear();
     
         // start at the texture generating step
     
@@ -227,33 +226,20 @@ function wsInitWebGL()
         // next step
     
     wsUpdateStatus();
-    wsStageStatus('Loading Shaders');
+    wsStageStatus('Initializing Internal Structures');
     setTimeout(wsInitLoadShaders,10);
 }
     
 function wsInitLoadShaders()
 {
-    mapShader.initialize();
-    
-        // next step
-    
-    wsUpdateStatus();
-    wsStageStatus('Initializing Misc Data');
-    setTimeout(function() { wsInitMiscData(); },10);
-}
-
-function wsInitMiscData()
-{
-        // text texture
-        
-    text.initialize();
+    if (!map.initialize()) return;
+    if (!text.initialize()) return;
     
         // next step
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Textures');
     setTimeout(function() { wsInitBuildTextures(0); },10);
-    
 }
 
 function wsInitBuildTextures(idx)

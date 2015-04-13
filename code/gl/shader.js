@@ -1,29 +1,10 @@
 "use strict";
 
 //
-// shader object
-//
-
-var shader={};
-
-//
-// constants
-//
-
-shader.LIGHT_COUNT=4;
-
-//
-// shader globals
-//
-
-shader.shaderList=[];
-shader.shaderCurrentIdx=-1;
-
-//
 // shader errors
 //
 
-shader.errorAlert=function(vertScriptId,fragScriptId,errStr)
+function shaderErrorAlert(vertScriptId,fragScriptId,errStr)
 {
     var str='Shader Error\n';
     if (vertScriptId!==-1) str+=('Vert Shader:'+vertScriptId+'\n');
@@ -38,202 +19,98 @@ shader.errorAlert=function(vertScriptId,fragScriptId,errStr)
 // load shaders
 //
 
-shader.loadVertexShader=function(vertScriptId)
+function shaderLoadVertexShader(vertScriptId)
 {
-    var shader=gl.createShader(gl.VERTEX_SHADER);
+    this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
     
-    var script=document.getElementById(vertScriptId);
-    
-    gl.shaderSource(shader,script.text);
-    gl.compileShader(shader);
+    var script=document.getElementById(vertScriptId);    
+    gl.shaderSource(this.vertexShader,script.text);
+    gl.compileShader(this.vertexShader);
 
-    if (gl.getShaderParameter(shader,gl.COMPILE_STATUS)) return(shader);
+    if (gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) return(true);
 
-    this.errorAlert(vertScriptId,-1,gl.getShaderInfoLog(shader));
-    return(null);
+    this.errorAlert(vertScriptId,-1,gl.getShaderInfoLog(this.vertexShader));
+    return(false);
 };
 
-shader.loadFragmentShader=function(fragScriptId)
+function shaderLoadFragmentShader(fragScriptId)
 {
-    var shader=gl.createShader(gl.FRAGMENT_SHADER);
+    this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
     
-    var script=document.getElementById(fragScriptId);
-    
-    gl.shaderSource(shader,script.text);
-    gl.compileShader(shader);
+    var script=document.getElementById(fragScriptId);    
+    gl.shaderSource(this.fragmentShader,script.text);
+    gl.compileShader(this.fragmentShader);
 
-    if (gl.getShaderParameter(shader,gl.COMPILE_STATUS)) return(shader);
+    if (gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) return(true);
 
-    this.errorAlert(-1,fragScriptId,gl.getShaderInfoLog(shader));
-    return(null);
+    this.errorAlert(-1,fragScriptId,gl.getShaderInfoLog(this.fragmentShader));
+    return(false);
 };
 
-shader.load=function(shaderIndex,vertScriptId,fragScriptId)
+//
+// close shader
+//
+
+function shaderClose()
 {
-        // get the shaders from iframes
+    if (this.program===null) return;
+
+    if (this.vertexShader!==null) {
+        gl.detachShader(this.program,this.vertexShader);
+        gl.deleteShader(this.vertexShader);
+    }
+    
+    if (this.fragmentShader!==null) {
+        gl.detachShader(this.program,this.fragmentShader);
+        gl.deleteShader(this.fragmentShader);
+    }
+    
+    gl.deleteProgram(this.program);
+    
+    this.vertexShader=null;
+    this.fragmentShader=null;
+    this.program=null;
+}
+
+//
+// main shader object
+//
+
+function shaderObject(vertScriptId,fragScriptId)
+{
+    this.vertexShader=null;
+    this.fragmentShader=null;
+    this.program=null;
+    
+        // need to define these upfront
+        // so they can be called
+    
+    this.loadVertexShader=shaderLoadVertexShader;
+    this.loadFragmentShader=shaderLoadFragmentShader;
+    this.errorAlert=shaderErrorAlert;
+    this.close=shaderClose;
+    
+        // get the shaders from divs
         
-    var vertexShader=this.loadVertexShader(vertScriptId);
-    if (vertexShader===null) return(false);
+    if (!this.loadVertexShader(vertScriptId)) {
+        this.close();
+        return;
+    }
     
-    var fragmentShader=this.loadFragmentShader(fragScriptId);
-    if (fragmentShader===null) return(false);
+    if (!this.loadFragmentShader(fragScriptId)) {
+        this.close();
+        return;
+    }
 
         // compile the program
         
-    var program=gl.createProgram();
-    gl.attachShader(program,vertexShader);
-    gl.attachShader(program,fragmentShader);
-    gl.linkProgram(program);
+    this.program=gl.createProgram();
+    gl.attachShader(this.program,this.vertexShader);
+    gl.attachShader(this.program,this.fragmentShader);
+    gl.linkProgram(this.program);
 
-    if (!gl.getProgramParameter(program,gl.LINK_STATUS)) {
-        this.errorAlert(vertScriptId,fragScriptId,gl.getProgramInfoLog(program));
-        return(false);
+    if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
+        this.errorAlert(vertScriptId,fragScriptId,gl.getProgramInfoLog(this.program));
+        this.close();
     }
-    
-        // build internal shader program object
-        
-    var shaderProgram=new wsShaderProgramObject(program);
-
-        // preset some attribute and uniform
-        // pointers
-
-    gl.useProgram(program);
-    
-    shaderProgram.vertexPositionAttribute=gl.getAttribLocation(program,'vertexPosition');
-    shaderProgram.vertexNormalAttribute=gl.getAttribLocation(program,'vertexNormal');
-    shaderProgram.vertexTangentAttribute=gl.getAttribLocation(program,'vertexTangent');    
-    shaderProgram.vertexAndLightmapUVAttribute=gl.getAttribLocation(program,'vertexAndLightmapUV');
-    
-    shaderProgram.perspectiveMatrixUniform=gl.getUniformLocation(program,'perspectiveMatrix');
-    shaderProgram.modelMatrixUniform=gl.getUniformLocation(program,'modelMatrix');
-    shaderProgram.normalMatrixUniform=gl.getUniformLocation(program,'normalMatrix');
-    shaderProgram.orthoMatrixUniform=gl.getUniformLocation(program,'orthoMatrix');
-    
-    shaderProgram.shineFactorUniform=gl.getUniformLocation(program,'shineFactor');
-    
-    shaderProgram.ambientUniform=gl.getUniformLocation(program,'ambient');
-
-    var n,name;
-    
-    for (n=0;n!==this.LIGHT_COUNT;n++) {
-        name='light_'+n;
-        shaderProgram.lights[n].positionUniform=gl.getUniformLocation(program,name+'.position');
-        shaderProgram.lights[n].colorUniform=gl.getUniformLocation(program,name+'.color');
-        shaderProgram.lights[n].intensityUniform=gl.getUniformLocation(program,name+'.intensity');
-        shaderProgram.lights[n].invertIntensityUniform=gl.getUniformLocation(program,name+'.invertIntensity');
-        shaderProgram.lights[n].exponentUniform=gl.getUniformLocation(program,name+'.exponent');
-    }
-    
-    shaderProgram.baseTexUniform=gl.getUniformLocation(program,'baseTex');
-    shaderProgram.normalTexUniform=gl.getUniformLocation(program,'normalTex');
-    shaderProgram.specularTexUniform=gl.getUniformLocation(program,'specularTex');
-    shaderProgram.lightmapTexUniform=gl.getUniformLocation(program,'lightmapTex');
-    
-    gl.useProgram(null);
-    
-        // store in list
-     
-    this.shaderList[shaderIndex]=shaderProgram;
-    
-    return(true);
-};
-
-//
-// drawing shader start/stop/set
-//
-
-shader.drawStart=function(view)
-{
-    var n,k,shaderProgram;
-    
-        // no current shader
-        
-    this.shaderCurrentIdx=-1;
-    
-        // set the uniforms on all the
-        // shaders
-        
-    for (n=0;n!==this.shaderList.length;n++) {
-        shaderProgram=this.shaderList[n];
-        if (shaderProgram===null) continue;
-        
-            // set the program and remember
-            // the last shader so we don't
-            // have to reset if it's the first draw
-            
-            // SUPERGUMBA -- NOTE!!!!
-            // windows has a dumb bug where two vec3 in a struct
-            // will stomp on each other.  The work-around is to use
-            // a vec4.  This is ugly. FIX LATER
-            
-        gl.useProgram(shaderProgram.program);
-        
-        this.shaderCurrentIdx=n;
-        
-            // matrix
-        
-        if (shaderProgram.perspectiveMatrixUniform!==null) gl.uniformMatrix4fv(shaderProgram.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-        if (shaderProgram.modelMatrixUniform!==null) gl.uniformMatrix4fv(shaderProgram.modelMatrixUniform,false,view.modelMatrix);
-        if (shaderProgram.normalMatrixUniform!==null) gl.uniformMatrix3fv(shaderProgram.normalMatrixUniform,false,view.normalMatrix);
-        if (shaderProgram.orthoMatrixUniform!==null) gl.uniformMatrix4fv(shaderProgram.orthoMatrixUniform,false,view.orthoMatrix);
-    
-            // lighting
-        
-        if (shaderProgram.ambientUniform!==null) gl.uniform3f(shaderProgram.ambientUniform,view.ambient.r,view.ambient.g,view.ambient.b);
-        
-        var n,shaderLight,viewLight;
-
-        for (k=0;k!==this.LIGHT_COUNT;k++) {
-            
-            shaderLight=shaderProgram.lights[k];
-            if (shaderLight.positionUniform===null) continue;
-            
-            viewLight=view.lights[k];
-            
-                // no light sets everything to 0
-                
-            if (viewLight===null) {
-                gl.uniform4f(shaderLight.positionUniform,0.0,0.0,0.0,1.0);
-                gl.uniform4f(shaderLight.colorUniform,1.0,1.0,0.0,0.0);
-                gl.uniform1f(shaderLight.intensityUniform,0.0);
-                gl.uniform1f(shaderLight.invertIntensityUniform,0.0);
-                gl.uniform1f(shaderLight.exponentUniform,1.0);
-                continue;
-            }
-            
-
-                // otherwise setup the light
-
-            gl.uniform4f(shaderLight.positionUniform,viewLight.position.x,viewLight.position.y,viewLight.position.z,1.0);
-            if (viewLight.inLightmap) {
-                gl.uniform4f(shaderLight.colorUniform,0.0,0.0,0.0,0.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
-            }
-            else {
-                gl.uniform4f(shaderLight.colorUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,0.0);
-            }
-            gl.uniform1f(shaderLight.intensityUniform,viewLight.intensity);
-            gl.uniform1f(shaderLight.invertIntensityUniform,viewLight.invertIntensity);
-            gl.uniform1f(shaderLight.exponentUniform,viewLight.exponent);
-        }
-    }
-};
-
-shader.drawEnd=function()
-{
-};
-
-shader.drawSet=function(shaderIndex)
-{
-        // ignore if already on this shader
-        
-    if (this.shaderCurrentIdx===shaderIndex) return(this.shaderList[shaderIndex]);
-    
-        // switch to this shader
-        
-    var shaderProgram=this.shaderList[shaderIndex];
-    gl.useProgram(shaderProgram.program);
-    
-    this.shaderCurrentIdx=shaderIndex;
-    
-    return(shaderProgram);
-};
+}

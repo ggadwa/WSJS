@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// close map
+// clear map
 //
 
-function mapClose()
+function mapClear()
 {
     var n;
     var nMesh=this.meshes.length;
@@ -54,16 +54,28 @@ function mapAddLightmap(lightmap)
 }
 
 //
-// bitmap lookup
+// bitmap/lightmap lookup
 //
 
-function getBitmapById(bitmapId)
+function mapGetBitmapById(bitmapId)
 {
     var n;
     var nBitmap=this.bitmaps.length;
     
     for (n=0;n!==nBitmap;n++) {
         if (this.bitmaps[n].bitmapId==bitmapId) return(this.bitmaps[n]);
+    }
+    
+    return(null);
+}
+
+function mapGetLightmapById(lightmapId)
+{
+    var n;
+    var nLightmap=this.lightmaps.length;
+    
+    for (n=0;n!==nLightmap;n++) {
+        if (this.lightmaps[n].lightmapId==lightmapId) return(this.lightmaps[n]);
     }
     
     return(null);
@@ -271,7 +283,7 @@ function mapCreateViewLightsFromMapLights(view,camera)
         // find the four closest lights
         // and put them into the view list
         
-    for (k=0;k!==shader.LIGHT_COUNT;k++) {
+    for (k=0;k!==mapShader.LIGHT_COUNT;k++) {
         view.lights[k]=null;
     }
     
@@ -290,17 +302,17 @@ function mapCreateViewLightsFromMapLights(view,camera)
         }
         
         if (idx===-1) {
-            if (view.lights.length<shader.LIGHT_COUNT) view.lights.push(light);
+            if (view.lights.length<mapShader.LIGHT_COUNT) view.lights.push(light);
         }
         else {
             view.lights.splice(idx,0,light);
-            if (view.lights.length>shader.LIGHT_COUNT) view.lights.pop();
+            if (view.lights.length>mapShader.LIGHT_COUNT) view.lights.pop();
         }
     }
     
         // fill in any missing lights
         
-    while (view.lights.length<shader.LIGHT_COUNT) {
+    while (view.lights.length<mapShader.LIGHT_COUNT) {
         view.lights.push(null);
     }
 }
@@ -326,7 +338,17 @@ function mapSetupBuffers()
 // draw map
 //
 
-function mapDraw(view)
+function mapDrawStart(view)
+{
+    mapShader.drawStart(view);
+}
+
+function mapDrawEnd()
+{
+    mapShader.drawEnd();
+}
+
+function mapDraw()
 {
     var n,mesh;
     var nMesh=this.meshes.length;
@@ -334,8 +356,6 @@ function mapDraw(view)
     
         // setup map drawing
         
-    mapShader.drawStart(view);
-    
     currentBitmap=null;
     currentLightmap=null;
     
@@ -349,7 +369,7 @@ function mapDraw(view)
             
         if (mesh.bitmap!==currentBitmap) {
             currentBitmap=mesh.bitmap;
-            mesh.bitmap.attach(mapShader);
+            mesh.bitmap.attach();
         }
         
         if (mesh.lightmap!==currentLightmap) {
@@ -357,18 +377,10 @@ function mapDraw(view)
             mesh.lightmap.attach();
         }
         
-            // setup attribute buffers
+            // draw the mesh
             
-        mesh.enableBuffers(mapShader);
-        mesh.bindBuffers(mapShader);
-        
-            // draw mesh
-            
+        mesh.bindBuffers();
         mesh.draw();
-        
-            // disable buffers
-            
-        mesh.disableBuffers(mapShader);
     }
     
     /* debuging
@@ -378,10 +390,20 @@ function mapDraw(view)
         debug.drawMeshNormals(SHADER_DEBUG,mesh);
     }
     */
+}
 
-        // finish map drawing
-    
-    mapShader.drawEnd();
+//
+// initialize and release
+//
+
+function mapInitialize()
+{
+    return(mapShader.initialize());
+}
+
+function mapRelease()
+{
+    mapShader.release();
 }
 
 //
@@ -395,12 +417,18 @@ function mapObject()
     this.bitmaps=[];
     this.lightmaps=[];
     
-    this.close=mapClose;
+    this.initialize=mapInitialize;
+    this.release=mapRelease;
+    
+    this.clear=mapClear;
     
     this.addMesh=mapAddMesh;
     this.addLight=mapAddLight;
     this.addBitmap=mapAddBitmap;
     this.addLightmap=mapAddLightmap;
+    
+    this.getBitmapById=mapGetBitmapById;
+    this.getLightmapById=mapGetLightmapById;
     
     this.countMeshByFlag=mapCountMeshByFlag;
     
@@ -414,6 +442,8 @@ function mapObject()
     this.createViewLightsFromMapLights=mapCreateViewLightsFromMapLights;
     this.setupBuffers=mapSetupBuffers;
     
+    this.drawStart=mapDrawStart;
+    this.drawEnd=mapDrawEnd;
     this.draw=mapDraw;
 }
 

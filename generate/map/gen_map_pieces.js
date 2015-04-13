@@ -129,7 +129,7 @@ function mapPieceCreateMeshFloor(bitmap,xBound,yBound,zBound,flag)
     
         // finally create the mesh
         
-    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
+    return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
 }
 
 function mapPieceCreateMeshCeiling(bitmap,xBound,yBound,zBound,flag)
@@ -182,7 +182,7 @@ function mapPieceCreateMeshCeiling(bitmap,xBound,yBound,zBound,flag)
     
         // finally create the mesh
         
-    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
+    return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
 }
 
 function mapPieceCreateMeshWalls(bitmap,xBound,yBound,zBound,flag)
@@ -252,7 +252,7 @@ function mapPieceCreateMeshWalls(bitmap,xBound,yBound,zBound,flag)
     
         // finally create the mesh
         
-    return(new meshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
+    return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
 }
 
 //

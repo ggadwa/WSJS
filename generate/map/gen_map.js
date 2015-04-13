@@ -202,7 +202,7 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
     var xLightBound=new wsBound((lightX-400),(lightX+400));
     var yLightBound=new wsBound(yBound.min,(yBound.min+1000));
     var zLightBound=new wsBound((lightZ-400),(lightZ+400));
-    map.addMesh(meshPrimitives.createMeshPryamid(SHADER_MAP,BITMAP_METAL,xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
+    map.addMesh(meshPrimitives.createMeshPryamid(map.getBitmapById(BITMAP_METAL),xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
     
         // reduce light if already in the
         // path of another light

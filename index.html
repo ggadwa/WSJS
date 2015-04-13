@@ -11,12 +11,16 @@
 <script type="text/javascript" src="code/main/defs.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/gl/gl.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/gl/shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/gl/text.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/gl/lightmap.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/mesh.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/main/canvas.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/main/debug.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/map/map.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/map/map_shader.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/map/map_bitmap.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map/map_lightmap.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map/map_mesh.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/text/text.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/text/text_shader.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/input.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/random.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/mesh_uv_tangents.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/mesh_primitives.js" charset="utf-8"></script>
@@ -26,9 +30,6 @@
 <script type="text/javascript" src="generate/map/gen_map.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/map/gen_map_decoration.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/map/gen_light_map.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/input.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/canvas.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/debug.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/main/main.js" charset="utf-8"></script>
 
 <!-- the shaders -->
@@ -305,7 +306,7 @@
 
 <script id="wsTextVertShader" type="x-shader/x-vertex">    
     attribute highp vec3 vertexPosition;
-    attribute highp vec2 vertexAndLightmapUV;      // we only use the xy of this as there's no lightmap
+    attribute highp vec2 vertexUV;
 
     uniform highp mat4 orthoMatrix;
 
@@ -314,13 +315,13 @@
     void main(void)
     {
         gl_Position=orthoMatrix*vec4(vertexPosition,1.0);
-        fragUV=vertexAndLightmapUV;
+        fragUV=vertexUV;
     }
 </script>
 
 <script id="wsTextFragShader" type="x-shader/x-fragment">
     uniform lowp sampler2D baseTex;
-    uniform lowp vec3 ambient;
+    uniform lowp vec3 color;
 
     varying highp vec2 fragUV;
 
@@ -328,7 +329,7 @@
     {
         lowp vec4 tex=texture2D(baseTex,fragUV);
 
-        gl_FragColor.rgb=tex.rgb;//*ambient;       // use the ambient to color the text
+        gl_FragColor.rgb=tex.rgb;//*color;
         gl_FragColor.a=1.0;//tex.a;
     }
 </script>

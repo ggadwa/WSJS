@@ -252,47 +252,6 @@ function wsLight(position,color,inLightmap,intensity,exponent)
 }
 
 //
-// shader objects
-//
-
-function wsShaderLight()
-{
-    this.positionUniform=null;
-    this.colorUniform=null;
-    this.intensityUniform=null;
-    this.invertIntensityUniform=null;
-    this.exponentUniform=null;
-}
-
-function wsShaderProgramObject(program)
-{
-    this.program=program;
-    
-    this.vertexPositionAttribute=null;
-    this.vertexNormalAttribute=null;
-    this.vertexTangentAttribute=null;
-    this.vertexAndLightMapUVAttribute=null;
-    
-    this.perspectiveMatrixUniform=null;
-    this.modelMatrixUniform=null;
-    this.normalMatrixUniform=null;
-    this.orthoMatrixUniform=null;
-    
-    this.shineFactorUniform=null;
-    
-    this.ambientUniform=null;
-    
-    this.lights=[];
-    for (var n=0;n!==shader.LIGHT_COUNT;n++) {
-        this.lights.push(new wsShaderLight());
-    }
-    
-    this.baseTexUniform=null;
-    this.normalTexUniform=null;
-    this.specularTexUniform=null;
-}
-
-//
 // view rendering
 //
 
@@ -315,7 +274,7 @@ function wsViewObject()
     this.ambient=new wsColor(0.0,0.0,0.0);
     
     this.lights=[];
-    for (var n=0;n!==shader.LIGHT_COUNT;n++) {
+    for (var n=0;n!==mapShader.LIGHT_COUNT;n++) {
         this.lights.push(null);
     }
 }

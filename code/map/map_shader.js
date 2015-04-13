@@ -25,7 +25,7 @@ function mapShaderLight()
 // variables
 //
 
-mapShader.program=null;
+mapShader.shader=null;
 
 mapShader.vertexPositionAttribute=null;
 mapShader.vertexNormalAttribute=null;
@@ -35,38 +35,39 @@ mapShader.vertexAndLightmapUVAttribute=null;
 mapShader.perspectiveMatrixUniform=null;
 mapShader.modelMatrixUniform=null;
 mapShader.normalMatrixUniform=null;
-    
+
+mapShader.shineFactorUniform=null;
+mapShader.ambientUniform=null;
+
 mapShader.lights=[];
 
 //
-// setup shader
+// initialize/release shader
 //
 
 mapShader.initialize=function()
 {
-        // load and compile the
-        // map shader
+        // get a new shader object
+        // and load/compile it
         
-    if (!shader.load(0,'wsMapVertShader','wsMapFragShader')) return(false);
-    
-    this.program=shader.shaderList[0].program;
+    this.shader=new shaderObject('wsMapVertShader','wsMapFragShader');
+    if (this.shader.program===null) return(false);
     
         // setup uniforms
     
-    gl.useProgram(this.program);
+    gl.useProgram(this.shader.program);
     
-    this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
-    this.vertexNormalAttribute=gl.getAttribLocation(this.program,'vertexNormal');
-    this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');    
-    this.vertexAndLightmapUVAttribute=gl.getAttribLocation(this.program,'vertexAndLightmapUV');
+    this.vertexPositionAttribute=gl.getAttribLocation(this.shader.program,'vertexPosition');
+    this.vertexNormalAttribute=gl.getAttribLocation(this.shader.program,'vertexNormal');
+    this.vertexTangentAttribute=gl.getAttribLocation(this.shader.program,'vertexTangent');    
+    this.vertexAndLightmapUVAttribute=gl.getAttribLocation(this.shader.program,'vertexAndLightmapUV');
     
-    this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
-    this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
-    this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
+    this.perspectiveMatrixUniform=gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
+    this.modelMatrixUniform=gl.getUniformLocation(this.shader.program,'modelMatrix');
+    this.normalMatrixUniform=gl.getUniformLocation(this.shader.program,'normalMatrix');
     
-    this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');
-    
-    this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
+    this.shineFactorUniform=gl.getUniformLocation(this.shader.program,'shineFactor');    
+    this.ambientUniform=gl.getUniformLocation(this.shader.program,'ambient');
 
     var n,name;
     
@@ -74,24 +75,29 @@ mapShader.initialize=function()
         this.lights.push(new mapShaderLight());
         
         name='light_'+n;
-        this.lights[n].positionUniform=gl.getUniformLocation(this.program,name+'.position');
-        this.lights[n].colorUniform=gl.getUniformLocation(this.program,name+'.color');
-        this.lights[n].intensityUniform=gl.getUniformLocation(this.program,name+'.intensity');
-        this.lights[n].invertIntensityUniform=gl.getUniformLocation(this.program,name+'.invertIntensity');
-        this.lights[n].exponentUniform=gl.getUniformLocation(this.program,name+'.exponent');
+        this.lights[n].positionUniform=gl.getUniformLocation(this.shader.program,name+'.position');
+        this.lights[n].colorUniform=gl.getUniformLocation(this.shader.program,name+'.color');
+        this.lights[n].intensityUniform=gl.getUniformLocation(this.shader.program,name+'.intensity');
+        this.lights[n].invertIntensityUniform=gl.getUniformLocation(this.shader.program,name+'.invertIntensity');
+        this.lights[n].exponentUniform=gl.getUniformLocation(this.shader.program,name+'.exponent');
     }
     
         // these uniforms are always the same
         
-    gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
-    gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
-    gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
-    gl.uniform1i(gl.getUniformLocation(this.program,'lightmapTex'),3);
+    gl.uniform1i(gl.getUniformLocation(this.shader.program,'baseTex'),0);
+    gl.uniform1i(gl.getUniformLocation(this.shader.program,'normalTex'),1);
+    gl.uniform1i(gl.getUniformLocation(this.shader.program,'specularTex'),2);
+    gl.uniform1i(gl.getUniformLocation(this.shader.program,'lightmapTex'),3);
     
     gl.useProgram(null);
     
     return(true);
-}
+};
+
+mapShader.release=function()
+{
+    this.shader.release();
+};
 
 //
 // drawing shader start/stop/set
@@ -104,7 +110,7 @@ mapShader.drawStart=function(view)
     
         // using the map shader
         
-    gl.useProgram(this.program);
+    gl.useProgram(this.shader.program);
 
         // matrix
 
@@ -149,9 +155,25 @@ mapShader.drawStart=function(view)
         gl.uniform1f(shaderLight.invertIntensityUniform,viewLight.invertIntensity);
         gl.uniform1f(shaderLight.exponentUniform,viewLight.exponent);
     }
+    
+        // enable the vertex attributes
+        
+    gl.enableVertexAttribArray(this.vertexPositionAttribute);
+    gl.enableVertexAttribArray(this.vertexNormalAttribute);
+    gl.enableVertexAttribArray(this.vertexTangentAttribute);
+    gl.enableVertexAttribArray(this.vertexAndLightmapUVAttribute);
 };
 
 mapShader.drawEnd=function()
 {
+        // disable vertex attributes
+        
+    gl.disableVertexAttribArray(this.vertexPositionAttribute);
+    gl.disableVertexAttribArray(this.vertexNormalAttribute);
+    gl.disableVertexAttribArray(this.vertexTangentAttribute);
+    gl.disableVertexAttribArray(this.vertexAndLightmapUVAttribute);
+    
+        // no longer using shader
+        
     gl.useProgram(null);
 };

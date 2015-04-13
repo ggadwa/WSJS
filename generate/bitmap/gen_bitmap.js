@@ -529,5 +529,5 @@ genBitmap.generate=function(bitmapId,generateType)
         // finally create the bitmap
         // object and load into WebGL
 
-    return(new bitmapObject(bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+    return(new mapBitmapObject(bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
 };

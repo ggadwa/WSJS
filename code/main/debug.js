@@ -6,9 +6,11 @@
 
 var debug={};
 
-//
-// draw mesh lines
-//
+
+/*
+
+supergumba
+these functions will need to load thier own shaders, so disabled for now
 
 debug.drawMeshLines=function(shaderIdx,mesh)
 {
@@ -33,10 +35,6 @@ debug.drawMeshLines=function(shaderIdx,mesh)
         
     mesh.disableBuffers();
 };
-
-//
-// draw mesh normals
-//
 
 debug.drawMeshNormals=function(shaderIdx,mesh)
 {
@@ -100,6 +98,7 @@ debug.drawMeshNormals=function(shaderIdx,mesh)
     gl.deleteBuffer(vertexPosBuffer);
     gl.deleteBuffer(indexBuffer);
 };
+*/
 
 //
 // display a canvas on page (for debuginning bitmaps)
@@ -151,5 +150,4 @@ debug.displayMapInfo=function(view,camera)
     }
         
     document.getElementById('wsStatus').innerHTML=str;
-
 }

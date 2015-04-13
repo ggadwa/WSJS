@@ -34,6 +34,10 @@ text.initialize=function()
 {
     var x,y,ch;
     
+        // start the shader
+        
+    if (!textShader.initialize()) return(false);
+    
         // setup the canvas
         
     var canvas=document.createElement('canvas');
@@ -70,18 +74,31 @@ text.initialize=function()
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.bindTexture(gl.TEXTURE_2D,null);
+    
+    return(true);
 };
   
 text.release=function()
 {
+    textShader.release();
     gl.deleteTexture(this.fontTexture);
-}
+};
 
 //
 // draw bitmap
 //
 
-text.draw=function(shaderIdx,x,y,wid,high,str,align,color)
+text.drawStart=function(view)
+{
+    textShader.drawStart(view);
+};
+
+text.drawEnd=function()
+{
+    textShader.drawEnd();
+};
+
+text.draw=function(x,y,wid,high,str,align,color)
 {
     var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
     var cx,gx,gx2;
@@ -162,13 +179,10 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align,color)
     
         // set the shader and bitmap
         
-    var shaderProgram=shader.drawSet(shaderIdx);
-    
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
-    gl.uniform1i(shaderProgram.baseTexUniform,0);
     
-    if (shaderProgram.ambientUniform!==null) gl.uniform3f(shaderProgram.ambientUniform,color.r,color.g,color.b);
+    gl.uniform3f(textShader.colorUniform,color.r,color.g,color.b);
     
         // setup the buffers
     
@@ -176,15 +190,15 @@ text.draw=function(shaderIdx,x,y,wid,high,str,align,color)
     gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
     gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
     
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+    gl.enableVertexAttribArray(textShader.vertexPositionAttribute);
+    gl.vertexAttribPointer(textShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
     
     var uvPosBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,uvPosBuffer);
     gl.bufferData(gl.ARRAY_BUFFER,uvs,gl.STREAM_DRAW);
    
-    gl.enableVertexAttribArray(shaderProgram.vertexAndLightmapUVAttribute);
-    gl.vertexAttribPointer(shaderProgram.vertexAndLightmapUVAttribute,2,gl.FLOAT,false,0,0);
+    gl.enableVertexAttribArray(textShader.vertexUVAttribute);
+    gl.vertexAttribPointer(textShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
     var indexBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
