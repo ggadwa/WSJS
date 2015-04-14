@@ -10,10 +10,12 @@ var text={};
 // constants
 //
 
-text.TEXTURE_WIDTH=2048;
-text.TEXTURE_HEIGHT=32;
-text.TEXTURE_CHAR_WIDTH=21;
-text.TEXTURE_FONT_SIZE=18;
+text.TEXTURE_WIDTH=512;
+text.TEXTURE_HEIGHT=512;
+text.TEXTURE_PER_ROW=10;
+text.TEXTURE_CHAR_WIDTH=50;
+text.TEXTURE_CHAR_HEIGHT=50;
+text.TEXTURE_FONT_SIZE=48;
 text.TEXTURE_FONT_NAME='Arial';
 
 text.ALIGN_LEFT=0;
@@ -32,7 +34,7 @@ text.fontTexture=null;
 
 text.initialize=function()
 {
-    var x,y,ch;
+    var x,y,yAdd,dx,cIdx,charStr,charWid,ch;
     
         // start the shader
         
@@ -48,7 +50,7 @@ text.initialize=function()
         // background is black, text is white
         // so it can be colored
         
-    genBitmapUtility.drawRect(ctx,0,0,this.TEXTURE_WIDTH,this.TEXTURE_HEIGHT,'#FF0000');
+    genBitmapUtility.drawRect(ctx,0,0,this.TEXTURE_WIDTH,this.TEXTURE_HEIGHT,'#000000');
     
         // draw the text
         
@@ -57,11 +59,20 @@ text.initialize=function()
     ctx.textBaseline='middle';
     ctx.fillStyle='#FFFFFF';
     
-    x=0;
-    y=Math.floor(this.TEXTURE_HEIGHT/2);
+    yAdd=Math.floor(this.TEXTURE_CHAR_HEIGHT/2);
     
-    for (ch=32;ch<=127;ch++) {
-        ctx.fillText(String.fromCharCode(ch),x,y);
+    for (ch=32;ch!==127;ch++) {
+        cIdx=ch-32;
+        x=(cIdx%this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_WIDTH;
+        y=Math.floor(cIdx/this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_HEIGHT;
+        y+=yAdd;
+        
+        charStr=String.fromCharCode(ch);
+        charWid=ctx.measureText(charStr).width;
+        
+        dx=Math.floor((x+(this.TEXTURE_CHAR_WIDTH/2))-(charWid/2));
+        ctx.fillText(charStr,dx,y);
+        
         x+=this.TEXTURE_CHAR_WIDTH;
     }
     
@@ -90,18 +101,23 @@ text.release=function()
 
 text.drawStart=function(view)
 {
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
+    
     textShader.drawStart(view);
 };
 
 text.drawEnd=function()
 {
     textShader.drawEnd();
+    
+    gl.disable(gl.BLEND);
 };
 
 text.draw=function(x,y,wid,high,str,align,color)
 {
     var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
-    var cx,gx,gx2;
+    var cIdx,gx,gy,gxAdd,gyAdd;
     
         // figure out the size
         // and alignment
@@ -122,8 +138,8 @@ text.draw=function(x,y,wid,high,str,align,color)
     
         // the y
         
-    ty=y-Math.floor(high/2);
-    by=y+high;
+    ty=y-high;
+    by=y;
     
         // build the vertices
     
@@ -138,6 +154,9 @@ text.draw=function(x,y,wid,high,str,align,color)
     uvIdx=0;
     iIdx=0;
     elementIdx=0;
+    
+    gxAdd=this.TEXTURE_CHAR_WIDTH/this.TEXTURE_WIDTH;
+    gyAdd=this.TEXTURE_CHAR_HEIGHT/this.TEXTURE_HEIGHT;
         
     for (n=0;n!==len;n++) {
         x2=x+wid;
@@ -151,18 +170,18 @@ text.draw=function(x,y,wid,high,str,align,color)
         vertices[vIdx++]=x;
         vertices[vIdx++]=by;
         
-        cx=(str.charAt(n)-32)*this.TEXTURE_CHAR_WIDTH;
-        gx=cx/this.TEXTURE_WIDTH;
-        gx2=(cx+this.TEXTURE_CHAR_WIDTH)/this.TEXTURE_WIDTH;
+        cIdx=str.charCodeAt(n)-32;
+        gx=((cIdx%this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_WIDTH)/this.TEXTURE_WIDTH;
+        gy=(Math.floor(cIdx/this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_HEIGHT)/this.TEXTURE_HEIGHT;
         
         uvs[uvIdx++]=gx;
-        uvs[uvIdx++]=0.0;
-        uvs[uvIdx++]=gx2;
-        uvs[uvIdx++]=0.0;
-        uvs[uvIdx++]=gx2;
-        uvs[uvIdx++]=1.0;
+        uvs[uvIdx++]=gy;
+        uvs[uvIdx++]=(gx+gxAdd);
+        uvs[uvIdx++]=gy;
+        uvs[uvIdx++]=(gx+gxAdd);
+        uvs[uvIdx++]=(gy+gyAdd);
         uvs[uvIdx++]=gx;
-        uvs[uvIdx++]=1.0;
+        uvs[uvIdx++]=(gy+gyAdd);
         
         indexes[iIdx++]=elementIdx;     // triangle 1
         indexes[iIdx++]=elementIdx+1;

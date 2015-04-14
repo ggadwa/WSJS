@@ -3,15 +3,10 @@
 - !!!NOTE!!! eventually move back to vec3 in lighting structure (sigh, windows bug)
 
 
---> text bitmap needs to deal with .r (count as grayscale) * ambient
-
 - obscuring by view port of meshes
 - start skeleton work (always start with single, vertical line)
 - when building view light list, ignore ones behind the player (pick better lights)
 
-
-- need font bitmap/fps/drawing routines
-   - precreate the text vertex buffer
 
 
 - light maps

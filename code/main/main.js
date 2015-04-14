@@ -23,8 +23,8 @@ var AMBIENT_R=0.35;
 var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
-var MAX_ROOM=5;
-var SIMPLE_LIGHTMAP=true;
+var MAX_ROOM=25;
+var SIMPLE_LIGHTMAP=false;
 
 //
 // textures to build
@@ -104,7 +104,7 @@ function drawView()
         // overlays
     
     text.drawStart(view);
-    text.draw(10,50,25,20,"Blech!",text.ALIGN_LEFT,new wsColor(1.0,1.0,0.0));
+    text.draw((view.wid-5),(18+5),20,18,"0.00",text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
     text.drawEnd();
     
 
