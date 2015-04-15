@@ -149,7 +149,7 @@ function viewDraw(map,camera)
         // draw the map
     
     map.drawStart(this);
-    drawMeshCount+=map.draw();
+    drawMeshCount+=map.draw(this);
     map.drawEnd();
     
         // overlays
@@ -207,6 +207,7 @@ function viewObject()
         // view functions
         
     this.buildCullingFrustum=viewBuildCullingFrustum;
+    this.boundBoxInFrustum=viewBoundBoxInFrustum;
     this.draw=viewDraw;
 }
     

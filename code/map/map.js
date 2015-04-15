@@ -348,7 +348,7 @@ function mapDrawEnd()
     mapShader.drawEnd();
 }
 
-function mapDraw()
+function mapDraw(view)
 {
     var n,mesh;
     var meshCount=0;
@@ -364,6 +364,10 @@ function mapDraw()
     
     for (n=0;n!==nMesh;n++) {
         mesh=this.meshes[n];
+        
+            // skip if not in view frustum
+            
+        if (!view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
         
             // time to change bitmap
             // or lightmap?
