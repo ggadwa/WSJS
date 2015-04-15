@@ -19,12 +19,14 @@ var BITMAP_WOOD_BOX=9;
 // constants
 //
 
+var WS_FPS_TIMER_MSECS=20;
+
 var AMBIENT_R=0.35;
 var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
-var MAX_ROOM=25;
-var SIMPLE_LIGHTMAP=false;
+var MAX_ROOM=5;
+var SIMPLE_LIGHTMAP=true;
 
 //
 // textures to build
@@ -48,67 +50,11 @@ var wsTextureBuildList=
 // global objects
 //
 
-var view=new wsViewObject();
-var camera=new wsCameraObject();
+var view=new viewObject();
+var camera=new cameraObject();
 var map=new mapObject();
 
 var timer=null;
-
-//
-// mainline draw
-//
-
-function drawView()
-{
-        // convert view lights to shader lights
-        
-    map.createViewLightsFromMapLights(view,camera);
-    
-        // create the perspective matrix
-        
-    mat4.perspective(view.perspectiveMatrix,view.OPENGL_FOV,view.aspect,view.OPENGL_NEAR_Z,view.OPENGL_FAR_Z);
-    mat4.translate(view.perspectiveMatrix,view.perspectiveMatrix,vec3.fromValues(0,0,view.OPENGL_NEAR_Z));
-
-        // get the eye point and rotate it
-        // around the view position
-
-    var eye=vec3.create();
-    var pos=camera.position.toVec3();
-    vec3.add(eye,pos,vec3.fromValues(0.0,0.0,-view.OPENGL_NEAR_Z));
-    vec3.rotateX(eye,eye,pos,glMatrix.toRadian(camera.angle.x));
-    vec3.rotateY(eye,eye,pos,glMatrix.toRadian(camera.angle.y));
-
-        // setup the look at
-
-    mat4.lookAt(view.modelMatrix,eye,pos,view.lookAtUpVector);
-    
-        // create the 3x3 normal matrix
-        // the normal is the invert-transpose of the model matrix
-    
-    var normal4x4Mat=mat4.create();
-    mat4.invert(normal4x4Mat,view.modelMatrix);
-    mat4.transpose(normal4x4Mat,normal4x4Mat);
-    
-    mat3.fromMat4(view.normalMatrix,normal4x4Mat);
-    
-        // the 2D ortho matrix
-        
-    mat4.ortho(view.orthoMatrix,0.0,view.wid,view.high,0.0,-1.0,1.0);
-    
-        // draw the map
-    
-    map.drawStart(view);
-    map.draw();
-    map.drawEnd();
-    
-        // overlays
-    
-    text.drawStart(view);
-    text.draw((view.wid-5),(18+5),20,18,"0.00",text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-    text.drawEnd();
-    
-
-}
 
 //
 // main loop
@@ -116,8 +62,8 @@ function drawView()
 
 function wsLoop()
 {
-    inputRun();
-    drawView();
+    inputRun(camera);
+    view.draw(map,camera);
 }
 
 //

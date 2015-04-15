@@ -176,6 +176,38 @@ function wsRect(lft,top,rgt,bot)
                 };
 }
 
+function wsPlane(a,b,c,d)
+{
+    this.a=a;
+    this.b=b;
+    this.c=c;
+    this.d=d;
+    
+    this.normalize=function()
+    {
+        var f=Math.sqrt((this.a*this.a)+(this.b*this.b)+(this.c*this.c));
+        if (f===0.0) return;
+        this.a/=f;
+        this.b/=f;
+        this.c/=f;
+        this.d/=f;
+    };
+    
+    this.boundBoxOutsidePlane=function(xBound,yBound,zBound)
+    {
+        if (((this.a*xBound.min)+(this.b*yBound.min)+(this.c*zBound.min)+this.d)>0.0) return(true);
+		if (((this.a*xBound.max)+(this.b*yBound.min)+(this.c*zBound.min)+this.d)>0.0) return(true);
+		if (((this.a*xBound.min)+(this.b*yBound.max)+(this.c*zBound.min)+this.d)>0.0) return(true);
+		if (((this.a*xBound.max)+(this.b*yBound.max)+(this.c*zBound.min)+this.d)>0.0) return(true);
+		if (((this.a*xBound.min)+(this.b*yBound.min)+(this.c*zBound.max)+this.d)>0.0) return(true);
+		if (((this.a*xBound.max)+(this.b*yBound.min)+(this.c*zBound.max)+this.d)>0.0) return(true);
+		if (((this.a*xBound.min)+(this.b*yBound.max)+(this.c*zBound.max)+this.d)>0.0) return(true);
+		if (((this.a*xBound.max)+(this.b*yBound.max)+(this.c*zBound.max)+this.d)>0.0) return(true);
+        
+        return(false);
+    };
+}
+
 //
 // colors
 //
@@ -215,82 +247,3 @@ function wsColor(r,g,b)
                     if (this.b<0.0) this.b=0.0;
                 };
 }
-
-//
-// lights
-//
-
-function wsLight(position,color,inLightmap,intensity,exponent)
-{
-    this.position=position;     // should be wsPoint
-    this.color=color;           // should be wsColor
-    this.intensity=intensity;
-    this.invertIntensity=1.0/intensity;
-    this.exponent=exponent;
-    
-    this.inLightmap=inLightmap; // if used to generate the light map (color component ignored in shaders)
-    
-    this.origIndex=0;           // used to sort lights
-    this.dist=0.0;
-    
-    this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
-    
-    this.distance=function(pt)
-                {
-                    return(this.position.distance(pt));
-                };
-                
-    this.distanceByTriplet=function(x,y,z)
-                {
-                    return(this.position.distanceByTriplet(x,y,z));
-                };
-                
-    this.withinLightRadius=function(pt)
-                {
-                    return(this.position.distance(pt)<this.intensity);
-                };
-}
-
-//
-// view rendering
-//
-
-function wsViewObject()
-{
-    this.OPENGL_FOV=55.0;
-    this.OPENGL_NEAR_Z=500;
-    this.OPENGL_FAR_Z=300000;
-
-    this.wid=0;
-    this.high=0;
-    this.aspect=0.0;
-    this.lookAtUpVector=vec3.fromValues(0.0,1.0,0.0);
-
-    this.perspectiveMatrix=mat4.create();
-    this.modelMatrix=mat4.create();
-    this.normalMatrix=mat3.create();
-    this.orthoMatrix=mat4.create();
-    
-    this.ambient=new wsColor(0.0,0.0,0.0);
-    
-    this.lights=[];
-    for (var n=0;n!==mapShader.LIGHT_COUNT;n++) {
-        this.lights.push(null);
-    }
-}
-    
-//
-// camera
-//
-
-function wsCameraObject()
-{
-    this.position=new wsPoint(0.0,0.0,0.0);
-    this.angle=new wsAngle(0.0,0.0,0.0);
-}
-
-//
-// frames per second
-//
-
-var WS_FPS_TIMER_MSECS=20;

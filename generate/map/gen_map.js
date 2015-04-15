@@ -220,7 +220,7 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
     
         // add light to map
         
-    map.addLight(new wsLight(pt,new wsColor(red,green,blue),true,intensity,1.0));
+    map.addLight(new mapLightObject(pt,new wsColor(red,green,blue),true,intensity,1.0));
 };
 
 //

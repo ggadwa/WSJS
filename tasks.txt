@@ -7,7 +7,7 @@
 - start skeleton work (always start with single, vertical line)
 - when building view light list, ignore ones behind the player (pick better lights)
 
-
+- redo input to be a static object
 
 - light maps
     - light maps need all black, all white spots

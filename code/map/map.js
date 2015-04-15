@@ -351,6 +351,7 @@ function mapDrawEnd()
 function mapDraw()
 {
     var n,mesh;
+    var meshCount=0;
     var nMesh=this.meshes.length;
     var currentBitmap,currentLightmap;
     
@@ -381,6 +382,8 @@ function mapDraw()
             
         mesh.bindBuffers();
         mesh.draw();
+        
+        meshCount++;
     }
     
     /* debuging
@@ -390,6 +393,8 @@ function mapDraw()
         debug.drawMeshNormals(SHADER_DEBUG,mesh);
     }
     */
+   
+    return(meshCount);
 }
 
 //

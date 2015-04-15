@@ -10,24 +10,6 @@ var mouseFirstMove=true;
 var mouseLastPos=[0,0];
 
 //
-// move camera
-//
-
-function inputMoveCamera(dist,extraAngle)
-{
-    var mov=vec3.fromValues(0.0,0.0,dist);
-    vec3.rotateY(mov,mov,[0.0,0.0,0.0],glMatrix.toRadian(camera.angle.y+extraAngle));
-    camera.position.move(mov[0],mov[1],mov[2]);
-}
-
-function inputTurnCamera(addAngle)
-{
-    camera.angle.y+=addAngle;
-    if (camera.angle.y<0.0) camera.angle.y+=360.0;
-    if (camera.angle.y>=360.00) camera.angle.y-=360.0;
-}
-
-//
 // input startup
 //
 
@@ -45,38 +27,38 @@ function inputStart()
 // run input from main loop
 //
 
-function inputRun()
+function inputRun(camera)
 {
         // left arrow and right arrow
         // turning
         
-    if (keyFlags[37]) inputTurnCamera(-3.0);
-    if (keyFlags[39]) inputTurnCamera(3.0);
+    if (keyFlags[37]) camera.turn(-3.0);
+    if (keyFlags[39]) camera.turn(3.0);
             
         // up arrow or W
         // down arrow or S
         // forward and backwards
             
-    if ((keyFlags[38]) || (keyFlags[87])) inputMoveCamera(125.0,0.0);
-    if ((keyFlags[40]) || (keyFlags[83])) inputMoveCamera(-125.0,0.0);
+    if ((keyFlags[38]) || (keyFlags[87])) camera.forward(125.0,0.0);
+    if ((keyFlags[40]) || (keyFlags[83])) camera.forward(-125.0,0.0);
             
         // A and D
         // sidestep
             
-    if (keyFlags[65]) inputMoveCamera(75.0,-90.0);
-    if (keyFlags[68]) inputMoveCamera(75.0,90.0);
+    if (keyFlags[65]) camera.forward(75.0,-90.0);
+    if (keyFlags[68]) camera.forward(75.0,90.0);
     
         // insert/home, delete/end
         // up or down
         
-    if ((keyFlags[45]) || (keyFlags[36])) camera.position.move(0.0,-125.0,0.0);
-    if ((keyFlags[46]) || (keyFlags[35])) camera.position.move(0.0,125.0,0.0);
+    if ((keyFlags[45]) || (keyFlags[36])) camera.move(0.0,-125.0,0.0);
+    if ((keyFlags[46]) || (keyFlags[35])) camera.move(0.0,125.0,0.0);
     
         // page up, page down
         // look up or down
         
-    if (keyFlags[33]) camera.angle.x+=1.5;
-    if (keyFlags[34]) camera.angle.x-=1.5; 
+    if (keyFlags[33]) camera.look(1.5);
+    if (keyFlags[34]) camera.look(-1.5); 
 }
 
 //
@@ -101,6 +83,9 @@ function inputKeyUpEvent(event)
 
 function inputMouseMoveEvent(event)
 {
+    /* supergumba -- work on this
+
+
         // get mouse movement in
         // canvas
         
@@ -121,11 +106,13 @@ function inputMouseMoveEvent(event)
     var ry=y-mouseLastPos[1];
     mouseLastPos=[x,y];
     
-        // handle the movement
+        // handle the movement -- supergumba -- move to inputrun
         
     camera.angle.y+=(rx/10.0);
     camera.angle.x+=(ry/10.0);
     if (camera.angle.x<-15.0) camera.angle.x=-15.0;
     if (camera.angle.x>15.0) camera.angle.x=15.0;
+    
+    */
 }
 
