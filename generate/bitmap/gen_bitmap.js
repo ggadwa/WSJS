@@ -428,7 +428,7 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
 // create bitmap
 //
 
-genBitmap.generate=function(bitmapId,generateType)
+genBitmap.generate=function(bitmapId,generateType,debug)
 {
     var edgeSize,paddingSize,segments;
     

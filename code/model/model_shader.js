@@ -1,15 +1,15 @@
 "use strict";
 
 //
-// initialize/release map shader
+// initialize/release model shader
 //
 
-function mapShaderInitialize(view)
+function modelShaderInitialize(view)
 {
         // get a new shader object
         // and load/compile it
         
-    this.shader=new shaderObject('wsMapVertShader','wsMapFragShader');
+    this.shader=new shaderObject('wsModelVertShader','wsModelFragShader');
     if (this.shader.program===null) return(false);
     
         // setup uniforms
@@ -19,7 +19,7 @@ function mapShaderInitialize(view)
     this.vertexPositionAttribute=gl.getAttribLocation(this.shader.program,'vertexPosition');
     this.vertexNormalAttribute=gl.getAttribLocation(this.shader.program,'vertexNormal');
     this.vertexTangentAttribute=gl.getAttribLocation(this.shader.program,'vertexTangent');    
-    this.vertexAndLightmapUVAttribute=gl.getAttribLocation(this.shader.program,'vertexAndLightmapUV');
+    this.vertexUVAttribute=gl.getAttribLocation(this.shader.program,'vertexUV');
     
     this.perspectiveMatrixUniform=gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
     this.modelMatrixUniform=gl.getUniformLocation(this.shader.program,'modelMatrix');
@@ -46,28 +46,27 @@ function mapShaderInitialize(view)
     gl.uniform1i(gl.getUniformLocation(this.shader.program,'baseTex'),0);
     gl.uniform1i(gl.getUniformLocation(this.shader.program,'normalTex'),1);
     gl.uniform1i(gl.getUniformLocation(this.shader.program,'specularTex'),2);
-    gl.uniform1i(gl.getUniformLocation(this.shader.program,'lightmapTex'),3);
     
     gl.useProgram(null);
     
     return(true);
 }
 
-function mapShaderRelease()
+function modelShaderRelease()
 {
     this.shader.release();
 }
 
 //
-// start/stop map shader drawing
+// start/stop model shader drawing
 //
 
-function mapShaderDrawStart(view)
+function modelShaderDrawStart(view)
 {
     var n;
     var light,viewLight;
     
-        // using the map shader
+        // using the model shader
         
     gl.useProgram(this.shader.program);
 
@@ -120,17 +119,17 @@ function mapShaderDrawStart(view)
     gl.enableVertexAttribArray(this.vertexPositionAttribute);
     gl.enableVertexAttribArray(this.vertexNormalAttribute);
     gl.enableVertexAttribArray(this.vertexTangentAttribute);
-    gl.enableVertexAttribArray(this.vertexAndLightmapUVAttribute);
+    gl.enableVertexAttribArray(this.vertexUVAttribute);
 }
 
-function mapShaderDrawEnd()
+function modelShaderDrawEnd()
 {
         // disable vertex attributes
         
     gl.disableVertexAttribArray(this.vertexPositionAttribute);
     gl.disableVertexAttribArray(this.vertexNormalAttribute);
     gl.disableVertexAttribArray(this.vertexTangentAttribute);
-    gl.disableVertexAttribArray(this.vertexAndLightmapUVAttribute);
+    gl.disableVertexAttribArray(this.vertexUVAttribute);
     
         // no longer using shader
         
@@ -138,17 +137,17 @@ function mapShaderDrawEnd()
 }
 
 //
-// map shader object
+// model shader object
 //
 
-function mapShaderObject()
+function modelShaderObject()
 {
     this.shader=null;
 
     this.vertexPositionAttribute=null;
     this.vertexNormalAttribute=null;
     this.vertexTangentAttribute=null;    
-    this.vertexAndLightmapUVAttribute=null;
+    this.vertexUVAttribute=null;
 
     this.perspectiveMatrixUniform=null;
     this.modelMatrixUniform=null;
@@ -159,9 +158,8 @@ function mapShaderObject()
 
     this.lights=[];
 
-    this.initialize=mapShaderInitialize;
-    this.release=mapShaderRelease;
-
-    this.drawStart=mapShaderDrawStart;
-    this.drawEnd=mapShaderDrawEnd;
+    this.initialize=modelShaderInitialize;
+    this.release=modelShaderRelease;
+    this.drawStart=modelShaderDrawStart;
+    this.drawEnd=modelShaderDrawEnd;
 }

@@ -102,7 +102,7 @@ function viewBoundBoxInFrustum(xBound,yBound,zBound)
 // draw view
 //
 
-function viewDraw(map,camera)
+function viewDraw(map,text,camera)
 {
     var startMillisec=Date.now();
     var drawMeshCount=0;
@@ -173,7 +173,7 @@ function viewObject()
     this.OPENGL_FOV=55.0;
     this.OPENGL_NEAR_Z=500;
     this.OPENGL_FAR_Z=300000;
-
+    
     this.wid=0;
     this.high=0;
     this.aspect=0.0;
@@ -188,10 +188,12 @@ function viewObject()
     
         // view lighting
         
+    this.LIGHT_COUNT=4;
+        
     this.ambient=new wsColor(0.0,0.0,0.0);
     
     this.lights=[];
-    for (var n=0;n!==mapShader.LIGHT_COUNT;n++) {
+    for (var n=0;n!==this.LIGHT_COUNT;n++) {
         this.lights.push(null);
     }
     

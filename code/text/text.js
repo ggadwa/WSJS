@@ -1,44 +1,16 @@
 "use strict";
 
 //
-// text object
+// initialize/release text
 //
 
-var text={};
-
-//
-// constants
-//
-
-text.TEXTURE_WIDTH=512;
-text.TEXTURE_HEIGHT=512;
-text.TEXTURE_PER_ROW=10;
-text.TEXTURE_CHAR_WIDTH=50;
-text.TEXTURE_CHAR_HEIGHT=50;
-text.TEXTURE_FONT_SIZE=48;
-text.TEXTURE_FONT_NAME='Arial';
-
-text.ALIGN_LEFT=0;
-text.ALIGN_CENTER=1;
-text.ALIGN_RIGHT=2;
-
-//
-// variables
-//
-
-text.fontTexture=null;
-
-//
-// create/dispose text bitmap
-//
-
-text.initialize=function()
+function textInitialize()
 {
     var x,y,yAdd,dx,cIdx,charStr,charWid,ch;
     
         // start the shader
         
-    if (!textShader.initialize()) return(false);
+    if (!this.textShader.initialize()) return(false);
     
         // setup the canvas
         
@@ -87,34 +59,34 @@ text.initialize=function()
     gl.bindTexture(gl.TEXTURE_2D,null);
     
     return(true);
-};
+}
   
-text.release=function()
+function textRelease()
 {
-    textShader.release();
+    this.textShader.release();
     gl.deleteTexture(this.fontTexture);
-};
+}
 
 //
-// draw bitmap
+// start/stop/draw text
 //
 
-text.drawStart=function(view)
+function textDrawStart(view)
 {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
     
-    textShader.drawStart(view);
-};
+    this.textShader.drawStart(view);
+}
 
-text.drawEnd=function()
+function textDrawEnd()
 {
-    textShader.drawEnd();
+    this.textShader.drawEnd();
     
     gl.disable(gl.BLEND);
-};
+}
 
-text.draw=function(x,y,wid,high,str,align,color)
+function textDraw(x,y,wid,high,str,align,color)
 {
     var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
     var cIdx,gx,gy,gxAdd,gyAdd;
@@ -201,7 +173,7 @@ text.draw=function(x,y,wid,high,str,align,color)
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
     
-    gl.uniform3f(textShader.colorUniform,color.r,color.g,color.b);
+    gl.uniform3f(this.textShader.colorUniform,color.r,color.g,color.b);
     
         // setup the buffers
     
@@ -209,15 +181,15 @@ text.draw=function(x,y,wid,high,str,align,color)
     gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
     gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
     
-    gl.enableVertexAttribArray(textShader.vertexPositionAttribute);
-    gl.vertexAttribPointer(textShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+    gl.enableVertexAttribArray(this.textShader.vertexPositionAttribute);
+    gl.vertexAttribPointer(this.textShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
     
     var uvPosBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,uvPosBuffer);
     gl.bufferData(gl.ARRAY_BUFFER,uvs,gl.STREAM_DRAW);
    
-    gl.enableVertexAttribArray(textShader.vertexUVAttribute);
-    gl.vertexAttribPointer(textShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+    gl.enableVertexAttribArray(this.textShader.vertexUVAttribute);
+    gl.vertexAttribPointer(this.textShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
     var indexBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
@@ -235,4 +207,39 @@ text.draw=function(x,y,wid,high,str,align,color)
     gl.deleteBuffer(vertexPosBuffer);
     gl.deleteBuffer(uvPosBuffer);
     gl.deleteBuffer(indexBuffer);
-};
+}
+
+//
+// text object
+//
+
+function textObject()
+{
+        // constants
+        
+    this.TEXTURE_WIDTH=512;
+    this.TEXTURE_HEIGHT=512;
+    this.TEXTURE_PER_ROW=10;
+    this.TEXTURE_CHAR_WIDTH=50;
+    this.TEXTURE_CHAR_HEIGHT=50;
+    this.TEXTURE_FONT_SIZE=48;
+    this.TEXTURE_FONT_NAME='Arial';
+
+    this.ALIGN_LEFT=0;
+    this.ALIGN_CENTER=1;
+    this.ALIGN_RIGHT=2;
+
+        // variables
+        
+    this.textShader=new textShaderObject();
+    this.fontTexture=null;
+
+        // methods
+        
+    this.initialize=textInitialize;
+    this.release=textRelease;
+    
+    this.drawStart=textDrawStart;
+    this.drawEnd=textDrawEnd;
+    this.draw=textDraw;
+}

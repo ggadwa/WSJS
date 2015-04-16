@@ -10,7 +10,7 @@ var gl;
 // intialize GL
 //
 
-function initGL(canvas)
+function initGL(view,canvas)
 {
     try {
         gl=canvas.getContext("experimental-webgl");

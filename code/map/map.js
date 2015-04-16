@@ -63,7 +63,7 @@ function mapGetBitmapById(bitmapId)
     var nBitmap=this.bitmaps.length;
     
     for (n=0;n!==nBitmap;n++) {
-        if (this.bitmaps[n].bitmapId==bitmapId) return(this.bitmaps[n]);
+        if (this.bitmaps[n].bitmapId===bitmapId) return(this.bitmaps[n]);
     }
     
     return(null);
@@ -75,7 +75,7 @@ function mapGetLightmapById(lightmapId)
     var nLightmap=this.lightmaps.length;
     
     for (n=0;n!==nLightmap;n++) {
-        if (this.lightmaps[n].lightmapId==lightmapId) return(this.lightmaps[n]);
+        if (this.lightmaps[n].lightmapId===lightmapId) return(this.lightmaps[n]);
     }
     
     return(null);
@@ -283,7 +283,7 @@ function mapCreateViewLightsFromMapLights(view,camera)
         // find the four closest lights
         // and put them into the view list
         
-    for (k=0;k!==mapShader.LIGHT_COUNT;k++) {
+    for (k=0;k!==view.LIGHT_COUNT;k++) {
         view.lights[k]=null;
     }
     
@@ -302,17 +302,17 @@ function mapCreateViewLightsFromMapLights(view,camera)
         }
         
         if (idx===-1) {
-            if (view.lights.length<mapShader.LIGHT_COUNT) view.lights.push(light);
+            if (view.lights.length<view.LIGHT_COUNT) view.lights.push(light);
         }
         else {
             view.lights.splice(idx,0,light);
-            if (view.lights.length>mapShader.LIGHT_COUNT) view.lights.pop();
+            if (view.lights.length>view.LIGHT_COUNT) view.lights.pop();
         }
     }
     
         // fill in any missing lights
         
-    while (view.lights.length<mapShader.LIGHT_COUNT) {
+    while (view.lights.length<view.LIGHT_COUNT) {
         view.lights.push(null);
     }
 }
@@ -324,13 +324,13 @@ function mapCreateViewLightsFromMapLights(view,camera)
 function mapSetupBuffers()
 {
     var n;
-    var nMesh=map.meshes.length;
+    var nMesh=this.meshes.length;
     
         // setup all the gl
         // buffers and indexes
     
     for (n=0;n!==nMesh;n++) {
-        map.meshes[n].setupBuffers();
+        this.meshes[n].setupBuffers();
     }
 }
    
@@ -340,12 +340,12 @@ function mapSetupBuffers()
 
 function mapDrawStart(view)
 {
-    mapShader.drawStart(view);
+    this.mapShader.drawStart(view);
 }
 
 function mapDrawEnd()
 {
-    mapShader.drawEnd();
+    this.mapShader.drawEnd();
 }
 
 function mapDraw(view)
@@ -374,30 +374,22 @@ function mapDraw(view)
             
         if (mesh.bitmap!==currentBitmap) {
             currentBitmap=mesh.bitmap;
-            mesh.bitmap.attach();
+            mesh.bitmap.attach(this.mapShader);
         }
         
         if (mesh.lightmap!==currentLightmap) {
             currentLightmap=mesh.lightmap;
-            mesh.lightmap.attach();
+            mesh.lightmap.attach(this.mapShader);
         }
         
             // draw the mesh
             
-        mesh.bindBuffers();
+        mesh.bindBuffers(this.mapShader);
         mesh.draw();
         
         meshCount++;
     }
     
-    /* debuging
-    for (n=0;n!==nMesh;n++) {
-        mesh=this.meshes[n];
-        debug.drawMeshLines(SHADER_DEBUG,mesh);
-        debug.drawMeshNormals(SHADER_DEBUG,mesh);
-    }
-    */
-   
     return(meshCount);
 }
 
@@ -405,14 +397,14 @@ function mapDraw(view)
 // initialize and release
 //
 
-function mapInitialize()
+function mapInitialize(view)
 {
-    return(mapShader.initialize());
+    return(this.mapShader.initialize(view));
 }
 
 function mapRelease()
 {
-    mapShader.release();
+    this.mapShader.release();
 }
 
 //
@@ -421,6 +413,8 @@ function mapRelease()
 
 function mapObject()
 {
+    this.mapShader=new mapShaderObject();
+    
     this.meshes=[];
     this.lights=[];
     this.bitmaps=[];

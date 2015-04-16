@@ -1,28 +1,10 @@
 "use strict";
 
 //
-// shader object
+// initialize/release text shader
 //
 
-var textShader={};
-
-//
-// variables
-//
-
-textShader.shader=null;
-
-textShader.vertexPositionAttribute=null;
-textShader.vertexUVAttribute=null;
-    
-textShader.orthoMatrixUniform=null;
-textShader.colorUniform=null;
-
-//
-// initialize/release shader
-//
-
-textShader.initialize=function()
+function textShaderInitialize()
 {
         // get a new shader object
         // and load/compile it
@@ -47,18 +29,18 @@ textShader.initialize=function()
     gl.useProgram(null);
     
     return(true);
-};
+}
 
-textShader.release=function()
+function textShaderRelease()
 {
     this.shader.release();
-};
+}
 
 //
-// drawing shader start/stop/set
+// start/stop text shader drawing
 //
 
-textShader.drawStart=function(view)
+function textShaderDrawStart(view)
 {
     gl.useProgram(this.shader.program);
 
@@ -70,9 +52,9 @@ textShader.drawStart=function(view)
         
     gl.enableVertexAttribArray(this.vertexPositionAttribute);
     gl.enableVertexAttribArray(this.vertexUVAttribute);
-};
+}
 
-textShader.drawEnd=function()
+function textShaderDrawEnd()
 {
         // disable vertex attributes
         
@@ -82,4 +64,24 @@ textShader.drawEnd=function()
         // no longer using program
         
     gl.useProgram(null);
-};
+}
+
+//
+// text shader object
+//
+
+function textShaderObject()
+{
+    this.shader=null;
+
+    this.vertexPositionAttribute=null;
+    this.vertexUVAttribute=null;
+
+    this.orthoMatrixUniform=null;
+    this.colorUniform=null;
+
+    this.initialize=textShaderInitialize;
+    this.release=textShaderRelease;
+    this.drawStart=textShaderDrawStart;
+    this.drawEnd=textShaderDrawEnd;
+}

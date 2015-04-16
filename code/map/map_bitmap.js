@@ -15,7 +15,7 @@ function mapBitmapClose()
 // attaching bitmaps
 //
 
-function mapBitmapAttach()
+function mapBitmapAttach(mapShader)
 {
         // shine factor in shader
         

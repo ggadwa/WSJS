@@ -73,6 +73,19 @@ function shaderClose()
 }
 
 //
+// shader light object
+//
+
+function shaderLightObject()
+{
+    this.positionUniform=null;
+    this.colorUniform=null;
+    this.intensityUniform=null;
+    this.invertIntensityUniform=null;
+    this.exponentUniform=null;
+}
+
+//
 // main shader object
 //
 

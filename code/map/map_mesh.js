@@ -334,7 +334,7 @@ function mapMeshSetupBuffers()
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    
 }
 
-function mapMeshBindBuffers()
+function mapMeshBindBuffers(mapShader)
 {
     gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
     gl.vertexAttribPointer(mapShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);

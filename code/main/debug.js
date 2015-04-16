@@ -1,29 +1,33 @@
 "use strict";
 
 //
-// debug object
+// initialize/release debug
 //
 
-var debug={};
+function debugInitialize()
+{
+    return(this.debugShader.initialize());
+}
 
+function debugRelease()
+{
+    this.debugShader.release();
+}
 
-/*
+//
+// draw lines around map mesh
+//
 
-supergumba
-these functions will need to load thier own shaders, so disabled for now
-
-debug.drawMeshLines=function(shaderIdx,mesh)
+function debugDrawMapMeshLines(view,map,mesh)
 {
     var n;
     
-        // set the shader
-        
-    shader.drawSet(shaderIdx);
+    this.debugShader.drawStart(view);
     
         // setup the buffers
         
     mesh.enableBuffers();
-    mesh.bindBuffers();
+    mesh.bindBuffers(map.mapShader);
     
         // draw the line loop trigs
         
@@ -34,9 +38,11 @@ debug.drawMeshLines=function(shaderIdx,mesh)
         // disable the buffers
         
     mesh.disableBuffers();
-};
+    
+    this.debugShader.drawEnd();
+}
 
-debug.drawMeshNormals=function(shaderIdx,mesh)
+function debugDrawMapMeshNormals(view,mesh)
 {
     var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
     var normalSize=200.0;
@@ -71,7 +77,7 @@ debug.drawMeshNormals=function(shaderIdx,mesh)
     
         // set the shader
         
-    var shaderProgram=shader.drawSet(shaderIdx);
+    this.debugShader.drawStart(view);
     
         // setup the buffers
     
@@ -79,8 +85,8 @@ debug.drawMeshNormals=function(shaderIdx,mesh)
     gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
     gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
     
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+    gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
+    gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
     var indexBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
@@ -97,14 +103,15 @@ debug.drawMeshNormals=function(shaderIdx,mesh)
     
     gl.deleteBuffer(vertexPosBuffer);
     gl.deleteBuffer(indexBuffer);
-};
-*/
+    
+    this.debugShader.drawEnd();
+}
 
 //
 // display a canvas on page (for debuginning bitmaps)
 //
 
-debug.displayCanvasData=function(fromCanvas,lft,top,wid,high)
+function debugDisplayCanvasData(fromCanvas,lft,top,wid,high)
 {
     var cvs=document.createElement('canvas');
     cvs.style.position="absolute";
@@ -118,13 +125,13 @@ debug.displayCanvasData=function(fromCanvas,lft,top,wid,high)
     ctx.drawImage(fromCanvas,0,0,wid,high);
     
     document.body.appendChild(cvs);
-};
+}
 
 //
 // write out data to debug div
 //
 
-debug.displayMapInfo=function(view,camera)
+function debugDisplayMapInfo(view,camera)
 {
     var n,light;
     var str='';
@@ -151,3 +158,21 @@ debug.displayMapInfo=function(view,camera)
         
     document.getElementById('wsStatus').innerHTML=str;
 }
+
+//
+// debug object
+//
+
+function debugObject()
+{
+    this.debugShader=new debugShaderObject();
+    
+    this.initialize=debugInitialize;
+    this.release=debugRelease;
+
+    this.drawMapMeshLines=debugDrawMapMeshLines;
+    this.drawMapMeshNormals=debugDrawMapMeshNormals;
+    this.displayCanvasData=debugDisplayCanvasData;
+    this.displayMapInfo=debugDisplayMapInfo;
+}
+

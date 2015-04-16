@@ -13,7 +13,7 @@ function mapLightmapClose()
 // attaching lightmaps
 //
 
-function mapLightmapAttach()
+function mapLightmapAttach(mapShader)
 {
     gl.activeTexture(gl.TEXTURE3);
     gl.bindTexture(gl.TEXTURE_2D,this.texture);

@@ -53,6 +53,9 @@ var wsTextureBuildList=
 var view=new viewObject();
 var camera=new cameraObject();
 var map=new mapObject();
+var modelList=new modelListObject();
+var text=new textObject();
+var debug=new debugObject();
 
 var timer=null;
 
@@ -63,7 +66,7 @@ var timer=null;
 function wsLoop()
 {
     inputRun(camera);
-    view.draw(map,camera);
+    view.draw(map,text,camera);
 }
 
 //
@@ -167,19 +170,21 @@ function wsInitWebGL()
 
         // init opengl
         
-    if (!initGL(canvas)) return;
+    if (!initGL(view,canvas)) return;
     
         // next step
     
     wsUpdateStatus();
     wsStageStatus('Initializing Internal Structures');
-    setTimeout(wsInitLoadShaders,10);
+    setTimeout(wsInitInternal,10);
 }
     
-function wsInitLoadShaders()
+function wsInitInternal()
 {
-    if (!map.initialize()) return;
+    if (!map.initialize(view)) return;
+    if (!modelList.initialize(view)) return;
     if (!text.initialize()) return;
+    if (!debug.initialize()) return;
     
         // next step
     
@@ -203,7 +208,7 @@ function wsInitBuildTextures(idx)
     
     var setup=wsTextureBuildList[idx];
     
-    map.addBitmap(genBitmap.generate(setup[0],setup[1]));
+    map.addBitmap(genBitmap.generate(setup[0],setup[1],debug));
     wsNextStatusBar();
     
         // if more textures, then loop back around

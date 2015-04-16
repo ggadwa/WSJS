@@ -2,8 +2,10 @@
 
 - !!!NOTE!!! eventually move back to vec3 in lighting structure (sigh, windows bug)
 
+---> try -vtx in the shaders!
+---> redo all the statics to be objects
+---> push gl around (bitmap,lightmap, on up)
 
-- obscuring by view port of meshes
 - start skeleton work (always start with single, vertical line)
 - when building view light list, ignore ones behind the player (pick better lights)
 
@@ -16,5 +18,7 @@
 
 - will need start and stop
     - close gl
-    - map.release()
-    - text.release()
+    - map.release();
+    - modelList.release();
+    - text.release();
+    - debug.release();
