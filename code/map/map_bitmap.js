@@ -6,9 +6,9 @@
 
 function mapBitmapClose()
 {
-    if (this.texture!==null) gl.deleteTexture(this.texture);
-    if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
-    if (this.specularMap!==null) gl.deleteTexture(this.specularMap);
+    if (this.texture!==null) this.gl.deleteTexture(this.texture);
+    if (this.normalMap!==null) this.gl.deleteTexture(this.normalMap);
+    if (this.specularMap!==null) this.gl.deleteTexture(this.specularMap);
 }
 
 //
@@ -19,26 +19,27 @@ function mapBitmapAttach(mapShader)
 {
         // shine factor in shader
         
-    gl.uniform1f(mapShader.shineFactorUniform,this.shineFactor);
+    this.gl.uniform1f(mapShader.shineFactorUniform,this.shineFactor);
     
         // the textures
         
-    gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
+    this.gl.activeTexture(this.gl.TEXTURE2);
+    this.gl.bindTexture(this.gl.TEXTURE_2D,this.specularMap);
     
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
+    this.gl.activeTexture(this.gl.TEXTURE1);
+    this.gl.bindTexture(this.gl.TEXTURE_2D,this.normalMap);
     
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D,this.texture);
+    this.gl.activeTexture(this.gl.TEXTURE0);
+    this.gl.bindTexture(this.gl.TEXTURE_2D,this.texture);
 }
 
 //
 // map bitmap object
 //
 
-function mapBitmapObject(bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
+function mapBitmapObject(gl,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
 {
+    this.gl=gl;
     this.bitmapId=bitmapId;
     this.texture=null;
     this.normalMap=null;
@@ -49,36 +50,36 @@ function mapBitmapObject(bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas
     
         // setup the texture
         
-    this.texture=gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D,this.texture);
-    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,bitmapCanvas);
-    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-    gl.generateMipmap(gl.TEXTURE_2D);
-    gl.bindTexture(gl.TEXTURE_2D,null);
+    this.texture=this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D,this.texture);
+    this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGB,this.gl.RGB,this.gl.UNSIGNED_BYTE,bitmapCanvas);
+    this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MAG_FILTER,this.gl.LINEAR);
+    this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MIN_FILTER,this.gl.LINEAR_MIPMAP_NEAREST);
+    this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    this.gl.bindTexture(this.gl.TEXTURE_2D,null);
     
         // setup the normal map
     
     if (normalMapCanvas!==null) {
-        this.normalMap=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,normalMapCanvas);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.bindTexture(gl.TEXTURE_2D,null);
+        this.normalMap=this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D,this.normalMap);
+        this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGB,this.gl.RGB,this.gl.UNSIGNED_BYTE,normalMapCanvas);
+        this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MAG_FILTER,this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MIN_FILTER,this.gl.LINEAR_MIPMAP_NEAREST);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.bindTexture(this.gl.TEXTURE_2D,null);
     }
     
         // setup the specular map
     
     if (specularMapCanvas!==null) {
-        this.specularMap=gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,specularMapCanvas);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.bindTexture(gl.TEXTURE_2D,null);
+        this.specularMap=this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D,this.specularMap);
+        this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGB,this.gl.RGB,this.gl.UNSIGNED_BYTE,specularMapCanvas);
+        this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MAG_FILTER,this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D,this.gl.TEXTURE_MIN_FILTER,this.gl.LINEAR_MIPMAP_NEAREST);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+        this.gl.bindTexture(this.gl.TEXTURE_2D,null);
     }
     
         // functions

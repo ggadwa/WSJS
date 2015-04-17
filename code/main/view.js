@@ -157,7 +157,7 @@ function viewDraw(map,text,camera)
     var drawMillisec=Date.now()-startMillisec;
     
     text.drawStart(this);
-    text.draw((this.wid-5),23,20,18,drawMillisec.toString(),text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+    text.draw((this.wid-5),23,20,18,(drawMillisec.toString()+"ms"),text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
     text.draw((this.wid-5),45,20,18,drawMeshCount.toString(),text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
     text.drawEnd();
 }

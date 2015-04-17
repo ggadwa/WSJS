@@ -108,6 +108,73 @@ function debugDrawMapMeshNormals(view,mesh)
 }
 
 //
+// draw skeleton
+//
+
+function debugDrawModelSkeleton(view,model,offsetPosition)
+{
+    var n,lineCount,vIdx,iIdx,nBone;
+    
+        // create the lines
+        
+    nBone=model.bones.length;
+        
+    var vertices=new Float32Array(nBone*3);
+    var indexes=new Uint16Array(nBone*2);
+        
+    vIdx=0;
+    
+    for (n=0;n!==nBone;n++) {
+        vertices[vIdx++]=model.bones[n].position.x+offsetPosition.x;
+        vertices[vIdx++]=model.bones[n].position.y+offsetPosition.y;
+        vertices[vIdx++]=model.bones[n].position.z+offsetPosition.z;
+    }
+    
+    iIdx=0;
+    lineCount=0;
+    
+    for (n=0;n!==nBone;n++) {
+        if (model.bones[n].parentBoneIdx===-1) continue;
+        
+        indexes[iIdx++]=n;
+        indexes[iIdx++]=model.bones[n].parentBoneIdx;
+        
+        lineCount++;
+    }
+    
+        // set the shader
+        
+    this.debugShader.drawStart(view);
+    
+        // setup the buffers
+    
+    var vertexPosBuffer=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+    
+    gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
+    gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+    var indexBuffer=gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
+    
+        // draw the lines
+    
+    gl.drawElements(gl.LINES,(lineCount*2),gl.UNSIGNED_SHORT,0);
+    
+        // remove the buffers
+        
+    gl.bindBuffer(gl.ARRAY_BUFFER,null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+    
+    gl.deleteBuffer(vertexPosBuffer);
+    gl.deleteBuffer(indexBuffer);
+    
+    this.debugShader.drawEnd();
+}
+
+//
 // display a canvas on page (for debuginning bitmaps)
 //
 
@@ -172,6 +239,8 @@ function debugObject()
 
     this.drawMapMeshLines=debugDrawMapMeshLines;
     this.drawMapMeshNormals=debugDrawMapMeshNormals;
+    this.drawModelSkeleton=debugDrawModelSkeleton;
+    
     this.displayCanvasData=debugDisplayCanvasData;
     this.displayMapInfo=debugDisplayMapInfo;
 }

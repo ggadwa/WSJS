@@ -796,7 +796,7 @@ genLightmap.createFinish=function(lightmapList,meshList,callbackFunc)
         // the index is used as the id
         
     for (n=0;n!==lightmapList.length;n++) {
-        map.addLightmap(new mapLightmapObject(n,lightmapList[n].canvas));
+        map.addLightmap(new mapLightmapObject(gl,n,lightmapList[n].canvas));
     }
     
         // and finally push all the required
