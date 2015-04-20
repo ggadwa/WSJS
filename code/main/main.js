@@ -19,7 +19,9 @@ var BITMAP_WOOD_BOX=9;
 // constants
 //
 
-var WS_FPS_TIMER_MSECS=20;
+var WS_PHYSICS_MSECS=16;
+var WS_DRAW_MSECS=16;
+var WS_BAIL_MSECS=5000;
 
 var AMBIENT_R=0.35;
 var AMBIENT_G=0.35;
@@ -57,16 +59,75 @@ var modelList=new modelListObject();
 var text=new textObject();
 var debug=new debugObject();
 
-var timer=null;
-
 //
 // main loop
 //
 
-function wsLoop()
+function wsLoopRun(timeStamp)
 {
-    inputRun(camera);
-    view.draw(map,text,camera);
+        // next frame
+        
+    if (view.loopCancel) return;
+    window.requestAnimationFrame(wsLoopRun);
+    
+        // get integer msec timestamp
+    
+    var ts=Math.floor(timeStamp);
+   
+        // physics and input
+    
+    var physicsTick=ts-view.loopLastPhysicTimeStamp;
+    view.loopLastPhysicTimeStamp=ts;
+    
+    if (physicsTick>WS_BAIL_MSECS) return;
+    
+    while (physicsTick>WS_PHYSICS_MSECS) {
+        physicsTick-=WS_PHYSICS_MSECS;
+        
+        inputRun(camera);
+    }
+    
+        // drawing
+        
+    var drawTick=ts-view.loopLastDrawTimeStamp;
+    
+    if (drawTick>WS_DRAW_MSECS) {
+        view.loopLastDrawTimeStamp=ts; 
+
+        view.draw(map,text,camera);
+        
+        view.fpsTotal+=drawTick;
+        view.fpsCount++;
+    }
+    
+        // the fps
+    
+    var fpsTime=ts-view.fpsStartTimeStamp;
+    if (fpsTime>=1000) {
+        view.fps=((view.fpsTotal/view.fpsCount)*1000.0)/fpsTime;
+        view.fpsStartTimeStamp=ts;
+        
+        view.fpsTotal=0;
+        view.fpsCount=0;
+    }
+}
+
+function wsLoopStart()
+{
+    var timeStamp=window.performance.now();
+    var ts=Math.floor(timeStamp);
+    
+    view.loopLastPhysicTimeStamp=ts;
+    view.loopLastDrawTimeStamp=ts;
+    
+    view.fps=0.0;
+    view.fpsTotal=0;
+    view.fpsCount=0;
+    view.fpsStartTimeStamp=ts;
+
+    view.loopCancel=false;
+    
+    wsLoopRun(timeStamp);    
 }
 
 //
@@ -125,6 +186,10 @@ function wsNextStatusBar()
 
 function wsRefresh()
 {
+        // cancel the loop
+        
+    view.loopCancel=true;
+    
         // close old map
         
     map.clear();
@@ -152,10 +217,6 @@ function wsInit()
     //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
     //document.getElementById('wsMapRandom').value=123456789;
     
-        // no timer yet
-        
-    timer=null;
-
         // start the initialization
         
     wsStageStatus('Initializing WebGL');
@@ -281,10 +342,9 @@ function wsInitFinish()
         
     inputStart();
 
-        // run the main interval
-        // do set this up if we already have one
-        
-    if (timer===null) timer=setInterval(wsLoop,WS_FPS_TIMER_MSECS);
+        // start the main loop
+    
+    wsLoopStart();
 }
 
 

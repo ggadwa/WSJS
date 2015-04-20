@@ -154,10 +154,17 @@ function viewDraw(map,text,camera)
     
         // overlays
         
-    var drawMillisec=Date.now()-startMillisec;
-    
+    var fpsStr=this.fps.toString();
+    var idx=fpsStr.indexOf('.');
+    if (idx===-1) {
+        fpsStr+='.0';
+    }
+    else {
+        fpsStr=fpsStr.substring(0,(idx+3));
+    }
+        
     text.drawStart(this);
-    text.draw((this.wid-5),23,20,18,(drawMillisec.toString()+"ms"),text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+    text.draw((this.wid-5),23,20,18,fpsStr,text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
     text.draw((this.wid-5),45,20,18,drawMeshCount.toString(),text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
     text.drawEnd();
 }
@@ -205,6 +212,16 @@ function viewObject()
 	this.frustumBottomPlane=new wsPlane(0.0,0.0,0.0,0.0);
 	this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
 	this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
+    
+        // main loop
+        
+    this.loopCancel=false;
+    this.loopLastPhysicTimeStamp=0;
+    this.loopLastDrawTimeStamp=0;
+    
+    this.fpsTotal=0;
+    this.fpsCount=0;
+    this.fpsStartTimeStamp=0;
 
         // view functions
         
