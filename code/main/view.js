@@ -104,7 +104,6 @@ function viewBoundBoxInFrustum(xBound,yBound,zBound)
 
 function viewDraw(map,text,camera)
 {
-    var startMillisec=Date.now();
     var drawMeshCount=0;
     
         // convert view lights to shader lights
@@ -152,6 +151,10 @@ function viewDraw(map,text,camera)
     drawMeshCount+=map.draw(this);
     map.drawEnd();
     
+        // supergumba -- TEST MODEL!
+        
+    debug.drawModelSkeleton(view,testModel,new wsPoint(150000,153000,155000));
+    
         // overlays
         
     var fpsStr=this.fps.toString();
@@ -162,11 +165,61 @@ function viewDraw(map,text,camera)
     else {
         fpsStr=fpsStr.substring(0,(idx+3));
     }
+    
+    var posStr=Math.floor(camera.position.x)+','+Math.floor(camera.position.y)+','+Math.floor(camera.position.z);
         
     text.drawStart(this);
     text.draw((this.wid-5),23,20,18,fpsStr,text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
     text.draw((this.wid-5),45,20,18,drawMeshCount.toString(),text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+    text.draw((this.wid-5),494,20,18,posStr,text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
     text.drawEnd();
+}
+
+//
+// initialize and release
+//
+
+function viewInitialize(canvasId)
+{
+        // get the canvas
+    
+    this.canvas=document.getElementById(canvasId);
+    if (this.canvas===null) {
+        alert('missing canvas id');
+        return(false);
+    }
+    
+    this.canvasTopLeft.x=parseInt(this.canvas.style.left);
+    this.canvasTopLeft.y=parseInt(this.canvas.style.top);
+
+        // get the gl context
+        
+    try {
+        this.gl=this.canvas.getContext("experimental-webgl");
+    }
+    catch (e) {
+        alert(e);
+        return(false);
+    }
+    
+        // some initial setups
+        
+    this.gl.viewport(0,0,this.canvas.width,this.canvas.height);
+    
+    this.gl.clearColor(0.0,0.0,0.0,1.0);
+    this.gl.enable(this.gl.DEPTH_TEST);
+    
+        // cache some values
+    
+    this.wid=this.canvas.width;
+    this.high=this.canvas.height;
+    this.aspect=this.canvas.width/this.canvas.height;
+    
+    return(true);
+}
+
+function viewRelease()
+{
 }
 
 //
@@ -175,6 +228,12 @@ function viewDraw(map,text,camera)
 
 function viewObject()
 {
+        // the opengl context
+
+    this.gl=null;
+    this.canvas=null;
+    this.canvasTopLeft=new ws2DPoint(0,0);
+    
         // the view setup
         
     this.OPENGL_FOV=55.0;
@@ -224,7 +283,10 @@ function viewObject()
     this.fpsStartTimeStamp=0;
 
         // view functions
-        
+    
+    this.initialize=viewInitialize;
+    this.release=viewRelease;
+    
     this.buildCullingFrustum=viewBuildCullingFrustum;
     this.boundBoxInFrustum=viewBoundBoxInFrustum;
     this.draw=viewDraw;

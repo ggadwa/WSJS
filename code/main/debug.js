@@ -21,6 +21,7 @@ function debugRelease()
 function debugDrawMapMeshLines(view,map,mesh)
 {
     var n;
+    var gl=view.gl;
     
     this.debugShader.drawStart(view);
     
@@ -45,6 +46,7 @@ function debugDrawMapMeshLines(view,map,mesh)
 function debugDrawMapMeshNormals(view,mesh)
 {
     var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
+    var gl=view.gl;
     var normalSize=200.0;
     
         // create the lines
@@ -113,31 +115,32 @@ function debugDrawMapMeshNormals(view,mesh)
 
 function debugDrawModelSkeleton(view,model,offsetPosition)
 {
-    var n,lineCount,vIdx,iIdx,nBone;
-    
+    var n,lineCount,vIdx,iIdx;
+    var skeleton=model.skeleton;
+    var nBone=skeleton.bones.length;
+    var gl=view.gl;
+            
         // create the lines
-        
-    nBone=model.bones.length;
-        
+    
     var vertices=new Float32Array(nBone*3);
     var indexes=new Uint16Array(nBone*2);
         
     vIdx=0;
     
     for (n=0;n!==nBone;n++) {
-        vertices[vIdx++]=model.bones[n].position.x+offsetPosition.x;
-        vertices[vIdx++]=model.bones[n].position.y+offsetPosition.y;
-        vertices[vIdx++]=model.bones[n].position.z+offsetPosition.z;
+        vertices[vIdx++]=skeleton.bones[n].position.x+offsetPosition.x;
+        vertices[vIdx++]=skeleton.bones[n].position.y+offsetPosition.y;
+        vertices[vIdx++]=skeleton.bones[n].position.z+offsetPosition.z;
     }
     
     iIdx=0;
     lineCount=0;
     
     for (n=0;n!==nBone;n++) {
-        if (model.bones[n].parentBoneIdx===-1) continue;
+        if (skeleton.bones[n].parentBoneIdx===-1) continue;
         
         indexes[iIdx++]=n;
-        indexes[iIdx++]=model.bones[n].parentBoneIdx;
+        indexes[iIdx++]=skeleton.bones[n].parentBoneIdx;
         
         lineCount++;
     }

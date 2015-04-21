@@ -52,12 +52,16 @@ var wsTextureBuildList=
 // global objects
 //
 
+var gl=null;        // supergumba -- delete!
 var view=new viewObject();
 var camera=new cameraObject();
 var map=new mapObject();
 var modelList=new modelListObject();
 var text=new textObject();
+var input=new inputObject();
 var debug=new debugObject();
+
+var testModel=new modelObject(null,new modelSkeletonObject());
 
 //
 // main loop
@@ -84,7 +88,7 @@ function wsLoopRun(timeStamp)
     while (physicsTick>WS_PHYSICS_MSECS) {
         physicsTick-=WS_PHYSICS_MSECS;
         
-        inputRun(camera);
+        input.run(camera);
     }
     
         // drawing
@@ -227,11 +231,14 @@ function wsInitWebGL()
 {
         // the drawing canvas
         
-    var canvas=canvasSetup();
+    //var canvas=canvasSetup();
 
         // init opengl
+    
+    if (!view.initialize("wsCanvas")) return;
+    gl=view.gl;
         
-    if (!initGL(view,canvas)) return;
+    //if (!initGL(view,canvas)) return;
     
         // next step
     
@@ -340,7 +347,7 @@ function wsInitFinish()
     
         // start the input
         
-    inputStart();
+    input.initialize(view);
 
         // start the main loop
     

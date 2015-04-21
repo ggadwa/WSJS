@@ -2,9 +2,16 @@
 
 - !!!NOTE!!! eventually move back to vec3 in lighting structure (sigh, windows bug)
 
----> try -vtx in the shaders!
+---> shader.js
+       - needs initialize/release
+       - move loading stuff to initialize
+       - always pass in view
+---> have gl be in view
+       - get rid of var gl and gl=view.gl in main
+       - get rid of all other gls, only from view
+
 ---> redo all the statics to be objects
----> push gl around (bitmap,lightmap, on up)
+
 
 - start skeleton work (always start with single, vertical line)
 - when building view light list, ignore ones behind the player (pick better lights)
