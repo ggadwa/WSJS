@@ -302,7 +302,7 @@ function mapMeshSetLightmap(lightmap,lightmapUVs)
 // mesh binding
 //
 
-function mapMeshSetupBuffers()
+function mapMeshSetupBuffers(view)
 {
         // need to build the combined texture and
         // light map uv buffer
@@ -312,6 +312,8 @@ function mapMeshSetupBuffers()
         // create all the buffers
         // expects buffers to already be Float32Array
         // or Uint16Array
+        
+    var gl=view.gl;
             
     this.vertexPosBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
@@ -334,8 +336,10 @@ function mapMeshSetupBuffers()
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    
 }
 
-function mapMeshBindBuffers(mapShader)
+function mapMeshBindBuffers(view,mapShader)
 {
+    var gl=view.gl;
+    
     gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
     gl.vertexAttribPointer(mapShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
  
@@ -355,8 +359,10 @@ function mapMeshBindBuffers(mapShader)
 // mesh drawing
 //
 
-function mapMeshDraw()
+function mapMeshDraw(view)
 {
+    var gl=view.gl;
+    
     gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
 }
 

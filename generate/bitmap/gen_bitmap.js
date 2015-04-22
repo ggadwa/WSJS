@@ -428,7 +428,7 @@ genBitmap.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
 // create bitmap
 //
 
-genBitmap.generate=function(bitmapId,generateType,debug)
+genBitmap.generate=function(view,bitmapId,generateType,debug)
 {
     var edgeSize,paddingSize,segments;
     
@@ -529,5 +529,5 @@ genBitmap.generate=function(bitmapId,generateType,debug)
         // finally create the bitmap
         // object and load into WebGL
 
-    return(new mapBitmapObject(gl,bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+    return(new mapBitmapObject(view,bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
 };

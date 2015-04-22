@@ -4,11 +4,13 @@
 // model mesh gl binding
 //
 
-function modelMeshSetupBuffers()
+function modelMeshSetupBuffers(view)
 {
         // create all the buffers
         // expects buffers to already be Float32Array
         // or Uint16Array
+        
+    var gl=view.gl;
             
     this.vertexPosBuffer=gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
@@ -31,8 +33,10 @@ function modelMeshSetupBuffers()
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    
 }
 
-function modelMeshBindBuffers(modelShader)
+function modelMeshBindBuffers(view,modelShader)
 {
+    var gl=view.gl;
+    
     gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
     gl.vertexAttribPointer(modelShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
  
@@ -52,8 +56,10 @@ function modelMeshBindBuffers(modelShader)
 // model mesh drawing
 //
 
-function modelMeshDraw()
+function modelMeshDraw(view)
 {
+    var gl=view.gl;
+    
     gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
 }
 
@@ -61,8 +67,10 @@ function modelMeshDraw()
 // close model mesh
 //
 
-function modelMeshClose()
+function modelMeshClose(view)
 {
+    var gl=view.gl;
+    
     gl.bindBuffer(gl.ARRAY_BUFFER,null);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
     

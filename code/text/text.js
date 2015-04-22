@@ -4,13 +4,13 @@
 // initialize/release text
 //
 
-function textInitialize()
+function textInitialize(view)
 {
     var x,y,yAdd,dx,cIdx,charStr,charWid,ch;
     
         // start the shader
         
-    if (!this.textShader.initialize()) return(false);
+    if (!this.textShader.initialize(view)) return(false);
     
         // setup the canvas
         
@@ -49,6 +49,8 @@ function textInitialize()
     }
     
         // finally load into webGL
+        
+    var gl=view.gl;
 
     this.fontTexture=gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
@@ -61,9 +63,11 @@ function textInitialize()
     return(true);
 }
   
-function textRelease()
+function textRelease(view)
 {
-    this.textShader.release();
+    var gl=view.gl;
+    
+    this.textShader.release(view);
     gl.deleteTexture(this.fontTexture);
 }
 
@@ -73,20 +77,24 @@ function textRelease()
 
 function textDrawStart(view)
 {
+    var gl=view.gl;
+    
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
     
     this.textShader.drawStart(view);
 }
 
-function textDrawEnd()
+function textDrawEnd(view)
 {
-    this.textShader.drawEnd();
+    var gl=view.gl;
+    
+    this.textShader.drawEnd(view);
     
     gl.disable(gl.BLEND);
 }
 
-function textDraw(x,y,wid,high,str,align,color)
+function textDraw(view,x,y,wid,high,str,align,color)
 {
     var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
     var cIdx,gx,gy,gxAdd,gyAdd;
@@ -169,6 +177,8 @@ function textDraw(x,y,wid,high,str,align,color)
     }
     
         // set the shader and bitmap
+        
+    var gl=view.gl;
         
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);

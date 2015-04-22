@@ -9,10 +9,12 @@ function mapShaderInitialize(view)
         // get a new shader object
         // and load/compile it
         
-    this.shader=new shaderObject('wsMapVertShader','wsMapFragShader');
-    if (this.shader.program===null) return(false);
+    this.shader=new shaderObject();
+    if (!this.shader.initialize(view,'wsMapVertShader','wsMapFragShader')) return(false);
     
         // setup uniforms
+        
+    var gl=view.gl;
     
     gl.useProgram(this.shader.program);
     
@@ -53,9 +55,9 @@ function mapShaderInitialize(view)
     return(true);
 }
 
-function mapShaderRelease()
+function mapShaderRelease(view)
 {
-    this.shader.release();
+    this.shader.release(view);
 }
 
 //
@@ -68,6 +70,8 @@ function mapShaderDrawStart(view)
     var light,viewLight;
     
         // using the map shader
+        
+    var gl=view.gl;
         
     gl.useProgram(this.shader.program);
 
@@ -123,8 +127,10 @@ function mapShaderDrawStart(view)
     gl.enableVertexAttribArray(this.vertexAndLightmapUVAttribute);
 }
 
-function mapShaderDrawEnd()
+function mapShaderDrawEnd(view)
 {
+    var gl=view.gl;
+    
         // disable vertex attributes
         
     gl.disableVertexAttribArray(this.vertexPositionAttribute);

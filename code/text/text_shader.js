@@ -4,36 +4,36 @@
 // initialize/release text shader
 //
 
-function textShaderInitialize()
+function textShaderInitialize(view)
 {
         // get a new shader object
         // and load/compile it
         
-    this.shader=new shaderObject('wsTextVertShader','wsTextFragShader');
-    if (this.shader.program===null) return(false);
+    this.shader=new shaderObject();
+    if (!this.shader.initialize(view,'wsTextVertShader','wsTextFragShader')) return(false);
     
         // setup uniforms
     
-    gl.useProgram(this.shader.program);
+    view.gl.useProgram(this.shader.program);
     
-    this.vertexPositionAttribute=gl.getAttribLocation(this.shader.program,'vertexPosition');
-    this.vertexUVAttribute=gl.getAttribLocation(this.shader.program,'vertexUV');
+    this.vertexPositionAttribute=view.gl.getAttribLocation(this.shader.program,'vertexPosition');
+    this.vertexUVAttribute=view.gl.getAttribLocation(this.shader.program,'vertexUV');
     
-    this.orthoMatrixUniform=gl.getUniformLocation(this.shader.program,'orthoMatrix');    
-    this.colorUniform=gl.getUniformLocation(this.shader.program,'color');
+    this.orthoMatrixUniform=view.gl.getUniformLocation(this.shader.program,'orthoMatrix');    
+    this.colorUniform=view.gl.getUniformLocation(this.shader.program,'color');
     
         // these uniforms are always the same
         
-    gl.uniform1i(gl.getUniformLocation(this.shader.program,'baseTex'),0);
+    view.gl.uniform1i(view.gl.getUniformLocation(this.shader.program,'baseTex'),0);
     
-    gl.useProgram(null);
+    view.gl.useProgram(null);
     
     return(true);
 }
 
-function textShaderRelease()
+function textShaderRelease(view)
 {
-    this.shader.release();
+    this.shader.release(view);
 }
 
 //
@@ -42,28 +42,28 @@ function textShaderRelease()
 
 function textShaderDrawStart(view)
 {
-    gl.useProgram(this.shader.program);
+    view.gl.useProgram(this.shader.program);
 
         // setup the uniforms
         
-    gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
+    view.gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
     
         // enable the vertex attributes
         
-    gl.enableVertexAttribArray(this.vertexPositionAttribute);
-    gl.enableVertexAttribArray(this.vertexUVAttribute);
+    view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
+    view.gl.enableVertexAttribArray(this.vertexUVAttribute);
 }
 
-function textShaderDrawEnd()
+function textShaderDrawEnd(view)
 {
         // disable vertex attributes
         
-    gl.disableVertexAttribArray(this.vertexPositionAttribute);
-    gl.disableVertexAttribArray(this.vertexUVAttribute);
+    view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
+    view.gl.disableVertexAttribArray(this.vertexUVAttribute);
     
         // no longer using program
         
-    gl.useProgram(null);
+    view.gl.useProgram(null);
 }
 
 //

@@ -4,7 +4,7 @@
 // clear map
 //
 
-function mapClear()
+function mapClear(view)
 {
     var n;
     var nMesh=this.meshes.length;
@@ -12,15 +12,15 @@ function mapClear()
     var nLightmap=this.lightmaps.length;
     
     for (n=0;n!==nMesh;n++) {
-        this.meshes[n].close();
+        this.meshes[n].close(view);
     }
     
     for (n=0;n!==nBitmap;n++) {
-        this.bitmaps[n].close;
+        this.bitmaps[n].close(view);
     }
     
     for (n=0;n!==nLightmap;n++) {
-        this.lightmaps[n].close;
+        this.lightmaps[n].close(view);
     }
     
     this.meshes=[];
@@ -321,7 +321,7 @@ function mapCreateViewLightsFromMapLights(view,camera)
 // setup all the mesh buffers
 //
 
-function mapSetupBuffers()
+function mapSetupBuffers(view)
 {
     var n;
     var nMesh=this.meshes.length;
@@ -330,7 +330,7 @@ function mapSetupBuffers()
         // buffers and indexes
     
     for (n=0;n!==nMesh;n++) {
-        this.meshes[n].setupBuffers();
+        this.meshes[n].setupBuffers(view);
     }
 }
    
@@ -343,9 +343,9 @@ function mapDrawStart(view)
     this.mapShader.drawStart(view);
 }
 
-function mapDrawEnd()
+function mapDrawEnd(view)
 {
-    this.mapShader.drawEnd();
+    this.mapShader.drawEnd(view);
 }
 
 function mapDraw(view)
@@ -374,18 +374,18 @@ function mapDraw(view)
             
         if (mesh.bitmap!==currentBitmap) {
             currentBitmap=mesh.bitmap;
-            mesh.bitmap.attach(this.mapShader);
+            mesh.bitmap.attach(view,this.mapShader);
         }
         
         if (mesh.lightmap!==currentLightmap) {
             currentLightmap=mesh.lightmap;
-            mesh.lightmap.attach(this.mapShader);
+            mesh.lightmap.attach(view,this.mapShader);
         }
         
             // draw the mesh
             
-        mesh.bindBuffers(this.mapShader);
-        mesh.draw();
+        mesh.bindBuffers(view,this.mapShader);
+        mesh.draw(view);
         
         meshCount++;
     }
@@ -402,9 +402,9 @@ function mapInitialize(view)
     return(this.mapShader.initialize(view));
 }
 
-function mapRelease()
+function mapRelease(view)
 {
-    this.mapShader.release();
+    this.mapShader.release(view);
 }
 
 //

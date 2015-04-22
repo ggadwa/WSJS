@@ -4,9 +4,9 @@
 // close model
 //
 
-function modelClose()
+function modelClose(view)
 {
-    this.mesh.close();
+    this.mesh.close(view);
     this.skeleton.close();
 }
 

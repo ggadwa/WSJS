@@ -9,10 +9,12 @@ function modelShaderInitialize(view)
         // get a new shader object
         // and load/compile it
         
-    this.shader=new shaderObject('wsModelVertShader','wsModelFragShader');
-    if (this.shader.program===null) return(false);
+    this.shader=new shaderObject();
+    if (!this.shader.initialize(view,'wsModelVertShader','wsModelFragShader')) return(false);
     
         // setup uniforms
+        
+    var gl=view.gl;
     
     gl.useProgram(this.shader.program);
     
@@ -52,9 +54,9 @@ function modelShaderInitialize(view)
     return(true);
 }
 
-function modelShaderRelease()
+function modelShaderRelease(view)
 {
-    this.shader.release();
+    this.shader.release(view);
 }
 
 //
@@ -67,6 +69,8 @@ function modelShaderDrawStart(view)
     var light,viewLight;
     
         // using the model shader
+        
+    var gl=view.gl;
         
     gl.useProgram(this.shader.program);
 
@@ -122,8 +126,10 @@ function modelShaderDrawStart(view)
     gl.enableVertexAttribArray(this.vertexUVAttribute);
 }
 
-function modelShaderDrawEnd()
+function modelShaderDrawEnd(view)
 {
+    var gl=view.gl;
+    
         // disable vertex attributes
         
     gl.disableVertexAttribArray(this.vertexPositionAttribute);

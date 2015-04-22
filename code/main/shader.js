@@ -13,59 +13,89 @@ function shaderErrorAlert(vertScriptId,fragScriptId,errStr)
     str+=errStr;
     
     alert(str);
-};
+}
 
 //
 // load shaders
 //
 
-function shaderLoadVertexShader(vertScriptId)
+function shaderLoadVertexShader(view,vertScriptId)
 {
-    this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
+    this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
     
     var script=document.getElementById(vertScriptId);    
-    gl.shaderSource(this.vertexShader,script.text);
-    gl.compileShader(this.vertexShader);
+    view.gl.shaderSource(this.vertexShader,script.text);
+    view.gl.compileShader(this.vertexShader);
 
-    if (gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) return(true);
+    if (view.gl.getShaderParameter(this.vertexShader,view.gl.COMPILE_STATUS)) return(true);
 
-    this.errorAlert(vertScriptId,-1,gl.getShaderInfoLog(this.vertexShader));
+    this.errorAlert(vertScriptId,-1,view.gl.getShaderInfoLog(this.vertexShader));
     return(false);
-};
+}
 
-function shaderLoadFragmentShader(fragScriptId)
+function shaderLoadFragmentShader(view,fragScriptId)
 {
-    this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
+    this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
     
     var script=document.getElementById(fragScriptId);    
-    gl.shaderSource(this.fragmentShader,script.text);
-    gl.compileShader(this.fragmentShader);
+    view.gl.shaderSource(this.fragmentShader,script.text);
+    view.gl.compileShader(this.fragmentShader);
 
-    if (gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) return(true);
+    if (view.gl.getShaderParameter(this.fragmentShader,view.gl.COMPILE_STATUS)) return(true);
 
-    this.errorAlert(-1,fragScriptId,gl.getShaderInfoLog(this.fragmentShader));
+    this.errorAlert(-1,fragScriptId,view.gl.getShaderInfoLog(this.fragmentShader));
     return(false);
-};
+}
 
 //
-// close shader
+// initialize/release shader
 //
 
-function shaderClose()
+function shaderInitialize(view,vertScriptId,fragScriptId)
+{
+        // get the shaders from divs
+        
+    if (!this.loadVertexShader(view,vertScriptId)) {
+        this.release();
+        return(false);
+    }
+    
+    if (!this.loadFragmentShader(view,fragScriptId)) {
+        this.release();
+        return(false);
+    }
+
+        // compile the program
+        
+    this.program=view.gl.createProgram();
+    view.gl.attachShader(this.program,this.vertexShader);
+    view.gl.attachShader(this.program,this.fragmentShader);
+    view.gl.linkProgram(this.program);
+
+    if (!view.gl.getProgramParameter(this.program,view.gl.LINK_STATUS)) {
+        this.errorAlert(vertScriptId,fragScriptId,view.gl.getProgramInfoLog(this.program));
+        this.release();
+        return(false);
+    }
+    
+    return(true);
+}
+
+function shaderRelease(view)
 {
     if (this.program===null) return;
 
     if (this.vertexShader!==null) {
-        gl.detachShader(this.program,this.vertexShader);
-        gl.deleteShader(this.vertexShader);
+        view.gl.detachShader(this.program,this.vertexShader);
+        view.gl.deleteShader(this.vertexShader);
     }
     
     if (this.fragmentShader!==null) {
-        gl.detachShader(this.program,this.fragmentShader);
-        gl.deleteShader(this.fragmentShader);
+        view.gl.detachShader(this.program,this.fragmentShader);
+        view.gl.deleteShader(this.fragmentShader);
     }
     
-    gl.deleteProgram(this.program);
+    view.gl.deleteProgram(this.program);
     
     this.vertexShader=null;
     this.fragmentShader=null;
@@ -89,7 +119,7 @@ function shaderLightObject()
 // main shader object
 //
 
-function shaderObject(vertScriptId,fragScriptId)
+function shaderObject()
 {
     this.vertexShader=null;
     this.fragmentShader=null;
@@ -97,33 +127,11 @@ function shaderObject(vertScriptId,fragScriptId)
     
         // need to define these upfront
         // so they can be called
+        
+    this.initialize=shaderInitialize;
+    this.release=shaderRelease;
     
     this.loadVertexShader=shaderLoadVertexShader;
     this.loadFragmentShader=shaderLoadFragmentShader;
     this.errorAlert=shaderErrorAlert;
-    this.close=shaderClose;
-    
-        // get the shaders from divs
-        
-    if (!this.loadVertexShader(vertScriptId)) {
-        this.close();
-        return;
-    }
-    
-    if (!this.loadFragmentShader(fragScriptId)) {
-        this.close();
-        return;
-    }
-
-        // compile the program
-        
-    this.program=gl.createProgram();
-    gl.attachShader(this.program,this.vertexShader);
-    gl.attachShader(this.program,this.fragmentShader);
-    gl.linkProgram(this.program);
-
-    if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
-        this.errorAlert(vertScriptId,fragScriptId,gl.getProgramInfoLog(this.program));
-        this.close();
-    }
-}
+ }

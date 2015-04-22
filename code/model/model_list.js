@@ -9,9 +9,9 @@ function modelListInitialize(view)
     return(this.modelShader.initialize(view));
 }
 
-function modelListRelease()
+function modelListRelease(view)
 {
-    this.modelShader.release();
+    this.modelShader.release(view);
 }
 
 //

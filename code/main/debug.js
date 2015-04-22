@@ -4,14 +4,14 @@
 // initialize/release debug
 //
 
-function debugInitialize()
+function debugInitialize(view)
 {
-    return(this.debugShader.initialize());
+    return(this.debugShader.initialize(view));
 }
 
-function debugRelease()
+function debugRelease(view)
 {
-    this.debugShader.release();
+    this.debugShader.release(view);
 }
 
 //
@@ -28,7 +28,7 @@ function debugDrawMapMeshLines(view,map,mesh)
         // setup the buffers
         
     mesh.enableBuffers();
-    mesh.bindBuffers(map.mapShader);
+    mesh.bindBuffers(view,map.mapShader);
     
         // draw the line loop trigs
         
@@ -40,7 +40,7 @@ function debugDrawMapMeshLines(view,map,mesh)
         
     mesh.disableBuffers();
     
-    this.debugShader.drawEnd();
+    this.debugShader.drawEnd(view);
 }
 
 function debugDrawMapMeshNormals(view,mesh)
@@ -106,7 +106,7 @@ function debugDrawMapMeshNormals(view,mesh)
     gl.deleteBuffer(vertexPosBuffer);
     gl.deleteBuffer(indexBuffer);
     
-    this.debugShader.drawEnd();
+    this.debugShader.drawEnd(view);
 }
 
 //
@@ -174,7 +174,7 @@ function debugDrawModelSkeleton(view,model,offsetPosition)
     gl.deleteBuffer(vertexPosBuffer);
     gl.deleteBuffer(indexBuffer);
     
-    this.debugShader.drawEnd();
+    this.debugShader.drawEnd(view);
 }
 
 //

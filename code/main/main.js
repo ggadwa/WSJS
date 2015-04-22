@@ -27,8 +27,8 @@ var AMBIENT_R=0.35;
 var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
-var MAX_ROOM=5;
-var SIMPLE_LIGHTMAP=true;
+var MAX_ROOM=25;
+var SIMPLE_LIGHTMAP=false;
 
 //
 // textures to build
@@ -52,7 +52,6 @@ var wsTextureBuildList=
 // global objects
 //
 
-var gl=null;        // supergumba -- delete!
 var view=new viewObject();
 var camera=new cameraObject();
 var map=new mapObject();
@@ -196,7 +195,7 @@ function wsRefresh()
     
         // close old map
         
-    map.clear();
+    map.clear(view);
     
         // start at the texture generating step
     
@@ -229,16 +228,10 @@ function wsInit()
     
 function wsInitWebGL()
 {
-        // the drawing canvas
-        
-    //var canvas=canvasSetup();
-
-        // init opengl
+        // init view
+        // webgl and canvas stuff
     
     if (!view.initialize("wsCanvas")) return;
-    gl=view.gl;
-        
-    //if (!initGL(view,canvas)) return;
     
         // next step
     
@@ -251,8 +244,8 @@ function wsInitInternal()
 {
     if (!map.initialize(view)) return;
     if (!modelList.initialize(view)) return;
-    if (!text.initialize()) return;
-    if (!debug.initialize()) return;
+    if (!text.initialize(view)) return;
+    if (!debug.initialize(view)) return;
     
         // next step
     
@@ -276,7 +269,7 @@ function wsInitBuildTextures(idx)
     
     var setup=wsTextureBuildList[idx];
     
-    map.addBitmap(genBitmap.generate(setup[0],setup[1],debug));
+    map.addBitmap(genBitmap.generate(view,setup[0],setup[1],debug));
     wsNextStatusBar();
     
         // if more textures, then loop back around
@@ -317,7 +310,7 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
         
-    genLightmap.create(map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
+    genLightmap.create(view,map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
 }
 
 function wsInitBuildLightmapFinish()
@@ -332,7 +325,7 @@ function wsInitFinish()
         // finish by setting up all the mesh
         // buffers and indexes
         
-    map.setupBuffers();
+    map.setupBuffers(view);
     
         // the initial camera position
         

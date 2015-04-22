@@ -4,31 +4,31 @@
 // initialize/release debug shader
 //
 
-function debugShaderInitialize()
+function debugShaderInitialize(view)
 {
         // get a new shader object
         // and load/compile it
         
-    this.shader=new shaderObject('wsDebugVertShader','wsDebugFragShader');
-    if (this.shader.program===null) return(false);
+    this.shader=new shaderObject();
+    if (!this.shader.initialize(view,'wsDebugVertShader','wsDebugFragShader')) return(false);
     
         // setup uniforms
     
-    gl.useProgram(this.shader.program);
+    view.gl.useProgram(this.shader.program);
     
-    this.vertexPositionAttribute=gl.getAttribLocation(this.shader.program,'vertexPosition');
+    this.vertexPositionAttribute=view.gl.getAttribLocation(this.shader.program,'vertexPosition');
     
-    this.perspectiveMatrixUniform=gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
-    this.modelMatrixUniform=gl.getUniformLocation(this.shader.program,'modelMatrix');
+    this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
+    this.modelMatrixUniform=view.gl.getUniformLocation(this.shader.program,'modelMatrix');
     
-    gl.useProgram(null);
+    view.gl.useProgram(null);
     
     return(true);
 }
 
-function debugShaderRelease()
+function debugShaderRelease(view)
 {
-    this.shader.release();
+    this.shader.release(view);
 }
 
 //
@@ -39,27 +39,27 @@ function debugShaderDrawStart(view)
 {
         // using the map shader
         
-    gl.useProgram(this.shader.program);
+    view.gl.useProgram(this.shader.program);
 
         // matrix
 
-    gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-    gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
+    view.gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
+    view.gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
     
         // enable the vertex attributes
         
-    gl.enableVertexAttribArray(this.vertexPositionAttribute);
+    view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
 }
 
-function debugShaderDrawEnd()
+function debugShaderDrawEnd(view)
 {
         // disable vertex attributes
         
-    gl.disableVertexAttribArray(this.vertexPositionAttribute);
+    view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
     
         // no longer using shader
         
-    gl.useProgram(null);
+    view.gl.useProgram(null);
 }
 
 //

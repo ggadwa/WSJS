@@ -667,7 +667,7 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightma
 // create lightmap
 //
 
-genLightmap.createLightmapForMesh=function(map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc)
+genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc)
 {
     var n,lightmapIdx,chunkIdx,nTrig;
     var lft,top;
@@ -734,13 +734,13 @@ genLightmap.createLightmapForMesh=function(map,meshIdx,simpleLightmap,lightmapLi
         
     meshIdx++;
     if (meshIdx>=map.meshes.length) {
-        setTimeout(function() { genLightmap.createFinish(lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+        setTimeout(function() { genLightmap.createFinish(view,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
         return;
     }
     
         // next mesh
     
-    setTimeout(function() { genLightmap.createLightmapForMesh(map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
 };
 
 //
@@ -749,7 +749,7 @@ genLightmap.createLightmapForMesh=function(map,meshIdx,simpleLightmap,lightmapLi
 // is too slow and browsers will bounce the script
 //
 
-genLightmap.create=function(map,simpleLightmap,callbackFunc)
+genLightmap.create=function(view,map,simpleLightmap,callbackFunc)
 {
     var n;
     var nMesh=map.meshes.length;
@@ -783,10 +783,10 @@ genLightmap.create=function(map,simpleLightmap,callbackFunc)
         // by a timer so we don't trigger the
         // script time out problem
         
-    setTimeout(function() { genLightmap.createLightmapForMesh(map,0,simpleLightmap,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,0,simpleLightmap,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
 };
     
-genLightmap.createFinish=function(lightmapList,meshList,callbackFunc)
+genLightmap.createFinish=function(view,lightmapList,meshList,callbackFunc)
 {
     var n;
     
@@ -796,7 +796,7 @@ genLightmap.createFinish=function(lightmapList,meshList,callbackFunc)
         // the index is used as the id
         
     for (n=0;n!==lightmapList.length;n++) {
-        map.addLightmap(new mapLightmapObject(gl,n,lightmapList[n].canvas));
+        map.addLightmap(new mapLightmapObject(view,n,lightmapList[n].canvas));
     }
     
         // and finally push all the required
