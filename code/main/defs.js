@@ -103,6 +103,12 @@ function wsAngle(x,y,z)
                 };
 }
 
+function wsLine(p1,p2)
+{
+    this.p1=p1;
+    this.p2=p2;
+}
+
 function wsBound(value1,value2)
 {
     if (value1<value2) {

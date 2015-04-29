@@ -27,8 +27,8 @@ var AMBIENT_R=0.35;
 var AMBIENT_G=0.35;
 var AMBIENT_B=0.35;
 
-var MAX_ROOM=25;
-var SIMPLE_LIGHTMAP=false;
+var MAX_ROOM=1;
+var SIMPLE_LIGHTMAP=true;
 
 //
 // textures to build

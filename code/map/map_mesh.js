@@ -255,6 +255,15 @@ function mapMeshBuildTrigRayTraceCache()
 }
 
 //
+// collision lines
+//
+
+function mapMeshAddCollisionLine(p1,p2)
+{
+    this.collisionLines.push(new wsLine(p1,p2));
+}
+
+//
 // UVs
 //
 
@@ -416,6 +425,10 @@ function mapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         
     this.trigRayTraceCache=null;
     
+        // collision lines
+        
+    this.collisionLines=[];
+    
         // mesh alterations
         
     this.combineMesh=mapMeshCombineMesh;
@@ -439,6 +452,10 @@ function mapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         // special caches
         
     this.buildTrigRayTraceCache=mapMeshBuildTrigRayTraceCache;
+    
+        // collision lines
+        
+    this.addCollisionLine=mapMeshAddCollisionLine;
     
         // UVs
     
