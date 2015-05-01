@@ -30,6 +30,9 @@ var AMBIENT_B=0.35;
 var MAX_ROOM=1;
 var SIMPLE_LIGHTMAP=true;
 
+var MONSTER_MODEL_COUNT=5;
+var MONSTER_ENTITY_COUNT=5;
+
 //
 // textures to build
 //
@@ -56,11 +59,10 @@ var view=new viewObject();
 var camera=new cameraObject();
 var map=new mapObject();
 var modelList=new modelListObject();
+var entityList=new entityListObject();
 var text=new textObject();
 var input=new inputObject();
 var debug=new debugObject();
-
-var testModel=new modelObject(null,new modelSkeletonObject());
 
 //
 // main loop
@@ -244,6 +246,7 @@ function wsInitInternal()
 {
     if (!map.initialize(view)) return;
     if (!modelList.initialize(view)) return;
+    if (!entityList.initialize(view)) return;
     if (!text.initialize(view)) return;
     if (!debug.initialize(view)) return;
     
@@ -316,8 +319,52 @@ function wsInitBuildLightmap()
 function wsInitBuildLightmapFinish()
 {
     wsUpdateStatus();
+    wsStageStatus('Building Models');
+    setTimeout(wsInitBuildModels,10);
+}
+
+function wsInitBuildModels()
+{
+    var n;
+    
+        // player model
+
+    modelList.add(new modelObject('player',null,new modelSkeletonObject()));
+    
+        // monster models
+    
+    for (n=0;n!==MONSTER_MODEL_COUNT;n++) {
+        modelList.add(new modelObject(('monster_'+n),null,new modelSkeletonObject()));
+    }
+    
+        // next step
+    
+    wsUpdateStatus();
+    wsStageStatus('Building Entities');
+    setTimeout(wsInitBuildEntities,10);
+}
+
+function wsInitBuildEntities()
+{
+    var n,monsterModelName;
+    
+        // make player entity
+        
+    var mapMid=view.OPENGL_FAR_Z/2;
+    entityList.addPlayer(new entityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),modelList.get('player')));
+    
+        // make monster entities
+        
+    for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
+        monsterModelName='monster_'+genRandom.randomInt(0,MONSTER_MODEL_COUNT);
+        entityList.add(new entityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),modelList.get(monsterModelName)));
+    }
+    
+        // add entities to map
+        
+    wsUpdateStatus();
     wsStageStatus('Running');
-    setTimeout(wsInitFinish,10);
+    setTimeout(wsInitFinish,10);    
 }
 
 function wsInitFinish()

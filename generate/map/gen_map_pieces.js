@@ -252,7 +252,28 @@ function mapPieceCreateMeshWalls(bitmap,xBound,yBound,zBound,flag)
     
         // finally create the mesh
         
-    return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
+    var mesh=new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag);
+    
+        // add these same lines as
+        // collision lines to be used
+        // by the physics
+    
+    for (n=0;n!==nPoint;n++) {
+        k=n+1;
+        if (k===nPoint) k=0;
+        
+        pt=this.points[n];
+        x1=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
+        z1=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
+        
+        pt=this.points[k];
+        x2=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
+        z2=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
+        
+        mesh.addCollisionLine(new wsLine(new ws2DPoint(x1,z1),new ws2DPoint(x2,z2)));
+    }
+    
+    return(mesh);
 }
 
 //

@@ -14,8 +14,9 @@ function modelClose(view)
 // model object
 //
 
-function modelObject(mesh,skeleton)
+function modelObject(name,mesh,skeleton)
 {
+    this.name=name;
     this.mesh=mesh;
     this.skeleton=skeleton;
     

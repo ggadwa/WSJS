@@ -88,3 +88,21 @@ int circle_line_intersect(d3pnt *p1,d3pnt *p2,d3pnt *circle_pnt,int radius,d3pnt
 }
 
  */
+
+//
+// colliding objects
+//
+
+function collisionMoveObjectInMap(map,pt,radius)
+{
+    
+}
+
+//
+// main collision object
+//
+
+function collisionObject()
+{
+    this.moveObjectInMap=collisionMoveObjectInMap;
+}

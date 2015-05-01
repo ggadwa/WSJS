@@ -2,13 +2,7 @@
 
 - !!!NOTE!!! eventually move back to vec3 in lighting structure (sigh, windows bug)
 
----> shader.js
-       - needs initialize/release
-       - move loading stuff to initialize
-       - always pass in view
----> have gl be in view
-       - get rid of var gl and gl=view.gl in main
-       - get rid of all other gls, only from view
+---> start generating models instead of the test model thing
 
 ---> redo all the statics to be objects
 
@@ -27,5 +21,6 @@
     - close gl
     - map.release();
     - modelList.release();
+    - entityList.release();
     - text.release();
     - debug.release();
