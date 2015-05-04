@@ -10,13 +10,7 @@ var genMap={};
 // constants
 // 
 
-genMap.MESH_FLAG_ROOM_WALL=0;
-genMap.MESH_FLAG_ROOM_FLOOR=1;
-genMap.MESH_FLAG_ROOM_CEILING=2;
-genMap.MESH_FLAG_STAIR=3;
-genMap.MESH_FLAG_LIGHT=4;
-
-genMap.STAIR_LENGTH=5000;
+const GEN_MAP_STAIR_LENGTH=5000;
 
 //
 // setup
@@ -63,7 +57,7 @@ genMap.removeSharedTriangles=function(map)
     
     for (n=0;n!==nMesh;n++) {
         mesh=map.meshes[n];
-        if (mesh.flag!==this.MESH_FLAG_ROOM_WALL) continue;
+        if (mesh.flag!==MAP_MESH_FLAG_ROOM_WALL) continue;
     
         for (t1=0;t1!==mesh.trigCount;t1++) {
             
@@ -74,7 +68,7 @@ genMap.removeSharedTriangles=function(map)
             
             for (k=(n+1);k<nMesh;k++) {
                 otherMesh=map.meshes[k];
-                if (otherMesh.flag!==this.MESH_FLAG_ROOM_WALL) continue;
+                if (otherMesh.flag!==MAP_MESH_FLAG_ROOM_WALL) continue;
             
                 for (t2=0;t2!==otherMesh.trigCount;t2++) {
                     
@@ -132,7 +126,7 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,levelCount
     
         // floor
         
-    map.addMesh(piece.createMeshFloor(map.getBitmapById(floorTextures[levelCount%3]),xBound,yBound,zBound,this.MESH_FLAG_ROOM_FLOOR));
+    map.addMesh(piece.createMeshFloor(map.getBitmapById(floorTextures[levelCount%3]),xBound,yBound,zBound,MAP_MESH_FLAG_ROOM_FLOOR));
     
         // walls
         // combine into a single mesh
@@ -144,11 +138,11 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,levelCount
     
     for (n=0;n!==storyCount;n++) {
         if (n===0) {
-            mesh=piece.createMeshWalls(map.getBitmapById(wallTextures[levelCount%3]),xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh=piece.createMeshWalls(map.getBitmapById(wallTextures[levelCount%3]),xBound,yStoryBound,zBound,MAP_MESH_FLAG_ROOM_WALL);
         }
         else {
             yStoryBound.add(-yStoryAdd);
-            mesh2=piece.createMeshWalls(map.getBitmapById(wallTextures[levelCount%3]),xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_WALL);
+            mesh2=piece.createMeshWalls(map.getBitmapById(wallTextures[levelCount%3]),xBound,yStoryBound,zBound,MAP_MESH_FLAG_ROOM_WALL);
             mesh.combineMesh(mesh2);
         }
     }
@@ -157,7 +151,7 @@ genMap.addRoomMesh=function(map,piece,storyCount,xBound,yBound,zBound,levelCount
     
         // ceiling
         
-    map.addMesh(piece.createMeshCeiling(map.getBitmapById(BITMAP_WOOD_PLANK),xBound,yStoryBound,zBound,this.MESH_FLAG_ROOM_CEILING));
+    map.addMesh(piece.createMeshCeiling(map.getBitmapById(BITMAP_WOOD_PLANK),xBound,yStoryBound,zBound,MAP_MESH_FLAG_ROOM_CEILING));
     
         // decorations
         
@@ -172,7 +166,7 @@ genMap.addStairMesh=function(map,piece,connectType,xStairBound,yStairBound,zStai
 {
         // no stair if collide with another staircase
         
-    if (map.boxBoundCollision(xStairBound,yStairBound,zStairBound,this.MESH_FLAG_STAIR)!==-1) return;
+    if (map.boxBoundCollision(xStairBound,yStairBound,zStairBound,MAP_MESH_FLAG_STAIR)!==-1) return;
 
     switch (connectType) {
         case piece.CONNECT_TYPE_LEFT:
@@ -202,7 +196,7 @@ genMap.addLight=function(map,piece,xBound,yBound,zBound)
     var xLightBound=new wsBound((lightX-400),(lightX+400));
     var yLightBound=new wsBound(yBound.min,(yBound.min+1000));
     var zLightBound=new wsBound((lightZ-400),(lightZ+400));
-    map.addMesh(meshPrimitives.createMeshPryamid(map.getBitmapById(BITMAP_METAL),xLightBound,yLightBound,zLightBound,genMap.MESH_FLAG_LIGHT));
+    map.addMesh(meshPrimitives.createMeshPryamid(map.getBitmapById(BITMAP_METAL),xLightBound,yLightBound,zLightBound,MAP_MESH_FLAG_LIGHT));
     
         // reduce light if already in the
         // path of another light
@@ -305,7 +299,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
                 case piece.CONNECT_TYPE_LEFT:
                     xBound=new wsBound((xConnectBound.min-setup.maxRoomSize[0]),xConnectBound.min);
                     zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
-                    xStairBound=new wsBound(xConnectBound.min,(xConnectBound.min+this.STAIR_LENGTH));
+                    xStairBound=new wsBound(xConnectBound.min,(xConnectBound.min+GEN_MAP_STAIR_LENGTH));
                     zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
                     break;
 
@@ -313,13 +307,13 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
                     xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                     zBound=new wsBound((zConnectBound.min-setup.maxRoomSize[2]),zConnectBound.min);
                     xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
-                    zStairBound=new wsBound(zConnectBound.min,(zConnectBound.min+this.STAIR_LENGTH));
+                    zStairBound=new wsBound(zConnectBound.min,(zConnectBound.min+GEN_MAP_STAIR_LENGTH));
                     break;
 
                 case piece.CONNECT_TYPE_RIGHT:
                     xBound=new wsBound(xConnectBound.max,(xConnectBound.max+setup.maxRoomSize[0]));
                     zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
-                    xStairBound=new wsBound((xConnectBound.max-this.STAIR_LENGTH),xConnectBound.max);
+                    xStairBound=new wsBound((xConnectBound.max-GEN_MAP_STAIR_LENGTH),xConnectBound.max);
                     zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
                     break;
 
@@ -327,7 +321,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
                     xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                     zBound=new wsBound(zConnectBound.max,(zConnectBound.max+setup.maxRoomSize[2]));
                     xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
-                    zStairBound=new wsBound((zConnectBound.max-this.STAIR_LENGTH),zConnectBound.max);
+                    zStairBound=new wsBound((zConnectBound.max-GEN_MAP_STAIR_LENGTH),zConnectBound.max);
                     break;
 
             }
@@ -338,7 +332,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
                 // we ignore the Y so upper stories don't
                 // go over current stories
             
-            if (map.boxBoundCollision(xBound,null,zBound,this.MESH_FLAG_ROOM_WALL)===-1) {
+            if (map.boxBoundCollision(xBound,null,zBound,MAP_MESH_FLAG_ROOM_WALL)===-1) {
                 usedConnectLineIdx=n;
                 break;
             }
@@ -394,7 +388,7 @@ genMap.buildMapRecursiveRoom=function(map,setup,recurseCount,connectPieceIdx,con
     
             // bail if we've reach max room count
 
-        if (map.countMeshByFlag(this.MESH_FLAG_ROOM_WALL)>=setup.maxRoom) return;
+        if (map.countMeshByFlag(MAP_MESH_FLAG_ROOM_WALL)>=setup.maxRoom) return;
         
             // determine if this line will go off
             // on another recursion

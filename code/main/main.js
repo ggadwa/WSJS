@@ -4,40 +4,44 @@
 // resource IDs
 //
 
-var BITMAP_BRICK_STACK=0;
-var BITMAP_BRICK_RANDOM=1;
-var BITMAP_STONE=2;
-var BITMAP_TILE=3;
-var BITMAP_TILE_2=4;
-var BITMAP_STAIR_TILE=5;
-var BITMAP_METAL=6;
-var BITMAP_CONCRETE=7;
-var BITMAP_WOOD_PLANK=8;
-var BITMAP_WOOD_BOX=9;
+const BITMAP_BRICK_STACK=0;
+const BITMAP_BRICK_RANDOM=1;
+const BITMAP_STONE=2;
+const BITMAP_TILE=3;
+const BITMAP_TILE_2=4;
+const BITMAP_STAIR_TILE=5;
+const BITMAP_METAL=6;
+const BITMAP_CONCRETE=7;
+const BITMAP_WOOD_PLANK=8;
+const BITMAP_WOOD_BOX=9;
 
 //
 // constants
 //
 
-var WS_PHYSICS_MSECS=16;
-var WS_DRAW_MSECS=16;
-var WS_BAIL_MSECS=5000;
+const WS_PHYSICS_MSECS=16;
+const WS_DRAW_MSECS=16;
+const WS_BAIL_MSECS=5000;
 
-var AMBIENT_R=0.35;
-var AMBIENT_G=0.35;
-var AMBIENT_B=0.35;
+const AMBIENT_R=0.35;
+const AMBIENT_G=0.35;
+const AMBIENT_B=0.35;
 
-var MAX_ROOM=1;
-var SIMPLE_LIGHTMAP=true;
+const MONSTER_MODEL_COUNT=5;
+const MONSTER_ENTITY_COUNT=5;
 
-var MONSTER_MODEL_COUNT=5;
-var MONSTER_ENTITY_COUNT=5;
+//
+// debugging and quick start up flags
+//
+
+const MAX_ROOM=1;
+const SIMPLE_LIGHTMAP=true;
 
 //
 // textures to build
 //
 
-var wsTextureBuildList=
+const wsTextureBuildList=
     [
         [BITMAP_BRICK_STACK,genBitmap.TYPE_BRICK_STACK],
         [BITMAP_BRICK_RANDOM,genBitmap.TYPE_BRICK_RANDOM],
@@ -56,11 +60,9 @@ var wsTextureBuildList=
 //
 
 var view=new viewObject();
-var camera=new cameraObject();
 var map=new mapObject();
 var modelList=new modelListObject();
 var entityList=new entityListObject();
-var text=new textObject();
 var input=new inputObject();
 var debug=new debugObject();
 
@@ -89,7 +91,7 @@ function wsLoopRun(timeStamp)
     while (physicsTick>WS_PHYSICS_MSECS) {
         physicsTick-=WS_PHYSICS_MSECS;
         
-        input.run(camera);
+        input.run(view.camera);
     }
     
         // drawing
@@ -99,7 +101,7 @@ function wsLoopRun(timeStamp)
     if (drawTick>WS_DRAW_MSECS) {
         view.loopLastDrawTimeStamp=ts; 
 
-        view.draw(map,text,camera);
+        view.draw(map,entityList);
         
         view.fpsTotal+=drawTick;
         view.fpsCount++;
@@ -247,7 +249,6 @@ function wsInitInternal()
     if (!map.initialize(view)) return;
     if (!modelList.initialize(view)) return;
     if (!entityList.initialize(view)) return;
-    if (!text.initialize(view)) return;
     if (!debug.initialize(view)) return;
     
         // next step
@@ -351,13 +352,13 @@ function wsInitBuildEntities()
         // make player entity
         
     var mapMid=view.OPENGL_FAR_Z/2;
-    entityList.addPlayer(new entityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),modelList.get('player')));
+    entityList.addPlayer(new entityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),modelList.get('player'),true));
     
         // make monster entities
         
     for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
         monsterModelName='monster_'+genRandom.randomInt(0,MONSTER_MODEL_COUNT);
-        entityList.add(new entityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),modelList.get(monsterModelName)));
+        entityList.add(new entityObject(map.findRandomPosition(),new wsAngle(0.0,0.0,0.0),modelList.get(monsterModelName),false));
     }
     
         // add entities to map
@@ -378,8 +379,8 @@ function wsInitFinish()
         
     var mapMid=view.OPENGL_FAR_Z/2;
 
-    camera.position.set(mapMid,mapMid,mapMid);
-    camera.angle.set(0.0,0.0,0.0);
+    view.camera.position.set(mapMid,mapMid,mapMid);
+    view.camera.angle.set(0.0,0.0,0.0);
     
         // ambient
         

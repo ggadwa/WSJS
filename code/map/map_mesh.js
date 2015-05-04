@@ -1,6 +1,16 @@
 "use strict";
 
 //
+// constants
+//
+      
+const MAP_MESH_FLAG_ROOM_WALL=0;
+const MAP_MESH_FLAG_ROOM_FLOOR=1;
+const MAP_MESH_FLAG_ROOM_CEILING=2;
+const MAP_MESH_FLAG_STAIR=3;
+const MAP_MESH_FLAG_LIGHT=4;
+ 
+//
 // combine two meshes
 //
 

@@ -318,6 +318,34 @@ function mapCreateViewLightsFromMapLights(view,camera)
 }
 
 //
+// find random spots in map
+//
+
+function mapFindRandomPosition()
+{
+    var findTry=0;
+    var meshIdx,mesh;
+    
+        // try to only look at wall meshes
+        
+    while (findTry<25) {
+        meshIdx=genRandom.randomInt(0,this.meshes.length);
+        mesh=this.meshes[meshIdx];
+        if (mesh.flag===MAP_MESH_FLAG_ROOM_FLOOR) break;
+        findTry++;
+    }
+        
+        // build a random location
+        
+    var pos=new wsPoint(0,0,0);
+    pos.x=genRandom.randomInBetween(mesh.xBound.min,mesh.xBound.max);
+    pos.y=mesh.yBound.max;
+    pos.z=genRandom.randomInBetween(mesh.zBound.min,mesh.zBound.max);
+
+    return(pos);
+}
+
+//
 // setup all the mesh buffers
 //
 
@@ -441,6 +469,8 @@ function mapObject()
     this.pointInLight=mapPointInLight;
     this.pointInSingleLight=mapPointInSingleLight;
     this.buildLightMeshIntersectLists=mapBuildLightMeshIntersectLists;
+    
+    this.findRandomPosition=mapFindRandomPosition;
     
     this.createViewLightsFromMapLights=mapCreateViewLightsFromMapLights;
     this.setupBuffers=mapSetupBuffers;

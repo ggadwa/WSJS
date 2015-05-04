@@ -5,6 +5,7 @@
 ---> start generating models instead of the test model thing
 
 ---> redo all the statics to be objects
+---> frustum cull the models
 
 
 - start skeleton work (always start with single, vertical line)

@@ -22,9 +22,23 @@ function entityListAddPlayer(entity)
     this.entities[0]=entity;
 }
 
-function entityAdd(entity)
+function entityListAdd(entity)
 {
     this.entities.push(entity);
+}
+
+//
+// entity list
+//
+
+function entityListCount()
+{
+    return(this.entities.length);
+}
+
+function entityListGet(entityIdx)
+{
+    return(this.entities[entityIdx]);
 }
 
 //
@@ -40,6 +54,9 @@ function entityListObject()
     this.release=entityListRelease;
     
     this.addPlayer=entityListAddPlayer;
-    this.add=entityAdd;
+    this.add=entityListAdd;
+    
+    this.count=entityListCount;
+    this.get=entityListGet;
 }
     

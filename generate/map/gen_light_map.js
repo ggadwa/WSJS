@@ -38,17 +38,16 @@ function genLightmapMeshObject()
 // constants
 //
 
-genLightmap.TIMEOUT_MSEC=100;
+const GEN_LIGHTMAP_TIMEOUT_MSEC=100;
+const GEN_LIGHTMAP_TEXTURE_SIZE=1024;
 
-genLightmap.TEXTURE_SIZE=1024;
 // chunk is one block available to draw a light map
-genLightmap.CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
-genLightmap.CHUNK_SIZE=Math.floor(genLightmap.TEXTURE_SIZE/genLightmap.CHUNK_SPLIT);    // square pixel size of chunks
-genLightmap.CHUNK_PER_TEXTURE=(genLightmap.CHUNK_SPLIT*genLightmap.CHUNK_SPLIT);        // how many chunks in a single texture
+const GEN_LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
+const GEN_LIGHTMAP_CHUNK_SIZE=Math.floor(GEN_LIGHTMAP_TEXTURE_SIZE/GEN_LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
+const GEN_LIGHTMAP_CHUNK_PER_TEXTURE=(GEN_LIGHTMAP_CHUNK_SPLIT*GEN_LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
 
-genLightmap.RENDER_MARGIN=2;                // margin around each light map triangle
-
-genLightmap.BLUR_COUNT=3;
+const GEN_LIGHTMAP_RENDER_MARGIN=2;                // margin around each light map triangle
+const GEN_LIGHTMAP_BLUR_COUNT=3;
 
 //
 // start light map canvas
@@ -59,19 +58,19 @@ genLightmap.startCanvas=function()
         // setup the canvas
         
     var canvas=document.createElement('canvas');
-    canvas.width=genLightmap.TEXTURE_SIZE;
-    canvas.height=genLightmap.TEXTURE_SIZE;
+    canvas.width=GEN_LIGHTMAP_TEXTURE_SIZE;
+    canvas.height=GEN_LIGHTMAP_TEXTURE_SIZE;
     var ctx=canvas.getContext('2d');
     
         // clear to black with
         // open alpha (we use this later
         // for smearing)
         
-    var imgData=ctx.getImageData(0,0,genLightmap.TEXTURE_SIZE,genLightmap.TEXTURE_SIZE);
+    var imgData=ctx.getImageData(0,0,GEN_LIGHTMAP_TEXTURE_SIZE,GEN_LIGHTMAP_TEXTURE_SIZE);
     var data=imgData.data;
     
     var n;
-    var pixelCount=genLightmap.TEXTURE_SIZE*genLightmap.TEXTURE_SIZE;
+    var pixelCount=GEN_LIGHTMAP_TEXTURE_SIZE*GEN_LIGHTMAP_TEXTURE_SIZE;
     var idx=0;
     
     for (n=0;n!==pixelCount;n++) {
@@ -188,7 +187,7 @@ genLightmap.blurChunk=function(data,wid,high)
     
         // blur pixels to count
 		
-    for (n=0;n!==genLightmap.BLUR_COUNT;n++) {
+    for (n=0;n!==GEN_LIGHTMAP_BLUR_COUNT;n++) {
 
         for (y=0;y!==high;y++) {
             
@@ -602,7 +601,7 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightma
     
         // 2D reduction factors
         
-    var renderSize=genLightmap.CHUNK_SIZE-(genLightmap.RENDER_MARGIN*2);
+    var renderSize=GEN_LIGHTMAP_CHUNK_SIZE-(GEN_LIGHTMAP_RENDER_MARGIN*2);
 
     var sz=xBound.max-xBound.min;
     var xFactor=(sz===0)?0:renderSize/sz;
@@ -637,30 +636,30 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightma
         // move so the triangle renders within
         // the margins so we have area to smear
         
-    pt0.move(genLightmap.RENDER_MARGIN,genLightmap.RENDER_MARGIN);
-    pt1.move(genLightmap.RENDER_MARGIN,genLightmap.RENDER_MARGIN);
-    pt2.move(genLightmap.RENDER_MARGIN,genLightmap.RENDER_MARGIN);
+    pt0.move(GEN_LIGHTMAP_RENDER_MARGIN,GEN_LIGHTMAP_RENDER_MARGIN);
+    pt1.move(GEN_LIGHTMAP_RENDER_MARGIN,GEN_LIGHTMAP_RENDER_MARGIN);
+    pt2.move(GEN_LIGHTMAP_RENDER_MARGIN,GEN_LIGHTMAP_RENDER_MARGIN);
     
         // ray trace the triangle
        
-    genLightmap.renderTriangle(map,meshIdx,trigIdx,simpleLightmap,ctx,[pt0,pt1,pt2],[v0,v1,v2],normal,lft,top,(lft+genLightmap.CHUNK_SIZE),(top+genLightmap.CHUNK_SIZE));
+    genLightmap.renderTriangle(map,meshIdx,trigIdx,simpleLightmap,ctx,[pt0,pt1,pt2],[v0,v1,v2],normal,lft,top,(lft+GEN_LIGHTMAP_CHUNK_SIZE),(top+GEN_LIGHTMAP_CHUNK_SIZE));
 
         // add the UV
     
-    var renderLft=lft+genLightmap.RENDER_MARGIN;
-    var renderTop=top+genLightmap.RENDER_MARGIN;
+    var renderLft=lft+GEN_LIGHTMAP_RENDER_MARGIN;
+    var renderTop=top+GEN_LIGHTMAP_RENDER_MARGIN;
 
     uvIdx=mesh.indexes[trigIdx*3]*2;
-    lightmapUVs[uvIdx]=(pt0.x+renderLft)/genLightmap.TEXTURE_SIZE;
-    lightmapUVs[uvIdx+1]=(pt0.y+renderTop)/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx]=(pt0.x+renderLft)/GEN_LIGHTMAP_TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=(pt0.y+renderTop)/GEN_LIGHTMAP_TEXTURE_SIZE;
     
     uvIdx=mesh.indexes[(trigIdx*3)+1]*2;
-    lightmapUVs[uvIdx]=(pt1.x+renderLft)/genLightmap.TEXTURE_SIZE;
-    lightmapUVs[uvIdx+1]=(pt1.y+renderTop)/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx]=(pt1.x+renderLft)/GEN_LIGHTMAP_TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=(pt1.y+renderTop)/GEN_LIGHTMAP_TEXTURE_SIZE;
     
     uvIdx=mesh.indexes[(trigIdx*3)+2]*2;
-    lightmapUVs[uvIdx]=(pt2.x+renderLft)/genLightmap.TEXTURE_SIZE;
-    lightmapUVs[uvIdx+1]=(pt2.y+renderTop)/genLightmap.TEXTURE_SIZE;
+    lightmapUVs[uvIdx]=(pt2.x+renderLft)/GEN_LIGHTMAP_TEXTURE_SIZE;
+    lightmapUVs[uvIdx+1]=(pt2.y+renderTop)/GEN_LIGHTMAP_TEXTURE_SIZE;
 };
     
 //
@@ -687,7 +686,7 @@ genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,light
 
             // check to see if we can fit
 
-        if ((genLightmap.CHUNK_PER_TEXTURE-lightmapList[n].chunkIdx)>nTrig) {
+        if ((GEN_LIGHTMAP_CHUNK_PER_TEXTURE-lightmapList[n].chunkIdx)>nTrig) {
             lightmapIdx=n;
             break;
         }
@@ -711,8 +710,8 @@ genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,light
 
     for (n=0;n!==nTrig;n++) {
 
-        lft=(chunkIdx%genLightmap.CHUNK_SPLIT)*genLightmap.CHUNK_SIZE;
-        top=Math.floor(chunkIdx/genLightmap.CHUNK_SPLIT)*genLightmap.CHUNK_SIZE;
+        lft=(chunkIdx%GEN_LIGHTMAP_CHUNK_SPLIT)*GEN_LIGHTMAP_CHUNK_SIZE;
+        top=Math.floor(chunkIdx/GEN_LIGHTMAP_CHUNK_SPLIT)*GEN_LIGHTMAP_CHUNK_SIZE;
 
         genLightmap.writePolyToChunk(map,meshIdx,n,simpleLightmap,lightmapIdx,ctx,lft,top,lightmapUVs);
 
@@ -734,13 +733,13 @@ genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,light
         
     meshIdx++;
     if (meshIdx>=map.meshes.length) {
-        setTimeout(function() { genLightmap.createFinish(view,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+        setTimeout(function() { genLightmap.createFinish(view,lightmapList,meshList,callbackFunc); },GEN_LIGHTMAP_TIMEOUT_MSEC);
         return;
     }
     
         // next mesh
     
-    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc); },GEN_LIGHTMAP_TIMEOUT_MSEC);
 };
 
 //
@@ -783,7 +782,7 @@ genLightmap.create=function(view,map,simpleLightmap,callbackFunc)
         // by a timer so we don't trigger the
         // script time out problem
         
-    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,0,simpleLightmap,lightmapList,meshList,callbackFunc); },genLightmap.TIMEOUT_MSEC);
+    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,0,simpleLightmap,lightmapList,meshList,callbackFunc); },GEN_LIGHTMAP_TIMEOUT_MSEC);
 };
     
 genLightmap.createFinish=function(view,lightmapList,meshList,callbackFunc)

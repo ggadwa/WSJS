@@ -1,5 +1,19 @@
 "use strict";
 
+    // constants
+
+const TEXT_TEXTURE_WIDTH=512;
+const TEXT_TEXTURE_HEIGHT=512;
+const TEXT_CHAR_PER_ROW=10;
+const TEXT_CHAR_WIDTH=50;
+const TEXT_CHAR_HEIGHT=50;
+const TEXT_FONT_SIZE=48;
+const TEXT_FONT_NAME='Arial';
+
+const TEXT_ALIGN_LEFT=0;
+const TEXT_ALIGN_CENTER=1;
+const TEXT_ALIGN_RIGHT=2;
+
 //
 // initialize/release text
 //
@@ -15,37 +29,37 @@ function textInitialize(view)
         // setup the canvas
         
     var canvas=document.createElement('canvas');
-    canvas.width=this.TEXTURE_WIDTH;
-    canvas.height=this.TEXTURE_HEIGHT;
+    canvas.width=TEXT_TEXTURE_WIDTH;
+    canvas.height=TEXT_TEXTURE_HEIGHT;
     var ctx=canvas.getContext('2d');
     
         // background is black, text is white
         // so it can be colored
         
-    genBitmapUtility.drawRect(ctx,0,0,this.TEXTURE_WIDTH,this.TEXTURE_HEIGHT,'#000000');
+    genBitmapUtility.drawRect(ctx,0,0,TEXT_TEXTURE_WIDTH,TEXT_TEXTURE_HEIGHT,'#000000');
     
         // draw the text
         
-    ctx.font=(this.TEXTURE_FONT_SIZE+'px ')+this.TEXTURE_FONT_NAME;
+    ctx.font=(TEXT_FONT_SIZE+'px ')+TEXT_FONT_NAME;
     ctx.textAlign='left';
     ctx.textBaseline='middle';
     ctx.fillStyle='#FFFFFF';
     
-    yAdd=Math.floor(this.TEXTURE_CHAR_HEIGHT/2);
+    yAdd=Math.floor(TEXT_CHAR_HEIGHT/2);
     
     for (ch=32;ch!==127;ch++) {
         cIdx=ch-32;
-        x=(cIdx%this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_WIDTH;
-        y=Math.floor(cIdx/this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_HEIGHT;
+        x=(cIdx%TEXT_CHAR_PER_ROW)*TEXT_CHAR_WIDTH;
+        y=Math.floor(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT;
         y+=yAdd;
         
         charStr=String.fromCharCode(ch);
         charWid=ctx.measureText(charStr).width;
         
-        dx=Math.floor((x+(this.TEXTURE_CHAR_WIDTH/2))-(charWid/2));
+        dx=Math.floor((x+(TEXT_CHAR_WIDTH/2))-(charWid/2));
         ctx.fillText(charStr,dx,y);
         
-        x+=this.TEXTURE_CHAR_WIDTH;
+        x+=TEXT_CHAR_WIDTH;
     }
     
         // finally load into webGL
@@ -108,10 +122,10 @@ function textDraw(view,x,y,wid,high,str,align,color)
     var drawWid=wid*len;
     
     switch (align) {
-        case this.ALIGN_CENTER:
+        case TEXT_ALIGN_CENTER:
             x-=Math.floor(drawWid/2);
             break;
-        case this.ALIGN_RIGHT:
+        case TEXT_ALIGN_RIGHT:
             x-=drawWid;
             break;
     }
@@ -135,8 +149,8 @@ function textDraw(view,x,y,wid,high,str,align,color)
     iIdx=0;
     elementIdx=0;
     
-    gxAdd=this.TEXTURE_CHAR_WIDTH/this.TEXTURE_WIDTH;
-    gyAdd=this.TEXTURE_CHAR_HEIGHT/this.TEXTURE_HEIGHT;
+    gxAdd=TEXT_CHAR_WIDTH/TEXT_TEXTURE_WIDTH;
+    gyAdd=TEXT_CHAR_HEIGHT/TEXT_TEXTURE_HEIGHT;
         
     for (n=0;n!==len;n++) {
         x2=x+wid;
@@ -151,8 +165,8 @@ function textDraw(view,x,y,wid,high,str,align,color)
         vertices[vIdx++]=by;
         
         cIdx=str.charCodeAt(n)-32;
-        gx=((cIdx%this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_WIDTH)/this.TEXTURE_WIDTH;
-        gy=(Math.floor(cIdx/this.TEXTURE_PER_ROW)*this.TEXTURE_CHAR_HEIGHT)/this.TEXTURE_HEIGHT;
+        gx=((cIdx%TEXT_CHAR_PER_ROW)*TEXT_CHAR_WIDTH)/TEXT_TEXTURE_WIDTH;
+        gy=(Math.floor(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT)/TEXT_TEXTURE_HEIGHT;
         
         uvs[uvIdx++]=gx;
         uvs[uvIdx++]=gy;
@@ -225,20 +239,6 @@ function textDraw(view,x,y,wid,high,str,align,color)
 
 function textObject()
 {
-        // constants
-        
-    this.TEXTURE_WIDTH=512;
-    this.TEXTURE_HEIGHT=512;
-    this.TEXTURE_PER_ROW=10;
-    this.TEXTURE_CHAR_WIDTH=50;
-    this.TEXTURE_CHAR_HEIGHT=50;
-    this.TEXTURE_FONT_SIZE=48;
-    this.TEXTURE_FONT_NAME='Arial';
-
-    this.ALIGN_LEFT=0;
-    this.ALIGN_CENTER=1;
-    this.ALIGN_RIGHT=2;
-
         // variables
         
     this.textShader=new textShaderObject();

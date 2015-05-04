@@ -102,9 +102,12 @@ function viewBoundBoxInFrustum(xBound,yBound,zBound)
 // draw view
 //
 
-function viewDraw(map,text,camera)
+function viewDraw(map,entityList)
 {
+    var n,nEntity,entity;
     var drawMeshCount=0;
+    var drawModelCount=0;
+    var camera=this.camera;
     
         // convert view lights to shader lights
         
@@ -149,11 +152,19 @@ function viewDraw(map,text,camera)
     
     map.drawStart(this);
     drawMeshCount+=map.draw(this);
-    map.drawEnd(view);
+    map.drawEnd(this);
     
-        // supergumba -- TEST MODEL!
+        // draw the entities
         
-    //debug.drawModelSkeleton(view,testModel,new wsPoint(150000,152500,155000));
+    nEntity=entityList.count();
+    
+    for (n=0;n!==nEntity;n++) {
+        entity=entityList.get(n);
+        if (entity.isPlayer) continue;
+        
+        debug.drawModelSkeleton(this,entity.model,entity.position);
+        drawModelCount++;
+    }
     
         // overlays
         
@@ -166,13 +177,15 @@ function viewDraw(map,text,camera)
         fpsStr=fpsStr.substring(0,(idx+3));
     }
     
+    var countStr=drawMeshCount.toString()+"/"+drawModelCount.toString();
+    
     var posStr=Math.floor(camera.position.x)+','+Math.floor(camera.position.y)+','+Math.floor(camera.position.z);
         
-    text.drawStart(this);
-    text.draw(this,(this.wid-5),23,20,18,fpsStr,text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-    text.draw(this,(this.wid-5),45,20,18,drawMeshCount.toString(),text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-    text.draw(this,(this.wid-5),494,20,18,posStr,text.ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-    text.drawEnd(this);
+    this.text.drawStart(this);
+    this.text.draw(this,(this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+    this.text.draw(this,(this.wid-5),45,20,18,countStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+    this.text.draw(this,(this.wid-5),494,20,18,posStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+    this.text.drawEnd(this);
 }
 
 //
@@ -215,11 +228,16 @@ function viewInitialize(canvasId)
     this.high=this.canvas.height;
     this.aspect=this.canvas.width/this.canvas.height;
     
+        // initialize text
+        
+    if (!this.text.initialize(this)) return(false);
+    
     return(true);
 }
 
 function viewRelease()
 {
+    this.text.release();
 }
 
 //
@@ -271,6 +289,14 @@ function viewObject()
 	this.frustumBottomPlane=new wsPlane(0.0,0.0,0.0,0.0);
 	this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
 	this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
+    
+        // text drawing
+        
+    this.text=new textObject();
+    
+        // the camera object
+        
+    this.camera=new cameraObject();
     
         // main loop
         
