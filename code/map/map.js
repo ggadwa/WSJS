@@ -321,7 +321,7 @@ function mapCreateViewLightsFromMapLights(view,camera)
 // find random spots in map
 //
 
-function mapFindRandomPosition()
+function mapFindRandomPosition(genRandom)
 {
     var findTry=0;
     var meshIdx,mesh;

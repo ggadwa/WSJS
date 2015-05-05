@@ -1,44 +1,38 @@
 "use strict";
 
 //
-// generate bitmap utilityu object
-//
-
-var genBitmapUtility={};
-
-//
 // generator defines
 //
 
-genBitmapUtility.STACKED_X_MIN_COUNT=1;
-genBitmapUtility.STACKED_X_EXTRA_COUNT=4;
-genBitmapUtility.STACKED_Y_MIN_COUNT=3;
-genBitmapUtility.STACKED_Y_EXTRA_COUNT=4;
+const GEN_BITMAP_UTILITY_STACKED_X_MIN_COUNT=1;
+const GEN_BITMAP_UTILITY_STACKED_X_EXTRA_COUNT=4;
+const GEN_BITMAP_UTILITY_STACKED_Y_MIN_COUNT=3;
+const GEN_BITMAP_UTILITY_STACKED_Y_EXTRA_COUNT=4;
 
-genBitmapUtility.GRID_DIVISION=100;
-genBitmapUtility.GRID_MIN_BLOCK_WIDTH=30;
-genBitmapUtility.GRID_EXTRA_BLOCK_WIDTH=10;
-genBitmapUtility.GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
-genBitmapUtility.GRID_MIN_BLOCK_HEIGHT=10;
-genBitmapUtility.GRID_EXTRA_BLOCK_HEIGHT=15;
-genBitmapUtility.GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
+const GEN_BITMAP_UTILITY_GRID_DIVISION=100;
+const GEN_BITMAP_UTILITY_GRID_MIN_BLOCK_WIDTH=30;
+const GEN_BITMAP_UTILITY_GRID_EXTRA_BLOCK_WIDTH=10;
+const GEN_BITMAP_UTILITY_GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
+const GEN_BITMAP_UTILITY_GRID_MIN_BLOCK_HEIGHT=10;
+const GEN_BITMAP_UTILITY_GRID_EXTRA_BLOCK_HEIGHT=15;
+const GEN_BITMAP_UTILITY_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
 
 //
 // segmenting routines
 //
 
-genBitmapUtility.createStackedSegments=function(cvsWid,cvsHigh)
+function genBitmapUtilityCreateStackedSegments(cvsWid,cvsHigh)
 {
     var x,y;
     var lft,top;
     var halfBrick;
     var segments=[];
     
-    var xCount=this.STACKED_X_MIN_COUNT+Math.floor(genRandom.random()*this.STACKED_X_EXTRA_COUNT);
+    var xCount=GEN_BITMAP_UTILITY_STACKED_X_MIN_COUNT+Math.floor(this.genRandom.random()*GEN_BITMAP_UTILITY_STACKED_X_EXTRA_COUNT);
     var wid=Math.floor(cvsWid/xCount);
     var halfWid=Math.floor(wid/2);
     
-    var yCount=this.STACKED_Y_MIN_COUNT+Math.floor(genRandom.random()*this.STACKED_Y_EXTRA_COUNT);
+    var yCount=GEN_BITMAP_UTILITY_STACKED_Y_MIN_COUNT+Math.floor(this.genRandom.random()*GEN_BITMAP_UTILITY_STACKED_Y_EXTRA_COUNT);
     var high=Math.floor(cvsHigh/yCount);
     
     top=0;
@@ -60,9 +54,9 @@ genBitmapUtility.createStackedSegments=function(cvsWid,cvsHigh)
     }
     
     return(segments);
-};
+}
 
-genBitmapUtility.createRandomSegments=function(cvsWid,cvsHigh)
+function genBitmapUtilityCreateRandomSegments(cvsWid,cvsHigh)
 {
     var x,y,x2,y2,hit;
     var wid,high,startWid,startHigh;
@@ -73,7 +67,7 @@ genBitmapUtility.createRandomSegments=function(cvsWid,cvsHigh)
         // build segments in
         // typed arrays initialize to 0
         
-    var grid=new Uint16Array(this.GRID_DIVISION*this.GRID_DIVISION);
+    var grid=new Uint16Array(GEN_BITMAP_UTILITY_GRID_DIVISION*GEN_BITMAP_UTILITY_GRID_DIVISION);
     
         // start making the segments
         
@@ -85,15 +79,15 @@ genBitmapUtility.createRandomSegments=function(cvsWid,cvsHigh)
         hit=false;
         
         while (true) {
-            if (grid[(y*this.GRID_DIVISION)+x]===0) {
+            if (grid[(y*GEN_BITMAP_UTILITY_GRID_DIVISION)+x]===0) {
                 hit=true;
                 break;
             }
             x++;
-            if (x===this.GRID_DIVISION) {
+            if (x===GEN_BITMAP_UTILITY_GRID_DIVISION) {
                 x=0;
                 y++;
-                if (y===this.GRID_DIVISION) break;
+                if (y===GEN_BITMAP_UTILITY_GRID_DIVISION) break;
             }
         }
         
@@ -103,86 +97,86 @@ genBitmapUtility.createRandomSegments=function(cvsWid,cvsHigh)
         
             // random size
             
-        startWid=this.GRID_MIN_BLOCK_WIDTH+Math.floor(genRandom.random()*this.GRID_EXTRA_BLOCK_WIDTH);
-        if ((x+startWid)>=this.GRID_DIVISION) startWid=this.GRID_DIVISION-x;
+        startWid=GEN_BITMAP_UTILITY_GRID_MIN_BLOCK_WIDTH+Math.floor(this.genRandom.random()*GEN_BITMAP_UTILITY_GRID_EXTRA_BLOCK_WIDTH);
+        if ((x+startWid)>=GEN_BITMAP_UTILITY_GRID_DIVISION) startWid=GEN_BITMAP_UTILITY_GRID_DIVISION-x;
         
-        startHigh=this.GRID_MIN_BLOCK_HEIGHT+Math.floor(genRandom.random()*this.GRID_EXTRA_BLOCK_HEIGHT);
-        if ((y+startHigh)>=this.GRID_DIVISION) startHigh=this.GRID_DIVISION-y;
+        startHigh=GEN_BITMAP_UTILITY_GRID_MIN_BLOCK_HEIGHT+Math.floor(this.genRandom.random()*GEN_BITMAP_UTILITY_GRID_EXTRA_BLOCK_HEIGHT);
+        if ((y+startHigh)>=GEN_BITMAP_UTILITY_GRID_DIVISION) startHigh=GEN_BITMAP_UTILITY_GRID_DIVISION-y;
         
             // make sure we aren't leaving a little sliver
             // at the end
             
-        if (((x+startWid)+this.GRID_MIN_BLOCK_WIDTH)>=this.GRID_DIVISION) startWid=this.GRID_DIVISION-x;
-        if (((y+startHigh)+this.GRID_MIN_BLOCK_HEIGHT)>=this.GRID_DIVISION) startHigh=this.GRID_DIVISION-y;
+        if (((x+startWid)+GEN_BITMAP_UTILITY_GRID_MIN_BLOCK_WIDTH)>=GEN_BITMAP_UTILITY_GRID_DIVISION) startWid=GEN_BITMAP_UTILITY_GRID_DIVISION-x;
+        if (((y+startHigh)+GEN_BITMAP_UTILITY_GRID_MIN_BLOCK_HEIGHT)>=GEN_BITMAP_UTILITY_GRID_DIVISION) startHigh=GEN_BITMAP_UTILITY_GRID_DIVISION-y;
         
             // determine what can fit
             
         wid=1;
         
         while (wid<startWid) {
-            if (grid[(y*this.GRID_DIVISION)+(x+wid)]!==0) break;
+            if (grid[(y*GEN_BITMAP_UTILITY_GRID_DIVISION)+(x+wid)]!==0) break;
             wid++;
         }
         
         high=1;
         
         while (high<startHigh) {
-            if (grid[((y+high)*this.GRID_DIVISION)+x]!==0) break;
+            if (grid[((y+high)*GEN_BITMAP_UTILITY_GRID_DIVISION)+x]!==0) break;
             high++;
         }
         
             // if segment is too small, just block off
             // the single grid item and try again
             
-        if ((wid<this.GRID_ELIMINATE_BLOCK_MIN_WIDTH) || (high<this.GRID_ELIMINATE_BLOCK_MIN_HEIGHT)) {
-            grid[(y*this.GRID_DIVISION)+x]=1;
+        if ((wid<GEN_BITMAP_UTILITY_GRID_ELIMINATE_BLOCK_MIN_WIDTH) || (high<GEN_BITMAP_UTILITY_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)) {
+            grid[(y*GEN_BITMAP_UTILITY_GRID_DIVISION)+x]=1;
             continue;
         }
         
             // create the segment and block off
             // the grid
             
-        lft=Math.floor(x*(cvsWid/this.GRID_DIVISION));
-        top=Math.floor(y*(cvsHigh/this.GRID_DIVISION));
-        rgt=Math.floor((x+wid)*(cvsWid/this.GRID_DIVISION));
-        bot=Math.floor((y+high)*(cvsHigh/this.GRID_DIVISION));
+        lft=Math.floor(x*(cvsWid/GEN_BITMAP_UTILITY_GRID_DIVISION));
+        top=Math.floor(y*(cvsHigh/GEN_BITMAP_UTILITY_GRID_DIVISION));
+        rgt=Math.floor((x+wid)*(cvsWid/GEN_BITMAP_UTILITY_GRID_DIVISION));
+        bot=Math.floor((y+high)*(cvsHigh/GEN_BITMAP_UTILITY_GRID_DIVISION));
 
         segments.push(new wsRect(lft,top,rgt,bot));
         
         for (y2=0;y2!==high;y2++) {
             for (x2=0;x2!==wid;x2++) {
-                grid[((y+y2)*this.GRID_DIVISION)+(x+x2)]=1;
+                grid[((y+y2)*GEN_BITMAP_UTILITY_GRID_DIVISION)+(x+x2)]=1;
             }
         }
     }
     
     return(segments);
-};
+}
 
 //
 // color routines
 //
 
-genBitmapUtility.getRandomColor=function(colorMin,colorMax)
+function genBitmapUtilityGetRandomColor(colorMin,colorMax)
 {
     var color=new Float32Array(3);
     
-    color[0]=colorMin[0]+((colorMax[0]-colorMin[0])*genRandom.random());
-    color[1]=colorMin[1]+((colorMax[1]-colorMin[1])*genRandom.random());
-    color[2]=colorMin[2]+((colorMax[2]-colorMin[2])*genRandom.random());
+    color[0]=colorMin[0]+((colorMax[0]-colorMin[0])*this.genRandom.random());
+    color[1]=colorMin[1]+((colorMax[1]-colorMin[1])*this.genRandom.random());
+    color[2]=colorMin[2]+((colorMax[2]-colorMin[2])*this.genRandom.random());
     return(color);
-};
+}
 
-genBitmapUtility.getRandomGreyColor=function(greyMin,greyMax)
+function genBitmapUtilityGetRandomGreyColor(greyMin,greyMax)
 {
     var color=new Float32Array(3);
-    var r=greyMin+((greyMax-greyMin)*genRandom.random());
+    var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
     
     color[0]=color[1]=color[2]=r;
     return(color);
-};
+}
 
-genBitmapUtility.darkenColor=function(color,darkenFactor)
+function genBitmapUtilityDarkenColor(color,darkenFactor)
 {
     var darkColor=new Float32Array(3);
     darkColor[0]=color[0]*darkenFactor;
@@ -190,9 +184,9 @@ genBitmapUtility.darkenColor=function(color,darkenFactor)
     darkColor[2]=color[2]*darkenFactor;
     
     return(darkColor);
-};
+}
 
-genBitmapUtility.colorToRGBColor=function(color,darkenFactor)
+function genBitmapUtilityColorToRGBColor(color,darkenFactor)
 {
     var colorStr='rgb(';
     colorStr+=Math.floor((color[0]*255.0)*darkenFactor);
@@ -203,9 +197,9 @@ genBitmapUtility.colorToRGBColor=function(color,darkenFactor)
     colorStr+=')';
     
     return(colorStr);
-};
+}
 
-genBitmapUtility.normalToRGBColor=function(normal)
+function genBitmapUtilityNormalToRGBColor(normal)
 {
     var colorStr='rgb(';
     colorStr+=Math.floor((normal[0]+1.0)*127.0);
@@ -216,9 +210,9 @@ genBitmapUtility.normalToRGBColor=function(normal)
     colorStr+=')';
     
     return(colorStr);
-};
+}
 
-genBitmapUtility.createRandomColorStripeArray=function(factor,baseColor)
+function genBitmapUtilityCreateRandomColorStripeArray(factor,baseColor)
 {
     var n,f,count;
     var redCol,greenCol,blueCol,cIdx;
@@ -233,9 +227,9 @@ genBitmapUtility.createRandomColorStripeArray=function(factor,baseColor)
         count--;
 		
         if (count<=0) {
-            count=1+Math.floor(genRandom.random()*3);
+            count=1+Math.floor(this.genRandom.random()*3);
 
-            f=1.0+((1.0-(genRandom.random()*2.0))*factor);
+            f=1.0+((1.0-(this.genRandom.random()*2.0))*factor);
         
             redCol=baseColor[0]*f;
             if (redCol<0.0) redCol=0.0;
@@ -256,31 +250,23 @@ genBitmapUtility.createRandomColorStripeArray=function(factor,baseColor)
     }    
         
     return(colors);
-};
+}
 
 //
-// low-level drawing routines
+// normal clearing
 //
 
-genBitmapUtility.drawRect=function(ctx,lft,top,rgt,bot,rgbColor)
-{
-    if ((lft>=rgt) || (top>=bot)) return;
-        
-    ctx.fillStyle=rgbColor;
-    ctx.fillRect(lft,top,(rgt-lft),(bot-top));
-};
-
-genBitmapUtility.clearNormalsRect=function(ctx,lft,top,rgt,bot)
+function genBitmapUtilityClearNormalsRect(ctx,lft,top,rgt,bot)
 {
     var normal=vec3.fromValues(-1.0,-1.0,1.0);
     this.drawRect(ctx,lft,top,rgt,bot,this.normalToRGBColor(normal));
-};
+}
 
 //
 // noise routines
 //
 
-genBitmapUtility.addNoiseRect=function(ctx,lft,top,rgt,bot,minDarken,maxDarken,percentage)
+function genBitmapUtilityAddNoiseRect(ctx,lft,top,rgt,bot,minDarken,maxDarken,percentage)
 {    
     if ((lft>=rgt) || (top>=bot)) return;
     
@@ -302,11 +288,11 @@ genBitmapUtility.addNoiseRect=function(ctx,lft,top,rgt,bot,minDarken,maxDarken,p
     
     for (n=0;n!==nPixel;n++) {
 
-        if (genRandom.random()<=percentage) {
+        if (this.genRandom.random()<=percentage) {
 
                 // the bitmap noise
                 
-            fct=minDarken+(darkenDif*genRandom.random());
+            fct=minDarken+(darkenDif*this.genRandom.random());
             
                 // darken the pixel
                 
@@ -329,13 +315,13 @@ genBitmapUtility.addNoiseRect=function(ctx,lft,top,rgt,bot,minDarken,maxDarken,p
     }
     
     ctx.putImageData(imgData,lft,top);
-};
+}
 
 //
 // specular routines
 //
 
-genBitmapUtility.createSpecularMap=function(bitmapCTX,specularCTX,wid,high,specularFactor)
+function genBitmapUtilityCreateSpecularMap(bitmapCTX,specularCTX,wid,high,specularFactor)
 {
     var n,idx,nPixel;
     var f;
@@ -380,13 +366,21 @@ genBitmapUtility.createSpecularMap=function(bitmapCTX,specularCTX,wid,high,specu
     }
     
     specularCTX.putImageData(specularImgData,0,0);
-};
+}
 
 //
 // high level drawing routines
 //
 
-genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+function genBitmapUtilityDrawRect(ctx,lft,top,rgt,bot,rgbColor)
+{
+    if ((lft>=rgt) || (top>=bot)) return;
+        
+    ctx.fillStyle=rgbColor;
+    ctx.fillRect(lft,top,(rgt-lft),(bot-top));
+}
+
+function genBitmapUtilityDraw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
 {
     var n,lx,rx,ty,by;
     var darkenFactor;
@@ -463,9 +457,9 @@ genBitmapUtility.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSiz
     this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.colorToRGBColor(fillRGBColor,1.0));
     
     this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor([-1.0,-1.0,1.0]));
-};
+}
 
-genBitmapUtility.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+function genBitmapUtilityDraw3DComplexRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
 {
     var n,k,k2,add,darkenFactor;
     
@@ -484,7 +478,7 @@ genBitmapUtility.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,
         add=Math.floor((wid/10)*n);
         x[n]=lft+add;
         y[n]=top;
-        x[n+20]=rgt-add
+        x[n+20]=rgt-add;
         y[n+20]=bot;
     }
     
@@ -499,9 +493,9 @@ genBitmapUtility.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,
         // randomize it
         
     for (n=0;n!==40;n++) {
-        add=genRandom.randomInt(0,10);
+        add=this.genRandom.randomInt(0,10);
         x[n]+=(x[n]<mx)?add:-add;
-        add=genRandom.randomInt(0,10);
+        add=this.genRandom.randomInt(0,10);
         y[n]+=(y[n]<my)?add:-add;
     }
 
@@ -597,9 +591,9 @@ genBitmapUtility.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,
     }
     
     bitmapCTX.fill();
-};
+}
 
-genBitmapUtility.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+function genBitmapUtilityDraw3DOval(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
 {
     var n,x,y,halfWid,halfHigh;
     var rad,fx,fy,col,idx;
@@ -665,9 +659,9 @@ genBitmapUtility.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSiz
 
     bitmapCTX.putImageData(bitmapImgData,lft,top);
     normalCTX.putImageData(normalImgData,lft,top);
-};
+}
 
-genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
+function genBitmapUtilityDrawParticle(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
 {
     if ((lft>=rgt) || (top>=bot)) return;
 
@@ -712,11 +706,11 @@ genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,imgWid,imgHigh,lft,to
             
                 // get a random pixel
 
-            rad=(Math.PI*2.0)*genRandom.random();
+            rad=(Math.PI*2.0)*this.genRandom.random();
             fx=Math.sin(rad);
             fy=Math.cos(rad);
 
-            fsz=genRandom.random();
+            fsz=this.genRandom.random();
             px=mx+Math.floor((fsz*ringWid)*fx);
             py=my-Math.floor((fsz*ringHigh)*fy);
             
@@ -766,9 +760,9 @@ genBitmapUtility.drawParticle=function(bitmapCTX,normalCTX,imgWid,imgHigh,lft,to
 
     bitmapCTX.putImageData(bitmapImgData,0,0);
     normalCTX.putImageData(normalImgData,0,0);
-};
+}
 
-genBitmapUtility.drawColorStripeHorizontal=function(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
+function genBitmapUtilityDrawColorStripeHorizontal(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
 {
     var x,y,idx,cIdx;
     var redByte,greenByte,blueByte;
@@ -805,9 +799,9 @@ genBitmapUtility.drawColorStripeHorizontal=function(bitmapCTX,lft,top,rgt,bot,fa
         // write all the data back
 
     bitmapCTX.putImageData(bitmapImgData,lft,top);        
-};
+}
 
-genBitmapUtility.drawColorStripeVertical=function(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
+function genBitmapUtilityDrawColorStripeVertical(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
 {
     var x,y,idx,cIdx;
     var redByte,greenByte,blueByte;
@@ -842,9 +836,9 @@ genBitmapUtility.drawColorStripeVertical=function(bitmapCTX,lft,top,rgt,bot,fact
         // write all the data back
 
     bitmapCTX.putImageData(bitmapImgData,lft,top);        
-};
+}
     
-genBitmapUtility.drawColorStripeSlant=function(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
+function genBitmapUtilityDrawColorStripeSlant(bitmapCTX,lft,top,rgt,bot,factor,baseColor)
 {
     var x,y,idx,cIdx;
     var colors=this.createRandomColorStripeArray(factor,baseColor);
@@ -875,4 +869,40 @@ genBitmapUtility.drawColorStripeSlant=function(bitmapCTX,lft,top,rgt,bot,factor,
         // write all the data back
 
     bitmapCTX.putImageData(bitmapImgData,lft,top);        
-};
+}
+
+//
+// generate bitmap utility object
+//
+
+function genBitmapUtilityObject(genRandom)
+{
+        // random generator
+
+    this.genRandom=genRandom;
+
+        // utility functions
+        
+    this.createStackedSegments=genBitmapUtilityCreateStackedSegments;
+    this.createRandomSegments=genBitmapUtilityCreateRandomSegments;
+    
+    this.getRandomColor=genBitmapUtilityGetRandomColor;
+    this.getRandomGreyColor=genBitmapUtilityGetRandomGreyColor;
+    this.darkenColor=genBitmapUtilityDarkenColor;
+    this.colorToRGBColor=genBitmapUtilityColorToRGBColor;
+    this.normalToRGBColor=genBitmapUtilityNormalToRGBColor;
+    this.createRandomColorStripeArray=genBitmapUtilityCreateRandomColorStripeArray;
+    
+    this.clearNormalsRect=genBitmapUtilityClearNormalsRect;
+    this.addNoiseRect=genBitmapUtilityAddNoiseRect;
+    this.createSpecularMap=genBitmapUtilityCreateSpecularMap;
+    
+    this.drawRect=genBitmapUtilityDrawRect;
+    this.draw3DRect=genBitmapUtilityDraw3DRect;
+    this.draw3DComplexRect=genBitmapUtilityDraw3DComplexRect;
+    this.draw3DOval=genBitmapUtilityDraw3DOval;
+    this.drawParticle=genBitmapUtilityDrawParticle;
+    this.drawColorStripeHorizontal=genBitmapUtilityDrawColorStripeHorizontal;
+    this.drawColorStripeVertical=genBitmapUtilityDrawColorStripeVertical;
+    this.drawColorStripeSlant=genBitmapUtilityDrawColorStripeSlant;
+}

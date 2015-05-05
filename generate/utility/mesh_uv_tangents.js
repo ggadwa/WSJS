@@ -1,16 +1,10 @@
 "use strict";
 
 //
-// generate mesh utility object
-//
-
-var meshUVTangents={};
- 
-//
 // create normals from verticies and triangles
 //
 
-meshUVTangents.buildMeshNormals=function(vertices,indexes,normalsIn)
+function meshUVTangentsBuildMeshNormals(vertices,indexes,normalsIn)
 {
     var n,nTrig,nVertex,trigIdx;
     var idx,v0Idx,v1Idx,v2Idx;
@@ -144,13 +138,13 @@ meshUVTangents.buildMeshNormals=function(vertices,indexes,normalsIn)
     }
     
     return(normals);
-};
+}
 
 //
 // create UVs from vertices and normals
 //
 
-meshUVTangents.buildMeshUVs=function(bitmap,vertices,normals)
+function meshUVTangentsBuildMeshUVs(bitmap,vertices,normals)
 {
     var n,nVertex,vIdx,arrIdx;
     var x,y,ang;
@@ -210,13 +204,13 @@ meshUVTangents.buildMeshUVs=function(bitmap,vertices,normals)
     }
     
     return(uvs);
-};
+}
 
 //
 // create tangents from vertices, uvs, and normals
 //
 
-meshUVTangents.buildMeshTangents=function(vertices,uvs,indexes)
+function meshUVTangentsBuildMeshTangents(vertices,uvs,indexes)
 {
     var n,nTrig,nVertex,trigIdx;
     var v0Idx,v1Idx,v2Idx;
@@ -315,4 +309,16 @@ meshUVTangents.buildMeshTangents=function(vertices,uvs,indexes)
     }
 
     return(tangents);
-};
+}
+
+//
+// mesh uv-tangents object
+//
+
+function meshUVTangentsObject()
+{
+    this.buildMeshNormals=meshUVTangentsBuildMeshNormals;
+    this.buildMeshUVs=meshUVTangentsBuildMeshUVs;
+    this.buildMeshTangents=meshUVTangentsBuildMeshTangents;
+}
+

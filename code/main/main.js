@@ -43,16 +43,16 @@ const SIMPLE_LIGHTMAP=true;
 
 const wsTextureBuildList=
     [
-        [BITMAP_BRICK_STACK,genBitmap.TYPE_BRICK_STACK],
-        [BITMAP_BRICK_RANDOM,genBitmap.TYPE_BRICK_RANDOM],
-        [BITMAP_STONE,genBitmap.TYPE_STONE],
-        [BITMAP_TILE,genBitmap.TYPE_TILE_SIMPLE],
-        [BITMAP_TILE_2,genBitmap.TYPE_TILE_COMPLEX],
-        [BITMAP_STAIR_TILE,genBitmap.TYPE_TILE_SMALL],
-        [BITMAP_METAL,genBitmap.TYPE_METAL],
-        [BITMAP_CONCRETE,genBitmap.TYPE_CONCRETE],
-        [BITMAP_WOOD_PLANK,genBitmap.TYPE_WOOD_PLANK],
-        [BITMAP_WOOD_BOX,genBitmap.TYPE_WOOD_BOX]
+        [BITMAP_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_STACK],
+        [BITMAP_BRICK_RANDOM,GEN_BITMAP_TYPE_BRICK_RANDOM],
+        [BITMAP_STONE,GEN_BITMAP_TYPE_STONE],
+        [BITMAP_TILE,GEN_BITMAP_TYPE_TILE_SIMPLE],
+        [BITMAP_TILE_2,GEN_BITMAP_TYPE_TILE_COMPLEX],
+        [BITMAP_STAIR_TILE,GEN_BITMAP_TYPE_TILE_SMALL],
+        [BITMAP_METAL,GEN_BITMAP_TYPE_METAL],
+        [BITMAP_CONCRETE,GEN_BITMAP_TYPE_CONCRETE],
+        [BITMAP_WOOD_PLANK,GEN_BITMAP_TYPE_WOOD_PLANK],
+        [BITMAP_WOOD_BOX,GEN_BITMAP_TYPE_WOOD_BOX]
     ];
 
 //
@@ -221,8 +221,12 @@ function wsInit()
     
     document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
     document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsModelRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsEntityRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
     //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
     //document.getElementById('wsMapRandom').value=123456789;
+    //document.getElementById('wsModelRandom').value=123456789;
+    //document.getElementById('wsEntityRandom').value=123456789;
     
         // start the initialization
         
@@ -252,26 +256,26 @@ function wsInitInternal()
     if (!debug.initialize(view)) return;
     
         // next step
+        
+    var textureGenRandom=new genRandomObject(parseInt(document.getElementById('wsBitmapRandom').value));
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Textures');
-    setTimeout(function() { wsInitBuildTextures(0); },10);
+    setTimeout(function() { wsInitBuildTextures(0,textureGenRandom); },10);
 }
 
-function wsInitBuildTextures(idx)
+function wsInitBuildTextures(idx,textureGenRandom)
 {
     var bitmapCount=wsTextureBuildList.length;
     
         // random seed
 
-    if (idx===0) {
-        wsStartStatusBar(bitmapCount);
-        genRandom.setSeed(parseInt(document.getElementById('wsBitmapRandom').value));
-    }
+    if (idx===0) wsStartStatusBar(bitmapCount);
     
         // generate the bitmap
     
     var setup=wsTextureBuildList[idx];
+    var genBitmap=new genBitmapObject(textureGenRandom);
     
     map.addBitmap(genBitmap.generate(view,setup[0],setup[1],debug));
     wsNextStatusBar();
@@ -280,7 +284,7 @@ function wsInitBuildTextures(idx)
         
     idx++;
     if (idx<wsTextureBuildList.length) {
-        setTimeout(function() { wsInitBuildTextures(idx); },10);
+        setTimeout(function() { wsInitBuildTextures(idx,textureGenRandom); },10);
         return;
     }
     
@@ -295,11 +299,13 @@ function wsInitBuildMap()
 {
         // random seed
 
-    genRandom.setSeed(parseInt(document.getElementById('wsMapRandom').value));
+    var mapGenRandom=new genRandomObject(parseInt(document.getElementById('wsMapRandom').value));
 
         // build the map
-        
-    genMap.build(map,new buildMapSetupObject(this.MAX_ROOM,3,[18000,5000,18000],3,0.25,0.8));
+   
+    var setup=new buildMapSetupObject(this.MAX_ROOM,3,[18000,5000,18000],3,0.25,0.8);
+    var genMap=new genMapObject(view,map,setup,mapGenRandom);
+    genMap.build();
     
         // next step
     
@@ -313,8 +319,9 @@ function wsInitBuildLightmap()
         // build the light map
         // light maps are a long running
         // process so we need a callback
-        
-    genLightmap.create(view,map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
+    
+    var genLightmap=new genLightmapObject(view,map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
+    genLightmap.create();
 }
 
 function wsInitBuildLightmapFinish()
@@ -327,15 +334,26 @@ function wsInitBuildLightmapFinish()
 function wsInitBuildModels()
 {
     var n;
+    var model,genSkeleton;
+    
+    var modelGenRandom=new genRandomObject(parseInt(document.getElementById('wsModelRandom').value));
     
         // player model
 
-    modelList.add(new modelObject('player',null,new modelSkeletonObject()));
+    model=new modelObject('player');
+    genSkeleton=new genSkeletonObject(model,modelGenRandom);
+    genSkeleton.build();
+    
+    modelList.add(model);
     
         // monster models
     
     for (n=0;n!==MONSTER_MODEL_COUNT;n++) {
-        modelList.add(new modelObject(('monster_'+n),null,new modelSkeletonObject()));
+        model=new modelObject('monster_'+n);
+        genSkeleton=new genSkeletonObject(model,modelGenRandom);
+        genSkeleton.build();
+        
+        modelList.add(model);
     }
     
         // next step
@@ -349,6 +367,8 @@ function wsInitBuildEntities()
 {
     var n,monsterModelName;
     
+    var entityGenRandom=new genRandomObject(parseInt(document.getElementById('wsEntityRandom').value));
+    
         // make player entity
         
     var mapMid=view.OPENGL_FAR_Z/2;
@@ -357,8 +377,8 @@ function wsInitBuildEntities()
         // make monster entities
         
     for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
-        monsterModelName='monster_'+genRandom.randomInt(0,MONSTER_MODEL_COUNT);
-        entityList.add(new entityObject(map.findRandomPosition(),new wsAngle(0.0,0.0,0.0),modelList.get(monsterModelName),false));
+        monsterModelName='monster_'+entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);
+        entityList.add(new entityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),modelList.get(monsterModelName),false));
     }
     
         // add entities to map

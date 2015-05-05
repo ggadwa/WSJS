@@ -35,7 +35,8 @@ function textInitialize(view)
     
         // background is black, text is white
         // so it can be colored
-        
+    
+    var genBitmapUtility=new genBitmapUtilityObject();
     genBitmapUtility.drawRect(ctx,0,0,TEXT_TEXTURE_WIDTH,TEXT_TEXTURE_HEIGHT,'#000000');
     
         // draw the text

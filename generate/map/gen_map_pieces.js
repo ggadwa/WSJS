@@ -1,12 +1,6 @@
 "use strict";
 
 //
-// generate map pieces array
-//
-
-var genMapPieces=[];
-
-//
 // piece object misc functions
 //
 
@@ -123,7 +117,8 @@ function mapPieceCreateMeshFloor(bitmap,xBound,yBound,zBound,flag)
     
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
-        
+    
+    var meshUVTangents=new meshUVTangentsObject();
     var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
@@ -176,7 +171,8 @@ function mapPieceCreateMeshCeiling(bitmap,xBound,yBound,zBound,flag)
     
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
-        
+    
+    var meshUVTangents=new meshUVTangentsObject();
     var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
     
@@ -245,7 +241,8 @@ function mapPieceCreateMeshWalls(bitmap,xBound,yBound,zBound,flag)
         // calculate the normals, then use those to
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
-        
+    
+    var meshUVTangents=new meshUVTangentsObject();
     var normals=meshUVTangents.buildMeshNormals(vertices,indexes,true);
     var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
@@ -305,6 +302,44 @@ function mapPieceBuildConnectLines()
 }
 
 //
+// clone, mirror, and rotate
+//
+
+function mapPieceClone()
+{
+    var mapPiece2=new mapPieceObject(this.isRoom);
+    mapPiece2.points=JSON.parse(JSON.stringify(this.points));
+    mapPiece2.connectLines=JSON.parse(JSON.stringify(this.connectLines));
+    return(mapPiece2);
+}
+
+function mapPieceMirror()
+{
+    var n,nPoint,pt;
+    
+    nPoint=this.points.length;
+    
+    for (n=0;n!==nPoint;n++) {
+        pt=this.points[n];
+        pt[1]=100-pt[1];
+    }
+}
+
+function mapPieceRotate()
+{
+    var n,k,nPoint,pt;
+    
+    nPoint=this.points.length;
+    
+    for (n=0;n!==nPoint;n++) {
+        pt=this.points[n];
+        k=pt[0];
+        pt[0]=pt[1];
+        pt[1]=k;
+    }
+}
+
+//
 // main piece object
 //
 
@@ -329,47 +364,17 @@ function mapPieceObject(isRoom)
     this.createMeshFloor=mapPieceCreateMeshFloor;
     this.createMeshCeiling=mapPieceCreateMeshCeiling;
     this.createMeshWalls=mapPieceCreateMeshWalls;
+    
+    this.clone=mapPieceClone;
+    this.mirror=mapPieceMirror;
+    this.rotate=mapPieceRotate;
 }
 
 //
-// add to pieces array
+// map piece list items
 //
 
-function mapPieceClone(mapPiece)
-{
-    var mapPiece2=new mapPieceObject(mapPiece.isRoom);
-    mapPiece2.points=JSON.parse(JSON.stringify(mapPiece.points));
-    mapPiece2.connectLines=JSON.parse(JSON.stringify(mapPiece.connectLines));
-    return(mapPiece2);
-}
-
-function mapPieceMirror(mapPiece)
-{
-    var n,nPoint,pt;
-    
-    nPoint=mapPiece.points.length;
-    
-    for (n=0;n!==nPoint;n++) {
-        pt=mapPiece.points[n];
-        pt[1]=100-pt[1];
-    }
-}
-
-function mapPieceRotate(mapPiece)
-{
-    var n,k,nPoint,pt;
-    
-    nPoint=mapPiece.points.length;
-    
-    for (n=0;n!==nPoint;n++) {
-        pt=mapPiece.points[n];
-        k=pt[0];
-        pt[0]=pt[1];
-        pt[1]=k;
-    }
-}
-
-function mapPieceAdd(mapPiece)
+function mapPieceListAdd(mapPiece)
 {
         // build the connection
         // line cache
@@ -379,39 +384,55 @@ function mapPieceAdd(mapPiece)
         // push a regular version
         // into the arrays
         
-    genMapPieces.push(mapPiece);
+    this.mapPieces.push(mapPiece);
     
         // now a mirrored version
         
-    var mapPiece2=mapPieceClone(mapPiece);
-    mapPieceMirror(mapPiece2);    
-    genMapPieces.push(mapPiece2);
+    var mapPiece2=mapPiece.clone();
+    mapPiece2.mirror();    
+    this.mapPieces.push(mapPiece2);
     
         // rotated version
         
-    mapPiece2=mapPieceClone(mapPiece);
-    mapPieceRotate(mapPiece2);    
-    genMapPieces.push(mapPiece2);
+    mapPiece2=mapPiece.clone();
+    mapPiece2.rotate();    
+    this.mapPieces.push(mapPiece2);
         
         // rotated and mirrored version
         
-    mapPiece2=mapPieceClone(mapPiece);
-    mapPieceMirror(mapPiece2);    
-    mapPieceRotate(mapPiece2);
-    genMapPieces.push(mapPiece2);
+    mapPiece2=mapPiece.clone();
+    mapPiece2.mirror();    
+    mapPiece2.rotate();
+    this.mapPieces.push(mapPiece2);
+}
+
+function mapPieceListCount()
+{
+    return(this.mapPieces.length);
+}
+
+function mapPieceListGet(pieceIdx)
+{
+    return(this.mapPieces[pieceIdx]);
 }
 
 //
-// setup map pieces
+// map piece list object
 //
 
-function mapPieceSetup()
+function mapPieceListObject()
 {
     var mapPiece;
     
-        // clear pieces
+        // functions
         
-    genMapPieces=[];
+    this.add=mapPieceListAdd;
+    this.count=mapPieceListCount;
+    this.get=mapPieceListGet;
+    
+        // map piece array
+        
+    this.mapPieces=[];
     
         // box
 
@@ -438,7 +459,7 @@ function mapPieceSetup()
     mapPiece.points.push([0,40]);
     mapPiece.points.push([0,20]);
 
-    mapPieceAdd(mapPiece);
+    this.add(mapPiece);
 
         // half circle
 
@@ -463,7 +484,7 @@ function mapPieceSetup()
     mapPiece.points.push([0,80]);
     mapPiece.points.push([0,60]);
 
-    mapPieceAdd(mapPiece);
+    this.add(mapPiece);
 
         // plus
 
@@ -482,7 +503,7 @@ function mapPieceSetup()
     mapPiece.points.push([0,4]);
     mapPiece.points.push([4,4]);
 
-    mapPieceAdd(mapPiece);
+    this.add(mapPiece);
 
         // Half X
 
@@ -507,7 +528,7 @@ function mapPieceSetup()
     mapPiece.points.push([20,40]);
     mapPiece.points.push([0,20]);
     
-    mapPieceAdd(mapPiece);
+    this.add(mapPiece);
 
         // U
 
@@ -534,6 +555,6 @@ function mapPieceSetup()
     mapPiece.points.push([0,40]);
     mapPiece.points.push([0,20]);
 
-    mapPieceAdd(mapPiece);
+    this.add(mapPiece);
 }
     

@@ -1,12 +1,6 @@
 "use strict";
 
 //
-// generate map utility object
-//
-
-var meshPrimitives={};
-
-//
 // constants
 //
 
@@ -16,7 +10,7 @@ const MESH_PRIMITIVE_STAIR_COUNT=10;
 // create cube
 //
 
-meshPrimitives.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,flags)
+function meshPrimitivesCreateMeshCube(bitmap,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,flags)
 {
         // get cube size
         
@@ -215,7 +209,8 @@ meshPrimitives.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,
         // calculate the normals, then use those to
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
-        
+    
+    var meshUVTangents=new meshUVTangentsObject();
     var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
     if (!wholeUV) uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
@@ -223,13 +218,13 @@ meshPrimitives.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,
         // finally create the mesh
         
     return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
-};
+}
 
 //
 // create pryamid
 //
 
-meshPrimitives.createMeshPryamid=function(bitmap,xBound,yBound,zBound,flags)
+function meshPrimitivesCreateMeshPryamid(bitmap,xBound,yBound,zBound,flags)
 {
     var x=xBound.getMidPoint();
     var z=zBound.getMidPoint();
@@ -286,7 +281,8 @@ meshPrimitives.createMeshPryamid=function(bitmap,xBound,yBound,zBound,flags)
         // calculate the normals, then use those to
         // calcualte the uvs, and finally the UVs to
         // calculate the tangents
-        
+    
+    var meshUVTangents=new meshUVTangentsObject();
     var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
     var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
     var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
@@ -294,13 +290,13 @@ meshPrimitives.createMeshPryamid=function(bitmap,xBound,yBound,zBound,flags)
         // finally create the mesh
         
     return(new mapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
-};
+}
 
 //
 // create stairs
 //
 
-meshPrimitives.createStairsPosX=function(map,xBound,yBound,zBound)
+function meshPrimitivesCreateStairsPosX(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(xBound.max-xBound.min)/MESH_PRIMITIVE_STAIR_COUNT;
@@ -321,9 +317,9 @@ meshPrimitives.createStairsPosX=function(map,xBound,yBound,zBound)
     }
     
     map.addMesh(mesh);
-};
+}
 
-meshPrimitives.createStairsPosZ=function(map,xBound,yBound,zBound)
+function meshPrimitivesCreateStairsPosZ(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(zBound.max-zBound.min)/MESH_PRIMITIVE_STAIR_COUNT;
@@ -344,9 +340,9 @@ meshPrimitives.createStairsPosZ=function(map,xBound,yBound,zBound)
     }
     
     map.addMesh(mesh);
-};
+}
 
-meshPrimitives.createStairsNegX=function(map,xBound,yBound,zBound)
+function meshPrimitivesCreateStairsNegX(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(xBound.max-xBound.min)/MESH_PRIMITIVE_STAIR_COUNT;
@@ -367,9 +363,9 @@ meshPrimitives.createStairsNegX=function(map,xBound,yBound,zBound)
     }
     
     map.addMesh(mesh);
-};
+}
 
-meshPrimitives.createStairsNegZ=function(map,xBound,yBound,zBound)
+function meshPrimitivesCreateStairsNegZ(map,xBound,yBound,zBound)
 {
     var n,mesh,mesh2;
     var stepAdd=(zBound.max-zBound.min)/MESH_PRIMITIVE_STAIR_COUNT;
@@ -390,4 +386,19 @@ meshPrimitives.createStairsNegZ=function(map,xBound,yBound,zBound)
     }
     
     map.addMesh(mesh);
-};
+}
+
+//
+// mesh primitives object
+//
+
+function meshPrimitivesObject()
+{
+    this.createMeshCube=meshPrimitivesCreateMeshCube;
+    this.createMeshPryamid=meshPrimitivesCreateMeshPryamid;
+    this.createStairsPosX=meshPrimitivesCreateStairsPosX;
+    this.createStairsPosZ=meshPrimitivesCreateStairsPosZ;
+    this.createStairsNegX=meshPrimitivesCreateStairsNegX;
+    this.createStairsNegZ=meshPrimitivesCreateStairsNegZ;
+}
+

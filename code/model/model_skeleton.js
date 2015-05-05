@@ -27,11 +27,7 @@ function modelSkeletonObject()
 {
     this.bones=[];
     
-        // testing
-    
-    this.bones.push(new modelBoneObject(-1,new wsPoint(0,-1000,0)));
-    this.bones.push(new modelBoneObject(0,new wsPoint(-500,0,0)));
-    this.bones.push(new modelBoneObject(0,new wsPoint(500,0,0)));
+        // functions
     
     this.close=modelSkeletonClose;
 }

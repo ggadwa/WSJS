@@ -1,15 +1,32 @@
 "use strict";
 
 //
-// Light Map Generation
+// NOTE!
 // 
-// This code generates light maps.  We have to pass
-// everything through instead of relying on variables in
-// the object because the callbacks make the "this" equal
-// to the window object.
+// We need to keep a global copy of the current
+// light map object because light maps require
+// time outs and the "this" on the timeout is
+// the window object.
+// EMAScript 6 probably has a work-around for this
+// in the future.
 //
 
-var genLightmap={};
+var currentGlobalLightMapObject=null;
+
+//
+// constants
+//
+
+const GEN_LIGHTMAP_TIMEOUT_MSEC=100;
+const GEN_LIGHTMAP_TEXTURE_SIZE=1024;
+
+// chunk is one block available to draw a light map
+const GEN_LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
+const GEN_LIGHTMAP_CHUNK_SIZE=Math.floor(GEN_LIGHTMAP_TEXTURE_SIZE/GEN_LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
+const GEN_LIGHTMAP_CHUNK_PER_TEXTURE=(GEN_LIGHTMAP_CHUNK_SPLIT*GEN_LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
+
+const GEN_LIGHTMAP_RENDER_MARGIN=2;                // margin around each light map triangle
+const GEN_LIGHTMAP_BLUR_COUNT=3;
 
 //
 // lightmap bitmap object
@@ -35,25 +52,10 @@ function genLightmapMeshObject()
 }
 
 //
-// constants
-//
-
-const GEN_LIGHTMAP_TIMEOUT_MSEC=100;
-const GEN_LIGHTMAP_TEXTURE_SIZE=1024;
-
-// chunk is one block available to draw a light map
-const GEN_LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
-const GEN_LIGHTMAP_CHUNK_SIZE=Math.floor(GEN_LIGHTMAP_TEXTURE_SIZE/GEN_LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
-const GEN_LIGHTMAP_CHUNK_PER_TEXTURE=(GEN_LIGHTMAP_CHUNK_SPLIT*GEN_LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
-
-const GEN_LIGHTMAP_RENDER_MARGIN=2;                // margin around each light map triangle
-const GEN_LIGHTMAP_BLUR_COUNT=3;
-
-//
 // start light map canvas
 //
 
-genLightmap.startCanvas=function()
+function genLightmapStartCanvas()
 {
         // setup the canvas
         
@@ -87,13 +89,13 @@ genLightmap.startCanvas=function()
         // return new canvas
     
     return(canvas);
-};
+}
 
 //
 // border and smear polygons
 //
 
-genLightmap.smudgeChunk=function(data,wid,high)
+function genLightmapSmudgeChunk(data,wid,high)
 {
     var x,y,cx,cy,cxs,cxe,cys,cye;
     var idx,idx2;
@@ -172,9 +174,9 @@ genLightmap.smudgeChunk=function(data,wid,high)
 
         if (noFill) break;
     }
-};
+}
 
-genLightmap.blurChunk=function(data,wid,high)
+function genLightmapBlurChunk(data,wid,high)
 {
     var n,k,idx,pixelCount;
     var x,y,cx,cy,cxs,cxe,cys,cye;
@@ -253,13 +255,13 @@ genLightmap.blurChunk=function(data,wid,high)
             idx+=4;
         }
     } 
-};
+}
 
 //
 // ray tracing
 //
 
-genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,tv1y,tv1z,tv2x,tv2y,tv2z)
+function genLightmapRayTraceCollision(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,tv1y,tv1z,tv2x,tv2y,tv2z)
 {
         // we pass in a single vertex (t0x,t0y,t0z) and
         // these pre-calculated vectors for the other
@@ -316,9 +318,9 @@ genLightmap.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,
 
     var t=invDet*((tv2x*lineToTrigPerpVectorX)+(tv2y*lineToTrigPerpVectorY)+(tv2z*lineToTrigPerpVectorZ));
     return((t>0.01)&&(t<1.0));
-};
+}
 
-genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,normal)
+function genLightmapRayTraceVertex(meshIdx,trigIdx,vx,vy,vz,normal)
 {
     var n,nLight,trigCount;
     var light;
@@ -338,11 +340,11 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,
         // triangle and two vectors for each side around that point
         // to speed this up.  That's what the trigRayTraceCache is for
     
-    lightMesh=map.meshes[meshIdx];
+    lightMesh=this.map.meshes[meshIdx];
     nLight=lightMesh.lightIntersectList.length;
     
     for (n=0;n!==nLight;n++) {
-        light=map.lights[lightMesh.lightIntersectList[n]];
+        light=this.map.lights[lightMesh.lightIntersectList[n]];
         
             // light within light range?
             
@@ -373,7 +375,7 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,
             // if simple light map, don't
             // ray trace, only light by attenuation
         
-        if (!simpleLightmap) {
+        if (!this.simpleLightmap) {
             
                 // each light has a list of meshes within
                 // it's light cone, these are the only meshes
@@ -386,7 +388,7 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,
             hit=false;
 
             for (k=0;k!==nMesh;k++) {
-                mesh=map.meshes[light.meshIntersectList[k]];
+                mesh=this.map.meshes[light.meshIntersectList[k]];
                 if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
 
                 cIdx=0;
@@ -395,7 +397,7 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,
 
                 for (p=0;p!==trigCount;p++) {
 
-                    if (genLightmap.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
+                    if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
                         hit=true;
                         break;
                     }
@@ -422,13 +424,13 @@ genLightmap.rayTraceVertex=function(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,
     col.fixOverflow();
     
     return(col);
-};
+}
 
 //
 // render a triangle
 //
 
-genLightmap.renderTriangle=function(map,meshIdx,trigIdx,simpleLightmap,ctx,pts,vs,normal,lft,top,rgt,bot)
+function genLightmapRenderTriangle(meshIdx,trigIdx,ctx,pts,vs,normal,lft,top,rgt,bot)
 {
     var x,y,lx,rx,tempX,ty,by,idx;
     var lxFactor,rxFactor,vFactor;
@@ -539,7 +541,7 @@ genLightmap.renderTriangle=function(map,meshIdx,trigIdx,simpleLightmap,ctx,pts,v
             
                 // write the pixel
                 
-            col=genLightmap.rayTraceVertex(map,meshIdx,trigIdx,simpleLightmap,vx,vy,vz,normal);
+            col=this.rayTraceVertex(meshIdx,trigIdx,vx,vy,vz,normal);
             data[idx++]=Math.floor(col.r*255.0);
             data[idx++]=Math.floor(col.g*255.0);
             data[idx++]=Math.floor(col.b*255.0);
@@ -549,21 +551,21 @@ genLightmap.renderTriangle=function(map,meshIdx,trigIdx,simpleLightmap,ctx,pts,v
     
         // smear and blur chunk
         
-    genLightmap.smudgeChunk(data,wid,high);
-    genLightmap.blurChunk(data,wid,high);
+    this.smudgeChunk(data,wid,high);
+    this.blurChunk(data,wid,high);
 
         // replace image data
         
     ctx.putImageData(imgData,lft,top);
-};
+}
 
 //
 // build light map in chunk
 //
 
-genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightmapIdx,ctx,lft,top,lightmapUVs)
+function genLightmapWritePolyToChunk(meshIdx,trigIdx,lightmapIdx,ctx,lft,top,lightmapUVs)
 {
-    var mesh=map.meshes[meshIdx];
+    var mesh=this.map.meshes[meshIdx];
     var vIdx,uvIdx;
     var pt0,pt1,pt2;
     
@@ -642,7 +644,7 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightma
     
         // ray trace the triangle
        
-    genLightmap.renderTriangle(map,meshIdx,trigIdx,simpleLightmap,ctx,[pt0,pt1,pt2],[v0,v1,v2],normal,lft,top,(lft+GEN_LIGHTMAP_CHUNK_SIZE),(top+GEN_LIGHTMAP_CHUNK_SIZE));
+    this.renderTriangle(meshIdx,trigIdx,ctx,[pt0,pt1,pt2],[v0,v1,v2],normal,lft,top,(lft+GEN_LIGHTMAP_CHUNK_SIZE),(top+GEN_LIGHTMAP_CHUNK_SIZE));
 
         // add the UV
     
@@ -660,33 +662,35 @@ genLightmap.writePolyToChunk=function(map,meshIdx,trigIdx,simpleLightmap,lightma
     uvIdx=mesh.indexes[(trigIdx*3)+2]*2;
     lightmapUVs[uvIdx]=(pt2.x+renderLft)/GEN_LIGHTMAP_TEXTURE_SIZE;
     lightmapUVs[uvIdx+1]=(pt2.y+renderTop)/GEN_LIGHTMAP_TEXTURE_SIZE;
-};
+}
     
 //
 // create lightmap
 //
 
-genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc)
+function genLightmapCreateLightmapForMesh(meshIdx)
 {
     var n,lightmapIdx,chunkIdx,nTrig;
     var lft,top;
     var mesh,ctx;
     var lightmapUVs;
     
+        // run the status bar
+    
     wsNextStatusBar();
     
-    mesh=map.meshes[meshIdx];
+    mesh=this.map.meshes[meshIdx];
     nTrig=mesh.trigCount;
 
         // find a lightmap to put mesh into
 
     lightmapIdx=-1;
 
-    for (n=0;n!==lightmapList.length;n++) {
+    for (n=0;n!==this.lightmapList.length;n++) {
 
             // check to see if we can fit
 
-        if ((GEN_LIGHTMAP_CHUNK_PER_TEXTURE-lightmapList[n].chunkIdx)>nTrig) {
+        if ((GEN_LIGHTMAP_CHUNK_PER_TEXTURE-this.lightmapList[n].chunkIdx)>nTrig) {
             lightmapIdx=n;
             break;
         }
@@ -695,8 +699,8 @@ genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,light
         // if we didn't find a lightmap, make a new one
 
     if (lightmapIdx===-1) {
-        lightmapIdx=lightmapList.length;
-        lightmapList[lightmapIdx]=new genLightmapBitmapObject(genLightmap.startCanvas());
+        lightmapIdx=this.lightmapList.length;
+        this.lightmapList[lightmapIdx]=new genLightmapBitmapObject(this.startCanvas());
     }
 
         // UVs for this mesh
@@ -705,42 +709,42 @@ genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,light
 
         // write polys to chunk
 
-    chunkIdx=lightmapList[lightmapIdx].chunkIdx;
-    ctx=lightmapList[lightmapIdx].canvas.getContext('2d');
+    chunkIdx=this.lightmapList[lightmapIdx].chunkIdx;
+    ctx=this.lightmapList[lightmapIdx].canvas.getContext('2d');
 
     for (n=0;n!==nTrig;n++) {
 
         lft=(chunkIdx%GEN_LIGHTMAP_CHUNK_SPLIT)*GEN_LIGHTMAP_CHUNK_SIZE;
         top=Math.floor(chunkIdx/GEN_LIGHTMAP_CHUNK_SPLIT)*GEN_LIGHTMAP_CHUNK_SIZE;
 
-        genLightmap.writePolyToChunk(map,meshIdx,n,simpleLightmap,lightmapIdx,ctx,lft,top,lightmapUVs);
+        this.writePolyToChunk(meshIdx,n,lightmapIdx,ctx,lft,top,lightmapUVs);
 
         chunkIdx++;
     }
 
-    lightmapList[lightmapIdx].chunkIdx=chunkIdx;
+    this.lightmapList[lightmapIdx].chunkIdx=chunkIdx;
 
         // set this data in the meshList
         // will be used later to setup the meshes
         // themselves
 
-    meshList[meshIdx].lightmapIdx=lightmapIdx;
-    meshList[meshIdx].lightmapUVs=lightmapUVs;
+    this.meshList[meshIdx].lightmapIdx=lightmapIdx;
+    this.meshList[meshIdx].lightmapUVs=lightmapUVs;
     
         // move on to next mesh
         // if out of mesh, finish up creation
         // by saving the light maps
         
     meshIdx++;
-    if (meshIdx>=map.meshes.length) {
-        setTimeout(function() { genLightmap.createFinish(view,lightmapList,meshList,callbackFunc); },GEN_LIGHTMAP_TIMEOUT_MSEC);
+    if (meshIdx>=this.map.meshes.length) {
+        setTimeout(function() { currentGlobalLightMapObject.createFinish(); },GEN_LIGHTMAP_TIMEOUT_MSEC);
         return;
     }
     
         // next mesh
     
-    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,meshIdx,simpleLightmap,lightmapList,meshList,callbackFunc); },GEN_LIGHTMAP_TIMEOUT_MSEC);
-};
+    setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(meshIdx); },GEN_LIGHTMAP_TIMEOUT_MSEC);
+}
 
 //
 // create lightmap
@@ -748,44 +752,40 @@ genLightmap.createLightmapForMesh=function(view,map,meshIdx,simpleLightmap,light
 // is too slow and browsers will bounce the script
 //
 
-genLightmap.create=function(view,map,simpleLightmap,callbackFunc)
+function genLightmapCreate()
 {
     var n;
-    var nMesh=map.meshes.length;
+    var nMesh=this.map.meshes.length;
     
-    wsStartStatusBar(map.meshes.length+2);
-    
-        // array of bitmaps that make up the lightmap
-        // each is an object with a canvas and the last chunk
-        // drawn to (the chunkIdx)
+        // remember the light map object
+        // globally for callbacks because "this" is
+        // the window object during them.  this is
+        // an ugly hack but there's no way around it
         
-    var lightmapList=[];
+    currentGlobalLightMapObject=this;
     
-        // a list paralell to the meshes that keeps
-        // a record of indexes and UVs so we can set
-        // all the meshes at the end (because the light
-        // map object isn't created until then)
-        
-    var meshList=[];
+        // setup the status bar
+    
+    wsStartStatusBar(this.map.meshes.length+2);
     
         // run through the meshes and build
         // cahce to speed up ray tracing
     
     for (n=0;n!==nMesh;n++) {
-        meshList.push(new genLightmapMeshObject());
-        map.meshes[n].buildTrigRayTraceCache();
+        this.meshList.push(new genLightmapMeshObject());
+        this.map.meshes[n].buildTrigRayTraceCache();
     }
     
     wsNextStatusBar();
     
         // run through the meshes
         // by a timer so we don't trigger the
-        // script time out problem
-        
-    setTimeout(function() { genLightmap.createLightmapForMesh(view,map,0,simpleLightmap,lightmapList,meshList,callbackFunc); },GEN_LIGHTMAP_TIMEOUT_MSEC);
-};
+        // script time out problem   
     
-genLightmap.createFinish=function(view,lightmapList,meshList,callbackFunc)
+    setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(0); },GEN_LIGHTMAP_TIMEOUT_MSEC);
+}
+    
+function genLightmapCreateFinish()
 {
     var n;
     
@@ -794,24 +794,66 @@ genLightmap.createFinish=function(view,lightmapList,meshList,callbackFunc)
         
         // the index is used as the id
         
-    for (n=0;n!==lightmapList.length;n++) {
-        map.addLightmap(new mapLightmapObject(view,n,lightmapList[n].canvas));
+    for (n=0;n!==this.lightmapList.length;n++) {
+        this.map.addLightmap(new mapLightmapObject(this.view,n,this.lightmapList[n].canvas));
     }
     
         // and finally push all the required
         // data to the meshes
     
     var lightMesh;
-    var nMesh=map.meshes.length;
+    var nMesh=this.map.meshes.length;
     
     for (n=0;n!==nMesh;n++) {
-        lightMesh=meshList[n];
-        map.meshes[n].setLightmap(map.lightmaps[lightMesh.lightmapIdx],lightMesh.lightmapUVs);
+        lightMesh=this.meshList[n];
+        this.map.meshes[n].setLightmap(this.map.lightmaps[lightMesh.lightmapIdx],lightMesh.lightmapUVs);
     }
     
     wsNextStatusBar();
     
         // finish with the callback
         
-    callbackFunc();
-};
+    this.callbackFunc();
+}
+
+//
+// generate lightmaps object
+//
+
+function genLightmapObject(view,map,simpleLightmap,callbackFunc)
+{
+    this.view=view;
+    this.map=map;
+    this.simpleLightmap=simpleLightmap;
+    
+        // array of bitmaps that make up the lightmap
+        // each is an object with a canvas and the last chunk
+        // drawn to (the chunkIdx)
+        
+    this.lightmapList=[];
+    
+        // a list paralell to the meshes that keeps
+        // a record of indexes and UVs so we can set
+        // all the meshes at the end (because the light
+        // map object isn't created until then)
+        
+    this.meshList=[];
+    
+        // the callback function when
+        // generation concludes
+        
+    this.callbackFunc=callbackFunc;
+    
+        // functions
+        
+    this.startCanvas=genLightmapStartCanvas;
+    this.smudgeChunk=genLightmapSmudgeChunk;
+    this.blurChunk=genLightmapBlurChunk;
+    this.rayTraceCollision=genLightmapRayTraceCollision;
+    this.rayTraceVertex=genLightmapRayTraceVertex;
+    this.renderTriangle=genLightmapRenderTriangle;
+    this.writePolyToChunk=genLightmapWritePolyToChunk;
+    this.createLightmapForMesh=genLightmapCreateLightmapForMesh;
+    this.create=genLightmapCreate;
+    this.createFinish=genLightmapCreateFinish;
+}

@@ -14,11 +14,11 @@ function modelClose(view)
 // model object
 //
 
-function modelObject(name,mesh,skeleton)
+function modelObject(name)
 {
     this.name=name;
-    this.mesh=mesh;
-    this.skeleton=skeleton;
+    this.mesh=null;
+    this.skeleton=new modelSkeletonObject();
     
         // close functions
         
