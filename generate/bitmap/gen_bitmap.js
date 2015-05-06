@@ -4,22 +4,23 @@
 // constants
 //
 
-const GEN_BITMAP_TEXTURE_SIZE=512;
+var GEN_BITMAP_TEXTURE_SIZE=512;
 
-const GEN_BITMAP_TYPE_BRICK_STACK=0;
-const GEN_BITMAP_TYPE_BRICK_RANDOM=1;
-const GEN_BITMAP_TYPE_STONE=2;
-const GEN_BITMAP_TYPE_TILE_SIMPLE=3;
-const GEN_BITMAP_TYPE_TILE_COMPLEX=4;
-const GEN_BITMAP_TYPE_TILE_SMALL=5;
-const GEN_BITMAP_TYPE_METAL=6;
-const GEN_BITMAP_TYPE_CONCRETE=7;
-const GEN_BITMAP_TYPE_WOOD_PLANK=8;
-const GEN_BITMAP_TYPE_WOOD_BOX=9;
+var GEN_BITMAP_TYPE_BRICK_STACK=0;
+var GEN_BITMAP_TYPE_BRICK_RANDOM=1;
+var GEN_BITMAP_TYPE_STONE=2;
+var GEN_BITMAP_TYPE_TILE_SIMPLE=3;
+var GEN_BITMAP_TYPE_TILE_COMPLEX=4;
+var GEN_BITMAP_TYPE_TILE_SMALL=5;
+var GEN_BITMAP_TYPE_METAL=6;
+var GEN_BITMAP_TYPE_CONCRETE=7;
+var GEN_BITMAP_TYPE_WOOD_PLANK=8;
+var GEN_BITMAP_TYPE_WOOD_BOX=9;
+var GEN_BITMAP_TYPE_SKIN=10;
 
-const GEN_BITMAP_TILE_STYLE_BORDER=0;
-const GEN_BITMAP_TILE_STYLE_CHECKER=1;
-const GEN_BITMAP_TILE_STYLE_STRIPE=2;
+var GEN_BITMAP_TILE_STYLE_BORDER=0;
+var GEN_BITMAP_TILE_STYLE_CHECKER=1;
+var GEN_BITMAP_TILE_STYLE_STRIPE=2;
 
 //
 // brick/rock bitmaps
@@ -415,6 +416,182 @@ function genBitmapGenerateWood(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
 }
 
 //
+// skin bitmaps
+//
+
+/*
+
+
+void bitmap_ag_texture_skin_chunk(bitmap_ag_type *ag_bitmap,int x,int y,int wid,int high,float scale_darken,float noise_darken)
+{
+	int				n,px,py,p_wid,p_high,scale_count;
+	d3col			border_col;
+
+		// set the clip so scales
+		// can wrap within their UV space
+
+	bitmap_ag_set_clip(ag_bitmap,x,y,wid,high);
+
+		// scales
+
+	scale_count=bitmap_ag_skin_start_scale_count+bitmap_ag_random_int(bitmap_ag_skin_extra_scale_count);
+	
+	border_col.r=ag_bitmap->back_col.r*scale_darken;
+	border_col.g=ag_bitmap->back_col.g*scale_darken;
+	border_col.b=ag_bitmap->back_col.b*scale_darken;
+
+	for (n=0;n!=scale_count;n++) {
+		px=bitmap_ag_random_int(wid);
+		py=bitmap_ag_random_int(high);
+		p_wid=bitmap_ag_skin_start_scale_size+bitmap_ag_random_int(bitmap_ag_skin_extra_scale_size);
+		p_high=bitmap_ag_skin_start_scale_size+bitmap_ag_random_int(bitmap_ag_skin_extra_scale_size);
+		bitmap_ag_texture_draw_oval(ag_bitmap,px,py,p_wid,p_high,1,TRUE,&border_col,NULL);
+	}
+
+	bitmap_ag_clear_clip(ag_bitmap);
+
+		// skin noise
+
+	bitmap_ag_texture_add_noise(ag_bitmap,x,y,wid,high,noise_darken,0.8f);
+}
+
+void bitmap_ag_texture_face_chunk(bitmap_ag_type *ag_bitmap,int x,int y,int wid,int high)
+{
+	int				n,eye_count,eye_x,eye_y,
+					px,py,px2,py2,px_add,face_x,face_wid,
+					eye_wid,eye_high,m_sz,border_sz,
+					pupil_wid,pupil_high,line_count;
+	d3col			border_col,eye_col,pupil_col,mouth_col;
+
+		// skin
+
+	bitmap_ag_texture_skin_chunk(ag_bitmap,x,y,wid,high,0.8f,0.8f);
+
+		// position of face
+	
+	face_x=x+((wid*6)/10);
+	face_wid=(wid*4)/10;
+
+		// eyes
+
+	bitmap_ag_random_color_lock(&border_col,0,50);
+	bitmap_ag_random_color(&eye_col,150,0,50,255,50,150);
+	bitmap_ag_random_color(&pupil_col,0,0,0,100,10,40);
+	bitmap_ag_random_color(&mouth_col,0,0,0,80,10,50);
+
+	eye_count=1+bitmap_ag_random_int(3);
+
+	eye_wid=face_wid/eye_count;
+	eye_high=(eye_wid>>1)+bitmap_ag_random_int(eye_wid);
+	if (eye_high>(high>>1)) eye_high=high>>1;
+
+	eye_x=(face_wid>>1)-((eye_count*eye_wid)>>1);
+	eye_y=40+bitmap_ag_random_int(30);
+
+	pupil_wid=eye_wid>>2;
+	pupil_high=eye_high-bitmap_ag_random_int(eye_high>>1);
+
+	px=face_x+eye_x;
+	py=y+eye_y;
+
+	border_sz=2+bitmap_ag_random_int(eye_high>>2);
+
+	for (n=0;n!=eye_count;n++) {
+		bitmap_ag_texture_draw_oval(ag_bitmap,px,py,(eye_wid-5),eye_high,border_sz,TRUE,&border_col,&eye_col);
+
+		px2=px+((eye_wid-pupil_wid)>>1);
+		py2=py+((eye_high-pupil_high)>>1);
+		bitmap_ag_texture_draw_oval(ag_bitmap,px2,py2,pupil_wid,pupil_high,0,TRUE,NULL,&pupil_col);
+
+		px+=eye_wid;
+	}
+
+		// mouth
+
+	line_count=1+bitmap_ag_random_int(4);
+
+	px=face_x+10;
+	px_add=(face_wid-20)/line_count;
+
+	for (n=0;n!=line_count;n++) {
+		m_sz=2+bitmap_ag_random_int(8);
+		bitmap_ag_texture_draw_line_horizontal(ag_bitmap,px,(y+(high-40)),px_add,m_sz,FALSE,&mouth_col);
+		px+=px_add;
+	}
+}
+
+void bitmap_ag_texture_cloth_chunk(bitmap_ag_type *ag_bitmap,int x,int y,int wid,int high)
+{
+	int				n,px,py,p_wid,p_high,mark_count;
+	d3col			col;
+
+	bitmap_ag_set_clip(ag_bitmap,x,y,wid,high);
+
+	bitmap_ag_random_color(&col,200,200,200,80,80,80);
+
+	bitmap_ag_texture_draw_rectangle(ag_bitmap,x,y,wid,high,1,TRUE,&col,NULL);
+	bitmap_ag_texture_gradient_overlay_vertical(ag_bitmap,x,y,wid,high,1.0f,0.7f);
+	bitmap_ag_texture_add_noise(ag_bitmap,x,y,wid,high,0.7f,0.5f);
+
+	mark_count=40+bitmap_ag_random_int(60);
+
+	for (n=0;n!=mark_count;n++) {
+		px=bitmap_ag_random_int(wid);
+		py=bitmap_ag_random_int(high);
+		p_wid=30+bitmap_ag_random_int(30);
+		p_high=30+bitmap_ag_random_int(30);
+		bitmap_ag_texture_add_particle(ag_bitmap,px,py,p_wid,p_high,0.9f,TRUE,bitmap_ag_cement_particle_density);
+	}
+
+	bitmap_ag_clear_clip(ag_bitmap);
+}
+
+bool bitmap_ag_texture_skin(texture_frame_type *frame,char *base_path,int pixel_sz)
+{
+	bitmap_ag_type	ag_bitmap;
+
+	ag_bitmap.pixel_sz=pixel_sz;
+	ag_bitmap.no_bump_spec=FALSE;
+	ag_bitmap.frame=frame;
+
+	bitmap_ag_random_color(&ag_bitmap.back_col,255,255,255,100,100,100);
+
+	if (!bitmap_ag_texture_create(&ag_bitmap,FALSE)) return(FALSE);
+
+		// top-left is plain skin
+		// top-right is face
+		// bottom-left is darker skin
+
+	bitmap_ag_texture_skin_chunk(&ag_bitmap,0,0,(pixel_sz>>1),(pixel_sz>>1),0.8f,0.8f);
+	bitmap_ag_texture_face_chunk(&ag_bitmap,(pixel_sz>>1),0,(pixel_sz>>1),(pixel_sz>>1));
+	bitmap_ag_texture_skin_chunk(&ag_bitmap,0,(pixel_sz>>1),(pixel_sz>>1),(pixel_sz>>1),0.7f,0.7f);
+	bitmap_ag_texture_cloth_chunk(&ag_bitmap,(pixel_sz>>1),(pixel_sz>>1),(pixel_sz>>1),(pixel_sz>>1));
+
+		// save textures
+
+	bitmap_ag_texture_make_spec(&ag_bitmap,0.5f);
+	return(bitmap_ag_texture_finish(&ag_bitmap,base_path));
+}
+            
+
+
+ */
+function genBitmapGenerateSkin(bitmapCTX,normalCTX,specularCTX,wid,high)
+{
+        // clear canvases
+        
+    this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,'#FFFFFF');
+    this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+    
+    
+    
+    
+        // finish with the specular
+        
+    this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
+}
+
+//
 // create bitmap
 //
 
@@ -502,6 +679,11 @@ function genBitmapGenerate(view,bitmapId,generateType,debug)
         case GEN_BITMAP_TYPE_WOOD_BOX:
             this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high,true);
             shineFactor=5.0;
+            break;
+            
+        case GEN_BITMAP_TYPE_SKIN:
+            this.generateSkin(bitmapCTX,normalCTX,specularCTX,wid,high);
+            shineFactor=15.0;
             break;
 
     }

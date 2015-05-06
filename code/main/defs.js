@@ -23,6 +23,32 @@ function wsPoint(x,y,z)
                     this.y+=yAdd;
                     this.z+=zAdd;
                 };
+    
+    this.addPoint=function(pt)
+                {
+                    this.x+=pt.x;
+                    this.y+=pt.y;
+                    this.z+=pt.z;
+                };
+    
+    this.subPoint=function(pt)
+                {
+                    this.x-=pt.x;
+                    this.y-=pt.y;
+                    this.z-=pt.z;
+                };
+                
+    this.rotateAroundPoint=function(centerPt,ang)
+                {
+                    var v3pt=vec3.fromValues(this.x,this.y,this.z);
+                    var v3center=vec3.fromValues(centerPt.x,centerPt.y,centerPt.z);
+                    vec3.rotateX(v3pt,v3pt,v3center,glMatrix.toRadian(ang.x));
+                    vec3.rotateY(v3pt,v3pt,v3center,glMatrix.toRadian(ang.y));
+                    vec3.rotateZ(v3pt,v3pt,v3center,glMatrix.toRadian(ang.z));
+                    this.x=v3pt[0];
+                    this.y=v3pt[1];
+                    this.z=v3pt[2];
+                };
                
     this.noSquareDistance=function(pt)
                 {

@@ -1,13 +1,16 @@
 
+IMPORTANT EVENTUAL TODOs
+    [ ] eventually move back to vec3 in lighting structure (sigh, windows bug)
+    [ ] eventually move back to const usage when EMCAScript6 is working in strict mode (check safari)
 
-- !!!NOTE!!! eventually move back to vec3 in lighting structure (sigh, windows bug)
 
----> start generating models instead of the test model thing
+- bones
+   - stop crossing of legs
+   - need waist bone. and random rotation
+   - need head bone
 
 ---> frustum cull the models
 
-
-- start skeleton work (always start with single, vertical line)
 - when building view light list, ignore ones behind the player (pick better lights)
 
 

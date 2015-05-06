@@ -4,7 +4,7 @@
 // constants
 // 
 
-const GEN_MAP_STAIR_LENGTH=5000;
+var GEN_MAP_STAIR_LENGTH=5000;
 
 //
 // setup

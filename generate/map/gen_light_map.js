@@ -17,16 +17,16 @@ var currentGlobalLightMapObject=null;
 // constants
 //
 
-const GEN_LIGHTMAP_TIMEOUT_MSEC=100;
-const GEN_LIGHTMAP_TEXTURE_SIZE=1024;
+var GEN_LIGHTMAP_TIMEOUT_MSEC=100;
+var GEN_LIGHTMAP_TEXTURE_SIZE=1024;
 
 // chunk is one block available to draw a light map
-const GEN_LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
-const GEN_LIGHTMAP_CHUNK_SIZE=Math.floor(GEN_LIGHTMAP_TEXTURE_SIZE/GEN_LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
-const GEN_LIGHTMAP_CHUNK_PER_TEXTURE=(GEN_LIGHTMAP_CHUNK_SPLIT*GEN_LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
+var GEN_LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
+var GEN_LIGHTMAP_CHUNK_SIZE=Math.floor(GEN_LIGHTMAP_TEXTURE_SIZE/GEN_LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
+var GEN_LIGHTMAP_CHUNK_PER_TEXTURE=(GEN_LIGHTMAP_CHUNK_SPLIT*GEN_LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
 
-const GEN_LIGHTMAP_RENDER_MARGIN=2;                // margin around each light map triangle
-const GEN_LIGHTMAP_BLUR_COUNT=3;
+var GEN_LIGHTMAP_RENDER_MARGIN=2;                // margin around each light map triangle
+var GEN_LIGHTMAP_BLUR_COUNT=3;
 
 //
 // lightmap bitmap object

@@ -13,8 +13,9 @@ function modelSkeletonClose()
 // model bone object
 //
 
-function modelBoneObject(parentBoneIdx,position)
+function modelBoneObject(name,parentBoneIdx,position)
 {
+    this.name=name;
     this.parentBoneIdx=parentBoneIdx;
     this.position=position;
 }

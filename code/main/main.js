@@ -4,44 +4,44 @@
 // resource IDs
 //
 
-const BITMAP_BRICK_STACK=0;
-const BITMAP_BRICK_RANDOM=1;
-const BITMAP_STONE=2;
-const BITMAP_TILE=3;
-const BITMAP_TILE_2=4;
-const BITMAP_STAIR_TILE=5;
-const BITMAP_METAL=6;
-const BITMAP_CONCRETE=7;
-const BITMAP_WOOD_PLANK=8;
-const BITMAP_WOOD_BOX=9;
+var BITMAP_BRICK_STACK=0;
+var BITMAP_BRICK_RANDOM=1;
+var BITMAP_STONE=2;
+var BITMAP_TILE=3;
+var BITMAP_TILE_2=4;
+var BITMAP_STAIR_TILE=5;
+var BITMAP_METAL=6;
+var BITMAP_CONCRETE=7;
+var BITMAP_WOOD_PLANK=8;
+var BITMAP_WOOD_BOX=9;
 
 //
 // constants
 //
 
-const WS_PHYSICS_MSECS=16;
-const WS_DRAW_MSECS=16;
-const WS_BAIL_MSECS=5000;
+var WS_PHYSICS_MSECS=16;
+var WS_DRAW_MSECS=16;
+var WS_BAIL_MSECS=5000;
 
-const AMBIENT_R=0.35;
-const AMBIENT_G=0.35;
-const AMBIENT_B=0.35;
+var AMBIENT_R=0.35;
+var AMBIENT_G=0.35;
+var AMBIENT_B=0.35;
 
-const MONSTER_MODEL_COUNT=5;
-const MONSTER_ENTITY_COUNT=5;
+var MONSTER_MODEL_COUNT=5;
+var MONSTER_ENTITY_COUNT=5;
 
 //
 // debugging and quick start up flags
 //
 
-const MAX_ROOM=1;
-const SIMPLE_LIGHTMAP=true;
+var MAX_ROOM=1;
+var SIMPLE_LIGHTMAP=true;
 
 //
 // textures to build
 //
 
-const wsTextureBuildList=
+var wsTextureBuildList=
     [
         [BITMAP_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_STACK],
         [BITMAP_BRICK_RANDOM,GEN_BITMAP_TYPE_BRICK_RANDOM],

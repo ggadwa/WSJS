@@ -4,7 +4,7 @@
 // constants
 //
 
-const MESH_PRIMITIVE_STAIR_COUNT=10;
+var MESH_PRIMITIVE_STAIR_COUNT=10;
 
 //
 // create cube
