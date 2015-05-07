@@ -52,7 +52,7 @@ var wsTextureBuildList=
         [BITMAP_METAL,GEN_BITMAP_TYPE_METAL],
         [BITMAP_CONCRETE,GEN_BITMAP_TYPE_CONCRETE],
         [BITMAP_WOOD_PLANK,GEN_BITMAP_TYPE_WOOD_PLANK],
-        [BITMAP_WOOD_BOX,GEN_BITMAP_TYPE_WOOD_BOX]
+        [BITMAP_WOOD_BOX,GEN_BITMAP_TYPE_WOOD_BOX],
     ];
 
 //
@@ -337,6 +337,12 @@ function wsInitBuildModels()
     var model,genSkeleton;
     
     var modelGenRandom=new genRandomObject(parseInt(document.getElementById('wsModelRandom').value));
+    
+        // supergumba -- temporary
+        // do this all by callback alter
+        
+    var genBitmap=new genBitmapObject(modelGenRandom);    
+    genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);
     
         // player model
 

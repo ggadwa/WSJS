@@ -4,6 +4,7 @@ IMPORTANT EVENTUAL TODOs
     [ ] eventually move back to const usage when EMCAScript6 is working in strict mode (check safari)
 
 
+
 - bones
    - stop crossing of legs
    - need waist bone. and random rotation

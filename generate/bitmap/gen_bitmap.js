@@ -422,38 +422,6 @@ function genBitmapGenerateWood(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
 /*
 
 
-void bitmap_ag_texture_skin_chunk(bitmap_ag_type *ag_bitmap,int x,int y,int wid,int high,float scale_darken,float noise_darken)
-{
-	int				n,px,py,p_wid,p_high,scale_count;
-	d3col			border_col;
-
-		// set the clip so scales
-		// can wrap within their UV space
-
-	bitmap_ag_set_clip(ag_bitmap,x,y,wid,high);
-
-		// scales
-
-	scale_count=bitmap_ag_skin_start_scale_count+bitmap_ag_random_int(bitmap_ag_skin_extra_scale_count);
-	
-	border_col.r=ag_bitmap->back_col.r*scale_darken;
-	border_col.g=ag_bitmap->back_col.g*scale_darken;
-	border_col.b=ag_bitmap->back_col.b*scale_darken;
-
-	for (n=0;n!=scale_count;n++) {
-		px=bitmap_ag_random_int(wid);
-		py=bitmap_ag_random_int(high);
-		p_wid=bitmap_ag_skin_start_scale_size+bitmap_ag_random_int(bitmap_ag_skin_extra_scale_size);
-		p_high=bitmap_ag_skin_start_scale_size+bitmap_ag_random_int(bitmap_ag_skin_extra_scale_size);
-		bitmap_ag_texture_draw_oval(ag_bitmap,px,py,p_wid,p_high,1,TRUE,&border_col,NULL);
-	}
-
-	bitmap_ag_clear_clip(ag_bitmap);
-
-		// skin noise
-
-	bitmap_ag_texture_add_noise(ag_bitmap,x,y,wid,high,noise_darken,0.8f);
-}
 
 void bitmap_ag_texture_face_chunk(bitmap_ag_type *ag_bitmap,int x,int y,int wid,int high)
 {
@@ -546,46 +514,71 @@ void bitmap_ag_texture_cloth_chunk(bitmap_ag_type *ag_bitmap,int x,int y,int wid
 	bitmap_ag_clear_clip(ag_bitmap);
 }
 
-bool bitmap_ag_texture_skin(texture_frame_type *frame,char *base_path,int pixel_sz)
-{
-	bitmap_ag_type	ag_bitmap;
-
-	ag_bitmap.pixel_sz=pixel_sz;
-	ag_bitmap.no_bump_spec=FALSE;
-	ag_bitmap.frame=frame;
-
-	bitmap_ag_random_color(&ag_bitmap.back_col,255,255,255,100,100,100);
-
-	if (!bitmap_ag_texture_create(&ag_bitmap,FALSE)) return(FALSE);
-
-		// top-left is plain skin
-		// top-right is face
-		// bottom-left is darker skin
-
-	bitmap_ag_texture_skin_chunk(&ag_bitmap,0,0,(pixel_sz>>1),(pixel_sz>>1),0.8f,0.8f);
-	bitmap_ag_texture_face_chunk(&ag_bitmap,(pixel_sz>>1),0,(pixel_sz>>1),(pixel_sz>>1));
-	bitmap_ag_texture_skin_chunk(&ag_bitmap,0,(pixel_sz>>1),(pixel_sz>>1),(pixel_sz>>1),0.7f,0.7f);
-	bitmap_ag_texture_cloth_chunk(&ag_bitmap,(pixel_sz>>1),(pixel_sz>>1),(pixel_sz>>1),(pixel_sz>>1));
-
-		// save textures
-
-	bitmap_ag_texture_make_spec(&ag_bitmap,0.5f);
-	return(bitmap_ag_texture_finish(&ag_bitmap,base_path));
-}
-            
-
 
  */
+
+function genBitmapGenerateSkinChunk(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot,scaleDarken,noiseDarken)
+{
+    var n,x,y,sWid,sHigh;
+    
+        // the skin background
+        
+    this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(skinColor,1.0));
+    
+		// scales
+
+	var scaleCount=this.genRandom.randomInt(80,40);
+    var borderColor=this.genBitmapUtility.darkenColor(skinColor,scaleDarken);
+    
+    var wid=rgt-lft;
+    var high=bot-top;
+
+	for (n=0;n!==scaleCount;n++) {
+        sWid=this.genRandom.randomInt(50,20);
+        sHigh=this.genRandom.randomInt(50,20);
+		x=lft+this.genRandom.randomInt(0,(wid-sWid));
+		y=top+this.genRandom.randomInt(0,(high-sHigh));
+        this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,x,y,(x+sWid),(y+sHigh),1,null,borderColor);
+	}
+    
+        // add noise
+        
+    this.genBitmapUtility.addNoiseRect(bitmapCTX,lft,top,rgt,bot,noiseDarken,(noiseDarken+0.05),0.8);
+    
+}
+function genBitmapGenerateFaceChunk(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot)
+{
+    
+}
+
+function genBitmapGenerateClothChunk(bitmapCTX,normalCTX,clothColor,lft,top,rgt,bot)
+{
+    this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(clothColor,1.0));
+    
+}
+
 function genBitmapGenerateSkin(bitmapCTX,normalCTX,specularCTX,wid,high)
 {
+    var skinColor=this.genBitmapUtility.getRandomColor([0.4,0.4,0.3],[1.0,1.0,0.8]);
+    var clothColor=this.genBitmapUtility.getRandomColor([0.4,0.3,0.3],[7.0,6.0,7.0]);
+
         // clear canvases
         
     this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,'#FFFFFF');
     this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
     
-    
-    
-    
+		// top-left is plain skin
+		// top-right is face
+		// bottom-left is darker skin
+        
+    var halfWid=Math.floor(wid/2);
+    var halfHigh=Math.floor(high/2);
+
+	this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,0,halfWid,halfHigh,0.8,0.8);
+	this.generateFaceChunk(bitmapCTX,normalCTX,skinColor,halfWid,0,wid,halfHigh);
+	this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,halfHigh,halfWid,high,0.7,0.7);
+	this.generateClothChunk(bitmapCTX,normalCTX,clothColor,halfWid,halfHigh,wid,high);
+
         // finish with the specular
         
     this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
@@ -691,7 +684,7 @@ function genBitmapGenerate(view,bitmapId,generateType,debug)
         // debugging
 
 /*
-    if (generateType==GEN_BITMAP_TYPE_CONCRETE) {
+    if (generateType===GEN_BITMAP_TYPE_SKIN) {
         debug.displayCanvasData(bitmapCanvas,810,10,400,400);
         debug.displayCanvasData(normalCanvas,810,410,400,400);
         debug.displayCanvasData(specularCanvas,810,820,400,400);
@@ -701,7 +694,7 @@ function genBitmapGenerate(view,bitmapId,generateType,debug)
         // finally create the bitmap
         // object and load into WebGL
 
-    return(new mapBitmapObject(view,bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+    return(new bitmapObject(view,bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
 }
 
 //
@@ -724,6 +717,10 @@ function genBitmapObject(genRandom)
     this.generateMetal=genBitmapGenerateMetal;
     this.generateConcrete=genBitmapGenerateConcrete;
     this.generateWood=genBitmapGenerateWood;
+    this.generateSkinChunk=genBitmapGenerateSkinChunk;
+    this.generateFaceChunk=genBitmapGenerateFaceChunk;
+    this.generateClothChunk=genBitmapGenerateClothChunk;
+    this.generateSkin=genBitmapGenerateSkin;
     
     this.generate=genBitmapGenerate;
 }

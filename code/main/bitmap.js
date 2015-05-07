@@ -4,7 +4,7 @@
 // close bitmaps
 //
 
-function mapBitmapClose(view)
+function bitmapClose(view)
 {
     var gl=view.gl;
     
@@ -17,7 +17,7 @@ function mapBitmapClose(view)
 // attaching bitmaps
 //
 
-function mapBitmapAttach(view,mapShader)
+function bitmapAttach(view,mapShader)
 {
     var gl=view.gl;
     
@@ -38,10 +38,10 @@ function mapBitmapAttach(view,mapShader)
 }
 
 //
-// map bitmap object
+// bitmap object
 //
 
-function mapBitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
+function bitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
 {
     this.bitmapId=bitmapId;
     this.texture=null;
@@ -89,6 +89,6 @@ function mapBitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapC
     
         // functions
         
-    this.close=mapBitmapClose;
-    this.attach=mapBitmapAttach;
+    this.close=bitmapClose;
+    this.attach=bitmapAttach;
 }
