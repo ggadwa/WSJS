@@ -1,47 +1,10 @@
 "use strict";
 
 //
-// close bitmaps
+// bitmap class
 //
 
-function bitmapClose(view)
-{
-    var gl=view.gl;
-    
-    if (this.texture!==null) gl.deleteTexture(this.texture);
-    if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
-    if (this.specularMap!==null) gl.deleteTexture(this.specularMap);
-}
-
-//
-// attaching bitmaps
-//
-
-function bitmapAttach(view,mapShader)
-{
-    var gl=view.gl;
-    
-        // shine factor in shader
-        
-    gl.uniform1f(mapShader.shineFactorUniform,this.shineFactor);
-    
-        // the textures
-        
-    gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
-    
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
-    
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D,this.texture);
-}
-
-//
-// bitmap object
-//
-
-function bitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
+function BitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
 {
     this.bitmapId=bitmapId;
     this.texture=null;
@@ -87,8 +50,41 @@ function bitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanv
         gl.bindTexture(gl.TEXTURE_2D,null);
     }
     
-        // functions
-        
-    this.close=bitmapClose;
-    this.attach=bitmapAttach;
+        //
+        // close the bitmap
+        //
+    
+    this.bitmapClose=function(view)
+    {
+        var gl=view.gl;
+
+        if (this.texture!==null) gl.deleteTexture(this.texture);
+        if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
+        if (this.specularMap!==null) gl.deleteTexture(this.specularMap);
+    };
+
+        //
+        // attach bitmap to shader
+        //
+    
+    this.attach=function(view,mapShader)
+    {
+        var gl=view.gl;
+
+            // shine factor in shader
+
+        gl.uniform1f(mapShader.shineFactorUniform,this.shineFactor);
+
+            // the textures
+
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
+
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+    };
+
 }

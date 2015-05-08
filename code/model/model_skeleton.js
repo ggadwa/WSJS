@@ -1,19 +1,10 @@
 "use strict";
 
 //
-// close skeleton
+// model bone class
 //
 
-function modelSkeletonClose()
-{
-    this.bones=[];
-}
-
-//
-// model bone object
-//
-
-function modelBoneObject(name,parentBoneIdx,position)
+function ModelBoneObject(name,parentBoneIdx,position)
 {
     this.name=name;
     this.parentBoneIdx=parentBoneIdx;
@@ -21,14 +12,20 @@ function modelBoneObject(name,parentBoneIdx,position)
 }
 
 //
-// model skeleton object
+// model skeleton class
 //
 
-function modelSkeletonObject()
+function ModelSkeletonObject()
 {
     this.bones=[];
     
-        // functions
-    
-    this.close=modelSkeletonClose;
+        //
+        // close skeleton
+        //
+
+    this.close=function()
+    {
+        this.bones=[];
+    };
+
 }

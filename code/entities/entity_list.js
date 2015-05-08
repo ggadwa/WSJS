@@ -1,62 +1,54 @@
 "use strict";
 
 //
-// initialize/release entityList
+// entity list class
 //
 
-function entityListInitialize(view)
-{
-    return(true);
-}
-
-function entityListRelease(view)
-{
-}
-
-//
-// add to entity
-//
-
-function entityListAddPlayer(entity)
-{
-    this.entities[0]=entity;
-}
-
-function entityListAdd(entity)
-{
-    this.entities.push(entity);
-}
-
-//
-// entity list
-//
-
-function entityListCount()
-{
-    return(this.entities.length);
-}
-
-function entityListGet(entityIdx)
-{
-    return(this.entities[entityIdx]);
-}
-
-//
-// entity list object
-//
-
-function entityListObject()
+function EntityListObject()
 {
     this.entities=[];
     this.entities.push(null);       // first entity is always the player entity
     
-    this.initialize=entityListInitialize;
-    this.release=entityListRelease;
-    
-    this.addPlayer=entityListAddPlayer;
-    this.add=entityListAdd;
-    
-    this.count=entityListCount;
-    this.get=entityListGet;
+        //
+        // initialize/release entityList
+        //
+
+    this.initialize=function(view)
+    {
+        return(true);
+    };
+
+    this.rRelease=function(view)
+    {
+    };
+
+        //
+        // add to entity
+        //
+
+    this.addPlayer=function(entity)
+    {
+        this.entities[0]=entity;
+    };
+
+    this.add=function(entity)
+    {
+        this.entities.push(entity);
+    };
+
+        //
+        // entity list
+        //
+
+    this.count=function()
+    {
+        return(this.entities.length);
+    };
+
+    this.get=function(entityIdx)
+    {
+        return(this.entities[entityIdx]);
+    };
+
 }
     

@@ -1,14 +1,13 @@
 
 IMPORTANT EVENTUAL TODOs
     [ ] eventually move back to vec3 in lighting structure (sigh, windows bug)
-    [ ] eventually move back to const usage when EMCAScript6 is working in strict mode (check safari)
 
+EMCA6 TODOs
+    [ ] transfer all object to classes
+    [ ] move in the genBitmapObject constants to class based statics
+    [ ] modulize the code
+    [ ] use Math.trunc when possible instead of Math.floor
 
-
-- bones
-   - stop crossing of legs
-   - need waist bone. and random rotation
-   - need head bone
 
 ---> frustum cull the models
 

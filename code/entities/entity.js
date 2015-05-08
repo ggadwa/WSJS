@@ -1,18 +1,17 @@
 "use strict";
 
 //
-// main entity object
+// entity class
 //
-// 
 
-function entityObject(position,angle,model,isPlayer)
+function EntityObject(position,angle,model,isPlayer)
 {
     this.position=position;
     this.angle=angle;
     this.model=model;
     this.isPlayer=isPlayer;
     
-    this.collision=new collisionObject();
+    this.collision=new CollisionObject();
     
     
 }

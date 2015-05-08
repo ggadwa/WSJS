@@ -1,112 +1,10 @@
 "use strict";
 
 //
-// shader errors
+// generic shader light class
 //
 
-function shaderErrorAlert(vertScriptId,fragScriptId,errStr)
-{
-    var str='Shader Error\n';
-    if (vertScriptId!==-1) str+=('Vert Shader:'+vertScriptId+'\n');
-    if (fragScriptId!==-1) str+=('Frag Shader:'+fragScriptId+'\n');
-    str+='-----------------------\n';
-    str+=errStr;
-    
-    alert(str);
-}
-
-//
-// load shaders
-//
-
-function shaderLoadVertexShader(view,vertScriptId)
-{
-    this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
-    
-    var script=document.getElementById(vertScriptId);    
-    view.gl.shaderSource(this.vertexShader,script.text);
-    view.gl.compileShader(this.vertexShader);
-
-    if (view.gl.getShaderParameter(this.vertexShader,view.gl.COMPILE_STATUS)) return(true);
-
-    this.errorAlert(vertScriptId,-1,view.gl.getShaderInfoLog(this.vertexShader));
-    return(false);
-}
-
-function shaderLoadFragmentShader(view,fragScriptId)
-{
-    this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
-    
-    var script=document.getElementById(fragScriptId);    
-    view.gl.shaderSource(this.fragmentShader,script.text);
-    view.gl.compileShader(this.fragmentShader);
-
-    if (view.gl.getShaderParameter(this.fragmentShader,view.gl.COMPILE_STATUS)) return(true);
-
-    this.errorAlert(-1,fragScriptId,view.gl.getShaderInfoLog(this.fragmentShader));
-    return(false);
-}
-
-//
-// initialize/release shader
-//
-
-function shaderInitialize(view,vertScriptId,fragScriptId)
-{
-        // get the shaders from divs
-        
-    if (!this.loadVertexShader(view,vertScriptId)) {
-        this.release();
-        return(false);
-    }
-    
-    if (!this.loadFragmentShader(view,fragScriptId)) {
-        this.release();
-        return(false);
-    }
-
-        // compile the program
-        
-    this.program=view.gl.createProgram();
-    view.gl.attachShader(this.program,this.vertexShader);
-    view.gl.attachShader(this.program,this.fragmentShader);
-    view.gl.linkProgram(this.program);
-
-    if (!view.gl.getProgramParameter(this.program,view.gl.LINK_STATUS)) {
-        this.errorAlert(vertScriptId,fragScriptId,view.gl.getProgramInfoLog(this.program));
-        this.release();
-        return(false);
-    }
-    
-    return(true);
-}
-
-function shaderRelease(view)
-{
-    if (this.program===null) return;
-
-    if (this.vertexShader!==null) {
-        view.gl.detachShader(this.program,this.vertexShader);
-        view.gl.deleteShader(this.vertexShader);
-    }
-    
-    if (this.fragmentShader!==null) {
-        view.gl.detachShader(this.program,this.fragmentShader);
-        view.gl.deleteShader(this.fragmentShader);
-    }
-    
-    view.gl.deleteProgram(this.program);
-    
-    this.vertexShader=null;
-    this.fragmentShader=null;
-    this.program=null;
-}
-
-//
-// shader light object
-//
-
-function shaderLightObject()
+function ShaderLightObject()
 {
     this.positionUniform=null;
     this.colorUniform=null;
@@ -116,22 +14,115 @@ function shaderLightObject()
 }
 
 //
-// main shader object
+// generic shader class
 //
 
-function shaderObject()
+function ShaderObject()
 {
     this.vertexShader=null;
     this.fragmentShader=null;
     this.program=null;
     
-        // need to define these upfront
-        // so they can be called
-        
-    this.initialize=shaderInitialize;
-    this.release=shaderRelease;
+        //
+        // initialize/release shader
+        //
+
+    this.initialize=function(view,vertScriptId,fragScriptId)
+    {
+            // get the shaders from divs
+
+        if (!this.loadVertexShader(view,vertScriptId)) {
+            this.release();
+            return(false);
+        }
+
+        if (!this.loadFragmentShader(view,fragScriptId)) {
+            this.release();
+            return(false);
+        }
+
+            // compile the program
+
+        this.program=view.gl.createProgram();
+        view.gl.attachShader(this.program,this.vertexShader);
+        view.gl.attachShader(this.program,this.fragmentShader);
+        view.gl.linkProgram(this.program);
+
+        if (!view.gl.getProgramParameter(this.program,view.gl.LINK_STATUS)) {
+            this.errorAlert(vertScriptId,fragScriptId,view.gl.getProgramInfoLog(this.program));
+            this.release();
+            return(false);
+        }
+
+        return(true);
+    };
+
+    this.release=function(view)
+    {
+        if (this.program===null) return;
+
+        if (this.vertexShader!==null) {
+            view.gl.detachShader(this.program,this.vertexShader);
+            view.gl.deleteShader(this.vertexShader);
+        }
+
+        if (this.fragmentShader!==null) {
+            view.gl.detachShader(this.program,this.fragmentShader);
+            view.gl.deleteShader(this.fragmentShader);
+        }
+
+        view.gl.deleteProgram(this.program);
+
+        this.vertexShader=null;
+        this.fragmentShader=null;
+        this.program=null;
+    };
     
-    this.loadVertexShader=shaderLoadVertexShader;
-    this.loadFragmentShader=shaderLoadFragmentShader;
-    this.errorAlert=shaderErrorAlert;
- }
+        //
+        // load shaders
+        //
+
+    this.loadVertexShader=function(view,vertScriptId)
+    {
+        this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
+
+        var script=document.getElementById(vertScriptId);    
+        view.gl.shaderSource(this.vertexShader,script.text);
+        view.gl.compileShader(this.vertexShader);
+
+        if (view.gl.getShaderParameter(this.vertexShader,view.gl.COMPILE_STATUS)) return(true);
+
+        this.errorAlert(vertScriptId,-1,view.gl.getShaderInfoLog(this.vertexShader));
+        return(false);
+    };
+
+    this.loadFragmentShader=function(view,fragScriptId)
+    {
+        this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
+
+        var script=document.getElementById(fragScriptId);    
+        view.gl.shaderSource(this.fragmentShader,script.text);
+        view.gl.compileShader(this.fragmentShader);
+
+        if (view.gl.getShaderParameter(this.fragmentShader,view.gl.COMPILE_STATUS)) return(true);
+
+        this.errorAlert(-1,fragScriptId,view.gl.getShaderInfoLog(this.fragmentShader));
+        return(false);
+    };
+   
+        //
+        // shader errors
+        //
+
+    this.errorAlert=function(vertScriptId,fragScriptId,errStr)
+    {
+        var str='Shader Error\n';
+        if (vertScriptId!==-1) str+=('Vert Shader:'+vertScriptId+'\n');
+        if (fragScriptId!==-1) str+=('Frag Shader:'+fragScriptId+'\n');
+        str+='-----------------------\n';
+        str+=errStr;
+
+        alert(str);
+    };
+
+}

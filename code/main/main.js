@@ -34,8 +34,8 @@ var MONSTER_ENTITY_COUNT=5;
 // debugging and quick start up flags
 //
 
-var MAX_ROOM=1;
-var SIMPLE_LIGHTMAP=true;
+var MAX_ROOM=15;
+var SIMPLE_LIGHTMAP=false;
 
 //
 // textures to build
@@ -59,12 +59,12 @@ var wsTextureBuildList=
 // global objects
 //
 
-var view=new viewObject();
-var map=new mapObject();
-var modelList=new modelListObject();
-var entityList=new entityListObject();
-var input=new inputObject();
-var debug=new debugObject();
+var view=new ViewObject();
+var map=new MapObject();
+var modelList=new ModelListObject();
+var entityList=new EntityListObject();
+var input=new InputObject();
+var debug=new DebugObject();
 
 //
 // main loop
@@ -219,12 +219,14 @@ function wsInit()
 {
         // setup the random numbers
     
-    document.getElementById('wsBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsMapBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
     document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
+    document.getElementById('wsModelBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
     document.getElementById('wsModelRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
     document.getElementById('wsEntityRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    //document.getElementById('wsBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
+    //document.getElementById('wsMapBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
     //document.getElementById('wsMapRandom').value=123456789;
+    //document.getElementById('wsModelBitmapRandom').value=123456789;
     //document.getElementById('wsModelRandom').value=123456789;
     //document.getElementById('wsEntityRandom').value=123456789;
     
@@ -257,7 +259,7 @@ function wsInitInternal()
     
         // next step
         
-    var textureGenRandom=new genRandomObject(parseInt(document.getElementById('wsBitmapRandom').value));
+    var textureGenRandom=new GenRandomObject(parseInt(document.getElementById('wsMapBitmapRandom').value));
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Textures');
@@ -268,14 +270,14 @@ function wsInitBuildTextures(idx,textureGenRandom)
 {
     var bitmapCount=wsTextureBuildList.length;
     
-        // random seed
-
+        // start status
+        
     if (idx===0) wsStartStatusBar(bitmapCount);
     
         // generate the bitmap
     
     var setup=wsTextureBuildList[idx];
-    var genBitmap=new genBitmapObject(textureGenRandom);
+    var genBitmap=new GenBitmapObject(textureGenRandom);
     
     map.addBitmap(genBitmap.generate(view,setup[0],setup[1],debug));
     wsNextStatusBar();
@@ -283,7 +285,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
         // if more textures, then loop back around
         
     idx++;
-    if (idx<wsTextureBuildList.length) {
+    if (idx<bitmapCount) {
         setTimeout(function() { wsInitBuildTextures(idx,textureGenRandom); },10);
         return;
     }
@@ -299,12 +301,12 @@ function wsInitBuildMap()
 {
         // random seed
 
-    var mapGenRandom=new genRandomObject(parseInt(document.getElementById('wsMapRandom').value));
+    var mapGenRandom=new GenRandomObject(parseInt(document.getElementById('wsMapRandom').value));
 
         // build the map
    
-    var setup=new buildMapSetupObject(this.MAX_ROOM,3,[18000,5000,18000],3,0.25,0.8);
-    var genMap=new genMapObject(view,map,setup,mapGenRandom);
+    var setup=new BuildMapSetupObject(this.MAX_ROOM,3,[18000,5000,18000],3,0.25,0.8);
+    var genMap=new GenMapObject(view,map,setup,mapGenRandom);
     genMap.build();
     
         // next step
@@ -320,46 +322,58 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
     
-    var genLightmap=new genLightmapObject(view,map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
+    var genLightmap=new GenLightmapObject(view,map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
 
 function wsInitBuildLightmapFinish()
 {
+    var textureGenRandom=new GenRandomObject(parseInt(document.getElementById('wsModelBitmapRandom').value));
+    var modelGenRandom=new GenRandomObject(parseInt(document.getElementById('wsModelRandom').value));
+
     wsUpdateStatus();
     wsStageStatus('Building Models');
-    setTimeout(wsInitBuildModels,10);
+    setTimeout(function() { wsInitBuildModels(0,textureGenRandom,modelGenRandom); },10);
 }
 
-function wsInitBuildModels()
+function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
 {
     var n;
     var model,genSkeleton;
     
-    var modelGenRandom=new genRandomObject(parseInt(document.getElementById('wsModelRandom').value));
-    
-        // supergumba -- temporary
-        // do this all by callback alter
+        // start status
         
-    var genBitmap=new genBitmapObject(modelGenRandom);    
-    genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);
+    if (idx===0) wsStartStatusBar(MONSTER_MODEL_COUNT+1);
     
-        // player model
-
-    model=new modelObject('player');
-    genSkeleton=new genSkeletonObject(model,modelGenRandom);
-    genSkeleton.build();
+        // get a model texture
+        
+    var genBitmap=new GenBitmapObject(textureGenRandom);    
+    if (idx===0) var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);     // supergumba -- temporary!
+    
+        // player model if 0
+        
+    if (idx===0) {
+        model=new ModelObject('player');
+        genSkeleton=new GenSkeletonObject(model,modelGenRandom);
+        genSkeleton.build();
+    }
+    
+        // else a monster
+        
+    else {
+        model=new ModelObject('monster_'+(idx-1));
+        genSkeleton=new GenSkeletonObject(model,modelGenRandom);
+        genSkeleton.build();
+    }
     
     modelList.add(model);
     
-        // monster models
-    
-    for (n=0;n!==MONSTER_MODEL_COUNT;n++) {
-        model=new modelObject('monster_'+n);
-        genSkeleton=new genSkeletonObject(model,modelGenRandom);
-        genSkeleton.build();
+        // if more models, then loop back around
         
-        modelList.add(model);
+    idx++;
+    if (idx<(MONSTER_MODEL_COUNT+1)) {
+        setTimeout(function() { wsInitBuildModels(idx,textureGenRandom,modelGenRandom); },10);
+        return;
     }
     
         // next step
@@ -373,18 +387,18 @@ function wsInitBuildEntities()
 {
     var n,monsterModelName;
     
-    var entityGenRandom=new genRandomObject(parseInt(document.getElementById('wsEntityRandom').value));
+    var entityGenRandom=new GenRandomObject(parseInt(document.getElementById('wsEntityRandom').value));
     
         // make player entity
         
     var mapMid=view.OPENGL_FAR_Z/2;
-    entityList.addPlayer(new entityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),modelList.get('player'),true));
+    entityList.addPlayer(new EntityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),modelList.get('player'),true));
     
         // make monster entities
         
     for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
         monsterModelName='monster_'+entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);
-        entityList.add(new entityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),modelList.get(monsterModelName),false));
+        entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),modelList.get(monsterModelName),false));
     }
     
         // add entities to map

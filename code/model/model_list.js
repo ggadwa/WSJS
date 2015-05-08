@@ -1,57 +1,57 @@
 "use strict";
 
 //
-// initialize/release modelList
+// model list class
 //
 
-function modelListInitialize(view)
-{
-    return(this.modelShader.initialize(view));
-}
-
-function modelListRelease(view)
-{
-    this.modelShader.release(view);
-}
-
-//
-// add models
-//
-
-function modelListAdd(model)
-{
-    this.models.push(model);
-}
-
-//
-// get models
-//
-
-function modelListGet(name)
-{
-    var n;
-    var nModel=this.models.length;
-    
-    for (n=0;n!==nModel;n++) {
-        if (this.models[n].name===name) return(this.models[n]);
-    }
-    
-    return(null);
-}
-
-//
-// model list object
-//
-
-function modelListObject()
+function ModelListObject()
 {
     this.models=[];
-    this.modelShader=new modelShaderObject();
+    this.modelShader=new ModelShaderObject();
     
-    this.initialize=modelListInitialize;
-    this.release=modelListRelease;
+        //
+        // initialize/release modelList
+        //
+
+    this.initialize=function(view)
+    {
+        return(this.modelShader.initialize(view));
+    };
+
+    this.release=function(view)
+    {
+        this.modelShader.release(view);
+    };
+
+        //
+        // add models
+        //
+
+    this.add=function(model)
+    {
+        this.models.push(model);
+    };
+
+        //
+        // get models
+        //
+
+    this.get=function(name)
+    {
+        var n;
+        var nModel=this.models.length;
+
+        for (n=0;n!==nModel;n++) {
+            if (this.models[n].name===name) return(this.models[n]);
+        }
+
+        return(null);
+    };
     
-    this.add=modelListAdd;
-    this.get=modelListGet;
+    this.count=function()
+    {
+        return(this.models.length);
+    };
+
 }
     
