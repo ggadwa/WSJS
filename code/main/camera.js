@@ -15,9 +15,9 @@ function CameraObject()
     
     this.forward=function(dist,extraAngle)
     {
-        var mov=vec3.fromValues(0.0,0.0,dist);
-        vec3.rotateY(mov,mov,[0.0,0.0,0.0],glMatrix.toRadian(this.angle.y+extraAngle));
-        this.position.move(mov[0],mov[1],mov[2]);
+        var pt=new wsPoint(0.0,0.0,dist);        
+        pt.rotateY(null,(this.angle.y+extraAngle));
+        this.position.addPoint(pt);
     };
     
         //

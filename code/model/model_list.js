@@ -29,6 +29,7 @@ function ModelListObject()
 
     this.add=function(model)
     {
+        model.modelShader=this.modelShader;
         this.models.push(model);
     };
 

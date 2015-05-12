@@ -34,7 +34,7 @@ var MONSTER_ENTITY_COUNT=5;
 // debugging and quick start up flags
 //
 
-var MAX_ROOM=15;
+var MAX_ROOM=25;
 var SIMPLE_LIGHTMAP=false;
 
 //
@@ -339,7 +339,7 @@ function wsInitBuildLightmapFinish()
 function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
 {
     var n;
-    var model,genSkeleton;
+    var model,genSkeleton,genModelMesh;
     
         // start status
         
@@ -348,23 +348,27 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
         // get a model texture
         
     var genBitmap=new GenBitmapObject(textureGenRandom);    
-    if (idx===0) var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);     // supergumba -- temporary!
+    var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);
+    
+    wsNextStatusBar();
     
         // player model if 0
+        // else a monster
         
     if (idx===0) {
         model=new ModelObject('player');
-        genSkeleton=new GenSkeletonObject(model,modelGenRandom);
-        genSkeleton.build();
     }
-    
-        // else a monster
-        
     else {
         model=new ModelObject('monster_'+(idx-1));
-        genSkeleton=new GenSkeletonObject(model,modelGenRandom);
-        genSkeleton.build();
     }
+    
+        // build the skeleton and mesh
+        
+    genSkeleton=new GenSkeletonObject(model,modelGenRandom);
+    genSkeleton.build();
+    
+    genModelMesh=new GenModelMeshObject(model,modelBitmap,modelGenRandom);
+    genModelMesh.build(view);
     
     modelList.add(model);
     

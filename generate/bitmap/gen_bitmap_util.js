@@ -266,8 +266,7 @@ function GenBitmapUtilityObject(genRandom)
 
     this.clearNormalsRect=function(ctx,lft,top,rgt,bot)
     {
-        var normal=vec3.fromValues(-1.0,-1.0,1.0);
-        this.drawRect(ctx,lft,top,rgt,bot,this.normalToRGBColor(normal));
+        this.drawRect(ctx,lft,top,rgt,bot,this.normalToRGBColor([-1.0,-1.0,1.0]));
     };
 
         //

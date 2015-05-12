@@ -48,6 +48,10 @@ function GenSkeletonObject(model,genRandom)
     this.build=function()
     {
         var ang;
+        
+            // build empty skeleton
+            
+        this.model.skeleton=new ModelSkeletonObject();
         var bones=this.model.skeleton.bones;
 
             // random sizes

@@ -9,6 +9,7 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
+---> remove the matrix js
 ---> frustum cull the models
 
 - when building view light list, ignore ones behind the player (pick better lights)

@@ -1,6 +1,12 @@
 "use strict";
 
 //
+// conversion constants
+//
+
+var DEGREE_TO_RAD=Math.PI/180.0;
+
+//
 // points and rects objects
 //
 
@@ -37,19 +43,77 @@ function wsPoint(x,y,z)
         this.y-=pt.y;
         this.z-=pt.z;
     };
-                
+    
+    this.rotateX=function(centerPt,rotX)
+    {
+        if (centerPt!==null) {
+            this.y-=centerPt.y;
+            this.z-=centerPt.z;
+        }
+        
+        var rd=rotX*DEGREE_TO_RAD;
+        
+        var y=(this.y*Math.cos(rd))-(this.z*Math.sin(rd));
+        var z=(this.y*Math.sin(rd))+(this.z*Math.cos(rd));
+
+        if (centerPt!==null) {
+            y+=centerPt.y;
+            z+=centerPt.z;
+        }
+        
+        this.y=y;
+        this.z=z;
+    };
+    
+    this.rotateY=function(centerPt,rotY)
+    {
+        if (centerPt!==null) {
+            this.x-=centerPt.x;
+            this.z-=centerPt.z;
+        }
+        
+        var rd=rotY*DEGREE_TO_RAD;
+        
+        var x=(this.z*Math.sin(rd))+(this.x*Math.cos(rd));
+        var z=(this.z*Math.cos(rd))-(this.x*Math.sin(rd));
+
+        if (centerPt!==null) {
+            x+=centerPt.x;
+            z+=centerPt.z;
+        }
+        
+        this.x=x;
+        this.z=z;
+    };
+    
+    this.rotateZ=function(centerPt,rotZ)
+    {
+        if (centerPt!==null) {
+            this.x-=centerPt.x;
+            this.y-=centerPt.y;
+        }
+        
+        var rd=rotZ*DEGREE_TO_RAD;
+        
+        var x=(this.x*Math.cos(rd))-(this.y*Math.sin(rd));
+        var y=(this.x*Math.sin(rd))+(this.y*Math.cos(rd));
+        
+        if (centerPt!==null) {
+            x+=centerPt.x;
+            y+=centerPt.y;
+        }
+        
+        this.x=x;
+        this.y=y;
+    };
+      
     this.rotateAroundPoint=function(centerPt,ang)
     {
-        var v3pt=vec3.fromValues(this.x,this.y,this.z);
-        var v3center=vec3.fromValues(centerPt.x,centerPt.y,centerPt.z);
-        vec3.rotateX(v3pt,v3pt,v3center,glMatrix.toRadian(ang.x));
-        vec3.rotateY(v3pt,v3pt,v3center,glMatrix.toRadian(ang.y));
-        vec3.rotateZ(v3pt,v3pt,v3center,glMatrix.toRadian(ang.z));
-        this.x=v3pt[0];
-        this.y=v3pt[1];
-        this.z=v3pt[2];
+        this.rotateX(centerPt,ang.x);
+        this.rotateY(centerPt,ang.y);
+        this.rotateZ(centerPt,ang.z);
     };
-               
+   
     this.noSquareDistance=function(pt)
     {
         var px=this.x-pt.x;
@@ -74,11 +138,6 @@ function wsPoint(x,y,z)
     this.distanceByTriplet=function(kx,ky,kz)
     {
         return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
-    };
-    
-    this.toVec3=function()
-    {
-        return(vec3.fromValues(this.x,this.y,this.z));
     };
     
     this.copy=function()

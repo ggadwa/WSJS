@@ -21,7 +21,7 @@ function ViewObject()
     this.wid=0;
     this.high=0;
     this.aspect=0.0;
-    this.lookAtUpVector=vec3.fromValues(0.0,1.0,0.0);
+    this.lookAtUpVector=new wsPoint(0.0,1.0,0.0);
 
         // the gl matrixes
         
@@ -121,6 +121,66 @@ function ViewObject()
     };
     
         //
+        // build look at matrix
+        //
+     
+    this.buildLookAt=function(eyePos,centerPos,up)
+    {
+        var x0, x1, x2, y0, y1, y2, z0, z1, z2, f;
+
+        z0=eyePos.x-centerPos.x;
+        z1=eyePos.y-centerPos.y;
+        z2=eyePos.z-centerPos.z;
+
+        f=Math.sqrt((z0*z0)+(z1*z1)+(z2*z2));
+        f=1.0/f;
+        z0*=f;
+        z1*=f;
+        z2*=f;
+
+        x0=(up.y*z2)-(up.z*z1);
+        x1=(up.z*z0)-(up.x*z2);
+        x2=(up.x*z1)-(up.y*z0);
+        
+        f=Math.sqrt((x0*x0)+(x1*x1)+(x2*x2));
+        if (f!==0.0) f=1.0/f;
+        x0*=f;
+        x1*=f;
+        x2*=f;
+
+        y0=(z1*x2)-(z2*x1);
+        y1=(z2*x0)-(z0*x2);
+        y2=(z0*x1)-(z1*x0);
+
+        f=Math.sqrt((y0*y0)+(y1*y1)+(y2*y2));
+        if (f!==0.0) f=1.0/f;
+        y0*=f;
+        y1*=f;
+        y2*=f;
+
+        var mat=new Float32Array(16);
+
+        mat[0]=x0;
+        mat[1]=y0;
+        mat[2]=z0;
+        mat[3]=0.0;
+        mat[4]=x1;
+        mat[5]=y1;
+        mat[6]=z1;
+        mat[7]=0.0;
+        mat[8]=x2;
+        mat[9]=y2;
+        mat[10]=z2;
+        mat[11]=0.0;
+        mat[12]=-((x0*eyePos.x)+(x1*eyePos.y)+(x2*eyePos.z));
+        mat[13]=-((y0*eyePos.x)+(y1*eyePos.y)+(y2*eyePos.z));
+        mat[14]=-((z0*eyePos.x)+(z1*eyePos.y)+(z2*eyePos.z));
+        mat[15]=1.0;
+
+        return(mat);
+    };
+    
+        //
         // draw view
         //
 
@@ -143,15 +203,13 @@ function ViewObject()
             // get the eye point and rotate it
             // around the view position
 
-        var eye=vec3.create();
-        var pos=camera.position.toVec3();
-        vec3.add(eye,pos,vec3.fromValues(0.0,0.0,-this.OPENGL_NEAR_Z));
-        vec3.rotateX(eye,eye,pos,glMatrix.toRadian(camera.angle.x));
-        vec3.rotateY(eye,eye,pos,glMatrix.toRadian(camera.angle.y));
+        var eyePos=new wsPoint(camera.position.x,camera.position.y,(camera.position.z-this.OPENGL_NEAR_Z));
+        eyePos.rotateX(camera.position,camera.angle.x);
+        eyePos.rotateY(camera.position,camera.angle.y);
 
             // setup the look at
 
-        mat4.lookAt(this.modelMatrix,eye,pos,this.lookAtUpVector);
+        this.modelMatrix=this.buildLookAt(eyePos,camera.position,this.lookAtUpVector);
 
             // create the 3x3 normal matrix
             // the normal is the invert-transpose of the model matrix
@@ -184,6 +242,10 @@ function ViewObject()
             entity=entityList.get(n);
             if (entity.isPlayer) continue;
 
+            entity.drawStart(this);
+            entity.draw(this);
+            entity.drawEnd(this);
+            
             debug.drawModelSkeleton(this,entity.model,entity.position);
             drawModelCount++;
         }
@@ -201,7 +263,7 @@ function ViewObject()
 
         var countStr=drawMeshCount.toString()+"/"+drawModelCount.toString();
 
-        var posStr=Math.floor(camera.position.x)+','+Math.floor(camera.position.y)+','+Math.floor(camera.position.z);
+        var posStr=Math.floor(camera.position.x)+','+Math.floor(camera.position.y)+','+Math.floor(camera.position.z)+':'+Math.floor(camera.angle.y);
 
         this.text.drawStart(this);
         this.text.draw(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));

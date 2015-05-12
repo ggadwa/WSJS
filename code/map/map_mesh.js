@@ -161,22 +161,22 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
     this.getTriangleVertex=function(trigIdx,vertexIdx)
     {
         var vIdx=this.indexes[(trigIdx*3)+vertexIdx]*3;
-        return(vec3.fromValues(this.vertices[vIdx],this.vertices[vIdx+1],this.vertices[vIdx+2]));
+        return(new wsPoint(this.vertices[vIdx],this.vertices[vIdx+1],this.vertices[vIdx+2]));
     };
 
     this.getTriangleBounds=function(trigIdx)
     {
         var v=this.getTriangleVertex(trigIdx,0);
 
-        var xBound=new wsBound(v[0],v[0]);
-        var yBound=new wsBound(v[1],v[1]);
-        var zBound=new wsBound(v[2],v[2]);
+        var xBound=new wsBound(v.x,v.x);
+        var yBound=new wsBound(v.y,v.y);
+        var zBound=new wsBound(v.z,v.z);
 
         for (var n=1;n!==3;n++) {
             v=this.getTriangleVertex(trigIdx,n);
-            xBound.adjust(v[0]);
-            yBound.adjust(v[1]);
-            zBound.adjust(v[2]);
+            xBound.adjust(v.x);
+            yBound.adjust(v.y);
+            zBound.adjust(v.z);
         }
 
         return([xBound,yBound,zBound]);
@@ -191,8 +191,8 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
             // if all the Xs of Zs are equal,
             // consider it a straight wall
 
-        if ((v0[0]===v1[0]) && (v0[0]===v2[0])) return(true);
-        if ((v0[1]===v1[1]) && (v0[1]===v2[1])) return(true);
+        if ((v0.x===v1.x) && (v0.x===v2.x)) return(true);
+        if ((v0.z===v1.z) && (v0.z===v2.z)) return(true);
 
         return(false);
     };

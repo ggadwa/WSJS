@@ -44,6 +44,30 @@ function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     };
+    
+        //
+        // supergumba -- TEMPORARY!!!  Just moving mesh to
+        // line up with entity position!
+        //
+        
+    this.tempMoveUpdateVertexes=function(view,offsetPosition)
+    {
+        var n,vIdx;
+        var gl=view.gl;
+        
+        vIdx=0;
+        var v2=new Float32Array(this.vertices.length);
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v2[vIdx]=this.vertices[vIdx]+offsetPosition.x;
+            v2[vIdx+1]=this.vertices[vIdx+1]+offsetPosition.y;
+            v2[vIdx+2]=this.vertices[vIdx+2]+offsetPosition.z;
+            vIdx+=3;
+        }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,v2,gl.DYNAMIC_DRAW);
+    };
 
         //
         // model mesh gl binding
@@ -59,7 +83,7 @@ function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag
 
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
 
         this.vertexNormalBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
@@ -92,7 +116,7 @@ function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag
         gl.vertexAttribPointer(modelShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
-        gl.vertexAttribPointer(modelShader.vertexUVAttribute,4,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(modelShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
     };
