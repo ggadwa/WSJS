@@ -358,7 +358,7 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
         var lightBoundX,lightBoundY,lightBoundZ;
         var dist,att;
         var col=new wsColor(0.0,0.0,0.0);
-        var lightVectorNormal=vec3.create();
+        var lightVectorNormal=new wsPoint(0.0,0.0,0.0);
 
             // we have a list of mesh/light intersections we
             // use to reduce the number of lights we check for
@@ -390,9 +390,9 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
                 // ignore all triangles that are facing
                 // away from the light
 
-            lightVectorNormal=vec3.fromValues(lightVectorX,lightVectorY,lightVectorZ);
-            vec3.normalize(lightVectorNormal,lightVectorNormal);
-            if (vec3.dot(lightVectorNormal,normal)<0.0) continue;
+            lightVectorNormal.set(lightVectorX,lightVectorY,lightVectorZ);
+            lightVectorNormal.normalize();
+            if (lightVectorNormal.dot(normal)<0.0) continue;
 
                 // light bounding
 
@@ -602,7 +602,7 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
 
         vIdx=mesh.indexes[trigIdx*3]*3;
         var v0=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
-        var normal=vec3.fromValues(mesh.normals[vIdx],mesh.normals[vIdx+1],mesh.normals[vIdx+2]);
+        var normal=new wsPoint(mesh.normals[vIdx],mesh.normals[vIdx+1],mesh.normals[vIdx+2]);
 
         vIdx=mesh.indexes[(trigIdx*3)+1]*3;
         var v1=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);

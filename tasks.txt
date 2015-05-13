@@ -1,6 +1,7 @@
 
 IMPORTANT EVENTUAL TODOs
     [ ] eventually move back to vec3 in lighting structure (sigh, windows bug)
+    [ ] remove uncessary .xyz in shaders because of above change
 
 EMCA6 TODOs
     [ ] transfer all object to classes

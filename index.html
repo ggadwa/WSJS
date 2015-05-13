@@ -108,7 +108,7 @@
 
             // translate the light 0 vector
 
-        lvct=light_0.position.xyz-vertexPosition;
+        lvct=light_0.position.xyz-vtx;
         lightDistance_0=length(lvct);
 
         lightVertexVector_0.x=dot(lvct,tangentSpaceTangent);
@@ -117,7 +117,7 @@
 
             // translate the light 1 vector
 
-        lvct=light_1.position.xyz-vertexPosition;
+        lvct=light_1.position.xyz-vtx;
         lightDistance_1=length(lvct);
 
         lightVertexVector_1.x=dot(lvct,tangentSpaceTangent);
@@ -126,7 +126,7 @@
 
             // translate the light 2 vector
 
-        lvct=light_2.position.xyz-vertexPosition;
+        lvct=light_2.position.xyz-vtx;
         lightDistance_2=length(lvct);
 
         lightVertexVector_2.x=dot(lvct,tangentSpaceTangent);
@@ -135,7 +135,7 @@
 
             // translate the light 3 vector
 
-        lvct=light_3.position.xyz-vertexPosition;
+        lvct=light_3.position.xyz-vtx;
         lightDistance_3=length(lvct);
 
         lightVertexVector_3.x=dot(lvct,tangentSpaceTangent);
@@ -311,6 +311,7 @@
 
             // finally create the pixel
 
+        //gl_FragColor.rgb=texture2D(lightmapTex,fragUV.zw).rgb; // light map test
         gl_FragColor.rgb=(tex.rgb*pixelAmbient)+spec;
         gl_FragColor.a=tex.a;
     }

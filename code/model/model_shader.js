@@ -128,7 +128,7 @@ function ModelShaderObject()
 
                 // otherwise setup the light
 
-            gl.uniform4f(light.positionUniform,viewLight.position.x,viewLight.position.y,viewLight.position.z,1.0);
+            gl.uniform4f(light.positionUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,1.0);
             if (viewLight.inLightmap) {
                 gl.uniform4f(light.colorUniform,0.0,0.0,0.0,0.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
             }

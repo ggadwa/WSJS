@@ -337,7 +337,9 @@ function MapObject()
                     break;
                 }
             }
-
+            
+                // build the eye coordinate version
+                
             if (idx===-1) {
                 if (view.lights.length<view.LIGHT_COUNT) view.lights.push(light);
             }

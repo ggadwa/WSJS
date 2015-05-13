@@ -431,18 +431,18 @@ function MapPieceListObject()
 
         mapPiece=new MapPieceObject(false);
 
-        mapPiece.points.push([4,0]);
-        mapPiece.points.push([6,0]);
-        mapPiece.points.push([6,4]);
-        mapPiece.points.push([100,4]);
-        mapPiece.points.push([100,6]);
-        mapPiece.points.push([6,6]);
-        mapPiece.points.push([6,100]);
-        mapPiece.points.push([4,100]);
-        mapPiece.points.push([4,6]);
-        mapPiece.points.push([0,6]);
-        mapPiece.points.push([0,4]);
-        mapPiece.points.push([4,4]);
+        mapPiece.points.push([40,0]);
+        mapPiece.points.push([60,0]);
+        mapPiece.points.push([60,40]);
+        mapPiece.points.push([100,40]);
+        mapPiece.points.push([100,60]);
+        mapPiece.points.push([60,60]);
+        mapPiece.points.push([60,100]);
+        mapPiece.points.push([40,100]);
+        mapPiece.points.push([40,60]);
+        mapPiece.points.push([0,60]);
+        mapPiece.points.push([0,40]);
+        mapPiece.points.push([40,40]);
 
         this.add(mapPiece);
 
@@ -473,7 +473,7 @@ function MapPieceListObject()
 
             // U
 
-        mapPiece=new MapPieceObject(false);
+        mapPiece=new MapPieceObject(true);
 
         mapPiece.points.push([0,0]);
         mapPiece.points.push([20,0]);
@@ -495,6 +495,29 @@ function MapPieceListObject()
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
         mapPiece.points.push([0,20]);
+
+        this.add(mapPiece);   
+        
+            // S
+
+        mapPiece=new MapPieceObject(false);
+
+        mapPiece.points.push([0,100]);
+        mapPiece.points.push([0,80]);
+        mapPiece.points.push([0,60]);
+        mapPiece.points.push([0,40]);
+        mapPiece.points.push([40,0]);
+        mapPiece.points.push([60,0]);
+        mapPiece.points.push([80,0]);
+        mapPiece.points.push([100,0]);
+        mapPiece.points.push([100,20]);
+        mapPiece.points.push([100,40]);
+        mapPiece.points.push([80,40]);
+        mapPiece.points.push([60,50]);
+        mapPiece.points.push([50,60]);
+        mapPiece.points.push([40,80]);
+        mapPiece.points.push([40,100]);
+        mapPiece.points.push([20,100]);
 
         this.add(mapPiece);   
     };

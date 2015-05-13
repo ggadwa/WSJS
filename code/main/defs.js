@@ -129,6 +129,36 @@ function wsPoint(x,y,z)
         var pz=this.z-kz;
         return((px*px)+(py*py)+(pz*pz));
     };
+    
+    this.normalize=function()
+    {
+        var f=Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z));
+        if (f!==0.0) f=1.0/f;
+        
+        this.x*=f;
+        this.y*=f;
+        this.z*=f;
+    };
+    
+    this.dot=function(pt)
+    {
+        return((this.x*pt.x)+(this.y*pt.y)+(this.z*pt.z));
+    };
+
+    this.cross=function(pt)
+    {
+        var x=(this.y*pt.z)-(this.z*pt.y);
+        var y=(this.z*pt.x)-(this.x*pt.z);
+        var z=(this.x*pt.y)-(this.y*pt.x);
+        return(new wsPoint(x,y,z));
+    };
+    
+    this.scale=function(f)
+    {
+        this.x*=f;
+        this.y*=f;
+        this.z*=f;
+    };
                 
     this.distance=function(pt)
     {

@@ -121,6 +121,19 @@ function ViewObject()
     };
     
         //
+        // convert coordinate to eye coordinates
+        //
+    
+    this.convertToEyeCoordinates=function(pt)
+    {
+        var x=(pt.x*this.modelMatrix[0])+(pt.y*this.modelMatrix[4])+(pt.z*this.modelMatrix[8])+this.modelMatrix[12];
+        var y=(pt.x*this.modelMatrix[1])+(pt.y*this.modelMatrix[5])+(pt.z*this.modelMatrix[9])+this.modelMatrix[13];
+        var z=(pt.x*this.modelMatrix[2])+(pt.y*this.modelMatrix[6])+(pt.z*this.modelMatrix[10])+this.modelMatrix[14];
+        
+        return(new wsPoint(x,y,z));
+    };
+    
+        //
         // build look at matrix
         //
      
@@ -187,13 +200,10 @@ function ViewObject()
     this.draw=function(map,entityList)
     {
         var n,nEntity,entity;
+        var light;
         var drawMeshCount=0;
         var drawModelCount=0;
         var camera=this.camera;
-
-            // convert view lights to shader lights
-
-        map.createViewLightsFromMapLights(this,camera);
 
             // create the perspective matrix
 
@@ -223,6 +233,17 @@ function ViewObject()
             // the 2D ortho matrix
 
         mat4.ortho(this.orthoMatrix,0.0,this.wid,this.high,0.0,-1.0,1.0);
+        
+            // convert view lights to shader lights
+            // all lights need a eye coordinate, so calc
+            // that here
+
+        map.createViewLightsFromMapLights(this,camera);
+        
+        for (n=0;n!==this.LIGHT_COUNT;n++) {
+            light=this.lights[n];
+            if (light!==null) light.eyePosition=this.convertToEyeCoordinates(light.position);
+        }
 
             // build the culling frustum
 

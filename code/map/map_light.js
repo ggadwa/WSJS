@@ -7,6 +7,7 @@
 function MapLightObject(position,color,inLightmap,intensity,exponent)
 {
     this.position=position;     // should be wsPoint
+    this.eyePosition=null;      // the eye position in the current render, setup when added to view light list
     this.color=color;           // should be wsColor
     this.intensity=intensity;
     this.invertIntensity=1.0/intensity;

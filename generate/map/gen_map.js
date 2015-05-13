@@ -144,19 +144,21 @@ function GenMapObject(view,map,setup,genRandom)
     this.addDecorationBox=function(map,xBound,yBound,zBound)
     {
         var n,count;
-        var x,z,boxBoundX,boxBoundY,boxBoundZ;
+        var x,z,high,boxBoundX,boxBoundY,boxBoundZ;
         var meshPrimitives=new MeshPrimitivesObject();
 
         count=this.genRandom.randomInt(1,3);
 
-        boxBoundY=new wsBound(yBound.max-2000,yBound.max);
-
         for (n=0;n!==count;n++) {
-            x=this.genRandom.randomInBetween(xBound.min,xBound.max);
-            z=this.genRandom.randomInBetween(zBound.min,zBound.max);
+            x=this.genRandom.randomInBetween((xBound.min+1000),(xBound.max-1000));
+            z=this.genRandom.randomInBetween((zBound.min+1000),(zBound.max-1000));
+            
+            high=2000;
+            if (this.genRandom.random()>0.5) high=3500;
 
-            boxBoundX=new wsBound(x-1000,x+1000);
-            boxBoundZ=new wsBound(z-1000,z+1000);
+            boxBoundX=new wsBound((x-1000),(x+1000));
+            boxBoundY=new wsBound((yBound.max-high),yBound.max);
+            boxBoundZ=new wsBound((z-1000),(z+1000));
             map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,0));
         }
     };
@@ -248,17 +250,35 @@ function GenMapObject(view,map,setup,genRandom)
         }
     };
 
-    this.addLight=function(piece,xBound,yBound,zBound)
+    this.addLight=function(piece,storyCount,xBound,yBound,zBound)
     {
             // light point
 
         var lightX=xBound.getMidPoint();
         var lightZ=zBound.getMidPoint();
+        
+        var lightY=yBound.min;
+        var poleY=lightY;
+        if (storyCount>1) {
+            var storyAdd=yBound.max-yBound.min;
+            lightY+=(storyAdd*(storyCount-1))-Math.floor(storyAdd/4);
+        }
+        
+            // pole
+            
+        if (lightY>poleY) {
+            var xPoleBound=new wsBound((lightX-100),(lightX+100));
+            var yPoleBound=new wsBound(poleY,lightY);
+            var zPoleBound=new wsBound((lightZ-100),(lightZ+100));
+            
+            var meshPrimitives=new MeshPrimitivesObject();
+            this.map.addMesh(meshPrimitives.createMeshCube(this.map.getBitmapById(BITMAP_METAL),xPoleBound,yPoleBound,zPoleBound,true,true,true,true,true,false,false,this.map.MESH_FLAG_LIGHT));
+        }
 
             // light fixture
 
         var xLightBound=new wsBound((lightX-400),(lightX+400));
-        var yLightBound=new wsBound(yBound.min,(yBound.min+1000));
+        var yLightBound=new wsBound(lightY,(lightY+1000));
         var zLightBound=new wsBound((lightZ-400),(lightZ+400));
 
         var meshPrimitives=new MeshPrimitivesObject();
@@ -269,7 +289,7 @@ function GenMapObject(view,map,setup,genRandom)
 
         var intensity=xBound.max-xBound.min*0.95;
 
-        var pt=new wsPoint(lightX,(yLightBound.max+100),lightZ);
+        var pt=new wsPoint(lightX,(lightY+1100),lightZ);
         if (this.map.pointInLight(pt)) intensity*=0.8;
 
             // the color
@@ -427,7 +447,7 @@ function GenMapObject(view,map,setup,genRandom)
 
             // add the light
 
-        this.addLight(piece,xBound,yStoryBound,zBound);
+        this.addLight(piece,storyCount,xBound,yStoryBound,zBound);
 
             // have we recursed too far?
 
