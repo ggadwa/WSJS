@@ -34,7 +34,7 @@ var MONSTER_ENTITY_COUNT=5;
 // debugging and quick start up flags
 //
 
-var MAX_ROOM=25;
+var MAX_ROOM=5;
 var SIMPLE_LIGHTMAP=false;
 
 //

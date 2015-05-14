@@ -27,7 +27,7 @@ function GenRandomObject(seed)
     {
         return(startInt+Math.floor(this.random()*extraInt));
     };
-
+    
     this.randomInBetween=function(startInt,endInt)
     {
         return(this.randomInt(startInt,(endInt-startInt)));

@@ -311,7 +311,7 @@
 
             // finally create the pixel
 
-        //gl_FragColor.rgb=texture2D(lightmapTex,fragUV.zw).rgb; // light map test
+        //gl_FragColor.rgb=tex.rgb*texture2D(lightmapTex,fragUV.zw).rgb; // light map test
         gl_FragColor.rgb=(tex.rgb*pixelAmbient)+spec;
         gl_FragColor.a=tex.a;
     }

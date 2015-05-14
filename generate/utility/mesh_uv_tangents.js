@@ -14,7 +14,9 @@ function MeshUVTangentsObject()
     {
         var n,nTrig,nVertex,trigIdx;
         var idx,v0Idx,v1Idx,v2Idx;
-        var v0,v1,v2;
+        var v0=new wsPoint(0.0,0.0,0.0);
+        var v1=new wsPoint(0.0,0.0,0.0);
+        var v2=new wsPoint(0.0,0.0,0.0);
         var flat;
 
             // default all the normals
@@ -33,22 +35,22 @@ function MeshUVTangentsObject()
             // or out, a mesh is meant to be inside or
             // outside
 
-        var meshCenter=vec3.fromValues(0.0,0.0,0.0);
+        var meshCenter=new wsPoint(0.0,0.0,0.0);
 
         idx=0;
 
         for (n=0;n!==nVertex;n++) {
-            meshCenter[0]+=vertices[idx++];
-            meshCenter[1]+=vertices[idx++];
-            meshCenter[2]+=vertices[idx++];
+            meshCenter.x+=vertices[idx++];
+            meshCenter.y+=vertices[idx++];
+            meshCenter.z+=vertices[idx++];
         }
 
-        meshCenter[0]/=nVertex;
-        meshCenter[1]/=nVertex;
-        meshCenter[2]/=nVertex;
+        meshCenter.x/=nVertex;
+        meshCenter.y/=nVertex;
+        meshCenter.z/=nVertex;
 
-        var trigCenter=vec3.create();
-        var faceVct=vec3.create();
+        var trigCenter=new wsPoint(0.0,0.0,0.0);
+        var faceVct=new wsPoint(0.0,0.0,0.0);
         var flip;
 
             // generate normals by the trigs
@@ -57,9 +59,9 @@ function MeshUVTangentsObject()
             // constant shared vertices against
             // triangle normals
 
-        var p10=vec3.create();
-        var p20=vec3.create();
-        var normal=vec3.create();
+        var p10=new wsPoint(0.0,0.0,0.0);
+        var p20=new wsPoint(0.0,0.0,0.0);
+        var normal=new wsPoint(0.0,0.0,0.0);
 
         nTrig=Math.floor(indexes.length/3);
 
@@ -77,28 +79,28 @@ function MeshUVTangentsObject()
             v1Idx=indexes[trigIdx+1]*3;
             v2Idx=indexes[trigIdx+2]*3;
 
-            v0=vec3.fromValues(vertices[v0Idx],vertices[v0Idx+1],vertices[v0Idx+2]);
-            v1=vec3.fromValues(vertices[v1Idx],vertices[v1Idx+1],vertices[v1Idx+2]);
-            v2=vec3.fromValues(vertices[v2Idx],vertices[v2Idx+1],vertices[v2Idx+2]);
+            v0.set(vertices[v0Idx],vertices[v0Idx+1],vertices[v0Idx+2]);
+            v1.set(vertices[v1Idx],vertices[v1Idx+1],vertices[v1Idx+2]);
+            v2.set(vertices[v2Idx],vertices[v2Idx+1],vertices[v2Idx+2]);
 
                 // detect special flat surfaces that have
                 // predictable normals
 
             flat=false;
 
-            if ((v0[0]===v1[0]) && (v0[0]===v2[0])) {
+            if ((v0.x===v1.x) && (v0.x===v2.x)) {
                 flat=true;
-                normal=vec3.fromValues(-1.0,0.0,0.0);
+                normal.set(-1.0,0.0,0.0);
             }
             else {
-                if ((v0[1]===v1[1]) && (v0[1]===v2[1])) {
+                if ((v0.y===v1.y) && (v0.y===v2.y)) {
                     flat=true;
-                    normal=vec3.fromValues(0.0,-1.0,0.0);
+                    normal.set(0.0,-1.0,0.0);
                 }
                 else {
-                    if ((v0[2]===v1[2]) && (v0[2]===v2[2])) {
+                    if ((v0.z===v1.z) && (v0.z===v2.z)) {
                         flat=true;
-                        normal=vec3.fromValues(0.0,0.0,-1.0);
+                        normal.set(0.0,0.0,-1.0);
                     }   
                 }
             }
@@ -107,10 +109,10 @@ function MeshUVTangentsObject()
                 // by the cross product
 
             if (!flat) {
-                vec3.sub(p10,v1,v0);
-                vec3.sub(p20,v2,v0);
-                vec3.cross(normal,p10,p20);
-                vec3.normalize(normal,normal);
+                p10.setFromSubPoint(v1,v0);
+                p20.setFromSubPoint(v2,v0);
+                normal.setFromCross(p10,p20);
+                normal.normalize();
             }
 
                 // determine if we need to flip
@@ -119,28 +121,29 @@ function MeshUVTangentsObject()
                 // more towards the center or more
                 // away from it
 
-            trigCenter=vec3.fromValues(((v0[0]+v1[0]+v2[0])/3),((v0[1]+v1[1]+v2[1])/3),((v0[2]+v1[2]+v2[2])/3));
-            vec3.sub(faceVct,trigCenter,meshCenter);
+            trigCenter.set(((v0.x+v1.x+v2.x)/3),((v0.y+v1.y+v2.y)/3),((v0.z+v1.z+v2.z)/3));
+            faceVct.set(((v0.x+v1.x+v2.x)/3),((v0.y+v1.y+v2.y)/3),((v0.z+v1.z+v2.z)/3));
+            faceVct.setFromSubPoint(trigCenter,meshCenter);
 
-            flip=(vec3.dot(normal,faceVct)>0.0);
+            flip=(normal.dot(faceVct)>0.0);
             if (!normalsIn) flip=!flip;
 
-            if (flip) vec3.scale(normal,normal,-1.0);
+            if (flip) normal.scale(-1.0);
 
                 // and set the mesh normal
                 // to all vertexes in this trig
 
-            normals[v0Idx]=normal[0];
-            normals[v0Idx+1]=normal[1];
-            normals[v0Idx+2]=normal[2];
+            normals[v0Idx]=normal.x;
+            normals[v0Idx+1]=normal.y;
+            normals[v0Idx+2]=normal.z;
 
-            normals[v1Idx]=normal[0];
-            normals[v1Idx+1]=normal[1];
-            normals[v1Idx+2]=normal[2];
+            normals[v1Idx]=normal.x;
+            normals[v1Idx+1]=normal.y;
+            normals[v1Idx+2]=normal.z;
 
-            normals[v2Idx]=normal[0];
-            normals[v2Idx+1]=normal[1];
-            normals[v2Idx+2]=normal[2];
+            normals[v2Idx]=normal.x;
+            normals[v2Idx+1]=normal.y;
+            normals[v2Idx+2]=normal.z;
         }
 
         return(normals);

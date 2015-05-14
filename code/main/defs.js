@@ -22,6 +22,28 @@ function wsPoint(x,y,z)
         this.y=ySet;
         this.z=zSet;
     };
+    
+    this.setFromAddPoint=function(pt1,pt2)
+    {
+        this.x=pt1.x+pt2.x;
+        this.y=pt1.y+pt2.y;
+        this.z=pt1.z+pt2.z;
+    };
+    
+    this.setFromSubPoint=function(pt1,pt2)
+    {
+        this.x=pt1.x-pt2.x;
+        this.y=pt1.y-pt2.y;
+        this.z=pt1.z-pt2.z;
+    };
+    
+    this.setFromCross=function(pt1,pt2)
+    {
+        this.x=pt1.x;
+        this.y=pt1.y;
+        this.z=pt1.z;
+        this.cross(pt2);
+    };
                 
     this.move=function(xAdd,yAdd,zAdd)
     {
