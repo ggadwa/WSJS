@@ -25,10 +25,10 @@ function ViewObject()
 
         // the gl matrixes
         
-    this.perspectiveMatrix=mat4.create();
-    this.modelMatrix=mat4.create();
-    this.normalMatrix=mat3.create();
-    this.orthoMatrix=mat4.create();
+    this.perspectiveMatrix=null;
+    this.modelMatrix=null;
+    this.normalMatrix=null;
+    this.orthoMatrix=null;
     
         // view lighting
         
@@ -134,12 +134,81 @@ function ViewObject()
     };
     
         //
+        // build perspective and ortho matrix
+        //
+
+    this.buildPerspectiveMatrix=function()
+    {
+        var fov=1.0/Math.tan(this.OPENGL_FOV*0.5);
+        var dist=1.0/(this.OPENGL_NEAR_Z-this.OPENGL_FAR_Z);
+        
+            // create the perspective matrix
+            
+        var mat=new Float32Array(16);
+        
+        mat[0]=fov/this.aspect;
+        mat[1]=0.0;
+        mat[2]=0.0;
+        mat[3]=0.0;
+        mat[4]=0.0;
+        mat[5]=fov;
+        mat[6]=0.0;
+        mat[7]=0.0;
+        mat[8]=0.0;
+        mat[9]=0.0;
+        mat[10]=(this.OPENGL_FAR_Z+this.OPENGL_NEAR_Z)*dist;
+        mat[11]=-1.0;
+        mat[12]=0.0;
+        mat[13]=0.0;
+        mat[14]=((this.OPENGL_FAR_Z*this.OPENGL_NEAR_Z)*2.0)*dist;
+        mat[15]=0.0;
+        
+            // now translate it for the near_z
+                     
+        mat[12]+=(mat[8]*this.OPENGL_NEAR_Z);
+        mat[13]+=(mat[9]*this.OPENGL_NEAR_Z);
+        mat[14]+=(mat[10]*this.OPENGL_NEAR_Z);
+        mat[15]+=(mat[11]*this.OPENGL_NEAR_Z);
+    
+        return(mat);
+    };
+    
+    this.buildOrthoMatrix=function(nearZ,farZ)
+    {
+        var horz=1.0/this.wid;
+        var vert=1.0/this.high;
+        var dist=1.0/(nearZ-farZ);
+
+        var mat=new Float32Array(16);
+
+        mat[0]=horz*2.0;
+        mat[1]=0.0;
+        mat[2]=0.0;
+        mat[3]=0.0;
+        mat[4]=0.0;
+        mat[5]=vert*-2.0;
+        mat[6]=0.0;
+        mat[7]=0.0;
+        mat[8]=0.0;
+        mat[9]=0.0;
+        mat[10]=dist*2.0;
+        mat[11]=0.0;
+        mat[12]=-1.0; // this.wid*-horz;      // these will always equal these numbers,
+        mat[13]=1.0; // this.high*vert;     // but leave in the code for readability
+        mat[14]=(farZ+nearZ)*dist;
+        mat[15]=1.0;
+
+        return(mat);
+    };
+    
+        //
         // build look at matrix
         //
      
-    this.buildLookAt=function(eyePos,centerPos,up)
+    this.buildLookAtMatrix=function(eyePos,centerPos)
     {
-        var x0, x1, x2, y0, y1, y2, z0, z1, z2, f;
+        var x0,x1,x2,y0,y1,y2,z0,z1,z2;
+        var f;
 
         z0=eyePos.x-centerPos.x;
         z1=eyePos.y-centerPos.y;
@@ -151,9 +220,9 @@ function ViewObject()
         z1*=f;
         z2*=f;
 
-        x0=(up.y*z2)-(up.z*z1);
-        x1=(up.z*z0)-(up.x*z2);
-        x2=(up.x*z1)-(up.y*z0);
+        x0=(this.lookAtUpVector.y*z2)-(this.lookAtUpVector.z*z1);
+        x1=(this.lookAtUpVector.z*z0)-(this.lookAtUpVector.x*z2);
+        x2=(this.lookAtUpVector.x*z1)-(this.lookAtUpVector.y*z0);
         
         f=Math.sqrt((x0*x0)+(x1*x1)+(x2*x2));
         if (f!==0.0) f=1.0/f;
@@ -194,6 +263,70 @@ function ViewObject()
     };
     
         //
+        // create the normal matrix
+        //
+        
+    this.buildNormalMatrix=function()
+    {
+            // the normal is the invert-transpose of the
+            // model matrix put into a 3x3 matrix
+        
+            // create the inversion
+            
+        var normalMat=new Float32Array(16);
+            
+        var m00=(this.modelMatrix[0]*this.modelMatrix[5])-(this.modelMatrix[1]*this.modelMatrix[4]);
+        var m01=(this.modelMatrix[0]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[4]);
+        var m02=(this.modelMatrix[0]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[4]);
+        var m03=(this.modelMatrix[1]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[5]);
+        var m04=(this.modelMatrix[1]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[5]);
+        var m05=(this.modelMatrix[2]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[6]);
+        var m06=(this.modelMatrix[8]*this.modelMatrix[13])-(this.modelMatrix[9]*this.modelMatrix[12]);
+        var m07=(this.modelMatrix[8]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[12]);
+        var m08=(this.modelMatrix[8]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[12]);
+        var m09=(this.modelMatrix[9]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[13]);
+        var m10=(this.modelMatrix[9]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[13]);
+        var m11=(this.modelMatrix[10]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[14]);
+
+        var det=(m00*m11)-(m01*m10)+(m02*m09)+(m03*m08)-(m04*m07)+(m05*m06);
+        if (det!==0.0) det=1.0/det;
+
+        normalMat[0]=((this.modelMatrix[5]*m11)-(this.modelMatrix[6]*m10)+(this.modelMatrix[7]*m09))*det;
+        normalMat[1]=((this.modelMatrix[2]*m10)-(this.modelMatrix[1]*m11)-(this.modelMatrix[3]*m09))*det;
+        normalMat[2]=((this.modelMatrix[13]*m05)-(this.modelMatrix[14]*m04)+(this.modelMatrix[15]*m03))*det;
+        normalMat[3]=((this.modelMatrix[10]*m04)-(this.modelMatrix[9]*m05)-(this.modelMatrix[11]*m03))*det;
+        normalMat[4]=((this.modelMatrix[6]*m08)-(this.modelMatrix[4]*m11)-(this.modelMatrix[7]*m07))*det;
+        normalMat[5]=((this.modelMatrix[0]*m11)-(this.modelMatrix[2]*m08)+(this.modelMatrix[3]*m07))*det;
+        normalMat[6]=((this.modelMatrix[14]*m02)-(this.modelMatrix[12]*m05)-(this.modelMatrix[15]*m01))*det;
+        normalMat[7]=((this.modelMatrix[8]*m05)-(this.modelMatrix[10]*m02)+(this.modelMatrix[11]*m01))*det;
+        normalMat[8]=((this.modelMatrix[4]*m10)-(this.modelMatrix[5]*m08)+(this.modelMatrix[7]*m06))*det;
+        normalMat[9]=((this.modelMatrix[1]*m08)-(this.modelMatrix[0]*m10)-(this.modelMatrix[3]*m06))*det;
+        normalMat[10]=((this.modelMatrix[12]*m04)-(this.modelMatrix[13]*m02)+(this.modelMatrix[15]*m00))*det;
+        normalMat[11]=((this.modelMatrix[9]*m02)-(this.modelMatrix[8]*m04)-(this.modelMatrix[11]*m00))*det;
+        normalMat[12]=((this.modelMatrix[5]*m07)-(this.modelMatrix[4]*m09)-(this.modelMatrix[6]*m06))*det;
+        normalMat[13]=((this.modelMatrix[0]*m09)-(this.modelMatrix[1]*m07)+(this.modelMatrix[2]*m06))*det;
+        normalMat[14]=((this.modelMatrix[13]*m01)-(this.modelMatrix[12]*m03)-(this.modelMatrix[14]*m00))*det;
+        normalMat[15]=((this.modelMatrix[8]*m03)-(this.modelMatrix[9]*m01)+(this.modelMatrix[10]*m00))*det;
+        
+            // put int 3x3 matrix
+            // we transpose this at the same time
+            
+        var mat33=new Float32Array(9);
+        
+        mat33[0]=normalMat[0];          // non-transposed these would be 0,1,2,4,5,6,8,9,10
+        mat33[1]=normalMat[4];
+        mat33[2]=normalMat[8];
+        mat33[3]=normalMat[1];
+        mat33[4]=normalMat[5];
+        mat33[5]=normalMat[9];
+        mat33[6]=normalMat[2];
+        mat33[7]=normalMat[6];
+        mat33[8]=normalMat[10];
+
+        return(mat33);
+    };
+    
+        //
         // draw view
         //
 
@@ -206,9 +339,9 @@ function ViewObject()
         var camera=this.camera;
 
             // create the perspective matrix
+            // note this function has a translate in it for NEAR_Z
 
-        mat4.perspective(this.perspectiveMatrix,this.OPENGL_FOV,this.aspect,this.OPENGL_NEAR_Z,this.OPENGL_FAR_Z);
-        mat4.translate(this.perspectiveMatrix,this.perspectiveMatrix,vec3.fromValues(0,0,this.OPENGL_NEAR_Z));
+        this.perspectiveMatrix=this.buildPerspectiveMatrix();
 
             // get the eye point and rotate it
             // around the view position
@@ -219,20 +352,16 @@ function ViewObject()
 
             // setup the look at
 
-        this.modelMatrix=this.buildLookAt(eyePos,camera.position,this.lookAtUpVector);
+        this.modelMatrix=this.buildLookAtMatrix(eyePos,camera.position);
 
             // create the 3x3 normal matrix
             // the normal is the invert-transpose of the model matrix
-
-        var normal4x4Mat=mat4.create();
-        mat4.invert(normal4x4Mat,this.modelMatrix);
-        mat4.transpose(normal4x4Mat,normal4x4Mat);
-
-        mat3.fromMat4(this.normalMatrix,normal4x4Mat);
+            
+        this.normalMatrix=this.buildNormalMatrix();
 
             // the 2D ortho matrix
 
-        mat4.ortho(this.orthoMatrix,0.0,this.wid,this.high,0.0,-1.0,1.0);
+        this.orthoMatrix=this.buildOrthoMatrix(-1.0,1.0);
         
             // convert view lights to shader lights
             // all lights need a eye coordinate, so calc

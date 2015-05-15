@@ -11,7 +11,7 @@ EMCA6 TODOs
 
 
 
----> remove the matrix js
+---> make sure to get rid of debug.drawModelSkeleton in view
 ---> frustum cull the models
 
 - when building view light list, ignore ones behind the player (pick better lights)

@@ -122,7 +122,6 @@ function MeshUVTangentsObject()
                 // away from it
 
             trigCenter.set(((v0.x+v1.x+v2.x)/3),((v0.y+v1.y+v2.y)/3),((v0.z+v1.z+v2.z)/3));
-            faceVct.set(((v0.x+v1.x+v2.x)/3),((v0.y+v1.y+v2.y)/3),((v0.z+v1.z+v2.z)/3));
             faceVct.setFromSubPoint(trigCenter,meshCenter);
 
             flip=(normal.dot(faceVct)>0.0);
@@ -152,7 +151,7 @@ function MeshUVTangentsObject()
         //
         // create UVs from vertices and normals
         //
-
+        
     this.buildMeshUVs=function(bitmap,vertices,normals)
     {
         var n,nVertex,vIdx,arrIdx;
@@ -172,8 +171,8 @@ function MeshUVTangentsObject()
             // the dot product of the normal
             // and an up vector
 
-        var normal=vec3.create();
-        var mapUp=vec3.fromValues(0.0,-1.0,0.0);
+        var normal=new wsPoint(0.0,0.0,0.0);
+        var mapUp=new wsPoint(0.0,-1.0,0.0);
 
             // run through the vertices
             // remember, both this and normals
@@ -183,20 +182,19 @@ function MeshUVTangentsObject()
 
             vIdx=n*3;
 
-            normal=vec3.fromValues(normals[vIdx],normals[vIdx+1],normals[vIdx+2]);
-            ang=vec3.dot(mapUp,normal);
+            normal.set(normals[vIdx],normals[vIdx+1],normals[vIdx+2]);
+            ang=mapUp.dot(normal);
 
                 // wall like
                 // use longest of x/z coordinates + Y coordinates of vertex
 
             if (Math.abs(ang)<=0.4) {
-                if (Math.abs(normal[0])<Math.abs(normal[2])) {
+                if (Math.abs(normal.x)<Math.abs(normal.z)) {
                     x=vertices[vIdx];
                 }
                 else {
                     x=vertices[vIdx+2];
                 }
-                //x=vertices[vIdx]+vertices[vIdx+2];
                 y=vertices[vIdx+1];
             }
 
@@ -211,6 +209,27 @@ function MeshUVTangentsObject()
             uvs[arrIdx++]=x*uvScale[0];
             uvs[arrIdx++]=y*uvScale[1];
         }
+        
+            // reduce all the UVs to
+            // their minimum integers
+            
+        arrIdx=0;
+        var i;
+        var minIntX=Math.floor(uvs[arrIdx++]);
+        var minIntY=Math.floor(uvs[arrIdx++]);
+        
+        for (n=1;n!==nVertex;n++) {
+            i=Math.floor(uvs[arrIdx++]);
+            if (i<minIntX) minIntX=i;
+            i=Math.floor(uvs[arrIdx++]);
+            if (i<minIntY) minIntY=i;
+        }
+        
+        arrIdx=0;
+        for (n=0;n!==nVertex;n++) {
+            uvs[arrIdx++]-=minIntX;
+            uvs[arrIdx++]-=minIntY;
+        }
 
         return(uvs);
     };
@@ -223,7 +242,9 @@ function MeshUVTangentsObject()
     {
         var n,nTrig,nVertex,trigIdx;
         var v0Idx,v1Idx,v2Idx;
-        var v0,v1,v2;
+        var v0=new wsPoint(0.0,0.0,0.0);
+        var v1=new wsPoint(0.0,0.0,0.0);
+        var v2=new wsPoint(0.0,0.0,0.0);
         var uv0Idx,uv1Idx,uv2Idx;
         var u10,u20,v10,v20;
 
@@ -244,13 +265,13 @@ function MeshUVTangentsObject()
             // goes on to create the normal, because
             // we need that first to make the UVs
 
-        var p10=vec3.create();
-        var p20=vec3.create();
-        var vLeft=vec3.create();
-        var vRight=vec3.create();
-        var vNum=vec3.create();
+        var p10=new wsPoint(0.0,0.0,0.0);
+        var p20=new wsPoint(0.0,0.0,0.0);
+        var vLeft=new wsPoint(0.0,0.0,0.0);
+        var vRight=new wsPoint(0.0,0.0,0.0);
+        var vNum=new wsPoint(0.0,0.0,0.0);
         var denom;
-        var tangent=vec3.create();
+        var tangent=new wsPoint(0.0,0.0,0.0);
 
         nTrig=Math.floor(indexes.length/3);
 
@@ -268,14 +289,14 @@ function MeshUVTangentsObject()
             v1Idx=indexes[trigIdx+1]*3;
             v2Idx=indexes[trigIdx+2]*3;
 
-            v0=vec3.fromValues(vertices[v0Idx],vertices[v0Idx+1],vertices[v0Idx+2]);
-            v1=vec3.fromValues(vertices[v1Idx],vertices[v1Idx+1],vertices[v1Idx+2]);
-            v2=vec3.fromValues(vertices[v2Idx],vertices[v2Idx+1],vertices[v2Idx+2]);
+            v0.set(vertices[v0Idx],vertices[v0Idx+1],vertices[v0Idx+2]);
+            v1.set(vertices[v1Idx],vertices[v1Idx+1],vertices[v1Idx+2]);
+            v2.set(vertices[v2Idx],vertices[v2Idx+1],vertices[v2Idx+2]);
 
                 // create vectors
 
-            vec3.sub(p10,v1,v0);
-            vec3.sub(p20,v2,v0);
+            p10.setFromSubPoint(v1,v0);
+            p20.setFromSubPoint(v2,v0);
 
                 // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
                 // uvs are packed lists of 2, so different here
@@ -292,29 +313,29 @@ function MeshUVTangentsObject()
                 // calculate the tangent
                 // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
 
-            vec3.scale(vLeft,p10,v20);
-            vec3.scale(vRight,p20,v10);
-            vec3.sub(vNum,vLeft,vRight);
+            vLeft.setFromScale(p10,v20);
+            vRight.setFromScale(p20,v10);
+            vNum.setFromSubPoint(vLeft,vRight);
 
             denom=(u10*v20)-(v10*u20);
             if (denom!==0.0) denom=1.0/denom;
-            vec3.scale(tangent,vNum,denom);
-            vec3.normalize(tangent,tangent);
+            tangent.setFromScale(vNum,denom);
+            tangent.normalize();
 
                 // and set the mesh normal
                 // to all vertexes in this trig
 
-            tangents[v0Idx]=tangent[0];
-            tangents[v0Idx+1]=tangent[1];
-            tangents[v0Idx+2]=tangent[2];
+            tangents[v0Idx]=tangent.x;
+            tangents[v0Idx+1]=tangent.y;
+            tangents[v0Idx+2]=tangent.z;
 
-            tangents[v1Idx]=tangent[0];
-            tangents[v1Idx+1]=tangent[1];
-            tangents[v1Idx+2]=tangent[2];
+            tangents[v1Idx]=tangent.x;
+            tangents[v1Idx+1]=tangent.y;
+            tangents[v1Idx+2]=tangent.z;
 
-            tangents[v2Idx]=tangent[0];
-            tangents[v2Idx+1]=tangent[1];
-            tangents[v2Idx+2]=tangent[2];
+            tangents[v2Idx]=tangent.x;
+            tangents[v2Idx+1]=tangent.y;
+            tangents[v2Idx+2]=tangent.z;
         }
 
         return(tangents);

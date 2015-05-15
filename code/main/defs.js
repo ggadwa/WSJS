@@ -44,6 +44,14 @@ function wsPoint(x,y,z)
         this.z=pt1.z;
         this.cross(pt2);
     };
+    
+    this.setFromScale=function(pt,f)
+    {
+        this.x=pt.x;
+        this.y=pt.y;
+        this.z=pt.z;
+        this.scale(f);
+    };
                 
     this.move=function(xAdd,yAdd,zAdd)
     {
@@ -135,7 +143,7 @@ function wsPoint(x,y,z)
         this.rotateY(centerPt,ang.y);
         this.rotateZ(centerPt,ang.z);
     };
-   
+                
     this.noSquareDistance=function(pt)
     {
         var px=this.x-pt.x;
@@ -150,6 +158,16 @@ function wsPoint(x,y,z)
         var py=this.y-ky;
         var pz=this.z-kz;
         return((px*px)+(py*py)+(pz*pz));
+    };
+    
+    this.distance=function(pt)
+    {
+        return(Math.sqrt(this.noSquareDistance(pt)));
+    };
+                
+    this.distanceByTriplet=function(kx,ky,kz)
+    {
+        return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
     };
     
     this.normalize=function()
@@ -172,7 +190,9 @@ function wsPoint(x,y,z)
         var x=(this.y*pt.z)-(this.z*pt.y);
         var y=(this.z*pt.x)-(this.x*pt.z);
         var z=(this.x*pt.y)-(this.y*pt.x);
-        return(new wsPoint(x,y,z));
+        this.x=x;
+        this.y=y;
+        this.z=z;
     };
     
     this.scale=function(f)
@@ -180,16 +200,6 @@ function wsPoint(x,y,z)
         this.x*=f;
         this.y*=f;
         this.z*=f;
-    };
-                
-    this.distance=function(pt)
-    {
-        return(Math.sqrt(this.noSquareDistance(pt)));
-    };
-                
-    this.distanceByTriplet=function(kx,ky,kz)
-    {
-        return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
     };
     
     this.copy=function()
@@ -213,6 +223,18 @@ function ws2DPoint(x,y)
     {
         this.x+=xAdd;
         this.y+=yAdd;
+    };
+    
+    this.noSquareDistance=function(pt)
+    {
+        var px=this.x-pt.x;
+        var py=this.y-pt.y;
+        return((px*px)+(py*py));
+    };
+                
+    this.distance=function(pt)
+    {
+        return(Math.sqrt(this.noSquareDistance(pt)));
     };
     
     this.copy=function()

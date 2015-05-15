@@ -35,7 +35,7 @@ var MONSTER_ENTITY_COUNT=5;
 //
 
 var MAX_ROOM=5;
-var SIMPLE_LIGHTMAP=false;
+var SIMPLE_LIGHTMAP=true;
 
 //
 // textures to build
