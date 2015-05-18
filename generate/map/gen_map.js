@@ -137,7 +137,7 @@ function GenMapObject(view,map,setup,genRandom)
 
             boxBoundX=new wsBound(x-1000,x+1000);
             boxBoundZ=new wsBound(z-1000,z+1000);
-            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_CONCRETE),boxBoundX,yBound,boxBoundZ,false,true,true,true,true,false,false,0));
+            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_CONCRETE),boxBoundX,yBound,boxBoundZ,false,true,true,true,true,false,false,this.map.MESH_FLAG_DECORATION));
         }
     };
 
@@ -159,12 +159,38 @@ function GenMapObject(view,map,setup,genRandom)
             boxBoundX=new wsBound((x-1000),(x+1000));
             boxBoundY=new wsBound((yBound.max-high),yBound.max);
             boxBoundZ=new wsBound((z-1000),(z+1000));
-            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,0));
+            
+            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
+            
+            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+        }
+    };
+    
+    this.addDecorationVertexPillars=function(map,piece,xBound,yBound,zBound)
+    {
+        var n,nPoint,pillarBoundX,pillarBoundZ;
+        var pointList=piece.getOusideWallVertexes(xBound,yBound,zBound);
+        var meshPrimitives=new MeshPrimitivesObject();
+        
+        nPoint=pointList.length;
+        
+        for (n=0;n!==nPoint;n++) {
+            
+                // always skip if collides with steps
+            
+            pillarBoundX=new wsBound((pointList[n].x-500),(pointList[n].x+500));
+            pillarBoundZ=new wsBound((pointList[n].z-500),(pointList[n].z+500));
+            if (this.map.boxBoundCollision(pillarBoundX,yBound,pillarBoundZ,this.map.MESH_FLAG_STAIR)!==-1) return;
+            
+                // create the pillar
+                
+            map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),this.genRandom,pointList[n],yBound,500,500,1,4,this.map.MESH_FLAG_DECORATION));
         }
     };
 
     this.addDecoration=function(map,piece,xBound,yBound,zBound)
     {
+        this.addDecorationVertexPillars(map,piece,xBound,yBound,zBound);
         this.addDecorationBox(map,xBound,yBound,zBound);
         return;
 
@@ -216,12 +242,6 @@ function GenMapObject(view,map,setup,genRandom)
             // ceiling
 
         this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_WOOD_PLANK),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
-
-            // decorations
-
-        if (piece.isRoom) {
-            this.addDecoration(this.map,piece,xBound,new wsBound(yStoryBound.min,yBound.max),zBound);
-        }
 
         return(yStoryBound);
     }
@@ -444,6 +464,9 @@ function GenMapObject(view,map,setup,genRandom)
             // add the room mesh
 
         var yStoryBound=this.addRoomMesh(piece,storyCount,xBound,yBound,zBound,levelCount);
+        var xDecorateBound=xBound.copy();
+        var yDecorateBound=new wsBound(yStoryBound.min,yBound.max);
+        var zDecorateBound=zBound.copy();
 
             // add the light
 
@@ -451,65 +474,73 @@ function GenMapObject(view,map,setup,genRandom)
 
             // have we recursed too far?
 
-        if (recurseCount>=this.setup.maxRecurseCount) return;
+        if (recurseCount<this.setup.maxRecurseCount) {
 
-            // always need to force at least
-            // one connection.  if that one
-            // was already used, move on to the next one
+                // always need to force at least
+                // one connection.  if that one
+                // was already used, move on to the next one
 
-        var forceConnectLineIdx=Math.floor(nConnectLine*this.genRandom.random());
-        if (forceConnectLineIdx===usedConnectLineIdx) {
-            forceConnectLineIdx++;
-            if (forceConnectLineIdx===nConnectLine) forceConnectLineIdx=0;
-        }
-
-            // run through connections
-            // if a random boolean flag is true,
-            // than try to connect another room
-            // and recurse
-
-        var yStoryAdd=yBound.max-yBound.min;
-
-        for (n=0;n!==nConnectLine;n++) {
-
-                // bail if we've reach max room count
-
-            if (this.map.countMeshByFlag(this.map.MESH_FLAG_ROOM_WALL)>=this.setup.maxRoom) return;
-
-                // determine if this line will go off
-                // on another recursion
-
-            if (n===usedConnectLineIdx) continue;
-            if (n!==forceConnectLineIdx) {
-                if (this.genRandom.random()>=this.setup.connectionPercentage) continue;
+            var forceConnectLineIdx=Math.floor(nConnectLine*this.genRandom.random());
+            if (forceConnectLineIdx===usedConnectLineIdx) {
+                forceConnectLineIdx++;
+                if (forceConnectLineIdx===nConnectLine) forceConnectLineIdx=0;
             }
 
-                // if we are connecting to a room
-                // with more than one story, we
-                // can change the Y
+                // run through connections
+                // if a random boolean flag is true,
+                // than try to connect another room
+                // and recurse
 
-            var nextNeedStairs=false;
-            yStoryBound=yBound.copy();
+            var yStoryAdd=yBound.max-yBound.min;
 
-            if (storyCount>1) {
-                if (this.genRandom.random()<this.setup.storyChangePercentage) {
+            for (n=0;n!==nConnectLine;n++) {
 
-                        // move new room up
-                        // and switch level
+                    // bail if we've reach max room count
 
-                    yStoryBound.add(-yStoryAdd);
-                    levelCount++;
+                if (this.map.countMeshByFlag(this.map.MESH_FLAG_ROOM_WALL)>=this.setup.maxRoom) break;
 
-                        // and tell next room that
-                        // we might need stairs to it
+                    // determine if this line will go off
+                    // on another recursion
 
-                    nextNeedStairs=true;
+                if (n===usedConnectLineIdx) continue;
+                if (n!==forceConnectLineIdx) {
+                    if (this.genRandom.random()>=this.setup.connectionPercentage) continue;
                 }
+
+                    // if we are connecting to a room
+                    // with more than one story, we
+                    // can change the Y
+
+                var nextNeedStairs=false;
+                yStoryBound=yBound.copy();
+
+                if (storyCount>1) {
+                    if (this.genRandom.random()<this.setup.storyChangePercentage) {
+
+                            // move new room up
+                            // and switch level
+
+                        yStoryBound.add(-yStoryAdd);
+                        levelCount++;
+
+                            // and tell next room that
+                            // we might need stairs to it
+
+                        nextNeedStairs=true;
+                    }
+                }
+
+                    // recurse on to build the new room
+
+                this.buildMapRecursiveRoom((recurseCount+1),pieceIdx,n,storyCount,nextNeedStairs,xBound,yStoryBound,zBound,levelCount);
             }
+        }
+        
+            // finally decorate the room
 
-                // recurse on to build the new room
-
-            this.buildMapRecursiveRoom((recurseCount+1),pieceIdx,n,storyCount,nextNeedStairs,xBound,yStoryBound,zBound,levelCount);
+        piece=this.mapPieceList.get(pieceIdx);
+        if (piece.isRoom) {
+            this.addDecoration(this.map,piece,xDecorateBound,yDecorateBound,zDecorateBound);
         }
     };
 

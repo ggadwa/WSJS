@@ -287,6 +287,33 @@ function MapPieceObject(isRoom)
 
         return(mesh);
     };
+    
+        //
+        // get outside vertexes
+        //
+        // this is used to get a series of points that
+        // we can build decorations in the room corners
+        //
+        
+    this.getOusideWallVertexes=function(xBound,yBound,zBound)
+    {
+        var n,nPoint,x,z;
+        var pt;
+
+        var pointList=[];
+        nPoint=this.points.length;
+
+        for (n=0;n!==nPoint;n++) {
+            pt=this.points[n];
+            x=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
+            z=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
+            
+            pointList.push(new wsPoint(x,yBound.max,z));
+        }
+        
+        return(pointList);
+    }
+
 
         //
         // build connection line list

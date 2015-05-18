@@ -295,6 +295,117 @@ function MeshPrimitivesObject()
 
         return(new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
     };
+    
+        //
+        // cylinders
+        //
+        
+    this.createMeshCylinder=function(bitmap,genRandom,centerPt,yBound,radius,extraRadius,segmentCount,segmentExtra,flags)
+    {
+        var n,k,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
+        var topRad,botRad;
+        
+            // get cylder size
+        
+        var sideCount=12;
+        var segCount=genRandom.randomInt(segmentCount,segmentExtra);
+        
+        var vertexCount=segCount*(sideCount*18);
+        var indexCount=segCount*(sideCount*6);
+        var iCount=sideCount*6;
+
+        var vertices=new Float32Array(vertexCount);
+        var indexes=new Uint16Array(indexCount);
+        
+        var vIdx=0;
+        var iIdx=0;
+        
+            // cylinder segments
+            
+        var yAdd=Math.floor(yBound.getSize()/segCount);
+            
+        var ySegBound=yBound.copy();
+        ySegBound.min=ySegBound.max-yAdd;
+        
+        botRad=genRandom.randomInt(radius,extraRadius);
+            
+        for (k=0;k!==segCount;k++) {
+            
+                // new radius
+                
+            topRad=genRandom.randomInt(radius,extraRadius);
+
+                // cyliner faces
+
+            var ang=0.0;
+            var ang2;
+            var angAdd=360.0/sideCount;
+
+            for (n=0;n!==sideCount;n++) {
+                ang2=ang+angAdd;
+                if (n===(sideCount-1)) ang2=0.0;
+
+                rd=ang*DEGREE_TO_RAD;
+                tx=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
+                tz=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
+                
+                bx=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
+                bz=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
+
+                rd=ang2*DEGREE_TO_RAD;
+                tx2=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
+                tz2=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
+                
+                bx2=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
+                bz2=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
+
+                vertices[vIdx++]=tx;
+                vertices[vIdx++]=ySegBound.min;
+                vertices[vIdx++]=tz;
+                vertices[vIdx++]=tx2;
+                vertices[vIdx++]=ySegBound.min;
+                vertices[vIdx++]=tz2;
+                vertices[vIdx++]=bx;
+                vertices[vIdx++]=ySegBound.max;
+                vertices[vIdx++]=bz;
+
+                vertices[vIdx++]=tx2;
+                vertices[vIdx++]=ySegBound.min;
+                vertices[vIdx++]=tz2;
+                vertices[vIdx++]=bx2;
+                vertices[vIdx++]=ySegBound.max;
+                vertices[vIdx++]=bz2;
+                vertices[vIdx++]=bx;
+                vertices[vIdx++]=ySegBound.max;
+                vertices[vIdx++]=bz;
+
+                ang=ang2;
+            }
+
+            for (n=0;n!==iCount;n++) {
+                indexes[iIdx+n]=iIdx+n;
+            }
+            
+            iIdx+=iCount;
+            botRad=topRad;
+            
+            ySegBound.max=ySegBound.min;
+            ySegBound.min-=yAdd;
+        }
+
+            // calculate the normals, then use those to
+            // calcualte the uvs, and finally the UVs to
+            // calculate the tangents
+
+        var meshUVTangents=new MeshUVTangentsObject();
+        var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
+        var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
+
+            // finally create the mesh
+
+        return(new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
+    };
 
         //
         // create stairs
