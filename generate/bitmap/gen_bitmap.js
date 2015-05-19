@@ -477,8 +477,8 @@ function GenBitmapObject(genRandom)
         var wid=rgt-lft;
         var high=bot-top;
 
-        var faceX=lft+Math.floor((wid*6)/10);
-        var faceWid=Math.floor((wid*4)/10);
+        var faceX=lft+Math.floor((wid*2)/10);
+        var faceWid=Math.floor((wid*8)/10);
 
             // eyes
 
@@ -557,7 +557,7 @@ function GenBitmapObject(genRandom)
 
     this.generateSkin=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var skinColor=this.genBitmapUtility.getRandomColor([0.4,0.4,0.3],[1.0,1.0,0.8]);
+        var skinColor=this.genBitmapUtility.getRandomColor([0.5,0.5,0.4],[1.0,1.0,0.8]);
         var clothColor=this.genBitmapUtility.getRandomColor([0.4,0.3,0.3],[0.7,0.6,0.7]);
 
             // clear canvases
@@ -680,15 +680,13 @@ function GenBitmapObject(genRandom)
         }
 
             // debugging
-
 /*
-        if (generateType===GEN_BITMAP_TYPE_STONE) {
+        if (generateType===GEN_BITMAP_TYPE_SKIN) {
             debug.displayCanvasData(bitmapCanvas,810,10,400,400);
             debug.displayCanvasData(normalCanvas,810,410,400,400);
             debug.displayCanvasData(specularCanvas,810,820,400,400);
         }
 */
-
             // finally create the bitmap
             // object and load into WebGL
 

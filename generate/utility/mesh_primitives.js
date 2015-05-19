@@ -300,7 +300,20 @@ function MeshPrimitivesObject()
         // cylinders
         //
         
-    this.createMeshCylinder=function(bitmap,genRandom,centerPt,yBound,radius,extraRadius,segmentCount,segmentExtra,flags)
+    this.createMeshCylinderSegmentList=function(genRandom,radius,extraRadius,segmentCount,segmentExtra)
+    {
+        var n;
+        var segCount=genRandom.randomInt(segmentCount,segmentExtra);
+        var segments=[];
+        
+        for (n=0;n!==(segCount+1);n++) {
+            segments.push(genRandom.randomInt(radius,extraRadius));
+        }
+        
+        return(segments);
+    };
+        
+    this.createMeshCylinder=function(bitmap,centerPt,yBound,segments,flags)
     {
         var n,k,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         var topRad,botRad;
@@ -308,7 +321,7 @@ function MeshPrimitivesObject()
             // get cylder size
         
         var sideCount=12;
-        var segCount=genRandom.randomInt(segmentCount,segmentExtra);
+        var segCount=segments.length-1;     // always one extra for top
         
         var vertexCount=segCount*(sideCount*18);
         var indexCount=segCount*(sideCount*6);
@@ -327,13 +340,13 @@ function MeshPrimitivesObject()
         var ySegBound=yBound.copy();
         ySegBound.min=ySegBound.max-yAdd;
         
-        botRad=genRandom.randomInt(radius,extraRadius);
+        botRad=segments[0];
             
         for (k=0;k!==segCount;k++) {
             
                 // new radius
                 
-            topRad=genRandom.randomInt(radius,extraRadius);
+            topRad=segments[1];
 
                 // cyliner faces
 

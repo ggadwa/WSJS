@@ -10,12 +10,7 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
-VERTEX PILLARS
- - skip if point is missing any other polygon (need to keep wall mesh around)
- - make a single segment type and use it across all cylinder in a room
-
-
----> possible use of drawarrays since all the trigs are static in map meshes?
+---> needs decoration location?
 ---> make sure to get rid of debug.drawModelSkeleton in view
 ---> frustum cull the models
 

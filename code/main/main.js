@@ -23,9 +23,9 @@ var WS_PHYSICS_MSECS=16;
 var WS_DRAW_MSECS=16;
 var WS_BAIL_MSECS=5000;
 
-var AMBIENT_R=0.25;
-var AMBIENT_G=0.25;
-var AMBIENT_B=0.25;
+var AMBIENT_R=0.33;
+var AMBIENT_G=0.33;
+var AMBIENT_B=0.33;
 
 var MONSTER_MODEL_COUNT=3;
 var MONSTER_ENTITY_COUNT=5;
@@ -34,7 +34,7 @@ var MONSTER_ENTITY_COUNT=5;
 // debugging and quick start up flags
 //
 
-var MAX_ROOM=5;
+var MAX_ROOM=1;
 var SIMPLE_LIGHTMAP=true;
 
 //

@@ -123,24 +123,6 @@ function GenMapObject(view,map,setup,genRandom)
         // decorations
         //
 
-    this.addDecorationPillar=function(map,xBound,yBound,zBound)
-    {
-        var n,count;
-        var x,z,boxBoundX,boxBoundZ;
-        var meshPrimitives=new MeshPrimitivesObject();
-
-        count=this.genRandom.randomInt(1,3);
-
-        for (n=0;n!==count;n++) {
-            x=this.genRandom.randomInBetween(xBound.min,xBound.max);
-            z=this.genRandom.randomInBetween(zBound.min,zBound.max);
-
-            boxBoundX=new wsBound(x-1000,x+1000);
-            boxBoundZ=new wsBound(z-1000,z+1000);
-            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_CONCRETE),boxBoundX,yBound,boxBoundZ,false,true,true,true,true,false,false,this.map.MESH_FLAG_DECORATION));
-        }
-    };
-
     this.addDecorationBox=function(map,xBound,yBound,zBound)
     {
         var n,count;
@@ -169,10 +151,23 @@ function GenMapObject(view,map,setup,genRandom)
     this.addDecorationVertexPillars=function(map,piece,xBound,yBound,zBound)
     {
         var n,nPoint,pillarBoundX,pillarBoundZ;
-        var pointList=piece.getOusideWallVertexes(xBound,yBound,zBound);
-        var meshPrimitives=new MeshPrimitivesObject();
         
+            // any pillar points?
+            
+        var pointList=piece.getPillarLocationList(xBound,yBound,zBound);
         nPoint=pointList.length;
+        if (nPoint===0) return;
+        
+            // randomize which gets vertex pillars
+            
+        if (this.genRandom.random()>0.75) return;
+        
+            // setup cylinder segments
+            
+        var meshPrimitives=new MeshPrimitivesObject();
+        var segments=meshPrimitives.createMeshCylinderSegmentList(this.genRandom,500,200,1,2)
+        
+            // build the points
         
         for (n=0;n!==nPoint;n++) {
             
@@ -180,11 +175,11 @@ function GenMapObject(view,map,setup,genRandom)
             
             pillarBoundX=new wsBound((pointList[n].x-500),(pointList[n].x+500));
             pillarBoundZ=new wsBound((pointList[n].z-500),(pointList[n].z+500));
-            if (this.map.boxBoundCollision(pillarBoundX,yBound,pillarBoundZ,this.map.MESH_FLAG_STAIR)!==-1) return;
+            if (this.map.boxBoundCollision(pillarBoundX,yBound,pillarBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
             
                 // create the pillar
                 
-            map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),this.genRandom,pointList[n],yBound,500,500,1,4,this.map.MESH_FLAG_DECORATION));
+            map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),pointList[n],yBound,segments,this.map.MESH_FLAG_DECORATION));
         }
     };
 
@@ -192,16 +187,6 @@ function GenMapObject(view,map,setup,genRandom)
     {
         this.addDecorationVertexPillars(map,piece,xBound,yBound,zBound);
         this.addDecorationBox(map,xBound,yBound,zBound);
-        return;
-
-        switch (this.genRandom.randomInt(0,2)) {
-            case 1:
-                this.addDecorationPillar(map,xBound,yBound,zBound);
-                break;
-            case 2:
-                this.addDecorationBox(map,xBound,yBound,zBound);
-                break;
-        }
     };
 
         //
