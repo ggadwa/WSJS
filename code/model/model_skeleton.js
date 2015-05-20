@@ -33,6 +33,15 @@ function ModelBoneObject(name,parentBoneIdx,position)
     {
         return(this.name.indexOf('Foot')!==-1);
     };
+    
+        //
+        // bone flags
+        //
+    
+    this.hasParent=function()
+    {
+        return(this.parentBoneIdx!==-1);
+    };
 }
 
 //

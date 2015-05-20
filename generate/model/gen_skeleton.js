@@ -61,7 +61,10 @@ function GenSkeletonObject(model,genRandom)
         var waistHigh=hipHigh+this.genRandom.randomInt(150,150);
         var torsoHigh=waistHigh+this.genRandom.randomInt(500,500);
         var torsoRadius=this.genRandom.randomInt(300,350);
-        var armSwing=this.genRandom.randomInt(40,40);
+        var armSwing=this.genRandom.randomInt(100,100);
+        var wristSwing=this.genRandom.randomInt(0,50);
+        var kneeSwing=this.genRandom.randomInt(100,100);
+        var ankleSwing=this.genRandom.randomInt(0,50);
         var neckHigh=torsoHigh+this.genRandom.randomInt(50,100);
         var headHigh=neckHigh+this.genRandom.randomInt(100,100);
         var handHigh=this.genRandom.randomInt(800,1000);
@@ -95,8 +98,8 @@ function GenSkeletonObject(model,genRandom)
         var leftElbowBoneIdx=bones.push(new ModelBoneObject('Left Elbow',leftShoulderBoneIdx,new wsPoint((torsoRadius+armSwing),-elbowHigh,60)))-1;
         var rightElbowBoneIdx=bones.push(new ModelBoneObject('Right Elbow',rightShoulderBoneIdx,new wsPoint(-(torsoRadius+armSwing),-elbowHigh,60)))-1;
 
-        var leftWristBoneIdx=bones.push(new ModelBoneObject('Left Wrist',leftElbowBoneIdx,new wsPoint(((torsoRadius+armSwing)+30),-(handHigh+150),0)))-1;
-        var rightWristBoneIdx=bones.push(new ModelBoneObject('Right Wrist',rightElbowBoneIdx,new wsPoint(-((torsoRadius+armSwing)+30),-(handHigh+150),0)))-1;
+        var leftWristBoneIdx=bones.push(new ModelBoneObject('Left Wrist',leftElbowBoneIdx,new wsPoint(((torsoRadius+armSwing)+wristSwing),-(handHigh+150),0)))-1;
+        var rightWristBoneIdx=bones.push(new ModelBoneObject('Right Wrist',rightElbowBoneIdx,new wsPoint(-((torsoRadius+armSwing)+wristSwing),-(handHigh+150),0)))-1;
 
         var leftHandBoneIdx=bones.push(new ModelBoneObject('Left Hand',leftWristBoneIdx,new wsPoint(((torsoRadius+armSwing)+30),-handHigh,0)))-1;
         var rightHandBoneIdx=bones.push(new ModelBoneObject('Right Hand',rightWristBoneIdx,new wsPoint(-((torsoRadius+armSwing)+30),-handHigh,0)))-1;
@@ -104,14 +107,14 @@ function GenSkeletonObject(model,genRandom)
         var rightHipBoneIdx=bones.push(new ModelBoneObject('Right Hip',hipBoneIdx,new wsPoint(-hipRadius,-(hipHigh-200),0)))-1;
         var leftHipBoneIdx=bones.push(new ModelBoneObject('Left Hip',hipBoneIdx,new wsPoint(hipRadius,-(hipHigh-200),0)))-1;
 
-        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint(hipRadius,-(hipHigh>>1),45)))-1;
-        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-hipRadius,-(hipHigh>>1),45)))-1;
+        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint((hipRadius+kneeSwing),-(hipHigh>>1),45)))-1;
+        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-(hipRadius+kneeSwing),-(hipHigh>>1),45)))-1;
 
-        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint(hipRadius,-ankleHigh,90)))-1;
-        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-hipRadius,-ankleHigh,90)))-1;
+        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint(((hipRadius+kneeSwing)+ankleSwing),-ankleHigh,90)))-1;
+        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-((hipRadius+kneeSwing)+ankleSwing),-ankleHigh,90)))-1;
 
-        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(hipRadius,-60,0)))-1;
-        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-hipRadius,-60,0)))-1;
+        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(((hipRadius+kneeSwing)+ankleSwing),-60,0)))-1;
+        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-((hipRadius+kneeSwing)+ankleSwing),-60,0)))-1;
 
             // some random rotations
             

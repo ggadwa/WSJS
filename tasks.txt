@@ -10,6 +10,12 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
+model generation
+ - rotation is wrong on spines, needs to on X, maybe minor Z
+ - randomize cylinder sizes
+ - bigger cylinders for torso
+ - hips get square
+
 ---> needs decoration location?
 ---> make sure to get rid of debug.drawModelSkeleton in view
 ---> frustum cull the models
