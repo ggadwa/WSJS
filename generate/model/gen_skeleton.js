@@ -89,7 +89,7 @@ function GenSkeletonObject(model,genRandom)
         var hipBoneIdx=bones.push(new ModelBoneObject('Hip',baseBoneIdx,new wsPoint(0,-hipHigh,0)))-1;
         var waistBoneIdx=bones.push(new ModelBoneObject('Waist',hipBoneIdx,new wsPoint(0,-waistHigh,0)))-1;
         var torsoBoneIdx=bones.push(new ModelBoneObject('Torso',waistBoneIdx,new wsPoint(0,-torsoHigh,0)))-1;
-        var neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoBoneIdx,new wsPoint(0,-headHigh,0)))-1;
+        var neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
         var headBoneIdx=bones.push(new ModelBoneObject('Head',neckBoneIdx,new wsPoint(0,-headHigh,0)))-1;
 
         var leftShoulderBoneIdx=bones.push(new ModelBoneObject('Left Shoulder',torsoBoneIdx,new wsPoint(torsoRadius,-torsoHigh,60)))-1;
@@ -118,7 +118,7 @@ function GenSkeletonObject(model,genRandom)
 
             // some random rotations
             
-        ang=this.getRandomRotateAngle(0,0,40);
+        ang=this.getRandomRotateAngle(60,0,0);
         var waistOffsetPnt=this.rotateBone(bones,waistBoneIdx,ang);
         this.moveBone(bones,torsoBoneIdx,waistOffsetPnt);
         this.moveBone(bones,neckBoneIdx,waistOffsetPnt);
@@ -127,14 +127,14 @@ function GenSkeletonObject(model,genRandom)
         this.rotateBone(bones,neckBoneIdx,ang);
         this.rotateBone(bones,headBoneIdx,ang);
 
-        ang=this.getRandomRotateAngle(0,0,20);
+        ang=this.getRandomRotateAngle(40,0,0);
         var torsoOffsetPnt=this.rotateBone(bones,torsoBoneIdx,ang);
         this.moveBone(bones,neckBoneIdx,torsoOffsetPnt);
         this.moveBone(bones,headBoneIdx,torsoOffsetPnt);
         this.rotateBone(bones,neckBoneIdx,ang);
         this.rotateBone(bones,headBoneIdx,ang);
         
-        ang=this.getRandomRotateAngle(0,0,10);
+        ang=this.getRandomRotateAngle(15,0,0);
         var neckOffsetPnt=this.rotateBone(bones,neckBoneIdx,ang);
         this.moveBone(bones,headBoneIdx,neckOffsetPnt);
         this.rotateBone(bones,headBoneIdx,ang);

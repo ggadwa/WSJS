@@ -107,7 +107,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
         // build cylinders around two bones
         //
         
-    this.buildCylinderAroundBones=function(view,bone1,bone2,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    this.buildCylinderAroundPoints=function(view,pt1,pt2,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         var n,rd,v2Idx;
         var tx,tz,bx,bz;
@@ -123,19 +123,19 @@ function GenModelMeshObject(model,bitmap,genRandom)
 
         for (n=0;n!==this.CYLINDER_SIDE_COUNT;n++) {
             rd=ang*DEGREE_TO_RAD;
-            tx=bone1.position.x+((radius1*Math.sin(rd))+(radius1*Math.cos(rd)));
-            tz=bone1.position.z+((radius1*Math.cos(rd))-(radius1*Math.sin(rd)));
+            tx=pt1.x+((radius1*Math.sin(rd))+(radius1*Math.cos(rd)));
+            tz=pt1.z+((radius1*Math.cos(rd))-(radius1*Math.sin(rd)));
 
-            bx=bone2.position.x+((radius2*Math.sin(rd))+(radius2*Math.cos(rd)));
-            bz=bone2.position.z+((radius2*Math.cos(rd))-(radius2*Math.sin(rd)));
+            bx=pt2.x+((radius2*Math.sin(rd))+(radius2*Math.cos(rd)));
+            bz=pt2.z+((radius2*Math.cos(rd))-(radius2*Math.sin(rd)));
             
             uAng=uOffset+((ang/360.0)*0.5);
 
             vertices[vIdx++]=tx;
-            vertices[vIdx++]=bone1.position.y;
+            vertices[vIdx++]=pt1.y;
             vertices[vIdx++]=tz;
             vertices[vIdx++]=bx;
-            vertices[vIdx++]=bone2.position.y;
+            vertices[vIdx++]=pt2.y;
             vertices[vIdx++]=bz;
             
             uvs[uvIdx++]=uAng;
@@ -167,21 +167,10 @@ function GenModelMeshObject(model,bitmap,genRandom)
         }
     };
     
-        //
-        // specialized bone calculations
-        //
-        
-    this.isBoneHorizontal=function(bone)
+    this.buildCylinderAroundBones=function(view,bone1,bone2,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
-        if (bone.parentBoneIdx===-1) return(false);
-        
-        var parentBone=this.model.skeleton.bones[bone.parentBoneIdx];
-        var x=Math.abs(bone.position.x-parentBone.position.x);
-        var y=Math.abs(bone.position.y-parentBone.position.y);
-        var z=Math.abs(bone.position.z-parentBone.position.z);
-        
-        return((x>y) || (z>y));
-    }
+        this.buildCylinderAroundPoints(view,bone1.position,bone2.position,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset);
+    };
     
         //
         // build mesh around skeleton
@@ -215,15 +204,8 @@ function GenModelMeshObject(model,bitmap,genRandom)
             }
             
                 // cylinder type bones
-                // these are used for bones with parents
-                // that aren't the base bone
                 
-            if (bone.hasParent()) {
-                
-                parentBone=bones[bone.parentBoneIdx];
-                if (parentBone.isBase()) continue;
-                if (this.isBoneHorizontal(bone)) continue;
-                
+            if ((bone.isWrist()) || (bone.isElbow()) || (bone.isAnkle()) || (bone.isKnee()) || (bone.isNeck()) || (bone.isTorso()) || (bone.isWaist()) || (bone.isHip())) {
                 vIdx+=this.CYLINDER_VERTEX_COUNT;
                 uvIdx+=this.CYLINDER_UV_COUNT;
                 iIdx+=this.CYLINDER_INDEX_COUNT;
@@ -231,7 +213,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
             }
         }
         
-            // supergumba -- temporary, boxing bones for now
+            // put primitives around bones
             
         var vertices=new Float32Array(vIdx);
         var uvs=new Float32Array(uvIdx);
@@ -256,7 +238,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
             
             if (bone.isHead()) {
                 xBound=new wsBound((bone.position.x-200),(bone.position.x+200));
-                yBound=new wsBound((bone.position.y-500),(bone.position.y));
+                yBound=new wsBound((bone.position.y-400),(bone.position.y+100));
                 zBound=new wsBound((bone.position.z-150),(bone.position.z+150));
 
                 this.buildBoxAroundBone(view,bone,xBound,yBound,zBound,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.0);
@@ -295,11 +277,8 @@ function GenModelMeshObject(model,bitmap,genRandom)
             
                 // cylinder type bones
                 
-            if (bone.hasParent()) {
+            if ((bone.isWrist()) || (bone.isElbow()) || (bone.isAnkle()) || (bone.isKnee()) || (bone.isNeck())) {
                 parentBone=bones[bone.parentBoneIdx];
-                if (parentBone.isBase()) continue;
-                if (this.isBoneHorizontal(bone)) continue;
-                
                 this.buildCylinderAroundBones(view,bone,parentBone,100,100,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
                 
                 vIdx+=this.CYLINDER_VERTEX_COUNT;
@@ -309,7 +288,37 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 continue;
             }
             
-       }
+        }
+       
+            // build the body bones
+            
+        var torsoRadius=this.genRandom.randomInt(200,150);
+        var waistRadius=this.genRandom.randomInt(200,150);
+        var hipRadius=this.genRandom.randomInt(200,150);
+        
+        var torsoBone=this.model.skeleton.findBone("Torso");
+        var waistBone=this.model.skeleton.findBone("Waist");
+        var hipBone=this.model.skeleton.findBone("Hip");
+        
+        this.buildCylinderAroundBones(view,torsoBone,waistBone,torsoRadius,waistRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        vIdx+=this.CYLINDER_VERTEX_COUNT;
+        uvIdx+=this.CYLINDER_UV_COUNT;
+        iIdx+=this.CYLINDER_INDEX_COUNT;
+        
+        this.buildCylinderAroundBones(view,waistBone,hipBone,waistRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        vIdx+=this.CYLINDER_VERTEX_COUNT;
+        uvIdx+=this.CYLINDER_UV_COUNT;
+        iIdx+=this.CYLINDER_INDEX_COUNT;
+        
+        var pt=hipBone.position.copy();
+        pt.y+=300;
+        
+        this.buildCylinderAroundPoints(view,hipBone.position,pt,hipRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        vIdx+=this.CYLINDER_VERTEX_COUNT;
+        uvIdx+=this.CYLINDER_UV_COUNT;
+        iIdx+=this.CYLINDER_INDEX_COUNT;
+            
+            // complete the tangent space vectors
     
         var meshUVTangents=new MeshUVTangentsObject();
         var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);

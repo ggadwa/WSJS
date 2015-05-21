@@ -396,7 +396,7 @@ function ViewObject()
             entity.draw(this);
             entity.drawEnd(this);
             
-            debug.drawModelSkeleton(this,entity.model,entity.position);
+            //debug.drawModelSkeleton(this,entity.model,entity.position);   // supergumba -- testing
             drawModelCount++;
         }
 

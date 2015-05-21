@@ -11,10 +11,8 @@ EMCA6 TODOs
 
 
 model generation
- - rotation is wrong on spines, needs to on X, maybe minor Z
- - randomize cylinder sizes
- - bigger cylinders for torso
- - hips get square
+ - do torse->waist->hips as separate find calls
+    torso size = arm size, hips = leg size, waist = random
 
 ---> needs decoration location?
 ---> make sure to get rid of debug.drawModelSkeleton in view
