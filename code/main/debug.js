@@ -205,36 +205,5 @@ function DebugObject()
         document.body.appendChild(cvs);
     };
 
-        //
-        // write out data to debug div
-        //
-
-    this.displayMapInfo=function(view,camera)
-    {
-        var n,light;
-        var str='';
-
-        str+=('Position: '+Math.floor(camera.position.x)+','+Math.floor(camera.position.y)+','+Math.floor(camera.position.z));
-        str+='<br>';
-        str+=('Angle: '+Math.floor(camera.angle.x)+','+Math.floor(camera.angle.y)+','+Math.floor(camera.angle.z));
-        str+='<br>';
-
-        for (n=0;n!==view.lights.length;n++) {
-            light=view.lights[n];
-            if (light===null) break;
-
-            str+=('Light_'+n+' ['+light.origIndex+']');
-            str+='<br>';
-
-            str+=('  Position: '+Math.floor(light.position.x)+','+Math.floor(light.position.y)+','+Math.floor(light.position.z));
-            str+='<br>';
-            str+=('  Color: '+light.color.r+','+light.color.g+','+light.color.b);
-            str+='<br>';
-            str+=('  Distance: '+Math.floor(light.dist));
-            str+='<br>';
-        }
-
-        document.getElementById('wsStatus').innerHTML=str;
-    };
 }
 

@@ -80,8 +80,12 @@ function wsLoopRun(timeStamp)
         // get integer msec timestamp
     
     var ts=Math.floor(timeStamp);
+    
+        // run the input
+        
+    input.run();
    
-        // physics and input
+        // entities and physics
     
     var physicsTick=ts-view.loopLastPhysicTimeStamp;
     view.loopLastPhysicTimeStamp=ts;
@@ -91,7 +95,7 @@ function wsLoopRun(timeStamp)
     while (physicsTick>WS_PHYSICS_MSECS) {
         physicsTick-=WS_PHYSICS_MSECS;
         
-        input.run(view.camera);
+        entityList.run();
     }
     
         // drawing
@@ -419,20 +423,13 @@ function wsInitFinish()
         
     map.setupBuffers(view);
     
-        // the initial camera position
-        
-    var mapMid=view.OPENGL_FAR_Z/2;
-
-    view.camera.position.set(mapMid,mapMid,mapMid);
-    view.camera.angle.set(0.0,0.0,0.0);
-    
         // ambient
         
     view.ambient.set(AMBIENT_R,AMBIENT_G,AMBIENT_B);
     
         // start the input
         
-    input.initialize(view);
+    input.initialize(view,entityList.getPlayer());
 
         // start the main loop
     

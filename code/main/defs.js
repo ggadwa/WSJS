@@ -23,6 +23,13 @@ function wsPoint(x,y,z)
         this.z=zSet;
     };
     
+    this.setFromPoint=function(pt)
+    {
+        this.x=pt.x;
+        this.y=pt.y;
+        this.z=pt.z;
+    };
+    
     this.setFromAddPoint=function(pt1,pt2)
     {
         this.x=pt1.x+pt2.x;
@@ -254,6 +261,13 @@ function wsAngle(x,y,z)
         this.x=xSet;
         this.y=ySet;
         this.z=zSet;
+    };
+    
+    this.setFromAngle=function(ang)
+    {
+        this.x=ang.x;
+        this.y=ang.y;
+        this.z=ang.z;
     };
                 
     this.copy=function()

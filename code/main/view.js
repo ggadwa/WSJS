@@ -1,6 +1,27 @@
 "use strict";
 
 //
+// view camera class
+//
+
+function ViewCameraObject()
+{
+    this.position=new wsPoint(0.0,0.0,0.0);
+    this.angle=new wsAngle(0.0,0.0,0.0);
+    
+        //
+        // set camera to entity
+        //
+        
+    this.setToEntity=function(entity)
+    {
+        this.position.setFromPoint(entity.position);
+        this.angle.setFromAngle(entity.angle);
+    };
+    
+}
+
+//
 // view class
 //
 
@@ -56,7 +77,7 @@ function ViewObject()
     
         // the camera object
         
-    this.camera=new CameraObject();
+    this.camera=new ViewCameraObject();
     
         // main loop
         
@@ -336,7 +357,11 @@ function ViewObject()
         var light;
         var drawMeshCount=0;
         var drawModelCount=0;
-        var camera=this.camera;
+        
+            // setup the view camera to be
+            // equal to player object
+            
+        this.camera.setToEntity(entityList.getPlayer());
 
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
@@ -346,13 +371,13 @@ function ViewObject()
             // get the eye point and rotate it
             // around the view position
 
-        var eyePos=new wsPoint(camera.position.x,camera.position.y,(camera.position.z-this.OPENGL_NEAR_Z));
-        eyePos.rotateX(camera.position,camera.angle.x);
-        eyePos.rotateY(camera.position,camera.angle.y);
+        var eyePos=new wsPoint(this.camera.position.x,this.camera.position.y,(this.camera.position.z-this.OPENGL_NEAR_Z));
+        eyePos.rotateX(this.camera.position,this.camera.angle.x);
+        eyePos.rotateY(this.camera.position,this.camera.angle.y);
 
             // setup the look at
 
-        this.modelMatrix=this.buildLookAtMatrix(eyePos,camera.position);
+        this.modelMatrix=this.buildLookAtMatrix(eyePos,this.camera.position);
 
             // create the 3x3 normal matrix
             // the normal is the invert-transpose of the model matrix
@@ -367,7 +392,7 @@ function ViewObject()
             // all lights need a eye coordinate, so calc
             // that here
 
-        map.createViewLightsFromMapLights(this,camera);
+        map.createViewLightsFromMapLights(this);
         
         for (n=0;n!==this.LIGHT_COUNT;n++) {
             light=this.lights[n];
@@ -413,7 +438,7 @@ function ViewObject()
 
         var countStr=drawMeshCount.toString()+"/"+drawModelCount.toString();
 
-        var posStr=Math.floor(camera.position.x)+','+Math.floor(camera.position.y)+','+Math.floor(camera.position.z)+':'+Math.floor(camera.angle.y);
+        var posStr=Math.floor(this.camera.position.x)+','+Math.floor(this.camera.position.y)+','+Math.floor(this.camera.position.z)+':'+Math.floor(this.camera.angle.y);
 
         this.text.drawStart(this);
         this.text.draw(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));

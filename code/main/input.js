@@ -13,13 +13,19 @@ function InputObject()
     this.mouseFirstMove=true;
     this.mouseLastPos=new ws2DPoint(0,0);
     
+    this.playerEntity=null;
+    
         //
         // initialize/release input
         //
 
-    this.initialize=function(view)
+    this.initialize=function(view,playerEntity)
     {
         var n;
+        
+            // remember the player entity
+            
+        this.playerEntity=playerEntity;
 
             // clear the run input flags
 
@@ -45,38 +51,44 @@ function InputObject()
         // run input from main loop
         //
 
-    this.run=function(camera)
+    this.run=function()
     {
+        this.playerEntity.turnSpeed=0.0;
+        this.playerEntity.lookSpeed=0.0;
+        this.playerEntity.forwardSpeed=0.0;
+        this.playerEntity.sideSpeed=0.0;
+        this.playerEntity.verticalSpeed=0.0;        // supergumba -- this is all temporary, we need to do start/stop here so acc/decl can take place
+        
             // left arrow and right arrow
             // turning
 
-        if (this.keyFlags[37]) camera.turn(-3.0);
-        if (this.keyFlags[39]) camera.turn(3.0);
+        if (this.keyFlags[37]) this.playerEntity.turnSpeed=-3.0;
+        if (this.keyFlags[39]) this.playerEntity.turnSpeed=3.0;
 
             // up arrow or W
             // down arrow or S
             // forward and backwards
 
-        if ((this.keyFlags[38]) || (this.keyFlags[87])) camera.forward(125.0,0.0);
-        if ((this.keyFlags[40]) || (this.keyFlags[83])) camera.forward(-125.0,0.0);
+        if ((this.keyFlags[38]) || (this.keyFlags[87])) this.playerEntity.forwardSpeed=125.0;
+        if ((this.keyFlags[40]) || (this.keyFlags[83])) this.playerEntity.forwardSpeed=-125.0;
 
             // A and D
             // sidestep
 
-        if (this.keyFlags[65]) camera.forward(75.0,-90.0);
-        if (this.keyFlags[68]) camera.forward(75.0,90.0);
+        if (this.keyFlags[65]) this.playerEntity.sideSpeed=-75.0;
+        if (this.keyFlags[68]) this.playerEntity.sideSpeed=75.0;
 
             // insert/home, delete/end
             // up or down
 
-        if ((this.keyFlags[45]) || (this.keyFlags[36])) camera.move(0.0,-125.0,0.0);
-        if ((this.keyFlags[46]) || (this.keyFlags[35])) camera.move(0.0,125.0,0.0);
+        if ((this.keyFlags[45]) || (this.keyFlags[36])) this.playerEntity.verticalSpeed=-125.0;
+        if ((this.keyFlags[46]) || (this.keyFlags[35])) this.playerEntity.verticalSpeed=125.0;
 
             // page up, page down
             // look up or down
 
-        if (this.keyFlags[33]) camera.look(1.5);
-        if (this.keyFlags[34]) camera.look(-1.5); 
+        if (this.keyFlags[33]) this.playerEntity.lookSpeed=1.5;
+        if (this.keyFlags[34]) this.playerEntity.lookSpeed=-1.5; 
     };
 
         //

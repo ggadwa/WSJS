@@ -49,6 +49,25 @@ function EntityListObject()
     {
         return(this.entities[entityIdx]);
     };
+    
+    this.getPlayer=function()
+    {
+        return(this.entities[0]);
+    };
+    
+        //
+        // run all entities
+        //
+        
+    this.run=function()
+    {
+        var n;
+        var nEntity=this.entities.length;
+        
+        for (n=0;n!==nEntity;n++) {
+            this.entities[n].run();
+        }
+    };
 
 }
     

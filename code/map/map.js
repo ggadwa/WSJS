@@ -297,7 +297,7 @@ function MapObject()
         // map light utilities
         //
 
-    this.createViewLightsFromMapLights=function(view,camera)
+    this.createViewLightsFromMapLights=function(view)
     {
         var n,k,nLight,idx;
         var x,y,z;
@@ -313,9 +313,9 @@ function MapObject()
 
             light.origIndex=n;
 
-            x=camera.position.x-light.position.x;
-            y=camera.position.y-light.position.y;
-            z=camera.position.z-light.position.z;
+            x=view.camera.position.x-light.position.x;
+            y=view.camera.position.y-light.position.y;
+            z=view.camera.position.z-light.position.z;
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));        // sqrt not required here, but overflow could be a problem
         }
 
