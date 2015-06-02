@@ -78,17 +78,17 @@ function InputObject()
         if (this.keyFlags[65]) this.playerEntity.sideSpeed=-75.0;
         if (this.keyFlags[68]) this.playerEntity.sideSpeed=75.0;
 
-            // insert/home, delete/end
+            // - and +
             // up or down
 
-        if ((this.keyFlags[45]) || (this.keyFlags[36])) this.playerEntity.verticalSpeed=-125.0;
-        if ((this.keyFlags[46]) || (this.keyFlags[35])) this.playerEntity.verticalSpeed=125.0;
+        if (this.keyFlags[61]) this.playerEntity.verticalSpeed=-125.0;
+        if (this.keyFlags[173]) this.playerEntity.verticalSpeed=125.0;
 
-            // page up, page down
+            // [ and ]
             // look up or down
 
-        if (this.keyFlags[33]) this.playerEntity.lookSpeed=1.5;
-        if (this.keyFlags[34]) this.playerEntity.lookSpeed=-1.5; 
+        if (this.keyFlags[219]) this.playerEntity.lookSpeed=1.5;
+        if (this.keyFlags[221]) this.playerEntity.lookSpeed=-1.5; 
     };
 
         //

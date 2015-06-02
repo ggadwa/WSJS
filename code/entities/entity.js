@@ -4,10 +4,11 @@
 // entity class
 //
 
-function EntityObject(position,angle,model,isPlayer)
+function EntityObject(position,angle,radius,model,isPlayer)
 {
     this.position=position;
     this.angle=angle;
+    this.radius=radius;
     this.model=model;
     this.isPlayer=isPlayer;
     
@@ -23,11 +24,22 @@ function EntityObject(position,angle,model,isPlayer)
         // move forward with angle
         //
     
-    this.forward=function(dist,extraAngle)
+    this.forward=function(map,dist,extraAngle)
     {
+            // get the move to point
+            
         var pt=new wsPoint(0.0,0.0,dist);        
         pt.rotateY(null,(this.angle.y+extraAngle));
-        this.position.addPoint(pt);
+        
+        var entityPt=this.position.copy();
+        entityPt.addPoint(pt);
+        
+            // run the collision and set
+            // to the hit point (which will
+            // be entityPt is nothing is hit)
+            
+        entityPt=this.collision.moveObjectInMap(map,entityPt,radius);
+        this.position.move(entityPt);
     };
     
         //
@@ -65,12 +77,12 @@ function EntityObject(position,angle,model,isPlayer)
         // run entity
         //
         
-    this.run=function()
+    this.run=function(map)
     {
         if (this.turnSpeed!==0.0) this.turn(this.turnSpeed);
         if (this.lookSpeed!==0.0) this.look(this.lookSpeed);
-        if (this.forwardSpeed!==0.0) this.forward(this.forwardSpeed,0.0);
-        if (this.sideSpeed!==0.0) this.forward(this.sideSpeed,90.0);
+        if (this.forwardSpeed!==0.0) this.forward(map,this.forwardSpeed,0.0);
+        if (this.sideSpeed!==0.0) this.forward(map,this.sideSpeed,90.0);
         if (this.verticalSpeed!==0.0) this.move(0.0,this.verticalSpeed,0.0);
     };
         

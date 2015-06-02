@@ -59,13 +59,13 @@ function EntityListObject()
         // run all entities
         //
         
-    this.run=function()
+    this.run=function(map)
     {
         var n;
         var nEntity=this.entities.length;
         
         for (n=0;n!==nEntity;n++) {
-            this.entities[n].run();
+            this.entities[n].run(map);
         }
     };
 

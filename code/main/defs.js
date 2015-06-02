@@ -280,6 +280,16 @@ function wsLine(p1,p2)
 {
     this.p1=p1;
     this.p2=p2;
+    
+    this.setPoint1=function(p1)
+    {
+        this.p1=p1;
+    };
+    
+    this.setPoint2=function(p2)
+    {
+        this.p2=p2;
+    };
 }
 
 function wsBound(value1,value2)

@@ -4,90 +4,11 @@
 // primitive collisions
 //
 
-/*
 
-static inline bool line_line_intersect(d3pnt *p0,d3pnt *p1,d3pnt *p2,d3pnt *p3,d3pnt *hit_pnt)
-{
-	float			fx0,fy0,fx1,fy1,fx2,fy2,fx3,fy3,
-					denom,
-					ax,bx,dx,ay,by,dy,r,s;
 
-	fx0=(float)p0->x;
-	fy0=(float)p0->z;
-	fx1=(float)p1->x;
-	fy1=(float)p1->z;
-	fx2=(float)p2->x;
-	fy2=(float)p2->z;
-	fx3=(float)p3->x;
-	fy3=(float)p3->z;
-	
-	ax=fx0-fx2;
-	bx=fx1-fx0;
-	dx=fx3-fx2;
-	
-	ay=fy0-fy2;
-	by=fy1-fy0;
-	dy=fy3-fy2;
-	
-	denom=(bx*dy)-(by*dx);
-	if (denom==0.0f) return(FALSE);
-	
-	r=((ay*dx)-(ax*dy))/denom;
-	if ((r<0.0f) || (r>1.0f)) return(FALSE);
-	
-	s=((ay*bx)-(ax*by))/denom;
-	if ((s<0.0f) || (s>1.0f)) return(FALSE);
-	
-	if ((r==0.0f) && (s==0.0f)) return(FALSE);
-	
-	hit_pnt->x=(int)(fx0+(r*bx));
-	hit_pnt->z=(int)(fy0+(r*by));
-	
-	return(TRUE);
-}
 
-int circle_line_intersect(d3pnt *p1,d3pnt *p2,d3pnt *circle_pnt,int radius,d3pnt *hit_pnt)
-{
-	int				n,dist,cur_dist;
-	float			rad,rad_add,f_radius;
-	float			fx,fz;
-	d3pnt			cp2,temp_hit_pnt;
-	
-		// ray cast like spokes from the circle
-		// normal math says check the perpendicular,
-		// but that allows parts of the circle to
-		// wade into corners
 
-	cur_dist=-1;
 
-	f_radius=(float)radius;
-
-	rad=0.0f;
-	rad_add=(TRIG_PI*2.0f)/24.0f;
-
-	for (n=0;n!=24;n++) {
-		cp2.x=circle_pnt->x+(int)(f_radius*sinf(rad));
-		cp2.z=circle_pnt->z-(int)(f_radius*cosf(rad));
-		
-		if (line_line_intersect(p1,p2,circle_pnt,&cp2,&temp_hit_pnt)) {
-			fx=(float)(temp_hit_pnt.x-circle_pnt->x);
-			fz=(float)(temp_hit_pnt.z-circle_pnt->z);
-			dist=(int)sqrtf((fx*fx)+(fz*fz));
-
-			if ((dist<cur_dist) || (cur_dist==-1)) {
-				cur_dist=dist;
-				hit_pnt->x=temp_hit_pnt.x;
-				hit_pnt->z=temp_hit_pnt.z;
-			}
-		}
-
-		rad+=rad_add;
-	}
-	
-	return(cur_dist);
-}
-
- */
 
 
 //
@@ -96,6 +17,92 @@ int circle_line_intersect(d3pnt *p1,d3pnt *p2,d3pnt *circle_pnt,int radius,d3pnt
 
 function CollisionObject()
 {
+    
+    //
+    // collision routines
+    //
+    
+    this.lineLineIntersection=function(line1,line2)
+    {
+        var fx0=line1.p1.x;
+        var fy0=line1.p1.y;
+        var fx1=line1.p2.x;
+        var fy1=line1.p2.y;
+        var fx2=line2.p1.x;
+        var fy2=line2.p1.y;
+        var fx3=line2.p2.x;
+        var fy3=line2.p2.y;
+
+        var ax=fx0-fx2;
+        var bx=fx1-fx0;
+        var dx=fx3-fx2;
+
+        var ay=fy0-fy2;
+        var by=fy1-fy0;
+        var dy=fy3-fy2;
+
+        var denom=(bx*dy)-(by*dx);
+        if (denom===0.0) return(null);
+
+        var r=((ay*dx)-(ax*dy))/denom;
+        if ((r<0.0) || (r>1.0)) return(null);
+
+        var s=((ay*bx)-(ax*by))/denom;
+        if ((s<0.0) || (s>1.0)) return(null);
+
+        if ((r===0.0) && (s===0.0)) return(null);
+
+        return(new ws2DPoint((fx0+(r*bx)),(fy0+(r*by))));
+    };
+
+    this.circleLineIntersection=function(line,circlePt,radius)
+    {
+        var n;
+        var hitPt=null;
+	
+            // cast rays from the center of the circle
+            // like spokes to check for collisions
+            // we do it instead of just checking the
+            // perpendicular so you can't wade into corners
+
+        var dist;
+        var currentDist=-1;
+        
+        var hitPt;
+        var currentHitPt=null;
+
+        var rad=0.0;
+        var radAdd=(Math.PI*2.0)/24.0;
+        
+        var spokePt=new ws2DPoint(circlePt.x,circlePt.z);
+        var spoke=new wsLine(circlePt,spokePt);
+
+        for (n=0;n!==24;n++) {
+            
+            spokePt.x=circlePt.x+radius*Math.sin(rad);
+            spokePt.y=circlePt.y-radius*Math.cos(rad);   // everything is passed by pointer so this will change the spoke line
+
+            hitPt=this.lineLineIntersection(line,spoke);
+            if (hitPt!==null) {
+                
+                if (currentHitPt===null) {
+                    hitPt=currentHitPt;
+                    currentDist=circlePt.noSquareDistance(currentHitPt);
+                }
+                else {
+                    dist=circlePt.noSquareDistance(hitPt);
+                    if (dist<currentDist) {
+                        hitPt=currentHitPt;
+                        currentDist=dist;
+                    }
+                }
+            }
+
+            rad+=radAdd;
+        }
+
+        return(currentHitPt);
+    };
 
         //
         // colliding objects
@@ -103,6 +110,63 @@ function CollisionObject()
 
     this.moveObjectInMap=function(map,pt,radius)
     {
+        var n,k;
+        var mesh,nMesh;
+        var collisionLine,nCollisionLine;
+        
+            // this is a 2D calculation, so
+            // we need to convert the pt
+            
+        var circlePt=new ws2DPoint(pt.x,pt.z);
+        
+        var hitPt;
+        var currentHitPt=null;
+        
+        var dist;
+        var currentDist=-1;
+        
+            // run through the meshes and
+            // check against x/z collision lines
+            
+        nMesh=map.meshes.length;
+        
+        for (n=0;n!==nMesh;n++) {
+            mesh=map.meshes[n];
+            nCollisionLine=mesh.collisionLines.length;
+            
+            for (k=0;k!==nCollisionLine;k++) {
+                collisionLine=mesh.collisionLines[k];
+                
+                    // check against line
+                    
+                hitPt=this.circleLineIntersection(collisionLine,circlePt,radius);
+                if (hitPt===null) continue;
+                
+                    // find closest hit point
+                    
+                if (currentHitPt===null) {
+                    currentHitPt=hitPt;
+                    currentDist=circlePt.noSquareDistance(currentHitPt);
+                }
+                else {
+                    dist=circlePt.noSquareDistance(hitPt);
+                    if (dist<currentDist) {
+                        currentHitPt=hitPt;
+                        currentDist=dist;
+                    }
+                }
+            }
+        }
+        
+            // any hits?
+            
+        if (currentHitPt!==null) {
+            pt.x=currentHitPt.x;
+            pt.z=currentHitPt.y;
+        }
+        
+            // return moved point
 
+        return(pt);
     };
 }
