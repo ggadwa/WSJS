@@ -284,7 +284,7 @@ function MapPieceObject(isRoom)
             x2=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
             z2=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
 
-            mesh.addCollisionLine(new wsLine(new ws2DPoint(x1,z1),new ws2DPoint(x2,z2)));
+            mesh.addCollisionLine(new wsLine(new wsPoint(x1,yBound.min,z1),new wsPoint(x2,yBound.max,z2)));
         }
 
         return(mesh);

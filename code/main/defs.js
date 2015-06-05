@@ -290,6 +290,21 @@ function wsLine(p1,p2)
     {
         this.p2=p2;
     };
+    
+    this.getXBound=function()
+    {
+        return(new wsBound(p1.x,p2.x));
+    };
+    
+    this.getYBound=function()
+    {
+        return(new wsBound(p1.y,p2.y));
+    };
+    
+    this.getZBound=function()
+    {
+        return(new wsBound(p1.z,p2.z));
+    };
 }
 
 function wsBound(value1,value2)

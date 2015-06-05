@@ -10,6 +10,12 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
+collisions
+ - need a slop to move collision backwards so not stuck in walls
+ - make sure all movements (side step, etc, get collision)
+ - sliding
+
+
 model generation
  - do torse->waist->hips as separate find calls
     torso size = arm size, hips = leg size, waist = random

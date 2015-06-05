@@ -38,8 +38,8 @@ function EntityObject(position,angle,radius,model,isPlayer)
             // to the hit point (which will
             // be entityPt is nothing is hit)
             
-        entityPt=this.collision.moveObjectInMap(map,entityPt,radius);
-        this.position.move(entityPt);
+        entityPt=this.collision.moveObjectInMap(map,entityPt,radius,true);
+        this.position.setFromPoint(entityPt);
     };
     
         //

@@ -318,9 +318,9 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         // collision lines
         //
 
-    this.addCollisionLine=function(p1,p2)
+    this.addCollisionLine=function(line)
     {
-        this.collisionLines.push(new wsLine(p1,p2));
+        this.collisionLines.push(line);
     };
 
         //
