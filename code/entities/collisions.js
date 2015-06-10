@@ -69,8 +69,8 @@ function CollisionObject()
 
         for (n=0;n!==24;n++) {
             
-            spokePt.x=circlePt.x+radius*Math.sin(rad);
-            spokePt.z=circlePt.z-radius*Math.cos(rad);   // everything is passed by pointer so this will change the spoke line
+            spokePt.x=circlePt.x+(radius*Math.sin(rad));
+            spokePt.z=circlePt.z-(radius*Math.cos(rad));   // everything is passed by pointer so this will change the spoke line
 
             hitPt=this.lineLineXZIntersection(line,spoke);
             if (hitPt!==null) {
@@ -91,7 +91,7 @@ function CollisionObject()
         // colliding objects
         //
 
-    this.moveObjectInMap=function(map,pt,radius,bump)
+    this.moveObjectInMap=function(map,origPt,movePt,radius,bump)
     {
         var n,k;
         var mesh;
@@ -106,6 +106,11 @@ function CollisionObject()
         var bumpOnce=false;
         var bumpY;
         var yBound;
+        
+            // the moved point
+            
+        var pt=origPt.copy();
+        pt.addPoint(movePt);
         
             // we need to possible run through
             // this multiple times to deal with
@@ -137,7 +142,7 @@ function CollisionObject()
 
                     hitPt=this.circleLineXZIntersection(collisionLine,pt,radius);
                     if (hitPt===null) continue;
-
+                    
                         // find closest hit point
 
                     dist=pt.noSquareDistance(hitPt);
@@ -153,17 +158,13 @@ function CollisionObject()
                 // if no hits, just return
                 // original move
                 
-            if (currentHitPt===null) return(pt);
+            if (currentHitPt===null) return(movePt);
             
                 // if no bump, not a bumpable
                 // hit, or we've already bumped,
                 // just return hit
                 
-            if ((!bump) || (bumpY===-1) || (bumpOnce)) {
-                pt.x=currentHitPt.x;
-                pt.z=currentHitPt.z;
-                return(pt);
-            }
+            if ((!bump) || (bumpY===-1) || (bumpOnce)) break;
                 
                 // do the bump, but only
                 // once
@@ -172,11 +173,35 @@ function CollisionObject()
             pt.y=bumpY;
         }
         
-            // return moved point
-
-        pt.x=currentHitPt.x;
-        pt.z=currentHitPt.z;
+            // the new move is to a point
+            // that is one radius away
+            // from the hit point, in the
+            // direction of the move
+            
+            // normalize the move from
+            // hit point to orig point and
+            // scale to radius
+            
+        movePt.x=origPt.x-currentHitPt.x;
+        movePt.y=0;
+        movePt.z=origPt.z-currentHitPt.z;
         
-        return(pt);
+        movePt.normalize();
+        movePt.scale(radius);
+        
+        movePt.addPoint(currentHitPt);
+        
+            // and the new move is the original
+            // point to this point
+            
+        movePt.x-=origPt.x;
+        movePt.z-=origPt.z;
+        
+            // always restore the bump move
+            
+        movePt.y=pt.y-origPt.y;
+        
+        return(movePt);
     };
+    
 }

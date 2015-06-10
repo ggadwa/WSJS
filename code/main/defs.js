@@ -81,6 +81,11 @@ function wsPoint(x,y,z)
         this.z-=pt.z;
     };
     
+    this.equals=function(pt)
+    {
+        return((this.x==pt.x)&&(this.y==pt.y)&&(this.z==pt.z));
+    };
+    
     this.rotateX=function(centerPt,rotX)
     {
         if (centerPt!==null) {

@@ -11,8 +11,8 @@ EMCA6 TODOs
 
 
 collisions
- - need a slop to move collision backwards so not stuck in walls
- - make sure all movements (side step, etc, get collision)
+ - need to eliminate meshes first in collision routines
+ - need to build collision mesh from raw meshes
  - sliding
 
 

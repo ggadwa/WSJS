@@ -400,13 +400,13 @@ function wsInitBuildEntities()
         // make player entity
         
     var mapMid=view.OPENGL_FAR_Z/2;
-    entityList.addPlayer(new EntityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),500,modelList.get('player'),true));
+    entityList.addPlayer(new EntityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),800,modelList.get('player'),true));
     
         // make monster entities
         
     for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
         monsterModelName='monster_'+entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);
-        entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),500,modelList.get(monsterModelName),false));
+        entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,modelList.get(monsterModelName),false));
     }
     
         // add entities to map

@@ -26,20 +26,48 @@ function EntityObject(position,angle,radius,model,isPlayer)
     
     this.forward=function(map,dist,extraAngle)
     {
+        var angY=this.angle.y+extraAngle;
+        
             // get the move to point
             
-        var pt=new wsPoint(0.0,0.0,dist);        
-        pt.rotateY(null,(this.angle.y+extraAngle));
+        var movePt=new wsPoint(0.0,0.0,dist);
+        movePt.rotateY(null,angY);
         
-        var entityPt=this.position.copy();
-        entityPt.addPoint(pt);
-        
-            // run the collision and set
-            // to the hit point (which will
-            // be entityPt is nothing is hit)
+            // run the collision which
+            // will return a new move direction
             
-        entityPt=this.collision.moveObjectInMap(map,entityPt,radius,true);
-        this.position.setFromPoint(entityPt);
+        var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,radius,true);
+        //if (collideMovePt.equals(movePt)) {
+            this.position.addPoint(collideMovePt);
+            return;
+        //}
+        
+            // try to slide
+            
+        var slidePt,collideSlidePt;
+            
+        slidePt=new wsPoint(movePt.x,0.0,0.0);
+        //slidePt.rotateY(null,(angY+90.0));
+        
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,true);
+        if (collideSlidePt.equals(slidePt)) {
+            this.position.addPoint(collideSlidePt);
+            return;
+        }
+        
+        slidePt=new wsPoint(0.0,0.0,movePt.z);
+        //slidePt.rotateY(null,(angY-90.0));
+        
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,true);
+        if (collideSlidePt.equals(slidePt)) {
+            this.position.addPoint(collideSlidePt);
+            return;
+        }
+        
+            // if nothing works, just use the
+            // the original collide point
+            
+        this.position.addPoint(collideMovePt);
     };
     
         //
