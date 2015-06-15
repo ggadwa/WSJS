@@ -112,6 +112,11 @@ function CollisionObject()
         var pt=origPt.copy();
         pt.addPoint(movePt);
         
+            // the rough collide boxes
+            
+        var objXBound=new wsBound((pt.x-radius),(pt.x+radius));
+        var objZBound=new wsBound((pt.z-radius),(pt.z+radius));
+        
             // we need to possible run through
             // this multiple times to deal with
             // bumps
@@ -128,6 +133,13 @@ function CollisionObject()
 
             for (n=0;n!==nMesh;n++) {
                 mesh=map.meshes[n];
+                
+                    // skip any mesh we don't collide with
+                    
+                if (!mesh.boxBoundCollision(objXBound,null,objZBound)) continue;
+                
+                    // check the collide lines
+                    
                 nCollisionLine=mesh.collisionLines.length;
 
                 for (k=0;k!==nCollisionLine;k++) {
@@ -181,27 +193,21 @@ function CollisionObject()
             // normalize the move from
             // hit point to orig point and
             // scale to radius
-            
-        movePt.x=origPt.x-currentHitPt.x;
-        movePt.y=0;
-        movePt.z=origPt.z-currentHitPt.z;
         
-        movePt.normalize();
-        movePt.scale(radius);
+        var newOrigPt=new wsPoint((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
         
-        movePt.addPoint(currentHitPt);
+        newOrigPt.normalize();
+        newOrigPt.scale(radius);
+        
+        newOrigPt.addPoint(currentHitPt);
         
             // and the new move is the original
             // point to this point
-            
-        movePt.x-=origPt.x;
-        movePt.z-=origPt.z;
-        
             // always restore the bump move
-            
-        movePt.y=pt.y-origPt.y;
         
-        return(movePt);
+        var rtnMovePt=new wsPoint((newOrigPt.x-origPt.x),(pt.y-origPt.y),(newOrigPt.z-origPt.z));
+        
+        return(rtnMovePt);
     };
     
 }

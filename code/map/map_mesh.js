@@ -315,12 +315,63 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
     };
 
         //
-        // collision lines
+        // collision geometry
         //
 
     this.addCollisionLine=function(line)
     {
         this.collisionLines.push(line);
+    };
+    
+    this.buildCollisionGeometry=function()
+    {
+        var n,k,nLine,line,skip;
+        var tIdx,v0Idx,v1Idx,v2Idx;
+
+            // run through the triangles
+            // and find any that make a wall
+            // and create a collision lines
+            // and boxes
+            
+        tIdx=0;
+            
+        for (n=0;n!==this.trigCount;n++) {
+            
+                // get trig vertices
+
+            v0Idx=this.indexes[tIdx++]*3;
+            v1Idx=this.indexes[tIdx++]*3;
+            v2Idx=this.indexes[tIdx++]*3;
+            
+                // detect if triangle is wall like
+                
+            if (!(Math.abs(this.normals[v0Idx+1])<=0.3)) continue;
+            
+                // create the line
+            
+            if (this.vertices[v0Idx+1]===this.vertices[v1Idx+1]) {
+                line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v2Idx],this.vertices[v2Idx+1],this.vertices[v2Idx+2]));
+            }
+            else {
+                line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v1Idx],this.vertices[v1Idx+1],this.vertices[v1Idx+2]));
+            }
+            
+                // is line already in list?
+                // usually, two triangles make
+                // a single line
+            
+            skip=false;
+            nLine=this.collisionLines.length;
+            
+            for (k=0;k!==nLine;k++) {
+                if (this.collisionLines[k].equals(line)) {
+                    skip=true;
+                    break;
+                }
+            }
+            
+            if (!skip) this.collisionLines.push(line);
+        }
     };
 
         //

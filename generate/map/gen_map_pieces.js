@@ -268,25 +268,6 @@ function MapPieceObject(isRoom)
 
         var mesh=new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag);
 
-            // add these same lines as
-            // collision lines to be used
-            // by the physics
-
-        for (n=0;n!==nPoint;n++) {
-            k=n+1;
-            if (k===nPoint) k=0;
-
-            pt=this.points[n];
-            x1=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
-            z1=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
-
-            pt=this.points[k];
-            x2=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
-            z2=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
-
-            mesh.addCollisionLine(new wsLine(new wsPoint(x1,yBound.min,z1),new wsPoint(x2,yBound.max,z2)));
-        }
-
         return(mesh);
     };
     

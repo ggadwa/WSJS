@@ -22,7 +22,7 @@ function GenMapObject(view,map,setup,genRandom)
 {
         // constants
         
-    this.GEN_MAP_STAIR_LENGTH=5000;
+    this.GEN_MAP_STAIR_LENGTH=8000;
 
         // variables
         
@@ -185,7 +185,7 @@ function GenMapObject(view,map,setup,genRandom)
 
     this.addDecoration=function(map,piece,xBound,yBound,zBound)
     {
-        this.addDecorationVertexPillars(map,piece,xBound,yBound,zBound);
+    //    this.addDecorationVertexPillars(map,piece,xBound,yBound,zBound);
         this.addDecorationBox(map,xBound,yBound,zBound);
     };
 
@@ -292,16 +292,16 @@ function GenMapObject(view,map,setup,genRandom)
             // reduce light if already in the
             // path of another light
 
-        var intensity=xBound.max-xBound.min*0.95;
+        var intensity=(xBound.max-xBound.min)*0.95;
 
         var pt=new wsPoint(lightX,(lightY+1100),lightZ);
         if (this.map.pointInLight(pt)) intensity*=0.8;
 
             // the color
 
-        var red=0.8+(this.genRandom.random()*0.2);
-        var green=0.8+(this.genRandom.random()*0.2);
-        var blue=0.8+(this.genRandom.random()*0.2);
+        var red=0.5+(this.genRandom.random()*0.5);
+        var green=0.5+(this.genRandom.random()*0.5);
+        var blue=0.5+(this.genRandom.random()*0.5);
 
             // add light to map
 
@@ -535,7 +535,7 @@ function GenMapObject(view,map,setup,genRandom)
 
     this.build=function()
     {
-        wsStartStatusBar(4);
+        wsStartStatusBar(3);
 
             // setup the pieces that
             // create the map
@@ -553,12 +553,7 @@ function GenMapObject(view,map,setup,genRandom)
             // delete any shared triangles
 
         this.removeSharedTriangles();
-        wsNextStatusBar();
-
-            // build the light/mesh intersection lists
-
-        this.map.buildLightMeshIntersectLists();
-        wsNextStatusBar();
+        wsNextStatusBar();  
     };
 
 }

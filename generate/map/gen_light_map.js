@@ -52,7 +52,7 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
     this.CHUNK_SIZE=Math.floor(this.TEXTURE_SIZE/this.CHUNK_SPLIT);    // square pixel size of chunks
     this.CHUNK_PER_TEXTURE=(this.CHUNK_SPLIT*this.CHUNK_SPLIT);        // how many chunks in a single texture
 
-    this.RENDER_MARGIN=2;                // margin around each light map triangle
+    this.RENDER_MARGIN=3;                // margin around each light map triangle
     this.BLUR_COUNT=3;
 
         // variables
@@ -188,9 +188,18 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
                         // with, then add the smear
 
                     if (colCount!==0) {
-                        data[idx]=Math.floor(r/colCount);
-                        data[idx+1]=Math.floor(g/colCount);
-                        data[idx+2]=Math.floor(b/colCount);
+                        r=Math.floor(r/colCount);
+                        if (r>255) r=255;
+                        
+                        g=Math.floor(g/colCount);
+                        if (g>255) g=255;
+                        
+                        b=Math.floor(b/colCount);
+                        if (b>255) b=255;
+                        
+                        data[idx]=r;
+                        data[idx+1]=g;
+                        data[idx+2]=b;
                         data[idx+3]=255;		// next time this is part of the smear
 
                         noFill=false;
@@ -253,14 +262,14 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
                             colCount++;
                         }
                     }
-
-                    r/=colCount;
+                    
+                    r=Math.floor(r/colCount);
                     if (r>255) r=255;
 
-                    g/=colCount;
+                    g=Math.floor(g/colCount);
                     if (g>255) g=255;
 
-                    b/=colCount;
+                    b=Math.floor(b/colCount);
                     if (b>255) b=255;
 
                     idx=((y*wid)+x)*4;
@@ -341,7 +350,7 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
             // invDet*dot(v2,lineToTrigPerpVector)
 
             // this is a little different then normal ray trace
-            // hits, we add in an extra 0.01f slop so polygons that are
+            // hits, we add in an extra 0.01 slop so polygons that are
             // touching each other don't have edges grayed in
 
         var t=invDet*((tv2x*lineToTrigPerpVectorX)+(tv2y*lineToTrigPerpVectorY)+(tv2z*lineToTrigPerpVectorZ));
@@ -630,6 +639,9 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
         zBound.adjust(v2.z);
 
             // 2D reduction factors
+            // we are drawing into a CHUNK_SIZE, but
+            // the actual points are within the margin
+            // so we have extra pixels to smear
 
         var renderSize=this.CHUNK_SIZE-(this.RENDER_MARGIN*2);
 
@@ -675,9 +687,10 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
         this.renderTriangle(meshIdx,trigIdx,ctx,[pt0,pt1,pt2],[v0,v1,v2],normal,lft,top,(lft+this.CHUNK_SIZE),(top+this.CHUNK_SIZE));
 
             // add the UV
+            // pt0-pt2 are already moved within the margin
 
-        var renderLft=lft+this.RENDER_MARGIN;
-        var renderTop=top+this.RENDER_MARGIN;
+        var renderLft=lft;
+        var renderTop=top;
 
         uvIdx=mesh.indexes[trigIdx*3]*2;
         lightmapUVs[uvIdx]=(pt0.x+renderLft)/this.TEXTURE_SIZE;

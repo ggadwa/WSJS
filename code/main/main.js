@@ -27,15 +27,25 @@ var AMBIENT_R=0.33;
 var AMBIENT_G=0.33;
 var AMBIENT_B=0.33;
 
-var MONSTER_MODEL_COUNT=3;
+var MAP_MAX_ROOM_DIMENSIONS=[25000,8000,25000];
+
+var MONSTER_MODEL_COUNT=1;
 var MONSTER_ENTITY_COUNT=5;
 
 //
 // debugging and quick start up flags
 //
 
-var MAX_ROOM=1;
-var SIMPLE_LIGHTMAP=true;
+var MAX_ROOM=5;
+var SIMPLE_LIGHTMAP=false;
+
+var RANDOM_MAP_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
+var RANDOM_MAP=Math.floor(Math.random()*0xFFFFFFFF);
+var RANDOM_MODEL_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
+var RANDOM_MODEL=Math.floor(Math.random()*0xFFFFFFFF);
+var RANDOM_ENTITY=Math.floor(Math.random()*0xFFFFFFFF);
+
+RANDOM_MAP=1176229181;
 
 //
 // textures to build
@@ -223,17 +233,12 @@ function wsInit()
 {
         // setup the random numbers
     
-    document.getElementById('wsMapBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsMapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsModelBitmapRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsModelRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    document.getElementById('wsEntityRandom').value=Math.floor(Math.random()*0xFFFFFFFF);
-    //document.getElementById('wsMapBitmapRandom').value=123456789; // supergumba -- a version to create the same map everytime for speed testing
-    //document.getElementById('wsMapRandom').value=123456789;
-    //document.getElementById('wsModelBitmapRandom').value=123456789;
-    //document.getElementById('wsModelRandom').value=123456789;
-    //document.getElementById('wsEntityRandom').value=123456789;
-    
+    document.getElementById('wsMapBitmapRandom').value=RANDOM_MAP_BITMAP;
+    document.getElementById('wsMapRandom').value=RANDOM_MAP;
+    document.getElementById('wsModelBitmapRandom').value=RANDOM_MODEL_BITMAP;
+    document.getElementById('wsModelRandom').value=RANDOM_MODEL;
+    document.getElementById('wsEntityRandom').value=RANDOM_ENTITY;
+
         // start the initialization
         
     wsStageStatus('Initializing WebGL');
@@ -309,9 +314,26 @@ function wsInitBuildMap()
 
         // build the map
    
-    var setup=new BuildMapSetupObject(this.MAX_ROOM,3,[18000,5000,18000],3,0.25,0.8);
+    var setup=new BuildMapSetupObject(this.MAX_ROOM,3,MAP_MAX_ROOM_DIMENSIONS,3,0.25,0.8);
     var genMap=new GenMapObject(view,map,setup,mapGenRandom);
     genMap.build();
+    
+        // next step
+    
+    wsUpdateStatus();
+    wsStageStatus('Building Collision Geometry');
+    setTimeout(wsInitBuildCollisionGeometry,10);
+}
+
+function wsInitBuildCollisionGeometry()
+{
+        // build the collision geometry
+
+    map.buildCollisionGeometry();
+
+        // build the light/mesh intersection lists
+
+    map.buildLightMeshIntersectLists();
     
         // next step
     

@@ -37,17 +37,16 @@ function EntityObject(position,angle,radius,model,isPlayer)
             // will return a new move direction
             
         var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,radius,true);
-        //if (collideMovePt.equals(movePt)) {
+        if (collideMovePt.equals(movePt)) {
             this.position.addPoint(collideMovePt);
             return;
-        //}
+        }
         
             // try to slide
             
         var slidePt,collideSlidePt;
             
         slidePt=new wsPoint(movePt.x,0.0,0.0);
-        //slidePt.rotateY(null,(angY+90.0));
         
         collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,true);
         if (collideSlidePt.equals(slidePt)) {
@@ -56,7 +55,6 @@ function EntityObject(position,angle,radius,model,isPlayer)
         }
         
         slidePt=new wsPoint(0.0,0.0,movePt.z);
-        //slidePt.rotateY(null,(angY-90.0));
         
         collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,true);
         if (collideSlidePt.equals(slidePt)) {

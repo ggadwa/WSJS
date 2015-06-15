@@ -357,6 +357,22 @@ function MapObject()
             view.lights.push(null);
         }
     };
+    
+        // run through the meshes and
+        // have them build their collision meshes
+        
+    this.buildCollisionGeometry=function()
+    {
+        var n;
+        var nMesh=this.meshes.length;
+
+            // setup all the gl
+            // buffers and indexes
+
+        for (n=0;n!==nMesh;n++) {
+            this.meshes[n].buildCollisionGeometry(view);
+        }
+    };
 
         //
         // find random spots in map

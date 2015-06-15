@@ -10,13 +10,20 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
+lighting
+ * light map isn't doing colored lights correctly
+ - fix hitting corner walls when tracing
+ - fix noticable triangle artifacts
+ - need to dial back lighting so it works without the light being in view
+ - specs are out of hand
+
 collisions
  - need to eliminate meshes first in collision routines
  - need to build collision mesh from raw meshes
- - sliding
 
 
 model generation
+ - combine close vertexes
  - do torse->waist->hips as separate find calls
     torso size = arm size, hips = leg size, waist = random
 
