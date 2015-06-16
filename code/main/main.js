@@ -23,20 +23,20 @@ var WS_PHYSICS_MSECS=16;
 var WS_DRAW_MSECS=16;
 var WS_BAIL_MSECS=5000;
 
-var AMBIENT_R=0.33;
-var AMBIENT_G=0.33;
-var AMBIENT_B=0.33;
+var AMBIENT_R=0.25;
+var AMBIENT_G=0.25;
+var AMBIENT_B=0.25;
 
 var MAP_MAX_ROOM_DIMENSIONS=[25000,8000,25000];
 
-var MONSTER_MODEL_COUNT=1;
-var MONSTER_ENTITY_COUNT=5;
+var MONSTER_MODEL_COUNT=3;
+var MONSTER_ENTITY_COUNT=8;
 
 //
 // debugging and quick start up flags
 //
 
-var MAX_ROOM=5;
+var MAX_ROOM=25;
 var SIMPLE_LIGHTMAP=false;
 
 var RANDOM_MAP_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
@@ -45,7 +45,7 @@ var RANDOM_MODEL_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
 var RANDOM_MODEL=Math.floor(Math.random()*0xFFFFFFFF);
 var RANDOM_ENTITY=Math.floor(Math.random()*0xFFFFFFFF);
 
-RANDOM_MAP=1176229181;
+//RANDOM_MAP=1176229181;    // testing
 
 //
 // textures to build
@@ -348,7 +348,7 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
     
-    var genLightmap=new GenLightmapObject(view,map,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
+    var genLightmap=new GenLightmapObject(view,map,debug,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
 
@@ -421,8 +421,7 @@ function wsInitBuildEntities()
     
         // make player entity
         
-    var mapMid=view.OPENGL_FAR_Z/2;
-    entityList.addPlayer(new EntityObject(new wsPoint(mapMid,mapMid,mapMid),new wsAngle(0.0,0.0,0.0),800,modelList.get('player'),true));
+    entityList.addPlayer(new EntityObject(map.findPlayerStartPosition(),new wsAngle(0.0,0.0,0.0),800,modelList.get('player'),true));
     
         // make monster entities
         

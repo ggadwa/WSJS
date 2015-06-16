@@ -38,5 +38,20 @@ function MapLightObject(position,color,inLightmap,intensity,exponent)
     {
         return(this.position.distance(pt)<this.intensity);
     };
+    
+    this.getXBound=function()
+    {
+        return(new wsBound((this.position.x-intensity),(this.position.x+intensity)));
+    };
+    
+    this.getYBound=function()
+    {
+        return(new wsBound((this.position.y-intensity),(this.position.y+intensity)));
+    };
+    
+    this.getZBound=function()
+    {
+        return(new wsBound((this.position.z-intensity),(this.position.z+intensity)));
+    };
 }
 

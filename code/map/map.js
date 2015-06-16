@@ -205,6 +205,7 @@ function MapObject()
     {
         var n,k,i,nIntersect,light,mesh,pt;
         var meshIndexes,lightIndexes;
+        var lightXBound,lightYBound,lightZBound;
         var nLight=this.lights.length;
         var nMesh=this.meshes.length;
 
@@ -213,6 +214,10 @@ function MapObject()
 
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
+            
+            lightXBound=light.getXBound();
+            lightYBound=light.getYBound();
+            lightZBound=light.getZBound();
 
             meshIndexes=[];
 
@@ -220,48 +225,15 @@ function MapObject()
 
             for (k=0;k!==nMesh;k++) {
                 mesh=this.meshes[k];
-
-                pt=new wsPoint(mesh.xBound.min,mesh.yBound.min,mesh.zBound.min);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-                pt=new wsPoint(mesh.xBound.min,mesh.yBound.min,mesh.zBound.max);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-                pt=new wsPoint(mesh.xBound.max,mesh.yBound.min,mesh.zBound.min);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-                pt=new wsPoint(mesh.xBound.max,mesh.yBound.min,mesh.zBound.max);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-                pt=new wsPoint(mesh.xBound.min,mesh.yBound.max,mesh.zBound.min);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-                pt=new wsPoint(mesh.xBound.min,mesh.yBound.max,mesh.zBound.max);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-                pt=new wsPoint(mesh.xBound.max,mesh.yBound.max,mesh.zBound.min);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-                pt=new wsPoint(mesh.xBound.max,mesh.yBound.max,mesh.zBound.max);
-                if (this.pointInSingleLight(light,pt)) {
-                    meshIndexes.push(k);
-                    continue;
-                }
-
+                
+                if (lightXBound.max<mesh.xBound.min) continue;
+                if (lightXBound.min>mesh.xBound.max) continue;
+                if (lightYBound.max<mesh.yBound.min) continue;
+                if (lightYBound.min>mesh.yBound.max) continue;
+                if (lightZBound.max<mesh.zBound.min) continue;
+                if (lightZBound.min>mesh.zBound.max) continue;
+                
+                meshIndexes.push(k);
             }
 
                 // add to the list
@@ -375,8 +347,17 @@ function MapObject()
     };
 
         //
-        // find random spots in map
+        // find positions in map
         //
+        
+    this.findPlayerStartPosition=function()
+    {
+            // always start in middle of
+            // first generated room
+            
+        var mesh=this.meshes[0];
+        return(new wsPoint(mesh.xBound.getMidPoint(),mesh.yBound.max,mesh.zBound.getMidPoint()));
+    };
 
     this.findRandomPosition=function(genRandom)
     {

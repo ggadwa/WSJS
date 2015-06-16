@@ -289,23 +289,29 @@ function GenMapObject(view,map,setup,genRandom)
         var meshPrimitives=new MeshPrimitivesObject();
         this.map.addMesh(meshPrimitives.createMeshPryamid(this.map.getBitmapById(BITMAP_METAL),xLightBound,yLightBound,zLightBound,this.map.MESH_FLAG_LIGHT));
 
-            // reduce light if already in the
-            // path of another light
+            // get light intensity and point
 
-        var intensity=(xBound.max-xBound.min)*0.95;
+        var intensity=xBound.getSize();
+        var zSize=zBound.getSize();
+        if (zSize>intensity) intensity=zSize;
+        
+        intensity*=(0.6+(this.genRandom.random()*0.4));
 
         var pt=new wsPoint(lightX,(lightY+1100),lightZ);
-        if (this.map.pointInLight(pt)) intensity*=0.8;
 
             // the color
 
         var red=0.5+(this.genRandom.random()*0.5);
         var green=0.5+(this.genRandom.random()*0.5);
         var blue=0.5+(this.genRandom.random()*0.5);
+        
+            // the exponent
+            
+        var exponent=this.genRandom.random()*0.75;
 
             // add light to map
 
-        this.map.addLight(new MapLightObject(pt,new wsColor(red,green,blue),true,intensity,1.0));
+        this.map.addLight(new MapLightObject(pt,new wsColor(red,green,blue),true,intensity,exponent));
     };
 
         //

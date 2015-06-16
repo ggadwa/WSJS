@@ -13,9 +13,10 @@ function ViewCameraObject()
         // set camera to entity
         //
         
-    this.setToEntity=function(entity)
+    this.setToEntity=function(entity,eyeHigh)
     {
         this.position.setFromPoint(entity.position);
+        this.position.y-=eyeHigh;
         this.angle.setFromAngle(entity.angle);
     };
     
@@ -61,6 +62,10 @@ function ViewObject()
     for (var n=0;n!==this.LIGHT_COUNT;n++) {
         this.lights.push(null);
     }
+    
+        // camera setup
+        
+    this.CAMERA_EYE_HEIGHT=3000;
     
         // frustum planes
         
@@ -361,7 +366,7 @@ function ViewObject()
             // setup the view camera to be
             // equal to player object
             
-        this.camera.setToEntity(entityList.getPlayer());
+        this.camera.setToEntity(entityList.getPlayer(),this.CAMERA_EYE_HEIGHT);
 
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z

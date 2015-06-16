@@ -40,7 +40,7 @@ function GenLightmapMeshObject()
 // generate lightmaps class
 //
 
-function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
+function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
 {
         // constants
 
@@ -59,6 +59,7 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
         
     this.view=view;
     this.map=map;
+    this.debug=debug;
     this.simpleLightmap=simpleLightmap;
     
         // array of bitmaps that make up the lightmap
@@ -122,97 +123,112 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
         //
         // border and smear polygons
         //
-
+        
     this.smudgeChunk=function(data,wid,high)
     {
-        var x,y,cx,cy,cxs,cxe,cys,cye;
-        var idx,idx2;
-        var colCount,r,g,b;
-        var noFill;
+        var x,y,idx;
+        var r,g,b;
+        var hasColor;
+        
+            // we run through the entire chunk
+            // from left to right, right to left,
+            // top to bottom, and bottom to top
+            // smearing any colors we find to
+            // build an edge around the triangle
 
-            // we constantly add and re-add
-            // the pixel border until the entire
-            // block is filled.  we use the
-            // alpha channel to determine this
-
-        while (true) {
-
-            noFill=true;
-
-            for (y=0;y!==high;y++) {
-
-                cys=y-1;
-                if (cys<0) cys=0;
-                cye=y+2;
-                if (cye>=high) cye=high-1;
-
-                for (x=0;x!==wid;x++) {
-
-                    idx=((y*wid)+x)*4;
-
-                        // already touched then
-                        // ignore
-
-                    if (data[idx+3]!==0) continue;
-
-                        // find all the touched pixels around
-                        // it to make the new border
-                        // smear pixel
-
-                    colCount=0;
-                    r=g=b=0;
-
-                    cxs=x-1;
-                    if (cxs<0) cxs=0;
-                    cxe=x+2;
-                    if (cxe>=wid) cxe=wid-1;
-
-                    for (cy=cys;cy!==cye;cy++) {
-                        for (cx=cxs;cx!==cxe;cx++) {
-
-                                // only use touched pixels
-
-                            idx2=((cy*wid)+cx)*4;
-                            if (data[idx2+3]===0) continue;
-
-                                // add in the color
-
-                            r+=data[idx2];
-                            g+=data[idx2+1];
-                            b+=data[idx2+2];
-                            colCount++;
-                        }
-                    }
-
-                        // if we had a pixel to smear
-                        // with, then add the smear
-
-                    if (colCount!==0) {
-                        r=Math.floor(r/colCount);
-                        if (r>255) r=255;
-                        
-                        g=Math.floor(g/colCount);
-                        if (g>255) g=255;
-                        
-                        b=Math.floor(b/colCount);
-                        if (b>255) b=255;
-                        
+        for (y=0;y!==high;y++) {
+            
+            idx=(y*wid)*4;
+            hasColor=false;
+            
+            for (x=0;x!==wid;x++) {
+                
+                if (data[idx+3]!==0) {
+                    hasColor=true;
+                    r=data[idx];
+                    g=data[idx+1];
+                    b=data[idx+2];
+                }
+                else {
+                    if (hasColor) {
                         data[idx]=r;
                         data[idx+1]=g;
                         data[idx+2]=b;
-                        data[idx+3]=255;		// next time this is part of the smear
-
-                        noFill=false;
+                        data[idx+3]=255;
+                    }
+                }
+                
+                idx+=4;
+            }
+            
+            idx=((y*wid)+(wid-1))*4;
+            hasColor=false;
+            
+            for (x=0;x!==wid;x++) {
+                
+                if (data[idx+3]!==0) {
+                    hasColor=true;
+                    r=data[idx];
+                    g=data[idx+1];
+                    b=data[idx+2];
+                }
+                else {
+                    if (hasColor) {
+                        data[idx]=r;
+                        data[idx+1]=g;
+                        data[idx+2]=b;
+                        data[idx+3]=255;
+                    }
+                }
+             
+                idx-=4;
+            }
+        }
+        
+        for (x=0;x!==wid;x++) {
+            
+            hasColor=false;
+            
+            for (y=0;y!==high;y++) {
+                
+                idx=((y*wid)+x)*4;
+                if (data[idx+3]!==0) {
+                    hasColor=true;
+                    r=data[idx];
+                    g=data[idx+1];
+                    b=data[idx+2];
+                }
+                else {
+                    if (hasColor) {
+                        data[idx]=r;
+                        data[idx+1]=g;
+                        data[idx+2]=b;
+                        data[idx+3]=255;
                     }
                 }
             }
-
-                // have we filled everything?
-
-            if (noFill) break;
+            
+            for (y=(high-1);y>=0;y--) {
+                
+                idx=((y*wid)+x)*4;
+                if (data[idx+3]!==0) {
+                    hasColor=true;
+                    r=data[idx];
+                    g=data[idx+1];
+                    b=data[idx+2];
+                }
+                else {
+                    if (hasColor) {
+                        data[idx]=r;
+                        data[idx+1]=g;
+                        data[idx+2]=b;
+                        data[idx+3]=255;
+                    }
+                }
+            }
         }
     };
-
+    
     this.blurChunk=function(data,wid,high)
     {
         var n,k,idx,pixelCount;
@@ -851,6 +867,10 @@ function GenLightmapObject(view,map,simpleLightmap,callbackFunc)
         }
 
         wsNextStatusBar();
+        
+                    // debugging
+
+        //if (this.lightmapList.length!==0) debug.displayCanvasData(this.lightmapList[0].canvas,810,10,1024,1024);
 
             // finish with the callback
 

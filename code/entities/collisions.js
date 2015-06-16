@@ -6,7 +6,7 @@
 
 function CollisionObject()
 {
-    this.BUMP_HIGH=550;
+    this.BUMP_HIGH=1000;
     
     //
     // collision routines
@@ -148,7 +148,7 @@ function CollisionObject()
                         // skip if not in the Y of the line
             
                     yBound=collisionLine.getYBound();
-                    if ((pt.y>=yBound.max) || (pt.y<=yBound.min)) continue;
+                    if ((pt.y>yBound.max) || (pt.y<=yBound.min)) continue;
 
                         // check against line
 
@@ -182,7 +182,7 @@ function CollisionObject()
                 // once
                 
             bumpOnce=true;
-            pt.y=bumpY;
+            movePt.y=bumpY-origPt.y;
         }
         
             // the new move is to a point
@@ -205,7 +205,7 @@ function CollisionObject()
             // point to this point
             // always restore the bump move
         
-        var rtnMovePt=new wsPoint((newOrigPt.x-origPt.x),(pt.y-origPt.y),(newOrigPt.z-origPt.z));
+        var rtnMovePt=new wsPoint((newOrigPt.x-origPt.x),movePt.y,(newOrigPt.z-origPt.z));
         
         return(rtnMovePt);
     };
