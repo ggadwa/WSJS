@@ -27,9 +27,9 @@ var AMBIENT_R=0.25;
 var AMBIENT_G=0.25;
 var AMBIENT_B=0.25;
 
-var MAP_MAX_ROOM_DIMENSIONS=[25000,8000,25000];
+var MAP_MAX_ROOM_DIMENSIONS=[30000,7000,30000];
 
-var MONSTER_MODEL_COUNT=3;
+var MONSTER_MODEL_COUNT=1;
 var MONSTER_ENTITY_COUNT=8;
 
 //
@@ -37,7 +37,7 @@ var MONSTER_ENTITY_COUNT=8;
 //
 
 var MAX_ROOM=25;
-var SIMPLE_LIGHTMAP=false;
+var SIMPLE_LIGHTMAP=true;
 
 var RANDOM_MAP_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
 var RANDOM_MAP=Math.floor(Math.random()*0xFFFFFFFF);
@@ -45,7 +45,7 @@ var RANDOM_MODEL_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
 var RANDOM_MODEL=Math.floor(Math.random()*0xFFFFFFFF);
 var RANDOM_ENTITY=Math.floor(Math.random()*0xFFFFFFFF);
 
-//RANDOM_MAP=1176229181;    // testing
+//RANDOM_MAP=123456789;    // testing
 
 //
 // textures to build

@@ -148,45 +148,60 @@ function GenMapObject(view,map,setup,genRandom)
         }
     };
     
-    this.addDecorationVertexPillars=function(map,piece,xBound,yBound,zBound)
+    this.addDecorationPillar=function(map,xBound,yBound,zBound)
     {
-        var n,nPoint,pillarBoundX,pillarBoundZ;
-        
-            // any pillar points?
-            
-        var pointList=piece.getPillarLocationList(xBound,yBound,zBound);
-        nPoint=pointList.length;
-        if (nPoint===0) return;
-        
-            // randomize which gets vertex pillars
-            
-        if (this.genRandom.random()>0.75) return;
+        var n,rd;
+        var boxBoundX,boxBoundY,boxBoundZ;
+        var pt=new wsPoint(0,yBound.max,0);
         
             // setup cylinder segments
             
         var meshPrimitives=new MeshPrimitivesObject();
-        var segments=meshPrimitives.createMeshCylinderSegmentList(this.genRandom,500,200,1,2)
+        var segments=meshPrimitives.createMeshCylinderSegmentList(this.genRandom,500,500,1,2);
         
-            // build the points
+            // get count and radius from center
+
+        var count=this.genRandom.randomInt(4,4);
+        var centerPt=new wsPoint(xBound.getMidPoint(),yBound.max,zBound.getMidPoint());
+        var radius=((xBound.getSize()*0.5)*0.75)*(0.8+(this.genRandom.random()*0.2));
         
-        for (n=0;n!==nPoint;n++) {
+            // make the pillars
             
-                // always skip if collides with steps
+        var ang=0.0;
+        var angAdd=360.0/count;
+
+        for (n=0;n!==count;n++) {
+            rd=ang*DEGREE_TO_RAD;
             
-            pillarBoundX=new wsBound((pointList[n].x-500),(pointList[n].x+500));
-            pillarBoundZ=new wsBound((pointList[n].z-500),(pointList[n].z+500));
-            if (this.map.boxBoundCollision(pillarBoundX,yBound,pillarBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
+            pt.x=centerPt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
+            pt.z=centerPt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
             
-                // create the pillar
+                // check for collisions with stairs
                 
-            map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),pointList[n],yBound,segments,this.map.MESH_FLAG_DECORATION));
+            boxBoundX=new wsBound((centerPt.x-1000),(centerPt.x+1000));
+            boxBoundY=new wsBound(yBound.min,yBound.max);
+            boxBoundZ=new wsBound((centerPt.z-1000),(centerPt.z+1000));
+            
+            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
+            
+                // put in the pillar
+                
+            map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
+            
+            ang+=angAdd;
         }
     };
 
     this.addDecoration=function(map,piece,xBound,yBound,zBound)
     {
-    //    this.addDecorationVertexPillars(map,piece,xBound,yBound,zBound);
-        this.addDecorationBox(map,xBound,yBound,zBound);
+        switch (this.genRandom.randomInt(0,2)) {
+            case 0:
+                this.addDecorationBox(map,xBound,yBound,zBound);
+                break;
+            case 1:
+                this.addDecorationPillar(map,xBound,yBound,zBound);
+                break;
+        }
     };
 
         //

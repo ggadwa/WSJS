@@ -168,9 +168,12 @@ function CollisionObject()
             }
             
                 // if no hits, just return
-                // original move
+                // original move plus any bump
+                // we might have had
                 
-            if (currentHitPt===null) return(movePt);
+            if (currentHitPt===null) {
+                return(new wsPoint(movePt.x,(pt.y-origPt.y),movePt.z));
+            }
             
                 // if no bump, not a bumpable
                 // hit, or we've already bumped,
@@ -182,7 +185,7 @@ function CollisionObject()
                 // once
                 
             bumpOnce=true;
-            movePt.y=bumpY-origPt.y;
+            pt.y=bumpY;
         }
         
             // the new move is to a point
@@ -205,9 +208,7 @@ function CollisionObject()
             // point to this point
             // always restore the bump move
         
-        var rtnMovePt=new wsPoint((newOrigPt.x-origPt.x),movePt.y,(newOrigPt.z-origPt.z));
-        
-        return(rtnMovePt);
+        return(new wsPoint((newOrigPt.x-origPt.x),(pt.y-origPt.y),(newOrigPt.z-origPt.z)));
     };
     
 }

@@ -35,9 +35,12 @@ function EntityObject(position,angle,radius,model,isPlayer)
         
             // run the collision which
             // will return a new move direction
+            // if it's the same as the original or
+            // there's been a bump, move it, otherwise,
+            // try sliding
             
         var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,radius,true);
-        if (collideMovePt.equals(movePt)) {
+        if ((collideMovePt.equals(movePt)) || (collideMovePt.y!==0)) {
             this.position.addPoint(collideMovePt);
             return;
         }
@@ -48,7 +51,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
             
         slidePt=new wsPoint(movePt.x,0.0,0.0);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,true);
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,false);
         if (collideSlidePt.equals(slidePt)) {
             this.position.addPoint(collideSlidePt);
             return;
@@ -56,7 +59,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
         
         slidePt=new wsPoint(0.0,0.0,movePt.z);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,true);
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,false);
         if (collideSlidePt.equals(slidePt)) {
             this.position.addPoint(collideSlidePt);
             return;

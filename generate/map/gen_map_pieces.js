@@ -9,7 +9,6 @@ function MapPieceObject(isRoom)
     this.isRoom=isRoom;
     this.points=[];
     this.connectLines=[];
-    this.pillarLocations=[];
     this.decorationLocations=[];
     
     this.CONNECT_TYPE_LEFT=0;
@@ -272,30 +271,6 @@ function MapPieceObject(isRoom)
     };
     
         //
-        // get pillar locations
-        //
-        
-    this.getPillarLocationList=function(xBound,yBound,zBound)
-    {
-        var n,nPoint,x,z;
-        var pt;
-
-        var pointList=[];
-        nPoint=this.pillarLocations.length;
-
-        for (n=0;n!==nPoint;n++) {
-            pt=this.pillarLocations[n];
-            
-            x=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
-            z=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
-            
-            pointList.push(new wsPoint(x,yBound.max,z));
-        }
-        
-        return(pointList);
-    };
-
-        //
         // build connection line list
         //
         // any line that is straight, 20 in length, and either X
@@ -332,7 +307,6 @@ function MapPieceObject(isRoom)
         var mapPiece2=new MapPieceObject(this.isRoom);
         mapPiece2.points=JSON.parse(JSON.stringify(this.points));
         mapPiece2.connectLines=JSON.parse(JSON.stringify(this.connectLines));
-        mapPiece2.pillarLocations=JSON.parse(JSON.stringify(this.pillarLocations));
         mapPiece2.decorationLocations=JSON.parse(JSON.stringify(this.decorationLocations));
         return(mapPiece2);
     };
@@ -345,13 +319,6 @@ function MapPieceObject(isRoom)
 
         for (n=0;n!==nPoint;n++) {
             pt=this.points[n];
-            pt[1]=100-pt[1];
-        }
-        
-        nPoint=this.pillarLocations.length;
-
-        for (n=0;n!==nPoint;n++) {
-            pt=this.pillarLocations[n];
             pt[1]=100-pt[1];
         }
         
@@ -371,15 +338,6 @@ function MapPieceObject(isRoom)
 
         for (n=0;n!==nPoint;n++) {
             pt=this.points[n];
-            k=pt[0];
-            pt[0]=pt[1];
-            pt[1]=k;
-        }
-        
-        nPoint=this.pillarLocations.length;
-
-        for (n=0;n!==nPoint;n++) {
-            pt=this.pillarLocations[n];
             k=pt[0];
             pt[0]=pt[1];
             pt[1]=k;
@@ -440,15 +398,6 @@ function MapPieceListObject()
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
         mapPiece.points.push([0,20]);
-        
-        mapPiece.pillarLocations.push([0,0]);
-        mapPiece.pillarLocations.push([50,0]);
-        mapPiece.pillarLocations.push([100,0]);
-        mapPiece.pillarLocations.push([100,50]);
-        mapPiece.pillarLocations.push([100,100]);
-        mapPiece.pillarLocations.push([50,100]);
-        mapPiece.pillarLocations.push([0,100]);
-        mapPiece.pillarLocations.push([0,50]);
 
         this.add(mapPiece);
 
@@ -474,13 +423,6 @@ function MapPieceListObject()
         mapPiece.points.push([0,100]);
         mapPiece.points.push([0,80]);
         mapPiece.points.push([0,60]);
-        
-        mapPiece.pillarLocations.push([0,40]);
-        mapPiece.pillarLocations.push([40,0]);
-        mapPiece.pillarLocations.push([60,0]);
-        mapPiece.pillarLocations.push([100,60]);
-        mapPiece.pillarLocations.push([100,100]);
-        mapPiece.pillarLocations.push([0,100]);    
 
         this.add(mapPiece);
 
@@ -525,13 +467,6 @@ function MapPieceListObject()
         mapPiece.points.push([20,60]);
         mapPiece.points.push([20,40]);
         mapPiece.points.push([0,20]);
-        
-        mapPiece.pillarLocations.push([40,20]);
-        mapPiece.pillarLocations.push([60,20]);
-        mapPiece.pillarLocations.push([80,40]);
-        mapPiece.pillarLocations.push([80,100]);
-        mapPiece.pillarLocations.push([20,100]);
-        mapPiece.pillarLocations.push([20,40]);    
 
         this.add(mapPiece);
 
@@ -559,13 +494,6 @@ function MapPieceListObject()
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
         mapPiece.points.push([0,20]);
-        
-        mapPiece.pillarLocations.push([40,40]);
-        mapPiece.pillarLocations.push([60,40]);
-        mapPiece.pillarLocations.push([100,80]);
-        mapPiece.pillarLocations.push([80,100]);
-        mapPiece.pillarLocations.push([20,100]);
-        mapPiece.pillarLocations.push([0,80]);    
 
         this.add(mapPiece);   
         
@@ -590,7 +518,30 @@ function MapPieceListObject()
         mapPiece.points.push([40,100]);
         mapPiece.points.push([20,100]);
 
-        this.add(mapPiece);   
+        this.add(mapPiece);
+        
+            // connecting hallway
+
+        mapPiece=new MapPieceObject(false);
+
+        mapPiece.points.push([0,20]);
+        mapPiece.points.push([20,20]);
+        mapPiece.points.push([20,0]);
+        mapPiece.points.push([40,0]);
+        mapPiece.points.push([40,20]);
+        mapPiece.points.push([60,40]);
+        mapPiece.points.push([100,40]);
+        mapPiece.points.push([100,60]);
+        mapPiece.points.push([100,80]);
+        mapPiece.points.push([80,80]);
+        mapPiece.points.push([80,100]);
+        mapPiece.points.push([60,100]);
+        mapPiece.points.push([60,80]);
+        mapPiece.points.push([40,60]);
+        mapPiece.points.push([0,60]);
+        mapPiece.points.push([0,40]);
+
+        this.add(mapPiece);
     };
     
         //
