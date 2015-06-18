@@ -306,9 +306,13 @@ function MeshPrimitivesObject()
         var segCount=genRandom.randomInt(segmentCount,segmentExtra);
         var segments=[];
         
-        for (n=0;n!==(segCount+1);n++) {
+        segments.push(radius+extraRadius);      // top always biggest
+        
+        for (n=0;n!==segCount;n++) {
             segments.push(genRandom.randomInt(radius,extraRadius));
         }
+        
+        segments.push(radius+extraRadius);      // and bottom
         
         return(segments);
     };
@@ -346,7 +350,7 @@ function MeshPrimitivesObject()
             
                 // new radius
                 
-            topRad=segments[1];
+            topRad=segments[k+1];
 
                 // cyliner faces
 

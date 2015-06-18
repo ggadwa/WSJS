@@ -33,9 +33,10 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         
     this.trigRayTraceCache=null;
     
-        // collision lines
+        // collision lists
         
     this.collisionLines=[];
+    this.collisionFloors=[];
     
         // supergumba -- NOTE!!!  When this is constructor, move in
         //  this.setupBounds(); to end of constructor, need this at the
@@ -318,14 +319,40 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         // collision geometry
         //
 
-    this.addCollisionLine=function(line)
+    this.buildCollisionGeometryLine=function(v0Idx,v1Idx,v2Idx)
     {
+        var n,nLine,line;
+        
+            // create the line
+
+        if (this.vertices[v0Idx+1]===this.vertices[v1Idx+1]) {
+            line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v2Idx],this.vertices[v2Idx+1],this.vertices[v2Idx+2]));
+        }
+        else {
+            line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v1Idx],this.vertices[v1Idx+1],this.vertices[v1Idx+2]));
+        }
+
+            // is line already in list?
+            // usually, two triangles make
+            // a single line
+
+        nLine=this.collisionLines.length;
+
+        for (n=0;n!==nLine;n++) {
+            if (this.collisionLines[n].equals(line)) return;
+        }
+
         this.collisionLines.push(line);
     };
     
+    this.buildCollisionGeometryFloor=function(v0Idx,v1Idx,v2Idx)
+    {
+        
+    }
+    
     this.buildCollisionGeometry=function()
     {
-        var n,k,nLine,line,skip;
+        var n,ny;
         var tIdx,v0Idx,v1Idx,v2Idx;
 
             // run through the triangles
@@ -343,10 +370,23 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
             v1Idx=this.indexes[tIdx++]*3;
             v2Idx=this.indexes[tIdx++]*3;
             
-                // detect if triangle is wall like
-                
-            if (!(Math.abs(this.normals[v0Idx+1])<=0.3)) continue;
+            ny=this.normals[v0Idx+1];
             
+                // detect if triangle is a floor
+                
+            if (ny<=-0.7) {
+                this.buildCollisionGeometryFloor(v0Idx,v1Idx,v2Idx);
+            }
+            
+                // detect if triangle is wall like
+            
+            else {
+                if (Math.abs(ny)<=0.3) {
+                    this.buildCollisionGeometryLine(v0Idx,v1Idx,v2Idx);
+                }
+            }
+            
+            /*
                 // create the line
             
             if (this.vertices[v0Idx+1]===this.vertices[v1Idx+1]) {
@@ -371,6 +411,7 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
             }
             
             if (!skip) this.collisionLines.push(line);
+            */
         }
     };
 

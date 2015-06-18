@@ -10,6 +10,12 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
+decorations
+ - full room machine
+
+collisions
+ - gravity and falling
+
 lighting
  - light map in worker threads?
 

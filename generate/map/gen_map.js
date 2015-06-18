@@ -18,10 +18,11 @@ function BuildMapSetupObject(maxRoom,maxRecurseCount,maxRoomSize,maxStoryCount,c
 // generate map class
 //
 
-function GenMapObject(view,map,setup,genRandom)
+function GenMapObject(view,map,setup,genRandom,callbackFunc)
 {
         // constants
         
+    this.TIMEOUT_MSEC=10;    
     this.GEN_MAP_STAIR_LENGTH=8000;
 
         // variables
@@ -30,6 +31,17 @@ function GenMapObject(view,map,setup,genRandom)
     this.map=map;
     this.setup=setup;
     this.genRandom=genRandom;
+    this.roomDecorationList=[];
+    
+        // the callback function when
+        // generation concludes
+        
+    this.callbackFunc=callbackFunc;
+    
+        // a link to this object so we can
+        // use it in the "this" callbacks
+        
+    var currentGlobalGenMapObject;
 
         //
         // remove shared triangles
@@ -116,91 +128,6 @@ function GenMapObject(view,map,setup,genRandom)
                     if (aTrig[1]<bTrig[1]) bTrig[1]--;
                 }
             }
-        }
-    };
-
-        //
-        // decorations
-        //
-
-    this.addDecorationBox=function(map,xBound,yBound,zBound)
-    {
-        var n,count;
-        var x,z,high,boxBoundX,boxBoundY,boxBoundZ;
-        var meshPrimitives=new MeshPrimitivesObject();
-
-        count=this.genRandom.randomInt(1,3);
-
-        for (n=0;n!==count;n++) {
-            x=this.genRandom.randomInBetween((xBound.min+1000),(xBound.max-1000));
-            z=this.genRandom.randomInBetween((zBound.min+1000),(zBound.max-1000));
-            
-            high=2000;
-            if (this.genRandom.random()>0.5) high=3500;
-
-            boxBoundX=new wsBound((x-1000),(x+1000));
-            boxBoundY=new wsBound((yBound.max-high),yBound.max);
-            boxBoundZ=new wsBound((z-1000),(z+1000));
-            
-            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
-            
-            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
-        }
-    };
-    
-    this.addDecorationPillar=function(map,xBound,yBound,zBound)
-    {
-        var n,rd;
-        var boxBoundX,boxBoundY,boxBoundZ;
-        var pt=new wsPoint(0,yBound.max,0);
-        
-            // setup cylinder segments
-            
-        var meshPrimitives=new MeshPrimitivesObject();
-        var segments=meshPrimitives.createMeshCylinderSegmentList(this.genRandom,500,500,1,2);
-        
-            // get count and radius from center
-
-        var count=this.genRandom.randomInt(4,4);
-        var centerPt=new wsPoint(xBound.getMidPoint(),yBound.max,zBound.getMidPoint());
-        var radius=((xBound.getSize()*0.5)*0.75)*(0.8+(this.genRandom.random()*0.2));
-        
-            // make the pillars
-            
-        var ang=0.0;
-        var angAdd=360.0/count;
-
-        for (n=0;n!==count;n++) {
-            rd=ang*DEGREE_TO_RAD;
-            
-            pt.x=centerPt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-            pt.z=centerPt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
-            
-                // check for collisions with stairs
-                
-            boxBoundX=new wsBound((centerPt.x-1000),(centerPt.x+1000));
-            boxBoundY=new wsBound(yBound.min,yBound.max);
-            boxBoundZ=new wsBound((centerPt.z-1000),(centerPt.z+1000));
-            
-            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
-            
-                // put in the pillar
-                
-            map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
-            
-            ang+=angAdd;
-        }
-    };
-
-    this.addDecoration=function(map,piece,xBound,yBound,zBound)
-    {
-        switch (this.genRandom.randomInt(0,2)) {
-            case 0:
-                this.addDecorationBox(map,xBound,yBound,zBound);
-                break;
-            case 1:
-                this.addDecorationPillar(map,xBound,yBound,zBound);
-                break;
         }
     };
 
@@ -542,11 +469,27 @@ function GenMapObject(view,map,setup,genRandom)
             }
         }
         
-            // finally decorate the room
+            // if it's a room, add to the
+            // decoration list
 
         piece=this.mapPieceList.get(pieceIdx);
         if (piece.isRoom) {
-            this.addDecoration(this.map,piece,xDecorateBound,yDecorateBound,zDecorateBound);
+            this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xDecorateBound,yDecorateBound,zDecorateBound,this.genRandom));
+        }
+    };
+    
+        //
+        // decorate the meshes
+        //
+        
+    this.buildRoomDecorations=function()
+    {
+        var n,nMesh;
+        
+        nMesh=this.roomDecorationList.length;
+        
+        for (n=0;n!==nMesh;n++) {
+            this.roomDecorationList[n].addDecoration();
         }
     };
 
@@ -556,25 +499,55 @@ function GenMapObject(view,map,setup,genRandom)
 
     this.build=function()
     {
-        wsStartStatusBar(3);
-
+        currentGlobalGenMapObject=this;
+        
+        wsStartStatusBar(4);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapPieceList(); },this.TIMEOUT_MSEC);
+    };
+    
+    this.buildMapPieceList=function()
+    {
             // setup the pieces that
             // create the map
 
         this.mapPieceList=new MapPieceListObject();
         this.mapPieceList.fill();
+        
         wsNextStatusBar();
-
+        setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },this.TIMEOUT_MSEC);
+    };
+    
+    this.buildMapRooms=function()
+    {
             // start the recursive
             // room adding
 
         this.buildMapRecursiveRoom(0,-1,-1,-1,false,null,null,null,0);
+        
         wsNextStatusBar();
-
+        setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },this.TIMEOUT_MSEC);
+    };
+    
+    this.buildMapRemoveSharedTriangles=function()
+    {
             // delete any shared triangles
 
         this.removeSharedTriangles();
-        wsNextStatusBar();  
+        
+        wsNextStatusBar();
+        setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },this.TIMEOUT_MSEC);
+    };
+    
+    this.buildMapDecorations=function()
+    {
+            // build room decorations
+            
+        this.buildRoomDecorations();
+        wsNextStatusBar();
+        
+            // finish with the callback
+
+        this.callbackFunc();
     };
 
 }

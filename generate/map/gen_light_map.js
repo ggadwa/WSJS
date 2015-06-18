@@ -44,7 +44,7 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
 {
         // constants
 
-    this.TIMEOUT_MSEC=100;
+    this.TIMEOUT_MSEC=10;
     this.TEXTURE_SIZE=1024;
 
     // chunk is one block available to draw a light map
@@ -79,6 +79,11 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
         // generation concludes
         
     this.callbackFunc=callbackFunc;
+    
+        // a link to this object so we can
+        // use it in the "this" callbacks
+        
+    var currentGlobalLightMapObject;
 
         //
         // start light map canvas
