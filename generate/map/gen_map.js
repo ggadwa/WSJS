@@ -169,7 +169,41 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
             // ceiling
 
         this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_WOOD_PLANK),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
-
+        
+            // bridges and platforms on
+            // other stories
+/*            
+        if (storyCount>1) {
+            var meshPrimitives=new MeshPrimitivesObject();
+            var platformBoundX,platformBoundZ;
+            
+            var platformBoundY=yBound.copy();
+            platformBoundY.max=platformBoundY.min+500;
+            
+            for (n=1;n!==storyCount;n++) {
+                platformBoundX=xBound.copy();
+                platformBoundZ=zBound.copy();
+                
+                switch (this.genRandom.randomInt(0,4)) {
+                    case 0:
+                        platformBoundX.max=platformBoundX.min+(xBound.getSize()*0.25);
+                        break;
+                    case 1:
+                        platformBoundX.min=platformBoundX.max-(xBound.getSize()*0.25);
+                        break;
+                    case 2:
+                        platformBoundZ.max=platformBoundZ.min+(zBound.getSize()*0.25);
+                        break;
+                    case 3:
+                        platformBoundZ.min=platformBoundZ.max-(zBound.getSize()*0.25);
+                        break;
+                }
+                
+                map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_PLANK),platformBoundX,platformBoundY,platformBoundZ,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
+                platformBoundY.add(-yStoryAdd);
+            }
+        }
+*/
         return(yStoryBound);
     }
 

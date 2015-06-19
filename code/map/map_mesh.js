@@ -36,7 +36,7 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         // collision lists
         
     this.collisionLines=[];
-    this.collisionFloors=[];
+    this.collisionRects=[];
     
         // supergumba -- NOTE!!!  When this is constructor, move in
         //  this.setupBounds(); to end of constructor, need this at the
@@ -347,8 +347,40 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
     
     this.buildCollisionGeometryFloor=function(v0Idx,v1Idx,v2Idx)
     {
+        var n,nRect;
+        var lft,top,rgt,bot;
         
-    }
+            // get 2D box
+            
+        lft=rgt=this.vertices[v0Idx];
+        top=bot=this.vertices[v0Idx+2];
+        
+        if (this.vertices[v1Idx]<lft) lft=this.vertices[v1Idx];
+        if (this.vertices[v2Idx]<lft) lft=this.vertices[v2Idx];
+        if (this.vertices[v1Idx]>rgt) rgt=this.vertices[v1Idx];
+        if (this.vertices[v2Idx]>rgt) rgt=this.vertices[v2Idx];
+        
+        if (this.vertices[v1Idx+2]<top) top=this.vertices[v1Idx+2];
+        if (this.vertices[v2Idx+2]<top) top=this.vertices[v2Idx+2];
+        if (this.vertices[v1Idx+2]>bot) bot=this.vertices[v1Idx+2];
+        if (this.vertices[v2Idx+2]>bot) bot=this.vertices[v2Idx+2];
+        
+            // build the rect
+        
+        var cRect=new wsCollisionRect(lft,top,rgt,bot,this.vertices[v0Idx+1]);
+        
+            // is line already in list?
+            // usually, two triangles make
+            // a single rectangle
+
+        nRect=this.collisionRects.length;
+
+        for (n=0;n!==nRect;n++) {
+            if (this.collisionRects[n].equals(cRect)) return;
+        }
+
+        this.collisionRects.push(cRect);
+    };
     
     this.buildCollisionGeometry=function()
     {

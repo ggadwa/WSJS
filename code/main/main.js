@@ -36,8 +36,8 @@ var MONSTER_ENTITY_COUNT=8;
 // debugging and quick start up flags
 //
 
-var MAX_ROOM=5;
-var SIMPLE_LIGHTMAP=false;
+var MAX_ROOM=10;
+var SIMPLE_LIGHTMAP=true;
 
 var RANDOM_MAP_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
 var RANDOM_MAP=Math.floor(Math.random()*0xFFFFFFFF);

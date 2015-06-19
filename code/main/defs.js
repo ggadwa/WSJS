@@ -391,6 +391,24 @@ function wsRect(lft,top,rgt,bot)
     };
 }
 
+function wsCollisionRect(lft,top,rgt,bot,y)
+{
+    this.lft=lft;
+    this.top=top;
+    this.rgt=rgt;
+    this.bot=bot;
+    this.y=y;
+    
+    this.equals=function(cRect)
+    {
+        if (this.lft!==cRect.lft) return(false);
+        if (this.top!==cRect.top) return(false);
+        if (this.rgt!==cRect.rgt) return(false);
+        if (this.bot!==cRect.bot) return(false);
+        return(this.y===cRect.y);
+    };
+}
+
 function wsPlane(a,b,c,d)
 {
     this.a=a;

@@ -10,8 +10,11 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
+maps
+ - better second floor platforms
+
 decorations
- - full room machine
+ - machines on edges of rooms
 
 collisions
  - gravity and falling

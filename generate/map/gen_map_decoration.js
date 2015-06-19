@@ -66,8 +66,8 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         var centerPt=new wsPoint(xBound.getMidPoint(),yBound.max,zBound.getMidPoint());
         
         var radiusReduce=(0.8+(this.genRandom.random()*0.2));
-        var radiusX=((xBound.getSize()*0.5)*0.75)*radiusReduce;
-        var radiusZ=((zBound.getSize()*0.5)*0.75)*radiusReduce;
+        var radiusX=(xBound.getSize()*0.3)*radiusReduce;
+        var radiusZ=(zBound.getSize()*0.3)*radiusReduce;
         
             // make the pillars
             
