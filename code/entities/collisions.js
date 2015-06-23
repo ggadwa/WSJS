@@ -211,4 +211,46 @@ function CollisionObject()
         return(new wsPoint((newOrigPt.x-origPt.x),(pt.y-origPt.y),(newOrigPt.z-origPt.z)));
     };
     
+    //
+    // fall object in map
+    //
+    
+    this.fallObjectInMap=function(map,pt,radius,fallY)
+    {
+        var n,k,nMesh,nCollisionRect;
+        var mesh,collisionRect;
+
+            // the rough collide boxes
+            
+        var objXBound=new wsBound((pt.x-radius),(pt.x+radius));
+        var objYBound=new wsBound(pt.y,(pt.y+fallY));
+        var objZBound=new wsBound((pt.z-radius),(pt.z+radius));
+        
+        nMesh=map.meshes.length;
+        
+        for (n=0;n!==nMesh;n++) {
+            mesh=map.meshes[n];
+
+                // skip any mesh we don't collide with
+
+            if (!mesh.boxBoundCollision(objXBound,objYBound,objZBound)) continue;
+
+                // check the collide rects
+                // if we are within the fall, then
+                // return the ground
+
+            nCollisionRect=mesh.collisionLines.length;
+
+            for (k=0;k!==nCollisionRect;k++) {
+                collisionRect=mesh.collisionRects[k];
+                if (collisionRect.overlapBounds(objXBound,objYBound,objZBound)) return(collisionRect.y-pt.y);
+            }
+        }
+        
+            // else return the fall
+            
+        return(fallY);
+    };
+    
+    
 }

@@ -417,33 +417,6 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
                     this.buildCollisionGeometryLine(v0Idx,v1Idx,v2Idx);
                 }
             }
-            
-            /*
-                // create the line
-            
-            if (this.vertices[v0Idx+1]===this.vertices[v1Idx+1]) {
-                line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v2Idx],this.vertices[v2Idx+1],this.vertices[v2Idx+2]));
-            }
-            else {
-                line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v1Idx],this.vertices[v1Idx+1],this.vertices[v1Idx+2]));
-            }
-            
-                // is line already in list?
-                // usually, two triangles make
-                // a single line
-            
-            skip=false;
-            nLine=this.collisionLines.length;
-            
-            for (k=0;k!==nLine;k++) {
-                if (this.collisionLines[k].equals(line)) {
-                    skip=true;
-                    break;
-                }
-            }
-            
-            if (!skip) this.collisionLines.push(line);
-            */
         }
     };
 

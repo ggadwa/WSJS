@@ -39,7 +39,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
             // there's been a bump, move it, otherwise,
             // try sliding
             
-        var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,radius,true);
+        var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,this.radius,true);
         if ((collideMovePt.equals(movePt)) || (collideMovePt.y!==0)) {
             this.position.addPoint(collideMovePt);
             return;
@@ -51,7 +51,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
             
         slidePt=new wsPoint(movePt.x,0.0,0.0);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,false);
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,false);
         if (collideSlidePt.equals(slidePt)) {
             this.position.addPoint(collideSlidePt);
             return;
@@ -59,7 +59,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
         
         slidePt=new wsPoint(0.0,0.0,movePt.z);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,radius,false);
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,false);
         if (collideSlidePt.equals(slidePt)) {
             this.position.addPoint(collideSlidePt);
             return;
@@ -108,11 +108,18 @@ function EntityObject(position,angle,radius,model,isPlayer)
         
     this.run=function(map)
     {
+            // input movement
+            
         if (this.turnSpeed!==0.0) this.turn(this.turnSpeed);
         if (this.lookSpeed!==0.0) this.look(this.lookSpeed);
         if (this.forwardSpeed!==0.0) this.forward(map,this.forwardSpeed,0.0);
         if (this.sideSpeed!==0.0) this.forward(map,this.sideSpeed,90.0);
         if (this.verticalSpeed!==0.0) this.move(0.0,this.verticalSpeed,0.0);
+        
+            // falling
+            
+        var fallY=this.fallObjectInMap(map,this.position,this.radius,50);
+        this.position.y+=fallY;
     };
         
     

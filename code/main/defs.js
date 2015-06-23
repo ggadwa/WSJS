@@ -407,6 +407,16 @@ function wsCollisionRect(lft,top,rgt,bot,y)
         if (this.bot!==cRect.bot) return(false);
         return(this.y===cRect.y);
     };
+    
+    this.overlapBounds=function(xBound,yBound,zBound)
+    {
+        if (this.y<yBound.min) return(false);
+        if (this.y>yBound.max) return(false);
+        if (this.lft>=xBound.max) return(false);
+        if (this.rgt<=xBound.min) return(false);
+        if (this.top>=zBound.max) return(false);
+        return(!(this.bot<=zBound.min));
+    };
 }
 
 function wsPlane(a,b,c,d)
