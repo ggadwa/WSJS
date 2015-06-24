@@ -118,8 +118,8 @@ function EntityObject(position,angle,radius,model,isPlayer)
         
             // falling
             
-        var fallY=this.fallObjectInMap(map,this.position,this.radius,50);
-        this.position.y+=fallY;
+        var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,50);
+        this.position.move(0,fallY,0);
     };
         
     

@@ -223,7 +223,7 @@ function CollisionObject()
             // the rough collide boxes
             
         var objXBound=new wsBound((pt.x-radius),(pt.x+radius));
-        var objYBound=new wsBound(pt.y,(pt.y+fallY));
+        var objYBound=new wsBound((pt.y-fallY),(pt.y+fallY));
         var objZBound=new wsBound((pt.z-radius),(pt.z+radius));
         
         nMesh=map.meshes.length;
@@ -239,7 +239,7 @@ function CollisionObject()
                 // if we are within the fall, then
                 // return the ground
 
-            nCollisionRect=mesh.collisionLines.length;
+            nCollisionRect=mesh.collisionRects.length;
 
             for (k=0;k!==nCollisionRect;k++) {
                 collisionRect=mesh.collisionRects[k];

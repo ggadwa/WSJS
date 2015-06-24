@@ -17,7 +17,7 @@ decorations
  - machines on edges of rooms
 
 collisions
- - gravity and falling
+ - gravity
 
 lighting
  - light map in worker threads?
