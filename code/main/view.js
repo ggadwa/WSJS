@@ -94,6 +94,11 @@ function ViewObject()
     this.fpsCount=0;
     this.fpsStartTimeStamp=0;
     
+        // loading screen
+        
+    this.loadingStrings=[];
+    this.loadingLastAddMsec=0;
+    
         //
         // initialize and release
         //
@@ -449,6 +454,61 @@ function ViewObject()
         this.text.draw(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.draw(this,(this.wid-5),45,20,18,countStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.draw(this,(this.wid-5),494,20,18,posStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawEnd(this);
+    };
+    
+        //
+        // loading screen
+        //
+    
+    this.loadingScreenClear=function()
+    {
+        this.loadingStrings=[];
+    };
+    
+    this.loadingScreenAddString=function(str)
+    {
+        this.loadingStrings.push(str);
+        
+        this.loadingLastAddMsec=Date.now();
+    };
+    
+    this.loadingScreenUpdate=function()
+    {
+        var idx=this.loadingStrings.length-1;
+        var msec=Date.now()-this.loadingLastAddMsec;
+        
+        this.loadingStrings[idx]+=('['+msec+']');
+    };
+    
+    this.loadingScreenDraw=function()
+    {
+        var n;
+        
+            // the 2D ortho matrix
+
+        this.orthoMatrix=this.buildOrthoMatrix(-1.0,1.0);
+        
+            // clear to black
+            
+        this.gl.clearColor(0.0,0.0,0.0,1.0);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        
+            // lines
+            
+        var nLine=this.loadingStrings.length;
+        
+        this.text.drawStart(this);
+        
+        var y=25;
+        var col=new wsColor(1.0,1.0,1.0);
+        
+        for (n=0;n!==nLine;n++) {
+            if (n===(nLine-1)) col=new wsColor(1.0,0.3,0.3);
+            this.text.draw(this,5,y,20,18,this.loadingStrings[n],this.text.TEXT_ALIGN_LEFT,col);
+            y+=22;
+        }
+        
         this.text.drawEnd(this);
     };
     

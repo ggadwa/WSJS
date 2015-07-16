@@ -10,6 +10,9 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
+- put all interface in gl view
+- put all keys and whatnot in js for now
+
 maps
  - better second floor platforms
 

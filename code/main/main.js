@@ -16,38 +16,6 @@ var BITMAP_WOOD_PLANK=8;
 var BITMAP_WOOD_BOX=9;
 
 //
-// constants
-//
-
-var WS_PHYSICS_MSECS=16;
-var WS_DRAW_MSECS=16;
-var WS_BAIL_MSECS=5000;
-
-var AMBIENT_R=0.25;
-var AMBIENT_G=0.25;
-var AMBIENT_B=0.25;
-
-var MAP_MAX_ROOM_DIMENSIONS=[35000,7000,35000];
-
-var MONSTER_MODEL_COUNT=1;
-var MONSTER_ENTITY_COUNT=8;
-
-//
-// debugging and quick start up flags
-//
-
-var MAX_ROOM=10;
-var SIMPLE_LIGHTMAP=true;
-
-var RANDOM_MAP_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
-var RANDOM_MAP=Math.floor(Math.random()*0xFFFFFFFF);
-var RANDOM_MODEL_BITMAP=Math.floor(Math.random()*0xFFFFFFFF);
-var RANDOM_MODEL=Math.floor(Math.random()*0xFFFFFFFF);
-var RANDOM_ENTITY=Math.floor(Math.random()*0xFFFFFFFF);
-
-//RANDOM_MAP=1984704624;    // testing
-
-//
 // textures to build
 //
 
@@ -100,10 +68,10 @@ function wsLoopRun(timeStamp)
     var physicsTick=ts-view.loopLastPhysicTimeStamp;
     view.loopLastPhysicTimeStamp=ts;
     
-    if (physicsTick>WS_BAIL_MSECS) return;
+    if (physicsTick>settings.bailMilliseconds) return;
     
-    while (physicsTick>WS_PHYSICS_MSECS) {
-        physicsTick-=WS_PHYSICS_MSECS;
+    while (physicsTick>settings.physicsMilliseconds) {
+        physicsTick-=settings.physicsMilliseconds;
         
         entityList.run(map);
     }
@@ -112,7 +80,7 @@ function wsLoopRun(timeStamp)
         
     var drawTick=ts-view.loopLastDrawTimeStamp;
     
-    if (drawTick>WS_DRAW_MSECS) {
+    if (drawTick>settings.drawMilliseconds) {
         view.loopLastDrawTimeStamp=ts; 
 
         view.draw(map,entityList);
@@ -152,7 +120,7 @@ function wsLoopStart()
 }
 
 //
-// status print out
+// loading status
 //
 
 var oldStatusStr;
@@ -182,6 +150,7 @@ function wsUpdateStatus()
     var completeMS=Date.now()-statusStartMS;
     
     elem.innerHTML=(oldStatusStr+' '+completeMS+'ms<br>');
+    
 }
 
 var wsStatusBarCount;
@@ -231,14 +200,6 @@ function wsRefresh()
 
 function wsInit()
 {
-        // setup the random numbers
-    
-    document.getElementById('wsMapBitmapRandom').value=RANDOM_MAP_BITMAP;
-    document.getElementById('wsMapRandom').value=RANDOM_MAP;
-    document.getElementById('wsModelBitmapRandom').value=RANDOM_MODEL_BITMAP;
-    document.getElementById('wsModelRandom').value=RANDOM_MODEL;
-    document.getElementById('wsEntityRandom').value=RANDOM_ENTITY;
-
         // start the initialization
         
     wsStageStatus('Initializing WebGL');
@@ -251,6 +212,12 @@ function wsInitWebGL()
         // webgl and canvas stuff
     
     if (!view.initialize("wsCanvas")) return;
+    
+        // status
+    
+    view.loadingScreenClear();
+    view.loadingScreenAddString('Initialized WebGL');
+    view.loadingScreenDraw();
     
         // next step
     
@@ -268,7 +235,11 @@ function wsInitInternal()
     
         // next step
         
-    var textureGenRandom=new GenRandomObject(parseInt(document.getElementById('wsMapBitmapRandom').value));
+    var textureGenRandom=new GenRandomObject(settings.randomSeedMapBitmap);
+    
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Generating Dynamic Textures');
+    view.loadingScreenDraw();
     
     wsUpdateStatus();
     wsStageStatus('Generating Dynamic Textures');
@@ -310,12 +281,11 @@ function wsInitBuildMap()
 {
         // random seed
 
-    var mapGenRandom=new GenRandomObject(parseInt(document.getElementById('wsMapRandom').value));
+    var mapGenRandom=new GenRandomObject(settings.randomSeedMap);
 
         // build the map
-   
-    var setup=new BuildMapSetupObject(this.MAX_ROOM,3,MAP_MAX_ROOM_DIMENSIONS,3,0.25,0.8);
-    var genMap=new GenMapObject(view,map,setup,mapGenRandom,wsInitBuildMapFinish);
+        
+    var genMap=new GenMapObject(view,map,mapGenRandom,wsInitBuildMapFinish);
     genMap.build();
 }
 
@@ -349,14 +319,14 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
     
-    var genLightmap=new GenLightmapObject(view,map,debug,this.SIMPLE_LIGHTMAP,wsInitBuildLightmapFinish);
+    var genLightmap=new GenLightmapObject(view,map,debug,settings.simpleLightmap,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
 
 function wsInitBuildLightmapFinish()
 {
-    var textureGenRandom=new GenRandomObject(parseInt(document.getElementById('wsModelBitmapRandom').value));
-    var modelGenRandom=new GenRandomObject(parseInt(document.getElementById('wsModelRandom').value));
+    var textureGenRandom=new GenRandomObject(settings.randomSeedModelBitmap);
+    var modelGenRandom=new GenRandomObject(settings.randomSeedModel);
 
     wsUpdateStatus();
     wsStageStatus('Building Models');
@@ -370,7 +340,7 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
     
         // start status
         
-    if (idx===0) wsStartStatusBar(MONSTER_MODEL_COUNT+1);
+    if (idx===0) wsStartStatusBar(settings.modelMonsterCount+1);
     
         // get a model texture
         
@@ -402,7 +372,7 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
         // if more models, then loop back around
         
     idx++;
-    if (idx<(MONSTER_MODEL_COUNT+1)) {
+    if (idx<(settings.modelMonsterCount+1)) {
         setTimeout(function() { wsInitBuildModels(idx,textureGenRandom,modelGenRandom); },10);
         return;
     }
@@ -418,7 +388,7 @@ function wsInitBuildEntities()
 {
     var n,monsterModelName;
     
-    var entityGenRandom=new GenRandomObject(parseInt(document.getElementById('wsEntityRandom').value));
+    var entityGenRandom=new GenRandomObject(settings.randomSeedEntity);
     
         // make player entity
         
@@ -426,8 +396,8 @@ function wsInitBuildEntities()
     
         // make monster entities
         
-    for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
-        monsterModelName='monster_'+entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);
+    for (n=0;n!==settings.monsterEntityCount;n++) {
+        monsterModelName='monster_'+entityGenRandom.randomInt(0,settings.modelMonsterCount);
         entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,modelList.get(monsterModelName),false));
     }
     
@@ -447,7 +417,7 @@ function wsInitFinish()
     
         // ambient
         
-    view.ambient.set(AMBIENT_R,AMBIENT_G,AMBIENT_B);
+    view.ambient.set(settings.ambient[0],settings.ambient[1],settings.ambient[2]);
     
         // start the input
         

@@ -1,24 +1,10 @@
 "use strict";
 
 //
-// map generate setup class
-//
-
-function BuildMapSetupObject(maxRoom,maxRecurseCount,maxRoomSize,maxStoryCount,connectionPercentage,storyChangePercentage)
-{
-    this.maxRoom=maxRoom;
-    this.maxRecurseCount=maxRecurseCount;
-    this.maxRoomSize=maxRoomSize;
-    this.maxStoryCount=maxStoryCount;
-    this.connectionPercentage=connectionPercentage;
-    this.storyChangePercentage=storyChangePercentage;
-}
-
-//
 // generate map class
 //
 
-function GenMapObject(view,map,setup,genRandom,callbackFunc)
+function GenMapObject(view,map,genRandom,callbackFunc)
 {
         // constants
         
@@ -29,7 +15,6 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
         
     this.view=view;
     this.map=map;
-    this.setup=setup;
     this.genRandom=genRandom;
     this.roomDecorationList=[];
     
@@ -326,13 +311,13 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
         if (connectPieceIdx===-1) {
             var mapMid=this.view.OPENGL_FAR_Z/2;
 
-            var halfSize=Math.floor(this.setup.maxRoomSize[0]/2);
+            var halfSize=Math.floor(settings.maxRoomSize[0]/2);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(this.setup.maxRoomSize[1]/2);
+            var halfSize=Math.floor(settings.maxRoomSize[1]/2);
             yBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(this.setup.maxRoomSize[2]/2);
+            var halfSize=Math.floor(settings.maxRoomSize[2]/2);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
         }
 
@@ -370,7 +355,7 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
                 switch (connectType) {
 
                     case piece.CONNECT_TYPE_LEFT:
-                        xBound=new wsBound((xConnectBound.min-this.setup.maxRoomSize[0]),xConnectBound.min);
+                        xBound=new wsBound((xConnectBound.min-settings.maxRoomSize[0]),xConnectBound.min);
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         xStairBound=new wsBound(xConnectBound.min,(xConnectBound.min+this.GEN_MAP_STAIR_LENGTH));
                         zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
@@ -378,13 +363,13 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
 
                     case piece.CONNECT_TYPE_TOP:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
-                        zBound=new wsBound((zConnectBound.min-this.setup.maxRoomSize[2]),zConnectBound.min);
+                        zBound=new wsBound((zConnectBound.min-settings.maxRoomSize[2]),zConnectBound.min);
                         xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
                         zStairBound=new wsBound(zConnectBound.min,(zConnectBound.min+this.GEN_MAP_STAIR_LENGTH));
                         break;
 
                     case piece.CONNECT_TYPE_RIGHT:
-                        xBound=new wsBound(xConnectBound.max,(xConnectBound.max+this.setup.maxRoomSize[0]));
+                        xBound=new wsBound(xConnectBound.max,(xConnectBound.max+settings.maxRoomSize[0]));
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         xStairBound=new wsBound((xConnectBound.max-this.GEN_MAP_STAIR_LENGTH),xConnectBound.max);
                         zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
@@ -392,7 +377,7 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
 
                     case piece.CONNECT_TYPE_BOTTOM:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
-                        zBound=new wsBound(zConnectBound.max,(zConnectBound.max+this.setup.maxRoomSize[2]));
+                        zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.maxRoomSize[2]));
                         xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
                         zStairBound=new wsBound((zConnectBound.max-this.GEN_MAP_STAIR_LENGTH),zConnectBound.max);
                         break;
@@ -426,7 +411,7 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
 
             // how many stories?
 
-        var storyCount=1+Math.floor(this.setup.maxStoryCount*this.genRandom.random());
+        var storyCount=1+Math.floor(settings.maxStoryCount*this.genRandom.random());
 
             // add the room mesh
 
@@ -441,7 +426,7 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
 
             // have we recursed too far?
 
-        if (recurseCount<this.setup.maxRecurseCount) {
+        if (recurseCount<settings.maxRoomRecursion) {
 
                 // always need to force at least
                 // one connection.  if that one
@@ -464,14 +449,14 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
 
                     // bail if we've reach max room count
 
-                if (this.map.countMeshByFlag(this.map.MESH_FLAG_ROOM_WALL)>=this.setup.maxRoom) break;
+                if (this.map.countMeshByFlag(this.map.MESH_FLAG_ROOM_WALL)>=settings.maxRoomCount) break;
 
                     // determine if this line will go off
                     // on another recursion
 
                 if (n===usedConnectLineIdx) continue;
                 if (n!==forceConnectLineIdx) {
-                    if (this.genRandom.random()>=this.setup.connectionPercentage) continue;
+                    if (this.genRandom.random()>=settings.connectionPercentage) continue;
                 }
 
                     // if we are connecting to a room
@@ -482,7 +467,7 @@ function GenMapObject(view,map,setup,genRandom,callbackFunc)
                 yStoryBound=yBound.copy();
 
                 if (storyCount>1) {
-                    if (this.genRandom.random()<this.setup.storyChangePercentage) {
+                    if (this.genRandom.random()<settings.storyChangePercentage) {
 
                             // move new room up
                             // and switch level

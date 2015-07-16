@@ -121,6 +121,12 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
 
     this.addDecoration=function()
     {
+            // this map have decorations?
+            
+        if (!settings.decorations) return;
+        
+            // randomly pick a decoration
+            
         switch (this.genRandom.randomInt(0,2)) {
             case 0:
                 this.addBoxes();
