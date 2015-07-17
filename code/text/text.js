@@ -24,6 +24,8 @@ function TextObject()
         
     this.textShader=new TextShaderObject();
     this.fontTexture=null;
+    
+    this.fontCharWids=new Array(128);
 
         //
         // initialize/release text
@@ -31,7 +33,7 @@ function TextObject()
 
     this.initialize=function(view)
     {
-        var x,y,yAdd,dx,cIdx,charStr,charWid,ch;
+        var x,y,yAdd,cIdx,charStr,ch;
 
             // start the shader
 
@@ -66,10 +68,10 @@ function TextObject()
             y+=yAdd;
 
             charStr=String.fromCharCode(ch);
-            charWid=ctx.measureText(charStr).width;
+            this.fontCharWids[cIdx]=((ctx.measureText(charStr).width+4)/this.TEXT_CHAR_WIDTH);
+            if (this.fontCharWids[cIdx]>1.0) this.fontCharWids[cIdx]=1.0;
 
-            dx=Math.floor((x+(this.TEXT_CHAR_WIDTH/2))-(charWid/2));
-            ctx.fillText(charStr,dx,y);
+            ctx.fillText(charStr,(x+2),y);
 
             x+=this.TEXT_CHAR_WIDTH;
         }
@@ -96,6 +98,29 @@ function TextObject()
         this.textShader.release(view);
         gl.deleteTexture(this.fontTexture);
     };
+    
+        //
+        // string lengths
+        //
+        
+    this.getStringDrawWidth=function(charWid,str)
+    {
+        var n,cIdx;
+        var wid=0;
+
+            // figure out the size
+            // and alignment
+
+        var len=str.length;
+        if (len===0) return(0);
+        
+        for (n=0;n!==len;n++) {
+            cIdx=str.charCodeAt(n)-32;
+            wid+=Math.floor(charWid*this.fontCharWids[cIdx]);
+        }
+        
+        return(wid);
+    };
 
         //
         // start/stop/draw text
@@ -105,6 +130,8 @@ function TextObject()
     {
         var gl=view.gl;
 
+        gl.disable(gl.DEPTH_TEST);
+        
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
 
@@ -118,9 +145,10 @@ function TextObject()
         this.textShader.drawEnd(view);
 
         gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
     };
 
-    this.draw=function(view,x,y,wid,high,str,align,color)
+    this.draw=function(view,x,y,charWid,charHigh,str,align,color)
     {
         var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
         var cIdx,gx,gy,gxAdd,gyAdd;
@@ -131,7 +159,7 @@ function TextObject()
         var len=str.length;
         if (len===0) return;
 
-        var drawWid=wid*len;
+        var drawWid=this.getStringDrawWidth(charWid,str);
 
         switch (align) {
             case this.TEXT_ALIGN_CENTER:
@@ -144,7 +172,7 @@ function TextObject()
 
             // the y
 
-        ty=y-high;
+        ty=y-charHigh;
         by=y;
 
             // build the vertices
@@ -165,7 +193,7 @@ function TextObject()
         gyAdd=this.TEXT_CHAR_HEIGHT/this.TEXT_TEXTURE_HEIGHT;
 
         for (n=0;n!==len;n++) {
-            x2=x+wid;
+            x2=x+charWid;
 
             vertices[vIdx++]=x;
             vertices[vIdx++]=ty;
@@ -198,8 +226,8 @@ function TextObject()
             indexes[iIdx++]=elementIdx+3;
 
             elementIdx+=4;
-
-            x=x2;
+            
+            x+=Math.floor(charWid*this.fontCharWids[cIdx]);
         }
 
             // set the shader and bitmap

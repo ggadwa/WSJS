@@ -76,9 +76,10 @@ function ViewObject()
 	this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
 	this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
     
-        // text drawing
+        // text and interface drawing
         
     this.text=new TextObject();
+    this.interface=new InterfaceObject();
     
         // the camera object
         
@@ -139,9 +140,10 @@ function ViewObject()
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
 
-            // initialize text
+            // initialize text and interface
 
         if (!this.text.initialize(this)) return(false);
+        if (!this.interface.initialize(this)) return(false);
 
         return(true);
     };
@@ -149,6 +151,7 @@ function ViewObject()
     this.release=function()
     {
         this.text.release();
+        this.interface.release();
     };
     
         //
@@ -453,7 +456,7 @@ function ViewObject()
         this.text.drawStart(this);
         this.text.draw(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.draw(this,(this.wid-5),45,20,18,countStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.draw(this,(this.wid-5),494,20,18,posStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.draw(this,(this.wid-5),(this.high-5),20,18,posStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.drawEnd(this);
     };
     
@@ -478,10 +481,10 @@ function ViewObject()
         var idx=this.loadingStrings.length-1;
         var msec=Date.now()-this.loadingLastAddMsec;
         
-        this.loadingStrings[idx]+=('['+msec+']');
+        this.loadingStrings[idx]+=(' ['+msec+']');
     };
     
-    this.loadingScreenDraw=function()
+    this.loadingScreenDraw=function(progress)
     {
         var n;
         
@@ -497,10 +500,10 @@ function ViewObject()
             // lines
             
         var nLine=this.loadingStrings.length;
-        
+
         this.text.drawStart(this);
         
-        var y=25;
+        var y=(this.high-30)-((nLine-1)*22);
         var col=new wsColor(1.0,1.0,1.0);
         
         for (n=0;n!==nLine;n++) {
@@ -510,6 +513,18 @@ function ViewObject()
         }
         
         this.text.drawEnd(this);
+
+            // progress
+        
+        if (progress!==null) {
+            var lft=5;
+            var rgt=lft+Math.floor((this.wid-10)*progress);
+        }
+
+        this.interface.drawStart(this);
+        if (progress!==null) this.interface.drawRect(this,new wsRect(lft,(this.high-25),rgt,(this.high-5)),new wsColor(0.3,0.1,1.0));
+        this.interface.drawFrameRect(this,new wsRect(5,(this.high-25),(this.wid-5),(this.high-5)),new wsColor(1.0,1.0,1.0));
+        this.interface.drawEnd(this);
     };
     
         //

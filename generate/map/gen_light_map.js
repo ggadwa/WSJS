@@ -739,8 +739,6 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
 
             // run the status bar
 
-        wsNextStatusBar();
-
         mesh=this.map.meshes[meshIdx];
         nTrig=mesh.trigCount;
 
@@ -805,6 +803,7 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
 
             // next mesh
 
+        this.view.loadingScreenDraw(meshIdx/(this.map.meshes.length+2.0));
         setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(meshIdx); },this.TIMEOUT_MSEC);
     };
 
@@ -826,10 +825,6 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
 
         currentGlobalLightMapObject=this;
 
-            // setup the status bar
-
-        wsStartStatusBar(this.map.meshes.length+2);
-
             // run through the meshes and build
             // cahce to speed up ray tracing
 
@@ -838,12 +833,11 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
             this.map.meshes[n].buildTrigRayTraceCache();
         }
 
-        wsNextStatusBar();
-
             // run through the meshes
             // by a timer so we don't trigger the
             // script time out problem   
 
+        this.view.loadingScreenDraw(1.0/(nMesh+2.0));
         setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(0); },this.TIMEOUT_MSEC);
     };
 
@@ -870,8 +864,6 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
             lightMesh=this.meshList[n];
             this.map.meshes[n].setLightmap(this.map.lightmaps[lightMesh.lightmapIdx],lightMesh.lightmapUVs);
         }
-
-        wsNextStatusBar();
         
                     // debugging
 
@@ -879,6 +871,7 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
 
             // finish with the callback
 
+        this.view.loadingScreenDraw(1.0);
         this.callbackFunc();
     };
 

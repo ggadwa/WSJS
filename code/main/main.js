@@ -120,78 +120,6 @@ function wsLoopStart()
 }
 
 //
-// loading status
-//
-
-var oldStatusStr;
-var statusStartMS;
-
-function wsStageStatus(status)
-{
-    var elem=document.getElementById('wsStatusText');
-    
-    oldStatusStr=elem.innerHTML;
-    oldStatusStr+=status;
-    
-    elem.innerHTML=(oldStatusStr+'...');
-    
-    statusStartMS=Date.now();
-}
-
-function wsClearStatus()
-{
-    document.getElementById('wsStatusText').innerHTML='';
-}
-
-function wsUpdateStatus()
-{
-    var elem=document.getElementById('wsStatusText');
-
-    var completeMS=Date.now()-statusStartMS;
-    
-    elem.innerHTML=(oldStatusStr+' '+completeMS+'ms<br>');
-    
-}
-
-var wsStatusBarCount;
-var wsStatusBarMaxCount;
-
-function wsStartStatusBar(maxCount)
-{
-    wsStatusBarCount=-1;
-    wsStatusBarMaxCount=maxCount;
-    wsNextStatusBar();
-}
-
-function wsNextStatusBar()
-{
-    wsStatusBarCount++;
-    if (wsStatusBarCount>wsStatusBarMaxCount) wsStatusBarCount=wsStatusBarMaxCount;
-    document.getElementById('wsStatusBarFill').style.width=((wsStatusBarCount/wsStatusBarMaxCount)*100.0)+'%';
-}
-
-//
-// Refresh
-//
-
-function wsRefresh()
-{
-        // cancel the loop
-        
-    view.loopCancel=true;
-    
-        // close old map
-        
-    map.clear(view);
-    
-        // start at the texture generating step
-    
-    wsClearStatus();
-    wsStageStatus('Generating Dynamic Textures');
-    setTimeout(function() { wsInitBuildTextures(0); },10);
-}
-
-//
 // initialize web-shooter
 //
 // we do this in a couple timeout steps so
@@ -200,29 +128,18 @@ function wsRefresh()
 
 function wsInit()
 {
-        // start the initialization
-        
-    wsStageStatus('Initializing WebGL');
-    setTimeout(wsInitWebGL,10);
-}
-    
-function wsInitWebGL()
-{
         // init view
         // webgl and canvas stuff
     
     if (!view.initialize("wsCanvas")) return;
     
-        // status
-    
-    view.loadingScreenClear();
-    view.loadingScreenAddString('Initialized WebGL');
-    view.loadingScreenDraw();
-    
         // next step
+        
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Initialized WebGL');
+    view.loadingScreenAddString('Initializing Internal Structures');
+    view.loadingScreenDraw(null);
     
-    wsUpdateStatus();
-    wsStageStatus('Initializing Internal Structures');
     setTimeout(wsInitInternal,10);
 }
     
@@ -239,10 +156,8 @@ function wsInitInternal()
     
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Textures');
-    view.loadingScreenDraw();
+    view.loadingScreenDraw(null);
     
-    wsUpdateStatus();
-    wsStageStatus('Generating Dynamic Textures');
     setTimeout(function() { wsInitBuildTextures(0,textureGenRandom); },10);
 }
 
@@ -250,30 +165,28 @@ function wsInitBuildTextures(idx,textureGenRandom)
 {
     var bitmapCount=wsTextureBuildList.length;
     
-        // start status
-        
-    if (idx===0) wsStartStatusBar(bitmapCount);
-    
         // generate the bitmap
     
     var setup=wsTextureBuildList[idx];
     var genBitmap=new GenBitmapObject(textureGenRandom);
     
     map.addBitmap(genBitmap.generate(view,setup[0],setup[1],debug));
-    wsNextStatusBar();
     
         // if more textures, then loop back around
         
     idx++;
     if (idx<bitmapCount) {
+        view.loadingScreenDraw(idx/bitmapCount);
         setTimeout(function() { wsInitBuildTextures(idx,textureGenRandom); },10);
         return;
     }
     
         // next step
-    
-    wsUpdateStatus();
-    wsStageStatus('Generating Dynamic Map');
+        
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Generating Dynamic Map');
+    view.loadingScreenDraw(null);
+
     setTimeout(wsInitBuildMap,10);
 }
 
@@ -291,8 +204,10 @@ function wsInitBuildMap()
 
 function wsInitBuildMapFinish()
 {
-    wsUpdateStatus();
-    wsStageStatus('Building Collision Geometry');
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Building Collision Geometry');
+    view.loadingScreenDraw(null);
+
     setTimeout(wsInitBuildCollisionGeometry,10);
 }
 
@@ -308,8 +223,10 @@ function wsInitBuildCollisionGeometry()
     
         // next step
     
-    wsUpdateStatus();
-    wsStageStatus('Building Light Map');
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Building Light Map');
+    view.loadingScreenDraw(null);
+
     setTimeout(wsInitBuildLightmap,10);
 }
 
@@ -318,7 +235,7 @@ function wsInitBuildLightmap()
         // build the light map
         // light maps are a long running
         // process so we need a callback
-    
+
     var genLightmap=new GenLightmapObject(view,map,debug,settings.simpleLightmap,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
@@ -327,27 +244,22 @@ function wsInitBuildLightmapFinish()
 {
     var textureGenRandom=new GenRandomObject(settings.randomSeedModelBitmap);
     var modelGenRandom=new GenRandomObject(settings.randomSeedModel);
+    
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Building Models');
+    view.loadingScreenDraw(null);
 
-    wsUpdateStatus();
-    wsStageStatus('Building Models');
     setTimeout(function() { wsInitBuildModels(0,textureGenRandom,modelGenRandom); },10);
 }
 
 function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
 {
-    var n;
     var model,genSkeleton,genModelMesh;
-    
-        // start status
-        
-    if (idx===0) wsStartStatusBar(settings.modelMonsterCount+1);
     
         // get a model texture
         
     var genBitmap=new GenBitmapObject(textureGenRandom);    
     var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);
-    
-    wsNextStatusBar();
     
         // player model if 0
         // else a monster
@@ -373,14 +285,17 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
         
     idx++;
     if (idx<(settings.modelMonsterCount+1)) {
+        view.loadingScreenDraw(idx/settings.modelMonsterCount);    
         setTimeout(function() { wsInitBuildModels(idx,textureGenRandom,modelGenRandom); },10);
         return;
     }
     
         // next step
+        
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Building Entities');
+    view.loadingScreenDraw(null);
     
-    wsUpdateStatus();
-    wsStageStatus('Building Entities');
     setTimeout(wsInitBuildEntities,10);
 }
 
@@ -401,10 +316,12 @@ function wsInitBuildEntities()
         entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,modelList.get(monsterModelName),false));
     }
     
-        // add entities to map
+        // finished
         
-    wsUpdateStatus();
-    wsStageStatus('Running');
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Running');
+    view.loadingScreenDraw(null);
+        
     setTimeout(wsInitFinish,10);    
 }
 

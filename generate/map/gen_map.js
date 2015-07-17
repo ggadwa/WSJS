@@ -520,7 +520,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     {
         currentGlobalGenMapObject=this;
         
-        wsStartStatusBar(4);
         setTimeout(function() { currentGlobalGenMapObject.buildMapPieceList(); },this.TIMEOUT_MSEC);
     };
     
@@ -532,7 +531,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         this.mapPieceList=new MapPieceListObject();
         this.mapPieceList.fill();
         
-        wsNextStatusBar();
+        this.view.loadingScreenDraw(0.25);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },this.TIMEOUT_MSEC);
     };
     
@@ -543,7 +542,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         this.buildMapRecursiveRoom(0,-1,-1,-1,false,null,null,null,0);
         
-        wsNextStatusBar();
+        this.view.loadingScreenDraw(0.5);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },this.TIMEOUT_MSEC);
     };
     
@@ -553,7 +552,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         this.removeSharedTriangles();
         
-        wsNextStatusBar();
+        this.view.loadingScreenDraw(0.75);
         setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },this.TIMEOUT_MSEC);
     };
     
@@ -562,10 +561,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // build room decorations
             
         this.buildRoomDecorations();
-        wsNextStatusBar();
         
             // finish with the callback
 
+        this.view.loadingScreenDraw(1.0);
         this.callbackFunc();
     };
 

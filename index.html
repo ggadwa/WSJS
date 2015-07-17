@@ -31,6 +31,8 @@
 <script type="text/javascript" src="code/entities/entity_list.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/text/text.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/text/text_shader.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/interface/interface.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/interface/interface_shader.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/random.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/mesh_uv_tangents.js" charset="utf-8"></script>
 <script type="text/javascript" src="generate/utility/mesh_primitives.js" charset="utf-8"></script>
@@ -613,6 +615,27 @@
     }
 </script>
 
+<script id="wsInterfaceVertShader" type="x-shader/x-vertex">    
+    attribute highp vec3 vertexPosition;
+
+    uniform highp mat4 orthoMatrix;
+
+    void main(void)
+    {
+        gl_Position=orthoMatrix*vec4(vertexPosition,1.0);
+    }
+</script>
+
+<script id="wsInterfaceFragShader" type="x-shader/x-fragment">
+    uniform lowp vec3 color;
+
+    void main(void)
+    {
+        gl_FragColor.rgb=color;
+        gl_FragColor.a=1.0;
+    }
+</script>
+
 <script id="wsDebugVertShader" type="x-shader/x-vertex">    
     attribute highp vec3 vertexPosition;
 
@@ -640,19 +663,11 @@
     
 <!-- the drawing canvas -->
 
-<canvas id="wsCanvas" style="position:absolute;left:0px;top:0px;border:1px solid black" width="800" height="500"></canvas>
-
-<!-- the status -->
-
-<div id="wsStatusBar" style="position:absolute;left:810px;top:2px;width:300px;height:20px;border:1px solid #000000">
-    <div id="wsStatusBarFill" style="position:absolute;left:0px;top:0px;width:0%;height:100%;background:#3300FF"></div>
-</div>
-
-<div id="wsStatusText" style="position:absolute;left:810px;top:24px;width:300px;height:325px;font-family:arial;font-size:16px"></div>
+<canvas id="wsCanvas" style="position:absolute;left:0px;top:0px;border:1px solid black" width="1024" height="576"></canvas>
 
 <!-- link back -->
 
-<div style="position:absolute;left:2px;top:510px;width:200px;font-family:arial;font-size:16px;white-space:nowrap">
+<div style="position:absolute;left:2px;top:590px;width:200px;font-family:arial;font-size:16px;white-space:nowrap">
     <a href="http://klinksoftware.net/forum/index.php">Klink! Software Forum</a> - <a href="https://github.com/ggadwa/WSJS">GitHub Source Code</a>
 </div>
 

@@ -10,8 +10,8 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
-- put all interface in gl view
-- put all keys and whatnot in js for now
+- figure out the flashing in the text
+- don't draw spaces in text
 
 maps
  - better second floor platforms
