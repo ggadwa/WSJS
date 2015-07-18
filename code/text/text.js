@@ -71,7 +71,7 @@ function TextObject()
             this.fontCharWids[cIdx]=((ctx.measureText(charStr).width+4)/this.TEXT_CHAR_WIDTH);
             if (this.fontCharWids[cIdx]>1.0) this.fontCharWids[cIdx]=1.0;
 
-            ctx.fillText(charStr,(x+2),y);
+            ctx.fillText(charStr,(x+2),(y-1));
 
             x+=this.TEXT_CHAR_WIDTH;
         }

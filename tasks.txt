@@ -12,6 +12,7 @@ EMCA6 TODOs
 
 - figure out the flashing in the text
 - don't draw spaces in text
+- need "filterMapBitmapColors" and "filterModelBitmapColors" (turn off for truly random colors)
 
 maps
  - better second floor platforms

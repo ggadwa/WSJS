@@ -371,6 +371,11 @@ function ViewObject()
         var drawMeshCount=0;
         var drawModelCount=0;
         
+            // everything overdraws except
+            // clear the depth buffer
+            
+        this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+        
             // setup the view camera to be
             // equal to player object
             
@@ -481,7 +486,7 @@ function ViewObject()
         var idx=this.loadingStrings.length-1;
         var msec=Date.now()-this.loadingLastAddMsec;
         
-        this.loadingStrings[idx]+=(' ['+msec+']');
+        this.loadingStrings[idx]+=(' ['+msec+'ms]');
     };
     
     this.loadingScreenDraw=function(progress)
@@ -495,7 +500,7 @@ function ViewObject()
             // clear to black
             
         this.gl.clearColor(0.0,0.0,0.0,1.0);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT,this.gl.DEPTH_BUFFER_BIT);
         
             // lines
             
