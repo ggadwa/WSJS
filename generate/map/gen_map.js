@@ -409,9 +409,11 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             this.addStairMesh(piece,connectType,xStairBound,yStairBound,zStairBound);
         }
 
-            // how many stories?
+            // if a room, it's possible to be
+            // more than one story
 
-        var storyCount=1+Math.floor(settings.maxStoryCount*this.genRandom.random());
+        var storyCount=1;
+        if (piece.isRoom) storyCount+=Math.floor(settings.maxStoryCount*this.genRandom.random());
 
             // add the room mesh
 

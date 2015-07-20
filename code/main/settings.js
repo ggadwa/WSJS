@@ -8,30 +8,30 @@ function SettingsObject()
 {
         // map construction
         
-    this.maxRoomCount=25;                   // the maximum possible number of rooms in the map
+    this.maxRoomCount=5;                   // the maximum possible number of rooms in the map
     
     this.maxRoomRecursion=3;                // how far down you will recurse to make rooms off a single room
     this.maxStoryCount=3;                   // maximum number of possible stories for a single room
     this.connectionPercentage=0.25;         // what % of the time a connection in a room spawns another room
     this.storyChangePercentage=0.8;         // what % of the time a room gains another story
     
-    this.decorations=true;                 // set to false for no decorations in the map
+    this.decorations=false;                 // set to false for no decorations in the map
     
     this.maxRoomSize=[35000,7000,35000];    // maximum size for a room [x,y,z]
     
         // lighting
     
-    this.ambient=[0.3,0.3,0.3];             // all over ambient light
+    this.ambient=[0.4,0.4,0.4];             // all over ambient light
     
-    this.simpleLightmap=false;               // set to true for simplier, non-traced light maps
+    this.simpleLightmap=true;               // set to true for simplier, non-traced light maps
 
         // models
         
-    this.modelMonsterCount=5;
+    this.modelMonsterCount=1;
 
         // entities
         
-    this.monsterEntityCount=20;
+    this.monsterEntityCount=10;
     
         // physics
         
