@@ -10,6 +10,7 @@ function MapPieceObject(isRoom)
     this.points=[];
     this.connectLines=[];
     this.decorationLocations=[];
+    this.platformGrid=null;
     
     this.CONNECT_TYPE_LEFT=0;
     this.CONNECT_TYPE_TOP=1;
@@ -308,12 +309,14 @@ function MapPieceObject(isRoom)
         mapPiece2.points=JSON.parse(JSON.stringify(this.points));
         mapPiece2.connectLines=JSON.parse(JSON.stringify(this.connectLines));
         mapPiece2.decorationLocations=JSON.parse(JSON.stringify(this.decorationLocations));
+        if (this.platformGrid!==null) mapPiece2.platformGrid=JSON.parse(JSON.stringify(this.platformGrid));
         return(mapPiece2);
     };
 
     this.mirror=function()
     {
         var n,nPoint,pt;
+        var x,y;
 
         nPoint=this.points.length;
 
@@ -327,12 +330,30 @@ function MapPieceObject(isRoom)
         for (n=0;n!==nPoint;n++) {
             pt=this.decorationLocations[n];
             pt[1]=100-pt[1];
+        }
+        
+        if (this.platformGrid!==null) {
+            var grid=[];
+            var gridLine;
+
+            for (y=0;y!==10;y++) {
+                gridLine=[];
+
+                for (x=0;x!==10;x++) {
+                    gridLine.push(this.platformGrid[y][9-x]);
+                }
+
+                grid.push(gridLine);
+            }
+
+            this.platformGrid=grid;
         }
     };
 
     this.rotate=function()
     {
         var n,k,nPoint,pt;
+        var x,y;
 
         nPoint=this.points.length;
 
@@ -350,6 +371,30 @@ function MapPieceObject(isRoom)
             k=pt[0];
             pt[0]=pt[1];
             pt[1]=k;
+        }
+        
+        if (this.platformGrid!==null) {
+            
+            var grid=[
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0],
+              [0,0,0,0,0,0,0,0,0,0]
+            ];
+
+            for (y=0;y!==10;y++) {
+                for (x=0;x!==10;x++) {
+                    grid[x][y]=this.platformGrid[y][x];
+                }
+            }
+
+            this.platformGrid=grid;
         }
     };
     
@@ -398,6 +443,19 @@ function MapPieceListObject()
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
         mapPiece.points.push([0,20]);
+        
+        mapPiece.platformGrid=[
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0]
+        ];
 
         this.add(mapPiece);
 
@@ -423,8 +481,62 @@ function MapPieceListObject()
         mapPiece.points.push([0,100]);
         mapPiece.points.push([0,80]);
         mapPiece.points.push([0,60]);
+        
+        mapPiece.platformGrid=[
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0],
+          [1,1,1,0,0,0,0,0,0,0]
+        ];
 
         this.add(mapPiece);
+        
+            // U
+
+        mapPiece=new MapPieceObject(true);
+
+        mapPiece.points.push([0,0]);
+        mapPiece.points.push([20,0]);
+        mapPiece.points.push([40,0]);
+        mapPiece.points.push([40,40]);
+        mapPiece.points.push([60,40]);
+        mapPiece.points.push([60,0]);
+        mapPiece.points.push([80,0]);
+        mapPiece.points.push([100,0]);
+        mapPiece.points.push([100,20]);
+        mapPiece.points.push([100,40]);
+        mapPiece.points.push([100,60]);
+        mapPiece.points.push([100,80]);
+        mapPiece.points.push([80,100]);
+        mapPiece.points.push([60,100]);
+        mapPiece.points.push([40,100]);
+        mapPiece.points.push([20,100]);
+        mapPiece.points.push([0,80]);
+        mapPiece.points.push([0,60]);
+        mapPiece.points.push([0,40]);
+        mapPiece.points.push([0,20]);
+        
+        mapPiece.platformGrid=[
+          [0,0,0,1,1,1,1,0,0,0],
+          [0,0,0,1,1,1,1,0,0,0],
+          [0,0,0,1,1,1,1,0,0,0],
+          [0,0,0,1,1,1,1,0,0,0],
+          [0,0,0,1,1,1,1,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0],
+          [0,0,0,0,0,0,0,0,0,0]
+        ];
+
+        this.add(mapPiece);   
+        
 
             // plus
 
@@ -470,33 +582,6 @@ function MapPieceListObject()
 
         this.add(mapPiece);
 
-            // U
-
-        mapPiece=new MapPieceObject(true);
-
-        mapPiece.points.push([0,0]);
-        mapPiece.points.push([20,0]);
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([40,40]);
-        mapPiece.points.push([60,40]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([80,0]);
-        mapPiece.points.push([100,0]);
-        mapPiece.points.push([100,20]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([100,60]);
-        mapPiece.points.push([100,80]);
-        mapPiece.points.push([80,100]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([20,100]);
-        mapPiece.points.push([0,80]);
-        mapPiece.points.push([0,60]);
-        mapPiece.points.push([0,40]);
-        mapPiece.points.push([0,20]);
-
-        this.add(mapPiece);   
-        
             // S
 
         mapPiece=new MapPieceObject(false);

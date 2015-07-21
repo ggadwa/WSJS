@@ -10,7 +10,12 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
-- figure out the flashing in the text
+
+- keep a list of open 20/20 spots in rooms
+    - need flip and mirror
+    - use that to build box platforms to stairs
+
+
 - don't draw spaces in text
 - need "filterMapBitmapColors" and "filterModelBitmapColors" (turn off for truly random colors)
 
