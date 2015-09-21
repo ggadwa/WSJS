@@ -236,7 +236,7 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
 
-    var genLightmap=new GenLightmapObject(view,map,debug,settings.simpleLightmap,wsInitBuildLightmapFinish);
+    var genLightmap=new GenLightmapObject(view,map,debug,settings.generateLightmap,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
 

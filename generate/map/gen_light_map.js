@@ -40,13 +40,13 @@ function GenLightmapMeshObject()
 // generate lightmaps class
 //
 
-function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
+function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 {
         // constants
 
     this.TIMEOUT_MSEC=10;
     this.TEXTURE_SIZE=1024;
-
+    
     // chunk is one block available to draw a light map
     this.CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
     this.CHUNK_SIZE=Math.floor(this.TEXTURE_SIZE/this.CHUNK_SPLIT);    // square pixel size of chunks
@@ -60,7 +60,7 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
     this.view=view;
     this.map=map;
     this.debug=debug;
-    this.simpleLightmap=simpleLightmap;
+    this.generateLightmap=generateLightmap;
     
         // array of bitmaps that make up the lightmap
         // each is an object with a canvas and the last chunk
@@ -430,46 +430,40 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
             lightBoundY=new wsBound(vy,light.position.y);
             lightBoundZ=new wsBound(vz,light.position.z);
 
-                // if simple light map, don't
-                // ray trace, only light by attenuation
+                // each light has a list of meshes within
+                // it's light cone, these are the only meshes
+                // that can block
 
-            if (!this.simpleLightmap) {
+            nMesh=light.meshIntersectList.length;
 
-                    // each light has a list of meshes within
-                    // it's light cone, these are the only meshes
-                    // that can block
+                // any hits?
 
-                nMesh=light.meshIntersectList.length;
+            hit=false;
 
-                    // any hits?
+            for (k=0;k!==nMesh;k++) {
+                mesh=this.map.meshes[light.meshIntersectList[k]];
+                if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
 
-                hit=false;
+                cIdx=0;
+                trigCount=mesh.trigCount;
+                trigRayTraceCache=mesh.trigRayTraceCache;
 
-                for (k=0;k!==nMesh;k++) {
-                    mesh=this.map.meshes[light.meshIntersectList[k]];
-                    if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
+                for (p=0;p!==trigCount;p++) {
 
-                    cIdx=0;
-                    trigCount=mesh.trigCount;
-                    trigRayTraceCache=mesh.trigRayTraceCache;
-
-                    for (p=0;p!==trigCount;p++) {
-
-                        if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
-                            hit=true;
-                            break;
-                        }
-
-                        cIdx+=9;
+                    if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
+                        hit=true;
+                        break;
                     }
 
-                    if (hit) break;
+                    cIdx+=9;
                 }
 
-                    // if a hit, don't add in light
-
-                if (hit) continue;
+                if (hit) break;
             }
+
+                // if a hit, don't add in light
+
+            if (hit) continue;
 
                 // get the color, attenuate
                 // it and add it to base color
@@ -482,6 +476,33 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
         col.fixOverflow();
 
         return(col);
+    };
+    
+        //
+        // render a single color to a chunk, used for
+        // special circumstances like no light maps or
+        // all black areas
+        //
+        
+    this.renderColor=function(ctx,lft,top)
+    {
+            // get the image data to render to
+
+        var imgData=ctx.getImageData(lft,top,this.CHUNK_SIZE,this.CHUNK_SIZE);
+        var data=imgData.data;
+        
+        var n;
+        var idx=0;
+        var pixelCount=this.CHUNK_SIZE*this.CHUNK_SIZE;
+        
+        for (n=0;n!==pixelCount;n++) {
+            data[idx++]=255;
+            data[idx++]=255;
+            data[idx++]=255;
+            data[idx++]=255;    
+        }
+            
+        ctx.putImageData(imgData,lft,top);
     };
 
         //
@@ -506,7 +527,7 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
 
         var imgData=ctx.getImageData(lft,top,wid,high);
         var data=imgData.data;
-
+        
             // find the top and bottom points
 
         var topPtIdx=0;
@@ -762,26 +783,51 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
             lightmapIdx=this.lightmapList.length;
             this.lightmapList[lightmapIdx]=new GenLightmapBitmapObject(this.startCanvas());
         }
-
+        
             // UVs for this mesh
 
         lightmapUVs=new Float32Array(mesh.vertexCount*2);
-
-            // write polys to chunk
-
+        
+            // starting chunk and context
+            
         chunkIdx=this.lightmapList[lightmapIdx].chunkIdx;
         ctx=this.lightmapList[lightmapIdx].canvas.getContext('2d');
-
-        for (n=0;n!==nTrig;n++) {
-
+        
+            // if no light map, then just create
+            // a white chunk and hard set the UVs to be
+            // the top-left of the chunk
+            
+        if (!this.generateLightmap) {
             lft=(chunkIdx%this.CHUNK_SPLIT)*this.CHUNK_SIZE;
             top=Math.floor(chunkIdx/this.CHUNK_SPLIT)*this.CHUNK_SIZE;
-
-            this.writePolyToChunk(meshIdx,n,lightmapIdx,ctx,lft,top,lightmapUVs);
-
+            
+            this.renderColor(ctx,lft,top);
             chunkIdx++;
+            
+            for (n=0;n!==(nTrig*6);n++) {
+                lightmapUVs[n]=0.0;
+            }
         }
 
+            // otherwise render the triangles
+
+        else {
+            
+                // write polys to chunk
+
+            for (n=0;n!==nTrig;n++) {
+
+                lft=(chunkIdx%this.CHUNK_SPLIT)*this.CHUNK_SIZE;
+                top=Math.floor(chunkIdx/this.CHUNK_SPLIT)*this.CHUNK_SIZE;
+
+                this.writePolyToChunk(meshIdx,n,lightmapIdx,ctx,lft,top,lightmapUVs);
+
+                chunkIdx++;
+            }
+        }
+        
+            // mark off the chunks we used
+            
         this.lightmapList[lightmapIdx].chunkIdx=chunkIdx;
 
             // set this data in the meshList
@@ -826,7 +872,7 @@ function GenLightmapObject(view,map,debug,simpleLightmap,callbackFunc)
         currentGlobalLightMapObject=this;
 
             // run through the meshes and build
-            // cahce to speed up ray tracing
+            // cache to speed up ray tracing
 
         for (n=0;n!==nMesh;n++) {
             this.meshList.push(new GenLightmapMeshObject());

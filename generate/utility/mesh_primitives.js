@@ -432,12 +432,11 @@ function MeshPrimitivesObject()
     {
         var n,mesh,mesh2;
         var stepAdd=(xBound.max-xBound.min)/this.MESH_PRIMITIVE_STAIR_COUNT;
-        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+1);
+        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+0);
         var xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
         var yStepBound=yBound.copy();
 
         for (n=0;n!==this.MESH_PRIMITIVE_STAIR_COUNT;n++) {
-            yStepBound.min+=stepDrop;
             if (n===0) {
                 mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,false,true,true,true,true,false,map.MESH_FLAG_STAIR);
             }
@@ -445,6 +444,7 @@ function MeshPrimitivesObject()
                 mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,false,true,true,true,true,false,map.MESH_FLAG_STAIR);
                 mesh.combineMesh(mesh2);
             }
+            yStepBound.min+=stepDrop;
             xStepBound.add(stepAdd);
         }
 
@@ -455,12 +455,11 @@ function MeshPrimitivesObject()
     {
         var n,mesh,mesh2;
         var stepAdd=(zBound.max-zBound.min)/this.MESH_PRIMITIVE_STAIR_COUNT;
-        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+1);
+        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+0);
         var zStepBound=new wsBound(zBound.min,zBound.min+stepAdd);
         var yStepBound=yBound.copy();
 
         for (n=0;n!==this.MESH_PRIMITIVE_STAIR_COUNT;n++) {
-            yStepBound.min+=stepDrop;
             if (n===0) {
                 mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,false,true,true,false,map.MESH_FLAG_STAIR);
             }
@@ -468,6 +467,7 @@ function MeshPrimitivesObject()
                 mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,false,true,true,false,map.MESH_FLAG_STAIR);
                 mesh.combineMesh(mesh2);
             }
+            yStepBound.min+=stepDrop;
             zStepBound.add(stepAdd);
         }
 
@@ -478,12 +478,11 @@ function MeshPrimitivesObject()
     {
         var n,mesh,mesh2;
         var stepAdd=(xBound.max-xBound.min)/this.MESH_PRIMITIVE_STAIR_COUNT;
-        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+1);
+        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+0);
         var xStepBound=new wsBound((xBound.max-stepAdd),xBound.max);
         var yStepBound=yBound.copy();
 
         for (n=0;n!==this.MESH_PRIMITIVE_STAIR_COUNT;n++) {
-            yStepBound.min+=stepDrop;
             if (n===0) {
                 mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,true,false,true,true,true,false,map.MESH_FLAG_STAIR);
             }
@@ -491,6 +490,7 @@ function MeshPrimitivesObject()
                 mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xStepBound,yStepBound,zBound,false,true,false,true,true,true,false,map.MESH_FLAG_STAIR);
                 mesh.combineMesh(mesh2);
             }
+            yStepBound.min+=stepDrop;
             xStepBound.add(-stepAdd);
         }
 
@@ -501,12 +501,11 @@ function MeshPrimitivesObject()
     {
         var n,mesh,mesh2;
         var stepAdd=(zBound.max-zBound.min)/this.MESH_PRIMITIVE_STAIR_COUNT;
-        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+1);
+        var stepDrop=(yBound.max-yBound.min)/(this.MESH_PRIMITIVE_STAIR_COUNT+0);
         var zStepBound=new wsBound((zBound.max-stepAdd),zBound.max);
         var yStepBound=yBound.copy();
 
         for (n=0;n!==this.MESH_PRIMITIVE_STAIR_COUNT;n++) {
-            yStepBound.min+=stepDrop;
             if (n===0) {
                 mesh=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,true,false,true,false,map.MESH_FLAG_STAIR);
             }
@@ -514,6 +513,7 @@ function MeshPrimitivesObject()
                 mesh2=this.createMeshCube(map.getBitmapById(BITMAP_STAIR_TILE),xBound,yStepBound,zStepBound,false,true,true,true,false,true,false,map.MESH_FLAG_STAIR);
                 mesh.combineMesh(mesh2);
             }
+            yStepBound.min+=stepDrop;
             zStepBound.add(-stepAdd);
         }
 

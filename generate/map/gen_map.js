@@ -23,6 +23,11 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
     this.callbackFunc=callbackFunc;
     
+        // a list of textures per level
+        
+    this.floorTextures=[BITMAP_CONCRETE,BITMAP_TILE,BITMAP_TILE_2];
+    this.wallTextures=[BITMAP_STONE,BITMAP_BRICK_RANDOM,BITMAP_BRICK_STACK];
+    
         // a link to this object so we can
         // use it in the "this" callbacks
         
@@ -123,12 +128,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     this.addRoomMesh=function(piece,storyCount,xBound,yBound,zBound,levelCount)
     {
         var n;
-        var floorTextures=[BITMAP_CONCRETE,BITMAP_TILE,BITMAP_TILE_2];
-        var wallTextures=[BITMAP_STONE,BITMAP_BRICK_RANDOM,BITMAP_BRICK_STACK];
 
             // floor
 
-        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(floorTextures[levelCount%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[levelCount%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
 
             // walls
             // combine into a single mesh
@@ -137,14 +140,16 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var yStoryBound=yBound.copy();
 
         var mesh,mesh2;
+        
+        var bitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
 
         for (n=0;n!==storyCount;n++) {
             if (n===0) {
-                mesh=piece.createMeshWalls(this.map.getBitmapById(wallTextures[levelCount%3]),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+                mesh=piece.createMeshWalls(bitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
             }
             else {
                 yStoryBound.add(-yStoryAdd);
-                mesh2=piece.createMeshWalls(this.map.getBitmapById(wallTextures[levelCount%3]),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+                mesh2=piece.createMeshWalls(bitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
                 mesh.combineMesh(mesh2);
             }
         }
@@ -190,29 +195,45 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         }
 */
         return(yStoryBound);
-    }
+    };
 
-    this.addStairMesh=function(piece,connectType,xStairBound,yStairBound,zStairBound)
+    this.addStairMesh=function(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount)
     {
-            // no stair if collide with another staircase
-
-        if (this.map.boxBoundCollision(xStairBound,yStairBound,zStairBound,this.map.MESH_FLAG_STAIR)!==-1) return;
-
         var meshPrimitives=new MeshPrimitivesObject();
+        
+            // the walls around the stairwell
+            
+        var yStoryAdd=yStairBound.max-yStairBound.min;
+        var yStairBound2=yStairBound.copy();
+        yStairBound2.add(-yStoryAdd);
 
+        var bitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
+        
+        var mesh=meshPrimitives.createMeshCube(bitmap,xStairBound,yStairBound,zStairBound,false,true,true,true,true,false,false,this.map.MESH_FLAG_ROOM_WALL);
+        var mesh2=meshPrimitives.createMeshCube(bitmap,xStairBound,yStairBound2,zStairBound,false,true,true,true,true,true,false,this.map.MESH_FLAG_ROOM_WALL);
+        mesh.combineMesh(mesh2);
+        this.map.addMesh(mesh);
+        
+            // staircase
+            
         switch (connectType) {
+            
             case piece.CONNECT_TYPE_LEFT:
                 meshPrimitives.createStairsPosX(this.map,xStairBound,yStairBound,zStairBound);
                 break;
+                
             case piece.CONNECT_TYPE_TOP:
                 meshPrimitives.createStairsPosZ(this.map,xStairBound,yStairBound,zStairBound);
                 break;
+                
             case piece.CONNECT_TYPE_RIGHT:
                 meshPrimitives.createStairsNegX(this.map,xStairBound,yStairBound,zStairBound);
                 break;
+                
             case piece.CONNECT_TYPE_BOTTOM:
                 meshPrimitives.createStairsNegZ(this.map,xStairBound,yStairBound,zStairBound);
                 break;
+                
         }
     };
 
@@ -298,6 +319,11 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var piece=this.mapPieceList.get(pieceIdx);
 
         var nConnectLine=piece.connectLines.length;
+        
+            // can only have a single staircase leading
+            // away from a room
+            
+        var noCurrentStairs=true;
 
             // get mesh location
             // if we don't have a connecting piece,
@@ -349,37 +375,54 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                     // get location of the new room
                     // by moving the connections together
 
-                    // at the same time, find the location
-                    // of any staircase if needed later
+                    // if this is a story change, then leave
+                    // room for the stair well and get the stair
+                    // bounds
 
                 switch (connectType) {
 
                     case piece.CONNECT_TYPE_LEFT:
                         xBound=new wsBound((xConnectBound.min-settings.maxRoomSize[0]),xConnectBound.min);
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
-                        xStairBound=new wsBound(xConnectBound.min,(xConnectBound.min+this.GEN_MAP_STAIR_LENGTH));
-                        zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
+                        
+                        if (needStairs) {
+                            xBound.add(-this.GEN_MAP_STAIR_LENGTH);
+                            xStairBound=new wsBound((xConnectBound.min-this.GEN_MAP_STAIR_LENGTH),xConnectBound.min);
+                            zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
+                        }
                         break;
 
                     case piece.CONNECT_TYPE_TOP:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                         zBound=new wsBound((zConnectBound.min-settings.maxRoomSize[2]),zConnectBound.min);
-                        xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
-                        zStairBound=new wsBound(zConnectBound.min,(zConnectBound.min+this.GEN_MAP_STAIR_LENGTH));
+                        
+                        if (needStairs) {
+                            zBound.add(-this.GEN_MAP_STAIR_LENGTH);
+                            xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
+                            zStairBound=new wsBound((zConnectBound.min-this.GEN_MAP_STAIR_LENGTH),zConnectBound.min);
+                        }
                         break;
 
                     case piece.CONNECT_TYPE_RIGHT:
                         xBound=new wsBound(xConnectBound.max,(xConnectBound.max+settings.maxRoomSize[0]));
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
-                        xStairBound=new wsBound((xConnectBound.max-this.GEN_MAP_STAIR_LENGTH),xConnectBound.max);
-                        zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
+                        
+                        if (needStairs) {
+                            xBound.add(this.GEN_MAP_STAIR_LENGTH);
+                            xStairBound=new wsBound(xConnectBound.max,(xConnectBound.max+this.GEN_MAP_STAIR_LENGTH));
+                            zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
+                        }
                         break;
 
                     case piece.CONNECT_TYPE_BOTTOM:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                         zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.maxRoomSize[2]));
-                        xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
-                        zStairBound=new wsBound((zConnectBound.max-this.GEN_MAP_STAIR_LENGTH),zConnectBound.max);
+                        
+                        if (needStairs) {
+                            zBound.add(this.GEN_MAP_STAIR_LENGTH);
+                            xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
+                            zStairBound=new wsBound(zConnectBound.max,(zConnectBound.max+this.GEN_MAP_STAIR_LENGTH));
+                        }
                         break;
 
                 }
@@ -406,7 +449,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         if (needStairs) {
             yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.max-yBound.min)));
-            this.addStairMesh(piece,connectType,xStairBound,yStairBound,zStairBound);
+            this.addStairMesh(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount);
         }
 
             // how many stories?
@@ -466,7 +509,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 var nextNeedStairs=false;
                 yStoryBound=yBound.copy();
 
-                if (storyCount>1) {
+                if ((storyCount>1) && (noCurrentStairs)) {
+
                     if (this.genRandom.random()<settings.storyChangePercentage) {
 
                             // move new room up
@@ -476,10 +520,16 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         levelCount++;
 
                             // and tell next room that
-                            // we might need stairs to it
+                            // we need stairs to it
 
                         nextNeedStairs=true;
+                        
+                            // only one stair away from room
+                            // at a time
+                            
+                        noCurrentStairs=false;
                     }
+
                 }
 
                     // recurse on to build the new room

@@ -10,15 +10,38 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
-- figure out the flashing in the text
+
+
+[X] level ups are stair hallways
+[ ] stairs are their own js code and only make necessary polygons
+[ ] do NOT need 2nd story to have stairs
+
+[ ] try to pack light struct floats
+
+
+[ ] need steel panel rooms
+
+[ ] add the 8-way room
+
+[ ] can we get shaders into script src and have it work with file://
+
+[ ] need real polygonal floors
+
+[X] no lightmap instead of simple lightmap
+[ ] need to use all black lightmap chunks
+[ ] diffuse calcs in light maps
+[ ] rooms need decoration locations and decoration models
+[ ] need filterMapBitmapColors and filterModelBitmapColors
+
+
+
+
 - don't draw spaces in text
-- need "filterMapBitmapColors" and "filterModelBitmapColors" (turn off for truly random colors)
+
 
 maps
  - better second floor platforms
 
-decorations
- - machines on edges of rooms
 
 collisions
  - gravity
@@ -39,11 +62,6 @@ model generation
 
 - when building view light list, ignore ones behind the player (pick better lights)
 
-
-- light maps
-    - light maps need all black, all white spots
-       - pre-determine so we can reduce light map usage
-    - need diffuse calcs
 
 - will need start and stop
     - close gl
