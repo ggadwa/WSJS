@@ -23,17 +23,17 @@ EMCA6 TODOs
 
 [ ] add the 8-way room
 
-[ ] can we get shaders into script src and have it work with file://
-
 [ ] need real polygonal floors
 
-[X] no lightmap instead of simple lightmap
 [ ] need to use all black lightmap chunks
 [ ] diffuse calcs in light maps
 [ ] rooms need decoration locations and decoration models
 [ ] need filterMapBitmapColors and filterModelBitmapColors
 
 
+- keep a list of open 20/20 spots in rooms
+    - need flip and mirror
+    - use that to build box platforms to stairs
 
 
 - don't draw spaces in text
