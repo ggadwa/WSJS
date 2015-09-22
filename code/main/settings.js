@@ -23,7 +23,7 @@ function SettingsObject()
     
     this.ambient=[0.4,0.4,0.4];             // all over ambient light
     
-    this.generateLightmap=true;               // set to true for simplier, non-traced light maps
+    this.generateLightmap=false;               // set to true to generate light maps
 
         // models
         
@@ -33,11 +33,16 @@ function SettingsObject()
         
     this.monsterEntityCount=0;
     
-        // physics
+        // timing
         
     this.physicsMilliseconds=16;
     this.drawMilliseconds=16;
     this.bailMilliseconds=5000;
+    
+        // testing
+        
+    this.clipWalls=true;
+    this.fly=true;
 
         // random seeds
         // hard set these to generate the

@@ -33,6 +33,13 @@ function EntityObject(position,angle,radius,model,isPlayer)
         var movePt=new wsPoint(0.0,0.0,dist);
         movePt.rotateY(null,angY);
         
+            // wall clipping setting, remove later
+            
+        if ((settings.clipWalls) && (this.isPlayer)) {
+            this.position.addPoint(movePt);
+            return;
+        }
+        
             // run the collision which
             // will return a new move direction
             // if it's the same as the original or
@@ -117,9 +124,11 @@ function EntityObject(position,angle,radius,model,isPlayer)
         if (this.verticalSpeed!==0.0) this.move(0.0,this.verticalSpeed,0.0);
         
             // falling
-            
-        var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,50);
-        this.position.move(0,fallY,0);
+        
+        if ((!settings.fly) && (this.isPlayer)) {
+            var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,50);
+            this.position.move(0,fallY,0);
+        }
     };
         
     
