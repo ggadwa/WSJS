@@ -164,7 +164,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // other stories
 /*            
         if (storyCount>1) {
-            var meshPrimitives=new MeshPrimitivesObject();
             var platformBoundX,platformBoundZ;
             
             var platformBoundY=yBound.copy();
@@ -200,7 +199,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     this.addStairMesh=function(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount)
     {
         /*
-        var meshPrimitives=new MeshPrimitivesObject();
         
             // the walls around the stairwell
             
@@ -263,8 +261,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             var xPoleBound=new wsBound((lightX-100),(lightX+100));
             var yPoleBound=new wsBound(poleY,lightY);
             var zPoleBound=new wsBound((lightZ-100),(lightZ+100));
-            
-            var meshPrimitives=new MeshPrimitivesObject();
             this.map.addMesh(meshPrimitives.createMeshCube(this.map.getBitmapById(BITMAP_METAL),xPoleBound,yPoleBound,zPoleBound,true,true,true,true,true,false,false,this.map.MESH_FLAG_LIGHT));
         }
 
@@ -273,8 +269,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var xLightBound=new wsBound((lightX-400),(lightX+400));
         var yLightBound=new wsBound(lightY,(lightY+1000));
         var zLightBound=new wsBound((lightZ-400),(lightZ+400));
-
-        var meshPrimitives=new MeshPrimitivesObject();
         this.map.addMesh(meshPrimitives.createMeshPryamid(this.map.getBitmapById(BITMAP_METAL),xLightBound,yLightBound,zLightBound,this.map.MESH_FLAG_LIGHT));
 
             // get light intensity and point
@@ -516,9 +510,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 var nextNeedStairs=false;
                 yStoryBound=yBound.copy();
 
-                //if (noCurrentStairs) {
+                if (noCurrentStairs) {
 
-                    //if (this.genRandom.random()<settings.storyChangePercentage) {
+                    if (this.genRandom.random()<settings.storyChangePercentage) {
 
                             // move new room up
                             // and switch level
@@ -535,8 +529,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                             // at a time
                             
                         noCurrentStairs=false;
-                    //}
-                //}
+                    }
+                }
 
                     // recurse on to build the new room
 

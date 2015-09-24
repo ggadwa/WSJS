@@ -320,7 +320,6 @@ function GenModelMeshObject(model,bitmap,genRandom)
             
             // complete the tangent space vectors
     
-        var meshUVTangents=new MeshUVTangentsObject();
         var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);
         var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
 

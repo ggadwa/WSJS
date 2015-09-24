@@ -125,10 +125,12 @@ function EntityObject(position,angle,radius,model,isPlayer)
         
             // falling
         
-        if ((!settings.fly) && (this.isPlayer)) {
-            var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,50);
-            this.position.move(0,fallY,0);
+        if (this.isPlayer) {
+            if (settings.fly) return;
         }
+        
+        var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,50);
+        this.position.move(0,fallY,0);
     };
         
     

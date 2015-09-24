@@ -343,3 +343,4 @@ function MeshUVTangentsObject()
     
 }
 
+var meshUVTangents=new MeshUVTangentsObject();

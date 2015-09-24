@@ -41,8 +41,8 @@ function SettingsObject()
     
         // testing
         
-    this.clipWalls=true;
-    this.fly=true;
+    this.clipWalls=false;
+    this.fly=false;
 
         // random seeds
         // hard set these to generate the

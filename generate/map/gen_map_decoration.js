@@ -24,7 +24,6 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
     {
         var n,count;
         var x,z,high,boxBoundX,boxBoundY,boxBoundZ;
-        var meshPrimitives=new MeshPrimitivesObject();
 
         count=this.genRandom.randomInt(1,3);
 
@@ -57,7 +56,6 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         
             // setup cylinder segments
             
-        var meshPrimitives=new MeshPrimitivesObject();
         var segments=meshPrimitives.createMeshCylinderSegmentList(this.genRandom,500,500,1,2);
         
             // get count and radius from center
@@ -102,8 +100,6 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         
     this.addMachine=function()
     {
-        var meshPrimitives=new MeshPrimitivesObject();
-        
             // the machine size
             
         var centerPt=new wsPoint(xBound.getMidPoint(),yBound.max,zBound.getMidPoint());

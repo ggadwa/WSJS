@@ -13,17 +13,26 @@ EMCA6 TODOs
 
 
 [X] level ups are stair hallways
-[ ] stairs are their own js code and only make necessary polygons
-[ ] do NOT need 2nd story to have stairs
+[X] stairs are their own js code and only make necessary polygons
+[X] do NOT need 2nd story to have stairs
+[X] stairs need wall/floor mesh (use same mesh flags as original box stairs)
+[X] add 8-way room
 
-[ ] try to pack light struct floats
+[ ] we need to share vertices in
+    [ ] primitives
+    [ ] stairs
+    [ ] anywhere else polygon -> triangles
 
+[ ] randomize starting connection that you look at, don't always start at 0
+
+
+[ ] try to pack glsl light struct floats
 
 [ ] need steel panel rooms
 
-[ ] add the 8-way room
-
 [ ] need real polygonal floors
+
+[ ] rooms have possible light positions
 
 [ ] need to use all black lightmap chunks
 [ ] diffuse calcs in light maps
@@ -33,7 +42,6 @@ EMCA6 TODOs
 
 - keep a list of open 20/20 spots in rooms
     - need flip and mirror
-    - use that to build box platforms to stairs
 
 
 - don't draw spaces in text
