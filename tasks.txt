@@ -12,15 +12,11 @@ EMCA6 TODOs
 
 
 
-[X] level ups are stair hallways
-[X] stairs are their own js code and only make necessary polygons
-[X] do NOT need 2nd story to have stairs
-[X] stairs need wall/floor mesh (use same mesh flags as original box stairs)
-[X] add 8-way room
+
 
 [ ] we need to share vertices in
     [ ] primitives
-    [ ] stairs
+    [X] stairs
     [ ] anywhere else polygon -> triangles
 
 [ ] randomize starting connection that you look at, don't always start at 0

@@ -9,7 +9,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         // constants
         
     this.TIMEOUT_MSEC=10;    
-    this.GEN_MAP_STAIR_LENGTH=8000;
 
         // variables
         
@@ -196,49 +195,12 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         return(yStoryBound);
     };
 
-    this.addStairMesh=function(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount)
+    this.addStairRoom=function(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount)
     {
-        /*
-        
-            // the walls around the stairwell
-            
-        var yStoryAdd=yStairBound.max-yStairBound.min;
-        var yStairBound2=yStairBound.copy();
-        yStairBound2.add(-yStoryAdd);
-
-        var bitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
-        
-        var mesh=meshPrimitives.createMeshCube(bitmap,xStairBound,yStairBound,zStairBound,false,true,true,true,true,false,false,this.map.MESH_FLAG_ROOM_WALL);
-        var mesh2=meshPrimitives.createMeshCube(bitmap,xStairBound,yStairBound2,zStairBound,false,true,true,true,true,true,false,this.map.MESH_FLAG_ROOM_WALL);
-        mesh.combineMesh(mesh2);
-        this.map.addMesh(mesh);
-        */
-       
         var genRoomStairs=new GenRoomStairs();
-        
-        var bitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
-       
-            // staircase        // supergumba -- move all this to genRoomStairs
-            
-        switch (connectType) {
-            
-            case piece.CONNECT_TYPE_LEFT:
-                genRoomStairs.createStairsPosX(this.map,bitmap,xStairBound,yStairBound,zStairBound);
-                break;
-                
-            case piece.CONNECT_TYPE_TOP:
-                genRoomStairs.createStairsPosZ(this.map,bitmap,xStairBound,yStairBound,zStairBound);
-                break;
-                
-            case piece.CONNECT_TYPE_RIGHT:
-                genRoomStairs.createStairsNegX(this.map,bitmap,xStairBound,yStairBound,zStairBound);
-                break;
-                
-            case piece.CONNECT_TYPE_BOTTOM:
-                genRoomStairs.createStairsNegZ(this.map,bitmap,xStairBound,yStairBound,zStairBound);
-                break;
-                
-        }
+
+        var roomBitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
+        genRoomStairs.createStairs(this.map,roomBitmap,piece,connectType,xStairBound,yStairBound,zStairBound);
     };
 
     this.addLight=function(piece,storyCount,xBound,yBound,zBound)
@@ -358,6 +320,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             var connectPiece=this.mapPieceList.get(connectPieceIdx);
             var connectType=connectPiece.getConnectType(connectLineIdx);
+            
+            var offset,connectOffset,connectLength;
+            var xAdd,zAdd,stairAdd;
 
             for (n=0;n!==nConnectLine;n++) {
                 if (!piece.isConnectTypeOpposite(n,connectType)) continue;
@@ -365,12 +330,12 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                     // get offsets for each line
                     // so we line up connections
 
-                var offset=piece.getConnectTypeOffset(n,xConnectBound,zConnectBound);
-                var connectOffset=connectPiece.getConnectTypeOffset(connectLineIdx,xConnectBound,zConnectBound);
-                var connectLength=connectPiece.getConnectTypeLength(connectLineIdx,xConnectBound,zConnectBound);
+                offset=piece.getConnectTypeOffset(n,xConnectBound,zConnectBound);
+                connectOffset=connectPiece.getConnectTypeOffset(connectLineIdx,xConnectBound,zConnectBound);
+                connectLength=connectPiece.getConnectTypeLength(connectLineIdx,xConnectBound,zConnectBound);
 
-                var xAdd=connectOffset[0]-offset[0];
-                var zAdd=connectOffset[1]-offset[1];
+                xAdd=connectOffset[0]-offset[0];
+                zAdd=connectOffset[1]-offset[1];
 
                     // get location of the new room
                     // by moving the connections together
@@ -386,8 +351,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
                         if (needStairs) {
-                            xBound.add(-this.GEN_MAP_STAIR_LENGTH);
-                            xStairBound=new wsBound((xConnectBound.min-this.GEN_MAP_STAIR_LENGTH),xConnectBound.min);
+                            stairAdd=connectLength[1]*2;
+                            xBound.add(-stairAdd);
+                            xStairBound=new wsBound((xConnectBound.min-stairAdd),xConnectBound.min);
                             zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
                         }
                         break;
@@ -397,9 +363,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         zBound=new wsBound((zConnectBound.min-settings.maxRoomSize[2]),zConnectBound.min);
                         
                         if (needStairs) {
-                            zBound.add(-this.GEN_MAP_STAIR_LENGTH);
+                            stairAdd=connectLength[0]*2;
+                            zBound.add(-stairAdd);
                             xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
-                            zStairBound=new wsBound((zConnectBound.min-this.GEN_MAP_STAIR_LENGTH),zConnectBound.min);
+                            zStairBound=new wsBound((zConnectBound.min-stairAdd),zConnectBound.min);
                         }
                         break;
 
@@ -408,8 +375,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
                         if (needStairs) {
-                            xBound.add(this.GEN_MAP_STAIR_LENGTH);
-                            xStairBound=new wsBound(xConnectBound.max,(xConnectBound.max+this.GEN_MAP_STAIR_LENGTH));
+                            stairAdd=connectLength[1]*2;
+                            xBound.add(stairAdd);
+                            xStairBound=new wsBound(xConnectBound.max,(xConnectBound.max+stairAdd));
                             zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
                         }
                         break;
@@ -419,9 +387,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.maxRoomSize[2]));
                         
                         if (needStairs) {
-                            zBound.add(this.GEN_MAP_STAIR_LENGTH);
+                            stairAdd=connectLength[0]*2;
+                            zBound.add(stairAdd);
                             xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
-                            zStairBound=new wsBound(zConnectBound.max,(zConnectBound.max+this.GEN_MAP_STAIR_LENGTH));
+                            zStairBound=new wsBound(zConnectBound.max,(zConnectBound.max+stairAdd));
                         }
                         break;
 
@@ -449,7 +418,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         if (needStairs) {
             yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.max-yBound.min)));
-            this.addStairMesh(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount);
+            this.addStairRoom(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount);
         }
 
             // if a room, it's possible to be
