@@ -15,12 +15,12 @@ function MeshPrimitivesObject()
             // get cube size
 
         var count=0;
-        if (left) count+=18;
-        if (right) count+=18;
-        if (front) count+=18;
-        if (back) count+=18;
-        if (top) count+=18;
-        if (bottom) count+=18;
+        if (left) count+=12;
+        if (right) count+=12;
+        if (front) count+=12;
+        if (back) count+=12;
+        if (top) count+=12;
+        if (bottom) count+=12;
         if (count===0) return(null);
 
         var vertices=new Float32Array(count);
@@ -37,13 +37,6 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.max;
-            vertices[idx++]=xBound.min;
-            vertices[idx++]=yBound.max;
-            vertices[idx++]=zBound.max;
-
-            vertices[idx++]=xBound.min;
-            vertices[idx++]=yBound.min;
-            vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
@@ -64,13 +57,6 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
-
-            vertices[idx++]=xBound.max;
-            vertices[idx++]=yBound.min;
-            vertices[idx++]=zBound.min;
-            vertices[idx++]=xBound.max;
-            vertices[idx++]=yBound.max;
-            vertices[idx++]=zBound.max;
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.min;
@@ -83,13 +69,6 @@ function MeshPrimitivesObject()
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.max;
-            vertices[idx++]=yBound.min;
-            vertices[idx++]=zBound.min;
-            vertices[idx++]=xBound.max;
-            vertices[idx++]=yBound.max;
-            vertices[idx++]=zBound.min;
-
-            vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.max;
@@ -112,13 +91,6 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
-
-            vertices[idx++]=xBound.min;
-            vertices[idx++]=yBound.min;
-            vertices[idx++]=zBound.max;
-            vertices[idx++]=xBound.max;
-            vertices[idx++]=yBound.max;
-            vertices[idx++]=zBound.max;
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
@@ -136,13 +108,6 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.max;
-
-            vertices[idx++]=xBound.min;
-            vertices[idx++]=yBound.min;
-            vertices[idx++]=zBound.min;
-            vertices[idx++]=xBound.max;
-            vertices[idx++]=yBound.min;
-            vertices[idx++]=zBound.max;    
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.max;
@@ -160,44 +125,44 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
-
-            vertices[idx++]=xBound.min;
-            vertices[idx++]=yBound.max;
-            vertices[idx++]=zBound.min;
-            vertices[idx++]=xBound.max;
-            vertices[idx++]=yBound.max;
-            vertices[idx++]=zBound.max;
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
         }
 
         var n;
-        var iCount=Math.floor(count/3);
+        var iCount=Math.floor(Math.floor(vertices.length/3)/4)*6;
 
         var indexes=new Uint16Array(iCount);
 
-        for (n=0;n!==iCount;n++) {
-            indexes[n]=n;
+        var vIdx=0;
+
+        for (n=0;n!==iCount;n+=6) {
+            indexes[n]=vIdx;
+            indexes[n+1]=vIdx+1;
+            indexes[n+2]=vIdx+2;
+            
+            indexes[n+3]=vIdx;
+            indexes[n+4]=vIdx+2;
+            indexes[n+5]=vIdx+3;
+            
+            vIdx+=4;
         }
 
             // build whole UVs
 
         if (wholeUV) {
-            uvs=new Float32Array(iCount*2);
+            
+            var uvCount=Math.floor(vertices.length/3);
+            uvs=new Float32Array(uvCount*2);
 
             idx=0;
-            var quadCount=Math.floor(iCount/6);
+            var quadCount=Math.floor(uvCount/4);
 
             for (n=0;n!==quadCount;n++) {
                 uvs[idx++]=0.0;
                 uvs[idx++]=0.0;
                 uvs[idx++]=1.0;
-                uvs[idx++]=0.0;
-                uvs[idx++]=1.0;
-                uvs[idx++]=1.0;
-
-                uvs[idx++]=0.0;
                 uvs[idx++]=0.0;
                 uvs[idx++]=1.0;
                 uvs[idx++]=1.0;

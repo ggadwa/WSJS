@@ -15,12 +15,16 @@ EMCA6 TODOs
 
 
 [ ] we need to share vertices in
-    [ ] primitives
+    [ ] pryamids
+    [ ] cylinders
+    [X] squares
     [X] stairs
     [ ] anywhere else polygon -> triangles
 
-[ ] randomize starting connection that you look at, don't always start at 0
+[ ] wood bitmaps have bad normals
 
+[ ] pillars need separate object and pillar locations and ONLY single story rooms
+[ ] better second floor stuff
 
 [ ] try to pack glsl light struct floats
 
@@ -43,16 +47,8 @@ EMCA6 TODOs
 - don't draw spaces in text
 
 
-maps
- - better second floor platforms
-
-
 collisions
  - gravity
-
-lighting
- - light map in worker threads?
-
 
 
 model generation

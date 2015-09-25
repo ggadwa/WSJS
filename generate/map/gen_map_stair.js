@@ -28,29 +28,6 @@ function GenRoomStairs()
         vertices[idx++]=x;
         vertices[idx++]=yBoundBottom.max;
         vertices[idx++]=zBound.min;
-
-        
-        /*
-        vertices[idx++]=x;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.min;
-        vertices[idx++]=x;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=zBound.max;
-        vertices[idx++]=x;
-        vertices[idx++]=yBoundTop.max;
-        vertices[idx++]=zBound.max;
-
-        vertices[idx++]=x;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.min;
-        vertices[idx++]=x;
-        vertices[idx++]=yBoundTop.max;
-        vertices[idx++]=zBound.max;
-        vertices[idx++]=x;
-        vertices[idx++]=yBoundBottom.max;
-        vertices[idx++]=zBound.min;
-        */
         
         return(idx);
     };
@@ -70,28 +47,6 @@ function GenRoomStairs()
         vertices[idx++]=yBoundBottom.max;
         vertices[idx++]=z;
 
-        /*
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=z;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=z;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.max;
-        vertices[idx++]=z;
-
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=z;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.max;
-        vertices[idx++]=z;
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.max;
-        vertices[idx++]=z;
-        */
-        
         return(idx);
     };
     
@@ -110,28 +65,6 @@ function GenRoomStairs()
         vertices[idx++]=yBoundBottom.min;
         vertices[idx++]=zBound.max;
         
-        /*
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.min;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=zBound.min;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=zBound.max;
-
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.min;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=zBound.max;
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.max;
-        */
-        
         return(idx);
     };
     
@@ -149,28 +82,6 @@ function GenRoomStairs()
         vertices[idx++]=xBound.max;
         vertices[idx++]=yBoundBottom.min;
         vertices[idx++]=zBound.min;
-        
-        /*
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.min;
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=zBound.max;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=zBound.max;
-
-        vertices[idx++]=xBound.min;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.min;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundTop.min;
-        vertices[idx++]=zBound.max;
-        vertices[idx++]=xBound.max;
-        vertices[idx++]=yBoundBottom.min;
-        vertices[idx++]=zBound.min;
-        */
         
         return(idx);
     };

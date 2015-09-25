@@ -117,6 +117,9 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
 
     this.addDecoration=function()
     {
+        this.addBoxes();
+        return;
+        
             // this map have decorations?
             
         if (!settings.decorations) return;
