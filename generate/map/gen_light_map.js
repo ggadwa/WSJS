@@ -496,9 +496,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var pixelCount=this.CHUNK_SIZE*this.CHUNK_SIZE;
         
         for (n=0;n!==pixelCount;n++) {
-            data[idx++]=255;
-            data[idx++]=255;
-            data[idx++]=255;
+            data[idx++]=0;
+            data[idx++]=0;
+            data[idx++]=0;
             data[idx++]=255;    
         }
             
@@ -731,20 +731,17 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             // add the UV
             // pt0-pt2 are already moved within the margin
 
-        var renderLft=lft;
-        var renderTop=top;
-
         uvIdx=mesh.indexes[trigIdx*3]*2;
-        lightmapUVs[uvIdx]=(pt0.x+renderLft)/this.TEXTURE_SIZE;
-        lightmapUVs[uvIdx+1]=(pt0.y+renderTop)/this.TEXTURE_SIZE;
+        lightmapUVs[uvIdx]=(pt0.x+lft)/this.TEXTURE_SIZE;
+        lightmapUVs[uvIdx+1]=(pt0.y+top)/this.TEXTURE_SIZE;
 
         uvIdx=mesh.indexes[(trigIdx*3)+1]*2;
-        lightmapUVs[uvIdx]=(pt1.x+renderLft)/this.TEXTURE_SIZE;
-        lightmapUVs[uvIdx+1]=(pt1.y+renderTop)/this.TEXTURE_SIZE;
+        lightmapUVs[uvIdx]=(pt1.x+lft)/this.TEXTURE_SIZE;
+        lightmapUVs[uvIdx+1]=(pt1.y+top)/this.TEXTURE_SIZE;
 
         uvIdx=mesh.indexes[(trigIdx*3)+2]*2;
-        lightmapUVs[uvIdx]=(pt2.x+renderLft)/this.TEXTURE_SIZE;
-        lightmapUVs[uvIdx+1]=(pt2.y+renderTop)/this.TEXTURE_SIZE;
+        lightmapUVs[uvIdx]=(pt2.x+lft)/this.TEXTURE_SIZE;
+        lightmapUVs[uvIdx+1]=(pt2.y+top)/this.TEXTURE_SIZE;
     };
 
         //
@@ -762,26 +759,45 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         mesh=this.map.meshes[meshIdx];
         nTrig=mesh.trigCount;
+        
+            // if we aren't generating lightmaps,
+            // then always use the same single lightmap
+            // set to black
+            
+        if (!this.generateLightmap) {
+            
+            lightmapIdx=0;
 
-            // find a lightmap to put mesh into
-
-        lightmapIdx=-1;
-
-        for (n=0;n!==this.lightmapList.length;n++) {
-
-                // check to see if we can fit
-
-            if ((this.CHUNK_PER_TEXTURE-this.lightmapList[n].chunkIdx)>nTrig) {
-                lightmapIdx=n;
-                break;
+            if (this.lightmapList.length===0) {     // have no lightmaps yet, so make a white one
+                this.lightmapList[0]=new GenLightmapBitmapObject(this.startCanvas());
+                this.renderColor(this.lightmapList[0].canvas.getContext('2d'),0,0);
             }
         }
+        
+            // else we need to pack triangles
+            // into lightmaps
+            
+        else {
 
-            // if we didn't find a lightmap, make a new one
+                // find a lightmap to put mesh into
+                // we do this by checking if we have enough
+                // room for the set of triangles
 
-        if (lightmapIdx===-1) {
-            lightmapIdx=this.lightmapList.length;
-            this.lightmapList[lightmapIdx]=new GenLightmapBitmapObject(this.startCanvas());
+            lightmapIdx=-1;
+
+            for (n=0;n!==this.lightmapList.length;n++) {
+                if ((this.CHUNK_PER_TEXTURE-this.lightmapList[n].chunkIdx)>nTrig) {
+                    lightmapIdx=n;
+                    break;
+                }
+            }
+
+                // if we didn't find a lightmap, make a new one
+
+            if (lightmapIdx===-1) {
+                lightmapIdx=this.lightmapList.length;
+                this.lightmapList[lightmapIdx]=new GenLightmapBitmapObject(this.startCanvas());
+            }
         }
         
             // UVs for this mesh
@@ -794,18 +810,12 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         ctx=this.lightmapList[lightmapIdx].canvas.getContext('2d');
         
             // if no light map, then just create
-            // a white chunk and hard set the UVs to be
-            // the top-left of the chunk
+            // UVs for the top-left white map
             
         if (!this.generateLightmap) {
-            lft=(chunkIdx%this.CHUNK_SPLIT)*this.CHUNK_SIZE;
-            top=Math.floor(chunkIdx/this.CHUNK_SPLIT)*this.CHUNK_SIZE;
-            
-            this.renderColor(ctx,lft,top);
-            chunkIdx++;
-            
-            for (n=0;n!==(nTrig*6);n++) {
-                lightmapUVs[n]=0.0;
+            var singleUV=this.RENDER_MARGIN/this.TEXTURE_SIZE;
+            for (n=0;n!==(mesh.vertexCount*2);n++) {
+                lightmapUVs[n]=singleUV;
             }
         }
 
@@ -913,7 +923,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         
                     // debugging
 
-        //if (this.lightmapList.length!==0) debug.displayCanvasData(this.lightmapList[0].canvas,810,10,1024,1024);
+        //if (this.lightmapList.length!==0) debug.displayCanvasData(this.lightmapList[0].canvas,1050,10,1024,1024);
 
             // finish with the callback
 

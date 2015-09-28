@@ -460,10 +460,15 @@ function MapObject()
             // debugging draw
         
         if (settings.debugDraw) {
+            
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) {
-                    debug.drawMapMeshLines(view,view.map,mesh);
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(view,mesh);
+            }
+            
+            for (n=0;n!==nMesh;n++) {
+                mesh=this.meshes[n];
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) {      // draw separately so they overlay the triangle lines
                     debug.drawMapMeshTangents(view,mesh);
                     debug.drawMapMeshNormals(view,mesh);
                 }

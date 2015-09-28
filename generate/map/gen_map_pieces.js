@@ -92,7 +92,8 @@ function MapPieceObject(isRoom)
 
     this.createMeshFloor=function(bitmap,xBound,yBound,zBound,flag)
     {
-        var vertices=new Float32Array(18);
+        var n;
+        var vertices=new Float32Array(12);
 
         vertices[0]=xBound.min;
         vertices[1]=yBound.max;
@@ -103,28 +104,23 @@ function MapPieceObject(isRoom)
         vertices[6]=xBound.max;
         vertices[7]=yBound.max;
         vertices[8]=zBound.max;
-
         vertices[9]=xBound.min;
         vertices[10]=yBound.max;
-        vertices[11]=zBound.min;
-        vertices[12]=xBound.max;
-        vertices[13]=yBound.max;
-        vertices[14]=zBound.max;    
-        vertices[15]=xBound.min;
-        vertices[16]=yBound.max;
-        vertices[17]=zBound.max;
+        vertices[11]=zBound.max;
 
-        var n;
         var indexes=new Uint16Array(6);
-
-        for (n=0;n!==6;n++) {
-            indexes[n]=n;
-        }
+        
+        indexes[0]=0;
+        indexes[1]=1;
+        indexes[2]=2;
+        indexes[3]=0;
+        indexes[4]=2;
+        indexes[5]=3;
 
             // always force normals up
 
         var nIdx=0;
-        var normals=new Float32Array(18);
+        var normals=new Float32Array(12);
 
         for (n=0;n!==6;n++) {
             normals[nIdx++]=0.0;
@@ -145,7 +141,8 @@ function MapPieceObject(isRoom)
 
     this.createMeshCeiling=function(bitmap,xBound,yBound,zBound,flag)
     {
-        var vertices=new Float32Array(18);
+        var n;
+        var vertices=new Float32Array(12);
 
         vertices[0]=xBound.min;
         vertices[1]=yBound.min;
@@ -156,28 +153,23 @@ function MapPieceObject(isRoom)
         vertices[6]=xBound.max;
         vertices[7]=yBound.min;
         vertices[8]=zBound.max;
-
         vertices[9]=xBound.min;
         vertices[10]=yBound.min;
-        vertices[11]=zBound.min;
-        vertices[12]=xBound.max;
-        vertices[13]=yBound.min;
-        vertices[14]=zBound.max;    
-        vertices[15]=xBound.min;
-        vertices[16]=yBound.min;
-        vertices[17]=zBound.max;
+        vertices[11]=zBound.max;
 
-        var n;
         var indexes=new Uint16Array(6);
 
-        for (n=0;n!==6;n++) {
-            indexes[n]=n;
-        }
+        indexes[0]=0;
+        indexes[1]=1;
+        indexes[2]=2;
+        indexes[3]=0;
+        indexes[4]=2;
+        indexes[5]=3;
 
             // always force normals down
 
         var nIdx=0;
-        var normals=new Float32Array(18);
+        var normals=new Float32Array(12);
 
         for (n=0;n!==6;n++) {
             normals[nIdx++]=0.0;

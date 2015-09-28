@@ -155,8 +155,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             }
         }
 
-        // supergumba -- testing
-        //this.map.addMesh(mesh);
+        this.map.addMesh(mesh);
 
             // ceiling
 
@@ -428,8 +427,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // more than one story
 
         var storyCount=1;
-        // supergumba -- test
-        //if (piece.isRoom) storyCount+=Math.floor(settings.maxStoryCount*this.genRandom.random());
+        if (piece.isRoom) storyCount+=Math.floor(settings.maxStoryCount*this.genRandom.random());
 
             // add the room mesh
 

@@ -431,8 +431,6 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.8);
-        
-        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);     // supergumba -- test
     };
 
         //
@@ -683,10 +681,10 @@ function GenBitmapObject(genRandom)
 
             // debugging
 /*
-        if (generateType===GEN_BITMAP_TYPE_SKIN) {
-            debug.displayCanvasData(bitmapCanvas,810,10,400,400);
-            debug.displayCanvasData(normalCanvas,810,410,400,400);
-            debug.displayCanvasData(specularCanvas,810,820,400,400);
+        if (generateType===GEN_BITMAP_TYPE_WOOD_BOX) {
+            debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
+            debug.displayCanvasData(normalCanvas,1050,410,400,400);
+            debug.displayCanvasData(specularCanvas,1050,820,400,400);
         }
 */
             // finally create the bitmap

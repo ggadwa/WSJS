@@ -23,7 +23,7 @@ function GenBitmapUtilityObject(genRandom)
     
         // normals
     
-    this.NORMAL_CLEAR=[-1.0,-1.0,1.0];
+    this.NORMAL_CLEAR=[0.0,0.0,1.0];
     
     this.NORMAL_LEFT_45=[-0.60,0.02,0.70];
     this.NORMAL_RIGHT_45=[0.60,-0.02,0.70];
@@ -479,7 +479,7 @@ function GenBitmapUtilityObject(genRandom)
 
         this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.colorToRGBColor(fillRGBColor,1.0));
 
-        this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor([-1.0,-1.0,1.0]));
+        this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor(this.NORMAL_CLEAR));
     };
 
     this.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
@@ -938,7 +938,7 @@ function GenBitmapUtilityObject(genRandom)
                 bitmapData[idx+2]=blueByte;
 
                 normalData[idx]=nx;
-                normalData[idx+1]=0;
+                normalData[idx+1]=127.0;
                 normalData[idx+2]=nz;
 
                 idx+=4;
@@ -990,7 +990,7 @@ function GenBitmapUtilityObject(genRandom)
                 bitmapData[idx+2]=blueByte;
 
                 normalData[idx]=nx;
-                normalData[idx+1]=0;
+                normalData[idx+1]=127.0;
                 normalData[idx+2]=nz;
             }
 
@@ -1036,7 +1036,7 @@ function GenBitmapUtilityObject(genRandom)
                 bitmapData[idx+2]=Math.floor(colors[cIdx+2]*256.0);
 
                 normalData[idx]=((cIdx&0x1)===0)?nx:-nx;
-                normalData[idx+1]=0;
+                normalData[idx+1]=127.0;
                 normalData[idx+2]=nz;
             }
         }

@@ -79,10 +79,10 @@
     varying highp vec3 eyeVector;
     varying highp vec4 fragUV;
 
-    varying highp float lightDistance_0;
-    varying highp float lightDistance_1;
-    varying highp float lightDistance_2;
-    varying highp float lightDistance_3;
+    varying highp vec3 lightVector_0;
+    varying highp vec3 lightVector_1;
+    varying highp vec3 lightVector_2;
+    varying highp vec3 lightVector_3;
 
     varying highp vec3 lightVertexVector_0;
     varying highp vec3 lightVertexVector_1;
@@ -94,7 +94,7 @@
         highp vec3 lvct;
 
         gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
-
+        
             // get the tangent space
 
         highp vec3 vtx=vec3(modelMatrix*vec4(vertexPosition,1.0));
@@ -111,39 +111,31 @@
 
             // translate the light 0 vector
 
-        lvct=light_0.position.xyz-vtx;
-        lightDistance_0=length(lvct);
-
-        lightVertexVector_0.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_0.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_0.z=dot(lvct,tangentSpaceNormal);
+        lightVector_0=light_0.position.xyz-vtx;
+        lightVertexVector_0.x=dot(lightVector_0,tangentSpaceTangent);
+        lightVertexVector_0.y=dot(lightVector_0,tangentSpaceBinormal);
+        lightVertexVector_0.z=dot(lightVector_0,tangentSpaceNormal);
 
             // translate the light 1 vector
 
-        lvct=light_1.position.xyz-vtx;
-        lightDistance_1=length(lvct);
-
-        lightVertexVector_1.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_1.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_1.z=dot(lvct,tangentSpaceNormal);
+        lightVector_1=light_1.position.xyz-vtx;
+        lightVertexVector_1.x=dot(lightVector_1,tangentSpaceTangent);
+        lightVertexVector_1.y=dot(lightVector_1,tangentSpaceBinormal);
+        lightVertexVector_1.z=dot(lightVector_1,tangentSpaceNormal);
 
             // translate the light 2 vector
 
-        lvct=light_2.position.xyz-vtx;
-        lightDistance_2=length(lvct);
-
-        lightVertexVector_2.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_2.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_2.z=dot(lvct,tangentSpaceNormal);
+        lightVector_2=light_2.position.xyz-vtx;
+        lightVertexVector_2.x=dot(lightVector_2,tangentSpaceTangent);
+        lightVertexVector_2.y=dot(lightVector_2,tangentSpaceBinormal);
+        lightVertexVector_2.z=dot(lightVector_2,tangentSpaceNormal);
 
             // translate the light 3 vector
 
-        lvct=light_3.position.xyz-vtx;
-        lightDistance_3=length(lvct);
-
-        lightVertexVector_3.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_3.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_3.z=dot(lvct,tangentSpaceNormal);
+        lightVector_3=light_3.position.xyz-vtx;
+        lightVertexVector_3.x=dot(lightVector_3,tangentSpaceTangent);
+        lightVertexVector_3.y=dot(lightVector_3,tangentSpaceBinormal);
+        lightVertexVector_3.z=dot(lightVector_3,tangentSpaceNormal);
 
             // the varying uv
 
@@ -176,10 +168,10 @@
     varying highp vec3 eyeVector;
     varying highp vec4 fragUV;
 
-    varying highp float lightDistance_0;
-    varying highp float lightDistance_1;
-    varying highp float lightDistance_2;
-    varying highp float lightDistance_3;
+    varying highp vec3 lightVector_0;
+    varying highp vec3 lightVector_1;
+    varying highp vec3 lightVector_2;
+    varying highp vec3 lightVector_3;
 
     varying highp vec3 lightVertexVector_0;
     varying highp vec3 lightVertexVector_1;
@@ -189,11 +181,12 @@
     void main(void)
     {
         lowp float att;
+        highp float dist;
 
-            // the ambient plus the
-            // light map
+            // the default light color is the lightmap
+            // plus the ambient
 
-        lowp vec3 pixelAmbient=texture2D(lightmapTex,fragUV.zw).rgb+ambient;
+        lowp vec3 lightCol=texture2D(lightmapTex,fragUV.zw).rgb+ambient;
 
             // the texture fragment
 
@@ -202,7 +195,7 @@
             // the starting bump map
             // since it will be created by going through the
             // lights, we need a default value
-
+            
         highp vec3 bumpLightVertexVector;
         lowp vec3 bumpMap=normalize((texture2D(normalTex,fragUV.xy).rgb*2.0)-1.0);
         lowp float bump=dot(vec3(0.33,0.33,0.33),bumpMap);
@@ -215,13 +208,14 @@
 
             // light 0
 
-        if (lightDistance_0<light_0.intensity) {
+        dist=length(lightVector_0);
+        if (dist<light_0.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_0*light_0.invertIntensity);
+            att=1.0-(dist*light_0.invertIntensity);
             att+=pow(att,light_0.exponent);
-            pixelAmbient+=(light_0.color.rgb*att);
+            lightCol+=(light_0.color.rgb*att);
 
                 // per-light bump calc
 
@@ -237,13 +231,14 @@
 
             // light 1
 
-        if (lightDistance_1<light_1.intensity) {
+        dist=length(lightVector_1);
+        if (dist<light_1.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_1*light_1.invertIntensity);
+            att=1.0-(dist*light_1.invertIntensity);
             att+=pow(att,light_1.exponent);
-            pixelAmbient+=(light_1.color.rgb*att);
+            lightCol+=(light_1.color.rgb*att);
 
                 // per-light bump calc
 
@@ -259,13 +254,14 @@
 
             // light 2
 
-        if (lightDistance_2<light_2.intensity) {
+        dist=length(lightVector_2);
+        if (dist<light_2.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_2*light_2.invertIntensity);
+            att=1.0-(dist*light_2.invertIntensity);
             att+=pow(att,light_2.exponent);
-            pixelAmbient+=(light_2.color.rgb*att);
+            lightCol+=(light_2.color.rgb*att);
 
                 // per-light bump calc
 
@@ -281,13 +277,14 @@
 
             // light 3
 
-        if (lightDistance_3<light_3.intensity) {
+        dist=length(lightVector_3);
+        if (dist<light_3.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_3*light_3.invertIntensity);
+            att=1.0-(dist*light_3.invertIntensity);
             att+=pow(att,light_3.exponent);
-            pixelAmbient+=(light_3.color.rgb*att);
+            lightCol+=(light_3.color.rgb*att);
 
                 // per-light bump calc
 
@@ -300,20 +297,21 @@
             specFactor=max(dot(bumpMap,specHalfVector),0.0);
             spec+=((specMap*pow(specFactor,shineFactor))*att);
         }
-
-            // finish the spec by making sure
+        
+           // finish the spec by making sure
             // it's dimmed in dark areas
 
-        spec=min(spec,1.0)*((pixelAmbient.r+pixelAmbient.g+pixelAmbient.b)*0.33);
+        spec=min(spec,1.0)*((lightCol.r+lightCol.g+lightCol.b)*0.33);
 
             // add bump into the ambient and make
             // sure it's never less than 10% of the
             // ambient
 
-        pixelAmbient=max((pixelAmbient*bump),(ambient*0.9));
+        lowp vec3 pixelAmbient=max((lightCol*bump),(ambient*0.9));
 
             // finally create the pixel
-
+        
+        //gl_FragColor.rgb=lightCol;          // light only test
         //gl_FragColor.rgb=texture2D(lightmapTex,fragUV.zw).rgb; // light map test
         //gl_FragColor.rgb=tex.rgb*texture2D(lightmapTex,fragUV.zw).rgb; // texture + light map test
         //gl_FragColor.rgb=tex.rgb*pixelAmbient;      // texture + light map + bump
@@ -348,10 +346,10 @@
     varying highp vec3 eyeVector;
     varying highp vec2 fragUV;
 
-    varying highp float lightDistance_0;
-    varying highp float lightDistance_1;
-    varying highp float lightDistance_2;
-    varying highp float lightDistance_3;
+    varying highp vec3 lightVector_0;
+    varying highp vec3 lightVector_1;
+    varying highp vec3 lightVector_2;
+    varying highp vec3 lightVector_3;
 
     varying highp vec3 lightVertexVector_0;
     varying highp vec3 lightVertexVector_1;
@@ -380,39 +378,31 @@
 
             // translate the light 0 vector
 
-        lvct=light_0.position.xyz-vtx;
-        lightDistance_0=length(lvct);
-
-        lightVertexVector_0.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_0.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_0.z=dot(lvct,tangentSpaceNormal);
+        lightVector_0=light_0.position.xyz-vtx;
+        lightVertexVector_0.x=dot(lightVector_0,tangentSpaceTangent);
+        lightVertexVector_0.y=dot(lightVector_0,tangentSpaceBinormal);
+        lightVertexVector_0.z=dot(lightVector_0,tangentSpaceNormal);
 
             // translate the light 1 vector
 
-        lvct=light_1.position.xyz-vtx;
-        lightDistance_1=length(lvct);
-
-        lightVertexVector_1.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_1.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_1.z=dot(lvct,tangentSpaceNormal);
+        lightVector_1=light_1.position.xyz-vtx;
+        lightVertexVector_1.x=dot(lightVector_1,tangentSpaceTangent);
+        lightVertexVector_1.y=dot(lightVector_1,tangentSpaceBinormal);
+        lightVertexVector_1.z=dot(lightVector_1,tangentSpaceNormal);
 
             // translate the light 2 vector
 
-        lvct=light_2.position.xyz-vtx;
-        lightDistance_2=length(lvct);
-
-        lightVertexVector_2.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_2.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_2.z=dot(lvct,tangentSpaceNormal);
+        lightVector_2=light_2.position.xyz-vtx;
+        lightVertexVector_2.x=dot(lightVector_2,tangentSpaceTangent);
+        lightVertexVector_2.y=dot(lightVector_2,tangentSpaceBinormal);
+        lightVertexVector_2.z=dot(lightVector_2,tangentSpaceNormal);
 
             // translate the light 3 vector
 
-        lvct=light_3.position.xyz-vtx;
-        lightDistance_3=length(lvct);
-
-        lightVertexVector_3.x=dot(lvct,tangentSpaceTangent);
-        lightVertexVector_3.y=dot(lvct,tangentSpaceBinormal);
-        lightVertexVector_3.z=dot(lvct,tangentSpaceNormal);
+        lightVector_3=light_3.position.xyz-vtx;
+        lightVertexVector_3.x=dot(lightVector_3,tangentSpaceTangent);
+        lightVertexVector_3.y=dot(lightVector_3,tangentSpaceBinormal);
+        lightVertexVector_3.z=dot(lightVector_3,tangentSpaceNormal);
 
             // the varying uv
 
@@ -444,10 +434,10 @@
     varying highp vec3 eyeVector;
     varying highp vec2 fragUV;
 
-    varying highp float lightDistance_0;
-    varying highp float lightDistance_1;
-    varying highp float lightDistance_2;
-    varying highp float lightDistance_3;
+    varying highp vec3 lightVector_0;
+    varying highp vec3 lightVector_1;
+    varying highp vec3 lightVector_2;
+    varying highp vec3 lightVector_3;
 
     varying highp vec3 lightVertexVector_0;
     varying highp vec3 lightVertexVector_1;
@@ -457,10 +447,11 @@
     void main(void)
     {
         lowp float att;
+        highp float dist;
 
-            // the ambient
+            // the default light color is the ambient
 
-        lowp vec3 pixelAmbient=ambient;
+        lowp vec3 lightCol=ambient;
 
             // the texture fragment
 
@@ -482,13 +473,14 @@
 
             // light 0
 
-        if (lightDistance_0<light_0.intensity) {
+        dist=length(lightVector_0);
+        if (dist<light_0.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_0*light_0.invertIntensity);
+            att=1.0-(dist*light_0.invertIntensity);
             att+=pow(att,light_0.exponent);
-            pixelAmbient+=(light_0.color.rgb*att);
+            lightCol+=(light_0.color.rgb*att);
 
                 // per-light bump calc
 
@@ -504,13 +496,14 @@
 
             // light 1
 
-        if (lightDistance_1<light_1.intensity) {
+        dist=length(lightVector_1);
+        if (dist<light_1.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_1*light_1.invertIntensity);
+            att=1.0-(dist*light_1.invertIntensity);
             att+=pow(att,light_1.exponent);
-            pixelAmbient+=(light_1.color.rgb*att);
+            lightCol+=(light_1.color.rgb*att);
 
                 // per-light bump calc
 
@@ -526,13 +519,14 @@
 
             // light 2
 
-        if (lightDistance_2<light_2.intensity) {
+        dist=length(lightVector_2);
+        if (dist<light_2.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_2*light_2.invertIntensity);
+            att=1.0-(dist*light_2.invertIntensity);
             att+=pow(att,light_2.exponent);
-            pixelAmbient+=(light_2.color.rgb*att);
+            lightCol+=(light_2.color.rgb*att);
 
                 // per-light bump calc
 
@@ -548,13 +542,14 @@
 
             // light 3
 
-        if (lightDistance_3<light_3.intensity) {
+        dist=length(lightVector_3);
+        if (dist<light_3.intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(lightDistance_3*light_3.invertIntensity);
+            att=1.0-(dist*light_3.invertIntensity);
             att+=pow(att,light_3.exponent);
-            pixelAmbient+=(light_3.color.rgb*att);
+            lightCol+=(light_3.color.rgb*att);
 
                 // per-light bump calc
 
@@ -571,13 +566,13 @@
             // finish the spec by making sure
             // it's dimmed in dark areas
 
-        spec=min(spec,1.0)*((pixelAmbient.r+pixelAmbient.g+pixelAmbient.b)*0.33);
+        spec=min(spec,1.0)*((lightCol.r+lightCol.g+lightCol.b)*0.33);
 
             // add bump into the ambient and make
             // sure it's never less than 10% of the
             // ambient
 
-        pixelAmbient=max((pixelAmbient*bump),(ambient*0.9));
+        lowp vec3 pixelAmbient=max((lightCol*bump),(ambient*0.9));
 
             // finally create the pixel
 

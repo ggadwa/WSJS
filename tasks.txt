@@ -11,12 +11,14 @@ EMCA6 TODOs
 
 
 [CURRENT BREAK FIXING]
-  [ ] get debugger to show proper mesh lines
-  [ ] floors and ceilings share vertices
-  [ ] need version of shader that just does lighting to figure out normal problems
-  [ ] eventually delete all supergumba -- testing marks
+  [X] get debugger to show proper mesh lines
+  [X] floors and ceilings share vertices
+  [X] need version of shader that just does lighting to figure out normal problems
+  [X] eventually delete all supergumba -- testing marks
+  [X] transfer light col stuff to model frags
 
-
+[ ] turn down the specs!
+[ ] maybe smaller lights
 
 [ ] we need to share vertices in
     [ ] pryamids
@@ -25,7 +27,6 @@ EMCA6 TODOs
     [X] stairs
     [ ] anywhere else polygon -> triangles
 
-[ ] wood bitmaps have bad normals
 
 [ ] pillars need separate object and pillar locations and ONLY single story rooms
 [ ] better second floor stuff

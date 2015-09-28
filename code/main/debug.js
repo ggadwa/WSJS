@@ -26,23 +26,26 @@ function DebugObject()
         // draw lines around map mesh
         //
 
-    this.drawMapMeshLines=function(view,map,mesh)
+    this.drawMapMeshLines=function(view,mesh)
     {
-        /* this whole thing needs to be redone
-
         var n;
         var gl=view.gl;
 
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,0.0));
         gl.disable(gl.DEPTH_TEST);
-
+        
             // setup the buffers
 
-        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        var vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,mesh.vertices,gl.STREAM_DRAW);
+
         gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        mesh.bindBuffers(view,this.debugShader);
+        var indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,mesh.indexes,gl.STREAM_DRAW);
 
             // draw the line loop trigs
 
@@ -52,8 +55,6 @@ function DebugObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
-        
-        */
     };
 
         //
