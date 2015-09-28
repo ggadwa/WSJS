@@ -24,7 +24,44 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
     {
         var n,count;
         var x,z,high,boxBoundX,boxBoundY,boxBoundZ;
+        
+        x=xBound.getMidPoint()-8000;
+        z=zBound.getMidPoint();
+        
+        boxBoundX=new wsBound((x-1000),(x+1000));
+        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
+        boxBoundZ=new wsBound((z-1000),(z+1000));
+        
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
 
+        x=xBound.getMidPoint()+8000;
+        z=zBound.getMidPoint();
+        
+        boxBoundX=new wsBound((x-1000),(x+1000));
+        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
+        boxBoundZ=new wsBound((z-1000),(z+1000));
+        
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+
+        x=xBound.getMidPoint();
+        z=zBound.getMidPoint()-8000;
+        
+        boxBoundX=new wsBound((x-1000),(x+1000));
+        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
+        boxBoundZ=new wsBound((z-1000),(z+1000));
+        
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+
+        x=xBound.getMidPoint();
+        z=zBound.getMidPoint()+8000;
+        
+        boxBoundX=new wsBound((x-1000),(x+1000));
+        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
+        boxBoundZ=new wsBound((z-1000),(z+1000));
+        
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+
+/*
         count=this.genRandom.randomInt(1,3);
 
         for (n=0;n!==count;n++) {
@@ -42,6 +79,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
             
             map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
         }
+        */
     };
     
         //

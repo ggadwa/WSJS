@@ -431,6 +431,8 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.8);
+        
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);     // supergumba -- test
     };
 
         //

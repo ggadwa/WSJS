@@ -8,7 +8,7 @@ function SettingsObject()
 {
         // map construction
         
-    this.maxRoomCount=10;                   // the maximum possible number of rooms in the map
+    this.maxRoomCount=1;                   // the maximum possible number of rooms in the map
     
     this.maxRoomRecursion=3;                // how far down you will recurse to make rooms off a single room
     this.maxStoryCount=3;                   // maximum number of possible stories for a single room
@@ -21,7 +21,7 @@ function SettingsObject()
     
         // lighting
     
-    this.ambient=[0.4,0.4,0.4];             // all over ambient light
+    this.ambient=[0.0,0.0,0.0];             // all over ambient light
     
     this.generateLightmap=false;               // set to true to generate light maps
 
@@ -39,7 +39,11 @@ function SettingsObject()
     this.drawMilliseconds=16;
     this.bailMilliseconds=5000;
     
-        // testing
+        // draw testing
+    
+    this.debugDraw=true;
+    
+        // play testing
         
     this.clipWalls=false;
     this.fly=false;

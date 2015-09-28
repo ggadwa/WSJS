@@ -130,7 +130,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // floor
 
-        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[levelCount%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
+            // supegumba -- test
+        //this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[levelCount%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.wallTextures[1]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
 
             // walls
             // combine into a single mesh
@@ -153,7 +155,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             }
         }
 
-        this.map.addMesh(mesh);
+        // supergumba -- testing
+        //this.map.addMesh(mesh);
 
             // ceiling
 
@@ -255,7 +258,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // add light to map
 
-        this.map.addLight(new MapLightObject(pt,new wsColor(red,green,blue),true,intensity,exponent));
+        this.map.addLight(new MapLightObject(pt,new wsColor(red,green,blue),(settings.generateLightmap),intensity,exponent));
     };
 
         //
@@ -425,7 +428,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // more than one story
 
         var storyCount=1;
-        if (piece.isRoom) storyCount+=Math.floor(settings.maxStoryCount*this.genRandom.random());
+        // supergumba -- test
+        //if (piece.isRoom) storyCount+=Math.floor(settings.maxStoryCount*this.genRandom.random());
 
             // add the room mesh
 

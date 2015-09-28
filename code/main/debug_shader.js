@@ -12,6 +12,8 @@ function DebugShaderObject()
 
     this.perspectiveMatrixUniform=null;
     this.modelMatrixUniform=null;
+    
+    this.colorUniform=null;
 
         //
         // initialize/release debug shader
@@ -33,6 +35,8 @@ function DebugShaderObject()
 
         this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
         this.modelMatrixUniform=view.gl.getUniformLocation(this.shader.program,'modelMatrix');
+        
+        this.colorUniform=view.gl.getUniformLocation(this.shader.program,'color');
 
         view.gl.useProgram(null);
 
@@ -48,7 +52,7 @@ function DebugShaderObject()
         // start/stop debug drawing
         //
 
-    this.drawStart=function(view)
+    this.drawStart=function(view,color)
     {
             // using the map shader
 
@@ -58,6 +62,10 @@ function DebugShaderObject()
 
         view.gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
         view.gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
+        
+            // debug color
+            
+        view.gl.uniform3f(this.colorUniform,color.r,color.g,color.b);
 
             // enable the vertex attributes
 

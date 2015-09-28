@@ -28,15 +28,21 @@ function DebugObject()
 
     this.drawMapMeshLines=function(view,map,mesh)
     {
+        /* this whole thing needs to be redone
+
         var n;
         var gl=view.gl;
 
-        this.debugShader.drawStart(view);
+        this.debugShader.drawStart(view,new wsColor(1.0,0.0,0.0));
+        gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
-        mesh.enableBuffers();
-        mesh.bindBuffers(view,map.mapShader);
+        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        mesh.bindBuffers(view,this.debugShader);
 
             // draw the line loop trigs
 
@@ -44,19 +50,22 @@ function DebugObject()
             gl.drawElements(gl.LINE_LOOP,3,gl.UNSIGNED_SHORT,(Uint16Array.BYTES_PER_ELEMENT*(n*3)));
         }
 
-            // disable the buffers
-
-        mesh.disableBuffers();
-
+        gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
+        
+        */
     };
 
+        //
+        // normal and tangents
+        //
+        
     this.drawMapMeshNormals=function(view,mesh)
     {
         var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
         var gl=view.gl;
         var normalSize=200.0;
-
+        
             // create the lines
 
         nVertex=mesh.vertexCount;
@@ -87,7 +96,8 @@ function DebugObject()
 
             // set the shader
 
-        this.debugShader.drawStart(view);
+        this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
+        gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -114,6 +124,75 @@ function DebugObject()
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
+        gl.enable(gl.DEPTH_TEST);
+        this.debugShader.drawEnd(view);
+    };
+    
+    this.drawMapMeshTangents=function(view,mesh)
+    {
+        var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
+        var gl=view.gl;
+        var tangentSize=200.0;
+        
+            // create the lines
+
+        nVertex=mesh.vertexCount;
+
+        var vertices=new Float32Array(nVertex*6);
+        var indexes=new Uint16Array(nVertex*2);
+
+        vertexIdx=0;
+        elementIdx=0;
+
+        vIdx=0;
+        iIdx=0;
+
+        for (n=0;n!==nVertex;n++) {
+            vertices[vIdx++]=mesh.vertices[vertexIdx];
+            vertices[vIdx++]=mesh.vertices[vertexIdx+1];
+            vertices[vIdx++]=mesh.vertices[vertexIdx+2];
+            vertices[vIdx++]=mesh.vertices[vertexIdx]+(mesh.tangents[vertexIdx]*tangentSize);
+            vertices[vIdx++]=mesh.vertices[vertexIdx+1]+(mesh.tangents[vertexIdx+1]*tangentSize);
+            vertices[vIdx++]=mesh.vertices[vertexIdx+2]+(mesh.tangents[vertexIdx+2]*tangentSize);
+
+            indexes[iIdx++]=elementIdx;
+            indexes[iIdx++]=elementIdx+1;
+
+            vertexIdx+=3;
+            elementIdx+=2;
+        }
+
+            // set the shader
+
+        this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
+        gl.disable(gl.DEPTH_TEST);
+
+            // setup the buffers
+
+        var vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+
+        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        var indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
+
+            // draw the lines
+
+        gl.drawElements(gl.LINES,elementIdx,gl.UNSIGNED_SHORT,0);
+
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+
+        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(indexBuffer);
+
+        gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     };
 
@@ -155,7 +234,7 @@ function DebugObject()
 
             // set the shader
 
-        this.debugShader.drawStart(view);
+        this.debugShader.drawStart(view,new wsColor(0.0,1.0,0.0));
 
             // setup the buffers
 

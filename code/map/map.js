@@ -457,13 +457,19 @@ function MapObject()
             meshCount++;
         }
         
-            // normal debugging draw
-/*            
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.meshes[n];
-            if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(view,mesh);
+            // debugging draw
+        
+        if (settings.debugDraw) {
+            for (n=0;n!==nMesh;n++) {
+                mesh=this.meshes[n];
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) {
+                    debug.drawMapMeshLines(view,view.map,mesh);
+                    debug.drawMapMeshTangents(view,mesh);
+                    debug.drawMapMeshNormals(view,mesh);
+                }
+            }
         }
-*/
+        
         return(meshCount);
     };
 

@@ -10,7 +10,11 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
-
+[CURRENT BREAK FIXING]
+  [ ] get debugger to show proper mesh lines
+  [ ] floors and ceilings share vertices
+  [ ] need version of shader that just does lighting to figure out normal problems
+  [ ] eventually delete all supergumba -- testing marks
 
 
 
