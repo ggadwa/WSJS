@@ -24,7 +24,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     
         // a list of textures per level
         
-    this.floorTextures=[BITMAP_CONCRETE,BITMAP_TILE,BITMAP_TILE_2];
+    this.floorTextures=[BITMAP_MOSAIC,BITMAP_TILE,BITMAP_TILE_2];
     this.wallTextures=[BITMAP_STONE,BITMAP_BRICK_RANDOM,BITMAP_BRICK_STACK];
     
         // a link to this object so we can
@@ -130,9 +130,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // floor
 
-            // supegumba -- test
-        //this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[levelCount%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
-        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.wallTextures[1]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[levelCount%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
 
             // walls
             // combine into a single mesh
@@ -163,7 +161,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // bridges and platforms on
             // other stories
-/*            
+            
         if (storyCount>1) {
             var platformBoundX,platformBoundZ;
             
@@ -193,7 +191,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 platformBoundY.add(-yStoryAdd);
             }
         }
-*/
+
         return(yStoryBound);
     };
 

@@ -732,10 +732,12 @@ function GenBitmapUtilityObject(genRandom)
                 normalCTX.moveTo(x,(y-1));
                 normalCTX.lineTo(x2,(y2-1));
                 normalCTX.stroke();
+                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
+                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_10);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y+1));
                 normalCTX.lineTo(x2,(y2+1));
@@ -747,10 +749,12 @@ function GenBitmapUtilityObject(genRandom)
                 normalCTX.moveTo((x-1),y);
                 normalCTX.lineTo((x2-1),y2);
                 normalCTX.stroke();
+                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
+                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_RIGHT_10);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x+1),y);
                 normalCTX.lineTo((x2+1),y2);

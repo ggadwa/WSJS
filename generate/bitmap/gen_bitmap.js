@@ -16,9 +16,10 @@ var GEN_BITMAP_TYPE_TILE_COMPLEX=4;
 var GEN_BITMAP_TYPE_TILE_SMALL=5;
 var GEN_BITMAP_TYPE_METAL=6;
 var GEN_BITMAP_TYPE_CONCRETE=7;
-var GEN_BITMAP_TYPE_WOOD_PLANK=8;
-var GEN_BITMAP_TYPE_WOOD_BOX=9;
-var GEN_BITMAP_TYPE_SKIN=10;
+var GEN_BITMAP_TYPE_MOSAIC=8;
+var GEN_BITMAP_TYPE_WOOD_PLANK=9;
+var GEN_BITMAP_TYPE_WOOD_BOX=10;
+var GEN_BITMAP_TYPE_SKIN=11;
 
 var GEN_BITMAP_TILE_STYLE_BORDER=0;
 var GEN_BITMAP_TILE_STYLE_CHECKER=1;
@@ -353,6 +354,74 @@ function GenBitmapObject(genRandom)
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.9);
     };
+    
+        //
+        // mosaic bitmaps
+        //
+
+    this.generateMosaic=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        var x,y,lft,rgt,top,bot,tileWid,tileHigh;
+        var splitCount,borderSize,edgeSize;
+        var mortarColor,borderColor,col,darkCol;
+        
+            // some random values
+
+        splitCount=this.genRandom.randomInt(5,5);
+        borderSize=this.genRandom.randomInt(2,3);
+        edgeSize=this.genRandom.randomInt(1,2);
+        
+        mortarColor=this.genBitmapUtility.getRandomGreyColor(0.4,0.6);
+        borderColor=this.genBitmapUtility.getRandomColor([0.2,0.2,0.2],[0.4,0.4,0.4]);
+        
+            // tile sizes
+            
+        tileWid=Math.floor(wid/splitCount);
+        tileHigh=Math.floor(high/splitCount);
+
+            // clear canvases
+
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(mortarColor,1.0));
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+
+            // draw the tiles
+        
+        top=0;
+        
+        for (y=0;y!==splitCount;y++) {
+
+            bot=(top+tileHigh)-borderSize;
+            
+            lft=0;
+
+            for (x=0;x!==splitCount;x++) {
+                
+                if ((x===0) || (y===0) || (x===(splitCount-1)) || (y===(splitCount-1))) {
+                    col=borderColor;
+                }
+                else {
+                    col=this.genBitmapUtility.getRandomColor([0.3,0.3,0.4],[0.6,0.6,0.7]);
+                }
+                darkCol=this.genBitmapUtility.darkenColor(col,0.5);
+
+                rgt=(lft+tileWid)-borderSize;
+
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,darkCol);
+
+                lft+=tileWid;
+            }
+            
+            top+=tileHigh;
+        }
+
+            // noise
+
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,1.1,1.3,0.2);
+
+            // finish with the specular
+
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.3);
+    };
 
         //
         // wood bitmaps
@@ -660,6 +729,11 @@ function GenBitmapObject(genRandom)
             case GEN_BITMAP_TYPE_CONCRETE:
                 this.generateConcrete(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
+                break;
+                
+            case GEN_BITMAP_TYPE_MOSAIC:
+                this.generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=10.0;
                 break;
 
             case GEN_BITMAP_TYPE_WOOD_PLANK:

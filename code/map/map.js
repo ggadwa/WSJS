@@ -226,7 +226,6 @@ function MapObject()
 
             for (k=0;k!==nMesh;k++) {
                 mesh=this.meshes[k];
-                if (mesh.flag===mesh.MESH_FLAG_LIGHT) continue;         // skip these, flagged light meshes are part of lights and don't block light
                 
                 if (lightXBound.max<mesh.xBound.min) continue;
                 if (lightXBound.min>mesh.xBound.max) continue;
