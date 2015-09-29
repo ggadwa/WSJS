@@ -681,7 +681,7 @@ function GenBitmapObject(genRandom)
 
             // debugging
 /*
-        if (generateType===GEN_BITMAP_TYPE_WOOD_BOX) {
+        if (generateType===GEN_BITMAP_TYPE_WOOD_PLANK) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);

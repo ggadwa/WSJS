@@ -10,22 +10,9 @@ EMCA6 TODOs
     [ ] use Math.trunc when possible instead of Math.floor
 
 
-[CURRENT BREAK FIXING]
-  [X] get debugger to show proper mesh lines
-  [X] floors and ceilings share vertices
-  [X] need version of shader that just does lighting to figure out normal problems
-  [X] eventually delete all supergumba -- testing marks
-  [X] transfer light col stuff to model frags
-
-[ ] turn down the specs!
-[ ] maybe smaller lights
-
-[ ] we need to share vertices in
-    [ ] pryamids
-    [ ] cylinders
-    [X] squares
-    [X] stairs
-    [ ] anywhere else polygon -> triangles
+[X] put OLD way of cubes back!  light map UVs will be bad!
+[ ] no light mesh hits -- needs "has flag" type call
+    [ ] need to highlight these in lightmap!
 
 
 [ ] pillars need separate object and pillar locations and ONLY single story rooms
@@ -35,11 +22,8 @@ EMCA6 TODOs
 
 [ ] need steel panel rooms
 
-[ ] need real polygonal floors
-
 [ ] rooms have possible light positions
 
-[ ] need to use all black lightmap chunks
 [ ] diffuse calcs in light maps
 [ ] rooms need decoration locations and decoration models
 [ ] need filterMapBitmapColors and filterModelBitmapColors

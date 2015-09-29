@@ -278,8 +278,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                             idx=((cy*wid)+cx)*4;
 
                             r+=data[idx];
-                            b+=data[idx+1];
-                            g+=data[idx+2];
+                            g+=data[idx+1];
+                            b+=data[idx+2];
                             colCount++;
                         }
                     }
@@ -511,7 +511,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
     this.renderTriangle=function(meshIdx,trigIdx,ctx,pts,vs,normal,lft,top,rgt,bot)
     {
-        var x,y,lx,rx,tempX,ty,by,idx;
+        var x,y,lx,rx,tempX,ty,my,by,idx;
         var lxFactor,rxFactor,vFactor;
         var vx,vy,vz;
         var vlx=new wsPoint(0,0,0);
@@ -528,7 +528,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var imgData=ctx.getImageData(lft,top,wid,high);
         var data=imgData.data;
         
-            // find the top and bottom points
+            // find the min and max Y points
+            // we will build the scan line around this
 
         var topPtIdx=0;
         if (pts[1].y<pts[topPtIdx].y) topPtIdx=1;
@@ -537,58 +538,60 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var botPtIdx=0;
         if (pts[1].y>pts[botPtIdx].y) botPtIdx=1;
         if (pts[2].y>pts[botPtIdx].y) botPtIdx=2;
+        
+            // find the middle point
+            
+        var midPtIdx=topPtIdx+1;
+        if (midPtIdx===3) midPtIdx=0;
+        
+        if (midPtIdx===botPtIdx) {
+            midPtIdx=topPtIdx-1;
+            if (midPtIdx===-1) midPtIdx=2;
+        }
 
-            // find the current lines to
-            // scan against
-
-        var l1StartPtIdx=topPtIdx;
-        var l1EndPtIdx=topPtIdx-1;
-        if (l1EndPtIdx===-1) l1EndPtIdx=2;
-
-        var l2StartPtIdx=topPtIdx;
-        var l2EndPtIdx=topPtIdx+1;
-        if (l2EndPtIdx===3) l2EndPtIdx=0;
-
+            // on line scans from top to
+            // bottom and the other goes from
+            // top point to midpoint and then
+            // midpoint to bottom point
+            
+        var midStartPtIdx=topPtIdx;
+        var midEndPtIdx=midPtIdx;
+        
             // render the triangle by scan
             // lines from top to bottom
 
         ty=pts[topPtIdx].y;
+        my=pts[midPtIdx].y;
         by=pts[botPtIdx].y;
         if (ty>=by) return;
 
         for (y=ty;y!==by;y++) {
 
-                // time to switch lines?
+                // hit the midpoint and need
+                // to switch lines?
 
-            if (y>=pts[l1EndPtIdx].y) {
-                l1StartPtIdx=l1EndPtIdx;
-                l1EndPtIdx--;
-                if (l1EndPtIdx===-1) l1EndPtIdx=2;
-            }
-
-            if (y>=pts[l2EndPtIdx].y) {
-                l2StartPtIdx=l2EndPtIdx;
-                l2EndPtIdx++;
-                if (l2EndPtIdx===3) l2EndPtIdx=0;
+            if (y===my) {
+                midStartPtIdx=midPtIdx;
+                midEndPtIdx=botPtIdx;
             }
 
                 // get the left right
 
-            lxFactor=(y-pts[l1StartPtIdx].y)/(pts[l1EndPtIdx].y-pts[l1StartPtIdx].y);
-            lx=pts[l1StartPtIdx].x+Math.floor((pts[l1EndPtIdx].x-pts[l1StartPtIdx].x)*lxFactor);
+            lxFactor=(y-pts[topPtIdx].y)/(pts[botPtIdx].y-pts[topPtIdx].y);
+            lx=pts[topPtIdx].x+Math.floor((pts[botPtIdx].x-pts[topPtIdx].x)*lxFactor);
 
-            rxFactor=(y-pts[l2StartPtIdx].y)/(pts[l2EndPtIdx].y-pts[l2StartPtIdx].y);
-            rx=pts[l2StartPtIdx].x+Math.floor((pts[l2EndPtIdx].x-pts[l2StartPtIdx].x)*rxFactor);
+            rxFactor=(y-pts[midStartPtIdx].y)/(pts[midEndPtIdx].y-pts[midStartPtIdx].y);
+            rx=pts[midStartPtIdx].x+Math.floor((pts[midEndPtIdx].x-pts[midStartPtIdx].x)*rxFactor);
 
                 // get the vertex left and right
 
-            vlx.x=vs[l1StartPtIdx].x+((vs[l1EndPtIdx].x-vs[l1StartPtIdx].x)*lxFactor);
-            vlx.y=vs[l1StartPtIdx].y+((vs[l1EndPtIdx].y-vs[l1StartPtIdx].y)*lxFactor);
-            vlx.z=vs[l1StartPtIdx].z+((vs[l1EndPtIdx].z-vs[l1StartPtIdx].z)*lxFactor);
+            vlx.x=vs[topPtIdx].x+Math.floor((vs[botPtIdx].x-vs[topPtIdx].x)*lxFactor);
+            vlx.y=vs[topPtIdx].y+Math.floor((vs[botPtIdx].y-vs[topPtIdx].y)*lxFactor);
+            vlx.z=vs[topPtIdx].z+Math.floor((vs[botPtIdx].z-vs[topPtIdx].z)*lxFactor);
 
-            vrx.x=vs[l2StartPtIdx].x+((vs[l2EndPtIdx].x-vs[l2StartPtIdx].x)*rxFactor);
-            vrx.y=vs[l2StartPtIdx].y+((vs[l2EndPtIdx].y-vs[l2StartPtIdx].y)*rxFactor);
-            vrx.z=vs[l2StartPtIdx].z+((vs[l2EndPtIdx].z-vs[l2StartPtIdx].z)*rxFactor);
+            vrx.x=vs[midStartPtIdx].x+Math.floor((vs[midEndPtIdx].x-vs[midStartPtIdx].x)*rxFactor);
+            vrx.y=vs[midStartPtIdx].y+Math.floor((vs[midEndPtIdx].y-vs[midStartPtIdx].y)*rxFactor);
+            vrx.z=vs[midStartPtIdx].z+Math.floor((vs[midEndPtIdx].z-vs[midStartPtIdx].z)*rxFactor);
 
                 // sometimes we need to swap
                 // left and right
@@ -598,9 +601,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 lx=rx;
                 rx=tempX;
 
-                tempX=vlx;
-                vlx=vrx;
-                vrx=tempX;
+                tempX=vlx.copy();
+                vlx=vrx.copy();
+                vrx=tempX.copy();
             }
 
                 // get the bitmap data index
@@ -614,13 +617,14 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                     // get the ray trace vetex
 
                 vFactor=(x-lx)/(rx-lx);
-                vx=vlx.x+((vrx.x-vlx.x)*vFactor);
-                vy=vlx.y+((vrx.y-vlx.y)*vFactor);
-                vz=vlx.z+((vrx.z-vlx.z)*vFactor);
-
+                vx=vlx.x+Math.floor((vrx.x-vlx.x)*vFactor);
+                vy=vlx.y+Math.floor((vrx.y-vlx.y)*vFactor);
+                vz=vlx.z+Math.floor((vrx.z-vlx.z)*vFactor);
+                
                     // write the pixel
 
                 col=this.rayTraceVertex(meshIdx,trigIdx,vx,vy,vz,normal);
+                
                 data[idx++]=Math.floor(col.r*255.0);
                 data[idx++]=Math.floor(col.g*255.0);
                 data[idx++]=Math.floor(col.b*255.0);
@@ -687,13 +691,13 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         var renderSize=this.CHUNK_SIZE-(this.RENDER_MARGIN*2);
 
-        var sz=xBound.max-xBound.min;
+        var sz=xBound.getSize();
         var xFactor=(sz===0)?0:renderSize/sz;
 
-        var sz=yBound.max-yBound.min;
+        var sz=yBound.getSize();
         var yFactor=(sz===0)?0:renderSize/sz;
 
-        var sz=zBound.max-zBound.min;
+        var sz=zBound.getSize();
         var zFactor=(sz===0)?0:renderSize/sz;
 
             // now create the 2D version of it

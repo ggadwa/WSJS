@@ -13,14 +13,15 @@ function MeshPrimitivesObject()
     this.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,flags)
     {
             // get cube size
+            // note: why duplicated vertexes?  Because light map UVs
 
         var count=0;
-        if (left) count+=12;
-        if (right) count+=12;
-        if (front) count+=12;
-        if (back) count+=12;
-        if (top) count+=12;
-        if (bottom) count+=12;
+        if (left) count+=18;
+        if (right) count+=18;
+        if (front) count+=18;
+        if (back) count+=18;
+        if (top) count+=18;
+        if (bottom) count+=18;
         if (count===0) return(null);
 
         var vertices=new Float32Array(count);
@@ -37,6 +38,13 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.max;
+            vertices[idx++]=xBound.min;
+            vertices[idx++]=yBound.max;
+            vertices[idx++]=zBound.max;
+            
+            vertices[idx++]=xBound.min;
+            vertices[idx++]=yBound.min;
+            vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
@@ -57,6 +65,13 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
+            
+            vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.min;
+            vertices[idx++]=zBound.min;
+            vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.max;
+            vertices[idx++]=zBound.max;
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.min;
@@ -69,6 +84,13 @@ function MeshPrimitivesObject()
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.min;
+            vertices[idx++]=zBound.min;
+            vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.max;
+            vertices[idx++]=zBound.min;
+            
+            vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.max;
@@ -91,6 +113,13 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
+            
+            vertices[idx++]=xBound.min;
+            vertices[idx++]=yBound.min;
+            vertices[idx++]=zBound.max;
+            vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.max;
+            vertices[idx++]=zBound.max;
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
@@ -103,6 +132,13 @@ function MeshPrimitivesObject()
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.min;
+            vertices[idx++]=zBound.min;
+            vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.min;
+            vertices[idx++]=zBound.max;
+            
+            vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.min;
             vertices[idx++]=zBound.min;
             vertices[idx++]=xBound.max;
@@ -125,28 +161,25 @@ function MeshPrimitivesObject()
             vertices[idx++]=xBound.max;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
+            
+            vertices[idx++]=xBound.min;
+            vertices[idx++]=yBound.max;
+            vertices[idx++]=zBound.min;
+            vertices[idx++]=xBound.max;
+            vertices[idx++]=yBound.max;
+            vertices[idx++]=zBound.max;
             vertices[idx++]=xBound.min;
             vertices[idx++]=yBound.max;
             vertices[idx++]=zBound.max;
         }
 
         var n;
-        var iCount=Math.floor(Math.floor(vertices.length/3)/4)*6;
+        var iCount=Math.floor(vertices.length/3);
 
         var indexes=new Uint16Array(iCount);
 
-        var vIdx=0;
-
-        for (n=0;n!==iCount;n+=6) {
-            indexes[n]=vIdx;
-            indexes[n+1]=vIdx+1;
-            indexes[n+2]=vIdx+2;
-            
-            indexes[n+3]=vIdx;
-            indexes[n+4]=vIdx+2;
-            indexes[n+5]=vIdx+3;
-            
-            vIdx+=4;
+        for (n=0;n!==iCount;n++) {
+            indexes[n]=n;
         }
 
             // build whole UVs
@@ -163,6 +196,11 @@ function MeshPrimitivesObject()
                 uvs[idx++]=0.0;
                 uvs[idx++]=0.0;
                 uvs[idx++]=1.0;
+                uvs[idx++]=0.0;
+                uvs[idx++]=1.0;
+                uvs[idx++]=1.0;
+                
+                uvs[idx++]=0.0;
                 uvs[idx++]=0.0;
                 uvs[idx++]=1.0;
                 uvs[idx++]=1.0;
