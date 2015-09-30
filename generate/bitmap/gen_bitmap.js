@@ -15,11 +15,12 @@ var GEN_BITMAP_TYPE_TILE_SIMPLE=3;
 var GEN_BITMAP_TYPE_TILE_COMPLEX=4;
 var GEN_BITMAP_TYPE_TILE_SMALL=5;
 var GEN_BITMAP_TYPE_METAL=6;
-var GEN_BITMAP_TYPE_CONCRETE=7;
-var GEN_BITMAP_TYPE_MOSAIC=8;
-var GEN_BITMAP_TYPE_WOOD_PLANK=9;
-var GEN_BITMAP_TYPE_WOOD_BOX=10;
-var GEN_BITMAP_TYPE_SKIN=11;
+var GEN_BITMAP_TYPE_METAL_PLATE=7;
+var GEN_BITMAP_TYPE_CONCRETE=8;
+var GEN_BITMAP_TYPE_MOSAIC=9;
+var GEN_BITMAP_TYPE_WOOD_PLANK=10;
+var GEN_BITMAP_TYPE_WOOD_BOX=11;
+var GEN_BITMAP_TYPE_SKIN=12;
 
 var GEN_BITMAP_TILE_STYLE_BORDER=0;
 var GEN_BITMAP_TILE_STYLE_CHECKER=1;
@@ -53,7 +54,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(groutColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,groutColor);
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.9);
 
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
@@ -102,7 +103,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(groutColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,groutColor);
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.9);
 
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
@@ -245,7 +246,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(tileColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,tileColor);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // original splits
@@ -273,16 +274,16 @@ function GenBitmapObject(genRandom)
             // some random values
 
         var metalColor=this.genBitmapUtility.getRandomColor([0.0,0.0,0.4],[0.25,0.25,0.6]);
-        var edgeColor=this.genBitmapUtility.darkenColor(metalColor,0.8);
+        var edgeColor=this.genBitmapUtility.darkenColor(metalColor,0.9);
         var markCount=this.genRandom.randomInt(10,15);
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(metalColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,metalColor);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // plates
-
+/*
         halfWid=Math.floor(wid/2);
         halfHigh=Math.floor(high/2);
 
@@ -292,25 +293,32 @@ function GenBitmapObject(genRandom)
 
             this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,plateX,plateY,(plateX+halfWid),(plateY+halfHigh),5,metalColor,edgeColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,plateX,plateY,(plateX+halfWid),(plateY+halfHigh),0.9,0.95,0.2);
-
+*/
                 // particles
 
-            for (k=0;k!==markCount;k++) {
-                particleWid=this.genRandom.randomInt(50,30);
-                particleHigh=this.genRandom.randomInt(50,30);
+            x=0;
+            
+            while (true) {
+                x+=this.genRandom.randomInt(10,5);
+                if (x>wid) break;
+
+                particleWid=this.genRandom.randomInt(5,10);
+                particleHigh=high; // this.genRandom.randomInt(50,30);
                 particleDensity=this.genRandom.randomInt(150,50);
 
-                x=this.genRandom.randomInt(plateX,(halfWid-particleWid));
-                y=this.genRandom.randomInt(plateY,(halfHigh-particleHigh));
+                //x=this.genRandom.randomInt(plateX,(halfWid-particleWid));
+                y=0; // this.genRandom.randomInt(plateY,(halfHigh-particleHigh));
+                
+                this.genBitmapUtility.drawStreak(bitmapCTX,wid,high,x,particleWid,edgeColor);
 
-                if ((k&0x1)===0) {
-                    this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.8,particleDensity,true);
-                }
-                else {
-                    this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity,false);
-                }
+                //if ((k&0x1)===0) {
+                //    this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.8,particleDensity,true);
+                //}
+                //else {
+                //    this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity,false);
+                //}
             }
-        }
+//        }
 
             // finish with the specular
 
@@ -333,7 +341,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(concreteColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,concreteColor);
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.8);
 
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
@@ -383,7 +391,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(mortarColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,mortarColor);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // draw the tiles
@@ -400,7 +408,7 @@ function GenBitmapObject(genRandom)
                 
                     // the tile
                     
-                if ((x===0) || (y===0)) {
+                if ((x===0) || (y===0) || (x===(splitCount-1)) || (y===(splitCount-1))) {
                     col=borderColor;
                 }
                 else {
@@ -464,7 +472,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,'#FFFFFF');
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,[1.0,1.0,1.0]);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // regular wood planking
@@ -540,7 +548,7 @@ function GenBitmapObject(genRandom)
 
             // the skin background
 
-        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(skinColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,skinColor);
 
             // scales
 
@@ -634,7 +642,7 @@ function GenBitmapObject(genRandom)
         var n,markCount;
         var x,y,mWid,mHigh;
 
-        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(clothColor));
+        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,clothColor);
         this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,0.2,clothColor);
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0.7,0.75,0.5);
 
@@ -659,7 +667,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,'#FFFFFF');
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,[1.0,1.0,1.0]);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // top-left is plain skin
@@ -782,13 +790,13 @@ function GenBitmapObject(genRandom)
         }
 
             // debugging
-/*
-        if (generateType===GEN_BITMAP_TYPE_STONE) {
+
+        if (generateType===GEN_BITMAP_TYPE_METAL) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);
         }
-*/
+
             // finally create the bitmap
             // object and load into WebGL
 

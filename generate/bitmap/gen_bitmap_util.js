@@ -295,7 +295,7 @@ function GenBitmapUtilityObject(genRandom)
 
     this.clearNormalsRect=function(ctx,lft,top,rgt,bot)
     {
-        this.drawRect(ctx,lft,top,rgt,bot,this.normalToRGBColor(this.NORMAL_CLEAR));
+        this.drawRectNormal(ctx,lft,top,rgt,bot,this.NORMAL_CLEAR);
     };
 
         //
@@ -410,11 +410,19 @@ function GenBitmapUtilityObject(genRandom)
         // rectangles, ovals, lines
         //
 
-    this.drawRect=function(ctx,lft,top,rgt,bot,rgbColor)
+    this.drawRect=function(ctx,lft,top,rgt,bot,color)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
-        ctx.fillStyle=rgbColor;
+        ctx.fillStyle=this.colorToRGBColor(color);
+        ctx.fillRect(lft,top,(rgt-lft),(bot-top));
+    };
+    
+    this.drawRectNormal=function(ctx,lft,top,rgt,bot,normal)
+    {
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        ctx.fillStyle=this.normalToRGBColor(normal);
         ctx.fillRect(lft,top,(rgt-lft),(bot-top));
     };
 
@@ -493,9 +501,9 @@ function GenBitmapUtilityObject(genRandom)
 
             // draw the inner fill
 
-        this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.colorToRGBColor(fillRGBColor));
+        this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillRGBColor);
 
-        this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor(this.NORMAL_CLEAR));
+        this.drawRectNormal(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.NORMAL_CLEAR);
     };
 
     this.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
@@ -927,6 +935,58 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.putImageData(bitmapImgData,0,0);
         normalCTX.putImageData(normalImgData,0,0);
+    };
+    
+        //
+        // streaks
+        //
+
+    this.drawStreak=function(bitmapCTX,imgWid,imgHigh,x,streakWid,baseColor)
+    {
+        var n,lx,rx,y,idx;
+        
+            // get the image data
+
+        var bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        var bitmapData=bitmapImgData.data;
+        
+            // start with 100 density and reduce
+            // as we go across the width
+            
+        var density=100;
+        var densityReduce=Math.floor(90/streakWid);
+        
+            // write the streaks
+            
+        for (n=0;n!==streakWid;n++) {
+            
+            lx=x-n;
+            rx=x+n;
+            
+            for (y=0;y!==imgHigh;y++) {
+                
+                if (this.genRandom.randomInt(0,100)<density) {
+                    idx=((y*imgWid)+lx)*4;
+                    bitmapData[idx]=Math.floor(baseColor.r*255.0);
+                    bitmapData[idx+1]=Math.floor(baseColor.g*255.0);
+                    bitmapData[idx+2]=Math.floor(baseColor.b*255.0);
+                }
+                
+                if (this.genRandom.randomInt(0,100)<density) {
+                    idx=((y*imgWid)+rx)*4;
+                    bitmapData[idx]=Math.floor(baseColor.r*255.0);
+                    bitmapData[idx+1]=Math.floor(baseColor.g*255.0);
+                    bitmapData[idx+2]=Math.floor(baseColor.b*255.0);
+                }
+            
+            }
+            
+            density-=densityReduce;
+        }
+        
+            // write all the data back
+
+        bitmapCTX.putImageData(bitmapImgData,0,0);
     };
     
         //
