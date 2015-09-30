@@ -53,7 +53,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(groutColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(groutColor));
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.9);
 
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
@@ -88,7 +88,7 @@ function GenBitmapObject(genRandom)
     this.generateStone=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,k,rect,edgeSize;
-        var drawStoneColor,drawEdgeColor,f;
+        var drawStoneColor,drawEdgeColor,lineColor,f;
         var x,y,x2,y2,lineCount,stoneWid,stoneHigh;
 
             // some random values
@@ -102,7 +102,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(groutColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(groutColor));
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.9);
 
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
@@ -137,7 +137,8 @@ function GenBitmapObject(genRandom)
                 x2=this.genRandom.randomInt((rect.lft+edgeSize),stoneWid);
                 y2=this.genRandom.randomInt((rect.top+edgeSize),stoneHigh);
                 
-                this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,drawEdgeColor);
+                lineColor=this.genBitmapUtility.darkenColor(drawStoneColor,0.8);
+                this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineColor);
             }
             
                  // any random noise
@@ -244,7 +245,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(tileColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(tileColor));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // original splits
@@ -277,7 +278,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(metalColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(metalColor));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // plates
@@ -332,7 +333,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(concreteColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(concreteColor));
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.8);
 
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
@@ -362,8 +363,9 @@ function GenBitmapObject(genRandom)
     this.generateMosaic=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var x,y,lft,rgt,top,bot,tileWid,tileHigh;
+        var sx,sy,ex,ey,lineMargin;
         var splitCount,borderSize,edgeSize;
-        var mortarColor,borderColor,col,darkCol;
+        var mortarColor,borderColor,col,darkCol,lineColor;
         
             // some random values
 
@@ -381,7 +383,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(mortarColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,this.genBitmapUtility.colorToRGBColor(mortarColor));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // draw the tiles
@@ -396,7 +398,9 @@ function GenBitmapObject(genRandom)
 
             for (x=0;x!==splitCount;x++) {
                 
-                if ((x===0) || (y===0) || (x===(splitCount-1)) || (y===(splitCount-1))) {
+                    // the tile
+                    
+                if ((x===0) || (y===0)) {
                     col=borderColor;
                 }
                 else {
@@ -407,7 +411,31 @@ function GenBitmapObject(genRandom)
                 rgt=(lft+tileWid)-borderSize;
 
                 this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,darkCol);
-
+                
+                    // any cracks
+                    
+                if (this.genRandom.randomInt(0,100)>95) {
+                    
+                    sx=lft+1;
+                    ex=rgt-1;
+                    sy=top+1;
+                    ey=bot-1;
+                    
+                    if (this.genRandom.randomInt(0,100)>50) {
+                        lineMargin=Math.floor(tileWid/5);
+                        sx=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+                        ex=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+                    }
+                    else {
+                        lineMargin=Math.floor(tileHigh/5);
+                        sy=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+                        ey=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+                    }
+                    
+                    lineColor=this.genBitmapUtility.darkenColor(col,0.8);
+                    this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,lineColor);
+                }
+                
                 lft+=tileWid;
             }
             
@@ -512,7 +540,7 @@ function GenBitmapObject(genRandom)
 
             // the skin background
 
-        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(skinColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(skinColor));
 
             // scales
 
@@ -606,7 +634,7 @@ function GenBitmapObject(genRandom)
         var n,markCount;
         var x,y,mWid,mHigh;
 
-        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(clothColor,1.0));
+        this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,this.genBitmapUtility.colorToRGBColor(clothColor));
         this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,0.2,clothColor);
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0.7,0.75,0.5);
 
@@ -755,7 +783,7 @@ function GenBitmapObject(genRandom)
 
             // debugging
 /*
-        if (generateType===GEN_BITMAP_TYPE_WOOD_PLANK) {
+        if (generateType===GEN_BITMAP_TYPE_STONE) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);

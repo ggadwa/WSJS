@@ -30,10 +30,10 @@ function GenBitmapUtilityObject(genRandom)
     this.NORMAL_TOP_45=[-0.02,0.60,0.70];
     this.NORMAL_BOTTOM_45=[0.02,-0.60,0.70];
     
-    this.NORMAL_LEFT_10=[-0.90,-1.0,0.95];
-    this.NORMAL_RIGHT_10=[-0.95,-1.0,0.90];
-    this.NORMAL_TOP_10=[-1.0,-0.95,0.90];
-    this.NORMAL_BOTTOM_10=[-1.0,-0.90,0.95];
+    this.NORMAL_LEFT_10=[-0.1,0.0,0.90];
+    this.NORMAL_RIGHT_10=[0.1,0.0,0.90];
+    this.NORMAL_TOP_10=[0.0,0.1,0.90];
+    this.NORMAL_BOTTOM_10=[0.0,-0.1,0.90];
 
         // random generator
 
@@ -208,14 +208,29 @@ function GenBitmapUtilityObject(genRandom)
         return(darkColor);
     };
 
-    this.colorToRGBColor=function(color,darkenFactor)
+    this.colorToRGBColor=function(color)
     {
         var colorStr='rgb(';
-        colorStr+=Math.floor((color[0]*255.0)*darkenFactor);
+        colorStr+=Math.floor(color[0]*255.0);
         colorStr+=',';
-        colorStr+=Math.floor((color[1]*255.0)*darkenFactor);
+        colorStr+=Math.floor(color[1]*255.0);
         colorStr+=',';
-        colorStr+=Math.floor((color[2]*255.0)*darkenFactor);
+        colorStr+=Math.floor(color[2]*255.0);
+        colorStr+=')';
+
+        return(colorStr);
+    };
+    
+    this.colorToRGBAColor=function(color,alpha)
+    {
+        var colorStr='rgba(';
+        colorStr+=Math.floor(color[0]*255.0);
+        colorStr+=',';
+        colorStr+=Math.floor(color[1]*255.0);
+        colorStr+=',';
+        colorStr+=Math.floor(color[2]*255.0);
+        colorStr+=',';
+        colorStr+=Math.floor(alpha*255.0);
         colorStr+=')';
 
         return(colorStr);
@@ -406,7 +421,7 @@ function GenBitmapUtilityObject(genRandom)
     this.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
         var n,lx,rx,ty,by;
-        var darkenFactor;
+        var darkenFactor,darkColor;
 
             // draw the edges
 
@@ -417,7 +432,8 @@ function GenBitmapUtilityObject(genRandom)
 
         for (n=0;n!==edgeSize;n++) {
             darkenFactor=(((n+1)/edgeSize)*0.5)+0.5;
-            bitmapCTX.strokeStyle=this.colorToRGBColor(edgeRGBColor,darkenFactor);
+            darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
+            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
 
                 // the color
 
@@ -477,14 +493,15 @@ function GenBitmapUtilityObject(genRandom)
 
             // draw the inner fill
 
-        this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.colorToRGBColor(fillRGBColor,1.0));
+        this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.colorToRGBColor(fillRGBColor));
 
         this.drawRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.normalToRGBColor(this.NORMAL_CLEAR));
     };
 
     this.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
-        var n,k,k2,add,darkenFactor;
+        var n,k,k2,add;
+        var darkenFactor,darkColor;
 
         var wid=rgt-lft;
         var high=bot-top;
@@ -532,7 +549,8 @@ function GenBitmapUtilityObject(genRandom)
                 // the color outline
 
             darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
-            bitmapCTX.strokeStyle=this.colorToRGBColor(edgeRGBColor,darkenFactor);
+            darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
+            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
 
             bitmapCTX.beginPath();
             bitmapCTX.moveTo(x[0],y[0]);
@@ -604,7 +622,7 @@ function GenBitmapUtilityObject(genRandom)
 
             // and the fill
 
-        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor,1.0);
+        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
 
         bitmapCTX.beginPath();
         bitmapCTX.moveTo(x[0],y[0]);
@@ -614,6 +632,17 @@ function GenBitmapUtilityObject(genRandom)
         }
 
         bitmapCTX.fill();
+        
+        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+
+        normalCTX.beginPath();
+        normalCTX.moveTo(x[0],y[0]);
+
+        for (k=1;k!==40;k++) {
+            normalCTX.lineTo(x[k],y[k]);
+        }
+
+        normalCTX.fill();
     };
 
     this.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
@@ -690,7 +719,7 @@ function GenBitmapUtilityObject(genRandom)
         
             // line itself
             
-        bitmapCTX.fillStyle=this.colorToRGBColor(color,1.0);
+        bitmapCTX.fillStyle=this.colorToRGBColor(color);
 
         bitmapCTX.beginPath();
         bitmapCTX.moveTo(x,y);
@@ -698,8 +727,8 @@ function GenBitmapUtilityObject(genRandom)
         bitmapCTX.stroke();
         
             // smoothing
-            
-        bitmapCTX.fillStyle=this.colorToRGBColor(color,1.5);
+  
+        bitmapCTX.strokeStyle=this.colorToRGBAColor(color,0.5);
 
         if (horizontal) {
             bitmapCTX.beginPath();
@@ -721,40 +750,40 @@ function GenBitmapUtilityObject(genRandom)
             bitmapCTX.lineTo((x2+1),y2);
             bitmapCTX.stroke();
         }
-        
+
             // the normal change
             // flip as lines are inside
-           
+
         if (normalCTX!==null) {
             if (horizontal) {
-                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_TOP_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_10);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y-1));
                 normalCTX.lineTo(x2,(y2-1));
                 normalCTX.stroke();
-                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
-                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_10);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y+1));
                 normalCTX.lineTo(x2,(y2+1));
                 normalCTX.stroke();
             }
             else {
-                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_LEFT_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_10);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x-1),y);
                 normalCTX.lineTo((x2-1),y2);
                 normalCTX.stroke();
-                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
-                normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_RIGHT_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_10);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x+1),y);
                 normalCTX.lineTo((x2+1),y2);

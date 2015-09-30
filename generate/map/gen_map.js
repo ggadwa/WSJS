@@ -166,6 +166,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             var platformBoundX,platformBoundZ;
             
             var platformBoundY=yBound.copy();
+            platformBoundY.min-=500;
             platformBoundY.max=platformBoundY.min+500;
             
             for (n=1;n!==storyCount;n++) {

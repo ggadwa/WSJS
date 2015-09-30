@@ -9,23 +9,30 @@ EMCA6 TODOs
     [ ] modulize the code
     [ ] use Math.trunc when possible instead of Math.floor
 
+RELEASE TODOs
+    [ ] close gl
+    [ ] map.release();
+    [ ] modelList.release();
+    [ ] entityList.release();
+    [ ] text.release();
+    [ ] debug.release();
 
-[X] put OLD way of cubes back!  light map UVs will be bad!
+REGULAR TODOs
+
+[ ] stair wells are special room collision cases, has to be < or > not >= or <= because can't hide sides
+
 [ ] no light mesh hits -- needs "has flag" type call
     [ ] need to highlight these in lightmap!
-
-[X] fix line normals (in rough stone)
-[X] mosaic floor
 
 [ ] pillars need separate object and pillar locations and ONLY single story rooms
 
 [ ] better second floor stuff
      [ ] U, L, T, +
-     [ ] go upwards 1 floor length
+     [X] go upwards 1 floor length
+	 [ ] need new ceiling texture, use wood panels for second stories
 
 [ ] try to pack glsl light struct floats
 
-[ ] need steel panel rooms
 
 [ ] rooms have possible light positions
 
@@ -34,33 +41,20 @@ EMCA6 TODOs
 [ ] need filterMapBitmapColors and filterModelBitmapColors
 
 
-- keep a list of open 20/20 spots in rooms
-    - need flip and mirror
+[ ] frustum cull models
+[ ] when building view light list, ignore ones behind the player (pick better lights)
+
+[ ] don't draw spaces in text
+
+[ ] collisions
+     [ ] gravity
 
 
-- don't draw spaces in text
+[ ] model generation
+  	[ ] need globe generators
+ 	[ ] combine close vertexes
+ 	[ ] do torse->waist->hips as separate find calls
+    		torso size = arm size, hips = leg size, waist = random
 
 
-collisions
- - gravity
 
-
-model generation
- - combine close vertexes
- - do torse->waist->hips as separate find calls
-    torso size = arm size, hips = leg size, waist = random
-
----> needs decoration location?
----> make sure to get rid of debug.drawModelSkeleton in view
----> frustum cull the models
-
-- when building view light list, ignore ones behind the player (pick better lights)
-
-
-- will need start and stop
-    - close gl
-    - map.release();
-    - modelList.release();
-    - entityList.release();
-    - text.release();
-    - debug.release();
