@@ -157,7 +157,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // ceiling
 
-        this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_WOOD_PLANK),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_METAL),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
         
             // bridges and platforms on
             // other stories

@@ -15,12 +15,11 @@ var GEN_BITMAP_TYPE_TILE_SIMPLE=3;
 var GEN_BITMAP_TYPE_TILE_COMPLEX=4;
 var GEN_BITMAP_TYPE_TILE_SMALL=5;
 var GEN_BITMAP_TYPE_METAL=6;
-var GEN_BITMAP_TYPE_METAL_PLATE=7;
-var GEN_BITMAP_TYPE_CONCRETE=8;
-var GEN_BITMAP_TYPE_MOSAIC=9;
-var GEN_BITMAP_TYPE_WOOD_PLANK=10;
-var GEN_BITMAP_TYPE_WOOD_BOX=11;
-var GEN_BITMAP_TYPE_SKIN=12;
+var GEN_BITMAP_TYPE_CONCRETE=7;
+var GEN_BITMAP_TYPE_MOSAIC=8;
+var GEN_BITMAP_TYPE_WOOD_PLANK=9;
+var GEN_BITMAP_TYPE_WOOD_BOX=10;
+var GEN_BITMAP_TYPE_SKIN=11;
 
 var GEN_BITMAP_TILE_STYLE_BORDER=0;
 var GEN_BITMAP_TILE_STYLE_CHECKER=1;
@@ -74,12 +73,12 @@ function GenBitmapObject(genRandom)
             drawEdgeColor=this.genBitmapUtility.darkenColor(edgeColor,f);
 
             this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,drawEdgeColor,true);
-            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),darkenFactor,1.0,0.4);
+            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,0.6);
         }
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.8);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.3);
     };
 
         //
@@ -144,12 +143,12 @@ function GenBitmapObject(genRandom)
             
                  // any random noise
                 
-            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,rect.lft,rect.top,rect.rgt,rect.bot,darkenFactor,1.0,0.4);
+            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,rect.lft,rect.top,rect.rgt,rect.bot,0.8,1.0,0.5);
         }
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.8);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.4);
     };
 
         //
@@ -213,7 +212,7 @@ function GenBitmapObject(genRandom)
 
                 }
 
-                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col,[0.0,0.0,0.0]);
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col,new wsColor(0.0,0.0,0.0));
 
                     // possible design
 
@@ -259,7 +258,7 @@ function GenBitmapObject(genRandom)
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.3);
     };
 
         //
@@ -268,61 +267,58 @@ function GenBitmapObject(genRandom)
 
     this.generateMetal=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,k,plateX,plateY,halfWid,halfHigh;
-        var x,y,particleWid,particleHigh,particleDensity;
+        var n,x,lft,top,streakWid;
+        var streakColor,darken;
 
             // some random values
 
         var metalColor=this.genBitmapUtility.getRandomColor([0.0,0.0,0.4],[0.25,0.25,0.6]);
         var edgeColor=this.genBitmapUtility.darkenColor(metalColor,0.9);
-        var markCount=this.genRandom.randomInt(10,15);
+        
+        var edgeSize=this.genRandom.randomInt(4,4);
+        var screwSize=this.genRandom.randomInt(10,10);
+        var streakCount=this.genRandom.randomInt(15,10);
 
             // clear canvases
 
         this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,metalColor);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
-            // plates
-/*
-        halfWid=Math.floor(wid/2);
-        halfHigh=Math.floor(high/2);
+            // plate
 
-        for (n=0;n!==4;n++) {
-            plateX=(n%2)*halfWid;
-            plateY=Math.floor(n/2)*halfHigh;
+        this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,edgeSize,metalColor,edgeColor);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,plateX,plateY,(plateX+halfWid),(plateY+halfHigh),5,metalColor,edgeColor);
-            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,plateX,plateY,(plateX+halfWid),(plateY+halfHigh),0.9,0.95,0.2);
-*/
-                // particles
+            // streaks
 
-            x=0;
-            
-            while (true) {
-                x+=this.genRandom.randomInt(10,5);
-                if (x>wid) break;
+        for (n=0;n!==streakCount;n++) {
+            streakWid=this.genRandom.randomInt(10,40);
+            x=edgeSize+this.genRandom.randomInBetween(streakWid,((wid-streakWid)-(edgeSize*2)));
 
-                particleWid=this.genRandom.randomInt(5,10);
-                particleHigh=high; // this.genRandom.randomInt(50,30);
-                particleDensity=this.genRandom.randomInt(150,50);
+            darken=0.5+(this.genRandom.random()*0.5);
+            streakColor=this.genBitmapUtility.darkenColor(metalColor,darken);
 
-                //x=this.genRandom.randomInt(plateX,(halfWid-particleWid));
-                y=0; // this.genRandom.randomInt(plateY,(halfHigh-particleHigh));
-                
-                this.genBitmapUtility.drawStreak(bitmapCTX,wid,high,x,particleWid,edgeColor);
+            this.genBitmapUtility.drawStreakVertical(bitmapCTX,wid,high,x,edgeSize,(high-(edgeSize*2)),streakWid,streakColor);
+        }
+        
+            // screws
+        
+        lft=edgeSize*2;
+        top=edgeSize*2;
+        this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),1,metalColor,new wsColor(0.0,0.0,0.0));
 
-                //if ((k&0x1)===0) {
-                //    this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.8,particleDensity,true);
-                //}
-                //else {
-                //    this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,1.2,particleDensity,false);
-                //}
-            }
-//        }
+        top=high-(screwSize+(edgeSize*2));
+        this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),1,metalColor,new wsColor(0.0,0.0,0.0));
+
+        lft=wid-(screwSize+(edgeSize*2));
+        top=edgeSize*2;
+        this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),1,metalColor,new wsColor(0.0,0.0,0.0));
+
+        top=high-(screwSize+(edgeSize*2));
+        this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),1,metalColor,new wsColor(0.0,0.0,0.0));
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.2);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.1);
     };
 
         //
@@ -361,7 +357,7 @@ function GenBitmapObject(genRandom)
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.9);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,4.0,-0.4);
     };
     
         //
@@ -456,7 +452,7 @@ function GenBitmapObject(genRandom)
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.3);
     };
 
         //
@@ -469,10 +465,11 @@ function GenBitmapObject(genRandom)
 
         var boardSize=Math.floor(wid/8);
         var woodColor=this.genBitmapUtility.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
+        var blackColor=new wsColor(0.0,0.0,0.0);
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,[1.0,1.0,1.0]);
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // regular wood planking
@@ -484,7 +481,7 @@ function GenBitmapObject(genRandom)
 
             while (lft<wid) {
                 woodFactor=0.8+((1.0-(this.genRandom.random()*2.0))*0.1);
-                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,-3,(lft+boardSize),(high+3),3,woodColor,[0.0,0.0,0.0]); // -3 to get around outside borders
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,-3,(lft+boardSize),(high+3),3,woodColor,blackColor); // -3 to get around outside borders
                 this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+3),0,((lft+boardSize)-3),high,0.1,woodColor);
                 this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,(lft+3),0,((lft+boardSize)-3),high,0.9,0.95,woodFactor);
                 lft+=boardSize;
@@ -497,19 +494,19 @@ function GenBitmapObject(genRandom)
 
                 // outside boards
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,[0.0,0.0,0.0]);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,blackColor);
             this.genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,3,(wid-3),(boardSize-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,boardSize,0.9,0.95,0.8);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,[0.0,0.0,0.0]);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,blackColor);
             this.genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,((high-boardSize)+3),(wid-3),(high-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,0.9,0.95,0.8);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,[0.0,0.0,0.0]);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,blackColor);
             this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,3,3,(boardSize-3),(high-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,boardSize,high,0.9,0.95,0.8);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,[0.0,0.0,0.0]);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,blackColor);
             this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,((wid-boardSize)+3),3,(wid-3),(high-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,0.9,0.95,0.8);
 
@@ -522,20 +519,20 @@ function GenBitmapObject(genRandom)
 
             var y=Math.floor(high/2)-Math.floor(boardSize/2);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),3,woodColor,[0.0,0.0,0.0]);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),3,woodColor,blackColor);
             this.genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,normalCTX,(boardSize+3),(y+3),((wid-boardSize)-3),((y+boardSize)-3),0.2,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),0.9,0.95,0.8);
 
             var x=Math.floor(wid/2)-Math.floor(boardSize/2);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),3,woodColor,[0.0,0.0,0.0]);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),3,woodColor,blackColor);
             this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,(x+3),(boardSize+3),((x+boardSize)-3),((high-boardSize)-3),0.2,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),0.9,0.95,0.8);
         }
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.8);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.2);
     };
 
         //
@@ -667,7 +664,7 @@ function GenBitmapObject(genRandom)
 
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,[1.0,1.0,1.0]);
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // top-left is plain skin
@@ -684,7 +681,7 @@ function GenBitmapObject(genRandom)
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
     };
 
         //
@@ -739,29 +736,29 @@ function GenBitmapObject(genRandom)
 
             case GEN_BITMAP_TYPE_STONE:
                 this.generateStone(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
+                shineFactor=5.0;
                 break;
 
             case GEN_BITMAP_TYPE_TILE_SIMPLE:
                 this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,false,false);
-                shineFactor=10.0;
+                shineFactor=8.0;
                 break;
 
             case GEN_BITMAP_TYPE_TILE_COMPLEX:
                 this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,true,false);
-                shineFactor=10.0;
+                shineFactor=8.0;
                 break;
 
             case GEN_BITMAP_TYPE_TILE_SMALL:
                 this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,false,true);
-                shineFactor=10.0;
+                shineFactor=5.0;
                 break;
 
             case GEN_BITMAP_TYPE_METAL:
                 this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=20.0;
+                shineFactor=15.0;
                 break;
-
+                
             case GEN_BITMAP_TYPE_CONCRETE:
                 this.generateConcrete(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
@@ -769,34 +766,34 @@ function GenBitmapObject(genRandom)
                 
             case GEN_BITMAP_TYPE_MOSAIC:
                 this.generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=10.0;
+                shineFactor=5.0;
                 break;
 
             case GEN_BITMAP_TYPE_WOOD_PLANK:
                 this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high,false);
-                shineFactor=5.0;
+                shineFactor=2.0;
                 break;
 
             case GEN_BITMAP_TYPE_WOOD_BOX:
                 this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high,true);
-                shineFactor=5.0;
+                shineFactor=2.0;
                 break;
 
             case GEN_BITMAP_TYPE_SKIN:
                 this.generateSkin(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=15.0;
+                shineFactor=10.0;
                 break;
 
         }
 
             // debugging
-
+/*
         if (generateType===GEN_BITMAP_TYPE_METAL) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);
         }
-
+*/
             // finally create the bitmap
             // object and load into WebGL
 

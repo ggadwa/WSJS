@@ -23,7 +23,7 @@ function SettingsObject()
     
     this.ambient=[0.0,0.0,0.0];             // all over ambient light
     
-    this.generateLightmap=false;               // set to true to generate light maps
+    this.generateLightmap=true;               // set to true to generate light maps
 
         // models
         

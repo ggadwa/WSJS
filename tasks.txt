@@ -22,7 +22,6 @@ FUTURE TODOs
 
 REGULAR TODOs
 
-[ ] all bitmap routines should probably use wsColor
 [ ] stair wells are special room collision cases, has to be < or > not >= or <= because can't hide sides
 
 [ ] no light mesh hits -- needs "has flag" type call
@@ -33,7 +32,6 @@ REGULAR TODOs
 [ ] better second floor stuff
      [ ] U, L, T, +
      [X] go upwards 1 floor length
-	 [ ] need new ceiling texture, use wood panels for second stories
 
 [ ] try to pack glsl light struct floats
 

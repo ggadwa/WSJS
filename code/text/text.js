@@ -50,7 +50,7 @@ function TextObject()
             // so it can be colored
 
         var genBitmapUtility=new GenBitmapUtilityObject();
-        genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,[0.0,0.0,0.0]);
+        genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,new wsColor(0.0,0.0,0.0));
 
             // draw the text
 

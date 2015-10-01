@@ -23,17 +23,17 @@ function GenBitmapUtilityObject(genRandom)
     
         // normals
     
-    this.NORMAL_CLEAR=[0.0,0.0,1.0];
+    this.NORMAL_CLEAR=new wsPoint(0.0,0.0,1.0);
     
-    this.NORMAL_LEFT_45=[-0.60,0.02,0.70];
-    this.NORMAL_RIGHT_45=[0.60,-0.02,0.70];
-    this.NORMAL_TOP_45=[-0.02,0.60,0.70];
-    this.NORMAL_BOTTOM_45=[0.02,-0.60,0.70];
+    this.NORMAL_LEFT_45=new wsPoint(-0.60,0.02,0.70);
+    this.NORMAL_RIGHT_45=new wsPoint(0.60,-0.02,0.70);
+    this.NORMAL_TOP_45=new wsPoint(-0.02,0.60,0.70);
+    this.NORMAL_BOTTOM_45=new wsPoint(0.02,-0.60,0.70);
     
-    this.NORMAL_LEFT_10=[-0.1,0.0,0.90];
-    this.NORMAL_RIGHT_10=[0.1,0.0,0.90];
-    this.NORMAL_TOP_10=[0.0,0.1,0.90];
-    this.NORMAL_BOTTOM_10=[0.0,-0.1,0.90];
+    this.NORMAL_LEFT_10=new wsPoint(-0.1,0.0,0.90);
+    this.NORMAL_RIGHT_10=new wsPoint(0.1,0.0,0.90);
+    this.NORMAL_TOP_10=new wsPoint(0.0,0.1,0.90);
+    this.NORMAL_BOTTOM_10=new wsPoint(0.0,-0.1,0.90);
 
         // random generator
 
@@ -181,41 +181,32 @@ function GenBitmapUtilityObject(genRandom)
 
     this.getRandomColor=function(colorMin,colorMax)
     {
-        var color=new Float32Array(3);
-
-        color[0]=colorMin[0]+((colorMax[0]-colorMin[0])*this.genRandom.random());
-        color[1]=colorMin[1]+((colorMax[1]-colorMin[1])*this.genRandom.random());
-        color[2]=colorMin[2]+((colorMax[2]-colorMin[2])*this.genRandom.random());
-        return(color);
+        var r=colorMin[0]+((colorMax[0]-colorMin[0])*this.genRandom.random());
+        var g=colorMin[1]+((colorMax[1]-colorMin[1])*this.genRandom.random());
+        var b=colorMin[2]+((colorMax[2]-colorMin[2])*this.genRandom.random());
+        
+        return(new wsColor(r,g,b));
     };
 
     this.getRandomGreyColor=function(greyMin,greyMax)
     {
-        var color=new Float32Array(3);
         var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
-
-        color[0]=color[1]=color[2]=r;
-        return(color);
+        return(new wsColor(r,r,r));
     };
 
     this.darkenColor=function(color,darkenFactor)
     {
-        var darkColor=new Float32Array(3);
-        darkColor[0]=color[0]*darkenFactor;
-        darkColor[1]=color[1]*darkenFactor;
-        darkColor[2]=color[2]*darkenFactor;
-
-        return(darkColor);
+        return(new wsColor((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
     };
 
     this.colorToRGBColor=function(color)
     {
         var colorStr='rgb(';
-        colorStr+=Math.floor(color[0]*255.0);
+        colorStr+=Math.floor(color.r*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color[1]*255.0);
+        colorStr+=Math.floor(color.g*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color[2]*255.0);
+        colorStr+=Math.floor(color.b*255.0);
         colorStr+=')';
 
         return(colorStr);
@@ -224,11 +215,11 @@ function GenBitmapUtilityObject(genRandom)
     this.colorToRGBAColor=function(color,alpha)
     {
         var colorStr='rgba(';
-        colorStr+=Math.floor(color[0]*255.0);
+        colorStr+=Math.floor(color.r*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color[1]*255.0);
+        colorStr+=Math.floor(color.g*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color[2]*255.0);
+        colorStr+=Math.floor(color.b*255.0);
         colorStr+=',';
         colorStr+=Math.floor(alpha*255.0);
         colorStr+=')';
@@ -239,11 +230,11 @@ function GenBitmapUtilityObject(genRandom)
     this.normalToRGBColor=function(normal)
     {
         var colorStr='rgb(';
-        colorStr+=Math.floor((normal[0]+1.0)*127.0);
+        colorStr+=Math.floor((normal.x+1.0)*127.0);
         colorStr+=',';
-        colorStr+=Math.floor((normal[1]+1.0)*127.0);
+        colorStr+=Math.floor((normal.y+1.0)*127.0);
         colorStr+=',';
-        colorStr+=Math.floor((normal[2]+1.0)*127.0);
+        colorStr+=Math.floor((normal.z+1.0)*127.0);
         colorStr+=')';
 
         return(colorStr);
@@ -252,12 +243,11 @@ function GenBitmapUtilityObject(genRandom)
     this.createRandomColorStripeArray=function(factor,baseColor)
     {
         var n,f,count;
-        var redCol,greenCol,blueCol,cIdx;
-        var colors=new Float32Array(100*3);
+        var r,g,b,color;
+        var colors=[];
 
             // make stripes of varying sizes and colors
 
-        cIdx=0;
         count=0;
 
         for (n=0;n!==100;n++) {
@@ -268,22 +258,22 @@ function GenBitmapUtilityObject(genRandom)
 
                 f=1.0+((1.0-(this.genRandom.random()*2.0))*factor);
 
-                redCol=baseColor[0]*f;
-                if (redCol<0.0) redCol=0.0;
-                if (redCol>1.0) redCol=1.0;
+                r=baseColor.r*f;
+                if (r<0.0) r=0.0;
+                if (r>1.0) r=1.0;
 
-                greenCol=baseColor[1]*f;
-                if (greenCol<0.0) greenCol=0.0;
-                if (greenCol>1.0) greenCol=1.0;
+                g=baseColor.g*f;
+                if (g<0.0) g=0.0;
+                if (g>1.0) g=1.0;
 
-                blueCol=baseColor[2]*f;
-                if (blueCol<0.0) blueCol=0.0;
-                if (blueCol>1.0) blueCol=1.0;
+                b=baseColor.b*f;
+                if (b<0.0) b=0.0;
+                if (b>1.0) b=1.0;
+                
+                color=new wsColor(r,g,b);
             }
 
-            colors[cIdx++]=redCol;
-            colors[cIdx++]=greenCol;
-            colors[cIdx++]=blueCol;
+            colors.push(color);
         }    
 
         return(colors);
@@ -293,9 +283,12 @@ function GenBitmapUtilityObject(genRandom)
         // normal clearing
         //
 
-    this.clearNormalsRect=function(ctx,lft,top,rgt,bot)
+    this.clearNormalsRect=function(normalCTX,lft,top,rgt,bot)
     {
-        this.drawRectNormal(ctx,lft,top,rgt,bot,this.NORMAL_CLEAR);
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     };
 
         //
@@ -359,7 +352,7 @@ function GenBitmapUtilityObject(genRandom)
         // specular routines
         //
 
-    this.createSpecularMap=function(bitmapCTX,specularCTX,wid,high,specularFactor)
+    this.createSpecularMap=function(bitmapCTX,specularCTX,wid,high,contrastFactor,brightnessAdd)
     {
         var n,idx,nPixel;
         var f;
@@ -383,9 +376,9 @@ function GenBitmapUtilityObject(genRandom)
 
             f/=255.0;
 
-                // add in the contrast
+                // calculate the contrast + brightness
 
-            f=((f-0.5)*specularFactor)+f;
+            f=(((f-0.5)*contrastFactor)+0.5)+brightnessAdd;
             if (f<0.0) f=0.0;
             if (f>1.0) f=1.0;
 
@@ -415,14 +408,6 @@ function GenBitmapUtilityObject(genRandom)
         if ((lft>=rgt) || (top>=bot)) return;
 
         ctx.fillStyle=this.colorToRGBColor(color);
-        ctx.fillRect(lft,top,(rgt-lft),(bot-top));
-    };
-    
-    this.drawRectNormal=function(ctx,lft,top,rgt,bot,normal)
-    {
-        if ((lft>=rgt) || (top>=bot)) return;
-
-        ctx.fillStyle=this.normalToRGBColor(normal);
         ctx.fillRect(lft,top,(rgt-lft),(bot-top));
     };
 
@@ -503,7 +488,7 @@ function GenBitmapUtilityObject(genRandom)
 
         this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillRGBColor);
 
-        this.drawRectNormal(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),this.NORMAL_CLEAR);
+        this.clearNormalsRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
     };
 
     this.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
@@ -941,9 +926,11 @@ function GenBitmapUtilityObject(genRandom)
         // streaks
         //
 
-    this.drawStreak=function(bitmapCTX,imgWid,imgHigh,x,streakWid,baseColor)
+    this.drawStreakVertical=function(bitmapCTX,imgWid,imgHigh,x,top,bot,streakWid,baseColor)
     {
         var n,lx,rx,y,idx;
+        
+        if (top>=bot) return;
         
             // get the image data
 
@@ -963,7 +950,7 @@ function GenBitmapUtilityObject(genRandom)
             lx=x-n;
             rx=x+n;
             
-            for (y=0;y!==imgHigh;y++) {
+            for (y=top;y!==bot;y++) {
                 
                 if (this.genRandom.randomInt(0,100)<density) {
                     idx=((y*imgWid)+lx)*4;
@@ -995,8 +982,8 @@ function GenBitmapUtilityObject(genRandom)
 
     this.drawColorStripeHorizontal=function(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
-        var x,y,idx,cIdx;
-        var redByte,greenByte,blueByte;
+        var x,y,idx;
+        var color,redByte,greenByte,blueByte;
         var colors=this.createRandomColorStripeArray(factor,baseColor);
 
             // get the image data
@@ -1018,10 +1005,10 @@ function GenBitmapUtilityObject(genRandom)
 
         for (y=0;y!==high;y++) {
 
-            cIdx=(y%100)*3;
-            redByte=Math.floor(colors[cIdx]*256.0);
-            greenByte=Math.floor(colors[cIdx+1]*256.0);
-            blueByte=Math.floor(colors[cIdx+2]*256.0);
+            color=colors[y%100];
+            redByte=Math.floor(color.r*256.0);
+            greenByte=Math.floor(color.g*256.0);
+            blueByte=Math.floor(color.b*256.0);
 
             idx=(y*wid)*4;
 
@@ -1048,8 +1035,8 @@ function GenBitmapUtilityObject(genRandom)
 
     this.drawColorStripeVertical=function(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
-        var x,y,idx,cIdx;
-        var redByte,greenByte,blueByte;
+        var x,y,idx;
+        var color,redByte,greenByte,blueByte;
         var colors=this.createRandomColorStripeArray(factor,baseColor);
 
             // get the image data
@@ -1071,10 +1058,10 @@ function GenBitmapUtilityObject(genRandom)
 
         for (x=0;x!==wid;x++) {
 
-            cIdx=(x%100)*3;
-            redByte=Math.floor(colors[cIdx]*256.0);
-            greenByte=Math.floor(colors[cIdx+1]*256.0);
-            blueByte=Math.floor(colors[cIdx+2]*256.0);
+            color=colors[x%100];
+            redByte=Math.floor(color.r*256.0);
+            greenByte=Math.floor(color.g*256.0);
+            blueByte=Math.floor(color.b*256.0);
 
             for (y=0;y!==high;y++) {
                 idx=((y*wid)+x)*4;
@@ -1099,6 +1086,7 @@ function GenBitmapUtilityObject(genRandom)
     this.drawColorStripeSlant=function(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
         var x,y,idx,cIdx;
+        var color;
         var colors=this.createRandomColorStripeArray(factor,baseColor);
 
             // get the image data
@@ -1121,12 +1109,14 @@ function GenBitmapUtilityObject(genRandom)
         for (y=0;y!==high;y++) {
             for (x=0;x!==wid;x++) {
 
-                cIdx=((x+y)%100)*3;
+                cIdx=(x+y)%100;
+                color=colors[cIdx];
+                
                 idx=((y*wid)+x)*4;
 
-                bitmapData[idx]=Math.floor(colors[cIdx]*256.0);
-                bitmapData[idx+1]=Math.floor(colors[cIdx+1]*256.0);
-                bitmapData[idx+2]=Math.floor(colors[cIdx+2]*256.0);
+                bitmapData[idx]=Math.floor(color.r*256.0);
+                bitmapData[idx+1]=Math.floor(color.g*256.0);
+                bitmapData[idx+2]=Math.floor(color.b*256.0);
 
                 normalData[idx]=((cIdx&0x1)===0)?nx:-nx;
                 normalData[idx+1]=127.0;
