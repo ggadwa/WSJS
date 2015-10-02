@@ -159,38 +159,11 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_METAL),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
         
-            // bridges and platforms on
-            // other stories
+            // platforms
             
         if (storyCount>1) {
-            var platformBoundX,platformBoundZ;
-            
-            var platformBoundY=yBound.copy();
-            platformBoundY.min-=500;
-            platformBoundY.max=platformBoundY.min+500;
-            
-            for (n=1;n!==storyCount;n++) {
-                platformBoundX=xBound.copy();
-                platformBoundZ=zBound.copy();
-                
-                switch (this.genRandom.randomInt(0,4)) {
-                    case 0:
-                        platformBoundX.max=platformBoundX.min+(xBound.getSize()*0.25);
-                        break;
-                    case 1:
-                        platformBoundX.min=platformBoundX.max-(xBound.getSize()*0.25);
-                        break;
-                    case 2:
-                        platformBoundZ.max=platformBoundZ.min+(zBound.getSize()*0.25);
-                        break;
-                    case 3:
-                        platformBoundZ.min=platformBoundZ.max-(zBound.getSize()*0.25);
-                        break;
-                }
-                
-                map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_PLANK),platformBoundX,platformBoundY,platformBoundZ,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
-                platformBoundY.add(-yStoryAdd);
-            }
+            var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom);
+            genRoomPlatform.createPlatforms(storyCount,yStoryAdd,xBound,yBound,zBound);
         }
 
         return(yStoryBound);
@@ -198,10 +171,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
     this.addStairRoom=function(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount)
     {
-        var genRoomStairs=new GenRoomStairs();
+        var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
 
         var roomBitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
-        genRoomStairs.createStairs(this.map,roomBitmap,piece,connectType,xStairBound,yStairBound,zStairBound);
+        genRoomStairs.createStairs(roomBitmap,piece,connectType,xStairBound,yStairBound,zStairBound);
     };
 
     this.addLight=function(piece,storyCount,xBound,yBound,zBound)

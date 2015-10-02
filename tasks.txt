@@ -30,8 +30,9 @@ REGULAR TODOs
 [ ] pillars need separate object and pillar locations and ONLY single story rooms
 
 [ ] better second floor stuff
-     [ ] U, L, T, +
-     [X] go upwards 1 floor length
+    [ ] random pick for next but skip previous (add one) -- use for second floor instead of just +1
+    [ ] do corners
+    [ ] do stubs
 
 [ ] try to pack glsl light struct floats
 

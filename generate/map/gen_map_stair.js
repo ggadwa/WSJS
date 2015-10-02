@@ -1,11 +1,14 @@
 "use strict";
 
 //
-// mesh primitives class
+// map stairs
 //
 
-function GenRoomStairs()
+function GenRoomStairs(map,genRandom)
 {
+    this.map=map;
+    this.genRandom=genRandom;
+    
         // constants
         
     this.STEP_COUNT=10;
@@ -108,7 +111,7 @@ function GenRoomStairs()
         // stair vertices into meshes
         //
         
-    this.finishStairMesh=function(map,bitmap,vertices,normals,flags)
+    this.finishStairMesh=function(bitmap,vertices,normals,flags)
     {
             // build the indexes
             // everything we build is a quad so
@@ -148,14 +151,14 @@ function GenRoomStairs()
         var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
 
         var mesh=new MapMeshObject(bitmap,vertices,calcNormals,tangents,uvs,indexes,flags);        
-        map.addMesh(mesh);
+        this.map.addMesh(mesh);
     };
 
         //
         // create stairs
         //
 
-    this.createStairsPosX=function(map,roomBitmap,xBound,yBound,zBound)
+    this.createStairsPosX=function(roomBitmap,xBound,yBound,zBound)
     {
         var n,idx;
         var vertices;
@@ -178,7 +181,7 @@ function GenRoomStairs()
         idx=this.createSingleWallX(idx,vertices,xBound.max,yBound,yBound,zBound);
         idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBound,zBound.max);
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_WALL);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
         
            // the ceiling
            
@@ -186,7 +189,7 @@ function GenRoomStairs()
         vertices=new Float32Array(12);
             
         this.createSingleCeilingX(idx,vertices,xBound,yBoundTop,yBound,zBound);
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_CEILING);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
         
             // the steps
         
@@ -211,10 +214,10 @@ function GenRoomStairs()
             xStepBound.add(stepAdd);
         }
         
-        this.finishStairMesh(map,map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,map.MESH_FLAG_STAIR);
+        this.finishStairMesh(this.map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,this.map.MESH_FLAG_STAIR);
     };
 
-    this.createStairsPosZ=function(map,roomBitmap,xBound,yBound,zBound)
+    this.createStairsPosZ=function(roomBitmap,xBound,yBound,zBound)
     {
         var n,idx;
         var vertices;
@@ -237,7 +240,7 @@ function GenRoomStairs()
         idx=this.createSingleWallZ(idx,vertices,xBound,yBound,yBound,zBound.max);
         idx=this.createSingleWallX(idx,vertices,xBound.min,yBoundTop,yBound,zBound);
         idx=this.createSingleWallX(idx,vertices,xBound.max,yBoundTop,yBound,zBound);
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_WALL);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
         
            // the ceiling
            
@@ -245,7 +248,7 @@ function GenRoomStairs()
         vertices=new Float32Array(12);
             
         this.createSingleCeilingZ(idx,vertices,xBound,yBoundTop,yBound,zBound);
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_CEILING);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
         
             // the steps
             
@@ -270,12 +273,10 @@ function GenRoomStairs()
             zStepBound.add(stepAdd);
         }
         
-        this.finishStairMesh(map,map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,map.MESH_FLAG_STAIR);
-
-        //map.addMesh(mesh);
+        this.finishStairMesh(this.map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,this.map.MESH_FLAG_STAIR);
     };
 
-    this.createStairsNegX=function(map,roomBitmap,xBound,yBound,zBound)
+    this.createStairsNegX=function(roomBitmap,xBound,yBound,zBound)
     {
         var n,idx;
         var vertices;
@@ -298,7 +299,7 @@ function GenRoomStairs()
         idx=this.createSingleWallX(idx,vertices,xBound.max,yBoundTop,yBoundTop,zBound);
         idx=this.createSingleWallZ(idx,vertices,xBound,yBound,yBoundTop,zBound.min);
         idx=this.createSingleWallZ(idx,vertices,xBound,yBound,yBoundTop,zBound.max);
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_WALL);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
         
            // the ceiling
            
@@ -306,7 +307,7 @@ function GenRoomStairs()
         vertices=new Float32Array(12);
             
         this.createSingleCeilingX(idx,vertices,xBound,yBound,yBoundTop,zBound);
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_CEILING);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
         
             // the steps
             
@@ -331,10 +332,10 @@ function GenRoomStairs()
             xStepBound.add(-stepAdd);
         }
         
-        this.finishStairMesh(map,map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,map.MESH_FLAG_STAIR);
+        this.finishStairMesh(this.map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,this.map.MESH_FLAG_STAIR);
     };
 
-    this.createStairsNegZ=function(map,roomBitmap,xBound,yBound,zBound)
+    this.createStairsNegZ=function(roomBitmap,xBound,yBound,zBound)
     {
         var n,idx;
         var vertices;
@@ -357,7 +358,7 @@ function GenRoomStairs()
         idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBoundTop,zBound.max);
         idx=this.createSingleWallX(idx,vertices,xBound.min,yBound,yBoundTop,zBound);
         idx=this.createSingleWallX(idx,vertices,xBound.max,yBound,yBoundTop,zBound);
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_WALL);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
         
            // the ceiling
            
@@ -365,7 +366,7 @@ function GenRoomStairs()
         vertices=new Float32Array(12);
 
         this.createSingleCeilingZ(idx,vertices,xBound,yBound,yBoundTop,zBound);        
-        this.finishStairMesh(map,roomBitmap,vertices,null,map.MESH_FLAG_ROOM_CEILING);
+        this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
         
             // the steps
         
@@ -390,31 +391,31 @@ function GenRoomStairs()
             zStepBound.add(-stepAdd);
         }
         
-        this.finishStairMesh(map,map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,map.MESH_FLAG_STAIR);
+        this.finishStairMesh(this.map.getBitmapById(BITMAP_STAIR_TILE),vertices,normals,this.map.MESH_FLAG_STAIR);
     };
     
         //
         // stairs mainline
         // 
     
-    this.createStairs=function(map,roomBitmap,piece,connectType,xStairBound,yStairBound,zStairBound)
+    this.createStairs=function(roomBitmap,piece,connectType,xStairBound,yStairBound,zStairBound)
     {
         switch (connectType) {
             
             case piece.CONNECT_TYPE_LEFT:
-                this.createStairsPosX(map,roomBitmap,xStairBound,yStairBound,zStairBound);
+                this.createStairsPosX(roomBitmap,xStairBound,yStairBound,zStairBound);
                 break;
                 
             case piece.CONNECT_TYPE_TOP:
-                this.createStairsPosZ(map,roomBitmap,xStairBound,yStairBound,zStairBound);
+                this.createStairsPosZ(roomBitmap,xStairBound,yStairBound,zStairBound);
                 break;
                 
             case piece.CONNECT_TYPE_RIGHT:
-                this.createStairsNegX(map,roomBitmap,xStairBound,yStairBound,zStairBound);
+                this.createStairsNegX(roomBitmap,xStairBound,yStairBound,zStairBound);
                 break;
                 
             case piece.CONNECT_TYPE_BOTTOM:
-                this.createStairsNegZ(map,roomBitmap,xStairBound,yStairBound,zStairBound);
+                this.createStairsNegZ(roomBitmap,xStairBound,yStairBound,zStairBound);
                 break;
                 
         }
