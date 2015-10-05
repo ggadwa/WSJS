@@ -179,19 +179,19 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         switch (connectType) {
             
             case piece.CONNECT_TYPE_LEFT:
-                genRoomStairs.createStairsPosX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false);
                 break;
                 
             case piece.CONNECT_TYPE_TOP:
-                genRoomStairs.createStairsPosZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false);
                 break;
                 
             case piece.CONNECT_TYPE_RIGHT:
-                genRoomStairs.createStairsNegX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,true);
                 break;
                 
             case piece.CONNECT_TYPE_BOTTOM:
-                genRoomStairs.createStairsNegZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,true);
                 break;
                 
         }

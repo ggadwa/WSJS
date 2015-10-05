@@ -158,23 +158,31 @@ function GenRoomStairs(map,genRandom)
         // create stairs
         //
 
-    this.createStairsPosX=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform)
+    this.createStairsX=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,flip)
     {
-        var n,idx;
+        var n,idx,stepAdd;
         var vertices;
-        var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound;
+        var xStepBound,yStepBound,yBoundTop,yBoundBottom;
         
             // height of stairs and steps
             
         var stairHigh=yBound.getSize();
         var stepDrop=stairHigh/this.STEP_COUNT;
-        var stepAdd=zBound.getSize()/this.STEP_COUNT;
         
             // the stair room
 
         if (!toPlatform) {
-            yBoundTop=yBound.copy();
-            yBoundTop.add(-stairHigh);
+            
+            if (!flip) {
+                yBoundTop=yBound.copy();
+                yBoundTop.add(-stairHigh);
+                yBoundBottom=yBound;
+            }
+            else {
+                yBoundTop=yBound;
+                yBoundBottom=yBound.copy();
+                yBoundBottom.add(-stairHigh);
+            }
 
                 // walls
 
@@ -182,9 +190,9 @@ function GenRoomStairs(map,genRandom)
             vertices=new Float32Array(48);
 
             idx=this.createSingleWallX(idx,vertices,xBound.min,yBoundTop,yBoundTop,zBound);
-            idx=this.createSingleWallX(idx,vertices,xBound.max,yBound,yBound,zBound);
-            idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBound,zBound.min);
-            idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBound,zBound.max);
+            idx=this.createSingleWallX(idx,vertices,xBound.max,yBoundBottom,yBoundBottom,zBound);
+            idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBoundBottom,zBound.min);
+            idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBoundBottom,zBound.max);
             this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
 
                // the ceiling
@@ -192,7 +200,7 @@ function GenRoomStairs(map,genRandom)
             idx=0;
             vertices=new Float32Array(12);
 
-            this.createSingleCeilingX(idx,vertices,xBound,yBoundTop,yBound,zBound);
+            this.createSingleCeilingX(idx,vertices,xBound,yBoundTop,yBoundBottom,zBound);
             this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
         }
         
@@ -203,12 +211,25 @@ function GenRoomStairs(map,genRandom)
         var normals=new Float32Array(((this.STEP_COUNT*4)*3)*2);
         
         var nIdx=0;
-        xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
+        if (!flip) {
+            xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
+            stepAdd=xBound.getSize()/this.STEP_COUNT;
+        }
+        else {
+            xStepBound=new wsBound((xBound.max-stepAdd),xBound.max);
+            stepAdd=-(xBound.getSize()/this.STEP_COUNT);
+        }
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
         
         for (n=0;n!==this.STEP_COUNT;n++) {
-            idx=this.createSingleWallX(idx,vertices,xStepBound.max,yStepBound,yStepBound,zBound);
-            nIdx=this.createNormalsForPolygon(nIdx,normals,1.0,0.0,0.0);
+            if (!flip) {
+                idx=this.createSingleWallX(idx,vertices,xStepBound.max,yStepBound,yStepBound,zBound);
+                nIdx=this.createNormalsForPolygon(nIdx,normals,1.0,0.0,0.0);
+            }
+            else {
+                idx=this.createSingleWallX(idx,vertices,xStepBound.min,yStepBound,yStepBound,zBound);
+                nIdx=this.createNormalsForPolygon(nIdx,normals,-1.0,0.0,0.0);
+            }
             
             idx=this.createSingleCeilingX(idx,vertices,xStepBound,yStepBound,yStepBound,zBound);
             nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,-1.0,0.0);
@@ -220,9 +241,9 @@ function GenRoomStairs(map,genRandom)
         this.finishStairMesh(stairBitmap,vertices,normals,this.map.MESH_FLAG_STAIR);
     };
 
-    this.createStairsPosZ=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform)
+    this.createStairsZ=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,flip)
     {
-        var n,idx;
+        var n,idx,stepAdd;
         var vertices;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound;
         
@@ -230,13 +251,21 @@ function GenRoomStairs(map,genRandom)
             
         var stairHigh=yBound.getSize();
         var stepDrop=stairHigh/this.STEP_COUNT;
-        var stepAdd=zBound.getSize()/this.STEP_COUNT;
         
             // the stair room
             
         if (!toPlatform) {
-            yBoundTop=yBound.copy();
-            yBoundTop.add(-stairHigh);
+            
+            if (!flip) {
+                yBoundTop=yBound.copy();
+                yBoundTop.add(-stairHigh);
+                yBoundBottom=yBound;
+            }
+            else {
+                yBoundTop=yBound;
+                yBoundBottom=yBound.copy();
+                yBoundBottom.add(-stairHigh);
+            }
 
                 // walls
 
@@ -244,9 +273,9 @@ function GenRoomStairs(map,genRandom)
             vertices=new Float32Array(48);
 
             idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBoundTop,zBound.min);
-            idx=this.createSingleWallZ(idx,vertices,xBound,yBound,yBound,zBound.max);
-            idx=this.createSingleWallX(idx,vertices,xBound.min,yBoundTop,yBound,zBound);
-            idx=this.createSingleWallX(idx,vertices,xBound.max,yBoundTop,yBound,zBound);
+            idx=this.createSingleWallZ(idx,vertices,xBound,yBoundBottom,yBoundBottom,zBound.max);
+            idx=this.createSingleWallX(idx,vertices,xBound.min,yBoundTop,yBoundBottom,zBound);
+            idx=this.createSingleWallX(idx,vertices,xBound.max,yBoundTop,yBoundBottom,zBound);
             this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
 
                // the ceiling
@@ -254,136 +283,13 @@ function GenRoomStairs(map,genRandom)
             idx=0;
             vertices=new Float32Array(12);
 
-            this.createSingleCeilingZ(idx,vertices,xBound,yBoundTop,yBound,zBound);
-            this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
-        }
-        
-            // the steps
-            
-        idx=0;
-        vertices=new Float32Array(((this.STEP_COUNT*4)*3)*2);
-        var normals=new Float32Array(((this.STEP_COUNT*4)*3)*2);
-        
-        var nIdx=0;
-        zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));
-        yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-
-        for (n=0;n!==this.STEP_COUNT;n++) {
-            idx=this.createSingleWallZ(idx,vertices,xBound,yStepBound,yStepBound,zStepBound.max);
-            nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,0.0,1.0);
-            
-            idx=this.createSingleCeilingZ(idx,vertices,xBound,yStepBound,yStepBound,zStepBound);
-            nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,-1.0,0.0);
-           
-            yStepBound.add(stepDrop);
-            zStepBound.add(stepAdd);
-        }
-        
-        this.finishStairMesh(stairBitmap,vertices,normals,this.map.MESH_FLAG_STAIR);
-    };
-
-    this.createStairsNegX=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform)
-    {
-        var n,idx;
-        var vertices;
-        var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound;
-        
-            // height of stairs and steps
-            
-        var stairHigh=yBound.getSize();
-        var stepDrop=stairHigh/this.STEP_COUNT;
-        var stepAdd=zBound.getSize()/this.STEP_COUNT;
-        
-            // the stair room
-            
-        if (!toPlatform) {     
-            yBoundTop=yBound.copy();
-            yBoundTop.add(-stairHigh);
-
-                // walls
-
-            idx=0;
-            vertices=new Float32Array(48);
-
-            idx=this.createSingleWallX(idx,vertices,xBound.min,yBound,yBound,zBound);
-            idx=this.createSingleWallX(idx,vertices,xBound.max,yBoundTop,yBoundTop,zBound);
-            idx=this.createSingleWallZ(idx,vertices,xBound,yBound,yBoundTop,zBound.min);
-            idx=this.createSingleWallZ(idx,vertices,xBound,yBound,yBoundTop,zBound.max);
-            this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
-
-               // the ceiling
-
-            idx=0;
-            vertices=new Float32Array(12);
-
-            this.createSingleCeilingX(idx,vertices,xBound,yBound,yBoundTop,zBound);
-            this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
-        }
-        
-            // the steps
-            
-        idx=0;
-        vertices=new Float32Array(((this.STEP_COUNT*4)*3)*2);
-        var normals=new Float32Array(((this.STEP_COUNT*4)*3)*2);
-        
-        var nIdx=0;
-        xStepBound=new wsBound((xBound.max-stepAdd),xBound.max);
-        yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-
-        for (n=0;n!==this.STEP_COUNT;n++) {
-            idx=this.createSingleWallX(idx,vertices,xStepBound.min,yStepBound,yStepBound,zBound);
-            nIdx=this.createNormalsForPolygon(nIdx,normals,-1.0,0.0,0.0);
-            
-            idx=this.createSingleCeilingX(idx,vertices,xStepBound,yStepBound,yStepBound,zBound);
-            nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,-1.0,0.0);
-           
-            yStepBound.add(stepDrop);
-            xStepBound.add(-stepAdd);
-        }
-        
-        this.finishStairMesh(stairBitmap,vertices,normals,this.map.MESH_FLAG_STAIR);
-    };
-
-    this.createStairsNegZ=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform)
-    {
-        var n,idx;
-        var vertices;
-        var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound;
-        
-            // height of stairs and steps
-            
-        var stairHigh=yBound.getSize();
-        var stepDrop=stairHigh/this.STEP_COUNT;
-        var stepAdd=zBound.getSize()/this.STEP_COUNT;
-        
-            // the stair room
-            
-        if (!toPlatform) {
-            yBoundTop=yBound.copy();
-            yBoundTop.add(-stairHigh);
-
-                // walls
-
-            idx=0;
-            vertices=new Float32Array(48);
-
-            idx=this.createSingleWallZ(idx,vertices,xBound,yBound,yBound,zBound.min);
-            idx=this.createSingleWallZ(idx,vertices,xBound,yBoundTop,yBoundTop,zBound.max);
-            idx=this.createSingleWallX(idx,vertices,xBound.min,yBound,yBoundTop,zBound);
-            idx=this.createSingleWallX(idx,vertices,xBound.max,yBound,yBoundTop,zBound);
-            this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_WALL);
-
-               // the ceiling
-
-            idx=0;
-            vertices=new Float32Array(12);
-
-            this.createSingleCeilingZ(idx,vertices,xBound,yBound,yBoundTop,zBound);
+            this.createSingleCeilingZ(idx,vertices,xBound,yBoundTop,yBoundBottom,zBound);
             this.finishStairMesh(roomBitmap,vertices,null,this.map.MESH_FLAG_ROOM_CEILING);
         }
         
             // the stair edges
-            
+        
+        if (toPlatform) {
         idx=0;
         vertices=new Float32Array(36);
 
@@ -395,7 +301,7 @@ function GenRoomStairs(map,genRandom)
         idx=this.createSingleWallX(idx,vertices,xStepBound.max,yBoundBottom,yBoundTop,zBound);
         this.createSingleCeilingZ(idx,vertices,xStepBound,yBoundBottom,yBoundTop,zBound);
         this.finishStairMesh(stairBitmap,vertices,null,this.map.MESH_FLAG_STAIR);
-        
+    }
         
             // the steps
         
@@ -404,18 +310,32 @@ function GenRoomStairs(map,genRandom)
         var normals=new Float32Array(((this.STEP_COUNT*4)*3)*2);
         
         var nIdx=0;
-        zStepBound=new wsBound((zBound.max-stepAdd),zBound.max);
+        if (!flip) {
+            zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));
+            stepAdd=zBound.getSize()/this.STEP_COUNT;
+
+        }
+        else {
+            zStepBound=new wsBound((zBound.max-stepAdd),zBound.max);
+            stepAdd=-(zBound.getSize()/this.STEP_COUNT);
+        }
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
 
         for (n=0;n!==this.STEP_COUNT;n++) {
-            idx=this.createSingleWallZ(idx,vertices,xBound,yStepBound,yStepBound,zStepBound.min);
-            nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,0.0,-1.0);
+            if (!flip) {
+                idx=this.createSingleWallZ(idx,vertices,xBound,yStepBound,yStepBound,zStepBound.max);
+                nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,0.0,1.0);
+            }
+            else {
+                idx=this.createSingleWallZ(idx,vertices,xBound,yStepBound,yStepBound,zStepBound.min);
+                nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,0.0,-1.0);
+            }
             
             idx=this.createSingleCeilingZ(idx,vertices,xBound,yStepBound,yStepBound,zStepBound);
             nIdx=this.createNormalsForPolygon(nIdx,normals,0.0,-1.0,0.0);
            
             yStepBound.add(stepDrop);
-            zStepBound.add(-stepAdd);
+            zStepBound.add(stepAdd);
         }
         
         this.finishStairMesh(stairBitmap,vertices,normals,this.map.MESH_FLAG_STAIR);

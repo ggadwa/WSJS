@@ -32,7 +32,8 @@ REGULAR TODOs
 [ ] pillars need separate object and pillar locations and ONLY single story rooms
 
 [ ] better second floor stuff
-    [ ] can we combine neg and pos versions of steps?
+    [X] can we combine neg and pos versions of steps?
+    [ ] stairs need to build normals always (pass into creation function since they will be equal)
     [X] looks like stair polys have a bug
     [X] random pick for next but skip previous (add one) -- use for second floor instead of just +1
     [ ] need to make one size the stair side and then the other sides by a random % (25, 50% etc)
@@ -40,6 +41,11 @@ REGULAR TODOs
 
 [ ] try to pack glsl light struct floats
 
+[ ] bitmaps
+    [ ] metal needs random plating (1 big, 2 long, 4 quarters)
+    [ ] normals are off for bolts (or frame is too large)
+    [ ] need metal + bar
+    [ ] need to have one set per map
 
 [ ] rooms have possible light positions
 

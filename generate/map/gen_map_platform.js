@@ -103,25 +103,25 @@ function GenRoomPlatform(map,genRandom)
             xStairBound.max=xBound.min+((xBound.getSize()*0.25)+4000);
             zStairBound.min=zBound.min+((zBound.getSize()*0.50)-1000);
             zStairBound.max=zBound.min+((zBound.getSize()*0.50)+1000);
-            genRoomStairs.createStairsPosX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true);
+            genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,false);
 
             xStairBound.min=xBound.min+((xBound.getSize()*0.50)-1000);
             xStairBound.max=xBound.min+((xBound.getSize()*0.50)+1000);
             zStairBound.min=zBound.min+(zBound.getSize()*0.25);
             zStairBound.max=zBound.min+((zBound.getSize()*0.25)+4000);
-            genRoomStairs.createStairsPosZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true);
+            genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,false);
 
             xStairBound.min=xBound.max-((xBound.getSize()*0.25)+4000);
             xStairBound.max=xBound.max-(xBound.getSize()*0.25);
             zStairBound.min=zBound.min+((zBound.getSize()*0.50)-1000);
             zStairBound.max=zBound.min+((zBound.getSize()*0.50)+1000);
-            genRoomStairs.createStairsNegX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true);
+            genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,true);
 
             xStairBound.min=xBound.min+((xBound.getSize()*0.50)-1000);
             xStairBound.max=xBound.min+((xBound.getSize()*0.50)+1000);
             zStairBound.min=zBound.max-((zBound.getSize()*0.25)+4000);
             zStairBound.max=zBound.max-(zBound.getSize()*0.25);
-            genRoomStairs.createStairsNegZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true);
+            genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,true);
 
             
                 // pick another platform, but don't
