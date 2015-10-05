@@ -22,6 +22,8 @@ FUTURE TODOs
 
 REGULAR TODOs
 
+[ ] make the two crazy rooms only half rooms
+
 [ ] stair wells are special room collision cases, has to be < or > not >= or <= because can't hide sides
 
 [ ] no light mesh hits -- needs "has flag" type call
@@ -30,9 +32,11 @@ REGULAR TODOs
 [ ] pillars need separate object and pillar locations and ONLY single story rooms
 
 [ ] better second floor stuff
-    [ ] random pick for next but skip previous (add one) -- use for second floor instead of just +1
-    [ ] do corners
-    [ ] do stubs
+    [ ] can we combine neg and pos versions of steps?
+    [X] looks like stair polys have a bug
+    [X] random pick for next but skip previous (add one) -- use for second floor instead of just +1
+    [ ] need to make one size the stair side and then the other sides by a random % (25, 50% etc)
+    [ ] exits can be on any level?
 
 [ ] try to pack glsl light struct floats
 

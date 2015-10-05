@@ -140,15 +140,15 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         var mesh,mesh2;
         
-        var bitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
+        var roomBitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
 
         for (n=0;n!==storyCount;n++) {
             if (n===0) {
-                mesh=piece.createMeshWalls(bitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+                mesh=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
             }
             else {
                 yStoryBound.add(-yStoryAdd);
-                mesh2=piece.createMeshWalls(bitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+                mesh2=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
                 mesh.combineMesh(mesh2);
             }
         }
@@ -163,7 +163,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
         if (storyCount>1) {
             var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom);
-            genRoomPlatform.createPlatforms(storyCount,yStoryAdd,xBound,yBound,zBound);
+            genRoomPlatform.createPlatforms(storyCount,yStoryAdd,roomBitmap,xBound,yBound,zBound);
         }
 
         return(yStoryBound);
@@ -174,7 +174,27 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
 
         var roomBitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
-        genRoomStairs.createStairs(roomBitmap,piece,connectType,xStairBound,yStairBound,zStairBound);
+        var stairBitmap=this.map.getBitmapById(BITMAP_STAIR_TILE);
+
+        switch (connectType) {
+            
+            case piece.CONNECT_TYPE_LEFT:
+                genRoomStairs.createStairsPosX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                break;
+                
+            case piece.CONNECT_TYPE_TOP:
+                genRoomStairs.createStairsPosZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                break;
+                
+            case piece.CONNECT_TYPE_RIGHT:
+                genRoomStairs.createStairsNegX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                break;
+                
+            case piece.CONNECT_TYPE_BOTTOM:
+                genRoomStairs.createStairsNegZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false);
+                break;
+                
+        }
     };
 
     this.addLight=function(piece,storyCount,xBound,yBound,zBound)

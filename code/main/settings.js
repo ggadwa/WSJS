@@ -23,7 +23,7 @@ function SettingsObject()
     
     this.ambient=[0.0,0.0,0.0];             // all over ambient light
     
-    this.generateLightmap=true;               // set to true to generate light maps
+    this.generateLightmap=false;               // set to true to generate light maps
 
         // models
         
@@ -55,7 +55,7 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=Math.floor((Math.random()*seed));
+    this.randomSeedMap=4; //Math.floor((Math.random()*seed));
     this.randomSeedModelBitmap=Math.floor((Math.random()*seed));
     this.randomSeedModel=Math.floor((Math.random()*seed));
     this.randomSeedEntity=Math.floor((Math.random()*seed));
