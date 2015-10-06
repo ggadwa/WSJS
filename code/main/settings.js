@@ -8,7 +8,7 @@ function SettingsObject()
 {
         // map construction
         
-    this.maxRoomCount=5;                   // the maximum possible number of rooms in the map
+    this.maxRoomCount=10;                   // the maximum possible number of rooms in the map
     
     this.maxRoomRecursion=3;                // how far down you will recurse to make rooms off a single room
     this.maxStoryCount=3;                   // maximum number of possible stories for a single room
@@ -55,7 +55,7 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=4; //Math.floor((Math.random()*seed));
+    this.randomSeedMap=2000; //Math.floor((Math.random()*seed));
     this.randomSeedModelBitmap=Math.floor((Math.random()*seed));
     this.randomSeedModel=Math.floor((Math.random()*seed));
     this.randomSeedEntity=Math.floor((Math.random()*seed));

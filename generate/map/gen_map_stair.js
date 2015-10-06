@@ -212,12 +212,12 @@ function GenRoomStairs(map,genRandom)
         
         var nIdx=0;
         if (!flip) {
-            xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
             stepAdd=xBound.getSize()/this.STEP_COUNT;
+            xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
         }
         else {
-            xStepBound=new wsBound((xBound.max-stepAdd),xBound.max);
             stepAdd=-(xBound.getSize()/this.STEP_COUNT);
+            xStepBound=new wsBound((xBound.max+stepAdd),xBound.max);
         }
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
         
@@ -311,13 +311,13 @@ function GenRoomStairs(map,genRandom)
         
         var nIdx=0;
         if (!flip) {
-            zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));
             stepAdd=zBound.getSize()/this.STEP_COUNT;
+            zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));
 
         }
         else {
-            zStepBound=new wsBound((zBound.max-stepAdd),zBound.max);
             stepAdd=-(zBound.getSize()/this.STEP_COUNT);
+            zStepBound=new wsBound((zBound.max+stepAdd),zBound.max);
         }
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
 

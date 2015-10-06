@@ -473,9 +473,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 var nextNeedStairs=false;
                 yStoryBound=yBound.copy();
 
-                if (noCurrentStairs) {
+                //if (noCurrentStairs) {
 
-                    if (this.genRandom.random()<settings.storyChangePercentage) {
+                    //if (this.genRandom.random()<settings.storyChangePercentage) {
 
                             // move new room up
                             // and switch level
@@ -492,8 +492,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                             // at a time
                             
                         noCurrentStairs=false;
-                    }
-                }
+                    //}
+                //}
 
                     // recurse on to build the new room
 

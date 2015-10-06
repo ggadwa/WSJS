@@ -92,7 +92,7 @@ function GenRoomPlatform(map,genRandom)
             }
             
                 // stairs
-                
+  
             var stairBitmap=this.map.getBitmapById(BITMAP_STAIR_TILE);
             
             xStairBound=new wsBound(0,0);
