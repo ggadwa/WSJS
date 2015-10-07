@@ -44,8 +44,7 @@ function GenRoomPlatform(map,genRandom)
             // do a platform for each story
 
         var yPlatformBound=yBound.copy();
-        yPlatformBound.min-=500;
-        yPlatformBound.max=yPlatformBound.min+500;
+        var yPlatformBound=new wsBound((yBound.min-500),yBound.min);
         
             // get random platform
 
@@ -100,26 +99,26 @@ function GenRoomPlatform(map,genRandom)
             zStairBound=new wsBound(0,0);
             
             xStairBound.min=xBound.min+(xBound.getSize()*0.25);
-            xStairBound.max=xBound.min+((xBound.getSize()*0.25)+4000);
-            zStairBound.min=zBound.min+((zBound.getSize()*0.50)-1000);
-            zStairBound.max=zBound.min+((zBound.getSize()*0.50)+1000);
+            xStairBound.max=xBound.min+((xBound.getSize()*0.25)+5000);
+            zStairBound.min=zBound.min+((zBound.getSize()*0.50)-2000);
+            zStairBound.max=zBound.min+((zBound.getSize()*0.50)+2000);
             genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,false);
 
-            xStairBound.min=xBound.min+((xBound.getSize()*0.50)-1000);
-            xStairBound.max=xBound.min+((xBound.getSize()*0.50)+1000);
+            xStairBound.min=xBound.min+((xBound.getSize()*0.50)-2000);
+            xStairBound.max=xBound.min+((xBound.getSize()*0.50)+2000);
             zStairBound.min=zBound.min+(zBound.getSize()*0.25);
-            zStairBound.max=zBound.min+((zBound.getSize()*0.25)+4000);
+            zStairBound.max=zBound.min+((zBound.getSize()*0.25)+5000);
             genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,false);
 
-            xStairBound.min=xBound.max-((xBound.getSize()*0.25)+4000);
+            xStairBound.min=xBound.max-((xBound.getSize()*0.25)+5000);
             xStairBound.max=xBound.max-(xBound.getSize()*0.25);
-            zStairBound.min=zBound.min+((zBound.getSize()*0.50)-1000);
-            zStairBound.max=zBound.min+((zBound.getSize()*0.50)+1000);
+            zStairBound.min=zBound.min+((zBound.getSize()*0.50)-2000);
+            zStairBound.max=zBound.min+((zBound.getSize()*0.50)+2000);
             genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,true);
 
-            xStairBound.min=xBound.min+((xBound.getSize()*0.50)-1000);
-            xStairBound.max=xBound.min+((xBound.getSize()*0.50)+1000);
-            zStairBound.min=zBound.max-((zBound.getSize()*0.25)+4000);
+            xStairBound.min=xBound.min+((xBound.getSize()*0.50)-2000);
+            xStairBound.max=xBound.min+((xBound.getSize()*0.50)+2000);
+            zStairBound.min=zBound.max-((zBound.getSize()*0.25)+5000);
             zStairBound.max=zBound.max-(zBound.getSize()*0.25);
             genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,true);
 
