@@ -9,19 +9,12 @@ function GenRoomPlatform(map,genRandom)
     this.map=map;
     this.genRandom=genRandom;
     
-        // platform definitions
-        // [left,top,bottom,right,left stub,top stub,bottom stub,right stub]
+        // platform constants
         
-    this.platforms=[];
-    
-    this.platforms.push([1,1,0,0,0,0,0,0]);
-    this.platforms.push([0,0,1,1,0,0,0,0]);
-    this.platforms.push([1,1,0,0,1,1,0,0]);
-    this.platforms.push([0,0,1,1,0,0,1,1]);
-    this.platforms.push([1,1,1,1,0,0,0,0]);
-    this.platforms.push([1,1,1,1,1,1,1,1]);
-    this.platforms.push([1,1,1,0,0,0,0,0]);
-    this.platforms.push([1,0,1,1,0,0,0,0]);
+    this.SIDE_MIN_Z=0;
+    this.SIDE_MIN_X=1;
+    this.SIDE_MAX_Z=2;
+    this.SIDE_MAX_X=3;
     
         //
         // platform mainline
@@ -29,13 +22,14 @@ function GenRoomPlatform(map,genRandom)
     
     this.createPlatforms=function(storyCount,yStoryAdd,roomBitmap,xBound,yBound,zBound)
     {
-        var n,platform;
+        var n,platformSide,platformSize;
         var xPlatformBound,zPlatformBound;
-        var xStairBound,yStairBound,zStairBound;
+        var xStairBound,yStairBound,zStairBound,stairFlip;
         
-            // platform bitmap
+            // bitmaps
             
-        var bitmap=this.map.getBitmapById(BITMAP_WOOD_PLANK);
+        var platformBitmap=this.map.getBitmapById(BITMAP_WOOD_PLANK);
+        var stairBitmap=this.map.getBitmapById(BITMAP_STAIR_TILE);
         
             // stairs
             
@@ -46,93 +40,73 @@ function GenRoomPlatform(map,genRandom)
         var yPlatformBound=yBound.copy();
         var yPlatformBound=new wsBound((yBound.min-500),yBound.min);
         
-            // get random platform
-
-        var platformIdx=this.genRandom.randomInt(0,this.platforms.length);
-        var nextPlatformIdx;
-        
             // platform for each story
             
         for (n=1;n!==storyCount;n++) {
             
-                // get the platform data
+                // get random side to start
+                // platform and steps on
                 
-            platform=this.platforms[platformIdx];
+            platformSide=this.genRandom.randomInt(0,4);
+            
+                // get random platform size for
+                // this side
                 
-                // supergumba -- need to have corners (0.25 of size)
-
-            if (platform[0]!==0) {
-                xPlatformBound=xBound.copy();
-                xPlatformBound.min=xBound.min;
-                xPlatformBound.max=xBound.min+(xBound.getSize()*0.25);
-                zPlatformBound=zBound.copy();
-                this.map.addMesh(meshPrimitives.createMeshCube(bitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
-            }
-            if (platform[1]!==0) {
-                xPlatformBound=xBound.copy();
-                zPlatformBound=zBound.copy();
-                zPlatformBound.min=zBound.min;
-                zPlatformBound.max=zBound.min+(zBound.getSize()*0.25);
-                this.map.addMesh(meshPrimitives.createMeshCube(bitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
-            }
-            if (platform[2]!==0) {
-                xPlatformBound=xBound.copy();
-                xPlatformBound.max=xBound.max;
-                xPlatformBound.min=xBound.max-(xBound.getSize()*0.25);
-                zPlatformBound=zBound.copy();
-                this.map.addMesh(meshPrimitives.createMeshCube(bitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
-            }
-            if (platform[3]!==0) {
-                xPlatformBound=xBound.copy();
-                zPlatformBound=zBound.copy();
-                zPlatformBound.max=zBound.max;
-                zPlatformBound.min=zBound.max-(zBound.getSize()*0.25);
-                this.map.addMesh(meshPrimitives.createMeshCube(bitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
-            }
+            platformSize=this.genRandom.randomInt(10,20)/100;
             
-                // stairs
-  
-            var stairBitmap=this.map.getBitmapById(BITMAP_STAIR_TILE);
-            
-            xStairBound=new wsBound(0,0);
-            yStairBound=yBound.copy();
-            zStairBound=new wsBound(0,0);
-            
-            xStairBound.min=xBound.min+(xBound.getSize()*0.25);
-            xStairBound.max=xBound.min+((xBound.getSize()*0.25)+5000);
-            zStairBound.min=zBound.min+((zBound.getSize()*0.50)-2000);
-            zStairBound.max=zBound.min+((zBound.getSize()*0.50)+2000);
-            genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,false);
-
-            xStairBound.min=xBound.min+((xBound.getSize()*0.50)-2000);
-            xStairBound.max=xBound.min+((xBound.getSize()*0.50)+2000);
-            zStairBound.min=zBound.min+(zBound.getSize()*0.25);
-            zStairBound.max=zBound.min+((zBound.getSize()*0.25)+5000);
-            genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,false);
-
-            xStairBound.min=xBound.max-((xBound.getSize()*0.25)+5000);
-            xStairBound.max=xBound.max-(xBound.getSize()*0.25);
-            zStairBound.min=zBound.min+((zBound.getSize()*0.50)-2000);
-            zStairBound.max=zBound.min+((zBound.getSize()*0.50)+2000);
-            genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,true);
-
-            xStairBound.min=xBound.min+((xBound.getSize()*0.50)-2000);
-            xStairBound.max=xBound.min+((xBound.getSize()*0.50)+2000);
-            zStairBound.min=zBound.max-((zBound.getSize()*0.25)+5000);
-            zStairBound.max=zBound.max-(zBound.getSize()*0.25);
-            genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,true,true);
-
-            
-                // pick another platform, but don't
-                // use the same one
+                // add the first platform
+                // and steps
                 
-            nextPlatformIdx=this.genRandom.randomInt(0,this.platforms.length);
-            if (nextPlatformIdx===platformIdx) {
-                nextPlatformIdx++;
-                if (nextPlatformIdx>=this.platforms.length) nextPlatformIdx=0;
-            }
-            platformIdx=nextPlatformIdx;
+            switch (platformSide) {
+                case this.SIDE_MIN_Z:
+                    xPlatformBound=xBound;
+                    zPlatformBound=new wsBound(zBound.min,(zBound.min+(zBound.getSize()*platformSize)));
+                    
+                    stairFlip=false;
+                    xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-2000),xBound.min+((xBound.getSize()*0.50)+2000));
+                    zStairBound=new wsBound(zPlatformBound.max,(zPlatformBound.max+5000));
+                    break;
+                case this.SIDE_MIN_X:
+                    xPlatformBound=new wsBound(xBound.min,(xBound.min+(xBound.getSize()*platformSize)));
+                    zPlatformBound=zBound;
+                    
+                    stairFlip=false;
+                    xStairBound=new wsBound(xPlatformBound.max,(xPlatformBound.max+5000));
+                    zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-2000),zBound.min+((zBound.getSize()*0.50)+2000));
+                    break;
+                case this.SIDE_MAX_Z:
+                    xPlatformBound=xBound;
+                    zPlatformBound=new wsBound((zBound.max-(zBound.getSize()*platformSize)),zBound.max);
+                    
+                    stairFlip=true;
+                    xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-2000),xBound.min+((xBound.getSize()*0.50)+2000));
+                    zStairBound=new wsBound((zPlatformBound.min-5000),zPlatformBound.min);
+                    break;
+                case this.SIDE_MAX_X:
+                    xPlatformBound=new wsBound((xBound.max-(xBound.getSize()*platformSize)),xBound.max);
+                    zPlatformBound=zBound;
+                    
+                    stairFlip=true;
+                    xStairBound=new wsBound((xPlatformBound.min-5000),xPlatformBound.min);
+                    zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-2000),zBound.min+((zBound.getSize()*0.50)+2000));
+                    break;
+            }   
+
+            this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
             
+            switch (platformSide) {
+                case this.SIDE_MIN_Z:
+                case this.SIDE_MAX_Z:
+                    genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,stairFlip);
+                    break;
+                case this.SIDE_MIN_X:
+                case this.SIDE_MAX_X:
+                    genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,stairFlip);
+                    break;
+            }
+
+            break;  // testing
+            //
                 // next story
 
             yPlatformBound.add(-yStoryAdd);

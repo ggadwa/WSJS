@@ -41,7 +41,9 @@ function SettingsObject()
     
         // draw testing
     
-    this.debugDraw=false;
+    this.debugDrawTangentSpace=false;
+    this.debugDrawMeshLines=false;
+    this.debugDrawSkeleton=false;
     
         // play testing
         
