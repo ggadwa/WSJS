@@ -22,9 +22,10 @@ function GenRoomPlatform(map,genRandom)
     
     this.createPlatforms=function(storyCount,yStoryAdd,roomBitmap,xBound,yBound,zBound)
     {
-        var n,platformSide,platformSize;
+        var n,platformSide,platformSize,platformSideSize;
+        var platformSideMin,platformSideMax;
         var xPlatformBound,zPlatformBound;
-        var xStairBound,yStairBound,zStairBound,stairFlip;
+        var xStairBound,yStairBound,zStairBound;
         
             // bitmaps
             
@@ -49,10 +50,17 @@ function GenRoomPlatform(map,genRandom)
                 
             platformSide=this.genRandom.randomInt(0,4);
             
+                // tell if there is a side or parallel
+                // platforms
+                
+            platformSideMin=this.genRandom.random()>0.75;
+            platformSideMax=this.genRandom.random()>0.75;
+            
                 // get random platform size for
                 // this side
                 
             platformSize=this.genRandom.randomInt(10,20)/100;
+            platformSideSize=this.genRandom.randomInt(15,25)/100;
             
                 // add the first platform
                 // and steps
@@ -61,52 +69,57 @@ function GenRoomPlatform(map,genRandom)
                 case this.SIDE_MIN_Z:
                     xPlatformBound=xBound;
                     zPlatformBound=new wsBound(zBound.min,(zBound.min+(zBound.getSize()*platformSize)));
+                    this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,false,false,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
-                    stairFlip=false;
                     xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-2000),xBound.min+((xBound.getSize()*0.50)+2000));
                     zStairBound=new wsBound(zPlatformBound.max,(zPlatformBound.max+5000));
+                    genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,false);
                     break;
+                    
                 case this.SIDE_MIN_X:
                     xPlatformBound=new wsBound(xBound.min,(xBound.min+(xBound.getSize()*platformSize)));
                     zPlatformBound=zBound;
+                    this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,false,false,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
-                    stairFlip=false;
                     xStairBound=new wsBound(xPlatformBound.max,(xPlatformBound.max+5000));
                     zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-2000),zBound.min+((zBound.getSize()*0.50)+2000));
+                    genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,false);
                     break;
+                    
                 case this.SIDE_MAX_Z:
                     xPlatformBound=xBound;
                     zPlatformBound=new wsBound((zBound.max-(zBound.getSize()*platformSize)),zBound.max);
+                    this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,false,false,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
-                    stairFlip=true;
                     xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-2000),xBound.min+((xBound.getSize()*0.50)+2000));
                     zStairBound=new wsBound((zPlatformBound.min-5000),zPlatformBound.min);
+                    genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true);
                     break;
+                    
                 case this.SIDE_MAX_X:
                     xPlatformBound=new wsBound((xBound.max-(xBound.getSize()*platformSize)),xBound.max);
                     zPlatformBound=zBound;
+                    this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,false,false,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
-                    stairFlip=true;
                     xStairBound=new wsBound((xPlatformBound.min-5000),xPlatformBound.min);
                     zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-2000),zBound.min+((zBound.getSize()*0.50)+2000));
-                    break;
-            }   
-
-            this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
-            
-            switch (platformSide) {
-                case this.SIDE_MIN_Z:
-                case this.SIDE_MAX_Z:
-                    genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,stairFlip);
-                    break;
-                case this.SIDE_MIN_X:
-                case this.SIDE_MAX_X:
-                    genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,stairFlip);
+                    genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true);
+                    
+                    if (platformSideMin||true) {
+                        xPlatformBound=new wsBound(xBound.min,xPlatformBound.min);
+                        zPlatformBound=new wsBound(zBound.min,(zBound.min+(zBound.getSize()*platformSideSize)));
+                        this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,false,false,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
+                    }
+                    if (platformSideMax||true) {
+                        xPlatformBound=new wsBound(xBound.min,xPlatformBound.min);
+                        zPlatformBound=new wsBound((zBound.max-(zBound.getSize()*platformSize)),zBound.max);
+                        this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,false,false,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
+                    }
+                    
                     break;
             }
+            
 
-            break;  // testing
-            //
                 // next story
 
             yPlatformBound.add(-yStoryAdd);
