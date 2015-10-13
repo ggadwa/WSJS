@@ -12,8 +12,11 @@ function SettingsObject()
     
     this.maxRoomRecursion=3;                // how far down you will recurse to make rooms off a single room
     this.maxStoryCount=3;                   // maximum number of possible stories for a single room
-    this.connectionPercentage=0.25;         // what % of the time a connection in a room spawns another room
-    this.storyChangePercentage=0.8;         // what % of the time a room gains another story
+    
+    this.connectionPercentage=0.25;             // what % of the time a connection in a room spawns another room
+    this.storyChangePercentage=0.8;             // what % of the time a room gains another story
+    this.storyPlatformSidePercentage=0.6;       // what % of the time a second story platform has a side piece
+    this.storyPlatformOppositePercentage=0.4;   // what % of the time a second story platform has an opposite piece
     
     this.decorations=false;                 // set to false for no decorations in the map
     

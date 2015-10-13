@@ -31,7 +31,6 @@ REGULAR TODOs
 
 [ ] better second floor stuff
     [X] can we combine neg and pos versions of steps?
-    [ ] stairs need to build normals always (pass into creation function since they will be equal)
     [X] looks like stair polys have a bug
     [X] random pick for next but skip previous (add one) -- use for second floor instead of just +1
     [ ] need to make one size the stair side and then the other sides by a random % (25, 50% etc)
