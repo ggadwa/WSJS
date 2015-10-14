@@ -8,7 +8,11 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 {
         // constants
         
-    this.TIMEOUT_MSEC=10;    
+    this.TIMEOUT_MSEC=10;
+    
+    this.STAIR_MODE_NONE=0;
+    this.STAIR_MODE_UP=1;
+    this.STAIR_MODE_DOWN=2;
 
         // variables
         
@@ -124,58 +128,64 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         // map parts
         //
 
-    this.addRoomMesh=function(piece,storyCount,xBound,yBound,zBound,levelCount)
+    this.addRoomMesh=function(piece,xBound,yBound,zBound,level)
     {
-        var n;
-
             // floor
 
-        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[levelCount%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[level%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
 
             // walls
-            // combine into a single mesh
-
-        var yStoryAdd=yBound.max-yBound.min;
-        var yStoryBound=yBound.copy();
+            // a single wall mesh and then
+            // a small one one top for floor depth
 
         var mesh,mesh2;
         
-        var roomBitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
+        var roomBitmap=this.map.getBitmapById(this.wallTextures[level%3]);
 
-        for (n=0;n!==storyCount;n++) {
-            if (n===0) {
-                mesh=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
-            }
-            else {
-                yStoryBound.add(-yStoryAdd);
-                mesh2=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
-                mesh.combineMesh(mesh2);
-            }
-        }
+        var mesh=piece.createMeshWalls(roomBitmap,xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+
+        var yStoryBound=new wsBound((yBound.min-settings.roomFloorDepth),yBound.min);
+        var mesh2=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+
+        mesh.combineMesh(mesh2);
 
         this.map.addMesh(mesh);
 
             // ceiling
 
-        this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_METAL),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
-        
-            // platforms
-            
-        if (storyCount>1) {
-            var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom);
-            genRoomPlatform.createPlatforms(storyCount,yStoryAdd,roomBitmap,xBound,yBound,zBound);
-        }
+        //this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_METAL),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
 
         return(yStoryBound);
     };
 
-    this.addStairRoom=function(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount)
+    this.addStairRoom=function(piece,connectType,xStairBound,yStairBound,zStairBound,flipDirection,level)
     {
         var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
 
-        var roomBitmap=this.map.getBitmapById(this.wallTextures[levelCount%3]);
+        var roomBitmap=this.map.getBitmapById(this.wallTextures[level%3]);
         var stairBitmap=this.map.getBitmapById(BITMAP_STAIR_TILE);
+        
+            // flip the direction if going down
+            
+        if (flipDirection) {
+            switch (connectType) {
+                case piece.CONNECT_TYPE_LEFT:
+                    connectType=piece.CONNECT_TYPE_RIGHT;
+                    break;
+                case piece.CONNECT_TYPE_TOP:
+                    connectType=piece.CONNECT_TYPE_BOTTOM;
+                    break;
+                case piece.CONNECT_TYPE_RIGHT:
+                    connectType=piece.CONNECT_TYPE_LEFT;
+                    break;
+                case piece.CONNECT_TYPE_BOTTOM:
+                    connectType=piece.CONNECT_TYPE_TOP;
+                    break;
+            }
+        }
 
+            // create the stairs
+            
         switch (connectType) {
             
             case piece.CONNECT_TYPE_LEFT:
@@ -197,7 +207,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         }
     };
 
-    this.addLight=function(piece,storyCount,xBound,yBound,zBound)
+    this.addLight=function(piece,xBound,yBound,zBound)
     {
             // light point
 
@@ -205,20 +215,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var lightZ=zBound.getMidPoint();
         
         var lightY=yBound.min;
-        var poleY=lightY;
-        if (storyCount>1) {
-            var storyAdd=yBound.max-yBound.min;
-            lightY+=(storyAdd*(storyCount-1))-Math.floor(storyAdd/4);
-        }
-        
-            // pole
-            
-        if (lightY>poleY) {
-            var xPoleBound=new wsBound((lightX-100),(lightX+100));
-            var yPoleBound=new wsBound(poleY,lightY);
-            var zPoleBound=new wsBound((lightZ-100),(lightZ+100));
-            this.map.addMesh(meshPrimitives.createMeshCube(this.map.getBitmapById(BITMAP_METAL),xPoleBound,yPoleBound,zPoleBound,true,true,true,true,true,false,false,this.map.MESH_FLAG_LIGHT));
-        }
 
             // light fixture
 
@@ -256,7 +252,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         // build map recursive room
         //
 
-    this.buildMapRecursiveRoom=function(recurseCount,connectPieceIdx,connectLineIdx,connectStoryCount,needStairs,xConnectBound,yConnectBound,zConnectBound,levelCount)
+    this.buildMapRecursiveRoom=function(recurseCount,connectPieceIdx,connectLineIdx,stairMode,xConnectBound,yConnectBound,zConnectBound,level)
     {
         var n;
 
@@ -276,10 +272,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         var nConnectLine=piece.connectLines.length;
         
-            // can only have a single staircase leading
-            // away from a room
+            // can only have a single level
+            // change from a room
             
-        var noCurrentStairs=true;
+        var noCurrentLevelChange=true;
 
             // get mesh location
             // if we don't have a connecting piece,
@@ -344,7 +340,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound((xConnectBound.min-settings.maxRoomSize[0]),xConnectBound.min);
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
-                        if (needStairs) {
+                        if (stairMode!==this.STAIR_MODE_NONE) {
                             stairAdd=connectLength[1]*2;
                             xBound.add(-stairAdd);
                             xStairBound=new wsBound((xConnectBound.min-stairAdd),xConnectBound.min);
@@ -356,7 +352,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                         zBound=new wsBound((zConnectBound.min-settings.maxRoomSize[2]),zConnectBound.min);
                         
-                        if (needStairs) {
+                        if (stairMode!==this.STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
                             zBound.add(-stairAdd);
                             xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
@@ -368,7 +364,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound(xConnectBound.max,(xConnectBound.max+settings.maxRoomSize[0]));
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
-                        if (needStairs) {
+                        if (stairMode!==this.STAIR_MODE_NONE) {
                             stairAdd=connectLength[1]*2;
                             xBound.add(stairAdd);
                             xStairBound=new wsBound(xConnectBound.max,(xConnectBound.max+stairAdd));
@@ -380,7 +376,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                         zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.maxRoomSize[2]));
                         
-                        if (needStairs) {
+                        if (stairMode!==this.STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
                             zBound.add(stairAdd);
                             xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
@@ -396,7 +392,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                     // we ignore the Y so upper stories don't
                     // go over current stories
 
-                if (this.map.boxBoundCollision(xBound,null,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) {
+                if (this.map.boxBoundCollision(xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) {
                     usedConnectLineIdx=n;
                     break;
                 }
@@ -410,27 +406,22 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // if previous room raised this one, then
             // we need a stairs to the previous room
 
-        if (needStairs) {
-            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.max-yBound.min)));
-            this.addStairRoom(piece,connectType,xStairBound,yStairBound,zStairBound,levelCount);
+        if (stairMode!==this.STAIR_MODE_NONE) {
+            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize())));
+            yStairBound.add(settings.roomFloorDepth);
+            this.addStairRoom(piece,connectType,xStairBound,yStairBound,zStairBound,(stairMode===this.STAIR_MODE_DOWN),level);
         }
-
-            // if a room, it's possible to be
-            // more than one story
-
-        var storyCount=1;
-        if (piece.isRoom) storyCount+=Math.floor(settings.maxStoryCount*this.genRandom.random());
 
             // add the room mesh
 
-        var yStoryBound=this.addRoomMesh(piece,storyCount,xBound,yBound,zBound,levelCount);
+        var yStoryBound=this.addRoomMesh(piece,xBound,yBound,zBound,level);
         var xDecorateBound=xBound.copy();
         var yDecorateBound=new wsBound(yStoryBound.min,yBound.max);
         var zDecorateBound=zBound.copy();
 
             // add the light
 
-        this.addLight(piece,storyCount,xBound,yStoryBound,zBound);
+        this.addLight(piece,xBound,yStoryBound,zBound);
 
             // have we recursed too far?
 
@@ -450,8 +441,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 // if a random boolean flag is true,
                 // than try to connect another room
                 // and recurse
-
-            var yStoryAdd=yBound.max-yBound.min;
+                
+            var nextLevel;
+            var nextStairMode;
+            var storyAdd=yBound.getSize()+settings.roomFloorDepth
 
             for (n=0;n!==nConnectLine;n++) {
 
@@ -470,34 +463,39 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                     // check if this connection should
                     // be a level change
 
-                var nextNeedStairs=false;
+                nextLevel=level;
+                nextStairMode=this.STAIR_MODE_NONE;
                 yStoryBound=yBound.copy();
 
-                //if (noCurrentStairs) {
+                if (noCurrentLevelChange) {
 
-                    //if (this.genRandom.random()<settings.storyChangePercentage) {
+                    if (this.genRandom.random()<settings.levelChangePercentage) {
 
-                            // move new room up
-                            // and switch level
-
-                        yStoryBound.add(-yStoryAdd);
-                        levelCount++;
-
-                            // and tell next room that
-                            // we need stairs to it
-
-                        nextNeedStairs=true;
-                        
-                            // only one stair away from a room
-                            // at a time
+                            // change level, we only have
+                            // two levels to keep map crossing
+                            // over itself
                             
-                        noCurrentStairs=false;
-                    //}
-                //}
+                        if (level===0) {
+                            nextLevel=1;
+                            yStoryBound.add(-storyAdd);
+                            nextStairMode=this.STAIR_MODE_UP;
+                        }
+                        else {
+                            nextLevel=0;
+                            yStoryBound.add(storyAdd);
+                            nextStairMode=this.STAIR_MODE_DOWN;
+                        }
+                        
+                            // only one level change
+                            // away from a room at a time
+                            
+                        noCurrentLevelChange=false;
+                    }
+                }
 
                     // recurse on to build the new room
 
-                this.buildMapRecursiveRoom((recurseCount+1),pieceIdx,n,storyCount,nextNeedStairs,xBound,yStoryBound,zBound,levelCount);
+                this.buildMapRecursiveRoom((recurseCount+1),pieceIdx,n,nextStairMode,xBound,yStoryBound,zBound,nextLevel);
             }
         }
         
@@ -553,7 +551,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // start the recursive
             // room adding
 
-        this.buildMapRecursiveRoom(0,-1,-1,-1,false,null,null,null,0);
+        this.buildMapRecursiveRoom(0,-1,-1,this.STAIR_MODE_NONE,null,null,null,0);
         
         this.view.loadingScreenDraw(0.5);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },this.TIMEOUT_MSEC);
