@@ -33,6 +33,12 @@ function EntityObject(position,angle,radius,model,isPlayer)
         var movePt=new wsPoint(0.0,0.0,dist);
         movePt.rotateY(null,angY);
         
+            // flying
+            
+        if (settings.fly) {
+            movePt.rotateZ(null,this.angle.x);
+        }
+        
             // wall clipping setting, remove later
             
         if ((settings.clipWalls) && (this.isPlayer)) {

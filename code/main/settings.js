@@ -18,16 +18,19 @@ function SettingsObject()
     this.storyPlatformSidePercentage=0.6;       // what % of the time a second story platform has a side piece
     this.storyPlatformOppositePercentage=0.4;   // what % of the time a second story platform has an opposite piece
     
-    this.decorations=false;                 // set to false for no decorations in the map
+    this.decorations=false;                     // set to false for no decorations in the map
     
-    this.maxRoomSize=[35000,7000,35000];    // maximum size for a room [x,y,z]
+    this.maxRoomSize=[35000,7000,35000];        // maximum size for a room [x,y,z]
     this.roomFloorDepth=700;
     
         // lighting
     
-    this.ambient=[0.0,0.0,0.0];             // all over ambient light
+    this.ambient=[0.0,0.0,0.0];                 // all over ambient light
     
-    this.generateLightmap=false;               // set to true to generate light maps
+    this.mapLightBoost=0.5;                     // factors for randomized lighting intensities past room radius
+    this.mapLightBoostExtra=0.4;
+    
+    this.generateLightmap=false;                // set to true to generate light maps
 
         // models
         

@@ -75,7 +75,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
             boxBoundY=new wsBound((yBound.max-high),yBound.max);
             boxBoundZ=new wsBound((z-1000),(z+1000));
             
-            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
+            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,-1,this.map.MESH_FLAG_STAIR)!==-1) continue;
             
             map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
         }
@@ -123,7 +123,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
             
                 // put in the pillar
             
-            if (this.map.boxBoundCollision(boxBoundX,yBound,boxBoundZ,this.map.MESH_FLAG_STAIR)===-1) {
+            if (this.map.boxBoundCollision(boxBoundX,yBound,boxBoundZ,-1,this.map.MESH_FLAG_STAIR)===-1) {
                 map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
             }
             

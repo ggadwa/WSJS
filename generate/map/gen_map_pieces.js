@@ -10,7 +10,8 @@ function MapPieceObject(isRoom)
     this.points=[];
     this.connectLines=[];
     this.decorationLocations=[];
-    this.platformGrid=null;
+    
+    this.floorGrid=null;
     
     this.CONNECT_TYPE_LEFT=0;
     this.CONNECT_TYPE_TOP=1;
@@ -76,12 +77,16 @@ function MapPieceObject(isRoom)
         var connectLine=this.connectLines[connectLineIdx];
         var pt1=this.points[connectLine[0]];
         var pt2=this.points[connectLine[1]];
+        
+        var sx=xBound.getSize();
 
-        var x1=Math.floor((xBound.max-xBound.min)*(pt1[0]*0.01));
-        var x2=Math.floor((xBound.max-xBound.min)*(pt2[0]*0.01));
+        var x1=Math.floor(sx*(pt1[0]*0.01));
+        var x2=Math.floor(sx*(pt2[0]*0.01));
 
-        var z1=Math.floor((zBound.max-zBound.min)*(pt1[1]*0.01));
-        var z2=Math.floor((zBound.max-zBound.min)*(pt2[1]*0.01));
+        var sz=zBound.getSize();
+        
+        var z1=Math.floor(sz*(pt1[1]*0.01));
+        var z2=Math.floor(sz*(pt2[1]*0.01));
 
         return([Math.abs(x2-x1),Math.abs(z2-z1)]);
     };
@@ -90,101 +95,86 @@ function MapPieceObject(isRoom)
         // piece object mesh creation
         //
 
-    this.createMeshFloor=function(bitmap,xBound,yBound,zBound,flag)
+    this.createMeshFloorOrCeiling=function(bitmap,xBound,yBound,zBound,isFloor,mask,flag)
     {
-        var n;
-        var vertices=new Float32Array(18);
-
-        vertices[0]=xBound.min;
-        vertices[1]=yBound.max;
-        vertices[2]=zBound.min;
-        vertices[3]=xBound.max;
-        vertices[4]=yBound.max;
-        vertices[5]=zBound.min;
-        vertices[6]=xBound.max;
-        vertices[7]=yBound.max;
-        vertices[8]=zBound.max;
+        var n,x,z,vxMin,vxMax,vzMin,vzMax;
         
-        vertices[9]=xBound.min;
-        vertices[10]=yBound.max;
-        vertices[11]=zBound.min;
-        vertices[12]=xBound.max;
-        vertices[13]=yBound.max;
-        vertices[14]=zBound.max;
-        vertices[15]=xBound.min;
-        vertices[16]=yBound.max;
-        vertices[17]=zBound.max;
-
-        var indexes=new Uint16Array(6);
+            // get the vertex count
+            
+        var count=0;
         
-        for (n=0;n!==6;n++) {
-            indexes[n]=n;
+        for (z=0;z!==5;z++) {
+            for (x=0;x!==5;x++) {
+                count+=(this.floorGrid[z][x]&mask[z][x]);
+            }
         }
-
-            // always force normals up
-
-        var nIdx=0;
-        var normals=new Float32Array(18);
-
-        for (n=0;n!==6;n++) {
-            normals[nIdx++]=0.0;
-            normals[nIdx++]=-1.0;
-            normals[nIdx++]=0.0;
-        }
-
-            // calcualte the uvs, and finally the UVs to
-            // calculate the tangents
-
-        var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
-
-            // finally create the mesh
-
-        return(new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
-    };
-
-    this.createMeshCeiling=function(bitmap,xBound,yBound,zBound,flag)
-    {
-        var n;
-        var vertices=new Float32Array(18);
-
-        vertices[0]=xBound.min;
-        vertices[1]=yBound.min;
-        vertices[2]=zBound.min;
-        vertices[3]=xBound.max;
-        vertices[4]=yBound.min;
-        vertices[5]=zBound.min;
-        vertices[6]=xBound.max;
-        vertices[7]=yBound.min;
-        vertices[8]=zBound.max;
         
-        vertices[9]=xBound.min;
-        vertices[10]=yBound.min;
-        vertices[11]=zBound.min;
-        vertices[12]=xBound.max;
-        vertices[13]=yBound.min;
-        vertices[14]=zBound.max;
-        vertices[15]=xBound.min;
-        vertices[16]=yBound.min;
-        vertices[17]=zBound.max;
-
-        var indexes=new Uint16Array(6);
+        if (count===0) return(null);
         
-        for (n=0;n!==6;n++) {
-            indexes[n]=n;
+            // bounds
+            
+        var sx=xBound.getSize();
+        var sz=zBound.getSize();
+        
+            // create mesh
+            
+        var vertices=new Float32Array(count*18);
+        var indexes=new Uint16Array(count*6);
+        var normals=new Float32Array(count*18);
+        
+        var vIdx=0;
+        var vArrIdx=0;
+        var iArrIdx=0;
+        var nArrIdx=0;
+        
+        var y=isFloor?yBound.max:yBound.min;
+        var ny=isFloor?-1.0:1.0;
+        
+        for (z=0;z!==5;z++) {
+            for (x=0;x!==5;x++) {
+                if ((this.floorGrid[z][x]&mask[z][x])===0) continue;
+        
+                vxMin=xBound.min+Math.floor(sx*(x*0.2));
+                vxMax=xBound.min+Math.floor(sx*((x+1)*0.2));
+                vzMin=zBound.min+Math.floor(sz*(z*0.2));
+                vzMax=zBound.min+Math.floor(sz*((z+1)*0.2));
+                
+                vertices[vArrIdx++]=vxMin;
+                vertices[vArrIdx++]=y;
+                vertices[vArrIdx++]=vzMin;
+                vertices[vArrIdx++]=vxMax;
+                vertices[vArrIdx++]=y;
+                vertices[vArrIdx++]=vzMin;
+                vertices[vArrIdx++]=vxMax;
+                vertices[vArrIdx++]=y;
+                vertices[vArrIdx++]=vzMax;
+                
+                indexes[iArrIdx++]=vIdx++;
+                indexes[iArrIdx++]=vIdx++;
+                indexes[iArrIdx++]=vIdx++;
+                
+                vertices[vArrIdx++]=vxMin;
+                vertices[vArrIdx++]=y;
+                vertices[vArrIdx++]=vzMin;
+                vertices[vArrIdx++]=vxMax;
+                vertices[vArrIdx++]=y;
+                vertices[vArrIdx++]=vzMax;
+                vertices[vArrIdx++]=vxMin;
+                vertices[vArrIdx++]=y;
+                vertices[vArrIdx++]=vzMax;
+
+                indexes[iArrIdx++]=vIdx++;
+                indexes[iArrIdx++]=vIdx++;
+                indexes[iArrIdx++]=vIdx++;
+
+                for (n=0;n!==6;n++) {
+                    normals[nArrIdx++]=0.0;
+                    normals[nArrIdx++]=ny;
+                    normals[nArrIdx++]=0.0;
+                }
+            }
         }
-
-            // always force normals down
-
-        var nIdx=0;
-        var normals=new Float32Array(18);
-
-        for (n=0;n!==6;n++) {
-            normals[nIdx++]=0.0;
-            normals[nIdx++]=1.0;
-            normals[nIdx++]=0.0;
-        }
-
+        
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
@@ -211,18 +201,21 @@ function MapPieceObject(isRoom)
 
         var vertices=new Float32Array(nPoint*18);
         var indexes=new Uint16Array(nPoint*6);
+        
+        var sx=xBound.getSize();
+        var sz=zBound.getSize();
 
         for (n=0;n!==nPoint;n++) {
             k=n+1;
             if (k===nPoint) k=0;
 
             pt=this.points[n];
-            x1=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
-            z1=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
+            x1=xBound.min+Math.floor(sx*(pt[0]*0.01));
+            z1=zBound.min+Math.floor(sz*(pt[1]*0.01));
 
             pt=this.points[k];
-            x2=xBound.min+Math.floor((xBound.max-xBound.min)*(pt[0]*0.01));
-            z2=zBound.min+Math.floor((zBound.max-zBound.min)*(pt[1]*0.01));
+            x2=xBound.min+Math.floor(sx*(pt[0]*0.01));
+            z2=zBound.min+Math.floor(sz*(pt[1]*0.01));
 
             vertices[vArrIdx++]=x1;
             vertices[vArrIdx++]=yBound.min;
@@ -306,7 +299,7 @@ function MapPieceObject(isRoom)
         mapPiece2.points=JSON.parse(JSON.stringify(this.points));
         mapPiece2.connectLines=JSON.parse(JSON.stringify(this.connectLines));
         mapPiece2.decorationLocations=JSON.parse(JSON.stringify(this.decorationLocations));
-        if (this.platformGrid!==null) mapPiece2.platformGrid=JSON.parse(JSON.stringify(this.platformGrid));
+        mapPiece2.floorGrid=JSON.parse(JSON.stringify(this.floorGrid));
         return(mapPiece2);
     };
 
@@ -329,22 +322,13 @@ function MapPieceObject(isRoom)
             pt[1]=100-pt[1];
         }
         
-        if (this.platformGrid!==null) {
-            var grid=[];
-            var gridLine;
+        var grid=[];
 
-            for (y=0;y!==10;y++) {
-                gridLine=[];
-
-                for (x=0;x!==10;x++) {
-                    gridLine.push(this.platformGrid[y][9-x]);
-                }
-
-                grid.push(gridLine);
-            }
-
-            this.platformGrid=grid;
+        for (y=0;y!==5;y++) {
+            grid.push(this.floorGrid[4-y]);
         }
+
+        this.floorGrid=grid;
     };
 
     this.rotate=function()
@@ -370,29 +354,21 @@ function MapPieceObject(isRoom)
             pt[1]=k;
         }
         
-        if (this.platformGrid!==null) {
-            
-            var grid=[
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0],
-              [0,0,0,0,0,0,0,0,0,0]
-            ];
+        var grid=[
+          [0,0,0,0,0],
+          [0,0,0,0,0],
+          [0,0,0,0,0],
+          [0,0,0,0,0],
+          [0,0,0,0,0]
+        ];
 
-            for (y=0;y!==10;y++) {
-                for (x=0;x!==10;x++) {
-                    grid[x][y]=this.platformGrid[y][x];
-                }
+        for (y=0;y!==5;y++) {
+            for (x=0;x!==5;x++) {
+                grid[x][y]=this.floorGrid[y][x];
             }
-
-            this.platformGrid=grid;
         }
+
+        this.floorGrid=grid;
     };
     
 }
@@ -441,17 +417,12 @@ function MapPieceListObject()
         mapPiece.points.push([0,40]);
         mapPiece.points.push([0,20]);
         
-        mapPiece.platformGrid=[
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0]
+        mapPiece.floorGrid=[
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1]
         ];
 
         this.add(mapPiece);
@@ -479,17 +450,12 @@ function MapPieceListObject()
         mapPiece.points.push([0,80]);
         mapPiece.points.push([0,60]);
         
-        mapPiece.platformGrid=[
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0],
-          [1,1,1,0,0,0,0,0,0,0]
+        mapPiece.floorGrid=[
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1]
         ];
 
         this.add(mapPiece);
@@ -519,17 +485,12 @@ function MapPieceListObject()
         mapPiece.points.push([0,40]);
         mapPiece.points.push([0,20]);
         
-        mapPiece.platformGrid=[
-          [0,0,0,1,1,1,1,0,0,0],
-          [0,0,0,1,1,1,1,0,0,0],
-          [0,0,0,1,1,1,1,0,0,0],
-          [0,0,0,1,1,1,1,0,0,0],
-          [0,0,0,1,1,1,1,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0]
+        mapPiece.floorGrid=[
+          [1,1,0,1,1],
+          [1,1,0,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1]
         ];
 
         this.add(mapPiece);
@@ -564,6 +525,14 @@ function MapPieceListObject()
         mapPiece.points.push([20,60]);
         mapPiece.points.push([20,40]);
         mapPiece.points.push([0,40]);
+        
+        mapPiece.floorGrid=[
+          [0,1,0,1,0],
+          [1,1,1,1,1],
+          [0,1,1,1,0],
+          [1,1,1,1,1],
+          [1,1,1,1,1]
+        ];
 
         this.add(mapPiece);
         
@@ -596,17 +565,12 @@ function MapPieceListObject()
         mapPiece.points.push([20,40]);
         mapPiece.points.push([0,20]);
         
-        mapPiece.platformGrid=[
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,1,1,1,1,1,1,0,0],
-          [0,0,1,1,1,1,1,1,0,0],
-          [0,0,1,1,1,1,1,1,0,0],
-          [0,0,1,1,1,1,1,1,0,0],
-          [0,0,1,1,1,1,1,1,0,0],
-          [0,0,1,1,1,1,1,1,0,0],
-          [0,0,0,0,0,0,0,0,0,0],
-          [0,0,0,0,0,0,0,0,0,0]
+        mapPiece.floorGrid=[
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,1]
         ];
 
         this.add(mapPiece);   
@@ -627,6 +591,14 @@ function MapPieceListObject()
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
         mapPiece.points.push([40,40]);
+        
+        mapPiece.floorGrid=[
+          [0,0,1,0,0],
+          [0,0,1,0,0],
+          [1,1,1,1,1],
+          [0,0,1,0,0],
+          [0,0,1,0,0]
+        ];
 
         this.add(mapPiece);
 
@@ -652,6 +624,14 @@ function MapPieceListObject()
         mapPiece.points.push([20,60]);
         mapPiece.points.push([20,40]);
         mapPiece.points.push([0,20]);
+        
+        mapPiece.floorGrid=[
+          [1,1,0,1,1],
+          [1,1,1,1,1],
+          [0,1,1,1,0],
+          [0,1,1,1,0],
+          [0,1,1,1,0]
+        ];
 
         this.add(mapPiece);
 
@@ -675,6 +655,14 @@ function MapPieceListObject()
         mapPiece.points.push([40,80]);
         mapPiece.points.push([40,100]);
         mapPiece.points.push([20,100]);
+        
+        mapPiece.floorGrid=[
+          [0,1,1,1,1],
+          [1,1,1,1,1],
+          [1,1,1,1,0],
+          [1,1,1,0,0],
+          [1,1,0,0,0]
+        ];
 
         this.add(mapPiece);
         
@@ -698,6 +686,14 @@ function MapPieceListObject()
         mapPiece.points.push([40,60]);
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
+        
+        mapPiece.floorGrid=[
+          [0,1,0,0,0],
+          [1,1,1,0,0],
+          [1,1,1,1,1],
+          [0,0,1,1,1],
+          [0,0,0,1,0]
+        ];
 
         this.add(mapPiece);
     };

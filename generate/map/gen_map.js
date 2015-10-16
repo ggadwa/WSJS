@@ -19,6 +19,12 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     this.view=view;
     this.map=map;
     this.genRandom=genRandom;
+    
+        // lists of specialized objects
+        // we use to track rooms and add
+        // additional elements
+        
+    this.roomFloorCeilingList=[];
     this.roomDecorationList=[];
     
         // the callback function when
@@ -97,7 +103,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 }
             }
         }
-
+        
             // finally delete the triangles
 
         var nTrig=trigList.length;
@@ -128,34 +134,24 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         // map parts
         //
 
-    this.addRoomMesh=function(piece,xBound,yBound,zBound,level)
+    this.addRoomWalls=function(piece,xBound,yBound,zBound,level)
     {
-            // floor
-
-        this.map.addMesh(piece.createMeshFloor(this.map.getBitmapById(this.floorTextures[level%3]),xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_FLOOR));
-
-            // walls
-            // a single wall mesh and then
-            // a small one one top for floor depth
-
-        var mesh,mesh2;
-        
         var roomBitmap=this.map.getBitmapById(this.wallTextures[level%3]);
 
+            // regular walls
+            
         var mesh=piece.createMeshWalls(roomBitmap,xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
 
+            // floor depth wall
+            
         var yStoryBound=new wsBound((yBound.min-settings.roomFloorDepth),yBound.min);
         var mesh2=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
 
         mesh.combineMesh(mesh2);
 
-        this.map.addMesh(mesh);
-
-            // ceiling
-
-        //this.map.addMesh(piece.createMeshCeiling(this.map.getBitmapById(BITMAP_METAL),xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_CEILING));
-
-        return(yStoryBound);
+            // add to map
+            
+        return(this.map.addMesh(mesh));
     };
 
     this.addStairRoom=function(piece,connectType,xStairBound,yStairBound,zStairBound,flipDirection,level)
@@ -229,7 +225,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var zSize=zBound.getSize();
         if (zSize>intensity) intensity=zSize;
         
-        intensity*=(0.6+(this.genRandom.random()*0.4));
+        intensity*=(settings.mapLightBoost+(this.genRandom.random()*settings.mapLightBoostExtra));
 
         var pt=new wsPoint(lightX,(lightY+1100),lightZ);
 
@@ -389,10 +385,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 yBound=yConnectBound.copy();
 
                     // is it blocked by other pieces?
-                    // we ignore the Y so upper stories don't
-                    // go over current stories
 
-                if (this.map.boxBoundCollision(xBound,yBound,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) {
+                if (this.map.boxBoundCollision(xBound,yBound,zBound,-1,this.map.MESH_FLAG_ROOM_WALL)===-1) {
                     usedConnectLineIdx=n;
                     break;
                 }
@@ -407,21 +401,18 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // we need a stairs to the previous room
 
         if (stairMode!==this.STAIR_MODE_NONE) {
-            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize())));
-            yStairBound.add(settings.roomFloorDepth);
+            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+settings.roomFloorDepth)));
             this.addStairRoom(piece,connectType,xStairBound,yStairBound,zStairBound,(stairMode===this.STAIR_MODE_DOWN),level);
         }
 
-            // add the room mesh
+            // the room walls mesh
+            // floors and ceilings added later
 
-        var yStoryBound=this.addRoomMesh(piece,xBound,yBound,zBound,level);
-        var xDecorateBound=xBound.copy();
-        var yDecorateBound=new wsBound(yStoryBound.min,yBound.max);
-        var zDecorateBound=zBound.copy();
+        var wallMeshIdx=this.addRoomWalls(piece,xBound,yBound,zBound,level);
 
             // add the light
 
-        this.addLight(piece,xBound,yStoryBound,zBound);
+        this.addLight(piece,xBound,yBound,zBound);
 
             // have we recursed too far?
 
@@ -444,6 +435,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 
             var nextLevel;
             var nextStairMode;
+            var yStoryBound;
             var storyAdd=yBound.getSize()+settings.roomFloorDepth
 
             for (n=0;n!==nConnectLine;n++) {
@@ -499,12 +491,30 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             }
         }
         
+            // add to floor-ceiling list
+            
+        piece=this.mapPieceList.get(pieceIdx);
+    
+        this.roomFloorCeilingList.push(new GenRoomFloorCeilingObject(this.view,this.map,piece,wallMeshIdx,level,xBound,yBound,zBound,this.genRandom));
+        
             // if it's a room, add to the
             // decoration list
 
-        piece=this.mapPieceList.get(pieceIdx);
-        if (piece.isRoom) {
-            this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xDecorateBound,yDecorateBound,zDecorateBound,this.genRandom));
+        if (piece.isRoom) this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xBound,yBound,zBound,this.genRandom));
+    };
+    
+        //
+        // floors and ceilings
+        //
+        
+    this.buildRoomFloorAndCeilings=function()
+    {
+        var n,nMesh;
+        
+        nMesh=this.roomFloorCeilingList.length;
+        
+        for (n=0;n!==nMesh;n++) {
+            this.roomFloorCeilingList[n].addFloorCeiling();
         }
     };
     
@@ -542,7 +552,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         this.mapPieceList=new MapPieceListObject();
         this.mapPieceList.fill();
         
-        this.view.loadingScreenDraw(0.25);
+        this.view.loadingScreenDraw(0.20);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },this.TIMEOUT_MSEC);
     };
     
@@ -553,7 +563,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         this.buildMapRecursiveRoom(0,-1,-1,this.STAIR_MODE_NONE,null,null,null,0);
         
-        this.view.loadingScreenDraw(0.5);
+        this.view.loadingScreenDraw(0.40);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },this.TIMEOUT_MSEC);
     };
     
@@ -563,7 +573,17 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         this.removeSharedTriangles();
         
-        this.view.loadingScreenDraw(0.75);
+        this.view.loadingScreenDraw(0.60);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapFloorAndCeilings(); },this.TIMEOUT_MSEC);
+    };
+    
+    this.buildMapFloorAndCeilings=function()
+    {
+            // build floors and ceilings for rooms
+
+        this.buildRoomFloorAndCeilings();
+        
+        this.view.loadingScreenDraw(0.80);
         setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },this.TIMEOUT_MSEC);
     };
     

@@ -183,6 +183,9 @@ function GenRoomStairs(map,genRandom)
                 yBoundBottom=yBound.copy();
                 yBoundBottom.add(-stairHigh);
             }
+            
+            yBoundTop.min+=settings.roomFloorDepth;
+            yBoundBottom.min+=settings.roomFloorDepth;
 
                 // walls
 
@@ -274,7 +277,9 @@ function GenRoomStairs(map,genRandom)
             stepAdd=-(xBound.getSize()/this.STEP_COUNT);
             xStepBound=new wsBound((xBound.max+stepAdd),xBound.max);
         }
+        
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
+        yStepBound.add(-settings.roomFloorDepth);
         
         for (n=0;n!==this.STEP_COUNT;n++) {
             if (!flip) {
@@ -321,6 +326,9 @@ function GenRoomStairs(map,genRandom)
                 yBoundBottom=yBound.copy();
                 yBoundBottom.add(-stairHigh);
             }
+            
+            yBoundTop.min+=settings.roomFloorDepth;
+            yBoundBottom.min+=settings.roomFloorDepth;
 
                 // walls
 
@@ -413,7 +421,9 @@ function GenRoomStairs(map,genRandom)
             stepAdd=-(zBound.getSize()/this.STEP_COUNT);
             zStepBound=new wsBound((zBound.max+stepAdd),zBound.max);
         }
+        
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
+        yStepBound.add(-settings.roomFloorDepth);
 
         for (n=0;n!==this.STEP_COUNT;n++) {
             if (!flip) {
