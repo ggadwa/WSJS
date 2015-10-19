@@ -22,17 +22,14 @@ FUTURE TODOs
 
 REGULAR TODOs
 
-[ ] redo all the second floor stuff to have external stair cases (try out)
-    [ ] room to room collision compares Y
-    [ ] remove ceilings to find good test seed
-    [ ] need to add single small room height to server as above floor heights and bit over doors
+
+--> need to have steps go in a bit and draw wall inside the box so they don't collide with walls
 
 
 
 
 
 
-[ ] stair wells are special room collision cases, has to be < or > not >= or <= because can't hide sides
 
 [ ] no light mesh hits -- needs "has flag" type call
     [ ] need to highlight these in lightmap!

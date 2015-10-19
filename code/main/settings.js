@@ -8,7 +8,7 @@ function SettingsObject()
 {
         // map construction
         
-    this.maxRoomCount=10;                   // the maximum possible number of rooms in the map
+    this.maxRoomCount=30;                   // the maximum possible number of rooms in the map
     
     this.maxRoomRecursion=3;                // how far down you will recurse to make rooms off a single room
     this.maxStoryCount=3;                   // maximum number of possible stories for a single room

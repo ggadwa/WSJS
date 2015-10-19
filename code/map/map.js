@@ -126,13 +126,12 @@ function MapObject()
         // check for map mesh collisions
         //
 
-    this.boxBoundCollision=function(xBound,yBound,zBound,skipMeshIdx,onlyFlag)
+    this.boxBoundCollision=function(xBound,yBound,zBound,onlyFlag)
     {
         var n;
         var nMesh=this.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
-            if (n===skipMeshIdx) continue;
             if (onlyFlag!==null) {
                 if (this.meshes[n].flag!==onlyFlag) continue;
             }

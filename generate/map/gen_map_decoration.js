@@ -32,7 +32,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         boxBoundY=new wsBound((yBound.max-2000),yBound.max);
         boxBoundZ=new wsBound((z-1000),(z+1000));
         
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
 
         x=xBound.getMidPoint()+8000;
         z=zBound.getMidPoint();
@@ -41,7 +41,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         boxBoundY=new wsBound((yBound.max-2000),yBound.max);
         boxBoundZ=new wsBound((z-1000),(z+1000));
         
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
 
         x=xBound.getMidPoint();
         z=zBound.getMidPoint()-8000;
@@ -50,7 +50,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         boxBoundY=new wsBound((yBound.max-2000),yBound.max);
         boxBoundZ=new wsBound((z-1000),(z+1000));
         
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
 
         x=xBound.getMidPoint();
         z=zBound.getMidPoint()+8000;
@@ -59,7 +59,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         boxBoundY=new wsBound((yBound.max-2000),yBound.max);
         boxBoundZ=new wsBound((z-1000),(z+1000));
         
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
 
 /*
         count=this.genRandom.randomInt(1,3);
@@ -75,9 +75,9 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
             boxBoundY=new wsBound((yBound.max-high),yBound.max);
             boxBoundZ=new wsBound((z-1000),(z+1000));
             
-            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,-1,this.map.MESH_FLAG_STAIR)!==-1) continue;
+            if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,this.map.MESH_FLAG_STAIR)!==-1) continue;
             
-            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_WOOD_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
         }
         */
     };
@@ -123,8 +123,8 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
             
                 // put in the pillar
             
-            if (this.map.boxBoundCollision(boxBoundX,yBound,boxBoundZ,-1,this.map.MESH_FLAG_STAIR)===-1) {
-                map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(BITMAP_STAIR_TILE),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
+            if (this.map.boxBoundCollision(boxBoundX,yBound,boxBoundZ,this.map.MESH_FLAG_STAIR)===-1) {
+                map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(TEXTURE_STAIR),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
             }
             
             ang+=angAdd;
@@ -150,7 +150,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         var machineBoundY=new wsBound((yBound.max-sizeY),yBound.max);
         var machineBoundZ=new wsBound((centerPt.z-sizeZ),(centerPt.z+sizeZ));
 
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(BITMAP_METAL),machineBoundX,machineBoundY,machineBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
     };
 
     this.addDecoration=function()

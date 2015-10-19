@@ -4,17 +4,13 @@
 // resource IDs
 //
 
-var BITMAP_BRICK_STACK=0;
-var BITMAP_BRICK_RANDOM=1;
-var BITMAP_STONE=2;
-var BITMAP_TILE=3;
-var BITMAP_TILE_2=4;
-var BITMAP_STAIR_TILE=5;
-var BITMAP_METAL=6;
-var BITMAP_CONCRETE=7;
-var BITMAP_MOSAIC=8;
-var BITMAP_WOOD_PLANK=9;
-var BITMAP_WOOD_BOX=10;
+var TEXTURE_WALL=0;
+var TEXTURE_FLOOR=1;
+var TEXTURE_CEILING=2;
+var TEXTURE_STAIR=3;
+var TEXTURE_PLATFORM=4;
+var TEXTURE_LIGHT=5;
+var TEXTURE_BOX=6;
 
 //
 // textures to build
@@ -22,17 +18,13 @@ var BITMAP_WOOD_BOX=10;
 
 var wsTextureBuildList=
     [
-        [BITMAP_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_STACK],
-        [BITMAP_BRICK_RANDOM,GEN_BITMAP_TYPE_BRICK_RANDOM],
-        [BITMAP_STONE,GEN_BITMAP_TYPE_STONE],
-        [BITMAP_TILE,GEN_BITMAP_TYPE_TILE_SIMPLE],
-        [BITMAP_TILE_2,GEN_BITMAP_TYPE_TILE_COMPLEX],
-        [BITMAP_STAIR_TILE,GEN_BITMAP_TYPE_TILE_SMALL],
-        [BITMAP_METAL,GEN_BITMAP_TYPE_METAL],
-        [BITMAP_CONCRETE,GEN_BITMAP_TYPE_CONCRETE],
-        [BITMAP_MOSAIC,GEN_BITMAP_TYPE_MOSAIC],
-        [BITMAP_WOOD_PLANK,GEN_BITMAP_TYPE_WOOD_PLANK],
-        [BITMAP_WOOD_BOX,GEN_BITMAP_TYPE_WOOD_BOX],
+        [TEXTURE_WALL,[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE]],
+        [TEXTURE_FLOOR,[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
+        [TEXTURE_CEILING,[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_WOOD_PLANK]],
+        [TEXTURE_STAIR,[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL]],
+        [TEXTURE_PLATFORM,[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_WOOD_PLANK]],
+        [TEXTURE_LIGHT,[GEN_BITMAP_TYPE_METAL]],
+        [TEXTURE_BOX,[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL]],
     ];
 
 //
@@ -152,9 +144,11 @@ function wsInitInternal()
     if (!entityList.initialize(view)) return;
     if (!debug.initialize(view)) return;
     
-        // next step
+        // create list of dynamic textures
         
     var textureGenRandom=new GenRandomObject(settings.randomSeedMapBitmap);
+    
+        // next step
     
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Textures');
@@ -167,12 +161,18 @@ function wsInitBuildTextures(idx,textureGenRandom)
 {
     var bitmapCount=wsTextureBuildList.length;
     
-        // generate the bitmap
+        // pick a random image to generate
+        // a texture type
     
-    var setup=wsTextureBuildList[idx];
+    var bitmapId=wsTextureBuildList[idx][0];
+    var bitmapTypeList=wsTextureBuildList[idx][1];
+    var k=textureGenRandom.randomInt(0,bitmapTypeList.length);
+    var bitmapType=bitmapTypeList[k];
+    
+        // generate bitmap
+    
     var genBitmap=new GenBitmapObject(textureGenRandom);
-    
-    map.addBitmap(genBitmap.generate(view,setup[0],setup[1],debug));
+    map.addBitmap(genBitmap.generate(view,bitmapId,bitmapType,debug));
     
         // if more textures, then loop back around
         

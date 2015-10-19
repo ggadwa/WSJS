@@ -230,6 +230,11 @@ function CollisionObject()
         
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshes[n];
+            
+                // skip walls or ceilings
+                
+            if (mesh.flag===map.MESH_FLAG_ROOM_CEILING) continue;
+            if (mesh.flag===map.MESH_FLAG_ROOM_WALL) continue;
 
                 // skip any mesh we don't collide with
 

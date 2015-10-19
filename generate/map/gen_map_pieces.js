@@ -95,7 +95,7 @@ function MapPieceObject(isRoom)
         // piece object mesh creation
         //
 
-    this.createMeshFloorOrCeiling=function(bitmap,xBound,yBound,zBound,isFloor,mask,flag)
+    this.createMeshFloorOrCeiling=function(bitmap,xBound,yBound,zBound,isFloor,flag)
     {
         var n,x,z,vxMin,vxMax,vzMin,vzMax;
         
@@ -105,7 +105,7 @@ function MapPieceObject(isRoom)
         
         for (z=0;z!==5;z++) {
             for (x=0;x!==5;x++) {
-                count+=(this.floorGrid[z][x]&mask[z][x]);
+                count+=this.floorGrid[z][x];
             }
         }
         
@@ -132,7 +132,7 @@ function MapPieceObject(isRoom)
         
         for (z=0;z!==5;z++) {
             for (x=0;x!==5;x++) {
-                if ((this.floorGrid[z][x]&mask[z][x])===0) continue;
+                if (this.floorGrid[z][x]===0) continue;
         
                 vxMin=xBound.min+Math.floor(sx*(x*0.2));
                 vxMax=xBound.min+Math.floor(sx*((x+1)*0.2));

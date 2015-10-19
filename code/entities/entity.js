@@ -36,7 +36,8 @@ function EntityObject(position,angle,radius,model,isPlayer)
             // flying
             
         if (settings.fly) {
-            movePt.rotateZ(null,this.angle.x);
+            movePt.y=-(20*this.angle.x);
+            if (dist<0) movePt.y=-movePt.y;
         }
         
             // wall clipping setting, remove later

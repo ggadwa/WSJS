@@ -29,8 +29,8 @@ function GenRoomPlatform(map,genRandom)
         
             // bitmaps
             
-        var platformBitmap=this.map.getBitmapById(BITMAP_WOOD_PLANK);
-        var stairBitmap=this.map.getBitmapById(BITMAP_STAIR_TILE);
+        var platformBitmap=this.map.getBitmapById(TEXTURE_PLATFORM);
+        var stairBitmap=this.map.getBitmapById(TEXTURE_STAIR);
         
             // stairs
             
