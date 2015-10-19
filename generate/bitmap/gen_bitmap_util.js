@@ -198,6 +198,11 @@ function GenBitmapUtilityObject(genRandom)
     {
         return(new wsColor((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
     };
+    
+    this.boostColor=function(color,boostAdd)
+    {
+        return(new wsColor((color.r+boostAdd),(color.g+boostAdd),(color.b+boostAdd)));
+    };
 
     this.colorToRGBColor=function(color)
     {
@@ -302,7 +307,7 @@ function GenBitmapUtilityObject(genRandom)
             // currently not using the normalCTX, might in the future
 
         var n,nPixel,idx;
-        var col,fct,randNormal;
+        var col,fct;
         var wid=rgt-lft;
         var high=bot-top;    
         var darkenDif=maxDarken-minDarken;
@@ -638,7 +643,7 @@ function GenBitmapUtilityObject(genRandom)
         normalCTX.fill();
     };
 
-    this.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    this.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
     {
         var n,x,y,halfWid,halfHigh;
         var rad,fx,fy,col,idx;
@@ -682,15 +687,24 @@ function GenBitmapUtilityObject(genRandom)
 
                 idx=((y*orgWid)+x)*4;
 
-                bitmapData[idx]=Math.floor(col[0]*255.0);
-                bitmapData[idx+1]=Math.floor(col[1]*255.0);
-                bitmapData[idx+2]=Math.floor(col[2]*255.0);
+                bitmapData[idx]=Math.floor(col.r*255.0);
+                bitmapData[idx+1]=Math.floor(col.g*255.0);
+                bitmapData[idx+2]=Math.floor(col.b*255.0);
 
                     // get a normal for the pixel change
+                    // if within the flat inner circle, just point the z out
+                    // otherwise calculate from radius
 
-                normalData[idx]=(fx+1.0)*127.0;
-                normalData[idx+1]=(fy+1.0)*127.0;
-                normalData[idx+2]=(0.5+1.0)*127.0;        // just so we remember that we are focing the Z back to top
+                if ((wid<=flatInnerSize) || (high<=flatInnerSize)) {
+                    normalData[idx]=0;
+                    normalData[idx+1]=0;
+                    normalData[idx+2]=255;
+                }
+                else {
+                    normalData[idx]=(fx+1.0)*127.0;
+                    normalData[idx+1]=(fy+1.0)*127.0;
+                    normalData[idx+2]=(0.5+1.0)*127.0;        // just so we remember that we are focing the Z back to top
+                }
             }
 
             if (edgeCount>0) edgeCount--;

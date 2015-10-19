@@ -164,7 +164,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
         if (hasStories) {
             var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom);
-            //genRoomPlatform.createPlatforms(2,yBound.getSize(),roomBitmap,xBound,yBound,zBound)
+            genRoomPlatform.createPlatforms(2,yBound.getSize(),roomBitmap,xBound,yBound,zBound)
         }
         
             // the ceiling
@@ -223,14 +223,19 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         }
     };
 
-    this.addLight=function(piece,xBound,yBound,zBound)
+    this.addLight=function(piece,xBound,yBound,zBound,level)
     {
+            // dual story room?
+            
+        var hasStories=((level===0) && (piece.isRoom));
+        
             // light point
 
         var lightX=xBound.getMidPoint();
         var lightZ=zBound.getMidPoint();
         
-        var lightY=yBound.min;
+        var lightY=yBound.min-settings.roomFloorDepth;
+        if (hasStories) lightY-=(yBound.getSize()+settings.roomFloorDepth);
 
             // light fixture
 
@@ -245,7 +250,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var zSize=zBound.getSize();
         if (zSize>intensity) intensity=zSize;
         
-        intensity*=(settings.mapLightBoost+(this.genRandom.random()*settings.mapLightBoostExtra));
+        intensity*=(settings.mapLightFactor+(this.genRandom.random()*settings.mapLightFactorExtra));
+        if (hasStories) intensity*=settings.mapTwoStoryLightBoost;
 
         var pt=new wsPoint(lightX,(lightY+1100),lightZ);
 
@@ -257,7 +263,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // the exponent
             
-        var exponent=this.genRandom.random()*0.75;
+        var exponent=settings.mapLightExponentMin+(this.genRandom.random()*settings.mapLightExponentExtra);
 
             // add light to map
 
@@ -305,13 +311,13 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         if (connectPieceIdx===-1) {
             var mapMid=this.view.OPENGL_FAR_Z/2;
 
-            var halfSize=Math.floor(settings.maxRoomSize[0]/2);
+            var halfSize=Math.floor(settings.roomDimension[0]/2);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(settings.maxRoomSize[1]/2);
+            var halfSize=Math.floor(settings.roomDimension[1]/2);
             yBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(settings.maxRoomSize[2]/2);
+            var halfSize=Math.floor(settings.roomDimension[2]/2);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
         }
 
@@ -353,7 +359,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 switch (connectType) {
 
                     case piece.CONNECT_TYPE_LEFT:
-                        xBound=new wsBound((xConnectBound.min-settings.maxRoomSize[0]),xConnectBound.min);
+                        xBound=new wsBound((xConnectBound.min-settings.roomDimension[0]),xConnectBound.min);
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
                         if (stairMode!==this.STAIR_MODE_NONE) {
@@ -366,7 +372,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                     case piece.CONNECT_TYPE_TOP:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
-                        zBound=new wsBound((zConnectBound.min-settings.maxRoomSize[2]),zConnectBound.min);
+                        zBound=new wsBound((zConnectBound.min-settings.roomDimension[2]),zConnectBound.min);
                         
                         if (stairMode!==this.STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
@@ -377,7 +383,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         break;
 
                     case piece.CONNECT_TYPE_RIGHT:
-                        xBound=new wsBound(xConnectBound.max,(xConnectBound.max+settings.maxRoomSize[0]));
+                        xBound=new wsBound(xConnectBound.max,(xConnectBound.max+settings.roomDimension[0]));
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
                         if (stairMode!==this.STAIR_MODE_NONE) {
@@ -390,7 +396,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                     case piece.CONNECT_TYPE_BOTTOM:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
-                        zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.maxRoomSize[2]));
+                        zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.roomDimension[2]));
                         
                         if (stairMode!==this.STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
@@ -433,11 +439,11 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // add the light
 
-        this.addLight(piece,xBound,yBound,zBound);
+        this.addLight(piece,xBound,yBound,zBound,level);
 
             // have we recursed too far?
 
-        if (recurseCount<settings.maxRoomRecursion) {
+        if (recurseCount<settings.roomMaxRecursion) {
 
                 // always need to force at least
                 // one connection.  if that one
@@ -463,14 +469,14 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                     // bail if we've reach max room count
 
-                if (this.map.countMeshByFlag(this.map.MESH_FLAG_ROOM_WALL)>=settings.maxRoomCount) break;
+                if (this.map.countMeshByFlag(this.map.MESH_FLAG_ROOM_WALL)>=settings.roomMaxCount) break;
 
                     // determine if this line will go off
                     // on another recursion
 
                 if (n===usedConnectLineIdx) continue;
                 if (n!==forceConnectLineIdx) {
-                    if (this.genRandom.random()>=settings.connectionPercentage) continue;
+                    if (this.genRandom.random()>=settings.roomConnectionPercentage) continue;
                 }
 
                     // check if this connection should
@@ -482,7 +488,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                 if (noCurrentLevelChange) {
 
-                    if (this.genRandom.random()<settings.levelChangePercentage) {
+                    if (this.genRandom.random()<settings.roomLevelChangePercentage) {
 
                             // change level, we only have
                             // two levels to keep map crossing

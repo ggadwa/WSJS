@@ -23,13 +23,10 @@ FUTURE TODOs
 REGULAR TODOs
 
 
---> need to have steps go in a bit and draw wall inside the box so they don't collide with walls
 
-
-
-
-
-
+[ ] platforms
+    [ ] platforms stairs outside room
+    [ ] automatic pillars?
 
 [ ] no light mesh hits -- needs "has flag" type call
     [ ] need to highlight these in lightmap!
@@ -38,21 +35,18 @@ REGULAR TODOs
 
 
 
-
-
 [ ] try to pack glsl light struct floats
 
 [ ] bitmaps
-    [ ] metal needs random plating (1 big, 2 long, 4 quarters)
-    [ ] normals are off for bolts (or frame is too large)
-    [ ] need metal + bar
-    [ ] need to have one set per map
+    [X] normals are off for bolts (or frame is too large)
+    [X] need metal + bar
+    [X] need to have one set per map
+    [ ] need bitmap colors filters are settings
 
 [ ] rooms have possible light positions
 
 [ ] diffuse calcs in light maps
 [ ] rooms need decoration locations and decoration models
-[ ] need filterMapBitmapColors and filterModelBitmapColors
 
 
 [ ] frustum cull models

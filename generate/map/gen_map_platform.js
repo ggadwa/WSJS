@@ -53,15 +53,16 @@ function GenRoomPlatform(map,genRandom)
                 // tell if there is a side or parallel
                 // platforms
                 
-            platformSideMin=this.genRandom.random()<settings.storyPlatformSidePercentage;
-            platformSideMax=this.genRandom.random()<settings.storyPlatformSidePercentage;
-            platformSideOpposite=this.genRandom.random()<settings.storyPlatformOppositePercentage;
+            platformSideMin=this.genRandom.random()<settings.platformSidePercentage;
+            platformSideMax=this.genRandom.random()<settings.platformSidePercentage;
+            platformSideOpposite=this.genRandom.random()<settings.platformOppositePercentage;
             
                 // get random platform size for
-                // this side
+                // this side, has to be at least 20 to
+                // get by any room vertexes that push in
                 
-            platformSize=this.genRandom.randomInt(10,20)/100;
-            platformSideSize=this.genRandom.randomInt(15,25)/100;
+            platformSize=this.genRandom.randomInt(20,10)/100;
+            platformSideSize=this.genRandom.randomInt(20,15)/100;
             
                 // add the first platform, opposite platform
                 // and steps
@@ -72,7 +73,7 @@ function GenRoomPlatform(map,genRandom)
                     zPlatformBound=new wsBound(zBound.min,(zBound.min+(zBound.getSize()*platformSize)));
                     this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,false,false,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
-                    xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-2000),xBound.min+((xBound.getSize()*0.50)+2000));
+                    xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-settings.platformStairLength),xBound.min+((xBound.getSize()*0.50)+settings.platformStairLength));
                     zStairBound=new wsBound(zPlatformBound.max,(zPlatformBound.max+5000));
                     genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,false);
                     break;
@@ -83,7 +84,7 @@ function GenRoomPlatform(map,genRandom)
                     this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,false,false,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
                     xStairBound=new wsBound(xPlatformBound.max,(xPlatformBound.max+5000));
-                    zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-2000),zBound.min+((zBound.getSize()*0.50)+2000));
+                    zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-settings.platformStairLength),zBound.min+((zBound.getSize()*0.50)+settings.platformStairLength));
                     genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,false);
                     
                     if (platformSideOpposite) {
@@ -102,7 +103,7 @@ function GenRoomPlatform(map,genRandom)
                     zPlatformBound=new wsBound((zBound.max-(zBound.getSize()*platformSize)),zBound.max);
                     this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,false,false,true,true,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
-                    xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-2000),xBound.min+((xBound.getSize()*0.50)+2000));
+                    xStairBound=new wsBound(xBound.min+((xBound.getSize()*0.50)-settings.platformStairLength),xBound.min+((xBound.getSize()*0.50)+settings.platformStairLength));
                     zStairBound=new wsBound((zPlatformBound.min-5000),zPlatformBound.min);
                     genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true);
                     break;
@@ -113,7 +114,7 @@ function GenRoomPlatform(map,genRandom)
                     this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,false,false,true,true,this.map.MESH_FLAG_ROOM_PLATFORM));
                     
                     xStairBound=new wsBound((xPlatformBound.min-5000),xPlatformBound.min);
-                    zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-2000),zBound.min+((zBound.getSize()*0.50)+2000));
+                    zStairBound=new wsBound(zBound.min+((zBound.getSize()*0.50)-settings.platformStairLength),zBound.min+((zBound.getSize()*0.50)+settings.platformStairLength));
                     genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true);
                     
                     if (platformSideOpposite) {

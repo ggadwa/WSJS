@@ -6,31 +6,41 @@
 
 function SettingsObject()
 {
-        // map construction
+        // room construction
         
-    this.maxRoomCount=30;                   // the maximum possible number of rooms in the map
+    this.roomMaxCount=30;                       // the maximum possible number of rooms in the map
     
-    this.maxRoomRecursion=3;                // how far down you will recurse to make rooms off a single room
-    this.maxStoryCount=3;                   // maximum number of possible stories for a single room
+    this.roomMaxRecursion=3;                    // how far down you will recurse to make rooms off a single room
     
-    this.connectionPercentage=0.25;             // what % of the time a connection in a room spawns another room
-    this.levelChangePercentage=0.8;             // what % of the time a room gains another story
-    this.storyPlatformSidePercentage=0.6;       // what % of the time a second story platform has a side piece
-    this.storyPlatformOppositePercentage=0.4;   // what % of the time a second story platform has an opposite piece
-    
-    this.decorations=false;                     // set to false for no decorations in the map
-    
-    this.maxRoomSize=[35000,7000,35000];        // maximum size for a room [x,y,z]
+    this.roomDimension=[35000,7000,35000];        // maximum size for a room [x,y,z]
     this.roomFloorDepth=700;
+    
+    this.roomConnectionPercentage=0.25;             // what % of the time a connection in a room spawns another room
+    this.roomLevelChangePercentage=0.8;             // what % of the time a room gains another story
+    
+        // platforms
+        
+    this.platformStairLength=3000;
+    
+    this.platformSidePercentage=0.6;            // what % of the time a second story platform has a side piece
+    this.platformOppositePercentage=0.4;        // what % of the time a second story platform has an opposite piece
     
         // lighting
     
     this.ambient=[0.0,0.0,0.0];                 // all over ambient light
     
-    this.mapLightBoost=0.5;                     // factors for randomized lighting intensities past room radius
-    this.mapLightBoostExtra=0.4;
+    this.mapLightFactor=0.5;                    // lights are initially set to room radius, this factor is multipled in
+    this.mapLightFactorExtra=0.3;               // random addition to light factor above
+    this.mapTwoStoryLightBoost=1.3;             // multiply boost when a light is in a two story room
+    
+    this.mapLightExponentMin=0.2;               // minimum light exponent (0.0 is completely hard light with no fall off)
+    this.mapLightExponentExtra=0.5;             // exponent add
     
     this.generateLightmap=false;                // set to true to generate light maps
+    
+        // decorations
+        
+    this.decorations=false;                     // set to false for no decorations in the map
 
         // models
         

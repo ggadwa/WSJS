@@ -24,7 +24,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
     {
         var n,count;
         var x,z,high,boxBoundX,boxBoundY,boxBoundZ;
-        
+/*        
         x=xBound.getMidPoint()-8000;
         z=zBound.getMidPoint();
         
@@ -60,8 +60,8 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         boxBoundZ=new wsBound((z-1000),(z+1000));
         
         map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
+*/
 
-/*
         count=this.genRandom.randomInt(1,3);
 
         for (n=0;n!==count;n++) {
@@ -79,7 +79,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
             
             map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,this.map.MESH_FLAG_DECORATION));
         }
-        */
+
     };
     
         //
@@ -124,7 +124,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
                 // put in the pillar
             
             if (this.map.boxBoundCollision(boxBoundX,yBound,boxBoundZ,this.map.MESH_FLAG_STAIR)===-1) {
-                map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(TEXTURE_STAIR),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
+                map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(TEXTURE_PILLAR),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
             }
             
             ang+=angAdd;
