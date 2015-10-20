@@ -18,13 +18,6 @@ function SettingsObject()
     this.roomConnectionPercentage=0.25;             // what % of the time a connection in a room spawns another room
     this.roomLevelChangePercentage=0.8;             // what % of the time a room gains another story
     
-        // platforms
-        
-    this.platformStairLength=3000;
-    
-    this.platformSidePercentage=0.6;            // what % of the time a second story platform has a side piece
-    this.platformOppositePercentage=0.4;        // what % of the time a second story platform has an opposite piece
-    
         // lighting
     
     this.ambient=[0.0,0.0,0.0];                 // all over ambient light
@@ -36,11 +29,11 @@ function SettingsObject()
     this.mapLightExponentMin=0.2;               // minimum light exponent (0.0 is completely hard light with no fall off)
     this.mapLightExponentExtra=0.5;             // exponent add
     
-    this.generateLightmap=false;                // set to true to generate light maps
+    this.generateLightmap=true;                // set to true to generate light maps
     
         // decorations
         
-    this.decorations=false;                     // set to false for no decorations in the map
+    this.decorations=true;                     // set to false for no decorations in the map
 
         // models
         
@@ -74,10 +67,12 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=2000; //Math.floor((Math.random()*seed));
+    this.randomSeedMap=Math.floor((Math.random()*seed));
     this.randomSeedModelBitmap=Math.floor((Math.random()*seed));
     this.randomSeedModel=Math.floor((Math.random()*seed));
     this.randomSeedEntity=Math.floor((Math.random()*seed));
+    
+    console.log('map seed='+this.randomSeedMap);
 }
 
 var settings=new SettingsObject();

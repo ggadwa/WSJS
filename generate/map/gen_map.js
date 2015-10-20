@@ -163,8 +163,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // platforms
             
         if (hasStories) {
-            var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom);
-            genRoomPlatform.createPlatforms(2,yBound.getSize(),roomBitmap,xBound,yBound,zBound)
+            var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom,piece);
+            genRoomPlatform.createPlatforms(xBound,yBound,zBound)
         }
         
             // the ceiling
@@ -522,7 +522,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // decoration list
 
         piece=this.mapPieceList.get(pieceIdx);
-        if (piece.isRoom) this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xBound,yBound,zBound,this.genRandom));
+        if ((piece.isRoom) && (level===1)) this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xBound,yBound,zBound,this.genRandom));
     };
     
         //

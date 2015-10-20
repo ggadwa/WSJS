@@ -499,19 +499,19 @@ function MapPieceListObject()
 
         mapPiece=new MapPieceObject(true);
 
-        mapPiece.points.push([0,20]);
-        mapPiece.points.push([20,20]);
+        mapPiece.points.push([0,10]);
+        mapPiece.points.push([20,10]);
         mapPiece.points.push([20,0]);
         mapPiece.points.push([40,0]);
-        mapPiece.points.push([40,20]);
-        mapPiece.points.push([60,20]);
+        mapPiece.points.push([40,10]);
+        mapPiece.points.push([60,10]);
         mapPiece.points.push([60,0]);
         mapPiece.points.push([80,0]);
-        mapPiece.points.push([80,20]);
-        mapPiece.points.push([100,20]);
+        mapPiece.points.push([80,10]);
+        mapPiece.points.push([100,10]);
         mapPiece.points.push([100,40]);
-        mapPiece.points.push([80,40]);
-        mapPiece.points.push([80,60]);
+        mapPiece.points.push([90,40]);
+        mapPiece.points.push([90,60]);
         mapPiece.points.push([100,60]);
         mapPiece.points.push([100,80]);
         mapPiece.points.push([100,100]);
@@ -522,14 +522,14 @@ function MapPieceListObject()
         mapPiece.points.push([0,100]);
         mapPiece.points.push([0,80]);
         mapPiece.points.push([0,60]);
-        mapPiece.points.push([20,60]);
-        mapPiece.points.push([20,40]);
+        mapPiece.points.push([10,60]);
+        mapPiece.points.push([10,40]);
         mapPiece.points.push([0,40]);
         
         mapPiece.floorGrid=[
-          [0,1,0,1,0],
           [1,1,1,1,1],
-          [0,1,1,1,0],
+          [1,1,1,1,1],
+          [1,1,1,1,1],
           [1,1,1,1,1],
           [1,1,1,1,1]
         ];
@@ -542,14 +542,14 @@ function MapPieceListObject()
 
         mapPiece.points.push([0,0]);
         mapPiece.points.push([20,0]);
-        mapPiece.points.push([40,20]);
+        mapPiece.points.push([40,10]);
         mapPiece.points.push([40,0]);
         mapPiece.points.push([60,0]);
-        mapPiece.points.push([60,20]);
+        mapPiece.points.push([60,10]);
         mapPiece.points.push([80,0]);
         mapPiece.points.push([100,0]);
         mapPiece.points.push([100,20]);
-        mapPiece.points.push([80,40]);
+        mapPiece.points.push([90,40]);
         mapPiece.points.push([100,40]);
         mapPiece.points.push([100,60]);
         mapPiece.points.push([100,80]);
@@ -562,7 +562,7 @@ function MapPieceListObject()
         mapPiece.points.push([0,80]);
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
-        mapPiece.points.push([20,40]);
+        mapPiece.points.push([10,40]);
         mapPiece.points.push([0,20]);
         
         mapPiece.floorGrid=[

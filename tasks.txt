@@ -24,9 +24,7 @@ REGULAR TODOs
 
 
 
-[ ] platforms
-    [ ] platforms stairs outside room
-    [ ] automatic pillars?
+[ ] stairs should skip back end if up against a pillar
 
 [ ] no light mesh hits -- needs "has flag" type call
     [ ] need to highlight these in lightmap!
