@@ -16,11 +16,13 @@ var GEN_BITMAP_TYPE_TILE_COMPLEX=4;
 var GEN_BITMAP_TYPE_TILE_SMALL=5;
 var GEN_BITMAP_TYPE_METAL=6;
 var GEN_BITMAP_TYPE_METAL_BAR=7;
-var GEN_BITMAP_TYPE_CONCRETE=8;
-var GEN_BITMAP_TYPE_MOSAIC=9;
-var GEN_BITMAP_TYPE_WOOD_PLANK=10;
-var GEN_BITMAP_TYPE_WOOD_BOX=11;
-var GEN_BITMAP_TYPE_SKIN=12;
+var GEN_BITMAP_TYPE_METAL_CORRUGATED=8;
+var GEN_BITMAP_TYPE_CONCRETE=9;
+var GEN_BITMAP_TYPE_PLASTER=10;
+var GEN_BITMAP_TYPE_MOSAIC=11;
+var GEN_BITMAP_TYPE_WOOD_PLANK=12;
+var GEN_BITMAP_TYPE_WOOD_BOX=13;
+var GEN_BITMAP_TYPE_SKIN=14;
 
 var GEN_BITMAP_TILE_STYLE_BORDER=0;
 var GEN_BITMAP_TILE_STYLE_CHECKER=1;
@@ -89,7 +91,7 @@ function GenBitmapObject(genRandom)
     this.generateStone=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,k,rect,edgeSize;
-        var drawStoneColor,drawEdgeColor,lineColor,f;
+        var drawStoneColor,drawEdgeColor,lineColor,darken,f;
         var x,y,x2,y2,lineCount,stoneWid,stoneHigh;
 
             // some random values
@@ -138,9 +140,15 @@ function GenBitmapObject(genRandom)
                 x2=this.genRandom.randomInt((rect.lft+edgeSize),stoneWid);
                 y2=this.genRandom.randomInt((rect.top+edgeSize),stoneHigh);
                 
-                lineColor=this.genBitmapUtility.darkenColor(drawStoneColor,0.8);
-                this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineColor);
+                darken=0.7+(this.genRandom.random()*0.2);
+                lineColor=this.genBitmapUtility.darkenColor(drawStoneColor,darken);
+                this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,20,lineColor);
             }
+            
+                // redo the fill, but just do the edges so we
+                // erase any lines that went over
+                
+            this.genBitmapUtility.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,rect.rgt,rect.bot,edgeSize,null,drawEdgeColor);
             
                  // any random noise
                 
@@ -213,7 +221,7 @@ function GenBitmapObject(genRandom)
 
                 }
 
-                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col,new wsColor(0.0,0.0,0.0));
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col,new wsColor(0.0,0.0,0.0),true);
 
                     // possible design
 
@@ -265,91 +273,181 @@ function GenBitmapObject(genRandom)
         //
         // metal bitmaps
         //
-
-    this.generateMetal=function(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
+    
+    this.generateMetalScrewLine=function(bitmapCTX,normalCTX,screwX,top,bot,screwCount,screwSize,screenFlatInnerSize,screwColor)
     {
-        var n,x,lft,top,streakWid;
-        var streakColor,screwColor,darken;
+        var n,y;
+        var high=bot-top;
+        var yAdd=Math.floor((high-(screwSize*2))/(screwCount-1));
+            
+        y=Math.floor(screwSize*0.5);
+        
+        for (n=0;n!==screwCount;n++) {
+            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,screwX,y,(screwX+screwSize),(y+screwSize),2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
+            y+=yAdd;
+        }
+    };
+    
+    this.generateMetalPlate=function(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize)
+    {
+        var n,x,streakWid;
+        var streakColor,darken;
+        var screwX;
+        
+        var palteWid=rgt-lft;
+        var plateHigh=bot-top;
+        
+            // the plate
+            
+        this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,metalColor,metalEdgeColor,true);
+        
+            // streaks
+            
+        var streakCount=this.genRandom.randomInt(15,10);
+
+        for (n=0;n!==streakCount;n++) {
+            streakWid=this.genRandom.randomInt(10,40);
+            x=edgeSize+this.genRandom.randomInBetween(streakWid,((palteWid-streakWid)-(edgeSize*2)));
+
+            darken=0.5+(this.genRandom.random()*0.5);
+            streakColor=this.genBitmapUtility.darkenColor(metalColor,darken);
+
+            this.genBitmapUtility.drawStreakVertical(bitmapCTX,wid,high,(lft+x),(top+edgeSize),(plateHigh-(edgeSize*2)),streakWid,streakColor);
+        }
+        
+            // the screws
+            
+        var screwColor=this.genBitmapUtility.boostColor(metalColor,0.2);
+        
+        screwX=lft+(edgeSize*2);
+        this.generateMetalScrewLine(bitmapCTX,normalCTX,screwX,(top+edgeSize),(bot+edgeSize),screwCount,screwSize,screenFlatInnerSize,screwColor);
+            
+        screwX=rgt-(screwSize+(edgeSize*2));
+        this.generateMetalScrewLine(bitmapCTX,normalCTX,screwX,(top+edgeSize),(bot+edgeSize),screwCount,screwSize,screenFlatInnerSize,screwColor);
+    };
+    
+    this.generateMetal=function(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar,isCorrugated)
+    {
+        var x,y;
 
             // some random values
 
-        var metalColor=this.genBitmapUtility.getRandomColor([0.0,0.0,0.4],[0.25,0.25,0.6]);
+        var metalColor=this.genBitmapUtility.getRandomGreyColor(0.6,0.8);
         var metalEdgeColor=this.genBitmapUtility.darkenColor(metalColor,0.9);
-        
-        var edgeSize=0;
-        var screwSize=this.genRandom.randomInt(20,20);
-        var screenFlatInnerSize=Math.floor(screwSize*0.4);
-        var streakCount=this.genRandom.randomInt(15,10);
-        
-        var barRandomWid=Math.floor(wid*0.15);
-        var barSize=this.genRandom.randomInt(barRandomWid,barRandomWid);
 
             // clear canvases
 
         this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,metalColor);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
-
-            // plate
-
-        if (!hasBar) {
-            edgeSize=this.genRandom.randomInt(4,4);
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,edgeSize,metalColor,metalEdgeColor);
-        }
         
-            // streaks
-
-        for (n=0;n!==streakCount;n++) {
-            streakWid=this.genRandom.randomInt(10,40);
-            x=edgeSize+this.genRandom.randomInBetween(streakWid,((wid-streakWid)-(edgeSize*2)));
-
-            darken=0.5+(this.genRandom.random()*0.5);
-            streakColor=this.genBitmapUtility.darkenColor(metalColor,darken);
-
-            this.genBitmapUtility.drawStreakVertical(bitmapCTX,wid,high,x,edgeSize,(high-(edgeSize*2)),streakWid,streakColor);
-        }
-        
-            // bars
+            // corugated
             
-        if (hasBar) {
-            var barColor=this.genBitmapUtility.getRandomColor([0.3,0.1,0.0],[0.4,0.2,0.0]);
-            var barEdgeColor=this.genBitmapUtility.darkenColor(barColor,0.9);
-        
-            edgeSize=this.genRandom.randomInt(5,5);
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,-edgeSize,barSize,(high+(edgeSize*2)),edgeSize,barColor,barEdgeColor);
-            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,barSize,high,0.6,0.7,0.4);
-        }
-        
-            // screws
-        
-        if (!hasBar) {
-            screwColor=this.genBitmapUtility.boostColor(metalColor,0.2);
+        if (isCorrugated) {
             
-            lft=edgeSize*2;
-            top=edgeSize*2;
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
-
-            top=high-(screwSize+(edgeSize*2));
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
-
-            lft=wid-(screwSize+(edgeSize*2));
-            top=edgeSize*2;
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
-
-            top=high-(screwSize+(edgeSize*2));
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
+            var dx,dy,sx,sy,ex,ey;
+            var metalCorrColor1=this.genBitmapUtility.boostColor(metalColor,0.1);
+            var metalCorrColor2=this.genBitmapUtility.darkenColor(metalColor,0.7);
+            
+            var edgeSize=this.genRandom.randomInt(5,10);
+            
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,edgeSize,metalColor,metalEdgeColor,false);
+            
+            var corrCount=this.genRandom.randomInt(10,20);
+            var corrWid=Math.floor((wid-((edgeSize*2)+10))/corrCount);
+            var corrHigh=Math.floor((high-((edgeSize*2)+10))/corrCount);
+            
+            var lft=Math.floor((wid-(corrWid*corrCount))*0.5);
+            var top=Math.floor((high-(corrHigh*corrCount))*0.5);
+            
+            dy=top;
+            
+            for (y=0;y!==corrCount;y++) {
+                
+                dx=lft;
+                
+                for (x=0;x!==corrCount;x++) {
+                    
+                    if ((y&0x1)===0) {
+                        sx=dx;
+                        sy=dy;
+                        ex=dx+(corrWid-4);
+                        ey=dy+(corrHigh-4);
+                        
+                        this.genBitmapUtility.drawLine(bitmapCTX,normalCTX,(sx-2),sy,(ex-2),ey,metalCorrColor2);
+                        this.genBitmapUtility.drawLine(bitmapCTX,normalCTX,sx,sy,ex,ey,metalCorrColor1);
+                        this.genBitmapUtility.drawLine(bitmapCTX,normalCTX,(sx+2),sy,(ex+2),ey,metalCorrColor2);
+                    }
+                    else {
+                        sx=dx;
+                        sy=dy+(corrHigh-4);
+                        ex=dx+(corrWid-4);
+                        ey=dy;
+                        
+                        this.genBitmapUtility.drawLine(bitmapCTX,normalCTX,sx,(sy-2),ex,(ey-2),metalCorrColor2);
+                        this.genBitmapUtility.drawLine(bitmapCTX,normalCTX,sx,sy,ex,ey,metalCorrColor1);
+                        this.genBitmapUtility.drawLine(bitmapCTX,normalCTX,sx,(sy+2),ex,(ey+2),metalCorrColor2);
+                    }
+                    
+                    dx+=corrWid;
+                }
+                
+                dy+=corrHigh;
+            }
         }
+        
+            // bar and metal
+        
         else {
-            screwColor=this.genBitmapUtility.boostColor(barColor,0.2);
             
-            lft=Math.floor((barSize*0.5)-(screwSize*0.5));
-            top=0;
-            
-            var screwCount=this.genRandom.randomInt(2,8);
-            var topAdd=Math.floor(high/screwCount);
-            
-            for (n=0;n!==screwCount;n++) {
-                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,lft,top,(lft+screwSize),(top+screwSize),2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
-                top+=topAdd;
+            var screwCount,screwColor;
+        
+            var barEdgeSize=this.genRandom.randomInt(5,5);
+            var metalEdgeSize=this.genRandom.randomInt(4,4);
+
+            var screwSize=this.genRandom.randomInt(20,20);
+            var screenFlatInnerSize=Math.floor(screwSize*0.4);
+
+            var barRandomWid=Math.floor(wid*0.15);
+            var barSize=this.genRandom.randomInt(barRandomWid,barRandomWid);
+        
+            if (hasBar) {
+
+                    // the bar
+
+                var barColor=this.genBitmapUtility.getRandomColor([0.3,0.1,0.0],[0.4,0.2,0.0]);
+                var barEdgeColor=this.genBitmapUtility.darkenColor(barColor,0.9);
+
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,-barEdgeSize,barSize,(high+(barEdgeSize*2)),barEdgeSize,barColor,barEdgeColor,true);
+                this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,barSize,high,0.6,0.7,0.4);
+
+                    // bar screws
+
+                x=Math.floor((barSize*0.5)-(screwSize*0.5));
+
+                screwCount=this.genRandom.randomInt(2,6);
+                screwColor=this.genBitmapUtility.boostColor(barColor,0.2);
+                this.generateMetalScrewLine(bitmapCTX,normalCTX,x,0,high,screwCount,screwSize,screenFlatInnerSize,screwColor);
+
+                    // the metal plate
+
+                screwCount=this.genRandom.randomInt(2,6);
+                this.generateMetalPlate(bitmapCTX,normalCTX,wid,high,barSize,0,wid,high,metalEdgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize);
+            }
+
+                // just plates
+
+            else {
+
+                screwCount=this.genRandom.randomInt(2,6);
+
+                if (this.genRandom.random()>=0.5) {
+                    this.generateMetalPlate(bitmapCTX,normalCTX,wid,high,0,0,wid,high,metalEdgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize);
+                }
+                else {
+                    x=Math.floor(wid*0.5);
+                    this.generateMetalPlate(bitmapCTX,normalCTX,wid,high,0,0,x,high,metalEdgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize);
+                    this.generateMetalPlate(bitmapCTX,normalCTX,wid,high,x,0,wid,high,metalEdgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize);
+                }
             }
         }
         
@@ -391,6 +489,55 @@ function GenBitmapObject(genRandom)
 
             this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
         }
+
+            // finish with the specular
+
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,4.0,-0.4);
+    };
+    
+        //
+        // plaster bitmaps
+        //
+
+    this.generatePlaster=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        var n,x;
+        var lineColor,darken,boost;
+
+            // some random values
+
+        var plasterColor=this.genBitmapUtility.getRandomColor([0.7,0.7,0.7],[0.8,0.8,0.8]);
+
+        var lineCount=this.genRandom.randomInt(30,20);
+
+            // clear canvases
+
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,plasterColor);
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        
+            // lines
+            
+        for (n=0;n!==lineCount;n++) {
+            x=this.genRandom.randomInt(0,wid);
+            
+            darken=0.85+(this.genRandom.random()*0.1);
+            lineColor=this.genBitmapUtility.darkenColor(plasterColor,darken);
+            
+            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,30,lineColor);
+        }
+        
+        for (n=0;n!==lineCount;n++) {
+            x=this.genRandom.randomInt(0,wid);
+            
+            boost=0.05+(this.genRandom.random()*0.1);
+            lineColor=this.genBitmapUtility.boostColor(plasterColor,boost);
+            
+            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,30,lineColor);
+        }
+        
+            // plaster noise
+            
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.8);
 
             // finish with the specular
 
@@ -451,7 +598,7 @@ function GenBitmapObject(genRandom)
 
                 rgt=(lft+tileWid)-borderSize;
 
-                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,darkCol);
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,darkCol,true);
                 
                     // any cracks
                     
@@ -474,7 +621,7 @@ function GenBitmapObject(genRandom)
                     }
                     
                     lineColor=this.genBitmapUtility.darkenColor(col,0.8);
-                    this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,lineColor);
+                    this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,20,lineColor);
                 }
                 
                 lft+=tileWid;
@@ -518,7 +665,7 @@ function GenBitmapObject(genRandom)
 
             while (lft<wid) {
                 woodFactor=0.8+((1.0-(this.genRandom.random()*2.0))*0.1);
-                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,-3,(lft+boardSize),(high+3),3,woodColor,blackColor); // -3 to get around outside borders
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,-3,(lft+boardSize),(high+3),3,woodColor,blackColor,true); // -3 to get around outside borders
                 this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+3),0,((lft+boardSize)-3),high,0.1,woodColor);
                 this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,(lft+3),0,((lft+boardSize)-3),high,0.9,0.95,woodFactor);
                 lft+=boardSize;
@@ -531,19 +678,19 @@ function GenBitmapObject(genRandom)
 
                 // outside boards
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,blackColor);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,blackColor,true);
             this.genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,3,(wid-3),(boardSize-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,boardSize,0.9,0.95,0.8);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,blackColor);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,blackColor,true);
             this.genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,((high-boardSize)+3),(wid-3),(high-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,0.9,0.95,0.8);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,blackColor);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,blackColor,true);
             this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,3,3,(boardSize-3),(high-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,boardSize,high,0.9,0.95,0.8);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,blackColor);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,blackColor,true);
             this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,((wid-boardSize)+3),3,(wid-3),(high-3),0.1,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,0.9,0.95,0.8);
 
@@ -556,13 +703,13 @@ function GenBitmapObject(genRandom)
 
             var y=Math.floor(high/2)-Math.floor(boardSize/2);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),3,woodColor,blackColor);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),3,woodColor,blackColor,true);
             this.genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,normalCTX,(boardSize+3),(y+3),((wid-boardSize)-3),((y+boardSize)-3),0.2,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,boardSize,y,(wid-boardSize),(y+boardSize),0.9,0.95,0.8);
 
             var x=Math.floor(wid/2)-Math.floor(boardSize/2);
 
-            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),3,woodColor,blackColor);
+            this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),3,woodColor,blackColor,true);
             this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,(x+3),(boardSize+3),((x+boardSize)-3),((high-boardSize)-3),0.2,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,x,boardSize,(x+boardSize),(high-boardSize),0.9,0.95,0.8);
         }
@@ -792,17 +939,27 @@ function GenBitmapObject(genRandom)
                 break;
 
             case GEN_BITMAP_TYPE_METAL:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,false);
+                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,false,false);
                 shineFactor=15.0;
                 break;
                 
             case GEN_BITMAP_TYPE_METAL_BAR:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,true);
+                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,true,false);
                 shineFactor=15.0;
+                break;
+                
+            case GEN_BITMAP_TYPE_METAL_CORRUGATED:
+                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,false,true);
+                shineFactor=12.0;
                 break;
                 
             case GEN_BITMAP_TYPE_CONCRETE:
                 this.generateConcrete(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=5.0;
+                break;
+                
+            case GEN_BITMAP_TYPE_PLASTER:
+                this.generatePlaster(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
                 break;
                 
@@ -830,7 +987,7 @@ function GenBitmapObject(genRandom)
 
             // debugging
 /*
-        if (generateType===GEN_BITMAP_TYPE_METAL_BAR) {
+        if (generateType===GEN_BITMAP_TYPE_METAL_CORRUGATED) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);

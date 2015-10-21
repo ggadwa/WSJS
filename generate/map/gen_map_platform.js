@@ -91,7 +91,7 @@ function GenRoomPlatform(map,genRandom,piece)
             
             this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,(isPillar?yPlatformPillarBound:yPlatformBound),zPlatformBound,false,true,true,true,true,true,(!isPillar),this.map.MESH_FLAG_ROOM_PLATFORM));
 
-            grid[z][x]=2;       // we use 2 so we can later re-check list for stair locations
+            grid[z][x]=isPillar?3:2;       // we use 2/3 so we can later re-check list for stair locations
             
                 // move to next platform area
                 
@@ -152,6 +152,7 @@ function GenRoomPlatform(map,genRandom,piece)
         z=-1;
         
         var stairDir=0;
+        var includeBack=true;
         
         tryCount=0;
         
@@ -172,20 +173,24 @@ function GenRoomPlatform(map,genRandom,piece)
                     // it to build stairs too
 
                 if (grid[z][x]===0) {
-                    if (grid[z][x+1]==2) {
+                    if (grid[z][x+1]>=2) {
                         stairDir=0;
+                        includeBack=(grid[z][x+1]===2);
                         break;
                     }
-                    if (grid[z][x-1]===2) {
+                    if (grid[z][x-1]>=2) {
                         stairDir=2;
+                        includeBack=(grid[z][x-1]===2);
                         break;
                     }
-                    if (grid[z+1][x]===2) {
+                    if (grid[z+1][x]>=2) {
                         stairDir=1;
+                        includeBack=(grid[z+1][x]===2);
                         break;
                     }
-                    if (grid[z+1][x]===2) {
+                    if (grid[z-1][x]>=2) {
                         stairDir=3;
+                        includeBack=(grid[z-1][x]===2);
                         break;
                     }
                 }
@@ -209,16 +214,16 @@ function GenRoomPlatform(map,genRandom,piece)
         
         switch (stairDir) {
             case 0:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true);
+                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,true);
                 break;
             case 1:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true);
+                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,true);
                 break;
             case 2:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,false);
+                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,false);
                 break;
             case 3:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,false);
+                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,false);
                 break;
         }
     };

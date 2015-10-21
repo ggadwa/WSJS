@@ -268,7 +268,10 @@ function MapObject()
     };
 
         //
-        // map light utilities
+        // find all the map lights in this view
+        // that we need to pass to glsl.  Ignore
+        // lights that are behind the player and
+        // outside the light cone
         //
 
     this.createViewLightsFromMapLights=function(view)
@@ -276,6 +279,7 @@ function MapObject()
         var n,k,nLight,idx;
         var x,y,z;
         var light;
+        var lightVector,cameraVector;
 
             // get the distance from the camera
             // to all the lights
@@ -290,8 +294,16 @@ function MapObject()
             x=view.camera.position.x-light.position.x;
             y=view.camera.position.y-light.position.y;
             z=view.camera.position.z-light.position.z;
-            light.dist=Math.sqrt((x*x)+(y*y)+(z*z));        // sqrt not required here, but overflow could be a problem
+            light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
         }
+        
+            // the camera normal
+            
+        cameraVector=new wsPoint(0.0,0.0,1.0);
+        cameraVector.rotateX(null,view.camera.angle.x);
+        cameraVector.rotateY(null,view.camera.angle.y);
+        
+        lightVector=new wsPoint(0.0,0.0,0.0);
 
             // find the four closest lights
             // and put them into the view list
@@ -314,7 +326,16 @@ function MapObject()
                 }
             }
             
-                // build the eye coordinate version
+                // are we out of the light cone
+                // and behind the light?
+                
+            lightVector.setFromSubPoint(view.camera.position,light.position);   
+            lightVector.normalize();
+            if (lightVector.dot(cameraVector)>0.0) {
+                if (light.dist>light.intensity) continue;
+            }
+            
+                // add the light
                 
             if (idx===-1) {
                 if (view.lights.length<view.LIGHT_COUNT) view.lights.push(light);
@@ -332,8 +353,10 @@ function MapObject()
         }
     };
     
+        //
         // run through the meshes and
         // have them build their collision meshes
+        //
         
     this.buildCollisionGeometry=function()
     {

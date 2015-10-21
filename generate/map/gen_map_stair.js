@@ -158,7 +158,7 @@ function GenRoomStairs(map,genRandom)
         // create stairs
         //
 
-    this.createStairsX=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,flip)
+    this.createStairsX=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,includeBack,flip)
     {
         var n,idx,stepAdd;
         var vertices;
@@ -266,16 +266,18 @@ function GenRoomStairs(map,genRandom)
             
                 // the behind box brace
             
-            var xBraceBound;
-            var braceSize=Math.floor(xBound.getSize()*0.4);
-            
-            if (!flip) {
-                xBraceBound=new wsBound((xBound.min-braceSize),xBound.min);
+            if (includeBack) {
+                var xBraceBound;
+                var braceSize=Math.floor(xBound.getSize()*0.4);
+
+                if (!flip) {
+                    xBraceBound=new wsBound((xBound.min-braceSize),xBound.min);
+                }
+                else {
+                    xBraceBound=new wsBound(xBound.max,(xBound.max+braceSize));
+                }
+                this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,false,!flip,flip,true,true,false,false,this.map.MESH_FLAG_STAIR));
             }
-            else {
-                xBraceBound=new wsBound(xBound.max,(xBound.max+braceSize));
-            }
-            this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,false,!flip,flip,true,true,false,false,this.map.MESH_FLAG_STAIR));
         }
         
             // the steps
@@ -319,7 +321,7 @@ function GenRoomStairs(map,genRandom)
         this.finishStairMesh(stairBitmap,vertices,normals,true,this.map.MESH_FLAG_STAIR);
     };
 
-    this.createStairsZ=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,flip)
+    this.createStairsZ=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,includeBack,flip)
     {
         var n,idx,stepAdd;
         var vertices;
@@ -427,16 +429,18 @@ function GenRoomStairs(map,genRandom)
             
                 // the behind box brace
             
-            var zBraceBound;
-            var braceSize=Math.floor(zBound.getSize()*0.4);
-            
-            if (!flip) {
-                zBraceBound=new wsBound((zBound.min-braceSize),zBound.min);
+            if (includeBack) {
+                var zBraceBound;
+                var braceSize=Math.floor(zBound.getSize()*0.4);
+
+                if (!flip) {
+                    zBraceBound=new wsBound((zBound.min-braceSize),zBound.min);
+                }
+                else {
+                    zBraceBound=new wsBound(zBound.max,(zBound.max+braceSize));
+                }
+                this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,false,true,true,!flip,flip,false,false,this.map.MESH_FLAG_STAIR));
             }
-            else {
-                zBraceBound=new wsBound(zBound.max,(zBound.max+braceSize));
-            }
-            this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,false,true,true,!flip,flip,false,false,this.map.MESH_FLAG_STAIR));
         }
         
             // the steps

@@ -416,7 +416,7 @@ function GenBitmapUtilityObject(genRandom)
         ctx.fillRect(lft,top,(rgt-lft),(bot-top));
     };
 
-    this.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    this.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor,faceOut)
     {
         var n,lx,rx,ty,by;
         var darkenFactor,darkColor;
@@ -457,25 +457,25 @@ function GenBitmapUtilityObject(genRandom)
 
                 // the normal
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_45);
+            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_LEFT_45:this.NORMAL_RIGHT_45);
             normalCTX.beginPath();
             normalCTX.moveTo(lx,ty);
             normalCTX.lineTo(lx,by);
             normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_45);
+            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_RIGHT_45:this.NORMAL_LEFT_45);
             normalCTX.beginPath();
             normalCTX.moveTo(rx,ty);
             normalCTX.lineTo(rx,by);
             normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
+            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
             normalCTX.beginPath();
             normalCTX.moveTo(lx,ty);
             normalCTX.lineTo(rx,ty);
             normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
+            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_BOTTOM_45:this.NORMAL_TOP_45);
             normalCTX.beginPath();
             normalCTX.moveTo(lx,by);
             normalCTX.lineTo(rx,by);
@@ -617,6 +617,8 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.lineWidth=1;
         normalCTX.lineWidth=1;
+        
+        if (fillRGBColor===null) return;
 
             // and the fill
 
@@ -649,18 +651,21 @@ function GenBitmapUtilityObject(genRandom)
         var rad,fx,fy,col,idx;
 
         var orgWid=rgt-lft;
-        var wid=orgWid;
-        var high=bot-top;   
+        var orgHigh=bot-top;
+        var wid=orgWid-1;
+        var high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
         var mx=Math.floor(wid/2);
         var my=Math.floor(high/2);
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        var bitmapImgData=bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
         var bitmapData=bitmapImgData.data;
 
-        var normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        var normalImgData=normalCTX.getImageData(lft,top,orgWid,orgHigh);
         var normalData=normalImgData.data;
 
         var edgeCount=edgeSize;
+        
+            // fill the oval
 
         while ((wid>0) && (high>0)) {
 
@@ -679,9 +684,11 @@ function GenBitmapUtilityObject(genRandom)
 
                 fx=Math.sin(rad);
                 x=mx+Math.floor(halfWid*fx);
+                if (x<0) x=0;
 
                 fy=Math.cos(rad);
                 y=my-Math.floor(halfHigh*fy);
+                if (y<0) y=0;
 
                     // the color pixel
 
@@ -696,8 +703,8 @@ function GenBitmapUtilityObject(genRandom)
                     // otherwise calculate from radius
 
                 if ((wid<=flatInnerSize) || (high<=flatInnerSize)) {
-                    normalData[idx]=0;
-                    normalData[idx+1]=0;
+                    normalData[idx]=127;
+                    normalData[idx+1]=127;
                     normalData[idx+2]=255;
                 }
                 else {
@@ -726,7 +733,7 @@ function GenBitmapUtilityObject(genRandom)
         
             // line itself
             
-        bitmapCTX.fillStyle=this.colorToRGBColor(color);
+        bitmapCTX.strokeStyle=this.colorToRGBColor(color);
 
         bitmapCTX.beginPath();
         bitmapCTX.moveTo(x,y);
@@ -799,7 +806,7 @@ function GenBitmapUtilityObject(genRandom)
         }
     };
     
-    this.drawRandomLine=function(bitmapCTX,normalCTX,x,y,x2,y2,color)
+    this.drawRandomLine=function(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color)
     {
         var n,sx,sy,ex,ey,r;
         var segCount=this.genRandom.randomInt(2,5);
@@ -812,16 +819,23 @@ function GenBitmapUtilityObject(genRandom)
         sy=y;
         
         for (n=0;n!==segCount;n++) {
-            ex=sx+xAdd;
-            ey=sy+yAdd;
             
-            r=10-this.genRandom.randomInt(0,20);
-            
-            if (horizontal) {
-                ey+=r;
+            if ((n+1)===segCount) {
+                ex=x2;
+                ey=y2;
             }
             else {
-                ex+=r;
+                ex=sx+xAdd;
+                ey=sy+yAdd;
+
+                r=10-this.genRandom.randomInt(0,lineVariant);
+
+                if (horizontal) {
+                    ey+=r;
+                }
+                else {
+                    ex+=r;
+                }
             }
             
             this.drawLine(bitmapCTX,normalCTX,sx,sy,ex,ey,color);

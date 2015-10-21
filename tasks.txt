@@ -17,20 +17,15 @@ WHEN THERE IS AN INTERFACE TODOs
     [ ] debug.release();
 
 FUTURE TODOs
-    [ ] convert setting to scrolling input controls
+    [ ] code to scan and covert settings to input controls
     [ ] create and save projects in indexedDB
 
 REGULAR TODOs
 
 
 
-[ ] stairs should skip back end if up against a pillar
-
-[ ] no light mesh hits -- needs "has flag" type call
-    [ ] need to highlight these in lightmap!
-
-[ ] pillars need separate object and pillar locations and ONLY single story rooms
-
+[ ] rooms need decoration locations and decoration models
+[ ] rooms have possible light positions
 
 
 [ ] try to pack glsl light struct floats
@@ -40,15 +35,24 @@ REGULAR TODOs
     [X] need metal + bar
     [X] need to have one set per map
     [ ] need bitmap colors filters are settings
+    [X] metal textures more light gray
+    [X] fix lines on rock textures
+    [X] corregated metal texture
+    [X] plaster wall texture
+    [X] metal needs a thin version
+    [X] fix bolt problems (normals, bottom cut off)
+    [ ] machine texture
 
-[ ] rooms have possible light positions
+
+[ ] jumping
+[ ] gravity
 
 [ ] diffuse calcs in light maps
-[ ] rooms need decoration locations and decoration models
+[ ] no light mesh hits -- needs "has flag" type call
+    [ ] need to highlight these in lightmap!
 
 
 [ ] frustum cull models
-[ ] when building view light list, ignore ones behind the player (pick better lights)
 
 [ ] don't draw spaces in text
 

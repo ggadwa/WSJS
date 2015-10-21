@@ -29,7 +29,10 @@ function SettingsObject()
     this.mapLightExponentMin=0.2;               // minimum light exponent (0.0 is completely hard light with no fall off)
     this.mapLightExponentExtra=0.5;             // exponent add
     
-    this.generateLightmap=true;                // set to true to generate light maps
+    this.mapLightRGBMinimum=0.6;                // minimum r, g, or b value for map lights
+    this.mapLightRGBExtra=0.4;                  // random r, g, b add for map lights
+    
+    this.generateLightmap=true;                 // set to true to generate light maps
     
         // decorations
         

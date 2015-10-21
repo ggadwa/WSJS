@@ -205,19 +205,19 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         switch (connectType) {
             
             case piece.CONNECT_TYPE_LEFT:
-                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false);
+                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,false);
                 break;
                 
             case piece.CONNECT_TYPE_TOP:
-                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false);
+                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,false);
                 break;
                 
             case piece.CONNECT_TYPE_RIGHT:
-                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,true);
+                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,true);
                 break;
                 
             case piece.CONNECT_TYPE_BOTTOM:
-                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,true);
+                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,true);
                 break;
                 
         }
@@ -257,9 +257,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // the color
 
-        var red=0.5+(this.genRandom.random()*0.5);
-        var green=0.5+(this.genRandom.random()*0.5);
-        var blue=0.5+(this.genRandom.random()*0.5);
+        var red=settings.mapLightRGBMinimum+(this.genRandom.random()*settings.mapLightRGBExtra);
+        var green=settings.mapLightRGBMinimum+(this.genRandom.random()*settings.mapLightRGBExtra);
+        var blue=settings.mapLightRGBMinimum+(this.genRandom.random()*settings.mapLightRGBExtra);
         
             // the exponent
             
