@@ -162,7 +162,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // platforms
             
-        if (hasStories) {
+        if ((hasStories) && (settings.roomPlatforms)) {
             var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom,piece);
             genRoomPlatform.createPlatforms(xBound,yBound,zBound)
         }

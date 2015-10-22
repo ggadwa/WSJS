@@ -845,6 +845,80 @@ function GenBitmapUtilityObject(genRandom)
         }
     };
     
+    this.drawBumpLine=function(bitmapCTX,normalCTX,x,y,x2,y2,color)
+    {
+        var n;
+        var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
+        
+            // the bump line
+            
+        bitmapCTX.strokeStyle=this.colorToRGBColor(color);
+
+        bitmapCTX.beginPath();
+        bitmapCTX.moveTo(x,y);
+        bitmapCTX.lineTo(x2,y2);
+        bitmapCTX.stroke();
+        
+        normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        
+        normalCTX.beginPath();
+        normalCTX.moveTo(x,y);
+        normalCTX.lineTo(x2,y2);
+        normalCTX.stroke();
+        
+            // fade of bump
+            
+        for (n=1;n!==4;n++) {
+            if (horizontal) {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,(y-n));
+                bitmapCTX.lineTo(x2,(y2-n));
+                bitmapCTX.stroke();
+                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
+                normalCTX.beginPath();
+                normalCTX.moveTo(x,(y-n));
+                normalCTX.lineTo(x2,(y2-n));
+                normalCTX.stroke();
+            }
+            else {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo((x-n),y);
+                bitmapCTX.lineTo((x2-n),y2);
+                bitmapCTX.stroke();
+                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
+                normalCTX.beginPath();
+                normalCTX.moveTo((x-n),y);
+                normalCTX.lineTo((x2-n),y2);
+                normalCTX.stroke();
+            }
+        }
+        
+        for (n=1;n!==4;n++) {
+            if (horizontal) {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,(y+n));
+                bitmapCTX.lineTo(x2,(y2+n));
+                bitmapCTX.stroke();
+                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
+                normalCTX.beginPath();
+                normalCTX.moveTo(x,(y+n));
+                normalCTX.lineTo(x2,(y2+n));
+                normalCTX.stroke();
+            }
+            else {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo((x+n),y);
+                bitmapCTX.lineTo((x2+n),y2);
+                bitmapCTX.stroke();
+                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
+                normalCTX.beginPath();
+                normalCTX.moveTo((x+n),y);
+                normalCTX.lineTo((x2+n),y2);
+                normalCTX.stroke();
+            }
+        }
+    };
+    
         //
         // particles
         //

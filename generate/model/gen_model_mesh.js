@@ -16,7 +16,9 @@ function GenModelMeshObject(model,bitmap,genRandom)
     this.BOX_VERTEX_COUNT=24;
     this.BOX_UV_COUNT=16;
     this.BOX_INDEX_COUNT=24;
-        
+    
+    this.GLOBE_QUAD_SPLIT=12;
+    
     this.CYLINDER_SIDE_COUNT=12;
     this.CYLINDER_VERTEX_COUNT=((this.CYLINDER_SIDE_COUNT*3)*2);
     this.CYLINDER_UV_COUNT=((this.CYLINDER_SIDE_COUNT*2)*2);
@@ -104,10 +106,18 @@ function GenModelMeshObject(model,bitmap,genRandom)
     };
     
         //
+        // build globe around bone
+        //
+        
+    this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    {
+    };
+    
+        //
         // build cylinders around two bones
         //
         
-    this.buildCylinderAroundPoints=function(view,pt1,pt2,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    this.buildCylinderAroundTwoPoints=function(view,pt1,pt2,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         var n,rd,v2Idx;
         var tx,tz,bx,bz;
@@ -167,9 +177,9 @@ function GenModelMeshObject(model,bitmap,genRandom)
         }
     };
     
-    this.buildCylinderAroundBones=function(view,bone1,bone2,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    this.buildCylinderAroundTwoBones=function(view,bone1,bone2,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
-        this.buildCylinderAroundPoints(view,bone1.position,bone2.position,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset);
+        this.buildCylinderAroundTwoPoints(view,bone1.position,bone2.position,radius1,radius2,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset);
     };
     
         //
@@ -279,7 +289,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 
             if ((bone.isWrist()) || (bone.isElbow()) || (bone.isAnkle()) || (bone.isKnee()) || (bone.isNeck())) {
                 parentBone=bones[bone.parentBoneIdx];
-                this.buildCylinderAroundBones(view,bone,parentBone,100,100,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+                this.buildCylinderAroundTwoBones(view,bone,parentBone,100,100,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
                 
                 vIdx+=this.CYLINDER_VERTEX_COUNT;
                 uvIdx+=this.CYLINDER_UV_COUNT;
@@ -300,12 +310,12 @@ function GenModelMeshObject(model,bitmap,genRandom)
         var waistBone=this.model.skeleton.findBone("Waist");
         var hipBone=this.model.skeleton.findBone("Hip");
         
-        this.buildCylinderAroundBones(view,torsoBone,waistBone,torsoRadius,waistRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        this.buildCylinderAroundTwoBones(view,torsoBone,waistBone,torsoRadius,waistRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
         vIdx+=this.CYLINDER_VERTEX_COUNT;
         uvIdx+=this.CYLINDER_UV_COUNT;
         iIdx+=this.CYLINDER_INDEX_COUNT;
         
-        this.buildCylinderAroundBones(view,waistBone,hipBone,waistRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        this.buildCylinderAroundTwoBones(view,waistBone,hipBone,waistRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
         vIdx+=this.CYLINDER_VERTEX_COUNT;
         uvIdx+=this.CYLINDER_UV_COUNT;
         iIdx+=this.CYLINDER_INDEX_COUNT;
@@ -313,7 +323,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
         var pt=hipBone.position.copy();
         pt.y+=300;
         
-        this.buildCylinderAroundPoints(view,hipBone.position,pt,hipRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        this.buildCylinderAroundTwoPoints(view,hipBone.position,pt,hipRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
         vIdx+=this.CYLINDER_VERTEX_COUNT;
         uvIdx+=this.CYLINDER_UV_COUNT;
         iIdx+=this.CYLINDER_INDEX_COUNT;
