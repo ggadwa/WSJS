@@ -17,7 +17,10 @@ function GenModelMeshObject(model,bitmap,genRandom)
     this.BOX_UV_COUNT=16;
     this.BOX_INDEX_COUNT=24;
     
-    this.GLOBE_QUAD_SPLIT=12;
+    this.GLOBE_SURFACE_COUNT=8;
+    this.GLOBE_VERTEX_COUNT=((this.GLOBE_SURFACE_COUNT*this.GLOBE_SURFACE_COUNT)*3);
+    this.GLOBE_UV_COUNT=((this.GLOBE_SURFACE_COUNT*this.GLOBE_SURFACE_COUNT)*2);
+    this.GLOBE_INDEX_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-1))*6);
     
     this.CYLINDER_SIDE_COUNT=12;
     this.CYLINDER_VERTEX_COUNT=((this.CYLINDER_SIDE_COUNT*3)*2);
@@ -111,6 +114,83 @@ function GenModelMeshObject(model,bitmap,genRandom)
         
     this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
+        var x,y;
+        var rd,radius,px,py,pz;
+        var vAng;
+        
+        var startVIdx=Math.floor(vIdx/3);
+        
+        var xzAng,yAng;
+        var angAdd=360.0/this.GLOBE_SURFACE_COUNT;
+        
+        yAng=0.0;
+        py=bone.position.y-600;
+        
+        for (y=0;y!==this.GLOBE_SURFACE_COUNT;y++) {
+            
+                // get y position and radius
+                // from angle
+                
+            radius=widRadius;
+            vAng=vOffset+((yAng/360.0)*0.5);
+            
+                // the band of vertexes
+            
+            xzAng=0.0;
+            
+            for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
+                rd=xzAng*DEGREE_TO_RAD;
+                px=bone.position.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
+                pz=bone.position.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+
+                vertices[vIdx++]=px;
+                vertices[vIdx++]=py;
+                vertices[vIdx++]=pz;
+
+                uvs[uvIdx++]=uOffset+((xzAng/360.0)*0.5);
+                uvs[uvIdx++]=vAng;
+
+                xzAng+=angAdd;
+            }
+            
+            py+=100;
+            yAng+=angAdd;
+        }
+        
+            // build the triangles to
+            // complete the globe
+            
+        vIdx=startVIdx;
+        var vNextIdx,v2Idx,v2NextIdx;
+        var vStartIdx,v2StartIdx;
+        
+        for (y=0;y!==(this.GLOBE_SURFACE_COUNT-1);y++) {
+            
+            vStartIdx=vIdx;
+            
+            v2Idx=vIdx+this.GLOBE_SURFACE_COUNT;
+            v2StartIdx=v2Idx;
+            
+            for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
+                
+                vNextIdx=vIdx+1;
+                if (vNextIdx===this.GLOBE_SURFACE_COUNT) vNextIdx=vStartIdx;
+                
+                v2NextIdx=v2Idx+1;
+                if (v2NextIdx===this.GLOBE_SURFACE_COUNT) v2NextIdx=v2StartIdx;
+            
+                indexes[iIdx++]=v2Idx;
+                indexes[iIdx++]=vIdx;
+                indexes[iIdx++]=vNextIdx;
+
+                indexes[iIdx++]=v2Idx;
+                indexes[iIdx++]=vNextIdx;
+                indexes[iIdx++]=v2NextIdx;
+            
+                vIdx++;
+                v2Idx++;
+            }
+        }
     };
     
         //
@@ -206,10 +286,19 @@ function GenModelMeshObject(model,bitmap,genRandom)
             
                 // box type bones
                 
-            if ((bone.isHead()) || (bone.isHand()) || (bone.isFoot())) {
+            if ((bone.isHand()) || (bone.isFoot())) {
                 vIdx+=this.BOX_VERTEX_COUNT;
                 uvIdx+=this.BOX_UV_COUNT;
                 iIdx+=this.BOX_INDEX_COUNT;
+                continue;
+            }
+            
+                // globe type bones
+                
+            if (bone.isHead()) {
+                vIdx+=this.GLOBE_VERTEX_COUNT;
+                uvIdx+=this.GLOBE_UV_COUNT;
+                iIdx+=this.GLOBE_INDEX_COUNT;
                 continue;
             }
             
@@ -247,14 +336,20 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 // box type bones
             
             if (bone.isHead()) {
-                xBound=new wsBound((bone.position.x-200),(bone.position.x+200));
-                yBound=new wsBound((bone.position.y-400),(bone.position.y+100));
-                zBound=new wsBound((bone.position.z-150),(bone.position.z+150));
+                this.buildGlobeAroundBone(view,bone,500,500,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.0);
+                vIdx+=this.GLOBE_VERTEX_COUNT;
+                uvIdx+=this.GLOBE_UV_COUNT;
+                iIdx+=this.GLOBE_INDEX_COUNT;
+                
+                
+                //xBound=new wsBound((bone.position.x-200),(bone.position.x+200));
+                //yBound=new wsBound((bone.position.y-400),(bone.position.y+100));
+                //zBound=new wsBound((bone.position.z-150),(bone.position.z+150));
 
-                this.buildBoxAroundBone(view,bone,xBound,yBound,zBound,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.0);
-                vIdx+=this.BOX_VERTEX_COUNT;
-                uvIdx+=this.BOX_UV_COUNT;
-                iIdx+=this.BOX_INDEX_COUNT;
+                //this.buildBoxAroundBone(view,bone,xBound,yBound,zBound,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.0);
+                //vIdx+=this.BOX_VERTEX_COUNT;
+                //uvIdx+=this.BOX_UV_COUNT;
+                //iIdx+=this.BOX_INDEX_COUNT;
                 
                 continue;
             }
