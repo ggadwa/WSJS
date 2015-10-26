@@ -43,13 +43,13 @@ REGULAR TODOs
     [X] fix bolt problems (normals, bottom cut off)
     [ ] machine texture
 
-
-[ ] jumping
-[ ] gravity
+[ ] physics
+    [ ] jumping
+    [ ] gravity
 
 [ ] diffuse calcs in light maps
 [ ] no light mesh hits -- needs "has flag" type call
-    [ ] need to highlight these in lightmap!
+    [ ] need to highlight these in lightmap
 
 
 [ ] don't draw spaces in text
@@ -58,11 +58,11 @@ REGULAR TODOs
 [ ] model generation
     [ ] frustum cull models
     [X] need globe generators
-    [ ] need to generate normals
+    [X] need to generate normals
+    [ ] pick sizes that always cause overlap
     [ ] facial features additional meshes
-    [ ] combine close vertexes
-    [ ] do torse->waist->hips as separate find calls
-    	  torso size = arm size, hips = leg size, waist = random
+    [ ] randomize meshes (new utility, always make bigger from center)
+    [ ] combine close vertexes (maybe)
 
 
 

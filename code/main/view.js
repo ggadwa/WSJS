@@ -439,7 +439,8 @@ function ViewObject()
             entity.draw(this);
             entity.drawEnd(this);
             
-            if (settings.debugDrawSkeleton) debug.drawModelSkeleton(this,entity.model,entity.position);
+            if (settings.debugDrawModelSkeleton) debug.drawModelSkeleton(this,entity.model,entity.position);
+            if (settings.debugDrawModelTangentSpace) debug.drawModelMeshNormals(this,entity.model,entity.position);
             drawModelCount++;
         }
 

@@ -8,9 +8,13 @@ function MeshUVTangentsObject()
 {
     //
     // create normals from verticies and triangles
+    // 
+    // this function expects the vertex and normal lists to be parallel and works
+    // on a chunk of the mesh.  Use buildMeshNormals() below for operating on
+    // the whole mesh
     //
 
-    this.buildMeshNormals=function(vertices,indexes,normalsIn)
+    this.buildMeshNormalsFromChunk=function(vertices,vIdxStart,vIdxLength,indexes,iIdxStart,iIdxLength,normals,normalsIn)
     {
         var n,nTrig,nVertex,trigIdx;
         var idx,v0Idx,v1Idx,v2Idx;
@@ -23,11 +27,7 @@ function MeshUVTangentsObject()
             // remember that these are opengl lists
             // so they are just packed arrays of floats
 
-            // we default all normals to being up in
-            // case we have stray normals without a trig
-
-        nVertex=Math.floor(vertices.length/3);
-        var normals=new Float32Array(nVertex*3);
+        nVertex=Math.floor(vIdxLength/3);
 
             // determine the center of the vertices
             // this will be used later to determine if
@@ -37,7 +37,7 @@ function MeshUVTangentsObject()
 
         var meshCenter=new wsPoint(0.0,0.0,0.0);
 
-        idx=0;
+        idx=vIdxStart;
 
         for (n=0;n!==nVertex;n++) {
             meshCenter.x+=vertices[idx++];
@@ -63,7 +63,7 @@ function MeshUVTangentsObject()
         var p20=new wsPoint(0.0,0.0,0.0);
         var normal=new wsPoint(0.0,0.0,0.0);
 
-        nTrig=Math.floor(indexes.length/3);
+        nTrig=Math.floor(iIdxLength/3);
 
         for (n=0;n!==nTrig;n++) {
 
@@ -73,7 +73,7 @@ function MeshUVTangentsObject()
                 // again, packed arrays, need to
                 // find vertex start in them
 
-            trigIdx=n*3;
+            trigIdx=iIdxStart+(n*3);
 
             v0Idx=indexes[trigIdx]*3;
             v1Idx=indexes[trigIdx+1]*3;
@@ -147,7 +147,15 @@ function MeshUVTangentsObject()
 
         return(normals);
     };
-
+    
+    this.buildMeshNormals=function(vertices,indexes,normalsIn)
+    {
+        var normals=new Float32Array(vertices.length);
+        this.buildMeshNormalsFromChunk(vertices,0,vertices.length,indexes,0,indexes.length,normals,normalsIn);
+        
+        return(normals);
+    };
+    
         //
         // create UVs from vertices and normals
         //

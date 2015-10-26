@@ -59,6 +59,11 @@ function ModelBoneObject(name,parentBoneIdx,position)
         return(this.name.indexOf('Elbow')!==-1);
     };
     
+    this.isShoulder=function()
+    {
+        return(this.name.indexOf('Shoulder')!==-1);
+    };
+    
     this.isFoot=function()
     {
         return(this.name.indexOf('Foot')!==-1);

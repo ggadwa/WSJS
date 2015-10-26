@@ -56,14 +56,16 @@ function SettingsObject()
     
         // draw testing
     
-    this.debugDrawTangentSpace=false;
+    this.debugDrawMapTangentSpace=false;
     this.debugDrawMeshLines=false;
-    this.debugDrawSkeleton=false;
+    
+    this.debugDrawModelSkeleton=true;
+    this.debugDrawModelTangentSpace=false;
     
         // play testing
         
     this.clipWalls=false;
-    this.fly=true;
+    this.fly=false;
 
         // random seeds
         // hard set these to generate the
@@ -72,10 +74,10 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=Math.floor((Math.random()*seed));
-    this.randomSeedModelBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedModel=Math.floor((Math.random()*seed));
-    this.randomSeedEntity=Math.floor((Math.random()*seed));
+    this.randomSeedMap=1;//Math.floor((Math.random()*seed));
+    this.randomSeedModelBitmap=1;//Math.floor((Math.random()*seed));
+    this.randomSeedModel=1; //Math.floor((Math.random()*seed));
+    this.randomSeedEntity=1; //Math.floor((Math.random()*seed));
     
     console.log('map seed='+this.randomSeedMap);
 }

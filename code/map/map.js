@@ -483,14 +483,14 @@ function MapObject()
         
             // debugging draw
         
-        if (settings.debugDrawMeshLines) {
+        if (settings.debugDrawMapMeshLines) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(view,mesh);
             }
         }
         
-        if (settings.debugDrawTangentSpace) {
+        if (settings.debugDrawMapTangentSpace) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) {      // draw separately so they overlay the triangle lines

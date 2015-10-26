@@ -236,6 +236,7 @@ function DebugObject()
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(0.0,1.0,0.0));
+        gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -262,6 +263,77 @@ function DebugObject()
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
+        gl.enable(gl.DEPTH_TEST);
+        this.debugShader.drawEnd(view);
+    };
+    
+    this.drawModelMeshNormals=function(view,model,offsetPosition)
+    {
+        var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
+        var gl=view.gl;
+        var normalSize=200.0;
+        
+        var mesh=model.mesh;
+        
+            // create the lines
+
+        nVertex=mesh.vertexCount;
+
+        var vertices=new Float32Array(nVertex*6);
+        var indexes=new Uint16Array(nVertex*2);
+
+        vertexIdx=0;
+        elementIdx=0;
+
+        vIdx=0;
+        iIdx=0;
+
+        for (n=0;n!==nVertex;n++) {
+            vertices[vIdx++]=mesh.vertices[vertexIdx]+offsetPosition.x;
+            vertices[vIdx++]=mesh.vertices[vertexIdx+1]+offsetPosition.y;
+            vertices[vIdx++]=mesh.vertices[vertexIdx+2]+offsetPosition.z;
+            vertices[vIdx++]=(mesh.vertices[vertexIdx]+offsetPosition.x)+(mesh.normals[vertexIdx]*normalSize);
+            vertices[vIdx++]=(mesh.vertices[vertexIdx+1]+offsetPosition.y)+(mesh.normals[vertexIdx+1]*normalSize);
+            vertices[vIdx++]=(mesh.vertices[vertexIdx+2]+offsetPosition.z)+(mesh.normals[vertexIdx+2]*normalSize);
+
+            indexes[iIdx++]=elementIdx;
+            indexes[iIdx++]=elementIdx+1;
+
+            vertexIdx+=3;
+            elementIdx+=2;
+        }
+
+            // set the shader
+
+        this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
+        gl.disable(gl.DEPTH_TEST);
+
+            // setup the buffers
+
+        var vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+
+        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        var indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
+
+            // draw the lines
+
+        gl.drawElements(gl.LINES,elementIdx,gl.UNSIGNED_SHORT,0);
+
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+
+        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(indexBuffer);
+
+        gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     };
 
