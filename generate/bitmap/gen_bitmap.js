@@ -998,13 +998,13 @@ function GenBitmapObject(genRandom)
         }
 
             // debugging
-/*
+
         if (generateType===GEN_BITMAP_TYPE_SKIN) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);
         }
-*/
+
             // finally create the bitmap
             // object and load into WebGL
 

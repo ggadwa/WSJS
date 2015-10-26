@@ -52,19 +52,17 @@ REGULAR TODOs
     [ ] need to highlight these in lightmap!
 
 
-[ ] frustum cull models
-
 [ ] don't draw spaces in text
-
-[ ] collisions
-     [ ] gravity
 
 
 [ ] model generation
-  	[ ] need globe generators
- 	[ ] combine close vertexes
- 	[ ] do torse->waist->hips as separate find calls
-    		torso size = arm size, hips = leg size, waist = random
+    [ ] frustum cull models
+    [X] need globe generators
+    [ ] need to generate normals
+    [ ] facial features additional meshes
+    [ ] combine close vertexes
+    [ ] do torse->waist->hips as separate find calls
+    	  torso size = arm size, hips = leg size, waist = random
 
 
 

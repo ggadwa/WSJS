@@ -1231,5 +1231,20 @@ function GenBitmapUtilityObject(genRandom)
         bitmapCTX.putImageData(bitmapImgData,lft,top);        
         normalCTX.putImageData(normalImgData,lft,top);
     };
+    
+    //
+    // testing
+    //
+    
+    this.drawUVTest=function(bitmapCTX,lft,top,rgt,bot)
+    {
+        var xMid=Math.floor((lft+rgt)/2);
+        var yMid=Math.floor((top+bot)/2);
+        
+        this.drawRect(bitmapCTX,lft,top,xMid,yMid,new wsColor(1,1,0));
+        this.drawRect(bitmapCTX,xMid,top,rgt,yMid,new wsColor(1,0,0));
+        this.drawRect(bitmapCTX,lft,yMid,xMid,bot,new wsColor(0,1,0));
+        this.drawRect(bitmapCTX,xMid,yMid,rgt,bot,new wsColor(0,0,1));
+    };
 
 }

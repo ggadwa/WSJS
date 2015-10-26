@@ -18,9 +18,9 @@ function GenModelMeshObject(model,bitmap,genRandom)
     this.BOX_INDEX_COUNT=24;
     
     this.GLOBE_SURFACE_COUNT=8;
-    this.GLOBE_VERTEX_COUNT=((this.GLOBE_SURFACE_COUNT*this.GLOBE_SURFACE_COUNT)*3);
-    this.GLOBE_UV_COUNT=((this.GLOBE_SURFACE_COUNT*this.GLOBE_SURFACE_COUNT)*2);
-    this.GLOBE_INDEX_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-1))*6);
+    this.GLOBE_VERTEX_COUNT=(((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-2))+2)*3);
+    this.GLOBE_UV_COUNT=(((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-2))+2)*2);
+    this.GLOBE_INDEX_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-3))*6)+((this.GLOBE_SURFACE_COUNT*2)*3);
     
     this.CYLINDER_SIDE_COUNT=12;
     this.CYLINDER_VERTEX_COUNT=((this.CYLINDER_SIDE_COUNT*3)*2);
@@ -114,25 +114,31 @@ function GenModelMeshObject(model,bitmap,genRandom)
         
     this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
-        var x,y;
+        var x,y,ang;
         var rd,radius,px,py,pz;
         var vAng;
         
         var startVIdx=Math.floor(vIdx/3);
         
-        var xzAng,yAng;
-        var angAdd=360.0/this.GLOBE_SURFACE_COUNT;
+            // create the globe without a top
+            // or bottom and build that with trigs later
+            
+        var xzAngAdd=360.0/this.GLOBE_SURFACE_COUNT;
+        var yAngAdd=180.0/this.GLOBE_SURFACE_COUNT;
+
+        var xzAng;
+        var yAng=yAngAdd;
         
-        yAng=0.0;
-        py=bone.position.y-600;
-        
-        for (y=0;y!==this.GLOBE_SURFACE_COUNT;y++) {
+        for (y=1;y!==(this.GLOBE_SURFACE_COUNT-1);y++) {
             
                 // get y position and radius
                 // from angle
-                
-            radius=widRadius;
-            vAng=vOffset+((yAng/360.0)*0.5);
+            
+            rd=yAng*DEGREE_TO_RAD;
+            radius=widRadius*Math.sin(rd);
+            py=bone.position.y-(highRadius*Math.cos(rd));
+            
+            vAng=vOffset+((yAng/180.0)*0.5);
             
                 // the band of vertexes
             
@@ -147,38 +153,56 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 vertices[vIdx++]=py;
                 vertices[vIdx++]=pz;
 
-                uvs[uvIdx++]=uOffset+((xzAng/360.0)*0.5);
+                ang=xzAng+225.0;
+                if (ang>=360.0) ang-=360.0;
+                
+                uvs[uvIdx++]=(uOffset+0.5)-((ang/360.0)*0.5);
                 uvs[uvIdx++]=vAng;
 
-                xzAng+=angAdd;
+                xzAng+=xzAngAdd;
             }
             
-            py+=100;
-            yAng+=angAdd;
+            yAng+=yAngAdd;
         }
         
-            // build the triangles to
-            // complete the globe
-            
-        vIdx=startVIdx;
-        var vNextIdx,v2Idx,v2NextIdx;
-        var vStartIdx,v2StartIdx;
+            // top and bottom points
         
-        for (y=0;y!==(this.GLOBE_SURFACE_COUNT-1);y++) {
+        var topIdx=Math.floor(vIdx/3);
+        
+        vertices[vIdx++]=bone.position.x;
+        vertices[vIdx++]=bone.position.y-highRadius;
+        vertices[vIdx++]=bone.position.z;
+        
+        uvs[uvIdx++]=uOffset+0.25;
+        uvs[uvIdx++]=vOffset;
+        
+        var botIdx=Math.floor(vIdx/3);
+       
+        vertices[vIdx++]=bone.position.x;
+        vertices[vIdx++]=bone.position.y+highRadius;
+        vertices[vIdx++]=bone.position.z;
+        
+        uvs[uvIdx++]=uOffset+0.25;
+        uvs[uvIdx++]=vOffset+0.5;
+        
+            // build the triangles on
+            // all the strips except the
+            // top and bottom strip
             
-            vStartIdx=vIdx;
-            
-            v2Idx=vIdx+this.GLOBE_SURFACE_COUNT;
-            v2StartIdx=v2Idx;
+        var nx,vNextIdx,v2Idx,v2NextIdx;
+        
+        for (y=0;y!==(this.GLOBE_SURFACE_COUNT-3);y++) {
             
             for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
                 
-                vNextIdx=vIdx+1;
-                if (vNextIdx===this.GLOBE_SURFACE_COUNT) vNextIdx=vStartIdx;
+                vIdx=startVIdx+((y*this.GLOBE_SURFACE_COUNT)+x);
+                v2Idx=startVIdx+(((y+1)*this.GLOBE_SURFACE_COUNT)+x);
                 
-                v2NextIdx=v2Idx+1;
-                if (v2NextIdx===this.GLOBE_SURFACE_COUNT) v2NextIdx=v2StartIdx;
-            
+                nx=(x<(this.GLOBE_SURFACE_COUNT-1))?(x+1):0;
+
+                vNextIdx=startVIdx+((y*this.GLOBE_SURFACE_COUNT)+nx);
+                v2NextIdx=startVIdx+(((y+1)*this.GLOBE_SURFACE_COUNT)+nx);
+                 
                 indexes[iIdx++]=v2Idx;
                 indexes[iIdx++]=vIdx;
                 indexes[iIdx++]=vNextIdx;
@@ -186,10 +210,35 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 indexes[iIdx++]=v2Idx;
                 indexes[iIdx++]=vNextIdx;
                 indexes[iIdx++]=v2NextIdx;
-            
-                vIdx++;
-                v2Idx++;
             }
+        }
+        
+            // top triangles
+            
+        for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
+            nx=(x<(this.GLOBE_SURFACE_COUNT-1))?(x+1):0;
+            
+            vIdx=startVIdx+x;
+            vNextIdx=startVIdx+nx;
+            
+            indexes[iIdx++]=vIdx;
+            indexes[iIdx++]=topIdx;
+            indexes[iIdx++]=vNextIdx;
+        }
+        
+            // bottom triangles
+            
+        var botOff=startVIdx+(this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-3));
+            
+        for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
+            nx=(x<(this.GLOBE_SURFACE_COUNT-1))?(x+1):0;
+            
+            vIdx=botOff+x;
+            vNextIdx=botOff+nx;
+            
+            indexes[iIdx++]=vIdx;
+            indexes[iIdx++]=botIdx;
+            indexes[iIdx++]=vNextIdx;
         }
     };
     
@@ -317,7 +366,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
         var vertices=new Float32Array(vIdx);
         var uvs=new Float32Array(uvIdx);
         var indexes=new Uint16Array(iIdx);
-
+        
             // box all the bones
         
         var vIdx=0;
@@ -336,21 +385,10 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 // box type bones
             
             if (bone.isHead()) {
-                this.buildGlobeAroundBone(view,bone,500,500,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.0);
+                this.buildGlobeAroundBone(view,bone,400,500,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.0);
                 vIdx+=this.GLOBE_VERTEX_COUNT;
                 uvIdx+=this.GLOBE_UV_COUNT;
                 iIdx+=this.GLOBE_INDEX_COUNT;
-                
-                
-                //xBound=new wsBound((bone.position.x-200),(bone.position.x+200));
-                //yBound=new wsBound((bone.position.y-400),(bone.position.y+100));
-                //zBound=new wsBound((bone.position.z-150),(bone.position.z+150));
-
-                //this.buildBoxAroundBone(view,bone,xBound,yBound,zBound,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.0);
-                //vIdx+=this.BOX_VERTEX_COUNT;
-                //uvIdx+=this.BOX_UV_COUNT;
-                //iIdx+=this.BOX_INDEX_COUNT;
-                
                 continue;
             }
             
@@ -396,7 +434,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
         }
        
             // build the body bones
-            
+           
         var torsoRadius=this.genRandom.randomInt(200,150);
         var waistRadius=this.genRandom.randomInt(200,150);
         var hipRadius=this.genRandom.randomInt(200,150);
@@ -405,12 +443,12 @@ function GenModelMeshObject(model,bitmap,genRandom)
         var waistBone=this.model.skeleton.findBone("Waist");
         var hipBone=this.model.skeleton.findBone("Hip");
         
-        this.buildCylinderAroundTwoBones(view,torsoBone,waistBone,torsoRadius,waistRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        this.buildCylinderAroundTwoBones(view,torsoBone,waistBone,torsoRadius,waistRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.5);
         vIdx+=this.CYLINDER_VERTEX_COUNT;
         uvIdx+=this.CYLINDER_UV_COUNT;
         iIdx+=this.CYLINDER_INDEX_COUNT;
         
-        this.buildCylinderAroundTwoBones(view,waistBone,hipBone,waistRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        this.buildCylinderAroundTwoBones(view,waistBone,hipBone,waistRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.5);
         vIdx+=this.CYLINDER_VERTEX_COUNT;
         uvIdx+=this.CYLINDER_UV_COUNT;
         iIdx+=this.CYLINDER_INDEX_COUNT;
@@ -418,11 +456,11 @@ function GenModelMeshObject(model,bitmap,genRandom)
         var pt=hipBone.position.copy();
         pt.y+=300;
         
-        this.buildCylinderAroundTwoPoints(view,hipBone.position,pt,hipRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        this.buildCylinderAroundTwoPoints(view,hipBone.position,pt,hipRadius,hipRadius,vertices,vIdx,uvs,uvIdx,indexes,iIdx,0.5,0.5);
         vIdx+=this.CYLINDER_VERTEX_COUNT;
         uvIdx+=this.CYLINDER_UV_COUNT;
         iIdx+=this.CYLINDER_INDEX_COUNT;
-            
+        
             // complete the tangent space vectors
     
         var normals=meshUVTangents.buildMeshNormals(vertices,indexes,false);

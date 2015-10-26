@@ -66,7 +66,7 @@ function GenSkeletonObject(model,genRandom)
         var kneeSwing=this.genRandom.randomInt(100,100);
         var ankleSwing=this.genRandom.randomInt(0,50);
         var neckHigh=torsoHigh+this.genRandom.randomInt(50,100);
-        var headHigh=neckHigh+this.genRandom.randomInt(100,100);
+        var headHigh=neckHigh+this.genRandom.randomInt(100,100)+500;
         var handHigh=this.genRandom.randomInt(800,1000);
         var elbowHigh=Math.floor((torsoHigh-handHigh)/2)+handHigh;
         var ankleHigh=this.genRandom.randomInt(100,200);
