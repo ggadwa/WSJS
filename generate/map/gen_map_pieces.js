@@ -178,8 +178,8 @@ function MapPieceObject(isRoom)
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
+        var uvs=meshUtility.buildMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
 
             // finally create the mesh
 
@@ -250,9 +250,9 @@ function MapPieceObject(isRoom)
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUVTangents.buildMeshNormals(vertices,indexes,true);
-        var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
+        var normals=meshUtility.buildMeshNormals(vertices,indexes,true);
+        var uvs=meshUtility.buildMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
 
             // finally create the mesh
 

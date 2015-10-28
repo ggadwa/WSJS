@@ -40,6 +40,31 @@ function GenSkeletonObject(model,genRandom)
     {
         bones[boneIdx].position.subPoint(offsetPnt);
     };
+    
+    this.rotateBoneAndAllChildren=function(bones,boneIdx,ang,offsetPnt)
+    {
+        var n,bone;
+        
+            // move this bone from the last
+            // rotational offset
+            
+        this.moveBone(bones,boneIdx,offsetPnt);
+        
+            // rotate bone and update the offset
+            // point for further children
+        
+        var nextOffsetPnt=this.rotateBone(bones,boneIdx,ang);
+        nextOffsetPnt.addPoint(offsetPnt);
+        
+            // now move all children
+            
+        for (n=0;n!==bones.length;n++) {
+            if (n===boneIdx) continue;
+            
+            bone=bones[n];
+            if (bone.parentBoneIdx===boneIdx) this.rotateBoneAndAllChildren(bones,n,ang,nextOffsetPnt);
+        }
+    };
 
         //
         // build skeleton bones
@@ -47,8 +72,6 @@ function GenSkeletonObject(model,genRandom)
 
     this.build=function()
     {
-        var ang;
-        
             // build empty skeleton
             
         this.model.skeleton=new ModelSkeletonObject();
@@ -61,11 +84,12 @@ function GenSkeletonObject(model,genRandom)
         var waistHigh=hipHigh+this.genRandom.randomInt(150,150);
         var torsoHigh=waistHigh+this.genRandom.randomInt(500,500);
         var torsoRadius=this.genRandom.randomInt(300,350);
+        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(20,30);
         var armSwing=this.genRandom.randomInt(100,100);
         var wristSwing=this.genRandom.randomInt(0,50);
         var kneeSwing=this.genRandom.randomInt(100,100);
         var ankleSwing=this.genRandom.randomInt(0,50);
-        var neckHigh=torsoHigh+this.genRandom.randomInt(50,100);
+        var neckHigh=torsoTopHigh+this.genRandom.randomInt(50,100);
         var headHigh=neckHigh+this.genRandom.randomInt(100,100)+500;
         var handHigh=this.genRandom.randomInt(800,1000);
         var elbowHigh=Math.floor((torsoHigh-handHigh)/2)+handHigh;
@@ -89,7 +113,8 @@ function GenSkeletonObject(model,genRandom)
         var hipBoneIdx=bones.push(new ModelBoneObject('Hip',baseBoneIdx,new wsPoint(0,-hipHigh,0)))-1;
         var waistBoneIdx=bones.push(new ModelBoneObject('Waist',hipBoneIdx,new wsPoint(0,-waistHigh,0)))-1;
         var torsoBoneIdx=bones.push(new ModelBoneObject('Torso',waistBoneIdx,new wsPoint(0,-torsoHigh,0)))-1;
-        var neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
+        var torsoTopBoneIdx=bones.push(new ModelBoneObject('Torso Top',torsoBoneIdx,new wsPoint(0,-torsoTopHigh,0)))-1;
+        var neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
         var headBoneIdx=bones.push(new ModelBoneObject('Head',neckBoneIdx,new wsPoint(0,-headHigh,0)))-1;
 
         var leftShoulderBoneIdx=bones.push(new ModelBoneObject('Left Shoulder',torsoBoneIdx,new wsPoint(torsoRadius,-torsoHigh,60)))-1;
@@ -116,29 +141,21 @@ function GenSkeletonObject(model,genRandom)
         var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(((hipRadius+kneeSwing)+ankleSwing),-60,0)))-1;
         var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-((hipRadius+kneeSwing)+ankleSwing),-60,0)))-1;
 
-            // some random rotations
+            // spine rotations
             
-        ang=this.getRandomRotateAngle(60,0,0);
-        var waistOffsetPnt=this.rotateBone(bones,waistBoneIdx,ang);
-        this.moveBone(bones,torsoBoneIdx,waistOffsetPnt);
-        this.moveBone(bones,neckBoneIdx,waistOffsetPnt);
-        this.moveBone(bones,headBoneIdx,waistOffsetPnt);
-        this.rotateBone(bones,torsoBoneIdx,ang);
-        this.rotateBone(bones,neckBoneIdx,ang);
-        this.rotateBone(bones,headBoneIdx,ang);
-
-        ang=this.getRandomRotateAngle(40,0,0);
-        var torsoOffsetPnt=this.rotateBone(bones,torsoBoneIdx,ang);
-        this.moveBone(bones,neckBoneIdx,torsoOffsetPnt);
-        this.moveBone(bones,headBoneIdx,torsoOffsetPnt);
-        this.rotateBone(bones,neckBoneIdx,ang);
-        this.rotateBone(bones,headBoneIdx,ang);
+        var waistAng=this.getRandomRotateAngle(80,0,0);
+        this.rotateBoneAndAllChildren(bones,waistBoneIdx,waistAng,new wsPoint(0,0,0));
         
-        ang=this.getRandomRotateAngle(15,0,0);
-        var neckOffsetPnt=this.rotateBone(bones,neckBoneIdx,ang);
-        this.moveBone(bones,headBoneIdx,neckOffsetPnt);
-        this.rotateBone(bones,headBoneIdx,ang);
+        var torsoAng=this.getRandomRotateAngle(60,0,0);
+        this.rotateBoneAndAllChildren(bones,torsoBoneIdx,torsoAng,new wsPoint(0,0,0));
+        
+        var neckAng=new wsAngle(-((waistAng.x+torsoAng.x)*(this.genRandom.random()*0.5)),0.0,0.0);
+        this.rotateBoneAndAllChildren(bones,neckBoneIdx,neckAng,new wsPoint(0,0,0));
 
+            // arm rotations
+        
+        
+/*
         ang=this.getRandomRotateAngle(0,10,20);
         this.moveBone(bones,rightShoulderBoneIdx,torsoOffsetPnt);
         this.rotateBone(bones,rightShoulderBoneIdx,ang);
@@ -157,6 +174,7 @@ function GenSkeletonObject(model,genRandom)
         var rightOffsetPnt=this.rotateBone(bones,rightKneeBoneIdx,ang);
         this.moveBone(bones,rightAnkleBoneIdx,rightOffsetPnt);
         this.moveBone(bones,rightFootBoneIdx,rightOffsetPnt);
+        */
     };
     
 }

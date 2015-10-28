@@ -29,6 +29,11 @@ function ModelBoneObject(name,parentBoneIdx,position)
         return(this.name==='Neck');
     };
     
+    this.isTorsoTop=function()
+    {
+        return(this.name==='Torso Top');
+    };
+    
     this.isTorso=function()
     {
         return(this.name==='Torso');

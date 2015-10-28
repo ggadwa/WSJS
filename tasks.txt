@@ -59,9 +59,12 @@ REGULAR TODOs
     [ ] frustum cull models
     [X] need globe generators
     [X] need to generate normals
+    [X] need body to neck cylinder
     [ ] pick sizes that always cause overlap
+    [ ] better feet
     [ ] facial features additional meshes
-    [ ] randomize meshes (new utility, always make bigger from center)
+    [ ] randomize meshes, always make bigger from center
+    [X] rename tangent space utility
     [ ] combine close vertexes (maybe)
 
 

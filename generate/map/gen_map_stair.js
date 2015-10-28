@@ -144,11 +144,11 @@ function GenRoomStairs(map,genRandom)
             calcNormals=normals;
         }
         else {
-            calcNormals=meshUVTangents.buildMeshNormals(vertices,indexes,normalsIn);
+            calcNormals=meshUtility.buildMeshNormals(vertices,indexes,normalsIn);
         }
         
-        var uvs=meshUVTangents.buildMeshUVs(bitmap,vertices,calcNormals);
-        var tangents=meshUVTangents.buildMeshTangents(vertices,uvs,indexes);
+        var uvs=meshUtility.buildMeshUVs(bitmap,vertices,calcNormals);
+        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
 
         var mesh=new MapMeshObject(bitmap,vertices,calcNormals,tangents,uvs,indexes,flags);        
         this.map.addMesh(mesh);

@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// mesh uv-tangents class
+// mesh utility class
 //
 
-function MeshUVTangentsObject()
+function MeshUtilityObject()
 {
     //
     // create normals from verticies and triangles
@@ -351,4 +351,4 @@ function MeshUVTangentsObject()
     
 }
 
-var meshUVTangents=new MeshUVTangentsObject();
+var meshUtility=new MeshUtilityObject();

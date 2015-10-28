@@ -76,7 +76,7 @@ function SettingsObject()
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
     this.randomSeedMap=1;//Math.floor((Math.random()*seed));
     this.randomSeedModelBitmap=1;//Math.floor((Math.random()*seed));
-    this.randomSeedModel=1; //Math.floor((Math.random()*seed));
+    this.randomSeedModel=1000; //Math.floor((Math.random()*seed));
     this.randomSeedEntity=1; //Math.floor((Math.random()*seed));
     
     console.log('map seed='+this.randomSeedMap);
