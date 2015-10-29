@@ -17,9 +17,9 @@ function GenSkeletonObject(model,genRandom)
     {
         var ang=new wsAngle(0.0,0.0,0.0);
 
-        if (rotX!==0) ang.x=this.genRandom.randomInt(0,rotX)-Math.floor(rotX/2);
-        if (rotY!==0) ang.y=this.genRandom.randomInt(0,rotY)-Math.floor(rotY/2);
-        if (rotZ!==0) ang.z=this.genRandom.randomInt(0,rotZ)-Math.floor(rotZ/2);
+        ang.x=rotX[0]+this.genRandom.randomInt(0,(rotX[1]-rotX[0]));
+        ang.y=rotY[0]+this.genRandom.randomInt(0,(rotY[1]-rotY[0]));
+        ang.z=rotZ[0]+this.genRandom.randomInt(0,(rotZ[1]-rotZ[0]));
 
         return(ang);
     };
@@ -143,38 +143,30 @@ function GenSkeletonObject(model,genRandom)
 
             // spine rotations
             
-        var waistAng=this.getRandomRotateAngle(80,0,0);
+        var waistAng=this.getRandomRotateAngle([0,-40],[0,0],[0,0]);
         this.rotateBoneAndAllChildren(bones,waistBoneIdx,waistAng,new wsPoint(0,0,0));
         
-        var torsoAng=this.getRandomRotateAngle(60,0,0);
+        var torsoAng=this.getRandomRotateAngle([-30,30],[0,0],[0,0]);
         this.rotateBoneAndAllChildren(bones,torsoBoneIdx,torsoAng,new wsPoint(0,0,0));
         
-        var neckAng=new wsAngle(-((waistAng.x+torsoAng.x)*(this.genRandom.random()*0.5)),0.0,0.0);
+        var neckAng=this.getRandomRotateAngle([0,-30],[0,0],[0,0]);
         this.rotateBoneAndAllChildren(bones,neckBoneIdx,neckAng,new wsPoint(0,0,0));
 
             // arm rotations
+            // only rotate shoulder forward because torso
+            // leans forward
         
-        
-/*
-        ang=this.getRandomRotateAngle(0,10,20);
-        this.moveBone(bones,rightShoulderBoneIdx,torsoOffsetPnt);
-        this.rotateBone(bones,rightShoulderBoneIdx,ang);
-        
+        var ang=this.getRandomRotateAngle([0,90],[0,0],[0,-40]);
+        this.rotateBoneAndAllChildren(bones,leftElbowBoneIdx,ang,new wsPoint(0,0,0));
         ang.z=-ang.z;
-        ang.y=-ang.y;
-        this.moveBone(bones,leftShoulderBoneIdx,torsoOffsetPnt);
-        this.rotateBone(bones,leftShoulderBoneIdx,ang);
-
-        ang=this.getRandomRotateAngle(0,40,0);
-        var leftOffsetPnt=this.rotateBone(bones,leftKneeBoneIdx,ang);
-        this.moveBone(bones,leftAnkleBoneIdx,leftOffsetPnt);
-        this.moveBone(bones,leftFootBoneIdx,leftOffsetPnt);
-
-        ang.y=-ang.y;
-        var rightOffsetPnt=this.rotateBone(bones,rightKneeBoneIdx,ang);
-        this.moveBone(bones,rightAnkleBoneIdx,rightOffsetPnt);
-        this.moveBone(bones,rightFootBoneIdx,rightOffsetPnt);
-        */
-    };
+        this.rotateBoneAndAllChildren(bones,rightElbowBoneIdx,ang,new wsPoint(0,0,0));
+        
+            // leg rotations
+        
+        var ang=this.getRandomRotateAngle([-20,20],[0,0],[-20,-20]);
+        this.rotateBoneAndAllChildren(bones,leftKneeBoneIdx,ang,new wsPoint(0,0,0));
+        ang.z=-ang.z;
+        this.rotateBoneAndAllChildren(bones,rightKneeBoneIdx,ang,new wsPoint(0,0,0));
+     };
     
 }

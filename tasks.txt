@@ -57,6 +57,7 @@ REGULAR TODOs
 
 [ ] model generation
     [ ] frustum cull models
+    [ ] erect type -- standing, crouching, all fours -- generate bone random rotations from that
     [X] need globe generators
     [X] need to generate normals
     [X] need body to neck cylinder
