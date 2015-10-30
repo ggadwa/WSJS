@@ -143,27 +143,27 @@ function GenSkeletonObject(model,genRandom)
 
             // spine rotations
             
-        var waistAng=this.getRandomRotateAngle([0,-40],[0,0],[0,0]);
-        this.rotateBoneAndAllChildren(bones,waistBoneIdx,waistAng,new wsPoint(0,0,0));
+        var ang=this.getRandomRotateAngle([0,-40],[0,0],[0,0]);
+        this.rotateBoneAndAllChildren(bones,waistBoneIdx,ang,new wsPoint(0,0,0));
         
-        var torsoAng=this.getRandomRotateAngle([-30,30],[0,0],[0,0]);
-        this.rotateBoneAndAllChildren(bones,torsoBoneIdx,torsoAng,new wsPoint(0,0,0));
+        ang.x*=0.75;
+        this.rotateBoneAndAllChildren(bones,torsoBoneIdx,ang,new wsPoint(0,0,0));
         
-        var neckAng=this.getRandomRotateAngle([0,-30],[0,0],[0,0]);
-        this.rotateBoneAndAllChildren(bones,neckBoneIdx,neckAng,new wsPoint(0,0,0));
+        ang.x*=0.75;
+        this.rotateBoneAndAllChildren(bones,neckBoneIdx,ang,new wsPoint(0,0,0));
 
             // arm rotations
             // only rotate shoulder forward because torso
             // leans forward
         
-        var ang=this.getRandomRotateAngle([0,90],[0,0],[0,-40]);
+        ang=this.getRandomRotateAngle([0,90],[0,0],[0,-40]);
         this.rotateBoneAndAllChildren(bones,leftElbowBoneIdx,ang,new wsPoint(0,0,0));
         ang.z=-ang.z;
         this.rotateBoneAndAllChildren(bones,rightElbowBoneIdx,ang,new wsPoint(0,0,0));
         
             // leg rotations
         
-        var ang=this.getRandomRotateAngle([-20,20],[0,0],[-20,-20]);
+        ang=this.getRandomRotateAngle([-20,20],[0,0],[-20,-20]);
         this.rotateBoneAndAllChildren(bones,leftKneeBoneIdx,ang,new wsPoint(0,0,0));
         ang.z=-ang.z;
         this.rotateBoneAndAllChildren(bones,rightKneeBoneIdx,ang,new wsPoint(0,0,0));

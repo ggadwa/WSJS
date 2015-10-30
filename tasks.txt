@@ -61,7 +61,8 @@ REGULAR TODOs
     [X] need globe generators
     [X] need to generate normals
     [X] need body to neck cylinder
-    [ ] pick sizes that always cause overlap
+    [ ] don't build shapes by going over bones, do by finding bone names
+    [X] pick sizes that always cause overlap
     [ ] better feet
     [ ] facial features additional meshes
     [ ] randomize meshes, always make bigger from center

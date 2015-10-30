@@ -133,5 +133,14 @@ function ModelSkeletonObject()
         if (idx===-1) return(null);
         return(this.bones[idx]);
     };
+    
+    this.getDistanceBetweenBones=function(name1,name2)
+    {
+        var bone1=this.findBone(name1);
+        var bone2=this.findBone(name2);
+        
+        if ((bone1===null) || (bone2===null)) return(null);
+        return(new wsPoint(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
+    };
 
 }

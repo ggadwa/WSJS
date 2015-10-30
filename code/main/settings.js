@@ -42,11 +42,11 @@ function SettingsObject()
 
         // models
         
-    this.modelMonsterCount=1;
+    this.modelMonsterCount=4;
 
         // entities
         
-    this.monsterEntityCount=1;
+    this.monsterEntityCount=4;
     
         // timing
         

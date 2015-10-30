@@ -120,7 +120,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
         // build globe around bone
         //
         
-    this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    this.buildGlobeAroundPoint=function(view,centerPnt,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         var x,y,ang;
         var rd,radius,px,py,pz;
@@ -147,7 +147,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
             
             rd=yAng*DEGREE_TO_RAD;
             radius=widRadius*Math.sin(rd);
-            py=bone.position.y-(highRadius*Math.cos(rd));
+            py=centerPnt.y-(highRadius*Math.cos(rd));
             
             vAng=vOffset+((yAng/180.0)*0.5);
             
@@ -157,8 +157,8 @@ function GenModelMeshObject(model,bitmap,genRandom)
             
             for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
                 rd=xzAng*DEGREE_TO_RAD;
-                px=bone.position.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-                pz=bone.position.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+                px=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
+                pz=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
                 vertices[vIdx++]=px;
                 vertices[vIdx++]=py;
@@ -180,18 +180,18 @@ function GenModelMeshObject(model,bitmap,genRandom)
         
         var topIdx=Math.floor(vIdx/3);
         
-        vertices[vIdx++]=bone.position.x;
-        vertices[vIdx++]=bone.position.y-highRadius;
-        vertices[vIdx++]=bone.position.z;
+        vertices[vIdx++]=centerPnt.x;
+        vertices[vIdx++]=centerPnt.y-highRadius;
+        vertices[vIdx++]=centerPnt.z;
         
         uvs[uvIdx++]=uOffset+0.25;
         uvs[uvIdx++]=vOffset;
         
         var botIdx=Math.floor(vIdx/3);
        
-        vertices[vIdx++]=bone.position.x;
-        vertices[vIdx++]=bone.position.y+highRadius;
-        vertices[vIdx++]=bone.position.z;
+        vertices[vIdx++]=centerPnt.x;
+        vertices[vIdx++]=centerPnt.y+highRadius;
+        vertices[vIdx++]=centerPnt.z;
         
         uvs[uvIdx++]=uOffset+0.25;
         uvs[uvIdx++]=vOffset+0.5;
@@ -253,6 +253,11 @@ function GenModelMeshObject(model,bitmap,genRandom)
         }
         
         meshUtility.buildMeshNormalsFromChunk(vertices,nStartVIdx,this.GLOBE_VERTEX_COUNT,indexes,nStartIIdx,this.GLOBE_INDEX_COUNT,normals,false);
+    };
+    
+    this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    {
+        this.buildGlobeAroundPoint(view,bone.position,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset);
     };
     
         //
@@ -335,9 +340,12 @@ function GenModelMeshObject(model,bitmap,genRandom)
 
     this.build=function(view)
     {
-        var n,bone,parentBone;
-        var radiusWid,radiusHigh;
+        var n,k,bone,parentBone;
         var bones=this.model.skeleton.bones;
+        
+            // some settings
+            
+        var eyeCount=2;
         
             // count primitives we will need
             
@@ -365,7 +373,7 @@ function GenModelMeshObject(model,bitmap,genRandom)
             
                 // globe type bones
                 
-            if ((bone.isHead()) || (bone.isShoulder())) {
+            if (bone.isHead()) {
                 vIdx+=this.GLOBE_VERTEX_COUNT;
                 nIdx+=this.GLOBE_NORMAL_COUNT;
                 uvIdx+=this.GLOBE_UV_COUNT;
@@ -382,6 +390,13 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 iIdx+=this.CYLINDER_INDEX_COUNT;
                 continue;
             }
+            
+                // eyes
+                
+            vIdx+=(this.GLOBE_VERTEX_COUNT*eyeCount);
+            nIdx+=(this.GLOBE_NORMAL_COUNT*eyeCount);
+            uvIdx+=(this.GLOBE_UV_COUNT*eyeCount);
+            iIdx+=(this.GLOBE_INDEX_COUNT*eyeCount);
         }
         
             // put primitives around bones
@@ -406,31 +421,6 @@ function GenModelMeshObject(model,bitmap,genRandom)
                 // skip the base bone
                 
             if (bone.isBase()) continue;
-            
-                // the head, it's radius height
-                // needs to bring it down to neck
-            
-            if (bone.isHead()) {
-                radiusHigh=bone.position.distance(parentBone.position)+100;     // force into neck, will need to change this later
-                radiusWid=radiusHigh*(0.25+(this.genRandom.random()*0.5));
-                
-                this.buildGlobeAroundBone(view,bone,radiusWid,radiusHigh,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,0.5,0.0);
-                vIdx+=this.GLOBE_VERTEX_COUNT;
-                uvIdx+=this.GLOBE_UV_COUNT;
-                iIdx+=this.GLOBE_INDEX_COUNT;
-                continue;
-            }
-            
-                // shoulders, need to be big enough
-                // to go into torso
-                
-            if (bone.isShoulder()) {
-                this.buildGlobeAroundBone(view,bone,100,100,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,0.5,0.0);
-                vIdx+=this.GLOBE_VERTEX_COUNT;
-                uvIdx+=this.GLOBE_UV_COUNT;
-                iIdx+=this.GLOBE_INDEX_COUNT;
-                continue;
-            }
             
                 // box type bones
             
@@ -473,13 +463,42 @@ function GenModelMeshObject(model,bitmap,genRandom)
             }
             
         }
+        
+            // head
+            
+        var headBone=this.model.skeleton.findBone('Head');
+        parentBone=bones[headBone.parentBoneIdx];
+        var headRadiusHigh=headBone.position.distance(parentBone.position)+100;     // force into neck, will need to change this later
+        var headRadiusWid=headRadiusHigh*(0.25+(this.genRandom.random()*0.5));
+        
+        this.buildGlobeAroundBone(view,headBone,headRadiusWid,headRadiusHigh,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,0.0,0.0);
+        vIdx+=this.GLOBE_VERTEX_COUNT;
+        uvIdx+=this.GLOBE_UV_COUNT;
+        iIdx+=this.GLOBE_INDEX_COUNT;
+             
+            // eyes
+
+        var eyePnt;
+        
+        for (k=0;k!==eyeCount;k++) {
+            eyePnt=headBone.position.copy();
+            eyePnt.z+=(headRadiusWid+200);
+            eyePnt.x+=(150*k);
+            this.buildGlobeAroundPoint(view,eyePnt,100,100,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,0.5,0.0);
+            vIdx+=this.GLOBE_VERTEX_COUNT;
+            uvIdx+=this.GLOBE_UV_COUNT;
+            iIdx+=this.GLOBE_INDEX_COUNT;
+            continue;
+        }
        
             // build the body bones
+            
+        var shoulderDist=this.model.skeleton.getDistanceBetweenBones('Left Shoulder','Right Shoulder');
         
         var neckRadius=this.genRandom.randomInt(100,50);
-        var torsoRadius=this.genRandom.randomInt(200,150);
-        var waistRadius=this.genRandom.randomInt(200,150);
-        var hipRadius=this.genRandom.randomInt(200,150);
+        var torsoRadius=Math.floor(shoulderDist.x*0.5)+this.genRandom.randomInt(0,50);
+        var waistRadius=torsoRadius-this.genRandom.randomInt(20,100);
+        var hipRadius=waistRadius+this.genRandom.randomInt(20,100);
         
         var neckBone=this.model.skeleton.findBone("Neck");
         var torsoTopBone=this.model.skeleton.findBone("Torso Top");
