@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// gen model mesh class
+// gen machine (non-organic) mesh class
 //
 
-function GenModelMeshObject(model,bitmap,genRandom)
+function GenModelMachineMeshObject(model,bitmap,genRandom)
 {
     this.model=model;
     this.genRandom=genRandom;

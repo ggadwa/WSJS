@@ -24,6 +24,8 @@ REGULAR TODOs
 
 
 
+[ ] add in a quad/point routine so we can show bones in skeletons
+
 [ ] rooms need decoration locations and decoration models
 [ ] rooms have possible light positions
 

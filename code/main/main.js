@@ -277,10 +277,10 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
     
         // build the skeleton and mesh
         
-    genSkeleton=new GenSkeletonObject(model,modelGenRandom);
+    genSkeleton=new GenModelOrganicSkeletonObject(model,modelGenRandom);
     genSkeleton.build();
     
-    genModelMesh=new GenModelMeshObject(model,modelBitmap,modelGenRandom);
+    genModelMesh=new GenModelOrganicMeshObject(model,modelBitmap,modelGenRandom);
     genModelMesh.build(view);
     
     modelList.add(model);

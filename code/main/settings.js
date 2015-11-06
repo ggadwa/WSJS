@@ -42,11 +42,11 @@ function SettingsObject()
 
         // models
         
-    this.modelMonsterCount=4;
+    this.modelMonsterCount=1;
 
         // entities
         
-    this.monsterEntityCount=4;
+    this.monsterEntityCount=1;
     
         // timing
         
@@ -74,10 +74,10 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=1;//Math.floor((Math.random()*seed));
+    this.randomSeedMap=2;//Math.floor((Math.random()*seed));
     this.randomSeedModelBitmap=1;//Math.floor((Math.random()*seed));
-    this.randomSeedModel=1000; //Math.floor((Math.random()*seed));
-    this.randomSeedEntity=1; //Math.floor((Math.random()*seed));
+    this.randomSeedModel=5; //Math.floor((Math.random()*seed));
+    this.randomSeedEntity=6; //Math.floor((Math.random()*seed));
     
     console.log('map seed='+this.randomSeedMap);
 }

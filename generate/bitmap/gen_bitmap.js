@@ -879,6 +879,17 @@ function GenBitmapObject(genRandom)
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
     };
+    
+        //
+        // UV tester
+        //
+        
+    this.generateUVTest=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.genBitmapUtility.drawUVTest(bitmapCTX,0,0,wid,high);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
+    };
 
         //
         // generate mainline
@@ -991,7 +1002,8 @@ function GenBitmapObject(genRandom)
                 break;
 
             case GEN_BITMAP_TYPE_SKIN:
-                this.generateSkin(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high);
+                //this.generateSkin(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=10.0;
                 break;
 

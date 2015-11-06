@@ -142,5 +142,42 @@ function ModelSkeletonObject()
         if ((bone1===null) || (bone2===null)) return(null);
         return(new wsPoint(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
     };
+    
+    this.getBounds=function(xBound,yBound,zBound)
+    {
+        var n,pos;
+        var nBone=this.bones.length;
+        
+        xBound.min=xBound.max=0;
+        yBound.min=yBound.max=0;
+        zBound.min=zBound.max=0;
+        
+        for (n=0;n!==nBone;n++) {
+            pos=this.bones[n].position;
+            xBound.adjust(pos.x);
+            yBound.adjust(pos.y);
+            zBound.adjust(pos.z);
+        }
+    };
+    
+    this.getCenter=function()
+    {
+        var n;
+        var nBone=this.bones.length;
+        
+        var pt=new wsPoint(0,0,0);
+        
+        for (n=0;n!==nBone;n++) {
+            pt.addPoint(this.bones[n].position);
+        }
+        
+        if (nBone===0) return(pt);
+        
+        pt.x=Math.floor(pt.x/nBone);
+        pt.y=Math.floor(pt.y/nBone);
+        pt.z=Math.floor(pt.z/nBone);
+        
+        return(pt);
+    };
 
 }
