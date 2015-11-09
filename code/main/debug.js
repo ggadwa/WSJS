@@ -40,7 +40,6 @@ function DebugObject()
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,mesh.vertices,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         var indexBuffer=gl.createBuffer();
@@ -106,7 +105,6 @@ function DebugObject()
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         var indexBuffer=gl.createBuffer();
@@ -174,7 +172,6 @@ function DebugObject()
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         var indexBuffer=gl.createBuffer();
@@ -207,6 +204,10 @@ function DebugObject()
         var skeleton=model.skeleton;
         var nBone=skeleton.bones.length;
         var gl=view.gl;
+        
+            // draw all this without depth testing
+            
+        gl.disable(gl.DEPTH_TEST);
 
             // create the lines
 
@@ -236,7 +237,6 @@ function DebugObject()
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(0.0,1.0,0.0));
-        gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -244,7 +244,6 @@ function DebugObject()
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         var indexBuffer=gl.createBuffer();
@@ -263,8 +262,26 @@ function DebugObject()
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
+        
+            // now the bones, use the particle engine
+            
+        var particlePoints=[];
+        var pnt;
+        
+        for (n=0;n!==nBone;n++) {
+            pnt=new wsPoint(skeleton.bones[n].position.x,skeleton.bones[n].position.y,skeleton.bones[n].position.z);
+            pnt.addPoint(offsetPosition);
+            particlePoints.push(pnt);
+        }
+            
+        view.particle.drawStart(view);
+        view.particle.draw(view,particlePoints,50,new wsColor(0.0,1.0,1.0));
+        view.particle.drawEnd(view);
+        
+            // bring back depth test
+            
+        gl.enable(gl.DEPTH_TEST);
     };
     
     this.drawModelMeshNormals=function(view,model,offsetPosition)
@@ -314,7 +331,6 @@ function DebugObject()
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.debugShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         var indexBuffer=gl.createBuffer();

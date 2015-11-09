@@ -52,6 +52,11 @@ function ViewObject()
     this.normalMatrix=null;
     this.orthoMatrix=null;
     
+        // billboarding matrixes
+        
+    this.billboardXMatrix=null;
+    this.billboardYMatrix=null;
+    
         // view lighting
         
     this.LIGHT_COUNT=4;
@@ -76,8 +81,9 @@ function ViewObject()
 	this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
 	this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
     
-        // text and interface drawing
+        // additional drawing objects
         
+    this.particle=new ParticleObject();
     this.text=new TextObject();
     this.interface=new InterfaceObject();
     
@@ -140,8 +146,9 @@ function ViewObject()
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
 
-            // initialize text and interface
+            // initialize other drawing objects
 
+        if (!this.particle.initialize(this)) return(false);
         if (!this.text.initialize(this)) return(false);
         if (!this.interface.initialize(this)) return(false);
 
@@ -150,6 +157,7 @@ function ViewObject()
 
     this.release=function()
     {
+        this.particle.release();
         this.text.release();
         this.interface.release();
     };
@@ -361,6 +369,48 @@ function ViewObject()
     };
     
         //
+        // billboarding matrixes
+        //
+        
+    this.buildBillboardXMatrix=function(ang)
+    {
+        var mat=new Float32Array(16);
+        
+            // identity
+            
+        mat[0]=mat[5]=mat[10]=mat[15]=1.0;
+
+            // rotation
+            
+        var rad=ang*DEGREE_TO_RAD;
+        
+        mat[5]=mat[10]=Math.cos(rad);
+        mat[6]=Math.sin(rad);
+        mat[9]=-mat[6];
+        
+        return(mat);
+    };
+    
+    this.buildBillboardYMatrix=function(ang)
+    {
+        var mat=new Float32Array(16);
+        
+            // identity
+            
+        mat[0]=mat[5]=mat[10]=mat[15]=1.0;
+
+            // rotation
+            
+        var rad=ang*DEGREE_TO_RAD;
+        
+        mat[0]=mat[10]=Math.cos(rad);
+        mat[8]=Math.sin(rad);
+        mat[2]=-mat[8];
+        
+        return(mat);
+    };
+    
+        //
         // draw view
         //
 
@@ -405,6 +455,12 @@ function ViewObject()
             // the 2D ortho matrix
 
         this.orthoMatrix=this.buildOrthoMatrix(-1.0,1.0);
+        
+            // build the billboarding matrixes
+            // mostly used for particles
+            
+        this.billboardXMatrix=this.buildBillboardXMatrix(this.camera.angle.x);
+        this.billboardYMatrix=this.buildBillboardYMatrix(this.camera.angle.y);
         
             // convert view lights to shader lights
             // all lights need a eye coordinate, so calc

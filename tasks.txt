@@ -24,6 +24,8 @@ REGULAR TODOs
 
 
 
+[ ] enableVertexAttribArray is probably be called when shaders already call it on vertex attribs
+
 [ ] add in a quad/point routine so we can show bones in skeletons
 
 [ ] rooms need decoration locations and decoration models

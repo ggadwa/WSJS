@@ -214,6 +214,28 @@ function wsPoint(x,y,z)
         this.z*=f;
     };
     
+    this.matrixMultiply=function(mat)
+    {
+        var mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8])+mat[12];
+        var my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9])+mat[13];
+        var mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10])+mat[14];
+        
+        this.x=mx;
+        this.y=my;
+        this.z=mz;
+    };
+    
+    this.matrixMultiplyIgnoreTransform=function(mat)
+    {
+        var mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8]);
+        var my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9]);
+        var mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10]);
+        
+        this.x=mx;
+        this.y=my;
+        this.z=mz;
+    };
+    
     this.copy=function()
     {
         return(new wsPoint(this.x,this.y,this.z));

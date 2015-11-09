@@ -29,6 +29,8 @@
 <script type="text/javascript" src="code/entities/collisions.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/entities/entity.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/entities/entity_list.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/particle/particle.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/particle/particle_shader.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/text/text.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/text/text_shader.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/interface/interface.js" charset="utf-8"></script>
@@ -580,6 +582,28 @@
 
         gl_FragColor.rgb=(tex.rgb*pixelAmbient)+spec;
         gl_FragColor.a=tex.a;
+    }
+</script>
+
+<script id="wsParticleVertShader" type="x-shader/x-vertex">    
+    attribute highp vec3 vertexPosition;
+
+    uniform highp mat4 perspectiveMatrix;
+    uniform highp mat4 modelMatrix;
+
+    void main(void)
+    {
+        gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
+    }
+</script>
+
+<script id="wsParticleFragShader" type="x-shader/x-fragment">
+    uniform lowp vec3 color;
+        
+    void main(void)
+    {
+        gl_FragColor.rgb=color;
+        gl_FragColor.a=1.0;
     }
 </script>
 
