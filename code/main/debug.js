@@ -51,6 +51,14 @@ function DebugObject()
         for (n=0;n!==mesh.trigCount;n++) {
             gl.drawElements(gl.LINE_LOOP,3,gl.UNSIGNED_SHORT,(Uint16Array.BYTES_PER_ELEMENT*(n*3)));
         }
+        
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+
+        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(indexBuffer);
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
@@ -284,6 +292,10 @@ function DebugObject()
         gl.enable(gl.DEPTH_TEST);
     };
     
+        //
+        // draw model tangent space
+        //
+        
     this.drawModelMeshNormals=function(view,model,offsetPosition)
     {
         var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
@@ -341,6 +353,67 @@ function DebugObject()
 
         gl.drawElements(gl.LINES,elementIdx,gl.UNSIGNED_SHORT,0);
 
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+
+        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(indexBuffer);
+
+        gl.enable(gl.DEPTH_TEST);
+        this.debugShader.drawEnd(view);
+    };
+    
+        //
+        // draw model mesh lines
+        //
+        
+    this.drawModelMeshLines=function(view,model,offsetPosition)
+    {
+        var n;
+        var gl=view.gl;
+        
+        var mesh=model.mesh;
+        
+            // get the offset vertices
+        
+        var nVertex=Math.floor(mesh.vertices.length/3);
+        
+        var vertices=new Float32Array(nVertex*3);
+
+        var vIdx=0;
+
+        for (n=0;n!==nVertex;n++) {
+            vertices[vIdx]=mesh.vertices[vIdx]+offsetPosition.x;
+            vertices[vIdx+1]=mesh.vertices[vIdx+1]+offsetPosition.y;
+            vertices[vIdx+2]=mesh.vertices[vIdx+2]+offsetPosition.z;
+            vIdx+=3;
+        }
+
+            // start the shader
+            
+        this.debugShader.drawStart(view,new wsColor(1.0,0.0,0.0));
+        gl.disable(gl.DEPTH_TEST);
+        
+            // setup the buffers
+
+        var vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+
+        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        var indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,mesh.indexes,gl.STREAM_DRAW);
+
+            // draw the line loop trigs
+
+        for (n=0;n!==mesh.trigCount;n++) {
+            gl.drawElements(gl.LINE_LOOP,3,gl.UNSIGNED_SHORT,(Uint16Array.BYTES_PER_ELEMENT*(n*3)));
+        }
+        
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);

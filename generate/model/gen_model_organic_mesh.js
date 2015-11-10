@@ -1,6 +1,16 @@
 "use strict";
 
 //
+// helper class for globe shrinking
+//
+
+function GenModelOrganicMeshVertexShrinkObject(moveVector)
+{
+    this.moving=true;
+    this.moveVector=moveVector;
+}
+
+//
 // gen organic mesh class
 //
 
@@ -152,57 +162,102 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // shrink wrap the globe
         //
         
-    this.shrinkWrapGlobe=function(vertices)
+    this.shrinkWrapGlobe=function(vertices,centerPnt)
     {
-        var n,k,vIdx,bIdx;
-        var bone,d,dist;
+        var n,k,vIdx;
+        var bone,hitBone,dist;
         var nVertex=Math.floor(vertices.length/3);
         var bones=this.model.skeleton.bones;
         var nBone=bones.length;
         
-        var pt=new wsPoint(0,0,0);
-        var vct=new wsPoint(0,0,0);
+        var pnt=new wsPoint(0,0,0);
+        
+            // we move each vertex inwards
+            // toward the center point
+            // each vertex stops when it reaches
+            // the radius of a bone
+            
+            // build the parallel list of
+            // vertex movement
+        
+        var move;
+        var moves=[];
+        var moveVct;
         
         for (n=0;n!==nVertex;n++) {
-            
-                // get the vertex
-                
             vIdx=n*3;
-            pt.set(vertices[vIdx],vertices[vIdx+1],vertices[vIdx+2]);
             
-                // get closest bone
+            moveVct=new wsPoint((centerPnt.x-vertices[vIdx]),(centerPnt.y-vertices[vIdx+1]),(centerPnt.z-vertices[vIdx+2]));
+            moveVct.normalize();
+            moveVct.scale(10);      // move 10 units at a time
             
-            bIdx=-1;
-            dist=1000000;
+            moves.push(new GenModelOrganicMeshVertexShrinkObject(moveVct));
+        }
+        
+            // loop the moves
             
-            for (k=0;k!==nBone;k++) {
-                bone=bones[k];
-                if (bone.isBase()) continue;
+        var anyMove;
+        var moveCount=0;
+        
+        while (moveCount<1000) {
+            
+            moveCount++;
+            anyMove=false;
+        
+                // run through the vertices
+
+            for (n=0;n!==nVertex;n++) {
+
+                    // is this one moving?
+
+                move=moves[n];
+                if (!move.moving) continue;
+
+                    // get the vertex
+
+                vIdx=n*3;
+                pnt.set(vertices[vIdx],vertices[vIdx+1],vertices[vIdx+2]);
+
+                    // close to any bone?
+
+                hitBone=false;
                 
-                d=bone.position.distance(pt);
-                if (d<dist) {
-                    bIdx=k;
-                    dist=d;
+                for (k=0;k!==nBone;k++) {
+                    bone=bones[k];
+                    if (bone.isBase()) continue;
+
+                    dist=bone.position.distance(pnt);
+                    if (dist<250) {
+                        hitBone=true;
+                        break;
+                    }
                 }
+                
+                    // hit a bone radius, so
+                    // no longer move this vertex
+                    
+                if (hitBone) {
+                    move.moving=false;
+                    continue;
+                }
+                
+                    // move the vertex
+                    
+                pnt.addPoint(move.moveVector);
+
+                vertices[vIdx]=pnt.x;
+                vertices[vIdx+1]=pnt.y;
+                vertices[vIdx+2]=pnt.z;
+                
+                    // we did a move so we go
+                    // around again
+                    
+                anyMove=true;
             }
             
-                // move towards bone
+                // no moves?  Then done
                 
-            if (bIdx!==-1) {
-                bone=bones[bIdx];
-                
-                vct.setFromSubPoint(pt,bone.position);
-                vct.normalize();
-                vct.scale(300);
-                
-                pt.setFromAddPoint(bone.position,vct);
-            }
-            
-                // save the vertex back
-                
-            vertices[vIdx]=pt.x;
-            vertices[vIdx+1]=pt.y;
-            vertices[vIdx+2]=pt.z;
+            if (!anyMove) break;
         }
     };
     
@@ -220,7 +275,10 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
         
             // get skeleton center
-            // and size
+            // and size, leave the size a bit
+            // bigger than the entire skeleton
+            // so it wraps properly around outer
+            // bones
         
         var xBound=new wsBound(0,0);
         var yBound=new wsBound(0,0);
@@ -230,9 +288,9 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
         var widRadius=xBound.getSize();
         if (zBound.getSize()>widRadius) widRadius=zBound.getSize();
-        widRadius=Math.floor(widRadius*0.5);
+        widRadius=Math.floor(widRadius*0.75);
         
-        var highRadius=Math.floor(yBound.getSize()*0.5);
+        var highRadius=Math.floor(yBound.getSize()*0.75);
         
         var centerPnt=this.model.skeleton.getCenter();
         
@@ -240,7 +298,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // wrap it to bones
         
         this.buildGlobeAroundSkeleton(view,centerPnt,widRadius,highRadius,vertices,uvs,indexes);
-        this.shrinkWrapGlobe(vertices);
+        this.shrinkWrapGlobe(vertices,centerPnt);
         
             // complete the tangent space vectors
     

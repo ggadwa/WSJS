@@ -79,33 +79,20 @@ function GenModelOrganicSkeletonObject(model,genRandom)
 
             // random sizes
 
-        var hipHigh=this.genRandom.randomInt(1000,1500);
-        var hipRadius=this.genRandom.randomInt(150,150);
+        var ankleHigh=this.genRandom.randomInt(100,100);
+        var kneeHigh=ankleHigh+this.genRandom.randomInt(500,500);
+        var hipHigh=kneeHigh+this.genRandom.randomInt(500,500);
+        var hipRadius=this.genRandom.randomInt(300,350);
         var waistHigh=hipHigh+this.genRandom.randomInt(150,150);
         var torsoHigh=waistHigh+this.genRandom.randomInt(500,500);
         var torsoRadius=this.genRandom.randomInt(300,350);
-        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(20,30);
-        var armSwing=this.genRandom.randomInt(100,100);
-        var wristSwing=this.genRandom.randomInt(0,50);
-        var kneeSwing=this.genRandom.randomInt(100,100);
-        var ankleSwing=this.genRandom.randomInt(0,50);
+        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(50,50);
+        var shoulderRadius=torsoRadius+this.genRandom.randomInt(150,150);
+        var elbowRadius=shoulderRadius+this.genRandom.randomInt(250,250);
+        var wristRadius=elbowRadius+this.genRandom.randomInt(250,250);
+        var handRadius=wristRadius+this.genRandom.randomInt(50,50);
         var neckHigh=torsoTopHigh+this.genRandom.randomInt(50,100);
         var headHigh=neckHigh+this.genRandom.randomInt(100,100)+500;
-        var handHigh=this.genRandom.randomInt(800,1000);
-        var elbowHigh=Math.floor((torsoHigh-handHigh)/2)+handHigh;
-        var ankleHigh=this.genRandom.randomInt(100,200);
-
-            // fix some extreme sizes
-
-        if (Math.abs(elbowHigh-torsoHigh)<300) {
-            elbowHigh-=300;
-            handHigh-=300;
-        }
-        if (Math.abs(handHigh-elbowHigh)<150) {
-            handHigh-=250;
-        }
-
-        if (handHigh<0) handHigh=0;
 
             // create bones
 
@@ -117,29 +104,29 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
         var headBoneIdx=bones.push(new ModelBoneObject('Head',neckBoneIdx,new wsPoint(0,-headHigh,0)))-1;
 
-        var leftShoulderBoneIdx=bones.push(new ModelBoneObject('Left Shoulder',torsoBoneIdx,new wsPoint(torsoRadius,-torsoHigh,60)))-1;
-        var rightShoulderBoneIdx=bones.push(new ModelBoneObject('Right Shoulder',torsoBoneIdx,new wsPoint(-torsoRadius,-torsoHigh,60)))-1;
+        var leftShoulderBoneIdx=bones.push(new ModelBoneObject('Left Shoulder',torsoBoneIdx,new wsPoint(shoulderRadius,-torsoHigh,60)))-1;
+        var rightShoulderBoneIdx=bones.push(new ModelBoneObject('Right Shoulder',torsoBoneIdx,new wsPoint(-shoulderRadius,-torsoHigh,60)))-1;
 
-        var leftElbowBoneIdx=bones.push(new ModelBoneObject('Left Elbow',leftShoulderBoneIdx,new wsPoint((torsoRadius+armSwing),-torsoHigh,60)))-1;
-        var rightElbowBoneIdx=bones.push(new ModelBoneObject('Right Elbow',rightShoulderBoneIdx,new wsPoint(-(torsoRadius+armSwing),-torsoHigh,60)))-1;
+        var leftElbowBoneIdx=bones.push(new ModelBoneObject('Left Elbow',leftShoulderBoneIdx,new wsPoint(elbowRadius,-torsoHigh,60)))-1;
+        var rightElbowBoneIdx=bones.push(new ModelBoneObject('Right Elbow',rightShoulderBoneIdx,new wsPoint(-elbowRadius,-torsoHigh,60)))-1;
 
-        var leftWristBoneIdx=bones.push(new ModelBoneObject('Left Wrist',leftElbowBoneIdx,new wsPoint(((torsoRadius+armSwing)+wristSwing),-torsoHigh,0)))-1;
-        var rightWristBoneIdx=bones.push(new ModelBoneObject('Right Wrist',rightElbowBoneIdx,new wsPoint(-((torsoRadius+armSwing)+wristSwing),-torsoHigh,0)))-1;
+        var leftWristBoneIdx=bones.push(new ModelBoneObject('Left Wrist',leftElbowBoneIdx,new wsPoint(wristRadius,-torsoHigh,0)))-1;
+        var rightWristBoneIdx=bones.push(new ModelBoneObject('Right Wrist',rightElbowBoneIdx,new wsPoint(-wristRadius,-torsoHigh,0)))-1;
 
-        var leftHandBoneIdx=bones.push(new ModelBoneObject('Left Hand',leftWristBoneIdx,new wsPoint(((torsoRadius+armSwing)+30),-torsoHigh,0)))-1;
-        var rightHandBoneIdx=bones.push(new ModelBoneObject('Right Hand',rightWristBoneIdx,new wsPoint(-((torsoRadius+armSwing)+30),-torsoHigh,0)))-1;
+        var leftHandBoneIdx=bones.push(new ModelBoneObject('Left Hand',leftWristBoneIdx,new wsPoint(handRadius,-torsoHigh,0)))-1;
+        var rightHandBoneIdx=bones.push(new ModelBoneObject('Right Hand',rightWristBoneIdx,new wsPoint(-handRadius,-torsoHigh,0)))-1;
 
-        var rightHipBoneIdx=bones.push(new ModelBoneObject('Right Hip',hipBoneIdx,new wsPoint(-hipRadius,-(hipHigh-200),0)))-1;
-        var leftHipBoneIdx=bones.push(new ModelBoneObject('Left Hip',hipBoneIdx,new wsPoint(hipRadius,-(hipHigh-200),0)))-1;
+        var leftHipBoneIdx=bones.push(new ModelBoneObject('Left Hip',hipBoneIdx,new wsPoint(hipRadius,-hipHigh,0)))-1;
+        var rightHipBoneIdx=bones.push(new ModelBoneObject('Right Hip',hipBoneIdx,new wsPoint(-hipRadius,-hipHigh,0)))-1;
 
-        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint((hipRadius+kneeSwing),-(hipHigh>>1),45)))-1;
-        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-(hipRadius+kneeSwing),-(hipHigh>>1),45)))-1;
+        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint(hipRadius,-kneeHigh,0)))-1;
+        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-hipRadius,-kneeHigh,0)))-1;
 
-        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint(((hipRadius+kneeSwing)+ankleSwing),-ankleHigh,90)))-1;
-        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-((hipRadius+kneeSwing)+ankleSwing),-ankleHigh,90)))-1;
+        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint(hipRadius,-ankleHigh,0)))-1;
+        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-hipRadius,-ankleHigh,0)))-1;
 
-        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(((hipRadius+kneeSwing)+ankleSwing),-60,0)))-1;
-        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-((hipRadius+kneeSwing)+ankleSwing),-60,0)))-1;
+        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(hipRadius,0,0)))-1;
+        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-hipRadius,0,0)))-1;
 
 /* should be part of the animation
             // spine rotations

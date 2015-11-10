@@ -57,10 +57,11 @@ function SettingsObject()
         // draw testing
     
     this.debugDrawMapTangentSpace=false;
-    this.debugDrawMeshLines=false;
+    this.debugDrawMapMeshLines=false;
     
     this.debugDrawModelSkeleton=true;
     this.debugDrawModelTangentSpace=false;
+    this.debugDrawModelMeshLines=true;
     
         // play testing
         
