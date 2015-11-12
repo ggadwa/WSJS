@@ -165,7 +165,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     this.shrinkWrapGlobe=function(vertices,centerPnt)
     {
         var n,k,vIdx;
-        var bone,hitBone,dist;
+        var bone,dist;
         var nVertex=Math.floor(vertices.length/3);
         var bones=this.model.skeleton.bones;
         var nBone=bones.length;
@@ -197,6 +197,8 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // loop the moves
             
         var anyMove;
+        var moveVector=new wsPoint(0,0,0);
+        var vct;
         var moveCount=0;
         
         while (moveCount<1000) {
@@ -217,33 +219,44 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
 
                 vIdx=n*3;
                 pnt.set(vertices[vIdx],vertices[vIdx+1],vertices[vIdx+2]);
+                               
+                    // get the gravity to each bone
 
-                    // close to any bone?
-
-                hitBone=false;
+                moveVector.set(0,0,0);
                 
                 for (k=0;k!==nBone;k++) {
                     bone=bones[k];
                     if (bone.isBase()) continue;
 
                     dist=bone.position.distance(pnt);
-                    if (dist<250) {
-                        hitBone=true;
+                    
+                        // if too close, then all movement stops
+                        
+                    if (dist<500) {
+                        move.moving=false;
                         break;
                     }
+                    
+                        // outside of gravity
+                        
+                    if (dist>4000) continue;
+                    
+                        // otherwise add in gravity
+                        
+                    vct=new wsPoint((bone.position.x-vertices[vIdx]),(bone.position.y-vertices[vIdx+1]),(bone.position.z-vertices[vIdx+2]));
+                    vct.normalize();
+                    vct.scale((1.0-(dist/4000.0))*10.0);
+                    
+                    moveVector.addPoint(vct);
                 }
                 
-                    // hit a bone radius, so
-                    // no longer move this vertex
+                    // are we done moving?
                     
-                if (hitBone) {
-                    move.moving=false;
-                    continue;
-                }
+                if (!move.moving) continue;
                 
                     // move the vertex
                     
-                pnt.addPoint(move.moveVector);
+                pnt.addPoint(moveVector);
 
                 vertices[vIdx]=pnt.x;
                 vertices[vIdx+1]=pnt.y;

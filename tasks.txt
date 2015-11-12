@@ -24,54 +24,28 @@ REGULAR TODOs
 
 
 
-[ ] enableVertexAttribArray is probably be called when shaders already call it on vertex attribs
-
-[ ] add in a quad/point routine so we can show bones in skeletons
 
 [ ] rooms need decoration locations and decoration models
 [ ] rooms have possible light positions
 
-
 [ ] try to pack glsl light struct floats
 
 [ ] bitmaps
-    [X] normals are off for bolts (or frame is too large)
-    [X] need metal + bar
-    [X] need to have one set per map
     [ ] need bitmap colors filters are settings
-    [X] metal textures more light gray
-    [X] fix lines on rock textures
-    [X] corregated metal texture
-    [X] plaster wall texture
-    [X] metal needs a thin version
-    [X] fix bolt problems (normals, bottom cut off)
     [ ] machine texture
 
 [ ] physics
     [ ] jumping
     [ ] gravity
 
-[ ] diffuse calcs in light maps
-[ ] no light mesh hits -- needs "has flag" type call
-    [ ] need to highlight these in lightmap
-
+[ ] light maps
+    [ ] diffuse calcs in light maps
+    [ ] no light mesh hits -- needs "has flag" type call, highlight in lightmap
 
 [ ] don't draw spaces in text
 
-
-[ ] model generation
+[ ] models
     [ ] frustum cull models
-    [ ] erect type -- standing, crouching, all fours -- generate bone random rotations from that
-    [X] need globe generators
-    [X] need to generate normals
-    [X] need body to neck cylinder
-    [ ] don't build shapes by going over bones, do by finding bone names
-    [X] pick sizes that always cause overlap
-    [ ] better feet
-    [ ] facial features additional meshes
-    [ ] randomize meshes, always make bigger from center
-    [X] rename tangent space utility
-    [ ] combine close vertexes (maybe)
-
-
+    [ ] move middle back bone up
+    [ ] bones have planes of bones or extra null bones to fill out shrink wrap
 
