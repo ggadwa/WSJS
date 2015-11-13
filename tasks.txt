@@ -46,6 +46,5 @@ REGULAR TODOs
 
 [ ] models
     [ ] frustum cull models
-    [ ] move middle back bone up
-    [ ] bones have planes of bones or extra null bones to fill out shrink wrap
+    [ ] models need vertex object with bone #, distance, etc
 

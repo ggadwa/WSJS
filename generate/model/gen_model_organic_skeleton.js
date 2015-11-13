@@ -84,9 +84,9 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var hipHigh=kneeHigh+this.genRandom.randomInt(500,500);
         var hipRadius=this.genRandom.randomInt(300,350);
         var waistHigh=hipHigh+this.genRandom.randomInt(150,150);
-        var torsoHigh=waistHigh+this.genRandom.randomInt(500,500);
+        var torsoHigh=waistHigh+this.genRandom.randomInt(250,250);
         var torsoRadius=this.genRandom.randomInt(300,350);
-        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(50,50);
+        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(250,250);
         var shoulderRadius=torsoRadius+this.genRandom.randomInt(150,150);
         var elbowRadius=shoulderRadius+this.genRandom.randomInt(250,250);
         var wristRadius=elbowRadius+this.genRandom.randomInt(250,250);
@@ -104,17 +104,17 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
         var headBoneIdx=bones.push(new ModelBoneObject('Head',neckBoneIdx,new wsPoint(0,-headHigh,0)))-1;
 
-        var leftShoulderBoneIdx=bones.push(new ModelBoneObject('Left Shoulder',torsoBoneIdx,new wsPoint(shoulderRadius,-torsoHigh,60)))-1;
-        var rightShoulderBoneIdx=bones.push(new ModelBoneObject('Right Shoulder',torsoBoneIdx,new wsPoint(-shoulderRadius,-torsoHigh,60)))-1;
+        var leftShoulderBoneIdx=bones.push(new ModelBoneObject('Left Shoulder',torsoTopBoneIdx,new wsPoint(shoulderRadius,-torsoTopHigh,60)))-1;
+        var rightShoulderBoneIdx=bones.push(new ModelBoneObject('Right Shoulder',torsoTopBoneIdx,new wsPoint(-shoulderRadius,-torsoTopHigh,60)))-1;
 
-        var leftElbowBoneIdx=bones.push(new ModelBoneObject('Left Elbow',leftShoulderBoneIdx,new wsPoint(elbowRadius,-torsoHigh,60)))-1;
-        var rightElbowBoneIdx=bones.push(new ModelBoneObject('Right Elbow',rightShoulderBoneIdx,new wsPoint(-elbowRadius,-torsoHigh,60)))-1;
+        var leftElbowBoneIdx=bones.push(new ModelBoneObject('Left Elbow',leftShoulderBoneIdx,new wsPoint(elbowRadius,-torsoTopHigh,60)))-1;
+        var rightElbowBoneIdx=bones.push(new ModelBoneObject('Right Elbow',rightShoulderBoneIdx,new wsPoint(-elbowRadius,-torsoTopHigh,60)))-1;
 
-        var leftWristBoneIdx=bones.push(new ModelBoneObject('Left Wrist',leftElbowBoneIdx,new wsPoint(wristRadius,-torsoHigh,0)))-1;
-        var rightWristBoneIdx=bones.push(new ModelBoneObject('Right Wrist',rightElbowBoneIdx,new wsPoint(-wristRadius,-torsoHigh,0)))-1;
+        var leftWristBoneIdx=bones.push(new ModelBoneObject('Left Wrist',leftElbowBoneIdx,new wsPoint(wristRadius,-torsoTopHigh,0)))-1;
+        var rightWristBoneIdx=bones.push(new ModelBoneObject('Right Wrist',rightElbowBoneIdx,new wsPoint(-wristRadius,-torsoTopHigh,0)))-1;
 
-        var leftHandBoneIdx=bones.push(new ModelBoneObject('Left Hand',leftWristBoneIdx,new wsPoint(handRadius,-torsoHigh,0)))-1;
-        var rightHandBoneIdx=bones.push(new ModelBoneObject('Right Hand',rightWristBoneIdx,new wsPoint(-handRadius,-torsoHigh,0)))-1;
+        var leftHandBoneIdx=bones.push(new ModelBoneObject('Left Hand',leftWristBoneIdx,new wsPoint(handRadius,-torsoTopHigh,0)))-1;
+        var rightHandBoneIdx=bones.push(new ModelBoneObject('Right Hand',rightWristBoneIdx,new wsPoint(-handRadius,-torsoTopHigh,0)))-1;
 
         var leftHipBoneIdx=bones.push(new ModelBoneObject('Left Hip',hipBoneIdx,new wsPoint(hipRadius,-hipHigh,0)))-1;
         var rightHipBoneIdx=bones.push(new ModelBoneObject('Right Hip',hipBoneIdx,new wsPoint(-hipRadius,-hipHigh,0)))-1;
