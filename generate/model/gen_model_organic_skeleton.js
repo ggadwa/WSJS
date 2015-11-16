@@ -10,63 +10,6 @@ function GenModelOrganicSkeletonObject(model,genRandom)
     this.genRandom=genRandom;
 
         //
-        // bone rotate/move utilities
-        //
-
-    this.getRandomRotateAngle=function(rotX,rotY,rotZ)
-    {
-        var ang=new wsAngle(0.0,0.0,0.0);
-
-        ang.x=rotX[0]+this.genRandom.randomInt(0,(rotX[1]-rotX[0]));
-        ang.y=rotY[0]+this.genRandom.randomInt(0,(rotY[1]-rotY[0]));
-        ang.z=rotZ[0]+this.genRandom.randomInt(0,(rotZ[1]-rotZ[0]));
-
-        return(ang);
-    };
-
-    this.rotateBone=function(bones,boneIdx,ang)
-    {
-        var bone=bones[boneIdx];
-        var parentBone=bones[bone.parentBoneIdx];
-
-        var offsetPnt=bone.position.copy();
-        bone.position.rotateAroundPoint(parentBone.position,ang);
-        offsetPnt.subPoint(bone.position);
-
-        return(offsetPnt);
-    };
-
-    this.moveBone=function(bones,boneIdx,offsetPnt)
-    {
-        bones[boneIdx].position.subPoint(offsetPnt);
-    };
-    
-    this.rotateBoneAndAllChildren=function(bones,boneIdx,ang,offsetPnt)
-    {
-        var n,bone;
-        
-            // move this bone from the last
-            // rotational offset
-            
-        this.moveBone(bones,boneIdx,offsetPnt);
-        
-            // rotate bone and update the offset
-            // point for further children
-        
-        var nextOffsetPnt=this.rotateBone(bones,boneIdx,ang);
-        nextOffsetPnt.addPoint(offsetPnt);
-        
-            // now move all children
-            
-        for (n=0;n!==bones.length;n++) {
-            if (n===boneIdx) continue;
-            
-            bone=bones[n];
-            if (bone.parentBoneIdx===boneIdx) this.rotateBoneAndAllChildren(bones,n,ang,nextOffsetPnt);
-        }
-    };
-
-        //
         // build skeleton bones
         //
 
@@ -127,35 +70,6 @@ function GenModelOrganicSkeletonObject(model,genRandom)
 
         var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(hipRadius,0,0)))-1;
         var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-hipRadius,0,0)))-1;
-
-/* should be part of the animation
-            // spine rotations
-            
-        var ang=this.getRandomRotateAngle([0,-40],[0,0],[0,0]);
-        this.rotateBoneAndAllChildren(bones,waistBoneIdx,ang,new wsPoint(0,0,0));
-        
-        ang.x*=0.75;
-        this.rotateBoneAndAllChildren(bones,torsoBoneIdx,ang,new wsPoint(0,0,0));
-        
-        ang.x*=0.75;
-        this.rotateBoneAndAllChildren(bones,neckBoneIdx,ang,new wsPoint(0,0,0));
-
-            // arm rotations
-            // only rotate shoulder forward because torso
-            // leans forward
-        
-        ang=this.getRandomRotateAngle([0,90],[0,0],[0,-40]);
-        this.rotateBoneAndAllChildren(bones,leftElbowBoneIdx,ang,new wsPoint(0,0,0));
-        ang.z=-ang.z;
-        this.rotateBoneAndAllChildren(bones,rightElbowBoneIdx,ang,new wsPoint(0,0,0));
-        
-            // leg rotations
-        
-        ang=this.getRandomRotateAngle([-20,20],[0,0],[-20,-20]);
-        this.rotateBoneAndAllChildren(bones,leftKneeBoneIdx,ang,new wsPoint(0,0,0));
-        ang.z=-ang.z;
-        this.rotateBoneAndAllChildren(bones,rightKneeBoneIdx,ang,new wsPoint(0,0,0));
-        */
      };
     
 }

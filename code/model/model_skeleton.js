@@ -10,6 +10,11 @@ function ModelBoneObject(name,parentBoneIdx,position)
     this.parentBoneIdx=parentBoneIdx;
     this.position=position;
     
+        // pose
+    
+    this.poseAngle=new wsPoint(0.0,0.0,0.0);
+    this.posePosition=this.position.copy();
+    
         //
         // bone types
         //
@@ -143,6 +148,10 @@ function ModelSkeletonObject()
         return(new wsPoint(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
     };
     
+        //
+        // bounds and center
+        //
+        
     this.getBounds=function(xBound,yBound,zBound)
     {
         var n,pos;
@@ -178,6 +187,125 @@ function ModelSkeletonObject()
         pt.z=Math.floor(pt.z/nBone);
         
         return(pt);
+    };
+    
+        //
+        // clear a pose
+        //
+        
+    this.clearPoseBones=function()
+    {
+        var n,bone;
+        var nBone=this.bones.length;
+        
+        for (n=0;n!==nBone;n++) {
+            bone=this.bones[n];
+            
+            bone.poseAngle.set(0.0,0.0,0.0);
+            bone.posePosition.setFromPoint(bone.position);
+        }
+    };
+    
+        //
+        // rotate pose bones
+        //
+    
+    this.rotatePoseBoneSingle=function(boneIdx,ang)
+    {
+        var bone=this.bones[boneIdx];
+        var parentBone=this.bones[bone.parentBoneIdx];
+
+            // move the bone and get the offset
+            // for later moves
+            
+        var offsetPnt=bone.posePosition.copy();
+        bone.posePosition.rotateAroundPoint(parentBone.posePosition,ang);
+        offsetPnt.subPoint(bone.posePosition);
+        
+            // remember the sum of all the
+            // angles for vertex moves
+            
+        bone.poseAngle.addPoint(ang);
+
+        return(offsetPnt);
+    };
+
+    this.movePoseBoneSingle=function(boneIdx,offsetPnt)
+    {
+        this.bones[boneIdx].posePosition.subPoint(offsetPnt);
+    };
+    
+    this.rotatePoseBoneRecursive=function(boneIdx,ang,offsetPnt)
+    {
+        var n,bone;
+        var nBone=this.bones.length;
+        
+            // move this bone from the last
+            // rotational offset
+            
+        this.movePoseBoneSingle(boneIdx,offsetPnt);
+        
+            // rotate bone and update the offset
+            // point for further children
+        
+        var nextOffsetPnt=this.rotatePoseBoneSingle(boneIdx,ang);
+        nextOffsetPnt.addPoint(offsetPnt);
+        
+            // now move all children
+            
+        for (n=0;n!==nBone;n++) {
+            if (n===boneIdx) continue;
+            
+            bone=this.bones[n];
+            if (bone.parentBoneIdx===boneIdx) this.rotatePoseBoneRecursive(n,ang,nextOffsetPnt);
+        }
+    };
+
+    this.rotatePoseBone=function(boneIdx,ang)
+    {
+        this.rotatePoseBoneRecursive(boneIdx,ang,new wsPoint(0,0,0));
+    };
+    
+    
+    
+    
+    // supergumba -- testing
+    this.randomPose=function(poseCount)
+    {
+        var ang;
+        var b=((poseCount&0x1)===0);
+        
+            // some random bone rotations for testing
+            // supergumba -- DELETE LATER
+            
+        this.clearPoseBones();
+            
+        var ang=new wsAngle((b?40.0:-40.0),0.0,0.0);
+        this.rotatePoseBone(this.findBoneIndex('Waist'),ang);
+        
+        ang.x*=0.75;
+        this.rotatePoseBone(this.findBoneIndex('Torso'),ang);
+        
+        ang.x*=0.75;
+        this.rotatePoseBone(this.findBoneIndex('Neck'),ang);
+
+            // arm rotations
+            // only rotate shoulder forward because torso
+            // leans forward
+        
+        ang=new wsAngle((b?90.0:-90.0),0.0,(b?40.0:-40.0));
+        this.rotatePoseBone(this.findBoneIndex('Left Elbow'),ang);
+        ang.z=-ang.z;
+        this.rotatePoseBone(this.findBoneIndex('Right Elbow'),ang);
+        
+            // leg rotations
+        
+        ang=new wsAngle((b?20.0:-20.0),0.0,0.0);
+        this.rotatePoseBone(this.findBoneIndex('Left Knee'),ang);
+        ang.z=-ang.z;
+        this.rotatePoseBone(this.findBoneIndex('Right Knee'),ang);
+        
+        
     };
 
 }

@@ -540,7 +540,7 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
 
             // add mesh to model
             
-        this.model.mesh=new ModelMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,0);
+        this.model.mesh=new ModelMeshObject(bitmap,vertices,normals,tangents,uvs,null,indexes,0);
         this.model.mesh.setupBuffers(view);
     };
     

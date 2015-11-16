@@ -4,13 +4,14 @@
 // model mesh class
 //
 
-function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
+function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,boneAttaches,indexes,flag)
 {
     this.bitmap=bitmap;
     this.vertices=vertices;
     this.normals=normals;
     this.tangents=tangents;
     this.vertexUVs=vertexUVs;
+    this.boneAttaches=boneAttaches;
     this.indexes=indexes;
     this.flag=flag;
     
@@ -18,7 +19,7 @@ function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag
     this.indexCount=this.indexes.length;
     this.trigCount=Math.floor(this.indexCount/3);
     
-        // null buffers
+        // gl buffers
         
     this.vertexPosBuffer=null;
     this.vertexNormalBuffer=null;

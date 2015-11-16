@@ -18,6 +18,9 @@ function EntityObject(position,angle,radius,model,isPlayer)
     this.sideSpeed=0;
     this.verticalSpeed=0;
     
+    this.nextPoseTimeStamp=0;           // supergumba -- possibly temporary
+    this.poseCount=0;                   // supergumba -- testing
+    
     this.collision=new CollisionObject();
     
         //
@@ -157,6 +160,15 @@ function EntityObject(position,angle,radius,model,isPlayer)
 
     this.draw=function(view)
     {
+            // time for a new pose?
+            
+        if (view.timeStamp>this.nextPoseTimeStamp) {
+            this.nextPoseTimeStamp=view.timeStamp+3000;
+            this.model.skeleton.randomPose(this.poseCount++);
+        }
+        
+            // draw the model
+            
         this.model.mesh.tempMoveUpdateVertexes(view,this.position);     // supergumba -- temporary
         this.model.draw(view);
     };

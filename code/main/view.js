@@ -93,6 +93,8 @@ function ViewObject()
     
         // main loop
         
+    this.timeStamp=0;
+        
     this.loopCancel=false;
     this.loopLastPhysicTimeStamp=0;
     this.loopLastDrawTimeStamp=0;

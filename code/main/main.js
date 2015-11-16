@@ -53,7 +53,7 @@ function wsLoopRun(timeStamp)
     
         // get integer msec timestamp
     
-    var ts=Math.floor(timeStamp);
+    view.timeStamp=Math.floor(timeStamp);
     
         // run the input
         
@@ -61,8 +61,8 @@ function wsLoopRun(timeStamp)
    
         // entities and physics
     
-    var physicsTick=ts-view.loopLastPhysicTimeStamp;
-    view.loopLastPhysicTimeStamp=ts;
+    var physicsTick=view.timeStamp-view.loopLastPhysicTimeStamp;
+    view.loopLastPhysicTimeStamp=view.timeStamp;
     
     if (physicsTick>settings.bailMilliseconds) return;
     
@@ -74,10 +74,10 @@ function wsLoopRun(timeStamp)
     
         // drawing
         
-    var drawTick=ts-view.loopLastDrawTimeStamp;
+    var drawTick=view.timeStamp-view.loopLastDrawTimeStamp;
     
     if (drawTick>settings.drawMilliseconds) {
-        view.loopLastDrawTimeStamp=ts; 
+        view.loopLastDrawTimeStamp=view.timeStamp; 
 
         view.draw(map,entityList);
         
@@ -87,10 +87,10 @@ function wsLoopRun(timeStamp)
     
         // the fps
     
-    var fpsTime=ts-view.fpsStartTimeStamp;
+    var fpsTime=view.timeStamp-view.fpsStartTimeStamp;
     if (fpsTime>=1000) {
         view.fps=((view.fpsTotal/view.fpsCount)*1000.0)/fpsTime;
-        view.fpsStartTimeStamp=ts;
+        view.fpsStartTimeStamp=view.timeStamp;
         
         view.fpsTotal=0;
         view.fpsCount=0;
@@ -100,15 +100,16 @@ function wsLoopRun(timeStamp)
 function wsLoopStart()
 {
     var timeStamp=window.performance.now();
-    var ts=Math.floor(timeStamp);
     
-    view.loopLastPhysicTimeStamp=ts;
-    view.loopLastDrawTimeStamp=ts;
+    view.timeStamp=Math.floor(timeStamp);
+    
+    view.loopLastPhysicTimeStamp=view.timeStamp;
+    view.loopLastDrawTimeStamp=view.timeStamp;
     
     view.fps=0.0;
     view.fpsTotal=0;
     view.fpsCount=0;
-    view.fpsStartTimeStamp=ts;
+    view.fpsStartTimeStamp=view.timeStamp;
 
     view.loopCancel=false;
     
