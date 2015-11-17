@@ -57,6 +57,10 @@ function ViewObject()
     this.billboardXMatrix=null;
     this.billboardYMatrix=null;
     
+        // in game random
+        
+    this.genRandom=new GenRandomObject(Date.now());
+    
         // view lighting
         
     this.LIGHT_COUNT=4;

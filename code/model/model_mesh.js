@@ -47,25 +47,31 @@ function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,boneAttaches
     };
     
         //
-        // supergumba -- TEMPORARY!!!  Just moving mesh to
-        // line up with entity position!
+        // set vertices to pose and model position
         //
         
-    this.tempMoveUpdateVertexes=function(view,offsetPosition)
+    this.updateVertexesToPoseAndPosition=function(view,skeleton,offsetPosition)
     {
         var n,vIdx;
-        var gl=view.gl;
+        var bone;
         
+            // move all the vertexes
+            
         vIdx=0;
         var v2=new Float32Array(this.vertices.length);
         
         for (n=0;n!==this.vertexCount;n++) {
-            v2[vIdx]=this.vertices[vIdx]+offsetPosition.x;
-            v2[vIdx+1]=this.vertices[vIdx+1]+offsetPosition.y;
-            v2[vIdx+2]=this.vertices[vIdx+2]+offsetPosition.z;
+            bone=skeleton.bones[this.boneAttaches[n]];
+            
+            v2[vIdx]=this.vertices[vIdx]+bone.curPoseVector.x+offsetPosition.x;
+            v2[vIdx+1]=this.vertices[vIdx+1]+bone.curPoseVector.y+offsetPosition.y;
+            v2[vIdx+2]=this.vertices[vIdx+2]+bone.curPoseVector.z+offsetPosition.z;
             vIdx+=3;
         }
         
+            // set the buffers
+            
+        var gl=view.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,v2,gl.DYNAMIC_DRAW);
     };

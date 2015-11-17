@@ -81,6 +81,13 @@ function wsPoint(x,y,z)
         this.z-=pt.z;
     };
     
+    this.tween=function(pt1,pt2,factor)
+    {
+        this.x=pt1.x+(pt2.x-pt1.x)*factor;
+        this.y=pt1.y+(pt2.y-pt1.y)*factor;
+        this.z=pt1.z+(pt2.z-pt1.z)*factor;
+    };
+    
     this.equals=function(pt)
     {
         return((this.x===pt.x)&&(this.y===pt.y)&&(this.z===pt.z));

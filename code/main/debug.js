@@ -225,9 +225,9 @@ function DebugObject()
         vIdx=0;
 
         for (n=0;n!==nBone;n++) {
-            vertices[vIdx++]=skeleton.bones[n].posePosition.x+offsetPosition.x;
-            vertices[vIdx++]=skeleton.bones[n].posePosition.y+offsetPosition.y;
-            vertices[vIdx++]=skeleton.bones[n].posePosition.z+offsetPosition.z;
+            vertices[vIdx++]=skeleton.bones[n].curPosePosition.x+offsetPosition.x;
+            vertices[vIdx++]=skeleton.bones[n].curPosePosition.y+offsetPosition.y;
+            vertices[vIdx++]=skeleton.bones[n].curPosePosition.z+offsetPosition.z;
         }
 
         iIdx=0;
@@ -278,7 +278,7 @@ function DebugObject()
         var pnt;
         
         for (n=0;n!==nBone;n++) {
-            pnt=new wsPoint(skeleton.bones[n].posePosition.x,skeleton.bones[n].posePosition.y,skeleton.bones[n].posePosition.z);
+            pnt=new wsPoint(skeleton.bones[n].curPosePosition.x,skeleton.bones[n].curPosePosition.y,skeleton.bones[n].curPosePosition.z);
             pnt.addPoint(offsetPosition);
             particlePoints.push(pnt);
         }

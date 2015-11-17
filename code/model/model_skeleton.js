@@ -12,8 +12,15 @@ function ModelBoneObject(name,parentBoneIdx,position)
     
         // pose
     
-    this.poseAngle=new wsPoint(0.0,0.0,0.0);
-    this.posePosition=this.position.copy();
+    this.curPoseAngle=new wsPoint(0.0,0.0,0.0);
+    this.curPosePosition=this.position.copy();
+    this.curPoseVector=new wsPoint(0,0,0);
+    
+    this.prevPoseAngle=new wsPoint(0.0,0.0,0.0);
+    this.prevPosePosition=this.position.copy();
+    
+    this.nextPoseAngle=new wsPoint(0.0,0.0,0.0);
+    this.nextPosePosition=this.position.copy();
     
         //
         // bone types
@@ -190,10 +197,12 @@ function ModelSkeletonObject()
     };
     
         //
-        // clear a pose
+        // functions to handle clear, moving
+        // and tweening the prev, next, and current
+        // pose
         //
         
-    this.clearPoseBones=function()
+    this.moveNextPoseToPrevPose=function()
     {
         var n,bone;
         var nBone=this.bones.length;
@@ -201,8 +210,43 @@ function ModelSkeletonObject()
         for (n=0;n!==nBone;n++) {
             bone=this.bones[n];
             
-            bone.poseAngle.set(0.0,0.0,0.0);
-            bone.posePosition.setFromPoint(bone.position);
+            bone.prevPoseAngle.setFromPoint(bone.nextPoseAngle);
+            bone.prevPosePosition.setFromPoint(bone.nextPosePosition);
+        }
+    };
+    
+    this.clearNextPose=function()
+    {
+        var n,bone;
+        var nBone=this.bones.length;
+        
+        for (n=0;n!==nBone;n++) {
+            bone=this.bones[n];
+            
+            bone.nextPoseAngle.set(0.0,0.0,0.0);
+            bone.nextPosePosition.setFromPoint(bone.position);
+        }
+    };
+    
+    this.tweenCurrentPose=function(prevTimeStamp,nextTimeStamp,curTimeStamp)
+    {
+        var n,bone;
+        var nBone=this.bones.length;
+        
+            // get the factor
+            
+        var factor=(curTimeStamp-prevTimeStamp)/(nextTimeStamp-prevTimeStamp);
+        
+            // move the bones
+            // we also setup a vector used to later move vertexes
+            
+        for (n=0;n!==nBone;n++) {
+            bone=this.bones[n];
+            
+            bone.curPoseAngle.tween(bone.prevPoseAngle,bone.nextPoseAngle);
+            bone.curPosePosition.tween(bone.prevPosePosition,bone.nextPosePosition,factor);
+            
+            bone.curPoseVector.setFromSubPoint(bone.curPosePosition,bone.position);
         }
     };
     
@@ -210,7 +254,7 @@ function ModelSkeletonObject()
         // rotate pose bones
         //
     
-    this.rotatePoseBoneSingle=function(boneIdx,ang)
+    this.rotateNextPoseBoneSingle=function(boneIdx,ang)
     {
         var bone=this.bones[boneIdx];
         var parentBone=this.bones[bone.parentBoneIdx];
@@ -218,24 +262,24 @@ function ModelSkeletonObject()
             // move the bone and get the offset
             // for later moves
             
-        var offsetPnt=bone.posePosition.copy();
-        bone.posePosition.rotateAroundPoint(parentBone.posePosition,ang);
-        offsetPnt.subPoint(bone.posePosition);
+        var offsetPnt=bone.nextPosePosition.copy();
+        bone.nextPosePosition.rotateAroundPoint(parentBone.nextPosePosition,ang);
+        offsetPnt.subPoint(bone.nextPosePosition);
         
             // remember the sum of all the
             // angles for vertex moves
             
-        bone.poseAngle.addPoint(ang);
+        bone.nextPoseAngle.addPoint(ang);
 
         return(offsetPnt);
     };
 
-    this.movePoseBoneSingle=function(boneIdx,offsetPnt)
+    this.moveNextPoseBoneSingle=function(boneIdx,offsetPnt)
     {
-        this.bones[boneIdx].posePosition.subPoint(offsetPnt);
+        this.bones[boneIdx].nextPosePosition.subPoint(offsetPnt);
     };
     
-    this.rotatePoseBoneRecursive=function(boneIdx,ang,offsetPnt)
+    this.rotateNextPoseBoneRecursive=function(boneIdx,ang,offsetPnt)
     {
         var n,bone;
         var nBone=this.bones.length;
@@ -243,12 +287,12 @@ function ModelSkeletonObject()
             // move this bone from the last
             // rotational offset
             
-        this.movePoseBoneSingle(boneIdx,offsetPnt);
+        this.moveNextPoseBoneSingle(boneIdx,offsetPnt);
         
             // rotate bone and update the offset
             // point for further children
         
-        var nextOffsetPnt=this.rotatePoseBoneSingle(boneIdx,ang);
+        var nextOffsetPnt=this.rotateNextPoseBoneSingle(boneIdx,ang);
         nextOffsetPnt.addPoint(offsetPnt);
         
             // now move all children
@@ -257,54 +301,79 @@ function ModelSkeletonObject()
             if (n===boneIdx) continue;
             
             bone=this.bones[n];
-            if (bone.parentBoneIdx===boneIdx) this.rotatePoseBoneRecursive(n,ang,nextOffsetPnt);
+            if (bone.parentBoneIdx===boneIdx) this.rotateNextPoseBoneRecursive(n,ang,nextOffsetPnt);
         }
     };
 
-    this.rotatePoseBone=function(boneIdx,ang)
+    this.rotateNextPoseBone=function(boneIdx,ang)
     {
-        this.rotatePoseBoneRecursive(boneIdx,ang,new wsPoint(0,0,0));
+        this.rotateNextPoseBoneRecursive(boneIdx,ang,new wsPoint(0,0,0));
     };
     
     
     
     
     // supergumba -- testing
-    this.randomPose=function(poseCount)
+    this.randomNextPose=function(view)
     {
-        var ang;
-        var b=((poseCount&0x1)===0);
+        var ang,x,z;
         
             // some random bone rotations for testing
             // supergumba -- DELETE LATER
             
-        this.clearPoseBones();
+            // move current next pose to previous pose
             
-        var ang=new wsAngle((b?40.0:-40.0),0.0,0.0);
-        this.rotatePoseBone(this.findBoneIndex('Waist'),ang);
+        this.moveNextPoseToPrevPose();
+        
+            // create the next pose
+            
+        this.clearNextPose();
+        
+            // spine rotations
+            
+        x=view.genRandom.randomInt(-40,80);
+            
+        var ang=new wsAngle(x,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Waist'),ang);
         
         ang.x*=0.75;
-        this.rotatePoseBone(this.findBoneIndex('Torso'),ang);
+        this.rotateNextPoseBone(this.findBoneIndex('Torso'),ang);
         
         ang.x*=0.75;
-        this.rotatePoseBone(this.findBoneIndex('Neck'),ang);
+        this.rotateNextPoseBone(this.findBoneIndex('Neck'),ang);
 
             // arm rotations
-            // only rotate shoulder forward because torso
-            // leans forward
         
-        ang=new wsAngle((b?90.0:-90.0),0.0,(b?40.0:-40.0));
-        this.rotatePoseBone(this.findBoneIndex('Left Elbow'),ang);
+        x=view.genRandom.randomInt(-90,180);
+        z=view.genRandom.randomInt(-40,80);
+        
+        ang=new wsAngle(x,0.0,z);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Elbow'),ang);
         ang.z=-ang.z;
-        this.rotatePoseBone(this.findBoneIndex('Right Elbow'),ang);
+        this.rotateNextPoseBone(this.findBoneIndex('Right Elbow'),ang);
+        
+        z=view.genRandom.randomInt(-40,80);
+        
+        ang=new wsAngle(0.0,0.0,z);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Wrist'),ang);
+        ang.z=-ang.z;
+        this.rotateNextPoseBone(this.findBoneIndex('Right Wrist'),ang);
         
             // leg rotations
+            
+        x=view.genRandom.randomInt(-50,100);
         
-        ang=new wsAngle((b?20.0:-20.0),0.0,0.0);
-        this.rotatePoseBone(this.findBoneIndex('Left Knee'),ang);
-        ang.z=-ang.z;
-        this.rotatePoseBone(this.findBoneIndex('Right Knee'),ang);
+        ang=new wsAngle(x,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Knee'),ang);
+        ang.x=-ang.x;
+        this.rotateNextPoseBone(this.findBoneIndex('Right Knee'),ang);
         
+        x=view.genRandom.randomInt(-20,40);
+        
+        ang=new wsAngle(x,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Ankle'),ang);
+        ang.x=-ang.x;
+        this.rotateNextPoseBone(this.findBoneIndex('Right Ankle'),ang);
         
     };
 

@@ -24,6 +24,7 @@ REGULAR TODOs
 
 
 
+[ ] need to deal with pausing time stamps
 
 [ ] rooms need decoration locations and decoration models
 [ ] rooms have possible light positions
@@ -47,6 +48,7 @@ REGULAR TODOs
 [ ] models
     [ ] frustum cull models
     [X] bones need pose position and original position
+    [ ] need to rotate vertexes on posing
     [ ] eventually get rid of bone "is" functions (leave base)
 
 
