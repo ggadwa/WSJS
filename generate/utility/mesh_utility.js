@@ -6,15 +6,11 @@
 
 function MeshUtilityObject()
 {
-    //
-    // create normals from verticies and triangles
-    // 
-    // this function expects the vertex and normal lists to be parallel and works
-    // on a chunk of the mesh.  Use buildMeshNormals() below for operating on
-    // the whole mesh
-    //
+        //
+        // build normals for map meshes
+        // 
 
-    this.buildMeshNormalsFromChunk=function(vertices,vIdxStart,vIdxLength,indexes,iIdxStart,iIdxLength,normals,normalsIn)
+    this.buildMapMeshNormalsFromChunk=function(vertices,vIdxStart,vIdxLength,indexes,iIdxStart,iIdxLength,normals,normalsIn)
     {
         var n,nTrig,nVertex,trigIdx;
         var idx,v0Idx,v1Idx,v2Idx;
@@ -148,19 +144,99 @@ function MeshUtilityObject()
         return(normals);
     };
     
-    this.buildMeshNormals=function(vertices,indexes,normalsIn)
+    this.buildMapMeshNormals=function(vertices,indexes,normalsIn)
     {
         var normals=new Float32Array(vertices.length);
-        this.buildMeshNormalsFromChunk(vertices,0,vertices.length,indexes,0,indexes.length,normals,normalsIn);
+        this.buildMapMeshNormalsFromChunk(vertices,0,vertices.length,indexes,0,indexes.length,normals,normalsIn);
         
         return(normals);
     };
     
         //
-        // create UVs from vertices and normals
+        // build normals for model meshes
+        //
+    
+    this.buildModelMeshNormals=function(vertexList,indexes)
+    {
+        var n,nTrig,nVertex,trigIdx;
+        var v0,v1,v2;
+
+        nVertex=vertexList.length;
+
+            // determine the center of the vertices
+            // this will be used later to determine if
+            // normals should be flipped (for models
+            // normals always face out)
+
+        var meshCenter=new wsPoint(0.0,0.0,0.0);
+
+        for (n=0;n!==nVertex;n++) {
+            meshCenter.addPoint(vertexList[n].position);
+        }
+
+        meshCenter.x/=nVertex;
+        meshCenter.y/=nVertex;
+        meshCenter.z/=nVertex;
+
+        var trigCenter=new wsPoint(0.0,0.0,0.0);
+        var faceVct=new wsPoint(0.0,0.0,0.0);
+
+            // generate normals by the trigs
+            // sometimes we will end up overwriting
+            // but it depends on the mesh to have
+            // constant shared vertices against
+            // triangle normals
+
+        var p10=new wsPoint(0.0,0.0,0.0);
+        var p20=new wsPoint(0.0,0.0,0.0);
+        var normal=new wsPoint(0.0,0.0,0.0);
+
+        nTrig=Math.floor(indexes.length/3);
+
+        for (n=0;n!==nTrig;n++) {
+
+                // get the vertex indexes and
+                // the vertexes for the trig
+
+            trigIdx=n*3;
+
+            v0=vertexList[indexes[trigIdx]];
+            v1=vertexList[indexes[trigIdx+1]];
+            v2=vertexList[indexes[trigIdx+2]];
+
+                // create vectors and calculate the normal
+                // by the cross product
+
+            p10.setFromSubPoint(v1.position,v0.position);
+            p20.setFromSubPoint(v2.position,v0.position);
+            normal.setFromCross(p10,p20);
+            normal.normalize();
+
+                // determine if we need to flip
+                // we can use the dot product to tell
+                // us if the normal is pointing
+                // more towards the center or more
+                // away from it
+
+            trigCenter.set(((v0.position.x+v1.position.x+v2.position.x)/3),((v0.position.y+v1.position.y+v2.position.y)/3),((v0.position.z+v1.position.z+v2.position.z)/3));
+            faceVct.setFromSubPoint(trigCenter,meshCenter);
+
+            if (!(normal.dot(faceVct)>0.0)) normal.scale(-1.0);
+
+                // and set the mesh normal
+                // to all vertexes in this trig
+
+            v0.normal.setFromPoint(normal);
+            v1.normal.setFromPoint(normal);
+            v2.normal.setFromPoint(normal);
+        }
+    };
+    
+        //
+        // build UVs for map meshes
         //
         
-    this.buildMeshUVs=function(bitmap,vertices,normals)
+    this.buildMapMeshUVs=function(bitmap,vertices,normals)
     {
         var n,nVertex,vIdx,arrIdx;
         var x,y,ang;
@@ -243,10 +319,10 @@ function MeshUtilityObject()
     };
 
         //
-        // create tangents from vertices, uvs, and normals
+        // build tangents from map meshes
         //
 
-    this.buildMeshTangents=function(vertices,uvs,indexes)
+    this.buildMapMeshTangents=function(vertices,uvs,indexes)
     {
         var n,nTrig,nVertex,trigIdx;
         var v0Idx,v1Idx,v2Idx;
@@ -347,6 +423,83 @@ function MeshUtilityObject()
         }
 
         return(tangents);
+    };
+    
+        //
+        // build tangents from model meshes
+        //
+
+    this.buildModelMeshTangents=function(vertexList,indexes)
+    {
+        var n,nTrig,nVertex,trigIdx;
+        var v0,v1,v2;
+        var u10,u20,v10,v20;
+
+        nVertex=vertexList.length;
+
+            // generate tangents by the trigs
+            // sometimes we will end up overwriting
+            // but it depends on the mesh to have
+            // constant shared vertices against
+            // triangle tangents
+
+            // note this recreates a bit of what
+            // goes on to create the normal, because
+            // we need that first to make the UVs
+
+        var p10=new wsPoint(0.0,0.0,0.0);
+        var p20=new wsPoint(0.0,0.0,0.0);
+        var vLeft=new wsPoint(0.0,0.0,0.0);
+        var vRight=new wsPoint(0.0,0.0,0.0);
+        var vNum=new wsPoint(0.0,0.0,0.0);
+        var denom;
+        var tangent=new wsPoint(0.0,0.0,0.0);
+
+        nTrig=Math.floor(indexes.length/3);
+
+        for (n=0;n!==nTrig;n++) {
+
+                // get the vertex indexes and
+                // the vertexes for the trig
+
+            trigIdx=n*3;
+
+            v0=vertexList[indexes[trigIdx]];
+            v1=vertexList[indexes[trigIdx+1]];
+            v2=vertexList[indexes[trigIdx+2]];
+
+                // create vectors
+
+            p10.setFromSubPoint(v1.position,v0.position);
+            p20.setFromSubPoint(v2.position,v0.position);
+
+                // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
+                // uvs are packed lists of 2, so different here
+
+            u10=v1.uv.x-v0.uv.x;        // x component
+            u20=v2.uv.x-v0.uv.x;
+            v10=v1.uv.y-v0.uv.y;        // y component
+            v20=v2.uv.y-v0.uv.y;
+
+                // calculate the tangent
+                // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
+
+            vLeft.setFromScale(p10,v20);
+            vRight.setFromScale(p20,v10);
+            vNum.setFromSubPoint(vLeft,vRight);
+
+            denom=(u10*v20)-(v10*u20);
+            if (denom!==0.0) denom=1.0/denom;
+            tangent.setFromScale(vNum,denom);
+            tangent.normalize();
+
+                // and set the mesh normal
+                // to all vertexes in this trig
+
+            v0.tangent.setFromPoint(tangent);
+            v1.tangent.setFromPoint(tangent);
+            v2.tangent.setFromPoint(tangent);
+        }
     };
     
 }

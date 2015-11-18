@@ -1,21 +1,30 @@
 "use strict";
 
 //
+// model mesh vertex
+//
+
+function ModelMeshVertexObject()
+{
+    this.position=new wsPoint(0,0,0);
+    this.normal=new wsPoint(0.0,0.0,0.0);
+    this.tangent=new wsPoint(0.0,0.0,0.0);
+    this.uv=new ws2DPoint(0.0,0.0);
+    this.boneIdx=-1;
+}
+
+//
 // model mesh class
 //
 
-function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,boneAttaches,indexes,flag)
+function ModelMeshObject(bitmap,vertexList,indexes,flag)
 {
     this.bitmap=bitmap;
-    this.vertices=vertices;
-    this.normals=normals;
-    this.tangents=tangents;
-    this.vertexUVs=vertexUVs;
-    this.boneAttaches=boneAttaches;
+    this.vertexList=vertexList;
     this.indexes=indexes;
     this.flag=flag;
     
-    this.vertexCount=Math.floor(this.vertices.length/3);
+    this.vertexCount=this.vertexList.length;
     this.indexCount=this.indexes.length;
     this.trigCount=Math.floor(this.indexCount/3);
     
@@ -52,28 +61,38 @@ function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,boneAttaches
         
     this.updateVertexesToPoseAndPosition=function(view,skeleton,offsetPosition)
     {
-        var n,vIdx;
+        var n,v;
         var bone;
         
             // move all the vertexes
             
-        vIdx=0;
-        var v2=new Float32Array(this.vertices.length);
+        var vIdx=0;
+        var nIdx=0;
+        
+        var vertices=new Float32Array(this.vertexCount*3);
+        var normals=new Float32Array(this.vertexCount*3);
         
         for (n=0;n!==this.vertexCount;n++) {
-            bone=skeleton.bones[this.boneAttaches[n]];
+            v=this.vertexList[n];
+            bone=skeleton.bones[v.boneIdx];
             
-            v2[vIdx]=this.vertices[vIdx]+bone.curPoseVector.x+offsetPosition.x;
-            v2[vIdx+1]=this.vertices[vIdx+1]+bone.curPoseVector.y+offsetPosition.y;
-            v2[vIdx+2]=this.vertices[vIdx+2]+bone.curPoseVector.z+offsetPosition.z;
-            vIdx+=3;
+            vertices[vIdx++]=v.position.x+bone.curPoseVector.x+offsetPosition.x;
+            vertices[vIdx++]=v.position.y+bone.curPoseVector.y+offsetPosition.y;
+            vertices[vIdx++]=v.position.z+bone.curPoseVector.z+offsetPosition.z;
+            
+            normals[nIdx++]=v.normal.x;         // supergumba -- need to rotate these
+            normals[nIdx++]=v.normal.y;
+            normals[nIdx++]=v.normal.z;
         }
         
             // set the buffers
             
         var gl=view.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,v2,gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.DYNAMIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,normals,gl.STATIC_DRAW);
     };
 
         //
@@ -82,28 +101,63 @@ function ModelMeshObject(bitmap,vertices,normals,tangents,vertexUVs,boneAttaches
 
     this.setupBuffers=function(view)
     {
+            // build the default buffer data
+            // from the vertex list
+        
+        var n;
+        
+        var vertices=new Float32Array(this.vertexCount*3);
+        var normals=new Float32Array(this.vertexCount*3);
+        var tangents=new Float32Array(this.vertexCount*3);
+        var uvs=new Float32Array(this.vertexCount*2);
+        
+        var vIdx=0;
+        var uIdx=0;
+        var nIdx=0;
+        var tIdx=0;
+        var v;
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            
+            vertices[vIdx++]=v.position.x;
+            vertices[vIdx++]=v.position.y;
+            vertices[vIdx++]=v.position.z;
+            
+            uvs[uIdx++]=v.uv.x;
+            uvs[uIdx++]=v.uv.y;
+            
+            normals[nIdx++]=v.normal.x;
+            normals[nIdx++]=v.normal.y;
+            normals[nIdx++]=v.normal.z;
+            
+            tangents[tIdx++]=v.tangent.x;
+            tangents[tIdx++]=v.tangent.y;
+            tangents[tIdx++]=v.tangent.z;
+        }
+
             // create all the buffers
-            // expects buffers to already be Float32Array
-            // or Uint16Array
 
         var gl=view.gl;
 
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.DYNAMIC_DRAW);
 
         this.vertexNormalBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.normals,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,normals,gl.STATIC_DRAW);
 
         this.vertexTangentBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.tangents,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,tangents,gl.STATIC_DRAW);
 
         this.vertexUVBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertexUVs,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,uvs,gl.STATIC_DRAW);
 
+            // indexes are static lists
+            
         this.indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    

@@ -22,9 +22,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // globe counts
         
     this.GLOBE_SURFACE_COUNT=24;
-    this.GLOBE_VERTEX_COUNT=(((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-2))+2)*3);
-    this.GLOBE_NORMAL_COUNT=this.GLOBE_VERTEX_COUNT;
-    this.GLOBE_UV_COUNT=(((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-2))+2)*2);
+    this.GLOBE_VERTEX_LIST_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-2))+2);
     this.GLOBE_INDEX_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-3))*6)+((this.GLOBE_SURFACE_COUNT*2)*3);
 
         //
@@ -32,11 +30,12 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // center of skeleton
         //
         
-    this.buildGlobeAroundSkeleton=function(view,centerPnt,widRadius,highRadius,vertices,uvs,indexes)
+    this.buildGlobeAroundSkeleton=function(view,centerPnt,widRadius,highRadius,vertexList,indexes)
     {
         var x,y,ang;
-        var rd,radius,px,py,pz;
+        var rd,radius,py;
         var vAng;
+        var v;
          
             // create the globe without a top
             // or bottom and build that with trigs later
@@ -48,7 +47,6 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var yAng=yAngAdd;
         
         var vIdx=0;
-        var uvIdx=0;
         
         for (y=1;y!==(this.GLOBE_SURFACE_COUNT-1);y++) {
             
@@ -66,19 +64,19 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             xzAng=0.0;
             
             for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
+                v=vertexList[vIdx++];
+                
                 rd=xzAng*DEGREE_TO_RAD;
-                px=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
-                pz=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
-
-                vertices[vIdx++]=px;
-                vertices[vIdx++]=py;
-                vertices[vIdx++]=pz;
+                
+                v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
+                v.position.y=py;
+                v.position.z=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
                 ang=xzAng+225.0;
                 if (ang>=360.0) ang-=360.0;
                 
-                uvs[uvIdx++]=1.0-(ang/360.0);
-                uvs[uvIdx++]=vAng;
+                v.uv.x=1.0-(ang/360.0);
+                v.uv.y=vAng;
 
                 xzAng+=xzAngAdd;
             }
@@ -88,23 +86,25 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
             // top and bottom points
         
-        var topIdx=Math.floor(vIdx/3);
+        var topIdx=Math.floor(vIdx);
         
-        vertices[vIdx++]=centerPnt.x;
-        vertices[vIdx++]=centerPnt.y-highRadius;
-        vertices[vIdx++]=centerPnt.z;
+        v=vertexList[vIdx++];
+        v.position.x=centerPnt.x;
+        v.position.y=centerPnt.y-highRadius;
+        v.position.z=centerPnt.z;
         
-        uvs[uvIdx++]=0.5;
-        uvs[uvIdx++]=0.0;
+        v.uv.x=0.5;
+        v.uv.y=0.0;
         
-        var botIdx=Math.floor(vIdx/3);
+        var botIdx=Math.floor(vIdx);
        
-        vertices[vIdx++]=centerPnt.x;
-        vertices[vIdx++]=centerPnt.y+highRadius;
-        vertices[vIdx++]=centerPnt.z;
+        v=vertexList[vIdx++];
+        v.position.x=centerPnt.x;
+        v.position.y=centerPnt.y+highRadius;
+        v.position.z=centerPnt.z;
         
-        uvs[uvIdx++]=0.5;
-        uvs[uvIdx++]=1.0;
+        v.uv.x=0.5;
+        v.uv.y=1.0;
         
             // build the triangles on
             // all the strips except the
@@ -162,15 +162,13 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // shrink wrap the globe
         //
         
-    this.shrinkWrapGlobe=function(vertices,centerPnt)
+    this.shrinkWrapGlobe=function(vertexList,centerPnt)
     {
-        var n,k,vIdx;
-        var bone,dist;
-        var nVertex=Math.floor(vertices.length/3);
+        var n,k;
+        var v,bone,dist;
+        var nVertex=vertexList.length;
         var bones=this.model.skeleton.bones;
         var nBone=bones.length;
-        
-        var pnt=new wsPoint(0,0,0);
         
             // we move each vertex inwards
             // toward the center point
@@ -185,9 +183,9 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var moveVct;
         
         for (n=0;n!==nVertex;n++) {
-            vIdx=n*3;
+            v=vertexList[n];
             
-            moveVct=new wsPoint((centerPnt.x-vertices[vIdx]),(centerPnt.y-vertices[vIdx+1]),(centerPnt.z-vertices[vIdx+2]));
+            moveVct=new wsPoint((centerPnt.x-v.position.x),(centerPnt.y-v.position.y),(centerPnt.z-v.position.z));
             moveVct.normalize();
             moveVct.scale(10);      // move 10 units at a time
             
@@ -217,8 +215,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
 
                     // get the vertex
 
-                vIdx=n*3;
-                pnt.set(vertices[vIdx],vertices[vIdx+1],vertices[vIdx+2]);
+                v=vertexList[n];
                                
                     // get the gravity to each bone
 
@@ -228,7 +225,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                     bone=bones[k];
                     if (bone.isBase()) continue;
 
-                    dist=bone.position.distance(pnt);
+                    dist=bone.position.distance(v.position);
                     
                         // if too close, then all movement stops
                         
@@ -243,7 +240,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                     
                         // otherwise add in gravity
                         
-                    vct=new wsPoint((bone.position.x-vertices[vIdx]),(bone.position.y-vertices[vIdx+1]),(bone.position.z-vertices[vIdx+2]));
+                    vct=new wsPoint((bone.position.x-v.position.x),(bone.position.y-v.position.y),(bone.position.z-v.position.z));
                     vct.normalize();
                     vct.scale((1.0-(dist/4000.0))*10.0);
                     
@@ -256,11 +253,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 
                     // move the vertex
                     
-                pnt.addPoint(moveVector);
-
-                vertices[vIdx]=pnt.x;
-                vertices[vIdx+1]=pnt.y;
-                vertices[vIdx+2]=pnt.z;
+                v.position.addPoint(moveVector);
                 
                     // we did a move so we go
                     // around again
@@ -278,20 +271,16 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // attach vertices to nearest bone
         //
         
-    this.attachVertexToBones=function(vertices,boneAttaches)
+    this.attachVertexToBones=function(vertexList)
     {
-        var n,k,vIdx;
+        var n,k,v;
         var bone,boneIdx,d,dist;
-        var nVertex=Math.floor(vertices.length/3);
+        var nVertex=vertexList.length;
         var bones=this.model.skeleton.bones;
         var nBone=bones.length;
         
-        var pnt=new wsPoint(0,0,0);
-        
         for (n=0;n!==nVertex;n++) {
-            
-            vIdx=n*3;
-            pnt.set(vertices[vIdx],vertices[vIdx+1],vertices[vIdx+2]);
+            v=vertexList[n];
             
             boneIdx=-1;
             
@@ -299,7 +288,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 bone=bones[k];
                 if (bone.isBase()) continue;
 
-                d=bone.position.distance(pnt);
+                d=bone.position.distance(v.position);
                 if (boneIdx===-1) {
                     boneIdx=k;
                     dist=d;
@@ -312,7 +301,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 }
             }
             
-            boneAttaches[n]=boneIdx;
+            v.boneIdx=boneIdx;
         }
     };
     
@@ -322,20 +311,25 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
 
     this.build=function(view)
     {
-            // build a single large globe
-            // around the skeleton
-            
-        var vertices=new Float32Array(this.GLOBE_VERTEX_COUNT);
-        var uvs=new Float32Array(this.GLOBE_UV_COUNT);
-        var indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+        var n;
+
+            // build the vertex list for the model vertexes
         
-        var boneAttaches=new Uint8Array(this.GLOBE_VERTEX_COUNT);
+        var vertexList=[];
+        
+        for (n=0;n!==this.GLOBE_VERTEX_LIST_COUNT;n++) {
+            vertexList.push(new ModelMeshVertexObject());
+        }
+        
+            // the indexes for the triangles
+            
+        var indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
         
             // get skeleton center
             // and size, leave the size a bit
             // bigger than the entire skeleton
-            // so it wraps properly around outer
-            // bones
+            // so globe gets wraps properly around
+            // outer bones
         
         var xBound=new wsBound(0,0);
         var yBound=new wsBound(0,0);
@@ -354,18 +348,18 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // build the globe and shrink
             // wrap it to bones
         
-        this.buildGlobeAroundSkeleton(view,centerPnt,widRadius,highRadius,vertices,uvs,indexes);
-        this.shrinkWrapGlobe(vertices,centerPnt);
-        this.attachVertexToBones(vertices,boneAttaches);
+        this.buildGlobeAroundSkeleton(view,centerPnt,widRadius,highRadius,vertexList,indexes);
+        this.shrinkWrapGlobe(vertexList,centerPnt);
+        this.attachVertexToBones(vertexList);
         
             // complete the tangent space vectors
-    
-        var normals=meshUtility.buildMeshNormals(vertices,indexes,false);
-        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
-
+        
+        meshUtility.buildModelMeshNormals(vertexList,indexes);
+        meshUtility.buildModelMeshTangents(vertexList,indexes);
+        
             // add mesh to model
             
-        this.model.mesh=new ModelMeshObject(bitmap,vertices,normals,tangents,uvs,boneAttaches,indexes,0);
+        this.model.mesh=new ModelMeshObject(bitmap,vertexList,indexes,0);
         this.model.mesh.setupBuffers(view);
     };
     

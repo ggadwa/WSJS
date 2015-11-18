@@ -178,12 +178,12 @@ function MapPieceObject(isRoom)
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var uvs=meshUtility.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
+        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag));
+        return(new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flag));
     };
 
     this.createMeshWalls=function(bitmap,xBound,yBound,zBound,flag)
@@ -250,13 +250,13 @@ function MapPieceObject(isRoom)
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUtility.buildMeshNormals(vertices,indexes,true);
-        var uvs=meshUtility.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
+        var normals=meshUtility.buildMapMeshNormals(vertices,indexes,true);
+        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
 
             // finally create the mesh
 
-        var mesh=new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flag);
+        var mesh=new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flag);
 
         return(mesh);
     };

@@ -213,13 +213,13 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUtility.buildMeshNormals(vertices,indexes,false);
-        if (!wholeUV) uvs=meshUtility.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
+        var normals=meshUtility.buildMapMeshNormals(vertices,indexes,false);
+        if (!wholeUV) uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
+        return(new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flags));
     };
 
         //
@@ -284,13 +284,13 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUtility.buildMeshNormals(vertices,indexes,false);
-        var uvs=meshUtility.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
+        var normals=meshUtility.buildMapMeshNormals(vertices,indexes,false);
+        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
+        return(new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flags));
     };
     
         //
@@ -411,13 +411,13 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUtility.buildMeshNormals(vertices,indexes,false);
-        var uvs=meshUtility.buildMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
+        var normals=meshUtility.buildMapMeshNormals(vertices,indexes,false);
+        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
+        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertices,normals,tangents,uvs,indexes,flags));
+        return(new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flags));
     };
     
 }

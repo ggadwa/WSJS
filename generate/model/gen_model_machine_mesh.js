@@ -113,7 +113,7 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
         indexes[iIdx++]=startVIdx+6;
         indexes[iIdx++]=startVIdx+2;
         
-        meshUtility.buildMeshNormalsFromChunk(vertices,nStartVIdx,this.BOX_VERTEX_COUNT,indexes,nStartIIdx,this.BOX_INDEX_COUNT,normals,false);
+        meshUtility.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.BOX_VERTEX_COUNT,indexes,nStartIIdx,this.BOX_INDEX_COUNT,normals,false);
     };
     
         //
@@ -252,7 +252,7 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
             indexes[iIdx++]=vNextIdx;
         }
         
-        meshUtility.buildMeshNormalsFromChunk(vertices,nStartVIdx,this.GLOBE_VERTEX_COUNT,indexes,nStartIIdx,this.GLOBE_INDEX_COUNT,normals,false);
+        meshUtility.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.GLOBE_VERTEX_COUNT,indexes,nStartIIdx,this.GLOBE_INDEX_COUNT,normals,false);
     };
     
     this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
@@ -326,7 +326,7 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
             vIdx+=2;
         }
         
-        meshUtility.buildMeshNormalsFromChunk(vertices,nStartVIdx,this.CYLINDER_VERTEX_COUNT,indexes,nStartIIdx,this.CYLINDER_INDEX_COUNT,normals,false);
+        meshUtility.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.CYLINDER_VERTEX_COUNT,indexes,nStartIIdx,this.CYLINDER_INDEX_COUNT,normals,false);
     };
     
     this.buildCylinderAroundTwoBones=function(view,bone1,bone2,radius1,radius2,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
@@ -340,6 +340,9 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
 
     this.build=function(view)
     {
+        /* supergumba -- all this needs a redo
+
+
         var n,k,bone,parentBone;
         var bones=this.model.skeleton.bones;
         
@@ -536,12 +539,13 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
         
             // complete the tangent space vectors
     
-        var tangents=meshUtility.buildMeshTangents(vertices,uvs,indexes);
+        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
 
             // add mesh to model
             
         this.model.mesh=new ModelMeshObject(bitmap,vertices,normals,tangents,uvs,null,indexes,0);
         this.model.mesh.setupBuffers(view);
+        */
     };
     
 }

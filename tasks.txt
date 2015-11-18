@@ -23,6 +23,13 @@ FUTURE TODOs
 REGULAR TODOs
 
 
+-----> POTENTIALLY have map meshes use vertexes, too
+        [x] then have a vertexList pass in and rebuild on if null
+        [ ] first rebuild vertex list internally in mesh itself
+             [ ] remove all uv, vertex, etc references in mesh, use on vertexlist
+        [ ] then remove all that temp code
+        [ ] potentially set lightmap UVs directly on mesh
+        [ ] use the new vertexList based normal and tangent code
 
 [ ] need to deal with pausing time stamps
 
@@ -47,8 +54,13 @@ REGULAR TODOs
 
 [ ] models
     [ ] frustum cull models
+    [ ] need to put legs up so shrinking works better
+    [X] models need vertex object with position, normal, uv, bone index, bone offset
+        [X] build uv, tangent, etc the first time, build vertex and normal on the fly
     [X] bones need pose position and original position
     [ ] need to rotate vertexes on posing
+        [ ] and normals
+    [ ] debug need to use pose positions
     [ ] eventually get rid of bone "is" functions (leave base)
 
 

@@ -1,23 +1,71 @@
 "use strict";
 
 //
+// map mesh vertex
+//
+
+function MapMeshVertexObject()
+{
+    this.position=new wsPoint(0,0,0);
+    this.normal=new wsPoint(0.0,0.0,0.0);
+    this.tangent=new wsPoint(0.0,0.0,0.0);
+    this.uv=new ws2DPoint(0.0,0.0);
+    this.lightmapUV=new ws2DPoint(0.0,0.0);
+}
+
+//
 // map mesh class
 //
 
-function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
+function MapMeshObject(bitmap,vertexList,vertices,normals,tangents,vertexUVs,indexes,flag)
 {
     this.bitmap=bitmap;
     this.lightmap=null;
-    this.vertices=vertices;
-    this.normals=normals;
-    this.tangents=tangents;
-    this.vertexUVs=vertexUVs;
-    this.lightmapUVs=null;
-    this.vertexAndLightmapUVs=null;
+    this.vertexList=vertexList;
     this.indexes=indexes;
     this.flag=flag;
     
-    this.vertexCount=Math.floor(this.vertices.length/3);
+        
+            // SUPERGUMBA __ TEMP!
+            // rebuilding vertex list for routines that don't make it yet
+            
+    if (this.vertexList===null) {
+        this.vertexList=[];
+        
+        var n;
+        var nVertex=Math.floor(vertices.length/3);
+
+            
+        var vIdx=0;
+        var uIdx=0;
+        var nIdx=0;
+        var tIdx=0;
+        var v;
+        
+        for (n=0;n!==nVertex;n++) {
+            v=new MapMeshVertexObject();
+            
+            v.position.x=vertices[vIdx++];
+            v.position.y=vertices[vIdx++];
+            v.position.z=vertices[vIdx++];
+            
+            v.uv.x=vertexUVs[uIdx++];
+            v.uv.y=vertexUVs[uIdx++];
+            
+            v.normal.x=normals[nIdx++];
+            v.normal.y=normals[nIdx++];
+            v.normal.z=normals[nIdx++];
+            
+            v.tangent.x=tangents[tIdx++];
+            v.tangent.y=tangents[tIdx++];
+            v.tangent.z=tangents[tIdx++];
+            
+            this.vertexList.push(v);
+        }
+    }
+
+    
+    this.vertexCount=this.vertexList.length;
     this.indexCount=this.indexes.length;
     this.trigCount=Math.floor(this.indexCount/3);
     
@@ -67,36 +115,12 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
 
     this.combineMesh=function(mesh)
     {
-            // change the data
+        var n;
+        
+            // add the vertexes
 
-        var vertices2=new Float32Array(this.vertices.length+mesh.vertices.length);
-        vertices2.set(this.vertices,0);
-        vertices2.set(mesh.vertices,this.vertices.length);
-        this.vertices=vertices2;
-
-        var normals2=new Float32Array(this.normals.length+mesh.normals.length);
-        normals2.set(this.normals,0);
-        normals2.set(mesh.normals,this.normals.length);
-        this.normals=normals2;
-
-        var tangents2=new Float32Array(this.tangents.length+mesh.tangents.length);
-        tangents2.set(this.tangents,0);
-        tangents2.set(mesh.tangents,this.tangents.length);
-        this.tangents=tangents2;
-
-        var vertexUVs2=new Float32Array(this.vertexUVs.length+mesh.vertexUVs.length);
-        vertexUVs2.set(this.vertexUVs,0);
-        vertexUVs2.set(mesh.vertexUVs,this.vertexUVs.length);
-        this.vertexUVs=vertexUVs2;
-
-        if ((this.lightmapUVs!==null) && (mesh.lightmapUVs!==null)) {
-            var lightmapUVs2=new Float32Array(this.lightmapUVs.length+mesh.lightmapUVs.length);
-            lightmapUVs2.set(this.lightmapUVs,0);
-            lightmapUVs2.set(mesh.lightmapUVs,this.lightmapUVs.length);
-            this.lightmapUVs=lightmapUVs2;
-        }
-        else {
-            this.lightmapUVs=null;
+        for (n=0;n!==mesh.vertexCount;n++) {
+            this.vertexList.push(mesh.vertexList[n]);
         }
 
             // indexes need to be moved
@@ -104,7 +128,6 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         var indexes2=new Uint16Array(this.indexes.length+mesh.indexes.length);
         indexes2.set(this.indexes,0);
 
-        var n;
         var iAdd=this.indexes.length;
 
         for (n=0;n!==mesh.indexes.length;n++) {
@@ -115,7 +138,7 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
 
             // reset counts
 
-        this.vertexCount=Math.floor(this.vertices.length/3);
+        this.vertexCount=this.vertexList.length;
         this.indexCount=this.indexes.length;
         this.trigCount=Math.floor(this.indexCount/3);
 
@@ -161,8 +184,8 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
 
     this.getTriangleVertex=function(trigIdx,vertexIdx)
     {
-        var vIdx=this.indexes[(trigIdx*3)+vertexIdx]*3;
-        return(new wsPoint(this.vertices[vIdx],this.vertices[vIdx+1],this.vertices[vIdx+2]));
+        var v=this.vertexList[this.indexes[(trigIdx*3)+vertexIdx]];
+        return(new wsPoint(v.position.x,v.position.y,v.position.z));
     };
 
     this.getTriangleBounds=function(trigIdx)
@@ -233,28 +256,23 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
 
     this.setupBounds=function()
     {
-        this.center=new wsPoint(this.vertices[0],this.vertices[1],this.vertices[2]);
-        this.xBound=new wsBound(this.vertices[0],this.vertices[0]);
-        this.yBound=new wsBound(this.vertices[1],this.vertices[1]);
-        this.zBound=new wsBound(this.vertices[2],this.vertices[2]);
+        var v=this.vertexList[0];
+        
+        this.center=new wsPoint(v.position.x,v.position.y,v.position.z);
+        this.xBound=new wsBound(v.position.x,v.position.x);
+        this.yBound=new wsBound(v.position.y,v.position.y);
+        this.zBound=new wsBound(v.position.z,v.position.z);
 
-        var n,x,y,z;
-        var idx=3;
+        var n;
 
         for (n=1;n<this.vertexCount;n++) {
-            x=this.vertices[idx];
-            y=this.vertices[idx+1];
-            z=this.vertices[idx+2];
+            v=this.vertexList[n];
+            
+            this.center.addPoint(v.position);
 
-            this.center.x+=x;
-            this.center.y+=y;
-            this.center.z+=z;
-
-            this.xBound.adjust(x);
-            this.yBound.adjust(y);
-            this.zBound.adjust(z);
-
-            idx+=3;
+            this.xBound.adjust(v.position.x);
+            this.yBound.adjust(v.position.y);
+            this.zBound.adjust(v.position.z);
         }
 
         this.center.x/=this.vertexCount;
@@ -269,7 +287,7 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
     this.buildTrigRayTraceCache=function()
     {
         var n,tIdx,cIdx;
-        var v0Idx,v1Idx,v2Idx;
+        var v0,v1,v2;
 
             // this builds a specialized cache to
             // speed up ray tracing.  For each triangle
@@ -291,27 +309,27 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         cIdx=0;
 
         for (n=0;n!==this.trigCount;n++) {
-            v0Idx=this.indexes[tIdx++]*3;
-            v1Idx=this.indexes[tIdx++]*3;
-            v2Idx=this.indexes[tIdx++]*3;
+            v0=this.vertexList[this.indexes[tIdx++]];
+            v1=this.vertexList[this.indexes[tIdx++]];
+            v2=this.vertexList[this.indexes[tIdx++]];
 
                 // point 0 of the triangle
 
-            this.trigRayTraceCache[cIdx++]=this.vertices[v0Idx];
-            this.trigRayTraceCache[cIdx++]=this.vertices[v0Idx+1];
-            this.trigRayTraceCache[cIdx++]=this.vertices[v0Idx+2];
+            this.trigRayTraceCache[cIdx++]=v0.position.x;
+            this.trigRayTraceCache[cIdx++]=v0.position.y;
+            this.trigRayTraceCache[cIdx++]=v0.position.z;
 
                 // vector of point 1-point 0
 
-            this.trigRayTraceCache[cIdx++]=this.vertices[v1Idx]-this.vertices[v0Idx];    
-            this.trigRayTraceCache[cIdx++]=this.vertices[v1Idx+1]-this.vertices[v0Idx+1];    
-            this.trigRayTraceCache[cIdx++]=this.vertices[v1Idx+2]-this.vertices[v0Idx+2];    
+            this.trigRayTraceCache[cIdx++]=v1.position.x-v0.position.x;    
+            this.trigRayTraceCache[cIdx++]=v1.position.y-v0.position.y;    
+            this.trigRayTraceCache[cIdx++]=v1.position.z-v0.position.z;
 
                 // vector of point 2-point 0
 
-            this.trigRayTraceCache[cIdx++]=this.vertices[v2Idx]-this.vertices[v0Idx];    
-            this.trigRayTraceCache[cIdx++]=this.vertices[v2Idx+1]-this.vertices[v0Idx+1];    
-            this.trigRayTraceCache[cIdx++]=this.vertices[v2Idx+2]-this.vertices[v0Idx+2];    
+            this.trigRayTraceCache[cIdx++]=v2.position.x-v0.position.x;
+            this.trigRayTraceCache[cIdx++]=v2.position.y-v0.position.y;
+            this.trigRayTraceCache[cIdx++]=v2.position.z-v0.position.z;
         }
     };
 
@@ -319,17 +337,17 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         // collision geometry
         //
 
-    this.buildCollisionGeometryLine=function(v0Idx,v1Idx,v2Idx)
+    this.buildCollisionGeometryLine=function(v0,v1,v2)
     {
         var n,nLine,line;
         
             // create the line
 
-        if (this.vertices[v0Idx+1]===this.vertices[v1Idx+1]) {
-            line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v2Idx],this.vertices[v2Idx+1],this.vertices[v2Idx+2]));
+        if (v0.y===v1.y) {
+            line=new wsLine(v0.position.copy(),v2.position.copy());
         }
         else {
-            line=new wsLine(new wsPoint(this.vertices[v0Idx],this.vertices[v0Idx+1],this.vertices[v0Idx+2]),new wsPoint(this.vertices[v1Idx],this.vertices[v1Idx+1],this.vertices[v1Idx+2]));
+            line=new wsLine(v0.position.copy(),v1.position.copy());
         }
 
             // is line already in list?
@@ -345,29 +363,29 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
         this.collisionLines.push(line);
     };
     
-    this.buildCollisionGeometryFloor=function(v0Idx,v1Idx,v2Idx)
+    this.buildCollisionGeometryFloor=function(v0,v1,v2)
     {
         var n,nRect;
         var lft,top,rgt,bot;
         
             // get 2D box
             
-        lft=rgt=this.vertices[v0Idx];
-        top=bot=this.vertices[v0Idx+2];
+        lft=rgt=v0.position.x;
+        top=bot=v0.position.z;
         
-        if (this.vertices[v1Idx]<lft) lft=this.vertices[v1Idx];
-        if (this.vertices[v2Idx]<lft) lft=this.vertices[v2Idx];
-        if (this.vertices[v1Idx]>rgt) rgt=this.vertices[v1Idx];
-        if (this.vertices[v2Idx]>rgt) rgt=this.vertices[v2Idx];
+        if (v1.position.x<lft) lft=v1.position.x;
+        if (v2.position.x<lft) lft=v2.position.x;
+        if (v1.position.x>rgt) rgt=v1.position.x;
+        if (v2.position.x>rgt) rgt=v2.position.x;
         
-        if (this.vertices[v1Idx+2]<top) top=this.vertices[v1Idx+2];
-        if (this.vertices[v2Idx+2]<top) top=this.vertices[v2Idx+2];
-        if (this.vertices[v1Idx+2]>bot) bot=this.vertices[v1Idx+2];
-        if (this.vertices[v2Idx+2]>bot) bot=this.vertices[v2Idx+2];
+        if (v1.position.z<top) top=v1.position.z;
+        if (v2.position.z<top) top=v2.position.z;
+        if (v1.position.z>bot) bot=v1.position.z;
+        if (v2.position.z>bot) bot=v2.position.z;
         
             // build the rect
         
-        var cRect=new wsCollisionRect(lft,top,rgt,bot,this.vertices[v0Idx+1]);
+        var cRect=new wsCollisionRect(lft,top,rgt,bot,v0.position.y);
         
             // is line already in list?
             // usually, two triangles make
@@ -385,7 +403,8 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
     this.buildCollisionGeometry=function()
     {
         var n,ny;
-        var tIdx,v0Idx,v1Idx,v2Idx;
+        var tIdx;
+        var v0,v1,v2;
 
             // run through the triangles
             // and find any that make a wall
@@ -398,70 +417,45 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
             
                 // get trig vertices
 
-            v0Idx=this.indexes[tIdx++]*3;
-            v1Idx=this.indexes[tIdx++]*3;
-            v2Idx=this.indexes[tIdx++]*3;
+            v0=this.vertexList[this.indexes[tIdx++]];
+            v1=this.vertexList[this.indexes[tIdx++]];
+            v2=this.vertexList[this.indexes[tIdx++]];
             
-            ny=this.normals[v0Idx+1];
+            ny=v0.normal.y;
             
                 // detect if triangle is a floor
                 
             if (ny<=-0.7) {
-                this.buildCollisionGeometryFloor(v0Idx,v1Idx,v2Idx);
+                this.buildCollisionGeometryFloor(v0,v1,v2);
             }
             
                 // detect if triangle is wall like
             
             else {
                 if (Math.abs(ny)<=0.3) {
-                    this.buildCollisionGeometryLine(v0Idx,v1Idx,v2Idx);
+                    this.buildCollisionGeometryLine(v0,v1,v2);
                 }
             }
         }
     };
 
         //
-        // UVs
+        // lightmap texture
         //
-
-    this.rebuildPackedUVBuffer=function()
-    {
-        var n,uvIdx,arrIdx;
-
-        uvIdx=0;
-        arrIdx=0;
-        this.vertexAndLightmapUVs=new Float32Array(this.vertexCount*4);
-
-            // if no light map UVs
-
-        if (this.lightmapUVs===null) {
-
-            for (n=0;n!==this.vertexCount;n++) {
-                this.vertexAndLightmapUVs[arrIdx++]=this.vertexUVs[uvIdx];
-                this.vertexAndLightmapUVs[arrIdx++]=this.vertexUVs[uvIdx+1];
-                this.vertexAndLightmapUVs[arrIdx++]=0.0;
-                this.vertexAndLightmapUVs[arrIdx++]=0.0;
-                uvIdx+=2;
-            }
-
-            return;
-        }
-
-            // pack both together
-
-        for (n=0;n!==this.vertexCount;n++) {
-            this.vertexAndLightmapUVs[arrIdx++]=this.vertexUVs[uvIdx];
-            this.vertexAndLightmapUVs[arrIdx++]=this.vertexUVs[uvIdx+1];
-            this.vertexAndLightmapUVs[arrIdx++]=this.lightmapUVs[uvIdx];
-            this.vertexAndLightmapUVs[arrIdx++]=this.lightmapUVs[uvIdx+1];
-            uvIdx+=2;
-        }
-    };
 
     this.setLightmap=function(lightmap,lightmapUVs)
     {
+        var n,v;
+        
         this.lightmap=lightmap;
-        this.lightmapUVs=lightmapUVs;
+        
+        var idx=0;
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            v.lightmapUV.x=lightmapUVs[idx++];
+            v.lightmapUV.y=lightmapUVs[idx++];
+        }
     };
 
         //
@@ -470,10 +464,42 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
 
     this.setupBuffers=function(view)
     {
-            // need to build the combined texture and
-            // light map uv buffer
-
-        this.rebuildPackedUVBuffer();
+            // build the default data
+            // from the vertex list
+        
+        var n;
+        
+        var vertices=new Float32Array(this.vertexCount*3);
+        var normals=new Float32Array(this.vertexCount*3);
+        var tangents=new Float32Array(this.vertexCount*3);
+        var packedUVs=new Float32Array(this.vertexCount*4);
+        
+        var vIdx=0;
+        var uIdx=0;
+        var nIdx=0;
+        var tIdx=0;
+        var v;
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            
+            vertices[vIdx++]=v.position.x;
+            vertices[vIdx++]=v.position.y;
+            vertices[vIdx++]=v.position.z;
+            
+            packedUVs[uIdx++]=v.uv.x;           // texture UV and light map UV pakced into a 4 part vector
+            packedUVs[uIdx++]=v.uv.y;
+            packedUVs[uIdx++]=v.lightmapUV.x;
+            packedUVs[uIdx++]=v.lightmapUV.y;
+            
+            normals[nIdx++]=v.normal.x;
+            normals[nIdx++]=v.normal.y;
+            normals[nIdx++]=v.normal.z;
+            
+            tangents[tIdx++]=v.tangent.x;
+            tangents[tIdx++]=v.tangent.y;
+            tangents[tIdx++]=v.tangent.z;
+        }
 
             // create all the buffers
             // expects buffers to already be Float32Array
@@ -483,20 +509,22 @@ function MapMeshObject(bitmap,vertices,normals,tangents,vertexUVs,indexes,flag)
 
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
 
         this.vertexNormalBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.normals,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,normals,gl.STATIC_DRAW);
 
         this.vertexTangentBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.tangents,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,tangents,gl.STATIC_DRAW);
 
         this.vertexAndLightmapUVBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertexAndLightmapUVs,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,packedUVs,gl.STATIC_DRAW);
 
+            // indexes are static
+            
         this.indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    

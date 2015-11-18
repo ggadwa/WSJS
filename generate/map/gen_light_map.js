@@ -648,6 +648,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
     this.writePolyToChunk=function(meshIdx,trigIdx,lightmapIdx,ctx,lft,top,lightmapUVs)
     {
+        var v;
         var mesh=this.map.meshes[meshIdx];
         var vIdx,uvIdx;
         var pt0,pt1,pt2;
@@ -655,20 +656,20 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             // get the vertexes for the triangle
             // and one normal
 
-        vIdx=mesh.indexes[trigIdx*3]*3;
-        var v0=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
-        var normal=new wsPoint(mesh.normals[vIdx],mesh.normals[vIdx+1],mesh.normals[vIdx+2]);
+        v=mesh.vertexList[mesh.indexes[trigIdx*3]];
+        var v0=v.position.copy();
+        var normal=v.normal;
 
-        vIdx=mesh.indexes[(trigIdx*3)+1]*3;
-        var v1=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
+        v=mesh.vertexList[mesh.indexes[(trigIdx*3)+1]];
+        var v1=v.position.copy();
 
-        vIdx=mesh.indexes[(trigIdx*3)+2]*3;
-        var v2=new wsPoint(mesh.vertices[vIdx],mesh.vertices[vIdx+1],mesh.vertices[vIdx+2]);
+        v=mesh.vertexList[mesh.indexes[(trigIdx*3)+2]];
+        var v2=v.position.copy();
 
             // look at one of the normal to determine if it's
             // wall or floor like
 
-        var wallLike=(Math.abs(mesh.normals[vIdx+1])<=0.3);
+        var wallLike=(Math.abs(normal.y)<=0.3);
 
             // get the bounds of the 3D point
 

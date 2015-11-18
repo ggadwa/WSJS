@@ -174,6 +174,15 @@ function EntityObject(position,angle,radius,model,isPlayer)
             }
             
             this.nextPoseTimeStamp=this.prevPoseTimeStamp+3000;
+            
+                // sanity check for time stamp being way off
+                // from last animation
+                
+            if (view.timeStamp>this.nextPoseTimeStamp) {
+                this.prevPoseTimeStamp=view.timeStamp;
+                this.nextPoseTimeStamp=this.prevPoseTimeStamp+3000;
+            }
+            
             this.model.skeleton.randomNextPose(view);
         }
         
