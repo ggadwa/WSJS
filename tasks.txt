@@ -25,16 +25,18 @@ REGULAR TODOs
 
 -----> POTENTIALLY have map meshes use vertexes, too
         [x] then have a vertexList pass in and rebuild on if null
-        [ ] first rebuild vertex list internally in mesh itself
-             [ ] remove all uv, vertex, etc references in mesh, use on vertexlist
-        [ ] then remove all that temp code
-        [ ] potentially set lightmap UVs directly on mesh
+        [X] first rebuild vertex list internally in mesh itself
+             [X] remove all uv, vertex, etc references in mesh, use on vertexlist
+             [ ] then remove all that temp code
+        [X] potentially set lightmap UVs directly on mesh
         [ ] use the new vertexList based normal and tangent code
+        [ ] try the light map cache by object
 
 [ ] need to deal with pausing time stamps
 
 [ ] rooms need decoration locations and decoration models
 [ ] rooms have possible light positions
+[ ] rooms track where they put platforms on 10x10, and monsters appear outside that, and one monster per square
 
 [ ] try to pack glsl light struct floats
 

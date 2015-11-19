@@ -14,6 +14,18 @@ function MapMeshVertexObject()
 }
 
 //
+// special object used to pre-calc some
+// light map calculations
+//
+
+function MapMeshLightMapTrigCacheObject()
+{
+    this.v0=new wsPoint(0,0,0);     // point 0 on the triangle
+    this.v10=new wsPoint(0,0,0);    // vector of point 1-point 0
+    this.v20=new wsPoint(0,0,0);    // vector of point 2-point 0
+}
+
+//
 // map mesh class
 //
 
@@ -24,6 +36,8 @@ function MapMeshObject(bitmap,vertexList,vertices,normals,tangents,vertexUVs,ind
     this.vertexList=vertexList;
     this.indexes=indexes;
     this.flag=flag;
+    
+    this.tempLightmapIdx=0;         // used to track light maps when building them, not used otherwise
     
         
             // SUPERGUMBA __ TEMP!
@@ -436,25 +450,6 @@ function MapMeshObject(bitmap,vertexList,vertices,normals,tangents,vertexUVs,ind
                     this.buildCollisionGeometryLine(v0,v1,v2);
                 }
             }
-        }
-    };
-
-        //
-        // lightmap texture
-        //
-
-    this.setLightmap=function(lightmap,lightmapUVs)
-    {
-        var n,v;
-        
-        this.lightmap=lightmap;
-        
-        var idx=0;
-        
-        for (n=0;n!==this.vertexCount;n++) {
-            v=this.vertexList[n];
-            v.lightmapUV.x=lightmapUVs[idx++];
-            v.lightmapUV.y=lightmapUVs[idx++];
         }
     };
 

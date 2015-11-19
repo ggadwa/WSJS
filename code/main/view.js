@@ -551,6 +551,8 @@ function ViewObject()
         var msec=Date.now()-this.loadingLastAddMsec;
         
         this.loadingStrings[idx]+=(' ['+msec+'ms]');
+        
+        console.log(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
     };
     
     this.loadingScreenDraw=function(progress)
