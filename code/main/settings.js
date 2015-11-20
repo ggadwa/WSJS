@@ -8,7 +8,7 @@ function SettingsObject()
 {
         // room construction
         
-    this.roomMaxCount=5;                       // the maximum possible number of rooms in the map
+    this.roomMaxCount=10;                       // the maximum possible number of rooms in the map
     
     this.roomMaxRecursion=3;                    // how far down you will recurse to make rooms off a single room
     
@@ -34,11 +34,11 @@ function SettingsObject()
     this.mapLightRGBMinimum=0.6;                // minimum r, g, or b value for map lights
     this.mapLightRGBExtra=0.4;                  // random r, g, b add for map lights
     
-    this.generateLightmap=true;                 // set to true to generate light maps
+    this.generateLightmap=false;                 // set to true to generate light maps
     
         // decorations
         
-    this.decorations=false;                     // set to false for no decorations in the map
+    this.decorations=true;                     // set to false for no decorations in the map
 
         // models
         
@@ -75,7 +75,7 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=2;//Math.floor((Math.random()*seed));
+    this.randomSeedMap=3;//Math.floor((Math.random()*seed));
     this.randomSeedModelBitmap=1;//Math.floor((Math.random()*seed));
     this.randomSeedModel=5; //Math.floor((Math.random()*seed));
     this.randomSeedEntity=6; //Math.floor((Math.random()*seed));

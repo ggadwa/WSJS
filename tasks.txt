@@ -30,7 +30,16 @@ REGULAR TODOs
              [ ] then remove all that temp code
         [X] potentially set lightmap UVs directly on mesh
         [ ] use the new vertexList based normal and tangent code
+            [ ] remove all the old
         [ ] try the light map cache by object
+        [X] stairs
+        [ ] primitives
+             [X] cube
+             [ ] pryamid
+             [ ] cylinder
+        [ ] map
+
+-=--->>> buildModelMeshNormals and the like need to become generic, and delete the others!
 
 [ ] need to deal with pausing time stamps
 
@@ -42,6 +51,7 @@ REGULAR TODOs
 
 [ ] bitmaps
     [ ] need bitmap colors filters are settings
+    [ ] box texture has potential other type of boards inside?
     [ ] machine texture
 
 [ ] physics

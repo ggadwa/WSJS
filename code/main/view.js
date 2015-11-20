@@ -548,6 +548,8 @@ function ViewObject()
     this.loadingScreenUpdate=function()
     {
         var idx=this.loadingStrings.length-1;
+        if (idx<0) return;
+        
         var msec=Date.now()-this.loadingLastAddMsec;
         
         this.loadingStrings[idx]+=(' ['+msec+'ms]');

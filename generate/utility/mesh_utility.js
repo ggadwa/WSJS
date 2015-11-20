@@ -7,6 +7,22 @@
 function MeshUtilityObject()
 {
         //
+        // utility to create vertex list of certain size
+        //
+        
+    this.createMapVertexList=function(nVertex)
+    {
+        var n;
+        var vertexList=[];
+        
+        for (n=0;n!==nVertex;n++) {
+            vertexList.push(new MapMeshVertexObject());
+        }
+        
+        return(vertexList);
+    };
+    
+        //
         // build normals for map meshes
         // 
 
@@ -156,9 +172,9 @@ function MeshUtilityObject()
         // build normals for model meshes
         //
     
-    this.buildModelMeshNormals=function(vertexList,indexes)
+    this.buildModelMeshNormals=function(vertexList,indexes,normalsIn)
     {
-        var n,nTrig,nVertex,trigIdx;
+        var n,flip,nTrig,nVertex,trigIdx;
         var v0,v1,v2;
 
         nVertex=vertexList.length;
@@ -221,7 +237,10 @@ function MeshUtilityObject()
             trigCenter.set(((v0.position.x+v1.position.x+v2.position.x)/3),((v0.position.y+v1.position.y+v2.position.y)/3),((v0.position.z+v1.position.z+v2.position.z)/3));
             faceVct.setFromSubPoint(trigCenter,meshCenter);
 
-            if (!(normal.dot(faceVct)>0.0)) normal.scale(-1.0);
+            flip=(normal.dot(faceVct)>0.0);
+            if (!normalsIn) flip=!flip;
+
+            if (flip) normal.scale(-1.0);
 
                 // and set the mesh normal
                 // to all vertexes in this trig
@@ -316,6 +335,84 @@ function MeshUtilityObject()
         }
 
         return(uvs);
+    };
+    
+    this.buildModelMeshUVs=function(bitmap,vertexList)
+    {
+        var n,v,nVertex;
+        var x,y,ang;
+
+        nVertex=vertexList.length;
+
+            // get the UV scale for this
+            // bitmap
+
+        var uvScale=bitmap.uvScale;
+
+            // determine floor/wall like by
+            // the dot product of the normal
+            // and an up vector
+
+        var mapUp=new wsPoint(0.0,-1.0,0.0);
+
+            // run through the vertices
+            // remember, both this and normals
+            // are packed arrays
+
+        for (n=0;n!==nVertex;n++) {
+
+            v=vertexList[n];
+
+            ang=mapUp.dot(v.normal);
+
+                // wall like
+                // use longest of x/z coordinates + Y coordinates of vertex
+
+            if (Math.abs(ang)<=0.4) {
+                if (Math.abs(v.normal.x)<Math.abs(v.normal.z)) {
+                    x=v.position.x;
+                }
+                else {
+                    x=v.position.z;
+                }
+                y=v.position.y;
+            }
+
+                // floor/ceiling like
+                // use x/z coordinates of vertex
+
+            else {
+                x=v.position.x;
+                y=v.position.z;
+            }
+
+            v.uv.x=x*uvScale[0];
+            v.uv.y=y*uvScale[1];
+        }
+        
+            // reduce all the UVs to
+            // their minimum integers
+            
+        var i;
+        
+        v=vertexList[0];
+        var minIntX=Math.floor(v.uv.x);
+        var minIntY=Math.floor(v.uv.y);
+        
+        for (n=1;n!==nVertex;n++) {
+            v=vertexList[n];
+            
+            i=Math.floor(v.uv.x);
+            if (i<minIntX) minIntX=i;
+            i=Math.floor(v.uv.y);
+            if (i<minIntY) minIntY=i;
+        }
+        
+        for (n=0;n!==nVertex;n++) {
+            v=vertexList[n];
+            v.uv.x-=minIntX;
+            v.uv.y-=minIntY;
+        }
     };
 
         //

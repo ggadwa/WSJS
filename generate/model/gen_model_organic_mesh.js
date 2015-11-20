@@ -354,7 +354,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
             // complete the tangent space vectors
         
-        meshUtility.buildModelMeshNormals(vertexList,indexes);
+        meshUtility.buildModelMeshNormals(vertexList,indexes,false);
         meshUtility.buildModelMeshTangents(vertexList,indexes);
         
             // add mesh to model
