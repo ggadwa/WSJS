@@ -89,22 +89,14 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var topIdx=Math.floor(vIdx);
         
         v=vertexList[vIdx++];
-        v.position.x=centerPnt.x;
-        v.position.y=centerPnt.y-highRadius;
-        v.position.z=centerPnt.z;
-        
-        v.uv.x=0.5;
-        v.uv.y=0.0;
+        v.position.set(centerPnt.x,(centerPnt.y-highRadius),centerPnt.z);
+        v.uv.set(0.5,0.0);
         
         var botIdx=Math.floor(vIdx);
        
         v=vertexList[vIdx++];
-        v.position.x=centerPnt.x;
-        v.position.y=centerPnt.y+highRadius;
-        v.position.z=centerPnt.z;
-        
-        v.uv.x=0.5;
-        v.uv.y=1.0;
+        v.position.set(centerPnt.x,(centerPnt.y+highRadius),centerPnt.z);
+        v.uv.set(0.5,1.0);
         
             // build the triangles on
             // all the strips except the
@@ -354,8 +346,8 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
             // complete the tangent space vectors
         
-        meshUtility.buildModelMeshNormals(vertexList,indexes,false);
-        meshUtility.buildModelMeshTangents(vertexList,indexes);
+        meshUtility.buildVertexListNormals(vertexList,indexes,false);
+        meshUtility.buildVertexListTangents(vertexList,indexes);
         
             // add mesh to model
             

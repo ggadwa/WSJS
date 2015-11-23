@@ -6,6 +6,8 @@
 
 function GenModelMachineMeshObject(model,bitmap,genRandom)
 {
+    /* supergumba -- this will all need to be redone
+     * 
     this.model=model;
     this.genRandom=genRandom;
     
@@ -340,9 +342,6 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
 
     this.build=function(view)
     {
-        /* supergumba -- all this needs a redo
-
-
         var n,k,bone,parentBone;
         var bones=this.model.skeleton.bones;
         
@@ -545,7 +544,6 @@ function GenModelMachineMeshObject(model,bitmap,genRandom)
             
         this.model.mesh=new ModelMeshObject(bitmap,vertices,normals,tangents,uvs,null,indexes,0);
         this.model.mesh.setupBuffers(view);
-        */
     };
-    
+    */
 }

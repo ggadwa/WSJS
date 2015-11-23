@@ -23,24 +23,6 @@ FUTURE TODOs
 REGULAR TODOs
 
 
------> POTENTIALLY have map meshes use vertexes, too
-        [x] then have a vertexList pass in and rebuild on if null
-        [X] first rebuild vertex list internally in mesh itself
-             [X] remove all uv, vertex, etc references in mesh, use on vertexlist
-             [ ] then remove all that temp code
-        [X] potentially set lightmap UVs directly on mesh
-        [ ] use the new vertexList based normal and tangent code
-            [ ] remove all the old
-        [ ] try the light map cache by object
-        [X] stairs
-        [ ] primitives
-             [X] cube
-             [ ] pryamid
-             [ ] cylinder
-        [ ] map
-
--=--->>> buildModelMeshNormals and the like need to become generic, and delete the others!
-
 [ ] need to deal with pausing time stamps
 
 [ ] rooms need decoration locations and decoration models
@@ -59,6 +41,7 @@ REGULAR TODOs
     [ ] gravity
 
 [ ] light maps
+    [ ] need to check closest meshes first
     [ ] diffuse calcs in light maps
     [ ] no light mesh hits -- needs "has flag" type call, highlight in lightmap
 

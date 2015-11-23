@@ -97,7 +97,7 @@ function MapPieceObject(isRoom)
 
     this.createMeshFloorOrCeiling=function(bitmap,xBound,yBound,zBound,isFloor,flag)
     {
-        var n,x,z,vxMin,vxMax,vzMin,vzMax;
+        var x,z,vxMin,vxMax,vzMin,vzMax;
         
             // get the vertex count
             
@@ -118,14 +118,12 @@ function MapPieceObject(isRoom)
         
             // create mesh
             
-        var vertices=new Float32Array(count*18);
+        var v;
+        var vertexList=meshUtility.createMapVertexList(count*6);
         var indexes=new Uint16Array(count*6);
-        var normals=new Float32Array(count*18);
         
         var vIdx=0;
-        var vArrIdx=0;
-        var iArrIdx=0;
-        var nArrIdx=0;
+        var iIdx=0;
         
         var y=isFloor?yBound.max:yBound.min;
         var ny=isFloor?-1.0:1.0;
@@ -139,71 +137,69 @@ function MapPieceObject(isRoom)
                 vzMin=zBound.min+Math.floor(sz*(z*0.2));
                 vzMax=zBound.min+Math.floor(sz*((z+1)*0.2));
                 
-                vertices[vArrIdx++]=vxMin;
-                vertices[vArrIdx++]=y;
-                vertices[vArrIdx++]=vzMin;
-                vertices[vArrIdx++]=vxMax;
-                vertices[vArrIdx++]=y;
-                vertices[vArrIdx++]=vzMin;
-                vertices[vArrIdx++]=vxMax;
-                vertices[vArrIdx++]=y;
-                vertices[vArrIdx++]=vzMax;
+                v=vertexList[vIdx];
+                v.position.set(vxMin,y,vzMin);
+                v.normal.set(0.0,ny,0.0);
                 
-                indexes[iArrIdx++]=vIdx++;
-                indexes[iArrIdx++]=vIdx++;
-                indexes[iArrIdx++]=vIdx++;
+                v=vertexList[vIdx+1];
+                v.position.set(vxMax,y,vzMin);
+                v.normal.set(0.0,ny,0.0);
                 
-                vertices[vArrIdx++]=vxMin;
-                vertices[vArrIdx++]=y;
-                vertices[vArrIdx++]=vzMin;
-                vertices[vArrIdx++]=vxMax;
-                vertices[vArrIdx++]=y;
-                vertices[vArrIdx++]=vzMax;
-                vertices[vArrIdx++]=vxMin;
-                vertices[vArrIdx++]=y;
-                vertices[vArrIdx++]=vzMax;
+                v=vertexList[vIdx+2];
+                v.position.set(vxMax,y,vzMax);
+                v.normal.set(0.0,ny,0.0);
+                
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
+                
+                v=vertexList[vIdx];
+                v.position.set(vxMin,y,vzMin);
+                v.normal.set(0.0,ny,0.0);
+                
+                v=vertexList[vIdx+1];
+                v.position.set(vxMax,y,vzMax);
+                v.normal.set(0.0,ny,0.0);
+                
+                v=vertexList[vIdx+2];
+                v.position.set(vxMin,y,vzMax);
+                v.normal.set(0.0,ny,0.0);
 
-                indexes[iArrIdx++]=vIdx++;
-                indexes[iArrIdx++]=vIdx++;
-                indexes[iArrIdx++]=vIdx++;
-
-                for (n=0;n!==6;n++) {
-                    normals[nArrIdx++]=0.0;
-                    normals[nArrIdx++]=ny;
-                    normals[nArrIdx++]=0.0;
-                }
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
             }
         }
         
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
+        meshUtility.buildVertexListUVs(bitmap,vertexList);
+        meshUtility.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flag));
+        return(new MapMeshObject(bitmap,vertexList,indexes,flag));
     };
 
     this.createMeshWalls=function(bitmap,xBound,yBound,zBound,flag)
     {
-        var n,k,nPoint,x1,x2,z1,z2,vIdx,vArrIdx,iArrIdx;
+        var n,k,nPoint,x1,x2,z1,z2;
         var pt;
 
             // build the vertices.  Each triangle gets it's
             // own vertices so normals and light map UVs work
 
-        vIdx=0;
-        vArrIdx=0;
-        iArrIdx=0;
         nPoint=this.points.length;
 
-        var vertices=new Float32Array(nPoint*18);
+        var vertexList=meshUtility.createMapVertexList(nPoint*6);
         var indexes=new Uint16Array(nPoint*6);
         
         var sx=xBound.getSize();
         var sz=zBound.getSize();
+        
+        var vIdx=0;
+        var iIdx=0;
 
         for (n=0;n!==nPoint;n++) {
             k=n+1;
@@ -217,46 +213,34 @@ function MapPieceObject(isRoom)
             x2=xBound.min+Math.floor(sx*(pt[0]*0.01));
             z2=zBound.min+Math.floor(sz*(pt[1]*0.01));
 
-            vertices[vArrIdx++]=x1;
-            vertices[vArrIdx++]=yBound.min;
-            vertices[vArrIdx++]=z1;
-            vertices[vArrIdx++]=x2;
-            vertices[vArrIdx++]=yBound.min;
-            vertices[vArrIdx++]=z2;
-            vertices[vArrIdx++]=x2;
-            vertices[vArrIdx++]=yBound.max;
-            vertices[vArrIdx++]=z2;
+            vertexList[vIdx].position.set(x1,yBound.min,z1);
+            vertexList[vIdx+1].position.set(x2,yBound.min,z2);
+            vertexList[vIdx+2].position.set(x2,yBound.max,z2);
 
-            indexes[iArrIdx++]=vIdx++;
-            indexes[iArrIdx++]=vIdx++;
-            indexes[iArrIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
 
-            vertices[vArrIdx++]=x1;
-            vertices[vArrIdx++]=yBound.min;
-            vertices[vArrIdx++]=z1;
-            vertices[vArrIdx++]=x2;
-            vertices[vArrIdx++]=yBound.max;
-            vertices[vArrIdx++]=z2;
-            vertices[vArrIdx++]=x1;
-            vertices[vArrIdx++]=yBound.max;
-            vertices[vArrIdx++]=z1;
+            vertexList[vIdx].position.set(x1,yBound.min,z1);
+            vertexList[vIdx+1].position.set(x2,yBound.max,z2);
+            vertexList[vIdx+2].position.set(x1,yBound.max,z1);
 
-            indexes[iArrIdx++]=vIdx++;
-            indexes[iArrIdx++]=vIdx++;
-            indexes[iArrIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
         }
 
             // calculate the normals, then use those to
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUtility.buildMapMeshNormals(vertices,indexes,true);
-        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
+        meshUtility.buildVertexListNormals(vertexList,indexes,true);
+        meshUtility.buildVertexListUVs(bitmap,vertexList);
+        meshUtility.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        var mesh=new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flag);
+        var mesh=new MapMeshObject(bitmap,vertexList,indexes,flag);
 
         return(mesh);
     };

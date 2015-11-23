@@ -301,23 +301,23 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         // ray tracing
         //
 
-    this.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,t0x,t0y,t0z,tv1x,tv1y,tv1z,tv2x,tv2y,tv2z)
+    this.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,trigCache)
     {
             // we pass in a single vertex (t0x,t0y,t0z) and
-            // these pre-calculated vectors for the other
-            // sides of the triangle
-            // tv1[x,y,z]=t1[x,y,z]-t0[x,y,z]
-            // tv2[x,y,z]=t2[x,y,z]-t0[x,y,z]
+            // these pre-calculated items:
+            // v0 = vertex of triangle
+            // v10[x,y,z]=t1[x,y,z]-t0[x,y,z]
+            // v20[x,y,z]=t2[x,y,z]-t0[x,y,z]
 
             // calculate the determinate
             // perpVector is cross(vector,v2)
             // det is dot(v1,perpVector)
 
-        var perpVectorX=(vctY*tv2z)-(vctZ*tv2y);
-        var perpVectorY=(vctZ*tv2x)-(vctX*tv2z);
-        var perpVectorZ=(vctX*tv2y)-(vctY*tv2x);
+        var perpVectorX=(vctY*trigCache.v20.z)-(vctZ*trigCache.v20.y);
+        var perpVectorY=(vctZ*trigCache.v20.x)-(vctX*trigCache.v20.z);
+        var perpVectorZ=(vctX*trigCache.v20.y)-(vctY*trigCache.v20.x);
 
-        var det=(tv1x*perpVectorX)+(tv1y*perpVectorY)+(tv1z*perpVectorZ);
+        var det=(trigCache.v10.x*perpVectorX)+(trigCache.v10.y*perpVectorY)+(trigCache.v10.z*perpVectorZ);
 
             // is line on the same plane as triangle?
 
@@ -331,9 +331,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             // lineToTrigPointVector is vector from vertex to triangle point 0
             // u is invDet * dot(lineToTrigPointVector,perpVector)
 
-        var lineToTrigPointVectorX=vx-t0x;
-        var lineToTrigPointVectorY=vy-t0y;
-        var lineToTrigPointVectorZ=vz-t0z;
+        var lineToTrigPointVectorX=vx-trigCache.v0.x;
+        var lineToTrigPointVectorY=vy-trigCache.v0.y;
+        var lineToTrigPointVectorZ=vz-trigCache.v0.z;
 
         var u=invDet*((lineToTrigPointVectorX*perpVectorX)+(lineToTrigPointVectorY*perpVectorY)+(lineToTrigPointVectorZ*perpVectorZ));
         if ((u<0.0) || (u>1.0)) return(false);
@@ -342,9 +342,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             // lineToTrigPerpVector is cross(lineToTrigPointVector,v1)
             // v is invDet * dot(vector,lineToTrigPerpVector)
 
-        var lineToTrigPerpVectorX=(lineToTrigPointVectorY*tv1z)-(lineToTrigPointVectorZ*tv1y);
-        var lineToTrigPerpVectorY=(lineToTrigPointVectorZ*tv1x)-(lineToTrigPointVectorX*tv1z);
-        var lineToTrigPerpVectorZ=(lineToTrigPointVectorX*tv1y)-(lineToTrigPointVectorY*tv1x);
+        var lineToTrigPerpVectorX=(lineToTrigPointVectorY*trigCache.v10.z)-(lineToTrigPointVectorZ*trigCache.v10.y);
+        var lineToTrigPerpVectorY=(lineToTrigPointVectorZ*trigCache.v10.x)-(lineToTrigPointVectorX*trigCache.v10.z);
+        var lineToTrigPerpVectorZ=(lineToTrigPointVectorX*trigCache.v10.y)-(lineToTrigPointVectorY*trigCache.v10.x);
 
         var v=invDet*((vctX*lineToTrigPerpVectorX)+(vctY*lineToTrigPerpVectorY)+(vctZ*lineToTrigPerpVectorZ));
         if ((v<0.0) || ((u+v)>1.0)) return(false);
@@ -356,7 +356,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             // hits, we add in an extra 0.01 slop so polygons that are
             // touching each other don't have edges grayed in
 
-        var t=invDet*((tv2x*lineToTrigPerpVectorX)+(tv2y*lineToTrigPerpVectorY)+(tv2z*lineToTrigPerpVectorZ));
+        var t=invDet*((trigCache.v20.x*lineToTrigPerpVectorX)+(trigCache.v20.y*lineToTrigPerpVectorY)+(trigCache.v20.z*lineToTrigPerpVectorZ));
         return((t>0.01)&&(t<1.0));
     };
 
@@ -364,7 +364,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
     {
         var n,nLight,trigCount;
         var light;
-        var k,p,hit,lightMesh,mesh,nMesh,cIdx;
+        var k,p,hit,lightMesh,mesh,nMesh;
         var trigRayTraceCache;
         var lightVectorX,lightVectorY,lightVectorZ;
         var lightBoundX,lightBoundY,lightBoundZ;
@@ -426,18 +426,14 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 mesh=this.map.meshes[light.meshIntersectList[k]];
                 if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
 
-                cIdx=0;
                 trigCount=mesh.trigCount;
                 trigRayTraceCache=mesh.trigRayTraceCache;
 
                 for (p=0;p!==trigCount;p++) {
-
-                    if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[cIdx],trigRayTraceCache[cIdx+1],trigRayTraceCache[cIdx+2],trigRayTraceCache[cIdx+3],trigRayTraceCache[cIdx+4],trigRayTraceCache[cIdx+5],trigRayTraceCache[cIdx+6],trigRayTraceCache[cIdx+7],trigRayTraceCache[cIdx+8])) {
+                    if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[p])) {
                         hit=true;
                         break;
                     }
-
-                    cIdx+=9;
                 }
 
                 if (hit) break;

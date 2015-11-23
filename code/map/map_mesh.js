@@ -18,18 +18,18 @@ function MapMeshVertexObject()
 // light map calculations
 //
 
-function MapMeshLightMapTrigCacheObject()
+function MapMeshLightMapTrigCacheObject(v0,v10,v20)
 {
-    this.v0=new wsPoint(0,0,0);     // point 0 on the triangle
-    this.v10=new wsPoint(0,0,0);    // vector of point 1-point 0
-    this.v20=new wsPoint(0,0,0);    // vector of point 2-point 0
+    this.v0=v0;        // point 0 on the triangle
+    this.v10=v10;      // vector of point 1-point 0
+    this.v20=v20;      // vector of point 2-point 0
 }
 
 //
 // map mesh class
 //
 
-function MapMeshObject(bitmap,vertexList,vertices,normals,tangents,vertexUVs,indexes,flag)
+function MapMeshObject(bitmap,vertexList,indexes,flag)
 {
     this.bitmap=bitmap;
     this.lightmap=null;
@@ -38,46 +38,6 @@ function MapMeshObject(bitmap,vertexList,vertices,normals,tangents,vertexUVs,ind
     this.flag=flag;
     
     this.tempLightmapIdx=0;         // used to track light maps when building them, not used otherwise
-    
-        
-            // SUPERGUMBA __ TEMP!
-            // rebuilding vertex list for routines that don't make it yet
-            
-    if (this.vertexList===null) {
-        this.vertexList=[];
-        
-        var n;
-        var nVertex=Math.floor(vertices.length/3);
-
-            
-        var vIdx=0;
-        var uIdx=0;
-        var nIdx=0;
-        var tIdx=0;
-        var v;
-        
-        for (n=0;n!==nVertex;n++) {
-            v=new MapMeshVertexObject();
-            
-            v.position.x=vertices[vIdx++];
-            v.position.y=vertices[vIdx++];
-            v.position.z=vertices[vIdx++];
-            
-            v.uv.x=vertexUVs[uIdx++];
-            v.uv.y=vertexUVs[uIdx++];
-            
-            v.normal.x=normals[nIdx++];
-            v.normal.y=normals[nIdx++];
-            v.normal.z=normals[nIdx++];
-            
-            v.tangent.x=tangents[tIdx++];
-            v.tangent.y=tangents[tIdx++];
-            v.tangent.z=tangents[tIdx++];
-            
-            this.vertexList.push(v);
-        }
-    }
-
     
     this.vertexCount=this.vertexList.length;
     this.indexCount=this.indexes.length;
@@ -300,50 +260,28 @@ function MapMeshObject(bitmap,vertexList,vertices,normals,tangents,vertexUVs,ind
 
     this.buildTrigRayTraceCache=function()
     {
-        var n,tIdx,cIdx;
-        var v0,v1,v2;
+        var n,tIdx;
+        var vp0,vp1,vp2,v10,v20;
 
             // this builds a specialized cache to
             // speed up ray tracing.  For each triangle
-            // in the mesh it builds this packed array
+            // in the mesh it stores a vertex, and the
+            // vectors to the other two vertexes
 
-            // X of point 0
-            // Y of point 0
-            // Z of point 0
-            // vector X of point 1-point 0
-            // vector Y of point 1-point 0
-            // vector Z of point 1-point 0
-            // vector X of point 2-point 0
-            // vector Y of point 2-point 0
-            // vector Z of point 2-point 0
-
-        this.trigRayTraceCache=new Float32Array(this.trigCount*9);
-
+        this.trigRayTraceCache=[];
+        
         tIdx=0;
-        cIdx=0;
 
         for (n=0;n!==this.trigCount;n++) {
-            v0=this.vertexList[this.indexes[tIdx++]];
-            v1=this.vertexList[this.indexes[tIdx++]];
-            v2=this.vertexList[this.indexes[tIdx++]];
 
-                // point 0 of the triangle
-
-            this.trigRayTraceCache[cIdx++]=v0.position.x;
-            this.trigRayTraceCache[cIdx++]=v0.position.y;
-            this.trigRayTraceCache[cIdx++]=v0.position.z;
-
-                // vector of point 1-point 0
-
-            this.trigRayTraceCache[cIdx++]=v1.position.x-v0.position.x;    
-            this.trigRayTraceCache[cIdx++]=v1.position.y-v0.position.y;    
-            this.trigRayTraceCache[cIdx++]=v1.position.z-v0.position.z;
-
-                // vector of point 2-point 0
-
-            this.trigRayTraceCache[cIdx++]=v2.position.x-v0.position.x;
-            this.trigRayTraceCache[cIdx++]=v2.position.y-v0.position.y;
-            this.trigRayTraceCache[cIdx++]=v2.position.z-v0.position.z;
+            vp0=this.vertexList[this.indexes[tIdx++]].position;
+            vp1=this.vertexList[this.indexes[tIdx++]].position;
+            vp2=this.vertexList[this.indexes[tIdx++]].position;
+            
+            v10=new wsPoint((vp1.x-vp0.x),(vp1.y-vp0.y),(vp1.z-vp0.z));
+            v20=new wsPoint((vp2.x-vp0.x),(vp2.y-vp0.y),(vp2.z-vp0.z));
+            
+            this.trigRayTraceCache.push(new MapMeshLightMapTrigCacheObject(vp0,v10,v20));
         }
     };
 

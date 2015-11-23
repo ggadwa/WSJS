@@ -32,205 +32,67 @@ function MeshPrimitivesObject()
         var idx=0;
 
         if (left) {
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min); 
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);        
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);     
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);    
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);  
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
         }
 
              // right
 
         if (right) {
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
         }
 
             // front
 
         if (front) {
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
         }
 
             // back
 
         if (back) {
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
         }
 
             // top
 
         if (top) {
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.min;
-            v.position.z=zBound.max;
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
         }
 
             // bottom
 
         if (bottom) {
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.min;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.max;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
-            
-            v=vertexList[idx++];
-            v.position.x=xBound.min;
-            v.position.y=yBound.max;
-            v.position.z=zBound.max;
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
         }
 
         var n;
@@ -279,13 +141,13 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildModelMeshNormals(vertexList,indexes,false);
-        if (!wholeUV) meshUtility.buildModelMeshUVs(bitmap,vertexList);
-        meshUtility.buildModelMeshTangents(vertexList,indexes);
+        meshUtility.buildVertexListNormals(vertexList,indexes,false);
+        if (!wholeUV) meshUtility.buildVertexListUVs(bitmap,vertexList);
+        meshUtility.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertexList,null,null,null,null,indexes,flags));
+        return(new MapMeshObject(bitmap,vertexList,indexes,flags));
     };
 
         //
@@ -297,47 +159,25 @@ function MeshPrimitivesObject()
         var x=xBound.getMidPoint();
         var z=zBound.getMidPoint();
 
-        var vertices=new Float32Array(36);
+        var vertexList=meshUtility.createMapVertexList(12);
+        
+        var idx=0;
 
-        vertices[0]=xBound.min;
-        vertices[1]=yBound.min;
-        vertices[2]=zBound.min;
-        vertices[3]=xBound.max;
-        vertices[4]=yBound.min;
-        vertices[5]=zBound.min;
-        vertices[6]=x;
-        vertices[7]=yBound.max;
-        vertices[8]=z;
+        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.set(x,yBound.max,z);
 
-        vertices[9]=xBound.max;
-        vertices[10]=yBound.min;
-        vertices[11]=zBound.min;
-        vertices[12]=xBound.max;
-        vertices[13]=yBound.min;
-        vertices[14]=zBound.max;
-        vertices[15]=x;
-        vertices[16]=yBound.max;
-        vertices[17]=z;
+        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.set(x,yBound.max,z);
 
-        vertices[18]=xBound.max;
-        vertices[19]=yBound.min;
-        vertices[20]=zBound.max;
-        vertices[21]=xBound.min;
-        vertices[22]=yBound.min;
-        vertices[23]=zBound.max;
-        vertices[24]=x;
-        vertices[25]=yBound.max;
-        vertices[26]=z;
+        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.set(x,yBound.max,z);
 
-        vertices[27]=xBound.min;
-        vertices[28]=yBound.min;
-        vertices[29]=zBound.max;
-        vertices[30]=xBound.min;
-        vertices[31]=yBound.min;
-        vertices[32]=zBound.min;
-        vertices[33]=x;
-        vertices[34]=yBound.max;
-        vertices[35]=z;
+        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.set(x,yBound.max,z);
 
         var n;
         var indexes=new Uint16Array(12);
@@ -350,13 +190,13 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUtility.buildMapMeshNormals(vertices,indexes,false);
-        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
+        meshUtility.buildVertexListNormals(vertexList,indexes,false);
+        meshUtility.buildVertexListUVs(bitmap,vertexList);
+        meshUtility.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flags));
+        return(new MapMeshObject(bitmap,vertexList,indexes,flags));
     };
     
         //
@@ -390,12 +230,10 @@ function MeshPrimitivesObject()
         var sideCount=12;
         var segCount=segments.length-1;     // always one extra for top
         
-        var vertexCount=segCount*(sideCount*18);
-        var indexCount=segCount*(sideCount*6);
-        var iCount=sideCount*6;
+        var vertexList=meshUtility.createMapVertexList(segCount*(sideCount*6));
+        var indexes=new Uint16Array(segCount*(sideCount*6));
 
-        var vertices=new Float32Array(vertexCount);
-        var indexes=new Uint16Array(indexCount);
+        var iCount=sideCount*6;
         
         var vIdx=0;
         var iIdx=0;
@@ -439,25 +277,12 @@ function MeshPrimitivesObject()
                 bx2=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
                 bz2=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
 
-                vertices[vIdx++]=tx;
-                vertices[vIdx++]=ySegBound.min;
-                vertices[vIdx++]=tz;
-                vertices[vIdx++]=tx2;
-                vertices[vIdx++]=ySegBound.min;
-                vertices[vIdx++]=tz2;
-                vertices[vIdx++]=bx;
-                vertices[vIdx++]=ySegBound.max;
-                vertices[vIdx++]=bz;
-
-                vertices[vIdx++]=tx2;
-                vertices[vIdx++]=ySegBound.min;
-                vertices[vIdx++]=tz2;
-                vertices[vIdx++]=bx2;
-                vertices[vIdx++]=ySegBound.max;
-                vertices[vIdx++]=bz2;
-                vertices[vIdx++]=bx;
-                vertices[vIdx++]=ySegBound.max;
-                vertices[vIdx++]=bz;
+                vertexList[vIdx++].position.set(tx,ySegBound.min,tz);
+                vertexList[vIdx++].position.set(tx2,ySegBound.min,tz2);
+                vertexList[vIdx++].position.set(bx,ySegBound.max,bz);
+                vertexList[vIdx++].position.set(tx2,ySegBound.min,tz2);
+                vertexList[vIdx++].position.set(bx2,ySegBound.max,bz2);
+                vertexList[vIdx++].position.set(bx,ySegBound.max,bz);
 
                 ang=ang2;
             }
@@ -477,13 +302,13 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        var normals=meshUtility.buildMapMeshNormals(vertices,indexes,false);
-        var uvs=meshUtility.buildMapMeshUVs(bitmap,vertices,normals);
-        var tangents=meshUtility.buildMapMeshTangents(vertices,uvs,indexes);
+        meshUtility.buildVertexListNormals(vertexList,indexes,false);
+        meshUtility.buildVertexListUVs(bitmap,vertexList);
+        meshUtility.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,null,vertices,normals,tangents,uvs,indexes,flags));
+        return(new MapMeshObject(bitmap,vertexList,indexes,flags));
     };
     
 }
