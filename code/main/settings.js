@@ -34,7 +34,7 @@ function SettingsObject()
     this.mapLightRGBMinimum=0.6;                // minimum r, g, or b value for map lights
     this.mapLightRGBExtra=0.4;                  // random r, g, b add for map lights
     
-    this.generateLightmap=true ;                 // set to true to generate light maps
+    this.generateLightmap=false;                 // set to true to generate light maps
     
         // decorations
         
@@ -59,7 +59,7 @@ function SettingsObject()
     this.debugDrawMapTangentSpace=false;
     this.debugDrawMapMeshLines=false;
     
-    this.debugDrawModelSkeleton=true;
+    this.debugDrawModelSkeleton=false;
     this.debugDrawModelTangentSpace=false;
     this.debugDrawModelMeshLines=false;
     

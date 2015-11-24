@@ -4,11 +4,12 @@
 // entity class
 //
 
-function EntityObject(position,angle,radius,model,isPlayer)
+function EntityObject(position,angle,radius,high,model,isPlayer)
 {
     this.position=position;
     this.angle=angle;
     this.radius=radius;
+    this.high=high;
     this.model=model;
     this.isPlayer=isPlayer;
     
@@ -17,6 +18,8 @@ function EntityObject(position,angle,radius,model,isPlayer)
     this.forwardSpeed=0;
     this.sideSpeed=0;
     this.verticalSpeed=0;
+    this.fallSpeed=0;
+    this.gravity=0;
     
     this.prevPoseTimeStamp=-1;
     this.nextPoseTimeStamp=-1;           // supergumba -- possibly temporary
@@ -56,7 +59,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
             // there's been a bump, move it, otherwise,
             // try sliding
             
-        var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,this.radius,true);
+        var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,this.radius,this.high,true);
         if ((collideMovePt.equals(movePt)) || (collideMovePt.y!==0)) {
             this.position.addPoint(collideMovePt);
             return;
@@ -68,7 +71,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
             
         slidePt=new wsPoint(movePt.x,0.0,0.0);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,false);
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,this.high,false);
         if (collideSlidePt.equals(slidePt)) {
             this.position.addPoint(collideSlidePt);
             return;
@@ -76,7 +79,7 @@ function EntityObject(position,angle,radius,model,isPlayer)
         
         slidePt=new wsPoint(0.0,0.0,movePt.z);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,false);
+        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,this.high,false);
         if (collideSlidePt.equals(slidePt)) {
             this.position.addPoint(collideSlidePt);
             return;
@@ -120,6 +123,15 @@ function EntityObject(position,angle,radius,model,isPlayer)
     };
     
         //
+        // jump
+        //
+        
+    this.startJump=function()
+    {
+        if (this.fallSpeed===0) this.fallSpeed=-300;
+    };
+    
+        //
         // run entity
         //
         
@@ -134,15 +146,47 @@ function EntityObject(position,angle,radius,model,isPlayer)
         if (this.verticalSpeed!==0.0) this.move(0.0,this.verticalSpeed,0.0);
         
             // falling
+            // supergumba -- there's some temp calculations here, need real gravity math
         
         if (this.isPlayer) {
             if (settings.fly) return;
         }
         
-        var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,50);
-        this.position.move(0,fallY,0);
-    };
+        this.fallSpeed+=this.gravity;
+        this.gravity+=2;
+        if (this.gravity>25) this.gravity=25;
         
+        var yChange=this.fallSpeed;
+        
+        if (yChange>=0) {
+            if (yChange===0) yChange=10;        // always try to fall
+            if (yChange>500) yChange=500;
+        
+            var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,yChange);
+            this.position.move(0,fallY,0);
+        
+            if (fallY<=0) {
+                this.fallSpeed=0;
+                this.gravity=0;
+            }
+        }
+        else {
+            this.position.move(0,yChange,0);
+        }
+    };
+    
+        //
+        // frustum checks
+        //
+        
+    this.inFrustum=function(view)
+    {
+        var xBound=new wsBound((this.position.x-this.radius),(this.position.x+this.radius));
+        var yBound=new wsBound(this.position.y,(this.position.y-this.high));
+        var zBound=new wsBound((this.position.z-this.radius),(this.position.z+this.radius));
+
+        return(view.boundBoxInFrustum(xBound,yBound,zBound));
+    };
     
         //
         // draw entity

@@ -77,6 +77,10 @@ function InputObject()
 
         if (this.keyFlags[65]) this.playerEntity.sideSpeed=-75.0;
         if (this.keyFlags[68]) this.playerEntity.sideSpeed=75.0;
+        
+            // space, jump
+            
+        if (this.keyFlags[32]) this.playerEntity.startJump();
 
             // - and +
             // up or down

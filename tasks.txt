@@ -22,7 +22,6 @@ FUTURE TODOs
 
 REGULAR TODOs
 
-
 [ ] need to deal with pausing time stamps
 
 [ ] rooms need decoration locations and decoration models
@@ -36,10 +35,6 @@ REGULAR TODOs
     [ ] box texture has potential other type of boards inside?
     [ ] machine texture
 
-[ ] physics
-    [ ] jumping
-    [ ] gravity
-
 [ ] light maps
     [ ] need to check closest meshes first
     [ ] diffuse calcs in light maps
@@ -48,7 +43,7 @@ REGULAR TODOs
 [ ] don't draw spaces in text
 
 [ ] models
-    [ ] frustum cull models
+    [X] frustum cull models
     [ ] need to put legs up so shrinking works better
     [X] models need vertex object with position, normal, uv, bone index, bone offset
         [X] build uv, tangent, etc the first time, build vertex and normal on the fly

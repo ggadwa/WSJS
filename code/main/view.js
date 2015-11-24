@@ -497,14 +497,17 @@ function ViewObject()
             entity=entityList.get(n);
             if (entity.isPlayer) continue;
 
-            entity.drawStart(this);
-            entity.draw(this);
-            entity.drawEnd(this);
-            
-            if (settings.debugDrawModelSkeleton) debug.drawModelSkeleton(this,entity.model,entity.position);
-            if (settings.debugDrawModelTangentSpace) debug.drawModelMeshNormals(this,entity.model,entity.position);
-            if (settings.debugDrawModelMeshLines) debug.drawModelMeshLines(this,entity.model,entity.position);
-            drawModelCount++;
+            if (entity.inFrustum(view)) {
+                entity.drawStart(this);
+                entity.draw(this);
+                entity.drawEnd(this);
+
+                if (settings.debugDrawModelSkeleton) debug.drawModelSkeleton(this,entity.model,entity.position);
+                if (settings.debugDrawModelTangentSpace) debug.drawModelMeshNormals(this,entity.model,entity.position);
+                if (settings.debugDrawModelMeshLines) debug.drawModelMeshLines(this,entity.model,entity.position);
+                
+                drawModelCount++;
+            }
         }
 
             // overlays

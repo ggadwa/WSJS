@@ -312,13 +312,13 @@ function wsInitBuildEntities()
     
         // make player entity
         
-    entityList.addPlayer(new EntityObject(map.findPlayerStartPosition(),new wsAngle(0.0,0.0,0.0),800,modelList.get('player'),true));
+    entityList.addPlayer(new EntityObject(map.findPlayerStartPosition(),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true));
     
         // make monster entities
         
     for (n=0;n!==settings.monsterEntityCount;n++) {
         monsterModelName='monster_'+entityGenRandom.randomInt(0,settings.modelMonsterCount);
-        entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,modelList.get(monsterModelName),false));
+        entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get(monsterModelName),false));
     }
     
         // finished

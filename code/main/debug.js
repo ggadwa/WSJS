@@ -298,7 +298,7 @@ function DebugObject()
         
     this.drawModelMeshNormals=function(view,model,offsetPosition)
     {
-        var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
+        var n,vIdx,iIdx,nVertex;
         var gl=view.gl;
         var normalSize=200.0;
         
@@ -311,25 +311,26 @@ function DebugObject()
         var vertices=new Float32Array(nVertex*6);
         var indexes=new Uint16Array(nVertex*2);
 
-        vertexIdx=0;
-        elementIdx=0;
-
         vIdx=0;
         iIdx=0;
+        
+        var v;
 
         for (n=0;n!==nVertex;n++) {
-            vertices[vIdx++]=mesh.vertices[vertexIdx]+offsetPosition.x;
-            vertices[vIdx++]=mesh.vertices[vertexIdx+1]+offsetPosition.y;
-            vertices[vIdx++]=mesh.vertices[vertexIdx+2]+offsetPosition.z;
-            vertices[vIdx++]=(mesh.vertices[vertexIdx]+offsetPosition.x)+(mesh.normals[vertexIdx]*normalSize);
-            vertices[vIdx++]=(mesh.vertices[vertexIdx+1]+offsetPosition.y)+(mesh.normals[vertexIdx+1]*normalSize);
-            vertices[vIdx++]=(mesh.vertices[vertexIdx+2]+offsetPosition.z)+(mesh.normals[vertexIdx+2]*normalSize);
+            v=mesh.vertexList[n];
+            
+            vertices[vIdx++]=v.position.x+offsetPosition.x;
+            vertices[vIdx++]=v.position.y+offsetPosition.y;
+            vertices[vIdx++]=v.position.z+offsetPosition.z;
+            vertices[vIdx++]=(v.position.x+offsetPosition.x)+(v.normal.x*normalSize);
+            vertices[vIdx++]=(v.position.y+offsetPosition.y)+(v.normal.y*normalSize);
+            vertices[vIdx++]=(v.position.z+offsetPosition.z)+(v.normal.z*normalSize);
 
-            indexes[iIdx++]=elementIdx;
-            indexes[iIdx++]=elementIdx+1;
-
-            vertexIdx+=3;
-            elementIdx+=2;
+            indexes[iIdx]=iIdx;
+            iIdx++;
+            
+            indexes[iIdx]=iIdx;
+            iIdx++;
         }
 
             // set the shader
@@ -351,7 +352,7 @@ function DebugObject()
 
             // draw the lines
 
-        gl.drawElements(gl.LINES,elementIdx,gl.UNSIGNED_SHORT,0);
+        gl.drawElements(gl.LINES,iIdx,gl.UNSIGNED_SHORT,0);
 
             // remove the buffers
 
@@ -378,17 +379,18 @@ function DebugObject()
         
             // get the offset vertices
         
-        var nVertex=Math.floor(mesh.vertices.length/3);
+        var nVertex=mesh.vertexCount;
         
         var vertices=new Float32Array(nVertex*3);
 
         var vIdx=0;
+        var v;
 
         for (n=0;n!==nVertex;n++) {
-            vertices[vIdx]=mesh.vertices[vIdx]+offsetPosition.x;
-            vertices[vIdx+1]=mesh.vertices[vIdx+1]+offsetPosition.y;
-            vertices[vIdx+2]=mesh.vertices[vIdx+2]+offsetPosition.z;
-            vIdx+=3;
+            v=mesh.vertexList[n];
+            vertices[vIdx++]=v.position.x+offsetPosition.x;
+            vertices[vIdx++]=v.position.y+offsetPosition.y;
+            vertices[vIdx++]=v.position.z+offsetPosition.z;
         }
 
             // start the shader

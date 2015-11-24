@@ -91,7 +91,7 @@ function CollisionObject()
         // colliding objects
         //
 
-    this.moveObjectInMap=function(map,origPt,movePt,radius,bump)
+    this.moveObjectInMap=function(map,origPt,movePt,radius,high,bump)
     {
         var n,k;
         var mesh;
@@ -115,6 +115,7 @@ function CollisionObject()
             // the rough collide boxes
             
         var objXBound=new wsBound((pt.x-radius),(pt.x+radius));
+        var objYBound=new wsBound(pt.y,(pt.y-high));
         var objZBound=new wsBound((pt.z-radius),(pt.z+radius));
         
             // we need to possible run through
@@ -136,7 +137,7 @@ function CollisionObject()
                 
                     // skip any mesh we don't collide with
                     
-                if (!mesh.boxBoundCollision(objXBound,null,objZBound)) continue;
+                if (!mesh.boxBoundCollision(objXBound,objYBound,objZBound)) continue;
                 
                     // check the collide lines
                     
