@@ -22,6 +22,21 @@ function ModelObject(name)
     };
     
         //
+        // clone this model
+        //
+        
+    this.clone=function()
+    {
+        var model=new ModelObject(this.name);
+        
+        model.modelShader=this.modelShader;
+        model.mesh=this.mesh.clone();
+        model.skeleton=this.skeleton.clone();
+
+        return(model);
+    };
+    
+        //
         // draw model
         //
 

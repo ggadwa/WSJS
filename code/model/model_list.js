@@ -49,6 +49,23 @@ function ModelListObject()
         return(null);
     };
     
+        //
+        // clone models
+        //
+        
+    this.clone=function(view,name)
+    {
+        var model=this.get(name);
+        if (model===null) return(null);
+        
+        var cloneModel=model.clone();
+        cloneModel.mesh.setupBuffers(view);
+        
+        this.models.push(cloneModel);
+        
+        return(cloneModel);
+    };
+    
     this.count=function()
     {
         return(this.models.length);

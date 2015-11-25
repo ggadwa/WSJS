@@ -764,11 +764,9 @@ function GenBitmapObject(genRandom)
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,noiseDarken,(noiseDarken+0.05),0.8);
     };
     
-    this.generateFaceChunk=function(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot)
+    this.generateFaceChunk=function(bitmapCTX,normalCTX,lft,top,rgt,bot)
     {
         var n,px,py,px2,py2,pxAdd,mSz;
-        
-        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot,0.8,0.8);
 
             // position of face
             
@@ -792,7 +790,7 @@ function GenBitmapObject(genRandom)
         if (eyeHigh>Math.floor(high/2)) eyeHigh=Math.floor(high/2);
 
         var eyeX=Math.floor(faceWid/2)-Math.floor((eyeCount*eyeWid)/2);
-        var eyeY=this.genRandom.randomInt(40,30);
+        var eyeY=this.genRandom.randomInt(10,Math.floor(eyeWid/4));
 
         var pupilWid=Math.floor(eyeWid/4);
         var pupilHigh=this.genRandom.randomInt(eyeHigh,Math.floor(eyeHigh/2));
@@ -820,7 +818,7 @@ function GenBitmapObject(genRandom)
         px=faceX+5;
         pxAdd=Math.floor((faceWid-10)/lineCount);
         
-        py=top+(high-40);
+        py=((top+eyeY)+eyeHigh)+10;
 
         for (n=0;n!==lineCount;n++) {
             mSz=this.genRandom.randomInt(2,8)-5;
@@ -855,7 +853,9 @@ function GenBitmapObject(genRandom)
 
     this.generateSkin=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var skinColor=this.genBitmapUtility.getRandomColor([0.5,0.5,0.4],[1.0,1.0,0.8]);
+        var lft,top,rgt,bot;
+        
+        var skinColor=this.genBitmapUtility.getRandomColor([0.3,0.7,0.3],[0.8,1.0,0.8]);
         var clothColor=this.genBitmapUtility.getRandomColor([0.4,0.3,0.3],[0.7,0.6,0.7]);
 
             // clear canvases
@@ -863,17 +863,42 @@ function GenBitmapObject(genRandom)
         this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
-            // top-left is plain skin
-            // top-right is face
-            // bottom-left is darker skin
+            // general skin texture
 
-        var halfWid=Math.floor(wid/2);
-        var halfHigh=Math.floor(high/2);
+        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,0,wid,high,0.8,0.8);
+        //this.generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high);
+        
+            // cloth part
+        
+        if (this.genRandom.random()>=0.5) {
+            lft=Math.floor(wid*0.1);
+            rgt=Math.floor(wid*0.4);
 
-        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,0,halfWid,halfHigh,0.8,0.8);
-        this.generateFaceChunk(bitmapCTX,normalCTX,skinColor,halfWid,0,wid,halfHigh);
-        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,halfHigh,halfWid,high,0.7,0.7);
-        this.generateClothChunk(bitmapCTX,normalCTX,wid,high,clothColor,halfWid,halfHigh,wid,high);
+            top=Math.floor(high*0.15);
+            bot=Math.floor(high*0.5);
+
+            this.generateClothChunk(bitmapCTX,normalCTX,wid,high,clothColor,lft,top,rgt,bot);
+
+            lft=Math.floor(wid*0.6);
+            rgt=Math.floor(wid*0.9);
+
+            this.generateClothChunk(bitmapCTX,normalCTX,wid,high,clothColor,lft,top,rgt,bot);
+
+            top=Math.floor(high*0.5);
+            bot=Math.floor(high*0.7);
+
+            this.generateClothChunk(bitmapCTX,normalCTX,wid,high,clothColor,0,top,wid,bot);
+        }
+        
+            // face part
+            
+        lft=Math.floor(wid*0.1);
+        rgt=Math.floor(wid*0.4);
+        
+        top=0;
+        bot=Math.floor(high*0.15);
+        
+        this.generateFaceChunk(bitmapCTX,normalCTX,lft,top,rgt,bot);
 
             // finish with the specular
 
@@ -1002,8 +1027,7 @@ function GenBitmapObject(genRandom)
                 break;
 
             case GEN_BITMAP_TYPE_SKIN:
-                this.generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high);
-                //this.generateSkin(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generateSkin(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=10.0;
                 break;
 

@@ -307,6 +307,7 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
 function wsInitBuildEntities()
 {
     var n,monsterModelName;
+    var model,pos;
     
     var entityGenRandom=new GenRandomObject(settings.randomSeedEntity);
     
@@ -315,10 +316,17 @@ function wsInitBuildEntities()
     entityList.addPlayer(new EntityObject(map.findPlayerStartPosition(),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true));
     
         // make monster entities
+        // we clone their models in the list so each entity gets
+        // it's own model
         
     for (n=0;n!==settings.monsterEntityCount;n++) {
+        pos=map.findRandomPosition(entityGenRandom);
+        if (pos===null) continue;
+        
         monsterModelName='monster_'+entityGenRandom.randomInt(0,settings.modelMonsterCount);
-        entityList.add(new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get(monsterModelName),false));
+        model=modelList.clone(view,monsterModelName);
+        
+        entityList.add(new EntityObject(pos,new wsAngle(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model,false));
     }
     
         // finished

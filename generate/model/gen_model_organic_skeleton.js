@@ -24,10 +24,12 @@ function GenModelOrganicSkeletonObject(model,genRandom)
 
         var ankleHigh=this.genRandom.randomInt(100,100);
         var kneeHigh=ankleHigh+this.genRandom.randomInt(500,500);
+        var legSpread=this.genRandom.randomInt(100,100);
+        var feetLength=this.genRandom.randomInt(200,250);
         var hipHigh=kneeHigh+this.genRandom.randomInt(500,500);
         var hipRadius=this.genRandom.randomInt(300,350);
-        var waistHigh=hipHigh+this.genRandom.randomInt(150,150);
-        var torsoHigh=waistHigh+this.genRandom.randomInt(250,250);
+        var waistHigh=hipHigh+this.genRandom.randomInt(200,250);
+        var torsoHigh=waistHigh+this.genRandom.randomInt(350,350);
         var torsoRadius=this.genRandom.randomInt(300,350);
         var torsoTopHigh=torsoHigh+this.genRandom.randomInt(250,250);
         var shoulderRadius=torsoRadius+this.genRandom.randomInt(150,150);
@@ -62,14 +64,14 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var leftHipBoneIdx=bones.push(new ModelBoneObject('Left Hip',hipBoneIdx,new wsPoint(hipRadius,-hipHigh,0)))-1;
         var rightHipBoneIdx=bones.push(new ModelBoneObject('Right Hip',hipBoneIdx,new wsPoint(-hipRadius,-hipHigh,0)))-1;
 
-        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint(hipRadius,-kneeHigh,0)))-1;
-        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-hipRadius,-kneeHigh,0)))-1;
+        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint((hipRadius+legSpread),-kneeHigh,0)))-1;
+        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-(hipRadius+legSpread),-kneeHigh,0)))-1;
 
-        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint(hipRadius,-ankleHigh,0)))-1;
-        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-hipRadius,-ankleHigh,0)))-1;
+        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint((hipRadius+(legSpread*2)),-ankleHigh,0)))-1;
+        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-(hipRadius+(legSpread*2)),-ankleHigh,0)))-1;
 
-        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(hipRadius,0,0)))-1;
-        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-hipRadius,0,0)))-1;
+        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint((hipRadius+(legSpread*2)),-ankleHigh,feetLength)))-1;
+        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-(hipRadius+(legSpread*2)),-ankleHigh,feetLength)))-1;
      };
     
 }

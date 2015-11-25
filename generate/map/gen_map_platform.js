@@ -4,11 +4,12 @@
 // map platforms
 //
 
-function GenRoomPlatform(map,genRandom,piece)
+function GenRoomPlatform(map,genRandom,piece,room)
 {
     this.map=map;
     this.genRandom=genRandom;
     this.piece=piece;
+    this.room=room;
     
         // constants
         
@@ -90,7 +91,8 @@ function GenRoomPlatform(map,genRandom,piece)
             zPlatformBound=new wsBound((zBound.min+(z*zAdd)),(zBound.min+((z+1)*zAdd)));
             
             this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,(isPillar?yPlatformPillarBound:yPlatformBound),zPlatformBound,false,true,true,true,true,true,(!isPillar),this.map.MESH_FLAG_ROOM_PLATFORM));
-
+            this.room.blockGrid(x,z,true,false);
+            
             grid[z][x]=isPillar?3:2;       // we use 2/3 so we can later re-check list for stair locations
             
                 // move to next platform area
@@ -226,6 +228,8 @@ function GenRoomPlatform(map,genRandom,piece)
                 genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,false);
                 break;
         }
+        
+        this.room.blockGrid(x,z,true,true);
     };
     
 }

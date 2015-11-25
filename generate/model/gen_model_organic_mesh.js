@@ -72,7 +72,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 v.position.y=py;
                 v.position.z=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-                ang=xzAng+225.0;
+                ang=xzAng+320.0;
                 if (ang>=360.0) ang-=360.0;
                 
                 v.uv.x=1.0-(ang/360.0);

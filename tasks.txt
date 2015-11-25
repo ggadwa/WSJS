@@ -24,11 +24,8 @@ REGULAR TODOs
 
 [ ] need to deal with pausing time stamps
 
-[ ] rooms need decoration locations and decoration models
-[ ] rooms have possible light positions
-[ ] rooms track where they put platforms on 10x10, and monsters appear outside that, and one monster per square
-
-[ ] try to pack glsl light struct floats
+[ ] rooms
+     [ ] decorations use location tracking
 
 [ ] bitmaps
     [ ] need bitmap colors filters are settings
@@ -43,11 +40,6 @@ REGULAR TODOs
 [ ] don't draw spaces in text
 
 [ ] models
-    [X] frustum cull models
-    [ ] need to put legs up so shrinking works better
-    [X] models need vertex object with position, normal, uv, bone index, bone offset
-        [X] build uv, tangent, etc the first time, build vertex and normal on the fly
-    [X] bones need pose position and original position
     [ ] need to rotate vertexes on posing
         [ ] and normals
     [ ] debug need to use pose positions

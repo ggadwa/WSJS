@@ -17,7 +17,7 @@ function MapObject()
     this.MESH_FLAG_LIGHT=6;
     this.MESH_FLAG_DECORATION=7;
  
-        // variables
+        // map items
         
     this.mapShader=new MapShaderObject();
     
@@ -25,6 +25,7 @@ function MapObject()
     this.lights=[];
     this.bitmaps=[];
     this.lightmaps=[];
+    this.rooms=[];
     
         //
         // initialize and release
@@ -92,6 +93,16 @@ function MapObject()
     this.addLightmap=function(lightmap)
     {
         this.lightmaps.push(lightmap);
+    };
+    
+        //
+        // tracking rooms
+        //
+        
+    this.addRoom=function(xBound,yBound,zBound,floorGrid,hasStories)
+    {
+        this.rooms.push(new MapRoomObject(xBound,yBound,zBound,floorGrid,hasStories));
+        return(this.rooms.length-1);
     };
 
         //
@@ -379,33 +390,32 @@ function MapObject()
     {
             // always start in middle of
             // first generated room
-            
-        var mesh=this.meshes[0];
-        return(new wsPoint(mesh.xBound.getMidPoint(),mesh.yBound.max,mesh.zBound.getMidPoint()));
+          
+        return(this.rooms[0].findCenterLocation());
     };
 
     this.findRandomPosition=function(genRandom)
     {
+        var roomIdx,room;
+        var pos;
         var findTry=0;
-        var meshIdx,mesh;
-
-            // try to only look at wall meshes
-
+        
         while (findTry<25) {
-            meshIdx=genRandom.randomInt(0,this.meshes.length);
-            mesh=this.meshes[meshIdx];
-            if (mesh.flag===this.MESH_FLAG_ROOM_FLOOR) break;
+
+                // find a random room
+
+            var roomIdx=genRandom.randomInt(0,this.rooms.length);
+            var room=this.rooms[roomIdx];
+        
+                // find a random spot
+                
+            pos=room.findRandomFreeLocation(genRandom);
+            if (pos!==null) return(pos);
+            
             findTry++;
         }
 
-            // build a random location
-
-        var pos=new wsPoint(0,0,0);
-        pos.x=genRandom.randomInBetween(mesh.xBound.min,mesh.xBound.max);
-        pos.y=mesh.yBound.max;
-        pos.z=genRandom.randomInBetween(mesh.zBound.min,mesh.zBound.max);
-
-        return(pos);
+        return(null);
     };
 
         //

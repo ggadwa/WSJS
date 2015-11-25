@@ -124,6 +124,25 @@ function ModelSkeletonObject()
     };
     
         //
+        // clone
+        //
+        
+    this.clone=function()
+    {
+        var n,bone;
+        var nBone=this.bones.length;
+        
+        var skeleton=new ModelSkeletonObject();
+        
+        for (n=0;n!==nBone;n++) {
+            bone=this.bones[n];
+            skeleton.bones.push(new ModelBoneObject(bone.name,bone.parentBoneIdx,bone.position));
+        }
+        
+        return(skeleton);
+    };
+    
+        //
         // find bone
         //
         
@@ -243,7 +262,7 @@ function ModelSkeletonObject()
         for (n=0;n!==nBone;n++) {
             bone=this.bones[n];
             
-            bone.curPoseAngle.tween(bone.prevPoseAngle,bone.nextPoseAngle);
+            bone.curPoseAngle.tween(bone.prevPoseAngle,bone.nextPoseAngle,factor);
             bone.curPosePosition.tween(bone.prevPosePosition,bone.nextPosePosition,factor);
             
             bone.curPoseVector.setFromSubPoint(bone.curPosePosition,bone.position);

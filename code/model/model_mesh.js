@@ -56,13 +56,26 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     };
     
         //
+        // clone
+        //
+        
+    this.clone=function()
+    {
+            // nothing that is part of this mesh is every changed
+            // only the internal gl arrays so we can just re-use the
+            // data
+        
+        return(new ModelMeshObject(this.bitmap,this.vertexList,this.indexes,this.flag));
+    };
+    
+        //
         // set vertices to pose and model position
         //
         
     this.updateVertexesToPoseAndPosition=function(view,skeleton,offsetPosition)
     {
         var n,v;
-        var bone;
+        var bone,pos,normal;
         
             // move all the vertexes
             
@@ -76,13 +89,19 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             v=this.vertexList[n];
             bone=skeleton.bones[v.boneIdx];
             
-            vertices[vIdx++]=v.position.x+bone.curPoseVector.x+offsetPosition.x;
-            vertices[vIdx++]=v.position.y+bone.curPoseVector.y+offsetPosition.y;
-            vertices[vIdx++]=v.position.z+bone.curPoseVector.z+offsetPosition.z;
+            pos=v.position.copy();
+            pos.rotateAroundPoint(bone.position,bone.curPoseAngle);
             
-            normals[nIdx++]=v.normal.x;         // supergumba -- need to rotate these
-            normals[nIdx++]=v.normal.y;
-            normals[nIdx++]=v.normal.z;
+            vertices[vIdx++]=pos.x+bone.curPoseVector.x+offsetPosition.x;
+            vertices[vIdx++]=pos.y+bone.curPoseVector.y+offsetPosition.y;
+            vertices[vIdx++]=pos.z+bone.curPoseVector.z+offsetPosition.z;
+            
+            normal=v.normal.copy();
+            normal.rotateAroundPoint(null,bone.curPoseAngle);
+            
+            normals[nIdx++]=normal.x;
+            normals[nIdx++]=normal.y;
+            normals[nIdx++]=normal.z;
         }
         
             // set the buffers
