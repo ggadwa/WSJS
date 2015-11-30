@@ -187,6 +187,47 @@ function GenBitmapUtilityObject(genRandom)
         
         return(new wsColor(r,g,b));
     };
+    
+    this.getRandomPrimaryColor=function(min,max)
+    {
+        var r,g,b;
+        var value=min+((max-min)*this.genRandom.random());
+        
+        switch (this.genRandom.randomInt(0,6)) {
+            case 0:
+                r=1.0;
+                g=value;
+                b=value;
+                break;
+            case 1:
+                r=value;
+                g=1.0;
+                b=value;
+                break;
+            case 2:
+                r=value;
+                g=value;
+                b=1.0;
+                break;
+            case 3:
+                r=1.0;
+                g=1.0;
+                b=value;
+                break;
+            case 4:
+                r=1.0;
+                g=value;
+                b=1.0;
+                break;
+            case 5:
+                r=value;
+                g=1.0;
+                b=1.0;
+                break;
+        }
+        
+        return(new wsColor(r,g,b));
+    };
 
     this.getRandomGreyColor=function(greyMin,greyMax)
     {
