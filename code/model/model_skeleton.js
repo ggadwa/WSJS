@@ -10,6 +10,11 @@ function ModelBoneObject(name,parentBoneIdx,position)
     this.parentBoneIdx=parentBoneIdx;
     this.position=position;
     
+        // mesh creation
+        
+    this.gravityLockDistance=500;
+    this.gravityPullDistance=4000;
+    
         // pose
     
     this.curPoseAngle=new wsPoint(0.0,0.0,0.0);
@@ -29,71 +34,6 @@ function ModelBoneObject(name,parentBoneIdx,position)
     this.isBase=function()
     {
         return(this.name==='Base');
-    };
-    
-    this.isHead=function()
-    {
-        return(this.name==='Head');
-    };
-    
-    this.isNeck=function()
-    {
-        return(this.name==='Neck');
-    };
-    
-    this.isTorsoTop=function()
-    {
-        return(this.name==='Torso Top');
-    };
-    
-    this.isTorso=function()
-    {
-        return(this.name==='Torso');
-    };
-    
-    this.isWaist=function()
-    {
-        return(this.name==='Waist');
-    };
-    
-    this.isHip=function()
-    {
-        return(this.name==='Hip');
-    };
-    
-    this.isHand=function()
-    {
-        return(this.name.indexOf('Hand')!==-1);
-    };
-    
-    this.isWrist=function()
-    {
-        return(this.name.indexOf('Wrist')!==-1);
-    };
-    
-    this.isElbow=function()
-    {
-        return(this.name.indexOf('Elbow')!==-1);
-    };
-    
-    this.isShoulder=function()
-    {
-        return(this.name.indexOf('Shoulder')!==-1);
-    };
-    
-    this.isFoot=function()
-    {
-        return(this.name.indexOf('Foot')!==-1);
-    };
-    
-    this.isAnkle=function()
-    {
-        return(this.name.indexOf('Ankle')!==-1);
-    };
-    
-    this.isKnee=function()
-    {
-        return(this.name.indexOf('Knee')!==-1);
     };
     
         //
@@ -247,14 +187,10 @@ function ModelSkeletonObject()
         }
     };
     
-    this.tweenCurrentPose=function(prevTimeStamp,nextTimeStamp,curTimeStamp)
+    this.tweenCurrentPose=function(factor)
     {
         var n,bone;
         var nBone=this.bones.length;
-        
-            // get the factor
-            
-        var factor=(curTimeStamp-prevTimeStamp)/(nextTimeStamp-prevTimeStamp);
         
             // move the bones
             // we also setup a vector used to later move vertexes
@@ -298,21 +234,37 @@ function ModelSkeletonObject()
         this.bones[boneIdx].nextPosePosition.subPoint(offsetPnt);
     };
     
-    this.rotateNextPoseBoneRecursive=function(boneIdx,ang,offsetPnt)
+    this.rotateNextPoseBoneRecursive=function(boneIdx,root,ang,offsetPnt)
     {
         var n,bone;
         var nBone=this.bones.length;
         
-            // move this bone from the last
-            // rotational offset
+            // if this is the root bone (the first bone
+            // in the move) then it just sets the rotation angle
+            // and no offset moves, as the first bone just turns
+            // other bones and not around it's parent
             
-        this.moveNextPoseBoneSingle(boneIdx,offsetPnt);
-        
-            // rotate bone and update the offset
-            // point for further children
-        
-        var nextOffsetPnt=this.rotateNextPoseBoneSingle(boneIdx,ang);
-        nextOffsetPnt.addPoint(offsetPnt);
+        if (root) {
+            bone=this.bones[boneIdx];
+            bone.nextPoseAngle.addPoint(ang);
+            nextOffsetPnt=new wsPoint(0,0,0);
+        }
+        else {
+            
+                // move this bone from the last
+                // rotational offset
+
+            this.moveNextPoseBoneSingle(boneIdx,offsetPnt);
+
+                // rotate bone and update the offset
+                // point for further children, if this
+                // bone is the root, we only set the rotation
+                // (it doesn't rotate around it's parent, only
+                // rotates the children)
+
+            var nextOffsetPnt=this.rotateNextPoseBoneSingle(boneIdx,ang);
+            nextOffsetPnt.addPoint(offsetPnt);
+        }
         
             // now move all children
             
@@ -320,80 +272,85 @@ function ModelSkeletonObject()
             if (n===boneIdx) continue;
             
             bone=this.bones[n];
-            if (bone.parentBoneIdx===boneIdx) this.rotateNextPoseBoneRecursive(n,ang,nextOffsetPnt);
+            if (bone.parentBoneIdx===boneIdx) this.rotateNextPoseBoneRecursive(n,false,ang,nextOffsetPnt);
         }
     };
 
     this.rotateNextPoseBone=function(boneIdx,ang)
     {
-        this.rotateNextPoseBoneRecursive(boneIdx,ang,new wsPoint(0,0,0));
+        this.rotateNextPoseBoneRecursive(boneIdx,true,ang,null);
     };
     
     
     
     
     // supergumba -- testing
-    this.randomNextPose=function(view)
+    
+    this.walkPose1=function()
     {
-        var ang,x,z;
-        
-            // some random bone rotations for testing
-            // supergumba -- DELETE LATER
-            
-            // move current next pose to previous pose
-            
-        this.moveNextPoseToPrevPose();
-        
-            // create the next pose
-            
         this.clearNextPose();
-        
-            // spine rotations
             
-        x=view.genRandom.randomInt(-40,80);
-            
-        var ang=new wsAngle(x,0.0,0.0);
-        this.rotateNextPoseBone(this.findBoneIndex('Waist'),ang);
+        var ang=new wsAngle(70.0,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Hip'),ang);
+        ang=new wsAngle(-60.0,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Right Hip'),ang);
         
-        ang.x*=0.75;
-        this.rotateNextPoseBone(this.findBoneIndex('Torso'),ang);
-        
-        ang.x*=0.75;
-        this.rotateNextPoseBone(this.findBoneIndex('Neck'),ang);
-
-            // arm rotations
-        
-        x=view.genRandom.randomInt(-90,180);
-        z=view.genRandom.randomInt(-40,80);
-        
-        ang=new wsAngle(x,0.0,z);
-        this.rotateNextPoseBone(this.findBoneIndex('Left Elbow'),ang);
-        ang.z=-ang.z;
-        this.rotateNextPoseBone(this.findBoneIndex('Right Elbow'),ang);
-        
-        z=view.genRandom.randomInt(-40,80);
-        
-        ang=new wsAngle(0.0,0.0,z);
-        this.rotateNextPoseBone(this.findBoneIndex('Left Wrist'),ang);
-        ang.z=-ang.z;
-        this.rotateNextPoseBone(this.findBoneIndex('Right Wrist'),ang);
-        
-            // leg rotations
-            
-        x=view.genRandom.randomInt(-50,100);
-        
-        ang=new wsAngle(x,0.0,0.0);
+        ang=new wsAngle(-95.0,0.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Left Knee'),ang);
-        ang.x=-ang.x;
+        ang=new wsAngle(-15.0,0.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Right Knee'),ang);
         
-        x=view.genRandom.randomInt(-20,40);
+        var ang=new wsAngle(0.0,0.0,40.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Elbow'),ang);
+        ang=new wsAngle(0.0,0.0,-40.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Right Elbow'),ang);
+    };
+    
+    this.walkPose2=function()
+    {
+        this.clearNextPose();
+            
+        var ang=new wsAngle(-60.0,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Hip'),ang);
+        ang=new wsAngle(70.0,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Right Hip'),ang);
         
-        ang=new wsAngle(x,0.0,0.0);
-        this.rotateNextPoseBone(this.findBoneIndex('Left Ankle'),ang);
-        ang.x=-ang.x;
-        this.rotateNextPoseBone(this.findBoneIndex('Right Ankle'),ang);
+        ang=new wsAngle(-15.0,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Knee'),ang);
+        ang=new wsAngle(-95.0,0.0,0.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Right Knee'),ang);
+    };
+    
+    this.walkPose=function(flip)
+    {
+            // testing to turn off animation
+
+        this.clearNextPose();
+        this.moveNextPoseToPrevPose();
         
+        /*
+            // we just hard setup some poses here, this is
+            // ALL supergumba temporary code
+            
+            // create the previous pose
+            
+        if (flip) {
+            this.walkPose1();
+        }
+        else {
+            this.walkPose2();
+        }
+        this.moveNextPoseToPrevPose();
+        
+            // and the opposite for the next pose
+            
+        if (flip) {
+            this.walkPose2();
+        }
+        else {
+            this.walkPose1();
+        }
+        */
     };
 
 }

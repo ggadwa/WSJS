@@ -40,8 +40,9 @@ REGULAR TODOs
 [ ] don't draw spaces in text
 
 [ ] models
-    [ ] need to rotate vertexes on posing
-        [ ] and normals
+    [X] rebuild normals after shrink wrap to work off of attached bones
+    [X] bones have gravity lock distances
+    [ ] temp testing -- need to get legs back into default pose for walking
     [ ] debug need to use pose positions
     [ ] eventually get rid of bone "is" functions (leave base)
 

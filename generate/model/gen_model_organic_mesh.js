@@ -221,20 +221,20 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                     
                         // if too close, then all movement stops
                         
-                    if (dist<500) {
+                    if (dist<bone.gravityLockDistance) {
                         move.moving=false;
                         break;
                     }
                     
                         // outside of gravity
                         
-                    if (dist>4000) continue;
+                    if (dist>bone.gravityPullDistance) continue;
                     
                         // otherwise add in gravity
                         
                     vct=new wsPoint((bone.position.x-v.position.x),(bone.position.y-v.position.y),(bone.position.z-v.position.z));
                     vct.normalize();
-                    vct.scale((1.0-(dist/4000.0))*10.0);
+                    vct.scale((1.0-(dist/bone.gravityPullDistance))*10.0);
                     
                     moveVector.addPoint(vct);
                 }
@@ -261,9 +261,11 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     
         //
         // attach vertices to nearest bone
+        // this function also rebuilds the normals as
+        // vertexes are attached to bones
         //
         
-    this.attachVertexToBones=function(vertexList)
+    this.attachVertexToBones=function(vertexList,centerPnt)
     {
         var n,k,v;
         var bone,boneIdx,d,dist;
@@ -274,6 +276,8 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
             
+                // attach a bone
+                
             boneIdx=-1;
             
             for (k=0;k!==nBone;k++) {
@@ -294,6 +298,16 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             }
             
             v.boneIdx=boneIdx;
+            
+                // rebuild the normals
+                
+            if (boneIdx===-1) {
+                v.normal.setFromSubPoint(v.position,centerPnt);
+            }
+            else {
+                v.normal.setFromSubPoint(v.position,bones[boneIdx].position);
+            }
+            v.normal.normalize();
         }
     };
     
@@ -342,11 +356,10 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
         this.buildGlobeAroundSkeleton(view,centerPnt,widRadius,highRadius,vertexList,indexes);
         this.shrinkWrapGlobe(vertexList,centerPnt);
-        this.attachVertexToBones(vertexList);
+        this.attachVertexToBones(vertexList,centerPnt);
         
             // complete the tangent space vectors
         
-        meshUtility.buildVertexListNormals(vertexList,indexes,false);
         meshUtility.buildVertexListTangents(vertexList,indexes);
         
             // add mesh to model

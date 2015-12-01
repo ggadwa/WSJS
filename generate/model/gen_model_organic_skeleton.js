@@ -22,10 +22,10 @@ function GenModelOrganicSkeletonObject(model,genRandom)
 
             // random sizes
 
-        var ankleHigh=this.genRandom.randomInt(100,100);
+        var footHigh=this.genRandom.randomInt(150,150);
+        var ankleHigh=footHigh+this.genRandom.randomInt(100,100);
         var kneeHigh=ankleHigh+this.genRandom.randomInt(500,500);
-        var legSpread=this.genRandom.randomInt(100,100);
-        var feetLength=this.genRandom.randomInt(200,250);
+        var legSpread=this.genRandom.randomInt(300,200);
         var hipHigh=kneeHigh+this.genRandom.randomInt(500,500);
         var hipRadius=this.genRandom.randomInt(300,350);
         var waistHigh=hipHigh+this.genRandom.randomInt(200,250);
@@ -33,10 +33,10 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var torsoRadius=this.genRandom.randomInt(300,350);
         var torsoTopHigh=torsoHigh+this.genRandom.randomInt(250,250);
         var shoulderRadius=torsoRadius+this.genRandom.randomInt(150,150);
-        var elbowRadius=shoulderRadius+this.genRandom.randomInt(250,250);
-        var wristRadius=elbowRadius+this.genRandom.randomInt(250,250);
-        var handRadius=wristRadius+this.genRandom.randomInt(50,50);
-        var neckHigh=torsoTopHigh+this.genRandom.randomInt(50,100);
+        var elbowRadius=shoulderRadius+this.genRandom.randomInt(350,350);
+        var wristRadius=elbowRadius+this.genRandom.randomInt(350,350);
+        var handRadius=wristRadius+this.genRandom.randomInt(100,100);
+        var neckHigh=torsoTopHigh+this.genRandom.randomInt(250,150);
         var headHigh=neckHigh+this.genRandom.randomInt(100,100)+500;
 
             // create bones
@@ -70,8 +70,31 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint((hipRadius+(legSpread*2)),-ankleHigh,0)))-1;
         var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-(hipRadius+(legSpread*2)),-ankleHigh,0)))-1;
 
-        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint((hipRadius+(legSpread*2)),-ankleHigh,feetLength)))-1;
-        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-(hipRadius+(legSpread*2)),-ankleHigh,feetLength)))-1;
+        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint((hipRadius+(legSpread*2)),-footHigh,0)))-1;
+        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-(hipRadius+(legSpread*2)),-footHigh,0)))-1;
+        
+            // change some wrapping gravity settings
+        
+        bones[headBoneIdx].gravityLockDistance=500;
+        bones[neckBoneIdx].gravityLockDistance=150;
+            
+        bones[leftShoulderBoneIdx].gravityLockDistance=250;
+        bones[rightShoulderBoneIdx].gravityLockDistance=250;
+        bones[leftElbowBoneIdx].gravityLockDistance=200;
+        bones[rightElbowBoneIdx].gravityLockDistance=200;
+        bones[leftWristBoneIdx].gravityLockDistance=200;
+        bones[rightWristBoneIdx].gravityLockDistance=200;
+        bones[leftHandBoneIdx].gravityLockDistance=250;
+        bones[rightHandBoneIdx].gravityLockDistance=250;
+        
+        bones[leftHipBoneIdx].gravityLockDistance=250;
+        bones[rightHipBoneIdx].gravityLockDistance=250;
+        bones[leftKneeBoneIdx].gravityLockDistance=200;
+        bones[rightKneeBoneIdx].gravityLockDistance=200;
+        bones[leftAnkleBoneIdx].gravityLockDistance=200;
+        bones[rightAnkleBoneIdx].gravityLockDistance=200;
+        bones[leftFootBoneIdx].gravityLockDistance=250;
+        bones[rightFootBoneIdx].gravityLockDistance=250;
      };
     
 }

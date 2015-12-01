@@ -21,9 +21,6 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
     this.fallSpeed=0;
     this.gravity=0;
     
-    this.prevPoseTimeStamp=-1;
-    this.nextPoseTimeStamp=-1;           // supergumba -- possibly temporary
-    
     this.collision=new CollisionObject();
     
         //
@@ -207,32 +204,14 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
             // time for a new pose?
             // supergumba -- random testing right now
             
-        if (view.timeStamp>this.nextPoseTimeStamp) {
-            
-            if (this.nextPoseTimeStamp===-1) {
-                this.prevPoseTimeStamp=view.timeStamp;
-                this.prevPoseTimeStamp=view.timeStamp;
-            }
-            else {
-                this.prevPoseTimeStamp=this.nextPoseTimeStamp;
-            }
-            
-            this.nextPoseTimeStamp=this.prevPoseTimeStamp+3000;
-            
-                // sanity check for time stamp being way off
-                // from last animation
-                
-            if (view.timeStamp>this.nextPoseTimeStamp) {
-                this.prevPoseTimeStamp=view.timeStamp;
-                this.nextPoseTimeStamp=this.prevPoseTimeStamp+3000;
-            }
-            
-            this.model.skeleton.randomNextPose(view);
-        }
+        var flip=(((Math.floor(view.timeStamp/3000))&0x1)===0);
+        this.model.skeleton.walkPose(flip);
+        
+        var factor=(view.timeStamp%3000)/3000;
         
             // create pose and vertexes
             
-        this.model.skeleton.tweenCurrentPose(this.prevPoseTimeStamp,this.nextPoseTimeStamp,view.timeStamp);
+        this.model.skeleton.tweenCurrentPose(factor);
         this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.position);
         
             // draw the model
