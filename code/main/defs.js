@@ -379,6 +379,15 @@ function wsBound(value1,value2)
         if (value<this.min) this.min=value;
         if (value>this.max) this.max=value;
     };
+    
+    this.forceMinSize=function(value)
+    {
+        if (this.getSize()<value) {
+            var mid=this.getMidPoint();
+            this.min=mid-value;
+            this.max=mid+value;
+        }
+    };
                 
     this.copy=function()
     {

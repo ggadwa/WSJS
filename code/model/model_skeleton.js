@@ -289,16 +289,21 @@ function ModelSkeletonObject()
     this.walkPose1=function()
     {
         this.clearNextPose();
-            
-        var ang=new wsAngle(70.0,0.0,0.0);
+        
+        var ang=new wsAngle(90.0,-10.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Left Hip'),ang);
-        ang=new wsAngle(-60.0,0.0,0.0);
+        ang=new wsAngle(-50.0,-10.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Right Hip'),ang);
         
         ang=new wsAngle(-95.0,0.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Left Knee'),ang);
         ang=new wsAngle(-15.0,0.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Right Knee'),ang);
+        
+        var ang=new wsAngle(0.0,0.0,20.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Left Shoulder'),ang);
+        ang=new wsAngle(0.0,0.0,-20.0);
+        this.rotateNextPoseBone(this.findBoneIndex('Right Shoulder'),ang);
         
         var ang=new wsAngle(0.0,0.0,40.0);
         this.rotateNextPoseBone(this.findBoneIndex('Left Elbow'),ang);
@@ -310,9 +315,9 @@ function ModelSkeletonObject()
     {
         this.clearNextPose();
             
-        var ang=new wsAngle(-60.0,0.0,0.0);
+        var ang=new wsAngle(-50.0,-10.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Left Hip'),ang);
-        ang=new wsAngle(70.0,0.0,0.0);
+        ang=new wsAngle(90.0,-10.0,0.0);
         this.rotateNextPoseBone(this.findBoneIndex('Right Hip'),ang);
         
         ang=new wsAngle(-15.0,0.0,0.0);
@@ -325,10 +330,10 @@ function ModelSkeletonObject()
     {
             // testing to turn off animation
 
-        this.clearNextPose();
-        this.moveNextPoseToPrevPose();
-        
-        /*
+//        this.clearNextPose();
+//        this.walkPose1();
+//        this.moveNextPoseToPrevPose();
+
             // we just hard setup some poses here, this is
             // ALL supergumba temporary code
             
@@ -350,7 +355,7 @@ function ModelSkeletonObject()
         else {
             this.walkPose1();
         }
-        */
+
     };
 
 }

@@ -22,12 +22,12 @@ function GenModelOrganicSkeletonObject(model,genRandom)
 
             // random sizes
 
-        var footHigh=this.genRandom.randomInt(150,150);
-        var ankleHigh=footHigh+this.genRandom.randomInt(100,100);
+        var footLength=this.genRandom.randomInt(150,150);
+        var ankleHigh=this.genRandom.randomInt(100,100);
         var kneeHigh=ankleHigh+this.genRandom.randomInt(500,500);
-        var legSpread=this.genRandom.randomInt(300,200);
-        var hipHigh=kneeHigh+this.genRandom.randomInt(500,500);
-        var hipRadius=this.genRandom.randomInt(300,350);
+        var legHipHigh=kneeHigh+this.genRandom.randomInt(500,500);
+        var hipHigh=legHipHigh+this.genRandom.randomInt(200,200);
+        var hipRadius=this.genRandom.randomInt(200,250);
         var waistHigh=hipHigh+this.genRandom.randomInt(200,250);
         var torsoHigh=waistHigh+this.genRandom.randomInt(350,350);
         var torsoRadius=this.genRandom.randomInt(300,350);
@@ -37,7 +37,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var wristRadius=elbowRadius+this.genRandom.randomInt(350,350);
         var handRadius=wristRadius+this.genRandom.randomInt(100,100);
         var neckHigh=torsoTopHigh+this.genRandom.randomInt(250,150);
-        var headHigh=neckHigh+this.genRandom.randomInt(100,100)+500;
+        var headHigh=neckHigh+this.genRandom.randomInt(100,100)+400;
 
             // create bones
 
@@ -61,17 +61,17 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var leftHandBoneIdx=bones.push(new ModelBoneObject('Left Hand',leftWristBoneIdx,new wsPoint(handRadius,-torsoTopHigh,0)))-1;
         var rightHandBoneIdx=bones.push(new ModelBoneObject('Right Hand',rightWristBoneIdx,new wsPoint(-handRadius,-torsoTopHigh,0)))-1;
 
-        var leftHipBoneIdx=bones.push(new ModelBoneObject('Left Hip',hipBoneIdx,new wsPoint(hipRadius,-hipHigh,0)))-1;
-        var rightHipBoneIdx=bones.push(new ModelBoneObject('Right Hip',hipBoneIdx,new wsPoint(-hipRadius,-hipHigh,0)))-1;
+        var leftHipBoneIdx=bones.push(new ModelBoneObject('Left Hip',hipBoneIdx,new wsPoint(hipRadius,-legHipHigh,0)))-1;
+        var rightHipBoneIdx=bones.push(new ModelBoneObject('Right Hip',hipBoneIdx,new wsPoint(-hipRadius,-legHipHigh,0)))-1;
 
-        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint((hipRadius+legSpread),-kneeHigh,0)))-1;
-        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-(hipRadius+legSpread),-kneeHigh,0)))-1;
+        var leftKneeBoneIdx=bones.push(new ModelBoneObject('Left Knee',leftHipBoneIdx,new wsPoint(hipRadius,-kneeHigh,0)))-1;
+        var rightKneeBoneIdx=bones.push(new ModelBoneObject('Right Knee',rightHipBoneIdx,new wsPoint(-hipRadius,-kneeHigh,0)))-1;
 
-        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint((hipRadius+(legSpread*2)),-ankleHigh,0)))-1;
-        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-(hipRadius+(legSpread*2)),-ankleHigh,0)))-1;
+        var leftAnkleBoneIdx=bones.push(new ModelBoneObject('Left Ankle',leftKneeBoneIdx,new wsPoint(hipRadius,-ankleHigh,0)))-1;
+        var rightAnkleBoneIdx=bones.push(new ModelBoneObject('Right Ankle',rightKneeBoneIdx,new wsPoint(-hipRadius,-ankleHigh,0)))-1;
 
-        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint((hipRadius+(legSpread*2)),-footHigh,0)))-1;
-        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-(hipRadius+(legSpread*2)),-footHigh,0)))-1;
+        var leftFootBoneIdx=bones.push(new ModelBoneObject('Left Foot',leftAnkleBoneIdx,new wsPoint(hipRadius,-ankleHigh,footLength)))-1;
+        var rightFootBoneIdx=bones.push(new ModelBoneObject('Right Foot',rightAnkleBoneIdx,new wsPoint(-hipRadius,-ankleHigh,footLength)))-1;
         
             // change some wrapping gravity settings
         
@@ -84,13 +84,13 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         bones[rightElbowBoneIdx].gravityLockDistance=200;
         bones[leftWristBoneIdx].gravityLockDistance=200;
         bones[rightWristBoneIdx].gravityLockDistance=200;
-        bones[leftHandBoneIdx].gravityLockDistance=250;
-        bones[rightHandBoneIdx].gravityLockDistance=250;
+        bones[leftHandBoneIdx].gravityLockDistance=300;
+        bones[rightHandBoneIdx].gravityLockDistance=300;
         
         bones[leftHipBoneIdx].gravityLockDistance=250;
         bones[rightHipBoneIdx].gravityLockDistance=250;
-        bones[leftKneeBoneIdx].gravityLockDistance=200;
-        bones[rightKneeBoneIdx].gravityLockDistance=200;
+        bones[leftKneeBoneIdx].gravityLockDistance=250;
+        bones[rightKneeBoneIdx].gravityLockDistance=250;
         bones[leftAnkleBoneIdx].gravityLockDistance=200;
         bones[rightAnkleBoneIdx].gravityLockDistance=200;
         bones[leftFootBoneIdx].gravityLockDistance=250;

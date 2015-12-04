@@ -21,13 +21,40 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     
         // globe counts
         
-    this.GLOBE_SURFACE_COUNT=24;
+    this.GLOBE_SURFACE_COUNT=16;
     this.GLOBE_VERTEX_LIST_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-2))+2);
     this.GLOBE_INDEX_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-3))*6)+((this.GLOBE_SURFACE_COUNT*2)*3);
+    
+        //
+        // find bounds for collection
+        // collection of bones
+        //
+        
+    this.findBoundsForBoneList=function(boneList,xBound,yBound,zBound)
+    {
+        var n,pos;
+        var nBone=boneList.length;
+        
+        pos=this.model.skeleton.bones[boneList[0]].position;
+        xBound.min=xBound.max=pos.x;
+        yBound.min=yBound.max=pos.y;
+        zBound.min=zBound.max=pos.z;
+        
+        for (n=1;n<nBone;n++) {
+            pos=this.model.skeleton.bones[boneList[n]].position;
+            xBound.adjust(pos.x);
+            yBound.adjust(pos.y);
+            zBound.adjust(pos.z);
+        }
+        
+        xBound.forceMinSize(1000);
+        yBound.forceMinSize(1000);
+        zBound.forceMinSize(1000);
+    };
 
         //
         // build a large global around
-        // center of skeleton
+        // center point
         //
         
     this.buildGlobeAroundSkeleton=function(view,centerPnt,widRadius,highRadius,vertexList,indexes)
@@ -151,16 +178,17 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     };
     
         //
-        // shrink wrap the globe
+        // shrink wrap the globe around a
+        // collection of points
         //
         
-    this.shrinkWrapGlobe=function(vertexList,centerPnt)
+    this.shrinkWrapGlobe=function(vertexList,boneList,centerPnt)
     {
         var n,k;
         var v,bone,dist;
         var nVertex=vertexList.length;
         var bones=this.model.skeleton.bones;
-        var nBone=bones.length;
+        var nBone=boneList.length;
         
             // we move each vertex inwards
             // toward the center point
@@ -214,9 +242,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 moveVector.set(0,0,0);
                 
                 for (k=0;k!==nBone;k++) {
-                    bone=bones[k];
-                    if (bone.isBase()) continue;
-
+                    bone=bones[boneList[k]];
                     dist=bone.position.distance(v.position);
                     
                         // if too close, then all movement stops
@@ -265,13 +291,13 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // vertexes are attached to bones
         //
         
-    this.attachVertexToBones=function(vertexList,centerPnt)
+    this.attachVertexToBones=function(vertexList,boneList,centerPnt)
     {
         var n,k,v;
         var bone,boneIdx,d,dist;
         var nVertex=vertexList.length;
         var bones=this.model.skeleton.bones;
-        var nBone=bones.length;
+        var nBone=boneList.length;
         
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
@@ -281,17 +307,16 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             boneIdx=-1;
             
             for (k=0;k!==nBone;k++) {
-                bone=bones[k];
-                if (bone.isBase()) continue;
+                bone=bones[boneList[k]];
 
                 d=bone.position.distance(v.position);
                 if (boneIdx===-1) {
-                    boneIdx=k;
+                    boneIdx=boneList[k];
                     dist=d;
                 }
                 else {
                     if (d<dist) {
-                        boneIdx=k;
+                        boneIdx=boneList[k];
                         dist=d;
                     }
                 }
@@ -312,36 +337,27 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     };
     
         //
-        // build mesh around skeleton
+        // build around bone list
         //
-
-    this.build=function(view)
+        
+    this.buildAroundBoneList=function(view,boneNames,vertexList,indexes)
     {
         var n;
-
-            // build the vertex list for the model vertexes
         
-        var vertexList=[];
-        
-        for (n=0;n!==this.GLOBE_VERTEX_LIST_COUNT;n++) {
-            vertexList.push(new ModelMeshVertexObject());
+            // create indexes of bones
+            
+        var boneList=[];
+        for (n=0;n!==boneNames.length;n++) {
+            boneList.push(this.model.skeleton.findBoneIndex(boneNames[n]));
         }
         
-            // the indexes for the triangles
+            // find the bounds for this list of bones
             
-        var indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
-        
-            // get skeleton center
-            // and size, leave the size a bit
-            // bigger than the entire skeleton
-            // so globe gets wraps properly around
-            // outer bones
-        
         var xBound=new wsBound(0,0);
         var yBound=new wsBound(0,0);
         var zBound=new wsBound(0,0);
         
-        this.model.skeleton.getBounds(xBound,yBound,zBound);
+        this.findBoundsForBoneList(boneList,xBound,yBound,zBound);
         
         var widRadius=xBound.getSize();
         if (zBound.getSize()>widRadius) widRadius=zBound.getSize();
@@ -349,22 +365,116 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
         var highRadius=Math.floor(yBound.getSize()*0.75);
         
-        var centerPnt=this.model.skeleton.getCenter();
+        var centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // build the globe and shrink
             // wrap it to bones
         
         this.buildGlobeAroundSkeleton(view,centerPnt,widRadius,highRadius,vertexList,indexes);
-        this.shrinkWrapGlobe(vertexList,centerPnt);
-        this.attachVertexToBones(vertexList,centerPnt);
+        this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
+        this.attachVertexToBones(vertexList,boneList,centerPnt);
         
             // complete the tangent space vectors
         
         meshUtility.buildVertexListTangents(vertexList,indexes);
+    };
+    
+        //
+        // build mesh around skeleton
+        //
+
+    this.build=function(view)
+    {
+        var modelVertexList,modelIndexes;
+        var indexOffset;
         
+            // build the vertex list for the body
+        
+        var vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+        var indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            
+        this.buildAroundBoneList(view,['Hip','Waist','Torso','Torso Top','Neck'],vertexList,indexes);
+        
+        meshUtility.transformUVs(vertexList,0.5,0.0,0.5,0.5);
+        
+        modelVertexList=vertexList;
+        modelIndexes=indexes;
+        
+        indexOffset=modelVertexList.length;
+        
+            // build the head
+
+        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            
+        this.buildAroundBoneList(view,['Head'],vertexList,indexes);
+        
+        meshUtility.transformUVs(vertexList,0.0,0.5,0.5,0.5);
+            
+        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+        
+        indexOffset=modelVertexList.length;
+        
+            // left arm
+
+        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            
+        this.buildAroundBoneList(view,['Left Shoulder','Left Elbow','Left Wrist','Left Hand'],vertexList,indexes);
+        
+        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+            
+        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+        
+        indexOffset=modelVertexList.length;
+        
+            // right arm
+
+        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            
+        this.buildAroundBoneList(view,['Right Shoulder','Right Elbow','Right Wrist','Right Hand'],vertexList,indexes);
+        
+        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+            
+        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+        
+        indexOffset=modelVertexList.length;
+        
+            // left foot
+
+        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            
+        this.buildAroundBoneList(view,['Left Hip','Left Knee','Left Ankle','Left Foot'],vertexList,indexes);
+        
+        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+            
+        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+        
+        indexOffset=modelVertexList.length;
+        
+            // right foot
+
+        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            
+        this.buildAroundBoneList(view,['Right Hip','Right Knee','Right Ankle','Right Foot'],vertexList,indexes);
+        
+        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+            
+        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+        
+        indexOffset=modelVertexList.length;
+
             // add mesh to model
             
-        this.model.mesh=new ModelMeshObject(bitmap,vertexList,indexes,0);
+        this.model.mesh=new ModelMeshObject(bitmap,modelVertexList,modelIndexes,0);
         this.model.mesh.setupBuffers(view);
     };
     

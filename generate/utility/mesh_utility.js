@@ -7,7 +7,7 @@
 function MeshUtilityObject()
 {
         //
-        // utility to create vertex list of certain size
+        // utility to create vertex lists
         //
         
     this.createMapVertexList=function(nVertex)
@@ -20,6 +20,55 @@ function MeshUtilityObject()
         }
         
         return(vertexList);
+    };
+    
+    this.createModelVertexList=function(nVertex)
+    {
+        var n;
+        var vertexList=[];
+        
+        for (n=0;n!==nVertex;n++) {
+            vertexList.push(new ModelMeshVertexObject());
+        }
+        
+        return(vertexList);
+    };
+    
+        //
+        // combine vertex lists and indexes
+        //
+    
+    this.combineVertexLists=function(vertexList1,vertexList2)
+    {
+        var n;
+        var vertexList=[];
+        
+        for (n=0;n!==vertexList1.length;n++) {
+            vertexList.push(vertexList1[n]);
+        }
+        for (n=0;n!==vertexList2.length;n++) {
+            vertexList.push(vertexList2[n]);
+        }
+        
+        return(vertexList);
+    };
+    
+    this.combineIndexes=function(indexes1,indexes2,index2Offset)
+    {
+        var n;
+        var indexes=new Uint16Array(indexes1.length+indexes2.length);
+        
+        var idx=0;
+        
+        for (n=0;n!==indexes1.length;n++) {
+            indexes[idx++]=indexes1[n];
+        }
+        
+        for (n=0;n!==indexes2.length;n++) {
+            indexes[idx++]=indexes2[n]+index2Offset;
+        }
+        
+        return(indexes);
     };
         
         //
@@ -184,6 +233,24 @@ function MeshUtilityObject()
             v=vertexList[n];
             v.uv.x-=minIntX;
             v.uv.y-=minIntY;
+        }
+    };
+    
+        //
+        // transform UVs
+        //
+        
+    this.transformUVs=function(vertexList,uAdd,vAdd,uReduce,vReduce)
+    {
+        var n,nVertex;
+        var v;
+        
+        nVertex=vertexList.length;
+        
+        for (n=0;n!==nVertex;n++) {
+            v=vertexList[n];
+            v.uv.x=(v.uv.x*uReduce)+uAdd;
+            v.uv.y=(v.uv.y*vReduce)+vAdd;
         }
     };
 

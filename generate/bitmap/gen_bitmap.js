@@ -773,8 +773,8 @@ function GenBitmapObject(genRandom)
         var wid=rgt-lft;
         var high=bot-top;
 
-        var faceX=lft+Math.floor((wid*2)/10);
-        var faceWid=Math.floor((wid*8)/10);
+        var faceWid=Math.floor(wid*0.5);
+        var faceX=Math.floor(faceWid*0.1);
 
             // eyes
 
@@ -836,9 +836,7 @@ function GenBitmapObject(genRandom)
         this.genBitmapUtility.clearNormalsRect(normalCTX,lft,top,rgt,bot);
 
         this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,clothColor);
-        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0.7,0.75,0.5);
-        return; // supergumba -- testing
-        
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0.7,0.75,0.5);        
         this.genBitmapUtility.drawColorStripeVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,0.2,clothColor);
 
         markCount=this.genRandom.randomInt(40,60);
@@ -851,69 +849,32 @@ function GenBitmapObject(genRandom)
             mHigh=this.genRandom.randomInt(50,20);
             x=lft+this.genRandom.randomInt(0,(wid-mWid));
             y=top+this.genRandom.randomInt(0,(high-mHigh));
-            this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,bitmapWid,bitmapHigh,x,y,mWid,mHigh,10,0.9,0.6,true);
+            this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,bitmapWid,bitmapHigh,x,y,mWid,mHigh,20,0.9,0.6,true);
         }
     };
 
     this.generateSkin=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var lft,top,rgt,bot;
+        var midX=Math.floor(wid*0.5);
+        var midY=Math.floor(high*0.5);
         
         var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.5);
-
+        var clothColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.6);
+        
             // clear canvases
 
         this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
-            // general skin texture
+            // chunks
 
-        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,0,wid,high,0.8,0.8);
-        //this.generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high);
+        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,0,midX,midY,0.8,0.8);
+        this.generateClothChunk(bitmapCTX,normalCTX,wid,high,clothColor,midX,0,wid,midY);
         
-            // cloth part
+        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,midY,midX,high,0.8,0.8);
+        this.generateFaceChunk(bitmapCTX,normalCTX,0,midY,midX,high);
         
-        if (this.genRandom.random()>=0.25) {
-        
-                // pants
-                
-            var pantsColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.6);
-            var pantsLen=0.7+(this.genRandom.random()*0.25);
-                
-            top=Math.floor(high*0.5);
-            bot=Math.floor(high*pantsLen);
-            this.generateClothChunk(bitmapCTX,normalCTX,wid,high,pantsColor,0,top,wid,bot);
-            
-            if (this.genRandom.random()>=0.35) {
-
-                    // shirt
-
-                var shirtColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.6);
-
-                lft=Math.floor(wid*0.1);
-                rgt=Math.floor(wid*0.4);
-
-                top=Math.floor(high*0.15);
-                bot=Math.floor(high*0.5);
-
-                this.generateClothChunk(bitmapCTX,normalCTX,wid,high,shirtColor,lft,top,rgt,bot);
-
-                lft=Math.floor(wid*0.6);
-                rgt=Math.floor(wid*0.9);
-
-                this.generateClothChunk(bitmapCTX,normalCTX,wid,high,shirtColor,lft,top,rgt,bot);
-            }
-        }
-        
-            // face part
-            
-        lft=Math.floor(wid*0.1);
-        rgt=Math.floor(wid*0.4);
-        
-        top=0;
-        bot=Math.floor(high*0.15);
-        
-        this.generateFaceChunk(bitmapCTX,normalCTX,lft,top,rgt,bot);
+        //this.genBitmapUtility.drawUVTest(bitmapCTX,0,midY,midX,high);
 
             // finish with the specular
 
