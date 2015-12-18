@@ -95,6 +95,10 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         bones[rightAnkleBoneIdx].gravityLockDistance=200;
         bones[leftFootBoneIdx].gravityLockDistance=250;
         bones[rightFootBoneIdx].gravityLockDistance=250;
+        
+            // finally setup the bones for animation
+            
+        this.model.skeleton.precalcAnimationValues();
      };
     
 }

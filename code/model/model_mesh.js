@@ -10,7 +10,9 @@ function ModelMeshVertexObject()
     this.normal=new wsPoint(0.0,0.0,0.0);
     this.tangent=new wsPoint(0.0,0.0,0.0);
     this.uv=new ws2DPoint(0.0,0.0);
+    
     this.boneIdx=-1;
+    this.vectorFromBone=new wsPoint(0.0,0.0,0.0);
 }
 
 //
@@ -69,13 +71,31 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     };
     
         //
+        // precalcs the vector from the bone animations
+        //
+        
+    this.precalcAnimationValues=function(skeleton)
+    {
+        var n,v,bone;
+
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            bone=skeleton.bones[v.boneIdx];
+            
+            v.vectorFromBone.setFromSubPoint(v.position,bone.position);
+        }
+    };
+    
+        //
         // set vertices to pose and model position
         //
         
     this.updateVertexesToPoseAndPosition=function(view,skeleton,offsetPosition)
     {
         var n,v;
-        var bone,pos,normal;
+        var bone,normal;
+        
+        var rotVector=new wsPoint(0.0,0.0,0.0);
         
             // move all the vertexes
             
@@ -89,12 +109,12 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             v=this.vertexList[n];
             bone=skeleton.bones[v.boneIdx];
             
-            pos=v.position.copy();
-            pos.rotateAroundPoint(bone.position,bone.curPoseAngle);
+            rotVector.setFromPoint(v.vectorFromBone);
+            rotVector.rotateAroundPoint(null,bone.curPoseAngle);
             
-            vertices[vIdx++]=pos.x+bone.curPoseVector.x+offsetPosition.x;
-            vertices[vIdx++]=pos.y+bone.curPoseVector.y+offsetPosition.y;
-            vertices[vIdx++]=pos.z+bone.curPoseVector.z+offsetPosition.z;
+            vertices[vIdx++]=bone.curPosePosition.x+rotVector.x+offsetPosition.x;
+            vertices[vIdx++]=bone.curPosePosition.y+rotVector.y+offsetPosition.y;
+            vertices[vIdx++]=bone.curPosePosition.z+rotVector.z+offsetPosition.z;
             
             normal=v.normal.copy();
             normal.rotateAroundPoint(null,bone.curPoseAngle);

@@ -46,5 +46,8 @@ REGULAR TODOs
     [X] temp testing -- need to get legs back into default pose for walking
     [ ] debug need to use pose positions
     [X] eventually get rid of bone "is" functions (leave base)
+    [X] tweeing must be between angles -- delete all that other stuff!
+    [X] need to create children list so we don't have to search entire bone list, and base index
+    [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
 
 

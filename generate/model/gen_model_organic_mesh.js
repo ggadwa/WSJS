@@ -476,6 +476,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             
         this.model.mesh=new ModelMeshObject(bitmap,modelVertexList,modelIndexes,0);
         this.model.mesh.setupBuffers(view);
+        this.model.mesh.precalcAnimationValues(this.model.skeleton);
     };
     
 }

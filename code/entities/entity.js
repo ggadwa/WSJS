@@ -211,7 +211,7 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
         
             // create pose and vertexes
             
-        this.model.skeleton.tweenCurrentPose(factor);
+        this.model.skeleton.animate(factor);
         this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.position);
         
             // draw the model
