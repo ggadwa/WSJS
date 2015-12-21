@@ -232,7 +232,7 @@ function ModelSkeletonObject()
     
     this.rotatePoseBoneRecursive=function(boneIdx,ang)
     {
-        var n,bone,parentBone,childBone;
+        var n,bone,parentBone;
         
             // get the bone
             
@@ -262,7 +262,7 @@ function ModelSkeletonObject()
         
             // set the bone's angle
             
-        bone.curPoseAngle.setFromPoint(ang);
+        bone.curPoseAngle.setFromPoint(nextAng);
         
             // now move all children
         

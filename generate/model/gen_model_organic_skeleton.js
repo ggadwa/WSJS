@@ -21,20 +21,23 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var bones=this.model.skeleton.bones;
 
             // random sizes
+            
+        var legLength=this.genRandom.randomInt(500,500);
+        var armLength=this.genRandom.randomInt(350,350);
 
         var footLength=this.genRandom.randomInt(150,150);
         var ankleHigh=this.genRandom.randomInt(100,100);
-        var kneeHigh=ankleHigh+this.genRandom.randomInt(500,500);
-        var legHipHigh=kneeHigh+this.genRandom.randomInt(500,500);
-        var hipHigh=legHipHigh+this.genRandom.randomInt(200,200);
+        var kneeHigh=ankleHigh+legLength;
+        var legHipHigh=kneeHigh+legLength;
+        var hipHigh=legHipHigh;
         var hipRadius=this.genRandom.randomInt(200,250);
         var waistHigh=hipHigh+this.genRandom.randomInt(200,250);
         var torsoHigh=waistHigh+this.genRandom.randomInt(350,350);
         var torsoRadius=this.genRandom.randomInt(300,350);
         var torsoTopHigh=torsoHigh+this.genRandom.randomInt(250,250);
-        var shoulderRadius=torsoRadius+this.genRandom.randomInt(150,150);
-        var elbowRadius=shoulderRadius+this.genRandom.randomInt(350,350);
-        var wristRadius=elbowRadius+this.genRandom.randomInt(350,350);
+        var shoulderRadius=torsoRadius;
+        var elbowRadius=shoulderRadius+armLength;
+        var wristRadius=elbowRadius+armLength;
         var handRadius=wristRadius+this.genRandom.randomInt(100,100);
         var neckHigh=torsoTopHigh+this.genRandom.randomInt(250,150);
         var headHigh=neckHigh+this.genRandom.randomInt(100,100)+400;

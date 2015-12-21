@@ -4,6 +4,14 @@
 // helper class for globe shrinking
 //
 
+function GenModelOrganicBoneObject()
+{
+    this.idx=-1;
+    this.position=null;
+    this.gravityLockDistance=0;
+    this.gravityPullDistance=0;
+}
+
 function GenModelOrganicMeshVertexShrinkObject(moveVector)
 {
     this.moving=true;
@@ -35,13 +43,13 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var n,pos;
         var nBone=boneList.length;
         
-        pos=this.model.skeleton.bones[boneList[0]].position;
+        pos=boneList[0].position;
         xBound.min=xBound.max=pos.x;
         yBound.min=yBound.max=pos.y;
         zBound.min=zBound.max=pos.z;
         
         for (n=1;n<nBone;n++) {
-            pos=this.model.skeleton.bones[boneList[n]].position;
+            pos=boneList[n].position;
             xBound.adjust(pos.x);
             yBound.adjust(pos.y);
             zBound.adjust(pos.z);
@@ -187,7 +195,6 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var n,k;
         var v,bone,dist;
         var nVertex=vertexList.length;
-        var bones=this.model.skeleton.bones;
         var nBone=boneList.length;
         
             // we move each vertex inwards
@@ -242,7 +249,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 moveVector.set(0,0,0);
                 
                 for (k=0;k!==nBone;k++) {
-                    bone=bones[boneList[k]];
+                    bone=boneList[k];
                     dist=bone.position.distance(v.position);
                     
                         // if too close, then all movement stops
@@ -307,16 +314,17 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             boneIdx=-1;
             
             for (k=0;k!==nBone;k++) {
-                bone=bones[boneList[k]];
+                bone=boneList[k];
+                if (bone.idx===-1) continue;        // this is a temp bone, skip it
 
                 d=bone.position.distance(v.position);
                 if (boneIdx===-1) {
-                    boneIdx=boneList[k];
+                    boneIdx=boneList[k].idx;
                     dist=d;
                 }
                 else {
                     if (d<dist) {
-                        boneIdx=boneList[k];
+                        boneIdx=boneList[k].idx;
                         dist=d;
                     }
                 }
@@ -342,13 +350,68 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
     this.buildAroundBoneList=function(view,boneNames,vertexList,indexes)
     {
-        var n;
+        var n,k,f,boneIdx,bone,parentBone,listBone;
+        var parentListIdx;
         
-            // create indexes of bones
+            // create list of bones
             
         var boneList=[];
-        for (n=0;n!==boneNames.length;n++) {
-            boneList.push(this.model.skeleton.findBoneIndex(boneNames[n]));
+        var boneCount=boneNames.length;
+        
+        for (n=0;n!==boneCount;n++) {
+            boneIdx=this.model.skeleton.findBoneIndex(boneNames[n]);
+            bone=this.model.skeleton.bones[boneIdx];
+            
+            listBone=new GenModelOrganicBoneObject();
+            listBone.idx=boneIdx;
+            listBone.position=bone.position.copy();
+            listBone.gravityLockDistance=bone.gravityLockDistance;
+            listBone.gravityPullDistance=bone.gravityPullDistance;
+            
+            boneList.push(listBone);
+        }
+        
+            // if any bone in the list is a parent of
+            // another bone in the list, then add some
+            // temp bones to smooth out the shrink wrapping
+            
+        for (n=0;n!==boneCount;n++) {
+            bone=this.model.skeleton.bones[boneList[n].idx];
+            
+                // parented in this list?
+                
+            parentListIdx=-1;
+            
+            for (k=0;k!==boneCount;k++) {
+                if (bone.parentBoneIdx===boneList[k].idx) {
+                    parentListIdx=k;
+                    break;
+                }
+            }
+            
+            if (parentListIdx===-1) continue;
+            
+                // create temp bones
+             
+            parentBone=this.model.skeleton.bones[bone.parentBoneIdx];
+            
+            for (k=1;k!==3;k++) {
+                f=k/3;
+                
+                listBone=new GenModelOrganicBoneObject();
+                listBone.idx=-1;
+                
+                listBone.position=new wsPoint(0,0,0);
+                
+                listBone.position.x=bone.position.x+((parentBone.position.x-bone.position.x)*f);
+                listBone.position.y=bone.position.y+((parentBone.position.y-bone.position.y)*f);
+                listBone.position.z=bone.position.z+((parentBone.position.z-bone.position.z)*f);
+                
+                listBone.gravityLockDistance=bone.gravityLockDistance+((parentBone.gravityLockDistance-bone.gravityLockDistance)*f);
+                listBone.gravityPullDistance=bone.gravityPullDistance+((parentBone.gravityPullDistance-bone.gravityPullDistance)*f);
+                
+                boneList.push(listBone);
+            }
         }
         
             // find the bounds for this list of bones
@@ -393,7 +456,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
         var indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
             
-        this.buildAroundBoneList(view,['Hip','Waist','Torso','Torso Top','Neck'],vertexList,indexes);
+        this.buildAroundBoneList(view,['Hip','Waist','Torso','Torso Top'],vertexList,indexes);
         
         meshUtility.transformUVs(vertexList,0.5,0.0,0.5,0.5);
         
@@ -407,7 +470,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
         indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
             
-        this.buildAroundBoneList(view,['Head'],vertexList,indexes);
+        this.buildAroundBoneList(view,['Head','Neck'],vertexList,indexes);
         
         meshUtility.transformUVs(vertexList,0.0,0.5,0.5,0.5);
             
