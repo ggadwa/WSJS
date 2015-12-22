@@ -49,6 +49,6 @@ REGULAR TODOs
     [X] tweeing must be between angles -- delete all that other stuff!
     [X] need to create children list so we don't have to search entire bone list, and base index
     [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
-    [ ] when doing shrink wrap, create array of BONE objects, and then next make temp bone objects along the skeletal line that have scaled values between the other two bones
+    [X] when doing shrink wrap, create array of BONE objects, and then next make temp bone objects along the skeletal line that have scaled values between the other two bones
 
 

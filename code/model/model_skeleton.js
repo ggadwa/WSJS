@@ -57,6 +57,18 @@ function ModelSkeletonObject()
     
     this.baseBoneIdx=0;
     
+        // lists of bones that are
+        // used for animation and
+        // mesh building
+        
+    this.headsBoneList=[];
+    this.bodiesBoneList=[];
+    this.limbsBoneList=[];
+    
+        // animations
+        
+    this.lastAnimationTick=0;
+    
         //
         // close skeleton
         //
@@ -82,6 +94,15 @@ function ModelSkeletonObject()
             skeleton.bones.push(new ModelBoneObject(bone.name,bone.parentBoneIdx,bone.position));
         }
         
+            // these list can just be copied,
+            // they are read only
+            
+        skeleton.headsBoneList=this.headsBoneList;
+        skeleton.bodiesBoneList=this.bodiesBoneList;
+        skeleton.limbsBoneList=this.limbsBoneList;
+        
+            // recalc the bone animation values
+            
         skeleton.precalcAnimationValues();
         
         return(skeleton);
@@ -273,10 +294,14 @@ function ModelSkeletonObject()
         }
     };
     
-    this.animate=function(factor)
+    this.animate=function(view)
     {
         var n,bone;
         var nBone=this.bones.length;
+        
+            // the current factor
+            
+        var factor=((this.lastAnimationTick-view.timeStamp)%3000)/3000;
 
             // tween the current angles
             
@@ -296,65 +321,52 @@ function ModelSkeletonObject()
     
     // supergumba -- testing
     
-    this.walkPose1=function()
+    this.randomNextPose=function(view)
     {
-        this.clearNextPose();
+        var n,k,boneIndexList;
+        var r,x,z;
         
-        this.findBone('Left Hip').nextPoseAngle=new wsAngle(70.0,-10.0,0.0);
-        this.findBone('Right Hip').nextPoseAngle=new wsAngle(-40.0,-10.0,0.0);
+        for (n=0;n!==this.limbsBoneList.length;n++) {
+            boneIndexList=this.limbsBoneList[n];
+            
+            r=view.genRandom.randomInBetween(-70.0,140.0);
+            
+            if (view.genRandom.random()>0.5) {
+                x=r;
+                z=0.0;
+            }
+            else {
+                x=0.0;
+                z=r;
+            }
+            
+            for (k=0;k!==boneIndexList.length;k++) {
+                this.bones[boneIndexList[k]].nextPoseAngle.set(x,0.0,z);
+                x*=0.75;
+                z*=0.75;
+            }
         
-        this.findBone('Left Knee').nextPoseAngle=new wsAngle(-40.0,0.0,0.0);
-        this.findBone('Right Knee').nextPoseAngle=new wsAngle(-50.0,0.0,0.0);
-        
-        this.findBone('Left Shoulder').nextPoseAngle=new wsAngle(0.0,0.0,20.0);
-        this.findBone('Right Shoulder').nextPoseAngle=new wsAngle(0.0,0.0,20.0);
-        
-        this.findBone('Left Elbow').nextPoseAngle=new wsAngle(0.0,0.0,40.0);
-        this.findBone('Right Elbow').nextPoseAngle=new wsAngle(0.0,0.0,40.0);
+        }
     };
     
-    this.walkPose2=function()
+    this.randomPose=function(view)
     {
-        this.clearNextPose();
-        
-        this.findBone('Left Hip').nextPoseAngle=new wsAngle(-40.0,-10.0,0.0);
-        this.findBone('Right Hip').nextPoseAngle=new wsAngle(70.0,-10.0,0.0);
-        
-        this.findBone('Left Knee').nextPoseAngle=new wsAngle(-50.0,0.0,0.0);
-        this.findBone('Right Knee').nextPoseAngle=new wsAngle(-40.0,0.0,0.0);
-    };
-    
-    this.walkPose=function(flip)
-    {
-            // testing to turn off animation
-
-//        this.clearNextPose();
-//        this.walkPose1();
-//        this.moveNextPoseToPrevPose();
-//        return;
-
-            // we just hard setup some poses here, this is
-            // ALL supergumba temporary code
+            // time for a new pose?
             
-            // create the previous pose
+        if (view.timeStamp<this.lastAnimationTick) return;
+        
+            // next pose 3 seconds away (testing)
             
-        if (flip) {
-            this.walkPose1();
-        }
-        else {
-            this.walkPose2();
-        }
+        this.lastAnimationTick=view.timeStamp+3000;
+        
+            // move current next pose to last pose
+            
         this.moveNextPoseToPrevPose();
         
-            // and the opposite for the next pose
-            
-        if (flip) {
-            this.walkPose2();
-        }
-        else {
-            this.walkPose1();
-        }
+            // construct new pose
 
+        this.clearNextPose();
+        this.randomNextPose(view);
     };
 
 }

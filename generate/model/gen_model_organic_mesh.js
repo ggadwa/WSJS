@@ -348,7 +348,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // build around bone list
         //
         
-    this.buildAroundBoneList=function(view,boneNames,vertexList,indexes)
+    this.buildAroundBoneList=function(view,skeletonBoneIndexes,vertexList,indexes)
     {
         var n,k,f,boneIdx,bone,parentBone,listBone;
         var parentListIdx;
@@ -356,10 +356,10 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // create list of bones
             
         var boneList=[];
-        var boneCount=boneNames.length;
+        var boneCount=skeletonBoneIndexes.length;
         
         for (n=0;n!==boneCount;n++) {
-            boneIdx=this.model.skeleton.findBoneIndex(boneNames[n]);
+            boneIdx=skeletonBoneIndexes[n];
             bone=this.model.skeleton.bones[boneIdx];
             
             listBone=new GenModelOrganicBoneObject();
@@ -448,93 +448,81 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
 
     this.build=function(view)
     {
-        var modelVertexList,modelIndexes;
+        var n;
         var indexOffset;
         
-            // build the vertex list for the body
-        
-        var vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-        var indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
-            
-        this.buildAroundBoneList(view,['Hip','Waist','Torso','Torso Top'],vertexList,indexes);
-        
-        meshUtility.transformUVs(vertexList,0.5,0.0,0.5,0.5);
-        
-        modelVertexList=vertexList;
-        modelIndexes=indexes;
-        
-        indexOffset=modelVertexList.length;
-        
-            // build the head
+        var skeleton=this.model.skeleton;
 
-        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+        var vertexList,indexes;
+        var modelVertexList=null;
+        var modelIndexes=null;
+        
+            // heads
             
-        this.buildAroundBoneList(view,['Head','Neck'],vertexList,indexes);
-        
-        meshUtility.transformUVs(vertexList,0.0,0.5,0.5,0.5);
-            
-        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
-        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
-        
-        indexOffset=modelVertexList.length;
-        
-            // left arm
+        for (n=0;n!==skeleton.headsBoneList.length;n++) {
+            vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+            indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
 
-        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
-            
-        this.buildAroundBoneList(view,['Left Shoulder','Left Elbow','Left Wrist','Left Hand'],vertexList,indexes);
-        
-        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
-            
-        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
-        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
-        
-        indexOffset=modelVertexList.length;
-        
-            // right arm
+            this.buildAroundBoneList(view,skeleton.headsBoneList[n],vertexList,indexes);
 
-        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
-            
-        this.buildAroundBoneList(view,['Right Shoulder','Right Elbow','Right Wrist','Right Hand'],vertexList,indexes);
-        
-        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
-            
-        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
-        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
-        
-        indexOffset=modelVertexList.length;
-        
-            // left foot
+            meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
 
-        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            if (modelVertexList===null) {
+                modelVertexList=vertexList;
+                modelIndexes=indexes;
+            }
+            else {
+                modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+                modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+            }
             
-        this.buildAroundBoneList(view,['Left Hip','Left Knee','Left Ankle','Left Foot'],vertexList,indexes);
+            indexOffset=modelVertexList.length;
+        }
         
-        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+            // bodies
             
-        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
-        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
-        
-        indexOffset=modelVertexList.length;
-        
-            // right foot
+        for (n=0;n!==skeleton.bodiesBoneList.length;n++) {
+            vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+            indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
 
-        vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-        indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
-            
-        this.buildAroundBoneList(view,['Right Hip','Right Knee','Right Ankle','Right Foot'],vertexList,indexes);
-        
-        meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
-            
-        modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
-        modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
-        
-        indexOffset=modelVertexList.length;
+            this.buildAroundBoneList(view,skeleton.bodiesBoneList[n],vertexList,indexes);
 
+            meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+
+            if (modelVertexList===null) {
+                modelVertexList=vertexList;
+                modelIndexes=indexes;
+            }
+            else {
+                modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+                modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+            }
+            
+            indexOffset=modelVertexList.length;
+        }
+        
+            // limbs
+            
+        for (n=0;n!==skeleton.limbsBoneList.length;n++) {
+            vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
+            indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+
+            this.buildAroundBoneList(view,skeleton.limbsBoneList[n],vertexList,indexes);
+
+            meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+
+            if (modelVertexList===null) {
+                modelVertexList=vertexList;
+                modelIndexes=indexes;
+            }
+            else {
+                modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
+                modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
+            }
+            
+            indexOffset=modelVertexList.length;
+        }
+        
             // add mesh to model
             
         this.model.mesh=new ModelMeshObject(bitmap,modelVertexList,modelIndexes,0);

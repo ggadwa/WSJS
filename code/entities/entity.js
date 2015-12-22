@@ -201,17 +201,16 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
 
     this.draw=function(view)
     {
-            // time for a new pose?
             // supergumba -- random testing right now
             
-        var flip=(((Math.floor(view.timeStamp/3000))&0x1)===0);
-        this.model.skeleton.walkPose(flip);
-        
-        var factor=(view.timeStamp%3000)/3000;
-        
-            // create pose and vertexes
+            // create current pose
             
-        this.model.skeleton.animate(factor);
+        this.model.skeleton.randomPose(view);
+        this.model.skeleton.animate(view);
+       
+            // move vertexes to reflect the pose
+            // and position in map
+            
         this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.position);
         
             // draw the model

@@ -78,8 +78,13 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         
             // change some wrapping gravity settings
         
-        bones[headBoneIdx].gravityLockDistance=500;
-        bones[neckBoneIdx].gravityLockDistance=150;
+        bones[headBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,200);
+        bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(50,100);
+        
+        bones[hipBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
+        bones[waistBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
+        bones[torsoBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
+        bones[torsoTopBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
             
         bones[leftShoulderBoneIdx].gravityLockDistance=250;
         bones[rightShoulderBoneIdx].gravityLockDistance=250;
@@ -98,6 +103,16 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         bones[rightAnkleBoneIdx].gravityLockDistance=200;
         bones[leftFootBoneIdx].gravityLockDistance=250;
         bones[rightFootBoneIdx].gravityLockDistance=250;
+        
+            // setup the heads, bodies, and limbs
+        
+        this.model.skeleton.headsBoneList.push([headBoneIdx,neckBoneIdx]);
+        this.model.skeleton.bodiesBoneList.push([hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
+            
+        this.model.skeleton.limbsBoneList.push([leftShoulderBoneIdx,leftElbowBoneIdx,leftWristBoneIdx,leftHandBoneIdx]);
+        this.model.skeleton.limbsBoneList.push([rightShoulderBoneIdx,rightElbowBoneIdx,rightWristBoneIdx,rightHandBoneIdx]);
+        this.model.skeleton.limbsBoneList.push([leftHipBoneIdx,leftKneeBoneIdx,leftAnkleBoneIdx,leftFootBoneIdx]);
+        this.model.skeleton.limbsBoneList.push([rightHipBoneIdx,rightKneeBoneIdx,rightAnkleBoneIdx,rightFootBoneIdx]);
         
             // finally setup the bones for animation
             
