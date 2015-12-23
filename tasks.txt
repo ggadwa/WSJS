@@ -7,6 +7,7 @@ EMCA6 TODOs
     [ ] move in the genBitmapObject constants to class based statics
     [ ] modulize the code
     [ ] use Math.trunc when possible instead of Math.floor
+    [ ] new ModelLimbObject needs to pass in constant instead of #
 
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
@@ -21,6 +22,11 @@ FUTURE TODOs
     [ ] create and save projects in indexedDB
 
 REGULAR TODOs
+
+[ ] speed ups
+     [ ] shared triangle reduction
+     [ ] model creation
+     [ ] light map generation
 
 [ ] need to deal with pausing time stamps
 
@@ -50,5 +56,6 @@ REGULAR TODOs
     [X] need to create children list so we don't have to search entire bone list, and base index
     [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
     [X] when doing shrink wrap, create array of BONE objects, and then next make temp bone objects along the skeletal line that have scaled values between the other two bones
+    [ ] ModelLimbObject needs constants passed in but can't do it until we get classes
 
 

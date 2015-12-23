@@ -251,7 +251,7 @@ function wsInitBuildLightmapFinish()
     var modelGenRandom=new GenRandomObject(settings.randomSeedModel);
     
     view.loadingScreenUpdate();
-    view.loadingScreenAddString('Building Models');
+    view.loadingScreenAddString('Generating Dynamic Models');
     view.loadingScreenDraw(null);
 
     setTimeout(function() { wsInitBuildModels(0,textureGenRandom,modelGenRandom); },10);
@@ -260,6 +260,8 @@ function wsInitBuildLightmapFinish()
 function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
 {
     var model,genSkeleton,genModelMesh;
+    
+    console.log(idx);
     
         // get a model texture
         
@@ -298,7 +300,7 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
         // next step
         
     view.loadingScreenUpdate();
-    view.loadingScreenAddString('Building Entities');
+    view.loadingScreenAddString('Generating Dynamic Entities');
     view.loadingScreenDraw(null);
     
     setTimeout(wsInitBuildEntities,10);

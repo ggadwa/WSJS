@@ -70,7 +70,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             if (mesh.flag!==this.map.MESH_FLAG_ROOM_WALL) continue;
 
             for (t1=0;t1!==mesh.trigCount;t1++) {
-
+                
                 if (!mesh.isTriangleStraightWall(t1)) continue;
                 bounds=mesh.getTriangleBounds(t1);
 

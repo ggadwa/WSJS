@@ -457,57 +457,13 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var modelVertexList=null;
         var modelIndexes=null;
         
-            // heads
+            // wrap all the limbs
             
-        for (n=0;n!==skeleton.headsBoneList.length;n++) {
+        for (n=0;n!==skeleton.limbs.length;n++) {
             vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
             indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
 
-            this.buildAroundBoneList(view,skeleton.headsBoneList[n],vertexList,indexes);
-
-            meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
-
-            if (modelVertexList===null) {
-                modelVertexList=vertexList;
-                modelIndexes=indexes;
-            }
-            else {
-                modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
-                modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
-            }
-            
-            indexOffset=modelVertexList.length;
-        }
-        
-            // bodies
-            
-        for (n=0;n!==skeleton.bodiesBoneList.length;n++) {
-            vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-            indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
-
-            this.buildAroundBoneList(view,skeleton.bodiesBoneList[n],vertexList,indexes);
-
-            meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
-
-            if (modelVertexList===null) {
-                modelVertexList=vertexList;
-                modelIndexes=indexes;
-            }
-            else {
-                modelVertexList=meshUtility.combineVertexLists(modelVertexList,vertexList);
-                modelIndexes=meshUtility.combineIndexes(modelIndexes,indexes,indexOffset);
-            }
-            
-            indexOffset=modelVertexList.length;
-        }
-        
-            // limbs
-            
-        for (n=0;n!==skeleton.limbsBoneList.length;n++) {
-            vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-            indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
-
-            this.buildAroundBoneList(view,skeleton.limbsBoneList[n],vertexList,indexes);
+            this.buildAroundBoneList(view,skeleton.limbs[n].boneIndexes,vertexList,indexes);
 
             meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
 

@@ -8,7 +8,7 @@ function SettingsObject()
 {
         // room construction
         
-    this.roomMaxCount=1;                       // the maximum possible number of rooms in the map
+    this.roomMaxCount=25;                       // the maximum possible number of rooms in the map
     
     this.roomMaxRecursion=3;                    // how far down you will recurse to make rooms off a single room
     
@@ -18,7 +18,7 @@ function SettingsObject()
     this.roomConnectionPercentage=0.25;             // what % of the time a connection in a room spawns another room
     this.roomLevelChangePercentage=0.8;             // what % of the time a room gains another story
     
-    this.roomPlatforms=false;                   // turns on or off platforms
+    this.roomPlatforms=true;                   // turns on or off platforms
     
         // lighting
     
@@ -38,15 +38,15 @@ function SettingsObject()
     
         // decorations
         
-    this.decorations=false;                     // set to false for no decorations in the map
+    this.decorations=true;                     // set to false for no decorations in the map
 
         // models
         
-    this.modelMonsterCount=1;
+    this.modelMonsterCount=5;
 
         // entities
         
-    this.monsterEntityCount=1;
+    this.monsterEntityCount=10;
     
         // timing
         
@@ -59,7 +59,7 @@ function SettingsObject()
     this.debugDrawMapTangentSpace=false;
     this.debugDrawMapMeshLines=false;
     
-    this.debugDrawModelSkeleton=true;
+    this.debugDrawModelSkeleton=false;
     this.debugDrawModelTangentSpace=false;
     this.debugDrawModelMeshLines=false;
     
@@ -75,12 +75,12 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=2; // Math.floor((Math.random()*seed));
-    this.randomSeedModelBitmap=1;//Math.floor((Math.random()*seed));
-    this.randomSeedModel=5; //Math.floor((Math.random()*seed));
-    this.randomSeedEntity=6; //Math.floor((Math.random()*seed));
+    this.randomSeedMap=Math.floor((Math.random()*seed));
+    this.randomSeedModelBitmap=Math.floor((Math.random()*seed));
+    this.randomSeedModel=Math.floor((Math.random()*seed));
+    this.randomSeedEntity=Math.floor((Math.random()*seed));
     
-    console.log('map seed='+this.randomSeedMap);
+    console.log('Map Seed='+this.randomSeedMap);
 }
 
 var settings=new SettingsObject();

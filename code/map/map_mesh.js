@@ -151,6 +151,17 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         if (this.zBound.min>=checkMesh.zBound.max) return(false);
         return(!(this.zBound.max<=checkMesh.zBound.min));
     };
+    
+    this.boxTouchOtherMesh=function(checkMesh)
+    {
+        if ((this.xBound.min===checkMesh.xBound.max) || (this.xBound.max===checkMesh.xBound.min)) {
+            return(!((this.zBound.min>=checkMesh.zBound.max) || (this.zBound.max<=checkMesh.zBound.min)));
+        }
+        if ((this.zBound.min===checkMesh.zBound.max) || (this.zBound.max===checkMesh.zBound.min)) {
+            return(!((this.xBound.min>=checkMesh.xBound.max) || (this.xBound.max<=checkMesh.xBound.min)));
+        }
+        return(false);
+    };
 
         //
         // triangles

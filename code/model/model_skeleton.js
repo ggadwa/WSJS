@@ -48,6 +48,23 @@ function ModelBoneObject(name,parentBoneIdx,position)
 }
 
 //
+// limb class
+//
+
+function ModelLimbObject(limbType,boneIndexes)
+{
+    this.limbType=limbType;
+    this.boneIndexes=boneIndexes;
+    
+        // constants
+        
+    this.LIMB_TYPE_BODY=0;
+    this.LIMB_TYPE_HEAD=1;
+    this.LIMB_TYPE_ARM=2;
+    this.LIMB_TYPE_LEG=3;
+};
+
+//
 // model skeleton class
 //
 
@@ -60,10 +77,8 @@ function ModelSkeletonObject()
         // lists of bones that are
         // used for animation and
         // mesh building
-        
-    this.headsBoneList=[];
-    this.bodiesBoneList=[];
-    this.limbsBoneList=[];
+    
+    this.limbs=[];
     
         // animations
         
@@ -96,10 +111,8 @@ function ModelSkeletonObject()
         
             // these list can just be copied,
             // they are read only
-            
-        skeleton.headsBoneList=this.headsBoneList;
-        skeleton.bodiesBoneList=this.bodiesBoneList;
-        skeleton.limbsBoneList=this.limbsBoneList;
+        
+        skeleton.limbs=this.limbs;
         
             // recalc the bone animation values
             
@@ -323,21 +336,25 @@ function ModelSkeletonObject()
     
     this.randomNextPose=function(view)
     {
-        var n,k,boneIndexList;
+        var n,k,limb,boneIndexList;
         var r,x,z;
+        var nLimb=this.limbs.length;
         
-        for (n=0;n!==this.limbsBoneList.length;n++) {
-            boneIndexList=this.limbsBoneList[n];
+        for (n=0;n!==nLimb;n++) {
+            limb=this.limbs[n];
+            if ((limb.limbType===limb.LIMB_TYPE_BODY) || (limb.limbType===limb.LIMB_TYPE_HEAD)) continue;
             
-            r=view.genRandom.randomInBetween(-70.0,140.0);
+            boneIndexList=this.limbs[n].boneIndexes;
             
-            if (view.genRandom.random()>0.5) {
-                x=r;
-                z=0.0;
-            }
-            else {
+            r=view.genRandom.randomInBetween(-45.0,90.0);
+
+            if (limb.limbType===limb.LIMB_TYPE_ARM) {
                 x=0.0;
                 z=r;
+            }
+            else {
+                x=r;
+                z=0.0;
             }
             
             for (k=0;k!==boneIndexList.length;k++) {
