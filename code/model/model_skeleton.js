@@ -314,7 +314,7 @@ function ModelSkeletonObject()
         
             // the current factor
             
-        var factor=((this.lastAnimationTick-view.timeStamp)%3000)/3000;
+        var factor=1.0-((this.lastAnimationTick-view.timeStamp)/3000);
 
             // tween the current angles
             

@@ -127,14 +127,10 @@ function ModelShaderObject()
             }
 
                 // otherwise setup the light
+                // models have no light maps so all lights are considered
 
             gl.uniform4f(light.positionUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,1.0);
-            if (viewLight.inLightmap) {
-                gl.uniform4f(light.colorUniform,0.0,0.0,0.0,0.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
-            }
-            else {
-                gl.uniform4f(light.colorUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,0.0);
-            }
+            gl.uniform4f(light.colorUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,0.0);
             gl.uniform1f(light.intensityUniform,viewLight.intensity);
             gl.uniform1f(light.invertIntensityUniform,viewLight.invertIntensity);
             gl.uniform1f(light.exponentUniform,viewLight.exponent);

@@ -261,8 +261,6 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
 {
     var model,genSkeleton,genModelMesh;
     
-    console.log(idx);
-    
         // get a model texture
         
     var genBitmap=new GenBitmapObject(textureGenRandom);    

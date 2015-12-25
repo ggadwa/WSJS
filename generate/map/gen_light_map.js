@@ -742,7 +742,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             
             lightmapIdx=0;
 
-            if (this.lightmapList.length===0) {     // have no lightmaps yet, so make a white one
+            if (this.lightmapList.length===0) {     // have no lightmaps yet, so make a black one
                 this.lightmapList[0]=new GenLightmapBitmapObject(this.startCanvas());
                 this.renderColor(this.lightmapList[0].canvas.getContext('2d'),0,0);
             }

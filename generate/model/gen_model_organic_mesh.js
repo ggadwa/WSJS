@@ -67,7 +67,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
     this.buildGlobeAroundSkeleton=function(view,centerPnt,widRadius,highRadius,vertexList,indexes)
     {
-        var x,y,ang;
+        var x,y;
         var rd,radius,py;
         var vAng;
         var v;
@@ -75,7 +75,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // create the globe without a top
             // or bottom and build that with trigs later
             
-        var xzAngAdd=360.0/this.GLOBE_SURFACE_COUNT;
+        var xzAngAdd=360.0/(this.GLOBE_SURFACE_COUNT-1);
         var yAngAdd=180.0/this.GLOBE_SURFACE_COUNT;
 
         var xzAng;
@@ -107,10 +107,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 v.position.y=py;
                 v.position.z=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-                ang=xzAng+320.0;
-                if (ang>=360.0) ang-=360.0;
-                
-                v.uv.x=1.0-(ang/360.0);
+                v.uv.x=xzAng/360.0;
                 v.uv.y=vAng;
 
                 xzAng+=xzAngAdd;

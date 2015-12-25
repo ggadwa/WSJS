@@ -735,100 +735,36 @@ function GenBitmapObject(genRandom)
         // skin bitmaps
         //
 
-    this.generateSkinChunk=function(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot,scaleDarken,noiseDarken)
+    this.generateScaleChunk=function(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot)
     {
-        var n,x,y,sWid,sHigh;
+        var x,y,dx,dy,dWid,dHigh;
 
-            // the skin background
+            // the scale background
 
         this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,skinColor);
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0.05,0.1,0.6);
 
             // scales
 
-        var scaleCount=this.genRandom.randomInt(80,40);
-        var borderColor=this.genBitmapUtility.darkenColor(skinColor,scaleDarken);
+        var scaleCount=this.genRandom.randomInt(20,40);
+        var borderColor=this.genBitmapUtility.darkenColor(skinColor,0.8);
 
-        var wid=rgt-lft;
-        var high=bot-top;
-
-        for (n=0;n!==scaleCount;n++) {
-            sWid=this.genRandom.randomInt(50,20);
-            sHigh=this.genRandom.randomInt(50,20);
-            x=lft+this.genRandom.randomInt(0,(wid-sWid));
-            y=top+this.genRandom.randomInt(0,(high-sHigh));
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,x,y,(x+sWid),(y+sHigh),1,0,null,borderColor);
+        var wid=(rgt-lft)/scaleCount;
+        var high=(bot-top)/scaleCount;
+        
+        dWid=Math.floor(wid);
+        dHigh=Math.floor(high);
+        
+        for (y=0;y!==scaleCount;y++) {
+            dy=Math.floor(y*high);
+            for (x=0;x!==scaleCount;x++) {
+                dx=Math.floor(x*wid);
+                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+dWid),(dy+dHigh),1,0,null,borderColor);
+            }
         }
-
-            // add noise
-
-        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,noiseDarken,(noiseDarken+0.05),0.8);
     };
     
-    this.generateFaceChunk=function(bitmapCTX,normalCTX,lft,top,rgt,bot)
-    {
-        var n,px,py,px2,py2,pxAdd,mSz;
-
-            // position of face
-            
-        var wid=rgt-lft;
-        var high=bot-top;
-
-        var faceWid=Math.floor(wid*0.5);
-        var faceX=Math.floor(faceWid*0.1);
-
-            // eyes
-
-        var borderColor=this.genBitmapUtility.getRandomGreyColor(0.0,0.25);
-        var eyeColor=this.genBitmapUtility.getRandomColor([0.5,0.4,0.2],[1.0,0.4,0.6]);
-        var pupilColor=this.genBitmapUtility.getRandomColor([0.0,0.0,0.0],[0.5,0.1,0.2]);
-        var mouthColor=this.genBitmapUtility.getRandomColor([0.0,0.0,0.0],[0.5,0.1,0.3]);
-
-        var eyeCount=this.genRandom.randomInt(1,3);
-
-        var eyeWid=faceWid/eyeCount;
-        var eyeHigh=this.genRandom.randomInt(Math.floor(eyeWid/2),eyeWid);
-        if (eyeHigh>Math.floor(high/2)) eyeHigh=Math.floor(high/2);
-
-        var eyeX=Math.floor(faceWid/2)-Math.floor((eyeCount*eyeWid)/2);
-        var eyeY=this.genRandom.randomInt(10,Math.floor(eyeWid/4));
-
-        var pupilWid=Math.floor(eyeWid/4);
-        var pupilHigh=this.genRandom.randomInt(eyeHigh,Math.floor(eyeHigh/2));
-        if (pupilHigh>eyeHigh) pupilHigh=eyeHigh;
-
-        px=faceX+eyeX;
-        py=top+eyeY;
-
-        var borderSize=this.genRandom.randomInt(1,4);
-
-        for (n=0;n!==eyeCount;n++) {
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,px,py,(px+(eyeWid-5)),(py+eyeHigh),borderSize,0,eyeColor,borderColor);
-
-            px2=px+Math.floor((eyeWid-pupilWid)/2);
-            py2=py+Math.floor((eyeHigh-pupilHigh)/2);
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,px2,py2,(px2+pupilWid),(py2+pupilHigh),0,0,pupilColor,null);
-
-            px+=eyeWid;
-        }
-
-            // mouth
-
-        var lineCount=this.genRandom.randomInt(2,6);
-
-        px=faceX+5;
-        pxAdd=Math.floor((faceWid-10)/lineCount);
-        
-        py=((top+eyeY)+eyeHigh)+10;
-
-        for (n=0;n!==lineCount;n++) {
-            mSz=this.genRandom.randomInt(2,8)-5;
-            this.genBitmapUtility.drawLine(bitmapCTX,normalCTX,px,py,(px+pxAdd),(py+mSz),mouthColor);
-            px+=pxAdd;
-            py+=mSz;
-        }
-    };
-
-    this.generateClothChunk=function(bitmapCTX,normalCTX,bitmapWid,bitmapHigh,clothColor,lft,top,rgt,bot)
+    this.generateLeatherChunk=function(bitmapCTX,normalCTX,bitmapWid,bitmapHigh,clothColor,lft,top,rgt,bot)
     {
         var n,markCount;
         var x,y,mWid,mHigh;
@@ -855,9 +791,6 @@ function GenBitmapObject(genRandom)
 
     this.generateSkin=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var midX=Math.floor(wid*0.5);
-        var midY=Math.floor(high*0.5);
-        
         var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.5);
         var clothColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.6);
         
@@ -868,13 +801,12 @@ function GenBitmapObject(genRandom)
 
             // chunks
 
-        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,0,midX,midY,0.8,0.8);
-        this.generateClothChunk(bitmapCTX,normalCTX,wid,high,clothColor,midX,0,wid,midY);
-        
-        this.generateSkinChunk(bitmapCTX,normalCTX,skinColor,0,midY,midX,high,0.8,0.8);
-        this.generateFaceChunk(bitmapCTX,normalCTX,0,midY,midX,high);
-        
-        //this.genBitmapUtility.drawUVTest(bitmapCTX,0,midY,midX,high);
+        //if (this.genBitmapUtility.genRandom.random()<=0.5) {
+            this.generateScaleChunk(bitmapCTX,normalCTX,skinColor,0,0,wid,high,0.8,0.8);
+        //}
+        //else {
+        //    this.generateLeatherChunk(bitmapCTX,normalCTX,wid,high,clothColor,0,0,wid,high);
+        //}
 
             // finish with the specular
 
