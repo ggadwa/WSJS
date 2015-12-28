@@ -514,8 +514,8 @@ function ViewObject()
                 entity.drawEnd(this);
 
                 if (settings.debugDrawModelSkeleton) debug.drawModelSkeleton(this,entity.model,entity.position);
-                if (settings.debugDrawModelTangentSpace) debug.drawModelMeshNormals(this,entity.model,entity.position);
-                if (settings.debugDrawModelMeshLines) debug.drawModelMeshLines(this,entity.model,entity.position);
+                if (settings.debugDrawModelTangentSpace) debug.drawModelMeshNormals(this,entity.model);
+                if (settings.debugDrawModelMeshLines) debug.drawModelMeshLines(this,entity.model);
             }
         }
         

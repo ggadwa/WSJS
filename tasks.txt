@@ -23,13 +23,15 @@ FUTURE TODOs
 
 REGULAR TODOs
 
-[ ] speed ups
-     [ ] shared triangle reduction
-     [ ] model creation
+
+[ ] optimizations
+     [X] shared triangle reduction
+     [ ] model wrapping
      [ ] light map generation
      [ ] normal culling
      [X] show triangle count
      [X] is timing calculated right?
+     [ ] in progress bar for models do bitmaps and models separately
 
 [ ] need to deal with pausing time stamps
 
@@ -50,15 +52,7 @@ REGULAR TODOs
 [ ] don't draw spaces in text
 
 [ ] models
-    [X] rebuild normals after shrink wrap to work off of attached bones
-    [X] bones have gravity lock distances
     [ ] need separate globe sizes for each part
-    [X] temp testing -- need to get legs back into default pose for walking
-    [ ] debug need to use pose positions
-    [X] eventually get rid of bone "is" functions (leave base)
-    [X] tweeing must be between angles -- delete all that other stuff!
-    [X] need to create children list so we don't have to search entire bone list, and base index
     [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
-    [X] when doing shrink wrap, create array of BONE objects, and then next make temp bone objects along the skeletal line that have scaled values between the other two bones
 
 

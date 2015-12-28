@@ -64,10 +64,30 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // straight walls are connected)
             
         nMesh=this.map.meshes.length;
+        
+        var targetMeshCount=0;
+        var targetMeshList=new Uint16Array(nMesh);
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshes[n];
             if (mesh.flag!==this.map.MESH_FLAG_ROOM_WALL) continue;
+            
+                // build a list of meshes that
+                // are targets for trig eliminations from
+                // this mesh
+            
+            targetMeshCount=0;
+            
+            for (k=(n+1);k<nMesh;k++) {
+                otherMesh=this.map.meshes[k];
+                if (otherMesh.flag!==this.map.MESH_FLAG_ROOM_WALL) continue;
+                
+                if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
+            }
+            
+            if (targetMeshCount===0) continue;
+                
+                // now run through the triangles
 
             for (t1=0;t1!==mesh.trigCount;t1++) {
                 
@@ -76,18 +96,17 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                 hit=false;
 
-                for (k=(n+1);k<nMesh;k++) {
-                    otherMesh=this.map.meshes[k];
-                    if (otherMesh.flag!==this.map.MESH_FLAG_ROOM_WALL) continue;
+                for (k=0;k!==targetMeshCount;k++) {
+                    otherMesh=this.map.meshes[targetMeshList[k]];
 
                     for (t2=0;t2!==otherMesh.trigCount;t2++) {
 
                         if (!otherMesh.isTriangleStraightWall(t2)) continue;
                         otherBounds=otherMesh.getTriangleBounds(t2);
-
+                        
                         if ((bounds[0].min===otherBounds[0].min) && (bounds[0].max===otherBounds[0].max) && (bounds[1].min===otherBounds[1].min) && (bounds[1].max===otherBounds[1].max) && (bounds[2].min===otherBounds[2].min) && (bounds[2].max===otherBounds[2].max)) {
                             trigList.push([n,t1]);
-                            trigList.push([k,t2]);
+                            trigList.push([targetMeshList[k],t2]);
                             hit=true;
                             break;
                         }

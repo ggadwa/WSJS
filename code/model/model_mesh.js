@@ -35,6 +35,11 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     this.nonCulledIndexCount=0;
     this.nonCulledIndexes=null;
     
+        // drawing lists
+        
+    this.drawVertices=null;
+    this.drawNormals=null;
+    
         // gl buffers
         
     this.vertexPosBuffer=null;
@@ -107,9 +112,6 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         var vIdx=0;
         var nIdx=0;
         
-        var vertices=new Float32Array(this.vertexCount*3);
-        var normals=new Float32Array(this.vertexCount*3);
-        
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
             bone=skeleton.bones[v.boneIdx];
@@ -117,26 +119,26 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             rotVector.setFromPoint(v.vectorFromBone);
             rotVector.rotateAroundPoint(null,bone.curPoseAngle);
             
-            vertices[vIdx++]=bone.curPosePosition.x+rotVector.x+offsetPosition.x;
-            vertices[vIdx++]=bone.curPosePosition.y+rotVector.y+offsetPosition.y;
-            vertices[vIdx++]=bone.curPosePosition.z+rotVector.z+offsetPosition.z;
+            this.drawVertices[vIdx++]=bone.curPosePosition.x+rotVector.x+offsetPosition.x;
+            this.drawVertices[vIdx++]=bone.curPosePosition.y+rotVector.y+offsetPosition.y;
+            this.drawVertices[vIdx++]=bone.curPosePosition.z+rotVector.z+offsetPosition.z;
             
             normal=v.normal.copy();
             normal.rotateAroundPoint(null,bone.curPoseAngle);
             
-            normals[nIdx++]=normal.x;
-            normals[nIdx++]=normal.y;
-            normals[nIdx++]=normal.z;
+            this.drawNormals[nIdx++]=normal.x;
+            this.drawNormals[nIdx++]=normal.y;
+            this.drawNormals[nIdx++]=normal.z;
         }
         
             // set the buffers
             
         var gl=view.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,normals,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.STATIC_DRAW);
     };
 
         //
@@ -150,9 +152,9 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
         var n;
         
-        var vertices=new Float32Array(this.vertexCount*3);
-        var normals=new Float32Array(this.vertexCount*3);
-        var tangents=new Float32Array(this.vertexCount*3);
+        this.drawVertices=new Float32Array(this.vertexCount*3);
+        this.drawNormals=new Float32Array(this.vertexCount*3);
+        var tangents=new Float32Array(this.vertexCount*3);          // tangents and UVs don't change
         var uvs=new Float32Array(this.vertexCount*2);
         
         var vIdx=0;
@@ -164,16 +166,16 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
             
-            vertices[vIdx++]=v.position.x;
-            vertices[vIdx++]=v.position.y;
-            vertices[vIdx++]=v.position.z;
+            this.drawVertices[vIdx++]=v.position.x;
+            this.drawVertices[vIdx++]=v.position.y;
+            this.drawVertices[vIdx++]=v.position.z;
             
             uvs[uIdx++]=v.uv.x;
             uvs[uIdx++]=v.uv.y;
             
-            normals[nIdx++]=v.normal.x;
-            normals[nIdx++]=v.normal.y;
-            normals[nIdx++]=v.normal.z;
+            this.drawNormals[nIdx++]=v.normal.x;
+            this.drawNormals[nIdx++]=v.normal.y;
+            this.drawNormals[nIdx++]=v.normal.z;
             
             tangents[tIdx++]=v.tangent.x;
             tangents[tIdx++]=v.tangent.y;
@@ -186,11 +188,11 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
 
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
 
         this.vertexNormalBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,normals,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.STATIC_DRAW);
 
         this.vertexTangentBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
@@ -200,11 +202,9 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,uvs,gl.STATIC_DRAW);
 
-            // indexes are static lists
+            // indexes are dynamic
             
         this.indexBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    
     };
 
     this.bindBuffers=function(view,modelShader)
@@ -223,7 +223,10 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.vertexAttribPointer(modelShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
+            // need to always rebuild the array from the culled list
+            
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
     };
     
         //
@@ -233,16 +236,47 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
     this.buildNonCulledTriangleIndexes=function(view)
     {
-         // non-culled index list
-        
-    //this.nonCulledIndexCount=0;
-    //this.nonCulledIndexes=null;
- 		// skip polys with away facing normals
-		// do dot product between normal and vector
-		// from poly mid-eye point
+        var n,idx;
+        var v0Idx,v1Idx,v2Idx;
+        var pnt=new wsPoint(0,0,0);
+        var normal=new wsPoint(0,0,0);
+        var trigToEyeVector=new wsPoint(0,0,0);
 
-	//return(((poly->tangent_space.normal.x*(float)(poly->box.mid.x-view.render->camera.pnt.x))+(poly->tangent_space.normal.y*(float)(poly->box.mid.y-view.render->camera.pnt.y))+(poly->tangent_space.normal.z*(float)(poly->box.mid.z-view.render->camera.pnt.z)))>map.optimize.cull_angle);
-      
+            // if it's the first time, we'll need
+            // to create the index array
+            
+        this.nonCulledIndexCount=0;
+        if (this.nonCulledIndexes===null) this.nonCulledIndexes=new Uint16Array(this.indexCount);
+        
+            // build it out of triangles
+            // that aren't normal culled, i.e.,
+            // have normals facing away from the eye
+            // which is the dot product between the normal
+            // and the vector from trig to eye point
+        
+        idx=0;
+        
+        for (n=0;n!==this.trigCount;n++) {
+            
+            v0Idx=this.indexes[idx++];
+            v1Idx=this.indexes[idx++];
+            v2Idx=this.indexes[idx++];
+            
+                // vector from trig to eye point
+                
+            pnt.set(this.drawVertices[v0Idx],this.drawVertices[v1Idx],this.drawVertices[v2Idx]);
+            trigToEyeVector.setFromSubPoint(pnt,view.camera.position);
+            
+                // dot product
+                
+            normal.set(this.drawNormals[v0Idx],this.drawNormals[v1Idx],this.drawNormals[v2Idx]);
+                
+            if (trigToEyeVector.dot(normal)<=0.0) {
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=v0Idx;
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=v1Idx;
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=v2Idx;
+            }    
+        }
     };
 
         //
@@ -253,10 +287,10 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     {
         var gl=view.gl;
 
-        gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
+        gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         
         view.drawModelCount++;
-        view.drawModelTrigCount+=this.trigCount;
+        view.drawModelTrigCount+=Math.floor(this.nonCulledIndexCount/3);
     };
 
 }

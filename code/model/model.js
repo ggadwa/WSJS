@@ -54,8 +54,9 @@ function ModelObject(name)
     {
         var mesh=this.mesh;
 
-        mesh.buildNonCulledTriangleIndexes(view);
         mesh.bitmap.attach(view,this.modelShader);
+        
+        mesh.buildNonCulledTriangleIndexes(view);
         mesh.bindBuffers(view,this.modelShader);
         mesh.draw(view);
     };

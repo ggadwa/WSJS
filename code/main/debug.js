@@ -296,9 +296,9 @@ function DebugObject()
         // draw model tangent space
         //
         
-    this.drawModelMeshNormals=function(view,model,offsetPosition)
+    this.drawModelMeshNormals=function(view,model)
     {
-        var n,vIdx,iIdx,nVertex;
+        var n,vIdx,iIdx,drawIdx,nVertex;
         var gl=view.gl;
         var normalSize=200.0;
         
@@ -313,18 +313,21 @@ function DebugObject()
 
         vIdx=0;
         iIdx=0;
+        drawIdx=0;
         
         var v;
 
         for (n=0;n!==nVertex;n++) {
             v=mesh.vertexList[n];
             
-            vertices[vIdx++]=v.position.x+offsetPosition.x;
-            vertices[vIdx++]=v.position.y+offsetPosition.y;
-            vertices[vIdx++]=v.position.z+offsetPosition.z;
-            vertices[vIdx++]=(v.position.x+offsetPosition.x)+(v.normal.x*normalSize);
-            vertices[vIdx++]=(v.position.y+offsetPosition.y)+(v.normal.y*normalSize);
-            vertices[vIdx++]=(v.position.z+offsetPosition.z)+(v.normal.z*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[drawIdx];
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+1];
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+2];
+            vertices[vIdx++]=mesh.drawVertices[drawIdx]+(mesh.drawNormals[drawIdx]*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+1]+(mesh.drawNormals[drawIdx+1]*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+2]+(mesh.drawNormals[drawIdx+2]*normalSize);
+            
+            drawIdx+=3;
 
             indexes[iIdx]=iIdx;
             iIdx++;
@@ -370,7 +373,7 @@ function DebugObject()
         // draw model mesh lines
         //
         
-    this.drawModelMeshLines=function(view,model,offsetPosition)
+    this.drawModelMeshLines=function(view,model)
     {
         var n;
         var gl=view.gl;
@@ -388,9 +391,10 @@ function DebugObject()
 
         for (n=0;n!==nVertex;n++) {
             v=mesh.vertexList[n];
-            vertices[vIdx++]=v.position.x+offsetPosition.x;
-            vertices[vIdx++]=v.position.y+offsetPosition.y;
-            vertices[vIdx++]=v.position.z+offsetPosition.z;
+            vertices[vIdx]=mesh.drawVertices[vIdx];
+            vertices[vIdx+1]=mesh.drawVertices[vIdx+1];
+            vertices[vIdx+2]=mesh.drawVertices[vIdx+2];
+            vIdx+=3;
         }
 
             // start the shader

@@ -160,10 +160,10 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
     this.boxTouchOtherMesh=function(checkMesh)
     {
         if ((this.xBound.min===checkMesh.xBound.max) || (this.xBound.max===checkMesh.xBound.min)) {
-            return(!((this.zBound.min>=checkMesh.zBound.max) || (this.zBound.max<=checkMesh.zBound.min)));
+            return(!((this.zBound.min>checkMesh.zBound.max) || (this.zBound.max<checkMesh.zBound.min)));
         }
         if ((this.zBound.min===checkMesh.zBound.max) || (this.zBound.max===checkMesh.zBound.min)) {
-            return(!((this.xBound.min>=checkMesh.xBound.max) || (this.xBound.max<=checkMesh.xBound.min)));
+            return(!((this.xBound.min>checkMesh.xBound.max) || (this.xBound.max<checkMesh.xBound.min)));
         }
         return(false);
     };
@@ -472,11 +472,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,packedUVs,gl.STATIC_DRAW);
 
-            // indexes are static
+            // indexes are dynamic
             
         this.indexBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);    
     };
 
     this.bindBuffers=function(view,mapShader)
@@ -495,7 +493,10 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
         gl.vertexAttribPointer(mapShader.vertexAndLightmapUVAttribute,4,gl.FLOAT,false,0,0);
 
+            // need to always rebuild the array from the culled list
+            
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
     };
     
         //
@@ -505,7 +506,40 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         
     this.buildNonCulledTriangleIndexes=function(view)
     {
+        var n,v,idx;
+        var trigToEyeVector=new wsPoint(0,0,0);
+
+            // if it's the first time, we'll need
+            // to create the index array
+            
+        this.nonCulledIndexCount=0;
+        if (this.nonCulledIndexes===null) this.nonCulledIndexes=new Uint16Array(this.indexCount);
         
+            // build it out of triangles
+            // that aren't normal culled, i.e.,
+            // have normals facing away from the eye
+            // which is the dot product between the normal
+            // and the vector from trig to eye point
+        
+        idx=0;
+        
+        for (n=0;n!==this.trigCount;n++) {
+            
+                // vector from trig to eye point
+                
+            v=this.vertexList[this.indexes[idx]];
+            trigToEyeVector.setFromSubPoint(v.position,view.camera.position);
+            
+                // dot product
+                
+            if (trigToEyeVector.dot(v.normal)<=0.0) {
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx];
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+1];
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+2];
+            }    
+        
+            idx+=3;
+        }
     };
     
         //
@@ -516,10 +550,10 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
     {
         var gl=view.gl;
 
-        gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
+        gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         
         view.drawMeshCount++;
-        view.drawMeshTrigCount=this.trigCount;
+        view.drawMeshTrigCount+=Math.floor(this.nonCulledIndexCount/3);
     };
         
         // setup bounds

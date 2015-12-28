@@ -746,7 +746,7 @@ function GenBitmapObject(genRandom)
 
             // scales
 
-        var scaleCount=this.genRandom.randomInt(20,40);
+        var scaleCount=this.genRandom.randomInt(10,20);
         var borderColor=this.genBitmapUtility.darkenColor(skinColor,0.8);
 
         var wid=(rgt-lft)/scaleCount;
