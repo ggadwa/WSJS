@@ -89,7 +89,7 @@ function wsLoopRun(timeStamp)
     
     var fpsTime=view.timeStamp-view.fpsStartTimeStamp;
     if (fpsTime>=1000) {
-        view.fps=((view.fpsTotal/view.fpsCount)*1000.0)/fpsTime;
+        view.fps=(view.fpsCount*1000.0)/view.fpsTotal;
         view.fpsStartTimeStamp=view.timeStamp;
         
         view.fpsTotal=0;

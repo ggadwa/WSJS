@@ -34,7 +34,7 @@ function SettingsObject()
     this.mapLightRGBMinimum=0.6;                // minimum r, g, or b value for map lights
     this.mapLightRGBExtra=0.4;                  // random r, g, b add for map lights
     
-    this.generateLightmap=true;                 // set to true to generate light maps
+    this.generateLightmap=false;                 // set to true to generate light maps
     
         // decorations
         
@@ -75,7 +75,7 @@ function SettingsObject()
     var seed=Date.now();
     
     this.randomSeedMapBitmap=Math.floor((Math.random()*seed));
-    this.randomSeedMap=Math.floor((Math.random()*seed));
+    this.randomSeedMap=657721966250; //Math.floor((Math.random()*seed));
     this.randomSeedModelBitmap=Math.floor((Math.random()*seed));
     this.randomSeedModel=Math.floor((Math.random()*seed));
     this.randomSeedEntity=Math.floor((Math.random()*seed));

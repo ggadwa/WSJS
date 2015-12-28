@@ -30,6 +30,11 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     this.indexCount=this.indexes.length;
     this.trigCount=Math.floor(this.indexCount/3);
     
+        // non-culled index list
+        
+    this.nonCulledIndexCount=0;
+    this.nonCulledIndexes=null;
+    
         // gl buffers
         
     this.vertexPosBuffer=null;
@@ -220,6 +225,25 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
     };
+    
+        //
+        // build an index list of triangles that aren't
+        // culled
+        //
+        
+    this.buildNonCulledTriangleIndexes=function(view)
+    {
+         // non-culled index list
+        
+    //this.nonCulledIndexCount=0;
+    //this.nonCulledIndexes=null;
+ 		// skip polys with away facing normals
+		// do dot product between normal and vector
+		// from poly mid-eye point
+
+	//return(((poly->tangent_space.normal.x*(float)(poly->box.mid.x-view.render->camera.pnt.x))+(poly->tangent_space.normal.y*(float)(poly->box.mid.y-view.render->camera.pnt.y))+(poly->tangent_space.normal.z*(float)(poly->box.mid.z-view.render->camera.pnt.z)))>map.optimize.cull_angle);
+      
+    };
 
         //
         // model mesh drawing
@@ -230,6 +254,9 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         var gl=view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
+        
+        view.drawModelCount++;
+        view.drawModelTrigCount+=this.trigCount;
     };
 
 }

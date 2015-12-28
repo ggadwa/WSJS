@@ -4,7 +4,7 @@
 // generate mesh decoration class
 //
 
-function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
+function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,genRandom)
 {
         // variables
         
@@ -14,6 +14,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
     this.xBound=xBound;
     this.yBound=yBound;
     this.zBound=zBound;
+    this.hasStories=hasStories;
     this.genRandom=genRandom;
 
         //
@@ -89,7 +90,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
     this.addPillars=function()
     {
         var n,rd;
-        var boxBoundX,boxBoundZ;
+        var boxBoundX,boxBoundZ,pillarYBound;
         var pt=new wsPoint(0,yBound.max,0);
         
             // setup cylinder segments
@@ -104,6 +105,11 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
         var radiusReduce=(0.8+(this.genRandom.random()*0.2));
         var radiusX=(xBound.getSize()*0.3)*radiusReduce;
         var radiusZ=(zBound.getSize()*0.3)*radiusReduce;
+        
+            // ybound
+            
+        pillarYBound=new wsBound((this.yBound.min-settings.roomFloorDepth),this.yBound.max);
+        if (this.hasStories) pillarYBound.min-=(this.yBound.getSize()+settings.roomFloorDepth);
         
             // make the pillars
             
@@ -124,7 +130,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,genRandom)
                 // put in the pillar
             
             if (this.map.boxBoundCollision(boxBoundX,yBound,boxBoundZ,this.map.MESH_FLAG_STAIR)===-1) {
-                map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(TEXTURE_PILLAR),pt,yBound,segments,this.map.MESH_FLAG_DECORATION));
+                map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(TEXTURE_PILLAR),pt,pillarYBound,segments,this.map.MESH_FLAG_DECORATION));
             }
             
             ang+=angAdd;

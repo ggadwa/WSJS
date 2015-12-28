@@ -43,6 +43,11 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
     this.indexCount=this.indexes.length;
     this.trigCount=Math.floor(this.indexCount/3);
     
+        // non-culled index list
+        
+    this.nonCulledIndexCount=0;
+    this.nonCulledIndexes=null;
+    
         // null buffers
         
     this.vertexPosBuffer=null;
@@ -494,6 +499,16 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
     };
     
         //
+        // build an index list of triangles that aren't
+        // culled
+        //
+        
+    this.buildNonCulledTriangleIndexes=function(view)
+    {
+        
+    };
+    
+        //
         // mesh drawing
         //
 
@@ -502,6 +517,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         var gl=view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
+        
+        view.drawMeshCount++;
+        view.drawMeshTrigCount=this.trigCount;
     };
         
         // setup bounds

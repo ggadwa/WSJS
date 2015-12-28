@@ -535,7 +535,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // decoration list
 
         piece=this.mapPieceList.get(pieceIdx);
-        if ((piece.isRoom) && (level===1)) this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xBound,yBound,zBound,this.genRandom));
+        if ((piece.isRoom) && (level===1)) this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xBound,yBound,zBound,hasStories,this.genRandom));
     };
     
         //

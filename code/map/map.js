@@ -452,7 +452,6 @@ function MapObject()
     this.draw=function(view)
     {
         var n,mesh;
-        var meshCount=0;
         var nMesh=this.meshes.length;
         var currentBitmap,currentLightmap;
 
@@ -485,10 +484,9 @@ function MapObject()
 
                 // draw the mesh
 
+            mesh.buildNonCulledTriangleIndexes(view);
             mesh.bindBuffers(view,this.mapShader);
             mesh.draw(view);
-
-            meshCount++;
         }
         
             // debugging draw
@@ -509,8 +507,6 @@ function MapObject()
                 }
             }
         }
-        
-        return(meshCount);
     };
 
 }

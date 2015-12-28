@@ -103,9 +103,16 @@ function ViewObject()
     this.loopLastPhysicTimeStamp=0;
     this.loopLastDrawTimeStamp=0;
     
+        // stats
+        
     this.fpsTotal=0;
     this.fpsCount=0;
     this.fpsStartTimeStamp=0;
+    
+    this.drawMeshCount=0;
+    this.drawMeshTrigCount=0;
+    this.drawModelCount=0;
+    this.drawModelTrigCount=0;
     
         // loading screen
         
@@ -145,7 +152,7 @@ function ViewObject()
 
         this.gl.clearColor(0.0,0.0,0.0,1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
-
+        
             // cache some values
 
         this.wid=this.canvas.width;
@@ -424,9 +431,7 @@ function ViewObject()
     {
         var n,nEntity,entity;
         var light;
-        var drawMeshCount=0;
-        var drawModelCount=0;
-        
+         
             // everything overdraws except
             // clear the depth buffer
             
@@ -482,14 +487,20 @@ function ViewObject()
             // build the culling frustum
 
         this.buildCullingFrustum();
-
+        
             // draw the map
+       
+        this.drawMeshCount=0;
+        this.drawMeshTrigCount=0;
 
         map.drawStart(this);
-        drawMeshCount+=map.draw(this);
+        map.draw(this);
         map.drawEnd(this);
 
             // draw the entities
+            
+        this.drawModelCount=0;
+        this.drawModelTrigCount=0;
 
         nEntity=entityList.count();
 
@@ -505,11 +516,9 @@ function ViewObject()
                 if (settings.debugDrawModelSkeleton) debug.drawModelSkeleton(this,entity.model,entity.position);
                 if (settings.debugDrawModelTangentSpace) debug.drawModelMeshNormals(this,entity.model,entity.position);
                 if (settings.debugDrawModelMeshLines) debug.drawModelMeshLines(this,entity.model,entity.position);
-                
-                drawModelCount++;
             }
         }
-
+        
             // overlays
 
         var fpsStr=this.fps.toString();
@@ -521,13 +530,15 @@ function ViewObject()
             fpsStr=fpsStr.substring(0,(idx+3));
         }
 
-        var countStr=drawMeshCount.toString()+"/"+drawModelCount.toString();
+        var mapCountStr=this.drawMeshCount.toString()+"/"+this.drawMeshTrigCount.toString();
+        var modelCountStr=this.drawModelCount.toString()+"/"+this.drawModelTrigCount.toString();
 
         var posStr=Math.floor(this.camera.position.x)+','+Math.floor(this.camera.position.y)+','+Math.floor(this.camera.position.z)+':'+Math.floor(this.camera.angle.y);
 
         this.text.drawStart(this);
         this.text.draw(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.draw(this,(this.wid-5),45,20,18,countStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.draw(this,(this.wid-5),45,20,18,mapCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.draw(this,(this.wid-5),67,20,18,modelCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.draw(this,(this.wid-5),(this.high-5),20,18,posStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.drawEnd(this);
     };
