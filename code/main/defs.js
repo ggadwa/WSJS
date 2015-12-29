@@ -6,20 +6,33 @@
 
 var DEGREE_TO_RAD=Math.PI/180.0;
 
-/*
+/* class testing
 class Point {
         constructor(x, y) {
             this.x = x;
             this.y = y;
+            this.yup=1.2345;
         }
         toString() {
             return '(' + this.x + ', ' + this.y + ')';
         }
+        static get staticYup()
+        {
+            return('static yup');
+        }
     }
     
     var testPt=new Point(5,6);
+    var testPt2=new Point(1,2);
     console.log(testPt.toString());
- */  
+    console.log(testPt.x);  // shouldn't be legal
+    console.log(testPt.yup);
+    testPt.yup=5.4321;
+    console.log(testPt.yup);
+    console.log(testPt2.yup);
+    console.log(Point.staticYup);
+*/
+ 
 //
 // points and rects objects
 //

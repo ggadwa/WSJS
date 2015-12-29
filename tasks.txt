@@ -4,7 +4,6 @@ IMPORTANT EVENTUAL TODOs
 
 EMCA6 TODOs
     [ ] transfer all object to classes
-    [ ] move in the genBitmapObject constants to class based statics
     [ ] modulize the code
     [ ] use Math.trunc when possible instead of Math.floor
     [ ] new ModelLimbObject needs to pass in constant instead of #
@@ -23,6 +22,14 @@ FUTURE TODOs
 
 REGULAR TODOs
 
+[X] fixed a number of bugs and improved text drawing, including shadowed text
+[ ] move all constants to const and outside of objects, no need to duplicate and emcascript6 doesn't support it, anyway
+[ ] try better way to load in shaders again
+
+[ ] we might need to find new way to make maps that preserve normals
+
+[ ] map display
+    [ ] need to build array outside of drawing
 
 [ ] optimizations
      [X] shared triangle reduction
@@ -33,6 +40,8 @@ REGULAR TODOs
      [X] is timing calculated right?
      [X] get rid of U, it normal culls badly
      [ ] in progress bar for models do bitmaps and models separately
+     [ ] checkboard bad
+     [ ] inside step normals bad
 
 [ ] need to deal with pausing time stamps
 

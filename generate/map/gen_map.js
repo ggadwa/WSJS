@@ -184,6 +184,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             mesh.combineMesh(mesh2);
             
             this.map.addMesh(mesh);
+            if (n===0) this.map.addOverlayPiece(piece,xBound,zBound);
             
             yStoryBound.add(-(yBound.getSize()+settings.roomFloorDepth));
         }
@@ -601,6 +602,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // room adding
 
         this.buildMapRecursiveRoom(0,-1,-1,this.STAIR_MODE_NONE,null,null,null,0);
+        
+            // can setup the map display now
+            
+        this.map.precalcOverlayDrawValues(this.view);
         
         this.view.loadingScreenDraw(0.50);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },this.TIMEOUT_MSEC);

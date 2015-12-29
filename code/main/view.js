@@ -81,11 +81,11 @@ function ViewObject()
         // frustum planes
         
     this.frustumLeftPlane=new wsPlane(0.0,0.0,0.0,0.0);
-	this.frustumRightPlane=new wsPlane(0.0,0.0,0.0,0.0);
-	this.frustumTopPlane=new wsPlane(0.0,0.0,0.0,0.0);
-	this.frustumBottomPlane=new wsPlane(0.0,0.0,0.0,0.0);
-	this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
-	this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
+    this.frustumRightPlane=new wsPlane(0.0,0.0,0.0,0.0);
+    this.frustumTopPlane=new wsPlane(0.0,0.0,0.0,0.0);
+    this.frustumBottomPlane=new wsPlane(0.0,0.0,0.0,0.0);
+    this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
+    this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
     
         // additional drawing objects
         
@@ -522,7 +522,11 @@ function ViewObject()
             }
         }
         
-            // overlays
+            // map overlay
+            
+        map.overlayDraw(this);
+        
+            // text overlays
 
         var fpsStr=this.fps.toString();
         var idx=fpsStr.indexOf('.');
@@ -539,10 +543,10 @@ function ViewObject()
         var posStr=Math.floor(this.camera.position.x)+','+Math.floor(this.camera.position.y)+','+Math.floor(this.camera.position.z)+':'+Math.floor(this.camera.angle.y);
 
         this.text.drawStart(this);
-        this.text.draw(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.draw(this,(this.wid-5),45,20,18,mapCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.draw(this,(this.wid-5),67,20,18,modelCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.draw(this,(this.wid-5),(this.high-5),20,18,posStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),45,20,18,mapCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),67,20,18,modelCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),(this.high-5),20,18,posStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.drawEnd(this);
     };
     

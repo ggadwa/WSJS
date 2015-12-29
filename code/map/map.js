@@ -27,18 +27,22 @@ function MapObject()
     this.lightmaps=[];
     this.rooms=[];
     
+    this.overlay=new MapOverlayObject();
+    
         //
         // initialize and release
         //
 
     this.initialize=function(view)
     {
+        if (!this.overlay.initialize(view)) return(false);
         return(this.mapShader.initialize(view));
     };
 
     this.release=function(view)
     {
         this.mapShader.release(view);
+        this.overlay.release(view);
     };
     
         //
@@ -417,6 +421,25 @@ function MapObject()
 
         return(null);
     };
+    
+        //
+        // pass-through for overlays
+        //
+        
+    this.precalcOverlayDrawValues=function(view)
+    {
+        this.overlay.precalcDrawValues(view);
+    }
+        
+    this.overlayDraw=function(view)
+    {
+        this.overlay.draw(view);
+    };
+    
+    this.addOverlayPiece=function(piece,xBound,zBound)
+    {
+        this.overlay.addPiece(piece,xBound,zBound);
+    };
 
         //
         // setup all the mesh buffers
@@ -513,6 +536,6 @@ function MapObject()
         }
         
     };
-
+    
 }
 

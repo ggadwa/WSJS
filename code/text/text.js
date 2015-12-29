@@ -26,6 +26,8 @@ function TextObject()
     this.fontTexture=null;
     
     this.fontCharWids=new Array(128);
+    
+    this.shadowColor=new wsColor(0.0,0.0,0.0);
 
         //
         // initialize/release text
@@ -133,7 +135,7 @@ function TextObject()
         gl.disable(gl.DEPTH_TEST);
         
         gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
         this.textShader.drawStart(view);
     };
@@ -272,5 +274,12 @@ function TextObject()
         gl.deleteBuffer(uvPosBuffer);
         gl.deleteBuffer(indexBuffer);
     };
+    
+    this.drawWithShadow=function(view,x,y,charWid,charHigh,str,align,color)
+    {
+        this.draw(view,(x+1),(y+1),charWid,charHigh,str,align,this.shadowColor);
+        this.draw(view,x,y,charWid,charHigh,str,align,color);
+    };
+
 
 }

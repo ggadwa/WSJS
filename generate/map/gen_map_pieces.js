@@ -245,6 +245,32 @@ function MapPieceObject(isRoom)
         return(mesh);
     };
     
+    this.createDisplayShapeLines=function(xBound,zBound)
+    {
+        var n,nPoint,x,z;
+        var pt;
+
+        nPoint=this.points.length;
+
+        var lineVertexList=new Float32Array(2*nPoint);
+        
+        var sx=xBound.getSize();
+        var sz=zBound.getSize();
+        
+        var vIdx=0;
+
+        for (n=0;n!==nPoint;n++) {
+            pt=this.points[n];
+            x=xBound.min+Math.floor(sx*(pt[0]*0.01));
+            z=zBound.min+Math.floor(sz*(pt[1]*0.01));
+
+            lineVertexList[vIdx++]=x;
+            lineVertexList[vIdx++]=z;
+        }
+
+        return(lineVertexList);
+    };
+    
         //
         // build connection line list
         //

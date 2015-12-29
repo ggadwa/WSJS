@@ -22,6 +22,8 @@
 <script type="text/javascript" src="code/map/map_mesh.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/map/map_light.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/map/map_room.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map/map_overlay.js" charset="utf-8"></script>
+<script type="text/javascript" src="code/map/map_overlay_shader.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/model/model_list.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/model/model.js" charset="utf-8"></script>
 <script type="text/javascript" src="code/model/model_skeleton.js" charset="utf-8"></script>
@@ -650,6 +652,27 @@
 </script>
 
 <script id="wsInterfaceFragShader" type="x-shader/x-fragment">
+    uniform lowp vec3 color;
+
+    void main(void)
+    {
+        gl_FragColor.rgb=color;
+        gl_FragColor.a=1.0;
+    }
+</script>
+
+<script id="wsMapOverlayVertShader" type="x-shader/x-vertex">    
+    attribute highp vec3 vertexPosition;
+
+    uniform highp mat4 orthoMatrix;
+
+    void main(void)
+    {
+        gl_Position=orthoMatrix*vec4(vertexPosition,1.0);
+    }
+</script>
+
+<script id="wsMapOverlayFragShader" type="x-shader/x-fragment">
     uniform lowp vec3 color;
 
     void main(void)
