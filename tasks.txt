@@ -28,9 +28,10 @@ REGULAR TODOs
      [X] shared triangle reduction
      [ ] model wrapping
      [ ] light map generation
-     [ ] normal culling
+     [X] normal culling
      [X] show triangle count
      [X] is timing calculated right?
+     [X] get rid of U, it normal culls badly
      [ ] in progress bar for models do bitmaps and models separately
 
 [ ] need to deal with pausing time stamps

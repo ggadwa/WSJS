@@ -6,6 +6,20 @@
 
 var DEGREE_TO_RAD=Math.PI/180.0;
 
+/*
+class Point {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        toString() {
+            return '(' + this.x + ', ' + this.y + ')';
+        }
+    }
+    
+    var testPt=new Point(5,6);
+    console.log(testPt.toString());
+ */  
 //
 // points and rects objects
 //

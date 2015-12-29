@@ -141,7 +141,7 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,false);
+        meshUtility.buildVertexListNormals(vertexList,indexes,null,false);
         if (!wholeUV) meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
 
@@ -190,7 +190,7 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,false);
+        meshUtility.buildVertexListNormals(vertexList,indexes,null,false);
         meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
 
@@ -302,7 +302,7 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,false);
+        meshUtility.buildVertexListNormals(vertexList,indexes,null,false);
         meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
 

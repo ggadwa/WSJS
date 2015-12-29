@@ -35,10 +35,12 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     this.nonCulledIndexCount=0;
     this.nonCulledIndexes=null;
     
-        // drawing lists
+        // drawing arrays
         
     this.drawVertices=null;
     this.drawNormals=null;
+    this.drawTangents=null;
+    this.drawUVs=null;
     
         // gl buffers
         
@@ -154,8 +156,8 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
         this.drawVertices=new Float32Array(this.vertexCount*3);
         this.drawNormals=new Float32Array(this.vertexCount*3);
-        var tangents=new Float32Array(this.vertexCount*3);          // tangents and UVs don't change
-        var uvs=new Float32Array(this.vertexCount*2);
+        this.drawTangents=new Float32Array(this.vertexCount*3);
+        this.drawUVs=new Float32Array(this.vertexCount*2);
         
         var vIdx=0;
         var uIdx=0;
@@ -170,16 +172,16 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             this.drawVertices[vIdx++]=v.position.y;
             this.drawVertices[vIdx++]=v.position.z;
             
-            uvs[uIdx++]=v.uv.x;
-            uvs[uIdx++]=v.uv.y;
-            
             this.drawNormals[nIdx++]=v.normal.x;
             this.drawNormals[nIdx++]=v.normal.y;
             this.drawNormals[nIdx++]=v.normal.z;
             
-            tangents[tIdx++]=v.tangent.x;
-            tangents[tIdx++]=v.tangent.y;
-            tangents[tIdx++]=v.tangent.z;
+            this.drawTangents[tIdx++]=v.tangent.x;
+            this.drawTangents[tIdx++]=v.tangent.y;
+            this.drawTangents[tIdx++]=v.tangent.z;
+            
+            this.drawUVs[uIdx++]=v.uv.x;
+            this.drawUVs[uIdx++]=v.uv.y;
         }
 
             // create all the buffers
@@ -196,11 +198,11 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
 
         this.vertexTangentBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,tangents,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawTangents,gl.STATIC_DRAW);
 
         this.vertexUVBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,uvs,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawUVs,gl.STATIC_DRAW);
 
             // indexes are dynamic
             
@@ -236,8 +238,7 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
     this.buildNonCulledTriangleIndexes=function(view)
     {
-        var n,idx;
-        var v0Idx,v1Idx,v2Idx;
+        var n,idx,vIdx;
         var pnt=new wsPoint(0,0,0);
         var normal=new wsPoint(0,0,0);
         var trigToEyeVector=new wsPoint(0,0,0);
@@ -258,24 +259,26 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
         for (n=0;n!==this.trigCount;n++) {
             
-            v0Idx=this.indexes[idx++];
-            v1Idx=this.indexes[idx++];
-            v2Idx=this.indexes[idx++];
+            vIdx=this.indexes[idx]*3;
             
                 // vector from trig to eye point
                 
-            pnt.set(this.drawVertices[v0Idx],this.drawVertices[v1Idx],this.drawVertices[v2Idx]);
+            pnt.set(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
             trigToEyeVector.setFromSubPoint(pnt,view.camera.position);
+            trigToEyeVector.normalize();
             
                 // dot product
                 
-            normal.set(this.drawNormals[v0Idx],this.drawNormals[v1Idx],this.drawNormals[v2Idx]);
+            normal.set(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]);
                 
-            if (trigToEyeVector.dot(normal)<=0.0) {
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=v0Idx;
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=v1Idx;
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=v2Idx;
-            }    
+            if (trigToEyeVector.dot(normal)<=view.VIEW_NORMAL_CULL_LIMIT) {
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
+            }
+            else {
+                idx+=3;
+            }
         }
     };
 

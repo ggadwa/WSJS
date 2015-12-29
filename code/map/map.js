@@ -498,15 +498,20 @@ function MapObject()
             }
         }
         
-        if (settings.debugDrawMapTangentSpace) {
+        if (settings.debugDrawMapMeshTangents) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) {      // draw separately so they overlay the triangle lines
-                    debug.drawMapMeshTangents(view,mesh);
-                    debug.drawMapMeshNormals(view,mesh);
-                }
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(view,mesh);
             }
         }
+        
+        if (settings.debugDrawMapMeshNormals) {
+            for (n=0;n!==nMesh;n++) {
+                mesh=this.meshes[n];
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(view,mesh);
+            }
+        }
+        
     };
 
 }

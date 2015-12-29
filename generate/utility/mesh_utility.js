@@ -75,7 +75,7 @@ function MeshUtilityObject()
         // build normals for vertex lists
         //
     
-    this.buildVertexListNormals=function(vertexList,indexes,normalsIn)
+    this.buildVertexListNormals=function(vertexList,indexes,meshCenterPoint,normalsIn)
     {
         var n,flip,nTrig,nVertex,trigIdx;
         var v0,v1,v2;
@@ -87,16 +87,23 @@ function MeshUtilityObject()
             // normals should be flipped (for models
             // normals always face out)
 
-        var meshCenter=new wsPoint(0.0,0.0,0.0);
-
-        for (n=0;n!==nVertex;n++) {
-            meshCenter.addPoint(vertexList[n].position);
+        var meshCenter;
+        
+        if (meshCenterPoint!==null) {
+            meshCenter=meshCenterPoint;
         }
+        else {
+            meshCenter=new wsPoint(0.0,0.0,0.0);
+            
+            for (n=0;n!==nVertex;n++) {
+                meshCenter.addPoint(vertexList[n].position);
+            }
 
-        meshCenter.x/=nVertex;
-        meshCenter.y/=nVertex;
-        meshCenter.z/=nVertex;
-
+            meshCenter.x/=nVertex;
+            meshCenter.y/=nVertex;
+            meshCenter.z/=nVertex;
+        }
+        
         var trigCenter=new wsPoint(0.0,0.0,0.0);
         var faceVct=new wsPoint(0.0,0.0,0.0);
 

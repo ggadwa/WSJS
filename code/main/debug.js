@@ -38,7 +38,7 @@ function DebugObject()
 
         var vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,mesh.vertices,gl.STREAM_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,mesh.drawVertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
@@ -88,12 +88,12 @@ function DebugObject()
         iIdx=0;
 
         for (n=0;n!==nVertex;n++) {
-            vertices[vIdx++]=mesh.vertices[vertexIdx];
-            vertices[vIdx++]=mesh.vertices[vertexIdx+1];
-            vertices[vIdx++]=mesh.vertices[vertexIdx+2];
-            vertices[vIdx++]=mesh.vertices[vertexIdx]+(mesh.normals[vertexIdx]*normalSize);
-            vertices[vIdx++]=mesh.vertices[vertexIdx+1]+(mesh.normals[vertexIdx+1]*normalSize);
-            vertices[vIdx++]=mesh.vertices[vertexIdx+2]+(mesh.normals[vertexIdx+2]*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx];
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+1];
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+2];
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx]+(mesh.drawNormals[vertexIdx]*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+1]+(mesh.drawNormals[vertexIdx+1]*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+2]+(mesh.drawNormals[vertexIdx+2]*normalSize);
 
             indexes[iIdx++]=elementIdx;
             indexes[iIdx++]=elementIdx+1;
@@ -155,12 +155,12 @@ function DebugObject()
         iIdx=0;
 
         for (n=0;n!==nVertex;n++) {
-            vertices[vIdx++]=mesh.vertices[vertexIdx];
-            vertices[vIdx++]=mesh.vertices[vertexIdx+1];
-            vertices[vIdx++]=mesh.vertices[vertexIdx+2];
-            vertices[vIdx++]=mesh.vertices[vertexIdx]+(mesh.tangents[vertexIdx]*tangentSize);
-            vertices[vIdx++]=mesh.vertices[vertexIdx+1]+(mesh.tangents[vertexIdx+1]*tangentSize);
-            vertices[vIdx++]=mesh.vertices[vertexIdx+2]+(mesh.tangents[vertexIdx+2]*tangentSize);
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx];
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+1];
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+2];
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx]+(mesh.drawTangents[vertexIdx]*tangentSize);
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+1]+(mesh.drawTangents[vertexIdx+1]*tangentSize);
+            vertices[vIdx++]=mesh.drawVertices[vertexIdx+2]+(mesh.drawTangents[vertexIdx+2]*tangentSize);
 
             indexes[iIdx++]=elementIdx;
             indexes[iIdx++]=elementIdx+1;
@@ -339,6 +339,79 @@ function DebugObject()
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
+        gl.disable(gl.DEPTH_TEST);
+
+            // setup the buffers
+
+        var vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+
+        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        var indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
+
+            // draw the lines
+
+        gl.drawElements(gl.LINES,iIdx,gl.UNSIGNED_SHORT,0);
+
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+
+        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(indexBuffer);
+
+        gl.enable(gl.DEPTH_TEST);
+        this.debugShader.drawEnd(view);
+    };
+    
+    this.drawModelMeshTangents=function(view,model)
+    {
+        var n,vIdx,iIdx,drawIdx,nVertex;
+        var gl=view.gl;
+        var normalSize=200.0;
+        
+        var mesh=model.mesh;
+        
+            // create the lines
+
+        nVertex=mesh.vertexCount;
+
+        var vertices=new Float32Array(nVertex*6);
+        var indexes=new Uint16Array(nVertex*2);
+
+        vIdx=0;
+        iIdx=0;
+        drawIdx=0;
+        
+        var v;
+
+        for (n=0;n!==nVertex;n++) {
+            v=mesh.vertexList[n];
+            
+            vertices[vIdx++]=mesh.drawVertices[drawIdx];
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+1];
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+2];
+            vertices[vIdx++]=mesh.drawVertices[drawIdx]+(mesh.drawTangents[drawIdx]*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+1]+(mesh.drawTangents[drawIdx+1]*normalSize);
+            vertices[vIdx++]=mesh.drawVertices[drawIdx+2]+(mesh.drawTangents[drawIdx+2]*normalSize);
+            
+            drawIdx+=3;
+
+            indexes[iIdx]=iIdx;
+            iIdx++;
+            
+            indexes[iIdx]=iIdx;
+            iIdx++;
+        }
+
+            // set the shader
+
+        this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
         gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers

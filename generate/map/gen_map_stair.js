@@ -73,7 +73,7 @@ function GenRoomStairs(map,genRandom)
         // stair vertices into meshes
         //
         
-    this.finishStairMesh=function(bitmap,vertexList,buildNormals,normalsIn,flags)
+    this.finishStairMesh=function(bitmap,vertexList,buildNormals,meshCenterPoint,normalsIn,flags)
     {
             // build the indexes
             // everything we build is a quad so
@@ -101,7 +101,7 @@ function GenRoomStairs(map,genRandom)
             // create the mesh and
             // add to map
                
-        if (buildNormals) meshUtility.buildVertexListNormals(vertexList,indexes,normalsIn);
+        if (buildNormals) meshUtility.buildVertexListNormals(vertexList,indexes,meshCenterPoint,normalsIn);
         meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
 
@@ -118,6 +118,11 @@ function GenRoomStairs(map,genRandom)
         var n,idx,stepAdd;
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,zThickBound;
+        
+            // need a center point to better
+            // create normals
+            
+        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
@@ -156,7 +161,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallX(idx,vertexList,xBound.max,yBoundBottom,yBoundBottom,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundTop,yBoundBottom,(zBound.min+thickSize));
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundTop,yBoundBottom,(zBound.max-thickSize));
-            this.finishStairMesh(roomBitmap,vertexList,true,true,this.map.MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,this.map.MESH_FLAG_ROOM_WALL);
             
                 // external walls
   
@@ -169,7 +174,7 @@ function GenRoomStairs(map,genRandom)
             zThickBound=new wsBound((zBound.max-thickSize),zBound.max);
             idx=this.createSingleWallX(idx,vertexList,xBound.min,yBoundTop,yBoundTop,zThickBound);
             idx=this.createSingleWallX(idx,vertexList,xBound.max,yBoundBottom,yBoundBottom,zThickBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,false,this.map.MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,this.map.MESH_FLAG_ROOM_WALL);
 
                // the ceiling
 
@@ -178,7 +183,7 @@ function GenRoomStairs(map,genRandom)
 
             zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundTop,yBoundBottom,zStepBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,true,this.map.MESH_FLAG_ROOM_CEILING);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,this.map.MESH_FLAG_ROOM_CEILING);
         }
         
             // the stair edges
@@ -206,7 +211,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
             idx=this.createSingleWallX(idx,vertexList,(flip?xBound.min:xBound.max),yBoundFront,yBoundFront,zStepBound);
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,false,this.map.MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,this.map.MESH_FLAG_STAIR);
             
             idx=0;
             vertexList=meshUtility.createMapVertexList(16);
@@ -217,7 +222,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
             idx=this.createSingleWallX(idx,vertexList,(flip?xBound.min:xBound.max),yBoundFront,yBoundFront,zStepBound);
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,false,this.map.MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,this.map.MESH_FLAG_STAIR);
             
                 // the behind box brace
             
@@ -272,7 +277,7 @@ function GenRoomStairs(map,genRandom)
             xStepBound.add(stepAdd);
         }
         
-        this.finishStairMesh(stairBitmap,vertexList,false,true,this.map.MESH_FLAG_STAIR);
+        this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,this.map.MESH_FLAG_STAIR);
     };
 
     this.createStairsZ=function(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,includeBack,flip)
@@ -280,6 +285,11 @@ function GenRoomStairs(map,genRandom)
         var n,idx,stepAdd;
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,xThickBound;
+        
+            // need a center point to better
+            // create normals
+            
+        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
@@ -318,7 +328,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundBottom,zBound.max);
             idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBoundTop,yBoundBottom,zBound);
             idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBoundTop,yBoundBottom,zBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,true,this.map.MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,this.map.MESH_FLAG_ROOM_WALL);
 
                 // external walls
             
@@ -331,7 +341,7 @@ function GenRoomStairs(map,genRandom)
             xThickBound=new wsBound((xBound.max-thickSize),xBound.max);
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundTop,yBoundTop,zBound.min);
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundBottom,yBoundBottom,zBound.max);
-            this.finishStairMesh(roomBitmap,vertexList,true,false,this.map.MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,this.map.MESH_FLAG_ROOM_WALL);
            
                // the ceiling
 
@@ -340,7 +350,7 @@ function GenRoomStairs(map,genRandom)
 
             xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundTop,yBoundBottom,zBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,true,this.map.MESH_FLAG_ROOM_CEILING);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,this.map.MESH_FLAG_ROOM_CEILING);
         }
         
             // the stair edges
@@ -368,7 +378,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xStepBound,yBoundFront,yBoundFront,(flip?zBound.min:zBound.max));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundBottom,yBoundTop,zBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,false,this.map.MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,this.map.MESH_FLAG_STAIR);
             
             idx=0;
             vertexList=meshUtility.createMapVertexList(16);
@@ -379,7 +389,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xStepBound,yBoundFront,yBoundFront,(flip?zBound.min:zBound.max));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundBottom,yBoundTop,zBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,false,this.map.MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,this.map.MESH_FLAG_STAIR);
             
                 // the behind box brace
             
@@ -435,7 +445,7 @@ function GenRoomStairs(map,genRandom)
             zStepBound.add(stepAdd);
         }
         
-        this.finishStairMesh(stairBitmap,vertexList,false,true,this.map.MESH_FLAG_STAIR);
+        this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,this.map.MESH_FLAG_STAIR);
     };
     
 }

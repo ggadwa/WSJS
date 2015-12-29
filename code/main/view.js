@@ -40,6 +40,8 @@ function ViewObject()
     this.OPENGL_NEAR_Z=500;
     this.OPENGL_FAR_Z=300000;
     
+    this.VIEW_NORMAL_CULL_LIMIT=0.3;
+    
     this.wid=0;
     this.high=0;
     this.aspect=0.0;
@@ -514,8 +516,9 @@ function ViewObject()
                 entity.drawEnd(this);
 
                 if (settings.debugDrawModelSkeleton) debug.drawModelSkeleton(this,entity.model,entity.position);
-                if (settings.debugDrawModelTangentSpace) debug.drawModelMeshNormals(this,entity.model);
                 if (settings.debugDrawModelMeshLines) debug.drawModelMeshLines(this,entity.model);
+                if (settings.debugDrawModelMeshNormals) debug.drawModelMeshNormals(this,entity.model);
+                if (settings.debugDrawModelMeshTangents) debug.drawModelMeshTangents(this,entity.model);
             }
         }
         

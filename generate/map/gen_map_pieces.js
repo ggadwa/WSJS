@@ -234,7 +234,7 @@ function MapPieceObject(isRoom)
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,true);
+        meshUtility.buildVertexListNormals(vertexList,indexes,null,true);
         meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
 
@@ -444,37 +444,25 @@ function MapPieceListObject()
 
         this.add(mapPiece);
         
-            // U
+            // diamond
 
         mapPiece=new MapPieceObject(true);
 
-        mapPiece.points.push([0,0]);
-        mapPiece.points.push([20,0]);
+        mapPiece.points.push([0,40]);
         mapPiece.points.push([40,0]);
-        mapPiece.points.push([40,40]);
-        mapPiece.points.push([60,40]);
         mapPiece.points.push([60,0]);
-        mapPiece.points.push([80,0]);
-        mapPiece.points.push([100,0]);
-        mapPiece.points.push([100,20]);
         mapPiece.points.push([100,40]);
         mapPiece.points.push([100,60]);
-        mapPiece.points.push([100,80]);
-        mapPiece.points.push([80,100]);
         mapPiece.points.push([60,100]);
         mapPiece.points.push([40,100]);
-        mapPiece.points.push([20,100]);
-        mapPiece.points.push([0,80]);
         mapPiece.points.push([0,60]);
-        mapPiece.points.push([0,40]);
-        mapPiece.points.push([0,20]);
         
         mapPiece.floorGrid=[
-          [1,1,0,1,1],
-          [1,1,0,1,1],
+          [0,1,1,1,0],
           [1,1,1,1,1],
           [1,1,1,1,1],
-          [1,1,1,1,1]
+          [1,1,1,1,1],
+          [0,1,1,1,0]
         ];
 
         this.add(mapPiece);
@@ -658,25 +646,25 @@ function MapPieceListObject()
         mapPiece.points.push([20,20]);
         mapPiece.points.push([20,0]);
         mapPiece.points.push([40,0]);
-        mapPiece.points.push([40,20]);
-        mapPiece.points.push([60,40]);
+        mapPiece.points.push([60,0]);
+        mapPiece.points.push([60,20]);
         mapPiece.points.push([100,40]);
         mapPiece.points.push([100,60]);
         mapPiece.points.push([100,80]);
         mapPiece.points.push([80,80]);
         mapPiece.points.push([80,100]);
         mapPiece.points.push([60,100]);
-        mapPiece.points.push([60,80]);
-        mapPiece.points.push([40,60]);
+        mapPiece.points.push([40,100]);
+        mapPiece.points.push([40,80]);
         mapPiece.points.push([0,60]);
         mapPiece.points.push([0,40]);
         
         mapPiece.floorGrid=[
-          [0,1,0,0,0],
-          [1,1,1,0,0],
+          [0,1,1,0,0],
           [1,1,1,1,1],
-          [0,0,1,1,1],
-          [0,0,0,1,0]
+          [1,1,1,1,1],
+          [1,1,1,1,1],
+          [0,0,1,1,0]
         ];
 
         this.add(mapPiece);

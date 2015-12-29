@@ -48,6 +48,13 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
     this.nonCulledIndexCount=0;
     this.nonCulledIndexes=null;
     
+        // drawing arrays
+        
+    this.drawVertices=null;
+    this.drawNormals=null;
+    this.drawTangents=null;
+    this.drawPackedUVs=null;
+    
         // null buffers
         
     this.vertexPosBuffer=null;
@@ -418,10 +425,10 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         
         var n;
         
-        var vertices=new Float32Array(this.vertexCount*3);
-        var normals=new Float32Array(this.vertexCount*3);
-        var tangents=new Float32Array(this.vertexCount*3);
-        var packedUVs=new Float32Array(this.vertexCount*4);
+        this.drawVertices=new Float32Array(this.vertexCount*3);
+        this.drawNormals=new Float32Array(this.vertexCount*3);
+        this.drawTangents=new Float32Array(this.vertexCount*3);
+        this.drawPackedUVs=new Float32Array(this.vertexCount*4);
         
         var vIdx=0;
         var uIdx=0;
@@ -432,22 +439,22 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
             
-            vertices[vIdx++]=v.position.x;
-            vertices[vIdx++]=v.position.y;
-            vertices[vIdx++]=v.position.z;
+            this.drawVertices[vIdx++]=v.position.x;
+            this.drawVertices[vIdx++]=v.position.y;
+            this.drawVertices[vIdx++]=v.position.z;
             
-            packedUVs[uIdx++]=v.uv.x;           // texture UV and light map UV pakced into a 4 part vector
-            packedUVs[uIdx++]=v.uv.y;
-            packedUVs[uIdx++]=v.lightmapUV.x;
-            packedUVs[uIdx++]=v.lightmapUV.y;
+            this.drawNormals[nIdx++]=v.normal.x;
+            this.drawNormals[nIdx++]=v.normal.y;
+            this.drawNormals[nIdx++]=v.normal.z;
             
-            normals[nIdx++]=v.normal.x;
-            normals[nIdx++]=v.normal.y;
-            normals[nIdx++]=v.normal.z;
+            this.drawTangents[tIdx++]=v.tangent.x;
+            this.drawTangents[tIdx++]=v.tangent.y;
+            this.drawTangents[tIdx++]=v.tangent.z;
             
-            tangents[tIdx++]=v.tangent.x;
-            tangents[tIdx++]=v.tangent.y;
-            tangents[tIdx++]=v.tangent.z;
+            this.drawPackedUVs[uIdx++]=v.uv.x;           // texture UV and light map UV pakced into a 4 part vector
+            this.drawPackedUVs[uIdx++]=v.uv.y;
+            this.drawPackedUVs[uIdx++]=v.lightmapUV.x;
+            this.drawPackedUVs[uIdx++]=v.lightmapUV.y;
         }
 
             // create all the buffers
@@ -458,19 +465,19 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
 
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.STATIC_DRAW);
 
         this.vertexNormalBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,normals,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.STATIC_DRAW);
 
         this.vertexTangentBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,tangents,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawTangents,gl.STATIC_DRAW);
 
         this.vertexAndLightmapUVBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,packedUVs,gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawPackedUVs,gl.STATIC_DRAW);
 
             // indexes are dynamic
             
@@ -529,10 +536,11 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
                 
             v=this.vertexList[this.indexes[idx]];
             trigToEyeVector.setFromSubPoint(v.position,view.camera.position);
+            trigToEyeVector.normalize();
             
                 // dot product
                 
-            if (trigToEyeVector.dot(v.normal)<=0.0) {
+            if (trigToEyeVector.dot(v.normal)<=view.VIEW_NORMAL_CULL_LIMIT) {
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+1];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+2];
