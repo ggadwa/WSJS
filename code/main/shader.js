@@ -81,18 +81,26 @@ function ShaderObject()
         //
         // load shaders
         //
-        
+    
     this.ajaxShaderFile=function(name)
     {
-            // yes, I know this is bad, will make
-            // async later
+        this.shaderSource=null;
         
         var req=new XMLHttpRequest();
+        
         req.open('GET',('shaders/'+name),false);
+        req.overrideMimeType('text/plain');
+        /*
+        req.onreadystatechange=function() {
+            if (req.readyState!==4) return;
+            if (req.status!==200) 
+        };
+        */
         req.send(null);
+        
         return(req.responseText);
     };
-
+    
     this.loadVertexShader=function(view,name)
     {
         this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);

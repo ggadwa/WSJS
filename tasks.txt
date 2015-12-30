@@ -21,9 +21,11 @@ FUTURE TODOs
 
 REGULAR TODOs
 
+[ ] we need a cached file list so sync can be used
+[ ] request needs to be sync
+[X] crazy FF syntax error on shaders
 [ ] settings -> constants
-[ ] map display needs to build float array outside of drawing and just pass it through
-[ ] map display need player location
+[X] map display need player location
 [X] fixed a number of bugs and improved text drawing, including shadowed text
 [X] move all constants to const and outside of objects, no need to duplicate and emcascript6 doesn't support it, anyway
 [X] shaders are now all ajax loaded instead of being inline.  This means some restrictions when running things locally, though (chrome isn't friendly)

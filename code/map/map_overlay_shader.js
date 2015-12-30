@@ -48,18 +48,22 @@ function MapOverlayShaderObject()
     // start/stop interface shader drawing
     //
 
-    this.drawStart=function(view,color)
+    this.drawStart=function(view)
     {
         view.gl.useProgram(this.shader.program);
 
             // setup the uniforms
 
         view.gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
-         view.gl.uniform3f(this.colorUniform,color.r,color.g,color.b);
 
             // enable the vertex attributes
 
         view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
+    };
+    
+    this.drawColor=function(view,color)
+    {
+        view.gl.uniform3f(this.colorUniform,color.r,color.g,color.b);
     };
 
     this.drawEnd=function(view)

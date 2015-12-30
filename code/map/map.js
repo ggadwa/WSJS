@@ -418,16 +418,21 @@ function MapObject()
     this.precalcOverlayDrawValues=function(view)
     {
         this.overlay.precalcDrawValues(view);
-    }
+    };
         
-    this.overlayDraw=function(view)
+    this.overlayDraw=function(view,entityList)
     {
-        this.overlay.draw(view);
+        this.overlay.draw(view,entityList);
     };
     
     this.addOverlayPiece=function(piece,xBound,zBound)
     {
         this.overlay.addPiece(piece,xBound,zBound);
+    };
+    
+    this.addOverlayBoundPiece=function(xBound,zBound)
+    {
+        this.overlay.addBoundPiece(xBound,zBound);
     };
 
         //

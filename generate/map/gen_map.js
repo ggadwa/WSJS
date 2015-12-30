@@ -248,6 +248,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 break;
                 
         }
+        
+            // add to overlay
+            
+        this.map.addOverlayBoundPiece(xStairBound,zStairBound);
     };
 
     this.addLight=function(piece,xBound,yBound,zBound,hasStories)

@@ -299,6 +299,27 @@ function ws2DPoint(x,y)
         return(Math.sqrt(this.noSquareDistance(pt)));
     };
     
+    this.rotate=function(centerPt,rot)
+    {
+        if (centerPt!==null) {
+            this.x-=centerPt.x;
+            this.y-=centerPt.y;
+        }
+        
+        var rd=rot*DEGREE_TO_RAD;
+        
+        var x=(this.y*Math.sin(rd))+(this.x*Math.cos(rd));
+        var y=(this.y*Math.cos(rd))-(this.x*Math.sin(rd));
+        
+        if (centerPt!==null) {
+            x+=centerPt.x;
+            y+=centerPt.y;
+        }
+        
+        this.x=x;
+        this.y=y;
+    };
+    
     this.copy=function()
     {
         return(new ws2DPoint(this.x,this.y));

@@ -14,17 +14,26 @@ function MapOverlayObject()
     this.mapOffsetZ=0;
     this.mapScale=1.0;
     
+    this.drawX=0;
+    this.drawY=0;
+    
+    this.vertexPosBuffer=null;
+    
         //
         // initialize/release overlay object
         //
 
     this.initialize=function(view)
     {
-        return(this.mapOverlayShader.initialize(view));
+        if (!this.mapOverlayShader.initialize(view)) return(false);
+        this.vertexPosBuffer=view.gl.createBuffer();
+        
+        return(true);
     };
 
     this.release=function(view)
     {
+        view.gl.deleteBuffer(this.vertexPosBuffer);
         this.mapOverlayShader.release(view);
     };
     
@@ -35,6 +44,18 @@ function MapOverlayObject()
     this.addPiece=function(piece,xBound,zBound)
     {
         this.pieceList.push(piece.createDisplayShapeLines(xBound,zBound));
+    };
+    
+    this.addBoundPiece=function(xBound,zBound)
+    {
+        var shapeLines=new Float32Array(8);
+        
+        shapeLines[0]=shapeLines[6]=xBound.min;
+        shapeLines[2]=shapeLines[4]=xBound.max;
+        shapeLines[1]=shapeLines[3]=zBound.min;
+        shapeLines[5]=shapeLines[7]=zBound.max;
+        
+        this.pieceList.push(shapeLines);
     };
     
     this.precalcDrawValues=function(view)
@@ -84,8 +105,8 @@ function MapOverlayObject()
         var drawWid=Math.floor(xBound.getSize()*this.mapScale);
         var drawHigh=Math.floor(zBound.getSize()*this.mapScale);
         
-        var drawX=(view.wid-5)-drawWid;
-        var drawY=Math.floor((view.high-drawHigh)/2);
+        this.drawX=(view.wid-5)-drawWid;
+        this.drawY=Math.floor((view.high-drawHigh)/2);
         
             // resize them
             
@@ -93,8 +114,8 @@ function MapOverlayObject()
             lineVertexList=this.pieceList[n];
             
             for (k=0;k<lineVertexList.length;k+=2) {
-                lineVertexList[k]=((lineVertexList[k]-this.mapOffsetX)*this.mapScale)+drawX;
-                lineVertexList[k+1]=((lineVertexList[k+1]-this.mapOffsetZ)*this.mapScale)+drawY;
+                lineVertexList[k]=((lineVertexList[k]-this.mapOffsetX)*this.mapScale)+this.drawX;
+                lineVertexList[k+1]=((lineVertexList[k+1]-this.mapOffsetZ)*this.mapScale)+this.drawY;
             }
         }
     };
@@ -103,22 +124,22 @@ function MapOverlayObject()
         // draw the map overlay
         //
         
-    this.draw=function(view)
+    this.draw=function(view,entityList)
     {
         var n;
         var gl=view.gl;
 
-        this.mapOverlayShader.drawStart(view,new wsColor(0.0,0.0,1.0));
+        this.mapOverlayShader.drawStart(view);
         gl.disable(gl.DEPTH_TEST);
         
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
-
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
 
-            // draw the lines
+            // map lines
+            
+        this.mapOverlayShader.drawColor(view,new wsColor(0.0,0.0,1.0));
             
         var lineVertexList;
         var nPiece=this.pieceList.length;
@@ -129,10 +150,50 @@ function MapOverlayObject()
             gl.drawArrays(gl.LINE_LOOP,0,Math.floor(lineVertexList.length/2));
         }
         
+            // entities
+            
+        var x,y;
+        
+        var p1=new ws2DPoint(0,0);
+        var p2=new ws2DPoint(0,0);
+        var p3=new ws2DPoint(0,0);
+        
+        var vList=new Float32Array(6);
+        
+        var entity;
+        var nEntity=entityList.count();
+        
+        var playerColor=new wsColor(0.5,1.0,0.5);
+        var monsterColor=new wsColor(1.0,0.5,0.5);
+
+        for (n=0;n!==nEntity;n++) {
+            entity=entityList.get(n);
+            this.mapOverlayShader.drawColor(view,(entity.isPlayer?playerColor:monsterColor));
+        
+            p1.set(-5,-5);
+            p1.rotate(null,entity.angle.y);
+            p2.set(0,5);
+            p2.rotate(null,entity.angle.y);
+            p3.set(5,-5);
+            p3.rotate(null,entity.angle.y);
+            
+            x=((entity.position.x-this.mapOffsetX)*this.mapScale)+this.drawX;
+            y=((entity.position.z-this.mapOffsetZ)*this.mapScale)+this.drawY;
+
+            vList[0]=p1.x+x;
+            vList[1]=p1.y+y;
+            vList[2]=p2.x+x;
+            vList[3]=p2.y+y;
+            vList[4]=p3.x+x;
+            vList[5]=p3.y+y;
+
+            gl.bufferData(gl.ARRAY_BUFFER,vList,gl.STREAM_DRAW);
+            gl.drawArrays(gl.LINE_LOOP,0,3);
+        }
+        
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-        gl.deleteBuffer(vertexPosBuffer);
 
         gl.enable(gl.DEPTH_TEST);
         this.mapOverlayShader.drawEnd(view);
