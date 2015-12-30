@@ -11,10 +11,6 @@ function GenRoomPlatform(map,genRandom,piece,room)
     this.piece=piece;
     this.room=room;
     
-        // constants
-        
-    this.MAX_OPEN_BLOCK_TRY=25;
-    
         //
         // platform mainline
         // 
@@ -63,7 +59,7 @@ function GenRoomPlatform(map,genRandom,piece,room)
             x=-1;
             
             tryCount++;
-            if (tryCount>this.MAX_OPEN_BLOCK_TRY) return;
+            if (tryCount>PLATFORM_MAX_OPEN_BLOCK_TRY) return;
         }
         
             // make the platforms
@@ -90,7 +86,7 @@ function GenRoomPlatform(map,genRandom,piece,room)
             xPlatformBound=new wsBound((xBound.min+(x*xAdd)),(xBound.min+((x+1)*xAdd)));
             zPlatformBound=new wsBound((zBound.min+(z*zAdd)),(zBound.min+((z+1)*zAdd)));
             
-            this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,(isPillar?yPlatformPillarBound:yPlatformBound),zPlatformBound,false,true,true,true,true,true,(!isPillar),this.map.MESH_FLAG_ROOM_PLATFORM));
+            this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,(isPillar?yPlatformPillarBound:yPlatformBound),zPlatformBound,false,true,true,true,true,true,(!isPillar),MESH_FLAG_ROOM_PLATFORM));
             this.room.blockGrid(x,z,true,false);
             
             grid[z][x]=isPillar?3:2;       // we use 2/3 so we can later re-check list for stair locations
@@ -143,7 +139,7 @@ function GenRoomPlatform(map,genRandom,piece,room)
                     // find a place in a while, break out
                     
                 tryCount++;
-                if (tryCount>this.MAX_OPEN_BLOCK_TRY) return;
+                if (tryCount>PLATFORM_MAX_OPEN_BLOCK_TRY) return;
             }
         }
         
@@ -203,7 +199,7 @@ function GenRoomPlatform(map,genRandom,piece,room)
             x=-1;
             
             tryCount++;
-            if (tryCount>this.MAX_OPEN_BLOCK_TRY) return;
+            if (tryCount>PLATFORM_MAX_OPEN_BLOCK_TRY) return;
         }
         
             // finally add a stair case

@@ -25,7 +25,7 @@ function ParticleShaderObject()
             // and load/compile it
 
         this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'wsParticleVertShader','wsParticleFragShader')) return(false);
+        if (!this.shader.initialize(view,'particle')) return(false);
 
             // setup uniforms
 

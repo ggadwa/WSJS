@@ -24,7 +24,7 @@ function TextShaderObject()
             // and load/compile it
 
         this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'wsTextVertShader','wsTextFragShader')) return(false);
+        if (!this.shader.initialize(view,'text')) return(false);
 
             // setup uniforms
 

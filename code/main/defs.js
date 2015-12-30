@@ -1,11 +1,5 @@
 "use strict";
 
-//
-// conversion constants
-//
-
-var DEGREE_TO_RAD=Math.PI/180.0;
-
 /* class testing
 class Point {
         constructor(x, y) {

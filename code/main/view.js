@@ -543,10 +543,10 @@ function ViewObject()
         var posStr=Math.floor(this.camera.position.x)+','+Math.floor(this.camera.position.y)+','+Math.floor(this.camera.position.z)+':'+Math.floor(this.camera.angle.y);
 
         this.text.drawStart(this);
-        this.text.drawWithShadow(this,(this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.drawWithShadow(this,(this.wid-5),45,20,18,mapCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.drawWithShadow(this,(this.wid-5),67,20,18,modelCountStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.drawWithShadow(this,(this.wid-5),(this.high-5),20,18,posStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),45,20,18,mapCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),67,20,18,modelCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow(this,(this.wid-5),(this.high-5),20,18,posStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.drawEnd(this);
     };
     
@@ -602,7 +602,7 @@ function ViewObject()
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new wsColor(1.0,0.3,0.3);
-            this.text.draw(this,5,y,20,18,this.loadingStrings[n],this.text.TEXT_ALIGN_LEFT,col);
+            this.text.draw(this,5,y,20,18,this.loadingStrings[n],TEXT_ALIGN_LEFT,col);
             y+=22;
         }
         

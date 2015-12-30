@@ -1,19 +1,6 @@
 "use strict";
 
 //
-// resource IDs
-//
-
-var TEXTURE_WALL=0;
-var TEXTURE_FLOOR=1;
-var TEXTURE_CEILING=2;
-var TEXTURE_STAIR=3;
-var TEXTURE_PLATFORM=4;
-var TEXTURE_LIGHT=5;
-var TEXTURE_BOX=6;
-var TEXTURE_PILLAR=7;
-
-//
 // textures to build
 //
 

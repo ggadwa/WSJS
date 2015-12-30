@@ -32,7 +32,7 @@ function ModelShaderObject()
             // and load/compile it
 
         this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'wsModelVertShader','wsModelFragShader')) return(false);
+        if (!this.shader.initialize(view,'model')) return(false);
 
             // setup uniforms
 

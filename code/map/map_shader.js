@@ -32,7 +32,7 @@ function MapShaderObject()
             // and load/compile it
 
         this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'wsMapVertShader','wsMapFragShader')) return(false);
+        if (!this.shader.initialize(view,'map')) return(false);
 
             // setup uniforms
 

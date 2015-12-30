@@ -6,7 +6,6 @@ EMCA6 TODOs
     [ ] transfer all object to classes
     [ ] modulize the code
     [ ] use Math.trunc when possible instead of Math.floor
-    [ ] new ModelLimbObject needs to pass in constant instead of #
 
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
@@ -22,14 +21,17 @@ FUTURE TODOs
 
 REGULAR TODOs
 
+[ ] settings -> constants
+[ ] map display needs to build float array outside of drawing and just pass it through
+[ ] map display need player location
 [X] fixed a number of bugs and improved text drawing, including shadowed text
-[ ] move all constants to const and outside of objects, no need to duplicate and emcascript6 doesn't support it, anyway
-[ ] try better way to load in shaders again
+[X] move all constants to const and outside of objects, no need to duplicate and emcascript6 doesn't support it, anyway
+[X] shaders are now all ajax loaded instead of being inline.  This means some restrictions when running things locally, though (chrome isn't friendly)
+[ ] in progress bar for models do bitmaps and models separately
 
 [ ] we might need to find new way to make maps that preserve normals
 
-[ ] map display
-    [ ] need to build array outside of drawing
+[X] map display
 
 [ ] optimizations
      [X] shared triangle reduction
@@ -39,7 +41,6 @@ REGULAR TODOs
      [X] show triangle count
      [X] is timing calculated right?
      [X] get rid of U, it normal culls badly
-     [ ] in progress bar for models do bitmaps and models separately
      [ ] checkboard bad
      [ ] inside step normals bad
 

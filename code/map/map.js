@@ -6,17 +6,6 @@
 
 function MapObject()
 {
-        // constants
-    
-    this.MESH_FLAG_NONE=0;
-    this.MESH_FLAG_ROOM_WALL=1;
-    this.MESH_FLAG_ROOM_FLOOR=2;
-    this.MESH_FLAG_ROOM_CEILING=3;
-    this.MESH_FLAG_ROOM_PLATFORM=4;
-    this.MESH_FLAG_STAIR=5;
-    this.MESH_FLAG_LIGHT=6;
-    this.MESH_FLAG_DECORATION=7;
- 
         // map items
         
     this.mapShader=new MapShaderObject();

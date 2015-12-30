@@ -6,22 +6,7 @@
 
 function GenBitmapUtilityObject(genRandom)
 {
-        // constants
-        
-    this.STACKED_X_MIN_COUNT=1;
-    this.STACKED_X_EXTRA_COUNT=4;
-    this.STACKED_Y_MIN_COUNT=3;
-    this.STACKED_Y_EXTRA_COUNT=4;
-
-    this.GRID_DIVISION=100;
-    this.GRID_MIN_BLOCK_WIDTH=30;
-    this.GRID_EXTRA_BLOCK_WIDTH=10;
-    this.GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
-    this.GRID_MIN_BLOCK_HEIGHT=10;
-    this.GRID_EXTRA_BLOCK_HEIGHT=15;
-    this.GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
-    
-        // normals
+        // some precalced normals
     
     this.NORMAL_CLEAR=new wsPoint(0.0,0.0,1.0);
     
@@ -50,11 +35,11 @@ function GenBitmapUtilityObject(genRandom)
         var halfBrick;
         var segments=[];
 
-        var xCount=this.STACKED_X_MIN_COUNT+Math.floor(this.genRandom.random()*this.STACKED_X_EXTRA_COUNT);
+        var xCount=BITMAP_STACKED_X_MIN_COUNT+Math.floor(this.genRandom.random()*BITMAP_STACKED_X_EXTRA_COUNT);
         var wid=Math.floor(cvsWid/xCount);
         var halfWid=Math.floor(wid/2);
 
-        var yCount=this.STACKED_Y_MIN_COUNT+Math.floor(this.genRandom.random()*this.STACKED_Y_EXTRA_COUNT);
+        var yCount=BITMAP_STACKED_Y_MIN_COUNT+Math.floor(this.genRandom.random()*BITMAP_STACKED_Y_EXTRA_COUNT);
         var high=Math.floor(cvsHigh/yCount);
 
         top=0;
@@ -89,7 +74,7 @@ function GenBitmapUtilityObject(genRandom)
             // build segments in
             // typed arrays initialize to 0
 
-        var grid=new Uint16Array(this.GRID_DIVISION*this.GRID_DIVISION);
+        var grid=new Uint16Array(BITMAP_GRID_DIVISION*BITMAP_GRID_DIVISION);
 
             // start making the segments
 
@@ -101,15 +86,15 @@ function GenBitmapUtilityObject(genRandom)
             hit=false;
 
             while (true) {
-                if (grid[(y*this.GRID_DIVISION)+x]===0) {
+                if (grid[(y*BITMAP_GRID_DIVISION)+x]===0) {
                     hit=true;
                     break;
                 }
                 x++;
-                if (x===this.GRID_DIVISION) {
+                if (x===BITMAP_GRID_DIVISION) {
                     x=0;
                     y++;
-                    if (y===this.GRID_DIVISION) break;
+                    if (y===BITMAP_GRID_DIVISION) break;
                 }
             }
 
@@ -119,55 +104,55 @@ function GenBitmapUtilityObject(genRandom)
 
                 // random size
 
-            startWid=this.GRID_MIN_BLOCK_WIDTH+Math.floor(this.genRandom.random()*this.GRID_EXTRA_BLOCK_WIDTH);
-            if ((x+startWid)>=this.GRID_DIVISION) startWid=this.GRID_DIVISION-x;
+            startWid=BITMAP_GRID_MIN_BLOCK_WIDTH+Math.floor(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_WIDTH);
+            if ((x+startWid)>=BITMAP_GRID_DIVISION) startWid=BITMAP_GRID_DIVISION-x;
 
-            startHigh=this.GRID_MIN_BLOCK_HEIGHT+Math.floor(this.genRandom.random()*this.GRID_EXTRA_BLOCK_HEIGHT);
-            if ((y+startHigh)>=this.GRID_DIVISION) startHigh=this.GRID_DIVISION-y;
+            startHigh=BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.floor(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
+            if ((y+startHigh)>=BITMAP_GRID_DIVISION) startHigh=BITMAP_GRID_DIVISION-y;
 
                 // make sure we aren't leaving a little sliver
                 // at the end
 
-            if (((x+startWid)+this.GRID_MIN_BLOCK_WIDTH)>=this.GRID_DIVISION) startWid=this.GRID_DIVISION-x;
-            if (((y+startHigh)+this.GRID_MIN_BLOCK_HEIGHT)>=this.GRID_DIVISION) startHigh=this.GRID_DIVISION-y;
+            if (((x+startWid)+BITMAP_GRID_MIN_BLOCK_WIDTH)>=BITMAP_GRID_DIVISION) startWid=BITMAP_GRID_DIVISION-x;
+            if (((y+startHigh)+BITMAP_GRID_MIN_BLOCK_HEIGHT)>=BITMAP_GRID_DIVISION) startHigh=BITMAP_GRID_DIVISION-y;
 
                 // determine what can fit
 
             wid=1;
 
             while (wid<startWid) {
-                if (grid[(y*this.GRID_DIVISION)+(x+wid)]!==0) break;
+                if (grid[(y*BITMAP_GRID_DIVISION)+(x+wid)]!==0) break;
                 wid++;
             }
 
             high=1;
 
             while (high<startHigh) {
-                if (grid[((y+high)*this.GRID_DIVISION)+x]!==0) break;
+                if (grid[((y+high)*BITMAP_GRID_DIVISION)+x]!==0) break;
                 high++;
             }
 
                 // if segment is too small, just block off
                 // the single grid item and try again
 
-            if ((wid<this.GRID_ELIMINATE_BLOCK_MIN_WIDTH) || (high<this.GRID_ELIMINATE_BLOCK_MIN_HEIGHT)) {
-                grid[(y*this.GRID_DIVISION)+x]=1;
+            if ((wid<BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH) || (high<BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)) {
+                grid[(y*BITMAP_GRID_DIVISION)+x]=1;
                 continue;
             }
 
                 // create the segment and block off
                 // the grid
 
-            lft=Math.floor(x*(cvsWid/this.GRID_DIVISION));
-            top=Math.floor(y*(cvsHigh/this.GRID_DIVISION));
-            rgt=Math.floor((x+wid)*(cvsWid/this.GRID_DIVISION));
-            bot=Math.floor((y+high)*(cvsHigh/this.GRID_DIVISION));
+            lft=Math.floor(x*(cvsWid/BITMAP_GRID_DIVISION));
+            top=Math.floor(y*(cvsHigh/BITMAP_GRID_DIVISION));
+            rgt=Math.floor((x+wid)*(cvsWid/BITMAP_GRID_DIVISION));
+            bot=Math.floor((y+high)*(cvsHigh/BITMAP_GRID_DIVISION));
 
             segments.push(new wsRect(lft,top,rgt,bot));
 
             for (y2=0;y2!==high;y2++) {
                 for (x2=0;x2!==wid;x2++) {
-                    grid[((y+y2)*this.GRID_DIVISION)+(x+x2)]=1;
+                    grid[((y+y2)*BItMAP_GRID_DIVISION)+(x+x2)]=1;
                 }
             }
         }

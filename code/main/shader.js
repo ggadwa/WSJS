@@ -27,16 +27,16 @@ function ShaderObject()
         // initialize/release shader
         //
 
-    this.initialize=function(view,vertScriptId,fragScriptId)
+    this.initialize=function(view,name)
     {
             // get the shaders from divs
 
-        if (!this.loadVertexShader(view,vertScriptId)) {
+        if (!this.loadVertexShader(view,name)) {
             this.release();
             return(false);
         }
 
-        if (!this.loadFragmentShader(view,fragScriptId)) {
+        if (!this.loadFragmentShader(view,name)) {
             this.release();
             return(false);
         }
@@ -49,7 +49,7 @@ function ShaderObject()
         view.gl.linkProgram(this.program);
 
         if (!view.gl.getProgramParameter(this.program,view.gl.LINK_STATUS)) {
-            this.errorAlert(vertScriptId,fragScriptId,view.gl.getProgramInfoLog(this.program));
+            this.errorAlert(name,"program",view.gl.getProgramInfoLog(this.program));
             this.release();
             return(false);
         }
@@ -81,32 +81,47 @@ function ShaderObject()
         //
         // load shaders
         //
+        
+    this.ajaxShaderFile=function(name)
+    {
+            // yes, I know this is bad, will make
+            // async later
+        
+        var req=new XMLHttpRequest();
+        req.open('GET',('shaders/'+name),false);
+        req.send(null);
+        return(req.responseText);
+    };
 
-    this.loadVertexShader=function(view,vertScriptId)
+    this.loadVertexShader=function(view,name)
     {
         this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
 
-        var script=document.getElementById(vertScriptId);    
-        view.gl.shaderSource(this.vertexShader,script.text);
+        var source=this.ajaxShaderFile(name+'.vert');
+        if (source===null) return(false);
+        
+        view.gl.shaderSource(this.vertexShader,source);
         view.gl.compileShader(this.vertexShader);
 
         if (view.gl.getShaderParameter(this.vertexShader,view.gl.COMPILE_STATUS)) return(true);
 
-        this.errorAlert(vertScriptId,-1,view.gl.getShaderInfoLog(this.vertexShader));
+        this.errorAlert(name,"vertex",view.gl.getShaderInfoLog(this.vertexShader));
         return(false);
     };
 
-    this.loadFragmentShader=function(view,fragScriptId)
+    this.loadFragmentShader=function(view,name)
     {
         this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
 
-        var script=document.getElementById(fragScriptId);    
-        view.gl.shaderSource(this.fragmentShader,script.text);
+        var source=this.ajaxShaderFile(name+'.frag');
+        if (source===null) return(false);
+        
+        view.gl.shaderSource(this.fragmentShader,source);
         view.gl.compileShader(this.fragmentShader);
 
         if (view.gl.getShaderParameter(this.fragmentShader,view.gl.COMPILE_STATUS)) return(true);
 
-        this.errorAlert(-1,fragScriptId,view.gl.getShaderInfoLog(this.fragmentShader));
+        this.errorAlert(name,"fragment",view.gl.getShaderInfoLog(this.fragmentShader));
         return(false);
     };
    
@@ -114,12 +129,10 @@ function ShaderObject()
         // shader errors
         //
 
-    this.errorAlert=function(vertScriptId,fragScriptId,errStr)
+    this.errorAlert=function(name,nameType,errStr)
     {
-        var str='Shader Error\n';
-        if (vertScriptId!==-1) str+=('Vert Shader:'+vertScriptId+'\n');
-        if (fragScriptId!==-1) str+=('Frag Shader:'+fragScriptId+'\n');
-        str+='-----------------------\n';
+        var str='Shader Error: '+name+'('+nameType+')\n';
+        str+='-----------------------------------------\n';
         str+=errStr;
 
         alert(str);

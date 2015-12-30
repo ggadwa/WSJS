@@ -6,16 +6,6 @@
 
 function GenMapObject(view,map,genRandom,callbackFunc)
 {
-        // constants
-        
-    this.TIMEOUT_MSEC=10;
-    
-    this.STAIR_MODE_NONE=0;
-    this.STAIR_MODE_UP=1;
-    this.STAIR_MODE_DOWN=2;
-
-        // variables
-        
     this.view=view;
     this.map=map;
     this.genRandom=genRandom;
@@ -70,7 +60,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshes[n];
-            if (mesh.flag!==this.map.MESH_FLAG_ROOM_WALL) continue;
+            if (mesh.flag!==MESH_FLAG_ROOM_WALL) continue;
             
                 // build a list of meshes that
                 // are targets for trig eliminations from
@@ -80,7 +70,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
             for (k=(n+1);k<nMesh;k++) {
                 otherMesh=this.map.meshes[k];
-                if (otherMesh.flag!==this.map.MESH_FLAG_ROOM_WALL) continue;
+                if (otherMesh.flag!==MESH_FLAG_ROOM_WALL) continue;
                 
                 if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
             }
@@ -167,7 +157,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // floor
             
-        this.map.addMesh(piece.createMeshFloorOrCeiling(this.map.getBitmapById(TEXTURE_FLOOR),xBound,yBound,zBound,true,this.map.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(piece.createMeshFloorOrCeiling(this.map.getBitmapById(TEXTURE_FLOOR),xBound,yBound,zBound,true,MESH_FLAG_ROOM_FLOOR));
 
             // walls
             
@@ -177,10 +167,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var yFloorBound;
         
         for (n=0;n!==storyCount;n++) {
-            mesh=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+            mesh=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,MESH_FLAG_ROOM_WALL);
 
             yFloorBound=new wsBound((yStoryBound.min-settings.roomFloorDepth),yStoryBound.min);
-            var mesh2=piece.createMeshWalls(roomBitmap,xBound,yFloorBound,zBound,this.map.MESH_FLAG_ROOM_WALL);
+            var mesh2=piece.createMeshWalls(roomBitmap,xBound,yFloorBound,zBound,MESH_FLAG_ROOM_WALL);
             mesh.combineMesh(mesh2);
             
             this.map.addMesh(mesh);
@@ -204,7 +194,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // the ceiling
             
-        this.map.addMesh(piece.createMeshFloorOrCeiling(this.map.getBitmapById(TEXTURE_CEILING),xBound,yFloorBound,zBound,false,this.map.MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(piece.createMeshFloorOrCeiling(this.map.getBitmapById(TEXTURE_CEILING),xBound,yFloorBound,zBound,false,MESH_FLAG_ROOM_CEILING));
         
         return(hasStories);
     };
@@ -275,7 +265,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var xLightBound=new wsBound((lightX-400),(lightX+400));
         var yLightBound=new wsBound(lightY,(lightY+1000));
         var zLightBound=new wsBound((lightZ-400),(lightZ+400));
-        this.map.addMesh(meshPrimitives.createMeshPryamid(this.map.getBitmapById(TEXTURE_LIGHT),xLightBound,yLightBound,zLightBound,this.map.MESH_FLAG_LIGHT));
+        this.map.addMesh(meshPrimitives.createMeshPryamid(this.map.getBitmapById(TEXTURE_LIGHT),xLightBound,yLightBound,zLightBound,MESH_FLAG_LIGHT));
 
             // get light intensity and point
 
@@ -395,7 +385,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound((xConnectBound.min-settings.roomDimension[0]),xConnectBound.min);
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
-                        if (stairMode!==this.STAIR_MODE_NONE) {
+                        if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[1]*2;
                             xBound.add(-stairAdd);
                             xStairBound=new wsBound((xConnectBound.min-stairAdd),xConnectBound.min);
@@ -407,7 +397,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                         zBound=new wsBound((zConnectBound.min-settings.roomDimension[2]),zConnectBound.min);
                         
-                        if (stairMode!==this.STAIR_MODE_NONE) {
+                        if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
                             zBound.add(-stairAdd);
                             xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
@@ -419,7 +409,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound(xConnectBound.max,(xConnectBound.max+settings.roomDimension[0]));
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
-                        if (stairMode!==this.STAIR_MODE_NONE) {
+                        if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[1]*2;
                             xBound.add(stairAdd);
                             xStairBound=new wsBound(xConnectBound.max,(xConnectBound.max+stairAdd));
@@ -431,7 +421,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
                         zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.roomDimension[2]));
                         
-                        if (stairMode!==this.STAIR_MODE_NONE) {
+                        if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
                             zBound.add(stairAdd);
                             xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
@@ -447,7 +437,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                     // we never cross over on floors so
                     // don't check the Y
 
-                if (this.map.boxBoundCollision(xBound,null,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) {
+                if (this.map.boxBoundCollision(xBound,null,zBound,MESH_FLAG_ROOM_WALL)===-1) {
                     usedConnectLineIdx=n;
                     break;
                 }
@@ -461,9 +451,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // if previous room raised this one, then
             // we need a stairs to the previous room
 
-        if (stairMode!==this.STAIR_MODE_NONE) {
+        if (stairMode!==STAIR_MODE_NONE) {
             yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+settings.roomFloorDepth)));
-            this.addStairRoom(piece,connectType,xStairBound,yStairBound,zStairBound,(stairMode===this.STAIR_MODE_DOWN),level);
+            this.addStairRoom(piece,connectType,xStairBound,yStairBound,zStairBound,(stairMode===STAIR_MODE_DOWN),level);
         }
 
             // the room mesh
@@ -502,7 +492,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                     // bail if we've reach max room count
 
-                if (this.map.countMeshByFlag(this.map.MESH_FLAG_ROOM_WALL)>=settings.roomMaxCount) break;
+                if (this.map.countMeshByFlag(MESH_FLAG_ROOM_WALL)>=settings.roomMaxCount) break;
 
                     // determine if this line will go off
                     // on another recursion
@@ -516,7 +506,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                     // be a level change
 
                 nextLevel=level;
-                nextStairMode=this.STAIR_MODE_NONE;
+                nextStairMode=STAIR_MODE_NONE;
                 yNextBound=yBound.copy();
 
                 if (noCurrentLevelChange) {
@@ -530,12 +520,12 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         if (level===0) {
                             nextLevel=1;
                             yNextBound.add(-storyAdd);
-                            nextStairMode=this.STAIR_MODE_UP;
+                            nextStairMode=STAIR_MODE_UP;
                         }
                         else {
                             nextLevel=0;
                             yNextBound.add(storyAdd);
-                            nextStairMode=this.STAIR_MODE_DOWN;
+                            nextStairMode=STAIR_MODE_DOWN;
                         }
                         
                             // only one level change
@@ -581,7 +571,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     {
         currentGlobalGenMapObject=this;
         
-        setTimeout(function() { currentGlobalGenMapObject.buildMapPieceList(); },this.TIMEOUT_MSEC);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapPieceList(); },PROCESS_TIMEOUT_MSEC);
     };
     
     this.buildMapPieceList=function()
@@ -593,7 +583,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         this.mapPieceList.fill();
         
         this.view.loadingScreenDraw(0.25);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },this.TIMEOUT_MSEC);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },PROCESS_TIMEOUT_MSEC);
     };
     
     this.buildMapRooms=function()
@@ -601,14 +591,14 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // start the recursive
             // room adding
 
-        this.buildMapRecursiveRoom(0,-1,-1,this.STAIR_MODE_NONE,null,null,null,0);
+        this.buildMapRecursiveRoom(0,-1,-1,STAIR_MODE_NONE,null,null,null,0);
         
             // can setup the map display now
             
         this.map.precalcOverlayDrawValues(this.view);
         
         this.view.loadingScreenDraw(0.50);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },this.TIMEOUT_MSEC);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },PROCESS_TIMEOUT_MSEC);
     };
     
     this.buildMapRemoveSharedTriangles=function()
@@ -618,7 +608,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         this.removeSharedTriangles();
         
         this.view.loadingScreenDraw(0.75);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },this.TIMEOUT_MSEC);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },PROCESS_TIMEOUT_MSEC);
     };
     
     this.buildMapDecorations=function()

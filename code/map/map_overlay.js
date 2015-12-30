@@ -76,13 +76,16 @@ function MapOverlayObject()
             this.mapScale=maxSize/zBound.getSize();
         }
             
-        this.offsetX=xBound.min;
-        this.offsetZ=zBound.min;
+        this.mapOffsetX=xBound.min;
+        this.mapOffsetZ=zBound.min;
         
             // get the drawing position
-            
-        var drawX=(view.wid-5)-Math.floor(xBound.getSize()*this.mapScale);
-        var drawY=Math.floor((view.high-Math.floor(zBound.getSize()*this.mapScale))/2);
+        
+        var drawWid=Math.floor(xBound.getSize()*this.mapScale);
+        var drawHigh=Math.floor(zBound.getSize()*this.mapScale);
+        
+        var drawX=(view.wid-5)-drawWid;
+        var drawY=Math.floor((view.high-drawHigh)/2);
         
             // resize them
             
@@ -94,7 +97,6 @@ function MapOverlayObject()
                 lineVertexList[k+1]=((lineVertexList[k+1]-this.mapOffsetZ)*this.mapScale)+drawY;
             }
         }
-        
     };
     
         //

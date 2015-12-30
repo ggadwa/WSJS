@@ -77,8 +77,8 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         
             // add bones to body and head lists
             
-        this.model.skeleton.limbs.push(new ModelLimbObject(1,[headBoneIdx,neckBoneIdx]));
-        this.model.skeleton.limbs.push(new ModelLimbObject(0,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_HEAD,[headBoneIdx,neckBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_BODY,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
         
             // create arms
         
@@ -98,7 +98,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
             bones[wristBoneIdx].gravityLockDistance=200;
             bones[handBoneIdx].gravityLockDistance=300;
             
-            this.model.skeleton.limbs.push(new ModelLimbObject(2,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx]));
+            this.model.skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_ARM,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx]));
         }
 
             // create legs
@@ -123,7 +123,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
             bones[ankleBoneIdx].gravityLockDistance=200;
             bones[footBoneIdx].gravityLockDistance=250;
             
-            this.model.skeleton.limbs.push(new ModelLimbObject(3,[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx]));
+            this.model.skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_LEG,[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx]));
         }
 
             // finally setup the bones for animation

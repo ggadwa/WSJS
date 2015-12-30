@@ -23,7 +23,7 @@ function InterfaceShaderObject()
             // and load/compile it
 
         this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'wsInterfaceVertShader','wsInterfaceFragShader')) return(false);
+        if (!this.shader.initialize(view,'interface')) return(false);
 
             // setup uniforms
 

@@ -23,7 +23,7 @@ function MapOverlayShaderObject()
             // and load/compile it
 
         this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'wsMapOverlayVertShader','wsMapOverlayFragShader')) return(false);
+        if (!this.shader.initialize(view,'map_overlay')) return(false);
 
             // setup uniforms
 

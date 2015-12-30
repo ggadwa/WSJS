@@ -25,7 +25,7 @@ function DebugShaderObject()
             // and load/compile it
 
         this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'wsDebugVertShader','wsDebugFragShader')) return(false);
+        if (!this.shader.initialize(view,'debug')) return(false);
 
             // setup uniforms
 

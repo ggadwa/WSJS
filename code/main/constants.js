@@ -1,0 +1,135 @@
+//
+// math
+//
+
+const DEGREE_TO_RAD=Math.PI/180.0;
+
+//
+// processing
+//
+
+const PROCESS_TIMEOUT_MSEC=1;           // this is used when using a timeout to keep browser active during long processes
+
+//
+// bitmap generation
+//
+
+const GEN_BITMAP_TEXTURE_SIZE=512;
+
+const GEN_BITMAP_TYPE_BRICK_STACK=0;
+const GEN_BITMAP_TYPE_BRICK_RANDOM=1;
+const GEN_BITMAP_TYPE_STONE=2;
+const GEN_BITMAP_TYPE_TILE_SIMPLE=3;
+const GEN_BITMAP_TYPE_TILE_COMPLEX=4;
+const GEN_BITMAP_TYPE_TILE_SMALL=5;
+const GEN_BITMAP_TYPE_METAL=6;
+const GEN_BITMAP_TYPE_METAL_BAR=7;
+const GEN_BITMAP_TYPE_METAL_CORRUGATED=8;
+const GEN_BITMAP_TYPE_CONCRETE=9;
+const GEN_BITMAP_TYPE_PLASTER=10;
+const GEN_BITMAP_TYPE_MOSAIC=11;
+const GEN_BITMAP_TYPE_WOOD_PLANK=12;
+const GEN_BITMAP_TYPE_WOOD_BOX=13;
+const GEN_BITMAP_TYPE_SKIN=14;
+
+const GEN_BITMAP_TILE_STYLE_BORDER=0;
+const GEN_BITMAP_TILE_STYLE_CHECKER=1;
+const GEN_BITMAP_TILE_STYLE_STRIPE=2;
+
+//
+// resource IDs
+//
+
+const TEXTURE_WALL=0;
+const TEXTURE_FLOOR=1;
+const TEXTURE_CEILING=2;
+const TEXTURE_STAIR=3;
+const TEXTURE_PLATFORM=4;
+const TEXTURE_LIGHT=5;
+const TEXTURE_BOX=6;
+const TEXTURE_PILLAR=7;
+
+//
+// map mesh flags
+//
+
+const MESH_FLAG_NONE=0;
+const MESH_FLAG_ROOM_WALL=1;
+const MESH_FLAG_ROOM_FLOOR=2;
+const MESH_FLAG_ROOM_CEILING=3;
+const MESH_FLAG_ROOM_PLATFORM=4;
+const MESH_FLAG_STAIR=5;
+const MESH_FLAG_LIGHT=6;
+const MESH_FLAG_DECORATION=7;
+
+//
+// map stairs
+//
+        
+const STAIR_MODE_NONE=0;
+const STAIR_MODE_UP=1;
+const STAIR_MODE_DOWN=2;
+
+const STAIR_STEP_COUNT=10;
+
+//
+// map platforms
+//
+
+const PLATFORM_MAX_OPEN_BLOCK_TRY=25;
+
+//
+// model limb types
+//
+
+const LIMB_TYPE_BODY=0;
+const LIMB_TYPE_HEAD=1;
+const LIMB_TYPE_ARM=2;
+const LIMB_TYPE_LEG=3;
+
+//
+// text drawing
+//
+
+const TEXT_TEXTURE_WIDTH=512;
+const TEXT_TEXTURE_HEIGHT=512;
+const TEXT_CHAR_PER_ROW=10;
+const TEXT_CHAR_WIDTH=50;
+const TEXT_CHAR_HEIGHT=50;
+const TEXT_FONT_SIZE=48;
+const TEXT_FONT_NAME='Arial';
+
+const TEXT_ALIGN_LEFT=0;
+const TEXT_ALIGN_CENTER=1;
+const TEXT_ALIGN_RIGHT=2;
+
+//
+// lightmap generation
+//
+
+const LIGHTMAP_TEXTURE_SIZE=1024;
+    
+const LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
+const LIGHTMAP_CHUNK_SIZE=Math.floor(LIGHTMAP_TEXTURE_SIZE/LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
+const LIGHTMAP_CHUNK_PER_TEXTURE=(LIGHTMAP_CHUNK_SPLIT*LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
+
+const LIGHTMAP_RENDER_MARGIN=3;                // margin around each light map triangle
+const LIGHTMAP_BLUR_COUNT=3;
+
+//
+// bitmap generation
+//
+
+const BITMAP_STACKED_X_MIN_COUNT=1;
+const BITMAP_STACKED_X_EXTRA_COUNT=4;
+const BITMAP_STACKED_Y_MIN_COUNT=3;
+const BITMAP_STACKED_Y_EXTRA_COUNT=4;
+
+const BITMAP_GRID_DIVISION=100;
+const BITMAP_GRID_MIN_BLOCK_WIDTH=30;
+const BITMAP_GRID_EXTRA_BLOCK_WIDTH=10;
+const BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
+const BITMAP_GRID_MIN_BLOCK_HEIGHT=10;
+const BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
+const BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
+    

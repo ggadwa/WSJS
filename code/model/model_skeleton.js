@@ -55,13 +55,6 @@ function ModelLimbObject(limbType,boneIndexes)
 {
     this.limbType=limbType;
     this.boneIndexes=boneIndexes;
-    
-        // constants
-        
-    this.LIMB_TYPE_BODY=0;
-    this.LIMB_TYPE_HEAD=1;
-    this.LIMB_TYPE_ARM=2;
-    this.LIMB_TYPE_LEG=3;
 };
 
 //
@@ -342,13 +335,13 @@ function ModelSkeletonObject()
         
         for (n=0;n!==nLimb;n++) {
             limb=this.limbs[n];
-            if ((limb.limbType===limb.LIMB_TYPE_BODY) || (limb.limbType===limb.LIMB_TYPE_HEAD)) continue;
+            if ((limb.limbType===LIMB_TYPE_BODY) || (limb.limbType===LIMB_TYPE_HEAD)) continue;
             
             boneIndexList=this.limbs[n].boneIndexes;
             
             r=view.genRandom.randomInBetween(-45.0,90.0);
 
-            if (limb.limbType===limb.LIMB_TYPE_ARM) {
+            if (limb.limbType===LIMB_TYPE_ARM) {
                 x=0.0;
                 z=r;
             }
