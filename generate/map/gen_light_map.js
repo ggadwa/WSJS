@@ -32,6 +32,10 @@ function GenLightmapBitmapObject()
     
     this.imgData=this.ctx.getImageData(0,0,LIGHTMAP_TEXTURE_SIZE,LIGHTMAP_TEXTURE_SIZE);
     this.pixelData=this.imgData.data;
+    
+        // data for blur
+        
+    this.blurData=new Uint8ClampedArray(this.pixelData.length);
 
         // clear to black with
         // open alpha (we use this later
@@ -91,11 +95,13 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         // border and smear polygons
         //
         
-    this.smudgeChunk=function(pixelData,lft,top,rgt,bot)
+    this.smudgeChunk=function(lightBitmap,lft,top,rgt,bot)
     {
         var x,y,idx;
         var r,g,b;
         var hasColor;
+        
+        var pixelData=lightBitmap.pixelData;
         
             // we run through the entire chunk
             // from left to right, right to left,
@@ -175,6 +181,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 }
             }
             
+            hasColor=false;
+            
             for (y=(bot-1);y<=top;y--) {
                 
                 idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
@@ -196,17 +204,15 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         }
     };
     
-    this.blurChunk=function(pixelData,lft,top,rgt,bot)
+    this.blurChunk=function(lightBitmap,lft,top,rgt,bot)
     {
         var n,idx;
         var x,y,cx,cy,cxs,cxe,cys,cye;
         var colCount,r,g,b;
-        var backData;
-
-            // create a copy of the data
-
-        var backData=new Uint8ClampedArray(pixelData);
-
+        
+        var pixelData=lightBitmap.pixelData;
+        var blurData=lightBitmap.blurData;
+        
             // blur pixels to count
 
         for (n=0;n!==LIGHTMAP_BLUR_COUNT;n++) {
@@ -257,9 +263,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
                     idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
 
-                    backData[idx]=r;
-                    backData[idx+1]=g;
-                    backData[idx+2]=b;
+                    blurData[idx]=r;
+                    blurData[idx+1]=g;
+                    blurData[idx+2]=b;
                 }
             }
 
@@ -268,9 +274,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             for (y=top;y!==bot;y++) {
                 idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
                 for (x=lft;x!==rgt;x++) {       
-                    pixelData[idx]=backData[idx];
-                    pixelData[idx+1]=backData[idx+1];
-                    pixelData[idx+2]=backData[idx+2];
+                    pixelData[idx]=blurData[idx];
+                    pixelData[idx+1]=blurData[idx+1];
+                    pixelData[idx+2]=blurData[idx+2];
                     idx+=4;
                 }
             }
@@ -463,7 +469,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         // render a triangle
         //
 
-    this.renderTriangle=function(meshIdx,pixelData,pts,vs,normal,lft,top,rgt,bot)
+    this.renderTriangle=function(lightBitmap,meshIdx,pts,vs,normal,lft,top,rgt,bot)
     {
         var x,y,lx,rx,tempX,ty,my,by,idx;
         var lxFactor,rxFactor,vFactor;
@@ -471,6 +477,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var vlx=new wsPoint(0,0,0);
         var vrx=new wsPoint(0,0,0);
         var col;
+        
+        var pixelData=lightBitmap.pixelData;
 
             // find the min and max Y points
             // we will build the scan line around this
@@ -578,15 +586,15 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
             // smear and blur chunk
 
-        this.smudgeChunk(pixelData,lft,top,rgt,bot);
-        this.blurChunk(pixelData,lft,top,rgt,bot);
+        this.smudgeChunk(lightBitmap,lft,top,rgt,bot);
+        this.blurChunk(lightBitmap,lft,top,rgt,bot);
     };
 
         //
         // build light map in chunk
         //
 
-    this.writePolyToChunk=function(meshIdx,trigIdx,pixelData,lft,top)
+    this.writePolyToChunk=function(lightBitmap,meshIdx,trigIdx,lft,top)
     {
         var mesh=this.map.meshes[meshIdx];
         var pt0,pt1,pt2;
@@ -665,7 +673,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
             // ray trace the triangle
 
-        this.renderTriangle(meshIdx,pixelData,[pt0,pt1,pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
+        this.renderTriangle(lightBitmap,meshIdx,[pt0,pt1,pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
 
             // add the UV
             // pt0-pt2 are already moved within the margin
@@ -687,7 +695,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
     this.createLightmapForMesh=function(meshIdx)
     {
         var n,lightmapIdx,chunkIdx,nTrig;
-        var lft,top,pixelData;
+        var lft,top;
         var mesh;
         
             // run the status bar
@@ -736,9 +744,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         }
         
             // starting chunk and context
-            
-        chunkIdx=this.lightmapList[lightmapIdx].chunkIdx;
-        pixelData=this.lightmapList[lightmapIdx].pixelData;
+        
+        var lightBitmap=this.lightmapList[lightmapIdx];
+        chunkIdx=lightBitmap.chunkIdx;
         
             // if no light map, then just create
             // UVs for the top-left white map
@@ -764,7 +772,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 lft=(chunkIdx%LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
                 top=Math.floor(chunkIdx/LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
 
-                this.writePolyToChunk(meshIdx,n,pixelData,lft,top);
+                this.writePolyToChunk(lightBitmap,meshIdx,n,lft,top);
 
                 chunkIdx++;
             }
@@ -772,7 +780,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         
             // mark off the chunks we used
             
-        this.lightmapList[lightmapIdx].chunkIdx=chunkIdx;
+        lightBitmap.chunkIdx=chunkIdx;
 
             // map meshes have a temporary index for
             // the light map.  we don't create the light

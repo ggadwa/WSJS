@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 const ROOM_DIMENSIONS=[35000,7000,35000];       // maximum size for a room [x,y,z]
 const ROOM_FLOOR_DEPTH=700;
