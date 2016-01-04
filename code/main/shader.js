@@ -82,32 +82,11 @@ function ShaderObject()
         // load shaders
         //
     
-    this.ajaxShaderFile=function(name)
-    {
-        this.shaderSource=null;
-        
-        var req=new XMLHttpRequest();
-        
-        req.open('GET',('shaders/'+name),false);
-        req.overrideMimeType('text/plain');
-        /*
-        req.onreadystatechange=function() {
-            if (req.readyState!==4) return;
-            if (req.status!==200) 
-        };
-        */
-        req.send(null);
-        
-        return(req.responseText);
-    };
-    
     this.loadVertexShader=function(view,name)
     {
         this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
 
-        var source=this.ajaxShaderFile(name+'.vert');
-        if (source===null) return(false);
-        
+        var source=fileCacheGet('shaders/'+name+'.vert');
         view.gl.shaderSource(this.vertexShader,source);
         view.gl.compileShader(this.vertexShader);
 
@@ -121,9 +100,7 @@ function ShaderObject()
     {
         this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
 
-        var source=this.ajaxShaderFile(name+'.frag');
-        if (source===null) return(false);
-        
+        var source=fileCacheGet('shaders/'+name+'.frag');
         view.gl.shaderSource(this.fragmentShader,source);
         view.gl.compileShader(this.fragmentShader);
 

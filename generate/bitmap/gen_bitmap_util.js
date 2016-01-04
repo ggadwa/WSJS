@@ -152,7 +152,7 @@ function GenBitmapUtilityObject(genRandom)
 
             for (y2=0;y2!==high;y2++) {
                 for (x2=0;x2!==wid;x2++) {
-                    grid[((y+y2)*BItMAP_GRID_DIVISION)+(x+x2)]=1;
+                    grid[((y+y2)*BITMAP_GRID_DIVISION)+(x+x2)]=1;
                 }
             }
         }

@@ -10,6 +10,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     this.map=map;
     this.genRandom=genRandom;
     
+    this.currentRoomCount=0;
+    
         // lists of specialized objects
         // we use to track rooms and add
         // additional elements
@@ -148,10 +150,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (level===0) {
             hasStories=piece.isRoom;
-            hasPlatforms=((hasStories) && (settings.roomPlatforms));
+            hasPlatforms=((hasStories) && (ROOM_PLATFORMS));
         }
         else {
-            hasStories=((this.genRandom.random()>0.5) && (settings.roomPlatforms));
+            hasStories=((this.genRandom.random()>0.5) && (ROOM_PLATFORMS));
             hasPlatforms=false;
         }
         
@@ -169,14 +171,14 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         for (n=0;n!==storyCount;n++) {
             mesh=piece.createMeshWalls(roomBitmap,xBound,yStoryBound,zBound,MESH_FLAG_ROOM_WALL);
 
-            yFloorBound=new wsBound((yStoryBound.min-settings.roomFloorDepth),yStoryBound.min);
+            yFloorBound=new wsBound((yStoryBound.min-ROOM_FLOOR_DEPTH),yStoryBound.min);
             var mesh2=piece.createMeshWalls(roomBitmap,xBound,yFloorBound,zBound,MESH_FLAG_ROOM_WALL);
             mesh.combineMesh(mesh2);
             
             this.map.addMesh(mesh);
             if (n===0) this.map.addOverlayPiece(piece,xBound,zBound);
             
-            yStoryBound.add(-(yBound.getSize()+settings.roomFloorDepth));
+            yStoryBound.add(-(yBound.getSize()+ROOM_FLOOR_DEPTH));
         }
             
             // add this room to the tracking room list so
@@ -261,8 +263,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var lightX=xBound.getMidPoint();
         var lightZ=zBound.getMidPoint();
         
-        var lightY=yBound.min-settings.roomFloorDepth;
-        if (hasStories) lightY-=(yBound.getSize()+settings.roomFloorDepth);
+        var lightY=yBound.min-ROOM_FLOOR_DEPTH;
+        if (hasStories) lightY-=(yBound.getSize()+ROOM_FLOOR_DEPTH);
 
             // light fixture
 
@@ -277,24 +279,24 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var zSize=zBound.getSize();
         if (zSize>intensity) intensity=zSize;
         
-        intensity*=(settings.mapLightFactor+(this.genRandom.random()*settings.mapLightFactorExtra));
-        if (hasStories) intensity*=settings.mapTwoStoryLightBoost;
+        intensity*=(MAP_LIGHT_FACTOR+(this.genRandom.random()*MAP_LIGHT_FACTOR_EXTRA));
+        if (hasStories) intensity*=MAP_LIGHT_TWO_STORY_BOOST;
 
         var pt=new wsPoint(lightX,(lightY+1100),lightZ);
 
             // the color
 
-        var red=settings.mapLightRGBMinimum+(this.genRandom.random()*settings.mapLightRGBExtra);
-        var green=settings.mapLightRGBMinimum+(this.genRandom.random()*settings.mapLightRGBExtra);
-        var blue=settings.mapLightRGBMinimum+(this.genRandom.random()*settings.mapLightRGBExtra);
+        var red=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
+        var green=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
+        var blue=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
         
             // the exponent
             
-        var exponent=settings.mapLightExponentMin+(this.genRandom.random()*settings.mapLightExponentExtra);
+        var exponent=MAP_LIGHT_EXPONENT_MINIMUM+(this.genRandom.random()*MAP_LIGHT_EXPONENT_EXTRA);
 
             // add light to map
 
-        this.map.addLight(new MapLightObject(pt,new wsColor(red,green,blue),(settings.generateLightmap),intensity,exponent));
+        this.map.addLight(new MapLightObject(pt,new wsColor(red,green,blue),MAP_GENERATE_LIGHTMAP,intensity,exponent));
     };
 
         //
@@ -316,8 +318,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         else {       
             pieceIdx=Math.floor(this.mapPieceList.count()*this.genRandom.random());
         }
-
+        
         var piece=this.mapPieceList.get(pieceIdx);
+        
+        this.currentRoomCount++;
 
         var nConnectLine=piece.connectLines.length;
         
@@ -338,13 +342,13 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         if (connectPieceIdx===-1) {
             var mapMid=this.view.OPENGL_FAR_Z/2;
 
-            var halfSize=Math.floor(settings.roomDimension[0]/2);
+            var halfSize=Math.floor(ROOM_DIMENSIONS[0]/2);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(settings.roomDimension[1]/2);
+            var halfSize=Math.floor(ROOM_DIMENSIONS[1]/2);
             yBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(settings.roomDimension[2]/2);
+            var halfSize=Math.floor(ROOM_DIMENSIONS[2]/2);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
         }
 
@@ -386,7 +390,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 switch (connectType) {
 
                     case piece.CONNECT_TYPE_LEFT:
-                        xBound=new wsBound((xConnectBound.min-settings.roomDimension[0]),xConnectBound.min);
+                        xBound=new wsBound((xConnectBound.min-ROOM_DIMENSIONS[0]),xConnectBound.min);
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
                         if (stairMode!==STAIR_MODE_NONE) {
@@ -399,7 +403,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                     case piece.CONNECT_TYPE_TOP:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
-                        zBound=new wsBound((zConnectBound.min-settings.roomDimension[2]),zConnectBound.min);
+                        zBound=new wsBound((zConnectBound.min-ROOM_DIMENSIONS[2]),zConnectBound.min);
                         
                         if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
@@ -410,7 +414,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         break;
 
                     case piece.CONNECT_TYPE_RIGHT:
-                        xBound=new wsBound(xConnectBound.max,(xConnectBound.max+settings.roomDimension[0]));
+                        xBound=new wsBound(xConnectBound.max,(xConnectBound.max+ROOM_DIMENSIONS[0]));
                         zBound=new wsBound((zConnectBound.min+zAdd),(zConnectBound.max+zAdd));
                         
                         if (stairMode!==STAIR_MODE_NONE) {
@@ -423,7 +427,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                     case piece.CONNECT_TYPE_BOTTOM:
                         xBound=new wsBound((xConnectBound.min+xAdd),(xConnectBound.max+xAdd));
-                        zBound=new wsBound(zConnectBound.max,(zConnectBound.max+settings.roomDimension[2]));
+                        zBound=new wsBound(zConnectBound.max,(zConnectBound.max+ROOM_DIMENSIONS[2]));
                         
                         if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
@@ -456,7 +460,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // we need a stairs to the previous room
 
         if (stairMode!==STAIR_MODE_NONE) {
-            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+settings.roomFloorDepth)));
+            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+ROOM_FLOOR_DEPTH)));
             this.addStairRoom(piece,connectType,xStairBound,yStairBound,zStairBound,(stairMode===STAIR_MODE_DOWN),level);
         }
 
@@ -470,7 +474,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // have we recursed too far?
 
-        if (recurseCount<settings.roomMaxRecursion) {
+        if (recurseCount<ROOM_MAX_RECURSIONS) {
 
                 // always need to force at least
                 // one connection.  if that one
@@ -490,20 +494,20 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             var nextLevel;
             var nextStairMode;
             var yNextBound;
-            var storyAdd=yBound.getSize()+settings.roomFloorDepth
+            var storyAdd=yBound.getSize()+ROOM_FLOOR_DEPTH;
 
             for (n=0;n!==nConnectLine;n++) {
 
                     // bail if we've reach max room count
 
-                if (this.map.countMeshByFlag(MESH_FLAG_ROOM_WALL)>=settings.roomMaxCount) break;
+                if (this.currentRoomCount>=ROOM_MAX_COUNT) break;
 
                     // determine if this line will go off
                     // on another recursion
 
                 if (n===usedConnectLineIdx) continue;
                 if (n!==forceConnectLineIdx) {
-                    if (this.genRandom.random()>=settings.roomConnectionPercentage) continue;
+                    if (this.genRandom.random()>=ROOM_CONNECTION_PERCENTAGE) continue;
                 }
 
                     // check if this connection should
@@ -515,7 +519,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
                 if (noCurrentLevelChange) {
 
-                    if (this.genRandom.random()<settings.roomLevelChangePercentage) {
+                    if (this.genRandom.random()<ROOM_LEVEL_CHANGE_PERCENTAGE) {
 
                             // change level, we only have
                             // two levels to keep map crossing
@@ -595,6 +599,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // start the recursive
             // room adding
 
+        this.currentRoomCount=0;
+        
         this.buildMapRecursiveRoom(0,-1,-1,STAIR_MODE_NONE,null,null,null,0);
         
             // can setup the map display now

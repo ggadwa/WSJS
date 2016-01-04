@@ -145,8 +145,8 @@ function GenRoomStairs(map,genRandom)
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=settings.roomFloorDepth;
-            yBoundBottom.min+=settings.roomFloorDepth;
+            yBoundTop.min+=ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -207,7 +207,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
             idx=this.createSingleWallX(idx,vertexList,(flip?xBound.min:xBound.max),yBoundFront,yBoundFront,zStepBound);
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
             
             idx=0;
             vertexList=meshUtility.createMapVertexList(16);
@@ -218,7 +218,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
             idx=this.createSingleWallX(idx,vertexList,(flip?xBound.min:xBound.max),yBoundFront,yBoundFront,zStepBound);
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
             
                 // the behind box brace
             
@@ -252,10 +252,10 @@ function GenRoomStairs(map,genRandom)
         }
         
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-settings.roomFloorDepth);
+        if (!toPlatform) yStepBound.add(-ROOM_FLOOR_DEPTH);
         
         zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
-        
+
         for (n=0;n!==STAIR_STEP_COUNT;n++) {
             if (!flip) {
                 idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yStepBound,yStepBound,zStepBound);
@@ -312,8 +312,8 @@ function GenRoomStairs(map,genRandom)
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=settings.roomFloorDepth;
-            yBoundBottom.min+=settings.roomFloorDepth;
+            yBoundTop.min+=ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -374,7 +374,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xStepBound,yBoundFront,yBoundFront,(flip?zBound.min:zBound.max));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundBottom,yBoundTop,zBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
             
             idx=0;
             vertexList=meshUtility.createMapVertexList(16);
@@ -385,7 +385,7 @@ function GenRoomStairs(map,genRandom)
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xStepBound,yBoundFront,yBoundFront,(flip?zBound.min:zBound.max));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundBottom,yBoundTop,zBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
             
                 // the behind box brace
             
@@ -420,7 +420,7 @@ function GenRoomStairs(map,genRandom)
         }
         
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-settings.roomFloorDepth);
+        if (!toPlatform) yStepBound.add(-ROOM_FLOOR_DEPTH);
         
         xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
 

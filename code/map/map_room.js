@@ -72,7 +72,7 @@ function MapRoomObject(xBound,yBound,zBound,floorGrid,hasStories)
             // if not lower, always force upper
             
         this.upperGrid[2][2]=0;
-        return(new wsPoint(bx,(this.yBound.min-settings.roomFloorDepth),bz));
+        return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
     };
         
     this.findRandomFreeLocation=function(genRandom)
@@ -99,7 +99,7 @@ function MapRoomObject(xBound,yBound,zBound,floorGrid,hasStories)
             else {
                 if (this.upperGrid[z][x]===1) {
                     this.upperGrid[z][x]=0;
-                    return(new wsPoint(bx,(this.yBound.min-settings.roomFloorDepth),bz));
+                    return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
                 }
             }
             

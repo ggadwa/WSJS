@@ -22,8 +22,8 @@ function GenRoomPlatform(map,genRandom,piece,room)
         var zAdd=Math.floor(xBound.getSize()/5);
         
         var xPlatformBound,zPlatformBound;
-        var yPlatformBound=new wsBound((yBound.min-settings.roomFloorDepth),yBound.min);
-        var yPlatformPillarBound=new wsBound((yBound.min-settings.roomFloorDepth),yBound.max);
+        var yPlatformBound=new wsBound((yBound.min-ROOM_FLOOR_DEPTH),yBound.min);
+        var yPlatformPillarBound=new wsBound((yBound.min-ROOM_FLOOR_DEPTH),yBound.max);
         
         var platformBitmap=this.map.getBitmapById(TEXTURE_PLATFORM);
         

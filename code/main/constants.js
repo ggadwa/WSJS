@@ -1,4 +1,87 @@
 //
+// room generation
+//
+
+const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
+const ROOM_DIMENSIONS=[35000,7000,35000];       // maximum size for a room [x,y,z]
+const ROOM_FLOOR_DEPTH=700;
+
+const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connection in a room spawns another room
+const ROOM_LEVEL_CHANGE_PERCENTAGE=0.8;         // what % of the time a room gains another story
+
+const ROOM_PLATFORMS=true;                      // turns on or off platforms
+const ROOM_DECORATIONS=false;                   // set to false for no decorations in the map
+
+//
+// lighting
+//
+
+const MAP_LIGHT_AMBIENT=[0.0,0.0,0.0];          // all over ambient light [r,g,b]
+    
+const MAP_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
+const MAP_LIGHT_FACTOR_EXTRA=0.3;               // random addition to light factor above
+const MAP_LIGHT_TWO_STORY_BOOST=1.3;            // multiply boost when a light is in a two story room
+  
+const MAP_LIGHT_EXPONENT_MINIMUM=0.2;           // minimum light exponent (0.0 is completely hard light with no fall off)
+const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
+    
+const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for map lights
+const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
+    
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+
+//
+// monsters
+//
+
+const MONSTER_MODEL_COUNT=0;
+const MONSTER_ENTITY_COUNT=0;
+
+//
+// timing
+//
+
+const PHYSICS_MILLISECONDS=16;
+const DRAW_MILLISECONDS=16;
+const BAIL_MILLISECONDS=5000;
+
+//
+// play testing
+//
+
+const PLAYER_CLIP_WALLS=false;
+const PLAYER_FLY=false;
+
+//
+// draw debuging
+//
+
+const DEBUG_DRAW_MAP_MESH_LINES=false;
+const DEBUG_DRAW_MAP_MESH_NORMALS=false;
+const DEBUG_DRAW_MAP_MESH_TANGENTS=false;
+
+const DEBUG_DRAW_MODEL_SKELETON=false;
+const DEBUG_DRAW_MODEL_MESH_LINES=false;
+const DEBUG_DRAW_MODEL_MESH_NORMALS=false;
+const DEBUG_DRAW_MODEL_MESH_TANGENTS=false;
+
+//
+// random seeds,
+// hard set these to generate the same map pieces every time
+//
+
+const SEED=Date.now();
+
+const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
+const SEED_MAP=1; // Math.floor((Math.random()*SEED));
+const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
+const SEED_MODEL=Math.floor((Math.random()*SEED));
+const SEED_ENTITY=Math.floor((Math.random()*SEED));
+    
+
+
+//
 // math
 //
 

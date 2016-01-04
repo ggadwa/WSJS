@@ -508,21 +508,21 @@ function MapObject()
         
             // debugging draw
         
-        if (settings.debugDrawMapMeshLines) {
+        if (DEBUG_DRAW_MAP_MESH_LINES) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(view,mesh);
             }
         }
         
-        if (settings.debugDrawMapMeshTangents) {
+        if (DEBUG_DRAW_MAP_MESH_TANGENTS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(view,mesh);
             }
         }
         
-        if (settings.debugDrawMapMeshNormals) {
+        if (DEBUG_DRAW_MAP_MESH_NORMALS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(view,mesh);

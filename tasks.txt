@@ -21,17 +21,24 @@ FUTURE TODOs
 
 REGULAR TODOs
 
-[ ] we need a cached file list so sync can be used
-[ ] request needs to be sync
-[X] crazy FF syntax error on shaders
-[ ] settings -> constants
+
+[ ] lightmaps
+     [X] rendercolor and rendertriangle need to render within the entire data structure
+     [X] then move getImageData outside of those routines (only do it once and remember it), save it back at end
+     [X] eventually move ctx outside of loop also
+     [ ] backData for blur part of rendering too
+
+[X] fix step normals
+[ ] don't draw spaces in text
+
+[X] settings -> constants
 [X] map display need player location
 [X] fixed a number of bugs and improved text drawing, including shadowed text
 [X] move all constants to const and outside of objects, no need to duplicate and emcascript6 doesn't support it, anyway
-[X] shaders are now all ajax loaded instead of being inline.  This means some restrictions when running things locally, though (chrome isn't friendly)
-[ ] in progress bar for models do bitmaps and models separately
+[X] added file cache and moved shaders to be ajax files
+[X] in progress bar for models do bitmaps and models separately
 
-[ ] we might need to find new way to make maps that preserve normals
+[X] we might need to find new way to make maps that preserve normals
 
 [X] map display
 
@@ -43,7 +50,6 @@ REGULAR TODOs
      [X] show triangle count
      [X] is timing calculated right?
      [X] get rid of U, it normal culls badly
-     [ ] checkboard bad
      [ ] inside step normals bad
 
 [ ] need to deal with pausing time stamps
@@ -61,8 +67,6 @@ REGULAR TODOs
     [ ] need to check closest meshes first
     [ ] diffuse calcs in light maps
     [ ] no light mesh hits -- needs "has flag" type call, highlight in lightmap
-
-[ ] don't draw spaces in text
 
 [ ] models
     [ ] need separate globe sizes for each part

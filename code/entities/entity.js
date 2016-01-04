@@ -38,14 +38,14 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
         
             // flying
             
-        if (settings.fly) {
+        if (PLAYER_FLY) {
             movePt.y=-(20*this.angle.x);
             if (dist<0) movePt.y=-movePt.y;
         }
         
             // wall clipping setting, remove later
             
-        if ((settings.clipWalls) && (this.isPlayer)) {
+        if ((PLAYER_CLIP_WALLS) && (this.isPlayer)) {
             this.position.addPoint(movePt);
             return;
         }
@@ -146,7 +146,7 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
             // supergumba -- there's some temp calculations here, need real gravity math
         
         if (this.isPlayer) {
-            if (settings.fly) return;
+            if (PLAYER_FLY) return;
         }
         
         this.fallSpeed+=this.gravity;

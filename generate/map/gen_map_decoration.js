@@ -108,8 +108,8 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
         
             // ybound
             
-        pillarYBound=new wsBound((this.yBound.min-settings.roomFloorDepth),this.yBound.max);
-        if (this.hasStories) pillarYBound.min-=(this.yBound.getSize()+settings.roomFloorDepth);
+        pillarYBound=new wsBound((this.yBound.min-ROOM_FLOOR_DEPTH),this.yBound.max);
+        if (this.hasStories) pillarYBound.min-=(this.yBound.getSize()+ROOM_FLOOR_DEPTH);
         
             // make the pillars
             
@@ -163,7 +163,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
     {
             // this map have decorations?
             
-        if (!settings.decorations) return;
+        if (!ROOM_DECORATIONS) return;
         
             // randomly pick a decoration
             

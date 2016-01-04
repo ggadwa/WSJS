@@ -17,6 +17,9 @@ function MapOverlayObject()
     this.drawX=0;
     this.drawY=0;
     
+    this.drawWid=0;
+    this.drawHigh=0;
+    
     this.vertexPosBuffer=null;
     
         //
@@ -38,24 +41,95 @@ function MapOverlayObject()
     };
     
         //
+        // clip similiar lines in the shape lists
+        //
+        
+    this.sliceLineFromArray=function(list,idx)
+    {
+        var n,k;
+        var len=list.length;
+        var copyLen=len-4;
+        
+        if (copyLen===0) return(new Float32Array(0));
+        
+        var copyList=new Float32Array(copyLen);
+        
+        k=0;
+        
+        for (n=0;n!==len;n++) {
+            if ((n>=idx) && (n<(idx+4))) continue;
+            copyList[k++]=list[n];
+        }
+        
+        return(copyList);
+        
+    };
+        
+    this.clipSimiliarLines=function(lineVertexList)
+    {
+        var n,k,i,clip;
+        var checkVertexList;
+        var nPiece=this.pieceList.length;
+        
+            // delete any similiar lines
+            
+        var hit=false;
+        
+        k=0;
+        while (k<lineVertexList.length) {
+            
+            hit=false;
+            
+            for (n=0;n!==nPiece;n++) {
+                checkVertexList=this.pieceList[n];
+
+                for (i=0;i<checkVertexList.length;i+=4) {
+                    clip=((lineVertexList[k]===checkVertexList[i]) && (lineVertexList[k+1]===checkVertexList[i+1]) && (lineVertexList[k+2]===checkVertexList[i+2]) && (lineVertexList[k+3]===checkVertexList[i+3]));
+                    if (!clip) clip=((lineVertexList[k]===checkVertexList[i+2]) && (lineVertexList[k+1]===checkVertexList[i+3]) && (lineVertexList[k+2]===checkVertexList[i]) && (lineVertexList[k+3]===checkVertexList[i+1]));
+                    
+                    if (clip) {
+                        this.pieceList[n]=this.sliceLineFromArray(checkVertexList,i);
+                        lineVertexList=this.sliceLineFromArray(lineVertexList,k);
+                        hit=true;
+                        break;
+                    }
+                }
+                
+                if (hit) break;
+            }
+            
+            if (!hit) k+=4;
+        }
+        
+        return(lineVertexList);
+    };
+    
+        //
         // add pieces and pre-calc sizing
         //
         
     this.addPiece=function(piece,xBound,zBound)
     {
-        this.pieceList.push(piece.createDisplayShapeLines(xBound,zBound));
+        var lineVertexList=piece.createOverlayLines(xBound,zBound);
+        lineVertexList=this.clipSimiliarLines(lineVertexList);
+        if (lineVertexList.length===0) return;
+        
+        this.pieceList.push(lineVertexList);
     };
     
     this.addBoundPiece=function(xBound,zBound)
     {
-        var shapeLines=new Float32Array(8);
+        var lineVertexList=new Float32Array(16);
         
-        shapeLines[0]=shapeLines[6]=xBound.min;
-        shapeLines[2]=shapeLines[4]=xBound.max;
-        shapeLines[1]=shapeLines[3]=zBound.min;
-        shapeLines[5]=shapeLines[7]=zBound.max;
+        lineVertexList[0]=lineVertexList[10]=lineVertexList[12]=lineVertexList[14]=Math.floor(xBound.min);
+        lineVertexList[2]=lineVertexList[4]=lineVertexList[6]=lineVertexList[8]=Math.floor(xBound.max);
+        lineVertexList[1]=lineVertexList[3]=lineVertexList[5]=lineVertexList[15]=Math.floor(zBound.min);
+        lineVertexList[7]=lineVertexList[9]=lineVertexList[11]=lineVertexList[13]=Math.floor(zBound.max);
         
-        this.pieceList.push(shapeLines);
+        lineVertexList=this.clipSimiliarLines(lineVertexList);
+        if (lineVertexList.length===0) return;
+        
+        this.pieceList.push(lineVertexList);
     };
     
     this.precalcDrawValues=function(view)
@@ -102,11 +176,11 @@ function MapOverlayObject()
         
             // get the drawing position
         
-        var drawWid=Math.floor(xBound.getSize()*this.mapScale);
-        var drawHigh=Math.floor(zBound.getSize()*this.mapScale);
+        this.drawWid=Math.floor(xBound.getSize()*this.mapScale);
+        this.drawHigh=Math.floor(zBound.getSize()*this.mapScale);
         
-        this.drawX=(view.wid-5)-drawWid;
-        this.drawY=Math.floor((view.high-drawHigh)/2);
+        this.drawX=(view.wid-5)-this.drawWid;
+        this.drawY=Math.floor((view.high-this.drawHigh)/2);
         
             // resize them
             
@@ -115,7 +189,7 @@ function MapOverlayObject()
             
             for (k=0;k<lineVertexList.length;k+=2) {
                 lineVertexList[k]=((lineVertexList[k]-this.mapOffsetX)*this.mapScale)+this.drawX;
-                lineVertexList[k+1]=((lineVertexList[k+1]-this.mapOffsetZ)*this.mapScale)+this.drawY;
+                lineVertexList[k+1]=(this.drawHigh-((lineVertexList[k+1]-this.mapOffsetZ)*this.mapScale))+this.drawY;
             }
         }
     };
@@ -147,7 +221,7 @@ function MapOverlayObject()
         for (n=0;n!==nPiece;n++) {
             lineVertexList=this.pieceList[n];
             gl.bufferData(gl.ARRAY_BUFFER,lineVertexList,gl.STREAM_DRAW);
-            gl.drawArrays(gl.LINE_LOOP,0,Math.floor(lineVertexList.length/2));
+            gl.drawArrays(gl.LINES,0,Math.floor(lineVertexList.length/2));
         }
         
             // entities
@@ -160,7 +234,7 @@ function MapOverlayObject()
         
         var vList=new Float32Array(6);
         
-        var entity;
+        var entity,ang;
         var nEntity=entityList.count();
         
         var playerColor=new wsColor(0.5,1.0,0.5);
@@ -169,16 +243,18 @@ function MapOverlayObject()
         for (n=0;n!==nEntity;n++) {
             entity=entityList.get(n);
             this.mapOverlayShader.drawColor(view,(entity.isPlayer?playerColor:monsterColor));
+            
+            ang=360.0-entity.angle.y;
         
-            p1.set(-5,-5);
-            p1.rotate(null,entity.angle.y);
-            p2.set(0,5);
-            p2.rotate(null,entity.angle.y);
-            p3.set(5,-5);
-            p3.rotate(null,entity.angle.y);
+            p1.set(-5,5);
+            p1.rotate(null,ang);
+            p2.set(0,-5);
+            p2.rotate(null,ang);
+            p3.set(5,5);
+            p3.rotate(null,ang);
             
             x=((entity.position.x-this.mapOffsetX)*this.mapScale)+this.drawX;
-            y=((entity.position.z-this.mapOffsetZ)*this.mapScale)+this.drawY;
+            y=(this.drawHigh-((entity.position.z-this.mapOffsetZ)*this.mapScale))+this.drawY;
 
             vList[0]=p1.x+x;
             vList[1]=p1.y+y;

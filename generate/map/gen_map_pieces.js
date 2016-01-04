@@ -245,14 +245,14 @@ function MapPieceObject(isRoom)
         return(mesh);
     };
     
-    this.createDisplayShapeLines=function(xBound,zBound)
+    this.createOverlayLines=function(xBound,zBound)
     {
-        var n,nPoint,x,z;
-        var pt;
+        var n,k,nPoint,x,z;
+        var pt1,pt2;
 
         nPoint=this.points.length;
 
-        var lineVertexList=new Float32Array(2*nPoint);
+        var lineVertexList=new Float32Array(4*nPoint);
         
         var sx=xBound.getSize();
         var sz=zBound.getSize();
@@ -260,12 +260,23 @@ function MapPieceObject(isRoom)
         var vIdx=0;
 
         for (n=0;n!==nPoint;n++) {
-            pt=this.points[n];
-            x=xBound.min+Math.floor(sx*(pt[0]*0.01));
-            z=zBound.min+Math.floor(sz*(pt[1]*0.01));
+            pt1=this.points[n];
+            
+            k=n+1;
+            if (k===nPoint) k=0;
+            pt2=this.points[k];
+            
+            x=xBound.min+Math.floor(sx*(pt1[0]*0.01));
+            z=zBound.min+Math.floor(sz*(pt1[1]*0.01));
 
-            lineVertexList[vIdx++]=x;
-            lineVertexList[vIdx++]=z;
+            lineVertexList[vIdx++]=Math.floor(x);
+            lineVertexList[vIdx++]=Math.floor(z);
+            
+            x=xBound.min+Math.floor(sx*(pt2[0]*0.01));
+            z=zBound.min+Math.floor(sz*(pt2[1]*0.01));
+
+            lineVertexList[vIdx++]=Math.floor(x);
+            lineVertexList[vIdx++]=Math.floor(z);
         }
 
         return(lineVertexList);
@@ -470,227 +481,28 @@ function MapPieceListObject()
 
         this.add(mapPiece);
         
-            // diamond
+            // slant
 
         mapPiece=new MapPieceObject(true);
 
-        mapPiece.points.push([0,40]);
         mapPiece.points.push([40,0]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([100,60]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([0,60]);
-        
-        mapPiece.floorGrid=[
-          [0,1,1,1,0],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [0,1,1,1,0]
-        ];
-
-        this.add(mapPiece);
-        
-            // checkerboard
-
-        mapPiece=new MapPieceObject(true);
-
-        mapPiece.points.push([0,10]);
-        mapPiece.points.push([20,10]);
-        mapPiece.points.push([20,0]);
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([40,10]);
-        mapPiece.points.push([60,10]);
         mapPiece.points.push([60,0]);
         mapPiece.points.push([80,0]);
-        mapPiece.points.push([80,10]);
-        mapPiece.points.push([100,10]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([90,40]);
-        mapPiece.points.push([90,60]);
-        mapPiece.points.push([100,60]);
-        mapPiece.points.push([100,80]);
-        mapPiece.points.push([100,100]);
-        mapPiece.points.push([80,100]);
+        mapPiece.points.push([100,0]);
+        mapPiece.points.push([100,20]);
         mapPiece.points.push([60,100]);
         mapPiece.points.push([40,100]);
         mapPiece.points.push([20,100]);
         mapPiece.points.push([0,100]);
         mapPiece.points.push([0,80]);
         mapPiece.points.push([0,60]);
-        mapPiece.points.push([10,60]);
-        mapPiece.points.push([10,40]);
-        mapPiece.points.push([0,40]);
-        
-        mapPiece.floorGrid=[
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1]
-        ];
-
-        this.add(mapPiece);
-        
-            // star
-
-        mapPiece=new MapPieceObject(true);
-
-        mapPiece.points.push([0,0]);
-        mapPiece.points.push([20,0]);
-        mapPiece.points.push([40,10]);
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([60,10]);
-        mapPiece.points.push([80,0]);
-        mapPiece.points.push([100,0]);
-        mapPiece.points.push([100,20]);
-        mapPiece.points.push([90,40]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([100,60]);
-        mapPiece.points.push([100,80]);
-        mapPiece.points.push([100,100]);
-        mapPiece.points.push([80,100]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([20,100]);
-        mapPiece.points.push([0,100]);
-        mapPiece.points.push([0,80]);
-        mapPiece.points.push([0,60]);
-        mapPiece.points.push([0,40]);
-        mapPiece.points.push([10,40]);
-        mapPiece.points.push([0,20]);
-        
-        mapPiece.floorGrid=[
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1]
-        ];
-
-        this.add(mapPiece);   
-
-            // plus
-
-        mapPiece=new MapPieceObject(false);
-
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([60,40]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([100,60]);
-        mapPiece.points.push([60,60]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([40,60]);
-        mapPiece.points.push([0,60]);
-        mapPiece.points.push([0,40]);
-        mapPiece.points.push([40,40]);
-        
-        mapPiece.floorGrid=[
-          [0,0,1,0,0],
-          [0,0,1,0,0],
-          [1,1,1,1,1],
-          [0,0,1,0,0],
-          [0,0,1,0,0]
-        ];
-
-        this.add(mapPiece);
-
-            // Half X
-
-        mapPiece=new MapPieceObject(false);
-
-        mapPiece.points.push([0,0]);
-        mapPiece.points.push([20,0]);
-        mapPiece.points.push([40,20]);
-        mapPiece.points.push([60,20]);
-        mapPiece.points.push([80,0]);
-        mapPiece.points.push([100,0]);
-        mapPiece.points.push([100,20]);
-        mapPiece.points.push([80,40]);
-        mapPiece.points.push([80,60]);
-        mapPiece.points.push([80,80]);
-        mapPiece.points.push([80,100]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([20,100]);
-        mapPiece.points.push([20,80]); 
-        mapPiece.points.push([20,60]);
-        mapPiece.points.push([20,40]);
-        mapPiece.points.push([0,20]);
-        
-        mapPiece.floorGrid=[
-          [1,1,0,1,1],
-          [1,1,1,1,1],
-          [0,1,1,1,0],
-          [0,1,1,1,0],
-          [0,1,1,1,0]
-        ];
-
-        this.add(mapPiece);
-
-            // S
-
-        mapPiece=new MapPieceObject(false);
-
-        mapPiece.points.push([0,100]);
-        mapPiece.points.push([0,80]);
-        mapPiece.points.push([0,60]);
-        mapPiece.points.push([0,40]);
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([80,0]);
-        mapPiece.points.push([100,0]);
-        mapPiece.points.push([100,20]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([80,40]);
-        mapPiece.points.push([60,50]);
-        mapPiece.points.push([50,60]);
-        mapPiece.points.push([40,80]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([20,100]);
         
         mapPiece.floorGrid=[
           [0,1,1,1,1],
           [1,1,1,1,1],
-          [1,1,1,1,0],
-          [1,1,1,0,0],
-          [1,1,0,0,0]
-        ];
-
-        this.add(mapPiece);
-        
-            // connecting hallway
-
-        mapPiece=new MapPieceObject(false);
-
-        mapPiece.points.push([0,20]);
-        mapPiece.points.push([20,20]);
-        mapPiece.points.push([20,0]);
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([60,20]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([100,60]);
-        mapPiece.points.push([100,80]);
-        mapPiece.points.push([80,80]);
-        mapPiece.points.push([80,100]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([40,80]);
-        mapPiece.points.push([0,60]);
-        mapPiece.points.push([0,40]);
-        
-        mapPiece.floorGrid=[
-          [0,1,1,0,0],
           [1,1,1,1,1],
           [1,1,1,1,1],
-          [1,1,1,1,1],
-          [0,0,1,1,0]
+          [1,1,1,1,0]
         ];
 
         this.add(mapPiece);

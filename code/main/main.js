@@ -51,10 +51,10 @@ function wsLoopRun(timeStamp)
     var physicsTick=view.timeStamp-view.loopLastPhysicTimeStamp;
     view.loopLastPhysicTimeStamp=view.timeStamp;
     
-    if (physicsTick>settings.bailMilliseconds) return;
+    if (physicsTick>BAIL_MILLISECONDS) return;
     
-    while (physicsTick>settings.physicsMilliseconds) {
-        physicsTick-=settings.physicsMilliseconds;
+    while (physicsTick>PHYSICS_MILLISECONDS) {
+        physicsTick-=PHYSICS_MILLISECONDS;
         
         entityList.run(map);
     }
@@ -63,7 +63,7 @@ function wsLoopRun(timeStamp)
         
     var drawTick=view.timeStamp-view.loopLastDrawTimeStamp;
     
-    if (drawTick>settings.drawMilliseconds) {
+    if (drawTick>DRAW_MILLISECONDS) {
         view.loopLastDrawTimeStamp=view.timeStamp; 
 
         view.draw(map,entityList);
@@ -112,6 +112,11 @@ function wsLoopStart()
 
 function wsInit()
 {
+    fileCacheStart(wsInitGL);       // this contains all the shaders, needs to be loaded first
+}
+
+function wsInitGL()
+{
         // init view
         // webgl and canvas stuff
     
@@ -124,7 +129,7 @@ function wsInit()
     view.loadingScreenAddString('Initializing Internal Structures');
     view.loadingScreenDraw(null);
     
-    setTimeout(wsInitInternal,10);
+    setTimeout(wsInitInternal,PROCESS_TIMEOUT_MSEC);
 }
     
 function wsInitInternal()
@@ -136,7 +141,7 @@ function wsInitInternal()
     
         // create list of dynamic textures
         
-    var textureGenRandom=new GenRandomObject(settings.randomSeedMapBitmap);
+    var textureGenRandom=new GenRandomObject(SEED_MAP_BITMAP);
     
         // next step
     
@@ -144,7 +149,7 @@ function wsInitInternal()
     view.loadingScreenAddString('Generating Dynamic Textures');
     view.loadingScreenDraw(null);
     
-    setTimeout(function() { wsInitBuildTextures(0,textureGenRandom); },10);
+    setTimeout(function() { wsInitBuildTextures(0,textureGenRandom); },PROCESS_TIMEOUT_MSEC);
 }
 
 function wsInitBuildTextures(idx,textureGenRandom)
@@ -169,7 +174,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
     idx++;
     if (idx<bitmapCount) {
         view.loadingScreenDraw(idx/bitmapCount);
-        setTimeout(function() { wsInitBuildTextures(idx,textureGenRandom); },10);
+        setTimeout(function() { wsInitBuildTextures(idx,textureGenRandom); },PROCESS_TIMEOUT_MSEC);
         return;
     }
     
@@ -179,14 +184,14 @@ function wsInitBuildTextures(idx,textureGenRandom)
     view.loadingScreenAddString('Generating Dynamic Map');
     view.loadingScreenDraw(null);
 
-    setTimeout(wsInitBuildMap,10);
+    setTimeout(wsInitBuildMap,PROCESS_TIMEOUT_MSEC);
 }
 
 function wsInitBuildMap()
 {
         // random seed
 
-    var mapGenRandom=new GenRandomObject(settings.randomSeedMap);
+    var mapGenRandom=new GenRandomObject(SEED_MAP);
 
         // build the map
         
@@ -200,7 +205,7 @@ function wsInitBuildMapFinish()
     view.loadingScreenAddString('Building Collision Geometry');
     view.loadingScreenDraw(null);
 
-    setTimeout(wsInitBuildCollisionGeometry,10);
+    setTimeout(wsInitBuildCollisionGeometry,PROCESS_TIMEOUT_MSEC);
 }
 
 function wsInitBuildCollisionGeometry()
@@ -219,7 +224,7 @@ function wsInitBuildCollisionGeometry()
     view.loadingScreenAddString('Building Light Map');
     view.loadingScreenDraw(null);
 
-    setTimeout(wsInitBuildLightmap,10);
+    setTimeout(wsInitBuildLightmap,PROCESS_TIMEOUT_MSEC);
 }
 
 function wsInitBuildLightmap()
@@ -228,30 +233,34 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
 
-    var genLightmap=new GenLightmapObject(view,map,debug,settings.generateLightmap,wsInitBuildLightmapFinish);
+    var genLightmap=new GenLightmapObject(view,map,debug,MAP_GENERATE_LIGHTMAP,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
 
 function wsInitBuildLightmapFinish()
 {
-    var textureGenRandom=new GenRandomObject(settings.randomSeedModelBitmap);
-    var modelGenRandom=new GenRandomObject(settings.randomSeedModel);
+    var textureGenRandom=new GenRandomObject(SEED_MODEL_BITMAP);
+    var modelGenRandom=new GenRandomObject(SEED_MODEL);
     
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Models');
     view.loadingScreenDraw(null);
 
-    setTimeout(function() { wsInitBuildModels(0,textureGenRandom,modelGenRandom); },10);
+    setTimeout(function() { wsInitBuildModelsTexture(0,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
 }
 
-function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
+function wsInitBuildModelsTexture(idx,textureGenRandom,modelGenRandom)
 {
-    var model,genSkeleton,genModelMesh;
-    
-        // get a model texture
-        
     var genBitmap=new GenBitmapObject(textureGenRandom);    
     var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);
+    
+    view.loadingScreenDraw((idx*2)/(MONSTER_MODEL_COUNT*2));    
+    setTimeout(function() { wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
+}
+    
+function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
+{
+    var model,genSkeleton,genModelMesh;
     
         // player model if 0
         // else a monster
@@ -274,11 +283,12 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
     modelList.add(model);
     
         // if more models, then loop back around
+    
+    view.loadingScreenDraw(((idx*2)+1)/(MONSTER_MODEL_COUNT*2));    
         
     idx++;
-    if (idx<(settings.modelMonsterCount+1)) {
-        view.loadingScreenDraw(idx/settings.modelMonsterCount);    
-        setTimeout(function() { wsInitBuildModels(idx,textureGenRandom,modelGenRandom); },10);
+    if (idx<(MONSTER_MODEL_COUNT+1)) {
+        setTimeout(function() { wsInitBuildModelsTexture(idx,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
         return;
     }
     
@@ -288,7 +298,7 @@ function wsInitBuildModels(idx,textureGenRandom,modelGenRandom)
     view.loadingScreenAddString('Generating Dynamic Entities');
     view.loadingScreenDraw(null);
     
-    setTimeout(wsInitBuildEntities,10);
+    setTimeout(wsInitBuildEntities,PROCESS_TIMEOUT_MSEC);
 }
 
 function wsInitBuildEntities()
@@ -296,7 +306,7 @@ function wsInitBuildEntities()
     var n,monsterModelName;
     var model,pos;
     
-    var entityGenRandom=new GenRandomObject(settings.randomSeedEntity);
+    var entityGenRandom=new GenRandomObject(SEED_ENTITY);
     
         // make player entity
         
@@ -306,11 +316,11 @@ function wsInitBuildEntities()
         // we clone their models in the list so each entity gets
         // it's own model
         
-    for (n=0;n!==settings.monsterEntityCount;n++) {
+    for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
         pos=map.findRandomPosition(entityGenRandom);
         if (pos===null) continue;
         
-        monsterModelName='monster_'+entityGenRandom.randomInt(0,settings.modelMonsterCount);
+        monsterModelName='monster_'+entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);
         model=modelList.clone(view,monsterModelName);
         
         entityList.add(new EntityObject(pos,new wsAngle(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model,false));
@@ -322,7 +332,7 @@ function wsInitBuildEntities()
     view.loadingScreenAddString('Running');
     view.loadingScreenDraw(null);
         
-    setTimeout(wsInitFinish,10);    
+    setTimeout(wsInitFinish,PROCESS_TIMEOUT_MSEC);    
 }
 
 function wsInitFinish()
@@ -334,7 +344,7 @@ function wsInitFinish()
     
         // ambient
         
-    view.ambient.set(settings.ambient[0],settings.ambient[1],settings.ambient[2]);
+    view.ambient.set(MAP_LIGHT_AMBIENT[0],MAP_LIGHT_AMBIENT[1],MAP_LIGHT_AMBIENT[2]);
     
         // start the input
         
