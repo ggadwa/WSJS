@@ -299,6 +299,11 @@ function ws2DPoint(x,y)
         return(Math.sqrt(this.noSquareDistance(pt)));
     };
     
+    this.equals=function(pt)
+    {
+        return((this.x===pt.x)&&(this.y===pt.y));
+    };
+    
     this.rotate=function(centerPt,rot)
     {
         if (centerPt!==null) {
@@ -386,6 +391,38 @@ function wsLine(p1,p2)
     this.getZBound=function()
     {
         return(new wsBound(p1.z,p2.z));
+    };
+}
+
+function ws2DLine(p1,p2)
+{
+    this.p1=p1;
+    this.p2=p2;
+    
+    this.setPoint1=function(p1)
+    {
+        this.p1=p1;
+    };
+    
+    this.setPoint2=function(p2)
+    {
+        this.p2=p2;
+    };
+    
+    this.equals=function(line)
+    {
+        if ((this.p1.equals(line.p1)) && (this.p2.equals(line.p2))) return(true);
+        return((this.p1.equals(line.p2)) && (this.p2.equals(line.p1)));
+    };
+    
+    this.getXBound=function()
+    {
+        return(new wsBound(p1.x,p2.x));
+    };
+    
+    this.getYBound=function()
+    {
+        return(new wsBound(p1.y,p2.y));
     };
 }
 

@@ -12,12 +12,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     
     this.currentRoomCount=0;
     
-        // lists of specialized objects
-        // we use to track rooms and add
-        // additional elements
-        
-    this.roomDecorationList=[];
-    
         // the callback function when
         // generation concludes
         
@@ -149,7 +143,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var hasPlatforms=false;
         
         if (level===0) {
-            hasStories=piece.isRoom;
+            hasStories=true;
             hasPlatforms=((hasStories) && (ROOM_PLATFORMS));
         }
         else {
@@ -176,7 +170,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             mesh.combineMesh(mesh2);
             
             this.map.addMesh(mesh);
-            if (n===0) this.map.addOverlayPiece(piece,xBound,zBound);
+            if (n===0) this.map.addOverlayRoom(piece,xBound,zBound);
             
             yStoryBound.add(-(yBound.getSize()+ROOM_FLOOR_DEPTH));
         }
@@ -184,8 +178,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        var roomIdx=0;
-        if (piece.isRoom) roomIdx=this.map.addRoom(xBound,yBound,zBound,piece.floorGrid,hasStories);
+        var roomIdx=this.map.addRoom(piece,xBound,yBound,zBound,hasStories,level);
         
             // platforms
             
@@ -253,7 +246,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // add to overlay
             
-        this.map.addOverlayBoundPiece(xStairBound,zStairBound);
+        this.map.addOverlayStair(xStairBound,zStairBound);
     };
 
     this.addLight=function(piece,xBound,yBound,zBound,hasStories)
@@ -548,26 +541,31 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 this.buildMapRecursiveRoom((recurseCount+1),pieceIdx,n,nextStairMode,xBound,yNextBound,zBound,nextLevel);
             }
         }
-        
-            // if it's a room, add to the
-            // decoration list
-
-        piece=this.mapPieceList.get(pieceIdx);
-        if ((piece.isRoom) && (level===1)) this.roomDecorationList.push(new GenRoomDecorationObject(this.view,this.map,piece,xBound,yBound,zBound,hasStories,this.genRandom));
     };
     
         //
-        // decorate the meshes
+        // closets and decorations
         //
+        
+    this.buildRoomClosets=function()
+    {
+        var n,closet;
+        var nRoom=this.map.rooms.length;
+        
+        for (n=0;n!==nRoom;n++) {
+            closet=new GenRoomClosetObject(this.view,this.map,this.map.rooms[n],genRandom);
+            closet.addCloset();
+        }
+    };
         
     this.buildRoomDecorations=function()
     {
-        var n,nMesh;
+        var n,decoration;
+        var nRoom=this.map.rooms.length;
         
-        nMesh=this.roomDecorationList.length;
-        
-        for (n=0;n!==nMesh;n++) {
-            this.roomDecorationList[n].addDecoration();
+        for (n=0;n!==nRoom;n++) {
+            decoration=new GenRoomDecorationObject(this.view,this.map,this.map.rooms[n],genRandom);
+            decoration.addDecoration();
         }
     };
 
@@ -579,6 +577,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     {
         currentGlobalGenMapObject=this;
         
+        this.view.loadingScreenDraw(0.15);
         setTimeout(function() { currentGlobalGenMapObject.buildMapPieceList(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -590,7 +589,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         this.mapPieceList=new MapPieceListObject();
         this.mapPieceList.fill();
         
-        this.view.loadingScreenDraw(0.25);
+        this.view.loadingScreenDraw(0.30);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -607,7 +606,19 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
         this.map.precalcOverlayDrawValues(this.view);
         
-        this.view.loadingScreenDraw(0.50);
+        this.view.loadingScreenDraw(0.45);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapClosets(); },PROCESS_TIMEOUT_MSEC);
+    };
+    
+    this.buildMapClosets=function()
+    {
+            // build room closets
+            
+        this.buildRoomClosets();
+        
+            // finish with the callback
+
+        this.view.loadingScreenDraw(0.60);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -617,6 +628,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         this.removeSharedTriangles();
         
+            // finish with the callback
+            
         this.view.loadingScreenDraw(0.75);
         setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },PROCESS_TIMEOUT_MSEC);
     };
@@ -628,7 +641,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         this.buildRoomDecorations();
         
             // finish with the callback
-
+            
         this.view.loadingScreenDraw(1.0);
         this.callbackFunc();
     };

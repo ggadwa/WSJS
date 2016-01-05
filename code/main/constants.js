@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=10;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 const ROOM_DIMENSIONS=[35000,7000,35000];       // maximum size for a room [x,y,z]
 const ROOM_FLOOR_DEPTH=700;
@@ -11,7 +11,7 @@ const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connecti
 const ROOM_LEVEL_CHANGE_PERCENTAGE=0.8;         // what % of the time a room gains another story
 
 const ROOM_PLATFORMS=true;                      // turns on or off platforms
-const ROOM_DECORATIONS=false;                   // set to false for no decorations in the map
+const ROOM_DECORATIONS=true;                   // set to false for no decorations in the map
 
 //
 // lighting
@@ -29,7 +29,7 @@ const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
 const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for map lights
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
     
-const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
 //
 // monsters

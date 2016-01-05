@@ -4,9 +4,8 @@
 // map piece class
 //
 
-function MapPieceObject(isRoom)
+function MapPieceObject()
 {
-    this.isRoom=isRoom;
     this.points=[];
     this.connectLines=[];
     this.decorationLocations=[];
@@ -245,20 +244,18 @@ function MapPieceObject(isRoom)
         return(mesh);
     };
     
-    this.createOverlayLines=function(xBound,zBound)
+    this.createOverlayLineList=function(xBound,zBound)
     {
-        var n,k,nPoint,x,z;
+        var n,k,nPoint,x,z,x2,z2;
         var pt1,pt2;
 
         nPoint=this.points.length;
 
-        var lineVertexList=new Float32Array(4*nPoint);
+        var lineList=[];
         
         var sx=xBound.getSize();
         var sz=zBound.getSize();
         
-        var vIdx=0;
-
         for (n=0;n!==nPoint;n++) {
             pt1=this.points[n];
             
@@ -269,17 +266,13 @@ function MapPieceObject(isRoom)
             x=xBound.min+Math.floor(sx*(pt1[0]*0.01));
             z=zBound.min+Math.floor(sz*(pt1[1]*0.01));
 
-            lineVertexList[vIdx++]=Math.floor(x);
-            lineVertexList[vIdx++]=Math.floor(z);
+            x2=xBound.min+Math.floor(sx*(pt2[0]*0.01));
+            z2=zBound.min+Math.floor(sz*(pt2[1]*0.01));
             
-            x=xBound.min+Math.floor(sx*(pt2[0]*0.01));
-            z=zBound.min+Math.floor(sz*(pt2[1]*0.01));
-
-            lineVertexList[vIdx++]=Math.floor(x);
-            lineVertexList[vIdx++]=Math.floor(z);
+            lineList.push(new ws2DLine(new ws2DPoint(x,z),new ws2DPoint(x2,z2)));
         }
 
-        return(lineVertexList);
+        return(lineList);
     };
     
         //
@@ -316,7 +309,7 @@ function MapPieceObject(isRoom)
 
     this.clone=function()
     {
-        var mapPiece2=new MapPieceObject(this.isRoom);
+        var mapPiece2=new MapPieceObject();
         mapPiece2.points=JSON.parse(JSON.stringify(this.points));
         mapPiece2.connectLines=JSON.parse(JSON.stringify(this.connectLines));
         mapPiece2.decorationLocations=JSON.parse(JSON.stringify(this.decorationLocations));
@@ -415,7 +408,7 @@ function MapPieceListObject()
     
             // box
 
-        mapPiece=new MapPieceObject(true);
+        mapPiece=new MapPieceObject();
 
         mapPiece.points.push([0,0]);
         mapPiece.points.push([20,0]);
@@ -450,7 +443,7 @@ function MapPieceListObject()
 
             // half circle
 
-        mapPiece=new MapPieceObject(true);
+        mapPiece=new MapPieceObject();
 
         mapPiece.points.push([0,40]);
         mapPiece.points.push([10,20]);
@@ -483,7 +476,7 @@ function MapPieceListObject()
         
             // slant
 
-        mapPiece=new MapPieceObject(true);
+        mapPiece=new MapPieceObject();
 
         mapPiece.points.push([40,0]);
         mapPiece.points.push([60,0]);

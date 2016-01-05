@@ -7,12 +7,14 @@
 // entities or decorations or objectives
 //
 
-function MapRoomObject(xBound,yBound,zBound,floorGrid,hasStories)
+function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
 {
+    this.piece=piece;
     this.xBound=xBound;
     this.yBound=yBound;
     this.zBound=zBound;
     this.hasStories=hasStories;
+    this.level=level;
     
         // floor grid becomes first part
         // of lower and upper grid
@@ -37,8 +39,8 @@ function MapRoomObject(xBound,yBound,zBound,floorGrid,hasStories)
     
     for (z=0;z!==5;z++) {
         for (x=0;x!==5;x++) {
-            this.lowerGrid[z][x]=floorGrid[z][x];
-            this.upperGrid[z][x]=floorGrid[z][x];
+            this.lowerGrid[z][x]=piece.floorGrid[z][x];
+            this.upperGrid[z][x]=piece.floorGrid[z][x];
         }
     }
 

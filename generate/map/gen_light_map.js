@@ -7,8 +7,6 @@
 // light map object because light maps require
 // time outs and the "this" on the timeout is
 // the window object.
-// EMAScript 6 probably has a work-around for this
-// in the future.
 //
 
 var currentGlobalLightMapObject=null;
@@ -63,6 +61,19 @@ function GenLightmapBitmapObject()
 }
 
 //
+// this is a object used to hold the last mesh/trig
+// that blocked a light.  we use this as an optimization
+// as a trig that blocked this light probably blocks
+// further pixels in the current trig render
+//
+
+function GetLightmapLastBlockObject()
+{
+    this.meshIdx=-1;
+    this.cacheTrigIdx=-1;
+}
+
+//
 // generate lightmaps class
 //
 
@@ -80,6 +91,10 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         // drawn to (the chunkIdx)
         
     this.lightmapList=[];
+    
+        // the last block optimization list
+        
+    this.lastBlockList=[];
     
         // the callback function when
         // generation concludes
@@ -183,7 +198,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             
             hasColor=false;
             
-            for (y=(bot-1);y<=top;y--) {
+            for (y=(bot-1);y>=top;y--) {
                 
                 idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
                 if (pixelData[idx+3]!==0) {
@@ -212,6 +227,19 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         
         var pixelData=lightBitmap.pixelData;
         var blurData=lightBitmap.blurData;
+        
+            // default to current color if blur
+            // fails because of alpha
+            
+        for (y=top;y!==bot;y++) {
+            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
+            for (x=lft;x!==rgt;x++) {       
+                blurData[idx]=pixelData[idx];
+                blurData[idx+1]=pixelData[idx+1];
+                blurData[idx+2]=pixelData[idx+2];
+                idx+=4;
+            }
+        }
         
             // blur pixels to count
 
@@ -245,27 +273,31 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
                             idx=((cy*LIGHTMAP_TEXTURE_SIZE)+cx)*4;
 
-                            r+=pixelData[idx];
-                            g+=pixelData[idx+1];
-                            b+=pixelData[idx+2];
-                            colCount++;
+                            if (pixelData[idx+3]!==0) {
+                                r+=pixelData[idx];
+                                g+=pixelData[idx+1];
+                                b+=pixelData[idx+2];
+                                colCount++;
+                            }
                         }
                     }
                     
-                    r=Math.floor(r/colCount);
-                    if (r>255) r=255;
+                    if (colCount!==0) {
+                        r=Math.floor(r/colCount);
+                        if (r>255) r=255;
 
-                    g=Math.floor(g/colCount);
-                    if (g>255) g=255;
+                        g=Math.floor(g/colCount);
+                        if (g>255) g=255;
 
-                    b=Math.floor(b/colCount);
-                    if (b>255) b=255;
+                        b=Math.floor(b/colCount);
+                        if (b>255) b=255;
 
-                    idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
+                        idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
 
-                    blurData[idx]=r;
-                    blurData[idx+1]=g;
-                    blurData[idx+2]=b;
+                        blurData[idx]=r;
+                        blurData[idx+1]=g;
+                        blurData[idx+2]=b;
+                    }
                 }
             }
 
@@ -348,7 +380,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
     this.rayTraceVertex=function(meshIdx,vx,vy,vz,normal)
     {
-        var n,nLight,trigCount;
+        var n,nLight,lightIdx,trigCount;
         var light;
         var k,p,hit,lightMesh,mesh,nMesh;
         var trigRayTraceCache;
@@ -370,7 +402,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         nLight=lightMesh.lightIntersectList.length;
 
         for (n=0;n!==nLight;n++) {
-            light=this.map.lights[lightMesh.lightIntersectList[n]];
+            lightIdx=lightMesh.lightIntersectList[n];
+            light=this.map.lights[lightIdx];
 
                 // light within light range?
 
@@ -397,6 +430,13 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             lightBoundX=new wsBound(vx,light.position.x);
             lightBoundY=new wsBound(vy,light.position.y);
             lightBoundZ=new wsBound(vz,light.position.z);
+            
+                // check the optimized list of last hits
+                
+            if (this.lastBlockList[lightIdx].meshIdx!==-1) {
+                mesh=this.map.meshes[this.lastBlockList[lightIdx].meshIdx];
+                if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,mesh.trigRayTraceCache[this.lastBlockList[lightIdx].cacheTrigIdx])) continue;
+            }
 
                 // each light has a list of meshes within
                 // it's light cone, these are the only meshes
@@ -418,6 +458,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 for (p=0;p!==trigCount;p++) {
                     if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,trigRayTraceCache[p])) {
                         hit=true;
+                        this.lastBlockList[lightIdx].meshIdx=light.meshIntersectList[k];
+                        this.lastBlockList[lightIdx].cacheTrigIdx=p;
                         break;
                     }
                 }
@@ -479,6 +521,11 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var col;
         
         var pixelData=lightBitmap.pixelData;
+        
+            // we keep track of the last mesh/trig
+            // that blocked this trig from a light
+            // as an optimization
+            // lightMesh.lightIntersectList.length
 
             // find the min and max Y points
             // we will build the scan line around this
@@ -831,6 +878,13 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         for (n=0;n!==nMesh;n++) {
             this.map.meshes[n].buildTrigRayTraceCache();
         }
+        
+            // now build the last block list, which
+            // is used to optimize ray collisions
+            
+        for (n=0;n!==this.map.lights.length;n++) {
+            this.lastBlockList.push(new GetLightmapLastBlockObject());
+        }
 
             // run through the meshes
             // by a timer so we don't trigger the
@@ -875,7 +929,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         
                     // debugging
 
-        if (this.lightmapList.length!==0) debug.displayCanvasData(this.lightmapList[0].canvas,1050,10,1024,1024);
+        //if (this.lightmapList.length!==0) debug.displayCanvasData(this.lightmapList[0].canvas,1050,10,1024,1024);
 
             // finish with the callback
 

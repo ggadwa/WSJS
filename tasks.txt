@@ -22,11 +22,7 @@ FUTURE TODOs
 REGULAR TODOs
 
 
-[ ] lightmaps
-     [X] rendercolor and rendertriangle need to render within the entire data structure
-     [X] then move getImageData outside of those routines (only do it once and remember it), save it back at end
-     [X] eventually move ctx outside of loop also
-     [ ] backData for blur part of rendering too
+[ ] closets
 
 [X] fix step normals
 [ ] don't draw spaces in text
@@ -41,16 +37,17 @@ REGULAR TODOs
 [X] we might need to find new way to make maps that preserve normals
 
 [X] map display
+[X] better lightmap generation
 
 [ ] optimizations
      [X] shared triangle reduction
      [ ] model wrapping
-     [ ] light map generation
+     [X] light map generation
      [X] normal culling
      [X] show triangle count
      [X] is timing calculated right?
      [X] get rid of U, it normal culls badly
-     [ ] inside step normals bad
+     [X] inside step normals bad
 
 [ ] need to deal with pausing time stamps
 

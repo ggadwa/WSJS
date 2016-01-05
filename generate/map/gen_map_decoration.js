@@ -1,21 +1,17 @@
 "use strict";
 
 //
-// generate mesh decoration class
+// generate room decoration class
 //
 
-function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,genRandom)
+function GenRoomDecorationObject(view,map,room,genRandom)
 {
         // variables
         
     this.view=view;
     this.map=map;
-    this.piece=piece;
-    this.xBound=xBound;
-    this.yBound=yBound;
-    this.zBound=zBound;
-    this.hasStories=hasStories;
     this.genRandom=genRandom;
+    this.room=room;
 
         //
         // random boxes
@@ -25,55 +21,18 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
     {
         var n,count;
         var x,z,high,boxBoundX,boxBoundY,boxBoundZ;
-/*        
-        x=xBound.getMidPoint()-8000;
-        z=zBound.getMidPoint();
-        
-        boxBoundX=new wsBound((x-1000),(x+1000));
-        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
-        boxBoundZ=new wsBound((z-1000),(z+1000));
-        
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
-
-        x=xBound.getMidPoint()+8000;
-        z=zBound.getMidPoint();
-        
-        boxBoundX=new wsBound((x-1000),(x+1000));
-        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
-        boxBoundZ=new wsBound((z-1000),(z+1000));
-        
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
-
-        x=xBound.getMidPoint();
-        z=zBound.getMidPoint()-8000;
-        
-        boxBoundX=new wsBound((x-1000),(x+1000));
-        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
-        boxBoundZ=new wsBound((z-1000),(z+1000));
-        
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
-
-        x=xBound.getMidPoint();
-        z=zBound.getMidPoint()+8000;
-        
-        boxBoundX=new wsBound((x-1000),(x+1000));
-        boxBoundY=new wsBound((yBound.max-2000),yBound.max);
-        boxBoundZ=new wsBound((z-1000),(z+1000));
-        
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
-*/
 
         count=this.genRandom.randomInt(1,3);
 
         for (n=0;n!==count;n++) {
-            x=this.genRandom.randomInBetween((xBound.min+1000),(xBound.max-1000));
-            z=this.genRandom.randomInBetween((zBound.min+1000),(zBound.max-1000));
+            x=this.genRandom.randomInBetween((this.room.xBound.min+1000),(this.room.xBound.max-1000));
+            z=this.genRandom.randomInBetween((this.room.zBound.min+1000),(this.room.zBound.max-1000));
             
             high=2000;
             if (this.genRandom.random()>0.5) high=3500;
 
             boxBoundX=new wsBound((x-1000),(x+1000));
-            boxBoundY=new wsBound((yBound.max-high),yBound.max);
+            boxBoundY=new wsBound((this.room.yBound.max-high),this.room.yBound.max);
             boxBoundZ=new wsBound((z-1000),(z+1000));
             
             if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,MESH_FLAG_STAIR)!==-1) continue;
@@ -91,7 +50,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
     {
         var n,rd;
         var boxBoundX,boxBoundZ,pillarYBound;
-        var pt=new wsPoint(0,yBound.max,0);
+        var pt=new wsPoint(0,this.room.yBound.max,0);
         
             // setup cylinder segments
             
@@ -100,16 +59,16 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
             // get count and radius from center
 
         var count=4+(this.genRandom.randomInt(0,2)*4);  // pillars are in groups of 4
-        var centerPt=new wsPoint(xBound.getMidPoint(),yBound.max,zBound.getMidPoint());
+        var centerPt=new wsPoint(this.room.xBound.getMidPoint(),this.room.yBound.max,this.room.zBound.getMidPoint());
         
         var radiusReduce=(0.8+(this.genRandom.random()*0.2));
-        var radiusX=(xBound.getSize()*0.3)*radiusReduce;
-        var radiusZ=(zBound.getSize()*0.3)*radiusReduce;
+        var radiusX=(this.room.xBound.getSize()*0.3)*radiusReduce;
+        var radiusZ=(this.room.zBound.getSize()*0.3)*radiusReduce;
         
             // ybound
             
-        pillarYBound=new wsBound((this.yBound.min-ROOM_FLOOR_DEPTH),this.yBound.max);
-        if (this.hasStories) pillarYBound.min-=(this.yBound.getSize()+ROOM_FLOOR_DEPTH);
+        pillarYBound=new wsBound((this.room.yBound.min-ROOM_FLOOR_DEPTH),this.room.yBound.max);
+        if (this.room.hasStories) pillarYBound.min-=(this.room.yBound.getSize()+ROOM_FLOOR_DEPTH);
         
             // make the pillars
             
@@ -129,7 +88,7 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
             
                 // put in the pillar
             
-            if (this.map.boxBoundCollision(boxBoundX,yBound,boxBoundZ,MESH_FLAG_STAIR)===-1) {
+            if (this.map.boxBoundCollision(boxBoundX,this.room.yBound,boxBoundZ,MESH_FLAG_STAIR)===-1) {
                 map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(TEXTURE_PILLAR),pt,pillarYBound,segments,MESH_FLAG_DECORATION));
             }
             
@@ -146,14 +105,14 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
     {
             // the machine size
             
-        var centerPt=new wsPoint(xBound.getMidPoint(),yBound.max,zBound.getMidPoint());
+        var centerPt=new wsPoint(this.room.xBound.getMidPoint(),this.room.yBound.max,this.room.zBound.getMidPoint());
             
         var sizeX=this.genRandom.randomInt(2000,1000);
-        var sizeY=yBound.getSize()*0.7;
+        var sizeY=this.room.yBound.getSize()*0.7;
         var sizeZ=this.genRandom.randomInt(2000,1000);
         
         var machineBoundX=new wsBound((centerPt.x-sizeX),(centerPt.x+sizeX));
-        var machineBoundY=new wsBound((yBound.max-sizeY),yBound.max);
+        var machineBoundY=new wsBound((this.room.yBound.max-sizeY),this.room.yBound.max);
         var machineBoundZ=new wsBound((centerPt.z-sizeZ),(centerPt.z+sizeZ));
 
         map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
@@ -163,11 +122,11 @@ function GenRoomDecorationObject(view,map,piece,xBound,yBound,zBound,hasStories,
     {
             // this map have decorations?
             
-        if (!ROOM_DECORATIONS) return;
+        if ((!ROOM_DECORATIONS) || (this.room.level===0)) return;
         
             // randomly pick a decoration
             
-        switch (this.genRandom.randomInt(0,2)) {
+        switch (this.genRandom.randomInt(0,1)) {
             case 0:
                 this.addBoxes();
                 break;

@@ -92,9 +92,9 @@ function MapObject()
         // tracking rooms
         //
         
-    this.addRoom=function(xBound,yBound,zBound,floorGrid,hasStories)
+    this.addRoom=function(piece,xBound,yBound,zBound,hasStories,level)
     {
-        this.rooms.push(new MapRoomObject(xBound,yBound,zBound,floorGrid,hasStories));
+        this.rooms.push(new MapRoomObject(piece,xBound,yBound,zBound,hasStories,level));
         return(this.rooms.length-1);
     };
 
@@ -425,14 +425,19 @@ function MapObject()
         this.overlay.draw(view,entityList);
     };
     
-    this.addOverlayPiece=function(piece,xBound,zBound)
+    this.addOverlayRoom=function(piece,xBound,zBound)
     {
-        this.overlay.addPiece(piece,xBound,zBound);
+        this.overlay.addRoom(piece,xBound,zBound);
     };
     
-    this.addOverlayBoundPiece=function(xBound,zBound)
+    this.addOverlayStair=function(xBound,zBound)
     {
-        this.overlay.addBoundPiece(xBound,zBound);
+        this.overlay.addStair(xBound,zBound);
+    };
+    
+    this.addOverlayPlatform=function(xBound,zBound)
+    {
+        this.overlay.addPlatform(xBound,zBound);
     };
 
         //

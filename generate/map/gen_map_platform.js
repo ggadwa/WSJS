@@ -91,6 +91,10 @@ function GenRoomPlatform(map,genRandom,piece,room)
             
             grid[z][x]=isPillar?3:2;       // we use 2/3 so we can later re-check list for stair locations
             
+                // add to overlay
+                
+            this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
+            
                 // move to next platform area
                 
             moveOk=false;

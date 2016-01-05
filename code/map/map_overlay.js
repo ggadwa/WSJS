@@ -8,7 +8,8 @@ function MapOverlayObject()
 {
     this.mapOverlayShader=new MapOverlayShaderObject();
     
-    this.pieceList=[];
+    this.roomLineList=[];
+    this.extraLineList=[];
     
     this.mapOffsetX=0;
     this.mapOffsetZ=0;
@@ -20,7 +21,9 @@ function MapOverlayObject()
     this.drawWid=0;
     this.drawHigh=0;
     
-    this.vertexPosBuffer=null;
+    this.roomVertexPosBuffer=null;
+    this.extraVertexPosBuffer=null;
+    this.entityVertexPosBuffer=null;
     
         //
         // initialize/release overlay object
@@ -29,131 +32,112 @@ function MapOverlayObject()
     this.initialize=function(view)
     {
         if (!this.mapOverlayShader.initialize(view)) return(false);
-        this.vertexPosBuffer=view.gl.createBuffer();
+        
+        this.roomVertexPosBuffer=view.gl.createBuffer();
+        this.extraVertexPosBuffer=view.gl.createBuffer();
+        this.entityVertexPosBuffer=view.gl.createBuffer();
         
         return(true);
     };
 
     this.release=function(view)
     {
-        view.gl.deleteBuffer(this.vertexPosBuffer);
+        view.gl.deleteBuffer(this.roomVertexPosBuffer);
+        view.gl.deleteBuffer(this.extraVertexPosBuffer);
+        view.gl.deleteBuffer(this.entityVertexPosBuffer);
+        
         this.mapOverlayShader.release(view);
     };
-    
+        
         //
-        // clip similiar lines in the shape lists
+        // add lines to specific line lists
         //
         
-    this.sliceLineFromArray=function(list,idx)
+    this.addLines=function(lineList,lines)
     {
         var n,k;
-        var len=list.length;
-        var copyLen=len-4;
+        var isDup;
         
-        if (copyLen===0) return(new Float32Array(0));
-        
-        var copyList=new Float32Array(copyLen);
-        
-        k=0;
-        
-        for (n=0;n!==len;n++) {
-            if ((n>=idx) && (n<(idx+4))) continue;
-            copyList[k++]=list[n];
-        }
-        
-        return(copyList);
-        
-    };
-        
-    this.clipSimiliarLines=function(lineVertexList)
-    {
-        var n,k,i,clip;
-        var checkVertexList;
-        var nPiece=this.pieceList.length;
-        
-            // delete any similiar lines
+            // add to line list, removing duplicates
             
-        var hit=false;
-        
-        k=0;
-        while (k<lineVertexList.length) {
+        for (n=0;n!==lines.length;n++) {
             
-            hit=false;
-            
-            for (n=0;n!==nPiece;n++) {
-                checkVertexList=this.pieceList[n];
-
-                for (i=0;i<checkVertexList.length;i+=4) {
-                    clip=((lineVertexList[k]===checkVertexList[i]) && (lineVertexList[k+1]===checkVertexList[i+1]) && (lineVertexList[k+2]===checkVertexList[i+2]) && (lineVertexList[k+3]===checkVertexList[i+3]));
-                    if (!clip) clip=((lineVertexList[k]===checkVertexList[i+2]) && (lineVertexList[k+1]===checkVertexList[i+3]) && (lineVertexList[k+2]===checkVertexList[i]) && (lineVertexList[k+3]===checkVertexList[i+1]));
-                    
-                    if (clip) {
-                        this.pieceList[n]=this.sliceLineFromArray(checkVertexList,i);
-                        lineVertexList=this.sliceLineFromArray(lineVertexList,k);
-                        hit=true;
-                        break;
-                    }
-                }
+                // check for dups
                 
-                if (hit) break;
+            isDup=false;
+            
+            for (k=0;k!==lineList.length;k++) {
+                if (lineList[k].equals(lines[n])) {
+                    isDup=true;
+                    lineList.splice(k,1);
+                    break;
+                }
             }
             
-            if (!hit) k+=4;
+                // add it
+                
+            if (!isDup) lineList.push(lines[n]);
         }
-        
-        return(lineVertexList);
     };
     
         //
-        // add pieces and pre-calc sizing
+        // add pieces to overlay
         //
         
-    this.addPiece=function(piece,xBound,zBound)
+    this.addRoom=function(piece,xBound,zBound)
     {
-        var lineVertexList=piece.createOverlayLines(xBound,zBound);
-        lineVertexList=this.clipSimiliarLines(lineVertexList);
-        if (lineVertexList.length===0) return;
-        
-        this.pieceList.push(lineVertexList);
+        this.addLines(this.roomLineList,piece.createOverlayLineList(xBound,zBound));
     };
     
-    this.addBoundPiece=function(xBound,zBound)
+    this.addStair=function(xBound,zBound)
     {
-        var lineVertexList=new Float32Array(16);
+        var lines=[];
         
-        lineVertexList[0]=lineVertexList[10]=lineVertexList[12]=lineVertexList[14]=Math.floor(xBound.min);
-        lineVertexList[2]=lineVertexList[4]=lineVertexList[6]=lineVertexList[8]=Math.floor(xBound.max);
-        lineVertexList[1]=lineVertexList[3]=lineVertexList[5]=lineVertexList[15]=Math.floor(zBound.min);
-        lineVertexList[7]=lineVertexList[9]=lineVertexList[11]=lineVertexList[13]=Math.floor(zBound.max);
+        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.min),new ws2DPoint(xBound.max,zBound.min)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.min),new ws2DPoint(xBound.max,zBound.max)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.max),new ws2DPoint(xBound.min,zBound.max)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.max),new ws2DPoint(xBound.min,zBound.min)));
         
-        lineVertexList=this.clipSimiliarLines(lineVertexList);
-        if (lineVertexList.length===0) return;
-        
-        this.pieceList.push(lineVertexList);
+        this.addLines(this.roomLineList,lines);
     };
+    
+    this.addPlatform=function(xBound,zBound)
+    {
+        var lines=[];
+        
+        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.min),new ws2DPoint(xBound.max,zBound.min)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.min),new ws2DPoint(xBound.max,zBound.max)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.max),new ws2DPoint(xBound.min,zBound.max)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.max),new ws2DPoint(xBound.min,zBound.min)));
+        
+        this.addLines(this.extraLineList,lines);
+    };
+    
+        //
+        // precalc the drawing values
+        //
     
     this.precalcDrawValues=function(view)
     {
-        var n,k;
-        var xBound,zBound;
-        var lineVertexList;
-        
-        var nPiece=this.pieceList.length;
+        var n,idx,line;
+        var xBound,yBound;
+        var gl=view.gl;
+        var nLine=this.roomLineList.length;
         
             // get the total size
             
-        for (n=0;n!==nPiece;n++) {
-            lineVertexList=this.pieceList[n];
+        for (n=0;n!==nLine;n++) {
+            line=this.roomLineList[n];
             
             if (n===0) {
-                xBound=new wsBound(lineVertexList[0],lineVertexList[0]);
-                zBound=new wsBound(lineVertexList[1],lineVertexList[1]);
+                xBound=line.getXBound();
+                yBound=line.getYBound();
             }
             
-            for (k=0;k<lineVertexList.length;k+=2) {
-                xBound.adjust(lineVertexList[k]);
-                zBound.adjust(lineVertexList[k+1]);
-            }
+            xBound.adjust(line.p1.x);
+            xBound.adjust(line.p2.x);
+            yBound.adjust(line.p1.y);
+            yBound.adjust(line.p2.y);
         }
         
             // the max size of the overlay
@@ -164,34 +148,61 @@ function MapOverlayObject()
             // get the scale
             // and remember offset to put entities in later
             
-        if (xBound.getSize()>zBound.getSize()) {
+        if (xBound.getSize()>yBound.getSize()) {
             this.mapScale=maxSize/xBound.getSize();
         }
         else {
-            this.mapScale=maxSize/zBound.getSize();
+            this.mapScale=maxSize/yBound.getSize();
         }
             
         this.mapOffsetX=xBound.min;
-        this.mapOffsetZ=zBound.min;
+        this.mapOffsetZ=yBound.min;
         
             // get the drawing position
         
         this.drawWid=Math.floor(xBound.getSize()*this.mapScale);
-        this.drawHigh=Math.floor(zBound.getSize()*this.mapScale);
+        this.drawHigh=Math.floor(yBound.getSize()*this.mapScale);
         
         this.drawX=(view.wid-5)-this.drawWid;
         this.drawY=Math.floor((view.high-this.drawHigh)/2);
         
-            // resize them
+            // create the room vertex buffer
+        
+        idx=0;
+        var roomVertexList=new Float32Array(nLine*4);
+        
+        for (n=0;n!==nLine;n++) {
+            line=this.roomLineList[n];
             
-        for (n=0;n!==nPiece;n++) {
-            lineVertexList=this.pieceList[n];
-            
-            for (k=0;k<lineVertexList.length;k+=2) {
-                lineVertexList[k]=((lineVertexList[k]-this.mapOffsetX)*this.mapScale)+this.drawX;
-                lineVertexList[k+1]=(this.drawHigh-((lineVertexList[k+1]-this.mapOffsetZ)*this.mapScale))+this.drawY;
-            }
+            roomVertexList[idx++]=((line.p1.x-this.mapOffsetX)*this.mapScale)+this.drawX;
+            roomVertexList[idx++]=(this.drawHigh-((line.p1.y-this.mapOffsetZ)*this.mapScale))+this.drawY;
+            roomVertexList[idx++]=((line.p2.x-this.mapOffsetX)*this.mapScale)+this.drawX;
+            roomVertexList[idx++]=(this.drawHigh-((line.p2.y-this.mapOffsetZ)*this.mapScale))+this.drawY;
         }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,roomVertexList,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        
+            // create the extra vertex buffer
+        
+        idx=0;
+        nLine=this.extraLineList.length;
+        
+        var extraVertexList=new Float32Array(nLine*4);
+        
+        for (n=0;n!==nLine;n++) {
+            line=this.extraLineList[n];
+            
+            extraVertexList[idx++]=((line.p1.x-this.mapOffsetX)*this.mapScale)+this.drawX;
+            extraVertexList[idx++]=(this.drawHigh-((line.p1.y-this.mapOffsetZ)*this.mapScale))+this.drawY;
+            extraVertexList[idx++]=((line.p2.x-this.mapOffsetX)*this.mapScale)+this.drawX;
+            extraVertexList[idx++]=(this.drawHigh-((line.p2.y-this.mapOffsetZ)*this.mapScale))+this.drawY;
+        }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,extraVertexList,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
     };
     
         //
@@ -206,25 +217,26 @@ function MapOverlayObject()
         this.mapOverlayShader.drawStart(view);
         gl.disable(gl.DEPTH_TEST);
         
-            // setup the buffers
-
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+            // extra lines
+            
+        this.mapOverlayShader.drawColor(view,new wsColor(0.5,0.5,1.0));
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-
-            // map lines
+        gl.drawArrays(gl.LINES,0,(this.extraLineList.length*2));
+        
+            // room lines
             
         this.mapOverlayShader.drawColor(view,new wsColor(0.0,0.0,1.0));
             
-        var lineVertexList;
-        var nPiece=this.pieceList.length;
-        
-        for (n=0;n!==nPiece;n++) {
-            lineVertexList=this.pieceList[n];
-            gl.bufferData(gl.ARRAY_BUFFER,lineVertexList,gl.STREAM_DRAW);
-            gl.drawArrays(gl.LINES,0,Math.floor(lineVertexList.length/2));
-        }
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
+        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        gl.drawArrays(gl.LINES,0,(this.roomLineList.length*2));
         
             // entities
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.entityVertexPosBuffer);
+        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             
         var x,y;
         
