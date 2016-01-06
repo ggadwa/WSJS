@@ -29,7 +29,7 @@ const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
 const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for map lights
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
     
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters

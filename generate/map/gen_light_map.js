@@ -862,8 +862,6 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
     {
         var n;
         var nMesh=this.map.meshes.length;
-        
-        this.startTime=Date.now();
 
             // remember the light map object
             // globally for callbacks because "this" is
@@ -924,8 +922,6 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             mesh=this.map.meshes[n];
             mesh.lightmap=this.map.lightmaps[mesh.tempLightmapIdx];
         }
-        
-        console.log('complete='+(Date.now()-this.startTime));
         
                     // debugging
 
