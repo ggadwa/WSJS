@@ -378,31 +378,30 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         return((t>0.01)&&(t<1.0));
     };
 
-    this.rayTraceVertex=function(meshIdx,vx,vy,vz,normal)
+    this.rayTraceVertex=function(meshIdx,lightList,vx,vy,vz,normal)
     {
         var n,nLight,lightIdx,trigCount;
         var light;
-        var k,p,hit,lightMesh,mesh,nMesh;
+        var k,p,hit,mesh,nMesh;
         var trigRayTraceCache;
         var lightVectorX,lightVectorY,lightVectorZ;
         var lightBoundX,lightBoundY,lightBoundZ;
         var dist,att;
         var col=new wsColor(0.0,0.0,0.0);
-        var lightVectorNormal=new wsPoint(0.0,0.0,0.0);
 
-            // we have a list of mesh/light intersections we
-            // use to reduce the number of lights we check for
-            // a mesh
+            // we use the passed in light list which is a cut down
+            // list precalculcated from mesh/light interactions and
+            // removing any lights that are facing away from the
+            // front side of the triangle
 
             // we precalculated a list of a single point on the
             // triangle and two vectors for each side around that point
             // to speed this up.  That's what the trigRayTraceCache is for
 
-        lightMesh=this.map.meshes[meshIdx];
-        nLight=lightMesh.lightIntersectList.length;
+        nLight=lightList.length;
 
         for (n=0;n!==nLight;n++) {
-            lightIdx=lightMesh.lightIntersectList[n];
+            lightIdx=lightList[n];
             light=this.map.lights[lightIdx];
 
                 // light within light range?
@@ -418,25 +417,18 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             lightVectorY=light.position.y-vy;
             lightVectorZ=light.position.z-vz;
 
-                // ignore all triangles that are facing
-                // away from the light
-
-            lightVectorNormal.set(lightVectorX,lightVectorY,lightVectorZ);
-            lightVectorNormal.normalize();
-            if (lightVectorNormal.dot(normal)<0.0) continue;
-
-                // light bounding
-
-            lightBoundX=new wsBound(vx,light.position.x);
-            lightBoundY=new wsBound(vy,light.position.y);
-            lightBoundZ=new wsBound(vz,light.position.z);
-            
                 // check the optimized list of last hits
                 
             if (this.lastBlockList[lightIdx].meshIdx!==-1) {
                 mesh=this.map.meshes[this.lastBlockList[lightIdx].meshIdx];
                 if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,mesh.trigRayTraceCache[this.lastBlockList[lightIdx].cacheTrigIdx])) continue;
             }
+            
+                // light bounding
+
+            lightBoundX=new wsBound(vx,light.position.x);
+            lightBoundY=new wsBound(vy,light.position.y);
+            lightBoundZ=new wsBound(vz,light.position.z);
 
                 // each light has a list of meshes within
                 // it's light cone, these are the only meshes
@@ -513,7 +505,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
     this.renderTriangle=function(lightBitmap,meshIdx,pts,vs,normal,lft,top,rgt,bot)
     {
-        var x,y,lx,rx,tempX,ty,my,by,idx;
+        var n,x,y,lx,rx,tempX,ty,my,by,idx;
         var lxFactor,rxFactor,vFactor;
         var vx,vy,vz;
         var vlx=new wsPoint(0,0,0);
@@ -522,10 +514,28 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         
         var pixelData=lightBitmap.pixelData;
         
-            // we keep track of the last mesh/trig
-            // that blocked this trig from a light
-            // as an optimization
-            // lightMesh.lightIntersectList.length
+            // create a list of possible lights
+            // for this triangle based on the compiled
+            // mesh light lists and triangle normal to
+            // determine if the triangle is facing away
+            // from the light
+            
+        var mesh=this.map.meshes[meshIdx];
+        var nLight=mesh.lightIntersectList.length;
+        
+        var light,lightIdx;
+        var lightVectorNormal=new wsPoint(0.0,0.0,0.0);
+        
+        var lightList=[];
+
+        for (n=0;n!==nLight;n++) {
+            lightIdx=mesh.lightIntersectList[n];
+            light=this.map.lights[lightIdx];
+
+            lightVectorNormal.set((light.position.x-vs[0].x),(light.position.y-vs[0].y),(light.position.z-vs[0].z));
+            lightVectorNormal.normalize();
+            if (lightVectorNormal.dot(normal)>=0.0) lightList.push(lightIdx);
+        }
 
             // find the min and max Y points
             // we will build the scan line around this
@@ -622,7 +632,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 
                     // write the pixel
 
-                col=this.rayTraceVertex(meshIdx,vx,vy,vz,normal);
+                col=this.rayTraceVertex(meshIdx,lightList,vx,vy,vz,normal);
                 
                 pixelData[idx++]=Math.floor(col.r*255.0);
                 pixelData[idx++]=Math.floor(col.g*255.0);

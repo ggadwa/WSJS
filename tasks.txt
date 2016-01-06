@@ -22,6 +22,9 @@ FUTURE TODOs
 REGULAR TODOs
 
 
+[X] do lightmap normal against lights check outside of ray trace
+[ ] special check for all black (lightList.length===0) -- always have an all black one
+
 [ ] closets
 
 [X] fix step normals
