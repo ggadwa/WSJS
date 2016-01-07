@@ -37,7 +37,7 @@ function GenRoomDecorationObject(view,map,room,genRandom)
             
             if (this.map.boxBoundCollision(boxBoundX,boxBoundY,boxBoundZ,MESH_FLAG_STAIR)!==-1) continue;
             
-            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
         }
 
     };
@@ -115,7 +115,7 @@ function GenRoomDecorationObject(view,map,room,genRandom)
         var machineBoundY=new wsBound((this.room.yBound.max-sizeY),this.room.yBound.max);
         var machineBoundZ=new wsBound((centerPt.z-sizeZ),(centerPt.z+sizeZ));
 
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
     };
 
     this.addDecoration=function()

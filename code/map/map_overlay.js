@@ -89,6 +89,18 @@ function MapOverlayObject()
         this.addLines(this.roomLineList,piece.createOverlayLineList(xBound,zBound));
     };
     
+    this.addCloset=function(xBound,zBound)
+    {
+        var lines=[];
+        
+        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.min),new ws2DPoint(xBound.max,zBound.min)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.min),new ws2DPoint(xBound.max,zBound.max)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.max),new ws2DPoint(xBound.min,zBound.max)));
+        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.max),new ws2DPoint(xBound.min,zBound.min)));
+        
+        this.addLines(this.roomLineList,lines);
+    };
+    
     this.addStair=function(xBound,zBound)
     {
         var lines=[];

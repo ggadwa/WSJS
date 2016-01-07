@@ -22,13 +22,18 @@ FUTURE TODOs
 REGULAR TODOs
 
 
-[X] do lightmap normal against lights check outside of ray trace
-[X] special check for all black (lightList.length===0) -- always have an all black one
+[ ] don't draw spaces in text
 
-[ ] closets
+[ ] models
+    [ ] 3 types, always generate one of each type -- blob (no limbs) humaniod (limbs on line) animal (limbs downwards)
+    [ ] need separate globe sizes for each part
+    [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
+    [ ] optimize whatever is slow
+
+
+[X] closets
 
 [X] fix step normals
-[ ] don't draw spaces in text
 
 [X] settings -> constants
 [X] map display need player location
@@ -42,20 +47,6 @@ REGULAR TODOs
 [X] map display
 [X] better lightmap generation
 
-[ ] models
-    [ ] 3 types, always generate one of each type -- blob (no limbs) humaniod (limbs on line) animal (limbs downwards)
-    [ ] need separate globe sizes for each part
-    [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
-
-[ ] optimizations
-     [X] shared triangle reduction
-     [ ] model wrapping
-     [X] light map generation
-     [X] normal culling
-     [X] show triangle count
-     [X] is timing calculated right?
-     [X] get rid of U, it normal culls badly
-     [X] inside step normals bad
 
 [ ] need to deal with pausing time stamps
 

@@ -362,7 +362,7 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         
         var cRect=new wsCollisionRect(lft,top,rgt,bot,v0.position.y);
         
-            // is line already in list?
+            // is rect already in list?
             // usually, two triangles make
             // a single rectangle
 
@@ -382,9 +382,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         var v0,v1,v2;
 
             // run through the triangles
-            // and find any that make a wall
-            // and create a collision lines
-            // and boxes
+            // and find any that make a wall to
+            // create collision lines and floors
+            // to create collision boxes
             
         tIdx=0;
             

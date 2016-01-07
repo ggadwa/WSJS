@@ -430,6 +430,11 @@ function MapObject()
         this.overlay.addRoom(piece,xBound,zBound);
     };
     
+    this.addOverlayCloset=function(xBound,zBound)
+    {
+        this.overlay.addCloset(xBound,zBound);
+    };
+    
     this.addOverlayStair=function(xBound,zBound)
     {
         this.overlay.addStair(xBound,zBound);

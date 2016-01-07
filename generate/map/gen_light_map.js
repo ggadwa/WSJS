@@ -512,6 +512,23 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             }
         }
     };
+    
+    this.clearChunk=function(pixelData,lft,top)
+    {
+        var x,y,idx;
+        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
+        var bot=top+LIGHTMAP_CHUNK_SIZE;
+        
+        for (y=top;y!==bot;y++) {
+            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
+            for (x=lft;x!==rgt;x++) {
+                pixelData[idx++]=0;
+                pixelData[idx++]=0;
+                pixelData[idx++]=0;
+                pixelData[idx++]=0;    
+            }
+        }
+    };
 
         //
         // render a triangle
@@ -524,7 +541,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var vx,vy,vz;
         var vlx=new wsPoint(0,0,0);
         var vrx=new wsPoint(0,0,0);
-        var col;
+        var col,blackCheck;
         
         var pixelData=lightBitmap.pixelData;
         
@@ -588,7 +605,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         ty=pts[topPtIdx].y;
         my=pts[midPtIdx].y;
         by=pts[botPtIdx].y;
-        if (ty>=by) return;
+        if (ty>=by) return(false);
+        
+        blackCheck=0;
 
         for (y=ty;y!==by;y++) {
 
@@ -654,7 +673,20 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 pixelData[idx++]=Math.floor(col.g*255.0);
                 pixelData[idx++]=Math.floor(col.b*255.0);
                 pixelData[idx++]=255;
+                
+                    // check if we only wrote black
+                    
+                blackCheck+=(col.r+col.g+col.b);
             }
+        }
+        
+            // all black?
+            // if so, we use the all black chunk 0
+            // and we re-clear the chunk
+            
+        if (blackCheck===0) {
+            this.clearChunk(lightBitmap.pixelData,lft,top);
+            return(false);
         }
 
             // smear and blur chunk
@@ -792,16 +824,11 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         
             // if we aren't generating lightmaps,
             // then always use the same single lightmap
-            // set to black
+            // and the default black chunk
             
-        if (!this.generateLightmap) {
-            
+        if (!this.generateLightmap) {            
             lightmapIdx=0;
-
-            if (this.lightmapList.length===0) {     // have no lightmaps yet, so make a black one
-                this.lightmapList[0]=new GenLightmapBitmapObject();
-                this.renderColor(this.lightmapList[0].pixelData,0,0);
-            }
+            if (this.lightmapList.length===0) this.lightmapList[0]=new GenLightmapBitmapObject();     // have no lightmaps yet, so make one
         }
         
             // else we need to pack triangles

@@ -370,8 +370,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 connectOffset=connectPiece.getConnectTypeOffset(connectLineIdx,xConnectBound,zConnectBound);
                 connectLength=connectPiece.getConnectTypeLength(connectLineIdx,xConnectBound,zConnectBound);
 
-                xAdd=connectOffset[0]-offset[0];
-                zAdd=connectOffset[1]-offset[1];
+                xAdd=connectOffset.x-offset.x;
+                zAdd=connectOffset.z-offset.z;
 
                     // get location of the new room
                     // by moving the connections together
@@ -390,7 +390,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                             stairAdd=connectLength[1]*2;
                             xBound.add(-stairAdd);
                             xStairBound=new wsBound((xConnectBound.min-stairAdd),xConnectBound.min);
-                            zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
+                            zStairBound=new wsBound((zConnectBound.min+connectOffset.z),((zConnectBound.min+connectOffset.z)+connectLength[1]));
                         }
                         break;
 
@@ -401,7 +401,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
                             zBound.add(-stairAdd);
-                            xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
+                            xStairBound=new wsBound((xConnectBound.min+connectOffset.x),((xConnectBound.min+connectOffset.x)+connectLength[0]));
                             zStairBound=new wsBound((zConnectBound.min-stairAdd),zConnectBound.min);
                         }
                         break;
@@ -414,7 +414,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                             stairAdd=connectLength[1]*2;
                             xBound.add(stairAdd);
                             xStairBound=new wsBound(xConnectBound.max,(xConnectBound.max+stairAdd));
-                            zStairBound=new wsBound((zConnectBound.min+connectOffset[1]),((zConnectBound.min+connectOffset[1])+connectLength[1]));
+                            zStairBound=new wsBound((zConnectBound.min+connectOffset.z),((zConnectBound.min+connectOffset.z)+connectLength[1]));
                         }
                         break;
 
@@ -425,7 +425,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                         if (stairMode!==STAIR_MODE_NONE) {
                             stairAdd=connectLength[0]*2;
                             zBound.add(stairAdd);
-                            xStairBound=new wsBound((xConnectBound.min+connectOffset[0]),((xConnectBound.min+connectOffset[0])+connectLength[0]));
+                            xStairBound=new wsBound((xConnectBound.min+connectOffset.x),((xConnectBound.min+connectOffset.x)+connectLength[0]));
                             zStairBound=new wsBound(zConnectBound.max,(zConnectBound.max+stairAdd));
                         }
                         break;
@@ -577,7 +577,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     {
         currentGlobalGenMapObject=this;
         
-        this.view.loadingScreenDraw(0.15);
+        this.view.loadingScreenDraw(0.14);
         setTimeout(function() { currentGlobalGenMapObject.buildMapPieceList(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -589,7 +589,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         this.mapPieceList=new MapPieceListObject();
         this.mapPieceList.fill();
         
-        this.view.loadingScreenDraw(0.30);
+        this.view.loadingScreenDraw(0.28);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -602,11 +602,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         this.buildMapRecursiveRoom(0,-1,-1,STAIR_MODE_NONE,null,null,null,0);
         
-            // can setup the map display now
-            
-        this.map.precalcOverlayDrawValues(this.view);
-        
-        this.view.loadingScreenDraw(0.45);
+        this.view.loadingScreenDraw(0.42);
         setTimeout(function() { currentGlobalGenMapObject.buildMapClosets(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -618,7 +614,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // finish with the callback
 
-        this.view.loadingScreenDraw(0.60);
+        this.view.loadingScreenDraw(0.58);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -630,7 +626,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // finish with the callback
             
-        this.view.loadingScreenDraw(0.75);
+        this.view.loadingScreenDraw(0.72);
         setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -639,6 +635,18 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // build room decorations
             
         this.buildRoomDecorations();
+        
+            // finish with the callback
+            
+        this.view.loadingScreenDraw(0.86);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapFinish(); },PROCESS_TIMEOUT_MSEC);
+    };
+    
+    this.buildMapFinish=function()
+    {
+            // overlay precalc
+            
+        this.map.precalcOverlayDrawValues(this.view);
         
             // finish with the callback
             

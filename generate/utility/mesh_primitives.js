@@ -10,7 +10,7 @@ function MeshPrimitivesObject()
         // create cube
         //
 
-    this.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,flags)
+    this.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,normalsIn,flags)
     {
             // get cube size
             // note: why duplicated vertexes?  Because light map UVs
@@ -141,7 +141,7 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,null,false);
+        meshUtility.buildVertexListNormals(vertexList,indexes,null,normalsIn);
         if (!wholeUV) meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
 

@@ -19,7 +19,7 @@ function GenRoomPlatform(map,genRandom,piece,room)
     {
         var n,x,z,moveOk,tryCount,isPillar;
         var xAdd=Math.floor(xBound.getSize()/5);
-        var zAdd=Math.floor(xBound.getSize()/5);
+        var zAdd=Math.floor(zBound.getSize()/5);
         
         var xPlatformBound,zPlatformBound;
         var yPlatformBound=new wsBound((yBound.min-ROOM_FLOOR_DEPTH),yBound.min);
@@ -86,7 +86,7 @@ function GenRoomPlatform(map,genRandom,piece,room)
             xPlatformBound=new wsBound((xBound.min+(x*xAdd)),(xBound.min+((x+1)*xAdd)));
             zPlatformBound=new wsBound((zBound.min+(z*zAdd)),(zBound.min+((z+1)*zAdd)));
             
-            this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,(isPillar?yPlatformPillarBound:yPlatformBound),zPlatformBound,false,true,true,true,true,true,(!isPillar),MESH_FLAG_ROOM_PLATFORM));
+            this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,(isPillar?yPlatformPillarBound:yPlatformBound),zPlatformBound,false,true,true,true,true,true,(!isPillar),false,MESH_FLAG_ROOM_PLATFORM));
             this.room.blockGrid(x,z,true,false);
             
             grid[z][x]=isPillar?3:2;       // we use 2/3 so we can later re-check list for stair locations
@@ -230,6 +230,8 @@ function GenRoomPlatform(map,genRandom,piece,room)
         }
         
         this.room.blockGrid(x,z,true,true);
+        
+        this.map.addOverlayPlatform(xStairBound,zStairBound);
     };
     
 }

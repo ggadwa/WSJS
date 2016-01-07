@@ -8,7 +8,6 @@ function MapPieceObject()
 {
     this.points=[];
     this.connectLines=[];
-    this.decorationLocations=[];
     
     this.floorGrid=null;
     
@@ -56,17 +55,17 @@ function MapPieceObject()
 
     this.getConnectTypeOffset=function(connectLineIdx,xBound,zBound)
     {
-        var offset=[0.0,0.0];
+        var offset=new wsPoint(0.0,0.0,0.0);
 
         var connectLine=this.connectLines[connectLineIdx];
         var pt1=this.points[connectLine[0]];
         var pt2=this.points[connectLine[1]];
 
         var x=(pt1[0]<pt2[0])?pt1[0]:pt2[0];
-        offset[0]=Math.floor((xBound.max-xBound.min)*(x*0.01));
+        offset.x=Math.floor((xBound.max-xBound.min)*(x*0.01));
 
         var z=(pt1[1]<pt2[1])?pt1[1]:pt2[1];
-        offset[1]=Math.floor((zBound.max-zBound.min)*(z*0.01));
+        offset.z=Math.floor((zBound.max-zBound.min)*(z*0.01));
 
         return(offset);
     };
@@ -312,7 +311,6 @@ function MapPieceObject()
         var mapPiece2=new MapPieceObject();
         mapPiece2.points=JSON.parse(JSON.stringify(this.points));
         mapPiece2.connectLines=JSON.parse(JSON.stringify(this.connectLines));
-        mapPiece2.decorationLocations=JSON.parse(JSON.stringify(this.decorationLocations));
         mapPiece2.floorGrid=JSON.parse(JSON.stringify(this.floorGrid));
         return(mapPiece2);
     };
@@ -326,13 +324,6 @@ function MapPieceObject()
 
         for (n=0;n!==nPoint;n++) {
             pt=this.points[n];
-            pt[1]=100-pt[1];
-        }
-        
-        nPoint=this.decorationLocations.length;
-
-        for (n=0;n!==nPoint;n++) {
-            pt=this.decorationLocations[n];
             pt[1]=100-pt[1];
         }
         
@@ -354,15 +345,6 @@ function MapPieceObject()
 
         for (n=0;n!==nPoint;n++) {
             pt=this.points[n];
-            k=pt[0];
-            pt[0]=pt[1];
-            pt[1]=k;
-        }
-        
-        nPoint=this.decorationLocations.length;
-
-        for (n=0;n!==nPoint;n++) {
-            pt=this.decorationLocations[n];
             k=pt[0];
             pt[0]=pt[1];
             pt[1]=k;
