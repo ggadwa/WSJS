@@ -19,8 +19,6 @@ var currentGlobalLightMapObject=null;
 
 function GenLightmapBitmapObject()
 {
-    this.chunkIdx=0;
-
         // setup the canvas
 
     this.canvas=document.createElement('canvas');
@@ -51,6 +49,24 @@ function GenLightmapBitmapObject()
         data[idx++]=0;
         data[idx++]=0;
     }
+    
+        // the first chunk is always all black
+    
+    var x,y;
+    
+    for (y=0;y!==LIGHTMAP_CHUNK_SIZE;y++) {
+        idx=(y*LIGHTMAP_TEXTURE_SIZE)*4;
+        for (x=0;x!==LIGHTMAP_CHUNK_SIZE;x++) {
+            data[idx+3]=255;
+            idx+=4;
+        }
+    }
+    
+        // the current chunk, we start at
+        // 1 to leave the first chunk black
+        // for triangles with no lights
+        
+    this.chunkIdx=1;
 
         // replace image data
 
@@ -378,7 +394,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         return((t>0.01)&&(t<1.0));
     };
 
-    this.rayTraceVertex=function(meshIdx,lightList,vx,vy,vz,normal)
+    this.rayTraceVertex=function(lightList,vx,vy,vz)
     {
         var n,nLight,lightIdx,trigCount;
         var light;
@@ -477,9 +493,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
     };
     
         //
-        // render a single color to a chunk, used for
-        // special circumstances like no light maps or
-        // all black areas
+        // render a single color to a chunk
         //
         
     this.renderColor=function(pixelData,lft,top)
@@ -536,6 +550,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             lightVectorNormal.normalize();
             if (lightVectorNormal.dot(normal)>=0.0) lightList.push(lightIdx);
         }
+        
+        if (lightList.length===0) return(false);
 
             // find the min and max Y points
             // we will build the scan line around this
@@ -632,7 +648,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 
                     // write the pixel
 
-                col=this.rayTraceVertex(meshIdx,lightList,vx,vy,vz,normal);
+                col=this.rayTraceVertex(lightList,vx,vy,vz);
                 
                 pixelData[idx++]=Math.floor(col.r*255.0);
                 pixelData[idx++]=Math.floor(col.g*255.0);
@@ -645,6 +661,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         this.smudgeChunk(lightBitmap,lft,top,rgt,bot);
         this.blurChunk(lightBitmap,lft,top,rgt,bot);
+        
+        return(true);
     };
 
         //
@@ -730,8 +748,18 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
             // ray trace the triangle
 
-        this.renderTriangle(lightBitmap,meshIdx,[pt0,pt1,pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
+        var hitLight=this.renderTriangle(lightBitmap,meshIdx,[pt0,pt1,pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
 
+            // if it didn't hit any lights, UV
+            // to the 0 black chunk
+        
+        if (!hitLight) {
+            var singleUV=LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE;
+            v0.lightmapUV.x=v0.lightmapUV.y=singleUV;
+            v1.lightmapUV.x=v1.lightmapUV.y=singleUV;
+            v2.lightmapUV.x=v2.lightmapUV.y=singleUV;
+            return(false);
+        }
             // add the UV
             // pt0-pt2 are already moved within the margin
 
@@ -743,6 +771,8 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         v2.lightmapUV.x=(pt2.x+lft)/LIGHTMAP_TEXTURE_SIZE;
         v2.lightmapUV.y=(pt2.y+top)/LIGHTMAP_TEXTURE_SIZE;
+        
+        return(true);
     };
 
         //
@@ -823,15 +853,16 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         else {
             
                 // write polys to chunk
-
+                // only advance the chunk if this trig
+                // hit a light, otherwise it's using the
+                // all-black chunk 0
+                
             for (n=0;n!==nTrig;n++) {
 
                 lft=(chunkIdx%LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
                 top=Math.floor(chunkIdx/LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
 
-                this.writePolyToChunk(lightBitmap,meshIdx,n,lft,top);
-
-                chunkIdx++;
+                if (this.writePolyToChunk(lightBitmap,meshIdx,n,lft,top)) chunkIdx++;
             }
         }
         

@@ -23,7 +23,7 @@ REGULAR TODOs
 
 
 [X] do lightmap normal against lights check outside of ray trace
-[ ] special check for all black (lightList.length===0) -- always have an all black one
+[X] special check for all black (lightList.length===0) -- always have an all black one
 
 [ ] closets
 
@@ -41,6 +41,11 @@ REGULAR TODOs
 
 [X] map display
 [X] better lightmap generation
+
+[ ] models
+    [ ] 3 types, always generate one of each type -- blob (no limbs) humaniod (limbs on line) animal (limbs downwards)
+    [ ] need separate globe sizes for each part
+    [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
 
 [ ] optimizations
      [X] shared triangle reduction
@@ -68,8 +73,5 @@ REGULAR TODOs
     [ ] diffuse calcs in light maps
     [ ] no light mesh hits -- needs "has flag" type call, highlight in lightmap
 
-[ ] models
-    [ ] need separate globe sizes for each part
-    [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
 
 
