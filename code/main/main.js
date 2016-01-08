@@ -267,10 +267,10 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
         // else a monster
         
     if (idx===0) {
-        model=new ModelObject('player');
+        model=new ModelObject('player',MODEL_TYPE_HUMANOID);
     }
     else {
-        model=new ModelObject('monster_'+(idx-1));
+        model=new ModelObject(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
     }
     
         // build the skeleton and mesh
@@ -321,7 +321,7 @@ function wsInitBuildEntities()
         pos=map.findRandomPosition(entityGenRandom);
         if (pos===null) continue;
         
-        monsterModelName='monster_'+entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);
+        monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
         model=modelList.clone(view,monsterModelName);
         
         entityList.add(new EntityObject(pos,new wsAngle(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model,false));

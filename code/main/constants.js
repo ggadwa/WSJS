@@ -9,9 +9,21 @@ const ROOM_FLOOR_DEPTH=700;
 
 const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connection in a room spawns another room
 const ROOM_LEVEL_CHANGE_PERCENTAGE=0.8;         // what % of the time a room gains another story
+const ROOM_CLOSET_UP_PERCENTAGE=0.75;           // what % of the time a closet goes to a second level if available
 
 const ROOM_PLATFORMS=true;                      // turns on or off platforms
+
+//
+// decorations
+//
+
 const ROOM_DECORATIONS=true;                   // set to false for no decorations in the map
+
+const ROOM_DECORATIONS_BOX_EXTRA_COUNT=8;       // extra number of boxes
+
+const ROOM_DECORATIONS_PILLAR_FACTOR=0.03;      // the max size (in % of room) for pillars
+const ROOM_DECORATIONS_PILLAR_MIN_RADIUS=200;   // minimum radius for pillars
+const ROOM_DECORATIONS_PILLAR_EXTRA_SEGMENTS=4; // possible number of extra segments for pillars
 
 //
 // lighting
@@ -29,14 +41,28 @@ const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
 const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for map lights
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
     
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+
+//
+// models
+//
+
+const MODEL_TYPE_HUMANOID=0;
+const MODEL_TYPE_ANIMAL=1;
+const MODEL_TYPE_BLOB=2;
 
 //
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=0;
-const MONSTER_ENTITY_COUNT=0;
+const MONSTER_MODEL_COUNT=3;
+const MONSTER_ENTITY_COUNT=10;
+
+//
+// overlays
+//
+
+const OVERLAY_DRAW=true;
 
 //
 // timing
@@ -74,7 +100,7 @@ const DEBUG_DRAW_MODEL_MESH_TANGENTS=false;
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=1; // Math.floor((Math.random()*SEED));
+const SEED_MAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
 const SEED_ENTITY=Math.floor((Math.random()*SEED));

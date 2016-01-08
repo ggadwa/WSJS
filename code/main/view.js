@@ -524,7 +524,7 @@ function ViewObject()
         
             // map overlay
             
-        map.overlayDraw(this,entityList);
+        if (OVERLAY_DRAW) map.overlayDraw(this,entityList);
         
             // text overlays
 

@@ -205,7 +205,7 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
             
             // create current pose
             
-        this.model.skeleton.randomPose(view);
+        this.model.skeleton.randomPose(view,this.model.modelType);
         this.model.skeleton.animate(view);
        
             // move vertexes to reflect the pose

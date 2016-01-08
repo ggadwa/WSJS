@@ -327,7 +327,7 @@ function ModelSkeletonObject()
     
     // supergumba -- testing
     
-    this.randomNextPose=function(view)
+    this.randomNextPose=function(view,modelType)
     {
         var n,k,limb,boneIndexList;
         var r,x,z;
@@ -335,11 +335,22 @@ function ModelSkeletonObject()
         
         for (n=0;n!==nLimb;n++) {
             limb=this.limbs[n];
-            if ((limb.limbType===LIMB_TYPE_BODY) || (limb.limbType===LIMB_TYPE_HEAD)) continue;
+            
+            switch (modelType) {
+                case MODEL_TYPE_HUMANOID:
+                    if ((limb.limbType===LIMB_TYPE_BODY) || (limb.limbType===LIMB_TYPE_HEAD)) continue;
+                    break;
+                case MODEL_TYPE_ANIMAL:
+                    if (limb.limbType===LIMB_TYPE_BODY) continue;
+                    break;
+                case MODEL_TYPE_BLOB:
+                    if (limb.limbType!==LIMB_TYPE_BODY) continue;
+                    break;
+            }
             
             boneIndexList=this.limbs[n].boneIndexes;
             
-            r=view.genRandom.randomInBetween(-45.0,90.0);
+            r=view.genRandom.randomInBetween(-25.0,25.0);
 
             if (limb.limbType===LIMB_TYPE_ARM) {
                 x=0.0;
@@ -359,7 +370,7 @@ function ModelSkeletonObject()
         }
     };
     
-    this.randomPose=function(view)
+    this.randomPose=function(view,modelType)
     {
             // time for a new pose?
             
@@ -376,7 +387,7 @@ function ModelSkeletonObject()
             // construct new pose
 
         this.clearNextPose();
-        this.randomNextPose(view);
+        this.randomNextPose(view,modelType);
     };
 
 }

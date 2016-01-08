@@ -23,27 +23,57 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var bones=this.model.skeleton.bones;
         
             // counts
-            
-        var armCount=this.genRandom.randomInt(1,4);
-        var legCount=this.genRandom.randomInt(0,5);
         
-            // some random lengths
-            
-        var armLength=this.genRandom.randomInt(350,350);
-        var legLength=this.genRandom.randomInt(500,500);
+        var headCount,armCount,legCount;
+        var armLength,legLength;
+        var hipHigh,minHeadRadius,minBodyRadius,minWaistHigh,minTorsoHigh,minTorsoTopHigh;
         
-            // hip height
-            
-        var hipHigh=0;
-        if (legCount>0) hipHigh=legLength*2;
+        switch (this.model.modelType) {
+            case MODEL_TYPE_HUMANOID:
+                headCount=this.genRandom.randomInt(1,1);
+                armCount=this.genRandom.randomInt(2,4);
+                legCount=this.genRandom.randomInt(2,4);
+                armLength=this.genRandom.randomInt(350,350);
+                legLength=this.genRandom.randomInt(500,500);
+                hipHigh=legLength*2;
+                minHeadRadius=300;
+                minBodyRadius=300;
+                minWaistHigh=200;
+                minTorsoHigh=350;
+                minTorsoTopHigh=250;
+                break;
+            case MODEL_TYPE_ANIMAL:
+                headCount=1;
+                armCount=0;
+                legCount=this.genRandom.randomInt(4,4);
+                legLength=this.genRandom.randomInt(350,350);
+                hipHigh=legLength*2;
+                minHeadRadius=300;
+                minBodyRadius=300;
+                minWaistHigh=150;
+                minTorsoHigh=150;
+                minTorsoTopHigh=100;
+                break;
+            case MODEL_TYPE_BLOB:
+                headCount=1;
+                armCount=0;
+                legCount=0;
+                hipHigh=0;
+                minHeadRadius=400;
+                minBodyRadius=600;
+                minWaistHigh=350;
+                minTorsoHigh=450;
+                minTorsoTopHigh=250;
+                break;
+        }
         
             // random radius
 
         var hipRadius=this.genRandom.randomInt(200,250);
-        var waistHigh=hipHigh+this.genRandom.randomInt(200,250);
-        var torsoHigh=waistHigh+this.genRandom.randomInt(350,350);
+        var waistHigh=hipHigh+this.genRandom.randomInt(minWaistHigh,250);
+        var torsoHigh=waistHigh+this.genRandom.randomInt(minTorsoHigh,350);
         var torsoRadius=this.genRandom.randomInt(300,350);
-        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(250,250);
+        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(minTorsoTopHigh,250);
 
         var neckHigh=torsoTopHigh+this.genRandom.randomInt(250,150);
         var headHigh=neckHigh+this.genRandom.randomInt(100,100)+400;
@@ -55,24 +85,41 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var kneeHigh=legLength;
         var ankleHigh=0;
         var footLength=this.genRandom.randomInt(150,150);
+        
+            // the base bone
+            
+        var baseBoneIdx=bones.push(new ModelBoneObject('Base',-1,new wsPoint(0,0,0)))-1;
 
             // create body and head bones
+            
+        var hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx,neckBoneIdx,headBoneIdx;
 
-        var baseBoneIdx=bones.push(new ModelBoneObject('Base',-1,new wsPoint(0,0,0)))-1;
-        var hipBoneIdx=bones.push(new ModelBoneObject('Hip',baseBoneIdx,new wsPoint(0,-hipHigh,0)))-1;
-        var waistBoneIdx=bones.push(new ModelBoneObject('Waist',hipBoneIdx,new wsPoint(0,-waistHigh,0)))-1;
-        var torsoBoneIdx=bones.push(new ModelBoneObject('Torso',waistBoneIdx,new wsPoint(0,-torsoHigh,0)))-1;
-        var torsoTopBoneIdx=bones.push(new ModelBoneObject('Torso Top',torsoBoneIdx,new wsPoint(0,-torsoTopHigh,0)))-1;
+        switch (this.model.modelType) {
+            case MODEL_TYPE_HUMANOID:
+            case MODEL_TYPE_BLOB:
+                hipBoneIdx=bones.push(new ModelBoneObject('Hip',baseBoneIdx,new wsPoint(0,-hipHigh,0)))-1;
+                waistBoneIdx=bones.push(new ModelBoneObject('Waist',hipBoneIdx,new wsPoint(0,-waistHigh,0)))-1;
+                torsoBoneIdx=bones.push(new ModelBoneObject('Torso',waistBoneIdx,new wsPoint(0,-torsoHigh,0)))-1;
+                torsoTopBoneIdx=bones.push(new ModelBoneObject('Torso Top',torsoBoneIdx,new wsPoint(0,-torsoTopHigh,0)))-1;
+                neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
+                headBoneIdx=bones.push(new ModelBoneObject('Head',neckBoneIdx,new wsPoint(0,-headHigh,0)))-1;
+                break;
+            case MODEL_TYPE_ANIMAL:
+                hipBoneIdx=bones.push(new ModelBoneObject('Hip',baseBoneIdx,new wsPoint(0,-hipHigh,0)))-1;
+                waistBoneIdx=bones.push(new ModelBoneObject('Waist',hipBoneIdx,new wsPoint(0,-hipHigh,-waistHigh)))-1;
+                torsoBoneIdx=bones.push(new ModelBoneObject('Torso',waistBoneIdx,new wsPoint(0,-hipHigh,-torsoHigh)))-1;
+                torsoTopBoneIdx=bones.push(new ModelBoneObject('Torso Top',torsoBoneIdx,new wsPoint(0,-hipHigh,-torsoTopHigh)))-1;
+                neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoTopBoneIdx,new wsPoint(0,-hipHigh,-neckHigh)))-1;
+                headBoneIdx=bones.push(new ModelBoneObject('Head',neckBoneIdx,new wsPoint(0,-hipHigh,-headHigh)))-1;
+                break;
+        }
         
-        bones[hipBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
-        bones[waistBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
-        bones[torsoBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
-        bones[torsoTopBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
+        bones[hipBoneIdx].gravityLockDistance=this.genRandom.randomInt(minBodyRadius,300);
+        bones[waistBoneIdx].gravityLockDistance=this.genRandom.randomInt(minBodyRadius,300);
+        bones[torsoBoneIdx].gravityLockDistance=this.genRandom.randomInt(minBodyRadius,300);
+        bones[torsoTopBoneIdx].gravityLockDistance=this.genRandom.randomInt(minBodyRadius,300);
         
-        var neckBoneIdx=bones.push(new ModelBoneObject('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
-        var headBoneIdx=bones.push(new ModelBoneObject('Head',neckBoneIdx,new wsPoint(0,-headHigh,0)))-1;
-        
-        bones[headBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,300);
+        bones[headBoneIdx].gravityLockDistance=this.genRandom.randomInt(minHeadRadius,300);
         bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,150);
         
             // add bones to body and head lists
@@ -103,13 +150,23 @@ function GenModelOrganicSkeletonObject(model,genRandom)
 
             // create legs
         
+        var boneIdx;
         var legHipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx;
         
-        for (n=0;n!==armCount;n++) {
+        for (n=0;n!==legCount;n++) {
             vct=new wsPoint(hipRadius,0.0,0.0);
             vct.rotateY(null,(this.genRandom.random()*360.0));
             
-            legHipBoneIdx=bones.push(new ModelBoneObject(('LegHip'+n),hipBoneIdx,new wsPoint(vct.x,-hipHigh,vct.z)))-1;
+            boneIdx=hipBoneIdx;
+            
+            if (this.model.modelType===MODEL_TYPE_ANIMAL) {
+                if (this.genRandom.random()>0.5) {
+                    boneIdx=torsoTopBoneIdx;
+                    vct.z-=torsoTopHigh;
+                }
+            }
+            
+            legHipBoneIdx=bones.push(new ModelBoneObject(('LegHip'+n),boneIdx,new wsPoint(vct.x,-hipHigh,vct.z)))-1;
             kneeBoneIdx=bones.push(new ModelBoneObject(('Knee'+n),legHipBoneIdx,new wsPoint(vct.x,-kneeHigh,vct.z)))-1;
             ankleBoneIdx=bones.push(new ModelBoneObject(('Aknle'+n),kneeBoneIdx,new wsPoint(vct.x,-ankleHigh,vct.z)))-1;
             

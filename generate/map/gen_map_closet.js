@@ -140,7 +140,7 @@ function GenRoomClosetObject(view,map,room,genRandom)
             
         var yClosetBound=room.yBound.copy();
         if (room.hasStories) {
-            if (genRandom.random()>0.75) yClosetBound.add(-(room.yBound.getSize()+ROOM_FLOOR_DEPTH));
+            if (genRandom.random()>ROOM_CLOSET_UP_PERCENTAGE) yClosetBound.add(-(room.yBound.getSize()+ROOM_FLOOR_DEPTH));
         }
         
             // initial connection try

@@ -22,13 +22,11 @@ FUTURE TODOs
 REGULAR TODOs
 
 
-[ ] don't draw spaces in text
-
 [ ] models
-    [ ] 3 types, always generate one of each type -- blob (no limbs) humaniod (limbs on line) animal (limbs downwards)
+    [X] 3 types, always generate one of each type -- blob (no limbs) humaniod (limbs on line) animal (limbs downwards)
     [ ] need separate globe sizes for each part
     [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
-    [ ] optimize whatever is slow
+    [ ] optimize whatever is slow in creation
 
 
 [X] closets
@@ -50,19 +48,11 @@ REGULAR TODOs
 
 [ ] need to deal with pausing time stamps
 
-[ ] rooms
-     [ ] decorations use location tracking
-     [ ] need machines
-
 [ ] bitmaps
     [ ] need bitmap colors filters are settings
     [ ] box texture has potential other type of boards inside?
     [ ] machine texture
 
-[ ] light maps
-    [ ] need to check closest meshes first
-    [ ] diffuse calcs in light maps
-    [ ] no light mesh hits -- needs "has flag" type call, highlight in lightmap
 
 
 

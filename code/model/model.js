@@ -4,9 +4,10 @@
 // model object
 //
 
-function ModelObject(name)
+function ModelObject(name,modelType)
 {
     this.name=name;
+    this.modelType=modelType;
     this.modelShader=null;          // this gets set when model is attached to model list
     this.mesh=null;
     this.skeleton=null;
@@ -27,7 +28,7 @@ function ModelObject(name)
         
     this.clone=function()
     {
-        var model=new ModelObject(this.name);
+        var model=new ModelObject(this.name,this.modelType);
         
         model.modelShader=this.modelShader;
         model.mesh=this.mesh.clone();
