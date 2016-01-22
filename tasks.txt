@@ -4,6 +4,7 @@ IMPORTANT EVENTUAL TODOs
 
 EMCA6 TODOs
     [ ] transfer all object to classes
+    [ ] can we do static getCONTANT_NAME() { return(1); } etc for constants?  PROBABLY NO, wait for 7?
     [ ] modulize the code
     [ ] use Math.trunc when possible instead of Math.floor
 
@@ -15,35 +16,22 @@ WHEN THERE IS AN INTERFACE TODOs
     [ ] text.release();
     [ ] debug.release();
 
-FUTURE TODOs
-    [ ] code to scan and covert settings to input controls
-    [ ] create and save projects in indexedDB
-
 REGULAR TODOs
 
+
+[ ] GL
+    [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
+    [ ] draw closest map meshes first
+    [ ] GET RID OF ALL copy() in defs!  This is super slow path!
+    [ ] text drawing is slow
+    [ ] point.rotate -- precalc the sin/cos for each part
 
 [ ] models
     [X] 3 types, always generate one of each type -- blob (no limbs) humaniod (limbs on line) animal (limbs downwards)
     [ ] need separate globe sizes for each part
-    [ ] wsPoint needs a no-center rotate (use for both bones and verticies)
     [ ] optimize whatever is slow in creation
+    [ ] redo mechanical object creation (for weapons)
 
-
-[X] closets
-
-[X] fix step normals
-
-[X] settings -> constants
-[X] map display need player location
-[X] fixed a number of bugs and improved text drawing, including shadowed text
-[X] move all constants to const and outside of objects, no need to duplicate and emcascript6 doesn't support it, anyway
-[X] added file cache and moved shaders to be ajax files
-[X] in progress bar for models do bitmaps and models separately
-
-[X] we might need to find new way to make maps that preserve normals
-
-[X] map display
-[X] better lightmap generation
 
 
 [ ] need to deal with pausing time stamps

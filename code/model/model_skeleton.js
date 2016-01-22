@@ -273,7 +273,7 @@ function ModelSkeletonObject()
             parentBone=this.bones[bone.parentBoneIdx];
             
             var rotVector=new wsPoint(bone.vectorFromParent.x,bone.vectorFromParent.y,bone.vectorFromParent.z);
-            rotVector.rotateAroundPoint(null,ang);
+            rotVector.rotate(ang);
             
             bone.curPosePosition.setFromAddPoint(parentBone.curPosePosition,rotVector);
         }
@@ -284,19 +284,14 @@ function ModelSkeletonObject()
             // need to pass this bone's rotation on
             // to it's children
             
-        var nextAng=ang.copy();
-        nextAng.addPoint(bone.curPoseAngle);
-        
-            // set the bone's angle
-            
-        bone.curPoseAngle.setFromPoint(nextAng);
+        bone.curPoseAngle.addPoint(ang);
         
             // now move all children
         
         var nChild=bone.childBoneIndexes.length;
         
         for (n=0;n!==nChild;n++) {
-            this.rotatePoseBoneRecursive(bone.childBoneIndexes[n],nextAng);
+            this.rotatePoseBoneRecursive(bone.childBoneIndexes[n],bone.curPoseAngle);
         }
     };
     

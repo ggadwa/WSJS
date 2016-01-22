@@ -108,6 +108,7 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         var bone,normal;
         
         var rotVector=new wsPoint(0.0,0.0,0.0);
+        var normal=new wsPoint(0.0,0.0,0.0);
         
             // move all the vertexes
             
@@ -119,14 +120,14 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             bone=skeleton.bones[v.boneIdx];
             
             rotVector.setFromPoint(v.vectorFromBone);
-            rotVector.rotateAroundPoint(null,bone.curPoseAngle);
+            rotVector.rotate(bone.curPoseAngle);
             
             this.drawVertices[vIdx++]=bone.curPosePosition.x+rotVector.x+offsetPosition.x;
             this.drawVertices[vIdx++]=bone.curPosePosition.y+rotVector.y+offsetPosition.y;
             this.drawVertices[vIdx++]=bone.curPosePosition.z+rotVector.z+offsetPosition.z;
             
-            normal=v.normal.copy();
-            normal.rotateAroundPoint(null,bone.curPoseAngle);
+            normal.setFromPoint(v.normal);
+            normal.rotate(bone.curPoseAngle);
             
             this.drawNormals[nIdx++]=normal.x;
             this.drawNormals[nIdx++]=normal.y;

@@ -176,12 +176,99 @@ function wsPoint(x,y,z)
         this.x=x;
         this.y=y;
     };
+    
+    this.rotate=function(ang)
+    {
+        var rd,x,y,z;
+        
+            // rotate X
+        
+        if (ang.x!==0.0) {
+            rd=ang.x*DEGREE_TO_RAD;
+
+            y=(this.y*Math.cos(rd))-(this.z*Math.sin(rd));
+            z=(this.y*Math.sin(rd))+(this.z*Math.cos(rd));
+
+            this.y=y;
+            this.z=z;
+        }
+        
+            // rotate Y
+        
+        if (ang.y!==0.0) {
+            rd=ang.y*DEGREE_TO_RAD;
+
+            x=(this.z*Math.sin(rd))+(this.x*Math.cos(rd));
+            z=(this.z*Math.cos(rd))-(this.x*Math.sin(rd));
+
+            this.x=x;
+            this.z=z;
+        }
+        
+            // rotate Z
+        
+        if (ang.z!==0.0) {
+            rd=ang.z*DEGREE_TO_RAD;
+
+            x=(this.x*Math.cos(rd))-(this.y*Math.sin(rd));
+            y=(this.x*Math.sin(rd))+(this.y*Math.cos(rd));
+
+            this.x=x;
+            this.y=y;
+        }
+    };
       
     this.rotateAroundPoint=function(centerPt,ang)
     {
-        this.rotateX(centerPt,ang.x);
-        this.rotateY(centerPt,ang.y);
-        this.rotateZ(centerPt,ang.z);
+        if (centerPt!==null) {
+            this.x-=centerPt.x;
+            this.y-=centerPt.y;
+            this.z-=centerPt.z;
+        }
+        
+        var rd,x,y,z;
+        
+            // rotate X
+        
+        if (ang.x!==0.0) {
+            rd=ang.x*DEGREE_TO_RAD;
+
+            y=(this.y*Math.cos(rd))-(this.z*Math.sin(rd));
+            z=(this.y*Math.sin(rd))+(this.z*Math.cos(rd));
+
+            this.y=y;
+            this.z=z;
+        }
+        
+            // rotate Y
+        
+        if (ang.y!==0.0) {
+            rd=ang.y*DEGREE_TO_RAD;
+
+            x=(this.z*Math.sin(rd))+(this.x*Math.cos(rd));
+            z=(this.z*Math.cos(rd))-(this.x*Math.sin(rd));
+
+            this.x=x;
+            this.z=z;
+        }
+        
+            // rotate Z
+        
+        if (ang.z!==0.0) {
+            rd=ang.z*DEGREE_TO_RAD;
+
+            x=(this.x*Math.cos(rd))-(this.y*Math.sin(rd));
+            y=(this.x*Math.sin(rd))+(this.y*Math.cos(rd));
+
+            this.x=x;
+            this.y=y;
+        }
+        
+        if (centerPt!==null) {
+            x+=centerPt.x;
+            y+=centerPt.y;
+            z+=centerPt.z;
+        }
     };
                 
     this.noSquareDistance=function(pt)

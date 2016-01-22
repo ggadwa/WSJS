@@ -539,6 +539,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var n,x,y,lx,rx,tempX,ty,my,by,idx;
         var lxFactor,rxFactor,vFactor;
         var vx,vy,vz;
+        var tempVX=new wsPoint(0,0,0);
         var vlx=new wsPoint(0,0,0);
         var vrx=new wsPoint(0,0,0);
         var col,blackCheck;
@@ -645,9 +646,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 lx=rx;
                 rx=tempX;
 
-                tempX=vlx.copy();
-                vlx=vrx.copy();
-                vrx=tempX.copy();
+                tempX=vlx;
+                vlx=vrx;
+                vrx=tempX;
             }
 
                 // get the bitmap data index
