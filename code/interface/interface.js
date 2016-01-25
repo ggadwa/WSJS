@@ -9,6 +9,8 @@ function InterfaceObject()
         // variables
         
     this.interfaceShader=new InterfaceShaderObject();
+    
+    this.vertexPosBuffer=null;
 
         //
         // initialize/release interface
@@ -16,11 +18,17 @@ function InterfaceObject()
 
     this.initialize=function(view)
     {
-        return(this.interfaceShader.initialize(view));
+        if (!this.interfaceShader.initialize(view)) return(false);
+        
+        this.vertexPosBuffer=view.gl.createBuffer();
+        
+        return(true);
     };
 
     this.release=function(view)
     {
+        view.gl.deleteBuffer(this.vertexPosBuffer);
+        
         this.interfaceShader.release(view);
     };
 
@@ -73,8 +81,7 @@ function InterfaceObject()
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.interfaceShader.vertexPositionAttribute);
@@ -87,8 +94,6 @@ function InterfaceObject()
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-        gl.deleteBuffer(vertexPosBuffer);
-        
     };
     
     this.drawRect=function(view,rect,color)
@@ -119,8 +124,7 @@ function InterfaceObject()
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.interfaceShader.vertexPositionAttribute);
@@ -133,7 +137,6 @@ function InterfaceObject()
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-        gl.deleteBuffer(vertexPosBuffer);
     };
     
 }

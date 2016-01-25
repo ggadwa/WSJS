@@ -25,6 +25,8 @@ function MapOverlayObject()
     this.extraVertexPosBuffer=null;
     this.entityVertexPosBuffer=null;
     
+    this.entityVertices=null;
+    
         //
         // initialize/release overlay object
         //
@@ -37,6 +39,8 @@ function MapOverlayObject()
         this.extraVertexPosBuffer=view.gl.createBuffer();
         this.entityVertexPosBuffer=view.gl.createBuffer();
         
+        this.entityVertices=new Float32Array(6);
+        
         return(true);
     };
 
@@ -45,6 +49,8 @@ function MapOverlayObject()
         view.gl.deleteBuffer(this.roomVertexPosBuffer);
         view.gl.deleteBuffer(this.extraVertexPosBuffer);
         view.gl.deleteBuffer(this.entityVertexPosBuffer);
+        
+        this.entityVertices=null;
         
         this.mapOverlayShader.release(view);
     };
@@ -256,8 +262,6 @@ function MapOverlayObject()
         var p2=new ws2DPoint(0,0);
         var p3=new ws2DPoint(0,0);
         
-        var vList=new Float32Array(6);
-        
         var entity,ang;
         var nEntity=entityList.count();
         
@@ -280,14 +284,14 @@ function MapOverlayObject()
             x=((entity.position.x-this.mapOffsetX)*this.mapScale)+this.drawX;
             y=(this.drawHigh-((entity.position.z-this.mapOffsetZ)*this.mapScale))+this.drawY;
 
-            vList[0]=p1.x+x;
-            vList[1]=p1.y+y;
-            vList[2]=p2.x+x;
-            vList[3]=p2.y+y;
-            vList[4]=p3.x+x;
-            vList[5]=p3.y+y;
+            this.entityVertices[0]=p1.x+x;
+            this.entityVertices[1]=p1.y+y;
+            this.entityVertices[2]=p2.x+x;
+            this.entityVertices[3]=p2.y+y;
+            this.entityVertices[4]=p3.x+x;
+            this.entityVertices[5]=p3.y+y;
 
-            gl.bufferData(gl.ARRAY_BUFFER,vList,gl.STREAM_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER,this.entityVertices,gl.STREAM_DRAW);
             gl.drawArrays(gl.LINE_LOOP,0,3);
         }
         

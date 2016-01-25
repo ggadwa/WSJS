@@ -122,9 +122,11 @@ function wsPoint(x,y,z)
         }
         
         var rd=rotX*DEGREE_TO_RAD;
+        var sn=Math.sin(rd);
+        var cs=Math.cos(rd);
         
-        var y=(this.y*Math.cos(rd))-(this.z*Math.sin(rd));
-        var z=(this.y*Math.sin(rd))+(this.z*Math.cos(rd));
+        var y=(this.y*cs)-(this.z*sn);
+        var z=(this.y*sn)+(this.z*cs);
 
         if (centerPt!==null) {
             y+=centerPt.y;
@@ -143,9 +145,11 @@ function wsPoint(x,y,z)
         }
         
         var rd=rotY*DEGREE_TO_RAD;
+        var sn=Math.sin(rd);
+        var cs=Math.cos(rd);
         
-        var x=(this.z*Math.sin(rd))+(this.x*Math.cos(rd));
-        var z=(this.z*Math.cos(rd))-(this.x*Math.sin(rd));
+        var x=(this.z*sn)+(this.x*cs);
+        var z=(this.z*cs)-(this.x*sn);
 
         if (centerPt!==null) {
             x+=centerPt.x;
@@ -164,9 +168,11 @@ function wsPoint(x,y,z)
         }
         
         var rd=rotZ*DEGREE_TO_RAD;
+        var sn=Math.sin(rd);
+        var cs=Math.cos(rd);
         
-        var x=(this.x*Math.cos(rd))-(this.y*Math.sin(rd));
-        var y=(this.x*Math.sin(rd))+(this.y*Math.cos(rd));
+        var x=(this.x*cs)-(this.y*sn);
+        var y=(this.x*sn)+(this.y*cs);
         
         if (centerPt!==null) {
             x+=centerPt.x;
@@ -179,15 +185,17 @@ function wsPoint(x,y,z)
     
     this.rotate=function(ang)
     {
-        var rd,x,y,z;
+        var rd,sn,cs,x,y,z;
         
             // rotate X
         
         if (ang.x!==0.0) {
             rd=ang.x*DEGREE_TO_RAD;
+            sn=Math.sin(rd);
+            cs=Math.cos(rd);
 
-            y=(this.y*Math.cos(rd))-(this.z*Math.sin(rd));
-            z=(this.y*Math.sin(rd))+(this.z*Math.cos(rd));
+            y=(this.y*cs)-(this.z*sn);
+            z=(this.y*sn)+(this.z*cs);
 
             this.y=y;
             this.z=z;
@@ -197,9 +205,11 @@ function wsPoint(x,y,z)
         
         if (ang.y!==0.0) {
             rd=ang.y*DEGREE_TO_RAD;
+            sn=Math.sin(rd);
+            cs=Math.cos(rd);
 
-            x=(this.z*Math.sin(rd))+(this.x*Math.cos(rd));
-            z=(this.z*Math.cos(rd))-(this.x*Math.sin(rd));
+            x=(this.z*sn)+(this.x*cs);
+            z=(this.z*cs)-(this.x*sn);
 
             this.x=x;
             this.z=z;
@@ -209,9 +219,11 @@ function wsPoint(x,y,z)
         
         if (ang.z!==0.0) {
             rd=ang.z*DEGREE_TO_RAD;
+            sn=Math.sin(rd);
+            cs=Math.cos(rd);
 
-            x=(this.x*Math.cos(rd))-(this.y*Math.sin(rd));
-            y=(this.x*Math.sin(rd))+(this.y*Math.cos(rd));
+            x=(this.x*cs)-(this.y*sn);
+            y=(this.x*sn)+(this.y*cs);
 
             this.x=x;
             this.y=y;
@@ -226,15 +238,17 @@ function wsPoint(x,y,z)
             this.z-=centerPt.z;
         }
         
-        var rd,x,y,z;
+        var rd,sn,cs,x,y,z;
         
             // rotate X
         
         if (ang.x!==0.0) {
             rd=ang.x*DEGREE_TO_RAD;
+            sn=Math.sin(rd);
+            cs=Math.cos(rd);
 
-            y=(this.y*Math.cos(rd))-(this.z*Math.sin(rd));
-            z=(this.y*Math.sin(rd))+(this.z*Math.cos(rd));
+            y=(this.y*cs)-(this.z*sn);
+            z=(this.y*sn)+(this.z*cs);
 
             this.y=y;
             this.z=z;
@@ -244,9 +258,11 @@ function wsPoint(x,y,z)
         
         if (ang.y!==0.0) {
             rd=ang.y*DEGREE_TO_RAD;
+            sn=Math.sin(rd);
+            cs=Math.cos(rd);
 
-            x=(this.z*Math.sin(rd))+(this.x*Math.cos(rd));
-            z=(this.z*Math.cos(rd))-(this.x*Math.sin(rd));
+            x=(this.z*sn)+(this.x*cs);
+            z=(this.z*cs)-(this.x*sn);
 
             this.x=x;
             this.z=z;
@@ -256,9 +272,11 @@ function wsPoint(x,y,z)
         
         if (ang.z!==0.0) {
             rd=ang.z*DEGREE_TO_RAD;
+            sn=Math.sin(rd);
+            cs=Math.cos(rd);
 
-            x=(this.x*Math.cos(rd))-(this.y*Math.sin(rd));
-            y=(this.x*Math.sin(rd))+(this.y*Math.cos(rd));
+            x=(this.x*cs)-(this.y*sn);
+            y=(this.x*sn)+(this.y*cs);
 
             this.x=x;
             this.y=y;

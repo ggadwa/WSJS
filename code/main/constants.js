@@ -213,6 +213,8 @@ const TEXT_ALIGN_LEFT=0;
 const TEXT_ALIGN_CENTER=1;
 const TEXT_ALIGN_RIGHT=2;
 
+const TEXT_MAX_STRING_LEN=256;
+
 //
 // lightmap generation
 //
