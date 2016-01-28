@@ -99,10 +99,10 @@ function MapOverlayObject()
     {
         var lines=[];
         
-        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.min),new ws2DPoint(xBound.max,zBound.min)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.min),new ws2DPoint(xBound.max,zBound.max)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.max),new ws2DPoint(xBound.min,zBound.max)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.max),new ws2DPoint(xBound.min,zBound.min)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
         this.addLines(this.roomLineList,lines);
     };
@@ -111,10 +111,10 @@ function MapOverlayObject()
     {
         var lines=[];
         
-        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.min),new ws2DPoint(xBound.max,zBound.min)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.min),new ws2DPoint(xBound.max,zBound.max)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.max),new ws2DPoint(xBound.min,zBound.max)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.max),new ws2DPoint(xBound.min,zBound.min)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
         this.addLines(this.roomLineList,lines);
     };
@@ -123,10 +123,10 @@ function MapOverlayObject()
     {
         var lines=[];
         
-        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.min),new ws2DPoint(xBound.max,zBound.min)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.min),new ws2DPoint(xBound.max,zBound.max)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.max,zBound.max),new ws2DPoint(xBound.min,zBound.max)));
-        lines.push(new ws2DLine(new ws2DPoint(xBound.min,zBound.max),new ws2DPoint(xBound.min,zBound.min)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
+        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
         this.addLines(this.extraLineList,lines);
     };
@@ -258,9 +258,9 @@ function MapOverlayObject()
             
         var x,y;
         
-        var p1=new ws2DPoint(0,0);
-        var p2=new ws2DPoint(0,0);
-        var p3=new ws2DPoint(0,0);
+        var p1=new ws2DIntPoint(0,0);
+        var p2=new ws2DIntPoint(0,0);
+        var p3=new ws2DIntPoint(0,0);
         
         var entity,ang;
         var nEntity=entityList.count();

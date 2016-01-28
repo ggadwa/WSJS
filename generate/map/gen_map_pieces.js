@@ -268,7 +268,7 @@ function MapPieceObject()
             x2=xBound.min+Math.floor(sx*(pt2[0]*0.01));
             z2=zBound.min+Math.floor(sz*(pt2[1]*0.01));
             
-            lineList.push(new ws2DLine(new ws2DPoint(x,z),new ws2DPoint(x2,z2)));
+            lineList.push(new ws2DLine(new ws2DIntPoint(x,z),new ws2DIntPoint(x2,z2)));
         }
 
         return(lineList);

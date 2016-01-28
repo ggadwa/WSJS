@@ -99,7 +99,7 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     };
     
         //
-        // set vertices to pose and model position
+        // set vertices to pose and offset position
         //
         
     this.updateVertexesToPoseAndPosition=function(view,skeleton,offsetPosition)
@@ -128,6 +128,51 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             
             normal.setFromPoint(v.normal);
             normal.rotate(bone.curPoseAngle);
+            
+            this.drawNormals[nIdx++]=normal.x;
+            this.drawNormals[nIdx++]=normal.y;
+            this.drawNormals[nIdx++]=normal.z;
+        }
+        
+            // set the buffers
+            
+        var gl=view.gl;
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.STATIC_DRAW);
+    };
+    
+        //
+        // set vertices to ang and offset position
+        //
+        
+    this.updateVertexesToAngleAndPosition=function(view,angle,offsetPosition)
+    {
+        var n,v;
+        var normal;
+        
+        var rotVector=new wsPoint(0.0,0.0,0.0);
+        var normal=new wsPoint(0.0,0.0,0.0);
+        
+            // move all the vertexes
+            
+        var vIdx=0;
+        var nIdx=0;
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            
+            rotVector.setFromPoint(v.position);
+            rotVector.rotate(angle);
+            
+            this.drawVertices[vIdx++]=rotVector.x+offsetPosition.x;
+            this.drawVertices[vIdx++]=rotVector.y+offsetPosition.y;
+            this.drawVertices[vIdx++]=rotVector.z+offsetPosition.z;
+            
+            normal.setFromPoint(v.normal);
+            normal.rotate(angle);
             
             this.drawNormals[nIdx++]=normal.x;
             this.drawNormals[nIdx++]=normal.y;

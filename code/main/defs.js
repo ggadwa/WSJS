@@ -75,10 +75,9 @@ function wsPoint(x,y,z)
     
     this.setFromScale=function(pt,f)
     {
-        this.x=pt.x;
-        this.y=pt.y;
-        this.z=pt.z;
-        this.scale(f);
+        this.x=pt.x*f;
+        this.y=pt.y*f;
+        this.z=pt.z*f;
     };
                 
     this.move=function(xAdd,yAdd,zAdd)
@@ -377,13 +376,13 @@ function wsPoint(x,y,z)
 
 function ws2DPoint(x,y)
 {
-    this.x=Math.floor(x);
-    this.y=Math.floor(y);
+    this.x=x;
+    this.y=y;
     
     this.set=function(xSet,ySet)
     {
-        this.x=Math.floor(xSet);
-        this.y=Math.floor(ySet);
+        this.x=xSet;
+        this.y=ySet;
     };
                 
     this.move=function(xAdd,yAdd)
@@ -433,6 +432,67 @@ function ws2DPoint(x,y)
     this.copy=function()
     {
         return(new ws2DPoint(this.x,this.y));
+    };
+}
+
+function ws2DIntPoint(x,y)
+{
+    this.x=Math.floor(x);
+    this.y=Math.floor(y);
+    
+    this.set=function(xSet,ySet)
+    {
+        this.x=Math.floor(xSet);
+        this.y=Math.floor(ySet);
+    };
+                
+    this.move=function(xAdd,yAdd)
+    {
+        this.x+=xAdd;
+        this.y+=yAdd;
+    };
+    
+    this.noSquareDistance=function(pt)
+    {
+        var px=this.x-pt.x;
+        var py=this.y-pt.y;
+        return((px*px)+(py*py));
+    };
+                
+    this.distance=function(pt)
+    {
+        return(Math.sqrt(this.noSquareDistance(pt)));
+    };
+    
+    this.equals=function(pt)
+    {
+        return((this.x===pt.x)&&(this.y===pt.y));
+    };
+    
+    this.rotate=function(centerPt,rot)
+    {
+        if (centerPt!==null) {
+            this.x-=centerPt.x;
+            this.y-=centerPt.y;
+        }
+        
+        var rd=rot*DEGREE_TO_RAD;
+        
+        var x=(this.y*Math.sin(rd))+(this.x*Math.cos(rd));
+        var y=(this.y*Math.cos(rd))-(this.x*Math.sin(rd));
+        
+        if (centerPt!==null) {
+            x+=centerPt.x;
+            y+=centerPt.y;
+        }
+        
+        this.x=Math.floor(x);
+        this.y=Math.floor(y);
+    };
+    
+    this.copy=function()
+    {
+        return(new ws2DIntPoint(this.x,this.y));
     };
 }
 

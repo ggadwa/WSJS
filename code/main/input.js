@@ -11,7 +11,7 @@ function InputObject()
     this.keyFlags=new Uint16Array(255);
 
     this.mouseFirstMove=true;
-    this.mouseLastPos=new ws2DPoint(0,0);
+    this.mouseLastPos=new ws2DIntPoint(0,0);
     
     this.playerEntity=null;
     
@@ -34,7 +34,7 @@ function InputObject()
         }
 
         this.mouseFirstMove=true;
-        this.mouseLastPos=new ws2DPoint(0,0);
+        this.mouseLastPos=new ws2DIntPoint(0,0);
 
             // add the listeners
 

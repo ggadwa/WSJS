@@ -88,7 +88,7 @@ function MapShaderObject()
 
     this.drawStart=function(view)
     {
-        var n,eyePt;
+        var n;
         var light,viewLight;
 
             // using the map shader

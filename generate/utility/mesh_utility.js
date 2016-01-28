@@ -267,11 +267,9 @@ function MeshUtilityObject()
 
     this.buildVertexListTangents=function(vertexList,indexes)
     {
-        var n,nTrig,nVertex,trigIdx;
+        var n,nTrig,trigIdx;
         var v0,v1,v2;
         var u10,u20,v10,v20;
-
-        nVertex=vertexList.length;
 
             // generate tangents by the trigs
             // sometimes we will end up overwriting
@@ -310,7 +308,6 @@ function MeshUtilityObject()
             p20.setFromSubPoint(v2.position,v0.position);
 
                 // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
-                // uvs are packed lists of 2, so different here
 
             u10=v1.uv.x-v0.uv.x;        // x component
             u20=v2.uv.x-v0.uv.x;

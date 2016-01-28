@@ -13,6 +13,9 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
     this.model=model;
     this.isPlayer=isPlayer;
     
+    this.weaponCurrentIndex=-1;
+    this.weapons=[];
+    
     this.turnSpeed=0;
     this.lookSpeed=0;
     this.forwardSpeed=0;
@@ -126,6 +129,26 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
     this.startJump=function()
     {
         if (this.fallSpeed===0) this.fallSpeed=-300;
+    };
+    
+        //
+        // weapons
+        //
+        
+    this.addWeapon=function(weapon)
+    {
+        this.weapons.push(weapon);
+    };
+    
+    this.setCurrentWeaponIndex=function(index)
+    {
+        this.weaponCurrentIndex=index;
+    };
+    
+    this.getCurrentWeapon=function()
+    {
+        if (this.weaponCurrentIndex===-1) return(null);
+        return(this.weapons[this.weaponCurrentIndex]);
     };
     
         //

@@ -756,20 +756,20 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         if (wallLike) {
             if (xBound.getSize()>zBound.getSize()) {
-                pt0=new ws2DPoint(((v0.position.x-xBound.min)*xFactor),((v0.position.y-yBound.min)*yFactor));
-                pt1=new ws2DPoint(((v1.position.x-xBound.min)*xFactor),((v1.position.y-yBound.min)*yFactor));
-                pt2=new ws2DPoint(((v2.position.x-xBound.min)*xFactor),((v2.position.y-yBound.min)*yFactor));
+                pt0=new ws2DIntPoint(((v0.position.x-xBound.min)*xFactor),((v0.position.y-yBound.min)*yFactor));
+                pt1=new ws2DIntPoint(((v1.position.x-xBound.min)*xFactor),((v1.position.y-yBound.min)*yFactor));
+                pt2=new ws2DIntPoint(((v2.position.x-xBound.min)*xFactor),((v2.position.y-yBound.min)*yFactor));
             }
             else {
-                pt0=new ws2DPoint(((v0.position.z-zBound.min)*zFactor),((v0.position.y-yBound.min)*yFactor));
-                pt1=new ws2DPoint(((v1.position.z-zBound.min)*zFactor),((v1.position.y-yBound.min)*yFactor));
-                pt2=new ws2DPoint(((v2.position.z-zBound.min)*zFactor),((v2.position.y-yBound.min)*yFactor));
+                pt0=new ws2DIntPoint(((v0.position.z-zBound.min)*zFactor),((v0.position.y-yBound.min)*yFactor));
+                pt1=new ws2DIntPoint(((v1.position.z-zBound.min)*zFactor),((v1.position.y-yBound.min)*yFactor));
+                pt2=new ws2DIntPoint(((v2.position.z-zBound.min)*zFactor),((v2.position.y-yBound.min)*yFactor));
             }
         }
         else {
-            pt0=new ws2DPoint(((v0.position.x-xBound.min)*xFactor),((v0.position.z-zBound.min)*zFactor));
-            pt1=new ws2DPoint(((v1.position.x-xBound.min)*xFactor),((v1.position.z-zBound.min)*zFactor));
-            pt2=new ws2DPoint(((v2.position.x-xBound.min)*xFactor),((v2.position.z-zBound.min)*zFactor));
+            pt0=new ws2DIntPoint(((v0.position.x-xBound.min)*xFactor),((v0.position.z-zBound.min)*zFactor));
+            pt1=new ws2DIntPoint(((v1.position.x-xBound.min)*xFactor),((v1.position.z-zBound.min)*zFactor));
+            pt2=new ws2DIntPoint(((v2.position.x-xBound.min)*xFactor),((v2.position.z-zBound.min)*zFactor));
         }
 
             // move so the triangle renders within

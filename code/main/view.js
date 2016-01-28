@@ -32,7 +32,7 @@ function ViewObject()
 
     this.gl=null;
     this.canvas=null;
-    this.canvasTopLeft=new ws2DPoint(0,0);
+    this.canvasTopLeft=new ws2DIntPoint(0,0);
     
         // the view setup
         
@@ -432,6 +432,7 @@ function ViewObject()
     this.draw=function(map,entityList)
     {
         var n,nEntity,entity;
+        var player=entityList.getPlayer();
         var light;
          
             // everything overdraws except
@@ -442,7 +443,7 @@ function ViewObject()
             // setup the view camera to be
             // equal to player object
             
-        this.camera.setToEntity(entityList.getPlayer(),this.CAMERA_EYE_HEIGHT);
+        this.camera.setToEntity(player,this.CAMERA_EYE_HEIGHT);
 
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
@@ -520,6 +521,15 @@ function ViewObject()
                 if (DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.model);
                 if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.model);
             }
+        }
+        
+            // player weapon
+            
+        var weapon=player.getCurrentWeapon();
+        if (weapon!==null) {
+            weapon.drawStart(this);
+            weapon.draw(this,player);
+            weapon.drawEnd(this);
         }
         
             // map overlay

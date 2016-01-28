@@ -23,12 +23,20 @@ REGULAR TODOs
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
     [ ] draw closest map meshes first
 
-[ ] models
-    [X] 3 types, always generate one of each type -- blob (no limbs) humaniod (limbs on line) animal (limbs downwards)
-    [ ] need separate globe sizes for each part
-    [ ] optimize whatever is slow in creation
-    [ ] redo mechanical object creation (for weapons)
+[ ] general
+    [X] fixed some bug in lost float/int conversions
 
+[ ] models
+    [ ] optimize whatever is slow in creation
+
+    [ ] make limbs bilateral
+    [ ] need separate globe sizes for each part
+    [ ] need fur bitmap
+    [ ] make other bitmap more scale-y
+
+[ ] weapons
+    [ ] add weapon system
+    [X] make dynamic weapon model construction
 
 
 [ ] need to deal with pausing time stamps

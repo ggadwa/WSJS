@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=10;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 const ROOM_DIMENSIONS=[35000,7000,35000];       // maximum size for a room [x,y,z]
 const ROOM_FLOOR_DEPTH=700;
@@ -44,19 +44,11 @@ const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map li
 const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
-// models
-//
-
-const MODEL_TYPE_HUMANOID=0;
-const MODEL_TYPE_ANIMAL=1;
-const MODEL_TYPE_BLOB=2;
-
-//
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=3;
-const MONSTER_ENTITY_COUNT=10;
+const MONSTER_MODEL_COUNT=1;
+const MONSTER_ENTITY_COUNT=1;
 
 //
 // overlays
@@ -104,8 +96,6 @@ const SEED_MAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
 const SEED_ENTITY=Math.floor((Math.random()*SEED));
-    
-
 
 //
 // math
@@ -245,3 +235,12 @@ const BITMAP_GRID_MIN_BLOCK_HEIGHT=10;
 const BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
 const BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
     
+//
+// model types
+//
+
+const MODEL_TYPE_HUMANOID=0;
+const MODEL_TYPE_ANIMAL=1;
+const MODEL_TYPE_BLOB=2;
+const MODEL_TYPE_WEAPON=3;
+

@@ -255,7 +255,7 @@ function wsInitBuildModelsTexture(idx,textureGenRandom,modelGenRandom)
     var genBitmap=new GenBitmapObject(textureGenRandom);    
     var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);
     
-    view.loadingScreenDraw((idx*2)/(MONSTER_MODEL_COUNT*2));    
+    view.loadingScreenDraw(((idx*2)+1)/((MONSTER_MODEL_COUNT*2)+1));    
     setTimeout(function() { wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
 }
     
@@ -285,7 +285,7 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
     
         // if more models, then loop back around
     
-    view.loadingScreenDraw(((idx*2)+1)/(MONSTER_MODEL_COUNT*2));    
+    view.loadingScreenDraw(((idx*2)+2)/((MONSTER_MODEL_COUNT*2)+1));    
         
     idx++;
     if (idx<(MONSTER_MODEL_COUNT+1)) {
@@ -293,6 +293,27 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
         return;
     }
     
+        // next step
+        
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Generating Dynamic Weapons');
+    view.loadingScreenDraw(null);
+    
+    setTimeout(function() { wsInitBuildWeapons(textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
+}
+
+function wsInitBuildWeapons(textureGenRandom,modelGenRandom)
+{
+    var genBitmap=new GenBitmapObject(textureGenRandom);    
+    var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_METAL,debug);
+    
+    var model=new ModelObject('weapon_0',MODEL_TYPE_WEAPON);
+    
+    var genModelMesh=new GenModelWeaponMeshObject(model,modelBitmap,modelGenRandom);
+    genModelMesh.build(view);
+    
+    modelList.add(model);
+
         // next step
         
     view.loadingScreenUpdate();
@@ -310,8 +331,12 @@ function wsInitBuildEntities()
     var entityGenRandom=new GenRandomObject(SEED_ENTITY);
     
         // make player entity
-        
-    entityList.addPlayer(new EntityObject(map.findPlayerStartPosition(),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true));
+    
+    var playerEntity=new EntityObject(map.findPlayerStartPosition(),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
+    playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0')));
+    playerEntity.setCurrentWeaponIndex(0);
+    
+    entityList.addPlayer(playerEntity);
     
         // make monster entities
         // we clone their models in the list so each entity gets
