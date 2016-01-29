@@ -240,8 +240,8 @@ function wsInitBuildLightmap()
 
 function wsInitBuildLightmapFinish()
 {
-    var textureGenRandom=new GenRandomObject(SEED_MODEL_BITMAP);
-    var modelGenRandom=new GenRandomObject(SEED_MODEL);
+    var textureGenRandom=new GenRandomObject(1 /* SEED_MODEL_BITMAP */);
+    var modelGenRandom=new GenRandomObject(1 /*SEED_MODEL*/);
     
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Models');
@@ -252,8 +252,10 @@ function wsInitBuildLightmapFinish()
 
 function wsInitBuildModelsTexture(idx,textureGenRandom,modelGenRandom)
 {
+    var skinTypes=[GEN_BITMAP_TYPE_SKIN_SCALE,GEN_BITMAP_TYPE_SKIN_LEATHER,GEN_BITMAP_TYPE_SKIN_FUR];
+    
     var genBitmap=new GenBitmapObject(textureGenRandom);    
-    var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_SKIN,debug);
+    var modelBitmap=genBitmap.generate(view,0,skinTypes[idx%3],debug);       // supergumba -- temporary to get all skin types
     
     view.loadingScreenDraw(((idx*2)+1)/((MONSTER_MODEL_COUNT*2)+1));    
     setTimeout(function() { wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
@@ -274,12 +276,16 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
     }
     
         // build the skeleton and mesh
-        
+    
+    var startTime=Date.now();
+    
     genSkeleton=new GenModelOrganicSkeletonObject(model,modelGenRandom);
     genSkeleton.build();
     
     genModelMesh=new GenModelOrganicMeshObject(model,modelBitmap,modelGenRandom);
     genModelMesh.build(view);
+    
+    console.log('model='+(Date.now()-startTime));
     
     modelList.add(model);
     

@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 const ROOM_DIMENSIONS=[35000,7000,35000];       // maximum size for a room [x,y,z]
 const ROOM_FLOOR_DEPTH=700;
@@ -11,13 +11,13 @@ const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connecti
 const ROOM_LEVEL_CHANGE_PERCENTAGE=0.8;         // what % of the time a room gains another story
 const ROOM_CLOSET_UP_PERCENTAGE=0.75;           // what % of the time a closet goes to a second level if available
 
-const ROOM_PLATFORMS=true;                      // turns on or off platforms
+const ROOM_PLATFORMS=false;                      // turns on or off platforms
 
 //
 // decorations
 //
 
-const ROOM_DECORATIONS=true;                   // set to false for no decorations in the map
+const ROOM_DECORATIONS=false;                   // set to false for no decorations in the map
 
 const ROOM_DECORATIONS_BOX_EXTRA_COUNT=8;       // extra number of boxes
 
@@ -41,14 +41,14 @@ const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
 const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for map lights
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
     
-const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
 //
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=1;
-const MONSTER_ENTITY_COUNT=1;
+const MONSTER_MODEL_COUNT=5;
+const MONSTER_ENTITY_COUNT=5;
 
 //
 // overlays
@@ -129,7 +129,9 @@ const GEN_BITMAP_TYPE_PLASTER=10;
 const GEN_BITMAP_TYPE_MOSAIC=11;
 const GEN_BITMAP_TYPE_WOOD_PLANK=12;
 const GEN_BITMAP_TYPE_WOOD_BOX=13;
-const GEN_BITMAP_TYPE_SKIN=14;
+const GEN_BITMAP_TYPE_SKIN_SCALE=14;
+const GEN_BITMAP_TYPE_SKIN_LEATHER=15;
+const GEN_BITMAP_TYPE_SKIN_FUR=16;
 
 const GEN_BITMAP_TILE_STYLE_BORDER=0;
 const GEN_BITMAP_TILE_STYLE_CHECKER=1;

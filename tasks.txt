@@ -25,9 +25,13 @@ REGULAR TODOs
 
 [ ] general
     [X] fixed some bug in lost float/int conversions
+    [ ] bitmaps drawing routines grab bitmap data once?
 
 [ ] models
     [ ] optimize whatever is slow in creation
+
+    [ ] need leather and fur bitmap
+    [ ] break into skin_scale, etc, always draw in upper left
 
     [ ] make limbs bilateral
     [ ] need separate globe sizes for each part

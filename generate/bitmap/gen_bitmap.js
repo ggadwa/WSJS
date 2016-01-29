@@ -198,7 +198,7 @@ function GenBitmapObject(genRandom)
                     // possible design
 
                 if ((complex) && (this.genRandom.random()<0.25)) {
-                    this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),5,0,null,[0.0,0.0,0.0]);
+                    this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.0,1.0,5,0,null,[0.0,0.0,0.0]);
                 }
             }
         }
@@ -255,7 +255,7 @@ function GenBitmapObject(genRandom)
         y=Math.floor(screwSize*0.5);
         
         for (n=0;n!==screwCount;n++) {
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,screwX,y,(screwX+screwSize),(y+screwSize),2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
+            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,screwX,y,(screwX+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
             y+=yAdd;
         }
     };
@@ -707,33 +707,62 @@ function GenBitmapObject(genRandom)
         // skin bitmaps
         //
 
-    this.generateScaleChunk=function(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot)
+    this.generateSkinScaleChunk=function(bitmapCTX,normalCTX,skinColor,lft,top,rgt,bot)
     {
-        var x,y,dx,dy,dWid,dHigh;
+        var x,y,dx,dy;
+        var xCount;
 
             // the scale background
 
         this.genBitmapUtility.drawRect(bitmapCTX,lft,top,rgt,bot,skinColor);
-        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0.05,0.1,0.6);
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0.4,0.6,0.6);
 
             // scales
 
-        var scaleCount=this.genRandom.randomInt(10,20);
+        var scaleCount=this.genRandom.randomInt(5,10);
         var borderColor=this.genBitmapUtility.darkenColor(skinColor,0.8);
 
-        var wid=(rgt-lft)/scaleCount;
-        var high=(bot-top)/scaleCount;
+        var wid=Math.floor((rgt-lft)/scaleCount);
+        var high=Math.floor((bot-top)/scaleCount);
         
-        dWid=Math.floor(wid);
-        dHigh=Math.floor(high);
+        dy=-high;
         
         for (y=0;y!==scaleCount;y++) {
-            dy=Math.floor(y*high);
-            for (x=0;x!==scaleCount;x++) {
-                dx=Math.floor(x*wid);
-                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+dWid),(dy+dHigh),1,0,null,borderColor);
+
+            if ((y%2)===0) {
+                dx=0;
+                xCount=scaleCount;
             }
+            else {
+                dx=-Math.floor(wid*0.5);
+                xCount=scaleCount+1;
+            }
+            
+            for (x=0;x!==xCount;x++) {
+                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+(high*2)),0.25,0.75,3,0,null,borderColor);
+                dx+=wid;
+            }
+            
+            dy+=high;
         }
+    };
+
+    this.generateSkinScale=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.5);
+         
+            // clear canvases
+
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0));
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+
+            // top left is scales
+
+        this.generateSkinScaleChunk(bitmapCTX,normalCTX,skinColor,0,0,Math.floor(wid*0.5),Math.floor(high*0.5),0.8,0.8);
+
+            // finish with the specular
+
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
     };
     
     this.generateLeatherChunk=function(bitmapCTX,normalCTX,bitmapWid,bitmapHigh,clothColor,lft,top,rgt,bot)
@@ -760,25 +789,19 @@ function GenBitmapObject(genRandom)
             this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,bitmapWid,bitmapHigh,x,y,mWid,mHigh,20,0.9,0.6,true);
         }
     };
-
-    this.generateSkin=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    
+    this.generateSkinLeather=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.5);
         var clothColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.6);
-        
+         
             // clear canvases
 
         this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0));
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
-            // chunks
+            // top left is scales
 
-        //if (this.genBitmapUtility.genRandom.random()<=0.5) {
-            this.generateScaleChunk(bitmapCTX,normalCTX,skinColor,0,0,wid,high,0.8,0.8);
-        //}
-        //else {
-        //    this.generateLeatherChunk(bitmapCTX,normalCTX,wid,high,clothColor,0,0,wid,high);
-        //}
+        //this.generateLeatherChunk(bitmapCTX,normalCTX,wid,high,clothColor,0,0,Math.floor(wid*0.5),Math.floor(high*0.5));
 
             // finish with the specular
 
@@ -906,16 +929,26 @@ function GenBitmapObject(genRandom)
                 shineFactor=2.0;
                 break;
 
-            case GEN_BITMAP_TYPE_SKIN:
-                this.generateSkin(bitmapCTX,normalCTX,specularCTX,wid,high);
+            case GEN_BITMAP_TYPE_SKIN_SCALE:
+                this.generateSkinScale(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=10.0;
+                break;
+                
+            case GEN_BITMAP_TYPE_SKIN_LEATHER:
+                this.generateSkinLeather(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=5.0;
+                break;
+                
+            case GEN_BITMAP_TYPE_SKIN_FUR:
+                this.generateSkinScale(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=2.0;
                 break;
 
         }
 
             // debugging
 /*
-        if (generateType===GEN_BITMAP_TYPE_SKIN) {
+        if (generateType===GEN_BITMAP_TYPE_SKIN_LEATHER) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);

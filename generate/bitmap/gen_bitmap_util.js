@@ -671,11 +671,19 @@ function GenBitmapUtilityObject(genRandom)
         normalCTX.fill();
     };
 
-    this.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
+    this.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
     {
         var n,x,y,halfWid,halfHigh;
         var rad,fx,fy,col,idx;
-
+        
+            // start and end arc
+            
+        startArc=Math.floor(startArc*1000);
+        endArc=Math.floor(endArc*1000);
+        if (startArc>=endArc) return;
+        
+            // the drawing size
+            
         var orgWid=rgt-lft;
         var orgHigh=bot-top;
         var wid=orgWid-1;
@@ -697,7 +705,7 @@ function GenBitmapUtilityObject(genRandom)
 
             halfWid=wid*0.5;
             halfHigh=high*0.5;
-
+            
             if (edgeCount>0) {
                 col=edgeRGBColor;
             }
@@ -705,8 +713,8 @@ function GenBitmapUtilityObject(genRandom)
                 col=fillRGBColor;
             }
 
-            for (n=0;n!==1000;n++) {
-                rad=(Math.PI*2.0)*(n/1000.0);
+            for (n=startArc;n<endArc;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
 
                 fx=Math.sin(rad);
                 x=mx+Math.floor(halfWid*fx);
