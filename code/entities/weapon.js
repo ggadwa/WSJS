@@ -26,7 +26,7 @@ function WeaponObject(model)
     {
             // get new position
             
-        var pos=new wsPoint(0,0,3000);      // supergumba -- all this is hardcoded!
+        var pos=new wsPoint(0,0,2500);      // supergumba -- all this is hardcoded!
         pos.rotate(entity.angle);
         pos.addPoint(entity.position);
         
@@ -35,6 +35,7 @@ function WeaponObject(model)
             // and rotational angle
             
         var ang=entity.angle.copy();
+        ang.x=(-ang.x)-15.0;
         ang.y+=180.0;
        
             // move vertexes to reflect

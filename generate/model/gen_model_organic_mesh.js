@@ -75,7 +75,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // create the globe without a top
             // or bottom and build that with trigs later
             
-        var xzAngAdd=360.0/(this.GLOBE_SURFACE_COUNT-1);
+        var xzAngAdd=360.0/this.GLOBE_SURFACE_COUNT;
         var yAngAdd=180.0/this.GLOBE_SURFACE_COUNT;
 
         var xzAng;
@@ -220,7 +220,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             
         var anyMove;
         var moveVector=new wsPoint(0,0,0);
-        var vct;
+        var gravityVector=new wsPoint(0,0,0);
         var moveCount=0;
         
         while (moveCount<1000) {
@@ -262,11 +262,11 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                     
                         // otherwise add in gravity
                         
-                    vct=new wsPoint((bone.position.x-v.position.x),(bone.position.y-v.position.y),(bone.position.z-v.position.z));
-                    vct.normalize();
-                    vct.scale((1.0-(dist/bone.gravityPullDistance))*10.0);
+                    gravityVector.setFromSubPoint(bone.position,v.position);
+                    gravityVector.normalize();
+                    gravityVector.scale((1.0-(dist/bone.gravityPullDistance))*10.0);
                     
-                    moveVector.addPoint(vct);
+                    moveVector.addPoint(gravityVector);
                 }
                 
                     // are we done moving?
@@ -461,8 +461,6 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
 
             this.buildAroundBoneList(view,skeleton.limbs[n].boneIndexes,vertexList,indexes);
-
-            meshUtility.transformUVs(vertexList,0.0,0.0,0.5,0.5);
 
             if (modelVertexList===null) {
                 modelVertexList=vertexList;

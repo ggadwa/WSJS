@@ -333,8 +333,8 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         var vertexList=meshUtility.createModelVertexList(this.CYLINDER_VERTEX_COUNT);
         var indexes=new Uint16Array(this.CYLINDER_INDEX_COUNT);
         
-        var pos1=new wsPoint(0,0,1000);
-        var pos2=new wsPoint(0,0,-1000);
+        var pos1=new wsPoint(0,0,1500);
+        var pos2=new wsPoint(0,0,-1500);
         
         this.buildCylinderAroundTwoPoints(view,pos1,pos2,500,500,vertexList,indexes);
         

@@ -91,11 +91,11 @@ const DEBUG_DRAW_MODEL_MESH_TANGENTS=false;
 
 const SEED=Date.now();
 
-const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=Math.floor((Math.random()*SEED));
-const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MODEL=Math.floor((Math.random()*SEED));
-const SEED_ENTITY=Math.floor((Math.random()*SEED));
+const SEED_MAP_BITMAP=1; //Math.floor((Math.random()*SEED));
+const SEED_MAP=3; //Math.floor((Math.random()*SEED));
+const SEED_MODEL_BITMAP=1;//Math.floor((Math.random()*SEED));
+const SEED_MODEL=1;//Math.floor((Math.random()*SEED));
+const SEED_ENTITY=3;//Math.floor((Math.random()*SEED));
 
 //
 // math

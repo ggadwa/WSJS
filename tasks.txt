@@ -7,6 +7,7 @@ EMCA6 TODOs
     [ ] can we do static getCONTANT_NAME() { return(1); } etc for constants?  PROBABLY NO, wait for 7?
     [ ] modulize the code
     [ ] use Math.trunc when possible instead of Math.floor
+    [ ] hoist all the vars, eventually use let
 
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
@@ -26,22 +27,33 @@ REGULAR TODOs
 [ ] general
     [X] fixed some bug in lost float/int conversions
     [ ] bitmaps drawing routines grab bitmap data once?
+    [X] speed up bitmap creation
 
 [ ] models
-    [ ] optimize whatever is slow in creation
+    [X] speed up model creation
+    [X] improved scale bitmap
+    [X] need leather and fur bitmap
+    [X] break into skin_scale, etc, always draw in upper left
 
-    [ ] need leather and fur bitmap
-    [ ] break into skin_scale, etc, always draw in upper left
+    
+    [X] fixed a bug that would create split areas in models
+    [ ] fix bad normal culling
+         [ ] MESH NORMAL CULLING IS OFF!
 
     [ ] make limbs bilateral
+        [ ] get legs as booleans (does bone X have legs) and always two
+
     [ ] need separate globe sizes for each part
-    [ ] need fur bitmap
-    [ ] make other bitmap more scale-y
+    [ ] smooth globes or have locked shrink coordinates (like no Y change on body, etc)
+
+    [ ] entities need to mark off their start positions (use same stuff as pillars) -- no entities create on top of each other
 
 [ ] weapons
-    [ ] add weapon system
+    [X] add weapon system
     [X] make dynamic weapon model construction
+    [X] clear z-buffer?
 
+[ ] projectiles
 
 [ ] need to deal with pausing time stamps
 

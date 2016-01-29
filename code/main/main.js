@@ -4,7 +4,7 @@
 // textures to build
 //
 
-var wsTextureBuildList=
+var mapTextureBuildList=
     [
         [TEXTURE_WALL,[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
         [TEXTURE_FLOOR,[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
@@ -155,13 +155,13 @@ function wsInitInternal()
 
 function wsInitBuildTextures(idx,textureGenRandom)
 {
-    var bitmapCount=wsTextureBuildList.length;
+    var bitmapCount=mapTextureBuildList.length;
     
         // pick a random image to generate
         // a texture type
     
-    var bitmapId=wsTextureBuildList[idx][0];
-    var bitmapTypeList=wsTextureBuildList[idx][1];
+    var bitmapId=mapTextureBuildList[idx][0];
+    var bitmapTypeList=mapTextureBuildList[idx][1];
     var k=textureGenRandom.randomInt(0,bitmapTypeList.length);
     var bitmapType=bitmapTypeList[k];
     
@@ -240,8 +240,8 @@ function wsInitBuildLightmap()
 
 function wsInitBuildLightmapFinish()
 {
-    var textureGenRandom=new GenRandomObject(1 /* SEED_MODEL_BITMAP */);
-    var modelGenRandom=new GenRandomObject(1 /*SEED_MODEL*/);
+    var textureGenRandom=new GenRandomObject(SEED_MODEL_BITMAP);
+    var modelGenRandom=new GenRandomObject(SEED_MODEL);
     
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Models');
@@ -277,15 +277,11 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
     
         // build the skeleton and mesh
     
-    var startTime=Date.now();
-    
     genSkeleton=new GenModelOrganicSkeletonObject(model,modelGenRandom);
     genSkeleton.build();
     
     genModelMesh=new GenModelOrganicMeshObject(model,modelBitmap,modelGenRandom);
     genModelMesh.build(view);
-    
-    console.log('model='+(Date.now()-startTime));
     
     modelList.add(model);
     

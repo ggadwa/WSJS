@@ -527,6 +527,7 @@ function ViewObject()
             
         var weapon=player.getCurrentWeapon();
         if (weapon!==null) {
+            this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
             weapon.drawStart(this);
             weapon.draw(this,player);
             weapon.drawEnd(this);
