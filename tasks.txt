@@ -30,18 +30,19 @@ REGULAR TODOs
 
 [ ] map generation
     [X] flag to make all generated lights white (the default)
-    [ ] platforms with no solid area (make that less likely) can have any number of 4 poles on edges
-    [ ] some platforms can be reduce to one edge (full, left, right, top, bottom) watch for steps
+    [ ] TRY: start with single solid platform and stairs, exapand vertical or horizontal randonly from that to wall
+    	[ ] platforms with no solid area (make that less likely) can have any number of 4 poles on edges
+    	[ ] some platforms can be reduce to one edge (full, left, right, top, bottom) watch for steps
+    [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 
 [ ] textures
     [X] added 3 monster textures, scales, fur, and a doom-ish leathery type
     [X] "plaster" texture has more color components
-    [X] better stone edges in rough stone texture
+    [X] better stones in rough stone texture
     [X] more variations in wood textures
     [X] metal textures now have a blue-ish tint instead of white tints
     [X] corrigated metal has deeper texture and better normals
     [X] some over-all specular collections
-    [X] make leather lines and splotches a color
 
 [ ] models
     [X] speed up model creation
