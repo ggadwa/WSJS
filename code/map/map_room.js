@@ -99,9 +99,11 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
             else {
-                if (this.upperGrid[z][x]===1) {
-                    this.upperGrid[z][x]=0;
-                    return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
+                if (ROOM_PLATFORMS) {
+                    if (this.upperGrid[z][x]===1) {
+                        this.upperGrid[z][x]=0;
+                        return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
+                    }
                 }
             }
             

@@ -42,7 +42,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         kneeBoneIdx=bones.push(new ModelBoneObject(('Knee'+nameSuffix),legHipBoneIdx,new wsPoint(vct.x,-kneeHigh,vct.z)))-1;
         ankleBoneIdx=bones.push(new ModelBoneObject(('Ankle'+nameSuffix),kneeBoneIdx,new wsPoint(vct.x,-ankleHigh,vct.z)))-1;
 
-        var vct2=new wsPoint(-footLength,0.0,0.0);
+        var vct2=new wsPoint(0.0,0.0,-footLength);
 
         footBoneIdx=bones.push(new ModelBoneObject(('Foot'+nameSuffix),ankleBoneIdx,new wsPoint((vct.x+vct2.x),-ankleHigh,(vct.z+vct2.z))))-1;
 
@@ -83,7 +83,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
             // counts
         
         var headCount,armCount;
-        var armLength,legLength;
+        var armLength,legLength,footLength;
         var hipHigh,minHeadRadius,minBodyRadius,minWaistHigh,minTorsoHigh,minTorsoTopHigh;
         
         switch (this.model.modelType) {
@@ -98,6 +98,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
                 minWaistHigh=200;
                 minTorsoHigh=350;
                 minTorsoTopHigh=250;
+                footLength=this.genRandom.randomInt(250,200);
                 break;
             case MODEL_TYPE_ANIMAL:
                 headCount=1;
@@ -106,9 +107,10 @@ function GenModelOrganicSkeletonObject(model,genRandom)
                 hipHigh=legLength*2;
                 minHeadRadius=300;
                 minBodyRadius=300;
-                minWaistHigh=150;
-                minTorsoHigh=150;
+                minWaistHigh=200;
+                minTorsoHigh=100;
                 minTorsoTopHigh=100;
+                footLength=this.genRandom.randomInt(150,150);
                 break;
             case MODEL_TYPE_BLOB:
                 headCount=1;
@@ -125,11 +127,22 @@ function GenModelOrganicSkeletonObject(model,genRandom)
             // random radius
 
         var hipRadius=this.genRandom.randomInt(200,250);
-        var waistHigh=hipHigh+this.genRandom.randomInt(minWaistHigh,250);
-        var torsoHigh=waistHigh+this.genRandom.randomInt(minTorsoHigh,350);
         var torsoRadius=this.genRandom.randomInt(300,350);
-        var torsoTopHigh=torsoHigh+this.genRandom.randomInt(minTorsoTopHigh,250);
-
+        
+        var waistHigh,torsoHigh,torsoTopHigh;
+        
+        if (this.model.modelType!==MODEL_TYPE_ANIMAL) {
+            waistHigh=hipHigh+this.genRandom.randomInt(minWaistHigh,250);
+            torsoHigh=waistHigh+this.genRandom.randomInt(minTorsoHigh,350);
+            torsoTopHigh=torsoHigh+this.genRandom.randomInt(minTorsoTopHigh,250);
+        }
+        else {
+            var high=this.genRandom.randomInt(minWaistHigh,250);
+            waistHigh=high;
+            torsoHigh=waistHigh+high;
+            torsoTopHigh=torsoHigh+high;
+        }
+        
         var neckHigh=torsoTopHigh+this.genRandom.randomInt(250,150);
         var headHigh=neckHigh+this.genRandom.randomInt(100,100)+400;
         
@@ -139,7 +152,6 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         
         var kneeHigh=legLength;
         var ankleHigh=0;
-        var footLength=this.genRandom.randomInt(150,150);
         
             // the base bone
             
@@ -213,8 +225,8 @@ function GenModelOrganicSkeletonObject(model,genRandom)
                 
             case MODEL_TYPE_ANIMAL:
                 this.buildLimbLegSet(hipBoneIdx,0,0,rotOffset,hipRadius,hipHigh,kneeHigh,ankleHigh,footLength);
-                this.buildLimbLegSet(waistBoneIdx,0,waistHigh,rotOffset,hipRadius,hipHigh,kneeHigh,ankleHigh,footLength);
-                this.buildLimbLegSet(torsoBoneIdx,0,torsoHigh,rotOffset,hipRadius,hipHigh,kneeHigh,ankleHigh,footLength);
+                if (this.genRandom.random()<0.3) this.buildLimbLegSet(waistBoneIdx,0,waistHigh,rotOffset,hipRadius,hipHigh,kneeHigh,ankleHigh,footLength);
+                if (this.genRandom.random()<0.3) this.buildLimbLegSet(torsoBoneIdx,0,torsoHigh,rotOffset,hipRadius,hipHigh,kneeHigh,ankleHigh,footLength);
                 this.buildLimbLegSet(torsoTopBoneIdx,0,torsoTopHigh,rotOffset,hipRadius,hipHigh,kneeHigh,ankleHigh,footLength);
                 break;
                 

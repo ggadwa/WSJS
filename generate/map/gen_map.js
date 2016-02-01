@@ -251,12 +251,15 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
     this.addLight=function(piece,xBound,yBound,zBound,hasStories)
     {
+        var lightX,lightY,lightZ;
+        var red,green,blue;
+        
             // light point
 
-        var lightX=xBound.getMidPoint();
-        var lightZ=zBound.getMidPoint();
+        lightX=xBound.getMidPoint();
+        lightZ=zBound.getMidPoint();
         
-        var lightY=yBound.min-ROOM_FLOOR_DEPTH;
+        lightY=yBound.min-ROOM_FLOOR_DEPTH;
         if (hasStories) lightY-=(yBound.getSize()+ROOM_FLOOR_DEPTH);
 
             // light fixture
@@ -279,9 +282,14 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // the color
 
-        var red=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
-        var green=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
-        var blue=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
+        red=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
+        if (MAP_LIGHT_ALWAYS_WHITE) {
+            green=blue=red;
+        }
+        else {
+            green=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
+            blue=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
+        }
         
             // the exponent
             

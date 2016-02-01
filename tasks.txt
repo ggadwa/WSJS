@@ -26,27 +26,41 @@ REGULAR TODOs
 
 [ ] general
     [X] fixed some bug in lost float/int conversions
-    [ ] bitmaps drawing routines grab bitmap data once?
     [X] speed up bitmap creation
+
+[ ] map generation
+    [X] flag to make all generated lights white (the default)
+    [ ] platforms with no solid area (make that less likely) can have any number of 4 poles on edges
+    [ ] some platforms can be reduce to one edge (full, left, right, top, bottom) watch for steps
+
+[ ] textures
+    [X] added 3 monster textures, scales, fur, and a doom-ish leathery type
+    [X] "plaster" texture has more color components
+    [X] better stone edges in rough stone texture
+    [X] more variations in wood textures
+    [X] metal textures now have a blue-ish tint instead of white tints
+    [X] corrigated metal has deeper texture and better normals
+    [X] some over-all specular collections
+    [X] make leather lines and splotches a color
 
 [ ] models
     [X] speed up model creation
-    [X] improved scale bitmap
-    [X] need leather and fur bitmap
-    [X] break into skin_scale, etc, always draw in upper left
+    [ ] will need to seam the 0->1 edge
 
     
+    
     [X] fixed a bug that would create split areas in models
-    [ ] fix bad normal culling
-         [ ] MESH NORMAL CULLING IS OFF!
-
-    [ ] make limbs bilateral
-        [ ] get legs as booleans (does bone X have legs) and always two
+    [ ] hands and feet separate globes
+        [ ] bad normals in feet because of bone connections
+    
+    [X] make limbs bilateral
+    [X] get legs as booleans (does bone X have legs) and always two
 
     [ ] need separate globe sizes for each part
     [ ] smooth globes or have locked shrink coordinates (like no Y change on body, etc)
 
-    [ ] entities need to mark off their start positions (use same stuff as pillars) -- no entities create on top of each other
+[ ] entities
+    [X] fixed a bug where entities could spawn in the same place if platforms turned off
 
 [ ] weapons
     [X] add weapon system

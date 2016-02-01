@@ -219,6 +219,14 @@ function GenBitmapUtilityObject(genRandom)
         var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
         return(new wsColor(r,r,r));
     };
+    
+    this.getRandomBlueColor=function(greyMin,greyMax)
+    {
+        var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
+        var b=r+0.5;
+        if (b>1.0) b=1.0;
+        return(new wsColor(r,r,b));
+    };
 
     this.darkenColor=function(color,darkenFactor)
     {
@@ -532,34 +540,75 @@ function GenBitmapUtilityObject(genRandom)
 
         var mx=Math.floor((lft+rgt)/2);
         var my=Math.floor((top+bot)/2);
+        
+        var sidePointCount=15;
+        var totalPointCount=sidePointCount*4;
 
             // build the polygon
 
-        var x=new Uint16Array(40);
-        var y=new Uint16Array(40);
-
-        for (n=0;n!==10;n++) {
-            add=Math.floor((wid/10)*n);
+        var x=new Uint16Array(totalPointCount);
+        var y=new Uint16Array(totalPointCount);
+        
+        for (n=0;n!==sidePointCount;n++) {
+            add=Math.floor((wid/sidePointCount)*n);
             x[n]=lft+add;
             y[n]=top;
-            x[n+20]=rgt-add;
-            y[n+20]=bot;
+            x[n+(sidePointCount*2)]=rgt-add;
+            y[n+(sidePointCount*2)]=bot;
         }
 
-        for (n=0;n!==10;n++) {
-            add=Math.floor((high/10)*n);
-            x[n+10]=rgt;
-            y[n+10]=top+add;
-            x[n+30]=lft;
-            y[n+30]=bot-add;
+        for (n=0;n!==sidePointCount;n++) {
+            add=Math.floor((high/sidePointCount)*n);
+            x[n+sidePointCount]=rgt;
+            y[n+sidePointCount]=top+add;
+            x[n+(sidePointCount*3)]=lft;
+            y[n+(sidePointCount*3)]=bot-add;
         }
+        
+            // round the corners
+        
+        add=this.genRandom.randomInt(5,5);
+        x[0]+=add;
+        y[0]+=add;
+        add*=0.5;
+        x[1]+=add;
+        y[1]+=add;
+        x[(sidePointCount*4)-1]+=add;
+        y[(sidePointCount*4)-1]+=add;
+        
+        add=this.genRandom.randomInt(5,5);
+        x[sidePointCount]-=add;
+        y[sidePointCount]+=add;
+        add*=0.5;
+        x[sidePointCount-1]-=add;
+        y[sidePointCount-1]+=add;
+        x[sidePointCount+1]-=add;
+        y[sidePointCount+1]+=add;
+
+        add=this.genRandom.randomInt(5,5);
+        x[sidePointCount*2]-=add;
+        y[sidePointCount*2]-=add;
+        add*=0.5;
+        x[(sidePointCount*2)-1]-=add;
+        y[(sidePointCount*2)-1]-=add;
+        x[(sidePointCount*2)+1]-=add;
+        y[(sidePointCount*2)+1]-=add;
+
+        add=this.genRandom.randomInt(5,5);
+        x[sidePointCount*3]+=add;
+        y[sidePointCount*3]-=add;
+        add*=0.5;
+        x[(sidePointCount*3)-1]+=add;
+        y[(sidePointCount*3)-1]-=add;
+        x[(sidePointCount*3)+1]+=add;
+        y[(sidePointCount*3)+1]-=add;
 
             // randomize it
 
-        for (n=0;n!==40;n++) {
-            add=this.genRandom.randomInt(0,10);
+        for (n=0;n!==totalPointCount;n++) {
+            add=this.genRandom.randomInt(0,5);
             x[n]+=(x[n]<mx)?add:-add;
-            add=this.genRandom.randomInt(0,10);
+            add=this.genRandom.randomInt(0,5);
             y[n]+=(y[n]<my)?add:-add;
         }
 
@@ -579,7 +628,7 @@ function GenBitmapUtilityObject(genRandom)
             bitmapCTX.beginPath();
             bitmapCTX.moveTo(x[0],y[0]);
 
-            for (k=1;k!==40;k++) {
+            for (k=1;k!==totalPointCount;k++) {
                 bitmapCTX.lineTo(x[k],y[k]);
             }
 
@@ -591,7 +640,7 @@ function GenBitmapUtilityObject(genRandom)
             normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
             normalCTX.beginPath();
 
-            for (k=0;k!==10;k++) {
+            for (k=0;k!==sidePointCount;k++) {
                 normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
                 normalCTX.lineTo(x[k2],y[k2]);
@@ -602,7 +651,7 @@ function GenBitmapUtilityObject(genRandom)
             normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_45);
             normalCTX.beginPath();
 
-            for (k=10;k!==20;k++) {
+            for (k=sidePointCount;k!==(sidePointCount*2);k++) {
                 normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
                 normalCTX.lineTo(x[k2],y[k2]);
@@ -613,7 +662,7 @@ function GenBitmapUtilityObject(genRandom)
             normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
             normalCTX.beginPath();
 
-            for (k=20;k!==30;k++) {
+            for (k=(sidePointCount*2);k!==(sidePointCount*3);k++) {
                 normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
                 normalCTX.lineTo(x[k2],y[k2]);
@@ -624,10 +673,10 @@ function GenBitmapUtilityObject(genRandom)
             normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_45);
             normalCTX.beginPath();
 
-            for (k=30;k!==40;k++) {
+            for (k=(sidePointCount*3);k!==(sidePointCount*4);k++) {
                 normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
-                if (k2===40) k2=0;
+                if (k2===totalPointCount) k2=0;
                 normalCTX.lineTo(x[k2],y[k2]);
             }
 
@@ -635,7 +684,7 @@ function GenBitmapUtilityObject(genRandom)
 
                 // reduce polygon
 
-            for (k=0;k!==40;k++) {
+            for (k=0;k!==totalPointCount;k++) {
                 x[k]+=(x[k]<mx)?1:-1;
                 y[k]+=(y[k]<my)?1:-1;
             }
@@ -653,7 +702,7 @@ function GenBitmapUtilityObject(genRandom)
         bitmapCTX.beginPath();
         bitmapCTX.moveTo(x[0],y[0]);
 
-        for (k=1;k!==40;k++) {
+        for (k=1;k!==totalPointCount;k++) {
             bitmapCTX.lineTo(x[k],y[k]);
         }
 
@@ -664,7 +713,7 @@ function GenBitmapUtilityObject(genRandom)
         normalCTX.beginPath();
         normalCTX.moveTo(x[0],y[0]);
 
-        for (k=1;k!==40;k++) {
+        for (k=1;k!==totalPointCount;k++) {
             normalCTX.lineTo(x[k],y[k]);
         }
 
@@ -804,7 +853,7 @@ function GenBitmapUtilityObject(genRandom)
 
         if (normalCTX!==null) {
             if (horizontal) {
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y-1));
                 normalCTX.lineTo(x2,(y2-1));
@@ -814,14 +863,14 @@ function GenBitmapUtilityObject(genRandom)
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y+1));
                 normalCTX.lineTo(x2,(y2+1));
                 normalCTX.stroke();
             }
             else {
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x-1),y);
                 normalCTX.lineTo((x2-1),y2);
@@ -831,7 +880,7 @@ function GenBitmapUtilityObject(genRandom)
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_10);
+                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x+1),y);
                 normalCTX.lineTo((x2+1),y2);
@@ -902,24 +951,16 @@ function GenBitmapUtilityObject(genRandom)
         
             // fade of bump
             
-        for (n=1;n!==4;n++) {
+        for (n=0;n!==4;n++) {
             if (horizontal) {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,(y-n));
-                bitmapCTX.lineTo(x2,(y2-n));
-                bitmapCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
+                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y-n));
                 normalCTX.lineTo(x2,(y2-n));
                 normalCTX.stroke();
             }
             else {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo((x-n),y);
-                bitmapCTX.lineTo((x2-n),y2);
-                bitmapCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
+                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x-n),y);
                 normalCTX.lineTo((x2-n),y2);
@@ -927,24 +968,16 @@ function GenBitmapUtilityObject(genRandom)
             }
         }
         
-        for (n=1;n!==4;n++) {
+        for (n=0;n!==4;n++) {
             if (horizontal) {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,(y+n));
-                bitmapCTX.lineTo(x2,(y2+n));
-                bitmapCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
+                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y+n));
                 normalCTX.lineTo(x2,(y2+n));
                 normalCTX.stroke();
             }
             else {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo((x+n),y);
-                bitmapCTX.lineTo((x2+n),y2);
-                bitmapCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor((n!==1)?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
+                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x+n),y);
                 normalCTX.lineTo((x2+n),y2);

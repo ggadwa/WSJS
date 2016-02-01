@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 const ROOM_DIMENSIONS=[35000,7000,35000];       // maximum size for a room [x,y,z]
 const ROOM_FLOOR_DEPTH=700;
@@ -11,13 +11,13 @@ const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connecti
 const ROOM_LEVEL_CHANGE_PERCENTAGE=0.8;         // what % of the time a room gains another story
 const ROOM_CLOSET_UP_PERCENTAGE=0.75;           // what % of the time a closet goes to a second level if available
 
-const ROOM_PLATFORMS=false;                      // turns on or off platforms
+const ROOM_PLATFORMS=true;                      // turns on or off platforms
 
 //
 // decorations
 //
 
-const ROOM_DECORATIONS=false;                   // set to false for no decorations in the map
+const ROOM_DECORATIONS=true;                   // set to false for no decorations in the map
 
 const ROOM_DECORATIONS_BOX_EXTRA_COUNT=8;       // extra number of boxes
 
@@ -33,28 +33,42 @@ const MAP_LIGHT_AMBIENT=[0.0,0.0,0.0];          // all over ambient light [r,g,b
     
 const MAP_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
 const MAP_LIGHT_FACTOR_EXTRA=0.3;               // random addition to light factor above
-const MAP_LIGHT_TWO_STORY_BOOST=1.3;            // multiply boost when a light is in a two story room
+const MAP_LIGHT_TWO_STORY_BOOST=1.4;            // multiply boost when a light is in a two story room
   
 const MAP_LIGHT_EXPONENT_MINIMUM=0.2;           // minimum light exponent (0.0 is completely hard light with no fall off)
 const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
     
 const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for map lights
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
-    
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
+
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=5;
-const MONSTER_ENTITY_COUNT=5;
+const MONSTER_MODEL_COUNT=3;
+const MONSTER_ENTITY_COUNT=3;
 
 //
 // overlays
 //
 
 const OVERLAY_DRAW=true;
+
+//
+// random seeds,
+// hard set these to generate the same map pieces every time
+//
+
+const SEED=Date.now();
+
+const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
+const SEED_MAP=Math.floor((Math.random()*SEED));
+const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
+const SEED_MODEL=Math.floor((Math.random()*SEED));
+const SEED_ENTITY=Math.floor((Math.random()*SEED));
 
 //
 // timing
@@ -83,19 +97,6 @@ const DEBUG_DRAW_MODEL_SKELETON=false;
 const DEBUG_DRAW_MODEL_MESH_LINES=false;
 const DEBUG_DRAW_MODEL_MESH_NORMALS=false;
 const DEBUG_DRAW_MODEL_MESH_TANGENTS=false;
-
-//
-// random seeds,
-// hard set these to generate the same map pieces every time
-//
-
-const SEED=Date.now();
-
-const SEED_MAP_BITMAP=1; //Math.floor((Math.random()*SEED));
-const SEED_MAP=3; //Math.floor((Math.random()*SEED));
-const SEED_MODEL_BITMAP=1;//Math.floor((Math.random()*SEED));
-const SEED_MODEL=1;//Math.floor((Math.random()*SEED));
-const SEED_ENTITY=3;//Math.floor((Math.random()*SEED));
 
 //
 // math
