@@ -12,226 +12,213 @@ function GenRoomPlatform(map,genRandom,piece,room)
     this.room=room;
     
         //
-        // platform mainline
+        // add stairs chunk
+        //
+        
+    this.addStairChunk=function(xBound,yBound,zBound,stairX,stairZ,stairDir,platformBitmap)
+    {
+        var xAdd=Math.floor(xBound.getSize()/ROOM_DIVISIONS);
+        var zAdd=Math.floor(zBound.getSize()/ROOM_DIVISIONS);
+        var xStairBound=new wsBound((xBound.min+(stairX*xAdd)),(xBound.min+((stairX+1)*xAdd)));
+        var zStairBound=new wsBound((zBound.min+(stairZ*zAdd)),(zBound.min+((stairZ+1)*zAdd)));
+
+        var stairBitmap=this.map.getBitmapById(TEXTURE_STAIR);
+        
+        var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
+        
+        switch (stairDir) {
+            case 0:
+                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true,true);
+                break;
+            case 1:
+                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true,true);
+                break;
+            case 2:
+                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true,false);
+                break;
+            case 3:
+                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,true,false);
+                break;
+        }
+        
+            // can't spawn items on upper or lower grid
+            
+        this.room.blockLowerGrid(stairX,stairZ);
+        this.room.blockUpperGrid(stairX,stairZ);
+        
+        this.map.addOverlayPlatform(xStairBound,zStairBound);
+    };
+    
+        //
+        // add platform chunk
+        //
+        
+    this.addPlatformChunk=function(xBound,yBound,zBound,x,z,platformBitmap)
+    {
+        var xAdd=Math.floor(xBound.getSize()/ROOM_DIVISIONS);
+        var zAdd=Math.floor(zBound.getSize()/ROOM_DIVISIONS);
+        
+        var xPlatformBound=new wsBound((xBound.min+(x*xAdd)),(xBound.min+((x+1)*xAdd)));
+        var yPlatformBound=new wsBound((yBound.min-ROOM_FLOOR_DEPTH),yBound.min);
+        var zPlatformBound=new wsBound((zBound.min+(z*zAdd)),(zBound.min+((z+1)*zAdd)));
+
+        this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,false,MESH_FLAG_ROOM_PLATFORM));
+
+            // can now spawn items unto upper grid
+            
+        this.room.unblockUpperGrid(x,z);
+
+        this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
+    };
+    
+        //
+        // walkways
+        //
+        
+    this.addChunkWalkwayDirPosX=function(xBound,yBound,zBound,stairX,stairZ,platformBitmap)
+    {
+        var x;
+        
+        for (x=(stairX+1);x<ROOM_DIVISIONS;x++) {
+            this.addPlatformChunk(xBound,yBound,zBound,x,stairZ,platformBitmap);
+        }
+        
+        return(ROOM_DIVISIONS-1);
+    };
+    
+    this.addChunkWalkwayDirPosZ=function(xBound,yBound,zBound,stairX,stairZ,platformBitmap)
+    {
+        var z;
+        
+        for (z=(stairZ+1);z<ROOM_DIVISIONS;z++) {
+            this.addPlatformChunk(xBound,yBound,zBound,stairX,z,platformBitmap);
+        }
+        
+        return(ROOM_DIVISIONS-1);
+    };
+    
+    this.addChunkWalkwayDirNegX=function(xBound,yBound,zBound,stairX,stairZ,platformBitmap)
+    {
+        var x;
+        
+        for (x=(stairX-1);x>=0;x--) {
+            this.addPlatformChunk(xBound,yBound,zBound,x,stairZ,platformBitmap);
+        }
+        
+        return(0);
+    };
+    
+    this.addChunkWalkwayDirNegZ=function(xBound,yBound,zBound,stairX,stairZ,platformBitmap)
+    {
+        var z;
+        
+        for (z=(stairZ-1);z>=0;z--) {
+            this.addPlatformChunk(xBound,yBound,zBound,stairX,z,platformBitmap);
+        }
+        
+        return(0);
+    };
+    
+        //
+        // create platforms
         // 
     
     this.createPlatforms=function(xBound,yBound,zBound)
     {
-        var n,x,z,moveOk,tryCount,isPillar;
-        var xAdd=Math.floor(xBound.getSize()/5);
-        var zAdd=Math.floor(zBound.getSize()/5);
-        
-        var xPlatformBound,zPlatformBound;
-        var yPlatformBound=new wsBound((yBound.min-ROOM_FLOOR_DEPTH),yBound.min);
-        var yPlatformPillarBound=new wsBound((yBound.min-ROOM_FLOOR_DEPTH),yBound.max);
+        var x,z,stairX,stairZ,stairDir,tryCount;
+        var midDiv=Math.floor(ROOM_DIVISIONS/2);
         
         var platformBitmap=this.map.getBitmapById(TEXTURE_PLATFORM);
         
-            // the grid to put down platform pieces is
-            // the reverse of the floor grid
-        
-        var grid=[
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0],
-            [0,0,0,0,0]
-        ];
-
-        for (z=0;z!==5;z++) {
-            for (x=0;x!==5;x++) {
-                grid[z][x]=(piece.floorGrid[z][x]===1)?0:1;
-            }
-        }
-        
-            // find a spot to start
+            // random stair direction
             
-        x=-1;
-        z=-1;
+        stairDir=this.genRandom.randomInt(0,3);
+        
+            // find a spot for the steps and add
+        
         tryCount=0;
         
-        while (x===-1) {
-            x=this.genRandom.randomInt(0,5);
-            z=this.genRandom.randomInt(0,5);
+        while (true) {
             
-            if (grid[z][x]===0) break;
+            stairX=this.genRandom.randomInt(1,(ROOM_DIVISIONS-2));
+            stairZ=this.genRandom.randomInt(1,(ROOM_DIVISIONS-2));
             
-            x=-1;
+                // skip middle as player spawns there
+                
+            if (!((stairX===midDiv) && (stairZ===midDiv))) break;
             
             tryCount++;
             if (tryCount>PLATFORM_MAX_OPEN_BLOCK_TRY) return;
         }
         
-            // make the platforms
+        this.addStairChunk(xBound,yBound,zBound,stairX,stairZ,stairDir,platformBitmap);
         
-        var platformCount=this.genRandom.randomInt(5,10);
-
-        for (n=0;n!==platformCount;n++) {
+            // expand from the platform
             
-                // is this a pillar version?
-                // don't do on edges or in middle (as
-                // player will spawn there)
-                
-            isPillar=false;
-            
-            if ((x!==0) && (x!==4) && (z!==0) && (z!==4)) {
-                if (!((x===2) && (z===2))) {
-                    isPillar=(this.genRandom.random()<0.5);
-                }
-            }
-            
-                // add platform and mark grid
-                // as being used
-                
-            xPlatformBound=new wsBound((xBound.min+(x*xAdd)),(xBound.min+((x+1)*xAdd)));
-            zPlatformBound=new wsBound((zBound.min+(z*zAdd)),(zBound.min+((z+1)*zAdd)));
-            
-            this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,(isPillar?yPlatformPillarBound:yPlatformBound),zPlatformBound,false,true,true,true,true,true,(!isPillar),false,MESH_FLAG_ROOM_PLATFORM));
-            this.room.blockGrid(x,z,true,false);
-            
-            grid[z][x]=isPillar?3:2;       // we use 2/3 so we can later re-check list for stair locations
-            
-                // add to overlay
-                
-            this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
-            
-                // move to next platform area
-                
-            moveOk=false;
-            tryCount=0;
-            
-            while (true) {
-                
-                switch (this.genRandom.randomInt(0,4)) {
-                    case 0:
-                        if (x<4) {
-                            if (grid[z][x+1]===0) {
-                                x++;
-                                moveOk=true;
-                            }
-                        }
-                        break;
-                    case 1:
-                        if (z<4) {
-                            if (grid[z+1][x]===0) {
-                                z++;
-                                moveOk=true;
-                            }
-                        }
-                        break;
-                    case 2:
-                        if (x>0) {
-                            if (grid[z][x-1]===0) {
-                                x--;
-                                moveOk=true;
-                            }
-                        }
-                        break;
-                    case 3:
-                        if (z>0) {
-                            if (grid[z-1][x]===0) {
-                                z--;
-                                moveOk=true;
-                            }
-                        }
-                        break;
-                }
-                
-                if (moveOk) break;
-                
-                    // if we tried to move and couldn't
-                    // find a place in a while, break out
-                    
-                tryCount++;
-                if (tryCount>PLATFORM_MAX_OPEN_BLOCK_TRY) return;
-            }
-        }
-        
-            // try to find a place to put
-            // some stairs
-            
-        x=-1;
-        z=-1;
-        
-        var stairDir=0;
-        var includeBack=true;
-        
-        tryCount=0;
-        
-        while (x===-1) {
-            
-                // skip the edges
-                
-            x=this.genRandom.randomInt(1,3);
-            z=this.genRandom.randomInt(1,3);
-            
-                // always skip middle, player
-                // can spawn there
-                
-            if (!((x===2) && (z===2))) {
-            
-                    // if this spot is open,
-                    // find if there's a block near
-                    // it to build stairs too
-
-                if (grid[z][x]===0) {
-                    if (grid[z][x+1]>=2) {
-                        stairDir=0;
-                        includeBack=(grid[z][x+1]===2);
-                        break;
-                    }
-                    if (grid[z][x-1]>=2) {
-                        stairDir=2;
-                        includeBack=(grid[z][x-1]===2);
-                        break;
-                    }
-                    if (grid[z+1][x]>=2) {
-                        stairDir=1;
-                        includeBack=(grid[z+1][x]===2);
-                        break;
-                    }
-                    if (grid[z-1][x]>=2) {
-                        stairDir=3;
-                        includeBack=(grid[z-1][x]===2);
-                        break;
-                    }
-                }
-            }
-            
-                // try again
-                
-            x=-1;
-            
-            tryCount++;
-            if (tryCount>PLATFORM_MAX_OPEN_BLOCK_TRY) return;
-        }
-        
-            // finally add a stair case
-        
-        var stairBitmap=this.map.getBitmapById(TEXTURE_STAIR);
-        var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
-
-        var xStairBound=new wsBound((xBound.min+(x*xAdd)),(xBound.min+((x+1)*xAdd)));
-        var zStairBound=new wsBound((zBound.min+(z*zAdd)),(zBound.min+((z+1)*zAdd)));
-        
         switch (stairDir) {
+            
             case 0:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,true);
+                x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
+                    if (this.genRandom.random()>0.5) {
+                        z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
+                    }
+                    else {
+                        z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
+                    }
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
+                        this.addChunkWalkwayDirNegX(xBound,yBound,zBound,x,z,platformBitmap);
+                    }
+                }
                 break;
+                
             case 1:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,true);
+                z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
+                    if (this.genRandom.random()>0.5) {
+                        x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,stairX,z,platformBitmap);
+                    }
+                    else {
+                        x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,stairX,z,platformBitmap);
+                    }
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
+                        this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,z,platformBitmap);
+                    }
+                }
                 break;
+                
             case 2:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,false);
+                x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
+                    if (this.genRandom.random()>0.5) {
+                        z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
+                    }
+                    else {
+                        z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
+                    }
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
+                        this.addChunkWalkwayDirPosX(xBound,yBound,zBound,x,z,platformBitmap);
+                    }
+                }
                 break;
+                
             case 3:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,yBound,zStairBound,true,includeBack,false);
+                z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
+                    if (this.genRandom.random()>0.5) {
+                        x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,stairX,z,platformBitmap);
+                    }
+                    else {
+                        x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,stairX,z,platformBitmap);
+                    }
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
+                        this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,z,platformBitmap);
+                    }
+                }
                 break;
+                
         }
         
-        this.room.blockGrid(x,z,true,true);
-        
-        this.map.addOverlayPlatform(xStairBound,zStairBound);
     };
     
 }

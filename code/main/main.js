@@ -334,7 +334,7 @@ function wsInitBuildEntities()
     
         // make player entity
     
-    var playerEntity=new EntityObject(map.findPlayerStartPosition(),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
+    var playerEntity=new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
     playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0')));
     playerEntity.setCurrentWeaponIndex(0);
     

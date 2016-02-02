@@ -422,7 +422,7 @@ function MapPieceListObject()
         ];
 
         this.add(mapPiece);
-
+/*
             // half circle
 
         mapPiece=new MapPieceObject();
@@ -455,7 +455,8 @@ function MapPieceListObject()
         ];
 
         this.add(mapPiece);
-        
+        */
+/*        
             // slant
 
         mapPiece=new MapPieceObject();
@@ -481,6 +482,7 @@ function MapPieceListObject()
         ];
 
         this.add(mapPiece);
+*/
     };
     
         //

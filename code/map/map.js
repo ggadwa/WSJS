@@ -379,14 +379,6 @@ function MapObject()
         // find positions in map
         //
         
-    this.findPlayerStartPosition=function()
-    {
-            // always start in middle of
-            // first generated room
-          
-        return(this.rooms[0].findCenterLocation());
-    };
-
     this.findRandomPosition=function(genRandom)
     {
         var roomIdx,room;

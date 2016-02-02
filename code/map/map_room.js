@@ -16,92 +16,75 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
     this.hasStories=hasStories;
     this.level=level;
     
-        // floor grid becomes first part
-        // of lower and upper grid
-        
-    this.lowerGrid=[
-      [0,0,0,0,0],
-      [0,0,0,0,0],
-      [0,0,0,0,0],
-      [0,0,0,0,0],
-      [0,0,0,0,0]
-    ];
+    this.lowerGrid=new Uint8Array(ROOM_DIVISIONS*ROOM_DIVISIONS);
+    this.upperGrid=new Uint8Array(ROOM_DIVISIONS*ROOM_DIVISIONS);
     
-    this.upperGrid=[
-      [0,0,0,0,0],
-      [0,0,0,0,0],
-      [0,0,0,0,0],
-      [0,0,0,0,0],
-      [0,0,0,0,0]
-    ];
-        
-    var x,z;
-    
-    for (z=0;z!==5;z++) {
-        for (x=0;x!==5;x++) {
-            this.lowerGrid[z][x]=piece.floorGrid[z][x];
-            this.upperGrid[z][x]=piece.floorGrid[z][x];
-        }
-    }
-
-        //
-        // block off a grid space
-        //
-        
-    this.blockGrid=function(x,z,blockLower,blockUpper)
+    this.setupGrid=function()
     {
-        if (blockLower) this.lowerGrid[z][x]=0;
-        if (blockUpper) this.upperGrid[z][x]=0;
+        var n;
+        var count=ROOM_DIVISIONS*ROOM_DIVISIONS;
+        
+            // lower grid starts all unblocked
+            // and upper grid starts blocked until we add platforms
+        
+        for (n=0;n!==count;n++) {
+            this.lowerGrid[n]=0;
+            this.upperGrid[n]=1;
+        }
+    };
+    
+    this.setupGrid();       // supergumba -- IMPORTANT!!!  Move all this after classes!
+        
+        //
+        // block or unblock off a grid space
+        //
+        
+    this.blockLowerGrid=function(x,z)
+    {
+        this.lowerGrid[(z*ROOM_DIVISIONS)+x]=1;
+    };
+    
+    this.blockUpperGrid=function(x,z)
+    {
+        this.upperGrid[(z*ROOM_DIVISIONS)+x]=1;
+    };
+    
+    this.unblockUpperGrid=function(x,z)
+    {
+        this.upperGrid[(z*ROOM_DIVISIONS)+x]=0;
     };
     
         //
         // find points in blocked grid space
         //
     
-    this.findCenterLocation=function()
-    {
-        var sx=this.xBound.getSize()/5;
-        var sz=this.zBound.getSize()/5;
-
-        var bx=Math.floor((this.xBound.min+(sx*2))+(sx*0.5));
-        var bz=Math.floor((this.zBound.min+(sz*2))+(sz*0.5));
-        
-        if (this.lowerGrid[2][2]===1) {
-            this.lowerGrid[2][2]=0;
-            return(new wsPoint(bx,this.yBound.max,bz));
-        }
-
-            // if not lower, always force upper
-            
-        this.upperGrid[2][2]=0;
-        return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
-    };
-        
     this.findRandomFreeLocation=function(genRandom)
     {
-        var x,z,sx,sz,bx,bz;
+        var x,z,sx,sz,bx,bz,idx;
         var findTry=0;
         
         while (findTry<25) {
-            x=genRandom.randomInt(0,5);
-            z=genRandom.randomInt(0,5);
+            x=genRandom.randomInt(0,ROOM_DIVISIONS);
+            z=genRandom.randomInt(0,ROOM_DIVISIONS);
             
                 // see if lower, than upper is OK
                 
-            sx=this.xBound.getSize()/5;
-            sz=this.zBound.getSize()/5;
+            sx=this.xBound.getSize()/ROOM_DIVISIONS;
+            sz=this.zBound.getSize()/ROOM_DIVISIONS;
                 
             bx=Math.floor((this.xBound.min+(sx*x))+(sx*0.5));
             bz=Math.floor((this.zBound.min+(sz*z))+(sz*0.5));
+            
+            idx=(z*ROOM_DIVISIONS)+x;
                 
-            if (this.lowerGrid[z][x]===1) {
-                this.lowerGrid[z][x]=0;
+            if (this.lowerGrid[idx]===0) {
+                this.lowerGrid[idx]=1;
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
             else {
                 if (ROOM_PLATFORMS) {
-                    if (this.upperGrid[z][x]===1) {
-                        this.upperGrid[z][x]=0;
+                    if (this.upperGrid[idx]===0) {
+                        this.upperGrid[idx]=1;
                         return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
                     }
                 }

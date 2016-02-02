@@ -4,10 +4,11 @@ IMPORTANT EVENTUAL TODOs
 
 EMCA6 TODOs
     [ ] transfer all object to classes
-    [ ] can we do static getCONTANT_NAME() { return(1); } etc for constants?  PROBABLY NO, wait for 7?
     [ ] modulize the code
     [ ] use Math.trunc when possible instead of Math.floor
     [ ] hoist all the vars, eventually use let
+    [ ] move setupGrid() in map_room.js
+    [ ] move this.setupBounds(); in map_mesh.js
 
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
@@ -29,10 +30,10 @@ REGULAR TODOs
     [X] speed up bitmap creation
 
 [ ] map generation
+    [ ] DO AWAY with pieces and make everything a 10x10 square?
     [X] flag to make all generated lights white (the default)
-    [ ] TRY: start with single solid platform and stairs, exapand vertical or horizontal randonly from that to wall
-    	[ ] platforms with no solid area (make that less likely) can have any number of 4 poles on edges
-    	[ ] some platforms can be reduce to one edge (full, left, right, top, bottom) watch for steps
+    [X] new platforms
+        [ ] platforms need more decorations
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 
 [ ] textures
