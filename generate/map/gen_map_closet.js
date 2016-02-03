@@ -133,8 +133,8 @@ function GenRoomClosetObject(view,map,room,genRandom)
         
             // box sizing
             
-        var xAdd=Math.floor(room.xBound.getSize()/5);
-        var zAdd=Math.floor(room.zBound.getSize()/5);
+        var xAdd=Math.floor(room.xBound.getSize()/ROOM_MAX_DIVISIONS);
+        var zAdd=Math.floor(room.zBound.getSize()/ROOM_MAX_DIVISIONS);
         
             // get the Y bound
             
@@ -146,7 +146,7 @@ function GenRoomClosetObject(view,map,room,genRandom)
             // initial connection try
             
         connectLineIdx=Math.floor(nConnectLine*this.genRandom.random());
-        closetLen=this.genRandom.randomInt(1,5);
+        closetLen=this.genRandom.randomInt(1,(ROOM_MAX_DIVISIONS-1));
         
             // try a number of times
             

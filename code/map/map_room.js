@@ -16,13 +16,13 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
     this.hasStories=hasStories;
     this.level=level;
     
-    this.lowerGrid=new Uint8Array(ROOM_DIVISIONS*ROOM_DIVISIONS);
-    this.upperGrid=new Uint8Array(ROOM_DIVISIONS*ROOM_DIVISIONS);
+    this.lowerGrid=new Uint8Array(ROOM_MAX_DIVISIONS*ROOM_MAX_DIVISIONS);
+    this.upperGrid=new Uint8Array(ROOM_MAX_DIVISIONS*ROOM_MAX_DIVISIONS);
     
     this.setupGrid=function()
     {
         var n;
-        var count=ROOM_DIVISIONS*ROOM_DIVISIONS;
+        var count=ROOM_MAX_DIVISIONS*ROOM_MAX_DIVISIONS;
         
             // lower grid starts all unblocked
             // and upper grid starts blocked until we add platforms
@@ -41,17 +41,17 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
         
     this.blockLowerGrid=function(x,z)
     {
-        this.lowerGrid[(z*ROOM_DIVISIONS)+x]=1;
+        this.lowerGrid[(z*ROOM_MAX_DIVISIONS)+x]=1;
     };
     
     this.blockUpperGrid=function(x,z)
     {
-        this.upperGrid[(z*ROOM_DIVISIONS)+x]=1;
+        this.upperGrid[(z*ROOM_MAX_DIVISIONS)+x]=1;
     };
     
     this.unblockUpperGrid=function(x,z)
     {
-        this.upperGrid[(z*ROOM_DIVISIONS)+x]=0;
+        this.upperGrid[(z*ROOM_MAX_DIVISIONS)+x]=0;
     };
     
         //
@@ -64,18 +64,18 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
         var findTry=0;
         
         while (findTry<25) {
-            x=genRandom.randomInt(0,ROOM_DIVISIONS);
-            z=genRandom.randomInt(0,ROOM_DIVISIONS);
+            x=genRandom.randomInt(0,ROOM_MAX_DIVISIONS);
+            z=genRandom.randomInt(0,ROOM_MAX_DIVISIONS);
             
                 // see if lower, than upper is OK
                 
-            sx=this.xBound.getSize()/ROOM_DIVISIONS;
-            sz=this.zBound.getSize()/ROOM_DIVISIONS;
+            sx=this.xBound.getSize()/ROOM_MAX_DIVISIONS;
+            sz=this.zBound.getSize()/ROOM_MAX_DIVISIONS;
                 
             bx=Math.floor((this.xBound.min+(sx*x))+(sx*0.5));
             bz=Math.floor((this.zBound.min+(sz*z))+(sz*0.5));
             
-            idx=(z*ROOM_DIVISIONS)+x;
+            idx=(z*ROOM_MAX_DIVISIONS)+x;
                 
             if (this.lowerGrid[idx]===0) {
                 this.lowerGrid[idx]=1;

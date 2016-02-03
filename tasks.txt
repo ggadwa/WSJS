@@ -34,6 +34,10 @@ REGULAR TODOs
     [X] flag to make all generated lights white (the default)
     [X] new platforms
         [ ] platforms need more decorations
+        [ ] move platforms in another spot after we go 10x10
+        [ ] rooms of random # grid spaces?
+        [ ] closets always by 2 or greater
+        [ ] stairs always by 2 or greater
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 
 [ ] textures

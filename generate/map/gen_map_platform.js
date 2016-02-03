@@ -17,8 +17,8 @@ function GenRoomPlatform(map,genRandom,piece,room)
         
     this.addStairChunk=function(xBound,yBound,zBound,stairX,stairZ,stairDir,platformBitmap)
     {
-        var xAdd=Math.floor(xBound.getSize()/ROOM_DIVISIONS);
-        var zAdd=Math.floor(zBound.getSize()/ROOM_DIVISIONS);
+        var xAdd=Math.floor(xBound.getSize()/ROOM_MAX_DIVISIONS);
+        var zAdd=Math.floor(zBound.getSize()/ROOM_MAX_DIVISIONS);
         var xStairBound=new wsBound((xBound.min+(stairX*xAdd)),(xBound.min+((stairX+1)*xAdd)));
         var zStairBound=new wsBound((zBound.min+(stairZ*zAdd)),(zBound.min+((stairZ+1)*zAdd)));
 
@@ -55,8 +55,8 @@ function GenRoomPlatform(map,genRandom,piece,room)
         
     this.addPlatformChunk=function(xBound,yBound,zBound,x,z,platformBitmap)
     {
-        var xAdd=Math.floor(xBound.getSize()/ROOM_DIVISIONS);
-        var zAdd=Math.floor(zBound.getSize()/ROOM_DIVISIONS);
+        var xAdd=Math.floor(xBound.getSize()/ROOM_MAX_DIVISIONS);
+        var zAdd=Math.floor(zBound.getSize()/ROOM_MAX_DIVISIONS);
         
         var xPlatformBound=new wsBound((xBound.min+(x*xAdd)),(xBound.min+((x+1)*xAdd)));
         var yPlatformBound=new wsBound((yBound.min-ROOM_FLOOR_DEPTH),yBound.min);
@@ -79,22 +79,22 @@ function GenRoomPlatform(map,genRandom,piece,room)
     {
         var x;
         
-        for (x=(stairX+1);x<ROOM_DIVISIONS;x++) {
+        for (x=(stairX+1);x<ROOM_MAX_DIVISIONS;x++) {
             this.addPlatformChunk(xBound,yBound,zBound,x,stairZ,platformBitmap);
         }
         
-        return(ROOM_DIVISIONS-1);
+        return(ROOM_MAX_DIVISIONS-1);
     };
     
     this.addChunkWalkwayDirPosZ=function(xBound,yBound,zBound,stairX,stairZ,platformBitmap)
     {
         var z;
         
-        for (z=(stairZ+1);z<ROOM_DIVISIONS;z++) {
+        for (z=(stairZ+1);z<ROOM_MAX_DIVISIONS;z++) {
             this.addPlatformChunk(xBound,yBound,zBound,stairX,z,platformBitmap);
         }
         
-        return(ROOM_DIVISIONS-1);
+        return(ROOM_MAX_DIVISIONS-1);
     };
     
     this.addChunkWalkwayDirNegX=function(xBound,yBound,zBound,stairX,stairZ,platformBitmap)
@@ -126,7 +126,7 @@ function GenRoomPlatform(map,genRandom,piece,room)
     this.createPlatforms=function(xBound,yBound,zBound)
     {
         var x,z,stairX,stairZ,stairDir,tryCount;
-        var midDiv=Math.floor(ROOM_DIVISIONS/2);
+        var midDiv=Math.floor(ROOM_MAX_DIVISIONS/2);
         
         var platformBitmap=this.map.getBitmapById(TEXTURE_PLATFORM);
         
@@ -140,8 +140,8 @@ function GenRoomPlatform(map,genRandom,piece,room)
         
         while (true) {
             
-            stairX=this.genRandom.randomInt(1,(ROOM_DIVISIONS-2));
-            stairZ=this.genRandom.randomInt(1,(ROOM_DIVISIONS-2));
+            stairX=this.genRandom.randomInt(1,(ROOM_MAX_DIVISIONS-2));
+            stairZ=this.genRandom.randomInt(1,(ROOM_MAX_DIVISIONS-2));
             
                 // skip middle as player spawns there
                 
@@ -159,61 +159,41 @@ function GenRoomPlatform(map,genRandom,piece,room)
             
             case 0:
                 x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
+
                 if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
-                    if (this.genRandom.random()>0.5) {
-                        z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
-                    }
-                    else {
-                        z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
-                    }
-                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
-                        this.addChunkWalkwayDirNegX(xBound,yBound,zBound,x,z,platformBitmap);
-                    }
+                    x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,x,z,platformBitmap);
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,z,platformBitmap);
                 }
                 break;
                 
             case 1:
                 z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,stairX,z,platformBitmap);
+
                 if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
-                    if (this.genRandom.random()>0.5) {
-                        x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,stairX,z,platformBitmap);
-                    }
-                    else {
-                        x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,stairX,z,platformBitmap);
-                    }
-                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
-                        this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,z,platformBitmap);
-                    }
+                    z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,z,platformBitmap);
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) this.addChunkWalkwayDirNegX(xBound,yBound,zBound,x,z,platformBitmap);
                 }
                 break;
                 
             case 2:
                 x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
+
                 if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
-                    if (this.genRandom.random()>0.5) {
-                        z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
-                    }
-                    else {
-                        z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,x,stairZ,platformBitmap);
-                    }
-                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
-                        this.addChunkWalkwayDirPosX(xBound,yBound,zBound,x,z,platformBitmap);
-                    }
+                    x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,x,z,platformBitmap);
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,z,platformBitmap);
                 }
                 break;
                 
             case 3:
                 z=this.addChunkWalkwayDirNegZ(xBound,yBound,zBound,stairX,stairZ,platformBitmap);
+                x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,stairX,z,platformBitmap);
+
                 if (this.genRandom.random()<ROOM_PLATFORM_2ND_PERCENTAGE) {
-                    if (this.genRandom.random()>0.5) {
-                        x=this.addChunkWalkwayDirPosX(xBound,yBound,zBound,stairX,z,platformBitmap);
-                    }
-                    else {
-                        x=this.addChunkWalkwayDirNegX(xBound,yBound,zBound,stairX,z,platformBitmap);
-                    }
-                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) {
-                        this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,z,platformBitmap);
-                    }
+                    z=this.addChunkWalkwayDirPosZ(xBound,yBound,zBound,x,z,platformBitmap);
+                    if (this.genRandom.random()<ROOM_PLATFORM_3RD_PERCENTAGE) this.addChunkWalkwayDirPosX(xBound,yBound,zBound,x,z,platformBitmap);
                 }
                 break;
                 

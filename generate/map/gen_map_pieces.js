@@ -9,8 +9,6 @@ function MapPieceObject()
     this.points=[];
     this.connectLines=[];
     
-    this.floorGrid=null;
-    
     this.CONNECT_TYPE_LEFT=0;
     this.CONNECT_TYPE_TOP=1;
     this.CONNECT_TYPE_RIGHT=2;
@@ -101,9 +99,9 @@ function MapPieceObject()
             
         var count=0;
         
-        for (z=0;z!==5;z++) {
-            for (x=0;x!==5;x++) {
-                count+=this.floorGrid[z][x];
+        for (z=0;z!==10;z++) {
+            for (x=0;x!==10;x++) {
+                count++;            // supergumba -- all this gets replaced
             }
         }
         
@@ -126,14 +124,12 @@ function MapPieceObject()
         var y=isFloor?yBound.max:yBound.min;
         var ny=isFloor?-1.0:1.0;
         
-        for (z=0;z!==5;z++) {
-            for (x=0;x!==5;x++) {
-                if (this.floorGrid[z][x]===0) continue;
-        
-                vxMin=xBound.min+Math.floor(sx*(x*0.2));
-                vxMax=xBound.min+Math.floor(sx*((x+1)*0.2));
-                vzMin=zBound.min+Math.floor(sz*(z*0.2));
-                vzMax=zBound.min+Math.floor(sz*((z+1)*0.2));
+        for (z=0;z!==10;z++) {
+            for (x=0;x!==10;x++) {
+                vxMin=xBound.min+Math.floor(sx*(x*0.1));
+                vxMax=xBound.min+Math.floor(sx*((x+1)*0.1));
+                vzMin=zBound.min+Math.floor(sz*(z*0.1));
+                vzMax=zBound.min+Math.floor(sz*((z+1)*0.1));
                 
                 v=vertexList[vIdx];
                 v.position.set(vxMin,y,vzMin);
@@ -294,79 +290,13 @@ function MapPieceObject()
             pt2=this.points[k];
 
             if (((pt1[0]===0) && (pt2[0]===0)) || ((pt1[0]===100) && (pt2[0]===100))) {
-                if (Math.abs(pt1[1]-pt2[1])===20) this.connectLines.push([n,k]);
+                if (Math.abs(pt1[1]-pt2[1])===10) this.connectLines.push([n,k]);
             }
             if (((pt1[1]===0) && (pt2[1]===0)) || ((pt1[1]===100) && (pt2[1]===100))) {
-                if (Math.abs(pt1[0]-pt2[0])===20) this.connectLines.push([n,k]);
+                if (Math.abs(pt1[0]-pt2[0])===10) this.connectLines.push([n,k]);
             }
        }
     };
-
-        //
-        // clone, mirror, and rotate
-        //
-
-    this.clone=function()
-    {
-        var mapPiece2=new MapPieceObject();
-        mapPiece2.points=JSON.parse(JSON.stringify(this.points));
-        mapPiece2.connectLines=JSON.parse(JSON.stringify(this.connectLines));
-        mapPiece2.floorGrid=JSON.parse(JSON.stringify(this.floorGrid));
-        return(mapPiece2);
-    };
-
-    this.mirror=function()
-    {
-        var n,nPoint,pt;
-        var x,y;
-
-        nPoint=this.points.length;
-
-        for (n=0;n!==nPoint;n++) {
-            pt=this.points[n];
-            pt[1]=100-pt[1];
-        }
-        
-        var grid=[];
-
-        for (y=0;y!==5;y++) {
-            grid.push(this.floorGrid[4-y]);
-        }
-
-        this.floorGrid=grid;
-    };
-
-    this.rotate=function()
-    {
-        var n,k,nPoint,pt;
-        var x,y;
-
-        nPoint=this.points.length;
-
-        for (n=0;n!==nPoint;n++) {
-            pt=this.points[n];
-            k=pt[0];
-            pt[0]=pt[1];
-            pt[1]=k;
-        }
-        
-        var grid=[
-          [0,0,0,0,0],
-          [0,0,0,0,0],
-          [0,0,0,0,0],
-          [0,0,0,0,0],
-          [0,0,0,0,0]
-        ];
-
-        for (y=0;y!==5;y++) {
-            for (x=0;x!==5;x++) {
-                grid[x][y]=this.floorGrid[y][x];
-            }
-        }
-
-        this.floorGrid=grid;
-    };
-    
 }
 
 //
@@ -393,96 +323,47 @@ function MapPieceListObject()
         mapPiece=new MapPieceObject();
 
         mapPiece.points.push([0,0]);
+        mapPiece.points.push([10,0]);
         mapPiece.points.push([20,0]);
+        mapPiece.points.push([30,0]);
         mapPiece.points.push([40,0]);
+        mapPiece.points.push([50,0]);
         mapPiece.points.push([60,0]);
+        mapPiece.points.push([70,0]);
         mapPiece.points.push([80,0]);
+        mapPiece.points.push([90,0]);
         mapPiece.points.push([100,0]);
+        mapPiece.points.push([100,10]);
         mapPiece.points.push([100,20]);
+        mapPiece.points.push([100,30]);
         mapPiece.points.push([100,40]);
+        mapPiece.points.push([100,50]);
         mapPiece.points.push([100,60]);
+        mapPiece.points.push([100,70]);
         mapPiece.points.push([100,80]);
+        mapPiece.points.push([100,90]);
         mapPiece.points.push([100,100]);
+        mapPiece.points.push([90,100]);
         mapPiece.points.push([80,100]);
+        mapPiece.points.push([70,100]);
         mapPiece.points.push([60,100]);
+        mapPiece.points.push([50,100]);
         mapPiece.points.push([40,100]);
+        mapPiece.points.push([30,100]);
         mapPiece.points.push([20,100]);
+        mapPiece.points.push([10,100]);
         mapPiece.points.push([0,100]);
+        mapPiece.points.push([0,90]);
         mapPiece.points.push([0,80]);
+        mapPiece.points.push([0,70]);
         mapPiece.points.push([0,60]);
+        mapPiece.points.push([0,50]);
         mapPiece.points.push([0,40]);
+        mapPiece.points.push([0,30]);
         mapPiece.points.push([0,20]);
-        
-        mapPiece.floorGrid=[
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1]
-        ];
+        mapPiece.points.push([0,10]);
 
         this.add(mapPiece);
-/*
-            // half circle
-
-        mapPiece=new MapPieceObject();
-
-        mapPiece.points.push([0,40]);
-        mapPiece.points.push([10,20]);
-        mapPiece.points.push([20,10]);
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([80,10]);
-        mapPiece.points.push([90,20]);
-        mapPiece.points.push([100,40]);
-        mapPiece.points.push([100,60]);
-        mapPiece.points.push([100,80]);
-        mapPiece.points.push([100,100]);
-        mapPiece.points.push([80,100]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([20,100]);
-        mapPiece.points.push([0,100]);
-        mapPiece.points.push([0,80]);
-        mapPiece.points.push([0,60]);
-        
-        mapPiece.floorGrid=[
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1]
-        ];
-
-        this.add(mapPiece);
-        */
-/*        
-            // slant
-
-        mapPiece=new MapPieceObject();
-
-        mapPiece.points.push([40,0]);
-        mapPiece.points.push([60,0]);
-        mapPiece.points.push([80,0]);
-        mapPiece.points.push([100,0]);
-        mapPiece.points.push([100,20]);
-        mapPiece.points.push([60,100]);
-        mapPiece.points.push([40,100]);
-        mapPiece.points.push([20,100]);
-        mapPiece.points.push([0,100]);
-        mapPiece.points.push([0,80]);
-        mapPiece.points.push([0,60]);
-        
-        mapPiece.floorGrid=[
-          [0,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,1],
-          [1,1,1,1,0]
-        ];
-
-        this.add(mapPiece);
-*/
     };
     
         //
@@ -500,25 +381,6 @@ function MapPieceListObject()
             // into the arrays
 
         this.mapPieces.push(mapPiece);
-
-            // now a mirrored version
-
-        var mapPiece2=mapPiece.clone();
-        mapPiece2.mirror();    
-        this.mapPieces.push(mapPiece2);
-
-            // rotated version
-
-        mapPiece2=mapPiece.clone();
-        mapPiece2.rotate();    
-        this.mapPieces.push(mapPiece2);
-
-            // rotated and mirrored version
-
-        mapPiece2=mapPiece.clone();
-        mapPiece2.mirror();    
-        mapPiece2.rotate();
-        this.mapPieces.push(mapPiece2);
     };
 
     this.count=function()
