@@ -98,5 +98,143 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
         
         return(null);
     };
+    
+        //
+        // create polygon walls and floors
+        //
+        
+    this.createMeshWalls=function(bitmap,yStoryBound,flag)
+    {
+        var n,nSegment,x,z,x2,z2;
+
+            // build the vertices.  Each triangle gets it's
+            // own vertices so normals and light map UVs work
+
+        nSegment=(this.xBlockSize*2)+(this.zBlockSize*2);
+
+        var vertexList=meshUtility.createMapVertexList(nSegment*6);
+        var indexes=new Uint16Array(nSegment*6);
+        
+        var vIdx=0;
+        var iIdx=0;
+        
+            // top square polygons
+        
+        x=this.xBound.min;
+        
+        for (n=0;n!==this.xBlockSize;n++) {
+            x2=x+ROOM_BLOCK_WIDTH;
+            
+            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.min);
+            vertexList[vIdx+1].position.set(x2,yStoryBound.min,this.zBound.min);
+            vertexList[vIdx+2].position.set(x2,yStoryBound.max,this.zBound.min);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+
+            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.min);
+            vertexList[vIdx+1].position.set(x2,yStoryBound.max,this.zBound.min);
+            vertexList[vIdx+2].position.set(x,yStoryBound.max,this.zBound.min);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            
+            x=x2;
+        }
+
+            // right square polygons
+            
+        z=this.zBound.min;
+        
+        for (n=0;n!==this.zBlockSize;n++) {
+            z2=z+ROOM_BLOCK_WIDTH;
+            
+            vertexList[vIdx].position.set(this.xBound.max,yStoryBound.min,z);
+            vertexList[vIdx+1].position.set(this.xBound.max,yStoryBound.min,z2);
+            vertexList[vIdx+2].position.set(this.xBound.max,yStoryBound.max,z2);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+
+            vertexList[vIdx].position.set(this.xBound.max,yStoryBound.min,z);
+            vertexList[vIdx+1].position.set(this.xBound.max,yStoryBound.max,z2);
+            vertexList[vIdx+2].position.set(this.xBound.max,yStoryBound.max,z);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            
+            z=z2;
+        }
+        
+            // bottom square polygons
+        
+        x=this.xBound.min;
+        
+        for (n=0;n!==this.xBlockSize;n++) {
+            x2=x+ROOM_BLOCK_WIDTH;
+            
+            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.max);
+            vertexList[vIdx+1].position.set(x2,yStoryBound.min,this.zBound.max);
+            vertexList[vIdx+2].position.set(x2,yStoryBound.max,this.zBound.max);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+
+            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.max);
+            vertexList[vIdx+1].position.set(x2,yStoryBound.max,this.zBound.max);
+            vertexList[vIdx+2].position.set(x,yStoryBound.max,this.zBound.max);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            
+            x=x2;
+        }
+
+            // left square polygons
+            
+        z=this.zBound.min;
+        
+        for (n=0;n!==this.zBlockSize;n++) {
+            z2=z+ROOM_BLOCK_WIDTH;
+            
+            vertexList[vIdx].position.set(this.xBound.min,yStoryBound.min,z);
+            vertexList[vIdx+1].position.set(this.xBound.min,yStoryBound.min,z2);
+            vertexList[vIdx+2].position.set(this.xBound.min,yStoryBound.max,z2);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+
+            vertexList[vIdx].position.set(this.xBound.min,yStoryBound.min,z);
+            vertexList[vIdx+1].position.set(this.xBound.min,yStoryBound.max,z2);
+            vertexList[vIdx+2].position.set(this.xBound.min,yStoryBound.max,z);
+
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            indexes[iIdx++]=vIdx++;
+            
+            z=z2;
+        }
+
+            // calculate the normals, then use those to
+            // calcualte the uvs, and finally the UVs to
+            // calculate the tangents
+
+        meshUtility.buildVertexListNormals(vertexList,indexes,null,true);
+        meshUtility.buildVertexListUVs(bitmap,vertexList);
+        meshUtility.buildVertexListTangents(vertexList,indexes);
+
+            // finally create the mesh
+
+        var mesh=new MapMeshObject(bitmap,vertexList,indexes,flag);
+
+        return(mesh);
+    };
 
 }

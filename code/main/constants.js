@@ -5,11 +5,19 @@
 const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 const ROOM_DIMENSIONS=[80000,7000,80000];       // maximum size for a room [x,y,z]
+
+const ROOM_BLOCK_WIDTH=8000;
+
 const ROOM_FLOOR_DEPTH=700;
 
+const ROOM_MAX_CONNECT_TRY=100;
+
 const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connection in a room spawns another room
-const ROOM_LEVEL_CHANGE_PERCENTAGE=0.8;         // what % of the time a room gains another story
-const ROOM_CLOSET_UP_PERCENTAGE=0.75;           // what % of the time a closet goes to a second level if available
+const ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connection to a room is up a story
+
+const ROOM_CLOSET_MAX_COUNT=5;                  // maximum number of possible closets in room
+const ROOM_CLOSET_MAX_LENGTH=10;                // maximum length of closet
+const ROOM_CLOSET_UP_PERCENTAGE=0.25;           // what % of the time a closet goes to a second level if available
 
 const ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform will have a secondary turn
 const ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
@@ -169,6 +177,15 @@ const MESH_FLAG_ROOM_PLATFORM=4;
 const MESH_FLAG_STAIR=5;
 const MESH_FLAG_LIGHT=6;
 const MESH_FLAG_DECORATION=7;
+
+//
+// room sides
+//
+
+const ROOM_SIDE_LEFT=0;
+const ROOM_SIDE_TOP=1;
+const ROOM_SIDE_RIGHT=2;
+const ROOM_SIDE_BOTTOM=3;
 
 //
 // map stairs

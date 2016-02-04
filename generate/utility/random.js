@@ -28,6 +28,16 @@ function GenRandomObject(seed)
         return(startInt+Math.floor(this.random()*extraInt));
     };
     
+    this.randomIndex=function(maxIndex)
+    {
+        return(Math.floor(this.random()*maxIndex));
+    };
+    
+    this.randomPercentage=function(percentage)
+    {
+        return(this.random()<percentage);
+    };
+    
     this.randomInBetween=function(startInt,endInt)
     {
         return(this.randomInt(startInt,(endInt-startInt)));

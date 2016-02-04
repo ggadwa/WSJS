@@ -29,6 +29,9 @@ REGULAR TODOs
     [X] fixed some bug in lost float/int conversions
     [X] speed up bitmap creation
 
+    [ ] use randomPercentage
+    [ ] use randomIndex
+
 [ ] map generation
     [ ] DO AWAY with pieces and make everything a 10x10 square?
     [X] flag to make all generated lights white (the default)
@@ -36,9 +39,10 @@ REGULAR TODOs
         [ ] platforms need more decorations
         [ ] move platforms in another spot after we go 10x10
         [ ] rooms of random # grid spaces?
-        [ ] closets always by 2 or greater
-        [ ] stairs always by 2 or greater
         [ ] don't have room size, but chunk size
+        [ ] recheck all supergumbas
+        [ ] closets need to not be so far off the side of a room
+        [ ] find and delete all "piece"
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 
 [ ] textures

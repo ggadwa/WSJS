@@ -123,84 +123,81 @@ function GenRoomClosetObject(view,map,room,genRandom)
         
     this.addCloset=function()
     {
-        var x,z;
-        var connectLineIdx,connectType,connectOffset,closetLen;
-        var xClosetBound,zClosetBound;
+        var n,k,x,z,xAdd,zAdd;
+        var connectSide,connectOffset,closetLen;
+        var xClosetBound,yClosetBound,zClosetBound;
         
         var room=this.room;
-        var piece=room.piece;
-        var nConnectLine=piece.connectLines.length;
         
-            // box sizing
-            
-        var xAdd=Math.floor(room.xBound.getSize()/ROOM_MAX_DIVISIONS);
-        var zAdd=Math.floor(room.zBound.getSize()/ROOM_MAX_DIVISIONS);
+        var closetCount=this.genRandom.randomIndex(ROOM_CLOSET_MAX_COUNT);
+        if (closetCount===0) return;
         
-            // get the Y bound
+            // create closests
             
-        var yClosetBound=room.yBound.copy();
-        if (room.hasStories) {
-            if (genRandom.random()>ROOM_CLOSET_UP_PERCENTAGE) yClosetBound.add(-(room.yBound.getSize()+ROOM_FLOOR_DEPTH));
-        }
-        
-            // initial connection try
+        for (n=0;n!==closetCount;n++) {
             
-        connectLineIdx=Math.floor(nConnectLine*this.genRandom.random());
-        closetLen=this.genRandom.randomInt(1,(ROOM_MAX_DIVISIONS-1));
-        
-            // try a number of times
-            
-        var tryCount=0;
-        
-        while (tryCount<10) {
-            
-                // find a connect line starting point
+                // find a connection side, offset, and
+                // closet length
                 
-            connectType=piece.getConnectType(connectLineIdx);
-            connectOffset=piece.getConnectTypeOffset(connectLineIdx,room.xBound,room.zBound);
+            connectSide=this.genRandom.randomIndex(4);
+            connectOffset=this.genRandom.randomInt(0,10);          // supergumba -- needs to consider block of two rooms
+            closetLen=this.genRandom.randomInt(1,ROOM_CLOSET_MAX_LENGTH);
             
-            x=connectOffset.x+room.xBound.min;
-            z=connectOffset.z+room.zBound.min;
+                // get the Y bound
+
+            yClosetBound=room.yBound.copy();
+            if (room.hasStories) {
+                if (this.genRandom.randomPercentage(ROOM_CLOSET_UP_PERCENTAGE)) yClosetBound.add(-(room.yBound.getSize()+ROOM_FLOOR_DEPTH));
+            }
             
                 // get the box
                 
-            switch (connectType) {
-                case piece.CONNECT_TYPE_LEFT:
-                    xClosetBound=new wsBound((x-xAdd),x);
-                    zClosetBound=new wsBound(z,(z+zAdd));
+            switch (connectSide) {
+                
+                case ROOM_SIDE_LEFT:
+                    xAdd=0;
+                    zAdd=ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound((room.xBound.min-ROOM_BLOCK_WIDTH),room.xBound.min);
+                    zClosetBound=new wsBound(z,(z+ROOM_BLOCK_WIDTH));
                     break;
-                case piece.CONNECT_TYPE_TOP:
-                    xClosetBound=new wsBound(x,(x+xAdd));
-                    zClosetBound=new wsBound((z-zAdd),z);
+                    
+                case ROOM_SIDE_TOP:
+                    xAdd=ROOM_BLOCK_WIDTH;
+                    zAdd=0;
+                    x=room.xBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(x,(x+ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound((room.zBound.min-ROOM_BLOCK_WIDTH),room.zBound.min);
                     break;
-                case piece.CONNECT_TYPE_RIGHT:
-                    xClosetBound=new wsBound(x,(x+xAdd));
-                    zClosetBound=new wsBound(z,(z+zAdd));
+                    
+                case ROOM_SIDE_RIGHT:
+                    xAdd=0;
+                    zAdd=-ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(room.xBound.max,(room.xBound.max+ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound(z,(z+ROOM_BLOCK_WIDTH));
                     break;
-                case piece.CONNECT_TYPE_BOTTOM:
-                    xClosetBound=new wsBound(x,(x+xAdd));
-                    zClosetBound=new wsBound(z,(z+zAdd));
+                    
+                case ROOM_SIDE_BOTTOM:
+                    xAdd=-ROOM_BLOCK_WIDTH;
+                    zAdd=0;
+                    x=room.xBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(x,(x+ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound(room.zBound.max,(room.zBound.max+ROOM_BLOCK_WIDTH));
                     break;
             }
             
-                // check if OK
+                // build the blocks
+            
+            for (k=0;k!==closetLen;k++) {
+                if (this.map.boxBoundCollision(xClosetBound,null,zClosetBound,MESH_FLAG_ROOM_WALL)!==-1) break;
+
+                this.createClosetCube(map,xClosetBound,yClosetBound,zClosetBound);
+                map.addOverlayCloset(xClosetBound,zClosetBound);
                 
-            if (this.map.boxBoundCollision(xClosetBound,null,zClosetBound,MESH_FLAG_ROOM_WALL)!==-1) {
-                connectLineIdx++;
-                if (connectLineIdx>=nConnectLine) connectLineIdx=0;
-                tryCount++;
-                continue;
+                xClosetBound.add(xAdd);
+                zClosetBound.add(zAdd);
             }
-            
-                // add a box
-            
-            this.createClosetCube(map,xClosetBound,yClosetBound,zClosetBound);
-            map.addOverlayCloset(xClosetBound,zClosetBound);
-            
-                // more length?
-                
-            closetLen--;
-            if (closetLen===0) break;
         }
         
     };
