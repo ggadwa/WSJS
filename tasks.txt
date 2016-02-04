@@ -38,6 +38,7 @@ REGULAR TODOs
         [ ] rooms of random # grid spaces?
         [ ] closets always by 2 or greater
         [ ] stairs always by 2 or greater
+        [ ] don't have room size, but chunk size
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 
 [ ] textures

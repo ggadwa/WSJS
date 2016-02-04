@@ -16,6 +16,9 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
     this.hasStories=hasStories;
     this.level=level;
     
+    this.xBlockSize=10;
+    this.zBlockSize=10;
+    
     this.lowerGrid=new Uint8Array(ROOM_MAX_DIVISIONS*ROOM_MAX_DIVISIONS);
     this.upperGrid=new Uint8Array(ROOM_MAX_DIVISIONS*ROOM_MAX_DIVISIONS);
     
@@ -34,7 +37,7 @@ function MapRoomObject(piece,xBound,yBound,zBound,hasStories,level)
     };
     
     this.setupGrid();       // supergumba -- IMPORTANT!!!  Move all this after classes!
-        
+    
         //
         // block or unblock off a grid space
         //
