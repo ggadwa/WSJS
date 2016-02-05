@@ -92,9 +92,9 @@ function MapObject()
         // tracking rooms
         //
         
-    this.addRoom=function(piece,xBound,yBound,zBound,hasStories,level)
+    this.addRoom=function(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level)
     {
-        this.rooms.push(new MapRoomObject(piece,xBound,yBound,zBound,hasStories,level));
+        this.rooms.push(new MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level));
         return(this.rooms.length-1);
     };
 
@@ -417,9 +417,9 @@ function MapObject()
         this.overlay.draw(view,entityList);
     };
     
-    this.addOverlayRoom=function(piece,xBound,zBound)
+    this.addOverlayRoom=function(room)
     {
-        this.overlay.addRoom(piece,xBound,zBound);
+        this.overlay.addRoom(room);
     };
     
     this.addOverlayCloset=function(xBound,zBound)

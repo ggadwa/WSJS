@@ -14,6 +14,7 @@ const ROOM_MAX_CONNECT_TRY=100;
 
 const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connection in a room spawns another room
 const ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connection to a room is up a story
+const ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
 const ROOM_CLOSET_MAX_COUNT=5;                  // maximum number of possible closets in room
 const ROOM_CLOSET_MAX_LENGTH=10;                // maximum length of closet

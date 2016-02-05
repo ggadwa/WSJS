@@ -90,9 +90,9 @@ function MapOverlayObject()
         // add pieces to overlay
         //
         
-    this.addRoom=function(piece,xBound,zBound)
+    this.addRoom=function(room)
     {
-        this.addLines(this.roomLineList,piece.createOverlayLineList(xBound,zBound));
+        this.addLines(this.roomLineList,room.createOverlayLineList());
     };
     
     this.addCloset=function(xBound,zBound)

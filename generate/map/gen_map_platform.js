@@ -4,11 +4,10 @@
 // map platforms
 //
 
-function GenRoomPlatform(map,genRandom,piece,room)
+function GenRoomPlatform(map,genRandom,room)
 {
     this.map=map;
     this.genRandom=genRandom;
-    this.piece=piece;
     this.room=room;
     
         //
