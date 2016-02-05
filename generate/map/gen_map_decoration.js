@@ -39,84 +39,7 @@ function GenRoomDecorationObject(view,map,room,genRandom)
         }
 
     };
-    
-        //
-        // pillars
-        //
-    
-    this.addPillars=function()
-    {
-        var n,x,z;
-        var pillarYBound;
         
-        var room=this.room;
-        
-            // ybound
-            
-        pillarYBound=new wsBound((room.yBound.min-ROOM_FLOOR_DEPTH),room.yBound.max);
-        if (room.hasStories) pillarYBound.min-=(room.yBound.getSize()+ROOM_FLOOR_DEPTH);
-        
-            // pillar default size
-        
-        var pillarRadius;
-        
-        if (room.xBound.getSize()>room.zBound.getSize()) {
-            pillarRadius=room.xBound.getSize()*(this.genRandom.random()*ROOM_DECORATIONS_PILLAR_FACTOR);
-        }
-        else {
-            pillarRadius=room.zBound.getSize()*(this.genRandom.random()*ROOM_DECORATIONS_PILLAR_FACTOR);
-        }
-        
-        if (pillarRadius<ROOM_DECORATIONS_PILLAR_MIN_RADIUS) pillarRadius=ROOM_DECORATIONS_PILLAR_MIN_RADIUS;
-        
-            // pilar locations
-            
-        var pillarLocs=[];
-            
-        switch (this.genRandom.randomInt(0,2)) {
-            
-                // four corners
-                
-            case 0:
-                x=room.xBound.getSize()*0.2;
-                z=room.zBound.getSize()*0.2;
-                pillarLocs.push(new wsPoint((room.xBound.min+x),room.yBound.max,(room.zBound.min+z)));
-                pillarLocs.push(new wsPoint((room.xBound.max-x),room.yBound.max,(room.zBound.min+z)));
-                pillarLocs.push(new wsPoint((room.xBound.max-x),room.yBound.max,(room.zBound.max-z)));
-                pillarLocs.push(new wsPoint((room.xBound.min+x),room.yBound.max,(room.zBound.max-z)));
-                break;
-                
-                // x line
-                
-            case 1:
-                x=room.xBound.getMidPoint();
-                z=room.zBound.getSize()/8;
-                pillarLocs.push(new wsPoint(x,room.yBound.max,(room.zBound.min+(z*2))));
-                pillarLocs.push(new wsPoint(x,room.yBound.max,(room.zBound.max-(z*2))));
-                break;
-                
-                // z line
-                
-            case 2:
-                x=room.xBound.getSize()/8;
-                z=room.zBound.getMidPoint();
-                pillarLocs.push(new wsPoint((room.xBound.min+(x*2)),room.yBound.max,z));
-                pillarLocs.push(new wsPoint((room.xBound.max-(x*2)),room.yBound.max,z));
-                break;
-            
-        }
-        
-            // setup cylinder segments
-            
-        var segments=meshPrimitives.createMeshCylinderSegmentList(this.genRandom,pillarRadius,pillarRadius,1,ROOM_DECORATIONS_PILLAR_EXTRA_SEGMENTS);
-        
-            // make the pillars
-            
-        for (n=0;n!==pillarLocs.length;n++) {
-            map.addMesh(meshPrimitives.createMeshCylinder(map.getBitmapById(TEXTURE_PILLAR),pillarLocs[n],pillarYBound,segments,MESH_FLAG_DECORATION));
-        }
-    };
-    
         //
         // machines
         //
@@ -138,20 +61,20 @@ function GenRoomDecorationObject(view,map,room,genRandom)
         map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
     };
 
-    this.addDecoration=function()
+    this.addDecorations=function()
     {
+        this.addBoxes();
+        return;
+        
             // this map have decorations?
             
-        if ((!ROOM_DECORATIONS) || (this.room.level===0)) return;
+        if (!ROOM_DECORATIONS) return;
         
             // randomly pick a decoration
             
-        switch (this.genRandom.randomInt(0,2)) {
+        switch (this.genRandom.randomIndex(2)) {
             case 0:
                 this.addBoxes();
-                break;
-            case 1:
-                this.addPillars();
                 break;
             //case 2:
             //    this.addMachine();

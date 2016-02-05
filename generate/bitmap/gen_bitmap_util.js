@@ -178,7 +178,7 @@ function GenBitmapUtilityObject(genRandom)
         var r,g,b;
         var value=min+((max-min)*this.genRandom.random());
         
-        switch (this.genRandom.randomInt(0,6)) {
+        switch (this.genRandom.randomIndex(6)) {
             case 0:
                 r=1.0;
                 g=value;
@@ -358,7 +358,7 @@ function GenBitmapUtilityObject(genRandom)
 
         for (n=0;n!==nPixel;n++) {
 
-            if (this.genRandom.random()<=percentage) {
+            if (this.genRandom.randomPercentage(percentage)) {
 
                     // the bitmap noise
 
@@ -606,9 +606,9 @@ function GenBitmapUtilityObject(genRandom)
             // randomize it
 
         for (n=0;n!==totalPointCount;n++) {
-            add=this.genRandom.randomInt(0,5);
+            add=this.genRandom.randomIndex(5);
             x[n]+=(x[n]<mx)?add:-add;
-            add=this.genRandom.randomInt(0,5);
+            add=this.genRandom.randomIndex(5);
             y[n]+=(y[n]<my)?add:-add;
         }
 
@@ -911,7 +911,7 @@ function GenBitmapUtilityObject(genRandom)
                 ex=sx+xAdd;
                 ey=sy+yAdd;
 
-                r=10-this.genRandom.randomInt(0,lineVariant);
+                r=10-this.genRandom.randomIndex(lineVariant);
 
                 if (horizontal) {
                     ey+=r;

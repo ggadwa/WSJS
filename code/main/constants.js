@@ -4,40 +4,46 @@
 
 const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
-const ROOM_DIMENSIONS=[80000,7000,80000];       // maximum size for a room [x,y,z]
 
-const ROOM_BLOCK_WIDTH=8000;
+const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
+const ROOM_FLOOR_HEIGHT=7000;                   // how tall each floor of a room is
+const ROOM_FLOOR_DEPTH=700;                     // the depth of the area between floors
 
-const ROOM_FLOOR_DEPTH=700;
+const ROOM_MIN_BLOCK_PER_SIDE=3;                // minimum number of blocks taht can make up one side of a room
+const ROOM_MAX_BLOCK_PER_SIDE=10;               // maximum number of blocks that can make up one side of a room
+const ROOM_MAX_BLOCK_COUNT=50;                  // maximum number of blocks in total for a room (x * z block count)
 
-const ROOM_MAX_CONNECT_TRY=100;
+const ROOM_MAX_CONNECT_TRY=20;                  // maximum times to try to find a place to connect a room to another room
 
-const ROOM_CONNECTION_PERCENTAGE=0.25;          // what % of the time a connection in a room spawns another room
 const ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connection to a room is up a story
 const ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
+//
+// closets and platforms
+//
+
 const ROOM_CLOSET_MAX_COUNT=5;                  // maximum number of possible closets in room
-const ROOM_CLOSET_MAX_LENGTH=10;                // maximum length of closet
 const ROOM_CLOSET_UP_PERCENTAGE=0.25;           // what % of the time a closet goes to a second level if available
 
 const ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform will have a secondary turn
 const ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
 
-const ROOM_MAX_DIVISIONS=10;                    // max division for dividing a room up into chunks
-
 const ROOM_PLATFORMS=true;                      // turns on or off platforms
 
 //
-// decorations
+// pillars and decorations
 //
 
-const ROOM_DECORATIONS=true;                   // set to false for no decorations in the map
+const ROOM_MAX_PILLAR_COUNT=5;                  // maximum number of pillars in a room
+
+const ROOM_PILLAR_MIN_RADIUS=500;               // minimum radius for pillars
+const ROOM_PILLAR_MAX_RADIUS=1000;              // maximum radius for pillars
+const ROOM_PILLAR_EXTRA_SEGMENTS=4;             // possible number of extra segments for pillars
 
 const ROOM_DECORATIONS_BOX_EXTRA_COUNT=8;       // extra number of boxes
 
-const ROOM_DECORATIONS_PILLAR_FACTOR=0.03;      // the max size (in % of room) for pillars
-const ROOM_DECORATIONS_PILLAR_MIN_RADIUS=200;   // minimum radius for pillars
-const ROOM_DECORATIONS_PILLAR_EXTRA_SEGMENTS=4; // possible number of extra segments for pillars
+const ROOM_PILLARS=true;                        // turns on or off pillars
+const ROOM_DECORATIONS=true;                    // turns on or off decorations
 
 //
 // lighting
@@ -79,7 +85,7 @@ const OVERLAY_DRAW=true;
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=2; //Math.floor((Math.random()*SEED));
+const SEED_MAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
 const SEED_ENTITY=Math.floor((Math.random()*SEED));
@@ -197,12 +203,6 @@ const STAIR_MODE_UP=1;
 const STAIR_MODE_DOWN=2;
 
 const STAIR_STEP_COUNT=10;
-
-//
-// map platforms
-//
-
-const PLATFORM_MAX_OPEN_BLOCK_TRY=25;
 
 //
 // model limb types

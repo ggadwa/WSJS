@@ -162,7 +162,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
     
     var bitmapId=mapTextureBuildList[idx][0];
     var bitmapTypeList=mapTextureBuildList[idx][1];
-    var k=textureGenRandom.randomInt(0,bitmapTypeList.length);
+    var k=textureGenRandom.randomIndex(bitmapTypeList.length);
     var bitmapType=bitmapTypeList[k];
     
         // generate bitmap
@@ -334,7 +334,13 @@ function wsInitBuildEntities()
     
         // make player entity
     
-    var playerEntity=new EntityObject(map.findRandomPosition(entityGenRandom),new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
+    pos=map.findRandomEntityPosition(entityGenRandom);
+    if (pos===null) {
+        alert('Couldn\'t find a place to spawn player!');
+        return;
+    }
+
+    var playerEntity=new EntityObject(pos,new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
     playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0')));
     playerEntity.setCurrentWeaponIndex(0);
     
@@ -345,7 +351,7 @@ function wsInitBuildEntities()
         // it's own model
         
     for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
-        pos=map.findRandomPosition(entityGenRandom);
+        pos=map.findRandomEntityPosition(entityGenRandom);
         if (pos===null) continue;
         
         monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types

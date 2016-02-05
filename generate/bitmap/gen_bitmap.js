@@ -143,7 +143,7 @@ function GenBitmapObject(genRandom)
 
             // tile style
 
-        tileStyle=this.genRandom.randomInt(0,3);
+        tileStyle=this.genRandom.randomIndex(3);
 
             // splits
 
@@ -167,8 +167,8 @@ function GenBitmapObject(genRandom)
                     // sometimes a tile piece is a recursion to
                     // another tile set
 
-                if ((complex) && (this.genRandom.random()<0.25)) {
-                    tileStyle=this.genRandom.randomInt(0,3);
+                if ((complex) && (this.genRandom.randomPercentage(0.25))) {
+                    tileStyle=this.genRandom.randomIndex(3);
                     this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,false);
                     continue;
                 }
@@ -213,7 +213,7 @@ function GenBitmapObject(genRandom)
 
         if (!small) {
             splitCount=this.genRandom.randomInt(2,2);
-            tileStyle=this.genRandom.randomInt(0,3);
+            tileStyle=this.genRandom.randomIndex(3);
             tileColor[0]=this.genBitmapUtility.getRandomColor([0.3,0.3,0.4],[0.6,0.6,0.7]);
             tileColor[1]=this.genBitmapUtility.darkenColor(tileColor[0],0.8);
         }
@@ -398,7 +398,7 @@ function GenBitmapObject(genRandom)
         lines.push([[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]]]);      // waves
         lines.push([[[0.5,0.0],[0.5,1.0]],[[0.0,0.5],[1.0,0.5]],[[0.0,0.5],[1.0,0.5]],[[0.5,0.0],[0.5,1.0]]]);      // pluses
 
-        lineStyle=this.genRandom.randomInt(0,lines.length);
+        lineStyle=this.genRandom.randomIndex(lines.length);
 
             // clear canvases
 
@@ -583,14 +583,14 @@ function GenBitmapObject(genRandom)
                 
                     // any cracks
                     
-                if (this.genRandom.randomInt(0,100)>95) {
+                if (this.genRandom.randomPercentage(0.10)) {
                     
                     sx=lft+1;
                     ex=rgt-1;
                     sy=top+1;
                     ey=bot-1;
                     
-                    if (this.genRandom.randomInt(0,100)>50) {
+                    if (this.genRandom.randomPercentage(0.50)) {
                         lineMargin=Math.floor(tileWid/5);
                         sx=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
                         ex=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));

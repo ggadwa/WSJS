@@ -379,9 +379,9 @@ function MapObject()
         // find positions in map
         //
         
-    this.findRandomPosition=function(genRandom)
+    this.findRandomEntityPosition=function(genRandom)
     {
-        var roomIdx,room;
+        var roomIdx;
         var pos;
         var findTry=0;
         
@@ -389,12 +389,11 @@ function MapObject()
 
                 // find a random room
 
-            var roomIdx=genRandom.randomInt(0,this.rooms.length);
-            var room=this.rooms[roomIdx];
+            roomIdx=genRandom.randomIndex(this.rooms.length);
         
                 // find a random spot
                 
-            pos=room.findRandomFreeLocation(genRandom);
+            pos=this.rooms[roomIdx].findRandomEntityPosition(genRandom);
             if (pos!==null) return(pos);
             
             findTry++;

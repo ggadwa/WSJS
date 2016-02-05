@@ -17,77 +17,110 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
     this.hasStories=hasStories;
     this.level=level;
     
-    this.lowerGrid=null;
-    this.upperGrid=null;
+    this.blockGrid=null;
+    this.platformGrid=null;
     
     this.setupGrid=function()
     {
         var n;
         var count=this.xBlockSize*this.zBlockSize;
         
-        this.lowerGrid=new Uint8Array(count);
-        this.upperGrid=new Uint8Array(count);
-        
-            // lower grid starts all unblocked
-            // and upper grid starts blocked until we add platforms
+        this.blockGrid=new Uint8Array(count);
+        this.platformGrid=new Uint8Array(count);
         
         for (n=0;n!==count;n++) {
-            this.lowerGrid[n]=0;
-            this.upperGrid[n]=1;
+            this.blockGrid[n]=0;
+            this.platformGrid[n]=0;
         }
     };
     
     this.setupGrid();       // supergumba -- IMPORTANT!!!  Move all this after classes!
     
         //
-        // block or unblock off a grid space
+        // flip bits on grid space
         //
         
-    this.blockLowerGrid=function(x,z)
+    this.setBlockGrid=function(x,z)
     {
-        this.lowerGrid[(z*this.zBlockSize)+x]=1;
+        this.blockGrid[(z*this.zBlockSize)+x]=1;
     };
     
-    this.blockUpperGrid=function(x,z)
+    this.setPlatformGrid=function(x,z)
     {
-        this.upperGrid[(z*this.zBlockSize)+x]=1;
-    };
-    
-    this.unblockUpperGrid=function(x,z)
-    {
-        this.upperGrid[(z*this.zBlockSize)+x]=0;
+        this.platformGrid[(z*this.zBlockSize)+x]=1;
     };
     
         //
         // find points in blocked grid space
         //
     
-    this.findRandomFreeLocation=function(genRandom)
+    this.findRandomEntityPosition=function(genRandom)
     {
         var x,z,bx,bz,idx;
         var findTry=0;
         
         while (findTry<25) {
-            x=genRandom.randomInt(0,ROOM_MAX_DIVISIONS);
+            x=genRandom.randomInt(0,this.xBlockSize);
             z=genRandom.randomInt(0,this.zBlockSize);
             
-                // see if lower, than upper is OK
+                // position in middle of block
                 
             bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
             bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
             
             idx=(z*this.zBlockSize)+x;
+            
+                // if the grid spot is blocked, then no
+                // entity spawns at all
                 
-            if (this.lowerGrid[idx]===0) {
-                this.lowerGrid[idx]=1;
-                return(new wsPoint(bx,this.yBound.max,bz));
+            if (this.blockGrid[idx]===0) {
+                
+                this.blockGrid[idx]=1;
+                
+                    // check to see if we can spawn
+                    // to a platform first
+                    
+                if (this.platformGrid[idx]===1) {
+                    return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
+                }
+                else {
+                    return(new wsPoint(bx,this.yBound.max,bz));
+                }
             }
-            else {
-                if (ROOM_PLATFORMS) {
-                    if (this.upperGrid[idx]===0) {
-                        this.upperGrid[idx]=1;
-                        return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
-                    }
+            
+            findTry++;
+        }
+        
+        return(null);
+    };
+    
+    this.findRandomPillarLocation=function(genRandom)
+    {
+        var x,z,bx,bz,idx;
+        var findTry=0;
+        
+        while (findTry<25) {
+            x=genRandom.randomInt(1,(this.xBlockSize-2));       // force pillars away from edge
+            z=genRandom.randomInt(1,(this.zBlockSize-2));
+            
+                // position in middle of block
+                
+            bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
+            bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
+            
+            idx=(z*this.zBlockSize)+x;
+            
+                // can only spawn pillars on non-blocked
+                // grids where there are no platforms
+                
+            if ((this.blockGrid[idx]===0) && (this.platformGrid[idx]===0)) {
+                
+                    // and don't spawn close to anything else as
+                    // pillars can block movement
+                    
+                if ((this.blockGrid[idx-this.zBlockSize]===0) && (this.blockGrid[idx+this.zBlockSize]===0) && (this.blockGrid[idx-1]===0) && (this.blockGrid[idx+1]===0)) {
+                    this.blockGrid[idx]=1;
+                    return(new wsPoint(bx,this.yBound.max,bz));
                 }
             }
             

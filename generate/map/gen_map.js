@@ -273,9 +273,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // get light intensity and point
 
-        var intensity=room.xBound.getSize();
-        var zSize=room.zBound.getSize();
-        if (zSize>intensity) intensity=zSize;
+        var intensity=Math.floor((room.xBound.getSize()+room.zBound.getSize())*0.5);
         
         intensity*=(MAP_LIGHT_FACTOR+(this.genRandom.random()*MAP_LIGHT_FACTOR_EXTRA));
         if (room.hasStories) intensity*=MAP_LIGHT_TWO_STORY_BOOST;
@@ -308,7 +306,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
     this.findRandomBlockOffsetBetweenTwoBounds=function(bound1,bound2)
     {
-        var count;
+        var count,offset;
         var min=bound1.min;
         var max=bound1.max;
         
@@ -316,27 +314,37 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         if (bound2.max<max) max=bound2.max;
         
         count=Math.floor((max-min)/ROOM_BLOCK_WIDTH);
-        return(this.genRandom.randomIndex(count)*ROOM_BLOCK_WIDTH);
+        offset=this.genRandom.randomIndex(count)*ROOM_BLOCK_WIDTH;
+        if (bound1.min<bound2.min) offset+=(bound2.min-bound1.min);           // need to align offset with bounds1
+        
+        return(offset);
     };
 
         //
         // build map recursive room
         //
 
-    this.buildMapRecursiveRoom=function(recurseCount,lastRoomIdx,stairMode,xConnectBound,yConnectBound,zConnectBound,level)
+    this.buildMapRecursiveRoom=function(recurseCount,lastRoom,yLastBound,stairMode,level)
     {
         var n,tryCount;
         var xBlockSize,zBlockSize;
+        var connectSide,connectOffset;
+        var xBound,yBound,zBound;
+        var xStairBound,yStairBound,zStairBound;
+        var stairOffset,stairAdd;
 
-            // get random piece
-            // unless recurse count is 0, then always
-            // start with square
-            
-        xBlockSize=10;
-        zBlockSize=10;
-
-        this.currentRoomCount++;
+            // get random block size for room
+            // and make sure it stays under the max
+            // blocks for room
         
+        xBlockSize=this.genRandom.randomInt(ROOM_MIN_BLOCK_PER_SIDE,ROOM_MAX_BLOCK_PER_SIDE);
+        zBlockSize=this.genRandom.randomInt(ROOM_MIN_BLOCK_PER_SIDE,ROOM_MAX_BLOCK_PER_SIDE);
+        
+        while ((xBlockSize*zBlockSize)>ROOM_MAX_BLOCK_COUNT) {
+            if (xBlockSize>ROOM_MIN_BLOCK_PER_SIDE) xBlockSize--;
+            if (zBlockSize>ROOM_MIN_BLOCK_PER_SIDE) zBlockSize--;
+        }
+
             // can only have a single level
             // change from a room
             
@@ -347,19 +355,16 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             // then it's the first room and it's
             // centered in the map
 
-        var xBound,yBound,zBound;
-        var xStairBound,yStairBound,zStairBound;
+        if (lastRoom===null) {
+            var mapMid=Math.floor(this.view.OPENGL_FAR_Z/2);
 
-        if (lastRoomIdx===-1) {
-            var mapMid=this.view.OPENGL_FAR_Z/2;
-
-            var halfSize=Math.floor(ROOM_DIMENSIONS[0]/2);
+            var halfSize=Math.floor((xBlockSize/2)*ROOM_BLOCK_WIDTH);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(ROOM_DIMENSIONS[1]/2);
+            var halfSize=Math.floor(ROOM_FLOOR_HEIGHT/2);
             yBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(ROOM_DIMENSIONS[2]/2);
+            var halfSize=Math.floor((zBlockSize/2)*ROOM_BLOCK_WIDTH);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
         }
 
@@ -374,61 +379,68 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             while (true) {
                 
                     // get random side and offset
+                    // we can start a new room half off the other
+                    // side and up the last room's side size
 
-                var connectSide=this.genRandom.randomIndex(4);
-                var connectOffset=this.genRandom.randomInt(-5,10);          // supergumba -- needs to consider block of two rooms
+                connectSide=this.genRandom.randomIndex(4);
+                if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
+                    connectOffset=this.genRandom.randomInt(-Math.floor(zBlockSize*0.5),lastRoom.zBlockSize);
+                }
+                else {
+                    connectOffset=this.genRandom.randomInt(-Math.floor(xBlockSize*0.5),lastRoom.xBlockSize);
+                }
+                connectOffset*=ROOM_BLOCK_WIDTH;
                 
-                var stairOffset;
-                var stairAdd=ROOM_BLOCK_WIDTH*2;
-                var roomAdd=ROOM_BLOCK_WIDTH*connectOffset;
+                stairOffset;
+                stairAdd=ROOM_BLOCK_WIDTH*2;
                 
                 switch (connectSide) {
 
                     case ROOM_SIDE_LEFT:
-                        xBound=new wsBound((xConnectBound.min-ROOM_DIMENSIONS[0]),xConnectBound.min);   // supergumba -- need to add in block sizes here instead of just dimensions
-                        zBound=new wsBound((zConnectBound.min+roomAdd),(zConnectBound.max+roomAdd));
+                        xBound=new wsBound((lastRoom.xBound.min-(xBlockSize*ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
+                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*ROOM_BLOCK_WIDTH)));
                         
                         if (stairMode!==STAIR_MODE_NONE) {
                             xBound.add(-stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(zConnectBound,zBound);
-                            xStairBound=new wsBound((xConnectBound.min-stairAdd),xConnectBound.min);
-                            zStairBound=new wsBound((zConnectBound.min+stairOffset),((zConnectBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
+                            xStairBound=new wsBound((lastRoom.xBound.min-stairAdd),lastRoom.xBound.min);
+                            zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
                         }
                         break;
 
                     case ROOM_SIDE_TOP:
-                        xBound=new wsBound((xConnectBound.min+roomAdd),(xConnectBound.max+roomAdd));
-                        zBound=new wsBound((zConnectBound.min-ROOM_DIMENSIONS[2]),zConnectBound.min);
+                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*ROOM_BLOCK_WIDTH)));
+                        zBound=new wsBound((lastRoom.zBound.min-(zBlockSize*ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
                         
                         if (stairMode!==STAIR_MODE_NONE) {
                             zBound.add(-stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(xConnectBound,xBound);
-                            xStairBound=new wsBound((xConnectBound.min+stairOffset),((xConnectBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
-                            zStairBound=new wsBound((zConnectBound.min-stairAdd),zConnectBound.min);
+                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
+                            xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                            zStairBound=new wsBound((lastRoom.zBound.min-stairAdd),lastRoom.zBound.min);
                         }
                         break;
 
                     case ROOM_SIDE_RIGHT:
-                        xBound=new wsBound(xConnectBound.max,(xConnectBound.max+ROOM_DIMENSIONS[0]));
-                        zBound=new wsBound((zConnectBound.min+roomAdd),(zConnectBound.max+roomAdd));
+                        xBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*ROOM_BLOCK_WIDTH)));
+                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*ROOM_BLOCK_WIDTH)));
                         
                         if (stairMode!==STAIR_MODE_NONE) {
                             xBound.add(stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(zConnectBound,zBound);
-                            xStairBound=new wsBound(xConnectBound.max,(xConnectBound.max+stairAdd));
-                            zStairBound=new wsBound((zConnectBound.min+stairOffset),((zConnectBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
+                            xStairBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+stairAdd));
+                            zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
                         }
                         break;
 
                     case ROOM_SIDE_BOTTOM:
-                        xBound=new wsBound((xConnectBound.min+roomAdd),(xConnectBound.max+roomAdd));
-                        zBound=new wsBound(zConnectBound.max,(zConnectBound.max+ROOM_DIMENSIONS[2]));
+                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*ROOM_BLOCK_WIDTH)));
+                        zBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*ROOM_BLOCK_WIDTH)));
                         
                         if (stairMode!==STAIR_MODE_NONE) {
                             zBound.add(stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(xConnectBound,xBound);
-                            xStairBound=new wsBound((xConnectBound.min+stairOffset),((xConnectBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
-                            zStairBound=new wsBound(zConnectBound.max,(zConnectBound.max+stairAdd));
+                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
+                            xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                            zStairBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+stairAdd));
                         }
                         break;
 
@@ -443,21 +455,22 @@ function GenMapObject(view,map,genRandom,callbackFunc)
                 // bounds now the same as last room
                 // until any level changes
                 
-            yBound=yConnectBound.copy();
+            yBound=yLastBound.copy();
         }
 
             // if previous room raised this one, then
             // we need a stairs to the previous room
-
+            
         if (stairMode!==STAIR_MODE_NONE) {
             yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+ROOM_FLOOR_DEPTH)));
             this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(stairMode===STAIR_MODE_DOWN),level);
         }
 
             // the room
-
+            
         var roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,level);
-
+        this.currentRoomCount++;
+        
             // add the light
 
         this.addLight(roomIdx);
@@ -510,7 +523,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
                 // recurse to next room
                 
-            this.buildMapRecursiveRoom((recurseCount+1),roomIdx,nextStairMode,xBound,yNextBound,zBound,nextLevel);
+            this.buildMapRecursiveRoom((recurseCount+1),this.map.rooms[roomIdx],yNextBound,nextStairMode,nextLevel);
         }
     };
     
@@ -528,6 +541,17 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             closet.addCloset();
         }
     };
+    
+    this.buildRoomPillars=function()
+    {
+        var n,pillar;
+        var nRoom=this.map.rooms.length;
+        
+        for (n=0;n!==nRoom;n++) {
+            pillar=new GenRoomPillarObject(this.view,this.map,this.map.rooms[n],genRandom);
+            pillar.addPillars();
+        }
+    };
         
     this.buildRoomDecorations=function()
     {
@@ -536,7 +560,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         for (n=0;n!==nRoom;n++) {
             decoration=new GenRoomDecorationObject(this.view,this.map,this.map.rooms[n],genRandom);
-            decoration.addDecoration();
+            decoration.addDecorations();
         }
     };
 
@@ -559,7 +583,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
         this.currentRoomCount=0;
         
-        this.buildMapRecursiveRoom(0,-1,STAIR_MODE_NONE,null,null,null,0);
+        this.buildMapRecursiveRoom(0,null,null,STAIR_MODE_NONE,0);
         
         this.view.loadingScreenDraw(0.32);
         setTimeout(function() { currentGlobalGenMapObject.buildMapClosets(); },PROCESS_TIMEOUT_MSEC);
@@ -591,8 +615,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     
     this.buildMapDecorations=function()
     {
-            // build room decorations
-            
+            // build room pillars and decorations
+        
+        this.buildRoomPillars();
         this.buildRoomDecorations();
         
             // finish with the callback

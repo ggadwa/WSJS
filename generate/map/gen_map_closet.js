@@ -140,8 +140,15 @@ function GenRoomClosetObject(view,map,room,genRandom)
                 // closet length
                 
             connectSide=this.genRandom.randomIndex(4);
-            connectOffset=this.genRandom.randomInt(0,10);          // supergumba -- needs to consider block of two rooms
-            closetLen=this.genRandom.randomInt(1,ROOM_CLOSET_MAX_LENGTH);
+            
+            if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
+                closetLen=this.genRandom.randomInt(2,(this.room.zBlockSize-2));
+                connectOffset=this.genRandom.randomInt(0,(this.room.zBlockSize-closetLen));
+            }
+            else {
+                closetLen=this.genRandom.randomInt(2,(this.room.xBlockSize-2));
+                connectOffset=this.genRandom.randomInt(0,(this.room.xBlockSize-closetLen));
+            }
             
                 // get the Y bound
 
@@ -172,14 +179,14 @@ function GenRoomClosetObject(view,map,room,genRandom)
                     
                 case ROOM_SIDE_RIGHT:
                     xAdd=0;
-                    zAdd=-ROOM_BLOCK_WIDTH;
+                    zAdd=ROOM_BLOCK_WIDTH;
                     z=room.zBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
                     xClosetBound=new wsBound(room.xBound.max,(room.xBound.max+ROOM_BLOCK_WIDTH));
                     zClosetBound=new wsBound(z,(z+ROOM_BLOCK_WIDTH));
                     break;
                     
                 case ROOM_SIDE_BOTTOM:
-                    xAdd=-ROOM_BLOCK_WIDTH;
+                    xAdd=ROOM_BLOCK_WIDTH;
                     zAdd=0;
                     x=room.xBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
                     xClosetBound=new wsBound(x,(x+ROOM_BLOCK_WIDTH));
