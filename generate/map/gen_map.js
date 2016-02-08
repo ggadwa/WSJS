@@ -185,7 +185,14 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
         if (hasPlatforms) {
             var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom,this.map.rooms[roomIdx]);
-            genRoomPlatform.createPlatforms(xBound,yBound,zBound);
+            genRoomPlatform.createPlatforms();
+        }
+        
+            // ledges
+            
+        if (hasStories) {
+            var genRoomLedge=new GenRoomLedge(this.map,this.genRandom,this.map.rooms[roomIdx]);
+            genRoomLedge.createLedges();
         }
         
             // the ceiling
@@ -326,7 +333,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
     this.buildMapRecursiveRoom=function(recurseCount,lastRoom,yLastBound,stairMode,level)
     {
-        var n,tryCount;
+        var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
         var connectSide,connectOffset;
         var xBound,yBound,zBound;
@@ -468,8 +475,26 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // the room
             
-        var roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,level);
+        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,level);
         this.currentRoomCount++;
+        
+        room=this.map.rooms[roomIdx];
+        
+            // mask off edges that have collided with
+            // the newest room or stairs leading to a room
+            // we use this mask to calculate ledges and other
+            // outside wall hugging map pieces
+        
+        if (lastRoom!==null) {
+            if (stairMode!==STAIR_MODE_NONE) {
+                lastRoom.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
+                room.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
+            }
+            else {
+                lastRoom.maskEdgeGridBlockToRoom(room);
+                room.maskEdgeGridBlockToRoom(lastRoom);
+            }
+        }
         
             // add the light
 
@@ -523,7 +548,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
                 // recurse to next room
                 
-            this.buildMapRecursiveRoom((recurseCount+1),this.map.rooms[roomIdx],yNextBound,nextStairMode,nextLevel);
+            this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextStairMode,nextLevel);
         }
     };
     
@@ -555,6 +580,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
     this.buildRoomDecorations=function()
     {
+        /*
         var n,decoration;
         var nRoom=this.map.rooms.length;
         
@@ -562,6 +588,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             decoration=new GenRoomDecorationObject(this.view,this.map,this.map.rooms[n],genRandom);
             decoration.addDecorations();
         }
+        */
     };
 
         //

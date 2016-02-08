@@ -85,7 +85,7 @@ const OVERLAY_DRAW=true;
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=Math.floor((Math.random()*SEED));
+const SEED_MAP=2; //Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
 const SEED_ENTITY=Math.floor((Math.random()*SEED));
@@ -181,9 +181,10 @@ const MESH_FLAG_ROOM_WALL=1;
 const MESH_FLAG_ROOM_FLOOR=2;
 const MESH_FLAG_ROOM_CEILING=3;
 const MESH_FLAG_ROOM_PLATFORM=4;
-const MESH_FLAG_STAIR=5;
-const MESH_FLAG_LIGHT=6;
-const MESH_FLAG_DECORATION=7;
+const MESH_FLAG_ROOM_LEDGE=5;
+const MESH_FLAG_STAIR=6;
+const MESH_FLAG_LIGHT=7;
+const MESH_FLAG_DECORATION=8;
 
 //
 // room sides

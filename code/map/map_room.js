@@ -22,15 +22,27 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
     
     this.setupGrid=function()
     {
-        var n;
+        var x,z,idx,isEdge;
         var count=this.xBlockSize*this.zBlockSize;
         
         this.blockGrid=new Uint8Array(count);
+        this.edgeGrid=new Uint8Array(count);
         this.platformGrid=new Uint8Array(count);
         
-        for (n=0;n!==count;n++) {
-            this.blockGrid[n]=0;
-            this.platformGrid[n]=0;
+            // everything open, accept the
+            // edges on the block grid as we
+            // never put anything there
+            
+        idx=0;
+        
+        for (z=0;z!==this.zBlockSize;z++) {
+            isEdge=((z===0) || (z===(this.zBlockSize-1)));
+            for (x=0;x!==this.xBlockSize;x++) {
+                this.blockGrid[idx]=((isEdge)||((x===0) || (x===(this.xBlockSize-1))))?1:0;
+                this.edgeGrid[idx]=0;
+                this.platformGrid[idx]=0;
+                idx++;
+            }
         }
     };
     
@@ -42,12 +54,95 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         
     this.setBlockGrid=function(x,z)
     {
-        this.blockGrid[(z*this.zBlockSize)+x]=1;
+        this.blockGrid[(z*this.xBlockSize)+x]=1;
     };
     
     this.setPlatformGrid=function(x,z)
     {
-        this.platformGrid[(z*this.zBlockSize)+x]=1;
+        this.platformGrid[(z*this.xBlockSize)+x]=1;
+    };
+    
+        //
+        // mask edge grid based on collisions with other
+        // rooms or bounds
+        //
+        
+    this.maskEdgeGridBlockToBounds=function(xCollideBound,yCollideBound,zCollideBound)
+    {
+        var x,z,x1,x2,z1,z2,idx;
+        
+            // no blocking if this collision starts above
+            // the current room
+            
+        if (yCollideBound.min<this.yBound.min) return;
+        
+            // find the collision bounds within the block
+            // width and mark off the edge grid
+        
+            // collide on our left
+            
+        if (xCollideBound.max===this.xBound.min) {
+            z1=Math.floor((this.zBound.min-zCollideBound.min)/ROOM_BLOCK_WIDTH);
+            z2=z1+Math.floor(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            if (z1<0) z1=0;
+            if (z1===z2) z2=z1+1;
+            
+            for (z=z1;z<z2;z++) {
+                idx=(z*this.xBlockSize);
+                this.edgeGrid[idx]=1;
+            }
+            return;
+        }
+        
+            // collide on our right
+            
+        if (xCollideBound.min===this.xBound.max) {
+            z1=Math.floor((this.zBound.min-zCollideBound.min)/ROOM_BLOCK_WIDTH);
+            z2=z1+Math.floor(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            if (z1<0) z1=0;
+            if (z1===z2) z2=z1+1;
+            
+            for (z=z1;z<z2;z++) {
+                idx=(z*this.xBlockSize)+(this.xBlockSize-1);
+                this.edgeGrid[idx]=1;
+            }
+            return;
+        }
+        
+            // collide on our top
+            
+        if (zCollideBound.max===this.zBound.min) {
+            x1=Math.floor((this.xBound.min-xCollideBound.min)/ROOM_BLOCK_WIDTH);
+            x2=x1+Math.floor(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            if (x1<0) x1=0;
+            if (x1===x2) x2=x1+1;
+            
+            for (x=x1;x<x2;x++) {
+                idx=x;
+                this.edgeGrid[idx]=1;
+            }
+            return;
+        }
+        
+            // collide on our bottom
+            
+        if (zCollideBound.min===this.zBound.max) {
+            x1=Math.floor((this.xBound.min-xCollideBound.min)/ROOM_BLOCK_WIDTH);
+            x2=x1+Math.floor(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            if (x1<0) x1=0;
+            if (x1===x2) x2=x1+1;
+            
+            for (x=x1;x<x2;x++) {
+                idx=((this.zBlockSize-1)*this.xBlockSize)+x;
+                this.edgeGrid[idx]=1;
+            }
+            return;
+        }
+    };
+    
+    this.maskEdgeGridBlockToRoom=function(collideRoom)
+    {
+        this.maskEdgeGridBlockToBounds(collideRoom.xBound,collideRoom.yBound,collideRoom.zBound);
     };
     
         //
@@ -68,7 +163,7 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
             bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
             
-            idx=(z*this.zBlockSize)+x;
+            idx=(z*this.xBlockSize)+x;
             
                 // if the grid spot is blocked, then no
                 // entity spawns at all
@@ -100,15 +195,15 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         var findTry=0;
         
         while (findTry<25) {
-            x=genRandom.randomInt(1,(this.xBlockSize-2));       // force pillars away from edge
-            z=genRandom.randomInt(1,(this.zBlockSize-2));
+            x=genRandom.randomInt(0,this.xBlockSize);
+            z=genRandom.randomInt(0,this.zBlockSize);
             
                 // position in middle of block
                 
             bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
             bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
             
-            idx=(z*this.zBlockSize)+x;
+            idx=(z*this.xBlockSize)+x;
             
                 // can only spawn pillars on non-blocked
                 // grids where there are no platforms

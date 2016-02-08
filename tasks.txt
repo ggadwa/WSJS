@@ -44,6 +44,11 @@ REGULAR TODOs
         [ ] try to find a way to connect platforms on different rooms together
     [X] pillars get own class?
         [ ] figure out the missing pillar segments
+    [ ] need ledge builder
+        [ ] have own ledge texture
+        [ ] closets block ledges too
+        [ ] and stairs vs room connections
+        [ ] need to do opposite on previous room
     [X] blocking needs the concept of platform blocks
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 
