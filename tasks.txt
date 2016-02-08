@@ -41,6 +41,7 @@ REGULAR TODOs
     [X] flag to make all generated lights white (the default)
     [X] new platforms builder
         [ ] platforms need more decorations
+        [ ] try to find a way to connect platforms on different rooms together
     [X] pillars get own class?
         [ ] figure out the missing pillar segments
     [X] blocking needs the concept of platform blocks
