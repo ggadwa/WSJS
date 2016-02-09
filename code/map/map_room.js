@@ -22,28 +22,35 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
     
     this.setupGrid=function()
     {
-        var x,z,idx,isEdge;
-        var count=this.xBlockSize*this.zBlockSize;
+        var x,z;
         
-        this.blockGrid=new Uint8Array(count);
-        this.edgeGrid=new Uint8Array(count);
-        this.platformGrid=new Uint8Array(count);
-        
-            // everything open, accept the
-            // edges on the block grid as we
-            // never put anything there
+            // make two dimensional arrays or
+            // xBlockSize * zBlockSize
             
-        idx=0;
+        this.blockGrid=[];
+        this.edgeGrid=[];
+        this.platformGrid=[];
         
         for (z=0;z!==this.zBlockSize;z++) {
-            isEdge=((z===0) || (z===(this.zBlockSize-1)));
-            for (x=0;x!==this.xBlockSize;x++) {
-                this.blockGrid[idx]=((isEdge)||((x===0) || (x===(this.xBlockSize-1))))?1:0;
-                this.edgeGrid[idx]=0;
-                this.platformGrid[idx]=0;
-                idx++;
-            }
+            this.blockGrid.push(new Uint8Array(this.xBlockSize));
+            this.edgeGrid.push(new Uint8Array(this.xBlockSize));
+            this.platformGrid.push(new Uint8Array(this.xBlockSize));
         }
+        
+            // the block grid has it's outer
+            // ring blocked off because we never want
+            // to build pieces there
+            
+        for (x=0;x!==this.xBlockSize;x++) {
+            this.blockGrid[0][x]=1;
+            this.blockGrid[this.zBlockSize-1][x]=1;
+        }
+            
+        for (z=0;z!==this.zBlockSize;z++) {
+            this.blockGrid[z][0]=1;
+            this.blockGrid[z][this.xBlockSize-1]=1;
+        }
+        
     };
     
     this.setupGrid();       // supergumba -- IMPORTANT!!!  Move all this after classes!
@@ -54,12 +61,12 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         
     this.setBlockGrid=function(x,z)
     {
-        this.blockGrid[(z*this.xBlockSize)+x]=1;
+        this.blockGrid[z][x]=1;
     };
     
     this.setPlatformGrid=function(x,z)
     {
-        this.platformGrid[(z*this.xBlockSize)+x]=1;
+        this.platformGrid[z][x]=1;
     };
     
         //
@@ -69,7 +76,7 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         
     this.maskEdgeGridBlockToBounds=function(xCollideBound,yCollideBound,zCollideBound)
     {
-        var x,z,x1,x2,z1,z2,idx;
+        var x,z,x1,x2,z1,z2;
         
             // no blocking if this collision starts above
             // the current room
@@ -82,14 +89,13 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our left
             
         if (xCollideBound.max===this.xBound.min) {
-            z1=Math.floor((this.zBound.min-zCollideBound.min)/ROOM_BLOCK_WIDTH);
+            z1=Math.floor((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
             z2=z1+Math.floor(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
-            if (z1===z2) z2=z1+1;
+            if (z2>this.zBlockSize) z2=this.zBlockSize;
             
             for (z=z1;z<z2;z++) {
-                idx=(z*this.xBlockSize);
-                this.edgeGrid[idx]=1;
+                this.edgeGrid[z][0]=1;
             }
             return;
         }
@@ -97,14 +103,13 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our right
             
         if (xCollideBound.min===this.xBound.max) {
-            z1=Math.floor((this.zBound.min-zCollideBound.min)/ROOM_BLOCK_WIDTH);
+            z1=Math.floor((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
             z2=z1+Math.floor(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
-            if (z1===z2) z2=z1+1;
+            if (z2>this.zBlockSize) z2=this.zBlockSize;
             
             for (z=z1;z<z2;z++) {
-                idx=(z*this.xBlockSize)+(this.xBlockSize-1);
-                this.edgeGrid[idx]=1;
+                this.edgeGrid[z][this.xBlockSize-1]=1;
             }
             return;
         }
@@ -112,14 +117,13 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our top
             
         if (zCollideBound.max===this.zBound.min) {
-            x1=Math.floor((this.xBound.min-xCollideBound.min)/ROOM_BLOCK_WIDTH);
+            x1=Math.floor((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
             x2=x1+Math.floor(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
-            if (x1===x2) x2=x1+1;
+            if (x2>this.xBlockSize) x2=this.xBlockSize;
             
             for (x=x1;x<x2;x++) {
-                idx=x;
-                this.edgeGrid[idx]=1;
+                this.edgeGrid[0][x]=1;
             }
             return;
         }
@@ -127,14 +131,13 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our bottom
             
         if (zCollideBound.min===this.zBound.max) {
-            x1=Math.floor((this.xBound.min-xCollideBound.min)/ROOM_BLOCK_WIDTH);
+            x1=Math.floor((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
             x2=x1+Math.floor(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
-            if (x1===x2) x2=x1+1;
+            if (x2>this.xBlockSize) x2=this.xBlockSize;
             
             for (x=x1;x<x2;x++) {
-                idx=((this.zBlockSize-1)*this.xBlockSize)+x;
-                this.edgeGrid[idx]=1;
+                this.edgeGrid[this.zBlockSize-1][x]=1;
             }
             return;
         }
@@ -145,13 +148,18 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         this.maskEdgeGridBlockToBounds(collideRoom.xBound,collideRoom.yBound,collideRoom.zBound);
     };
     
+    this.getEdgeGridValue=function(x,z)
+    {
+        return(this.edgeGrid[z][x]);
+    };
+    
         //
         // find points in blocked grid space
         //
     
     this.findRandomEntityPosition=function(genRandom)
     {
-        var x,z,bx,bz,idx;
+        var x,z,bx,bz;
         var findTry=0;
         
         while (findTry<25) {
@@ -163,19 +171,18 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
             bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
             
-            idx=(z*this.xBlockSize)+x;
-            
                 // if the grid spot is blocked, then no
                 // entity spawns at all
                 
-            if (this.blockGrid[idx]===0) {
+            if (this.blockGrid[z][x]===0) {
                 
-                this.blockGrid[idx]=1;
+                this.blockGrid[z][x]=1;
                 
                     // check to see if we can spawn
                     // to a platform first
                     
-                if (this.platformGrid[idx]===1) {
+                if (this.platformGrid[z][x]===1) {
+                    this.platformGrid[z][x]=2;
                     return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
                 }
                 else {
@@ -191,7 +198,7 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
     
     this.findRandomPillarLocation=function(genRandom)
     {
-        var x,z,bx,bz,idx;
+        var x,z,bx,bz;
         var findTry=0;
         
         while (findTry<25) {
@@ -203,18 +210,16 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
             bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
             
-            idx=(z*this.xBlockSize)+x;
-            
                 // can only spawn pillars on non-blocked
                 // grids where there are no platforms
                 
-            if ((this.blockGrid[idx]===0) && (this.platformGrid[idx]===0)) {
+            if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
                 
                     // and don't spawn close to anything else as
                     // pillars can block movement
                     
-                if ((this.blockGrid[idx-this.zBlockSize]===0) && (this.blockGrid[idx+this.zBlockSize]===0) && (this.blockGrid[idx-1]===0) && (this.blockGrid[idx+1]===0)) {
-                    this.blockGrid[idx]=1;
+                if ((this.blockGrid[z][x-1]===0) && (this.blockGrid[z][x+1]===0) && (this.blockGrid[z-1][x]===0) && (this.blockGrid[z+1][x]===0)) {
+                    this.blockGrid[z][x]=1;
                     return(new wsPoint(bx,this.yBound.max,bz));
                 }
             }

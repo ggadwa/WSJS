@@ -202,6 +202,8 @@ function GenRoomClosetObject(view,map,room,genRandom)
                 this.createClosetCube(map,xClosetBound,yClosetBound,zClosetBound);
                 map.addOverlayCloset(xClosetBound,zClosetBound);
                 
+                this.room.maskEdgeGridBlockToBounds(xClosetBound,yClosetBound,zClosetBound);    // block off ledges for edge grid
+                
                 xClosetBound.add(xAdd);
                 zClosetBound.add(zAdd);
             }

@@ -46,9 +46,10 @@ REGULAR TODOs
         [ ] figure out the missing pillar segments
     [ ] need ledge builder
         [ ] have own ledge texture
-        [ ] closets block ledges too
-        [ ] and stairs vs room connections
-        [ ] need to do opposite on previous room
+        [ ] randomize them appearing
+        [X] closets block ledges too
+        [X] and stairs vs room connections
+        [X] need to do opposite on previous room
     [X] blocking needs the concept of platform blocks
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 

@@ -135,27 +135,26 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
     this.addRegularRoom=function(xBlockSize,zBlockSize,xBound,yBound,zBound,level)
     {
+        var n,mesh,mesh2;
+        var storyCount,yStoryBound,yFloorBound;
+        var roomIdx,room;
+        var hasStories;
         var roomBitmap=this.map.getBitmapById(TEXTURE_WALL);
         
-            // stories and platforms
+            // stories, platforms, and ledges
             
-        var hasStories=false;
-        var hasPlatforms=false;
-        
         if (level===0) {
             hasStories=true;
-            hasPlatforms=((hasStories) && (ROOM_PLATFORMS));
         }
         else {
             hasStories=this.genRandom.randomPercentage(ROOM_UPPER_TALL_PERCENTAGE);
-            hasPlatforms=false;
         }
             
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        var roomIdx=this.map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level);
-        var room=this.map.rooms[roomIdx];
+        roomIdx=this.map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level);
+        room=this.map.rooms[roomIdx];
         
             // floor
             
@@ -163,11 +162,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // walls
             
-        var n,mesh,mesh2;
-        var storyCount=hasStories?2:1;
-        var yStoryBound=yBound.copy();
-        var yFloorBound;
-        
+        storyCount=hasStories?2:1;
+        yStoryBound=yBound.copy();
+            
         for (n=0;n!==storyCount;n++) {
             mesh=room.createMeshWalls(roomBitmap,yStoryBound,MESH_FLAG_ROOM_WALL);
 
@@ -179,20 +176,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             if (n===0) this.map.addOverlayRoom(room);
             
             yStoryBound.add(-(yBound.getSize()+ROOM_FLOOR_DEPTH));
-        }
-        
-            // platforms
-            
-        if (hasPlatforms) {
-            var genRoomPlatform=new GenRoomPlatform(this.map,this.genRandom,this.map.rooms[roomIdx]);
-            genRoomPlatform.createPlatforms();
-        }
-        
-            // ledges
-            
-        if (hasStories) {
-            var genRoomLedge=new GenRoomLedge(this.map,this.genRandom,this.map.rooms[roomIdx]);
-            genRoomLedge.createLedges();
         }
         
             // the ceiling
@@ -553,7 +536,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     };
     
         //
-        // closets and decorations
+        // closets, platforms, ledges, pillars and decorations
         //
         
     this.buildRoomClosets=function()
@@ -564,6 +547,36 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         for (n=0;n!==nRoom;n++) {
             closet=new GenRoomClosetObject(this.view,this.map,this.map.rooms[n],genRandom);
             closet.addCloset();
+        }
+    };
+    
+    this.buildRoomPlatforms=function()
+    {
+        var n,room,platform;
+        var nRoom=this.map.rooms.length;
+        
+        for (n=0;n!==nRoom;n++) {
+            room=this.map.rooms[n];
+            
+            if ((room.hasStories) && (room.level===0) && (ROOM_PLATFORMS)) {
+                platform=new GenRoomPlatformObject(this.map,this.genRandom,room);
+                platform.createPlatforms();
+            }
+        }
+    };
+    
+    this.buildRoomLedges=function()
+    {
+        var n,room,ledge;
+        var nRoom=this.map.rooms.length;
+        
+        for (n=0;n!==nRoom;n++) {
+            room=this.map.rooms[n];
+            
+            if ((ROOM_LEDGES) && (this.genRandom.randomPercentage(ROOM_LEDGE_PERCENTAGE))) {
+                ledge=new GenRoomLedgeObject(this.map,this.genRandom,room);
+                ledge.createLedges();
+            }
         }
     };
     
@@ -599,7 +612,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     {
         currentGlobalGenMapObject=this;
         
-        this.view.loadingScreenDraw(0.16);
+        this.view.loadingScreenDraw(0.12);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -612,7 +625,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         this.buildMapRecursiveRoom(0,null,null,STAIR_MODE_NONE,0);
         
-        this.view.loadingScreenDraw(0.32);
+        this.view.loadingScreenDraw(0.24);
         setTimeout(function() { currentGlobalGenMapObject.buildMapClosets(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -624,7 +637,31 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // finish with the callback
 
+        this.view.loadingScreenDraw(0.36);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapPlatforms(); },PROCESS_TIMEOUT_MSEC);
+    };
+    
+    this.buildMapPlatforms=function()
+    {
+            // build room platforms
+            
+        this.buildRoomPlatforms();
+        
+            // finish with the callback
+
         this.view.loadingScreenDraw(0.48);
+        setTimeout(function() { currentGlobalGenMapObject.buildMapLedges(); },PROCESS_TIMEOUT_MSEC);
+    };
+    
+    this.buildMapLedges=function()
+    {
+            // build room platforms
+            
+        this.buildRoomLedges();
+        
+            // finish with the callback
+
+        this.view.loadingScreenDraw(0.60);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -636,7 +673,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // finish with the callback
             
-        this.view.loadingScreenDraw(0.64);
+        this.view.loadingScreenDraw(0.72);
         setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },PROCESS_TIMEOUT_MSEC);
     };
     
@@ -649,7 +686,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // finish with the callback
             
-        this.view.loadingScreenDraw(0.86);
+        this.view.loadingScreenDraw(0.84);
         setTimeout(function() { currentGlobalGenMapObject.buildMapFinish(); },PROCESS_TIMEOUT_MSEC);
     };
     

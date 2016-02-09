@@ -19,7 +19,7 @@ const ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connecti
 const ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
 //
-// closets and platforms
+// closets, platforms, ledges
 //
 
 const ROOM_CLOSET_MAX_COUNT=5;                  // maximum number of possible closets in room
@@ -28,7 +28,11 @@ const ROOM_CLOSET_UP_PERCENTAGE=0.25;           // what % of the time a closet g
 const ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform will have a secondary turn
 const ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
 
+const ROOM_LEDGE_PERCENTAGE=0.5;                // percentage of > 1 story rooms that have ledges
+const ROOM_LEDGE_HEIGHT=1000;                   // height of ledges
+
 const ROOM_PLATFORMS=true;                      // turns on or off platforms
+const ROOM_LEDGES=true;
 
 //
 // pillars and decorations
@@ -85,7 +89,7 @@ const OVERLAY_DRAW=true;
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=2; //Math.floor((Math.random()*SEED));
+const SEED_MAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
 const SEED_ENTITY=Math.floor((Math.random()*SEED));
@@ -167,10 +171,11 @@ const TEXTURE_FLOOR=1;
 const TEXTURE_CEILING=2;
 const TEXTURE_STAIR=3;
 const TEXTURE_PLATFORM=4;
-const TEXTURE_LIGHT=5;
-const TEXTURE_BOX=6;
-const TEXTURE_PILLAR=7;
-const TEXTURE_CLOSET=8;
+const TEXTURE_LEDGE=5;
+const TEXTURE_LIGHT=6;
+const TEXTURE_BOX=7;
+const TEXTURE_PILLAR=8;
+const TEXTURE_CLOSET=9;
 
 //
 // map mesh flags
