@@ -29,7 +29,10 @@ const ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform
 const ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
 
 const ROOM_LEDGE_PERCENTAGE=0.5;                // percentage of > 1 story rooms that have ledges
-const ROOM_LEDGE_HEIGHT=1000;                   // height of ledges
+const ROOM_LEDGE_MIN_HEIGHT=500;                // minimum height of ledges
+const ROOM_LEDGE_EXTRA_HEIGHT=1000;             // extra height of ledges
+const ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
+const ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
 
 const ROOM_PLATFORMS=true;                      // turns on or off platforms
 const ROOM_LEDGES=true;

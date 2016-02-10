@@ -45,8 +45,12 @@ REGULAR TODOs
     [X] pillars get own class?
         [ ] figure out the missing pillar segments
     [ ] need ledge builder
-        [ ] have own ledge texture
-        [ ] randomize them appearing
+        [ ] need ledge types
+              [ ] current flat ledge
+              [ ] wedges
+              [ ] supports
+        [X] have own ledge texture
+        [X] randomize them appearing
         [X] closets block ledges too
         [X] and stairs vs room connections
         [X] need to do opposite on previous room
