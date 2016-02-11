@@ -29,8 +29,8 @@ const ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform
 const ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
 
 const ROOM_LEDGE_PERCENTAGE=0.5;                // percentage of > 1 story rooms that have ledges
-const ROOM_LEDGE_MIN_HEIGHT=500;                // minimum height of ledges
-const ROOM_LEDGE_EXTRA_HEIGHT=1000;             // extra height of ledges
+const ROOM_LEDGE_MIN_HEIGHT=200;                // minimum height of ledges
+const ROOM_LEDGE_EXTRA_HEIGHT=800;             // extra height of ledges
 const ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
 const ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
 
@@ -69,14 +69,14 @@ const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=0;
-const MONSTER_ENTITY_COUNT=0;
+const MONSTER_MODEL_COUNT=3;
+const MONSTER_ENTITY_COUNT=15;
 
 //
 // overlays

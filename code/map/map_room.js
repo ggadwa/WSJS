@@ -205,23 +205,14 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             x=genRandom.randomInt(0,this.xBlockSize);
             z=genRandom.randomInt(0,this.zBlockSize);
             
-                // position in middle of block
-                
-            bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
-            bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
-            
                 // can only spawn pillars on non-blocked
                 // grids where there are no platforms
                 
             if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
-                
-                    // and don't spawn close to anything else as
-                    // pillars can block movement
-                    
-                if ((this.blockGrid[z][x-1]===0) && (this.blockGrid[z][x+1]===0) && (this.blockGrid[z-1][x]===0) && (this.blockGrid[z+1][x]===0)) {
-                    this.blockGrid[z][x]=1;
-                    return(new wsPoint(bx,this.yBound.max,bz));
-                }
+                this.blockGrid[z][x]=1;
+                bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
+                bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
+                return(new wsPoint(bx,this.yBound.max,bz));
             }
             
             findTry++;

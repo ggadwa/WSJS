@@ -222,7 +222,7 @@ function MeshPrimitivesObject()
         
     this.createMeshCylinder=function(bitmap,centerPt,yBound,segments,flags)
     {
-        var n,k,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
+        var n,k,t,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         var topRad,botRad;
         
             // get cylder size
@@ -277,13 +277,41 @@ function MeshPrimitivesObject()
                 bx2=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
                 bz2=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
 
-                vertexList[vIdx++].position.set(tx,ySegBound.min,tz);
-                vertexList[vIdx++].position.set(tx2,ySegBound.min,tz2);
-                vertexList[vIdx++].position.set(bx,ySegBound.max,bz);
-                vertexList[vIdx++].position.set(tx2,ySegBound.min,tz2);
-                vertexList[vIdx++].position.set(bx2,ySegBound.max,bz2);
-                vertexList[vIdx++].position.set(bx,ySegBound.max,bz);
-
+                    // the points
+                
+                v=vertexList[vIdx];
+                v.position.set(tx,ySegBound.min,tz);
+                v.uv.set((ang/360.0),0.0);
+                
+                v=vertexList[vIdx+1];
+                v.position.set(tx2,ySegBound.min,tz2);
+                v.uv.set((ang2/360.0),0.0);
+                
+                v=vertexList[vIdx+2];
+                v.position.set(bx,ySegBound.max,bz);
+                v.uv.set((ang/360.0),1.0);
+                
+                v=vertexList[vIdx+3];
+                v.position.set(tx2,ySegBound.min,tz2);
+                v.uv.set((ang2/360.0),0.0);
+                
+                v=vertexList[vIdx+4];
+                v.position.set(bx2,ySegBound.max,bz2);
+                v.uv.set((ang2/360.0),1.0);
+                
+                v=vertexList[vIdx+5];
+                v.position.set(bx,ySegBound.max,bz);
+                v.uv.set((ang/360.0),1.0);
+                
+                    // the normals
+                    
+                for (t=0;t!==6;t++) {
+                    v=vertexList[vIdx++];
+                    v.normal.setFromSubPoint(v.position,centerPt);
+                    v.normal.y=0.0;
+                    v.normal.normalize();
+                }
+                
                 ang=ang2;
             }
 
@@ -298,12 +326,8 @@ function MeshPrimitivesObject()
             ySegBound.min-=yAdd;
         }
 
-            // calculate the normals, then use those to
-            // calcualte the uvs, and finally the UVs to
-            // calculate the tangents
+            // calcualte the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,null,false);
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh

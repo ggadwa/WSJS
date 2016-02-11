@@ -593,7 +593,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
     this.buildRoomDecorations=function()
     {
-        /*
         var n,decoration;
         var nRoom=this.map.rooms.length;
         
@@ -601,7 +600,6 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             decoration=new GenRoomDecorationObject(this.view,this.map,this.map.rooms[n],genRandom);
             decoration.addDecorations();
         }
-        */
     };
 
         //

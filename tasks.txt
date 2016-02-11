@@ -29,22 +29,21 @@ REGULAR TODOs
     [X] fixed some bug in lost float/int conversions
     [X] speed up bitmap creation
 
-    [ ] use randomIndex
 
 [ ] map generation
     [X] v2 of map generator
     [ ] decorations updates
-         [ ] in all rooms
+         [X] in all rooms
          [ ] by block
          [ ] stack boxes
-         [ ] need floor variations
+         [ ] machine + texture
+
     [X] flag to make all generated lights white (the default)
     [X] new platforms builder
         [ ] platforms need more decorations
         [ ] try to find a way to connect platforms on different rooms together
     [X] pillars get own class?
-        [ ] figure out the missing pillar segments
-    [ ] need ledge builder
+    [X] need ledge builder
         [ ] need ledge types
               [ ] current flat ledge
               [ ] wedges
@@ -68,7 +67,7 @@ REGULAR TODOs
 
 [ ] models
     [X] speed up model creation
-    [ ] will need to seam the 0->1 edge
+    [X] will need to seam the 0->1 edge
 
     
     

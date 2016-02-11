@@ -63,9 +63,6 @@ function GenRoomDecorationObject(view,map,room,genRandom)
 
     this.addDecorations=function()
     {
-        this.addBoxes();
-        return;
-        
             // this map have decorations?
             
         if (!ROOM_DECORATIONS) return;
