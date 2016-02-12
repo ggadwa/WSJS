@@ -4,11 +4,13 @@
 // input class
 //
 
-function InputObject()
+function InputObject(view)
 {
+    this.view=view;
+    
         // input flags
         
-    this.keyFlags=new Uint16Array(255);
+    this.keyFlags=new Uint8Array(255);
 
     this.mouseFirstMove=true;
     this.mouseLastPos=new ws2DIntPoint(0,0);
@@ -19,7 +21,7 @@ function InputObject()
         // initialize/release input
         //
 
-    this.initialize=function(view,playerEntity)
+    this.initialize=function(playerEntity)
     {
         var n;
         
@@ -78,9 +80,20 @@ function InputObject()
         if (this.keyFlags[65]) this.playerEntity.sideSpeed=-75.0;
         if (this.keyFlags[68]) this.playerEntity.sideSpeed=75.0;
         
-            // space, jump
+            // space jump
             
         if (this.keyFlags[32]) this.playerEntity.startJump();
+        
+            // q fire
+            
+        if (this.keyFlags[81]) console.log('fire!');
+        
+            // m flips map on/off
+            
+        if (this.keyFlags[77]) {
+            this.keyFlags[77]=0;        // force it up
+            view.mapOverlayStateFlip();
+        }
 
             // - and +
             // up or down

@@ -8,6 +8,9 @@ function WeaponObject(model)
 {
     this.model=model;
     
+    this.handOffset=new wsPoint(0,0,0);
+    this.handAngle=new wsPoint(0,0,0);
+    
         //
         // draw weapon
         //
@@ -26,22 +29,22 @@ function WeaponObject(model)
     {
             // get new position
             
-        var pos=new wsPoint(0,0,2500);      // supergumba -- all this is hardcoded!
-        pos.rotate(entity.angle);
-        pos.addPoint(entity.position);
+        this.handOffset.set(0,0,2500);      // supergumba -- all this is hardcoded!
+        this.handOffset.rotate(entity.angle);
+        this.handOffset.addPoint(entity.position);
         
-        pos.y-=1000;        // supergumba -- all this is hardcoded!
+        this.handOffset.y-=1000;        // supergumba -- all this is hardcoded!
         
             // and rotational angle
             
-        var ang=entity.angle.copy();
-        ang.x=(-ang.x)-15.0;
-        ang.y+=180.0;
+        this.handAngle.setFromPoint(entity.angle);
+        this.handAngle.x=(-this.handAngle.x)-15.0;
+        this.handAngle.y+=180.0;
        
             // move vertexes to reflect
             // angle and offset of weapon
             
-        this.model.mesh.updateVertexesToAngleAndPosition(view,ang,pos);
+        this.model.mesh.updateVertexesToAngleAndPosition(view,this.handAngle,this.handOffset);
         
             // draw the model
             

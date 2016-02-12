@@ -159,17 +159,12 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
     
     this.findRandomEntityPosition=function(genRandom)
     {
-        var x,z,bx,bz;
-        var findTry=0;
+        var x,z,startX,startZ,bx,bz;
         
-        while (findTry<25) {
-            x=genRandom.randomInt(0,this.xBlockSize);
-            z=genRandom.randomInt(0,this.zBlockSize);
-            
-                // position in middle of block
-                
-            bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
-            bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
+        x=startX=genRandom.randomInt(0,this.xBlockSize);
+        z=startZ=genRandom.randomInt(0,this.zBlockSize);
+        
+        while (true) {
             
                 // if the grid spot is blocked, then no
                 // entity spawns at all
@@ -181,6 +176,9 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
                     // check to see if we can spawn
                     // to a platform first
                     
+                bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                    
                 if (this.platformGrid[z][x]===1) {
                     this.platformGrid[z][x]=2;
                     return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
@@ -190,7 +188,16 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
                 }
             }
             
-            findTry++;
+                // move a square over and try again
+                
+            x++;
+            if (x>=this.xBlockSize) {
+                x=0;
+                z++;
+                if (z>=this.zBlockSize) z=0;
+            }
+            
+            if ((x===startX) && (z===startZ)) break;
         }
         
         return(null);
@@ -198,24 +205,72 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
     
     this.findRandomPillarLocation=function(genRandom)
     {
-        var x,z,bx,bz;
-        var findTry=0;
+        var x,z,startX,startZ,mx,mz,bx,bz;
         
-        while (findTry<25) {
-            x=genRandom.randomInt(0,this.xBlockSize);
-            z=genRandom.randomInt(0,this.zBlockSize);
+        x=startX=genRandom.randomInt(0,this.xBlockSize);
+        z=startZ=genRandom.randomInt(0,this.zBlockSize);
+        
+        mx=Math.floor(this.xBlockSize/2);
+        mz=Math.floor(this.zBlockSize/2);
+        
+        while (true) {
             
                 // can only spawn pillars on non-blocked
-                // grids where there are no platforms
+                // grids where there are no platforms and not
+                // the middle of the room (it'll block light)
+            
+            if ((x!==mx) && (z!==mz)) {
+                if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
+                    this.blockGrid[z][x]=1;
+                    bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+                    bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                    return(new wsPoint(bx,this.yBound.max,bz));
+                }
+            }
+            
+                // move a square over and try again
                 
-            if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
+            x++;
+            if (x>=this.xBlockSize) {
+                x=0;
+                z++;
+                if (z>=this.zBlockSize) z=0;
+            }
+            
+            if ((x===startX) && (z===startZ)) break;
+        }
+        
+        return(null);
+    };
+    
+    this.findRandomDecorationLocation=function(genRandom)
+    {
+        var x,z,startX,startZ,bx,bz;
+        
+        x=startX=genRandom.randomInt(0,this.xBlockSize);
+        z=startZ=genRandom.randomInt(0,this.zBlockSize);
+        
+        while (true) {
+            
+                // decorations only spawn on bottom
+            
+            if (this.blockGrid[z][x]===0) {
                 this.blockGrid[z][x]=1;
-                bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH*0.5));
-                bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH*0.5));
+                bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
             
-            findTry++;
+                // move a square over and try again
+                
+            x++;
+            if (x>=this.xBlockSize) {
+                x=0;
+                z++;
+                if (z>=this.zBlockSize) z=0;
+            }
+            
+            if ((x===startX) && (z===startZ)) break;
         }
         
         return(null);

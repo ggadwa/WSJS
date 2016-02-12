@@ -30,12 +30,17 @@ REGULAR TODOs
     [X] speed up bitmap creation
 
 
+[ ] optimizations
+     [ ] get rid of as many news as possible
+         [X] collision routines are a really bad spot
+     [ ] get rid of any copy()
+
 [ ] map generation
     [X] v2 of map generator
     [ ] decorations updates
          [X] in all rooms
-         [ ] by block
-         [ ] stack boxes
+         [X] by block
+         [X] stack boxes
          [ ] machine + texture
 
     [X] flag to make all generated lights white (the default)
@@ -90,6 +95,7 @@ REGULAR TODOs
     [X] clear z-buffer?
 
 [ ] projectiles
+[ ] particles
 
 [ ] need to deal with pausing time stamps
 

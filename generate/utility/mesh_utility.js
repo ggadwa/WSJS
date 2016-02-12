@@ -335,6 +335,21 @@ function MeshUtilityObject()
         }
     };
     
+        //
+        // rotate vertexes
+        //
+        
+    this.rotateVertexes=function(vertexList,centerPt,ang)
+    {
+        var n,nVertex;
+        
+        nVertex=vertexList.length;
+        
+        for (n=0;n!==nVertex;n++) {
+            vertexList[n].position.rotateAroundPoint(centerPt,ang);
+        }
+    };
+    
 }
 
 var meshUtility=new MeshUtilityObject();

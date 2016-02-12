@@ -55,7 +55,7 @@ function GenRoomPlatformObject(map,genRandom,room)
         var yPlatformBound=new wsBound((this.room.yBound.min-ROOM_FLOOR_DEPTH),this.room.yBound.min);
         var zPlatformBound=new wsBound((this.room.zBound.min+(z*ROOM_BLOCK_WIDTH)),(this.room.zBound.min+((z+1)*ROOM_BLOCK_WIDTH)));
 
-        this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,false,true,true,true,true,true,true,false,MESH_FLAG_ROOM_PLATFORM));
+        this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_ROOM_PLATFORM));
 
             // can now spawn items unto upper grid
             

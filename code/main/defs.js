@@ -282,9 +282,9 @@ function wsPoint(x,y,z)
         }
         
         if (centerPt!==null) {
-            x+=centerPt.x;
-            y+=centerPt.y;
-            z+=centerPt.z;
+            this.x+=centerPt.x;
+            this.y+=centerPt.y;
+            this.z+=centerPt.z;
         }
     };
                 
@@ -496,44 +496,14 @@ function ws2DIntPoint(x,y)
     };
 }
 
-function wsAngle(x,y,z)
-{
-    this.x=x;
-    this.y=y;
-    this.z=z;
-    
-    this.set=function(xSet,ySet,zSet)
-    {
-        this.x=xSet;
-        this.y=ySet;
-        this.z=zSet;
-    };
-    
-    this.setFromAngle=function(ang)
-    {
-        this.x=ang.x;
-        this.y=ang.y;
-        this.z=ang.z;
-    };
-                
-    this.copy=function()
-    {
-        return(new wsAngle(this.x,this.y,this.z));
-    };
-}
-
 function wsLine(p1,p2)
 {
     this.p1=p1;
     this.p2=p2;
     
-    this.setPoint1=function(p1)
+    this.set=function(p1,p2)
     {
         this.p1=p1;
-    };
-    
-    this.setPoint2=function(p2)
-    {
         this.p2=p2;
     };
     
@@ -564,13 +534,9 @@ function ws2DLine(p1,p2)
     this.p1=p1;
     this.p2=p2;
     
-    this.setPoint1=function(p1)
+    this.set=function(p1,p2)
     {
         this.p1=p1;
-    };
-    
-    this.setPoint2=function(p2)
-    {
         this.p2=p2;
     };
     
@@ -601,6 +567,18 @@ function wsBound(value1,value2)
         this.min=value2;
         this.max=value1;
     }
+    
+    this.set=function(value1,value2)
+    {
+        if (value1<value2) {
+            this.min=value1;
+            this.max=value2;
+        }
+        else {
+            this.min=value2;
+            this.max=value1;
+        }
+    };
     
     this.add=function(addValue)
     {

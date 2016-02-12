@@ -7,7 +7,7 @@
 function ViewCameraObject()
 {
     this.position=new wsPoint(0.0,0.0,0.0);
-    this.angle=new wsAngle(0.0,0.0,0.0);
+    this.angle=new wsPoint(0.0,0.0,0.0);
     
         //
         // set camera to entity
@@ -17,7 +17,7 @@ function ViewCameraObject()
     {
         this.position.setFromPoint(entity.position);
         this.position.y-=eyeHigh;
-        this.angle.setFromAngle(entity.angle);
+        this.angle.setFromPoint(entity.angle);
     };
     
 }
@@ -46,6 +46,8 @@ function ViewObject()
     this.high=0;
     this.aspect=0.0;
     this.lookAtUpVector=new wsPoint(0.0,1.0,0.0);
+    
+    this.eyePos=new wsPoint(0.0,0.0,0.0);
 
         // the gl matrixes
         
@@ -58,6 +60,10 @@ function ViewObject()
         
     this.billboardXMatrix=null;
     this.billboardYMatrix=null;
+    
+        // overlay drawing
+        
+    this.drawOverlay=false;
     
         // in game random
         
@@ -178,16 +184,23 @@ function ViewObject()
     };
     
         //
+        // interface controls
+        //
+        
+    this.mapOverlayStateFlip=function()
+    {
+        this.drawOverlay=!this.drawOverlay;
+    };
+    
+        //
         // convert coordinate to eye coordinates
         //
     
-    this.convertToEyeCoordinates=function(pt)
+    this.convertToEyeCoordinates=function(pt,eyePt)
     {
-        var x=(pt.x*this.modelMatrix[0])+(pt.y*this.modelMatrix[4])+(pt.z*this.modelMatrix[8])+this.modelMatrix[12];
-        var y=(pt.x*this.modelMatrix[1])+(pt.y*this.modelMatrix[5])+(pt.z*this.modelMatrix[9])+this.modelMatrix[13];
-        var z=(pt.x*this.modelMatrix[2])+(pt.y*this.modelMatrix[6])+(pt.z*this.modelMatrix[10])+this.modelMatrix[14];
-        
-        return(new wsPoint(x,y,z));
+        eyePt.x=(pt.x*this.modelMatrix[0])+(pt.y*this.modelMatrix[4])+(pt.z*this.modelMatrix[8])+this.modelMatrix[12];
+        eyePt.y=(pt.x*this.modelMatrix[1])+(pt.y*this.modelMatrix[5])+(pt.z*this.modelMatrix[9])+this.modelMatrix[13];
+        eyePt.z=(pt.x*this.modelMatrix[2])+(pt.y*this.modelMatrix[6])+(pt.z*this.modelMatrix[10])+this.modelMatrix[14];
     };
     
         //
@@ -262,14 +275,14 @@ function ViewObject()
         // build look at matrix
         //
      
-    this.buildLookAtMatrix=function(eyePos,centerPos)
+    this.buildLookAtMatrix=function(centerPos)
     {
         var x0,x1,x2,y0,y1,y2,z0,z1,z2;
         var f;
 
-        z0=eyePos.x-centerPos.x;
-        z1=eyePos.y-centerPos.y;
-        z2=eyePos.z-centerPos.z;
+        z0=this.eyePos.x-centerPos.x;
+        z1=this.eyePos.y-centerPos.y;
+        z2=this.eyePos.z-centerPos.z;
 
         f=Math.sqrt((z0*z0)+(z1*z1)+(z2*z2));
         f=1.0/f;
@@ -311,9 +324,9 @@ function ViewObject()
         mat[9]=y2;
         mat[10]=z2;
         mat[11]=0.0;
-        mat[12]=-((x0*eyePos.x)+(x1*eyePos.y)+(x2*eyePos.z));
-        mat[13]=-((y0*eyePos.x)+(y1*eyePos.y)+(y2*eyePos.z));
-        mat[14]=-((z0*eyePos.x)+(z1*eyePos.y)+(z2*eyePos.z));
+        mat[12]=-((x0*this.eyePos.x)+(x1*this.eyePos.y)+(x2*this.eyePos.z));
+        mat[13]=-((y0*this.eyePos.x)+(y1*this.eyePos.y)+(y2*this.eyePos.z));
+        mat[14]=-((z0*this.eyePos.x)+(z1*this.eyePos.y)+(z2*this.eyePos.z));
         mat[15]=1.0;
 
         return(mat);
@@ -453,13 +466,13 @@ function ViewObject()
             // get the eye point and rotate it
             // around the view position
 
-        var eyePos=new wsPoint(this.camera.position.x,this.camera.position.y,(this.camera.position.z-this.OPENGL_NEAR_Z));
-        eyePos.rotateX(this.camera.position,this.camera.angle.x);
-        eyePos.rotateY(this.camera.position,this.camera.angle.y);
+        this.eyePos.set(this.camera.position.x,this.camera.position.y,(this.camera.position.z-this.OPENGL_NEAR_Z));
+        this.eyePos.rotateX(this.camera.position,this.camera.angle.x);
+        this.eyePos.rotateY(this.camera.position,this.camera.angle.y);
 
             // setup the look at
 
-        this.modelMatrix=this.buildLookAtMatrix(eyePos,this.camera.position);
+        this.modelMatrix=this.buildLookAtMatrix(this.camera.position);
 
             // create the 3x3 normal matrix
             // the normal is the invert-transpose of the model matrix
@@ -484,7 +497,7 @@ function ViewObject()
         
         for (n=0;n!==this.LIGHT_COUNT;n++) {
             light=this.lights[n];
-            if (light!==null) light.eyePosition=this.convertToEyeCoordinates(light.position);
+            if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
         }
 
             // build the culling frustum
@@ -535,7 +548,7 @@ function ViewObject()
         
             // map overlay
             
-        if (OVERLAY_DRAW) map.overlayDraw(this,entityList);
+        if (this.drawOverlay) map.overlayDraw(this,entityList);
         
             // text overlays
 

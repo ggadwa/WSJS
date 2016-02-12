@@ -26,7 +26,7 @@ var view=new ViewObject();
 var map=new MapObject();
 var modelList=new ModelListObject();
 var entityList=new EntityListObject();
-var input=new InputObject();
+var input=new InputObject(view);
 var debug=new DebugObject();
 
 //
@@ -341,7 +341,7 @@ function wsInitBuildEntities()
         return;
     }
 
-    var playerEntity=new EntityObject(pos,new wsAngle(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
+    var playerEntity=new EntityObject(pos,new wsPoint(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
     playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0')));
     playerEntity.setCurrentWeaponIndex(0);
     
@@ -358,7 +358,7 @@ function wsInitBuildEntities()
         monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
         model=modelList.clone(view,monsterModelName);
         
-        entityList.add(new EntityObject(pos,new wsAngle(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model,false));
+        entityList.add(new EntityObject(pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model,false));
     }
     
         // finished
@@ -383,7 +383,7 @@ function wsInitFinish()
     
         // start the input
         
-    input.initialize(view,entityList.getPlayer());
+    input.initialize(entityList.getPlayer());
 
         // start the main loop
     

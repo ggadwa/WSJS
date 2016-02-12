@@ -18,6 +18,12 @@ function MapObject()
     
     this.overlay=new MapOverlayObject();
     
+    this.cameraVector=new wsPoint(0,0,0);           // global not local so they won't get GCd
+    this.lightVector=new wsPoint(0,0,0);
+    this.lightXBound=new wsBound(0,0);
+    this.lightYBound=new wsBound(0,0);
+    this.lightZBound=new wsBound(0,0);
+    
         //
         // initialize and release
         //
@@ -209,9 +215,8 @@ function MapObject()
 
     this.buildLightMeshIntersectLists=function()
     {
-        var n,k,i,nIntersect,light,mesh,pt;
+        var n,k,i,nIntersect,light,mesh;
         var meshIndexes,lightIndexes;
-        var lightXBound,lightYBound,lightZBound;
         var nLight=this.lights.length;
         var nMesh=this.meshes.length;
 
@@ -221,9 +226,9 @@ function MapObject()
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
             
-            lightXBound=light.getXBound();
-            lightYBound=light.getYBound();
-            lightZBound=light.getZBound();
+            light.getXBound(this.lightXBound);
+            light.getYBound(this.lightYBound);
+            light.getZBound(this.lightZBound);
 
             meshIndexes=[];
 
@@ -232,12 +237,12 @@ function MapObject()
             for (k=0;k!==nMesh;k++) {
                 mesh=this.meshes[k];
                 
-                if (lightXBound.max<mesh.xBound.min) continue;
-                if (lightXBound.min>mesh.xBound.max) continue;
-                if (lightYBound.max<mesh.yBound.min) continue;
-                if (lightYBound.min>mesh.yBound.max) continue;
-                if (lightZBound.max<mesh.zBound.min) continue;
-                if (lightZBound.min>mesh.zBound.max) continue;
+                if (this.lightXBound.max<mesh.xBound.min) continue;
+                if (this.lightXBound.min>mesh.xBound.max) continue;
+                if (this.lightYBound.max<mesh.yBound.min) continue;
+                if (this.lightYBound.min>mesh.yBound.max) continue;
+                if (this.lightZBound.max<mesh.zBound.min) continue;
+                if (this.lightZBound.min>mesh.zBound.max) continue;
                 
                 meshIndexes.push(k);
             }
@@ -283,7 +288,6 @@ function MapObject()
         var n,k,nLight,idx;
         var x,y,z;
         var light;
-        var lightVector,cameraVector;
 
             // get the distance from the camera
             // to all the lights
@@ -303,12 +307,10 @@ function MapObject()
         
             // the camera normal
             
-        cameraVector=new wsPoint(0.0,0.0,1.0);
-        cameraVector.rotateX(null,view.camera.angle.x);
-        cameraVector.rotateY(null,view.camera.angle.y);
+        this.cameraVector.set(0.0,0.0,1.0);
+        this.cameraVector.rotateX(null,view.camera.angle.x);
+        this.cameraVector.rotateY(null,view.camera.angle.y);
         
-        lightVector=new wsPoint(0.0,0.0,0.0);
-
             // find the four closest lights
             // and put them into the view list
 
@@ -333,9 +335,9 @@ function MapObject()
                 // are we out of the light cone
                 // and behind the light?
                 
-            lightVector.setFromSubPoint(view.camera.position,light.position);   
-            lightVector.normalize();
-            if (lightVector.dot(cameraVector)>0.0) {
+            this.lightVector.setFromSubPoint(view.camera.position,light.position);   
+            this.lightVector.normalize();
+            if (this.lightVector.dot(this.cameraVector)>0.0) {
                 if (light.dist>light.intensity) continue;
             }
             

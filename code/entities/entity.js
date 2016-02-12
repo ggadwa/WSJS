@@ -24,6 +24,15 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
     this.fallSpeed=0;
     this.gravity=0;
     
+    this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
+    this.slidePt=new wsPoint(0,0,0);
+    this.collideMovePt=new wsPoint(0,0,0);
+    this.collideSlideMovePt=new wsPoint(0,0,0);
+    
+    this.xFrustumBound=new wsBound(0,0);
+    this.yFrustumBound=new wsBound(0,0);
+    this.zFrustumBound=new wsBound(0,0);
+
     this.collision=new CollisionObject();
     
         //
@@ -36,20 +45,20 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
         
             // get the move to point
             
-        var movePt=new wsPoint(0.0,0.0,dist);
-        movePt.rotateY(null,angY);
+        this.movePt.set(0.0,0.0,dist);
+        this.movePt.rotateY(null,angY);
         
             // flying
             
         if (PLAYER_FLY) {
-            movePt.y=-(20*this.angle.x);
-            if (dist<0) movePt.y=-movePt.y;
+            this.movePt.y=-(20*this.angle.x);
+            if (dist<0) this.movePt.y=-this.movePt.y;
         }
         
             // wall clipping setting, remove later
             
         if ((PLAYER_CLIP_WALLS) && (this.isPlayer)) {
-            this.position.addPoint(movePt);
+            this.position.addPoint(this.movePt);
             return;
         }
         
@@ -59,36 +68,34 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
             // there's been a bump, move it, otherwise,
             // try sliding
             
-        var collideMovePt=this.collision.moveObjectInMap(map,this.position,movePt,this.radius,this.high,true);
-        if ((collideMovePt.equals(movePt)) || (collideMovePt.y!==0)) {
-            this.position.addPoint(collideMovePt);
+        this.collision.moveObjectInMap(map,this.position,this.movePt,this.radius,this.high,true,this.collideMovePt);
+        if ((this.collideMovePt.equals(this.movePt)) || (this.collideMovePt.y!==0)) {
+            this.position.addPoint(this.collideMovePt);
             return;
         }
         
             // try to slide
             
-        var slidePt,collideSlidePt;
-            
-        slidePt=new wsPoint(movePt.x,0.0,0.0);
+        this.slidePt.set(this.movePt.x,0.0,0.0);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,this.high,false);
-        if (collideSlidePt.equals(slidePt)) {
-            this.position.addPoint(collideSlidePt);
+        this.collision.moveObjectInMap(map,this.position,this.slidePt,this.radius,this.high,false,this.collideSlideMovePt);
+        if (this.collideSlideMovePt.equals(this.slidePt)) {
+            this.position.addPoint(this.collideSlideMovePt);
             return;
         }
         
-        slidePt=new wsPoint(0.0,0.0,movePt.z);
+        this.slidePt.set(0.0,0.0,this.movePt.z);
         
-        collideSlidePt=this.collision.moveObjectInMap(map,this.position,slidePt,this.radius,this.high,false);
-        if (collideSlidePt.equals(slidePt)) {
-            this.position.addPoint(collideSlidePt);
+        this.collision.moveObjectInMap(map,this.position,this.slidePt,this.radius,this.high,false,this.collideSlideMovePt);
+        if (this.collideSlideMovePt.equals(this.slidePt)) {
+            this.position.addPoint(this.collideSlideMovePt);
             return;
         }
         
             // if nothing works, just use the
             // the original collide point
             
-        this.position.addPoint(collideMovePt);
+        this.position.addPoint(this.collideMovePt);
     };
     
         //
@@ -201,11 +208,11 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
         
     this.inFrustum=function(view)
     {
-        var xBound=new wsBound((this.position.x-this.radius),(this.position.x+this.radius));
-        var yBound=new wsBound(this.position.y,(this.position.y-this.high));
-        var zBound=new wsBound((this.position.z-this.radius),(this.position.z+this.radius));
+        this.xFrustumBound.set((this.position.x-this.radius),(this.position.x+this.radius));
+        this.yFrustumBound.set(this.position.y,(this.position.y-this.high));
+        this.zFrustumBound.set((this.position.z-this.radius),(this.position.z+this.radius));
 
-        return(view.boundBoxInFrustum(xBound,yBound,zBound));
+        return(view.boundBoxInFrustum(this.xFrustumBound,this.yFrustumBound,this.zFrustumBound));
     };
     
         //

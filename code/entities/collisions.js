@@ -8,11 +8,23 @@ function CollisionObject()
 {
     this.BUMP_HIGH=1000;
     
-    //
-    // collision routines
-    //
+    this.spokePt=new wsPoint(0,0,0);        // these are global to avoid it being local and GCd
+    this.spokeHitPt=new wsPoint(0,0,0);
+    this.spokeLine=new wsLine(null,null);
     
-    this.lineLineXZIntersection=function(line1,line2)
+    this.testPt=new wsPoint(0,0,0);
+    this.moveIntersectPt=new wsPoint(0,0,0);
+    this.radiusPt=new wsPoint(0,0,0);
+    
+    this.objXBound=new wsBound(0,0);
+    this.objYBound=new wsBound(0,0);
+    this.objZBound=new wsBound(0,0);
+    
+        //
+        // collision routines
+        //
+    
+    this.lineLineXZIntersection=function(line1,line2,lineIntersectPt)
     {
         var fx0=line1.p1.x;
         var fz0=line1.p1.z;
@@ -32,51 +44,45 @@ function CollisionObject()
         var dz=fz3-fz2;
 
         var denom=(bx*dz)-(bz*dx);
-        if (denom===0.0) return(null);
+        if (denom===0.0) return(false);
 
         var r=((az*dx)-(ax*dz))/denom;
-        if ((r<0.0) || (r>1.0)) return(null);
+        if ((r<0.0) || (r>1.0)) return(false);
 
         var s=((az*bx)-(ax*bz))/denom;
-        if ((s<0.0) || (s>1.0)) return(null);
+        if ((s<0.0) || (s>1.0)) return(false);
 
-        if ((r===0.0) && (s===0.0)) return(null);
+        if ((r===0.0) && (s===0.0)) return(false);
 
-        return(new wsPoint((fx0+(r*bx)),line1.p1.y,(fz0+(r*bz))));
+        lineIntersectPt.set((fx0+(r*bx)),line1.p1.y,(fz0+(r*bz)));
+        return(true);
     };
 
-    this.circleLineXZIntersection=function(line,circlePt,radius)
+    this.circleLineXZIntersection=function(line,circlePt,radius,lineIntersectPt)
     {
             // cast rays from the center of the circle
             // like spokes to check for collisions
             // we do it instead of just checking the
             // perpendicular so you can't wade into corners
             
-        var n;
-        var hitPt=null;
-
-        var dist;
+        var n,dist;
         var currentDist=-1;
         
-        var hitPt;
-        var currentHitPt=null;
-
         var rad=0.0;
         var radAdd=(Math.PI*2.0)/24.0;
         
-        var spokePt=new wsPoint(circlePt.x,circlePt.y,circlePt.z);
-        var spoke=new wsLine(circlePt,spokePt);
+        this.spokePt.set(circlePt.x,circlePt.y,circlePt.z);
+        this.spokeLine.set(circlePt,this.spokePt);
 
         for (n=0;n!==24;n++) {
             
-            spokePt.x=circlePt.x+(radius*Math.sin(rad));
-            spokePt.z=circlePt.z-(radius*Math.cos(rad));   // everything is passed by pointer so this will change the spoke line
+            this.spokePt.x=circlePt.x+(radius*Math.sin(rad));
+            this.spokePt.z=circlePt.z-(radius*Math.cos(rad));   // everything is passed by pointer so this will change the spoke line
 
-            hitPt=this.lineLineXZIntersection(line,spoke);
-            if (hitPt!==null) {
-                dist=circlePt.noSquareDistance(hitPt);
+            if (this.lineLineXZIntersection(line,this.spokeLine,this.spokeHitPt)) {
+                dist=circlePt.noSquareDistance(this.spokeHitPt);
                 if ((dist<currentDist) || (currentDist===-1)) {
-                    currentHitPt=hitPt;
+                    lineIntersectPt.setFromPoint(this.spokeHitPt);
                     currentDist=dist;
                 }
             }
@@ -84,19 +90,19 @@ function CollisionObject()
             rad+=radAdd;
         }
 
-        return(currentHitPt);
+        return(currentDist!==-1);
     };
 
         //
         // colliding objects
         //
 
-    this.moveObjectInMap=function(map,origPt,movePt,radius,high,bump)
+    this.moveObjectInMap=function(map,origPt,movePt,radius,high,bump,collideMovePt)
     {
         var n,k;
         var mesh;
         var collisionLine,nCollisionLine;        
-        var hitPt,currentHitPt;        
+        var currentHitPt;        
         var dist,currentDist;
         
         var nMesh=map.meshes.length;
@@ -109,14 +115,14 @@ function CollisionObject()
         
             // the moved point
             
-        var pt=origPt.copy();
-        pt.addPoint(movePt);
+        this.testPt.setFromPoint(origPt);
+        this.testPt.addPoint(movePt);
         
             // the rough collide boxes
             
-        var objXBound=new wsBound((pt.x-radius),(pt.x+radius));
-        var objYBound=new wsBound(pt.y,(pt.y-high));
-        var objZBound=new wsBound((pt.z-radius),(pt.z+radius));
+        this.objXBound.set((this.testPt.x-radius),(this.testPt.x+radius));
+        this.objYBound.set(this.testPt.y,(this.testPt.y-high));
+        this.objZBound.set((this.testPt.z-radius),(this.testPt.z+radius));
         
             // we need to possible run through
             // this multiple times to deal with
@@ -137,7 +143,7 @@ function CollisionObject()
                 
                     // skip any mesh we don't collide with
                     
-                if (!mesh.boxBoundCollision(objXBound,objYBound,objZBound)) continue;
+                if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
                 
                     // check the collide lines
                     
@@ -149,21 +155,20 @@ function CollisionObject()
                         // skip if not in the Y of the line
             
                     yBound=collisionLine.getYBound();
-                    if ((pt.y>yBound.max) || (pt.y<=yBound.min)) continue;
+                    if ((this.testPt.y>yBound.max) || (this.testPt.y<=yBound.min)) continue;
 
                         // check against line
 
-                    hitPt=this.circleLineXZIntersection(collisionLine,pt,radius);
-                    if (hitPt===null) continue;
+                    if (!this.circleLineXZIntersection(collisionLine,this.testPt,radius,this.moveIntersectPt)) continue;
                     
                         // find closest hit point
 
-                    dist=pt.noSquareDistance(hitPt);
+                    dist=this.testPt.noSquareDistance(this.moveIntersectPt);
                     if ((dist<currentDist) || (currentDist===-1)) {
-                        currentHitPt=hitPt;
+                        currentHitPt=this.moveIntersectPt;
                         currentDist=dist;
                         bumpY=-1;
-                        if ((pt.y-yBound.min)<this.BUMP_HIGH) bumpY=yBound.min;
+                        if ((this.testPt.y-yBound.min)<this.BUMP_HIGH) bumpY=yBound.min;
                     }
                 }
             }
@@ -173,7 +178,8 @@ function CollisionObject()
                 // we might have had
                 
             if (currentHitPt===null) {
-                return(new wsPoint(movePt.x,(pt.y-origPt.y),movePt.z));
+                collideMovePt.set(movePt.x,(this.testPt.y-origPt.y),movePt.z);
+                return;
             }
             
                 // if no bump, not a bumpable
@@ -186,7 +192,7 @@ function CollisionObject()
                 // once
                 
             bumpOnce=true;
-            pt.y=bumpY;
+            this.testPt.y=bumpY;
         }
         
             // the new move is to a point
@@ -198,18 +204,18 @@ function CollisionObject()
             // hit point to orig point and
             // scale to radius
         
-        var newOrigPt=new wsPoint((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
+        this.radiusPt.set((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
         
-        newOrigPt.normalize();
-        newOrigPt.scale(radius);
+        this.radiusPt.normalize();
+        this.radiusPt.scale(radius);
         
-        newOrigPt.addPoint(currentHitPt);
+        this.radiusPt.addPoint(currentHitPt);
         
             // and the new move is the original
             // point to this point
             // always restore the bump move
         
-        return(new wsPoint((newOrigPt.x-origPt.x),(pt.y-origPt.y),(newOrigPt.z-origPt.z)));
+        collideMovePt.set((this.radiusPt.x-origPt.x),(this.testPt.y-origPt.y),(this.radiusPt.z-origPt.z));
     };
     
     //
@@ -223,9 +229,9 @@ function CollisionObject()
 
             // the rough collide boxes
             
-        var objXBound=new wsBound((pt.x-radius),(pt.x+radius));
-        var objYBound=new wsBound((pt.y-fallY),(pt.y+fallY));
-        var objZBound=new wsBound((pt.z-radius),(pt.z+radius));
+        this.objXBound.set((pt.x-radius),(pt.x+radius));
+        this.objYBound.set((pt.y-fallY),(pt.y+fallY));
+        this.objZBound.set((pt.z-radius),(pt.z+radius));
         
         nMesh=map.meshes.length;
         
@@ -239,7 +245,7 @@ function CollisionObject()
 
                 // skip any mesh we don't collide with
 
-            if (!mesh.boxBoundCollision(objXBound,objYBound,objZBound)) continue;
+            if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
 
                 // check the collide rects
                 // if we are within the fall, then
@@ -249,7 +255,7 @@ function CollisionObject()
 
             for (k=0;k!==nCollisionRect;k++) {
                 collisionRect=mesh.collisionRects[k];
-                if (collisionRect.overlapBounds(objXBound,objYBound,objZBound)) return(collisionRect.y-pt.y);
+                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) return(collisionRect.y-pt.y);
             }
         }
         

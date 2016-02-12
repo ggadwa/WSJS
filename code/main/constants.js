@@ -29,8 +29,8 @@ const ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform
 const ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
 
 const ROOM_LEDGE_PERCENTAGE=0.5;                // percentage of > 1 story rooms that have ledges
-const ROOM_LEDGE_MIN_HEIGHT=200;                // minimum height of ledges
-const ROOM_LEDGE_EXTRA_HEIGHT=800;             // extra height of ledges
+const ROOM_LEDGE_MIN_HEIGHT=300;                // minimum height of ledges
+const ROOM_LEDGE_EXTRA_HEIGHT=1500;             // extra height of ledges
 const ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
 const ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
 
@@ -47,7 +47,15 @@ const ROOM_PILLAR_MIN_RADIUS=500;               // minimum radius for pillars
 const ROOM_PILLAR_MAX_RADIUS=1000;              // maximum radius for pillars
 const ROOM_PILLAR_EXTRA_SEGMENTS=4;             // possible number of extra segments for pillars
 
-const ROOM_DECORATIONS_BOX_EXTRA_COUNT=8;       // extra number of boxes
+const ROOM_DECORATION_BOX_MIN_COUNT=1;          // minimum number of boxes
+const ROOM_DECORATION_BOX_EXTRA_COUNT=4;        // extra number of boxes
+
+const ROOM_DECORATION_BOX_MIN_WIDTH=1000;       // minimum width of boxes
+const ROOM_DECORATION_BOX_EXTRA_WIDTH=2000;     // extra width for boxes
+
+const ROOM_DECORATION_BOX_MIN_STACK_COUNT=1;    // minimum number of boxes in a stack
+const ROOM_DECORATION_BOX_EXTRA_STACK_COUNT=4;  // extra number of boxes in a stack
+const ROOM_DECORATION_BOX_STACK_PERCENTAGE=0.5; // percent of time boxes have stack on top
 
 const ROOM_PILLARS=true;                        // turns on or off pillars
 const ROOM_DECORATIONS=true;                    // turns on or off decorations
@@ -77,12 +85,6 @@ const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light 
 
 const MONSTER_MODEL_COUNT=3;
 const MONSTER_ENTITY_COUNT=15;
-
-//
-// overlays
-//
-
-const OVERLAY_DRAW=true;
 
 //
 // random seeds,

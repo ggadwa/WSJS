@@ -19,23 +19,68 @@ function GenRoomDecorationObject(view,map,room,genRandom)
 
     this.addBoxes=function()
     {
-        var n,count;
-        var x,z,high,boxBoundX,boxBoundY,boxBoundZ;
+        var n,k,stackLevel,pos,boxPos,boxY,stackCount,boxCount,rotWid;
+        var ang,angAdd;
+        var wid,high,rotAngle;
+        
+        var boxBoundX=new wsBound(0,0);
+        var boxBoundY=new wsBound(0,0);
+        var boxBoundZ=new wsBound(0,0);
+        
+        var boxPos=new wsPoint(0,0,0);
+        var rotAngle=new wsPoint(0.0,0.0,0.0);
 
-        count=this.genRandom.randomInt(1,ROOM_DECORATIONS_BOX_EXTRA_COUNT);
+        stackCount=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_COUNT,ROOM_DECORATION_BOX_EXTRA_COUNT);
 
-        for (n=0;n!==count;n++) {
-            x=this.genRandom.randomInBetween((this.room.xBound.min+1000),(this.room.xBound.max-1000));
-            z=this.genRandom.randomInBetween((this.room.zBound.min+1000),(this.room.zBound.max-1000));
+        for (n=0;n!==stackCount;n++) {
             
-            high=2000;
-            if (this.genRandom.random()>0.5) high=3500;
-
-            boxBoundX=new wsBound((x-1000),(x+1000));
-            boxBoundY=new wsBound((this.room.yBound.max-high),this.room.yBound.max);
-            boxBoundZ=new wsBound((z-1000),(z+1000));
+                // find the middle of the box spot
+                // and box sizes
+                
+            pos=this.room.findRandomDecorationLocation(genRandom);
+            if (pos===null) break;
             
-            map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+            high=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_WIDTH,ROOM_DECORATION_BOX_EXTRA_WIDTH);
+            wid=Math.floor(high/2);
+            
+                // count of boxes
+                
+            boxCount=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_STACK_COUNT,ROOM_DECORATION_BOX_EXTRA_STACK_COUNT);
+            boxY=this.room.yBound.max;
+            rotWid=Math.floor(wid*1.5);
+            
+                // build the boxes around a rotating axis
+                
+            for (stackLevel=0;stackLevel!==3;stackLevel++) {
+                
+                ang=0;
+                angAdd=(360.0/boxCount);
+
+                for (k=0;k!==boxCount;k++) {
+
+                    boxPos.set(-rotWid,0,0);
+                    boxPos.rotateY(null,ang);
+                    boxPos.addPoint(pos);
+
+                    boxBoundX.set((boxPos.x-wid),(boxPos.x+wid));
+                    boxBoundY.set((boxY-high),boxY);
+                    boxBoundZ.set((boxPos.z-wid),(boxPos.z+wid));
+
+                    rotAngle.set(0.0,(this.genRandom.random()*360.0),0.0);
+
+                    map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
+
+                    ang+=angAdd;
+                }
+                
+                    // go up one level?
+                    
+                if ((boxCount===1) || (!this.genRandom.randomPercentage(ROOM_DECORATION_BOX_STACK_PERCENTAGE))) break;
+                
+                boxCount--;
+                boxY-=high;
+                rotWid=Math.floor(rotWid*0.8);
+            }
         }
 
     };
@@ -58,7 +103,7 @@ function GenRoomDecorationObject(view,map,room,genRandom)
         var machineBoundY=new wsBound((this.room.yBound.max-sizeY),this.room.yBound.max);
         var machineBoundZ=new wsBound((centerPt.z-sizeZ),(centerPt.z+sizeZ));
 
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
     };
 
     this.addDecorations=function()

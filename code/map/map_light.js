@@ -6,9 +6,9 @@
 
 function MapLightObject(position,color,inLightmap,intensity,exponent)
 {
-    this.position=position;     // should be wsPoint
-    this.eyePosition=null;      // the eye position in the current render, setup when added to view light list
-    this.color=color;           // should be wsColor
+    this.position=position;                 // should be wsPoint
+    this.eyePosition=new wsPoint(0,0,0);    // the eye position in the current render, set by the view
+    this.color=color;                       // should be wsColor
     this.intensity=intensity;
     this.invertIntensity=1.0/intensity;
     this.exponent=exponent;
@@ -39,19 +39,19 @@ function MapLightObject(position,color,inLightmap,intensity,exponent)
         return(this.position.distance(pt)<this.intensity);
     };
     
-    this.getXBound=function()
+    this.getXBound=function(xBound)
     {
-        return(new wsBound((this.position.x-intensity),(this.position.x+intensity)));
+        xBound.set((this.position.x-intensity),(this.position.x+intensity));
     };
     
-    this.getYBound=function()
+    this.getYBound=function(yBound)
     {
-        return(new wsBound((this.position.y-intensity),(this.position.y+intensity)));
+        yBound.set((this.position.y-intensity),(this.position.y+intensity));
     };
     
-    this.getZBound=function()
+    this.getZBound=function(zBound)
     {
-        return(new wsBound((this.position.z-intensity),(this.position.z+intensity)));
+        zBound.set((this.position.z-intensity),(this.position.z+intensity));
     };
 }
 

@@ -10,7 +10,7 @@ function MeshPrimitivesObject()
         // create cube
         //
 
-    this.createMeshCube=function(bitmap,xBound,yBound,zBound,wholeUV,left,right,front,back,top,bottom,normalsIn,flags)
+    this.createMeshCube=function(bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,front,back,top,bottom,normalsIn,flags)
     {
             // get cube size
             // note: why duplicated vertexes?  Because light map UVs
@@ -136,7 +136,14 @@ function MeshPrimitivesObject()
                 v.uv.y=1.0;
             }  
         }
-
+        
+            // rotate
+            
+        if (rotAngle!==null) {
+            var centerPt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            meshUtility.rotateVertexes(vertexList,centerPt,rotAngle);
+        }
+        
             // calculate the normals, then use those to
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents

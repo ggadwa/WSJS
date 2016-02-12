@@ -232,7 +232,7 @@ function GenRoomStairs(map,genRandom)
                 else {
                     xBraceBound=new wsBound(xBound.max,(xBound.max+braceSize));
                 }
-                this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,false,!flip,flip,true,true,false,false,false,MESH_FLAG_STAIR));
+                this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,null,false,!flip,flip,true,true,false,false,false,MESH_FLAG_STAIR));
             }
         }
         
@@ -399,7 +399,7 @@ function GenRoomStairs(map,genRandom)
                 else {
                     zBraceBound=new wsBound(zBound.max,(zBound.max+braceSize));
                 }
-                this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,false,true,true,!flip,flip,false,false,false,MESH_FLAG_STAIR));
+                this.map.addMesh(meshPrimitives.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,null,false,true,true,!flip,flip,false,false,false,MESH_FLAG_STAIR));
             }
         }
         
