@@ -29,6 +29,8 @@ REGULAR TODOs
     [X] fixed some bug in lost float/int conversions
     [X] speed up bitmap creation
 
+---> speed up light map creation on safari
+---> lights need to not be bigger than X time smallest width
 
 [ ] optimizations
      [ ] get rid of as many news as possible
