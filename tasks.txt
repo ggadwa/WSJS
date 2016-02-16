@@ -21,6 +21,10 @@ WHEN THERE IS AN INTERFACE TODOs
 REGULAR TODOs
 
 
+----> redo all the entity nonsense when we have classes
+       * getAngle() getPosition() should go back to angle/position and be getters
+----> entity list should start the player object, and map resets it (MAYBE NOT, think about this)
+
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
     [ ] draw closest map meshes first
@@ -29,11 +33,9 @@ REGULAR TODOs
     [X] fixed some bug in lost float/int conversions
     [X] speed up bitmap creation
 
----> speed up light map creation on safari
----> lights need to not be bigger than X time smallest width
-
 [ ] optimizations
-     [ ] get rid of as many news as possible
+     [X] speed up light maps
+     [X] get rid of as many news as possible
          [X] collision routines are a really bad spot
      [ ] get rid of any copy()
 
@@ -75,7 +77,7 @@ REGULAR TODOs
 [ ] models
     [X] speed up model creation
     [X] will need to seam the 0->1 edge
-
+    [ ] animal models need to have body in middle, not at tail end
     
     
     [X] fixed a bug that would create split areas in models

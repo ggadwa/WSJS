@@ -263,7 +263,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // get light intensity and point
 
-        var intensity=Math.floor((room.xBound.getSize()+room.zBound.getSize())*0.5);
+        var intensity=Math.floor((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
         
         intensity*=(MAP_LIGHT_FACTOR+(this.genRandom.random()*MAP_LIGHT_FACTOR_EXTRA));
         if (room.hasStories) intensity*=MAP_LIGHT_TWO_STORY_BOOST;

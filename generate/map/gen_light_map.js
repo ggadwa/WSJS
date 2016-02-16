@@ -121,6 +121,27 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         // use it in the "this" callbacks
         
     var currentGlobalLightMapObject;
+    
+        // global variables to reduce new/GC during light maps
+    
+    this.rayTraceVertexColor=new wsColor(0.0,0.0,0.0);
+    
+    this.lightBoundX=new wsBound(0,0);
+    this.lightBoundY=new wsBound(0,0);
+    this.lightBoundZ=new wsBound(0,0);
+    
+    this.vlx=new wsPoint(0,0,0);
+    this.vrx=new wsPoint(0,0,0);
+    
+    this.lightVectorNormal=new wsPoint(0.0,0.0,0.0);
+    
+    this.xTrigBound=new wsBound(0,0);
+    this.yTrigBound=new wsBound(0,0);
+    this.zTrigBound=new wsBound(0,0);
+    
+    this.pt0=new ws2DIntPoint(0,0);
+    this.pt1=new ws2DIntPoint(0,0);
+    this.pt2=new ws2DIntPoint(0,0);
 
         //
         // border and smear polygons
@@ -394,16 +415,18 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         return((t>0.01)&&(t<1.0));
     };
 
-    this.rayTraceVertex=function(lightList,vx,vy,vz)
+    this.rayTraceVertex=function(lightList,vx,vy,vz,col)
     {
         var n,nLight,lightIdx,trigCount;
         var light;
         var k,p,hit,mesh,nMesh;
         var trigRayTraceCache;
         var lightVectorX,lightVectorY,lightVectorZ;
-        var lightBoundX,lightBoundY,lightBoundZ;
         var dist,att;
-        var col=new wsColor(0.0,0.0,0.0);
+        
+            // start at black
+            
+        col.set(0.0,0.0,0.0);
 
             // we use the passed in light list which is a cut down
             // list precalculcated from mesh/light interactions and
@@ -442,9 +465,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             
                 // light bounding
 
-            lightBoundX=new wsBound(vx,light.position.x);
-            lightBoundY=new wsBound(vy,light.position.y);
-            lightBoundZ=new wsBound(vz,light.position.z);
+            this.lightBoundX.set(vx,light.position.x);
+            this.lightBoundY.set(vy,light.position.y);
+            this.lightBoundZ.set(vz,light.position.z);
 
                 // each light has a list of meshes within
                 // it's light cone, these are the only meshes
@@ -458,7 +481,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
             for (k=0;k!==nMesh;k++) {
                 mesh=this.map.meshes[light.meshIntersectList[k]];
-                if (!mesh.boxBoundCollision(lightBoundX,lightBoundY,lightBoundZ)) continue;
+                if (!mesh.boxBoundCollision(this.lightBoundX,this.lightBoundY,this.lightBoundZ)) continue;
 
                 trigCount=mesh.trigCount;
                 trigRayTraceCache=mesh.trigRayTraceCache;
@@ -539,10 +562,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var n,x,y,lx,rx,tempX,ty,my,by,idx;
         var lxFactor,rxFactor,vFactor;
         var vx,vy,vz;
-        var tempVX=new wsPoint(0,0,0);
-        var vlx=new wsPoint(0,0,0);
-        var vrx=new wsPoint(0,0,0);
-        var col,blackCheck;
+        var blackCheck;
         
         var pixelData=lightBitmap.pixelData;
         
@@ -556,7 +576,6 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
         var nLight=mesh.lightIntersectList.length;
         
         var light,lightIdx;
-        var lightVectorNormal=new wsPoint(0.0,0.0,0.0);
         
         var lightList=[];
 
@@ -564,9 +583,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             lightIdx=mesh.lightIntersectList[n];
             light=this.map.lights[lightIdx];
 
-            lightVectorNormal.set((light.position.x-vs[0].x),(light.position.y-vs[0].y),(light.position.z-vs[0].z));
-            lightVectorNormal.normalize();
-            if (lightVectorNormal.dot(normal)>=0.0) lightList.push(lightIdx);
+            this.lightVectorNormal.set((light.position.x-vs[0].x),(light.position.y-vs[0].y),(light.position.z-vs[0].z));
+            this.lightVectorNormal.normalize();
+            if (this.lightVectorNormal.dot(normal)>=0.0) lightList.push(lightIdx);
         }
         
         if (lightList.length===0) return(false);
@@ -630,13 +649,13 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
                 // get the vertex left and right
 
-            vlx.x=vs[topPtIdx].x+Math.floor((vs[botPtIdx].x-vs[topPtIdx].x)*lxFactor);
-            vlx.y=vs[topPtIdx].y+Math.floor((vs[botPtIdx].y-vs[topPtIdx].y)*lxFactor);
-            vlx.z=vs[topPtIdx].z+Math.floor((vs[botPtIdx].z-vs[topPtIdx].z)*lxFactor);
+            this.vlx.x=vs[topPtIdx].x+Math.floor((vs[botPtIdx].x-vs[topPtIdx].x)*lxFactor);
+            this.vlx.y=vs[topPtIdx].y+Math.floor((vs[botPtIdx].y-vs[topPtIdx].y)*lxFactor);
+            this.vlx.z=vs[topPtIdx].z+Math.floor((vs[botPtIdx].z-vs[topPtIdx].z)*lxFactor);
 
-            vrx.x=vs[midStartPtIdx].x+Math.floor((vs[midEndPtIdx].x-vs[midStartPtIdx].x)*rxFactor);
-            vrx.y=vs[midStartPtIdx].y+Math.floor((vs[midEndPtIdx].y-vs[midStartPtIdx].y)*rxFactor);
-            vrx.z=vs[midStartPtIdx].z+Math.floor((vs[midEndPtIdx].z-vs[midStartPtIdx].z)*rxFactor);
+            this.vrx.x=vs[midStartPtIdx].x+Math.floor((vs[midEndPtIdx].x-vs[midStartPtIdx].x)*rxFactor);
+            this.vrx.y=vs[midStartPtIdx].y+Math.floor((vs[midEndPtIdx].y-vs[midStartPtIdx].y)*rxFactor);
+            this.vrx.z=vs[midStartPtIdx].z+Math.floor((vs[midEndPtIdx].z-vs[midStartPtIdx].z)*rxFactor);
 
                 // sometimes we need to swap
                 // left and right
@@ -646,9 +665,9 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                 lx=rx;
                 rx=tempX;
 
-                tempX=vlx;
-                vlx=vrx;
-                vrx=tempX;
+                tempX=this.vlx;
+                this.vlx=this.vrx;
+                this.vrx=tempX;
             }
 
                 // get the bitmap data index
@@ -662,22 +681,22 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
                     // get the ray trace vetex
 
                 vFactor=(x-lx)/(rx-lx);
-                vx=vlx.x+Math.floor((vrx.x-vlx.x)*vFactor);
-                vy=vlx.y+Math.floor((vrx.y-vlx.y)*vFactor);
-                vz=vlx.z+Math.floor((vrx.z-vlx.z)*vFactor);
+                vx=this.vlx.x+Math.floor((this.vrx.x-this.vlx.x)*vFactor);
+                vy=this.vlx.y+Math.floor((this.vrx.y-this.vlx.y)*vFactor);
+                vz=this.vlx.z+Math.floor((this.vrx.z-this.vlx.z)*vFactor);
                 
                     // write the pixel
 
-                col=this.rayTraceVertex(lightList,vx,vy,vz);
+                this.rayTraceVertex(lightList,vx,vy,vz,this.rayTraceVertexColor);
                 
-                pixelData[idx++]=Math.floor(col.r*255.0);
-                pixelData[idx++]=Math.floor(col.g*255.0);
-                pixelData[idx++]=Math.floor(col.b*255.0);
+                pixelData[idx++]=Math.floor(this.rayTraceVertexColor.r*255.0);
+                pixelData[idx++]=Math.floor(this.rayTraceVertexColor.g*255.0);
+                pixelData[idx++]=Math.floor(this.rayTraceVertexColor.b*255.0);
                 pixelData[idx++]=255;
                 
                     // check if we only wrote black
                     
-                blackCheck+=(col.r+col.g+col.b);
+                blackCheck+=(this.rayTraceVertexColor.r+this.rayTraceVertexColor.g+this.rayTraceVertexColor.b);
             }
         }
         
@@ -705,7 +724,6 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
     this.writePolyToChunk=function(lightBitmap,meshIdx,trigIdx,lft,top)
     {
         var mesh=this.map.meshes[meshIdx];
-        var pt0,pt1,pt2;
 
             // get the vertexes for the triangle
             // and one normal
@@ -721,19 +739,19 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         var wallLike=(Math.abs(v0.normal.y)<=0.3);
 
-            // get the bounds of the 3D point
+            // get the bounds of the 3D triangle
 
-        var xBound=new wsBound(v0.position.x,v0.position.x);
-        xBound.adjust(v1.position.x);
-        xBound.adjust(v2.position.x);
+        this.xTrigBound.set(v0.position.x,v0.position.x);
+        this.xTrigBound.adjust(v1.position.x);
+        this.xTrigBound.adjust(v2.position.x);
 
-        var yBound=new wsBound(v0.position.y,v0.position.y);
-        yBound.adjust(v1.position.y);
-        yBound.adjust(v2.position.y);
+        this.yTrigBound.set(v0.position.y,v0.position.y);
+        this.yTrigBound.adjust(v1.position.y);
+        this.yTrigBound.adjust(v2.position.y);
 
-        var zBound=new wsBound(v0.position.z,v0.position.z);
-        zBound.adjust(v1.position.z);
-        zBound.adjust(v2.position.z);
+        this.zTrigBound.set(v0.position.z,v0.position.z);
+        this.zTrigBound.adjust(v1.position.z);
+        this.zTrigBound.adjust(v2.position.z);
 
             // 2D reduction factors
             // we are drawing into a CHUNK_SIZE, but
@@ -742,46 +760,46 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         var renderSize=LIGHTMAP_CHUNK_SIZE-(LIGHTMAP_RENDER_MARGIN*2);
 
-        var sz=xBound.getSize();
+        var sz=this.xTrigBound.getSize();
         var xFactor=(sz===0)?0:renderSize/sz;
 
-        var sz=yBound.getSize();
+        var sz=this.yTrigBound.getSize();
         var yFactor=(sz===0)?0:renderSize/sz;
 
-        var sz=zBound.getSize();
+        var sz=this.zTrigBound.getSize();
         var zFactor=(sz===0)?0:renderSize/sz;
 
             // now create the 2D version of it
             // these points are offsets WITHIN the margin box
 
         if (wallLike) {
-            if (xBound.getSize()>zBound.getSize()) {
-                pt0=new ws2DIntPoint(((v0.position.x-xBound.min)*xFactor),((v0.position.y-yBound.min)*yFactor));
-                pt1=new ws2DIntPoint(((v1.position.x-xBound.min)*xFactor),((v1.position.y-yBound.min)*yFactor));
-                pt2=new ws2DIntPoint(((v2.position.x-xBound.min)*xFactor),((v2.position.y-yBound.min)*yFactor));
+            if (this.xTrigBound.getSize()>this.zTrigBound.getSize()) {
+                this.pt0.set(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
+                this.pt1.set(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
+                this.pt2.set(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
             }
             else {
-                pt0=new ws2DIntPoint(((v0.position.z-zBound.min)*zFactor),((v0.position.y-yBound.min)*yFactor));
-                pt1=new ws2DIntPoint(((v1.position.z-zBound.min)*zFactor),((v1.position.y-yBound.min)*yFactor));
-                pt2=new ws2DIntPoint(((v2.position.z-zBound.min)*zFactor),((v2.position.y-yBound.min)*yFactor));
+                this.pt0.set(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
+                this.pt1.set(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
+                this.pt2.set(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
             }
         }
         else {
-            pt0=new ws2DIntPoint(((v0.position.x-xBound.min)*xFactor),((v0.position.z-zBound.min)*zFactor));
-            pt1=new ws2DIntPoint(((v1.position.x-xBound.min)*xFactor),((v1.position.z-zBound.min)*zFactor));
-            pt2=new ws2DIntPoint(((v2.position.x-xBound.min)*xFactor),((v2.position.z-zBound.min)*zFactor));
+            this.pt0.set(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
+            this.pt1.set(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
+            this.pt2.set(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
         }
 
             // move so the triangle renders within
             // the margins so we have area to smear
 
-        pt0.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
-        pt1.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
-        pt2.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
+        this.pt0.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
+        this.pt1.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
+        this.pt2.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
 
             // ray trace the triangle
 
-        var hitLight=this.renderTriangle(lightBitmap,meshIdx,[pt0,pt1,pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
+        var hitLight=this.renderTriangle(lightBitmap,meshIdx,[this.pt0,this.pt1,this.pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
 
             // if it didn't hit any lights, UV
             // to the 0 black chunk
@@ -796,14 +814,14 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             // add the UV
             // pt0-pt2 are already moved within the margin
 
-        v0.lightmapUV.x=(pt0.x+lft)/LIGHTMAP_TEXTURE_SIZE;
-        v0.lightmapUV.y=(pt0.y+top)/LIGHTMAP_TEXTURE_SIZE;
+        v0.lightmapUV.x=(this.pt0.x+lft)/LIGHTMAP_TEXTURE_SIZE;
+        v0.lightmapUV.y=(this.pt0.y+top)/LIGHTMAP_TEXTURE_SIZE;
 
-        v1.lightmapUV.x=(pt1.x+lft)/LIGHTMAP_TEXTURE_SIZE;
-        v1.lightmapUV.y=(pt1.y+top)/LIGHTMAP_TEXTURE_SIZE;
+        v1.lightmapUV.x=(this.pt1.x+lft)/LIGHTMAP_TEXTURE_SIZE;
+        v1.lightmapUV.y=(this.pt1.y+top)/LIGHTMAP_TEXTURE_SIZE;
 
-        v2.lightmapUV.x=(pt2.x+lft)/LIGHTMAP_TEXTURE_SIZE;
-        v2.lightmapUV.y=(pt2.y+top)/LIGHTMAP_TEXTURE_SIZE;
+        v2.lightmapUV.x=(this.pt2.x+lft)/LIGHTMAP_TEXTURE_SIZE;
+        v2.lightmapUV.y=(this.pt2.y+top)/LIGHTMAP_TEXTURE_SIZE;
         
         return(true);
     };

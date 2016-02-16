@@ -26,7 +26,7 @@ var view=new ViewObject();
 var map=new MapObject();
 var modelList=new ModelListObject();
 var entityList=new EntityListObject();
-var input=new InputObject(view);
+var input=new InputObject(view,entityList);
 var debug=new DebugObject();
 
 //
@@ -58,7 +58,7 @@ function wsLoopRun(timeStamp)
     while (physicsTick>PHYSICS_MILLISECONDS) {
         physicsTick-=PHYSICS_MILLISECONDS;
         
-        entityList.run(map);
+        entityList.run(view,map);
     }
     
         // drawing
@@ -341,11 +341,11 @@ function wsInitBuildEntities()
         return;
     }
 
-    var playerEntity=new EntityObject(pos,new wsPoint(0.0,0.0,0.0),800,1000,modelList.get('player'),true);
+    var playerEntity=new EntityPlayerObject(pos,new wsPoint(0.0,0.0,0.0),800,1000,modelList.get('player'));
     playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0')));
     playerEntity.setCurrentWeaponIndex(0);
     
-    entityList.addPlayer(playerEntity);
+    entityList.setPlayer(playerEntity);
     
         // make monster entities
         // we clone their models in the list so each entity gets
@@ -358,7 +358,7 @@ function wsInitBuildEntities()
         monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
         model=modelList.clone(view,monsterModelName);
         
-        entityList.add(new EntityObject(pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model,false));
+        entityList.add(new EntityMonsterObject(pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model));
     }
     
         // finished

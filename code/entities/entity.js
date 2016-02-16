@@ -1,20 +1,16 @@
 "use strict";
 
 //
-// entity class
+// entity base class
 //
 
-function EntityObject(position,angle,radius,high,model,isPlayer)
+function EntityObject(position,angle,radius,high,model)
 {
     this.position=position;
     this.angle=angle;
     this.radius=radius;
     this.high=high;
     this.model=model;
-    this.isPlayer=isPlayer;
-    
-    this.weaponCurrentIndex=-1;
-    this.weapons=[];
     
     this.turnSpeed=0;
     this.lookSpeed=0;
@@ -23,6 +19,8 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
     this.verticalSpeed=0;
     this.fallSpeed=0;
     this.gravity=0;
+    
+    this.markedForDeletion=false;              // used to delete this outside the run loop
     
     this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
     this.slidePt=new wsPoint(0,0,0);
@@ -36,10 +34,43 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
     this.collision=new CollisionObject();
     
         //
-        // move forward with angle
+        // getters -- supergumba -- replace these with real getters!
+        //
+        
+    this.getModel=function()
+    {
+        return(this.model);
+    };
+        
+    this.getPosition=function()
+    {
+        return(this.position);
+    };
+    
+    this.getAngle=function()
+    {
+        return(this.angle);
+    };
+    
+        //
+        // deleting
+        //
+        
+    this.markAsDelete=function()
+    {
+        this.markedForDeletion=true;
+    };
+    
+    this.isMarkedForDeletion=function()
+    {
+        return(this.markedForDeletion);
+    };
+    
+        //
+        // move entity
         //
     
-    this.forward=function(map,dist,extraAngle)
+    this.moveComplex=function(map,dist,extraAngle,flying,clipping)
     {
         var angY=this.angle.y+extraAngle;
         
@@ -50,14 +81,14 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
         
             // flying
             
-        if (PLAYER_FLY) {
+        if (flying) {
             this.movePt.y=-(20*this.angle.x);
             if (dist<0) this.movePt.y=-this.movePt.y;
         }
         
-            // wall clipping setting, remove later
+            // if clipping on
             
-        if ((PLAYER_CLIP_WALLS) && (this.isPlayer)) {
+        if (clipping) {
             this.position.addPoint(this.movePt);
             return;
         }
@@ -98,87 +129,29 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
         this.position.addPoint(this.collideMovePt);
     };
     
-        //
-        // move directly
-        //
-
-    this.move=function(x,y,z)
+    this.moveSimple=function(map,speed)
+    {
+        this.movePt.set(0.0,0.0,speed);
+        this.movePt.rotateY(null,angle.y);
+            
+        this.collision.moveObjectInMap(map,this.position,this.movePt,this.radius,this.high,true,this.collideMovePt);
+        if (!this.collideMovePt.equals(this.movePt)) return(true);
+        
+        this.position.addPoint(this.collideMovePt);
+        return(false);
+    };
+    
+    this.moveDirect=function(x,y,z)
     {
         this.position.move(x,y,z);
     };
     
         //
-        // turn (y angle)
-        //
-
-    this.turn=function(addAngle)
-    {
-        this.angle.y+=addAngle;
-        if (this.angle.y<0.0) this.angle.y+=360.0;
-        if (this.angle.y>=360.00) this.angle.y-=360.0;
-    };
-    
-        //
-        // look (x angle)
-        //
-
-    this.look=function(addAngle)
-    {
-        this.angle.x+=addAngle;
-        if (this.angle.x<-80.0) this.angle.x=-80.0;
-        if (this.angle.x>=80.0) this.angle.x=80.0;
-    };
-    
-        //
-        // jump
+        // falling
         //
         
-    this.startJump=function()
+    this.fall=function()
     {
-        if (this.fallSpeed===0) this.fallSpeed=-300;
-    };
-    
-        //
-        // weapons
-        //
-        
-    this.addWeapon=function(weapon)
-    {
-        this.weapons.push(weapon);
-    };
-    
-    this.setCurrentWeaponIndex=function(index)
-    {
-        this.weaponCurrentIndex=index;
-    };
-    
-    this.getCurrentWeapon=function()
-    {
-        if (this.weaponCurrentIndex===-1) return(null);
-        return(this.weapons[this.weaponCurrentIndex]);
-    };
-    
-        //
-        // run entity
-        //
-        
-    this.run=function(map)
-    {
-            // input movement
-            
-        if (this.turnSpeed!==0.0) this.turn(this.turnSpeed);
-        if (this.lookSpeed!==0.0) this.look(this.lookSpeed);
-        if (this.forwardSpeed!==0.0) this.forward(map,this.forwardSpeed,0.0);
-        if (this.sideSpeed!==0.0) this.forward(map,this.sideSpeed,90.0);
-        if (this.verticalSpeed!==0.0) this.move(0.0,this.verticalSpeed,0.0);
-        
-            // falling
-            // supergumba -- there's some temp calculations here, need real gravity math
-        
-        if (this.isPlayer) {
-            if (PLAYER_FLY) return;
-        }
-        
         this.fallSpeed+=this.gravity;
         this.gravity+=2;
         if (this.gravity>25) this.gravity=25;
@@ -203,6 +176,65 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
     };
     
         //
+        // turn (y angle)
+        //
+
+    this.turn=function(addAngle)
+    {
+        this.angle.y+=addAngle;
+        if (this.angle.y<0.0) this.angle.y+=360.0;
+        if (this.angle.y>=360.00) this.angle.y-=360.0;
+    };
+    
+    this.turnTowards=function(toY,speed)
+    {
+        var subway,addway;
+        
+        if (this.angle.y===toY) return;
+	
+            // which way is faster?
+	
+	if (this.angle.y>toY) {
+            subway=this.angle.y-toY;
+            addway=360.0-(this.angle.y-toY);
+	}
+	else {
+            subway=360.0-(toY-this.angle.y);
+            addway=toY-this.angle.y;
+	}
+		
+            // now turn
+		
+	if (subway<addway) {
+            if (subway>speed) subway=speed;
+            this.turn(-subway);
+	}
+        else {
+            if (addway>speed) addway=speed;
+            this.turn(addway);
+        }
+    };
+    
+        //
+        // look (x angle)
+        //
+
+    this.look=function(addAngle)
+    {
+        this.angle.x+=addAngle;
+        if (this.angle.x<-80.0) this.angle.x=-80.0;
+        if (this.angle.x>=80.0) this.angle.x=80.0;
+    };
+    
+        //
+        // run entity
+        //
+        
+    this.run=function(view,map,entityList)
+    {
+    };
+    
+        //
         // frustum checks
         //
         
@@ -218,7 +250,7 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
         //
         // draw entity
         //
-
+        
     this.drawStart=function(view)
     {
         this.model.drawStart(view);
@@ -231,17 +263,18 @@ function EntityObject(position,angle,radius,high,model,isPlayer)
 
     this.draw=function(view)
     {
-            // supergumba -- random testing right now
+            // either update skeleton and create
+            // vertices or just move to current position
+            // and angle
             
-            // create current pose
-            
-        this.model.skeleton.randomPose(view,this.model.modelType);
-        this.model.skeleton.animate(view);
-       
-            // move vertexes to reflect the pose
-            // and position in map
-            
-        this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.position);
+        if (this.model.skeleton!==null) {
+            this.model.skeleton.randomPose(view,this.model.modelType);
+            this.model.skeleton.animate(view);
+            this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.angle,this.position);
+        }
+        else {
+            this.model.mesh.updateVertexesToAngleAndPosition(view,this.angle,this.position);
+        }
         
             // draw the model
             

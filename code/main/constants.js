@@ -64,20 +64,20 @@ const ROOM_DECORATIONS=true;                    // turns on or off decorations
 // lighting
 //
 
-const MAP_LIGHT_AMBIENT=[0.0,0.0,0.0];          // all over ambient light [r,g,b]
+const MAP_LIGHT_AMBIENT=[0.15,0.15,0.15];       // all over ambient light [r,g,b]
     
-const MAP_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
-const MAP_LIGHT_FACTOR_EXTRA=0.3;               // random addition to light factor above
+const MAP_LIGHT_FACTOR=0.7;                     // lights are initially set to room radius, this factor is multipled in
+const MAP_LIGHT_FACTOR_EXTRA=0.4;               // random addition to light factor above
 const MAP_LIGHT_TWO_STORY_BOOST=1.4;            // multiply boost when a light is in a two story room
   
 const MAP_LIGHT_EXPONENT_MINIMUM=0.2;           // minimum light exponent (0.0 is completely hard light with no fall off)
 const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
     
-const MAP_LIGHT_RGB_MINIMUM=0.6;                // minimum r, g, or b value for map lights
-const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.4;          // random r, g, b add for map lights
+const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for map lights
+const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
 //
 // monsters
@@ -85,6 +85,8 @@ const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light 
 
 const MONSTER_MODEL_COUNT=3;
 const MONSTER_ENTITY_COUNT=15;
+
+const MONSTER_AI_ON=true;
 
 //
 // random seeds,
@@ -94,10 +96,10 @@ const MONSTER_ENTITY_COUNT=15;
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=Math.floor((Math.random()*SEED));
+const SEED_MAP=1; // Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
-const SEED_ENTITY=Math.floor((Math.random()*SEED));
+const SEED_ENTITY=1; //Math.floor((Math.random()*SEED));
 
 //
 // timing

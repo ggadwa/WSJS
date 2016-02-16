@@ -7,7 +7,6 @@
 function EntityListObject()
 {
     this.entities=[];
-    this.entities.push(null);       // first entity is always the player entity
     
         //
         // initialize/release entityList
@@ -15,6 +14,11 @@ function EntityListObject()
 
     this.initialize=function(view)
     {
+            // first entity is always the player
+            // so reserve it
+            
+        this.entities.push(null);
+        
         return(true);
     };
 
@@ -25,8 +29,11 @@ function EntityListObject()
         //
         // add to entity
         //
+        // entity index 0 is always the player, so that's always
+        // a set
+        //
 
-    this.addPlayer=function(entity)
+    this.setPlayer=function(entity)
     {
         this.entities[0]=entity;
     };
@@ -59,13 +66,29 @@ function EntityListObject()
         // run all entities
         //
         
-    this.run=function(map)
+    this.run=function(view,map)
     {
         var n;
         var nEntity=this.entities.length;
         
+            // run the entities
+            
         for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(map);
+            this.entities[n].run(view,map,this);
+        }
+        
+            // now clean up any that got
+            // marked for deleting
+            
+        n=0;
+        
+        while (n<nEntity) {
+            if (this.entities[n].isMarkedForDeletion()) {
+                this.entities.splice(n,1);
+                nEntity--;
+                continue;
+            }
+            n++;
         }
     };
 

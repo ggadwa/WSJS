@@ -270,9 +270,9 @@ function MapOverlayObject()
 
         for (n=0;n!==nEntity;n++) {
             entity=entityList.get(n);
-            this.mapOverlayShader.drawColor(view,(entity.isPlayer?playerColor:monsterColor));
+            this.mapOverlayShader.drawColor(view,((n===0)?playerColor:monsterColor));       // index 0 is the player
             
-            ang=360.0-entity.angle.y;
+            ang=360.0-entity.getAngle().y;
         
             p1.set(-5,5);
             p1.rotate(null,ang);

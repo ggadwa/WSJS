@@ -8,8 +8,35 @@ function WeaponObject(model)
 {
     this.model=model;
     
-    this.handOffset=new wsPoint(0,0,0);
+    this.lastFireTimeStamp=0;
+    
+    this.handOffset=new wsPoint(0,0,0);     // global to stop GCd
     this.handAngle=new wsPoint(0,0,0);
+    
+        //
+        // fire weapon
+        //
+        
+    this.fire=function(view,entityList,entity)
+    {
+            // time to fire again?
+            
+        if (view.timeStamp<this.lastFireTimeStamp) return;
+        
+        this.lastFireTimeStamp=view.timeStamp+1000;
+        
+            // create projectile
+            
+        var ang=new wsPoint(0,0,0);
+        ang.setFromPoint(entity.getAngle());
+        
+        var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
+        pos.rotate(ang);
+        pos.addPoint(entity.getPosition());
+        pos.y-=2000;        // supergumba -- all this is hardcoded!
+        
+        entityList.add(new EntityProjectileObject(view,pos,ang,500,500,this.model));
+    };
     
         //
         // draw weapon
@@ -27,17 +54,20 @@ function WeaponObject(model)
 
     this.draw=function(view,entity)
     {
+        var pos=entity.getPosition();
+        var angle=entity.getAngle();
+        
             // get new position
             
         this.handOffset.set(0,0,2500);      // supergumba -- all this is hardcoded!
-        this.handOffset.rotate(entity.angle);
-        this.handOffset.addPoint(entity.position);
+        this.handOffset.rotate(angle);
+        this.handOffset.addPoint(pos);
         
         this.handOffset.y-=1000;        // supergumba -- all this is hardcoded!
         
             // and rotational angle
             
-        this.handAngle.setFromPoint(entity.angle);
+        this.handAngle.setFromPoint(angle);
         this.handAngle.x=(-this.handAngle.x)-15.0;
         this.handAngle.y+=180.0;
        

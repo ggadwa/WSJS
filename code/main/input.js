@@ -4,9 +4,10 @@
 // input class
 //
 
-function InputObject(view)
+function InputObject(view,entityList)
 {
     this.view=view;
+    this.entityList=entityList;
     
         // input flags
         
@@ -55,30 +56,30 @@ function InputObject(view)
 
     this.run=function()
     {
-        this.playerEntity.turnSpeed=0.0;
-        this.playerEntity.lookSpeed=0.0;
-        this.playerEntity.forwardSpeed=0.0;
-        this.playerEntity.sideSpeed=0.0;
-        this.playerEntity.verticalSpeed=0.0;        // supergumba -- this is all temporary, we need to do start/stop here so acc/decl can take place
+        this.playerEntity.setTurnSpeed(0.0);
+        this.playerEntity.setLookSpeed(0.0);
+        this.playerEntity.setForwardSpeed(0.0);
+        this.playerEntity.setSideSpeed(0.0);
+        this.playerEntity.setVerticalSpeed(0.0);        // supergumba -- this is all temporary, we need to do start/stop here so acc/decl can take place
         
             // left arrow and right arrow
             // turning
 
-        if (this.keyFlags[37]) this.playerEntity.turnSpeed=-3.0;
-        if (this.keyFlags[39]) this.playerEntity.turnSpeed=3.0;
+        if (this.keyFlags[37]) this.playerEntity.setTurnSpeed(-3.0);
+        if (this.keyFlags[39]) this.playerEntity.setTurnSpeed(3.0);
 
             // up arrow or W
             // down arrow or S
             // forward and backwards
 
-        if ((this.keyFlags[38]) || (this.keyFlags[87])) this.playerEntity.forwardSpeed=125.0;
-        if ((this.keyFlags[40]) || (this.keyFlags[83])) this.playerEntity.forwardSpeed=-125.0;
+        if ((this.keyFlags[38]) || (this.keyFlags[87])) this.playerEntity.setForwardSpeed(125.0);
+        if ((this.keyFlags[40]) || (this.keyFlags[83])) this.playerEntity.setForwardSpeed(-125.0);
 
             // A and D
             // sidestep
 
-        if (this.keyFlags[65]) this.playerEntity.sideSpeed=-75.0;
-        if (this.keyFlags[68]) this.playerEntity.sideSpeed=75.0;
+        if (this.keyFlags[65]) this.playerEntity.setSideSpeed(-75.0);
+        if (this.keyFlags[68]) this.playerEntity.setSideSpeed(75.0);
         
             // space jump
             
@@ -86,7 +87,7 @@ function InputObject(view)
         
             // q fire
             
-        if (this.keyFlags[81]) console.log('fire!');
+        if (this.keyFlags[81]) this.playerEntity.fireCurrentWeapon(this.view,this.entityList);
         
             // m flips map on/off
             
@@ -98,14 +99,14 @@ function InputObject(view)
             // - and +
             // up or down
 
-        if (this.keyFlags[61]) this.playerEntity.verticalSpeed=-125.0;
-        if (this.keyFlags[173]) this.playerEntity.verticalSpeed=125.0;
+        if (this.keyFlags[61]) this.playerEntity.setVerticalSpeed(-125.0);
+        if (this.keyFlags[173]) this.playerEntity.setVerticalSpeed(125.0);
 
             // [ and ]
             // look up or down
 
-        if (this.keyFlags[219]) this.playerEntity.lookSpeed=1.5;
-        if (this.keyFlags[221]) this.playerEntity.lookSpeed=-1.5; 
+        if (this.keyFlags[219]) this.playerEntity.setLookSpeed(1.5);
+        if (this.keyFlags[221]) this.playerEntity.setLookSpeed(-1.5); 
     };
 
         //

@@ -15,9 +15,9 @@ function ViewCameraObject()
         
     this.setToEntity=function(entity,eyeHigh)
     {
-        this.position.setFromPoint(entity.position);
+        this.position.setFromPoint(entity.getPosition());
         this.position.y-=eyeHigh;
-        this.angle.setFromPoint(entity.angle);
+        this.angle.setFromPoint(entity.getAngle());
     };
     
 }
@@ -514,30 +514,30 @@ function ViewObject()
         map.drawEnd(this);
 
             // draw the entities
+            // always skip index 0 as that's the player
             
         this.drawModelCount=0;
         this.drawModelTrigCount=0;
 
         nEntity=entityList.count();
 
-        for (n=0;n!==nEntity;n++) {
+        for (n=1;n<nEntity;n++) {
             entity=entityList.get(n);
-            if (entity.isPlayer) continue;
 
             if (entity.inFrustum(view)) {
                 entity.drawStart(this);
                 entity.draw(this);
                 entity.drawEnd(this);
 
-                if (DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.model,entity.position);
-                if (DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.model);
-                if (DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.model);
-                if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.model);
+                if (DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.getModel(),entity.getPosition());
+                if (DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.getModel());
+                if (DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.getModel());
+                if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.getModel());
             }
         }
-        
+      
             // player weapon
-            
+         
         var weapon=player.getCurrentWeapon();
         if (weapon!==null) {
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
@@ -545,7 +545,7 @@ function ViewObject()
             weapon.draw(this,player);
             weapon.drawEnd(this);
         }
-        
+
             // map overlay
             
         if (this.drawOverlay) map.overlayDraw(this,entityList);

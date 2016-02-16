@@ -102,10 +102,10 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         // set vertices to pose and offset position
         //
         
-    this.updateVertexesToPoseAndPosition=function(view,skeleton,offsetPosition)
+    this.updateVertexesToPoseAndPosition=function(view,skeleton,angle,position)
     {
         var n,v;
-        var bone,normal;
+        var bone;
         
         var rotVector=new wsPoint(0.0,0.0,0.0);
         var normal=new wsPoint(0.0,0.0,0.0);
@@ -119,15 +119,28 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             v=this.vertexList[n];
             bone=skeleton.bones[v.boneIdx];
             
+                // bone movement
+                
             rotVector.setFromPoint(v.vectorFromBone);
             rotVector.rotate(bone.curPoseAngle);
             
-            this.drawVertices[vIdx++]=bone.curPosePosition.x+rotVector.x+offsetPosition.x;
-            this.drawVertices[vIdx++]=bone.curPosePosition.y+rotVector.y+offsetPosition.y;
-            this.drawVertices[vIdx++]=bone.curPosePosition.z+rotVector.z+offsetPosition.z;
+            rotVector.x=bone.curPosePosition.x+rotVector.x;
+            rotVector.y=bone.curPosePosition.y+rotVector.y;
+            rotVector.z=bone.curPosePosition.z+rotVector.z;
             
             normal.setFromPoint(v.normal);
             normal.rotate(bone.curPoseAngle);
+            
+                // whole model movement
+                
+            //rotVector.setFromPoint(v.position);
+            rotVector.rotate(angle);
+            
+            this.drawVertices[vIdx++]=rotVector.x+position.x;
+            this.drawVertices[vIdx++]=rotVector.y+position.y;
+            this.drawVertices[vIdx++]=rotVector.z+position.z;
+            
+            normal.rotate(angle);
             
             this.drawNormals[nIdx++]=normal.x;
             this.drawNormals[nIdx++]=normal.y;
@@ -148,7 +161,7 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         // set vertices to ang and offset position
         //
         
-    this.updateVertexesToAngleAndPosition=function(view,angle,offsetPosition)
+    this.updateVertexesToAngleAndPosition=function(view,angle,position)
     {
         var n,v;
         var normal;
@@ -167,9 +180,9 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             rotVector.setFromPoint(v.position);
             rotVector.rotate(angle);
             
-            this.drawVertices[vIdx++]=rotVector.x+offsetPosition.x;
-            this.drawVertices[vIdx++]=rotVector.y+offsetPosition.y;
-            this.drawVertices[vIdx++]=rotVector.z+offsetPosition.z;
+            this.drawVertices[vIdx++]=rotVector.x+position.x;
+            this.drawVertices[vIdx++]=rotVector.y+position.y;
+            this.drawVertices[vIdx++]=rotVector.z+position.z;
             
             normal.setFromPoint(v.normal);
             normal.rotate(angle);
