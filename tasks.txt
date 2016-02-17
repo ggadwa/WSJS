@@ -22,7 +22,12 @@ REGULAR TODOs
 
 ----> redo all the entity nonsense when we have classes
        * getAngle() getPosition() should go back to angle/position and be getters
-----> entity list should start the player object, and map resets it (MAYBE NOT, think about this)
+       * (touchEntity.getName()==='projectile') use instanceof
+
+#### entity collisions need to push apart to radius1 or radius2
+#### particles
+
+#### models (1) leg, torso height, divide out to make separate parts, different radiuses, finger/hands, animal bodies in middle
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html

@@ -4,12 +4,16 @@
 // monster entity class
 //
 
-function EntityMonsterObject(position,angle,radius,high,model)
+function EntityMonsterObject(name,position,angle,radius,high,model)
 {
         // supergumba -- ALL AWFUL REPLACE WHEN WE HAVE CLASSES
         // change all baseEntity. to this.
         
-    this.baseEntity=new EntityObject(position,angle,radius,high,model);
+    this.baseEntity=new EntityObject(name,position,angle,radius,high,model);
+    this.getName=function()
+    {
+        return(this.baseEntity.name);
+    };
     this.getModel=function()
     {
         return(this.baseEntity.getModel());
@@ -25,6 +29,25 @@ function EntityMonsterObject(position,angle,radius,high,model)
         return(this.baseEntity.getAngle());
     };
     
+    this.getRadius=function()
+    {
+        return(this.baseEntity.radius);
+    };
+    
+    this.getHigh=function()
+    {
+        return(this.baseEntity.high);
+    };
+    this.setId=function(id)
+    {
+        this.baseEntity.setId(id);
+    };
+    
+    this.getId=function()
+    {
+        return(this.baseEntity.getId());
+    };
+    
     this.markAsDelete=function()
     {
         this.baseEntity.markedForDeletion=true;
@@ -33,6 +56,20 @@ function EntityMonsterObject(position,angle,radius,high,model)
     this.isMarkedForDeletion=function()
     {
         return(this.baseEntity.isMarkedForDeletion());
+    };
+    this.clearTouchEntity=function()
+    {
+        this.baseEntity.touchEntity=null;
+    };
+    
+    this.setTouchEntity=function(entity)
+    {
+        this.baseEntity.touchEntity=entity;
+    };
+    
+    this.getTouchEntity=function()
+    {
+        return(this.baseEntity.touchEntity);
     };
 
     this.inFrustum=function(view)
@@ -55,12 +92,37 @@ function EntityMonsterObject(position,angle,radius,high,model)
         this.baseEntity.draw(view);
     };
     
+    
+    
+    // local functions
+    
+        //
+        // override bumping
+        //
+        
+    this.canBump=function()
+    {
+        return(true);
+    };
+    
         //
         // run monster
         //
     
     this.run=function(view,map,entityList)
     {
+            // delete if hit by projectile
+        
+        var touchEntity=this.getTouchEntity();
+        if (touchEntity!==null) {
+            if (touchEntity.getName()==='projectile') {     // supergumba -- use instanceof here!!!
+                this.markAsDelete();
+                return;
+            }
+        }
+        
+        this.clearTouchEntity();
+        
             // only move if close to player
         
         var player=entityList.getPlayer();
@@ -77,7 +139,7 @@ function EntityMonsterObject(position,angle,radius,high,model)
         
             // run towards player
             
-        this.baseEntity.moveSimple(map,-50);
+        this.baseEntity.moveSimple(map,entityList,-50);
             
             // falling
         

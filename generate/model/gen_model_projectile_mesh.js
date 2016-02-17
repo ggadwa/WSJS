@@ -11,7 +11,7 @@ function GenModelProjectileMeshObject(model,bitmap,genRandom)
     
     this.buildBoxAroundPoint=function(centerPt,sz,vertexList,indexes)
     {
-        var n;
+        var n,v;
         var idx=0;
         
         var xBound=new wsBound((centerPt.x-sz),(centerPt.x+sz));

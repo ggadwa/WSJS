@@ -4,13 +4,16 @@
 // entity base class
 //
 
-function EntityObject(position,angle,radius,high,model)
+function EntityObject(name,position,angle,radius,high,model)
 {
+    this.name=name;
     this.position=position;
     this.angle=angle;
     this.radius=radius;
     this.high=high;
     this.model=model;
+    
+    this.id=-1;
     
     this.turnSpeed=0;
     this.lookSpeed=0;
@@ -21,6 +24,8 @@ function EntityObject(position,angle,radius,high,model)
     this.gravity=0;
     
     this.markedForDeletion=false;              // used to delete this outside the run loop
+    
+    this.touchEntity=null;
     
     this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
     this.slidePt=new wsPoint(0,0,0);
@@ -36,7 +41,12 @@ function EntityObject(position,angle,radius,high,model)
         //
         // getters -- supergumba -- replace these with real getters!
         //
-        
+    
+    this.getName=function()
+    {
+        return(this.name);
+    };
+    
     this.getModel=function()
     {
         return(this.model);
@@ -50,6 +60,30 @@ function EntityObject(position,angle,radius,high,model)
     this.getAngle=function()
     {
         return(this.angle);
+    };
+    
+    this.getRadius=function()
+    {
+        return(this.radius);
+    };
+    
+    this.getHigh=function()
+    {
+        return(this.high);
+    };
+    
+        //
+        // IDs
+        //
+        
+    this.setId=function(id)
+    {
+        this.id=id;
+    };
+    
+    this.getId=function()
+    {
+        return(this.id);
     };
     
         //
@@ -67,10 +101,38 @@ function EntityObject(position,angle,radius,high,model)
     };
     
         //
+        // touching
+        //
+        
+    this.clearTouchEntity=function()
+    {
+        this.touchEntity=null;
+    };
+    
+    this.setTouchEntity=function(entity)
+    {
+        this.touchEntity=entity;
+    };
+    
+    this.getTouchEntity=function()
+    {
+        return(this.touchEntity);
+    };
+    
+        //
+        // bumping
+        //
+        
+    this.canBump=function()
+    {
+        return(true);
+    };
+    
+        //
         // move entity
         //
     
-    this.moveComplex=function(map,dist,extraAngle,flying,clipping)
+    this.moveComplex=function(map,entityList,dist,extraAngle,flying,clipping)
     {
         var angY=this.angle.y+extraAngle;
         
@@ -99,7 +161,7 @@ function EntityObject(position,angle,radius,high,model)
             // there's been a bump, move it, otherwise,
             // try sliding
             
-        this.collision.moveObjectInMap(map,this.position,this.movePt,this.radius,this.high,true,this.collideMovePt);
+        this.collision.moveObjectInMap(map,entityList,this,this.movePt,this.canBump(),this.collideMovePt);
         if ((this.collideMovePt.equals(this.movePt)) || (this.collideMovePt.y!==0)) {
             this.position.addPoint(this.collideMovePt);
             return;
@@ -109,7 +171,7 @@ function EntityObject(position,angle,radius,high,model)
             
         this.slidePt.set(this.movePt.x,0.0,0.0);
         
-        this.collision.moveObjectInMap(map,this.position,this.slidePt,this.radius,this.high,false,this.collideSlideMovePt);
+        this.collision.moveObjectInMap(map,entityList,this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
             this.position.addPoint(this.collideSlideMovePt);
             return;
@@ -117,7 +179,7 @@ function EntityObject(position,angle,radius,high,model)
         
         this.slidePt.set(0.0,0.0,this.movePt.z);
         
-        this.collision.moveObjectInMap(map,this.position,this.slidePt,this.radius,this.high,false,this.collideSlideMovePt);
+        this.collision.moveObjectInMap(map,entityList,this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
             this.position.addPoint(this.collideSlideMovePt);
             return;
@@ -129,12 +191,12 @@ function EntityObject(position,angle,radius,high,model)
         this.position.addPoint(this.collideMovePt);
     };
     
-    this.moveSimple=function(map,speed)
+    this.moveSimple=function(map,entityList,dist)
     {
-        this.movePt.set(0.0,0.0,speed);
+        this.movePt.set(0.0,0.0,dist);
         this.movePt.rotateY(null,angle.y);
             
-        this.collision.moveObjectInMap(map,this.position,this.movePt,this.radius,this.high,true,this.collideMovePt);
+        this.collision.moveObjectInMap(map,entityList,this,this.movePt,this.canBump(),this.collideMovePt);
         if (!this.collideMovePt.equals(this.movePt)) return(true);
         
         this.position.addPoint(this.collideMovePt);

@@ -4,9 +4,10 @@
 // weapon class
 //
 
-function WeaponObject(model)
+function WeaponObject(model,projectileModel)
 {
     this.model=model;
+    this.projectileModel=projectileModel;
     
     this.lastFireTimeStamp=0;
     
@@ -35,7 +36,7 @@ function WeaponObject(model)
         pos.addPoint(entity.getPosition());
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        entityList.add(new EntityProjectileObject(view,pos,ang,500,500,this.model));
+        entityList.add(new EntityProjectileObject('projectile',view,pos,ang,500,500,this.projectileModel));
     };
     
         //

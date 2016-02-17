@@ -6,6 +6,7 @@
 
 function EntityListObject()
 {
+    this.entityCurrentId=1;
     this.entities=[];
     
         //
@@ -22,7 +23,7 @@ function EntityListObject()
         return(true);
     };
 
-    this.rRelease=function(view)
+    this.release=function(view)
     {
     };
 
@@ -35,11 +36,13 @@ function EntityListObject()
 
     this.setPlayer=function(entity)
     {
+        entity.setId(0);
         this.entities[0]=entity;
     };
 
     this.add=function(entity)
     {
+        entity.setId(this.entityCurrentId++);
         this.entities.push(entity);
     };
 

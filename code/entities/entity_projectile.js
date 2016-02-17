@@ -4,7 +4,7 @@
 // entity projectile object
 //
 
-function EntityProjectileObject(view,position,angle,radius,high,model)
+function EntityProjectileObject(name,view,position,angle,radius,high,model)
 {
     this.startTimeStamp=view.timeStamp;
     
@@ -13,7 +13,11 @@ function EntityProjectileObject(view,position,angle,radius,high,model)
         // supergumba -- ALL AWFUL REPLACE WHEN WE HAVE CLASSES
         // change all baseEntity. to this.
         
-    this.baseEntity=new EntityObject(position,angle,radius,high,model);
+    this.baseEntity=new EntityObject(name,position,angle,radius,high,model);
+    this.getName=function()
+    {
+        return(this.baseEntity.name);
+    };
     this.getModel=function()
     {
         return(this.baseEntity.getModel());
@@ -28,6 +32,24 @@ function EntityProjectileObject(view,position,angle,radius,high,model)
     {
         return(this.baseEntity.getAngle());
     };
+    this.getRadius=function()
+    {
+        return(this.baseEntity.radius);
+    };
+    
+    this.getHigh=function()
+    {
+        return(this.baseEntity.high);
+    };
+    this.setId=function(id)
+    {
+        this.baseEntity.setId(id);
+    };
+    
+    this.getId=function()
+    {
+        return(this.baseEntity.getId());
+    };
     
     this.markAsDelete=function()
     {
@@ -37,6 +59,20 @@ function EntityProjectileObject(view,position,angle,radius,high,model)
     this.isMarkedForDeletion=function()
     {
         return(this.baseEntity.isMarkedForDeletion());
+    };
+    this.clearTouchEntity=function()
+    {
+        this.baseEntity.touchEntity=null;
+    };
+    
+    this.setTouchEntity=function(entity)
+    {
+        this.baseEntity.touchEntity=entity;
+    };
+    
+    this.getTouchEntity=function()
+    {
+        return(this.baseEntity.touchEntity);
     };
 
     this.inFrustum=function(view)
@@ -62,6 +98,15 @@ function EntityProjectileObject(view,position,angle,radius,high,model)
     
     
     // supergumba -- local functions
+    // 
+        //
+        // override bumping
+        //
+        
+    this.canBump=function()
+    {
+        return(false);
+    };
     
         //
         // run projectile
@@ -79,7 +124,7 @@ function EntityProjectileObject(view,position,angle,radius,high,model)
         
             // else move it
             
-        if (this.baseEntity.moveSimple(map,400)) {
+        if (this.baseEntity.moveSimple(map,entityList,400)) {
             this.baseEntity.markAsDelete();
         }
     };

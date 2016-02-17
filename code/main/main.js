@@ -310,10 +310,21 @@ function wsInitBuildWeapons(textureGenRandom,modelGenRandom)
     var genBitmap=new GenBitmapObject(textureGenRandom);    
     var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_METAL,debug);
     
+        // weapon
+        
     var model=new ModelObject('weapon_0',MODEL_TYPE_WEAPON);
     
-    var genModelMesh=new GenModelWeaponMeshObject(model,modelBitmap,modelGenRandom);
-    genModelMesh.build(view);
+    var genModelWeaponMesh=new GenModelWeaponMeshObject(model,modelBitmap,modelGenRandom);
+    genModelWeaponMesh.build(view);
+    
+    modelList.add(model);
+    
+        // projectile
+        
+    var model=new ModelObject('projectile_0',MODEL_TYPE_PROJECTILE);
+    
+    var genModelProjectileMesh=new GenModelProjectileMeshObject(model,modelBitmap,modelGenRandom);
+    genModelProjectileMesh.build(view);
     
     modelList.add(model);
 
@@ -341,8 +352,8 @@ function wsInitBuildEntities()
         return;
     }
 
-    var playerEntity=new EntityPlayerObject(pos,new wsPoint(0.0,0.0,0.0),800,1000,modelList.get('player'));
-    playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0')));
+    var playerEntity=new EntityPlayerObject('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.get('player'));
+    playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0'),modelList.get('projectile_0')));
     playerEntity.setCurrentWeaponIndex(0);
     
     entityList.setPlayer(playerEntity);
@@ -358,7 +369,7 @@ function wsInitBuildEntities()
         monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
         model=modelList.clone(view,monsterModelName);
         
-        entityList.add(new EntityMonsterObject(pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),800,1000,model));
+        entityList.add(new EntityMonsterObject(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
     }
     
         // finished

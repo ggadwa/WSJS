@@ -4,7 +4,7 @@
 // player entity class
 //
 
-function EntityPlayerObject(position,angle,radius,high,model)
+function EntityPlayerObject(name,position,angle,radius,high,model)
 {
     this.weaponCurrentIndex=-1;
     this.weapons=[];
@@ -13,8 +13,12 @@ function EntityPlayerObject(position,angle,radius,high,model)
         // supergumba -- ALL AWFUL REPLACE WHEN WE HAVE CLASSES
         // change all baseEntity. to this.
         
-    this.baseEntity=new EntityObject(position,angle,radius,high,model);
+    this.baseEntity=new EntityObject(name,position,angle,radius,high,model);
     
+    this.getName=function()
+    {
+        return(this.baseEntity.name);
+    };
     this.getModel=function()
     {
         return(this.baseEntity.getModel());
@@ -29,6 +33,24 @@ function EntityPlayerObject(position,angle,radius,high,model)
     {
         return(this.baseEntity.getAngle());
     };
+    this.getRadius=function()
+    {
+        return(this.baseEntity.radius);
+    };
+    
+    this.getHigh=function()
+    {
+        return(this.baseEntity.high);
+    };
+    this.setId=function(id)
+    {
+        this.baseEntity.setId(id);
+    };
+    
+    this.getId=function()
+    {
+        return(this.baseEntity.getId());
+    };
     
     this.markAsDelete=function()
     {
@@ -38,6 +60,20 @@ function EntityPlayerObject(position,angle,radius,high,model)
     this.isMarkedForDeletion=function()
     {
         return(this.baseEntity.isMarkedForDeletion());
+    };
+    this.clearTouchEntity=function()
+    {
+        this.baseEntity.touchEntity=null;
+    };
+    
+    this.setTouchEntity=function(entity)
+    {
+        this.baseEntity.touchEntity=entity;
+    };
+    
+    this.getTouchEntity=function()
+    {
+        return(this.baseEntity.touchEntity);
     };
 
     this.inFrustum=function(view)
@@ -72,6 +108,15 @@ function EntityPlayerObject(position,angle,radius,high,model)
     this.setVerticalSpeed=function(speed)
     {
         this.baseEntity.verticalSpeed=speed;
+    };
+    
+        //
+        // override bumping
+        //
+        
+    this.canBump=function()
+    {
+        return(true);
     };
     
         //
@@ -120,8 +165,8 @@ function EntityPlayerObject(position,angle,radius,high,model)
         this.baseEntity.turn(this.baseEntity.turnSpeed);
         this.baseEntity.look(this.baseEntity.lookSpeed);
         
-        if (this.baseEntity.forwardSpeed!==0.0) this.baseEntity.moveComplex(map,this.baseEntity.forwardSpeed,0.0,PLAYER_FLY,PLAYER_CLIP_WALLS);
-        if (this.baseEntity.sideSpeed!==0.0) this.baseEntity.moveComplex(map,this.baseEntity.sideSpeed,90.0,PLAYER_FLY,PLAYER_CLIP_WALLS);
+        if (this.baseEntity.forwardSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.forwardSpeed,0.0,PLAYER_FLY,PLAYER_CLIP_WALLS);
+        if (this.baseEntity.sideSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.sideSpeed,90.0,PLAYER_FLY,PLAYER_CLIP_WALLS);
         
         if (this.baseEntity.verticalSpeed!==0.0) this.baseEntity.moveDirect(0.0,this.baseEntity.verticalSpeed,0.0);
         

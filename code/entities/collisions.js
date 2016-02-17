@@ -92,20 +92,47 @@ function CollisionObject()
 
         return(currentDist!==-1);
     };
+    
+    this.circleCircleIntersection=function(circlePt1,radius1,circlePt2,radius2,circleIntersectPt)
+    {
+        var dist;
+        var totalRadius=radius1+radius2;
+        
+            // get distance between center points
+            // if less than r1+r2 then it's a hit
+            
+        dist=circlePt1.distance(circlePt2);
+        if (dist>totalRadius) return(false);
+        
+            // get the hit point by the total
+            // raidus from the second circle
+            
+        circleIntersectPt.setFromSubPoint(circlePt1,circlePt2);
+        circleIntersectPt.normalize();
+        circleIntersectPt.scale(totalRadius);
+        circleIntersectPt.addPoint(circlePt2);
+        
+        return(true);
+    };
 
         //
         // colliding objects
         //
 
-    this.moveObjectInMap=function(map,origPt,movePt,radius,high,bump,collideMovePt)
+    this.moveObjectInMap=function(map,entityList,entity,movePt,bump,collideMovePt)
     {
         var n,k;
-        var mesh;
+        var mesh,checkEntity,checkEntityPt;
         var collisionLine,nCollisionLine;        
         var currentHitPt;        
         var dist,currentDist;
         
+        var origPt=entity.getPosition();
+        var radius=entity.getRadius();
+        var high=entity.getHigh();
+        
         var nMesh=map.meshes.length;
+        var nEntity=entityList.count();
         
             // only bump once
             
@@ -173,6 +200,41 @@ function CollisionObject()
                 }
             }
             
+                // check other entities
+   
+            for (n=0;n!==nEntity;n++) {
+                checkEntity=entityList.get(n);
+                if (checkEntity.getId()===entity.getId()) continue;
+                
+                checkEntityPt=checkEntity.getPosition();
+                
+                    // skip if not in the Y of the line
+
+                if ((this.testPt.y>checkEntityPt.y) || (this.testPt.y<=(checkEntityPt.y-checkEntity.getHigh()))) continue;
+                
+                    // check the circle
+                    
+                if (!this.circleCircleIntersection(this.testPt,radius,checkEntityPt,checkEntity.getRadius(),this.moveIntersectPt)) continue;
+                
+                    // find closest hit point
+
+                dist=this.testPt.noSquareDistance(this.moveIntersectPt);
+                if ((dist<currentDist) || (currentDist===-1)) {
+                    
+                        // set the touch
+                        
+                    entity.setTouchEntity(checkEntity);
+                    checkEntity.setTouchEntity(entity);
+                    
+                        // the hit point
+                        
+                    currentHitPt=this.moveIntersectPt;
+                    currentDist=dist;
+                    bumpY=-1;
+                    if ((this.testPt.y-yBound.min)<this.BUMP_HIGH) bumpY=yBound.min;
+                }
+            }
+
                 // if no hits, just return
                 // original move plus any bump
                 // we might have had
