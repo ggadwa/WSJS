@@ -20,7 +20,6 @@ WHEN THERE IS AN INTERFACE TODOs
 
 REGULAR TODOs
 
-
 ----> redo all the entity nonsense when we have classes
        * getAngle() getPosition() should go back to angle/position and be getters
 ----> entity list should start the player object, and map resets it (MAYBE NOT, think about this)

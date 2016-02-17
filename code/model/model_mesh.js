@@ -49,6 +49,11 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     this.vertexTangentBuffer=null;
     this.vertexUVAttribute=null;
     this.indexBuffer=null;
+    
+        // global variables to stop GCd
+        
+    this.rotVector=new wsPoint(0.0,0.0,0.0);
+    this.rotNormal=new wsPoint(0.0,0.0,0.0);
         
         //
         // close model mesh
@@ -107,9 +112,6 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         var n,v;
         var bone;
         
-        var rotVector=new wsPoint(0.0,0.0,0.0);
-        var normal=new wsPoint(0.0,0.0,0.0);
-        
             // move all the vertexes
             
         var vIdx=0;
@@ -121,30 +123,29 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             
                 // bone movement
                 
-            rotVector.setFromPoint(v.vectorFromBone);
-            rotVector.rotate(bone.curPoseAngle);
+            this.rotVector.setFromPoint(v.vectorFromBone);
+            this.rotVector.rotate(bone.curPoseAngle);
             
-            rotVector.x=bone.curPosePosition.x+rotVector.x;
-            rotVector.y=bone.curPosePosition.y+rotVector.y;
-            rotVector.z=bone.curPosePosition.z+rotVector.z;
+            this.rotVector.x=bone.curPosePosition.x+this.rotVector.x;
+            this.rotVector.y=bone.curPosePosition.y+this.rotVector.y;
+            this.rotVector.z=bone.curPosePosition.z+this.rotVector.z;
             
-            normal.setFromPoint(v.normal);
-            normal.rotate(bone.curPoseAngle);
+            this.rotNormal.setFromPoint(v.normal);
+            this.rotNormal.rotate(bone.curPoseAngle);
             
                 // whole model movement
                 
-            //rotVector.setFromPoint(v.position);
-            rotVector.rotate(angle);
+            this.rotVector.rotate(angle);
             
-            this.drawVertices[vIdx++]=rotVector.x+position.x;
-            this.drawVertices[vIdx++]=rotVector.y+position.y;
-            this.drawVertices[vIdx++]=rotVector.z+position.z;
+            this.drawVertices[vIdx++]=this.rotVector.x+position.x;
+            this.drawVertices[vIdx++]=this.rotVector.y+position.y;
+            this.drawVertices[vIdx++]=this.rotVector.z+position.z;
             
-            normal.rotate(angle);
+            this.rotNormal.rotate(angle);
             
-            this.drawNormals[nIdx++]=normal.x;
-            this.drawNormals[nIdx++]=normal.y;
-            this.drawNormals[nIdx++]=normal.z;
+            this.drawNormals[nIdx++]=this.rotNormal.x;
+            this.drawNormals[nIdx++]=this.rotNormal.y;
+            this.drawNormals[nIdx++]=this.rotNormal.z;
         }
         
             // set the buffers
@@ -164,10 +165,6 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     this.updateVertexesToAngleAndPosition=function(view,angle,position)
     {
         var n,v;
-        var normal;
-        
-        var rotVector=new wsPoint(0.0,0.0,0.0);
-        var normal=new wsPoint(0.0,0.0,0.0);
         
             // move all the vertexes
             
@@ -177,19 +174,19 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
             
-            rotVector.setFromPoint(v.position);
-            rotVector.rotate(angle);
+            this.rotVector.setFromPoint(v.position);
+            this.rotVector.rotate(angle);
             
-            this.drawVertices[vIdx++]=rotVector.x+position.x;
-            this.drawVertices[vIdx++]=rotVector.y+position.y;
-            this.drawVertices[vIdx++]=rotVector.z+position.z;
+            this.drawVertices[vIdx++]=this.rotVector.x+position.x;
+            this.drawVertices[vIdx++]=this.rotVector.y+position.y;
+            this.drawVertices[vIdx++]=this.rotVector.z+position.z;
             
-            normal.setFromPoint(v.normal);
-            normal.rotate(angle);
+            this.rotNormal.setFromPoint(v.normal);
+            this.rotNormal.rotate(angle);
             
-            this.drawNormals[nIdx++]=normal.x;
-            this.drawNormals[nIdx++]=normal.y;
-            this.drawNormals[nIdx++]=normal.z;
+            this.drawNormals[nIdx++]=this.rotNormal.x;
+            this.drawNormals[nIdx++]=this.rotNormal.y;
+            this.drawNormals[nIdx++]=this.rotNormal.z;
         }
         
             // set the buffers
