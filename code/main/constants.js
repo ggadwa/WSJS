@@ -86,7 +86,7 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 const MONSTER_MODEL_COUNT=3;
 const MONSTER_ENTITY_COUNT=15;
 
-const MONSTER_AI_ON=true;
+const MONSTER_AI_ON=false;
 
 //
 // random seeds,

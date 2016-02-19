@@ -24,7 +24,8 @@ REGULAR TODOs
        * getAngle() getPosition() should go back to angle/position and be getters
        * (touchEntity.getName()==='projectile') use instanceof
 
-#### entity collisions need to push apart to radius1 or radius2
+
+#### stops falling if pushing against a wall
 #### particles
 
 #### models (1) leg, torso height, divide out to make separate parts, different radiuses, finger/hands, animal bodies in middle

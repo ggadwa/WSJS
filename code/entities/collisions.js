@@ -89,7 +89,7 @@ function CollisionObject()
 
             rad+=radAdd;
         }
-
+        
         return(currentDist!==-1);
     };
     
@@ -104,12 +104,12 @@ function CollisionObject()
         dist=circlePt1.distance(circlePt2);
         if (dist>totalRadius) return(false);
         
-            // get the hit point by the total
-            // raidus from the second circle
+            // hit point needs to be on the
+            // radius of circle2
             
-        circleIntersectPt.setFromSubPoint(circlePt1,circlePt2);
+        circleIntersectPt.set((circlePt1.x-circlePt2.x),0,(circlePt1.z-circlePt2.z));
         circleIntersectPt.normalize();
-        circleIntersectPt.scale(totalRadius);
+        circleIntersectPt.scale(radius2);
         circleIntersectPt.addPoint(circlePt2);
         
         return(true);
@@ -201,7 +201,7 @@ function CollisionObject()
             }
             
                 // check other entities
-   
+
             for (n=0;n!==nEntity;n++) {
                 checkEntity=entityList.get(n);
                 if (checkEntity.getId()===entity.getId()) continue;
@@ -257,14 +257,8 @@ function CollisionObject()
             this.testPt.y=bumpY;
         }
         
-            // the new move is to a point
-            // that is one radius away
-            // from the hit point, in the
-            // direction of the move
-            
-            // normalize the move from
-            // hit point to orig point and
-            // scale to radius
+            // we need to move the hit point so it's
+            // always outside the radius of moving point
         
         this.radiusPt.set((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
         
@@ -274,7 +268,7 @@ function CollisionObject()
         this.radiusPt.addPoint(currentHitPt);
         
             // and the new move is the original
-            // point to this point
+            // point to this current hit point
             // always restore the bump move
         
         collideMovePt.set((this.radiusPt.x-origPt.x),(this.testPt.y-origPt.y),(this.radiusPt.z-origPt.z));
