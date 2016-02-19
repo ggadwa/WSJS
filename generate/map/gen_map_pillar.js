@@ -23,8 +23,6 @@ function GenRoomPillarObject(view,map,room,genRandom)
         var count,radius,yBound;
         var room=this.room;
         
-        if (!ROOM_PILLARS) return;
-        
             // pillar count
             
         count=this.genRandom.randomIndex(ROOM_MAX_PILLAR_COUNT);

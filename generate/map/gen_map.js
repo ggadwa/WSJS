@@ -544,6 +544,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var n,closet;
         var nRoom=this.map.rooms.length;
         
+        if (!ROOM_CLOSETS) return;
+        
         for (n=0;n!==nRoom;n++) {
             closet=new GenRoomClosetObject(this.view,this.map,this.map.rooms[n],genRandom);
             closet.addCloset();
@@ -555,10 +557,12 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var n,room,platform;
         var nRoom=this.map.rooms.length;
         
+        if (!ROOM_PLATFORMS) return;
+        
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
             
-            if ((room.hasStories) && (room.level===0) && (ROOM_PLATFORMS)) {
+            if ((room.hasStories) && (room.level===0)) {
                 platform=new GenRoomPlatformObject(this.map,this.genRandom,room);
                 platform.createPlatforms();
             }
@@ -570,10 +574,12 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var n,room,ledge;
         var nRoom=this.map.rooms.length;
         
+        if (!ROOM_LEDGES) return;
+        
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
             
-            if ((ROOM_LEDGES) && (this.genRandom.randomPercentage(ROOM_LEDGE_PERCENTAGE))) {
+            if (this.genRandom.randomPercentage(ROOM_LEDGE_PERCENTAGE)) {
                 ledge=new GenRoomLedgeObject(this.map,this.genRandom,room);
                 ledge.createLedges();
             }
@@ -585,6 +591,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var n,pillar;
         var nRoom=this.map.rooms.length;
         
+        if (!ROOM_PILLARS) return;
+        
         for (n=0;n!==nRoom;n++) {
             pillar=new GenRoomPillarObject(this.view,this.map,this.map.rooms[n],genRandom);
             pillar.addPillars();
@@ -595,6 +603,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     {
         var n,decoration;
         var nRoom=this.map.rooms.length;
+        
+        if (!ROOM_DECORATIONS) return;
         
         for (n=0;n!==nRoom;n++) {
             decoration=new GenRoomDecorationObject(this.view,this.map,this.map.rooms[n],genRandom);

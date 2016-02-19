@@ -28,7 +28,7 @@ REGULAR TODOs
 #### stops falling if pushing against a wall
 #### particles
 
-#### models (1) leg, torso height, divide out to make separate parts, different radiuses, finger/hands, animal bodies in middle
+#### models (1) leg, torso height, divide out to make separate parts, different radiuses, finger/hands, animal bodies in middle, tails, random vertex moves
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html

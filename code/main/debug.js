@@ -206,7 +206,7 @@ function DebugObject()
         // draw skeleton
         //
 
-    this.drawModelSkeleton=function(view,model,offsetPosition)
+    this.drawModelSkeleton=function(view,model,angle,position)
     {
         var n,lineCount,vIdx,iIdx;
         var skeleton=model.skeleton;
@@ -221,13 +221,18 @@ function DebugObject()
 
         var vertices=new Float32Array(nBone*3);
         var indexes=new Uint16Array(nBone*2);
+        
+        var rotVector=new wsPoint(0,0,0);
 
         vIdx=0;
 
         for (n=0;n!==nBone;n++) {
-            vertices[vIdx++]=skeleton.bones[n].curPosePosition.x+offsetPosition.x;
-            vertices[vIdx++]=skeleton.bones[n].curPosePosition.y+offsetPosition.y;
-            vertices[vIdx++]=skeleton.bones[n].curPosePosition.z+offsetPosition.z;
+            rotVector.setFromPoint(skeleton.bones[n].curPosePosition);
+            rotVector.rotate(angle);
+
+            vertices[vIdx++]=rotVector.x+position.x;
+            vertices[vIdx++]=rotVector.y+position.y;
+            vertices[vIdx++]=rotVector.z+position.z;
         }
 
         iIdx=0;
@@ -279,7 +284,8 @@ function DebugObject()
         
         for (n=0;n!==nBone;n++) {
             pnt=new wsPoint(skeleton.bones[n].curPosePosition.x,skeleton.bones[n].curPosePosition.y,skeleton.bones[n].curPosePosition.z);
-            pnt.addPoint(offsetPosition);
+            pnt.rotate(angle);
+            pnt.addPoint(position);
             particlePoints.push(pnt);
         }
             

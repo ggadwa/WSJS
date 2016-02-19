@@ -108,10 +108,6 @@ function GenRoomDecorationObject(view,map,room,genRandom)
 
     this.addDecorations=function()
     {
-            // this map have decorations?
-            
-        if (!ROOM_DECORATIONS) return;
-        
             // randomly pick a decoration
             
         switch (this.genRandom.randomIndex(2)) {

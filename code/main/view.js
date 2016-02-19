@@ -529,7 +529,7 @@ function ViewObject()
                 entity.draw(this);
                 entity.drawEnd(this);
 
-                if (DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.getModel(),entity.getPosition());
+                if (DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.getModel(),entity.getAngle(),entity.getPosition());
                 if (DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.getModel());
                 if (DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.getModel());
                 if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.getModel());
