@@ -4,20 +4,19 @@
 // map platforms
 //
 
-function GenRoomPlatformObject(map,genRandom,room)
+function GenRoomPlatformObject(map,genRandom)
 {
     this.map=map;
     this.genRandom=genRandom;
-    this.room=room;
     
         //
         // add stairs chunk
         //
         
-    this.addStairChunk=function(stairX,stairZ,stairDir,platformBitmap)
+    this.addStairChunk=function(room,stairX,stairZ,stairDir,platformBitmap)
     {
-        var xStairBound=new wsBound((this.room.xBound.min+(stairX*ROOM_BLOCK_WIDTH)),(this.room.xBound.min+((stairX+1)*ROOM_BLOCK_WIDTH)));
-        var zStairBound=new wsBound((this.room.zBound.min+(stairZ*ROOM_BLOCK_WIDTH)),(this.room.zBound.min+((stairZ+1)*ROOM_BLOCK_WIDTH)));
+        var xStairBound=new wsBound((room.xBound.min+(stairX*ROOM_BLOCK_WIDTH)),(room.xBound.min+((stairX+1)*ROOM_BLOCK_WIDTH)));
+        var zStairBound=new wsBound((room.zBound.min+(stairZ*ROOM_BLOCK_WIDTH)),(room.zBound.min+((stairZ+1)*ROOM_BLOCK_WIDTH)));
 
         var stairBitmap=this.map.getBitmapById(TEXTURE_STAIR);
         
@@ -25,22 +24,22 @@ function GenRoomPlatformObject(map,genRandom,room)
         
         switch (stairDir) {
             case 0:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,this.room.yBound,zStairBound,true,true,true);
+                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,true);
                 break;
             case 1:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,this.room.yBound,zStairBound,true,true,true);
+                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,true);
                 break;
             case 2:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,this.room.yBound,zStairBound,true,true,false);
+                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,false);
                 break;
             case 3:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,this.room.yBound,zStairBound,true,true,false);
+                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,false);
                 break;
         }
         
             // can't spawn items on this grid spot
             
-        this.room.setBlockGrid(stairX,stairZ);
+        room.setBlockGrid(stairX,stairZ);
         
         this.map.addOverlayPlatform(xStairBound,zStairBound);
     };
@@ -49,17 +48,17 @@ function GenRoomPlatformObject(map,genRandom,room)
         // add platform chunk
         //
         
-    this.addPlatformChunk=function(x,z,platformBitmap)
+    this.addPlatformChunk=function(room,x,z,platformBitmap)
     {
-        var xPlatformBound=new wsBound((this.room.xBound.min+(x*ROOM_BLOCK_WIDTH)),(this.room.xBound.min+((x+1)*ROOM_BLOCK_WIDTH)));
-        var yPlatformBound=new wsBound((this.room.yBound.min-ROOM_FLOOR_DEPTH),this.room.yBound.min);
-        var zPlatformBound=new wsBound((this.room.zBound.min+(z*ROOM_BLOCK_WIDTH)),(this.room.zBound.min+((z+1)*ROOM_BLOCK_WIDTH)));
+        var xPlatformBound=new wsBound((room.xBound.min+(x*ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*ROOM_BLOCK_WIDTH)));
+        var yPlatformBound=new wsBound((room.yBound.min-ROOM_FLOOR_DEPTH),room.yBound.min);
+        var zPlatformBound=new wsBound((room.zBound.min+(z*ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*ROOM_BLOCK_WIDTH)));
 
         this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_ROOM_PLATFORM));
 
             // can now spawn items unto upper grid
             
-        this.room.setPlatformGrid(x,z);
+        room.setPlatformGrid(x,z);
 
         this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
     };
@@ -68,45 +67,45 @@ function GenRoomPlatformObject(map,genRandom,room)
         // walkways
         //
         
-    this.addChunkWalkwayDirPosX=function(stairX,stairZ,platformBitmap)
+    this.addChunkWalkwayDirPosX=function(room,stairX,stairZ,platformBitmap)
     {
         var x;
         
-        for (x=(stairX+1);x<this.room.xBlockSize;x++) {
-            this.addPlatformChunk(x,stairZ,platformBitmap);
+        for (x=(stairX+1);x<room.xBlockSize;x++) {
+            this.addPlatformChunk(room,x,stairZ,platformBitmap);
         }
         
-        return(this.room.xBlockSize-1);
+        return(room.xBlockSize-1);
     };
     
-    this.addChunkWalkwayDirPosZ=function(stairX,stairZ,platformBitmap)
+    this.addChunkWalkwayDirPosZ=function(room,stairX,stairZ,platformBitmap)
     {
         var z;
         
-        for (z=(stairZ+1);z<this.room.zBlockSize;z++) {
-            this.addPlatformChunk(stairX,z,platformBitmap);
+        for (z=(stairZ+1);z<room.zBlockSize;z++) {
+            this.addPlatformChunk(room,stairX,z,platformBitmap);
         }
         
-        return(this.room.zBlockSize-1);
+        return(room.zBlockSize-1);
     };
     
-    this.addChunkWalkwayDirNegX=function(stairX,stairZ,platformBitmap)
+    this.addChunkWalkwayDirNegX=function(room,stairX,stairZ,platformBitmap)
     {
         var x;
         
         for (x=(stairX-1);x>=0;x--) {
-            this.addPlatformChunk(x,stairZ,platformBitmap);
+            this.addPlatformChunk(room,x,stairZ,platformBitmap);
         }
         
         return(0);
     };
     
-    this.addChunkWalkwayDirNegZ=function(stairX,stairZ,platformBitmap)
+    this.addChunkWalkwayDirNegZ=function(room,stairX,stairZ,platformBitmap)
     {
         var z;
         
         for (z=(stairZ-1);z>=0;z--) {
-            this.addPlatformChunk(stairX,z,platformBitmap);
+            this.addPlatformChunk(room,stairX,z,platformBitmap);
         }
         
         return(0);
@@ -116,7 +115,7 @@ function GenRoomPlatformObject(map,genRandom,room)
         // create platforms
         // 
     
-    this.createPlatforms=function()
+    this.createPlatforms=function(room)
     {
         var x,z,stairX,stairZ,stairDir;
         
@@ -130,52 +129,52 @@ function GenRoomPlatformObject(map,genRandom,room)
             // platforms are the first thing we do so we don't need
             // to check for open spots
         
-        stairX=this.genRandom.randomInt(1,(this.room.xBlockSize-2));
-        stairZ=this.genRandom.randomInt(1,(this.room.zBlockSize-2));
+        stairX=this.genRandom.randomInt(1,(room.xBlockSize-2));
+        stairZ=this.genRandom.randomInt(1,(room.zBlockSize-2));
         
-        this.addStairChunk(stairX,stairZ,stairDir,platformBitmap);
+        this.addStairChunk(room,stairX,stairZ,stairDir,platformBitmap);
         
             // expand from the platform
             
         switch (stairDir) {
             
             case 0:
-                x=this.addChunkWalkwayDirPosX(stairX,stairZ,platformBitmap);
-                z=this.addChunkWalkwayDirPosZ(x,stairZ,platformBitmap);
+                x=this.addChunkWalkwayDirPosX(room,stairX,stairZ,platformBitmap);
+                z=this.addChunkWalkwayDirPosZ(room,x,stairZ,platformBitmap);
 
                 if (this.genRandom.randomPercentage(ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    x=this.addChunkWalkwayDirNegX(x,z,platformBitmap);
-                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirNegZ(x,z,platformBitmap);
+                    x=this.addChunkWalkwayDirNegX(room,x,z,platformBitmap);
+                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirNegZ(room,x,z,platformBitmap);
                 }
                 break;
                 
             case 1:
-                z=this.addChunkWalkwayDirPosZ(stairX,stairZ,platformBitmap);
-                x=this.addChunkWalkwayDirPosX(stairX,z,platformBitmap);
+                z=this.addChunkWalkwayDirPosZ(room,stairX,stairZ,platformBitmap);
+                x=this.addChunkWalkwayDirPosX(room,stairX,z,platformBitmap);
 
                 if (this.genRandom.randomPercentage(ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    z=this.addChunkWalkwayDirNegZ(x,z,platformBitmap);
-                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirNegX(x,z,platformBitmap);
+                    z=this.addChunkWalkwayDirNegZ(room,x,z,platformBitmap);
+                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirNegX(room,x,z,platformBitmap);
                 }
                 break;
                 
             case 2:
-                x=this.addChunkWalkwayDirNegX(stairX,stairZ,platformBitmap);
-                z=this.addChunkWalkwayDirNegZ(x,stairZ,platformBitmap);
+                x=this.addChunkWalkwayDirNegX(room,stairX,stairZ,platformBitmap);
+                z=this.addChunkWalkwayDirNegZ(room,x,stairZ,platformBitmap);
 
                 if (this.genRandom.randomPercentage(ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    x=this.addChunkWalkwayDirPosX(x,z,platformBitmap);
-                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirPosZ(x,z,platformBitmap);
+                    x=this.addChunkWalkwayDirPosX(room,x,z,platformBitmap);
+                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirPosZ(room,x,z,platformBitmap);
                 }
                 break;
                 
             case 3:
-                z=this.addChunkWalkwayDirNegZ(stairX,stairZ,platformBitmap);
-                x=this.addChunkWalkwayDirNegX(stairX,z,platformBitmap);
+                z=this.addChunkWalkwayDirNegZ(room,stairX,stairZ,platformBitmap);
+                x=this.addChunkWalkwayDirNegX(room,stairX,z,platformBitmap);
 
                 if (this.genRandom.randomPercentage(ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    z=this.addChunkWalkwayDirPosZ(x,z,platformBitmap);
-                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirPosX(x,z,platformBitmap);
+                    z=this.addChunkWalkwayDirPosZ(room,x,z,platformBitmap);
+                    if (this.genRandom.randomPercentage(ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirPosX(room,x,z,platformBitmap);
                 }
                 break;
                 

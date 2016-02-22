@@ -203,46 +203,6 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         return(null);
     };
     
-    this.findRandomPillarLocation=function(genRandom)
-    {
-        var x,z,startX,startZ,mx,mz,bx,bz;
-        
-        x=startX=genRandom.randomInt(0,this.xBlockSize);
-        z=startZ=genRandom.randomInt(0,this.zBlockSize);
-        
-        mx=Math.floor(this.xBlockSize/2);
-        mz=Math.floor(this.zBlockSize/2);
-        
-        while (true) {
-            
-                // can only spawn pillars on non-blocked
-                // grids where there are no platforms and not
-                // the middle of the room (it'll block light)
-            
-            if ((x!==mx) && (z!==mz)) {
-                if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
-                    this.blockGrid[z][x]=1;
-                    bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-                    bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
-                    return(new wsPoint(bx,this.yBound.max,bz));
-                }
-            }
-            
-                // move a square over and try again
-                
-            x++;
-            if (x>=this.xBlockSize) {
-                x=0;
-                z++;
-                if (z>=this.zBlockSize) z=0;
-            }
-            
-            if ((x===startX) && (z===startZ)) break;
-        }
-        
-        return(null);
-    };
-    
     this.findRandomDecorationLocation=function(genRandom)
     {
         var x,z,startX,startZ,bx,bz;
@@ -271,6 +231,20 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             }
             
             if ((x===startX) && (z===startZ)) break;
+        }
+        
+        return(null);
+    };
+    
+    this.checkLocationFreeAndBlock=function(x,z)
+    {
+        var bx,bz;
+        
+        if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
+            this.blockGrid[z][x]=1;
+            bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+            bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+            return(new wsPoint(bx,this.yBound.max,bz));
         }
         
         return(null);

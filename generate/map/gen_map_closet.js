@@ -4,14 +4,13 @@
 // generate room closet class
 //
 
-function GenRoomClosetObject(view,map,room,genRandom)
+function GenRoomClosetObject(view,map,genRandom)
 {
         // variables
         
     this.view=view;
     this.map=map;
     this.genRandom=genRandom;
-    this.room=room;
     
         // build the closet cube
         
@@ -121,13 +120,11 @@ function GenRoomClosetObject(view,map,room,genRandom)
 
         // closet mainline
         
-    this.addCloset=function()
+    this.addCloset=function(room)
     {
         var n,k,x,z,xAdd,zAdd;
         var connectSide,connectOffset,closetLen;
         var xClosetBound,yClosetBound,zClosetBound;
-        
-        var room=this.room;
         
         var closetCount=this.genRandom.randomIndex(ROOM_CLOSET_MAX_COUNT);
         if (closetCount===0) return;
@@ -142,12 +139,12 @@ function GenRoomClosetObject(view,map,room,genRandom)
             connectSide=this.genRandom.randomIndex(4);
             
             if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
-                closetLen=this.genRandom.randomInt(2,(this.room.zBlockSize-2));
-                connectOffset=this.genRandom.randomInt(0,(this.room.zBlockSize-closetLen));
+                closetLen=this.genRandom.randomInt(2,(room.zBlockSize-2));
+                connectOffset=this.genRandom.randomInt(0,(room.zBlockSize-closetLen));
             }
             else {
-                closetLen=this.genRandom.randomInt(2,(this.room.xBlockSize-2));
-                connectOffset=this.genRandom.randomInt(0,(this.room.xBlockSize-closetLen));
+                closetLen=this.genRandom.randomInt(2,(room.xBlockSize-2));
+                connectOffset=this.genRandom.randomInt(0,(room.xBlockSize-closetLen));
             }
             
                 // get the Y bound
@@ -202,7 +199,7 @@ function GenRoomClosetObject(view,map,room,genRandom)
                 this.createClosetCube(map,xClosetBound,yClosetBound,zClosetBound);
                 map.addOverlayCloset(xClosetBound,zClosetBound);
                 
-                this.room.maskEdgeGridBlockToBounds(xClosetBound,yClosetBound,zClosetBound);    // block off ledges for edge grid
+                room.maskEdgeGridBlockToBounds(xClosetBound,yClosetBound,zClosetBound);    // block off ledges for edge grid
                 
                 xClosetBound.add(xAdd);
                 zClosetBound.add(zAdd);

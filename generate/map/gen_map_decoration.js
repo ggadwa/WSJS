@@ -4,20 +4,19 @@
 // generate room decoration class
 //
 
-function GenRoomDecorationObject(view,map,room,genRandom)
+function GenRoomDecorationObject(view,map,genRandom)
 {
         // variables
         
     this.view=view;
     this.map=map;
     this.genRandom=genRandom;
-    this.room=room;
 
         //
         // random boxes
         //
 
-    this.addBoxes=function()
+    this.addBoxes=function(room)
     {
         var n,k,stackLevel,pos,boxPos,boxY,stackCount,boxCount,rotWid;
         var ang,angAdd;
@@ -37,7 +36,7 @@ function GenRoomDecorationObject(view,map,room,genRandom)
                 // find the middle of the box spot
                 // and box sizes
                 
-            pos=this.room.findRandomDecorationLocation(genRandom);
+            pos=room.findRandomDecorationLocation(genRandom);
             if (pos===null) break;
             
             high=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_WIDTH,ROOM_DECORATION_BOX_EXTRA_WIDTH);
@@ -46,7 +45,7 @@ function GenRoomDecorationObject(view,map,room,genRandom)
                 // count of boxes
                 
             boxCount=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_STACK_COUNT,ROOM_DECORATION_BOX_EXTRA_STACK_COUNT);
-            boxY=this.room.yBound.max;
+            boxY=room.yBound.max;
             rotWid=Math.floor(wid*1.5);
             
                 // build the boxes around a rotating axis
@@ -89,33 +88,33 @@ function GenRoomDecorationObject(view,map,room,genRandom)
         // machines
         //
         
-    this.addMachine=function()
+    this.addMachine=function(room)
     {
             // the machine size
             
-        var centerPt=new wsPoint(this.room.xBound.getMidPoint(),this.room.yBound.max,this.room.zBound.getMidPoint());
+        var centerPt=new wsPoint(room.xBound.getMidPoint(),room.yBound.max,room.zBound.getMidPoint());
             
         var sizeX=this.genRandom.randomInt(2000,1000);
-        var sizeY=this.room.yBound.getSize()*0.7;
+        var sizeY=room.yBound.getSize()*0.7;
         var sizeZ=this.genRandom.randomInt(2000,1000);
         
         var machineBoundX=new wsBound((centerPt.x-sizeX),(centerPt.x+sizeX));
-        var machineBoundY=new wsBound((this.room.yBound.max-sizeY),this.room.yBound.max);
+        var machineBoundY=new wsBound((room.yBound.max-sizeY),room.yBound.max);
         var machineBoundZ=new wsBound((centerPt.z-sizeZ),(centerPt.z+sizeZ));
 
         map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
     };
 
-    this.addDecorations=function()
+    this.addDecorations=function(room)
     {
             // randomly pick a decoration
             
         switch (this.genRandom.randomIndex(2)) {
             case 0:
-                this.addBoxes();
+                this.addBoxes(room);
                 break;
             //case 2:
-            //    this.addMachine();
+            //    this.addMachine(room);
             //    break;
         }
     };

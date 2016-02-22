@@ -239,36 +239,21 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             
         this.map.addOverlayStair(xStairBound,zStairBound);
     };
+    
+        //
+        // lights
+        //
 
-    this.addLight=function(roomIdx)
+    this.addGeneralLight=function(lightPos,fixturePos,intensity)
     {
-        var lightX,lightY,lightZ;
         var red,green,blue;
-        var room=this.map.rooms[roomIdx];
-        
-            // light point
-
-        lightX=room.xBound.getMidPoint();
-        lightZ=room.zBound.getMidPoint();
-        
-        lightY=room.yBound.min-ROOM_FLOOR_DEPTH;
-        if (room.hasStories) lightY-=(room.yBound.getSize()+ROOM_FLOOR_DEPTH);
 
             // light fixture
 
-        var xLightBound=new wsBound((lightX-400),(lightX+400));
-        var yLightBound=new wsBound(lightY,(lightY+1000));
-        var zLightBound=new wsBound((lightZ-400),(lightZ+400));
-        this.map.addMesh(meshPrimitives.createMeshPryamid(this.map.getBitmapById(TEXTURE_LIGHT),xLightBound,yLightBound,zLightBound,MESH_FLAG_LIGHT));
-
-            // get light intensity and point
-
-        var intensity=Math.floor((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
-        
-        intensity*=(MAP_LIGHT_FACTOR+(this.genRandom.random()*MAP_LIGHT_FACTOR_EXTRA));
-        if (room.hasStories) intensity*=MAP_LIGHT_TWO_STORY_BOOST;
-
-        var pt=new wsPoint(lightX,(lightY+1100),lightZ);
+        var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
+        var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
+        var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
+        this.map.addMesh(meshPrimitives.createMeshPryamid(this.map.getBitmapById(TEXTURE_LIGHT),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
 
             // the color
 
@@ -287,7 +272,48 @@ function GenMapObject(view,map,genRandom,callbackFunc)
 
             // add light to map
 
-        this.map.addLight(new MapLightObject(pt,new wsColor(red,green,blue),MAP_GENERATE_LIGHTMAP,intensity,exponent));
+        this.map.addLight(new MapLightObject(lightPos,new wsColor(red,green,blue),MAP_GENERATE_LIGHTMAP,intensity,exponent));
+    };
+    
+    this.addRoomLight=function(roomIdx)
+    {
+        var lightY,fixturePos,lightPos,intensity;
+        var room=this.map.rooms[roomIdx];
+        
+            // locations
+            
+        lightY=room.yBound.min-ROOM_FLOOR_DEPTH;
+        if (room.hasStories) lightY-=(room.yBound.getSize()+ROOM_FLOOR_DEPTH);
+        
+        fixturePos=new wsPoint(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
+        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        
+            // intensity
+            
+        intensity=Math.floor((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
+        
+        intensity*=(MAP_LIGHT_FACTOR+(this.genRandom.random()*MAP_LIGHT_FACTOR_EXTRA));
+        if (room.hasStories) intensity*=MAP_LIGHT_TWO_STORY_BOOST;
+        
+            // create the light
+            
+        this.addGeneralLight(lightPos,fixturePos,intensity);
+    };
+    
+    this.addStairLight=function(xBound,yBound,zBound)
+    {
+        var fixturePos,lightPos,high;
+        
+            // locations
+            
+        high=Math.floor(ROOM_FLOOR_HEIGHT*0.6);
+            
+        fixturePos=new wsPoint(xBound.getMidPoint(),(yBound.min-high),zBound.getMidPoint());
+        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        
+            // create the light
+            
+        this.addGeneralLight(lightPos,fixturePos,(ROOM_FLOOR_HEIGHT*1.5));
     };
     
         //
@@ -454,6 +480,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         if (stairMode!==STAIR_MODE_NONE) {
             yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+ROOM_FLOOR_DEPTH)));
             this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(stairMode===STAIR_MODE_DOWN),level);
+            this.addStairLight(xStairBound,yStairBound,zStairBound);
         }
 
             // the room
@@ -479,9 +506,9 @@ function GenMapObject(view,map,genRandom,callbackFunc)
             }
         }
         
-            // add the light
+            // add the room light
 
-        this.addLight(roomIdx);
+        this.addRoomLight(roomIdx);
         
             // start recursing for more rooms
             
@@ -546,9 +573,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_CLOSETS) return;
         
+        closet=new GenRoomClosetObject(this.view,this.map,genRandom);
+        
         for (n=0;n!==nRoom;n++) {
-            closet=new GenRoomClosetObject(this.view,this.map,this.map.rooms[n],genRandom);
-            closet.addCloset();
+            closet.addCloset(this.map.rooms[n]);
         }
     };
     
@@ -559,30 +587,25 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_PLATFORMS) return;
         
+        platform=new GenRoomPlatformObject(this.map,this.genRandom);
+        
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
-            
-            if ((room.hasStories) && (room.level===0)) {
-                platform=new GenRoomPlatformObject(this.map,this.genRandom,room);
-                platform.createPlatforms();
-            }
+            if ((room.hasStories) && (room.level===0)) platform.createPlatforms(room);
         }
     };
     
     this.buildRoomLedges=function()
     {
-        var n,room,ledge;
+        var n,ledge;
         var nRoom=this.map.rooms.length;
         
         if (!ROOM_LEDGES) return;
         
+        ledge=new GenRoomLedgeObject(this.map,this.genRandom);
+        
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
-            
-            if (this.genRandom.randomPercentage(ROOM_LEDGE_PERCENTAGE)) {
-                ledge=new GenRoomLedgeObject(this.map,this.genRandom,room);
-                ledge.createLedges();
-            }
+            ledge.createLedges(this.map.rooms[n]);
         }
     };
     
@@ -593,9 +616,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_PILLARS) return;
         
+        pillar=new GenRoomPillarObject(this.view,this.map,genRandom);
+        
         for (n=0;n!==nRoom;n++) {
-            pillar=new GenRoomPillarObject(this.view,this.map,this.map.rooms[n],genRandom);
-            pillar.addPillars();
+            pillar.addPillars(this.map.rooms[n]);
         }
     };
         
@@ -606,9 +630,10 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_DECORATIONS) return;
         
+        decoration=new GenRoomDecorationObject(this.view,this.map,genRandom);
+        
         for (n=0;n!==nRoom;n++) {
-            decoration=new GenRoomDecorationObject(this.view,this.map,this.map.rooms[n],genRandom);
-            decoration.addDecorations();
+            decoration.addDecorations(this.map.rooms[n]);
         }
     };
 

@@ -13,8 +13,7 @@ function ParticleShaderObject()
     this.perspectiveMatrixUniform=null;
     this.modelMatrixUniform=null;
     
-    this.colorUniform=null;
-    this.alphaUniform=null;
+    this.colorAlphaUniform=null;
 
         //
         // initialize/release particle shader
@@ -37,8 +36,7 @@ function ParticleShaderObject()
         this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
         this.modelMatrixUniform=view.gl.getUniformLocation(this.shader.program,'modelMatrix');
         
-        this.colorUniform=view.gl.getUniformLocation(this.shader.program,'color');
-        this.alphaUniform=view.gl.getUniformLocation(this.shader.program,'alpha');
+        this.colorAlphaUniform=view.gl.getUniformLocation(this.shader.program,'colorAlpha');
 
         view.gl.useProgram(null);
 

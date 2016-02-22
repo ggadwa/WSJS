@@ -23,13 +23,11 @@ REGULAR TODOs
 ----> redo all the entity nonsense when we have classes
        * getAngle() getPosition() should go back to angle/position and be getters
        * (touchEntity.getName()==='projectile') use instanceof
+       * put instanceof in map_overlay to not so projectiles
 
 
-#### move the alpha to the top to avoid that weird vec4 problem (TEST)
+
 #### stops falling if pushing against a wall
-
-#### don't put non projectile entities in map
-
 #### tails, random vertex moves
 #### normals bad in animation (or culling is bad)
 

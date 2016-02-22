@@ -239,10 +239,9 @@ function ParticleObject()
             elementIdx+=4;
         }
 
-            // set the color
+            // set the color and alpha
 
-        gl.uniform3f(particleShader.colorUniform,r,g,b);
-        gl.uniform1f(particleShader.alphaUniform,alpha);
+        gl.uniform4f(particleShader.colorAlphaUniform,r,g,b,alpha);
 
             // setup the buffers
 

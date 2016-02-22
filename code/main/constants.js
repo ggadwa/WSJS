@@ -42,7 +42,7 @@ const ROOM_LEDGES=true;                        // turns on or off ledges
 // pillars and decorations
 //
 
-const ROOM_MAX_PILLAR_COUNT=5;                  // maximum number of pillars in a room
+const ROOM_MAX_PILLAR_PERCENTAGE=0.5;           // amount of time a room has pillars
 
 const ROOM_PILLAR_MIN_RADIUS=500;               // minimum radius for pillars
 const ROOM_PILLAR_MAX_RADIUS=1000;              // maximum radius for pillars
@@ -78,14 +78,14 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=6;
-const MONSTER_ENTITY_COUNT=15;
+const MONSTER_MODEL_COUNT=0;
+const MONSTER_ENTITY_COUNT=0;
 
 const MONSTER_AI_ON=true;
 
@@ -104,7 +104,7 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=Math.floor((Math.random()*SEED));
+const SEED_MAP=5; //Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
 const SEED_ENTITY=Math.floor((Math.random()*SEED));

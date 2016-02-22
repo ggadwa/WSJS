@@ -147,7 +147,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
             
             armRadius=Math.floor(botBodyRadius*0.35);
             if (armRadius<250) armRadius=250;
-            armLength=this.genRandom.randomInt(Math.floor(totalHigh*0.2),Math.floor(totalHigh*0.2));
+            armLength=this.genRandom.randomInt(Math.floor(totalHigh*0.5),Math.floor(totalHigh*0.3));
         
             shoulderLength=Math.floor(topBodyRadius*0.75);
             elbowLength=shoulderLength+Math.floor(armLength*0.42);
@@ -169,7 +169,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         
         var legRadius=Math.floor(botBodyRadius*0.35);
         if (legRadius<250) legRadius=250;
-        var footLength=Math.floor(legRadius*2.5);
+        var footLength=Math.floor(legRadius*1.5);
        
         rotOffset=(this.genRandom.random()*20.0)-10.0;
         

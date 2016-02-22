@@ -270,6 +270,8 @@ function MapOverlayObject()
 
         for (n=0;n!==nEntity;n++) {
             entity=entityList.get(n);
+            if (entity.getName()==='projectile') continue;
+            
             this.mapOverlayShader.drawColor(view,((n===0)?playerColor:monsterColor));       // index 0 is the player
             
             ang=360.0-entity.getAngle().y;

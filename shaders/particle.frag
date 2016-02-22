@@ -1,9 +1,8 @@
-uniform lowp float alpha;
-uniform lowp vec3 color;
+uniform lowp vec4 colorAlpha;
 
 void main(void)
 {
-    gl_FragColor.rgb=color;
-    gl_FragColor.a=alpha;
+    gl_FragColor.rgb=colorAlpha.rgb;
+    gl_FragColor.a=colorAlpha.a;
 }
 
