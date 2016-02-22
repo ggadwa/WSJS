@@ -342,6 +342,27 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     };
     
         //
+        // each bone has a gravity scale factor that
+        // squishes the shrunk globe in a direction
+        //
+        
+    this.scaleVertexToBones=function(vertexList)
+    {
+        var n,v;
+        var bone;
+        var nVertex=vertexList.length;
+        var bones=this.model.skeleton.bones;
+        
+        for (n=0;n!==nVertex;n++) {
+            v=vertexList[n];
+            if (v.boneIdx===-1) continue;
+            
+            bone=bones[v.boneIdx];
+            v.position.scaleFromPoint(bone.gravityScale);
+        }
+    };
+    
+        //
         // build around bone list
         //
         
@@ -433,6 +454,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         this.buildGlobeAroundSkeleton(view,centerPnt,widRadius,highRadius,vertexList,indexes);
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
+        this.scaleVertexToBones(vertexList);
         
             // complete the tangent space vectors
         

@@ -95,9 +95,9 @@ function ViewObject()
     
         // additional drawing objects
         
-    this.particle=new ParticleObject();
     this.text=new TextObject();
     this.interface=new InterfaceObject();
+    this.particleList=new ParticleListObject();
     
         // the camera object
         
@@ -169,18 +169,18 @@ function ViewObject()
 
             // initialize other drawing objects
 
-        if (!this.particle.initialize(this)) return(false);
         if (!this.text.initialize(this)) return(false);
         if (!this.interface.initialize(this)) return(false);
+        if (!this.particleList.initialize(this)) return(false);
 
         return(true);
     };
 
     this.release=function()
     {
-        this.particle.release();
         this.text.release();
         this.interface.release();
+        this.particleList.release();
     };
     
         //
@@ -535,6 +535,10 @@ function ViewObject()
                 if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.getModel());
             }
         }
+        
+            // particles
+            
+        this.particleList.draw(this);
       
             // player weapon
          

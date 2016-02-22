@@ -718,7 +718,7 @@ function GenBitmapObject(genRandom)
         var xCount;
 
         var scaleCount=this.genRandom.randomInt(5,10);
-        var skinColor=this.genBitmapUtility.getRandomColor([0.0,0.5,0.0],[0.4,1.0,0.6]);
+        var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.7);
         var borderColor=this.genBitmapUtility.darkenColor(skinColor,0.8);
 
         var sWid=Math.floor(wid/scaleCount);
@@ -764,7 +764,7 @@ function GenBitmapObject(genRandom)
         var darken,lineColor,markCount;
         var particleWid,particleHigh,particleDensity;
         
-        var clothColor=this.genBitmapUtility.getRandomGreyColor(0.5,0.7);
+        var clothColor=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.3);
         var lineColorBase=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.6);
          
             // clear canvases

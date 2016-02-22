@@ -19,6 +19,7 @@ function ModelBoneObject(name,parentBoneIdx,position)
         
     this.gravityLockDistance=500;
     this.gravityPullDistance=4000;
+    this.gravityScale=new wsPoint(1.0,1.0,1.0);
     
         // pose
     

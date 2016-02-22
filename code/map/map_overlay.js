@@ -262,7 +262,7 @@ function MapOverlayObject()
         var p2=new ws2DIntPoint(0,0);
         var p3=new ws2DIntPoint(0,0);
         
-        var entity,ang;
+        var entity,ang,pos;
         var nEntity=entityList.count();
         
         var playerColor=new wsColor(0.5,1.0,0.5);
@@ -281,8 +281,9 @@ function MapOverlayObject()
             p3.set(5,5);
             p3.rotate(null,ang);
             
-            x=((entity.position.x-this.mapOffsetX)*this.mapScale)+this.drawX;
-            y=(this.drawHigh-((entity.position.z-this.mapOffsetZ)*this.mapScale))+this.drawY;
+            pos=entity.getPosition();
+            x=((pos.x-this.mapOffsetX)*this.mapScale)+this.drawX;
+            y=(this.drawHigh-((pos.z-this.mapOffsetZ)*this.mapScale))+this.drawY;
 
             this.entityVertices[0]=p1.x+x;
             this.entityVertices[1]=p1.y+y;

@@ -126,6 +126,7 @@ function EntityProjectileObject(name,view,position,angle,radius,high,model)
             
         if (this.baseEntity.moveSimple(map,entityList,400)) {
             this.baseEntity.markAsDelete();
+            view.particleList.addExplosionParticles(view,this.getPosition());
         }
     };
     

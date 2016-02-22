@@ -209,9 +209,12 @@ function DebugObject()
     this.drawModelSkeleton=function(view,model,angle,position)
     {
         var n,lineCount,vIdx,iIdx;
-        var skeleton=model.skeleton;
-        var nBone=skeleton.bones.length;
         var gl=view.gl;
+        
+        var skeleton=model.skeleton;
+        if (skeleton===null) return;
+        
+        var nBone=skeleton.bones.length;
         
             // draw all this without depth testing
             
@@ -277,25 +280,32 @@ function DebugObject()
 
         this.debugShader.drawEnd(view);
         
-            // now the bones, use the particle engine
-            
-        var particlePoints=[];
-        var pnt;
-        
-        for (n=0;n!==nBone;n++) {
-            pnt=new wsPoint(skeleton.bones[n].curPosePosition.x,skeleton.bones[n].curPosePosition.y,skeleton.bones[n].curPosePosition.z);
-            pnt.rotate(angle);
-            pnt.addPoint(position);
-            particlePoints.push(pnt);
-        }
-            
-        view.particle.drawStart(view);
-        view.particle.draw(view,particlePoints,50,new wsColor(0.0,1.0,1.0));
-        view.particle.drawEnd(view);
-        
             // bring back depth test
             
         gl.enable(gl.DEPTH_TEST);
+        
+            // now the bones, use the particle engine
+            
+        var particle=view.particleList.getFree();
+        if (particle!==null) {
+            
+            particle.setCount(nBone);
+            particle.setRadius(50,50);
+            particle.setMovement(1.0);
+            particle.setCenterPointFromPoint(position);      // particles are offsets from center point
+            particle.setAlpha(1.0,1.0);
+            particle.setColor(0.0,1.0,1.0,0.0,1.0,1.0);
+            particle.setTiming(view.timeStamp,0);       // want it to immediately die after next draw
+            particle.setNoDepthTest(true);
+            
+            var pnt;
+
+            for (n=0;n!==nBone;n++) {
+                pnt=particle.getPoint(n);
+                pnt.setFromPoint(skeleton.bones[n].curPosePosition);
+                pnt.rotate(angle);
+            }
+        }
     };
     
         //

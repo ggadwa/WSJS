@@ -346,6 +346,13 @@ function wsPoint(x,y,z)
         this.z*=f;
     };
     
+    this.scaleFromPoint=function(pt)
+    {
+        this.x*=pt.x;
+        this.y*=pt.y;
+        this.z*=pt.z;
+    };
+    
     this.matrixMultiply=function(mat)
     {
         var mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8])+mat[12];

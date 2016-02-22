@@ -25,10 +25,13 @@ REGULAR TODOs
        * (touchEntity.getName()==='projectile') use instanceof
 
 
+#### move the alpha to the top to avoid that weird vec4 problem (TEST)
 #### stops falling if pushing against a wall
-#### particles
 
-#### models (1) leg, torso height, divide out to make separate parts, different radiuses, finger/hands, animal bodies in middle, tails, random vertex moves
+#### don't put non projectile entities in map
+
+#### tails, random vertex moves
+#### normals bad in animation (or culling is bad)
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
@@ -82,7 +85,7 @@ REGULAR TODOs
 [ ] models
     [X] speed up model creation
     [X] will need to seam the 0->1 edge
-    [ ] animal models need to have body in middle, not at tail end
+    [X] animal models need to have body in middle, not at tail end
     
     
     [X] fixed a bug that would create split areas in models
@@ -93,7 +96,7 @@ REGULAR TODOs
     [X] get legs as booleans (does bone X have legs) and always two
 
     [ ] need separate globe sizes for each part
-    [ ] smooth globes or have locked shrink coordinates (like no Y change on body, etc)
+    [X] smooth globes or have locked shrink coordinates (like no Y change on body, etc)
 
 [ ] entities
     [X] fixed a bug where entities could spawn in the same place if platforms turned off
@@ -103,8 +106,8 @@ REGULAR TODOs
     [X] make dynamic weapon model construction
     [X] clear z-buffer?
 
-[ ] projectiles
-[ ] particles
+[X] projectiles
+[X] particles
 
 [ ] need to deal with pausing time stamps
 
