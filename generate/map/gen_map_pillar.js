@@ -76,12 +76,11 @@ function GenRoomPillarObject(view,map,genRandom)
         
             // this room have pillars?
             
-        //if (!this.genRandom.randomPercentage(ROOM_MAX_PILLAR_PERCENTAGE)) return;
+        if (!this.genRandom.randomPercentage(ROOM_MAX_PILLAR_PERCENTAGE)) return;
         
             // ybound
             
-        yBound=new wsBound((room.yBound.min-ROOM_FLOOR_DEPTH),room.yBound.max);
-        if (room.hasStories) yBound.min-=(room.yBound.getSize()+ROOM_FLOOR_DEPTH);
+        yBound=room.yStoryBound;
         
             // room size creates the pillar types
             

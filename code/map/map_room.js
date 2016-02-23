@@ -20,6 +20,10 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
     this.blockGrid=null;
     this.platformGrid=null;
     
+    this.yStoryBound=new wsBound((this.yBound.min-ROOM_FLOOR_DEPTH),this.yBound.max);
+    if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+ROOM_FLOOR_DEPTH);
+
+    
     this.setupGrid=function()
     {
         var x,z;
@@ -203,9 +207,9 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         return(null);
     };
     
-    this.findRandomDecorationLocation=function(genRandom)
+    this.findRandomDecorationLocation=function(genRandom,checkPlatform)
     {
-        var x,z,startX,startZ,bx,bz;
+        var x,z,startX,startZ,bx,bz,gridSpot;
         
         x=startX=genRandom.randomInt(0,this.xBlockSize);
         z=startZ=genRandom.randomInt(0,this.zBlockSize);
@@ -214,7 +218,10 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             
                 // decorations only spawn on bottom
             
-            if (this.blockGrid[z][x]===0) {
+            gridSpot=this.blockGrid[z][x];
+            if (checkPlatform) gridSpot+=this.platformGrid[z][x];
+            
+            if (gridSpot===0) {
                 this.blockGrid[z][x]=1;
                 bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
                 bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));

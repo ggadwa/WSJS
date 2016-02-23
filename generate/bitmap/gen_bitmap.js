@@ -707,6 +707,28 @@ function GenBitmapObject(genRandom)
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.2);
     };
+    
+        //
+        // machine
+        //
+    
+    this.generateMachine=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        var metalColor=this.genBitmapUtility.getRandomGreyColor(0.6,0.8);
+        var metalEdgeColor=this.genBitmapUtility.darkenColor(metalColor,0.9);
+        var metalInsideColor=this.genBitmapUtility.boostColor(metalColor,0.1);
+        
+       
+            // face plate
+            
+        this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,8,metalColor,metalEdgeColor,true);
+        
+            // inside plates
+            
+        this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,20,20,100,100,5,metalInsideColor,metalEdgeColor,false);
+        
+        
+    };
 
         //
         // skin bitmaps
@@ -985,6 +1007,11 @@ function GenBitmapObject(genRandom)
                 this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high,true);
                 shineFactor=2.0;
                 break;
+                
+            case GEN_BITMAP_TYPE_MACHINE:
+                this.generateMachine(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=2.0;
+                break;
 
             case GEN_BITMAP_TYPE_SKIN_SCALE:
                 this.generateSkinScale(bitmapCTX,normalCTX,specularCTX,wid,high);
@@ -1005,7 +1032,7 @@ function GenBitmapObject(genRandom)
 
             // debugging
 /*
-        if (generateType===GEN_BITMAP_TYPE_SKIN_LEATHER) {
+        if (generateType===GEN_BITMAP_TYPE_MACHINE) {
             debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
             debug.displayCanvasData(normalCanvas,1050,410,400,400);
             debug.displayCanvasData(specularCanvas,1050,820,400,400);

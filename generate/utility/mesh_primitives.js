@@ -342,6 +342,16 @@ function MeshPrimitivesObject()
         return(new MapMeshObject(bitmap,vertexList,indexes,flags));
     };
     
+    this.createMeshCylinderSimple=function(bitmap,centerPt,yBound,radius,flags)
+    {
+        var segments=[];
+        
+        segments.push(radius);
+        segments.push(radius);
+        
+        return(this.createMeshCylinder(bitmap,centerPt,yBound,segments,flags));
+    };
+    
 }
 
 var meshPrimitives=new MeshPrimitivesObject();

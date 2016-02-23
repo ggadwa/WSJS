@@ -36,7 +36,7 @@ function GenRoomDecorationObject(view,map,genRandom)
                 // find the middle of the box spot
                 // and box sizes
                 
-            pos=room.findRandomDecorationLocation(genRandom);
+            pos=room.findRandomDecorationLocation(genRandom,false);
             if (pos===null) break;
             
             high=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_WIDTH,ROOM_DECORATION_BOX_EXTRA_WIDTH);
@@ -90,32 +90,67 @@ function GenRoomDecorationObject(view,map,genRandom)
         
     this.addMachine=function(room)
     {
-            // the machine size
-            
-        var centerPt=new wsPoint(room.xBound.getMidPoint(),room.yBound.max,room.zBound.getMidPoint());
-            
-        var sizeX=this.genRandom.randomInt(2000,1000);
-        var sizeY=room.yBound.getSize()*0.7;
-        var sizeZ=this.genRandom.randomInt(2000,1000);
+        var pos,wid,high;
+        var machineBoundX,machineBoundY,machineBoundZ;
+        var n,nPipe,radius;
+        var ang,angAdd,rd,x,z;
+        var centerPt,yPipeBound,pipeBitmap;
         
-        var machineBoundX=new wsBound((centerPt.x-sizeX),(centerPt.x+sizeX));
-        var machineBoundY=new wsBound((room.yBound.max-sizeY),room.yBound.max);
-        var machineBoundZ=new wsBound((centerPt.z-sizeZ),(centerPt.z+sizeZ));
+            // the machine location
+            
+        pos=room.findRandomDecorationLocation(genRandom,true);
+            
+        wid=Math.floor(ROOM_BLOCK_WIDTH/2);
+        high=this.genRandom.randomInt(ROOM_BLOCK_WIDTH,1000);
+        
+        machineBoundX=new wsBound((pos.x-wid),(pos.x+wid));
+        machineBoundY=new wsBound((room.yBound.max-high),room.yBound.max);
+        machineBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
 
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+            // the machine box
+            
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_MACHINE),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+
+            // the machine pipes
+
+        nPipe=this.genRandom.randomInt(1,5);
+        radius=Math.floor(ROOM_BLOCK_WIDTH*0.1);
+       
+        pipeBitmap=map.getBitmapById(TEXTURE_LIGHT);
+        centerPt=new wsPoint(0,0,0);
+        
+        yPipeBound=new wsBound(room.yStoryBound.min,(room.yBound.max-high));
+        
+        ang=0.0;
+        angAdd=360.0/nPipe;
+        
+        wid=Math.floor(ROOM_BLOCK_WIDTH*0.25);
+        
+        for (n=0;n!==nPipe;n++) {
+            rd=ang*DEGREE_TO_RAD;
+            centerPt.x=pos.x+((wid*Math.sin(rd))+(wid*Math.cos(rd)));
+            centerPt.z=pos.z+((wid*Math.cos(rd))-(wid*Math.sin(rd)));
+            
+            map.addMesh(meshPrimitives.createMeshCylinderSimple(pipeBitmap,centerPt,yPipeBound,radius,MESH_FLAG_DECORATION));
+            
+            ang+=angAdd;
+        }
     };
 
     this.addDecorations=function(room)
     {
+        this.addMachine(room);
+        return;
+        
             // randomly pick a decoration
             
         switch (this.genRandom.randomIndex(2)) {
             case 0:
                 this.addBoxes(room);
                 break;
-            //case 2:
-            //    this.addMachine(room);
-            //    break;
+            case 1:
+                this.addMachine(room);
+                break;
         }
     };
 
