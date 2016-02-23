@@ -140,6 +140,7 @@ function GenBitmapObject(genRandom)
     {
         var x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh;
         var col;
+        var borderColor=new wsColor(0.0,0.0,0.0);
 
             // tile style
 
@@ -198,7 +199,7 @@ function GenBitmapObject(genRandom)
                     // possible design
 
                 if ((complex) && (this.genRandom.random()<0.25)) {
-                    this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.0,1.0,5,0,null,[0.0,0.0,0.0]);
+                    this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.0,1.0,5,0,null,borderColor);
                 }
             }
         }
@@ -251,11 +252,12 @@ function GenBitmapObject(genRandom)
         var n,y;
         var high=bot-top;
         var yAdd=Math.floor((high-(screwSize*2))/(screwCount-1));
+        var borderColor=new wsColor(0.0,0.0,0.0);
             
         y=Math.floor(screwSize*0.5);
         
         for (n=0;n!==screwCount;n++) {
-            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,screwX,y,(screwX+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,new wsColor(0.0,0.0,0.0));
+            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,screwX,y,(screwX+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
             y+=yAdd;
         }
     };
@@ -712,22 +714,95 @@ function GenBitmapObject(genRandom)
         // machine
         //
     
+    this.generateMachineComponent=function(bitmapCTX,normalCTX,lft,top,rgt,bot,metalInsideColor,metalEdgeColor)
+    {
+        var x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
+        var color;
+        var borderColor=new wsColor(0.0,0.0,0.0);
+        
+            // the plate of the component
+            
+        this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,5,metalInsideColor,metalEdgeColor,false);
+        
+            // any lights
+            
+        if (this.genRandom.randomPercentage(0.5)) return;
+        
+        wid=this.genRandom.randomInt(30,25);
+        
+        xCount=Math.floor((rgt-lft)/wid);
+        yCount=Math.floor((bot-top)/wid);
+        
+        xOff=lft+Math.floor(((rgt-lft)-(xCount*wid))/2);
+        yOff=top+Math.floor(((bot-top)-(yCount*wid))/2);
+        
+        for (y=0;y!==yCount;y++) {
+            dy=yOff+(y*wid);
+            
+            for (x=0;x!==xCount;x++) {
+                dx=xOff+(x*wid);
+                color=this.genBitmapUtility.getRandomPrimaryColor(0.8,1.0);
+                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,borderColor);
+            }
+        }
+    };
+    
     this.generateMachine=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
+        var mx,my,sz,lft,top,rgt,bot;
+        
         var metalColor=this.genBitmapUtility.getRandomGreyColor(0.6,0.8);
         var metalEdgeColor=this.genBitmapUtility.darkenColor(metalColor,0.9);
         var metalInsideColor=this.genBitmapUtility.boostColor(metalColor,0.1);
-        
        
             // face plate
             
         this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,8,metalColor,metalEdgeColor,true);
         
-            // inside plates
+            // inside components
+            // these are stacks of vertical or horizontal chunks
             
-        this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,20,20,100,100,5,metalInsideColor,metalEdgeColor,false);
+        mx=15;
+        my=15;
         
+        while (true) {
+            
+            lft=mx;
+            top=my;
+            sz=this.genRandom.randomInt(100,50);
+            
+                // vertical stack
+                
+            if (this.genRandom.randomPercentage(0.5)) {
+                rgt=lft+sz;
+                if (rgt>(wid-15)) rgt=wid-15;
+                bot=high-15;
+                
+                mx+=(sz+5);
+            }
+            
+                // horizontal stack
+                
+            else {
+                bot=top+sz;
+                if (bot>(high-15)) bot=high-15;
+                rgt=wid-15;
+                
+                my+=(sz+5);
+            }
+            
+                // draw the segment
+            
+            this.generateMachineComponent(bitmapCTX,normalCTX,lft,top,rgt,bot,metalInsideColor,metalEdgeColor);
+            
+                // are we finished?
+                
+            if ((mx>=(wid-15)) || (my>=(high-15))) break;
+        }
         
+            // finish with the specular
+
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.5);
     };
 
         //

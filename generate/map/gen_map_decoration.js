@@ -91,9 +91,9 @@ function GenRoomDecorationObject(view,map,genRandom)
     this.addMachine=function(room)
     {
         var pos,wid,high;
-        var machineBoundX,machineBoundY,machineBoundZ;
+        var machineBoundX,machineBoundY,machineBoundZ,topBoundY,botBoundY;
         var n,nPipe,radius;
-        var ang,angAdd,rd,x,z;
+        var ang,angAdd,rd;
         var centerPt,yPipeBound,pipeBitmap;
         
             // the machine location
@@ -106,10 +106,15 @@ function GenRoomDecorationObject(view,map,genRandom)
         machineBoundX=new wsBound((pos.x-wid),(pos.x+wid));
         machineBoundY=new wsBound((room.yBound.max-high),room.yBound.max);
         machineBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
+        
+        topBoundY=new wsBound(room.yStoryBound.min,(room.yStoryBound.min+ROOM_FLOOR_DEPTH));
+        botBoundY=new wsBound((machineBoundY.min-ROOM_FLOOR_DEPTH),machineBoundY.min);
 
-            // the machine box
+            // the machine box and top
             
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_MACHINE),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_MACHINE),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_LIGHT),machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
+        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_LIGHT),machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
 
             // the machine pipes
 
@@ -119,7 +124,7 @@ function GenRoomDecorationObject(view,map,genRandom)
         pipeBitmap=map.getBitmapById(TEXTURE_LIGHT);
         centerPt=new wsPoint(0,0,0);
         
-        yPipeBound=new wsBound(room.yStoryBound.min,(room.yBound.max-high));
+        yPipeBound=new wsBound((room.yStoryBound.min+ROOM_FLOOR_DEPTH),(room.yBound.max-(high+ROOM_FLOOR_DEPTH)));
         
         ang=0.0;
         angAdd=360.0/nPipe;
@@ -139,9 +144,6 @@ function GenRoomDecorationObject(view,map,genRandom)
 
     this.addDecorations=function(room)
     {
-        this.addMachine(room);
-        return;
-        
             // randomly pick a decoration
             
         switch (this.genRandom.randomIndex(2)) {
