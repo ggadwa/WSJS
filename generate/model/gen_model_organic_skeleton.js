@@ -18,18 +18,26 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx;
         var skeleton=this.model.skeleton;
         var bones=skeleton.bones;
+        
+            // arm
             
         shoulderBoneIdx=bones.push(new ModelBoneObject(('Shoulder'+nameSuffix),torsoTopBoneIdx,new wsPoint((shoulderLength*vct.x),y,(shoulderLength*vct.z))))-1;
         elbowBoneIdx=bones.push(new ModelBoneObject(('Elbow'+nameSuffix),shoulderBoneIdx,new wsPoint((elbowLength*vct.x),y,(elbowLength*vct.z))))-1;
         wristBoneIdx=bones.push(new ModelBoneObject(('Wrist'+nameSuffix),elbowBoneIdx,new wsPoint((wristLength*vct.x),y,(wristLength*vct.z))))-1;
-        handBoneIdx=bones.push(new ModelBoneObject(('Hand'+nameSuffix),wristBoneIdx,new wsPoint((handLength*vct.x),y,(handLength*vct.z))))-1;
 
         bones[shoulderBoneIdx].gravityLockDistance=250;
         bones[elbowBoneIdx].gravityLockDistance=200;
         bones[wristBoneIdx].gravityLockDistance=200;
-        bones[handBoneIdx].gravityLockDistance=300;
 
-        skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_ARM,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx]));
+        skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_ARM,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]));
+        
+            // hand
+            
+        handBoneIdx=bones.push(new ModelBoneObject(('Hand'+nameSuffix),wristBoneIdx,new wsPoint((handLength*vct.x),y,(handLength*vct.z))))-1;
+        
+        bones[handBoneIdx].gravityLockDistance=300;
+        
+        skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_ARM,[handBoneIdx]));
     };
     
     this.buildLimbLeg=function(vct,boneIdx,nameSuffix,hipHigh,kneeHigh,ankleHigh,legRadius,footLength)

@@ -120,19 +120,10 @@ function EntityObject(name,position,angle,radius,high,model)
     };
     
         //
-        // bumping
-        //
-        
-    this.canBump=function()
-    {
-        return(true);
-    };
-    
-        //
         // move entity
         //
     
-    this.moveComplex=function(map,entityList,dist,extraAngle,flying,clipping)
+    this.moveComplex=function(map,entityList,dist,extraAngle,bump,flying,clipping)
     {
         var angY=this.angle.y+extraAngle;
         
@@ -161,7 +152,7 @@ function EntityObject(name,position,angle,radius,high,model)
             // there's been a bump, move it, otherwise,
             // try sliding
             
-        this.collision.moveObjectInMap(map,entityList,this,this.movePt,this.canBump(),this.collideMovePt);
+        this.collision.moveObjectInMap(map,entityList,this,this.movePt,bump,this.collideMovePt);
         if ((this.collideMovePt.equals(this.movePt)) || (this.collideMovePt.y!==0)) {
             this.position.addPoint(this.collideMovePt);
             return;
@@ -191,12 +182,12 @@ function EntityObject(name,position,angle,radius,high,model)
         this.position.addPoint(this.collideMovePt);
     };
     
-    this.moveSimple=function(map,entityList,dist)
+    this.moveSimple=function(map,entityList,dist,bump)
     {
         this.movePt.set(0.0,0.0,dist);
         this.movePt.rotateY(null,angle.y);
             
-        this.collision.moveObjectInMap(map,entityList,this,this.movePt,this.canBump(),this.collideMovePt);
+        this.collision.moveObjectInMap(map,entityList,this,this.movePt,bump,this.collideMovePt);
         if (!this.collideMovePt.equals(this.movePt)) return(true);
         
         this.position.addPoint(this.collideMovePt);
@@ -213,10 +204,10 @@ function EntityObject(name,position,angle,radius,high,model)
         //
         
     this.fall=function()
-    {
+    {        
         this.fallSpeed+=this.gravity;
         this.gravity+=2;
-        if (this.gravity>25) this.gravity=25;
+        if (this.gravity>25) this.gravity=25;       // supergumba -- there's a lot of made-up numbers here, need to be real numbers in the future
         
         var yChange=this.fallSpeed;
         
@@ -235,6 +226,11 @@ function EntityObject(name,position,angle,radius,high,model)
         else {
             this.position.move(0,yChange,0);
         }
+    };
+    
+    this.isFalling=function()
+    {
+        return(this.fallSpeed>0);
     };
     
         //

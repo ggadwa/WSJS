@@ -96,14 +96,6 @@ function EntityMonsterObject(name,position,angle,radius,high,model)
     
     // local functions
     
-        //
-        // override bumping
-        //
-        
-    this.canBump=function()
-    {
-        return(true);
-    };
     
         //
         // run monster
@@ -139,7 +131,7 @@ function EntityMonsterObject(name,position,angle,radius,high,model)
         
             // run towards player
             
-        this.baseEntity.moveSimple(map,entityList,-50);
+        this.baseEntity.moveSimple(map,entityList,-50,true);
             
             // falling
         

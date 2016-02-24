@@ -2,11 +2,11 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
-const ROOM_FLOOR_HEIGHT=7000;                   // how tall each floor of a room is
+const ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is
 const ROOM_FLOOR_DEPTH=700;                     // the depth of the area between floors
 
 const ROOM_MIN_BLOCK_PER_SIDE=3;                // minimum number of blocks taht can make up one side of a room
@@ -35,8 +35,8 @@ const ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
 const ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
 
 const ROOM_CLOSETS=true;                       // turns on or off closets
-const ROOM_PLATFORMS=true;                      // turns on or off platforms
-const ROOM_LEDGES=true;                        // turns on or off ledges
+const ROOM_PLATFORMS=false;                      // turns on or off platforms
+const ROOM_LEDGES=false;                        // turns on or off ledges
 
 //
 // pillars and decorations
@@ -58,8 +58,8 @@ const ROOM_DECORATION_BOX_MIN_STACK_COUNT=1;    // minimum number of boxes in a 
 const ROOM_DECORATION_BOX_EXTRA_STACK_COUNT=4;  // extra number of boxes in a stack
 const ROOM_DECORATION_BOX_STACK_PERCENTAGE=0.5; // percent of time boxes have stack on top
 
-const ROOM_PILLARS=true;                        // turns on or off pillars
-const ROOM_DECORATIONS=true;                    // turns on or off decorations
+const ROOM_PILLARS=false;                        // turns on or off pillars
+const ROOM_DECORATIONS=false;                    // turns on or off decorations
 
 //
 // lighting
@@ -84,10 +84,10 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=0;
-const MONSTER_ENTITY_COUNT=0;
+const MONSTER_MODEL_COUNT=3;
+const MONSTER_ENTITY_COUNT=3;
 
-const MONSTER_AI_ON=true;
+const MONSTER_AI_ON=false;
 
 //
 // particles
@@ -104,10 +104,10 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=Math.floor((Math.random()*SEED));
+const SEED_MAP=5; //Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
-const SEED_ENTITY=Math.floor((Math.random()*SEED));
+const SEED_ENTITY=6; //Math.floor((Math.random()*SEED));
 
 //
 // timing
@@ -235,6 +235,8 @@ const LIMB_TYPE_BODY=0;
 const LIMB_TYPE_HEAD=1;
 const LIMB_TYPE_ARM=2;
 const LIMB_TYPE_LEG=3;
+const LIMB_TYPE_HAND=4;
+const LIMB_TYPE_FOOT=5;
 
 //
 // text drawing

@@ -110,14 +110,6 @@ function EntityPlayerObject(name,position,angle,radius,high,model)
         this.baseEntity.verticalSpeed=speed;
     };
     
-        //
-        // override bumping
-        //
-        
-    this.canBump=function()
-    {
-        return(true);
-    };
     
         //
         // jump
@@ -160,13 +152,23 @@ function EntityPlayerObject(name,position,angle,radius,high,model)
     
     this.run=function(view,map,entityList)
     {
-            // input movement
+        var bump;
+        
+            // input turning and looking
             
         this.baseEntity.turn(this.baseEntity.turnSpeed);
         this.baseEntity.look(this.baseEntity.lookSpeed);
         
-        if (this.baseEntity.forwardSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.forwardSpeed,0.0,PLAYER_FLY,PLAYER_CLIP_WALLS);
-        if (this.baseEntity.sideSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.sideSpeed,90.0,PLAYER_FLY,PLAYER_CLIP_WALLS);
+            // can only bump if we aren't falling
+            // as otherwise ledges can catch you and
+            // bump you back up
+            
+        bump=!this.baseEntity.isFalling();
+        
+            // movement
+            
+        if (this.baseEntity.forwardSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.forwardSpeed,0.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
+        if (this.baseEntity.sideSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.sideSpeed,90.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
         
         if (this.baseEntity.verticalSpeed!==0.0) this.baseEntity.moveDirect(0.0,this.baseEntity.verticalSpeed,0.0);
         

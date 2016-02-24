@@ -27,7 +27,7 @@ REGULAR TODOs
 
 
 
-#### stops falling if pushing against a wall
+
 #### tails, random vertex moves
 #### normals bad in animation (or culling is bad)
 
@@ -35,84 +35,29 @@ REGULAR TODOs
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
     [ ] draw closest map meshes first
 
-[ ] general
-    [X] fixed some bug in lost float/int conversions
-    [X] speed up bitmap creation
-
 [ ] optimizations
-     [X] speed up light maps
-     [X] get rid of as many news as possible
-         [X] collision routines are a really bad spot
+     [ ] look for any addition new optimizations
      [ ] get rid of any copy()
 
 [ ] map generation
-    [X] v2 of map generator
-    [ ] decorations updates
-         [X] in all rooms
-         [X] by block
-         [X] stack boxes
-         [ ] machine + texture
-
-    [X] flag to make all generated lights white (the default)
     [X] new platforms builder
         [ ] platforms need more decorations
         [ ] try to find a way to connect platforms on different rooms together
-    [X] pillars get own class?
+    [ ] decorations
+        [ ] pedestals?
     [X] need ledge builder
-        [ ] need ledge types
-              [ ] current flat ledge
-              [ ] wedges
-              [ ] supports
-        [X] have own ledge texture
-        [X] randomize them appearing
-        [X] closets block ledges too
-        [X] and stairs vs room connections
-        [X] need to do opposite on previous room
-    [X] blocking needs the concept of platform blocks
+        [ ] dup for ceilings? maybe
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
 
-[ ] textures
-    [X] added 3 monster textures, scales, fur, and a doom-ish leathery type
-    [X] "plaster" texture has more color components
-    [X] better stones in rough stone texture
-    [X] more variations in wood textures
-    [X] metal textures now have a blue-ish tint instead of white tints
-    [X] corrigated metal has deeper texture and better normals
-    [X] some over-all specular collections
-
 [ ] models
-    [X] speed up model creation
-    [X] will need to seam the 0->1 edge
-    [X] animal models need to have body in middle, not at tail end
-    
-    
-    [X] fixed a bug that would create split areas in models
     [ ] hands and feet separate globes
         [ ] bad normals in feet because of bone connections
-    
-    [X] make limbs bilateral
-    [X] get legs as booleans (does bone X have legs) and always two
-
-    [ ] need separate globe sizes for each part
-    [X] smooth globes or have locked shrink coordinates (like no Y change on body, etc)
-
-[ ] entities
-    [X] fixed a bug where entities could spawn in the same place if platforms turned off
-
-[ ] weapons
-    [X] add weapon system
-    [X] make dynamic weapon model construction
-    [X] clear z-buffer?
-
-[X] projectiles
-[X] particles
+    [ ] need separate starting globe sizes for each part - maybe?
 
 [ ] need to deal with pausing time stamps
 
 [ ] bitmaps
-    [ ] need bitmap colors filters are settings
     [ ] box texture has potential other type of boards inside?
-    [ ] machine texture
 
 
 

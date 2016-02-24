@@ -99,14 +99,6 @@ function EntityProjectileObject(name,view,position,angle,radius,high,model)
     
     // supergumba -- local functions
     // 
-        //
-        // override bumping
-        //
-        
-    this.canBump=function()
-    {
-        return(false);
-    };
     
         //
         // run projectile
@@ -124,7 +116,7 @@ function EntityProjectileObject(name,view,position,angle,radius,high,model)
         
             // else move it
             
-        if (this.baseEntity.moveSimple(map,entityList,400)) {
+        if (this.baseEntity.moveSimple(map,entityList,400,false)) {
             this.baseEntity.markAsDelete();
             view.particleList.addExplosionParticles(view,this.getPosition());
         }
