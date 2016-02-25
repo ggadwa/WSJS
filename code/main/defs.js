@@ -79,7 +79,7 @@ function wsPoint(x,y,z)
         this.y=pt.y*f;
         this.z=pt.z*f;
     };
-                
+    
     this.move=function(xAdd,yAdd,zAdd)
     {
         this.x+=xAdd;

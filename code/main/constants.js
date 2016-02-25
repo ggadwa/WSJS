@@ -84,8 +84,8 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=3;
-const MONSTER_ENTITY_COUNT=3;
+const MONSTER_MODEL_COUNT=5;
+const MONSTER_ENTITY_COUNT=5;
 
 const MONSTER_AI_ON=false;
 
@@ -106,7 +106,7 @@ const SEED=Date.now();
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MAP=5; //Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MODEL=Math.floor((Math.random()*SEED));
+const SEED_MODEL=6; // Math.floor((Math.random()*SEED));
 const SEED_ENTITY=6; //Math.floor((Math.random()*SEED));
 
 //
@@ -233,10 +233,14 @@ const STAIR_STEP_COUNT=10;
 
 const LIMB_TYPE_BODY=0;
 const LIMB_TYPE_HEAD=1;
-const LIMB_TYPE_ARM=2;
-const LIMB_TYPE_LEG=3;
-const LIMB_TYPE_HAND=4;
-const LIMB_TYPE_FOOT=5;
+const LIMB_TYPE_ARM_LEFT=2;
+const LIMB_TYPE_ARM_RIGHT=3;
+const LIMB_TYPE_LEG_LEFT=4;
+const LIMB_TYPE_LEG_RIGHT=5;
+const LIMB_TYPE_HAND_LEFT=6;
+const LIMB_TYPE_HAND_RIGHT=7;
+const LIMB_TYPE_FOOT_LEFT=8;
+const LIMB_TYPE_FOOT_RIGHT=9;
 
 //
 // text drawing

@@ -27,7 +27,7 @@ REGULAR TODOs
 
 
 
-
+#### feet as separate globes
 #### tails, random vertex moves
 #### normals bad in animation (or culling is bad)
 

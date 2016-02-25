@@ -18,7 +18,6 @@ function ModelBoneObject(name,parentBoneIdx,position)
         // mesh creation
         
     this.gravityLockDistance=500;
-    this.gravityPullDistance=4000;
     this.gravityScale=new wsPoint(1.0,1.0,1.0);
     
         // pose
@@ -77,6 +76,7 @@ function ModelSkeletonObject()
         // animations
         
     this.lastAnimationTick=0;
+    this.lastAnimationFlip=false;          // supergumba -- temporary for random animations
     
         //
         // close skeleton
@@ -329,6 +329,9 @@ function ModelSkeletonObject()
         var r,x,z;
         var nLimb=this.limbs.length;
         
+        var armLeftZAngle=40.0;
+        var armRightZAngle=40.0;
+        
         for (n=0;n!==nLimb;n++) {
             limb=this.limbs[n];
             
@@ -346,24 +349,35 @@ function ModelSkeletonObject()
             
             boneIndexList=this.limbs[n].boneIndexes;
             
-            r=view.genRandom.randomInBetween(-25.0,25.0);
+            r=view.genRandom.randomInBetween(15.0,30.0);
 
-            if (limb.limbType===LIMB_TYPE_ARM) {
-                x=0.0;
-                z=r;
-            }
-            else {
-                x=r;
-                z=0.0;
-            }
+            x=((limb.limbType===LIMB_TYPE_ARM_LEFT) || (limb.limbType===LIMB_TYPE_LEG_LEFT))?r:-r;
+            if (this.lastAnimationFlip) x=-x;
             
             for (k=0;k!==boneIndexList.length;k++) {
+                z=0.0;
+                
+                    // always push shoulders down out of the T formation
+                    
+                if (k===0) {
+                    if (limb.limbType===LIMB_TYPE_ARM_LEFT) {
+                        z=armLeftZAngle;
+                        armLeftZAngle+=5.0;
+                    }
+                    if (limb.limbType===LIMB_TYPE_ARM_RIGHT) {
+                        z=-armRightZAngle;
+                        armRightZAngle+=5.0;
+                    }
+                }
+                
+                    // move the bone and reduce the movement
+                    
                 this.bones[boneIndexList[k]].nextPoseAngle.set(x,0.0,z);
                 x*=0.75;
-                z*=0.75;
             }
-        
         }
+        
+        this.lastAnimationFlip=!this.lastAnimationFlip;
     };
     
     this.randomPose=function(view,modelType)
