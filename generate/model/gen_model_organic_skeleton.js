@@ -46,20 +46,26 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var skeleton=this.model.skeleton;
         var bones=skeleton.bones;
         
+            // leg
+            
         legHipBoneIdx=bones.push(new ModelBoneObject(('LegHip'+nameSuffix),boneIdx,new wsPoint(vct.x,hipHigh,vct.z)))-1;
         kneeBoneIdx=bones.push(new ModelBoneObject(('Knee'+nameSuffix),legHipBoneIdx,new wsPoint(vct.x,kneeHigh,vct.z)))-1;
         ankleBoneIdx=bones.push(new ModelBoneObject(('Ankle'+nameSuffix),kneeBoneIdx,new wsPoint(vct.x,ankleHigh,vct.z)))-1;
 
-        var vct2=new wsPoint(0.0,0.0,-footLength);
-
-        footBoneIdx=bones.push(new ModelBoneObject(('Foot'+nameSuffix),ankleBoneIdx,new wsPoint((vct.x+vct2.x),ankleHigh,(vct.z+vct2.z))))-1;
-
         bones[legHipBoneIdx].gravityLockDistance=legRadius;
         bones[kneeBoneIdx].gravityLockDistance=legRadius;
         bones[ankleBoneIdx].gravityLockDistance=legRadius;
-        bones[footBoneIdx].gravityLockDistance=legRadius;
 
-        this.model.skeleton.limbs.push(new ModelLimbObject((leftLimb?LIMB_TYPE_LEG_LEFT:LIMB_TYPE_LEG_RIGHT),[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbObject((leftLimb?LIMB_TYPE_LEG_LEFT:LIMB_TYPE_LEG_RIGHT),[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx]));
+
+            // foot
+
+        var vct2=new wsPoint(0.0,0.0,-footLength);
+        footBoneIdx=bones.push(new ModelBoneObject(('Foot'+nameSuffix),ankleBoneIdx,new wsPoint((vct.x+vct2.x),ankleHigh,(vct.z+vct2.z))))-1;
+
+        bones[footBoneIdx].gravityLockDistance=legRadius;
+        
+        this.model.skeleton.limbs.push(new ModelLimbObject((leftLimb?LIMB_TYPE_FOOT_LEFT:LIMB_TYPE_FOOT_RIGHT),[ankleBoneIdx,footBoneIdx]));
     };
     
     this.buildLimbLegSet=function(boneIdx,legIndex,boneOffset,rotOffset,hipRadius,hipHigh,legRadius,footLength)

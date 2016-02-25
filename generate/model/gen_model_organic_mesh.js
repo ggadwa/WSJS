@@ -385,6 +385,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     this.buildAroundBoneList=function(view,skeletonBoneIndexes,vertexList,indexes)
     {
         var n,k,f,boneIdx,bone,parentBone,listBone;
+        var extraBoneCount;
         var parentListIdx;
         
             // create list of bones
@@ -425,11 +426,16 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             if (parentListIdx===-1) continue;
             
                 // create temp bones
+                // based on the distance, we insert extra
+                // bones inbetween to smooth out shrink wrap
              
             parentBone=this.model.skeleton.bones[bone.parentBoneIdx];
             
-            for (k=1;k!==3;k++) {
-                f=k/3;
+            extraBoneCount=Math.floor(parentBone.position.distance(bone.position)/300);
+            if (extraBoneCount<3) extraBoneCount=3;
+            
+            for (k=1;k!==extraBoneCount;k++) {
+                f=k/extraBoneCount;
                 
                 listBone=new GenModelOrganicBoneObject();
                 listBone.idx=-1;

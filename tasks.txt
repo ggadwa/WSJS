@@ -26,8 +26,6 @@ REGULAR TODOs
        * put instanceof in map_overlay to not so projectiles
 
 
-
-#### feet as separate globes
 #### tails, random vertex moves
 #### normals bad in animation (or culling is bad)
 
