@@ -84,8 +84,8 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=5;
-const MONSTER_ENTITY_COUNT=5;
+const MONSTER_MODEL_COUNT=2;
+const MONSTER_ENTITY_COUNT=2;
 
 const MONSTER_AI_ON=false;
 
@@ -132,7 +132,7 @@ const DEBUG_DRAW_MAP_MESH_LINES=false;
 const DEBUG_DRAW_MAP_MESH_NORMALS=false;
 const DEBUG_DRAW_MAP_MESH_TANGENTS=false;
 
-const DEBUG_DRAW_MODEL_SKELETON=false;
+const DEBUG_DRAW_MODEL_SKELETON=true;
 const DEBUG_DRAW_MODEL_MESH_LINES=false;
 const DEBUG_DRAW_MODEL_MESH_NORMALS=false;
 const DEBUG_DRAW_MODEL_MESH_TANGENTS=false;

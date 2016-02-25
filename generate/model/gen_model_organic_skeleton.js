@@ -15,7 +15,8 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         
     this.buildLimbArm=function(vct,nameSuffix,torsoTopBoneIdx,armRadius,y,shoulderLength,elbowLength,wristLength,handLength,leftLimb)
     {
-        var shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx;
+        var shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx,fingerBoneIdx;
+        var n,nFinger,fy,handList;
         var skeleton=this.model.skeleton;
         var bones=skeleton.bones;
         
@@ -34,10 +35,30 @@ function GenModelOrganicSkeletonObject(model,genRandom)
             // hand
             
         handBoneIdx=bones.push(new ModelBoneObject(('Hand'+nameSuffix),wristBoneIdx,new wsPoint((handLength*vct.x),y,(handLength*vct.z))))-1;
-        
         bones[handBoneIdx].gravityLockDistance=300;
         
-        skeleton.limbs.push(new ModelLimbObject((leftLimb?LIMB_TYPE_ARM_LEFT:LIMB_TYPE_ARM_RIGHT),[handBoneIdx]));
+        handList=[];
+        handList.push(handBoneIdx);
+        
+            // add fingers to hand
+            
+        nFinger=this.genRandom.randomInt(3,3);
+        
+        handLength+=1000;
+        fy=y-Math.trunc((nFinger/2)*150);
+        
+        for (n=0;n!==nFinger;n++) {
+            fingerBoneIdx=bones.push(new ModelBoneObject(('Finger'+n+nameSuffix),handBoneIdx,new wsPoint((handLength*vct.x),fy,(handLength*vct.z))))-1;
+            fy+=150;
+            
+            bones[fingerBoneIdx].gravityLockDistance=100;
+            
+            handList.push(fingerBoneIdx);
+        }
+        
+            // find add limb
+            
+        skeleton.limbs.push(new ModelLimbObject((leftLimb?LIMB_TYPE_ARM_LEFT:LIMB_TYPE_ARM_RIGHT),handList));
     };
     
     this.buildLimbLeg=function(vct,boneIdx,nameSuffix,hipHigh,kneeHigh,ankleHigh,legRadius,footLength,leftLimb)
@@ -152,7 +173,7 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         var armCount=1;
         if (this.genRandom.randomPercentage(0.25)) armCount=this.genRandom.randomInt(1,3);
         
-        var armRadius,armLength;
+        var armRadius,armY,armLength;
         
         var shoulderLength,elbowLength,wristLength,handLength;
         
@@ -162,20 +183,22 @@ function GenModelOrganicSkeletonObject(model,genRandom)
             armRadius=Math.floor(botBodyRadius*0.35);
             if (armRadius<250) armRadius=250;
             if (armRadius>350) armRadius=350;
-            armLength=this.genRandom.randomInt(Math.floor(totalHigh*0.5),Math.floor(totalHigh*0.3));
+            armLength=this.genRandom.randomInt(Math.floor(totalHigh*0.4),Math.floor(totalHigh*0.2));
         
             shoulderLength=Math.floor(topBodyRadius*0.75);
             elbowLength=shoulderLength+Math.floor(armLength*0.42);
             wristLength=shoulderLength+Math.floor(armLength*0.84);
             handLength=shoulderLength+Math.floor(armLength*0.9);
             
+            armY=y+Math.trunc(armRadius*0.5);
+            
             vct=new wsPoint(1.0,0.0,0.0);
             vct.rotateY(null,rotOffset);
-            this.buildLimbArm(vct,('Left'+n),torsoTopBoneIdx,armRadius,y,shoulderLength,elbowLength,wristLength,handLength,true);
+            this.buildLimbArm(vct,('Left'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,true);
         
             vct=new wsPoint(-1.0,0.0,0.0);
             vct.rotateY(null,-rotOffset);
-            this.buildLimbArm(vct,('Right'+n),torsoTopBoneIdx,armRadius,y,shoulderLength,elbowLength,wristLength,handLength,false);
+            this.buildLimbArm(vct,('Right'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,false);
         
             y+=(armRadius+Math.floor(armRadius*0.1));
         }

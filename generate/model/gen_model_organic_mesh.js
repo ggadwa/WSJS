@@ -203,12 +203,6 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             moving.push(true);
         }
         
-            // special move to center vector
-            // for vertexes that aren't within the gravity
-            // well of any bones
-            
-        var moveToCenterVector=new wsPoint(0,0,0);
-        
             // loop the moves
             
         var anyMove;
@@ -357,23 +351,42 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // builds the normals based on bones
         //
         
-    this.buildNormalsToBones=function(vertexList,centerPnt)
+    this.buildNormalsToBones=function(vertexList,boneList,centerPnt)
     {
-        var n,v;
+        var n,k,v,bone,bonePos,dist,curDist;
         var nVertex=vertexList.length;
-        var bones=this.model.skeleton.bones;
+        var nBone=boneList.length;
+        
+            // find the closest bone in the bone list,
+            // even though we have attachments, we need to
+            // use the enlarged bone list because it
+            // gives up better normals
         
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
             
+            curDist=-1;
+            bonePos=null;
+            
+            for (k=0;k!==nBone;k++) {
+                bone=boneList[k];
+                dist=bone.position.distance(v.position);
+                
+                if ((dist<curDist) || (curDist===-1)) {
+                    curDist=dist;
+                    bonePos=bone.position;
+                }
+            }
+            
                 // rebuild the normals
                 
-            if (v.boneIdx===-1) {
+            if (bonePos===null) {
                 v.normal.setFromSubPoint(v.position,centerPnt);
             }
             else {
-                v.normal.setFromSubPoint(v.position,bones[v.boneIdx].position);
+                v.normal.setFromSubPoint(v.position,bonePos);
             }
+            
             v.normal.normalize();
         }
     };
@@ -475,7 +488,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList);
-        this.buildNormalsToBones(vertexList,centerPnt);
+        this.buildNormalsToBones(vertexList,boneList,centerPnt);
         
             // complete the tangent space vectors
         

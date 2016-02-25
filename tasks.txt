@@ -26,6 +26,8 @@ REGULAR TODOs
        * put instanceof in map_overlay to not so projectiles
 
 
+#### limbs need small or large globe setting
+#### fingers another globe, hand part of arm
 #### tails, random vertex moves
 #### normals bad in animation (or culling is bad)
 
@@ -46,11 +48,6 @@ REGULAR TODOs
     [X] need ledge builder
         [ ] dup for ceilings? maybe
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
-
-[ ] models
-    [ ] hands and feet separate globes
-        [ ] bad normals in feet because of bone connections
-    [ ] need separate starting globe sizes for each part - maybe?
 
 [ ] need to deal with pausing time stamps
 
