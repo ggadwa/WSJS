@@ -26,8 +26,8 @@ REGULAR TODOs
        * put instanceof in map_overlay to not so projectiles
 
 
-#### limbs need small or large globe setting
-#### fingers another globe, hand part of arm
+#### something weird about left sides of bubbles
+#### monsters only animate when moving?
 #### tails, random vertex moves
 #### normals bad in animation (or culling is bad)
 

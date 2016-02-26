@@ -274,8 +274,8 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
         model=new ModelObject('player',MODEL_TYPE_HUMANOID);
     }
     else {
-    //    model=new ModelObject(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
-        model=new ModelObject(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
+        model=new ModelObject(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
+    //    model=new ModelObject(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
     }
     
         // build the skeleton and mesh

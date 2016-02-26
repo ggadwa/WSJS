@@ -51,9 +51,10 @@ function ModelBoneObject(name,parentBoneIdx,position)
 // limb class
 //
 
-function ModelLimbObject(limbType,boneIndexes)
+function ModelLimbObject(limbType,globeSurfaceCount,boneIndexes)
 {
     this.limbType=limbType;
+    this.globeSurfaceCount=globeSurfaceCount;
     this.boneIndexes=boneIndexes;
 };
 
@@ -323,10 +324,59 @@ function ModelSkeletonObject()
     
     // supergumba -- testing
     
+    this.randomNextPoseLeg=function(view,limb)
+    {
+        var r,backLeg;
+
+        r=view.genRandom.randomInBetween(20.0,40.0);
+        
+        backLeg=(limb.limbType===LIMB_TYPE_LEG_LEFT);
+        if (this.lastAnimationFlip) backLeg=!backLeg;
+        
+        if (backLeg) {
+            this.bones[limb.boneIndexes[0]].nextPoseAngle.set(-r,0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.set(-(r*0.7),0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.set(-(r*0.5),0.0,0.0);
+        }
+        else {
+            this.bones[limb.boneIndexes[0]].nextPoseAngle.set(r,0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.set((r*2.0),0.0,0.0);
+        }
+    };
+    
+    this.randomNextPoseArm=function(view,limb,armAngle)
+    {
+        var r,z,backArm;
+
+        r=view.genRandom.randomInBetween(20.0,40.0);
+        
+        //backArm=(limb.limbType===LIMB_TYPE_ARM_LEFT);
+        //if (this.lastAnimationFlip) backArm=!backArm;
+        
+        z=-armAngle;
+        if (limb.limbType===LIMB_TYPE_ARM_LEFT) z=-z;
+        
+        this.bones[limb.boneIndexes[0]].nextPoseAngle.set(0,0.0,z);
+        this.bones[limb.boneIndexes[1]].nextPoseAngle.set(0,0.0,(z*0.9));
+    };
+    
+    this.randomNextPoseBody=function(view,limb,startAng,extraAng)
+    {
+        var n,x;
+        var nBone=limb.boneIndexes.length;
+
+        x=view.genRandom.randomInBetween(startAng,extraAng);
+        if (this.lastAnimationFlip) x=-x;
+            
+        for (n=0;n!==nBone;n++) {
+            this.bones[limb.boneIndexes[n]].nextPoseAngle.set(x,0.0,0.0);
+            x*=0.75;
+        }
+    };
+    
     this.randomNextPose=function(view,modelType)
     {
-        var n,k,limb,boneIndexList;
-        var r,x,z;
+        var n,limb;
         var nLimb=this.limbs.length;
         
         var armLeftZAngle=40.0;
@@ -335,45 +385,29 @@ function ModelSkeletonObject()
         for (n=0;n!==nLimb;n++) {
             limb=this.limbs[n];
             
-            switch (modelType) {
-                case MODEL_TYPE_HUMANOID:
-                    if ((limb.limbType===LIMB_TYPE_BODY) || (limb.limbType===LIMB_TYPE_HEAD)) continue;
-                    break;
-                case MODEL_TYPE_ANIMAL:
-                    if (limb.limbType===LIMB_TYPE_BODY) continue;
-                    break;
-                case MODEL_TYPE_BLOB:
-                    if (limb.limbType!==LIMB_TYPE_BODY) continue;
-                    break;
-            }
-            
-            boneIndexList=this.limbs[n].boneIndexes;
-            
-            r=view.genRandom.randomInBetween(15.0,30.0);
-
-            x=((limb.limbType===LIMB_TYPE_ARM_LEFT) || (limb.limbType===LIMB_TYPE_LEG_LEFT))?r:-r;
-            if (this.lastAnimationFlip) x=-x;
-            
-            for (k=0;k!==boneIndexList.length;k++) {
-                z=0.0;
-                
-                    // always push shoulders down out of the T formation
-                    
-                if (k===0) {
-                    if (limb.limbType===LIMB_TYPE_ARM_LEFT) {
-                        z=armLeftZAngle;
-                        armLeftZAngle+=5.0;
+            switch (limb.limbType) {
+                case LIMB_TYPE_BODY:
+                    if (modelType==MODEL_TYPE_HUMANOID) {
+                        this.randomNextPoseBody(view,limb,5.0,5.0);
+                        break;
                     }
-                    if (limb.limbType===LIMB_TYPE_ARM_RIGHT) {
-                        z=-armRightZAngle;
-                        armRightZAngle+=5.0;
+                    if (modelType===MODEL_TYPE_BLOB) {
+                        this.randomNextPoseBody(view,limb,15.0,30.0);
+                        break;
                     }
-                }
-                
-                    // move the bone and reduce the movement
-                    
-                this.bones[boneIndexList[k]].nextPoseAngle.set(x,0.0,z);
-                x*=0.75;
+                    break;
+                case LIMB_TYPE_LEG_LEFT:
+                case LIMB_TYPE_LEG_RIGHT:
+                    this.randomNextPoseLeg(view,limb);
+                    break;
+                case LIMB_TYPE_ARM_LEFT:
+                    this.randomNextPoseArm(view,limb,armLeftZAngle);
+                    armLeftZAngle+=5.0;
+                    break;
+                case LIMB_TYPE_ARM_RIGHT:
+                    this.randomNextPoseArm(view,limb,armRightZAngle);
+                    armRightZAngle+=5.0;
+                    break;
             }
         }
         

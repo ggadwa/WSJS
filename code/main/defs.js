@@ -108,6 +108,13 @@ function wsPoint(x,y,z)
         this.z=pt1.z+(pt2.z-pt1.z)*factor;
     };
     
+    this.average=function(pt)
+    {
+        this.x=(this.x+pt.x)*0.5;
+        this.y=(this.y+pt.y)*0.5;
+        this.z=(this.z+pt.z)*0.5;
+    };
+    
     this.equals=function(pt)
     {
         return((this.x===pt.x)&&(this.y===pt.y)&&(this.z===pt.z));
@@ -444,13 +451,13 @@ function ws2DPoint(x,y)
 
 function ws2DIntPoint(x,y)
 {
-    this.x=Math.floor(x);
-    this.y=Math.floor(y);
+    this.x=Math.trunc(x);
+    this.y=Math.trunc(y);
     
     this.set=function(xSet,ySet)
     {
-        this.x=Math.floor(xSet);
-        this.y=Math.floor(ySet);
+        this.x=Math.trunc(xSet);
+        this.y=Math.trunc(ySet);
     };
                 
     this.move=function(xAdd,yAdd)
@@ -493,8 +500,8 @@ function ws2DIntPoint(x,y)
             y+=centerPt.y;
         }
         
-        this.x=Math.floor(x);
-        this.y=Math.floor(y);
+        this.x=Math.trunc(x);
+        this.y=Math.trunc(y);
     };
     
     this.copy=function()
@@ -600,7 +607,7 @@ function wsBound(value1,value2)
                 
     this.getSize=function()
     {
-        return(this.max-this.min);
+        return(Math.trunc(this.max-this.min));
     };
                 
     this.adjust=function(value)
@@ -609,15 +616,6 @@ function wsBound(value1,value2)
         if (value>this.max) this.max=value;
     };
     
-    this.forceMinSize=function(value)
-    {
-        if (this.getSize()<value) {
-            var mid=this.getMidPoint();
-            this.min=mid-value;
-            this.max=mid+value;
-        }
-    };
-                
     this.copy=function()
     {
         return(new wsBound(this.min,this.max));

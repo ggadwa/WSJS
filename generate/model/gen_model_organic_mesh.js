@@ -20,15 +20,11 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
     this.model=model;
     this.genRandom=genRandom;
     
-        // globe counts
-        
-    this.GLOBE_SURFACE_COUNT=16;
-    this.GLOBE_VERTEX_LIST_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-2))+2);
-    this.GLOBE_INDEX_COUNT=((this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-3))*6)+((this.GLOBE_SURFACE_COUNT*2)*3);
-    
         //
-        // find bounds for collection
-        // collection of bones
+        // find bounds for a collection of bones
+        // and find the width and heigth of a globe
+        // that will circle them and be within the min
+        // gravity distance
         //
         
     this.findBoundsForBoneList=function(boneList,xBound,yBound,zBound)
@@ -47,10 +43,42 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             yBound.adjust(pos.y);
             zBound.adjust(pos.z);
         }
+    };
+    
+    this.findWidthForEnclosingGlobe=function(boneList,xBound,zBound)
+    {
+        var n,widRadius;
+        var nBone=boneList.length;
+        var minGravityDist=0;
         
-        xBound.forceMinSize(1000);
-        yBound.forceMinSize(1000);
-        zBound.forceMinSize(1000);
+            // find the min gravity distance
+            
+        for (n=0;n!==nBone;n++) {
+            if (boneList[n].gravityLockDistance>minGravityDist) minGravityDist=boneList[n].gravityLockDistance;
+        }
+
+            // build the width
+            
+        widRadius=xBound.getSize();
+        if (zBound.getSize()>widRadius) widRadius=zBound.getSize();
+        return(Math.trunc(widRadius*0.5)+minGravityDist);
+    };
+    
+    this.findHeightForEnclosingGlobe=function(boneList,yBound)
+    {
+        var n;
+        var nBone=boneList.length;
+        var minGravityDist=0;
+        
+            // find the min gravity distance
+            
+        for (n=0;n!==nBone;n++) {
+            if (boneList[n].gravityLockDistance>minGravityDist) minGravityDist=boneList[n].gravityLockDistance;
+        }
+
+            // build the height
+        
+        return(Math.trunc(yBound.getSize()*0.5)+minGravityDist);
     };
 
         //
@@ -58,25 +86,25 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // center point
         //
         
-    this.buildGlobeAroundSkeleton=function(view,centerPnt,widRadius,highRadius,vertexList,indexes)
+    this.buildGlobeAroundSkeleton=function(view,globeSurfaceCount,centerPnt,widRadius,highRadius,vertexList,indexes)
     {
         var x,y;
         var rd,radius,py;
         var vAng;
         var v;
-         
+        
             // create the globe without a top
             // or bottom and build that with trigs later
             
-        var xzAngAdd=360.0/this.GLOBE_SURFACE_COUNT;
-        var yAngAdd=180.0/this.GLOBE_SURFACE_COUNT;
+        var xzAngAdd=360.0/globeSurfaceCount;
+        var yAngAdd=180.0/globeSurfaceCount;
 
         var xzAng;
         var yAng=yAngAdd;
         
         var vIdx=0;
         
-        for (y=1;y!==(this.GLOBE_SURFACE_COUNT-1);y++) {
+        for (y=1;y!==(globeSurfaceCount-1);y++) {
             
                 // get y position and radius
                 // from angle
@@ -91,7 +119,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             
             xzAng=0.0;
             
-            for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
+            for (x=0;x!==globeSurfaceCount;x++) {
                 v=vertexList[vIdx++];
                 
                 rd=xzAng*DEGREE_TO_RAD;
@@ -130,17 +158,17 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var nx,vNextIdx,v2Idx,v2NextIdx;
         var iIdx=0;
         
-        for (y=0;y!==(this.GLOBE_SURFACE_COUNT-3);y++) {
+        for (y=0;y!==(globeSurfaceCount-3);y++) {
             
-            for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
+            for (x=0;x!==globeSurfaceCount;x++) {
                 
-                vIdx=(y*this.GLOBE_SURFACE_COUNT)+x;
-                v2Idx=((y+1)*this.GLOBE_SURFACE_COUNT)+x;
+                vIdx=(y*globeSurfaceCount)+x;
+                v2Idx=((y+1)*globeSurfaceCount)+x;
                 
-                nx=(x<(this.GLOBE_SURFACE_COUNT-1))?(x+1):0;
+                nx=(x<(globeSurfaceCount-1))?(x+1):0;
 
-                vNextIdx=(y*this.GLOBE_SURFACE_COUNT)+nx;
-                v2NextIdx=((y+1)*this.GLOBE_SURFACE_COUNT)+nx;
+                vNextIdx=(y*globeSurfaceCount)+nx;
+                v2NextIdx=((y+1)*globeSurfaceCount)+nx;
                  
                 indexes[iIdx++]=v2Idx;
                 indexes[iIdx++]=vIdx;
@@ -154,8 +182,8 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
             // top triangles
             
-        for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
-            nx=(x<(this.GLOBE_SURFACE_COUNT-1))?(x+1):0;
+        for (x=0;x!==globeSurfaceCount;x++) {
+            nx=(x<(globeSurfaceCount-1))?(x+1):0;
             
             indexes[iIdx++]=x;
             indexes[iIdx++]=topIdx;
@@ -164,10 +192,10 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
             // bottom triangles
             
-        var botOff=this.GLOBE_SURFACE_COUNT*(this.GLOBE_SURFACE_COUNT-3);
+        var botOff=globeSurfaceCount*(globeSurfaceCount-3);
             
-        for (x=0;x!==this.GLOBE_SURFACE_COUNT;x++) {
-            nx=(x<(this.GLOBE_SURFACE_COUNT-1))?(x+1):0;
+        for (x=0;x!==globeSurfaceCount;x++) {
+            nx=(x<(globeSurfaceCount-1))?(x+1):0;
             
             indexes[iIdx++]=botOff+x;
             indexes[iIdx++]=botIdx;
@@ -395,7 +423,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         // build around bone list
         //
         
-    this.buildAroundBoneList=function(view,skeletonBoneIndexes,vertexList,indexes)
+    this.buildAroundBoneList=function(view,globeSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
     {
         var n,k,f,boneIdx,bone,parentBone,listBone;
         var extraBoneCount;
@@ -421,7 +449,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // if any bone in the list is a parent of
             // another bone in the list, then add some
             // temp bones to smooth out the shrink wrapping
-            
+   
         for (n=0;n!==boneCount;n++) {
             bone=this.model.skeleton.bones[boneList[n].idx];
             
@@ -464,7 +492,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                 boneList.push(listBone);
             }
         }
-        
+
             // find the bounds for this list of bones
             
         var xBound=new wsBound(0,0);
@@ -472,19 +500,14 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var zBound=new wsBound(0,0);
         
         this.findBoundsForBoneList(boneList,xBound,yBound,zBound);
-        
-        var widRadius=xBound.getSize();
-        if (zBound.getSize()>widRadius) widRadius=zBound.getSize();
-        widRadius=Math.floor(widRadius*0.5);
-        
-        var highRadius=Math.floor(yBound.getSize()*0.5);
-        
+        var widRadius=this.findWidthForEnclosingGlobe(boneList,xBound,zBound);
+        var highRadius=this.findHeightForEnclosingGlobe(boneList,yBound);
         var centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // build the globe and shrink
             // wrap it to bones
         
-        this.buildGlobeAroundSkeleton(view,centerPnt,widRadius,highRadius,vertexList,indexes);
+        this.buildGlobeAroundSkeleton(view,globeSurfaceCount,centerPnt,widRadius,highRadius,vertexList,indexes);
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList);
@@ -501,7 +524,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
 
     this.build=function(view)
     {
-        var n;
+        var n,limb;
         var indexOffset;
         
         var skeleton=this.model.skeleton;
@@ -513,10 +536,14 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
             // wrap all the limbs
             
         for (n=0;n!==skeleton.limbs.length;n++) {
-            vertexList=meshUtility.createModelVertexList(this.GLOBE_VERTEX_LIST_COUNT);
-            indexes=new Uint16Array(this.GLOBE_INDEX_COUNT);
+            limb=skeleton.limbs[n];
+            
+                        // counts
+            
+            vertexList=meshUtility.createModelVertexList((limb.globeSurfaceCount*(limb.globeSurfaceCount-2))+2);
+            indexes=new Uint16Array(((limb.globeSurfaceCount*(limb.globeSurfaceCount-3))*6)+((limb.globeSurfaceCount*2)*3));
 
-            this.buildAroundBoneList(view,skeleton.limbs[n].boneIndexes,vertexList,indexes);
+            this.buildAroundBoneList(view,limb.globeSurfaceCount,limb.boneIndexes,vertexList,indexes);
 
             if (modelVertexList===null) {
                 modelVertexList=vertexList;

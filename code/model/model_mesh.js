@@ -13,6 +13,9 @@ function ModelMeshVertexObject()
     
     this.boneIdx=-1;
     this.vectorFromBone=new wsPoint(0.0,0.0,0.0);
+    
+    this.parentBoneIdx=-1;
+    this.vectorFromParentBone=new wsPoint(0.0,0.0,0.0);
 }
 
 //
@@ -54,6 +57,8 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
     this.rotVector=new wsPoint(0.0,0.0,0.0);
     this.rotNormal=new wsPoint(0.0,0.0,0.0);
+    this.parentRotVector=new wsPoint(0.0,0.0,0.0);
+    this.parentRotNormal=new wsPoint(0.0,0.0,0.0);
         
         //
         // close model mesh
@@ -93,13 +98,20 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
     this.precalcAnimationValues=function(skeleton)
     {
-        var n,v,bone;
+        var n,v,bone,parentBone;
 
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
-            bone=skeleton.bones[v.boneIdx];
             
+            bone=skeleton.bones[v.boneIdx];
             v.vectorFromBone.setFromSubPoint(v.position,bone.position);
+            
+            if (bone.parentBoneIdx!==-1) {
+                parentBone=skeleton.bones[bone.parentBoneIdx];
+                
+                v.parentBoneIdx=bone.parentBoneIdx;
+                v.vectorFromParentBone.setFromSubPoint(v.position,parentBone.position);
+            }
         }
     };
     
@@ -110,7 +122,7 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     this.updateVertexesToPoseAndPosition=function(view,skeleton,angle,position)
     {
         var n,v;
-        var bone;
+        var bone,parentBone;
         
             // move all the vertexes
             
@@ -119,9 +131,10 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
-            bone=skeleton.bones[v.boneIdx];
             
                 // bone movement
+                
+            bone=skeleton.bones[v.boneIdx];
                 
             this.rotVector.setFromPoint(v.vectorFromBone);
             this.rotVector.rotate(bone.curPoseAngle);
@@ -132,6 +145,25 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             
             this.rotNormal.setFromPoint(v.normal);
             this.rotNormal.rotate(bone.curPoseAngle);
+            
+                // average in any parent movement
+                
+            if (v.parentBoneIdx!==-1) {
+                parentBone=skeleton.bones[v.parentBoneIdx];
+                
+                this.parentRotVector.setFromPoint(v.vectorFromParentBone);
+                this.parentRotVector.rotate(parentBone.curPoseAngle);
+
+                this.parentRotVector.x=parentBone.curPosePosition.x+this.parentRotVector.x;
+                this.parentRotVector.y=parentBone.curPosePosition.y+this.parentRotVector.y;
+                this.parentRotVector.z=parentBone.curPosePosition.z+this.parentRotVector.z;
+
+                this.parentRotNormal.setFromPoint(v.normal);
+                this.parentRotNormal.rotate(parentBone.curPoseAngle);
+                
+                this.rotVector.average(this.parentRotVector);
+                this.rotNormal.average(this.parentRotNormal);
+            }    
             
                 // whole model movement
                 

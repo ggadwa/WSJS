@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
@@ -84,10 +84,10 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 // monsters
 //
 
-const MONSTER_MODEL_COUNT=2;
-const MONSTER_ENTITY_COUNT=2;
+const MONSTER_MODEL_COUNT=5;
+const MONSTER_ENTITY_COUNT=5;
 
-const MONSTER_AI_ON=false;
+const MONSTER_AI_ON=true;
 
 //
 // particles
@@ -104,10 +104,10 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 const SEED=Date.now();
 
 const SEED_MAP_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MAP=5; //Math.floor((Math.random()*SEED));
+const SEED_MAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
-const SEED_MODEL=6; // Math.floor((Math.random()*SEED));
-const SEED_ENTITY=6; //Math.floor((Math.random()*SEED));
+const SEED_MODEL=Math.floor((Math.random()*SEED));
+const SEED_ENTITY=Math.floor((Math.random()*SEED));
 
 //
 // timing
@@ -132,7 +132,7 @@ const DEBUG_DRAW_MAP_MESH_LINES=false;
 const DEBUG_DRAW_MAP_MESH_NORMALS=false;
 const DEBUG_DRAW_MAP_MESH_TANGENTS=false;
 
-const DEBUG_DRAW_MODEL_SKELETON=true;
+const DEBUG_DRAW_MODEL_SKELETON=false;
 const DEBUG_DRAW_MODEL_MESH_LINES=false;
 const DEBUG_DRAW_MODEL_MESH_NORMALS=false;
 const DEBUG_DRAW_MODEL_MESH_TANGENTS=false;
@@ -237,10 +237,12 @@ const LIMB_TYPE_ARM_LEFT=2;
 const LIMB_TYPE_ARM_RIGHT=3;
 const LIMB_TYPE_LEG_LEFT=4;
 const LIMB_TYPE_LEG_RIGHT=5;
-const LIMB_TYPE_HAND_LEFT=6;
-const LIMB_TYPE_HAND_RIGHT=7;
+const LIMB_TYPE_FINGER_LEFT=6;
+const LIMB_TYPE_FINGER_RIGHT=7;
 const LIMB_TYPE_FOOT_LEFT=8;
 const LIMB_TYPE_FOOT_RIGHT=9;
+const LIMB_TYPE_TOE_LEFT=10;
+const LIMB_TYPE_TOE_RIGHT=11;
 
 //
 // text drawing
