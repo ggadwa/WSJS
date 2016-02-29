@@ -69,7 +69,7 @@ function EntityListObject()
         // run all entities
         //
         
-    this.run=function(view,map)
+    this.run=function(view,soundList,map)
     {
         var n;
         var nEntity=this.entities.length;
@@ -77,7 +77,7 @@ function EntityListObject()
             // run the entities
             
         for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(view,map,this);
+            this.entities[n].run(view,soundList,map,this);
         }
         
             // now clean up any that got

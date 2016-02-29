@@ -18,7 +18,7 @@ function WeaponObject(model,projectileModel)
         // fire weapon
         //
         
-    this.fire=function(view,entityList,entity)
+    this.fire=function(view,soundList,entityList,entity)
     {
             // time to fire again?
             
@@ -37,6 +37,8 @@ function WeaponObject(model,projectileModel)
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
         entityList.add(new EntityProjectileObject('projectile',view,pos,ang,500,500,this.projectileModel));
+        
+        soundList.play('fire');           // supergumba -- testing
     };
     
         //

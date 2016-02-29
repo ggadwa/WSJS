@@ -18,12 +18,16 @@ var mapTextureBuildList=
         [TEXTURE_CLOSET,[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
         [TEXTURE_MACHINE,[GEN_BITMAP_TYPE_MACHINE]]
     ];
+    
+var mapSoundBuildList=
+    ['fire','explosion','tone'];
 
 //
 // global objects
 //
 
 var view=new ViewObject();
+var soundList=new SoundListObject();
 var map=new MapObject();
 var modelList=new ModelListObject();
 var entityList=new EntityListObject();
@@ -59,7 +63,7 @@ function wsLoopRun(timeStamp)
     while (physicsTick>PHYSICS_MILLISECONDS) {
         physicsTick-=PHYSICS_MILLISECONDS;
         
-        entityList.run(view,map);
+        entityList.run(view,soundList,map);
     }
     
         // drawing
@@ -137,6 +141,7 @@ function wsInitGL()
     
 function wsInitInternal()
 {
+    if (!soundList.initialize()) return;
     if (!map.initialize(view)) return;
     if (!modelList.initialize(view)) return;
     if (!entityList.initialize(view)) return;
@@ -182,6 +187,33 @@ function wsInitBuildTextures(idx,textureGenRandom)
     }
     
         // next step
+        
+    view.loadingScreenUpdate();
+    view.loadingScreenAddString('Generating Dynamic Sounds');
+    view.loadingScreenDraw(null);
+
+    setTimeout(function() { wsInitBuildSounds(0,new GenRandomObject(SEED_ENTITY)); },PROCESS_TIMEOUT_MSEC);
+}
+
+function wsInitBuildSounds(idx,soundGenRandom)
+{
+    var soundCount=mapSoundBuildList.length;
+    
+         // generate sound
+    
+    var genSound=new GenSoundObject(soundList.getAudioContext(),soundGenRandom);
+    soundList.addSound(mapSoundBuildList[idx],genSound.generate());
+    
+        // if more textures, then loop back around
+        
+    idx++;
+    if (idx<soundCount) {
+        view.loadingScreenDraw(idx/soundCount);
+        setTimeout(function() { wsInitBuildSounds(idx,soundGenRandom); },PROCESS_TIMEOUT_MSEC);
+        return;
+    }
+    
+            // next step
         
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Map');

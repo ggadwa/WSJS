@@ -13,6 +13,7 @@ EMCA6 TODOs
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
     [ ] map.release();
+    [ ] sound.release();
     [ ] modelList.release();
     [ ] entityList.release();
     [ ] text.release();
@@ -25,10 +26,8 @@ REGULAR TODOs
        * (touchEntity.getName()==='projectile') use instanceof
        * put instanceof in map_overlay to not so projectiles
 
-
-#### something weird about left sides of bubbles
-#### monsters only animate when moving?
-#### tails, random vertex moves
+#### should textures be by name ('wall', 'floor', etc)
+#### tails, spikes, random vertex moves
 #### normals bad in animation (or culling is bad)
 
 [ ] GL
@@ -38,6 +37,10 @@ REGULAR TODOs
 [ ] optimizations
      [ ] look for any addition new optimizations
      [ ] get rid of any copy()
+
+[ ] sound
+     [ ] need to create sounds
+     [ ] need to add panner
 
 [ ] map generation
     [X] new platforms builder

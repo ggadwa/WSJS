@@ -288,7 +288,7 @@ function EntityObject(name,position,angle,radius,high,model)
         // run entity
         //
         
-    this.run=function(view,map,entityList)
+    this.run=function(view,soundList,map,entityList)
     {
     };
     
@@ -326,7 +326,6 @@ function EntityObject(name,position,angle,radius,high,model)
             // and angle
             
         if (this.model.skeleton!==null) {
-            this.model.skeleton.randomPose(view,this.model.modelType);
             this.model.skeleton.animate(view);
             this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.angle,this.position);
         }

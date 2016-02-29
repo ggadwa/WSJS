@@ -6,6 +6,8 @@
 
 function EntityMonsterObject(name,position,angle,radius,high,model)
 {
+    this.active=false;
+    
         // supergumba -- ALL AWFUL REPLACE WHEN WE HAVE CLASSES
         // change all baseEntity. to this.
         
@@ -101,7 +103,7 @@ function EntityMonsterObject(name,position,angle,radius,high,model)
         // run monster
         //
     
-    this.run=function(view,map,entityList)
+    this.run=function(view,soundList,map,entityList)
     {
             // delete if hit by projectile
         
@@ -115,24 +117,31 @@ function EntityMonsterObject(name,position,angle,radius,high,model)
         
         this.clearTouchEntity();
         
-            // only move if close to player
+            // time to activate monster?
         
         var player=entityList.getPlayer();
-        var dist=player.getPosition().distance(this.getPosition());
         
-        if ((dist>25000) || (!MONSTER_AI_ON)) {
-            this.baseEntity.fall();
-            return;
+        if ((!this.active) && (MONSTER_AI_ON)) {
+            var dist=player.getPosition().distance(this.getPosition());
+            this.active=(dist<25000);
         }
         
-            // turn towards player
+        if (this.active) {
             
-        this.baseEntity.turnTowards(player.getAngle().y,1.0);
+                // pose
+            
+            var model=this.getModel();
+            model.skeleton.randomPose(view,model.modelType);
         
-            // run towards player
-            
-        this.baseEntity.moveSimple(map,entityList,-50,true);
-            
+                // turn towards player
+
+            this.baseEntity.turnTowards(player.getAngle().y,1.0);
+
+                // run towards player
+
+            this.baseEntity.moveSimple(map,entityList,-50,true);
+        }
+        
             // falling
         
         this.baseEntity.fall();

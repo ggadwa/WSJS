@@ -7,6 +7,7 @@
 function EntityPlayerObject(name,position,angle,radius,high,model)
 {
     this.weaponCurrentIndex=-1;
+    this.weaponFired=false;
     this.weapons=[];
     
     
@@ -142,17 +143,25 @@ function EntityPlayerObject(name,position,angle,radius,high,model)
     
     this.fireCurrentWeapon=function(view,entityList)
     {
-        var weapon=this.getCurrentWeapon();
-        if (weapon!==null) weapon.fire(view,entityList,this);
+        this.weaponFired=true;
     };
     
         //
         // run player
         //
     
-    this.run=function(view,map,entityList)
+    this.run=function(view,soundList,map,entityList)
     {
-        var bump;
+        var bump,weapon;
+        
+            // fire any weapons that were triggered
+            
+        if (this.weaponFired) {
+            this.weaponFired=false;
+            
+            weapon=this.getCurrentWeapon();
+            if (weapon!==null) weapon.fire(view,soundList,entityList,this);
+        }
         
             // input turning and looking
             

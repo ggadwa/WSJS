@@ -104,7 +104,7 @@ function EntityProjectileObject(name,view,position,angle,radius,high,model)
         // run projectile
         //
     
-    this.run=function(view,map,entityList)
+    this.run=function(view,soundList,map,entityList)
     {
             // supergumba -- right now cancel any projectile
             // that last over 10 seconds
@@ -119,6 +119,7 @@ function EntityProjectileObject(name,view,position,angle,radius,high,model)
         if (this.baseEntity.moveSimple(map,entityList,400,false)) {
             this.baseEntity.markAsDelete();
             view.particleList.addExplosionParticles(view,this.getPosition());
+            soundList.play('explosion');
         }
     };
     

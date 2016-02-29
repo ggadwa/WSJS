@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
@@ -87,7 +87,7 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 const MONSTER_MODEL_COUNT=5;
 const MONSTER_ENTITY_COUNT=5;
 
-const MONSTER_AI_ON=true;
+const MONSTER_AI_ON=false;
 
 //
 // particles
@@ -108,6 +108,7 @@ const SEED_MAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.floor((Math.random()*SEED));
 const SEED_MODEL=Math.floor((Math.random()*SEED));
 const SEED_ENTITY=Math.floor((Math.random()*SEED));
+const SEED_SOUND=Math.floor((Math.random()*SEED));
 
 //
 // timing
