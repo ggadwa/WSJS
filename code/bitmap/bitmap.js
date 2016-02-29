@@ -4,9 +4,10 @@
 // bitmap class
 //
 
-function BitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
+function BitmapObject(view,name,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
 {
-    this.bitmapId=bitmapId;
+    this.view=view;
+    this.name=name;
     this.texture=null;
     this.normalMap=null;
     this.specularMap=null;
@@ -54,9 +55,9 @@ function BitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanv
         // close the bitmap
         //
     
-    this.bitmapClose=function(view)
+    this.close=function()
     {
-        var gl=view.gl;
+        var gl=this.view.gl;
 
         if (this.texture!==null) gl.deleteTexture(this.texture);
         if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
@@ -64,12 +65,13 @@ function BitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanv
     };
 
         //
-        // attach bitmap to shader
+        // attach bitmap to shader as a texture
+        // or as a lightmap
         //
     
-    this.attach=function(view,mapShader)
+    this.attachAsTexture=function(mapShader)
     {
-        var gl=view.gl;
+        var gl=this.view.gl;
 
             // shine factor in shader
 
@@ -84,6 +86,14 @@ function BitmapObject(view,bitmapId,bitmapCanvas,normalMapCanvas,specularMapCanv
         gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
 
         gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+    };
+    
+    this.attachAsLightmap=function()
+    {
+        var gl=this.view.gl;
+
+        gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     };
 

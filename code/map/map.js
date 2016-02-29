@@ -12,7 +12,6 @@ function MapObject()
     
     this.meshes=[];
     this.lights=[];
-    this.bitmaps=[];
     this.lightmaps=[];
     this.rooms=[];
     
@@ -48,15 +47,10 @@ function MapObject()
     {
         var n;
         var nMesh=this.meshes.length;
-        var nBitmap=this.bitmaps.length;
         var nLightmap=this.lightmaps.length;
 
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].close(view);
-        }
-
-        for (n=0;n!==nBitmap;n++) {
-            this.bitmaps[n].close(view);
         }
 
         for (n=0;n!==nLightmap;n++) {
@@ -65,7 +59,6 @@ function MapObject()
 
         this.meshes=[];
         this.lights=[];
-        this.bitmaps=[];
         this.lightmaps=[];
     };
 
@@ -84,11 +77,6 @@ function MapObject()
         this.lights.push(light);
     };
 
-    this.addBitmap=function(bitmap)
-    {
-        this.bitmaps.push(bitmap);
-    };
-
     this.addLightmap=function(lightmap)
     {
         this.lightmaps.push(lightmap);
@@ -102,34 +90,6 @@ function MapObject()
     {
         this.rooms.push(new MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level));
         return(this.rooms.length-1);
-    };
-
-        //
-        // bitmap/lightmap lookup
-        //
-
-    this.getBitmapById=function(bitmapId)
-    {
-        var n;
-        var nBitmap=this.bitmaps.length;
-
-        for (n=0;n!==nBitmap;n++) {
-            if (this.bitmaps[n].bitmapId===bitmapId) return(this.bitmaps[n]);
-        }
-
-        return(null);
-    };
-
-    this.getLightmapById=function(lightmapId)
-    {
-        var n;
-        var nLightmap=this.lightmaps.length;
-
-        for (n=0;n!==nLightmap;n++) {
-            if (this.lightmaps[n].lightmapId===lightmapId) return(this.lightmaps[n]);
-        }
-
-        return(null);
     };
 
         //
@@ -494,12 +454,12 @@ function MapObject()
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attach(view,this.mapShader);
+                mesh.bitmap.attachAsTexture(this.mapShader);
             }
 
             if (mesh.lightmap!==currentLightmap) {
                 currentLightmap=mesh.lightmap;
-                mesh.lightmap.attach(view,this.mapShader);
+                mesh.lightmap.attachAsLightmap();
             }
 
                 // draw the mesh

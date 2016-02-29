@@ -4,11 +4,12 @@
 // generate room decoration class
 //
 
-function GenRoomDecorationObject(view,map,genRandom)
+function GenRoomDecorationObject(view,bitmapList,map,genRandom)
 {
         // variables
         
     this.view=view;
+    this.bitmapList=bitmapList;
     this.map=map;
     this.genRandom=genRandom;
 
@@ -67,7 +68,7 @@ function GenRoomDecorationObject(view,map,genRandom)
 
                     rotAngle.set(0.0,(this.genRandom.random()*360.0),0.0);
 
-                    map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_BOX),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
+                    this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.get('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
 
                     ang+=angAdd;
                 }
@@ -112,16 +113,16 @@ function GenRoomDecorationObject(view,map,genRandom)
 
             // the machine box and top
             
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_MACHINE),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_LIGHT),machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
-        map.addMesh(meshPrimitives.createMeshCube(map.getBitmapById(TEXTURE_LIGHT),machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.get('Map Machine'),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
+        this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.get('Map Metal'),machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
+        this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.get('Map Metal'),machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
 
             // the machine pipes
 
         nPipe=this.genRandom.randomInt(1,5);
         radius=Math.floor(ROOM_BLOCK_WIDTH*0.1);
        
-        pipeBitmap=map.getBitmapById(TEXTURE_LIGHT);
+        pipeBitmap=this.bitmapList.get('Map Metal');
         centerPt=new wsPoint(0,0,0);
         
         yPipeBound=new wsBound((room.yStoryBound.min+ROOM_FLOOR_DEPTH),(room.yBound.max-(high+ROOM_FLOOR_DEPTH)));

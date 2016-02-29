@@ -977,7 +977,7 @@ function GenBitmapObject(genRandom)
         // generate mainline
         //
 
-    this.generate=function(view,bitmapId,generateType,debug)
+    this.generate=function(view,name,generateType,debug)
     {
         var wid,high,edgeSize,paddingSize,segments;
         var shineFactor=1.0;
@@ -1116,7 +1116,7 @@ function GenBitmapObject(genRandom)
             // finally create the bitmap
             // object and load into WebGL
 
-        return(new BitmapObject(view,bitmapId,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapObject(view,name,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     };
 
 }

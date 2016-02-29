@@ -4,21 +4,22 @@
 // generate room closet class
 //
 
-function GenRoomClosetObject(view,map,genRandom)
+function GenRoomClosetObject(view,bitmapList,map,genRandom)
 {
         // variables
         
     this.view=view;
+    this.bitmapList=bitmapList;
     this.map=map;
     this.genRandom=genRandom;
     
         // build the closet cube
         
-    this.createClosetCube=function(map,xBound,yBound,zBound)
+    this.createClosetCube=function(xBound,yBound,zBound)
     {
         var n,idx;
         var vertexList,indexes;
-        var bitmap=map.getBitmapById(TEXTURE_CLOSET);
+        var bitmap=this.bitmapList.get('Map Closet');
         
             // center point for normal creation
             
@@ -67,7 +68,7 @@ function GenRoomClosetObject(view,map,genRandom)
         meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
+        this.map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
@@ -91,7 +92,7 @@ function GenRoomClosetObject(view,map,genRandom)
         meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
 
             // floor
             
@@ -115,7 +116,7 @@ function GenRoomClosetObject(view,map,genRandom)
         meshUtility.buildVertexListUVs(bitmap,vertexList);
         meshUtility.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
     };
 
         // closet mainline
@@ -196,8 +197,8 @@ function GenRoomClosetObject(view,map,genRandom)
             for (k=0;k!==closetLen;k++) {
                 if (this.map.boxBoundCollision(xClosetBound,null,zClosetBound,MESH_FLAG_ROOM_WALL)!==-1) break;
 
-                this.createClosetCube(map,xClosetBound,yClosetBound,zClosetBound);
-                map.addOverlayCloset(xClosetBound,zClosetBound);
+                this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
+                this.map.addOverlayCloset(xClosetBound,zClosetBound);
                 
                 room.maskEdgeGridBlockToBounds(xClosetBound,yClosetBound,zClosetBound);    // block off ledges for edge grid
                 

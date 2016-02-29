@@ -9,7 +9,13 @@ function GenSoundObject(ctx,genRandom)
     this.ctx=ctx;
     this.genRandom=genRandom;
     
-    this.generate=function()
+    // SUPERGUMBA
+    // types:
+    // white nose
+    // white nose over tone (low rumble for explosion)
+    // tone
+    
+    this.generate=function(name)
     {
             // supergumba -- testing!
             
@@ -36,8 +42,7 @@ function GenSoundObject(ctx,genRandom)
             data[n]*=(1.0-((n-fadeStart)/fadeLen));
         }
         
-        return(buffer);
-        
+        return(new SoundObject(name,this.ctx,buffer));
     };
 }
 

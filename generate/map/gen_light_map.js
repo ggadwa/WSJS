@@ -93,9 +93,10 @@ function GetLightmapLastBlockObject()
 // generate lightmaps class
 //
 
-function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
+function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFunc)
 {
     this.view=view;
+    this.bitmapList=bitmapList;
     this.map=map;
     this.debug=debug;
     this.generateLightmap=generateLightmap;
@@ -997,7 +998,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            this.map.addLightmap(new MapLightmapObject(this.view,n,this.lightmapList[n].canvas));
+            this.bitmapList.add(new BitmapObject(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
         }
 
             // and set the light map on the meshes
@@ -1007,7 +1008,7 @@ function GenLightmapObject(view,map,debug,generateLightmap,callbackFunc)
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshes[n];
-            mesh.lightmap=this.map.lightmaps[mesh.tempLightmapIdx];
+            mesh.lightmap=this.bitmapList.get('Lightmap '+mesh.tempLightmapIdx);
         }
         
                     // debugging

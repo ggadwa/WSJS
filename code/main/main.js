@@ -4,29 +4,36 @@
 // textures to build
 //
 
-var mapTextureBuildList=
+var textureBuildList=
     [
-        [TEXTURE_WALL,[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
-        [TEXTURE_FLOOR,[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
-        [TEXTURE_CEILING,[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_WOOD_PLANK]],
-        [TEXTURE_STAIR,[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE]],
-        [TEXTURE_PLATFORM,[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_CORRUGATED,GEN_BITMAP_TYPE_WOOD_PLANK]],
-        [TEXTURE_LEDGE,[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
-        [TEXTURE_LIGHT,[GEN_BITMAP_TYPE_METAL]],
-        [TEXTURE_BOX,[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR]],
-        [TEXTURE_PILLAR,[GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER]],
-        [TEXTURE_CLOSET,[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
-        [TEXTURE_MACHINE,[GEN_BITMAP_TYPE_MACHINE]]
+        ['Map Wall',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
+        ['Map Floor',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
+        ['Map Ceiling',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_WOOD_PLANK]],
+        ['Map Stairs',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE]],
+        ['Map Platform',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_CORRUGATED,GEN_BITMAP_TYPE_WOOD_PLANK]],
+        ['Map Ledge',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
+        ['Map Metal',[GEN_BITMAP_TYPE_METAL]],
+        ['Map Box',[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR]],
+        ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER]],
+        ['Map Closet',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
+        ['Map Machine',[GEN_BITMAP_TYPE_MACHINE]],
+        ['Skin Scale',[GEN_BITMAP_TYPE_SKIN_SCALE]],
+        ['Skin Leather',[GEN_BITMAP_TYPE_SKIN_LEATHER]],
+        ['Skin Fur',[GEN_BITMAP_TYPE_SKIN_FUR]]
     ];
     
-var mapSoundBuildList=
-    ['fire','explosion','tone'];
+var soundBuildList=
+    [
+        ['fire'],
+        ['explosion']
+    ];
 
 //
 // global objects
 //
 
 var view=new ViewObject();
+var bitmapList=new BitmapListObject(view);
 var soundList=new SoundListObject();
 var map=new MapObject();
 var modelList=new ModelListObject();
@@ -141,6 +148,7 @@ function wsInitGL()
     
 function wsInitInternal()
 {
+    if (!bitmapList.initialize()) return;
     if (!soundList.initialize()) return;
     if (!map.initialize(view)) return;
     if (!modelList.initialize(view)) return;
@@ -162,20 +170,22 @@ function wsInitInternal()
 
 function wsInitBuildTextures(idx,textureGenRandom)
 {
-    var bitmapCount=mapTextureBuildList.length;
+    var bitmapCount=textureBuildList.length;
     
-        // pick a random image to generate
-        // a texture type
+        // bitmap name
+        
+    var name=textureBuildList[idx][0];
     
-    var bitmapId=mapTextureBuildList[idx][0];
-    var bitmapTypeList=mapTextureBuildList[idx][1];
+        // pick a random texture type
+    
+    var bitmapTypeList=textureBuildList[idx][1];
     var k=textureGenRandom.randomIndex(bitmapTypeList.length);
     var bitmapType=bitmapTypeList[k];
     
         // generate bitmap
     
     var genBitmap=new GenBitmapObject(textureGenRandom);
-    map.addBitmap(genBitmap.generate(view,bitmapId,bitmapType,debug));
+    bitmapList.add(genBitmap.generate(view,name,bitmapType,debug));
     
         // if more textures, then loop back around
         
@@ -197,12 +207,14 @@ function wsInitBuildTextures(idx,textureGenRandom)
 
 function wsInitBuildSounds(idx,soundGenRandom)
 {
-    var soundCount=mapSoundBuildList.length;
+    var soundCount=soundBuildList.length;
+    
+    name=soundBuildList[idx][0];
     
          // generate sound
     
     var genSound=new GenSoundObject(soundList.getAudioContext(),soundGenRandom);
-    soundList.addSound(mapSoundBuildList[idx],genSound.generate());
+    soundList.add(genSound.generate(name));
     
         // if more textures, then loop back around
         
@@ -230,7 +242,7 @@ function wsInitBuildMap()
 
         // build the map
         
-    var genMap=new GenMapObject(view,map,mapGenRandom,wsInitBuildMapFinish);
+    var genMap=new GenMapObject(view,bitmapList,map,mapGenRandom,wsInitBuildMapFinish);
     genMap.build();
 }
 
@@ -268,36 +280,29 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
 
-    var genLightmap=new GenLightmapObject(view,map,debug,MAP_GENERATE_LIGHTMAP,wsInitBuildLightmapFinish);
+    var genLightmap=new GenLightmapObject(view,bitmapList,map,debug,MAP_GENERATE_LIGHTMAP,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
 
 function wsInitBuildLightmapFinish()
 {
-    var textureGenRandom=new GenRandomObject(SEED_MODEL_BITMAP);
     var modelGenRandom=new GenRandomObject(SEED_MODEL);
     
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Models');
     view.loadingScreenDraw(null);
 
-    setTimeout(function() { wsInitBuildModelsTexture(0,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
+    setTimeout(function() { wsInitBuildModelsMesh(0,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
 }
 
-function wsInitBuildModelsTexture(idx,textureGenRandom,modelGenRandom)
-{
-    var skinTypes=[GEN_BITMAP_TYPE_SKIN_SCALE,GEN_BITMAP_TYPE_SKIN_LEATHER,GEN_BITMAP_TYPE_SKIN_FUR];
-    
-    var genBitmap=new GenBitmapObject(textureGenRandom);    
-    var modelBitmap=genBitmap.generate(view,0,skinTypes[idx%3],debug);       // supergumba -- temporary to get all skin types
-    
-    view.loadingScreenDraw(((idx*2)+1)/((MONSTER_MODEL_COUNT*2)+1));    
-    setTimeout(function() { wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
-}
-    
-function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
+function wsInitBuildModelsMesh(idx,modelGenRandom)
 {
     var model,genSkeleton,genModelMesh;
+    
+        // get bitmap
+        
+    var skinTypes=['Skin Scale','Skin Leather','Skin Fur'];
+    var modelBitmap=bitmapList.get(skinTypes[idx%3]);
     
         // player model if 0
         // else a monster
@@ -322,11 +327,11 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
     
         // if more models, then loop back around
     
-    view.loadingScreenDraw(((idx*2)+2)/((MONSTER_MODEL_COUNT*2)+1));    
+    view.loadingScreenDraw(idx/MONSTER_MODEL_COUNT);    
         
     idx++;
     if (idx<(MONSTER_MODEL_COUNT+1)) {
-        setTimeout(function() { wsInitBuildModelsTexture(idx,textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(function() { wsInitBuildModelsMesh(idx,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
         return;
     }
     
@@ -336,13 +341,12 @@ function wsInitBuildModelsMesh(idx,modelBitmap,textureGenRandom,modelGenRandom)
     view.loadingScreenAddString('Generating Dynamic Weapons');
     view.loadingScreenDraw(null);
     
-    setTimeout(function() { wsInitBuildWeapons(textureGenRandom,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
+    setTimeout(function() { wsInitBuildWeapons(modelGenRandom); },PROCESS_TIMEOUT_MSEC);
 }
 
-function wsInitBuildWeapons(textureGenRandom,modelGenRandom)
+function wsInitBuildWeapons(modelGenRandom)
 {
-    var genBitmap=new GenBitmapObject(textureGenRandom);    
-    var modelBitmap=genBitmap.generate(view,0,GEN_BITMAP_TYPE_METAL,debug);
+    var modelBitmap=bitmapList.get('Map Metal');        // for now just use map metal
     
         // weapon
         
@@ -387,7 +391,7 @@ function wsInitBuildEntities()
     }
 
     var playerEntity=new EntityPlayerObject('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.get('player'));
-    playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0'),modelList.get('projectile_0')));
+    playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0'),modelList.get('projectile_0'),soundList.get('fire'),soundList.get('explosion')));
     playerEntity.setCurrentWeaponIndex(0);
     
     entityList.setPlayer(playerEntity);

@@ -2,7 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=1;                        // the maximum possible number of rooms in the map
+const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
 const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
@@ -35,8 +35,8 @@ const ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
 const ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
 
 const ROOM_CLOSETS=true;                       // turns on or off closets
-const ROOM_PLATFORMS=false;                      // turns on or off platforms
-const ROOM_LEDGES=false;                        // turns on or off ledges
+const ROOM_PLATFORMS=true;                      // turns on or off platforms
+const ROOM_LEDGES=true;                        // turns on or off ledges
 
 //
 // pillars and decorations
@@ -58,8 +58,8 @@ const ROOM_DECORATION_BOX_MIN_STACK_COUNT=1;    // minimum number of boxes in a 
 const ROOM_DECORATION_BOX_EXTRA_STACK_COUNT=4;  // extra number of boxes in a stack
 const ROOM_DECORATION_BOX_STACK_PERCENTAGE=0.5; // percent of time boxes have stack on top
 
-const ROOM_PILLARS=false;                        // turns on or off pillars
-const ROOM_DECORATIONS=false;                    // turns on or off decorations
+const ROOM_PILLARS=true;                        // turns on or off pillars
+const ROOM_DECORATIONS=true;                    // turns on or off decorations
 
 //
 // lighting
@@ -78,7 +78,7 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
@@ -178,22 +178,6 @@ const GEN_BITMAP_TYPE_SKIN_FUR=17;
 const GEN_BITMAP_TILE_STYLE_BORDER=0;
 const GEN_BITMAP_TILE_STYLE_CHECKER=1;
 const GEN_BITMAP_TILE_STYLE_STRIPE=2;
-
-//
-// resource IDs
-//
-
-const TEXTURE_WALL=0;
-const TEXTURE_FLOOR=1;
-const TEXTURE_CEILING=2;
-const TEXTURE_STAIR=3;
-const TEXTURE_PLATFORM=4;
-const TEXTURE_LEDGE=5;
-const TEXTURE_LIGHT=6;
-const TEXTURE_BOX=7;
-const TEXTURE_PILLAR=8;
-const TEXTURE_CLOSET=9;
-const TEXTURE_MACHINE=10;
 
 //
 // map mesh flags

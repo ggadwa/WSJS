@@ -40,9 +40,9 @@ function SoundObject(name,ctx,buffer)
         return(true);
     };
     
-    this.release=function()
+    this.close=function()
     {
-        
+        this.buffer=null;
     };
     
     this.play=function()

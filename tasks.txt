@@ -13,7 +13,8 @@ EMCA6 TODOs
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
     [ ] map.release();
-    [ ] sound.release();
+    [ ] bitmapList.release();
+    [ ] soundList.release();
     [ ] modelList.release();
     [ ] entityList.release();
     [ ] text.release();
@@ -26,7 +27,6 @@ REGULAR TODOs
        * (touchEntity.getName()==='projectile') use instanceof
        * put instanceof in map_overlay to not so projectiles
 
-#### should textures be by name ('wall', 'floor', etc)
 #### tails, spikes, random vertex moves
 #### normals bad in animation (or culling is bad)
 

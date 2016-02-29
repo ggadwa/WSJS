@@ -21,6 +21,12 @@ function SoundListObject()
     
     this.release=function()
     {
+        var n;
+        var nSound=this.sounds.length;
+        
+        for (n=0;n!==nSound;n++) {
+            this.sounds[n].close();
+        }
     };
     
     this.getAudioContext=function()
@@ -28,22 +34,21 @@ function SoundListObject()
         return(this.ctx);
     };
     
-    this.addSound=function(name,buffer)
+    this.add=function(sound)
     {
-        this.sounds.push(new SoundObject(name,this.ctx,buffer));
+        this.sounds.push(sound);
     };
     
-    this.play=function(name)
+    this.get=function(name)
     {
         var n;
         var nSound=this.sounds.length;
         
         for (n=0;n!==nSound;n++) {
-            if (this.sounds[n].name===name) {
-                this.sounds[n].play();
-                return;
-            }
+            if (this.sounds[n].name===name) return(this.sounds[n]);
         }
+        
+        return(null);
     };
     
 

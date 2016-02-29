@@ -4,9 +4,10 @@
 // generate map class
 //
 
-function GenMapObject(view,map,genRandom,callbackFunc)
+function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
 {
     this.view=view;
+    this.bitmapList=bitmapList;
     this.map=map;
     this.genRandom=genRandom;
     
@@ -139,7 +140,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var storyCount,yStoryBound,yFloorBound;
         var roomIdx,room;
         var hasStories;
-        var roomBitmap=this.map.getBitmapById(TEXTURE_WALL);
+        var roomBitmap=this.bitmapList.get('Map Wall');
         
             // stories, platforms, and ledges
             
@@ -158,7 +159,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // floor
             
-        this.map.addMesh(room.createMeshFloorOrCeiling(this.map.getBitmapById(TEXTURE_FLOOR),yBound,true,MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.get('Map Floor'),yBound,true,MESH_FLAG_ROOM_FLOOR));
 
             // walls
             
@@ -180,7 +181,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
             // the ceiling
             
-        this.map.addMesh(room.createMeshFloorOrCeiling(this.map.getBitmapById(TEXTURE_CEILING),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.get('Map Ceiling'),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
         
         return(roomIdx);
     };
@@ -189,8 +190,8 @@ function GenMapObject(view,map,genRandom,callbackFunc)
     {
         var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
 
-        var roomBitmap=this.map.getBitmapById(TEXTURE_WALL);
-        var stairBitmap=this.map.getBitmapById(TEXTURE_STAIR);
+        var roomBitmap=this.bitmapList.get('Map Wall');
+        var stairBitmap=this.bitmapList.get('Map Stairs');
         
             // flip the direction if going down
             
@@ -253,7 +254,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
         var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
         var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-        this.map.addMesh(meshPrimitives.createMeshPryamid(this.map.getBitmapById(TEXTURE_LIGHT),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
+        this.map.addMesh(meshPrimitives.createMeshPryamid(this.bitmapList.get('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
 
             // the color
 
@@ -573,7 +574,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_CLOSETS) return;
         
-        closet=new GenRoomClosetObject(this.view,this.map,genRandom);
+        closet=new GenRoomClosetObject(this.view,this.bitmapList,this.map,genRandom);
         
         for (n=0;n!==nRoom;n++) {
             closet.addCloset(this.map.rooms[n]);
@@ -587,7 +588,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_PLATFORMS) return;
         
-        platform=new GenRoomPlatformObject(this.map,this.genRandom);
+        platform=new GenRoomPlatformObject(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -602,7 +603,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_LEDGES) return;
         
-        ledge=new GenRoomLedgeObject(this.map,this.genRandom);
+        ledge=new GenRoomLedgeObject(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             ledge.createLedges(this.map.rooms[n]);
@@ -616,7 +617,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_PILLARS) return;
         
-        pillar=new GenRoomPillarObject(this.view,this.map,genRandom);
+        pillar=new GenRoomPillarObject(this.view,this.bitmapList,this.map,genRandom);
         
         for (n=0;n!==nRoom;n++) {
             pillar.addPillars(this.map.rooms[n]);
@@ -630,7 +631,7 @@ function GenMapObject(view,map,genRandom,callbackFunc)
         
         if (!ROOM_DECORATIONS) return;
         
-        decoration=new GenRoomDecorationObject(this.view,this.map,genRandom);
+        decoration=new GenRoomDecorationObject(this.view,this.bitmapList,this.map,genRandom);
         
         for (n=0;n!==nRoom;n++) {
             decoration.addDecorations(this.map.rooms[n]);

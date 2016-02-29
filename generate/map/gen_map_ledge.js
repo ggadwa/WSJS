@@ -1,12 +1,13 @@
 "use strict";
 
 //
-// map platforms
+// map ledges
 //
 
-function GenRoomLedgeObject(map,genRandom)
+function GenRoomLedgeObject(bitmapList,map,genRandom)
 {
     this.map=map;
+    this.bitmapList=bitmapList;
     this.genRandom=genRandom;
     
         //
@@ -88,7 +89,7 @@ function GenRoomLedgeObject(map,genRandom)
     this.createLedges=function(room)
     {
         var x,z;
-        var ledgeBitmap=this.map.getBitmapById(TEXTURE_LEDGE);
+        var ledgeBitmap=this.bitmapList.get('Map Ledge');
         
             // does this room have a ledge?
             

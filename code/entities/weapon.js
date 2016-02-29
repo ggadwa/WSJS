@@ -4,10 +4,12 @@
 // weapon class
 //
 
-function WeaponObject(model,projectileModel)
+function WeaponObject(model,projectileModel,fireSound,hitSound)
 {
     this.model=model;
     this.projectileModel=projectileModel;
+    this.fireSound=fireSound;
+    this.hitSound=hitSound;
     
     this.lastFireTimeStamp=0;
     
@@ -36,9 +38,9 @@ function WeaponObject(model,projectileModel)
         pos.addPoint(entity.getPosition());
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        entityList.add(new EntityProjectileObject('projectile',view,pos,ang,500,500,this.projectileModel));
+        entityList.add(new EntityProjectileObject('projectile',view,pos,ang,500,500,this.projectileModel,this.hitSound));
         
-        soundList.play('fire');           // supergumba -- testing
+        fireSound.play();
     };
     
         //

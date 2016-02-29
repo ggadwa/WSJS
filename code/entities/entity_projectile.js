@@ -4,9 +4,10 @@
 // entity projectile object
 //
 
-function EntityProjectileObject(name,view,position,angle,radius,high,model)
+function EntityProjectileObject(name,view,position,angle,radius,high,model,hitSound)
 {
     this.startTimeStamp=view.timeStamp;
+    this.hitSound=hitSound;
     
     this.movePt=new wsPoint(0,0,0);     // global to stop GCd
     
@@ -119,7 +120,7 @@ function EntityProjectileObject(name,view,position,angle,radius,high,model)
         if (this.baseEntity.moveSimple(map,entityList,400,false)) {
             this.baseEntity.markAsDelete();
             view.particleList.addExplosionParticles(view,this.getPosition());
-            soundList.play('explosion');
+            hitSound.play();
         }
     };
     
