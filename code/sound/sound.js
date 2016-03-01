@@ -10,51 +10,45 @@ function SoundObject(name,ctx,buffer)
     this.ctx=ctx;
     this.buffer=buffer;
     
-    this.initialize=function()
-    {
-            // supergumba -- testing!
-            
-        var frameCount=this.ctx.sampleRate; // 1 second
-            
-        this.buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
-        
-        var data=this.buffer.getChannelData(0);
-        var rd=0.0;
-        var rdAdd=Math.random()*0.05;
-        var n;
-        
-        for (n=0;n!==frameCount;n++) {
-            data[n]=Math.sin(rd);
-            rd+=rdAdd;
-        }
-        
-        // fade
-        
-        var fadeLen=1000;
-        var fadeStart=frameCount-fadeLen;
-        
-        for (n=fadeStart;n!==frameCount;n++) {
-            data[n]*=(1.0-((n-fadeStart)/fadeLen));
-        }
-        
-        return(true);
-    };
-    
     this.close=function()
     {
         this.buffer=null;
     };
     
-    this.play=function()
+    this.play=function(listenerPos,soundPos)
     {
         var source=this.ctx.createBufferSource();
         source.buffer=this.buffer;
         
-        var gainNode=this.ctx.createGain();
-        source.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
+        var pannerNode=this.ctx.createPanner();
+        //pannerNode.panningModel='HRTF';
+        //pannerNode.distanceModel='inverse';
+        //pannerNode.refDistance=1.0;
+        pannerNode.maxDistance=100000;
+        //pannerNode.rolloffFactor=1.0;
+        //pannerNode.coneInnerAngle=360.0;
+        //pannerNode.coneOuterAngle=0.0;
+        //pannerNode.coneOuterGain=0.0;
+        //pannerNode.setOrientation(1,0,0);
+        pannerNode.setPosition((listenerPos.x-soundPos.x),(listenerPos.y-soundPos.y),(listenerPos.z-soundPos.z));
         
-        gainNode.gain.value=0.1;
+        console.log((listenerPos.x-soundPos.x)+','+(listenerPos.y-soundPos.y)+','+(listenerPos.z-soundPos.z));
+        console.log(listenerPos.distance(soundPos));
+        
+        var gainNode=this.ctx.createGain();
+        gainNode.gain.value=1.0;
+        source.connect(gainNode);
+        gainNode.connect(pannerNode);
+        
+        //source.connect(pannerNode);
+        pannerNode.connect(this.ctx.destination);
+        
+        
+//        var gainNode=this.ctx.createGain();
+//        source.connect(gainNode);
+//        gainNode.connect(this.ctx.destination);
+        
+//        gainNode.gain.value=0.1;
         
         source.start(0);
     };

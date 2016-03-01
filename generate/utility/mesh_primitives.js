@@ -108,7 +108,7 @@ function MeshPrimitivesObject()
         if (wholeUV) {
             
             idx=0;
-            var quadCount=Math.floor(count/6);
+            var quadCount=Math.trunc(count/6);
 
             for (n=0;n!==quadCount;n++) {
                 v=vertexList[idx++];
@@ -247,7 +247,7 @@ function MeshPrimitivesObject()
         
             // cylinder segments
             
-        var yAdd=Math.floor(yBound.getSize()/segCount);
+        var yAdd=Math.trunc(yBound.getSize()/segCount);
             
         var ySegBound=yBound.copy();
         ySegBound.min=ySegBound.max-yAdd;

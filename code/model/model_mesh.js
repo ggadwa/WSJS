@@ -31,7 +31,7 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
     
     this.vertexCount=this.vertexList.length;
     this.indexCount=this.indexes.length;
-    this.trigCount=Math.floor(this.indexCount/3);
+    this.trigCount=Math.trunc(this.indexCount/3);
     
         // non-culled index list
         
@@ -381,7 +381,7 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         
         view.drawModelCount++;
-        view.drawModelTrigCount+=Math.floor(this.nonCulledIndexCount/3);
+        view.drawModelTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
     };
 
 }

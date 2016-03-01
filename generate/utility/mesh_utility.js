@@ -117,7 +117,7 @@ function MeshUtilityObject()
         var p20=new wsPoint(0.0,0.0,0.0);
         var normal=new wsPoint(0.0,0.0,0.0);
 
-        nTrig=Math.floor(indexes.length/3);
+        nTrig=Math.trunc(indexes.length/3);
 
         for (n=0;n!==nTrig;n++) {
 
@@ -224,15 +224,15 @@ function MeshUtilityObject()
         var i;
         
         v=vertexList[0];
-        var minIntX=Math.floor(v.uv.x);
-        var minIntY=Math.floor(v.uv.y);
+        var minIntX=Math.trunc(v.uv.x);
+        var minIntY=Math.trunc(v.uv.y);
         
         for (n=1;n!==nVertex;n++) {
             v=vertexList[n];
             
-            i=Math.floor(v.uv.x);
+            i=Math.trunc(v.uv.x);
             if (i<minIntX) minIntX=i;
-            i=Math.floor(v.uv.y);
+            i=Math.trunc(v.uv.y);
             if (i<minIntY) minIntY=i;
         }
         
@@ -289,7 +289,7 @@ function MeshUtilityObject()
         var denom;
         var tangent=new wsPoint(0.0,0.0,0.0);
 
-        nTrig=Math.floor(indexes.length/3);
+        nTrig=Math.trunc(indexes.length/3);
 
         for (n=0;n!==nTrig;n++) {
 

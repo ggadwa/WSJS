@@ -57,12 +57,12 @@ function TextObject()
         ctx.textBaseline='middle';
         ctx.fillStyle='#FFFFFF';
 
-        yAdd=Math.floor(TEXT_CHAR_HEIGHT/2);
+        yAdd=Math.trunc(TEXT_CHAR_HEIGHT/2);
 
         for (ch=32;ch!==127;ch++) {
             cIdx=ch-32;
             x=(cIdx%TEXT_CHAR_PER_ROW)*TEXT_CHAR_WIDTH;
-            y=Math.floor(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT;
+            y=Math.trunc(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT;
             y+=yAdd;
 
             charStr=String.fromCharCode(ch);
@@ -141,7 +141,7 @@ function TextObject()
         
         for (n=0;n!==len;n++) {
             cIdx=str.charCodeAt(n)-32;
-            wid+=Math.floor(charWid*this.fontCharWids[cIdx]);
+            wid+=Math.trunc(charWid*this.fontCharWids[cIdx]);
         }
         
         return(wid);
@@ -193,7 +193,7 @@ function TextObject()
 
         switch (align) {
             case TEXT_ALIGN_CENTER:
-                x-=Math.floor(drawWid/2);
+                x-=Math.trunc(drawWid/2);
                 break;
             case TEXT_ALIGN_RIGHT:
                 x-=drawWid;
@@ -231,7 +231,7 @@ function TextObject()
 
             cIdx=str.charCodeAt(n)-32;
             gx=((cIdx%TEXT_CHAR_PER_ROW)*TEXT_CHAR_WIDTH)/TEXT_TEXTURE_WIDTH;
-            gy=(Math.floor(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT)/TEXT_TEXTURE_HEIGHT;
+            gy=(Math.trunc(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT)/TEXT_TEXTURE_HEIGHT;
 
             this.uvs[uvIdx++]=gx;
             this.uvs[uvIdx++]=gy;
@@ -252,7 +252,7 @@ function TextObject()
 
             elementIdx+=4;
             
-            x+=Math.floor(charWid*this.fontCharWids[cIdx]);
+            x+=Math.trunc(charWid*this.fontCharWids[cIdx]);
         }
 
             // set the shader and bitmap

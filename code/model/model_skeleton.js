@@ -182,9 +182,9 @@ function ModelSkeletonObject()
         
         if (nBone===0) return(pt);
         
-        pt.x=Math.floor(pt.x/nBone);
-        pt.y=Math.floor(pt.y/nBone);
-        pt.z=Math.floor(pt.z/nBone);
+        pt.x=Math.trunc(pt.x/nBone);
+        pt.y=Math.trunc(pt.y/nBone);
+        pt.z=Math.trunc(pt.z/nBone);
         
         return(pt);
     };
@@ -393,6 +393,12 @@ function ModelSkeletonObject()
                     }
                     if (modelType===MODEL_TYPE_BLOB) {
                         this.randomNextPoseBody(view,limb,15.0,30.0);
+                        break;
+                    }
+                    break;
+                case LIMB_TYPE_HEAD:
+                    if (modelType===MODEL_TYPE_ANIMAL) {
+                        this.randomNextPoseBody(view,limb,5.0,15.0);
                         break;
                     }
                     break;

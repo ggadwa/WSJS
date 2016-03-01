@@ -5,7 +5,6 @@ IMPORTANT EVENTUAL TODOs
 EMCA6 TODOs
     [ ] transfer all object to classes
     [ ] modulize the code
-    [ ] use Math.trunc when possible instead of Math.floor
     [ ] hoist all the vars, eventually use let
     [ ] move setupGrid() in map_room.js
     [ ] move this.setupBounds(); in map_mesh.js
@@ -36,11 +35,10 @@ REGULAR TODOs
 
 [ ] optimizations
      [ ] look for any addition new optimizations
-     [ ] get rid of any copy()
 
 [ ] sound
-     [ ] need to create sounds
-     [ ] need to add panner
+     [X] need to create sounds
+     [ ] figure out what's wrong with panner
 
 [ ] map generation
     [X] new platforms builder

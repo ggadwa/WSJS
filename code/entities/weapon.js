@@ -40,7 +40,7 @@ function WeaponObject(model,projectileModel,fireSound,hitSound)
         
         entityList.add(new EntityProjectileObject('projectile',view,pos,ang,500,500,this.projectileModel,this.hitSound));
         
-        fireSound.play();
+        fireSound.play(entityList.getPlayer().getPosition(),pos);
     };
     
         //

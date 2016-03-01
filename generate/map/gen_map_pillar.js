@@ -43,8 +43,8 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
         var x,mx,mz,pos;
         var bitmap=this.bitmapList.get('Map Pillar');
         
-        mx=Math.floor(room.xBlockSize/2);
-        mz=Math.floor(room.zBlockSize/2);
+        mx=Math.trunc(room.xBlockSize/2);
+        mz=Math.trunc(room.zBlockSize/2);
         
         for (x=1;x<=(room.xBlockSize-2);x+=2) {
             if (x===mx) continue;           // never block light
@@ -59,8 +59,8 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
         var z,mx,mz,pos;
         var bitmap=this.bitmapList.get('Map Pillar');
         
-        mx=Math.floor(room.xBlockSize/2);
-        mz=Math.floor(room.zBlockSize/2);
+        mx=Math.trunc(room.xBlockSize/2);
+        mz=Math.trunc(room.zBlockSize/2);
         
         for (z=1;z<=(room.zBlockSize-2);z+=2) {
             if (z===mz) continue;           // never block light

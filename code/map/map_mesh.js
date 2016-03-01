@@ -41,7 +41,7 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
     
     this.vertexCount=this.vertexList.length;
     this.indexCount=this.indexes.length;
-    this.trigCount=Math.floor(this.indexCount/3);
+    this.trigCount=Math.trunc(this.indexCount/3);
     
         // non-culled index list
         
@@ -126,7 +126,7 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
 
         this.vertexCount=this.vertexList.length;
         this.indexCount=this.indexes.length;
-        this.trigCount=Math.floor(this.indexCount/3);
+        this.trigCount=Math.trunc(this.indexCount/3);
 
             // setup bounds
 
@@ -244,7 +244,7 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
             // fix a couple counts
 
         this.indexCount=this.indexes.length;
-        this.trigCount=Math.floor(this.indexCount/3);
+        this.trigCount=Math.trunc(this.indexCount/3);
     };
 
         //
@@ -561,7 +561,7 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         
         view.drawMeshCount++;
-        view.drawMeshTrigCount+=Math.floor(this.nonCulledIndexCount/3);
+        view.drawMeshTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
     };
         
         // setup bounds

@@ -178,11 +178,11 @@ function MapOverlayObject()
         
             // get the drawing position
         
-        this.drawWid=Math.floor(xBound.getSize()*this.mapScale);
-        this.drawHigh=Math.floor(yBound.getSize()*this.mapScale);
+        this.drawWid=Math.trunc(xBound.getSize()*this.mapScale);
+        this.drawHigh=Math.trunc(yBound.getSize()*this.mapScale);
         
         this.drawX=(view.wid-5)-this.drawWid;
-        this.drawY=Math.floor((view.high-this.drawHigh)/2);
+        this.drawY=Math.trunc((view.high-this.drawHigh)/2);
         
             // create the room vertex buffer
         

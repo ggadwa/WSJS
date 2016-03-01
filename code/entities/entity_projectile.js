@@ -120,7 +120,7 @@ function EntityProjectileObject(name,view,position,angle,radius,high,model,hitSo
         if (this.baseEntity.moveSimple(map,entityList,400,false)) {
             this.baseEntity.markAsDelete();
             view.particleList.addExplosionParticles(view,this.getPosition());
-            hitSound.play();
+            hitSound.play(entityList.getPlayer().getPosition(),this.getPosition());
         }
     };
     

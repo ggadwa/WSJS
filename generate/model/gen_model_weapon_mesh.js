@@ -29,7 +29,7 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         
     this.buildBoxAroundBone=function(view,bone,xBound,yBound,zBound,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
-        var startVIdx=Math.floor(vIdx/3);       // remember this for building indexes
+        var startVIdx=Math.trunc(vIdx/3);       // remember this for building indexes
         
         var nStartVIdx=vIdx;                    // remember these for building indexes and normals
         var nStartIIdx=iIdx;
@@ -119,7 +119,7 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         var rd,radius,px,py,pz;
         var vAng;
         
-        var startVIdx=Math.floor(vIdx/3);
+        var startVIdx=Math.trunc(vIdx/3);
         
         var nStartVIdx=vIdx;                    // remember these for building indexes and normals
         var nStartIIdx=iIdx;
@@ -171,7 +171,7 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         
             // top and bottom points
         
-        var topIdx=Math.floor(vIdx/3);
+        var topIdx=Math.trunc(vIdx/3);
         
         vertices[vIdx++]=centerPnt.x;
         vertices[vIdx++]=centerPnt.y-highRadius;
@@ -180,7 +180,7 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         uvs[uvIdx++]=uOffset+0.25;
         uvs[uvIdx++]=vOffset;
         
-        var botIdx=Math.floor(vIdx/3);
+        var botIdx=Math.trunc(vIdx/3);
        
         vertices[vIdx++]=centerPnt.x;
         vertices[vIdx++]=centerPnt.y+highRadius;

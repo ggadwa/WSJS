@@ -76,7 +76,7 @@ function GenRoomStairs(map,genRandom)
             // we have 6 * # of quads in indexes
             
         var n;
-        var iCount=Math.floor(Math.floor(vertexList.length)/4)*6;
+        var iCount=Math.trunc(Math.trunc(vertexList.length)/4)*6;
 
         var indexes=new Uint16Array(iCount);
         
@@ -123,7 +123,7 @@ function GenRoomStairs(map,genRandom)
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.floor(zBound.getSize()*0.05);
+        var thickSize=Math.trunc(zBound.getSize()*0.05);
         
             // height of stairs and steps
             
@@ -224,7 +224,7 @@ function GenRoomStairs(map,genRandom)
             
             if (includeBack) {
                 var xBraceBound;
-                var braceSize=Math.floor(xBound.getSize()*0.4);
+                var braceSize=Math.trunc(xBound.getSize()*0.4);
 
                 if (!flip) {
                     xBraceBound=new wsBound((xBound.min-braceSize),xBound.min);
@@ -290,7 +290,7 @@ function GenRoomStairs(map,genRandom)
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.floor(zBound.getSize()*0.05);
+        var thickSize=Math.trunc(zBound.getSize()*0.05);
         
             // height of stairs and steps
             
@@ -391,7 +391,7 @@ function GenRoomStairs(map,genRandom)
             
             if (includeBack) {
                 var zBraceBound;
-                var braceSize=Math.floor(zBound.getSize()*0.4);
+                var braceSize=Math.trunc(zBound.getSize()*0.4);
 
                 if (!flip) {
                     zBraceBound=new wsBound((zBound.min-braceSize),zBound.min);

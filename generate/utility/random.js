@@ -25,12 +25,12 @@ function GenRandomObject(seed)
 
     this.randomInt=function(startInt,extraInt)
     {
-        return(startInt+Math.floor(this.random()*extraInt));
+        return(startInt+Math.trunc(this.random()*extraInt));
     };
     
     this.randomIndex=function(maxIndex)
     {
-        return(Math.floor(this.random()*maxIndex));
+        return(Math.trunc(this.random()*maxIndex));
     };
     
     this.randomPercentage=function(percentage)

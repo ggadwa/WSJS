@@ -148,8 +148,8 @@ function GenBitmapObject(genRandom)
 
             // splits
 
-        tileWid=Math.floor((rgt-lft)/splitCount);
-        tileHigh=Math.floor((bot-top)/splitCount);
+        tileWid=Math.trunc((rgt-lft)/splitCount);
+        tileHigh=Math.trunc((bot-top)/splitCount);
 
         for (y=0;y!==splitCount;y++) {
 
@@ -251,10 +251,10 @@ function GenBitmapObject(genRandom)
     {
         var n,y;
         var high=bot-top;
-        var yAdd=Math.floor((high-(screwSize*2))/(screwCount-1));
+        var yAdd=Math.trunc((high-(screwSize*2))/(screwCount-1));
         var borderColor=new wsColor(0.0,0.0,0.0);
             
-        y=Math.floor(screwSize*0.5);
+        y=Math.trunc(screwSize*0.5);
         
         for (n=0;n!==screwCount;n++) {
             this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,screwX,y,(screwX+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
@@ -314,9 +314,9 @@ function GenBitmapObject(genRandom)
         var metalEdgeSize=this.genRandom.randomInt(4,4);
 
         var screwSize=this.genRandom.randomInt(20,20);
-        var screenFlatInnerSize=Math.floor(screwSize*0.4);
+        var screenFlatInnerSize=Math.trunc(screwSize*0.4);
 
-        var barRandomWid=Math.floor(wid*0.15);
+        var barRandomWid=Math.trunc(wid*0.15);
         var barSize=this.genRandom.randomInt(barRandomWid,barRandomWid);
         
             // clear canvases
@@ -336,7 +336,7 @@ function GenBitmapObject(genRandom)
 
                 // bar screws
 
-            x=Math.floor((barSize*0.5)-(screwSize*0.5));
+            x=Math.trunc((barSize*0.5)-(screwSize*0.5));
 
             screwCount=this.genRandom.randomInt(2,6);
             screwColor=this.genBitmapUtility.boostColor(barColor,0.2);
@@ -358,7 +358,7 @@ function GenBitmapObject(genRandom)
                 this.generateMetalPlate(bitmapCTX,normalCTX,wid,high,0,0,wid,high,metalEdgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize);
             }
             else {
-                x=Math.floor(wid*0.5);
+                x=Math.trunc(wid*0.5);
                 this.generateMetalPlate(bitmapCTX,normalCTX,wid,high,0,0,x,high,metalEdgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize);
                 this.generateMetalPlate(bitmapCTX,normalCTX,wid,high,x,0,wid,high,metalEdgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize);
             }
@@ -385,11 +385,11 @@ function GenBitmapObject(genRandom)
         var edgeSize=this.genRandom.randomInt(5,10);
         
         var corrCount=this.genRandom.randomInt(10,20);
-        var corrWid=Math.floor((wid-((edgeSize*2)+10))/corrCount);
-        var corrHigh=Math.floor((high-((edgeSize*2)+10))/corrCount);
+        var corrWid=Math.trunc((wid-((edgeSize*2)+10))/corrCount);
+        var corrHigh=Math.trunc((high-((edgeSize*2)+10))/corrCount);
 
-        var lft=Math.floor((wid-(corrWid*corrCount))*0.5);
-        var top=Math.floor((high-(corrHigh*corrCount))*0.5);
+        var lft=Math.trunc((wid-(corrWid*corrCount))*0.5);
+        var top=Math.trunc((high-(corrHigh*corrCount))*0.5);
 
         var lineWid=corrWid-4;
         var lineHigh=corrHigh-4;
@@ -549,8 +549,8 @@ function GenBitmapObject(genRandom)
         
             // tile sizes
             
-        tileWid=Math.floor(wid/splitCount);
-        tileHigh=Math.floor(high/splitCount);
+        tileWid=Math.trunc(wid/splitCount);
+        tileHigh=Math.trunc(high/splitCount);
 
             // clear canvases
 
@@ -593,12 +593,12 @@ function GenBitmapObject(genRandom)
                     ey=bot-1;
                     
                     if (this.genRandom.randomPercentage(0.50)) {
-                        lineMargin=Math.floor(tileWid/5);
+                        lineMargin=Math.trunc(tileWid/5);
                         sx=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
                         ex=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
                     }
                     else {
-                        lineMargin=Math.floor(tileHigh/5);
+                        lineMargin=Math.trunc(tileHigh/5);
                         sy=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
                         ey=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
                     }
@@ -632,7 +632,7 @@ function GenBitmapObject(genRandom)
         
             // some random values
 
-        var boardSize=Math.floor(wid/8);
+        var boardSize=Math.trunc(wid/8);
         var woodColor;
         var blackColor=new wsColor(0.0,0.0,0.0);
 
@@ -668,14 +668,14 @@ function GenBitmapObject(genRandom)
 
                 // inner boards
 
-            y=Math.floor(high/2)-Math.floor(boardSize/2);
+            y=Math.trunc(high/2)-Math.trunc(boardSize/2);
 
             woodColor=this.genBitmapUtility.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,0,y,wid,(y+boardSize),3,woodColor,blackColor,true);
             this.genBitmapUtility.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,(y+3),(wid-3),((y+boardSize)-3),0.2,woodColor);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,y,wid,(y+boardSize),0.9,0.95,0.8);
 
-            x=Math.floor(wid/2)-Math.floor(boardSize/2);
+            x=Math.trunc(wid/2)-Math.trunc(boardSize/2);
 
             woodColor=this.genBitmapUtility.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,x,0,(x+boardSize),high,3,woodColor,blackColor,true);
@@ -717,32 +717,39 @@ function GenBitmapObject(genRandom)
     this.generateMachineComponent=function(bitmapCTX,normalCTX,lft,top,rgt,bot,metalInsideColor,metalEdgeColor)
     {
         var x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
-        var color;
+        var color,panelType;
         var borderColor=new wsColor(0.0,0.0,0.0);
         
             // the plate of the component
             
         this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,5,metalInsideColor,metalEdgeColor,false);
         
-            // any lights
-            
-        if (this.genRandom.randomPercentage(0.5)) return;
+            // panel looks
+        
+        panelType=this.genRandom.randomIndex(3);
+        if (panelType===0) return;          // 0 = none
         
         wid=this.genRandom.randomInt(30,25);
         
-        xCount=Math.floor((rgt-lft)/wid);
-        yCount=Math.floor((bot-top)/wid);
+        xCount=Math.trunc((rgt-lft)/wid);
+        yCount=Math.trunc((bot-top)/wid);
         
-        xOff=lft+Math.floor(((rgt-lft)-(xCount*wid))/2);
-        yOff=top+Math.floor(((bot-top)-(yCount*wid))/2);
+        xOff=lft+Math.trunc(((rgt-lft)-(xCount*wid))/2);
+        yOff=top+Math.trunc(((bot-top)-(yCount*wid))/2);
         
         for (y=0;y!==yCount;y++) {
             dy=yOff+(y*wid);
             
             for (x=0;x!==xCount;x++) {
                 dx=xOff+(x*wid);
-                color=this.genBitmapUtility.getRandomPrimaryColor(0.8,1.0);
-                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,borderColor);
+                color=this.genBitmapUtility.getRandomPrimaryColor(0.2,0.4);
+                
+                if (panelType===1) {
+                    this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,borderColor);
+                }
+                else {
+                    this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+wid),2,color,borderColor,false);
+                }
             }
         }
     };
@@ -818,8 +825,8 @@ function GenBitmapObject(genRandom)
         var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.7);
         var borderColor=this.genBitmapUtility.darkenColor(skinColor,0.8);
 
-        var sWid=Math.floor(wid/scaleCount);
-        var sHigh=Math.floor(high/scaleCount);
+        var sWid=Math.trunc(wid/scaleCount);
+        var sHigh=Math.trunc(high/scaleCount);
          
             // clear canvases
 
@@ -838,7 +845,7 @@ function GenBitmapObject(genRandom)
                 xCount=scaleCount;
             }
             else {
-                dx=-Math.floor(sWid*0.5);
+                dx=-Math.trunc(sWid*0.5);
                 xCount=scaleCount+1;
             }
             
@@ -921,7 +928,7 @@ function GenBitmapObject(genRandom)
     {
         var n,x,y;
         var darken,boost,lineColor;
-        var halfHigh=Math.floor(high*0.5);
+        var halfHigh=Math.trunc(high*0.5);
 
         var furColor=this.genBitmapUtility.getRandomColor([0.5,0.2,0.0],[0.7,0.4,0.0]);
          

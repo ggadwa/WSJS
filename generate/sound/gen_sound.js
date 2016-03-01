@@ -9,40 +9,125 @@ function GenSoundObject(ctx,genRandom)
     this.ctx=ctx;
     this.genRandom=genRandom;
     
-    // SUPERGUMBA
-    // types:
-    // white nose
-    // white nose over tone (low rumble for explosion)
-    // tone
+    //
+    // sound utilities
+    //
     
-    this.generate=function(name)
+    this.addTone=function(data,frameCount,freq)
     {
-            // supergumba -- testing!
-            
-        var frameCount=this.ctx.sampleRate; // 1 second
-            
-        var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
-        
-        var data=buffer.getChannelData(0);
+        var n;
         var rd=0.0;
-        var rdAdd=Math.random()*0.05;
+        
+        for (n=0;n!==frameCount;n++) {
+            data[n]+=Math.sin(rd);
+            rd+=freq;
+        }
+    };
+    
+    this.addWhiteNoise=function(data,frameCount,range)
+    {
+        var n;
+        var doubleRange=range*2.0;
+        
+        for (n=0;n!==frameCount;n++) {
+            data[n]+=(Math.random()*doubleRange)-range;     // use internal random as white noise doesn't need to be anything that we track and recreate
+        }
+    };
+    
+    this.normalize=function(data,frameCount)
+    {
         var n;
         
         for (n=0;n!==frameCount;n++) {
-            data[n]=Math.sin(rd);
-            rd+=rdAdd;
+            if (data[n]>1.0) {
+                data[n]=1.0;
+            }
+            else {
+                if (data[n]<-1.0) data[n]=-1.0;
+            }
+        }
+    };
+    
+    this.fade=function(data,frameCount,fadeIn,fadeOut)
+    {
+        var n,fadeLen,fadeStart;
+        
+            // fade in
+        
+        if (fadeIn!==null) {
+            fadeLen=Math.trunc(frameCount*fadeIn);
+
+            for (n=0;n<fadeLen;n++) {
+                data[n]*=(n/fadeLen);
+            }
         }
         
-        // fade
+            // fade out
         
-        var fadeLen=1000;
-        var fadeStart=frameCount-fadeLen;
-        
-        for (n=fadeStart;n!==frameCount;n++) {
-            data[n]*=(1.0-((n-fadeStart)/fadeLen));
+        if (fadeOut!==null) {
+            fadeLen=Math.trunc(frameCount*fadeOut);
+            fadeStart=frameCount-fadeLen;
+
+            for (n=fadeStart;n<frameCount;n++) {
+                data[n]*=(1.0-((n-fadeStart)/fadeLen));
+            }
         }
+    };
+    
+    //
+    // gun fire sound
+    //
+    
+    this.generateGunFire=function(name)
+    {
+        var frameCount=this.ctx.sampleRate*0.5;
+        var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
+        var data=buffer.getChannelData(0);
+        
+        this.addTone(data,frameCount,0.007);
+        this.addTone(data,frameCount,0.008);
+        this.addWhiteNoise(data,frameCount,0.1);
+        this.normalize(data,frameCount);
+        this.fade(data,frameCount,null,0.1);
         
         return(new SoundObject(name,this.ctx,buffer));
+    };
+    
+    //
+    // explosion sound
+    //
+    
+    this.generateExplosion=function(name)
+    {
+        var frameCount=this.ctx.sampleRate*2;
+        var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
+        var data=buffer.getChannelData(0);
+        
+        this.addTone(data,frameCount,0.007);
+        this.addTone(data,frameCount,0.005);
+        this.addWhiteNoise(data,frameCount,0.2);
+        this.normalize(data,frameCount);
+        this.fade(data,frameCount,0.1,0.5);
+        
+        return(new SoundObject(name,this.ctx,buffer));
+    };
+    
+    //
+    // generate sound mainline
+    //
+    
+    this.generate=function(name,soundType)
+    {
+        switch (soundType) {
+            
+            case GEN_SOUND_GUN_FIRE:
+                return(this.generateGunFire(name));
+                
+            case GEN_SOUND_EXPLOSION:
+                return(this.generateExplosion(name));
+        }
+        
+        return(null);
     };
 }
 

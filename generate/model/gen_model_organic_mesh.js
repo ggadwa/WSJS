@@ -139,13 +139,13 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         
             // top and bottom points
         
-        var topIdx=Math.floor(vIdx);
+        var topIdx=Math.trunc(vIdx);
         
         v=vertexList[vIdx++];
         v.position.set(centerPnt.x,(centerPnt.y-highRadius),centerPnt.z);
         v.uv.set(0.5,0.0);
         
-        var botIdx=Math.floor(vIdx);
+        var botIdx=Math.trunc(vIdx);
        
         v=vertexList[vIdx++];
         v.position.set(centerPnt.x,(centerPnt.y+highRadius),centerPnt.z);
@@ -472,7 +472,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
              
             parentBone=this.model.skeleton.bones[bone.parentBoneIdx];
             
-            extraBoneCount=Math.floor(parentBone.position.distance(bone.position)/300);
+            extraBoneCount=Math.trunc(parentBone.position.distance(bone.position)/300);
             if (extraBoneCount<3) extraBoneCount=3;
             
             for (k=1;k!==extraBoneCount;k++) {

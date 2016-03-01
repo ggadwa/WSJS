@@ -321,13 +321,13 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
                     }
                     
                     if (colCount!==0) {
-                        r=Math.floor(r/colCount);
+                        r=Math.trunc(r/colCount);
                         if (r>255) r=255;
 
-                        g=Math.floor(g/colCount);
+                        g=Math.trunc(g/colCount);
                         if (g>255) g=255;
 
-                        b=Math.floor(b/colCount);
+                        b=Math.trunc(b/colCount);
                         if (b>255) b=255;
 
                         idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
@@ -643,20 +643,20 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
                 // get the left right
 
             lxFactor=(y-pts[topPtIdx].y)/(pts[botPtIdx].y-pts[topPtIdx].y);
-            lx=pts[topPtIdx].x+Math.floor((pts[botPtIdx].x-pts[topPtIdx].x)*lxFactor);
+            lx=pts[topPtIdx].x+Math.trunc((pts[botPtIdx].x-pts[topPtIdx].x)*lxFactor);
 
             rxFactor=(y-pts[midStartPtIdx].y)/(pts[midEndPtIdx].y-pts[midStartPtIdx].y);
-            rx=pts[midStartPtIdx].x+Math.floor((pts[midEndPtIdx].x-pts[midStartPtIdx].x)*rxFactor);
+            rx=pts[midStartPtIdx].x+Math.trunc((pts[midEndPtIdx].x-pts[midStartPtIdx].x)*rxFactor);
 
                 // get the vertex left and right
 
-            this.vlx.x=vs[topPtIdx].x+Math.floor((vs[botPtIdx].x-vs[topPtIdx].x)*lxFactor);
-            this.vlx.y=vs[topPtIdx].y+Math.floor((vs[botPtIdx].y-vs[topPtIdx].y)*lxFactor);
-            this.vlx.z=vs[topPtIdx].z+Math.floor((vs[botPtIdx].z-vs[topPtIdx].z)*lxFactor);
+            this.vlx.x=vs[topPtIdx].x+Math.trunc((vs[botPtIdx].x-vs[topPtIdx].x)*lxFactor);
+            this.vlx.y=vs[topPtIdx].y+Math.trunc((vs[botPtIdx].y-vs[topPtIdx].y)*lxFactor);
+            this.vlx.z=vs[topPtIdx].z+Math.trunc((vs[botPtIdx].z-vs[topPtIdx].z)*lxFactor);
 
-            this.vrx.x=vs[midStartPtIdx].x+Math.floor((vs[midEndPtIdx].x-vs[midStartPtIdx].x)*rxFactor);
-            this.vrx.y=vs[midStartPtIdx].y+Math.floor((vs[midEndPtIdx].y-vs[midStartPtIdx].y)*rxFactor);
-            this.vrx.z=vs[midStartPtIdx].z+Math.floor((vs[midEndPtIdx].z-vs[midStartPtIdx].z)*rxFactor);
+            this.vrx.x=vs[midStartPtIdx].x+Math.trunc((vs[midEndPtIdx].x-vs[midStartPtIdx].x)*rxFactor);
+            this.vrx.y=vs[midStartPtIdx].y+Math.trunc((vs[midEndPtIdx].y-vs[midStartPtIdx].y)*rxFactor);
+            this.vrx.z=vs[midStartPtIdx].z+Math.trunc((vs[midEndPtIdx].z-vs[midStartPtIdx].z)*rxFactor);
 
                 // sometimes we need to swap
                 // left and right
@@ -682,17 +682,17 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
                     // get the ray trace vetex
 
                 vFactor=(x-lx)/(rx-lx);
-                vx=this.vlx.x+Math.floor((this.vrx.x-this.vlx.x)*vFactor);
-                vy=this.vlx.y+Math.floor((this.vrx.y-this.vlx.y)*vFactor);
-                vz=this.vlx.z+Math.floor((this.vrx.z-this.vlx.z)*vFactor);
+                vx=this.vlx.x+Math.trunc((this.vrx.x-this.vlx.x)*vFactor);
+                vy=this.vlx.y+Math.trunc((this.vrx.y-this.vlx.y)*vFactor);
+                vz=this.vlx.z+Math.trunc((this.vrx.z-this.vlx.z)*vFactor);
                 
                     // write the pixel
 
                 this.rayTraceVertex(lightList,vx,vy,vz,this.rayTraceVertexColor);
                 
-                pixelData[idx++]=Math.floor(this.rayTraceVertexColor.r*255.0);
-                pixelData[idx++]=Math.floor(this.rayTraceVertexColor.g*255.0);
-                pixelData[idx++]=Math.floor(this.rayTraceVertexColor.b*255.0);
+                pixelData[idx++]=Math.trunc(this.rayTraceVertexColor.r*255.0);
+                pixelData[idx++]=Math.trunc(this.rayTraceVertexColor.g*255.0);
+                pixelData[idx++]=Math.trunc(this.rayTraceVertexColor.b*255.0);
                 pixelData[idx++]=255;
                 
                     // check if we only wrote black
@@ -907,7 +907,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             for (n=0;n!==nTrig;n++) {
 
                 lft=(chunkIdx%LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
-                top=Math.floor(chunkIdx/LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
+                top=Math.trunc(chunkIdx/LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
 
                 if (this.writePolyToChunk(lightBitmap,meshIdx,n,lft,top)) chunkIdx++;
             }

@@ -9,6 +9,9 @@ function SoundListObject()
     this.ctx=null;
     this.sounds=null;
     
+    this.listenerForwardVector=new wsPoint(0.0,0.0,1.0);            // local to global to avoid GC
+    this.listenerUpVector=new wsPoint(0.0,1.0,0.0);
+    
     this.initialize=function()
     {
         var initAudioContext=window.AudioContext||window.webkitAudioContext;
@@ -32,6 +35,18 @@ function SoundListObject()
     this.getAudioContext=function()
     {
         return(this.ctx);
+    };
+    
+    this.setListenerToEntity=function(entity)
+    {
+        var ang=entity.getAngle();
+        
+        this.listenerForwardVector.set(0.0,0.0,1.0);
+        this.listenerForwardVector.rotateY(null,ang.y);
+        
+        // supergumba -- we aren't handling up vector here
+        
+        this.ctx.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,this.listenerUpVector.x,this.listenerUpVector.y,this.listenerUpVector.z);
     };
     
     this.add=function(sound)

@@ -41,13 +41,13 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
             if (pos===null) break;
             
             high=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_WIDTH,ROOM_DECORATION_BOX_EXTRA_WIDTH);
-            wid=Math.floor(high/2);
+            wid=Math.trunc(high/2);
             
                 // count of boxes
                 
             boxCount=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_STACK_COUNT,ROOM_DECORATION_BOX_EXTRA_STACK_COUNT);
             boxY=room.yBound.max;
-            rotWid=Math.floor(wid*1.5);
+            rotWid=Math.trunc(wid*1.5);
             
                 // build the boxes around a rotating axis
                 
@@ -79,7 +79,7 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
                 
                 boxCount--;
                 boxY-=high;
-                rotWid=Math.floor(rotWid*0.8);
+                rotWid=Math.trunc(rotWid*0.8);
             }
         }
 
@@ -100,8 +100,9 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
             // the machine location
             
         pos=room.findRandomDecorationLocation(genRandom,true);
+        if (pos===null) return;
             
-        wid=Math.floor(ROOM_BLOCK_WIDTH/2);
+        wid=Math.trunc(ROOM_BLOCK_WIDTH/2);
         high=this.genRandom.randomInt(ROOM_BLOCK_WIDTH,1000);
         
         machineBoundX=new wsBound((pos.x-wid),(pos.x+wid));
@@ -120,7 +121,7 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
             // the machine pipes
 
         nPipe=this.genRandom.randomInt(1,5);
-        radius=Math.floor(ROOM_BLOCK_WIDTH*0.1);
+        radius=Math.trunc(ROOM_BLOCK_WIDTH*0.1);
        
         pipeBitmap=this.bitmapList.get('Map Metal');
         centerPt=new wsPoint(0,0,0);
@@ -130,7 +131,7 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
         ang=0.0;
         angAdd=360.0/nPipe;
         
-        wid=Math.floor(ROOM_BLOCK_WIDTH*0.25);
+        wid=Math.trunc(ROOM_BLOCK_WIDTH*0.25);
         
         for (n=0;n!==nPipe;n++) {
             rd=ang*DEGREE_TO_RAD;
@@ -145,6 +146,9 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
 
     this.addDecorations=function(room)
     {
+        this.addMachine(room);
+        return;
+        
             // randomly pick a decoration
             
         switch (this.genRandom.randomIndex(2)) {

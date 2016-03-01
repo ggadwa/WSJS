@@ -291,7 +291,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         
             // intensity
             
-        intensity=Math.floor((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
+        intensity=Math.trunc((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
         
         intensity*=(MAP_LIGHT_FACTOR+(this.genRandom.random()*MAP_LIGHT_FACTOR_EXTRA));
         if (room.hasStories) intensity*=MAP_LIGHT_TWO_STORY_BOOST;
@@ -307,7 +307,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         
             // locations
             
-        high=Math.floor(ROOM_FLOOR_HEIGHT*0.6);
+        high=Math.trunc(ROOM_FLOOR_HEIGHT*0.6);
             
         fixturePos=new wsPoint(xBound.getMidPoint(),(yBound.min-high),zBound.getMidPoint());
         lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
@@ -330,7 +330,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         if (bound2.min>min) min=bound2.min;
         if (bound2.max<max) max=bound2.max;
         
-        count=Math.floor((max-min)/ROOM_BLOCK_WIDTH);
+        count=Math.trunc((max-min)/ROOM_BLOCK_WIDTH);
         offset=this.genRandom.randomIndex(count)*ROOM_BLOCK_WIDTH;
         if (bound1.min<bound2.min) offset+=(bound2.min-bound1.min);           // need to align offset with bounds1
         
@@ -373,15 +373,15 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
             // centered in the map
 
         if (lastRoom===null) {
-            var mapMid=Math.floor(this.view.OPENGL_FAR_Z/2);
+            var mapMid=Math.trunc(this.view.OPENGL_FAR_Z/2);
 
-            var halfSize=Math.floor((xBlockSize/2)*ROOM_BLOCK_WIDTH);
+            var halfSize=Math.trunc((xBlockSize/2)*ROOM_BLOCK_WIDTH);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor(ROOM_FLOOR_HEIGHT/2);
+            var halfSize=Math.trunc(ROOM_FLOOR_HEIGHT/2);
             yBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.floor((zBlockSize/2)*ROOM_BLOCK_WIDTH);
+            var halfSize=Math.trunc((zBlockSize/2)*ROOM_BLOCK_WIDTH);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
         }
 
@@ -401,10 +401,10 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
 
                 connectSide=this.genRandom.randomIndex(4);
                 if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
-                    connectOffset=this.genRandom.randomInt(-Math.floor(zBlockSize*0.5),lastRoom.zBlockSize);
+                    connectOffset=this.genRandom.randomInt(-Math.trunc(zBlockSize*0.5),lastRoom.zBlockSize);
                 }
                 else {
-                    connectOffset=this.genRandom.randomInt(-Math.floor(xBlockSize*0.5),lastRoom.xBlockSize);
+                    connectOffset=this.genRandom.randomInt(-Math.trunc(xBlockSize*0.5),lastRoom.xBlockSize);
                 }
                 connectOffset*=ROOM_BLOCK_WIDTH;
                 

@@ -93,8 +93,8 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our left
             
         if (xCollideBound.max===this.xBound.min) {
-            z1=Math.floor((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
-            z2=z1+Math.floor(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -107,8 +107,8 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our right
             
         if (xCollideBound.min===this.xBound.max) {
-            z1=Math.floor((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
-            z2=z1+Math.floor(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -121,8 +121,8 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our top
             
         if (zCollideBound.max===this.zBound.min) {
-            x1=Math.floor((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
-            x2=x1+Math.floor(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -135,8 +135,8 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // collide on our bottom
             
         if (zCollideBound.min===this.zBound.max) {
-            x1=Math.floor((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
-            x2=x1+Math.floor(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -180,8 +180,8 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
                     // check to see if we can spawn
                     // to a platform first
                     
-                bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
                     
                 if (this.platformGrid[z][x]===1) {
                     this.platformGrid[z][x]=2;
@@ -223,8 +223,8 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             
             if (gridSpot===0) {
                 this.blockGrid[z][x]=1;
-                bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
             
@@ -249,8 +249,8 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         
         if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
             this.blockGrid[z][x]=1;
-            bx=Math.floor((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-            bz=Math.floor((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+            bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+            bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
             return(new wsPoint(bx,this.yBound.max,bz));
         }
         

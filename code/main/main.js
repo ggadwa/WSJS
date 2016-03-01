@@ -24,8 +24,8 @@ var textureBuildList=
     
 var soundBuildList=
     [
-        ['fire'],
-        ['explosion']
+        ['fire',GEN_SOUND_GUN_FIRE],
+        ['explosion',GEN_SOUND_EXPLOSION]
     ];
 
 //
@@ -54,12 +54,12 @@ function wsLoopRun(timeStamp)
     
         // get integer msec timestamp
     
-    view.timeStamp=Math.floor(timeStamp);
+    view.timeStamp=Math.trunc(timeStamp);
     
         // run the input
         
     input.run();
-   
+    
         // entities and physics
     
     var physicsTick=view.timeStamp-view.loopLastPhysicTimeStamp;
@@ -72,6 +72,10 @@ function wsLoopRun(timeStamp)
         
         entityList.run(view,soundList,map);
     }
+    
+        // update the listener
+    
+    soundList.setListenerToEntity(entityList.getPlayer());
     
         // drawing
         
@@ -102,7 +106,7 @@ function wsLoopStart()
 {
     var timeStamp=window.performance.now();
     
-    view.timeStamp=Math.floor(timeStamp);
+    view.timeStamp=Math.trunc(timeStamp);
     
     view.loopLastPhysicTimeStamp=view.timeStamp;
     view.loopLastDrawTimeStamp=view.timeStamp;
@@ -209,12 +213,15 @@ function wsInitBuildSounds(idx,soundGenRandom)
 {
     var soundCount=soundBuildList.length;
     
-    name=soundBuildList[idx][0];
+        // name and type
+        
+    var name=soundBuildList[idx][0];
+    var soundType=soundBuildList[idx][1];
     
          // generate sound
     
     var genSound=new GenSoundObject(soundList.getAudioContext(),soundGenRandom);
-    soundList.add(genSound.generate(name));
+    soundList.add(genSound.generate(name,soundType));
     
         // if more textures, then loop back around
         

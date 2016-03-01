@@ -10,6 +10,7 @@ function InterfaceObject()
         
     this.interfaceShader=new InterfaceShaderObject();
     
+    this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
     this.vertexPosBuffer=null;
 
         //
@@ -64,16 +65,14 @@ function InterfaceObject()
         
             // vertices
             
-        var vertices=new Float32Array(4*2);
-        
-        vertices[0]=rect.lft;
-        vertices[1]=rect.top;
-        vertices[2]=rect.rgt;
-        vertices[3]=rect.top;
-        vertices[4]=rect.rgt;
-        vertices[5]=rect.bot;
-        vertices[6]=rect.lft;
-        vertices[7]=rect.bot;
+        this.rectVertices[0]=rect.lft;
+        this.rectVertices[1]=rect.top;
+        this.rectVertices[2]=rect.rgt;
+        this.rectVertices[3]=rect.top;
+        this.rectVertices[4]=rect.rgt;
+        this.rectVertices[5]=rect.bot;
+        this.rectVertices[6]=rect.lft;
+        this.rectVertices[7]=rect.bot;
         
             // setup the color
             
@@ -82,7 +81,7 @@ function InterfaceObject()
             // setup the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertices,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.interfaceShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -102,21 +101,19 @@ function InterfaceObject()
         
             // vertices
             
-        var vertices=new Float32Array(6*2);
+        this.rectVertices[0]=rect.lft;
+        this.rectVertices[1]=rect.top;
+        this.rectVertices[2]=rect.rgt;
+        this.rectVertices[3]=rect.top;
+        this.rectVertices[4]=rect.lft;
+        this.rectVertices[5]=rect.bot;
         
-        vertices[0]=rect.lft;
-        vertices[1]=rect.top;
-        vertices[2]=rect.rgt;
-        vertices[3]=rect.top;
-        vertices[4]=rect.lft;
-        vertices[5]=rect.bot;
-        
-        vertices[6]=rect.rgt;
-        vertices[7]=rect.top;
-        vertices[8]=rect.rgt;
-        vertices[9]=rect.bot;
-        vertices[10]=rect.lft;
-        vertices[11]=rect.bot;
+        this.rectVertices[6]=rect.rgt;
+        this.rectVertices[7]=rect.top;
+        this.rectVertices[8]=rect.rgt;
+        this.rectVertices[9]=rect.bot;
+        this.rectVertices[10]=rect.lft;
+        this.rectVertices[11]=rect.bot;
         
             // setup the color
             
@@ -125,7 +122,7 @@ function InterfaceObject()
             // setup the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertices,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.interfaceShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);

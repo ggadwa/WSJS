@@ -35,12 +35,12 @@ function GenBitmapUtilityObject(genRandom)
         var halfBrick;
         var segments=[];
 
-        var xCount=BITMAP_STACKED_X_MIN_COUNT+Math.floor(this.genRandom.random()*BITMAP_STACKED_X_EXTRA_COUNT);
-        var wid=Math.floor(cvsWid/xCount);
-        var halfWid=Math.floor(wid/2);
+        var xCount=BITMAP_STACKED_X_MIN_COUNT+Math.trunc(this.genRandom.random()*BITMAP_STACKED_X_EXTRA_COUNT);
+        var wid=Math.trunc(cvsWid/xCount);
+        var halfWid=Math.trunc(wid/2);
 
-        var yCount=BITMAP_STACKED_Y_MIN_COUNT+Math.floor(this.genRandom.random()*BITMAP_STACKED_Y_EXTRA_COUNT);
-        var high=Math.floor(cvsHigh/yCount);
+        var yCount=BITMAP_STACKED_Y_MIN_COUNT+Math.trunc(this.genRandom.random()*BITMAP_STACKED_Y_EXTRA_COUNT);
+        var high=Math.trunc(cvsHigh/yCount);
 
         top=0;
         halfBrick=false;
@@ -104,10 +104,10 @@ function GenBitmapUtilityObject(genRandom)
 
                 // random size
 
-            startWid=BITMAP_GRID_MIN_BLOCK_WIDTH+Math.floor(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_WIDTH);
+            startWid=BITMAP_GRID_MIN_BLOCK_WIDTH+Math.trunc(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_WIDTH);
             if ((x+startWid)>=BITMAP_GRID_DIVISION) startWid=BITMAP_GRID_DIVISION-x;
 
-            startHigh=BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.floor(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
+            startHigh=BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.trunc(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
             if ((y+startHigh)>=BITMAP_GRID_DIVISION) startHigh=BITMAP_GRID_DIVISION-y;
 
                 // make sure we aren't leaving a little sliver
@@ -143,10 +143,10 @@ function GenBitmapUtilityObject(genRandom)
                 // create the segment and block off
                 // the grid
 
-            lft=Math.floor(x*(cvsWid/BITMAP_GRID_DIVISION));
-            top=Math.floor(y*(cvsHigh/BITMAP_GRID_DIVISION));
-            rgt=Math.floor((x+wid)*(cvsWid/BITMAP_GRID_DIVISION));
-            bot=Math.floor((y+high)*(cvsHigh/BITMAP_GRID_DIVISION));
+            lft=Math.trunc(x*(cvsWid/BITMAP_GRID_DIVISION));
+            top=Math.trunc(y*(cvsHigh/BITMAP_GRID_DIVISION));
+            rgt=Math.trunc((x+wid)*(cvsWid/BITMAP_GRID_DIVISION));
+            bot=Math.trunc((y+high)*(cvsHigh/BITMAP_GRID_DIVISION));
 
             segments.push(new wsRect(lft,top,rgt,bot));
 
@@ -241,11 +241,11 @@ function GenBitmapUtilityObject(genRandom)
     this.colorToRGBColor=function(color)
     {
         var colorStr='rgb(';
-        colorStr+=Math.floor(color.r*255.0);
+        colorStr+=Math.trunc(color.r*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color.g*255.0);
+        colorStr+=Math.trunc(color.g*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color.b*255.0);
+        colorStr+=Math.trunc(color.b*255.0);
         colorStr+=')';
 
         return(colorStr);
@@ -254,13 +254,13 @@ function GenBitmapUtilityObject(genRandom)
     this.colorToRGBAColor=function(color,alpha)
     {
         var colorStr='rgba(';
-        colorStr+=Math.floor(color.r*255.0);
+        colorStr+=Math.trunc(color.r*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color.g*255.0);
+        colorStr+=Math.trunc(color.g*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(color.b*255.0);
+        colorStr+=Math.trunc(color.b*255.0);
         colorStr+=',';
-        colorStr+=Math.floor(alpha*255.0);
+        colorStr+=Math.trunc(alpha*255.0);
         colorStr+=')';
 
         return(colorStr);
@@ -269,11 +269,11 @@ function GenBitmapUtilityObject(genRandom)
     this.normalToRGBColor=function(normal)
     {
         var colorStr='rgb(';
-        colorStr+=Math.floor((normal.x+1.0)*127.0);
+        colorStr+=Math.trunc((normal.x+1.0)*127.0);
         colorStr+=',';
-        colorStr+=Math.floor((normal.y+1.0)*127.0);
+        colorStr+=Math.trunc((normal.y+1.0)*127.0);
         colorStr+=',';
-        colorStr+=Math.floor((normal.z+1.0)*127.0);
+        colorStr+=Math.trunc((normal.z+1.0)*127.0);
         colorStr+=')';
 
         return(colorStr);
@@ -293,7 +293,7 @@ function GenBitmapUtilityObject(genRandom)
             count--;
 
             if (count<=0) {
-                count=1+Math.floor(this.genRandom.random()*3);
+                count=1+Math.trunc(this.genRandom.random()*3);
 
                 f=1.0+((1.0-(this.genRandom.random()*2.0))*factor);
 
@@ -368,15 +368,15 @@ function GenBitmapUtilityObject(genRandom)
 
                 col=(bitmapData[idx]/255.0)*fct;
                 if (col>1.0) col=1.0;
-                bitmapData[idx]=Math.floor(col*255.0);
+                bitmapData[idx]=Math.trunc(col*255.0);
 
                 col=(bitmapData[idx+1]/255.0)*fct;
                 if (col>1.0) col=1.0;
-                bitmapData[idx+1]=Math.floor(col*255.0);
+                bitmapData[idx+1]=Math.trunc(col*255.0);
 
                 col=(bitmapData[idx+2]/255.0)*fct;
                 if (col>1.0) col=1.0;
-                bitmapData[idx+2]=Math.floor(col*255.0);
+                bitmapData[idx+2]=Math.trunc(col*255.0);
             }
 
                 // next pixel
@@ -538,8 +538,8 @@ function GenBitmapUtilityObject(genRandom)
         var wid=rgt-lft;
         var high=bot-top;
 
-        var mx=Math.floor((lft+rgt)/2);
-        var my=Math.floor((top+bot)/2);
+        var mx=Math.trunc((lft+rgt)/2);
+        var my=Math.trunc((top+bot)/2);
         
         var sidePointCount=15;
         var totalPointCount=sidePointCount*4;
@@ -550,7 +550,7 @@ function GenBitmapUtilityObject(genRandom)
         var y=new Uint16Array(totalPointCount);
         
         for (n=0;n!==sidePointCount;n++) {
-            add=Math.floor((wid/sidePointCount)*n);
+            add=Math.trunc((wid/sidePointCount)*n);
             x[n]=lft+add;
             y[n]=top;
             x[n+(sidePointCount*2)]=rgt-add;
@@ -558,7 +558,7 @@ function GenBitmapUtilityObject(genRandom)
         }
 
         for (n=0;n!==sidePointCount;n++) {
-            add=Math.floor((high/sidePointCount)*n);
+            add=Math.trunc((high/sidePointCount)*n);
             x[n+sidePointCount]=rgt;
             y[n+sidePointCount]=top+add;
             x[n+(sidePointCount*3)]=lft;
@@ -727,8 +727,8 @@ function GenBitmapUtilityObject(genRandom)
         
             // start and end arc
             
-        startArc=Math.floor(startArc*1000);
-        endArc=Math.floor(endArc*1000);
+        startArc=Math.trunc(startArc*1000);
+        endArc=Math.trunc(endArc*1000);
         if (startArc>=endArc) return;
         
             // the drawing size
@@ -737,8 +737,8 @@ function GenBitmapUtilityObject(genRandom)
         var orgHigh=bot-top;
         var wid=orgWid-1;
         var high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
-        var mx=Math.floor(wid/2);
-        var my=Math.floor(high/2);
+        var mx=Math.trunc(wid/2);
+        var my=Math.trunc(high/2);
 
         var bitmapImgData=bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
         var bitmapData=bitmapImgData.data;
@@ -766,20 +766,20 @@ function GenBitmapUtilityObject(genRandom)
                 rad=(Math.PI*2.0)*(n*0.001);
 
                 fx=Math.sin(rad);
-                x=mx+Math.floor(halfWid*fx);
+                x=mx+Math.trunc(halfWid*fx);
                 if (x<0) x=0;
 
                 fy=Math.cos(rad);
-                y=my-Math.floor(halfHigh*fy);
+                y=my-Math.trunc(halfHigh*fy);
                 if (y<0) y=0;
 
                     // the color pixel
 
                 idx=((y*orgWid)+x)*4;
 
-                bitmapData[idx]=Math.floor(col.r*255.0);
-                bitmapData[idx+1]=Math.floor(col.g*255.0);
-                bitmapData[idx+2]=Math.floor(col.b*255.0);
+                bitmapData[idx]=Math.trunc(col.r*255.0);
+                bitmapData[idx+1]=Math.trunc(col.g*255.0);
+                bitmapData[idx+2]=Math.trunc(col.b*255.0);
 
                     // get a normal for the pixel change
                     // if within the flat inner circle, just point the z out
@@ -895,8 +895,8 @@ function GenBitmapUtilityObject(genRandom)
         var segCount=this.genRandom.randomInt(2,5);
         var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
-        var xAdd=Math.floor((x2-x)/segCount);
-        var yAdd=Math.floor((y2-y)/segCount);
+        var xAdd=Math.trunc((x2-x)/segCount);
+        var yAdd=Math.trunc((y2-y)/segCount);
         
         sx=x;
         sy=y;
@@ -1015,17 +1015,17 @@ function GenBitmapUtilityObject(genRandom)
             // remember this is a clip so
             // it always starts at 0,0
 
-        var mx=lft+Math.floor(wid/2);
-        var my=top+Math.floor(high/2);
+        var mx=lft+Math.trunc(wid/2);
+        var my=top+Math.trunc(high/2);
 
             // create the rings of
             // particles
 
         var ringWid=wid;
-        var ringWidSub=Math.floor(wid/(ringCount+1));
+        var ringWidSub=Math.trunc(wid/(ringCount+1));
 
         var ringHigh=high;
-        var ringHighSub=Math.floor(high/(ringCount+1));
+        var ringHighSub=Math.trunc(high/(ringCount+1));
 
         for (n=0;n!==ringCount;n++) {
 
@@ -1040,8 +1040,8 @@ function GenBitmapUtilityObject(genRandom)
                 fy=Math.cos(rad);
 
                 fsz=this.genRandom.random();
-                px=mx+Math.floor((fsz*ringWid)*fx);
-                py=my-Math.floor((fsz*ringHigh)*fy);
+                px=mx+Math.trunc((fsz*ringWid)*fx);
+                py=my-Math.trunc((fsz*ringHigh)*fy);
 
                     // this can wrap
 
@@ -1056,15 +1056,15 @@ function GenBitmapUtilityObject(genRandom)
 
                 col=(bitmapData[idx]/255.0)*darkenFactor;
                 if (col>1.0) col=1.0;
-                bitmapData[idx]=Math.floor(col*255.0);
+                bitmapData[idx]=Math.trunc(col*255.0);
 
                 col=(bitmapData[idx+1]/255.0)*darkenFactor;
                 if (col>1.0) col=1.0;
-                bitmapData[idx+1]=Math.floor(col*255.0);
+                bitmapData[idx+1]=Math.trunc(col*255.0);
 
                 col=(bitmapData[idx+2]/255.0)*darkenFactor;
                 if (col>1.0) col=1.0;
-                bitmapData[idx+2]=Math.floor(col*255.0);
+                bitmapData[idx+2]=Math.trunc(col*255.0);
 
                     // get a normal for the pixel change
 
@@ -1110,7 +1110,7 @@ function GenBitmapUtilityObject(genRandom)
             // as we go across the width
             
         var density=100;
-        var densityReduce=Math.floor(90/streakWid);
+        var densityReduce=Math.trunc(90/streakWid);
         
             // write the streaks
             
@@ -1123,16 +1123,16 @@ function GenBitmapUtilityObject(genRandom)
                 
                 if (this.genRandom.randomInt(0,100)<density) {
                     idx=((y*imgWid)+lx)*4;
-                    bitmapData[idx]=Math.floor(baseColor.r*255.0);
-                    bitmapData[idx+1]=Math.floor(baseColor.g*255.0);
-                    bitmapData[idx+2]=Math.floor(baseColor.b*255.0);
+                    bitmapData[idx]=Math.trunc(baseColor.r*255.0);
+                    bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
+                    bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
                 }
                 
                 if (this.genRandom.randomInt(0,100)<density) {
                     idx=((y*imgWid)+rx)*4;
-                    bitmapData[idx]=Math.floor(baseColor.r*255.0);
-                    bitmapData[idx+1]=Math.floor(baseColor.g*255.0);
-                    bitmapData[idx+2]=Math.floor(baseColor.b*255.0);
+                    bitmapData[idx]=Math.trunc(baseColor.r*255.0);
+                    bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
+                    bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
                 }
             
             }
@@ -1167,17 +1167,17 @@ function GenBitmapUtilityObject(genRandom)
         var normalImgData=normalCTX.getImageData(lft,top,wid,high);
         var normalData=normalImgData.data;
 
-        var nx=Math.floor((0.10+1.0)*127.0);
-        var nz=Math.floor((0.90+1.0)*127.0);
+        var nx=Math.trunc((0.10+1.0)*127.0);
+        var nz=Math.trunc((0.90+1.0)*127.0);
 
             // write the stripe
 
         for (y=0;y!==high;y++) {
 
             color=colors[y%100];
-            redByte=Math.floor(color.r*256.0);
-            greenByte=Math.floor(color.g*256.0);
-            blueByte=Math.floor(color.b*256.0);
+            redByte=Math.trunc(color.r*256.0);
+            greenByte=Math.trunc(color.g*256.0);
+            blueByte=Math.trunc(color.b*256.0);
 
             idx=(y*wid)*4;
 
@@ -1220,17 +1220,17 @@ function GenBitmapUtilityObject(genRandom)
         var normalImgData=normalCTX.getImageData(lft,top,wid,high);
         var normalData=normalImgData.data;
 
-        var nx=Math.floor((0.10+1.0)*127.0);
-        var nz=Math.floor((0.90+1.0)*127.0);
+        var nx=Math.trunc((0.10+1.0)*127.0);
+        var nz=Math.trunc((0.90+1.0)*127.0);
 
             // write the stripe
 
         for (x=0;x!==wid;x++) {
 
             color=colors[x%100];
-            redByte=Math.floor(color.r*256.0);
-            greenByte=Math.floor(color.g*256.0);
-            blueByte=Math.floor(color.b*256.0);
+            redByte=Math.trunc(color.r*256.0);
+            greenByte=Math.trunc(color.g*256.0);
+            blueByte=Math.trunc(color.b*256.0);
 
             for (y=0;y!==high;y++) {
                 idx=((y*wid)+x)*4;
@@ -1270,8 +1270,8 @@ function GenBitmapUtilityObject(genRandom)
         var normalImgData=normalCTX.getImageData(lft,top,wid,high);
         var normalData=normalImgData.data;
 
-        var nx=Math.floor((0.10+1.0)*127.0);
-        var nz=Math.floor((0.90+1.0)*127.0);
+        var nx=Math.trunc((0.10+1.0)*127.0);
+        var nz=Math.trunc((0.90+1.0)*127.0);
 
             // write the stripe
 
@@ -1283,9 +1283,9 @@ function GenBitmapUtilityObject(genRandom)
                 
                 idx=((y*wid)+x)*4;
 
-                bitmapData[idx]=Math.floor(color.r*256.0);
-                bitmapData[idx+1]=Math.floor(color.g*256.0);
-                bitmapData[idx+2]=Math.floor(color.b*256.0);
+                bitmapData[idx]=Math.trunc(color.r*256.0);
+                bitmapData[idx+1]=Math.trunc(color.g*256.0);
+                bitmapData[idx+2]=Math.trunc(color.b*256.0);
 
                 normalData[idx]=((cIdx&0x1)===0)?nx:-nx;
                 normalData[idx+1]=127.0;
@@ -1305,8 +1305,8 @@ function GenBitmapUtilityObject(genRandom)
     
     this.drawUVTest=function(bitmapCTX,lft,top,rgt,bot)
     {
-        var xMid=Math.floor((lft+rgt)/2);
-        var yMid=Math.floor((top+bot)/2);
+        var xMid=Math.trunc((lft+rgt)/2);
+        var yMid=Math.trunc((top+bot)/2);
         
         this.drawRect(bitmapCTX,lft,top,xMid,yMid,new wsColor(1,1,0));
         this.drawRect(bitmapCTX,xMid,top,rgt,yMid,new wsColor(1,0,0));
