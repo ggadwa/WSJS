@@ -90,7 +90,7 @@ function GenSoundObject(ctx,genRandom)
         this.normalize(data,frameCount);
         this.fade(data,frameCount,null,0.1);
         
-        return(new SoundObject(name,this.ctx,buffer));
+        return(new SoundObject(name,this.ctx,buffer,25000));
     };
     
     //
@@ -109,7 +109,7 @@ function GenSoundObject(ctx,genRandom)
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.1,0.5);
         
-        return(new SoundObject(name,this.ctx,buffer));
+        return(new SoundObject(name,this.ctx,buffer,50000));
     };
     
     //

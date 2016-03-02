@@ -10,7 +10,6 @@ function SoundListObject()
     this.sounds=null;
     
     this.listenerForwardVector=new wsPoint(0.0,0.0,1.0);            // local to global to avoid GC
-    this.listenerUpVector=new wsPoint(0.0,1.0,0.0);
     
     this.initialize=function()
     {
@@ -46,7 +45,7 @@ function SoundListObject()
         
         // supergumba -- we aren't handling up vector here
         
-        this.ctx.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,this.listenerUpVector.x,this.listenerUpVector.y,this.listenerUpVector.z);
+        this.ctx.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0.0,1.0,0.0);
     };
     
     this.add=function(sound)

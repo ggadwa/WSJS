@@ -146,9 +146,6 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
 
     this.addDecorations=function(room)
     {
-        this.addMachine(room);
-        return;
-        
             // randomly pick a decoration
             
         switch (this.genRandom.randomIndex(2)) {
