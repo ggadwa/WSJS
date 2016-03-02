@@ -26,6 +26,7 @@ REGULAR TODOs
        * (touchEntity.getName()==='projectile') use instanceof
        * put instanceof in map_overlay to not so projectiles
 
+#### collisions against slanted walls are bad
 #### tails, spikes, random vertex moves
 #### normals bad in animation (or culling is bad)
 

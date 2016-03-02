@@ -36,15 +36,25 @@ function GenSoundObject(ctx,genRandom)
     
     this.normalize=function(data,frameCount)
     {
-        var n;
+        var n,k,f,max;
+        
+            // get max value
+            
+        max=0.0;
         
         for (n=0;n!==frameCount;n++) {
-            if (data[n]>1.0) {
-                data[n]=1.0;
-            }
-            else {
-                if (data[n]<-1.0) data[n]=-1.0;
-            }
+            k=Math.abs(data[n]);
+            if (k>max) max=k;
+        }
+        
+        if (max===0.0) return;
+        
+            // normalize
+            
+        f=1.0/max;
+        
+        for (n=0;n!==frameCount;n++) {
+            data[n]*=f;
         }
     };
     
