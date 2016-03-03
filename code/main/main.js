@@ -25,7 +25,8 @@ var textureBuildList=
 var soundBuildList=
     [
         ['fire',GEN_SOUND_GUN_FIRE],
-        ['explosion',GEN_SOUND_EXPLOSION]
+        ['explosion',GEN_SOUND_EXPLOSION],
+        ['monster scream',GEN_SOUND_MONSTER_SCREAM]
     ];
 
 //

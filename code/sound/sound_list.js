@@ -38,14 +38,15 @@ function SoundListObject()
     
     this.setListenerToEntity=function(entity)
     {
+            // supergumba -- all this has to be replace with spatialListener
+        var pos=entity.getPosition();
         var ang=entity.getAngle();
         
         this.listenerForwardVector.set(0.0,0.0,1.0);
         this.listenerForwardVector.rotateY(null,ang.y);
         
-        // supergumba -- we aren't handling up vector here
-        
-        this.ctx.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0.0,1.0,0.0);
+        //this.ctx.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0.0,1.0,0.0);
+        this.ctx.wsTempPosition=pos;       // supergumba -- temporary for now
     };
     
     this.add=function(sound)

@@ -13,23 +13,24 @@ function GenSoundObject(ctx,genRandom)
     // sound utilities
     //
     
-    this.addTone=function(data,frameCount,freq)
+    this.addTone=function(data,frameStart,frameEnd,freq,freqChange)
     {
         var n;
         var rd=0.0;
         
-        for (n=0;n!==frameCount;n++) {
+        for (n=frameStart;n<frameEnd;n++) {
             data[n]+=Math.sin(rd);
             rd+=freq;
+            freq+=freqChange;
         }
     };
     
-    this.addWhiteNoise=function(data,frameCount,range)
+    this.addWhiteNoise=function(data,frameStart,frameEnd,range)
     {
         var n;
         var doubleRange=range*2.0;
         
-        for (n=0;n!==frameCount;n++) {
+        for (n=frameStart;n<frameEnd;n++) {
             data[n]+=(Math.random()*doubleRange)-range;     // use internal random as white noise doesn't need to be anything that we track and recreate
         }
     };
@@ -94,8 +95,8 @@ function GenSoundObject(ctx,genRandom)
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         var data=buffer.getChannelData(0);
         
-        this.addTone(data,frameCount,0.007);
-        this.addTone(data,frameCount,0.008);
+        this.addTone(data,0,frameCount,0.007,0.0);
+        this.addTone(data,0,frameCount,0.008,0.0);
         this.addWhiteNoise(data,frameCount,0.1);
         this.normalize(data,frameCount);
         this.fade(data,frameCount,null,0.1);
@@ -113,13 +114,36 @@ function GenSoundObject(ctx,genRandom)
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         var data=buffer.getChannelData(0);
         
-        this.addTone(data,frameCount,0.007);
-        this.addTone(data,frameCount,0.005);
+        this.addTone(data,0,frameCount,0.007,0.0);
+        this.addTone(data,0,frameCount,0.005,0.005);
         this.addWhiteNoise(data,frameCount,0.2);
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.1,0.5);
         
         return(new SoundObject(name,this.ctx,buffer,50000));
+    };
+    
+    //
+    // monster scream sound
+    //
+    
+    this.generateMonsterScream=function(name)
+    {
+        var n;
+
+        var frameCount=this.ctx.sampleRate*1.2;
+        var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
+        var data=buffer.getChannelData(0);
+        
+        this.addTone(data,0,frameCount,0.01,0.00001);
+        this.addTone(data,0,frameCount,0.02,-0.000015);
+        
+        
+        //this.addWhiteNoise(data,frameCount,0.1);
+        this.normalize(data,frameCount);
+        this.fade(data,frameCount,0.05,0.2);
+        
+        return(new SoundObject(name,this.ctx,buffer,25000));
     };
     
     //
@@ -135,6 +159,9 @@ function GenSoundObject(ctx,genRandom)
                 
             case GEN_SOUND_EXPLOSION:
                 return(this.generateExplosion(name));
+                
+            case GEN_SOUND_MONSTER_SCREAM:
+                return(this.generateMonsterScream(name));
         }
         
         return(null);

@@ -39,7 +39,7 @@ REGULAR TODOs
 
 [ ] sound
      [X] need to create sounds
-     [ ] figure out what's wrong with panner
+     [ ] move up to spatial panner (sound_list.setListenerToEntity, sound.play)
 
 [ ] map generation
     [X] new platforms builder
