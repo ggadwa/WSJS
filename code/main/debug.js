@@ -540,6 +540,51 @@ function DebugObject()
 
         document.body.appendChild(cvs);
     };
+    
+        //
+        // display a canvas on page (for debuginning sound data)
+        //
 
+    this.displaySoundData=function(data,lft,top,wid,high)
+    {
+        var n,fx,fxAdd,y,halfHigh;
+        var dataLen=data.length;
+        
+        console.log(dataLen);
+        
+        var cvs=document.createElement('canvas');
+        cvs.style.position="absolute";
+        cvs.style.left=lft+'px';
+        cvs.style.top=top+'px';
+        cvs.style.border='1px solid #000000';
+        cvs.width=wid;
+        cvs.height=high;
+        
+            // get x divisions
+        
+        fx=0;
+        fxAdd=wid/dataLen;
+        halfHigh=Math.trunc(high/2);
+        
+            // draw the wave
+
+        var ctx=cvs.getContext('2d');
+        
+        ctx.strokeStyle='#0000FF';
+        ctx.beginPath();
+        
+        y=halfHigh+Math.trunc(data[0]*halfHigh);
+        ctx.moveTo(Math.trunc(fx),y);
+
+        for (n=1;n<dataLen;n++) {
+            fx+=fxAdd;
+            y=halfHigh+Math.trunc(data[n]*halfHigh);
+            ctx.lineTo(Math.trunc(fx),y);
+        }
+
+        ctx.stroke();
+
+        document.body.appendChild(cvs);
+    };
 }
 

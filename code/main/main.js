@@ -217,12 +217,12 @@ function wsInitBuildSounds(idx,soundGenRandom)
         // name and type
         
     var name=soundBuildList[idx][0];
-    var soundType=soundBuildList[idx][1];
+    var generateType=soundBuildList[idx][1];
     
          // generate sound
     
     var genSound=new GenSoundObject(soundList.getAudioContext(),soundGenRandom);
-    soundList.add(genSound.generate(name,soundType));
+    soundList.add(genSound.generate(name,generateType,debug));
     
         // if more textures, then loop back around
         

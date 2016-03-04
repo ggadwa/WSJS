@@ -13,19 +13,35 @@ function GenSoundObject(ctx,genRandom)
     // sound utilities
     //
     
-    this.addTone=function(data,frameStart,frameEnd,freq,freqChange)
+    this.createTone=function(data,frameStart,frameEnd,cycleCount)
     {
         var n;
         var rd=0.0;
+        var rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
         
+            // tones are always in cycles, so we always
+            // start and stop at 0 points to reduce clicks
+            // which means cycleCount needs to always be an integer
+            
         for (n=frameStart;n<frameEnd;n++) {
-            data[n]+=Math.sin(rd);
-            rd+=freq;
-            freq+=freqChange;
+            data[n]=Math.sin(rd);
+            rd+=rdAdd;
         }
     };
     
-    this.addWhiteNoise=function(data,frameStart,frameEnd,range)
+    this.mixTone=function(data,frameStart,frameEnd,cycleCount)
+    {
+        var n;
+        var rd=0.0;
+        var rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
+        
+        for (n=frameStart;n<frameEnd;n++) {
+            data[n]=(data[n]*0.5)+(Math.sin(rd)*0.5);
+            rd+=rdAdd;
+        }
+    };
+    
+    this.mixWhiteNoise=function(data,frameStart,frameEnd,range)
     {
         var n;
         var doubleRange=range*2.0;
@@ -91,13 +107,13 @@ function GenSoundObject(ctx,genRandom)
     
     this.generateGunFire=function(name)
     {
-        var frameCount=this.ctx.sampleRate*0.5;
+        var frameCount=this.ctx.sampleRate*0.25;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         var data=buffer.getChannelData(0);
         
-        this.addTone(data,0,frameCount,0.007,0.0);
-        this.addTone(data,0,frameCount,0.008,0.0);
-        this.addWhiteNoise(data,frameCount,0.1);
+        this.createTone(data,0,frameCount,50);
+        this.mixTone(data,0,frameCount,70);
+        this.mixWhiteNoise(data,0,frameCount,0.05);
         this.normalize(data,frameCount);
         this.fade(data,frameCount,null,0.1);
         
@@ -114,9 +130,9 @@ function GenSoundObject(ctx,genRandom)
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         var data=buffer.getChannelData(0);
         
-        this.addTone(data,0,frameCount,0.007,0.0);
-        this.addTone(data,0,frameCount,0.005,0.005);
-        this.addWhiteNoise(data,frameCount,0.2);
+        this.createTone(data,0,frameCount,80);
+        this.mixTone(data,0,frameCount,150);
+        this.mixWhiteNoise(data,0,frameCount,0.25);
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.1,0.5);
         
@@ -129,17 +145,20 @@ function GenSoundObject(ctx,genRandom)
     
     this.generateMonsterScream=function(name)
     {
-        var n;
-
-        var frameCount=this.ctx.sampleRate*1.2;
+        var frameCount=this.ctx.sampleRate*1;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         var data=buffer.getChannelData(0);
         
-        this.addTone(data,0,frameCount,0.01,0.00001);
-        this.addTone(data,0,frameCount,0.02,-0.000015);
+        var frameAdd=Math.trunc(frameCount/5);
+        
+        this.createTone(data,0,frameCount,50);        
+        this.mixTone(data,frameAdd-100,(frameAdd*2),45);
+        this.mixTone(data,((frameAdd*2)-100),(frameAdd*3),42);
+        this.mixTone(data,((frameAdd*3)-100),(frameAdd*4),45);
+        this.mixTone(data,((frameAdd*4)-100),frameCount,35);
         
         
-        //this.addWhiteNoise(data,frameCount,0.1);
+        //this.mixWhiteNoise(data,0,frameCount,0.5);
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.05,0.2);
         
@@ -150,21 +169,32 @@ function GenSoundObject(ctx,genRandom)
     // generate sound mainline
     //
     
-    this.generate=function(name,soundType)
+    this.generate=function(name,generateType,debug)
     {
-        switch (soundType) {
+        var sound=null;
+        
+        switch (generateType) {
             
             case GEN_SOUND_GUN_FIRE:
-                return(this.generateGunFire(name));
+                sound=this.generateGunFire(name);
+                break;
                 
             case GEN_SOUND_EXPLOSION:
-                return(this.generateExplosion(name));
+                sound=this.generateExplosion(name);
+                break;
                 
             case GEN_SOUND_MONSTER_SCREAM:
-                return(this.generateMonsterScream(name));
+                sound=this.generateMonsterScream(name);
+                break;
         }
         
-        return(null);
+            // debugging
+/*
+        if (generateType===GEN_SOUND_MONSTER_SCREAM) {
+            debug.displaySoundData(sound.buffer.getChannelData(0),1050,10,500,250);
+        }
+*/       
+        return(sound);
     };
 }
 
