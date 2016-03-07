@@ -283,6 +283,15 @@ const GEN_BITMAP_TYPE_SKIN_SCALE=15;
 const GEN_BITMAP_TYPE_SKIN_LEATHER=16;
 const GEN_BITMAP_TYPE_SKIN_FUR=17;
 
+const GEN_BITMAP_TYPE_NAMES=[
+                                'Brick Stack','Brick Random','Stone',
+                                'Tile Simple','Tile Complex','Tile Small',
+                                'Metal','Metal Bar','Metal Corrugated',
+                                'Concrete','Plaster','Mosaic','Wood Plank',
+                                'Wood Box','Machine','Skin Scale',
+                                'Skin Leather','Skin Fur'
+                            ];
+
 const GEN_BITMAP_TILE_STYLE_BORDER=0;
 const GEN_BITMAP_TILE_STYLE_CHECKER=1;
 const GEN_BITMAP_TILE_STYLE_STRIPE=2;
@@ -291,6 +300,10 @@ const GEN_BITMAP_TILE_STYLE_STRIPE=2;
 // sound generation types
 //
 
-const GEN_SOUND_GUN_FIRE=0;
-const GEN_SOUND_EXPLOSION=1;
-const GEN_SOUND_MONSTER_SCREAM=2;
+const GEN_SOUND_TYPE_GUN_FIRE=0;
+const GEN_SOUND_TYPE_EXPLOSION=1;
+const GEN_SOUND_TYPE_MONSTER_SCREAM=2;
+
+const GEN_SOUND_TYPE_NAMES= [
+                                'Gun Fire','Explosion','Monster Scream'
+                            ];

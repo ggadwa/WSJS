@@ -175,15 +175,15 @@ function GenSoundObject(ctx,genRandom)
         
         switch (generateType) {
             
-            case GEN_SOUND_GUN_FIRE:
+            case GEN_SOUND_TYPE_GUN_FIRE:
                 sound=this.generateGunFire(name);
                 break;
                 
-            case GEN_SOUND_EXPLOSION:
+            case GEN_SOUND_TYPE_EXPLOSION:
                 sound=this.generateExplosion(name);
                 break;
                 
-            case GEN_SOUND_MONSTER_SCREAM:
+            case GEN_SOUND_TYPE_MONSTER_SCREAM:
                 sound=this.generateMonsterScream(name);
                 break;
         }
