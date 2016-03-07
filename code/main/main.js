@@ -190,7 +190,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
         // generate bitmap
     
     var genBitmap=new GenBitmapObject(textureGenRandom);
-    bitmapList.add(genBitmap.generate(view,name,bitmapType,debug));
+    bitmapList.add(genBitmap.generate(view,name,bitmapType));
     
         // if more textures, then loop back around
         
@@ -207,7 +207,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
     view.loadingScreenAddString('Generating Dynamic Sounds');
     view.loadingScreenDraw(null);
 
-    setTimeout(function() { wsInitBuildSounds(0,new GenRandomObject(SEED_ENTITY)); },PROCESS_TIMEOUT_MSEC);
+    setTimeout(function() { wsInitBuildSounds(0,new GenRandomObject(SEED_SOUND)); },PROCESS_TIMEOUT_MSEC);
 }
 
 function wsInitBuildSounds(idx,soundGenRandom)
@@ -222,7 +222,7 @@ function wsInitBuildSounds(idx,soundGenRandom)
          // generate sound
     
     var genSound=new GenSoundObject(soundList.getAudioContext(),soundGenRandom);
-    soundList.add(genSound.generate(name,generateType,debug));
+    soundList.add(genSound.generate(name,generateType));
     
         // if more textures, then loop back around
         

@@ -51,6 +51,18 @@ function GenSoundObject(ctx,genRandom)
         }
     };
     
+    this.delay=function(data,frameStart,frameEnd,frameCount,delayOffset,mixDest)
+    {
+        var n;
+        var mixSource=1.0-mixDest;
+        var delayIdx=frameStart+delayOffset;
+        
+        for (n=frameEnd;n>=frameStart;n--) {
+            if (delayIdx<frameCount) data[delayIdx]=(data[delayIdx]*mixSource)+(data[n]*mixDest);
+            delayIdx--;
+        }
+    };
+    
     this.normalize=function(data,frameCount)
     {
         var n,k,f,max;
@@ -157,6 +169,8 @@ function GenSoundObject(ctx,genRandom)
         this.mixTone(data,((frameAdd*3)-100),(frameAdd*4),45);
         this.mixTone(data,((frameAdd*4)-100),frameCount,35);
         
+        this.delay(data,0,frameCount,frameCount,Math.trunc(frameCount*0.1),0.25);
+        
         
         //this.mixWhiteNoise(data,0,frameCount,0.5);
         this.normalize(data,frameCount);
@@ -169,7 +183,7 @@ function GenSoundObject(ctx,genRandom)
     // generate sound mainline
     //
     
-    this.generate=function(name,generateType,debug)
+    this.generate=function(name,generateType)
     {
         var sound=null;
         
@@ -188,12 +202,6 @@ function GenSoundObject(ctx,genRandom)
                 break;
         }
         
-            // debugging
-/*
-        if (generateType===GEN_SOUND_MONSTER_SCREAM) {
-            debug.displaySoundData(sound.buffer.getChannelData(0),1050,10,500,250);
-        }
-*/       
         return(sound);
     };
 }

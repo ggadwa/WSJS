@@ -135,6 +135,37 @@ function GenBitmapObject(genRandom)
         //
         // tile bitmaps
         //
+        
+    this.generateTilePieceCrack=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeMargin,tileColor)
+    {
+        var sx,ex,sy,ey;
+        var lineColor,lineMargin;
+        var tileWid,tileHigh;
+        
+        if (!this.genRandom.randomPercentage(0.10)) return;
+
+        sx=lft+edgeMargin;
+        ex=rgt-edgeMargin;
+        sy=top+edgeMargin;
+        ey=bot-edgeMargin;
+        
+        tileWid=rgt-lft;
+        tileHigh=bot-top;
+
+        if (this.genRandom.randomPercentage(0.50)) {
+            lineMargin=Math.trunc(tileWid/5);
+            sx=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+            ex=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+        }
+        else {
+            lineMargin=Math.trunc(tileHigh/5);
+            sy=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+            ey=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+        }
+
+        lineColor=this.genBitmapUtility.darkenColor(tileColor,0.9);
+        this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,20,lineColor);
+    };
 
     this.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,complex)
     {
@@ -200,6 +231,9 @@ function GenBitmapObject(genRandom)
 
                 if ((complex) && (this.genRandom.random()<0.25)) {
                     this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.0,1.0,5,0,null,borderColor);
+                }
+                else {
+                    this.generateTilePieceCrack(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col);
                 }
             }
         }
@@ -287,7 +321,7 @@ function GenBitmapObject(genRandom)
             darken=0.5+(this.genRandom.random()*0.5);
             streakColor=this.genBitmapUtility.darkenColor(metalColor,darken);
 
-            this.genBitmapUtility.drawStreakVertical(bitmapCTX,wid,high,(lft+x),(top+edgeSize),(plateHigh-(edgeSize*2)),streakWid,streakColor);
+            this.genBitmapUtility.drawStreakVertical(bitmapCTX,wid,high,(lft+x),(top+edgeSize),(plateHigh-edgeSize),streakWid,streakColor);
         }
         
             // the screws
@@ -521,6 +555,7 @@ function GenBitmapObject(genRandom)
             // plaster noise
             
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.8);
+        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,5);
 
             // finish with the specular
 
@@ -534,9 +569,8 @@ function GenBitmapObject(genRandom)
     this.generateMosaic=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var x,y,lft,rgt,top,bot,tileWid,tileHigh;
-        var sx,sy,ex,ey,lineMargin;
         var splitCount,borderSize,edgeSize;
-        var mortarColor,borderColor,col,darkCol,lineColor;
+        var mortarColor,borderColor,col,darkCol;
         
             // some random values
 
@@ -585,28 +619,8 @@ function GenBitmapObject(genRandom)
                 
                     // any cracks
                     
-                if (this.genRandom.randomPercentage(0.10)) {
-                    
-                    sx=lft+1;
-                    ex=rgt-1;
-                    sy=top+1;
-                    ey=bot-1;
-                    
-                    if (this.genRandom.randomPercentage(0.50)) {
-                        lineMargin=Math.trunc(tileWid/5);
-                        sx=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
-                        ex=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
-                    }
-                    else {
-                        lineMargin=Math.trunc(tileHigh/5);
-                        sy=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
-                        ey=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
-                    }
-                    
-                    lineColor=this.genBitmapUtility.darkenColor(col,0.8);
-                    this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,20,lineColor);
-                }
-                
+                this.generateTilePieceCrack(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col);
+
                 lft+=tileWid;
             }
             
@@ -734,8 +748,8 @@ function GenBitmapObject(genRandom)
         xCount=Math.trunc((rgt-lft)/wid);
         yCount=Math.trunc((bot-top)/wid);
         
-        xOff=lft+Math.trunc(((rgt-lft)-(xCount*wid))/2);
-        yOff=top+Math.trunc(((bot-top)-(yCount*wid))/2);
+        xOff=(lft+2)+Math.trunc(((rgt-lft)-(xCount*wid))/2);
+        yOff=(top+2)+Math.trunc(((bot-top)-(yCount*wid))/2);
         
         for (y=0;y!==yCount;y++) {
             dy=yOff+(y*wid);
@@ -832,6 +846,7 @@ function GenBitmapObject(genRandom)
 
         this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,skinColor);
         this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.5,0.7,0.6);
+        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,5);
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
         
             // scales
@@ -859,7 +874,7 @@ function GenBitmapObject(genRandom)
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.2);
     };
     
     this.generateSkinLeather=function(bitmapCTX,normalCTX,specularCTX,wid,high)
@@ -887,7 +902,7 @@ function GenBitmapObject(genRandom)
             y=this.genRandom.randomInt(0,high);
             y2=this.genRandom.randomInt(0,high);
             
-            darken=0.6+(this.genRandom.random()*0.25);
+            darken=0.2+(this.genRandom.random()*0.6);
             lineColor=this.genBitmapUtility.darkenColor(lineColorBase,darken);
             
             this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor);
@@ -898,7 +913,7 @@ function GenBitmapObject(genRandom)
             x2=this.genRandom.randomInt(0,wid);
             y=this.genRandom.randomInt(0,high);
             
-            darken=0.6+(this.genRandom.random()*0.25);
+            darken=0.2+(this.genRandom.random()*0.6);
             lineColor=this.genBitmapUtility.darkenColor(lineColorBase,darken);
             
             this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y,30,lineColor);
@@ -918,10 +933,14 @@ function GenBitmapObject(genRandom)
 
             this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
         }
+        
+            // blur it
+            
+        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,25);
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5,-0.4);
     };
     
     this.generateSkinFur=function(bitmapCTX,normalCTX,specularCTX,wid,high)
@@ -966,7 +985,7 @@ function GenBitmapObject(genRandom)
             // finish with the specular
             // fur isn't shiney so this specular is very low
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5,-0.8);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5,-0.6);
     };
     
         //
@@ -984,7 +1003,7 @@ function GenBitmapObject(genRandom)
         // generate mainline
         //
 
-    this.generate=function(view,name,generateType,debug)
+    this.generate=function(view,name,generateType)
     {
         var wid,high,edgeSize,paddingSize,segments;
         var shineFactor=1.0;
@@ -1112,16 +1131,16 @@ function GenBitmapObject(genRandom)
 
         }
 
-            // debugging
-/*
-        if (generateType===GEN_BITMAP_TYPE_MACHINE) {
-            debug.displayCanvasData(bitmapCanvas,1050,10,400,400);
-            debug.displayCanvasData(normalCanvas,1050,410,400,400);
-            debug.displayCanvasData(specularCanvas,1050,820,400,400);
+            // if view is null, then we are in the special
+            // debug main, which just displays the canvases, so send
+            // them back
+        
+        if (view===null) {
+            return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas});
         }
-*/
-            // finally create the bitmap
-            // object and load into WebGL
+        
+            // otherwise, create the wenGL
+            // bitmap object
 
         return(new BitmapObject(view,name,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     };

@@ -386,6 +386,99 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.putImageData(bitmapImgData,lft,top);
     };
+    
+        //
+        // blur routines
+        //
+        
+    this.blur=function(bitmapCTX,lft,top,rgt,bot,blurCount)
+    {
+        var n,idx;
+        var x,y,cx,cy,cxs,cxe,cys,cye;
+        var colCount,r,g,b;
+        var wid=rgt-lft;
+        var high=bot-top;
+        
+        if ((wid<=0) || (high<=0)) return;
+        
+        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        var bitmapData=bitmapImgData.data;
+        
+        var blurData=new Uint8ClampedArray(bitmapData.length);
+        
+            // blur pixels to count
+
+        for (n=0;n!==blurCount;n++) {
+            
+            for (y=0;y!==high;y++) {
+
+                cys=y-1;
+                if (cys<0) cys=0;
+                cye=y+2;
+                if (cye>=high) cye=high-1;
+
+                for (x=0;x!==wid;x++) {
+
+                        // get blur from 8 surrounding pixels
+
+                    colCount=0;
+                    r=g=b=0;
+
+                    cxs=x-1;
+                    if (cxs<0) cxs=0;
+                    cxe=x+2;
+                    if (cxe>=wid) cxe=wid-1;
+
+                    for (cy=cys;cy!==cye;cy++) {
+                        for (cx=cxs;cx!==cxe;cx++) {
+                            if ((cy===y) && (cx===x)) continue;       // ignore self
+
+                                // add up blur from the
+                                // original pixels
+
+                            idx=((cy*wid)+cx)*4;
+
+                            r+=bitmapData[idx];
+                            g+=bitmapData[idx+1];
+                            b+=bitmapData[idx+2];
+                            colCount++;
+                        }
+                    }
+                    
+                    if (colCount!==0) {
+                        r=Math.trunc(r/colCount);
+                        if (r>255) r=255;
+
+                        g=Math.trunc(g/colCount);
+                        if (g>255) g=255;
+
+                        b=Math.trunc(b/colCount);
+                        if (b>255) b=255;
+
+                        idx=((y*wid)+x)*4;
+
+                        blurData[idx]=r;
+                        blurData[idx+1]=g;
+                        blurData[idx+2]=b;
+                    }
+                }
+            }
+
+                // transfer over the changed pixels
+
+            for (y=0;y!==high;y++) {
+                idx=(y*wid)*4;
+                for (x=0;x!==wid;x++) {       
+                    bitmapData[idx]=blurData[idx];
+                    bitmapData[idx+1]=blurData[idx+1];
+                    bitmapData[idx+2]=blurData[idx+2];
+                    idx+=4;
+                }
+            }
+        } 
+        
+        bitmapCTX.putImageData(bitmapImgData,lft,top);
+    };
 
         //
         // specular routines
