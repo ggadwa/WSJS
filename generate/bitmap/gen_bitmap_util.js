@@ -394,8 +394,8 @@ function GenBitmapUtilityObject(genRandom)
     this.blur=function(bitmapCTX,lft,top,rgt,bot,blurCount)
     {
         var n,idx;
-        var x,y,cx,cy,cxs,cxe,cys,cye;
-        var colCount,r,g,b;
+        var x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
+        var r,g,b;
         var wid=rgt-lft;
         var high=bot-top;
         
@@ -413,54 +413,50 @@ function GenBitmapUtilityObject(genRandom)
             for (y=0;y!==high;y++) {
 
                 cys=y-1;
-                if (cys<0) cys=0;
                 cye=y+2;
-                if (cye>=high) cye=high-1;
 
                 for (x=0;x!==wid;x++) {
 
                         // get blur from 8 surrounding pixels
 
-                    colCount=0;
                     r=g=b=0;
 
                     cxs=x-1;
-                    if (cxs<0) cxs=0;
                     cxe=x+2;
-                    if (cxe>=wid) cxe=wid-1;
 
                     for (cy=cys;cy!==cye;cy++) {
+                        
+                        dy=cy;
+                        if (dy<0) dy=high+dy;
+                        if (dy>=high) dy=dy-high;
+                                
                         for (cx=cxs;cx!==cxe;cx++) {
                             if ((cy===y) && (cx===x)) continue;       // ignore self
+                            
+                            dx=cx;
+                            if (dx<0) dx=wid+dx;
+                            if (dx>=wid) dx=dx-wid;
 
                                 // add up blur from the
                                 // original pixels
 
-                            idx=((cy*wid)+cx)*4;
+                            idx=((dy*wid)+dx)*4;
 
                             r+=bitmapData[idx];
                             g+=bitmapData[idx+1];
                             b+=bitmapData[idx+2];
-                            colCount++;
                         }
                     }
                     
-                    if (colCount!==0) {
-                        r=Math.trunc(r/colCount);
-                        if (r>255) r=255;
+                    r=Math.trunc(r/8);
+                    g=Math.trunc(g/8);
+                    b=Math.trunc(b/8);
 
-                        g=Math.trunc(g/colCount);
-                        if (g>255) g=255;
+                    idx=((y*wid)+x)*4;
 
-                        b=Math.trunc(b/colCount);
-                        if (b>255) b=255;
-
-                        idx=((y*wid)+x)*4;
-
-                        blurData[idx]=r;
-                        blurData[idx+1]=g;
-                        blurData[idx+2]=b;
-                    }
+                    blurData[idx]=r;
+                    blurData[idx+1]=g;
+                    blurData[idx+2]=b;
                 }
             }
 

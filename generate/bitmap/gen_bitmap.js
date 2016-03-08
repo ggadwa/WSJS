@@ -17,8 +17,8 @@ function GenBitmapObject(genRandom)
 
     this.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSize,paddingSize,darkenFactor,segments)
     {
-        var n,rect;
-        var drawBrickColor,drawEdgeColor,f;
+        var n,rect,darken;
+        var drawBrickColor,drawEdgeColor,streakColor,f;
 
             // some random values
 
@@ -49,6 +49,13 @@ function GenBitmapObject(genRandom)
 
             this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,drawEdgeColor,true);
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,0.6);
+            
+            /* supergumba -- put in some streaks here, for dripping water type effects
+            darken=0.5+(this.genRandom.random()*0.4);
+            streakColor=this.genBitmapUtility.darkenColor(drawBrickColor,darken);
+
+            this.genBitmapUtility.drawStreakVertical(bitmapCTX,wid,high,(rect.lft+edgeSize),(rect.top+edgeSize),(rect.bot-edgeSize),10,streakColor);
+            */
         }
 
             // finish with the specular
@@ -583,8 +590,8 @@ function GenBitmapObject(genRandom)
         
             // tile sizes
             
-        tileWid=Math.trunc(wid/splitCount);
-        tileHigh=Math.trunc(high/splitCount);
+        tileWid=wid/splitCount;
+        tileHigh=high/splitCount;
 
             // clear canvases
 
@@ -615,11 +622,11 @@ function GenBitmapObject(genRandom)
 
                 rgt=(lft+tileWid)-borderSize;
 
-                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,darkCol,true);
+                this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col,darkCol,true);
                 
                     // any cracks
                     
-                this.generateTilePieceCrack(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col);
+                this.generateTilePieceCrack(bitmapCTX,normalCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
 
                 lft+=tileWid;
             }
@@ -629,7 +636,7 @@ function GenBitmapObject(genRandom)
 
             // noise
 
-        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,1.1,1.3,0.2);
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,1.1,1.3,0.5);
 
             // finish with the specular
 
@@ -839,8 +846,8 @@ function GenBitmapObject(genRandom)
         var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.7);
         var borderColor=this.genBitmapUtility.darkenColor(skinColor,0.8);
 
-        var sWid=Math.trunc(wid/scaleCount);
-        var sHigh=Math.trunc(high/scaleCount);
+        var sWid=wid/scaleCount;
+        var sHigh=high/scaleCount;
          
             // clear canvases
 
@@ -865,7 +872,7 @@ function GenBitmapObject(genRandom)
             }
             
             for (x=0;x!==xCount;x++) {
-                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+sWid),(dy+(sHigh*2)),0.25,0.75,3,0,null,borderColor);
+                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,Math.trunc(dx),Math.trunc(dy),Math.trunc(dx+sWid),Math.trunc(dy+(sHigh*2)),0.25,0.75,3,0,null,borderColor);
                 dx+=sWid;
             }
             
@@ -879,12 +886,11 @@ function GenBitmapObject(genRandom)
     
     this.generateSkinLeather=function(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,x2,y,y2,lineCount;
+        var n,x,y,y2,lineCount;
         var darken,lineColor,markCount;
         var particleWid,particleHigh,particleDensity;
         
         var clothColor=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.3);
-        var lineColorBase=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.6);
          
             // clear canvases
 
@@ -895,37 +901,26 @@ function GenBitmapObject(genRandom)
  
             // lines
             
-        lineCount=this.genRandom.randomInt(20,20);
+        lineCount=this.genRandom.randomInt(30,30);
             
         for (n=0;n!==lineCount;n++) {
             x=this.genRandom.randomInt(0,wid);
             y=this.genRandom.randomInt(0,high);
             y2=this.genRandom.randomInt(0,high);
             
-            darken=0.2+(this.genRandom.random()*0.6);
-            lineColor=this.genBitmapUtility.darkenColor(lineColorBase,darken);
+            darken=0.6+(this.genRandom.random()*0.25);
+            lineColor=this.genBitmapUtility.darkenColor(clothColor,darken);
             
             this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor);
         }
-        
-        for (n=0;n!==lineCount;n++) {
-            x=this.genRandom.randomInt(0,wid);
-            x2=this.genRandom.randomInt(0,wid);
-            y=this.genRandom.randomInt(0,high);
-            
-            darken=0.2+(this.genRandom.random()*0.6);
-            lineColor=this.genBitmapUtility.darkenColor(lineColorBase,darken);
-            
-            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y,30,lineColor);
-        }
-        
+
             // marks
             
         markCount=this.genRandom.randomInt(20,20);
 
         for (n=0;n!==markCount;n++) {
-            particleWid=this.genRandom.randomInt(20,50);
-            particleHigh=this.genRandom.randomInt(20,50);
+            particleWid=this.genRandom.randomInt(30,60);
+            particleHigh=this.genRandom.randomInt(30,60);
             particleDensity=this.genRandom.randomInt(50,150);
 
             x=this.genRandom.randomInt(0,wid);
