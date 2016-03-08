@@ -85,7 +85,7 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 //
 
 const MONSTER_MODEL_COUNT=3;
-const MONSTER_ENTITY_COUNT=3;
+const MONSTER_ENTITY_COUNT=10;
 
 const MONSTER_AI_ON=true;
 

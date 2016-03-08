@@ -1,26 +1,27 @@
-"use strict";
-
 //
 // weapon class
 //
 
-function WeaponObject(model,projectileModel,fireSound,hitSound)
+class Weapon
 {
-    this.model=model;
-    this.projectileModel=projectileModel;
-    this.fireSound=fireSound;
-    this.hitSound=hitSound;
-    
-    this.lastFireTimeStamp=0;
-    
-    this.handOffset=new wsPoint(0,0,0);     // global to stop GCd
-    this.handAngle=new wsPoint(0,0,0);
+    constructor(model,projectileModel,fireSound,hitSound)
+    {
+        this.model=model;
+        this.projectileModel=projectileModel;
+        this.fireSound=fireSound;
+        this.hitSound=hitSound;
+
+        this.lastFireTimeStamp=0;
+
+        this.handOffset=new wsPoint(0,0,0);     // global to stop GCd
+        this.handAngle=new wsPoint(0,0,0);
+    }
     
         //
         // fire weapon
         //
         
-    this.fire=function(view,soundList,entityList,entity)
+    fire(view,soundList,entityList,entity)
     {
             // time to fire again?
             
@@ -31,36 +32,36 @@ function WeaponObject(model,projectileModel,fireSound,hitSound)
             // create projectile
             
         var ang=new wsPoint(0,0,0);
-        ang.setFromPoint(entity.getAngle());
+        ang.setFromPoint(entity.angle);
         
         var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
         pos.rotate(ang);
-        pos.addPoint(entity.getPosition());
+        pos.addPoint(entity.position);
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        entityList.add(new EntityProjectileObject('projectile',view,pos,ang,500,500,this.projectileModel,this.hitSound));
+        entityList.add(new EntityProjectile('projectile',view,pos,ang,500,500,this.projectileModel,this.hitSound));
         
-        fireSound.play(pos);
-    };
+        this.fireSound.play(pos);
+    }
     
         //
         // draw weapon
         //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
         this.model.drawStart(view);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         this.model.drawEnd(view);
-    };
+    }
 
-    this.draw=function(view,entity)
+    draw(view,entity)
     {
-        var pos=entity.getPosition();
-        var angle=entity.getAngle();
+        var pos=entity.position;
+        var angle=entity.angle;
         
             // get new position
             
@@ -84,6 +85,6 @@ function WeaponObject(model,projectileModel,fireSound,hitSound)
             // draw the model
             
         this.model.draw(view);
-    };
+    }
 
 }

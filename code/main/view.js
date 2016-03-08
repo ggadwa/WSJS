@@ -1,24 +1,25 @@
-"use strict";
-
 //
 // view camera class
 //
 
-function ViewCameraObject()
+class ViewCamera
 {
-    this.position=new wsPoint(0.0,0.0,0.0);
-    this.angle=new wsPoint(0.0,0.0,0.0);
+    constructor()
+    {
+        this.position=new wsPoint(0.0,0.0,0.0);
+        this.angle=new wsPoint(0.0,0.0,0.0);
+    }
     
         //
         // set camera to entity
         //
         
-    this.setToEntity=function(entity,eyeHigh)
+    setToEntity(entity,eyeHigh)
     {
-        this.position.setFromPoint(entity.getPosition());
+        this.position.setFromPoint(entity.position);
         this.position.y-=eyeHigh;
-        this.angle.setFromPoint(entity.getAngle());
-    };
+        this.angle.setFromPoint(entity.angle);
+    }
     
 }
 
@@ -26,115 +27,118 @@ function ViewCameraObject()
 // view class
 //
 
-function ViewObject()
+class View
 {
-        // the opengl context
+    constructor()
+    {
+            // the opengl context
 
-    this.gl=null;
-    this.canvas=null;
-    this.canvasTopLeft=new ws2DIntPoint(0,0);
-    
-        // the view setup
-        
-    this.OPENGL_FOV=55.0;
-    this.OPENGL_NEAR_Z=500;
-    this.OPENGL_FAR_Z=300000;
-    
-    this.VIEW_NORMAL_CULL_LIMIT=0.3;
-    
-    this.wid=0;
-    this.high=0;
-    this.aspect=0.0;
-    this.lookAtUpVector=new wsPoint(0.0,1.0,0.0);
-    
-    this.eyePos=new wsPoint(0.0,0.0,0.0);
+        this.gl=null;
+        this.canvas=null;
+        this.canvasTopLeft=new ws2DIntPoint(0,0);
 
-        // the gl matrixes
-        
-    this.perspectiveMatrix=new Float32Array(16);
-    this.modelMatrix=new Float32Array(16);
-    this.normalMatrixTemp=new Float32Array(16);         // global to eliminate GCd
-    this.normalMatrix=new Float32Array(9);
-    this.orthoMatrix=new Float32Array(16);
-    
-        // billboarding matrixes
-        
-    this.billboardXMatrix=new Float32Array(16);
-    this.billboardYMatrix=new Float32Array(16);
-    
-        // overlay drawing
-        
-    this.drawOverlay=false;
-    
-        // in game random
-        
-    this.genRandom=new GenRandomObject(Date.now());
-    
-        // view lighting
-        
-    this.LIGHT_COUNT=4;
-        
-    this.ambient=new wsColor(0.0,0.0,0.0);
-    
-    this.lights=[];
-    for (var n=0;n!==this.LIGHT_COUNT;n++) {
-        this.lights.push(null);
+            // the view setup
+
+        this.OPENGL_FOV=55.0;
+        this.OPENGL_NEAR_Z=500;
+        this.OPENGL_FAR_Z=300000;
+
+        this.VIEW_NORMAL_CULL_LIMIT=0.3;
+
+        this.wid=0;
+        this.high=0;
+        this.aspect=0.0;
+        this.lookAtUpVector=new wsPoint(0.0,1.0,0.0);
+
+        this.eyePos=new wsPoint(0.0,0.0,0.0);
+
+            // the gl matrixes
+
+        this.perspectiveMatrix=new Float32Array(16);
+        this.modelMatrix=new Float32Array(16);
+        this.normalMatrixTemp=new Float32Array(16);         // global to eliminate GCd
+        this.normalMatrix=new Float32Array(9);
+        this.orthoMatrix=new Float32Array(16);
+
+            // billboarding matrixes
+
+        this.billboardXMatrix=new Float32Array(16);
+        this.billboardYMatrix=new Float32Array(16);
+
+            // overlay drawing
+
+        this.drawOverlay=false;
+
+            // in game random
+
+        this.genRandom=new GenRandomObject(Date.now());
+
+            // view lighting
+
+        this.LIGHT_COUNT=4;
+
+        this.ambient=new wsColor(0.0,0.0,0.0);
+
+        this.lights=[];
+        for (var n=0;n!==this.LIGHT_COUNT;n++) {
+            this.lights.push(null);
+        }
+
+            // camera setup
+
+        this.CAMERA_EYE_HEIGHT=3000;
+
+            // frustum planes
+
+        this.clipPlane=new Float32Array(16);            // global to avoid GCd
+
+        this.frustumLeftPlane=new wsPlane(0.0,0.0,0.0,0.0);
+        this.frustumRightPlane=new wsPlane(0.0,0.0,0.0,0.0);
+        this.frustumTopPlane=new wsPlane(0.0,0.0,0.0,0.0);
+        this.frustumBottomPlane=new wsPlane(0.0,0.0,0.0,0.0);
+        this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
+        this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
+
+            // additional drawing objects
+
+        this.text=new Text();
+        this.interface=new InterfaceObject();
+        this.particleList=new ParticleList();
+
+            // the camera object
+
+        this.camera=new ViewCamera();
+
+            // main loop
+
+        this.timeStamp=0;
+
+        this.loopCancel=false;
+        this.loopLastPhysicTimeStamp=0;
+        this.loopLastDrawTimeStamp=0;
+
+            // stats
+
+        this.fpsTotal=0;
+        this.fpsCount=0;
+        this.fpsStartTimeStamp=0;
+
+        this.drawMeshCount=0;
+        this.drawMeshTrigCount=0;
+        this.drawModelCount=0;
+        this.drawModelTrigCount=0;
+
+            // loading screen
+
+        this.loadingStrings=[];
+        this.loadingLastAddMsec=0;
     }
-    
-        // camera setup
-        
-    this.CAMERA_EYE_HEIGHT=3000;
-    
-        // frustum planes
-        
-    this.clipPlane=new Float32Array(16);            // global to avoid GCd
-        
-    this.frustumLeftPlane=new wsPlane(0.0,0.0,0.0,0.0);
-    this.frustumRightPlane=new wsPlane(0.0,0.0,0.0,0.0);
-    this.frustumTopPlane=new wsPlane(0.0,0.0,0.0,0.0);
-    this.frustumBottomPlane=new wsPlane(0.0,0.0,0.0,0.0);
-    this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
-    this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
-    
-        // additional drawing objects
-        
-    this.text=new TextObject();
-    this.interface=new InterfaceObject();
-    this.particleList=new ParticleListObject();
-    
-        // the camera object
-        
-    this.camera=new ViewCameraObject();
-    
-        // main loop
-        
-    this.timeStamp=0;
-        
-    this.loopCancel=false;
-    this.loopLastPhysicTimeStamp=0;
-    this.loopLastDrawTimeStamp=0;
-    
-        // stats
-        
-    this.fpsTotal=0;
-    this.fpsCount=0;
-    this.fpsStartTimeStamp=0;
-    
-    this.drawMeshCount=0;
-    this.drawMeshTrigCount=0;
-    this.drawModelCount=0;
-    this.drawModelTrigCount=0;
-    
-        // loading screen
-        
-    this.loadingStrings=[];
-    this.loadingLastAddMsec=0;
     
         //
         // initialize and release
         //
 
-    this.initialize=function(canvasId)
+    initialize(canvasId)
     {
             // get the canvas
 
@@ -177,40 +181,40 @@ function ViewObject()
         if (!this.particleList.initialize(this)) return(false);
 
         return(true);
-    };
+    }
 
-    this.release=function()
+    release()
     {
         this.text.release();
         this.interface.release();
         this.particleList.release();
-    };
+    }
     
         //
         // interface controls
         //
         
-    this.mapOverlayStateFlip=function()
+    mapOverlayStateFlip()
     {
         this.drawOverlay=!this.drawOverlay;
-    };
+    }
     
         //
         // convert coordinate to eye coordinates
         //
     
-    this.convertToEyeCoordinates=function(pt,eyePt)
+    convertToEyeCoordinates(pt,eyePt)
     {
         eyePt.x=(pt.x*this.modelMatrix[0])+(pt.y*this.modelMatrix[4])+(pt.z*this.modelMatrix[8])+this.modelMatrix[12];
         eyePt.y=(pt.x*this.modelMatrix[1])+(pt.y*this.modelMatrix[5])+(pt.z*this.modelMatrix[9])+this.modelMatrix[13];
         eyePt.z=(pt.x*this.modelMatrix[2])+(pt.y*this.modelMatrix[6])+(pt.z*this.modelMatrix[10])+this.modelMatrix[14];
-    };
+    }
     
         //
         // build perspective and ortho matrix
         //
 
-    this.buildPerspectiveMatrix=function()
+    buildPerspectiveMatrix()
     {
         var fov=1.0/Math.tan(this.OPENGL_FOV*0.5);
         var dist=1.0/(this.OPENGL_NEAR_Z-this.OPENGL_FAR_Z);
@@ -240,9 +244,9 @@ function ViewObject()
         this.perspectiveMatrix[13]+=(this.perspectiveMatrix[9]*this.OPENGL_NEAR_Z);
         this.perspectiveMatrix[14]+=(this.perspectiveMatrix[10]*this.OPENGL_NEAR_Z);
         this.perspectiveMatrix[15]+=(this.perspectiveMatrix[11]*this.OPENGL_NEAR_Z);
-    };
+    }
     
-    this.buildOrthoMatrix=function(nearZ,farZ)
+    buildOrthoMatrix(nearZ,farZ)
     {
         var horz=1.0/this.wid;
         var vert=1.0/this.high;
@@ -264,13 +268,13 @@ function ViewObject()
         this.orthoMatrix[13]=1.0; // this.high*vert;     // but leave in the code for readability
         this.orthoMatrix[14]=(farZ+nearZ)*dist;
         this.orthoMatrix[15]=1.0;
-    };
+    }
     
         //
         // build look at matrix
         //
      
-    this.buildLookAtMatrix=function(centerPos)
+    buildLookAtMatrix(centerPos)
     {
         var x0,x1,x2,y0,y1,y2,z0,z1,z2;
         var f;
@@ -321,13 +325,13 @@ function ViewObject()
         this.modelMatrix[13]=-((y0*this.eyePos.x)+(y1*this.eyePos.y)+(y2*this.eyePos.z));
         this.modelMatrix[14]=-((z0*this.eyePos.x)+(z1*this.eyePos.y)+(z2*this.eyePos.z));
         this.modelMatrix[15]=1.0;
-    };
+    }
     
         //
         // create the normal matrix
         //
         
-    this.buildNormalMatrix=function()
+    buildNormalMatrix()
     {
             // the normal is the invert-transpose of the
             // model matrix put into a 3x3 matrix
@@ -379,13 +383,13 @@ function ViewObject()
         this.normalMatrix[6]=this.normalMatrixTemp[2];
         this.normalMatrix[7]=this.normalMatrixTemp[6];
         this.normalMatrix[8]=this.normalMatrixTemp[10];
-    };
+    }
     
         //
         // billboarding matrixes
         //
         
-    this.buildBillboardXMatrix=function(ang)
+    buildBillboardXMatrix(ang)
     {
             // identity
             // we can assume non-touched cells will always be 0
@@ -402,9 +406,9 @@ function ViewObject()
         this.billboardXMatrix[5]=this.billboardXMatrix[10]=Math.cos(rad);
         this.billboardXMatrix[6]=Math.sin(rad);
         this.billboardXMatrix[9]=-this.billboardXMatrix[6];
-    };
+    }
     
-    this.buildBillboardYMatrix=function(ang)
+    buildBillboardYMatrix(ang)
     {
             // identity
             // we can assume non-touched cells will always be 0
@@ -421,13 +425,13 @@ function ViewObject()
         this.billboardYMatrix[0]=this.billboardYMatrix[10]=Math.cos(rad);
         this.billboardYMatrix[8]=Math.sin(rad);
         this.billboardYMatrix[2]=-this.billboardYMatrix[8];
-    };
+    }
     
         //
         // draw view
         //
 
-    this.draw=function(map,entityList)
+    draw(map,entityList)
     {
         var n,nEntity,entity;
         var player=entityList.getPlayer();
@@ -514,10 +518,10 @@ function ViewObject()
                 entity.draw(this);
                 entity.drawEnd(this);
 
-                if (DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.getModel(),entity.getAngle(),entity.getPosition());
-                if (DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.getModel());
-                if (DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.getModel());
-                if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.getModel());
+                if (DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.model,entity.angle,entity.position);
+                if (DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.model);
+                if (DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.model);
+                if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.model);
             }
         }
         
@@ -561,25 +565,25 @@ function ViewObject()
         this.text.drawWithShadow(this,(this.wid-5),67,20,18,modelCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.drawWithShadow(this,(this.wid-5),(this.high-5),20,18,posStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.drawEnd(this);
-    };
+    }
     
         //
         // loading screen
         //
     
-    this.loadingScreenClear=function()
+    loadingScreenClear()
     {
         this.loadingStrings=[];
-    };
+    }
     
-    this.loadingScreenAddString=function(str)
+    loadingScreenAddString(str)
     {
         this.loadingStrings.push(str);
         
         this.loadingLastAddMsec=Date.now();
-    };
+    }
     
-    this.loadingScreenUpdate=function()
+    loadingScreenUpdate()
     {
         var idx=this.loadingStrings.length-1;
         if (idx<0) return;
@@ -589,9 +593,9 @@ function ViewObject()
         this.loadingStrings[idx]+=(' ['+msec+'ms]');
         
         console.log(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
-    };
+    }
     
-    this.loadingScreenDraw=function(progress)
+    loadingScreenDraw(progress)
     {
         var n;
         
@@ -632,13 +636,13 @@ function ViewObject()
         if (progress!==null) this.interface.drawRect(this,new wsRect(lft,(this.high-25),rgt,(this.high-5)),new wsColor(0.3,0.1,1.0));
         this.interface.drawFrameRect(this,new wsRect(5,(this.high-25),(this.wid-5),(this.high-5)),new wsColor(1.0,1.0,1.0));
         this.interface.drawEnd(this);
-    };
+    }
     
         //
         // view frustum culling
         //
 
-    this.buildCullingFrustum=function()
+    buildCullingFrustum()
     {
             // combine the matrixes
             // to build the frustum
@@ -711,9 +715,9 @@ function ViewObject()
         this.frustumFarPlane.c=this.clipPlane[11]-this.clipPlane[10];
         this.frustumFarPlane.d=this.clipPlane[15]-this.clipPlane[14];
         this.frustumFarPlane.normalize();
-    };
+    }
 
-    this.boundBoxInFrustum=function(xBound,yBound,zBound)
+    boundBoxInFrustum(xBound,yBound,zBound)
     {
             // check if outside the plane, if it is,
             // then it's considered outside the bounds
@@ -728,7 +732,7 @@ function ViewObject()
             // otherwise considered within the frustum planes
 
         return(true);
-    };
+    }
     
 }
     

@@ -1,92 +1,92 @@
-"use strict";
-
 //
 // map shader object
 //
 
-function MapShaderObject()
+class MapShader extends Shader
 {
-    this.shader=null;
+    constructor()
+    {
+        super();
+        
+        this.vertexPositionAttribute=null;
+        this.vertexNormalAttribute=null;
+        this.vertexTangentAttribute=null;    
+        this.vertexAndLightmapUVAttribute=null;
 
-    this.vertexPositionAttribute=null;
-    this.vertexNormalAttribute=null;
-    this.vertexTangentAttribute=null;    
-    this.vertexAndLightmapUVAttribute=null;
+        this.perspectiveMatrixUniform=null;
+        this.modelMatrixUniform=null;
+        this.normalMatrixUniform=null;
 
-    this.perspectiveMatrixUniform=null;
-    this.modelMatrixUniform=null;
-    this.normalMatrixUniform=null;
+        this.shineFactorUniform=null;
+        this.ambientUniform=null;
 
-    this.shineFactorUniform=null;
-    this.ambientUniform=null;
-
-    this.lights=[];
-
+        this.lights=[];
+    }
+    
         //
         // initialize/release map shader
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
             // get a new shader object
             // and load/compile it
 
-        this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'map')) return(false);
+        if (!super.initialize(view,'map')) return(false);
 
             // setup uniforms
 
         var gl=view.gl;
 
-        gl.useProgram(this.shader.program);
+        gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=gl.getAttribLocation(this.shader.program,'vertexPosition');
-        this.vertexNormalAttribute=gl.getAttribLocation(this.shader.program,'vertexNormal');
-        this.vertexTangentAttribute=gl.getAttribLocation(this.shader.program,'vertexTangent');    
-        this.vertexAndLightmapUVAttribute=gl.getAttribLocation(this.shader.program,'vertexAndLightmapUV');
+        this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexNormalAttribute=gl.getAttribLocation(this.program,'vertexNormal');
+        this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');    
+        this.vertexAndLightmapUVAttribute=gl.getAttribLocation(this.program,'vertexAndLightmapUV');
 
-        this.perspectiveMatrixUniform=gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
-        this.modelMatrixUniform=gl.getUniformLocation(this.shader.program,'modelMatrix');
-        this.normalMatrixUniform=gl.getUniformLocation(this.shader.program,'normalMatrix');
+        this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
+        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
+        this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
 
-        this.shineFactorUniform=gl.getUniformLocation(this.shader.program,'shineFactor');    
-        this.ambientUniform=gl.getUniformLocation(this.shader.program,'ambient');
+        this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');    
+        this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
 
         var n,name;
 
         for (n=0;n!==view.LIGHT_COUNT;n++) {
-            this.lights.push(new ShaderLightObject());
+            this.lights.push(new ShaderLight());
 
             name='light_'+n;
-            this.lights[n].positionUniform=gl.getUniformLocation(this.shader.program,name+'.position');
-            this.lights[n].colorUniform=gl.getUniformLocation(this.shader.program,name+'.color');
-            this.lights[n].intensityUniform=gl.getUniformLocation(this.shader.program,name+'.intensity');
-            this.lights[n].invertIntensityUniform=gl.getUniformLocation(this.shader.program,name+'.invertIntensity');
-            this.lights[n].exponentUniform=gl.getUniformLocation(this.shader.program,name+'.exponent');
+            this.lights[n].positionUniform=gl.getUniformLocation(this.program,name+'.position');
+            this.lights[n].colorUniform=gl.getUniformLocation(this.program,name+'.color');
+            this.lights[n].intensityUniform=gl.getUniformLocation(this.program,name+'.intensity');
+            this.lights[n].invertIntensityUniform=gl.getUniformLocation(this.program,name+'.invertIntensity');
+            this.lights[n].exponentUniform=gl.getUniformLocation(this.program,name+'.exponent');
         }
 
             // these uniforms are always the same
 
-        gl.uniform1i(gl.getUniformLocation(this.shader.program,'baseTex'),0);
-        gl.uniform1i(gl.getUniformLocation(this.shader.program,'normalTex'),1);
-        gl.uniform1i(gl.getUniformLocation(this.shader.program,'specularTex'),2);
-        gl.uniform1i(gl.getUniformLocation(this.shader.program,'lightmapTex'),3);
+        gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
+        gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
+        gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
+        gl.uniform1i(gl.getUniformLocation(this.program,'lightmapTex'),3);
 
         gl.useProgram(null);
 
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
-        this.shader.release(view);
-    };
+        super.release(view);
+    }
 
         //
         // start/stop map shader drawing
         //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
         var n;
         var light,viewLight;
@@ -95,7 +95,7 @@ function MapShaderObject()
 
         var gl=view.gl;
 
-        gl.useProgram(this.shader.program);
+        gl.useProgram(this.program);
 
             // matrix
 
@@ -147,9 +147,9 @@ function MapShaderObject()
         gl.enableVertexAttribArray(this.vertexNormalAttribute);
         gl.enableVertexAttribArray(this.vertexTangentAttribute);
         gl.enableVertexAttribArray(this.vertexAndLightmapUVAttribute);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         var gl=view.gl;
 
@@ -163,6 +163,6 @@ function MapShaderObject()
             // no longer using shader
 
         gl.useProgram(null);
-    };
+    }
 
 }

@@ -1,46 +1,49 @@
-"use strict";
-
 //
 // particle class
 //
 
-function ParticleObject()
+class Particle
 {
-        // variables
+    constructor()
+    {
+        this.radiusStart=0;
+        this.radiusEnd=0;
+
+        this.movement=0.0;
+
+        this.colorStart=new wsColor(0,0,0);
+        this.colorEnd=new wsColor(0,0,0);
+
+        this.alphaStart=0.0;
+        this.alphaEnd=0.0;
+
+        this.startTimeStamp=0;
+        this.endTimeStamp=0;
+        this.lifeTime=0;
+
+        this.noDepthTest=false;
+
+        this.centerPt=new wsPoint(0,0,0);
+
+        this.count=0;
+        this.points=[];
+
+        this.topLeft=new wsPoint(0,0,0);            // global variables so we don't GC
+        this.topRight=new wsPoint(0,0,0);
+        this.bottomLeft=new wsPoint(0,0,0);
+        this.bottomRight=new wsPoint(0,0,0);
+
+        this.randomRot=new wsPoint(0.0,0.0,0.0);
+
+        this.vertices=new Float32Array((PARTICLE_MAX_POINTS*4)*3);
+        this.indexes=new Uint16Array((PARTICLE_MAX_POINTS*2)*3);
+    }
     
-    this.radiusStart=0;
-    this.radiusEnd=0;
-    
-    this.movement=0.0;
-    
-    this.colorStart=new wsColor(0,0,0);
-    this.colorEnd=new wsColor(0,0,0);
-    
-    this.alphaStart=0.0;
-    this.alphaEnd=0.0;
-    
-    this.startTimeStamp=0;
-    this.endTimeStamp=0;
-    this.lifeTime=0;
-    
-    this.noDepthTest=false;
-    
-    this.centerPt=new wsPoint(0,0,0);
-    
-    this.count=0;
-    this.points=[];
-    
-    this.topLeft=new wsPoint(0,0,0);            // global variables so we don't GC
-    this.topRight=new wsPoint(0,0,0);
-    this.bottomLeft=new wsPoint(0,0,0);
-    this.bottomRight=new wsPoint(0,0,0);
-    
-    this.randomRot=new wsPoint(0.0,0.0,0.0);
-    
-    this.vertices=new Float32Array((PARTICLE_MAX_POINTS*4)*3);
-    this.indexes=new Uint16Array((PARTICLE_MAX_POINTS*2)*3);
-    
-    this.initialize=function(view)
+        //
+        // initialize and release particle
+        //
+        
+    initialize(view)
     {
         for (var n=0;n!==PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
             this.points.push(new wsPoint(0,0,0));
@@ -48,94 +51,94 @@ function ParticleObject()
 
         this.vertexPosBuffer=view.gl.createBuffer();
         this.indexBuffer=view.gl.createBuffer();
-    };
+    }
     
-    this.release=function(view)
+    release(view)
     {
         this.points=[];
 
         view.gl.deleteBuffer(this.vertexPosBuffer);
         view.gl.deleteBuffer(this.indexBuffer);
-    };
+    }
     
         //
         // determine free particles
         //
         
-    this.isFree=function()
+    isFree()
     {
         return(this.count===0);
-    };
+    }
     
-    this.timeout=function(view)
+    timeout(view)
     {
         if (view.timeStamp>this.endTimeStamp) this.count=0;
-    };
+    }
     
         //
         // setup
         //
         
-    this.setRadius=function(radiusStart,radiusEnd)
+    setRadius(radiusStart,radiusEnd)
     {
         this.radiusStart=radiusStart;
         this.radiusEnd=radiusEnd;
-    };
+    }
     
-    this.setMovement=function(movement)
+    setMovement(movement)
     {
         this.movement=movement;
-    };
+    }
     
-    this.setCenterPointFromPoint=function(pt)
+    setCenterPointFromPoint(pt)
     {
         this.centerPt.setFromPoint(pt);
-    };
+    }
 
-    this.setColor=function(colorStartR,colorStartG,colorStartB,colorEndR,colorEndG,colorEndB)
+    setColor(colorStartR,colorStartG,colorStartB,colorEndR,colorEndG,colorEndB)
     {
         this.colorStart.set(colorStartR,colorStartG,colorStartB);
         this.colorEnd.set(colorEndR,colorEndG,colorEndB);
-    };
+    }
     
-    this.setAlpha=function(alphaStart,alphaEnd)
+    setAlpha(alphaStart,alphaEnd)
     {
         this.alphaStart=alphaStart;
         this.alphaEnd=alphaEnd;
-    };
+    }
     
-    this.setTiming=function(timeStamp,lifeTime)
+    setTiming(timeStamp,lifeTime)
     {
         this.startTimeStamp=timeStamp;
         this.lifeTime=lifeTime;
         this.endTimeStamp=timeStamp+lifeTime;
-    };
+    }
     
-    this.setNoDepthTest=function(noDepthTest)
+    setNoDepthTest(noDepthTest)
     {
         this.noDepthTest=noDepthTest;
-    };
+    }
     
-    this.setCount=function(count)
+    setCount(count)
     {
         this.count=count;
-    };
+    }
     
-    this.getPoint=function(pointIdx)
+    getPoint(pointIdx)
     {
         return(this.points[pointIdx]);
-    };
+    }
     
-    this.setPoint=function(pointIdx,x,y,z)
+    setPoint(pointIdx,x,y,z)
     {
         this.points[pointIdx].set(x,y,z);
-    };
+    }
     
         //
         // point utilities
         //
         
-    this.createRandomGlobePoints=function(view,pointCount)
+    createRandomGlobePoints(view,pointCount)
     {
         var n,pnt;
         
@@ -148,13 +151,13 @@ function ParticleObject()
         }
         
         this.count=pointCount;
-    };
+    }
 
         //
         // draw single particle effect
         //
 
-    this.draw=function(view,particleShader)
+    draw(view,particleShader)
     {
         var n,pnt,vIdx,iIdx,elementIdx;
         var timeFactor,radius,moveFactor,r,g,b,alpha;
@@ -265,6 +268,6 @@ function ParticleObject()
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
-    };
+    }
 
 }

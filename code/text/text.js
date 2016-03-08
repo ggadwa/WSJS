@@ -1,35 +1,34 @@
-"use strict";
-
 //
 // text class
 //
 
-function TextObject()
+class Text
 {
-        // variables
-        
-    this.textShader=new TextShaderObject();
-    this.fontTexture=null;
-    
-    this.fontCharWids=new Array(128);
-    
-    this.shadowColor=new wsColor(0.0,0.0,0.0);
-    
-        // drawing objects
-        
-    this.vertices=null;
-    this.uvs=null;
-    this.indexes=null;
-    
-    this.vertexPosBuffer=null;
-    this.uvPosBuffer=null;
-    this.indexBuffer=null;
+    constructor()
+    {    
+        this.textShader=new TextShader();
+        this.fontTexture=null;
 
+        this.fontCharWids=new Array(128);
+
+        this.shadowColor=new wsColor(0.0,0.0,0.0);
+
+            // drawing objects
+
+        this.vertices=null;
+        this.uvs=null;
+        this.indexes=null;
+
+        this.vertexPosBuffer=null;
+        this.uvPosBuffer=null;
+        this.indexBuffer=null;
+    }
+    
         //
         // initialize/release text
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
         var x,y,yAdd,cIdx,charStr,ch;
 
@@ -101,9 +100,9 @@ function TextObject()
         this.indexBuffer=gl.createBuffer();
 
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         var gl=view.gl;
         
@@ -122,13 +121,13 @@ function TextObject()
 
         this.textShader.release(view);
         gl.deleteTexture(this.fontTexture);
-    };
+    }
     
         //
         // string lengths
         //
         
-    this.getStringDrawWidth=function(charWid,str)
+    getStringDrawWidth(charWid,str)
     {
         var n,cIdx;
         var wid=0;
@@ -145,13 +144,13 @@ function TextObject()
         }
         
         return(wid);
-    };
+    }
 
         //
         // start/stop/draw text
         //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
         var gl=view.gl;
 
@@ -161,9 +160,9 @@ function TextObject()
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
         this.textShader.drawStart(view);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         var gl=view.gl;
 
@@ -171,9 +170,9 @@ function TextObject()
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
-    };
+    }
 
-    this.draw=function(view,x,y,charWid,charHigh,str,align,color)
+    draw(view,x,y,charWid,charHigh,str,align,color)
     {
         var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
         var cIdx,gx,gy,gxAdd,gyAdd;
@@ -289,13 +288,13 @@ function TextObject()
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
-    };
+    }
     
-    this.drawWithShadow=function(view,x,y,charWid,charHigh,str,align,color)
+    drawWithShadow(view,x,y,charWid,charHigh,str,align,color)
     {
         this.draw(view,(x+1),(y+1),charWid,charHigh,str,align,this.shadowColor);
         this.draw(view,x,y,charWid,charHigh,str,align,color);
-    };
+    }
 
 
 }

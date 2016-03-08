@@ -1,62 +1,59 @@
-"use strict";
-
 //
 // debug shader class
 //
 
-function DebugShaderObject()
+class DebugShader extends Shader
 {
-    this.shader=null;
-
-    this.vertexPositionAttribute=null;
-
-    this.perspectiveMatrixUniform=null;
-    this.modelMatrixUniform=null;
+    constructor()
+    {
+        super();
+        this.vertexPositionAttribute=null;
+        this.perspectiveMatrixUniform=null;
+        this.modelMatrixUniform=null;
+        this.colorUniform=null;
+    }
     
-    this.colorUniform=null;
-
         //
         // initialize/release debug shader
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
             // get a new shader object
             // and load/compile it
 
-        this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'debug')) return(false);
+        if (!super.initialize(view,'debug')) return(false);
 
             // setup uniforms
 
-        view.gl.useProgram(this.shader.program);
+        view.gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.shader.program,'vertexPosition');
+        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
 
-        this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
-        this.modelMatrixUniform=view.gl.getUniformLocation(this.shader.program,'modelMatrix');
+        this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.program,'perspectiveMatrix');
+        this.modelMatrixUniform=view.gl.getUniformLocation(this.program,'modelMatrix');
         
-        this.colorUniform=view.gl.getUniformLocation(this.shader.program,'color');
+        this.colorUniform=view.gl.getUniformLocation(this.program,'color');
 
         view.gl.useProgram(null);
 
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
-        this.shader.release(view);
-    };
+        super.release(view);
+    }
 
         //
         // start/stop debug drawing
         //
 
-    this.drawStart=function(view,color)
+    drawStart(view,color)
     {
             // using the map shader
 
-        view.gl.useProgram(this.shader.program);
+        view.gl.useProgram(this.program);
 
             // matrix
 
@@ -70,9 +67,9 @@ function DebugShaderObject()
             // enable the vertex attributes
 
         view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
             // disable vertex attributes
 
@@ -81,6 +78,6 @@ function DebugShaderObject()
             // no longer using shader
 
         view.gl.useProgram(null);
-    };
+    }
 }
 

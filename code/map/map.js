@@ -8,7 +8,7 @@ function MapObject()
 {
         // map items
         
-    this.mapShader=new MapShaderObject();
+    this.mapShader=new MapShader();
     
     this.meshes=[];
     this.lights=[];

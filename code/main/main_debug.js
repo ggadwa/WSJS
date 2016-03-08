@@ -97,7 +97,7 @@ function debugInit()
         // the sounds
         // need to create soundlist for audio sample rates
         
-    debugSoundList=new SoundListObject();
+    debugSoundList=new SoundList();
     if (!debugSoundList.initialize()) return;
 
     nSound=GEN_SOUND_TYPE_NAMES.length;

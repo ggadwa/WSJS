@@ -7,7 +7,7 @@
 function ModelListObject()
 {
     this.models=[];
-    this.modelShader=new ModelShaderObject();
+    this.modelShader=new ModelShader();
     
         //
         // initialize/release modelList

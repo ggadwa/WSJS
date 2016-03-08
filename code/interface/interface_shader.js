@@ -1,56 +1,54 @@
-"use strict";
-
 //
 // interface shader class
 //
 
-function InterfaceShaderObject()
+class InterfaceShader extends Shader
 {
-    this.shader=null;
+    constructor()
+    {
+        super();
+        this.vertexPositionAttribute=null;
+        this.orthoMatrixUniform=null;
+        this.colorUniform=null;
+    }
+    
+        //
+        // initialize/release interface shader
+        //
 
-    this.vertexPositionAttribute=null;
-
-    this.orthoMatrixUniform=null;
-    this.colorUniform=null;
-
-    //
-    // initialize/release interface shader
-    //
-
-    this.initialize=function(view)
+    initialize(view)
     {
             // get a new shader object
             // and load/compile it
 
-        this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'interface')) return(false);
+        if (!super.initialize(view,'interface')) return(false);
 
             // setup uniforms
 
-        view.gl.useProgram(this.shader.program);
+        view.gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.shader.program,'vertexPosition');
+        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
 
-        this.orthoMatrixUniform=view.gl.getUniformLocation(this.shader.program,'orthoMatrix');    
-        this.colorUniform=view.gl.getUniformLocation(this.shader.program,'color');
+        this.orthoMatrixUniform=view.gl.getUniformLocation(this.program,'orthoMatrix');    
+        this.colorUniform=view.gl.getUniformLocation(this.program,'color');
 
         view.gl.useProgram(null);
 
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
-        this.shader.release(view);
-    };
+        super.release(view);
+    }
 
-    //
-    // start/stop interface shader drawing
-    //
+        //
+        // start/stop interface shader drawing
+        //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
-        view.gl.useProgram(this.shader.program);
+        view.gl.useProgram(this.program);
 
             // setup the uniforms
 
@@ -59,9 +57,9 @@ function InterfaceShaderObject()
             // enable the vertex attributes
 
         view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
             // disable vertex attributes
 
@@ -70,6 +68,6 @@ function InterfaceShaderObject()
             // no longer using program
 
         view.gl.useProgram(null);
-    };
+    }
 
 }

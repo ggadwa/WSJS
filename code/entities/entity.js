@@ -1,129 +1,77 @@
-"use strict";
-
 //
 // entity base class
 //
 
-function EntityObject(name,position,angle,radius,high,model)
+class Entity
 {
-    this.name=name;
-    this.position=position;
-    this.angle=angle;
-    this.radius=radius;
-    this.high=high;
-    this.model=model;
-    
-    this.id=-1;
-    
-    this.turnSpeed=0;
-    this.lookSpeed=0;
-    this.forwardSpeed=0;
-    this.sideSpeed=0;
-    this.verticalSpeed=0;
-    this.fallSpeed=0;
-    this.gravity=0;
-    
-    this.markedForDeletion=false;              // used to delete this outside the run loop
-    
-    this.touchEntity=null;
-    
-    this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
-    this.slidePt=new wsPoint(0,0,0);
-    this.collideMovePt=new wsPoint(0,0,0);
-    this.collideSlideMovePt=new wsPoint(0,0,0);
-    
-    this.xFrustumBound=new wsBound(0,0);
-    this.yFrustumBound=new wsBound(0,0);
-    this.zFrustumBound=new wsBound(0,0);
+    constructor(name,position,angle,radius,high,model)
+    {
+        this.name=name;
+        this.position=position;
+        this.angle=angle;
+        this.radius=radius;
+        this.high=high;
+        this.model=model;
 
-    this.collision=new CollisionObject();
-    
-        //
-        // getters -- supergumba -- replace these with real getters!
-        //
-    
-    this.getName=function()
-    {
-        return(this.name);
-    };
-    
-    this.getModel=function()
-    {
-        return(this.model);
-    };
-        
-    this.getPosition=function()
-    {
-        return(this.position);
-    };
-    
-    this.getAngle=function()
-    {
-        return(this.angle);
-    };
-    
-    this.getRadius=function()
-    {
-        return(this.radius);
-    };
-    
-    this.getHigh=function()
-    {
-        return(this.high);
-    };
-    
-        //
-        // IDs
-        //
-        
-    this.setId=function(id)
-    {
-        this.id=id;
-    };
-    
-    this.getId=function()
-    {
-        return(this.id);
-    };
+        this.id=-1;
+
+        this.fallSpeed=0;
+        this.gravity=0;
+
+        this.markedForDeletion=false;              // used to delete this outside the run loop
+
+        this.touchEntity=null;
+
+        this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
+        this.slidePt=new wsPoint(0,0,0);
+        this.collideMovePt=new wsPoint(0,0,0);
+        this.collideSlideMovePt=new wsPoint(0,0,0);
+
+        this.xFrustumBound=new wsBound(0,0);
+        this.yFrustumBound=new wsBound(0,0);
+        this.zFrustumBound=new wsBound(0,0);
+
+        this.collision=new Collision();
+    }
     
         //
         // deleting
         //
         
-    this.markAsDelete=function()
+    markAsDelete()
     {
         this.markedForDeletion=true;
-    };
+    }
     
-    this.isMarkedForDeletion=function()
+    isMarkedForDeletion()
     {
         return(this.markedForDeletion);
-    };
+    }
     
         //
         // touching
         //
         
-    this.clearTouchEntity=function()
+    clearTouchEntity()
     {
         this.touchEntity=null;
-    };
+    }
     
-    this.setTouchEntity=function(entity)
+    setTouchEntity(entity)
     {
         this.touchEntity=entity;
-    };
+    }
     
-    this.getTouchEntity=function()
+    getTouchEntity()
     {
         return(this.touchEntity);
-    };
+    }
     
         //
         // move entity
         //
     
-    this.moveComplex=function(map,entityList,dist,extraAngle,bump,flying,clipping)
+    moveComplex(map,entityList,dist,extraAngle,bump,flying,clipping)
     {
         var angY=this.angle.y+extraAngle;
         
@@ -180,30 +128,30 @@ function EntityObject(name,position,angle,radius,high,model)
             // the original collide point
             
         this.position.addPoint(this.collideMovePt);
-    };
+    }
     
-    this.moveSimple=function(map,entityList,dist,bump)
+    moveSimple(map,entityList,dist,bump)
     {
         this.movePt.set(0.0,0.0,dist);
-        this.movePt.rotateY(null,angle.y);
+        this.movePt.rotateY(null,this.angle.y);
             
         this.collision.moveObjectInMap(map,entityList,this,this.movePt,bump,this.collideMovePt);
         if (!this.collideMovePt.equals(this.movePt)) return(true);
         
         this.position.addPoint(this.collideMovePt);
         return(false);
-    };
+    }
     
-    this.moveDirect=function(x,y,z)
+    moveDirect(x,y,z)
     {
         this.position.move(x,y,z);
-    };
+    }
     
         //
         // falling
         //
         
-    this.fall=function()
+    fall()
     {        
         this.fallSpeed+=this.gravity;
         this.gravity+=2;
@@ -226,25 +174,25 @@ function EntityObject(name,position,angle,radius,high,model)
         else {
             this.position.move(0,yChange,0);
         }
-    };
+    }
     
-    this.isFalling=function()
+    isFalling()
     {
         return(this.fallSpeed>0);
-    };
+    }
     
         //
         // turn (y angle)
         //
 
-    this.turn=function(addAngle)
+    turn(addAngle)
     {
         this.angle.y+=addAngle;
         if (this.angle.y<0.0) this.angle.y+=360.0;
         if (this.angle.y>=360.00) this.angle.y-=360.0;
-    };
+    }
     
-    this.turnTowards=function(toY,speed)
+    turnTowards(toY,speed)
     {
         var subway,addway;
         
@@ -271,55 +219,55 @@ function EntityObject(name,position,angle,radius,high,model)
             if (addway>speed) addway=speed;
             this.turn(addway);
         }
-    };
+    }
     
         //
         // look (x angle)
         //
 
-    this.look=function(addAngle)
+    look(addAngle)
     {
         this.angle.x+=addAngle;
         if (this.angle.x<-80.0) this.angle.x=-80.0;
         if (this.angle.x>=80.0) this.angle.x=80.0;
-    };
+    }
     
         //
         // run entity
         //
         
-    this.run=function(view,soundList,map,entityList)
+    run(view,soundList,map,entityList)
     {
-    };
+    }
     
         //
         // frustum checks
         //
         
-    this.inFrustum=function(view)
+    inFrustum(view)
     {
         this.xFrustumBound.set((this.position.x-this.radius),(this.position.x+this.radius));
         this.yFrustumBound.set(this.position.y,(this.position.y-this.high));
         this.zFrustumBound.set((this.position.z-this.radius),(this.position.z+this.radius));
 
         return(view.boundBoxInFrustum(this.xFrustumBound,this.yFrustumBound,this.zFrustumBound));
-    };
+    }
     
         //
         // draw entity
         //
         
-    this.drawStart=function(view)
+    drawStart(view)
     {
         this.model.drawStart(view);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         this.model.drawEnd(view);
-    };
+    }
 
-    this.draw=function(view)
+    draw(view)
     {
             // either update skeleton and create
             // vertices or just move to current position
@@ -336,7 +284,7 @@ function EntityObject(name,position,angle,radius,high,model)
             // draw the model
             
         this.model.draw(view);
-    };
+    }
     
     
 }

@@ -1,17 +1,22 @@
-"use strict";
-
 //
 // sound list class
 //
 
-function SoundListObject()
+class SoundList
 {
-    this.ctx=null;
-    this.sounds=null;
+    constructor()
+    {
+        this.ctx=null;
+        this.sounds=null;
+
+        this.listenerForwardVector=new wsPoint(0.0,0.0,1.0);            // local to global to avoid GC
+    }
     
-    this.listenerForwardVector=new wsPoint(0.0,0.0,1.0);            // local to global to avoid GC
-    
-    this.initialize=function()
+        //
+        // initialize and release list
+        //
+        
+    initialize()
     {
         var initAudioContext=window.AudioContext||window.webkitAudioContext;
         this.ctx=new initAudioContext();
@@ -19,9 +24,9 @@ function SoundListObject()
         this.sounds=[];
         
         return(true);
-    };
+    }
     
-    this.release=function()
+    release()
     {
         var n;
         var nSound=this.sounds.length;
@@ -29,32 +34,40 @@ function SoundListObject()
         for (n=0;n!==nSound;n++) {
             this.sounds[n].close();
         }
-    };
+    }
     
-    this.getAudioContext=function()
+        //
+        // various getters and setup
+        //
+        
+    getAudioContext()
     {
         return(this.ctx);
-    };
+    }
     
-    this.setListenerToEntity=function(entity)
+    setListenerToEntity(entity)
     {
             // supergumba -- all this has to be replace with spatialListener
-        var pos=entity.getPosition();
-        var ang=entity.getAngle();
+        var pos=entity.position;
+        var ang=entity.angle;
         
         this.listenerForwardVector.set(0.0,0.0,1.0);
         this.listenerForwardVector.rotateY(null,ang.y);
         
         //this.ctx.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0.0,1.0,0.0);
         this.ctx.wsTempPosition=pos;       // supergumba -- temporary for now
-    };
+    }
     
-    this.add=function(sound)
+        //
+        // add and get sounds in list
+        //
+        
+    add(sound)
     {
         this.sounds.push(sound);
-    };
+    }
     
-    this.get=function(name)
+    get(name)
     {
         var n;
         var nSound=this.sounds.length;
@@ -64,7 +77,7 @@ function SoundListObject()
         }
         
         return(null);
-    };
+    }
     
 
 }

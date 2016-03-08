@@ -1,26 +1,27 @@
-"use strict";
-
 //
 // sound class
 //
 
-function SoundObject(name,ctx,buffer,maxDistance)
+class Sound
 {
-    this.name=name;
-    this.ctx=ctx;
-    this.buffer=buffer;
-    this.maxDistance=maxDistance;
+    constructor(name,ctx,buffer,maxDistance)
+    {
+        this.name=name;
+        this.ctx=ctx;
+        this.buffer=buffer;
+        this.maxDistance=maxDistance;
+    }
     
-    this.close=function()
+    close()
     {
         this.buffer=null;
-    };
+    }
     
         //
         // play a sound with distance attenuation and panning
         //
         
-    this.play=function(soundPos)
+    play(soundPos)
     {
             // skip if over max
             
@@ -44,13 +45,13 @@ function SoundObject(name,ctx,buffer,maxDistance)
         gainNode.connect(this.ctx.destination);
         
         source.start();
-    };
+    }
     
         //
         // simple sound play with no change
         //
         
-    this.playSimple=function()
+    playSimple()
     {
         var source=this.ctx.createBufferSource();
         source.buffer=this.buffer;
@@ -62,6 +63,6 @@ function SoundObject(name,ctx,buffer,maxDistance)
         gainNode.connect(this.ctx.destination);
         
         source.start();
-    };
+    }
 
 }

@@ -1,20 +1,21 @@
-"use strict";
-
 //
 // particle list class
 //
 
-function ParticleListObject()
+class ParticleList
 {
-    this.particleShader=new ParticleShaderObject();
-    
-    this.particles=[];
+    constructor()
+    {
+        this.particleShader=new ParticleShader();
+
+        this.particles=[];
+    }
     
         //
-        // initialize/release entityList
+        // initialize/release particle list
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
         var n,particle;
 
@@ -27,15 +28,15 @@ function ParticleListObject()
         this.particles=[];
         
         for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
-            particle=new ParticleObject();
+            particle=new Particle();
             particle.initialize(view);
             this.particles.push(particle);
         }
         
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         var n;
         
@@ -44,23 +45,23 @@ function ParticleListObject()
         }
         
         this.particleShader.release(view);
-    };
+    }
 
         //
         // particle list
         //
 
-    this.count=function()
+    count()
     {
         return(PARTICLE_MAX_COUNT);
-    };
+    }
 
-    this.get=function(particleIdx)
+    get(particleIdx)
     {
         return(this.particles[particleIdx]);
-    };
+    }
     
-    this.getFree=function()
+    getFree()
     {
         var n;
         
@@ -69,13 +70,13 @@ function ParticleListObject()
         }
         
         return(null);
-    };
+    }
     
         //
         // some particle types
         //
         
-    this.addExplosionParticles=function(view,centerPt)
+    addExplosionParticles(view,centerPt)
     {
         var particle;
         
@@ -117,13 +118,13 @@ function ParticleListObject()
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,1.0,0.0,0.7,0.7,0.0);
         particle.setTiming(view.timeStamp,1500);
-    };
+    }
     
         //
         // draw all particles
         //
         
-    this.draw=function(view)
+    draw(view)
     {
         var n,needDraw;
         var gl=view.gl;
@@ -163,7 +164,7 @@ function ParticleListObject()
         gl.disable(gl.BLEND);
         
         this.particleShader.drawEnd(view);
-    };
+    }
 
 }
     

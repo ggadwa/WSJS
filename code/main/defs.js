@@ -1,126 +1,100 @@
-"use strict";
+//
+// utility classes
+//
 
-/* class testing
-class Point {
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.yup=1.2345;
-        }
-        toString() {
-            return '(' + this.x + ', ' + this.y + ')';
-        }
-        static get staticYup()
-        {
-            return('static yup');
-        }
+class wsPoint
+{
+    constructor(x,y,z)
+    {
+        this.x=x;
+        this.y=y;
+        this.z=z;
     }
     
-    var testPt=new Point(5,6);
-    var testPt2=new Point(1,2);
-    console.log(testPt.toString());
-    console.log(testPt.x);  // shouldn't be legal
-    console.log(testPt.yup);
-    testPt.yup=5.4321;
-    console.log(testPt.yup);
-    console.log(testPt2.yup);
-    console.log(Point.staticYup);
-*/
- 
-//
-// points and rects objects
-//
-
-function wsPoint(x,y,z)
-{
-    this.x=x;
-    this.y=y;
-    this.z=z;
-    
-    this.set=function(xSet,ySet,zSet)
+    set(xSet,ySet,zSet)
     {
         this.x=xSet;
         this.y=ySet;
         this.z=zSet;
-    };
+    }
     
-    this.setFromPoint=function(pt)
+    setFromPoint(pt)
     {
         this.x=pt.x;
         this.y=pt.y;
         this.z=pt.z;
-    };
+    }
     
-    this.setFromAddPoint=function(pt1,pt2)
+    setFromAddPoint(pt1,pt2)
     {
         this.x=pt1.x+pt2.x;
         this.y=pt1.y+pt2.y;
         this.z=pt1.z+pt2.z;
-    };
+    }
     
-    this.setFromSubPoint=function(pt1,pt2)
+    setFromSubPoint(pt1,pt2)
     {
         this.x=pt1.x-pt2.x;
         this.y=pt1.y-pt2.y;
         this.z=pt1.z-pt2.z;
-    };
+    }
     
-    this.setFromCross=function(pt1,pt2)
+    setFromCross(pt1,pt2)
     {
         this.x=pt1.x;
         this.y=pt1.y;
         this.z=pt1.z;
         this.cross(pt2);
-    };
+    }
     
-    this.setFromScale=function(pt,f)
+    setFromScale(pt,f)
     {
         this.x=pt.x*f;
         this.y=pt.y*f;
         this.z=pt.z*f;
-    };
+    }
     
-    this.move=function(xAdd,yAdd,zAdd)
+    move(xAdd,yAdd,zAdd)
     {
         this.x+=xAdd;
         this.y+=yAdd;
         this.z+=zAdd;
-    };
+    }
     
-    this.addPoint=function(pt)
+    addPoint(pt)
     {
         this.x+=pt.x;
         this.y+=pt.y;
         this.z+=pt.z;
-    };
+    }
     
-    this.subPoint=function(pt)
+    subPoint(pt)
     {
         this.x-=pt.x;
         this.y-=pt.y;
         this.z-=pt.z;
-    };
+    }
     
-    this.tween=function(pt1,pt2,factor)
+    tween(pt1,pt2,factor)
     {
         this.x=pt1.x+(pt2.x-pt1.x)*factor;
         this.y=pt1.y+(pt2.y-pt1.y)*factor;
         this.z=pt1.z+(pt2.z-pt1.z)*factor;
-    };
+    }
     
-    this.average=function(pt)
+    average(pt)
     {
         this.x=(this.x+pt.x)*0.5;
         this.y=(this.y+pt.y)*0.5;
         this.z=(this.z+pt.z)*0.5;
-    };
+    }
     
-    this.equals=function(pt)
+    equals(pt)
     {
         return((this.x===pt.x)&&(this.y===pt.y)&&(this.z===pt.z));
-    };
+    }
     
-    this.rotateX=function(centerPt,rotX)
+    rotateX(centerPt,rotX)
     {
         if (centerPt!==null) {
             this.y-=centerPt.y;
@@ -141,9 +115,9 @@ function wsPoint(x,y,z)
         
         this.y=y;
         this.z=z;
-    };
+    }
     
-    this.rotateY=function(centerPt,rotY)
+    rotateY(centerPt,rotY)
     {
         if (centerPt!==null) {
             this.x-=centerPt.x;
@@ -164,9 +138,9 @@ function wsPoint(x,y,z)
         
         this.x=x;
         this.z=z;
-    };
+    }
     
-    this.rotateZ=function(centerPt,rotZ)
+    rotateZ(centerPt,rotZ)
     {
         if (centerPt!==null) {
             this.x-=centerPt.x;
@@ -187,9 +161,9 @@ function wsPoint(x,y,z)
         
         this.x=x;
         this.y=y;
-    };
+    }
     
-    this.rotate=function(ang)
+    rotate(ang)
     {
         var rd,sn,cs,x,y,z;
         
@@ -234,9 +208,9 @@ function wsPoint(x,y,z)
             this.x=x;
             this.y=y;
         }
-    };
+    }
       
-    this.rotateAroundPoint=function(centerPt,ang)
+    rotateAroundPoint(centerPt,ang)
     {
         if (centerPt!==null) {
             this.x-=centerPt.x;
@@ -293,35 +267,35 @@ function wsPoint(x,y,z)
             this.y+=centerPt.y;
             this.z+=centerPt.z;
         }
-    };
+    }
                 
-    this.noSquareDistance=function(pt)
+    noSquareDistance(pt)
     {
         var px=this.x-pt.x;
         var py=this.y-pt.y;
         var pz=this.z-pt.z;
         return((px*px)+(py*py)+(pz*pz));
-    };
+    }
                 
-    this.noSquareDistanceByTriplet=function(kx,ky,kz)
+    noSquareDistanceByTriplet(kx,ky,kz)
     {
         var px=this.x-kx;
         var py=this.y-ky;
         var pz=this.z-kz;
         return((px*px)+(py*py)+(pz*pz));
-    };
+    }
     
-    this.distance=function(pt)
+    distance(pt)
     {
         return(Math.sqrt(this.noSquareDistance(pt)));
-    };
+    }
                 
-    this.distanceByTriplet=function(kx,ky,kz)
+    distanceByTriplet(kx,ky,kz)
     {
         return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
-    };
+    }
     
-    this.normalize=function()
+    normalize()
     {
         var f=Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z));
         if (f!==0.0) f=1.0/f;
@@ -329,14 +303,14 @@ function wsPoint(x,y,z)
         this.x*=f;
         this.y*=f;
         this.z*=f;
-    };
+    }
     
-    this.dot=function(pt)
+    dot(pt)
     {
         return((this.x*pt.x)+(this.y*pt.y)+(this.z*pt.z));
-    };
+    }
 
-    this.cross=function(pt)
+    cross(pt)
     {
         var x=(this.y*pt.z)-(this.z*pt.y);
         var y=(this.z*pt.x)-(this.x*pt.z);
@@ -344,23 +318,23 @@ function wsPoint(x,y,z)
         this.x=x;
         this.y=y;
         this.z=z;
-    };
+    }
     
-    this.scale=function(f)
+    scale(f)
     {
         this.x*=f;
         this.y*=f;
         this.z*=f;
-    };
+    }
     
-    this.scaleFromPoint=function(pt)
+    scaleFromPoint(pt)
     {
         this.x*=pt.x;
         this.y*=pt.y;
         this.z*=pt.z;
-    };
+    }
     
-    this.matrixMultiply=function(mat)
+    matrixMultiply(mat)
     {
         var mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8])+mat[12];
         var my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9])+mat[13];
@@ -369,9 +343,9 @@ function wsPoint(x,y,z)
         this.x=mx;
         this.y=my;
         this.z=mz;
-    };
+    }
     
-    this.matrixMultiplyIgnoreTransform=function(mat)
+    matrixMultiplyIgnoreTransform(mat)
     {
         var mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8]);
         var my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9]);
@@ -380,49 +354,52 @@ function wsPoint(x,y,z)
         this.x=mx;
         this.y=my;
         this.z=mz;
-    };
+    }
     
-    this.copy=function()
+    copy()
     {
         return(new wsPoint(this.x,this.y,this.z));
-    };
+    }
 }
 
-function ws2DPoint(x,y)
+class ws2DPoint
 {
-    this.x=x;
-    this.y=y;
+    constructor(x,y)
+    {
+        this.x=x;
+        this.y=y;
+    }
     
-    this.set=function(xSet,ySet)
+    set(xSet,ySet)
     {
         this.x=xSet;
         this.y=ySet;
-    };
+    }
                 
-    this.move=function(xAdd,yAdd)
+    move(xAdd,yAdd)
     {
         this.x+=xAdd;
         this.y+=yAdd;
-    };
+    }
     
-    this.noSquareDistance=function(pt)
+    noSquareDistance(pt)
     {
         var px=this.x-pt.x;
         var py=this.y-pt.y;
         return((px*px)+(py*py));
-    };
+    }
                 
-    this.distance=function(pt)
+    distance(pt)
     {
         return(Math.sqrt(this.noSquareDistance(pt)));
-    };
+    }
     
-    this.equals=function(pt)
+    equals(pt)
     {
         return((this.x===pt.x)&&(this.y===pt.y));
-    };
+    }
     
-    this.rotate=function(centerPt,rot)
+    rotate(centerPt,rot)
     {
         if (centerPt!==null) {
             this.x-=centerPt.x;
@@ -441,49 +418,52 @@ function ws2DPoint(x,y)
         
         this.x=x;
         this.y=y;
-    };
+    }
     
-    this.copy=function()
+    copy()
     {
         return(new ws2DPoint(this.x,this.y));
-    };
+    }
 }
 
-function ws2DIntPoint(x,y)
+class ws2DIntPoint
 {
-    this.x=Math.trunc(x);
-    this.y=Math.trunc(y);
+    constructor(x,y)
+    {
+        this.x=Math.trunc(x);
+        this.y=Math.trunc(y);
+    }
     
-    this.set=function(xSet,ySet)
+    set(xSet,ySet)
     {
         this.x=Math.trunc(xSet);
         this.y=Math.trunc(ySet);
-    };
+    }
                 
-    this.move=function(xAdd,yAdd)
+    move(xAdd,yAdd)
     {
         this.x+=xAdd;
         this.y+=yAdd;
-    };
+    }
     
-    this.noSquareDistance=function(pt)
+    noSquareDistance(pt)
     {
         var px=this.x-pt.x;
         var py=this.y-pt.y;
         return((px*px)+(py*py));
-    };
+    }
                 
-    this.distance=function(pt)
+    distance(pt)
     {
         return(Math.sqrt(this.noSquareDistance(pt)));
-    };
+    }
     
-    this.equals=function(pt)
+    equals(pt)
     {
         return((this.x===pt.x)&&(this.y===pt.y));
-    };
+    }
     
-    this.rotate=function(centerPt,rot)
+    rotate(centerPt,rot)
     {
         if (centerPt!==null) {
             this.x-=centerPt.x;
@@ -502,87 +482,84 @@ function ws2DIntPoint(x,y)
         
         this.x=Math.trunc(x);
         this.y=Math.trunc(y);
-    };
+    }
     
-    this.copy=function()
+    copy()
     {
         return(new ws2DIntPoint(this.x,this.y));
-    };
+    }
 }
 
-function wsLine(p1,p2)
+class wsLine
 {
-    this.p1=p1;
-    this.p2=p2;
-    
-    this.set=function(p1,p2)
+    constructor(p1,p2)
     {
         this.p1=p1;
         this.p2=p2;
-    };
+    }
     
-    this.equals=function(line)
-    {
-        if ((this.p1.equals(line.p1)) && (this.p2.equals(line.p2))) return(true);
-        return((this.p1.equals(line.p2)) && (this.p2.equals(line.p1)));
-    };
-    
-    this.getXBound=function()
-    {
-        return(new wsBound(p1.x,p2.x));
-    };
-    
-    this.getYBound=function()
-    {
-        return(new wsBound(p1.y,p2.y));
-    };
-    
-    this.getZBound=function()
-    {
-        return(new wsBound(p1.z,p2.z));
-    };
-}
-
-function ws2DLine(p1,p2)
-{
-    this.p1=p1;
-    this.p2=p2;
-    
-    this.set=function(p1,p2)
+    set(p1,p2)
     {
         this.p1=p1;
         this.p2=p2;
-    };
+    }
     
-    this.equals=function(line)
+    equals(line)
     {
         if ((this.p1.equals(line.p1)) && (this.p2.equals(line.p2))) return(true);
         return((this.p1.equals(line.p2)) && (this.p2.equals(line.p1)));
-    };
+    }
     
-    this.getXBound=function()
+    getXBound()
     {
-        return(new wsBound(p1.x,p2.x));
-    };
+        return(new wsBound(this.p1.x,this.p2.x));
+    }
     
-    this.getYBound=function()
+    getYBound()
     {
-        return(new wsBound(p1.y,p2.y));
-    };
+        return(new wsBound(this.p1.y,this.p2.y));
+    }
+    
+    getZBound()
+    {
+        return(new wsBound(this.p1.z,this.p2.z));
+    }
 }
 
-function wsBound(value1,value2)
+class ws2DLine
 {
-    if (value1<value2) {
-        this.min=value1;
-        this.max=value2;
-    }
-    else {
-        this.min=value2;
-        this.max=value1;
+    constructor(p1,p2)
+    {
+        this.p1=p1;
+        this.p2=p2;
     }
     
-    this.set=function(value1,value2)
+    set(p1,p2)
+    {
+        this.p1=p1;
+        this.p2=p2;
+    }
+    
+    equals(line)
+    {
+        if ((this.p1.equals(line.p1)) && (this.p2.equals(line.p2))) return(true);
+        return((this.p1.equals(line.p2)) && (this.p2.equals(line.p1)));
+    }
+    
+    getXBound()
+    {
+        return(new wsBound(this.p1.x,this.p2.x));
+    }
+    
+    getYBound()
+    {
+        return(new wsBound(this.p1.y,this.p2.y));
+    }
+}
+
+class wsBound
+{
+    constructor(value1,value2)
     {
         if (value1<value2) {
             this.min=value1;
@@ -592,88 +569,106 @@ function wsBound(value1,value2)
             this.min=value2;
             this.max=value1;
         }
-    };
+    }
     
-    this.add=function(addValue)
+    set(value1,value2)
+    {
+        if (value1<value2) {
+            this.min=value1;
+            this.max=value2;
+        }
+        else {
+            this.min=value2;
+            this.max=value1;
+        }
+    }
+    
+    add(addValue)
     {
         this.min+=addValue;
         this.max+=addValue;
-    };
+    }
                 
-    this.getMidPoint=function()
+    getMidPoint()
     {
         return((this.max+this.min)/2);
-    };
+    }
                 
-    this.getSize=function()
+    getSize()
     {
         return(Math.trunc(this.max-this.min));
-    };
+    }
                 
-    this.adjust=function(value)
+    adjust(value)
     {
         if (value<this.min) this.min=value;
         if (value>this.max) this.max=value;
-    };
+    }
     
-    this.copy=function()
+    copy()
     {
         return(new wsBound(this.min,this.max));
-    };
+    }
 }
 
-function wsRect(lft,top,rgt,bot)
+class wsRect
 {
-    this.lft=lft;
-    this.top=top;
-    this.rgt=rgt;
-    this.bot=bot;
+    constructor(lft,top,rgt,bot)
+    {
+        this.lft=lft;
+        this.top=top;
+        this.rgt=rgt;
+        this.bot=bot;
+    }
     
-    this.overlap=function(rect)
+    overlap(rect)
     {
         if (this.lft>=rect.rgt) return(false);
         if (this.rgt<=rect.lft) return(false);
         if (this.top>=rect.bot) return(false);
         return(!(this.bot<=rect.top));
-    };
+    }
     
-    this.pointIn=function(x,y)
+    pointIn(x,y)
     {
         return((x>=this.lft) && (x<this.rgt) && (y>=this.top) && (y<this.bot));     
-    };
+    }
     
-    this.move=function(x,y)
+    move(x,y)
     {
         this.lft+=x;
         this.rgt+=x;
         this.top+=y;
         this.bot+=y;
-    };
+    }
                 
-    this.copy=function()
+    copy()
     {
         return(new wsRect(this.lft,this.top,this.rgt,this.bot));
-    };
+    }
 }
 
-function wsCollisionRect(lft,top,rgt,bot,y)
+class wsCollisionRect
 {
-    this.lft=lft;
-    this.top=top;
-    this.rgt=rgt;
-    this.bot=bot;
-    this.y=y;
+    constructor(lft,top,rgt,bot,y)
+    {
+        this.lft=lft;
+        this.top=top;
+        this.rgt=rgt;
+        this.bot=bot;
+        this.y=y;
+    }
     
-    this.equals=function(cRect)
+    equals(cRect)
     {
         if (this.lft!==cRect.lft) return(false);
         if (this.top!==cRect.top) return(false);
         if (this.rgt!==cRect.rgt) return(false);
         if (this.bot!==cRect.bot) return(false);
         return(this.y===cRect.y);
-    };
+    }
     
-    this.overlapBounds=function(xBound,yBound,zBound)
+    overlapBounds(xBound,yBound,zBound)
     {
         if (this.y<yBound.min) return(false);
         if (this.y>yBound.max) return(false);
@@ -681,17 +676,20 @@ function wsCollisionRect(lft,top,rgt,bot,y)
         if (this.rgt<=xBound.min) return(false);
         if (this.top>=zBound.max) return(false);
         return(!(this.bot<=zBound.min));
-    };
+    }
 }
 
-function wsPlane(a,b,c,d)
+class wsPlane
 {
-    this.a=a;
-    this.b=b;
-    this.c=c;
-    this.d=d;
+    constructor(a,b,c,d)
+    {
+        this.a=a;
+        this.b=b;
+        this.c=c;
+        this.d=d;
+    }
     
-    this.normalize=function()
+    normalize()
     {
         var f=Math.sqrt((this.a*this.a)+(this.b*this.b)+(this.c*this.c));
         if (f===0.0) return;
@@ -699,9 +697,9 @@ function wsPlane(a,b,c,d)
         this.b/=f;
         this.c/=f;
         this.d/=f;
-    };
+    }
     
-    this.boundBoxOutsidePlane=function(xBound,yBound,zBound)
+    boundBoxOutsidePlane(xBound,yBound,zBound)
     {
         if (((this.a*xBound.min)+(this.b*yBound.min)+(this.c*zBound.min)+this.d)>0.0) return(true);
 		if (((this.a*xBound.max)+(this.b*yBound.min)+(this.c*zBound.min)+this.d)>0.0) return(true);
@@ -713,39 +711,42 @@ function wsPlane(a,b,c,d)
 		if (((this.a*xBound.max)+(this.b*yBound.max)+(this.c*zBound.max)+this.d)>0.0) return(true);
         
         return(false);
-    };
+    }
 }
 
 //
 // colors
 //
 
-function wsColor(r,g,b)
+class wsColor
 {
-    this.r=r;
-    this.g=g;
-    this.b=b;
-    
-    this.set=function(r,g,b)
+    constructor(r,g,b)
     {
         this.r=r;
         this.g=g;
         this.b=b;
-    };
+    }
+    
+    set(r,g,b)
+    {
+        this.r=r;
+        this.g=g;
+        this.b=b;
+    }
                 
-    this.add=function(col)
+    add(col)
     {
         this.r+=col.r;
         this.g+=col.g;
         this.b+=col.b;
-    };
+    }
     
-    this.attenuate=function(att)
+    attenuate(att)
     {
         return(new wsColor((this.r*att),(this.g*att),(this.b*att)));
-    };
+    }
                 
-    this.fixOverflow=function()
+    fixOverflow()
     {
         var f;
         
@@ -785,5 +786,5 @@ function wsColor(r,g,b)
         if (this.r<0.0) this.r=0.0;
         if (this.g<0.0) this.g=0.0;
         if (this.b<0.0) this.b=0.0;
-    };
+    }
 }

@@ -1,62 +1,60 @@
-"use strict";
-
 //
 // text shader class
 //
 
-function TextShaderObject()
+class TextShader extends Shader
 {
-    this.shader=null;
-
-    this.vertexPositionAttribute=null;
-    this.vertexUVAttribute=null;
-
-    this.orthoMatrixUniform=null;
-    this.colorUniform=null;
-
+    constructor()
+    {
+        super();
+        this.vertexPositionAttribute=null;
+        this.vertexUVAttribute=null;
+        this.orthoMatrixUniform=null;
+        this.colorUniform=null;
+    }
+    
     //
     // initialize/release text shader
     //
 
-    this.initialize=function(view)
+    initialize(view)
     {
             // get a new shader object
             // and load/compile it
 
-        this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'text')) return(false);
+        if (!super.initialize(view,'text')) return(false);
 
             // setup uniforms
 
-        view.gl.useProgram(this.shader.program);
+        view.gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.shader.program,'vertexPosition');
-        this.vertexUVAttribute=view.gl.getAttribLocation(this.shader.program,'vertexUV');
+        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexUVAttribute=view.gl.getAttribLocation(this.program,'vertexUV');
 
-        this.orthoMatrixUniform=view.gl.getUniformLocation(this.shader.program,'orthoMatrix');    
-        this.colorUniform=view.gl.getUniformLocation(this.shader.program,'color');
+        this.orthoMatrixUniform=view.gl.getUniformLocation(this.program,'orthoMatrix');    
+        this.colorUniform=view.gl.getUniformLocation(this.program,'color');
 
             // these uniforms are always the same
 
-        view.gl.uniform1i(view.gl.getUniformLocation(this.shader.program,'baseTex'),0);
+        view.gl.uniform1i(view.gl.getUniformLocation(this.program,'baseTex'),0);
 
         view.gl.useProgram(null);
 
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
-        this.shader.release(view);
-    };
+        super.release(view);
+    }
 
     //
     // start/stop text shader drawing
     //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
-        view.gl.useProgram(this.shader.program);
+        view.gl.useProgram(this.program);
 
             // setup the uniforms
 
@@ -66,9 +64,9 @@ function TextShaderObject()
 
         view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
         view.gl.enableVertexAttribArray(this.vertexUVAttribute);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
             // disable vertex attributes
 
@@ -78,6 +76,6 @@ function TextShaderObject()
             // no longer using program
 
         view.gl.useProgram(null);
-    };
+    }
 
 }

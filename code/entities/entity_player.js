@@ -1,156 +1,92 @@
-"use strict";
-
 //
 // player entity class
 //
 
-function EntityPlayerObject(name,position,angle,radius,high,model)
+class EntityPlayer extends Entity
 {
-    this.weaponCurrentIndex=-1;
-    this.weaponFired=false;
-    this.weapons=[];
-    
-    
-        // supergumba -- ALL AWFUL REPLACE WHEN WE HAVE CLASSES
-        // change all baseEntity. to this.
+    constructor(name,position,angle,radius,high,model)
+    {
+        super(name,position,angle,radius,high,model);
         
-    this.baseEntity=new EntityObject(name,position,angle,radius,high,model);
-    
-    this.getName=function()
-    {
-        return(this.baseEntity.name);
-    };
-    this.getModel=function()
-    {
-        return(this.baseEntity.getModel());
-    };
-    
-    this.getPosition=function()
-    {
-        return(this.baseEntity.getPosition());
-    };
-    
-    this.getAngle=function()
-    {
-        return(this.baseEntity.getAngle());
-    };
-    this.getRadius=function()
-    {
-        return(this.baseEntity.radius);
-    };
-    
-    this.getHigh=function()
-    {
-        return(this.baseEntity.high);
-    };
-    this.setId=function(id)
-    {
-        this.baseEntity.setId(id);
-    };
-    
-    this.getId=function()
-    {
-        return(this.baseEntity.getId());
-    };
-    
-    this.markAsDelete=function()
-    {
-        this.baseEntity.markedForDeletion=true;
-    };
-    
-    this.isMarkedForDeletion=function()
-    {
-        return(this.baseEntity.isMarkedForDeletion());
-    };
-    this.clearTouchEntity=function()
-    {
-        this.baseEntity.touchEntity=null;
-    };
-    
-    this.setTouchEntity=function(entity)
-    {
-        this.baseEntity.touchEntity=entity;
-    };
-    
-    this.getTouchEntity=function()
-    {
-        return(this.baseEntity.touchEntity);
-    };
+        this.turnSpeed=0;
+        this.lookSpeed=0;
+        this.forwardSpeed=0;
+        this.sideSpeed=0;
+        this.verticalSpeed=0;
 
-    this.inFrustum=function(view)
-    {
-        return(this.baseEntity.inFrustum(view));
-    };
+        this.weaponCurrentIndex=-1;
+        this.weaponFired=false;
+        this.weapons=[];
+    }
     
-        // supergumba -- end of replace stuff
-        // supergumba -- local code
+        //
+        // looking and turning
         //
         
-    this.setTurnSpeed=function(speed)
+    setTurnSpeed(speed)
     {
-        this.baseEntity.turnSpeed=speed;
-    };
+        this.turnSpeed=speed;
+    }
     
-    this.setLookSpeed=function(speed)
+    setLookSpeed(speed)
     {
-        this.baseEntity.lookSpeed=speed;
-    };
+        this.lookSpeed=speed;
+    }
     
-    this.setForwardSpeed=function(speed)
+    setForwardSpeed(speed)
     {
-        this.baseEntity.forwardSpeed=speed;
-    };
+        this.forwardSpeed=speed;
+    }
     
-    this.setSideSpeed=function(speed)
+    setSideSpeed(speed)
     {
-        this.baseEntity.sideSpeed=speed;
-    };
+        this.sideSpeed=speed;
+    }
     
-    this.setVerticalSpeed=function(speed)
+    setVerticalSpeed(speed)
     {
-        this.baseEntity.verticalSpeed=speed;
-    };
-    
+        this.verticalSpeed=speed;
+    }
     
         //
         // jump
         //
         
-    this.startJump=function()
+    startJump()
     {
-        if (this.baseEntity.fallSpeed===0) this.baseEntity.fallSpeed=-300;
-    };
+        if (this.fallSpeed===0) this.fallSpeed=-300;
+    }
     
         //
         // weapons
         //
         
-    this.addWeapon=function(weapon)
+    addWeapon(weapon)
     {
         this.weapons.push(weapon);
-    };
+    }
     
-    this.setCurrentWeaponIndex=function(index)
+    setCurrentWeaponIndex(index)
     {
         this.weaponCurrentIndex=index;
-    };
+    }
     
-    this.getCurrentWeapon=function()
+    getCurrentWeapon()
     {
         if (this.weaponCurrentIndex===-1) return(null);
         return(this.weapons[this.weaponCurrentIndex]);
-    };
+    }
     
-    this.fireCurrentWeapon=function(view,entityList)
+    fireCurrentWeapon(view,entityList)
     {
         this.weaponFired=true;
-    };
+    }
     
         //
         // run player
         //
     
-    this.run=function(view,soundList,map,entityList)
+    run(view,soundList,map,entityList)
     {
         var bump,weapon;
         
@@ -165,25 +101,25 @@ function EntityPlayerObject(name,position,angle,radius,high,model)
         
             // input turning and looking
             
-        this.baseEntity.turn(this.baseEntity.turnSpeed);
-        this.baseEntity.look(this.baseEntity.lookSpeed);
+        super.turn(this.turnSpeed);
+        super.look(this.lookSpeed);
         
             // can only bump if we aren't falling
             // as otherwise ledges can catch you and
             // bump you back up
             
-        bump=!this.baseEntity.isFalling();
+        bump=!super.isFalling();
         
             // movement
             
-        if (this.baseEntity.forwardSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.forwardSpeed,0.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
-        if (this.baseEntity.sideSpeed!==0.0) this.baseEntity.moveComplex(map,entityList,this.baseEntity.sideSpeed,90.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
+        if (this.forwardSpeed!==0.0) super.moveComplex(map,entityList,this.forwardSpeed,0.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
+        if (this.sideSpeed!==0.0) super.moveComplex(map,entityList,this.sideSpeed,90.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
         
-        if (this.baseEntity.verticalSpeed!==0.0) this.baseEntity.moveDirect(0.0,this.baseEntity.verticalSpeed,0.0);
+        if (this.verticalSpeed!==0.0) super.moveDirect(0.0,this.verticalSpeed,0.0);
         
             // falling
         
-        if (!PLAYER_FLY) this.baseEntity.fall();
-    };
+        if (!PLAYER_FLY) super.fall();
+    }
     
 }

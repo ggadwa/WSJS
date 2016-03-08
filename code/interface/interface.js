@@ -8,7 +8,7 @@ function InterfaceObject()
 {
         // variables
         
-    this.interfaceShader=new InterfaceShaderObject();
+    this.interfaceShader=new InterfaceShader();
     
     this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
     this.vertexPosBuffer=null;

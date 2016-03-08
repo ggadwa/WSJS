@@ -1,19 +1,20 @@
-"use strict";
-
 //
 // entity list class
 //
 
-function EntityListObject()
+class EntityList
 {
-    this.entityCurrentId=1;
-    this.entities=[];
+    constructor()
+    {
+        this.entityCurrentId=1;
+        this.entities=[];
+    }
     
         //
         // initialize/release entityList
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
             // first entity is always the player
             // so reserve it
@@ -21,11 +22,11 @@ function EntityListObject()
         this.entities.push(null);
         
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
-    };
+    }
 
         //
         // add to entity
@@ -34,42 +35,42 @@ function EntityListObject()
         // a set
         //
 
-    this.setPlayer=function(entity)
+    setPlayer(entity)
     {
-        entity.setId(0);
+        entity.id=0;
         this.entities[0]=entity;
-    };
+    }
 
-    this.add=function(entity)
+    add(entity)
     {
-        entity.setId(this.entityCurrentId++);
+        entity.id=this.entityCurrentId++;
         this.entities.push(entity);
-    };
+    }
 
         //
         // entity list
         //
 
-    this.count=function()
+    count()
     {
         return(this.entities.length);
-    };
+    }
 
-    this.get=function(entityIdx)
+    get(entityIdx)
     {
         return(this.entities[entityIdx]);
-    };
+    }
     
-    this.getPlayer=function()
+    getPlayer()
     {
         return(this.entities[0]);
-    };
+    }
     
         //
         // run all entities
         //
         
-    this.run=function(view,soundList,map)
+    run(view,soundList,map)
     {
         var n;
         var nEntity=this.entities.length;
@@ -93,7 +94,7 @@ function EntityListObject()
             }
             n++;
         }
-    };
+    }
 
 }
     

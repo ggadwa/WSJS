@@ -26,10 +26,13 @@ var fileNames=[
 
 var fileCache=[];
 
-function FileCacheObject(name,data)
+class FileCache
 {
-    this.name=name;
-    this.data=data;
+    constructor(name,data)
+    {
+        this.name=name;
+        this.data=data;
+    }
 }
 
 // the file loading functions
@@ -69,7 +72,7 @@ function fileCacheFinishLoad(idx,callback,data)
 {
         // put file in cache
     
-    fileCache.push(new FileCacheObject(fileNames[idx],data));
+    fileCache.push(new FileCache(fileNames[idx],data));
     
         // finished?
         

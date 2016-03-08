@@ -1,32 +1,33 @@
-"use strict";
-
 //
 // debug class
 //
 
-function DebugObject()
+class Debug
 {
-    this.debugShader=new DebugShaderObject();
+    constructor()
+    {
+        this.debugShader=new DebugShader();
+    }
     
         //
         // initialize/release debug
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
         return(this.debugShader.initialize(view));
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         this.debugShader.release(view);
-    };
+    }
 
         //
         // draw lines around map mesh
         //
 
-    this.drawMapMeshLines=function(view,mesh)
+    drawMapMeshLines(view,mesh)
     {
         var n;
         var gl=view.gl;
@@ -62,13 +63,13 @@ function DebugObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
-    };
+    }
 
         //
         // normal and tangents
         //
         
-    this.drawMapMeshNormals=function(view,mesh)
+    drawMapMeshNormals(view,mesh)
     {
         var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
         var gl=view.gl;
@@ -133,9 +134,9 @@ function DebugObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
-    };
+    }
     
-    this.drawMapMeshTangents=function(view,mesh)
+    drawMapMeshTangents(view,mesh)
     {
         var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
         var gl=view.gl;
@@ -200,13 +201,13 @@ function DebugObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
-    };
+    }
 
         //
         // draw skeleton
         //
 
-    this.drawModelSkeleton=function(view,model,angle,position)
+    drawModelSkeleton(view,model,angle,position)
     {
         var n,lineCount,vIdx,iIdx;
         var gl=view.gl;
@@ -306,13 +307,13 @@ function DebugObject()
                 pnt.rotate(angle);
             }
         }
-    };
+    }
     
         //
         // draw model tangent space
         //
         
-    this.drawModelMeshNormals=function(view,model)
+    drawModelMeshNormals(view,model)
     {
         var n,vIdx,iIdx,drawIdx,nVertex;
         var gl=view.gl;
@@ -383,9 +384,9 @@ function DebugObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
-    };
+    }
     
-    this.drawModelMeshTangents=function(view,model)
+    drawModelMeshTangents(view,model)
     {
         var n,vIdx,iIdx,drawIdx,nVertex;
         var gl=view.gl;
@@ -456,13 +457,13 @@ function DebugObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
-    };
+    }
     
         //
         // draw model mesh lines
         //
         
-    this.drawModelMeshLines=function(view,model)
+    drawModelMeshLines(view,model)
     {
         var n;
         var gl=view.gl;
@@ -519,13 +520,13 @@ function DebugObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
-    };
+    }
 
         //
         // display a canvas on page (for debuginning bitmaps)
         //
 
-    this.displayCanvasData=function(fromCanvas,lft,top,wid,high)
+    displayCanvasData(fromCanvas,lft,top,wid,high)
     {
         var cvs=document.createElement('canvas');
         cvs.style.position="absolute";
@@ -539,13 +540,13 @@ function DebugObject()
         ctx.drawImage(fromCanvas,0,0,wid,high);
 
         document.body.appendChild(cvs);
-    };
+    }
     
         //
         // display a canvas on page (for debuginning sound data)
         //
 
-    this.displaySoundData=function(data,lft,top,wid,high)
+    displaySoundData(data,lft,top,wid,high)
     {
         var n,fx,fxAdd,y,halfHigh;
         var dataLen=data.length;
@@ -585,6 +586,6 @@ function DebugObject()
         ctx.stroke();
 
         document.body.appendChild(cvs);
-    };
+    }
 }
 

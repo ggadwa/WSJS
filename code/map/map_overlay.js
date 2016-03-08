@@ -6,7 +6,7 @@
 
 function MapOverlayObject()
 {
-    this.mapOverlayShader=new MapOverlayShaderObject();
+    this.mapOverlayShader=new MapOverlayShader();
     
     this.roomLineList=[];
     this.extraLineList=[];
@@ -270,11 +270,11 @@ function MapOverlayObject()
 
         for (n=0;n!==nEntity;n++) {
             entity=entityList.get(n);
-            if (entity.getName()==='projectile') continue;
+            if (entity instanceof EntityProjectile) continue;
             
             this.mapOverlayShader.drawColor(view,((n===0)?playerColor:monsterColor));       // index 0 is the player
             
-            ang=360.0-entity.getAngle().y;
+            ang=360.0-entity.angle.y;
         
             p1.set(-5,5);
             p1.rotate(null,ang);
@@ -283,7 +283,7 @@ function MapOverlayObject()
             p3.set(5,5);
             p3.rotate(null,ang);
             
-            pos=entity.getPosition();
+            pos=entity.position;
             x=((pos.x-this.mapOffsetX)*this.mapScale)+this.drawX;
             y=(this.drawHigh-((pos.z-this.mapOffsetZ)*this.mapScale))+this.drawY;
 

@@ -1,115 +1,28 @@
-"use strict";
-
 //
 // monster entity class
 //
 
-function EntityMonsterObject(name,position,angle,radius,high,model)
+class EntityMonster extends Entity
 {
-    this.active=false;
-    
-        // supergumba -- ALL AWFUL REPLACE WHEN WE HAVE CLASSES
-        // change all baseEntity. to this.
-        
-    this.baseEntity=new EntityObject(name,position,angle,radius,high,model);
-    this.getName=function()
+    constructor(name,position,angle,radius,high,model)
     {
-        return(this.baseEntity.name);
-    };
-    this.getModel=function()
-    {
-        return(this.baseEntity.getModel());
-    };
-    
-    this.getPosition=function()
-    {
-        return(this.baseEntity.getPosition());
-    };
-    
-    this.getAngle=function()
-    {
-        return(this.baseEntity.getAngle());
-    };
-    
-    this.getRadius=function()
-    {
-        return(this.baseEntity.radius);
-    };
-    
-    this.getHigh=function()
-    {
-        return(this.baseEntity.high);
-    };
-    this.setId=function(id)
-    {
-        this.baseEntity.setId(id);
-    };
-    
-    this.getId=function()
-    {
-        return(this.baseEntity.getId());
-    };
-    
-    this.markAsDelete=function()
-    {
-        this.baseEntity.markedForDeletion=true;
-    };
-    
-    this.isMarkedForDeletion=function()
-    {
-        return(this.baseEntity.isMarkedForDeletion());
-    };
-    this.clearTouchEntity=function()
-    {
-        this.baseEntity.touchEntity=null;
-    };
-    
-    this.setTouchEntity=function(entity)
-    {
-        this.baseEntity.touchEntity=entity;
-    };
-    
-    this.getTouchEntity=function()
-    {
-        return(this.baseEntity.touchEntity);
-    };
-
-    this.inFrustum=function(view)
-    {
-        return(this.baseEntity.inFrustum(view));
-    };
-    
-    this.drawStart=function(view)
-    {
-        this.baseEntity.drawStart(view);
-    };
-
-    this.drawEnd=function(view)
-    {
-        this.baseEntity.drawEnd(view);
-    };
-
-    this.draw=function(view)
-    {
-        this.baseEntity.draw(view);
-    };
-    
-    
-    
-    // local functions
-    
+        super(name,position,angle,radius,high,model);
+        this.active=false;
+    }
     
         //
         // run monster
         //
     
-    this.run=function(view,soundList,map,entityList)
+    run(view,soundList,map,entityList)
     {
+        var player,touchEntity;
+        
             // delete if hit by projectile
         
-        var touchEntity=this.getTouchEntity();
+        touchEntity=this.getTouchEntity();
         if (touchEntity!==null) {
-            if (touchEntity.getName()==='projectile') {     // supergumba -- use instanceof here!!!
+            if (touchEntity instanceof EntityProjectile) {
                 this.markAsDelete();
                 return;
             }
@@ -119,10 +32,10 @@ function EntityMonsterObject(name,position,angle,radius,high,model)
         
             // time to activate monster?
         
-        var player=entityList.getPlayer();
+        player=entityList.getPlayer();
         
         if ((!this.active) && (MONSTER_AI_ON)) {
-            var dist=player.getPosition().distance(this.getPosition());
+            var dist=player.position.distance(this.position);
             this.active=(dist<25000);
         }
         
@@ -130,21 +43,20 @@ function EntityMonsterObject(name,position,angle,radius,high,model)
             
                 // pose
             
-            var model=this.getModel();
-            model.skeleton.randomPose(view,model.modelType);
+            this.model.skeleton.randomPose(view,this.model.modelType);
         
                 // turn towards player
 
-            this.baseEntity.turnTowards(player.getAngle().y,1.0);
+            super.turnTowards(player.angle.y,1.0);
 
                 // run towards player
 
-            this.baseEntity.moveSimple(map,entityList,-50,true);
+            super.moveSimple(map,entityList,-50,true);
         }
         
             // falling
         
-        this.baseEntity.fall();
-    };
+        super.fall();
+    }
     
 }

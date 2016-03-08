@@ -1,22 +1,27 @@
-"use strict";
-
 //
 // bitmap list class
 //
 
-function BitmapListObject(view)
+class BitmapList
 {
-    this.view=view;
-    this.bitmaps=null;
+    constructor(view)
+    {
+        this.view=view;
+        this.bitmaps=null;
+    }
     
-    this.initialize=function()
+        //
+        // initialize or release bitmap list
+        //
+        
+    initialize()
     {
         this.bitmaps=[];
         
         return(true);
-    };
+    }
     
-    this.release=function()
+    release()
     {
         var n;
         var nBitmap=this.bitmaps.length;
@@ -26,14 +31,18 @@ function BitmapListObject(view)
         }
 
         this.bitmaps=[];
-    };
+    }
     
-    this.add=function(bitmap)
+        //
+        // add or get a bitmap
+        //
+        
+    add(bitmap)
     {
         this.bitmaps.push(bitmap);
-    };
+    }
     
-    this.get=function(name)
+    get(name)
     {
         var n;
         var nBitmap=this.bitmaps.length;
@@ -43,7 +52,6 @@ function BitmapListObject(view)
         }
         
         return(null);
-    };
-    
+    }
 
 }

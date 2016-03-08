@@ -1,33 +1,37 @@
-"use strict";
-
 //
 // generic shader light class
 //
 
-function ShaderLightObject()
+class ShaderLight
 {
-    this.positionUniform=null;
-    this.colorUniform=null;
-    this.intensityUniform=null;
-    this.invertIntensityUniform=null;
-    this.exponentUniform=null;
+    constructor()
+    {
+        this.positionUniform=null;
+        this.colorUniform=null;
+        this.intensityUniform=null;
+        this.invertIntensityUniform=null;
+        this.exponentUniform=null;
+    }
 }
 
 //
 // generic shader class
 //
 
-function ShaderObject()
+class Shader
 {
-    this.vertexShader=null;
-    this.fragmentShader=null;
-    this.program=null;
+    constructor()
+    {
+        this.vertexShader=null;
+        this.fragmentShader=null;
+        this.program=null;
+    }
     
         //
         // initialize/release shader
         //
 
-    this.initialize=function(view,name)
+    initialize(view,name)
     {
             // get the shaders from divs
 
@@ -55,9 +59,9 @@ function ShaderObject()
         }
 
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         if (this.program===null) return;
 
@@ -76,13 +80,13 @@ function ShaderObject()
         this.vertexShader=null;
         this.fragmentShader=null;
         this.program=null;
-    };
+    }
     
         //
         // load shaders
         //
     
-    this.loadVertexShader=function(view,name)
+    loadVertexShader(view,name)
     {
         this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
 
@@ -94,9 +98,9 @@ function ShaderObject()
 
         this.errorAlert(name,"vertex",view.gl.getShaderInfoLog(this.vertexShader));
         return(false);
-    };
+    }
 
-    this.loadFragmentShader=function(view,name)
+    loadFragmentShader(view,name)
     {
         this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
 
@@ -108,19 +112,19 @@ function ShaderObject()
 
         this.errorAlert(name,"fragment",view.gl.getShaderInfoLog(this.fragmentShader));
         return(false);
-    };
+    }
    
         //
         // shader errors
         //
 
-    this.errorAlert=function(name,nameType,errStr)
+    errorAlert(name,nameType,errStr)
     {
         var str='Shader Error: '+name+'('+nameType+')\n';
         str+='-----------------------------------------\n';
         str+=errStr;
 
         alert(str);
-    };
+    }
 
 }

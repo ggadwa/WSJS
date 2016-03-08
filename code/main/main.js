@@ -33,14 +33,14 @@ var soundBuildList=
 // global objects
 //
 
-var view=new ViewObject();
-var bitmapList=new BitmapListObject(view);
-var soundList=new SoundListObject();
+var view=new View();
+var bitmapList=new BitmapList(view);
+var soundList=new SoundList();
 var map=new MapObject();
 var modelList=new ModelListObject();
-var entityList=new EntityListObject();
-var input=new InputObject(view,entityList);
-var debug=new DebugObject();
+var entityList=new EntityList();
+var input=new Input(view,entityList);
+var debug=new Debug();
 
 //
 // main loop
@@ -398,8 +398,8 @@ function wsInitBuildEntities()
         return;
     }
 
-    var playerEntity=new EntityPlayerObject('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.get('player'));
-    playerEntity.addWeapon(new WeaponObject(modelList.get('weapon_0'),modelList.get('projectile_0'),soundList.get('fire'),soundList.get('explosion')));
+    var playerEntity=new EntityPlayer('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.get('player'));
+    playerEntity.addWeapon(new Weapon(modelList.get('weapon_0'),modelList.get('projectile_0'),soundList.get('fire'),soundList.get('explosion')));
     playerEntity.setCurrentWeaponIndex(0);
     
     entityList.setPlayer(playerEntity);
@@ -415,7 +415,7 @@ function wsInitBuildEntities()
         monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
         model=modelList.clone(view,monsterModelName);
         
-        entityList.add(new EntityMonsterObject(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
+        entityList.add(new EntityMonster(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
     }
     
         // finished

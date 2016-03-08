@@ -1,28 +1,29 @@
-"use strict";
-
 //
 // input class
 //
 
-function InputObject(view,entityList)
+class Input
 {
-    this.view=view;
-    this.entityList=entityList;
-    
-        // input flags
-        
-    this.keyFlags=new Uint8Array(255);
+    constructor(view,entityList)
+    {
+        this.view=view;
+        this.entityList=entityList;
 
-    this.mouseFirstMove=true;
-    this.mouseLastPos=new ws2DIntPoint(0,0);
-    
-    this.playerEntity=null;
+            // input flags
+
+        this.keyFlags=new Uint8Array(255);
+
+        this.mouseFirstMove=true;
+        this.mouseLastPos=new ws2DIntPoint(0,0);
+
+        this.playerEntity=null;
+    }
     
         //
         // initialize/release input
         //
 
-    this.initialize=function(playerEntity)
+    initialize(playerEntity)
     {
         var n;
         
@@ -43,18 +44,18 @@ function InputObject(view,entityList)
 
         document.addEventListener("keydown",this.keyDownEvent.bind(this),true);
         document.addEventListener("keyup",this.keyUpEvent.bind(this),true);
-        // TODO - use pointerlock here
-    };
+        // supergumba - use pointerlock here
+    }
 
-    this.release=function()
+    release()
     { 
-    };
+    }
     
         //
         // run input from main loop
         //
 
-    this.run=function()
+    run()
     {
         this.playerEntity.setTurnSpeed(0.0);
         this.playerEntity.setLookSpeed(0.0);
@@ -107,22 +108,22 @@ function InputObject(view,entityList)
 
         if (this.keyFlags[219]) this.playerEntity.setLookSpeed(1.5);
         if (this.keyFlags[221]) this.playerEntity.setLookSpeed(-1.5); 
-    };
+    }
 
         //
         // canvas key events
         //
 
-    this.keyDownEvent=function(event)
+    keyDownEvent(event)
     {
         this.keyFlags[event.keyCode]=1;
         return(false);
-    };
+    }
 
-    this.keyUpEvent=function(event)
+    keyUpEvent(event)
     {
         this.keyFlags[event.keyCode]=0;
         return(false);
-    };
+    }
 
 }

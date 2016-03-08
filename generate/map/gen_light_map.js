@@ -998,7 +998,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            this.bitmapList.add(new BitmapObject(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
+            this.bitmapList.add(new Bitmap(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
         }
 
             // and set the light map on the meshes

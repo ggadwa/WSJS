@@ -1,91 +1,91 @@
-"use strict";
-
 //
 // model shader class
 //
 
-function ModelShaderObject()
+class ModelShader extends Shader
 {
-    this.shader=null;
+    constructor()
+    {
+        super();
+        
+        this.vertexPositionAttribute=null;
+        this.vertexNormalAttribute=null;
+        this.vertexTangentAttribute=null;    
+        this.vertexUVAttribute=null;
 
-    this.vertexPositionAttribute=null;
-    this.vertexNormalAttribute=null;
-    this.vertexTangentAttribute=null;    
-    this.vertexUVAttribute=null;
+        this.perspectiveMatrixUniform=null;
+        this.modelMatrixUniform=null;
+        this.normalMatrixUniform=null;
 
-    this.perspectiveMatrixUniform=null;
-    this.modelMatrixUniform=null;
-    this.normalMatrixUniform=null;
+        this.shineFactorUniform=null;
+        this.ambientUniform=null;
 
-    this.shineFactorUniform=null;
-    this.ambientUniform=null;
-
-    this.lights=[];
-
+        this.lights=[];
+    }
+    
         //
         // initialize/release model shader
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
             // get a new shader object
             // and load/compile it
 
-        this.shader=new ShaderObject();
-        if (!this.shader.initialize(view,'model')) return(false);
+        if (!super.initialize(view,'model')) return(false);
 
             // setup uniforms
 
         var gl=view.gl;
 
-        gl.useProgram(this.shader.program);
+        gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=gl.getAttribLocation(this.shader.program,'vertexPosition');
-        this.vertexNormalAttribute=gl.getAttribLocation(this.shader.program,'vertexNormal');
-        this.vertexTangentAttribute=gl.getAttribLocation(this.shader.program,'vertexTangent');    
-        this.vertexUVAttribute=gl.getAttribLocation(this.shader.program,'vertexUV');
+        this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexNormalAttribute=gl.getAttribLocation(this.program,'vertexNormal');
+        this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');    
+        this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
-        this.perspectiveMatrixUniform=gl.getUniformLocation(this.shader.program,'perspectiveMatrix');
-        this.modelMatrixUniform=gl.getUniformLocation(this.shader.program,'modelMatrix');
-        this.normalMatrixUniform=gl.getUniformLocation(this.shader.program,'normalMatrix');
+        this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
+        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
+        this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
 
-        this.shineFactorUniform=gl.getUniformLocation(this.shader.program,'shineFactor');    
-        this.ambientUniform=gl.getUniformLocation(this.shader.program,'ambient');
+        this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');    
+        this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
 
         var n,name;
 
         for (n=0;n!==view.LIGHT_COUNT;n++) {
-            this.lights.push(new ShaderLightObject());
+            this.lights.push(new ShaderLight());
 
             name='light_'+n;
-            this.lights[n].positionUniform=gl.getUniformLocation(this.shader.program,name+'.position');
-            this.lights[n].colorUniform=gl.getUniformLocation(this.shader.program,name+'.color');
-            this.lights[n].intensityUniform=gl.getUniformLocation(this.shader.program,name+'.intensity');
-            this.lights[n].invertIntensityUniform=gl.getUniformLocation(this.shader.program,name+'.invertIntensity');
-            this.lights[n].exponentUniform=gl.getUniformLocation(this.shader.program,name+'.exponent');
+            this.lights[n].positionUniform=gl.getUniformLocation(this.program,name+'.position');
+            this.lights[n].colorUniform=gl.getUniformLocation(this.program,name+'.color');
+            this.lights[n].intensityUniform=gl.getUniformLocation(this.program,name+'.intensity');
+            this.lights[n].invertIntensityUniform=gl.getUniformLocation(this.program,name+'.invertIntensity');
+            this.lights[n].exponentUniform=gl.getUniformLocation(this.program,name+'.exponent');
         }
 
             // these uniforms are always the same
 
-        gl.uniform1i(gl.getUniformLocation(this.shader.program,'baseTex'),0);
-        gl.uniform1i(gl.getUniformLocation(this.shader.program,'normalTex'),1);
-        gl.uniform1i(gl.getUniformLocation(this.shader.program,'specularTex'),2);
+        gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
+        gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
+        gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
 
         gl.useProgram(null);
 
         return(true);
-    };
+    }
 
-    this.rRelease=function(view)
+    release(view)
     {
-        this.shader.release(view);
-    };
+        super.release(view);
+    }
 
         //
         // start/stop model shader drawing
         //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
         var n;
         var light,viewLight;
@@ -94,7 +94,7 @@ function ModelShaderObject()
 
         var gl=view.gl;
 
-        gl.useProgram(this.shader.program);
+        gl.useProgram(this.program);
 
             // matrix
 
@@ -142,9 +142,9 @@ function ModelShaderObject()
         gl.enableVertexAttribArray(this.vertexNormalAttribute);
         gl.enableVertexAttribArray(this.vertexTangentAttribute);
         gl.enableVertexAttribArray(this.vertexUVAttribute);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         var gl=view.gl;
 
@@ -158,6 +158,6 @@ function ModelShaderObject()
             // no longer using shader
 
         gl.useProgram(null);
-    };
+    }
 
 }
