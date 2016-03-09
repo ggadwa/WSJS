@@ -77,7 +77,7 @@ class Entity
         
             // get the move to point
             
-        this.movePt.set(0.0,0.0,dist);
+        this.movePt.setFromValues(0.0,0.0,dist);
         this.movePt.rotateY(null,angY);
         
             // flying
@@ -108,7 +108,7 @@ class Entity
         
             // try to slide
             
-        this.slidePt.set(this.movePt.x,0.0,0.0);
+        this.slidePt.setFromValues(this.movePt.x,0.0,0.0);
         
         this.collision.moveObjectInMap(map,entityList,this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
@@ -116,7 +116,7 @@ class Entity
             return;
         }
         
-        this.slidePt.set(0.0,0.0,this.movePt.z);
+        this.slidePt.setFromValues(0.0,0.0,this.movePt.z);
         
         this.collision.moveObjectInMap(map,entityList,this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
@@ -132,7 +132,7 @@ class Entity
     
     moveSimple(map,entityList,dist,bump)
     {
-        this.movePt.set(0.0,0.0,dist);
+        this.movePt.setFromValues(0.0,0.0,dist);
         this.movePt.rotateY(null,this.angle.y);
             
         this.collision.moveObjectInMap(map,entityList,this,this.movePt,bump,this.collideMovePt);
@@ -246,9 +246,9 @@ class Entity
         
     inFrustum(view)
     {
-        this.xFrustumBound.set((this.position.x-this.radius),(this.position.x+this.radius));
-        this.yFrustumBound.set(this.position.y,(this.position.y-this.high));
-        this.zFrustumBound.set((this.position.z-this.radius),(this.position.z+this.radius));
+        this.xFrustumBound.setFromValues((this.position.x-this.radius),(this.position.x+this.radius));
+        this.yFrustumBound.setFromValues(this.position.y,(this.position.y-this.high));
+        this.zFrustumBound.setFromValues((this.position.z-this.radius),(this.position.z+this.radius));
 
         return(view.boundBoxInFrustum(this.xFrustumBound,this.yFrustumBound,this.zFrustumBound));
     }

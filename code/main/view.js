@@ -455,7 +455,7 @@ class View
             // get the eye point and rotate it
             // around the view position
 
-        this.eyePos.set(this.camera.position.x,this.camera.position.y,(this.camera.position.z-this.OPENGL_NEAR_Z));
+        this.eyePos.setFromValues(this.camera.position.x,this.camera.position.y,(this.camera.position.z-this.OPENGL_NEAR_Z));
         this.eyePos.rotateX(this.camera.position,this.camera.angle.x);
         this.eyePos.rotateY(this.camera.position,this.camera.angle.y);
 
@@ -508,10 +508,10 @@ class View
         this.drawModelCount=0;
         this.drawModelTrigCount=0;
 
-        nEntity=entityList.count();
+        nEntity=entityList.countEntity();
 
         for (n=1;n<nEntity;n++) {
-            entity=entityList.get(n);
+            entity=entityList.getEntity(n);
 
             if (entity.inFrustum(view)) {
                 entity.drawStart(this);

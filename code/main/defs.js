@@ -11,7 +11,7 @@ class wsPoint
         this.z=z;
     }
     
-    set(xSet,ySet,zSet)
+    setFromValues(xSet,ySet,zSet)
     {
         this.x=xSet;
         this.y=ySet;
@@ -370,7 +370,7 @@ class ws2DPoint
         this.y=y;
     }
     
-    set(xSet,ySet)
+    setFromValues(xSet,ySet)
     {
         this.x=xSet;
         this.y=ySet;
@@ -434,7 +434,7 @@ class ws2DIntPoint
         this.y=Math.trunc(y);
     }
     
-    set(xSet,ySet)
+    setFromValues(xSet,ySet)
     {
         this.x=Math.trunc(xSet);
         this.y=Math.trunc(ySet);
@@ -498,7 +498,7 @@ class wsLine
         this.p2=p2;
     }
     
-    set(p1,p2)
+    setFromValues(p1,p2)
     {
         this.p1=p1;
         this.p2=p2;
@@ -534,7 +534,7 @@ class ws2DLine
         this.p2=p2;
     }
     
-    set(p1,p2)
+    setFromValues(p1,p2)
     {
         this.p1=p1;
         this.p2=p2;
@@ -571,7 +571,7 @@ class wsBound
         }
     }
     
-    set(value1,value2)
+    setFromValues(value1,value2)
     {
         if (value1<value2) {
             this.min=value1;
@@ -727,7 +727,7 @@ class wsColor
         this.b=b;
     }
     
-    set(r,g,b)
+    setFromValues(r,g,b)
     {
         this.r=r;
         this.g=g;

@@ -41,17 +41,17 @@ function MapLightObject(position,color,inLightmap,intensity,exponent)
     
     this.getXBound=function(xBound)
     {
-        xBound.set((this.position.x-intensity),(this.position.x+intensity));
+        xBound.setFromValues((this.position.x-intensity),(this.position.x+intensity));
     };
     
     this.getYBound=function(yBound)
     {
-        yBound.set((this.position.y-intensity),(this.position.y+intensity));
+        yBound.setFromValues((this.position.y-intensity),(this.position.y+intensity));
     };
     
     this.getZBound=function(zBound)
     {
-        zBound.set((this.position.z-intensity),(this.position.z+intensity));
+        zBound.setFromValues((this.position.z-intensity),(this.position.z+intensity));
     };
 }
 

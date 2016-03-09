@@ -41,7 +41,7 @@ class EntityList
         this.entities[0]=entity;
     }
 
-    add(entity)
+    addEntity(entity)
     {
         entity.id=this.entityCurrentId++;
         this.entities.push(entity);
@@ -51,12 +51,12 @@ class EntityList
         // entity list
         //
 
-    count()
+    countEntity()
     {
         return(this.entities.length);
     }
 
-    get(entityIdx)
+    getEntity(entityIdx)
     {
         return(this.entities[entityIdx]);
     }

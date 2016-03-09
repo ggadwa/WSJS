@@ -39,7 +39,7 @@ class Weapon
         pos.addPoint(entity.position);
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        entityList.add(new EntityProjectile('projectile',view,pos,ang,500,500,this.projectileModel,this.hitSound));
+        entityList.addEntity(new EntityProjectile('projectile',view,pos,ang,500,500,this.projectileModel,this.hitSound));
         
         this.fireSound.play(pos);
     }
@@ -65,7 +65,7 @@ class Weapon
         
             // get new position
             
-        this.handOffset.set(0,0,2500);      // supergumba -- all this is hardcoded!
+        this.handOffset.setFromValues(0,0,2500);      // supergumba -- all this is hardcoded!
         this.handOffset.rotate(angle);
         this.handOffset.addPoint(pos);
         

@@ -190,7 +190,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
         // generate bitmap
     
     var genBitmap=new GenBitmapObject(textureGenRandom);
-    bitmapList.add(genBitmap.generate(view,name,bitmapType));
+    bitmapList.addBitmap(genBitmap.generate(view,name,bitmapType));
     
         // if more textures, then loop back around
         
@@ -222,7 +222,7 @@ function wsInitBuildSounds(idx,soundGenRandom)
          // generate sound
     
     var genSound=new GenSoundObject(soundList.getAudioContext(),soundGenRandom);
-    soundList.add(genSound.generate(name,generateType));
+    soundList.addSound(genSound.generate(name,generateType));
     
         // if more textures, then loop back around
         
@@ -310,7 +310,7 @@ function wsInitBuildModelsMesh(idx,modelGenRandom)
         // get bitmap
         
     var skinTypes=['Skin Scale','Skin Leather','Skin Fur'];
-    var modelBitmap=bitmapList.get(skinTypes[idx%3]);
+    var modelBitmap=bitmapList.getBitmap(skinTypes[idx%3]);
     
         // player model if 0
         // else a monster
@@ -354,7 +354,7 @@ function wsInitBuildModelsMesh(idx,modelGenRandom)
 
 function wsInitBuildWeapons(modelGenRandom)
 {
-    var modelBitmap=bitmapList.get('Map Metal');        // for now just use map metal
+    var modelBitmap=bitmapList.getBitmap('Map Metal');        // for now just use map metal
     
         // weapon
         
@@ -399,7 +399,7 @@ function wsInitBuildEntities()
     }
 
     var playerEntity=new EntityPlayer('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.get('player'));
-    playerEntity.addWeapon(new Weapon(modelList.get('weapon_0'),modelList.get('projectile_0'),soundList.get('fire'),soundList.get('explosion')));
+    playerEntity.addWeapon(new Weapon(modelList.get('weapon_0'),modelList.get('projectile_0'),soundList.getSound('fire'),soundList.getSound('explosion')));
     playerEntity.setCurrentWeaponIndex(0);
     
     entityList.setPlayer(playerEntity);
@@ -415,7 +415,7 @@ function wsInitBuildEntities()
         monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
         model=modelList.clone(view,monsterModelName);
         
-        entityList.add(new EntityMonster(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
+        entityList.addEntity(new EntityMonster(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
     }
     
         // finished
@@ -436,7 +436,7 @@ function wsInitFinish()
     
         // ambient
         
-    view.ambient.set(MAP_LIGHT_AMBIENT[0],MAP_LIGHT_AMBIENT[1],MAP_LIGHT_AMBIENT[2]);
+    view.ambient.setFromValues(MAP_LIGHT_AMBIENT[0],MAP_LIGHT_AMBIENT[1],MAP_LIGHT_AMBIENT[2]);
     
         // start the input
         

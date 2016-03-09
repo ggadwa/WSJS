@@ -351,13 +351,13 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             
                 // vector from trig to eye point
                 
-            pnt.set(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
+            pnt.setFromValues(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
             trigToEyeVector.setFromSubPoint(pnt,view.camera.position);
             trigToEyeVector.normalize();
             
                 // dot product
                 
-            normal.set(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]);
+            normal.setFromValues(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]);
                 
             if (trigToEyeVector.dot(normal)<=view.VIEW_NORMAL_CULL_LIMIT) {
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];

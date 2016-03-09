@@ -45,20 +45,20 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
             k=n+1;
             if (k===nSide) k=0;
 
-            vertexList[idx++].position.set(pts[n].x,ty,pts[n].z); 
-            vertexList[idx++].position.set(pts[k].x,ty,pts[k].z);        
-            vertexList[idx++].position.set(pts[k].x,by,pts[k].z);     
-            vertexList[idx++].position.set(pts[n].x,ty,pts[n].z);    
-            vertexList[idx++].position.set(pts[k].x,by,pts[k].z);  
-            vertexList[idx++].position.set(pts[n].x,by,pts[n].z);
+            vertexList[idx++].position.setFromValues(pts[n].x,ty,pts[n].z); 
+            vertexList[idx++].position.setFromValues(pts[k].x,ty,pts[k].z);        
+            vertexList[idx++].position.setFromValues(pts[k].x,by,pts[k].z);     
+            vertexList[idx++].position.setFromValues(pts[n].x,ty,pts[n].z);    
+            vertexList[idx++].position.setFromValues(pts[k].x,by,pts[k].z);  
+            vertexList[idx++].position.setFromValues(pts[n].x,by,pts[n].z);
         }
 
             // top
 
         for (n=0;n!==(nSide-2);n++) {
-            vertexList[idx++].position.set(pts[0].x,ty,pts[0].z);
-            vertexList[idx++].position.set(pts[n+1].x,ty,pts[n+1].z);
-            vertexList[idx++].position.set(pts[n+2].x,ty,pts[n+2].z);
+            vertexList[idx++].position.setFromValues(pts[0].x,ty,pts[0].z);
+            vertexList[idx++].position.setFromValues(pts[n+1].x,ty,pts[n+1].z);
+            vertexList[idx++].position.setFromValues(pts[n+2].x,ty,pts[n+2].z);
         }
 
         var n;
@@ -89,7 +89,7 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
     this.createLedges=function(room)
     {
         var x,z;
-        var ledgeBitmap=this.bitmapList.get('Map Ledge');
+        var ledgeBitmap=this.bitmapList.getBitmap('Map Ledge');
         
             // does this room have a ledge?
             
@@ -110,32 +110,32 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
         for (z=1;z<(room.zBlockSize-1);z++) {
             
             if (room.getEdgeGridValue(0,z)===0) {
-                pts[0].set(0,0,(z*ROOM_BLOCK_WIDTH));
+                pts[0].setFromValues(0,0,(z*ROOM_BLOCK_WIDTH));
                 pts[0].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].set(wid,0,(z*ROOM_BLOCK_WIDTH));
+                pts[1].setFromValues(wid,0,(z*ROOM_BLOCK_WIDTH));
                 pts[1].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].set(wid,0,((z+1)*ROOM_BLOCK_WIDTH));
+                pts[2].setFromValues(wid,0,((z+1)*ROOM_BLOCK_WIDTH));
                 pts[2].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].set(0,0,((z+1)*ROOM_BLOCK_WIDTH));
+                pts[3].setFromValues(0,0,((z+1)*ROOM_BLOCK_WIDTH));
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,[false,false,false,true],ledgeBitmap);
             }
             
             if (room.getEdgeGridValue((room.xBlockSize-1),z)===0) {
-                pts[0].set((xMax-wid),0,(z*ROOM_BLOCK_WIDTH));
+                pts[0].setFromValues((xMax-wid),0,(z*ROOM_BLOCK_WIDTH));
                 pts[0].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].set(xMax,0,(z*ROOM_BLOCK_WIDTH));
+                pts[1].setFromValues(xMax,0,(z*ROOM_BLOCK_WIDTH));
                 pts[1].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].set(xMax,0,((z+1)*ROOM_BLOCK_WIDTH));
+                pts[2].setFromValues(xMax,0,((z+1)*ROOM_BLOCK_WIDTH));
                 pts[2].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].set((xMax-wid),0,((z+1)*ROOM_BLOCK_WIDTH));
+                pts[3].setFromValues((xMax-wid),0,((z+1)*ROOM_BLOCK_WIDTH));
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,[false,true,false,false],ledgeBitmap);
@@ -147,32 +147,32 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
         for (x=1;x<(room.xBlockSize-1);x++) {
             
             if (room.getEdgeGridValue(x,0)===0) {
-                pts[0].set((x*ROOM_BLOCK_WIDTH),0,0);
+                pts[0].setFromValues((x*ROOM_BLOCK_WIDTH),0,0);
                 pts[0].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].set((x*ROOM_BLOCK_WIDTH),0,wid);
+                pts[1].setFromValues((x*ROOM_BLOCK_WIDTH),0,wid);
                 pts[1].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].set(((x+1)*ROOM_BLOCK_WIDTH),0,wid);
+                pts[2].setFromValues(((x+1)*ROOM_BLOCK_WIDTH),0,wid);
                 pts[2].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].set(((x+1)*ROOM_BLOCK_WIDTH),0,0);
+                pts[3].setFromValues(((x+1)*ROOM_BLOCK_WIDTH),0,0);
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,[false,false,false,true],ledgeBitmap);
             }
             
             if (room.getEdgeGridValue(x,(room.zBlockSize-1))===0) {
-                pts[0].set((x*ROOM_BLOCK_WIDTH),0,(zMax-wid));
+                pts[0].setFromValues((x*ROOM_BLOCK_WIDTH),0,(zMax-wid));
                 pts[0].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].set((x*ROOM_BLOCK_WIDTH),0,zMax);
+                pts[1].setFromValues((x*ROOM_BLOCK_WIDTH),0,zMax);
                 pts[1].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].set(((x+1)*ROOM_BLOCK_WIDTH),0,zMax);
+                pts[2].setFromValues(((x+1)*ROOM_BLOCK_WIDTH),0,zMax);
                 pts[2].move(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].set(((x+1)*ROOM_BLOCK_WIDTH),0,(zMax-wid));
+                pts[3].setFromValues(((x+1)*ROOM_BLOCK_WIDTH),0,(zMax-wid));
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,[false,true,false,false],ledgeBitmap);
@@ -185,76 +185,76 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
         high=this.genRandom.randomInt(ROOM_LEDGE_MIN_HEIGHT,ROOM_LEDGE_EXTRA_HEIGHT);
             
         if (room.getEdgeGridValue(0,0)===0) {
-            pts[0].set(0,0,0);
+            pts[0].setFromValues(0,0,0);
             pts[0].move(room.xBound.min,0,room.zBound.min);
 
-            pts[1].set(ROOM_BLOCK_WIDTH,0,0);
+            pts[1].setFromValues(ROOM_BLOCK_WIDTH,0,0);
             pts[1].move(room.xBound.min,0,room.zBound.min);
 
-            pts[2].set(ROOM_BLOCK_WIDTH,0,wid);
+            pts[2].setFromValues(ROOM_BLOCK_WIDTH,0,wid);
             pts[2].move(room.xBound.min,0,room.zBound.min);
 
-            pts[3].set(wid,0,ROOM_BLOCK_WIDTH);
+            pts[3].setFromValues(wid,0,ROOM_BLOCK_WIDTH);
             pts[3].move(room.xBound.min,0,room.zBound.min);
             
-            pts[4].set(0,0,ROOM_BLOCK_WIDTH);
+            pts[4].setFromValues(0,0,ROOM_BLOCK_WIDTH);
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
             this.addLedgeChunk(room,pts,5,high,[true,false,false,false,true],ledgeBitmap);
         }
         
         if (room.getEdgeGridValue((room.xBlockSize-1),0)===0) {
-            pts[0].set((xMax-ROOM_BLOCK_WIDTH),0,0);
+            pts[0].setFromValues((xMax-ROOM_BLOCK_WIDTH),0,0);
             pts[0].move(room.xBound.min,0,room.zBound.min);
 
-            pts[1].set(xMax,0,0);
+            pts[1].setFromValues(xMax,0,0);
             pts[1].move(room.xBound.min,0,room.zBound.min);
 
-            pts[2].set(xMax,0,ROOM_BLOCK_WIDTH);
+            pts[2].setFromValues(xMax,0,ROOM_BLOCK_WIDTH);
             pts[2].move(room.xBound.min,0,room.zBound.min);
 
-            pts[3].set((xMax-wid),0,ROOM_BLOCK_WIDTH);
+            pts[3].setFromValues((xMax-wid),0,ROOM_BLOCK_WIDTH);
             pts[3].move(room.xBound.min,0,room.zBound.min);
             
-            pts[4].set((xMax-ROOM_BLOCK_WIDTH),0,wid);
+            pts[4].setFromValues((xMax-ROOM_BLOCK_WIDTH),0,wid);
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
             this.addLedgeChunk(room,pts,5,high,[true,true,false,false,false],ledgeBitmap);
         }
         
         if (room.getEdgeGridValue((room.xBlockSize-1),(room.zBlockSize-1))===0) {
-            pts[0].set((xMax-wid),0,(zMax-ROOM_BLOCK_WIDTH));
+            pts[0].setFromValues((xMax-wid),0,(zMax-ROOM_BLOCK_WIDTH));
             pts[0].move(room.xBound.min,0,room.zBound.min);
 
-            pts[1].set(xMax,0,(zMax-ROOM_BLOCK_WIDTH));
+            pts[1].setFromValues(xMax,0,(zMax-ROOM_BLOCK_WIDTH));
             pts[1].move(room.xBound.min,0,room.zBound.min);
 
-            pts[2].set(xMax,0,zMax);
+            pts[2].setFromValues(xMax,0,zMax);
             pts[2].move(room.xBound.min,0,room.zBound.min);
 
-            pts[3].set((xMax-ROOM_BLOCK_WIDTH),0,zMax);
+            pts[3].setFromValues((xMax-ROOM_BLOCK_WIDTH),0,zMax);
             pts[3].move(room.xBound.min,0,room.zBound.min);
             
-            pts[4].set((xMax-ROOM_BLOCK_WIDTH),0,(zMax-wid));
+            pts[4].setFromValues((xMax-ROOM_BLOCK_WIDTH),0,(zMax-wid));
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
             this.addLedgeChunk(room,pts,5,high,[false,true,true,false,false],ledgeBitmap);
         }
         
         if (room.getEdgeGridValue(0,(room.zBlockSize-1))===0) {
-            pts[0].set(0,0,(zMax-ROOM_BLOCK_WIDTH));
+            pts[0].setFromValues(0,0,(zMax-ROOM_BLOCK_WIDTH));
             pts[0].move(room.xBound.min,0,room.zBound.min);
 
-            pts[1].set(wid,0,(zMax-ROOM_BLOCK_WIDTH));
+            pts[1].setFromValues(wid,0,(zMax-ROOM_BLOCK_WIDTH));
             pts[1].move(room.xBound.min,0,room.zBound.min);
 
-            pts[2].set(ROOM_BLOCK_WIDTH,0,(zMax-wid));
+            pts[2].setFromValues(ROOM_BLOCK_WIDTH,0,(zMax-wid));
             pts[2].move(room.xBound.min,0,room.zBound.min);
 
-            pts[3].set(ROOM_BLOCK_WIDTH,0,zMax);
+            pts[3].setFromValues(ROOM_BLOCK_WIDTH,0,zMax);
             pts[3].move(room.xBound.min,0,room.zBound.min);
             
-            pts[4].set(0,0,zMax);
+            pts[4].setFromValues(0,0,zMax);
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
             this.addLedgeChunk(room,pts,5,high,[false,false,false,true,true],ledgeBitmap);

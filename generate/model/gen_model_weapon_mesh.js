@@ -283,14 +283,14 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
             uAng=ang/360.0;
             
             v=vertexList[vIdx++];
-            v.position.set(tx,ty,pt1.z);
-            v.uv.set(uAng,0.0);
+            v.position.setFromValues(tx,ty,pt1.z);
+            v.uv.setFromValues(uAng,0.0);
             v.normal.setFromSubPoint(v.position,pt1);
             v.normal.normalize();
             
             v=vertexList[vIdx++];
-            v.position.set(bx,by,pt2.z);
-            v.uv.set(uAng,1.0);
+            v.position.setFromValues(bx,by,pt2.z);
+            v.uv.setFromValues(uAng,1.0);
             v.normal.setFromSubPoint(v.position,pt2);
             v.normal.normalize();
 

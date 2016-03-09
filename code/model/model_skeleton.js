@@ -251,7 +251,7 @@ function ModelSkeletonObject()
         
         for (n=0;n!==nBone;n++) {
             bone=this.bones[n];
-            bone.nextPoseAngle.set(0.0,0.0,0.0);
+            bone.nextPoseAngle.setFromValues(0.0,0.0,0.0);
         }
     };
     
@@ -334,13 +334,13 @@ function ModelSkeletonObject()
         if (this.lastAnimationFlip) backLeg=!backLeg;
         
         if (backLeg) {
-            this.bones[limb.boneIndexes[0]].nextPoseAngle.set(-r,0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.set(-(r*0.7),0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.set(-(r*0.5),0.0,0.0);
+            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(-r,0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*0.7),0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*0.5),0.0,0.0);
         }
         else {
-            this.bones[limb.boneIndexes[0]].nextPoseAngle.set(r,0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.set((r*2.0),0.0,0.0);
+            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*2.0),0.0,0.0);
         }
     };
     
@@ -356,8 +356,8 @@ function ModelSkeletonObject()
         z=-armAngle;
         if (limb.limbType===LIMB_TYPE_ARM_LEFT) z=-z;
         
-        this.bones[limb.boneIndexes[0]].nextPoseAngle.set(0,0.0,z);
-        this.bones[limb.boneIndexes[1]].nextPoseAngle.set(0,0.0,(z*0.9));
+        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0,0.0,z);
+        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0,0.0,(z*0.9));
     };
     
     this.randomNextPoseBody=function(view,limb,startAng,extraAng)
@@ -369,7 +369,7 @@ function ModelSkeletonObject()
         if (this.lastAnimationFlip) x=-x;
             
         for (n=0;n!==nBone;n++) {
-            this.bones[limb.boneIndexes[n]].nextPoseAngle.set(x,0.0,0.0);
+            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);
             x*=0.75;
         }
     };

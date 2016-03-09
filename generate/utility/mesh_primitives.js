@@ -32,67 +32,67 @@ function MeshPrimitivesObject()
         var idx=0;
 
         if (left) {
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min); 
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);        
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);     
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);    
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);  
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);    
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);  
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
         }
 
              // right
 
         if (right) {
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
         }
 
             // front
 
         if (front) {
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
         }
 
             // back
 
         if (back) {
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
         }
 
             // top
 
         if (top) {
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-            vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
         }
 
             // bottom
 
         if (bottom) {
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
-            vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-            vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
         }
 
         var n;
@@ -170,21 +170,21 @@ function MeshPrimitivesObject()
         
         var idx=0;
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(x,yBound.max,z);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(x,yBound.max,z);
 
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(x,yBound.max,z);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(x,yBound.max,z);
 
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.set(x,yBound.max,z);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(x,yBound.max,z);
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(x,yBound.max,z);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(x,yBound.max,z);
 
         var n;
         var indexes=new Uint16Array(12);
@@ -287,28 +287,28 @@ function MeshPrimitivesObject()
                     // the points
                 
                 v=vertexList[vIdx];
-                v.position.set(tx,ySegBound.min,tz);
-                v.uv.set((ang/360.0),0.0);
+                v.position.setFromValues(tx,ySegBound.min,tz);
+                v.uv.setFromValues((ang/360.0),0.0);
                 
                 v=vertexList[vIdx+1];
-                v.position.set(tx2,ySegBound.min,tz2);
-                v.uv.set((ang2/360.0),0.0);
+                v.position.setFromValues(tx2,ySegBound.min,tz2);
+                v.uv.setFromValues((ang2/360.0),0.0);
                 
                 v=vertexList[vIdx+2];
-                v.position.set(bx,ySegBound.max,bz);
-                v.uv.set((ang/360.0),1.0);
+                v.position.setFromValues(bx,ySegBound.max,bz);
+                v.uv.setFromValues((ang/360.0),1.0);
                 
                 v=vertexList[vIdx+3];
-                v.position.set(tx2,ySegBound.min,tz2);
-                v.uv.set((ang2/360.0),0.0);
+                v.position.setFromValues(tx2,ySegBound.min,tz2);
+                v.uv.setFromValues((ang2/360.0),0.0);
                 
                 v=vertexList[vIdx+4];
-                v.position.set(bx2,ySegBound.max,bz2);
-                v.uv.set((ang2/360.0),1.0);
+                v.position.setFromValues(bx2,ySegBound.max,bz2);
+                v.uv.setFromValues((ang2/360.0),1.0);
                 
                 v=vertexList[vIdx+5];
-                v.position.set(bx,ySegBound.max,bz);
-                v.uv.set((ang/360.0),1.0);
+                v.position.setFromValues(bx,ySegBound.max,bz);
+                v.uv.setFromValues((ang/360.0),1.0);
                 
                     // the normals
                     

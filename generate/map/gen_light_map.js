@@ -427,7 +427,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
         
             // start at black
             
-        col.set(0.0,0.0,0.0);
+        col.setFromValues(0.0,0.0,0.0);
 
             // we use the passed in light list which is a cut down
             // list precalculcated from mesh/light interactions and
@@ -466,9 +466,9 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             
                 // light bounding
 
-            this.lightBoundX.set(vx,light.position.x);
-            this.lightBoundY.set(vy,light.position.y);
-            this.lightBoundZ.set(vz,light.position.z);
+            this.lightBoundX.setFromValues(vx,light.position.x);
+            this.lightBoundY.setFromValues(vy,light.position.y);
+            this.lightBoundZ.setFromValues(vz,light.position.z);
 
                 // each light has a list of meshes within
                 // it's light cone, these are the only meshes
@@ -584,7 +584,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             lightIdx=mesh.lightIntersectList[n];
             light=this.map.lights[lightIdx];
 
-            this.lightVectorNormal.set((light.position.x-vs[0].x),(light.position.y-vs[0].y),(light.position.z-vs[0].z));
+            this.lightVectorNormal.setFromValues((light.position.x-vs[0].x),(light.position.y-vs[0].y),(light.position.z-vs[0].z));
             this.lightVectorNormal.normalize();
             if (this.lightVectorNormal.dot(normal)>=0.0) lightList.push(lightIdx);
         }
@@ -742,15 +742,15 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
             // get the bounds of the 3D triangle
 
-        this.xTrigBound.set(v0.position.x,v0.position.x);
+        this.xTrigBound.setFromValues(v0.position.x,v0.position.x);
         this.xTrigBound.adjust(v1.position.x);
         this.xTrigBound.adjust(v2.position.x);
 
-        this.yTrigBound.set(v0.position.y,v0.position.y);
+        this.yTrigBound.setFromValues(v0.position.y,v0.position.y);
         this.yTrigBound.adjust(v1.position.y);
         this.yTrigBound.adjust(v2.position.y);
 
-        this.zTrigBound.set(v0.position.z,v0.position.z);
+        this.zTrigBound.setFromValues(v0.position.z,v0.position.z);
         this.zTrigBound.adjust(v1.position.z);
         this.zTrigBound.adjust(v2.position.z);
 
@@ -775,20 +775,20 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
         if (wallLike) {
             if (this.xTrigBound.getSize()>this.zTrigBound.getSize()) {
-                this.pt0.set(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
-                this.pt1.set(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
-                this.pt2.set(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
+                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
+                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
+                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
             }
             else {
-                this.pt0.set(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
-                this.pt1.set(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
-                this.pt2.set(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
+                this.pt0.setFromValues(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
+                this.pt1.setFromValues(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
+                this.pt2.setFromValues(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
             }
         }
         else {
-            this.pt0.set(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
-            this.pt1.set(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
-            this.pt2.set(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
+            this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
+            this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
+            this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
         }
 
             // move so the triangle renders within
@@ -998,7 +998,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            this.bitmapList.add(new Bitmap(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
+            this.bitmapList.addBitmap(new Bitmap(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
         }
 
             // and set the light map on the meshes
@@ -1008,7 +1008,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshes[n];
-            mesh.lightmap=this.bitmapList.get('Lightmap '+mesh.tempLightmapIdx);
+            mesh.lightmap=this.bitmapList.getBitmap('Lightmap '+mesh.tempLightmapIdx);
         }
         
                     // debugging

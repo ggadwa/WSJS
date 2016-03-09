@@ -283,17 +283,17 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         for (n=0;n!==this.xBlockSize;n++) {
             x2=x+ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.min);
-            vertexList[vIdx+1].position.set(x2,yStoryBound.min,this.zBound.min);
-            vertexList[vIdx+2].position.set(x2,yStoryBound.max,this.zBound.min);
+            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.min);
+            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.min,this.zBound.min);
+            vertexList[vIdx+2].position.setFromValues(x2,yStoryBound.max,this.zBound.min);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.min);
-            vertexList[vIdx+1].position.set(x2,yStoryBound.max,this.zBound.min);
-            vertexList[vIdx+2].position.set(x,yStoryBound.max,this.zBound.min);
+            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.min);
+            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.max,this.zBound.min);
+            vertexList[vIdx+2].position.setFromValues(x,yStoryBound.max,this.zBound.min);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -309,17 +309,17 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         for (n=0;n!==this.zBlockSize;n++) {
             z2=z+ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.set(this.xBound.max,yStoryBound.min,z);
-            vertexList[vIdx+1].position.set(this.xBound.max,yStoryBound.min,z2);
-            vertexList[vIdx+2].position.set(this.xBound.max,yStoryBound.max,z2);
+            vertexList[vIdx].position.setFromValues(this.xBound.max,yStoryBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.max,yStoryBound.min,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.max,yStoryBound.max,z2);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.set(this.xBound.max,yStoryBound.min,z);
-            vertexList[vIdx+1].position.set(this.xBound.max,yStoryBound.max,z2);
-            vertexList[vIdx+2].position.set(this.xBound.max,yStoryBound.max,z);
+            vertexList[vIdx].position.setFromValues(this.xBound.max,yStoryBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.max,yStoryBound.max,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.max,yStoryBound.max,z);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -335,17 +335,17 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         for (n=0;n!==this.xBlockSize;n++) {
             x2=x+ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.max);
-            vertexList[vIdx+1].position.set(x2,yStoryBound.min,this.zBound.max);
-            vertexList[vIdx+2].position.set(x2,yStoryBound.max,this.zBound.max);
+            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.max);
+            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.min,this.zBound.max);
+            vertexList[vIdx+2].position.setFromValues(x2,yStoryBound.max,this.zBound.max);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.set(x,yStoryBound.min,this.zBound.max);
-            vertexList[vIdx+1].position.set(x2,yStoryBound.max,this.zBound.max);
-            vertexList[vIdx+2].position.set(x,yStoryBound.max,this.zBound.max);
+            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.max);
+            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.max,this.zBound.max);
+            vertexList[vIdx+2].position.setFromValues(x,yStoryBound.max,this.zBound.max);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -361,17 +361,17 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         for (n=0;n!==this.zBlockSize;n++) {
             z2=z+ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.set(this.xBound.min,yStoryBound.min,z);
-            vertexList[vIdx+1].position.set(this.xBound.min,yStoryBound.min,z2);
-            vertexList[vIdx+2].position.set(this.xBound.min,yStoryBound.max,z2);
+            vertexList[vIdx].position.setFromValues(this.xBound.min,yStoryBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.min,yStoryBound.min,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.min,yStoryBound.max,z2);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.set(this.xBound.min,yStoryBound.min,z);
-            vertexList[vIdx+1].position.set(this.xBound.min,yStoryBound.max,z2);
-            vertexList[vIdx+2].position.set(this.xBound.min,yStoryBound.max,z);
+            vertexList[vIdx].position.setFromValues(this.xBound.min,yStoryBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.min,yStoryBound.max,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.min,yStoryBound.max,z);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -480,32 +480,32 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
                 vx2=vx+ROOM_BLOCK_WIDTH;
                 
                 v=vertexList[vIdx];
-                v.position.set(vx,y,vz);
-                v.normal.set(0.0,ny,0.0);
+                v.position.setFromValues(vx,y,vz);
+                v.normal.setFromValues(0.0,ny,0.0);
                 
                 v=vertexList[vIdx+1];
-                v.position.set(vx2,y,vz);
-                v.normal.set(0.0,ny,0.0);
+                v.position.setFromValues(vx2,y,vz);
+                v.normal.setFromValues(0.0,ny,0.0);
                 
                 v=vertexList[vIdx+2];
-                v.position.set(vx2,y,vz2);
-                v.normal.set(0.0,ny,0.0);
+                v.position.setFromValues(vx2,y,vz2);
+                v.normal.setFromValues(0.0,ny,0.0);
                 
                 indexes[iIdx++]=vIdx++;
                 indexes[iIdx++]=vIdx++;
                 indexes[iIdx++]=vIdx++;
                 
                 v=vertexList[vIdx];
-                v.position.set(vx,y,vz);
-                v.normal.set(0.0,ny,0.0);
+                v.position.setFromValues(vx,y,vz);
+                v.normal.setFromValues(0.0,ny,0.0);
                 
                 v=vertexList[vIdx+1];
-                v.position.set(vx2,y,vz2);
-                v.normal.set(0.0,ny,0.0);
+                v.position.setFromValues(vx2,y,vz2);
+                v.normal.setFromValues(0.0,ny,0.0);
                 
                 v=vertexList[vIdx+2];
-                v.position.set(vx,y,vz2);
-                v.normal.set(0.0,ny,0.0);
+                v.position.setFromValues(vx,y,vz2);
+                v.normal.setFromValues(0.0,ny,0.0);
 
                 indexes[iIdx++]=vIdx++;
                 indexes[iIdx++]=vIdx++;

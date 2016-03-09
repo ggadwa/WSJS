@@ -23,7 +23,7 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
     this.addPillarsCorners=function(room,yBound)
     {
         var pos;
-        var bitmap=this.bitmapList.get('Map Pillar');
+        var bitmap=this.bitmapList.getBitmap('Map Pillar');
         
         pos=room.checkLocationFreeAndBlock(1,1);
         if (pos!==null) this.map.addMesh(meshPrimitives.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
@@ -41,7 +41,7 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
     this.addPillarsLineX=function(room,yBound)
     {
         var x,mx,mz,pos;
-        var bitmap=this.bitmapList.get('Map Pillar');
+        var bitmap=this.bitmapList.getBitmap('Map Pillar');
         
         mx=Math.trunc(room.xBlockSize/2);
         mz=Math.trunc(room.zBlockSize/2);
@@ -57,7 +57,7 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
     this.addPillarsLineZ=function(room,yBound)
     {
         var z,mx,mz,pos;
-        var bitmap=this.bitmapList.get('Map Pillar');
+        var bitmap=this.bitmapList.getBitmap('Map Pillar');
         
         mx=Math.trunc(room.xBlockSize/2);
         mz=Math.trunc(room.zBlockSize/2);

@@ -51,12 +51,12 @@ class ParticleList
         // particle list
         //
 
-    count()
+    countParticle()
     {
         return(PARTICLE_MAX_COUNT);
     }
 
-    get(particleIdx)
+    getParticle(particleIdx)
     {
         return(this.particles[particleIdx]);
     }

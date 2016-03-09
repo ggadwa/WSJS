@@ -55,7 +55,7 @@ class Collision
 
         if ((r===0.0) && (s===0.0)) return(false);
 
-        lineIntersectPt.set((fx0+(r*bx)),line1.p1.y,(fz0+(r*bz)));
+        lineIntersectPt.setFromValues((fx0+(r*bx)),line1.p1.y,(fz0+(r*bz)));
         return(true);
     }
 
@@ -72,8 +72,8 @@ class Collision
         var rad=0.0;
         var radAdd=(Math.PI*2.0)/24.0;
         
-        this.spokePt.set(circlePt.x,circlePt.y,circlePt.z);
-        this.spokeLine.set(circlePt,this.spokePt);
+        this.spokePt.setFromValues(circlePt.x,circlePt.y,circlePt.z);
+        this.spokeLine.setFromValues(circlePt,this.spokePt);
 
         for (n=0;n!==24;n++) {
             
@@ -108,7 +108,7 @@ class Collision
             // hit point needs to be on the
             // radius of circle2
             
-        circleIntersectPt.set((circlePt1.x-circlePt2.x),0,(circlePt1.z-circlePt2.z));
+        circleIntersectPt.setFromValues((circlePt1.x-circlePt2.x),0,(circlePt1.z-circlePt2.z));
         circleIntersectPt.normalize();
         circleIntersectPt.scale(radius2);
         circleIntersectPt.addPoint(circlePt2);
@@ -133,7 +133,7 @@ class Collision
         var high=entity.high;
         
         var nMesh=map.meshes.length;
-        var nEntity=entityList.count();
+        var nEntity=entityList.countEntity();
         
             // only bump once
             
@@ -148,9 +148,9 @@ class Collision
         
             // the rough collide boxes
             
-        this.objXBound.set((this.testPt.x-radius),(this.testPt.x+radius));
-        this.objYBound.set(this.testPt.y,(this.testPt.y-high));
-        this.objZBound.set((this.testPt.z-radius),(this.testPt.z+radius));
+        this.objXBound.setFromValues((this.testPt.x-radius),(this.testPt.x+radius));
+        this.objYBound.setFromValues(this.testPt.y,(this.testPt.y-high));
+        this.objZBound.setFromValues((this.testPt.z-radius),(this.testPt.z+radius));
         
             // we need to possible run through
             // this multiple times to deal with
@@ -204,7 +204,7 @@ class Collision
                 // check other entities
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=entityList.get(n);
+                checkEntity=entityList.getEntity(n);
                 if (checkEntity.id===entity.id) continue;
                 
                 checkEntityPt=checkEntity.position;
@@ -241,7 +241,7 @@ class Collision
                 // we might have had
                 
             if (currentHitPt===null) {
-                collideMovePt.set(movePt.x,(this.testPt.y-origPt.y),movePt.z);
+                collideMovePt.setFromValues(movePt.x,(this.testPt.y-origPt.y),movePt.z);
                 return;
             }
             
@@ -261,7 +261,7 @@ class Collision
             // we need to move the hit point so it's
             // always outside the radius of moving point
         
-        this.radiusPt.set((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
+        this.radiusPt.setFromValues((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
         
         this.radiusPt.normalize();
         this.radiusPt.scale(radius);
@@ -272,7 +272,7 @@ class Collision
             // point to this current hit point
             // always restore the bump move
         
-        collideMovePt.set((this.radiusPt.x-origPt.x),(this.testPt.y-origPt.y),(this.radiusPt.z-origPt.z));
+        collideMovePt.setFromValues((this.radiusPt.x-origPt.x),(this.testPt.y-origPt.y),(this.radiusPt.z-origPt.z));
     }
     
     //
@@ -286,9 +286,9 @@ class Collision
 
             // the rough collide boxes
             
-        this.objXBound.set((pt.x-radius),(pt.x+radius));
-        this.objYBound.set((pt.y-fallY),(pt.y+fallY));
-        this.objZBound.set((pt.z-radius),(pt.z+radius));
+        this.objXBound.setFromValues((pt.x-radius),(pt.x+radius));
+        this.objYBound.setFromValues((pt.y-fallY),(pt.y+fallY));
+        this.objZBound.setFromValues((pt.z-radius),(pt.z+radius));
         
         nMesh=map.meshes.length;
         

@@ -267,7 +267,7 @@ function MapObject()
         
             // the camera normal
             
-        this.cameraVector.set(0.0,0.0,1.0);
+        this.cameraVector.setFromValues(0.0,0.0,1.0);
         this.cameraVector.rotateX(null,view.camera.angle.x);
         this.cameraVector.rotateY(null,view.camera.angle.y);
         

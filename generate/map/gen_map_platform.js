@@ -19,7 +19,7 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
         var xStairBound=new wsBound((room.xBound.min+(stairX*ROOM_BLOCK_WIDTH)),(room.xBound.min+((stairX+1)*ROOM_BLOCK_WIDTH)));
         var zStairBound=new wsBound((room.zBound.min+(stairZ*ROOM_BLOCK_WIDTH)),(room.zBound.min+((stairZ+1)*ROOM_BLOCK_WIDTH)));
 
-        var stairBitmap=this.bitmapList.get('Map Stairs');
+        var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
         
         var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
         
@@ -120,7 +120,7 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
     {
         var x,z,stairX,stairZ,stairDir;
         
-        var platformBitmap=this.bitmapList.get('Map Platform');
+        var platformBitmap=this.bitmapList.getBitmap('Map Platform');
         
             // random stair direction
             

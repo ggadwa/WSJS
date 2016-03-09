@@ -37,12 +37,12 @@ class BitmapList
         // add or get a bitmap
         //
         
-    add(bitmap)
+    addBitmap(bitmap)
     {
         this.bitmaps.push(bitmap);
     }
     
-    get(name)
+    getBitmap(name)
     {
         var n;
         var nBitmap=this.bitmaps.length;

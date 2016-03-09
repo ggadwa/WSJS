@@ -144,7 +144,7 @@ function MeshUtilityObject()
                 // more towards the center or more
                 // away from it
 
-            trigCenter.set(((v0.position.x+v1.position.x+v2.position.x)/3),((v0.position.y+v1.position.y+v2.position.y)/3),((v0.position.z+v1.position.z+v2.position.z)/3));
+            trigCenter.setFromValues(((v0.position.x+v1.position.x+v2.position.x)/3),((v0.position.y+v1.position.y+v2.position.y)/3),((v0.position.z+v1.position.z+v2.position.z)/3));
             faceVct.setFromSubPoint(trigCenter,meshCenter);
 
             flip=(normal.dot(faceVct)>0.0);

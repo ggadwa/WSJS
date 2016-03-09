@@ -161,10 +161,10 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         bones[torsoBoneIdx].gravityLockDistance=botBodyRadius+Math.trunc((topBodyRadius-botBodyRadius)*0.66);
         bones[torsoTopBoneIdx].gravityLockDistance=topBodyRadius;
         
-        bones[hipBoneIdx].gravityScale.set(1.0,1.0,0.7);
-        bones[waistBoneIdx].gravityScale.set(1.0,1.0,0.7);
-        bones[torsoBoneIdx].gravityScale.set(1.0,1.0,0.7);
-        bones[torsoTopBoneIdx].gravityScale.set(1.0,1.0,0.7);
+        bones[hipBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
+        bones[waistBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
+        bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
+        bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
             
         this.model.skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
         
@@ -273,10 +273,10 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         bones[torsoBoneIdx].gravityLockDistance=rightBodyRadius+Math.trunc((leftBodyRadius-rightBodyRadius)*0.66);
         bones[torsoTopBoneIdx].gravityLockDistance=leftBodyRadius;
         
-        bones[hipBoneIdx].gravityScale.set(1.0,1.0,0.7);
-        bones[waistBoneIdx].gravityScale.set(1.0,1.0,0.7);
-        bones[torsoBoneIdx].gravityScale.set(1.0,1.0,0.7);
-        bones[torsoTopBoneIdx].gravityScale.set(1.0,1.0,0.7);
+        bones[hipBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
+        bones[waistBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
+        bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
+        bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
                     
         this.model.skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
         
@@ -345,10 +345,10 @@ function GenModelOrganicSkeletonObject(model,genRandom)
         
         var xScale=this.genRandom.randomInt(70,50)/100.0;
         var zScale=this.genRandom.randomInt(70,50)/100.0;
-        bones[hipBoneIdx].gravityScale.set(xScale,1.0,zScale);
-        bones[waistBoneIdx].gravityScale.set(xScale,1.0,zScale);
-        bones[torsoBoneIdx].gravityScale.set(xScale,1.0,zScale);
-        bones[torsoTopBoneIdx].gravityScale.set(xScale,1.0,zScale);
+        bones[hipBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
+        bones[waistBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
+        bones[torsoBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
+        bones[torsoTopBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
             
         this.model.skeleton.limbs.push(new ModelLimbObject(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
         

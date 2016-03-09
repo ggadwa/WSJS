@@ -15,37 +15,37 @@ function GenRoomStairs(map,genRandom)
         
     this.createSingleWallX=function(idx,vertexList,x,yBoundBottom,yBoundTop,zBound)
     {
-        vertexList[idx++].position.set(x,yBoundBottom.min,zBound.min);
-        vertexList[idx++].position.set(x,yBoundTop.min,zBound.max);
-        vertexList[idx++].position.set(x,yBoundTop.max,zBound.max);
-        vertexList[idx++].position.set(x,yBoundBottom.max,zBound.min);
+        vertexList[idx++].position.setFromValues(x,yBoundBottom.min,zBound.min);
+        vertexList[idx++].position.setFromValues(x,yBoundTop.min,zBound.max);
+        vertexList[idx++].position.setFromValues(x,yBoundTop.max,zBound.max);
+        vertexList[idx++].position.setFromValues(x,yBoundBottom.max,zBound.min);
         return(idx);
     };
     
     this.createSingleWallZ=function(idx,vertexList,xBound,yBoundBottom,yBoundTop,z)
     {
-        vertexList[idx++].position.set(xBound.min,yBoundBottom.min,z);
-        vertexList[idx++].position.set(xBound.max,yBoundTop.min,z);
-        vertexList[idx++].position.set(xBound.max,yBoundTop.max,z);
-        vertexList[idx++].position.set(xBound.min,yBoundBottom.max,z);
+        vertexList[idx++].position.setFromValues(xBound.min,yBoundBottom.min,z);
+        vertexList[idx++].position.setFromValues(xBound.max,yBoundTop.min,z);
+        vertexList[idx++].position.setFromValues(xBound.max,yBoundTop.max,z);
+        vertexList[idx++].position.setFromValues(xBound.min,yBoundBottom.max,z);
         return(idx);
     };
     
     this.createSingleCeilingX=function(idx,vertexList,xBound,yBoundBottom,yBoundTop,zBound)
     {
-        vertexList[idx++].position.set(xBound.min,yBoundBottom.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBoundTop.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBoundTop.min,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBoundBottom.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBoundBottom.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBoundTop.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBoundTop.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBoundBottom.min,zBound.max);
         return(idx);
     };
     
     this.createSingleCeilingZ=function(idx,vertexList,xBound,yBoundBottom,yBoundTop,zBound)
     {
-        vertexList[idx++].position.set(xBound.min,yBoundBottom.min,zBound.min);
-        vertexList[idx++].position.set(xBound.min,yBoundTop.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBoundTop.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBoundBottom.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBoundBottom.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBoundTop.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBoundTop.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBoundBottom.min,zBound.min);
         return(idx);
     };
     
@@ -58,7 +58,7 @@ function GenRoomStairs(map,genRandom)
         var n;
         
         for (n=0;n!==4;n++) {
-            vertexList[nIdx++].normal.set(nx,ny,nz);
+            vertexList[nIdx++].normal.setFromValues(nx,ny,nz);
         }
         
         return(nIdx);

@@ -97,8 +97,8 @@ class Particle
 
     setColor(colorStartR,colorStartG,colorStartB,colorEndR,colorEndG,colorEndB)
     {
-        this.colorStart.set(colorStartR,colorStartG,colorStartB);
-        this.colorEnd.set(colorEndR,colorEndG,colorEndB);
+        this.colorStart.setFromValues(colorStartR,colorStartG,colorStartB);
+        this.colorEnd.setFromValues(colorEndR,colorEndG,colorEndB);
     }
     
     setAlpha(alphaStart,alphaEnd)
@@ -131,7 +131,7 @@ class Particle
     
     setPoint(pointIdx,x,y,z)
     {
-        this.points[pointIdx].set(x,y,z);
+        this.points[pointIdx].setFromValues(x,y,z);
     }
     
         //
@@ -145,8 +145,8 @@ class Particle
         for (n=0;n!==pointCount;n++) {
             pnt=this.points[n];
             
-            pnt.set(0.0,0.0,1.0);
-            this.randomRot.set((view.genRandom.random()*360.0),(view.genRandom.random()*360.0),(view.genRandom.random()*360.0));
+            pnt.setFromValues(0.0,0.0,1.0);
+            this.randomRot.setFromValues((view.genRandom.random()*360.0),(view.genRandom.random()*360.0),(view.genRandom.random()*360.0));
             pnt.rotate(this.randomRot);
         }
         

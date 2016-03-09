@@ -19,7 +19,7 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
     {
         var n,idx;
         var vertexList,indexes;
-        var bitmap=this.bitmapList.get('Map Closet');
+        var bitmap=this.bitmapList.getBitmap('Map Closet');
         
             // center point for normal creation
             
@@ -30,33 +30,33 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
         idx=0;
         vertexList=meshUtility.createMapVertexList(24);
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min); 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);        
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);     
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);    
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);  
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);    
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);  
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
 
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
 
         indexes=new Uint16Array(24);
 
@@ -75,12 +75,12 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
         idx=0;
         vertexList=meshUtility.createMapVertexList(6);
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
         
         indexes=new Uint16Array(6);
 
@@ -99,12 +99,12 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
         idx=0;
         vertexList=meshUtility.createMapVertexList(6);
 
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
 
         indexes=new Uint16Array(6);
 

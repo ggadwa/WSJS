@@ -140,7 +140,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         var storyCount,yStoryBound,yFloorBound;
         var roomIdx,room;
         var hasStories;
-        var roomBitmap=this.bitmapList.get('Map Wall');
+        var roomBitmap=this.bitmapList.getBitmap('Map Wall');
         
             // stories, platforms, and ledges
             
@@ -159,7 +159,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         
             // floor
             
-        this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.get('Map Floor'),yBound,true,MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.getBitmap('Map Floor'),yBound,true,MESH_FLAG_ROOM_FLOOR));
 
             // walls
             
@@ -181,7 +181,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         
             // the ceiling
             
-        this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.get('Map Ceiling'),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.getBitmap('Map Ceiling'),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
         
         return(roomIdx);
     };
@@ -190,8 +190,8 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
     {
         var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
 
-        var roomBitmap=this.bitmapList.get('Map Wall');
-        var stairBitmap=this.bitmapList.get('Map Stairs');
+        var roomBitmap=this.bitmapList.getBitmap('Map Wall');
+        var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
         
             // flip the direction if going down
             
@@ -254,7 +254,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
         var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
         var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-        this.map.addMesh(meshPrimitives.createMeshPryamid(this.bitmapList.get('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
+        this.map.addMesh(meshPrimitives.createMeshPryamid(this.bitmapList.getBitmap('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
 
             // the color
 

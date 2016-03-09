@@ -37,7 +37,7 @@ function debugDrawWave(ctx,wid,high,data)
 
 function debugClickSound(event,name)
 {
-    debugSoundList.get(name).playSimple();
+    debugSoundList.getSound(name).playSimple();
 }
 
 function debugInit()
@@ -109,7 +109,7 @@ function debugInit()
             // generate random sound
             
         debugSound=genSound.generate(GEN_SOUND_TYPE_NAMES[n],n);
-        debugSoundList.add(debugSound);      // so we can play later
+        debugSoundList.addSound(debugSound);      // so we can play later
 
             // label
 

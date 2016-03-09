@@ -20,57 +20,57 @@ function GenModelProjectileMeshObject(model,bitmap,genRandom)
         
             // left
             
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min); 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);        
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);     
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);    
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);  
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);    
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);  
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
 
              // right
 
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
 
             // front
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
 
             // back
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
 
             // top
 
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
 
             // bottom
 
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.set(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.set(xBound.min,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
         
         for (n=0;n!==36;n++) {
             indexes[n]=n;

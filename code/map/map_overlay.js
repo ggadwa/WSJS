@@ -263,24 +263,24 @@ function MapOverlayObject()
         var p3=new ws2DIntPoint(0,0);
         
         var entity,ang,pos;
-        var nEntity=entityList.count();
+        var nEntity=entityList.countEntity();
         
         var playerColor=new wsColor(0.5,1.0,0.5);
         var monsterColor=new wsColor(1.0,0.5,0.5);
 
         for (n=0;n!==nEntity;n++) {
-            entity=entityList.get(n);
+            entity=entityList.getEntity(n);
             if (entity instanceof EntityProjectile) continue;
             
             this.mapOverlayShader.drawColor(view,((n===0)?playerColor:monsterColor));       // index 0 is the player
             
             ang=360.0-entity.angle.y;
         
-            p1.set(-5,5);
+            p1.setFromValues(-5,5);
             p1.rotate(null,ang);
-            p2.set(0,-5);
+            p2.setFromValues(0,-5);
             p2.rotate(null,ang);
-            p3.set(5,5);
+            p3.setFromValues(5,5);
             p3.rotate(null,ang);
             
             pos=entity.position;

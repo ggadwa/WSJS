@@ -142,14 +142,14 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
         var topIdx=Math.trunc(vIdx);
         
         v=vertexList[vIdx++];
-        v.position.set(centerPnt.x,(centerPnt.y-highRadius),centerPnt.z);
-        v.uv.set(0.5,0.0);
+        v.position.setFromValues(centerPnt.x,(centerPnt.y-highRadius),centerPnt.z);
+        v.uv.setFromValues(0.5,0.0);
         
         var botIdx=Math.trunc(vIdx);
        
         v=vertexList[vIdx++];
-        v.position.set(centerPnt.x,(centerPnt.y+highRadius),centerPnt.z);
-        v.uv.set(0.5,1.0);
+        v.position.setFromValues(centerPnt.x,(centerPnt.y+highRadius),centerPnt.z);
+        v.uv.setFromValues(0.5,1.0);
         
             // build the triangles on
             // all the strips except the
@@ -259,7 +259,7 @@ function GenModelOrganicMeshObject(model,bitmap,genRandom)
                     // get the gravity to each bone
 
                 boneHit=false;
-                moveVector.set(0,0,0);
+                moveVector.setFromValues(0,0,0);
                 
                 for (k=0;k!==nBone;k++) {
                     bone=boneList[k];

@@ -51,7 +51,7 @@ class SoundList
         var pos=entity.position;
         var ang=entity.angle;
         
-        this.listenerForwardVector.set(0.0,0.0,1.0);
+        this.listenerForwardVector.setFromValues(0.0,0.0,1.0);
         this.listenerForwardVector.rotateY(null,ang.y);
         
         //this.ctx.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0.0,1.0,0.0);
@@ -62,12 +62,12 @@ class SoundList
         // add and get sounds in list
         //
         
-    add(sound)
+    addSound(sound)
     {
         this.sounds.push(sound);
     }
     
-    get(name)
+    getSound(name)
     {
         var n;
         var nSound=this.sounds.length;
