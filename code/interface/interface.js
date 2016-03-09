@@ -1,43 +1,42 @@
-"use strict";
-
 //
 // interface class
 //
 
-function InterfaceObject()
+class InterfaceClass
 {
-        // variables
-        
-    this.interfaceShader=new InterfaceShader();
-    
-    this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
-    this.vertexPosBuffer=null;
+    constructor()
+    {
+        this.interfaceShader=new InterfaceShaderClass();
 
+        this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
+        this.vertexPosBuffer=null;
+    }
+    
         //
         // initialize/release interface
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
         if (!this.interfaceShader.initialize(view)) return(false);
         
         this.vertexPosBuffer=view.gl.createBuffer();
         
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         view.gl.deleteBuffer(this.vertexPosBuffer);
         
         this.interfaceShader.release(view);
-    };
+    }
 
         //
         // start/stop/draw interface
         //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
         var gl=view.gl;
         
@@ -47,9 +46,9 @@ function InterfaceObject()
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
 
         this.interfaceShader.drawStart(view);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         var gl=view.gl;
 
@@ -57,9 +56,9 @@ function InterfaceObject()
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
-    };
+    }
     
-    this.drawFrameRect=function(view,rect,color)
+    drawFrameRect(view,rect,color)
     {
         var gl=view.gl;
         
@@ -93,9 +92,9 @@ function InterfaceObject()
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-    };
+    }
     
-    this.drawRect=function(view,rect,color)
+    drawRect(view,rect,color)
     {
         var gl=view.gl;
         
@@ -134,6 +133,6 @@ function InterfaceObject()
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-    };
+    }
     
 }

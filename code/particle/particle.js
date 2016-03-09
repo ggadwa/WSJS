@@ -2,7 +2,7 @@
 // particle class
 //
 
-class Particle
+class ParticleClass
 {
     constructor()
     {

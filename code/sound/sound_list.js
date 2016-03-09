@@ -2,7 +2,7 @@
 // sound list class
 //
 
-class SoundList
+class SoundListClass
 {
     constructor()
     {

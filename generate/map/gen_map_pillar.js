@@ -1,44 +1,43 @@
-"use strict";
-
 //
 // generate room pillar class
 //
 
-function GenRoomPillarObject(view,bitmapList,map,genRandom)
+class GenRoomPillarClass
 {
-        // variables
-        
-    this.view=view;
-    this.bitmapList=bitmapList;
-    this.map=map;
-    this.genRandom=genRandom;
-    
-    var radius=this.genRandom.randomInBetween(ROOM_PILLAR_MIN_RADIUS,ROOM_PILLAR_MAX_RADIUS);
-    this.segments=meshPrimitives.createMeshCylinderSegmentList(this.genRandom,radius,radius,1,ROOM_PILLAR_EXTRA_SEGMENTS);
+    constructor(view,bitmapList,map,genRandom)
+    {    
+        this.view=view;
+        this.bitmapList=bitmapList;
+        this.map=map;
+        this.genRandom=genRandom;
+
+        var radius=this.genRandom.randomInBetween(ROOM_PILLAR_MIN_RADIUS,ROOM_PILLAR_MAX_RADIUS);
+        this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(this.genRandom,radius,radius,1,ROOM_PILLAR_EXTRA_SEGMENTS);
+    }
     
         //
         // pillar types
         //
         
-    this.addPillarsCorners=function(room,yBound)
+    addPillarsCorners(room,yBound)
     {
         var pos;
         var bitmap=this.bitmapList.getBitmap('Map Pillar');
         
         pos=room.checkLocationFreeAndBlock(1,1);
-        if (pos!==null) this.map.addMesh(meshPrimitives.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
         pos=room.checkLocationFreeAndBlock((room.xBlockSize-2),1);
-        if (pos!==null) this.map.addMesh(meshPrimitives.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
         pos=room.checkLocationFreeAndBlock((room.xBlockSize-2),(room.zBlockSize-2));
-        if (pos!==null) this.map.addMesh(meshPrimitives.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
         pos=room.checkLocationFreeAndBlock(1,(room.zBlockSize-2));
-        if (pos!==null) this.map.addMesh(meshPrimitives.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
-    };
+        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+    }
     
-    this.addPillarsLineX=function(room,yBound)
+    addPillarsLineX(room,yBound)
     {
         var x,mx,mz,pos;
         var bitmap=this.bitmapList.getBitmap('Map Pillar');
@@ -50,11 +49,11 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
             if (x===mx) continue;           // never block light
             
             pos=room.checkLocationFreeAndBlock(x,mz);
-            if (pos!==null) map.addMesh(meshPrimitives.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
-    };
+    }
     
-    this.addPillarsLineZ=function(room,yBound)
+    addPillarsLineZ(room,yBound)
     {
         var z,mx,mz,pos;
         var bitmap=this.bitmapList.getBitmap('Map Pillar');
@@ -66,15 +65,15 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
             if (z===mz) continue;           // never block light
             
             pos=room.checkLocationFreeAndBlock(mx,z);
-            if (pos!==null) map.addMesh(meshPrimitives.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
-    };
+    }
     
         //
         // pillars
         //
     
-    this.addPillars=function(room)
+    addPillars(room)
     {
         var yBound;
         
@@ -99,6 +98,6 @@ function GenRoomPillarObject(view,bitmapList,map,genRandom)
         else {
             this.addPillarsLineZ(room,yBound);
         }
-    };
+    }
     
 }

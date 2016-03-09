@@ -1,57 +1,58 @@
-"use strict";
-
 //
 // model object
 //
 
-function ModelObject(name,modelType)
+class ModelClass
 {
-    this.name=name;
-    this.modelType=modelType;
-    this.modelShader=null;          // this gets set when model is attached to model list
-    this.mesh=null;
-    this.skeleton=null;
+    constructor(name,modelType)
+    {
+        this.name=name;
+        this.modelType=modelType;
+        this.modelShader=null;          // this gets set when model is attached to model list
+        this.mesh=null;
+        this.skeleton=null;
+    }
     
         //
         // close model
         //
 
-    this.close=function(view)
+    close(view)
     {
         this.mesh.close(view);
         this.skeleton.close();
-    };
+    }
     
         //
         // clone this model
         //
         
-    this.clone=function()
+    clone()
     {
-        var model=new ModelObject(this.name,this.modelType);
+        var model=new ModelClass(this.name,this.modelType);
         
         model.modelShader=this.modelShader;
         model.mesh=this.mesh.clone();
         model.skeleton=this.skeleton.clone();
 
         return(model);
-    };
+    }
     
         //
         // draw model
         //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
         this.modelShader.drawStart(view);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         this.modelShader.drawEnd(view);
-    };
+    }
 
-    this.draw=function(view)
+    draw(view)
     {
         var mesh=this.mesh;
 
@@ -60,6 +61,6 @@ function ModelObject(name,modelType)
         mesh.buildNonCulledTriangleIndexes(view);
         mesh.bindBuffers(view,this.modelShader);
         mesh.draw(view);
-    };
+    }
 
 }

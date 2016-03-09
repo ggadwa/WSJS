@@ -1,27 +1,28 @@
-"use strict";
-
 //
 // map platforms
 //
 
-function GenRoomPlatformObject(bitmapList,map,genRandom)
+class GenRoomPlatformClass
 {
-    this.bitmapList=bitmapList;
-    this.map=map;
-    this.genRandom=genRandom;
+    constructor(bitmapList,map,genRandom)
+    {
+        this.bitmapList=bitmapList;
+        this.map=map;
+        this.genRandom=genRandom;
+    }
     
         //
         // add stairs chunk
         //
         
-    this.addStairChunk=function(room,stairX,stairZ,stairDir,platformBitmap)
+    addStairChunk(room,stairX,stairZ,stairDir,platformBitmap)
     {
         var xStairBound=new wsBound((room.xBound.min+(stairX*ROOM_BLOCK_WIDTH)),(room.xBound.min+((stairX+1)*ROOM_BLOCK_WIDTH)));
         var zStairBound=new wsBound((room.zBound.min+(stairZ*ROOM_BLOCK_WIDTH)),(room.zBound.min+((stairZ+1)*ROOM_BLOCK_WIDTH)));
 
         var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
         
-        var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
         
         switch (stairDir) {
             case 0:
@@ -39,36 +40,54 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
         }
         
             // can't spawn items on this grid spot
+            // or the spot where the stairs empties
             
         room.setBlockGrid(stairX,stairZ);
         
+        switch (stairDir) {
+            case 0:
+                if (stairX>0) room.setBlockGrid((stairX-1),stairZ);
+                break;
+            case 1:
+                if (stairZ>0) room.setBlockGrid(stairX,(stairZ-1));
+                break;
+            case 2:
+                if (stairX<(room.xBlockSize-1)) room.setBlockGrid((stairX+1),stairZ);
+                break;
+            case 3:
+                if (stairZ<(room.zBlockSize-1)) room.setBlockGrid(stairX,(stairZ+1));
+                break;
+        }
+        
+            // add to overlay
+        
         this.map.addOverlayPlatform(xStairBound,zStairBound);
-    };
+    }
     
         //
         // add platform chunk
         //
         
-    this.addPlatformChunk=function(room,x,z,platformBitmap)
+    addPlatformChunk(room,x,z,platformBitmap)
     {
         var xPlatformBound=new wsBound((room.xBound.min+(x*ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*ROOM_BLOCK_WIDTH)));
         var yPlatformBound=new wsBound((room.yBound.min-ROOM_FLOOR_DEPTH),room.yBound.min);
         var zPlatformBound=new wsBound((room.zBound.min+(z*ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*ROOM_BLOCK_WIDTH)));
 
-        this.map.addMesh(meshPrimitives.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_ROOM_PLATFORM));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_ROOM_PLATFORM));
 
             // can now spawn items unto upper grid
             
         room.setPlatformGrid(x,z);
 
         this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
-    };
+    }
     
         //
         // walkways
         //
         
-    this.addChunkWalkwayDirPosX=function(room,stairX,stairZ,platformBitmap)
+    addChunkWalkwayDirPosX(room,stairX,stairZ,platformBitmap)
     {
         var x;
         
@@ -77,9 +96,9 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
         }
         
         return(room.xBlockSize-1);
-    };
+    }
     
-    this.addChunkWalkwayDirPosZ=function(room,stairX,stairZ,platformBitmap)
+    addChunkWalkwayDirPosZ(room,stairX,stairZ,platformBitmap)
     {
         var z;
         
@@ -88,9 +107,9 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
         }
         
         return(room.zBlockSize-1);
-    };
+    }
     
-    this.addChunkWalkwayDirNegX=function(room,stairX,stairZ,platformBitmap)
+    addChunkWalkwayDirNegX(room,stairX,stairZ,platformBitmap)
     {
         var x;
         
@@ -99,9 +118,9 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
         }
         
         return(0);
-    };
+    }
     
-    this.addChunkWalkwayDirNegZ=function(room,stairX,stairZ,platformBitmap)
+    addChunkWalkwayDirNegZ(room,stairX,stairZ,platformBitmap)
     {
         var z;
         
@@ -110,13 +129,13 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
         }
         
         return(0);
-    };
+    }
     
         //
         // create platforms
         // 
     
-    this.createPlatforms=function(room)
+    createPlatforms(room)
     {
         var x,z,stairX,stairZ,stairDir;
         
@@ -181,7 +200,7 @@ function GenRoomPlatformObject(bitmapList,map,genRandom)
                 
         }
         
-    };
+    }
     
 }
 

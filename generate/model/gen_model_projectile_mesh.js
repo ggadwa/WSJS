@@ -1,15 +1,17 @@
-"use strict";
-
 //
 // gen projectile mesh class
 //
 
-function GenModelProjectileMeshObject(model,bitmap,genRandom)
+class GenModelProjectileMeshClass
 {
-    this.model=model;
-    this.genRandom=genRandom;
+    constructor(model,bitmap,genRandom)
+    {
+        this.model=model;
+        this.bitmap=bitmap;
+        this.genRandom=genRandom;
+    }
     
-    this.buildBoxAroundPoint=function(centerPt,sz,vertexList,indexes)
+    buildBoxAroundPoint(centerPt,sz,vertexList,indexes)
     {
         var n,v;
         var idx=0;
@@ -108,25 +110,25 @@ function GenModelProjectileMeshObject(model,bitmap,genRandom)
         
             // finish with normals and tangents
         
-        meshUtility.buildVertexListNormals(vertexList,indexes,centerPt,false);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
-    };
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPt,false);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
+    }
         
         //
         // build projectile mesh
         //
 
-    this.build=function(view)
+    build(view)
     {
-        var vertexList=meshUtility.createModelVertexList(36);
+        var vertexList=MeshUtilityClass.createModelVertexList(36);
         var indexes=new Uint16Array(36);
         
         this.buildBoxAroundPoint(new wsPoint(0,0,0),200,vertexList,indexes);
         
             // add mesh to model
             
-        this.model.mesh=new ModelMeshObject(bitmap,vertexList,indexes,0);
+        this.model.mesh=new ModelMeshClass(this.bitmap,vertexList,indexes,0);
         this.model.mesh.setupBuffers(view);
-    };
+    }
     
 }

@@ -1,49 +1,48 @@
-"use strict";
-
 //
 // map class
 //
 
-function MapObject()
+class MapClass
 {
-        // map items
-        
-    this.mapShader=new MapShader();
-    
-    this.meshes=[];
-    this.lights=[];
-    this.lightmaps=[];
-    this.rooms=[];
-    
-    this.overlay=new MapOverlayObject();
-    
-    this.cameraVector=new wsPoint(0,0,0);           // global not local so they won't get GCd
-    this.lightVector=new wsPoint(0,0,0);
-    this.lightXBound=new wsBound(0,0);
-    this.lightYBound=new wsBound(0,0);
-    this.lightZBound=new wsBound(0,0);
+    constructor()
+    {
+        this.mapShader=new MapShaderClass();
+
+        this.meshes=[];
+        this.lights=[];
+        this.lightmaps=[];
+        this.rooms=[];
+
+        this.overlay=new MapOverlayClass();
+
+        this.cameraVector=new wsPoint(0,0,0);           // global not local so they won't get GCd
+        this.lightVector=new wsPoint(0,0,0);
+        this.lightXBound=new wsBound(0,0);
+        this.lightYBound=new wsBound(0,0);
+        this.lightZBound=new wsBound(0,0);
+    }
     
         //
         // initialize and release
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
         if (!this.overlay.initialize(view)) return(false);
         return(this.mapShader.initialize(view));
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         this.mapShader.release(view);
         this.overlay.release(view);
-    };
+    }
     
         //
         // clear map
         //
 
-    this.clear=function(view)
+    clear(view)
     {
         var n;
         var nMesh=this.meshes.length;
@@ -60,43 +59,43 @@ function MapObject()
         this.meshes=[];
         this.lights=[];
         this.lightmaps=[];
-    };
+    }
 
         //
         // add items to map
         //
 
-    this.addMesh=function(mesh)
+    addMesh(mesh)
     {
         this.meshes.push(mesh);
         return(this.meshes.length-1);
-    };
+    }
 
-    this.addLight=function(light)
+    addLight(light)
     {
         this.lights.push(light);
-    };
+    }
 
-    this.addLightmap=function(lightmap)
+    addLightmap(lightmap)
     {
         this.lightmaps.push(lightmap);
-    };
+    }
     
         //
         // tracking rooms
         //
         
-    this.addRoom=function(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level)
+    addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level)
     {
-        this.rooms.push(new MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level));
+        this.rooms.push(new MapRoomClass(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level));
         return(this.rooms.length-1);
-    };
+    }
 
         //
         // check for map mesh collisions
         //
 
-    this.boxBoundCollision=function(xBound,yBound,zBound,onlyFlag)
+    boxBoundCollision(xBound,yBound,zBound,onlyFlag)
     {
         var n;
         var nMesh=this.meshes.length;
@@ -109,9 +108,9 @@ function MapObject()
         }
 
         return(-1);
-    };
+    }
 
-    this.boxMeshCollision=function(checkMesh,onlyFlag)
+    boxMeshCollision(checkMesh,onlyFlag)
     {
         var n;
         var nMesh=this.meshes.length;
@@ -124,13 +123,13 @@ function MapObject()
         }
 
         return(-1);
-    };
+    }
 
         //
         // flag counts
         //
 
-    this.countMeshByFlag=function(onlyFlag)
+    countMeshByFlag(onlyFlag)
     {
         var n;
         var nMesh=this.meshes.length;
@@ -144,13 +143,13 @@ function MapObject()
         }
 
         return(count);
-    };
+    }
 
         //
         // check if point is in light
         //
 
-    this.pointInLight=function(pt)
+    pointInLight(pt)
     {
         var n;
         var nLight=this.lights.length;
@@ -160,12 +159,12 @@ function MapObject()
         }
 
         return(false);
-    };
+    }
 
-    this.pointInSingleLight=function(light,pt)
+    pointInSingleLight(light,pt)
     {
         return(light.position.distance(pt)<light.intensity);
-    };
+    }
 
         //
         // build list of meshes that intersect with
@@ -173,7 +172,7 @@ function MapObject()
         // meshes
         //
 
-    this.buildLightMeshIntersectLists=function()
+    buildLightMeshIntersectLists()
     {
         var n,k,i,nIntersect,light,mesh;
         var meshIndexes,lightIndexes;
@@ -234,7 +233,7 @@ function MapObject()
 
             mesh.lightIntersectList=new Uint16Array(lightIndexes);
         }
-    };
+    }
 
         //
         // find all the map lights in this view
@@ -243,7 +242,7 @@ function MapObject()
         // outside the light cone
         //
 
-    this.createViewLightsFromMapLights=function(view)
+    createViewLightsFromMapLights(view)
     {
         var n,k,nLight,idx;
         var x,y,z;
@@ -317,14 +316,14 @@ function MapObject()
         while (view.lights.length<view.LIGHT_COUNT) {
             view.lights.push(null);
         }
-    };
+    }
     
         //
         // run through the meshes and
         // have them build their collision meshes
         //
         
-    this.buildCollisionGeometry=function()
+    buildCollisionGeometry()
     {
         var n;
         var nMesh=this.meshes.length;
@@ -335,13 +334,13 @@ function MapObject()
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].buildCollisionGeometry(view);
         }
-    };
+    }
 
         //
         // find positions in map
         //
         
-    this.findRandomEntityPosition=function(genRandom)
+    findRandomEntityPosition(genRandom)
     {
         var roomIdx;
         var pos;
@@ -362,47 +361,47 @@ function MapObject()
         }
 
         return(null);
-    };
+    }
     
         //
         // pass-through for overlays
         //
         
-    this.precalcOverlayDrawValues=function(view)
+    precalcOverlayDrawValues(view)
     {
         this.overlay.precalcDrawValues(view);
-    };
+    }
         
-    this.overlayDraw=function(view,entityList)
+    overlayDraw(view,entityList)
     {
         this.overlay.draw(view,entityList);
-    };
+    }
     
-    this.addOverlayRoom=function(room)
+    addOverlayRoom(room)
     {
         this.overlay.addRoom(room);
-    };
+    }
     
-    this.addOverlayCloset=function(xBound,zBound)
+    addOverlayCloset(xBound,zBound)
     {
         this.overlay.addCloset(xBound,zBound);
-    };
+    }
     
-    this.addOverlayStair=function(xBound,zBound)
+    addOverlayStair(xBound,zBound)
     {
         this.overlay.addStair(xBound,zBound);
     };
     
-    this.addOverlayPlatform=function(xBound,zBound)
+    addOverlayPlatform(xBound,zBound)
     {
         this.overlay.addPlatform(xBound,zBound);
-    };
+    }
 
         //
         // setup all the mesh buffers
         //
 
-    this.setupBuffers=function(view)
+    setupBuffers(view)
     {
         var n;
         var nMesh=this.meshes.length;
@@ -413,23 +412,23 @@ function MapObject()
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].setupBuffers(view);
         }
-    };
+    }
 
         //
         // draw map
         //
 
-    this.drawStart=function(view)
+    drawStart(view)
     {
         this.mapShader.drawStart(view);
-    };
+    }
 
-    this.drawEnd=function(view)
+    drawEnd(view)
     {
         this.mapShader.drawEnd(view);
-    };
+    }
 
-    this.draw=function(view)
+    draw(view)
     {
         var n,mesh;
         var nMesh=this.meshes.length;
@@ -492,7 +491,7 @@ function MapObject()
             }
         }
         
-    };
+    }
     
 }
 

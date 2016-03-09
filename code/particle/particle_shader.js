@@ -2,7 +2,7 @@
 // particle shader class
 //
 
-class ParticleShader extends Shader
+class ParticleShaderClass extends ShaderClass
 {
     constructor()
     {

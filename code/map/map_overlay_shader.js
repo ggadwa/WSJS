@@ -2,7 +2,7 @@
 // map overlay shader class
 //
 
-class MapOverlayShader extends Shader
+class MapOverlayShaderClass extends ShaderClass
 {
     constructor()
     {

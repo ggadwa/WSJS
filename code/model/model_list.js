@@ -1,43 +1,49 @@
-"use strict";
-
 //
 // model list class
 //
 
-function ModelListObject()
+class ModelListClass
 {
-    this.models=[];
-    this.modelShader=new ModelShader();
+    constructor()
+    {
+        this.models=[];
+        this.modelShader=new ModelShaderClass();
+    }
     
         //
         // initialize/release modelList
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
         return(this.modelShader.initialize(view));
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         this.modelShader.release(view);
-    };
+    }
 
         //
         // add models
         //
 
-    this.add=function(model)
+    addModel(model)
     {
         model.modelShader=this.modelShader;
         this.models.push(model);
-    };
+    }
 
         //
         // get models
         //
+    
+    countModel()
+    {
+        return(this.models.length);
+    }
 
-    this.get=function(name)
+    getModel(name)
     {
         var n;
         var nModel=this.models.length;
@@ -47,15 +53,15 @@ function ModelListObject()
         }
 
         return(null);
-    };
+    }
     
         //
         // clone models
         //
         
-    this.clone=function(view,name)
+    cloneModel(view,name)
     {
-        var model=this.get(name);
+        var model=this.getModel(name);
         if (model===null) return(null);
         
         var cloneModel=model.clone();
@@ -64,12 +70,7 @@ function ModelListObject()
         this.models.push(cloneModel);
         
         return(cloneModel);
-    };
-    
-    this.count=function()
-    {
-        return(this.models.length);
-    };
+    }
 
 }
     

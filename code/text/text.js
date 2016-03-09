@@ -6,7 +6,7 @@ class Text
 {
     constructor()
     {    
-        this.textShader=new TextShader();
+        this.textShader=new TextShaderClass();
         this.fontTexture=null;
 
         this.fontCharWids=new Array(128);
@@ -46,7 +46,7 @@ class Text
             // background is black, text is white
             // so it can be colored
 
-        var genBitmapUtility=new GenBitmapUtilityObject();
+        var genBitmapUtility=new GenBitmapUtilityClass();
         genBitmapUtility.drawRect(ctx,0,0,TEXT_TEXTURE_WIDTH,TEXT_TEXTURE_HEIGHT,new wsColor(0.0,0.0,0.0));
 
             // draw the text

@@ -1,44 +1,46 @@
-"use strict";
-
 //
-// mesh utility class
+// mesh utility class (static)
 //
 
-function MeshUtilityObject()
+class MeshUtilityClass
 {
+    constructor()
+    {
+    }
+    
         //
         // utility to create vertex lists
         //
         
-    this.createMapVertexList=function(nVertex)
+    static createMapVertexList(nVertex)
     {
         var n;
         var vertexList=[];
         
         for (n=0;n!==nVertex;n++) {
-            vertexList.push(new MapMeshVertexObject());
+            vertexList.push(new MapMeshVertexClass());
         }
         
         return(vertexList);
-    };
+    }
     
-    this.createModelVertexList=function(nVertex)
+    static createModelVertexList(nVertex)
     {
         var n;
         var vertexList=[];
         
         for (n=0;n!==nVertex;n++) {
-            vertexList.push(new ModelMeshVertexObject());
+            vertexList.push(new ModelMeshVertexClass());
         }
         
         return(vertexList);
-    };
+    }
     
         //
         // combine vertex lists and indexes
         //
     
-    this.combineVertexLists=function(vertexList1,vertexList2)
+    static combineVertexLists(vertexList1,vertexList2)
     {
         var n;
         var vertexList=[];
@@ -51,9 +53,9 @@ function MeshUtilityObject()
         }
         
         return(vertexList);
-    };
+    }
     
-    this.combineIndexes=function(indexes1,indexes2,index2Offset)
+    static combineIndexes(indexes1,indexes2,index2Offset)
     {
         var n;
         var indexes=new Uint16Array(indexes1.length+indexes2.length);
@@ -69,13 +71,13 @@ function MeshUtilityObject()
         }
         
         return(indexes);
-    };
+    }
         
         //
         // build normals for vertex lists
         //
     
-    this.buildVertexListNormals=function(vertexList,indexes,meshCenterPoint,normalsIn)
+    static buildVertexListNormals(vertexList,indexes,meshCenterPoint,normalsIn)
     {
         var n,flip,nTrig,nVertex,trigIdx;
         var v0,v1,v2;
@@ -159,13 +161,13 @@ function MeshUtilityObject()
             v1.normal.setFromPoint(normal);
             v2.normal.setFromPoint(normal);
         }
-    };
+    }
     
         //
         // build UVs for vertex lists
         //
             
-    this.buildVertexListUVs=function(bitmap,vertexList)
+    static buildVertexListUVs(bitmap,vertexList)
     {
         var n,v,nVertex;
         var x,y,ang;
@@ -241,13 +243,13 @@ function MeshUtilityObject()
             v.uv.x-=minIntX;
             v.uv.y-=minIntY;
         }
-    };
+    }
     
         //
         // transform UVs
         //
         
-    this.transformUVs=function(vertexList,uAdd,vAdd,uReduce,vReduce)
+    static transformUVs(vertexList,uAdd,vAdd,uReduce,vReduce)
     {
         var n,nVertex;
         var v;
@@ -259,13 +261,13 @@ function MeshUtilityObject()
             v.uv.x=(v.uv.x*uReduce)+uAdd;
             v.uv.y=(v.uv.y*vReduce)+vAdd;
         }
-    };
+    }
 
         //
         // build tangents from vertex lists
         //
 
-    this.buildVertexListTangents=function(vertexList,indexes)
+    static buildVertexListTangents(vertexList,indexes)
     {
         var n,nTrig,trigIdx;
         var v0,v1,v2;
@@ -333,13 +335,13 @@ function MeshUtilityObject()
             v1.tangent.setFromPoint(tangent);
             v2.tangent.setFromPoint(tangent);
         }
-    };
+    }
     
         //
         // rotate vertexes
         //
         
-    this.rotateVertexes=function(vertexList,centerPt,ang)
+    static rotateVertexes(vertexList,centerPt,ang)
     {
         var n,nVertex;
         
@@ -348,8 +350,6 @@ function MeshUtilityObject()
         for (n=0;n!==nVertex;n++) {
             vertexList[n].position.rotateAroundPoint(centerPt,ang);
         }
-    };
+    }
     
 }
-
-var meshUtility=new MeshUtilityObject();

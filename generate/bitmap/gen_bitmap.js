@@ -1,26 +1,26 @@
-"use strict";
-
 //
 // generate bitmap class
 //
 
-function GenBitmapObject(genRandom)
+class GenBitmapClass
 {
-        // random generator and utility functions
-        
-    this.genRandom=genRandom;
-    this.genBitmapUtility=new GenBitmapUtilityObject(genRandom);
-
+    constructor(genRandom)
+    {    
+        this.genRandom=genRandom;
+        this.genBitmapUtility=new GenBitmapUtilityClass(genRandom);
+    }
+    
         //
         // brick/rock bitmaps
         //
 
-    this.generateBrick=function(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSize,paddingSize,darkenFactor,segments)
+    generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high,edgeSize,paddingSize,darkenFactor,segments)
     {
         var n,rect;
         var drawBrickColor,drawEdgeColor,f;
         var lft,rgt,top,bot;
         var sx,ex,lineColor,lineMargin;
+        var streakWid,streakColor;
 
             // some random values
 
@@ -55,7 +55,6 @@ function GenBitmapObject(genRandom)
             this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,0.6);
             
                 // calc the brick size around the edges
-                // and padding and then blur it
                 
             lft=rect.lft;
             if (lft<0) {
@@ -75,6 +74,16 @@ function GenBitmapObject(genRandom)
             
             top=rect.top+edgeSize;
             bot=rect.bot-(paddingSize+edgeSize);
+            
+                // any stains
+            
+            if (this.genRandom.randomPercentage(0.90)) {
+                streakColor=this.genBitmapUtility.darkenColor(drawBrickColor,0.9);
+                streakWid=this.genRandom.randomInBetween(Math.trunc((rgt-lft)*0.2),Math.trunc((rgt-lft)*0.5));
+                sx=this.genRandom.randomInBetween((lft+streakWid),(rgt-streakWid));
+                this.genBitmapUtility.drawStreakVertical(bitmapCTX,wid,high,sx,top,bot,streakWid,streakColor);
+            }   
+                // and blur it
                 
             this.genBitmapUtility.blur(bitmapCTX,lft,top,rgt,bot,4);
             
@@ -93,13 +102,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.3);
-    };
+    }
 
         //
         // stone bitmaps
         //
 
-    this.generateStone=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateStone(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,k,rect,edgeSize;
         var drawStoneColor,drawEdgeColor,lineColor,darken,f;
@@ -172,13 +181,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.4);
-    };
+    }
 
         //
         // tile bitmaps
         //
         
-    this.generateTilePieceCrack=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeMargin,tileColor)
+    generateTilePieceCrack(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeMargin,tileColor)
     {
         var sx,ex,sy,ey;
         var lineColor,lineMargin;
@@ -207,9 +216,9 @@ function GenBitmapObject(genRandom)
 
         lineColor=this.genBitmapUtility.darkenColor(tileColor,0.9);
         this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,20,lineColor);
-    };
+    }
 
-    this.generateTileInner=function(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,complex)
+    generateTileInner(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,complex,skipTile)
     {
         var x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh;
         var col;
@@ -233,6 +242,12 @@ function GenBitmapObject(genRandom)
             dLft=lft;
 
             for (x=0;x!==splitCount;x++) {
+                
+                    // possible broken tile
+                    
+                if (skipTile) {
+                    if (this.genRandom.randomPercentage(0.02)) continue;
+                }
 
                 dLft=lft+(tileWid*x);
                 dRgt=dLft+tileWid;
@@ -243,7 +258,7 @@ function GenBitmapObject(genRandom)
 
                 if ((complex) && (this.genRandom.randomPercentage(0.25))) {
                     tileStyle=this.genRandom.randomIndex(3);
-                    this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,false);
+                    this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,false,false);
                     continue;
                 }
 
@@ -270,20 +285,30 @@ function GenBitmapObject(genRandom)
                 this.genBitmapUtility.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col,new wsColor(0.0,0.0,0.0),true);
 
                     // possible design
+                    // 0 = nothing
 
-                if ((complex) && (this.genRandom.random()<0.25)) {
-                    this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.0,1.0,5,0,null,borderColor);
+                if (complex) {
+                    switch (this.genRandom.randomIndex(3)) {
+                        case 1:
+                            this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.0,1.0,5,0,null,borderColor);
+                            break;
+                        case 2:
+                            col=this.genBitmapUtility.darkenColor(col,0.8);
+                            this.genBitmapUtility.drawDiamond(bitmapCTX,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),col);
+                            break;
+                    }
                 }
-                else {
-                    this.generateTilePieceCrack(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col);
-                }
+                
+                    // possible crack
+                    
+                this.generateTilePieceCrack(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col);
             }
         }
-    };
+    }
 
-    this.generateTile=function(bitmapCTX,normalCTX,specularCTX,wid,high,complex,small)
+    generateTile(bitmapCTX,normalCTX,specularCTX,wid,high,complex,small)
     {
-        var splitCount,tileStyle;
+        var splitCount,tileStyle,groutColor;
         var tileColor=[];
 
             // some random values
@@ -301,14 +326,23 @@ function GenBitmapObject(genRandom)
             tileColor[1]=this.genBitmapUtility.darkenColor(tileColor[0],0.9);
         }
 
-            // clear canvases
+            // clear canvas
+            // if small, we can skip tiles so
+            // need to blur grout underneath
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,tileColor);
+        groutColor=this.genBitmapUtility.getRandomGreyColor(0.3,0.4);
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,groutColor);
+        
+        if (small) {
+            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.9);
+            this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,5);
+        }
+        
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // original splits
 
-        this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,tileStyle,splitCount,(small?2:5),complex);
+        this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,tileStyle,splitCount,(small?2:5),complex,small);
 
             // tile noise
 
@@ -317,13 +351,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.3);
-    };
+    }
 
         //
         // metal bitmaps
         //
     
-    this.generateMetalScrewLine=function(bitmapCTX,normalCTX,screwX,top,bot,screwCount,screwSize,screenFlatInnerSize,screwColor)
+    generateMetalScrewLine(bitmapCTX,normalCTX,screwX,top,bot,screwCount,screwSize,screenFlatInnerSize,screwColor)
     {
         var n,y;
         var high=bot-top;
@@ -336,9 +370,9 @@ function GenBitmapObject(genRandom)
             this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,screwX,y,(screwX+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
             y+=yAdd;
         }
-    };
+    }
     
-    this.generateMetalPlate=function(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize)
+    generateMetalPlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor,metalEdgeColor,screwCount,screwSize,screenFlatInnerSize)
     {
         var n,x,streakWid;
         var streakColor,darken;
@@ -373,9 +407,9 @@ function GenBitmapObject(genRandom)
             
         screwX=rgt-(screwSize+(edgeSize*2));
         this.generateMetalScrewLine(bitmapCTX,normalCTX,screwX,(top+edgeSize),(bot+edgeSize),screwCount,screwSize,screenFlatInnerSize,screwColor);
-    };
+    }
     
-    this.generateMetal=function(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
+    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
     {
         var x;
         var barColor,barEdgeColor;
@@ -443,9 +477,9 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.1);
-    };
+    }
     
-    this.generateMetalCorrugated=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateMetalCorrugated(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var x,y;
         var dx,dy,sx,sy,ex,ey;
@@ -514,13 +548,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.1);
-    };
+    }
 
         //
         // concrete bitmaps
         //
 
-    this.generateConcrete=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateConcrete(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y,particleWid,particleHigh,particleDensity;
 
@@ -552,13 +586,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,4.0,-0.4);
-    };
+    }
     
         //
         // plaster bitmaps
         //
 
-    this.generatePlaster=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generatePlaster(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x;
         var lineColor,darken,boost;
@@ -602,13 +636,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.4);
-    };
+    }
     
         //
         // mosaic bitmaps
         //
 
-    this.generateMosaic=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var x,y,lft,rgt,top,bot,tileWid,tileHigh;
         var splitCount,borderSize,edgeSize;
@@ -679,13 +713,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.3);
-    };
+    }
 
         //
         // wood bitmaps
         //
 
-    this.generateWood=function(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
+    generateWood(bitmapCTX,normalCTX,specularCTX,wid,high,isBox)
     {
         var x,y,lft,woodFactor;
         
@@ -767,13 +801,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.2);
-    };
+    }
     
         //
         // machine
         //
     
-    this.generateMachineComponent=function(bitmapCTX,normalCTX,lft,top,rgt,bot,metalInsideColor,metalEdgeColor)
+    generateMachineComponent(bitmapCTX,normalCTX,lft,top,rgt,bot,metalInsideColor,metalEdgeColor)
     {
         var x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         var color,panelType;
@@ -815,9 +849,9 @@ function GenBitmapObject(genRandom)
                 }
             }
         }
-    };
+    }
     
-    this.generateMachine=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateMachine(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var mx,my,sz,lft,top,rgt,bot;
         
@@ -873,13 +907,13 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.5);
-    };
+    }
 
         //
         // skin bitmaps
         //
 
-    this.generateSkinScale=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateSkinScale(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var x,y,dx,dy;
         var xCount;
@@ -924,9 +958,9 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.2);
-    };
+    }
     
-    this.generateSkinLeather=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateSkinLeather(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y,y2,lineCount;
         var darken,lineColor,markCount;
@@ -978,9 +1012,9 @@ function GenBitmapObject(genRandom)
             // finish with the specular
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5,-0.4);
-    };
+    }
     
-    this.generateSkinFur=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateSkinFur(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y;
         var darken,boost,lineColor;
@@ -1023,24 +1057,24 @@ function GenBitmapObject(genRandom)
             // fur isn't shiney so this specular is very low
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5,-0.6);
-    };
+    }
     
         //
         // UV tester
         //
         
-    this.generateUVTest=function(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
         this.genBitmapUtility.drawUVTest(bitmapCTX,0,0,wid,high);
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
-    };
+    }
 
         //
         // generate mainline
         //
 
-    this.generate=function(view,name,generateType)
+    generate(view,name,generateType)
     {
         var wid,high,edgeSize,paddingSize,segments;
         var shineFactor=1.0;
@@ -1179,7 +1213,7 @@ function GenBitmapObject(genRandom)
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new Bitmap(view,name,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
-    };
+        return(new BitmapClass(view,name,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+    }
 
 }

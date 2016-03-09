@@ -2,7 +2,7 @@
 // generic shader light class
 //
 
-class ShaderLight
+class ShaderLightClass
 {
     constructor()
     {
@@ -18,7 +18,7 @@ class ShaderLight
 // generic shader class
 //
 
-class Shader
+class ShaderClass
 {
     constructor()
     {

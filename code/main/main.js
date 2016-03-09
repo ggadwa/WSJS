@@ -14,7 +14,7 @@ var textureBuildList=
         ['Map Ledge',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
         ['Map Metal',[GEN_BITMAP_TYPE_METAL]],
         ['Map Box',[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR]],
-        ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER]],
+        ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL /*,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER */]],
         ['Map Closet',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
         ['Map Machine',[GEN_BITMAP_TYPE_MACHINE]],
         ['Skin Scale',[GEN_BITMAP_TYPE_SKIN_SCALE]],
@@ -33,14 +33,14 @@ var soundBuildList=
 // global objects
 //
 
-var view=new View();
-var bitmapList=new BitmapList(view);
-var soundList=new SoundList();
-var map=new MapObject();
-var modelList=new ModelListObject();
-var entityList=new EntityList();
-var input=new Input(view,entityList);
-var debug=new Debug();
+var view=new ViewClass();
+var bitmapList=new BitmapListClass(view);
+var soundList=new SoundListClass();
+var map=new MapClass();
+var modelList=new ModelListClass();
+var entityList=new EntityListClass();
+var input=new InputClass(view,entityList);
+var debug=new DebugClass();
 
 //
 // main loop
@@ -162,7 +162,7 @@ function wsInitInternal()
     
         // create list of dynamic textures
         
-    var textureGenRandom=new GenRandomObject(SEED_MAP_BITMAP);
+    var textureGenRandom=new GenRandomClass(SEED_MAP_BITMAP);
     
         // next step
     
@@ -189,7 +189,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
     
         // generate bitmap
     
-    var genBitmap=new GenBitmapObject(textureGenRandom);
+    var genBitmap=new GenBitmapClass(textureGenRandom);
     bitmapList.addBitmap(genBitmap.generate(view,name,bitmapType));
     
         // if more textures, then loop back around
@@ -207,7 +207,7 @@ function wsInitBuildTextures(idx,textureGenRandom)
     view.loadingScreenAddString('Generating Dynamic Sounds');
     view.loadingScreenDraw(null);
 
-    setTimeout(function() { wsInitBuildSounds(0,new GenRandomObject(SEED_SOUND)); },PROCESS_TIMEOUT_MSEC);
+    setTimeout(function() { wsInitBuildSounds(0,new GenRandomClass(SEED_SOUND)); },PROCESS_TIMEOUT_MSEC);
 }
 
 function wsInitBuildSounds(idx,soundGenRandom)
@@ -221,7 +221,7 @@ function wsInitBuildSounds(idx,soundGenRandom)
     
          // generate sound
     
-    var genSound=new GenSoundObject(soundList.getAudioContext(),soundGenRandom);
+    var genSound=new GenSoundClass(soundList.getAudioContext(),soundGenRandom);
     soundList.addSound(genSound.generate(name,generateType));
     
         // if more textures, then loop back around
@@ -246,11 +246,11 @@ function wsInitBuildMap()
 {
         // random seed
 
-    var mapGenRandom=new GenRandomObject(SEED_MAP);
+    var mapGenRandom=new GenRandomClass(SEED_MAP);
 
         // build the map
         
-    var genMap=new GenMapObject(view,bitmapList,map,mapGenRandom,wsInitBuildMapFinish);
+    var genMap=new GenMapClass(view,bitmapList,map,mapGenRandom,wsInitBuildMapFinish);
     genMap.build();
 }
 
@@ -288,13 +288,13 @@ function wsInitBuildLightmap()
         // light maps are a long running
         // process so we need a callback
 
-    var genLightmap=new GenLightmapObject(view,bitmapList,map,debug,MAP_GENERATE_LIGHTMAP,wsInitBuildLightmapFinish);
+    var genLightmap=new GenLightmapClass(view,bitmapList,map,debug,MAP_GENERATE_LIGHTMAP,wsInitBuildLightmapFinish);
     genLightmap.create();
 }
 
 function wsInitBuildLightmapFinish()
 {
-    var modelGenRandom=new GenRandomObject(SEED_MODEL);
+    var modelGenRandom=new GenRandomClass(SEED_MODEL);
     
     view.loadingScreenUpdate();
     view.loadingScreenAddString('Generating Dynamic Models');
@@ -316,22 +316,22 @@ function wsInitBuildModelsMesh(idx,modelGenRandom)
         // else a monster
         
     if (idx===0) {
-        model=new ModelObject('player',MODEL_TYPE_HUMANOID);
+        model=new ModelClass('player',MODEL_TYPE_HUMANOID);
     }
     else {
-        model=new ModelObject(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
-    //    model=new ModelObject(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
+        model=new ModelClass(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
+    //    model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
     }
     
         // build the skeleton and mesh
     
-    genSkeleton=new GenModelOrganicSkeletonObject(model,modelGenRandom);
+    genSkeleton=new GenModelOrganicSkeletonClass(model,modelGenRandom);
     genSkeleton.build();
     
-    genModelMesh=new GenModelOrganicMeshObject(model,modelBitmap,modelGenRandom);
+    genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap,modelGenRandom);
     genModelMesh.build(view);
     
-    modelList.add(model);
+    modelList.addModel(model);
     
         // if more models, then loop back around
     
@@ -358,21 +358,21 @@ function wsInitBuildWeapons(modelGenRandom)
     
         // weapon
         
-    var model=new ModelObject('weapon_0',MODEL_TYPE_WEAPON);
+    var model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
     
-    var genModelWeaponMesh=new GenModelWeaponMeshObject(model,modelBitmap,modelGenRandom);
+    var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap,modelGenRandom);
     genModelWeaponMesh.build(view);
     
-    modelList.add(model);
+    modelList.addModel(model);
     
         // projectile
         
-    var model=new ModelObject('projectile_0',MODEL_TYPE_PROJECTILE);
+    var model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
     
-    var genModelProjectileMesh=new GenModelProjectileMeshObject(model,modelBitmap,modelGenRandom);
+    var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap,modelGenRandom);
     genModelProjectileMesh.build(view);
     
-    modelList.add(model);
+    modelList.addModel(model);
 
         // next step
         
@@ -388,7 +388,7 @@ function wsInitBuildEntities()
     var n,monsterModelName;
     var model,pos;
     
-    var entityGenRandom=new GenRandomObject(SEED_ENTITY);
+    var entityGenRandom=new GenRandomClass(SEED_ENTITY);
     
         // make player entity
     
@@ -398,8 +398,8 @@ function wsInitBuildEntities()
         return;
     }
 
-    var playerEntity=new EntityPlayer('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.get('player'));
-    playerEntity.addWeapon(new Weapon(modelList.get('weapon_0'),modelList.get('projectile_0'),soundList.getSound('fire'),soundList.getSound('explosion')));
+    var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.getModel('player'));
+    playerEntity.addWeapon(new WeaponClass(modelList.getModel('weapon_0'),modelList.getModel('projectile_0'),soundList.getSound('fire'),soundList.getSound('explosion')));
     playerEntity.setCurrentWeaponIndex(0);
     
     entityList.setPlayer(playerEntity);
@@ -413,9 +413,9 @@ function wsInitBuildEntities()
         if (pos===null) continue;
         
         monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
-        model=modelList.clone(view,monsterModelName);
+        model=modelList.cloneModel(view,monsterModelName);
         
-        entityList.addEntity(new EntityMonster(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
+        entityList.addEntity(new EntityMonsterClass(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
     }
     
         // finished

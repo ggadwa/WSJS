@@ -26,7 +26,7 @@ var fileNames=[
 
 var fileCache=[];
 
-class FileCache
+class FileCacheClass
 {
     constructor(name,data)
     {
@@ -72,7 +72,7 @@ function fileCacheFinishLoad(idx,callback,data)
 {
         // put file in cache
     
-    fileCache.push(new FileCache(fileNames[idx],data));
+    fileCache.push(new FileCacheClass(fileNames[idx],data));
     
         // finished?
         

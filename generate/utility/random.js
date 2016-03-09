@@ -1,46 +1,45 @@
-"use strict";
-
 //
 // gen random object
 //
 
-function GenRandomObject(seed)
+class GenRandomClass
 {
-        // the seed
-        
-    this.mwcW=(seed<<16)&0xFFFF;
-    this.mwcZ=seed&0xFFFF;
+    constructor(seed)
+    {
+        this.mwcW=(seed<<16)&0xFFFF;
+        this.mwcZ=seed&0xFFFF;
+    }
     
         //
         // random numbers
         //
 
-    this.random=function()
+    random()
     {
         this.mwcZ=(36969*(this.mwcZ&0xFFFF)+(this.mwcZ>>16))&0xFFFFFFFF;
         this.mwcW=(18000*(this.mwcW&0xFFFF)+(this.mwcW>>16))&0xFFFFFFFF;
         var r=((this.mwcZ<<16)+this.mwcW)&0xFFFFFFFF;
         return((r/=0xFFFFFFFF)+0.5);
-    };
+    }
 
-    this.randomInt=function(startInt,extraInt)
+    randomInt(startInt,extraInt)
     {
         return(startInt+Math.trunc(this.random()*extraInt));
-    };
+    }
     
-    this.randomIndex=function(maxIndex)
+    randomIndex(maxIndex)
     {
         return(Math.trunc(this.random()*maxIndex));
-    };
+    }
     
-    this.randomPercentage=function(percentage)
+    randomPercentage(percentage)
     {
         return(this.random()<percentage);
-    };
+    }
     
-    this.randomInBetween=function(startInt,endInt)
+    randomInBetween(startInt,endInt)
     {
         return(this.randomInt(startInt,(endInt-startInt)));
-    };
+    }
 
 }

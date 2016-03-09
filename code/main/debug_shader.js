@@ -2,7 +2,7 @@
 // debug shader class
 //
 
-class DebugShader extends Shader
+class DebugShaderClass extends ShaderClass
 {
     constructor()
     {

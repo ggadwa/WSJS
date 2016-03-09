@@ -2,11 +2,11 @@
 // debug class
 //
 
-class Debug
+class DebugClass
 {
     constructor()
     {
-        this.debugShader=new DebugShader();
+        this.debugShader=new DebugShaderClass();
     }
     
         //

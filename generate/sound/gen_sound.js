@@ -1,19 +1,20 @@
-"use strict";
-
 //
 // sound class
 //
 
-function GenSoundObject(ctx,genRandom)
+class GenSoundClass
 {
-    this.ctx=ctx;
-    this.genRandom=genRandom;
+    constructor(ctx,genRandom)
+    {
+        this.ctx=ctx;
+        this.genRandom=genRandom;
+    }
     
-    //
-    // sound utilities
-    //
+        //
+        // sound utilities
+        //
     
-    this.createTone=function(data,frameStart,frameEnd,cycleCount)
+    createTone(data,frameStart,frameEnd,cycleCount)
     {
         var n;
         var rd=0.0;
@@ -27,9 +28,9 @@ function GenSoundObject(ctx,genRandom)
             data[n]=Math.sin(rd);
             rd+=rdAdd;
         }
-    };
+    }
     
-    this.mixTone=function(data,frameStart,frameEnd,cycleCount)
+    mixTone(data,frameStart,frameEnd,cycleCount)
     {
         var n;
         var rd=0.0;
@@ -39,9 +40,9 @@ function GenSoundObject(ctx,genRandom)
             data[n]=(data[n]*0.5)+(Math.sin(rd)*0.5);
             rd+=rdAdd;
         }
-    };
+    }
     
-    this.mixWhiteNoise=function(data,frameStart,frameEnd,range)
+    mixWhiteNoise(data,frameStart,frameEnd,range)
     {
         var n;
         var doubleRange=range*2.0;
@@ -49,9 +50,9 @@ function GenSoundObject(ctx,genRandom)
         for (n=frameStart;n<frameEnd;n++) {
             data[n]+=(Math.random()*doubleRange)-range;     // use internal random as white noise doesn't need to be anything that we track and recreate
         }
-    };
+    }
     
-    this.delay=function(data,frameStart,frameEnd,frameCount,delayOffset,mixDest)
+    delay(data,frameStart,frameEnd,frameCount,delayOffset,mixDest)
     {
         var n;
         var mixSource=1.0-mixDest;
@@ -61,9 +62,9 @@ function GenSoundObject(ctx,genRandom)
             if (delayIdx<frameCount) data[delayIdx]=(data[delayIdx]*mixSource)+(data[n]*mixDest);
             delayIdx--;
         }
-    };
+    }
     
-    this.normalize=function(data,frameCount)
+    normalize(data,frameCount)
     {
         var n,k,f,max;
         
@@ -85,9 +86,9 @@ function GenSoundObject(ctx,genRandom)
         for (n=0;n!==frameCount;n++) {
             data[n]*=f;
         }
-    };
+    }
     
-    this.fade=function(data,frameCount,fadeIn,fadeOut)
+    fade(data,frameCount,fadeIn,fadeOut)
     {
         var n,fadeLen,fadeStart;
         
@@ -111,13 +112,13 @@ function GenSoundObject(ctx,genRandom)
                 data[n]*=(1.0-((n-fadeStart)/fadeLen));
             }
         }
-    };
+    }
     
-    //
-    // gun fire sound
-    //
+        //
+        // gun fire sound
+        //
     
-    this.generateGunFire=function(name)
+    generateGunFire(name)
     {
         var frameCount=this.ctx.sampleRate*0.25;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
@@ -129,14 +130,14 @@ function GenSoundObject(ctx,genRandom)
         this.normalize(data,frameCount);
         this.fade(data,frameCount,null,0.1);
         
-        return(new Sound(name,this.ctx,buffer,25000));
-    };
+        return(new SoundClass(name,this.ctx,buffer,25000));
+    }
     
-    //
-    // explosion sound
-    //
+        //
+        // explosion sound
+        //
     
-    this.generateExplosion=function(name)
+    generateExplosion(name)
     {
         var frameCount=this.ctx.sampleRate*2;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
@@ -148,14 +149,14 @@ function GenSoundObject(ctx,genRandom)
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.1,0.5);
         
-        return(new Sound(name,this.ctx,buffer,50000));
-    };
+        return(new SoundClass(name,this.ctx,buffer,50000));
+    }
     
-    //
-    // monster scream sound
-    //
+        //
+        // monster scream sound
+        //
     
-    this.generateMonsterScream=function(name)
+    generateMonsterScream(name)
     {
         var frameCount=this.ctx.sampleRate*1;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
@@ -176,14 +177,14 @@ function GenSoundObject(ctx,genRandom)
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.05,0.2);
         
-        return(new Sound(name,this.ctx,buffer,25000));
-    };
+        return(new SoundClass(name,this.ctx,buffer,25000));
+    }
     
-    //
-    // generate sound mainline
-    //
+        //
+        // generate sound mainline
+        //
     
-    this.generate=function(name,generateType)
+    generate(name,generateType)
     {
         var sound=null;
         
@@ -203,6 +204,6 @@ function GenSoundObject(ctx,genRandom)
         }
         
         return(sound);
-    };
+    }
 }
 

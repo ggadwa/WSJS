@@ -2,7 +2,7 @@
 // text shader class
 //
 
-class TextShader extends Shader
+class TextShaderClass extends ShaderClass
 {
     constructor()
     {

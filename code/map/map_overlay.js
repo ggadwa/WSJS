@@ -1,37 +1,38 @@
-"use strict";
-
 //
 // map overlay class
 //
 
-function MapOverlayObject()
+class MapOverlayClass
 {
-    this.mapOverlayShader=new MapOverlayShader();
-    
-    this.roomLineList=[];
-    this.extraLineList=[];
-    
-    this.mapOffsetX=0;
-    this.mapOffsetZ=0;
-    this.mapScale=1.0;
-    
-    this.drawX=0;
-    this.drawY=0;
-    
-    this.drawWid=0;
-    this.drawHigh=0;
-    
-    this.roomVertexPosBuffer=null;
-    this.extraVertexPosBuffer=null;
-    this.entityVertexPosBuffer=null;
-    
-    this.entityVertices=null;
+    constructor()
+    {
+        this.mapOverlayShader=new MapOverlayShaderClass();
+
+        this.roomLineList=[];
+        this.extraLineList=[];
+
+        this.mapOffsetX=0;
+        this.mapOffsetZ=0;
+        this.mapScale=1.0;
+
+        this.drawX=0;
+        this.drawY=0;
+
+        this.drawWid=0;
+        this.drawHigh=0;
+
+        this.roomVertexPosBuffer=null;
+        this.extraVertexPosBuffer=null;
+        this.entityVertexPosBuffer=null;
+
+        this.entityVertices=null;
+    }
     
         //
         // initialize/release overlay object
         //
 
-    this.initialize=function(view)
+    initialize(view)
     {
         if (!this.mapOverlayShader.initialize(view)) return(false);
         
@@ -42,9 +43,9 @@ function MapOverlayObject()
         this.entityVertices=new Float32Array(6);
         
         return(true);
-    };
+    }
 
-    this.release=function(view)
+    release(view)
     {
         view.gl.deleteBuffer(this.roomVertexPosBuffer);
         view.gl.deleteBuffer(this.extraVertexPosBuffer);
@@ -53,13 +54,13 @@ function MapOverlayObject()
         this.entityVertices=null;
         
         this.mapOverlayShader.release(view);
-    };
+    }
         
         //
         // add lines to specific line lists
         //
         
-    this.addLines=function(lineList,lines)
+    addLines(lineList,lines)
     {
         var n,k;
         var isDup;
@@ -84,18 +85,18 @@ function MapOverlayObject()
                 
             if (!isDup) lineList.push(lines[n]);
         }
-    };
+    }
     
         //
         // add pieces to overlay
         //
         
-    this.addRoom=function(room)
+    addRoom(room)
     {
         this.addLines(this.roomLineList,room.createOverlayLineList());
-    };
+    }
     
-    this.addCloset=function(xBound,zBound)
+    addCloset(xBound,zBound)
     {
         var lines=[];
         
@@ -105,9 +106,9 @@ function MapOverlayObject()
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
         this.addLines(this.roomLineList,lines);
-    };
+    }
     
-    this.addStair=function(xBound,zBound)
+    addStair(xBound,zBound)
     {
         var lines=[];
         
@@ -117,9 +118,9 @@ function MapOverlayObject()
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
         this.addLines(this.roomLineList,lines);
-    };
+    }
     
-    this.addPlatform=function(xBound,zBound)
+    addPlatform(xBound,zBound)
     {
         var lines=[];
         
@@ -129,13 +130,13 @@ function MapOverlayObject()
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
         this.addLines(this.extraLineList,lines);
-    };
+    }
     
         //
         // precalc the drawing values
         //
     
-    this.precalcDrawValues=function(view)
+    precalcDrawValues(view)
     {
         var n,idx,line;
         var xBound,yBound;
@@ -221,13 +222,13 @@ function MapOverlayObject()
         gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,extraVertexList,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-    };
+    }
     
         //
         // draw the map overlay
         //
         
-    this.draw=function(view,entityList)
+    draw(view,entityList)
     {
         var n;
         var gl=view.gl;
@@ -270,7 +271,7 @@ function MapOverlayObject()
 
         for (n=0;n!==nEntity;n++) {
             entity=entityList.getEntity(n);
-            if (entity instanceof EntityProjectile) continue;
+            if (entity instanceof EntityProjectileClass) continue;
             
             this.mapOverlayShader.drawColor(view,((n===0)?playerColor:monsterColor));       // index 0 is the player
             
@@ -304,7 +305,7 @@ function MapOverlayObject()
 
         gl.enable(gl.DEPTH_TEST);
         this.mapOverlayShader.drawEnd(view);
-    };
+    }
     
 }
 

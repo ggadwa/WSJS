@@ -2,7 +2,7 @@
 // input class
 //
 
-class Input
+class InputClass
 {
     constructor(view,entityList)
     {

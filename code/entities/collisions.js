@@ -2,7 +2,7 @@
 // collision class
 //
 
-class Collision
+class CollisionClass
 {
     constructor()
     {

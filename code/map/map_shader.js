@@ -2,7 +2,7 @@
 // map shader object
 //
 
-class MapShader extends Shader
+class MapShaderClass extends ShaderClass
 {
     constructor()
     {
@@ -55,7 +55,7 @@ class MapShader extends Shader
         var n,name;
 
         for (n=0;n!==view.LIGHT_COUNT;n++) {
-            this.lights.push(new ShaderLight());
+            this.lights.push(new ShaderLightClass());
 
             name='light_'+n;
             this.lights[n].positionUniform=gl.getUniformLocation(this.program,name+'.position');

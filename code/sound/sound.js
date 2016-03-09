@@ -2,7 +2,7 @@
 // sound class
 //
 
-class Sound
+class SoundClass
 {
     constructor(name,ctx,buffer,maxDistance)
     {

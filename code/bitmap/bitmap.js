@@ -2,7 +2,7 @@
 // bitmap class
 //
 
-class Bitmap
+class BitmapClass
 {
     constructor(view,name,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
     {

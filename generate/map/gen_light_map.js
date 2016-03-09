@@ -1,12 +1,11 @@
-"use strict";
-
 //
 // NOTE!
 // 
 // We need to keep a global copy of the current
 // light map object because light maps require
 // time outs and the "this" on the timeout is
-// the window object.
+// the window object (supergumba -- arrow functions
+// will probably fix this, need to try later)
 //
 
 var currentGlobalLightMapObject=null;
@@ -17,63 +16,66 @@ var currentGlobalLightMapObject=null;
 // canvas and the last chunk written to
 //
 
-function GenLightmapBitmapObject()
+class GenLightmapBitmapClass
 {
-        // setup the canvas
+    constructor()
+    {
+            // setup the canvas
 
-    this.canvas=document.createElement('canvas');
-    this.canvas.width=LIGHTMAP_TEXTURE_SIZE;
-    this.canvas.height=LIGHTMAP_TEXTURE_SIZE;
-    this.ctx=this.canvas.getContext('2d');
-    
-    this.imgData=this.ctx.getImageData(0,0,LIGHTMAP_TEXTURE_SIZE,LIGHTMAP_TEXTURE_SIZE);
-    this.pixelData=this.imgData.data;
-    
-        // data for blur
-        
-    this.blurData=new Uint8ClampedArray(this.pixelData.length);
+        this.canvas=document.createElement('canvas');
+        this.canvas.width=LIGHTMAP_TEXTURE_SIZE;
+        this.canvas.height=LIGHTMAP_TEXTURE_SIZE;
+        this.ctx=this.canvas.getContext('2d');
 
-        // clear to black with
-        // open alpha (we use this later
-        // for smearing)
+        this.imgData=this.ctx.getImageData(0,0,LIGHTMAP_TEXTURE_SIZE,LIGHTMAP_TEXTURE_SIZE);
+        this.pixelData=this.imgData.data;
 
-    var n;
-    var pixelCount=LIGHTMAP_TEXTURE_SIZE*LIGHTMAP_TEXTURE_SIZE;
-    var idx=0;
-    
-    var data=this.pixelData;
+            // data for blur
 
-    for (n=0;n!==pixelCount;n++) {
-        data[idx++]=0;
-        data[idx++]=0;
-        data[idx++]=0;
-        data[idx++]=0;
-    }
-    
-        // the first chunk is always all black
-    
-    var x,y;
-    
-    for (y=0;y!==LIGHTMAP_CHUNK_SIZE;y++) {
-        idx=(y*LIGHTMAP_TEXTURE_SIZE)*4;
-        for (x=0;x!==LIGHTMAP_CHUNK_SIZE;x++) {
-            data[idx+3]=255;
-            idx+=4;
+        this.blurData=new Uint8ClampedArray(this.pixelData.length);
+
+            // clear to black with
+            // open alpha (we use this later
+            // for smearing)
+
+        var n;
+        var pixelCount=LIGHTMAP_TEXTURE_SIZE*LIGHTMAP_TEXTURE_SIZE;
+        var idx=0;
+
+        var data=this.pixelData;
+
+        for (n=0;n!==pixelCount;n++) {
+            data[idx++]=0;
+            data[idx++]=0;
+            data[idx++]=0;
+            data[idx++]=0;
         }
+
+            // the first chunk is always all black
+
+        var x,y;
+
+        for (y=0;y!==LIGHTMAP_CHUNK_SIZE;y++) {
+            idx=(y*LIGHTMAP_TEXTURE_SIZE)*4;
+            for (x=0;x!==LIGHTMAP_CHUNK_SIZE;x++) {
+                data[idx+3]=255;
+                idx+=4;
+            }
+        }
+
+            // the current chunk, we start at
+            // 1 to leave the first chunk black
+            // for triangles with no lights
+
+        this.chunkIdx=1;
     }
     
-        // the current chunk, we start at
-        // 1 to leave the first chunk black
-        // for triangles with no lights
-        
-    this.chunkIdx=1;
-
         // replace image data
 
-    this.fixCanvasImageData=function()
+    fixCanvasImageData()
     {
         this.ctx.putImageData(this.imgData,0,0);
-    };
+    }
 }
 
 //
@@ -83,72 +85,78 @@ function GenLightmapBitmapObject()
 // further pixels in the current trig render
 //
 
-function GetLightmapLastBlockObject()
+class GetLightmapLastBlockClass
 {
-    this.meshIdx=-1;
-    this.cacheTrigIdx=-1;
+    constructor()
+    {
+        this.meshIdx=-1;
+        this.cacheTrigIdx=-1;
+    }
 }
 
 //
 // generate lightmaps class
 //
 
-function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFunc)
+class GenLightmapClass
 {
-    this.view=view;
-    this.bitmapList=bitmapList;
-    this.map=map;
-    this.debug=debug;
-    this.generateLightmap=generateLightmap;
-    
-        // chunk is one block available to draw a light map
-    
-        // array of bitmaps that make up the lightmap
-        // each is an object with a canvas and the last chunk
-        // drawn to (the chunkIdx)
-        
-    this.lightmapList=[];
-    
-        // the last block optimization list
-        
-    this.lastBlockList=[];
-    
-        // the callback function when
-        // generation concludes
-        
-    this.callbackFunc=callbackFunc;
-    
-        // a link to this object so we can
-        // use it in the "this" callbacks
-        
-    var currentGlobalLightMapObject;
-    
-        // global variables to reduce new/GC during light maps
-    
-    this.rayTraceVertexColor=new wsColor(0.0,0.0,0.0);
-    
-    this.lightBoundX=new wsBound(0,0);
-    this.lightBoundY=new wsBound(0,0);
-    this.lightBoundZ=new wsBound(0,0);
-    
-    this.vlx=new wsPoint(0,0,0);
-    this.vrx=new wsPoint(0,0,0);
-    
-    this.lightVectorNormal=new wsPoint(0.0,0.0,0.0);
-    
-    this.xTrigBound=new wsBound(0,0);
-    this.yTrigBound=new wsBound(0,0);
-    this.zTrigBound=new wsBound(0,0);
-    
-    this.pt0=new ws2DIntPoint(0,0);
-    this.pt1=new ws2DIntPoint(0,0);
-    this.pt2=new ws2DIntPoint(0,0);
+    constructor(view,bitmapList,map,debug,generateLightmap,callbackFunc)
+    {
+        this.view=view;
+        this.bitmapList=bitmapList;
+        this.map=map;
+        this.debug=debug;
+        this.generateLightmap=generateLightmap;
 
+            // chunk is one block available to draw a light map
+
+            // array of bitmaps that make up the lightmap
+            // each is an object with a canvas and the last chunk
+            // drawn to (the chunkIdx)
+
+        this.lightmapList=[];
+
+            // the last block optimization list
+
+        this.lastBlockList=[];
+
+            // the callback function when
+            // generation concludes
+
+        this.callbackFunc=callbackFunc;
+
+            // a link to this object so we can
+            // use it in the "this" callbacks
+
+        var currentGlobalLightMapObject;
+
+            // global variables to reduce new/GC during light maps
+
+        this.rayTraceVertexColor=new wsColor(0.0,0.0,0.0);
+
+        this.lightBoundX=new wsBound(0,0);
+        this.lightBoundY=new wsBound(0,0);
+        this.lightBoundZ=new wsBound(0,0);
+
+        this.vlx=new wsPoint(0,0,0);
+        this.vrx=new wsPoint(0,0,0);
+
+        this.lightVectorNormal=new wsPoint(0.0,0.0,0.0);
+
+        this.xTrigBound=new wsBound(0,0);
+        this.yTrigBound=new wsBound(0,0);
+        this.zTrigBound=new wsBound(0,0);
+
+        this.pt0=new ws2DIntPoint(0,0);
+        this.pt1=new ws2DIntPoint(0,0);
+        this.pt2=new ws2DIntPoint(0,0);
+    }
+    
         //
         // border and smear polygons
         //
         
-    this.smudgeChunk=function(lightBitmap,lft,top,rgt,bot)
+    smudgeChunk(lightBitmap,lft,top,rgt,bot)
     {
         var x,y,idx;
         var r,g,b;
@@ -255,9 +263,9 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
                 }
             }
         }
-    };
+    }
     
-    this.blurChunk=function(lightBitmap,lft,top,rgt,bot)
+    blurChunk(lightBitmap,lft,top,rgt,bot)
     {
         var n,idx;
         var x,y,cx,cy,cxs,cxe,cys,cye;
@@ -351,13 +359,13 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
                 }
             }
         } 
-    };
+    }
 
         //
         // ray tracing
         //
 
-    this.rayTraceCollision=function(vx,vy,vz,vctX,vctY,vctZ,trigCache)
+    rayTraceCollision(vx,vy,vz,vctX,vctY,vctZ,trigCache)
     {
             // we pass in a single vertex (t0x,t0y,t0z) and
             // these pre-calculated items:
@@ -414,9 +422,9 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
         var t=invDet*((trigCache.v20.x*lineToTrigPerpVectorX)+(trigCache.v20.y*lineToTrigPerpVectorY)+(trigCache.v20.z*lineToTrigPerpVectorZ));
         return((t>0.01)&&(t<1.0));
-    };
+    }
 
-    this.rayTraceVertex=function(lightList,vx,vy,vz,col)
+    rayTraceVertex(lightList,vx,vy,vz,col)
     {
         var n,nLight,lightIdx,trigCount;
         var light;
@@ -514,13 +522,13 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
         col.fixOverflow();
 
         return(col);
-    };
+    }
     
         //
         // render a single color to a chunk
         //
         
-    this.renderColor=function(pixelData,lft,top)
+    renderColor(pixelData,lft,top)
     {
         var x,y,idx;
         var rgt=lft+LIGHTMAP_CHUNK_SIZE;
@@ -535,9 +543,9 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
                 pixelData[idx++]=255;    
             }
         }
-    };
+    }
     
-    this.clearChunk=function(pixelData,lft,top)
+    clearChunk(pixelData,lft,top)
     {
         var x,y,idx;
         var rgt=lft+LIGHTMAP_CHUNK_SIZE;
@@ -552,13 +560,13 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
                 pixelData[idx++]=0;    
             }
         }
-    };
+    }
 
         //
         // render a triangle
         //
 
-    this.renderTriangle=function(lightBitmap,meshIdx,pts,vs,normal,lft,top,rgt,bot)
+    renderTriangle(lightBitmap,meshIdx,pts,vs,normal,lft,top,rgt,bot)
     {
         var n,x,y,lx,rx,tempX,ty,my,by,idx;
         var lxFactor,rxFactor,vFactor;
@@ -716,13 +724,13 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
         this.blurChunk(lightBitmap,lft,top,rgt,bot);
         
         return(true);
-    };
+    }
 
         //
         // build light map in chunk
         //
 
-    this.writePolyToChunk=function(lightBitmap,meshIdx,trigIdx,lft,top)
+    writePolyToChunk(lightBitmap,meshIdx,trigIdx,lft,top)
     {
         var mesh=this.map.meshes[meshIdx];
 
@@ -825,13 +833,13 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
         v2.lightmapUV.y=(this.pt2.y+top)/LIGHTMAP_TEXTURE_SIZE;
         
         return(true);
-    };
+    }
 
         //
         // create lightmap for single mesh
         //
 
-    this.createLightmapForMesh=function(meshIdx)
+    createLightmapForMesh(meshIdx)
     {
         var n,lightmapIdx,chunkIdx,nTrig;
         var lft,top;
@@ -848,7 +856,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             
         if (!this.generateLightmap) {            
             lightmapIdx=0;
-            if (this.lightmapList.length===0) this.lightmapList[0]=new GenLightmapBitmapObject();     // have no lightmaps yet, so make one
+            if (this.lightmapList.length===0) this.lightmapList[0]=new GenLightmapBitmapClass();     // have no lightmaps yet, so make one
         }
         
             // else we need to pack triangles
@@ -873,7 +881,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
             if (lightmapIdx===-1) {
                 lightmapIdx=this.lightmapList.length;
-                this.lightmapList[lightmapIdx]=new GenLightmapBitmapObject();
+                this.lightmapList[lightmapIdx]=new GenLightmapBitmapClass();
             }
         }
         
@@ -938,7 +946,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
         this.view.loadingScreenDraw(meshIdx/(this.map.meshes.length+2.0));
         setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(meshIdx); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
 
         //
         // create lightmap
@@ -946,7 +954,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
         // is too slow and browsers will bounce the script
         //
 
-    this.create=function()
+    create()
     {
         var n;
         var nMesh=this.map.meshes.length;
@@ -969,7 +977,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             // is used to optimize ray collisions
             
         for (n=0;n!==this.map.lights.length;n++) {
-            this.lastBlockList.push(new GetLightmapLastBlockObject());
+            this.lastBlockList.push(new GetLightmapLastBlockClass());
         }
 
             // run through the meshes
@@ -978,9 +986,9 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
         this.view.loadingScreenDraw(1.0/(nMesh+2.0));
         setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(0); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
 
-    this.createFinish=function()
+    createFinish()
     {
         var n;
         
@@ -998,7 +1006,7 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            this.bitmapList.addBitmap(new Bitmap(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
+            this.bitmapList.addBitmap(new BitmapClass(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
         }
 
             // and set the light map on the meshes
@@ -1019,6 +1027,6 @@ function GenLightmapObject(view,bitmapList,map,debug,generateLightmap,callbackFu
 
         this.view.loadingScreenDraw(1.0);
         this.callbackFunc();
-    };
+    }
 
 }

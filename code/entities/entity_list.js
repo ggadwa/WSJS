@@ -2,7 +2,7 @@
 // entity list class
 //
 
-class EntityList
+class EntityListClass
 {
     constructor()
     {

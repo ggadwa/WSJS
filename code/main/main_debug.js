@@ -57,7 +57,7 @@ function debugInit()
     wid=Math.trunc(bitmapWid/3);
     nBitmap=GEN_BITMAP_TYPE_NAMES.length;
     
-    genBitmap=new GenBitmapObject(new GenRandomObject(SEED_MAP_BITMAP));
+    genBitmap=new GenBitmapClass(new GenRandomClass(SEED_MAP_BITMAP));
     
     for (n=0;n!==nBitmap;n++) {
         
@@ -97,12 +97,12 @@ function debugInit()
         // the sounds
         // need to create soundlist for audio sample rates
         
-    debugSoundList=new SoundList();
+    debugSoundList=new SoundListClass();
     if (!debugSoundList.initialize()) return;
 
     nSound=GEN_SOUND_TYPE_NAMES.length;
     
-    genSound=new GenSoundObject(debugSoundList.getAudioContext(),new GenRandomObject(SEED_SOUND));
+    genSound=new GenSoundClass(debugSoundList.getAudioContext(),new GenRandomClass(SEED_SOUND));
     
     for (n=0;n!==nSound;n++) {
         

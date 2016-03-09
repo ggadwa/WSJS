@@ -1,107 +1,110 @@
-"use strict";
-
 //
 // model bone class
 //
 
-function ModelBoneObject(name,parentBoneIdx,position)
+class ModelBoneClass
 {
-    this.name=name;
-    this.parentBoneIdx=parentBoneIdx;
-    this.position=position;
-    
-        // parenting
-        
-    this.vectorFromParent=new wsPoint(0.0,0,0,0,0);
-    this.childBoneIndexes=[];
-    
-        // mesh creation
-        
-    this.gravityLockDistance=500;
-    this.gravityScale=new wsPoint(1.0,1.0,1.0);
-    
-        // pose
-    
-    this.curPoseAngle=new wsPoint(0.0,0.0,0.0);
-    this.curPosePosition=this.position.copy();
-    
-    this.prevPoseAngle=new wsPoint(0.0,0.0,0.0);
-    this.nextPoseAngle=new wsPoint(0.0,0.0,0.0);
+    constructor(name,parentBoneIdx,position)
+    {
+        this.name=name;
+        this.parentBoneIdx=parentBoneIdx;
+        this.position=position;
+
+            // parenting
+
+        this.vectorFromParent=new wsPoint(0.0,0,0,0,0);
+        this.childBoneIndexes=[];
+
+            // mesh creation
+
+        this.gravityLockDistance=500;
+        this.gravityScale=new wsPoint(1.0,1.0,1.0);
+
+            // pose
+
+        this.curPoseAngle=new wsPoint(0.0,0.0,0.0);
+        this.curPosePosition=this.position.copy();
+
+        this.prevPoseAngle=new wsPoint(0.0,0.0,0.0);
+        this.nextPoseAngle=new wsPoint(0.0,0.0,0.0);
+    }
     
         //
-        // bone types
+        // bone types and flags
         //
         
-    this.isBase=function()
+    isBase()
     {
         return(this.name==='Base');
-    };
+    }
     
-        //
-        // bone flags
-        //
-    
-    this.hasParent=function()
+    hasParent()
     {
         return(this.parentBoneIdx!==-1);
-    };
+    }
 }
 
 //
 // limb class
 //
 
-function ModelLimbObject(limbType,globeSurfaceCount,boneIndexes)
+class ModelLimbClass
 {
-    this.limbType=limbType;
-    this.globeSurfaceCount=globeSurfaceCount;
-    this.boneIndexes=boneIndexes;
+    constructor(limbType,globeSurfaceCount,boneIndexes)
+    {
+        this.limbType=limbType;
+        this.globeSurfaceCount=globeSurfaceCount;
+        this.boneIndexes=boneIndexes;
+    }
 };
 
 //
 // model skeleton class
 //
 
-function ModelSkeletonObject()
+class ModelSkeletonClass
 {
-    this.bones=[];
-    
-    this.baseBoneIdx=0;
-    
-        // lists of bones that are
-        // used for animation and
-        // mesh building
-    
-    this.limbs=[];
-    
-        // animations
-        
-    this.lastAnimationTick=0;
-    this.lastAnimationFlip=false;          // supergumba -- temporary for random animations
+    constructor()
+    {
+        this.bones=[];
+
+        this.baseBoneIdx=0;
+
+            // lists of bones that are
+            // used for animation and
+            // mesh building
+
+        this.limbs=[];
+
+            // animations
+
+        this.lastAnimationTick=0;
+        this.lastAnimationFlip=false;          // supergumba -- temporary for random animations
+    }
     
         //
         // close skeleton
         //
 
-    this.close=function()
+    close()
     {
         this.bones=[];
-    };
+    }
     
         //
         // clone
         //
         
-    this.clone=function()
+    clone()
     {
         var n,bone;
         var nBone=this.bones.length;
         
-        var skeleton=new ModelSkeletonObject();
+        var skeleton=new ModelSkeletonClass();
         
         for (n=0;n!==nBone;n++) {
             bone=this.bones[n];
-            skeleton.bones.push(new ModelBoneObject(bone.name,bone.parentBoneIdx,bone.position));
+            skeleton.bones.push(new ModelBoneClass(bone.name,bone.parentBoneIdx,bone.position));
         }
         
             // these list can just be copied,
@@ -114,13 +117,13 @@ function ModelSkeletonObject()
         skeleton.precalcAnimationValues();
         
         return(skeleton);
-    };
+    }
     
         //
         // find bone
         //
         
-    this.findBoneIndex=function(name)
+    findBoneIndex(name)
     {
         var n;
         var nBone=this.bones.length;
@@ -130,29 +133,29 @@ function ModelSkeletonObject()
         }
         
         return(-1);
-    };
+    }
     
-    this.findBone=function(name)
+    findBone(name)
     {
         var idx=this.findBoneIndex(name);
         if (idx===-1) return(null);
         return(this.bones[idx]);
-    };
+    }
     
-    this.getDistanceBetweenBones=function(name1,name2)
+    getDistanceBetweenBones(name1,name2)
     {
         var bone1=this.findBone(name1);
         var bone2=this.findBone(name2);
         
         if ((bone1===null) || (bone2===null)) return(null);
         return(new wsPoint(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
-    };
+    }
     
         //
         // bounds and center
         //
         
-    this.getBounds=function(xBound,yBound,zBound)
+    getBounds(xBound,yBound,zBound)
     {
         var n,pos;
         var nBone=this.bones.length;
@@ -167,9 +170,9 @@ function ModelSkeletonObject()
             yBound.adjust(pos.y);
             zBound.adjust(pos.z);
         }
-    };
+    }
     
-    this.getCenter=function()
+    getCenter()
     {
         var n;
         var nBone=this.bones.length;
@@ -187,14 +190,14 @@ function ModelSkeletonObject()
         pt.z=Math.trunc(pt.z/nBone);
         
         return(pt);
-    };
+    }
     
         //
         // this runs a number of pre-calcs to setup
         // the skeleton for animation
         //
         
-    this.precalcAnimationValues=function()
+    precalcAnimationValues()
     {
         var n,k,bone,parentBone;
         var nBone=this.bones.length;
@@ -225,7 +228,7 @@ function ModelSkeletonObject()
                 }
             }
         }
-    };
+    }
     
         //
         // functions to handle clear, moving
@@ -233,7 +236,7 @@ function ModelSkeletonObject()
         // pose
         //
         
-    this.moveNextPoseToPrevPose=function()
+    moveNextPoseToPrevPose()
     {
         var n,bone;
         var nBone=this.bones.length;
@@ -242,9 +245,9 @@ function ModelSkeletonObject()
             bone=this.bones[n];
             bone.prevPoseAngle.setFromPoint(bone.nextPoseAngle);
         }
-    };
+    }
     
-    this.clearNextPose=function()
+    clearNextPose()
     {
         var n,bone;
         var nBone=this.bones.length;
@@ -253,13 +256,13 @@ function ModelSkeletonObject()
             bone=this.bones[n];
             bone.nextPoseAngle.setFromValues(0.0,0.0,0.0);
         }
-    };
+    }
     
         //
         // animate bones
         //
     
-    this.rotatePoseBoneRecursive=function(boneIdx,ang)
+    rotatePoseBoneRecursive(boneIdx,ang)
     {
         var n,bone,parentBone;
         
@@ -295,9 +298,9 @@ function ModelSkeletonObject()
         for (n=0;n!==nChild;n++) {
             this.rotatePoseBoneRecursive(bone.childBoneIndexes[n],bone.curPoseAngle);
         }
-    };
+    }
     
-    this.animate=function(view)
+    animate(view)
     {
         var n,bone;
         var nBone=this.bones.length;
@@ -317,14 +320,14 @@ function ModelSkeletonObject()
             // the base
             
         this.rotatePoseBoneRecursive(this.baseBoneIdx,new wsPoint(0.0,0.0,0.0));
-    };
+    }
     
     
     
     
     // supergumba -- testing
     
-    this.randomNextPoseLeg=function(view,limb)
+    randomNextPoseLeg(view,limb)
     {
         var r,backLeg;
 
@@ -342,9 +345,9 @@ function ModelSkeletonObject()
             this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
             this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*2.0),0.0,0.0);
         }
-    };
+    }
     
-    this.randomNextPoseArm=function(view,limb,armAngle)
+    randomNextPoseArm(view,limb,armAngle)
     {
         var r,z,backArm;
 
@@ -358,9 +361,9 @@ function ModelSkeletonObject()
         
         this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0,0.0,z);
         this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0,0.0,(z*0.9));
-    };
+    }
     
-    this.randomNextPoseBody=function(view,limb,startAng,extraAng)
+    randomNextPoseBody(view,limb,startAng,extraAng)
     {
         var n,x;
         var nBone=limb.boneIndexes.length;
@@ -372,9 +375,9 @@ function ModelSkeletonObject()
             this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);
             x*=0.75;
         }
-    };
+    }
     
-    this.randomNextPose=function(view,modelType)
+    randomNextPose(view,modelType)
     {
         var n,limb;
         var nLimb=this.limbs.length;
@@ -418,9 +421,9 @@ function ModelSkeletonObject()
         }
         
         this.lastAnimationFlip=!this.lastAnimationFlip;
-    };
+    }
     
-    this.randomPose=function(view,modelType)
+    randomPose(view,modelType)
     {
             // time for a new pose?
             
@@ -438,6 +441,6 @@ function ModelSkeletonObject()
 
         this.clearNextPose();
         this.randomNextPose(view,modelType);
-    };
+    }
 
 }

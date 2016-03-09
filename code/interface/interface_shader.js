@@ -2,7 +2,7 @@
 // interface shader class
 //
 
-class InterfaceShader extends Shader
+class InterfaceShaderClass extends ShaderClass
 {
     constructor()
     {

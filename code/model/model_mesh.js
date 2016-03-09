@@ -1,70 +1,74 @@
-"use strict";
-
 //
 // model mesh vertex
 //
 
-function ModelMeshVertexObject()
+class ModelMeshVertexClass
 {
-    this.position=new wsPoint(0,0,0);
-    this.normal=new wsPoint(0.0,0.0,0.0);
-    this.tangent=new wsPoint(0.0,0.0,0.0);
-    this.uv=new ws2DPoint(0.0,0.0);
-    
-    this.boneIdx=-1;
-    this.vectorFromBone=new wsPoint(0.0,0.0,0.0);
-    
-    this.parentBoneIdx=-1;
-    this.vectorFromParentBone=new wsPoint(0.0,0.0,0.0);
+    constructor()
+    {
+        this.position=new wsPoint(0,0,0);
+        this.normal=new wsPoint(0.0,0.0,0.0);
+        this.tangent=new wsPoint(0.0,0.0,0.0);
+        this.uv=new ws2DPoint(0.0,0.0);
+
+        this.boneIdx=-1;
+        this.vectorFromBone=new wsPoint(0.0,0.0,0.0);
+
+        this.parentBoneIdx=-1;
+        this.vectorFromParentBone=new wsPoint(0.0,0.0,0.0);
+    }
 }
 
 //
 // model mesh class
 //
 
-function ModelMeshObject(bitmap,vertexList,indexes,flag)
+class ModelMeshClass
 {
-    this.bitmap=bitmap;
-    this.vertexList=vertexList;
-    this.indexes=indexes;
-    this.flag=flag;
+    constructor(bitmap,vertexList,indexes,flag)
+    {
+        this.bitmap=bitmap;
+        this.vertexList=vertexList;
+        this.indexes=indexes;
+        this.flag=flag;
+
+        this.vertexCount=this.vertexList.length;
+        this.indexCount=this.indexes.length;
+        this.trigCount=Math.trunc(this.indexCount/3);
+
+            // non-culled index list
+
+        this.nonCulledIndexCount=0;
+        this.nonCulledIndexes=null;
+
+            // drawing arrays
+
+        this.drawVertices=null;
+        this.drawNormals=null;
+        this.drawTangents=null;
+        this.drawUVs=null;
+
+            // gl buffers
+
+        this.vertexPosBuffer=null;
+        this.vertexNormalBuffer=null;
+        this.vertexTangentBuffer=null;
+        this.vertexUVAttribute=null;
+        this.indexBuffer=null;
+
+            // global variables to stop GCd
+
+        this.rotVector=new wsPoint(0.0,0.0,0.0);
+        this.rotNormal=new wsPoint(0.0,0.0,0.0);
+        this.parentRotVector=new wsPoint(0.0,0.0,0.0);
+        this.parentRotNormal=new wsPoint(0.0,0.0,0.0);
+    }
     
-    this.vertexCount=this.vertexList.length;
-    this.indexCount=this.indexes.length;
-    this.trigCount=Math.trunc(this.indexCount/3);
-    
-        // non-culled index list
-        
-    this.nonCulledIndexCount=0;
-    this.nonCulledIndexes=null;
-    
-        // drawing arrays
-        
-    this.drawVertices=null;
-    this.drawNormals=null;
-    this.drawTangents=null;
-    this.drawUVs=null;
-    
-        // gl buffers
-        
-    this.vertexPosBuffer=null;
-    this.vertexNormalBuffer=null;
-    this.vertexTangentBuffer=null;
-    this.vertexUVAttribute=null;
-    this.indexBuffer=null;
-    
-        // global variables to stop GCd
-        
-    this.rotVector=new wsPoint(0.0,0.0,0.0);
-    this.rotNormal=new wsPoint(0.0,0.0,0.0);
-    this.parentRotVector=new wsPoint(0.0,0.0,0.0);
-    this.parentRotNormal=new wsPoint(0.0,0.0,0.0);
-        
         //
         // close model mesh
         //
 
-    this.close=function(view)
+    close(view)
     {
         var gl=view.gl;
 
@@ -77,26 +81,26 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         if (this.vertexUVAttribute!==null) gl.deleteBuffer(this.vertexUVAttribute);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
-    };
+    }
     
         //
         // clone
         //
         
-    this.clone=function()
+    clone()
     {
             // nothing that is part of this mesh is every changed
             // only the internal gl arrays so we can just re-use the
             // data
         
-        return(new ModelMeshObject(this.bitmap,this.vertexList,this.indexes,this.flag));
-    };
+        return(new ModelMeshClass(this.bitmap,this.vertexList,this.indexes,this.flag));
+    }
     
         //
         // precalcs the vector from the bone animations
         //
         
-    this.precalcAnimationValues=function(skeleton)
+    precalcAnimationValues(skeleton)
     {
         var n,v,bone,parentBone;
 
@@ -113,13 +117,13 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
                 v.vectorFromParentBone.setFromSubPoint(v.position,parentBone.position);
             }
         }
-    };
+    }
     
         //
         // set vertices to pose and offset position
         //
         
-    this.updateVertexesToPoseAndPosition=function(view,skeleton,angle,position)
+    updateVertexesToPoseAndPosition(view,skeleton,angle,position)
     {
         var n,v;
         var bone,parentBone;
@@ -188,13 +192,13 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.STATIC_DRAW);
-    };
+    }
     
         //
         // set vertices to ang and offset position
         //
         
-    this.updateVertexesToAngleAndPosition=function(view,angle,position)
+    updateVertexesToAngleAndPosition(view,angle,position)
     {
         var n,v;
         
@@ -229,13 +233,13 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.STATIC_DRAW);
-    };
+    }
 
         //
         // model mesh gl binding
         //
 
-    this.setupBuffers=function(view)
+    setupBuffers(view)
     {
             // build the default buffer data
             // from the vertex list
@@ -295,9 +299,9 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             // indexes are dynamic
             
         this.indexBuffer=gl.createBuffer();
-    };
+    }
 
-    this.bindBuffers=function(view,modelShader)
+    bindBuffers(view,modelShader)
     {
         var gl=view.gl;
 
@@ -317,14 +321,14 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
             
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
-    };
+    }
     
         //
         // build an index list of triangles that aren't
         // culled
         //
         
-    this.buildNonCulledTriangleIndexes=function(view)
+    buildNonCulledTriangleIndexes(view)
     {
         var n,idx,vIdx;
         var pnt=new wsPoint(0,0,0);
@@ -368,13 +372,13 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
                 idx+=3;
             }
         }
-    };
+    }
 
         //
         // model mesh drawing
         //
 
-    this.draw=function(view)
+    draw(view)
     {
         var gl=view.gl;
 
@@ -382,6 +386,6 @@ function ModelMeshObject(bitmap,vertexList,indexes,flag)
         
         view.drawModelCount++;
         view.drawModelTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
-    };
+    }
 
 }

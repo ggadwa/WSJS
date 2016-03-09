@@ -1,16 +1,18 @@
-"use strict";
-
 //
-// mesh primitives class
+// mesh primitives class (static)
 //
 
-function MeshPrimitivesObject()
+class MeshPrimitivesClass
 {
+    constructor()
+    {
+    }
+    
         //
         // create cube
         //
 
-    this.createMeshCube=function(bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,front,back,top,bottom,normalsIn,flags)
+    static createMeshCube(bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,front,back,top,bottom,normalsIn,flags)
     {
             // get cube size
             // note: why duplicated vertexes?  Because light map UVs
@@ -25,7 +27,7 @@ function MeshPrimitivesObject()
         if (count===0) return(null);
 
         var v;
-        var vertexList=meshUtility.createMapVertexList(count);
+        var vertexList=MeshUtilityClass.createMapVertexList(count);
 
             // left
 
@@ -141,32 +143,32 @@ function MeshPrimitivesObject()
             
         if (rotAngle!==null) {
             var centerPt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
-            meshUtility.rotateVertexes(vertexList,centerPt,rotAngle);
+            MeshUtilityClass.rotateVertexes(vertexList,centerPt,rotAngle);
         }
         
             // calculate the normals, then use those to
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,null,normalsIn);
-        if (!wholeUV) meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,normalsIn);
+        if (!wholeUV) MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertexList,indexes,flags));
-    };
+        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+    }
 
         //
         // create pryamid
         //
 
-    this.createMeshPryamid=function(bitmap,xBound,yBound,zBound,flags)
+    static createMeshPryamid(bitmap,xBound,yBound,zBound,flags)
     {
         var x=xBound.getMidPoint();
         var z=zBound.getMidPoint();
 
-        var vertexList=meshUtility.createMapVertexList(12);
+        var vertexList=MeshUtilityClass.createMapVertexList(12);
         
         var idx=0;
 
@@ -197,20 +199,20 @@ function MeshPrimitivesObject()
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,null,false);
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,false);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertexList,indexes,flags));
-    };
+        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+    }
     
         //
         // cylinders
         //
         
-    this.createMeshCylinderSegmentList=function(genRandom,radius,extraRadius,segmentCount,segmentExtra)
+    static createMeshCylinderSegmentList(genRandom,radius,extraRadius,segmentCount,segmentExtra)
     {
         var n;
         var segCount=genRandom.randomInt(segmentCount,segmentExtra);
@@ -225,19 +227,20 @@ function MeshPrimitivesObject()
         segments.push(radius+extraRadius);      // and bottom
         
         return(segments);
-    };
+    }
         
-    this.createMeshCylinder=function(bitmap,centerPt,yBound,segments,flags)
+    static createMeshCylinder(bitmap,centerPt,yBound,segments,flags)
     {
         var n,k,t,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         var topRad,botRad;
+        var u1,u2;
         
             // get cylder size
         
         var sideCount=12;
         var segCount=segments.length-1;     // always one extra for top
         
-        var vertexList=meshUtility.createMapVertexList(segCount*(sideCount*6));
+        var vertexList=MeshUtilityClass.createMapVertexList(segCount*(sideCount*6));
         var indexes=new Uint16Array(segCount*(sideCount*6));
 
         var iCount=sideCount*6;
@@ -268,6 +271,14 @@ function MeshPrimitivesObject()
 
             for (n=0;n!==sideCount;n++) {
                 ang2=ang+angAdd;
+                
+                    // the two Us
+                    
+                u1=(ang*segCount)/360.0;
+                u2=(ang2*segCount)/360.0;
+
+                    // force last segment to wrap
+                    
                 if (n===(sideCount-1)) ang2=0.0;
 
                 rd=ang*DEGREE_TO_RAD;
@@ -283,32 +294,32 @@ function MeshPrimitivesObject()
                 
                 bx2=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
                 bz2=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
-
+                
                     // the points
                 
                 v=vertexList[vIdx];
                 v.position.setFromValues(tx,ySegBound.min,tz);
-                v.uv.setFromValues((ang/360.0),0.0);
+                v.uv.setFromValues(u1,0.0);
                 
                 v=vertexList[vIdx+1];
                 v.position.setFromValues(tx2,ySegBound.min,tz2);
-                v.uv.setFromValues((ang2/360.0),0.0);
+                v.uv.setFromValues(u2,0.0);
                 
                 v=vertexList[vIdx+2];
                 v.position.setFromValues(bx,ySegBound.max,bz);
-                v.uv.setFromValues((ang/360.0),1.0);
+                v.uv.setFromValues(u1,1.0);
                 
                 v=vertexList[vIdx+3];
                 v.position.setFromValues(tx2,ySegBound.min,tz2);
-                v.uv.setFromValues((ang2/360.0),0.0);
+                v.uv.setFromValues(u2,0.0);
                 
                 v=vertexList[vIdx+4];
                 v.position.setFromValues(bx2,ySegBound.max,bz2);
-                v.uv.setFromValues((ang2/360.0),1.0);
+                v.uv.setFromValues(u2,1.0);
                 
                 v=vertexList[vIdx+5];
                 v.position.setFromValues(bx,ySegBound.max,bz);
-                v.uv.setFromValues((ang/360.0),1.0);
+                v.uv.setFromValues(u1,1.0);
                 
                     // the normals
                     
@@ -335,14 +346,14 @@ function MeshPrimitivesObject()
 
             // calcualte the tangents
 
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertexList,indexes,flags));
-    };
+        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+    }
     
-    this.createMeshCylinderSimple=function(bitmap,centerPt,yBound,radius,flags)
+    static createMeshCylinderSimple(bitmap,centerPt,yBound,radius,flags)
     {
         var segments=[];
         
@@ -350,8 +361,6 @@ function MeshPrimitivesObject()
         segments.push(radius);
         
         return(this.createMeshCylinder(bitmap,centerPt,yBound,segments,flags));
-    };
+    }
     
 }
-
-var meshPrimitives=new MeshPrimitivesObject();

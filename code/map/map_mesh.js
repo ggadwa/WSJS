@@ -1,86 +1,91 @@
-"use strict";
-
 //
 // map mesh vertex
 //
 
-function MapMeshVertexObject()
+class MapMeshVertexClass
 {
-    this.position=new wsPoint(0,0,0);
-    this.normal=new wsPoint(0.0,0.0,0.0);
-    this.tangent=new wsPoint(0.0,0.0,0.0);
-    this.uv=new ws2DPoint(0.0,0.0);
-    this.lightmapUV=new ws2DPoint(0.0,0.0);
+    constructor()
+    {
+        this.position=new wsPoint(0,0,0);
+        this.normal=new wsPoint(0.0,0.0,0.0);
+        this.tangent=new wsPoint(0.0,0.0,0.0);
+        this.uv=new ws2DPoint(0.0,0.0);
+        this.lightmapUV=new ws2DPoint(0.0,0.0);
+    }
 }
 
 //
-// special object used to pre-calc some
+// special class used to pre-calc some
 // light map calculations
 //
 
-function MapMeshLightMapTrigCacheObject(v0,v10,v20)
+class MapMeshLightMapTrigCacheClass
 {
-    this.v0=v0;        // point 0 on the triangle
-    this.v10=v10;      // vector of point 1-point 0
-    this.v20=v20;      // vector of point 2-point 0
+    constructor(v0,v10,v20)
+    {
+        this.v0=v0;        // point 0 on the triangle
+        this.v10=v10;      // vector of point 1-point 0
+        this.v20=v20;      // vector of point 2-point 0
+    }
 }
 
 //
 // map mesh class
 //
 
-function MapMeshObject(bitmap,vertexList,indexes,flag)
+class MapMeshClass
 {
-    this.bitmap=bitmap;
-    this.lightmap=null;
-    this.vertexList=vertexList;
-    this.indexes=indexes;
-    this.flag=flag;
-    
-    this.tempLightmapIdx=0;         // used to track light maps when building them, not used otherwise
-    
-    this.vertexCount=this.vertexList.length;
-    this.indexCount=this.indexes.length;
-    this.trigCount=Math.trunc(this.indexCount/3);
-    
-        // non-culled index list
+    constructor(bitmap,vertexList,indexes,flag)
+    {
+        this.bitmap=bitmap;
+        this.lightmap=null;
+        this.vertexList=vertexList;
+        this.indexes=indexes;
+        this.flag=flag;
+
+        this.tempLightmapIdx=0;         // used to track light maps when building them, not used otherwise
+
+        this.vertexCount=this.vertexList.length;
+        this.indexCount=this.indexes.length;
+        this.trigCount=Math.trunc(this.indexCount/3);
+
+            // non-culled index list
+
+        this.nonCulledIndexCount=0;
+        this.nonCulledIndexes=null;
+
+            // drawing arrays
+
+        this.drawVertices=null;
+        this.drawNormals=null;
+        this.drawTangents=null;
+        this.drawPackedUVs=null;
+
+            // null buffers
+
+        this.vertexPosBuffer=null;
+        this.vertexNormalBuffer=null;
+        this.vertexTangentBuffer=null;
+        this.vertexAndLightmapUVAttribute=null;
+        this.indexBuffer=null;
+
+            // special caches for light map building
+
+        this.trigRayTraceCache=null;
+
+            // collision lists
+
+        this.collisionLines=[];
+        this.collisionRects=[];
         
-    this.nonCulledIndexCount=0;
-    this.nonCulledIndexes=null;
-    
-        // drawing arrays
-        
-    this.drawVertices=null;
-    this.drawNormals=null;
-    this.drawTangents=null;
-    this.drawPackedUVs=null;
-    
-        // null buffers
-        
-    this.vertexPosBuffer=null;
-    this.vertexNormalBuffer=null;
-    this.vertexTangentBuffer=null;
-    this.vertexAndLightmapUVAttribute=null;
-    this.indexBuffer=null;
-    
-        // special caches for light map building
-        
-    this.trigRayTraceCache=null;
-    
-        // collision lists
-        
-    this.collisionLines=[];
-    this.collisionRects=[];
-    
-        // supergumba -- NOTE!!!  When this is constructor, move in
-        //  this.setupBounds(); to end of constructor, need this at the
-        // bottom now so function is defined, won't be a problem with classes
+        this.setupBounds();
+    }
     
         //
         // close mesh
         //
 
-    this.close=function(view)
+    close(view)
     {
         var gl=view.gl;
         
@@ -93,13 +98,13 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         if (this.vertexAndLightmapUVAttribute!==null) gl.deleteBuffer(this.vertexAndLightmapUVAttribute);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
-    };
+    }
     
         //
         // combine two meshes
         //
 
-    this.combineMesh=function(mesh)
+    combineMesh(mesh)
     {
         var n;
         
@@ -131,13 +136,13 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
             // setup bounds
 
         this.setupBounds();
-    };
+    }
 
         //
         // mesh box collision
         //
 
-    this.boxBoundCollision=function(xBound,yBound,zBound)
+    boxBoundCollision(xBound,yBound,zBound)
     {
         if (xBound!==null) {
             if (this.xBound.min>=xBound.max) return(false);
@@ -152,9 +157,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
             if (this.zBound.max<=zBound.min) return(false);
         }
         return(true);
-    };
+    }
 
-    this.boxMeshCollision=function(checkMesh)
+    boxMeshCollision(checkMesh)
     {
         if (this.xBound.min>=checkMesh.xBound.max) return(false);
         if (this.xBound.max<=checkMesh.xBound.min) return(false);
@@ -162,9 +167,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         if (this.yBound.max<=checkMesh.yBound.min) return(false);
         if (this.zBound.min>=checkMesh.zBound.max) return(false);
         return(!(this.zBound.max<=checkMesh.zBound.min));
-    };
+    }
     
-    this.boxTouchOtherMesh=function(checkMesh)
+    boxTouchOtherMesh(checkMesh)
     {
         if ((this.xBound.min===checkMesh.xBound.max) || (this.xBound.max===checkMesh.xBound.min)) {
             return(!((this.zBound.min>checkMesh.zBound.max) || (this.zBound.max<checkMesh.zBound.min)));
@@ -173,19 +178,19 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
             return(!((this.xBound.min>checkMesh.xBound.max) || (this.xBound.max<checkMesh.xBound.min)));
         }
         return(false);
-    };
+    }
 
         //
         // triangles
         //
 
-    this.getTriangleVertex=function(trigIdx,vertexIdx)
+    getTriangleVertex(trigIdx,vertexIdx)
     {
         var v=this.vertexList[this.indexes[(trigIdx*3)+vertexIdx]];
         return(new wsPoint(v.position.x,v.position.y,v.position.z));
-    };
+    }
 
-    this.getTriangleBounds=function(trigIdx)
+    getTriangleBounds(trigIdx)
     {
         var v=this.getTriangleVertex(trigIdx,0);
 
@@ -201,9 +206,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         }
 
         return([xBound,yBound,zBound]);
-    };
+    }
 
-    this.isTriangleStraightWall=function(trigIdx)
+    isTriangleStraightWall(trigIdx)
     {
         var v0=this.getTriangleVertex(trigIdx,0);
         var v1=this.getTriangleVertex(trigIdx,0);
@@ -216,9 +221,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         if ((v0.z===v1.z) && (v0.z===v2.z)) return(true);
 
         return(false);
-    };
+    }
 
-    this.removeTriangle=function(trigIdx)
+    removeTriangle(trigIdx)
     {
         if (this.indexCount===0) return;
         if ((trigIdx<0) || (trigIdx>=this.trigCount)) return;
@@ -245,13 +250,13 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
 
         this.indexCount=this.indexes.length;
         this.trigCount=Math.trunc(this.indexCount/3);
-    };
+    }
 
         //
         // setup mesh boxes and bounds
         //
 
-    this.setupBounds=function()
+    setupBounds()
     {
         var v=this.vertexList[0];
         
@@ -275,13 +280,13 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         this.center.x/=this.vertexCount;
         this.center.y/=this.vertexCount;
         this.center.z/=this.vertexCount;
-    };
+    }
 
         //
         // special cache for ray tracing
         //
 
-    this.buildTrigRayTraceCache=function()
+    buildTrigRayTraceCache()
     {
         var n,tIdx;
         var vp0,vp1,vp2,v10,v20;
@@ -304,15 +309,15 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
             v10=new wsPoint((vp1.x-vp0.x),(vp1.y-vp0.y),(vp1.z-vp0.z));
             v20=new wsPoint((vp2.x-vp0.x),(vp2.y-vp0.y),(vp2.z-vp0.z));
             
-            this.trigRayTraceCache.push(new MapMeshLightMapTrigCacheObject(vp0,v10,v20));
+            this.trigRayTraceCache.push(new MapMeshLightMapTrigCacheClass(vp0,v10,v20));
         }
-    };
+    }
 
         //
         // collision geometry
         //
 
-    this.buildCollisionGeometryLine=function(v0,v1,v2)
+    buildCollisionGeometryLine(v0,v1,v2)
     {
         var n,nLine,line;
         
@@ -336,9 +341,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         }
 
         this.collisionLines.push(line);
-    };
+    }
     
-    this.buildCollisionGeometryFloor=function(v0,v1,v2)
+    buildCollisionGeometryFloor(v0,v1,v2)
     {
         var n,nRect;
         var lft,top,rgt,bot;
@@ -373,9 +378,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         }
 
         this.collisionRects.push(cRect);
-    };
+    }
     
-    this.buildCollisionGeometry=function()
+    buildCollisionGeometry()
     {
         var n,ny;
         var tIdx;
@@ -412,13 +417,13 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
                 }
             }
         }
-    };
+    }
 
         //
         // mesh binding
         //
 
-    this.setupBuffers=function(view)
+    setupBuffers(view)
     {
             // build the default data
             // from the vertex list
@@ -482,9 +487,9 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
             // indexes are dynamic
             
         this.indexBuffer=gl.createBuffer();
-    };
+    }
 
-    this.bindBuffers=function(view,mapShader)
+    bindBuffers(view,mapShader)
     {
         var gl=view.gl;
 
@@ -504,14 +509,14 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
             
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
-    };
+    }
     
         //
         // build an index list of triangles that aren't
         // culled
         //
         
-    this.buildNonCulledTriangleIndexes=function(view)
+    buildNonCulledTriangleIndexes(view)
     {
         var n,v,idx;
         var trigToEyeVector=new wsPoint(0,0,0);
@@ -548,13 +553,13 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         
             idx+=3;
         }
-    };
+    }
     
         //
         // mesh drawing
         //
 
-    this.draw=function(view)
+    draw(view)
     {
         var gl=view.gl;
 
@@ -562,12 +567,5 @@ function MapMeshObject(bitmap,vertexList,indexes,flag)
         
         view.drawMeshCount++;
         view.drawMeshTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
-    };
-        
-        // setup bounds
-        // supergumba -- THIS IS A HACK, when these
-        // are classes move this to constructor
-        
-    this.setupBounds();
-
+    }
 }

@@ -2,7 +2,7 @@
 // view camera class
 //
 
-class ViewCamera
+class ViewCameraClass
 {
     constructor()
     {
@@ -27,7 +27,7 @@ class ViewCamera
 // view class
 //
 
-class View
+class ViewClass
 {
     constructor()
     {
@@ -71,7 +71,7 @@ class View
 
             // in game random
 
-        this.genRandom=new GenRandomObject(Date.now());
+        this.genRandom=new GenRandomClass(Date.now());
 
             // view lighting
 
@@ -102,12 +102,12 @@ class View
             // additional drawing objects
 
         this.text=new Text();
-        this.interface=new InterfaceObject();
-        this.particleList=new ParticleList();
+        this.interface=new InterfaceClass();
+        this.particleList=new ParticleListClass();
 
             // the camera object
 
-        this.camera=new ViewCamera();
+        this.camera=new ViewCameraClass();
 
             // main loop
 

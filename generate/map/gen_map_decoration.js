@@ -1,23 +1,22 @@
-"use strict";
-
 //
 // generate room decoration class
 //
 
-function GenRoomDecorationObject(view,bitmapList,map,genRandom)
+class GenRoomDecorationClass
 {
-        // variables
-        
-    this.view=view;
-    this.bitmapList=bitmapList;
-    this.map=map;
-    this.genRandom=genRandom;
-
+    constructor(view,bitmapList,map,genRandom)
+    {    
+        this.view=view;
+        this.bitmapList=bitmapList;
+        this.map=map;
+        this.genRandom=genRandom;
+    }
+    
         //
         // random boxes
         //
 
-    this.addBoxes=function(room)
+    addBoxes(room)
     {
         var n,k,stackLevel,pos,boxPos,boxY,stackCount,boxCount,rotWid;
         var ang,angAdd;
@@ -37,7 +36,7 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
                 // find the middle of the box spot
                 // and box sizes
                 
-            pos=room.findRandomDecorationLocation(genRandom,false);
+            pos=room.findRandomDecorationLocation(this.genRandom,false);
             if (pos===null) break;
             
             high=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_WIDTH,ROOM_DECORATION_BOX_EXTRA_WIDTH);
@@ -68,7 +67,7 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
 
                     rotAngle.setFromValues(0.0,(this.genRandom.random()*360.0),0.0);
 
-                    this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
+                    this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
 
                     ang+=angAdd;
                 }
@@ -83,13 +82,13 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
             }
         }
 
-    };
+    }
         
         //
         // machines
         //
         
-    this.addMachine=function(room)
+    addMachine(room)
     {
         var pos,wid,high;
         var machineBoundX,machineBoundY,machineBoundZ,topBoundY,botBoundY;
@@ -99,7 +98,7 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
         
             // the machine location
             
-        pos=room.findRandomDecorationLocation(genRandom,true);
+        pos=room.findRandomDecorationLocation(this.genRandom,true);
         if (pos===null) return;
             
         wid=Math.trunc(ROOM_BLOCK_WIDTH/2);
@@ -114,9 +113,9 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
 
             // the machine box and top
             
-        this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.getBitmap('Map Machine'),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
-        this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.getBitmap('Map Metal'),machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
-        this.map.addMesh(meshPrimitives.createMeshCube(this.bitmapList.getBitmap('Map Metal'),machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.bitmapList.getBitmap('Map Machine'),machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.bitmapList.getBitmap('Map Metal'),machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.bitmapList.getBitmap('Map Metal'),machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
 
             // the machine pipes
 
@@ -138,24 +137,25 @@ function GenRoomDecorationObject(view,bitmapList,map,genRandom)
             centerPt.x=pos.x+((wid*Math.sin(rd))+(wid*Math.cos(rd)));
             centerPt.z=pos.z+((wid*Math.cos(rd))-(wid*Math.sin(rd)));
             
-            map.addMesh(meshPrimitives.createMeshCylinderSimple(pipeBitmap,centerPt,yPipeBound,radius,MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPt,yPipeBound,radius,MESH_FLAG_DECORATION));
             
             ang+=angAdd;
         }
-    };
+    }
 
-    this.addDecorations=function(room)
+    addDecorations(room)
     {
             // randomly pick a decoration
+            // 0 = nothing
             
-        switch (this.genRandom.randomIndex(2)) {
-            case 0:
+        switch (this.genRandom.randomIndex(3)) {
+            case 1:
                 this.addBoxes(room);
                 break;
-            case 1:
+            case 2:
                 this.addMachine(room);
                 break;
         }
-    };
+    }
 
 }

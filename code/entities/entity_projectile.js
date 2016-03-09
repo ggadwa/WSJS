@@ -2,7 +2,7 @@
 // entity projectile object
 //
 
-class EntityProjectile extends Entity
+class EntityProjectileClass extends EntityClass
 {
     constructor(name,view,position,angle,radius,high,model,hitSound)
     {

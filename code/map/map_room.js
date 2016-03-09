@@ -1,5 +1,3 @@
-"use strict";
-
 //
 // map room class
 // 
@@ -7,24 +5,28 @@
 // entities or decorations or objectives
 //
 
-function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level)
+class MapRoomClass
 {
-    this.xBlockSize=xBlockSize;
-    this.zBlockSize=zBlockSize;
-    this.xBound=xBound;
-    this.yBound=yBound;
-    this.zBound=zBound;
-    this.hasStories=hasStories;
-    this.level=level;
-    
-    this.blockGrid=null;
-    this.platformGrid=null;
-    
-    this.yStoryBound=new wsBound((this.yBound.min-ROOM_FLOOR_DEPTH),this.yBound.max);
-    if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+ROOM_FLOOR_DEPTH);
+    constructor(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level)
+    {
+        this.xBlockSize=xBlockSize;
+        this.zBlockSize=zBlockSize;
+        this.xBound=xBound;
+        this.yBound=yBound;
+        this.zBound=zBound;
+        this.hasStories=hasStories;
+        this.level=level;
 
+        this.blockGrid=null;
+        this.platformGrid=null;
+
+        this.yStoryBound=new wsBound((this.yBound.min-ROOM_FLOOR_DEPTH),this.yBound.max);
+        if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+ROOM_FLOOR_DEPTH);
+        
+        this.setupGrid();
+    }
     
-    this.setupGrid=function()
+    setupGrid()
     {
         var x,z;
         
@@ -55,30 +57,28 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             this.blockGrid[z][this.xBlockSize-1]=1;
         }
         
-    };
-    
-    this.setupGrid();       // supergumba -- IMPORTANT!!!  Move all this after classes!
+    }
     
         //
         // flip bits on grid space
         //
         
-    this.setBlockGrid=function(x,z)
+    setBlockGrid(x,z)
     {
         this.blockGrid[z][x]=1;
-    };
+    }
     
-    this.setPlatformGrid=function(x,z)
+    setPlatformGrid(x,z)
     {
         this.platformGrid[z][x]=1;
-    };
+    }
     
         //
         // mask edge grid based on collisions with other
         // rooms or bounds
         //
         
-    this.maskEdgeGridBlockToBounds=function(xCollideBound,yCollideBound,zCollideBound)
+    maskEdgeGridBlockToBounds(xCollideBound,yCollideBound,zCollideBound)
     {
         var x,z,x1,x2,z1,z2;
         
@@ -145,23 +145,23 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             }
             return;
         }
-    };
+    }
     
-    this.maskEdgeGridBlockToRoom=function(collideRoom)
+    maskEdgeGridBlockToRoom(collideRoom)
     {
         this.maskEdgeGridBlockToBounds(collideRoom.xBound,collideRoom.yBound,collideRoom.zBound);
-    };
+    }
     
-    this.getEdgeGridValue=function(x,z)
+    getEdgeGridValue(x,z)
     {
         return(this.edgeGrid[z][x]);
-    };
+    }
     
         //
         // find points in blocked grid space
         //
     
-    this.findRandomEntityPosition=function(genRandom)
+    findRandomEntityPosition(genRandom)
     {
         var x,z,startX,startZ,bx,bz;
         
@@ -205,9 +205,9 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         }
         
         return(null);
-    };
+    }
     
-    this.findRandomDecorationLocation=function(genRandom,checkPlatform)
+    findRandomDecorationLocation(genRandom,checkPlatform)
     {
         var x,z,startX,startZ,bx,bz,gridSpot;
         
@@ -241,9 +241,9 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         }
         
         return(null);
-    };
+    }
     
-    this.checkLocationFreeAndBlock=function(x,z)
+    checkLocationFreeAndBlock(x,z)
     {
         var bx,bz;
         
@@ -255,13 +255,13 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         }
         
         return(null);
-    };
+    }
     
         //
         // create polygon walls and floors
         //
         
-    this.createMeshWalls=function(bitmap,yStoryBound,flag)
+    createMeshWalls(bitmap,yStoryBound,flag)
     {
         var n,nSegment,x,z,x2,z2;
 
@@ -270,7 +270,7 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
 
         nSegment=(this.xBlockSize*2)+(this.zBlockSize*2);
 
-        var vertexList=meshUtility.createMapVertexList(nSegment*6);
+        var vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
         var indexes=new Uint16Array(nSegment*6);
         
         var vIdx=0;
@@ -384,22 +384,22 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,null,true);
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,true);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        var mesh=new MapMeshObject(bitmap,vertexList,indexes,flag);
+        var mesh=new MapMeshClass(bitmap,vertexList,indexes,flag);
 
         return(mesh);
-    };
+    }
     
         //
         // overlay lines for room
         //
         
-    this.createOverlayLineList=function()
+    createOverlayLineList()
     {
         var n,x,z,x2,z2;
         var lineList=[];
@@ -445,13 +445,13 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
         }
 
         return(lineList);
-    };
+    }
     
         //
         // create polygon floors or ceilings
         //
         
-    this.createMeshFloorOrCeiling=function(bitmap,yStoryBound,isFloor,flag)
+    createMeshFloorOrCeiling(bitmap,yStoryBound,isFloor,flag)
     {
         var x,z,vx,vz,vx2,vz2;
         var v,nSegment;
@@ -460,7 +460,7 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             
         nSegment=this.xBlockSize*this.zBlockSize;
         
-        var vertexList=meshUtility.createMapVertexList(nSegment*6);
+        var vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
         var indexes=new Uint16Array(nSegment*6);
         
         var vIdx=0;
@@ -520,12 +520,12 @@ function MapRoomObject(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,lev
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        return(new MapMeshObject(bitmap,vertexList,indexes,flag));
-    };
+        return(new MapMeshClass(bitmap,vertexList,indexes,flag));
+    }
 
 }

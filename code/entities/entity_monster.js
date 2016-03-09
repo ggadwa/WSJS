@@ -2,7 +2,7 @@
 // monster entity class
 //
 
-class EntityMonster extends Entity
+class EntityMonsterClass extends EntityClass
 {
     constructor(name,position,angle,radius,high,model)
     {
@@ -22,7 +22,7 @@ class EntityMonster extends Entity
         
         touchEntity=this.getTouchEntity();
         if (touchEntity!==null) {
-            if (touchEntity instanceof EntityProjectile) {
+            if (touchEntity instanceof EntityProjectileClass) {
                 this.markAsDelete();
                 return;
             }

@@ -2,11 +2,11 @@
 // particle list class
 //
 
-class ParticleList
+class ParticleListClass
 {
     constructor()
     {
-        this.particleShader=new ParticleShader();
+        this.particleShader=new ParticleShaderClass();
 
         this.particles=[];
     }
@@ -28,7 +28,7 @@ class ParticleList
         this.particles=[];
         
         for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
-            particle=new Particle();
+            particle=new ParticleClass();
             particle.initialize(view);
             this.particles.push(particle);
         }

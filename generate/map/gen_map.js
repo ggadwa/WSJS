@@ -1,33 +1,41 @@
-"use strict";
+//
+// NOTE!
+// 
+// We need to keep a global copy of the current
+// map object because maps require
+// time outs and the "this" on the timeout is
+// the window object (supergumba -- arrow functions
+// or bind will probably fix this, need to try later)
+//
+
+var currentGlobalGenMapObject=null;
 
 //
 // generate map class
 //
 
-function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
+class GenMapClass
 {
-    this.view=view;
-    this.bitmapList=bitmapList;
-    this.map=map;
-    this.genRandom=genRandom;
-    
-    this.currentRoomCount=0;
-    
-        // the callback function when
-        // generation concludes
-        
-    this.callbackFunc=callbackFunc;
-    
-        // a link to this object so we can
-        // use it in the "this" callbacks
-        
-    var currentGlobalGenMapObject;
+    constructor(view,bitmapList,map,genRandom,callbackFunc)
+    {
+        this.view=view;
+        this.bitmapList=bitmapList;
+        this.map=map;
+        this.genRandom=genRandom;
 
+        this.currentRoomCount=0;
+
+            // the callback function when
+            // generation concludes
+
+        this.callbackFunc=callbackFunc;
+    }
+    
         //
         // remove shared triangles
         //
 
-    this.removeSharedTriangles=function()
+    removeSharedTriangles()
     {
         var n,k,t1,t2,nMesh,hit;
         var bounds,otherBounds;
@@ -128,13 +136,13 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
                 }
             }
         }
-    };
+    }
 
         //
         // create rooms
         //
 
-    this.addRegularRoom=function(xBlockSize,zBlockSize,xBound,yBound,zBound,level)
+    addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,level)
     {
         var n,mesh,mesh2;
         var storyCount,yStoryBound,yFloorBound;
@@ -184,11 +192,11 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.getBitmap('Map Ceiling'),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
         
         return(roomIdx);
-    };
+    }
 
-    this.addStairRoom=function(connectSide,xStairBound,yStairBound,zStairBound,flipDirection,level)
+    addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,flipDirection,level)
     {
-        var genRoomStairs=new GenRoomStairs(this.map,this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
 
         var roomBitmap=this.bitmapList.getBitmap('Map Wall');
         var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
@@ -239,13 +247,13 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
             // add to overlay
             
         this.map.addOverlayStair(xStairBound,zStairBound);
-    };
+    }
     
         //
         // lights
         //
 
-    this.addGeneralLight=function(lightPos,fixturePos,intensity)
+    addGeneralLight(lightPos,fixturePos,intensity)
     {
         var red,green,blue;
 
@@ -254,7 +262,7 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
         var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
         var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-        this.map.addMesh(meshPrimitives.createMeshPryamid(this.bitmapList.getBitmap('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
+        this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.bitmapList.getBitmap('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
 
             // the color
 
@@ -273,10 +281,10 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
 
             // add light to map
 
-        this.map.addLight(new MapLightObject(lightPos,new wsColor(red,green,blue),MAP_GENERATE_LIGHTMAP,intensity,exponent));
-    };
+        this.map.addLight(new MapLightClass(lightPos,new wsColor(red,green,blue),MAP_GENERATE_LIGHTMAP,intensity,exponent));
+    }
     
-    this.addRoomLight=function(roomIdx)
+    addRoomLight(roomIdx)
     {
         var lightY,fixturePos,lightPos,intensity;
         var room=this.map.rooms[roomIdx];
@@ -299,9 +307,9 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
             // create the light
             
         this.addGeneralLight(lightPos,fixturePos,intensity);
-    };
+    }
     
-    this.addStairLight=function(xBound,yBound,zBound)
+    addStairLight(xBound,yBound,zBound)
     {
         var fixturePos,lightPos,high;
         
@@ -315,13 +323,13 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
             // create the light
             
         this.addGeneralLight(lightPos,fixturePos,(ROOM_FLOOR_HEIGHT*1.5));
-    };
+    }
     
         //
         // finds a single random block offset between two bounds
         //
         
-    this.findRandomBlockOffsetBetweenTwoBounds=function(bound1,bound2)
+    findRandomBlockOffsetBetweenTwoBounds(bound1,bound2)
     {
         var count,offset;
         var min=bound1.min;
@@ -335,13 +343,13 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         if (bound1.min<bound2.min) offset+=(bound2.min-bound1.min);           // need to align offset with bounds1
         
         return(offset);
-    };
+    }
 
         //
         // build map recursive room
         //
 
-    this.buildMapRecursiveRoom=function(recurseCount,lastRoom,yLastBound,stairMode,level)
+    buildMapRecursiveRoom(recurseCount,lastRoom,yLastBound,stairMode,level)
     {
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
@@ -561,96 +569,96 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
                 
             this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextStairMode,nextLevel);
         }
-    };
+    }
     
         //
         // closets, platforms, ledges, pillars and decorations
         //
         
-    this.buildRoomClosets=function()
+    buildRoomClosets()
     {
         var n,closet;
         var nRoom=this.map.rooms.length;
         
         if (!ROOM_CLOSETS) return;
         
-        closet=new GenRoomClosetObject(this.view,this.bitmapList,this.map,genRandom);
+        closet=new GenRoomClosetClass(this.view,this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             closet.addCloset(this.map.rooms[n]);
         }
-    };
+    }
     
-    this.buildRoomPlatforms=function()
+    buildRoomPlatforms()
     {
         var n,room,platform;
         var nRoom=this.map.rooms.length;
         
         if (!ROOM_PLATFORMS) return;
         
-        platform=new GenRoomPlatformObject(this.bitmapList,this.map,this.genRandom);
+        platform=new GenRoomPlatformClass(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
             if ((room.hasStories) && (room.level===0)) platform.createPlatforms(room);
         }
-    };
+    }
     
-    this.buildRoomLedges=function()
+    buildRoomLedges()
     {
         var n,ledge;
         var nRoom=this.map.rooms.length;
         
         if (!ROOM_LEDGES) return;
         
-        ledge=new GenRoomLedgeObject(this.bitmapList,this.map,this.genRandom);
+        ledge=new GenRoomLedgeClass(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             ledge.createLedges(this.map.rooms[n]);
         }
-    };
+    }
     
-    this.buildRoomPillars=function()
+    buildRoomPillars()
     {
         var n,pillar;
         var nRoom=this.map.rooms.length;
         
         if (!ROOM_PILLARS) return;
         
-        pillar=new GenRoomPillarObject(this.view,this.bitmapList,this.map,genRandom);
+        pillar=new GenRoomPillarClass(this.view,this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             pillar.addPillars(this.map.rooms[n]);
         }
-    };
+    }
         
-    this.buildRoomDecorations=function()
+    buildRoomDecorations()
     {
         var n,decoration;
         var nRoom=this.map.rooms.length;
         
         if (!ROOM_DECORATIONS) return;
         
-        decoration=new GenRoomDecorationObject(this.view,this.bitmapList,this.map,genRandom);
+        decoration=new GenRoomDecorationClass(this.view,this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             decoration.addDecorations(this.map.rooms[n]);
         }
-    };
+    }
 
         //
         // build map mainline
         //
 
-    this.build=function()
+    build()
     {
         currentGlobalGenMapObject=this;
         
         this.view.loadingScreenDraw(0.12);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
     
-    this.buildMapRooms=function()
+    buildMapRooms()
     {
             // start the recursive
             // room adding
@@ -661,9 +669,9 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
         
         this.view.loadingScreenDraw(0.24);
         setTimeout(function() { currentGlobalGenMapObject.buildMapClosets(); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
     
-    this.buildMapClosets=function()
+    buildMapClosets()
     {
             // build room closets
             
@@ -673,9 +681,9 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
 
         this.view.loadingScreenDraw(0.36);
         setTimeout(function() { currentGlobalGenMapObject.buildMapPlatforms(); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
     
-    this.buildMapPlatforms=function()
+    buildMapPlatforms()
     {
             // build room platforms
             
@@ -685,9 +693,9 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
 
         this.view.loadingScreenDraw(0.48);
         setTimeout(function() { currentGlobalGenMapObject.buildMapLedges(); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
     
-    this.buildMapLedges=function()
+    buildMapLedges()
     {
             // build room platforms
             
@@ -697,9 +705,9 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
 
         this.view.loadingScreenDraw(0.60);
         setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
     
-    this.buildMapRemoveSharedTriangles=function()
+    buildMapRemoveSharedTriangles()
     {
             // delete any shared triangles
 
@@ -709,9 +717,9 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
             
         this.view.loadingScreenDraw(0.72);
         setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
     
-    this.buildMapDecorations=function()
+    buildMapDecorations()
     {
             // build room pillars and decorations
         
@@ -722,9 +730,9 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
             
         this.view.loadingScreenDraw(0.84);
         setTimeout(function() { currentGlobalGenMapObject.buildMapFinish(); },PROCESS_TIMEOUT_MSEC);
-    };
+    }
     
-    this.buildMapFinish=function()
+    buildMapFinish()
     {
             // overlay precalc
             
@@ -734,6 +742,6 @@ function GenMapObject(view,bitmapList,map,genRandom,callbackFunc)
             
         this.view.loadingScreenDraw(1.0);
         this.callbackFunc();
-    };
+    }
 
 }

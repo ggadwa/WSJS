@@ -2,7 +2,7 @@
 // entity base class
 //
 
-class Entity
+class EntityClass
 {
     constructor(name,position,angle,radius,high,model)
     {
@@ -31,7 +31,7 @@ class Entity
         this.yFrustumBound=new wsBound(0,0);
         this.zFrustumBound=new wsBound(0,0);
 
-        this.collision=new Collision();
+        this.collision=new CollisionClass();
     }
     
         //

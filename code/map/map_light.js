@@ -1,57 +1,54 @@
-"use strict";
-
 //
 // map light class
 //
 
-function MapLightObject(position,color,inLightmap,intensity,exponent)
+class MapLightClass
 {
-    this.position=position;                 // should be wsPoint
-    this.eyePosition=new wsPoint(0,0,0);    // the eye position in the current render, set by the view
-    this.color=color;                       // should be wsColor
-    this.intensity=intensity;
-    this.invertIntensity=1.0/intensity;
-    this.exponent=exponent;
+    constructor(position,color,inLightmap,intensity,exponent)
+    {
+        this.position=position;                 // should be wsPoint
+        this.eyePosition=new wsPoint(0,0,0);    // the eye position in the current render, set by the view
+        this.color=color;                       // should be wsColor
+        this.intensity=intensity;
+        this.invertIntensity=1.0/intensity;
+        this.exponent=exponent;
+
+        this.inLightmap=inLightmap; // if used to generate the light map (color component ignored in shaders)
+
+        this.origIndex=0;           // used to sort lights
+        this.dist=0.0;
+
+        this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
+    }
     
-    this.inLightmap=inLightmap; // if used to generate the light map (color component ignored in shaders)
-    
-    this.origIndex=0;           // used to sort lights
-    this.dist=0.0;
-    
-    this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
-    
-        //
-        // functions
-        //
-        
-    this.distance=function(pt)
+    distance(pt)
     {
         return(this.position.distance(pt));
-    };
+    }
                 
-    this.distanceByTriplet=function(x,y,z)
+    distanceByTriplet(x,y,z)
     {
         return(this.position.distanceByTriplet(x,y,z));
-    };
+    }
                 
-    this.withinLightRadius=function(pt)
+    withinLightRadius(pt)
     {
         return(this.position.distance(pt)<this.intensity);
-    };
+    }
     
-    this.getXBound=function(xBound)
+    getXBound(xBound)
     {
-        xBound.setFromValues((this.position.x-intensity),(this.position.x+intensity));
-    };
+        xBound.setFromValues((this.position.x-this.intensity),(this.position.x+this.intensity));
+    }
     
-    this.getYBound=function(yBound)
+    getYBound(yBound)
     {
-        yBound.setFromValues((this.position.y-intensity),(this.position.y+intensity));
-    };
+        yBound.setFromValues((this.position.y-this.intensity),(this.position.y+this.intensity));
+    }
     
-    this.getZBound=function(zBound)
+    getZBound(zBound)
     {
-        zBound.setFromValues((this.position.z-intensity),(this.position.z+intensity));
-    };
+        zBound.setFromValues((this.position.z-this.intensity),(this.position.z+this.intensity));
+    }
 }
 

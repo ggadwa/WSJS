@@ -1,21 +1,20 @@
-"use strict";
-
 //
 // generate room closet class
 //
 
-function GenRoomClosetObject(view,bitmapList,map,genRandom)
+class GenRoomClosetClass
 {
-        // variables
-        
-    this.view=view;
-    this.bitmapList=bitmapList;
-    this.map=map;
-    this.genRandom=genRandom;
+    constructor(view,bitmapList,map,genRandom)
+    {    
+        this.view=view;
+        this.bitmapList=bitmapList;
+        this.map=map;
+        this.genRandom=genRandom;
+    }
     
         // build the closet cube
         
-    this.createClosetCube=function(xBound,yBound,zBound)
+    createClosetCube(xBound,yBound,zBound)
     {
         var n,idx;
         var vertexList,indexes;
@@ -28,7 +27,7 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
             // the walls
 
         idx=0;
-        vertexList=meshUtility.createMapVertexList(24);
+        vertexList=MeshUtilityClass.createMapVertexList(24);
 
         vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
         vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
@@ -64,16 +63,16 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
             indexes[n]=n;
         }
         
-        meshUtility.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
         idx=0;
-        vertexList=meshUtility.createMapVertexList(6);
+        vertexList=MeshUtilityClass.createMapVertexList(6);
 
         vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
         vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
@@ -88,16 +87,16 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
             indexes[n]=n;
         }
         
-        meshUtility.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
 
             // floor
             
         idx=0;
-        vertexList=meshUtility.createMapVertexList(6);
+        vertexList=MeshUtilityClass.createMapVertexList(6);
 
         vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
         vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
@@ -112,16 +111,16 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
             indexes[n]=n;
         }
         
-        meshUtility.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
-    };
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
+    }
 
         // closet mainline
         
-    this.addCloset=function(room)
+    addCloset(room)
     {
         var n,k,x,z,xAdd,zAdd;
         var connectSide,connectOffset,closetLen;
@@ -207,6 +206,6 @@ function GenRoomClosetObject(view,bitmapList,map,genRandom)
             }
         }
         
-    };
+    }
 
 }

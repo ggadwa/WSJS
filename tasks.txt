@@ -5,8 +5,6 @@ IMPORTANT EVENTUAL TODOs
 EMCA6 TODOs
     [ ] modulize the code
     [ ] hoist all the vars, eventually use let
-    [ ] move setupGrid() in map_room.js
-    [ ] move this.setupBounds(); in map_mesh.js
 
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
@@ -20,30 +18,10 @@ WHEN THERE IS AN INTERFACE TODOs
 
 REGULAR TODOs
 
----> CLASS UPDATES:
-
-_code
-  X bitmap
-  X entities
-  _ interface
-  X main
-  _ map
-  _ model
-  X particle
-  X sound
-  X text
-_ generate
-  _ bitmap
-  _ map
-  _ model
-  _ sound
-  _ utility
-
-
-#### tiles can have diamond patterns
 #### collisions against slanted walls are bad
 #### tails, spikes, random vertex moves
 #### normals bad in animation (or culling is bad)
+#### arrow functions for wait states in gen map and light map class?
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html

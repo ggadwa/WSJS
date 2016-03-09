@@ -1,33 +1,35 @@
-"use strict";
-
 //
 // gen weapon mesh class
 //
 
-function GenModelWeaponMeshObject(model,bitmap,genRandom)
+class GenModelWeaponMeshClass
 {
-    this.model=model;
-    this.genRandom=genRandom;
-    
-        //
-        // counts for vertex/uvs/indexes
-        //
-        
-    this.BOX_VERTEX_COUNT=24;
-    this.BOX_NORMAL_COUNT=this.BOX_VERTEX_COUNT;
-    this.BOX_UV_COUNT=16;
-    this.BOX_INDEX_COUNT=24;
-    
-    this.CYLINDER_SIDE_COUNT=12;
-    this.CYLINDER_VERTEX_COUNT=((this.CYLINDER_SIDE_COUNT*3)*2);
-    this.CYLINDER_INDEX_COUNT=(this.CYLINDER_SIDE_COUNT*6);
+    constructor(model,bitmap,genRandom)
+    {
+        this.model=model;
+        this.bitmap=bitmap;
+        this.genRandom=genRandom;
+
+            //
+            // counts for vertex/uvs/indexes
+            //
+
+        this.BOX_VERTEX_COUNT=24;
+        this.BOX_NORMAL_COUNT=this.BOX_VERTEX_COUNT;
+        this.BOX_UV_COUNT=16;
+        this.BOX_INDEX_COUNT=24;
+
+        this.CYLINDER_SIDE_COUNT=12;
+        this.CYLINDER_VERTEX_COUNT=((this.CYLINDER_SIDE_COUNT*3)*2);
+        this.CYLINDER_INDEX_COUNT=(this.CYLINDER_SIDE_COUNT*6);
+    }
     
     /*
         //
         // build a box around a bone
         //
         
-    this.buildBoxAroundBone=function(view,bone,xBound,yBound,zBound,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    buildBoxAroundBone(view,bone,xBound,yBound,zBound,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         var startVIdx=Math.trunc(vIdx/3);       // remember this for building indexes
         
@@ -106,14 +108,14 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         indexes[iIdx++]=startVIdx+6;
         indexes[iIdx++]=startVIdx+2;
         
-        meshUtility.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.BOX_VERTEX_COUNT,indexes,nStartIIdx,this.BOX_INDEX_COUNT,normals,false);
-    };
+        MeshUtilityClass.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.BOX_VERTEX_COUNT,indexes,nStartIIdx,this.BOX_INDEX_COUNT,normals,false);
+    }
     
         //
         // build globe around bone
         //
         
-    this.buildGlobeAroundPoint=function(view,centerPnt,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    buildGlobeAroundPoint(view,centerPnt,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         var x,y,ang;
         var rd,radius,px,py,pz;
@@ -245,20 +247,20 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
             indexes[iIdx++]=vNextIdx;
         }
         
-        meshUtility.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.GLOBE_VERTEX_COUNT,indexes,nStartIIdx,this.GLOBE_INDEX_COUNT,normals,false);
+        MeshUtilityClass.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.GLOBE_VERTEX_COUNT,indexes,nStartIIdx,this.GLOBE_INDEX_COUNT,normals,false);
     };
     
     this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         this.buildGlobeAroundPoint(view,bone.position,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset);
-    };
+    }
     */
    
         //
         // build cylinders around two points
         //
         
-    this.buildCylinderAroundTwoPoints=function(view,pt1,pt2,radius1,radius2,vertexList,indexes)
+    buildCylinderAroundTwoPoints(view,pt1,pt2,radius1,radius2,vertexList,indexes)
     {
         var n,v,rd,v2Idx;
         var tx,ty,bx,by;
@@ -320,17 +322,17 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         
             // finish with the tagents
             
-        meshUtility.buildVertexListTangents(vertexList,indexes);
-    };
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
+    }
     
    
         //
         // build weapon mesh
         //
 
-    this.build=function(view)
+    build(view)
     {
-        var vertexList=meshUtility.createModelVertexList(this.CYLINDER_VERTEX_COUNT);
+        var vertexList=MeshUtilityClass.createModelVertexList(this.CYLINDER_VERTEX_COUNT);
         var indexes=new Uint16Array(this.CYLINDER_INDEX_COUNT);
         
         var pos1=new wsPoint(0,0,1500);
@@ -340,8 +342,8 @@ function GenModelWeaponMeshObject(model,bitmap,genRandom)
         
             // add mesh to model
             
-        this.model.mesh=new ModelMeshObject(bitmap,vertexList,indexes,0);
+        this.model.mesh=new ModelMeshClass(this.bitmap,vertexList,indexes,0);
         this.model.mesh.setupBuffers(view);
-    };
+    }
     
 }

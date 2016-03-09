@@ -1,20 +1,21 @@
-"use strict";
-
 //
 // map ledges
 //
 
-function GenRoomLedgeObject(bitmapList,map,genRandom)
+class GenRoomLedgeClass
 {
-    this.map=map;
-    this.bitmapList=bitmapList;
-    this.genRandom=genRandom;
+    constructor(bitmapList,map,genRandom)
+    {
+        this.map=map;
+        this.bitmapList=bitmapList;
+        this.genRandom=genRandom;
+    }
     
         //
         // add ledge chunk
         //
 
-    this.addLedgeChunk=function(room,pts,nSide,high,skipSides,bitmap)
+    addLedgeChunk(room,pts,nSide,high,skipSides,bitmap)
     {
         var n,k,idx;
         var vertexCount,vertexList;
@@ -35,7 +36,7 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
             // get cube size
 
         idx=0;
-        vertexList=meshUtility.createMapVertexList(vertexCount);
+        vertexList=MeshUtilityClass.createMapVertexList(vertexCount);
 
             // sides
 
@@ -73,20 +74,20 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
-        meshUtility.buildVertexListNormals(vertexList,indexes,null,false);
-        meshUtility.buildVertexListUVs(bitmap,vertexList);
-        meshUtility.buildVertexListTangents(vertexList,indexes);
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,false);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
-        this.map.addMesh(new MapMeshObject(bitmap,vertexList,indexes,MESH_FLAG_ROOM_PLATFORM));
-    };
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_PLATFORM));
+    }
         
         //
         // create ledges
         // 
     
-    this.createLedges=function(room)
+    createLedges(room)
     {
         var x,z;
         var ledgeBitmap=this.bitmapList.getBitmap('Map Ledge');
@@ -259,7 +260,7 @@ function GenRoomLedgeObject(bitmapList,map,genRandom)
 
             this.addLedgeChunk(room,pts,5,high,[false,false,false,true,true],ledgeBitmap);
         }
-    };
+    }
     
 }
 

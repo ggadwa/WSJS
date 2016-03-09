@@ -2,7 +2,7 @@
 // player entity class
 //
 
-class EntityPlayer extends Entity
+class EntityPlayerClass extends EntityClass
 {
     constructor(name,position,angle,radius,high,model)
     {

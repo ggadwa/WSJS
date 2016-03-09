@@ -1,34 +1,33 @@
-"use strict";
-
 //
 // generate bitmap utility class
 //
 
-function GenBitmapUtilityObject(genRandom)
+class GenBitmapUtilityClass
 {
-        // some precalced normals
-    
-    this.NORMAL_CLEAR=new wsPoint(0.0,0.0,1.0);
-    
-    this.NORMAL_LEFT_45=new wsPoint(-0.60,0.02,0.70);
-    this.NORMAL_RIGHT_45=new wsPoint(0.60,-0.02,0.70);
-    this.NORMAL_TOP_45=new wsPoint(-0.02,0.60,0.70);
-    this.NORMAL_BOTTOM_45=new wsPoint(0.02,-0.60,0.70);
-    
-    this.NORMAL_LEFT_10=new wsPoint(-0.1,0.0,0.90);
-    this.NORMAL_RIGHT_10=new wsPoint(0.1,0.0,0.90);
-    this.NORMAL_TOP_10=new wsPoint(0.0,0.1,0.90);
-    this.NORMAL_BOTTOM_10=new wsPoint(0.0,-0.1,0.90);
+    constructor(genRandom)
+    {
+        this.genRandom=genRandom;
 
-        // random generator
+            // some precalced normals
 
-    this.genRandom=genRandom;
+        this.NORMAL_CLEAR=new wsPoint(0.0,0.0,1.0);
+
+        this.NORMAL_LEFT_45=new wsPoint(-0.60,0.02,0.70);
+        this.NORMAL_RIGHT_45=new wsPoint(0.60,-0.02,0.70);
+        this.NORMAL_TOP_45=new wsPoint(-0.02,0.60,0.70);
+        this.NORMAL_BOTTOM_45=new wsPoint(0.02,-0.60,0.70);
+
+        this.NORMAL_LEFT_10=new wsPoint(-0.1,0.0,0.90);
+        this.NORMAL_RIGHT_10=new wsPoint(0.1,0.0,0.90);
+        this.NORMAL_TOP_10=new wsPoint(0.0,0.1,0.90);
+        this.NORMAL_BOTTOM_10=new wsPoint(0.0,-0.1,0.90);
+    }
 
         //
         // segmenting routines
         //
 
-    this.createStackedSegments=function(cvsWid,cvsHigh)
+    createStackedSegments(cvsWid,cvsHigh)
     {
         var x,y;
         var lft,top;
@@ -61,9 +60,9 @@ function GenBitmapUtilityObject(genRandom)
         }
 
         return(segments);
-    };
+    }
 
-    this.createRandomSegments=function(cvsWid,cvsHigh)
+    createRandomSegments(cvsWid,cvsHigh)
     {
         var x,y,x2,y2,hit;
         var wid,high,startWid,startHigh;
@@ -158,22 +157,22 @@ function GenBitmapUtilityObject(genRandom)
         }
 
         return(segments);
-    };
+    }
 
         //
         // color routines
         //
 
-    this.getRandomColor=function(colorMin,colorMax)
+    getRandomColor(colorMin,colorMax)
     {
         var r=colorMin[0]+((colorMax[0]-colorMin[0])*this.genRandom.random());
         var g=colorMin[1]+((colorMax[1]-colorMin[1])*this.genRandom.random());
         var b=colorMin[2]+((colorMax[2]-colorMin[2])*this.genRandom.random());
         
         return(new wsColor(r,g,b));
-    };
+    }
     
-    this.getRandomPrimaryColor=function(min,max)
+    getRandomPrimaryColor(min,max)
     {
         var r,g,b;
         var value=min+((max-min)*this.genRandom.random());
@@ -212,33 +211,33 @@ function GenBitmapUtilityObject(genRandom)
         }
         
         return(new wsColor(r,g,b));
-    };
+    }
 
-    this.getRandomGreyColor=function(greyMin,greyMax)
+    getRandomGreyColor(greyMin,greyMax)
     {
         var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
         return(new wsColor(r,r,r));
-    };
+    }
     
-    this.getRandomBlueColor=function(greyMin,greyMax)
+    getRandomBlueColor(greyMin,greyMax)
     {
         var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
         var b=r+0.5;
         if (b>1.0) b=1.0;
         return(new wsColor(r,r,b));
-    };
+    }
 
-    this.darkenColor=function(color,darkenFactor)
+    darkenColor(color,darkenFactor)
     {
         return(new wsColor((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
-    };
+    }
     
-    this.boostColor=function(color,boostAdd)
+    boostColor(color,boostAdd)
     {
         return(new wsColor((color.r+boostAdd),(color.g+boostAdd),(color.b+boostAdd)));
-    };
+    }
 
-    this.colorToRGBColor=function(color)
+    colorToRGBColor(color)
     {
         var colorStr='rgb(';
         colorStr+=Math.trunc(color.r*255.0);
@@ -249,9 +248,9 @@ function GenBitmapUtilityObject(genRandom)
         colorStr+=')';
 
         return(colorStr);
-    };
+    }
     
-    this.colorToRGBAColor=function(color,alpha)
+    colorToRGBAColor(color,alpha)
     {
         var colorStr='rgba(';
         colorStr+=Math.trunc(color.r*255.0);
@@ -264,9 +263,9 @@ function GenBitmapUtilityObject(genRandom)
         colorStr+=')';
 
         return(colorStr);
-    };
+    }
 
-    this.normalToRGBColor=function(normal)
+    normalToRGBColor(normal)
     {
         var colorStr='rgb(';
         colorStr+=Math.trunc((normal.x+1.0)*127.0);
@@ -277,9 +276,9 @@ function GenBitmapUtilityObject(genRandom)
         colorStr+=')';
 
         return(colorStr);
-    };
+    }
 
-    this.createRandomColorStripeArray=function(factor,baseColor)
+    createRandomColorStripeArray(factor,baseColor)
     {
         var n,f,count;
         var r,g,b,color;
@@ -316,25 +315,25 @@ function GenBitmapUtilityObject(genRandom)
         }    
 
         return(colors);
-    };
+    }
 
         //
         // normal clearing
         //
 
-    this.clearNormalsRect=function(normalCTX,lft,top,rgt,bot)
+    clearNormalsRect(normalCTX,lft,top,rgt,bot)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
         normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
         normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
-    };
+    }
 
         //
         // noise routines
         //
 
-    this.addNoiseRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,minDarken,maxDarken,percentage)
+    addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,minDarken,maxDarken,percentage)
     {    
         if ((lft>=rgt) || (top>=bot)) return;
         
@@ -385,13 +384,13 @@ function GenBitmapUtilityObject(genRandom)
         }
 
         bitmapCTX.putImageData(bitmapImgData,lft,top);
-    };
+    }
     
         //
         // blur routines
         //
         
-    this.blur=function(bitmapCTX,lft,top,rgt,bot,blurCount)
+    blur(bitmapCTX,lft,top,rgt,bot,blurCount)
     {
         var n,idx;
         var x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
@@ -474,13 +473,13 @@ function GenBitmapUtilityObject(genRandom)
         } 
         
         bitmapCTX.putImageData(bitmapImgData,lft,top);
-    };
+    }
 
         //
         // specular routines
         //
 
-    this.createSpecularMap=function(bitmapCTX,specularCTX,wid,high,contrastFactor,brightnessAdd)
+    createSpecularMap(bitmapCTX,specularCTX,wid,high,contrastFactor,brightnessAdd)
     {
         var n,idx,nPixel;
         var f;
@@ -525,21 +524,21 @@ function GenBitmapUtilityObject(genRandom)
         }
 
         specularCTX.putImageData(specularImgData,0,0);
-    };
+    }
 
         //
         // rectangles, ovals, lines
         //
 
-    this.drawRect=function(ctx,lft,top,rgt,bot,color)
+    drawRect(ctx,lft,top,rgt,bot,color)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
         ctx.fillStyle=this.colorToRGBColor(color);
         ctx.fillRect(lft,top,(rgt-lft),(bot-top));
-    };
+    }
 
-    this.draw3DRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor,faceOut)
+    draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor,faceOut)
     {
         var n,lx,rx,ty,by;
         var darkenFactor,darkColor;
@@ -617,9 +616,9 @@ function GenBitmapUtilityObject(genRandom)
         this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillRGBColor);
 
         this.clearNormalsRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
-    };
+    }
 
-    this.draw3DComplexRect=function(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    draw3DComplexRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
         var n,k,k2,add;
         var darkenFactor,darkColor;
@@ -807,9 +806,27 @@ function GenBitmapUtilityObject(genRandom)
         }
 
         normalCTX.fill();
-    };
+    }
+    
+    drawDiamond(bitmapCTX,lft,top,rgt,bot,fillRGBColor)
+    {
+        var mx,my;
 
-    this.draw3DOval=function(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
+        mx=Math.trunc((lft+rgt)/2);
+        my=Math.trunc((top+bot)/2);
+
+        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+
+        bitmapCTX.beginPath();
+        bitmapCTX.moveTo(mx,top);
+        bitmapCTX.lineTo(rgt,my);
+        bitmapCTX.lineTo(mx,bot);
+        bitmapCTX.lineTo(lft,my);
+        bitmapCTX.lineTo(mx,top);
+        bitmapCTX.fill();
+    }
+
+    draw3DOval(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
     {
         var n,x,y,halfWid,halfHigh;
         var rad,fx,fy,col,idx;
@@ -897,9 +914,9 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.putImageData(bitmapImgData,lft,top);
         normalCTX.putImageData(normalImgData,lft,top);
-    };
+    }
     
-    this.drawLine=function(bitmapCTX,normalCTX,x,y,x2,y2,color)
+    drawLine(bitmapCTX,normalCTX,x,y,x2,y2,color)
     {
         var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
@@ -976,9 +993,9 @@ function GenBitmapUtilityObject(genRandom)
                 normalCTX.stroke();
             }
         }
-    };
+    }
     
-    this.drawRandomLine=function(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color)
+    drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color)
     {
         var n,sx,sy,ex,ey,r;
         var segCount=this.genRandom.randomInt(2,5);
@@ -1015,9 +1032,9 @@ function GenBitmapUtilityObject(genRandom)
             sx=ex;
             sy=ey;
         }
-    };
+    }
     
-    this.drawBumpLine=function(bitmapCTX,normalCTX,x,y,x2,y2,color)
+    drawBumpLine(bitmapCTX,normalCTX,x,y,x2,y2,color)
     {
         var n;
         var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
@@ -1073,13 +1090,13 @@ function GenBitmapUtilityObject(genRandom)
                 normalCTX.stroke();
             }
         }
-    };
+    }
     
         //
         // particles
         //
 
-    this.drawParticle=function(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
+    drawParticle(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
@@ -1178,17 +1195,18 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.putImageData(bitmapImgData,0,0);
         normalCTX.putImageData(normalImgData,0,0);
-    };
+    }
     
         //
         // streaks
         //
 
-    this.drawStreakVertical=function(bitmapCTX,imgWid,imgHigh,x,top,bot,streakWid,baseColor)
+    drawStreakVertical(bitmapCTX,imgWid,imgHigh,x,top,bot,streakWid,baseColor)
     {
         var n,lx,rx,y,idx;
         
         if (top>=bot) return;
+        if (streakWid<=0) return;
         
             // get the image data
 
@@ -1211,17 +1229,21 @@ function GenBitmapUtilityObject(genRandom)
             for (y=top;y!==bot;y++) {
                 
                 if (this.genRandom.randomInt(0,100)<density) {
-                    idx=((y*imgWid)+lx)*4;
-                    bitmapData[idx]=Math.trunc(baseColor.r*255.0);
-                    bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
-                    bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                    if ((lx>=0) && (lx<imgWid)) {
+                        idx=((y*imgWid)+lx)*4;
+                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
+                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
+                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                    }
                 }
                 
                 if (this.genRandom.randomInt(0,100)<density) {
-                    idx=((y*imgWid)+rx)*4;
-                    bitmapData[idx]=Math.trunc(baseColor.r*255.0);
-                    bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
-                    bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                    if ((rx>=0) && (rx<imgWid)) {
+                        idx=((y*imgWid)+rx)*4;
+                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
+                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
+                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                    }
                 }
             
             }
@@ -1232,13 +1254,13 @@ function GenBitmapUtilityObject(genRandom)
             // write all the data back
 
         bitmapCTX.putImageData(bitmapImgData,0,0);
-    };
+    }
     
         //
         // gradients
         //
 
-    this.drawColorStripeHorizontal=function(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
+    drawColorStripeHorizontal(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
         var x,y,idx;
         var color,redByte,greenByte,blueByte;
@@ -1289,9 +1311,9 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.putImageData(bitmapImgData,lft,top);        
         normalCTX.putImageData(normalImgData,lft,top);
-    };
+    }
 
-    this.drawColorStripeVertical=function(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
+    drawColorStripeVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
         var x,y,idx;
         var color,redByte,greenByte,blueByte;
@@ -1339,9 +1361,9 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.putImageData(bitmapImgData,lft,top);
         normalCTX.putImageData(normalImgData,lft,top);
-    };
+    }
 
-    this.drawColorStripeSlant=function(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
+    drawColorStripeSlant(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
         var x,y,idx,cIdx;
         var color;
@@ -1386,13 +1408,13 @@ function GenBitmapUtilityObject(genRandom)
 
         bitmapCTX.putImageData(bitmapImgData,lft,top);        
         normalCTX.putImageData(normalImgData,lft,top);
-    };
+    }
     
     //
     // testing
     //
     
-    this.drawUVTest=function(bitmapCTX,lft,top,rgt,bot)
+    drawUVTest(bitmapCTX,lft,top,rgt,bot)
     {
         var xMid=Math.trunc((lft+rgt)/2);
         var yMid=Math.trunc((top+bot)/2);
@@ -1401,6 +1423,6 @@ function GenBitmapUtilityObject(genRandom)
         this.drawRect(bitmapCTX,xMid,top,rgt,yMid,new wsColor(1,0,0));
         this.drawRect(bitmapCTX,lft,yMid,xMid,bot,new wsColor(0,1,0));
         this.drawRect(bitmapCTX,xMid,yMid,rgt,bot,new wsColor(0,0,1));
-    };
+    }
 
 }

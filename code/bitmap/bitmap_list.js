@@ -2,7 +2,7 @@
 // bitmap list class
 //
 
-class BitmapList
+class BitmapListClass
 {
     constructor(view)
     {
