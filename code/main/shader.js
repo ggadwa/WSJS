@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // generic shader light class
 //

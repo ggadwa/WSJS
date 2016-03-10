@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // map light class
 //

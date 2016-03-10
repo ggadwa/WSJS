@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // gen random object
 //

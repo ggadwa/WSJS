@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // generate room closet class
 //

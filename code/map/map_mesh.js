@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // map mesh vertex
 //

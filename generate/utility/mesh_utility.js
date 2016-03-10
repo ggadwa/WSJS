@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // mesh utility class (static)
 //

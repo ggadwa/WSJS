@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // entity projectile object
 //

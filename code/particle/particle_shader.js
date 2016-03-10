@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // particle shader class
 //

@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // player entity class
 //

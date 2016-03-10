@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // generate bitmap class
 //

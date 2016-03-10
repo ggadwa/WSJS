@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // gen organic skeleton class
 //

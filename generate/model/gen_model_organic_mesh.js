@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // helper class for globe shrinking
 //

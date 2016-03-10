@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // gen weapon mesh class
 //

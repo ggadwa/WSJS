@@ -1,3 +1,5 @@
+"use strict";
+
 //
 // model list class
 //
