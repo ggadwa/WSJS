@@ -1,18 +1,6 @@
 "use strict";
 
 //
-// NOTE!
-// 
-// We need to keep a global copy of the current
-// light map object because light maps require
-// time outs and the "this" on the timeout is
-// the window object (supergumba -- arrow functions
-// will probably fix this, need to try later)
-//
-
-var currentGlobalLightMapObject=null;
-
-//
 // lightmap bitmap class
 // records each generated lightmap
 // canvas and the last chunk written to
@@ -126,11 +114,6 @@ class GenLightmapClass
             // generation concludes
 
         this.callbackFunc=callbackFunc;
-
-            // a link to this object so we can
-            // use it in the "this" callbacks
-
-        var currentGlobalLightMapObject;
 
             // global variables to reduce new/GC during light maps
 
@@ -940,14 +923,14 @@ class GenLightmapClass
 
         meshIdx++;
         if (meshIdx>=this.map.meshes.length) {
-            setTimeout(function() { currentGlobalLightMapObject.createFinish(); },PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.createFinish.bind(this),PROCESS_TIMEOUT_MSEC);
             return;
         }
 
             // next mesh
 
         this.view.loadingScreenDraw(meshIdx/(this.map.meshes.length+2.0));
-        setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(meshIdx); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.createLightmapForMesh.bind(this,meshIdx),PROCESS_TIMEOUT_MSEC);
     }
 
         //
@@ -960,13 +943,6 @@ class GenLightmapClass
     {
         var n;
         var nMesh=this.map.meshes.length;
-
-            // remember the light map object
-            // globally for callbacks because "this" is
-            // the window object during them.  this is
-            // an ugly hack but there's no way around it
-
-        currentGlobalLightMapObject=this;
 
             // run through the meshes and build
             // cache to speed up ray tracing
@@ -987,7 +963,7 @@ class GenLightmapClass
             // script time out problem   
 
         this.view.loadingScreenDraw(1.0/(nMesh+2.0));
-        setTimeout(function() { currentGlobalLightMapObject.createLightmapForMesh(0); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.createLightmapForMesh.bind(this,0),PROCESS_TIMEOUT_MSEC);
     }
 
     createFinish()

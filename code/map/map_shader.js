@@ -29,12 +29,12 @@ class MapShaderClass extends ShaderClass
         // initialize/release map shader
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,'map')) return(false);
+        if (!super.initialize(view,fileCache,'map')) return(false);
 
             // setup uniforms
 

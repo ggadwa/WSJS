@@ -1,18 +1,6 @@
 "use strict";
 
 //
-// NOTE!
-// 
-// We need to keep a global copy of the current
-// map object because maps require
-// time outs and the "this" on the timeout is
-// the window object (supergumba -- arrow functions
-// or bind will probably fix this, need to try later)
-//
-
-var currentGlobalGenMapObject=null;
-
-//
 // generate map class
 //
 
@@ -654,10 +642,8 @@ class GenMapClass
 
     build()
     {
-        currentGlobalGenMapObject=this;
-        
         this.view.loadingScreenDraw(0.12);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapRooms(); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapRooms.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
     buildMapRooms()
@@ -670,7 +656,7 @@ class GenMapClass
         this.buildMapRecursiveRoom(0,null,null,STAIR_MODE_NONE,0);
         
         this.view.loadingScreenDraw(0.24);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapClosets(); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapClosets.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
     buildMapClosets()
@@ -682,7 +668,7 @@ class GenMapClass
             // finish with the callback
 
         this.view.loadingScreenDraw(0.36);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapPlatforms(); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapPlatforms.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
     buildMapPlatforms()
@@ -694,7 +680,7 @@ class GenMapClass
             // finish with the callback
 
         this.view.loadingScreenDraw(0.48);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapLedges(); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapLedges.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
     buildMapLedges()
@@ -706,7 +692,7 @@ class GenMapClass
             // finish with the callback
 
         this.view.loadingScreenDraw(0.60);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapRemoveSharedTriangles(); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapRemoveSharedTriangles.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
     buildMapRemoveSharedTriangles()
@@ -718,7 +704,7 @@ class GenMapClass
             // finish with the callback
             
         this.view.loadingScreenDraw(0.72);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapDecorations(); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapDecorations.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
     buildMapDecorations()
@@ -731,7 +717,7 @@ class GenMapClass
             // finish with the callback
             
         this.view.loadingScreenDraw(0.84);
-        setTimeout(function() { currentGlobalGenMapObject.buildMapFinish(); },PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapFinish.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
     buildMapFinish()

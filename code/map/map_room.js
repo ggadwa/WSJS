@@ -245,6 +245,67 @@ class MapRoomClass
         return(null);
     }
     
+    nextDecorationLocation(genRandom,checkPlatform,curPnt)
+    {
+        var x,z,bx,bz;
+        var gridSpot;
+        
+        x=Math.trunc((curPnt.x-this.xBound.min)/ROOM_BLOCK_WIDTH);
+        z=Math.trunc((curPnt.z-this.zBound.min)/ROOM_BLOCK_WIDTH);
+        
+            // check four locations
+            
+        if (x>0) {
+            gridSpot=this.blockGrid[z][x-1];
+            if (checkPlatform) gridSpot+=this.platformGrid[z][x-1];
+            
+            if (gridSpot===0) {
+                this.blockGrid[z][x-1]=1;
+                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*(x-1)))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                return(new wsPoint(bx,this.yBound.max,bz));
+            }
+        }
+        
+        if (z>0) {
+            gridSpot=this.blockGrid[z-1][x];
+            if (checkPlatform) gridSpot+=this.platformGrid[z-1][x];
+            
+            if (gridSpot===0) {
+                this.blockGrid[z-1][x]=1;
+                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*(z-1)))+(ROOM_BLOCK_WIDTH/2));
+                return(new wsPoint(bx,this.yBound.max,bz));
+            }
+        }
+        
+        if (x<(this.xBlockSize-1)) {
+            gridSpot=this.blockGrid[z][x+1];
+            if (checkPlatform) gridSpot+=this.platformGrid[z][x+1];
+            
+            if (gridSpot===0) {
+                this.blockGrid[z][x+1]=1;
+                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*(x+1)))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                return(new wsPoint(bx,this.yBound.max,bz));
+            }
+        }
+        
+        if (z<(this.zBlockSize-1)) {
+            gridSpot=this.blockGrid[z+1][x];
+            if (checkPlatform) gridSpot+=this.platformGrid[z+1][x];
+            
+            if (gridSpot===0) {
+                this.blockGrid[z+1][x]=1;
+                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*(z+1)))+(ROOM_BLOCK_WIDTH/2));
+                return(new wsPoint(bx,this.yBound.max,bz));
+            }
+        }
+
+        return(null);
+    }
+    
     checkLocationFreeAndBlock(x,z)
     {
         var bx,bz;

@@ -34,9 +34,9 @@ class MapOverlayClass
         // initialize/release overlay object
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
-        if (!this.mapOverlayShader.initialize(view)) return(false);
+        if (!this.mapOverlayShader.initialize(view,fileCache)) return(false);
         
         this.roomVertexPosBuffer=view.gl.createBuffer();
         this.extraVertexPosBuffer=view.gl.createBuffer();

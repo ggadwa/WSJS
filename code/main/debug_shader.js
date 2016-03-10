@@ -19,12 +19,12 @@ class DebugShaderClass extends ShaderClass
         // initialize/release debug shader
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,'debug')) return(false);
+        if (!super.initialize(view,fileCache,'debug')) return(false);
 
             // setup uniforms
 

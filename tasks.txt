@@ -18,10 +18,12 @@ WHEN THERE IS AN INTERFACE TODOs
 
 REGULAR TODOs
 
+* tables as decorations
+* all decorations get same min/max count
+
 #### collisions against slanted walls are bad
 #### tails, spikes, random vertex moves
 #### normals bad in animation (or culling is bad)
-#### arrow functions for wait states in gen map and light map class?
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html

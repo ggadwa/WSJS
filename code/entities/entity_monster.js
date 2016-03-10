@@ -58,7 +58,7 @@ class EntityMonsterClass extends EntityClass
         
             // falling
         
-        super.fall();
+        super.fall(map);
     }
     
 }

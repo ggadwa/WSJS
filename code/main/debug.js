@@ -15,9 +15,9 @@ class DebugClass
         // initialize/release debug
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
-        return(this.debugShader.initialize(view));
+        return(this.debugShader.initialize(view,fileCache));
     }
 
     release(view)

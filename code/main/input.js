@@ -96,7 +96,7 @@ class InputClass
             
         if (this.keyFlags[77]) {
             this.keyFlags[77]=0;        // force it up
-            view.mapOverlayStateFlip();
+            this.view.mapOverlayStateFlip();
         }
 
             // - and +

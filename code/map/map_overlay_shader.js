@@ -18,12 +18,12 @@ class MapOverlayShaderClass extends ShaderClass
     // initialize/release map overlay shader
     //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,'map_overlay')) return(false);
+        if (!super.initialize(view,fileCache,'map_overlay')) return(false);
 
             // setup uniforms
 

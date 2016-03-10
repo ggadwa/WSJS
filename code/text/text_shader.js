@@ -19,12 +19,12 @@ class TextShaderClass extends ShaderClass
     // initialize/release text shader
     //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,'text')) return(false);
+        if (!super.initialize(view,fileCache,'text')) return(false);
 
             // setup uniforms
 

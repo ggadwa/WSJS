@@ -140,7 +140,7 @@ class ViewClass
         // initialize and release
         //
 
-    initialize(canvasId)
+    initialize(fileCache,canvasId)
     {
             // get the canvas
 
@@ -178,9 +178,9 @@ class ViewClass
 
             // initialize other drawing objects
 
-        if (!this.text.initialize(this)) return(false);
-        if (!this.interface.initialize(this)) return(false);
-        if (!this.particleList.initialize(this)) return(false);
+        if (!this.text.initialize(this,fileCache)) return(false);
+        if (!this.interface.initialize(this,fileCache)) return(false);
+        if (!this.particleList.initialize(this,fileCache)) return(false);
 
         return(true);
     }
@@ -515,7 +515,7 @@ class ViewClass
         for (n=1;n<nEntity;n++) {
             entity=entityList.getEntity(n);
 
-            if (entity.inFrustum(view)) {
+            if (entity.inFrustum(this)) {
                 entity.drawStart(this);
                 entity.draw(this);
                 entity.drawEnd(this);

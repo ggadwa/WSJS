@@ -28,10 +28,10 @@ class MapClass
         // initialize and release
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
-        if (!this.overlay.initialize(view)) return(false);
-        return(this.mapShader.initialize(view));
+        if (!this.overlay.initialize(view,fileCache)) return(false);
+        return(this.mapShader.initialize(view,fileCache));
     }
 
     release(view)
@@ -325,7 +325,7 @@ class MapClass
         // have them build their collision meshes
         //
         
-    buildCollisionGeometry()
+    buildCollisionGeometry(view)
     {
         var n;
         var nMesh=this.meshes.length;

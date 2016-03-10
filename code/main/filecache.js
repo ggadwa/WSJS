@@ -5,28 +5,8 @@
 
 // the files to cache
 
-var fileNames=[
-        'shaders/debug.frag',
-        'shaders/debug.vert',
-        'shaders/interface.frag',
-        'shaders/interface.vert',
-        'shaders/map.frag',
-        'shaders/map.vert',
-        'shaders/map_overlay.frag',
-        'shaders/map_overlay.vert',
-        'shaders/model.frag',
-        'shaders/model.vert',
-        'shaders/particle.frag',
-        'shaders/particle.vert',
-        'shaders/text.frag',
-        'shaders/text.vert'
-];
 
-// the cache and cache object
-
-var fileCache=[];
-
-class FileCacheClass
+class FileClass
 {
     constructor(name,data)
     {
@@ -35,68 +15,102 @@ class FileCacheClass
     }
 }
 
-// the file loading functions
-
-function fileCacheStart(callback)
+class FileCacheClass
 {
-    fileCacheLoadFile(0,callback);
-}
-
-function fileCacheLoadFile(idx,callback)
-{
-        // ajax the file
+    constructor()
+    {
+        this.files=[];
         
-    var req=new XMLHttpRequest();
+            // all the files we need to load for this
+            // engine, all fragment and vertex shaders
+            
+        this.fileNames=[
+                'shaders/debug.frag',
+                'shaders/debug.vert',
+                'shaders/interface.frag',
+                'shaders/interface.vert',
+                'shaders/map.frag',
+                'shaders/map.vert',
+                'shaders/map_overlay.frag',
+                'shaders/map_overlay.vert',
+                'shaders/model.frag',
+                'shaders/model.vert',
+                'shaders/particle.frag',
+                'shaders/particle.vert',
+                'shaders/text.frag',
+                'shaders/text.vert'
+        ];
+    }
 
-    req.open('GET',fileNames[idx],true);
-    req.overrideMimeType('text/plain');
+        //
+        // load the files
+        //
+        
+    fillCache(callback)
+    {
+        this.loadFile(0,callback);
+    }
+    
+    loadFile(idx,callback)
+    {
+            // ajax the file
 
-    req.onreadystatechange=function() {
-        if (req.readyState!==4) return;
-        var res=req.responseText;
-        if (res!==null) {
-            if (res.length===0) res=null;
-        }
-        if (res===null) {
-            alert('Missing File: '+fileNames[idx]);
+        var req=new XMLHttpRequest();
+
+        req.open('GET',this.fileNames[idx],true);
+        req.overrideMimeType('text/plain');
+
+        var self=this;
+        
+        req.onreadystatechange=function() {
+            if (req.readyState!==4) return;
+            var res=req.responseText;
+            if (res!==null) {
+                if (res.length===0) res=null;
+            }
+            if (res===null) {
+                alert('Missing File: '+self.fileNames[idx]);
+                return;
+            }
+
+            self.finishLoad(idx,callback,res);
+        };
+
+        req.send(null);
+    }
+    
+    finishLoad(idx,callback,data)
+    {
+            // put file in cache
+
+        this.files.push(new FileClass(this.fileNames[idx],data));
+
+            // finished?
+
+        idx++;
+        if (idx===this.fileNames.length) {
+            callback();
             return;
         }
-        
-        fileCacheFinishLoad(idx,callback,res);
-    };
 
-    req.send(null);
-}
-    
-function fileCacheFinishLoad(idx,callback,data)
-{
-        // put file in cache
-    
-    fileCache.push(new FileCacheClass(fileNames[idx],data));
-    
-        // finished?
-        
-    idx++;
-    if (idx===fileNames.length) {
-        callback();
-        return;
+            // next file
+
+        setTimeout(this.loadFile.bind(this,idx,callback),PROCESS_TIMEOUT_MSEC);
     }
-    
-        // next file
+
+        //
+        // get files from cache
+        //
         
-    setTimeout(function() { fileCacheLoadFile(idx,callback); },PROCESS_TIMEOUT_MSEC);
-}
+    getFile(name)
+    {
+        var n;
+        var nFile=this.files.length;
 
-// get files from cache
+        for (n=0;n!==nFile;n++) {
+            if (this.files[n].name===name) return(this.files[n].data);
+        }
 
-function fileCacheGet(name)
-{
-    var n;
-    var nFile=fileCache.length;
-    
-    for (n=0;n!==nFile;n++) {
-        if (fileCache[n].name===name) return(fileCache[n].data);
+        return(null);
     }
-    
-    return(null);
 }

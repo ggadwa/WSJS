@@ -18,9 +18,9 @@ class InterfaceClass
         // initialize/release interface
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
-        if (!this.interfaceShader.initialize(view)) return(false);
+        if (!this.interfaceShader.initialize(view,fileCache)) return(false);
         
         this.vertexPosBuffer=view.gl.createBuffer();
         

@@ -30,13 +30,13 @@ class Text
         // initialize/release text
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
         var x,y,yAdd,cIdx,charStr,ch;
 
             // start the shader
 
-        if (!this.textShader.initialize(view)) return(false);
+        if (!this.textShader.initialize(view,fileCache)) return(false);
 
             // setup the canvas
 

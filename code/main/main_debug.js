@@ -1,143 +1,191 @@
 "use strict";
 
-var debugSoundList;
-
 //
 // this is a specialized main that just outputs bitmaps and sounds
 // so we can check what they look like without running the entire engine
 //
 
-function debugDrawWave(ctx,wid,high,data)
+class MainDebugClass
 {
-    var n,fx,fxAdd,y,halfHigh;
-    var dataLen=data.length;
-
-        // get x divisions
-
-    fx=0;
-    fxAdd=wid/dataLen;
-    halfHigh=Math.trunc(high/2);
-
-        // draw the wave
-
-    ctx.strokeStyle='#0000FF';
-    ctx.beginPath();
-
-    y=halfHigh+Math.trunc(data[0]*halfHigh);
-    ctx.moveTo(Math.trunc(fx),y);
-
-    for (n=1;n<dataLen;n++) {
-        fx+=fxAdd;
-        y=halfHigh+Math.trunc(data[n]*halfHigh);
-        ctx.lineTo(Math.trunc(fx),y);
+    constructor()
+    {
+        this.drawTop=5;
+        this.bitmapWid=1200;
+        this.bitmapHigh=400;
+        this.soundWid=1200;
+        this.soundHigh=250;
+        
+        this.genBitmap=null;
+        
+        this.debugSoundList=null;
+        this.genSound=null;
     }
-
-    ctx.stroke();
-}
-
-function debugClickSound(event,name)
-{
-    debugSoundList.getSound(name).playSimple();
-}
-
-function debugInit()
-{
-    var n,nBitmap,nSound;
-    var canvas,ctx,div;
-    var top,wid;
-    var genBitmap,debugBitmap,genSound,debugSound;
-    var bitmapWid=1200;
-    var bitmapHigh=400;
-    var soundWid=1200;
-    var soundHigh=250;
     
-        // the bitmaps
-    
-    top=5;
-    wid=Math.trunc(bitmapWid/3);
-    nBitmap=GEN_BITMAP_TYPE_NAMES.length;
-    
-    genBitmap=new GenBitmapClass(new GenRandomClass(SEED_MAP_BITMAP));
-    
-    for (n=0;n!==nBitmap;n++) {
+        //
+        // bitmaps
+        //
         
+    addBitmaps(idx)
+    {
+        var canvas,ctx,div;
+        var wid;
+        var debugBitmap;
+
+        wid=Math.trunc(this.bitmapWid/3);
+
             // generate random bitmap
-            
-        debugBitmap=genBitmap.generate(null,GEN_BITMAP_TYPE_NAMES[n],n);
-        
+
+        debugBitmap=this.genBitmap.generate(null,GEN_BITMAP_TYPE_NAMES[idx],idx);
+
             // label
 
         div=document.createElement('div');
         div.style.position="absolute";
         div.style.left='5px';
-        div.style.top=top+'px';
-        div.innerHTML=GEN_BITMAP_TYPE_NAMES[n];
+        div.style.top=this.drawTop+'px';
+        div.innerHTML=GEN_BITMAP_TYPE_NAMES[idx];
         document.body.appendChild(div);
-        
-        top+=25;
-        
+
+        this.drawTop+=25;
+
         canvas=document.createElement('canvas');
         canvas.style.position="absolute";
         canvas.style.left='5px';
-        canvas.style.top=top+'px';
+        canvas.style.top=this.drawTop+'px';
         canvas.style.border='1px solid #000000';
-        canvas.width=bitmapWid;
-        canvas.height=bitmapHigh;
+        canvas.width=this.bitmapWid;
+        canvas.height=this.bitmapHigh;
 
         var ctx=canvas.getContext('2d');
-        ctx.drawImage(debugBitmap.bitmap,0,0,wid,bitmapHigh);
-        ctx.drawImage(debugBitmap.normal,wid,0,wid,bitmapHigh);
-        ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,bitmapHigh);
+        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
+        ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
+        ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
 
         document.body.appendChild(canvas);
+
+        this.drawTop+=(this.bitmapHigh+5);
         
-        top+=bitmapHigh+5;
+            // next bitmap
+            
+        idx++;
+        if (idx>=GEN_BITMAP_TYPE_NAMES.length) {
+            setTimeout(this.addSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmaps.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
-        // the sounds
-        // need to create soundlist for audio sample rates
-        
-    debugSoundList=new SoundListClass();
-    if (!debugSoundList.initialize()) return;
+        //
+        // sound waves
+        //
+    
+    drawWave(ctx,wid,high,data)
+    {
+        var n,fx,fxAdd,y,halfHigh;
+        var dataLen=data.length;
 
-    nSound=GEN_SOUND_TYPE_NAMES.length;
+            // get x divisions
+
+        fx=0;
+        fxAdd=wid/dataLen;
+        halfHigh=Math.trunc(high/2);
+
+            // draw the wave
+
+        ctx.strokeStyle='#0000FF';
+        ctx.beginPath();
+
+        y=halfHigh+Math.trunc(data[0]*halfHigh);
+        ctx.moveTo(Math.trunc(fx),y);
+
+        for (n=1;n<dataLen;n++) {
+            fx+=fxAdd;
+            y=halfHigh+Math.trunc(data[n]*halfHigh);
+            ctx.lineTo(Math.trunc(fx),y);
+        }
+
+        ctx.stroke();
+    }
     
-    genSound=new GenSoundClass(debugSoundList.getAudioContext(),new GenRandomClass(SEED_SOUND));
+    clickSound(name)
+    {
+        this.debugSoundList.getSound(name).playSimple();
+    }
     
-    for (n=0;n!==nSound;n++) {
+    addSounds(idx)
+    {
+        var canvas,ctx,div;
+        var debugSound;
         
             // generate random sound
-            
-        debugSound=genSound.generate(GEN_SOUND_TYPE_NAMES[n],n);
-        debugSoundList.addSound(debugSound);      // so we can play later
+
+        debugSound=this.genSound.generate(GEN_SOUND_TYPE_NAMES[idx],idx);
+        this.debugSoundList.addSound(debugSound);      // so we can play later
 
             // label
 
         div=document.createElement('div');
         div.style.position="absolute";
         div.style.left='5px';
-        div.style.top=top+'px';
-        div.innerHTML=GEN_SOUND_TYPE_NAMES[n];
+        div.style.top=this.drawTop+'px';
+        div.innerHTML=GEN_SOUND_TYPE_NAMES[idx];
         document.body.appendChild(div);
-        
-        top+=25;
-        
+
+        this.drawTop+=25;
+
         canvas=document.createElement('canvas');
         canvas.style.position="absolute";
         canvas.style.left='5px';
-        canvas.style.top=top+'px';
+        canvas.style.top=this.drawTop+'px';
         canvas.style.border='1px solid #000000';
-        canvas.width=soundWid;
-        canvas.height=soundHigh;
+        canvas.width=this.soundWid;
+        canvas.height=this.soundHigh;
         canvas.style.cursor='pointer';
-        canvas.onclick=new Function('event','debugClickSound(event,\''+GEN_SOUND_TYPE_NAMES[n]+'\')');
+        canvas.onclick=this.clickSound.bind(this,GEN_SOUND_TYPE_NAMES[idx]);
 
         var ctx=canvas.getContext('2d');
-        debugDrawWave(ctx,soundWid,soundHigh,debugSound.buffer.getChannelData(0));
+        this.drawWave(ctx,this.soundWid,this.soundHigh,debugSound.buffer.getChannelData(0));
 
         document.body.appendChild(canvas);
-        
-        top+=soundHigh+5;
-    }
 
+        this.drawTop+=(this.soundHigh+5);
+        
+            // next bitmap
+            
+        idx++;
+        if (idx>=GEN_SOUND_TYPE_NAMES.length) return;
+        
+        setTimeout(this.addSounds.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+        //
+        // main run for debug
+        //
+        
+    run()
+    {
+            // construct necessary classes
+            
+        this.genBitmap=new GenBitmapClass(new GenRandomClass(SEED_MAP_BITMAP));
+        
+        this.debugSoundList=new SoundListClass();
+        if (!this.debugSoundList.initialize()) {
+            alert('Sound initialization failed');
+            return;
+        }
+        
+        this.genSound=new GenSoundClass(this.debugSoundList.getAudioContext(),new GenRandomClass(SEED_SOUND));
+
+            // start the timed process
+            
+        this.addBitmaps(0);
+    }
+}
+
+var mainDebug=new MainDebugClass();
+
+function mainDebugRun()
+{
+    mainDebug.run();
 }

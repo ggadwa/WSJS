@@ -51,7 +51,7 @@ class GenRoomPillarClass
             if (x===mx) continue;           // never block light
             
             pos=room.checkLocationFreeAndBlock(x,mz);
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+            if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
     }
     
@@ -67,7 +67,7 @@ class GenRoomPillarClass
             if (z===mz) continue;           // never block light
             
             pos=room.checkLocationFreeAndBlock(mx,z);
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+            if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
     }
     

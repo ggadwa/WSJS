@@ -29,12 +29,12 @@ class ModelShaderClass extends ShaderClass
         // initialize/release model shader
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,'model')) return(false);
+        if (!super.initialize(view,fileCache,'model')) return(false);
 
             // setup uniforms
 

@@ -33,16 +33,16 @@ class ShaderClass
         // initialize/release shader
         //
 
-    initialize(view,name)
+    initialize(view,fileCache,name)
     {
             // get the shaders from divs
 
-        if (!this.loadVertexShader(view,name)) {
+        if (!this.loadVertexShader(view,fileCache,name)) {
             this.release();
             return(false);
         }
 
-        if (!this.loadFragmentShader(view,name)) {
+        if (!this.loadFragmentShader(view,fileCache,name)) {
             this.release();
             return(false);
         }
@@ -88,11 +88,11 @@ class ShaderClass
         // load shaders
         //
     
-    loadVertexShader(view,name)
+    loadVertexShader(view,fileCache,name)
     {
         this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
 
-        var source=fileCacheGet('shaders/'+name+'.vert');
+        var source=fileCache.getFile('shaders/'+name+'.vert');
         view.gl.shaderSource(this.vertexShader,source);
         view.gl.compileShader(this.vertexShader);
 
@@ -102,11 +102,11 @@ class ShaderClass
         return(false);
     }
 
-    loadFragmentShader(view,name)
+    loadFragmentShader(view,fileCache,name)
     {
         this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
 
-        var source=fileCacheGet('shaders/'+name+'.frag');
+        var source=fileCache.getFile('shaders/'+name+'.frag');
         view.gl.shaderSource(this.fragmentShader,source);
         view.gl.compileShader(this.fragmentShader);
 

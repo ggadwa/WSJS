@@ -18,12 +18,12 @@ class InterfaceShaderClass extends ShaderClass
         // initialize/release interface shader
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,'interface')) return(false);
+        if (!super.initialize(view,fileCache,'interface')) return(false);
 
             // setup uniforms
 

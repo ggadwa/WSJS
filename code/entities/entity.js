@@ -153,7 +153,7 @@ class EntityClass
         // falling
         //
         
-    fall()
+    fall(map)
     {        
         this.fallSpeed+=this.gravity;
         this.gravity+=2;

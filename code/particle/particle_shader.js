@@ -19,12 +19,12 @@ class ParticleShaderClass extends ShaderClass
         // initialize/release particle shader
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,'particle')) return(false);
+        if (!super.initialize(view,fileCache,'particle')) return(false);
 
             // setup uniforms
 

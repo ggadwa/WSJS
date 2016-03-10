@@ -17,13 +17,13 @@ class ParticleListClass
         // initialize/release particle list
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
         var n,particle;
 
             // create the shader
             
-        if (!this.particleShader.initialize(view)) return(false);
+        if (!this.particleShader.initialize(view,fileCache)) return(false);
         
             // precreate all the particles so we don't have GC problems
             

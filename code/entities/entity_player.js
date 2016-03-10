@@ -121,7 +121,7 @@ class EntityPlayerClass extends EntityClass
         
             // falling
         
-        if (!PLAYER_FLY) super.fall();
+        if (!PLAYER_FLY) super.fall(map);
     }
     
 }

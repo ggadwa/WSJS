@@ -1,57 +1,406 @@
 "use strict";
 
 //
-// textures to build
+// main class
 //
 
-var textureBuildList=
-    [
-        ['Map Wall',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
-        ['Map Floor',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
-        ['Map Ceiling',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_WOOD_PLANK]],
-        ['Map Stairs',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE]],
-        ['Map Platform',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_CORRUGATED,GEN_BITMAP_TYPE_WOOD_PLANK]],
-        ['Map Ledge',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
-        ['Map Metal',[GEN_BITMAP_TYPE_METAL]],
-        ['Map Box',[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR]],
-        ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL /*,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER */]],
-        ['Map Closet',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
-        ['Map Machine',[GEN_BITMAP_TYPE_MACHINE]],
-        ['Skin Scale',[GEN_BITMAP_TYPE_SKIN_SCALE]],
-        ['Skin Leather',[GEN_BITMAP_TYPE_SKIN_LEATHER]],
-        ['Skin Fur',[GEN_BITMAP_TYPE_SKIN_FUR]]
-    ];
-    
-var soundBuildList=
-    [
-        ['fire',GEN_SOUND_TYPE_GUN_FIRE],
-        ['explosion',GEN_SOUND_TYPE_EXPLOSION],
-        ['monster scream',GEN_SOUND_TYPE_MONSTER_SCREAM]
-    ];
+class MainClass
+{
+    constructor()
+    {
+        this.fileCache=new FileCacheClass();
+        this.view=new ViewClass();
+        this.bitmapList=new BitmapListClass(this.view);
+        this.soundList=new SoundListClass();
+        this.map=new MapClass();
+        this.modelList=new ModelListClass();
+        this.entityList=new EntityListClass();
+        this.input=new InputClass(this.view,this.entityList);
+        this.debug=new DebugClass();
+        
+        this.genBitmap=null;
+        this.genSound=null;
+        
+            // texture list for the map
+            
+        this.textureBuildList=
+            [
+                ['Map Wall',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
+                ['Map Floor',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
+                ['Map Ceiling',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_WOOD_PLANK]],
+                ['Map Stairs',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE]],
+                ['Map Platform',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_CORRUGATED,GEN_BITMAP_TYPE_WOOD_PLANK]],
+                ['Map Ledge',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
+                ['Map Metal',[GEN_BITMAP_TYPE_METAL]],
+                ['Map Box',[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR]],
+                ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL /*,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER */]],
+                ['Map Closet',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
+                ['Map Machine',[GEN_BITMAP_TYPE_MACHINE]],
+                ['Skin Scale',[GEN_BITMAP_TYPE_SKIN_SCALE]],
+                ['Skin Leather',[GEN_BITMAP_TYPE_SKIN_LEATHER]],
+                ['Skin Fur',[GEN_BITMAP_TYPE_SKIN_FUR]]
+            ];
+
+            // sound list for the game
+            
+        this.soundBuildList=
+            [
+                ['fire',GEN_SOUND_TYPE_GUN_FIRE],
+                ['explosion',GEN_SOUND_TYPE_EXPLOSION],
+                ['monster scream',GEN_SOUND_TYPE_MONSTER_SCREAM]
+            ];
+    }
+
+    run()
+    {
+        this.fileCache.fillCache(this.initGL.bind(this));       // this contains all the shader code, needs to be loaded first
+    }
+
+    initGL()
+    {
+            // init view
+            // webgl and canvas stuff
+
+        if (!this.view.initialize(this.fileCache,"wsCanvas")) return;
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Initialized WebGL');
+        this.view.loadingScreenAddString('Initializing Internal Structures');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initInternal.bind(this),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initInternal()
+    {
+        if (!this.bitmapList.initialize()) return;
+        if (!this.soundList.initialize()) return;
+        if (!this.map.initialize(this.view,this.fileCache)) return;
+        if (!this.modelList.initialize(this.view,this.fileCache)) return;
+        if (!this.entityList.initialize(this.view)) return;
+        if (!this.debug.initialize(this.view,this.fileCache)) return;
+
+            // dynamic creation classes
+
+        this.genBitmap=new GenBitmapClass(new GenRandomClass(SEED_MAP_BITMAP));
+        this.genSound=new GenSoundClass(this.soundList.getAudioContext(),new GenRandomClass(SEED_SOUND));
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Textures');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildTextures(idx)
+    {
+        var bitmapCount=this.textureBuildList.length;
+
+            // bitmap name
+
+        var name=this.textureBuildList[idx][0];
+
+            // pick a random texture type
+            // we borrow the current random generator from the gen bitmap
+
+        var bitmapTypeList=this.textureBuildList[idx][1];
+        var k=this.genBitmap.genRandom.randomIndex(bitmapTypeList.length);
+        var bitmapType=bitmapTypeList[k];
+
+            // generate bitmap
+
+        this.bitmapList.addBitmap(this.genBitmap.generate(this.view,name,bitmapType));
+
+            // if more textures, then loop back around
+
+        idx++;
+        if (idx<bitmapCount) {
+            this.view.loadingScreenDraw(idx/bitmapCount);
+            setTimeout(this.initBuildTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Sounds');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildSounds(idx)
+    {
+        var soundCount=this.soundBuildList.length;
+
+            // name and type
+
+        var name=this.soundBuildList[idx][0];
+        var generateType=this.soundBuildList[idx][1];
+
+             // generate sound
+
+        this.soundList.addSound(this.genSound.generate(name,generateType));
+
+            // if more textures, then loop back around
+
+        idx++;
+        if (idx<soundCount) {
+            this.view.loadingScreenDraw(idx/soundCount);
+            setTimeout(this.initBuildSounds.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+
+                // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Map');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildMap.bind(this),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildMap()
+    {
+        var genMap=new GenMapClass(this.view,this.bitmapList,this.map,new GenRandomClass(SEED_MAP),this.initBuildMapFinish.bind(this));
+        genMap.build();
+    }
+
+    initBuildMapFinish()
+    {
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Building Collision Geometry');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildCollisionGeometry.bind(this),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildCollisionGeometry()
+    {
+            // build the collision geometry
+
+        this.map.buildCollisionGeometry(this.view);
+
+            // build the light/mesh intersection lists
+
+        this.map.buildLightMeshIntersectLists();
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Building Light Map');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildLightmap.bind(this),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildLightmap()
+    {
+            // build the light map
+            // light maps are a long running
+            // process so we need a callback
+
+        var genLightmap=new GenLightmapClass(this.view,this.bitmapList,this.map,this.debug,MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
+        genLightmap.create();
+    }
+
+    initBuildLightmapFinish()
+    {
+        var modelGenRandom=new GenRandomClass(SEED_MODEL);
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Models');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildModelsMesh.bind(this,0,modelGenRandom),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildModelsMesh(idx,modelGenRandom)
+    {
+        var model,genSkeleton,genModelMesh;
+
+            // get bitmap
+
+        var skinTypes=['Skin Scale','Skin Leather','Skin Fur'];
+        var modelBitmap=this.bitmapList.getBitmap(skinTypes[idx%3]);
+
+            // player model if 0
+            // else a monster
+
+        if (idx===0) {
+            model=new ModelClass('player',MODEL_TYPE_HUMANOID);
+        }
+        else {
+            model=new ModelClass(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
+        //    model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
+        }
+
+            // build the skeleton and mesh
+
+        genSkeleton=new GenModelOrganicSkeletonClass(model,modelGenRandom);
+        genSkeleton.build();
+
+        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap,modelGenRandom);
+        genModelMesh.build(this.view);
+
+        this.modelList.addModel(model);
+
+            // if more models, then loop back around
+
+        this.view.loadingScreenDraw(idx/MONSTER_MODEL_COUNT);    
+
+        idx++;
+        if (idx<(MONSTER_MODEL_COUNT+1)) {
+            setTimeout(this.initBuildModelsMesh.bind(this,idx,modelGenRandom),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Weapons');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildWeapons.bind(this,modelGenRandom),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildWeapons(modelGenRandom)
+    {
+        var modelBitmap=this.bitmapList.getBitmap('Map Metal');        // for now just use map metal
+
+            // weapon
+
+        var model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
+
+        var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap,modelGenRandom);
+        genModelWeaponMesh.build(this.view);
+
+        this.modelList.addModel(model);
+
+            // projectile
+
+        var model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
+
+        var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap,modelGenRandom);
+        genModelProjectileMesh.build(this.view);
+
+        this.modelList.addModel(model);
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Entities');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildEntities.bind(this),PROCESS_TIMEOUT_MSEC);
+    }
+
+    initBuildEntities()
+    {
+        var n,monsterModelName;
+        var model,pos;
+
+        var entityGenRandom=new GenRandomClass(SEED_ENTITY);
+
+            // make player entity
+
+        pos=this.map.findRandomEntityPosition(entityGenRandom);
+        if (pos===null) {
+            alert('Couldn\'t find a place to spawn player!');
+            return;
+        }
+
+        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,this.modelList.getModel('player'));
+        playerEntity.addWeapon(new WeaponClass(this.modelList.getModel('weapon_0'),this.modelList.getModel('projectile_0'),this.soundList.getSound('fire'),this.soundList.getSound('explosion')));
+        playerEntity.setCurrentWeaponIndex(0);
+
+        this.entityList.setPlayer(playerEntity);
+
+            // make monster entities
+            // we clone their models in the list so each entity gets
+            // it's own model
+
+        for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
+            pos=this.map.findRandomEntityPosition(entityGenRandom);
+            if (pos===null) continue;
+
+            monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
+            model=this.modelList.cloneModel(this.view,monsterModelName);
+
+            this.entityList.addEntity(new EntityMonsterClass(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
+        }
+
+            // finished
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Running');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initFinish.bind(this),PROCESS_TIMEOUT_MSEC);    
+    }
+
+    initFinish()
+    {
+        var timeStamp;
+        
+            // finish by setting up all the mesh
+            // buffers and indexes
+
+        this.map.setupBuffers(this.view);
+
+            // ambient
+
+        this.view.ambient.setFromValues(MAP_LIGHT_AMBIENT[0],MAP_LIGHT_AMBIENT[1],MAP_LIGHT_AMBIENT[2]);
+
+            // start the input
+
+        this.input.initialize(this.entityList.getPlayer());
+
+            // start the main loop
+
+        timeStamp=Math.trunc(window.performance.now());
+        this.view.timeStamp=timeStamp;
+
+        this.view.loopLastPhysicTimeStamp=timeStamp;
+        this.view.loopLastDrawTimeStamp=timeStamp;
+
+        this.view.fps=0.0;
+        this.view.fpsTotal=0;
+        this.view.fpsCount=0;
+        this.view.fpsStartTimeStamp=timeStamp;
+
+        this.view.loopCancel=false;
+
+        mainLoop(timeStamp);    
+    }
+}
 
 //
-// global objects
+// single global object is the main class
 //
 
-var view=new ViewClass();
-var bitmapList=new BitmapListClass(view);
-var soundList=new SoundListClass();
-var map=new MapClass();
-var modelList=new ModelListClass();
-var entityList=new EntityListClass();
-var input=new InputClass(view,entityList);
-var debug=new DebugClass();
+var main=new MainClass();
+
 
 //
 // main loop
 //
 
-function wsLoopRun(timeStamp)
+function mainLoop(timeStamp)
 {
+    var view=main.view;
+    var map=main.map;
+    var entityList=main.entityList;
+    var soundList=main.soundList;
+    
         // next frame
         
     if (view.loopCancel) return;
-    window.requestAnimationFrame(wsLoopRun);
+    window.requestAnimationFrame(mainLoop);
     
         // get integer msec timestamp
     
@@ -59,7 +408,7 @@ function wsLoopRun(timeStamp)
     
         // run the input
         
-    input.run();
+    main.input.run();
     
         // entities and physics
     
@@ -103,348 +452,8 @@ function wsLoopRun(timeStamp)
     }
 }
 
-function wsLoopStart()
+
+function mainRun()
 {
-    var timeStamp=window.performance.now();
-    
-    view.timeStamp=Math.trunc(timeStamp);
-    
-    view.loopLastPhysicTimeStamp=view.timeStamp;
-    view.loopLastDrawTimeStamp=view.timeStamp;
-    
-    view.fps=0.0;
-    view.fpsTotal=0;
-    view.fpsCount=0;
-    view.fpsStartTimeStamp=view.timeStamp;
-
-    view.loopCancel=false;
-    
-    wsLoopRun(timeStamp);    
+    main.run();
 }
-
-//
-// initialize web-shooter
-//
-// we do this in a couple timeout steps so
-// browser doesn't halt a long running script
-//
-
-function wsInit()
-{
-    fileCacheStart(wsInitGL);       // this contains all the shaders, needs to be loaded first
-}
-
-function wsInitGL()
-{
-        // init view
-        // webgl and canvas stuff
-    
-    if (!view.initialize("wsCanvas")) return;
-    
-        // next step
-        
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Initialized WebGL');
-    view.loadingScreenAddString('Initializing Internal Structures');
-    view.loadingScreenDraw(null);
-    
-    setTimeout(wsInitInternal,PROCESS_TIMEOUT_MSEC);
-}
-    
-function wsInitInternal()
-{
-    if (!bitmapList.initialize()) return;
-    if (!soundList.initialize()) return;
-    if (!map.initialize(view)) return;
-    if (!modelList.initialize(view)) return;
-    if (!entityList.initialize(view)) return;
-    if (!debug.initialize(view)) return;
-    
-        // create list of dynamic textures
-        
-    var textureGenRandom=new GenRandomClass(SEED_MAP_BITMAP);
-    
-        // next step
-    
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Generating Dynamic Textures');
-    view.loadingScreenDraw(null);
-    
-    setTimeout(function() { wsInitBuildTextures(0,textureGenRandom); },PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildTextures(idx,textureGenRandom)
-{
-    var bitmapCount=textureBuildList.length;
-    
-        // bitmap name
-        
-    var name=textureBuildList[idx][0];
-    
-        // pick a random texture type
-    
-    var bitmapTypeList=textureBuildList[idx][1];
-    var k=textureGenRandom.randomIndex(bitmapTypeList.length);
-    var bitmapType=bitmapTypeList[k];
-    
-        // generate bitmap
-    
-    var genBitmap=new GenBitmapClass(textureGenRandom);
-    bitmapList.addBitmap(genBitmap.generate(view,name,bitmapType));
-    
-        // if more textures, then loop back around
-        
-    idx++;
-    if (idx<bitmapCount) {
-        view.loadingScreenDraw(idx/bitmapCount);
-        setTimeout(function() { wsInitBuildTextures(idx,textureGenRandom); },PROCESS_TIMEOUT_MSEC);
-        return;
-    }
-    
-        // next step
-        
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Generating Dynamic Sounds');
-    view.loadingScreenDraw(null);
-
-    setTimeout(function() { wsInitBuildSounds(0,new GenRandomClass(SEED_SOUND)); },PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildSounds(idx,soundGenRandom)
-{
-    var soundCount=soundBuildList.length;
-    
-        // name and type
-        
-    var name=soundBuildList[idx][0];
-    var generateType=soundBuildList[idx][1];
-    
-         // generate sound
-    
-    var genSound=new GenSoundClass(soundList.getAudioContext(),soundGenRandom);
-    soundList.addSound(genSound.generate(name,generateType));
-    
-        // if more textures, then loop back around
-        
-    idx++;
-    if (idx<soundCount) {
-        view.loadingScreenDraw(idx/soundCount);
-        setTimeout(function() { wsInitBuildSounds(idx,soundGenRandom); },PROCESS_TIMEOUT_MSEC);
-        return;
-    }
-    
-            // next step
-        
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Generating Dynamic Map');
-    view.loadingScreenDraw(null);
-
-    setTimeout(wsInitBuildMap,PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildMap()
-{
-        // random seed
-
-    var mapGenRandom=new GenRandomClass(SEED_MAP);
-
-        // build the map
-        
-    var genMap=new GenMapClass(view,bitmapList,map,mapGenRandom,wsInitBuildMapFinish);
-    genMap.build();
-}
-
-function wsInitBuildMapFinish()
-{
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Building Collision Geometry');
-    view.loadingScreenDraw(null);
-
-    setTimeout(wsInitBuildCollisionGeometry,PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildCollisionGeometry()
-{
-        // build the collision geometry
-
-    map.buildCollisionGeometry();
-
-        // build the light/mesh intersection lists
-
-    map.buildLightMeshIntersectLists();
-    
-        // next step
-    
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Building Light Map');
-    view.loadingScreenDraw(null);
-
-    setTimeout(wsInitBuildLightmap,PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildLightmap()
-{
-        // build the light map
-        // light maps are a long running
-        // process so we need a callback
-
-    var genLightmap=new GenLightmapClass(view,bitmapList,map,debug,MAP_GENERATE_LIGHTMAP,wsInitBuildLightmapFinish);
-    genLightmap.create();
-}
-
-function wsInitBuildLightmapFinish()
-{
-    var modelGenRandom=new GenRandomClass(SEED_MODEL);
-    
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Generating Dynamic Models');
-    view.loadingScreenDraw(null);
-
-    setTimeout(function() { wsInitBuildModelsMesh(0,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildModelsMesh(idx,modelGenRandom)
-{
-    var model,genSkeleton,genModelMesh;
-    
-        // get bitmap
-        
-    var skinTypes=['Skin Scale','Skin Leather','Skin Fur'];
-    var modelBitmap=bitmapList.getBitmap(skinTypes[idx%3]);
-    
-        // player model if 0
-        // else a monster
-        
-    if (idx===0) {
-        model=new ModelClass('player',MODEL_TYPE_HUMANOID);
-    }
-    else {
-        model=new ModelClass(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
-    //    model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
-    }
-    
-        // build the skeleton and mesh
-    
-    genSkeleton=new GenModelOrganicSkeletonClass(model,modelGenRandom);
-    genSkeleton.build();
-    
-    genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap,modelGenRandom);
-    genModelMesh.build(view);
-    
-    modelList.addModel(model);
-    
-        // if more models, then loop back around
-    
-    view.loadingScreenDraw(idx/MONSTER_MODEL_COUNT);    
-        
-    idx++;
-    if (idx<(MONSTER_MODEL_COUNT+1)) {
-        setTimeout(function() { wsInitBuildModelsMesh(idx,modelGenRandom); },PROCESS_TIMEOUT_MSEC);
-        return;
-    }
-    
-        // next step
-        
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Generating Dynamic Weapons');
-    view.loadingScreenDraw(null);
-    
-    setTimeout(function() { wsInitBuildWeapons(modelGenRandom); },PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildWeapons(modelGenRandom)
-{
-    var modelBitmap=bitmapList.getBitmap('Map Metal');        // for now just use map metal
-    
-        // weapon
-        
-    var model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
-    
-    var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap,modelGenRandom);
-    genModelWeaponMesh.build(view);
-    
-    modelList.addModel(model);
-    
-        // projectile
-        
-    var model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
-    
-    var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap,modelGenRandom);
-    genModelProjectileMesh.build(view);
-    
-    modelList.addModel(model);
-
-        // next step
-        
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Generating Dynamic Entities');
-    view.loadingScreenDraw(null);
-    
-    setTimeout(wsInitBuildEntities,PROCESS_TIMEOUT_MSEC);
-}
-
-function wsInitBuildEntities()
-{
-    var n,monsterModelName;
-    var model,pos;
-    
-    var entityGenRandom=new GenRandomClass(SEED_ENTITY);
-    
-        // make player entity
-    
-    pos=map.findRandomEntityPosition(entityGenRandom);
-    if (pos===null) {
-        alert('Couldn\'t find a place to spawn player!');
-        return;
-    }
-
-    var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,modelList.getModel('player'));
-    playerEntity.addWeapon(new WeaponClass(modelList.getModel('weapon_0'),modelList.getModel('projectile_0'),soundList.getSound('fire'),soundList.getSound('explosion')));
-    playerEntity.setCurrentWeaponIndex(0);
-    
-    entityList.setPlayer(playerEntity);
-    
-        // make monster entities
-        // we clone their models in the list so each entity gets
-        // it's own model
-        
-    for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
-        pos=map.findRandomEntityPosition(entityGenRandom);
-        if (pos===null) continue;
-        
-        monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
-        model=modelList.cloneModel(view,monsterModelName);
-        
-        entityList.addEntity(new EntityMonsterClass(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
-    }
-    
-        // finished
-        
-    view.loadingScreenUpdate();
-    view.loadingScreenAddString('Running');
-    view.loadingScreenDraw(null);
-        
-    setTimeout(wsInitFinish,PROCESS_TIMEOUT_MSEC);    
-}
-
-function wsInitFinish()
-{
-        // finish by setting up all the mesh
-        // buffers and indexes
-        
-    map.setupBuffers(view);
-    
-        // ambient
-        
-    view.ambient.setFromValues(MAP_LIGHT_AMBIENT[0],MAP_LIGHT_AMBIENT[1],MAP_LIGHT_AMBIENT[2]);
-    
-        // start the input
-        
-    input.initialize(entityList.getPlayer());
-
-        // start the main loop
-    
-    wsLoopStart();
-}
-
-

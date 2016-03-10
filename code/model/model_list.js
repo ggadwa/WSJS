@@ -16,9 +16,9 @@ class ModelListClass
         // initialize/release modelList
         //
 
-    initialize(view)
+    initialize(view,fileCache)
     {
-        return(this.modelShader.initialize(view));
+        return(this.modelShader.initialize(view,fileCache));
     }
 
     release(view)
