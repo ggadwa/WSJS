@@ -185,7 +185,8 @@ class CollisionClass
                         // skip if not in the Y of the line
             
                     yBound=collisionLine.getYBound();
-                    if ((this.testPt.y>yBound.max) || (this.testPt.y<=yBound.min)) continue;
+                    if (this.testPt.y<=yBound.min) continue;
+                    if ((this.testPt.y-high)>yBound.max) continue;
 
                         // check against line
 

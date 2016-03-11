@@ -184,14 +184,15 @@ class GenRoomDecorationClass
     addFurnature(room)
     {
         var n,pieceCount;
-        var pos,wid,high;
+        var pos,xWid,zWid,legWid,high;
+        var bitmap;
         
         var boxBoundX=new wsBound(0,0);
         var boxBoundY=new wsBound(0,0);
         var boxBoundZ=new wsBound(0,0);
         
-        wid=Math.trunc(ROOM_BLOCK_WIDTH/2);
-        high=this.genRandom.randomInt(Math.trunc(ROOM_BLOCK_WIDTH/4),1000);
+        legWid=Math.trunc(ROOM_BLOCK_WIDTH*0.1);
+        bitmap=this.bitmapList.getBitmap('Map Box');
 
         pieceCount=this.genRandom.randomInt(ROOM_DECORATION_BOX_MIN_COUNT,ROOM_DECORATION_BOX_EXTRA_COUNT);
 
@@ -199,11 +200,43 @@ class GenRoomDecorationClass
             pos=room.findRandomDecorationLocation(this.genRandom,false);
             if (pos===null) return;
             
-            boxBoundX=new wsBound((pos.x-wid),(pos.x+wid));
-            boxBoundY=new wsBound((room.yBound.max-high),((room.yBound.max-high)+ROOM_FLOOR_DEPTH));
-            boxBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
+                // height and width
             
-            this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+            if (this.genRandom.randomPercentage(0.5)) {
+                xWid=Math.trunc(ROOM_BLOCK_WIDTH/2);
+                zWid=xWid-Math.trunc(0,Math.trunc(ROOM_BLOCK_WIDTH*0.2));
+            }
+            else {
+                zWid=Math.trunc(ROOM_BLOCK_WIDTH/2);
+                xWid=zWid-Math.trunc(0,Math.trunc(ROOM_BLOCK_WIDTH*0.2));
+            }
+            high=this.genRandom.randomInt(Math.trunc(ROOM_BLOCK_WIDTH*0.25),1000);
+
+                // the table
+                
+            boxBoundX=new wsBound((pos.x-xWid),(pos.x+xWid));
+            boxBoundY=new wsBound((room.yBound.max-high),((room.yBound.max-high)+ROOM_FLOOR_DEPTH));
+            boxBoundZ=new wsBound((pos.z-zWid),(pos.z+zWid));
+            
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+            
+                // legs
+                
+            boxBoundY=new wsBound(((room.yBound.max-high)+ROOM_FLOOR_DEPTH),room.yBound.max);
+                
+            boxBoundX=new wsBound((pos.x-xWid),((pos.x-xWid)+legWid));
+            boxBoundZ=new wsBound((pos.z-zWid),((pos.z-zWid)+legWid));            
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+            
+            boxBoundZ=new wsBound(((pos.z+zWid)-legWid),(pos.z+zWid));            
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+
+            boxBoundX=new wsBound(((pos.x+xWid)-legWid),(pos.x+xWid));
+            boxBoundZ=new wsBound((pos.z-zWid),((pos.z-zWid)+legWid));            
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+            
+            boxBoundZ=new wsBound(((pos.z+zWid)-legWid),(pos.z+zWid));            
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
         }
     }
     
@@ -213,9 +246,6 @@ class GenRoomDecorationClass
 
     addDecorations(room)
     {
-        this.addFurnature(room);
-        return;
-        
             // randomly pick a decoration
             // 0 = nothing
             

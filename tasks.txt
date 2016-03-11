@@ -18,7 +18,7 @@ WHEN THERE IS AN INTERFACE TODOs
 
 REGULAR TODOs
 
-* tables as decorations
+
 * all decorations get same min/max count
 
 #### collisions against slanted walls are bad
@@ -40,8 +40,6 @@ REGULAR TODOs
     [X] new platforms builder
         [ ] platforms need more decorations
         [ ] try to find a way to connect platforms on different rooms together
-    [ ] decorations
-        [ ] pedestals?
     [X] need ledge builder
         [ ] dup for ceilings? maybe
     [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
