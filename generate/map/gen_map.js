@@ -55,7 +55,7 @@ class GenMapClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshes[n];
-            if (mesh.flag!==MESH_FLAG_ROOM_WALL) continue;
+            if ((mesh.flag!==MESH_FLAG_ROOM_WALL) && (mesh.flag!==MESH_FLAG_ROOM_LEDGE)) continue;
             
                 // build a list of meshes that
                 // are targets for trig eliminations from
@@ -65,7 +65,7 @@ class GenMapClass
             
             for (k=(n+1);k<nMesh;k++) {
                 otherMesh=this.map.meshes[k];
-                if (otherMesh.flag!==MESH_FLAG_ROOM_WALL) continue;
+                if ((otherMesh.flag!==MESH_FLAG_ROOM_WALL) && (otherMesh.flag!==MESH_FLAG_ROOM_LEDGE)) continue;
                 
                 if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
             }
@@ -339,7 +339,7 @@ class GenMapClass
         // build map recursive room
         //
 
-    buildMapRecursiveRoom(recurseCount,lastRoom,yLastBound,stairMode,level)
+    buildMapRecursiveRoom(recurseCount,lastRoom,yLastBound,stairMode,level,depth)
     {
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
@@ -510,17 +510,15 @@ class GenMapClass
         this.addRoomLight(roomIdx);
         
             // start recursing for more rooms
+            // we try a couple times to find a place
+            // for the next room
             
         var nextLevel;
         var nextStairMode;
         var yNextBound;
         var storyAdd=yBound.getSize()+ROOM_FLOOR_DEPTH;
             
-        for (n=0;n!==ROOM_MAX_RECURSIONS;n++) {
-            
-                // at max room?
-                
-            if (this.currentRoomCount>=ROOM_MAX_COUNT) return;
+        for (n=0;n!==10;n++) {
             
                 // detect any level changes, we
                 // can only have one per room
@@ -556,8 +554,8 @@ class GenMapClass
             }
             
                 // recurse to next room
-                
-            this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextStairMode,nextLevel);
+            
+            if ((depth+1)<ROOM_MAX_RECURSION_DEPTH) this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextStairMode,nextLevel,(depth+1));
         }
     }
     
@@ -653,7 +651,7 @@ class GenMapClass
 
         this.currentRoomCount=0;
         
-        this.buildMapRecursiveRoom(0,null,null,STAIR_MODE_NONE,0);
+        this.buildMapRecursiveRoom(0,null,null,STAIR_MODE_NONE,0,0);
         
         this.view.loadingScreenDraw(0.24);
         setTimeout(this.buildMapClosets.bind(this),PROCESS_TIMEOUT_MSEC);

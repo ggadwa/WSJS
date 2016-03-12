@@ -17,7 +17,7 @@ class GenRoomLedgeClass
         // add ledge chunk
         //
 
-    addLedgeChunk(room,pts,nSide,high,skipSides,bitmap)
+    addLedgeChunk(room,pts,nSide,high,bitmap)
     {
         var n,k,idx;
         var vertexCount,vertexList;
@@ -29,11 +29,8 @@ class GenRoomLedgeClass
         
             // get vertex count
         
-        vertexCount=(nSide-2)*3;          // the top
-        
-        for (n=0;n!==nSide;n++) {
-            if (!skipSides[n]) vertexCount+=6;
-        }
+        vertexCount=(nSide-2)*3;            // the top
+        vertexCount+=(6*nSide);             // sides
         
             // get cube size
 
@@ -43,8 +40,6 @@ class GenRoomLedgeClass
             // sides
 
         for (n=0;n!==nSide;n++) {
-            if (skipSides[n]) continue;
-            
             k=n+1;
             if (k===nSide) k=0;
 
@@ -82,7 +77,7 @@ class GenRoomLedgeClass
 
             // finally create the mesh
 
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_PLATFORM));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_LEDGE));
     }
         
         //
@@ -125,7 +120,7 @@ class GenRoomLedgeClass
                 pts[3].setFromValues(0,0,((z+1)*ROOM_BLOCK_WIDTH));
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
-                this.addLedgeChunk(room,pts,4,high,[false,false,false,true],ledgeBitmap);
+                this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
             }
             
             if (room.getEdgeGridValue((room.xBlockSize-1),z)===0) {
@@ -141,7 +136,7 @@ class GenRoomLedgeClass
                 pts[3].setFromValues((xMax-wid),0,((z+1)*ROOM_BLOCK_WIDTH));
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
-                this.addLedgeChunk(room,pts,4,high,[false,true,false,false],ledgeBitmap);
+                this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
             }
         }
         
@@ -162,7 +157,7 @@ class GenRoomLedgeClass
                 pts[3].setFromValues(((x+1)*ROOM_BLOCK_WIDTH),0,0);
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
-                this.addLedgeChunk(room,pts,4,high,[false,false,false,true],ledgeBitmap);
+                this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
             }
             
             if (room.getEdgeGridValue(x,(room.zBlockSize-1))===0) {
@@ -178,7 +173,7 @@ class GenRoomLedgeClass
                 pts[3].setFromValues(((x+1)*ROOM_BLOCK_WIDTH),0,(zMax-wid));
                 pts[3].move(room.xBound.min,0,room.zBound.min);
                 
-                this.addLedgeChunk(room,pts,4,high,[false,true,false,false],ledgeBitmap);
+                this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
             }
         }
         
@@ -203,7 +198,7 @@ class GenRoomLedgeClass
             pts[4].setFromValues(0,0,ROOM_BLOCK_WIDTH);
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
-            this.addLedgeChunk(room,pts,5,high,[true,false,false,false,true],ledgeBitmap);
+            this.addLedgeChunk(room,pts,5,high,ledgeBitmap);
         }
         
         if (room.getEdgeGridValue((room.xBlockSize-1),0)===0) {
@@ -222,7 +217,7 @@ class GenRoomLedgeClass
             pts[4].setFromValues((xMax-ROOM_BLOCK_WIDTH),0,wid);
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
-            this.addLedgeChunk(room,pts,5,high,[true,true,false,false,false],ledgeBitmap);
+            this.addLedgeChunk(room,pts,5,high,ledgeBitmap);
         }
         
         if (room.getEdgeGridValue((room.xBlockSize-1),(room.zBlockSize-1))===0) {
@@ -241,7 +236,7 @@ class GenRoomLedgeClass
             pts[4].setFromValues((xMax-ROOM_BLOCK_WIDTH),0,(zMax-wid));
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
-            this.addLedgeChunk(room,pts,5,high,[false,true,true,false,false],ledgeBitmap);
+            this.addLedgeChunk(room,pts,5,high,ledgeBitmap);
         }
         
         if (room.getEdgeGridValue(0,(room.zBlockSize-1))===0) {
@@ -260,7 +255,7 @@ class GenRoomLedgeClass
             pts[4].setFromValues(0,0,zMax);
             pts[4].move(room.xBound.min,0,room.zBound.min);
 
-            this.addLedgeChunk(room,pts,5,high,[false,false,false,true,true],ledgeBitmap);
+            this.addLedgeChunk(room,pts,5,high,ledgeBitmap);
         }
     }
     

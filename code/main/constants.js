@@ -2,8 +2,7 @@
 // room generation
 //
 
-const ROOM_MAX_COUNT=5;                        // the maximum possible number of rooms in the map
-const ROOM_MAX_RECURSIONS=3;                    // how far down you will recurse to make rooms off a single room
+const ROOM_MAX_RECURSION_DEPTH=3;               // how far we recurse building the map, room to room, determines the size of the map
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
 const ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is
@@ -78,14 +77,14 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
 //
 
 const MONSTER_MODEL_COUNT=3;
-const MONSTER_ENTITY_COUNT=3;
+const MONSTER_ENTITY_COUNT=15;
 
 const MONSTER_AI_ON=true;
 
