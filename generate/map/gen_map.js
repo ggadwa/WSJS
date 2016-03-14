@@ -518,7 +518,7 @@ class GenMapClass
         var yNextBound;
         var storyAdd=yBound.getSize()+ROOM_FLOOR_DEPTH;
             
-        for (n=0;n!==10;n++) {
+        for (n=0;n!==ROOM_MAX_CONNECTION_COUNT;n++) {
             
                 // detect any level changes, we
                 // can only have one per room

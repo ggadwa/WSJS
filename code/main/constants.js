@@ -3,12 +3,13 @@
 //
 
 const ROOM_MAX_RECURSION_DEPTH=3;               // how far we recurse building the map, room to room, determines the size of the map
+const ROOM_MAX_CONNECTION_COUNT=10;             // how many times we try to create a room that connects with this room
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
 const ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is
 const ROOM_FLOOR_DEPTH=700;                     // the depth of the area between floors
 
-const ROOM_MIN_BLOCK_PER_SIDE=3;                // minimum number of blocks taht can make up one side of a room
+const ROOM_MIN_BLOCK_PER_SIDE=3;                // minimum number of blocks that can make up one side of a room
 const ROOM_MAX_BLOCK_PER_SIDE=10;               // maximum number of blocks that can make up one side of a room
 const ROOM_MAX_BLOCK_COUNT=50;                  // maximum number of blocks in total for a room (x * z block count)
 
@@ -77,7 +78,7 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
 //
 // monsters
