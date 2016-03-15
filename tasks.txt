@@ -1,7 +1,3 @@
-IMPORTANT EVENTUAL TODOs
-    [ ] eventually move back to vec3 in lighting structure (sigh, windows bug)
-    [ ] remove uncessary .xyz in shaders because of above change
-
 EMCA6 TODOs
     [ ] modulize the code
     [ ] hoist all the vars, eventually use let
@@ -19,11 +15,26 @@ WHEN THERE IS AN INTERFACE TODOs
 REGULAR TODOs
 
 
-* all decorations get same min/max count
 
+#### blobs should be able to have random whip limbs
+#### stacked block textures can have (randomly) altered Y sizes (one line)
 #### collisions against slanted walls are bad
-#### tails, spikes, random vertex moves
+#### tails/whips, spikes, random vertex moves
 #### normals bad in animation (or culling is bad)
+#### glowing computer lights?
+#### rounded particles (need bitmap?)
+#### why is some shrinking bad?
+      ---> I know what this is, the inside bones are making correct normals, but
+           it's a long polygon and the normal is enough to break it, we might need
+           a "normal needs to face this direction* and flip otherwise, not sure yet
+#### need to separate Y and X/Z globe building segments so we can have more XZ, less Y (or vice versa) on limbs
+
+[X] slight color variations in lighting
+[X] packed lights into vec4 to save space, changed light in scene algorithm and now handling 6 lights
+[X] some decoration random min/maxes are now dynamic based on room sizes
+[X] table decorations is now tables and shelves
+[ ] whip limbs
+
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
@@ -36,18 +47,6 @@ REGULAR TODOs
      [X] need to create sounds
      [ ] move up to spatial panner (sound_list.setListenerToEntity, sound.play)
 
-[ ] map generation
-    [X] new platforms builder
-        [ ] platforms need more decorations
-        [ ] try to find a way to connect platforms on different rooms together
-    [X] need ledge builder
-        [ ] dup for ceilings? maybe
-    [ ] TRY: remember closet locations, and from any closet side, expand in 3 direction and fill in if hit another closet
-
-[ ] need to deal with pausing time stamps
-
-[ ] bitmaps
-    [ ] box texture has potential other type of boards inside?
 
 
 

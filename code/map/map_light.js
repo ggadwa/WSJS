@@ -19,6 +19,7 @@ class MapLightClass
 
         this.origIndex=0;           // used to sort lights
         this.dist=0.0;
+        this.usedInList=false;
 
         this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
     }

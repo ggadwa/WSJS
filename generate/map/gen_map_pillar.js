@@ -12,9 +12,12 @@ class GenRoomPillarClass
         this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
+        
+        var minRadius=Math.trunc(ROOM_BLOCK_WIDTH*0.08);
+        var maxRadius=Math.trunc(ROOM_BLOCK_WIDTH*0.14);
 
-        var radius=this.genRandom.randomInBetween(ROOM_PILLAR_MIN_RADIUS,ROOM_PILLAR_MAX_RADIUS);
-        this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(this.genRandom,radius,radius,1,ROOM_PILLAR_EXTRA_SEGMENTS);
+        var radius=this.genRandom.randomInBetween(minRadius,maxRadius);
+        this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(this.genRandom,radius,radius,1,4);
     }
     
         //

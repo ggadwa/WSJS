@@ -60,11 +60,8 @@ class MapShaderClass extends ShaderClass
             this.lights.push(new ShaderLightClass());
 
             name='light_'+n;
-            this.lights[n].positionUniform=gl.getUniformLocation(this.program,name+'.position');
-            this.lights[n].colorUniform=gl.getUniformLocation(this.program,name+'.color');
-            this.lights[n].intensityUniform=gl.getUniformLocation(this.program,name+'.intensity');
-            this.lights[n].invertIntensityUniform=gl.getUniformLocation(this.program,name+'.invertIntensity');
-            this.lights[n].exponentUniform=gl.getUniformLocation(this.program,name+'.exponent');
+            this.lights[n].positionIntensityUniform=gl.getUniformLocation(this.program,name+'.positionIntensity');
+            this.lights[n].colorExponentUniform=gl.getUniformLocation(this.program,name+'.colorExponent');
         }
 
             // these uniforms are always the same
@@ -106,10 +103,8 @@ class MapShaderClass extends ShaderClass
         gl.uniformMatrix3fv(this.normalMatrixUniform,false,view.normalMatrix);
 
             // lighting
-            // SUPERGUMBA -- NOTE!!!!
-            // windows has a dumb bug where two vec3 in a struct
-            // will stomp on each other.  The work-around is to use
-            // a vec4.  This is ugly. FIX LATER
+            // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)
+            // and the second vec4 is r,g,b,exponent (color and exponent)
 
         gl.uniform3f(this.ambientUniform,view.ambient.r,view.ambient.g,view.ambient.b);
 
@@ -121,26 +116,20 @@ class MapShaderClass extends ShaderClass
                 // no light sets everything to 0
 
             if (viewLight===null) {
-                gl.uniform4f(light.positionUniform,0.0,0.0,0.0,1.0);
-                gl.uniform4f(light.colorUniform,1.0,1.0,0.0,0.0);
-                gl.uniform1f(light.intensityUniform,0.0);
-                gl.uniform1f(light.invertIntensityUniform,0.0);
-                gl.uniform1f(light.exponentUniform,1.0);
+                gl.uniform4f(light.positionIntensityUniform,0.0,0.0,0.0,1.0);    // x,y,z,intensity
+                gl.uniform4f(light.colorExponentUniform,1.0,1.0,0.0,1.0);       // r,g,b,exponent
                 continue;
             }
 
                 // otherwise setup the light
 
-            gl.uniform4f(light.positionUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,1.0);
+            gl.uniform4f(light.positionIntensityUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,viewLight.intensity);
             if (viewLight.inLightmap) {
-                gl.uniform4f(light.colorUniform,0.0,0.0,0.0,0.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
+                gl.uniform4f(light.colorExponentUniform,0.0,0.0,0.0,1.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
             }
             else {
-                gl.uniform4f(light.colorUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,0.0);
+                gl.uniform4f(light.colorExponentUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,viewLight.exponent);
             }
-            gl.uniform1f(light.intensityUniform,viewLight.intensity);
-            gl.uniform1f(light.invertIntensityUniform,viewLight.invertIntensity);
-            gl.uniform1f(light.exponentUniform,viewLight.exponent);
         }
 
             // enable the vertex attributes

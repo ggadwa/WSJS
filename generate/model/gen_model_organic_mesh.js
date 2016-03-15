@@ -56,36 +56,36 @@ class GenModelOrganicMeshClass
     {
         var n,widRadius;
         var nBone=boneList.length;
-        var minGravityDist=0;
+        var maxGravityDist=0;
         
             // find the min gravity distance
             
         for (n=0;n!==nBone;n++) {
-            if (boneList[n].gravityLockDistance>minGravityDist) minGravityDist=boneList[n].gravityLockDistance;
+            if (boneList[n].gravityLockDistance>maxGravityDist) maxGravityDist=boneList[n].gravityLockDistance;
         }
 
             // build the width
             
         widRadius=xBound.getSize();
         if (zBound.getSize()>widRadius) widRadius=zBound.getSize();
-        return(Math.trunc(widRadius*0.5)+minGravityDist);
+        return(Math.trunc(widRadius*0.5)+maxGravityDist);
     }
     
     findHeightForEnclosingGlobe(boneList,yBound)
     {
         var n;
         var nBone=boneList.length;
-        var minGravityDist=0;
+        var maxGravityDist=0;
         
             // find the min gravity distance
             
         for (n=0;n!==nBone;n++) {
-            if (boneList[n].gravityLockDistance>minGravityDist) minGravityDist=boneList[n].gravityLockDistance;
+            if (boneList[n].gravityLockDistance>maxGravityDist) maxGravityDist=boneList[n].gravityLockDistance;
         }
 
             // build the height
         
-        return(Math.trunc(yBound.getSize()*0.5)+minGravityDist);
+        return(Math.trunc(yBound.getSize()*0.5)+maxGravityDist);
     }
 
         //

@@ -77,7 +77,7 @@ class ViewClass
 
             // view lighting
 
-        this.LIGHT_COUNT=4;
+        this.LIGHT_COUNT=6;
 
         this.ambient=new wsColor(0.0,0.0,0.0);
 
@@ -433,7 +433,7 @@ class ViewClass
         // draw view
         //
 
-    draw(map,entityList)
+    draw(map,entityList,debug)
     {
         var n,nEntity,entity;
         var player=entityList.getPlayer();

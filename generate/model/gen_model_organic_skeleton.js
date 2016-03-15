@@ -128,6 +128,32 @@ class GenModelOrganicSkeletonClass
         vct.z+=boneOffset;
         this.buildLimbLeg(vct,boneIdx,('Right'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,false);
     }
+        
+    buildLimbWhip(whipCount,parentBoneIdx,whipRadius,y,whipLength,rotOffset)
+    {
+        var whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx;
+        var skeleton=this.model.skeleton;
+        var bones=skeleton.bones;
+        
+            // direction
+            
+        var vct=new wsPoint(whipLength,0.0,0.0);
+        vct.rotateY(null,rotOffset);
+        
+            // the whip
+            
+        whip0BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_0'),parentBoneIdx,new wsPoint((vct.x*0.25),y,(vct.z*0.25))))-1;
+        whip1BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_1'),whip0BoneIdx,new wsPoint((vct.x*0.50),y,(vct.z*0.50))))-1;
+        whip2BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_2'),whip1BoneIdx,new wsPoint((vct.x*0.75),y,(vct.z*0.75))))-1;
+        whip3BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_3'),whip2BoneIdx,new wsPoint(vct.x,y,vct.z)))-1;
+
+        bones[whip0BoneIdx].gravityLockDistance=whipRadius;
+        bones[whip1BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.8);
+        bones[whip2BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.6);
+        bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.1);
+
+        skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_WHIP,16,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
+    }
     
         //
         // build humanoid skeletons
@@ -135,7 +161,8 @@ class GenModelOrganicSkeletonClass
         
     buildHumanoid()
     {
-        var n;
+        var n,boneIdx;
+        var bodyLimb,whipRadius,whipLength;
         
         this.model.skeleton=new ModelSkeletonClass();
         var bones=this.model.skeleton.bones;
@@ -168,8 +195,9 @@ class GenModelOrganicSkeletonClass
         bones[waistBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
-            
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
+        
+        bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
+        this.model.skeleton.limbs.push(bodyLimb);
         
             // create head limbs
             
@@ -235,6 +263,19 @@ class GenModelOrganicSkeletonClass
         rotOffset=(this.genRandom.random()*20.0)-10.0;
         
         this.buildLimbLegSet(hipBoneIdx,0,0,rotOffset,Math.trunc(botBodyRadius*0.5),bones[hipBoneIdx].position.y,legRadius,footLength);
+        
+            // create any whips
+        for (n=0;n!==3;n++) {
+            boneIdx=bodyLimb.getRandomBoneIndex(this.genRandom);
+            rotOffset=this.genRandom.random()*360.0;
+            
+            whipRadius=Math.trunc(botBodyRadius*0.35);
+            if (whipRadius<250) whipRadius=250;
+            if (whipRadius>350) whipRadius=350;
+            whipLength=this.genRandom.randomInt(Math.trunc(totalHigh*0.3),Math.trunc(totalHigh*0.2));
+            
+            this.buildLimbWhip(n,boneIdx,whipRadius,bones[boneIdx].position.y,whipLength,rotOffset);
+        }
     }
 
         //

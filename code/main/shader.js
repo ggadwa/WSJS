@@ -8,11 +8,8 @@ class ShaderLightClass
 {
     constructor()
     {
-        this.positionUniform=null;
-        this.colorUniform=null;
-        this.intensityUniform=null;
-        this.invertIntensityUniform=null;
-        this.exponentUniform=null;
+        this.positionIntensityUniform=null;
+        this.colorExponentUniform=null;
     }
 }
 

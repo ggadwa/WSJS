@@ -8,17 +8,16 @@ uniform highp mat4 modelMatrix;
 uniform highp mat3 normalMatrix;
 
 struct lightType {
-    highp vec4 position;
-    lowp vec4 color;
-    mediump float intensity;
-    mediump float invertIntensity;
-    mediump float exponent;
+    highp vec4 positionIntensity;
+    mediump vec4 colorExponent;
 };
 
 uniform lightType light_0;
 uniform lightType light_1;
 uniform lightType light_2;
 uniform lightType light_3;
+uniform lightType light_4;
+uniform lightType light_5;
 
 varying highp vec3 eyeVector;
 varying highp vec2 fragUV;
@@ -27,11 +26,15 @@ varying highp vec3 lightVector_0;
 varying highp vec3 lightVector_1;
 varying highp vec3 lightVector_2;
 varying highp vec3 lightVector_3;
+varying highp vec3 lightVector_4;
+varying highp vec3 lightVector_5;
 
 varying highp vec3 lightVertexVector_0;
 varying highp vec3 lightVertexVector_1;
 varying highp vec3 lightVertexVector_2;
 varying highp vec3 lightVertexVector_3;
+varying highp vec3 lightVertexVector_4;
+varying highp vec3 lightVertexVector_5;
 
 void main(void)
 {
@@ -55,31 +58,45 @@ void main(void)
 
         // translate the light 0 vector
 
-    lightVector_0=light_0.position.xyz-vtx;
+    lightVector_0=light_0.positionIntensity.xyz-vtx;
     lightVertexVector_0.x=dot(lightVector_0,tangentSpaceTangent);
     lightVertexVector_0.y=dot(lightVector_0,tangentSpaceBinormal);
     lightVertexVector_0.z=dot(lightVector_0,tangentSpaceNormal);
 
         // translate the light 1 vector
 
-    lightVector_1=light_1.position.xyz-vtx;
+    lightVector_1=light_1.positionIntensity.xyz-vtx;
     lightVertexVector_1.x=dot(lightVector_1,tangentSpaceTangent);
     lightVertexVector_1.y=dot(lightVector_1,tangentSpaceBinormal);
     lightVertexVector_1.z=dot(lightVector_1,tangentSpaceNormal);
 
         // translate the light 2 vector
 
-    lightVector_2=light_2.position.xyz-vtx;
+    lightVector_2=light_2.positionIntensity.xyz-vtx;
     lightVertexVector_2.x=dot(lightVector_2,tangentSpaceTangent);
     lightVertexVector_2.y=dot(lightVector_2,tangentSpaceBinormal);
     lightVertexVector_2.z=dot(lightVector_2,tangentSpaceNormal);
 
         // translate the light 3 vector
 
-    lightVector_3=light_3.position.xyz-vtx;
+    lightVector_3=light_3.positionIntensity.xyz-vtx;
     lightVertexVector_3.x=dot(lightVector_3,tangentSpaceTangent);
     lightVertexVector_3.y=dot(lightVector_3,tangentSpaceBinormal);
     lightVertexVector_3.z=dot(lightVector_3,tangentSpaceNormal);
+
+        // translate the light 4 vector
+
+    lightVector_4=light_4.positionIntensity.xyz-vtx;
+    lightVertexVector_4.x=dot(lightVector_4,tangentSpaceTangent);
+    lightVertexVector_4.y=dot(lightVector_4,tangentSpaceBinormal);
+    lightVertexVector_4.z=dot(lightVector_4,tangentSpaceNormal);
+
+        // translate the light 5 vector
+
+    lightVector_5=light_5.positionIntensity.xyz-vtx;
+    lightVertexVector_5.x=dot(lightVector_5,tangentSpaceTangent);
+    lightVertexVector_5.y=dot(lightVector_5,tangentSpaceBinormal);
+    lightVertexVector_5.z=dot(lightVector_5,tangentSpaceNormal);
 
         // the varying uv
 

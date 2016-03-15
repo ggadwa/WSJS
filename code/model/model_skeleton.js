@@ -58,6 +58,11 @@ class ModelLimbClass
         this.globeSurfaceCount=globeSurfaceCount;
         this.boneIndexes=boneIndexes;
     }
+    
+    getRandomBoneIndex(genRandom)
+    {
+        return(this.boneIndexes[genRandom.randomIndex(this.boneIndexes.length)]);
+    }
 };
 
 //
@@ -355,9 +360,6 @@ class ModelSkeletonClass
 
         r=view.genRandom.randomInBetween(20.0,40.0);
         
-        //backArm=(limb.limbType===LIMB_TYPE_ARM_LEFT);
-        //if (this.lastAnimationFlip) backArm=!backArm;
-        
         z=-armAngle;
         if (limb.limbType===LIMB_TYPE_ARM_LEFT) z=-z;
         
@@ -376,6 +378,25 @@ class ModelSkeletonClass
         for (n=0;n!==nBone;n++) {
             this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);
             x*=0.75;
+        }
+    }
+    
+    randomNextPoseWhip(view,limb)
+    {
+        var n,x,z;
+        var nBone=limb.boneIndexes.length;
+
+        x=view.genRandom.randomInBetween(15,45);
+        z=view.genRandom.randomInBetween(15,45);
+        if (this.lastAnimationFlip) {
+            x=-x;
+            z=-z;
+        }
+            
+        for (n=0;n!==nBone;n++) {
+            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,z);
+            x*=1.1;
+            z*=1.1;
         }
     }
     
@@ -418,6 +439,9 @@ class ModelSkeletonClass
                 case LIMB_TYPE_ARM_RIGHT:
                     this.randomNextPoseArm(view,limb,armRightZAngle);
                     armRightZAngle+=5.0;
+                    break;
+                case LIMB_TYPE_WHIP:
+                    this.randomNextPoseWhip(view,limb);
                     break;
             }
         }

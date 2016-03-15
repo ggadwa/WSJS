@@ -396,6 +396,7 @@ function mainLoop(timeStamp)
     var map=main.map;
     var entityList=main.entityList;
     var soundList=main.soundList;
+    var debug=main.debug;
     
         // next frame
         
@@ -434,7 +435,7 @@ function mainLoop(timeStamp)
     if (drawTick>DRAW_MILLISECONDS) {
         view.loopLastDrawTimeStamp=view.timeStamp; 
 
-        view.draw(map,entityList);
+        view.draw(map,entityList,debug);
         
         view.fpsTotal+=drawTick;
         view.fpsCount++;

@@ -246,7 +246,7 @@ class MapClass
 
     createViewLightsFromMapLights(view)
     {
-        var n,k,nLight,idx;
+        var n,k,nLight,idx,startIdx;
         var x,y,z;
         var light;
 
@@ -264,6 +264,8 @@ class MapClass
             y=view.camera.position.y-light.position.y;
             z=view.camera.position.z-light.position.z;
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
+            
+            light.usedInList=false;         // to make sure we don't add lights twice
         }
         
             // the camera normal
@@ -272,7 +274,7 @@ class MapClass
         this.cameraVector.rotateX(null,view.camera.angle.x);
         this.cameraVector.rotateY(null,view.camera.angle.y);
         
-            // find the four closest lights
+            // find the view.LIGHT_COUNT closest lights
             // and put them into the view list
 
         for (k=0;k!==view.LIGHT_COUNT;k++) {
@@ -280,10 +282,15 @@ class MapClass
         }
 
         view.lights=[];
-
+        
+            // first, we put in all lights where
+            // we are within the light cone, this are
+            // must do lights
+            
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
-
+            if (light.dist>light.intensity) continue;
+            
             idx=-1;
 
             for (k=0;k!==view.lights.length;k++) {
@@ -293,13 +300,39 @@ class MapClass
                 }
             }
             
-                // are we out of the light cone
-                // and behind the light?
+                // add the light
                 
+            if (idx===-1) {
+                if (view.lights.length<view.LIGHT_COUNT) view.lights.push(light);
+            }
+            else {
+                view.lights.splice(idx,0,light);
+                if (view.lights.length>view.LIGHT_COUNT) view.lights.pop();
+            }
+            
+            light.usedInList=true;
+        }
+        
+            // if we have spots left, then closests lights
+            // that aren't behind the player
+            
+        startIdx=view.lights.length;    
+            
+        for (n=0;n!==nLight;n++) {
+            light=this.lights[n];
+            if (light.usedInList) continue;
+            
             this.lightVector.setFromSubPoint(view.camera.position,light.position);   
             this.lightVector.normalize();
-            if (this.lightVector.dot(this.cameraVector)>0.0) {
-                if (light.dist>light.intensity) continue;
+            if (this.lightVector.dot(this.cameraVector)>0.0) continue;
+            
+            idx=-1;
+
+            for (k=startIdx;k<view.lights.length;k++) {
+                if (view.lights[k].dist>light.dist) {
+                    idx=k;
+                    break;
+                }
             }
             
                 // add the light
