@@ -52,10 +52,12 @@ class ModelBoneClass
 
 class ModelLimbClass
 {
-    constructor(limbType,globeSurfaceCount,boneIndexes)
+    constructor(limbType,axis,acrossSurfaceCount,aroundSurfaceCount,boneIndexes)
     {
         this.limbType=limbType;
-        this.globeSurfaceCount=globeSurfaceCount;
+        this.axis=axis;
+        this.acrossSurfaceCount=acrossSurfaceCount;
+        this.aroundSurfaceCount=aroundSurfaceCount;
         this.boneIndexes=boneIndexes;
     }
     

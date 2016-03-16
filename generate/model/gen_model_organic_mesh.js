@@ -52,40 +52,17 @@ class GenModelOrganicMeshClass
         }
     }
     
-    findWidthForEnclosingGlobe(boneList,xBound,zBound)
-    {
-        var n,widRadius;
-        var nBone=boneList.length;
-        var maxGravityDist=0;
-        
-            // find the min gravity distance
-            
-        for (n=0;n!==nBone;n++) {
-            if (boneList[n].gravityLockDistance>maxGravityDist) maxGravityDist=boneList[n].gravityLockDistance;
-        }
-
-            // build the width
-            
-        widRadius=xBound.getSize();
-        if (zBound.getSize()>widRadius) widRadius=zBound.getSize();
-        return(Math.trunc(widRadius*0.5)+maxGravityDist);
-    }
-    
-    findHeightForEnclosingGlobe(boneList,yBound)
+    findMaxGravityForBoneList(boneList)
     {
         var n;
         var nBone=boneList.length;
         var maxGravityDist=0;
         
-            // find the min gravity distance
-            
         for (n=0;n!==nBone;n++) {
             if (boneList[n].gravityLockDistance>maxGravityDist) maxGravityDist=boneList[n].gravityLockDistance;
         }
-
-            // build the height
-        
-        return(Math.trunc(yBound.getSize()*0.5)+maxGravityDist);
+            
+        return(maxGravityDist);
     }
 
         //
@@ -93,9 +70,126 @@ class GenModelOrganicMeshClass
         // center point
         //
         
-    buildGlobeAroundSkeleton(view,globeSurfaceCount,centerPnt,widRadius,highRadius,vertexList,indexes)
+    buildGlobeAroundSkeletonX(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
-        var x,y;
+        var x,yz;
+        var rd,radius,px;
+        var vAng;
+        var v;
+        
+            // create the globe without a top
+            // or bottom and build that with trigs later
+            
+        var yzAngAdd=360.0/aroundSurfaceCount;
+        var xAngAdd=180.0/acrossSurfaceCount;
+
+        var yzAng;
+        var xAng=xAngAdd;
+        
+        var vIdx=0;
+        
+        for (x=1;x!==(acrossSurfaceCount-1);x++) {
+            
+                // get x position and radius
+                // from angle
+            
+            rd=xAng*DEGREE_TO_RAD;
+            radius=aroundRadius*Math.sin(rd);
+            px=centerPnt.x-(acrossRadius*Math.cos(rd));
+            
+            vAng=xAng/180.0;
+            
+                // the band of vertexes
+            
+            yzAng=0.0;
+            
+            for (yz=0;yz!==aroundSurfaceCount;yz++) {
+                v=vertexList[vIdx++];
+                
+                rd=yzAng*DEGREE_TO_RAD;
+                
+                v.position.x=px;
+                v.position.y=centerPnt.y+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
+                v.position.z=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+
+                v.uv.x=yzAng/360.0;
+                v.uv.y=vAng;
+
+                yzAng+=yzAngAdd;
+            }
+            
+            xAng+=xAngAdd;
+        }
+        
+            // end points
+        
+        var minIdx=vIdx;
+        
+        v=vertexList[vIdx++];
+        v.position.setFromValues((centerPnt.x-acrossRadius),centerPnt.y,centerPnt.z);
+        v.uv.setFromValues(0.5,0.0);
+        
+        var maxIdx=Math.trunc(vIdx);
+       
+        v=vertexList[vIdx++];
+        v.position.setFromValues((centerPnt.x+acrossRadius),centerPnt.y,centerPnt.z);
+        v.uv.setFromValues(0.5,1.0);
+        
+            // build the triangles on
+            // all the strips except the
+            // end points
+            
+        var nyz,vNextIdx,v2Idx,v2NextIdx;
+        var iIdx=0;
+        
+        for (x=0;x!==(acrossSurfaceCount-3);x++) {
+            
+            for (yz=0;yz!==aroundSurfaceCount;yz++) {
+                
+                vIdx=(x*aroundSurfaceCount)+yz;
+                v2Idx=((x+1)*aroundSurfaceCount)+yz;
+                
+                nyz=(yz<(aroundSurfaceCount-1))?(yz+1):0;
+
+                vNextIdx=(x*aroundSurfaceCount)+nyz;
+                v2NextIdx=((x+1)*aroundSurfaceCount)+nyz;
+                 
+                indexes[iIdx++]=v2Idx;
+                indexes[iIdx++]=vIdx;
+                indexes[iIdx++]=vNextIdx;
+
+                indexes[iIdx++]=v2Idx;
+                indexes[iIdx++]=vNextIdx;
+                indexes[iIdx++]=v2NextIdx;
+            }
+        }
+        
+            // min end point
+            
+        for (yz=0;yz!==aroundSurfaceCount;yz++) {
+            nyz=(yz<(aroundSurfaceCount-1))?(yz+1):0;
+            
+            indexes[iIdx++]=yz;
+            indexes[iIdx++]=minIdx;
+            indexes[iIdx++]=nyz;
+        }
+        
+            // max end point
+            
+        var maxOff=aroundSurfaceCount*(acrossSurfaceCount-3);
+            
+        for (yz=0;yz!==aroundSurfaceCount;yz++) {
+            nyz=(yz<(aroundSurfaceCount-1))?(yz+1):0;
+            
+            indexes[iIdx++]=maxOff+yz;
+            indexes[iIdx++]=maxIdx;
+            indexes[iIdx++]=maxOff+nyz;
+        }
+    }
+    
+    buildGlobeAroundSkeletonY(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
+    {
+        var xz,y;
         var rd,radius,py;
         var vAng;
         var v;
@@ -103,22 +197,22 @@ class GenModelOrganicMeshClass
             // create the globe without a top
             // or bottom and build that with trigs later
             
-        var xzAngAdd=360.0/globeSurfaceCount;
-        var yAngAdd=180.0/globeSurfaceCount;
+        var xzAngAdd=360.0/aroundSurfaceCount;
+        var yAngAdd=180.0/acrossSurfaceCount;
 
         var xzAng;
         var yAng=yAngAdd;
         
         var vIdx=0;
         
-        for (y=1;y!==(globeSurfaceCount-1);y++) {
+        for (y=1;y!==(acrossSurfaceCount-1);y++) {
             
                 // get y position and radius
                 // from angle
             
             rd=yAng*DEGREE_TO_RAD;
-            radius=widRadius*Math.sin(rd);
-            py=centerPnt.y-(highRadius*Math.cos(rd));
+            radius=aroundRadius*Math.sin(rd);
+            py=centerPnt.y-(acrossRadius*Math.cos(rd));
             
             vAng=yAng/180.0;
             
@@ -126,7 +220,7 @@ class GenModelOrganicMeshClass
             
             xzAng=0.0;
             
-            for (x=0;x!==globeSurfaceCount;x++) {
+            for (xz=0;xz!==aroundSurfaceCount;xz++) {
                 v=vertexList[vIdx++];
                 
                 rd=xzAng*DEGREE_TO_RAD;
@@ -144,38 +238,38 @@ class GenModelOrganicMeshClass
             yAng+=yAngAdd;
         }
         
-            // top and bottom points
+            // end points
         
-        var topIdx=Math.trunc(vIdx);
+        var minIdx=vIdx;
         
         v=vertexList[vIdx++];
-        v.position.setFromValues(centerPnt.x,(centerPnt.y-highRadius),centerPnt.z);
+        v.position.setFromValues(centerPnt.x,(centerPnt.y-acrossRadius),centerPnt.z);
         v.uv.setFromValues(0.5,0.0);
         
-        var botIdx=Math.trunc(vIdx);
+        var maxIdx=Math.trunc(vIdx);
        
         v=vertexList[vIdx++];
-        v.position.setFromValues(centerPnt.x,(centerPnt.y+highRadius),centerPnt.z);
+        v.position.setFromValues(centerPnt.x,(centerPnt.y+acrossRadius),centerPnt.z);
         v.uv.setFromValues(0.5,1.0);
         
             // build the triangles on
             // all the strips except the
-            // top and bottom strip
+            // end points
             
-        var nx,vNextIdx,v2Idx,v2NextIdx;
+        var nxz,vNextIdx,v2Idx,v2NextIdx;
         var iIdx=0;
         
-        for (y=0;y!==(globeSurfaceCount-3);y++) {
+        for (y=0;y!==(acrossSurfaceCount-3);y++) {
             
-            for (x=0;x!==globeSurfaceCount;x++) {
+            for (xz=0;xz!==aroundSurfaceCount;xz++) {
                 
-                vIdx=(y*globeSurfaceCount)+x;
-                v2Idx=((y+1)*globeSurfaceCount)+x;
+                vIdx=(y*aroundSurfaceCount)+xz;
+                v2Idx=((y+1)*aroundSurfaceCount)+xz;
                 
-                nx=(x<(globeSurfaceCount-1))?(x+1):0;
+                nxz=(xz<(aroundSurfaceCount-1))?(xz+1):0;
 
-                vNextIdx=(y*globeSurfaceCount)+nx;
-                v2NextIdx=((y+1)*globeSurfaceCount)+nx;
+                vNextIdx=(y*aroundSurfaceCount)+nxz;
+                v2NextIdx=((y+1)*aroundSurfaceCount)+nxz;
                  
                 indexes[iIdx++]=v2Idx;
                 indexes[iIdx++]=vIdx;
@@ -187,29 +281,146 @@ class GenModelOrganicMeshClass
             }
         }
         
-            // top triangles
+            // min end point
             
-        for (x=0;x!==globeSurfaceCount;x++) {
-            nx=(x<(globeSurfaceCount-1))?(x+1):0;
+        for (xz=0;xz!==aroundSurfaceCount;xz++) {
+            nxz=(xz<(aroundSurfaceCount-1))?(xz+1):0;
             
-            indexes[iIdx++]=x;
-            indexes[iIdx++]=topIdx;
-            indexes[iIdx++]=nx;
+            indexes[iIdx++]=xz;
+            indexes[iIdx++]=minIdx;
+            indexes[iIdx++]=nxz;
         }
         
-            // bottom triangles
+            // max end point
             
-        var botOff=globeSurfaceCount*(globeSurfaceCount-3);
+        var maxOff=aroundSurfaceCount*(acrossSurfaceCount-3);
             
-        for (x=0;x!==globeSurfaceCount;x++) {
-            nx=(x<(globeSurfaceCount-1))?(x+1):0;
+        for (xz=0;xz!==aroundSurfaceCount;xz++) {
+            nxz=(xz<(aroundSurfaceCount-1))?(xz+1):0;
             
-            indexes[iIdx++]=botOff+x;
-            indexes[iIdx++]=botIdx;
-            indexes[iIdx++]=botOff+nx;
+            indexes[iIdx++]=maxOff+xz;
+            indexes[iIdx++]=maxIdx;
+            indexes[iIdx++]=maxOff+nxz;
         }
     }
     
+    buildGlobeAroundSkeletonZ(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
+    {
+        var xy,z;
+        var rd,radius,pz;
+        var vAng;
+        var v;
+        
+            // create the globe without a top
+            // or bottom and build that with trigs later
+            
+        var xyAngAdd=360.0/aroundSurfaceCount;
+        var zAngAdd=180.0/acrossSurfaceCount;
+
+        var xyAng;
+        var zAng=zAngAdd;
+        
+        var vIdx=0;
+        
+        for (z=1;z!==(acrossSurfaceCount-1);z++) {
+            
+                // get y position and radius
+                // from angle
+            
+            rd=zAng*DEGREE_TO_RAD;
+            radius=aroundRadius*Math.sin(rd);
+            pz=centerPnt.z-(acrossRadius*Math.cos(rd));
+            
+            vAng=zAng/180.0;
+            
+                // the band of vertexes
+            
+            xyAng=0.0;
+            
+            for (xy=0;xy!==aroundSurfaceCount;xy++) {
+                v=vertexList[vIdx++];
+                
+                rd=xyAng*DEGREE_TO_RAD;
+                
+                v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
+                v.position.y=centerPnt.y+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
+                v.position.z=pz;
+
+                v.uv.x=xyAng/360.0;
+                v.uv.y=vAng;
+
+                xyAng+=xyAngAdd;
+            }
+            
+            zAng+=zAngAdd;
+        }
+        
+            // end points
+        
+        var minIdx=vIdx;
+        
+        v=vertexList[vIdx++];
+        v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z-acrossRadius));
+        v.uv.setFromValues(0.5,0.0);
+        
+        var maxIdx=Math.trunc(vIdx);
+       
+        v=vertexList[vIdx++];
+        v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z+acrossRadius));
+        v.uv.setFromValues(0.5,1.0);
+        
+            // build the triangles on
+            // all the strips except the
+            // end points
+            
+        var nxy,vNextIdx,v2Idx,v2NextIdx;
+        var iIdx=0;
+        
+        for (z=0;z!==(acrossSurfaceCount-3);z++) {
+            
+            for (xy=0;xy!==aroundSurfaceCount;xy++) {
+                
+                vIdx=(z*aroundSurfaceCount)+xy;
+                v2Idx=((z+1)*aroundSurfaceCount)+xy;
+                
+                nxy=(xy<(aroundSurfaceCount-1))?(xy+1):0;
+
+                vNextIdx=(z*aroundSurfaceCount)+nxy;
+                v2NextIdx=((z+1)*aroundSurfaceCount)+nxy;
+                 
+                indexes[iIdx++]=v2Idx;
+                indexes[iIdx++]=vIdx;
+                indexes[iIdx++]=vNextIdx;
+
+                indexes[iIdx++]=v2Idx;
+                indexes[iIdx++]=vNextIdx;
+                indexes[iIdx++]=v2NextIdx;
+            }
+        }
+        
+            // min end point
+            
+        for (xy=0;xy!==aroundSurfaceCount;xy++) {
+            nxy=(xy<(aroundSurfaceCount-1))?(xy+1):0;
+            
+            indexes[iIdx++]=xy;
+            indexes[iIdx++]=minIdx;
+            indexes[iIdx++]=nxy;
+        }
+        
+            // max end point
+            
+        var maxOff=aroundSurfaceCount*(acrossSurfaceCount-3);
+            
+        for (xy=0;xy!==aroundSurfaceCount;xy++) {
+            nxy=(xy<(aroundSurfaceCount-1))?(xy+1):0;
+            
+            indexes[iIdx++]=maxOff+xy;
+            indexes[iIdx++]=maxIdx;
+            indexes[iIdx++]=maxOff+nxy;
+        }
+    }
+
         //
         // shrink wrap the globe around a
         // collection of points
@@ -430,9 +641,10 @@ class GenModelOrganicMeshClass
         // build around bone list
         //
         
-    buildAroundBoneList(view,globeSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
+    buildAroundBoneList(view,axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
     {
         var n,k,f,boneIdx,bone,parentBone,listBone;
+        var acrossRadius,aroundRadius;
         var extraBoneCount;
         var parentListIdx;
         
@@ -507,14 +719,31 @@ class GenModelOrganicMeshClass
         var zBound=new wsBound(0,0);
         
         this.findBoundsForBoneList(boneList,xBound,yBound,zBound);
-        var widRadius=this.findWidthForEnclosingGlobe(boneList,xBound,zBound);
-        var highRadius=this.findHeightForEnclosingGlobe(boneList,yBound);
         var centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // build the globe and shrink
             // wrap it to bones
+            
+        var maxGravity=this.findMaxGravityForBoneList(boneList);
         
-        this.buildGlobeAroundSkeleton(view,globeSurfaceCount,centerPnt,widRadius,highRadius,vertexList,indexes);
+        switch (axis) {
+            case LIMB_AXIS_X:
+                acrossRadius=(xBound.getSize()*0.5)+maxGravity;
+                aroundRadius=(yBound.getSize()>zBound.getSize())?((yBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
+                this.buildGlobeAroundSkeletonX(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                break;
+            case LIMB_AXIS_Y:
+                acrossRadius=(yBound.getSize()*0.5)+maxGravity;
+                aroundRadius=(xBound.getSize()>zBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
+                this.buildGlobeAroundSkeletonY(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                break;
+            case LIMB_AXIS_Z:
+                acrossRadius=(zBound.getSize()*0.5)+maxGravity;
+                aroundRadius=(xBound.getSize()>yBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((yBound.getSize()*0.5)+maxGravity);
+                this.buildGlobeAroundSkeletonZ(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                break;
+        }
+
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList);
@@ -545,12 +774,12 @@ class GenModelOrganicMeshClass
         for (n=0;n!==skeleton.limbs.length;n++) {
             limb=skeleton.limbs[n];
             
-                        // counts
+                // counts
+                
+            vertexList=MeshUtilityClass.createModelVertexList((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-2))+2);    // around*(across-2) for quads, + 2 for top and bottom point
+            indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-2))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-2))*6 for quads, (around*2)*3 for top and bottom trigs
             
-            vertexList=MeshUtilityClass.createModelVertexList((limb.globeSurfaceCount*(limb.globeSurfaceCount-2))+2);
-            indexes=new Uint16Array(((limb.globeSurfaceCount*(limb.globeSurfaceCount-3))*6)+((limb.globeSurfaceCount*2)*3));
-
-            this.buildAroundBoneList(view,limb.globeSurfaceCount,limb.boneIndexes,vertexList,indexes);
+            this.buildAroundBoneList(view,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
 
             if (modelVertexList===null) {
                 modelVertexList=vertexList;

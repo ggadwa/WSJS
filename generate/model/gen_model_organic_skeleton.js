@@ -35,7 +35,7 @@ class GenModelOrganicSkeletonClass
         bones[wristBoneIdx].gravityLockDistance=armRadius;
         bones[handBoneIdx].gravityLockDistance=armRadius*2;
 
-        skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_ARM_LEFT:LIMB_TYPE_ARM_RIGHT),10,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx]));
+        skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_ARM_LEFT:LIMB_TYPE_ARM_RIGHT),LIMB_AXIS_X,8,5,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx]));
         
             // add fingers to hand
             
@@ -56,7 +56,7 @@ class GenModelOrganicSkeletonClass
             bones[knuckleBoneIdx].gravityLockDistance=fingerRadius;
             bones[fingerBoneIdx].gravityLockDistance=fingerRadius;
             
-            skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_FINGER_LEFT:LIMB_TYPE_FINGER_RIGHT),5,[handBoneIdx,knuckleBoneIdx,fingerBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_FINGER_LEFT:LIMB_TYPE_FINGER_RIGHT),LIMB_AXIS_X,4,4,[handBoneIdx,knuckleBoneIdx,fingerBoneIdx]));
             
             fy+=150;
         }
@@ -79,7 +79,7 @@ class GenModelOrganicSkeletonClass
         bones[kneeBoneIdx].gravityLockDistance=legRadius;
         bones[ankleBoneIdx].gravityLockDistance=legRadius;
 
-        this.model.skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_LEG_LEFT:LIMB_TYPE_LEG_RIGHT),10,[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_LEG_LEFT:LIMB_TYPE_LEG_RIGHT),LIMB_AXIS_Y,8,5,[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx]));
 
             // foot
 
@@ -89,7 +89,7 @@ class GenModelOrganicSkeletonClass
 
         bones[footBoneIdx].gravityLockDistance=legRadius;
         
-        this.model.skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_FOOT_LEFT:LIMB_TYPE_FOOT_RIGHT),5,[ankleBoneIdx,footBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_FOOT_LEFT:LIMB_TYPE_FOOT_RIGHT),LIMB_AXIS_Z,5,5,[ankleBoneIdx,footBoneIdx]));
         
             // add toes to foot
             
@@ -107,7 +107,7 @@ class GenModelOrganicSkeletonClass
             
             bones[toeBoneIdx].gravityLockDistance=toeRadius;
             
-            skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_TOE_LEFT:LIMB_TYPE_TOE_RIGHT),5,[footBoneIdx,toeBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_TOE_LEFT:LIMB_TYPE_TOE_RIGHT),LIMB_AXIS_Z,4,4,[footBoneIdx,toeBoneIdx]));
             
             fx+=150;
         }
@@ -152,7 +152,7 @@ class GenModelOrganicSkeletonClass
         bones[whip2BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.6);
         bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.1);
 
-        skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_WHIP,16,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
+        skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_WHIP,LIMB_AXIS_Z,8,5,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
     }
     
         //
@@ -196,7 +196,7 @@ class GenModelOrganicSkeletonClass
         bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         
-        bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
+        bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_Y,10,10,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
         this.model.skeleton.limbs.push(bodyLimb);
         
             // create head limbs
@@ -213,7 +213,7 @@ class GenModelOrganicSkeletonClass
         bones[jawBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,400);
         bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,150);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,12,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,LIMB_AXIS_Y,8,8,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
         
             // create arm limbs
             // arm length is about quarter body size + some random
@@ -265,9 +265,10 @@ class GenModelOrganicSkeletonClass
         this.buildLimbLegSet(hipBoneIdx,0,0,rotOffset,Math.trunc(botBodyRadius*0.5),bones[hipBoneIdx].position.y,legRadius,footLength);
         
             // create any whips
+            
         for (n=0;n!==3;n++) {
             boneIdx=bodyLimb.getRandomBoneIndex(this.genRandom);
-            rotOffset=this.genRandom.random()*360.0;
+            rotOffset=90.0+((this.genRandom.random()*90.0)-45.0);
             
             whipRadius=Math.trunc(botBodyRadius*0.35);
             if (whipRadius<250) whipRadius=250;
@@ -322,7 +323,7 @@ class GenModelOrganicSkeletonClass
         bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
                     
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_Z,10,10,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
         
             // create the head limbs
 
@@ -340,7 +341,7 @@ class GenModelOrganicSkeletonClass
         bones[jawBoneIdx].gravityLockDistance=headRadius;
         bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,150);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,12,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,LIMB_AXIS_Z,8,8,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
 
             // create legs
         
@@ -394,7 +395,7 @@ class GenModelOrganicSkeletonClass
         bones[torsoBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
         bones[torsoTopBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
             
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_BODY,16,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_Y,10,10,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
         
             // create head limbs
             
@@ -410,7 +411,7 @@ class GenModelOrganicSkeletonClass
         bones[jawBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,400);
         bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,150);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,12,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,LIMB_AXIS_Y,8,8,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
      }
 
         //
