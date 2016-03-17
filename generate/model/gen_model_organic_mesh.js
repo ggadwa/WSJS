@@ -638,6 +638,32 @@ class GenModelOrganicMeshClass
     }
     
         //
+        // random vertex moves along
+        // the line to the attached bone
+        //
+        
+    randomScaleVertexToBones(vertexList)
+    {
+        var n,v,f,len;
+        var bone;
+        var nVertex=vertexList.length;
+        var bones=this.model.skeleton.bones;
+
+        for (n=0;n!==nVertex;n++) {
+            v=vertexList[n];
+            if (v.boneIdx===-1) continue;
+            
+            bone=bones[v.boneIdx];
+            v.position.subPoint(bone.position);
+            
+            f=0.9+(this.genRandom.random()*0.2);
+            v.position.scale(f);
+            
+            v.position.addPoint(bone.position);
+        }
+    }
+    
+        //
         // build around bone list
         //
         
@@ -747,6 +773,7 @@ class GenModelOrganicMeshClass
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList);
+        this.randomScaleVertexToBones(vertexList);
         this.buildNormalsToBones(vertexList,boneList,centerPnt);
         
             // complete the tangent space vectors

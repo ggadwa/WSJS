@@ -18,6 +18,8 @@ class ParticleClass
 
         this.alphaStart=0.0;
         this.alphaEnd=0.0;
+        
+        this.bitmap=null;
 
         this.startTimeStamp=0;
         this.endTimeStamp=0;
@@ -38,7 +40,12 @@ class ParticleClass
         this.randomRot=new wsPoint(0.0,0.0,0.0);
 
         this.vertices=new Float32Array((PARTICLE_MAX_POINTS*4)*3);
+        this.uvs=new Float32Array((PARTICLE_MAX_POINTS*4)*2);
         this.indexes=new Uint16Array((PARTICLE_MAX_POINTS*2)*3);
+        
+        this.vertexPosBuffer=null;
+        this.vertexUVBuffer=null;
+        this.indexBuffer=null;
     }
     
         //
@@ -52,6 +59,7 @@ class ParticleClass
         }
 
         this.vertexPosBuffer=view.gl.createBuffer();
+        this.vertexUVBuffer=view.gl.createBuffer();
         this.indexBuffer=view.gl.createBuffer();
     }
     
@@ -60,6 +68,7 @@ class ParticleClass
         this.points=[];
 
         view.gl.deleteBuffer(this.vertexPosBuffer);
+        view.gl.deleteBuffer(this.vertexUVBuffer);
         view.gl.deleteBuffer(this.indexBuffer);
     }
     
@@ -95,6 +104,11 @@ class ParticleClass
     setCenterPointFromPoint(pt)
     {
         this.centerPt.setFromPoint(pt);
+    }
+    
+    setBitmap(bitmap)
+    {
+        this.bitmap=bitmap;
     }
 
     setColor(colorStartR,colorStartG,colorStartB,colorEndR,colorEndG,colorEndB)
@@ -161,7 +175,7 @@ class ParticleClass
 
     draw(view,particleShader)
     {
-        var n,pnt,vIdx,iIdx,elementIdx;
+        var n,pnt,vIdx,uvIdx,iIdx,elementIdx;
         var timeFactor,radius,moveFactor,r,g,b,alpha;
         var gl=view.gl;
         
@@ -186,6 +200,7 @@ class ParticleClass
             // build the vertices
 
         vIdx=0;
+        uvIdx=0;
         iIdx=0;
         elementIdx=0;
         
@@ -204,32 +219,47 @@ class ParticleClass
             this.vertices[vIdx++]=this.topLeft.y+(pnt.y*moveFactor)+this.centerPt.y;
             this.vertices[vIdx++]=this.topLeft.z+(pnt.z*moveFactor)+this.centerPt.z;
             
+            this.uvs[uvIdx++]=0.0;
+            this.uvs[uvIdx++]=0.0;
+            
             this.topRight.x=radius;
             this.topRight.y=-radius;
             this.topRight.z=0.0;
             this.topRight.matrixMultiplyIgnoreTransform(view.billboardXMatrix);
             this.topRight.matrixMultiplyIgnoreTransform(view.billboardYMatrix);
+            
             this.vertices[vIdx++]=this.topRight.x+(pnt.x*moveFactor)+this.centerPt.x;
             this.vertices[vIdx++]=this.topRight.y+(pnt.y*moveFactor)+this.centerPt.y;
             this.vertices[vIdx++]=this.topRight.z+(pnt.z*moveFactor)+this.centerPt.z;
+            
+            this.uvs[uvIdx++]=1.0;
+            this.uvs[uvIdx++]=0.0;
             
             this.bottomRight.x=radius;
             this.bottomRight.y=radius;
             this.bottomRight.z=0.0;
             this.bottomRight.matrixMultiplyIgnoreTransform(view.billboardXMatrix);
             this.bottomRight.matrixMultiplyIgnoreTransform(view.billboardYMatrix);
+            
             this.vertices[vIdx++]=this.bottomRight.x+(pnt.x*moveFactor)+this.centerPt.x;
             this.vertices[vIdx++]=this.bottomRight.y+(pnt.y*moveFactor)+this.centerPt.y;
             this.vertices[vIdx++]=this.bottomRight.z+(pnt.z*moveFactor)+this.centerPt.z;
+            
+            this.uvs[uvIdx++]=1.0;
+            this.uvs[uvIdx++]=1.0;
             
             this.bottomLeft.x=-radius;
             this.bottomLeft.y=radius;
             this.bottomLeft.z=0.0;
             this.bottomLeft.matrixMultiplyIgnoreTransform(view.billboardXMatrix);
             this.bottomLeft.matrixMultiplyIgnoreTransform(view.billboardYMatrix);
+            
             this.vertices[vIdx++]=this.bottomLeft.x+(pnt.x*moveFactor)+this.centerPt.x;
             this.vertices[vIdx++]=this.bottomLeft.y+(pnt.y*moveFactor)+this.centerPt.y;
             this.vertices[vIdx++]=this.bottomLeft.z+(pnt.z*moveFactor)+this.centerPt.z;
+            
+            this.uvs[uvIdx++]=0.0;
+            this.uvs[uvIdx++]=1.0;
             
                 // build the triangles
             
@@ -244,7 +274,9 @@ class ParticleClass
             elementIdx+=4;
         }
 
-            // set the color and alpha
+            // set texture, color, alpha
+            
+        this.bitmap.attachAsParticle();
 
         gl.uniform4f(particleShader.colorAlphaUniform,r,g,b,alpha);
 
@@ -252,8 +284,11 @@ class ParticleClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.STREAM_DRAW);
-
         gl.vertexAttribPointer(particleShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.STREAM_DRAW);
+        gl.vertexAttribPointer(particleShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STREAM_DRAW);

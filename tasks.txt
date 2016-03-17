@@ -16,7 +16,6 @@ REGULAR TODOs
 
 
 
-#### blobs should be able to have random whip limbs
 #### stacked block textures can have (randomly) altered Y sizes (one line)
 #### collisions against slanted walls are bad
 #### glowing computer lights?
@@ -27,8 +26,8 @@ REGULAR TODOs
 [X] some decoration random min/maxes are now dynamic based on room sizes
 [X] table decorations is now tables and shelves
 [X] better and more precise model sphere wrapping
-[ ] whip/tail type limbs
-[ ] random model mesh vertex variations
+[X] whip/tail type limbs
+[X] random model mesh vertex variations
 [ ] spikes
 
 

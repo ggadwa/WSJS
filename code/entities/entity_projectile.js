@@ -20,7 +20,7 @@ class EntityProjectileClass extends EntityClass
         // run projectile
         //
     
-    run(view,soundList,map,entityList)
+    run(view,bitmapList,soundList,map,entityList)
     {
             // supergumba -- right now cancel any projectile
             // that last over 10 seconds
@@ -34,7 +34,7 @@ class EntityProjectileClass extends EntityClass
             
         if (super.moveSimple(map,entityList,400,false)) {
             super.markAsDelete();
-            view.particleList.addExplosionParticles(view,this.position);
+            view.particleList.addExplosionParticles(view,bitmapList.getBitmap('Particle Blob'),this.position);
             this.hitSound.play(this.position);
         }
     }

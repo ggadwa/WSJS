@@ -192,6 +192,8 @@ const LIMB_TYPE_ARM_LEFT=2;
 const LIMB_TYPE_ARM_RIGHT=3;
 const LIMB_TYPE_LEG_LEFT=4;
 const LIMB_TYPE_LEG_RIGHT=5;
+const LIMB_TYPE_HAND_LEFT=8;
+const LIMB_TYPE_HAND_RIGHT=9;
 const LIMB_TYPE_FINGER_LEFT=6;
 const LIMB_TYPE_FINGER_RIGHT=7;
 const LIMB_TYPE_FOOT_LEFT=8;
@@ -276,6 +278,7 @@ const GEN_BITMAP_TYPE_MACHINE=14;
 const GEN_BITMAP_TYPE_SKIN_SCALE=15;
 const GEN_BITMAP_TYPE_SKIN_LEATHER=16;
 const GEN_BITMAP_TYPE_SKIN_FUR=17;
+const GEN_BITMAP_TYPE_PARTICLE_BLOB=18;
 
 const GEN_BITMAP_TYPE_NAMES=[
                                 'Brick Stack','Brick Random','Stone',
@@ -283,7 +286,7 @@ const GEN_BITMAP_TYPE_NAMES=[
                                 'Metal','Metal Bar','Metal Corrugated',
                                 'Concrete','Plaster','Mosaic','Wood Plank',
                                 'Wood Box','Machine','Skin Scale',
-                                'Skin Leather','Skin Fur'
+                                'Skin Leather','Skin Fur','Particle Blob'
                             ];
 
 const GEN_BITMAP_TILE_STYLE_BORDER=0;

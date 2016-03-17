@@ -16,7 +16,7 @@ class EntityMonsterClass extends EntityClass
         // run monster
         //
     
-    run(view,soundList,map,entityList)
+    run(view,bitmapList,soundList,map,entityList)
     {
         var player,touchEntity;
         

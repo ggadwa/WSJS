@@ -88,7 +88,7 @@ class EntityPlayerClass extends EntityClass
         // run player
         //
     
-    run(view,soundList,map,entityList)
+    run(view,bitmapList,soundList,map,entityList)
     {
         var bump,weapon;
         

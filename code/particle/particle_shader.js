@@ -9,7 +9,9 @@ class ParticleShaderClass extends ShaderClass
     constructor()
     {
         super();
+        
         this.vertexPositionAttribute=null;
+        this.vertexUVAttribute=null;
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;    
         this.colorAlphaUniform=null;
@@ -21,6 +23,8 @@ class ParticleShaderClass extends ShaderClass
 
     initialize(view,fileCache)
     {
+        var gl=view.gl;
+        
             // get a new shader object
             // and load/compile it
 
@@ -28,16 +32,21 @@ class ParticleShaderClass extends ShaderClass
 
             // setup uniforms
 
-        view.gl.useProgram(this.program);
+        gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
-        this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.program,'perspectiveMatrix');
-        this.modelMatrixUniform=view.gl.getUniformLocation(this.program,'modelMatrix');
+        this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
+        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         
-        this.colorAlphaUniform=view.gl.getUniformLocation(this.program,'colorAlpha');
+        this.colorAlphaUniform=gl.getUniformLocation(this.program,'colorAlpha');
+        
+            // texture uniforms never change
+            
+        gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
 
         return(true);
     }
@@ -65,6 +74,7 @@ class ParticleShaderClass extends ShaderClass
             // enable the vertex attributes
 
         view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        view.gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
     drawEnd(view)
@@ -72,6 +82,7 @@ class ParticleShaderClass extends ShaderClass
             // disable vertex attributes
 
         view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        view.gl.disableVertexAttribArray(this.vertexUVAttribute);
 
             // no longer using shader
 

@@ -297,6 +297,11 @@ class wsPoint
         return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
     }
     
+    length()
+    {
+        return(Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z)));
+    }
+    
     normalize()
     {
         var f=Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z));
