@@ -10,6 +10,8 @@ class GenRandomClass
     {
         this.mwcW=(seed<<16)&0xFFFF;
         this.mwcZ=seed&0xFFFF;
+        
+        Object.seal(this);
     }
     
         //

@@ -19,6 +19,8 @@ class GenMapClass
             // generation concludes
 
         this.callbackFunc=callbackFunc;
+        
+        Object.seal(this);
     }
     
         //

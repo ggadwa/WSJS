@@ -9,6 +9,8 @@ class DebugClass
     constructor()
     {
         this.debugShader=new DebugShaderClass();
+        
+        Object.seal(this);
     }
     
         //

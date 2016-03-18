@@ -8,6 +8,7 @@ class MeshPrimitivesClass
 {
     constructor()
     {
+        Object.seal(this);
     }
     
         //

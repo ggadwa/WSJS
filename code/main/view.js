@@ -10,6 +10,8 @@ class ViewCameraClass
     {
         this.position=new wsPoint(0.0,0.0,0.0);
         this.angle=new wsPoint(0.0,0.0,0.0);
+        
+        Object.seal(this);
     }
     
         //
@@ -45,7 +47,7 @@ class ViewClass
         this.OPENGL_NEAR_Z=500;
         this.OPENGL_FAR_Z=300000;
 
-        this.VIEW_NORMAL_CULL_LIMIT=0.3;
+        this.VIEW_NORMAL_CULL_LIMIT=0.0;
 
         this.wid=0;
         this.high=0;
@@ -121,6 +123,7 @@ class ViewClass
 
             // stats
 
+        this.fps=0.0;
         this.fpsTotal=0;
         this.fpsCount=0;
         this.fpsStartTimeStamp=0;
@@ -134,6 +137,8 @@ class ViewClass
 
         this.loadingStrings=[];
         this.loadingLastAddMsec=0;
+        
+        Object.seal(this);
     }
     
         //

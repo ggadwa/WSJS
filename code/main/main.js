@@ -38,8 +38,7 @@ class MainClass
                 ['Map Machine',[GEN_BITMAP_TYPE_MACHINE]],
                 ['Skin Scale',[GEN_BITMAP_TYPE_SKIN_SCALE]],
                 ['Skin Leather',[GEN_BITMAP_TYPE_SKIN_LEATHER]],
-                ['Skin Fur',[GEN_BITMAP_TYPE_SKIN_FUR]],
-                ['Particle Blob',[GEN_BITMAP_TYPE_PARTICLE_BLOB]]
+                ['Skin Fur',[GEN_BITMAP_TYPE_SKIN_FUR]]
             ];
 
             // sound list for the game
@@ -50,6 +49,8 @@ class MainClass
                 ['explosion',GEN_SOUND_TYPE_EXPLOSION],
                 ['monster scream',GEN_SOUND_TYPE_MONSTER_SCREAM]
             ];
+            
+        Object.seal(this);
     }
 
     run()
@@ -396,7 +397,6 @@ function mainLoop(timeStamp)
     var view=main.view;
     var map=main.map;
     var entityList=main.entityList;
-    var bitmapList=main.bitmapList;
     var soundList=main.soundList;
     var debug=main.debug;
     
@@ -423,7 +423,7 @@ function mainLoop(timeStamp)
     while (physicsTick>PHYSICS_MILLISECONDS) {
         physicsTick-=PHYSICS_MILLISECONDS;
         
-        entityList.run(view,bitmapList,soundList,map);
+        entityList.run(view,soundList,map);
     }
     
         // update the listener

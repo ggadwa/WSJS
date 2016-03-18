@@ -12,6 +12,8 @@ class MapOverlayShaderClass extends ShaderClass
         this.vertexPositionAttribute=null;
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
+        
+        Object.seal(this);
     }
     
     //

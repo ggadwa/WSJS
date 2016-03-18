@@ -12,6 +12,8 @@ class SoundListClass
         this.sounds=null;
 
         this.listenerForwardVector=new wsPoint(0.0,0.0,1.0);            // local to global to avoid GC
+        
+        Object.seal(this);
     }
     
         //

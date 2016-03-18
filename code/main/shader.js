@@ -10,6 +10,8 @@ class ShaderLightClass
     {
         this.positionIntensityUniform=null;
         this.colorExponentUniform=null;
+        
+        Object.seal(this);
     }
 }
 
@@ -24,6 +26,8 @@ class ShaderClass
         this.vertexShader=null;
         this.fragmentShader=null;
         this.program=null;
+        
+        // no seal, this class is extended
     }
     
         //

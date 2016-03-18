@@ -8,6 +8,7 @@ class MeshUtilityClass
 {
     constructor()
     {
+        Object.seal(this);
     }
     
         //

@@ -19,6 +19,8 @@ class EntityPlayerClass extends EntityClass
         this.weaponCurrentIndex=-1;
         this.weaponFired=false;
         this.weapons=[];
+        
+        Object.seal(this);
     }
     
         //
@@ -88,7 +90,7 @@ class EntityPlayerClass extends EntityClass
         // run player
         //
     
-    run(view,bitmapList,soundList,map,entityList)
+    run(view,soundList,map,entityList)
     {
         var bump,weapon;
         

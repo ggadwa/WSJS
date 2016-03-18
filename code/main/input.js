@@ -19,6 +19,8 @@ class InputClass
         this.mouseLastPos=new ws2DIntPoint(0,0);
 
         this.playerEntity=null;
+        
+        Object.seal(this);
     }
     
         //

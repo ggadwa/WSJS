@@ -13,6 +13,8 @@ class TextShaderClass extends ShaderClass
         this.vertexUVAttribute=null;
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
+        
+        Object.seal(this);
     }
     
     //

@@ -21,6 +21,8 @@ class CollisionClass
         this.objXBound=new wsBound(0,0);
         this.objYBound=new wsBound(0,0);
         this.objZBound=new wsBound(0,0);
+        
+        Object.seal(this);
     }
     
         //

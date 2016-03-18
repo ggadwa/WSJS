@@ -10,6 +10,8 @@ class GenBitmapClass
     {    
         this.genRandom=genRandom;
         this.genBitmapUtility=new GenBitmapUtilityClass(genRandom);
+        
+        Object.seal(this);
     }
     
         //
@@ -152,6 +154,7 @@ class GenBitmapClass
             edgeSize=this.genRandom.randomInt(5,12);     // new edge size as stones aren't the same
 
             this.genBitmapUtility.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
+            this.genBitmapUtility.blur(bitmapCTX,(rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4);
             
                 // cracked lines
                 
@@ -220,7 +223,7 @@ class GenBitmapClass
         this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,20,lineColor);
     }
 
-    generateTileInner(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,complex,skipTile)
+    generateTileInner(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,paddingSize,complex)
     {
         var x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh;
         var col;
@@ -238,29 +241,25 @@ class GenBitmapClass
         for (y=0;y!==splitCount;y++) {
 
             dTop=top+(tileHigh*y);
-            dBot=dTop+tileHigh;
+            dBot=(dTop+tileHigh)-paddingSize;
             if (y===(splitCount-1)) dBot=bot;
 
             dLft=lft;
 
             for (x=0;x!==splitCount;x++) {
                 
-                    // possible broken tile
-                    
-                if (skipTile) {
-                    if (this.genRandom.randomPercentage(0.02)) continue;
-                }
-
                 dLft=lft+(tileWid*x);
                 dRgt=dLft+tileWid;
                 if (x===(splitCount-1)) dRgt=rgt;
+                
+                dRgt-=paddingSize;
 
                     // sometimes a tile piece is a recursion to
                     // another tile set
 
                 if ((complex) && (this.genRandom.randomPercentage(0.25))) {
                     tileStyle=this.genRandom.randomIndex(3);
-                    this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,false,false);
+                    this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,paddingSize,false);
                     continue;
                 }
 
@@ -317,34 +316,30 @@ class GenBitmapClass
 
         if (!small) {
             splitCount=this.genRandom.randomInt(2,2);
-            tileStyle=this.genRandom.randomIndex(3);
             tileColor[0]=this.genBitmapUtility.getRandomColor([0.3,0.3,0.4],[0.6,0.6,0.7]);
-            tileColor[1]=this.genBitmapUtility.darkenColor(tileColor[0],0.8);
         }
         else {
-            splitCount=8;
-            tileStyle=GEN_BITMAP_TILE_STYLE_CHECKER;
+            splitCount=this.genRandom.randomInt(6,4);
             tileColor[0]=this.genBitmapUtility.getRandomColor([0.5,0.3,0.3],[0.8,0.6,0.6]);
-            tileColor[1]=this.genBitmapUtility.darkenColor(tileColor[0],0.9);
+            
         }
+        
+        tileStyle=this.genRandom.randomIndex(3);
+        tileColor[1]=this.genBitmapUtility.darkenColor(tileColor[0],0.85);
 
             // clear canvas
-            // if small, we can skip tiles so
-            // need to blur grout underneath
 
         groutColor=this.genBitmapUtility.getRandomGreyColor(0.3,0.4);
         this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,groutColor);
         
-        if (small) {
-            this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.9);
-            this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,5);
-        }
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,normalCTX,0,0,wid,high,0.6,0.8,0.9);
+        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,5);
         
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // original splits
 
-        this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,tileStyle,splitCount,(small?2:5),complex,small);
+        this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,tileStyle,splitCount,(small?2:5),(small?3:0),complex);
 
             // tile noise
 
@@ -1201,7 +1196,7 @@ class GenBitmapClass
                 this.generateSkinFur(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=1.0;
                 break;
-
+                
         }
 
             // if view is null, then we are in the special

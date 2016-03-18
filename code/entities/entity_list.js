@@ -10,6 +10,8 @@ class EntityListClass
     {
         this.entityCurrentId=1;
         this.entities=[];
+        
+        Object.seal(this);
     }
     
         //
@@ -72,7 +74,7 @@ class EntityListClass
         // run all entities
         //
         
-    run(view,bitmapList,soundList,map)
+    run(view,soundList,map)
     {
         var n;
         var nEntity=this.entities.length;
@@ -80,7 +82,7 @@ class EntityListClass
             // run the entities
             
         for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(view,bitmapList,soundList,map,this);
+            this.entities[n].run(view,soundList,map,this);
         }
         
             // now clean up any that got

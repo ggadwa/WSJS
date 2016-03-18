@@ -12,6 +12,8 @@ class FileClass
     {
         this.name=name;
         this.data=data;
+        
+        Object.seal(this);
     }
 }
 
@@ -40,6 +42,8 @@ class FileCacheClass
                 'shaders/text.frag',
                 'shaders/text.vert'
         ];
+        
+        Object.seal(this);
     }
 
         //

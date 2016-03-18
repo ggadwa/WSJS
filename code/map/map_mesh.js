@@ -13,6 +13,8 @@ class MapMeshVertexClass
         this.tangent=new wsPoint(0.0,0.0,0.0);
         this.uv=new ws2DPoint(0.0,0.0);
         this.lightmapUV=new ws2DPoint(0.0,0.0);
+        
+        Object.seal(this);
     }
 }
 
@@ -28,6 +30,8 @@ class MapMeshLightMapTrigCacheClass
         this.v0=v0;        // point 0 on the triangle
         this.v10=v10;      // vector of point 1-point 0
         this.v20=v20;      // vector of point 2-point 0
+        
+        Object.seal(this);
     }
 }
 
@@ -68,12 +72,16 @@ class MapMeshClass
         this.vertexPosBuffer=null;
         this.vertexNormalBuffer=null;
         this.vertexTangentBuffer=null;
-        this.vertexAndLightmapUVAttribute=null;
+        this.vertexAndLightmapUVBuffer=null;
         this.indexBuffer=null;
 
             // special caches for light map building
 
         this.trigRayTraceCache=null;
+        
+            // light intersection lists
+            
+        this.lightIntersectList=null;
 
             // collision lists
 
@@ -81,6 +89,8 @@ class MapMeshClass
         this.collisionRects=[];
         
         this.setupBounds();
+        
+        Object.seal(this);
     }
     
         //
@@ -97,7 +107,7 @@ class MapMeshClass
         if (this.vertexPosBuffer!==null) gl.deleteBuffer(this.vertexPosBuffer);
         if (this.vertexNormalBuffer!==null) gl.deleteBuffer(this.vertexNormalBuffer);
         if (this.vertexTangentBuffer!==null) gl.deleteBuffer(this.vertexTangentBuffer);
-        if (this.vertexAndLightmapUVAttribute!==null) gl.deleteBuffer(this.vertexAndLightmapUVAttribute);
+        if (this.vertexAndLightmapUVBuffer!==null) gl.deleteBuffer(this.vertexAndLightmapUVBuffer);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     }

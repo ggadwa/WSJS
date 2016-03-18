@@ -26,6 +26,8 @@ class MapRoomClass
         if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+ROOM_FLOOR_DEPTH);
         
         this.setupGrid();
+        
+        Object.seal(this);
     }
     
     setupGrid()

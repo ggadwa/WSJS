@@ -12,6 +12,8 @@ class InterfaceClass
 
         this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
         this.vertexPosBuffer=null;
+        
+        Object.seal(this);
     }
     
         //

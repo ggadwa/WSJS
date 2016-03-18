@@ -23,6 +23,8 @@ class GenBitmapUtilityClass
         this.NORMAL_RIGHT_10=new wsPoint(0.1,0.0,0.90);
         this.NORMAL_TOP_10=new wsPoint(0.0,0.1,0.90);
         this.NORMAL_BOTTOM_10=new wsPoint(0.0,-0.1,0.90);
+        
+        Object.seal(this);
     }
 
         //
@@ -527,6 +529,29 @@ class GenBitmapUtilityClass
 
         specularCTX.putImageData(specularImgData,0,0);
     }
+    
+        //
+        // channel swaps
+        //
+        
+    swapRedToAlpha(bitmapCTX,wid,high)
+    {
+        var n,nPixel,idx;
+        
+        var bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
+        var bitmapData=bitmapImgData.data;
+        
+        idx=0;
+        nPixel=wid*high;
+        
+        for (n=0;n!==nPixel;n++) {
+            bitmapData[idx+3]=bitmapData[idx];
+            idx+=4;
+        }
+        
+        bitmapCTX.putImageData(bitmapImgData,0,0);
+    }
+
 
         //
         // rectangles, ovals, lines
@@ -825,6 +850,22 @@ class GenBitmapUtilityClass
         bitmapCTX.lineTo(mx,bot);
         bitmapCTX.lineTo(lft,my);
         bitmapCTX.lineTo(mx,top);
+        bitmapCTX.fill();
+    }
+    
+    drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor)
+    {
+        var mx,my,radius;
+
+        mx=Math.trunc((lft+rgt)/2);
+        my=Math.trunc((top+bot)/2);
+        
+        radius=Math.trunc((rgt-lft)/2);
+
+        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        
+        bitmapCTX.beginPath();
+        bitmapCTX.arc(mx,my,radius,0.0,(Math.PI*2));
         bitmapCTX.fill();
     }
 

@@ -22,6 +22,8 @@ class MapClass
         this.lightXBound=new wsBound(0,0);
         this.lightYBound=new wsBound(0,0);
         this.lightZBound=new wsBound(0,0);
+        
+        Object.seal(this);
     }
     
         //

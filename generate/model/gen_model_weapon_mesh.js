@@ -24,6 +24,8 @@ class GenModelWeaponMeshClass
         this.CYLINDER_SIDE_COUNT=12;
         this.CYLINDER_VERTEX_COUNT=((this.CYLINDER_SIDE_COUNT*3)*2);
         this.CYLINDER_INDEX_COUNT=(this.CYLINDER_SIDE_COUNT*6);
+        
+        Object.seal(this);
     }
     
     /*

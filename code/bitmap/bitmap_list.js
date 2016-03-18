@@ -10,6 +10,8 @@ class BitmapListClass
     {
         this.view=view;
         this.bitmaps=null;
+        
+        Object.seal(this);
     }
     
         //

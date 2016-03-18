@@ -11,6 +11,8 @@ class GenRoomPlatformClass
         this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
         //

@@ -52,6 +52,8 @@ class BitmapClass
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.bindTexture(gl.TEXTURE_2D,null);
         }
+        
+        Object.seal(this);
     }
     
         //

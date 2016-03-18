@@ -2,8 +2,8 @@
 // room generation
 //
 
-const ROOM_MAX_RECURSION_DEPTH=1;//3;               // how far we recurse building the map, room to room, determines the size of the map
-const ROOM_MAX_CONNECTION_COUNT=0;//10;             // how many times we try to create a room that connects with this room
+const ROOM_MAX_RECURSION_DEPTH=3;               // how far we recurse building the map, room to room, determines the size of the map
+const ROOM_MAX_CONNECTION_COUNT=10;             // how many times we try to create a room that connects with this room
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
 const ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is
@@ -67,16 +67,16 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
 //
 
 const MONSTER_MODEL_COUNT=3;
-const MONSTER_ENTITY_COUNT=5;
+const MONSTER_ENTITY_COUNT=15;
 
-const MONSTER_AI_ON=false;
+const MONSTER_AI_ON=true;
 
 //
 // particles
@@ -92,11 +92,11 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 
 const SEED=Date.now();
 
-const SEED_MAP_BITMAP=1; //Math.trunc((Math.random()*SEED));
-const SEED_MAP=1; //Math.trunc((Math.random()*SEED));
+const SEED_MAP_BITMAP=Math.trunc((Math.random()*SEED));
+const SEED_MAP=Math.trunc((Math.random()*SEED));
 const SEED_MODEL_BITMAP=Math.trunc((Math.random()*SEED));
-const SEED_MODEL=1; //Math.trunc((Math.random()*SEED));
-const SEED_ENTITY=1; //Math.trunc((Math.random()*SEED));
+const SEED_MODEL=Math.trunc((Math.random()*SEED));
+const SEED_ENTITY=Math.trunc((Math.random()*SEED));
 const SEED_SOUND=Math.trunc((Math.random()*SEED));
 
 //
@@ -278,7 +278,6 @@ const GEN_BITMAP_TYPE_MACHINE=14;
 const GEN_BITMAP_TYPE_SKIN_SCALE=15;
 const GEN_BITMAP_TYPE_SKIN_LEATHER=16;
 const GEN_BITMAP_TYPE_SKIN_FUR=17;
-const GEN_BITMAP_TYPE_PARTICLE_BLOB=18;
 
 const GEN_BITMAP_TYPE_NAMES=[
                                 'Brick Stack','Brick Random','Stone',
@@ -286,7 +285,7 @@ const GEN_BITMAP_TYPE_NAMES=[
                                 'Metal','Metal Bar','Metal Corrugated',
                                 'Concrete','Plaster','Mosaic','Wood Plank',
                                 'Wood Box','Machine','Skin Scale',
-                                'Skin Leather','Skin Fur','Particle Blob'
+                                'Skin Leather','Skin Fur'
                             ];
 
 const GEN_BITMAP_TILE_STYLE_BORDER=0;

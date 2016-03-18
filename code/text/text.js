@@ -24,6 +24,8 @@ class Text
         this.vertexPosBuffer=null;
         this.uvPosBuffer=null;
         this.indexBuffer=null;
+        
+        Object.seal(this);
     }
     
         //

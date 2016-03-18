@@ -10,13 +10,15 @@ class EntityMonsterClass extends EntityClass
     {
         super(name,position,angle,radius,high,model);
         this.active=false;
+        
+        Object.seal(this);
     }
     
         //
         // run monster
         //
     
-    run(view,bitmapList,soundList,map,entityList)
+    run(view,soundList,map,entityList)
     {
         var player,touchEntity;
         
@@ -41,11 +43,14 @@ class EntityMonsterClass extends EntityClass
             this.active=(dist<25000);
         }
         
-        if (this.active) {
+        if (!this.active) {
+            this.model.skeleton.idlePose(view,this.model.modelType);
+        }
+        else {
             
                 // pose
             
-            this.model.skeleton.randomPose(view,this.model.modelType);
+            this.model.skeleton.walkPose(view,this.model.modelType);
         
                 // turn towards player
 

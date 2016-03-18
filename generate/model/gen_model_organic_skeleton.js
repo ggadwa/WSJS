@@ -10,16 +10,18 @@ class GenModelOrganicSkeletonClass
     {
         this.model=model;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
         //
         // build chunks
         //
         
-    buildLimbArm(vct,nameSuffix,torsoTopBoneIdx,armRadius,y,shoulderLength,elbowLength,wristLength,handLength,fingerLength,leftLimb)
+    buildLimbArm(vct,nameSuffix,torsoTopBoneIdx,armRadius,y,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,leftLimb)
     {
         var shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx,knuckleBoneIdx,fingerBoneIdx;
-        var n,nFinger,fy,fingerRadius,knuckleLength,fingerTotalLength,handRadius;
+        var n,fy,fingerRadius,knuckleLength,fingerTotalLength,handRadius;
         var skeleton=this.model.skeleton;
         var bones=skeleton.bones;
         
@@ -46,17 +48,15 @@ class GenModelOrganicSkeletonClass
         
             // add fingers to hand
             
-        nFinger=this.genRandom.randomInt(3,3);
-        
         fingerRadius=Math.trunc(armRadius*0.5);
         if (fingerRadius<100) fingerRadius=100;
         
         knuckleLength=handLength+Math.trunc(handRadius*0.5);
         fingerTotalLength=knuckleLength+fingerLength;
 
-        fy=y-Math.trunc((nFinger/2)*150);
+        fy=y-Math.trunc((fingerCount/2)*150)+75;
         
-        for (n=0;n!==nFinger;n++) {
+        for (n=0;n!==fingerCount;n++) {
             knuckleBoneIdx=bones.push(new ModelBoneClass(('Finger Knuckle'+n+nameSuffix),handBoneIdx,new wsPoint((knuckleLength*vct.x),fy,(knuckleLength*vct.z))))-1;
             fingerBoneIdx=bones.push(new ModelBoneClass(('Finger'+n+nameSuffix),knuckleBoneIdx,new wsPoint((fingerTotalLength*vct.x),fy,(fingerTotalLength*vct.z))))-1;
             
@@ -69,10 +69,10 @@ class GenModelOrganicSkeletonClass
         }
     }
     
-    buildLimbLeg(vct,boneIdx,nameSuffix,hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeLength,leftLimb)
+    buildLimbLeg(vct,boneIdx,nameSuffix,hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,leftLimb)
     {
         var legHipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx,knuckleBoneIdx,toeBoneIdx;
-        var n,nToe,knuckleLength,toeRadius,toeTotalLength,fx,fz,vct;
+        var n,knuckleLength,toeRadius,toeTotalLength,fx,fz,vct;
         var skeleton=this.model.skeleton;
         var bones=skeleton.bones;
         
@@ -100,17 +100,15 @@ class GenModelOrganicSkeletonClass
         
             // add toes to foot
             
-        nToe=this.genRandom.randomInt(3,3);
-        
         toeRadius=Math.trunc(legRadius*0.5);
         if (toeRadius<100) toeRadius=100;
         
         knuckleLength=Math.trunc(footLength*0.5);
         toeTotalLength=knuckleLength+toeLength;
 
-        fx=vct.x-Math.trunc((nToe/2)*150);
+        fx=(vct.x-Math.trunc((toeCount/2)*150))+75;
         
-        for (n=0;n!==nToe;n++) {
+        for (n=0;n!==toeCount;n++) {
             knuckleBoneIdx=bones.push(new ModelBoneClass(('Toe Knuckle'+n+nameSuffix),footBoneIdx,new wsPoint(fx,ankleHigh,(fz-knuckleLength))))-1;
             toeBoneIdx=bones.push(new ModelBoneClass(('Toe'+n+nameSuffix),knuckleBoneIdx,new wsPoint(fx,ankleHigh,(fz-toeTotalLength))))-1;
             
@@ -127,17 +125,19 @@ class GenModelOrganicSkeletonClass
     {
         var kneeHigh=Math.trunc(hipHigh*0.5);
         var ankleHigh=Math.trunc(hipHigh*0.05);
+        
+        var toeCount=this.genRandom.randomInt(1,3);
         var toeLength=this.genRandom.randomInt(Math.trunc(legRadius*0.5),legRadius);
         
         var vct=new wsPoint(hipRadius,0.0,0.0);
         vct.rotateY(null,rotOffset);
         vct.z+=boneOffset;
-        this.buildLimbLeg(vct,boneIdx,('Left'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeLength,true);
+        this.buildLimbLeg(vct,boneIdx,('Left'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,true);
 
         vct=new wsPoint(-hipRadius,0.0,0.0);
         vct.rotateY(null,-rotOffset);
         vct.z+=boneOffset;
-        this.buildLimbLeg(vct,boneIdx,('Right'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeLength,false);
+        this.buildLimbLeg(vct,boneIdx,('Right'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,false);
     }
         
     buildLimbWhip(whipCount,parentBoneIdx,whipRadius,y,whipLength,rotOffset)
@@ -232,35 +232,36 @@ class GenModelOrganicSkeletonClass
         var y=bones[torsoTopBoneIdx].position.y-Math.trunc(topBodyRadius*0.5);
         var rotOffset,vct,y;
         
-        var armCount=1;
-        if (this.genRandom.randomPercentage(0.25)) armCount=this.genRandom.randomInt(1,3);
+        var armCount=this.genRandom.randomInt(1,2);
         
         var armRadius,armY,armLength;
-        var shoulderLength,elbowLength,wristLength,handLength,fingerLength;
+        var shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength;
+        
+        rotOffset=(this.genRandom.random()*20.0)-10.0;
+
+        armRadius=Math.trunc(botBodyRadius*0.35);
+        if (armRadius<250) armRadius=250;
+        if (armRadius>350) armRadius=350;
+        armLength=this.genRandom.randomInt(Math.trunc(totalHigh*0.3),Math.trunc(totalHigh*0.2));
+
+        shoulderLength=Math.trunc(topBodyRadius*0.75);
+        elbowLength=shoulderLength+Math.trunc(armLength*0.42);
+        wristLength=shoulderLength+Math.trunc(armLength*0.84);
+        handLength=shoulderLength+Math.trunc(armLength*0.9);
+
+        fingerCount=this.genRandom.randomInt(1,3);
+        fingerLength=this.genRandom.randomInt(500,500);
         
         for (n=0;n!==armCount;n++) {
-            rotOffset=(this.genRandom.random()*20.0)-10.0;
-            
-            armRadius=Math.trunc(botBodyRadius*0.35);
-            if (armRadius<250) armRadius=250;
-            if (armRadius>350) armRadius=350;
-            armLength=this.genRandom.randomInt(Math.trunc(totalHigh*0.3),Math.trunc(totalHigh*0.2));
-        
-            shoulderLength=Math.trunc(topBodyRadius*0.75);
-            elbowLength=shoulderLength+Math.trunc(armLength*0.42);
-            wristLength=shoulderLength+Math.trunc(armLength*0.84);
-            handLength=shoulderLength+Math.trunc(armLength*0.9);
-            fingerLength=this.genRandom.randomInt(500,500);
-            
             armY=y+Math.trunc(armRadius*0.5);
             
             vct=new wsPoint(1.0,0.0,0.0);
             vct.rotateY(null,rotOffset);
-            this.buildLimbArm(vct,('Left'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerLength,true);
+            this.buildLimbArm(vct,('Left'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,true);
         
             vct=new wsPoint(-1.0,0.0,0.0);
             vct.rotateY(null,-rotOffset);
-            this.buildLimbArm(vct,('Right'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerLength,false);
+            this.buildLimbArm(vct,('Right'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,false);
         
             y+=Math.trunc(armRadius*2.2);
         }
@@ -353,14 +354,12 @@ class GenModelOrganicSkeletonClass
 
             // tail
             
-        //if (this.genRandom.randomPercentage(0.75)) {
-            whipRadius=Math.trunc(rightBodyRadius*0.35);
+        if (this.genRandom.randomPercentage(0.75)) {
+            whipRadius=this.genRandom.randomInt(Math.trunc(rightBodyRadius*0.35),Math.trunc(rightBodyRadius*0.2));
             whipLength=this.genRandom.randomInt(bodyLength,(bodyLength*3));
             
-            whipRadius=500;
-            
             this.buildLimbWhip(0,hipBoneIdx,whipRadius,bones[hipBoneIdx].position.y,whipLength,270.0);
-        //}
+        }
     }
      
         //
@@ -436,7 +435,7 @@ class GenModelOrganicSkeletonClass
             whipRadius=Math.trunc(botBodyRadius*0.35);
             if (whipRadius<250) whipRadius=250;
             if (whipRadius>350) whipRadius=350;
-            whipLength=this.genRandom.randomInt(Math.trunc(bones[boneIdx].gravityLockDistance*0.5),Math.trunc(totalHigh*0.5));
+            whipLength=this.genRandom.randomInt(Math.trunc(bones[boneIdx].gravityLockDistance*0.7),Math.trunc(totalHigh*0.7));
             
             this.buildLimbWhip(n,boneIdx,whipRadius,bones[boneIdx].position.y,whipLength,rotOffset);
         }

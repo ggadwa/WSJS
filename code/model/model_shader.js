@@ -23,6 +23,8 @@ class ModelShaderClass extends ShaderClass
         this.ambientUniform=null;
 
         this.lights=[];
+        
+        Object.seal(this);
     }
     
         //

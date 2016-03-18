@@ -22,6 +22,8 @@ class MapLightClass
         this.usedInList=false;
 
         this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
+        
+        Object.seal(this);
     }
     
     distance(pt)

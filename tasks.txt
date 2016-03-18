@@ -19,7 +19,7 @@ REGULAR TODOs
 #### stacked block textures can have (randomly) altered Y sizes (one line)
 #### collisions against slanted walls are bad
 #### glowing computer lights?
-#### rounded particles (need bitmap?)
+#### spikes
 
 [X] slight color variations in lighting
 [X] packed lights into vec4 to save space, changed light in scene algorithm and now handling 6 lights
@@ -28,7 +28,8 @@ REGULAR TODOs
 [X] better and more precise model sphere wrapping
 [X] whip/tail type limbs
 [X] random model mesh vertex variations
-[ ] spikes
+[X] improved walk animations, added random idle animations
+[X] improved the particles a bit
 
 
 [ ] GL

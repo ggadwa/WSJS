@@ -29,6 +29,8 @@ class ModelBoneClass
 
         this.prevPoseAngle=new wsPoint(0.0,0.0,0.0);
         this.nextPoseAngle=new wsPoint(0.0,0.0,0.0);
+        
+        Object.seal(this);
     }
     
         //
@@ -59,6 +61,8 @@ class ModelLimbClass
         this.acrossSurfaceCount=acrossSurfaceCount;
         this.aroundSurfaceCount=aroundSurfaceCount;
         this.boneIndexes=boneIndexes;
+        
+        Object.seal(this);
     }
     
     getRandomBoneIndex(genRandom)
@@ -88,7 +92,10 @@ class ModelSkeletonClass
             // animations
 
         this.lastAnimationTick=0;
+        this.lastAnimationMillisec=1;
         this.lastAnimationFlip=false;          // supergumba -- temporary for random animations
+        
+        Object.seal(this);
     }
     
         //
@@ -316,7 +323,7 @@ class ModelSkeletonClass
         
             // the current factor
             
-        var factor=1.0-((this.lastAnimationTick-view.timeStamp)/3000);
+        var factor=1.0-((this.lastAnimationTick-view.timeStamp)/this.lastAnimationMillisec);
 
             // tween the current angles
             
@@ -331,16 +338,16 @@ class ModelSkeletonClass
         this.rotatePoseBoneRecursive(this.baseBoneIdx,new wsPoint(0.0,0.0,0.0));
     }
     
-    
-    
-    
-    // supergumba -- testing
-    
-    randomNextPoseLeg(view,limb)
+        //
+        // pose utilities
+        //
+        
+    poseSetLeg(view,limb,walking)
     {
         var r,backLeg;
 
-        r=view.genRandom.randomInBetween(20.0,40.0);
+        r=0.0;
+        if (walking) r=view.genRandom.randomInBetween(20.0,40.0);
         
         backLeg=(limb.limbType===LIMB_TYPE_LEG_LEFT);
         if (this.lastAnimationFlip) backLeg=!backLeg;
@@ -348,28 +355,32 @@ class ModelSkeletonClass
         if (backLeg) {
             this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(-r,0.0,0.0);
             this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*0.7),0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*0.5),0.0,0.0);
+            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(-(r*0.5),0.0,0.0);
         }
         else {
             this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
             this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*2.0),0.0,0.0);
+            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(0.0,0.0,0.0);
         }
     }
     
-    randomNextPoseArm(view,limb,armAngle)
+    poseSetArm(view,limb,armAngle,walking)
     {
         var r,z,backArm;
 
-        r=view.genRandom.randomInBetween(20.0,40.0);
+        r=0.0;
+        if (walking) r=view.genRandom.randomInBetween(20.0,40.0);
         
         z=-armAngle;
         if (limb.limbType===LIMB_TYPE_ARM_LEFT) z=-z;
         
-        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0,0.0,z);
-        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0,0.0,(z*0.9));
+        if (this.lastAnimationFlip) r=-r;
+        
+        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0.0,r,z);
+        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0.0,(r*0.5),(z*0.9));
     }
     
-    randomNextPoseBody(view,limb,startAng,extraAng)
+    poseSetBody(view,limb,startAng,extraAng)
     {
         var n,x;
         var nBone=limb.boneIndexes.length;
@@ -383,7 +394,7 @@ class ModelSkeletonClass
         }
     }
     
-    randomNextPoseWhip(view,limb)
+    poseSetWhip(view,limb)
     {
         var n,x,z;
         var nBone=limb.boneIndexes.length;
@@ -402,7 +413,11 @@ class ModelSkeletonClass
         }
     }
     
-    randomNextPose(view,modelType)
+        //
+        // walk poses
+        //
+        
+    walkNextPose(view,modelType)
     {
         var n,limb;
         var nLimb=this.limbs.length;
@@ -416,34 +431,34 @@ class ModelSkeletonClass
             switch (limb.limbType) {
                 case LIMB_TYPE_BODY:
                     if (modelType==MODEL_TYPE_HUMANOID) {
-                        this.randomNextPoseBody(view,limb,5.0,5.0);
+                        this.poseSetBody(view,limb,5.0,5.0);
                         break;
                     }
                     if (modelType===MODEL_TYPE_BLOB) {
-                        this.randomNextPoseBody(view,limb,15.0,30.0);
+                        this.poseSetBody(view,limb,15.0,30.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_HEAD:
                     if (modelType===MODEL_TYPE_ANIMAL) {
-                        this.randomNextPoseBody(view,limb,5.0,15.0);
+                        this.poseSetBody(view,limb,5.0,15.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_LEG_LEFT:
                 case LIMB_TYPE_LEG_RIGHT:
-                    this.randomNextPoseLeg(view,limb);
+                    this.poseSetLeg(view,limb,true);
                     break;
                 case LIMB_TYPE_ARM_LEFT:
-                    this.randomNextPoseArm(view,limb,armLeftZAngle);
+                    this.poseSetArm(view,limb,armLeftZAngle,true);
                     armLeftZAngle+=5.0;
                     break;
                 case LIMB_TYPE_ARM_RIGHT:
-                    this.randomNextPoseArm(view,limb,armRightZAngle);
+                    this.poseSetArm(view,limb,armRightZAngle,true);
                     armRightZAngle+=5.0;
                     break;
                 case LIMB_TYPE_WHIP:
-                    this.randomNextPoseWhip(view,limb);
+                    this.poseSetWhip(view,limb);
                     break;
             }
         }
@@ -451,15 +466,16 @@ class ModelSkeletonClass
         this.lastAnimationFlip=!this.lastAnimationFlip;
     }
     
-    randomPose(view,modelType)
+    walkPose(view,modelType)
     {
             // time for a new pose?
             
         if (view.timeStamp<this.lastAnimationTick) return;
         
             // next pose 3 seconds away (testing)
-            
-        this.lastAnimationTick=view.timeStamp+3000;
+        
+        this.lastAnimationMillisec=3000;
+        this.lastAnimationTick=view.timeStamp+this.lastAnimationMillisec;
         
             // move current next pose to last pose
             
@@ -468,7 +484,81 @@ class ModelSkeletonClass
             // construct new pose
 
         this.clearNextPose();
-        this.randomNextPose(view,modelType);
+        this.walkNextPose(view,modelType);
+    }
+    
+        //
+        // idle poses
+        //
+        
+    idleNextPose(view,modelType)
+    {
+        var n,limb;
+        var nLimb=this.limbs.length;
+        
+        var armLeftZAngle=40.0;
+        var armRightZAngle=40.0;
+        
+        for (n=0;n!==nLimb;n++) {
+            limb=this.limbs[n];
+            
+            switch (limb.limbType) {
+                case LIMB_TYPE_BODY:
+                    if (modelType==MODEL_TYPE_HUMANOID) {
+                        this.poseSetBody(view,limb,3.0,3.0);
+                        break;
+                    }
+                    if (modelType===MODEL_TYPE_BLOB) {
+                        this.poseSetBody(view,limb,5.0,5.0);
+                        break;
+                    }
+                    break;
+                case LIMB_TYPE_HEAD:
+                    if (modelType===MODEL_TYPE_ANIMAL) {
+                        this.poseSetBody(view,limb,0.0,10.0);
+                        break;
+                    }
+                    break;
+                case LIMB_TYPE_LEG_LEFT:
+                case LIMB_TYPE_LEG_RIGHT:
+                    this.poseSetLeg(view,limb,false);
+                    break;
+                case LIMB_TYPE_ARM_LEFT:
+                    this.poseSetArm(view,limb,armLeftZAngle,false);
+                    armLeftZAngle+=5.0;
+                    break;
+                case LIMB_TYPE_ARM_RIGHT:
+                    this.poseSetArm(view,limb,armRightZAngle,false);
+                    armRightZAngle+=5.0;
+                    break;
+                case LIMB_TYPE_WHIP:
+                    this.poseSetWhip(view,limb);
+                    break;
+            }
+        }
+        
+        this.lastAnimationFlip=!this.lastAnimationFlip;
+    }
+        
+    idlePose(view,modelType)
+    {
+            // time for a new pose?
+            
+        if (view.timeStamp<this.lastAnimationTick) return;
+        
+            // next pose 4 seconds away
+            
+        this.lastAnimationMillisec=4000;
+        this.lastAnimationTick=view.timeStamp+this.lastAnimationMillisec;
+        
+            // move current next pose to last pose
+            
+        this.moveNextPoseToPrevPose();
+        
+            // construct new pose
+
+        this.clearNextPose();
+        this.idleNextPose(view,modelType);
     }
 
 }

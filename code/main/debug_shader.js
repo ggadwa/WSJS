@@ -13,6 +13,8 @@ class DebugShaderClass extends ShaderClass
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;
         this.colorUniform=null;
+        
+        Object.seal(this);
     }
     
         //

@@ -12,6 +12,8 @@ class GenRoomClosetClass
         this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
         // build the closet cube

@@ -34,6 +34,8 @@ class EntityClass
         this.zFrustumBound=new wsBound(0,0);
 
         this.collision=new CollisionClass();
+        
+        // no seal, as this object is extended
     }
     
         //
@@ -238,7 +240,7 @@ class EntityClass
         // run entity
         //
         
-    run(view,bitmapList,soundList,map,entityList)
+    run(view,soundList,map,entityList)
     {
     }
     

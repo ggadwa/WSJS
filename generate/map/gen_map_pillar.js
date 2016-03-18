@@ -18,6 +18,8 @@ class GenRoomPillarClass
 
         var radius=this.genRandom.randomInBetween(minRadius,maxRadius);
         this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(this.genRandom,radius,radius,1,4);
+        
+        Object.seal(this);
     }
     
         //

@@ -28,6 +28,8 @@ class MapOverlayClass
         this.entityVertexPosBuffer=null;
 
         this.entityVertices=null;
+        
+        Object.seal(this);
     }
     
         //

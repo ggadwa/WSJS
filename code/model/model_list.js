@@ -10,6 +10,8 @@ class ModelListClass
     {
         this.models=[];
         this.modelShader=new ModelShaderClass();
+        
+        Object.seal(this);
     }
     
         //

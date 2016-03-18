@@ -10,6 +10,8 @@ class GenSoundClass
     {
         this.ctx=ctx;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
         //

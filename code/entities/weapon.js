@@ -17,6 +17,8 @@ class WeaponClass
 
         this.handOffset=new wsPoint(0,0,0);     // global to stop GCd
         this.handAngle=new wsPoint(0,0,0);
+        
+        Object.seal(this);
     }
     
         //

@@ -12,6 +12,8 @@ class SoundClass
         this.ctx=ctx;
         this.buffer=buffer;
         this.maxDistance=maxDistance;
+        
+        Object.seal(this);
     }
     
     close()

@@ -18,6 +18,8 @@ class ModelMeshVertexClass
 
         this.parentBoneIdx=-1;
         this.vectorFromParentBone=new wsPoint(0.0,0.0,0.0);
+        
+        Object.seal(this);
     }
 }
 
@@ -38,8 +40,10 @@ class ModelMeshClass
         this.indexCount=this.indexes.length;
         this.trigCount=Math.trunc(this.indexCount/3);
 
-            // non-culled index list
+            // non-culled vertex and index list
 
+        this.nonCulledVertexes=null;
+        
         this.nonCulledIndexCount=0;
         this.nonCulledIndexes=null;
 
@@ -55,7 +59,7 @@ class ModelMeshClass
         this.vertexPosBuffer=null;
         this.vertexNormalBuffer=null;
         this.vertexTangentBuffer=null;
-        this.vertexUVAttribute=null;
+        this.vertexUVBuffer=null;
         this.indexBuffer=null;
 
             // global variables to stop GCd
@@ -64,6 +68,8 @@ class ModelMeshClass
         this.rotNormal=new wsPoint(0.0,0.0,0.0);
         this.parentRotVector=new wsPoint(0.0,0.0,0.0);
         this.parentRotNormal=new wsPoint(0.0,0.0,0.0);
+        
+        Object.seal(this);
     }
     
         //
@@ -80,7 +86,7 @@ class ModelMeshClass
         if (this.vertexPosBuffer!==null) gl.deleteBuffer(this.vertexPosBuffer);
         if (this.vertexNormalBuffer!==null) gl.deleteBuffer(this.vertexNormalBuffer);
         if (this.vertexTangentBuffer!==null) gl.deleteBuffer(this.vertexTangentBuffer);
-        if (this.vertexUVAttribute!==null) gl.deleteBuffer(this.vertexUVAttribute);
+        if (this.vertexUVBuffer!==null) gl.deleteBuffer(this.vertexUVBuffer);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     }
@@ -332,10 +338,16 @@ class ModelMeshClass
         
     buildNonCulledTriangleIndexes(view)
     {
-        var n,idx,vIdx;
+        var n,k,idx,vIdx;
         var pnt=new wsPoint(0,0,0);
         var normal=new wsPoint(0,0,0);
         var trigToEyeVector=new wsPoint(0,0,0);
+        
+            // we build a list of array the vertexes
+            // that aren't culled, if it's the first
+            // time we need to create the array
+            
+        if (this.nonCulledVertexes===null) this.nonCulledVertexes=new Uint8Array(this.vertexCount);
 
             // if it's the first time, we'll need
             // to create the index array
@@ -343,29 +355,31 @@ class ModelMeshClass
         this.nonCulledIndexCount=0;
         if (this.nonCulledIndexes===null) this.nonCulledIndexes=new Uint16Array(this.indexCount);
         
-            // build it out of triangles
-            // that aren't normal culled, i.e.,
+            // check all the vertexes for culling, i.e.,
             // have normals facing away from the eye
             // which is the dot product between the normal
             // and the vector from trig to eye point
         
-        idx=0;
+        vIdx=0;
         
-        for (n=0;n!==this.trigCount;n++) {
-            
-            vIdx=this.indexes[idx]*3;
-            
-                // vector from trig to eye point
-                
+        for (n=0;n!==this.vertexCount;n++) {
             pnt.setFromValues(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
             trigToEyeVector.setFromSubPoint(pnt,view.camera.position);
             trigToEyeVector.normalize();
-            
-                // dot product
                 
             normal.setFromValues(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]);
-                
-            if (trigToEyeVector.dot(normal)<=view.VIEW_NORMAL_CULL_LIMIT) {
+            this.nonCulledVertexes[n]=(trigToEyeVector.dot(normal)<=view.VIEW_NORMAL_CULL_LIMIT);
+            
+            vIdx+=3;
+        }
+        
+            // rebuild the index list for any trig
+            // that has at least one non-culled vertex
+            
+        idx=0;
+        
+        for (n=0;n!==this.trigCount;n++) {
+            if ((this.nonCulledVertexes[this.indexes[idx]]) || (this.nonCulledVertexes[this.indexes[idx+1]]) || (this.nonCulledVertexes[this.indexes[idx+2]])) {
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];

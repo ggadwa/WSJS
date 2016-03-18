@@ -13,6 +13,8 @@ class ModelClass
         this.modelShader=null;          // this gets set when model is attached to model list
         this.mesh=null;
         this.skeleton=null;
+        
+        Object.seal(this);
     }
     
         //

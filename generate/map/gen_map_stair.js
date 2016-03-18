@@ -10,6 +10,8 @@ class GenRoomStairsClass
     {
         this.map=map;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
         //

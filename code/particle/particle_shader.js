@@ -15,6 +15,8 @@ class ParticleShaderClass extends ShaderClass
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;    
         this.colorAlphaUniform=null;
+        
+        Object.seal(this);
     }
     
         //

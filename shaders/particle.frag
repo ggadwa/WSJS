@@ -5,7 +5,9 @@ varying highp vec2 fragUV;
 
 void main(void)
 {
-    gl_FragColor.rgb=texture2D(baseTex,fragUV).rgb*colorAlpha.rgb;
-    gl_FragColor.a=colorAlpha.a;
+    lowp float r=texture2D(baseTex,fragUV).r;   // red component is used as a mask
+    if (r!=1.0) discard;
+
+    gl_FragColor=colorAlpha;
 }
 

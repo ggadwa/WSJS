@@ -9,8 +9,13 @@ class ParticleListClass
     constructor()
     {
         this.particleShader=new ParticleShaderClass();
+        
+        this.particleBitmap=null;
+        this.particleBitmapSize=32;
 
         this.particles=[];
+        
+        Object.seal(this);
     }
     
         //
@@ -20,6 +25,7 @@ class ParticleListClass
     initialize(view,fileCache)
     {
         var n,particle;
+        var genBitmapUtility,bitmapCanvas,bitmapCTX;
 
             // create the shader
             
@@ -35,6 +41,35 @@ class ParticleListClass
             this.particles.push(particle);
         }
         
+            // construct a particle bitmap
+        
+        genBitmapUtility=new GenBitmapUtilityClass(view.genRandom);
+        
+        bitmapCanvas=document.createElement('canvas');
+        bitmapCanvas.width=this.particleBitmapSize;
+        bitmapCanvas.height=this.particleBitmapSize;
+        bitmapCTX=bitmapCanvas.getContext('2d');
+        
+        genBitmapUtility.drawRect(bitmapCTX,0,0,this.particleBitmapSize,this.particleBitmapSize,new wsColor(0.0,0.0,0.0));
+        genBitmapUtility.drawOval(bitmapCTX,0,0,this.particleBitmapSize,this.particleBitmapSize,new wsColor(1.0,1.0,1.0));
+        
+        this.particleBitmap=new BitmapClass(view,'Particle Blob',bitmapCanvas,null,null,1.0,0.0);
+        
+        /* debugging
+        var cvs=document.createElement('canvas');
+        cvs.style.position="absolute";
+        cvs.style.left='1024px';
+        cvs.style.top='0px';
+        cvs.style.border='1px solid #000000';
+        cvs.width=this.particleBitmapSize;
+        cvs.height=this.particleBitmapSize;
+
+        var ctx=cvs.getContext('2d');
+        ctx.drawImage(bitmapCanvas,0,0,this.particleBitmapSize,this.particleBitmapSize);
+
+        document.body.appendChild(cvs);
+        */
+       
         return(true);
     }
 
@@ -45,6 +80,8 @@ class ParticleListClass
         for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
             this.particles[n].release(view);
         }
+        
+        this.particleBitmap.close();
         
         this.particleShader.release(view);
     }
@@ -78,7 +115,7 @@ class ParticleListClass
         // some particle types
         //
         
-    addExplosionParticles(view,bitmap,centerPt)
+    addExplosionParticles(view,centerPt)
     {
         var particle;
         
@@ -91,7 +128,7 @@ class ParticleListClass
         particle.setRadius(300,10);
         particle.setMovement(4000.0);
         particle.setCenterPointFromPoint(centerPt);
-        particle.setBitmap(bitmap);
+        particle.setBitmap(this.particleBitmap);
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,0.0,0.0,0.7,0.0,0.0);
         particle.setTiming(view.timeStamp,1500);
@@ -105,7 +142,7 @@ class ParticleListClass
         particle.setRadius(300,20);
         particle.setMovement(2500.0);
         particle.setCenterPointFromPoint(centerPt);
-        particle.setBitmap(bitmap);
+        particle.setBitmap(this.particleBitmap);
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,0.5,0.0,1.0,0.5,0.0);
         particle.setTiming(view.timeStamp,1500);
@@ -119,7 +156,7 @@ class ParticleListClass
         particle.setRadius(300,30);
         particle.setMovement(1000.0);
         particle.setCenterPointFromPoint(centerPt);
-        particle.setBitmap(bitmap);
+        particle.setBitmap(this.particleBitmap);
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,1.0,0.0,0.7,0.7,0.0);
         particle.setTiming(view.timeStamp,1500);

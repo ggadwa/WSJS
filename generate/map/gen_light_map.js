@@ -58,6 +58,8 @@ class GenLightmapBitmapClass
             // for triangles with no lights
 
         this.chunkIdx=1;
+        
+        Object.seal(this);
     }
     
         // replace image data

@@ -19,6 +19,8 @@ class MainDebugClass
         
         this.debugSoundList=null;
         this.genSound=null;
+        
+        Object.seal(this);
     }
     
         //

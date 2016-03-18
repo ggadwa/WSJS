@@ -11,6 +11,8 @@ class GenRoomLedgeClass
         this.map=map;
         this.bitmapList=bitmapList;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
         //

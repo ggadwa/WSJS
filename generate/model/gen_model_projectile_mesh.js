@@ -11,6 +11,8 @@ class GenModelProjectileMeshClass
         this.model=model;
         this.bitmap=bitmap;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
     buildBoxAroundPoint(centerPt,sz,vertexList,indexes)

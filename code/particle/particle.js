@@ -46,6 +46,8 @@ class ParticleClass
         this.vertexPosBuffer=null;
         this.vertexUVBuffer=null;
         this.indexBuffer=null;
+        
+        Object.seal(this);
     }
     
         //

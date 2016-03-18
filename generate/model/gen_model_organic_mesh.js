@@ -11,6 +11,8 @@ class GenModelOrganicBoneClass
         this.idx=-1;
         this.position=null;
         this.gravityLockDistance=0;
+        
+        Object.seal(this);
     }
 }
 
@@ -25,6 +27,8 @@ class GenModelOrganicMeshClass
         this.model=model;
         this.bitmap=bitmap;
         this.genRandom=genRandom;
+        
+        Object.seal(this);
     }
     
         //
