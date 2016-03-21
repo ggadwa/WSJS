@@ -51,7 +51,7 @@ class ParticleListClass
         bitmapCTX=bitmapCanvas.getContext('2d');
         
         genBitmapUtility.drawRect(bitmapCTX,0,0,this.particleBitmapSize,this.particleBitmapSize,new wsColor(0.0,0.0,0.0));
-        genBitmapUtility.drawOval(bitmapCTX,0,0,this.particleBitmapSize,this.particleBitmapSize,new wsColor(1.0,1.0,1.0));
+        genBitmapUtility.drawOval(bitmapCTX,0,0,this.particleBitmapSize,this.particleBitmapSize,new wsColor(1.0,1.0,1.0),null);
         
         this.particleBitmap=new BitmapClass(view,'Particle Blob',bitmapCanvas,null,null,1.0,0.0);
         

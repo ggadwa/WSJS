@@ -47,7 +47,7 @@ class ViewClass
         this.OPENGL_NEAR_Z=500;
         this.OPENGL_FAR_Z=300000;
 
-        this.VIEW_NORMAL_CULL_LIMIT=0.0;
+        this.VIEW_NORMAL_CULL_LIMIT=0.3;
 
         this.wid=0;
         this.high=0;

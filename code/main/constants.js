@@ -92,9 +92,9 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 
 const SEED=Date.now();
 
-const SEED_MAP_BITMAP=Math.trunc((Math.random()*SEED));
+const SEED_BITMAP_MAP=Math.trunc((Math.random()*SEED));
 const SEED_MAP=Math.trunc((Math.random()*SEED));
-const SEED_MODEL_BITMAP=Math.trunc((Math.random()*SEED));
+const SEED_BITMAP_MODEL=Math.trunc((Math.random()*SEED));
 const SEED_MODEL=Math.trunc((Math.random()*SEED));
 const SEED_ENTITY=Math.trunc((Math.random()*SEED));
 const SEED_SOUND=Math.trunc((Math.random()*SEED));
@@ -260,33 +260,40 @@ const BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
 // bitmap generation types
 //
 
-const GEN_BITMAP_TYPE_BRICK_STACK=0;
-const GEN_BITMAP_TYPE_BRICK_RANDOM=1;
-const GEN_BITMAP_TYPE_STONE=2;
-const GEN_BITMAP_TYPE_TILE_SIMPLE=3;
-const GEN_BITMAP_TYPE_TILE_COMPLEX=4;
-const GEN_BITMAP_TYPE_TILE_SMALL=5;
-const GEN_BITMAP_TYPE_METAL=6;
-const GEN_BITMAP_TYPE_METAL_BAR=7;
-const GEN_BITMAP_TYPE_METAL_CORRUGATED=8;
-const GEN_BITMAP_TYPE_CONCRETE=9;
-const GEN_BITMAP_TYPE_PLASTER=10;
-const GEN_BITMAP_TYPE_MOSAIC=11;
-const GEN_BITMAP_TYPE_WOOD_PLANK=12;
-const GEN_BITMAP_TYPE_WOOD_BOX=13;
-const GEN_BITMAP_TYPE_MACHINE=14;
-const GEN_BITMAP_TYPE_SKIN_SCALE=15;
-const GEN_BITMAP_TYPE_SKIN_LEATHER=16;
-const GEN_BITMAP_TYPE_SKIN_FUR=17;
+const GEN_BITMAP_MAP_TYPE_BRICK_STACK=0;
+const GEN_BITMAP_MAP_TYPE_BRICK_RANDOM=1;
+const GEN_BITMAP_MAP_TYPE_STONE=2;
+const GEN_BITMAP_MAP_TYPE_BLOCK=3;
+const GEN_BITMAP_MAP_TYPE_TILE_SIMPLE=4;
+const GEN_BITMAP_MAP_TYPE_TILE_COMPLEX=5;
+const GEN_BITMAP_MAP_TYPE_TILE_SMALL=6;
+const GEN_BITMAP_MAP_TYPE_HEXAGONAL=7;
+const GEN_BITMAP_MAP_TYPE_METAL=8;
+const GEN_BITMAP_MAP_TYPE_METAL_BAR=9;
+const GEN_BITMAP_MAP_TYPE_METAL_CORRUGATED=10;
+const GEN_BITMAP_MAP_TYPE_CONCRETE=11;
+const GEN_BITMAP_MAP_TYPE_CEMENT=12;
+const GEN_BITMAP_MAP_TYPE_PLASTER=13;
+const GEN_BITMAP_MAP_TYPE_MOSAIC=14;
+const GEN_BITMAP_MAP_TYPE_WOOD_PLANK=15;
+const GEN_BITMAP_MAP_TYPE_WOOD_BOX=16;
+const GEN_BITMAP_MAP_TYPE_MACHINE=17;
 
-const GEN_BITMAP_TYPE_NAMES=[
-                                'Brick Stack','Brick Random','Stone',
-                                'Tile Simple','Tile Complex','Tile Small',
-                                'Metal','Metal Bar','Metal Corrugated',
-                                'Concrete','Plaster','Mosaic','Wood Plank',
-                                'Wood Box','Machine','Skin Scale',
-                                'Skin Leather','Skin Fur'
-                            ];
+const GEN_BITMAP_MAP_TYPE_NAMES=[
+                        'Brick Stack','Brick Random','Stone','Block',
+                        'Tile Simple','Tile Complex','Tile Small','Hexagonal',
+                        'Metal','Metal Bar','Metal Corrugated',
+                        'Concrete','Cement','Plaster','Mosaic',
+                        'Wood Plank','Wood Box','Machine'
+                    ];
+
+const GEN_BITMAP_MODEL_TYPE_SKIN_SCALE=0;
+const GEN_BITMAP_MODEL_TYPE_SKIN_LEATHER=1;
+const GEN_BITMAP_MODEL_TYPE_SKIN_FUR=2;
+
+const GEN_BITMAP_MODEL_TYPE_NAMES=[
+                        'Skin Scale','Skin Leather','Skin Fur'
+                    ];
 
 //
 // sound generation types

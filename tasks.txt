@@ -21,8 +21,6 @@ REGULAR TODOs
 #### glowing computer lights?
 #### spikes
 
-#### separate map texture generation from model texture generation (and update debug)
-#### make main skip textures already used
 
 [X] slight color variations in lighting
 [X] packed lights into vec4 to save space, changed light in scene algorithm and now handling 6 lights
@@ -32,7 +30,9 @@ REGULAR TODOs
 [X] whip/tail type limbs
 [X] random model mesh vertex variations
 [X] improved walk animations, added random idle animations
-[X] improved the particles a bit
+[X] improved the particles
+[X] textures types are now marked so maps are less likely to keep picking the same type in the same map
+[ ] added cement, block wall, and hexagonal floor texture types, improved other textures a bit
 
 
 [ ] GL

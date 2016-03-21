@@ -26,7 +26,7 @@ class GenBitmapUtilityClass
         
         Object.seal(this);
     }
-
+    
         //
         // segmenting routines
         //
@@ -337,12 +337,10 @@ class GenBitmapUtilityClass
         // noise routines
         //
 
-    addNoiseRect(bitmapCTX,normalCTX,lft,top,rgt,bot,minDarken,maxDarken,percentage)
+    addNoiseRect(bitmapCTX,lft,top,rgt,bot,minDarken,maxDarken,percentage)
     {    
         if ((lft>=rgt) || (top>=bot)) return;
         
-            // currently not using the normalCTX, might in the future
-
         var n,nPixel,idx;
         var col,fct;
         var wid=rgt-lft;
@@ -835,7 +833,103 @@ class GenBitmapUtilityClass
         normalCTX.fill();
     }
     
-    drawDiamond(bitmapCTX,lft,top,rgt,bot,fillRGBColor)
+    draw3DHexagon(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    {
+        var n,k,x,y,my,xAdd;
+        var darkenFactor,darkColor;
+
+            // build the polygon
+
+        x=new Uint16Array(6);
+        y=new Uint16Array(6);
+        
+        xAdd=Math.trunc((rgt-lft)*0.1);
+        my=Math.trunc((top+bot)/2);
+        
+        x[0]=lft;
+        y[0]=my;
+        x[1]=lft+xAdd;
+        y[1]=top;
+        x[2]=rgt-xAdd;
+        y[2]=top;
+        x[3]=rgt;
+        y[3]=my;
+        x[4]=rgt-xAdd;
+        y[4]=bot;
+        x[5]=lft+xAdd;
+        y[5]=bot;
+        
+            // draw the edges
+
+        for (n=0;n!==edgeSize;n++) {
+
+                // the colors
+
+            darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
+            darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
+            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+            
+                // top
+
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(x[0],y[0]);
+            bitmapCTX.lineTo(x[1],y[1]);
+            bitmapCTX.lineTo(x[2],y[2]);
+            bitmapCTX.lineTo(x[3],y[3]);
+            bitmapCTX.stroke();
+            
+            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
+            normalCTX.beginPath();
+            normalCTX.moveTo(x[0],y[0]);
+            normalCTX.lineTo(x[1],y[1]);
+            normalCTX.lineTo(x[2],y[2]);
+            normalCTX.lineTo(x[3],y[3]);
+            normalCTX.stroke();
+            
+                // bottom
+                
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(x[3],y[3]);
+            bitmapCTX.lineTo(x[4],y[4]);
+            bitmapCTX.lineTo(x[5],y[5]);
+            bitmapCTX.lineTo(x[0],y[0]);
+            bitmapCTX.stroke();
+            
+            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
+            normalCTX.beginPath();
+            normalCTX.moveTo(x[3],y[3]);
+            normalCTX.lineTo(x[4],y[4]);
+            normalCTX.lineTo(x[5],y[5]);
+            normalCTX.lineTo(x[0],y[0]);
+            normalCTX.stroke();
+        }
+        
+        if (fillRGBColor===null) return;
+
+            // and the fill
+
+        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+
+            // top fill
+            
+        bitmapCTX.beginPath();
+        bitmapCTX.moveTo(x[0],y[0]);
+        for (k=1;k!==6;k++) {
+            bitmapCTX.lineTo(x[k],y[k]);
+        }
+        bitmapCTX.fill();
+        
+        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+
+        normalCTX.beginPath();
+        normalCTX.moveTo(x[0],y[0]);
+        for (k=1;k!==6;k++) {
+            normalCTX.lineTo(x[k],y[k]);
+        }
+        normalCTX.fill();
+    }
+    
+    drawDiamond(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
         var mx,my;
 
@@ -843,6 +937,7 @@ class GenBitmapUtilityClass
         my=Math.trunc((top+bot)/2);
 
         bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        if (borderRGBColor!==null) bitmapCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
 
         bitmapCTX.beginPath();
         bitmapCTX.moveTo(mx,top);
@@ -851,9 +946,10 @@ class GenBitmapUtilityClass
         bitmapCTX.lineTo(lft,my);
         bitmapCTX.lineTo(mx,top);
         bitmapCTX.fill();
+        if (borderRGBColor!==null) bitmapCTX.stroke();
     }
     
-    drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor)
+    drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
         var mx,my,radius;
 
@@ -863,10 +959,12 @@ class GenBitmapUtilityClass
         radius=Math.trunc((rgt-lft)/2);
 
         bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        if (borderRGBColor!==null) bitmapCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
         
         bitmapCTX.beginPath();
         bitmapCTX.arc(mx,my,radius,0.0,(Math.PI*2));
         bitmapCTX.fill();
+        if (borderRGBColor!==null) bitmapCTX.stroke();
     }
 
     draw3DOval(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)

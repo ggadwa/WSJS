@@ -15,7 +15,8 @@ class MainDebugClass
         this.soundWid=1200;
         this.soundHigh=250;
         
-        this.genBitmap=null;
+        this.genBitmapMap=null;
+        this.genBitmapModel=null;
         
         this.debugSoundList=null;
         this.genSound=null;
@@ -24,10 +25,10 @@ class MainDebugClass
     }
     
         //
-        // bitmaps
+        // map bitmaps
         //
         
-    addBitmaps(idx)
+    addBitmapMaps(idx)
     {
         var canvas,ctx,div;
         var wid;
@@ -37,7 +38,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmap.generate(null,GEN_BITMAP_TYPE_NAMES[idx],idx);
+        debugBitmap=this.genBitmapMap.generate(null,GEN_BITMAP_MAP_TYPE_NAMES[idx],idx);
 
             // label
 
@@ -45,7 +46,7 @@ class MainDebugClass
         div.style.position="absolute";
         div.style.left='5px';
         div.style.top=this.drawTop+'px';
-        div.innerHTML=GEN_BITMAP_TYPE_NAMES[idx];
+        div.innerHTML='[MAP] '+GEN_BITMAP_MAP_TYPE_NAMES[idx];
         document.body.appendChild(div);
 
         this.drawTop+=25;
@@ -70,14 +71,69 @@ class MainDebugClass
             // next bitmap
             
         idx++;
-        if (idx>=GEN_BITMAP_TYPE_NAMES.length) {
+        if (idx>=GEN_BITMAP_MAP_TYPE_NAMES.length) {
+            setTimeout(this.addBitmapModels.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapMaps.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+        //
+        // model bitmaps
+        //
+        
+    addBitmapModels(idx)
+    {
+        var canvas,ctx,div;
+        var wid;
+        var debugBitmap;
+
+        wid=Math.trunc(this.bitmapWid/3);
+
+            // generate random bitmap
+
+        debugBitmap=this.genBitmapModel.generate(null,GEN_BITMAP_MODEL_TYPE_NAMES[idx],idx);
+
+            // label
+
+        div=document.createElement('div');
+        div.style.position="absolute";
+        div.style.left='5px';
+        div.style.top=this.drawTop+'px';
+        div.innerHTML='[MODEL] '+GEN_BITMAP_MODEL_TYPE_NAMES[idx];
+        document.body.appendChild(div);
+
+        this.drawTop+=25;
+
+        canvas=document.createElement('canvas');
+        canvas.style.position="absolute";
+        canvas.style.left='5px';
+        canvas.style.top=this.drawTop+'px';
+        canvas.style.border='1px solid #000000';
+        canvas.width=this.bitmapWid;
+        canvas.height=this.bitmapHigh;
+
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
+        ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
+        ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
+
+        document.body.appendChild(canvas);
+
+        this.drawTop+=(this.bitmapHigh+5);
+        
+            // next bitmap
+            
+        idx++;
+        if (idx>=GEN_BITMAP_MODEL_TYPE_NAMES.length) {
             setTimeout(this.addSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
-        setTimeout(this.addBitmaps.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapModels.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
-    
+   
         //
         // sound waves
         //
@@ -169,7 +225,8 @@ class MainDebugClass
     {
             // construct necessary classes
             
-        this.genBitmap=new GenBitmapClass(new GenRandomClass(SEED_MAP_BITMAP));
+        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(SEED_BITMAP_MAP));
+        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(SEED_BITMAP_MODEL));
         
         this.debugSoundList=new SoundListClass();
         if (!this.debugSoundList.initialize()) {
@@ -181,7 +238,7 @@ class MainDebugClass
 
             // start the timed process
             
-        this.addBitmaps(0);
+        this.addBitmapMaps(0);
     }
 }
 

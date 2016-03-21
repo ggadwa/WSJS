@@ -18,29 +18,32 @@ class MainClass
         this.input=new InputClass(this.view,this.entityList);
         this.debug=new DebugClass();
         
-        this.genBitmap=null;
+        this.genBitmapMap=null;
+        this.genBitmapModel=null;
         this.genSound=null;
         
             // texture list for the map
             
         this.mapTextureBuildList=
             [
-                ['Map Wall',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER,GEN_BITMAP_TYPE_TILE_SIMPLE]],
-                ['Map Floor',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
-                ['Map Ceiling',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_WOOD_PLANK]],
-                ['Map Stairs',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_METAL]],
-                ['Map Platform',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_CORRUGATED,GEN_BITMAP_TYPE_WOOD_PLANK]],
-                ['Map Ledge',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
-                ['Map Metal',[GEN_BITMAP_TYPE_METAL]],
-                ['Map Box',[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR]],
-                ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER]],
-                ['Map Closet',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER,GEN_BITMAP_TYPE_TILE_SIMPLE]],
-                ['Map Machine',[GEN_BITMAP_TYPE_MACHINE]],
+                ['Map Wall',[GEN_BITMAP_MAP_TYPE_BRICK_STACK,GEN_BITMAP_MAP_TYPE_BRICK_RANDOM,GEN_BITMAP_MAP_TYPE_STONE,GEN_BITMAP_MAP_TYPE_BLOCK,GEN_BITMAP_MAP_TYPE_PLASTER,GEN_BITMAP_MAP_TYPE_TILE_SIMPLE]],
+                ['Map Floor',[GEN_BITMAP_MAP_TYPE_TILE_SIMPLE,GEN_BITMAP_MAP_TYPE_TILE_COMPLEX,GEN_BITMAP_MAP_TYPE_TILE_SMALL,GEN_BITMAP_MAP_TYPE_TYPE_HEXAGONAL,GEN_BITMAP_MAP_TYPE_TYPE_CONCRETE,GEN_BITMAP_TILE_TYPE_CEMENT,GEN_BITMAP_MAP_TYPE_MOSAIC]],
+                ['Map Ceiling',[GEN_BITMAP_MAP_TYPE_METAL,GEN_BITMAP_MAP_TYPE_METAL_BAR,GEN_BITMAP_MAP_TYPE_TYPE_HEXAGONAL,GEN_BITMAP_MAP_TYPE_CONCRETE,GEN_BITMAP_MAP_TYPE_CEMENT,GEN_BITMAP_MAP_TYPE_WOOD_PLANK]],
+                ['Map Stairs',[GEN_BITMAP_MAP_TYPE_TILE_SIMPLE,GEN_BITMAP_MAP_TYPE_TILE_SMALL,GEN_BITMAP_MAP_TYPE_CONCRETE,GEN_BITMAP_MAP_TYPE_METAL]],
+                ['Map Platform',[GEN_BITMAP_MAP_TYPE_METAL,GEN_BITMAP_MAP_TYPE_METAL_CORRUGATED,GEN_BITMAP_MAP_TYPE_TYPE_HEXAGONAL,GEN_BITMAP_MAP_TYPE_WOOD_PLANK]],
+                ['Map Ledge',[GEN_BITMAP_MAP_TYPE_TILE_SIMPLE,GEN_BITMAP_MAP_TYPE_TILE_COMPLEX,GEN_BITMAP_MAP_TYPE_TILE_SMALL,GEN_BITMAP_MAP_TYPE_TYPE_HEXAGONAL,GEN_BITMAP_MAP_TYPE_CONCRETE,GEN_BITMAP_MAP_TYPE_CEMENT,GEN_BITMAP_MAP_TYPE_MOSAIC]],
+                ['Map Metal',[GEN_BITMAP_MAP_TYPE_METAL]],
+                ['Map Box',[GEN_BITMAP_MAP_TYPE_WOOD_BOX,GEN_BITMAP_MAP_TYPE_METAL,GEN_BITMAP_MAP_TYPE_METAL_BAR]],
+                ['Map Pillar',[GEN_BITMAP_MAP_TYPE_BLOCK,GEN_BITMAP_MAP_TYPE_TILE_SMALL,GEN_BITMAP_MAP_TYPE_CONCRETE,GEN_BITMAP_MAP_TYPE_CEMENT,GEN_BITMAP_MAP_TYPE_PLASTER]],
+                ['Map Closet',[GEN_BITMAP_MAP_TYPE_BRICK_STACK,GEN_BITMAP_MAP_TYPE_BRICK_RANDOM,GEN_BITMAP_MAP_TYPE_STONE,GEN_BITMAP_MAP_TYPE_BLOCK,GEN_BITMAP_MAP_TYPE_PLASTER,GEN_BITMAP_MAP_TYPE_TILE_SIMPLE]],
+                ['Map Machine',[GEN_BITMAP_MAP_TYPE_MACHINE]],
             ];
+            
+        this.mapTextureUsedList=[];
             
             // texture types for models
             
-        this.modelTextureTypes=[GEN_BITMAP_TYPE_SKIN_SCALE,GEN_BITMAP_TYPE_SKIN_LEATHER,GEN_BITMAP_TYPE_SKIN_FUR];
+        this.modelTextureTypes=[GEN_BITMAP_MODEL_TYPE_SKIN_SCALE,GEN_BITMAP_MODEL_TYPE_SKIN_LEATHER,GEN_BITMAP_MODEL_TYPE_SKIN_FUR];
 
             // sound list for the game
             
@@ -87,7 +90,8 @@ class MainClass
 
             // dynamic creation classes
 
-        this.genBitmap=new GenBitmapClass(new GenRandomClass(SEED_MAP_BITMAP));
+        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(SEED_BITMAP_MAP));
+        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(SEED_BITMAP_MODEL));
         this.genSound=new GenSoundClass(this.soundList.getAudioContext(),new GenRandomClass(SEED_SOUND));
 
             // next step
@@ -109,13 +113,35 @@ class MainClass
 
             // pick a random texture type
             // we borrow the current random generator from the gen bitmap
+            // and never pick the same texture twice
 
         var bitmapTypeList=this.mapTextureBuildList[idx][1];
-        var bitmapType=bitmapTypeList[this.genBitmap.genRandom.randomIndex(bitmapTypeList.length)];
+        
+        var tryCount=bitmapTypeList.length;
+        var textureIdx=this.genBitmapMap.genRandom.randomIndex(bitmapTypeList.length);
+        
+        if (bitmapTypeList.length===1) {
+            this.mapTextureUsedList.push(textureIdx);
+        }
+        else {
+            while (tryCount>0) {
+                if (this.mapTextureUsedList.indexOf(textureIdx)===-1) {
+                    this.mapTextureUsedList.push(textureIdx);
+                    break;
+                }
+
+                textureIdx++;
+                if (textureIdx>=bitmapTypeList.length) textureIdx=0;
+
+                tryCount--;
+            }
+        }
+        
+        var bitmapType=bitmapTypeList[textureIdx];
 
             // generate bitmap
 
-        this.bitmapList.addBitmap(this.genBitmap.generate(this.view,name,bitmapType));
+        this.bitmapList.addBitmap(this.genBitmapMap.generate(this.view,name,bitmapType));
 
             // if more textures, then loop back around
 
@@ -139,11 +165,11 @@ class MainClass
     {
             // pick a random model texture type
 
-        var bitmapType=this.modelTextureTypes[this.genBitmap.genRandom.randomIndex(this.modelTextureTypes.length)];
+        var bitmapType=this.modelTextureTypes[this.genBitmapModel.genRandom.randomIndex(this.modelTextureTypes.length)];
 
             // generate bitmap
 
-        this.bitmapList.addBitmap(this.genBitmap.generate(this.view,('Monster '+idx),bitmapType));
+        this.bitmapList.addBitmap(this.genBitmapModel.generate(this.view,('Monster '+idx),bitmapType));
 
             // if more textures, then loop back around
 
