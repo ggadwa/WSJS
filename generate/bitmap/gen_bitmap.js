@@ -269,15 +269,15 @@ class GenBitmapClass
 
                 switch (tileStyle) {
 
-                    case GEN_BITMAP_TILE_STYLE_BORDER:
+                    case 0:         // border style
                         if ((x!==0) && (y!==0)) col=tileColor[1];
                         break;
 
-                    case GEN_BITMAP_TILE_STYLE_CHECKER:
+                    case 1:         // checker board style
                         col=tileColor[(x+y)&0x1];
                         break;
 
-                    case GEN_BITMAP_TILE_STYLE_STRIPE:
+                    case 2:         // stripe style
                         if ((x&0x1)!==0) col=tileColor[1];
                         break;
 

@@ -67,7 +67,7 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
 //
 // monsters
@@ -287,10 +287,6 @@ const GEN_BITMAP_TYPE_NAMES=[
                                 'Wood Box','Machine','Skin Scale',
                                 'Skin Leather','Skin Fur'
                             ];
-
-const GEN_BITMAP_TILE_STYLE_BORDER=0;
-const GEN_BITMAP_TILE_STYLE_CHECKER=1;
-const GEN_BITMAP_TILE_STYLE_STRIPE=2;
 
 //
 // sound generation types

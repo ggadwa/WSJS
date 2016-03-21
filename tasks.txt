@@ -21,6 +21,9 @@ REGULAR TODOs
 #### glowing computer lights?
 #### spikes
 
+#### separate map texture generation from model texture generation (and update debug)
+#### make main skip textures already used
+
 [X] slight color variations in lighting
 [X] packed lights into vec4 to save space, changed light in scene algorithm and now handling 6 lights
 [X] some decoration random min/maxes are now dynamic based on room sizes

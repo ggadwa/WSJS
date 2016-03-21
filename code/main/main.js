@@ -23,23 +23,24 @@ class MainClass
         
             // texture list for the map
             
-        this.textureBuildList=
+        this.mapTextureBuildList=
             [
-                ['Map Wall',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
+                ['Map Wall',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER,GEN_BITMAP_TYPE_TILE_SIMPLE]],
                 ['Map Floor',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
                 ['Map Ceiling',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_WOOD_PLANK]],
-                ['Map Stairs',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE]],
+                ['Map Stairs',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_METAL]],
                 ['Map Platform',[GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_CORRUGATED,GEN_BITMAP_TYPE_WOOD_PLANK]],
                 ['Map Ledge',[GEN_BITMAP_TYPE_TILE_SIMPLE,GEN_BITMAP_TYPE_TILE_COMPLEX,GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_MOSAIC]],
                 ['Map Metal',[GEN_BITMAP_TYPE_METAL]],
                 ['Map Box',[GEN_BITMAP_TYPE_WOOD_BOX,GEN_BITMAP_TYPE_METAL,GEN_BITMAP_TYPE_METAL_BAR]],
-                ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL /*,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER */]],
-                ['Map Closet',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER]],
+                ['Map Pillar',[GEN_BITMAP_TYPE_TILE_SMALL,GEN_BITMAP_TYPE_CONCRETE,GEN_BITMAP_TYPE_PLASTER]],
+                ['Map Closet',[GEN_BITMAP_TYPE_BRICK_STACK,GEN_BITMAP_TYPE_BRICK_RANDOM,GEN_BITMAP_TYPE_STONE,GEN_BITMAP_TYPE_PLASTER,GEN_BITMAP_TYPE_TILE_SIMPLE]],
                 ['Map Machine',[GEN_BITMAP_TYPE_MACHINE]],
-                ['Skin Scale',[GEN_BITMAP_TYPE_SKIN_SCALE]],
-                ['Skin Leather',[GEN_BITMAP_TYPE_SKIN_LEATHER]],
-                ['Skin Fur',[GEN_BITMAP_TYPE_SKIN_FUR]]
             ];
+            
+            // texture types for models
+            
+        this.modelTextureTypes=[GEN_BITMAP_TYPE_SKIN_SCALE,GEN_BITMAP_TYPE_SKIN_LEATHER,GEN_BITMAP_TYPE_SKIN_FUR];
 
             // sound list for the game
             
@@ -92,26 +93,25 @@ class MainClass
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Textures');
+        this.view.loadingScreenAddString('Generating Dynamic Map Textures');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildMapTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
     }
 
-    initBuildTextures(idx)
+    initBuildMapTextures(idx)
     {
-        var bitmapCount=this.textureBuildList.length;
+        var bitmapCount=this.mapTextureBuildList.length;
 
             // bitmap name
 
-        var name=this.textureBuildList[idx][0];
+        var name=this.mapTextureBuildList[idx][0];
 
             // pick a random texture type
             // we borrow the current random generator from the gen bitmap
 
-        var bitmapTypeList=this.textureBuildList[idx][1];
-        var k=this.genBitmap.genRandom.randomIndex(bitmapTypeList.length);
-        var bitmapType=bitmapTypeList[k];
+        var bitmapTypeList=this.mapTextureBuildList[idx][1];
+        var bitmapType=bitmapTypeList[this.genBitmap.genRandom.randomIndex(bitmapTypeList.length)];
 
             // generate bitmap
 
@@ -122,7 +122,35 @@ class MainClass
         idx++;
         if (idx<bitmapCount) {
             this.view.loadingScreenDraw(idx/bitmapCount);
-            setTimeout(this.initBuildTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.initBuildMapTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Model Textures');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initBuildModelTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    initBuildModelTextures(idx)
+    {
+            // pick a random model texture type
+
+        var bitmapType=this.modelTextureTypes[this.genBitmap.genRandom.randomIndex(this.modelTextureTypes.length)];
+
+            // generate bitmap
+
+        this.bitmapList.addBitmap(this.genBitmap.generate(this.view,('Monster '+idx),bitmapType));
+
+            // if more textures, then loop back around
+
+        idx++;
+        if (idx<MONSTER_MODEL_COUNT) {
+            this.view.loadingScreenDraw(idx/MONSTER_MODEL_COUNT);
+            setTimeout(this.initBuildModelTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
             return;
         }
 
@@ -227,8 +255,7 @@ class MainClass
 
             // get bitmap
 
-        var skinTypes=['Skin Scale','Skin Leather','Skin Fur'];
-        var modelBitmap=this.bitmapList.getBitmap(skinTypes[idx%3]);
+        var modelBitmap=this.bitmapList.getBitmap('Monster '+(idx%3));
 
             // player model if 0
             // else a monster
