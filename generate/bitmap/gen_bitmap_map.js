@@ -404,26 +404,37 @@ class GenBitmapMapClass
         
             // sizing
         
-        edgeSize=this.genRandom.randomInt(5,5)+20;
+        edgeSize=this.genRandom.randomInt(5,5);
         xCount=this.genRandom.randomInt(2,2);
         yCount=this.genRandom.randomInt(2,10);
         
         xSize=Math.trunc(wid/xCount);
         ySize=Math.trunc(high/yCount);
         
-        top=0; //-Math.trunc(ySize/2);
+        bitmapCTX.save();
+        //bitmapCTX.translate(-Math.trunc(xSize/2),-Math.trunc(ySize/2));
+        
+        normalCTX.save();
+        //normalCTX.translate(-Math.trunc(xSize/2),-Math.trunc(ySize/2));
+        
+        top=-Math.trunc(ySize/2);
         
         for (y=0;y!==(yCount*2);y++) {
             
-            lft=((y%2)==0)?0:xSize;
+            lft=50;//((y%2)==0)?0:xSize;
             
             for (x=0;x<xCount;x+=2) {
-                this.genBitmapUtility.draw3DHexagon(bitmapCTX,normalCTX,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
+                this.genBitmapUtility.draw3DHexagon(bitmapCTX,normalCTX,wid,high,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
                 lft+=(xSize*2);
+                break;
             }
             
             top+=(ySize/2);
+            break;
         }
+        
+        bitmapCTX.restore();
+        normalCTX.restore();
         
             // finish with the specular
 

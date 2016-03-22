@@ -833,7 +833,7 @@ class GenBitmapUtilityClass
         normalCTX.fill();
     }
     
-    draw3DHexagon(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    draw3DHexagon(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
         var n,k,x,y,my,xAdd;
         var darkenFactor,darkColor;
@@ -846,20 +846,23 @@ class GenBitmapUtilityClass
         xAdd=Math.trunc((rgt-lft)*0.1);
         my=Math.trunc((top+bot)/2);
         
-        x[0]=lft;
+        x[0]=lft-xAdd;
         y[0]=my;
-        x[1]=lft+xAdd;
+        x[1]=lft;
         y[1]=top;
-        x[2]=rgt-xAdd;
+        x[2]=rgt;
         y[2]=top;
-        x[3]=rgt;
+        x[3]=rgt+xAdd;
         y[3]=my;
-        x[4]=rgt-xAdd;
+        x[4]=rgt;
         y[4]=bot;
-        x[5]=lft+xAdd;
+        x[5]=lft;
         y[5]=bot;
         
             // draw the edges
+            
+        bitmapCTX.lineWidth=2;
+        normalCTX.lineWidth=2;
 
         for (n=0;n!==edgeSize;n++) {
 
@@ -902,31 +905,67 @@ class GenBitmapUtilityClass
             normalCTX.lineTo(x[5],y[5]);
             normalCTX.lineTo(x[0],y[0]);
             normalCTX.stroke();
+            
+                // reduce it
+                
+            x[0]++;
+            x[1]++;
+            y[1]++;
+            x[2]--;
+            y[2]++;
+            x[3]--;
+            x[4]--;
+            y[4]--;
+            x[5]++;
+            y[5]--;
         }
+        
+        bitmapCTX.lineWidth=1;
+        normalCTX.lineWidth=1;
         
         if (fillRGBColor===null) return;
 
-            // and the fill
+            // and the fills
+            // which we have to break up because canvases
+            // get confused with offscreen coordinates
 
         bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
-
-            // top fill
-            
-        bitmapCTX.beginPath();
-        bitmapCTX.moveTo(x[0],y[0]);
-        for (k=1;k!==6;k++) {
-            bitmapCTX.lineTo(x[k],y[k]);
-        }
-        bitmapCTX.fill();
-        
         normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
 
-        normalCTX.beginPath();
-        normalCTX.moveTo(x[0],y[0]);
-        for (k=1;k!==6;k++) {
-            normalCTX.lineTo(x[k],y[k]);
-        }
-        normalCTX.fill();
+            // the box
+            
+        bitmapCTX.fillRect(x[1],y[1],(x[4]-x[1]),(y[4]-y[1]));
+        normalCTX.fillRect(x[1],y[1],(x[4]-x[1]),(y[4]-y[1]));
+        
+            // left triangle
+            
+        //if (x[1]>0) {
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(x[0],y[0]);
+            bitmapCTX.lineTo(x[1],y[1]);
+            bitmapCTX.lineTo(x[5],y[5]);
+            //bitmapCTX.fill();
+           
+            normalCTX.beginPath();
+            normalCTX.moveTo(x[0],y[0]);
+            normalCTX.lineTo(x[1],y[1]);
+            normalCTX.lineTo(x[5],y[5]);
+            //normalCTX.fill();
+        //}
+            
+        //if (x[2]>0) {
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(x[3],y[3]);
+            bitmapCTX.lineTo(x[4],y[4]);
+            bitmapCTX.lineTo(x[2],y[2]);
+            //bitmapCTX.fill();
+           
+            normalCTX.beginPath();
+            normalCTX.moveTo(x[3],y[3]);
+            normalCTX.lineTo(x[4],y[4]);
+            normalCTX.lineTo(x[2],y[2]);
+            //normalCTX.fill();
+        //}
     }
     
     drawDiamond(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
