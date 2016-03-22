@@ -16,10 +16,10 @@ REGULAR TODOs
 
 
 
-#### stacked block textures can have (randomly) altered Y sizes (one line)
 #### collisions against slanted walls are bad
 #### glowing computer lights?
 #### spikes
+#### need ability for meshes to skip light mapping phase
 
 
 [X] slight color variations in lighting
@@ -32,7 +32,8 @@ REGULAR TODOs
 [X] improved walk animations, added random idle animations
 [X] improved the particles
 [X] textures types are now marked so maps are less likely to keep picking the same type in the same map
-[ ] added cement, block wall, and hexagonal floor texture types, improved other textures a bit
+[X] added cement, block wall, metal shutters, and hexagonal texture types
+[X] improvements in other textures, plus new dirty streaking options
 
 
 [ ] GL

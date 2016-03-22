@@ -24,6 +24,11 @@ class GenBitmapUtilityClass
         this.NORMAL_TOP_10=new wsPoint(0.0,0.1,0.90);
         this.NORMAL_BOTTOM_10=new wsPoint(0.0,-0.1,0.90);
         
+        this.NORMAL_TOP_LEFT_45=new wsPoint(-0.30,0.30,0.70);
+        this.NORMAL_TOP_RIGHT_45=new wsPoint(0.30,0.30,0.70);
+        this.NORMAL_BOTTOM_LEFT_45=new wsPoint(-0.30,-0.30,0.70);
+        this.NORMAL_BOTTOM_RIGHT_45=new wsPoint(0.30,-0.30,0.70);
+        
         Object.seal(this);
     }
     
@@ -388,6 +393,48 @@ class GenBitmapUtilityClass
         bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
     
+    addNormalNoiseRect(normalCTX,lft,top,rgt,bot,percentage)
+    {    
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+        var n,nPixel,idx;
+        var wid=rgt-lft;
+        var high=bot-top;    
+        
+        var normal;
+        var normals=[this.NORMAL_LEFT_10,this.NORMAL_RIGHT_10,this.NORMAL_TOP_10,this.NORMAL_BOTTOM_10];
+
+            // get the image data to add noise to
+
+        var normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        var normalData=normalImgData.data;
+
+            // get the image data to add noise to
+
+        idx=0;
+        nPixel=wid*high;
+
+        for (n=0;n!==nPixel;n++) {
+
+            if (this.genRandom.randomPercentage(percentage)) {
+
+                    // the random normal
+
+                normal=normals[this.genRandom.randomIndex(4)];
+
+                normalData[idx]=Math.trunc(normal.x*255.0);
+                normalData[idx+1]=Math.trunc(normal.y*255.0);
+                normalData[idx+2]=Math.trunc(normal.z*255.0);
+            }
+
+                // next pixel
+
+            idx+=4;
+        }
+
+        normalCTX.putImageData(normalImgData,lft,top);
+    }
+    
         //
         // blur routines
         //
@@ -449,15 +496,11 @@ class GenBitmapUtilityClass
                         }
                     }
                     
-                    r=Math.trunc(r/8);
-                    g=Math.trunc(g/8);
-                    b=Math.trunc(b/8);
-
                     idx=((y*wid)+x)*4;
 
-                    blurData[idx]=r;
-                    blurData[idx+1]=g;
-                    blurData[idx+2]=b;
+                    blurData[idx]=Math.trunc(r*0.125);
+                    blurData[idx+1]=Math.trunc(g*0.125);
+                    blurData[idx+2]=Math.trunc(b*0.125);
                 }
             }
 
@@ -835,29 +878,17 @@ class GenBitmapUtilityClass
     
     draw3DHexagon(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
-        var n,k,x,y,my,xAdd;
+        var n,lx,rx,my,xAdd;
         var darkenFactor,darkColor;
 
             // build the polygon
 
-        x=new Uint16Array(6);
-        y=new Uint16Array(6);
-        
         xAdd=Math.trunc((rgt-lft)*0.1);
-        my=Math.trunc((top+bot)/2);
         
-        x[0]=lft-xAdd;
-        y[0]=my;
-        x[1]=lft;
-        y[1]=top;
-        x[2]=rgt;
-        y[2]=top;
-        x[3]=rgt+xAdd;
-        y[3]=my;
-        x[4]=rgt;
-        y[4]=bot;
-        x[5]=lft;
-        y[5]=bot;
+        lx=lft-xAdd;
+        rx=rgt;
+        rgt-=xAdd;
+        my=Math.trunc((top+bot)/2);
         
             // draw the edges
             
@@ -872,52 +903,84 @@ class GenBitmapUtilityClass
             darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
             bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
             
-                // top
+                // top-left to top to top-right
+            
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(lx,my);
+            bitmapCTX.lineTo(lft,top);
+            bitmapCTX.stroke();
+
+            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_LEFT_45);
+            normalCTX.beginPath();
+            normalCTX.moveTo(lx,my);
+            normalCTX.lineTo(lft,top);
+            normalCTX.stroke();
 
             bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x[0],y[0]);
-            bitmapCTX.lineTo(x[1],y[1]);
-            bitmapCTX.lineTo(x[2],y[2]);
-            bitmapCTX.lineTo(x[3],y[3]);
+            bitmapCTX.moveTo(lft,top);
+            bitmapCTX.lineTo(rgt,top);
             bitmapCTX.stroke();
-            
+
             normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
             normalCTX.beginPath();
-            normalCTX.moveTo(x[0],y[0]);
-            normalCTX.lineTo(x[1],y[1]);
-            normalCTX.lineTo(x[2],y[2]);
-            normalCTX.lineTo(x[3],y[3]);
+            normalCTX.moveTo(lft,top);
+            normalCTX.lineTo(rgt,top);
+            normalCTX.stroke();
+
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(rgt,top);
+            bitmapCTX.lineTo(rx,my);
+            bitmapCTX.stroke();
+
+            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_RIGHT_45);
+            normalCTX.beginPath();
+            normalCTX.moveTo(rgt,top);
+            normalCTX.lineTo(rx,my);
             normalCTX.stroke();
             
-                // bottom
-                
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x[3],y[3]);
-            bitmapCTX.lineTo(x[4],y[4]);
-            bitmapCTX.lineTo(x[5],y[5]);
-            bitmapCTX.lineTo(x[0],y[0]);
-            bitmapCTX.stroke();
+                // bottom-right to bottom to bottom-left
             
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(rx,my);
+            bitmapCTX.lineTo(rgt,bot);
+            bitmapCTX.stroke();
+
+            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_RIGHT_45);
+            normalCTX.beginPath();
+            normalCTX.moveTo(rx,my);
+            normalCTX.lineTo(rgt,bot);
+            normalCTX.stroke();
+
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(rgt,bot);
+            bitmapCTX.lineTo(lft,bot);
+            bitmapCTX.stroke();
+
             normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
             normalCTX.beginPath();
-            normalCTX.moveTo(x[3],y[3]);
-            normalCTX.lineTo(x[4],y[4]);
-            normalCTX.lineTo(x[5],y[5]);
-            normalCTX.lineTo(x[0],y[0]);
+            normalCTX.moveTo(rgt,bot);
+            normalCTX.lineTo(lft,bot);
+            normalCTX.stroke();
+
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(lft,bot);
+            bitmapCTX.lineTo(lx,my);
+            bitmapCTX.stroke();
+
+            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_LEFT_45);
+            normalCTX.beginPath();
+            normalCTX.moveTo(lft,bot);
+            normalCTX.lineTo(lx,my);
             normalCTX.stroke();
             
                 // reduce it
                 
-            x[0]++;
-            x[1]++;
-            y[1]++;
-            x[2]--;
-            y[2]++;
-            x[3]--;
-            x[4]--;
-            y[4]--;
-            x[5]++;
-            y[5]--;
+            lx++;
+            lft++;
+            rx--;
+            rgt--;
+            top++;
+            bot--;
         }
         
         bitmapCTX.lineWidth=1;
@@ -934,38 +997,38 @@ class GenBitmapUtilityClass
 
             // the box
             
-        bitmapCTX.fillRect(x[1],y[1],(x[4]-x[1]),(y[4]-y[1]));
-        normalCTX.fillRect(x[1],y[1],(x[4]-x[1]),(y[4]-y[1]));
+        bitmapCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
         
             // left triangle
-            
-        //if (x[1]>0) {
+
+        if (lft>=0) {
             bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x[0],y[0]);
-            bitmapCTX.lineTo(x[1],y[1]);
-            bitmapCTX.lineTo(x[5],y[5]);
-            //bitmapCTX.fill();
+            bitmapCTX.moveTo(lx,my);
+            bitmapCTX.lineTo(lft,top);
+            bitmapCTX.lineTo(lft,bot);
+            bitmapCTX.fill();
            
             normalCTX.beginPath();
-            normalCTX.moveTo(x[0],y[0]);
-            normalCTX.lineTo(x[1],y[1]);
-            normalCTX.lineTo(x[5],y[5]);
-            //normalCTX.fill();
-        //}
-            
-        //if (x[2]>0) {
+            normalCTX.moveTo(lx,my);
+            normalCTX.lineTo(lft,top);
+            normalCTX.lineTo(lft,bot);
+            normalCTX.fill();
+        }
+
+        if (rgt<wid) {
             bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x[3],y[3]);
-            bitmapCTX.lineTo(x[4],y[4]);
-            bitmapCTX.lineTo(x[2],y[2]);
-            //bitmapCTX.fill();
+            bitmapCTX.moveTo(rx,my);
+            bitmapCTX.lineTo(rgt,top);
+            bitmapCTX.lineTo(rgt,bot);
+            bitmapCTX.fill();
            
             normalCTX.beginPath();
-            normalCTX.moveTo(x[3],y[3]);
-            normalCTX.lineTo(x[4],y[4]);
-            normalCTX.lineTo(x[2],y[2]);
-            //normalCTX.fill();
-        //}
+            normalCTX.moveTo(rx,my);
+            normalCTX.lineTo(rgt,top);
+            normalCTX.lineTo(rgt,bot);
+            normalCTX.fill();
+        }
     }
     
     drawDiamond(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
@@ -1096,7 +1159,7 @@ class GenBitmapUtilityClass
         normalCTX.putImageData(normalImgData,lft,top);
     }
     
-    drawLine(bitmapCTX,normalCTX,x,y,x2,y2,color)
+    drawLine(bitmapCTX,normalCTX,x,y,x2,y2,color,lightLine)
     {
         var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
@@ -1139,7 +1202,7 @@ class GenBitmapUtilityClass
 
         if (normalCTX!==null) {
             if (horizontal) {
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
+                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y-1));
                 normalCTX.lineTo(x2,(y2-1));
@@ -1149,14 +1212,14 @@ class GenBitmapUtilityClass
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
+                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo(x,(y+1));
                 normalCTX.lineTo(x2,(y2+1));
                 normalCTX.stroke();
             }
             else {
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_45);
+                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x-1),y);
                 normalCTX.lineTo((x2-1),y2);
@@ -1166,7 +1229,7 @@ class GenBitmapUtilityClass
                 normalCTX.moveTo(x,y);
                 normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_45);
+                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
                 normalCTX.beginPath();
                 normalCTX.moveTo((x+1),y);
                 normalCTX.lineTo((x2+1),y2);
@@ -1175,7 +1238,7 @@ class GenBitmapUtilityClass
         }
     }
     
-    drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color)
+    drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color,lightLine)
     {
         var n,sx,sy,ex,ey,r;
         var segCount=this.genRandom.randomInt(2,5);
@@ -1207,7 +1270,7 @@ class GenBitmapUtilityClass
                 }
             }
             
-            this.drawLine(bitmapCTX,normalCTX,sx,sy,ex,ey,color);
+            this.drawLine(bitmapCTX,normalCTX,sx,sy,ex,ey,color,lightLine);
             
             sx=ex;
             sy=ey;
@@ -1269,6 +1332,38 @@ class GenBitmapUtilityClass
                 normalCTX.lineTo((x2+n),y2);
                 normalCTX.stroke();
             }
+        }
+    }
+    
+        //
+        // slopes
+        //
+        
+    drawSlope(bitmapCTX,normalCTX,lft,top,rgt,bot,color,up)
+    {
+        var y;
+        var darkenFactor,darkColor;
+        var high=bot-top;
+        
+        normalCTX.strokeStyle=this.normalToRGBColor(up?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
+        
+        for (y=top;y!==bot;y++) {
+            
+            darkenFactor=(((y-top)+1)/high)*0.2;
+            if (up) darkenFactor=0.2-darkenFactor;
+            darkenFactor+=0.8;
+            darkColor=this.darkenColor(color,darkenFactor);
+            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+            
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(lft,y);
+            bitmapCTX.lineTo(rgt,y);
+            bitmapCTX.stroke();
+            
+            normalCTX.beginPath();
+            normalCTX.moveTo(lft,y);
+            normalCTX.lineTo(rgt,y);
+            normalCTX.stroke();
         }
     }
     
@@ -1381,7 +1476,7 @@ class GenBitmapUtilityClass
         // streaks
         //
 
-    drawStreakVertical(bitmapCTX,imgWid,imgHigh,x,top,bot,streakWid,baseColor)
+    drawStreakMetal(bitmapCTX,imgWid,imgHigh,x,top,bot,streakWid,baseColor)
     {
         var n,lx,rx,y,idx;
         
@@ -1434,6 +1529,71 @@ class GenBitmapUtilityClass
             // write all the data back
 
         bitmapCTX.putImageData(bitmapImgData,0,0);
+    }
+    
+    drawStreakDirtSingle(bitmapCTX,lft,top,rgt,bot,density,darken)
+    {
+        var lx,rx,xAdd,x,y,idx;
+        var lineDensity;
+        var wid=rgt-lft;
+        var high=bot-top;
+        
+        if ((wid<=0) || (high<=0)) return;
+        
+            // get the image data
+
+        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        var bitmapData=bitmapImgData.data;
+        
+            // draw the dirt
+            
+        for (y=0;y!==high;y++) {
+            
+                // the dirt works down to a point
+                
+            xAdd=Math.trunc((y/high)*(wid*0.48));
+            lx=xAdd;
+            rx=wid-xAdd;
+            if (lx>=rx) break;
+            
+            lineDensity=(1.0-(y/high))*density;
+            if (lineDensity<=0.0) break;
+            
+            for (x=lx;x!==rx;x++) {
+                
+                if (this.genRandom.randomPercentage(lineDensity)) {
+                    idx=((y*wid)+x)*4;
+                    bitmapData[idx]=Math.trunc(bitmapData[idx]*darken);
+                    bitmapData[idx+1]=Math.trunc(bitmapData[idx+1]*darken);
+                    bitmapData[idx+2]=Math.trunc(bitmapData[idx+2]*darken);
+                }
+            }
+        }
+        
+            // write all the data back
+
+        bitmapCTX.putImageData(bitmapImgData,lft,top);
+    }
+    
+    drawStreakDirt(bitmapCTX,lft,top,rgt,bot,additionalStreakCount,density,darken)
+    {
+        var n,sx,ex,ey;
+        
+            // original streak
+            
+        this.drawStreakDirtSingle(bitmapCTX,lft,top,rgt,bot,density,darken);
+        
+            // additional streaks
+            
+        for (n=0;n!=additionalStreakCount;n++) {
+            sx=this.genRandom.randomInBetween(lft,rgt);
+            ex=this.genRandom.randomInBetween(sx,rgt);
+            if (sx>=ex) continue;
+            
+            ey=bot-this.genRandom.randomInt(0,Math.trunc((bot-top)*0.25));
+            
+            this.drawStreakDirtSingle(bitmapCTX,sx,top,ex,ey,density,darken);
+        }
     }
     
         //

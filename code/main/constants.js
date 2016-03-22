@@ -67,7 +67,7 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
@@ -93,7 +93,7 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 const SEED=Date.now();
 
 const SEED_BITMAP_MAP=Math.trunc((Math.random()*SEED));
-const SEED_MAP=Math.trunc((Math.random()*SEED));
+const SEED_MAP=1; //Math.trunc((Math.random()*SEED));
 const SEED_BITMAP_MODEL=Math.trunc((Math.random()*SEED));
 const SEED_MODEL=Math.trunc((Math.random()*SEED));
 const SEED_ENTITY=Math.trunc((Math.random()*SEED));
@@ -271,18 +271,19 @@ const GEN_BITMAP_MAP_TYPE_HEXAGONAL=7;
 const GEN_BITMAP_MAP_TYPE_METAL=8;
 const GEN_BITMAP_MAP_TYPE_METAL_BAR=9;
 const GEN_BITMAP_MAP_TYPE_METAL_CORRUGATED=10;
-const GEN_BITMAP_MAP_TYPE_CONCRETE=11;
-const GEN_BITMAP_MAP_TYPE_CEMENT=12;
-const GEN_BITMAP_MAP_TYPE_PLASTER=13;
-const GEN_BITMAP_MAP_TYPE_MOSAIC=14;
-const GEN_BITMAP_MAP_TYPE_WOOD_PLANK=15;
-const GEN_BITMAP_MAP_TYPE_WOOD_BOX=16;
-const GEN_BITMAP_MAP_TYPE_MACHINE=17;
+const GEN_BITMAP_MAP_TYPE_METAL_SHUTTER=11;
+const GEN_BITMAP_MAP_TYPE_CONCRETE=12;
+const GEN_BITMAP_MAP_TYPE_CEMENT=13;
+const GEN_BITMAP_MAP_TYPE_PLASTER=14;
+const GEN_BITMAP_MAP_TYPE_MOSAIC=15;
+const GEN_BITMAP_MAP_TYPE_WOOD_PLANK=16;
+const GEN_BITMAP_MAP_TYPE_WOOD_BOX=17;
+const GEN_BITMAP_MAP_TYPE_MACHINE=18;
 
 const GEN_BITMAP_MAP_TYPE_NAMES=[
                         'Brick Stack','Brick Random','Stone','Block',
                         'Tile Simple','Tile Complex','Tile Small','Hexagonal',
-                        'Metal','Metal Bar','Metal Corrugated',
+                        'Metal','Metal Bar','Metal Corrugated','Metal Shutter',
                         'Concrete','Cement','Plaster','Mosaic',
                         'Wood Plank','Wood Box','Machine'
                     ];

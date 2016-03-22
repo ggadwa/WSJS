@@ -426,11 +426,11 @@ class GenModelOrganicSkeletonClass
         
             // create any whips
             
-        var whipCount=this.genRandom.randomInt(0,4);
+        var whipCount=this.genRandom.randomInt(0,8);
             
         for (n=0;n!==whipCount;n++) {
             boneIdx=bodyLimb.getRandomBoneIndex(this.genRandom);
-            rotOffset=90.0+((this.genRandom.random()*90.0)-45.0);
+            rotOffset=this.genRandom.random()*360.0;
             
             whipRadius=Math.trunc(botBodyRadius*0.35);
             if (whipRadius<250) whipRadius=250;

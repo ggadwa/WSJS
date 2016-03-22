@@ -256,7 +256,7 @@ class GenLightmapClass
     {
         var n,idx;
         var x,y,cx,cy,cxs,cxe,cys,cye;
-        var colCount,r,g,b;
+        var colCount,fCount,r,g,b;
         
         var pixelData=lightBitmap.pixelData;
         var blurData=lightBitmap.blurData;
@@ -316,20 +316,13 @@ class GenLightmapClass
                     }
                     
                     if (colCount!==0) {
-                        r=Math.trunc(r/colCount);
-                        if (r>255) r=255;
-
-                        g=Math.trunc(g/colCount);
-                        if (g>255) g=255;
-
-                        b=Math.trunc(b/colCount);
-                        if (b>255) b=255;
-
+                        fCount=1/colCount;
+                        
                         idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
 
-                        blurData[idx]=r;
-                        blurData[idx+1]=g;
-                        blurData[idx+2]=b;
+                        blurData[idx]=Math.trunc(r*fCount);
+                        blurData[idx+1]=Math.trunc(g*fCount);
+                        blurData[idx+2]=Math.trunc(b*fCount);
                     }
                 }
             }

@@ -96,7 +96,7 @@ class GenBitmapModelClass
             darken=0.6+(this.genRandom.random()*0.25);
             lineColor=this.genBitmapUtility.darkenColor(clothColor,darken);
             
-            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor);
+            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor,false);
         }
 
             // marks
@@ -158,12 +158,12 @@ class GenBitmapModelClass
                 // hair half from top
                 
             y=halfHigh+this.genRandom.randomInt(0,halfHigh);
-            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,-5,x,(y+5),10,lineColor);
+            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,-5,x,(y+5),10,lineColor,false);
             
                 // hair half from bottom
                 
             y=high-(halfHigh+this.genRandom.randomInt(0,halfHigh));
-            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(high+5),10,lineColor);
+            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(high+5),10,lineColor,false);
         }
 
             // finish with the specular
