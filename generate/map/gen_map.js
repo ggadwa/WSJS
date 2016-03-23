@@ -241,6 +241,20 @@ class GenMapClass
         this.map.addOverlayStair(xStairBound,zStairBound);
     }
     
+        // doors
+        
+    addDoorRoom(connectSide,xDoorBound,yDoorBound,zDoorBound)
+    {
+            // build the door
+            
+        var genRoomDoor=new GenRoomDoorClass(this.view,this.bitmapList,this.map,this.genRandom);
+        genRoomDoor.createDoor(connectSide,xDoorBound,yDoorBound,zDoorBound);
+        
+            // add to overlay
+            
+        this.map.addOverlayStair(xDoorBound,zDoorBound);
+    }
+    
         //
         // lights
         //
@@ -341,14 +355,14 @@ class GenMapClass
         // build map recursive room
         //
 
-    buildMapRecursiveRoom(recurseCount,lastRoom,yLastBound,stairMode,level,depth)
+    buildMapRecursiveRoom(recurseCount,lastRoom,yLastBound,connectionMode,level,depth)
     {
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
         var connectSide,connectOffset;
         var xBound,yBound,zBound;
-        var xStairBound,yStairBound,zStairBound;
-        var stairOffset,stairAdd;
+        var stairOffset,stairAdd,xStairBound,yStairBound,zStairBound;
+        var doorOffset,doorAdd,xDoorBound,yDoorBound,zDoorBound;
 
             // get random block size for room
             // and make sure it stays under the max
@@ -408,8 +422,11 @@ class GenMapClass
                 }
                 connectOffset*=ROOM_BLOCK_WIDTH;
                 
-                stairOffset;
+                    // get new room bounds and move it around
+                    // if we need space for stairs or doors
+                
                 stairAdd=ROOM_BLOCK_WIDTH*2;
+                doorAdd=ROOM_BLOCK_WIDTH;
                 
                 switch (connectSide) {
 
@@ -417,48 +434,88 @@ class GenMapClass
                         xBound=new wsBound((lastRoom.xBound.min-(xBlockSize*ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
                         zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*ROOM_BLOCK_WIDTH)));
                         
-                        if (stairMode!==STAIR_MODE_NONE) {
-                            xBound.add(-stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
-                            xStairBound=new wsBound((lastRoom.xBound.min-stairAdd),lastRoom.xBound.min);
-                            zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                        switch (connectionMode) {
+                            case ROOM_CONNECT_MODE_UP:
+                            case ROOM_CONNECT_MODE_DOWN:
+                                xBound.add(-stairAdd);
+                                stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
+                                xStairBound=new wsBound((lastRoom.xBound.min-stairAdd),lastRoom.xBound.min);
+                                zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                break;
+                            case ROOM_CONNECT_MODE_DOOR:
+                                xBound.add(-doorAdd);
+                                doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
+                                xDoorBound=new wsBound((lastRoom.xBound.min-doorAdd),lastRoom.xBound.min);
+                                zDoorBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                break;
                         }
+                        
                         break;
 
                     case ROOM_SIDE_TOP:
                         xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*ROOM_BLOCK_WIDTH)));
                         zBound=new wsBound((lastRoom.zBound.min-(zBlockSize*ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
                         
-                        if (stairMode!==STAIR_MODE_NONE) {
-                            zBound.add(-stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                            xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
-                            zStairBound=new wsBound((lastRoom.zBound.min-stairAdd),lastRoom.zBound.min);
+                        switch (connectionMode) {
+                            case ROOM_CONNECT_MODE_UP:
+                            case ROOM_CONNECT_MODE_DOWN:
+                                zBound.add(-stairAdd);
+                                stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
+                                xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                zStairBound=new wsBound((lastRoom.zBound.min-stairAdd),lastRoom.zBound.min);
+                                break;
+                            case ROOM_CONNECT_MODE_DOOR:
+                                zBound.add(-doorAdd);
+                                doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
+                                xDoorBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                zDoorBound=new wsBound((lastRoom.zBound.min-doorAdd),lastRoom.zBound.min);
+                                break;
                         }
+                        
                         break;
 
                     case ROOM_SIDE_RIGHT:
                         xBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*ROOM_BLOCK_WIDTH)));
                         zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*ROOM_BLOCK_WIDTH)));
                         
-                        if (stairMode!==STAIR_MODE_NONE) {
-                            xBound.add(stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
-                            xStairBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+stairAdd));
-                            zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                        switch (connectionMode) {
+                            case ROOM_CONNECT_MODE_UP:
+                            case ROOM_CONNECT_MODE_DOWN:
+                                xBound.add(stairAdd);
+                                stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
+                                xStairBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+stairAdd));
+                                zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                break;
+                            case ROOM_CONNECT_MODE_DOOR:
+                                xBound.add(doorAdd);
+                                doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
+                                xDoorBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+doorAdd));
+                                zDoorBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                break;
                         }
+                        
                         break;
 
                     case ROOM_SIDE_BOTTOM:
                         xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*ROOM_BLOCK_WIDTH)));
                         zBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*ROOM_BLOCK_WIDTH)));
                         
-                        if (stairMode!==STAIR_MODE_NONE) {
-                            zBound.add(stairAdd);
-                            stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                            xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
-                            zStairBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+stairAdd));
+                        switch (connectionMode) {
+                            case ROOM_CONNECT_MODE_UP:
+                            case ROOM_CONNECT_MODE_DOWN:
+                                zBound.add(stairAdd);
+                                stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
+                                xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                zStairBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+stairAdd));
+                                break;
+                            case ROOM_CONNECT_MODE_DOOR:
+                                zBound.add(doorAdd);
+                                doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
+                                xDoorBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                zDoorBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+doorAdd));
+                                break;
                         }
+                        
                         break;
 
                 }
@@ -475,13 +532,19 @@ class GenMapClass
             yBound=yLastBound.copy();
         }
 
-            // if previous room raised this one, then
-            // we need a stairs to the previous room
+            // add in any stairs or doors
             
-        if (stairMode!==STAIR_MODE_NONE) {
-            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+ROOM_FLOOR_DEPTH)));
-            this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(stairMode===STAIR_MODE_DOWN),level);
-            this.addStairLight(xStairBound,yStairBound,zStairBound);
+        switch (connectionMode) {
+            case ROOM_CONNECT_MODE_UP:
+            case ROOM_CONNECT_MODE_DOWN:
+                yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+ROOM_FLOOR_DEPTH)));
+                this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
+                this.addStairLight(xStairBound,yStairBound,zStairBound);
+                break;
+            case ROOM_CONNECT_MODE_DOOR:
+                yDoorBound=new wsBound(yBound.max,(yBound.max-ROOM_FLOOR_HEIGHT));
+                this.addDoorRoom(connectSide,xDoorBound,yDoorBound,zDoorBound);
+                break;
         }
 
             // the room
@@ -497,13 +560,20 @@ class GenMapClass
             // outside wall hugging map pieces
         
         if (lastRoom!==null) {
-            if (stairMode!==STAIR_MODE_NONE) {
-                lastRoom.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
-                room.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
-            }
-            else {
-                lastRoom.maskEdgeGridBlockToRoom(room);
-                room.maskEdgeGridBlockToRoom(lastRoom);
+            switch (connectionMode) {
+                case ROOM_CONNECT_MODE_UP:
+                case ROOM_CONNECT_MODE_DOWN:
+                    lastRoom.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
+                    room.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
+                    break;
+                case ROOM_CONNECT_MODE_DOOR:
+                    lastRoom.maskEdgeGridBlockToBounds(xDoorBound,yDoorBound,zDoorBound);
+                    room.maskEdgeGridBlockToBounds(xDoorBound,yDoorBound,zDoorBound);
+                    break;
+                default:
+                    lastRoom.maskEdgeGridBlockToRoom(room);
+                    room.maskEdgeGridBlockToRoom(lastRoom);
+                    break;
             }
         }
         
@@ -516,7 +586,7 @@ class GenMapClass
             // for the next room
             
         var nextLevel;
-        var nextStairMode;
+        var nextConnectionMode;
         var yNextBound;
         var storyAdd=yBound.getSize()+ROOM_FLOOR_DEPTH;
             
@@ -526,7 +596,7 @@ class GenMapClass
                 // can only have one per room
                 
             nextLevel=level;
-            nextStairMode=STAIR_MODE_NONE;
+            nextConnectionMode=ROOM_CONNECT_MODE_NONE;
             yNextBound=yBound.copy();
                 
             if (noCurrentLevelChange) {
@@ -540,12 +610,12 @@ class GenMapClass
                     if (level===0) {
                         nextLevel=1;
                         yNextBound.add(-storyAdd);
-                        nextStairMode=STAIR_MODE_UP;
+                        nextConnectionMode=ROOM_CONNECT_MODE_UP;
                     }
                     else {
                         nextLevel=0;
                         yNextBound.add(storyAdd);
-                        nextStairMode=STAIR_MODE_DOWN;
+                        nextConnectionMode=ROOM_CONNECT_MODE_DOWN;
                     }
 
                         // only one level change
@@ -555,9 +625,15 @@ class GenMapClass
                 }
             }
             
+                // if no level change, check for a door
+                
+            if (nextConnectionMode===ROOM_CONNECT_MODE_NONE) {
+                if (this.genRandom.randomPercentage(ROOM_DOOR_PERCENTAGE)) nextConnectionMode=ROOM_CONNECT_MODE_DOOR;
+            }
+            
                 // recurse to next room
             
-            if ((depth+1)<ROOM_MAX_RECURSION_DEPTH) this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextStairMode,nextLevel,(depth+1));
+            if ((depth+1)<ROOM_MAX_RECURSION_DEPTH) this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextConnectionMode,nextLevel,(depth+1));
         }
     }
     
@@ -653,7 +729,7 @@ class GenMapClass
 
         this.currentRoomCount=0;
         
-        this.buildMapRecursiveRoom(0,null,null,STAIR_MODE_NONE,0,0);
+        this.buildMapRecursiveRoom(0,null,null,ROOM_CONNECT_MODE_NONE,0,0);
         
         this.view.loadingScreenDraw(0.24);
         setTimeout(this.buildMapClosets.bind(this),PROCESS_TIMEOUT_MSEC);

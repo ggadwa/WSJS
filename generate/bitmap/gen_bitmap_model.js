@@ -62,7 +62,7 @@ class GenBitmapModelClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.2);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.4);
     }
     
         //
@@ -120,7 +120,7 @@ class GenBitmapModelClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5,-0.4);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.3);
     }
     
         //
@@ -169,7 +169,7 @@ class GenBitmapModelClass
             // finish with the specular
             // fur isn't shiney so this specular is very low
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5,-0.6);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.3);
     }
     
         //
@@ -180,7 +180,7 @@ class GenBitmapModelClass
     {
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
         this.genBitmapUtility.drawUVTest(bitmapCTX,0,0,wid,high);
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.3);
     }
 
         //

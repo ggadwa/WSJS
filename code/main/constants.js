@@ -15,6 +15,7 @@ const ROOM_MAX_BLOCK_COUNT=50;                  // maximum number of blocks in t
 
 const ROOM_MAX_CONNECT_TRY=20;                  // maximum times to try to find a place to connect a room to another room
 
+const ROOM_DOOR_PERCENTAGE=0.33;                // what % of the time a connection to a room is a door
 const ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connection to a room is up a story
 const ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
@@ -56,9 +57,9 @@ const ROOM_DECORATIONS=true;                    // turns on or off decorations
 
 const MAP_LIGHT_AMBIENT=[0.15,0.15,0.15];       // all over ambient light [r,g,b]
     
-const MAP_LIGHT_FACTOR=0.7;                     // lights are initially set to room radius, this factor is multipled in
-const MAP_LIGHT_FACTOR_EXTRA=0.4;               // random addition to light factor above
-const MAP_LIGHT_TWO_STORY_BOOST=1.4;            // multiply boost when a light is in a two story room
+const MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
+const MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above
+const MAP_LIGHT_TWO_STORY_BOOST=1.3;            // multiply boost when a light is in a two story room
   
 const MAP_LIGHT_EXPONENT_MINIMUM=0.2;           // minimum light exponent (0.0 is completely hard light with no fall off)
 const MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
@@ -67,7 +68,7 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
 //
 // monsters
@@ -93,10 +94,10 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 const SEED=Date.now();
 
 const SEED_BITMAP_MAP=Math.trunc((Math.random()*SEED));
-const SEED_MAP=1; //Math.trunc((Math.random()*SEED));
+const SEED_MAP=2; //Math.trunc((Math.random()*SEED));
 const SEED_BITMAP_MODEL=Math.trunc((Math.random()*SEED));
 const SEED_MODEL=Math.trunc((Math.random()*SEED));
-const SEED_ENTITY=Math.trunc((Math.random()*SEED));
+const SEED_ENTITY=2; //Math.trunc((Math.random()*SEED));
 const SEED_SOUND=Math.trunc((Math.random()*SEED));
 
 //
@@ -163,12 +164,13 @@ const ROOM_SIDE_RIGHT=2;
 const ROOM_SIDE_BOTTOM=3;
 
 //
-// map stairs
+// room connection modes
 //
         
-const STAIR_MODE_NONE=0;
-const STAIR_MODE_UP=1;
-const STAIR_MODE_DOWN=2;
+const ROOM_CONNECT_MODE_NONE=0;
+const ROOM_CONNECT_MODE_UP=1;
+const ROOM_CONNECT_MODE_DOWN=2;
+const ROOM_CONNECT_MODE_DOOR=3;
 
 const STAIR_STEP_COUNT=10;
 

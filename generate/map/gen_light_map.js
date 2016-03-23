@@ -53,9 +53,7 @@ class GenLightmapBitmapClass
             }
         }
 
-            // the current chunk, we start at
-            // 1 to leave the first chunk black
-            // for triangles with no lights
+            // start at chunk 1 as the first free chunk
 
         this.chunkIdx=1;
         
@@ -994,7 +992,7 @@ class GenLightmapClass
         
                     // debugging
 
-        //if (this.lightmapList.length!==0) debug.displayCanvasData(this.lightmapList[0].canvas,1050,10,1024,1024);
+        //if (this.lightmapList.length!==0) this.debug.displayCanvasData(this.lightmapList[0].canvas,1050,10,1024,1024);
 
             // finish with the callback
 

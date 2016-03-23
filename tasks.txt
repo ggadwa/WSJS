@@ -20,12 +20,13 @@ REGULAR TODOs
 #### glowing computer lights?
 #### spikes
 #### need ability for meshes to skip light mapping phase
-
+#### need doors (short hallways)
+#### add elevators for stairs (50/50)
 
 [X] slight color variations in lighting
 [X] packed lights into vec4 to save space, changed light in scene algorithm and now handling 6 lights
 [X] some decoration random min/maxes are now dynamic based on room sizes
-[X] table decorations is now tables and shelves
+[X] table decorations are now tables and shelves
 [X] better and more precise model sphere wrapping
 [X] whip/tail type limbs
 [X] random model mesh vertex variations
@@ -34,6 +35,7 @@ REGULAR TODOs
 [X] textures types are now marked so maps are less likely to keep picking the same type in the same map
 [X] added cement, block wall, metal shutters, and hexagonal texture types
 [X] improvements in other textures, plus new dirty streaking options
+[X] much better specular generation
 
 
 [ ] GL

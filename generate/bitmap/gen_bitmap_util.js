@@ -524,10 +524,10 @@ class GenBitmapUtilityClass
         // specular routines
         //
 
-    createSpecularMap(bitmapCTX,specularCTX,wid,high,contrastFactor,brightnessAdd)
+    createSpecularMap(bitmapCTX,specularCTX,wid,high,contrastFactor,clamp)
     {
         var n,idx,nPixel;
-        var f;
+        var f,fHigh,fClamp;
 
         var bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
         var bitmapData=bitmapImgData.data;
@@ -537,36 +537,51 @@ class GenBitmapUtilityClass
 
         idx=0;
         nPixel=wid*high;
+        
+            // calculate the contrast and just
+            // put it in the first byte value as we
+            // are going to normalize to clamp all this later
+            
+        fHigh=0.0;
 
         for (n=0;n!==nPixel;n++) {
 
-                // get max color
+                // get color brightness
 
-            f=bitmapData[idx];
-            if (bitmapData[idx+1]>f) f=bitmapData[idx+1];
-            if (bitmapData[idx+2]>f) f=bitmapData[idx+2];
+            f=((bitmapData[idx]+bitmapData[idx+1]+bitmapData[idx+2])*0.33)/255.0
 
-            f/=255.0;
+                // calculate the contrast
 
-                // calculate the contrast + brightness
-
-            f=(((f-0.5)*contrastFactor)+0.5)+brightnessAdd;
+            f=((f-0.5)*contrastFactor)+0.5;
             if (f<0.0) f=0.0;
             if (f>1.0) f=1.0;
+            
+            if (f>fHigh) fHigh=f;
 
-                // write to specular
+                // write to first byte, we
+                // spread this out after we clamp later
 
-            f*=255.0;
-
-            specularData[idx]=f;
-            specularData[idx+1]=f;
-            specularData[idx+2]=f;
-            specularData[idx+3]=0xFF;
+            specularData[idx]=f*255.0;
 
                 // next pixel
 
             idx+=4;
         }
+        
+            // use the highest color to normalize
+            // to the clamped brightness
+        
+        idx=0;
+        fClamp=clamp/fHigh;
+        
+        for (n=0;n!==nPixel;n++) {
+            f=specularData[idx]*fClamp;
+                    
+            specularData[idx++]=f;
+            specularData[idx++]=f;
+            specularData[idx++]=f;
+            specularData[idx++]=0xFF;
+        } 
 
         specularCTX.putImageData(specularImgData,0,0);
     }

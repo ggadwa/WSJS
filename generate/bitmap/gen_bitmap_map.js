@@ -29,7 +29,7 @@ class GenBitmapMapClass
             // some random values
 
         var groutColor=this.genBitmapUtility.getRandomGreyColor(0.6,0.7);
-        var brickColor=this.genBitmapUtility.getRandomColor([0.3,0.2,0.2],[1.0,0.8,0.8]);
+        var brickColor=this.genBitmapUtility.getRandomColor([0.5,0.5,0.5],[1.0,1.0,1.0]);
         var edgeColor=this.genBitmapUtility.darkenColor(brickColor,0.8);
 
             // clear canvases
@@ -106,7 +106,7 @@ class GenBitmapMapClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.4);
     }
 
         //
@@ -122,7 +122,7 @@ class GenBitmapMapClass
             // some random values
 
         var groutColor=this.genBitmapUtility.getRandomGreyColor(0.3,0.4);
-        var stoneColor=this.genBitmapUtility.getRandomColor([0.5,0.4,0.3],[0.8,0.6,0.6]);
+        var stoneColor=this.genBitmapUtility.getRandomColor([0.5,0.5,0.5],[1.0,1.0,1.0]);
         var edgeColor=this.genBitmapUtility.darkenColor(stoneColor,0.8);
         
         var padding=this.genRandom.randomInt(3,5);
@@ -181,12 +181,12 @@ class GenBitmapMapClass
             
                  // any random noise
                 
-            this.genBitmapUtility.addNoiseRect(bitmapCTX,rect.lft,rect.top,rect.rgt,rect.bot,0.8,1.0,0.5);
+            this.genBitmapUtility.addNoiseRect(bitmapCTX,rect.lft,rect.top,rect.rgt,rect.bot,0.8,1.0,0.4);
         }
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.4);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.5);
     }
     
         //
@@ -216,7 +216,7 @@ class GenBitmapMapClass
                
                // concrete background
                
-            concreteColor=this.genBitmapUtility.getRandomGreyColor(0.4,0.6);
+            concreteColor=this.genBitmapUtility.getRandomGreyColor(0.5,0.8);
             this.genBitmapUtility.drawRect(bitmapCTX,0,top,wid,bot,concreteColor);
             
                 // slopes
@@ -251,7 +251,7 @@ class GenBitmapMapClass
         
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,4.0,0.2);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.5);
     }
     
         //
@@ -415,7 +415,7 @@ class GenBitmapMapClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.4);
     }
     
         //
@@ -459,7 +459,7 @@ class GenBitmapMapClass
         
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.6);
     }
 
         //
@@ -587,7 +587,7 @@ class GenBitmapMapClass
         
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.2);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.6);
     }
     
     generateMetalCorrugated(bitmapCTX,normalCTX,specularCTX,wid,high)
@@ -658,7 +658,7 @@ class GenBitmapMapClass
         
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.6);
     }
     
     generateMetalShutter(bitmapCTX,normalCTX,specularCTX,wid,high)
@@ -674,7 +674,7 @@ class GenBitmapMapClass
 
         var barEdgeSize=this.genRandom.randomInt(5,5);
         var metalEdgeSize=this.genRandom.randomInt(4,4);
-        var frameSize=this.genRandom.randomInt(10,50);
+        var frameSize=this.genRandom.randomInt(50,100);
         
             // outer and inner plate
             
@@ -708,7 +708,7 @@ class GenBitmapMapClass
         
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.6);
     }
     
         //
@@ -748,7 +748,7 @@ class GenBitmapMapClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,4.0,0.2);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.5);
     }
     
         //
@@ -805,7 +805,7 @@ class GenBitmapMapClass
         
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,4.0,-0.4);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.4);
     }
     
         //
@@ -855,7 +855,7 @@ class GenBitmapMapClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.4);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.4);
     }
     
         //
@@ -932,7 +932,7 @@ class GenBitmapMapClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.3);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.5);
     }
 
         //
@@ -1020,7 +1020,7 @@ class GenBitmapMapClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,-0.2);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.4);
     }
     
         //
@@ -1126,7 +1126,7 @@ class GenBitmapMapClass
         
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,3.0,-0.5);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.4);
     }
     
         //
@@ -1137,7 +1137,7 @@ class GenBitmapMapClass
     {
         this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
         this.genBitmapUtility.drawUVTest(bitmapCTX,0,0,wid,high);
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,2.0,0.0);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.5);
     }
 
         //
