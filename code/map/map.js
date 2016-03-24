@@ -14,6 +14,8 @@ class MapClass
         this.lights=[];
         this.lightmaps=[];
         this.rooms=[];
+        
+        this.movementList=new MovementListClass();
 
         this.overlay=new MapOverlayClass();
 
@@ -73,6 +75,11 @@ class MapClass
     {
         this.meshes.push(mesh);
         return(this.meshes.length-1);
+    }
+    
+    getMesh(idx)
+    {
+        return(this.meshes[idx]);
     }
 
     addLight(light)
@@ -401,6 +408,20 @@ class MapClass
     }
     
         //
+        // map movements
+        //
+    
+    addMovement(movement)
+    {
+        this.movementList.addMovement(movement);
+    }
+    
+    runMovements(view,soundList)
+    {
+        this.movementList.run(view,soundList,this);
+    }
+    
+        //
         // pass-through for overlays
         //
         
@@ -424,9 +445,9 @@ class MapClass
         this.overlay.addCloset(xBound,zBound);
     }
     
-    addOverlayStair(xBound,zBound)
+    addOverlayConnection(xBound,zBound)
     {
-        this.overlay.addStair(xBound,zBound);
+        this.overlay.addConnection(xBound,zBound);
     };
     
     addOverlayPlatform(xBound,zBound)
@@ -500,6 +521,7 @@ class MapClass
 
                 // draw the mesh
 
+            mesh.updateBuffers(view);
             mesh.buildNonCulledTriangleIndexes(view);
             mesh.bindBuffers(view,this.mapShader);
             mesh.draw(view);

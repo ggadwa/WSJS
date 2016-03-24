@@ -440,7 +440,6 @@ class MainClass
 
 var main=new MainClass();
 
-
 //
 // main loop
 //
@@ -466,17 +465,21 @@ function mainLoop(timeStamp)
         
     main.input.run();
     
-        // entities and physics
+        // map movement, entities, and
+        // other physics
     
-    var physicsTick=view.timeStamp-view.loopLastPhysicTimeStamp;
+    view.physicsTick=view.timeStamp-view.loopLastPhysicTimeStamp;
     view.loopLastPhysicTimeStamp=view.timeStamp;
     
-    if (physicsTick>BAIL_MILLISECONDS) return;
+    map.runMovements(view,soundList);
     
-    while (physicsTick>PHYSICS_MILLISECONDS) {
-        physicsTick-=PHYSICS_MILLISECONDS;
-        
-        entityList.run(view,soundList,map);
+    if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held stuff up for a long time
+    
+        while (view.physicsTick>PHYSICS_MILLISECONDS) {
+            view.physicsTick-=PHYSICS_MILLISECONDS;
+
+            entityList.run(view,soundList,map);
+        }
     }
     
         // update the listener
@@ -485,14 +488,14 @@ function mainLoop(timeStamp)
     
         // drawing
         
-    var drawTick=view.timeStamp-view.loopLastDrawTimeStamp;
+    view.drawTick=view.timeStamp-view.loopLastDrawTimeStamp;
     
-    if (drawTick>DRAW_MILLISECONDS) {
+    if (view.drawTick>DRAW_MILLISECONDS) {
         view.loopLastDrawTimeStamp=view.timeStamp; 
 
         view.draw(map,entityList,debug);
         
-        view.fpsTotal+=drawTick;
+        view.fpsTotal+=view.drawTick;
         view.fpsCount++;
     }
     

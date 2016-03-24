@@ -1,14 +1,13 @@
 "use strict";
 
 //
-// generate room door class
+// map doors
 //
 
 class GenRoomDoorClass
 {
-    constructor(view,bitmapList,map,genRandom)
+    constructor(bitmapList,map,genRandom)
     {    
-        this.view=view;
         this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
@@ -16,134 +15,250 @@ class GenRoomDoorClass
         Object.seal(this);
     }
     
-        // build any cubes for doors
+        //
+        // create a single wall in vertexes
+        //
         
-    createCube(bitmap,xBound,yBound,zBound,normalsIn)
+    createSingleWallX(idx,vertexList,x,yBound,zBound)
     {
-        var n,idx;
-        var vertexList,indexes;
+        vertexList[idx++].position.setFromValues(x,yBound.min,zBound.min);
+        vertexList[idx++].position.setFromValues(x,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(x,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(x,yBound.max,zBound.min);
+        return(idx);
+    }
+    
+    createSingleWallZ(idx,vertexList,xBound,yBound,z)
+    {
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,z);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,z);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,z);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,z);
+        return(idx);
+    }
+    
+    createSingleCeilingX(idx,vertexList,xBound,top,zBound)
+    {
+        vertexList[idx++].position.setFromValues(xBound.min,top,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,top,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,top,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,top,zBound.max);
+        return(idx);
+    }
+    
+    createSingleCeilingZ(idx,vertexList,xBound,bottom,zBound)
+    {
+        vertexList[idx++].position.setFromValues(xBound.min,bottom,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.min,bottom,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,bottom,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,bottom,zBound.min);
+        return(idx);
+    }
+    
+        //
+        // utility routine to complete sets of
+        // vertices into meshes
+        //
         
-            // center point for normal creation
+    finishDoorMesh(bitmap,vertexList,buildNormals,meshCenterPoint,normalsIn,flags)
+    {
+            // build the indexes
+            // everything we build is a quad so
+            // we have 6 * # of quads in indexes
             
-        var centerPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        var n;
+        var iCount=Math.trunc(Math.trunc(vertexList.length)/4)*6;
 
-            // the walls
+        var indexes=new Uint16Array(iCount);
+        
+        var vIdx=0;
 
-        idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList(24);
-
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);    
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);  
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
-
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
-
-        indexes=new Uint16Array(24);
-
-        for (n=0;n!==24;n++) {
-            indexes[n]=n;
+        for (n=0;n!==iCount;n+=6) {
+            indexes[n]=vIdx;
+            indexes[n+1]=vIdx+1;
+            indexes[n+2]=vIdx+2;
+            
+            indexes[n+3]=vIdx;
+            indexes[n+4]=vIdx+2;
+            indexes[n+5]=vIdx+3;
+            
+            vIdx+=4;
         }
         
-        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
+            // create the mesh and
+            // add to map
+               
+        if (buildNormals) MeshUtilityClass.buildVertexListNormals(vertexList,indexes,meshCenterPoint,normalsIn);
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
 
-            // ceiling
-            
-        idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList(6);
-
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
-        
-        indexes=new Uint16Array(6);
-
-        for (n=0;n!==6;n++) {
-            indexes[n]=n;
-        }
-        
-        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
-        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
-
-            // floor
-            
-        idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList(6);
-
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
-
-        indexes=new Uint16Array(6);
-
-        for (n=0;n!==6;n++) {
-            indexes[n]=n;
-        }
-        
-        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,normalsIn);
-        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
-        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
+        var mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
+        return(this.map.addMesh(mesh));
     }
 
-        // door mainline
-        
-    createDoor(connectSide,xDoorBound,yDoorBound,zDoorBound)
+        //
+        // create doors
+        //
+
+    createDoorX(xBound,yBound,zBound)
     {
-        var x,z,xSliderBound,zSliderBound,ySliderBound;
-        var doorDepth=Math.trunc(ROOM_BLOCK_WIDTH*0.1);
+        var n,idx,meshIdx;
+        var vertexList,movement;
+        var x,xDoorBound,zDoorBound,zThickBound;
         
-        this.createCube(this.bitmapList.getBitmap('Map Closet'),xDoorBound,yDoorBound,zDoorBound,true);
+        var roomBitmap=this.bitmapList.getBitmap('Map Closet');
+        var doorBitmap=this.bitmapList.getBitmap('Map Metal');
         
-        if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
-            x=xDoorBound.getMidPoint();
-            xSliderBound=new wsBound((x-doorDepth),(x+doorDepth));
-            zSliderBound=zDoorBound.copy();
-        }
-        else {
-            xSliderBound=xDoorBound.copy();
-            z=zDoorBound.getMidPoint();
-            zSliderBound=new wsBound((z-doorDepth),(z+doorDepth));
-        }
+            // need a center point to better
+            // create normals
+            
+        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
-        ySliderBound=new wsBound((yDoorBound.min+1000),yDoorBound.min);
+            // doors need to be pushed in on
+            // the edges so they have a wall thickness
+            
+        var thickSize=Math.trunc(zBound.getSize()*0.05);
         
-        this.createCube(this.bitmapList.getBitmap('Map Metal'),xSliderBound,ySliderBound,zSliderBound,false);
+            // the door room
+            // internal walls
+
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(16);
+
+        idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.min+thickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.max-thickSize));
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+
+            // external walls
+
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(16);
+
+        zThickBound=new wsBound(zBound.min,(zBound.min+thickSize));
+        idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
+        idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound); 
+        zThickBound=new wsBound((zBound.max-thickSize),zBound.max);
+        idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
+        idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound);
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+
+           // the ceiling and floor
+
+        zDoorBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
+
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(4);
+        this.createSingleCeilingX(idx,vertexList,xBound,yBound.min,zDoorBound);
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+        
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(4);
+        this.createSingleCeilingX(idx,vertexList,xBound,yBound.max,zDoorBound);
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
+        
+            // the door
+            
+        x=xBound.getMidPoint();
+        xDoorBound=new wsBound((x-thickSize),(x+thickSize));
+            
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(12);
+        
+        idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zDoorBound);
+        idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zDoorBound);
+        this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zDoorBound);
+        meshIdx=this.finishDoorMesh(doorBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_DOOR);
+        
+            // and the movement
+        
+        movement=new MovementClass(meshIdx);
+        movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-7000,0)));
+        
+        this.map.addMovement(movement); 
     }
 
+    createDoorZ(xBound,yBound,zBound)
+    {
+        var n,idx,meshIdx;
+        var vertexList,movement;
+        var z,xDoorBound,zDoorBound,xThickBound;
+        
+        var roomBitmap=this.bitmapList.getBitmap('Map Closet');
+        var doorBitmap=this.bitmapList.getBitmap('Map Metal');
+        
+            // need a center point to better
+            // create normals
+            
+        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        
+            // doors need to be pushed in on
+            // the edges so they have a wall thickness
+            
+        var thickSize=Math.trunc(zBound.getSize()*0.05);
+         
+            // the door room
+            // internal walls
+
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(16);
+
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.min);
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
+        idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBound,zBound);
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+
+            // external walls
+
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(16);
+
+        xThickBound=new wsBound(xBound.min,(xBound.min+thickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
+        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
+        xThickBound=new wsBound((xBound.max-thickSize),xBound.max);
+        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
+        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+
+           // the ceiling
+           
+        xDoorBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
+
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(4);
+        this.createSingleCeilingZ(idx,vertexList,xDoorBound,yBound.min,zBound);
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+        
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(4);
+        this.createSingleCeilingZ(idx,vertexList,xDoorBound,yBound.max,zBound);
+        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
+        
+            // the door
+            
+        z=zBound.getMidPoint();
+        zDoorBound=new wsBound((z-thickSize),(z+thickSize));
+            
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(12);
+        
+        idx=this.createSingleWallZ(idx,vertexList,xDoorBound,yBound,(z-thickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xDoorBound,yBound,(z+thickSize));
+        this.createSingleCeilingZ(idx,vertexList,xDoorBound,yBound.max,zDoorBound);
+        meshIdx=this.finishDoorMesh(doorBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_DOOR);
+        
+            // and the movement
+        
+        movement=new MovementClass(meshIdx);
+        movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-7000,0)));
+        
+        this.map.addMovement(movement); 
+    }
 }
+

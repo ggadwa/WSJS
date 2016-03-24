@@ -24,22 +24,20 @@ class GenRoomPlatformClass
         var xStairBound=new wsBound((room.xBound.min+(stairX*ROOM_BLOCK_WIDTH)),(room.xBound.min+((stairX+1)*ROOM_BLOCK_WIDTH)));
         var zStairBound=new wsBound((room.zBound.min+(stairZ*ROOM_BLOCK_WIDTH)),(room.zBound.min+((stairZ+1)*ROOM_BLOCK_WIDTH)));
 
-        var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
-        
-        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass(this.bitmapList,this.map,this.genRandom);
         
         switch (stairDir) {
             case 0:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,true);
+                genRoomStairs.createStairsX(xStairBound,room.yBound,zStairBound,true,true,true);
                 break;
             case 1:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,true);
+                genRoomStairs.createStairsZ(xStairBound,room.yBound,zStairBound,true,true,true);
                 break;
             case 2:
-                genRoomStairs.createStairsX(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,false);
+                genRoomStairs.createStairsX(xStairBound,room.yBound,zStairBound,true,true,false);
                 break;
             case 3:
-                genRoomStairs.createStairsZ(platformBitmap,stairBitmap,xStairBound,room.yBound,zStairBound,true,true,false);
+                genRoomStairs.createStairsZ(xStairBound,room.yBound,zStairBound,true,true,false);
                 break;
         }
         

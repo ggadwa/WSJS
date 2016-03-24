@@ -188,10 +188,7 @@ class GenMapClass
 
     addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,flipDirection,level)
     {
-        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
-
-        var roomBitmap=this.bitmapList.getBitmap('Map Wall');
-        var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
+        var genRoomStairs=new GenRoomStairsClass(this.bitmapList,this.map,this.genRandom);
         
             // flip the direction if going down
             
@@ -219,26 +216,26 @@ class GenMapClass
         switch (connectSide) {
             
             case ROOM_SIDE_LEFT:
-                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,false);
+                genRoomStairs.createStairsX(xStairBound,yStairBound,zStairBound,false,false,false);
                 break;
                 
             case ROOM_SIDE_TOP:
-                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,false);
+                genRoomStairs.createStairsZ(xStairBound,yStairBound,zStairBound,false,false,false);
                 break;
                 
             case ROOM_SIDE_RIGHT:
-                genRoomStairs.createStairsX(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,true);
+                genRoomStairs.createStairsX(xStairBound,yStairBound,zStairBound,false,false,true);
                 break;
                 
             case ROOM_SIDE_BOTTOM:
-                genRoomStairs.createStairsZ(roomBitmap,stairBitmap,xStairBound,yStairBound,zStairBound,false,false,true);
+                genRoomStairs.createStairsZ(xStairBound,yStairBound,zStairBound,false,false,true);
                 break;
                 
         }
         
             // add to overlay
             
-        this.map.addOverlayStair(xStairBound,zStairBound);
+        this.map.addOverlayConnection(xStairBound,zStairBound);
     }
     
         // doors
@@ -247,12 +244,18 @@ class GenMapClass
     {
             // build the door
             
-        var genRoomDoor=new GenRoomDoorClass(this.view,this.bitmapList,this.map,this.genRandom);
-        genRoomDoor.createDoor(connectSide,xDoorBound,yDoorBound,zDoorBound);
+        var genRoomDoor=new GenRoomDoorClass(this.bitmapList,this.map,this.genRandom);
+        
+        if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
+            genRoomDoor.createDoorX(xDoorBound,yDoorBound,zDoorBound);
+        }
+        else {
+            genRoomDoor.createDoorZ(xDoorBound,yDoorBound,zDoorBound);
+        }
         
             // add to overlay
             
-        this.map.addOverlayStair(xDoorBound,zDoorBound);
+        this.map.addOverlayConnection(xDoorBound,zDoorBound);
     }
     
         //

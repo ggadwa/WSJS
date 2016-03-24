@@ -511,6 +511,12 @@ class wsLine
         this.p2=p2;
     }
     
+    addPoint(pnt)
+    {
+        this.p1.addPoint(pnt);
+        this.p2.addPoint(pnt);
+    }
+    
     equals(line)
     {
         if ((this.p1.equals(line.p1)) && (this.p2.equals(line.p2))) return(true);
@@ -664,6 +670,15 @@ class wsCollisionRect
         this.rgt=rgt;
         this.bot=bot;
         this.y=y;
+    }
+    
+    addPoint(pnt)
+    {
+        this.lft+=pnt.x;
+        this.rgt+=pnt.x;
+        this.top+=pnt.z;
+        this.bot+=pnt.z;
+        this.y+=pnt.y;
     }
     
     equals(cRect)

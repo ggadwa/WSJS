@@ -112,7 +112,7 @@ class MapOverlayClass
         this.addLines(this.roomLineList,lines);
     }
     
-    addStair(xBound,zBound)
+    addConnection(xBound,zBound)
     {
         var lines=[];
         

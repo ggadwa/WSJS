@@ -88,6 +88,13 @@ class MapMeshClass
         this.collisionLines=[];
         this.collisionRects=[];
         
+            // marks if the vertices have changed
+            // and a buffer update is required
+            
+        this.requiresBufferUpdate=false;
+        
+            // setup the bounds
+        
         this.setupBounds();
         
         Object.seal(this);
@@ -430,6 +437,48 @@ class MapMeshClass
             }
         }
     }
+    
+        //
+        // move mesh
+        //
+        
+    move(view,movePnt)
+    {
+        var n;
+        var nCollide;
+        
+            // move the vertexes
+            
+        for (n=0;n!==this.vertexCount;n++) {
+            this.vertexList[n].position.addPoint(movePnt);
+        }
+        
+            // update the collision boxes
+            
+        nCollide=this.collisionLines.length;
+        
+        for (n=0;n!==nCollide;n++) {
+            this.collisionLines[n].addPoint(movePnt);
+        }
+        
+        nCollide=this.collisionRects.length;
+        
+        for (n=0;n!==nCollide;n++) {
+            this.collisionRects[n].addPoint(movePnt);
+        }
+            
+            // and finally the bounds
+            
+        this.center.addPoint(movePnt);
+        this.xBound.add(movePnt.x);
+        this.yBound.add(movePnt.y);
+        this.zBound.add(movePnt.z);
+        
+            // and mark as requiring a
+            // gl buffer update when drawing
+            
+        this.requiresBufferUpdate=true;
+    }
 
         //
         // mesh binding
@@ -521,6 +570,41 @@ class MapMeshClass
             
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
+    }
+    
+        //
+        // update buffers
+        // this happens when a mesh is moved, and flagged to get
+        // updated.  We only do this when the mesh is drawn so we don't
+        // update uncessarly
+        //
+        
+    updateBuffers(view)
+    {
+        var n,v,vIdx;
+        var gl=view.gl;
+        
+        if (!this.requiresBufferUpdate) return;
+        
+            // update buffer
+        
+        vIdx=0;
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            
+            this.drawVertices[vIdx++]=v.position.x;
+            this.drawVertices[vIdx++]=v.position.y;
+            this.drawVertices[vIdx++]=v.position.z;
+        }
+
+        this.vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+
+            // mark as updated
+
+        this.requiresBufferUpdate=false;
     }
     
         //

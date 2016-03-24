@@ -6,8 +6,9 @@
 
 class GenRoomStairsClass
 {
-    constructor(map,genRandom)
+    constructor(bitmapList,map,genRandom)
     {
+        this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
         
@@ -114,11 +115,14 @@ class GenRoomStairsClass
         // create stairs
         //
 
-    createStairsX(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,includeBack,flip)
+    createStairsX(xBound,yBound,zBound,toPlatform,includeBack,flip)
     {
         var n,idx,stepAdd;
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,zThickBound;
+        
+        var roomBitmap=this.bitmapList.getBitmap('Map Closet');
+        var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
         
             // need a center point to better
             // create normals
@@ -281,11 +285,14 @@ class GenRoomStairsClass
         this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,MESH_FLAG_STAIR);
     }
 
-    createStairsZ(roomBitmap,stairBitmap,xBound,yBound,zBound,toPlatform,includeBack,flip)
+    createStairsZ(xBound,yBound,zBound,toPlatform,includeBack,flip)
     {
         var n,idx,stepAdd;
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,xThickBound;
+        
+        var roomBitmap=this.bitmapList.getBitmap('Map Closet');
+        var stairBitmap=this.bitmapList.getBitmap('Map Stairs');
         
             // need a center point to better
             // create normals

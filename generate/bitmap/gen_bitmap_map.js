@@ -669,7 +669,7 @@ class GenBitmapMapClass
         var metalColor=this.genBitmapUtility.getRandomBlueColor(0.6,0.8);
         var metalEdgeColor=this.genBitmapUtility.darkenColor(metalColor,0.9);
         
-        var shutterColor=this.genBitmapUtility.getRandomColor([0.3,0.1,0.0],[0.4,0.2,0.0]);
+        var shutterColor=this.genBitmapUtility.getRandomColor([0.5,0.3,0.0],[0.8,0.6,0.0]);
         var shutterEdgeColor=this.genBitmapUtility.darkenColor(shutterColor,0.9);
 
         var barEdgeSize=this.genRandom.randomInt(5,5);

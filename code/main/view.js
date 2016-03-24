@@ -116,6 +116,8 @@ class ViewClass
             // main loop
 
         this.timeStamp=0;
+        this.physicsTick=0;
+        this.drawTick=0;
 
         this.loopCancel=false;
         this.loopLastPhysicTimeStamp=0;
