@@ -41,7 +41,7 @@ class MovementClass
         this.moves.push(move);
     }
     
-    run(view,soundList,map)
+    run(view,soundList,map,entityList)
     {
         var prevIdx;
         var f,move;
@@ -77,7 +77,11 @@ class MovementClass
         this.lastOffsetPnt.setFromPoint(this.nextOffsetPnt);
         
             // do the move
-            
+        
         map.getMesh(this.meshIdx).move(view,this.movePnt);
+        
+            // and any effected entity
+            
+        entityList.movementPush(map,this.meshIdx,this.movePnt);
     }
 }

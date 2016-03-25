@@ -471,7 +471,9 @@ function mainLoop(timeStamp)
     view.physicsTick=view.timeStamp-view.loopLastPhysicTimeStamp;
     view.loopLastPhysicTimeStamp=view.timeStamp;
     
-    map.runMovements(view,soundList);
+    if (view.physicsTick>PHYSICS_MILLISECONDS) {
+        map.runMovements(view,soundList,entityList);
+    }
     
     if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held stuff up for a long time
     

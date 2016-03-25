@@ -54,6 +54,13 @@ class MapMeshClass
         this.vertexCount=this.vertexList.length;
         this.indexCount=this.indexes.length;
         this.trigCount=Math.trunc(this.indexCount/3);
+        
+            // center and bounds
+            
+        this.center=new wsPoint(0,0,0);
+        this.xBound=new wsBound(0,0);
+        this.yBound=new wsBound(0,0);
+        this.zBound=new wsBound(0,0);
 
             // non-culled index list
 
@@ -279,10 +286,10 @@ class MapMeshClass
     {
         var v=this.vertexList[0];
         
-        this.center=new wsPoint(v.position.x,v.position.y,v.position.z);
-        this.xBound=new wsBound(v.position.x,v.position.x);
-        this.yBound=new wsBound(v.position.y,v.position.y);
-        this.zBound=new wsBound(v.position.z,v.position.z);
+        this.center.setFromValues(v.position.x,v.position.y,v.position.z);
+        this.xBound.setFromValues(v.position.x,v.position.x);
+        this.yBound.setFromValues(v.position.y,v.position.y);
+        this.zBound.setFromValues(v.position.z,v.position.z);
 
         var n;
 

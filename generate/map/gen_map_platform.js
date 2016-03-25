@@ -76,13 +76,45 @@ class GenRoomPlatformClass
         var yPlatformBound=new wsBound((room.yBound.min-ROOM_FLOOR_DEPTH),room.yBound.min);
         var zPlatformBound=new wsBound((room.zBound.min+(z*ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*ROOM_BLOCK_WIDTH)));
 
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_ROOM_PLATFORM));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             
         room.setPlatformGrid(x,z);
 
         this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
+    }
+    
+        //
+        // add lift chunk
+        //
+        
+    addLiftChunk(room,x,z)
+    {
+        var meshIdx,movement;
+        var liftBitmap=this.bitmapList.getBitmap('Map Metal');
+        
+        var xLiftBound=new wsBound((room.xBound.min+(x*ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*ROOM_BLOCK_WIDTH)));
+        var yLiftBound=new wsBound((room.yBound.min-ROOM_FLOOR_DEPTH),room.yBound.max);
+        var zLiftBound=new wsBound((room.zBound.min+(z*ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*ROOM_BLOCK_WIDTH)));
+
+        meshIdx=this.map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_LIFT));
+
+            // the movement
+        
+        movement=new MovementClass(meshIdx);
+        movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
+        movement.addMove(new MoveClass(2000,new wsPoint(0,0,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,ROOM_FLOOR_HEIGHT,0)));
+        movement.addMove(new MoveClass(2000,new wsPoint(0,ROOM_FLOOR_HEIGHT,0)));
+        
+        this.map.addMovement(movement); 
+
+            // can't span on this
+            
+        room.setBlockGrid(x,z);
+
+        this.map.addOverlayPlatform(xLiftBound,zLiftBound);
     }
     
         //
@@ -147,14 +179,19 @@ class GenRoomPlatformClass
             
         stairDir=this.genRandom.randomIndex(4);
         
-            // find a spot for the steps and add
+            // find a spot for the steps or lifts and add
             // platforms are the first thing we do so we don't need
             // to check for open spots
         
         stairX=this.genRandom.randomInt(1,(room.xBlockSize-2));
         stairZ=this.genRandom.randomInt(1,(room.zBlockSize-2));
         
-        this.addStairChunk(room,stairX,stairZ,stairDir,platformBitmap);
+        if (this.genRandom.randomPercentage(0.5)) {
+            this.addStairChunk(room,stairX,stairZ,stairDir,platformBitmap);
+        }
+        else {
+            this.addLiftChunk(room,stairX,stairZ);
+        }
         
             // expand from the platform
             

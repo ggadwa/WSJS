@@ -229,8 +229,8 @@ class CollisionClass
                     
                         // set the touch
                         
-                    entity.setTouchEntity(checkEntity);
-                    checkEntity.setTouchEntity(entity);
+                    entity.touchEntity=checkEntity;
+                    checkEntity.touchEntity=entity;
                     
                         // the hit point
                         
@@ -284,16 +284,16 @@ class CollisionClass
     // fall object in map
     //
     
-    fallObjectInMap(map,pt,radius,fallY)
+    fallObjectInMap(map,entity,fallY)
     {
         var n,k,nMesh,nCollisionRect;
         var mesh,collisionRect;
 
             // the rough collide boxes
             
-        this.objXBound.setFromValues((pt.x-radius),(pt.x+radius));
-        this.objYBound.setFromValues((pt.y-fallY),(pt.y+fallY));
-        this.objZBound.setFromValues((pt.z-radius),(pt.z+radius));
+        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
+        this.objYBound.setFromValues((entity.position.y-fallY),(entity.position.y+fallY));
+        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
         nMesh=map.meshes.length;
         
@@ -317,12 +317,16 @@ class CollisionClass
 
             for (k=0;k!==nCollisionRect;k++) {
                 collisionRect=mesh.collisionRects[k];
-                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) return(collisionRect.y-pt.y);
+                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
+                    entity.standOnMeshIdx=n;
+                    return(collisionRect.y-entity.position.y);
+                }
             }
         }
         
             // else return the fall
-            
+        
+        entity.standOnMeshIdx=-1;
         return(fallY);
     }
     

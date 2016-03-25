@@ -79,7 +79,7 @@ class GenRoomLedgeClass
 
             // finally create the mesh
 
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_LEDGE));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_LEDGE));
     }
         
         //

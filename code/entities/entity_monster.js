@@ -20,19 +20,18 @@ class EntityMonsterClass extends EntityClass
     
     run(view,soundList,map,entityList)
     {
-        var player,touchEntity;
+        var player;
         
             // delete if hit by projectile
         
-        touchEntity=this.getTouchEntity();
-        if (touchEntity!==null) {
-            if (touchEntity instanceof EntityProjectileClass) {
+        if (this.touchEntity!==null) {
+            if (this.touchEntity instanceof EntityProjectileClass) {
                 this.markAsDelete();
                 return;
             }
         }
         
-        this.clearTouchEntity();
+        this.touchEntity=null;
         
             // time to activate monster?
         

@@ -71,6 +71,26 @@ class EntityListClass
     }
     
         //
+        // handle movement pushes from moving map segments
+        //
+        
+    movementPush(map,meshIdx,movePnt)
+    {
+        var n,entity;
+        var nEntity=this.entities.length;
+        
+            // check the entities, skipping
+            // any projectiles
+            
+        for (n=0;n!==nEntity;n++) {
+            entity=this.entities[n];
+            if (entity instanceof EntityProjectileClass) continue;
+            
+            entity.movementPush(map,meshIdx,movePnt);
+        }
+    }
+    
+        //
         // run all entities
         //
         

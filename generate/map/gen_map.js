@@ -57,7 +57,7 @@ class GenMapClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshes[n];
-            if ((mesh.flag!==MESH_FLAG_ROOM_WALL) && (mesh.flag!==MESH_FLAG_ROOM_LEDGE)) continue;
+            if ((mesh.flag!==MESH_FLAG_ROOM_WALL) && (mesh.flag!==MESH_FLAG_LEDGE)) continue;
             
                 // build a list of meshes that
                 // are targets for trig eliminations from
@@ -67,7 +67,7 @@ class GenMapClass
             
             for (k=(n+1);k<nMesh;k++) {
                 otherMesh=this.map.meshes[k];
-                if ((otherMesh.flag!==MESH_FLAG_ROOM_WALL) && (otherMesh.flag!==MESH_FLAG_ROOM_LEDGE)) continue;
+                if ((otherMesh.flag!==MESH_FLAG_ROOM_WALL) && (otherMesh.flag!==MESH_FLAG_LEDGE)) continue;
                 
                 if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
             }

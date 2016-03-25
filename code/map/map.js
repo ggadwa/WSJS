@@ -416,9 +416,9 @@ class MapClass
         this.movementList.addMovement(movement);
     }
     
-    runMovements(view,soundList)
+    runMovements(view,soundList,entityList)
     {
-        this.movementList.run(view,soundList,this);
+        this.movementList.run(view,soundList,this,entityList);
     }
     
         //

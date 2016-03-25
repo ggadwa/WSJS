@@ -175,7 +175,7 @@ class GenRoomDoorClass
         
         movement=new MovementClass(meshIdx);
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,-7000,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-(ROOM_FLOOR_HEIGHT-ROOM_FLOOR_DEPTH),0)));
         
         this.map.addMovement(movement); 
     }
@@ -256,7 +256,7 @@ class GenRoomDoorClass
         movement=new MovementClass(meshIdx);
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,-7000,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-(ROOM_FLOOR_HEIGHT-ROOM_FLOOR_DEPTH),0)));
         
         this.map.addMovement(movement); 
     }

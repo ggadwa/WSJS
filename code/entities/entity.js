@@ -23,6 +23,7 @@ class EntityClass
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
         this.touchEntity=null;
+        this.standOnMeshIdx=-1;
 
         this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
         this.slidePt=new wsPoint(0,0,0);
@@ -32,6 +33,8 @@ class EntityClass
         this.xFrustumBound=new wsBound(0,0);
         this.yFrustumBound=new wsBound(0,0);
         this.zFrustumBound=new wsBound(0,0);
+        
+        this.pushMesh=null;
 
         this.collision=new CollisionClass();
         
@@ -50,25 +53,6 @@ class EntityClass
     isMarkedForDeletion()
     {
         return(this.markedForDeletion);
-    }
-    
-        //
-        // touching
-        //
-        
-    clearTouchEntity()
-    {
-        this.touchEntity=null;
-    }
-    
-    setTouchEntity(entity)
-    {
-        this.touchEntity=entity;
-    }
-    
-    getTouchEntity()
-    {
-        return(this.touchEntity);
     }
     
         //
@@ -167,7 +151,7 @@ class EntityClass
             if (yChange===0) yChange=10;        // always try to fall
             if (yChange>500) yChange=500;
         
-            var fallY=this.collision.fallObjectInMap(map,this.position,this.radius,yChange);
+            var fallY=this.collision.fallObjectInMap(map,this,yChange);
             this.position.move(0,fallY,0);
         
             if (fallY<=0) {
@@ -183,6 +167,24 @@ class EntityClass
     isFalling()
     {
         return(this.fallSpeed>0);
+    }
+    
+        //
+        // mesh pushing
+        //
+        
+    movementPush(map,meshIdx,movePnt)
+    {
+            // lifts
+            
+        if (movePnt.y<0) {
+            if (this.standOnMeshIdx===meshIdx) {
+                this.pushMesh=map.getMesh(meshIdx);
+                if (this.position.y>=this.pushMesh.yBound.min) {
+                    this.position.y=Math.trunc(this.pushMesh.yBound.min)-1;
+                }
+            }
+        }
     }
     
         //
