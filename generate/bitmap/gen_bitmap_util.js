@@ -1608,6 +1608,9 @@ class GenBitmapUtilityClass
             ey=bot-this.genRandom.randomInt(0,Math.trunc((bot-top)*0.25));
             
             this.drawStreakDirtSingle(bitmapCTX,sx,top,ex,ey,density,darken);
+            
+            lft=sx;     // always make sure the newest streaks are smaller and within the first one
+            rgt=ex;
         }
     }
     

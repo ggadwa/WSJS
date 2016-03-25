@@ -20,12 +20,10 @@ REGULAR TODOs
 #### glowing computer lights?
 #### spikes
 #### need ability for meshes to skip light mapping phase
-#### strings in view need to be global
+#### avoid closets where doors?
 
-#### need to get rid of physics timestamp, that's prone to errors, need last physics tick (how to do in entity?)
 
-#### need approach movement (away = 0, approach = 1) and looping (lifts)
-
+[X] fixed some bugs in the physics timing
 [X] slight color variations in lighting
 [X] packed lights into vec4 to save space, changed light in scene algorithm and now handling 6 lights
 [X] some decoration random min/maxes are now dynamic based on room sizes
@@ -41,7 +39,7 @@ REGULAR TODOs
 [X] much better specular generation
 [X] added doors
 [X] added lifts
-[X] added map movements
+[X] added map movements, looping and approach triggered
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html

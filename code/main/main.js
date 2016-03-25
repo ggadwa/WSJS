@@ -120,13 +120,17 @@ class MainClass
         var tryCount=bitmapTypeList.length;
         var textureIdx=this.genBitmapMap.genRandom.randomIndex(bitmapTypeList.length);
         
-        if (bitmapTypeList.length===1) {
-            this.mapTextureUsedList.push(textureIdx);
+        var bitmapType=bitmapTypeList[textureIdx];
+        
+        if (bitmapTypeList.length===0) {
+            this.mapTextureUsedList.push(bitmapType);
         }
         else {
             while (tryCount>0) {
-                if (this.mapTextureUsedList.indexOf(textureIdx)===-1) {
-                    this.mapTextureUsedList.push(textureIdx);
+                bitmapType=bitmapTypeList[textureIdx];
+                
+                if (this.mapTextureUsedList.indexOf(bitmapType)===-1) {
+                    this.mapTextureUsedList.push(bitmapType);
                     break;
                 }
 
@@ -136,8 +140,6 @@ class MainClass
                 tryCount--;
             }
         }
-        
-        var bitmapType=bitmapTypeList[textureIdx];
 
             // generate bitmap
 
@@ -420,8 +422,8 @@ class MainClass
         timeStamp=Math.trunc(window.performance.now());
         this.view.timeStamp=timeStamp;
 
-        this.view.loopLastPhysicTimeStamp=timeStamp;
-        this.view.loopLastDrawTimeStamp=timeStamp;
+        this.view.lastPhysicTimeStamp=timeStamp;
+        this.view.lastDrawTimeStamp=timeStamp;
 
         this.view.fps=0.0;
         this.view.fpsTotal=0;
@@ -466,34 +468,42 @@ function mainLoop(timeStamp)
     main.input.run();
     
         // map movement, entities, and
-        // other physics
+        // other physics, we only do this if we've
+        // moved unto another physics tick
+        
+        // this timing needs to be precise so
+        // physics remains constants
     
-    view.physicsTick=view.timeStamp-view.loopLastPhysicTimeStamp;
-    view.loopLastPhysicTimeStamp=view.timeStamp;
-    
+    view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
+   
     if (view.physicsTick>PHYSICS_MILLISECONDS) {
         map.runMovements(view,soundList,entityList);
-    }
     
-    if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held stuff up for a long time
-    
-        while (view.physicsTick>PHYSICS_MILLISECONDS) {
-            view.physicsTick-=PHYSICS_MILLISECONDS;
+        if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
-            entityList.run(view,soundList,map);
+            while (view.physicsTick>PHYSICS_MILLISECONDS) {
+                view.physicsTick-=PHYSICS_MILLISECONDS;
+                view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
+
+                entityList.run(view,soundList,map);
+            }
         }
+        else {
+            view.lastPhysicTimeStamp=view.timeStamp;
+        }
+
+        soundList.setListenerToEntity(entityList.getPlayer());
     }
-    
-        // update the listener
-    
-    soundList.setListenerToEntity(entityList.getPlayer());
     
         // drawing
         
-    view.drawTick=view.timeStamp-view.loopLastDrawTimeStamp;
+        // this timing is loose, as it's only there to
+        // draw frames
+        
+    view.drawTick=view.timeStamp-view.lastDrawTimeStamp;
     
     if (view.drawTick>DRAW_MILLISECONDS) {
-        view.loopLastDrawTimeStamp=view.timeStamp; 
+        view.lastDrawTimeStamp=view.timeStamp; 
 
         view.draw(map,entityList,debug);
         

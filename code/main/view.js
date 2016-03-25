@@ -120,8 +120,8 @@ class ViewClass
         this.drawTick=0;
 
         this.loopCancel=false;
-        this.loopLastPhysicTimeStamp=0;
-        this.loopLastDrawTimeStamp=0;
+        this.lastPhysicTimeStamp=0;
+        this.lastDrawTimeStamp=0;
 
             // stats
 
@@ -563,16 +563,15 @@ class ViewClass
             fpsStr=fpsStr.substring(0,(idx+3));
         }
 
-        var mapCountStr=this.drawMeshCount.toString()+"/"+this.drawMeshTrigCount.toString();
-        var modelCountStr=this.drawModelCount.toString()+"/"+this.drawModelTrigCount.toString();
-
-        var posStr=Math.trunc(this.camera.position.x)+','+Math.trunc(this.camera.position.y)+','+Math.trunc(this.camera.position.z)+':'+Math.trunc(this.camera.angle.y);
+        //var mapCountStr=this.drawMeshCount.toString()+"/"+this.drawMeshTrigCount.toString();
+        //var modelCountStr=this.drawModelCount.toString()+"/"+this.drawModelTrigCount.toString();
+        //var posStr=Math.trunc(this.camera.position.x)+','+Math.trunc(this.camera.position.y)+','+Math.trunc(this.camera.position.z)+':'+Math.trunc(this.camera.angle.y);
 
         this.text.drawStart(this);
         this.text.drawWithShadow(this,(this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.drawWithShadow(this,(this.wid-5),45,20,18,mapCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.drawWithShadow(this,(this.wid-5),67,20,18,modelCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        this.text.drawWithShadow(this,(this.wid-5),(this.high-5),20,18,posStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        //this.text.drawWithShadow(this,(this.wid-5),45,20,18,mapCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        //this.text.drawWithShadow(this,(this.wid-5),67,20,18,modelCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        //this.text.drawWithShadow(this,(this.wid-5),(this.high-5),20,18,posStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         this.text.drawEnd(this);
     }
     

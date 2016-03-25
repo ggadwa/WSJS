@@ -20,12 +20,16 @@ class MoveClass
 
 class MovementClass
 {
-    constructor(meshIdx)
+    constructor(meshIdx,looping,approachDistance)
     {
         this.meshIdx=meshIdx;
+        this.looping=looping;
+        this.approachDistance=approachDistance;
         
         this.currentMoveIdx=-1;
         this.nextMoveNextTick=0;
+        
+        this.moving=looping;            // looping movements are always moving
         
         this.movePnt=new wsPoint(0,0,0);
         this.nextOffsetPnt=new wsPoint(0,0,0);
@@ -43,20 +47,61 @@ class MovementClass
     
     run(view,soundList,map,entityList)
     {
-        var prevIdx;
+        var mesh,isOpen,prevIdx;
         var f,move;
         
             // skip if no moves
             
         if (this.moves.length===0) return;
         
-            // next view
+            // the mesh
             
-        if (this.nextMoveNextTick<view.timeStamp) {
-            this.currentMoveIdx++;
-            if (this.currentMoveIdx>=this.moves.length) this.currentMoveIdx=0;
+        mesh=map.getMesh(this.meshIdx);
+        
+            // if not looping, then do approach disance
+            // if not already moving
             
-            this.nextMoveNextTick=view.timeStamp+this.moves[this.currentMoveIdx].lifeTick;
+        if (!this.looping) {
+            
+            if (!this.moving) {
+                isOpen=(mesh.center.distance(entityList.getPlayer().position)<this.approachDistance);
+                
+                if (isOpen) {
+                    if (this.currentMoveIdx==1) return;
+                    this.currentMoveIdx=1;
+                }
+                else {
+                    if (this.currentMoveIdx==0) return;
+                    this.currentMoveIdx=0;
+                }
+                
+                this.moving=true;
+                this.nextMoveNextTick=view.timeStamp+this.moves[this.currentMoveIdx].lifeTick;
+            }
+            else {
+                
+                    // check if we've finished, and make sure
+                    // the movement lands on the final spot
+            
+                if (this.nextMoveNextTick<view.timeStamp) {
+                    this.nextMoveNextTick=view.timeStamp;
+                    this.moving=false;
+                }
+            }
+        }
+        
+            // looping movements
+            
+        else {
+        
+                // next view
+
+            if (this.nextMoveNextTick<view.timeStamp) {
+                this.currentMoveIdx++;
+                if (this.currentMoveIdx>=this.moves.length) this.currentMoveIdx=0;
+
+                this.nextMoveNextTick=view.timeStamp+this.moves[this.currentMoveIdx].lifeTick;
+            }
         }
         
             // the next offset we need to move to
@@ -78,7 +123,7 @@ class MovementClass
         
             // do the move
         
-        map.getMesh(this.meshIdx).move(view,this.movePnt);
+        mesh.move(view,this.movePnt);
         
             // and any effected entity
             

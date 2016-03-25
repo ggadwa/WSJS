@@ -102,7 +102,7 @@ class GenRoomPlatformClass
 
             // the movement
         
-        movement=new MovementClass(meshIdx);
+        movement=new MovementClass(meshIdx,true,0);
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
         movement.addMove(new MoveClass(2000,new wsPoint(0,0,0)));
         movement.addMove(new MoveClass(1500,new wsPoint(0,ROOM_FLOOR_HEIGHT,0)));

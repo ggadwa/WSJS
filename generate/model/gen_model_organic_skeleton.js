@@ -181,7 +181,7 @@ class GenModelOrganicSkeletonClass
             // random height
             // can never be taller than a single floor height
         
-        var totalHigh=this.genRandom.randomInt(Math.trunc(ROOM_FLOOR_HEIGHT*0.4),Math.trunc(ROOM_FLOOR_HEIGHT*0.6));
+        var totalHigh=this.genRandom.randomInt(Math.trunc(ROOM_FLOOR_HEIGHT*0.2),Math.trunc(ROOM_FLOOR_HEIGHT*0.6));
         
             // the base bone
             

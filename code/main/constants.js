@@ -68,7 +68,7 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
@@ -94,10 +94,10 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 const SEED=Date.now();
 
 const SEED_BITMAP_MAP=Math.trunc((Math.random()*SEED));
-const SEED_MAP=2; //Math.trunc((Math.random()*SEED));
+const SEED_MAP=Math.trunc((Math.random()*SEED));
 const SEED_BITMAP_MODEL=Math.trunc((Math.random()*SEED));
 const SEED_MODEL=Math.trunc((Math.random()*SEED));
-const SEED_ENTITY=2; //Math.trunc((Math.random()*SEED));
+const SEED_ENTITY=Math.trunc((Math.random()*SEED));
 const SEED_SOUND=Math.trunc((Math.random()*SEED));
 
 //
