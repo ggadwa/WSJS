@@ -162,6 +162,26 @@ class ParticleListClass
         particle.setTiming(view.timeStamp,1500);
     }
     
+    addDebugParticles(view,centerPt,count)
+    {
+        var particle;
+        
+        particle=this.getFree();
+        if (particle===null) return(null);
+        
+        particle.setCount(count);
+        particle.setRadius(100,100);
+        particle.setMovement(1.0);
+        particle.setCenterPointFromPoint(centerPt);
+        particle.setBitmap(this.particleBitmap);
+        particle.setAlpha(1.0,1.0);
+        particle.setColor(0.0,1.0,1.0,0.0,1.0,1.0);
+        particle.setTiming(view.timeStamp,0);
+        particle.setNoDepthTest(true);
+        
+        return(particle);
+    }
+    
         //
         // draw all particles
         //

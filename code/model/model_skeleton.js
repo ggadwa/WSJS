@@ -422,8 +422,8 @@ class ModelSkeletonClass
         var n,limb;
         var nLimb=this.limbs.length;
         
-        var armLeftZAngle=40.0;
-        var armRightZAngle=40.0;
+        var armLeftZAngle=50.0;
+        var armRightZAngle=50.0;
         
         for (n=0;n!==nLimb;n++) {
             limb=this.limbs[n];
@@ -496,8 +496,8 @@ class ModelSkeletonClass
         var n,limb;
         var nLimb=this.limbs.length;
         
-        var armLeftZAngle=40.0;
-        var armRightZAngle=40.0;
+        var armLeftZAngle=50.0;
+        var armRightZAngle=50.0;
         
         for (n=0;n!==nLimb;n++) {
             limb=this.limbs[n];

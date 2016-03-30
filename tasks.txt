@@ -22,7 +22,15 @@ REGULAR TODOs
 #### need ability for meshes to skip light mapping phase
 #### avoid closets where doors?
 
-#### don't do % humanoid high, makes them all the same, legs/arms/body/head all need to be separate heights
+#### all mesh shrinking/moving needs equal vertex lists
+
+
+
+
+
+[X] dynamic humanoid models have much greater range in body shape, is possible to have no arms and no head
+[X] fixed bad UVs in wrapped models
+
 
 
 

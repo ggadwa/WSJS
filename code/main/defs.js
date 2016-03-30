@@ -96,6 +96,11 @@ class wsPoint
         return((this.x===pt.x)&&(this.y===pt.y)&&(this.z===pt.z));
     }
     
+    truncEquals(pt)
+    {
+        return((Math.trunc(this.x)===Math.trunc(pt.x))&&(Math.trunc(this.y)===Math.trunc(pt.y))&&(Math.trunc(this.z)===Math.trunc(pt.z)));
+    }
+    
     rotateX(centerPt,rotX)
     {
         if (centerPt!==null) {

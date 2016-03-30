@@ -107,10 +107,15 @@ class GenModelOrganicMeshClass
             
             yzAng=0.0;
             
-            for (yz=0;yz!==aroundSurfaceCount;yz++) {
+            for (yz=0;yz<=aroundSurfaceCount;yz++) {
                 v=vertexList[vIdx++];
                 
-                rd=yzAng*DEGREE_TO_RAD;
+                if (yz!==aroundSurfaceCount) {
+                    rd=yzAng*DEGREE_TO_RAD;
+                }
+                else {
+                    rd=0.0;
+                }
                 
                 v.position.x=px;
                 v.position.y=centerPnt.y+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
@@ -143,20 +148,18 @@ class GenModelOrganicMeshClass
             // all the strips except the
             // end points
             
-        var nyz,vNextIdx,v2Idx,v2NextIdx;
+        var vNextIdx,v2Idx,v2NextIdx;
         var iIdx=0;
         
         for (x=0;x!==(acrossSurfaceCount-3);x++) {
             
             for (yz=0;yz!==aroundSurfaceCount;yz++) {
                 
-                vIdx=(x*aroundSurfaceCount)+yz;
-                v2Idx=((x+1)*aroundSurfaceCount)+yz;
+                vIdx=(x*(aroundSurfaceCount+1))+yz;
+                v2Idx=((x+1)*(aroundSurfaceCount+1))+yz;
                 
-                nyz=(yz<(aroundSurfaceCount-1))?(yz+1):0;
-
-                vNextIdx=(x*aroundSurfaceCount)+nyz;
-                v2NextIdx=((x+1)*aroundSurfaceCount)+nyz;
+                vNextIdx=(x*(aroundSurfaceCount+1))+(yz+1);
+                v2NextIdx=((x+1)*(aroundSurfaceCount+1))+(yz+1);
                  
                 indexes[iIdx++]=v2Idx;
                 indexes[iIdx++]=vIdx;
@@ -171,23 +174,19 @@ class GenModelOrganicMeshClass
             // min end point
             
         for (yz=0;yz!==aroundSurfaceCount;yz++) {
-            nyz=(yz<(aroundSurfaceCount-1))?(yz+1):0;
-            
             indexes[iIdx++]=yz;
             indexes[iIdx++]=minIdx;
-            indexes[iIdx++]=nyz;
+            indexes[iIdx++]=yz+1;
         }
         
             // max end point
             
-        var maxOff=aroundSurfaceCount*(acrossSurfaceCount-3);
+        var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (yz=0;yz!==aroundSurfaceCount;yz++) {
-            nyz=(yz<(aroundSurfaceCount-1))?(yz+1):0;
-            
             indexes[iIdx++]=maxOff+yz;
             indexes[iIdx++]=maxIdx;
-            indexes[iIdx++]=maxOff+nyz;
+            indexes[iIdx++]=maxOff+(yz+1);
         }
     }
     
@@ -224,10 +223,15 @@ class GenModelOrganicMeshClass
             
             xzAng=0.0;
             
-            for (xz=0;xz!==aroundSurfaceCount;xz++) {
+            for (xz=0;xz<=aroundSurfaceCount;xz++) {
                 v=vertexList[vIdx++];
                 
-                rd=xzAng*DEGREE_TO_RAD;
+                if (xz!==aroundSurfaceCount) {
+                    rd=xzAng*DEGREE_TO_RAD;
+                }
+                else {
+                    rd=0.0;
+                }
                 
                 v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 v.position.y=py;
@@ -235,7 +239,7 @@ class GenModelOrganicMeshClass
 
                 v.uv.x=xzAng/360.0;
                 v.uv.y=vAng;
-
+                
                 xzAng+=xzAngAdd;
             }
             
@@ -260,20 +264,18 @@ class GenModelOrganicMeshClass
             // all the strips except the
             // end points
             
-        var nxz,vNextIdx,v2Idx,v2NextIdx;
+        var vNextIdx,v2Idx,v2NextIdx;
         var iIdx=0;
         
         for (y=0;y!==(acrossSurfaceCount-3);y++) {
             
             for (xz=0;xz!==aroundSurfaceCount;xz++) {
                 
-                vIdx=(y*aroundSurfaceCount)+xz;
-                v2Idx=((y+1)*aroundSurfaceCount)+xz;
+                vIdx=(y*(aroundSurfaceCount+1))+xz;
+                v2Idx=((y+1)*(aroundSurfaceCount+1))+xz;
                 
-                nxz=(xz<(aroundSurfaceCount-1))?(xz+1):0;
-
-                vNextIdx=(y*aroundSurfaceCount)+nxz;
-                v2NextIdx=((y+1)*aroundSurfaceCount)+nxz;
+                vNextIdx=(y*(aroundSurfaceCount+1))+(xz+1);
+                v2NextIdx=((y+1)*(aroundSurfaceCount+1))+(xz+1);
                  
                 indexes[iIdx++]=v2Idx;
                 indexes[iIdx++]=vIdx;
@@ -288,23 +290,19 @@ class GenModelOrganicMeshClass
             // min end point
             
         for (xz=0;xz!==aroundSurfaceCount;xz++) {
-            nxz=(xz<(aroundSurfaceCount-1))?(xz+1):0;
-            
             indexes[iIdx++]=xz;
             indexes[iIdx++]=minIdx;
-            indexes[iIdx++]=nxz;
+            indexes[iIdx++]=xz+1;
         }
         
             // max end point
             
-        var maxOff=aroundSurfaceCount*(acrossSurfaceCount-3);
+        var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (xz=0;xz!==aroundSurfaceCount;xz++) {
-            nxz=(xz<(aroundSurfaceCount-1))?(xz+1):0;
-            
             indexes[iIdx++]=maxOff+xz;
             indexes[iIdx++]=maxIdx;
-            indexes[iIdx++]=maxOff+nxz;
+            indexes[iIdx++]=maxOff+(xz+1);
         }
     }
     
@@ -341,10 +339,15 @@ class GenModelOrganicMeshClass
             
             xyAng=0.0;
             
-            for (xy=0;xy!==aroundSurfaceCount;xy++) {
+            for (xy=0;xy<=aroundSurfaceCount;xy++) {
                 v=vertexList[vIdx++];
                 
-                rd=xyAng*DEGREE_TO_RAD;
+                if (xy!==aroundSurfaceCount) {
+                    rd=xyAng*DEGREE_TO_RAD;
+                }
+                else {
+                    rd=0.0;
+                }
                 
                 v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 v.position.y=centerPnt.y+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
@@ -377,20 +380,18 @@ class GenModelOrganicMeshClass
             // all the strips except the
             // end points
             
-        var nxy,vNextIdx,v2Idx,v2NextIdx;
+        var vNextIdx,v2Idx,v2NextIdx;
         var iIdx=0;
         
         for (z=0;z!==(acrossSurfaceCount-3);z++) {
             
             for (xy=0;xy!==aroundSurfaceCount;xy++) {
                 
-                vIdx=(z*aroundSurfaceCount)+xy;
-                v2Idx=((z+1)*aroundSurfaceCount)+xy;
+                vIdx=(z*(aroundSurfaceCount+1))+xy;
+                v2Idx=((z+1)*(aroundSurfaceCount+1))+xy;
                 
-                nxy=(xy<(aroundSurfaceCount-1))?(xy+1):0;
-
-                vNextIdx=(z*aroundSurfaceCount)+nxy;
-                v2NextIdx=((z+1)*aroundSurfaceCount)+nxy;
+                vNextIdx=(z*(aroundSurfaceCount+1))+(xy+1);
+                v2NextIdx=((z+1)*(aroundSurfaceCount+1))+(xy+1);
                  
                 indexes[iIdx++]=v2Idx;
                 indexes[iIdx++]=vIdx;
@@ -405,23 +406,19 @@ class GenModelOrganicMeshClass
             // min end point
             
         for (xy=0;xy!==aroundSurfaceCount;xy++) {
-            nxy=(xy<(aroundSurfaceCount-1))?(xy+1):0;
-            
             indexes[iIdx++]=xy;
             indexes[iIdx++]=minIdx;
-            indexes[iIdx++]=nxy;
+            indexes[iIdx++]=xy+1;
         }
         
             // max end point
             
-        var maxOff=aroundSurfaceCount*(acrossSurfaceCount-3);
+        var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (xy=0;xy!==aroundSurfaceCount;xy++) {
-            nxy=(xy<(aroundSurfaceCount-1))?(xy+1):0;
-            
             indexes[iIdx++]=maxOff+xy;
             indexes[iIdx++]=maxIdx;
-            indexes[iIdx++]=maxOff+nxy;
+            indexes[iIdx++]=maxOff+(xy+1);
         }
     }
 
@@ -648,22 +645,39 @@ class GenModelOrganicMeshClass
         
     randomScaleVertexToBones(vertexList)
     {
-        var n,v,f,len;
+        var n,k,v,v2,f,len;
         var bone;
         var nVertex=vertexList.length;
         var bones=this.model.skeleton.bones;
+        
+        var prevMove=new Uint8Array(nVertex);
 
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
             if (v.boneIdx===-1) continue;
             
+                // some vertexes are in the same place,
+                // we don't want to move them separately or
+                // the mesh breaks up
+                
+            if (prevMove[n]!==0) continue;
+            
+                // move the vertex
+                // and any similar vertex
+            
             bone=bones[v.boneIdx];
-            v.position.subPoint(bone.position);
-            
             f=0.9+(this.genRandom.random()*0.2);
-            v.position.scale(f);
             
-            v.position.addPoint(bone.position);
+            for (k=0;k!==nVertex;k++) {
+                if (prevMove[k]!==0) continue;
+                v2=vertexList[k];
+                if (v2.position.truncEquals(v.position)) {
+                    v2.position.subPoint(bone.position);
+                    v2.position.scale(f);
+                    v2.position.addPoint(bone.position);
+                    prevMove[k]=1;
+                }
+            }
         }
     }
     
@@ -807,8 +821,8 @@ class GenModelOrganicMeshClass
             
                 // counts
                 
-            vertexList=MeshUtilityClass.createModelVertexList((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-2))+2);    // around*(across-2) for quads, + 2 for top and bottom point
-            indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-2))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-2))*6 for quads, (around*2)*3 for top and bottom trigs
+            vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point
+            indexes=new Uint16Array((((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))*6)+(((limb.aroundSurfaceCount+1)*2)*3));   // ((around+1)*(across-2))*6 for quads, ((around+1)*2)*3 for top and bottom trigs
             
             this.buildAroundBoneList(view,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
 

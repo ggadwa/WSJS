@@ -290,19 +290,9 @@ class DebugClass
         gl.enable(gl.DEPTH_TEST);
         
             // now the bones, use the particle engine
-            
-        var particle=view.particleList.getFree();
-        if (particle!==null) {
-            
-            particle.setCount(nBone);
-            particle.setRadius(50,50);
-            particle.setMovement(1.0);
-            particle.setCenterPointFromPoint(position);      // particles are offsets from center point
-            particle.setAlpha(1.0,1.0);
-            particle.setColor(0.0,1.0,1.0,0.0,1.0,1.0);
-            particle.setTiming(view.timeStamp,0);       // want it to immediately die after next draw
-            particle.setNoDepthTest(true);
-            
+        
+        var particle=view.particleList.addDebugParticles(view,position,nBone);
+        if (particle!==null) {            
             var pnt;
 
             for (n=0;n!==nBone;n++) {
