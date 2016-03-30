@@ -22,24 +22,9 @@ REGULAR TODOs
 #### need ability for meshes to skip light mapping phase
 #### avoid closets where doors?
 
+#### don't do % humanoid high, makes them all the same, legs/arms/body/head all need to be separate heights
 
-[X] fixed some bugs in the physics timing
-[X] slight color variations in lighting
-[X] packed lights into vec4 to save space, changed light in scene algorithm and now handling 6 lights
-[X] some decoration random min/maxes are now dynamic based on room sizes
-[X] table decorations are now tables and shelves
-[X] better and more precise model sphere wrapping
-[X] whip/tail type limbs
-[X] random model mesh vertex variations
-[X] improved walk animations, added random idle animations
-[X] improved the particles
-[X] textures types are now marked so maps are less likely to keep picking the same type in the same map
-[X] added cement, block wall, metal shutters, and hexagonal texture types
-[X] improvements in other textures, plus new dirty streaking options
-[X] much better specular generation
-[X] added doors
-[X] added lifts
-[X] added map movements, looping and approach triggered
+
 
 [ ] GL
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
@@ -49,7 +34,6 @@ REGULAR TODOs
      [ ] look for any addition new optimizations
 
 [ ] sound
-     [X] need to create sounds
      [ ] move up to spatial panner (sound_list.setListenerToEntity, sound.play)
 
 
