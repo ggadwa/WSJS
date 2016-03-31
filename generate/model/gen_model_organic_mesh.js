@@ -85,7 +85,7 @@ class GenModelOrganicMeshClass
             // or bottom and build that with trigs later
             
         var yzAngAdd=360.0/aroundSurfaceCount;
-        var xAngAdd=180.0/acrossSurfaceCount;
+        var xAngAdd=180.0/(acrossSurfaceCount-1);
 
         var yzAng;
         var xAng=xAngAdd;
@@ -110,18 +110,13 @@ class GenModelOrganicMeshClass
             for (yz=0;yz<=aroundSurfaceCount;yz++) {
                 v=vertexList[vIdx++];
                 
-                if (yz!==aroundSurfaceCount) {
-                    rd=yzAng*DEGREE_TO_RAD;
-                }
-                else {
-                    rd=0.0;
-                }
+                rd=(yz!==aroundSurfaceCount)?(yzAng*DEGREE_TO_RAD):0.0;
                 
                 v.position.x=px;
                 v.position.y=centerPnt.y+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 v.position.z=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-                v.uv.x=yzAng/360.0;
+                v.uv.x=(yz!==aroundSurfaceCount)?(yzAng/360.0):0.9999;
                 v.uv.y=vAng;
 
                 yzAng+=yzAngAdd;
@@ -138,7 +133,7 @@ class GenModelOrganicMeshClass
         v.position.setFromValues((centerPnt.x-acrossRadius),centerPnt.y,centerPnt.z);
         v.uv.setFromValues(0.5,0.0);
         
-        var maxIdx=Math.trunc(vIdx);
+        var maxIdx=vIdx;
        
         v=vertexList[vIdx++];
         v.position.setFromValues((centerPnt.x+acrossRadius),centerPnt.y,centerPnt.z);
@@ -174,9 +169,9 @@ class GenModelOrganicMeshClass
             // min end point
             
         for (yz=0;yz!==aroundSurfaceCount;yz++) {
-            indexes[iIdx++]=yz;
-            indexes[iIdx++]=minIdx;
-            indexes[iIdx++]=yz+1;
+        //    indexes[iIdx++]=yz;
+        //    indexes[iIdx++]=minIdx;
+        //    indexes[iIdx++]=yz+1;
         }
         
             // max end point
@@ -184,9 +179,9 @@ class GenModelOrganicMeshClass
         var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (yz=0;yz!==aroundSurfaceCount;yz++) {
-            indexes[iIdx++]=maxOff+yz;
-            indexes[iIdx++]=maxIdx;
-            indexes[iIdx++]=maxOff+(yz+1);
+        //    indexes[iIdx++]=maxOff+yz;
+        //    indexes[iIdx++]=maxIdx;
+        //    indexes[iIdx++]=maxOff+(yz+1);
         }
     }
     
@@ -201,7 +196,7 @@ class GenModelOrganicMeshClass
             // or bottom and build that with trigs later
             
         var xzAngAdd=360.0/aroundSurfaceCount;
-        var yAngAdd=180.0/acrossSurfaceCount;
+        var yAngAdd=180.0/(acrossSurfaceCount-1);
 
         var xzAng;
         var yAng=yAngAdd;
@@ -226,18 +221,13 @@ class GenModelOrganicMeshClass
             for (xz=0;xz<=aroundSurfaceCount;xz++) {
                 v=vertexList[vIdx++];
                 
-                if (xz!==aroundSurfaceCount) {
-                    rd=xzAng*DEGREE_TO_RAD;
-                }
-                else {
-                    rd=0.0;
-                }
+                rd=(xz!==aroundSurfaceCount)?(xzAng*DEGREE_TO_RAD):0.0;
                 
                 v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 v.position.y=py;
                 v.position.z=centerPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-                v.uv.x=xzAng/360.0;
+                v.uv.x=(xz!==aroundSurfaceCount)?(xzAng/360.0):0.9999;
                 v.uv.y=vAng;
                 
                 xzAng+=xzAngAdd;
@@ -254,7 +244,7 @@ class GenModelOrganicMeshClass
         v.position.setFromValues(centerPnt.x,(centerPnt.y-acrossRadius),centerPnt.z);
         v.uv.setFromValues(0.5,0.0);
         
-        var maxIdx=Math.trunc(vIdx);
+        var maxIdx=vIdx;
        
         v=vertexList[vIdx++];
         v.position.setFromValues(centerPnt.x,(centerPnt.y+acrossRadius),centerPnt.z);
@@ -317,7 +307,7 @@ class GenModelOrganicMeshClass
             // or bottom and build that with trigs later
             
         var xyAngAdd=360.0/aroundSurfaceCount;
-        var zAngAdd=180.0/acrossSurfaceCount;
+        var zAngAdd=180.0/(acrossSurfaceCount-1);
 
         var xyAng;
         var zAng=zAngAdd;
@@ -342,18 +332,13 @@ class GenModelOrganicMeshClass
             for (xy=0;xy<=aroundSurfaceCount;xy++) {
                 v=vertexList[vIdx++];
                 
-                if (xy!==aroundSurfaceCount) {
-                    rd=xyAng*DEGREE_TO_RAD;
-                }
-                else {
-                    rd=0.0;
-                }
+                rd=(xy!==aroundSurfaceCount)?(xyAng*DEGREE_TO_RAD):0.0;
                 
                 v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 v.position.y=centerPnt.y+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
                 v.position.z=pz;
 
-                v.uv.x=xyAng/360.0;
+                v.uv.x=(xy!==aroundSurfaceCount)?(xyAng/360.0):0.9999;
                 v.uv.y=vAng;
 
                 xyAng+=xyAngAdd;
@@ -370,7 +355,7 @@ class GenModelOrganicMeshClass
         v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z-acrossRadius));
         v.uv.setFromValues(0.5,0.0);
         
-        var maxIdx=Math.trunc(vIdx);
+        var maxIdx=vIdx;
        
         v=vertexList[vIdx++];
         v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z+acrossRadius));
@@ -788,10 +773,10 @@ class GenModelOrganicMeshClass
                 break;
         }
 
-        this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
+        //this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
-        this.scaleVertexToBones(vertexList);
-        this.randomScaleVertexToBones(vertexList);
+        //this.scaleVertexToBones(vertexList);
+        //this.randomScaleVertexToBones(vertexList);
         this.buildNormalsToBones(vertexList,boneList,centerPnt);
         
             // complete the tangent space vectors

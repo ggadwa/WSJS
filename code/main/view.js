@@ -105,7 +105,7 @@ class ViewClass
 
             // additional drawing objects
 
-        this.text=new Text();
+        this.text=new TextClass();
         this.interface=new InterfaceClass();
         this.particleList=new ParticleListClass();
 

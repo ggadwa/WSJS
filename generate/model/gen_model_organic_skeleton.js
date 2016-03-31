@@ -242,8 +242,10 @@ class GenModelOrganicSkeletonClass
         bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         
-        bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_Y,8,8,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
+        bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_X,8,8,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
         this.model.skeleton.limbs.push(bodyLimb);
+        
+        return;
         
             // create head limbs
         

@@ -4,7 +4,7 @@
 // text class
 //
 
-class Text
+class TextClass
 {
     constructor()
     {    
