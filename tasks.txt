@@ -22,16 +22,16 @@ REGULAR TODOs
 #### need ability for meshes to skip light mapping phase
 #### avoid closets where doors?
 
-#### all mesh shrinking/moving needs equal vertex lists MAYBE
-#### make sure to change body limb type back to y
-#### turn back on all the commented stuff
+#### animals better
+#### blobs better
+#### weapon models
 
 
 
-
+[X] changed a reserved word I was using that caused errors on safari tech preview
 [X] dynamic humanoid models have much greater range in body shape, is possible to have no arms and no head
-[X] fixed bad UVs in wrapped models
-[ ] changed a reserved word I was using that caused errors on newest safari
+[X] fixed bad UVs in wrapped models and slightly better wrapping/random routines
+
 
 
 

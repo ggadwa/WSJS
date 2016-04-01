@@ -292,8 +292,8 @@ class MainClass
             model=new ModelClass('player',MODEL_TYPE_HUMANOID);
         }
         else {
-        //    model=new ModelClass(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
-            model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
+            model=new ModelClass(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
+        //    model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
         }
 
             // build the skeleton and mesh

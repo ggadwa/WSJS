@@ -2,8 +2,8 @@
 // room generation
 //
 
-const ROOM_MAX_RECURSION_DEPTH=1;//3;               // how far we recurse building the map, room to room, determines the size of the map
-const ROOM_MAX_CONNECTION_COUNT=0;//10;             // how many times we try to create a room that connects with this room
+const ROOM_MAX_RECURSION_DEPTH=3;               // how far we recurse building the map, room to room, determines the size of the map
+const ROOM_MAX_CONNECTION_COUNT=10;             // how many times we try to create a room that connects with this room
 
 const ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
 const ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is
@@ -35,9 +35,9 @@ const ROOM_LEDGE_EXTRA_HEIGHT=1500;             // extra height of ledges
 const ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
 const ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
 
-const ROOM_CLOSETS=false;                       // turns on or off closets
-const ROOM_PLATFORMS=false;                      // turns on or off platforms
-const ROOM_LEDGES=false;                        // turns on or off ledges
+const ROOM_CLOSETS=true;                       // turns on or off closets
+const ROOM_PLATFORMS=true;                      // turns on or off platforms
+const ROOM_LEDGES=true;                        // turns on or off ledges
 
 //
 // pillars and decorations
@@ -48,8 +48,8 @@ const ROOM_MAX_PILLAR_PERCENTAGE=0.5;           // amount of time a room has pil
 const ROOM_DECORATION_MIN_COUNT=1;              // minimum number of decoration pieces in a room
 const ROOM_DECORATION_EXTRA_COUNT=3;            // extra number of decoration pieces
 
-const ROOM_PILLARS=false;                        // turns on or off pillars
-const ROOM_DECORATIONS=false;                    // turns on or off decorations
+const ROOM_PILLARS=true;                        // turns on or off pillars
+const ROOM_DECORATIONS=true;                    // turns on or off decorations
 
 //
 // lighting
@@ -68,7 +68,7 @@ const MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for 
 const MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 const MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+const MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
 //
 // monsters
@@ -77,7 +77,7 @@ const MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light
 const MONSTER_MODEL_COUNT=8;
 const MONSTER_ENTITY_COUNT=8;
 
-const MONSTER_AI_ON=false;
+const MONSTER_AI_ON=true;
 
 //
 // particles
@@ -93,11 +93,11 @@ const PARTICLE_MAX_POINTS=200;                      // maximum number of points 
 
 const SEED=Date.now();
 
-const SEED_BITMAP_MAP=1;//Math.trunc((Math.random()*SEED));
-const SEED_MAP=2;//Math.trunc((Math.random()*SEED));
-const SEED_BITMAP_MODEL=1;//Math.trunc((Math.random()*SEED));
-const SEED_MODEL=1;//Math.trunc((Math.random()*SEED));
-const SEED_ENTITY=1;//Math.trunc((Math.random()*SEED));
+const SEED_BITMAP_MAP=Math.trunc((Math.random()*SEED));
+const SEED_MAP=Math.trunc((Math.random()*SEED));
+const SEED_BITMAP_MODEL=Math.trunc((Math.random()*SEED));
+const SEED_MODEL=Math.trunc((Math.random()*SEED));
+const SEED_ENTITY=Math.trunc((Math.random()*SEED));
 const SEED_SOUND=Math.trunc((Math.random()*SEED));
 
 //

@@ -198,7 +198,7 @@ class GenModelOrganicSkeletonClass
         waistHigh=hipHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.15));
         torsoHigh=waistHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.2));
         torsoTopHigh=torsoHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.15));
-        neckHigh=(torsoTopHigh+100)+Math.trunc(topBodyRadius*0.5);
+        neckHigh=torsoTopHigh+Math.trunc(topBodyRadius*0.25);
         jawHigh=neckHigh+this.genRandom.randomInt(100,Math.trunc(ROOM_FLOOR_HEIGHT*0.1));
         headHigh=jawHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.2));
         
@@ -219,7 +219,7 @@ class GenModelOrganicSkeletonClass
         topBodyRadius=this.genRandom.randomInt(300,1000);
         botBodyRadius=this.genRandom.randomInt(300,1000);
         
-        armLength=this.genRandom.randomInt(300,(torsoTopHigh-600));
+        armLength=this.genRandom.randomInt(Math.trunc(hipHigh*0.5),torsoTopHigh);
         
             // the base bone
             
@@ -242,10 +242,8 @@ class GenModelOrganicSkeletonClass
         bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         
-        bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_X,8,8,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
+        bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_Y,8,8,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
         this.model.skeleton.limbs.push(bodyLimb);
-        
-        return;
         
             // create head limbs
         
@@ -332,11 +330,11 @@ class GenModelOrganicSkeletonClass
             // create body limbs
         
         var high;
-        var totalHigh=this.genRandom.randomInt(500,1500);
-        var bodyLength=this.genRandom.randomInt(600,800);
+        var totalHigh=this.genRandom.randomInt(800,2500);
+        var bodyLength=this.genRandom.randomInt(600,1000);
         
-        var leftBodyRadius=this.genRandom.randomInt(300,500);
-        var rightBodyRadius=this.genRandom.randomInt(300,500);
+        var leftBodyRadius=this.genRandom.randomInt(300,700);
+        var rightBodyRadius=this.genRandom.randomInt(300,700);
 
         high=totalHigh+this.genRandom.randomInt(0,300);
         var torsoBoneIdx=bones.push(new ModelBoneClass('Torso',baseBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.25))))-1;

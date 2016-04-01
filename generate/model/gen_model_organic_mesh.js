@@ -169,9 +169,9 @@ class GenModelOrganicMeshClass
             // min end point
             
         for (yz=0;yz!==aroundSurfaceCount;yz++) {
-        //    indexes[iIdx++]=yz;
-        //    indexes[iIdx++]=minIdx;
-        //    indexes[iIdx++]=yz+1;
+            indexes[iIdx++]=yz;
+            indexes[iIdx++]=minIdx;
+            indexes[iIdx++]=yz+1;
         }
         
             // max end point
@@ -179,9 +179,9 @@ class GenModelOrganicMeshClass
         var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (yz=0;yz!==aroundSurfaceCount;yz++) {
-        //    indexes[iIdx++]=maxOff+yz;
-        //    indexes[iIdx++]=maxIdx;
-        //    indexes[iIdx++]=maxOff+(yz+1);
+            indexes[iIdx++]=maxOff+yz;
+            indexes[iIdx++]=maxIdx;
+            indexes[iIdx++]=maxOff+(yz+1);
         }
     }
     
@@ -773,10 +773,10 @@ class GenModelOrganicMeshClass
                 break;
         }
 
-        //this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
+        this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
-        //this.scaleVertexToBones(vertexList);
-        //this.randomScaleVertexToBones(vertexList);
+        this.scaleVertexToBones(vertexList);
+        this.randomScaleVertexToBones(vertexList);
         this.buildNormalsToBones(vertexList,boneList,centerPnt);
         
             // complete the tangent space vectors
@@ -806,8 +806,8 @@ class GenModelOrganicMeshClass
             
                 // counts
                 
-            vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point
-            indexes=new Uint16Array((((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))*6)+(((limb.aroundSurfaceCount+1)*2)*3));   // ((around+1)*(across-2))*6 for quads, ((around+1)*2)*3 for top and bottom trigs
+            vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point (around+1 for extra vertexes to stop UV wrapping)
+            indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-3))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-3))*6 for quads, (around*2)*3 for top and bottom trigs
             
             this.buildAroundBoneList(view,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
 
