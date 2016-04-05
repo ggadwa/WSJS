@@ -225,8 +225,8 @@ class MainDebugClass
     {
             // construct necessary classes
             
-        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(SEED_BITMAP_MAP));
-        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(SEED_BITMAP_MODEL));
+        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
         
         this.debugSoundList=new SoundListClass();
         if (!this.debugSoundList.initialize()) {
@@ -234,7 +234,7 @@ class MainDebugClass
             return;
         }
         
-        this.genSound=new GenSoundClass(this.debugSoundList.getAudioContext(),new GenRandomClass(SEED_SOUND));
+        this.genSound=new GenSoundClass(this.debugSoundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
 
             // start the timed process
             

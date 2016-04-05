@@ -33,10 +33,10 @@ class GenRoomDecorationClass
         var boxPos=new wsPoint(0,0,0);
         var rotAngle=new wsPoint(0.0,0.0,0.0);
         
-        var minWidth=Math.trunc(ROOM_BLOCK_WIDTH*0.2);
-        var extraWidth=Math.trunc(ROOM_BLOCK_WIDTH*0.25);
+        var minWidth=Math.trunc(config.ROOM_BLOCK_WIDTH*0.2);
+        var extraWidth=Math.trunc(config.ROOM_BLOCK_WIDTH*0.25);
 
-        stackCount=this.genRandom.randomInt(ROOM_DECORATION_MIN_COUNT,ROOM_DECORATION_EXTRA_COUNT);
+        stackCount=this.genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
 
         for (n=0;n!==stackCount;n++) {
             
@@ -112,17 +112,17 @@ class GenRoomDecorationClass
             
             // machine size setup
             
-        margin=this.genRandom.randomInt(0,Math.trunc(ROOM_BLOCK_WIDTH/8));
+        margin=this.genRandom.randomInt(0,Math.trunc(config.ROOM_BLOCK_WIDTH/8));
 
-        wid=Math.trunc(ROOM_BLOCK_WIDTH/2);
-        high=this.genRandom.randomInt(ROOM_BLOCK_WIDTH,1000);
+        wid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
+        high=this.genRandom.randomInt(config.ROOM_BLOCK_WIDTH,1000);
 
         machineWid=wid-margin;
         
-        machineBoundY=new wsBound((room.yBound.max-high),(room.yBound.max-ROOM_FLOOR_DEPTH));
-        topBoundY=new wsBound(room.yStoryBound.min,(room.yStoryBound.min+ROOM_FLOOR_DEPTH));
-        midBoundY=new wsBound((machineBoundY.min-ROOM_FLOOR_DEPTH),machineBoundY.min);
-        botBoundY=new wsBound((room.yBound.max-ROOM_FLOOR_DEPTH),room.yBound.max);
+        machineBoundY=new wsBound((room.yBound.max-high),(room.yBound.max-config.ROOM_FLOOR_DEPTH));
+        topBoundY=new wsBound(room.yStoryBound.min,(room.yStoryBound.min+config.ROOM_FLOOR_DEPTH));
+        midBoundY=new wsBound((machineBoundY.min-config.ROOM_FLOOR_DEPTH),machineBoundY.min);
+        botBoundY=new wsBound((room.yBound.max-config.ROOM_FLOOR_DEPTH),room.yBound.max);
             
             // the machine start location
 
@@ -159,7 +159,7 @@ class GenRoomDecorationClass
 
             centerPt=new wsPoint(0,0,0);
 
-            yPipeBound=new wsBound((room.yStoryBound.min+ROOM_FLOOR_DEPTH),(room.yBound.max-(high+ROOM_FLOOR_DEPTH)));
+            yPipeBound=new wsBound((room.yStoryBound.min+config.ROOM_FLOOR_DEPTH),(room.yBound.max-(high+config.ROOM_FLOOR_DEPTH)));
 
             ang=0.0;
             angAdd=360.0/nPipe;
@@ -201,10 +201,10 @@ class GenRoomDecorationClass
         var boxBoundY=new wsBound(0,0);
         var boxBoundZ=new wsBound(0,0);
         
-        legWid=Math.trunc(ROOM_BLOCK_WIDTH*0.1);
+        legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
         bitmap=this.bitmapList.getBitmap('Map Box');
 
-        pieceCount=this.genRandom.randomInt(ROOM_DECORATION_MIN_COUNT,ROOM_DECORATION_EXTRA_COUNT);
+        pieceCount=this.genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
 
         for (n=0;n!==pieceCount;n++) {
             pos=room.findRandomDecorationLocation(this.genRandom,false);
@@ -213,14 +213,14 @@ class GenRoomDecorationClass
                 // height and width
             
             if (this.genRandom.randomPercentage(0.5)) {
-                xWid=Math.trunc(ROOM_BLOCK_WIDTH/2);
-                zWid=xWid-Math.trunc(0,Math.trunc(ROOM_BLOCK_WIDTH*0.2));
+                xWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
+                zWid=xWid-Math.trunc(0,Math.trunc(config.ROOM_BLOCK_WIDTH*0.2));
             }
             else {
-                zWid=Math.trunc(ROOM_BLOCK_WIDTH/2);
-                xWid=zWid-Math.trunc(0,Math.trunc(ROOM_BLOCK_WIDTH*0.2));
+                zWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
+                xWid=zWid-Math.trunc(0,Math.trunc(config.ROOM_BLOCK_WIDTH*0.2));
             }
-            high=this.genRandom.randomInt(Math.trunc(ROOM_BLOCK_WIDTH*0.25),1000);
+            high=this.genRandom.randomInt(Math.trunc(config.ROOM_BLOCK_WIDTH*0.25),1000);
             
             stackCount=1;
             if (this.genRandom.randomPercentage(0.75)) stackCount=this.genRandom.randomInt(2,2);
@@ -232,14 +232,14 @@ class GenRoomDecorationClass
                     // the table
 
                 boxBoundX=new wsBound((pos.x-xWid),(pos.x+xWid));
-                boxBoundY=new wsBound((boxY-high),((boxY-high)+ROOM_FLOOR_DEPTH));
+                boxBoundY=new wsBound((boxY-high),((boxY-high)+config.ROOM_FLOOR_DEPTH));
                 boxBoundZ=new wsBound((pos.z-zWid),(pos.z+zWid));
 
                 this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
 
                     // legs
 
-                boxBoundY=new wsBound(((boxY-high)+ROOM_FLOOR_DEPTH),boxY);
+                boxBoundY=new wsBound(((boxY-high)+config.ROOM_FLOOR_DEPTH),boxY);
 
                 boxBoundX=new wsBound((pos.x-xWid),((pos.x-xWid)+legWid));
                 boxBoundZ=new wsBound((pos.z-zWid),((pos.z-zWid)+legWid));            

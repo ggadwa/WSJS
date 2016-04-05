@@ -22,8 +22,8 @@ class MapRoomClass
         this.blockGrid=null;
         this.platformGrid=null;
 
-        this.yStoryBound=new wsBound((this.yBound.min-ROOM_FLOOR_DEPTH),this.yBound.max);
-        if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+ROOM_FLOOR_DEPTH);
+        this.yStoryBound=new wsBound((this.yBound.min-config.ROOM_FLOOR_DEPTH),this.yBound.max);
+        if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+config.ROOM_FLOOR_DEPTH);
         
         this.setupGrid();
         
@@ -97,8 +97,8 @@ class MapRoomClass
             // collide on our left
             
         if (xCollideBound.max===this.xBound.min) {
-            z1=Math.trunc((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
-            z2=z1+Math.trunc(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -111,8 +111,8 @@ class MapRoomClass
             // collide on our right
             
         if (xCollideBound.min===this.xBound.max) {
-            z1=Math.trunc((zCollideBound.min-this.zBound.min)/ROOM_BLOCK_WIDTH);
-            z2=z1+Math.trunc(zCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -125,8 +125,8 @@ class MapRoomClass
             // collide on our top
             
         if (zCollideBound.max===this.zBound.min) {
-            x1=Math.trunc((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
-            x2=x1+Math.trunc(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -139,8 +139,8 @@ class MapRoomClass
             // collide on our bottom
             
         if (zCollideBound.min===this.zBound.max) {
-            x1=Math.trunc((xCollideBound.min-this.xBound.min)/ROOM_BLOCK_WIDTH);
-            x2=x1+Math.trunc(xCollideBound.getSize()/ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -184,12 +184,12 @@ class MapRoomClass
                     // check to see if we can spawn
                     // to a platform first
                     
-                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
                     
                 if (this.platformGrid[z][x]===1) {
                     this.platformGrid[z][x]=2;
-                    return(new wsPoint(bx,(this.yBound.min-ROOM_FLOOR_DEPTH),bz));
+                    return(new wsPoint(bx,(this.yBound.min-config.ROOM_FLOOR_DEPTH),bz));
                 }
                 else {
                     return(new wsPoint(bx,this.yBound.max,bz));
@@ -227,8 +227,8 @@ class MapRoomClass
             
             if (gridSpot===0) {
                 this.blockGrid[z][x]=1;
-                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
             
@@ -252,8 +252,8 @@ class MapRoomClass
         var x,z,bx,bz;
         var gridSpot;
         
-        x=Math.trunc((curPnt.x-this.xBound.min)/ROOM_BLOCK_WIDTH);
-        z=Math.trunc((curPnt.z-this.zBound.min)/ROOM_BLOCK_WIDTH);
+        x=Math.trunc((curPnt.x-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
+        z=Math.trunc((curPnt.z-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
         
             // check four locations
             
@@ -263,8 +263,8 @@ class MapRoomClass
             
             if (gridSpot===0) {
                 this.blockGrid[z][x-1]=1;
-                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*(x-1)))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*(x-1)))+(config.ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
         }
@@ -275,8 +275,8 @@ class MapRoomClass
             
             if (gridSpot===0) {
                 this.blockGrid[z-1][x]=1;
-                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*(z-1)))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*(z-1)))+(config.ROOM_BLOCK_WIDTH/2));
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
         }
@@ -287,8 +287,8 @@ class MapRoomClass
             
             if (gridSpot===0) {
                 this.blockGrid[z][x+1]=1;
-                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*(x+1)))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*(x+1)))+(config.ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
         }
@@ -299,8 +299,8 @@ class MapRoomClass
             
             if (gridSpot===0) {
                 this.blockGrid[z+1][x]=1;
-                bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*(z+1)))+(ROOM_BLOCK_WIDTH/2));
+                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
+                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*(z+1)))+(config.ROOM_BLOCK_WIDTH/2));
                 return(new wsPoint(bx,this.yBound.max,bz));
             }
         }
@@ -314,8 +314,8 @@ class MapRoomClass
         
         if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
             this.blockGrid[z][x]=1;
-            bx=Math.trunc((this.xBound.min+(ROOM_BLOCK_WIDTH*x))+(ROOM_BLOCK_WIDTH/2));
-            bz=Math.trunc((this.zBound.min+(ROOM_BLOCK_WIDTH*z))+(ROOM_BLOCK_WIDTH/2));
+            bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
+            bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
             return(new wsPoint(bx,this.yBound.max,bz));
         }
         
@@ -346,7 +346,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+ROOM_BLOCK_WIDTH;
+            x2=x+config.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.min);
             vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.min,this.zBound.min);
@@ -372,7 +372,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+ROOM_BLOCK_WIDTH;
+            z2=z+config.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(this.xBound.max,yStoryBound.min,z);
             vertexList[vIdx+1].position.setFromValues(this.xBound.max,yStoryBound.min,z2);
@@ -398,7 +398,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+ROOM_BLOCK_WIDTH;
+            x2=x+config.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.max);
             vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.min,this.zBound.max);
@@ -424,7 +424,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+ROOM_BLOCK_WIDTH;
+            z2=z+config.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(this.xBound.min,yStoryBound.min,z);
             vertexList[vIdx+1].position.setFromValues(this.xBound.min,yStoryBound.min,z2);
@@ -474,7 +474,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+ROOM_BLOCK_WIDTH;
+            x2=x+config.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(x,this.zBound.min),new ws2DIntPoint(x2,this.zBound.min)));
             x=x2;
         }
@@ -484,7 +484,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+ROOM_BLOCK_WIDTH;
+            z2=z+config.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(this.xBound.max,z),new ws2DIntPoint(this.xBound.max,z2)));
             z=z2;
         }
@@ -494,7 +494,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+ROOM_BLOCK_WIDTH;
+            x2=x+config.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(x,this.zBound.max),new ws2DIntPoint(x2,this.zBound.max)));
             x=x2;
         }
@@ -504,7 +504,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+ROOM_BLOCK_WIDTH;
+            z2=z+config.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(this.xBound.min,z),new ws2DIntPoint(this.xBound.min,z2)));
             z=z2;
         }
@@ -537,12 +537,12 @@ class MapRoomClass
         vz=this.zBound.min;
         
         for (z=0;z!==this.zBlockSize;z++) {
-            vz2=vz+ROOM_BLOCK_WIDTH;
+            vz2=vz+config.ROOM_BLOCK_WIDTH;
             
             vx=this.xBound.min;
             
             for (x=0;x!==this.xBlockSize;x++) {
-                vx2=vx+ROOM_BLOCK_WIDTH;
+                vx2=vx+config.ROOM_BLOCK_WIDTH;
                 
                 v=vertexList[vIdx];
                 v.position.setFromValues(vx,y,vz);

@@ -116,14 +116,14 @@ class EntityPlayerClass extends EntityClass
         
             // movement
             
-        if (this.forwardSpeed!==0.0) super.moveComplex(map,entityList,this.forwardSpeed,0.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
-        if (this.sideSpeed!==0.0) super.moveComplex(map,entityList,this.sideSpeed,90.0,bump,PLAYER_FLY,PLAYER_CLIP_WALLS);
+        if (this.forwardSpeed!==0.0) super.moveComplex(map,entityList,this.forwardSpeed,0.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
+        if (this.sideSpeed!==0.0) super.moveComplex(map,entityList,this.sideSpeed,90.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
         
         if (this.verticalSpeed!==0.0) super.moveDirect(0.0,this.verticalSpeed,0.0);
         
             // falling
         
-        if (!PLAYER_FLY) super.fall(map);
+        if (!config.PLAYER_FLY) super.fall(map);
     }
     
 }

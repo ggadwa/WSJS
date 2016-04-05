@@ -51,7 +51,7 @@ class MainClass
             [
                 ['fire',GEN_SOUND_TYPE_GUN_FIRE],
                 ['explosion',GEN_SOUND_TYPE_EXPLOSION],
-                ['monster scream',GEN_SOUND_TYPE_MONSTER_SCREAM]
+                ['monster scream',config.GEN_SOUND_TYPE_MONSTER_SCREAM]
             ];
             
         Object.seal(this);
@@ -90,9 +90,9 @@ class MainClass
 
             // dynamic creation classes
 
-        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(SEED_BITMAP_MAP));
-        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(SEED_BITMAP_MODEL));
-        this.genSound=new GenSoundClass(this.soundList.getAudioContext(),new GenRandomClass(SEED_SOUND));
+        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
+        this.genSound=new GenSoundClass(this.soundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
 
             // next step
 
@@ -176,8 +176,8 @@ class MainClass
             // if more textures, then loop back around
 
         idx++;
-        if (idx<MONSTER_MODEL_COUNT) {
-            this.view.loadingScreenDraw(idx/MONSTER_MODEL_COUNT);
+        if (idx<config.MONSTER_TYPE_COUNT) {
+            this.view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);
             setTimeout(this.initBuildModelTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
             return;
         }
@@ -224,7 +224,7 @@ class MainClass
 
     initBuildMap()
     {
-        var genMap=new GenMapClass(this.view,this.bitmapList,this.map,new GenRandomClass(SEED_MAP),this.initBuildMapFinish.bind(this));
+        var genMap=new GenMapClass(this.view,this.bitmapList,this.map,new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 
@@ -262,13 +262,13 @@ class MainClass
             // light maps are a long running
             // process so we need a callback
 
-        var genLightmap=new GenLightmapClass(this.view,this.bitmapList,this.map,this.debug,MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
+        var genLightmap=new GenLightmapClass(this.view,this.bitmapList,this.map,this.debug,config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
         genLightmap.create();
     }
 
     initBuildLightmapFinish()
     {
-        var modelGenRandom=new GenRandomClass(SEED_MODEL);
+        var modelGenRandom=new GenRandomClass(config.SEED_MODEL);
 
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Generating Dynamic Models');
@@ -293,7 +293,7 @@ class MainClass
         }
         else {
             model=new ModelClass(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
-        //    model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_HUMANOID);
+        //    model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_ANIMAL);
         }
 
             // build the skeleton and mesh
@@ -308,10 +308,10 @@ class MainClass
 
             // if more models, then loop back around
 
-        this.view.loadingScreenDraw(idx/MONSTER_MODEL_COUNT);    
+        this.view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);    
 
         idx++;
-        if (idx<(MONSTER_MODEL_COUNT+1)) {
+        if (idx<(config.MONSTER_TYPE_COUNT+1)) {
             setTimeout(this.initBuildModelsMesh.bind(this,idx,modelGenRandom),PROCESS_TIMEOUT_MSEC);
             return;
         }
@@ -361,7 +361,7 @@ class MainClass
         var n,monsterModelName;
         var model,pos;
 
-        var entityGenRandom=new GenRandomClass(SEED_ENTITY);
+        var entityGenRandom=new GenRandomClass(config.SEED_ENTITY);
 
             // make player entity
 
@@ -381,11 +381,11 @@ class MainClass
             // we clone their models in the list so each entity gets
             // it's own model
 
-        for (n=0;n!==MONSTER_ENTITY_COUNT;n++) {
+        for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
             pos=this.map.findRandomEntityPosition(entityGenRandom);
             if (pos===null) continue;
 
-            monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,MONSTER_MODEL_COUNT);     // supergumba -- testing -- to get all monster types
+            monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);     // supergumba -- testing -- to get all monster types
             model=this.modelList.cloneModel(this.view,monsterModelName);
 
             this.entityList.addEntity(new EntityMonsterClass(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
@@ -411,7 +411,7 @@ class MainClass
 
             // ambient
 
-        this.view.ambient.setFromValues(MAP_LIGHT_AMBIENT[0],MAP_LIGHT_AMBIENT[1],MAP_LIGHT_AMBIENT[2]);
+        this.view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT[0],config.MAP_LIGHT_AMBIENT[1],config.MAP_LIGHT_AMBIENT[2]);
 
             // start the input
 
@@ -522,7 +522,6 @@ function mainLoop(timeStamp)
         view.fpsCount=0;
     }
 }
-
 
 function mainRun()
 {

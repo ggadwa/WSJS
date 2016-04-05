@@ -39,7 +39,6 @@ class ViewClass
 
         this.gl=null;
         this.canvas=null;
-        this.canvasTopLeft=new ws2DIntPoint(0,0);
 
             // the view setup
 
@@ -149,21 +148,36 @@ class ViewClass
 
     initialize(fileCache,canvasId)
     {
-            // get the canvas
-
-        this.canvas=document.getElementById(canvasId);
-        if (this.canvas===null) {
-            alert('missing canvas id');
-            return(false);
+        var margin=0;
+        
+            // canvas position
+            
+        var wid=window.innerWidth-margin;
+        var high=Math.trunc((wid*9)/16);
+        
+        if (high>(window.innerHeight-margin)) {
+            high=window.innerHeight-margin;
+            wid=Math.trunc((high*16)/9);
         }
-
-        this.canvasTopLeft.x=parseInt(this.canvas.style.left);
-        this.canvasTopLeft.y=parseInt(this.canvas.style.top);
+        
+        var lft=Math.trunc((window.innerWidth-wid)/2);
+        var top=Math.trunc((window.innerHeight-high)/2);
+        
+            // create the canvas
+        
+        this.canvas=document.createElement('canvas');
+        this.canvas.style.position='absolute';
+        this.canvas.style.left=lft+'px';
+        this.canvas.style.top=top+'px';
+        this.canvas.width=wid;
+        this.canvas.height=high;
+        
+        document.body.appendChild(this.canvas);
 
             // get the gl context
 
         try {
-            this.gl=this.canvas.getContext("experimental-webgl");
+            this.gl=this.canvas.getContext("webgl");
         }
         catch (e) {
             alert(e);
@@ -527,10 +541,10 @@ class ViewClass
                 entity.draw(this);
                 entity.drawEnd(this);
 
-                if (DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.model,entity.angle,entity.position);
-                if (DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.model);
-                if (DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.model);
-                if (DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.model);
+                if (config.DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.model,entity.angle,entity.position);
+                if (config.DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.model);
+                if (config.DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.model);
+                if (config.DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.model);
             }
         }
         

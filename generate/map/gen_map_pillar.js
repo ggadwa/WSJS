@@ -13,8 +13,8 @@ class GenRoomPillarClass
         this.map=map;
         this.genRandom=genRandom;
         
-        var minRadius=Math.trunc(ROOM_BLOCK_WIDTH*0.08);
-        var maxRadius=Math.trunc(ROOM_BLOCK_WIDTH*0.14);
+        var minRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.08);
+        var maxRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.14);
 
         var radius=this.genRandom.randomInBetween(minRadius,maxRadius);
         this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(this.genRandom,radius,radius,1,4);
@@ -86,7 +86,7 @@ class GenRoomPillarClass
         
             // this room have pillars?
             
-        if (!this.genRandom.randomPercentage(ROOM_MAX_PILLAR_PERCENTAGE)) return;
+        if (!this.genRandom.randomPercentage(config.ROOM_MAX_PILLAR_PERCENTAGE)) return;
         
             // ybound
             

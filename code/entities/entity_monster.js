@@ -37,7 +37,7 @@ class EntityMonsterClass extends EntityClass
         
         player=entityList.getPlayer();
         
-        if ((!this.active) && (MONSTER_AI_ON)) {
+        if ((!this.active) && (config.MONSTER_AI_ON)) {
             var dist=player.position.distance(this.position);
             this.active=(dist<25000);
         }

@@ -194,16 +194,16 @@ class GenModelOrganicSkeletonClass
             // random heights
             // can never be taller than a single floor height
             
-        hipHigh=this.genRandom.randomInt(600,Math.trunc(ROOM_FLOOR_HEIGHT*0.4));
-        waistHigh=hipHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.15));
-        torsoHigh=waistHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.2));
-        torsoTopHigh=torsoHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.15));
+        hipHigh=this.genRandom.randomInt(600,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.4));
+        waistHigh=hipHigh+this.genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.15));
+        torsoHigh=waistHigh+this.genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.2));
+        torsoTopHigh=torsoHigh+this.genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.15));
         neckHigh=torsoTopHigh+Math.trunc(topBodyRadius*0.25);
-        jawHigh=neckHigh+this.genRandom.randomInt(100,Math.trunc(ROOM_FLOOR_HEIGHT*0.1));
-        headHigh=jawHigh+this.genRandom.randomInt(200,Math.trunc(ROOM_FLOOR_HEIGHT*0.2));
+        jawHigh=neckHigh+this.genRandom.randomInt(100,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.1));
+        headHigh=jawHigh+this.genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.2));
         
         while (true) {
-            if (headHigh<ROOM_FLOOR_HEIGHT) break;
+            if (headHigh<config.ROOM_FLOOR_HEIGHT) break;
             
             hipHigh-=5;
             waistHigh-=10;
@@ -413,7 +413,7 @@ class GenModelOrganicSkeletonClass
             // can never be taller than a single floor height
             // and always shorter than humanoids (no legs)
         
-        var totalHigh=this.genRandom.randomInt(Math.trunc(ROOM_FLOOR_HEIGHT*0.1),Math.trunc(ROOM_FLOOR_HEIGHT*0.4));
+        var totalHigh=this.genRandom.randomInt(Math.trunc(config.ROOM_FLOOR_HEIGHT*0.1),Math.trunc(config.ROOM_FLOOR_HEIGHT*0.4));
         
             // the base bone
             

@@ -130,7 +130,7 @@ class GenRoomClosetClass
         var connectSide,connectOffset,closetLen;
         var xClosetBound,yClosetBound,zClosetBound;
         
-        var closetCount=this.genRandom.randomIndex(ROOM_CLOSET_MAX_COUNT);
+        var closetCount=this.genRandom.randomIndex(config.ROOM_CLOSET_MAX_COUNT);
         if (closetCount===0) return;
         
             // create closests
@@ -155,7 +155,7 @@ class GenRoomClosetClass
 
             yClosetBound=room.yBound.copy();
             if (room.hasStories) {
-                if (this.genRandom.randomPercentage(ROOM_CLOSET_UP_PERCENTAGE)) yClosetBound.add(-(room.yBound.getSize()+ROOM_FLOOR_DEPTH));
+                if (this.genRandom.randomPercentage(config.ROOM_CLOSET_UP_PERCENTAGE)) yClosetBound.add(-(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH));
             }
             
                 // get the box
@@ -164,34 +164,34 @@ class GenRoomClosetClass
                 
                 case ROOM_SIDE_LEFT:
                     xAdd=0;
-                    zAdd=ROOM_BLOCK_WIDTH;
-                    z=room.zBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound((room.xBound.min-ROOM_BLOCK_WIDTH),room.xBound.min);
-                    zClosetBound=new wsBound(z,(z+ROOM_BLOCK_WIDTH));
+                    zAdd=config.ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound((room.xBound.min-config.ROOM_BLOCK_WIDTH),room.xBound.min);
+                    zClosetBound=new wsBound(z,(z+config.ROOM_BLOCK_WIDTH));
                     break;
                     
                 case ROOM_SIDE_TOP:
-                    xAdd=ROOM_BLOCK_WIDTH;
+                    xAdd=config.ROOM_BLOCK_WIDTH;
                     zAdd=0;
-                    x=room.xBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound(x,(x+ROOM_BLOCK_WIDTH));
-                    zClosetBound=new wsBound((room.zBound.min-ROOM_BLOCK_WIDTH),room.zBound.min);
+                    x=room.xBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(x,(x+config.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound((room.zBound.min-config.ROOM_BLOCK_WIDTH),room.zBound.min);
                     break;
                     
                 case ROOM_SIDE_RIGHT:
                     xAdd=0;
-                    zAdd=ROOM_BLOCK_WIDTH;
-                    z=room.zBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound(room.xBound.max,(room.xBound.max+ROOM_BLOCK_WIDTH));
-                    zClosetBound=new wsBound(z,(z+ROOM_BLOCK_WIDTH));
+                    zAdd=config.ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(room.xBound.max,(room.xBound.max+config.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound(z,(z+config.ROOM_BLOCK_WIDTH));
                     break;
                     
                 case ROOM_SIDE_BOTTOM:
-                    xAdd=ROOM_BLOCK_WIDTH;
+                    xAdd=config.ROOM_BLOCK_WIDTH;
                     zAdd=0;
-                    x=room.xBound.min+(connectOffset*ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound(x,(x+ROOM_BLOCK_WIDTH));
-                    zClosetBound=new wsBound(room.zBound.max,(room.zBound.max+ROOM_BLOCK_WIDTH));
+                    x=room.xBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(x,(x+config.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound(room.zBound.max,(room.zBound.max+config.ROOM_BLOCK_WIDTH));
                     break;
             }
             

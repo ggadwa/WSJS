@@ -27,7 +27,12 @@ REGULAR TODOs
 #### weapon models
 
 
+#### is it faster if we reduce the number of timeouts in light mapping?
 
+
+
+[X] game view automatically sizes it's self to max area for 16:9
+[X] new startup that allows you to configure some building variables
 [X] changed a reserved word I was using that caused errors on safari tech preview
 [X] dynamic humanoid models have much greater range in body shape, is possible to have no arms and no head
 [X] fixed bad UVs in wrapped models and slightly better wrapping/random routines

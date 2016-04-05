@@ -148,7 +148,7 @@ class GenMapClass
             hasStories=true;
         }
         else {
-            hasStories=this.genRandom.randomPercentage(ROOM_UPPER_TALL_PERCENTAGE);
+            hasStories=this.genRandom.randomPercentage(config.ROOM_UPPER_TALL_PERCENTAGE);
         }
             
             // add this room to the tracking room list so
@@ -169,14 +169,14 @@ class GenMapClass
         for (n=0;n!==storyCount;n++) {
             mesh=room.createMeshWalls(roomBitmap,yStoryBound,MESH_FLAG_ROOM_WALL);
 
-            yFloorBound=new wsBound((yStoryBound.min-ROOM_FLOOR_DEPTH),yStoryBound.min);
+            yFloorBound=new wsBound((yStoryBound.min-config.ROOM_FLOOR_DEPTH),yStoryBound.min);
             mesh2=room.createMeshWalls(roomBitmap,yFloorBound,MESH_FLAG_ROOM_WALL);
             mesh.combineMesh(mesh2);
             
             this.map.addMesh(mesh);
             if (n===0) this.map.addOverlayRoom(room);
             
-            yStoryBound.add(-(yBound.getSize()+ROOM_FLOOR_DEPTH));
+            yStoryBound.add(-(yBound.getSize()+config.ROOM_FLOOR_DEPTH));
         }
         
             // the ceiling
@@ -275,22 +275,22 @@ class GenMapClass
 
             // the color
 
-        red=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
-        if (MAP_LIGHT_ALWAYS_WHITE) {
+        red=config.MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
+        if (config.MAP_LIGHT_ALWAYS_WHITE) {
             green=blue=red;
         }
         else {
-            green=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
-            blue=MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*MAP_LIGHT_RGB_MINIMUM_EXTRA);
+            green=config.MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
+            blue=config.MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
         }
         
             // the exponent
             
-        var exponent=MAP_LIGHT_EXPONENT_MINIMUM+(this.genRandom.random()*MAP_LIGHT_EXPONENT_EXTRA);
+        var exponent=config.MAP_LIGHT_EXPONENT_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_EXPONENT_EXTRA);
 
             // add light to map
 
-        this.map.addLight(new MapLightClass(lightPos,new wsColor(red,green,blue),MAP_GENERATE_LIGHTMAP,intensity,exponent));
+        this.map.addLight(new MapLightClass(lightPos,new wsColor(red,green,blue),config.MAP_GENERATE_LIGHTMAP,intensity,exponent));
     }
     
     addRoomLight(roomIdx)
@@ -300,8 +300,8 @@ class GenMapClass
         
             // locations
             
-        lightY=room.yBound.min-ROOM_FLOOR_DEPTH;
-        if (room.hasStories) lightY-=(room.yBound.getSize()+ROOM_FLOOR_DEPTH);
+        lightY=room.yBound.min-config.ROOM_FLOOR_DEPTH;
+        if (room.hasStories) lightY-=(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH);
         
         fixturePos=new wsPoint(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
         lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
@@ -310,8 +310,8 @@ class GenMapClass
             
         intensity=Math.trunc((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
         
-        intensity*=(MAP_LIGHT_FACTOR+(this.genRandom.random()*MAP_LIGHT_FACTOR_EXTRA));
-        if (room.hasStories) intensity*=MAP_LIGHT_TWO_STORY_BOOST;
+        intensity*=(config.MAP_LIGHT_FACTOR+(this.genRandom.random()*config.MAP_LIGHT_FACTOR_EXTRA));
+        if (room.hasStories) intensity*=config.MAP_LIGHT_TWO_STORY_BOOST;
         
             // create the light
             
@@ -324,14 +324,14 @@ class GenMapClass
         
             // locations
             
-        high=Math.trunc(ROOM_FLOOR_HEIGHT*0.6);
+        high=Math.trunc(config.ROOM_FLOOR_HEIGHT*0.6);
             
         fixturePos=new wsPoint(xBound.getMidPoint(),(yBound.min-high),zBound.getMidPoint());
         lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
         
             // create the light
             
-        this.addGeneralLight(lightPos,fixturePos,(ROOM_FLOOR_HEIGHT*1.5));
+        this.addGeneralLight(lightPos,fixturePos,(config.ROOM_FLOOR_HEIGHT*1.5));
     }
     
         //
@@ -347,8 +347,8 @@ class GenMapClass
         if (bound2.min>min) min=bound2.min;
         if (bound2.max<max) max=bound2.max;
         
-        count=Math.trunc((max-min)/ROOM_BLOCK_WIDTH);
-        offset=this.genRandom.randomIndex(count)*ROOM_BLOCK_WIDTH;
+        count=Math.trunc((max-min)/config.ROOM_BLOCK_WIDTH);
+        offset=this.genRandom.randomIndex(count)*config.ROOM_BLOCK_WIDTH;
         if (bound1.min<bound2.min) offset+=(bound2.min-bound1.min);           // need to align offset with bounds1
         
         return(offset);
@@ -371,12 +371,12 @@ class GenMapClass
             // and make sure it stays under the max
             // blocks for room
         
-        xBlockSize=this.genRandom.randomInt(ROOM_MIN_BLOCK_PER_SIDE,ROOM_MAX_BLOCK_PER_SIDE);
-        zBlockSize=this.genRandom.randomInt(ROOM_MIN_BLOCK_PER_SIDE,ROOM_MAX_BLOCK_PER_SIDE);
+        xBlockSize=this.genRandom.randomInt(config.ROOM_MIN_BLOCK_PER_SIDE,config.ROOM_MAX_BLOCK_PER_SIDE);
+        zBlockSize=this.genRandom.randomInt(config.ROOM_MIN_BLOCK_PER_SIDE,config.ROOM_MAX_BLOCK_PER_SIDE);
         
-        while ((xBlockSize*zBlockSize)>ROOM_MAX_BLOCK_COUNT) {
-            if (xBlockSize>ROOM_MIN_BLOCK_PER_SIDE) xBlockSize--;
-            if (zBlockSize>ROOM_MIN_BLOCK_PER_SIDE) zBlockSize--;
+        while ((xBlockSize*zBlockSize)>config.ROOM_MAX_BLOCK_COUNT) {
+            if (xBlockSize>config.ROOM_MIN_BLOCK_PER_SIDE) xBlockSize--;
+            if (zBlockSize>config.ROOM_MIN_BLOCK_PER_SIDE) zBlockSize--;
         }
 
             // can only have a single level
@@ -392,13 +392,13 @@ class GenMapClass
         if (lastRoom===null) {
             var mapMid=Math.trunc(this.view.OPENGL_FAR_Z/2);
 
-            var halfSize=Math.trunc((xBlockSize/2)*ROOM_BLOCK_WIDTH);
+            var halfSize=Math.trunc((xBlockSize/2)*config.ROOM_BLOCK_WIDTH);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.trunc(ROOM_FLOOR_HEIGHT/2);
+            var halfSize=Math.trunc(config.ROOM_FLOOR_HEIGHT/2);
             yBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
-            var halfSize=Math.trunc((zBlockSize/2)*ROOM_BLOCK_WIDTH);
+            var halfSize=Math.trunc((zBlockSize/2)*config.ROOM_BLOCK_WIDTH);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
         }
 
@@ -423,19 +423,19 @@ class GenMapClass
                 else {
                     connectOffset=this.genRandom.randomInt(-Math.trunc(xBlockSize*0.5),lastRoom.xBlockSize);
                 }
-                connectOffset*=ROOM_BLOCK_WIDTH;
+                connectOffset*=config.ROOM_BLOCK_WIDTH;
                 
                     // get new room bounds and move it around
                     // if we need space for stairs or doors
                 
-                stairAdd=ROOM_BLOCK_WIDTH*2;
-                doorAdd=ROOM_BLOCK_WIDTH;
+                stairAdd=config.ROOM_BLOCK_WIDTH*2;
+                doorAdd=config.ROOM_BLOCK_WIDTH;
                 
                 switch (connectSide) {
 
                     case ROOM_SIDE_LEFT:
-                        xBound=new wsBound((lastRoom.xBound.min-(xBlockSize*ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
-                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*ROOM_BLOCK_WIDTH)));
+                        xBound=new wsBound((lastRoom.xBound.min-(xBlockSize*config.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
+                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*config.ROOM_BLOCK_WIDTH)));
                         
                         switch (connectionMode) {
                             case ROOM_CONNECT_MODE_UP:
@@ -443,34 +443,34 @@ class GenMapClass
                                 xBound.add(-stairAdd);
                                 stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
                                 xStairBound=new wsBound((lastRoom.xBound.min-stairAdd),lastRoom.xBound.min);
-                                zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+config.ROOM_BLOCK_WIDTH));
                                 break;
                             case ROOM_CONNECT_MODE_DOOR:
                                 xBound.add(-doorAdd);
                                 doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
                                 xDoorBound=new wsBound((lastRoom.xBound.min-doorAdd),lastRoom.xBound.min);
-                                zDoorBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                zDoorBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+config.ROOM_BLOCK_WIDTH));
                                 break;
                         }
                         
                         break;
 
                     case ROOM_SIDE_TOP:
-                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*ROOM_BLOCK_WIDTH)));
-                        zBound=new wsBound((lastRoom.zBound.min-(zBlockSize*ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
+                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*config.ROOM_BLOCK_WIDTH)));
+                        zBound=new wsBound((lastRoom.zBound.min-(zBlockSize*config.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
                         
                         switch (connectionMode) {
                             case ROOM_CONNECT_MODE_UP:
                             case ROOM_CONNECT_MODE_DOWN:
                                 zBound.add(-stairAdd);
                                 stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                                xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+config.ROOM_BLOCK_WIDTH));
                                 zStairBound=new wsBound((lastRoom.zBound.min-stairAdd),lastRoom.zBound.min);
                                 break;
                             case ROOM_CONNECT_MODE_DOOR:
                                 zBound.add(-doorAdd);
                                 doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                                xDoorBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                xDoorBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+config.ROOM_BLOCK_WIDTH));
                                 zDoorBound=new wsBound((lastRoom.zBound.min-doorAdd),lastRoom.zBound.min);
                                 break;
                         }
@@ -478,8 +478,8 @@ class GenMapClass
                         break;
 
                     case ROOM_SIDE_RIGHT:
-                        xBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*ROOM_BLOCK_WIDTH)));
-                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*ROOM_BLOCK_WIDTH)));
+                        xBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*config.ROOM_BLOCK_WIDTH)));
+                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*config.ROOM_BLOCK_WIDTH)));
                         
                         switch (connectionMode) {
                             case ROOM_CONNECT_MODE_UP:
@@ -487,34 +487,34 @@ class GenMapClass
                                 xBound.add(stairAdd);
                                 stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
                                 xStairBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+stairAdd));
-                                zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+config.ROOM_BLOCK_WIDTH));
                                 break;
                             case ROOM_CONNECT_MODE_DOOR:
                                 xBound.add(doorAdd);
                                 doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
                                 xDoorBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+doorAdd));
-                                zDoorBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                zDoorBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+config.ROOM_BLOCK_WIDTH));
                                 break;
                         }
                         
                         break;
 
                     case ROOM_SIDE_BOTTOM:
-                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*ROOM_BLOCK_WIDTH)));
-                        zBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*ROOM_BLOCK_WIDTH)));
+                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*config.ROOM_BLOCK_WIDTH)));
+                        zBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*config.ROOM_BLOCK_WIDTH)));
                         
                         switch (connectionMode) {
                             case ROOM_CONNECT_MODE_UP:
                             case ROOM_CONNECT_MODE_DOWN:
                                 zBound.add(stairAdd);
                                 stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                                xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+ROOM_BLOCK_WIDTH));
+                                xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+config.ROOM_BLOCK_WIDTH));
                                 zStairBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+stairAdd));
                                 break;
                             case ROOM_CONNECT_MODE_DOOR:
                                 zBound.add(doorAdd);
                                 doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                                xDoorBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+ROOM_BLOCK_WIDTH));
+                                xDoorBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+config.ROOM_BLOCK_WIDTH));
                                 zDoorBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+doorAdd));
                                 break;
                         }
@@ -526,7 +526,7 @@ class GenMapClass
                 if (this.map.boxBoundCollision(xBound,null,zBound,MESH_FLAG_ROOM_WALL)===-1) break;
 
                 tryCount++;
-                if (tryCount>ROOM_MAX_CONNECT_TRY) return;
+                if (tryCount>config.ROOM_MAX_CONNECT_TRY) return;
             }
             
                 // bounds now the same as last room
@@ -540,12 +540,12 @@ class GenMapClass
         switch (connectionMode) {
             case ROOM_CONNECT_MODE_UP:
             case ROOM_CONNECT_MODE_DOWN:
-                yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+ROOM_FLOOR_DEPTH)));
+                yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+config.ROOM_FLOOR_DEPTH)));
                 this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
                 this.addStairLight(xStairBound,yStairBound,zStairBound);
                 break;
             case ROOM_CONNECT_MODE_DOOR:
-                yDoorBound=new wsBound(yBound.max,(yBound.max-ROOM_FLOOR_HEIGHT));
+                yDoorBound=new wsBound(yBound.max,(yBound.max-config.ROOM_FLOOR_HEIGHT));
                 this.addDoorRoom(connectSide,xDoorBound,yDoorBound,zDoorBound);
                 break;
         }
@@ -591,9 +591,9 @@ class GenMapClass
         var nextLevel;
         var nextConnectionMode;
         var yNextBound;
-        var storyAdd=yBound.getSize()+ROOM_FLOOR_DEPTH;
+        var storyAdd=yBound.getSize()+config.ROOM_FLOOR_DEPTH;
             
-        for (n=0;n!==ROOM_MAX_CONNECTION_COUNT;n++) {
+        for (n=0;n!==config.ROOM_MAX_CONNECTION_COUNT;n++) {
             
                 // detect any level changes, we
                 // can only have one per room
@@ -604,7 +604,7 @@ class GenMapClass
                 
             if (noCurrentLevelChange) {
 
-                if (this.genRandom.randomPercentage(ROOM_LEVEL_CHANGE_PERCENTAGE)) {
+                if (this.genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
 
                         // change level, we only have
                         // two levels to keep map crossing
@@ -631,12 +631,12 @@ class GenMapClass
                 // if no level change, check for a door
                 
             if (nextConnectionMode===ROOM_CONNECT_MODE_NONE) {
-                if (this.genRandom.randomPercentage(ROOM_DOOR_PERCENTAGE)) nextConnectionMode=ROOM_CONNECT_MODE_DOOR;
+                if (this.genRandom.randomPercentage(config.ROOM_DOOR_PERCENTAGE)) nextConnectionMode=ROOM_CONNECT_MODE_DOOR;
             }
             
                 // recurse to next room
             
-            if ((depth+1)<ROOM_MAX_RECURSION_DEPTH) this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextConnectionMode,nextLevel,(depth+1));
+            if ((depth+1)<config.ROOM_MAX_RECURSION_DEPTH) this.buildMapRecursiveRoom((recurseCount+1),room,yNextBound,nextConnectionMode,nextLevel,(depth+1));
         }
     }
     
@@ -649,7 +649,7 @@ class GenMapClass
         var n,closet;
         var nRoom=this.map.rooms.length;
         
-        if (!ROOM_CLOSETS) return;
+        if (!config.ROOM_CLOSETS) return;
         
         closet=new GenRoomClosetClass(this.view,this.bitmapList,this.map,this.genRandom);
         
@@ -663,7 +663,7 @@ class GenMapClass
         var n,room,platform;
         var nRoom=this.map.rooms.length;
         
-        if (!ROOM_PLATFORMS) return;
+        if (!config.ROOM_PLATFORMS) return;
         
         platform=new GenRoomPlatformClass(this.bitmapList,this.map,this.genRandom);
         
@@ -678,7 +678,7 @@ class GenMapClass
         var n,ledge;
         var nRoom=this.map.rooms.length;
         
-        if (!ROOM_LEDGES) return;
+        if (!config.ROOM_LEDGES) return;
         
         ledge=new GenRoomLedgeClass(this.bitmapList,this.map,this.genRandom);
         
@@ -692,7 +692,7 @@ class GenMapClass
         var n,pillar;
         var nRoom=this.map.rooms.length;
         
-        if (!ROOM_PILLARS) return;
+        if (!config.ROOM_PILLARS) return;
         
         pillar=new GenRoomPillarClass(this.view,this.bitmapList,this.map,this.genRandom);
         
@@ -706,7 +706,7 @@ class GenMapClass
         var n,decoration;
         var nRoom=this.map.rooms.length;
         
-        if (!ROOM_DECORATIONS) return;
+        if (!config.ROOM_DECORATIONS) return;
         
         decoration=new GenRoomDecorationClass(this.view,this.bitmapList,this.map,this.genRandom);
         

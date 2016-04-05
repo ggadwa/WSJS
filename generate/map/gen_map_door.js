@@ -173,9 +173,9 @@ class GenRoomDoorClass
         
             // and the movement
         
-        movement=new MovementClass(meshIdx,false,(ROOM_BLOCK_WIDTH*2));
+        movement=new MovementClass(meshIdx,false,(config.ROOM_BLOCK_WIDTH*2));
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,-(ROOM_FLOOR_HEIGHT-ROOM_FLOOR_DEPTH),0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
         
         this.map.addMovement(movement); 
     }
@@ -253,9 +253,9 @@ class GenRoomDoorClass
         
             // and the movement
         
-        movement=new MovementClass(meshIdx,false,(ROOM_BLOCK_WIDTH*2));
+        movement=new MovementClass(meshIdx,false,(config.ROOM_BLOCK_WIDTH*2));
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,-(ROOM_FLOOR_HEIGHT-ROOM_FLOOR_DEPTH),0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
         
         this.map.addMovement(movement); 
     }

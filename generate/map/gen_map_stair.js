@@ -137,7 +137,7 @@ class GenRoomStairsClass
             // height of stairs and steps
             
         var stairHigh=yBound.getSize();
-        var stepDrop=stairHigh/STAIR_STEP_COUNT;
+        var stepDrop=stairHigh/config.STAIR_STEP_COUNT;
         
             // the stair room
 
@@ -154,8 +154,8 @@ class GenRoomStairsClass
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=ROOM_FLOOR_DEPTH;
-            yBoundBottom.min+=ROOM_FLOOR_DEPTH;
+            yBoundTop.min+=config.ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=config.ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -248,24 +248,24 @@ class GenRoomStairsClass
             // the steps
         
         idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList((STAIR_STEP_COUNT*4)*2);
+        vertexList=MeshUtilityClass.createMapVertexList((config.STAIR_STEP_COUNT*4)*2);
         
         var nIdx=0;
         if (!flip) {
-            stepAdd=xBound.getSize()/STAIR_STEP_COUNT;
+            stepAdd=xBound.getSize()/config.STAIR_STEP_COUNT;
             xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
         }
         else {
-            stepAdd=-(xBound.getSize()/STAIR_STEP_COUNT);
+            stepAdd=-(xBound.getSize()/config.STAIR_STEP_COUNT);
             xStepBound=new wsBound((xBound.max+stepAdd),xBound.max);
         }
         
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-ROOM_FLOOR_DEPTH);
+        if (!toPlatform) yStepBound.add(-config.ROOM_FLOOR_DEPTH);
         
         zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
 
-        for (n=0;n!==STAIR_STEP_COUNT;n++) {
+        for (n=0;n!==config.STAIR_STEP_COUNT;n++) {
             if (!flip) {
                 idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yStepBound,yStepBound,zStepBound);
                 nIdx=this.createNormalsForPolygon(nIdx,vertexList,1.0,0.0,0.0);
@@ -307,7 +307,7 @@ class GenRoomStairsClass
             // height of stairs and steps
             
         var stairHigh=yBound.getSize();
-        var stepDrop=stairHigh/STAIR_STEP_COUNT;
+        var stepDrop=stairHigh/config.STAIR_STEP_COUNT;
         
             // the stair room
             
@@ -324,8 +324,8 @@ class GenRoomStairsClass
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=ROOM_FLOOR_DEPTH;
-            yBoundBottom.min+=ROOM_FLOOR_DEPTH;
+            yBoundTop.min+=config.ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=config.ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -418,25 +418,25 @@ class GenRoomStairsClass
             // the steps
         
         idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList((STAIR_STEP_COUNT*4)*2);
+        vertexList=MeshUtilityClass.createMapVertexList((config.STAIR_STEP_COUNT*4)*2);
         
         var nIdx=0;
         if (!flip) {
-            stepAdd=zBound.getSize()/STAIR_STEP_COUNT;
+            stepAdd=zBound.getSize()/config.STAIR_STEP_COUNT;
             zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));
 
         }
         else {
-            stepAdd=-(zBound.getSize()/STAIR_STEP_COUNT);
+            stepAdd=-(zBound.getSize()/config.STAIR_STEP_COUNT);
             zStepBound=new wsBound((zBound.max+stepAdd),zBound.max);
         }
         
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-ROOM_FLOOR_DEPTH);
+        if (!toPlatform) yStepBound.add(-config.ROOM_FLOOR_DEPTH);
         
         xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
 
-        for (n=0;n!==STAIR_STEP_COUNT;n++) {
+        for (n=0;n!==config.STAIR_STEP_COUNT;n++) {
             if (!flip) {
                 idx=this.createSingleWallZ(idx,vertexList,xStepBound,yStepBound,yStepBound,zStepBound.max);
                 nIdx=this.createNormalsForPolygon(nIdx,vertexList,0.0,0.0,1.0);

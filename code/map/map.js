@@ -529,21 +529,21 @@ class MapClass
         
             // debugging draw
         
-        if (DEBUG_DRAW_MAP_MESH_LINES) {
+        if (config.DEBUG_DRAW_MAP_MESH_LINES) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(view,mesh);
             }
         }
         
-        if (DEBUG_DRAW_MAP_MESH_TANGENTS) {
+        if (config.DEBUG_DRAW_MAP_MESH_TANGENTS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(view,mesh);
             }
         }
         
-        if (DEBUG_DRAW_MAP_MESH_NORMALS) {
+        if (config.DEBUG_DRAW_MAP_MESH_NORMALS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
                 if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(view,mesh);
