@@ -25,7 +25,7 @@ class ConfigClass
 
         this.ROOM_MAX_CONNECT_TRY=20;                  // maximum times to try to find a place to connect a room to another room
 
-        this.ROOM_DOOR_PERCENTAGE=0.33;                // what % of the time a connection to a room is a door
+        this.ROOM_DOOR_PERCENTAGE=1.0;//0.33;                // what % of the time a connection to a room is a door
         this.ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connection to a room is up a story
         this.ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
@@ -80,14 +80,14 @@ class ConfigClass
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
             //
             // monsters
             //
 
         this.MONSTER_TYPE_COUNT=3;
-        this.MONSTER_ENTITY_COUNT=20;
+        this.MONSTER_ENTITY_COUNT=10;
 
         this.MONSTER_AI_ON=true;
 
@@ -99,10 +99,10 @@ class ConfigClass
         this.SEED=Date.now();
 
         this.SEED_BITMAP_MAP=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=5;//Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_ENTITY=Math.trunc((Math.random()*this.SEED));
+        this.SEED_ENTITY=5;//Math.trunc((Math.random()*this.SEED));
         this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));
 
             //

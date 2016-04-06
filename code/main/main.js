@@ -358,7 +358,7 @@ class MainClass
 
     initBuildEntities()
     {
-        var n,monsterModelName;
+        var n,monsterType;
         var model,pos;
 
         var entityGenRandom=new GenRandomClass(config.SEED_ENTITY);
@@ -376,6 +376,14 @@ class MainClass
         playerEntity.setCurrentWeaponIndex(0);
 
         this.entityList.setPlayer(playerEntity);
+        
+            // create AI type for each monster
+        
+        var monsterAIs=[];
+        
+        for (n=0;n!==config.MONSTER_TYPE_COUNT;n++) {
+            monsterAIs.push(new MonsterAIClass(this.modelList.getModel('projectile_0'),this.soundList.getSound('fire'),this.soundList.getSound('explosion')));
+        }
 
             // make monster entities
             // we clone their models in the list so each entity gets
@@ -384,11 +392,11 @@ class MainClass
         for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
             pos=this.map.findRandomEntityPosition(entityGenRandom);
             if (pos===null) continue;
+            
+            monsterType=entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);
+            model=this.modelList.cloneModel(this.view,('monster_'+monsterType));
 
-            monsterModelName='monster_'+(n%3); // entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);     // supergumba -- testing -- to get all monster types
-            model=this.modelList.cloneModel(this.view,monsterModelName);
-
-            this.entityList.addEntity(new EntityMonsterClass(('Monster'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model));
+            this.entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model,monsterAIs[monsterType]));
         }
 
             // finished

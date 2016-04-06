@@ -486,7 +486,7 @@ class MapClass
         this.mapShader.drawEnd(view);
     }
 
-    draw(view)
+    draw(view,debug)
     {
         var n,mesh;
         var nMesh=this.meshes.length;

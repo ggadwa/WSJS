@@ -969,7 +969,6 @@ class GenLightmapClass
         for (n=0;n!==this.lightmapList.length;n++) {
             this.lightmapList[n].fixCanvasImageData();
         }
-        
 
             // turn canvas into lightmap
             // and put lightmap in map

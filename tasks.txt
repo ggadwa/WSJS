@@ -20,22 +20,23 @@ REGULAR TODOs
 #### glowing computer lights?
 #### spikes
 #### need ability for meshes to skip light mapping phase
-#### avoid closets where doors?
+
+
+#### what's wrong with shots not hitting monsters?
+#### need a separate monster AI setting class to go along with monsters
 
 #### animals better
 #### blobs better
 #### weapon models
 
+#### what is up with light mapping on door and stair segments?
+#### get rid of weapon fire hard-coding
 
-#### is it faster if we reduce the number of timeouts in light mapping?
+#### need projectile.js, attach those to weapon and monster, has two fire sounds, speed, gravity wait, gravity add, gravity free, bounce, bounceFactor, reflect, lifeTick
 
 
-
-[X] game view automatically sizes it's self to max area for 16:9
-[X] new startup that allows you to configure some building variables
-[X] changed a reserved word I was using that caused errors on safari tech preview
-[X] dynamic humanoid models have much greater range in body shape, is possible to have no arms and no head
-[X] fixed bad UVs in wrapped models and slightly better wrapping/random routines
+[X] walls with doors no longer break into other rooms except for door
+[ ] stated work on monster AI variations, firing, stalking, etc
 
 
 

@@ -522,7 +522,7 @@ class ViewClass
         this.drawMeshTrigCount=0;
 
         map.drawStart(this);
-        map.draw(this);
+        map.draw(this,debug);
         map.drawEnd(this);
 
             // draw the entities

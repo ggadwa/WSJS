@@ -21,6 +21,8 @@ class MapRoomClass
 
         this.blockGrid=null;
         this.platformGrid=null;
+        
+        this.connectSideHasDoor=[false,false,false,false];      // track which connections had a door
 
         this.yStoryBound=new wsBound((this.yBound.min-config.ROOM_FLOOR_DEPTH),this.yBound.max);
         if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+config.ROOM_FLOOR_DEPTH);
@@ -159,6 +161,33 @@ class MapRoomClass
     getEdgeGridValue(x,z)
     {
         return(this.edgeGrid[z][x]);
+    }
+    
+        //
+        // mark doors
+        //
+        
+    markDoorOnConnectionSide(connectSide,flipSide)
+    {
+        switch (connectSide) {
+            case ROOM_SIDE_LEFT:
+                this.connectSideHasDoor[flipSide?ROOM_SIDE_RIGHT:ROOM_SIDE_LEFT]=true;
+                break;
+            case ROOM_SIDE_RIGHT:
+                this.connectSideHasDoor[flipSide?ROOM_SIDE_LEFT:ROOM_SIDE_RIGHT]=true;
+                break;
+            case ROOM_SIDE_TOP:
+                this.connectSideHasDoor[flipSide?ROOM_SIDE_BOTTOM:ROOM_SIDE_TOP]=true;
+                break;
+            case ROOM_SIDE_BOTTOM:
+                this.connectSideHasDoor[flipSide?ROOM_SIDE_TOP:ROOM_SIDE_BOTTOM]=true;
+                break;
+        }
+    }
+    
+    isDoorOnConnectionSide(connectSide)
+    {
+        return(this.connectSideHasDoor[connectSide]);
     }
     
         //

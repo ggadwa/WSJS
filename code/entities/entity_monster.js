@@ -1,15 +1,34 @@
 "use strict";
 
 //
+// monster AI class
+// we use this to create a type of monster, and attach this to the regular entity monster
+//
+
+class MonsterAIClass
+{
+    constructor(projectileModel,fireSound,hitSound)
+    {
+        this.projectileModel=projectileModel;
+        this.fireSound=fireSound;
+        this.hitSound=hitSound;
+    }
+}
+
+//
 // monster entity class
 //
 
 class EntityMonsterClass extends EntityClass
 {
-    constructor(name,position,angle,radius,high,model)
+    constructor(name,position,angle,radius,high,model,ai)
     {
         super(name,position,angle,radius,high,model);
+        
+        this.ai=ai;
+        
         this.active=false;
+        this.lastShotTimeStamp=0;
         
         Object.seal(this);
     }
@@ -51,18 +70,35 @@ class EntityMonsterClass extends EntityClass
             
             this.model.skeleton.walkPose(view,this.model.modelType);
         
-                // turn towards player
-
-            super.turnTowards(player.angle.y,1.0);
-
-                // run towards player
-
-            super.moveSimple(map,entityList,-50,true);
+                // turn and move towards player if
+                // not falling
+                
+            if (!super.isFalling()) {
+                super.turnTowards(player.angle.y,1.0);
+                super.moveSimple(map,entityList,-50,true);
+            }
         }
         
             // falling
         
         super.fall(map);
+        
+            // firing projectiles
+ /*
+        if (view.timeStamp>this.lastShotTimeStamp) {
+            this.lastShotTimeStamp=view.timeStamp+5000;
+            
+            var ang=new wsPoint(0,0,0);
+            ang.setFromPoint(this.angle);
+
+            var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
+            pos.rotate(ang);
+            pos.addPoint(this.position);
+            pos.y-=2000;        // supergumba -- all this is hardcoded!
+
+            entityList.addEntity(new EntityProjectileClass('projectile',view,pos,ang,500,500,this.ai.projectileModel,this.ai.hitSound));
+        }
+        */
     }
     
 }

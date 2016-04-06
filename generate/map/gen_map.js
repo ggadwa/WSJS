@@ -522,7 +522,7 @@ class GenMapClass
                         break;
 
                 }
-
+                
                 if (this.map.boxBoundCollision(xBound,null,zBound,MESH_FLAG_ROOM_WALL)===-1) break;
 
                 tryCount++;
@@ -556,6 +556,13 @@ class GenMapClass
         this.currentRoomCount++;
         
         room=this.map.rooms[roomIdx];
+        
+            // mark off any doors we made
+            
+        if (connectionMode===ROOM_CONNECT_MODE_DOOR) {
+            lastRoom.markDoorOnConnectionSide(connectSide,false);
+            room.markDoorOnConnectionSide(connectSide,true);
+        }
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room

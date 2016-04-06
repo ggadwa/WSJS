@@ -137,10 +137,14 @@ class GenRoomClosetClass
             
         for (n=0;n!==closetCount;n++) {
             
-                // find a connection side, offset, and
-                // closet length
+                // find a connection side, skip if
+                // there's a door on this side
                 
             connectSide=this.genRandom.randomIndex(4);
+            
+            if (room.isDoorOnConnectionSide(connectSide)) continue;
+            
+                // get length and offset
             
             if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
                 closetLen=this.genRandom.randomInt(2,(room.zBlockSize-2));
