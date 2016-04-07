@@ -1,7 +1,7 @@
 "use strict";
 
 //
-// sound class
+// generate sound class
 //
 
 class GenSoundClass

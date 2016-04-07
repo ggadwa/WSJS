@@ -103,6 +103,8 @@ class ConfigClass
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_ENTITY=5;//Math.trunc((Math.random()*this.SEED));
+        this.SEED_WEAPON=Math.trunc((Math.random()*this.SEED));
+        this.SEED_PROJECTILE=Math.trunc((Math.random()*this.SEED));
         this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));
 
             //

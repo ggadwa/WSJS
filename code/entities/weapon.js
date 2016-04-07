@@ -6,12 +6,10 @@
 
 class WeaponClass
 {
-    constructor(model,projectileModel,fireSound,hitSound)
+    constructor(model,projectile)
     {
         this.model=model;
-        this.projectileModel=projectileModel;
-        this.fireSound=fireSound;
-        this.hitSound=hitSound;
+        this.projectile=projectile;
 
         this.lastFireTimeStamp=0;
 
@@ -43,9 +41,7 @@ class WeaponClass
         pos.addPoint(entity.position);
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        entityList.addEntity(new EntityProjectileClass('projectile',view,pos,ang,500,500,this.projectileModel,this.hitSound));
-        
-        this.fireSound.play(pos);
+        this.projectile.fire(view,soundList,entityList,pos,ang);
     }
     
         //

@@ -362,6 +362,7 @@ class MainClass
         var model,pos;
 
         var entityGenRandom=new GenRandomClass(config.SEED_ENTITY);
+        var genProjectile=new GenProjectileClass(this.modelList,this.soundList,new GenRandomClass(config.SEED_PROJECTILE));
 
             // make player entity
 
@@ -371,8 +372,8 @@ class MainClass
             return;
         }
 
-        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,this.modelList.getModel('player'));
-        playerEntity.addWeapon(new WeaponClass(this.modelList.getModel('weapon_0'),this.modelList.getModel('projectile_0'),this.soundList.getSound('fire'),this.soundList.getSound('explosion')));
+        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,200,this.modelList.getModel('player'));
+        playerEntity.addWeapon(new WeaponClass(this.modelList.getModel('weapon_0'),genProjectile.generate()));
         playerEntity.setCurrentWeaponIndex(0);
 
         this.entityList.setPlayer(playerEntity);
@@ -382,7 +383,7 @@ class MainClass
         var monsterAIs=[];
         
         for (n=0;n!==config.MONSTER_TYPE_COUNT;n++) {
-            monsterAIs.push(new MonsterAIClass(this.modelList.getModel('projectile_0'),this.soundList.getSound('fire'),this.soundList.getSound('explosion')));
+            monsterAIs.push(new MonsterAIClass(genProjectile.generate()));
         }
 
             // make monster entities
@@ -396,7 +397,7 @@ class MainClass
             monsterType=entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);
             model=this.modelList.cloneModel(this.view,('monster_'+monsterType));
 
-            this.entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,model,monsterAIs[monsterType]));
+            this.entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,100,model,monsterAIs[monsterType]));
         }
 
             // finished
@@ -424,6 +425,10 @@ class MainClass
             // start the input
 
         this.input.initialize(this.entityList.getPlayer());
+        
+            // make sure there's an initial sound position
+            
+        this.soundList.setListenerToEntity(this.entityList.getPlayer());
 
             // start the main loop
 

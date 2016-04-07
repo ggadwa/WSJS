@@ -7,11 +7,9 @@
 
 class MonsterAIClass
 {
-    constructor(projectileModel,fireSound,hitSound)
+    constructor(projectile)
     {
-        this.projectileModel=projectileModel;
-        this.fireSound=fireSound;
-        this.hitSound=hitSound;
+        this.projectile=projectile;
     }
 }
 
@@ -21,9 +19,9 @@ class MonsterAIClass
 
 class EntityMonsterClass extends EntityClass
 {
-    constructor(name,position,angle,radius,high,model,ai)
+    constructor(name,position,angle,radius,high,maxHealth,model,ai)
     {
-        super(name,position,angle,radius,high,model);
+        super(name,position,angle,radius,high,maxHealth,model);
         
         this.ai=ai;
         
@@ -84,21 +82,23 @@ class EntityMonsterClass extends EntityClass
         super.fall(map);
         
             // firing projectiles
- /*
-        if (view.timeStamp>this.lastShotTimeStamp) {
-            this.lastShotTimeStamp=view.timeStamp+5000;
-            
-            var ang=new wsPoint(0,0,0);
-            ang.setFromPoint(this.angle);
 
-            var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
-            pos.rotate(ang);
-            pos.addPoint(this.position);
-            pos.y-=2000;        // supergumba -- all this is hardcoded!
+        if (this.active) {
+            if (view.timeStamp>this.lastShotTimeStamp) {
+                this.lastShotTimeStamp=view.timeStamp+5000;
 
-            entityList.addEntity(new EntityProjectileClass('projectile',view,pos,ang,500,500,this.ai.projectileModel,this.ai.hitSound));
+                var ang=new wsPoint(0,0,0);
+                ang.setFromPoint(this.angle);
+                ang.y+=180.0;
+
+                var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
+                pos.rotate(ang);
+                pos.addPoint(this.position);
+                pos.y-=2000;        // supergumba -- all this is hardcoded!
+
+                this.ai.projectile.fire(view,soundList,entityList,pos,ang);
+            }
         }
-        */
     }
     
 }

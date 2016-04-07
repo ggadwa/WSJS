@@ -6,9 +6,9 @@
 
 class EntityPlayerClass extends EntityClass
 {
-    constructor(name,position,angle,radius,high,model)
+    constructor(name,position,angle,radius,high,maxHealth,model)
     {
-        super(name,position,angle,radius,high,model);
+        super(name,position,angle,radius,high,maxHealth,model);
         
         this.turnSpeed=0;
         this.lookSpeed=0;

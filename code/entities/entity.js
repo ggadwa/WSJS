@@ -6,16 +6,19 @@
 
 class EntityClass
 {
-    constructor(name,position,angle,radius,high,model)
+    constructor(name,position,angle,radius,high,maxHealth,model)
     {
         this.name=name;
         this.position=position;
         this.angle=angle;
         this.radius=radius;
         this.high=high;
+        this.maxHealth=maxHealth;
         this.model=model;
 
         this.id=-1;
+        
+        this.health=maxHealth;
 
         this.fallSpeed=0;
         this.gravity=0;

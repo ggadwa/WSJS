@@ -6,12 +6,12 @@
 
 class EntityProjectileClass extends EntityClass
 {
-    constructor(name,view,position,angle,radius,high,model,hitSound)
+    constructor(name,view,position,angle,radius,high,projectile)
     {
-        super(name,position,angle,radius,high,model);
+        super(name,position,angle,radius,high,0,projectile.model);
         
+        this.projectile=projectile;
         this.startTimeStamp=view.timeStamp;
-        this.hitSound=hitSound;
     
         this.movePt=new wsPoint(0,0,0);     // global to stop GCd
         
@@ -27,17 +27,17 @@ class EntityProjectileClass extends EntityClass
             // supergumba -- right now cancel any projectile
             // that last over 10 seconds
             
-        if ((this.startTimeStamp+10000)<view.timeStamp) {
+        if ((this.startTimeStamp+this.projectile.lifeTick)<view.timeStamp) {
             super.markAsDelete();
             return;
         }
         
             // else move it
             
-        if (super.moveSimple(map,entityList,400,false)) {
+        if (super.moveSimple(map,entityList,this.projectile.speed,false)) {
             super.markAsDelete();
             view.particleList.addExplosionParticles(view,this.position);
-            this.hitSound.play(this.position);
+            this.projectile.hitSound.play(this.position);
         }
     }
     
