@@ -94,7 +94,7 @@ class EntityListClass
         // run all entities
         //
         
-    run(view,soundList,map)
+    run(view,map)
     {
         var n;
         var nEntity=this.entities.length;
@@ -102,7 +102,7 @@ class EntityListClass
             // run the entities
             
         for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(view,soundList,map,this);
+            this.entities[n].run(view,map,this);
         }
         
             // now clean up any that got

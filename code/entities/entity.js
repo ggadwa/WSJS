@@ -245,7 +245,7 @@ class EntityClass
         // run entity
         //
         
-    run(view,soundList,map,entityList)
+    run(view,map,entityList)
     {
     }
     

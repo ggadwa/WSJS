@@ -506,11 +506,9 @@ class GenLightmapClass
         // render a single color to a chunk
         //
         
-    renderColor(pixelData,lft,top)
+    renderColor(pixelData,lft,top,rgt,bot)
     {
         var x,y,idx;
-        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
-        var bot=top+LIGHTMAP_CHUNK_SIZE;
         
         for (y=top;y!==bot;y++) {
             idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
@@ -523,11 +521,9 @@ class GenLightmapClass
         }
     }
     
-    clearChunk(pixelData,lft,top)
+    clearChunk(pixelData,lft,top,rgt,bot)
     {
         var x,y,idx;
-        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
-        var bot=top+LIGHTMAP_CHUNK_SIZE;
         
         for (y=top;y!==bot;y++) {
             idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
@@ -597,7 +593,7 @@ class GenLightmapClass
             midPtIdx=topPtIdx-1;
             if (midPtIdx===-1) midPtIdx=2;
         }
-
+        
             // on line scans from top to
             // bottom and the other goes from
             // top point to midpoint and then
@@ -660,7 +656,7 @@ class GenLightmapClass
                 // get the bitmap data index
 
             idx=(((y+top)*LIGHTMAP_TEXTURE_SIZE)+(lx+lft))*4;
-
+            
                 // render the scan line
 
             for (x=lx;x!==rx;x++) {
@@ -692,7 +688,7 @@ class GenLightmapClass
             // and we re-clear the chunk
             
         if (blackCheck===0) {
-            this.clearChunk(lightBitmap.pixelData,lft,top);
+            this.clearChunk(pixelData,lft,top,rgt,bot);
             return(false);
         }
 
@@ -760,21 +756,35 @@ class GenLightmapClass
             // these points are offsets WITHIN the margin box
 
         if (wallLike) {
-            if (this.xTrigBound.getSize()>this.zTrigBound.getSize()) {
-                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
-                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
-                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
+            if ((yFactor<xFactor) && (yFactor<zFactor)) {
+                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*yFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
+                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*yFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
+                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*yFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
             }
             else {
-                this.pt0.setFromValues(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
-                this.pt1.setFromValues(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
-                this.pt2.setFromValues(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
+                if (xFactor<zFactor) {
+                    this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*xFactor));
+                    this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*xFactor));
+                    this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*xFactor));
+                }
+                else {
+                    this.pt0.setFromValues(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*zFactor));
+                    this.pt1.setFromValues(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*zFactor));
+                    this.pt2.setFromValues(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*zFactor));
+                }
             }
         }
         else {
-            this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
-            this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
-            this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
+            if (xFactor<zFactor) {
+                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*xFactor));
+                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*xFactor));
+                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*xFactor));
+            }
+            else {
+                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*zFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
+                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*zFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
+                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*zFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
+            }
         }
 
             // move so the triangle renders within
@@ -798,6 +808,7 @@ class GenLightmapClass
             v2.lightmapUV.x=v2.lightmapUV.y=singleUV;
             return(false);
         }
+        
             // add the UV
             // pt0-pt2 are already moved within the margin
 
@@ -891,7 +902,6 @@ class GenLightmapClass
                 // all-black chunk 0
                 
             for (n=0;n!==nTrig;n++) {
-
                 lft=(chunkIdx%LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
                 top=Math.trunc(chunkIdx/LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
 
@@ -991,7 +1001,11 @@ class GenLightmapClass
         
                     // debugging
 
-        //if (this.lightmapList.length!==0) this.debug.displayCanvasData(this.lightmapList[0].canvas,1050,10,1024,1024);
+        var y=2000;
+        for (n=0;n!==this.lightmapList.length;n++) {
+            this.debug.displayCanvasData(this.lightmapList[n].canvas,10,y,1024,1024);
+            y+=1034;
+        }
 
             // finish with the callback
 

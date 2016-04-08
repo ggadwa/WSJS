@@ -47,7 +47,7 @@ class ProjectileClass
         this.splashDamage=splashDamage;
     }
     
-    fire(view,soundList,entityList,pos,ang)
+    fire(view,entityList,pos,ang)
     {
         entityList.addEntity(new EntityProjectileClass('projectile',view,pos,ang,this.radius,this.high,this));
         if (this.fireSound!==null) this.fireSound.play(pos);

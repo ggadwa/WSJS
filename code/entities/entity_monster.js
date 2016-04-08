@@ -35,7 +35,7 @@ class EntityMonsterClass extends EntityClass
         // run monster
         //
     
-    run(view,soundList,map,entityList)
+    run(view,map,entityList)
     {
         var player;
         
@@ -96,7 +96,7 @@ class EntityMonsterClass extends EntityClass
                 pos.addPoint(this.position);
                 pos.y-=2000;        // supergumba -- all this is hardcoded!
 
-                this.ai.projectile.fire(view,soundList,entityList,pos,ang);
+                this.ai.projectile.fire(view,entityList,pos,ang);
             }
         }
     }

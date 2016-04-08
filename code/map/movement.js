@@ -45,7 +45,7 @@ class MovementClass
         this.moves.push(move);
     }
     
-    run(view,soundList,map,entityList)
+    run(view,map,entityList)
     {
         var mesh,isOpen,prevIdx;
         var f,move;

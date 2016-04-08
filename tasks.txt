@@ -19,7 +19,6 @@ REGULAR TODOs
 #### collisions against slanted walls are bad
 #### glowing computer lights?
 #### spikes
-#### need ability for meshes to skip light mapping phase
 
 
 #### what's wrong with shots not hitting monsters?
@@ -30,17 +29,20 @@ REGULAR TODOs
 #### blobs better
 #### weapon models
 
-#### what is up with light mapping on door and stair segments?
+#### what is up with light mapping on door and stair segments? (it's the all black skip)
 #### get rid of weapon fire hard-coding
 
-#### do I need to pass around sound list anymore?
+#### put doors back to 0.33!!
 
 
 
 [X] walls with doors no longer break into other rooms except for door
 [X] monsters can have projectiles
-[ ] started work on monster AI variations, firing, stalking, etc
-[ ] started work on projectile variations, bouncing, reflections, etc
+[ ] fix for weird light mapping on some polygons
+[ ] ability for meshes to skip light map obscuring (for things like full lit light pieces)
+[ ] started work on monster AI variations
+[ ] started work on weapon variations
+[ ] started work on projectile variations
 
 
 

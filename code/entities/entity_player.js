@@ -90,7 +90,7 @@ class EntityPlayerClass extends EntityClass
         // run player
         //
     
-    run(view,soundList,map,entityList)
+    run(view,map,entityList)
     {
         var bump,weapon;
         
@@ -100,7 +100,7 @@ class EntityPlayerClass extends EntityClass
             this.weaponFired=false;
             
             weapon=this.getCurrentWeapon();
-            if (weapon!==null) weapon.fire(view,soundList,entityList,this);
+            if (weapon!==null) weapon.fire(view,entityList,this);
         }
         
             // input turning and looking

@@ -363,6 +363,7 @@ class MainClass
 
         var entityGenRandom=new GenRandomClass(config.SEED_ENTITY);
         var genProjectile=new GenProjectileClass(this.modelList,this.soundList,new GenRandomClass(config.SEED_PROJECTILE));
+        var genWeapon=new GenWeaponClass(this.modelList,this.soundList,new GenRandomClass(config.SEED_WEAPON));
 
             // make player entity
 
@@ -373,7 +374,9 @@ class MainClass
         }
 
         var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,200,this.modelList.getModel('player'));
-        playerEntity.addWeapon(new WeaponClass(this.modelList.getModel('weapon_0'),genProjectile.generate()));
+        var playerWeapon=genWeapon.generate();
+        playerWeapon.addProjectile(genProjectile.generate());
+        playerEntity.addWeapon(playerWeapon);
         playerEntity.setCurrentWeaponIndex(0);
 
         this.entityList.setPlayer(playerEntity);
@@ -490,7 +493,7 @@ function mainLoop(timeStamp)
     view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
    
     if (view.physicsTick>PHYSICS_MILLISECONDS) {
-        map.runMovements(view,soundList,entityList);
+        map.runMovements(view,entityList);
     
         if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
@@ -498,7 +501,7 @@ function mainLoop(timeStamp)
                 view.physicsTick-=PHYSICS_MILLISECONDS;
                 view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
 
-                entityList.run(view,soundList,map);
+                entityList.run(view,map);
             }
         }
         else {

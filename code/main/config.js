@@ -12,7 +12,7 @@ class ConfigClass
             // room generation
             //
 
-        this.ROOM_MAX_RECURSION_DEPTH=3;               // how far we recurse building the map, room to room, determines the size of the map
+        this.ROOM_MAX_RECURSION_DEPTH=2;//3;               // how far we recurse building the map, room to room, determines the size of the map
         this.ROOM_MAX_CONNECTION_COUNT=10;             // how many times we try to create a room that connects with this room
 
         this.ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
@@ -80,14 +80,14 @@ class ConfigClass
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
             //
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=3;
-        this.MONSTER_ENTITY_COUNT=10;
+        this.MONSTER_TYPE_COUNT=1;//3;
+        this.MONSTER_ENTITY_COUNT=0;//10;
 
         this.MONSTER_AI_ON=true;
 
@@ -99,7 +99,7 @@ class ConfigClass
         this.SEED=Date.now();
 
         this.SEED_BITMAP_MAP=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=5;//Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=6;//Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_ENTITY=5;//Math.trunc((Math.random()*this.SEED));

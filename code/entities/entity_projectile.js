@@ -22,7 +22,7 @@ class EntityProjectileClass extends EntityClass
         // run projectile
         //
     
-    run(view,soundList,map,entityList)
+    run(view,map,entityList)
     {
             // supergumba -- right now cancel any projectile
             // that last over 10 seconds

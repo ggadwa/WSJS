@@ -9,7 +9,7 @@ class WeaponClass
     constructor(model,projectile)
     {
         this.model=model;
-        this.projectile=projectile;
+        this.projectiles=[];
 
         this.lastFireTimeStamp=0;
 
@@ -20,10 +20,19 @@ class WeaponClass
     }
     
         //
+        // projectiles
+        //
+    
+    addProjectile(projectile)
+    {
+        this.projectiles.push(projectile);
+    }
+    
+        //
         // fire weapon
         //
         
-    fire(view,soundList,entityList,entity)
+    fire(view,entityList,entity)
     {
             // time to fire again?
             
@@ -41,7 +50,7 @@ class WeaponClass
         pos.addPoint(entity.position);
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        this.projectile.fire(view,soundList,entityList,pos,ang);
+        this.projectiles[0].fire(view,entityList,pos,ang);
     }
     
         //
