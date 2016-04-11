@@ -25,7 +25,7 @@ class ConfigClass
 
         this.ROOM_MAX_CONNECT_TRY=20;                  // maximum times to try to find a place to connect a room to another room
 
-        this.ROOM_DOOR_PERCENTAGE=1.0;//0.33;                // what % of the time a connection to a room is a door
+        this.ROOM_DOOR_PERCENTAGE=0.33;                // what % of the time a connection to a room is a door
         this.ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connection to a room is up a story
         this.ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
@@ -67,7 +67,7 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=[0.15,0.15,0.15];       // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=[0.0,0.0,0.0];//[0.15,0.15,0.15];       // all over ambient light [r,g,b]
 
         this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above

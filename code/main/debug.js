@@ -37,7 +37,6 @@ class DebugClass
         var gl=view.gl;
 
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,0.0));
-        gl.disable(gl.DEPTH_TEST);
         
             // setup the buffers
 
@@ -53,9 +52,13 @@ class DebugClass
 
             // draw the line loop trigs
 
+        gl.depthFunc(gl.LEQUAL);
+        
         for (n=0;n!==mesh.trigCount;n++) {
             gl.drawElements(gl.LINE_LOOP,3,gl.UNSIGNED_SHORT,(Uint16Array.BYTES_PER_ELEMENT*(n*3)));
         }
+        
+        gl.depthFunc(gl.LESS);
         
             // remove the buffers
 
@@ -65,7 +68,6 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
 
@@ -110,7 +112,7 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
-        gl.disable(gl.DEPTH_TEST);
+        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -136,7 +138,7 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        gl.enable(gl.DEPTH_TEST);
+        //gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
     
@@ -177,7 +179,7 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
-        gl.disable(gl.DEPTH_TEST);
+        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -203,7 +205,7 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        gl.enable(gl.DEPTH_TEST);
+        //gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
 
@@ -350,7 +352,7 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
-        gl.disable(gl.DEPTH_TEST);
+        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -376,7 +378,7 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        gl.enable(gl.DEPTH_TEST);
+        //gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
     
@@ -423,7 +425,7 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
-        gl.disable(gl.DEPTH_TEST);
+        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -449,7 +451,7 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        gl.enable(gl.DEPTH_TEST);
+        //gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
     
@@ -484,7 +486,6 @@ class DebugClass
             // start the shader
             
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,0.0));
-        gl.disable(gl.DEPTH_TEST);
         
             // setup the buffers
 
@@ -500,9 +501,13 @@ class DebugClass
 
             // draw the line loop trigs
 
+        gl.depthFunc(gl.LEQUAL);
+        
         for (n=0;n!==mesh.trigCount;n++) {
             gl.drawElements(gl.LINE_LOOP,3,gl.UNSIGNED_SHORT,(Uint16Array.BYTES_PER_ELEMENT*(n*3)));
         }
+        
+        gl.depthFunc(gl.LESS);
         
             // remove the buffers
 

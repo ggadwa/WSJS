@@ -387,6 +387,12 @@ class ws2DPoint
         this.x=xSet;
         this.y=ySet;
     }
+    
+    setFromPoint(pt)
+    {
+        this.x=pt.x;
+        this.y=pt.y;
+    }
                 
     move(xAdd,yAdd)
     {

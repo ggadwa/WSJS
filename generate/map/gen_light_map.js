@@ -52,10 +52,24 @@ class GenLightmapBitmapClass
                 idx+=4;
             }
         }
+        
+            // the next chunk is always white
+            
+        var x,y;
 
-            // start at chunk 1 as the first free chunk
+        for (y=0;y!==LIGHTMAP_CHUNK_SIZE;y++) {
+            idx=((y*LIGHTMAP_TEXTURE_SIZE)+LIGHTMAP_CHUNK_SIZE)*4;
+            for (x=0;x!==LIGHTMAP_CHUNK_SIZE;x++) {
+                data[idx++]=255;
+                data[idx++]=255;
+                data[idx++]=255;
+                data[idx++]=255;
+            }
+        }
 
-        this.chunkIdx=1;
+            // start at chunk 2 as the first free chunk
+
+        this.chunkIdx=2;
         
         Object.seal(this);
     }
@@ -114,6 +128,11 @@ class GenLightmapClass
             // generation concludes
 
         this.callbackFunc=callbackFunc;
+        
+            // UVs for all black and all white items
+        
+        this.blackChunkUV=new ws2DPoint((LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE),(LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE));
+        this.whiteChunkUV=new ws2DPoint(((LIGHTMAP_CHUNK_SIZE+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE),(LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE));
 
             // global variables to reduce new/GC during light maps
 
@@ -469,7 +488,14 @@ class GenLightmapClass
             for (k=0;k!==nMesh;k++) {
                 mesh=this.map.meshes[light.meshIntersectList[k]];
                 if (!mesh.boxBoundCollision(this.lightBoundX,this.lightBoundY,this.lightBoundZ)) continue;
+                
+                    // skip doors, lifts, and lights as
+                    // they either move or project light
+                    
+                if ((mesh.flag===MESH_FLAG_DOOR) || (mesh.flag===MESH_FLAG_LIFT) || (mesh.flag===MESH_FLAG_LIGHT)) continue;
 
+                    // do all the trigs
+                    
                 trigCount=mesh.trigCount;
                 trigRayTraceCache=mesh.trigRayTraceCache;
 
@@ -506,16 +532,16 @@ class GenLightmapClass
         // render a single color to a chunk
         //
         
-    renderColor(pixelData,lft,top,rgt,bot)
+    renderColor(pixelData,r,g,b,lft,top,rgt,bot)
     {
         var x,y,idx;
         
         for (y=top;y!==bot;y++) {
             idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
             for (x=lft;x!==rgt;x++) {
-                pixelData[idx++]=0;
-                pixelData[idx++]=0;
-                pixelData[idx++]=0;
+                pixelData[idx++]=r;
+                pixelData[idx++]=g;
+                pixelData[idx++]=b;
                 pixelData[idx++]=255;    
             }
         }
@@ -707,7 +733,7 @@ class GenLightmapClass
     writePolyToChunk(lightBitmap,meshIdx,trigIdx,lft,top)
     {
         var mesh=this.map.meshes[meshIdx];
-
+        
             // get the vertexes for the triangle
             // and one normal
 
@@ -716,11 +742,15 @@ class GenLightmapClass
         var v0=mesh.vertexList[mesh.indexes[tIdx]];
         var v1=mesh.vertexList[mesh.indexes[tIdx+1]];
         var v2=mesh.vertexList[mesh.indexes[tIdx+2]];
+        
+            // lights are always highlighted
 
-            // look at one of the normal to determine if it's
-            // wall or floor like
-
-        var wallLike=(Math.abs(v0.normal.y)<=0.3);
+        if (mesh.flag===MESH_FLAG_LIGHT) {
+            v0.lightmapUV.setFromPoint(this.whiteChunkUV);
+            v1.lightmapUV.setFromPoint(this.whiteChunkUV);
+            v2.lightmapUV.setFromPoint(this.whiteChunkUV);
+            return(false);
+        }
 
             // get the bounds of the 3D triangle
 
@@ -743,48 +773,41 @@ class GenLightmapClass
 
         var renderSize=LIGHTMAP_CHUNK_SIZE-(LIGHTMAP_RENDER_MARGIN*2);
 
-        var sz=this.xTrigBound.getSize();
-        var xFactor=(sz===0)?0:renderSize/sz;
+        var xsz=this.xTrigBound.getSize();
+        var xFactor=(xsz===0)?0:renderSize/xsz;
 
-        var sz=this.yTrigBound.getSize();
-        var yFactor=(sz===0)?0:renderSize/sz;
+        var ysz=this.yTrigBound.getSize();
+        var yFactor=(ysz===0)?0:renderSize/ysz;
 
-        var sz=this.zTrigBound.getSize();
-        var zFactor=(sz===0)?0:renderSize/sz;
+        var zsz=this.zTrigBound.getSize();
+        var zFactor=(zsz===0)?0:renderSize/zsz;
 
             // now create the 2D version of it
-            // these points are offsets WITHIN the margin box
+            // these points as offsets WITHIN the margin box
+            // we determine if it's wall like by the normal
 
-        if (wallLike) {
-            if ((yFactor<xFactor) && (yFactor<zFactor)) {
-                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*yFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
-                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*yFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
-                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*yFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
+        if (Math.abs(v0.normal.y)<=0.3) {
+            
+                // wall like, use x/z & y
+                
+            if (xsz>zsz) {
+                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
+                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
+                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
             }
             else {
-                if (xFactor<zFactor) {
-                    this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*xFactor));
-                    this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*xFactor));
-                    this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*xFactor));
-                }
-                else {
-                    this.pt0.setFromValues(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*zFactor));
-                    this.pt1.setFromValues(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*zFactor));
-                    this.pt2.setFromValues(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*zFactor));
-                }
+                this.pt0.setFromValues(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
+                this.pt1.setFromValues(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
+                this.pt2.setFromValues(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
             }
         }
         else {
-            if (xFactor<zFactor) {
-                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*xFactor));
-                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*xFactor));
-                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*xFactor));
-            }
-            else {
-                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*zFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
-                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*zFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
-                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*zFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
-            }
+            
+                // floor/ceiling like, use x & z
+                
+            this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
+            this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
+            this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
         }
 
             // move so the triangle renders within
@@ -803,9 +826,9 @@ class GenLightmapClass
         
         if (!hitLight) {
             var singleUV=LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE;
-            v0.lightmapUV.x=v0.lightmapUV.y=singleUV;
-            v1.lightmapUV.x=v1.lightmapUV.y=singleUV;
-            v2.lightmapUV.x=v2.lightmapUV.y=singleUV;
+            v0.lightmapUV.setFromPoint(this.blackChunkUV);
+            v1.lightmapUV.setFromPoint(this.blackChunkUV);
+            v2.lightmapUV.setFromPoint(this.blackChunkUV);
             return(false);
         }
         
@@ -999,14 +1022,14 @@ class GenLightmapClass
             mesh.lightmap=this.bitmapList.getBitmap('Lightmap '+mesh.tempLightmapIdx);
         }
         
-                    // debugging
-
+            // debugging
+/*
         var y=2000;
         for (n=0;n!==this.lightmapList.length;n++) {
             this.debug.displayCanvasData(this.lightmapList[n].canvas,10,y,1024,1024);
             y+=1034;
         }
-
+*/
             // finish with the callback
 
         this.view.loadingScreenDraw(1.0);

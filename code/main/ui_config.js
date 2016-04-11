@@ -24,7 +24,14 @@ class UIConfigClass
                                 'MONSTER_ENTITY_COUNT',
                                 'MONSTER_AI_ON',
                                 'PLAYER_CLIP_WALLS',
-                                'PLAYER_FLY'
+                                'PLAYER_FLY',
+                                'DEBUG_DRAW_MAP_MESH_LINES',
+                                'DEBUG_DRAW_MAP_MESH_NORMALS',
+                                'DEBUG_DRAW_MAP_MESH_TANGENTS',
+                                'DEBUG_DRAW_MODEL_SKELETON',
+                                'DEBUG_DRAW_MODEL_MESH_LINES',
+                                'DEBUG_DRAW_MODEL_MESH_NORMALS',
+                                'DEBUG_DRAW_MODEL_MESH_TANGENTS',
                             ];
     }
     
@@ -95,7 +102,7 @@ class UIConfigClass
         headerDiv.style.position='absolute';
         headerDiv.style.left='5px';
         headerDiv.style.top='5px';
-        headerDiv.style.width='600px';
+        headerDiv.style.width='800px';
         headerDiv.style.height='30px';
         headerDiv.style.backgroundColor='#CCCCFF';
         headerDiv.style.fontFamily='Arial';
@@ -118,14 +125,14 @@ class UIConfigClass
         barDiv.style.position='absolute';
         barDiv.style.left='5px';
         barDiv.style.top='35px';
-        barDiv.style.width='600px';
+        barDiv.style.width='800px';
         barDiv.style.height='40px';
         barDiv.style.backgroundColor='#DDDDFF';
         barDiv.style.boxSizing='border-box';
         
         var btn=document.createElement('div');
         btn.style.position='absolute';
-        btn.style.left='490px';
+        btn.style.left='690px';
         btn.style.top='5px';
         btn.style.width='100px';
         btn.style.height='30px';
@@ -150,7 +157,7 @@ class UIConfigClass
         mainDiv.style.position='absolute';
         mainDiv.style.left='5px';
         mainDiv.style.top='75px';
-        mainDiv.style.width='600px';
+        mainDiv.style.width='800px';
         mainDiv.style.height=((nControl*25)+10)+'px';
         mainDiv.style.backgroundColor='#EEEEFF';
         mainDiv.style.fontFamily='Arial';
@@ -167,7 +174,7 @@ class UIConfigClass
             nameDiv.style.position='absolute';
             nameDiv.style.left='5px';
             nameDiv.style.top=y+'px';
-            nameDiv.style.width='300px';
+            nameDiv.style.width='400px';
             nameDiv.style.textAlign='right';
             nameDiv.appendChild(document.createTextNode(this.configConsts[n]));
             
@@ -178,7 +185,7 @@ class UIConfigClass
             ctrl=document.createElement('input');
             ctrl.id='ctrl_'+n;
             ctrl.style.position='absolute';
-            ctrl.style.left='315px';
+            ctrl.style.left='415px';
             ctrl.style.top=y+'px';
             
             if (typeof(config[this.configConsts[n]])==='boolean') {
@@ -188,7 +195,7 @@ class UIConfigClass
             else {
                 ctrl.type='text';
                 ctrl.value=config[this.configConsts[n]];
-                ctrl.style.width='200px';
+                ctrl.style.width='300px';
             }
             
             mainDiv.appendChild(ctrl);
