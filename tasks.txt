@@ -31,15 +31,13 @@ REGULAR TODOs
 
 #### get rid of weapon fire hard-coding
 
-#### put back in smear and smudge
-
 
 
 
 [X] walls with doors no longer break into other rooms except for door
 [X] monsters can have projectiles
 [ ] lots of lightmapping updates, highlighted meshes, skipped meshes, bug fixes
-[ ] ability for meshes to skip light map obscuring (for things like full lit light pieces)
+[X] ability for meshes to skip light map obscuring (for things like full lit light pieces)
 [ ] started work on monster AI variations
 [ ] started work on weapon variations
 [ ] started work on projectile variations
