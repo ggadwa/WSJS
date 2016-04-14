@@ -346,7 +346,7 @@ class MeshPrimitivesClass
             ySegBound.max=ySegBound.min;
             ySegBound.min-=yAdd;
         }
-
+        
             // calcualte the tangents
 
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);

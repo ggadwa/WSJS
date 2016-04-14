@@ -433,7 +433,7 @@ class GenLightmapClass
             // start at black
             
         col.setFromValues(0.0,0.0,0.0);
-
+        
             // we use the passed in light list which is a cut down
             // list precalculcated from mesh/light interactions and
             // removing any lights that are facing away from the
@@ -524,8 +524,6 @@ class GenLightmapClass
         }
 
         col.fixOverflow();
-
-        return(col);
     }
     
         //
@@ -598,7 +596,7 @@ class GenLightmapClass
         }
         
         if (lightList.length===0) return(false);
-
+        
             // find the min and max Y points
             // we will build the scan line around this
 
@@ -712,7 +710,7 @@ class GenLightmapClass
             // all black?
             // if so, we use the all black chunk 0
             // and we re-clear the chunk
-            
+   
         if (blackCheck===0) {
             this.clearChunk(pixelData,lft,top,rgt,bot);
             return(false);
@@ -788,7 +786,8 @@ class GenLightmapClass
 
         if (Math.abs(v0.normal.y)<=0.3) {
             
-                // wall like, use x/z & y
+                // wall like, use x/z if one is 0,
+                // use distance if neither is 0
                 
             if (xsz>zsz) {
                 this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
@@ -799,6 +798,12 @@ class GenLightmapClass
                 this.pt0.setFromValues(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
                 this.pt1.setFromValues(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
                 this.pt2.setFromValues(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
+            }
+            
+            if ((this.pt0.x===this.pt1.x) && (this.pt0.y===this.pt1.y)) {
+                console.log('wall');
+                console.log(xsz+'='+this.xTrigBound.min+','+this.xTrigBound.max);
+                console.log(zsz+'='+this.zTrigBound.min+','+this.zTrigBound.max);
             }
         }
         else {
@@ -818,14 +823,13 @@ class GenLightmapClass
         this.pt2.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
 
             // ray trace the triangle
-
+            
         var hitLight=this.renderTriangle(lightBitmap,meshIdx,[this.pt0,this.pt1,this.pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
 
             // if it didn't hit any lights, UV
             // to the 0 black chunk
         
         if (!hitLight) {
-            var singleUV=LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE;
             v0.lightmapUV.setFromPoint(this.blackChunkUV);
             v1.lightmapUV.setFromPoint(this.blackChunkUV);
             v2.lightmapUV.setFromPoint(this.blackChunkUV);
@@ -903,15 +907,13 @@ class GenLightmapClass
         chunkIdx=lightBitmap.chunkIdx;
         
             // if no light map, then just create
-            // UVs for the top-left white map
+            // UVs for the top-left white map (in a real
+            // generation, this would be the black map but we
+            // just reuse the UV here.)
             
         if (!this.generateLightmap) {
-            var v;
-            var singleUV=LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE;
             for (n=0;n!==mesh.vertexCount;n++) {
-                v=mesh.vertexList[n];
-                v.lightmapUV.x=singleUV;
-                v.lightmapUV.x=singleUV;
+                mesh.vertexList[n].lightmapUV.setFromPoint(this.blackChunkUV);
             }
         }
 

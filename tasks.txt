@@ -29,8 +29,24 @@ REGULAR TODOs
 #### blobs better
 #### weapon models
 
+#### are columns in one mesh?  If not, combine them
+
 #### get rid of weapon fire hard-coding
 
+#### hit box drawing
+
+#### what's wrong with cylinder light mapping
+       - NOT no lights
+       - DOES fall through to black chunk
+       - NOT last hit mesh optimization
+       - SKIPPING black check does nothing
+       - NOT out of light cone
+       - NOT getting to ray trace
+       - NOT ty>by in render triangle
+       - !!!! THE DRAW TRIANGLE IS BAD !!!!
+
+
+       
 
 
 
@@ -41,7 +57,7 @@ REGULAR TODOs
 [ ] started work on monster AI variations
 [ ] started work on weapon variations
 [ ] started work on projectile variations
-[ ] better debugging tools (exposed in ui config)
+[X] better debugging tools (exposed in ui config)
 
 
 [ ] GL
