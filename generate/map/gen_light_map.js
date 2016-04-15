@@ -147,10 +147,6 @@ class GenLightmapClass
 
         this.lightVectorNormal=new wsPoint(0.0,0.0,0.0);
 
-        this.xTrigBound=new wsBound(0,0);
-        this.yTrigBound=new wsBound(0,0);
-        this.zTrigBound=new wsBound(0,0);
-
         this.pt0=new ws2DIntPoint(0,0);
         this.pt1=new ws2DIntPoint(0,0);
         this.pt2=new ws2DIntPoint(0,0);
@@ -730,6 +726,8 @@ class GenLightmapClass
 
     writePolyToChunk(lightBitmap,meshIdx,trigIdx,lft,top)
     {
+        var xsz,ysz,zsz,xFactor,yFactor,zFactor;
+        var dx,dz,totalDist,dist,distFactor;
         var mesh=this.map.meshes[meshIdx];
         
             // get the vertexes for the triangle
@@ -750,77 +748,14 @@ class GenLightmapClass
             return(false);
         }
 
-            // get the bounds of the 3D triangle
-
-        this.xTrigBound.setFromValues(v0.position.x,v0.position.x);
-        this.xTrigBound.adjust(v1.position.x);
-        this.xTrigBound.adjust(v2.position.x);
-
-        this.yTrigBound.setFromValues(v0.position.y,v0.position.y);
-        this.yTrigBound.adjust(v1.position.y);
-        this.yTrigBound.adjust(v2.position.y);
-
-        this.zTrigBound.setFromValues(v0.position.z,v0.position.z);
-        this.zTrigBound.adjust(v1.position.z);
-        this.zTrigBound.adjust(v2.position.z);
-
-            // 2D reduction factors
-            // we are drawing into a CHUNK_SIZE, but
-            // the actual points are within the margin
-            // so we have extra pixels to smear
-
-        var renderSize=LIGHTMAP_CHUNK_SIZE-(LIGHTMAP_RENDER_MARGIN*2);
-
-        var xsz=this.xTrigBound.getSize();
-        var xFactor=(xsz===0)?0:renderSize/xsz;
-
-        var ysz=this.yTrigBound.getSize();
-        var yFactor=(ysz===0)?0:renderSize/ysz;
-
-        var zsz=this.zTrigBound.getSize();
-        var zFactor=(zsz===0)?0:renderSize/zsz;
-
-            // now create the 2D version of it
-            // these points as offsets WITHIN the margin box
-            // we determine if it's wall like by the normal
-
-        if (Math.abs(v0.normal.y)<=0.3) {
+            // since everything is a triangle, we just
+            // create a triangle that the light mapping
+            // will be drawn into.  the orientation doesn't
+            // matter as it's mapped to this 2D triangle
             
-                // wall like, use x/z if one is 0,
-                // use distance if neither is 0
-                
-            if (xsz>zsz) {
-                this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
-                this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
-                this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
-            }
-            else {
-                this.pt0.setFromValues(((v0.position.z-this.zTrigBound.min)*zFactor),((v0.position.y-this.yTrigBound.min)*yFactor));
-                this.pt1.setFromValues(((v1.position.z-this.zTrigBound.min)*zFactor),((v1.position.y-this.yTrigBound.min)*yFactor));
-                this.pt2.setFromValues(((v2.position.z-this.zTrigBound.min)*zFactor),((v2.position.y-this.yTrigBound.min)*yFactor));
-            }
-            
-            if ((this.pt0.x===this.pt1.x) && (this.pt0.y===this.pt1.y)) {
-                console.log('wall');
-                console.log(xsz+'='+this.xTrigBound.min+','+this.xTrigBound.max);
-                console.log(zsz+'='+this.zTrigBound.min+','+this.zTrigBound.max);
-            }
-        }
-        else {
-            
-                // floor/ceiling like, use x & z
-                
-            this.pt0.setFromValues(((v0.position.x-this.xTrigBound.min)*xFactor),((v0.position.z-this.zTrigBound.min)*zFactor));
-            this.pt1.setFromValues(((v1.position.x-this.xTrigBound.min)*xFactor),((v1.position.z-this.zTrigBound.min)*zFactor));
-            this.pt2.setFromValues(((v2.position.x-this.xTrigBound.min)*xFactor),((v2.position.z-this.zTrigBound.min)*zFactor));
-        }
-
-            // move so the triangle renders within
-            // the margins so we have area to smear
-
-        this.pt0.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
-        this.pt1.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
-        this.pt2.move(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
+        this.pt0.setFromValues(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
+        this.pt1.setFromValues((LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN),LIGHTMAP_RENDER_MARGIN);
+        this.pt2.setFromValues(LIGHTMAP_RENDER_MARGIN,(LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN));
 
             // ray trace the triangle
             
