@@ -39,7 +39,11 @@ class ViewClass
 
         this.gl=null;
         this.canvas=null;
-
+        
+            // pause flag
+            
+        this.paused=true;
+        
             // the view setup
 
         this.OPENGL_FOV=55.0;
@@ -211,6 +215,36 @@ class ViewClass
         this.text.release();
         this.interface.release();
         this.particleList.release();
+    }
+    
+        //
+        // pause state
+        //
+    
+    setPauseState(input,pause)
+    {
+        if (this.paused===pause) return;
+        
+            // set the state
+
+        this.paused=pause;
+        
+            // always reset all the timing
+            
+        var timeStamp=Math.trunc(window.performance.now());
+        this.timeStamp=timeStamp;
+
+        this.lastPhysicTimeStamp=timeStamp;
+        this.lastDrawTimeStamp=timeStamp;
+
+        this.fps=0.0;
+        this.fpsTotal=0;
+        this.fpsCount=0;
+        this.fpsStartTimeStamp=timeStamp;
+        
+            // and start/stop input
+            
+        input.setPauseState(pause);
     }
     
         //
@@ -577,15 +611,9 @@ class ViewClass
             fpsStr=fpsStr.substring(0,(idx+3));
         }
 
-        //var mapCountStr=this.drawMeshCount.toString()+"/"+this.drawMeshTrigCount.toString();
-        //var modelCountStr=this.drawModelCount.toString()+"/"+this.drawModelTrigCount.toString();
-        //var posStr=Math.trunc(this.camera.position.x)+','+Math.trunc(this.camera.position.y)+','+Math.trunc(this.camera.position.z)+':'+Math.trunc(this.camera.angle.y);
-
         this.text.drawStart(this);
         this.text.drawWithShadow(this,(this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        //this.text.drawWithShadow(this,(this.wid-5),45,20,18,mapCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        //this.text.drawWithShadow(this,(this.wid-5),67,20,18,modelCountStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        //this.text.drawWithShadow(this,(this.wid-5),(this.high-5),20,18,posStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        if (this.paused) this.text.drawWithShadow(this,Math.trunc(this.wid*0.5),Math.trunc(this.high*0.5),48,45,'Paused - Click to Start',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
         this.text.drawEnd(this);
     }
     

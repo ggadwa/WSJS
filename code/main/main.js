@@ -414,8 +414,6 @@ class MainClass
 
     initFinish()
     {
-        var timeStamp;
-        
             // finish by setting up all the mesh
             // buffers and indexes
 
@@ -424,31 +422,28 @@ class MainClass
             // ambient
 
         this.view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT[0],config.MAP_LIGHT_AMBIENT[1],config.MAP_LIGHT_AMBIENT[2]);
-
-            // start the input
-
-        this.input.initialize(this.entityList.getPlayer());
         
             // make sure there's an initial sound position
             
         this.soundList.setListenerToEntity(this.entityList.getPlayer());
 
-            // start the main loop
+            // start the input
 
-        timeStamp=Math.trunc(window.performance.now());
-        this.view.timeStamp=timeStamp;
-
-        this.view.lastPhysicTimeStamp=timeStamp;
-        this.view.lastDrawTimeStamp=timeStamp;
-
-        this.view.fps=0.0;
-        this.view.fpsTotal=0;
-        this.view.fpsCount=0;
-        this.view.fpsStartTimeStamp=timeStamp;
-
+        this.input.initialize(this.entityList.getPlayer());
+        
+            // the cancel loop flag
+            
         this.view.loopCancel=false;
+        
+            // start the main loop in paused mode
+            // as we require a click to get pointer lock access
 
-        mainLoop(timeStamp);    
+        this.view.setPauseState(this.input,true);
+        this.view.canvas.onclick=this.view.setPauseState.bind(this.view,this.input,false);
+        
+            // and now start the loop
+            
+        window.requestAnimationFrame(mainLoop);
     }
 }
 
@@ -481,7 +476,7 @@ function mainLoop(timeStamp)
     
         // run the input
         
-    main.input.run();
+    if (!view.paused) main.input.run();
     
         // map movement, entities, and
         // other physics, we only do this if we've
@@ -490,25 +485,27 @@ function mainLoop(timeStamp)
         // this timing needs to be precise so
         // physics remains constants
     
-    view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
-   
-    if (view.physicsTick>PHYSICS_MILLISECONDS) {
-        map.runMovements(view,entityList);
-    
-        if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+    if (!view.paused) {
+        view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
 
-            while (view.physicsTick>PHYSICS_MILLISECONDS) {
-                view.physicsTick-=PHYSICS_MILLISECONDS;
-                view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
+        if (view.physicsTick>PHYSICS_MILLISECONDS) {
+            map.runMovements(view,entityList);
 
-                entityList.run(view,map);
+            if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+
+                while (view.physicsTick>PHYSICS_MILLISECONDS) {
+                    view.physicsTick-=PHYSICS_MILLISECONDS;
+                    view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
+
+                    entityList.run(view,map);
+                }
             }
-        }
-        else {
-            view.lastPhysicTimeStamp=view.timeStamp;
-        }
+            else {
+                view.lastPhysicTimeStamp=view.timeStamp;
+            }
 
-        soundList.setListenerToEntity(entityList.getPlayer());
+            soundList.setListenerToEntity(entityList.getPlayer());
+        }
     }
     
         // drawing
@@ -529,13 +526,15 @@ function mainLoop(timeStamp)
     
         // the fps
     
-    var fpsTime=view.timeStamp-view.fpsStartTimeStamp;
-    if (fpsTime>=1000) {
-        view.fps=(view.fpsCount*1000.0)/view.fpsTotal;
-        view.fpsStartTimeStamp=view.timeStamp;
-        
-        view.fpsTotal=0;
-        view.fpsCount=0;
+    if (!view.paused) {
+        var fpsTime=view.timeStamp-view.fpsStartTimeStamp;
+        if (fpsTime>=1000) {
+            view.fps=(view.fpsCount*1000.0)/view.fpsTotal;
+            view.fpsStartTimeStamp=view.timeStamp;
+
+            view.fpsTotal=0;
+            view.fpsCount=0;
+        }
     }
 }
 

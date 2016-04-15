@@ -67,7 +67,7 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=[0.0,0.0,0.0];//[0.15,0.15,0.15];       // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=[0.0,0.0,0.0];           // all over ambient light [r,g,b]
 
         this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above
@@ -80,7 +80,7 @@ class ConfigClass
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
             //
             // monsters

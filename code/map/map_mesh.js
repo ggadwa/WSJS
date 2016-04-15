@@ -274,8 +274,8 @@ class MapMeshClass
 
             // fix a couple counts
 
-        this.indexCount=this.indexes.length;
-        this.trigCount=Math.trunc(this.indexCount/3);
+        this.indexCount-=3;
+        this.trigCount--;
     }
 
         //

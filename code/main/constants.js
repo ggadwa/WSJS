@@ -125,7 +125,7 @@ const LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X
 const LIGHTMAP_CHUNK_SIZE=Math.trunc(LIGHTMAP_TEXTURE_SIZE/LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
 const LIGHTMAP_CHUNK_PER_TEXTURE=(LIGHTMAP_CHUNK_SPLIT*LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
 
-const LIGHTMAP_RENDER_MARGIN=3;                // margin around each light map triangle
+const LIGHTMAP_RENDER_MARGIN=4;                // margin around each light map triangle
 const LIGHTMAP_BLUR_COUNT=3;
 
     //

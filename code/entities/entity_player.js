@@ -11,7 +11,13 @@ class EntityPlayerClass extends EntityClass
         super(name,position,angle,radius,high,maxHealth,model);
         
         this.turnSpeed=0;
+        this.factorTurnSpeed=1.0;
+        this.maxTurnSpeed=8.0;
+        
         this.lookSpeed=0;
+        this.factorLookSpeed=0.25;
+        this.maxLookSpeed=8.0;
+        
         this.forwardSpeed=0;
         this.sideSpeed=0;
         this.verticalSpeed=0;
@@ -29,11 +35,17 @@ class EntityPlayerClass extends EntityClass
         
     setTurnSpeed(speed)
     {
+        speed*=this.factorTurnSpeed;
+        if (Math.abs(speed)>this.maxTurnSpeed) speed=(speed>0)?this.maxTurnSpeed:-this.maxTurnSpeed;
+        
         this.turnSpeed=speed;
     }
     
     setLookSpeed(speed)
     {
+        speed*=this.factorLookSpeed;
+        if (Math.abs(speed)>this.maxLookSpeed) speed=(speed>0)?this.maxLookSpeed:-this.maxLookSpeed;
+        
         this.lookSpeed=speed;
     }
     

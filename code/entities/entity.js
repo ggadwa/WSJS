@@ -282,7 +282,7 @@ class EntityClass
             // vertices or just move to current position
             // and angle
             
-        if (this.model.skeleton!==null) {
+        if ((this.model.skeleton!==null) && (!view.paused)) {
             this.model.skeleton.animate(view);
             this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.angle,this.position);
         }

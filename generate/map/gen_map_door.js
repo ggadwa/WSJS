@@ -201,7 +201,7 @@ class GenRoomDoorClass
          
             // the door room
             // internal walls
-
+            
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(16);
 

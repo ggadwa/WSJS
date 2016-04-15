@@ -95,6 +95,8 @@ class GetLightmapLastBlockClass
     {
         this.meshIdx=-1;
         this.cacheTrigIdx=-1;
+        
+        Object.seal(this);
     }
 }
 
@@ -146,21 +148,22 @@ class GenLightmapClass
         this.vrx=new wsPoint(0,0,0);
 
         this.lightVectorNormal=new wsPoint(0.0,0.0,0.0);
-
-        this.pt0=new ws2DIntPoint(0,0);
-        this.pt1=new ws2DIntPoint(0,0);
-        this.pt2=new ws2DIntPoint(0,0);
+        
+        Object.seal(this);
     }
     
         //
         // border and smear polygons
         //
         
-    smudgeChunk(lightBitmap,lft,top,rgt,bot)
+    smudgeChunk(lightBitmap,lft,top)
     {
         var x,y,idx;
         var r,g,b;
         var hasColor;
+        
+        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
+        var bot=top+LIGHTMAP_CHUNK_SIZE;
         
         var pixelData=lightBitmap.pixelData;
         
@@ -265,11 +268,14 @@ class GenLightmapClass
         }
     }
     
-    blurChunk(lightBitmap,lft,top,rgt,bot)
+    blurChunk(lightBitmap,lft,top)
     {
         var n,idx;
         var x,y,cx,cy,cxs,cxe,cys,cye;
         var colCount,fCount,r,g,b;
+        
+        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
+        var bot=top+LIGHTMAP_CHUNK_SIZE;
         
         var pixelData=lightBitmap.pixelData;
         var blurData=lightBitmap.blurData;
@@ -526,9 +532,11 @@ class GenLightmapClass
         // render a single color to a chunk
         //
         
-    renderColor(pixelData,r,g,b,lft,top,rgt,bot)
+    renderColor(pixelData,r,g,b,lft,top)
     {
         var x,y,idx;
+        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
+        var bot=top+LIGHTMAP_CHUNK_SIZE;
         
         for (y=top;y!==bot;y++) {
             idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
@@ -541,9 +549,11 @@ class GenLightmapClass
         }
     }
     
-    clearChunk(pixelData,lft,top,rgt,bot)
+    clearChunk(pixelData,lft,top)
     {
         var x,y,idx;
+        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
+        var bot=top+LIGHTMAP_CHUNK_SIZE;
         
         for (y=top;y!==bot;y++) {
             idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
@@ -560,10 +570,10 @@ class GenLightmapClass
         // render a triangle
         //
 
-    renderTriangle(lightBitmap,meshIdx,pts,vs,normal,lft,top,rgt,bot)
+    renderTriangle(lightBitmap,meshIdx,v0,v1,v2,lft,top)
     {
-        var n,x,y,lx,rx,tempX,ty,my,by,idx;
-        var lxFactor,rxFactor,vFactor;
+        var n,x,y,lx,rx,ty,by,idx;
+        var xFactor,yFactor;
         var vx,vy,vz;
         var blackCheck;
         
@@ -586,96 +596,64 @@ class GenLightmapClass
             lightIdx=mesh.lightIntersectList[n];
             light=this.map.lights[lightIdx];
 
-            this.lightVectorNormal.setFromValues((light.position.x-vs[0].x),(light.position.y-vs[0].y),(light.position.z-vs[0].z));
+                // check all the vertex normals
+                // only eliminate if all vertexes are
+                // behind
+                
+            this.lightVectorNormal.setFromValues((light.position.x-v0.position.x),(light.position.y-v0.position.y),(light.position.z-v0.position.z));
             this.lightVectorNormal.normalize();
-            if (this.lightVectorNormal.dot(normal)>=0.0) lightList.push(lightIdx);
+            if (this.lightVectorNormal.dot(v0.normal)>=0.0) {
+                lightList.push(lightIdx);
+                continue;
+            }
+            
+            this.lightVectorNormal.setFromValues((light.position.x-v1.position.x),(light.position.y-v1.position.y),(light.position.z-v1.position.z));
+            this.lightVectorNormal.normalize();
+            if (this.lightVectorNormal.dot(v1.normal)>=0.0) {
+                lightList.push(lightIdx);
+                continue;
+            }
+            
+            this.lightVectorNormal.setFromValues((light.position.x-v2.position.x),(light.position.y-v2.position.y),(light.position.z-v2.position.z));
+            this.lightVectorNormal.normalize();
+            if (this.lightVectorNormal.dot(v2.normal)>=0.0) {
+                lightList.push(lightIdx);
+                continue;
+            }
         }
         
         if (lightList.length===0) return(false);
         
-            // find the min and max Y points
-            // we will build the scan line around this
-
-        var topPtIdx=0;
-        if (pts[1].y<pts[topPtIdx].y) topPtIdx=1;
-        if (pts[2].y<pts[topPtIdx].y) topPtIdx=2;
-
-        var botPtIdx=0;
-        if (pts[1].y>pts[botPtIdx].y) botPtIdx=1;
-        if (pts[2].y>pts[botPtIdx].y) botPtIdx=2;
-        
-            // find the middle point
-            
-        var midPtIdx=topPtIdx+1;
-        if (midPtIdx===3) midPtIdx=0;
-        
-        if (midPtIdx===botPtIdx) {
-            midPtIdx=topPtIdx-1;
-            if (midPtIdx===-1) midPtIdx=2;
-        }
-        
-            // on line scans from top to
-            // bottom and the other goes from
-            // top point to midpoint and then
-            // midpoint to bottom point
-            
-        var midStartPtIdx=topPtIdx;
-        var midEndPtIdx=midPtIdx;
-        
             // render the triangle by scan
             // lines from top to bottom
 
-        ty=pts[topPtIdx].y;
-        my=pts[midPtIdx].y;
-        by=pts[botPtIdx].y;
-        if (ty>=by) return(false);
+        ty=top+LIGHTMAP_RENDER_MARGIN;
+        by=(top+LIGHTMAP_CHUNK_SIZE)-LIGHTMAP_RENDER_MARGIN;
+        
+        lx=lft+LIGHTMAP_RENDER_MARGIN;
         
         blackCheck=0;
 
         for (y=ty;y!==by;y++) {
+            
+                // get the 2D x line
+                
+            yFactor=(y-ty)/(by-ty);
+            rx=lx+Math.trunc((LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN)*(1.0-yFactor));
+            
+                // get the 3D x line
+                
+            this.vlx.x=v0.position.x+Math.trunc((v2.position.x-v0.position.x)*yFactor);
+            this.vlx.y=v0.position.y+Math.trunc((v2.position.y-v0.position.y)*yFactor);
+            this.vlx.z=v0.position.z+Math.trunc((v2.position.z-v0.position.z)*yFactor);
 
-                // hit the midpoint and need
-                // to switch lines?
-
-            if (y===my) {
-                midStartPtIdx=midPtIdx;
-                midEndPtIdx=botPtIdx;
-            }
-
-                // get the left right
-
-            lxFactor=(y-pts[topPtIdx].y)/(pts[botPtIdx].y-pts[topPtIdx].y);
-            lx=pts[topPtIdx].x+Math.trunc((pts[botPtIdx].x-pts[topPtIdx].x)*lxFactor);
-
-            rxFactor=(y-pts[midStartPtIdx].y)/(pts[midEndPtIdx].y-pts[midStartPtIdx].y);
-            rx=pts[midStartPtIdx].x+Math.trunc((pts[midEndPtIdx].x-pts[midStartPtIdx].x)*rxFactor);
-
-                // get the vertex left and right
-
-            this.vlx.x=vs[topPtIdx].x+Math.trunc((vs[botPtIdx].x-vs[topPtIdx].x)*lxFactor);
-            this.vlx.y=vs[topPtIdx].y+Math.trunc((vs[botPtIdx].y-vs[topPtIdx].y)*lxFactor);
-            this.vlx.z=vs[topPtIdx].z+Math.trunc((vs[botPtIdx].z-vs[topPtIdx].z)*lxFactor);
-
-            this.vrx.x=vs[midStartPtIdx].x+Math.trunc((vs[midEndPtIdx].x-vs[midStartPtIdx].x)*rxFactor);
-            this.vrx.y=vs[midStartPtIdx].y+Math.trunc((vs[midEndPtIdx].y-vs[midStartPtIdx].y)*rxFactor);
-            this.vrx.z=vs[midStartPtIdx].z+Math.trunc((vs[midEndPtIdx].z-vs[midStartPtIdx].z)*rxFactor);
-
-                // sometimes we need to swap
-                // left and right
-
-            if (lx>rx) {
-                tempX=lx;
-                lx=rx;
-                rx=tempX;
-
-                tempX=this.vlx;
-                this.vlx=this.vrx;
-                this.vrx=tempX;
-            }
+            this.vrx.x=v1.position.x+Math.trunc((v2.position.x-v1.position.x)*yFactor);
+            this.vrx.y=v1.position.y+Math.trunc((v2.position.y-v1.position.y)*yFactor);
+            this.vrx.z=v1.position.z+Math.trunc((v2.position.z-v1.position.z)*yFactor);
 
                 // get the bitmap data index
 
-            idx=(((y+top)*LIGHTMAP_TEXTURE_SIZE)+(lx+lft))*4;
+            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lx)*4;
             
                 // render the scan line
 
@@ -683,15 +661,15 @@ class GenLightmapClass
 
                     // get the ray trace vetex
 
-                vFactor=(x-lx)/(rx-lx);
-                vx=this.vlx.x+Math.trunc((this.vrx.x-this.vlx.x)*vFactor);
-                vy=this.vlx.y+Math.trunc((this.vrx.y-this.vlx.y)*vFactor);
-                vz=this.vlx.z+Math.trunc((this.vrx.z-this.vlx.z)*vFactor);
+                xFactor=(x-lx)/(rx-lx);
+                vx=this.vlx.x+Math.trunc((this.vrx.x-this.vlx.x)*xFactor);
+                vy=this.vlx.y+Math.trunc((this.vrx.y-this.vlx.y)*xFactor);
+                vz=this.vlx.z+Math.trunc((this.vrx.z-this.vlx.z)*xFactor);
                 
                     // write the pixel
 
                 this.rayTraceVertex(lightList,vx,vy,vz,this.rayTraceVertexColor);
-                
+
                 pixelData[idx++]=Math.trunc(this.rayTraceVertexColor.r*255.0);
                 pixelData[idx++]=Math.trunc(this.rayTraceVertexColor.g*255.0);
                 pixelData[idx++]=Math.trunc(this.rayTraceVertexColor.b*255.0);
@@ -708,14 +686,14 @@ class GenLightmapClass
             // and we re-clear the chunk
    
         if (blackCheck===0) {
-            this.clearChunk(pixelData,lft,top,rgt,bot);
+            this.clearChunk(pixelData,lft,top);
             return(false);
         }
 
             // smear and blur chunk
 
-        this.smudgeChunk(lightBitmap,lft,top,rgt,bot);
-        this.blurChunk(lightBitmap,lft,top,rgt,bot);
+        this.smudgeChunk(lightBitmap,lft,top);
+        this.blurChunk(lightBitmap,lft,top);
         
         return(true);
     }
@@ -726,8 +704,6 @@ class GenLightmapClass
 
     writePolyToChunk(lightBitmap,meshIdx,trigIdx,lft,top)
     {
-        var xsz,ysz,zsz,xFactor,yFactor,zFactor;
-        var dx,dz,totalDist,dist,distFactor;
         var mesh=this.map.meshes[meshIdx];
         
             // get the vertexes for the triangle
@@ -748,18 +724,10 @@ class GenLightmapClass
             return(false);
         }
 
-            // since everything is a triangle, we just
-            // create a triangle that the light mapping
-            // will be drawn into.  the orientation doesn't
-            // matter as it's mapped to this 2D triangle
+            // ray trace the 3D triangle onto
+            // a 2D triangle in the chunk within the render margin
             
-        this.pt0.setFromValues(LIGHTMAP_RENDER_MARGIN,LIGHTMAP_RENDER_MARGIN);
-        this.pt1.setFromValues((LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN),LIGHTMAP_RENDER_MARGIN);
-        this.pt2.setFromValues(LIGHTMAP_RENDER_MARGIN,(LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN));
-
-            // ray trace the triangle
-            
-        var hitLight=this.renderTriangle(lightBitmap,meshIdx,[this.pt0,this.pt1,this.pt2],[v0.position,v1.position,v2.position],v0.normal,lft,top,(lft+LIGHTMAP_CHUNK_SIZE),(top+LIGHTMAP_CHUNK_SIZE));
+        var hitLight=this.renderTriangle(lightBitmap,meshIdx,v0,v1,v2,lft,top);
 
             // if it didn't hit any lights, UV
             // to the 0 black chunk
@@ -774,14 +742,14 @@ class GenLightmapClass
             // add the UV
             // pt0-pt2 are already moved within the margin
 
-        v0.lightmapUV.x=(this.pt0.x+lft)/LIGHTMAP_TEXTURE_SIZE;
-        v0.lightmapUV.y=(this.pt0.y+top)/LIGHTMAP_TEXTURE_SIZE;
+        v0.lightmapUV.x=(lft+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
+        v0.lightmapUV.y=(top+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
 
-        v1.lightmapUV.x=(this.pt1.x+lft)/LIGHTMAP_TEXTURE_SIZE;
-        v1.lightmapUV.y=(this.pt1.y+top)/LIGHTMAP_TEXTURE_SIZE;
+        v1.lightmapUV.x=(lft+(LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN))/LIGHTMAP_TEXTURE_SIZE;
+        v1.lightmapUV.y=(top+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
 
-        v2.lightmapUV.x=(this.pt2.x+lft)/LIGHTMAP_TEXTURE_SIZE;
-        v2.lightmapUV.y=(this.pt2.y+top)/LIGHTMAP_TEXTURE_SIZE;
+        v2.lightmapUV.x=(lft+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
+        v2.lightmapUV.y=(top+(LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN))/LIGHTMAP_TEXTURE_SIZE;
         
         return(true);
     }
