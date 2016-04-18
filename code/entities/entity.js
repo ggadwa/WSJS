@@ -6,15 +6,16 @@
 
 class EntityClass
 {
-    constructor(name,position,angle,radius,high,maxHealth,model)
+    constructor(name,position,angle,maxHealth,model)
     {
         this.name=name;
         this.position=position;
         this.angle=angle;
-        this.radius=radius;
-        this.high=high;
         this.maxHealth=maxHealth;
         this.model=model;
+        
+        this.radius=this.model.calculateRadius();
+        this.high=this.model.calculateHeight();
 
         this.id=-1;
         
@@ -42,6 +43,16 @@ class EntityClass
         this.collision=new CollisionClass();
         
         // no seal, as this object is extended
+    }
+    
+        //
+        // setup
+        //
+        
+    overrideRadiusHeight(radius,high)
+    {
+        this.radius=radius;
+        this.high=high;
     }
     
         //
@@ -256,7 +267,7 @@ class EntityClass
     inFrustum(view)
     {
         this.xFrustumBound.setFromValues((this.position.x-this.radius),(this.position.x+this.radius));
-        this.yFrustumBound.setFromValues(this.position.y,(this.position.y-this.high));
+        this.yFrustumBound.setFromValues((this.position.y-this.high),this.position.y);
         this.zFrustumBound.setFromValues((this.position.z-this.radius),(this.position.z+this.radius));
 
         return(view.boundBoxInFrustum(this.xFrustumBound,this.yFrustumBound,this.zFrustumBound));

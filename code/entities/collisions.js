@@ -104,9 +104,10 @@ class CollisionClass
         var totalRadius=radius1+radius2;
         
             // get distance between center points
+            // (x,z only, scrub out the Y)
             // if less than r1+r2 then it's a hit
             
-        dist=circlePt1.distance(circlePt2);
+        dist=circlePt1.distanceScrubY(circlePt2);
         if (dist>totalRadius) return(false);
         
             // hit point needs to be on the
@@ -142,7 +143,7 @@ class CollisionClass
             // only bump once
             
         var bumpOnce=false;
-        var bumpY;
+        var bumpY,entityTopY;
         var yBound;
         
             // the moved point
@@ -153,7 +154,7 @@ class CollisionClass
             // the rough collide boxes
             
         this.objXBound.setFromValues((this.testPt.x-radius),(this.testPt.x+radius));
-        this.objYBound.setFromValues(this.testPt.y,(this.testPt.y-high));
+        this.objYBound.setFromValues((this.testPt.y-high),this.testPt.y);
         this.objZBound.setFromValues((this.testPt.z-radius),(this.testPt.z+radius));
         
             // we need to possible run through
@@ -216,7 +217,8 @@ class CollisionClass
                 
                     // skip if not in the Y of the line
 
-                if ((this.testPt.y>checkEntityPt.y) || (this.testPt.y<=(checkEntityPt.y-checkEntity.high))) continue;
+                entityTopY=checkEntityPt.y-checkEntity.high;
+                if (((this.testPt.y-high)>checkEntityPt.y) || (this.testPt.y<=entityTopY)) continue;
                 
                     // check the circle
                     
@@ -236,8 +238,9 @@ class CollisionClass
                         
                     currentHitPt=this.moveIntersectPt;
                     currentDist=dist;
+                    
                     bumpY=-1;
-                    if ((this.testPt.y-yBound.min)<this.BUMP_HIGH) bumpY=yBound.min;
+                    if ((this.testPt.y-entityTopY)<this.BUMP_HIGH) bumpY=entityTopY;
                 }
             }
 

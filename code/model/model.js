@@ -43,6 +43,20 @@ class ModelClass
     }
     
         //
+        // information
+        //
+        
+    calculateRadius()
+    {
+        return(this.mesh.calculateRadius());
+    }
+    
+    calculateHeight()
+    {
+        return(this.mesh.calculateHeight());
+    }
+    
+        //
         // draw model
         //
 

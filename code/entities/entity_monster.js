@@ -19,9 +19,9 @@ class MonsterAIClass
 
 class EntityMonsterClass extends EntityClass
 {
-    constructor(name,position,angle,radius,high,maxHealth,model,ai)
+    constructor(name,position,angle,maxHealth,model,ai)
     {
-        super(name,position,angle,radius,high,maxHealth,model);
+        super(name,position,angle,maxHealth,model);
         
         this.ai=ai;
         

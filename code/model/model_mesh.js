@@ -39,6 +39,11 @@ class ModelMeshClass
         this.vertexCount=this.vertexList.length;
         this.indexCount=this.indexes.length;
         this.trigCount=Math.trunc(this.indexCount/3);
+        
+            // cache the radius and height calcs
+            
+        this.cacheRadius=-1;
+        this.cacheHigh=-1;
 
             // non-culled vertex and index list
 
@@ -102,6 +107,46 @@ class ModelMeshClass
             // data
         
         return(new ModelMeshClass(this.bitmap,this.vertexList,this.indexes,this.flag));
+    }
+    
+        //
+        // information
+        //
+        
+    calculateRadius()
+    {
+        if (this.cacheRadius===-1) {
+            var n,v;
+            var xBound=new wsBound(0,0);
+            var zBound=new wsBound(0,0);
+
+            for (n=0;n!==this.vertexCount;n++) {
+                v=this.vertexList[n];
+                xBound.adjust(v.position.x);
+                zBound.adjust(v.position.z);
+            }
+
+            this.cacheRadius=Math.trunc((xBound.getSize()+zBound.getSize())*0.25);       // average, then /2 for half (radius)
+        }
+        
+        return(this.cacheRadius);
+    }
+    
+    calculateHeight()
+    {
+        if (this.cacheHigh===-1) {
+            var n,v;
+            var high=0;
+
+            for (n=0;n!==this.vertexCount;n++) {
+                v=this.vertexList[n];
+                if (v.position.y<high) high=v.position.y;
+            }
+
+            this.cacheHigh=-high;
+        }
+        
+        return(this.cacheHigh);
     }
     
         //

@@ -6,16 +6,14 @@
 
 class EntityPlayerClass extends EntityClass
 {
-    constructor(name,position,angle,radius,high,maxHealth,model)
+    constructor(name,position,angle,maxHealth,model)
     {
-        super(name,position,angle,radius,high,maxHealth,model);
+        super(name,position,angle,maxHealth,model);
         
         this.turnSpeed=0;
-        this.factorTurnSpeed=1.0;
         this.maxTurnSpeed=8.0;
         
         this.lookSpeed=0;
-        this.factorLookSpeed=0.25;
         this.maxLookSpeed=8.0;
         
         this.forwardSpeed=0;
@@ -35,7 +33,7 @@ class EntityPlayerClass extends EntityClass
         
     setTurnSpeed(speed)
     {
-        speed*=this.factorTurnSpeed;
+        speed*=config.MOUSE_TURN_SENSITIVITY;
         if (Math.abs(speed)>this.maxTurnSpeed) speed=(speed>0)?this.maxTurnSpeed:-this.maxTurnSpeed;
         
         this.turnSpeed=speed;
@@ -43,7 +41,7 @@ class EntityPlayerClass extends EntityClass
     
     setLookSpeed(speed)
     {
-        speed*=this.factorLookSpeed;
+        speed*=config.MOUSE_LOOK_SENSITIVITY;
         if (Math.abs(speed)>this.maxLookSpeed) speed=(speed>0)?this.maxLookSpeed:-this.maxLookSpeed;
         
         this.lookSpeed=speed;

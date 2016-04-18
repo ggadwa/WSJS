@@ -373,7 +373,8 @@ class MainClass
             return;
         }
 
-        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),2000,5000,200,this.modelList.getModel('player'));
+        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),200,this.modelList.getModel('player'));
+        playerEntity.overrideRadiusHeight(2000,5500);       // lock player into a certain radius/height for viewport clipping
         var playerWeapon=genWeapon.generate();
         playerWeapon.addProjectile(genProjectile.generate());
         playerEntity.addWeapon(playerWeapon);
@@ -400,7 +401,7 @@ class MainClass
             monsterType=entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);
             model=this.modelList.cloneModel(this.view,('monster_'+monsterType));
 
-            this.entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),2000,5000,100,model,monsterAIs[monsterType]));
+            this.entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
 
             // finished
@@ -436,10 +437,8 @@ class MainClass
         this.view.loopCancel=false;
         
             // start the main loop in paused mode
-            // as we require a click to get pointer lock access
 
-        this.view.setPauseState(this.input,true);
-        this.view.canvas.onclick=this.view.setPauseState.bind(this.view,this.input,false);
+        this.view.setPauseState(this.input,true,true);
         
             // and now start the loop
             

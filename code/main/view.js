@@ -123,8 +123,11 @@ class ViewClass
         this.drawTick=0;
 
         this.loopCancel=false;
+        
         this.lastPhysicTimeStamp=0;
+        this.lastPhysicTimeStampPauseOffset=0;
         this.lastDrawTimeStamp=0;
+        this.lastDrawTimeStampPauseOffset=0;
 
             // stats
 
@@ -221,22 +224,40 @@ class ViewClass
         // pause state
         //
     
-    setPauseState(input,pause)
+    setPauseState(input,pause,initState)
     {
-        if (this.paused===pause) return;
-        
             // set the state
 
         this.paused=pause;
         
-            // always reset all the timing
+            // current timestamp
             
         var timeStamp=Math.trunc(window.performance.now());
+        
+            // if going into pause, we need
+            // to remember the time stamp offsets
+            // so they can be restored
+        
+        if (initState) {
+            this.lastPhysicTimeStampPauseOffset=0;
+            this.lastDrawTimeStampPauseOffset=0;
+        }
+        else {
+            if (pause) {
+                this.lastPhysicTimeStampPauseOffset=timeStamp-this.lastPhysicTimeStamp;
+                this.lastDrawTimeStampPauseOffset=timeStamp-this.lastDrawTimeStamp;
+            }
+        }
+        
+            // reset the timing to this timestamp
+            
         this.timeStamp=timeStamp;
 
-        this.lastPhysicTimeStamp=timeStamp;
-        this.lastDrawTimeStamp=timeStamp;
+        this.lastPhysicTimeStamp=timeStamp+this.lastPhysicTimeStampPauseOffset;
+        this.lastDrawTimeStamp=timeStamp+this.lastDrawTimeStampPauseOffset;
 
+            // start the fps over again
+            
         this.fps=0.0;
         this.fpsTotal=0;
         this.fpsCount=0;
@@ -575,6 +596,7 @@ class ViewClass
                 entity.draw(this);
                 entity.drawEnd(this);
 
+                if (config.DEBUG_DRAW_MODEL_HITBOX) debug.drawModelHitBox(this,entity.model,entity.radius,entity.high,entity.angle,entity.position);
                 if (config.DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.model,entity.angle,entity.position);
                 if (config.DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.model);
                 if (config.DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.model);
@@ -613,7 +635,10 @@ class ViewClass
 
         this.text.drawStart(this);
         this.text.drawWithShadow(this,(this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
-        if (this.paused) this.text.drawWithShadow(this,Math.trunc(this.wid*0.5),Math.trunc(this.high*0.5),48,45,'Paused - Click to Start',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+        if (this.paused) {
+            this.text.drawWithShadow(this,Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+            this.text.drawWithShadow(this,Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+        }
         this.text.drawEnd(this);
     }
     

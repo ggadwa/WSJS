@@ -112,7 +112,6 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
-        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -138,7 +137,6 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        //gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
     
@@ -179,7 +177,6 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
-        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -205,7 +202,114 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        //gl.enable(gl.DEPTH_TEST);
+        this.debugShader.drawEnd(view);
+    }
+    
+        //
+        // draw hit box
+        //
+        
+    drawModelHitBox(view,model,radius,high,angle,position)
+    {
+        var vIdx,iIdx;
+        var gl=view.gl;
+        
+            // create the lines
+
+        var vertices=new Float32Array(24);      // 8 points
+        var indexes=new Uint16Array(24);        // 12 lines
+        
+        vIdx=0;
+        
+        vertices[vIdx++]=position.x-radius;
+        vertices[vIdx++]=position.y;
+        vertices[vIdx++]=position.z-radius;
+        
+        vertices[vIdx++]=position.x-radius;
+        vertices[vIdx++]=position.y;
+        vertices[vIdx++]=position.z+radius;
+        
+        vertices[vIdx++]=position.x+radius;
+        vertices[vIdx++]=position.y;
+        vertices[vIdx++]=position.z+radius;
+        
+        vertices[vIdx++]=position.x+radius;
+        vertices[vIdx++]=position.y;
+        vertices[vIdx++]=position.z-radius;
+        
+        vertices[vIdx++]=position.x-radius;
+        vertices[vIdx++]=position.y-high;
+        vertices[vIdx++]=position.z-radius;
+        
+        vertices[vIdx++]=position.x-radius;
+        vertices[vIdx++]=position.y-high;
+        vertices[vIdx++]=position.z+radius;
+        
+        vertices[vIdx++]=position.x+radius;
+        vertices[vIdx++]=position.y-high;
+        vertices[vIdx++]=position.z+radius;
+        
+        vertices[vIdx++]=position.x+radius;
+        vertices[vIdx++]=position.y-high;
+        vertices[vIdx++]=position.z-radius;
+
+        iIdx=0;
+        
+        indexes[iIdx++]=0;
+        indexes[iIdx++]=1;
+        indexes[iIdx++]=1;
+        indexes[iIdx++]=2;
+        indexes[iIdx++]=2;
+        indexes[iIdx++]=3;
+        indexes[iIdx++]=3;
+        indexes[iIdx++]=0;
+        
+        indexes[iIdx++]=4;
+        indexes[iIdx++]=5;
+        indexes[iIdx++]=5;
+        indexes[iIdx++]=6;
+        indexes[iIdx++]=6;
+        indexes[iIdx++]=7;
+        indexes[iIdx++]=7;
+        indexes[iIdx++]=4;
+        
+        indexes[iIdx++]=0;
+        indexes[iIdx++]=4;
+        indexes[iIdx++]=1;
+        indexes[iIdx++]=5;
+        indexes[iIdx++]=2;
+        indexes[iIdx++]=6;
+        indexes[iIdx++]=3;
+        indexes[iIdx++]=7;
+
+            // set the shader
+
+        this.debugShader.drawStart(view,new wsColor(1.0,1.0,0.0));
+
+            // setup the buffers
+
+        var vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
+
+        gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        var indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
+
+            // draw the lines
+
+        gl.drawElements(gl.LINES,24,gl.UNSIGNED_SHORT,0);
+
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+
+        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(indexBuffer);
+
         this.debugShader.drawEnd(view);
     }
 
@@ -352,7 +456,6 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
-        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -378,7 +481,6 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        //gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
     
@@ -425,7 +527,6 @@ class DebugClass
             // set the shader
 
         this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
-        //gl.disable(gl.DEPTH_TEST);
 
             // setup the buffers
 
@@ -451,7 +552,6 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        //gl.enable(gl.DEPTH_TEST);
         this.debugShader.drawEnd(view);
     }
     

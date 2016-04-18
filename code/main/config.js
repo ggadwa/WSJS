@@ -86,10 +86,10 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=1;//3;
-        this.MONSTER_ENTITY_COUNT=0;//10;
+        this.MONSTER_TYPE_COUNT=3;
+        this.MONSTER_ENTITY_COUNT=10;
 
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
 
             //
             // random seeds,
@@ -99,13 +99,20 @@ class ConfigClass
         this.SEED=Date.now();
 
         this.SEED_BITMAP_MAP=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=6;//Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_ENTITY=5;//Math.trunc((Math.random()*this.SEED));
+        this.SEED_ENTITY=Math.trunc((Math.random()*this.SEED));
         this.SEED_WEAPON=Math.trunc((Math.random()*this.SEED));
         this.SEED_PROJECTILE=Math.trunc((Math.random()*this.SEED));
         this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));
+        
+            //
+            // controls
+            //
+            
+        this.MOUSE_TURN_SENSITIVITY=0.9;
+        this.MOUSE_LOOK_SENSITIVITY=0.25;
 
             //
             // play testing
@@ -122,6 +129,7 @@ class ConfigClass
         this.DEBUG_DRAW_MAP_MESH_NORMALS=false;
         this.DEBUG_DRAW_MAP_MESH_TANGENTS=false;
 
+        this.DEBUG_DRAW_MODEL_HITBOX=false;
         this.DEBUG_DRAW_MODEL_SKELETON=false;
         this.DEBUG_DRAW_MODEL_MESH_LINES=false;
         this.DEBUG_DRAW_MODEL_MESH_NORMALS=false;

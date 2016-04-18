@@ -302,6 +302,13 @@ class wsPoint
         return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
     }
     
+    distanceScrubY(pt)
+    {
+        var px=this.x-pt.x;
+        var pz=this.z-pt.z;
+        return(Math.sqrt((px*px)+(pz*pz)));
+    }
+    
     length()
     {
         return(Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z)));

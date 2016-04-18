@@ -24,6 +24,8 @@ class InputClass
         this.mouseChangeX=0;
         this.mouseChangeY=0;
         
+        this.mouseButtonFlags=new Uint8Array(8);
+        
             // listeners
             // need to set them to a variables so remove
             // can find them later
@@ -33,6 +35,9 @@ class InputClass
         
         this.pointerLockChangeListener=this.pointerLockChange.bind(this);
         this.pointerLockErrorListener=this.pointerLockError.bind(this);
+        
+        this.mouseDownListener=this.mouseDown.bind(this);
+        this.mouseUpListener=this.mouseUp.bind(this);
         this.mouseMovedListener=this.mouseMove.bind(this);
         
         Object.seal(this);
@@ -50,9 +55,10 @@ class InputClass
             
         this.playerEntity=playerEntity;
 
-            // clear any keys
+            // clear any flags
 
         this.keyClear();
+        this.mouseButtonClear();
     }
 
     release()
@@ -70,13 +76,28 @@ class InputClass
     setPauseState(pause)
     {
         if (pause) {
+            
+                // unattach any events
+                
             if (this.eventsAttached) {
                 this.keyEnd();
                 this.mouseEnd();
                 this.eventsAttached=false;
             }
+            
+                // and make sure a click
+                // unpaused
+                
+            this.view.canvas.onclick=this.view.setPauseState.bind(this.view,this,false,false);
         }
         else {
+            
+                // clear the unpause click
+                
+            this.view.canvas.onclick=null;
+            
+                // attach events
+                
             this.keyStart();
             this.mouseStart();
             this.eventsAttached=true;
@@ -118,9 +139,9 @@ class InputClass
             
         if (this.keyFlags[32]) this.playerEntity.startJump();
         
-            // q fire
+            // mouse 0 fire
             
-        if (this.keyFlags[81]) this.playerEntity.fireCurrentWeapon(this.view,this.entityList);
+        if (this.mouseButtonFlags[0]) this.playerEntity.fireCurrentWeapon(this.view,this.entityList);
         
             // m flips map on/off
             
@@ -155,28 +176,15 @@ class InputClass
     }
 
         //
-        // canvas key events
+        // start/stop key events
         //
 
     keyStart()
     {
-            // clear all the key flags
-            
         this.keyClear();
-        
-            // start the key events
             
         document.addEventListener('keydown',this.keyDownListener,true);
         document.addEventListener('keyup',this.keyUpListener.bind(this),true);
-    }
-    
-    keyClear()
-    {
-        var n;
-            
-        for (n=0;n!==255;n++) {
-            this.keyFlags[n]=0;
-        }
     }
     
     keyEnd()
@@ -189,19 +197,31 @@ class InputClass
     {
         this.keyFlags[event.keyCode]=1;
     }
-
+    
+    keyClear()
+    {
+        var n;
+            
+        for (n=0;n!==255;n++) {
+            this.keyFlags[n]=0;
+        }
+    }
+    
+        //
+        // key event callbacks
+        //
+        
     keyUpEvent(event)
     {
         this.keyFlags[event.keyCode]=0;
     }
     
-        // canvas mouse events
+        // start/stop mouse events
         // supergumba -- eventually get rid of moz/webkit stuff
     
     mouseStart()
     {
-        this.mouseChangeX=0;
-        this.mouseChangeY=0;
+        this.mouseButtonClear();
         
             // request the pointer lock
             
@@ -256,10 +276,21 @@ class InputClass
                 }
             }
         }
-        
-            // remove pointer lock events
-            
     }
+    
+    mouseButtonClear()
+    {
+        var n;
+        
+        this.mouseChangeX=0;
+        this.mouseChangeY=0;
+            
+        for (n=0;n!==8;n++) {
+            this.mouseButtonFlags[n]=0;
+        }
+    }
+    
+        // mouse event callbacks
     
     pointerLockChange(event)
     {
@@ -269,16 +300,31 @@ class InputClass
         if (document.webkitPointerLockElement) elem=document.webkitPointerLockElement;
         
         if (elem===this.view.canvas) {
+            document.addEventListener('mousedown',this.mouseDownListener,false);
+            document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('mousemove',this.mouseMovedListener,false);
         }
         else {
+            document.removeEventListener('mousedown',this.mouseDownListener,false);
+            document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
+            this.view.setPauseState(this,true,false);       // go into pause
         }
     }
     
     pointerLockError(err)
     {
         console.log('PointerLock: '+err);
+    }
+    
+    mouseDown(event)
+    {
+        this.mouseButtonFlags[event.button]=1;
+    }
+    
+    mouseUp(event)
+    {
+        this.mouseButtonFlags[event.button]=0;
     }
     
     mouseMove(event)

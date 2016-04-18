@@ -21,7 +21,7 @@ class GenModelProjectileMeshClass
         var idx=0;
         
         var xBound=new wsBound((centerPt.x-sz),(centerPt.x+sz));
-        var yBound=new wsBound((centerPt.y-sz),(centerPt.y+sz));
+        var yBound=new wsBound((centerPt.y-(sz*2)),centerPt.y);
         var zBound=new wsBound((centerPt.z-sz),(centerPt.z+sz));
         
             // left
