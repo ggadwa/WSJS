@@ -93,7 +93,8 @@ class MapMeshClass
             // collision lists
 
         this.collisionLines=[];
-        this.collisionRects=[];
+        this.collisionFloorRects=[];
+        this.collisionCeilingRects=[];
         
             // marks if the vertices have changed
             // and a buffer update is required
@@ -369,7 +370,7 @@ class MapMeshClass
         this.collisionLines.push(line);
     }
     
-    buildCollisionGeometryFloor(v0,v1,v2)
+    buildCollisionGeometryRect(v0,v1,v2,rectList)
     {
         var n,nRect;
         var lft,top,rgt,bot;
@@ -397,13 +398,13 @@ class MapMeshClass
             // usually, two triangles make
             // a single rectangle
 
-        nRect=this.collisionRects.length;
+        nRect=rectList.length;
 
         for (n=0;n!==nRect;n++) {
-            if (this.collisionRects[n].equals(cRect)) return;
+            if (rectList[n].equals(cRect)) return;
         }
 
-        this.collisionRects.push(cRect);
+        rectList.push(cRect);
     }
     
     buildCollisionGeometry()
@@ -432,14 +433,22 @@ class MapMeshClass
                 // detect if triangle is a floor
                 
             if (ny<=-0.7) {
-                this.buildCollisionGeometryFloor(v0,v1,v2);
+                this.buildCollisionGeometryRect(v0,v1,v2,this.collisionFloorRects);
             }
             
-                // detect if triangle is wall like
-            
+                // detect if triangle is a ceiling
+                
             else {
-                if (Math.abs(ny)<=0.3) {
-                    this.buildCollisionGeometryLine(v0,v1,v2);
+                if (ny>=0.7) {
+                    this.buildCollisionGeometryRect(v0,v1,v2,this.collisionCeilingRects);
+                }
+
+                    // detect if triangle is wall like
+
+                else {
+                    if (Math.abs(ny)<=0.3) {
+                        this.buildCollisionGeometryLine(v0,v1,v2);
+                    }
                 }
             }
         }
@@ -468,10 +477,16 @@ class MapMeshClass
             this.collisionLines[n].addPoint(movePnt);
         }
         
-        nCollide=this.collisionRects.length;
+        nCollide=this.collisionFloorRects.length;
         
         for (n=0;n!==nCollide;n++) {
-            this.collisionRects[n].addPoint(movePnt);
+            this.collisionFloorRects[n].addPoint(movePnt);
+        }
+        
+        nCollide=this.collisionCeilingRects.length;
+        
+        for (n=0;n!==nCollide;n++) {
+            this.collisionCeilingRects[n].addPoint(movePnt);
         }
             
             // and finally the bounds

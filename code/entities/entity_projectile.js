@@ -26,13 +26,23 @@ class EntityProjectileClass extends EntityClass
     }
     
         //
+        // projectile hits
+        //
+        
+    hit(view,map,entityList)
+    {
+        super.markAsDelete();
+        view.particleList.addExplosionParticles(view,this.position);
+        this.projectile.hitSound.play(this.position);
+    }
+    
+        //
         // run projectile
         //
     
     run(view,map,entityList)
     {
-            // supergumba -- right now cancel any projectile
-            // that last over 10 seconds
+            // cancel any projectile that lasts over lifetime
             
         if ((this.startTimeStamp+this.projectile.lifeTick)<view.timeStamp) {
             super.markAsDelete();
@@ -47,12 +57,18 @@ class EntityProjectileClass extends EntityClass
             this.gravity+=this.projectile.gravityAdd;
         }
         
-            // else move it
+            // move it and check wall collisions
             
         if (super.moveSimple(map,entityList,this.projectile.speed,false)) {
-            super.markAsDelete();
-            view.particleList.addExplosionParticles(view,this.position);
-            this.projectile.hitSound.play(this.position);
+            this.hit(view,map,entityList);
+            return;
+        }
+        
+            // check floor and ceiling collisions
+            
+        if (super.checkFloorCeilingCollision(map)) {
+            this.hit(view,map,entityList);
+            return;
         }
     }
     

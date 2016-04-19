@@ -27,6 +27,9 @@ class EntityClass
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
         this.touchEntity=null;
+        
+        this.collideWallMeshIdx=-1;
+        this.collideFloorCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
 
         this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
@@ -181,6 +184,15 @@ class EntityClass
     isFalling()
     {
         return(this.fallSpeed>0);
+    }
+    
+        //
+        // check floors and ceilings (mostly projectiles)
+        //
+        
+    checkFloorCeilingCollision(map)
+    {
+        return(this.collision.checkFloorCeilingCollision(map,this));
     }
     
         //

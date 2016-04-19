@@ -157,6 +157,10 @@ class CollisionClass
         this.objYBound.setFromValues((this.testPt.y-high),this.testPt.y);
         this.objZBound.setFromValues((this.testPt.z-radius),(this.testPt.z+radius));
         
+            // no collisions yet
+            
+        entity.collideWallMeshIdx=-1;
+        
             // we need to possible run through
             // this multiple times to deal with
             // bumps
@@ -199,6 +203,7 @@ class CollisionClass
 
                     dist=this.testPt.noSquareDistance(this.moveIntersectPt);
                     if ((dist<currentDist) || (currentDist===-1)) {
+                        entity.collideWallMeshIdx=n;
                         currentHitPt=this.moveIntersectPt;
                         currentDist=dist;
                         bumpY=-1;
@@ -228,6 +233,7 @@ class CollisionClass
 
                 dist=this.testPt.noSquareDistance(this.moveIntersectPt);
                 if ((dist<currentDist) || (currentDist===-1)) {
+                    entity.collideWallMeshIdx=-1;
                     
                         // set the touch
                         
@@ -316,10 +322,10 @@ class CollisionClass
                 // if we are within the fall, then
                 // return the ground
 
-            nCollisionRect=mesh.collisionRects.length;
+            nCollisionRect=mesh.collisionFloorRects.length;
 
             for (k=0;k!==nCollisionRect;k++) {
-                collisionRect=mesh.collisionRects[k];
+                collisionRect=mesh.collisionFloorRects[k];
                 if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
                     entity.standOnMeshIdx=n;
                     return(collisionRect.y-entity.position.y);
@@ -333,5 +339,65 @@ class CollisionClass
         return(fallY);
     }
     
+        //
+        // floor and ceiling collisions
+        //
+        
+    checkFloorCeilingCollision(map,entity)
+    {
+        var n,k,nMesh,nCollisionRect;
+        var mesh,collisionRect;
+
+            // the rough collide boxes
+            
+        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
+        this.objYBound.setFromValues((entity.position.y-entity.high),entity.position.y);
+        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
+        
+            // run through the meshes
+        
+        nMesh=map.meshes.length;
+        
+        for (n=0;n!==nMesh;n++) {
+            mesh=map.meshes[n];
+            
+                // skip walls
+                
+            if (mesh.flag===MESH_FLAG_ROOM_WALL) continue;
+
+                // skip any mesh we don't collide with
+
+            if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                // check the floor collide rects
+
+            nCollisionRect=mesh.collisionFloorRects.length;
+
+            for (k=0;k!==nCollisionRect;k++) {
+                collisionRect=mesh.collisionFloorRects[k];
+                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
+                    entity.collideFloorCeilingMeshIdx=n;
+                    return(true);
+                }
+            }
+            
+                // check the ceiling collide rects
+
+            nCollisionRect=mesh.collisionCeilingRects.length;
+
+            for (k=0;k!==nCollisionRect;k++) {
+                collisionRect=mesh.collisionCeilingRects[k];
+                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
+                    entity.collideFloorCeilingMeshIdx=n;
+                    return(true);
+                }
+            }
+        }
+        
+            // no hits
+        
+        entity.collideFloorCeilingMeshIdx=-1;
+        return(false);
+    }
     
 }
