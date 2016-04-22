@@ -32,23 +32,21 @@ class EntityMonsterClass extends EntityClass
     }
     
         //
+        // death override
+        //
+        
+    die()
+    {
+        this.markAsDelete();
+    }
+    
+        //
         // run monster
         //
     
     run(view,map,entityList)
     {
         var player;
-        
-            // delete if hit by projectile
-        
-        if (this.touchEntity!==null) {
-            if (this.touchEntity instanceof EntityProjectileClass) {
-                this.markAsDelete();
-                return;
-            }
-        }
-        
-        this.touchEntity=null;
         
             // time to activate monster?
         

@@ -97,6 +97,15 @@ class EntityPlayerClass extends EntityClass
     }
     
         //
+        // death override
+        //
+        
+    die()
+    {
+        console.log('Dead');
+    }
+    
+        //
         // run player
         //
     

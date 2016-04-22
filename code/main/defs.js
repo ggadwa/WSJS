@@ -652,6 +652,14 @@ class wsRect
         this.bot=bot;
     }
     
+    setFromValues(lft,top,rgt,bot)
+    {
+        this.lft=lft;
+        this.top=top;
+        this.rgt=rgt;
+        this.bot=bot;
+    }
+    
     overlap(rect)
     {
         if (this.lft>=rect.rgt) return(false);

@@ -374,7 +374,7 @@ class MainClass
         }
 
         var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),200,this.modelList.getModel('player'));
-        playerEntity.overrideRadiusHeight(2000,5500);       // lock player into a certain radius/height for viewport clipping
+        playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         var playerWeapon=genWeapon.generate();
         playerWeapon.addProjectile(genProjectile.generate());
         playerEntity.addWeapon(playerWeapon);

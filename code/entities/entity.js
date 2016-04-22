@@ -265,6 +265,20 @@ class EntityClass
     }
     
         //
+        // health, damage, death
+        //
+    
+    die()
+    {
+    }
+    
+    addDamage(damage)
+    {
+        this.health-=damage;
+        if (this.health<=0) this.die();
+    }
+    
+        //
         // run entity
         //
         

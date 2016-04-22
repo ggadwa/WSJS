@@ -26,14 +26,34 @@ class EntityProjectileClass extends EntityClass
     }
     
         //
+        // damage overrides
+        // projectiles can't take damage, they just get destroyed
+        // if they hit each other
+        //
+    
+    addDamage(damage)
+    {
+        this.markAsDelete();
+    }
+    
+        //
         // projectile hits
         //
         
     hit(view,map,entityList)
     {
+            // delete entity
+            
         super.markAsDelete();
+        
+            // explosion and sound
+            
         view.particleList.addExplosionParticles(view,this.position);
         this.projectile.hitSound.play(this.position);
+        
+            // handle any damage
+        
+        if (this.touchEntity!==null) this.touchEntity.addDamage(this.projectile.damage);
     }
     
         //

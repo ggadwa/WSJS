@@ -21,9 +21,7 @@ REGULAR TODOs
 #### spikes
 
 
-#### what's wrong with shots not hitting monsters?
 #### monster ai: speed,project=null no projectile
-#### deal with health and damage
 
 #### animals better
 #### blobs better
@@ -32,6 +30,8 @@ REGULAR TODOs
 
 #### get rid of weapon fire hard-coding
 #### still need to figure out door/staircase problem
+
+#### health display
 
 #### projectiles
       - gravity, initvalue, add (test)

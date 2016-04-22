@@ -111,8 +111,8 @@ class ConfigClass
             // controls
             //
             
-        this.MOUSE_TURN_SENSITIVITY=0.9;
-        this.MOUSE_LOOK_SENSITIVITY=0.25;
+        this.MOUSE_TURN_SENSITIVITY=0.8;
+        this.MOUSE_LOOK_SENSITIVITY=0.2;
 
             //
             // play testing

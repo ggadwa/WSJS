@@ -140,6 +140,11 @@ class ViewClass
         this.drawMeshTrigCount=0;
         this.drawModelCount=0;
         this.drawModelTrigCount=0;
+        
+            // interface pieces
+            
+        this.uiHealthRect=new wsRect(0,0,0,0);
+        this.uiHealthColor=new wsColor(1,0,0);
 
             // loading screen
 
@@ -209,6 +214,10 @@ class ViewClass
         if (!this.text.initialize(this,fileCache)) return(false);
         if (!this.interface.initialize(this,fileCache)) return(false);
         if (!this.particleList.initialize(this,fileCache)) return(false);
+        
+            // setup the health rectangle
+            
+        this.uiHealthRect.setFromValues(5,(high-105),25,(high-5));
 
         return(true);
     }
@@ -617,6 +626,12 @@ class ViewClass
             weapon.draw(this,player);
             weapon.drawEnd(this);
         }
+        
+            // health
+        
+        this.interface.drawStart(this);
+        this.interface.drawRect(this,this.uiHealthRect,this.uiHealthColor);
+        this.interface.drawEnd(this);
 
             // map overlay
             
