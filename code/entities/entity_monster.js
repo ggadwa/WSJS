@@ -80,7 +80,7 @@ class EntityMonsterClass extends EntityClass
         super.fall(map);
         
             // firing projectiles
-
+/*
         if (this.active) {
             if (view.timeStamp>this.lastShotTimeStamp) {
                 this.lastShotTimeStamp=view.timeStamp+5000;
@@ -97,6 +97,7 @@ class EntityMonsterClass extends EntityClass
                 this.ai.projectile.fire(view,entityList,pos,ang);
             }
         }
+*/
     }
     
 }
