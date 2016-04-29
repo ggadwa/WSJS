@@ -47,7 +47,7 @@ class InterfaceClass
         gl.disable(gl.DEPTH_TEST);
 
         gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
         this.interfaceShader.drawStart(view);
     }
@@ -62,7 +62,7 @@ class InterfaceClass
         gl.enable(gl.DEPTH_TEST);
     }
     
-    drawFrameRect(view,rect,color)
+    drawFrameRect(view,rect,color,alpha)
     {
         var gl=view.gl;
         
@@ -79,7 +79,7 @@ class InterfaceClass
         
             // setup the color
             
-        gl.uniform3f(this.interfaceShader.colorUniform,color.r,color.g,color.b);
+        gl.uniform4f(this.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
 
             // setup the buffers
 
@@ -98,7 +98,7 @@ class InterfaceClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
     }
     
-    drawRect(view,rect,color)
+    drawRect(view,rect,color,alpha)
     {
         var gl=view.gl;
         
@@ -120,7 +120,7 @@ class InterfaceClass
         
             // setup the color
             
-        gl.uniform3f(this.interfaceShader.colorUniform,color.r,color.g,color.b);
+        gl.uniform4f(this.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
 
             // setup the buffers
 

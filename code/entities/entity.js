@@ -19,6 +19,7 @@ class EntityClass
 
         this.id=-1;
         
+        this.maxHealth=maxHealth;
         this.health=maxHealth;
 
         this.fallSpeed=0;
@@ -276,6 +277,11 @@ class EntityClass
     {
         this.health-=damage;
         if (this.health<=0) this.die();
+    }
+    
+    getPercentageHealth()
+    {
+        return(this.health/this.maxHealth);
     }
     
         //

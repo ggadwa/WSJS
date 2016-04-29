@@ -142,14 +142,22 @@ class ViewClass
         this.drawModelTrigCount=0;
         
             // interface pieces
-            
+        
+        this.uiHealthHigh=0;
         this.uiHealthRect=new wsRect(0,0,0,0);
-        this.uiHealthColor=new wsColor(1,0,0);
+        this.uiHealthColor=new wsColor(1.0,0.0,0.0);
+        this.uiHealthFrameRect=new wsRect(0,0,0,0);
+        this.uiHealthFrameColor=new wsColor(1.0,1.0,1.0);
+        this.uiHealthAlpha=0.7;
 
             // loading screen
 
         this.loadingStrings=[];
         this.loadingLastAddMsec=0;
+        this.loadingBarRect=new wsRect(0,0,0,0);
+        this.loadingBarColor=new wsColor(0.3,0.1,1.0);
+        this.loadingBarFrameRect=new wsRect(0,0,0,0);
+        this.loadingBarFrameColor=new wsColor(1.0,1.0,1.0);
         
         Object.seal(this);
     }
@@ -215,9 +223,14 @@ class ViewClass
         if (!this.interface.initialize(this,fileCache)) return(false);
         if (!this.particleList.initialize(this,fileCache)) return(false);
         
-            // setup the health rectangle
-            
-        this.uiHealthRect.setFromValues(5,(high-105),25,(high-5));
+            // setup some interface positions
+        
+        this.loadingBarRect.setFromValues(5,(this.high-25),5,(this.high-5));
+        this.loadingBarFrameRect.setFromValues(5,(this.high-25),(this.wid-5),(this.high-5));
+        
+        this.uiHealthHigh=Math.trunc(this.high*0.5)-10;
+        this.uiHealthRect.setFromValues(5,(this.high-this.uiHealthHigh),25,(this.high-5));
+        this.uiHealthFrameRect.setFromValues(5,((this.high-5)-this.uiHealthHigh),25,(this.high-5));
 
         return(true);
     }
@@ -630,7 +643,9 @@ class ViewClass
             // health
         
         this.interface.drawStart(this);
-        this.interface.drawRect(this,this.uiHealthRect,this.uiHealthColor);
+        this.uiHealthRect.top=this.uiHealthRect.bot-Math.trunc(this.uiHealthHigh*player.getPercentageHealth());
+        this.interface.drawRect(this,this.uiHealthRect,this.uiHealthColor,this.uiHealthAlpha);
+        this.interface.drawFrameRect(this,this.uiHealthFrameRect,this.uiHealthFrameColor,1.0);
         this.interface.drawEnd(this);
 
             // map overlay
@@ -717,14 +732,12 @@ class ViewClass
 
             // progress
         
-        if (progress!==null) {
-            var lft=5;
-            var rgt=lft+Math.trunc((this.wid-10)*progress);
-        }
-
         this.interface.drawStart(this);
-        if (progress!==null) this.interface.drawRect(this,new wsRect(lft,(this.high-25),rgt,(this.high-5)),new wsColor(0.3,0.1,1.0));
-        this.interface.drawFrameRect(this,new wsRect(5,(this.high-25),(this.wid-5),(this.high-5)),new wsColor(1.0,1.0,1.0));
+        if (progress!==null) {
+            this.loadingBarRect.rgt=5+Math.trunc((this.wid-10)*progress);
+            this.interface.drawRect(this,this.loadingBarRect,this.loadingBarColor,1.0);
+        }
+        this.interface.drawFrameRect(this,this.loadingBarFrameRect,this.loadingBarFrameColor,1.0);
         this.interface.drawEnd(this);
     }
     

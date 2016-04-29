@@ -31,7 +31,7 @@ REGULAR TODOs
 #### get rid of weapon fire hard-coding
 #### still need to figure out door/staircase problem
 
-#### health display
+
 
 #### projectiles
       - gravity, initvalue, add (test)
@@ -60,6 +60,7 @@ REGULAR TODOs
 [ ] started work on weapon variations
 [ ] started work on projectile variations
 [X] improved collision routines
+[X] player health display
 [X] some more debugging options
 
 
