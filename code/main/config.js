@@ -80,7 +80,7 @@ class ConfigClass
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
             //
             // monsters
@@ -89,7 +89,7 @@ class ConfigClass
         this.MONSTER_TYPE_COUNT=6;
         this.MONSTER_ENTITY_COUNT=20;
 
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
 
             //
             // random seeds,
@@ -99,7 +99,7 @@ class ConfigClass
         this.SEED=Date.now();
 
         this.SEED_BITMAP_MAP=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=5; //Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_ENTITY=Math.trunc((Math.random()*this.SEED));

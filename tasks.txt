@@ -32,7 +32,6 @@ REGULAR TODOs
 #### still need to figure out door/staircase problem
 
 
-
 #### projectiles
       - gravity, initvalue, add (test)
       - bounce, bounce factor (implement)
@@ -61,6 +60,7 @@ REGULAR TODOs
 [ ] started work on projectile variations
 [X] improved collision routines
 [X] player health display
+[X] fixed a bug with movement pushing throwing off the collision detection
 [X] some more debugging options
 
 

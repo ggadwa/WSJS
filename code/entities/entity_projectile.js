@@ -73,7 +73,7 @@ class EntityProjectileClass extends EntityClass
             
         this.position.y+=this.gravity;
         
-        if ((this.startTimeStamp+this.projectile.gravityWaitTimeStamp)>=view.timeStamp) {
+        if ((this.startTimeStamp+this.projectile.gravityWaitTimeStamp)<=view.timeStamp) {
             this.gravity+=this.projectile.gravityAdd;
         }
         

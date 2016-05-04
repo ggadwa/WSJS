@@ -376,7 +376,7 @@ class MainClass
         var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),200,this.modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         var playerWeapon=genWeapon.generate();
-        playerWeapon.addProjectile(genProjectile.generate());
+        playerWeapon.addProjectile(genProjectile.generate(true));
         playerEntity.addWeapon(playerWeapon);
         playerEntity.setCurrentWeaponIndex(0);
 
@@ -387,7 +387,7 @@ class MainClass
         var monsterAIs=[];
         
         for (n=0;n!==config.MONSTER_TYPE_COUNT;n++) {
-            monsterAIs.push(new MonsterAIClass(genProjectile.generate()));
+            monsterAIs.push(new MonsterAIClass(genProjectile.generate(false)));
         }
 
             // make monster entities

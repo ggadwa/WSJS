@@ -266,10 +266,7 @@ class GenModelOrganicSkeletonClass
         var rotOffset,vct,y;
         
         if (this.genRandom.randomPercentage(0.9)) {
-            var armCount=this.genRandom.randomInt(1,2);
-            
-            //armCount=0; // supergumba -- testing
-
+            var armCount=this.genRandom.randomPercentage(0.8)?1:2;
             var armRadius,armY;
             var shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength;
 

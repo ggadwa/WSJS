@@ -56,6 +56,13 @@ class wsPoint
         this.z=pt.z*f;
     }
     
+    trunc()
+    {
+        this.x=Math.trunc(this.x);
+        this.y=Math.trunc(this.y);
+        this.z=Math.trunc(this.z);
+    }
+    
     move(xAdd,yAdd,zAdd)
     {
         this.x+=xAdd;

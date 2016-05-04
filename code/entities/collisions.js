@@ -194,7 +194,7 @@ class CollisionClass
                     yBound=collisionLine.getYBound();
                     if (this.testPt.y<=yBound.min) continue;
                     if ((this.testPt.y-high)>yBound.max) continue;
-
+                    
                         // check against line
 
                     if (!this.circleLineXZIntersection(collisionLine,this.testPt,radius,this.moveIntersectPt)) continue;

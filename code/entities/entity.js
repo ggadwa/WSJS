@@ -93,6 +93,11 @@ class EntityClass
             if (dist<0) this.movePt.y=-this.movePt.y;
         }
         
+            // trunc it to avoid floats which can
+            // effect the collisions
+            
+        this.movePt.trunc();
+        
             // if clipping on
             
         if (clipping) {

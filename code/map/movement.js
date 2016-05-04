@@ -115,6 +115,7 @@ class MovementClass
         if (prevIdx<0) prevIdx=this.moves.length-1;
         
         this.nextOffsetPnt.tween(this.moves[prevIdx].movePnt,move.movePnt,f);
+        this.nextOffsetPnt.trunc();         // stops these calculations from messing with the collisions because of float slop
         
             // move is change from last move
             
