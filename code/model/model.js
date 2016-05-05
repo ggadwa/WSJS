@@ -48,7 +48,7 @@ class ModelClass
         
     calculateRadius()
     {
-        return(this.mesh.calculateRadius());
+        return(this.mesh.calculateRadius(this.skeleton));
     }
     
     calculateHeight()

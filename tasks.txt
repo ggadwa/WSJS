@@ -21,8 +21,6 @@ REGULAR TODOs
 #### spikes
 
 
-#### monster ai: speed,project=null no projectile
-
 #### animals better
 #### blobs better
 #### weapon models
@@ -31,37 +29,27 @@ REGULAR TODOs
 #### get rid of weapon fire hard-coding
 #### still need to figure out door/staircase problem
 
+#### monster speed/health random/projectile,no-projectile
 
 #### projectiles
       - gravity, initvalue, add (test)
       - bounce, bounce factor (implement)
       - reflect (implement)
 
+#### more decorations
+#### better wall sliding
+
+#### outside sections
+#### windows
 
 
 
-
-
-
-
+[X] monster cylinders now are around body size instead of complete size including limbs
+[X] better whips on blobs
 
        
 
 
-[X] game now has a paused mode (starts in that mode)
-[X] implemented pointer lock and free mouse controls when possible
-[X] walls with doors no longer break into other rooms except for door
-[X] collisions are now calculated off the randomized models
-[X] monsters can have projectiles
-[X] lots of light mapping updates, highlighted meshes, skipped meshes, bug fixes, speed ups, etc
-[X] ability for meshes to skip light map obscuring (for things like full lit light pieces)
-[ ] started work on monster AI variations
-[ ] started work on weapon variations
-[ ] started work on projectile variations
-[X] improved collision routines
-[X] player health display
-[X] fixed a bug with movement pushing throwing off the collision detection
-[X] some more debugging options
 
 
 [ ] GL

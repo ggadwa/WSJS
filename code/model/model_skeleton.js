@@ -167,6 +167,21 @@ class ModelSkeletonClass
         return(new wsPoint(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
     }
     
+    getBoneLimbType(boneIdx)
+    {
+        var n,limb;
+        var nLimb=this.limbs.length;
+        
+        if (boneIdx===-1) return(-1);
+        
+        for (n=0;n!==nLimb;n++) {
+            limb=this.limbs[n];
+            if (limb.boneIndexes.indexOf(boneIdx)!==-1) return(limb.limbType);
+        }
+        
+        return(-1);
+    }
+    
         //
         // bounds and center
         //
