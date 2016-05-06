@@ -170,13 +170,17 @@ const GEN_BITMAP_MAP_TYPE_MOSAIC=15;
 const GEN_BITMAP_MAP_TYPE_WOOD_PLANK=16;
 const GEN_BITMAP_MAP_TYPE_WOOD_BOX=17;
 const GEN_BITMAP_MAP_TYPE_MACHINE=18;
+const GEN_BITMAP_MAP_TYPE_SKY_TOP=19;
+const GEN_BITMAP_MAP_TYPE_SKY_BOTTOM=20;
+const GEN_BITMAP_MAP_TYPE_SKY_SIDE=21;
 
 const GEN_BITMAP_MAP_TYPE_NAMES=[
                         'Brick Stack','Brick Random','Stone','Block',
                         'Tile Simple','Tile Complex','Tile Small','Hexagonal',
                         'Metal','Metal Bar','Metal Corrugated','Metal Shutter',
                         'Concrete','Cement','Plaster','Mosaic',
-                        'Wood Plank','Wood Box','Machine'
+                        'Wood Plank','Wood Box','Machine',
+                        'Sky Top','Sky Bottom','Sky Side'
                     ];
 
 const GEN_BITMAP_MODEL_TYPE_SKIN_SCALE=0;

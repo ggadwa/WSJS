@@ -1617,6 +1617,47 @@ class GenBitmapUtilityClass
         //
         // gradients
         //
+        
+    drawVerticalGradient(bitmapCTX,lft,top,rgt,bot,topColor,botColor)
+    {
+        var x,y,idx;
+        var colorDif,factor,redByte,greenByte,blueByte;
+
+            // get the image data
+
+        var wid=rgt-lft;
+        var high=bot-top;
+        if ((wid<1) || (high<1)) return;
+
+        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        var bitmapData=bitmapImgData.data;
+        
+        colorDif=new wsColor((botColor.r-topColor.r),(botColor.g-topColor.g),(botColor.b-topColor.b));
+
+            // write the stripe
+
+        for (y=0;y!==high;y++) {
+
+            factor=y/high;
+            
+            redByte=Math.trunc((topColor.r+(colorDif.r*factor))*255.0);
+            greenByte=Math.trunc((topColor.g+(colorDif.g*factor))*255.0);
+            blueByte=Math.trunc((topColor.b+(colorDif.b*factor))*255.0);
+            
+            idx=(y*wid)*4;
+
+            for (x=0;x!==wid;x++) {
+                bitmapData[idx++]=redByte;
+                bitmapData[idx++]=greenByte;
+                bitmapData[idx++]=blueByte;
+                bitmapData[idx++]=255;
+            }
+        }
+
+            // write all the data back
+
+        bitmapCTX.putImageData(bitmapImgData,lft,top);
+    }
 
     drawColorStripeHorizontal(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
@@ -1644,9 +1685,9 @@ class GenBitmapUtilityClass
         for (y=0;y!==high;y++) {
 
             color=colors[y%100];
-            redByte=Math.trunc(color.r*256.0);
-            greenByte=Math.trunc(color.g*256.0);
-            blueByte=Math.trunc(color.b*256.0);
+            redByte=Math.trunc(color.r*255.0);
+            greenByte=Math.trunc(color.g*255.0);
+            blueByte=Math.trunc(color.b*255.0);
 
             idx=(y*wid)*4;
 
@@ -1697,9 +1738,9 @@ class GenBitmapUtilityClass
         for (x=0;x!==wid;x++) {
 
             color=colors[x%100];
-            redByte=Math.trunc(color.r*256.0);
-            greenByte=Math.trunc(color.g*256.0);
-            blueByte=Math.trunc(color.b*256.0);
+            redByte=Math.trunc(color.r*255.0);
+            greenByte=Math.trunc(color.g*255.0);
+            blueByte=Math.trunc(color.b*255.0);
 
             for (y=0;y!==high;y++) {
                 idx=((y*wid)+x)*4;
@@ -1752,9 +1793,9 @@ class GenBitmapUtilityClass
                 
                 idx=((y*wid)+x)*4;
 
-                bitmapData[idx]=Math.trunc(color.r*256.0);
-                bitmapData[idx+1]=Math.trunc(color.g*256.0);
-                bitmapData[idx+2]=Math.trunc(color.b*256.0);
+                bitmapData[idx]=Math.trunc(color.r*255.0);
+                bitmapData[idx+1]=Math.trunc(color.g*255.0);
+                bitmapData[idx+2]=Math.trunc(color.b*255.0);
 
                 normalData[idx]=((cIdx&0x1)===0)?nx:-nx;
                 normalData[idx+1]=127.0;

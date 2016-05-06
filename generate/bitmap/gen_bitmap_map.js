@@ -1130,6 +1130,31 @@ class GenBitmapMapClass
     }
     
         //
+        // sky
+        //
+        
+    generateSkyTop(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.1,0.95,1.0));
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.0,0.0);
+    }
+
+    generateSkyBottom(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.0,0.2,1.0));
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.0,0.0);
+    }
+
+    generateSkySide(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        this.genBitmapUtility.drawVerticalGradient(bitmapCTX,0,0,wid,high,new wsColor(0.1,0.95,1.0),new wsColor(0.0,0.2,1.0));
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.0,0.0);
+    }
+
+        //
         // UV tester
         //
         
@@ -1273,6 +1298,21 @@ class GenBitmapMapClass
             case GEN_BITMAP_MAP_TYPE_MACHINE:
                 this.generateMachine(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=2.0;
+                break;
+                
+            case GEN_BITMAP_MAP_TYPE_SKY_TOP:
+                this.generateSkyTop(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=0.0;
+                break;
+                
+            case GEN_BITMAP_MAP_TYPE_SKY_BOTTOM:
+                this.generateSkyBottom(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=0.0;
+                break;
+                
+            case GEN_BITMAP_MAP_TYPE_SKY_SIDE:
+                this.generateSkySide(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=0.0;
                 break;
 
         }

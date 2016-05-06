@@ -196,11 +196,11 @@ class ViewClass
 
             // get the gl context
 
-        try {
-            this.gl=this.canvas.getContext("webgl");
-        }
-        catch (e) {
-            alert(e);
+        this.gl=this.canvas.getContext("webgl");
+        if (this.gl===null) this.canvas.getContext("experimental-webgl");
+        
+        if (this.gl===null) {
+            alert('WebGL not available, can not run, try a newer browser');
             return(false);
         }
 

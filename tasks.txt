@@ -32,13 +32,16 @@ REGULAR TODOs
 #### monster speed/health random/projectile,no-projectile
 
 #### projectiles
-      - gravity, initvalue, add (test)
       - bounce, bounce factor (implement)
       - reflect (implement)
 
 #### more decorations
 #### better wall sliding
 
+#### can I pack lighting better?
+
+#### sky box / sky box texture
+#### remove unnecessary glClear
 #### outside sections
 #### windows
 
@@ -46,9 +49,9 @@ REGULAR TODOs
 
 [X] monster cylinders now are around body size instead of complete size including limbs
 [X] better whips on blobs
-
+[ ] started skybox texture generator and added skyboxes
        
-
+[ ] add ability for projectiles to have different gravity settings, bounce, and reflect
 
 
 

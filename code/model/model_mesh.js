@@ -119,17 +119,32 @@ class ModelMeshClass
             var n,v,limbType;
             var xBound=new wsBound(0,0);
             var zBound=new wsBound(0,0);
-
-            for (n=0;n!==this.vertexCount;n++) {
-                v=this.vertexList[n];
-                limbType=skeleton.getBoneLimbType(v.boneIdx);
+            
+                // no skeleton, do all vertexes
                 
-                if ((limbType===LIMB_TYPE_BODY) || (limbType===LIMB_TYPE_HEAD) || (limbType===LIMB_TYPE_LEG_LEFT) || (limbType===LIMB_TYPE_LEG_RIGHT)) {
+            if (skeleton===null) {
+                for (n=0;n!==this.vertexCount;n++) {
+                    v=this.vertexList[n];
                     xBound.adjust(v.position.x);
                     zBound.adjust(v.position.z);
                 }
             }
 
+                // has a skeleton, eliminate some
+                // limbs that bulk up the collision radius
+                
+            else {
+                for (n=0;n!==this.vertexCount;n++) {
+                    v=this.vertexList[n];
+                    limbType=skeleton.getBoneLimbType(v.boneIdx);
+
+                    if ((limbType===LIMB_TYPE_BODY) || (limbType===LIMB_TYPE_HEAD) || (limbType===LIMB_TYPE_LEG_LEFT) || (limbType===LIMB_TYPE_LEG_RIGHT)) {
+                        xBound.adjust(v.position.x);
+                        zBound.adjust(v.position.z);
+                    }
+                }
+            }
+            
             this.cacheRadius=Math.trunc((xBound.getSize()+zBound.getSize())*0.25);       // average, then /2 for half (radius)
         }
         
