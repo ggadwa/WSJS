@@ -40,7 +40,9 @@ class FileCacheClass
                 'shaders/particle.frag',
                 'shaders/particle.vert',
                 'shaders/text.frag',
-                'shaders/text.vert'
+                'shaders/text.vert',
+                'shaders/sky.frag',
+                'shaders/sky.vert'
         ];
         
         Object.seal(this);

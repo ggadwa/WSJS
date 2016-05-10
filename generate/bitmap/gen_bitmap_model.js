@@ -189,25 +189,25 @@ class GenBitmapModelClass
 
     generate(view,name,generateType)
     {
-        var wid,high,edgeSize,paddingSize,segments;
+        var wid,high;
         var shineFactor=1.0;
         var bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_TEXTURE_SIZE;
+        bitmapCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        bitmapCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_TEXTURE_SIZE;
+        normalCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        normalCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_TEXTURE_SIZE;
+        specularCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        specularCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

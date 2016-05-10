@@ -9,6 +9,7 @@ class TextShaderClass extends ShaderClass
     constructor()
     {
         super();
+        
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
         this.orthoMatrixUniform=null;

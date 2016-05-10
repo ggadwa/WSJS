@@ -25,7 +25,7 @@ class ParticleListClass
     initialize(view,fileCache)
     {
         var n,particle;
-        var genBitmapUtility,bitmapCanvas,bitmapCTX;
+        var genBitmapParticle;
 
             // create the shader
             
@@ -42,33 +42,9 @@ class ParticleListClass
         }
         
             // construct a particle bitmap
-        
-        genBitmapUtility=new GenBitmapUtilityClass(view.genRandom);
-        
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.particleBitmapSize;
-        bitmapCanvas.height=this.particleBitmapSize;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-        
-        genBitmapUtility.drawRect(bitmapCTX,0,0,this.particleBitmapSize,this.particleBitmapSize,new wsColor(0.0,0.0,0.0));
-        genBitmapUtility.drawOval(bitmapCTX,0,0,this.particleBitmapSize,this.particleBitmapSize,new wsColor(1.0,1.0,1.0),null);
-        
-        this.particleBitmap=new BitmapClass(view,'Particle Blob',bitmapCanvas,null,null,1.0,0.0);
-        
-        /* debugging
-        var cvs=document.createElement('canvas');
-        cvs.style.position="absolute";
-        cvs.style.left='1024px';
-        cvs.style.top='0px';
-        cvs.style.border='1px solid #000000';
-        cvs.width=this.particleBitmapSize;
-        cvs.height=this.particleBitmapSize;
-
-        var ctx=cvs.getContext('2d');
-        ctx.drawImage(bitmapCanvas,0,0,this.particleBitmapSize,this.particleBitmapSize);
-
-        document.body.appendChild(cvs);
-        */
+            
+        genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_BITMAP_PARTICLE));  
+        this.particleBitmap=genBitmapParticle.generate(view,"Particle Oval",GEN_BITMAP_PARTICLE_TYPE_OVAL);
        
         return(true);
     }

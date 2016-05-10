@@ -111,6 +111,7 @@ class ViewClass
         this.text=new TextClass();
         this.interface=new InterfaceClass();
         this.particleList=new ParticleListClass();
+        this.sky=new SkyClass();
 
             // the camera object
 
@@ -222,6 +223,7 @@ class ViewClass
         if (!this.text.initialize(this,fileCache)) return(false);
         if (!this.interface.initialize(this,fileCache)) return(false);
         if (!this.particleList.initialize(this,fileCache)) return(false);
+        if (!this.sky.initialize(this,fileCache)) return(false);
         
             // setup some interface positions
         
@@ -240,6 +242,7 @@ class ViewClass
         this.text.release();
         this.interface.release();
         this.particleList.release();
+        this.sky.release();
     }
     
         //
@@ -592,6 +595,12 @@ class ViewClass
             // build the culling frustum
 
         this.buildCullingFrustum();
+        
+            // draw the sky
+            
+        this.sky.drawStart(this);
+        this.sky.draw(this);
+        this.sky.drawEnd(this);
         
             // draw the map
        

@@ -9,7 +9,9 @@ class SkyShaderClass extends ShaderClass
     constructor()
     {
         super();
+        
         this.vertexPositionAttribute=null;
+        this.vertexUVAttribute=null;
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;
         
@@ -32,6 +34,7 @@ class SkyShaderClass extends ShaderClass
         view.gl.useProgram(this.program);
 
         this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexUVAttribute=view.gl.getAttribLocation(this.program,'vertexUV');
 
         this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.modelMatrixUniform=view.gl.getUniformLocation(this.program,'modelMatrix');
@@ -62,6 +65,7 @@ class SkyShaderClass extends ShaderClass
             // enable the vertex attributes
 
         view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        view.gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
     drawEnd(view)
@@ -69,6 +73,7 @@ class SkyShaderClass extends ShaderClass
             // disable vertex attributes
 
         view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        view.gl.disableVertexAttribArray(this.vertexUVAttribute);
 
             // no longer using program
 

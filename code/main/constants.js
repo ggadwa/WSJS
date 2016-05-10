@@ -132,7 +132,10 @@ const LIGHTMAP_BLUR_COUNT=3;
     // bitmap generation
     //
 
-const GEN_BITMAP_TEXTURE_SIZE=512;
+const GEN_BITMAP_MAP_TEXTURE_SIZE=512;
+const GEN_BITMAP_MODEL_TEXTURE_SIZE=512;
+const GEN_BITMAP_SKY_TEXTURE_SIZE=512;
+const GEN_BITMAP_PARTICLE_TEXTURE_SIZE=32;
 
 const BITMAP_STACKED_X_MIN_COUNT=1;
 const BITMAP_STACKED_X_EXTRA_COUNT=4;
@@ -170,17 +173,13 @@ const GEN_BITMAP_MAP_TYPE_MOSAIC=15;
 const GEN_BITMAP_MAP_TYPE_WOOD_PLANK=16;
 const GEN_BITMAP_MAP_TYPE_WOOD_BOX=17;
 const GEN_BITMAP_MAP_TYPE_MACHINE=18;
-const GEN_BITMAP_MAP_TYPE_SKY_TOP=19;
-const GEN_BITMAP_MAP_TYPE_SKY_BOTTOM=20;
-const GEN_BITMAP_MAP_TYPE_SKY_SIDE=21;
 
 const GEN_BITMAP_MAP_TYPE_NAMES=[
                         'Brick Stack','Brick Random','Stone','Block',
                         'Tile Simple','Tile Complex','Tile Small','Hexagonal',
                         'Metal','Metal Bar','Metal Corrugated','Metal Shutter',
                         'Concrete','Cement','Plaster','Mosaic',
-                        'Wood Plank','Wood Box','Machine',
-                        'Sky Top','Sky Bottom','Sky Side'
+                        'Wood Plank','Wood Box','Machine'
                     ];
 
 const GEN_BITMAP_MODEL_TYPE_SKIN_SCALE=0;
@@ -189,6 +188,20 @@ const GEN_BITMAP_MODEL_TYPE_SKIN_FUR=2;
 
 const GEN_BITMAP_MODEL_TYPE_NAMES=[
                         'Skin Scale','Skin Leather','Skin Fur'
+                    ];
+                    
+const GEN_BITMAP_SKY_TYPE_TOP=0;
+const GEN_BITMAP_SKY_TYPE_BOTTOM=1;
+const GEN_BITMAP_SKY_TYPE_SIDE=2;
+
+const GEN_BITMAP_SKY_TYPE_NAMES=[
+                        'Top','Bottom','Side'
+                    ];
+                    
+const GEN_BITMAP_PARTICLE_TYPE_OVAL=0;
+
+const GEN_BITMAP_PARTICLE_TYPE_NAMES=[
+                        'Oval'
                     ];
 
     //

@@ -17,6 +17,8 @@ class MainDebugClass
         
         this.genBitmapMap=null;
         this.genBitmapModel=null;
+        this.genBitmapSky=null;
+        this.genBitmapParticle=null;
         
         this.debugSoundList=null;
         this.genSound=null;
@@ -127,11 +129,117 @@ class MainDebugClass
             
         idx++;
         if (idx>=GEN_BITMAP_MODEL_TYPE_NAMES.length) {
-            setTimeout(this.addSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapSkies.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
         setTimeout(this.addBitmapModels.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+        //
+        // sky bitmaps
+        //
+        
+    addBitmapSkies(idx)
+    {
+        var canvas,ctx,div;
+        var wid;
+        var debugBitmap;
+
+        wid=Math.trunc(this.bitmapWid/3);
+
+            // generate random bitmap
+
+        debugBitmap=this.genBitmapSky.generate(null,GEN_BITMAP_SKY_TYPE_NAMES[idx],idx);
+
+            // label
+
+        div=document.createElement('div');
+        div.style.position="absolute";
+        div.style.left='5px';
+        div.style.top=this.drawTop+'px';
+        div.innerHTML='[SKY] '+GEN_BITMAP_SKY_TYPE_NAMES[idx];
+        document.body.appendChild(div);
+
+        this.drawTop+=25;
+
+        canvas=document.createElement('canvas');
+        canvas.style.position="absolute";
+        canvas.style.left='5px';
+        canvas.style.top=this.drawTop+'px';
+        canvas.style.border='1px solid #000000';
+        canvas.width=this.bitmapWid;
+        canvas.height=this.bitmapHigh;
+
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
+
+        document.body.appendChild(canvas);
+
+        this.drawTop+=(this.bitmapHigh+5);
+        
+            // next bitmap
+            
+        idx++;
+        if (idx>=GEN_BITMAP_SKY_TYPE_NAMES.length) {
+            setTimeout(this.addBitmapParticles.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapSkies.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+        //
+        // particle bitmaps
+        //
+        
+    addBitmapParticles(idx)
+    {
+        var canvas,ctx,div;
+        var wid;
+        var debugBitmap;
+
+        wid=Math.trunc(this.bitmapWid/3);
+
+            // generate random bitmap
+
+        debugBitmap=this.genBitmapParticle.generate(null,GEN_BITMAP_PARTICLE_TYPE_NAMES[idx],idx);
+
+            // label
+
+        div=document.createElement('div');
+        div.style.position="absolute";
+        div.style.left='5px';
+        div.style.top=this.drawTop+'px';
+        div.innerHTML='[PARTICLE] '+GEN_BITMAP_PARTICLE_TYPE_NAMES[idx];
+        document.body.appendChild(div);
+
+        this.drawTop+=25;
+
+        canvas=document.createElement('canvas');
+        canvas.style.position="absolute";
+        canvas.style.left='5px';
+        canvas.style.top=this.drawTop+'px';
+        canvas.style.border='1px solid #000000';
+        canvas.width=this.bitmapWid;
+        canvas.height=this.bitmapHigh;
+
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
+
+        document.body.appendChild(canvas);
+
+        this.drawTop+=(this.bitmapHigh+5);
+        
+            // next bitmap
+            
+        idx++;
+        if (idx>=GEN_BITMAP_PARTICLE_TYPE_NAMES.length) {
+            setTimeout(this.addSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapSkies.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
    
         //
@@ -227,6 +335,8 @@ class MainDebugClass
             
         this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(config.SEED_BITMAP_MAP));
         this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
+        this.genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
+        this.genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_BITMAP_PARTICLE));
         
         this.debugSoundList=new SoundListClass();
         if (!this.debugSoundList.initialize()) {

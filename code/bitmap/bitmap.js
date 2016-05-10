@@ -109,5 +109,13 @@ class BitmapClass
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
+    
+    attachAsSky()
+    {
+        var gl=this.view.gl;
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+    }
 
 }

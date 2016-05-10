@@ -10,9 +10,17 @@ class SkyClass
     {
         this.skyShader=new SkyShaderClass();
 
-        this.skyVertices=new Float32Array(72);         // local to global to avoid GCd
-        this.skyUVs=new Float32Array(48);
+        this.vertexes=null;
+        this.uvs=null;
+        this.indexes=null;
+        
         this.vertexPosBuffer=null;
+        this.uvPosBuffer=null;
+        this.indexBuffer=null;
+        
+        this.topBitmap=null;
+        this.bottomBitmap=null;
+        this.sideBitmap=null;
         
         Object.seal(this);
     }
@@ -23,18 +31,45 @@ class SkyClass
 
     initialize(view,fileCache)
     {
+        var gl=view.gl;
+        var genBitmapSky;
+
         if (!this.skyShader.initialize(view,fileCache)) return(false);
         
-        this.vertexPosBuffer=view.gl.createBuffer();
+            // room enough for the 8 points of the cube
+            
+        this.vertexes=new Float32Array(24);
+        this.uvs=new Float32Array(16);
+        this.indexes=new Uint16Array(6*4);      //enough for 4 sides, the longest draw pattern we do
+        
+        this.vertexPosBuffer=gl.createBuffer();
+        this.uvPosBuffer=gl.createBuffer();
+        this.indexBuffer=gl.createBuffer();
+        
+            // create bitmaps
+        
+        genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
+        
+        this.topBitmap=genBitmapSky.generate(view,"Sky Top",GEN_BITMAP_SKY_TYPE_TOP);
+        this.bottomBitmap=genBitmapSky.generate(view,"Sky Bottom",GEN_BITMAP_SKY_TYPE_BOTTOM);
+        this.sideBitmap=genBitmapSky.generate(view,"Sky Side",GEN_BITMAP_SKY_TYPE_SIDE);
         
         return(true);
     }
 
     release(view)
     {
+        var gl=view.gl;
+
         view.gl.deleteBuffer(this.vertexPosBuffer);
+        view.gl.deleteBuffer(this.uvPosBuffer);
+        gl.deleteBuffer(this.indexBuffer);
         
-        this.interfaceShader.release(view);
+        this.topBitmap.close();
+        this.topBitmap.close();
+        this.sideBitmap.close();
+        
+        this.skyShader.release(view);
     }
 
         //
@@ -47,63 +82,108 @@ class SkyClass
         
         gl.disable(gl.DEPTH_TEST);
 
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-        this.interfaceShader.drawStart(view);
+        this.skyShader.drawStart(view);
     }
 
     drawEnd(view)
     {
         var gl=view.gl;
+        
+        this.skyShader.drawEnd(view);
 
-        this.interfaceShader.drawEnd(view);
-
-        gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }
-        
-    draw(view,rect,color,alpha)
+    
+    drawPlane(gl,cameraPos,vx0,vy0,vz0,vx1,vy1,vz1,vx2,vy2,vz2,vx3,vy3,vz3)
     {
-        /*
-        var gl=view.gl;
+        this.vertexes[0]=cameraPos.x+vx0;
+        this.vertexes[1]=cameraPos.y+vy0;
+        this.vertexes[2]=cameraPos.z+vz0;
         
-            // vertices
+        this.vertexes[3]=cameraPos.x+vx1;
+        this.vertexes[4]=cameraPos.y+vy1;
+        this.vertexes[5]=cameraPos.z+vz1;
+        
+        this.vertexes[6]=cameraPos.x+vx2;
+        this.vertexes[7]=cameraPos.y+vy2;
+        this.vertexes[8]=cameraPos.z+vz2;
+        
+        this.vertexes[9]=cameraPos.x+vx3;
+        this.vertexes[10]=cameraPos.y+vy3;
+        this.vertexes[11]=cameraPos.z+vz3;
+        
+        this.uvs[0]=0.0;
+        this.uvs[1]=0.0;
+        
+        this.uvs[2]=1.0;
+        this.uvs[3]=0.0;
+        
+        this.uvs[4]=1.0;
+        this.uvs[5]=1.0;
+        
+        this.uvs[6]=0.0;
+        this.uvs[7]=1.0;
+        
+        this.indexes[0]=0;
+        this.indexes[1]=1;
+        this.indexes[2]=3;
+        this.indexes[3]=1;
+        this.indexes[4]=2;
+        this.indexes[5]=3;
+        
+            // attach buffers
             
-        this.rectVertices[0]=rect.lft;
-        this.rectVertices[1]=rect.top;
-        this.rectVertices[2]=rect.rgt;
-        this.rectVertices[3]=rect.top;
-        this.rectVertices[4]=rect.lft;
-        this.rectVertices[5]=rect.bot;
-        
-        this.rectVertices[6]=rect.rgt;
-        this.rectVertices[7]=rect.top;
-        this.rectVertices[8]=rect.rgt;
-        this.rectVertices[9]=rect.bot;
-        this.rectVertices[10]=rect.lft;
-        this.rectVertices[11]=rect.bot;
-        
-            // setup the color
-            
-        gl.uniform4f(this.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
-
-            // setup the buffers
-
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertices,gl.STREAM_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER,this.vertexes,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.interfaceShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.skyShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
-            // draw the indexes
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.STREAM_DRAW);
+
+        gl.enableVertexAttribArray(this.skyShader.vertexUVAttribute);
+        gl.vertexAttribPointer(this.skyShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STREAM_DRAW);
+
+            // draw the plane
             
-        gl.drawArrays(gl.TRIANGLES,0,6);
+        gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+    }
+        
+    draw(view)
+    {
+        var gl=view.gl;
+        var cameraPos=view.camera.position;
+        var skyRadius=25000;
+        
+            // sides
+        
+        this.sideBitmap.attachAsSky();
+        
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius);
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius);        
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius);
+        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius);
+        
+            // top
+        
+        this.topBitmap.attachAsSky();
+        
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius);
+        
+            // bottom
+        
+        this.topBitmap.attachAsSky();
+        
+        this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius);
 
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
-        */
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
     }
     
 }

@@ -1823,5 +1823,4 @@ class GenBitmapUtilityClass
         this.drawRect(bitmapCTX,lft,yMid,xMid,bot,new wsColor(0,1,0));
         this.drawRect(bitmapCTX,xMid,yMid,rgt,bot,new wsColor(0,0,1));
     }
-
 }
