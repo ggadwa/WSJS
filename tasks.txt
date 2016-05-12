@@ -4,13 +4,7 @@ EMCA6 TODOs
 
 WHEN THERE IS AN INTERFACE TODOs
     [ ] close gl
-    [ ] map.release();
-    [ ] bitmapList.release();
-    [ ] soundList.release();
-    [ ] modelList.release();
-    [ ] entityList.release();
-    [ ] text.release();
-    [ ] debug.release();
+    [ ] all the object release()
 
 REGULAR TODOs
 
