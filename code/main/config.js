@@ -47,9 +47,9 @@ class ConfigClass
 
         this.STAIR_STEP_COUNT=10;
 
-        this.ROOM_CLOSETS=true;                       // turns on or off closets
-        this.ROOM_PLATFORMS=true;                      // turns on or off platforms
-        this.ROOM_LEDGES=true;                        // turns on or off ledges
+        this.ROOM_CLOSETS=true;                         // turns on or off closets
+        this.ROOM_PLATFORMS=true;                       // turns on or off platforms
+        this.ROOM_LEDGES=true;                          // turns on or off ledges
 
             //
             // pillars and decorations
@@ -67,7 +67,7 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=[0.0,0.0,0.0];           // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=[0.2,0.2,0.2];           // all over ambient light [r,g,b]
 
         this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above

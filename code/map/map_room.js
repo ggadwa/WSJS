@@ -18,6 +18,8 @@ class MapRoomClass
         this.zBound=zBound;
         this.hasStories=hasStories;
         this.level=level;
+        
+        this.openCeiling=false;
 
         this.blockGrid=null;
         this.platformGrid=null;

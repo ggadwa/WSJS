@@ -180,8 +180,11 @@ class GenMapClass
         }
         
             // the ceiling
-            
-        //this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.getBitmap('Map Ceiling'),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
+        
+        room.openCeiling=(this.genRandom.randomPercentage(0.5))&&(room.level!==0);
+        if (!room.openCeiling) {
+            this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.getBitmap('Map Ceiling'),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
+        }
         
         return(roomIdx);
     }
@@ -268,11 +271,13 @@ class GenMapClass
 
             // light fixture
 
-        var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
-        var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
-        var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-        this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.bitmapList.getBitmap('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
-
+        if (fixturePos!==null) {
+            var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
+            var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
+            var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
+            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.bitmapList.getBitmap('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
+        }
+        
             // the color
 
         red=config.MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
@@ -315,7 +320,7 @@ class GenMapClass
         
             // create the light
             
-        this.addGeneralLight(lightPos,fixturePos,intensity);
+        this.addGeneralLight(lightPos,(room.openCeiling?null:fixturePos),intensity);
     }
     
     addStairLight(xBound,yBound,zBound)
@@ -696,7 +701,7 @@ class GenMapClass
     
     buildRoomPillars()
     {
-        var n,pillar;
+        var n,room,pillar;
         var nRoom=this.map.rooms.length;
         
         if (!config.ROOM_PILLARS) return;
@@ -704,7 +709,8 @@ class GenMapClass
         pillar=new GenRoomPillarClass(this.view,this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            pillar.addPillars(this.map.rooms[n]);
+            room=this.map.rooms[n];
+            if (!room.openCeiling) pillar.addPillars(room);
         }
     }
         
