@@ -158,8 +158,9 @@ class GenMapClass
         room=this.map.rooms[roomIdx];
         
             // floor
-            
-        this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.getBitmap('Map Floor'),yBound,true,MESH_FLAG_ROOM_FLOOR));
+        
+        room.liquid=(this.genRandom.randomPercentage(0.1))&&(room.level!==1);
+        room.createMeshFloor(this.map,this.bitmapList.getBitmap('Map Floor'),yBound);
 
             // walls
             
@@ -167,10 +168,10 @@ class GenMapClass
         yStoryBound=yBound.copy();
             
         for (n=0;n!==storyCount;n++) {
-            mesh=room.createMeshWalls(roomBitmap,yStoryBound,MESH_FLAG_ROOM_WALL);
+            mesh=room.createMeshWalls(roomBitmap,yStoryBound);
 
             yFloorBound=new wsBound((yStoryBound.min-config.ROOM_FLOOR_DEPTH),yStoryBound.min);
-            mesh2=room.createMeshWalls(roomBitmap,yFloorBound,MESH_FLAG_ROOM_WALL);
+            mesh2=room.createMeshWalls(roomBitmap,yFloorBound);
             mesh.combineMesh(mesh2);
             
             this.map.addMesh(mesh);
@@ -182,9 +183,7 @@ class GenMapClass
             // the ceiling
         
         room.openCeiling=(this.genRandom.randomPercentage(0.5))&&(room.level!==0);
-        if (!room.openCeiling) {
-            this.map.addMesh(room.createMeshFloorOrCeiling(this.bitmapList.getBitmap('Map Ceiling'),yFloorBound,false,MESH_FLAG_ROOM_CEILING));
-        }
+        room.createMeshCeiling(this.map,this.bitmapList.getBitmap('Map Ceiling'),yFloorBound);
         
         return(roomIdx);
     }
@@ -309,7 +308,7 @@ class GenMapClass
         if (room.hasStories) lightY-=(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH);
         
         fixturePos=new wsPoint(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
-        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        lightPos=new wsPoint(fixturePos.x,(room.openCeiling?(fixturePos.y-100):(fixturePos.y+1100)),fixturePos.z);
         
             // intensity
             
@@ -569,6 +568,37 @@ class GenMapClass
             room.markDoorOnConnectionSide(connectSide,true);
         }
         
+            // if we are in a pool, we need to make stairs out
+            // to the connection point
+            
+        if (room.liquid) {
+            yStairBound=new wsBound(yBound.max,(yBound.max+config.ROOM_BLOCK_WIDTH));
+            
+            switch (connectSide) {
+                case ROOM_SIDE_LEFT:
+                    xStairBound=new wsBound(xBound.min,(xBound.min+config.ROOM_BLOCK_WIDTH));
+                    zStairBound=new wsBound((zBound.min+connectOffset),((zBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
+                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
+                    break;
+                case ROOM_SIDE_RIGHT:
+                    xStairBound=new wsBound((xBound.max-config.ROOM_BLOCK_WIDTH),xBound.max);
+                    zStairBound=new wsBound((zBound.min+connectOffset),((zBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
+                    yStairBound=new wsBound(yBound.max,(yBound.max+config.ROOM_BLOCK_WIDTH));
+                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
+                    break;
+                case ROOM_SIDE_TOP:
+                    xStairBound=new wsBound((xBound.min+connectOffset),((xBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
+                    zStairBound=new wsBound(zBound.min,(zBound.min+config.ROOM_BLOCK_WIDTH));
+                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
+                    break;
+                case ROOM_SIDE_BOTTOM:
+                    xStairBound=new wsBound((xBound.min+connectOffset),((xBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
+                    zStairBound=new wsBound((zBound.max-config.ROOM_BLOCK_WIDTH),zBound.max);
+                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
+                    break;
+            }
+        }
+        
             // mask off edges that have collided with
             // the newest room or stairs leading to a room
             // we use this mask to calculate ledges and other
@@ -658,7 +688,7 @@ class GenMapClass
         
     buildRoomClosets()
     {
-        var n,closet;
+        var n,room,closet;
         var nRoom=this.map.rooms.length;
         
         if (!config.ROOM_CLOSETS) return;
@@ -666,7 +696,8 @@ class GenMapClass
         closet=new GenRoomClosetClass(this.view,this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            closet.addCloset(this.map.rooms[n]);
+            room=this.map.rooms[n];
+            if (!room.liquid) closet.addCloset(room);
         }
     }
     
@@ -687,7 +718,7 @@ class GenMapClass
     
     buildRoomLedges()
     {
-        var n,ledge;
+        var n,room,ledge;
         var nRoom=this.map.rooms.length;
         
         if (!config.ROOM_LEDGES) return;
@@ -695,7 +726,8 @@ class GenMapClass
         ledge=new GenRoomLedgeClass(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            ledge.createLedges(this.map.rooms[n]);
+            room=this.map.rooms[n];
+            if (!room.liquid) ledge.createLedges(room);
         }
     }
     
@@ -710,13 +742,13 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
-            if (!room.openCeiling) pillar.addPillars(room);
+            if ((!room.openCeiling) && (!room.liquid)) pillar.addPillars(room);
         }
     }
         
     buildRoomDecorations()
     {
-        var n,decoration;
+        var n,room,decoration;
         var nRoom=this.map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;
@@ -724,7 +756,8 @@ class GenMapClass
         decoration=new GenRoomDecorationClass(this.view,this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            decoration.addDecorations(this.map.rooms[n]);
+            room=this.map.rooms[n];
+            if (!room.liquid) decoration.addDecorations(room);
         }
     }
 

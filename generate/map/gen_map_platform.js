@@ -186,11 +186,13 @@ class GenRoomPlatformClass
         stairX=this.genRandom.randomInt(1,(room.xBlockSize-2));
         stairZ=this.genRandom.randomInt(1,(room.zBlockSize-2));
         
-        if (this.genRandom.randomPercentage(0.5)) {
-            this.addStairChunk(room,stairX,stairZ,stairDir,platformBitmap);
-        }
-        else {
-            this.addLiftChunk(room,stairX,stairZ);
+        if (!room.liquid) {
+            if (this.genRandom.randomPercentage(0.5)) {
+                this.addStairChunk(room,stairX,stairZ,stairDir,platformBitmap);
+            }
+            else {
+                this.addLiftChunk(room,stairX,stairZ);
+            }
         }
         
             // expand from the platform

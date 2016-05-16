@@ -25,11 +25,14 @@ REGULAR TODOs
 
 #### monster speed/health random/projectile,no-projectile
 
+#### flying monsters
+
 #### projectiles
       - bounce, bounce factor (implement)
       - reflect (implement)
 
 #### more decorations
+      - can combine decorations in one room
       - benches?
       - cages (2 corners, top and bottom)
 #### closets more complex?
@@ -38,10 +41,11 @@ REGULAR TODOs
 
 #### can I pack lighting better?
 
-#### crazy wrap in the sky
 #### outside sections
-#### open ceilings
-      - new ceiling type
+#### water rooms
+      #### any door or connection gets extra steps
+      #### ^ move this to separate function
+      #### need liquid switch
 
 
 
@@ -49,7 +53,8 @@ REGULAR TODOs
 [X] monster cylinders now are around body size instead of complete size including limbs
 [X] better whips on blobs
 [X] started skybox texture generator and added skyboxes
-[ ] added open ceilings
+[X] added open ceilings
+[ ] added water rooms
 [ ] more decoration types
 [X] separated and cleaned up the code for all the different bitmap generation types, separated in debug mode
        

@@ -150,7 +150,13 @@ class SkyClass
 
             // draw the plane
             
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+        
         gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+        
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
     }
         
     draw(view)
@@ -171,15 +177,13 @@ class SkyClass
             // top
         
         this.topBitmap.attachAsSky();
-        
         this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius);
         
             // bottom
         
         this.topBitmap.attachAsSky();
-        
         this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius);
-
+        
             // remove the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
