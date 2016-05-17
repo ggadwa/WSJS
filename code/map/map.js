@@ -14,6 +14,7 @@ class MapClass
         this.lights=[];
         this.lightmaps=[];
         this.rooms=[];
+        this.liquids=[];
         
         this.movementList=new MovementListClass();
 
@@ -65,6 +66,8 @@ class MapClass
         this.meshes=[];
         this.lights=[];
         this.lightmaps=[];
+        this.rooms=[];
+        this.liquids=[];
     }
 
         //
@@ -90,6 +93,12 @@ class MapClass
     addLightmap(lightmap)
     {
         this.lightmaps.push(lightmap);
+    }
+    
+    addLiquid(liquid)
+    {
+        this.liquid.push(liquid);
+        return(this.liquids.length-1);
     }
     
         //

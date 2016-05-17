@@ -159,7 +159,7 @@ class GenMapClass
         
             // floor
         
-        room.liquid=(this.genRandom.randomPercentage(0.1))&&(room.level!==1);
+        room.liquid=(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1);
         room.createMeshFloor(this.map,this.bitmapList.getBitmap('Map Floor'),yBound);
 
             // walls
@@ -240,7 +240,9 @@ class GenMapClass
         this.map.addOverlayConnection(xStairBound,zStairBound);
     }
     
-        // doors
+        //
+        // doors and liquid steps
+        //
         
     addDoorRoom(connectSide,xDoorBound,yDoorBound,zDoorBound)
     {
@@ -258,6 +260,54 @@ class GenMapClass
             // add to overlay
             
         this.map.addOverlayConnection(xDoorBound,zDoorBound);
+    }
+    
+    addLiquidStairRoom(room,connectSide,xBound,zBound,flip)
+    {
+        var xStairBound,zStairBound;
+        var yStairBound=new wsBound(room.yBound.max,(room.yBound.max+config.ROOM_BLOCK_WIDTH));
+        var genRoomStairs=new GenRoomStairsClass(this.bitmapList,this.map,this.genRandom);
+        
+            // if there's a door, sometimes we need stairs
+            // on both sides of room, so we have a flipped version
+            
+        if (flip) {
+            switch (connectSide) {
+                case ROOM_SIDE_LEFT:
+                    connectSide=ROOM_SIDE_RIGHT;
+                    break;
+                case ROOM_SIDE_RIGHT:
+                    connectSide=ROOM_SIDE_LEFT;
+                    break;
+                case ROOM_SIDE_TOP:
+                    connectSide=ROOM_SIDE_BOTTOM;
+                    break;
+                case ROOM_SIDE_BOTTOM:
+                    connectSide=ROOM_SIDE_TOP;
+                    break;
+            }
+        }
+
+            // create the stairs
+            
+        switch (connectSide) {
+            case ROOM_SIDE_LEFT:
+                xStairBound=new wsBound(xBound.max,(xBound.max+config.ROOM_BLOCK_WIDTH));
+                genRoomStairs.createStairsX(xStairBound,yStairBound,zBound,true,false,false);
+                break;
+            case ROOM_SIDE_RIGHT:
+                xStairBound=new wsBound((xBound.min-config.ROOM_BLOCK_WIDTH),xBound.min);
+                genRoomStairs.createStairsX(xStairBound,yStairBound,zBound,true,false,true);
+                break;
+            case ROOM_SIDE_TOP:
+                zStairBound=new wsBound(zBound.max,(zBound.max+config.ROOM_BLOCK_WIDTH));
+                genRoomStairs.createStairsZ(xBound,yStairBound,zStairBound,true,false,false);
+                break;
+            case ROOM_SIDE_BOTTOM:
+                zStairBound=new wsBound((zBound.min-config.ROOM_BLOCK_WIDTH),zBound.min);
+                genRoomStairs.createStairsZ(xBound,yStairBound,zStairBound,true,false,true);
+                break;
+        }
     }
     
         //
@@ -568,35 +618,22 @@ class GenMapClass
             room.markDoorOnConnectionSide(connectSide,true);
         }
         
-            // if we are in a pool, we need to make stairs out
-            // to the connection point
+            // if we are in a liquid, we need to make stairs out
+            // to the connection point or complete stairs down into
+            // the liquid (depending on the stair direction, it's either
+            // this room or the previous room)
             
-        if (room.liquid) {
-            yStairBound=new wsBound(yBound.max,(yBound.max+config.ROOM_BLOCK_WIDTH));
-            
-            switch (connectSide) {
-                case ROOM_SIDE_LEFT:
-                    xStairBound=new wsBound(xBound.min,(xBound.min+config.ROOM_BLOCK_WIDTH));
-                    zStairBound=new wsBound((zBound.min+connectOffset),((zBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
-                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
-                    break;
-                case ROOM_SIDE_RIGHT:
-                    xStairBound=new wsBound((xBound.max-config.ROOM_BLOCK_WIDTH),xBound.max);
-                    zStairBound=new wsBound((zBound.min+connectOffset),((zBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
-                    yStairBound=new wsBound(yBound.max,(yBound.max+config.ROOM_BLOCK_WIDTH));
-                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
-                    break;
-                case ROOM_SIDE_TOP:
-                    xStairBound=new wsBound((xBound.min+connectOffset),((xBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
-                    zStairBound=new wsBound(zBound.min,(zBound.min+config.ROOM_BLOCK_WIDTH));
-                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
-                    break;
-                case ROOM_SIDE_BOTTOM:
-                    xStairBound=new wsBound((xBound.min+connectOffset),((xBound.min+connectOffset)+config.ROOM_BLOCK_WIDTH));
-                    zStairBound=new wsBound((zBound.max-config.ROOM_BLOCK_WIDTH),zBound.max);
-                    this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(connectionMode===ROOM_CONNECT_MODE_DOWN),level);
-                    break;
-            }
+        switch (connectionMode) {
+            case ROOM_CONNECT_MODE_UP:
+                if (lastRoom.liquid) this.addLiquidStairRoom(lastRoom,connectSide,xStairBound,zStairBound,false);
+                break;
+            case ROOM_CONNECT_MODE_DOWN:
+                if (room.liquid) this.addLiquidStairRoom(room,connectSide,xStairBound,zStairBound,true);
+                break;
+            case ROOM_CONNECT_MODE_DOOR:
+                if (room.liquid) this.addLiquidStairRoom(room,connectSide,xDoorBound,zDoorBound,true);
+                if (lastRoom.liquid) this.addLiquidStairRoom(lastRoom,connectSide,xDoorBound,zDoorBound,false);
+                break;
         }
         
             // mask off edges that have collided with

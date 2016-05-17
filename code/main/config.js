@@ -30,7 +30,7 @@ class ConfigClass
         this.ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
             //
-            // closets, platforms, ledges
+            // closets, platforms, ledges, liquids
             //
 
         this.ROOM_CLOSET_MAX_COUNT=5;                  // maximum number of possible closets in room
@@ -46,10 +46,13 @@ class ConfigClass
         this.ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
 
         this.STAIR_STEP_COUNT=10;
+        
+        this.ROOM_LIQUID_PERCENTAGE=0.3;                // what % of time a two story room can have a liquid
 
         this.ROOM_CLOSETS=true;                         // turns on or off closets
         this.ROOM_PLATFORMS=true;                       // turns on or off platforms
         this.ROOM_LEDGES=true;                          // turns on or off ledges
+        this.ROOM_LIQUIDS=true;                         // turns on or off liquids
 
             //
             // pillars and decorations
@@ -67,7 +70,7 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=[0.2,0.2,0.2];           // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=[0.5,0.5,0.5]; //[0.2,0.2,0.2];           // all over ambient light [r,g,b]
 
         this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above
@@ -86,8 +89,8 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=6;
-        this.MONSTER_ENTITY_COUNT=20;
+        this.MONSTER_TYPE_COUNT=1;
+        this.MONSTER_ENTITY_COUNT=0;
 
         this.MONSTER_AI_ON=false;
 
@@ -102,9 +105,9 @@ class ConfigClass
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_SKY=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=5; // Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_ENTITY=Math.trunc((Math.random()*this.SEED));
+        this.SEED_ENTITY=5; //Math.trunc((Math.random()*this.SEED));
         this.SEED_WEAPON=Math.trunc((Math.random()*this.SEED));
         this.SEED_PROJECTILE=Math.trunc((Math.random()*this.SEED));
         this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));

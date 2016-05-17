@@ -5,7 +5,6 @@
 
 // the files to cache
 
-
 class FileClass
 {
     constructor(name,data)
@@ -120,3 +119,9 @@ class FileCacheClass
         return(null);
     }
 }
+
+//
+// the file cache global
+//
+
+var fileCache=new FileCacheClass();

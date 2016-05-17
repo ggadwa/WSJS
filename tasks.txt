@@ -42,19 +42,29 @@ REGULAR TODOs
 #### can I pack lighting better?
 
 #### outside sections
-#### water rooms
-      #### any door or connection gets extra steps
-      #### ^ move this to separate function
-      #### need liquid switch
+#### liquid rooms
+#### implement swimming
 
+
+[ ] make a lot of objects global (map, view, there's only one, no need to pass around)
+
+        this.fileCache
+        this.view
+        this.bitmapList
+        this.soundList
+        this.map
+        this.modelList
+        this.entityList
+        this.input
+        this.debug
 
 
 
 [X] monster cylinders now are around body size instead of complete size including limbs
 [X] better whips on blobs
-[X] started skybox texture generator and added skyboxes
-[X] added open ceilings
-[ ] added water rooms
+[X] added skybox and liquid textures (need work, placeholders now)
+[X] add sky boxes and open ceilings
+[ ] added liquid rooms, plus connector stairs and lifts
 [ ] more decoration types
 [X] separated and cleaned up the code for all the different bitmap generation types, separated in debug mode
        

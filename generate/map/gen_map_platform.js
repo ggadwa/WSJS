@@ -89,13 +89,13 @@ class GenRoomPlatformClass
         // add lift chunk
         //
         
-    addLiftChunk(room,x,z)
+    addLiftChunk(room,x,z,extraY)
     {
         var meshIdx,movement;
         var liftBitmap=this.bitmapList.getBitmap('Map Metal');
         
         var xLiftBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
-        var yLiftBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),room.yBound.max);
+        var yLiftBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),(room.yBound.max+extraY));
         var zLiftBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
 
         meshIdx=this.map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_LIFT));
@@ -105,8 +105,8 @@ class GenRoomPlatformClass
         movement=new MovementClass(meshIdx,true,0);
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
         movement.addMove(new MoveClass(2000,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,config.ROOM_FLOOR_HEIGHT,0)));
-        movement.addMove(new MoveClass(2000,new wsPoint(0,config.ROOM_FLOOR_HEIGHT,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,(config.ROOM_FLOOR_HEIGHT+extraY),0)));
+        movement.addMove(new MoveClass(2000,new wsPoint(0,(config.ROOM_FLOOR_HEIGHT+extraY),0)));
         
         this.map.addMovement(movement); 
 
@@ -182,16 +182,21 @@ class GenRoomPlatformClass
             // find a spot for the steps or lifts and add
             // platforms are the first thing we do so we don't need
             // to check for open spots
+            
+            // liquid rooms always get lifts
         
         stairX=this.genRandom.randomInt(1,(room.xBlockSize-2));
         stairZ=this.genRandom.randomInt(1,(room.zBlockSize-2));
         
-        if (!room.liquid) {
+        if (room.liquid) {
+            this.addLiftChunk(room,stairX,stairZ,config.ROOM_BLOCK_WIDTH);
+        }
+        else {
             if (this.genRandom.randomPercentage(0.5)) {
                 this.addStairChunk(room,stairX,stairZ,stairDir,platformBitmap);
             }
             else {
-                this.addLiftChunk(room,stairX,stairZ);
+                this.addLiftChunk(room,stairX,stairZ,0);
             }
         }
         
