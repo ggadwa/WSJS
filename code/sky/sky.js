@@ -29,12 +29,12 @@ class SkyClass
         // initialize/release interface
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
         var gl=view.gl;
         var genBitmapSky;
 
-        if (!this.skyShader.initialize(view,fileCache)) return(false);
+        if (!this.skyShader.initialize()) return(false);
         
             // room enough for the 8 points of the cube
             
@@ -50,46 +50,46 @@ class SkyClass
         
         genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
         
-        this.topBitmap=genBitmapSky.generate(view,"Sky Top",GEN_BITMAP_SKY_TYPE_TOP);
-        this.bottomBitmap=genBitmapSky.generate(view,"Sky Bottom",GEN_BITMAP_SKY_TYPE_BOTTOM);
-        this.sideBitmap=genBitmapSky.generate(view,"Sky Side",GEN_BITMAP_SKY_TYPE_SIDE);
+        this.topBitmap=genBitmapSky.generate("Sky Top",GEN_BITMAP_SKY_TYPE_TOP,false);
+        this.bottomBitmap=genBitmapSky.generate("Sky Bottom",GEN_BITMAP_SKY_TYPE_BOTTOM,false);
+        this.sideBitmap=genBitmapSky.generate("Sky Side",GEN_BITMAP_SKY_TYPE_SIDE,false);
         
         return(true);
     }
 
-    release(view)
+    release()
     {
         var gl=view.gl;
 
-        view.gl.deleteBuffer(this.vertexPosBuffer);
-        view.gl.deleteBuffer(this.uvPosBuffer);
+        gl.deleteBuffer(this.vertexPosBuffer);
+        gl.deleteBuffer(this.uvPosBuffer);
         gl.deleteBuffer(this.indexBuffer);
         
         this.topBitmap.close();
         this.topBitmap.close();
         this.sideBitmap.close();
         
-        this.skyShader.release(view);
+        this.skyShader.release();
     }
 
         //
         // start/stop/draw interface
         //
 
-    drawStart(view)
+    drawStart()
     {
         var gl=view.gl;
         
         gl.disable(gl.DEPTH_TEST);
 
-        this.skyShader.drawStart(view);
+        this.skyShader.drawStart();
     }
 
-    drawEnd(view)
+    drawEnd()
     {
         var gl=view.gl;
         
-        this.skyShader.drawEnd(view);
+        this.skyShader.drawEnd();
 
         gl.enable(gl.DEPTH_TEST);
     }
@@ -159,7 +159,7 @@ class SkyClass
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
     }
         
-    draw(view)
+    draw()
     {
         var gl=view.gl;
         var cameraPos=view.camera.position;
@@ -191,3 +191,9 @@ class SkyClass
     }
     
 }
+
+//
+// the global sky object
+//
+
+var sky=new SkyClass();

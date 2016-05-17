@@ -18,14 +18,14 @@ class ModelListClass
         // initialize/release modelList
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
-        return(this.modelShader.initialize(view,fileCache));
+        return(this.modelShader.initialize());
     }
 
-    release(view)
+    release()
     {
-        this.modelShader.release(view);
+        this.modelShader.release();
     }
 
         //
@@ -63,13 +63,13 @@ class ModelListClass
         // clone models
         //
         
-    cloneModel(view,name)
+    cloneModel(name)
     {
         var model=this.getModel(name);
         if (model===null) return(null);
         
         var cloneModel=model.clone();
-        cloneModel.mesh.setupBuffers(view);
+        cloneModel.mesh.setupBuffers();
         
         this.models.push(cloneModel);
         

@@ -111,7 +111,7 @@ class FileCacheClass
     {
         var n;
         var nFile=this.files.length;
-
+        
         for (n=0;n!==nFile;n++) {
             if (this.files[n].name===name) return(this.files[n].data);
         }

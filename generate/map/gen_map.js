@@ -6,9 +6,8 @@
 
 class GenMapClass
 {
-    constructor(view,bitmapList,map,genRandom,callbackFunc)
+    constructor(bitmapList,map,genRandom,callbackFunc)
     {
-        this.view=view;
         this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
@@ -444,7 +443,7 @@ class GenMapClass
             // centered in the map
 
         if (lastRoom===null) {
-            var mapMid=Math.trunc(this.view.OPENGL_FAR_Z/2);
+            var mapMid=Math.trunc(view.OPENGL_FAR_Z/2);
 
             var halfSize=Math.trunc((xBlockSize/2)*config.ROOM_BLOCK_WIDTH);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
@@ -730,7 +729,7 @@ class GenMapClass
         
         if (!config.ROOM_CLOSETS) return;
         
-        closet=new GenRoomClosetClass(this.view,this.bitmapList,this.map,this.genRandom);
+        closet=new GenRoomClosetClass(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -775,7 +774,7 @@ class GenMapClass
         
         if (!config.ROOM_PILLARS) return;
         
-        pillar=new GenRoomPillarClass(this.view,this.bitmapList,this.map,this.genRandom);
+        pillar=new GenRoomPillarClass(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -790,7 +789,7 @@ class GenMapClass
         
         if (!config.ROOM_DECORATIONS) return;
         
-        decoration=new GenRoomDecorationClass(this.view,this.bitmapList,this.map,this.genRandom);
+        decoration=new GenRoomDecorationClass(this.bitmapList,this.map,this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -804,7 +803,7 @@ class GenMapClass
 
     build()
     {
-        this.view.loadingScreenDraw(0.12);
+        view.loadingScreenDraw(0.12);
         setTimeout(this.buildMapRooms.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -817,7 +816,7 @@ class GenMapClass
         
         this.buildMapRecursiveRoom(0,null,null,ROOM_CONNECT_MODE_NONE,0,0);
         
-        this.view.loadingScreenDraw(0.24);
+        view.loadingScreenDraw(0.24);
         setTimeout(this.buildMapClosets.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -829,7 +828,7 @@ class GenMapClass
         
             // finish with the callback
 
-        this.view.loadingScreenDraw(0.36);
+        view.loadingScreenDraw(0.36);
         setTimeout(this.buildMapPlatforms.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -841,7 +840,7 @@ class GenMapClass
         
             // finish with the callback
 
-        this.view.loadingScreenDraw(0.48);
+        view.loadingScreenDraw(0.48);
         setTimeout(this.buildMapLedges.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -853,7 +852,7 @@ class GenMapClass
         
             // finish with the callback
 
-        this.view.loadingScreenDraw(0.60);
+        view.loadingScreenDraw(0.60);
         setTimeout(this.buildMapRemoveSharedTriangles.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -865,7 +864,7 @@ class GenMapClass
         
             // finish with the callback
             
-        this.view.loadingScreenDraw(0.72);
+        view.loadingScreenDraw(0.72);
         setTimeout(this.buildMapDecorations.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -878,7 +877,7 @@ class GenMapClass
         
             // finish with the callback
             
-        this.view.loadingScreenDraw(0.84);
+        view.loadingScreenDraw(0.84);
         setTimeout(this.buildMapFinish.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -886,11 +885,11 @@ class GenMapClass
     {
             // overlay precalc
             
-        this.map.precalcOverlayDrawValues(this.view);
+        this.map.precalcOverlayDrawValues();
         
             // finish with the callback
             
-        this.view.loadingScreenDraw(1.0);
+        view.loadingScreenDraw(1.0);
         this.callbackFunc();
     }
 

@@ -106,12 +106,10 @@ class GetLightmapLastBlockClass
 
 class GenLightmapClass
 {
-    constructor(view,bitmapList,map,debug,generateLightmap,callbackFunc)
+    constructor(bitmapList,map,generateLightmap,callbackFunc)
     {
-        this.view=view;
         this.bitmapList=bitmapList;
         this.map=map;
-        this.debug=debug;
         this.generateLightmap=generateLightmap;
 
             // chunk is one block available to draw a light map
@@ -860,7 +858,7 @@ class GenLightmapClass
 
             // next mesh
 
-        this.view.loadingScreenDraw(meshIdx/(this.map.meshes.length+2.0));
+        view.loadingScreenDraw(meshIdx/(this.map.meshes.length+2.0));
         setTimeout(this.createLightmapForMesh.bind(this,meshIdx),PROCESS_TIMEOUT_MSEC);
     }
 
@@ -893,7 +891,7 @@ class GenLightmapClass
             // by a timer so we don't trigger the
             // script time out problem   
 
-        this.view.loadingScreenDraw(1.0/(nMesh+2.0));
+        view.loadingScreenDraw(1.0/(nMesh+2.0));
         setTimeout(this.createLightmapForMesh.bind(this,0),PROCESS_TIMEOUT_MSEC);
     }
 
@@ -914,7 +912,7 @@ class GenLightmapClass
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            this.bitmapList.addBitmap(new BitmapClass(this.view,('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
+            this.bitmapList.addBitmap(new BitmapClass(('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
         }
 
             // and set the light map on the meshes
@@ -931,13 +929,13 @@ class GenLightmapClass
 /*
         var y=2000;
         for (n=0;n!==this.lightmapList.length;n++) {
-            this.debug.displayCanvasData(this.lightmapList[n].canvas,10,y,1024,1024);
+            debug.displayCanvasData(this.lightmapList[n].canvas,10,y,1024,1024);
             y+=1034;
         }
 */
             // finish with the callback
 
-        this.view.loadingScreenDraw(1.0);
+        view.loadingScreenDraw(1.0);
         this.callbackFunc();
     }
 

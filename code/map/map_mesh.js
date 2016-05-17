@@ -112,7 +112,7 @@ class MapMeshClass
         // close mesh
         //
 
-    close(view)
+    close()
     {
         var gl=view.gl;
         
@@ -458,7 +458,7 @@ class MapMeshClass
         // move mesh
         //
         
-    move(view,movePnt)
+    move(movePnt)
     {
         var n;
         var nCollide;
@@ -506,7 +506,7 @@ class MapMeshClass
         // mesh binding
         //
 
-    setupBuffers(view)
+    setupBuffers()
     {
             // build the default data
             // from the vertex list
@@ -572,7 +572,7 @@ class MapMeshClass
         this.indexBuffer=gl.createBuffer();
     }
 
-    bindBuffers(view,mapShader)
+    bindBuffers(mapShader)
     {
         var gl=view.gl;
 
@@ -601,7 +601,7 @@ class MapMeshClass
         // update uncessarly
         //
         
-    updateBuffers(view)
+    updateBuffers()
     {
         var n,v,vIdx;
         var gl=view.gl;
@@ -634,7 +634,7 @@ class MapMeshClass
         // culled
         //
         
-    buildNonCulledTriangleIndexes(view)
+    buildNonCulledTriangleIndexes()
     {
         var n,v,idx;
         var trigToEyeVector=new wsPoint(0,0,0);
@@ -677,7 +677,7 @@ class MapMeshClass
         // mesh drawing
         //
 
-    draw(view)
+    draw()
     {
         var gl=view.gl;
 

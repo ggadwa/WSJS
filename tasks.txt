@@ -48,18 +48,15 @@ REGULAR TODOs
 
 [ ] make a lot of objects global (map, view, there's only one, no need to pass around)
 
-        this.fileCache
-        this.view
-        this.bitmapList
-        this.soundList
-        this.map
-        this.modelList
-        this.entityList
-        this.input
-        this.debug
+        bitmapList
+        soundList
+        map
+        modelList
+        input
 
 
 
+[X] some more code refactoring
 [X] monster cylinders now are around body size instead of complete size including limbs
 [X] better whips on blobs
 [X] added skybox and liquid textures (need work, placeholders now)

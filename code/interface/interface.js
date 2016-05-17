@@ -20,27 +20,27 @@ class InterfaceClass
         // initialize/release interface
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
-        if (!this.interfaceShader.initialize(view,fileCache)) return(false);
+        if (!this.interfaceShader.initialize()) return(false);
         
         this.vertexPosBuffer=view.gl.createBuffer();
         
         return(true);
     }
 
-    release(view)
+    release()
     {
         view.gl.deleteBuffer(this.vertexPosBuffer);
         
-        this.interfaceShader.release(view);
+        this.interfaceShader.release();
     }
 
         //
         // start/stop/draw interface
         //
 
-    drawStart(view)
+    drawStart()
     {
         var gl=view.gl;
         
@@ -49,20 +49,20 @@ class InterfaceClass
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-        this.interfaceShader.drawStart(view);
+        this.interfaceShader.drawStart();
     }
 
-    drawEnd(view)
+    drawEnd()
     {
         var gl=view.gl;
 
-        this.interfaceShader.drawEnd(view);
+        this.interfaceShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }
     
-    drawFrameRect(view,rect,color,alpha)
+    drawFrameRect(rect,color,alpha)
     {
         var gl=view.gl;
         
@@ -98,7 +98,7 @@ class InterfaceClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
     }
     
-    drawRect(view,rect,color,alpha)
+    drawRect(rect,color,alpha)
     {
         var gl=view.gl;
         

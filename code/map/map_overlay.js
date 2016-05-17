@@ -36,28 +36,32 @@ class MapOverlayClass
         // initialize/release overlay object
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
-        if (!this.mapOverlayShader.initialize(view,fileCache)) return(false);
+        var gl=view.gl;
         
-        this.roomVertexPosBuffer=view.gl.createBuffer();
-        this.extraVertexPosBuffer=view.gl.createBuffer();
-        this.entityVertexPosBuffer=view.gl.createBuffer();
+        if (!this.mapOverlayShader.initialize()) return(false);
+        
+        this.roomVertexPosBuffer=gl.createBuffer();
+        this.extraVertexPosBuffer=gl.createBuffer();
+        this.entityVertexPosBuffer=gl.createBuffer();
         
         this.entityVertices=new Float32Array(6);
         
         return(true);
     }
 
-    release(view)
+    release()
     {
-        view.gl.deleteBuffer(this.roomVertexPosBuffer);
-        view.gl.deleteBuffer(this.extraVertexPosBuffer);
-        view.gl.deleteBuffer(this.entityVertexPosBuffer);
+        var gl=view.gl;
+        
+        gl.deleteBuffer(this.roomVertexPosBuffer);
+        gl.deleteBuffer(this.extraVertexPosBuffer);
+        gl.deleteBuffer(this.entityVertexPosBuffer);
         
         this.entityVertices=null;
         
-        this.mapOverlayShader.release(view);
+        this.mapOverlayShader.release();
     }
         
         //
@@ -140,7 +144,7 @@ class MapOverlayClass
         // precalc the drawing values
         //
     
-    precalcDrawValues(view)
+    precalcDrawValues()
     {
         var n,idx,line;
         var xBound,yBound;
@@ -232,17 +236,17 @@ class MapOverlayClass
         // draw the map overlay
         //
         
-    draw(view,entityList)
+    draw()
     {
         var n;
         var gl=view.gl;
 
-        this.mapOverlayShader.drawStart(view);
+        this.mapOverlayShader.drawStart();
         gl.disable(gl.DEPTH_TEST);
         
             // extra lines
             
-        this.mapOverlayShader.drawColor(view,new wsColor(0.5,0.5,1.0));
+        this.mapOverlayShader.drawColor(new wsColor(0.5,0.5,1.0));
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -250,7 +254,7 @@ class MapOverlayClass
         
             // room lines
             
-        this.mapOverlayShader.drawColor(view,new wsColor(0.0,0.0,1.0));
+        this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,1.0));
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -277,7 +281,7 @@ class MapOverlayClass
             entity=entityList.getEntity(n);
             if (entity instanceof EntityProjectileClass) continue;
             
-            this.mapOverlayShader.drawColor(view,((n===0)?playerColor:monsterColor));       // index 0 is the player
+            this.mapOverlayShader.drawColor(((n===0)?playerColor:monsterColor));       // index 0 is the player
             
             ang=360.0-entity.angle.y;
         
@@ -308,7 +312,7 @@ class MapOverlayClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
 
         gl.enable(gl.DEPTH_TEST);
-        this.mapOverlayShader.drawEnd(view);
+        this.mapOverlayShader.drawEnd();
     }
     
 }

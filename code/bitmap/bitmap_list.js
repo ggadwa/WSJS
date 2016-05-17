@@ -6,9 +6,8 @@
 
 class BitmapListClass
 {
-    constructor(view)
+    constructor()
     {
-        this.view=view;
         this.bitmaps=null;
         
         Object.seal(this);

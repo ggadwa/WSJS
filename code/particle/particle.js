@@ -54,24 +54,28 @@ class ParticleClass
         // initialize and release particle
         //
         
-    initialize(view)
+    initialize()
     {
+        var gl=view.gl;
+        
         for (var n=0;n!==PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
             this.points.push(new wsPoint(0,0,0));
         }
 
-        this.vertexPosBuffer=view.gl.createBuffer();
-        this.vertexUVBuffer=view.gl.createBuffer();
-        this.indexBuffer=view.gl.createBuffer();
+        this.vertexPosBuffer=gl.createBuffer();
+        this.vertexUVBuffer=gl.createBuffer();
+        this.indexBuffer=gl.createBuffer();
     }
     
-    release(view)
+    release()
     {
+        var gl=view.gl;
+        
         this.points=[];
 
-        view.gl.deleteBuffer(this.vertexPosBuffer);
-        view.gl.deleteBuffer(this.vertexUVBuffer);
-        view.gl.deleteBuffer(this.indexBuffer);
+        gl.deleteBuffer(this.vertexPosBuffer);
+        gl.deleteBuffer(this.vertexUVBuffer);
+        gl.deleteBuffer(this.indexBuffer);
     }
     
         //
@@ -83,7 +87,7 @@ class ParticleClass
         return(this.count===0);
     }
     
-    timeout(view)
+    timeout()
     {
         if (view.timeStamp>this.endTimeStamp) this.count=0;
     }
@@ -156,7 +160,7 @@ class ParticleClass
         // point utilities
         //
         
-    createRandomGlobePoints(view,pointCount)
+    createRandomGlobePoints(pointCount)
     {
         var n,pnt;
         
@@ -175,7 +179,7 @@ class ParticleClass
         // draw single particle effect
         //
 
-    draw(view,particleShader)
+    draw(particleShader)
     {
         var n,pnt,vIdx,uvIdx,iIdx,elementIdx;
         var timeFactor,radius,moveFactor,r,g,b,alpha;

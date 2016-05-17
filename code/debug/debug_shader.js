@@ -21,67 +21,73 @@ class DebugShaderClass extends ShaderClass
         // initialize/release debug shader
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
+        var gl=view.gl;
+        
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,fileCache,'debug')) return(false);
+        if (!super.initialize('debug')) return(false);
 
             // setup uniforms
 
-        view.gl.useProgram(this.program);
+        gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
 
-        this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.program,'perspectiveMatrix');
-        this.modelMatrixUniform=view.gl.getUniformLocation(this.program,'modelMatrix');
+        this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
+        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         
-        this.colorUniform=view.gl.getUniformLocation(this.program,'color');
+        this.colorUniform=gl.getUniformLocation(this.program,'color');
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
 
         return(true);
     }
 
-    release(view)
+    release()
     {
-        super.release(view);
+        super.release();
     }
 
         //
         // start/stop debug drawing
         //
 
-    drawStart(view,color)
+    drawStart(color)
     {
+        var gl=view.gl;
+        
             // using the map shader
 
-        view.gl.useProgram(this.program);
+        gl.useProgram(this.program);
 
             // matrix
 
-        view.gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-        view.gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
+        gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
         
             // debug color
             
-        view.gl.uniform3f(this.colorUniform,color.r,color.g,color.b);
+        gl.uniform3f(this.colorUniform,color.r,color.g,color.b);
 
             // enable the vertex attributes
 
-        view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        gl.enableVertexAttribArray(this.vertexPositionAttribute);
     }
 
-    drawEnd(view)
+    drawEnd()
     {
+        var gl=view.gl;
+        
             // disable vertex attributes
 
-        view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.vertexPositionAttribute);
 
             // no longer using shader
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
     }
 }
 

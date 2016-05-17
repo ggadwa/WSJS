@@ -32,7 +32,7 @@ class WeaponClass
         // fire weapon
         //
         
-    fire(view,entityList,entity)
+    fire(entity)
     {
             // time to fire again?
             
@@ -50,24 +50,24 @@ class WeaponClass
         pos.addPoint(entity.position);
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        this.projectiles[0].fire(view,entityList,pos,ang);
+        this.projectiles[0].fire(pos,ang);
     }
     
         //
         // draw weapon
         //
 
-    drawStart(view)
+    drawStart()
     {
-        this.model.drawStart(view);
+        this.model.drawStart();
     }
 
-    drawEnd(view)
+    drawEnd()
     {
-        this.model.drawEnd(view);
+        this.model.drawEnd();
     }
 
-    draw(view,entity)
+    draw(entity)
     {
         var pos=entity.position;
         var angle=entity.angle;
@@ -89,11 +89,11 @@ class WeaponClass
             // move vertexes to reflect
             // angle and offset of weapon
             
-        this.model.mesh.updateVertexesToAngleAndPosition(view,this.handAngle,this.handOffset);
+        this.model.mesh.updateVertexesToAngleAndPosition(this.handAngle,this.handOffset);
         
             // draw the model
             
-        this.model.draw(view);
+        this.model.draw();
     }
 
 }

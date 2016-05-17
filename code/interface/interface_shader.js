@@ -20,58 +20,64 @@ class InterfaceShaderClass extends ShaderClass
         // initialize/release interface shader
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
+        var gl=view.gl;
+        
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,fileCache,'interface')) return(false);
+        if (!super.initialize('interface')) return(false);
 
             // setup uniforms
 
-        view.gl.useProgram(this.program);
+        gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
 
-        this.orthoMatrixUniform=view.gl.getUniformLocation(this.program,'orthoMatrix');    
-        this.colorUniform=view.gl.getUniformLocation(this.program,'color');
+        this.orthoMatrixUniform=gl.getUniformLocation(this.program,'orthoMatrix');    
+        this.colorUniform=gl.getUniformLocation(this.program,'color');
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
 
         return(true);
     }
 
-    release(view)
+    release()
     {
-        super.release(view);
+        super.release();
     }
 
         //
         // start/stop interface shader drawing
         //
 
-    drawStart(view)
+    drawStart()
     {
-        view.gl.useProgram(this.program);
+        var gl=view.gl;
+        
+        gl.useProgram(this.program);
 
             // setup the uniforms
 
-        view.gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
+        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
 
             // enable the vertex attributes
 
-        view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        gl.enableVertexAttribArray(this.vertexPositionAttribute);
     }
 
-    drawEnd(view)
+    drawEnd()
     {
+        var gl=view.gl;
+        
             // disable vertex attributes
 
-        view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.vertexPositionAttribute);
 
             // no longer using program
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
     }
 
 }

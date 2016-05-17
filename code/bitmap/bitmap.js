@@ -6,9 +6,8 @@
 
 class BitmapClass
 {
-    constructor(view,name,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
+    constructor(name,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
     {
-        this.view=view;
         this.name=name;
         this.texture=null;
         this.normalMap=null;
@@ -62,7 +61,7 @@ class BitmapClass
     
     close()
     {
-        var gl=this.view.gl;
+        var gl=view.gl;
 
         if (this.texture!==null) gl.deleteTexture(this.texture);
         if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
@@ -76,7 +75,7 @@ class BitmapClass
     
     attachAsTexture(mapShader)
     {
-        var gl=this.view.gl;
+        var gl=view.gl;
 
             // shine factor in shader
 
@@ -96,7 +95,7 @@ class BitmapClass
     
     attachAsLightmap()
     {
-        var gl=this.view.gl;
+        var gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -104,7 +103,7 @@ class BitmapClass
     
     attachAsParticle()
     {
-        var gl=this.view.gl;
+        var gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -112,7 +111,7 @@ class BitmapClass
     
     attachAsSky()
     {
-        var gl=this.view.gl;
+        var gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);

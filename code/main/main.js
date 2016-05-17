@@ -8,15 +8,11 @@ class MainClass
 {
     constructor()
     {
-        this.fileCache=new FileCacheClass();
-        this.view=new ViewClass();
-        this.bitmapList=new BitmapListClass(this.view);
+        this.bitmapList=new BitmapListClass();
         this.soundList=new SoundListClass();
         this.map=new MapClass();
         this.modelList=new ModelListClass();
-        this.entityList=new EntityListClass();
-        this.input=new InputClass(this.view,this.entityList);
-        this.debug=new DebugClass();
+        this.input=new InputClass();
         
         this.genBitmapMap=null;
         this.genBitmapModel=null;
@@ -59,7 +55,7 @@ class MainClass
 
     run()
     {
-        this.fileCache.fillCache(this.initGL.bind(this));       // this contains all the shader code, needs to be loaded first
+        fileCache.fillCache(this.initGL.bind(this));       // this contains all the shader code, needs to be loaded first
     }
 
     initGL()
@@ -67,14 +63,14 @@ class MainClass
             // init view
             // webgl and canvas stuff
 
-        if (!this.view.initialize(this.fileCache,"wsCanvas")) return;
+        if (!view.initialize("wsCanvas")) return;
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Initialized WebGL');
-        this.view.loadingScreenAddString('Initializing Internal Structures');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Initialized WebGL');
+        view.loadingScreenAddString('Initializing Internal Structures');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initInternal.bind(this),PROCESS_TIMEOUT_MSEC);
     }
@@ -83,10 +79,12 @@ class MainClass
     {
         if (!this.bitmapList.initialize()) return;
         if (!this.soundList.initialize()) return;
-        if (!this.map.initialize(this.view,this.fileCache)) return;
-        if (!this.modelList.initialize(this.view,this.fileCache)) return;
-        if (!this.entityList.initialize(this.view)) return;
-        if (!this.debug.initialize(this.view,this.fileCache)) return;
+        if (!this.map.initialize()) return;
+        if (!this.modelList.initialize()) return;
+        if (!sky.initialize()) return(false);
+        if (!entityList.initialize()) return;
+        if (!particleList.initialize()) return(false);
+        if (!debug.initialize()) return;
 
             // dynamic creation classes
 
@@ -96,9 +94,9 @@ class MainClass
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Map Textures');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Dynamic Map Textures');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildMapTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
     }
@@ -143,22 +141,22 @@ class MainClass
 
             // generate bitmap
 
-        this.bitmapList.addBitmap(this.genBitmapMap.generate(this.view,name,bitmapType));
+        this.bitmapList.addBitmap(this.genBitmapMap.generate(name,bitmapType,false));
 
             // if more textures, then loop back around
 
         idx++;
         if (idx<bitmapCount) {
-            this.view.loadingScreenDraw(idx/bitmapCount);
+            view.loadingScreenDraw(idx/bitmapCount);
             setTimeout(this.initBuildMapTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
             return;
         }
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Model Textures');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Dynamic Model Textures');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildModelTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
     }
@@ -171,22 +169,22 @@ class MainClass
 
             // generate bitmap
 
-        this.bitmapList.addBitmap(this.genBitmapModel.generate(this.view,('Monster '+idx),bitmapType));
+        this.bitmapList.addBitmap(this.genBitmapModel.generate(('Monster '+idx),bitmapType,false));
 
             // if more textures, then loop back around
 
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
-            this.view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);
+            view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);
             setTimeout(this.initBuildModelTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
             return;
         }
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Sounds');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Dynamic Sounds');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
     }
@@ -202,37 +200,37 @@ class MainClass
 
              // generate sound
 
-        this.soundList.addSound(this.genSound.generate(name,generateType));
+        this.soundList.addSound(this.genSound.generate(name,generateType,false));
 
             // if more textures, then loop back around
 
         idx++;
         if (idx<soundCount) {
-            this.view.loadingScreenDraw(idx/soundCount);
+            view.loadingScreenDraw(idx/soundCount);
             setTimeout(this.initBuildSounds.bind(this,idx),PROCESS_TIMEOUT_MSEC);
             return;
         }
 
                 // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Map');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Dynamic Map');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildMap.bind(this),PROCESS_TIMEOUT_MSEC);
     }
 
     initBuildMap()
     {
-        var genMap=new GenMapClass(this.view,this.bitmapList,this.map,new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
+        var genMap=new GenMapClass(this.bitmapList,this.map,new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 
     initBuildMapFinish()
     {
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Building Collision Geometry');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Building Collision Geometry');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildCollisionGeometry.bind(this),PROCESS_TIMEOUT_MSEC);
     }
@@ -241,7 +239,7 @@ class MainClass
     {
             // build the collision geometry
 
-        this.map.buildCollisionGeometry(this.view);
+        this.map.buildCollisionGeometry();
 
             // build the light/mesh intersection lists
 
@@ -249,9 +247,9 @@ class MainClass
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Building Light Map');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Building Light Map');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildLightmap.bind(this),PROCESS_TIMEOUT_MSEC);
     }
@@ -262,7 +260,7 @@ class MainClass
             // light maps are a long running
             // process so we need a callback
 
-        var genLightmap=new GenLightmapClass(this.view,this.bitmapList,this.map,this.debug,config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
+        var genLightmap=new GenLightmapClass(this.bitmapList,this.map,config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
         genLightmap.create();
     }
 
@@ -270,9 +268,9 @@ class MainClass
     {
         var modelGenRandom=new GenRandomClass(config.SEED_MODEL);
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Models');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Dynamic Models');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildModelsMesh.bind(this,0,modelGenRandom),PROCESS_TIMEOUT_MSEC);
     }
@@ -302,13 +300,13 @@ class MainClass
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap,modelGenRandom);
-        genModelMesh.build(this.view);
+        genModelMesh.build();
 
         this.modelList.addModel(model);
 
             // if more models, then loop back around
 
-        this.view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);    
+        view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);    
 
         idx++;
         if (idx<(config.MONSTER_TYPE_COUNT+1)) {
@@ -318,9 +316,9 @@ class MainClass
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Weapons');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Dynamic Weapons');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildWeapons.bind(this,modelGenRandom),PROCESS_TIMEOUT_MSEC);
     }
@@ -334,7 +332,7 @@ class MainClass
         var model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
 
         var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap,modelGenRandom);
-        genModelWeaponMesh.build(this.view);
+        genModelWeaponMesh.build();
 
         this.modelList.addModel(model);
 
@@ -343,15 +341,15 @@ class MainClass
         var model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
 
         var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap,modelGenRandom);
-        genModelProjectileMesh.build(this.view);
+        genModelProjectileMesh.build();
 
         this.modelList.addModel(model);
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Entities');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Dynamic Entities');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildEntities.bind(this),PROCESS_TIMEOUT_MSEC);
     }
@@ -380,7 +378,7 @@ class MainClass
         playerEntity.addWeapon(playerWeapon);
         playerEntity.setCurrentWeaponIndex(0);
 
-        this.entityList.setPlayer(playerEntity);
+        entityList.setPlayer(playerEntity);
         
             // create AI type for each monster
         
@@ -399,16 +397,16 @@ class MainClass
             if (pos===null) continue;
             
             monsterType=entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);
-            model=this.modelList.cloneModel(this.view,('monster_'+monsterType));
+            model=this.modelList.cloneModel(('monster_'+monsterType));
 
-            this.entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
 
             // finished
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Running');
-        this.view.loadingScreenDraw(null);
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Running');
+        view.loadingScreenDraw(null);
 
         setTimeout(this.initFinish.bind(this),PROCESS_TIMEOUT_MSEC);    
     }
@@ -418,27 +416,27 @@ class MainClass
             // finish by setting up all the mesh
             // buffers and indexes
 
-        this.map.setupBuffers(this.view);
+        this.map.setupBuffers();
 
             // ambient
 
-        this.view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT[0],config.MAP_LIGHT_AMBIENT[1],config.MAP_LIGHT_AMBIENT[2]);
+        view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT[0],config.MAP_LIGHT_AMBIENT[1],config.MAP_LIGHT_AMBIENT[2]);
         
             // make sure there's an initial sound position
             
-        this.soundList.setListenerToEntity(this.entityList.getPlayer());
+        this.soundList.setListenerToEntity(entityList.getPlayer());
 
             // start the input
 
-        this.input.initialize(this.entityList.getPlayer());
+        this.input.initialize(entityList.getPlayer());
         
             // the cancel loop flag
             
-        this.view.loopCancel=false;
+        view.loopCancel=false;
         
             // start the main loop in paused mode
 
-        this.view.setPauseState(this.input,true,true);
+        view.setPauseState(this.input,true,true);
         
             // and now start the loop
             
@@ -458,11 +456,8 @@ var main=new MainClass();
 
 function mainLoop(timeStamp)
 {
-    var view=main.view;
     var map=main.map;
-    var entityList=main.entityList;
     var soundList=main.soundList;
-    var debug=main.debug;
     
         // next frame
         
@@ -488,7 +483,7 @@ function mainLoop(timeStamp)
         view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
 
         if (view.physicsTick>PHYSICS_MILLISECONDS) {
-            map.runMovements(view,entityList);
+            map.runMovements();
 
             if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
@@ -496,7 +491,7 @@ function mainLoop(timeStamp)
                     view.physicsTick-=PHYSICS_MILLISECONDS;
                     view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
 
-                    entityList.run(view,map);
+                    entityList.run(map);
                 }
             }
             else {
@@ -517,7 +512,7 @@ function mainLoop(timeStamp)
     if (view.drawTick>DRAW_MILLISECONDS) {
         view.lastDrawTimeStamp=view.timeStamp; 
 
-        view.draw(map,entityList,debug);
+        view.draw(map);
         
         view.fpsTotal+=view.drawTick;
         view.fpsCount++;

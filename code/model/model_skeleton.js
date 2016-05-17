@@ -331,7 +331,7 @@ class ModelSkeletonClass
         }
     }
     
-    animate(view)
+    animate()
     {
         var n,bone;
         var nBone=this.bones.length;
@@ -357,7 +357,7 @@ class ModelSkeletonClass
         // pose utilities
         //
         
-    poseSetLeg(view,limb,walking)
+    poseSetLeg(limb,walking)
     {
         var r,backLeg;
 
@@ -379,7 +379,7 @@ class ModelSkeletonClass
         }
     }
     
-    poseSetArm(view,limb,armAngle,walking)
+    poseSetArm(limb,armAngle,walking)
     {
         var r,z,backArm;
 
@@ -395,7 +395,7 @@ class ModelSkeletonClass
         this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0.0,(r*0.5),(z*0.9));
     }
     
-    poseSetBody(view,limb,startAng,extraAng)
+    poseSetBody(limb,startAng,extraAng)
     {
         var n,x;
         var nBone=limb.boneIndexes.length;
@@ -409,7 +409,7 @@ class ModelSkeletonClass
         }
     }
     
-    poseSetWhip(view,limb)
+    poseSetWhip(limb)
     {
         var n,x,z;
         var nBone=limb.boneIndexes.length;
@@ -432,7 +432,7 @@ class ModelSkeletonClass
         // walk poses
         //
         
-    walkNextPose(view,modelType)
+    walkNextPose(modelType)
     {
         var n,limb;
         var nLimb=this.limbs.length;
@@ -446,34 +446,34 @@ class ModelSkeletonClass
             switch (limb.limbType) {
                 case LIMB_TYPE_BODY:
                     if (modelType==MODEL_TYPE_HUMANOID) {
-                        this.poseSetBody(view,limb,5.0,5.0);
+                        this.poseSetBody(limb,5.0,5.0);
                         break;
                     }
                     if (modelType===MODEL_TYPE_BLOB) {
-                        this.poseSetBody(view,limb,15.0,30.0);
+                        this.poseSetBody(limb,15.0,30.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_HEAD:
                     if (modelType===MODEL_TYPE_ANIMAL) {
-                        this.poseSetBody(view,limb,5.0,15.0);
+                        this.poseSetBody(limb,5.0,15.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_LEG_LEFT:
                 case LIMB_TYPE_LEG_RIGHT:
-                    this.poseSetLeg(view,limb,true);
+                    this.poseSetLeg(limb,true);
                     break;
                 case LIMB_TYPE_ARM_LEFT:
-                    this.poseSetArm(view,limb,armLeftZAngle,true);
+                    this.poseSetArm(limb,armLeftZAngle,true);
                     armLeftZAngle+=5.0;
                     break;
                 case LIMB_TYPE_ARM_RIGHT:
-                    this.poseSetArm(view,limb,armRightZAngle,true);
+                    this.poseSetArm(limb,armRightZAngle,true);
                     armRightZAngle+=5.0;
                     break;
                 case LIMB_TYPE_WHIP:
-                    this.poseSetWhip(view,limb);
+                    this.poseSetWhip(limb);
                     break;
             }
         }
@@ -481,7 +481,7 @@ class ModelSkeletonClass
         this.lastAnimationFlip=!this.lastAnimationFlip;
     }
     
-    walkPose(view,modelType)
+    walkPose(modelType)
     {
             // time for a new pose?
             
@@ -499,14 +499,14 @@ class ModelSkeletonClass
             // construct new pose
 
         this.clearNextPose();
-        this.walkNextPose(view,modelType);
+        this.walkNextPose(modelType);
     }
     
         //
         // idle poses
         //
         
-    idleNextPose(view,modelType)
+    idleNextPose(modelType)
     {
         var n,limb;
         var nLimb=this.limbs.length;
@@ -520,34 +520,34 @@ class ModelSkeletonClass
             switch (limb.limbType) {
                 case LIMB_TYPE_BODY:
                     if (modelType==MODEL_TYPE_HUMANOID) {
-                        this.poseSetBody(view,limb,3.0,3.0);
+                        this.poseSetBody(limb,3.0,3.0);
                         break;
                     }
                     if (modelType===MODEL_TYPE_BLOB) {
-                        this.poseSetBody(view,limb,5.0,5.0);
+                        this.poseSetBody(limb,5.0,5.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_HEAD:
                     if (modelType===MODEL_TYPE_ANIMAL) {
-                        this.poseSetBody(view,limb,0.0,10.0);
+                        this.poseSetBody(limb,0.0,10.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_LEG_LEFT:
                 case LIMB_TYPE_LEG_RIGHT:
-                    this.poseSetLeg(view,limb,false);
+                    this.poseSetLeg(limb,false);
                     break;
                 case LIMB_TYPE_ARM_LEFT:
-                    this.poseSetArm(view,limb,armLeftZAngle,false);
+                    this.poseSetArm(limb,armLeftZAngle,false);
                     armLeftZAngle+=5.0;
                     break;
                 case LIMB_TYPE_ARM_RIGHT:
-                    this.poseSetArm(view,limb,armRightZAngle,false);
+                    this.poseSetArm(limb,armRightZAngle,false);
                     armRightZAngle+=5.0;
                     break;
                 case LIMB_TYPE_WHIP:
-                    this.poseSetWhip(view,limb);
+                    this.poseSetWhip(limb);
                     break;
             }
         }
@@ -555,7 +555,7 @@ class ModelSkeletonClass
         this.lastAnimationFlip=!this.lastAnimationFlip;
     }
         
-    idlePose(view,modelType)
+    idlePose(modelType)
     {
             // time for a new pose?
             
@@ -573,7 +573,7 @@ class ModelSkeletonClass
             // construct new pose
 
         this.clearNextPose();
-        this.idleNextPose(view,modelType);
+        this.idleNextPose(modelType);
     }
 
 }

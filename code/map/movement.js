@@ -45,7 +45,7 @@ class MovementClass
         this.moves.push(move);
     }
     
-    run(view,map,entityList)
+    run(map)
     {
         var mesh,isOpen,prevIdx;
         var f,move;
@@ -124,7 +124,7 @@ class MovementClass
         
             // do the move
         
-        mesh.move(view,this.movePnt);
+        mesh.move(this.movePnt);
         
             // and any effected entity
             

@@ -37,7 +37,7 @@ class GenBitmapSkyClass
         // generate mainline
         //
 
-    generate(view,name,generateType)
+    generate(name,generateType,inDebug)
     {
         var wid,high;
         var bitmapCanvas,bitmapCTX;
@@ -70,18 +70,15 @@ class GenBitmapSkyClass
 
         }
 
-            // if view is null, then we are in the special
-            // debug main, which just displays the canvases, so send
+            // debug just displays the canvases, so send
             // them back
         
-        if (view===null) {
-            return({bitmap:bitmapCanvas,normal:null,specular:null});
-        }
+        if (inDebug) return({bitmap:bitmapCanvas,normal:null,specular:null});
         
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(view,name,bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+        return(new BitmapClass(name,bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
     }
 
 }

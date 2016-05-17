@@ -34,29 +34,31 @@ class ShaderClass
         // initialize/release shader
         //
 
-    initialize(view,fileCache,name)
+    initialize(name)
     {
+        var gl=view.gl;
+        
             // get the shaders from divs
 
-        if (!this.loadVertexShader(view,fileCache,name)) {
+        if (!this.loadVertexShader(name)) {
             this.release();
             return(false);
         }
 
-        if (!this.loadFragmentShader(view,fileCache,name)) {
+        if (!this.loadFragmentShader(name)) {
             this.release();
             return(false);
         }
 
             // compile the program
 
-        this.program=view.gl.createProgram();
-        view.gl.attachShader(this.program,this.vertexShader);
-        view.gl.attachShader(this.program,this.fragmentShader);
-        view.gl.linkProgram(this.program);
+        this.program=gl.createProgram();
+        gl.attachShader(this.program,this.vertexShader);
+        gl.attachShader(this.program,this.fragmentShader);
+        gl.linkProgram(this.program);
 
-        if (!view.gl.getProgramParameter(this.program,view.gl.LINK_STATUS)) {
-            this.errorAlert(name,"program",view.gl.getProgramInfoLog(this.program));
+        if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
+            this.errorAlert(name,"program",gl.getProgramInfoLog(this.program));
             this.release();
             return(false);
         }
@@ -64,21 +66,23 @@ class ShaderClass
         return(true);
     }
 
-    release(view)
+    release()
     {
+        var gl=view.gl;
+        
         if (this.program===null) return;
 
         if (this.vertexShader!==null) {
-            view.gl.detachShader(this.program,this.vertexShader);
-            view.gl.deleteShader(this.vertexShader);
+            gl.detachShader(this.program,this.vertexShader);
+            gl.deleteShader(this.vertexShader);
         }
 
         if (this.fragmentShader!==null) {
-            view.gl.detachShader(this.program,this.fragmentShader);
-            view.gl.deleteShader(this.fragmentShader);
+            gl.detachShader(this.program,this.fragmentShader);
+            gl.deleteShader(this.fragmentShader);
         }
 
-        view.gl.deleteProgram(this.program);
+        gl.deleteProgram(this.program);
 
         this.vertexShader=null;
         this.fragmentShader=null;
@@ -89,31 +93,35 @@ class ShaderClass
         // load shaders
         //
     
-    loadVertexShader(view,fileCache,name)
+    loadVertexShader(name)
     {
-        this.vertexShader=view.gl.createShader(view.gl.VERTEX_SHADER);
+        var gl=view.gl;
+        
+        this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
 
         var source=fileCache.getFile('shaders/'+name+'.vert');
-        view.gl.shaderSource(this.vertexShader,source);
-        view.gl.compileShader(this.vertexShader);
+        gl.shaderSource(this.vertexShader,source);
+        gl.compileShader(this.vertexShader);
 
-        if (view.gl.getShaderParameter(this.vertexShader,view.gl.COMPILE_STATUS)) return(true);
+        if (gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) return(true);
 
-        this.errorAlert(name,"vertex",view.gl.getShaderInfoLog(this.vertexShader));
+        this.errorAlert(name,"vertex",gl.getShaderInfoLog(this.vertexShader));
         return(false);
     }
 
-    loadFragmentShader(view,fileCache,name)
+    loadFragmentShader(name)
     {
-        this.fragmentShader=view.gl.createShader(view.gl.FRAGMENT_SHADER);
+        var gl=view.gl;
+        
+        this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
 
         var source=fileCache.getFile('shaders/'+name+'.frag');
-        view.gl.shaderSource(this.fragmentShader,source);
-        view.gl.compileShader(this.fragmentShader);
+        gl.shaderSource(this.fragmentShader,source);
+        gl.compileShader(this.fragmentShader);
 
-        if (view.gl.getShaderParameter(this.fragmentShader,view.gl.COMPILE_STATUS)) return(true);
+        if (gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) return(true);
 
-        this.errorAlert(name,"fragment",view.gl.getShaderInfoLog(this.fragmentShader));
+        this.errorAlert(name,"fragment",gl.getShaderInfoLog(this.fragmentShader));
         return(false);
     }
    

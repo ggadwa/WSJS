@@ -31,12 +31,12 @@ class MapShaderClass extends ShaderClass
         // initialize/release map shader
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,fileCache,'map')) return(false);
+        if (!super.initialize('map')) return(false);
 
             // setup uniforms
 
@@ -78,16 +78,16 @@ class MapShaderClass extends ShaderClass
         return(true);
     }
 
-    release(view)
+    release()
     {
-        super.release(view);
+        super.release();
     }
 
         //
         // start/stop map shader drawing
         //
 
-    drawStart(view)
+    drawStart()
     {
         var n;
         var light,viewLight;
@@ -142,7 +142,7 @@ class MapShaderClass extends ShaderClass
         gl.enableVertexAttribArray(this.vertexAndLightmapUVAttribute);
     }
 
-    drawEnd(view)
+    drawEnd()
     {
         var gl=view.gl;
 

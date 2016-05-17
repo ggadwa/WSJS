@@ -44,7 +44,7 @@ class EntityMonsterClass extends EntityClass
         // run monster
         //
     
-    run(view,map,entityList)
+    run(map)
     {
         var player;
         
@@ -58,20 +58,20 @@ class EntityMonsterClass extends EntityClass
         }
         
         if (!this.active) {
-            this.model.skeleton.idlePose(view,this.model.modelType);
+            this.model.skeleton.idlePose(this.model.modelType);
         }
         else {
             
                 // pose
             
-            this.model.skeleton.walkPose(view,this.model.modelType);
+            this.model.skeleton.walkPose(this.model.modelType);
         
                 // turn and move towards player if
                 // not falling
                 
             if (!super.isFalling()) {
                 super.turnTowards(player.angle.y,1.0);
-                super.moveSimple(map,entityList,-50,true);
+                super.moveSimple(map,-50,true);
             }
         }
         
@@ -94,7 +94,7 @@ class EntityMonsterClass extends EntityClass
                 pos.addPoint(this.position);
                 pos.y-=2000;        // supergumba -- all this is hardcoded!
 
-                this.ai.projectile.fire(view,entityList,pos,ang);
+                this.ai.projectile.fire(pos,ang);
             }
         }
     }

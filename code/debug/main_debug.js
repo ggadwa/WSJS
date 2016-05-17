@@ -40,7 +40,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapMap.generate(null,GEN_BITMAP_MAP_TYPE_NAMES[idx],idx);
+        debugBitmap=this.genBitmapMap.generate(GEN_BITMAP_MAP_TYPE_NAMES[idx],idx,true);
 
             // label
 
@@ -95,7 +95,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapModel.generate(null,GEN_BITMAP_MODEL_TYPE_NAMES[idx],idx);
+        debugBitmap=this.genBitmapModel.generate(GEN_BITMAP_MODEL_TYPE_NAMES[idx],idx,true);
 
             // label
 
@@ -150,7 +150,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapSky.generate(null,GEN_BITMAP_SKY_TYPE_NAMES[idx],idx);
+        debugBitmap=this.genBitmapSky.generate(GEN_BITMAP_SKY_TYPE_NAMES[idx],idx,true);
 
             // label
 
@@ -203,7 +203,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapParticle.generate(null,GEN_BITMAP_PARTICLE_TYPE_NAMES[idx],idx);
+        debugBitmap=this.genBitmapParticle.generate(GEN_BITMAP_PARTICLE_TYPE_NAMES[idx],idx,true);
 
             // label
 
@@ -286,7 +286,7 @@ class MainDebugClass
         
             // generate random sound
 
-        debugSound=this.genSound.generate(GEN_SOUND_TYPE_NAMES[idx],idx);
+        debugSound=this.genSound.generate(GEN_SOUND_TYPE_NAMES[idx],idx,true);
         this.debugSoundList.addSound(debugSound);      // so we can play later
 
             // label
@@ -351,6 +351,11 @@ class MainDebugClass
         this.addBitmapMaps(0);
     }
 }
+
+//
+// the global main debug object
+// and the debug runner
+//
 
 var mainDebug=new MainDebugClass();
 

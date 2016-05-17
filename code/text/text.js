@@ -32,13 +32,13 @@ class TextClass
         // initialize/release text
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
         var x,y,yAdd,cIdx,charStr,ch;
 
             // start the shader
 
-        if (!this.textShader.initialize(view,fileCache)) return(false);
+        if (!this.textShader.initialize()) return(false);
 
             // setup the canvas
 
@@ -106,7 +106,7 @@ class TextClass
         return(true);
     }
 
-    release(view)
+    release()
     {
         var gl=view.gl;
         
@@ -123,7 +123,7 @@ class TextClass
             // shut down the texture
             // and shader
 
-        this.textShader.release(view);
+        this.textShader.release();
         gl.deleteTexture(this.fontTexture);
     }
     
@@ -154,7 +154,7 @@ class TextClass
         // start/stop/draw text
         //
 
-    drawStart(view)
+    drawStart()
     {
         var gl=view.gl;
 
@@ -163,20 +163,20 @@ class TextClass
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-        this.textShader.drawStart(view);
+        this.textShader.drawStart();
     }
 
-    drawEnd(view)
+    drawEnd()
     {
         var gl=view.gl;
 
-        this.textShader.drawEnd(view);
+        this.textShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }
 
-    draw(view,x,y,charWid,charHigh,str,align,color)
+    draw(x,y,charWid,charHigh,str,align,color)
     {
         var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
         var cIdx,gx,gy,gxAdd,gyAdd;
@@ -294,10 +294,10 @@ class TextClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
     }
     
-    drawWithShadow(view,x,y,charWid,charHigh,str,align,color)
+    drawWithShadow(x,y,charWid,charHigh,str,align,color)
     {
-        this.draw(view,(x+1),(y+1),charWid,charHigh,str,align,this.shadowColor);
-        this.draw(view,x,y,charWid,charHigh,str,align,color);
+        this.draw((x+1),(y+1),charWid,charHigh,str,align,this.shadowColor);
+        this.draw(x,y,charWid,charHigh,str,align,color);
     }
 
 

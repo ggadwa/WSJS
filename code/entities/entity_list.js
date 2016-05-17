@@ -18,7 +18,7 @@ class EntityListClass
         // initialize/release entityList
         //
 
-    initialize(view)
+    initialize()
     {
             // first entity is always the player
             // so reserve it
@@ -28,7 +28,7 @@ class EntityListClass
         return(true);
     }
 
-    release(view)
+    release()
     {
     }
 
@@ -94,7 +94,7 @@ class EntityListClass
         // run all entities
         //
         
-    run(view,map)
+    run(map)
     {
         var n;
         var nEntity=this.entities.length;
@@ -102,7 +102,7 @@ class EntityListClass
             // run the entities
             
         for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(view,map,this);
+            this.entities[n].run(map,this);
         }
         
             // now clean up any that got
@@ -122,3 +122,8 @@ class EntityListClass
 
 }
     
+//
+// the global entitylist
+//
+
+var entityList=new EntityListClass();

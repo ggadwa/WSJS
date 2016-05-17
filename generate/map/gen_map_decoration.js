@@ -6,9 +6,8 @@
 
 class GenRoomDecorationClass
 {
-    constructor(view,bitmapList,map,genRandom)
+    constructor(bitmapList,map,genRandom)
     {    
-        this.view=view;
         this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;

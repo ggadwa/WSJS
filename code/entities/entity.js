@@ -77,7 +77,7 @@ class EntityClass
         // move entity
         //
     
-    moveComplex(map,entityList,dist,extraAngle,bump,flying,clipping)
+    moveComplex(map,dist,extraAngle,bump,flying,clipping)
     {
         var angY=this.angle.y+extraAngle;
         
@@ -111,7 +111,7 @@ class EntityClass
             // there's been a bump, move it, otherwise,
             // try sliding
             
-        this.collision.moveObjectInMap(map,entityList,this,this.movePt,bump,this.collideMovePt);
+        this.collision.moveObjectInMap(map,this,this.movePt,bump,this.collideMovePt);
         if ((this.collideMovePt.equals(this.movePt)) || (this.collideMovePt.y!==0)) {
             this.position.addPoint(this.collideMovePt);
             return;
@@ -121,7 +121,7 @@ class EntityClass
             
         this.slidePt.setFromValues(this.movePt.x,0.0,0.0);
         
-        this.collision.moveObjectInMap(map,entityList,this,this.slidePt,false,this.collideSlideMovePt);
+        this.collision.moveObjectInMap(map,this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
             this.position.addPoint(this.collideSlideMovePt);
             return;
@@ -129,7 +129,7 @@ class EntityClass
         
         this.slidePt.setFromValues(0.0,0.0,this.movePt.z);
         
-        this.collision.moveObjectInMap(map,entityList,this,this.slidePt,false,this.collideSlideMovePt);
+        this.collision.moveObjectInMap(map,this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
             this.position.addPoint(this.collideSlideMovePt);
             return;
@@ -141,12 +141,12 @@ class EntityClass
         this.position.addPoint(this.collideMovePt);
     }
     
-    moveSimple(map,entityList,dist,bump)
+    moveSimple(map,dist,bump)
     {
         this.movePt.setFromValues(0.0,0.0,dist);
         this.movePt.rotateY(null,this.angle.y);
             
-        this.collision.moveObjectInMap(map,entityList,this,this.movePt,bump,this.collideMovePt);
+        this.collision.moveObjectInMap(map,this,this.movePt,bump,this.collideMovePt);
         if (!this.collideMovePt.equals(this.movePt)) return(true);
         
         this.position.addPoint(this.collideMovePt);
@@ -293,7 +293,7 @@ class EntityClass
         // run entity
         //
         
-    run(view,map,entityList)
+    run(map)
     {
     }
     
@@ -301,7 +301,7 @@ class EntityClass
         // frustum checks
         //
         
-    inFrustum(view)
+    inFrustum()
     {
         this.xFrustumBound.setFromValues((this.position.x-this.radius),(this.position.x+this.radius));
         this.yFrustumBound.setFromValues((this.position.y-this.high),this.position.y);
@@ -314,33 +314,33 @@ class EntityClass
         // draw entity
         //
         
-    drawStart(view)
+    drawStart()
     {
-        this.model.drawStart(view);
+        this.model.drawStart();
     }
 
-    drawEnd(view)
+    drawEnd()
     {
-        this.model.drawEnd(view);
+        this.model.drawEnd();
     }
 
-    draw(view)
+    draw()
     {
             // either update skeleton and create
             // vertices or just move to current position
             // and angle
             
         if ((this.model.skeleton!==null) && (!view.paused)) {
-            this.model.skeleton.animate(view);
-            this.model.mesh.updateVertexesToPoseAndPosition(view,this.model.skeleton,this.angle,this.position);
+            this.model.skeleton.animate();
+            this.model.mesh.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
         }
         else {
-            this.model.mesh.updateVertexesToAngleAndPosition(view,this.angle,this.position);
+            this.model.mesh.updateVertexesToAngleAndPosition(this.angle,this.position);
         }
         
             // draw the model
             
-        this.model.draw(view);
+        this.model.draw();
     }
     
     

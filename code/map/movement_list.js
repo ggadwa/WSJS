@@ -16,13 +16,13 @@ class MovementListClass
         this.movements.push(movement);
     }
     
-    run(view,map,entityList)
+    run(map)
     {
         var n;
         var nMovement=this.movements.length;
         
         for (n=0;n!==nMovement;n++) {
-            this.movements[n].run(view,map,entityList);
+            this.movements[n].run(map);
         }
     }
 }

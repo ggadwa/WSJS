@@ -6,11 +6,8 @@
 
 class InputClass
 {
-    constructor(view,entityList)
+    constructor()
     {
-        this.view=view;
-        this.entityList=entityList;
-
             // the single player entity
             
         this.playerEntity=null;
@@ -88,13 +85,13 @@ class InputClass
                 // and make sure a click
                 // unpaused
                 
-            this.view.canvas.onclick=this.view.setPauseState.bind(this.view,this,false,false);
+            view.canvas.onclick=view.setPauseState.bind(view,this,false,false);
         }
         else {
             
                 // clear the unpause click
                 
-            this.view.canvas.onclick=null;
+            view.canvas.onclick=null;
             
                 // attach events
                 
@@ -141,13 +138,13 @@ class InputClass
         
             // mouse 0 fire
             
-        if (this.mouseButtonFlags[0]) this.playerEntity.fireCurrentWeapon(this.view,this.entityList);
+        if (this.mouseButtonFlags[0]) this.playerEntity.fireCurrentWeapon();
         
             // m flips map on/off
             
         if (this.keyFlags[77]) {
             this.keyFlags[77]=0;        // force it up
-            this.view.mapOverlayStateFlip();
+            view.mapOverlayStateFlip();
         }
 
             // - and +
@@ -225,24 +222,24 @@ class InputClass
         
             // request the pointer lock
             
-        if (this.view.canvas.requestPointerLock) {
+        if (view.canvas.requestPointerLock) {
             document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
             document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-            this.view.canvas.requestPointerLock();
+            view.canvas.requestPointerLock();
             console.log('did pointer lock');
         }
         else {
-            if (this.view.canvas.mozRequestPointerLock) {
+            if (view.canvas.mozRequestPointerLock) {
                 document.addEventListener('mozpointerlockchange',this.pointerLockChangeListener,false);
                 document.addEventListener('mozpointerlockerror',this.pointerLockErrorListener,false);
-                this.view.canvas.mozRequestPointerLock();
+                view.canvas.mozRequestPointerLock();
                 console.log('did moz pointer lock');
             }
             else {
-                if (this.view.canvas.webkitRequestPointerLock) {
+                if (view.canvas.webkitRequestPointerLock) {
                     document.addEventListener('webkitpointerlockchange',pointerLockChangeListener,false);
                     document.addEventListener('webkitpointerlockerror',this.pointerLockErrorListener,false);
-                    this.view.canvas.webkitRequestPointerLoc();
+                    view.canvas.webkitRequestPointerLoc();
                     console.log('did webkit pointer lock');
                 }
                 else {
@@ -299,7 +296,7 @@ class InputClass
         if (document.mozPointerLockElement) elem=document.mozPointerLockElement;
         if (document.webkitPointerLockElement) elem=document.webkitPointerLockElement;
         
-        if (elem===this.view.canvas) {
+        if (elem===view.canvas) {
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('mousemove',this.mouseMovedListener,false);
@@ -308,7 +305,7 @@ class InputClass
             document.removeEventListener('mousedown',this.mouseDownListener,false);
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            this.view.setPauseState(this,true,false);       // go into pause
+            view.setPauseState(this,true,false);       // go into pause
         }
     }
     

@@ -125,7 +125,7 @@ class CollisionClass
         // colliding objects
         //
 
-    moveObjectInMap(map,entityList,entity,movePt,bump,collideMovePt)
+    moveObjectInMap(map,entity,movePt,bump,collideMovePt)
     {
         var n,k;
         var mesh,checkEntity,checkEntityPt;

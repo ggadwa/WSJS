@@ -21,9 +21,9 @@ class ModelClass
         // close model
         //
 
-    close(view)
+    close()
     {
-        this.mesh.close(view);
+        this.mesh.close();
         this.skeleton.close();
     }
     
@@ -60,25 +60,25 @@ class ModelClass
         // draw model
         //
 
-    drawStart(view)
+    drawStart()
     {
-        this.modelShader.drawStart(view);
+        this.modelShader.drawStart();
     }
 
-    drawEnd(view)
+    drawEnd()
     {
-        this.modelShader.drawEnd(view);
+        this.modelShader.drawEnd();
     }
 
-    draw(view)
+    draw()
     {
         var mesh=this.mesh;
 
         mesh.bitmap.attachAsTexture(this.modelShader);
         
-        mesh.buildNonCulledTriangleIndexes(view);
-        mesh.bindBuffers(view,this.modelShader);
-        mesh.draw(view);
+        mesh.buildNonCulledTriangleIndexes();
+        mesh.bindBuffers(this.modelShader);
+        mesh.draw();
     }
 
 }

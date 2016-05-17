@@ -76,10 +76,6 @@ class ViewClass
 
         this.drawOverlay=false;
 
-            // in game random
-
-        this.genRandom=new GenRandomClass(Date.now());
-
             // view lighting
 
         this.LIGHT_COUNT=6;
@@ -106,16 +102,12 @@ class ViewClass
         this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
         this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
 
-            // additional drawing objects
+            // additional view classes
 
-        this.text=new TextClass();
-        this.interface=new InterfaceClass();
-        this.particleList=new ParticleListClass();
-        this.sky=new SkyClass();
-
-            // the camera object
-
-        this.camera=new ViewCameraClass();
+        this.genRandom=null;
+        this.text=null;
+        this.interface=null;
+        this.camera=null;
 
             // main loop
 
@@ -167,7 +159,7 @@ class ViewClass
         // initialize and release
         //
 
-    initialize(fileCache,canvasId)
+    initialize(canvasId)
     {
         var margin=0;
         
@@ -217,13 +209,18 @@ class ViewClass
         this.wid=this.canvas.width;
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
+        
+            // create needed objects
+            
+        this.genRandom=new GenRandomClass(Date.now());
+        this.text=new TextClass();
+        this.interface=new InterfaceClass();
+        this.camera=new ViewCameraClass();
 
             // initialize other drawing objects
 
-        if (!this.text.initialize(this,fileCache)) return(false);
-        if (!this.interface.initialize(this,fileCache)) return(false);
-        if (!this.particleList.initialize(this,fileCache)) return(false);
-        if (!this.sky.initialize(this,fileCache)) return(false);
+        if (!this.text.initialize()) return(false);
+        if (!this.interface.initialize()) return(false);
         
             // setup some interface positions
         
@@ -241,8 +238,6 @@ class ViewClass
     {
         this.text.release();
         this.interface.release();
-        this.particleList.release();
-        this.sky.release();
     }
     
         //
@@ -534,7 +529,7 @@ class ViewClass
         // draw view
         //
 
-    draw(map,entityList,debug)
+    draw(map)
     {
         var n,nEntity,entity;
         var player=entityList.getPlayer();
@@ -585,7 +580,7 @@ class ViewClass
             // all lights need a eye coordinate, so calc
             // that here
 
-        map.createViewLightsFromMapLights(this);
+        map.createViewLightsFromMapLights();
         
         for (n=0;n!==this.LIGHT_COUNT;n++) {
             light=this.lights[n];
@@ -598,18 +593,18 @@ class ViewClass
         
             // draw the sky
             
-        this.sky.drawStart(this);
-        this.sky.draw(this);
-        this.sky.drawEnd(this);
+        sky.drawStart();
+        sky.draw();
+        sky.drawEnd();
         
             // draw the map
        
         this.drawMeshCount=0;
         this.drawMeshTrigCount=0;
 
-        map.drawStart(this);
-        map.draw(this,debug);
-        map.drawEnd(this);
+        map.drawStart();
+        map.draw();
+        map.drawEnd();
 
             // draw the entities
             // always skip index 0 as that's the player
@@ -622,44 +617,44 @@ class ViewClass
         for (n=1;n<nEntity;n++) {
             entity=entityList.getEntity(n);
 
-            if (entity.inFrustum(this)) {
-                entity.drawStart(this);
-                entity.draw(this);
-                entity.drawEnd(this);
+            if (entity.inFrustum()) {
+                entity.drawStart();
+                entity.draw();
+                entity.drawEnd();
 
-                if (config.DEBUG_DRAW_MODEL_HITBOX) debug.drawModelHitBox(this,entity.model,entity.radius,entity.high,entity.angle,entity.position);
-                if (config.DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(this,entity.model,entity.angle,entity.position);
-                if (config.DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(this,entity.model);
-                if (config.DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(this,entity.model);
-                if (config.DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(this,entity.model);
+                if (config.DEBUG_DRAW_MODEL_HITBOX) debug.drawModelHitBox(entity.model,entity.radius,entity.high,entity.angle,entity.position);
+                if (config.DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(entity.model,entity.angle,entity.position);
+                if (config.DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(entity.model);
+                if (config.DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(entity.model);
+                if (config.DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(entity.model);
             }
         }
         
             // particles
             
-        this.particleList.draw(this);
+        particleList.draw();
       
             // player weapon
          
         var weapon=player.getCurrentWeapon();
         if (weapon!==null) {
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-            weapon.drawStart(this);
-            weapon.draw(this,player);
-            weapon.drawEnd(this);
+            weapon.drawStart();
+            weapon.draw(player);
+            weapon.drawEnd();
         }
         
             // health
         
-        this.interface.drawStart(this);
+        this.interface.drawStart();
         this.uiHealthRect.top=this.uiHealthRect.bot-Math.trunc(this.uiHealthHigh*player.getPercentageHealth());
-        this.interface.drawRect(this,this.uiHealthRect,this.uiHealthColor,this.uiHealthAlpha);
-        this.interface.drawFrameRect(this,this.uiHealthFrameRect,this.uiHealthFrameColor,1.0);
-        this.interface.drawEnd(this);
+        this.interface.drawRect(this.uiHealthRect,this.uiHealthColor,this.uiHealthAlpha);
+        this.interface.drawFrameRect(this.uiHealthFrameRect,this.uiHealthFrameColor,1.0);
+        this.interface.drawEnd();
 
             // map overlay
             
-        if (this.drawOverlay) map.overlayDraw(this,entityList);
+        if (this.drawOverlay) map.overlayDraw();
         
             // text overlays
 
@@ -672,13 +667,13 @@ class ViewClass
             fpsStr=fpsStr.substring(0,(idx+3));
         }
 
-        this.text.drawStart(this);
-        this.text.drawWithShadow(this,(this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawStart();
+        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         if (this.paused) {
-            this.text.drawWithShadow(this,Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
-            this.text.drawWithShadow(this,Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
         }
-        this.text.drawEnd(this);
+        this.text.drawEnd();
     }
     
         //
@@ -726,28 +721,28 @@ class ViewClass
             
         var nLine=this.loadingStrings.length;
 
-        this.text.drawStart(this);
+        this.text.drawStart();
         
         var y=(this.high-30)-((nLine-1)*22);
         var col=new wsColor(1.0,1.0,1.0);
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new wsColor(1.0,0.3,0.3);
-            this.text.draw(this,5,y,20,18,this.loadingStrings[n],TEXT_ALIGN_LEFT,col);
+            this.text.draw(5,y,20,18,this.loadingStrings[n],TEXT_ALIGN_LEFT,col);
             y+=22;
         }
         
-        this.text.drawEnd(this);
+        this.text.drawEnd();
 
             // progress
         
-        this.interface.drawStart(this);
+        this.interface.drawStart();
         if (progress!==null) {
             this.loadingBarRect.rgt=5+Math.trunc((this.wid-10)*progress);
-            this.interface.drawRect(this,this.loadingBarRect,this.loadingBarColor,1.0);
+            this.interface.drawRect(this.loadingBarRect,this.loadingBarColor,1.0);
         }
-        this.interface.drawFrameRect(this,this.loadingBarFrameRect,this.loadingBarFrameColor,1.0);
-        this.interface.drawEnd(this);
+        this.interface.drawFrameRect(this.loadingBarFrameRect,this.loadingBarFrameColor,1.0);
+        this.interface.drawEnd();
     }
     
         //
@@ -848,3 +843,8 @@ class ViewClass
     
 }
     
+//
+// the global view class
+//
+
+var view=new ViewClass();

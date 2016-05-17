@@ -91,7 +91,7 @@ class EntityPlayerClass extends EntityClass
         return(this.weapons[this.weaponCurrentIndex]);
     }
     
-    fireCurrentWeapon(view,entityList)
+    fireCurrentWeapon()
     {
         this.weaponFired=true;
     }
@@ -109,7 +109,7 @@ class EntityPlayerClass extends EntityClass
         // run player
         //
     
-    run(view,map,entityList)
+    run(map)
     {
         var bump,weapon;
         
@@ -119,7 +119,7 @@ class EntityPlayerClass extends EntityClass
             this.weaponFired=false;
             
             weapon=this.getCurrentWeapon();
-            if (weapon!==null) weapon.fire(view,entityList,this);
+            if (weapon!==null) weapon.fire(this);
         }
         
             // input turning and looking
@@ -135,8 +135,8 @@ class EntityPlayerClass extends EntityClass
         
             // movement
             
-        if (this.forwardSpeed!==0.0) super.moveComplex(map,entityList,this.forwardSpeed,0.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
-        if (this.sideSpeed!==0.0) super.moveComplex(map,entityList,this.sideSpeed,90.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
+        if (this.forwardSpeed!==0.0) super.moveComplex(map,this.forwardSpeed,0.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
+        if (this.sideSpeed!==0.0) super.moveComplex(map,this.sideSpeed,90.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
         
         if (this.verticalSpeed!==0.0) super.moveDirect(0.0,this.verticalSpeed,0.0);
         

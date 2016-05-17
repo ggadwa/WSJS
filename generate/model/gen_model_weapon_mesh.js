@@ -33,7 +33,7 @@ class GenModelWeaponMeshClass
         // build a box around a bone
         //
         
-    buildBoxAroundBone(view,bone,xBound,yBound,zBound,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    buildBoxAroundBone(bone,xBound,yBound,zBound,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         var startVIdx=Math.trunc(vIdx/3);       // remember this for building indexes
         
@@ -119,7 +119,7 @@ class GenModelWeaponMeshClass
         // build globe around bone
         //
         
-    buildGlobeAroundPoint(view,centerPnt,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    buildGlobeAroundPoint(centerPnt,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
         var x,y,ang;
         var rd,radius,px,py,pz;
@@ -254,9 +254,9 @@ class GenModelWeaponMeshClass
         MeshUtilityClass.buildMapMeshNormalsFromChunk(vertices,nStartVIdx,this.GLOBE_VERTEX_COUNT,indexes,nStartIIdx,this.GLOBE_INDEX_COUNT,normals,false);
     };
     
-    this.buildGlobeAroundBone=function(view,bone,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
+    this.buildGlobeAroundBone=function(bone,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset)
     {
-        this.buildGlobeAroundPoint(view,bone.position,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset);
+        this.buildGlobeAroundPoint(bone.position,widRadius,highRadius,vertices,vIdx,normals,uvs,uvIdx,indexes,iIdx,uOffset,vOffset);
     }
     */
    
@@ -264,7 +264,7 @@ class GenModelWeaponMeshClass
         // build cylinders around two points
         //
         
-    buildCylinderAroundTwoPoints(view,pt1,pt2,radius1,radius2,vertexList,indexes)
+    buildCylinderAroundTwoPoints(pt1,pt2,radius1,radius2,vertexList,indexes)
     {
         var n,v,rd,v2Idx;
         var tx,ty,bx,by;
@@ -334,7 +334,7 @@ class GenModelWeaponMeshClass
         // build weapon mesh
         //
 
-    build(view)
+    build()
     {
         var vertexList=MeshUtilityClass.createModelVertexList(this.CYLINDER_VERTEX_COUNT);
         var indexes=new Uint16Array(this.CYLINDER_INDEX_COUNT);
@@ -342,12 +342,12 @@ class GenModelWeaponMeshClass
         var pos1=new wsPoint(0,0,1500);
         var pos2=new wsPoint(0,0,-1500);
         
-        this.buildCylinderAroundTwoPoints(view,pos1,pos2,500,500,vertexList,indexes);
+        this.buildCylinderAroundTwoPoints(pos1,pos2,500,500,vertexList,indexes);
         
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.bitmap,vertexList,indexes,0);
-        this.model.mesh.setupBuffers(view);
+        this.model.mesh.setupBuffers();
     }
     
 }

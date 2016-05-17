@@ -81,7 +81,7 @@ class ModelMeshClass
         // close model mesh
         //
 
-    close(view)
+    close()
     {
         var gl=view.gl;
 
@@ -195,7 +195,7 @@ class ModelMeshClass
         // set vertices to pose and offset position
         //
         
-    updateVertexesToPoseAndPosition(view,skeleton,angle,position)
+    updateVertexesToPoseAndPosition(skeleton,angle,position)
     {
         var n,v;
         var bone,parentBone;
@@ -270,7 +270,7 @@ class ModelMeshClass
         // set vertices to ang and offset position
         //
         
-    updateVertexesToAngleAndPosition(view,angle,position)
+    updateVertexesToAngleAndPosition(angle,position)
     {
         var n,v;
         
@@ -311,7 +311,7 @@ class ModelMeshClass
         // model mesh gl binding
         //
 
-    setupBuffers(view)
+    setupBuffers()
     {
             // build the default buffer data
             // from the vertex list
@@ -373,7 +373,7 @@ class ModelMeshClass
         this.indexBuffer=gl.createBuffer();
     }
 
-    bindBuffers(view,modelShader)
+    bindBuffers(modelShader)
     {
         var gl=view.gl;
 
@@ -400,7 +400,7 @@ class ModelMeshClass
         // culled
         //
         
-    buildNonCulledTriangleIndexes(view)
+    buildNonCulledTriangleIndexes()
     {
         var n,k,idx,vIdx;
         var pnt=new wsPoint(0,0,0);
@@ -458,7 +458,7 @@ class ModelMeshClass
         // model mesh drawing
         //
 
-    draw(view)
+    draw()
     {
         var gl=view.gl;
 

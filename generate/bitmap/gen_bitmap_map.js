@@ -1144,7 +1144,7 @@ class GenBitmapMapClass
         // generate mainline
         //
 
-    generate(view,name,generateType)
+    generate(name,generateType,inDebug)
     {
         var wid,high,edgeSize,paddingSize,segments;
         var shineFactor=1.0;
@@ -1274,21 +1274,23 @@ class GenBitmapMapClass
                 this.generateMachine(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=2.0;
                 break;
+                
+            case GEN_BITMAP_MAP_TYPE_LIQUID:
+                this.generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=8.0;
+                break;
 
         }
 
-            // if view is null, then we are in the special
-            // debug main, which just displays the canvases, so send
+            // debug just displays the canvases, so send
             // them back
         
-        if (view===null) {
-            return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas});
-        }
+        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas});
         
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(view,name,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(name,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 
 }

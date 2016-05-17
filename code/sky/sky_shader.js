@@ -22,62 +22,68 @@ class SkyShaderClass extends ShaderClass
         // initialize/release sky shader
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
+        var gl=view.gl;
+        
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,fileCache,'sky')) return(false);
+        if (!super.initialize('sky')) return(false);
 
             // setup uniforms
 
-        view.gl.useProgram(this.program);
+        gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
-        this.vertexUVAttribute=view.gl.getAttribLocation(this.program,'vertexUV');
+        this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
-        this.perspectiveMatrixUniform=view.gl.getUniformLocation(this.program,'perspectiveMatrix');
-        this.modelMatrixUniform=view.gl.getUniformLocation(this.program,'modelMatrix');
+        this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
+        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
 
         return(true);
     }
 
-    release(view)
+    release()
     {
-        super.release(view);
+        super.release();
     }
 
         //
         // start/stop interface shader drawing
         //
 
-    drawStart(view)
+    drawStart()
     {
-        view.gl.useProgram(this.program);
+        var gl=view.gl;
+        
+        gl.useProgram(this.program);
 
             // setup the uniforms
 
-        view.gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-        view.gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
+        gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
 
             // enable the vertex attributes
 
-        view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-        view.gl.enableVertexAttribArray(this.vertexUVAttribute);
+        gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
-    drawEnd(view)
+    drawEnd()
     {
+        var gl=view.gl;
+        
             // disable vertex attributes
 
-        view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
-        view.gl.disableVertexAttribArray(this.vertexUVAttribute);
+        gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.vertexUVAttribute);
 
             // no longer using program
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
     }
 
 }

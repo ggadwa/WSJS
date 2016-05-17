@@ -22,14 +22,14 @@ class ParticleListClass
         // initialize/release particle list
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
         var n,particle;
         var genBitmapParticle;
 
             // create the shader
             
-        if (!this.particleShader.initialize(view,fileCache)) return(false);
+        if (!this.particleShader.initialize()) return(false);
         
             // precreate all the particles so we don't have GC problems
             
@@ -37,29 +37,29 @@ class ParticleListClass
         
         for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
             particle=new ParticleClass();
-            particle.initialize(view);
+            particle.initialize();
             this.particles.push(particle);
         }
         
             // construct a particle bitmap
             
         genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_BITMAP_PARTICLE));  
-        this.particleBitmap=genBitmapParticle.generate(view,"Particle Oval",GEN_BITMAP_PARTICLE_TYPE_OVAL);
+        this.particleBitmap=genBitmapParticle.generate("Particle Oval",GEN_BITMAP_PARTICLE_TYPE_OVAL,false);
        
         return(true);
     }
 
-    release(view)
+    release()
     {
         var n;
         
         for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
-            this.particles[n].release(view);
+            this.particles[n].release();
         }
         
         this.particleBitmap.close();
         
-        this.particleShader.release(view);
+        this.particleShader.release();
     }
 
         //
@@ -91,7 +91,7 @@ class ParticleListClass
         // some particle types
         //
         
-    addExplosionParticles(view,centerPt)
+    addExplosionParticles(centerPt)
     {
         var particle;
         
@@ -100,7 +100,7 @@ class ParticleListClass
         particle=this.getFree();
         if (particle===null) return;
         
-        particle.createRandomGlobePoints(view,100);
+        particle.createRandomGlobePoints(100);
         particle.setRadius(300,10);
         particle.setMovement(4000.0);
         particle.setCenterPointFromPoint(centerPt);
@@ -114,7 +114,7 @@ class ParticleListClass
         particle=this.getFree();
         if (particle===null) return;
         
-        particle.createRandomGlobePoints(view,80);
+        particle.createRandomGlobePoints(80);
         particle.setRadius(300,20);
         particle.setMovement(2500.0);
         particle.setCenterPointFromPoint(centerPt);
@@ -128,7 +128,7 @@ class ParticleListClass
         particle=this.getFree();
         if (particle===null) return;
         
-        particle.createRandomGlobePoints(view,60);
+        particle.createRandomGlobePoints(60);
         particle.setRadius(300,30);
         particle.setMovement(1000.0);
         particle.setCenterPointFromPoint(centerPt);
@@ -138,7 +138,7 @@ class ParticleListClass
         particle.setTiming(view.timeStamp,1500);
     }
     
-    addDebugParticles(view,centerPt,count)
+    addDebugParticles(centerPt,count)
     {
         var particle;
         
@@ -162,7 +162,7 @@ class ParticleListClass
         // draw all particles
         //
         
-    draw(view)
+    draw()
     {
         var n,needDraw;
         var gl=view.gl;
@@ -183,7 +183,7 @@ class ParticleListClass
         
             // start the shader
             
-        this.particleShader.drawStart(view);
+        this.particleShader.drawStart();
         
         gl.enable(gl.BLEND);
         //gl.blendFunc(gl.SRC_ALPHA,gl.ONE);        // additive   
@@ -194,15 +194,20 @@ class ParticleListClass
             
         for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
             if (!this.particles[n].isFree()) {
-                this.particles[n].draw(view,this.particleShader);
-                this.particles[n].timeout(view);
+                this.particles[n].draw(this.particleShader);
+                this.particles[n].timeout();
             }
         }
         
         gl.disable(gl.BLEND);
         
-        this.particleShader.drawEnd(view);
+        this.particleShader.drawEnd();
     }
 
 }
     
+//
+// the global particlelist object
+//
+
+var particleList=new ParticleListClass();

@@ -33,34 +33,34 @@ class MapClass
         // initialize and release
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
-        if (!this.overlay.initialize(view,fileCache)) return(false);
-        return(this.mapShader.initialize(view,fileCache));
+        if (!this.overlay.initialize()) return(false);
+        return(this.mapShader.initialize());
     }
 
-    release(view)
+    release()
     {
-        this.mapShader.release(view);
-        this.overlay.release(view);
+        this.mapShader.release();
+        this.overlay.release();
     }
     
         //
         // clear map
         //
 
-    clear(view)
+    clear()
     {
         var n;
         var nMesh=this.meshes.length;
         var nLightmap=this.lightmaps.length;
 
         for (n=0;n!==nMesh;n++) {
-            this.meshes[n].close(view);
+            this.meshes[n].close();
         }
 
         for (n=0;n!==nLightmap;n++) {
-            this.lightmaps[n].close(view);
+            this.lightmaps[n].close();
         }
 
         this.meshes=[];
@@ -262,7 +262,7 @@ class MapClass
         // outside the light cone
         //
 
-    createViewLightsFromMapLights(view)
+    createViewLightsFromMapLights()
     {
         var n,k,nLight,idx,startIdx;
         var x,y,z;
@@ -376,7 +376,7 @@ class MapClass
         // have them build their collision meshes
         //
         
-    buildCollisionGeometry(view)
+    buildCollisionGeometry()
     {
         var n;
         var nMesh=this.meshes.length;
@@ -385,7 +385,7 @@ class MapClass
             // buffers and indexes
 
         for (n=0;n!==nMesh;n++) {
-            this.meshes[n].buildCollisionGeometry(view);
+            this.meshes[n].buildCollisionGeometry();
         }
     }
 
@@ -425,23 +425,23 @@ class MapClass
         this.movementList.addMovement(movement);
     }
     
-    runMovements(view,entityList)
+    runMovements()
     {
-        this.movementList.run(view,this,entityList);
+        this.movementList.run(this);
     }
     
         //
         // pass-through for overlays
         //
         
-    precalcOverlayDrawValues(view)
+    precalcOverlayDrawValues()
     {
-        this.overlay.precalcDrawValues(view);
+        this.overlay.precalcDrawValues();
     }
         
-    overlayDraw(view,entityList)
+    overlayDraw()
     {
-        this.overlay.draw(view,entityList);
+        this.overlay.draw();
     }
     
     addOverlayRoom(room)
@@ -468,7 +468,7 @@ class MapClass
         // setup all the mesh buffers
         //
 
-    setupBuffers(view)
+    setupBuffers()
     {
         var n;
         var nMesh=this.meshes.length;
@@ -477,7 +477,7 @@ class MapClass
             // buffers and indexes
 
         for (n=0;n!==nMesh;n++) {
-            this.meshes[n].setupBuffers(view);
+            this.meshes[n].setupBuffers();
         }
     }
 
@@ -485,17 +485,17 @@ class MapClass
         // draw map
         //
 
-    drawStart(view)
+    drawStart()
     {
-        this.mapShader.drawStart(view);
+        this.mapShader.drawStart();
     }
 
-    drawEnd(view)
+    drawEnd()
     {
-        this.mapShader.drawEnd(view);
+        this.mapShader.drawEnd();
     }
 
-    draw(view,debug)
+    draw()
     {
         var n,mesh;
         var nMesh=this.meshes.length;
@@ -530,10 +530,10 @@ class MapClass
 
                 // draw the mesh
 
-            mesh.updateBuffers(view);
-            mesh.buildNonCulledTriangleIndexes(view);
-            mesh.bindBuffers(view,this.mapShader);
-            mesh.draw(view);
+            mesh.updateBuffers();
+            mesh.buildNonCulledTriangleIndexes();
+            mesh.bindBuffers(this.mapShader);
+            mesh.draw();
         }
         
             // debugging draw
@@ -541,21 +541,21 @@ class MapClass
         if (config.DEBUG_DRAW_MAP_MESH_LINES) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(view,mesh);
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(mesh);
             }
         }
         
         if (config.DEBUG_DRAW_MAP_MESH_TANGENTS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(view,mesh);
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(mesh);
             }
         }
         
         if (config.DEBUG_DRAW_MAP_MESH_NORMALS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(view,mesh);
+                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(mesh);
             }
         }
         

@@ -74,7 +74,7 @@ class GenModelOrganicMeshClass
         // center point
         //
         
-    buildGlobeAroundSkeletonX(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
+    buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
         var x,yz;
         var rd,radius,px;
@@ -185,7 +185,7 @@ class GenModelOrganicMeshClass
         }
     }
     
-    buildGlobeAroundSkeletonY(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
+    buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
         var xz,y;
         var rd,radius,py;
@@ -296,7 +296,7 @@ class GenModelOrganicMeshClass
         }
     }
     
-    buildGlobeAroundSkeletonZ(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
+    buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
         var xy,z;
         var rd,radius,pz;
@@ -670,7 +670,7 @@ class GenModelOrganicMeshClass
         // build around bone list
         //
         
-    buildAroundBoneList(view,axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
+    buildAroundBoneList(axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
     {
         var n,k,f,boneIdx,bone,parentBone,listBone;
         var acrossRadius,aroundRadius;
@@ -759,17 +759,17 @@ class GenModelOrganicMeshClass
             case LIMB_AXIS_X:
                 acrossRadius=(xBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(yBound.getSize()>zBound.getSize())?((yBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonX(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                this.buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
             case LIMB_AXIS_Y:
                 acrossRadius=(yBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>zBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonY(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                this.buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
             case LIMB_AXIS_Z:
                 acrossRadius=(zBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>yBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((yBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonZ(view,acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                this.buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
         }
 
@@ -788,7 +788,7 @@ class GenModelOrganicMeshClass
         // build mesh around skeleton
         //
 
-    build(view)
+    build()
     {
         var n,limb;
         var indexOffset;
@@ -809,7 +809,7 @@ class GenModelOrganicMeshClass
             vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point (around+1 for extra vertexes to stop UV wrapping)
             indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-3))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-3))*6 for quads, (around*2)*3 for top and bottom trigs
             
-            this.buildAroundBoneList(view,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
+            this.buildAroundBoneList(limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
 
             if (modelVertexList===null) {
                 modelVertexList=vertexList;
@@ -826,7 +826,7 @@ class GenModelOrganicMeshClass
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.bitmap,modelVertexList,modelIndexes,0);
-        this.model.mesh.setupBuffers(view);
+        this.model.mesh.setupBuffers();
         this.model.mesh.precalcAnimationValues(this.model.skeleton);
     }
     

@@ -17,26 +17,26 @@ class DebugClass
         // initialize/release debug
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
-        return(this.debugShader.initialize(view,fileCache));
+        return(this.debugShader.initialize());
     }
 
-    release(view)
+    release()
     {
-        this.debugShader.release(view);
+        this.debugShader.release();
     }
 
         //
         // draw lines around map mesh
         //
 
-    drawMapMeshLines(view,mesh)
+    drawMapMeshLines(mesh)
     {
         var n;
         var gl=view.gl;
 
-        this.debugShader.drawStart(view,new wsColor(1.0,0.0,0.0));
+        this.debugShader.drawStart(new wsColor(1.0,0.0,0.0));
         
             // setup the buffers
 
@@ -68,14 +68,14 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
     }
 
         //
         // normal and tangents
         //
         
-    drawMapMeshNormals(view,mesh)
+    drawMapMeshNormals(mesh)
     {
         var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
         var gl=view.gl;
@@ -111,7 +111,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
+        this.debugShader.drawStart(new wsColor(1.0,0.0,1.0));
 
             // setup the buffers
 
@@ -137,10 +137,10 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
     }
     
-    drawMapMeshTangents(view,mesh)
+    drawMapMeshTangents(mesh)
     {
         var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
         var gl=view.gl;
@@ -176,7 +176,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
+        this.debugShader.drawStart(new wsColor(0.0,0.0,1.0));
 
             // setup the buffers
 
@@ -202,14 +202,14 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
     }
     
         //
         // draw hit box
         //
         
-    drawModelHitBox(view,model,radius,high,angle,position)
+    drawModelHitBox(model,radius,high,angle,position)
     {
         var vIdx,iIdx;
         var gl=view.gl;
@@ -284,7 +284,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(view,new wsColor(1.0,1.0,0.0));
+        this.debugShader.drawStart(new wsColor(1.0,1.0,0.0));
 
             // setup the buffers
 
@@ -310,14 +310,14 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
     }
 
         //
         // draw skeleton
         //
 
-    drawModelSkeleton(view,model,angle,position)
+    drawModelSkeleton(model,angle,position)
     {
         var n,lineCount,vIdx,iIdx;
         var gl=view.gl;
@@ -363,7 +363,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(view,new wsColor(0.0,1.0,0.0));
+        this.debugShader.drawStart(new wsColor(0.0,1.0,0.0));
 
             // setup the buffers
 
@@ -389,7 +389,7 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
         
             // bring back depth test
             
@@ -397,7 +397,7 @@ class DebugClass
         
             // now the bones, use the particle engine
         
-        var particle=view.particleList.addDebugParticles(view,position,nBone);
+        var particle=particleList.addDebugParticles(position,nBone);
         if (particle!==null) {            
             var pnt;
 
@@ -413,7 +413,7 @@ class DebugClass
         // draw model tangent space
         //
         
-    drawModelMeshNormals(view,model)
+    drawModelMeshNormals(model)
     {
         var n,vIdx,iIdx,drawIdx,nVertex;
         var gl=view.gl;
@@ -455,7 +455,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(view,new wsColor(1.0,0.0,1.0));
+        this.debugShader.drawStart(new wsColor(1.0,0.0,1.0));
 
             // setup the buffers
 
@@ -481,10 +481,10 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
     }
     
-    drawModelMeshTangents(view,model)
+    drawModelMeshTangents(model)
     {
         var n,vIdx,iIdx,drawIdx,nVertex;
         var gl=view.gl;
@@ -526,7 +526,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(view,new wsColor(0.0,0.0,1.0));
+        this.debugShader.drawStart(new wsColor(0.0,0.0,1.0));
 
             // setup the buffers
 
@@ -552,14 +552,14 @@ class DebugClass
         gl.deleteBuffer(vertexPosBuffer);
         gl.deleteBuffer(indexBuffer);
 
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
     }
     
         //
         // draw model mesh lines
         //
         
-    drawModelMeshLines(view,model)
+    drawModelMeshLines(model)
     {
         var n;
         var gl=view.gl;
@@ -585,7 +585,7 @@ class DebugClass
 
             // start the shader
             
-        this.debugShader.drawStart(view,new wsColor(1.0,0.0,0.0));
+        this.debugShader.drawStart(new wsColor(1.0,0.0,0.0));
         
             // setup the buffers
 
@@ -618,7 +618,7 @@ class DebugClass
         gl.deleteBuffer(indexBuffer);
 
         gl.enable(gl.DEPTH_TEST);
-        this.debugShader.drawEnd(view);
+        this.debugShader.drawEnd();
     }
 
         //
@@ -688,3 +688,8 @@ class DebugClass
     }
 }
 
+//
+// the global debug object
+//
+
+var debug=new DebugClass();

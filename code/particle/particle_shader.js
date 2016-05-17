@@ -23,14 +23,14 @@ class ParticleShaderClass extends ShaderClass
         // initialize/release particle shader
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
         var gl=view.gl;
         
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,fileCache,'particle')) return(false);
+        if (!super.initialize('particle')) return(false);
 
             // setup uniforms
 
@@ -53,42 +53,46 @@ class ParticleShaderClass extends ShaderClass
         return(true);
     }
 
-    release(view)
+    release()
     {
-        super.release(view);
+        super.release();
     }
 
         //
         // start/stop particle drawing
         //
 
-    drawStart(view)
+    drawStart()
     {
+        var gl=view.gl;
+        
             // using the map shader
 
-        view.gl.useProgram(this.program);
+        gl.useProgram(this.program);
 
             // matrix
 
-        view.gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-        view.gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
+        gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
 
             // enable the vertex attributes
 
-        view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-        view.gl.enableVertexAttribArray(this.vertexUVAttribute);
+        gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
-    drawEnd(view)
+    drawEnd()
     {
+        var gl=view.gl;
+        
             // disable vertex attributes
 
-        view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
-        view.gl.disableVertexAttribArray(this.vertexUVAttribute);
+        gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.vertexUVAttribute);
 
             // no longer using shader
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
     }
 }
 

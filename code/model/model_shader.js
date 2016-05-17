@@ -31,12 +31,12 @@ class ModelShaderClass extends ShaderClass
         // initialize/release model shader
         //
 
-    initialize(view,fileCache)
+    initialize()
     {
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,fileCache,'model')) return(false);
+        if (!super.initialize('model')) return(false);
 
             // setup uniforms
 
@@ -77,16 +77,16 @@ class ModelShaderClass extends ShaderClass
         return(true);
     }
 
-    release(view)
+    release()
     {
-        super.release(view);
+        super.release();
     }
 
         //
         // start/stop model shader drawing
         //
 
-    drawStart(view)
+    drawStart()
     {
         var n;
         var light,viewLight;
@@ -137,7 +137,7 @@ class ModelShaderClass extends ShaderClass
         gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
-    drawEnd(view)
+    drawEnd()
     {
         var gl=view.gl;
 

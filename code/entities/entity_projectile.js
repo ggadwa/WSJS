@@ -6,7 +6,7 @@
 
 class EntityProjectileClass extends EntityClass
 {
-    constructor(name,view,position,angle,projectile)
+    constructor(name,position,angle,projectile)
     {
         super(name,position,angle,0,projectile.model);
         
@@ -40,7 +40,7 @@ class EntityProjectileClass extends EntityClass
         // projectile hits
         //
         
-    hit(view,map,entityList)
+    hit(map)
     {
             // delete entity
             
@@ -48,7 +48,7 @@ class EntityProjectileClass extends EntityClass
         
             // explosion and sound
             
-        view.particleList.addExplosionParticles(view,this.position);
+        particleList.addExplosionParticles(this.position);
         this.projectile.hitSound.play(this.position);
         
             // handle any damage
@@ -60,7 +60,7 @@ class EntityProjectileClass extends EntityClass
         // run projectile
         //
     
-    run(view,map,entityList)
+    run(map)
     {
             // cancel any projectile that lasts over lifetime
             
@@ -79,15 +79,15 @@ class EntityProjectileClass extends EntityClass
         
             // move it and check wall collisions
             
-        if (super.moveSimple(map,entityList,this.projectile.speed,false)) {
-            this.hit(view,map,entityList);
+        if (super.moveSimple(map,this.projectile.speed,false)) {
+            this.hit(map);
             return;
         }
         
             // check floor and ceiling collisions
             
         if (super.checkFloorCeilingCollision(map)) {
-            this.hit(view,map,entityList);
+            this.hit(map);
             return;
         }
     }

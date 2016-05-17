@@ -188,7 +188,7 @@ class GenSoundClass
         // generate sound mainline
         //
     
-    generate(name,generateType)
+    generate(name,generateType,inDebug)
     {
         var sound=null;
         

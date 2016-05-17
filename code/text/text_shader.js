@@ -22,65 +22,71 @@ class TextShaderClass extends ShaderClass
     // initialize/release text shader
     //
 
-    initialize(view,fileCache)
+    initialize()
     {
+        var gl=view.gl;
+        
             // get a new shader object
             // and load/compile it
 
-        if (!super.initialize(view,fileCache,'text')) return(false);
+        if (!super.initialize('text')) return(false);
 
             // setup uniforms
 
-        view.gl.useProgram(this.program);
+        gl.useProgram(this.program);
 
-        this.vertexPositionAttribute=view.gl.getAttribLocation(this.program,'vertexPosition');
-        this.vertexUVAttribute=view.gl.getAttribLocation(this.program,'vertexUV');
+        this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
-        this.orthoMatrixUniform=view.gl.getUniformLocation(this.program,'orthoMatrix');    
-        this.colorUniform=view.gl.getUniformLocation(this.program,'color');
+        this.orthoMatrixUniform=gl.getUniformLocation(this.program,'orthoMatrix');    
+        this.colorUniform=gl.getUniformLocation(this.program,'color');
 
             // these uniforms are always the same
 
-        view.gl.uniform1i(view.gl.getUniformLocation(this.program,'baseTex'),0);
+        gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
 
         return(true);
     }
 
-    release(view)
+    release()
     {
-        super.release(view);
+        super.release();
     }
 
     //
     // start/stop text shader drawing
     //
 
-    drawStart(view)
+    drawStart()
     {
-        view.gl.useProgram(this.program);
+        var gl=view.gl;
+        
+        gl.useProgram(this.program);
 
             // setup the uniforms
 
-        view.gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
+        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
 
             // enable the vertex attributes
 
-        view.gl.enableVertexAttribArray(this.vertexPositionAttribute);
-        view.gl.enableVertexAttribArray(this.vertexUVAttribute);
+        gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
-    drawEnd(view)
+    drawEnd()
     {
+        var gl=view.gl;
+        
             // disable vertex attributes
 
-        view.gl.disableVertexAttribArray(this.vertexPositionAttribute);
-        view.gl.disableVertexAttribArray(this.vertexUVAttribute);
+        gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.vertexUVAttribute);
 
             // no longer using program
 
-        view.gl.useProgram(null);
+        gl.useProgram(null);
     }
 
 }
