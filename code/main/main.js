@@ -8,11 +8,7 @@ class MainClass
 {
     constructor()
     {
-        this.bitmapList=new BitmapListClass();
-        this.soundList=new SoundListClass();
         this.map=new MapClass();
-        this.modelList=new ModelListClass();
-        this.input=new InputClass();
         
         this.genBitmapMap=null;
         this.genBitmapModel=null;
@@ -77,10 +73,10 @@ class MainClass
 
     initInternal()
     {
-        if (!this.bitmapList.initialize()) return;
-        if (!this.soundList.initialize()) return;
+        if (!bitmapList.initialize()) return;
+        if (!soundList.initialize()) return;
         if (!this.map.initialize()) return;
-        if (!this.modelList.initialize()) return;
+        if (!modelList.initialize()) return;
         if (!sky.initialize()) return(false);
         if (!entityList.initialize()) return;
         if (!particleList.initialize()) return(false);
@@ -90,7 +86,7 @@ class MainClass
 
         this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(config.SEED_BITMAP_MAP));
         this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
-        this.genSound=new GenSoundClass(this.soundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
+        this.genSound=new GenSoundClass(soundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
 
             // next step
 
@@ -141,7 +137,7 @@ class MainClass
 
             // generate bitmap
 
-        this.bitmapList.addBitmap(this.genBitmapMap.generate(name,bitmapType,false));
+        bitmapList.addBitmap(this.genBitmapMap.generate(name,bitmapType,false));
 
             // if more textures, then loop back around
 
@@ -169,7 +165,7 @@ class MainClass
 
             // generate bitmap
 
-        this.bitmapList.addBitmap(this.genBitmapModel.generate(('Monster '+idx),bitmapType,false));
+        bitmapList.addBitmap(this.genBitmapModel.generate(('Monster '+idx),bitmapType,false));
 
             // if more textures, then loop back around
 
@@ -200,7 +196,7 @@ class MainClass
 
              // generate sound
 
-        this.soundList.addSound(this.genSound.generate(name,generateType,false));
+        soundList.addSound(this.genSound.generate(name,generateType,false));
 
             // if more textures, then loop back around
 
@@ -222,7 +218,7 @@ class MainClass
 
     initBuildMap()
     {
-        var genMap=new GenMapClass(this.bitmapList,this.map,new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
+        var genMap=new GenMapClass(this.map,new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 
@@ -260,7 +256,7 @@ class MainClass
             // light maps are a long running
             // process so we need a callback
 
-        var genLightmap=new GenLightmapClass(this.bitmapList,this.map,config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
+        var genLightmap=new GenLightmapClass(this.map,config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
         genLightmap.create();
     }
 
@@ -281,7 +277,7 @@ class MainClass
 
             // get bitmap
 
-        var modelBitmap=this.bitmapList.getBitmap('Monster '+(idx%3));
+        var modelBitmap=bitmapList.getBitmap('Monster '+(idx%3));
 
             // player model if 0
             // else a monster
@@ -302,7 +298,7 @@ class MainClass
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap,modelGenRandom);
         genModelMesh.build();
 
-        this.modelList.addModel(model);
+        modelList.addModel(model);
 
             // if more models, then loop back around
 
@@ -325,7 +321,7 @@ class MainClass
 
     initBuildWeapons(modelGenRandom)
     {
-        var modelBitmap=this.bitmapList.getBitmap('Map Metal');        // for now just use map metal
+        var modelBitmap=bitmapList.getBitmap('Map Metal');        // for now just use map metal
 
             // weapon
 
@@ -334,7 +330,7 @@ class MainClass
         var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap,modelGenRandom);
         genModelWeaponMesh.build();
 
-        this.modelList.addModel(model);
+        modelList.addModel(model);
 
             // projectile
 
@@ -343,7 +339,7 @@ class MainClass
         var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap,modelGenRandom);
         genModelProjectileMesh.build();
 
-        this.modelList.addModel(model);
+        modelList.addModel(model);
 
             // next step
 
@@ -360,8 +356,8 @@ class MainClass
         var model,pos;
 
         var entityGenRandom=new GenRandomClass(config.SEED_ENTITY);
-        var genProjectile=new GenProjectileClass(this.modelList,this.soundList,new GenRandomClass(config.SEED_PROJECTILE));
-        var genWeapon=new GenWeaponClass(this.modelList,this.soundList,new GenRandomClass(config.SEED_WEAPON));
+        var genProjectile=new GenProjectileClass(new GenRandomClass(config.SEED_PROJECTILE));
+        var genWeapon=new GenWeaponClass(new GenRandomClass(config.SEED_WEAPON));
 
             // make player entity
 
@@ -371,7 +367,7 @@ class MainClass
             return;
         }
 
-        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),200,this.modelList.getModel('player'));
+        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),200,modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         var playerWeapon=genWeapon.generate();
         playerWeapon.addProjectile(genProjectile.generate(true));
@@ -397,7 +393,7 @@ class MainClass
             if (pos===null) continue;
             
             monsterType=entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);
-            model=this.modelList.cloneModel(('monster_'+monsterType));
+            model=modelList.cloneModel(('monster_'+monsterType));
 
             entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
@@ -424,11 +420,11 @@ class MainClass
         
             // make sure there's an initial sound position
             
-        this.soundList.setListenerToEntity(entityList.getPlayer());
+        soundList.setListenerToEntity(entityList.getPlayer());
 
             // start the input
 
-        this.input.initialize(entityList.getPlayer());
+        input.initialize(entityList.getPlayer());
         
             // the cancel loop flag
             
@@ -436,7 +432,7 @@ class MainClass
         
             // start the main loop in paused mode
 
-        view.setPauseState(this.input,true,true);
+        view.setPauseState(true,true);
         
             // and now start the loop
             
@@ -457,7 +453,6 @@ var main=new MainClass();
 function mainLoop(timeStamp)
 {
     var map=main.map;
-    var soundList=main.soundList;
     
         // next frame
         
@@ -470,7 +465,7 @@ function mainLoop(timeStamp)
     
         // run the input
         
-    if (!view.paused) main.input.run();
+    if (!view.paused) input.run();
     
         // map movement, entities, and
         // other physics, we only do this if we've

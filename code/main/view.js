@@ -244,7 +244,7 @@ class ViewClass
         // pause state
         //
     
-    setPauseState(input,pause,initState)
+    setPauseState(pause,initState)
     {
             // set the state
 

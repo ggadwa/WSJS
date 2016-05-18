@@ -85,7 +85,7 @@ class InputClass
                 // and make sure a click
                 // unpaused
                 
-            view.canvas.onclick=view.setPauseState.bind(view,this,false,false);
+            view.canvas.onclick=view.setPauseState.bind(view,false,false);
         }
         else {
             
@@ -305,7 +305,7 @@ class InputClass
             document.removeEventListener('mousedown',this.mouseDownListener,false);
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            view.setPauseState(this,true,false);       // go into pause
+            view.setPauseState(true,false);       // go into pause
         }
     }
     
@@ -331,3 +331,9 @@ class InputClass
     }
 
 }
+
+//
+// the input global object
+//
+
+var input=new InputClass();

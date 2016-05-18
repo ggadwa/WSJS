@@ -6,9 +6,8 @@
 
 class GenRoomPillarClass
 {
-    constructor(bitmapList,map,genRandom)
+    constructor(map,genRandom)
     {    
-        this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
         
@@ -28,7 +27,7 @@ class GenRoomPillarClass
     addPillarsCorners(room,yBound)
     {
         var pos;
-        var bitmap=this.bitmapList.getBitmap('Map Pillar');
+        var bitmap=bitmapList.getBitmap('Map Pillar');
         
         pos=room.checkLocationFreeAndBlock(1,1);
         if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
@@ -46,7 +45,7 @@ class GenRoomPillarClass
     addPillarsLineX(room,yBound)
     {
         var x,mx,mz,pos;
-        var bitmap=this.bitmapList.getBitmap('Map Pillar');
+        var bitmap=bitmapList.getBitmap('Map Pillar');
         
         mx=Math.trunc(room.xBlockSize/2);
         mz=Math.trunc(room.zBlockSize/2);
@@ -62,7 +61,7 @@ class GenRoomPillarClass
     addPillarsLineZ(room,yBound)
     {
         var z,mx,mz,pos;
-        var bitmap=this.bitmapList.getBitmap('Map Pillar');
+        var bitmap=bitmapList.getBitmap('Map Pillar');
         
         mx=Math.trunc(room.xBlockSize/2);
         mz=Math.trunc(room.zBlockSize/2);

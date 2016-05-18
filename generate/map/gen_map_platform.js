@@ -6,9 +6,8 @@
 
 class GenRoomPlatformClass
 {
-    constructor(bitmapList,map,genRandom)
+    constructor(map,genRandom)
     {
-        this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
         
@@ -24,7 +23,7 @@ class GenRoomPlatformClass
         var xStairBound=new wsBound((room.xBound.min+(stairX*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((stairX+1)*config.ROOM_BLOCK_WIDTH)));
         var zStairBound=new wsBound((room.zBound.min+(stairZ*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((stairZ+1)*config.ROOM_BLOCK_WIDTH)));
 
-        var genRoomStairs=new GenRoomStairsClass(this.bitmapList,this.map,this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
         
         switch (stairDir) {
             case 0:
@@ -92,7 +91,7 @@ class GenRoomPlatformClass
     addLiftChunk(room,x,z,extraY)
     {
         var meshIdx,movement;
-        var liftBitmap=this.bitmapList.getBitmap('Map Metal');
+        var liftBitmap=bitmapList.getBitmap('Map Metal');
         
         var xLiftBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
         var yLiftBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),(room.yBound.max+extraY));
@@ -173,7 +172,7 @@ class GenRoomPlatformClass
     {
         var x,z,stairX,stairZ,stairDir;
         
-        var platformBitmap=this.bitmapList.getBitmap('Map Platform');
+        var platformBitmap=bitmapList.getBitmap('Map Platform');
         
             // random stair direction
             

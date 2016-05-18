@@ -6,9 +6,8 @@
 
 class GenRoomDecorationClass
 {
-    constructor(bitmapList,map,genRandom)
+    constructor(map,genRandom)
     {    
-        this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
         
@@ -73,7 +72,7 @@ class GenRoomDecorationClass
 
                     rotAngle.setFromValues(0.0,(this.genRandom.random()*360.0),0.0);
 
-                    this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
+                    this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
 
                     ang+=angAdd;
                 }
@@ -128,9 +127,9 @@ class GenRoomDecorationClass
         pos=room.findRandomDecorationLocation(this.genRandom,true);
         if (pos===null) return;
         
-        machineBitmap=this.bitmapList.getBitmap('Map Machine');
-        metalBitmap=this.bitmapList.getBitmap('Map Metal');
-        pipeBitmap=this.bitmapList.getBitmap('Map Metal');
+        machineBitmap=bitmapList.getBitmap('Map Machine');
+        metalBitmap=bitmapList.getBitmap('Map Metal');
+        pipeBitmap=bitmapList.getBitmap('Map Metal');
         
             // do row of machines
         
@@ -201,7 +200,7 @@ class GenRoomDecorationClass
         var boxBoundZ=new wsBound(0,0);
         
         legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
-        bitmap=this.bitmapList.getBitmap('Map Box');
+        bitmap=bitmapList.getBitmap('Map Box');
 
         pieceCount=this.genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
 

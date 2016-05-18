@@ -6,9 +6,8 @@
 
 class GenRoomClosetClass
 {
-    constructor(bitmapList,map,genRandom)
+    constructor(map,genRandom)
     {    
-        this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
         
@@ -21,7 +20,7 @@ class GenRoomClosetClass
     {
         var n,idx;
         var vertexList,indexes;
-        var bitmap=this.bitmapList.getBitmap('Map Closet');
+        var bitmap=bitmapList.getBitmap('Map Closet');
         
             // center point for normal creation
             

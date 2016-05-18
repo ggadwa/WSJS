@@ -6,10 +6,8 @@
 
 class GenWeaponClass
 {
-    constructor(modelList,soundList,genProjectile,genRandom)
+    constructor(genProjectile,genRandom)
     {
-        this.modelList=modelList;
-        this.soundList=soundList;
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -17,6 +15,6 @@ class GenWeaponClass
     
     generate()
     {
-        return(new WeaponClass(this.modelList.getModel('weapon_0')));
+        return(new WeaponClass(modelList.getModel('weapon_0')));
     }
 }

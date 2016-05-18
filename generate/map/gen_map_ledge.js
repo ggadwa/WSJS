@@ -6,10 +6,9 @@
 
 class GenRoomLedgeClass
 {
-    constructor(bitmapList,map,genRandom)
+    constructor(map,genRandom)
     {
         this.map=map;
-        this.bitmapList=bitmapList;
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -89,7 +88,7 @@ class GenRoomLedgeClass
     createLedges(room)
     {
         var x,z;
-        var ledgeBitmap=this.bitmapList.getBitmap('Map Ledge');
+        var ledgeBitmap=bitmapList.getBitmap('Map Ledge');
         
             // does this room have a ledge?
             

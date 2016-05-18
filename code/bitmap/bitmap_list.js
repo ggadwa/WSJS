@@ -58,3 +58,9 @@ class BitmapListClass
     }
 
 }
+
+//
+// the global bitmaplist object
+//
+
+var bitmapList=new BitmapListClass();

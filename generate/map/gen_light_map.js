@@ -106,9 +106,8 @@ class GetLightmapLastBlockClass
 
 class GenLightmapClass
 {
-    constructor(bitmapList,map,generateLightmap,callbackFunc)
+    constructor(map,generateLightmap,callbackFunc)
     {
-        this.bitmapList=bitmapList;
         this.map=map;
         this.generateLightmap=generateLightmap;
 
@@ -912,7 +911,7 @@ class GenLightmapClass
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            this.bitmapList.addBitmap(new BitmapClass(('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
+            bitmapList.addBitmap(new BitmapClass(('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
         }
 
             // and set the light map on the meshes
@@ -922,7 +921,7 @@ class GenLightmapClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshes[n];
-            mesh.lightmap=this.bitmapList.getBitmap('Lightmap '+mesh.tempLightmapIdx);
+            mesh.lightmap=bitmapList.getBitmap('Lightmap '+mesh.tempLightmapIdx);
         }
         
             // debugging

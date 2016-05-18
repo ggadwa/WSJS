@@ -70,7 +70,7 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=[0.5,0.5,0.5]; //[0.2,0.2,0.2];           // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=[0.2,0.2,0.2];          // all over ambient light [r,g,b]
 
         this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above

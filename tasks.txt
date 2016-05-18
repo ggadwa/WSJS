@@ -48,11 +48,8 @@ REGULAR TODOs
 
 [ ] make a lot of objects global (map, view, there's only one, no need to pass around)
 
-        bitmapList
-        soundList
         map
         modelList
-        input
 
 
 

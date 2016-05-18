@@ -85,3 +85,9 @@ class SoundListClass
     
 
 }
+
+//
+// the global soundList object
+//
+
+var soundList=new SoundListClass();

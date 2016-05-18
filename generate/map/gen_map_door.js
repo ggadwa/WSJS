@@ -6,9 +6,8 @@
 
 class GenRoomDoorClass
 {
-    constructor(bitmapList,map,genRandom)
+    constructor(map,genRandom)
     {    
-        this.bitmapList=bitmapList;
         this.map=map;
         this.genRandom=genRandom;
         
@@ -106,8 +105,8 @@ class GenRoomDoorClass
         var vertexList,movement;
         var x,xDoorBound,zDoorBound,zThickBound;
         
-        var roomBitmap=this.bitmapList.getBitmap('Map Closet');
-        var doorBitmap=this.bitmapList.getBitmap('Map Metal');
+        var roomBitmap=bitmapList.getBitmap('Map Closet');
+        var doorBitmap=bitmapList.getBitmap('Map Metal');
         
             // need a center point to better
             // create normals
@@ -186,8 +185,8 @@ class GenRoomDoorClass
         var vertexList,movement;
         var z,xDoorBound,zDoorBound,xThickBound;
         
-        var roomBitmap=this.bitmapList.getBitmap('Map Closet');
-        var doorBitmap=this.bitmapList.getBitmap('Map Metal');
+        var roomBitmap=bitmapList.getBitmap('Map Closet');
+        var doorBitmap=bitmapList.getBitmap('Map Metal');
         
             // need a center point to better
             // create normals

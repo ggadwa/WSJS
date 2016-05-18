@@ -78,3 +78,8 @@ class ModelListClass
 
 }
     
+//
+// the modelList global object
+//
+
+var modelList=new ModelListClass();
