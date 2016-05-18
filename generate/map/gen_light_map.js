@@ -106,9 +106,8 @@ class GetLightmapLastBlockClass
 
 class GenLightmapClass
 {
-    constructor(map,generateLightmap,callbackFunc)
+    constructor(generateLightmap,callbackFunc)
     {
-        this.map=map;
         this.generateLightmap=generateLightmap;
 
             // chunk is one block available to draw a light map
@@ -446,7 +445,7 @@ class GenLightmapClass
 
         for (n=0;n!==nLight;n++) {
             lightIdx=lightList[n];
-            light=this.map.lights[lightIdx];
+            light=map.lights[lightIdx];
 
                 // light within light range?
 
@@ -464,7 +463,7 @@ class GenLightmapClass
                 // check the optimized list of last hits
                 
             if (this.lastBlockList[lightIdx].meshIdx!==-1) {
-                mesh=this.map.meshes[this.lastBlockList[lightIdx].meshIdx];
+                mesh=map.meshes[this.lastBlockList[lightIdx].meshIdx];
                 if (this.rayTraceCollision(vx,vy,vz,lightVectorX,lightVectorY,lightVectorZ,mesh.trigRayTraceCache[this.lastBlockList[lightIdx].cacheTrigIdx])) continue;
             }
             
@@ -485,7 +484,7 @@ class GenLightmapClass
             hit=false;
 
             for (k=0;k!==nMesh;k++) {
-                mesh=this.map.meshes[light.meshIntersectList[k]];
+                mesh=map.meshes[light.meshIntersectList[k]];
                 if (!mesh.boxBoundCollision(this.lightBoundX,this.lightBoundY,this.lightBoundZ)) continue;
                 
                     // skip doors, lifts, and lights as
@@ -582,7 +581,7 @@ class GenLightmapClass
             // determine if the triangle is facing away
             // from the light
             
-        var mesh=this.map.meshes[meshIdx];
+        var mesh=map.meshes[meshIdx];
         var nLight=mesh.lightIntersectList.length;
         
         var light,lightIdx;
@@ -591,7 +590,7 @@ class GenLightmapClass
 
         for (n=0;n!==nLight;n++) {
             lightIdx=mesh.lightIntersectList[n];
-            light=this.map.lights[lightIdx];
+            light=map.lights[lightIdx];
 
                 // check all the vertex normals
                 // only eliminate if all vertexes are
@@ -701,7 +700,7 @@ class GenLightmapClass
 
     writePolyToChunk(lightBitmap,meshIdx,trigIdx,lft,top)
     {
-        var mesh=this.map.meshes[meshIdx];
+        var mesh=map.meshes[meshIdx];
         
             // get the vertexes for the triangle
             // and one normal
@@ -763,7 +762,7 @@ class GenLightmapClass
         
             // run the status bar
 
-        mesh=this.map.meshes[meshIdx];
+        mesh=map.meshes[meshIdx];
         nTrig=mesh.trigCount;
         
             // if we aren't generating lightmaps,
@@ -850,14 +849,14 @@ class GenLightmapClass
             // by saving the light maps
 
         meshIdx++;
-        if (meshIdx>=this.map.meshes.length) {
+        if (meshIdx>=map.meshes.length) {
             setTimeout(this.createFinish.bind(this),PROCESS_TIMEOUT_MSEC);
             return;
         }
 
             // next mesh
 
-        view.loadingScreenDraw(meshIdx/(this.map.meshes.length+2.0));
+        view.loadingScreenDraw(meshIdx/(map.meshes.length+2.0));
         setTimeout(this.createLightmapForMesh.bind(this,meshIdx),PROCESS_TIMEOUT_MSEC);
     }
 
@@ -870,19 +869,19 @@ class GenLightmapClass
     create()
     {
         var n;
-        var nMesh=this.map.meshes.length;
+        var nMesh=map.meshes.length;
 
             // run through the meshes and build
             // cache to speed up ray tracing
 
         for (n=0;n!==nMesh;n++) {
-            this.map.meshes[n].buildTrigRayTraceCache();
+            map.meshes[n].buildTrigRayTraceCache();
         }
         
             // now build the last block list, which
             // is used to optimize ray collisions
             
-        for (n=0;n!==this.map.lights.length;n++) {
+        for (n=0;n!==map.lights.length;n++) {
             this.lastBlockList.push(new GetLightmapLastBlockClass());
         }
 
@@ -917,10 +916,10 @@ class GenLightmapClass
             // and set the light map on the meshes
 
         var mesh;
-        var nMesh=this.map.meshes.length;
+        var nMesh=map.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshes[n];
+            mesh=map.meshes[n];
             mesh.lightmap=bitmapList.getBitmap('Lightmap '+mesh.tempLightmapIdx);
         }
         

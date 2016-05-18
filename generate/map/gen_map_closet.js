@@ -6,9 +6,8 @@
 
 class GenRoomClosetClass
 {
-    constructor(map,genRandom)
+    constructor(genRandom)
     {    
-        this.map=map;
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -69,7 +68,7 @@ class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
@@ -93,7 +92,7 @@ class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
 
             // floor
             
@@ -117,7 +116,7 @@ class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
     }
 
         // closet mainline
@@ -200,10 +199,10 @@ class GenRoomClosetClass
                 // build the blocks
             
             for (k=0;k!==closetLen;k++) {
-                if (this.map.boxBoundCollision(xClosetBound,null,zClosetBound,MESH_FLAG_ROOM_WALL)!==-1) break;
+                if (map.boxBoundCollision(xClosetBound,null,zClosetBound,MESH_FLAG_ROOM_WALL)!==-1) break;
 
                 this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
-                this.map.addOverlayCloset(xClosetBound,zClosetBound);
+                map.addOverlayCloset(xClosetBound,zClosetBound);
                 
                 room.maskEdgeGridBlockToBounds(xClosetBound,yClosetBound,zClosetBound);    // block off ledges for edge grid
                 

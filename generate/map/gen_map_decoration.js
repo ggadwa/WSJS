@@ -6,9 +6,8 @@
 
 class GenRoomDecorationClass
 {
-    constructor(map,genRandom)
-    {    
-        this.map=map;
+    constructor(genRandom)
+    {
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -72,7 +71,7 @@ class GenRoomDecorationClass
 
                     rotAngle.setFromValues(0.0,(this.genRandom.random()*360.0),0.0);
 
-                    this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
+                    map.addMesh(MeshPrimitivesClass.createMeshCube(bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
 
                     ang+=angAdd;
                 }
@@ -140,16 +139,16 @@ class GenRoomDecorationClass
             machineBoundX=new wsBound((pos.x-machineWid),(pos.x+machineWid));
             machineBoundZ=new wsBound((pos.z-machineWid),(pos.z+machineWid));
             
-            this.map.addMesh(MeshPrimitivesClass.createMeshCube(machineBitmap,machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(machineBitmap,machineBoundX,machineBoundY,machineBoundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
 
                 // the top, mid, and bottom boxes
                 
             machineBoundX=new wsBound((pos.x-wid),(pos.x+wid));
             machineBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
 
-            this.map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
-            this.map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,midBoundY,machineBoundZ,null,false,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
-            this.map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,midBoundY,machineBoundZ,null,false,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
 
                 // the machine pipes
 
@@ -170,7 +169,7 @@ class GenRoomDecorationClass
                 centerPt.x=pos.x+((pipeWid*Math.sin(rd))+(pipeWid*Math.cos(rd)));
                 centerPt.z=pos.z+((pipeWid*Math.cos(rd))-(pipeWid*Math.sin(rd)));
 
-                this.map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPt,yPipeBound,radius,MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPt,yPipeBound,radius,MESH_FLAG_DECORATION));
 
                 ang+=angAdd;
             }
@@ -233,7 +232,7 @@ class GenRoomDecorationClass
                 boxBoundY=new wsBound((boxY-high),((boxY-high)+config.ROOM_FLOOR_DEPTH));
                 boxBoundZ=new wsBound((pos.z-zWid),(pos.z+zWid));
 
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
 
                     // legs
 
@@ -241,17 +240,17 @@ class GenRoomDecorationClass
 
                 boxBoundX=new wsBound((pos.x-xWid),((pos.x-xWid)+legWid));
                 boxBoundZ=new wsBound((pos.z-zWid),((pos.z-zWid)+legWid));            
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
 
                 boxBoundZ=new wsBound(((pos.z+zWid)-legWid),(pos.z+zWid));            
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
 
                 boxBoundX=new wsBound(((pos.x+xWid)-legWid),(pos.x+xWid));
                 boxBoundZ=new wsBound((pos.z-zWid),((pos.z-zWid)+legWid));            
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
 
                 boxBoundZ=new wsBound(((pos.z+zWid)-legWid),(pos.z+zWid));            
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
 
                     // go up one level
                     

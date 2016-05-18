@@ -6,9 +6,8 @@
 
 class GenRoomDoorClass
 {
-    constructor(map,genRandom)
-    {    
-        this.map=map;
+    constructor(genRandom)
+    {
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -92,7 +91,7 @@ class GenRoomDoorClass
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
         var mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
-        return(this.map.addMesh(mesh));
+        return(map.addMesh(mesh));
     }
 
         //
@@ -176,7 +175,7 @@ class GenRoomDoorClass
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
         movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
         
-        this.map.addMovement(movement); 
+        map.addMovement(movement); 
     }
 
     createDoorZ(xBound,yBound,zBound)
@@ -256,7 +255,7 @@ class GenRoomDoorClass
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
         movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
         
-        this.map.addMovement(movement); 
+        map.addMovement(movement); 
     }
 }
 

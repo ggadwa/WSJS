@@ -544,7 +544,7 @@ class MapRoomClass
         // create polygon floors or ceilings
         //
         
-    createMeshFloor(map,bitmap,yStoryBound)
+    createMeshFloor(bitmap,yStoryBound)
     {
         var x,z,vx,vz,vx2,vz2;
         var v,nSegment;
@@ -625,7 +625,7 @@ class MapRoomClass
         map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
     }
     
-    createMeshCeiling(map,bitmap,yStoryBound)
+    createMeshCeiling(bitmap,yStoryBound)
     {
         var x,z,vx,vz,vx2,vz2;
         var v,nSegment,doBlock,yOpenBound;

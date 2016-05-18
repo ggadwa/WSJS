@@ -6,9 +6,8 @@
 
 class GenRoomStairsClass
 {
-    constructor(map,genRandom)
+    constructor(genRandom)
     {
-        this.map=map;
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -107,7 +106,7 @@ class GenRoomStairsClass
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
         var mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
-        this.map.addMesh(mesh);
+        map.addMesh(mesh);
     }
 
         //
@@ -240,7 +239,7 @@ class GenRoomStairsClass
                 else {
                     xBraceBound=new wsBound(xBound.max,(xBound.max+braceSize));
                 }
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,null,false,!flip,flip,true,true,false,false,false,MESH_FLAG_STAIR));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,null,false,!flip,flip,true,true,false,false,false,MESH_FLAG_STAIR));
             }
         }
         
@@ -410,7 +409,7 @@ class GenRoomStairsClass
                 else {
                     zBraceBound=new wsBound(zBound.max,(zBound.max+braceSize));
                 }
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,null,false,true,true,!flip,flip,false,false,false,MESH_FLAG_STAIR));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,null,false,true,true,!flip,flip,false,false,false,MESH_FLAG_STAIR));
             }
         }
         

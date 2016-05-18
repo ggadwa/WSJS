@@ -45,7 +45,7 @@ class MovementClass
         this.moves.push(move);
     }
     
-    run(map)
+    run()
     {
         var mesh,isOpen,prevIdx;
         var f,move;
@@ -128,6 +128,6 @@ class MovementClass
         
             // and any effected entity
             
-        entityList.movementPush(map,this.meshIdx,this.movePnt);
+        entityList.movementPush(this.meshIdx,this.movePnt);
     }
 }

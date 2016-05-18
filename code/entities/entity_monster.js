@@ -44,7 +44,7 @@ class EntityMonsterClass extends EntityClass
         // run monster
         //
     
-    run(map)
+    run()
     {
         var player;
         
@@ -71,13 +71,13 @@ class EntityMonsterClass extends EntityClass
                 
             if (!super.isFalling()) {
                 super.turnTowards(player.angle.y,1.0);
-                super.moveSimple(map,-50,true);
+                super.moveSimple(-50,true);
             }
         }
         
             // falling
         
-        super.fall(map);
+        super.fall();
         
             // firing projectiles
 

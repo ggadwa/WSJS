@@ -6,9 +6,8 @@
 
 class GenRoomLedgeClass
 {
-    constructor(map,genRandom)
+    constructor(genRandom)
     {
-        this.map=map;
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -78,7 +77,7 @@ class GenRoomLedgeClass
 
             // finally create the mesh
 
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_LEDGE));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_LEDGE));
     }
         
         //

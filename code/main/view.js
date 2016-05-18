@@ -529,7 +529,7 @@ class ViewClass
         // draw view
         //
 
-    draw(map)
+    draw()
     {
         var n,nEntity,entity;
         var player=entityList.getPlayer();

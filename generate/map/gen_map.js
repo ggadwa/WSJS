@@ -6,9 +6,8 @@
 
 class GenMapClass
 {
-    constructor(map,genRandom,callbackFunc)
+    constructor(genRandom,callbackFunc)
     {
-        this.map=map;
         this.genRandom=genRandom;
 
         this.currentRoomCount=0;
@@ -48,13 +47,13 @@ class GenMapClass
             // so slanted walls don't get erased (only
             // straight walls are connected)
             
-        nMesh=this.map.meshes.length;
+        nMesh=map.meshes.length;
         
         var targetMeshCount=0;
         var targetMeshList=new Uint16Array(nMesh);
 
         for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshes[n];
+            mesh=map.meshes[n];
             if ((mesh.flag!==MESH_FLAG_ROOM_WALL) && (mesh.flag!==MESH_FLAG_LEDGE)) continue;
             
                 // build a list of meshes that
@@ -64,7 +63,7 @@ class GenMapClass
             targetMeshCount=0;
             
             for (k=(n+1);k<nMesh;k++) {
-                otherMesh=this.map.meshes[k];
+                otherMesh=map.meshes[k];
                 if ((otherMesh.flag!==MESH_FLAG_ROOM_WALL) && (otherMesh.flag!==MESH_FLAG_LEDGE)) continue;
                 
                 if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
@@ -82,7 +81,7 @@ class GenMapClass
                 hit=false;
 
                 for (k=0;k!==targetMeshCount;k++) {
-                    otherMesh=this.map.meshes[targetMeshList[k]];
+                    otherMesh=map.meshes[targetMeshList[k]];
 
                     for (t2=0;t2!==otherMesh.trigCount;t2++) {
 
@@ -115,7 +114,7 @@ class GenMapClass
                 // remove the trig
 
             aTrig=trigList[n];
-            this.map.meshes[aTrig[0]].removeTriangle(aTrig[1]);
+            map.meshes[aTrig[0]].removeTriangle(aTrig[1]);
 
                 // shift other indexes
 
@@ -152,13 +151,13 @@ class GenMapClass
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=this.map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level);
-        room=this.map.rooms[roomIdx];
+        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level);
+        room=map.rooms[roomIdx];
         
             // floor
         
         room.liquid=(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1);
-        room.createMeshFloor(this.map,bitmapList.getBitmap('Map Floor'),yBound);
+        room.createMeshFloor(bitmapList.getBitmap('Map Floor'),yBound);
 
             // walls
             
@@ -172,8 +171,8 @@ class GenMapClass
             mesh2=room.createMeshWalls(roomBitmap,yFloorBound);
             mesh.combineMesh(mesh2);
             
-            this.map.addMesh(mesh);
-            if (n===0) this.map.addOverlayRoom(room);
+            map.addMesh(mesh);
+            if (n===0) map.addOverlayRoom(room);
             
             yStoryBound.add(-(yBound.getSize()+config.ROOM_FLOOR_DEPTH));
         }
@@ -181,14 +180,14 @@ class GenMapClass
             // the ceiling
         
         room.openCeiling=(this.genRandom.randomPercentage(0.5))&&(room.level!==0);
-        room.createMeshCeiling(this.map,bitmapList.getBitmap('Map Ceiling'),yFloorBound);
+        room.createMeshCeiling(bitmapList.getBitmap('Map Ceiling'),yFloorBound);
         
         return(roomIdx);
     }
 
     addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,flipDirection,level)
     {
-        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass(this.genRandom);
         
             // flip the direction if going down
             
@@ -235,7 +234,7 @@ class GenMapClass
         
             // add to overlay
             
-        this.map.addOverlayConnection(xStairBound,zStairBound);
+        map.addOverlayConnection(xStairBound,zStairBound);
     }
     
         //
@@ -246,7 +245,7 @@ class GenMapClass
     {
             // build the door
             
-        var genRoomDoor=new GenRoomDoorClass(this.map,this.genRandom);
+        var genRoomDoor=new GenRoomDoorClass(this.genRandom);
         
         if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
             genRoomDoor.createDoorX(xDoorBound,yDoorBound,zDoorBound);
@@ -257,14 +256,14 @@ class GenMapClass
         
             // add to overlay
             
-        this.map.addOverlayConnection(xDoorBound,zDoorBound);
+        map.addOverlayConnection(xDoorBound,zDoorBound);
     }
     
     addLiquidStairRoom(room,connectSide,xBound,zBound,flip)
     {
         var xStairBound,zStairBound;
         var yStairBound=new wsBound(room.yBound.max,(room.yBound.max+config.ROOM_BLOCK_WIDTH));
-        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass(this.genRandom);
         
             // if there's a door, sometimes we need stairs
             // on both sides of room, so we have a flipped version
@@ -322,7 +321,7 @@ class GenMapClass
             var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
             var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
             var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(bitmapList.getBitmap('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
+            map.addMesh(MeshPrimitivesClass.createMeshPryamid(bitmapList.getBitmap('Map Metal'),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -342,13 +341,13 @@ class GenMapClass
 
             // add light to map
 
-        this.map.addLight(new MapLightClass(lightPos,new wsColor(red,green,blue),config.MAP_GENERATE_LIGHTMAP,intensity,exponent));
+        map.addLight(new MapLightClass(lightPos,new wsColor(red,green,blue),config.MAP_GENERATE_LIGHTMAP,intensity,exponent));
     }
     
     addRoomLight(roomIdx)
     {
         var lightY,fixturePos,lightPos,intensity;
-        var room=this.map.rooms[roomIdx];
+        var room=map.rooms[roomIdx];
         
             // locations
             
@@ -575,7 +574,7 @@ class GenMapClass
 
                 }
                 
-                if (this.map.boxBoundCollision(xBound,null,zBound,MESH_FLAG_ROOM_WALL)===-1) break;
+                if (map.boxBoundCollision(xBound,null,zBound,MESH_FLAG_ROOM_WALL)===-1) break;
 
                 tryCount++;
                 if (tryCount>config.ROOM_MAX_CONNECT_TRY) return;
@@ -607,7 +606,7 @@ class GenMapClass
         roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,level);
         this.currentRoomCount++;
         
-        room=this.map.rooms[roomIdx];
+        room=map.rooms[roomIdx];
         
             // mark off any doors we made
             
@@ -724,14 +723,14 @@ class GenMapClass
     buildRoomClosets()
     {
         var n,room,closet;
-        var nRoom=this.map.rooms.length;
+        var nRoom=map.rooms.length;
         
         if (!config.ROOM_CLOSETS) return;
         
-        closet=new GenRoomClosetClass(this.map,this.genRandom);
+        closet=new GenRoomClosetClass(this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=map.rooms[n];
             if (!room.liquid) closet.addCloset(room);
         }
     }
@@ -739,14 +738,14 @@ class GenMapClass
     buildRoomPlatforms()
     {
         var n,room,platform;
-        var nRoom=this.map.rooms.length;
+        var nRoom=map.rooms.length;
         
         if (!config.ROOM_PLATFORMS) return;
         
-        platform=new GenRoomPlatformClass(this.map,this.genRandom);
+        platform=new GenRoomPlatformClass(this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=map.rooms[n];
             if ((room.hasStories) && (room.level===0)) platform.createPlatforms(room);
         }
     }
@@ -754,14 +753,14 @@ class GenMapClass
     buildRoomLedges()
     {
         var n,room,ledge;
-        var nRoom=this.map.rooms.length;
+        var nRoom=map.rooms.length;
         
         if (!config.ROOM_LEDGES) return;
         
-        ledge=new GenRoomLedgeClass(this.map,this.genRandom);
+        ledge=new GenRoomLedgeClass(this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=map.rooms[n];
             if (!room.liquid) ledge.createLedges(room);
         }
     }
@@ -769,14 +768,14 @@ class GenMapClass
     buildRoomPillars()
     {
         var n,room,pillar;
-        var nRoom=this.map.rooms.length;
+        var nRoom=map.rooms.length;
         
         if (!config.ROOM_PILLARS) return;
         
-        pillar=new GenRoomPillarClass(this.map,this.genRandom);
+        pillar=new GenRoomPillarClass(this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=map.rooms[n];
             if ((!room.openCeiling) && (!room.liquid)) pillar.addPillars(room);
         }
     }
@@ -784,14 +783,14 @@ class GenMapClass
     buildRoomDecorations()
     {
         var n,room,decoration;
-        var nRoom=this.map.rooms.length;
+        var nRoom=map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;
         
-        decoration=new GenRoomDecorationClass(this.map,this.genRandom);
+        decoration=new GenRoomDecorationClass(this.genRandom);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=map.rooms[n];
             if (!room.liquid) decoration.addDecorations(room);
         }
     }
@@ -884,7 +883,7 @@ class GenMapClass
     {
             // overlay precalc
             
-        this.map.precalcOverlayDrawValues();
+        map.precalcOverlayDrawValues();
         
             // finish with the callback
             

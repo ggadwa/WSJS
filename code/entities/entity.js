@@ -77,7 +77,7 @@ class EntityClass
         // move entity
         //
     
-    moveComplex(map,dist,extraAngle,bump,flying,clipping)
+    moveComplex(dist,extraAngle,bump,flying,clipping)
     {
         var angY=this.angle.y+extraAngle;
         
@@ -111,7 +111,7 @@ class EntityClass
             // there's been a bump, move it, otherwise,
             // try sliding
             
-        this.collision.moveObjectInMap(map,this,this.movePt,bump,this.collideMovePt);
+        this.collision.moveObjectInMap(this,this.movePt,bump,this.collideMovePt);
         if ((this.collideMovePt.equals(this.movePt)) || (this.collideMovePt.y!==0)) {
             this.position.addPoint(this.collideMovePt);
             return;
@@ -121,7 +121,7 @@ class EntityClass
             
         this.slidePt.setFromValues(this.movePt.x,0.0,0.0);
         
-        this.collision.moveObjectInMap(map,this,this.slidePt,false,this.collideSlideMovePt);
+        this.collision.moveObjectInMap(this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
             this.position.addPoint(this.collideSlideMovePt);
             return;
@@ -129,7 +129,7 @@ class EntityClass
         
         this.slidePt.setFromValues(0.0,0.0,this.movePt.z);
         
-        this.collision.moveObjectInMap(map,this,this.slidePt,false,this.collideSlideMovePt);
+        this.collision.moveObjectInMap(this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
             this.position.addPoint(this.collideSlideMovePt);
             return;
@@ -141,12 +141,12 @@ class EntityClass
         this.position.addPoint(this.collideMovePt);
     }
     
-    moveSimple(map,dist,bump)
+    moveSimple(dist,bump)
     {
         this.movePt.setFromValues(0.0,0.0,dist);
         this.movePt.rotateY(null,this.angle.y);
             
-        this.collision.moveObjectInMap(map,this,this.movePt,bump,this.collideMovePt);
+        this.collision.moveObjectInMap(this,this.movePt,bump,this.collideMovePt);
         if (!this.collideMovePt.equals(this.movePt)) return(true);
         
         this.position.addPoint(this.collideMovePt);
@@ -162,7 +162,7 @@ class EntityClass
         // falling
         //
         
-    fall(map)
+    fall()
     {        
         this.fallSpeed+=this.gravity;
         this.gravity+=2;
@@ -174,7 +174,7 @@ class EntityClass
             if (yChange===0) yChange=10;        // always try to fall
             if (yChange>500) yChange=500;
         
-            var fallY=this.collision.fallObjectInMap(map,this,yChange);
+            var fallY=this.collision.fallObjectInMap(this,yChange);
             this.position.move(0,fallY,0);
         
             if (fallY<=0) {
@@ -196,16 +196,16 @@ class EntityClass
         // check floors and ceilings (mostly projectiles)
         //
         
-    checkFloorCeilingCollision(map)
+    checkFloorCeilingCollision()
     {
-        return(this.collision.checkFloorCeilingCollision(map,this));
+        return(this.collision.checkFloorCeilingCollision(this));
     }
     
         //
         // mesh pushing
         //
         
-    movementPush(map,meshIdx,movePnt)
+    movementPush(meshIdx,movePnt)
     {
             // lifts
             
@@ -293,7 +293,7 @@ class EntityClass
         // run entity
         //
         
-    run(map)
+    run()
     {
     }
     

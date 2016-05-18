@@ -8,8 +8,6 @@ class MainClass
 {
     constructor()
     {
-        this.map=new MapClass();
-        
         this.genBitmapMap=null;
         this.genBitmapModel=null;
         this.genSound=null;
@@ -75,7 +73,7 @@ class MainClass
     {
         if (!bitmapList.initialize()) return;
         if (!soundList.initialize()) return;
-        if (!this.map.initialize()) return;
+        if (!map.initialize()) return;
         if (!modelList.initialize()) return;
         if (!sky.initialize()) return(false);
         if (!entityList.initialize()) return;
@@ -218,7 +216,7 @@ class MainClass
 
     initBuildMap()
     {
-        var genMap=new GenMapClass(this.map,new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
+        var genMap=new GenMapClass(new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 
@@ -235,11 +233,11 @@ class MainClass
     {
             // build the collision geometry
 
-        this.map.buildCollisionGeometry();
+        map.buildCollisionGeometry();
 
             // build the light/mesh intersection lists
 
-        this.map.buildLightMeshIntersectLists();
+        map.buildLightMeshIntersectLists();
 
             // next step
 
@@ -256,7 +254,7 @@ class MainClass
             // light maps are a long running
             // process so we need a callback
 
-        var genLightmap=new GenLightmapClass(this.map,config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
+        var genLightmap=new GenLightmapClass(config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
         genLightmap.create();
     }
 
@@ -361,7 +359,7 @@ class MainClass
 
             // make player entity
 
-        pos=this.map.findRandomEntityPosition(entityGenRandom);
+        pos=map.findRandomEntityPosition(entityGenRandom);
         if (pos===null) {
             alert('Couldn\'t find a place to spawn player!');
             return;
@@ -389,7 +387,7 @@ class MainClass
             // it's own model
 
         for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
-            pos=this.map.findRandomEntityPosition(entityGenRandom);
+            pos=map.findRandomEntityPosition(entityGenRandom);
             if (pos===null) continue;
             
             monsterType=entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);
@@ -412,7 +410,7 @@ class MainClass
             // finish by setting up all the mesh
             // buffers and indexes
 
-        this.map.setupBuffers();
+        map.setupBuffers();
 
             // ambient
 
@@ -452,8 +450,6 @@ var main=new MainClass();
 
 function mainLoop(timeStamp)
 {
-    var map=main.map;
-    
         // next frame
         
     if (view.loopCancel) return;
@@ -486,7 +482,7 @@ function mainLoop(timeStamp)
                     view.physicsTick-=PHYSICS_MILLISECONDS;
                     view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
 
-                    entityList.run(map);
+                    entityList.run();
                 }
             }
             else {
@@ -507,7 +503,7 @@ function mainLoop(timeStamp)
     if (view.drawTick>DRAW_MILLISECONDS) {
         view.lastDrawTimeStamp=view.timeStamp; 
 
-        view.draw(map);
+        view.draw();
         
         view.fpsTotal+=view.drawTick;
         view.fpsCount++;

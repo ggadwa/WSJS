@@ -74,7 +74,7 @@ class EntityListClass
         // handle movement pushes from moving map segments
         //
         
-    movementPush(map,meshIdx,movePnt)
+    movementPush(meshIdx,movePnt)
     {
         var n,entity;
         var nEntity=this.entities.length;
@@ -86,7 +86,7 @@ class EntityListClass
             entity=this.entities[n];
             if (entity instanceof EntityProjectileClass) continue;
             
-            entity.movementPush(map,meshIdx,movePnt);
+            entity.movementPush(meshIdx,movePnt);
         }
     }
     
@@ -94,7 +94,7 @@ class EntityListClass
         // run all entities
         //
         
-    run(map)
+    run()
     {
         var n;
         var nEntity=this.entities.length;
@@ -102,7 +102,7 @@ class EntityListClass
             // run the entities
             
         for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(map,this);
+            this.entities[n].run(this);
         }
         
             // now clean up any that got

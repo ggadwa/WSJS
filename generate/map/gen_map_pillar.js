@@ -6,9 +6,8 @@
 
 class GenRoomPillarClass
 {
-    constructor(map,genRandom)
-    {    
-        this.map=map;
+    constructor(genRandom)
+    {
         this.genRandom=genRandom;
         
         var minRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.08);
@@ -30,16 +29,16 @@ class GenRoomPillarClass
         var bitmap=bitmapList.getBitmap('Map Pillar');
         
         pos=room.checkLocationFreeAndBlock(1,1);
-        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
         pos=room.checkLocationFreeAndBlock((room.xBlockSize-2),1);
-        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
         pos=room.checkLocationFreeAndBlock((room.xBlockSize-2),(room.zBlockSize-2));
-        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
         pos=room.checkLocationFreeAndBlock(1,(room.zBlockSize-2));
-        if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
     }
     
     addPillarsLineX(room,yBound)
@@ -54,7 +53,7 @@ class GenRoomPillarClass
             if (x===mx) continue;           // never block light
             
             pos=room.checkLocationFreeAndBlock(x,mz);
-            if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
     }
     
@@ -70,7 +69,7 @@ class GenRoomPillarClass
             if (z===mz) continue;           // never block light
             
             pos=room.checkLocationFreeAndBlock(mx,z);
-            if (pos!==null) this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
     }
     

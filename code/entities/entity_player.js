@@ -109,7 +109,7 @@ class EntityPlayerClass extends EntityClass
         // run player
         //
     
-    run(map)
+    run()
     {
         var bump,weapon;
         
@@ -135,14 +135,14 @@ class EntityPlayerClass extends EntityClass
         
             // movement
             
-        if (this.forwardSpeed!==0.0) super.moveComplex(map,this.forwardSpeed,0.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
-        if (this.sideSpeed!==0.0) super.moveComplex(map,this.sideSpeed,90.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
+        if (this.forwardSpeed!==0.0) super.moveComplex(this.forwardSpeed,0.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
+        if (this.sideSpeed!==0.0) super.moveComplex(this.sideSpeed,90.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
         
         if (this.verticalSpeed!==0.0) super.moveDirect(0.0,this.verticalSpeed,0.0);
         
             // falling
         
-        if (!config.PLAYER_FLY) super.fall(map);
+        if (!config.PLAYER_FLY) super.fall();
     }
     
 }

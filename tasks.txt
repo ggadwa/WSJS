@@ -46,11 +46,6 @@ REGULAR TODOs
 #### implement swimming
 
 
-[ ] make a lot of objects global (map, view, there's only one, no need to pass around)
-
-        map
-        modelList
-
 
 
 [X] some more code refactoring

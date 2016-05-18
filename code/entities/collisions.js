@@ -125,7 +125,7 @@ class CollisionClass
         // colliding objects
         //
 
-    moveObjectInMap(map,entity,movePt,bump,collideMovePt)
+    moveObjectInMap(entity,movePt,bump,collideMovePt)
     {
         var n,k;
         var mesh,checkEntity,checkEntityPt;
@@ -293,7 +293,7 @@ class CollisionClass
     // fall object in map
     //
     
-    fallObjectInMap(map,entity,fallY)
+    fallObjectInMap(entity,fallY)
     {
         var n,k,nMesh,nCollisionRect;
         var mesh,collisionRect;
@@ -343,7 +343,7 @@ class CollisionClass
         // floor and ceiling collisions
         //
         
-    checkFloorCeilingCollision(map,entity)
+    checkFloorCeilingCollision(entity)
     {
         var n,k,nMesh,nCollisionRect;
         var mesh,collisionRect;

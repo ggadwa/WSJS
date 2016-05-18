@@ -6,9 +6,8 @@
 
 class GenRoomPlatformClass
 {
-    constructor(map,genRandom)
+    constructor(genRandom)
     {
-        this.map=map;
         this.genRandom=genRandom;
         
         Object.seal(this);
@@ -23,7 +22,7 @@ class GenRoomPlatformClass
         var xStairBound=new wsBound((room.xBound.min+(stairX*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((stairX+1)*config.ROOM_BLOCK_WIDTH)));
         var zStairBound=new wsBound((room.zBound.min+(stairZ*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((stairZ+1)*config.ROOM_BLOCK_WIDTH)));
 
-        var genRoomStairs=new GenRoomStairsClass(this.map,this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass(this.genRandom);
         
         switch (stairDir) {
             case 0:
@@ -62,7 +61,7 @@ class GenRoomPlatformClass
         
             // add to overlay
         
-        this.map.addOverlayPlatform(xStairBound,zStairBound);
+        map.addOverlayPlatform(xStairBound,zStairBound);
     }
     
         //
@@ -75,13 +74,13 @@ class GenRoomPlatformClass
         var yPlatformBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),room.yBound.min);
         var zPlatformBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
 
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_PLATFORM));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             
         room.setPlatformGrid(x,z);
 
-        this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
+        map.addOverlayPlatform(xPlatformBound,zPlatformBound);
     }
     
         //
@@ -97,7 +96,7 @@ class GenRoomPlatformClass
         var yLiftBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),(room.yBound.max+extraY));
         var zLiftBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
 
-        meshIdx=this.map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_LIFT));
+        meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_LIFT));
 
             // the movement
         
@@ -107,13 +106,13 @@ class GenRoomPlatformClass
         movement.addMove(new MoveClass(1500,new wsPoint(0,(config.ROOM_FLOOR_HEIGHT+extraY),0)));
         movement.addMove(new MoveClass(2000,new wsPoint(0,(config.ROOM_FLOOR_HEIGHT+extraY),0)));
         
-        this.map.addMovement(movement); 
+        map.addMovement(movement); 
 
             // can't span on this
             
         room.setBlockGrid(x,z);
 
-        this.map.addOverlayPlatform(xLiftBound,zLiftBound);
+        map.addOverlayPlatform(xLiftBound,zLiftBound);
     }
     
         //

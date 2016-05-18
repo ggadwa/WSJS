@@ -563,3 +563,8 @@ class MapClass
     
 }
 
+//
+// the global map object
+//
+
+var map=new MapClass();

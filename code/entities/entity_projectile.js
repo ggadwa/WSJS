@@ -40,7 +40,7 @@ class EntityProjectileClass extends EntityClass
         // projectile hits
         //
         
-    hit(map)
+    hit()
     {
             // delete entity
             
@@ -60,7 +60,7 @@ class EntityProjectileClass extends EntityClass
         // run projectile
         //
     
-    run(map)
+    run()
     {
             // cancel any projectile that lasts over lifetime
             
@@ -79,15 +79,15 @@ class EntityProjectileClass extends EntityClass
         
             // move it and check wall collisions
             
-        if (super.moveSimple(map,this.projectile.speed,false)) {
-            this.hit(map);
+        if (super.moveSimple(this.projectile.speed,false)) {
+            this.hit();
             return;
         }
         
             // check floor and ceiling collisions
             
-        if (super.checkFloorCeilingCollision(map)) {
-            this.hit(map);
+        if (super.checkFloorCeilingCollision()) {
+            this.hit();
             return;
         }
     }
