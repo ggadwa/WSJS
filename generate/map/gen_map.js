@@ -633,6 +633,10 @@ class GenMapClass
                 break;
         }
         
+            // finally add the liquid
+        
+        map.addLiquid(new MapLiquidClass(bitmapList.getBitmap('Map Liquid'),room));
+        
             // mask off edges that have collided with
             // the newest room or stairs leading to a room
             // we use this mask to calculate ledges and other

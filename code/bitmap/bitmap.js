@@ -73,13 +73,13 @@ class BitmapClass
         // or as a lightmap
         //
     
-    attachAsTexture(mapShader)
+    attachAsTexture(shader)
     {
         var gl=view.gl;
 
             // shine factor in shader
 
-        gl.uniform1f(mapShader.shineFactorUniform,this.shineFactor);
+        gl.uniform1f(shader.shineFactorUniform,this.shineFactor);
 
             // the textures
 
@@ -98,6 +98,14 @@ class BitmapClass
         var gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE3);
+        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+    }
+    
+    attachAsLiquid()
+    {
+        var gl=view.gl;
+
+        gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
     

@@ -602,9 +602,9 @@ class ViewClass
         this.drawMeshCount=0;
         this.drawMeshTrigCount=0;
 
-        map.drawStart();
-        map.draw();
-        map.drawEnd();
+        map.drawMeshStart();
+        map.drawMesh();
+        map.drawMeshEnd();
 
             // draw the entities
             // always skip index 0 as that's the player
@@ -629,6 +629,12 @@ class ViewClass
                 if (config.DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(entity.model);
             }
         }
+        
+            // liquids
+            
+        map.drawLiquidStart();
+        map.drawLiquid();
+        map.drawLiquidEnd();
         
             // particles
             

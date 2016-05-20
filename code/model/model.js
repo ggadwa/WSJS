@@ -10,7 +10,7 @@ class ModelClass
     {
         this.name=name;
         this.modelType=modelType;
-        this.modelShader=null;          // this gets set when model is attached to model list
+        this.modelMeshShader=null;          // this gets set when model is attached to model list
         this.mesh=null;
         this.skeleton=null;
         
@@ -35,7 +35,7 @@ class ModelClass
     {
         var model=new ModelClass(this.name,this.modelType);
         
-        model.modelShader=this.modelShader;
+        model.modelMeshShader=this.modelMeshShader;
         model.mesh=this.mesh.clone();
         model.skeleton=this.skeleton.clone();
 
@@ -62,22 +62,22 @@ class ModelClass
 
     drawStart()
     {
-        this.modelShader.drawStart();
+        this.modelMeshShader.drawStart();
     }
 
     drawEnd()
     {
-        this.modelShader.drawEnd();
+        this.modelMeshShader.drawEnd();
     }
 
     draw()
     {
         var mesh=this.mesh;
 
-        mesh.bitmap.attachAsTexture(this.modelShader);
+        mesh.bitmap.attachAsTexture(this.modelMeshShader);
         
         mesh.buildNonCulledTriangleIndexes();
-        mesh.bindBuffers(this.modelShader);
+        mesh.bindBuffers(this.modelMeshShader);
         mesh.draw();
     }
 

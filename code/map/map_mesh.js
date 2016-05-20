@@ -572,21 +572,21 @@ class MapMeshClass
         this.indexBuffer=gl.createBuffer();
     }
 
-    bindBuffers(mapShader)
+    bindBuffers(mapMeshShader)
     {
         var gl=view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.vertexAttribPointer(mapShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(mapMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.vertexAttribPointer(mapShader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(mapMeshShader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.vertexAttribPointer(mapShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(mapMeshShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
-        gl.vertexAttribPointer(mapShader.vertexAndLightmapUVAttribute,4,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(mapMeshShader.vertexAndLightmapUVAttribute,4,gl.FLOAT,false,0,0);
 
             // need to always rebuild the array from the culled list
             

@@ -9,7 +9,7 @@ class ModelListClass
     constructor()
     {
         this.models=[];
-        this.modelShader=new ModelShaderClass();
+        this.modelMeshShader=new ModelMeshShaderClass();
         
         Object.seal(this);
     }
@@ -20,12 +20,12 @@ class ModelListClass
 
     initialize()
     {
-        return(this.modelShader.initialize());
+        return(this.modelMeshShader.initialize());
     }
 
     release()
     {
-        this.modelShader.release();
+        this.modelMeshShader.release();
     }
 
         //
@@ -34,7 +34,7 @@ class ModelListClass
 
     addModel(model)
     {
-        model.modelShader=this.modelShader;
+        model.modelMeshShader=this.modelMeshShader;
         this.models.push(model);
     }
 

@@ -8,7 +8,8 @@ class MapClass
 {
     constructor()
     {
-        this.mapShader=new MapShaderClass();
+        this.mapMeshShader=new MapMeshShaderClass();
+        this.mapLiquidShader=new MapLiquidShaderClass();        // shared
 
         this.meshes=[];
         this.lights=[];
@@ -36,12 +37,12 @@ class MapClass
     initialize()
     {
         if (!this.overlay.initialize()) return(false);
-        return(this.mapShader.initialize());
+        return(this.mapMeshShader.initialize());
     }
 
     release()
     {
-        this.mapShader.release();
+        this.mapMeshShader.release();
         this.overlay.release();
     }
     
@@ -53,10 +54,15 @@ class MapClass
     {
         var n;
         var nMesh=this.meshes.length;
+        var nLiquid=this.liquids.length;
         var nLightmap=this.lightmaps.length;
 
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].close();
+        }
+        
+        for (n=0;n!==nLiquid;n++) {
+            this.liquids[n].close();
         }
 
         for (n=0;n!==nLightmap;n++) {
@@ -97,7 +103,7 @@ class MapClass
     
     addLiquid(liquid)
     {
-        this.liquid.push(liquid);
+        this.liquids.push(liquid);
         return(this.liquids.length-1);
     }
     
@@ -472,30 +478,35 @@ class MapClass
     {
         var n;
         var nMesh=this.meshes.length;
+        var nLiquid=this.liquids.length;
 
-            // setup all the gl
-            // buffers and indexes
+            // setup all the mesh and
+            // liquid gl buffers
 
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].setupBuffers();
         }
+        
+        for (n=0;n!==nLiquid;n++) {
+            this.liquids[n].setupBuffers();
+        }
     }
 
         //
-        // draw map
+        // draw map meshes
         //
 
-    drawStart()
+    drawMeshStart()
     {
-        this.mapShader.drawStart();
+        this.mapMeshShader.drawStart();
     }
 
-    drawEnd()
+    drawMeshEnd()
     {
-        this.mapShader.drawEnd();
+        this.mapMeshShader.drawEnd();
     }
 
-    draw()
+    drawMesh()
     {
         var n,mesh;
         var nMesh=this.meshes.length;
@@ -520,7 +531,7 @@ class MapClass
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.mapShader);
+                mesh.bitmap.attachAsTexture(this.mapMeshShader);
             }
 
             if (mesh.lightmap!==currentLightmap) {
@@ -532,7 +543,7 @@ class MapClass
 
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers(this.mapShader);
+            mesh.bindBuffers(this.mapMeshShader);
             mesh.draw();
         }
         
@@ -559,6 +570,55 @@ class MapClass
             }
         }
         
+    }
+    
+        //
+        // draw map liquids
+        //
+
+    drawLiquidStart()
+    {
+        this.mapMeshShader.drawStart();
+    }
+
+    drawLiquidEnd()
+    {
+        this.mapMeshShader.drawEnd();
+    }
+
+    drawLiquid()
+    {
+        var n,liquid;
+        var nLiquid=this.liquids.length;
+        var currentBitmap;
+
+            // setup liquid drawing
+
+        currentBitmap=null;
+
+            // draw the liquids
+
+        for (n=0;n!==nLiquid;n++) {
+            liquid=this.liquids[n];
+
+                // skip if not in view frustum
+
+            if (!view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
+
+                // time to change bitmap
+                // or lightmap?
+
+            if (liquid.bitmap!==currentBitmap) {
+                currentBitmap=liquid.bitmap;
+                liquid.bitmap.attachAsLiquid(this.mapLiquidShader);
+            }
+
+                // draw the liquid
+
+            liquid.updateBuffers();
+            liquid.bindBuffers(this.mapMeshShader);
+            liquid.draw();
+        }
     }
     
 }
