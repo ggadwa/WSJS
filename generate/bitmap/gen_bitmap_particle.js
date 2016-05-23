@@ -4,12 +4,11 @@
 // generate particle bitmap class
 //
 
-class GenBitmapParticleClass
+class GenBitmapParticleClass extends GenBitmapClass
 {
     constructor(genRandom)
     {    
-        this.genRandom=genRandom;
-        this.genBitmapUtility=new GenBitmapUtilityClass(genRandom);
+        super(genRandom);
         
         Object.seal(this);
     }
@@ -35,8 +34,8 @@ class GenBitmapParticleClass
 
             // no types yet
             
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.0,0.0,0.0));
-        this.genBitmapUtility.drawOval(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0),null);
+        this.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.0,0.0,0.0));
+        this.drawOval(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0),null);
 
             // debug just displays the canvases, so send
             // them back

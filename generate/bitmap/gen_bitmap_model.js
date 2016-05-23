@@ -4,12 +4,11 @@
 // generate model bitmap class
 //
 
-class GenBitmapModelClass
+class GenBitmapModelClass extends GenBitmapClass
 {
     constructor(genRandom)
     {    
-        this.genRandom=genRandom;
-        this.genBitmapUtility=new GenBitmapUtilityClass(genRandom);
+        super(genRandom);
         
         Object.seal(this);
     }
@@ -24,18 +23,18 @@ class GenBitmapModelClass
         var xCount;
 
         var scaleCount=this.genRandom.randomInt(5,10);
-        var skinColor=this.genBitmapUtility.getRandomPrimaryColor(0.4,0.7);
-        var borderColor=this.genBitmapUtility.darkenColor(skinColor,0.8);
+        var skinColor=this.getRandomPrimaryColor(0.4,0.7);
+        var borderColor=this.darkenColor(skinColor,0.8);
 
         var sWid=wid/scaleCount;
         var sHigh=high/scaleCount;
          
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,skinColor);
-        this.genBitmapUtility.addNoiseRect(bitmapCTX,0,0,wid,high,0.5,0.7,0.6);
-        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,5);
-        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.drawRect(bitmapCTX,0,0,wid,high,skinColor);
+        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.5,0.7,0.6);
+        this.blur(bitmapCTX,0,0,wid,high,5);
+        this.clearNormalsRect(normalCTX,0,0,wid,high);
         
             // scales
 
@@ -53,7 +52,7 @@ class GenBitmapModelClass
             }
             
             for (x=0;x!==xCount;x++) {
-                this.genBitmapUtility.draw3DOval(bitmapCTX,normalCTX,Math.trunc(dx),Math.trunc(dy),Math.trunc(dx+sWid),Math.trunc(dy+(sHigh*2)),0.25,0.75,3,0,null,borderColor);
+                this.draw3DOval(bitmapCTX,normalCTX,Math.trunc(dx),Math.trunc(dy),Math.trunc(dx+sWid),Math.trunc(dy+(sHigh*2)),0.25,0.75,3,0,null,borderColor);
                 dx+=sWid;
             }
             
@@ -62,7 +61,7 @@ class GenBitmapModelClass
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.4);
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.4);
     }
     
         //
@@ -75,14 +74,14 @@ class GenBitmapModelClass
         var darken,lineColor,markCount;
         var particleWid,particleHigh,particleDensity;
         
-        var clothColor=this.genBitmapUtility.getRandomPrimaryColor(0.3,0.3);
+        var clothColor=this.getRandomPrimaryColor(0.3,0.3);
          
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,clothColor);
-        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.drawRect(bitmapCTX,0,0,wid,high,clothColor);
+        this.clearNormalsRect(normalCTX,0,0,wid,high);
         
-        this.genBitmapUtility.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.5);        
+        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.5);        
  
             // lines
             
@@ -94,9 +93,9 @@ class GenBitmapModelClass
             y2=this.genRandom.randomInt(0,high);
             
             darken=0.6+(this.genRandom.random()*0.25);
-            lineColor=this.genBitmapUtility.darkenColor(clothColor,darken);
+            lineColor=this.darkenColor(clothColor,darken);
             
-            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor,false);
         }
 
             // marks
@@ -111,16 +110,16 @@ class GenBitmapModelClass
             x=this.genRandom.randomInt(0,wid);
             y=this.genRandom.randomInt(0,high);
 
-            this.genBitmapUtility.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
+            this.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
         }
         
             // blur it
             
-        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,25);
+        this.blur(bitmapCTX,0,0,wid,high,25);
 
             // finish with the specular
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.3);
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.3);
     }
     
         //
@@ -133,12 +132,12 @@ class GenBitmapModelClass
         var darken,boost,lineColor;
         var halfHigh=Math.trunc(high*0.5);
 
-        var furColor=this.genBitmapUtility.getRandomColor([0.5,0.2,0.0],[0.7,0.4,0.0]);
+        var furColor=this.getRandomColor([0.5,0.2,0.0],[0.7,0.4,0.0]);
          
             // clear canvases
 
-        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,furColor);       
-        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.drawRect(bitmapCTX,0,0,wid,high,furColor);       
+        this.clearNormalsRect(normalCTX,0,0,wid,high);
 
             // hair
             
@@ -148,28 +147,28 @@ class GenBitmapModelClass
                 
             if ((n%2)===0) {
                 darken=0.5+(this.genRandom.random()*0.3);
-                lineColor=this.genBitmapUtility.darkenColor(furColor,darken);
+                lineColor=this.darkenColor(furColor,darken);
             }
             else {
                 boost=0.1+(this.genRandom.random()*0.3);
-                lineColor=this.genBitmapUtility.boostColor(furColor,boost);
+                lineColor=this.boostColor(furColor,boost);
             }
             
                 // hair half from top
                 
             y=halfHigh+this.genRandom.randomInt(0,halfHigh);
-            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,-5,x,(y+5),10,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,-5,x,(y+5),10,lineColor,false);
             
                 // hair half from bottom
                 
             y=high-(halfHigh+this.genRandom.randomInt(0,halfHigh));
-            this.genBitmapUtility.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(high+5),10,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(high+5),10,lineColor,false);
         }
 
             // finish with the specular
             // fur isn't shiney so this specular is very low
 
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.3);
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.3);
     }
     
         //
@@ -178,9 +177,9 @@ class GenBitmapModelClass
         
     generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
-        this.genBitmapUtility.drawUVTest(bitmapCTX,0,0,wid,high);
-        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.3);
+        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.drawUVTest(bitmapCTX,0,0,wid,high);
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.3);
     }
 
         //

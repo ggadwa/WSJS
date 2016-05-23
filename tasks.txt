@@ -36,26 +36,25 @@ REGULAR TODOs
       - benches?
       - cages (2 corners, top and bottom)
 #### closets more complex?
+#### windows like you do closets
 
 #### better wall sliding
 
-#### can I pack lighting better?
+#### can I pack lighting better? (maybe remove exponent)
 
 #### outside sections
 #### implement swimming
 
-#### rename gen_bitmap_util to gen_bitmap
-#### make vertex movement based on x/z position, not position in room
 
 
 
 
 [X] some more code refactoring
+[X] some generated texture improvements
 [X] monster cylinders now are around body size instead of complete size including limbs
 [X] better whips on blobs
-[X] added skybox and liquid textures (need work, placeholders now)
-[X] add sky boxes and open ceilings
-[X] added liquid rooms, plus connector stairs and lifts
+[X] add sky textures, sky boxes and open ceilings
+[X] added liquid textures, liquid rooms, plus connector stairs and lifts
 [ ] more decoration types
 [X] separated and cleaned up the code for all the different bitmap generation types, separated in debug mode
        

@@ -83,18 +83,18 @@ class MapLiquidClass
         vz=this.zBound.min;
         gz=0.0;
         
-        offRow=true;
+        offRow=Math.trunc(vz/config.ROOM_BLOCK_WIDTH);
         
         for (z=0;z!==(this.zBlockSize+1);z++) {
             
             vx=this.xBound.min;
             gx=0.0;
             
-            offCol=offRow;
+            offCol=Math.trunc(vx/config.ROOM_BLOCK_WIDTH);
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
-                this.vertices[vIdx++]=offCol?(this.y-offY):(this.y+offY);
+                this.vertices[vIdx++]=(((offRow+offCol)%2)===0)?(this.y-offY):(this.y+offY);
                 this.vertices[vIdx++]=vz;
                 
                 this.uvs[uvIdx++]=gx;
@@ -103,13 +103,13 @@ class MapLiquidClass
                 vx+=config.ROOM_BLOCK_WIDTH;
                 gx+=1.0;
                 
-                offCol=!offCol;
+                offCol++;
             }
             
             vz+=config.ROOM_BLOCK_WIDTH;
             gz+=1.0;
             
-            offRow=!offRow;
+            offRow++;
         }
     }
     
