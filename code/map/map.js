@@ -37,11 +37,13 @@ class MapClass
     initialize()
     {
         if (!this.overlay.initialize()) return(false);
-        return(this.mapMeshShader.initialize());
+        if (!this.mapMeshShader.initialize()) return(false);
+        return(this.mapLiquidShader.initialize());
     }
 
     release()
     {
+        this.mapLiquidShader.release();
         this.mapMeshShader.release();
         this.overlay.release();
     }
@@ -578,12 +580,21 @@ class MapClass
 
     drawLiquidStart()
     {
-        this.mapMeshShader.drawStart();
+        var gl=view.gl;
+        
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+        this.mapLiquidShader.drawStart();
     }
 
     drawLiquidEnd()
     {
-        this.mapMeshShader.drawEnd();
+        var gl=view.gl;
+        
+        this.mapLiquidShader.drawEnd();
+        
+        gl.disable(gl.BLEND);
     }
 
     drawLiquid()
@@ -610,13 +621,13 @@ class MapClass
 
             if (liquid.bitmap!==currentBitmap) {
                 currentBitmap=liquid.bitmap;
-                liquid.bitmap.attachAsLiquid(this.mapLiquidShader);
+                liquid.bitmap.attachAsLiquid();
             }
 
                 // draw the liquid
 
             liquid.updateBuffers();
-            liquid.bindBuffers(this.mapMeshShader);
+            liquid.bindBuffers(this.mapLiquidShader);
             liquid.draw();
         }
     }

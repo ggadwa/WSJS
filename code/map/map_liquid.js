@@ -65,8 +65,15 @@ class MapLiquidClass
 
     updateBuffers()
     {
-        var x,z,vx,vz,xFlip,zFlip;
+        var x,z,vx,vz,gx,gz;
         var vIdx,uvIdx;
+        var offRow,offCol;
+        
+            // get the y offsets for waves
+        
+        var freq=((view.timeStamp%config.ROOM_LIQUID_WAVE_FREQUENCY)/config.ROOM_LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
+        var cs=Math.cos(freq);
+        var offY=Math.trunc(cs*config.ROOM_LIQUID_WAVE_HEIGHT);
         
             // create mesh
             
@@ -74,25 +81,35 @@ class MapLiquidClass
         uvIdx=0;
         
         vz=this.zBound.min;
-        zFlip=true;
+        gz=0.0;
+        
+        offRow=true;
         
         for (z=0;z!==(this.zBlockSize+1);z++) {
+            
             vx=this.xBound.min;
+            gx=0.0;
+            
+            offCol=offRow;
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
-                this.vertices[vIdx++]=this.y;
+                this.vertices[vIdx++]=offCol?(this.y-offY):(this.y+offY);
                 this.vertices[vIdx++]=vz;
                 
-                this.uvs[uvIdx++]=zFlip?0.0:1.0;
-                this.uvs[uvIdx++]=xFlip?0.0:1.0;
+                this.uvs[uvIdx++]=gx;
+                this.uvs[uvIdx++]=gz;
                 
                 vx+=config.ROOM_BLOCK_WIDTH;
-                xFlip=!xFlip;
+                gx+=1.0;
+                
+                offCol=!offCol;
             }
             
             vz+=config.ROOM_BLOCK_WIDTH;
-            zFlip=!zFlip;
+            gz+=1.0;
+            
+            offRow=!offRow;
         }
     }
     

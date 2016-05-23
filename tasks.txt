@@ -42,8 +42,10 @@ REGULAR TODOs
 #### can I pack lighting better?
 
 #### outside sections
-#### liquid rooms
 #### implement swimming
+
+#### rename gen_bitmap_util to gen_bitmap
+#### make vertex movement based on x/z position, not position in room
 
 
 
@@ -53,7 +55,7 @@ REGULAR TODOs
 [X] better whips on blobs
 [X] added skybox and liquid textures (need work, placeholders now)
 [X] add sky boxes and open ceilings
-[ ] added liquid rooms, plus connector stairs and lifts
+[X] added liquid rooms, plus connector stairs and lifts
 [ ] more decoration types
 [X] separated and cleaned up the code for all the different bitmap generation types, separated in debug mode
        

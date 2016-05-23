@@ -1128,6 +1128,26 @@ class GenBitmapMapClass
 
         this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,5.0,0.4);
     }
+    
+        //
+        // liquid
+        //
+        
+    generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        var color=this.genBitmapUtility.getRandomColor([0.2,0.6,0.2],[0.4,1.0,0.4]);
+        
+        this.genBitmapUtility.clearNormalsRect(normalCTX,0,0,wid,high);
+        
+        this.genBitmapUtility.drawRect(bitmapCTX,0,0,wid,high,color);
+        
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,0,0,wid,high,0.3,0.5,0.9);
+        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,10);
+        this.genBitmapUtility.addNoiseRect(bitmapCTX,0,0,wid,high,0.4,0.7,0.9);
+        this.genBitmapUtility.blur(bitmapCTX,0,0,wid,high,5);
+        
+        this.genBitmapUtility.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.5);
+    }
 
         //
         // UV tester
@@ -1276,7 +1296,7 @@ class GenBitmapMapClass
                 break;
                 
             case GEN_BITMAP_MAP_TYPE_LIQUID:
-                this.generateUVTest(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=8.0;
                 break;
 

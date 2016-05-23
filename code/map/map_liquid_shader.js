@@ -39,7 +39,7 @@ class MapLiquidShaderClass extends ShaderClass
 
         this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
         this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
-
+        
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');

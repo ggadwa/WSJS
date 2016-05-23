@@ -131,7 +131,7 @@ class GenMapClass
         // create rooms
         //
 
-    addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,level)
+    addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,lastLiquid,level)
     {
         var n,mesh,mesh2;
         var storyCount,yStoryBound,yFloorBound;
@@ -156,7 +156,7 @@ class GenMapClass
         
             // floor
         
-        room.liquid=(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1);
+        room.liquid=(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1)&&(!lastLiquid);
         room.createMeshFloor(bitmapList.getBitmap('Map Floor'),yBound);
 
             // walls
@@ -603,7 +603,10 @@ class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,level);
+        var lastLiquid=false;
+        if (lastRoom!==null) lastLiquid=lastRoom.liquid;
+            
+        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,lastLiquid,level);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -635,7 +638,7 @@ class GenMapClass
         
             // finally add the liquid
         
-        map.addLiquid(new MapLiquidClass(bitmapList.getBitmap('Map Liquid'),room));
+        if (room.liquid) map.addLiquid(new MapLiquidClass(bitmapList.getBitmap('Map Liquid'),room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room
