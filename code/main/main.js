@@ -50,15 +50,21 @@ class MainClass
 
     run()
     {
-        fileCache.fillCache(this.initGL.bind(this));       // this contains all the shader code, needs to be loaded first
+        fileCache.fillCache(this.initCanvas.bind(this));       // this contains all the shader code, needs to be loaded first
+    }
+    
+    initCanvas()
+    {
+        view.createCanvas();
+        
+        setTimeout(this.initGL.bind(this),PROCESS_TIMEOUT_MSEC);
     }
 
     initGL()
     {
-            // init view
-            // webgl and canvas stuff
-
-        if (!view.initialize("wsCanvas")) return;
+            // init view ang webgl
+        
+        if (!view.initialize()) return;
 
             // next step
 

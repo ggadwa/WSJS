@@ -34,7 +34,7 @@ REGULAR TODOs
 #### more decorations
       - can combine decorations in one room
       - benches?
-      - cages (2 corners, top and bottom)
+      - cages 3 possible walls, can be wall, or bars, top and bottom
 #### closets more complex?
 #### windows like you do closets
 

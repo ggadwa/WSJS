@@ -159,7 +159,7 @@ class ViewClass
         // initialize and release
         //
 
-    initialize(canvasId)
+    createCanvas()
     {
         var margin=0;
         
@@ -186,11 +186,27 @@ class ViewClass
         this.canvas.height=high;
         
         document.body.appendChild(this.canvas);
-
+    }
+    
+        //
+        // initialize and release
+        //
+    
+    initialize()
+    {
             // get the gl context
 
-        this.gl=this.canvas.getContext("webgl");
-        if (this.gl===null) this.canvas.getContext("experimental-webgl");
+        this.gl=this.canvas.getContext("webgl",
+                {
+                    alpha:false,
+                    depth:true,
+                    stencil:false,
+                    antialias:false,
+                    premultipliedAlpha:false,
+                    preserveDrawingBuffer:true,
+                    failIfMajorPerformanceCaveat:false
+                }
+            );
         
         if (this.gl===null) {
             alert('WebGL not available, can not run, try a newer browser');
