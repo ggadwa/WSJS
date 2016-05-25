@@ -55,7 +55,7 @@ class ConfigClass
             // liquids
             //
             
-        this.ROOM_LIQUID_PERCENTAGE=0.3;                // what % of time a two story room can have a liquid
+        this.ROOM_LIQUID_PERCENTAGE=0.2;                // what % of time a two story room can have a liquid
         
         this.ROOM_LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
         this.ROOM_LIQUID_WAVE_HEIGHT=400;               // pixel height of waves

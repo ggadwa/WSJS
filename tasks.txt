@@ -11,52 +11,45 @@ REGULAR TODOs
 
 
 #### collisions against slanted walls are bad
-#### glowing computer lights?
-#### spikes
-
-
-#### animals better
-#### blobs better
 #### weapon models
-
-
 #### get rid of weapon fire hard-coding
-#### still need to figure out door/staircase problem
 
 #### monster speed/health random/projectile,no-projectile
-
-#### flying monsters
 
 #### projectiles
       - bounce, bounce factor (implement)
       - reflect (implement)
 
 #### more decorations
-      - can combine decorations in one room
       - benches?
-      - cages 3 possible walls, can be wall, or bars, top and bottom
+      - random platform, then bars or walls, then platform?  pedestal
 #### closets more complex?
 #### windows like you do closets
 
 #### better wall sliding
 
-#### can I pack lighting better? (maybe remove exponent)
-
 #### outside sections
 #### implement swimming
 
+#### humanoid models
+      - whips instead of arms
+      - need hunch offset for animations
+      - spikes?
+#### animal models
+      - need to be more random
+      - animation better
+      - legs have outwards (spider like) angle
+#### blob models
+      - overall size changes, can be much shorter
+#### flyers
 
 
 
 
-[X] some more code refactoring
-[X] some generated texture improvements
-[X] monster cylinders now are around body size instead of complete size including limbs
-[X] better whips on blobs
-[X] add sky textures, sky boxes and open ceilings
-[X] added liquid textures, liquid rooms, plus connector stairs and lifts
+[X] room decorations can now be mixed
 [ ] more decoration types
-[X] separated and cleaned up the code for all the different bitmap generation types, separated in debug mode
+
+
        
 [ ] add ability for projectiles to have different gravity settings, bounce, and reflect
 
