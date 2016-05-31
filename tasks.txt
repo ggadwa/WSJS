@@ -26,6 +26,8 @@ REGULAR TODOs
 #### closets more complex?
 #### windows like you do closets
 
+#### light mapping is pretty crappy in places, more than likely because of low resolution
+
 #### better wall sliding
 
 #### outside sections
@@ -33,21 +35,28 @@ REGULAR TODOs
 
 #### humanoid models
       - whips instead of arms
-      - need hunch offset for animations
       - spikes?
 #### animal models
       - need to be more random
       - animation better
       - legs have outwards (spider like) angle
 #### blob models
-      - overall size changes, can be much shorter
 #### flyers
 
 
 
 
+
+
 [X] room decorations can now be mixed
-[ ] more decoration types
+[X] added pipe decorations
+[X] machine decorations don't have cables in open ceiling rooms
+[X] liquid flag wasn't working properly
+[X] fixed a bug where generator would not get even distribution of monster types
+[X] blobs have must larger body size ranges and no longer require heads
+[X] fixed a bug random body changes could open up seams
+[X] animal model types have improved heads
+[X] humanoid models have random back hunches
 
 
        

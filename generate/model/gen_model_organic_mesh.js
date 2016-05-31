@@ -575,7 +575,7 @@ class GenModelOrganicMeshClass
             if (v.boneIdx===-1) continue;
             
             bone=bones[v.boneIdx];
-            v.position.scaleFromPoint(bone.gravityScale);
+            v.position.scaleFromPoint(bone.position,bone.gravityScale);
         }
     }
     
@@ -631,11 +631,13 @@ class GenModelOrganicMeshClass
     randomScaleVertexToBones(vertexList)
     {
         var n,k,v,v2,f,len;
-        var bone;
+        var bone,pos;
         var nVertex=vertexList.length;
         var bones=this.model.skeleton.bones;
         
         var prevMove=new Uint8Array(nVertex);
+        
+        pos=new wsPoint(0,0,0);
 
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
@@ -647,6 +649,10 @@ class GenModelOrganicMeshClass
                 
             if (prevMove[n]!==0) continue;
             
+                // get original position
+                
+            pos.setFromPoint(v.position);
+            
                 // move the vertex
                 // and any similar vertex
             
@@ -656,7 +662,7 @@ class GenModelOrganicMeshClass
             for (k=0;k!==nVertex;k++) {
                 if (prevMove[k]!==0) continue;
                 v2=vertexList[k];
-                if (v2.position.truncEquals(v.position)) {
+                if ((k===n) || (v2.position.truncEquals(pos))) {
                     v2.position.subPoint(bone.position);
                     v2.position.scale(f);
                     v2.position.addPoint(bone.position);

@@ -245,6 +245,8 @@ class GenModelOrganicSkeletonClass
         bodyLimb=new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_Y,8,8,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
         this.model.skeleton.limbs.push(bodyLimb);
         
+        bodyLimb.hunchAngle=this.genRandom.randomInt(0,20);
+        
             // create head limbs
         
         if (this.genRandom.randomPercentage(0.9)) {
@@ -357,23 +359,33 @@ class GenModelOrganicSkeletonClass
                     
         this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_BODY,LIMB_AXIS_Z,10,10,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]));
         
-            // create the head limbs
+            // create the head and jaw limbs
 
-        var headRadius=this.genRandom.randomInt(300,300);
+        var headRadius=this.genRandom.randomInt(300,700);
         
-        var jawLength=Math.trunc(bodyLength*(this.genRandom.randomInt(95,20)/100.0));
-        var jawHigh=totalHigh+this.genRandom.randomInt(50,300);
-        var headHigh=jawHigh+Math.trunc(headRadius*0.5);
-            
-        var neckBoneIdx=bones.push(new ModelBoneClass('Neck',torsoTopBoneIdx,new wsPoint(0,-totalHigh,-Math.trunc(bodyLength*0.55))))-1;
-        var jawBoneIdx=bones.push(new ModelBoneClass('Neck',neckBoneIdx,new wsPoint(0,-jawHigh,-jawLength)))-1;
-        var headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new wsPoint(0,-headHigh,-jawLength)))-1;
+        var high=-bones[torsoTopBoneIdx].position.y;
+        var neckLength=Math.trunc(bodyLength*0.5)+this.genRandom.randomInt(400,600);
+        var headLength=neckLength+this.genRandom.randomInt(300,800);
+        var jawPivotLength=neckLength+this.genRandom.randomInt(50,50);
+        var jawLength=jawPivotLength+this.genRandom.randomInt(300,800);
+        var jawHigh=high-this.genRandom.randomInt(50,100);
+        var headHigh=high;
+        
+        var neckPivotBoneIdx=bones.push(new ModelBoneClass('Neck Pivot',torsoTopBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.5))))-1;
+        var neckBoneIdx=bones.push(new ModelBoneClass('Neck',neckPivotBoneIdx,new wsPoint(0,-high,-neckLength)))-1;
+        var jawPivotBoneIdx=bones.push(new ModelBoneClass('Jaw Pivot',neckBoneIdx,new wsPoint(0,-jawHigh,-jawPivotLength)))-1;
+        var jawBoneIdx=bones.push(new ModelBoneClass('Jaw',jawPivotBoneIdx,new wsPoint(0,-jawHigh,-jawLength)))-1;
+        var headBoneIdx=bones.push(new ModelBoneClass('Head',neckBoneIdx,new wsPoint(0,-headHigh,-headLength)))-1;
         
         bones[headBoneIdx].gravityLockDistance=headRadius;
-        bones[jawBoneIdx].gravityLockDistance=headRadius;
-        bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,150);
+        bones[jawPivotBoneIdx].gravityLockDistance=bones[jawBoneIdx].gravityLockDistance=Math.trunc(headRadius*0.8);
+        bones[neckBoneIdx].gravityLockDistance=bones[neckPivotBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,150);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,LIMB_AXIS_Z,8,8,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
+        bones[headBoneIdx].gravityScale.setFromValues(1.0,0.8,1.0);
+        bones[jawBoneIdx].gravityScale.setFromValues(1.0,0.3,1.0);
+        
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD_SNOUT,LIMB_AXIS_Z,8,8,[headBoneIdx,neckBoneIdx,neckPivotBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD_JAW,LIMB_AXIS_Z,8,8,[jawBoneIdx,jawPivotBoneIdx]));
 
             // create legs
         
@@ -410,7 +422,7 @@ class GenModelOrganicSkeletonClass
             // can never be taller than a single floor height
             // and always shorter than humanoids (no legs)
         
-        var totalHigh=this.genRandom.randomInt(Math.trunc(config.ROOM_FLOOR_HEIGHT*0.1),Math.trunc(config.ROOM_FLOOR_HEIGHT*0.4));
+        var totalHigh=this.genRandom.randomInt(Math.trunc(config.ROOM_FLOOR_HEIGHT*0.05),Math.trunc(config.ROOM_FLOOR_HEIGHT*0.7));
         
             // the base bone
             
@@ -418,8 +430,8 @@ class GenModelOrganicSkeletonClass
 
             // create body limb
             
-        var topBodyRadius=this.genRandom.randomInt(300,1000);
-        var botBodyRadius=this.genRandom.randomInt(300,1000);
+        var topBodyRadius=this.genRandom.randomInt(200,2500);
+        var botBodyRadius=this.genRandom.randomInt(200,2500);
 
         var hipBoneIdx=bones.push(new ModelBoneClass('Hip',baseBoneIdx,new wsPoint(0,0,0)))-1;
         var waistBoneIdx=bones.push(new ModelBoneClass('Waist',hipBoneIdx,new wsPoint(0,-Math.trunc(totalHigh*0.25),0)))-1;
@@ -442,20 +454,22 @@ class GenModelOrganicSkeletonClass
         this.model.skeleton.limbs.push(bodyLimb);
         
             // create head limbs
-            
-        var neckHigh=Math.trunc(totalHigh*0.76);
-        var jawHigh=neckHigh+this.genRandom.randomInt(topBodyRadius,(totalHigh*0.05));
-        var headHigh=jawHigh+this.genRandom.randomInt(topBodyRadius,(totalHigh*0.1));
-            
-        var neckBoneIdx=bones.push(new ModelBoneClass('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
-        var jawBoneIdx=bones.push(new ModelBoneClass('Neck',neckBoneIdx,new wsPoint(0,-jawHigh,0)))-1;
-        var headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new wsPoint(0,-headHigh,0)))-1;
         
-        bones[headBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,400);
-        bones[jawBoneIdx].gravityLockDistance=this.genRandom.randomInt(300,400);
-        bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,150);
-        
-        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,LIMB_AXIS_Y,8,8,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
+        if (this.genRandom.randomPercentage(0.5)) {
+            var neckHigh=Math.trunc(totalHigh*0.76);
+            var jawHigh=neckHigh+this.genRandom.randomInt((topBodyRadius*0.5),(totalHigh*0.1));
+            var headHigh=jawHigh+this.genRandom.randomInt((topBodyRadius*0.5),(totalHigh*0.2));
+
+            var neckBoneIdx=bones.push(new ModelBoneClass('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
+            var jawBoneIdx=bones.push(new ModelBoneClass('Neck',neckBoneIdx,new wsPoint(0,-jawHigh,0)))-1;
+            var headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new wsPoint(0,-headHigh,0)))-1;
+
+            bones[headBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,800);
+            bones[jawBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,800);
+            bones[neckBoneIdx].gravityLockDistance=this.genRandom.randomInt(100,800);
+
+            this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HEAD,LIMB_AXIS_Y,8,8,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
+        }
         
             // create any whips
             
@@ -469,7 +483,7 @@ class GenModelOrganicSkeletonClass
             
             whipRadius=Math.trunc(botBodyRadius*0.35);
             if (whipRadius<250) whipRadius=250;
-            if (whipRadius>350) whipRadius=350;
+            if (whipRadius>500) whipRadius=500;
             whipLength=this.genRandom.randomInt(whipMinLength,whipExtraLength);
             
             this.buildLimbWhip(n,boneIdx,whipRadius,bones[boneIdx].position.y,whipLength,rotOffset);

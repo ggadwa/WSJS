@@ -74,7 +74,7 @@ class GenBitmapModelClass extends GenBitmapClass
         var darken,lineColor,markCount;
         var particleWid,particleHigh,particleDensity;
         
-        var clothColor=this.getRandomPrimaryColor(0.3,0.3);
+        var clothColor=this.getRandomPrimaryColor(0.3,0.4);
          
             // clear canvases
 
@@ -132,7 +132,7 @@ class GenBitmapModelClass extends GenBitmapClass
         var darken,boost,lineColor;
         var halfHigh=Math.trunc(high*0.5);
 
-        var furColor=this.getRandomColor([0.5,0.2,0.0],[0.7,0.4,0.0]);
+        var furColor=this.getRandomPrimaryColor(0.2,0.4);
          
             // clear canvases
 

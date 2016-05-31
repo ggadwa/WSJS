@@ -209,7 +209,7 @@ class ViewClass
             );
         
         if (this.gl===null) {
-            alert('WebGL not available, can not run, try a newer browser');
+            alert('WebGL not available, try a newer browser');
             return(false);
         }
 

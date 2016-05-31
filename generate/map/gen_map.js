@@ -154,9 +154,9 @@ class GenMapClass
         roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level);
         room=map.rooms[roomIdx];
         
-            // floor
+            // liquid flags and floor
         
-        room.liquid=(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1)&&(!lastLiquid);
+        room.liquid=(config.ROOM_LIQUIDS)&&(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1)&&(!lastLiquid);
         room.createMeshFloor(bitmapList.getBitmap('Map Floor'),yBound);
 
             // walls

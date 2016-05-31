@@ -97,7 +97,7 @@ class GenRoomDecorationClass
         var machineWid;
         var nPipe,pipeWid,radius;
         var ang,angAdd,rd;
-        var machineBitmap,metalBitmap,pipeBitmap;
+        var machineBitmap,platformBitmap,pipeBitmap;
         var centerPt,yPipeBound;
             
             // machine size setup
@@ -120,7 +120,7 @@ class GenRoomDecorationClass
         if (pos===null) return;
         
         machineBitmap=bitmapList.getBitmap('Map Machine');
-        metalBitmap=bitmapList.getBitmap('Map Metal');
+        platformBitmap=bitmapList.getBitmap('Map Platform');
         pipeBitmap=bitmapList.getBitmap('Map Metal');
         
             // do machine
@@ -135,10 +135,14 @@ class GenRoomDecorationClass
         machineBoundX=new wsBound((pos.x-wid),(pos.x+wid));
         machineBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
 
-        map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
-        map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,midBoundY,machineBoundZ,null,false,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
-        map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        if (!room.openCeiling) map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,machineBoundX,topBoundY,machineBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,machineBoundX,midBoundY,machineBoundZ,null,false,true,true,true,true,true,true,false,MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,machineBoundX,botBoundY,machineBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
 
+            // no pipes if open ceiling
+
+        if (room.openCeiling) return;
+        
             // the machine pipes
 
         nPipe=this.genRandom.randomInt(1,5);
@@ -237,6 +241,71 @@ class GenRoomDecorationClass
     }
     
         //
+        // pipes
+        //
+        
+    addPipes(room)
+    {
+        var n,pos,ty,by,platformBoundX,platformBoundY,platformBoundZ,pipeBoundY;
+        var nPipe,pipeWid,radius,wid;
+        var ang,angAdd,rd;
+        var platformBitmap,pipeBitmap;
+        var centerPt;
+        
+            // can't have pipes in open ceiling rooms
+            
+        if (room.openCeiling) return;
+            
+            // the pipes location
+
+        pos=room.findRandomDecorationLocation(this.genRandom,true);
+        if (pos===null) return;
+        
+        platformBitmap=bitmapList.getBitmap('Map Platform');
+        pipeBitmap=bitmapList.getBitmap('Map Metal');
+        
+            // the pipe platforms
+            
+        ty=room.yStoryBound.min+this.genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
+        by=room.yStoryBound.max-this.genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
+        
+        wid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.5);
+
+        platformBoundX=new wsBound((pos.x-wid),(pos.x+wid));
+        platformBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
+
+        platformBoundY=new wsBound(room.yStoryBound.min,ty);
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
+        
+        platformBoundY=new wsBound(by,room.yStoryBound.max);
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+
+        pipeBoundY=new wsBound(ty,by);
+        
+            // create the pipes
+            
+        nPipe=this.genRandom.randomInt(1,5);
+
+        centerPt=new wsPoint(0,0,0);
+
+        ang=0.0;
+        angAdd=360.0/nPipe;
+
+        pipeWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.25);
+        radius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
+
+        for (n=0;n!==nPipe;n++) {
+            rd=ang*DEGREE_TO_RAD;
+            centerPt.x=pos.x+((pipeWid*Math.sin(rd))+(pipeWid*Math.cos(rd)));
+            centerPt.z=pos.z+((pipeWid*Math.cos(rd))-(pipeWid*Math.sin(rd)));
+
+            map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPt,pipeBoundY,radius,MESH_FLAG_DECORATION));
+
+            ang+=angAdd;
+        }
+    }
+    
+        //
         // decorations mainline
         //
 
@@ -247,11 +316,11 @@ class GenRoomDecorationClass
         pieceCount=this.genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
 
         for (n=0;n!==pieceCount;n++) {
-
+            
                 // randomly pick a decoration
                 // 0 = nothing
 
-            switch (this.genRandom.randomIndex(4)) {
+            switch (this.genRandom.randomIndex(5)) {
                 case 1:
                     this.addBoxes(room);
                     break;
@@ -260,6 +329,9 @@ class GenRoomDecorationClass
                     break;
                 case 3:
                     this.addShelve(room);
+                    break;
+                case 4:
+                    this.addPipes(room);
                     break;
             }
         }

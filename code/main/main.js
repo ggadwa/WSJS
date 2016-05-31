@@ -156,34 +156,6 @@ class MainClass
             // next step
 
         view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Dynamic Model Textures');
-        view.loadingScreenDraw(null);
-
-        setTimeout(this.initBuildModelTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
-    }
-    
-    initBuildModelTextures(idx)
-    {
-            // pick a random model texture type
-
-        var bitmapType=this.modelTextureTypes[this.genBitmapModel.genRandom.randomIndex(this.modelTextureTypes.length)];
-
-            // generate bitmap
-
-        bitmapList.addBitmap(this.genBitmapModel.generate(('Monster '+idx),bitmapType,false));
-
-            // if more textures, then loop back around
-
-        idx++;
-        if (idx<config.MONSTER_TYPE_COUNT) {
-            view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);
-            setTimeout(this.initBuildModelTextures.bind(this,idx),PROCESS_TIMEOUT_MSEC);
-            return;
-        }
-
-            // next step
-
-        view.loadingScreenUpdate();
         view.loadingScreenAddString('Generating Dynamic Sounds');
         view.loadingScreenDraw(null);
 
@@ -273,26 +245,30 @@ class MainClass
         view.loadingScreenAddString('Generating Dynamic Models');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildModelsMesh.bind(this,0,modelGenRandom),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildModelsMesh.bind(this,-1,modelGenRandom),PROCESS_TIMEOUT_MSEC);
     }
 
     initBuildModelsMesh(idx,modelGenRandom)
     {
         var model,genSkeleton,genModelMesh;
+        var monsterType;
 
-            // get bitmap
+            // build a bitmap
+            
+        var bitmapName=(idx===-1)?'player':('monster_'+idx);
+        var bitmapType=this.modelTextureTypes[this.genBitmapModel.genRandom.randomIndex(this.modelTextureTypes.length)];
+        var modelBitmap=this.genBitmapModel.generate(bitmapName,bitmapType,false);
+        bitmapList.addBitmap(modelBitmap);
 
-        var modelBitmap=bitmapList.getBitmap('Monster '+(idx%3));
-
-            // player model if 0
+            // player is -1
             // else a monster
 
-        if (idx===0) {
+        if (idx===-1) {
             model=new ModelClass('player',MODEL_TYPE_HUMANOID);
         }
         else {
-            model=new ModelClass(('monster_'+(idx-1)),((idx-1)%3));        // supergumba -- TESTING -- always make at least one of each type
-        //    model=new ModelClass(('monster_'+(idx-1)),MODEL_TYPE_ANIMAL);
+            monsterType=MODEL_MONSTER_TYPES[idx%(MODEL_MONSTER_TYPES.length)];        // supergumba -- TESTING -- always make at least one of each type
+            model=new ModelClass(('monster_'+idx),monsterType);
         }
 
             // build the skeleton and mesh
@@ -307,10 +283,9 @@ class MainClass
 
             // if more models, then loop back around
 
-        view.loadingScreenDraw(idx/config.MONSTER_TYPE_COUNT);    
-
         idx++;
-        if (idx<(config.MONSTER_TYPE_COUNT+1)) {
+        if (idx<config.MONSTER_TYPE_COUNT) {
+            view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
             setTimeout(this.initBuildModelsMesh.bind(this,idx,modelGenRandom),PROCESS_TIMEOUT_MSEC);
             return;
         }
@@ -372,7 +347,7 @@ class MainClass
             return;
         }
 
-        var playerEntity=new EntityPlayerClass('Player',pos,new wsPoint(0.0,0.0,0.0),200,modelList.getModel('player'));
+        var playerEntity=new EntityPlayerClass('player',pos,new wsPoint(0.0,0.0,0.0),200,modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         var playerWeapon=genWeapon.generate();
         playerWeapon.addProjectile(genProjectile.generate(true));
@@ -397,10 +372,10 @@ class MainClass
             pos=map.findRandomEntityPosition(entityGenRandom);
             if (pos===null) continue;
             
-            monsterType=entityGenRandom.randomInt(0,config.MONSTER_TYPE_COUNT);
-            model=modelList.cloneModel(('monster_'+monsterType));
-
-            entityList.addEntity(new EntityMonsterClass(('Monster '+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
+            //monsterType=MODEL_TYPE_ANIMAL;      // testing
+            model=modelList.cloneModel('monster_'+monsterType);
+            entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
 
             // finished

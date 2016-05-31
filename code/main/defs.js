@@ -353,11 +353,11 @@ class wsPoint
         this.z*=f;
     }
     
-    scaleFromPoint(pt)
+    scaleFromPoint(pt,scale)
     {
-        this.x*=pt.x;
-        this.y*=pt.y;
-        this.z*=pt.z;
+        this.x=((this.x-pt.x)*scale.x)+pt.x;
+        this.y=((this.y-pt.y)*scale.y)+pt.y;
+        this.z=((this.z-pt.z)*scale.z)+pt.z;
     }
     
     matrixMultiply(mat)

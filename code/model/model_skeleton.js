@@ -62,6 +62,8 @@ class ModelLimbClass
         this.aroundSurfaceCount=aroundSurfaceCount;
         this.boneIndexes=boneIndexes;
         
+        this.hunchAngle=0.0;
+        
         Object.seal(this);
     }
     
@@ -395,15 +397,20 @@ class ModelSkeletonClass
         this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0.0,(r*0.5),(z*0.9));
     }
     
-    poseSetBody(limb,startAng,extraAng)
+    poseSetBody(limb,startAng,extraAng,hunchAngle)
     {
         var n,x;
         var nBone=limb.boneIndexes.length;
 
         x=view.genRandom.randomInBetween(startAng,extraAng);
         if (this.lastAnimationFlip) x=-x;
+        
+        x+=hunchAngle;
+        
+            // always start past hip bone as we don't
+            // want to rotate against the base bone
             
-        for (n=0;n!==nBone;n++) {
+        for (n=1;n!==nBone;n++) {
             this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);
             x*=0.75;
         }
@@ -414,11 +421,13 @@ class ModelSkeletonClass
         var n,x,z;
         var nBone=limb.boneIndexes.length;
 
-        x=view.genRandom.randomInBetween(15,45);
-        z=view.genRandom.randomInBetween(15,45);
         if (this.lastAnimationFlip) {
-            x=-x;
-            z=-z;
+            x=view.genRandom.randomInBetween(5,10);
+            z=view.genRandom.randomInBetween(5,10);
+        }
+        else {
+            x=-view.genRandom.randomInBetween(15,45);
+            z=-view.genRandom.randomInBetween(15,45);
         }
             
         for (n=0;n!==nBone;n++) {
@@ -428,6 +437,33 @@ class ModelSkeletonClass
         }
     }
     
+    poseSetHeadSnout(limb)
+    {
+        var n,y;
+        var nBone=limb.boneIndexes.length;
+
+        y=view.genRandom.randomInBetween(5,10);
+        if (this.lastAnimationFlip) y=-y;
+            
+        for (n=0;n!==nBone;n++) {
+            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(0.0,y,0.0);
+            y*=1.1;
+        }
+    }
+    
+    poseSetHeadJaw(limb)
+    {
+        var n,x;
+        var nBone=limb.boneIndexes.length;
+
+        x=view.genRandom.randomInBetween(25,40);
+        if (this.lastAnimationFlip) x=0;
+            
+        for (n=0;n!==nBone;n++) {
+            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);
+        }
+    }
+   
         //
         // walk poses
         //
@@ -446,17 +482,17 @@ class ModelSkeletonClass
             switch (limb.limbType) {
                 case LIMB_TYPE_BODY:
                     if (modelType==MODEL_TYPE_HUMANOID) {
-                        this.poseSetBody(limb,5.0,5.0);
+                        this.poseSetBody(limb,5.0,5.0,limb.hunchAngle);
                         break;
                     }
                     if (modelType===MODEL_TYPE_BLOB) {
-                        this.poseSetBody(limb,15.0,30.0);
+                        this.poseSetBody(limb,15.0,30.0,0.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_HEAD:
                     if (modelType===MODEL_TYPE_ANIMAL) {
-                        this.poseSetBody(limb,5.0,15.0);
+                        this.poseSetBody(limb,5.0,15.0,0.0);
                         break;
                     }
                     break;
@@ -474,6 +510,12 @@ class ModelSkeletonClass
                     break;
                 case LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);
+                    break;
+                case LIMB_TYPE_HEAD_SNOUT:
+                    this.poseSetHeadSnout(limb);
+                    break;
+                case LIMB_TYPE_HEAD_JAW:
+                    this.poseSetHeadJaw(limb);
                     break;
             }
         }
@@ -520,17 +562,17 @@ class ModelSkeletonClass
             switch (limb.limbType) {
                 case LIMB_TYPE_BODY:
                     if (modelType==MODEL_TYPE_HUMANOID) {
-                        this.poseSetBody(limb,3.0,3.0);
+                        this.poseSetBody(limb,3.0,3.0,limb.hunchAngle);
                         break;
                     }
                     if (modelType===MODEL_TYPE_BLOB) {
-                        this.poseSetBody(limb,5.0,5.0);
+                        this.poseSetBody(limb,5.0,5.0,0.0);
                         break;
                     }
                     break;
                 case LIMB_TYPE_HEAD:
                     if (modelType===MODEL_TYPE_ANIMAL) {
-                        this.poseSetBody(limb,0.0,10.0);
+                        this.poseSetBody(limb,0.0,10.0,0.0);
                         break;
                     }
                     break;
@@ -548,6 +590,12 @@ class ModelSkeletonClass
                     break;
                 case LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);
+                    break;
+                case LIMB_TYPE_HEAD_SNOUT:
+                    this.poseSetHeadSnout(limb);
+                    break;
+                case LIMB_TYPE_HEAD_JAW:
+                    this.poseSetHeadJaw(limb);
                     break;
             }
         }
