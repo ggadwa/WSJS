@@ -25,7 +25,7 @@ class MapLiquidClass
             // need a single Y, and then create a yBound
             // so the frustum calcs can use it
             
-        this.y=room.yBound.max+config.ROOM_FLOOR_DEPTH;
+        this.y=room.getLiquidY();
         this.yBound=new wsBound(this.y,this.y);
         
             // null buffers

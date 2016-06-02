@@ -25,6 +25,7 @@ REGULAR TODOs
       - random platform, then bars or walls, then platform?  pedestal
 #### closets more complex?
 #### windows like you do closets
+#### liquid tint colors are hardcoded
 
 #### light mapping is pretty crappy in places, more than likely because of low resolution
 
@@ -33,16 +34,9 @@ REGULAR TODOs
 #### outside sections
 #### implement swimming
 
-#### humanoid models
-      - whips instead of arms
-      - spikes?
-#### animal models
-      - need to be more random
-      - animation better
-      - legs have outwards (spider like) angle
-#### blob models
-#### flyers
-
+#### model spikes
+#### other leg positions
+#### flyers models
 
 
 
@@ -57,6 +51,8 @@ REGULAR TODOs
 [X] fixed a bug random body changes could open up seams
 [X] animal model types have improved heads
 [X] humanoid models have random back hunches
+[X] some models can have limbs but no toes or fingers
+[X] liquid tinting
 
 
        

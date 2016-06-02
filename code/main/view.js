@@ -87,10 +87,6 @@ class ViewClass
             this.lights.push(null);
         }
 
-            // camera setup
-
-        this.CAMERA_EYE_HEIGHT=3000;
-
             // frustum planes
 
         this.clipPlane=new Float32Array(16);            // global to avoid GCd
@@ -134,7 +130,7 @@ class ViewClass
         this.drawModelCount=0;
         this.drawModelTrigCount=0;
         
-            // interface pieces
+            // health
         
         this.uiHealthHigh=0;
         this.uiHealthRect=new wsRect(0,0,0,0);
@@ -142,6 +138,11 @@ class ViewClass
         this.uiHealthFrameRect=new wsRect(0,0,0,0);
         this.uiHealthFrameColor=new wsColor(1.0,1.0,1.0);
         this.uiHealthAlpha=0.7;
+        
+            // tinting
+            
+        this.uiTintRect=new wsRect(0,0,0,0);
+        this.uiTintColor=new wsColor(1.0,0.0,0.0);
 
             // loading screen
 
@@ -246,6 +247,8 @@ class ViewClass
         this.uiHealthHigh=Math.trunc(this.high*0.5)-10;
         this.uiHealthRect.setFromValues(5,(this.high-this.uiHealthHigh),25,(this.high-5));
         this.uiHealthFrameRect.setFromValues(5,((this.high-5)-this.uiHealthHigh),25,(this.high-5));
+        
+        this.uiTintRect.setFromValues(0,0,this.wid,this.high);
 
         return(true);
     }
@@ -549,7 +552,7 @@ class ViewClass
     {
         var n,nEntity,entity;
         var player=entityList.getPlayer();
-        var light;
+        var light,tintOn,tintAlpha;
          
             // everything overdraws except
             // clear the depth buffer
@@ -559,7 +562,7 @@ class ViewClass
             // setup the view camera to be
             // equal to player object
             
-        this.camera.setToEntity(player,this.CAMERA_EYE_HEIGHT);
+        this.camera.setToEntity(player,player.eyeOffset);
 
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
@@ -666,12 +669,34 @@ class ViewClass
             weapon.drawEnd();
         }
         
+            // setup any tinting
+        
+        tintOn=false;
+        
+        if (player.inLiquid()) {
+            tintOn=true;
+            player.getCurrentRoom().setTintFromLiquidColor(this.uiTintColor);
+            tintAlpha=0.5;
+        }
+        
+            // interface drawing
+            
+        this.interface.drawStart();
+        
+            // any tints
+            
+        if (tintOn) {
+            this.interface.drawRect(this.uiTintRect,this.uiTintColor,tintAlpha);
+        }
+        
             // health
         
-        this.interface.drawStart();
         this.uiHealthRect.top=this.uiHealthRect.bot-Math.trunc(this.uiHealthHigh*player.getPercentageHealth());
         this.interface.drawRect(this.uiHealthRect,this.uiHealthColor,this.uiHealthAlpha);
         this.interface.drawFrameRect(this.uiHealthFrameRect,this.uiHealthFrameColor,1.0);
+        
+            // finish interface drawing
+            
         this.interface.drawEnd();
 
             // map overlay

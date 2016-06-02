@@ -16,6 +16,8 @@ class EntityClass
         
         this.radius=this.model.calculateRadius();
         this.high=this.model.calculateHeight();
+        
+        this.eyeOffset=3000;
 
         this.id=-1;
         
@@ -24,6 +26,8 @@ class EntityClass
 
         this.fallSpeed=0;
         this.gravity=0;
+        
+        this.currentRoom=null;
 
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
@@ -287,6 +291,44 @@ class EntityClass
     getPercentageHealth()
     {
         return(this.health/this.maxHealth);
+    }
+    
+        //
+        // room information
+        //
+        
+    inLiquid()
+    {
+        if (this.currentRoom===null) return(false);
+        if (!this.currentRoom.liquid) return(false);
+        
+        return((this.position.y-this.eyeOffset)>=this.currentRoom.getLiquidY());
+    }
+    
+    getCurrentRoom()
+    {
+        return(this.currentRoom);
+    }
+    
+    setupCurrentRoom()
+    {
+        var n,room;
+        var nRoom=map.rooms.length;
+        
+            // check if still in the current
+            // room
+            
+        if (this.currentRoom!==null) {
+            if (this.currentRoom.posInRoom(this.position)) return;
+        }
+        
+        for (n=0;n!==nRoom;n++) {
+            room=map.rooms[n];
+            if (room.posInRoom(this.position)) {
+                this.currentRoom=room;
+                return;
+            }
+        }
     }
     
         //

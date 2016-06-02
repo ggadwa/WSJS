@@ -143,6 +143,10 @@ class EntityPlayerClass extends EntityClass
             // falling
         
         if (!config.PLAYER_FLY) super.fall();
+        
+            // setup current room
+            
+        super.setupCurrentRoom();
     }
     
 }

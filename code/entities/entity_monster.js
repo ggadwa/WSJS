@@ -79,6 +79,10 @@ class EntityMonsterClass extends EntityClass
         
         super.fall();
         
+            // setup current room
+            
+        super.setupCurrentRoom();
+        
             // firing projectiles
 
         if (this.active) {

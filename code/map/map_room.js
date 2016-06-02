@@ -358,6 +358,15 @@ class MapRoomClass
     }
     
         //
+        // position utilities
+        //
+        
+    posInRoom(pos)
+    {
+        return((pos.x>=this.xBound.min) && (pos.x<this.xBound.max) && (pos.z>=this.zBound.min) && (pos.z<this.zBound.max));
+    }
+    
+        //
         // create polygon walls and floors
         //
         
@@ -731,6 +740,20 @@ class MapRoomClass
             this.zBound.min-=config.ROOM_BLOCK_WIDTH;
             this.zBound.max+=config.ROOM_BLOCK_WIDTH;
         }
+    }
+    
+        //
+        // liquids
+        //
+        
+    getLiquidY()
+    {
+        return(this.yBound.max+config.ROOM_FLOOR_DEPTH);
+    }
+    
+    setTintFromLiquidColor(col)
+    {
+        col.setFromValues(0.0,0.0,1.0);         // supergumba -- hard coded
     }
 
 }
