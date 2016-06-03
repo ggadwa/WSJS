@@ -552,7 +552,7 @@ class ViewClass
     {
         var n,nEntity,entity;
         var player=entityList.getPlayer();
-        var light,tintOn,tintAlpha;
+        var light,tintOn,tintAtt;
          
             // everything overdraws except
             // clear the depth buffer
@@ -672,11 +672,16 @@ class ViewClass
             // setup any tinting
         
         tintOn=false;
+        this.uiTintColor.setFromValues(0.0,0.0,0.0);
         
+        tintAtt=player.getDamageTintAttenuation();
+        if (tintAtt!==0.0) {
+            tintOn=true;
+            this.uiTintColor.addFromValues(tintAtt,0.0,0.0);
+        }
         if (player.inLiquid()) {
             tintOn=true;
-            player.getCurrentRoom().setTintFromLiquidColor(this.uiTintColor);
-            tintAlpha=0.5;
+            player.getCurrentRoom().addTintFromLiquidColor(this.uiTintColor);
         }
         
             // interface drawing
@@ -686,7 +691,8 @@ class ViewClass
             // any tints
             
         if (tintOn) {
-            this.interface.drawRect(this.uiTintRect,this.uiTintColor,tintAlpha);
+            this.uiTintColor.fixOverflow();
+            this.interface.drawRect(this.uiTintRect,this.uiTintColor,0.5);
         }
         
             // health

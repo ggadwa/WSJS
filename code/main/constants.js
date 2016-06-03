@@ -7,6 +7,7 @@
     //
 
 const DEGREE_TO_RAD=Math.PI/180.0;
+const RAD_TO_DEGREE=180.0/Math.PI;
 
     //
     // processing

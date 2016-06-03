@@ -38,8 +38,8 @@ REGULAR TODOs
 #### other leg positions
 #### flyers models
 
-
-
+#### news in lines (defs.h)
+#### turn towards was broken, get all the angles working right
 
 
 [X] room decorations can now be mixed
@@ -52,7 +52,8 @@ REGULAR TODOs
 [X] animal model types have improved heads
 [X] humanoid models have random back hunches
 [X] some models can have limbs but no toes or fingers
-[X] liquid tinting
+[X] liquid and damage tinting
+[X] monsters turning was broken, and can now face placer when idling
 
 
        

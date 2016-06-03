@@ -382,6 +382,19 @@ class wsPoint
         this.z=mz;
     }
     
+    angleTo(pt)
+    {
+	if (Math.trunc(this.x)===Math.trunc(pt.x)) return((pt.z>this.z)?180.0:0.0);
+	if (Math.trunc(this.z)===Math.trunc(pt.z)) return((pt.x>this.x)?90.0:270.0);
+
+	var fx=Math.abs(pt.x-this.x);
+	var fz=Math.abs(pt.z-this.z);
+	var fang=Math.atan2(fx,fz)*RAD_TO_DEGREE;
+	
+	if (pt.z>this.z) return((pt.x<this.x)?(180.0+fang):(180.0-fang));
+	return((pt.z<this.z)?(360.0-fang):fang);
+    }
+    
     copy()
     {
         return(new wsPoint(this.x,this.y,this.z));
@@ -796,9 +809,18 @@ class wsColor
         this.b+=col.b;
     }
     
-    attenuate(att)
+    addFromValues(r,g,b)
     {
-        return(new wsColor((this.r*att),(this.g*att),(this.b*att)));
+        this.r+=r;
+        this.g+=g;
+        this.b+=b;
+    }
+    
+    addAttenuate(col,att)
+    {
+        this.r+=(col.r*att);
+        this.g+=(col.g*att);
+        this.b+=(col.b*att);
     }
                 
     fixOverflow()

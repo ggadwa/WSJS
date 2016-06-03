@@ -32,12 +32,19 @@ class EntityMonsterClass extends EntityClass
     }
     
         //
-        // death override
+        // death and damage override
         //
         
     die()
     {
         this.markAsDelete();
+    }
+    
+    addDamage(damage)
+    {
+        super.addDamage(damage);
+        
+        this.active=true;           // always active monsters that take damage
     }
     
         //
@@ -57,9 +64,19 @@ class EntityMonsterClass extends EntityClass
             this.active=(dist<25000);
         }
         
+            // inactive monsters can only turn towards
+            // the player
+            
         if (!this.active) {
             this.model.skeleton.idlePose(this.model.modelType);
+            
+            if (!super.isFalling()) {
+                super.turnTowardsPosition(player.position,1.0);
+            }
         }
+        
+            // active monsters stalk the player
+
         else {
             
                 // pose
@@ -70,7 +87,7 @@ class EntityMonsterClass extends EntityClass
                 // not falling
                 
             if (!super.isFalling()) {
-                super.turnTowards(player.angle.y,1.0);
+                super.turnTowardsPosition(player.position,1.0);
                 super.moveSimple(-50,true);
             }
         }

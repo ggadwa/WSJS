@@ -36,6 +36,8 @@ class EntityClass
         this.collideWallMeshIdx=-1;
         this.collideFloorCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
+        
+        this.damageTintStartTick=-1;
 
         this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
         this.slidePt=new wsPoint(0,0,0);
@@ -263,6 +265,11 @@ class EntityClass
         }
     }
     
+    turnTowardsPosition(pos,speed)
+    {
+        this.turnTowards(this.position.angleTo(pos),speed);
+    }
+    
         //
         // look (x angle)
         //
@@ -284,6 +291,8 @@ class EntityClass
     
     addDamage(damage)
     {
+        this.damageTintStartTick=view.timeStamp;
+        
         this.health-=damage;
         if (this.health<=0) this.die();
     }
@@ -291,6 +300,20 @@ class EntityClass
     getPercentageHealth()
     {
         return(this.health/this.maxHealth);
+    }
+    
+    getDamageTintAttenuation()
+    {
+        if (this.damageTintStartTick===-1) return(0.0);
+        
+        var tick=view.timeStamp-this.damageTintStartTick;
+        if (tick>=1000) {
+            this.damageTintStartTick=-1;
+            return(0.0);
+        }
+        
+        if (tick<500) return((tick/500.0)*0.6);
+        return((1.0-((tick-500)/500.0))*0.6);
     }
     
         //

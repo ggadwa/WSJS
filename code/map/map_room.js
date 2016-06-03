@@ -751,9 +751,9 @@ class MapRoomClass
         return(this.yBound.max+config.ROOM_FLOOR_DEPTH);
     }
     
-    setTintFromLiquidColor(col)
+    addTintFromLiquidColor(col)
     {
-        col.setFromValues(0.0,0.0,1.0);         // supergumba -- hard coded
+        col.addFromValues(0.0,0.0,1.0);         // supergumba -- hard coded
     }
 
 }

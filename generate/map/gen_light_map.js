@@ -518,7 +518,7 @@ class GenLightmapClass
 
             att=1.0-(dist*light.invertIntensity);
             att+=Math.pow(att,light.exponent);
-            col.add(light.color.attenuate(att));
+            col.addAttenuate(light.color,att);
         }
 
         col.fixOverflow();
