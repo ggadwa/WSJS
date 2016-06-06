@@ -119,7 +119,7 @@ class EntityClass
             
         this.collision.moveObjectInMap(this,this.movePt,bump,this.collideMovePt);
         if ((this.collideMovePt.equals(this.movePt)) || (this.collideMovePt.y!==0)) {
-            this.position.addPoint(this.collideMovePt);
+            this.position.addPointTrunc(this.collideMovePt);
             return;
         }
         
@@ -129,7 +129,7 @@ class EntityClass
         
         this.collision.moveObjectInMap(this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
-            this.position.addPoint(this.collideSlideMovePt);
+            this.position.addPointTrunc(this.collideSlideMovePt);
             return;
         }
         
@@ -137,14 +137,14 @@ class EntityClass
         
         this.collision.moveObjectInMap(this,this.slidePt,false,this.collideSlideMovePt);
         if (this.collideSlideMovePt.equals(this.slidePt)) {
-            this.position.addPoint(this.collideSlideMovePt);
+            this.position.addPointTrunc(this.collideSlideMovePt);
             return;
         }
         
             // if nothing works, just use the
             // the original collide point
             
-        this.position.addPoint(this.collideMovePt);
+        this.position.addPointTrunc(this.collideMovePt);
     }
     
     moveSimple(dist,bump)
@@ -155,13 +155,13 @@ class EntityClass
         this.collision.moveObjectInMap(this,this.movePt,bump,this.collideMovePt);
         if (!this.collideMovePt.equals(this.movePt)) return(true);
         
-        this.position.addPoint(this.collideMovePt);
+        this.position.addPointTrunc(this.collideMovePt);
         return(false);
     }
     
     moveDirect(x,y,z)
     {
-        this.position.move(x,y,z);
+        this.position.addValuesTrunc(x,y,z);
     }
     
         //
@@ -181,7 +181,7 @@ class EntityClass
             if (yChange>500) yChange=500;
         
             var fallY=this.collision.fallObjectInMap(this,yChange);
-            this.position.move(0,fallY,0);
+            this.position.addValuesTrunc(0,fallY,0);
         
             if (fallY<=0) {
                 this.fallSpeed=0;
@@ -189,7 +189,7 @@ class EntityClass
             }
         }
         else {
-            this.position.move(0,yChange,0);
+            this.position.addValuesTrunc(0,yChange,0);
         }
     }
     
@@ -267,7 +267,7 @@ class EntityClass
     
     turnTowardsPosition(pos,speed)
     {
-        this.turnTowards(this.position.angleTo(pos),speed);
+        this.turnTowards(this.position.angleYTo(pos),speed);
     }
     
         //

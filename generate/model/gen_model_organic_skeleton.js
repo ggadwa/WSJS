@@ -93,7 +93,7 @@ class GenModelOrganicSkeletonClass
 
             // foot
 
-        var vct2=new wsPoint(0.0,0.0,-footLength);
+        var vct2=new wsPoint(0.0,0.0,footLength);
         fz=vct.z+vct2.z;
         footBoneIdx=bones.push(new ModelBoneClass(('Foot'+nameSuffix),ankleBoneIdx,new wsPoint((vct.x+vct2.x),ankleHigh,fz)))-1;
 
@@ -115,8 +115,8 @@ class GenModelOrganicSkeletonClass
         fx=(vct.x-Math.trunc((toeCount/2)*150))+75;
         
         for (n=0;n!==toeCount;n++) {
-            knuckleBoneIdx=bones.push(new ModelBoneClass(('Toe Knuckle'+n+nameSuffix),footBoneIdx,new wsPoint(fx,ankleHigh,(fz-knuckleLength))))-1;
-            toeBoneIdx=bones.push(new ModelBoneClass(('Toe'+n+nameSuffix),knuckleBoneIdx,new wsPoint(fx,ankleHigh,(fz-toeTotalLength))))-1;
+            knuckleBoneIdx=bones.push(new ModelBoneClass(('Toe Knuckle'+n+nameSuffix),footBoneIdx,new wsPoint(fx,ankleHigh,(fz+knuckleLength))))-1;
+            toeBoneIdx=bones.push(new ModelBoneClass(('Toe'+n+nameSuffix),knuckleBoneIdx,new wsPoint(fx,ankleHigh,(fz+toeTotalLength))))-1;
             
             bones[knuckleBoneIdx].gravityLockDistance=toeRadius;
             bones[toeBoneIdx].gravityLockDistance=toeRadius;
@@ -169,9 +169,9 @@ class GenModelOrganicSkeletonClass
         
             // the whip
             
-        whip0BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_0'),parentBoneIdx,new wsPoint((vct.x*0.25),y,(vct.z*0.25))))-1;
-        whip1BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_1'),whip0BoneIdx,new wsPoint((vct.x*0.50),y,(vct.z*0.50))))-1;
-        whip2BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_2'),whip1BoneIdx,new wsPoint((vct.x*0.75),y,(vct.z*0.75))))-1;
+        whip0BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_0'),parentBoneIdx,new wsPoint(0,y,0)))-1;
+        whip1BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_1'),whip0BoneIdx,new wsPoint((vct.x*0.33),y,(vct.z*0.33))))-1;
+        whip2BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_2'),whip1BoneIdx,new wsPoint((vct.x*0.66),y,(vct.z*0.66))))-1;
         whip3BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_3'),whip2BoneIdx,new wsPoint(vct.x,y,vct.z)))-1;
 
         bones[whip0BoneIdx].gravityLockDistance=whipRadius;
@@ -353,16 +353,16 @@ class GenModelOrganicSkeletonClass
         var rightBodyRadius=this.genRandom.randomInt(300,700);
 
         high=totalHigh+this.genRandom.randomInt(0,300);
-        var torsoBoneIdx=bones.push(new ModelBoneClass('Torso',baseBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.25))))-1;
+        var torsoBoneIdx=bones.push(new ModelBoneClass('Torso',baseBoneIdx,new wsPoint(0,-high,Math.trunc(bodyLength*0.25))))-1;
         
         high=totalHigh+this.genRandom.randomInt(0,400);
-        var waistBoneIdx=bones.push(new ModelBoneClass('Waist',torsoBoneIdx,new wsPoint(0,-high,Math.trunc(bodyLength*0.25))))-1;
+        var waistBoneIdx=bones.push(new ModelBoneClass('Waist',torsoBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.25))))-1;
         
         high=totalHigh+this.genRandom.randomInt(0,400);
-        var hipBoneIdx=bones.push(new ModelBoneClass('Hip',waistBoneIdx,new wsPoint(0,-high,Math.trunc(bodyLength*0.5))))-1;
+        var hipBoneIdx=bones.push(new ModelBoneClass('Hip',waistBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.5))))-1;
         
         high=totalHigh+this.genRandom.randomInt(0,300);
-        var torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso Top',torsoBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.5))))-1;
+        var torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso Top',torsoBoneIdx,new wsPoint(0,-high,Math.trunc(bodyLength*0.5))))-1;
         
         bones[hipBoneIdx].gravityLockDistance=rightBodyRadius;
         bones[waistBoneIdx].gravityLockDistance=rightBodyRadius+Math.trunc((leftBodyRadius-rightBodyRadius)*0.33);
@@ -388,11 +388,11 @@ class GenModelOrganicSkeletonClass
         var jawHigh=high-this.genRandom.randomInt(50,100);
         var headHigh=high;
         
-        var neckPivotBoneIdx=bones.push(new ModelBoneClass('Neck Pivot',torsoTopBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.5))))-1;
-        var neckBoneIdx=bones.push(new ModelBoneClass('Neck',neckPivotBoneIdx,new wsPoint(0,-high,-neckLength)))-1;
-        var jawPivotBoneIdx=bones.push(new ModelBoneClass('Jaw Pivot',neckBoneIdx,new wsPoint(0,-jawHigh,-jawPivotLength)))-1;
-        var jawBoneIdx=bones.push(new ModelBoneClass('Jaw',jawPivotBoneIdx,new wsPoint(0,-jawHigh,-jawLength)))-1;
-        var headBoneIdx=bones.push(new ModelBoneClass('Head',neckBoneIdx,new wsPoint(0,-headHigh,-headLength)))-1;
+        var neckPivotBoneIdx=bones.push(new ModelBoneClass('Neck Pivot',torsoTopBoneIdx,new wsPoint(0,-high,Math.trunc(bodyLength*0.5))))-1;
+        var neckBoneIdx=bones.push(new ModelBoneClass('Neck',neckPivotBoneIdx,new wsPoint(0,-high,neckLength)))-1;
+        var jawPivotBoneIdx=bones.push(new ModelBoneClass('Jaw Pivot',neckBoneIdx,new wsPoint(0,-jawHigh,jawPivotLength)))-1;
+        var jawBoneIdx=bones.push(new ModelBoneClass('Jaw',jawPivotBoneIdx,new wsPoint(0,-jawHigh,jawLength)))-1;
+        var headBoneIdx=bones.push(new ModelBoneClass('Head',neckBoneIdx,new wsPoint(0,-headHigh,headLength)))-1;
         
         bones[headBoneIdx].gravityLockDistance=headRadius;
         bones[jawPivotBoneIdx].gravityLockDistance=bones[jawBoneIdx].gravityLockDistance=Math.trunc(headRadius*0.8);
@@ -420,7 +420,7 @@ class GenModelOrganicSkeletonClass
             whipRadius=this.genRandom.randomInt(Math.trunc(rightBodyRadius*0.35),Math.trunc(rightBodyRadius*0.2));
             whipLength=this.genRandom.randomInt(bodyLength,(bodyLength*3));
             
-            this.buildLimbWhip(0,hipBoneIdx,whipRadius,bones[hipBoneIdx].position.y,whipLength,270.0);
+            this.buildLimbWhip(0,hipBoneIdx,whipRadius,bones[hipBoneIdx].position.y,whipLength,90.0);
         }
     }
      

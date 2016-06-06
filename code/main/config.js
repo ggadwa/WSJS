@@ -60,7 +60,7 @@ class ConfigClass
         this.ROOM_LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
         this.ROOM_LIQUID_WAVE_HEIGHT=400;               // pixel height of waves
                 
-        this.ROOM_LIQUIDS=true;                         // turns on or off liquids
+        this.ROOM_LIQUIDS=false;                         // turns on or off liquids
 
             //
             // pillars and decorations
@@ -98,7 +98,7 @@ class ConfigClass
             //
 
         this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=10;
+        this.MONSTER_ENTITY_COUNT=1;
 
         this.MONSTER_AI_ON=true;
 

@@ -370,13 +370,13 @@ class ModelSkeletonClass
         if (this.lastAnimationFlip) backLeg=!backLeg;
         
         if (backLeg) {
-            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(-r,0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*0.7),0.0,0.0);
-            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(-(r*0.5),0.0,0.0);
+            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*0.7),0.0,0.0);
+            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues((r*0.5),0.0,0.0);
         }
         else {
-            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*2.0),0.0,0.0);
+            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(-r,0.0,0.0);
+            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*2.0),0.0,0.0);
             this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(0.0,0.0,0.0);
         }
     }
@@ -393,8 +393,8 @@ class ModelSkeletonClass
         
         if (this.lastAnimationFlip) r=-r;
         
-        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0.0,r,z);
-        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0.0,(r*0.5),(z*0.9));
+        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0.0,-r,z);
+        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0.0,-(r*0.5),(z*0.9));
     }
     
     poseSetBody(limb,startAng,extraAng,hunchAngle)
@@ -405,7 +405,7 @@ class ModelSkeletonClass
         x=view.genRandom.randomInBetween(startAng,extraAng);
         if (this.lastAnimationFlip) x=-x;
         
-        x+=hunchAngle;
+        x-=hunchAngle;
         
             // always start past hip bone as we don't
             // want to rotate against the base bone
@@ -456,8 +456,8 @@ class ModelSkeletonClass
         var n,x;
         var nBone=limb.boneIndexes.length;
 
-        x=view.genRandom.randomInBetween(25,40);
-        if (this.lastAnimationFlip) x=0;
+        x=-view.genRandom.randomInBetween(25,40);
+        if (this.lastAnimationFlip) x=-10;
             
         for (n=0;n!==nBone;n++) {
             this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);

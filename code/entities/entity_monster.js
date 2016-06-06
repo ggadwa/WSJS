@@ -88,7 +88,7 @@ class EntityMonsterClass extends EntityClass
                 
             if (!super.isFalling()) {
                 super.turnTowardsPosition(player.position,1.0);
-                super.moveSimple(-50,true);
+                super.moveSimple(50,true);
             }
         }
         
@@ -108,7 +108,6 @@ class EntityMonsterClass extends EntityClass
 
                 var ang=new wsPoint(0,0,0);
                 ang.setFromPoint(this.angle);
-                ang.y+=180.0;
 
                 var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
                 pos.rotate(ang);

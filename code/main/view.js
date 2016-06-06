@@ -719,7 +719,7 @@ class ViewClass
         else {
             fpsStr=fpsStr.substring(0,(idx+3));
         }
-
+        
         this.text.drawStart();
         this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         if (this.paused) {

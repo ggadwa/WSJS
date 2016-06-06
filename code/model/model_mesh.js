@@ -242,7 +242,7 @@ class ModelMeshClass
             }    
             
                 // whole model movement
-                
+   
             this.rotVector.rotate(angle);
             
             this.drawVertices[vIdx++]=this.rotVector.x+position.x;

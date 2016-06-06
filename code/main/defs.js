@@ -63,19 +63,34 @@ class wsPoint
         this.z=Math.trunc(this.z);
     }
     
-    move(xAdd,yAdd,zAdd)
+    addValues(xAdd,yAdd,zAdd)
     {
         this.x+=xAdd;
         this.y+=yAdd;
         this.z+=zAdd;
     }
     
+    addValuesTrunc(xAdd,yAdd,zAdd)
+    {
+        this.x=Math.trunc(this.x+xAdd);
+        this.y=Math.trunc(this.y+yAdd);
+        this.z=Math.trunc(this.z+zAdd);
+    }
+   
     addPoint(pt)
     {
         this.x+=pt.x;
         this.y+=pt.y;
         this.z+=pt.z;
     }
+    
+    addPointTrunc(pt)
+    {
+        this.x=Math.trunc(this.x+pt.x);
+        this.y=Math.trunc(this.y+pt.y);
+        this.z=Math.trunc(this.z+pt.z);
+    }
+    
     
     subPoint(pt)
     {
@@ -382,17 +397,19 @@ class wsPoint
         this.z=mz;
     }
     
-    angleTo(pt)
+    angleYTo(pt)
     {
-	if (Math.trunc(this.x)===Math.trunc(pt.x)) return((pt.z>this.z)?180.0:0.0);
-	if (Math.trunc(this.z)===Math.trunc(pt.z)) return((pt.x>this.x)?90.0:270.0);
-
-	var fx=Math.abs(pt.x-this.x);
-	var fz=Math.abs(pt.z-this.z);
-	var fang=Math.atan2(fx,fz)*RAD_TO_DEGREE;
-	
-	if (pt.z>this.z) return((pt.x<this.x)?(180.0+fang):(180.0-fang));
-	return((pt.z<this.z)?(360.0-fang):fang);
+            // z is pointing up, atan2 gives us the angle to the x vector,
+            // so we need the Z up vector (positive) and the vector to pt
+            // then subtract them for correct angle
+        
+        var fang=(Math.atan2(0,100)-Math.atan2((pt.x-this.x),(pt.z-this.z)))*RAD_TO_DEGREE;
+        
+            // now we need to switch it up for which side the x is on
+            // (if greater, the #s are 0 to -180, if positive, 180 to 0)
+        
+        if (this.x>pt.x) return(-fang);
+        return((180.0-fang)+180.0);
     }
     
     copy()
@@ -421,7 +438,7 @@ class ws2DPoint
         this.y=pt.y;
     }
                 
-    move(xAdd,yAdd)
+    addValues(xAdd,yAdd)
     {
         this.x+=xAdd;
         this.y+=yAdd;
@@ -485,10 +502,10 @@ class ws2DIntPoint
         this.y=Math.trunc(ySet);
     }
                 
-    move(xAdd,yAdd)
+    addValues(xAdd,yAdd)
     {
-        this.x+=xAdd;
-        this.y+=yAdd;
+        this.x=Math.trunc(this.x+xAdd);
+        this.y=Math.trunc(this.y+yAdd);
     }
     
     noSquareDistance(pt)
