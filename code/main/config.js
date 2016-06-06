@@ -47,9 +47,9 @@ class ConfigClass
 
         this.STAIR_STEP_COUNT=10;
         
-        this.ROOM_CLOSETS=false;                         // turns on or off closets
-        this.ROOM_PLATFORMS=false;                       // turns on or off platforms
-        this.ROOM_LEDGES=false;                          // turns on or off ledges
+        this.ROOM_CLOSETS=true;                         // turns on or off closets
+        this.ROOM_PLATFORMS=true;                       // turns on or off platforms
+        this.ROOM_LEDGES=true;                          // turns on or off ledges
         
             //
             // liquids
@@ -60,7 +60,7 @@ class ConfigClass
         this.ROOM_LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
         this.ROOM_LIQUID_WAVE_HEIGHT=400;               // pixel height of waves
                 
-        this.ROOM_LIQUIDS=false;                         // turns on or off liquids
+        this.ROOM_LIQUIDS=true;                         // turns on or off liquids
 
             //
             // pillars and decorations
@@ -71,8 +71,8 @@ class ConfigClass
         this.ROOM_DECORATION_MIN_COUNT=1;              // minimum number of decoration pieces in a room
         this.ROOM_DECORATION_EXTRA_COUNT=3;            // extra number of decoration pieces
 
-        this.ROOM_PILLARS=false;                        // turns on or off pillars
-        this.ROOM_DECORATIONS=false;                    // turns on or off decorations
+        this.ROOM_PILLARS=true;                        // turns on or off pillars
+        this.ROOM_DECORATIONS=true;                    // turns on or off decorations
 
             //
             // lighting
@@ -98,9 +98,9 @@ class ConfigClass
             //
 
         this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=1;
+        this.MONSTER_ENTITY_COUNT=0;
 
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
 
             //
             // random seeds,
@@ -113,9 +113,9 @@ class ConfigClass
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_SKY=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=5; //Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_ENTITY=Math.trunc((Math.random()*this.SEED));
+        this.SEED_ENTITY=5; //Math.trunc((Math.random()*this.SEED));
         this.SEED_WEAPON=Math.trunc((Math.random()*this.SEED));
         this.SEED_PROJECTILE=Math.trunc((Math.random()*this.SEED));
         this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));

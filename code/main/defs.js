@@ -11,6 +11,8 @@ class wsPoint
         this.x=x;
         this.y=y;
         this.z=z;
+        
+        Object.seal(this);
     }
     
     setFromValues(xSet,ySet,zSet)
@@ -424,6 +426,8 @@ class ws2DPoint
     {
         this.x=x;
         this.y=y;
+        
+        Object.seal(this);
     }
     
     setFromValues(xSet,ySet)
@@ -494,6 +498,8 @@ class ws2DIntPoint
     {
         this.x=Math.trunc(x);
         this.y=Math.trunc(y);
+        
+        Object.seal(this);
     }
     
     setFromValues(xSet,ySet)
@@ -558,6 +564,8 @@ class wsLine
     {
         this.p1=p1;
         this.p2=p2;
+        
+        Object.seal(this);
     }
     
     setFromValues(p1,p2)
@@ -600,6 +608,8 @@ class ws2DLine
     {
         this.p1=p1;
         this.p2=p2;
+        
+        Object.seal(this);
     }
     
     setFromValues(p1,p2)
@@ -637,6 +647,8 @@ class wsBound
             this.min=value2;
             this.max=value1;
         }
+        
+        Object.seal(this);
     }
     
     setFromValues(value1,value2)
@@ -687,6 +699,8 @@ class wsRect
         this.top=top;
         this.rgt=rgt;
         this.bot=bot;
+        
+        Object.seal(this);
     }
     
     setFromValues(lft,top,rgt,bot)
@@ -733,6 +747,8 @@ class wsCollisionRect
         this.rgt=rgt;
         this.bot=bot;
         this.y=y;
+        
+        Object.seal(this);
     }
     
     addPoint(pnt)
@@ -772,6 +788,8 @@ class wsPlane
         this.b=b;
         this.c=c;
         this.d=d;
+        
+        Object.seal(this);
     }
     
     normalize()
@@ -810,6 +828,8 @@ class wsColor
         this.r=r;
         this.g=g;
         this.b=b;
+        
+        Object.seal(this);
     }
     
     setFromValues(r,g,b)

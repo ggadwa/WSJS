@@ -23,11 +23,24 @@ class EntityClass
         
         this.maxHealth=maxHealth;
         this.health=maxHealth;
+        
+        this.movementForwardMaxSpeed=0;
+        this.movementForwardAcceleration=0;
+        this.movementForwardDeceleration=0;
+        this.movementSideMaxSpeed=0;
+        this.movementSideAcceleration=0;
+        this.movementSideDeceleration=0;
 
-        this.fallSpeed=0;
+        this.movementForwardOn=false;
+        this.movementBackwardOn=false;
+        this.movementSideLeftOn=false;
+        this.movementSideRightOn=false;
+        
+        this.movement=new wsPoint(0,0,0);
         this.gravity=0;
         
         this.currentRoom=null;
+        this.onFloor=false;
 
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
@@ -80,36 +93,38 @@ class EntityClass
     }
     
         //
+        // start and stop movements
+        //
+        
+    setMovementForward(on)
+    {
+        this.movementForwardOn=on;
+    }
+    
+    setMovementBackward(on)
+    {
+        this.movementBackwardOn=on;
+    }
+    
+    setMovementSideLeft(on)
+    {
+        this.movementSideLeftOn=on;
+    }
+    
+    setMovementSideRight(on)
+    {
+        this.movementSideRightOn=on;
+    }
+    
+        //
         // move entity
         //
     
-    moveComplex(dist,extraAngle,bump,flying,clipping)
+    moveXZ(bump,clipping)
     {
-        var angY=this.angle.y+extraAngle;
+            // if no movement, then skip
         
-            // get the move to point
-            
-        this.movePt.setFromValues(0.0,0.0,dist);
-        this.movePt.rotateY(null,angY);
-        
-            // flying
-            
-        if (flying) {
-            this.movePt.y=-(20*this.angle.x);
-            if (dist<0) this.movePt.y=-this.movePt.y;
-        }
-        
-            // trunc it to avoid floats which can
-            // effect the collisions
-            
-        this.movePt.trunc();
-        
-            // if clipping on
-            
-        if (clipping) {
-            this.position.addPoint(this.movePt);
-            return;
-        }
+        if ((this.movePt.x===0) && (this.movePt.z===0)) return;
         
             // run the collision which
             // will return a new move direction
@@ -147,9 +162,125 @@ class EntityClass
         this.position.addPointTrunc(this.collideMovePt);
     }
     
-    moveSimple(dist,bump)
+    moveY(noGravity)
     {
-        this.movePt.setFromValues(0.0,0.0,dist);
+         var yAdd=this.movePt.y;
+         
+            // mark as not on floor
+            
+        this.onFloor=false;
+
+            // add in gravity
+            
+        if (noGravity) {
+            this.gravity=0;
+        }
+        else {
+            if (this.gravity<=0) this.gravity=5;
+            this.gravity*=1.1;
+            if (this.gravity>100) this.gravity=100;       // supergumba -- there's a lot of made-up numbers here, need to be real numbers in the future
+
+            yAdd+=this.gravity;
+        }
+        
+            // now move
+            
+        if (yAdd>=0) {
+            if (yAdd===0) yAdd=10;              // always try to fall
+            
+            var fallY=this.collision.fallObjectInMap(this,yAdd);
+            this.position.addValuesTrunc(0,fallY,0);
+        
+            if (fallY<=0) {
+                this.gravity=0;
+                this.onFloor=true;
+            }
+        }
+        else {
+            this.position.addValuesTrunc(0,yAdd,0);
+        }
+    }
+    
+    move(bump,noGravity,clipping)
+    {
+            // calculate the movement, add in
+            // acceleration and deceleration
+        
+        if (this.movementForwardOn) {
+            this.movement.z+=this.movementForwardAcceleration;
+            if (this.movement.z>this.movementForwardMaxSpeed) this.movement.z=this.movementForwardMaxSpeed;
+        }
+        else {
+            if (!this.movementBackwardOn) {
+                this.movement.z-=this.movementForwardDeceleration;
+                if (this.movement.z<0) this.movement.z=0;
+            }
+        }
+        
+        if (this.movementBackwardOn) {
+            this.movement.z-=this.movementForwardAcceleration;
+            if (this.movement.z<-this.movementForwardMaxSpeed) this.movement.z=-this.movementForwardMaxSpeed;
+        }
+        else {
+            if (!this.movementForwardOn) {
+                this.movement.z+=this.movementForwardDeceleration;
+                if (this.movement.z>0) this.movement.z=0;
+            }
+        }
+
+        if (this.movementSideLeftOn) {
+            this.movement.x-=this.movementSideAcceleration;
+            if (this.movement.x<-this.movementSideMaxSpeed) this.movement.x=-this.movementSideMaxSpeed;
+        }
+        else {
+            if (!this.movementSideRightOn) {
+                this.movement.x+=this.movementSideAcceleration;
+                if (this.movement.x>0) this.movement.x=0;
+            }
+        }
+
+        if (this.movementSideRightOn) {
+            this.movement.x+=this.movementSideAcceleration;
+            if (this.movement.x>this.movementSideMaxSpeed) this.movement.x=this.movementSideMaxSpeed;
+        }
+        else {
+            if (!this.movementSideLeftOn) {
+                this.movement.x-=this.movementSideAcceleration;
+                if (this.movement.x<0) this.movement.x=0;
+            }
+        }
+        
+            // turn the facing angle(s), trunc it to avoid
+            // floats which mess up the math.  if there is no gravity,
+            // then add in the X rotation so we can fly up and down
+            // during the moveY section
+            
+        this.movePt.setFromValues(this.movement.x,0,this.movement.z);
+        if (noGravity) this.movePt.rotateX(null,this.angle.x);
+        this.movePt.rotateY(null,this.angle.y);
+        this.movePt.trunc();
+        
+            // if no clipping, just move
+            
+        if (clipping) {
+            this.position.addPoint(this.movePt);
+            this.setupCurrentRoom();
+            return;
+        }
+
+            // move around the map
+        
+        this.moveY(noGravity);
+        this.moveXZ(bump,clipping);
+        
+            // reset which room entity is in
+            
+        this.setupCurrentRoom();
+    }
+    
+    moveSimple(xzDist,bump)
+    {
+        this.movePt.setFromValues(0.0,0.0,xzDist);
         this.movePt.rotateY(null,this.angle.y);
             
         this.collision.moveObjectInMap(this,this.movePt,bump,this.collideMovePt);
@@ -162,40 +293,6 @@ class EntityClass
     moveDirect(x,y,z)
     {
         this.position.addValuesTrunc(x,y,z);
-    }
-    
-        //
-        // falling
-        //
-        
-    fall()
-    {        
-        this.fallSpeed+=this.gravity;
-        this.gravity+=2;
-        if (this.gravity>25) this.gravity=25;       // supergumba -- there's a lot of made-up numbers here, need to be real numbers in the future
-        
-        var yChange=this.fallSpeed;
-        
-        if (yChange>=0) {
-            if (yChange===0) yChange=10;        // always try to fall
-            if (yChange>500) yChange=500;
-        
-            var fallY=this.collision.fallObjectInMap(this,yChange);
-            this.position.addValuesTrunc(0,fallY,0);
-        
-            if (fallY<=0) {
-                this.fallSpeed=0;
-                this.gravity=0;
-            }
-        }
-        else {
-            this.position.addValuesTrunc(0,yChange,0);
-        }
-    }
-    
-    isFalling()
-    {
-        return(this.fallSpeed>0);
     }
     
         //
@@ -326,6 +423,11 @@ class EntityClass
         if (!this.currentRoom.liquid) return(false);
         
         return((this.position.y-this.eyeOffset)>=this.currentRoom.getLiquidY());
+    }
+    
+    isOnFloor()
+    {
+        return(this.onFloor);
     }
     
     getCurrentRoom()

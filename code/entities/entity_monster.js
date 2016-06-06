@@ -28,6 +28,10 @@ class EntityMonsterClass extends EntityClass
         this.active=false;
         this.lastShotTimeStamp=0;
         
+        this.movementForwardMaxSpeed=50;
+        this.movementForwardAcceleration=5;
+        this.movementForwardDeceleration=10;
+        
         Object.seal(this);
     }
     
@@ -70,8 +74,8 @@ class EntityMonsterClass extends EntityClass
         if (!this.active) {
             this.model.skeleton.idlePose(this.model.modelType);
             
-            if (!super.isFalling()) {
-                super.turnTowardsPosition(player.position,1.0);
+            if (this.isOnFloor()) {
+                this.turnTowardsPosition(player.position,1.0);
             }
         }
         
@@ -86,19 +90,19 @@ class EntityMonsterClass extends EntityClass
                 // turn and move towards player if
                 // not falling
                 
-            if (!super.isFalling()) {
-                super.turnTowardsPosition(player.position,1.0);
-                super.moveSimple(50,true);
+            if (this.isOnFloor()) {
+                this.turnTowardsPosition(player.position,1.0);
+                this.moveSimple(50,true);
             }
         }
         
             // falling
         
-        super.fall();
+        this.fall();
         
             // setup current room
             
-        super.setupCurrentRoom();
+        this.setupCurrentRoom();
         
             // firing projectiles
 

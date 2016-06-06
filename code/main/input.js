@@ -109,9 +109,6 @@ class InputClass
     {
         this.playerEntity.setTurnSpeed(0.0);
         this.playerEntity.setLookSpeed(0.0);
-        this.playerEntity.setForwardSpeed(0.0);
-        this.playerEntity.setSideSpeed(0.0);
-        this.playerEntity.setVerticalSpeed(0.0);        // supergumba -- this is all temporary, we need to do start/stop here so acc/decl can take place
         
             // left arrow and right arrow
             // turning
@@ -122,15 +119,15 @@ class InputClass
             // up arrow or W
             // down arrow or S
             // forward and backwards
-
-        if ((this.keyFlags[38]) || (this.keyFlags[87])) this.playerEntity.setForwardSpeed(125.0);
-        if ((this.keyFlags[40]) || (this.keyFlags[83])) this.playerEntity.setForwardSpeed(-125.0);
+            
+        this.playerEntity.setMovementForward((this.keyFlags[38]) || (this.keyFlags[87]));
+        this.playerEntity.setMovementBackward((this.keyFlags[40]) || (this.keyFlags[83]));
 
             // A and D
             // sidestep
 
-        if (this.keyFlags[65]) this.playerEntity.setSideSpeed(-75.0);
-        if (this.keyFlags[68]) this.playerEntity.setSideSpeed(75.0);
+        this.playerEntity.setMovementSideLeft(this.keyFlags[65]);
+        this.playerEntity.setMovementSideRight(this.keyFlags[68]);
         
             // space jump
             
@@ -147,18 +144,6 @@ class InputClass
             view.mapOverlayStateFlip();
         }
 
-            // - and +
-            // up or down
-
-        if (this.keyFlags[61]) this.playerEntity.setVerticalSpeed(-125.0);
-        if (this.keyFlags[173]) this.playerEntity.setVerticalSpeed(125.0);
-
-            // [ and ]
-            // look up or down
-
-        if (this.keyFlags[219]) this.playerEntity.setLookSpeed(1.5);
-        if (this.keyFlags[221]) this.playerEntity.setLookSpeed(-1.5);
-        
             // mouse turning
             
         if (this.mouseChangeX!==0) {

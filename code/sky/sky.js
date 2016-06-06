@@ -181,7 +181,7 @@ class SkyClass
         
             // bottom
         
-        this.topBitmap.attachAsSky();
+        this.bottomBitmap.attachAsSky();
         this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius);
         
             // remove the buffers

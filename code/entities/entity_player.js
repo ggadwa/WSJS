@@ -16,9 +16,16 @@ class EntityPlayerClass extends EntityClass
         this.lookSpeed=0;
         this.maxLookSpeed=8.0;
         
-        this.forwardSpeed=0;
-        this.sideSpeed=0;
-        this.verticalSpeed=0;
+        this.movementForwardMaxSpeed=125;
+        this.movementForwardAcceleration=10;
+        this.movementForwardDeceleration=20;
+        this.movementSideMaxSpeed=75;
+        this.movementSideAcceleration=20;
+        this.movementSideDeceleration=40;
+        
+        this.jumpHeight=300;
+        
+        this.lastInLiquid=false;
 
         this.weaponCurrentIndex=-1;
         this.weaponFired=false;
@@ -46,29 +53,19 @@ class EntityPlayerClass extends EntityClass
         
         this.lookSpeed=speed;
     }
-    
-    setForwardSpeed(speed)
-    {
-        this.forwardSpeed=speed;
-    }
-    
-    setSideSpeed(speed)
-    {
-        this.sideSpeed=speed;
-    }
-    
-    setVerticalSpeed(speed)
-    {
-        this.verticalSpeed=speed;
-    }
-    
+        
         //
         // jump
         //
         
     startJump()
     {
-        if (this.fallSpeed===0) this.fallSpeed=-300;
+            // can't jump if falling or in liquid
+
+        if ((this.isOnFloor()) && (!this.inLiquid())) {
+            this.gravity=0;
+            this.movement.y-=this.jumpHeight;
+        }
     }
     
         //
@@ -124,29 +121,30 @@ class EntityPlayerClass extends EntityClass
         
             // input turning and looking
             
-        super.turn(this.turnSpeed);
-        super.look(this.lookSpeed);
+        this.turn(this.turnSpeed);
+        this.look(this.lookSpeed);
         
             // can only bump if we aren't falling
             // as otherwise ledges can catch you and
             // bump you back up
             
-        bump=!super.isFalling();
+        bump=this.isOnFloor();
+        
+            // determine if we've passed out of a liquid
+            // if we have and than automatically jump
+        
+        if (this.inLiquid()) {
+            this.lastInLiquid=true;
+        }
+        else {
+            if ((this.lastInLiquid) && (this.angle.x<0)) this.movement.y-=this.jumpHeight;
+            this.lastInLiquid=false;
+        }
         
             // movement
             
-        if (this.forwardSpeed!==0.0) super.moveComplex(this.forwardSpeed,0.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
-        if (this.sideSpeed!==0.0) super.moveComplex(this.sideSpeed,90.0,bump,config.PLAYER_FLY,config.PLAYER_CLIP_WALLS);
-        
-        if (this.verticalSpeed!==0.0) super.moveDirect(0.0,this.verticalSpeed,0.0);
-        
-            // falling
-        
-        if (!config.PLAYER_FLY) super.fall();
-        
-            // setup current room
-            
-        super.setupCurrentRoom();
+        var noGravity=((config.PLAYER_FLY) || (this.lastInLiquid));
+        this.move(bump,noGravity,config.PLAYER_CLIP_WALLS);
     }
     
 }

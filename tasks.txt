@@ -32,20 +32,23 @@ REGULAR TODOs
 #### better wall sliding
 
 #### outside sections
-#### implement swimming
+
 
 #### model spikes
 #### other leg positions
 #### flyers models
 
-#### news in lines (defs.h)
-#### turn towards was broken, get all the angles working right
+#### give certain meshes square hit boxes (like pipes and pillars)
+
+#### implement swimming
+#### don't need all the super. stuff, this. works fine
 
 
 
 [X] room decorations can now be mixed
 [X] added pipe decorations
 [X] machine decorations don't have cables in open ceiling rooms
+[X] larger decorations are no longer allowed to block lights
 [X] liquid flag wasn't working properly
 [X] fixed a bug where generator would not get even distribution of monster types
 [X] blobs have must larger body size ranges and no longer require heads
@@ -55,9 +58,15 @@ REGULAR TODOs
 [X] some models can have limbs but no toes or fingers
 [X] liquid and damage tinting
 [X] monsters turning was broken, and can now face placer when idling
+[X] fixed some math problems between model generation and coordinate systems
+[X] better monster stalking
 
+[ ] lots of clean up in the entity code to commonize all the movement routines between entities
+[ ] all entities have acceleration/deceleration
+[ ] swimming physics and updated flying physics
+[ ] auto-jump out of liquids
 
-       
+[ ] different random speeds for monsters
 [ ] add ability for projectiles to have different gravity settings, bounce, and reflect
 
 

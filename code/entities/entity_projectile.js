@@ -44,7 +44,7 @@ class EntityProjectileClass extends EntityClass
     {
             // delete entity
             
-        super.markAsDelete();
+        this.markAsDelete();
         
             // explosion and sound
             
@@ -65,7 +65,7 @@ class EntityProjectileClass extends EntityClass
             // cancel any projectile that lasts over lifetime
             
         if ((this.startTimeStamp+this.projectile.lifeTick)<view.timeStamp) {
-            super.markAsDelete();
+            this.markAsDelete();
             return;
         }
         
@@ -79,14 +79,14 @@ class EntityProjectileClass extends EntityClass
         
             // move it and check wall collisions
             
-        if (super.moveSimple(this.projectile.speed,false)) {
+        if (this.moveSimple(this.projectile.speed,false)) {
             this.hit();
             return;
         }
         
             // check floor and ceiling collisions
             
-        if (super.checkFloorCeilingCollision()) {
+        if (this.checkFloorCeilingCollision()) {
             this.hit();
             return;
         }

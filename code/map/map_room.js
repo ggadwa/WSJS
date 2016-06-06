@@ -260,6 +260,13 @@ class MapRoomClass
             gridSpot=this.blockGrid[z][x];
             if (checkPlatform) gridSpot+=this.platformGrid[z][x];
             
+                // if we are checking platforms, always
+                // skip center grid spot because there's a light there
+                
+            if (checkPlatform) {
+                if ((x===Math.trunc(this.xBlockSize/2)) && (z===Math.trunc(this.zBlockSize/2))) gridSpot=1;
+            }    
+            
             if (gridSpot===0) {
                 this.blockGrid[z][x]=1;
                 bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));

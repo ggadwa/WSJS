@@ -172,7 +172,7 @@ class GenRoomDecorationClass
         // shelves
         //
         
-    addShelve(room)
+    addShelf(room)
     {
         var pos,xWid,zWid,legWid,high;
         var stackLevel,stackCount,boxY;
@@ -328,7 +328,7 @@ class GenRoomDecorationClass
                     this.addMachine(room);
                     break;
                 case 3:
-                    this.addShelve(room);
+                    this.addShelf(room);
                     break;
                 case 4:
                     this.addPipes(room);
