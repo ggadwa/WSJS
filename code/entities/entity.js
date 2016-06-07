@@ -24,6 +24,10 @@ class EntityClass
         this.maxHealth=maxHealth;
         this.health=maxHealth;
         
+        this.gravityMinValue=20;
+        this.gravityMaxValue=500;
+        this.gravityAcceleration=10;
+        
         this.movementForwardMaxSpeed=0;
         this.movementForwardAcceleration=0;
         this.movementForwardDeceleration=0;
@@ -37,23 +41,22 @@ class EntityClass
         this.movementSideRightOn=false;
         
         this.movement=new wsPoint(0,0,0);
-        this.gravity=0;
+        this.gravity=this.gravityMinValue;
         
         this.currentRoom=null;
-        this.onFloor=false;
 
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
         this.touchEntity=null;
         
         this.collideWallMeshIdx=-1;
-        this.collideFloorCeilingMeshIdx=-1;
+        this.collideCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
         
         this.damageTintStartTick=-1;
 
         this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
-        this.slidePt=new wsPoint(0,0,0);
+        this.checkMovePt=new wsPoint(0,0,0);
         this.collideMovePt=new wsPoint(0,0,0);
         this.collideSlideMovePt=new wsPoint(0,0,0);
 
@@ -120,7 +123,7 @@ class EntityClass
         // move entity
         //
     
-    moveXZ(bump,clipping)
+    moveXZ(bump,slide,clipping)
     {
             // if no movement, then skip
         
@@ -131,29 +134,33 @@ class EntityClass
             // if it's the same as the original or
             // there's been a bump, move it, otherwise,
             // try sliding
-            
-        this.collision.moveObjectInMap(this,this.movePt,bump,this.collideMovePt);
-        if ((this.collideMovePt.equals(this.movePt)) || (this.collideMovePt.y!==0)) {
+        
+        this.checkMovePt.setFromValues(this.movePt.x,0.0,this.movePt.z);
+        
+        this.collision.moveObjectInMap(this,this.checkMovePt,bump,this.collideMovePt);
+        if ((this.collideMovePt.equals(this.checkMovePt)) || (this.collideMovePt.y!==0)) {
             this.position.addPointTrunc(this.collideMovePt);
             return;
         }
         
             // try to slide
-            
-        this.slidePt.setFromValues(this.movePt.x,0.0,0.0);
         
-        this.collision.moveObjectInMap(this,this.slidePt,false,this.collideSlideMovePt);
-        if (this.collideSlideMovePt.equals(this.slidePt)) {
-            this.position.addPointTrunc(this.collideSlideMovePt);
-            return;
-        }
-        
-        this.slidePt.setFromValues(0.0,0.0,this.movePt.z);
-        
-        this.collision.moveObjectInMap(this,this.slidePt,false,this.collideSlideMovePt);
-        if (this.collideSlideMovePt.equals(this.slidePt)) {
-            this.position.addPointTrunc(this.collideSlideMovePt);
-            return;
+        if (slide) {
+            this.checkMovePt.setFromValues(this.movePt.x,0.0,0.0);
+
+            this.collision.moveObjectInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
+            if (this.collideSlideMovePt.equals(this.checkMovePt)) {
+                this.position.addPointTrunc(this.collideSlideMovePt);
+                return;
+            }
+
+            this.checkMovePt.setFromValues(0.0,0.0,this.movePt.z);
+
+            this.collision.moveObjectInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
+            if (this.collideSlideMovePt.equals(this.checkMovePt)) {
+                this.position.addPointTrunc(this.collideSlideMovePt);
+                return;
+            }
         }
         
             // if nothing works, just use the
@@ -164,44 +171,58 @@ class EntityClass
     
     moveY(noGravity)
     {
-         var yAdd=this.movePt.y;
-         
-            // mark as not on floor
-            
-        this.onFloor=false;
+            // y movement is the rotated x/z movement
+            // (for swimming and flying) plus the natural
+            // y movement
 
+         var yAdd=this.movePt.y+this.movement.y;
+         
             // add in gravity
             
         if (noGravity) {
-            this.gravity=0;
+            this.gravity=this.gravityMinValue;
         }
         else {
-            if (this.gravity<=0) this.gravity=5;
-            this.gravity*=1.1;
-            if (this.gravity>100) this.gravity=100;       // supergumba -- there's a lot of made-up numbers here, need to be real numbers in the future
+            this.gravity+=this.gravityAcceleration;
+            if (this.gravity>this.gravityMaxValue) this.gravity=this.gravityMaxValue;
 
-            yAdd+=this.gravity;
+                // if there is upwards movement (usually a jump or push)
+                // then reduce it by the current gravity
+                
+            if (this.movement.y<0) {
+                this.movement.y+=this.gravity;
+                if (this.movement.y>0) {
+                    this.movement.y=0;
+                    this.gravity=-this.movement.y;
+                }
+            }
+            
+                // otherwise add it into movement
+
+            else {
+                yAdd+=this.gravity;
+            }
         }
         
-            // now move
+            // now move up or down
             
         if (yAdd>=0) {
-            if (yAdd===0) yAdd=10;              // always try to fall
-            
+            this.collideCeilingMeshIdx=-1;                         // no ceiling collisions if going down
+
             var fallY=this.collision.fallObjectInMap(this,yAdd);
             this.position.addValuesTrunc(0,fallY,0);
         
-            if (fallY<=0) {
-                this.gravity=0;
-                this.onFloor=true;
-            }
+            if (fallY<=0) this.gravity=this.gravityMinValue;
         }
         else {
-            this.position.addValuesTrunc(0,yAdd,0);
+            this.standOnMeshIdx=-1;                                 // no standing if going up
+            
+            var riseY=this.collision.riseObjectInMap(this,yAdd);
+            this.position.addValuesTrunc(0,riseY,0);
         }
     }
     
-    move(bump,noGravity,clipping)
+    move(bump,slide,noGravity,clipping)
     {
             // calculate the movement, add in
             // acceleration and deceleration
@@ -271,37 +292,16 @@ class EntityClass
             // move around the map
         
         this.moveY(noGravity);
-        this.moveXZ(bump,clipping);
+        this.moveXZ(bump,slide,clipping);
         
             // reset which room entity is in
             
         this.setupCurrentRoom();
     }
     
-    moveSimple(xzDist,bump)
-    {
-        this.movePt.setFromValues(0.0,0.0,xzDist);
-        this.movePt.rotateY(null,this.angle.y);
-            
-        this.collision.moveObjectInMap(this,this.movePt,bump,this.collideMovePt);
-        if (!this.collideMovePt.equals(this.movePt)) return(true);
-        
-        this.position.addPointTrunc(this.collideMovePt);
-        return(false);
-    }
-    
     moveDirect(x,y,z)
     {
         this.position.addValuesTrunc(x,y,z);
-    }
-    
-        //
-        // check floors and ceilings (mostly projectiles)
-        //
-        
-    checkFloorCeilingCollision()
-    {
-        return(this.collision.checkFloorCeilingCollision(this));
     }
     
         //
@@ -417,7 +417,7 @@ class EntityClass
         // room information
         //
         
-    inLiquid()
+    isInLiquid()
     {
         if (this.currentRoom===null) return(false);
         if (!this.currentRoom.liquid) return(false);
@@ -425,9 +425,24 @@ class EntityClass
         return((this.position.y-this.eyeOffset)>=this.currentRoom.getLiquidY());
     }
     
-    isOnFloor()
+    isStandingOnFloor()
     {
-        return(this.onFloor);
+        return(this.standOnMeshIdx!==-1);
+    }
+    
+    isHitCeiling()
+    {
+        return(this.collideCeilingMeshIdx!==-1);
+    }
+    
+    isAnyCollision()
+    {
+        if (this.touchEntity!==null) return(true);
+        if (this.collideWallMeshIdx!==-1) return(true);
+        if (this.collideCeilingMeshIdx!==-1) return(true);
+        if (this.standOnMeshIdx!==-1) return(true);
+        
+        return(false);
     }
     
     getCurrentRoom()

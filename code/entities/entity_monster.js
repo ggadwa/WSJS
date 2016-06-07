@@ -23,14 +23,18 @@ class EntityMonsterClass extends EntityClass
     {
         super(name,position,angle,maxHealth,model);
         
+            // entity setup
+            
+        this.movementForwardMaxSpeed=50;
+        this.movementForwardAcceleration=5;
+        this.movementForwardDeceleration=10;
+        
+            // local variables
+
         this.ai=ai;
         
         this.active=false;
         this.lastShotTimeStamp=0;
-        
-        this.movementForwardMaxSpeed=50;
-        this.movementForwardAcceleration=5;
-        this.movementForwardDeceleration=10;
         
         Object.seal(this);
     }
@@ -69,14 +73,14 @@ class EntityMonsterClass extends EntityClass
         }
         
             // inactive monsters can only turn towards
-            // the player
+            // the player if standing on a floor
             
         if (!this.active) {
             this.model.skeleton.idlePose(this.model.modelType);
             
-            if (this.isOnFloor()) {
-                this.turnTowardsPosition(player.position,1.0);
-            }
+            this.setMovementForward(false);
+            this.move(true,false,false);
+            if (this.isStandingOnFloor()) this.turnTowardsPosition(player.position,1.0);
         }
         
             // active monsters stalk the player
@@ -87,22 +91,12 @@ class EntityMonsterClass extends EntityClass
             
             this.model.skeleton.walkPose(this.model.modelType);
         
-                // turn and move towards player if
-                // not falling
-                
-            if (this.isOnFloor()) {
-                this.turnTowardsPosition(player.position,1.0);
-                this.moveSimple(50,true);
-            }
+                // turn towards and stalk player
+
+            this.setMovementForward(true);
+            this.move(true,true,false,false);
+            if (this.isStandingOnFloor()) this.turnTowardsPosition(player.position,1.0);
         }
-        
-            // falling
-        
-        this.fall();
-        
-            // setup current room
-            
-        this.setupCurrentRoom();
         
             // firing projectiles
 

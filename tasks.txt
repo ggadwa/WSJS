@@ -40,9 +40,6 @@ REGULAR TODOs
 
 #### give certain meshes square hit boxes (like pipes and pillars)
 
-#### implement swimming
-#### don't need all the super. stuff, this. works fine
-
 
 
 [X] room decorations can now be mixed
@@ -60,11 +57,10 @@ REGULAR TODOs
 [X] monsters turning was broken, and can now face placer when idling
 [X] fixed some math problems between model generation and coordinate systems
 [X] better monster stalking
-
-[ ] lots of clean up in the entity code to commonize all the movement routines between entities
-[ ] all entities have acceleration/deceleration
-[ ] swimming physics and updated flying physics
-[ ] auto-jump out of liquids
+[X] lots of clean up in the entity code to commonize all the movement routines between entities
+[X] all entities have acceleration/deceleration
+[X] swimming physics and updated flying physics
+[X] auto-jump out of liquids
 
 [ ] different random speeds for monsters
 [ ] add ability for projectiles to have different gravity settings, bounce, and reflect

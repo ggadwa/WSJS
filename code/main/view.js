@@ -679,7 +679,7 @@ class ViewClass
             tintOn=true;
             this.uiTintColor.addFromValues(tintAtt,0.0,0.0);
         }
-        if (player.inLiquid()) {
+        if (player.isInLiquid()) {
             tintOn=true;
             player.getCurrentRoom().addTintFromLiquidColor(this.uiTintColor);
         }

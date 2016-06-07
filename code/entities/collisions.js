@@ -290,7 +290,7 @@ class CollisionClass
     }
     
     //
-    // fall object in map
+    // floor collisions
     //
     
     fallObjectInMap(entity,fallY)
@@ -340,10 +340,10 @@ class CollisionClass
     }
     
         //
-        // floor and ceiling collisions
+        // ceiling collisions
         //
         
-    checkFloorCeilingCollision(entity)
+    riseObjectInMap(entity,riseY)
     {
         var n,k,nMesh,nCollisionRect;
         var mesh,collisionRect;
@@ -351,7 +351,7 @@ class CollisionClass
             // the rough collide boxes
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues((entity.position.y-entity.high),entity.position.y);
+        this.objYBound.setFromValues(((entity.position.y-entity.high)+riseY),((entity.position.y-entity.high)-riseY));      // riseY is NEGATIVE
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
             // run through the meshes
@@ -369,35 +369,25 @@ class CollisionClass
 
             if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
 
-                // check the floor collide rects
-
-            nCollisionRect=mesh.collisionFloorRects.length;
-
-            for (k=0;k!==nCollisionRect;k++) {
-                collisionRect=mesh.collisionFloorRects[k];
-                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    entity.collideFloorCeilingMeshIdx=n;
-                    return(true);
-                }
-            }
-            
-                // check the ceiling collide rects
+                // check the collide rects
+                // if we are within the rise, then
+                // bound to the ceiling
 
             nCollisionRect=mesh.collisionCeilingRects.length;
 
             for (k=0;k!==nCollisionRect;k++) {
                 collisionRect=mesh.collisionCeilingRects[k];
                 if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    entity.collideFloorCeilingMeshIdx=n;
-                    return(true);
+                    entity.collideCeilingMeshIdx=n;
+                    return(collisionRect.y-entity.position.y);
                 }
             }
         }
         
             // no hits
         
-        entity.collideFloorCeilingMeshIdx=-1;
-        return(false);
+        entity.collideCeilingMeshIdx=-1;
+        return(riseY);
     }
     
 }

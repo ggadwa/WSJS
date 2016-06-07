@@ -20,9 +20,10 @@ class ProjectileClass
         this.splashRadius=0;
         this.splashDamage=0;
         
-        this.gravityWaitTimeStamp=0;
+        this.noGravity=true;
         this.gravityInitValue=0;
-        this.gravityAdd=0.0;
+        this.gravityMaxValue=0;
+        this.gravityAcceleration=0;
         
         this.bounce=false;
         this.bounceFactor=1.0;
@@ -57,11 +58,12 @@ class ProjectileClass
         this.splashDamage=splashDamage;
     }
     
-    setGravity(gravityWaitTimeStamp,gravityInitValue,gravityAdd)
+    setGravity(gravityInitValue,gravityMaxValue,gravityAcceleration)
     {
-        this.gravityWaitTimeStamp=gravityWaitTimeStamp;
+        this.noGravity=false;
         this.gravityInitValue=gravityInitValue;
-        this.gravityAdd=gravityAdd;
+        this.gravityMaxValue=gravityMaxValue;
+        this.gravityAcceleration=gravityAcceleration;
     }
     
     setBounce(bound,bounceFactor)

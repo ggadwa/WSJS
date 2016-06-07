@@ -10,12 +10,8 @@ class EntityPlayerClass extends EntityClass
     {
         super(name,position,angle,maxHealth,model);
         
-        this.turnSpeed=0;
-        this.maxTurnSpeed=8.0;
-        
-        this.lookSpeed=0;
-        this.maxLookSpeed=8.0;
-        
+            // entity setup
+            
         this.movementForwardMaxSpeed=125;
         this.movementForwardAcceleration=10;
         this.movementForwardDeceleration=20;
@@ -23,7 +19,16 @@ class EntityPlayerClass extends EntityClass
         this.movementSideAcceleration=20;
         this.movementSideDeceleration=40;
         
-        this.jumpHeight=300;
+            // local variables
+        
+        this.turnSpeed=0;
+        this.maxTurnSpeed=8.0;
+        
+        this.lookSpeed=0;
+        this.maxLookSpeed=8.0;
+        
+        this.jumpHeight=600;
+        this.jumpWaterHeight=800;
         
         this.lastInLiquid=false;
 
@@ -61,10 +66,10 @@ class EntityPlayerClass extends EntityClass
     startJump()
     {
             // can't jump if falling or in liquid
-
-        if ((this.isOnFloor()) && (!this.inLiquid())) {
+            
+        if ((this.isStandingOnFloor()) && (!this.isInLiquid())) {
             this.gravity=0;
-            this.movement.y-=this.jumpHeight;
+            this.movement.y=-this.jumpHeight;
         }
     }
     
@@ -128,23 +133,26 @@ class EntityPlayerClass extends EntityClass
             // as otherwise ledges can catch you and
             // bump you back up
             
-        bump=this.isOnFloor();
+        bump=this.isStandingOnFloor();
         
             // determine if we've passed out of a liquid
             // if we have and than automatically jump
         
-        if (this.inLiquid()) {
+        if (this.isInLiquid()) {
             this.lastInLiquid=true;
         }
         else {
-            if ((this.lastInLiquid) && (this.angle.x<0)) this.movement.y-=this.jumpHeight;
+            if ((this.lastInLiquid) && (this.angle.x>0)) {
+                this.gravity=0;
+                this.movement.y-=this.jumpWaterHeight;
+            }
             this.lastInLiquid=false;
         }
         
             // movement
             
         var noGravity=((config.PLAYER_FLY) || (this.lastInLiquid));
-        this.move(bump,noGravity,config.PLAYER_CLIP_WALLS);
+        this.move(bump,true,noGravity,config.PLAYER_CLIP_WALLS);
     }
     
 }

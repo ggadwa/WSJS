@@ -10,17 +10,20 @@ class EntityProjectileClass extends EntityClass
     {
         super(name,position,angle,0,projectile.model);
         
+            // entity setup
+            
+        this.movementForwardMaxSpeed=projectile.speed;
+        this.movementForwardAcceleration=projectile.speed;
+        this.movementForwardDeceleration=0;
+        
+        this.gravity=projectile.gravityInitValue;
+        this.gravityMaxValue=projectile.gravityMaxValue;
+        this.gravityAcceleration=projectile.gravityAcceleration;
+        
+            // local variables
+            
         this.projectile=projectile;
         this.startTimeStamp=view.timeStamp;
-        
-            // reset gravity from look up angle
-            // and initial value
-            
-        var rd=angle.x*DEGREE_TO_RAD;
-        this.gravity=(angle.x*Math.cos(rd))-(this.projectile.speed*Math.sin(rd));
-        this.gravity+=this.projectile.gravityInitValue;
-    
-        this.movePt=new wsPoint(0,0,0);     // global to stop GCd
         
         Object.seal(this);
     }
@@ -69,24 +72,12 @@ class EntityProjectileClass extends EntityClass
             return;
         }
         
-            // handle gravity
-            
-        this.position.y+=this.gravity;
+            // move it and check for any collisions
         
-        if ((this.startTimeStamp+this.projectile.gravityWaitTimeStamp)<=view.timeStamp) {
-            this.gravity+=this.projectile.gravityAdd;
-        }
+        this.setMovementForward(true);
+        this.move(false,false,this.projectile.noGravity,false);
         
-            // move it and check wall collisions
-            
-        if (this.moveSimple(this.projectile.speed,false)) {
-            this.hit();
-            return;
-        }
-        
-            // check floor and ceiling collisions
-            
-        if (this.checkFloorCeilingCollision()) {
+        if (this.isAnyCollision()) {
             this.hit();
             return;
         }
