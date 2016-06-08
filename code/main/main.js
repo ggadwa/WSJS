@@ -334,11 +334,12 @@ class MainClass
     initBuildEntities()
     {
         var n,monsterType;
-        var model,pos;
+        var model,pos,proj;
 
         var entityGenRandom=new GenRandomClass(config.SEED_ENTITY);
         var genProjectile=new GenProjectileClass(new GenRandomClass(config.SEED_PROJECTILE));
         var genWeapon=new GenWeaponClass(new GenRandomClass(config.SEED_WEAPON));
+        var genAI=new GenAIClass(genProjectile,new GenRandomClass(config.SEED_PROJECTILE));
 
             // make player entity
 
@@ -362,7 +363,7 @@ class MainClass
         var monsterAIs=[];
         
         for (n=0;n!==config.MONSTER_TYPE_COUNT;n++) {
-            monsterAIs.push(new MonsterAIClass(genProjectile.generate(false)));
+            monsterAIs.push(genAI.generate());
         }
 
             // make monster entities

@@ -379,7 +379,7 @@ class CollisionClass
                 collisionRect=mesh.collisionCeilingRects[k];
                 if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
                     entity.collideCeilingMeshIdx=n;
-                    return(collisionRect.y-entity.position.y);
+                    return(collisionRect.y-(entity.position.y-entity.high));
                 }
             }
         }

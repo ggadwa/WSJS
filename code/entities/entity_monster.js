@@ -1,19 +1,6 @@
 "use strict";
 
 //
-// monster AI class
-// we use this to create a type of monster, and attach this to the regular entity monster
-//
-
-class MonsterAIClass
-{
-    constructor(projectile)
-    {
-        this.projectile=projectile;
-    }
-}
-
-//
 // monster entity class
 //
 

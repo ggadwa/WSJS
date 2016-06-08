@@ -352,8 +352,12 @@ class MeshPrimitivesClass
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
+            // all cylinders are simple box collisions
 
-        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+        var mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);
+        mesh.simpleCollisionGeometry=true;
+        
+        return(mesh);
     }
     
     static createMeshCylinderSimple(bitmap,centerPt,yBound,radius,flags)
@@ -363,7 +367,10 @@ class MeshPrimitivesClass
         segments.push(radius);
         segments.push(radius);
         
-        return(this.createMeshCylinder(bitmap,centerPt,yBound,segments,flags));
+        var mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,flags);
+        mesh.simpleCollisionGeometry=true;
+        
+        return(mesh);
     }
     
 }

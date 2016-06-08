@@ -92,6 +92,8 @@ class MapMeshClass
 
             // collision lists
 
+        this.simpleCollisionGeometry=false;
+        
         this.collisionLines=[];
         this.collisionFloorRects=[];
         this.collisionCeilingRects=[];
@@ -411,7 +413,20 @@ class MapMeshClass
     {
         var n,ny;
         var tIdx;
-        var v0,v1,v2;
+        var v0,v1,v2,line;
+        
+            // some meshes have simple collision
+            // geometery -- these are assumed to be
+            // only walls, not top, no bottom, and
+            // the boundbox
+            
+        if (this.simpleCollisionGeometry) {
+            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.min)));
+            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.max),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.max)));
+            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.min,this.yBound.max,this.zBound.max)));
+            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.max,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.max)));
+            return;
+        }
 
             // run through the triangles
             // and find any that make a wall to

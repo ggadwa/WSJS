@@ -98,9 +98,9 @@ class ConfigClass
             //
 
         this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=10;
+        this.MONSTER_ENTITY_COUNT=0;
 
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
 
             //
             // random seeds,
@@ -113,9 +113,9 @@ class ConfigClass
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_SKY=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=5; //Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=6; //Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_ENTITY=5; //Math.trunc((Math.random()*this.SEED));
+        this.SEED_ENTITY=6; //Math.trunc((Math.random()*this.SEED));
         this.SEED_WEAPON=Math.trunc((Math.random()*this.SEED));
         this.SEED_PROJECTILE=Math.trunc((Math.random()*this.SEED));
         this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));
