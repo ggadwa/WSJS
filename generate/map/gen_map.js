@@ -24,9 +24,9 @@ class GenMapClass
         // remove shared triangles
         //
 
-    removeSharedTriangles()
+    removeSharedTrianglesChunk(meshFlag,compareMeshFlag,equalY,removeBoth)
     {
-        var n,k,t1,t2,nMesh,hit;
+        var n,k,t1,t2,nMesh,hit,boundCheck;
         var bounds,otherBounds;
         var mesh,otherMesh;
 
@@ -54,19 +54,34 @@ class GenMapClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshes[n];
-            if ((mesh.flag!==MESH_FLAG_ROOM_WALL) && (mesh.flag!==MESH_FLAG_LEDGE)) continue;
+            if (mesh.flag!==meshFlag) continue;
             
                 // build a list of meshes that
                 // are targets for trig eliminations from
                 // this mesh
+                
+                // if we are comparing two distinct types
+                // then we need to iterate over the whole
+                // list, otherwise just the back half as we've
+                // already hit that type in the outer loop
             
             targetMeshCount=0;
             
-            for (k=(n+1);k<nMesh;k++) {
-                otherMesh=map.meshes[k];
-                if ((otherMesh.flag!==MESH_FLAG_ROOM_WALL) && (otherMesh.flag!==MESH_FLAG_LEDGE)) continue;
-                
-                if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
+            if (meshFlag===compareMeshFlag) {
+                for (k=(n+1);k<nMesh;k++) {
+                    otherMesh=map.meshes[k];
+                    if (otherMesh.flag!==compareMeshFlag) continue;
+
+                    if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
+                }
+            }
+            else {
+                for (k=0;k!==nMesh;k++) {
+                    otherMesh=map.meshes[k];
+                    if (otherMesh.flag!==compareMeshFlag) continue;
+
+                    if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
+                }
             }
             
             if (targetMeshCount===0) continue;
@@ -88,9 +103,16 @@ class GenMapClass
                         if (!otherMesh.isTriangleStraightWall(t2)) continue;
                         otherBounds=otherMesh.getTriangleBounds(t2);
                         
-                        if ((bounds[0].min===otherBounds[0].min) && (bounds[0].max===otherBounds[0].max) && (bounds[1].min===otherBounds[1].min) && (bounds[1].max===otherBounds[1].max) && (bounds[2].min===otherBounds[2].min) && (bounds[2].max===otherBounds[2].max)) {
+                        if (equalY) {
+                            boundCheck=((bounds[0].min===otherBounds[0].min) && (bounds[0].max===otherBounds[0].max) && (bounds[1].min===otherBounds[1].min) && (bounds[1].max===otherBounds[1].max) && (bounds[2].min===otherBounds[2].min) && (bounds[2].max===otherBounds[2].max));
+                        }
+                        else {
+                            boundCheck=((bounds[0].min===otherBounds[0].min) && (bounds[0].max===otherBounds[0].max) && (bounds[1].min>=otherBounds[1].min) && (bounds[1].max<=otherBounds[1].max) && (bounds[2].min===otherBounds[2].min) && (bounds[2].max===otherBounds[2].max));
+                        }
+                        
+                        if (boundCheck) {
                             trigList.push([n,t1]);
-                            trigList.push([targetMeshList[k],t2]);
+                            if (removeBoth) trigList.push([targetMeshList[k],t2]);
                             hit=true;
                             break;
                         }
@@ -125,6 +147,28 @@ class GenMapClass
                 }
             }
         }
+    }
+    
+    removeSharedTriangles()
+    {
+             // we do this in separate passes as some polygons
+            // shouldn't remove others, and vice versa.  first
+            // remove all the shared trigs between rooms and
+            // remove them both
+            
+        this.removeSharedTrianglesChunk(MESH_FLAG_ROOM_WALL,MESH_FLAG_ROOM_WALL,true,true);
+        
+            // now remove any platforms or ledges that are equal
+            // in another platform or ledge wall
+            
+        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_PLATFORM,true,true);
+        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_LEDGE,true,true);
+  
+            // and finally remove any platform or ledge triangles that
+            // are enclosed by an outer wall
+            
+        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_ROOM_WALL,false,false);
     }
 
         //

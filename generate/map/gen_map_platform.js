@@ -96,7 +96,7 @@ class GenRoomPlatformClass
         var yLiftBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),(room.yBound.max+extraY));
         var zLiftBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
 
-        meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_LIFT));
+        meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,false,false,MESH_FLAG_LIFT));
 
             // the movement
         

@@ -485,7 +485,14 @@ class GenLightmapClass
 
             for (k=0;k!==nMesh;k++) {
                 mesh=map.meshes[light.meshIntersectList[k]];
-                if (!mesh.boxBoundCollision(this.lightBoundX,this.lightBoundY,this.lightBoundZ)) continue;
+                
+                    // hand inlined this from mesh.boxBoundCollision
+                    // do x/z first because of more x/z nature of maps as
+                    // this should be the earliest eliminations
+                    
+                if ((mesh.xBound.min>=this.lightBoundX.max) || (mesh.xBound.max<=this.lightBoundX.min)) continue;
+                if ((mesh.zBound.min>=this.lightBoundZ.max) || (mesh.zBound.max<=this.lightBoundZ.min)) continue;
+                if ((mesh.yBound.min>=this.lightBoundY.max) || (mesh.yBound.max<=this.lightBoundY.min)) continue;
                 
                     // skip doors, lifts, and lights as
                     // they either move or project light
