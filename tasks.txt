@@ -30,19 +30,15 @@ REGULAR TODOs
 
 #### light mapping is pretty crappy in places, more than likely because of low resolution
 
-#### better wall sliding
-
 #### outside sections
-
 
 #### model spikes
 #### other leg positions
 #### flyers models
 
-
-#### speed up triangle deleter
-
 #### monsters need random line of sight fire and fire wait
+
+
 
 
 [X] room decorations can now be mixed
@@ -65,7 +61,7 @@ REGULAR TODOs
 [X] swimming physics and updated flying physics
 [X] auto-jump out of liquids
 [X] setting for meshes to have simple bounds collision geometery
-[X] better extranous polygon remover
+[X] better colluded polygon remover
 
 [ ] different random speeds for monsters
 [ ] add ability for projectiles to have different gravity settings, bounce, and reflect

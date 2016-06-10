@@ -198,12 +198,23 @@ class MapMeshClass
         return(!(this.zBound.max<=checkMesh.zBound.min));
     }
     
-    boxTouchOtherMesh(checkMesh)
+    boxTouchOtherMeshInside(checkMesh)
     {
-        if ((this.xBound.min===checkMesh.xBound.max) || (this.xBound.max===checkMesh.xBound.min) || (this.xBound.min===checkMesh.xBound.min) || (this.xBound.max===checkMesh.xBound.max)) {
+        if ((this.xBound.min===checkMesh.xBound.min) || (this.xBound.max===checkMesh.xBound.max)) {
             return(!((this.zBound.min>checkMesh.zBound.max) || (this.zBound.max<checkMesh.zBound.min)));
         }
-        if ((this.zBound.min===checkMesh.zBound.max) || (this.zBound.max===checkMesh.zBound.min) || (this.zBound.min===checkMesh.zBound.min) || (this.zBound.max===checkMesh.zBound.max)) {
+        if ((this.zBound.min===checkMesh.zBound.min) || (this.zBound.max===checkMesh.zBound.max)) {
+            return(!((this.xBound.min>checkMesh.xBound.max) || (this.xBound.max<checkMesh.xBound.min)));
+        }
+        return(false);
+    }
+    
+    boxTouchOtherMeshOutside(checkMesh)
+    {
+        if ((this.xBound.min===checkMesh.xBound.max) || (this.xBound.max===checkMesh.xBound.min)) {
+            return(!((this.zBound.min>checkMesh.zBound.max) || (this.zBound.max<checkMesh.zBound.min)));
+        }
+        if ((this.zBound.min===checkMesh.zBound.max) || (this.zBound.max===checkMesh.zBound.min)) {
             return(!((this.xBound.min>checkMesh.xBound.max) || (this.xBound.max<checkMesh.xBound.min)));
         }
         return(false);
@@ -219,22 +230,43 @@ class MapMeshClass
         return(new wsPoint(v.position.x,v.position.y,v.position.z));
     }
 
-    getTriangleBounds(trigIdx)
+    getTriangleXBound(trigIdx,xBound)
     {
+        var n;
         var v=this.getTriangleVertex(trigIdx,0);
 
-        var xBound=new wsBound(v.x,v.x);
-        var yBound=new wsBound(v.y,v.y);
-        var zBound=new wsBound(v.z,v.z);
+        xBound.setFromValues(v.x,v.x);
 
-        for (var n=1;n!==3;n++) {
+        for (n=1;n!==3;n++) {
             v=this.getTriangleVertex(trigIdx,n);
             xBound.adjust(v.x);
+        }
+    }
+    
+    getTriangleYBound(trigIdx,yBound)
+    {
+        var n;
+        var v=this.getTriangleVertex(trigIdx,0);
+
+        yBound.setFromValues(v.y,v.y);
+
+        for (n=1;n!==3;n++) {
+            v=this.getTriangleVertex(trigIdx,n);
             yBound.adjust(v.y);
+        }
+    }
+    
+    getTriangleZBound(trigIdx,zBound)
+    {
+        var n;
+        var v=this.getTriangleVertex(trigIdx,0);
+
+        zBound.setFromValues(v.z,v.z);
+
+        for (n=1;n!==3;n++) {
+            v=this.getTriangleVertex(trigIdx,n);
             zBound.adjust(v.z);
         }
-
-        return([xBound,yBound,zBound]);
     }
 
     isTriangleStraightWall(trigIdx)

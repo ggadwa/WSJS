@@ -196,11 +196,13 @@ class GenBitmapMapClass extends GenBitmapClass
 
     generateBlock(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,nBlock;
+        var n,nBlock,flip;
         var top,bot,ySize,slopeHigh,concreteColor;
         var sx,ex,streakWid;
         
-        var dirtColor=this.getRandomGreyColor(0.2,0.4);
+        var concreteColor=this.getRandomPrimaryColor(0.3,0.7);
+        var concreteColor2=this.darkenColor(concreteColor,0.8);
+        var dirtColor=this.darkenColor(concreteColor,0.5);
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
@@ -215,17 +217,17 @@ class GenBitmapMapClass extends GenBitmapClass
         
         for (n=0;n!==nBlock;n++) {
             
+            flip=((n%2)!==0);
             bot=top+Math.trunc(ySize);
                
                // concrete background
                
-            concreteColor=this.getRandomGreyColor(0.5,0.8);
-            this.drawRect(bitmapCTX,0,top,wid,bot,concreteColor);
+            this.drawRect(bitmapCTX,0,top,wid,bot,(flip?concreteColor:concreteColor2));
             
                 // slopes
             
             slopeHigh=0;
-            if ((n%2)!==0) {
+            if (flip) {
                 slopeHigh=this.genRandom.randomInt(10,Math.trunc(ySize/6));
                 this.drawSlope(bitmapCTX,normalCTX,0,top,wid,(top+slopeHigh),concreteColor,true);
                 this.drawSlope(bitmapCTX,normalCTX,0,(bot-slopeHigh),wid,bot,concreteColor,false);

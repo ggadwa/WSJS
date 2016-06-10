@@ -26,9 +26,14 @@ class GenMapClass
 
     removeSharedTrianglesChunk(meshFlag,compareMeshFlag,equalY,removeBoth)
     {
-        var n,k,t1,t2,nMesh,hit,boundCheck;
-        var bounds,otherBounds;
+        var n,k,t1,t2,nMesh,hit;
         var mesh,otherMesh;
+        var xBound=new wsBound(0,0);
+        var yBound=new wsBound(0,0);
+        var zBound=new wsBound(0,0);
+        var xOtherBound=new wsBound(0,0);
+        var yOtherBound=new wsBound(0,0);
+        var zOtherBound=new wsBound(0,0);
 
             // create a list of triangles
             // to delete
@@ -64,6 +69,9 @@ class GenMapClass
                 // then we need to iterate over the whole
                 // list, otherwise just the back half as we've
                 // already hit that type in the outer loop
+                
+                // also, two different types means we are
+                // eliminating from inside, so do the touch differently
             
             targetMeshCount=0;
             
@@ -72,7 +80,7 @@ class GenMapClass
                     otherMesh=map.meshes[k];
                     if (otherMesh.flag!==compareMeshFlag) continue;
 
-                    if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
+                    if (mesh.boxTouchOtherMeshOutside(otherMesh)) targetMeshList[targetMeshCount++]=k;
                 }
             }
             else {
@@ -80,7 +88,7 @@ class GenMapClass
                     otherMesh=map.meshes[k];
                     if (otherMesh.flag!==compareMeshFlag) continue;
 
-                    if (mesh.boxTouchOtherMesh(otherMesh)) targetMeshList[targetMeshCount++]=k;
+                    if (mesh.boxTouchOtherMeshInside(otherMesh)) targetMeshList[targetMeshCount++]=k;
                 }
             }
             
@@ -91,7 +99,9 @@ class GenMapClass
             for (t1=0;t1!==mesh.trigCount;t1++) {
                 
                 if (!mesh.isTriangleStraightWall(t1)) continue;
-                bounds=mesh.getTriangleBounds(t1);
+                mesh.getTriangleXBound(t1,xBound);
+                mesh.getTriangleYBound(t1,yBound);
+                mesh.getTriangleZBound(t1,zBound);
 
                 hit=false;
 
@@ -101,21 +111,25 @@ class GenMapClass
                     for (t2=0;t2!==otherMesh.trigCount;t2++) {
 
                         if (!otherMesh.isTriangleStraightWall(t2)) continue;
-                        otherBounds=otherMesh.getTriangleBounds(t2);
                         
+                        otherMesh.getTriangleXBound(t2,xOtherBound);
+                        if ((xBound.min!==xOtherBound.min) || (xBound.max!==xOtherBound.max)) continue;
+                        
+                        otherMesh.getTriangleZBound(t2,zOtherBound);
+                        if ((zBound.min!==zOtherBound.min) || (zBound.max!==zOtherBound.max)) continue;
+                        
+                        otherMesh.getTriangleYBound(t2,yOtherBound);
                         if (equalY) {
-                            boundCheck=((bounds[0].min===otherBounds[0].min) && (bounds[0].max===otherBounds[0].max) && (bounds[1].min===otherBounds[1].min) && (bounds[1].max===otherBounds[1].max) && (bounds[2].min===otherBounds[2].min) && (bounds[2].max===otherBounds[2].max));
+                            if ((yBound.min!==yOtherBound.min) || (yBound.max!==yOtherBound.max)) continue;
                         }
                         else {
-                            boundCheck=((bounds[0].min===otherBounds[0].min) && (bounds[0].max===otherBounds[0].max) && (bounds[1].min>=otherBounds[1].min) && (bounds[1].max<=otherBounds[1].max) && (bounds[2].min===otherBounds[2].min) && (bounds[2].max===otherBounds[2].max));
+                            if ((yBound.min<yOtherBound.min) || (yBound.max>yOtherBound.max)) continue;
                         }
                         
-                        if (boundCheck) {
-                            trigList.push([n,t1]);
-                            if (removeBoth) trigList.push([targetMeshList[k],t2]);
-                            hit=true;
-                            break;
-                        }
+                        trigList.push([n,t1]);
+                        if (removeBoth) trigList.push([targetMeshList[k],t2]);
+                        hit=true;
+                        break;
                     }
 
                     if (hit) break;
@@ -147,28 +161,6 @@ class GenMapClass
                 }
             }
         }
-    }
-    
-    removeSharedTriangles()
-    {
-             // we do this in separate passes as some polygons
-            // shouldn't remove others, and vice versa.  first
-            // remove all the shared trigs between rooms and
-            // remove them both
-            
-        this.removeSharedTrianglesChunk(MESH_FLAG_ROOM_WALL,MESH_FLAG_ROOM_WALL,true,true);
-        
-            // now remove any platforms or ledges that are equal
-            // in another platform or ledge wall
-            
-        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_PLATFORM,true,true);
-        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_LEDGE,true,true);
-  
-            // and finally remove any platform or ledge triangles that
-            // are enclosed by an outer wall
-            
-        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_ROOM_WALL,false,false);
-        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_ROOM_WALL,false,false);
     }
 
         //
@@ -852,7 +844,7 @@ class GenMapClass
 
     build()
     {
-        view.loadingScreenDraw(0.12);
+        view.loadingScreenDraw(0.1);
         setTimeout(this.buildMapRooms.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -865,7 +857,7 @@ class GenMapClass
         
         this.buildMapRecursiveRoom(0,null,null,ROOM_CONNECT_MODE_NONE,0,0);
         
-        view.loadingScreenDraw(0.24);
+        view.loadingScreenDraw(0.2);
         setTimeout(this.buildMapClosets.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -877,7 +869,7 @@ class GenMapClass
         
             // finish with the callback
 
-        view.loadingScreenDraw(0.36);
+        view.loadingScreenDraw(0.3);
         setTimeout(this.buildMapPlatforms.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -889,7 +881,7 @@ class GenMapClass
         
             // finish with the callback
 
-        view.loadingScreenDraw(0.48);
+        view.loadingScreenDraw(0.4);
         setTimeout(this.buildMapLedges.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -901,19 +893,51 @@ class GenMapClass
         
             // finish with the callback
 
-        view.loadingScreenDraw(0.60);
-        setTimeout(this.buildMapRemoveSharedTriangles.bind(this),PROCESS_TIMEOUT_MSEC);
+        view.loadingScreenDraw(0.5);
+        setTimeout(this.buildMapRemoveSharedTriangles1.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
-    buildMapRemoveSharedTriangles()
+    buildMapRemoveSharedTriangles1()
     {
-            // delete any shared triangles
-
-        this.removeSharedTriangles();
+             // we do this in separate passes as some polygons
+            // shouldn't remove others, and vice versa.  first
+            // remove all the shared trigs between rooms and
+            // remove them both
+            
+        this.removeSharedTrianglesChunk(MESH_FLAG_ROOM_WALL,MESH_FLAG_ROOM_WALL,true,true);
         
             // finish with the callback
             
-        view.loadingScreenDraw(0.72);
+        view.loadingScreenDraw(0.6);
+        setTimeout(this.buildMapRemoveSharedTriangles2.bind(this),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    
+    buildMapRemoveSharedTriangles2()
+    {
+            // now remove any platforms or ledges that are equal
+            // in another platform or ledge wall
+            
+        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_PLATFORM,true,true);
+        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_LEDGE,true,true);
+        
+            // finish with the callback
+            
+        view.loadingScreenDraw(0.7);
+        setTimeout(this.buildMapRemoveSharedTriangles3.bind(this),PROCESS_TIMEOUT_MSEC);
+    }
+
+    buildMapRemoveSharedTriangles3()
+    {
+            // and finally remove any platform or ledge triangles that
+            // are enclosed by an outer wall
+            
+        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_ROOM_WALL,false,false);
+        
+            // finish with the callback
+            
+        view.loadingScreenDraw(0.8);
         setTimeout(this.buildMapDecorations.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -926,7 +950,7 @@ class GenMapClass
         
             // finish with the callback
             
-        view.loadingScreenDraw(0.84);
+        view.loadingScreenDraw(0.9);
         setTimeout(this.buildMapFinish.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     

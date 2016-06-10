@@ -78,7 +78,7 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=[0.1,0.1,0.1];          // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=[0.2,0.2,0.2];          // all over ambient light [r,g,b]
 
         this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above
@@ -113,9 +113,9 @@ class ConfigClass
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_SKY=Math.trunc((Math.random()*this.SEED));
         this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=6; //Math.trunc((Math.random()*this.SEED));
+        this.SEED_MAP=Math.trunc((Math.random()*this.SEED));
         this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_ENTITY=6; //Math.trunc((Math.random()*this.SEED));
+        this.SEED_ENTITY=Math.trunc((Math.random()*this.SEED));
         this.SEED_WEAPON=Math.trunc((Math.random()*this.SEED));
         this.SEED_PROJECTILE=Math.trunc((Math.random()*this.SEED));
         this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));
