@@ -19,6 +19,7 @@ class GenAIClass
         var ai=new AIClass();
         
         ai.setProjectile(this.genProjectile.generate(false));
+        ai.setProjectileFire(5000,20);
         
         return(ai);
     }

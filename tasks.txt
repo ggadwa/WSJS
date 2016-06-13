@@ -28,8 +28,6 @@ REGULAR TODOs
 #### liquid tint colors are hardcoded
 #### be able to attach rounded sections or just use rounded rooms at end of path
 
-#### light mapping is pretty crappy in places, more than likely because of low resolution
-
 #### outside sections
 
 #### model spikes
@@ -37,7 +35,6 @@ REGULAR TODOs
 #### flyers models
 
 #### monsters need random line of sight fire and fire wait
-
 
 
 

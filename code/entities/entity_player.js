@@ -129,14 +129,12 @@ class EntityPlayerClass extends EntityClass
         this.turn(this.turnSpeed);
         this.look(this.lookSpeed);
         
-            // can only bump if we aren't falling
-            // as otherwise ledges can catch you and
-            // bump you back up
-            
-        bump=this.isStandingOnFloor();
-        
             // determine if we've passed out of a liquid
-            // if we have and than automatically jump
+            // if we are, auto-jump to get out of liquid
+            
+            // colliding while moving can depend on being on
+            // precise ticks so we count hits within a certain
+            // time frame
         
         if (this.isInLiquid()) {
             this.lastInLiquid=true;
@@ -146,8 +144,18 @@ class EntityPlayerClass extends EntityClass
                 this.gravity=0;
                 this.movement.y-=this.jumpWaterHeight;
             }
+            
             this.lastInLiquid=false;
         }
+        
+            // can only bump if we aren't falling
+            // as otherwise ledges can catch you and
+            // bump you back up
+            
+            // the only exception is swimming, which always
+            // bumps over small obstacles
+            
+        bump=(this.isStandingOnFloor())||(this.lastInLiquid);
         
             // movement
             

@@ -28,12 +28,16 @@ class GenMapClass
     {
         var n,k,t1,t2,nMesh,hit;
         var mesh,otherMesh;
-        var xBound=new wsBound(0,0);
-        var yBound=new wsBound(0,0);
-        var zBound=new wsBound(0,0);
-        var xOtherBound=new wsBound(0,0);
-        var yOtherBound=new wsBound(0,0);
-        var zOtherBound=new wsBound(0,0);
+        var trigCache,otherTrigCache;
+        
+            // this function calculates if a triangle
+            // is wall like, and it's bounds, and caches it
+            
+        nMesh=map.meshes.length;
+            
+        for (n=0;n!==nMesh;n++) {
+            map.meshes[n].buildSharedTriangleCache();
+        }
 
             // create a list of triangles
             // to delete
@@ -52,8 +56,6 @@ class GenMapClass
             // so slanted walls don't get erased (only
             // straight walls are connected)
             
-        nMesh=map.meshes.length;
-        
         var targetMeshCount=0;
         var targetMeshList=new Uint16Array(nMesh);
 
@@ -98,10 +100,8 @@ class GenMapClass
 
             for (t1=0;t1!==mesh.trigCount;t1++) {
                 
-                if (!mesh.isTriangleStraightWall(t1)) continue;
-                mesh.getTriangleXBound(t1,xBound);
-                mesh.getTriangleYBound(t1,yBound);
-                mesh.getTriangleZBound(t1,zBound);
+                trigCache=mesh.getSharedTriangleCacheItem(t1);
+                if (!trigCache.isWall) continue;
 
                 hit=false;
 
@@ -109,21 +109,18 @@ class GenMapClass
                     otherMesh=map.meshes[targetMeshList[k]];
 
                     for (t2=0;t2!==otherMesh.trigCount;t2++) {
+                        
+                        otherTrigCache=otherMesh.getSharedTriangleCacheItem(t2);
+                        if (!otherTrigCache.isWall) continue;
+                        
+                        if ((trigCache.xBound.min!==otherTrigCache.xBound.min) || (trigCache.xBound.max!==otherTrigCache.xBound.max)) continue;
+                        if ((trigCache.zBound.min!==otherTrigCache.zBound.min) || (trigCache.zBound.max!==otherTrigCache.zBound.max)) continue;
 
-                        if (!otherMesh.isTriangleStraightWall(t2)) continue;
-                        
-                        otherMesh.getTriangleXBound(t2,xOtherBound);
-                        if ((xBound.min!==xOtherBound.min) || (xBound.max!==xOtherBound.max)) continue;
-                        
-                        otherMesh.getTriangleZBound(t2,zOtherBound);
-                        if ((zBound.min!==zOtherBound.min) || (zBound.max!==zOtherBound.max)) continue;
-                        
-                        otherMesh.getTriangleYBound(t2,yOtherBound);
                         if (equalY) {
-                            if ((yBound.min!==yOtherBound.min) || (yBound.max!==yOtherBound.max)) continue;
+                            if ((trigCache.yBound.min!==otherTrigCache.yBound.min) || (trigCache.yBound.max!==otherTrigCache.yBound.max)) continue;
                         }
                         else {
-                            if ((yBound.min<yOtherBound.min) || (yBound.max>yOtherBound.max)) continue;
+                            if ((trigCache.yBound.min<otherTrigCache.yBound.min) || (trigCache.yBound.max>otherTrigCache.yBound.max)) continue;
                         }
                         
                         trigList.push([n,t1]);
@@ -135,6 +132,12 @@ class GenMapClass
                     if (hit) break;
                 }
             }
+        }
+        
+            // clear the caches
+            
+        for (n=0;n!==nMesh;n++) {
+            map.meshes[n].clearSharedTriangleCache();
         }
         
             // finally delete the triangles

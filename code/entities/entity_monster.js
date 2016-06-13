@@ -23,6 +23,11 @@ class EntityMonsterClass extends EntityClass
         this.active=false;
         this.lastShotTimeStamp=0;
         
+            // global to stop GC
+            
+        this.fireAngle=new wsPoint(0,0,0);
+        this.firePosition=new wsPoint(0,0,0);
+        
         Object.seal(this);
     }
     
@@ -43,6 +48,41 @@ class EntityMonsterClass extends EntityClass
     }
     
         //
+        // projectile firing
+        //
+        
+    fire(enemyEntity)
+    {
+            // can't fire if no projectile
+            
+        if (this.ai.projectile===null) return;
+        
+            // wait time not up
+            
+        if (view.timeStamp<this.lastShotTimeStamp) return;
+        
+            // check if we are within fire slop angle
+            
+            console.log(this.position.angleYTo(enemyEntity.position)+'='+this.angle.y+'='+this.ai.fireSlopAngle);
+                
+        if (Math.abs(this.position.angleYTo(enemyEntity.position)-this.angle)>this.ai.fireSlopAngle) return;
+        
+            // fire
+            /*
+        this.lastShotTimeStamp=view.timeStamp+this.ai.fireRechargeTick;
+
+        this.fireAngle.setFromPoint(this.angle);
+
+        this.firePosition.setFromValues(0,0,4000);      // supergumba -- all this is hardcoded!
+        this.firePosition.rotate(ang);
+        this.firePosition.addPoint(this.position);
+        this.firePosition.y-=2000;        // supergumba -- all this is hardcoded!
+
+        this.ai.projectile.fire(this.firePosition,this.fireAngle);
+        */
+    }
+    
+        //
         // run monster
         //
     
@@ -56,7 +96,7 @@ class EntityMonsterClass extends EntityClass
         
         if ((!this.active) && (config.MONSTER_AI_ON)) {
             var dist=player.position.distance(this.position);
-            this.active=(dist<25000);
+            //this.active=(dist<25000);
         }
         
             // inactive monsters can only turn towards
@@ -67,7 +107,7 @@ class EntityMonsterClass extends EntityClass
             
             this.setMovementForward(false);
             this.move(true,false,false);
-            if (this.isStandingOnFloor()) this.turnTowardsPosition(player.position,1.0);
+            if (this.isStandingOnFloor()) this.turnTowardsPosition(player.position,0.4);
         }
         
             // active monsters stalk the player
@@ -86,22 +126,8 @@ class EntityMonsterClass extends EntityClass
         }
         
             // firing projectiles
-
-        if (this.active) {
-            if (view.timeStamp>this.lastShotTimeStamp) {
-                this.lastShotTimeStamp=view.timeStamp+5000;
-
-                var ang=new wsPoint(0,0,0);
-                ang.setFromPoint(this.angle);
-
-                var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
-                pos.rotate(ang);
-                pos.addPoint(this.position);
-                pos.y-=2000;        // supergumba -- all this is hardcoded!
-
-                this.ai.projectile.fire(pos,ang);
-            }
-        }
+            
+        if (this.active) this.fire(player);
     }
     
 }

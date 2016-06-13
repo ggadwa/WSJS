@@ -36,6 +36,24 @@ class MapMeshLightMapTrigCacheClass
 }
 
 //
+// special class used to pre-calc some
+// shared triangle elimination calculations
+//
+
+class MapMeshSharedTrigCacheClass
+{
+    constructor()
+    {
+        this.isWall=false;
+        this.xBound=null;
+        this.yBound=null;
+        this.zBound=null;
+        
+        Object.seal(this);
+    }
+}
+
+//
 // map mesh class
 //
 
@@ -85,6 +103,7 @@ class MapMeshClass
             // special caches for light map building
 
         this.trigRayTraceCache=null;
+        this.trigSharedTrigCache=null;
         
             // light intersection lists
             
@@ -224,64 +243,54 @@ class MapMeshClass
         // triangles
         //
 
-    getTriangleVertex(trigIdx,vertexIdx)
+    buildSharedTriangleCache()
     {
-        var v=this.vertexList[this.indexes[(trigIdx*3)+vertexIdx]];
-        return(new wsPoint(v.position.x,v.position.y,v.position.z));
-    }
+        var n,k,vIdx,v0,v1,v2;
+        var cacheItem;
+        
+        this.trigSharedTrigCache=[];
+        
+        for (n=0;n!==this.trigCount;n++) {
+            
+            cacheItem=new MapMeshSharedTrigCacheClass();
+            
+            v0=this.vertexList[this.indexes[(n*3)]];
+            v1=this.vertexList[this.indexes[(n*3)+1]];
+            v2=this.vertexList[this.indexes[(n*3)+2]];
 
-    getTriangleXBound(trigIdx,xBound)
-    {
-        var n;
-        var v=this.getTriangleVertex(trigIdx,0);
+                // if all the Xs of Zs are equal,
+                // consider it a straight wall
 
-        xBound.setFromValues(v.x,v.x);
-
-        for (n=1;n!==3;n++) {
-            v=this.getTriangleVertex(trigIdx,n);
-            xBound.adjust(v.x);
+            cacheItem.isWall=((v0.position.x===v1.position.x) && (v0.position.x===v2.position.x)) || ((v0.position.z===v1.position.z) && (v0.position.z===v2.position.z));
+            
+                // the bounds
+            
+            cacheItem.xBound=new wsBound(v0.position.x,v0.position.x);
+            cacheItem.xBound.adjust(v1.position.x);
+            cacheItem.xBound.adjust(v2.position.x);
+            
+            cacheItem.yBound=new wsBound(v0.position.y,v0.position.y);
+            cacheItem.yBound.adjust(v1.position.y);
+            cacheItem.yBound.adjust(v2.position.y);
+            
+            cacheItem.zBound=new wsBound(v0.position.z,v0.position.z);
+            cacheItem.zBound.adjust(v1.position.z);
+            cacheItem.zBound.adjust(v2.position.z);
+            
+                // store in cache
+                
+            this.trigSharedTrigCache.push(cacheItem);
         }
     }
     
-    getTriangleYBound(trigIdx,yBound)
+    getSharedTriangleCacheItem(trigIdx)
     {
-        var n;
-        var v=this.getTriangleVertex(trigIdx,0);
-
-        yBound.setFromValues(v.y,v.y);
-
-        for (n=1;n!==3;n++) {
-            v=this.getTriangleVertex(trigIdx,n);
-            yBound.adjust(v.y);
-        }
+        return(this.trigSharedTrigCache[trigIdx]);
     }
     
-    getTriangleZBound(trigIdx,zBound)
+    clearSharedTriangleCache()
     {
-        var n;
-        var v=this.getTriangleVertex(trigIdx,0);
-
-        zBound.setFromValues(v.z,v.z);
-
-        for (n=1;n!==3;n++) {
-            v=this.getTriangleVertex(trigIdx,n);
-            zBound.adjust(v.z);
-        }
-    }
-
-    isTriangleStraightWall(trigIdx)
-    {
-        var v0=this.getTriangleVertex(trigIdx,0);
-        var v1=this.getTriangleVertex(trigIdx,0);
-        var v2=this.getTriangleVertex(trigIdx,0);
-
-            // if all the Xs of Zs are equal,
-            // consider it a straight wall
-
-        if ((v0.x===v1.x) && (v0.x===v2.x)) return(true);
-        if ((v0.z===v1.z) && (v0.z===v2.z)) return(true);
-
-        return(false);
+        this.trigSharedTrigCache=null;
     }
 
     removeTriangle(trigIdx)
@@ -372,6 +381,11 @@ class MapMeshClass
             
             this.trigRayTraceCache.push(new MapMeshLightMapTrigCacheClass(vp0,v10,v20));
         }
+    }
+    
+    clearTrigRayTraceCache()
+    {
+        this.trigRayTraceCache=null;
     }
 
         //

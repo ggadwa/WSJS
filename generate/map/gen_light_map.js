@@ -921,12 +921,14 @@ class GenLightmapClass
         }
 
             // and set the light map on the meshes
+            // and clear any caches
 
         var mesh;
         var nMesh=map.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshes[n];
+            mesh.clearTrigRayTraceCache();
             mesh.lightmap=bitmapList.getBitmap('Lightmap '+mesh.tempLightmapIdx);
         }
         

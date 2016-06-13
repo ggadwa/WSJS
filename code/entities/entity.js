@@ -354,10 +354,12 @@ class EntityClass
 		
 	if (subway<addway) {
             if (subway>speed) subway=speed;
+            console.log(-subway);
             this.turn(-subway);
 	}
         else {
             if (addway>speed) addway=speed;
+            console.log(addway);
             this.turn(addway);
         }
     }
