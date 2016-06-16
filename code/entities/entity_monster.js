@@ -63,8 +63,8 @@ class EntityMonsterClass extends EntityClass
         
             // check if we are within fire slop angle
             
-            console.log(this.position.angleYTo(enemyEntity.position)+'='+this.angle.y+'='+this.ai.fireSlopAngle);
-                
+            //console.log(this.position.angleYTo(enemyEntity.position)+'='+this.angle.y+'='+this.ai.fireSlopAngle);
+        
         if (Math.abs(this.position.angleYTo(enemyEntity.position)-this.angle)>this.ai.fireSlopAngle) return;
         
             // fire

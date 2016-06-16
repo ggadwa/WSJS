@@ -409,9 +409,18 @@ class wsPoint
         
             // now we need to switch it up for which side the x is on
             // (if greater, the #s are 0 to -180, if positive, 180 to 0)
+            
+        if (this.x>pt.x) {
+            fang=-fang;
+        }
+        else {
+            fang=(180.0-fang)+180.0;
+        }
         
-        if (this.x>pt.x) return(-fang);
-        return((180.0-fang)+180.0);
+        if (fang<0) fang=360.0+fang;
+        if (fang>=360.0) fang-=360.0;
+        
+        return(fang);
     }
     
     copy()

@@ -36,6 +36,7 @@ REGULAR TODOs
 
 #### monsters need random line of sight fire and fire wait
 
+#### what the heck is wrong with all the turning and angle facing routines (getting stuck on 180 degrees)
 
 
 [X] room decorations can now be mixed
