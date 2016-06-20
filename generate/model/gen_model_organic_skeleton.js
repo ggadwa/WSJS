@@ -18,7 +18,7 @@ class GenModelOrganicSkeletonClass
         // build chunks
         //
         
-    buildLimbArm(vct,nameSuffix,torsoTopBoneIdx,armRadius,y,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,leftLimb)
+    buildLimbArm(vct,nameSuffix,torsoTopBoneIdx,armRadius,y,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,limbType)
     {
         var shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx,knuckleBoneIdx,fingerBoneIdx;
         var n,fy,fingerRadius,knuckleLength,fingerTotalLength,handRadius;
@@ -35,7 +35,7 @@ class GenModelOrganicSkeletonClass
         bones[elbowBoneIdx].gravityLockDistance=armRadius;
         bones[wristBoneIdx].gravityLockDistance=armRadius;
 
-        skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_ARM_LEFT:LIMB_TYPE_ARM_RIGHT),LIMB_AXIS_X,8,5,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]));
+        skeleton.limbs.push(new ModelLimbClass(limbType,LIMB_AXIS_X,8,5,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]));
         
             // hand
 
@@ -45,7 +45,7 @@ class GenModelOrganicSkeletonClass
         bones[handBoneIdx].gravityLockDistance=handRadius;
         bones[handBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_HAND_LEFT:LIMB_TYPE_HAND_RIGHT),LIMB_AXIS_X,5,5,[handBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_HAND,LIMB_AXIS_X,5,5,[handBoneIdx]));
         
             // add fingers to hand
             
@@ -66,13 +66,13 @@ class GenModelOrganicSkeletonClass
             bones[knuckleBoneIdx].gravityLockDistance=fingerRadius;
             bones[fingerBoneIdx].gravityLockDistance=fingerRadius;
             
-            skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_FINGER_LEFT:LIMB_TYPE_FINGER_RIGHT),LIMB_AXIS_X,4,4,[knuckleBoneIdx,fingerBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_FINGER,LIMB_AXIS_X,4,4,[knuckleBoneIdx,fingerBoneIdx]));
             
             fy+=150;
         }
     }
     
-    buildLimbLeg(vct,boneIdx,nameSuffix,hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,leftLimb)
+    buildLimbLeg(vct,boneIdx,nameSuffix,hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,limbType)
     {
         var legHipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx,knuckleBoneIdx,toeBoneIdx;
         var n,knuckleLength,toeRadius,toeTotalLength,fx,fz,vct;
@@ -89,7 +89,7 @@ class GenModelOrganicSkeletonClass
         bones[kneeBoneIdx].gravityLockDistance=legRadius;
         bones[ankleBoneIdx].gravityLockDistance=legRadius;
 
-        this.model.skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_LEG_LEFT:LIMB_TYPE_LEG_RIGHT),LIMB_AXIS_Y,8,5,[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(limbType,LIMB_AXIS_Y,8,5,[legHipBoneIdx,kneeBoneIdx,ankleBoneIdx]));
 
             // foot
 
@@ -100,7 +100,7 @@ class GenModelOrganicSkeletonClass
         bones[footBoneIdx].gravityLockDistance=legRadius;
         bones[footBoneIdx].gravityScale.setFromValues(1.0,0.7,1.0);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_FOOT_LEFT:LIMB_TYPE_FOOT_RIGHT),LIMB_AXIS_Z,5,5,[ankleBoneIdx,footBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_FOOT,LIMB_AXIS_Z,5,5,[ankleBoneIdx,footBoneIdx]));
         
             // add toes to foot
             
@@ -124,13 +124,13 @@ class GenModelOrganicSkeletonClass
             bones[knuckleBoneIdx].gravityScale.setFromValues(1.0,0.7,1.0);
             bones[toeBoneIdx].gravityScale.setFromValues(1.0,0.7,1.0);
             
-            skeleton.limbs.push(new ModelLimbClass((leftLimb?LIMB_TYPE_TOE_LEFT:LIMB_TYPE_TOE_RIGHT),LIMB_AXIS_Z,4,4,[knuckleBoneIdx,toeBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass(LIMB_TYPE_TOE,LIMB_AXIS_Z,4,4,[knuckleBoneIdx,toeBoneIdx]));
             
             fx+=150;
         }
     }
     
-    buildLimbLegSet(boneIdx,legIndex,boneOffset,rotOffset,hipRadius,hipHigh,legRadius,footLength)
+    buildLimbLegSet(boneIdx,legIndex,boneOffset,rotOffset,hipRadius,hipHigh,legRadius,footLength,leftLimbType,rightLimbType)
     {
         var toeCount,toeLength;
         var kneeHigh=Math.trunc(hipHigh*0.5);
@@ -148,12 +148,12 @@ class GenModelOrganicSkeletonClass
         var vct=new wsPoint(hipRadius,0.0,0.0);
         vct.rotateY(null,rotOffset);
         vct.z+=boneOffset;
-        this.buildLimbLeg(vct,boneIdx,('Left'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,true);
+        this.buildLimbLeg(vct,boneIdx,('Left'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,leftLimbType);
 
         vct=new wsPoint(-hipRadius,0.0,0.0);
         vct.rotateY(null,-rotOffset);
         vct.z+=boneOffset;
-        this.buildLimbLeg(vct,boneIdx,('Right'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,false);
+        this.buildLimbLeg(vct,boneIdx,('Right'+legIndex),hipHigh,kneeHigh,ankleHigh,legRadius,footLength,toeCount,toeLength,rightLimbType);
     }
         
     buildLimbWhip(whipCount,parentBoneIdx,whipRadius,y,whipLength,rotOffset)
@@ -308,11 +308,11 @@ class GenModelOrganicSkeletonClass
 
                 vct=new wsPoint(1.0,0.0,0.0);
                 vct.rotateY(null,rotOffset);
-                this.buildLimbArm(vct,('Left'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,true);
+                this.buildLimbArm(vct,('Left'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,LIMB_TYPE_ARM_LEFT);
 
                 vct=new wsPoint(-1.0,0.0,0.0);
                 vct.rotateY(null,-rotOffset);
-                this.buildLimbArm(vct,('Right'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,false);
+                this.buildLimbArm(vct,('Right'+n),torsoTopBoneIdx,armRadius,armY,shoulderLength,elbowLength,wristLength,handLength,fingerCount,fingerLength,LIMB_TYPE_ARM_RIGHT);
 
                 y+=Math.trunc(armRadius*2.2);
             }
@@ -326,7 +326,7 @@ class GenModelOrganicSkeletonClass
        
         rotOffset=(this.genRandom.random()*20.0)-10.0;
         
-        this.buildLimbLegSet(hipBoneIdx,0,0,rotOffset,Math.trunc(botBodyRadius*0.5),bones[hipBoneIdx].position.y,legRadius,footLength);
+        this.buildLimbLegSet(hipBoneIdx,0,0,rotOffset,Math.trunc(botBodyRadius*0.5),bones[hipBoneIdx].position.y,legRadius,footLength,LIMB_TYPE_LEG_LEFT,LIMB_TYPE_LEG_RIGHT);
     }
 
         //
@@ -409,10 +409,8 @@ class GenModelOrganicSkeletonClass
         var rotOffset=(this.genRandom.random()*20.0)-10.0;
         var footLength=this.genRandom.randomInt(150,150);
         
-        this.buildLimbLegSet(hipBoneIdx,0,bones[hipBoneIdx].position.z,rotOffset,Math.trunc(bones[hipBoneIdx].gravityLockDistance*0.7),bones[hipBoneIdx].position.y,200,footLength);
-        if (this.genRandom.randomPercentage(0.3)) this.buildLimbLegSet(waistBoneIdx,0,bones[waistBoneIdx].position.z,rotOffset,Math.trunc(bones[waistBoneIdx].gravityLockDistance*0.7),bones[waistBoneIdx].position.y,200,footLength);
-        if (this.genRandom.randomPercentage(0.3)) this.buildLimbLegSet(torsoBoneIdx,0,bones[torsoBoneIdx].position.z,rotOffset,Math.trunc(bones[torsoBoneIdx].gravityLockDistance*0.7),bones[torsoBoneIdx].position.y,200,footLength);
-        this.buildLimbLegSet(torsoTopBoneIdx,0,bones[torsoTopBoneIdx].position.z,rotOffset,Math.trunc(bones[torsoTopBoneIdx].gravityLockDistance*0.7),bones[torsoTopBoneIdx].position.y,200,footLength);
+        this.buildLimbLegSet(hipBoneIdx,0,bones[hipBoneIdx].position.z,rotOffset,Math.trunc(bones[hipBoneIdx].gravityLockDistance*0.8),bones[hipBoneIdx].position.y,200,footLength,LIMB_TYPE_LEG_BACK,LIMB_TYPE_LEG_BACK);
+        this.buildLimbLegSet(torsoTopBoneIdx,0,bones[torsoTopBoneIdx].position.z,rotOffset,Math.trunc(bones[torsoTopBoneIdx].gravityLockDistance*0.5),bones[torsoTopBoneIdx].position.y,200,footLength,LIMB_TYPE_LEG_FRONT,LIMB_TYPE_LEG_FRONT);
 
             // tail
             

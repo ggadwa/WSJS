@@ -50,7 +50,7 @@ class WeaponClass
         pos.addPoint(entity.position);
         pos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        this.projectiles[0].fire(pos,ang);
+        this.projectiles[0].fire(entity.id,pos,ang);
     }
     
         //

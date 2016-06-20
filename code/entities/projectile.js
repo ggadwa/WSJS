@@ -72,9 +72,9 @@ class ProjectileClass
         this.bounceFactor=bounceFactor;
     }
     
-    fire(pos,ang)
+    fire(parentEntityId,pos,ang)
     {
-        entityList.addEntity(new EntityProjectileClass('projectile',pos,ang,this));
+        entityList.addEntity(new EntityProjectileClass('projectile',parentEntityId,pos,ang,this));
         if (this.fireSound!==null) this.fireSound.play(pos);
     }
     

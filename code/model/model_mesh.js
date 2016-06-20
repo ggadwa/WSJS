@@ -138,7 +138,7 @@ class ModelMeshClass
                     v=this.vertexList[n];
                     limbType=skeleton.getBoneLimbType(v.boneIdx);
 
-                    if ((limbType===LIMB_TYPE_BODY) || (limbType===LIMB_TYPE_HEAD) || (limbType===LIMB_TYPE_LEG_LEFT) || (limbType===LIMB_TYPE_LEG_RIGHT)) {
+                    if ((limbType===LIMB_TYPE_BODY) || (limbType===LIMB_TYPE_HEAD) || (limbType===LIMB_TYPE_LEG_LEFT) || (limbType===LIMB_TYPE_LEG_RIGHT) || (limbType===LIMB_TYPE_LEG_FRONT) || (limbType===LIMB_TYPE_LEG_BACK)) {
                         xBound.adjust(v.position.x);
                         zBound.adjust(v.position.z);
                     }

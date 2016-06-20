@@ -268,7 +268,7 @@ class MainClass
         }
         else {
             monsterType=MODEL_MONSTER_TYPES[idx%(MODEL_MONSTER_TYPES.length)];        // supergumba -- TESTING -- always make at least one of each type
-            //monsterType=MODEL_TYPE_ANIMAL;      // supergumba -- testing
+            monsterType=MODEL_TYPE_ANIMAL;      // supergumba -- testing
             model=new ModelClass(('monster_'+idx),monsterType);
         }
 

@@ -98,7 +98,7 @@ class ConfigClass
             //
 
         this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=1;
+        this.MONSTER_ENTITY_COUNT=3;
 
         this.MONSTER_AI_ON=true;
 

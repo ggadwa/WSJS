@@ -12,9 +12,9 @@ class EntityMonsterClass extends EntityClass
         
             // entity setup
             
-        this.movementForwardMaxSpeed=50;
-        this.movementForwardAcceleration=5;
-        this.movementForwardDeceleration=10;
+        this.movementForwardMaxSpeed=ai.speed;
+        this.movementForwardAcceleration=ai.acceleration;
+        this.movementForwardDeceleration=ai.deceleration;
         
             // local variables
 
@@ -22,6 +22,9 @@ class EntityMonsterClass extends EntityClass
         
         this.active=false;
         this.lastShotTimeStamp=0;
+        
+        this.enemyId=-1;
+        this.lastAngleDifToEnemy=360;
         
             // global to stop GC
             
@@ -40,18 +43,19 @@ class EntityMonsterClass extends EntityClass
         this.markAsDelete();
     }
     
-    addDamage(damage)
+    addDamage(hitEntityId,damage)
     {
-        super.addDamage(damage);
+        super.addDamage(hitEntityId,damage);
         
-        this.active=true;           // always active monsters that take damage
+        this.active=true;                           // always active monsters that take damage
+        if (hitEntityId!==-1) this.enemyId=hitEntityId;     // and switch over enemy to whoever hit me
     }
     
         //
         // projectile firing
         //
         
-    fire(enemyEntity)
+    fire(enemy)
     {
             // can't fire if no projectile
             
@@ -63,23 +67,20 @@ class EntityMonsterClass extends EntityClass
         
             // check if we are within fire slop angle
             
-            //console.log(this.position.angleYTo(enemyEntity.position)+'='+this.angle.y+'='+this.ai.fireSlopAngle);
-        
-        if (Math.abs(this.position.angleYTo(enemyEntity.position)-this.angle)>this.ai.fireSlopAngle) return;
+        if (this.lastAngleDifToEnemy>this.ai.fireSlopAngle) return;
         
             // fire
-            /*
+
         this.lastShotTimeStamp=view.timeStamp+this.ai.fireRechargeTick;
 
         this.fireAngle.setFromPoint(this.angle);
 
-        this.firePosition.setFromValues(0,0,4000);      // supergumba -- all this is hardcoded!
-        this.firePosition.rotate(ang);
+        this.firePosition.setFromValues(0,0,Math.trunc(this.radius*1.5));      // supergumba -- all this is hardcoded!
+        this.firePosition.rotate(this.fireAngle);
         this.firePosition.addPoint(this.position);
-        this.firePosition.y-=2000;        // supergumba -- all this is hardcoded!
+        this.firePosition.y-=Math.trunc(this.high*0.5);        // supergumba -- all this is hardcoded!
 
-        this.ai.projectile.fire(this.firePosition,this.fireAngle);
-        */
+        this.ai.projectile.fire(this.id,this.firePosition,this.fireAngle);
     }
     
         //
@@ -88,15 +89,25 @@ class EntityMonsterClass extends EntityClass
     
     run()
     {
-        var player;
+        var enemy;
+        
+            // if we don't have an enemy yet,
+            // make it the player, and if our old
+            // enemy got deleted, revert back to player
+            
+        if (this.enemyId===-1) this.enemyId=entityList.getPlayer().id;
+        
+        enemy=entityList.findEntityById(this.enemyId);
+        if (enemy===null) {
+            enemy=entityList.getPlayer();
+            this.enemyId=enemy.id;
+        }
         
             // time to activate monster?
         
-        player=entityList.getPlayer();
-        
         if ((!this.active) && (config.MONSTER_AI_ON)) {
-            var dist=player.position.distance(this.position);
-            //this.active=(dist<25000);
+            var dist=enemy.position.distance(this.position);
+            this.active=(dist<25000);
         }
         
             // inactive monsters can only turn towards
@@ -107,7 +118,7 @@ class EntityMonsterClass extends EntityClass
             
             this.setMovementForward(false);
             this.move(true,false,false);
-            if (this.isStandingOnFloor()) this.turnTowardsPosition(player.position,0.4);
+            if (this.isStandingOnFloor()) this.lastAngleDifToEnemy=this.turnTowardsPosition(enemy.position,this.ai.standTurnSpeed);
         }
         
             // active monsters stalk the player
@@ -121,13 +132,13 @@ class EntityMonsterClass extends EntityClass
                 // turn towards and stalk player
 
             this.setMovementForward(true);
-            this.move(true,true,false,false);
-            if (this.isStandingOnFloor()) this.turnTowardsPosition(player.position,1.0);
+            //this.move(true,true,false,false);
+            //if (this.isStandingOnFloor()) this.lastAngleDifToEnemy=this.turnTowardsPosition(enemy.position,this.ai.walkTurnSpeed);
         }
         
             // firing projectiles
             
-        if (this.active) this.fire(player);
+        if (this.active) this.fire(enemy);
     }
     
 }

@@ -70,6 +70,19 @@ class EntityListClass
         return(this.entities[0]);
     }
     
+    findEntityById(id)
+    {
+        var n,entity;
+        var nEntity=this.entities.length;
+            
+        for (n=0;n!==nEntity;n++) {
+            entity=this.entities[n];
+            if (entity.id===id) return(entity);
+        }
+        
+        return(null);
+    }
+    
         //
         // handle movement pushes from moving map segments
         //

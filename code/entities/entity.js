@@ -335,39 +335,39 @@ class EntityClass
     
     turnTowards(toY,speed)
     {
-        var subway,addway,dif;
+        var subway,addway;
         
         if (this.angle.y===toY) return(0);
         
             // which way is faster?
 	
 	if (this.angle.y>toY) {
-            addway=this.angle.y-toY;
-            subway=360.0-(this.angle.y-toY);
+            addway=360.0-(this.angle.y-toY);
+            subway=this.angle.y-toY;
 	}
 	else {
             addway=toY-this.angle.y;
             subway=360.0-(toY-this.angle.y);
 	}
-		
-            // now turn
-	
-        dif=0;
         
-	if (subway<addway) {
-            dif=subway;
+            // if we are within speed, then
+            // it's equal
             
-            if (subway>speed) subway=speed;
-            this.turn(-subway);
-	}
-        else {
-            dif=addway;
-            
-            if (addway>speed) addway=speed;
-            this.turn(addway);
+        if ((subway<speed) || (addway<speed)) {
+            this.angle.y=toY;
+            return(0);
         }
-        
-        return(dif);
+		
+            // now turn and always
+            // return the difference
+	
+	if (subway<addway) {
+            this.turn(-speed);
+            return(subway);
+	}
+
+        this.turn(speed);
+        return(addway);
     }
     
     turnTowardsPosition(pos,speed)
@@ -394,7 +394,7 @@ class EntityClass
     {
     }
     
-    addDamage(damage)
+    addDamage(hitEntityId,damage)
     {
         this.damageTintStartTick=view.timeStamp;
         

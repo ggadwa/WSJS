@@ -34,9 +34,6 @@ REGULAR TODOs
 #### other leg positions
 #### flyers models
 
-#### monsters need random line of sight fire and fire wait
-
-#### what the heck is wrong with all the turning and angle facing routines (getting stuck on 180 degrees)
 
 
 [X] room decorations can now be mixed
@@ -60,8 +57,10 @@ REGULAR TODOs
 [X] auto-jump out of liquids
 [X] setting for meshes to have simple bounds collision geometery
 [X] better colluded polygon remover
+[X] monsters can get in fights over damage
+[X] animation on animal type model legs are better
 
-[ ] different random speeds for monsters
+[ ] different random speeds, acceleration, etc for monsters
 [ ] add ability for projectiles to have different gravity settings, bounce, and reflect
 
 

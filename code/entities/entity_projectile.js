@@ -6,9 +6,13 @@
 
 class EntityProjectileClass extends EntityClass
 {
-    constructor(name,position,angle,projectile)
+    constructor(name,parentEntityId,position,angle,projectile)
     {
         super(name,position,angle,0,projectile.model);
+        
+            // remember who shot this
+            
+        this.parentEntityId=parentEntityId;
         
             // entity setup
             
@@ -34,7 +38,7 @@ class EntityProjectileClass extends EntityClass
         // if they hit each other
         //
     
-    addDamage(damage)
+    addDamage(hitEntityId,damage)
     {
         this.markAsDelete();
     }
@@ -56,7 +60,7 @@ class EntityProjectileClass extends EntityClass
         
             // handle any damage
         
-        if (this.touchEntity!==null) this.touchEntity.addDamage(this.projectile.damage);
+        if (this.touchEntity!==null) this.touchEntity.addDamage(this.parentEntityId,this.projectile.damage);
     }
     
         //

@@ -359,7 +359,7 @@ class ModelSkeletonClass
         // pose utilities
         //
         
-    poseSetLeg(limb,walking)
+    poseSetLeftRightLeg(limb,walking)
     {
         var r,backLeg;
 
@@ -379,6 +379,31 @@ class ModelSkeletonClass
             this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*2.0),0.0,0.0);
             this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(0.0,0.0,0.0);
         }
+    }
+    
+    poseSetFrontBackLeg(limb,walking)
+    {
+        var r,m0,m1,m2;
+
+        r=0.0;
+        if (walking) r=view.genRandom.randomInBetween(10.0,20.0);
+        
+        if (limb.limbType===LIMB_TYPE_LEG_BACK) {
+            if (this.lastAnimationFlip) r*=0.2;
+            m0=1.0;
+            m1=0.7;
+            m2=0.5;
+        }
+        else {
+            if (this.lastAnimationFlip) r*=0.2;
+            m0=-1.0;
+            m1=-2.0;
+            m2=0.0;
+        }
+        
+        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues((r*m0),0.0,0.0);
+        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*m1),0.0,0.0);
+        this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues((r*m2),0.0,0.0);
     }
     
     poseSetArm(limb,armAngle,walking)
@@ -498,7 +523,11 @@ class ModelSkeletonClass
                     break;
                 case LIMB_TYPE_LEG_LEFT:
                 case LIMB_TYPE_LEG_RIGHT:
-                    this.poseSetLeg(limb,true);
+                    this.poseSetLeftRightLeg(limb,true);
+                    break;
+                case LIMB_TYPE_LEG_FRONT:
+                case LIMB_TYPE_LEG_BACK:
+                    this.poseSetFrontBackLeg(limb,true);
                     break;
                 case LIMB_TYPE_ARM_LEFT:
                     this.poseSetArm(limb,armLeftZAngle,true);
@@ -578,7 +607,11 @@ class ModelSkeletonClass
                     break;
                 case LIMB_TYPE_LEG_LEFT:
                 case LIMB_TYPE_LEG_RIGHT:
-                    this.poseSetLeg(limb,false);
+                    this.poseSetLeftRightLeg(limb,false);
+                    break;
+                case LIMB_TYPE_LEG_FRONT:
+                case LIMB_TYPE_LEG_BACK:
+                    this.poseSetFrontBackLeg(limb,false);
                     break;
                 case LIMB_TYPE_ARM_LEFT:
                     this.poseSetArm(limb,armLeftZAngle,false);
