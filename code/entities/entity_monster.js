@@ -132,8 +132,8 @@ class EntityMonsterClass extends EntityClass
                 // turn towards and stalk player
 
             this.setMovementForward(true);
-            //this.move(true,true,false,false);
-            //if (this.isStandingOnFloor()) this.lastAngleDifToEnemy=this.turnTowardsPosition(enemy.position,this.ai.walkTurnSpeed);
+            this.move(true,true,false,false);
+            if (this.isStandingOnFloor()) this.lastAngleDifToEnemy=this.turnTowardsPosition(enemy.position,this.ai.walkTurnSpeed);
         }
         
             // firing projectiles

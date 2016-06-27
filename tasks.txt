@@ -1,14 +1,18 @@
-EMCA6 TODOs
+EMCA6
     [ ] modulize the code
-    [ ] hoist all the vars, eventually use let
+    [ ] hoist all the vars, eventually use let (safari hold up)
 
-WHEN THERE IS AN INTERFACE TODOs
+WebGL2
+    [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
+
+When interface created
     [ ] close gl
     [ ] all the object release()
 
-REGULAR TODOs
+ToDos
 
 
+#### move up to spatial panner (sound_list.setListenerToEntity, sound.play)
 
 #### collisions against slanted walls are bad
 #### weapon models
@@ -34,7 +38,7 @@ REGULAR TODOs
 #### other leg positions
 #### flyers models
 
-
+#### draw closest map meshes first
 
 [X] room decorations can now be mixed
 [X] added pipe decorations
@@ -62,20 +66,4 @@ REGULAR TODOs
 
 [ ] different random speeds, acceleration, etc for monsters
 [ ] add ability for projectiles to have different gravity settings, bounce, and reflect
-
-
-
-[ ] GL
-    [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
-    [ ] draw closest map meshes first
-
-[ ] optimizations
-     [ ] look for any addition new optimizations
-
-[ ] sound
-     [ ] move up to spatial panner (sound_list.setListenerToEntity, sound.play)
-
-
-
-
 

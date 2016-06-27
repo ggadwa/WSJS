@@ -12,7 +12,7 @@ class ConfigClass
             // room generation
             //
 
-        this.ROOM_MAX_RECURSION_DEPTH=1; //3;               // how far we recurse building the map, room to room, determines the size of the map
+        this.ROOM_MAX_RECURSION_DEPTH=3;               // how far we recurse building the map, room to room, determines the size of the map
         this.ROOM_MAX_CONNECTION_COUNT=10;             // how many times we try to create a room that connects with this room
 
         this.ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
@@ -47,9 +47,9 @@ class ConfigClass
 
         this.STAIR_STEP_COUNT=10;
         
-        this.ROOM_CLOSETS=false;                         // turns on or off closets
-        this.ROOM_PLATFORMS=false;                       // turns on or off platforms
-        this.ROOM_LEDGES=false;                          // turns on or off ledges
+        this.ROOM_CLOSETS=true;                         // turns on or off closets
+        this.ROOM_PLATFORMS=true;                       // turns on or off platforms
+        this.ROOM_LEDGES=true;                          // turns on or off ledges
         
             //
             // liquids
@@ -60,7 +60,7 @@ class ConfigClass
         this.ROOM_LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
         this.ROOM_LIQUID_WAVE_HEIGHT=400;               // pixel height of waves
                 
-        this.ROOM_LIQUIDS=false;                         // turns on or off liquids
+        this.ROOM_LIQUIDS=true;                         // turns on or off liquids
 
             //
             // pillars and decorations
@@ -71,8 +71,8 @@ class ConfigClass
         this.ROOM_DECORATION_MIN_COUNT=1;              // minimum number of decoration pieces in a room
         this.ROOM_DECORATION_EXTRA_COUNT=3;            // extra number of decoration pieces
 
-        this.ROOM_PILLARS=false;                        // turns on or off pillars
-        this.ROOM_DECORATIONS=false;                    // turns on or off decorations
+        this.ROOM_PILLARS=true;                        // turns on or off pillars
+        this.ROOM_DECORATIONS=true;                    // turns on or off decorations
 
             //
             // lighting
@@ -91,14 +91,14 @@ class ConfigClass
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
             //
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=3;
+        this.MONSTER_TYPE_COUNT=5;
+        this.MONSTER_ENTITY_COUNT=20;
 
         this.MONSTER_AI_ON=true;
 
