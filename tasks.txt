@@ -40,6 +40,8 @@ ToDos
 
 #### draw closest map meshes first
 
+
+[X] start page now has complete configuration settings
 [X] room decorations can now be mixed
 [X] added pipe decorations
 [X] machine decorations don't have cables in open ceiling rooms
@@ -63,7 +65,8 @@ ToDos
 [X] better colluded polygon remover
 [X] monsters can get in fights over damage
 [X] animation on animal type model legs are better
+[X] different random speeds, acceleration, turns, etc for monsters
+[X] monsters randomly have ability to fire
 
-[ ] different random speeds, acceleration, etc for monsters
 [ ] add ability for projectiles to have different gravity settings, bounce, and reflect
 

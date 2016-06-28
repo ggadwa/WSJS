@@ -78,7 +78,9 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=[0.2,0.2,0.2];          // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT_R=0.2;                   // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT_G=0.2;
+        this.MAP_LIGHT_AMBIENT_B=0.2;
 
         this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above
@@ -91,7 +93,7 @@ class ConfigClass
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
             //
             // monsters
@@ -99,6 +101,20 @@ class ConfigClass
 
         this.MONSTER_TYPE_COUNT=5;
         this.MONSTER_ENTITY_COUNT=20;
+        
+        this.MONSTER_FIRE_PERCENTAGE=0.5;               // amount of time a monster can fire
+        
+        this.MONSTER_MIN_SPEED=15;                      // minimum speed for monster
+        this.MONSTER_RANDOM_EXTRA_SPEED=60;             // additional random speed for monster
+        this.MONSTER_MIN_ACCELERATION=1;                // minimum acceleration
+        this.MONSTER_RANDOM_EXTRA_ACCELERATION=20;
+        this.MONSTER_MIN_DECLERATION=1;                 // minimum deceleration
+        this.MONSTER_RANDOM_EXTRA_DECELERATION=20;
+        
+        this.MONSTER_MIN_STAND_TURN_SPEED=0.1;
+        this.MONSTER_RANDOM_EXTRA_STAND_TURN_SPEED=0.5;
+        this.MONSTER_MIN_WALK_TURN_SPEED=0.1;
+        this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=0.5;
 
         this.MONSTER_AI_ON=true;
 
@@ -107,18 +123,18 @@ class ConfigClass
             // hard set these to generate the same map pieces every time
             //
 
-        this.SEED=Date.now();
+        var seed=Date.now();
 
-        this.SEED_BITMAP_MAP=Math.trunc((Math.random()*this.SEED));
-        this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_BITMAP_SKY=Math.trunc((Math.random()*this.SEED));
-        this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MAP=Math.trunc((Math.random()*this.SEED));
-        this.SEED_MODEL=Math.trunc((Math.random()*this.SEED));
-        this.SEED_ENTITY=Math.trunc((Math.random()*this.SEED));
-        this.SEED_WEAPON=Math.trunc((Math.random()*this.SEED));
-        this.SEED_PROJECTILE=Math.trunc((Math.random()*this.SEED));
-        this.SEED_SOUND=Math.trunc((Math.random()*this.SEED));
+        this.SEED_BITMAP_MAP=Math.trunc((Math.random()*seed));
+        this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*seed));
+        this.SEED_BITMAP_SKY=Math.trunc((Math.random()*seed));
+        this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*seed));
+        this.SEED_MAP=Math.trunc((Math.random()*seed));
+        this.SEED_MODEL=Math.trunc((Math.random()*seed));
+        this.SEED_ENTITY=Math.trunc((Math.random()*seed));
+        this.SEED_WEAPON=Math.trunc((Math.random()*seed));
+        this.SEED_PROJECTILE=Math.trunc((Math.random()*seed));
+        this.SEED_SOUND=Math.trunc((Math.random()*seed));
         
             //
             // controls

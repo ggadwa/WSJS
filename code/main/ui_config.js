@@ -9,45 +9,19 @@ class UIConfigClass
 {
     constructor()
     {
-        this.configConsts=  [
-                                'ROOM_MAX_RECURSION_DEPTH',
-                                'ROOM_MAX_CONNECTION_COUNT',
-                                'ROOM_CLOSETS',
-                                'ROOM_PLATFORMS',
-                                'ROOM_LEDGES',
-                                'ROOM_LIQUIDS',
-                                'ROOM_PILLARS',
-                                'ROOM_DECORATIONS',
-                                'ROOM_DOOR_PERCENTAGE',
-                                'ROOM_LEVEL_CHANGE_PERCENTAGE',
-                                'ROOM_LIQUID_PERCENTAGE',
-                                'MAP_GENERATE_LIGHTMAP',
-                                'MONSTER_TYPE_COUNT',
-                                'MONSTER_ENTITY_COUNT',
-                                'MONSTER_AI_ON',
-                                'MOUSE_TURN_SENSITIVITY',
-                                'MOUSE_LOOK_SENSITIVITY',
-                                'PLAYER_CLIP_WALLS',
-                                'PLAYER_FLY',
-                                'DEBUG_DRAW_MAP_MESH_LINES',
-                                'DEBUG_DRAW_MAP_MESH_NORMALS',
-                                'DEBUG_DRAW_MAP_MESH_TANGENTS',
-                                'DEBUG_DRAW_MODEL_HITBOX',
-                                'DEBUG_DRAW_MODEL_SKELETON',
-                                'DEBUG_DRAW_MODEL_MESH_LINES',
-                                'DEBUG_DRAW_MODEL_MESH_NORMALS',
-                                'DEBUG_DRAW_MODEL_MESH_TANGENTS',
-                            ];
     }
     
     createLinkTextDiv(url,str)
     {
         if (url!==null) {
             var aDiv=document.createElement('a');
+            aDiv.style.float='left';
             aDiv.href=url;
         }
         
         var textSpan=document.createElement('span');
+        if (url===null) textSpan.style.float='left';
+        textSpan.style.paddingRight='5px';
         textSpan.appendChild(document.createTextNode(str));
         if (url===null) return(textSpan);
         
@@ -58,28 +32,30 @@ class UIConfigClass
     startGame()
     {
         var n,ctrl,str;
-        var nControl=this.configConsts.length;
+
+        var propList=Object.getOwnPropertyNames(config);
+        var nProp=propList.length;
         
             // reset the config
 
-        for (n=0;n!==nControl;n++) {
+        for (n=0;n!==nProp;n++) {
             
                 // get the control
                 
-            ctrl=document.getElementById('ctrl_'+n);
+            ctrl=document.getElementById('ctrl_'+propList[n]);
             
                 // set the config
                 
-            if (typeof(config[this.configConsts[n]])==='boolean') {
-                config[this.configConsts[n]]=ctrl.checked;
+            if (typeof(config[propList[n]])==='boolean') {
+                config[propList[n]]=ctrl.checked;
             }
             else {
                 str=ctrl.value;
                 if (str.indexOf('.')===-1) {
-                    config[this.configConsts[n]]=parseInt(str);
+                    config[propList[n]]=parseInt(str);
                 }
                 else {
-                    config[this.configConsts[n]]=parseFloat(str);
+                    config[propList[n]]=parseFloat(str);
                 }
             }
             
@@ -96,24 +72,24 @@ class UIConfigClass
     
     run()
     {
-        var n,nameDiv,ctrl;
-        var y=5;
-        var nControl=this.configConsts.length;
+        var n,wrapperDiv,nameDiv,ctrl,isCheck;
+
+        var propList=Object.getOwnPropertyNames(config);
+        var nProp=propList.length;
         
             // header
             
         var headerDiv=document.createElement('div');
         headerDiv.id='header';
-        headerDiv.style.position='absolute';
-        headerDiv.style.left='5px';
-        headerDiv.style.top='5px';
-        headerDiv.style.width='800px';
-        headerDiv.style.height='30px';
+        headerDiv.style.width='100%';
+        headerDiv.style.height='40px';
         headerDiv.style.backgroundColor='#CCCCFF';
         headerDiv.style.fontFamily='Arial';
         headerDiv.style.fontSize='16pt';
         headerDiv.style.whiteSpace='nowrap';
         headerDiv.style.paddingLeft='4px';
+        headerDiv.style.paddingRight='4px';
+        headerDiv.style.paddingTop='4px';
         headerDiv.style.boxSizing='border-box';
         
         headerDiv.appendChild(this.createLinkTextDiv(null,'WSJS - '));
@@ -123,24 +99,14 @@ class UIConfigClass
             
         document.body.appendChild(headerDiv);
         
-            // button bar
+            // start button
             
-        var barDiv=document.createElement('div');
-        barDiv.id='bar';
-        barDiv.style.position='absolute';
-        barDiv.style.left='5px';
-        barDiv.style.top='35px';
-        barDiv.style.width='800px';
-        barDiv.style.height='40px';
-        barDiv.style.backgroundColor='#DDDDFF';
-        barDiv.style.boxSizing='border-box';
-        
         var btn=document.createElement('div');
-        btn.style.position='absolute';
-        btn.style.left='690px';
-        btn.style.top='5px';
+        btn.style.float='right';
+        btn.style.right='5px';
         btn.style.width='100px';
         btn.style.height='30px';
+        btn.style.margin='1px';
         btn.style.backgroundColor='#CCCCDD';
         btn.style.border='1px solid #555555';
         btn.style.boxSizing='border-box';
@@ -152,60 +118,92 @@ class UIConfigClass
         
         btn.onclick=this.startGame.bind(this);
         
-        barDiv.appendChild(btn);
-        document.body.appendChild(barDiv);
+        headerDiv.appendChild(btn);
         
             // setup main div
             
         var mainDiv=document.createElement('div');
         mainDiv.id='main';
-        mainDiv.style.position='absolute';
-        mainDiv.style.left='5px';
-        mainDiv.style.top='75px';
-        mainDiv.style.width='800px';
-        mainDiv.style.height=((nControl*25)+10)+'px';
-        mainDiv.style.backgroundColor='#EEEEFF';
+        mainDiv.style.float='left';
+        mainDiv.style.width='100%';
+        mainDiv.style.backgroundColor='#DDDDFF';
         mainDiv.style.fontFamily='Arial';
         mainDiv.style.fontSize='12pt';
         mainDiv.style.boxSizing='border-box';
         
+        var leftColDiv=document.createElement('div');
+        leftColDiv.id='leftCol';
+        leftColDiv.style.float='left';
+        leftColDiv.style.width='calc(50% - 10px)';
+        leftColDiv.style.margin='4px';
+        leftColDiv.style.backgroundColor='#EEEEFF';
+        leftColDiv.style.fontFamily='Arial';
+        leftColDiv.style.fontSize='12pt';
+        leftColDiv.style.boxSizing='border-box';
+        
+        mainDiv.appendChild(leftColDiv);
+        
+        var rightColDiv=document.createElement('div');
+        rightColDiv.id='leftCol';
+        rightColDiv.style.float='left';
+        rightColDiv.style.width='calc(50% - 10px)';
+        rightColDiv.style.margin='4px';
+        rightColDiv.style.backgroundColor='#EEEEFF';
+        rightColDiv.style.fontFamily='Arial';
+        rightColDiv.style.fontSize='12pt';
+        rightColDiv.style.boxSizing='border-box';
+        
+        mainDiv.appendChild(rightColDiv);
+        
             // add the controls
         
-        for (n=0;n!==nControl;n++) {
+        for (n=0;n!==nProp;n++) {
+            
+            isCheck=(typeof(config[propList[n]])==='boolean');
+            
+                // the wrapper
+                
+            wrapperDiv=document.createElement('div');
+            wrapperDiv.style.width='100%';
+            wrapperDiv.style.height='25px';
+            wrapperDiv.style.paddingLeft='2px';
+            wrapperDiv.style.paddingRight='2px';
+            
+            if (isCheck) {
+                leftColDiv.appendChild(wrapperDiv);
+            }
+            else {
+                rightColDiv.appendChild(wrapperDiv);
+            }
             
                 // the name
                 
             nameDiv=document.createElement('div');
-            nameDiv.style.position='absolute';
-            nameDiv.style.left='5px';
-            nameDiv.style.top=y+'px';
-            nameDiv.style.width='400px';
+            nameDiv.style.float='left';
+            nameDiv.style.width='80%';
+            nameDiv.style.paddingRight='4px';
             nameDiv.style.textAlign='right';
-            nameDiv.appendChild(document.createTextNode(this.configConsts[n]));
+            nameDiv.appendChild(document.createTextNode(propList[n]+':'));
             
-            mainDiv.appendChild(nameDiv);
+            wrapperDiv.appendChild(nameDiv);
             
                 // the control
                 
             ctrl=document.createElement('input');
-            ctrl.id='ctrl_'+n;
-            ctrl.style.position='absolute';
-            ctrl.style.left='415px';
-            ctrl.style.top=y+'px';
+            ctrl.id='ctrl_'+propList[n];
+            ctrl.style.float='left';
             
-            if (typeof(config[this.configConsts[n]])==='boolean') {
+            if (isCheck) {
                 ctrl.type='checkbox';
-                ctrl.checked=config[this.configConsts[n]];
+                ctrl.checked=config[propList[n]];
             }
             else {
                 ctrl.type='text';
-                ctrl.value=config[this.configConsts[n]];
-                ctrl.style.width='300px';
+                ctrl.value=config[propList[n]];
+                ctrl.style.width='calc(20% - 14px)';
             }
             
-            mainDiv.appendChild(ctrl);
-            
-            y+=25;
+            wrapperDiv.appendChild(ctrl);
         }
         
         document.body.appendChild(mainDiv);

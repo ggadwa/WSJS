@@ -8,7 +8,7 @@ class AIClass
 {
     constructor(projectile)
     {
-        this.speed=20;
+        this.speed=config.MONSTER_MIN_SPEED;
         this.acceleration=5;
         this.deceleration=10;
         

@@ -398,7 +398,7 @@ class MainClass
 
             // ambient
 
-        view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT[0],config.MAP_LIGHT_AMBIENT[1],config.MAP_LIGHT_AMBIENT[2]);
+        view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT_R,config.MAP_LIGHT_AMBIENT_G,config.MAP_LIGHT_AMBIENT_B);
         
             // make sure there's an initial sound position
             
