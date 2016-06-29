@@ -116,7 +116,7 @@ class ConfigClass
         this.MONSTER_MIN_WALK_TURN_SPEED=0.1;
         this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=0.5;
 
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
 
             //
             // random seeds,

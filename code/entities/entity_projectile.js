@@ -44,6 +44,22 @@ class EntityProjectileClass extends EntityClass
     }
     
         //
+        // projectile bounce and reflect
+        //
+        
+    bounce()
+    {
+        if (!this.movementBounce(this.projectile.bounceFactor)) {
+            this.movementForwardMaxSpeed=0;         // if we can't bounce, then stop
+        }
+    }
+    
+    reflect()
+    {
+        
+    }
+    
+        //
         // projectile hits
         //
         
@@ -76,12 +92,35 @@ class EntityProjectileClass extends EntityClass
             return;
         }
         
-            // move it and check for any collisions
+            // move it
         
         this.setMovementForward(true);
         this.move(false,false,this.projectile.noGravity,false);
         
+            // check collisions
+        
         if (this.isAnyCollision()) {
+            
+                // bouncing
+                
+            if (this.projectile.bounce) {
+                if (this.standOnMeshIdx!==-1) {
+                    this.bounce();
+                    return;
+                }
+            }
+            
+                // reflecting
+                
+            if (this.projectile.reflect) {
+                if (this.collideWallMeshIdx!==-1) {
+                    this.reflect();
+                    return;
+                }
+            }
+            
+                // anything else a hit
+                
             this.hit();
             return;
         }

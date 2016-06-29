@@ -66,10 +66,15 @@ class ProjectileClass
         this.gravityAcceleration=gravityAcceleration;
     }
     
-    setBounce(bound,bounceFactor)
+    setBounce(bounce,bounceFactor)
     {
         this.bounce=bounce;
         this.bounceFactor=bounceFactor;
+    }
+    
+    setReflect(reflect)
+    {
+        this.reflect=reflect;
     }
     
     fire(parentEntityId,pos,ang)

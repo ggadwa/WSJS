@@ -24,6 +24,10 @@ class GenProjectileClass
         
         if (!isPlayer) projectile.setGravity(-150,60,5);
         
+        projectile.setGravity(-150,60,5);
+        projectile.setSpeed(30);
+        projectile.setBounce(true,0.8);
+        
         return(projectile);
     }
     

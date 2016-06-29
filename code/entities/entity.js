@@ -322,6 +322,20 @@ class EntityClass
         }
     }
     
+        // change movement
+        
+    movementBounce(bounceFactor)
+    {
+        console.log('movement.y='+this.movement.y+', gravity='+this.gravity+'='+(-Math.trunc((this.movement.y+this.gravity)*bounceFactor)));
+        
+        this.movement.y=-Math.trunc((this.movement.y+this.gravity)*bounceFactor);
+        this.gravity=this.gravityMinValue;
+        
+        console.log('  movement y='+this.movement.y);
+        
+        return(Math.abs(this.movement.y)<this.gravity);
+    }
+    
         //
         // turn (y angle)
         //
