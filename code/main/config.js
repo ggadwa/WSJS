@@ -93,16 +93,16 @@ class ConfigClass
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
 
             //
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=5;
+        this.MONSTER_TYPE_COUNT=6;
         this.MONSTER_ENTITY_COUNT=20;
         
-        this.MONSTER_FIRE_PERCENTAGE=0.5;               // amount of time a monster can fire
+        this.MONSTER_FIRE_PERCENTAGE=0.75;              // amount of time a monster can fire
         
         this.MONSTER_MIN_SPEED=15;                      // minimum speed for monster
         this.MONSTER_RANDOM_EXTRA_SPEED=60;             // additional random speed for monster
@@ -111,12 +111,12 @@ class ConfigClass
         this.MONSTER_MIN_DECLERATION=1;                 // minimum deceleration
         this.MONSTER_RANDOM_EXTRA_DECELERATION=20;
         
-        this.MONSTER_MIN_STAND_TURN_SPEED=0.1;
+        this.MONSTER_MIN_STAND_TURN_SPEED=0.2;
         this.MONSTER_RANDOM_EXTRA_STAND_TURN_SPEED=0.5;
-        this.MONSTER_MIN_WALK_TURN_SPEED=0.1;
+        this.MONSTER_MIN_WALK_TURN_SPEED=0.2;
         this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=0.5;
 
-        this.MONSTER_AI_ON=false;
+        this.MONSTER_AI_ON=true;
 
             //
             // random seeds,

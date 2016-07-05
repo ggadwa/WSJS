@@ -21,9 +21,7 @@ class ProjectileClass
         this.splashDamage=0;
         
         this.noGravity=true;
-        this.gravityInitValue=0;
-        this.gravityMaxValue=0;
-        this.gravityAcceleration=0;
+        this.lob=0;
         
         this.bounce=false;
         this.bounceFactor=1.0;
@@ -58,12 +56,15 @@ class ProjectileClass
         this.splashDamage=splashDamage;
     }
     
-    setGravity(gravityInitValue,gravityMaxValue,gravityAcceleration)
+    setNoGravity(noGravity)
     {
-        this.noGravity=false;
-        this.gravityInitValue=gravityInitValue;
-        this.gravityMaxValue=gravityMaxValue;
-        this.gravityAcceleration=gravityAcceleration;
+        this.noGravity=noGravity;
+    }
+    
+    setLob(lob)
+    {
+        this.noGravity=false;       // lobbing always turns gravity on
+        this.lob=lob;
     }
     
     setBounce(bounce,bounceFactor)

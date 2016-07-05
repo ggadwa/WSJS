@@ -24,8 +24,8 @@ class EntityClass
         this.maxHealth=maxHealth;
         this.health=maxHealth;
         
-        this.gravityMinValue=20;
-        this.gravityMaxValue=500;
+        this.gravityMinValue=10;
+        this.gravityMaxValue=280;
         this.gravityAcceleration=10;
         
         this.movementForwardMaxSpeed=0;
@@ -183,23 +183,28 @@ class EntityClass
             this.gravity=this.gravityMinValue;
         }
         else {
-            this.gravity+=this.gravityAcceleration;
-            if (this.gravity>this.gravityMaxValue) this.gravity=this.gravityMaxValue;
-
+            
                 // if there is upwards movement (usually a jump or push)
                 // then reduce it by the current gravity
-                
+  
             if (this.movement.y<0) {
-                this.movement.y+=this.gravity;
-                if (this.movement.y>0) {
+                this.movement.y+=this.gravityAcceleration;
+                if (this.movement.y>=0) {
+                    this.gravity=this.movement.y;
                     this.movement.y=0;
-                    this.gravity=-this.movement.y;
+                }
+                else {
+                    this.gravity=this.gravityMinValue;
                 }
             }
             
-                // otherwise add it into movement
+                // otherwise run the gravity and
+                // add it into the movement
 
             else {
+                this.gravity+=this.gravityAcceleration;
+                if (this.gravity>this.gravityMaxValue) this.gravity=this.gravityMaxValue;
+            
                 yAdd+=this.gravity;
             }
         }
@@ -326,14 +331,16 @@ class EntityClass
         
     movementBounce(bounceFactor)
     {
-        console.log('movement.y='+this.movement.y+', gravity='+this.gravity+'='+(-Math.trunc((this.movement.y+this.gravity)*bounceFactor)));
-        
         this.movement.y=-Math.trunc((this.movement.y+this.gravity)*bounceFactor);
         this.gravity=this.gravityMinValue;
         
-        console.log('  movement y='+this.movement.y);
-        
-        return(Math.abs(this.movement.y)<this.gravity);
+        return(Math.abs(this.movement.y)>this.gravityAcceleration);
+    }
+    
+    movementJump(jumpValue)
+    {
+        this.gravity=this.gravityMinValue;
+        this.movement.y=-jumpValue;
     }
     
         //

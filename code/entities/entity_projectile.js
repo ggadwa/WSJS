@@ -20,9 +20,7 @@ class EntityProjectileClass extends EntityClass
         this.movementForwardAcceleration=projectile.speed;
         this.movementForwardDeceleration=0;
         
-        this.gravity=projectile.gravityInitValue;
-        this.gravityMaxValue=projectile.gravityMaxValue;
-        this.gravityAcceleration=projectile.gravityAcceleration;
+        this.movement.y=projectile.lob;
         
             // local variables
             

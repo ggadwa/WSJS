@@ -27,8 +27,8 @@ class EntityPlayerClass extends EntityClass
         this.lookSpeed=0;
         this.maxLookSpeed=8.0;
         
-        this.jumpHeight=600;
-        this.jumpWaterHeight=800;
+        this.jumpHeight=300;
+        this.jumpWaterHeight=400;
         
         this.lastInLiquid=false;
 
@@ -67,10 +67,7 @@ class EntityPlayerClass extends EntityClass
     {
             // can't jump if falling or in liquid
             
-        if ((this.isStandingOnFloor()) && (!this.isInLiquid())) {
-            this.gravity=0;
-            this.movement.y=-this.jumpHeight;
-        }
+        if ((this.isStandingOnFloor()) && (!this.isInLiquid())) this.movementJump(this.jumpHeight);
     }
     
         //

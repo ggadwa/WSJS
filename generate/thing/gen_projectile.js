@@ -16,17 +16,38 @@ class GenProjectileClass
     generate(isPlayer)
     {
         var projectile=new ProjectileClass(modelList.getModel('projectile_0'));
-        projectile.setSpeed(isPlayer?400:200);
+        
         projectile.setLifeTick(10000);
         projectile.setFireSound(soundList.getSound('fire'));
         projectile.setHitSound(soundList.getSound('explosion'));
         projectile.setDamage((isPlayer?25:15),0,0);
         
-        if (!isPlayer) projectile.setGravity(-150,60,5);
+            // enemy settings
+            
+        if (!isPlayer) {
+            projectile.setSpeed(this.genRandom.randomInt(150,150));
+            
+                // possible lob or reflect
+                
+            if (this.genRandom.randomPercentage(0.5)) {
+                projectile.setLob(-this.genRandom.randomInt(150,150));
+                projectile.setNoGravity(false);
+            }
+            
+            if (this.genRandom.randomPercentage(0.5)) {
+                projectile.setReflect(true);
+            }
+            
+            if (this.genRandom.randomPercentage(0.5)) {
+                projectile.setBounce(true,0.95);
+            }
+        }
         
-        projectile.setGravity(-150,60,5);
-        projectile.setSpeed(30);
-        projectile.setBounce(true,0.8);
+            // player settings
+            
+        else {
+            projectile.setSpeed(400);
+        }
         
         return(projectile);
     }
