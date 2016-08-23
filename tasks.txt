@@ -12,6 +12,14 @@ When interface created
 ToDos
 
 
+#### let textures be more colorful
+
+--------------> do path based maps, always go up, than right?  Corridors that separate blobs?
+                    * make room
+                    * add up or right corridor
+                    * now add other rooms around it
+                    * map size by number of encounter rooms?
+
 #### move up to spatial panner (sound_list.setListenerToEntity, sound.play)
 
 #### collisions against slanted walls are bad
@@ -40,3 +48,5 @@ ToDos
 
 
 
+
+* fixed Edge problem

@@ -178,7 +178,7 @@ class ViewClass
         var top=Math.trunc((window.innerHeight-high)/2);
         
             // create the canvas
-        
+            
         this.canvas=document.createElement('canvas');
         this.canvas.style.position='absolute';
         this.canvas.style.left=lft+'px';
@@ -195,20 +195,20 @@ class ViewClass
     
     initialize()
     {
+        var glOptions={
+            alpha:false,
+            depth:true,
+            stencil:false,
+            antialias:false,
+            premultipliedAlpha:false,
+            preserveDrawingBuffer:true,
+            failIfMajorPerformanceCaveat:false
+        };
+        
             // get the gl context
 
-        this.gl=this.canvas.getContext("webgl",
-                {
-                    alpha:false,
-                    depth:true,
-                    stencil:false,
-                    antialias:false,
-                    premultipliedAlpha:false,
-                    preserveDrawingBuffer:true,
-                    failIfMajorPerformanceCaveat:false
-                }
-            );
-        
+        this.gl=this.canvas.getContext("webgl",glOptions);
+        if (this.gl===null) this.gl=this.canvas.getContext("experimental-webgl",glOptions);
         if (this.gl===null) {
             alert('WebGL not available, try a newer browser');
             return(false);
