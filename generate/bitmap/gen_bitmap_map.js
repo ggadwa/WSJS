@@ -26,10 +26,10 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // some random values
 
-        var groutColor=this.getRandomGreyColor(0.6,0.7);
-        var brickColor=this.getRandomPrimaryColor(0.1,0.4);
+        var groutColor=this.getRandomColor();
+        var brickColor=this.getRandomColor();
         var edgeColor=this.darkenColor(brickColor,0.8);
-        var dirtColor=this.getRandomColor([0.5,0.4,0.0],[0.6,0.5,0.0]);
+        var dirtColor=this.getRandomColor();
 
             // clear canvases
 
@@ -122,8 +122,8 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // some random values
 
-        var groutColor=this.getRandomGreyColor(0.3,0.4);
-        var stoneColor=this.getRandomPrimaryColor(0.1,0.2);
+        var groutColor=this.getRandomColor();
+        var stoneColor=this.getRandomColor();
         var edgeColor=this.darkenColor(stoneColor,0.8);
         
         var padding=this.genRandom.randomInt(3,5);
@@ -200,7 +200,7 @@ class GenBitmapMapClass extends GenBitmapClass
         var top,bot,ySize,slopeHigh,concreteColor;
         var sx,ex,streakWid;
         
-        var concreteColor=this.getRandomPrimaryColor(0.3,0.7);
+        var concreteColor=this.getRandomColor();
         var concreteColor2=this.darkenColor(concreteColor,0.8);
         var dirtColor=this.darkenColor(concreteColor,0.5);
         
@@ -392,11 +392,11 @@ class GenBitmapMapClass extends GenBitmapClass
 
         if (!small) {
             splitCount=this.genRandom.randomInt(2,2);
-            tileColor[0]=this.getRandomColor([0.3,0.3,0.4],[0.6,0.6,0.7]);
+            tileColor[0]=this.getRandomColor();
         }
         else {
             splitCount=this.genRandom.randomInt(6,4);
-            tileColor[0]=this.getRandomColor([0.5,0.3,0.3],[0.8,0.6,0.6]);
+            tileColor[0]=this.getRandomColor();
             
         }
         
@@ -405,7 +405,7 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // clear canvas
 
-        groutColor=this.getRandomGreyColor(0.3,0.4);
+        groutColor=this.getRandomColor();
         this.drawRect(bitmapCTX,0,0,wid,high,groutColor);
         
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
@@ -439,7 +439,7 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // colors
             
-        color=this.getRandomColor([0.5,0.5,0.4],[0.8,0.8,0.7]);
+        color=this.getRandomColor();
         edgeColor=this.darkenColor(color,0.8);
         
             // sizing
@@ -536,7 +536,7 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // some random values
 
-        var metalColor=this.getRandomBlueColor(0.6,0.8);
+        var metalColor=this.getRandomColor();
         var metalEdgeColor=this.darkenColor(metalColor,0.9);
 
         var barEdgeSize=this.genRandom.randomInt(5,5);
@@ -557,7 +557,7 @@ class GenBitmapMapClass extends GenBitmapClass
 
                 // the bar
 
-            barColor=this.getRandomColor([0.3,0.1,0.0],[0.4,0.2,0.0]);
+            barColor=this.getRandomColor();
             barEdgeColor=this.darkenColor(barColor,0.9);
 
             this.draw3DRect(bitmapCTX,normalCTX,0,-barEdgeSize,barSize,(high+(barEdgeSize*2)),barEdgeSize,barColor,barEdgeColor,true);
@@ -607,7 +607,7 @@ class GenBitmapMapClass extends GenBitmapClass
         
             // some random values
 
-        var metalColor=this.getRandomGreyColor(0.6,0.8);
+        var metalColor=this.getRandomColor();
         var metalEdgeColor=this.darkenColor(metalColor,0.8);
         var metalCorrColor=this.darkenColor(metalColor,0.6);
 
@@ -674,10 +674,10 @@ class GenBitmapMapClass extends GenBitmapClass
         var n,nShutter,shutterSize,lft,top,rgt,bot;
         var y,yAdd;
         
-        var metalColor=this.getRandomBlueColor(0.6,0.8);
+        var metalColor=this.getRandomColor();
         var metalEdgeColor=this.darkenColor(metalColor,0.9);
         
-        var shutterColor=this.getRandomColor([0.5,0.3,0.0],[0.9,0.7,0.2]);
+        var shutterColor=this.getRandomColor();
         var shutterEdgeColor=this.darkenColor(shutterColor,0.9);
 
         var barEdgeSize=this.genRandom.randomInt(5,5);
@@ -731,7 +731,7 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // some random values
 
-        var concreteColor=this.getRandomGreyColor(0.4,0.6);
+        var concreteColor=this.getRandomColor();
         var markCount=this.genRandom.randomInt(30,20);
 
             // clear canvases
@@ -772,7 +772,7 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // some random values
 
-        concreteColor=this.getRandomGreyColor(0.7,0.9);
+        concreteColor=this.getRandomColor();
         edgeColor=this.darkenColor(concreteColor,0.7);
         lineColor=this.darkenColor(concreteColor,0.95);
         line2Color=this.boostColor(concreteColor,0.05);
@@ -829,8 +829,8 @@ class GenBitmapMapClass extends GenBitmapClass
 
             // some random values
 
-        var plasterColor=this.getRandomColor([0.7,0.7,0.7],[0.8,0.8,0.8]);
-        var lineColorBase=this.getRandomPrimaryColor(0.3,0.6);
+        var plasterColor=this.getRandomColor();
+        var lineColorBase=this.getRandomColor();
         var lineCount=this.genRandom.randomInt(40,30);
 
             // clear canvases
@@ -884,8 +884,8 @@ class GenBitmapMapClass extends GenBitmapClass
         borderSize=this.genRandom.randomInt(2,3);
         edgeSize=this.genRandom.randomInt(1,2);
         
-        mortarColor=this.getRandomGreyColor(0.4,0.6);
-        borderColor=this.getRandomColor([0.2,0.2,0.2],[0.4,0.4,0.4]);
+        mortarColor=this.getRandomColor();
+        borderColor=this.getRandomColor();
         
             // tile sizes
             
@@ -917,7 +917,7 @@ class GenBitmapMapClass extends GenBitmapClass
                     col=borderColor;
                 }
                 else {
-                    col=this.getRandomColor([0.5,0.5,0.6],[0.8,0.8,0.9]);
+                    col=this.getRandomColor();
                 }
                 darkCol=this.darkenColor(col,0.5);
 
@@ -956,7 +956,7 @@ class GenBitmapMapClass extends GenBitmapClass
             // some random values
 
         var boardSize=Math.trunc(wid/8);
-        var woodColor;
+        var woodColor=this.getRandomColor();
         var blackColor=new wsColor(0.0,0.0,0.0);
 
             // clear canvases
@@ -970,7 +970,6 @@ class GenBitmapMapClass extends GenBitmapClass
             lft=0;
             
             while (lft<wid) {
-                woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
                 woodFactor=0.8+((1.0-(this.genRandom.random()*2.0))*0.1);
                 this.draw3DRect(bitmapCTX,normalCTX,lft,-3,(lft+boardSize),(high+3),3,woodColor,blackColor,true); // -3 to get around outside borders
                 this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+3),0,((lft+boardSize)-3),high,0.1,woodColor);
@@ -985,7 +984,6 @@ class GenBitmapMapClass extends GenBitmapClass
 
                 // inner boards
 
-            woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.drawColorStripeSlant(bitmapCTX,normalCTX,boardSize,boardSize,(wid-boardSize),(high-boardSize),0.3,woodColor);
             this.addNoiseRect(bitmapCTX,boardSize,boardSize,(wid-boardSize),(high-boardSize),0.9,0.95,0.8);
 
@@ -993,36 +991,30 @@ class GenBitmapMapClass extends GenBitmapClass
 
             y=Math.trunc(high/2)-Math.trunc(boardSize/2);
 
-            woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.draw3DRect(bitmapCTX,normalCTX,0,y,wid,(y+boardSize),3,woodColor,blackColor,true);
             this.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,(y+3),(wid-3),((y+boardSize)-3),0.2,woodColor);
             this.addNoiseRect(bitmapCTX,0,y,wid,(y+boardSize),0.9,0.95,0.8);
 
             x=Math.trunc(wid/2)-Math.trunc(boardSize/2);
 
-            woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.draw3DRect(bitmapCTX,normalCTX,x,0,(x+boardSize),high,3,woodColor,blackColor,true);
             this.drawColorStripeVertical(bitmapCTX,normalCTX,(x+3),3,((x+boardSize)-3),(high-3),0.2,woodColor);
             this.addNoiseRect(bitmapCTX,x,0,(x+boardSize),high,0.9,0.95,0.8);
 
                 // outside boards
 
-            woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,blackColor,true);
             this.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,3,(wid-3),(boardSize-3),0.1,woodColor);
             this.addNoiseRect(bitmapCTX,0,0,wid,boardSize,0.9,0.95,0.8);
 
-            woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,blackColor,true);
             this.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,((high-boardSize)+3),(wid-3),(high-3),0.1,woodColor);
             this.addNoiseRect(bitmapCTX,0,(high-boardSize),wid,high,0.9,0.95,0.8);
 
-            woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,blackColor,true);
             this.drawColorStripeVertical(bitmapCTX,normalCTX,3,3,(boardSize-3),(high-3),0.1,woodColor);
             this.addNoiseRect(bitmapCTX,0,0,boardSize,high,0.9,0.95,0.8);
 
-            woodColor=this.getRandomColor([0.4,0.2,0.0],[0.5,0.3,0.0]);
             this.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,blackColor,true);
             this.drawColorStripeVertical(bitmapCTX,normalCTX,((wid-boardSize)+3),3,(wid-3),(high-3),0.1,woodColor);
             this.addNoiseRect(bitmapCTX,(wid-boardSize),0,wid,high,0.9,0.95,0.8);
@@ -1061,7 +1053,7 @@ class GenBitmapMapClass extends GenBitmapClass
             top+=5;
             bot-=5;
             
-            shutterColor=this.getRandomColor([0.3,0.3,0.5],[0.4,0.4,0.8]);
+            shutterColor=this.getRandomColor();
             shutterEdgeColor=this.darkenColor(shutterColor,0.9);
             
             this.drawRect(bitmapCTX,lft,top,rgt,bot,shutterColor);
@@ -1100,7 +1092,7 @@ class GenBitmapMapClass extends GenBitmapClass
             
             for (x=0;x!==xCount;x++) {
                 dx=xOff+(x*wid);
-                color=this.getRandomPrimaryColor(0.2,0.4);
+                color=this.getRandomColor();
                 
                 if (panelType===1) {
                     this.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,borderColor);
@@ -1116,7 +1108,7 @@ class GenBitmapMapClass extends GenBitmapClass
     {
         var mx,my,sz,lft,top,rgt,bot;
         
-        var metalColor=this.getRandomGreyColor(0.6,0.8);
+        var metalColor=this.getRandomColor();
         var metalEdgeColor=this.darkenColor(metalColor,0.9);
         var metalInsideColor=this.boostColor(metalColor,0.1);
        
@@ -1176,7 +1168,7 @@ class GenBitmapMapClass extends GenBitmapClass
         
     generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var color=this.getRandomColor([0.4,0.7,0.4],[0.5,1.0,0.5]);
+        var color=this.getRandomColor();
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         

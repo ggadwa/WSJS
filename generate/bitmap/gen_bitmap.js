@@ -28,6 +28,32 @@ class GenBitmapClass
         this.NORMAL_TOP_RIGHT_45=new wsPoint(0.30,0.30,0.70);
         this.NORMAL_BOTTOM_LEFT_45=new wsPoint(-0.30,-0.30,0.70);
         this.NORMAL_BOTTOM_RIGHT_45=new wsPoint(0.30,-0.30,0.70);
+        
+            // some primary colors
+            
+        this.primaryColorList=
+                [
+                    [1.0,0.0,0.0],      // red
+                    [0.0,1.0,0.0],      // green
+                    [0.0,0.0,1.0],      // blue
+                    [1.0,1.0,0.0],      // yellow
+                    [1.0,0.0,1.0],      // purple
+                    [1.0,1.0,0.0],      // light blue
+                    [0.0,1.0,0.78],     // sea green
+                    [1.0,0.4,0.0],      // orange
+                    [0.75,0.4,0.0],     // brown
+                    [1.0,0.84,0.0],     // gold
+                    [1.0,0.84,1.0],     // lavender
+                    [1.0,0.82,0.82],    // pink
+                    [0.7,1.0,0.0],      // lime
+                    [0.23,0.5,0.0],     // tree green
+                    [0.5,0.5,0.5],      // gray
+                    [0.7,0.0,1.0],      // dark purple
+                    [0.0,0.3,0.5],      // slate blue
+                    [1.0,0.68,0.5],     // peach
+                    [1.0,0.0,0.43],     // muave
+                    [1.0,0.5,0.5],      // dull red
+                ];
 
         // can't seal as this is a parent class
     }
@@ -172,75 +198,14 @@ class GenBitmapClass
         // color routines
         //
 
-    getRandomColor(colorMin,colorMax)
+    getRandomColor()
     {
-        var r=colorMin[0]+((colorMax[0]-colorMin[0])*this.genRandom.random());
-        var g=colorMin[1]+((colorMax[1]-colorMin[1])*this.genRandom.random());
-        var b=colorMin[2]+((colorMax[2]-colorMin[2])*this.genRandom.random());
+        var col=this.primaryColorList[this.genRandom.randomIndex(this.primaryColorList.length)];
+        var darken=0.1-(this.genRandom.random()*0.2);
         
-        return(new wsColor(r,g,b));
+        return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
     
-    getRandomPrimaryColor(min,max)
-    {
-        var r,g,b;
-        var value=min+((max-min)*this.genRandom.random());
-        
-        switch (this.genRandom.randomIndex(7)) {
-            case 0:
-                r=1.0;
-                g=value;
-                b=value;
-                break;
-            case 1:
-                r=value;
-                g=1.0;
-                b=value;
-                break;
-            case 2:
-                r=value;
-                g=value;
-                b=1.0;
-                break;
-            case 3:
-                r=1.0;
-                g=1.0;
-                b=value;
-                break;
-            case 4:
-                r=1.0;
-                g=value;
-                b=1.0;
-                break;
-            case 5:
-                r=value;
-                g=1.0;
-                b=1.0;
-                break;
-            case 6:
-                r=value;
-                g=value*0.9;
-                b=1.0;
-                break;
-        }
-        
-        return(new wsColor(r,g,b));
-    }
-
-    getRandomGreyColor(greyMin,greyMax)
-    {
-        var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
-        return(new wsColor(r,r,r));
-    }
-    
-    getRandomBlueColor(greyMin,greyMax)
-    {
-        var r=greyMin+((greyMax-greyMin)*this.genRandom.random());
-        var b=r+0.5;
-        if (b>1.0) b=1.0;
-        return(new wsColor(r,r,b));
-    }
-
     darkenColor(color,darkenFactor)
     {
         return(new wsColor((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));

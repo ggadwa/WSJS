@@ -12,7 +12,12 @@ When interface created
 ToDos
 
 
-#### let textures be more colorful
+#### separate out liquid into own generator
+#### make map textures on the fly (bitmapList.get('xxx') make if not there)
+#### wood needs to be more varied with extra pieces
+#### bricks need more variance
+#### textures shouldn't be restricted to certain mesh types (not counting liquids)
+
 
 --------------> do path based maps, always go up, than right?  Corridors that separate blobs?
                     * make room
@@ -49,4 +54,5 @@ ToDos
 
 
 
-* fixed Edge problem
+* fixed Edge browser webgl problem
+* textures no longer have any color restrictions
