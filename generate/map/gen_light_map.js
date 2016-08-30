@@ -917,9 +917,9 @@ class GenLightmapClass
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            bitmapList.addBitmap(new BitmapClass(('Lightmap '+n),this.lightmapList[n].canvas,null,null,1.0,0.0));
+            map.addLightmapBitmap(new BitmapClass(this.lightmapList[n].canvas,null,null,1.0,0.0));
         }
-
+        
             // and set the light map on the meshes
             // and clear any caches
 
@@ -929,7 +929,7 @@ class GenLightmapClass
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshes[n];
             mesh.clearTrigRayTraceCache();
-            mesh.lightmap=bitmapList.getBitmap('Lightmap '+mesh.tempLightmapIdx);
+            mesh.lightmap=map.getLightmapBitmap(mesh.tempLightmapIdx);
         }
         
             // debugging

@@ -22,6 +22,7 @@ class GenRoomDecorationClass
         var n,stackLevel,pos,boxPos,boxY,boxCount,rotWid;
         var ang,angAdd;
         var wid,high,rotAngle;
+        var boxBitmap=map.getRandomTexture(this.genRandom);
         
         var boxBoundX=new wsBound(0,0);
         var boxBoundY=new wsBound(0,0);
@@ -67,7 +68,7 @@ class GenRoomDecorationClass
 
                 rotAngle.setFromValues(0.0,(this.genRandom.random()*360.0),0.0);
 
-                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmapList.getBitmap('Map Box'),boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(boxBitmap,boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
 
                 ang+=angAdd;
             }
@@ -119,9 +120,9 @@ class GenRoomDecorationClass
         pos=room.findRandomDecorationLocation(this.genRandom,true);
         if (pos===null) return;
         
-        machineBitmap=bitmapList.getBitmap('Map Machine');
-        platformBitmap=bitmapList.getBitmap('Map Platform');
-        pipeBitmap=bitmapList.getBitmap('Map Metal');
+        machineBitmap=map.getRandomTexture(this.genRandom);
+        platformBitmap=map.getRandomTexture(this.genRandom);
+        pipeBitmap=map.getRandomTexture(this.genRandom);
         
             // do machine
         
@@ -183,7 +184,7 @@ class GenRoomDecorationClass
         var boxBoundZ=new wsBound(0,0);
         
         legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
-        bitmap=bitmapList.getBitmap('Map Box');
+        bitmap=map.getRandomTexture(this.genRandom);
 
         pos=room.findRandomDecorationLocation(this.genRandom,false);
         if (pos===null) return;
@@ -261,8 +262,8 @@ class GenRoomDecorationClass
         pos=room.findRandomDecorationLocation(this.genRandom,true);
         if (pos===null) return;
         
-        platformBitmap=bitmapList.getBitmap('Map Platform');
-        pipeBitmap=bitmapList.getBitmap('Map Metal');
+        platformBitmap=map.getRandomTexture(this.genRandom);
+        pipeBitmap=map.getRandomTexture(this.genRandom);
         
             // the pipe platforms
             

@@ -44,6 +44,8 @@ class ConfigClass
         this.ROOM_LEDGE_EXTRA_HEIGHT=1500;             // extra height of ledges
         this.ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
         this.ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
+        
+        this.ROOM_TEXTURE_COUNT=8;                      // # of different types of textures per map
 
         this.STAIR_STEP_COUNT=10;
         
@@ -91,16 +93,16 @@ class ConfigClass
 
         this.MAP_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for map lights
         this.MAP_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
-        this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
+        this.MAP_LIGHT_ALWAYS_WHITE=true;              // make sure map lights are always white
 
-        this.MAP_GENERATE_LIGHTMAP=true;              // set to true to generate light maps
+        this.MAP_GENERATE_LIGHTMAP=false;              // set to true to generate light maps
 
             //
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=6;
-        this.MONSTER_ENTITY_COUNT=20;
+        this.MONSTER_TYPE_COUNT=1;
+        this.MONSTER_ENTITY_COUNT=0;
         
         this.MONSTER_FIRE_PERCENTAGE=0.75;              // amount of time a monster can fire
         
@@ -116,7 +118,7 @@ class ConfigClass
         this.MONSTER_MIN_WALK_TURN_SPEED=0.2;
         this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=0.5;
 
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
 
             //
             // random seeds,
@@ -126,6 +128,7 @@ class ConfigClass
         var seed=Date.now();
 
         this.SEED_BITMAP_MAP=Math.trunc((Math.random()*seed));
+        this.SEED_BITMAP_LIQUID=Math.trunc((Math.random()*seed));
         this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*seed));
         this.SEED_BITMAP_SKY=Math.trunc((Math.random()*seed));
         this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*seed));

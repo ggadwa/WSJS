@@ -87,7 +87,7 @@ class GenRoomLedgeClass
     createLedges(room)
     {
         var x,z;
-        var ledgeBitmap=bitmapList.getBitmap('Map Ledge');
+        var ledgeBitmap=map.getRandomTexture(this.genRandom);
         
             // does this room have a ledge?
             

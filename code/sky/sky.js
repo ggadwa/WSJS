@@ -50,9 +50,9 @@ class SkyClass
         
         genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
         
-        this.topBitmap=genBitmapSky.generate("Sky Top",GEN_BITMAP_SKY_TYPE_TOP,false);
-        this.bottomBitmap=genBitmapSky.generate("Sky Bottom",GEN_BITMAP_SKY_TYPE_BOTTOM,false);
-        this.sideBitmap=genBitmapSky.generate("Sky Side",GEN_BITMAP_SKY_TYPE_SIDE,false);
+        this.topBitmap=genBitmapSky.generate(genBitmapSky.TYPE_TOP,false);
+        this.bottomBitmap=genBitmapSky.generate(genBitmapSky.TYPE_BOTTOM,false);
+        this.sideBitmap=genBitmapSky.generate(genBitmapSky.TYPE_SIDE,false);
         
         return(true);
     }

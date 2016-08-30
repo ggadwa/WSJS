@@ -19,7 +19,7 @@ class GenRoomClosetClass
     {
         var n,idx;
         var vertexList,indexes;
-        var bitmap=bitmapList.getBitmap('Map Closet');
+        var bitmap=map.getRandomTexture(this.genRandom);
         
             // center point for normal creation
             

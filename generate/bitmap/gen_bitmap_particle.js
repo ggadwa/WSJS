@@ -10,6 +10,13 @@ class GenBitmapParticleClass extends GenBitmapClass
     {    
         super(genRandom);
         
+        this.TYPE_OVAL=0;
+
+        this.TYPE_NAMES=
+                [
+                    'Oval'
+                ];
+        
         Object.seal(this);
     }
         
@@ -17,7 +24,7 @@ class GenBitmapParticleClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(name,generateType,inDebug)
+    generate(generateType,inDebug)
     {
         var wid,high;
         var bitmapCanvas,bitmapCTX;
@@ -45,7 +52,7 @@ class GenBitmapParticleClass extends GenBitmapClass
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(name,bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+        return(new BitmapClass(bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
     }
 
 }

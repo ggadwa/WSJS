@@ -16,6 +16,7 @@ class MainDebugClass
         this.soundHigh=250;
         
         this.genBitmapMap=null;
+        this.genBitmapLiquid=null;
         this.genBitmapModel=null;
         this.genBitmapSky=null;
         this.genBitmapParticle=null;
@@ -40,7 +41,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapMap.generate(GEN_BITMAP_MAP_TYPE_NAMES[idx],idx,true);
+        debugBitmap=this.genBitmapMap.generate(idx,true);
 
             // label
 
@@ -48,7 +49,7 @@ class MainDebugClass
         div.style.position="absolute";
         div.style.left='5px';
         div.style.top=this.drawTop+'px';
-        div.innerHTML='[MAP] '+GEN_BITMAP_MAP_TYPE_NAMES[idx];
+        div.innerHTML='[MAP] '+this.genBitmapMap.TYPE_NAMES[idx];
         document.body.appendChild(div);
 
         this.drawTop+=25;
@@ -73,12 +74,63 @@ class MainDebugClass
             // next bitmap
             
         idx++;
-        if (idx>=GEN_BITMAP_MAP_TYPE_NAMES.length) {
-            setTimeout(this.addBitmapModels.bind(this,0),PROCESS_TIMEOUT_MSEC);
+        if (idx>=this.genBitmapMap.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapLiquids.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
         setTimeout(this.addBitmapMaps.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    addBitmapLiquids(idx)
+    {
+        var canvas,ctx,div;
+        var wid;
+        var debugBitmap;
+
+        wid=Math.trunc(this.bitmapWid/3);
+
+            // generate random bitmap
+
+        debugBitmap=this.genBitmapLiquid.generate(idx,true);
+
+            // label
+
+        div=document.createElement('div');
+        div.style.position="absolute";
+        div.style.left='5px';
+        div.style.top=this.drawTop+'px';
+        div.innerHTML='[MAP] '+this.genBitmapLiquid.TYPE_NAMES[idx];
+        document.body.appendChild(div);
+
+        this.drawTop+=25;
+
+        canvas=document.createElement('canvas');
+        canvas.style.position="absolute";
+        canvas.style.left='5px';
+        canvas.style.top=this.drawTop+'px';
+        canvas.style.border='1px solid #000000';
+        canvas.width=this.bitmapWid;
+        canvas.height=this.bitmapHigh;
+
+        var ctx=canvas.getContext('2d');
+        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
+        ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
+        ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
+
+        document.body.appendChild(canvas);
+
+        this.drawTop+=(this.bitmapHigh+5);
+        
+            // next bitmap
+            
+        idx++;
+        if (idx>=this.genBitmapLiquid.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapModels.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapLiquids.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
         //
@@ -95,7 +147,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapModel.generate(GEN_BITMAP_MODEL_TYPE_NAMES[idx],idx,true);
+        debugBitmap=this.genBitmapModel.generate(idx,true);
 
             // label
 
@@ -103,7 +155,7 @@ class MainDebugClass
         div.style.position="absolute";
         div.style.left='5px';
         div.style.top=this.drawTop+'px';
-        div.innerHTML='[MODEL] '+GEN_BITMAP_MODEL_TYPE_NAMES[idx];
+        div.innerHTML='[MODEL] '+this.genBitmapModel.TYPE_NAMES[idx];
         document.body.appendChild(div);
 
         this.drawTop+=25;
@@ -128,7 +180,7 @@ class MainDebugClass
             // next bitmap
             
         idx++;
-        if (idx>=GEN_BITMAP_MODEL_TYPE_NAMES.length) {
+        if (idx>=this.genBitmapModel.TYPE_NAMES.length) {
             setTimeout(this.addBitmapSkies.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
@@ -150,7 +202,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapSky.generate(GEN_BITMAP_SKY_TYPE_NAMES[idx],idx,true);
+        debugBitmap=this.genBitmapSky.generate(idx,true);
 
             // label
 
@@ -158,7 +210,7 @@ class MainDebugClass
         div.style.position="absolute";
         div.style.left='5px';
         div.style.top=this.drawTop+'px';
-        div.innerHTML='[SKY] '+GEN_BITMAP_SKY_TYPE_NAMES[idx];
+        div.innerHTML='[SKY] '+this.genBitmapSky.TYPE_NAMES[idx];
         document.body.appendChild(div);
 
         this.drawTop+=25;
@@ -181,7 +233,7 @@ class MainDebugClass
             // next bitmap
             
         idx++;
-        if (idx>=GEN_BITMAP_SKY_TYPE_NAMES.length) {
+        if (idx>=this.genBitmapSky.TYPE_NAMES.length) {
             setTimeout(this.addBitmapParticles.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
@@ -203,7 +255,7 @@ class MainDebugClass
 
             // generate random bitmap
 
-        debugBitmap=this.genBitmapParticle.generate(GEN_BITMAP_PARTICLE_TYPE_NAMES[idx],idx,true);
+        debugBitmap=this.genBitmapParticle.generate(idx,true);
 
             // label
 
@@ -211,7 +263,7 @@ class MainDebugClass
         div.style.position="absolute";
         div.style.left='5px';
         div.style.top=this.drawTop+'px';
-        div.innerHTML='[PARTICLE] '+GEN_BITMAP_PARTICLE_TYPE_NAMES[idx];
+        div.innerHTML='[PARTICLE] '+this.genBitmapParticle.TYPE_NAMES[idx];
         document.body.appendChild(div);
 
         this.drawTop+=25;
@@ -234,7 +286,7 @@ class MainDebugClass
             // next bitmap
             
         idx++;
-        if (idx>=GEN_BITMAP_PARTICLE_TYPE_NAMES.length) {
+        if (idx>=this.genBitmapParticle.TYPE_NAMES.length) {
             setTimeout(this.addSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
@@ -286,7 +338,7 @@ class MainDebugClass
         
             // generate random sound
 
-        debugSound=this.genSound.generate(GEN_SOUND_TYPE_NAMES[idx],idx,true);
+        debugSound=this.genSound.generate('test',idx,true);
         this.debugSoundList.addSound(debugSound);      // so we can play later
 
             // label
@@ -334,6 +386,7 @@ class MainDebugClass
             // construct necessary classes
             
         this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_LIQUID));
         this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
         this.genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
         this.genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_BITMAP_PARTICLE));

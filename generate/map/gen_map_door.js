@@ -104,8 +104,8 @@ class GenRoomDoorClass
         var vertexList,movement;
         var x,xDoorBound,zDoorBound,zThickBound;
         
-        var roomBitmap=bitmapList.getBitmap('Map Closet');
-        var doorBitmap=bitmapList.getBitmap('Map Metal');
+        var roomBitmap=map.getRandomTexture(this.genRandom);
+        var doorBitmap=map.getRandomTexture(this.genRandom);
         
             // need a center point to better
             // create normals
@@ -184,8 +184,8 @@ class GenRoomDoorClass
         var vertexList,movement;
         var z,xDoorBound,zDoorBound,xThickBound;
         
-        var roomBitmap=bitmapList.getBitmap('Map Closet');
-        var doorBitmap=bitmapList.getBitmap('Map Metal');
+        var roomBitmap=map.getRandomTexture(this.genRandom);
+        var doorBitmap=map.getRandomTexture(this.genRandom);
         
             // need a center point to better
             // create normals

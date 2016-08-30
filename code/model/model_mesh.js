@@ -66,6 +66,11 @@ class ModelMeshClass
         this.vertexTangentBuffer=null;
         this.vertexUVBuffer=null;
         this.indexBuffer=null;
+        
+            // keep track if this is a clone or
+            // not because the bitmaps are shared
+            
+        this.isClone=false;
 
             // global variables to stop GCd
 
@@ -94,6 +99,10 @@ class ModelMeshClass
         if (this.vertexUVBuffer!==null) gl.deleteBuffer(this.vertexUVBuffer);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
+        
+            // if not a clone, then close the bitmap
+            
+        if (!this.isClone) this.bitmap.close();
     }
     
         //
@@ -106,7 +115,10 @@ class ModelMeshClass
             // only the internal gl arrays so we can just re-use the
             // data
         
-        return(new ModelMeshClass(this.bitmap,this.vertexList,this.indexes,this.flag));
+        var mesh=new ModelMeshClass(this.bitmap,this.vertexList,this.indexes,this.flag);
+        mesh.isClone=true;
+        
+        return(mesh);
     }
     
         //

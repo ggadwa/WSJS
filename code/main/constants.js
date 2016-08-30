@@ -154,61 +154,6 @@ const BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
 const BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
 
     //
-    // bitmap generation types
-    //
-
-const GEN_BITMAP_MAP_TYPE_BRICK_STACK=0;
-const GEN_BITMAP_MAP_TYPE_BRICK_RANDOM=1;
-const GEN_BITMAP_MAP_TYPE_STONE=2;
-const GEN_BITMAP_MAP_TYPE_BLOCK=3;
-const GEN_BITMAP_MAP_TYPE_TILE_SIMPLE=4;
-const GEN_BITMAP_MAP_TYPE_TILE_COMPLEX=5;
-const GEN_BITMAP_MAP_TYPE_TILE_SMALL=6;
-const GEN_BITMAP_MAP_TYPE_HEXAGONAL=7;
-const GEN_BITMAP_MAP_TYPE_METAL=8;
-const GEN_BITMAP_MAP_TYPE_METAL_BAR=9;
-const GEN_BITMAP_MAP_TYPE_METAL_CORRUGATED=10;
-const GEN_BITMAP_MAP_TYPE_METAL_SHUTTER=11;
-const GEN_BITMAP_MAP_TYPE_CONCRETE=12;
-const GEN_BITMAP_MAP_TYPE_CEMENT=13;
-const GEN_BITMAP_MAP_TYPE_PLASTER=14;
-const GEN_BITMAP_MAP_TYPE_MOSAIC=15;
-const GEN_BITMAP_MAP_TYPE_WOOD_PLANK=16;
-const GEN_BITMAP_MAP_TYPE_WOOD_BOX=17;
-const GEN_BITMAP_MAP_TYPE_MACHINE=18;
-const GEN_BITMAP_MAP_TYPE_LIQUID=19;
-
-const GEN_BITMAP_MAP_TYPE_NAMES=[
-                        'Brick Stack','Brick Random','Stone','Block',
-                        'Tile Simple','Tile Complex','Tile Small','Hexagonal',
-                        'Metal','Metal Bar','Metal Corrugated','Metal Shutter',
-                        'Concrete','Cement','Plaster','Mosaic',
-                        'Wood Plank','Wood Box','Machine','Liquid'
-                    ];
-
-const GEN_BITMAP_MODEL_TYPE_SKIN_SCALE=0;
-const GEN_BITMAP_MODEL_TYPE_SKIN_LEATHER=1;
-const GEN_BITMAP_MODEL_TYPE_SKIN_FUR=2;
-
-const GEN_BITMAP_MODEL_TYPE_NAMES=[
-                        'Skin Scale','Skin Leather','Skin Fur'
-                    ];
-                    
-const GEN_BITMAP_SKY_TYPE_TOP=0;
-const GEN_BITMAP_SKY_TYPE_BOTTOM=1;
-const GEN_BITMAP_SKY_TYPE_SIDE=2;
-
-const GEN_BITMAP_SKY_TYPE_NAMES=[
-                        'Top','Bottom','Side'
-                    ];
-                    
-const GEN_BITMAP_PARTICLE_TYPE_OVAL=0;
-
-const GEN_BITMAP_PARTICLE_TYPE_NAMES=[
-                        'Oval'
-                    ];
-
-    //
     // sound generation types
     //
 

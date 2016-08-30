@@ -10,6 +10,15 @@ class GenBitmapModelClass extends GenBitmapClass
     {    
         super(genRandom);
         
+        this.TYPE_SKIN_SCALE=0;
+        this.TYPE_SKIN_LEATHER=1;
+        this.TYPE_SKIN_FUR=2;
+
+        this.TYPE_NAMES=
+                [
+                    'Skin Scale','Skin Leather','Skin Fur'
+                ];
+        
         Object.seal(this);
     }
     
@@ -186,7 +195,7 @@ class GenBitmapModelClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(name,generateType,inDebug)
+    generate(generateType,inDebug)
     {
         var wid,high;
         var shineFactor=1.0;
@@ -216,17 +225,17 @@ class GenBitmapModelClass extends GenBitmapClass
 
         switch (generateType) {
 
-            case GEN_BITMAP_MODEL_TYPE_SKIN_SCALE:
+            case this.TYPE_SKIN_SCALE:
                 this.generateSkinScale(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=8.0;
                 break;
                 
-            case GEN_BITMAP_MODEL_TYPE_SKIN_LEATHER:
+            case this.TYPE_SKIN_LEATHER:
                 this.generateSkinLeather(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=2.0;
                 break;
                 
-            case GEN_BITMAP_MODEL_TYPE_SKIN_FUR:
+            case this.TYPE_SKIN_FUR:
                 this.generateSkinFur(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=1.0;
                 break;
@@ -241,7 +250,12 @@ class GenBitmapModelClass extends GenBitmapClass
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(name,bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+    }
+    
+    generateRandom()
+    {
+        return(generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),false));
     }
 
 }

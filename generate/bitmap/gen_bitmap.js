@@ -36,7 +36,7 @@ class GenBitmapClass
                     [1.0,0.0,0.0],      // red
                     [0.0,1.0,0.0],      // green
                     [0.0,0.0,1.0],      // blue
-                    [1.0,1.0,0.0],      // yellow
+                    [0.9,0.9,0.0],      // yellow
                     [1.0,0.0,1.0],      // purple
                     [1.0,1.0,0.0],      // light blue
                     [0.0,1.0,0.78],     // sea green

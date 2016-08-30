@@ -17,8 +17,11 @@ class MapClass
         this.rooms=[];
         this.liquids=[];
         
+        this.liquidBitmap=null;
+        this.meshBitmapList=[];
+        this.lightmapBitmapList=[];
+        
         this.movementList=new MovementListClass();
-
         this.overlay=new MapOverlayClass();
 
         this.cameraVector=new wsPoint(0,0,0);           // global not local so they won't get GCd
@@ -46,6 +49,71 @@ class MapClass
         this.mapLiquidShader.release();
         this.mapMeshShader.release();
         this.overlay.release();
+    }
+    
+        //
+        // textures
+        //
+        
+    createTexturesLoop(textureIndex,genBitmapMap,callbackFunc)
+    {
+        this.meshBitmapList.push(genBitmapMap.generateRandom());
+        
+        textureIndex++;
+        if (textureIndex>=config.ROOM_TEXTURE_COUNT) {
+            view.loadingScreenDraw(1.0);
+            callbackFunc();
+            return;
+        }
+        
+        view.loadingScreenDraw(textureIndex/(config.ROOM_TEXTURE_COUNT+2));
+        setTimeout(this.createTexturesLoop.bind(this,textureIndex,genBitmapMap,callbackFunc),PROCESS_TIMEOUT_MSEC);
+    }
+        
+    createTextures(genBitmapMap,genBitmapLiquid,callbackFunc)
+    {
+            // the single liquid
+            
+        this.liquidBitmap=genBitmapLiquid.generateRandom();
+        
+            // all the other textures
+            
+        view.loadingScreenDraw(1.0/(config.ROOM_TEXTURE_COUNT+2));
+        setTimeout(this.createTexturesLoop.bind(this,0,genBitmapMap,callbackFunc),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    releaseTextures()
+    {
+        var n;
+        
+        this.liquidBitmap.close();
+        
+        for (n=0;n!==ROOM_TEXTURE_COUNT;n++) {
+            this.meshBitmapList[n].close();
+        }
+        
+        for (n=0;n!=lightmapBitmapList.length;n++) {
+            this.lightmapBitmapList[n].close();
+        }
+        
+        this.liquidBitmap=null;
+        this.meshBitmapList=[];
+        this.lightmapBitmapList=[];
+    }
+    
+    getRandomTexture(genRandom)
+    {
+        return(this.meshBitmapList[genRandom.randomIndex(config.ROOM_TEXTURE_COUNT)]);
+    }
+    
+    addLightmapBitmap(bitmap)
+    {
+        this.lightmapBitmapList.push(bitmap);
+    }
+    
+    getLightmapBitmap(idx)
+    {
+        return(this.lightmapBitmapList[idx]);
     }
     
         //

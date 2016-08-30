@@ -119,8 +119,8 @@ class GenRoomStairsClass
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,zThickBound;
         
-        var roomBitmap=bitmapList.getBitmap('Map Closet');
-        var stairBitmap=bitmapList.getBitmap('Map Stairs');
+        var roomBitmap=map.getRandomTexture(this.genRandom);
+        var stairBitmap=map.getRandomTexture(this.genRandom);
         
             // need a center point to better
             // create normals
@@ -289,8 +289,8 @@ class GenRoomStairsClass
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,xThickBound;
         
-        var roomBitmap=bitmapList.getBitmap('Map Closet');
-        var stairBitmap=bitmapList.getBitmap('Map Stairs');
+        var roomBitmap=map.getRandomTexture(this.genRandom);
+        var stairBitmap=map.getRandomTexture(this.genRandom);
         
             // need a center point to better
             // create normals

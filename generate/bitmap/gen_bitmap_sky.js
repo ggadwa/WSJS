@@ -10,6 +10,15 @@ class GenBitmapSkyClass extends GenBitmapClass
     {    
         super(genRandom);
         
+        this.TYPE_TOP=0;
+        this.TYPE_BOTTOM=1;
+        this.TYPE_SIDE=2;
+
+        this.TYPE_NAMES=
+                [
+                    'Top','Bottom','Side'
+                ];
+        
         Object.seal(this);
     }
         
@@ -76,7 +85,7 @@ class GenBitmapSkyClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(name,generateType,inDebug)
+    generate(generateType,inDebug)
     {
         var wid,high;
         var bitmapCanvas,bitmapCTX;
@@ -95,15 +104,15 @@ class GenBitmapSkyClass extends GenBitmapClass
 
         switch (generateType) {
 
-            case GEN_BITMAP_SKY_TYPE_TOP:
+            case this.TYPE_TOP:
                 this.generateSkyTop(bitmapCTX,wid,high);
                 break;
                 
-            case GEN_BITMAP_SKY_TYPE_BOTTOM:
+            case this.TYPE_BOTTOM:
                 this.generateSkyBottom(bitmapCTX,wid,high);
                 break;
                 
-            case GEN_BITMAP_SKY_TYPE_SIDE:
+            case this.TYPE_SIDE:
                 this.generateSkySide(bitmapCTX,wid,high);
                 break;
 
@@ -117,7 +126,7 @@ class GenBitmapSkyClass extends GenBitmapClass
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(name,bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+        return(new BitmapClass(bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
     }
 
 }

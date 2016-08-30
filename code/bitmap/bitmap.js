@@ -6,9 +6,8 @@
 
 class BitmapClass
 {
-    constructor(name,bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
+    constructor(bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
     {
-        this.name=name;
         this.texture=null;
         this.normalMap=null;
         this.specularMap=null;
