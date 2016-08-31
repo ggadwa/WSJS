@@ -12,24 +12,21 @@ When interface created
 ToDos
 
 
-#### !!!!! 3D rect needs to reverse light->dark climb when in/out is reversed
+
 
 #### wood needs to be more varied with extra pieces
-#### bricks need more variance
+#### plaster is pretty bad, color of lines has to be related to background color
+#### hexigons need to be more interesting
 
 
-
-#### bitmap type constants need to be in bitmap class
 #### sound constants in soundgen
-
 #### remove soundlist also
 
 
-# 1 brick type (randomly picks which one)
+
 # 1 metal type (build a chunk for each type now)
 # 1 wood type (with random wood chunks)
 # 1 tile type
-# 1 cement type (use cement as basis, random edging, adding particles)
 
 
 #### machine -> equipment, have 2 to 4 parts (vertical) each part can be pipe or machine
@@ -73,4 +70,4 @@ ToDos
 * more internal re-arrangement
 * fixed Edge browser webgl problem
 * reworking of texture generation, much more variance in color and structure
-* textures are more random in placement, and pick from a random list where than random "type" of thing
+* textures are more random in placement, and pick from a random list instead of a random "type" of thing

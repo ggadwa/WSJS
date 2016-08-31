@@ -211,6 +211,11 @@ class GenBitmapClass
         return(new wsColor((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
     }
     
+    lightenColor(color,lightenFactor)
+    {
+        return(new wsColor((color.r+(color.r*lightenFactor)),(color.g+(color.g*lightenFactor)),(color.b+(color.b*lightenFactor))));
+    }
+    
     boostColor(color,boostAdd)
     {
         return(new wsColor((color.r+boostAdd),(color.g+boostAdd),(color.b+boostAdd)));
@@ -591,10 +596,10 @@ class GenBitmapClass
         ctx.fillRect(lft,top,(rgt-lft),(bot-top));
     }
 
-    draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor,faceOut)
+    draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,color,faceOut)
     {
         var n,lx,rx,ty,by;
-        var darkenFactor,darkColor;
+        var colFactor,edgeColor,fillColor;
 
             // draw the edges
 
@@ -603,10 +608,16 @@ class GenBitmapClass
         ty=top;
         by=bot;
 
-        for (n=0;n!==edgeSize;n++) {
-            darkenFactor=(((n+1)/edgeSize)*0.5)+0.5;
-            darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
-            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+        for (n=0;n<=edgeSize;n++) {
+            if (faceOut) {
+                colFactor=((n/edgeSize)*0.3)+0.7;
+            }
+            else {
+                colFactor=(0.3-((n/edgeSize)*0.3))+0.7;
+            }
+            
+            edgeColor=this.darkenColor(color,colFactor);
+            bitmapCTX.strokeStyle=this.colorToRGBColor(edgeColor);
 
                 // the color
 
@@ -663,10 +674,15 @@ class GenBitmapClass
             ty++;
             by--;
         }
+        
+            // if this is facing in, then we use darker color
+        
+        fillColor=color;
+        if (!faceOut) fillColor=this.darkenColor(color,0.7);
 
             // draw the inner fill
 
-        this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillRGBColor);
+        this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillColor);
 
         this.clearNormalsRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
     }
