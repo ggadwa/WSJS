@@ -13,11 +13,12 @@ ToDos
 
 
 
-
+#### make sure grout is darker than bricks/color primary needs a light/dark factor
+#### stones can have bigger grout, less bigger grout on bricks
 #### wood needs to be more varied with extra pieces
 #### plaster is pretty bad, color of lines has to be related to background color
 #### hexigons need to be more interesting
-
+#### mosaics need to never include inner color
 
 #### sound constants in soundgen
 #### remove soundlist also

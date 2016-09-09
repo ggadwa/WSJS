@@ -43,7 +43,7 @@ class GenBitmapMapClass extends GenBitmapClass
         var n,rect,segments;
         var drawBrickColor,f;
         var lft,rgt,top,bot;
-        var sx,ex,streakWid,lineColor,lineMargin;
+        var sx,ex,streakWid,lineColor;
         
         var edgeSize=this.genRandom.randomInt(3,10);
         var paddingSize=this.genRandom.randomInt(1,20);
@@ -123,14 +123,15 @@ class GenBitmapMapClass extends GenBitmapClass
             this.blur(bitmapCTX,lft,top,rgt,bot,4);
             
                 // add cracks (after any blurs)
-                
-            if (this.genRandom.randomPercentage(0.10)) {
-                lineMargin=Math.trunc((rgt-lft)/5);
-                sx=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
-                ex=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+            
+            if ((rgt-lft)>(bot-top)) {
+                if (this.genRandom.randomPercentage(0.10)) {
+                    sx=this.genRandom.randomInBetween((lft+20),(rgt-20));
+                    ex=this.genRandom.randomInBetween((lft+20),(rgt-20));
 
-                lineColor=this.darkenColor(drawBrickColor,0.9);
-                this.drawRandomLine(bitmapCTX,normalCTX,sx,top,ex,bot,20,lineColor,false);
+                    lineColor=this.darkenColor(drawBrickColor,0.9);
+                    this.drawRandomLine(bitmapCTX,normalCTX,sx,top,ex,bot,20,lineColor,false);
+                }
             }
         }
 
@@ -947,14 +948,16 @@ class GenBitmapMapClass extends GenBitmapClass
 
     generateWood(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,y,lft,rgt,woodFactor;
+        var n,k,lft,rgt,top,bot;
+        var halfSize,boardSplit,boardHigh,woodFactor;
         
             // some random values
 
         var boardCount=this.genRandom.randomInt(4,8);
         var boardSize=Math.trunc(wid/boardCount);
+        var edgeSize=this.genRandom.randomInt(3,3);
         var woodColor=this.getRandomColor();
-        var breakColor=new wsColor(0.0,0.0,0.0);
+        var col;
 
             // clear canvases
 
@@ -968,57 +971,27 @@ class GenBitmapMapClass extends GenBitmapClass
             rgt=lft+boardSize;
             if (n===(boardCount-1)) rgt=wid;
             
-            woodFactor=0.8+((1.0-(this.genRandom.random()*2.0))*0.1);
+            boardSplit=this.genRandom.randomInt(1,3);
+            boardHigh=Math.trunc(high/boardSplit);
             
-            this.drawColorStripeVertical(bitmapCTX,normalCTX,lft,0,rgt,high,0.1,woodColor);
-            this.addNoiseRect(bitmapCTX,lft,0,rgt,high,0.9,0.95,woodFactor);
-            this.drawLine(bitmapCTX,normalCTX,(rgt-1),0,(rgt-1),high,breakColor,true);
+            top=0;
+            
+            for (k=0;k!=boardSplit;k++) {
+                bot=top+boardHigh;
+                if (k===(boardSplit-1)) bot=high;
+                
+                woodFactor=0.8+(this.genRandom.random()*0.2);
+                col=this.darkenColor(woodColor,woodFactor);
+
+                this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
+                this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+                this.addNoiseRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
+                
+                top=bot;
+            }
             
             lft=rgt;
         }
-
-
-
-
-/*
-
-                // inner boards
-
-            this.drawColorStripeSlant(bitmapCTX,normalCTX,boardSize,boardSize,(wid-boardSize),(high-boardSize),0.3,woodColor);
-            this.addNoiseRect(bitmapCTX,boardSize,boardSize,(wid-boardSize),(high-boardSize),0.9,0.95,0.8);
-
-                // inner boards
-
-            y=Math.trunc(high/2)-Math.trunc(boardSize/2);
-
-            this.draw3DRect(bitmapCTX,normalCTX,0,y,wid,(y+boardSize),3,woodColor,true);
-            this.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,(y+3),(wid-3),((y+boardSize)-3),0.2,woodColor);
-            this.addNoiseRect(bitmapCTX,0,y,wid,(y+boardSize),0.9,0.95,0.8);
-
-            x=Math.trunc(wid/2)-Math.trunc(boardSize/2);
-
-            this.draw3DRect(bitmapCTX,normalCTX,x,0,(x+boardSize),high,3,woodColor,true);
-            this.drawColorStripeVertical(bitmapCTX,normalCTX,(x+3),3,((x+boardSize)-3),(high-3),0.2,woodColor);
-            this.addNoiseRect(bitmapCTX,x,0,(x+boardSize),high,0.9,0.95,0.8);
-
-                // outside boards
-
-            this.draw3DRect(bitmapCTX,normalCTX,0,0,wid,boardSize,3,woodColor,true);
-            this.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,3,(wid-3),(boardSize-3),0.1,woodColor);
-            this.addNoiseRect(bitmapCTX,0,0,wid,boardSize,0.9,0.95,0.8);
-
-            this.draw3DRect(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,3,woodColor,true);
-            this.drawColorStripeHorizontal(bitmapCTX,normalCTX,3,((high-boardSize)+3),(wid-3),(high-3),0.1,woodColor);
-            this.addNoiseRect(bitmapCTX,0,(high-boardSize),wid,high,0.9,0.95,0.8);
-
-            this.draw3DRect(bitmapCTX,normalCTX,0,0,boardSize,high,3,woodColor,true);
-            this.drawColorStripeVertical(bitmapCTX,normalCTX,3,3,(boardSize-3),(high-3),0.1,woodColor);
-            this.addNoiseRect(bitmapCTX,0,0,boardSize,high,0.9,0.95,0.8);
-
-            this.draw3DRect(bitmapCTX,normalCTX,(wid-boardSize),0,wid,high,3,woodColor,true);
-            this.drawColorStripeVertical(bitmapCTX,normalCTX,((wid-boardSize)+3),3,(wid-3),(high-3),0.1,woodColor);
-            this.addNoiseRect(bitmapCTX,(wid-boardSize),0,wid,high,0.9,0.95,0.8);
-*/
 
             // finish with the specular
 
