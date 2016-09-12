@@ -220,6 +220,21 @@ class GenBitmapClass
     {
         return(new wsColor((color.r+boostAdd),(color.g+boostAdd),(color.b+boostAdd)));
     }
+    
+    dullColor(color,dullFactor)
+    {
+            // find the midpoint
+            
+        var midPoint=(color.r+color.g+color.b)/3.0;
+        
+            // move towards it
+            
+        var r=color.r+(midPoint-color.r)*dullFactor;
+        var g=color.g+(midPoint-color.g)*dullFactor;
+        var b=color.b+(midPoint-color.b)*dullFactor;
+
+        return(new wsColor(r,g,b));
+    }
 
     colorToRGBColor(color)
     {
@@ -499,10 +514,10 @@ class GenBitmapClass
         // specular routines
         //
 
-    createSpecularMap(bitmapCTX,specularCTX,wid,high,contrastFactor,clamp)
+    createSpecularMap(bitmapCTX,specularCTX,wid,high,clamp)
     {
         var n,idx,nPixel;
-        var f,fHigh,fClamp;
+        var f,fMin,fMax,fDif;
 
         var bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
         var bitmapData=bitmapImgData.data;
@@ -513,44 +528,38 @@ class GenBitmapClass
         idx=0;
         nPixel=wid*high;
         
-            // calculate the contrast and just
-            // put it in the first byte value as we
-            // are going to normalize to clamp all this later
+            // get the min-max across the entire
+            // bitmap
             
-        fHigh=0.0;
+        fMin=1.0;
+        fMax=0.0;
 
         for (n=0;n!==nPixel;n++) {
-
-                // get color brightness
-
-            f=((bitmapData[idx]+bitmapData[idx+1]+bitmapData[idx+2])*0.33)/255.0
-
-                // calculate the contrast
-
-            f=((f-0.5)*contrastFactor)+0.5;
-            if (f<0.0) f=0.0;
-            if (f>1.0) f=1.0;
-            
-            if (f>fHigh) fHigh=f;
-
-                // write to first byte, we
-                // spread this out after we clamp later
-
-            specularData[idx]=f*255.0;
-
-                // next pixel
+            f=(bitmapData[idx]+bitmapData[idx+1]+bitmapData[idx+2])/(255.0*3.0);
+            if (f<fMin) fMin=f;
+            if (f>fMax) fMax=f;
 
             idx+=4;
         }
         
-            // use the highest color to normalize
-            // to the clamped brightness
+            // more than likely never going to happen, but
+            // just in case reset if min-max are bad
+            
+        if (fMin>fMax) {
+            fMin=0.0;
+            fMax=1.0;
+        }
+        
+            // use the the min/max to reclamp
+            // to 0...1 then * clamp
         
         idx=0;
-        fClamp=clamp/fHigh;
+        fDif=fMax-fMin;
         
         for (n=0;n!==nPixel;n++) {
-            f=specularData[idx]*fClamp;
+            f=(bitmapData[idx]+bitmapData[idx+1]+bitmapData[idx+2])/(255.0*3.0);
+            f=((f-fMin)/fDif)*clamp;
+            f*=255.0;
                     
             specularData[idx++]=f;
             specularData[idx++]=f;

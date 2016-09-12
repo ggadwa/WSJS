@@ -176,7 +176,7 @@ class GenMapClass
         var storyCount,yStoryBound,yFloorBound;
         var roomIdx,room;
         var hasStories;
-        var roomBitmap=map.getRandomTexture(this.genRandom);
+        var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
             // stories, platforms, and ledges
             
@@ -196,7 +196,7 @@ class GenMapClass
             // liquid flags and floor
         
         room.liquid=(config.ROOM_LIQUIDS)&&(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1)&&(!lastLiquid);
-        room.createMeshFloor(map.getRandomTexture(this.genRandom),yBound);
+        room.createMeshFloor(map.getTexture(map.TEXTURE_TYPE_FLOOR),yBound);
 
             // walls
             
@@ -219,7 +219,7 @@ class GenMapClass
             // the ceiling
         
         room.openCeiling=(this.genRandom.randomPercentage(0.5))&&(room.level!==0);
-        room.createMeshCeiling(map.getRandomTexture(this.genRandom),yFloorBound);
+        room.createMeshCeiling(map.getTexture(map.TEXTURE_TYPE_CEILING),yFloorBound);
         
         return(roomIdx);
     }
@@ -360,7 +360,7 @@ class GenMapClass
             var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
             var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
             var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-            map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getRandomTexture(this.genRandom),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
+            map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getTexture(map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -677,7 +677,7 @@ class GenMapClass
         
             // finally add the liquid
         
-        if (room.liquid) map.addLiquid(new MapLiquidClass(map.liquidBitmap,room));
+        if (room.liquid) map.addLiquid(new MapLiquidClass(map.getTexture(map.TEXTURE_TYPE_LIQUID),room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room

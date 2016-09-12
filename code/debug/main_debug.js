@@ -15,9 +15,12 @@ class MainDebugClass
         this.soundWid=1200;
         this.soundHigh=250;
         
-        this.genBitmapMap=null;
-        this.genBitmapLiquid=null;
-        this.genBitmapModel=null;
+        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+
         this.genBitmapSky=null;
         this.genBitmapParticle=null;
         
@@ -28,20 +31,13 @@ class MainDebugClass
     }
     
         //
-        // map bitmaps
+        // draw single bitmap
         //
         
-    addBitmapMaps(idx)
+    drawSingleBitmap(genName,typeName,debugBitmap)
     {
         var canvas,ctx,div;
-        var wid;
-        var debugBitmap;
-
-        wid=Math.trunc(this.bitmapWid/3);
-
-            // generate random bitmap
-
-        debugBitmap=this.genBitmapMap.generate(idx,true);
+        var wid=Math.trunc(this.bitmapWid/3);
 
             // label
 
@@ -49,7 +45,7 @@ class MainDebugClass
         div.style.position="absolute";
         div.style.left='5px';
         div.style.top=this.drawTop+'px';
-        div.innerHTML='[MAP] '+this.genBitmapMap.TYPE_NAMES[idx];
+        div.innerHTML=genName+': '+typeName;
         document.body.appendChild(div);
 
         this.drawTop+=25;
@@ -70,60 +66,55 @@ class MainDebugClass
         document.body.appendChild(canvas);
 
         this.drawTop+=(this.bitmapHigh+5);
+    }
+    
+        //
+        // bitmap types
+        //
         
-            // next bitmap
-            
+    addBitmapWall(idx)
+    {
+        this.drawSingleBitmap('Wall',this.genBitmapWall.TYPE_NAMES[idx],this.genBitmapWall.generate(idx,true));
+
         idx++;
-        if (idx>=this.genBitmapMap.TYPE_NAMES.length) {
+        if (idx>=this.genBitmapWall.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapFloorCeiling.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapWall.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    addBitmapFloorCeiling(idx)
+    {
+        this.drawSingleBitmap('Floor/Ceiling',this.genBitmapFloorCeiling.TYPE_NAMES[idx],this.genBitmapFloorCeiling.generate(idx,true));
+
+        idx++;
+        if (idx>=this.genBitmapFloorCeiling.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapMachine.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapFloorCeiling.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    addBitmapMachine(idx)
+    {
+        this.drawSingleBitmap('Machine',this.genBitmapMachine.TYPE_NAMES[idx],this.genBitmapMachine.generate(idx,true));
+        
+        idx++;
+        if (idx>=this.genBitmapMachine.TYPE_NAMES.length) {
             setTimeout(this.addBitmapLiquids.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
-        setTimeout(this.addBitmapMaps.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapMachine.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
     addBitmapLiquids(idx)
     {
-        var canvas,ctx,div;
-        var wid;
-        var debugBitmap;
-
-        wid=Math.trunc(this.bitmapWid/3);
-
-            // generate random bitmap
-
-        debugBitmap=this.genBitmapLiquid.generate(idx,true);
-
-            // label
-
-        div=document.createElement('div');
-        div.style.position="absolute";
-        div.style.left='5px';
-        div.style.top=this.drawTop+'px';
-        div.innerHTML='[MAP] '+this.genBitmapLiquid.TYPE_NAMES[idx];
-        document.body.appendChild(div);
-
-        this.drawTop+=25;
-
-        canvas=document.createElement('canvas');
-        canvas.style.position="absolute";
-        canvas.style.left='5px';
-        canvas.style.top=this.drawTop+'px';
-        canvas.style.border='1px solid #000000';
-        canvas.width=this.bitmapWid;
-        canvas.height=this.bitmapHigh;
-
-        var ctx=canvas.getContext('2d');
-        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
-        ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
-        ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
-
-        document.body.appendChild(canvas);
-
-        this.drawTop+=(this.bitmapHigh+5);
+        this.drawSingleBitmap('Liquid',this.genBitmapLiquid.TYPE_NAMES[idx],this.genBitmapLiquid.generate(idx,true));
         
-            // next bitmap
-            
         idx++;
         if (idx>=this.genBitmapLiquid.TYPE_NAMES.length) {
             setTimeout(this.addBitmapModels.bind(this,0),PROCESS_TIMEOUT_MSEC);
@@ -133,59 +124,17 @@ class MainDebugClass
         setTimeout(this.addBitmapLiquids.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
-        //
-        // model bitmaps
-        //
-        
     addBitmapModels(idx)
     {
-        var canvas,ctx,div;
-        var wid;
-        var debugBitmap;
-
-        wid=Math.trunc(this.bitmapWid/3);
-
-            // generate random bitmap
-
-        debugBitmap=this.genBitmapModel.generate(idx,true);
-
-            // label
-
-        div=document.createElement('div');
-        div.style.position="absolute";
-        div.style.left='5px';
-        div.style.top=this.drawTop+'px';
-        div.innerHTML='[MODEL] '+this.genBitmapModel.TYPE_NAMES[idx];
-        document.body.appendChild(div);
-
-        this.drawTop+=25;
-
-        canvas=document.createElement('canvas');
-        canvas.style.position="absolute";
-        canvas.style.left='5px';
-        canvas.style.top=this.drawTop+'px';
-        canvas.style.border='1px solid #000000';
-        canvas.width=this.bitmapWid;
-        canvas.height=this.bitmapHigh;
-
-        var ctx=canvas.getContext('2d');
-        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
-        ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
-        ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
-
-        document.body.appendChild(canvas);
-
-        this.drawTop+=(this.bitmapHigh+5);
+        this.drawSingleBitmap('Model',this.genBitmapModel.TYPE_NAMES[idx],this.genBitmapModel.generate(idx,true));
         
-            // next bitmap
-            
         idx++;
         if (idx>=this.genBitmapModel.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapSkies.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapMachine.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
-        setTimeout(this.addBitmapModels.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapSkies.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
         //
@@ -385,7 +334,6 @@ class MainDebugClass
     {
             // construct necessary classes
             
-        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(config.SEED_BITMAP_MAP));
         this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_LIQUID));
         this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
         this.genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
@@ -401,7 +349,7 @@ class MainDebugClass
 
             // start the timed process
             
-        this.addBitmapMaps(0);
+        this.addBitmapWall(0);
     }
 }
 

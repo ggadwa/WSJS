@@ -8,8 +8,6 @@ class MainClass
 {
     constructor()
     {
-        this.genBitmapMap=null;
-        this.genBitmapLiquid=null;
         this.genBitmapModel=null;
         this.genSound=null;
         
@@ -65,32 +63,16 @@ class MainClass
 
             // dynamic creation classes
 
-        this.genBitmapMap=new GenBitmapMapClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_LIQUID));
         this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
         this.genSound=new GenSoundClass(soundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
 
             // next step
 
         view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Dynamic Map Textures');
-        view.loadingScreenDraw(null);
-
-        setTimeout(this.initBuildMapTextures.bind(this,0),PROCESS_TIMEOUT_MSEC);
-    }
-
-    initBuildMapTextures(idx)
-    {
-        map.createTextures(this.genBitmapMap,this.genBitmapLiquid,this.initBuildMapTexturesFinish.bind(this));
-    }
-    
-    initBuildMapTexturesFinish()
-    {
-        view.loadingScreenUpdate();
         view.loadingScreenAddString('Generating Dynamic Sounds');
         view.loadingScreenDraw(null);
 
-        this.initBuildSounds(0);
+        setTimeout(this.initBuildSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
     }
 
     initBuildSounds(idx)
@@ -186,7 +168,7 @@ class MainClass
 
             // build a bitmap
             
-        var modelBitmap=this.genBitmapModel.generateRandom();
+        var modelBitmap=this.genBitmapModel.generateRandom(false);
 
             // player is -1
             // else a monster
@@ -233,7 +215,7 @@ class MainClass
             // supergumba -- right now this is bad, it'll leak and get closed more than once,
             // deal with this when we have real weapon routines
         
-        var modelBitmap=this.genBitmapMap.generate(this.genBitmapMap.TYPE_METAL,false);
+        var modelBitmap=this.genBitmapModel.generate(0,false);
 
             // weapon
 

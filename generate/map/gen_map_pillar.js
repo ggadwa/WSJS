@@ -88,7 +88,7 @@ class GenRoomPillarClass
         
             // texture
             
-        var bitmap=map.getRandomTexture(this.genRandom);
+        var bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
         
             // room size creates the pillar types
             

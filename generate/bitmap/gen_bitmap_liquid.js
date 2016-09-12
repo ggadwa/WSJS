@@ -37,7 +37,7 @@ class GenBitmapLiquidClass extends GenBitmapClass
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);
         this.blur(bitmapCTX,0,0,wid,high,5);
         
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,10.0,0.5);
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
     }
 
         //
@@ -92,9 +92,9 @@ class GenBitmapLiquidClass extends GenBitmapClass
         return(new BitmapClass(bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
     
-    generateRandom()
+    generateRandom(inDebug)
     {
-        return(generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),false));
+        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

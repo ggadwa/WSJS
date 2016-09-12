@@ -8,6 +8,8 @@ class MapClass
 {
     constructor()
     {
+        var n;
+        
         this.mapMeshShader=new MapMeshShaderClass();
         this.mapLiquidShader=new MapLiquidShaderClass();        // shared
 
@@ -17,8 +19,28 @@ class MapClass
         this.rooms=[];
         this.liquids=[];
         
-        this.liquidBitmap=null;
-        this.meshBitmapList=[];
+        this.TEXTURE_COUNT=11;
+        
+        this.TEXTURE_TYPE_WALL=0;
+        this.TEXTURE_TYPE_FLOOR=1;
+        this.TEXTURE_TYPE_WALL=2;
+        this.TEXTURE_TYPE_FLOOR=3;
+        this.TEXTURE_TYPE_CEILING=4;
+        this.TEXTURE_TYPE_CLOSET=5;
+        this.TEXTURE_TYPE_PLATFORM=6;
+        this.TEXTURE_TYPE_PILLAR=7;
+        this.TEXTURE_TYPE_METAL=8;
+        this.TEXTURE_TYPE_MACHINE=9;
+        this.TEXTURE_TYPE_LIQUID=10;
+        
+        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_BITMAP_MAP));
+        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_LIQUID));
+        
+        this.textureBitmapList=[];
+        for (n=0;n!=this.TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
+        
         this.lightmapBitmapList=[];
         
         this.movementList=new MovementListClass();
@@ -54,56 +76,54 @@ class MapClass
         //
         // textures
         //
-        
-    createTexturesLoop(textureIndex,genBitmapMap,callbackFunc)
-    {
-        this.meshBitmapList.push(genBitmapMap.generateRandom());
-        
-        textureIndex++;
-        if (textureIndex>=config.ROOM_TEXTURE_COUNT) {
-            view.loadingScreenDraw(1.0);
-            callbackFunc();
-            return;
-        }
-        
-        view.loadingScreenDraw(textureIndex/(config.ROOM_TEXTURE_COUNT+2));
-        setTimeout(this.createTexturesLoop.bind(this,textureIndex,genBitmapMap,callbackFunc),PROCESS_TIMEOUT_MSEC);
-    }
-        
-    createTextures(genBitmapMap,genBitmapLiquid,callbackFunc)
-    {
-            // the single liquid
-            
-        this.liquidBitmap=genBitmapLiquid.generateRandom();
-        
-            // all the other textures
-            
-        view.loadingScreenDraw(1.0/(config.ROOM_TEXTURE_COUNT+2));
-        setTimeout(this.createTexturesLoop.bind(this,0,genBitmapMap,callbackFunc),PROCESS_TIMEOUT_MSEC);
-    }
     
     releaseTextures()
     {
         var n;
         
-        this.liquidBitmap.close();
-        
         for (n=0;n!==ROOM_TEXTURE_COUNT;n++) {
-            this.meshBitmapList[n].close();
+            if (this.textureBitmapList[n]!==null) {
+                this.textureBitmapList[n].close();
+                this.textureBitmapList[n]=null;
+            }
         }
         
         for (n=0;n!=lightmapBitmapList.length;n++) {
             this.lightmapBitmapList[n].close();
         }
         
-        this.liquidBitmap=null;
-        this.meshBitmapList=[];
         this.lightmapBitmapList=[];
     }
     
-    getRandomTexture(genRandom)
+    getTexture(textureType)
     {
-        return(this.meshBitmapList[genRandom.randomIndex(config.ROOM_TEXTURE_COUNT)]);
+        if (this.textureBitmapList[textureType]===null) {
+            
+            switch (textureType) {
+                case this.TEXTURE_TYPE_WALL:
+                case this.TEXTURE_TYPE_CLOSET:
+                case this.TEXTURE_TYPE_PILLAR:
+                case this.TEXTURE_TYPE_METAL:
+                    this.textureBitmapList[textureType]=this.genBitmapWall.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_FLOOR:
+                case this.TEXTURE_TYPE_CEILING:
+                case this.TEXTURE_TYPE_PLATFORM:
+                    this.textureBitmapList[textureType]=this.genBitmapFloorCeiling.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_MACHINE:
+                    this.textureBitmapList[textureType]=this.genBitmapMachine.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_LIQUID:
+                    this.textureBitmapList[textureType]=this.genBitmapLiquid.generateRandom(false);
+                    break;
+            }
+        }
+        
+        return(this.textureBitmapList[textureType]);
     }
     
     addLightmapBitmap(bitmap)

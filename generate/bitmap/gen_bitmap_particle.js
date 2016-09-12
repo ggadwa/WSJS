@@ -54,5 +54,10 @@ class GenBitmapParticleClass extends GenBitmapClass
 
         return(new BitmapClass(bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
     }
+    
+    generateRandom(inDebug)
+    {
+        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+    }
 
 }

@@ -22,7 +22,7 @@ class GenRoomDecorationClass
         var n,stackLevel,pos,boxPos,boxY,boxCount,rotWid;
         var ang,angAdd;
         var wid,high,rotAngle;
-        var boxBitmap=map.getRandomTexture(this.genRandom);
+        var boxBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
         var boxBoundX=new wsBound(0,0);
         var boxBoundY=new wsBound(0,0);
@@ -120,9 +120,9 @@ class GenRoomDecorationClass
         pos=room.findRandomDecorationLocation(this.genRandom,true);
         if (pos===null) return;
         
-        machineBitmap=map.getRandomTexture(this.genRandom);
-        platformBitmap=map.getRandomTexture(this.genRandom);
-        pipeBitmap=map.getRandomTexture(this.genRandom);
+        machineBitmap=map.getTexture(map.TEXTURE_TYPE_MACHINE);
+        platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        pipeBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
             // do machine
         
@@ -184,7 +184,7 @@ class GenRoomDecorationClass
         var boxBoundZ=new wsBound(0,0);
         
         legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
-        bitmap=map.getRandomTexture(this.genRandom);
+        bitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
 
         pos=room.findRandomDecorationLocation(this.genRandom,false);
         if (pos===null) return;
@@ -262,8 +262,8 @@ class GenRoomDecorationClass
         pos=room.findRandomDecorationLocation(this.genRandom,true);
         if (pos===null) return;
         
-        platformBitmap=map.getRandomTexture(this.genRandom);
-        pipeBitmap=map.getRandomTexture(this.genRandom);
+        platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        pipeBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
             // the pipe platforms
             

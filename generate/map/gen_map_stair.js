@@ -119,8 +119,8 @@ class GenRoomStairsClass
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,zThickBound;
         
-        var roomBitmap=map.getRandomTexture(this.genRandom);
-        var stairBitmap=map.getRandomTexture(this.genRandom);
+        var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        var stairBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
             // need a center point to better
             // create normals
@@ -289,8 +289,8 @@ class GenRoomStairsClass
         var vertexList;
         var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,xThickBound;
         
-        var roomBitmap=map.getRandomTexture(this.genRandom);
-        var stairBitmap=map.getRandomTexture(this.genRandom);
+        var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        var stairBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
             // need a center point to better
             // create normals

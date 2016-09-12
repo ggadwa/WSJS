@@ -90,7 +90,7 @@ class GenRoomPlatformClass
     addLiftChunk(room,x,z,extraY)
     {
         var meshIdx,movement;
-        var liftBitmap=map.getRandomTexture(this.genRandom);
+        var liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
         var xLiftBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
         var yLiftBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),(room.yBound.max+extraY));
@@ -171,7 +171,7 @@ class GenRoomPlatformClass
     {
         var x,z,stairX,stairZ,stairDir;
         
-        var platformBitmap=map.getRandomTexture(this.genRandom);
+        var platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
             // random stair direction
             
