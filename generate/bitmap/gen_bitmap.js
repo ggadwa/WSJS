@@ -33,12 +33,12 @@ class GenBitmapClass
             
         this.primaryColorList=
                 [
-                    [1.0,0.0,0.0],      // red
-                    [0.0,1.0,0.0],      // green
-                    [0.0,0.0,1.0],      // blue
-                    [0.9,0.9,0.0],      // yellow
-                    [1.0,0.0,1.0],      // purple
-                    [1.0,1.0,0.0],      // light blue
+                    [0.8,0.0,0.0],      // red
+                    [0.0,0.8,0.0],      // green
+                    [0.0,0.0,0.8],      // blue
+                    [0.8,0.8,0.0],      // yellow
+                    [0.8,0.0,0.8],      // purple
+                    [0.8,0.8,0.0],      // light blue
                     [0.0,1.0,0.78],     // sea green
                     [1.0,0.4,0.0],      // orange
                     [0.75,0.4,0.0],     // brown

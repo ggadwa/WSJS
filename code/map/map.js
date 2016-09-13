@@ -26,17 +26,16 @@ class MapClass
         this.TEXTURE_TYPE_WALL=2;
         this.TEXTURE_TYPE_FLOOR=3;
         this.TEXTURE_TYPE_CEILING=4;
-        this.TEXTURE_TYPE_CLOSET=5;
-        this.TEXTURE_TYPE_PLATFORM=6;
-        this.TEXTURE_TYPE_PILLAR=7;
-        this.TEXTURE_TYPE_METAL=8;
-        this.TEXTURE_TYPE_MACHINE=9;
-        this.TEXTURE_TYPE_LIQUID=10;
+        this.TEXTURE_TYPE_PLATFORM=5;
+        this.TEXTURE_TYPE_PILLAR=6;
+        this.TEXTURE_TYPE_METAL=7;
+        this.TEXTURE_TYPE_MACHINE=8;
+        this.TEXTURE_TYPE_LIQUID=9;
         
-        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_LIQUID));
+        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_TEXTURE));
         
         this.textureBitmapList=[];
         for (n=0;n!=this.TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
@@ -81,7 +80,7 @@ class MapClass
     {
         var n;
         
-        for (n=0;n!==ROOM_TEXTURE_COUNT;n++) {
+        for (n=0;n!==this.TEXTURE_COUNT;n++) {
             if (this.textureBitmapList[n]!==null) {
                 this.textureBitmapList[n].close();
                 this.textureBitmapList[n]=null;
@@ -101,7 +100,6 @@ class MapClass
             
             switch (textureType) {
                 case this.TEXTURE_TYPE_WALL:
-                case this.TEXTURE_TYPE_CLOSET:
                 case this.TEXTURE_TYPE_PILLAR:
                 case this.TEXTURE_TYPE_METAL:
                     this.textureBitmapList[textureType]=this.genBitmapWall.generateRandom(false);

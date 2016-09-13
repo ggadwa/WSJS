@@ -19,13 +19,15 @@ class GenRoomClosetClass
     {
         var n,idx;
         var vertexList,indexes;
-        var bitmap=map.getTexture(map.TEXTURE_TYPE_CLOSET);
+        var bitmap;
         
             // center point for normal creation
             
         var centerPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
 
             // the walls
+            
+        bitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(24);
@@ -72,6 +74,8 @@ class GenRoomClosetClass
 
             // ceiling
             
+        bitmap=map.getTexture(map.TEXTURE_TYPE_CEILING);
+        
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);
 
@@ -95,7 +99,9 @@ class GenRoomClosetClass
         map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
 
             // floor
-            
+        
+        bitmap=map.getTexture(map.TEXTURE_TYPE_FLOOR);
+        
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);
 

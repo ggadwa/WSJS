@@ -63,7 +63,7 @@ class MainClass
 
             // dynamic creation classes
 
-        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
+        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genSound=new GenSoundClass(soundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
 
             // next step

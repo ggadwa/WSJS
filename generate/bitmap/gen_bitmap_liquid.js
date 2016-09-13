@@ -23,15 +23,65 @@ class GenBitmapLiquidClass extends GenBitmapClass
         //
         // liquid
         //
+    
+    drawOvalGradient(bitmapCTX,lft,top,rgt,bot,startColor,endColor)
+    {
+        var col=new wsColor(startColor.r,startColor.g,startColor.b);
+        var count,rAdd,gAdd,bAdd;
         
+        var wid=rgt-lft;
+        var high=bot-top;
+        
+            // find color changes
+            
+        count=(wid>high)?Math.trunc(wid*0.5):Math.trunc(high*0.5);
+        rAdd=(endColor.r-startColor.r)/count;
+        gAdd=(endColor.g-startColor.g)/count;
+        bAdd=(endColor.b-startColor.b)/count;
+
+            // ovals
+            
+        while (true) {
+            this.drawOval(bitmapCTX,lft,top,rgt,bot,col,null);
+            lft++;
+            rgt--;
+            if (lft>=rgt) break;
+            top++;
+            bot--;
+            if (top>=bot) break;
+
+            col.addFromValues(rAdd,gAdd,bAdd);
+        }
+    }
+
     generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
+        var n,x,y,ovalWid,ovalHigh,startColor,endColor;
         var color=this.getRandomColor();
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
+            // main color
+            
         this.drawRect(bitmapCTX,0,0,wid,high,color);
         
+            // gradient ovals
+            
+        startColor=this.darkenColor(color,0.98);
+        endColor=this.lightenColor(color,0.1);
+            
+        for (n=0;n!=20;n++) {
+            ovalWid=this.genRandom.randomInt(50,100);
+            ovalHigh=this.genRandom.randomInt(50,100);
+            
+            x=this.genRandom.randomInt(0,(wid-ovalWid));
+            y=this.genRandom.randomInt(0,(high-ovalHigh));
+            
+            this.drawOvalGradient(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),startColor,endColor);
+        }
+        
+            // noise and blurs
+            
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.7,0.8,0.9);
         this.blur(bitmapCTX,0,0,wid,high,10);
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);

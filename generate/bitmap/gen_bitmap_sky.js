@@ -10,13 +10,11 @@ class GenBitmapSkyClass extends GenBitmapClass
     {    
         super(genRandom);
         
-        this.TYPE_TOP=0;
-        this.TYPE_BOTTOM=1;
-        this.TYPE_SIDE=2;
+        this.TYPE_CLOUDS=0;
 
         this.TYPE_NAMES=
                 [
-                    'Top','Bottom','Side'
+                    'Clouds'
                 ];
         
         Object.seal(this);
@@ -44,41 +42,46 @@ class GenBitmapSkyClass extends GenBitmapClass
             this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
         }
     }
-    
-    generateSkyTop(bitmapCTX,wid,high)
+
+    generateSkyClouds(bitmapCTX,wid,high)
     {
         var n,nCloud;
         var x,y,xsz,ysz;
-        var quarterWid=Math.trunc(wid*0.25);
-        var quarterHigh=Math.trunc(high*0.25);
+        
+        var mx=Math.trunc(wid*0.5);
+        var my=Math.trunc(high*0.5);
+        var cloudWid=Math.trunc(mx*0.25);
+        var cloudHigh=Math.trunc(my*0.25);
         
         var cloudColor=new wsColor(1,1,1);
         
+            // top
+            // color the whole thing in first
+            // so the cloud blur doesn't produce lines
+            
         this.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.1,0.95,1.0));
         
         nCloud=this.genRandom.randomInt(5,10);
         
         for (n=0;n!==nCloud;n++) {
-            xsz=this.genRandom.randomInt(quarterWid,quarterWid);
-            ysz=this.genRandom.randomInt(quarterHigh,quarterHigh);
+            xsz=this.genRandom.randomInt(cloudWid,cloudWid);
+            ysz=this.genRandom.randomInt(cloudHigh,cloudHigh);
             
-            x=this.genRandom.randomInt(0,(wid-xsz));
-            y=this.genRandom.randomInt(0,(high-ysz));
+            x=this.genRandom.randomInt(0,(mx-xsz));
+            y=this.genRandom.randomInt(0,(my-ysz));
             
             this.generateCloud(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor);
         }
         
         this.blur(bitmapCTX,0,0,wid,high,5);
-    }
-
-    generateSkyBottom(bitmapCTX,wid,high)
-    {
-        this.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.0,0.2,1.0));
-    }
-
-    generateSkySide(bitmapCTX,wid,high)
-    {
-        this.drawVerticalGradient(bitmapCTX,0,0,wid,high,new wsColor(0.1,0.95,1.0),new wsColor(0.0,0.2,1.0));
+        
+            // bottom
+            
+        this.drawRect(bitmapCTX,mx,0,wid,my,new wsColor(0.0,0.2,1.0));
+        
+            // side
+            
+        this.drawVerticalGradient(bitmapCTX,0,my,mx,high,new wsColor(0.1,0.95,1.0),new wsColor(0.0,0.2,1.0));
     }
 
         //
@@ -104,18 +107,10 @@ class GenBitmapSkyClass extends GenBitmapClass
 
         switch (generateType) {
 
-            case this.TYPE_TOP:
-                this.generateSkyTop(bitmapCTX,wid,high);
+            case this.TYPE_CLOUDS:
+                this.generateSkyClouds(bitmapCTX,wid,high);
                 break;
                 
-            case this.TYPE_BOTTOM:
-                this.generateSkyBottom(bitmapCTX,wid,high);
-                break;
-                
-            case this.TYPE_SIDE:
-                this.generateSkySide(bitmapCTX,wid,high);
-                break;
-
         }
 
             // debug just displays the canvases, so send
@@ -127,6 +122,11 @@ class GenBitmapSkyClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+    }
+    
+    generateRandom(inDebug)
+    {
+        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

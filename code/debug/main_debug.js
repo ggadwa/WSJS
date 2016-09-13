@@ -15,14 +15,13 @@ class MainDebugClass
         this.soundWid=1200;
         this.soundHigh=250;
         
-        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MAP));
-
-        this.genBitmapSky=null;
-        this.genBitmapParticle=null;
+        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_TEXTURE));
         
         this.debugSoundList=null;
         this.genSound=null;
@@ -60,8 +59,8 @@ class MainDebugClass
 
         var ctx=canvas.getContext('2d');
         ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
-        ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
-        ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
+        if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
+        if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
 
         document.body.appendChild(canvas);
 
@@ -130,57 +129,17 @@ class MainDebugClass
         
         idx++;
         if (idx>=this.genBitmapModel.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapMachine.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapSkies.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
-        setTimeout(this.addBitmapSkies.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapModels.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
-        //
-        // sky bitmaps
-        //
-        
     addBitmapSkies(idx)
     {
-        var canvas,ctx,div;
-        var wid;
-        var debugBitmap;
-
-        wid=Math.trunc(this.bitmapWid/3);
-
-            // generate random bitmap
-
-        debugBitmap=this.genBitmapSky.generate(idx,true);
-
-            // label
-
-        div=document.createElement('div');
-        div.style.position="absolute";
-        div.style.left='5px';
-        div.style.top=this.drawTop+'px';
-        div.innerHTML='[SKY] '+this.genBitmapSky.TYPE_NAMES[idx];
-        document.body.appendChild(div);
-
-        this.drawTop+=25;
-
-        canvas=document.createElement('canvas');
-        canvas.style.position="absolute";
-        canvas.style.left='5px';
-        canvas.style.top=this.drawTop+'px';
-        canvas.style.border='1px solid #000000';
-        canvas.width=this.bitmapWid;
-        canvas.height=this.bitmapHigh;
-
-        var ctx=canvas.getContext('2d');
-        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
-
-        document.body.appendChild(canvas);
-
-        this.drawTop+=(this.bitmapHigh+5);
+        this.drawSingleBitmap('Sky',this.genBitmapSky.TYPE_NAMES[idx],this.genBitmapSky.generate(idx,true));
         
-            // next bitmap
-            
         idx++;
         if (idx>=this.genBitmapSky.TYPE_NAMES.length) {
             setTimeout(this.addBitmapParticles.bind(this,0),PROCESS_TIMEOUT_MSEC);
@@ -190,57 +149,17 @@ class MainDebugClass
         setTimeout(this.addBitmapSkies.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
-        //
-        // particle bitmaps
-        //
-        
     addBitmapParticles(idx)
     {
-        var canvas,ctx,div;
-        var wid;
-        var debugBitmap;
-
-        wid=Math.trunc(this.bitmapWid/3);
-
-            // generate random bitmap
-
-        debugBitmap=this.genBitmapParticle.generate(idx,true);
-
-            // label
-
-        div=document.createElement('div');
-        div.style.position="absolute";
-        div.style.left='5px';
-        div.style.top=this.drawTop+'px';
-        div.innerHTML='[PARTICLE] '+this.genBitmapParticle.TYPE_NAMES[idx];
-        document.body.appendChild(div);
-
-        this.drawTop+=25;
-
-        canvas=document.createElement('canvas');
-        canvas.style.position="absolute";
-        canvas.style.left='5px';
-        canvas.style.top=this.drawTop+'px';
-        canvas.style.border='1px solid #000000';
-        canvas.width=this.bitmapWid;
-        canvas.height=this.bitmapHigh;
-
-        var ctx=canvas.getContext('2d');
-        ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
-
-        document.body.appendChild(canvas);
-
-        this.drawTop+=(this.bitmapHigh+5);
+        this.drawSingleBitmap('Particle',this.genBitmapParticle.TYPE_NAMES[idx],this.genBitmapParticle.generate(idx,true));
         
-            // next bitmap
-            
         idx++;
         if (idx>=this.genBitmapParticle.TYPE_NAMES.length) {
             setTimeout(this.addSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
-        setTimeout(this.addBitmapSkies.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapParticles.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
    
         //
@@ -334,11 +253,6 @@ class MainDebugClass
     {
             // construct necessary classes
             
-        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_BITMAP_LIQUID));
-        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_BITMAP_MODEL));
-        this.genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
-        this.genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_BITMAP_PARTICLE));
-        
         this.debugSoundList=new SoundListClass();
         if (!this.debugSoundList.initialize()) {
             alert('Sound initialization failed');

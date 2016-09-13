@@ -18,9 +18,7 @@ class SkyClass
         this.uvPosBuffer=null;
         this.indexBuffer=null;
         
-        this.topBitmap=null;
-        this.bottomBitmap=null;
-        this.sideBitmap=null;
+        this.bitmap=null;
         
         Object.seal(this);
     }
@@ -48,11 +46,8 @@ class SkyClass
         
             // create bitmaps
         
-        genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_BITMAP_SKY));
-        
-        this.topBitmap=genBitmapSky.generate(genBitmapSky.TYPE_TOP,false);
-        this.bottomBitmap=genBitmapSky.generate(genBitmapSky.TYPE_BOTTOM,false);
-        this.sideBitmap=genBitmapSky.generate(genBitmapSky.TYPE_SIDE,false);
+        genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.bitmap=genBitmapSky.generateRandom(false);
         
         return(true);
     }
@@ -65,9 +60,7 @@ class SkyClass
         gl.deleteBuffer(this.uvPosBuffer);
         gl.deleteBuffer(this.indexBuffer);
         
-        this.topBitmap.close();
-        this.topBitmap.close();
-        this.sideBitmap.close();
+        this.bitmap.close();
         
         this.skyShader.release();
     }
@@ -94,7 +87,7 @@ class SkyClass
         gl.enable(gl.DEPTH_TEST);
     }
     
-    drawPlane(gl,cameraPos,vx0,vy0,vz0,vx1,vy1,vz1,vx2,vy2,vz2,vx3,vy3,vz3)
+    drawPlane(gl,cameraPos,vx0,vy0,vz0,vx1,vy1,vz1,vx2,vy2,vz2,vx3,vy3,vz3,u,v)
     {
         this.vertexes[0]=cameraPos.x+vx0;
         this.vertexes[1]=cameraPos.y+vy0;
@@ -112,17 +105,17 @@ class SkyClass
         this.vertexes[10]=cameraPos.y+vy3;
         this.vertexes[11]=cameraPos.z+vz3;
         
-        this.uvs[0]=0.0;
-        this.uvs[1]=0.0;
+        this.uvs[0]=u;
+        this.uvs[1]=v;
         
-        this.uvs[2]=1.0;
-        this.uvs[3]=0.0;
+        this.uvs[2]=u+0.5;
+        this.uvs[3]=v;
         
-        this.uvs[4]=1.0;
-        this.uvs[5]=1.0;
+        this.uvs[4]=u+0.5;
+        this.uvs[5]=v+0.5;
         
-        this.uvs[6]=0.0;
-        this.uvs[7]=1.0;
+        this.uvs[6]=u;
+        this.uvs[7]=v+0.5;
         
         this.indexes[0]=0;
         this.indexes[1]=1;
@@ -165,24 +158,22 @@ class SkyClass
         var cameraPos=view.camera.position;
         var skyRadius=25000;
         
+        this.bitmap.attachAsSky();
+        
             // sides
         
-        this.sideBitmap.attachAsSky();
-        
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius);
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius);        
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius);
-        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius);
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.0,0.5);
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.0,0.5);        
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.0,0.5);
+        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.0,0.5);
         
             // top
         
-        this.topBitmap.attachAsSky();
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius);
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,0.0,0.0);
         
             // bottom
         
-        this.bottomBitmap.attachAsSky();
-        this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius);
+        this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.5,0.0);
         
             // remove the buffers
 

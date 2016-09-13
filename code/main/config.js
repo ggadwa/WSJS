@@ -45,8 +45,6 @@ class ConfigClass
         this.ROOM_LEDGE_MIN_WIDTH=2000;                // minum width of ledges
         this.ROOM_LEDGE_EXTRA_WIDTH=3000;              // extra width
         
-        this.ROOM_TEXTURE_COUNT=8;                      // # of different types of textures per map
-
         this.STAIR_STEP_COUNT=10;
         
         this.ROOM_CLOSETS=true;                         // turns on or off closets
@@ -127,11 +125,7 @@ class ConfigClass
 
         var seed=Date.now();
 
-        this.SEED_BITMAP_MAP=Math.trunc((Math.random()*seed));
-        this.SEED_BITMAP_LIQUID=Math.trunc((Math.random()*seed));
-        this.SEED_BITMAP_MODEL=Math.trunc((Math.random()*seed));
-        this.SEED_BITMAP_SKY=Math.trunc((Math.random()*seed));
-        this.SEED_BITMAP_PARTICLE=Math.trunc((Math.random()*seed));
+        this.SEED_TEXTURE=Math.trunc((Math.random()*seed));
         this.SEED_MAP=Math.trunc((Math.random()*seed));
         this.SEED_MODEL=Math.trunc((Math.random()*seed));
         this.SEED_ENTITY=Math.trunc((Math.random()*seed));

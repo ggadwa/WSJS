@@ -11,12 +11,9 @@ When interface created
 
 ToDos
 
-#### wall metal has no corrugation
-#### on single seed for textures
-#### make skies one single texture
+
+#### seam in skybox
 #### hexagons need to be more interesting
-#### parquet (wood) for floor
-#### cement better
 
 #### genBitmapModel in main.js delete later
 

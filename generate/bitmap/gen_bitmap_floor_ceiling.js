@@ -359,7 +359,7 @@ class GenBitmapFloorCeilingClass extends GenBitmapClass
     generateCement(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,nLine,markCount,x,y,y2;
-        var particleWid,particleHigh,particleDensity;
+        var particleWid,particleHigh,particleDensity,particleRingCount,particleDarken;
         var edgeSize,concreteColor,lineColor,line2Color;
 
             // some random values
@@ -408,12 +408,14 @@ class GenBitmapFloorCeilingClass extends GenBitmapClass
         for (n=0;n!==markCount;n++) {
             particleWid=this.genRandom.randomInt(100,100);
             particleHigh=this.genRandom.randomInt(100,100);
-            particleDensity=this.genRandom.randomInt(250,150);
+            particleDensity=this.genRandom.randomInt(150,250);
+            particleRingCount=this.genRandom.randomInt(8,8);
+            particleDarken=0.95-(this.genRandom.random()*0.15);
 
-            x=this.genRandom.randomInt(edgeSize,((wid-particleWid)-(edgeSize*2)));
-            y=this.genRandom.randomInt(edgeSize,((high-particleHigh)-(edgeSize*2)));
+            x=this.genRandom.randomInt(edgeSize,wid);
+            y=this.genRandom.randomInt(edgeSize,high);
 
-            this.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
+            this.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),particleRingCount,particleDarken,particleDensity,false);
         }
 
             // noise
