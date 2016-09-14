@@ -33,7 +33,8 @@ class MapClass
         this.TEXTURE_TYPE_LIQUID=9;
         
         this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapFloor=new GenBitmapFloorClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapCeiling=new GenBitmapCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_TEXTURE));
         
@@ -106,9 +107,12 @@ class MapClass
                     break;
                     
                 case this.TEXTURE_TYPE_FLOOR:
-                case this.TEXTURE_TYPE_CEILING:
                 case this.TEXTURE_TYPE_PLATFORM:
-                    this.textureBitmapList[textureType]=this.genBitmapFloorCeiling.generateRandom(false);
+                    this.textureBitmapList[textureType]=this.genBitmapFloor.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_CEILING:
+                    this.textureBitmapList[textureType]=this.genBitmapCeiling.generateRandom(false);
                     break;
                     
                 case this.TEXTURE_TYPE_MACHINE:

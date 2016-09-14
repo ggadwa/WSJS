@@ -12,10 +12,13 @@ When interface created
 ToDos
 
 
-#### seam in skybox
-#### hexagons need to be more interesting
+#### color should be it's own class
+#### need to have a floor/ceiling and wall color separate and passed through as defaultColor
+#### improve item generator (random screws, machine square lights, wires)
 
-#### genBitmapModel in main.js delete later
+#### possibly have color so map isn't all same color?
+
+#### genBitmapSkin/genBitmapItem in main.js delete later
 
 #### sound constants in soundgen
 #### remove soundlist also

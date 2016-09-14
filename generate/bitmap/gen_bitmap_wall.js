@@ -1,7 +1,7 @@
 "use strict";
 
 //
-// generate map bitmap class
+// generate wall bitmap class
 //
 
 class GenBitmapWallClass extends GenBitmapClass

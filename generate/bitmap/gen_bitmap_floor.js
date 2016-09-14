@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// generate map bitmap class
+// generate floor bitmap class
 //
 
-class GenBitmapFloorCeilingClass extends GenBitmapClass
+class GenBitmapFloorClass extends GenBitmapClass
 {
     constructor(genRandom)
     {
@@ -193,7 +193,7 @@ class GenBitmapFloorCeilingClass extends GenBitmapClass
 
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.4);
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
     }
     
         //
@@ -255,7 +255,6 @@ class GenBitmapFloorCeilingClass extends GenBitmapClass
             // some random values
 
         var metalColor=this.getRandomColor();
-        var shutterColor=this.getRandomColor();
         var borderColor=new wsColor(0.0,0.0,0.0);
 
         var edgeSize=this.genRandom.randomInt(4,8);
@@ -605,7 +604,7 @@ class GenBitmapFloorCeilingClass extends GenBitmapClass
 
             case this.TYPE_TILE:
                 this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
+                shineFactor=10.0;
                 break;
 
             case this.TYPE_HEXAGONAL:
@@ -625,7 +624,7 @@ class GenBitmapFloorCeilingClass extends GenBitmapClass
                 
             case this.TYPE_MOSAIC:
                 this.generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=5.0;
+                shineFactor=10.0;
                 break;
 
             case this.TYPE_WOOD:

@@ -16,10 +16,12 @@ class MainDebugClass
         this.soundHigh=250;
         
         this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapFloorCeiling=new GenBitmapFloorCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapFloor=new GenBitmapFloorClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapCeiling=new GenBitmapCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapSkin=new GenBitmapSkinClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapItem=new GenBitmapItemClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_TEXTURE));
         
@@ -77,24 +79,37 @@ class MainDebugClass
 
         idx++;
         if (idx>=this.genBitmapWall.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapFloorCeiling.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapFloor.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
         setTimeout(this.addBitmapWall.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
-    addBitmapFloorCeiling(idx)
+    addBitmapFloor(idx)
     {
-        this.drawSingleBitmap('Floor/Ceiling',this.genBitmapFloorCeiling.TYPE_NAMES[idx],this.genBitmapFloorCeiling.generate(idx,true));
+        this.drawSingleBitmap('Floor',this.genBitmapFloor.TYPE_NAMES[idx],this.genBitmapFloor.generate(idx,true));
 
         idx++;
-        if (idx>=this.genBitmapFloorCeiling.TYPE_NAMES.length) {
+        if (idx>=this.genBitmapFloor.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapCeiling.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapFloor.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    addBitmapCeiling(idx)
+    {
+        this.drawSingleBitmap('Ceiling',this.genBitmapCeiling.TYPE_NAMES[idx],this.genBitmapCeiling.generate(idx,true));
+
+        idx++;
+        if (idx>=this.genBitmapCeiling.TYPE_NAMES.length) {
             setTimeout(this.addBitmapMachine.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
-        setTimeout(this.addBitmapFloorCeiling.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapCeiling.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
     addBitmapMachine(idx)
@@ -116,26 +131,39 @@ class MainDebugClass
         
         idx++;
         if (idx>=this.genBitmapLiquid.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapModels.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapSkins.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
         setTimeout(this.addBitmapLiquids.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
-    addBitmapModels(idx)
+    addBitmapSkins(idx)
     {
-        this.drawSingleBitmap('Model',this.genBitmapModel.TYPE_NAMES[idx],this.genBitmapModel.generate(idx,true));
+        this.drawSingleBitmap('Skin',this.genBitmapSkin.TYPE_NAMES[idx],this.genBitmapSkin.generate(idx,true));
         
         idx++;
-        if (idx>=this.genBitmapModel.TYPE_NAMES.length) {
+        if (idx>=this.genBitmapSkin.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapItems.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapSkins.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    addBitmapItems(idx)
+    {
+        this.drawSingleBitmap('Item',this.genBitmapItem.TYPE_NAMES[idx],this.genBitmapItem.generate(idx,true));
+        
+        idx++;
+        if (idx>=this.genBitmapItem.TYPE_NAMES.length) {
             setTimeout(this.addBitmapSkies.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
-        setTimeout(this.addBitmapModels.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapSkin.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
-    
+   
     addBitmapSkies(idx)
     {
         this.drawSingleBitmap('Sky',this.genBitmapSky.TYPE_NAMES[idx],this.genBitmapSky.generate(idx,true));

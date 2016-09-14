@@ -108,14 +108,14 @@ class SkyClass
         this.uvs[0]=u;
         this.uvs[1]=v;
         
-        this.uvs[2]=u+0.5;
+        this.uvs[2]=u+0.49;
         this.uvs[3]=v;
         
-        this.uvs[4]=u+0.5;
-        this.uvs[5]=v+0.5;
+        this.uvs[4]=u+0.49;
+        this.uvs[5]=v+0.49;
         
         this.uvs[6]=u;
-        this.uvs[7]=v+0.5;
+        this.uvs[7]=v+0.49;
         
         this.indexes[0]=0;
         this.indexes[1]=1;

@@ -1,22 +1,22 @@
 "use strict";
 
 //
-// generate model bitmap class
+// generate skin bitmap class
 //
 
-class GenBitmapModelClass extends GenBitmapClass
+class GenBitmapSkinClass extends GenBitmapClass
 {
     constructor(genRandom)
     {    
         super(genRandom);
         
-        this.TYPE_SKIN_SCALE=0;
-        this.TYPE_SKIN_LEATHER=1;
-        this.TYPE_SKIN_FUR=2;
+        this.TYPE_SCALE=0;
+        this.TYPE_LEATHER=1;
+        this.TYPE_FUR=2;
 
         this.TYPE_NAMES=
                 [
-                    'Skin Scale','Skin Leather','Skin Fur'
+                    'Scale','Leather','Fur'
                 ];
         
         Object.seal(this);
@@ -26,7 +26,7 @@ class GenBitmapModelClass extends GenBitmapClass
         // scales
         //
 
-    generateSkinScale(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateScale(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var x,y,dx,dy;
         var xCount;
@@ -74,10 +74,10 @@ class GenBitmapModelClass extends GenBitmapClass
     }
     
         //
-        // leather skin
+        // leather
         //
         
-    generateSkinLeather(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y,y2,lineCount;
         var darken,lineColor,markCount;
@@ -135,7 +135,7 @@ class GenBitmapModelClass extends GenBitmapClass
         // fur
         //
         
-    generateSkinFur(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateFur(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y;
         var darken,boost,lineColor;
@@ -225,18 +225,18 @@ class GenBitmapModelClass extends GenBitmapClass
 
         switch (generateType) {
 
-            case this.TYPE_SKIN_SCALE:
-                this.generateSkinScale(bitmapCTX,normalCTX,specularCTX,wid,high);
+            case this.TYPE_SCALE:
+                this.generateScale(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=8.0;
                 break;
                 
-            case this.TYPE_SKIN_LEATHER:
-                this.generateSkinLeather(bitmapCTX,normalCTX,specularCTX,wid,high);
+            case this.TYPE_LEATHER:
+                this.generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=2.0;
                 break;
                 
-            case this.TYPE_SKIN_FUR:
-                this.generateSkinFur(bitmapCTX,normalCTX,specularCTX,wid,high);
+            case this.TYPE_FUR:
+                this.generateFur(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=1.0;
                 break;
                 

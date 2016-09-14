@@ -8,7 +8,8 @@ class MainClass
 {
     constructor()
     {
-        this.genBitmapModel=null;
+        this.genBitmapSkin=null;
+        this.genBitmapItem=null;
         this.genSound=null;
         
             // sound list for the game
@@ -63,7 +64,8 @@ class MainClass
 
             // dynamic creation classes
 
-        this.genBitmapModel=new GenBitmapModelClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapSkin=new GenBitmapSkinClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapItem=new GenBitmapItemClass(new GenRandomClass(config.SEED_TEXTURE));
         this.genSound=new GenSoundClass(soundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
 
             // next step
@@ -168,7 +170,7 @@ class MainClass
 
             // build a bitmap
             
-        var modelBitmap=this.genBitmapModel.generateRandom(false);
+        var modelBitmap=this.genBitmapSkin.generateRandom(false);
 
             // player is -1
             // else a monster
@@ -215,7 +217,7 @@ class MainClass
             // supergumba -- right now this is bad, it'll leak and get closed more than once,
             // deal with this when we have real weapon routines
         
-        var modelBitmap=this.genBitmapModel.generate(0,false);
+        var modelBitmap=this.genBitmapItem.generate(0,false);
 
             // weapon
 
