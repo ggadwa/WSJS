@@ -244,7 +244,7 @@ class GenBitmapFloorClass extends GenBitmapClass
         // metal bitmaps
         //
     
-    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
+    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y,offset;
         var dx,dy,sx,sy,ex,ey;
@@ -337,7 +337,7 @@ class GenBitmapFloorClass extends GenBitmapClass
                     ex=dx+(line[1][0]*lineWid);
                     ey=dy+(line[1][1]*lineHigh);
 
-                    this.drawBumpLine(bitmapCTX,normalCTX,sx,sy,ex,ey,metalCorrColor);
+                    this.drawBumpLine(bitmapCTX,normalCTX,sx,sy,ex,ey,9,metalCorrColor);
 
                     dx+=corrWid;
                 }
@@ -613,7 +613,7 @@ class GenBitmapFloorClass extends GenBitmapClass
                 break;
 
             case this.TYPE_METAL:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,false);
+                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
                 

@@ -24,27 +24,116 @@ class GenBitmapItemClass extends GenBitmapClass
         // metal
         //
 
-    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
+    generateMetalWires(bitmapCTX,normalCTX,wid,high,grid,color)
+    {
+        var n,k,x,y,split;
+        var lineCount=this.genRandom.randomInt(1,5);
+        
+        var lineWidth=Math.trunc(wid*0.05);
+        if (lineWidth<5) lineWidth=5;
+        
+        for (n=0;n!==lineCount;n++) {
+            
+            if (this.genRandom.randomPercentage(0.5)) {
+                x=this.genRandom.randomInt(lineWidth,(wid-(lineWidth*2)));
+                this.drawBumpLine(bitmapCTX,normalCTX,x,0,x,high,lineWidth,color);
+                
+                split=Math.trunc(wid/16);
+                x=Math.trunc(x/split);
+                for (k=0;k!==16;k++) {
+                    grid[(k*16)+x]=1;
+                }
+            }
+            else {
+                y=this.genRandom.randomInt(lineWidth,(high-(lineWidth*2)));
+                this.drawBumpLine(bitmapCTX,normalCTX,0,y,wid,y,lineWidth,color);
+                
+                split=Math.trunc(high/16);
+                y=Math.trunc(y/split);
+                for (k=0;k!==16;k++) {
+                    grid[(y*16)+k]=1;
+                }
+            }
+            
+        }
+    }
+    
+    generateMetalButtons(bitmapCTX,normalCTX,wid,high,grid)
+    {
+        var n,k,x,y,color;
+        var buttonWid=Math.trunc(wid/16);
+        var buttonHigh=Math.trunc(high/16);
+        var buttonCount=this.genRandom.randomInt(3,5);
+        
+        for (n=0;n!==buttonCount;n++) {
+            
+            for (k=0;k!==10;k++) {
+                x=this.genRandom.randomInt(0,15);
+                y=this.genRandom.randomInt(0,15);
+                
+                if (grid[(y*16)+x]!==0) continue;
+                grid[(y*16)+x]=1;
+                
+                color=this.getRandomColor();
+                
+                x*=buttonWid;
+                y*=buttonHigh;
+                this.draw3DRect(bitmapCTX,normalCTX,x,y,(x+buttonWid),(y+buttonHigh),2,color,false);
+                break;
+            }
+        }
+    }
+    
+    generateMetalScrews(bitmapCTX,normalCTX,wid,high,grid,color)
+    {
+        var n,k,x,y,color;
+        var screwWid=Math.trunc(wid/16);
+        var screwHigh=Math.trunc(high/16);
+        var screwCount=this.genRandom.randomInt(2,5);
+        
+        var screwColor=this.boostColor(color,0.05);
+        var borderColor=new wsColor(0,0,0);
+        var screwFlatInnerSize=Math.trunc(screwWid*0.4);
+        
+        for (n=0;n!==screwCount;n++) {
+            
+            for (k=0;k!==10;k++) {
+                x=this.genRandom.randomInt(0,15);
+                y=this.genRandom.randomInt(0,15);
+                
+                if (grid[(y*16)+x]!==0) continue;
+                grid[(y*16)+x]=1;
+                
+                color=this.getRandomColor();
+                
+                x*=screwWid;
+                y*=screwHigh;
+                this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwWid),(y+screwHigh),0.0,1.0,2,screwFlatInnerSize,screwColor,borderColor);
+                break;
+            }
+        }
+    }
+    
+    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y,offset;
         var dx,dy,sx,sy,ex,ey;
         var streakWid,streakColor,darken;
         var idx,line,lineStyle;
         var lines=[];
+        
+            // a grid to place items
+            
+        var grid=new Uint8Array(16*16);
 
             // some random values
 
         var metalColor=this.getRandomColor();
-        var borderColor=new wsColor(0.0,0.0,0.0);
+        var wireColor=this.getRandomColor();
 
         var edgeSize=this.genRandom.randomInt(4,8);
-        var innerEdgeSize=this.genRandom.randomInt(4,10)+edgeSize;
-        
-        var screwSize=this.genRandom.randomInt(10,20);
-        var screenFlatInnerSize=Math.trunc(screwSize*0.4);
         
         var streakCount=this.genRandom.randomInt(15,10);
-        var screwColor=this.boostColor(metalColor,0.05);
         
             // clear canvases
 
@@ -68,19 +157,12 @@ class GenBitmapItemClass extends GenBitmapClass
             }
         }
         
-            // possible screws
+            // wires and buttons
             
-        if (this.genRandom.randomPercentage(0.5)) {
-            offset=edgeSize+4;
-            
-            this.draw3DOval(bitmapCTX,normalCTX,offset,offset,(offset+screwSize),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,offset,((high-offset)-screwSize),(offset+screwSize),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),offset,(wid-offset),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),((high-offset)-screwSize),(wid-offset),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            
-            innerEdgeSize+=screwSize;
-        }
-        
+        this.generateMetalWires(bitmapCTX,normalCTX,wid,high,grid,wireColor);
+        this.generateMetalButtons(bitmapCTX,normalCTX,wid,high,grid);
+        this.generateMetalScrews(bitmapCTX,normalCTX,wid,high,grid,metalColor);
+
             // finish with the specular
 
         this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);

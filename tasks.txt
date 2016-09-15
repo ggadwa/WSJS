@@ -14,7 +14,6 @@ ToDos
 
 #### color should be it's own class
 #### need to have a floor/ceiling and wall color separate and passed through as defaultColor
-#### improve item generator (random screws, machine square lights, wires)
 
 #### possibly have color so map isn't all same color?
 

@@ -141,7 +141,7 @@ class GenBitmapWallClass extends GenBitmapClass
     {
         var n,k,rect,edgeSize;
         var drawStoneColor,drawEdgeColor,lineColor,darken,f;
-        var x,y,x2,y2,lineCount,stoneWid,stoneHigh;
+        var x,y,x2,y2,lineCount,lineVarient,stoneWid,stoneHigh;
 
             // some random values
 
@@ -193,9 +193,13 @@ class GenBitmapWallClass extends GenBitmapClass
                 x2=this.genRandom.randomInt((rect.lft+edgeSize),stoneWid);
                 y2=this.genRandom.randomInt((rect.top+edgeSize),stoneHigh);
                 
+                lineVarient=20;
+                if (lineVarient>stoneWid) lineVarient=stoneWid;
+                if (lineVarient>stoneHigh) lineVarient=stoneHigh;
+                
                 darken=0.9+(this.genRandom.random()*0.1);
                 lineColor=this.darkenColor(drawStoneColor,darken);
-                this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,20,lineColor,false);
+                this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVarient,lineColor,false);
             }
             
                 // redo the fill, but just do the edges so we

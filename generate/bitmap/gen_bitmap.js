@@ -1287,60 +1287,133 @@ class GenBitmapClass
         }
     }
     
-    drawBumpLine(bitmapCTX,normalCTX,x,y,x2,y2,color)
+    drawBumpLine(bitmapCTX,normalCTX,x,y,x2,y2,wid,color)
     {
         var n;
+        var halfWid=Math.trunc(wid*0.5);
+        var chunkOne=Math.trunc(wid*0.33);
+        var chunkTwo=Math.trunc(wid*0.66);
+        
+        var darkColor=this.darkenColor(color,0.9);
+        
         var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
-            // the bump line
+        if (!horizontal) {
+            x-=halfWid;
+            x2-=halfWid;
+        }
+        else {
+            y-=halfWid;
+            y2-=halfWid;
+        }
+        
+            // the fade up
             
-        bitmapCTX.strokeStyle=this.colorToRGBColor(color);
-
-        bitmapCTX.beginPath();
-        bitmapCTX.moveTo(x,y);
-        bitmapCTX.lineTo(x2,y2);
-        bitmapCTX.stroke();
-        
-        normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
-        
-        normalCTX.beginPath();
-        normalCTX.moveTo(x,y);
-        normalCTX.lineTo(x2,y2);
-        normalCTX.stroke();
-        
-            // fade of bump
+        bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
             
-        for (n=0;n!==4;n++) {
+        for (n=0;n!==chunkOne;n++) {
             if (horizontal) {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,y);
+                bitmapCTX.lineTo(x2,y2);
+                bitmapCTX.stroke();
+                
                 normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
                 normalCTX.beginPath();
-                normalCTX.moveTo(x,(y-n));
-                normalCTX.lineTo(x2,(y2-n));
+                normalCTX.moveTo(x,y);
+                normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
+                
+                y++;
+                y2++;
             }
             else {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,y);
+                bitmapCTX.lineTo(x2,y2);
+                bitmapCTX.stroke();
+
                 normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
                 normalCTX.beginPath();
-                normalCTX.moveTo((x-n),y);
-                normalCTX.lineTo((x2-n),y2);
+                normalCTX.moveTo(x,y);
+                normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
+                
+                x++;
+                x2++;
             }
         }
         
-        for (n=0;n!==4;n++) {
+            // the level chunk
+            
+        bitmapCTX.strokeStyle=this.colorToRGBColor(color);
+        normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        
+        for (n=chunkOne;n!==chunkTwo;n++) {
             if (horizontal) {
-                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,y);
+                bitmapCTX.lineTo(x2,y2);
+                bitmapCTX.stroke();
+                
                 normalCTX.beginPath();
-                normalCTX.moveTo(x,(y+n));
-                normalCTX.lineTo(x2,(y2+n));
+                normalCTX.moveTo(x,y);
+                normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
+                
+                y++;
+                y2++;
             }
             else {
-                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,y);
+                bitmapCTX.lineTo(x2,y2);
+                bitmapCTX.stroke();
+
                 normalCTX.beginPath();
-                normalCTX.moveTo((x+n),y);
-                normalCTX.lineTo((x2+n),y2);
+                normalCTX.moveTo(x,y);
+                normalCTX.lineTo(x2,y2);
                 normalCTX.stroke();
+                
+                x++;
+                x2++;
+            }
+        }
+            
+            // the fade down
+            
+        bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+            
+        for (n=chunkTwo;n!==wid;n++) {
+            if (horizontal) {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,y);
+                bitmapCTX.lineTo(x2,y2);
+                bitmapCTX.stroke();
+                
+                normalCTX.strokeStyle=this.normalToRGBColor((n===(wid-1))?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
+                normalCTX.beginPath();
+                normalCTX.moveTo(x,y);
+                normalCTX.lineTo(x2,y2);
+                normalCTX.stroke();
+                
+                y++;
+                y2++;
+            }
+            else {
+                bitmapCTX.beginPath();
+                bitmapCTX.moveTo(x,y);
+                bitmapCTX.lineTo(x2,y2);
+                bitmapCTX.stroke();
+
+                normalCTX.strokeStyle=this.normalToRGBColor((n===(wid-1))?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
+                normalCTX.beginPath();
+                normalCTX.moveTo(x,y);
+                normalCTX.lineTo(x2,y2);
+                normalCTX.stroke();
+                
+                x++;
+                x2++;
             }
         }
     }

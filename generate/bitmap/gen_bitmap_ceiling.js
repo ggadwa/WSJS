@@ -81,7 +81,7 @@ class GenBitmapCeilingClass extends GenBitmapClass
         // metal bitmaps
         //
     
-    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
+    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y,offset;
         var dx,dy,sx,sy,ex,ey;
@@ -265,7 +265,7 @@ class GenBitmapCeilingClass extends GenBitmapClass
                 break;
 
             case this.TYPE_METAL:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,false);
+                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
                 
