@@ -6,10 +6,8 @@
 
 class GenProjectileClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        this.genRandom=genRandom;
-        
         Object.seal(this);
     }
 
@@ -25,20 +23,20 @@ class GenProjectileClass
             // enemy settings
             
         if (!isPlayer) {
-            projectile.setSpeed(this.genRandom.randomInt(150,150));
+            projectile.setSpeed(genRandom.randomInt(150,150));
             
                 // possible lob or reflect
                 
-            if (this.genRandom.randomPercentage(0.5)) {
-                projectile.setLob(-this.genRandom.randomInt(150,150));
+            if (genRandom.randomPercentage(0.5)) {
+                projectile.setLob(-genRandom.randomInt(150,150));
                 projectile.setNoGravity(false);
             }
             
-            if (this.genRandom.randomPercentage(0.5)) {
+            if (genRandom.randomPercentage(0.5)) {
                 projectile.setReflect(true);
             }
             
-            if (this.genRandom.randomPercentage(0.5)) {
+            if (genRandom.randomPercentage(0.5)) {
                 projectile.setBounce(true,0.95);
             }
         }

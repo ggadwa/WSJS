@@ -15,15 +15,15 @@ class MainDebugClass
         this.soundWid=1200;
         this.soundHigh=250;
         
-        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapFloor=new GenBitmapFloorClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapCeiling=new GenBitmapCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapSkin=new GenBitmapSkinClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapItem=new GenBitmapItemClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapWall=new GenBitmapWallClass();
+        this.genBitmapFloor=new GenBitmapFloorClass();
+        this.genBitmapCeiling=new GenBitmapCeilingClass();
+        this.genBitmapMachine=new GenBitmapMachineClass();
+        this.genBitmapLiquid=new GenBitmapLiquidClass();
+        this.genBitmapSkin=new GenBitmapSkinClass();
+        this.genBitmapItem=new GenBitmapItemClass();
+        this.genBitmapSky=new GenBitmapSkyClass();
+        this.genBitmapParticle=new GenBitmapParticleClass();
         
         this.debugSoundList=null;
         this.genSound=null;
@@ -287,7 +287,7 @@ class MainDebugClass
             return;
         }
         
-        this.genSound=new GenSoundClass(this.debugSoundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
+        this.genSound=new GenSoundClass(this.debugSoundList.getAudioContext());
 
             // start the timed process
             

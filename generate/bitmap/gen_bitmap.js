@@ -6,10 +6,8 @@
 
 class GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        this.genRandom=genRandom;
-
             // some precalced normals
 
         this.NORMAL_CLEAR=new wsPoint(0.0,0.0,1.0);
@@ -54,6 +52,11 @@ class GenBitmapClass
                     [1.0,0.0,0.43],     // muave
                     [1.0,0.5,0.5],      // dull red
                 ];
+                
+            // we have a default primary color for every instance
+            // so things created with this have the same color scheme
+            
+        this.defaultPrimaryColorIdx=genRandom.randomInt(0,this.primaryColorList.length);
 
         // can't seal as this is a parent class
     }
@@ -69,11 +72,11 @@ class GenBitmapClass
         var halfBrick;
         var segments=[];
 
-        var xCount=BITMAP_STACKED_X_MIN_COUNT+Math.trunc(this.genRandom.random()*BITMAP_STACKED_X_EXTRA_COUNT);
+        var xCount=BITMAP_STACKED_X_MIN_COUNT+Math.trunc(genRandom.random()*BITMAP_STACKED_X_EXTRA_COUNT);
         var wid=Math.trunc(cvsWid/xCount);
         var halfWid=Math.trunc(wid/2);
 
-        var yCount=BITMAP_STACKED_Y_MIN_COUNT+Math.trunc(this.genRandom.random()*BITMAP_STACKED_Y_EXTRA_COUNT);
+        var yCount=BITMAP_STACKED_Y_MIN_COUNT+Math.trunc(genRandom.random()*BITMAP_STACKED_Y_EXTRA_COUNT);
         var high=Math.trunc(cvsHigh/yCount);
 
         top=0;
@@ -138,10 +141,10 @@ class GenBitmapClass
 
                 // random size
 
-            startWid=BITMAP_GRID_MIN_BLOCK_WIDTH+Math.trunc(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_WIDTH);
+            startWid=BITMAP_GRID_MIN_BLOCK_WIDTH+Math.trunc(genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_WIDTH);
             if ((x+startWid)>=BITMAP_GRID_DIVISION) startWid=BITMAP_GRID_DIVISION-x;
 
-            startHigh=BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.trunc(this.genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
+            startHigh=BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.trunc(genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
             if ((y+startHigh)>=BITMAP_GRID_DIVISION) startHigh=BITMAP_GRID_DIVISION-y;
 
                 // make sure we aren't leaving a little sliver
@@ -198,10 +201,18 @@ class GenBitmapClass
         // color routines
         //
 
+    getDefaultPrimaryColor()
+    {
+        var col=this.primaryColorList[this.defaultPrimaryColorIdx];
+        var darken=0.1-(genRandom.random()*0.2);
+        
+        return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+    }
+    
     getRandomColor()
     {
-        var col=this.primaryColorList[this.genRandom.randomIndex(this.primaryColorList.length)];
-        var darken=0.1-(this.genRandom.random()*0.2);
+        var col=this.primaryColorList[genRandom.randomIndex(this.primaryColorList.length)];
+        var darken=0.1-(genRandom.random()*0.2);
         
         return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
@@ -291,9 +302,9 @@ class GenBitmapClass
             count--;
 
             if (count<=0) {
-                count=1+Math.trunc(this.genRandom.random()*3);
+                count=1+Math.trunc(genRandom.random()*3);
 
-                f=1.0+((1.0-(this.genRandom.random()*2.0))*factor);
+                f=1.0+((1.0-(genRandom.random()*2.0))*factor);
 
                 r=baseColor.r*f;
                 if (r<0.0) r=0.0;
@@ -354,11 +365,11 @@ class GenBitmapClass
 
         for (n=0;n!==nPixel;n++) {
 
-            if (this.genRandom.randomPercentage(percentage)) {
+            if (genRandom.randomPercentage(percentage)) {
 
                     // the bitmap noise
 
-                fct=minDarken+(darkenDif*this.genRandom.random());
+                fct=minDarken+(darkenDif*genRandom.random());
 
                     // darken the pixel
 
@@ -406,11 +417,11 @@ class GenBitmapClass
 
         for (n=0;n!==nPixel;n++) {
 
-            if (this.genRandom.randomPercentage(percentage)) {
+            if (genRandom.randomPercentage(percentage)) {
 
                     // the random normal
 
-                normal=normals[this.genRandom.randomIndex(4)];
+                normal=normals[genRandom.randomIndex(4)];
 
                 normalData[idx]=Math.trunc(normal.x*255.0);
                 normalData[idx+1]=Math.trunc(normal.y*255.0);
@@ -733,7 +744,7 @@ class GenBitmapClass
         
             // round the corners
         
-        add=this.genRandom.randomInt(5,5);
+        add=genRandom.randomInt(5,5);
         x[0]+=add;
         y[0]+=add;
         add*=0.5;
@@ -742,7 +753,7 @@ class GenBitmapClass
         x[(sidePointCount*4)-1]+=add;
         y[(sidePointCount*4)-1]+=add;
         
-        add=this.genRandom.randomInt(5,5);
+        add=genRandom.randomInt(5,5);
         x[sidePointCount]-=add;
         y[sidePointCount]+=add;
         add*=0.5;
@@ -751,7 +762,7 @@ class GenBitmapClass
         x[sidePointCount+1]-=add;
         y[sidePointCount+1]+=add;
 
-        add=this.genRandom.randomInt(5,5);
+        add=genRandom.randomInt(5,5);
         x[sidePointCount*2]-=add;
         y[sidePointCount*2]-=add;
         add*=0.5;
@@ -760,7 +771,7 @@ class GenBitmapClass
         x[(sidePointCount*2)+1]-=add;
         y[(sidePointCount*2)+1]-=add;
 
-        add=this.genRandom.randomInt(5,5);
+        add=genRandom.randomInt(5,5);
         x[sidePointCount*3]+=add;
         y[sidePointCount*3]-=add;
         add*=0.5;
@@ -772,9 +783,9 @@ class GenBitmapClass
             // randomize it
 
         for (n=0;n!==totalPointCount;n++) {
-            add=this.genRandom.randomIndex(5);
+            add=genRandom.randomIndex(5);
             x[n]+=(x[n]<mx)?add:-add;
-            add=this.genRandom.randomIndex(5);
+            add=genRandom.randomIndex(5);
             y[n]+=(y[n]<my)?add:-add;
         }
 
@@ -1251,7 +1262,7 @@ class GenBitmapClass
     drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color,lightLine)
     {
         var n,sx,sy,ex,ey,r;
-        var segCount=this.genRandom.randomInt(2,5);
+        var segCount=genRandom.randomInt(2,5);
         var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
         var xAdd=Math.trunc((x2-x)/segCount);
@@ -1270,7 +1281,7 @@ class GenBitmapClass
                 ex=sx+xAdd;
                 ey=sy+yAdd;
 
-                r=10-this.genRandom.randomIndex(lineVariant);
+                r=10-genRandom.randomIndex(lineVariant);
 
                 if (horizontal) {
                     ey+=r;
@@ -1500,11 +1511,11 @@ class GenBitmapClass
 
                     // get a random pixel
 
-                rad=(Math.PI*2.0)*this.genRandom.random();
+                rad=(Math.PI*2.0)*genRandom.random();
                 fx=Math.sin(rad);
                 fy=Math.cos(rad);
 
-                fsz=this.genRandom.random();
+                fsz=genRandom.random();
                 px=mx+Math.trunc((fsz*ringWid)*fx);
                 py=my-Math.trunc((fsz*ringHigh)*fy);
 
@@ -1589,7 +1600,7 @@ class GenBitmapClass
             
             for (y=top;y!==bot;y++) {
                 
-                if (this.genRandom.randomInt(0,100)<density) {
+                if (genRandom.randomInt(0,100)<density) {
                     if ((lx>=0) && (lx<imgWid)) {
                         idx=((y*imgWid)+lx)*4;
                         bitmapData[idx]=Math.trunc(baseColor.r*255.0);
@@ -1598,7 +1609,7 @@ class GenBitmapClass
                     }
                 }
                 
-                if (this.genRandom.randomInt(0,100)<density) {
+                if (genRandom.randomInt(0,100)<density) {
                     if ((rx>=0) && (rx<imgWid)) {
                         idx=((y*imgWid)+rx)*4;
                         bitmapData[idx]=Math.trunc(baseColor.r*255.0);
@@ -1634,7 +1645,7 @@ class GenBitmapClass
             // random dirt reductions
         
         dirtWidReduce=0;
-        if (reduceStreak) dirtWidReduce=(this.genRandom.random()*0.1)*wid;
+        if (reduceStreak) dirtWidReduce=(genRandom.random()*0.1)*wid;
         
             // draw the dirt
             
@@ -1654,7 +1665,7 @@ class GenBitmapClass
             
             for (x=lx;x!==rx;x++) {
                 
-                if (this.genRandom.randomPercentage(lineDensity)) {
+                if (genRandom.randomPercentage(lineDensity)) {
                     idx=((y*wid)+x)*4;
                     bitmapData[idx]=Math.trunc((bitmapData[idx]+dirtColorAvg[0])*0.5);
                     bitmapData[idx+1]=Math.trunc((bitmapData[idx]+dirtColorAvg[1])*0.5);
@@ -1684,11 +1695,11 @@ class GenBitmapClass
             // additional streaks
             
         for (n=0;n!=additionalStreakCount;n++) {
-            sx=this.genRandom.randomInBetween(lft,rgt);
-            ex=this.genRandom.randomInBetween(sx,rgt);
+            sx=genRandom.randomInBetween(lft,rgt);
+            ex=genRandom.randomInBetween(sx,rgt);
             if (sx>=ex) continue;
             
-            ey=bot-this.genRandom.randomInt(0,Math.trunc((bot-top)*0.25));
+            ey=bot-genRandom.randomInt(0,Math.trunc((bot-top)*0.25));
             
             this.drawStreakDirtSingle(bitmapCTX,sx,top,ex,ey,reduceStreak,density,dirtColorAvg);
             

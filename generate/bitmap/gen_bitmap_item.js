@@ -6,9 +6,9 @@
 
 class GenBitmapItemClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {    
-        super(genRandom);
+        super();
         
         this.TYPE_METAL=0;
 
@@ -27,15 +27,15 @@ class GenBitmapItemClass extends GenBitmapClass
     generateMetalWires(bitmapCTX,normalCTX,wid,high,grid,color)
     {
         var n,k,x,y,split;
-        var lineCount=this.genRandom.randomInt(1,5);
+        var lineCount=genRandom.randomInt(1,5);
         
         var lineWidth=Math.trunc(wid*0.05);
         if (lineWidth<5) lineWidth=5;
         
         for (n=0;n!==lineCount;n++) {
             
-            if (this.genRandom.randomPercentage(0.5)) {
-                x=this.genRandom.randomInt(lineWidth,(wid-(lineWidth*2)));
+            if (genRandom.randomPercentage(0.5)) {
+                x=genRandom.randomInt(lineWidth,(wid-(lineWidth*2)));
                 this.drawBumpLine(bitmapCTX,normalCTX,x,0,x,high,lineWidth,color);
                 
                 split=Math.trunc(wid/16);
@@ -45,7 +45,7 @@ class GenBitmapItemClass extends GenBitmapClass
                 }
             }
             else {
-                y=this.genRandom.randomInt(lineWidth,(high-(lineWidth*2)));
+                y=genRandom.randomInt(lineWidth,(high-(lineWidth*2)));
                 this.drawBumpLine(bitmapCTX,normalCTX,0,y,wid,y,lineWidth,color);
                 
                 split=Math.trunc(high/16);
@@ -63,13 +63,13 @@ class GenBitmapItemClass extends GenBitmapClass
         var n,k,x,y,color;
         var buttonWid=Math.trunc(wid/16);
         var buttonHigh=Math.trunc(high/16);
-        var buttonCount=this.genRandom.randomInt(3,5);
+        var buttonCount=genRandom.randomInt(3,5);
         
         for (n=0;n!==buttonCount;n++) {
             
             for (k=0;k!==10;k++) {
-                x=this.genRandom.randomInt(0,15);
-                y=this.genRandom.randomInt(0,15);
+                x=genRandom.randomInt(0,15);
+                y=genRandom.randomInt(0,15);
                 
                 if (grid[(y*16)+x]!==0) continue;
                 grid[(y*16)+x]=1;
@@ -89,7 +89,7 @@ class GenBitmapItemClass extends GenBitmapClass
         var n,k,x,y,color;
         var screwWid=Math.trunc(wid/16);
         var screwHigh=Math.trunc(high/16);
-        var screwCount=this.genRandom.randomInt(2,5);
+        var screwCount=genRandom.randomInt(2,5);
         
         var screwColor=this.boostColor(color,0.05);
         var borderColor=new wsColor(0,0,0);
@@ -98,8 +98,8 @@ class GenBitmapItemClass extends GenBitmapClass
         for (n=0;n!==screwCount;n++) {
             
             for (k=0;k!==10;k++) {
-                x=this.genRandom.randomInt(0,15);
-                y=this.genRandom.randomInt(0,15);
+                x=genRandom.randomInt(0,15);
+                y=genRandom.randomInt(0,15);
                 
                 if (grid[(y*16)+x]!==0) continue;
                 grid[(y*16)+x]=1;
@@ -128,12 +128,12 @@ class GenBitmapItemClass extends GenBitmapClass
 
             // some random values
 
-        var metalColor=this.getRandomColor();
+        var metalColor=this.getDefaultPrimaryColor();
         var wireColor=this.getRandomColor();
 
-        var edgeSize=this.genRandom.randomInt(4,8);
+        var edgeSize=genRandom.randomInt(4,8);
         
-        var streakCount=this.genRandom.randomInt(15,10);
+        var streakCount=genRandom.randomInt(15,10);
         
             // clear canvases
 
@@ -145,12 +145,12 @@ class GenBitmapItemClass extends GenBitmapClass
         
             // possible streaks
         
-        if (this.genRandom.randomPercentage(0.5)) {
+        if (genRandom.randomPercentage(0.5)) {
             for (n=0;n!==streakCount;n++) {
-                streakWid=this.genRandom.randomInt(10,40);
-                x=this.genRandom.randomInBetween(streakWid,(wid-streakWid));
+                streakWid=genRandom.randomInt(10,40);
+                x=genRandom.randomInBetween(streakWid,(wid-streakWid));
 
-                darken=0.5+(this.genRandom.random()*0.5);
+                darken=0.5+(genRandom.random()*0.5);
                 streakColor=this.darkenColor(metalColor,darken);
 
                 this.drawStreakMetal(bitmapCTX,wid,high,x,0,high,streakWid,streakColor);
@@ -222,7 +222,7 @@ class GenBitmapItemClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

@@ -6,10 +6,8 @@
 
 class GenWeaponClass
 {
-    constructor(genProjectile,genRandom)
+    constructor(genProjectile)
     {
-        this.genRandom=genRandom;
-        
         Object.seal(this);
     }
     

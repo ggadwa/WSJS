@@ -6,9 +6,9 @@
 
 class GenBitmapMachineClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        super(genRandom);
+        super();
         
             // types
             
@@ -39,7 +39,7 @@ class GenBitmapMachineClass extends GenBitmapClass
         
             // panel looks
         
-        panelType=this.genRandom.randomIndex(4);
+        panelType=genRandom.randomIndex(4);
         if (panelType===0) return;          // 0 = none
         
             // shutter panels
@@ -60,7 +60,7 @@ class GenBitmapMachineClass extends GenBitmapClass
             yAdd=(bot-top)/nShutter;
             y=top+Math.trunc(yAdd/2);
             
-            shutterSize=this.genRandom.randomInt(5,Math.trunc(yAdd*0.2));
+            shutterSize=genRandom.randomInt(5,Math.trunc(yAdd*0.2));
 
             for (n=0;n!==nShutter;n++) {
                 this.drawSlope(bitmapCTX,normalCTX,lft,y,rgt,(y+shutterSize),shutterEdgeColor,false);
@@ -72,7 +72,7 @@ class GenBitmapMachineClass extends GenBitmapClass
         
             // circle or square lights
         
-        wid=this.genRandom.randomInt(30,25);
+        wid=genRandom.randomInt(30,25);
         
         xCount=Math.trunc((rgt-lft)/wid)-1;
         yCount=Math.trunc((bot-top)/wid)-1;
@@ -105,7 +105,7 @@ class GenBitmapMachineClass extends GenBitmapClass
     {
         var mx,my,sz,lft,top,rgt,bot;
         
-        var metalColor=this.getRandomColor();
+        var metalColor=this.getDefaultPrimaryColor();
         var metalInsideColor=this.boostColor(metalColor,0.1);
        
             // face plate
@@ -122,11 +122,11 @@ class GenBitmapMachineClass extends GenBitmapClass
             
             lft=mx;
             top=my;
-            sz=this.genRandom.randomInt(100,50);
+            sz=genRandom.randomInt(100,50);
             
                 // vertical stack
                 
-            if (this.genRandom.randomPercentage(0.5)) {
+            if (genRandom.randomPercentage(0.5)) {
                 rgt=lft+sz;
                 if (rgt>(wid-15)) rgt=wid-15;
                 bot=high-15;
@@ -212,7 +212,7 @@ class GenBitmapMachineClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

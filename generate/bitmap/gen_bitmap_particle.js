@@ -6,9 +6,9 @@
 
 class GenBitmapParticleClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {    
-        super(genRandom);
+        super();
         
         this.TYPE_OVAL=0;
 
@@ -57,7 +57,7 @@ class GenBitmapParticleClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

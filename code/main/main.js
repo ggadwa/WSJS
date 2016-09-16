@@ -64,9 +64,9 @@ class MainClass
 
             // dynamic creation classes
 
-        this.genBitmapSkin=new GenBitmapSkinClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapItem=new GenBitmapItemClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genSound=new GenSoundClass(soundList.getAudioContext(),new GenRandomClass(config.SEED_SOUND));
+        this.genBitmapSkin=new GenBitmapSkinClass();
+        this.genBitmapItem=new GenBitmapItemClass();
+        this.genSound=new GenSoundClass(soundList.getAudioContext());
 
             // next step
 
@@ -110,7 +110,7 @@ class MainClass
 
     initBuildMap()
     {
-        var genMap=new GenMapClass(new GenRandomClass(config.SEED_MAP),this.initBuildMapFinish.bind(this));
+        var genMap=new GenMapClass(this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 
@@ -154,16 +154,14 @@ class MainClass
 
     initBuildLightmapFinish()
     {
-        var modelGenRandom=new GenRandomClass(config.SEED_MODEL);
-
         view.loadingScreenUpdate();
         view.loadingScreenAddString('Generating Dynamic Models');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildModelsMesh.bind(this,-1,modelGenRandom),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildModelsMesh.bind(this,-1),PROCESS_TIMEOUT_MSEC);
     }
 
-    initBuildModelsMesh(idx,modelGenRandom)
+    initBuildModelsMesh(idx)
     {
         var model,genSkeleton,genModelMesh;
         var monsterType;
@@ -186,10 +184,10 @@ class MainClass
 
             // build the skeleton and mesh
 
-        genSkeleton=new GenModelOrganicSkeletonClass(model,modelGenRandom);
+        genSkeleton=new GenModelOrganicSkeletonClass(model);
         genSkeleton.build();
 
-        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap,modelGenRandom);
+        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
         genModelMesh.build();
 
         modelList.addModel(model);
@@ -199,7 +197,7 @@ class MainClass
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
             view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
-            setTimeout(this.initBuildModelsMesh.bind(this,idx,modelGenRandom),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.initBuildModelsMesh.bind(this,idx),PROCESS_TIMEOUT_MSEC);
             return;
         }
 
@@ -209,10 +207,10 @@ class MainClass
         view.loadingScreenAddString('Generating Dynamic Weapons');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildWeapons.bind(this,modelGenRandom),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildWeapons.bind(this),PROCESS_TIMEOUT_MSEC);
     }
 
-    initBuildWeapons(modelGenRandom)
+    initBuildWeapons()
     {
             // supergumba -- right now this is bad, it'll leak and get closed more than once,
             // deal with this when we have real weapon routines
@@ -223,7 +221,7 @@ class MainClass
 
         var model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
 
-        var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap,modelGenRandom);
+        var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap);
         genModelWeaponMesh.build();
 
         modelList.addModel(model);
@@ -232,7 +230,7 @@ class MainClass
 
         var model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
 
-        var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap,modelGenRandom);
+        var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap);
         genModelProjectileMesh.build();
 
         modelList.addModel(model);
@@ -251,14 +249,13 @@ class MainClass
         var n,monsterType;
         var model,pos,proj;
 
-        var entityGenRandom=new GenRandomClass(config.SEED_ENTITY);
-        var genProjectile=new GenProjectileClass(new GenRandomClass(config.SEED_PROJECTILE));
-        var genWeapon=new GenWeaponClass(new GenRandomClass(config.SEED_WEAPON));
-        var genAI=new GenAIClass(genProjectile,new GenRandomClass(config.SEED_PROJECTILE));
+        var genProjectile=new GenProjectileClass();
+        var genWeapon=new GenWeaponClass();
+        var genAI=new GenAIClass(genProjectile);
 
             // make player entity
 
-        pos=map.findRandomEntityPosition(entityGenRandom);
+        pos=map.findRandomEntityPosition();
         if (pos===null) {
             alert('Couldn\'t find a place to spawn player!');
             return;
@@ -286,13 +283,13 @@ class MainClass
             // it's own model
 
         for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
-            pos=map.findRandomEntityPosition(entityGenRandom);
+            pos=map.findRandomEntityPosition();
             if (pos===null) continue;
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
             //monsterType=MODEL_TYPE_ANIMAL;      // testing
             model=modelList.cloneModel('monster_'+monsterType);
-            entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new wsPoint(0.0,(entityGenRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
 
             // finished

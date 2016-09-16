@@ -200,7 +200,7 @@ class MapRoomClass
         // find points in blocked grid space
         //
     
-    findRandomEntityPosition(genRandom)
+    findRandomEntityPosition()
     {
         var x,z,startX,startZ,bx,bz;
         
@@ -246,7 +246,7 @@ class MapRoomClass
         return(null);
     }
     
-    findRandomDecorationLocation(genRandom,checkPlatform)
+    findRandomDecorationLocation(checkPlatform)
     {
         var x,z,startX,startZ,bx,bz,gridSpot;
         
@@ -289,7 +289,7 @@ class MapRoomClass
         return(null);
     }
     
-    nextDecorationLocation(genRandom,checkPlatform,curPnt)
+    nextDecorationLocation(checkPlatform,curPnt)
     {
         var x,z,bx,bz;
         var gridSpot;

@@ -9,6 +9,13 @@ class ConfigClass
     constructor()
     {
             //
+            // random seed for generation
+            // guarenteed to make exact same game with same seed
+            //
+
+        this.SEED=Date.now();
+        
+            //
             // room generation
             //
 
@@ -117,21 +124,6 @@ class ConfigClass
         this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=0.5;
 
         this.MONSTER_AI_ON=false;
-
-            //
-            // random seeds,
-            // hard set these to generate the same map pieces every time
-            //
-
-        var seed=Date.now();
-
-        this.SEED_TEXTURE=Math.trunc((Math.random()*seed));
-        this.SEED_MAP=Math.trunc((Math.random()*seed));
-        this.SEED_MODEL=Math.trunc((Math.random()*seed));
-        this.SEED_ENTITY=Math.trunc((Math.random()*seed));
-        this.SEED_WEAPON=Math.trunc((Math.random()*seed));
-        this.SEED_PROJECTILE=Math.trunc((Math.random()*seed));
-        this.SEED_SOUND=Math.trunc((Math.random()*seed));
         
             //
             // controls

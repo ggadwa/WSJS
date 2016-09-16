@@ -6,9 +6,9 @@
 
 class GenBitmapSkinClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {    
-        super(genRandom);
+        super();
         
         this.TYPE_SCALE=0;
         this.TYPE_LEATHER=1;
@@ -31,7 +31,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         var x,y,dx,dy;
         var xCount;
 
-        var scaleCount=this.genRandom.randomInt(5,10);
+        var scaleCount=genRandom.randomInt(5,10);
         var skinColor=this.getRandomColor();
         var borderColor=this.darkenColor(skinColor,0.8);
 
@@ -94,14 +94,14 @@ class GenBitmapSkinClass extends GenBitmapClass
  
             // lines
             
-        lineCount=this.genRandom.randomInt(30,30);
+        lineCount=genRandom.randomInt(30,30);
             
         for (n=0;n!==lineCount;n++) {
-            x=this.genRandom.randomInt(0,wid);
-            y=this.genRandom.randomInt(0,high);
-            y2=this.genRandom.randomInt(0,high);
+            x=genRandom.randomInt(0,wid);
+            y=genRandom.randomInt(0,high);
+            y2=genRandom.randomInt(0,high);
             
-            darken=0.6+(this.genRandom.random()*0.25);
+            darken=0.6+(genRandom.random()*0.25);
             lineColor=this.darkenColor(clothColor,darken);
             
             this.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor,false);
@@ -109,15 +109,15 @@ class GenBitmapSkinClass extends GenBitmapClass
 
             // marks
             
-        markCount=this.genRandom.randomInt(20,20);
+        markCount=genRandom.randomInt(20,20);
 
         for (n=0;n!==markCount;n++) {
-            particleWid=this.genRandom.randomInt(30,60);
-            particleHigh=this.genRandom.randomInt(30,60);
-            particleDensity=this.genRandom.randomInt(50,150);
+            particleWid=genRandom.randomInt(30,60);
+            particleHigh=genRandom.randomInt(30,60);
+            particleDensity=genRandom.randomInt(50,150);
 
-            x=this.genRandom.randomInt(0,wid);
-            y=this.genRandom.randomInt(0,high);
+            x=genRandom.randomInt(0,wid);
+            y=genRandom.randomInt(0,high);
 
             this.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
         }
@@ -155,22 +155,22 @@ class GenBitmapSkinClass extends GenBitmapClass
                 // hair color
                 
             if ((n%2)===0) {
-                darken=0.5+(this.genRandom.random()*0.3);
+                darken=0.5+(genRandom.random()*0.3);
                 lineColor=this.darkenColor(furColor,darken);
             }
             else {
-                boost=0.1+(this.genRandom.random()*0.3);
+                boost=0.1+(genRandom.random()*0.3);
                 lineColor=this.boostColor(furColor,boost);
             }
             
                 // hair half from top
                 
-            y=halfHigh+this.genRandom.randomInt(0,halfHigh);
+            y=halfHigh+genRandom.randomInt(0,halfHigh);
             this.drawRandomLine(bitmapCTX,normalCTX,x,-5,x,(y+5),10,lineColor,false);
             
                 // hair half from bottom
                 
-            y=high-(halfHigh+this.genRandom.randomInt(0,halfHigh));
+            y=high-(halfHigh+genRandom.randomInt(0,halfHigh));
             this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(high+5),10,lineColor,false);
         }
 
@@ -255,7 +255,7 @@ class GenBitmapSkinClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

@@ -32,11 +32,11 @@ class MapClass
         this.TEXTURE_TYPE_MACHINE=8;
         this.TEXTURE_TYPE_LIQUID=9;
         
-        this.genBitmapWall=new GenBitmapWallClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapFloor=new GenBitmapFloorClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapCeiling=new GenBitmapCeilingClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapMachine=new GenBitmapMachineClass(new GenRandomClass(config.SEED_TEXTURE));
-        this.genBitmapLiquid=new GenBitmapLiquidClass(new GenRandomClass(config.SEED_TEXTURE));
+        this.genBitmapWall=new GenBitmapWallClass();
+        this.genBitmapFloor=new GenBitmapFloorClass();
+        this.genBitmapCeiling=new GenBitmapCeilingClass();
+        this.genBitmapMachine=new GenBitmapMachineClass();
+        this.genBitmapLiquid=new GenBitmapLiquidClass();
         
         this.textureBitmapList=[];
         for (n=0;n!=this.TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
@@ -491,7 +491,7 @@ class MapClass
         // find positions in map
         //
         
-    findRandomEntityPosition(genRandom)
+    findRandomEntityPosition()
     {
         var roomIdx;
         var pos;
@@ -505,7 +505,7 @@ class MapClass
         
                 // find a random spot
                 
-            pos=this.rooms[roomIdx].findRandomEntityPosition(genRandom);
+            pos=this.rooms[roomIdx].findRandomEntityPosition();
             if (pos!==null) return(pos);
             
             findTry++;

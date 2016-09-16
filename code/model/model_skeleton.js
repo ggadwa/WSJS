@@ -67,7 +67,7 @@ class ModelLimbClass
         Object.seal(this);
     }
     
-    getRandomBoneIndex(genRandom)
+    getRandomBoneIndex()
     {
         return(this.boneIndexes[genRandom.randomIndex(this.boneIndexes.length)]);
     }
@@ -364,7 +364,7 @@ class ModelSkeletonClass
         var r,backLeg;
 
         r=0.0;
-        if (walking) r=view.genRandom.randomInBetween(20.0,40.0);
+        if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
         backLeg=(limb.limbType===LIMB_TYPE_LEG_LEFT);
         if (this.lastAnimationFlip) backLeg=!backLeg;
@@ -386,7 +386,7 @@ class ModelSkeletonClass
         var r,m0,m1,m2;
 
         r=0.0;
-        if (walking) r=view.genRandom.randomInBetween(10.0,20.0);
+        if (walking) r=genRandom.randomInBetween(10.0,20.0);
         
         if (limb.limbType===LIMB_TYPE_LEG_BACK) {
             if (this.lastAnimationFlip) r*=0.2;
@@ -411,7 +411,7 @@ class ModelSkeletonClass
         var r,z,backArm;
 
         r=0.0;
-        if (walking) r=view.genRandom.randomInBetween(20.0,40.0);
+        if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
         z=-armAngle;
         if (limb.limbType===LIMB_TYPE_ARM_LEFT) z=-z;
@@ -427,7 +427,7 @@ class ModelSkeletonClass
         var n,x;
         var nBone=limb.boneIndexes.length;
 
-        x=view.genRandom.randomInBetween(startAng,extraAng);
+        x=genRandom.randomInBetween(startAng,extraAng);
         if (this.lastAnimationFlip) x=-x;
         
         x-=hunchAngle;
@@ -447,12 +447,12 @@ class ModelSkeletonClass
         var nBone=limb.boneIndexes.length;
 
         if (this.lastAnimationFlip) {
-            x=view.genRandom.randomInBetween(5,10);
-            z=view.genRandom.randomInBetween(5,10);
+            x=genRandom.randomInBetween(5,10);
+            z=genRandom.randomInBetween(5,10);
         }
         else {
-            x=-view.genRandom.randomInBetween(15,45);
-            z=-view.genRandom.randomInBetween(15,45);
+            x=-genRandom.randomInBetween(15,45);
+            z=-genRandom.randomInBetween(15,45);
         }
             
         for (n=0;n!==nBone;n++) {
@@ -467,7 +467,7 @@ class ModelSkeletonClass
         var n,y;
         var nBone=limb.boneIndexes.length;
 
-        y=view.genRandom.randomInBetween(5,10);
+        y=genRandom.randomInBetween(5,10);
         if (this.lastAnimationFlip) y=-y;
             
         for (n=0;n!==nBone;n++) {
@@ -481,7 +481,7 @@ class ModelSkeletonClass
         var n,x;
         var nBone=limb.boneIndexes.length;
 
-        x=-view.genRandom.randomInBetween(25,40);
+        x=-genRandom.randomInBetween(25,40);
         if (this.lastAnimationFlip) x=-10;
             
         for (n=0;n!==nBone;n++) {

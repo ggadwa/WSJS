@@ -43,7 +43,7 @@ class ParticleListClass
         
             // construct a particle bitmap
             
-        genBitmapParticle=new GenBitmapParticleClass(new GenRandomClass(config.SEED_BITMAP_PARTICLE));  
+        genBitmapParticle=new GenBitmapParticleClass();  
         this.particleBitmap=genBitmapParticle.generate(genBitmapParticle.TYPE_OVAL,false);
        
         return(true);

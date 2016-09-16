@@ -168,7 +168,7 @@ class ParticleClass
             pnt=this.points[n];
             
             pnt.setFromValues(0.0,0.0,1.0);
-            this.randomRot.setFromValues((view.genRandom.random()*360.0),(view.genRandom.random()*360.0),(view.genRandom.random()*360.0));
+            this.randomRot.setFromValues((genRandom.random()*360.0),(genRandom.random()*360.0),(genRandom.random()*360.0));
             pnt.rotate(this.randomRot);
         }
         

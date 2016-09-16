@@ -12,13 +12,8 @@ When interface created
 ToDos
 
 
-#### color should be it's own class
-#### need to have a floor/ceiling and wall color separate and passed through as defaultColor
-
-#### possibly have color so map isn't all same color?
-
+#### item texture is pretty ugly
 #### genBitmapSkin/genBitmapItem in main.js delete later
-
 #### sound constants in soundgen
 #### remove soundlist also
 
@@ -39,9 +34,7 @@ ToDos
 #### collisions against slanted walls are bad
 #### weapon models
 #### get rid of weapon fire hard-coding
-
 #### monster speed/health random/projectile,no-projectile
-
 #### implement reflect for projectiles
 
 #### more decorations

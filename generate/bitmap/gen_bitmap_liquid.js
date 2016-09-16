@@ -6,9 +6,9 @@
 
 class GenBitmapLiquidClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        super(genRandom);
+        super();
         
         this.TYPE_WATER=0;
         
@@ -57,7 +57,7 @@ class GenBitmapLiquidClass extends GenBitmapClass
     generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         var n,x,y,ovalWid,ovalHigh,startColor,endColor;
-        var color=this.getRandomColor();
+        var color=this.getDefaultPrimaryColor();
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
@@ -71,11 +71,11 @@ class GenBitmapLiquidClass extends GenBitmapClass
         endColor=this.lightenColor(color,0.1);
             
         for (n=0;n!=20;n++) {
-            ovalWid=this.genRandom.randomInt(50,100);
-            ovalHigh=this.genRandom.randomInt(50,100);
+            ovalWid=genRandom.randomInt(50,100);
+            ovalHigh=genRandom.randomInt(50,100);
             
-            x=this.genRandom.randomInt(0,(wid-ovalWid));
-            y=this.genRandom.randomInt(0,(high-ovalHigh));
+            x=genRandom.randomInt(0,(wid-ovalWid));
+            y=genRandom.randomInt(0,(high-ovalHigh));
             
             this.drawOvalGradient(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),startColor,endColor);
         }
@@ -144,7 +144,7 @@ class GenBitmapLiquidClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

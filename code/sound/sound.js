@@ -37,7 +37,7 @@ class SoundClass
         var f=((this.maxDistance-dist)/this.maxDistance);
         
             // supergumba -- doing a simple inverse linear distance until
-            // spatialpanner is implemented
+            // panner starts working and/or is implemented correctly
             
         var source=this.ctx.createBufferSource();
         source.buffer=this.buffer;

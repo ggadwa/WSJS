@@ -6,9 +6,9 @@
 
 class GenBitmapFloorClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        super(genRandom);
+        super();
         
             // types
             
@@ -38,7 +38,7 @@ class GenBitmapFloorClass extends GenBitmapClass
         var lineColor,lineMargin;
         var tileWid,tileHigh;
         
-        if (!this.genRandom.randomPercentage(0.10)) return;
+        if (!genRandom.randomPercentage(0.10)) return;
 
         sx=lft+edgeMargin;
         ex=rgt-edgeMargin;
@@ -48,15 +48,15 @@ class GenBitmapFloorClass extends GenBitmapClass
         tileWid=rgt-lft;
         tileHigh=bot-top;
 
-        if (this.genRandom.randomPercentage(0.50)) {
+        if (genRandom.randomPercentage(0.50)) {
             lineMargin=Math.trunc(tileWid/5);
-            sx=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
-            ex=this.genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+            sx=genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+            ex=genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
         }
         else {
             lineMargin=Math.trunc(tileHigh/5);
-            sy=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
-            ey=this.genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+            sy=genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+            ey=genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
         }
 
         lineColor=this.darkenColor(tileColor,0.9);
@@ -71,7 +71,7 @@ class GenBitmapFloorClass extends GenBitmapClass
 
             // tile style
 
-        tileStyle=this.genRandom.randomIndex(3);
+        tileStyle=genRandom.randomIndex(3);
 
             // splits
 
@@ -97,8 +97,8 @@ class GenBitmapFloorClass extends GenBitmapClass
                     // sometimes a tile piece is a recursion to
                     // another tile set
 
-                if ((complex) && (this.genRandom.randomPercentage(0.25))) {
-                    tileStyle=this.genRandom.randomIndex(3);
+                if ((complex) && (genRandom.randomPercentage(0.25))) {
+                    tileStyle=genRandom.randomIndex(3);
                     this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,paddingSize,false);
                     continue;
                 }
@@ -132,7 +132,7 @@ class GenBitmapFloorClass extends GenBitmapClass
                     col=this.darkenColor(col,0.8);
                     padding=edgeSize+2;
                     
-                    switch (this.genRandom.randomIndex(3)) {
+                    switch (genRandom.randomIndex(3)) {
                         case 1:
                             this.drawOval(bitmapCTX,(dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),col,borderColor);
                             break;
@@ -154,28 +154,26 @@ class GenBitmapFloorClass extends GenBitmapClass
         var splitCount,tileStyle,groutColor;
         var tileColor=[];
         
-        var complex=this.genRandom.randomPercentage(0.5);
+        var complex=genRandom.randomPercentage(0.5);
         var small=false;
-        if (!complex) small=this.genRandom.randomPercentage(0.5);
+        if (!complex) small=genRandom.randomPercentage(0.5);
 
             // some random values
 
         if (!small) {
-            splitCount=this.genRandom.randomInt(2,2);
-            tileColor[0]=this.getRandomColor();
+            splitCount=genRandom.randomInt(2,2);
         }
         else {
-            splitCount=this.genRandom.randomInt(6,4);
-            tileColor[0]=this.getRandomColor();
-            
+            splitCount=genRandom.randomInt(6,4);
         }
         
-        tileStyle=this.genRandom.randomIndex(3);
+        tileStyle=genRandom.randomIndex(3);
+        tileColor[0]=this.getDefaultPrimaryColor();
         tileColor[1]=this.darkenColor(tileColor[0],0.85);
 
             // clear canvas
 
-        groutColor=this.getRandomColor();
+        groutColor=this.dullColor(tileColor[0],0.7);
         this.drawRect(bitmapCTX,0,0,wid,high,groutColor);
         
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
@@ -209,14 +207,14 @@ class GenBitmapFloorClass extends GenBitmapClass
 
             // colors
             
-        color=this.getRandomColor();
+        color=this.getDefaultPrimaryColor();
         edgeColor=this.darkenColor(color,0.8);
         
             // sizing
         
-        edgeSize=this.genRandom.randomInt(2,3);
-        xCount=2+(2*this.genRandom.randomInt(0,2));
-        yCount=2+(2*this.genRandom.randomInt(0,5));
+        edgeSize=genRandom.randomInt(2,3);
+        xCount=2+(2*genRandom.randomInt(0,2));
+        yCount=2+(2*genRandom.randomInt(0,5));
         
         xSize=Math.trunc(wid/xCount);
         ySize=Math.trunc(high/yCount);
@@ -254,16 +252,16 @@ class GenBitmapFloorClass extends GenBitmapClass
 
             // some random values
 
-        var metalColor=this.getRandomColor();
+        var metalColor=this.getDefaultPrimaryColor();
         var borderColor=new wsColor(0.0,0.0,0.0);
 
-        var edgeSize=this.genRandom.randomInt(4,8);
-        var innerEdgeSize=this.genRandom.randomInt(4,10)+edgeSize;
+        var edgeSize=genRandom.randomInt(4,8);
+        var innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
         
-        var screwSize=this.genRandom.randomInt(10,20);
+        var screwSize=genRandom.randomInt(10,20);
         var screenFlatInnerSize=Math.trunc(screwSize*0.4);
         
-        var streakCount=this.genRandom.randomInt(15,10);
+        var streakCount=genRandom.randomInt(15,10);
         var screwColor=this.boostColor(metalColor,0.05);
         
             // clear canvases
@@ -277,10 +275,10 @@ class GenBitmapFloorClass extends GenBitmapClass
             // streaks
             
         for (n=0;n!==streakCount;n++) {
-            streakWid=this.genRandom.randomInt(10,40);
-            x=edgeSize+this.genRandom.randomInBetween(streakWid,((wid-streakWid)-(edgeSize*2)));
+            streakWid=genRandom.randomInt(10,40);
+            x=edgeSize+genRandom.randomInBetween(streakWid,((wid-streakWid)-(edgeSize*2)));
 
-            darken=0.5+(this.genRandom.random()*0.5);
+            darken=0.5+(genRandom.random()*0.5);
             streakColor=this.darkenColor(metalColor,darken);
 
             this.drawStreakMetal(bitmapCTX,wid,high,x,edgeSize,(high-edgeSize),streakWid,streakColor);
@@ -288,7 +286,7 @@ class GenBitmapFloorClass extends GenBitmapClass
         
             // possible screws
             
-        if (this.genRandom.randomPercentage(0.5)) {
+        if (genRandom.randomPercentage(0.5)) {
             offset=edgeSize+4;
             
             this.draw3DOval(bitmapCTX,normalCTX,offset,offset,(offset+screwSize),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
@@ -301,10 +299,10 @@ class GenBitmapFloorClass extends GenBitmapClass
             
             // any corrugation
  
-        if ((this.genRandom.randomPercentage(0.5)) || (1===1)) {
+        if ((genRandom.randomPercentage(0.5)) || (1===1)) {
             var metalCorrColor=this.darkenColor(metalColor,0.6);
 
-            var corrCount=this.genRandom.randomInt(8,15);
+            var corrCount=genRandom.randomInt(8,15);
             var corrWid=Math.trunc((wid-(innerEdgeSize*2))/corrCount);
             var corrHigh=Math.trunc((high-(innerEdgeSize*2))/corrCount);
 
@@ -317,7 +315,7 @@ class GenBitmapFloorClass extends GenBitmapClass
             lines.push([[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]]]);      // waves
             lines.push([[[0.5,0.0],[0.5,1.0]],[[0.0,0.5],[1.0,0.5]],[[0.0,0.5],[1.0,0.5]],[[0.5,0.0],[0.5,1.0]]]);      // pluses
 
-            lineStyle=this.genRandom.randomIndex(lines.length);
+            lineStyle=genRandom.randomIndex(lines.length);
 
                 // corrugations
 
@@ -363,7 +361,7 @@ class GenBitmapFloorClass extends GenBitmapClass
 
             // some random values
 
-        concreteColor=this.getRandomColor();
+        concreteColor=this.getDefaultPrimaryColor();
         lineColor=this.darkenColor(concreteColor,0.95);
         line2Color=this.boostColor(concreteColor,0.05);
 
@@ -373,8 +371,8 @@ class GenBitmapFloorClass extends GenBitmapClass
         
             // random edging
             
-        if (this.genRandom.randomPercentage(0.5)) {
-            edgeSize=this.genRandom.randomInt(5,5);
+        if (genRandom.randomPercentage(0.5)) {
+            edgeSize=genRandom.randomInt(5,5);
             this.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,edgeSize,concreteColor,true);
         }
         else {
@@ -384,13 +382,13 @@ class GenBitmapFloorClass extends GenBitmapClass
         
             // the stress lines
         
-        nLine=this.genRandom.randomInt(100,100);
+        nLine=genRandom.randomInt(100,100);
         
         for (n=0;n!==nLine;n++) {
-            x=this.genRandom.randomInBetween((edgeSize+3),(wid-(edgeSize+3)));
+            x=genRandom.randomInBetween((edgeSize+3),(wid-(edgeSize+3)));
             
-            y=this.genRandom.randomInBetween((edgeSize+3),Math.trunc(high/2));
-            y2=y+this.genRandom.randomInt(20,Math.trunc((high/2)-(edgeSize+23)));
+            y=genRandom.randomInBetween((edgeSize+3),Math.trunc(high/2));
+            y2=y+genRandom.randomInt(20,Math.trunc((high/2)-(edgeSize+23)));
             
             if ((n%2)===0) {
                 y=high-y;
@@ -402,17 +400,17 @@ class GenBitmapFloorClass extends GenBitmapClass
         
             // marks
 
-        var markCount=this.genRandom.randomInt(5,20);
+        var markCount=genRandom.randomInt(5,20);
         
         for (n=0;n!==markCount;n++) {
-            particleWid=this.genRandom.randomInt(100,100);
-            particleHigh=this.genRandom.randomInt(100,100);
-            particleDensity=this.genRandom.randomInt(150,250);
-            particleRingCount=this.genRandom.randomInt(8,8);
-            particleDarken=0.95-(this.genRandom.random()*0.15);
+            particleWid=genRandom.randomInt(100,100);
+            particleHigh=genRandom.randomInt(100,100);
+            particleDensity=genRandom.randomInt(150,250);
+            particleRingCount=genRandom.randomInt(8,8);
+            particleDarken=0.95-(genRandom.random()*0.15);
 
-            x=this.genRandom.randomInt(edgeSize,wid);
-            y=this.genRandom.randomInt(edgeSize,high);
+            x=genRandom.randomInt(edgeSize,wid);
+            y=genRandom.randomInt(edgeSize,high);
 
             this.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),particleRingCount,particleDarken,particleDensity,false);
         }
@@ -445,11 +443,11 @@ class GenBitmapFloorClass extends GenBitmapClass
         
             // some random values
 
-        splitCount=this.genRandom.randomInt(5,5);
-        borderSize=this.genRandom.randomInt(2,5);
-        edgeSize=this.genRandom.randomInt(1,2);
+        splitCount=genRandom.randomInt(5,5);
+        borderSize=genRandom.randomInt(2,5);
+        edgeSize=genRandom.randomInt(1,2);
         
-        borderColor=this.getRandomColor();
+        borderColor=this.getDefaultPrimaryColor();
         mortarColor=this.dullColor(borderColor,0.7);
         
         mosaicColor=this.getRandomColor();
@@ -485,7 +483,7 @@ class GenBitmapFloorClass extends GenBitmapClass
                     col=borderColor;
                 }
                 else {
-                    col=(this.genRandom.randomPercentage(0.5))?mosaicColor:mosaic2Color;
+                    col=(genRandom.randomPercentage(0.5))?mosaicColor:mosaic2Color;
                 }
 
                 rgt=(lft+tileWid)-borderSize;
@@ -523,10 +521,10 @@ class GenBitmapFloorClass extends GenBitmapClass
         
             // some random values
 
-        var boardCount=this.genRandom.randomInt(4,8);
+        var boardCount=genRandom.randomInt(4,8);
         var boardSize=Math.trunc(wid/boardCount);
-        var edgeSize=this.genRandom.randomInt(3,3);
-        var woodColor=this.getRandomColor();
+        var edgeSize=genRandom.randomInt(3,3);
+        var woodColor=this.getDefaultPrimaryColor();
         var col;
 
             // clear canvases
@@ -541,7 +539,7 @@ class GenBitmapFloorClass extends GenBitmapClass
             rgt=lft+boardSize;
             if (n===(boardCount-1)) rgt=wid;
             
-            boardSplit=this.genRandom.randomInt(1,3);
+            boardSplit=genRandom.randomInt(1,3);
             boardHigh=Math.trunc(high/boardSplit);
             
             top=0;
@@ -550,7 +548,7 @@ class GenBitmapFloorClass extends GenBitmapClass
                 bot=top+boardHigh;
                 if (k===(boardSplit-1)) bot=high;
                 
-                woodFactor=0.8+(this.genRandom.random()*0.2);
+                woodFactor=0.8+(genRandom.random()*0.2);
                 col=this.darkenColor(woodColor,woodFactor);
 
                 this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
@@ -647,7 +645,7 @@ class GenBitmapFloorClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

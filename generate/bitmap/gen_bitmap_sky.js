@@ -6,9 +6,9 @@
 
 class GenBitmapSkyClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {    
-        super(genRandom);
+        super();
         
         this.TYPE_CLOUDS=0;
 
@@ -33,11 +33,11 @@ class GenBitmapSkyClass extends GenBitmapClass
         var quarterHigh=Math.trunc(high*0.25);
         
         for (n=0;n!==20;n++) {
-            xsz=this.genRandom.randomInt(quarterWid,quarterWid);
-            ysz=this.genRandom.randomInt(quarterHigh,quarterHigh);
+            xsz=genRandom.randomInt(quarterWid,quarterWid);
+            ysz=genRandom.randomInt(quarterHigh,quarterHigh);
             
-            x=this.genRandom.randomInt(lft,(wid-xsz));
-            y=this.genRandom.randomInt(top,(high-ysz));
+            x=genRandom.randomInt(lft,(wid-xsz));
+            y=genRandom.randomInt(top,(high-ysz));
             
             this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
         }
@@ -61,14 +61,14 @@ class GenBitmapSkyClass extends GenBitmapClass
             
         this.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.1,0.95,1.0));
         
-        nCloud=this.genRandom.randomInt(5,10);
+        nCloud=genRandom.randomInt(5,10);
         
         for (n=0;n!==nCloud;n++) {
-            xsz=this.genRandom.randomInt(cloudWid,cloudWid);
-            ysz=this.genRandom.randomInt(cloudHigh,cloudHigh);
+            xsz=genRandom.randomInt(cloudWid,cloudWid);
+            ysz=genRandom.randomInt(cloudHigh,cloudHigh);
             
-            x=this.genRandom.randomInt(0,(mx-xsz));
-            y=this.genRandom.randomInt(0,(my-ysz));
+            x=genRandom.randomInt(0,(mx-xsz));
+            y=genRandom.randomInt(0,(my-ysz));
             
             this.generateCloud(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor);
         }
@@ -126,7 +126,7 @@ class GenBitmapSkyClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

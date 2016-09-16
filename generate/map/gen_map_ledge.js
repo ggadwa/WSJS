@@ -6,10 +6,8 @@
 
 class GenRoomLedgeClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        this.genRandom=genRandom;
-        
         Object.seal(this);
     }
     
@@ -91,12 +89,12 @@ class GenRoomLedgeClass
         
             // does this room have a ledge?
             
-        if (!this.genRandom.randomPercentage(config.ROOM_LEDGE_PERCENTAGE)) return;
+        if (!genRandom.randomPercentage(config.ROOM_LEDGE_PERCENTAGE)) return;
         
             // ledge width and height
             
-        var wid=this.genRandom.randomInt(config.ROOM_LEDGE_MIN_WIDTH,config.ROOM_LEDGE_EXTRA_WIDTH);
-        var high=this.genRandom.randomInt(config.ROOM_LEDGE_MIN_HEIGHT,config.ROOM_LEDGE_EXTRA_HEIGHT);
+        var wid=genRandom.randomInt(config.ROOM_LEDGE_MIN_WIDTH,config.ROOM_LEDGE_EXTRA_WIDTH);
+        var high=genRandom.randomInt(config.ROOM_LEDGE_MIN_HEIGHT,config.ROOM_LEDGE_EXTRA_HEIGHT);
         
         var xMax=room.xBlockSize*config.ROOM_BLOCK_WIDTH;
         var zMax=room.zBlockSize*config.ROOM_BLOCK_WIDTH;
@@ -180,7 +178,7 @@ class GenRoomLedgeClass
             // corners
             // they can have different heights
             
-        high=this.genRandom.randomInt(config.ROOM_LEDGE_MIN_HEIGHT,config.ROOM_LEDGE_EXTRA_HEIGHT);
+        high=genRandom.randomInt(config.ROOM_LEDGE_MIN_HEIGHT,config.ROOM_LEDGE_EXTRA_HEIGHT);
             
         if (room.getEdgeGridValue(0,0)===0) {
             pts[0].setFromValues(0,0,0);

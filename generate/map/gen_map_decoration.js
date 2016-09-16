@@ -6,10 +6,8 @@
 
 class GenRoomDecorationClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        this.genRandom=genRandom;
-        
         Object.seal(this);
     }
     
@@ -37,15 +35,15 @@ class GenRoomDecorationClass
             // find the middle of the box spot
             // and box sizes
 
-        pos=room.findRandomDecorationLocation(this.genRandom,false);
+        pos=room.findRandomDecorationLocation(false);
         if (pos===null) return;
 
-        high=this.genRandom.randomInt(minWidth,extraWidth);
+        high=genRandom.randomInt(minWidth,extraWidth);
         wid=Math.trunc(high/2);
 
             // count of boxes, up to 4 levels
 
-        boxCount=this.genRandom.randomInt(1,4);
+        boxCount=genRandom.randomInt(1,4);
         boxY=room.yBound.max;
         rotWid=Math.trunc(wid*1.5);
 
@@ -66,7 +64,7 @@ class GenRoomDecorationClass
                 boxBoundY.setFromValues((boxY-high),boxY);
                 boxBoundZ.setFromValues((boxPos.z-wid),(boxPos.z+wid));
 
-                rotAngle.setFromValues(0.0,(this.genRandom.random()*360.0),0.0);
+                rotAngle.setFromValues(0.0,(genRandom.random()*360.0),0.0);
 
                 map.addMesh(MeshPrimitivesClass.createMeshCube(boxBitmap,boxBoundX,boxBoundY,boxBoundZ,rotAngle,true,true,true,true,true,true,(stackLevel!==0),false,MESH_FLAG_DECORATION));
 
@@ -103,10 +101,10 @@ class GenRoomDecorationClass
             
             // machine size setup
             
-        margin=this.genRandom.randomInt(0,Math.trunc(config.ROOM_BLOCK_WIDTH/8));
+        margin=genRandom.randomInt(0,Math.trunc(config.ROOM_BLOCK_WIDTH/8));
 
         wid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
-        high=this.genRandom.randomInt(config.ROOM_BLOCK_WIDTH,1000);
+        high=genRandom.randomInt(config.ROOM_BLOCK_WIDTH,1000);
 
         machineWid=wid-margin;
         
@@ -117,7 +115,7 @@ class GenRoomDecorationClass
             
             // the machine location
 
-        pos=room.findRandomDecorationLocation(this.genRandom,true);
+        pos=room.findRandomDecorationLocation(true);
         if (pos===null) return;
         
         machineBitmap=map.getTexture(map.TEXTURE_TYPE_MACHINE);
@@ -146,7 +144,7 @@ class GenRoomDecorationClass
         
             // the machine pipes
 
-        nPipe=this.genRandom.randomInt(1,5);
+        nPipe=genRandom.randomInt(1,5);
 
         centerPt=new wsPoint(0,0,0);
 
@@ -186,12 +184,12 @@ class GenRoomDecorationClass
         legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
         bitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
 
-        pos=room.findRandomDecorationLocation(this.genRandom,false);
+        pos=room.findRandomDecorationLocation(false);
         if (pos===null) return;
 
             // height and width
 
-        if (this.genRandom.randomPercentage(0.5)) {
+        if (genRandom.randomPercentage(0.5)) {
             xWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
             zWid=xWid-Math.trunc(0,Math.trunc(config.ROOM_BLOCK_WIDTH*0.2));
         }
@@ -199,10 +197,10 @@ class GenRoomDecorationClass
             zWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
             xWid=zWid-Math.trunc(0,Math.trunc(config.ROOM_BLOCK_WIDTH*0.2));
         }
-        high=this.genRandom.randomInt(Math.trunc(config.ROOM_BLOCK_WIDTH*0.25),1000);
+        high=genRandom.randomInt(Math.trunc(config.ROOM_BLOCK_WIDTH*0.25),1000);
 
         stackCount=1;
-        if (this.genRandom.randomPercentage(0.75)) stackCount=this.genRandom.randomInt(2,2);
+        if (genRandom.randomPercentage(0.75)) stackCount=genRandom.randomInt(2,2);
 
         boxY=room.yBound.max;
 
@@ -259,7 +257,7 @@ class GenRoomDecorationClass
             
             // the pipes location
 
-        pos=room.findRandomDecorationLocation(this.genRandom,true);
+        pos=room.findRandomDecorationLocation(true);
         if (pos===null) return;
         
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
@@ -267,8 +265,8 @@ class GenRoomDecorationClass
         
             // the pipe platforms
             
-        ty=room.yStoryBound.min+this.genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
-        by=room.yStoryBound.max-this.genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
+        ty=room.yStoryBound.min+genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
+        by=room.yStoryBound.max-genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
         
         wid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.5);
 
@@ -285,7 +283,7 @@ class GenRoomDecorationClass
         
             // create the pipes
             
-        nPipe=this.genRandom.randomInt(1,5);
+        nPipe=genRandom.randomInt(1,5);
 
         centerPt=new wsPoint(0,0,0);
 
@@ -314,14 +312,14 @@ class GenRoomDecorationClass
     {
         var n,pieceCount;
         
-        pieceCount=this.genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
+        pieceCount=genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
 
         for (n=0;n!==pieceCount;n++) {
             
                 // randomly pick a decoration
                 // 0 = nothing
 
-            switch (this.genRandom.randomIndex(5)) {
+            switch (genRandom.randomIndex(5)) {
                 case 1:
                     this.addBoxes(room);
                     break;

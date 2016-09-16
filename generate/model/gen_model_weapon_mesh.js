@@ -6,11 +6,10 @@
 
 class GenModelWeaponMeshClass
 {
-    constructor(model,bitmap,genRandom)
+    constructor(model,bitmap)
     {
         this.model=model;
         this.bitmap=bitmap;
-        this.genRandom=genRandom;
 
             //
             // counts for vertex/uvs/indexes

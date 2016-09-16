@@ -46,7 +46,7 @@ class SkyClass
         
             // create bitmaps
         
-        genBitmapSky=new GenBitmapSkyClass(new GenRandomClass(config.SEED_TEXTURE));
+        genBitmapSky=new GenBitmapSkyClass();
         this.bitmap=genBitmapSky.generateRandom(false);
         
         return(true);

@@ -22,11 +22,10 @@ class GenModelOrganicBoneClass
 
 class GenModelOrganicMeshClass
 {
-    constructor(model,bitmap,genRandom)
+    constructor(model,bitmap)
     {
         this.model=model;
         this.bitmap=bitmap;
-        this.genRandom=genRandom;
         
         Object.seal(this);
     }
@@ -657,7 +656,7 @@ class GenModelOrganicMeshClass
                 // and any similar vertex
             
             bone=bones[v.boneIdx];
-            f=0.9+(this.genRandom.random()*0.2);
+            f=0.9+(genRandom.random()*0.2);
             
             for (k=0;k!==nVertex;k++) {
                 if (prevMove[k]!==0) continue;

@@ -6,10 +6,9 @@
 
 class GenSoundClass
 {
-    constructor(ctx,genRandom)
+    constructor(ctx)
     {
         this.ctx=ctx;
-        this.genRandom=genRandom;
         
         Object.seal(this);
     }

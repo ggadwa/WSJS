@@ -215,7 +215,7 @@ class MeshPrimitivesClass
         // cylinders
         //
         
-    static createMeshCylinderSegmentList(genRandom,radius,extraRadius,segmentCount,segmentExtra)
+    static createMeshCylinderSegmentList(radius,extraRadius,segmentCount,segmentExtra)
     {
         var n;
         var segCount=genRandom.randomInt(segmentCount,segmentExtra);

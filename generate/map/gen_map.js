@@ -6,10 +6,8 @@
 
 class GenMapClass
 {
-    constructor(genRandom,callbackFunc)
+    constructor(callbackFunc)
     {
-        this.genRandom=genRandom;
-
         this.currentRoomCount=0;
 
             // the callback function when
@@ -184,7 +182,7 @@ class GenMapClass
             hasStories=true;
         }
         else {
-            hasStories=this.genRandom.randomPercentage(config.ROOM_UPPER_TALL_PERCENTAGE);
+            hasStories=genRandom.randomPercentage(config.ROOM_UPPER_TALL_PERCENTAGE);
         }
             
             // add this room to the tracking room list so
@@ -195,7 +193,7 @@ class GenMapClass
         
             // liquid flags and floor
         
-        room.liquid=(config.ROOM_LIQUIDS)&&(this.genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1)&&(!lastLiquid);
+        room.liquid=(config.ROOM_LIQUIDS)&&(genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1)&&(!lastLiquid);
         room.createMeshFloor(map.getTexture(map.TEXTURE_TYPE_FLOOR),yBound);
 
             // walls
@@ -218,7 +216,7 @@ class GenMapClass
         
             // the ceiling
         
-        room.openCeiling=(this.genRandom.randomPercentage(0.5))&&(room.level!==0);
+        room.openCeiling=(genRandom.randomPercentage(0.5))&&(room.level!==0);
         room.createMeshCeiling(map.getTexture(map.TEXTURE_TYPE_CEILING),yFloorBound);
         
         return(roomIdx);
@@ -226,7 +224,7 @@ class GenMapClass
 
     addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,flipDirection,level)
     {
-        var genRoomStairs=new GenRoomStairsClass(this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass();
         
             // flip the direction if going down
             
@@ -284,7 +282,7 @@ class GenMapClass
     {
             // build the door
             
-        var genRoomDoor=new GenRoomDoorClass(this.genRandom);
+        var genRoomDoor=new GenRoomDoorClass();
         
         if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
             genRoomDoor.createDoorX(xDoorBound,yDoorBound,zDoorBound);
@@ -302,7 +300,7 @@ class GenMapClass
     {
         var xStairBound,zStairBound;
         var yStairBound=new wsBound(room.yBound.max,(room.yBound.max+config.ROOM_BLOCK_WIDTH));
-        var genRoomStairs=new GenRoomStairsClass(this.genRandom);
+        var genRoomStairs=new GenRoomStairsClass();
         
             // if there's a door, sometimes we need stairs
             // on both sides of room, so we have a flipped version
@@ -365,18 +363,18 @@ class GenMapClass
         
             // the color
 
-        red=config.MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
+        red=config.MAP_LIGHT_RGB_MINIMUM+(genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
         if (config.MAP_LIGHT_ALWAYS_WHITE) {
             green=blue=red;
         }
         else {
-            green=config.MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
-            blue=config.MAP_LIGHT_RGB_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
+            green=config.MAP_LIGHT_RGB_MINIMUM+(genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
+            blue=config.MAP_LIGHT_RGB_MINIMUM+(genRandom.random()*config.MAP_LIGHT_RGB_MINIMUM_EXTRA);
         }
         
             // the exponent
             
-        var exponent=config.MAP_LIGHT_EXPONENT_MINIMUM+(this.genRandom.random()*config.MAP_LIGHT_EXPONENT_EXTRA);
+        var exponent=config.MAP_LIGHT_EXPONENT_MINIMUM+(genRandom.random()*config.MAP_LIGHT_EXPONENT_EXTRA);
 
             // add light to map
 
@@ -400,7 +398,7 @@ class GenMapClass
             
         intensity=Math.trunc((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
         
-        intensity*=(config.MAP_LIGHT_FACTOR+(this.genRandom.random()*config.MAP_LIGHT_FACTOR_EXTRA));
+        intensity*=(config.MAP_LIGHT_FACTOR+(genRandom.random()*config.MAP_LIGHT_FACTOR_EXTRA));
         if (room.hasStories) intensity*=config.MAP_LIGHT_TWO_STORY_BOOST;
         
             // create the light
@@ -438,7 +436,7 @@ class GenMapClass
         if (bound2.max<max) max=bound2.max;
         
         count=Math.trunc((max-min)/config.ROOM_BLOCK_WIDTH);
-        offset=this.genRandom.randomIndex(count)*config.ROOM_BLOCK_WIDTH;
+        offset=genRandom.randomIndex(count)*config.ROOM_BLOCK_WIDTH;
         if (bound1.min<bound2.min) offset+=(bound2.min-bound1.min);           // need to align offset with bounds1
         
         return(offset);
@@ -461,8 +459,8 @@ class GenMapClass
             // and make sure it stays under the max
             // blocks for room
         
-        xBlockSize=this.genRandom.randomInt(config.ROOM_MIN_BLOCK_PER_SIDE,config.ROOM_MAX_BLOCK_PER_SIDE);
-        zBlockSize=this.genRandom.randomInt(config.ROOM_MIN_BLOCK_PER_SIDE,config.ROOM_MAX_BLOCK_PER_SIDE);
+        xBlockSize=genRandom.randomInt(config.ROOM_MIN_BLOCK_PER_SIDE,config.ROOM_MAX_BLOCK_PER_SIDE);
+        zBlockSize=genRandom.randomInt(config.ROOM_MIN_BLOCK_PER_SIDE,config.ROOM_MAX_BLOCK_PER_SIDE);
         
         while ((xBlockSize*zBlockSize)>config.ROOM_MAX_BLOCK_COUNT) {
             if (xBlockSize>config.ROOM_MIN_BLOCK_PER_SIDE) xBlockSize--;
@@ -506,12 +504,12 @@ class GenMapClass
                     // we can start a new room half off the other
                     // side and up the last room's side size
 
-                connectSide=this.genRandom.randomIndex(4);
+                connectSide=genRandom.randomIndex(4);
                 if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
-                    connectOffset=this.genRandom.randomInt(-Math.trunc(zBlockSize*0.5),lastRoom.zBlockSize);
+                    connectOffset=genRandom.randomInt(-Math.trunc(zBlockSize*0.5),lastRoom.zBlockSize);
                 }
                 else {
-                    connectOffset=this.genRandom.randomInt(-Math.trunc(xBlockSize*0.5),lastRoom.xBlockSize);
+                    connectOffset=genRandom.randomInt(-Math.trunc(xBlockSize*0.5),lastRoom.xBlockSize);
                 }
                 connectOffset*=config.ROOM_BLOCK_WIDTH;
                 
@@ -726,7 +724,7 @@ class GenMapClass
                 
             if (noCurrentLevelChange) {
 
-                if (this.genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
+                if (genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
 
                         // change level, we only have
                         // two levels to keep map crossing
@@ -753,7 +751,7 @@ class GenMapClass
                 // if no level change, check for a door
                 
             if (nextConnectionMode===ROOM_CONNECT_MODE_NONE) {
-                if (this.genRandom.randomPercentage(config.ROOM_DOOR_PERCENTAGE)) nextConnectionMode=ROOM_CONNECT_MODE_DOOR;
+                if (genRandom.randomPercentage(config.ROOM_DOOR_PERCENTAGE)) nextConnectionMode=ROOM_CONNECT_MODE_DOOR;
             }
             
                 // recurse to next room
@@ -773,7 +771,7 @@ class GenMapClass
         
         if (!config.ROOM_CLOSETS) return;
         
-        closet=new GenRoomClosetClass(this.genRandom);
+        closet=new GenRoomClosetClass();
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
@@ -788,7 +786,7 @@ class GenMapClass
         
         if (!config.ROOM_PLATFORMS) return;
         
-        platform=new GenRoomPlatformClass(this.genRandom);
+        platform=new GenRoomPlatformClass();
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
@@ -803,7 +801,7 @@ class GenMapClass
         
         if (!config.ROOM_LEDGES) return;
         
-        ledge=new GenRoomLedgeClass(this.genRandom);
+        ledge=new GenRoomLedgeClass();
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
@@ -818,7 +816,7 @@ class GenMapClass
         
         if (!config.ROOM_PILLARS) return;
         
-        pillar=new GenRoomPillarClass(this.genRandom);
+        pillar=new GenRoomPillarClass();
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
@@ -833,7 +831,7 @@ class GenMapClass
         
         if (!config.ROOM_DECORATIONS) return;
         
-        decoration=new GenRoomDecorationClass(this.genRandom);
+        decoration=new GenRoomDecorationClass();
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];

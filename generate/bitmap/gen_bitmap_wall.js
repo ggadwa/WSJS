@@ -6,9 +6,9 @@
 
 class GenBitmapWallClass extends GenBitmapClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        super(genRandom);
+        super();
         
             // types
             
@@ -38,10 +38,10 @@ class GenBitmapWallClass extends GenBitmapClass
         var lft,rgt,top,bot;
         var sx,ex,streakWid,lineColor;
         
-        var edgeSize=this.genRandom.randomInt(3,7);
-        var paddingSize=this.genRandom.randomInt(2,10);
+        var edgeSize=genRandom.randomInt(3,7);
+        var paddingSize=genRandom.randomInt(2,10);
         
-        if (this.genRandom.randomPercentage(0.5)) {
+        if (genRandom.randomPercentage(0.5)) {
             segments=this.createStackedSegments(wid,high);
         }
         else {
@@ -50,7 +50,7 @@ class GenBitmapWallClass extends GenBitmapClass
 
             // some random values
 
-        var brickColor=this.getRandomColor();
+        var brickColor=this.getDefaultPrimaryColor();
         var groutColor=this.dullColor(brickColor,0.7);
         var edgeColor=this.darkenColor(brickColor,0.8);
         var dirtColor=this.darkenColor(brickColor,0.5);
@@ -71,7 +71,7 @@ class GenBitmapWallClass extends GenBitmapClass
                 
             f=1.0;
             if (!((rect.lft<0) || (rect.rgt>wid))) {        // don't darken bricks that fall off edges
-                f=0.6+(this.genRandom.random()*0.4);
+                f=0.6+(genRandom.random()*0.4);
             }
 
             drawBrickColor=this.darkenColor(brickColor,f);
@@ -103,9 +103,9 @@ class GenBitmapWallClass extends GenBitmapClass
                 // add cracks (after any blurs)
             
             if ((rgt-lft)>(bot-top)) {
-                if (this.genRandom.randomPercentage(0.10)) {
-                    sx=this.genRandom.randomInBetween((lft+20),(rgt-20));
-                    ex=this.genRandom.randomInBetween((lft+20),(rgt-20));
+                if (genRandom.randomPercentage(0.10)) {
+                    sx=genRandom.randomInBetween((lft+20),(rgt-20));
+                    ex=genRandom.randomInBetween((lft+20),(rgt-20));
 
                     lineColor=this.darkenColor(drawBrickColor,0.9);
                     this.drawRandomLine(bitmapCTX,normalCTX,sx,top,ex,bot,20,lineColor,false);
@@ -114,10 +114,10 @@ class GenBitmapWallClass extends GenBitmapClass
             
                 // any stains
             
-            if (this.genRandom.randomPercentage(0.50)) {
-                streakWid=this.genRandom.randomInBetween(Math.trunc((rgt-lft)*0.5),Math.trunc((rgt-lft)*0.8));
+            if (genRandom.randomPercentage(0.50)) {
+                streakWid=genRandom.randomInBetween(Math.trunc((rgt-lft)*0.5),Math.trunc((rgt-lft)*0.8));
                 if (streakWid>5) {
-                    sx=this.genRandom.randomInt(lft,((rgt-lft)-streakWid));
+                    sx=genRandom.randomInt(lft,((rgt-lft)-streakWid));
                     ex=sx+streakWid;
                     this.drawStreakDirt(bitmapCTX,sx,top,ex,bot,true,2,0.6,dirtColor);
                 }
@@ -145,11 +145,11 @@ class GenBitmapWallClass extends GenBitmapClass
 
             // some random values
 
-        var stoneColor=this.getRandomColor();
+        var stoneColor=this.getDefaultPrimaryColor();
         var groutColor=this.dullColor(stoneColor,0.7);
         var edgeColor=this.darkenColor(stoneColor,0.8);
         
-        var padding=this.genRandom.randomInt(3,10);
+        var padding=genRandom.randomInt(3,10);
 
         var segments=this.createRandomSegments(wid,high);
         var darkenFactor=0.5;
@@ -169,14 +169,14 @@ class GenBitmapWallClass extends GenBitmapClass
 
             f=1.0;
             if ((rect.lft>=0) && (rect.top>=0) && (rect.rgt<=wid) && (rect.bot<=high)) {        // don't darken stones that fall off edges
-                f=this.genRandom.random()+darkenFactor;
+                f=genRandom.random()+darkenFactor;
                 if (f>1.0) f=1.0;
             }
 
             drawStoneColor=this.darkenColor(stoneColor,f);
             drawEdgeColor=this.darkenColor(edgeColor,f);
 
-            edgeSize=this.genRandom.randomInt(5,12);     // new edge size as stones aren't the same
+            edgeSize=genRandom.randomInt(5,12);     // new edge size as stones aren't the same
 
             this.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
             this.blur(bitmapCTX,(rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4);
@@ -185,19 +185,19 @@ class GenBitmapWallClass extends GenBitmapClass
                 
             stoneWid=(rect.rgt-rect.lft)-((edgeSize*2)+padding);
             stoneHigh=(rect.bot-rect.top)-((edgeSize*2)+padding);
-            lineCount=this.genRandom.randomInt(5,10);
+            lineCount=genRandom.randomInt(5,10);
             
             for (k=0;k!==lineCount;k++) {
-                x=this.genRandom.randomInt((rect.lft+edgeSize),stoneWid);
-                y=this.genRandom.randomInt((rect.top+edgeSize),stoneHigh);
-                x2=this.genRandom.randomInt((rect.lft+edgeSize),stoneWid);
-                y2=this.genRandom.randomInt((rect.top+edgeSize),stoneHigh);
+                x=genRandom.randomInt((rect.lft+edgeSize),stoneWid);
+                y=genRandom.randomInt((rect.top+edgeSize),stoneHigh);
+                x2=genRandom.randomInt((rect.lft+edgeSize),stoneWid);
+                y2=genRandom.randomInt((rect.top+edgeSize),stoneHigh);
                 
                 lineVarient=20;
                 if (lineVarient>stoneWid) lineVarient=stoneWid;
                 if (lineVarient>stoneHigh) lineVarient=stoneHigh;
                 
-                darken=0.9+(this.genRandom.random()*0.1);
+                darken=0.9+(genRandom.random()*0.1);
                 lineColor=this.darkenColor(drawStoneColor,darken);
                 this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVarient,lineColor,false);
             }
@@ -227,7 +227,7 @@ class GenBitmapWallClass extends GenBitmapClass
         var top,bot,ySize,slopeHigh,concreteColor;
         var sx,ex,streakWid;
         
-        var concreteColor=this.getRandomColor();
+        var concreteColor=this.getDefaultPrimaryColor();
         var concreteColor2=this.darkenColor(concreteColor,0.8);
         var dirtColor=this.darkenColor(concreteColor,0.5);
         
@@ -235,7 +235,7 @@ class GenBitmapWallClass extends GenBitmapClass
         
             // block sizes
             
-        nBlock=2+(this.genRandom.randomInt(0,2)*2);
+        nBlock=2+(genRandom.randomInt(0,2)*2);
         ySize=high/nBlock;
         
             // the blocks
@@ -255,7 +255,7 @@ class GenBitmapWallClass extends GenBitmapClass
             
             slopeHigh=0;
             if (flip) {
-                slopeHigh=this.genRandom.randomInt(10,Math.trunc(ySize/6));
+                slopeHigh=genRandom.randomInt(10,Math.trunc(ySize/6));
                 this.drawSlope(bitmapCTX,normalCTX,0,top,wid,(top+slopeHigh),concreteColor,true);
                 this.drawSlope(bitmapCTX,normalCTX,0,(bot-slopeHigh),wid,bot,concreteColor,false);
             }
@@ -272,8 +272,8 @@ class GenBitmapWallClass extends GenBitmapClass
                 
             this.addNoiseRect(bitmapCTX,0,top,wid,bot,1.0,1.2,0.6);
             
-            streakWid=this.genRandom.randomInBetween(Math.trunc(wid/2),(wid-20));
-            sx=this.genRandom.randomInt(0,(wid-streakWid));
+            streakWid=genRandom.randomInBetween(Math.trunc(wid/2),(wid-20));
+            sx=genRandom.randomInt(0,(wid-streakWid));
             ex=sx+streakWid;
 
             this.drawStreakDirt(bitmapCTX,sx,top,ex,(top+slopeHigh),false,4,0.8,dirtColor);    
@@ -301,7 +301,7 @@ class GenBitmapWallClass extends GenBitmapClass
         var palteWid=rgt-lft;
         var plateHigh=bot-top;
         
-        var streakCount=this.genRandom.randomInt(15,10);
+        var streakCount=genRandom.randomInt(15,10);
         
             // the plate
             
@@ -310,10 +310,10 @@ class GenBitmapWallClass extends GenBitmapClass
             // streaks
             
         for (n=0;n!==streakCount;n++) {
-            streakWid=this.genRandom.randomInt(10,40);
-            x=edgeSize+this.genRandom.randomInBetween(streakWid,((palteWid-streakWid)-(edgeSize*2)));
+            streakWid=genRandom.randomInt(10,40);
+            x=edgeSize+genRandom.randomInBetween(streakWid,((palteWid-streakWid)-(edgeSize*2)));
 
-            darken=0.5+(this.genRandom.random()*0.5);
+            darken=0.5+(genRandom.random()*0.5);
             streakColor=this.darkenColor(metalColor,darken);
 
             this.drawStreakMetal(bitmapCTX,wid,high,(lft+x),(top+edgeSize),((top+plateHigh)-edgeSize),streakWid,streakColor);
@@ -324,7 +324,7 @@ class GenBitmapWallClass extends GenBitmapClass
     {
         var n,x,y,xAdd,yAdd,offset,wid,high,screwCount;
         
-        var screwSize=this.genRandom.randomInt(10,20);
+        var screwSize=genRandom.randomInt(10,20);
         var screenFlatInnerSize=Math.trunc(screwSize*0.4);
 
         var screwColor=this.darkenColor(metalColor,0.9);
@@ -336,12 +336,12 @@ class GenBitmapWallClass extends GenBitmapClass
         
             // in a line
             
-        if (this.genRandom.randomPercentage(0.5)) {
+        if (genRandom.randomPercentage(0.5)) {
             
             wid=rgt-lft;
             high=bot-top;
             
-            screwCount=this.genRandom.randomInt(2,4);
+            screwCount=genRandom.randomInt(2,4);
             
             if (wid>high) {
                 y=top+Math.trunc(((top+bot)*0.5)-(screwSize*0.5));
@@ -385,10 +385,10 @@ class GenBitmapWallClass extends GenBitmapClass
         var y,yAdd;
         
         var shutterEdgeColor=this.darkenColor(shutterColor,0.9);
-        var barEdgeSize=this.genRandom.randomInt(5,5);
+        var barEdgeSize=genRandom.randomInt(5,5);
         
-        var frameXSize=this.genRandom.randomInt(10,30);
-        var frameYSize=this.genRandom.randomInt(10,30);
+        var frameXSize=genRandom.randomInt(10,30);
+        var frameYSize=genRandom.randomInt(10,30);
         
             // outer and inner plate
             
@@ -408,12 +408,12 @@ class GenBitmapWallClass extends GenBitmapClass
         
             // the shutters
             
-        nShutter=this.genRandom.randomInt(4,10);
+        nShutter=genRandom.randomInt(4,10);
         
         yAdd=(bot-top)/nShutter;
         y=top;
         
-        shutterSize=this.genRandom.randomInt(10,Math.trunc(yAdd*0.25));
+        shutterSize=genRandom.randomInt(10,Math.trunc(yAdd*0.25));
         
         for (n=0;n!==nShutter;n++) {
             this.drawSlope(bitmapCTX,normalCTX,lft,y,rgt,(y+shutterSize),shutterEdgeColor,false);
@@ -427,11 +427,11 @@ class GenBitmapWallClass extends GenBitmapClass
 
             // some random values
 
-        var metalColor=this.getRandomColor();
+        var metalColor=this.getDefaultPrimaryColor();
         var darkMetalColor=this.darkenColor(metalColor,0.8);
         var shutterColor=this.getRandomColor();
 
-        var metalEdgeSize=this.genRandom.randomInt(4,4);
+        var metalEdgeSize=genRandom.randomInt(4,4);
         
             // clear canvases
 
@@ -453,11 +453,11 @@ class GenBitmapWallClass extends GenBitmapClass
             
             lft=mx;
             top=my;
-            sz=this.genRandom.randomInt(100,50);
+            sz=genRandom.randomInt(100,50);
             
                 // vertical stack
                 
-            if (this.genRandom.randomPercentage(0.5)) {
+            if (genRandom.randomPercentage(0.5)) {
                 rgt=lft+sz;
                 if (rgt>forceWid) rgt=wid;
                 bot=high;
@@ -477,11 +477,11 @@ class GenBitmapWallClass extends GenBitmapClass
             
                 // some are darkened
                 
-            col=(this.genRandom.randomPercentage(0.75))?metalColor:darkMetalColor;
+            col=(genRandom.randomPercentage(0.75))?metalColor:darkMetalColor;
             
                 // draw the segment
             
-            switch (this.genRandom.randomIndex(3)) {
+            switch (genRandom.randomIndex(3)) {
                 case 0:
                     this.generateMetalPiecePlate(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col);
                     break;
@@ -514,9 +514,9 @@ class GenBitmapWallClass extends GenBitmapClass
 
             // some random values
 
-        var lineColorBase=this.getRandomColor();
+        var lineColorBase=this.getDefaultPrimaryColor();
         var plasterColor=this.dullColor(lineColorBase,0.8);
-        var lineCount=this.genRandom.randomInt(40,30);
+        var lineCount=genRandom.randomInt(40,30);
 
             // clear canvases
 
@@ -526,18 +526,18 @@ class GenBitmapWallClass extends GenBitmapClass
             // lines
             
         for (n=0;n!==lineCount;n++) {
-            x=this.genRandom.randomInt(0,wid);
+            x=genRandom.randomInt(0,wid);
             
-            darken=0.85+(this.genRandom.random()*0.1);
+            darken=0.85+(genRandom.random()*0.1);
             lineColor=this.darkenColor(lineColorBase,darken);
             
             this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,30,lineColor,false);
         }
         
         for (n=0;n!==lineCount;n++) {
-            x=this.genRandom.randomInt(0,wid);
+            x=genRandom.randomInt(0,wid);
             
-            boost=0.05+(this.genRandom.random()*0.1);
+            boost=0.05+(genRandom.random()*0.1);
             lineColor=this.boostColor(lineColorBase,boost);
             
             this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,30,lineColor,false);
@@ -627,7 +627,7 @@ class GenBitmapWallClass extends GenBitmapClass
     
     generateRandom(inDebug)
     {
-        return(this.generate(this.genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
+        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

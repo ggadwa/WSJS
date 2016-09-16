@@ -100,7 +100,6 @@ class ViewClass
 
             // additional view classes
 
-        this.genRandom=null;
         this.text=null;
         this.interface=null;
         this.camera=null;
@@ -229,7 +228,6 @@ class ViewClass
         
             // create needed objects
             
-        this.genRandom=new GenRandomClass(Date.now());
         this.text=new TextClass();
         this.interface=new InterfaceClass();
         this.camera=new ViewCameraClass();

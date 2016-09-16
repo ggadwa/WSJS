@@ -6,10 +6,8 @@
 
 class GenRoomClosetClass
 {
-    constructor(genRandom)
+    constructor()
     {    
-        this.genRandom=genRandom;
-        
         Object.seal(this);
     }
     
@@ -133,7 +131,7 @@ class GenRoomClosetClass
         var connectSide,connectOffset,closetLen;
         var xClosetBound,yClosetBound,zClosetBound;
         
-        var closetCount=this.genRandom.randomIndex(config.ROOM_CLOSET_MAX_COUNT);
+        var closetCount=genRandom.randomIndex(config.ROOM_CLOSET_MAX_COUNT);
         if (closetCount===0) return;
         
             // create closests
@@ -143,26 +141,26 @@ class GenRoomClosetClass
                 // find a connection side, skip if
                 // there's a door on this side
                 
-            connectSide=this.genRandom.randomIndex(4);
+            connectSide=genRandom.randomIndex(4);
             
             if (room.isDoorOnConnectionSide(connectSide)) continue;
             
                 // get length and offset
             
             if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
-                closetLen=this.genRandom.randomInt(2,(room.zBlockSize-2));
-                connectOffset=this.genRandom.randomInt(0,(room.zBlockSize-closetLen));
+                closetLen=genRandom.randomInt(2,(room.zBlockSize-2));
+                connectOffset=genRandom.randomInt(0,(room.zBlockSize-closetLen));
             }
             else {
-                closetLen=this.genRandom.randomInt(2,(room.xBlockSize-2));
-                connectOffset=this.genRandom.randomInt(0,(room.xBlockSize-closetLen));
+                closetLen=genRandom.randomInt(2,(room.xBlockSize-2));
+                connectOffset=genRandom.randomInt(0,(room.xBlockSize-closetLen));
             }
             
                 // get the Y bound
 
             yClosetBound=room.yBound.copy();
             if (room.hasStories) {
-                if (this.genRandom.randomPercentage(config.ROOM_CLOSET_UP_PERCENTAGE)) yClosetBound.add(-(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH));
+                if (genRandom.randomPercentage(config.ROOM_CLOSET_UP_PERCENTAGE)) yClosetBound.add(-(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH));
             }
             
                 // get the box

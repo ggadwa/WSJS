@@ -6,10 +6,8 @@
 
 class GenRoomStairsClass
 {
-    constructor(genRandom)
+    constructor()
     {
-        this.genRandom=genRandom;
-        
         Object.seal(this);
     }
     

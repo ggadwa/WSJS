@@ -47,3 +47,5 @@ class GenRandomClass
     }
 
 }
+
+var genRandom=new GenRandomClass(config.SEED);
