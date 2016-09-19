@@ -255,7 +255,7 @@ class MainClass
 
             // make player entity
 
-        pos=map.findRandomEntityPosition();
+        pos=map.findRandomPlayerPosition();
         if (pos===null) {
             alert('Couldn\'t find a place to spawn player!');
             return;

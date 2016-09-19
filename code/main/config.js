@@ -19,8 +19,7 @@ class ConfigClass
             // room generation
             //
 
-        this.ROOM_MAX_RECURSION_DEPTH=3;               // how far we recurse building the map, room to room, determines the size of the map
-        this.ROOM_MAX_CONNECTION_COUNT=10;             // how many times we try to create a room that connects with this room
+        this.ROOM_PATH_COUNT=8;                        // how many rooms in the map path
 
         this.ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
         this.ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is

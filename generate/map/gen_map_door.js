@@ -103,7 +103,7 @@ class GenRoomDoorClass
         var x,xDoorBound,zDoorBound,zThickBound;
         
         var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
-        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
+        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
         
             // need a center point to better
             // create normals
@@ -183,7 +183,7 @@ class GenRoomDoorClass
         var z,xDoorBound,zDoorBound,xThickBound;
         
         var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
-        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
+        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
         
             // need a center point to better
             // create normals

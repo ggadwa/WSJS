@@ -18,6 +18,8 @@ class MainDebugClass
         this.genBitmapWall=new GenBitmapWallClass();
         this.genBitmapFloor=new GenBitmapFloorClass();
         this.genBitmapCeiling=new GenBitmapCeilingClass();
+        this.genBitmapDoor=new GenBitmapDoorClass();
+        this.genBitmapMetal=new GenBitmapMetalClass();
         this.genBitmapMachine=new GenBitmapMachineClass();
         this.genBitmapLiquid=new GenBitmapLiquidClass();
         this.genBitmapSkin=new GenBitmapSkinClass();
@@ -105,13 +107,39 @@ class MainDebugClass
 
         idx++;
         if (idx>=this.genBitmapCeiling.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapMachine.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapDoor.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
         setTimeout(this.addBitmapCeiling.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
+    addBitmapDoor(idx)
+    {
+        this.drawSingleBitmap('Door',this.genBitmapDoor.TYPE_NAMES[idx],this.genBitmapDoor.generate(idx,true));
+
+        idx++;
+        if (idx>=this.genBitmapDoor.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapMetal.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapDoor.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    addBitmapMetal(idx)
+    {
+        this.drawSingleBitmap('Metal',this.genBitmapMetal.TYPE_NAMES[idx],this.genBitmapMetal.generate(idx,true));
+
+        idx++;
+        if (idx>=this.genBitmapMetal.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapMachine.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapMetal.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+   
     addBitmapMachine(idx)
     {
         this.drawSingleBitmap('Machine',this.genBitmapMachine.TYPE_NAMES[idx],this.genBitmapMachine.generate(idx,true));

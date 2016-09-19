@@ -12,6 +12,8 @@ When interface created
 ToDos
 
 
+#### need to group the lights to better pick the lights in each room
+
 #### item texture is pretty ugly
 #### genBitmapSkin/genBitmapItem in main.js delete later
 #### sound constants in soundgen
@@ -24,12 +26,11 @@ ToDos
 #### machine -> equipment, have 2 to 4 parts (vertical) each part can be pipe or machine
 
 
---------------> do path based maps, always go up, than right?  Corridors that separate blobs?
-                    * make room
-                    * add up or right corridor
-                    * now add other rooms around it
-                    * map size by number of encounter rooms?
-
+--------------> generation
+  - door and liquid in map overlay
+  - remove ROOM_CONNECT_MODE_DOOR
+  - need long hallways with two doors (10% of time)
+  - make win button at last room
 
 #### collisions against slanted walls are bad
 #### weapon models

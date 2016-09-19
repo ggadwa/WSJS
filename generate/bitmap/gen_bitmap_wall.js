@@ -15,12 +15,12 @@ class GenBitmapWallClass extends GenBitmapClass
         this.TYPE_BRICK=0;
         this.TYPE_STONE=1;
         this.TYPE_BLOCK=2;
-        this.TYPE_METAL=3;
+        this.TYPE_SCIFI=3;
         this.TYPE_PLASTER=4;
 
         this.TYPE_NAMES=
                 [
-                    'Brick','Stone','Block','Metal',
+                    'Brick','Stone','Block','SciFi',
                     'Plaster'
                 ];
         
@@ -290,10 +290,10 @@ class GenBitmapWallClass extends GenBitmapClass
     }
     
         //
-        // metal bitmaps
+        // scifi bitmaps
         //
     
-    generateMetalPiecePlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor)
+    generateSciFiPiecePlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor)
     {
         var n,x,streakWid;
         var streakColor,darken;
@@ -320,7 +320,7 @@ class GenBitmapWallClass extends GenBitmapClass
         }
     }
     
-    generateMetalPieceScrews(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor)
+    generateSciFiPieceScrews(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor)
     {
         var n,x,y,xAdd,yAdd,offset,wid,high,screwCount;
         
@@ -379,7 +379,7 @@ class GenBitmapWallClass extends GenBitmapClass
         }
     }
     
-    generateMetalPieceShutter(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor,shutterColor)
+    generateSciFiPieceShutter(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor,shutterColor)
     {
         var n,nShutter,shutterSize;
         var y,yAdd;
@@ -392,7 +392,7 @@ class GenBitmapWallClass extends GenBitmapClass
         
             // outer and inner plate
             
-        this.generateMetalPiecePlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor,0,0,0);
+        this.generateSciFiPiecePlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor,0,0,0);
         
         lft+=frameXSize;
         top+=frameYSize;
@@ -421,7 +421,7 @@ class GenBitmapWallClass extends GenBitmapClass
         }
     }
     
-    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
+    generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
     {
         var x,mx,my,sz,lft,rgt,top,bot,col;
 
@@ -483,13 +483,13 @@ class GenBitmapWallClass extends GenBitmapClass
             
             switch (genRandom.randomIndex(3)) {
                 case 0:
-                    this.generateMetalPiecePlate(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col);
+                    this.generateSciFiPiecePlate(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col);
                     break;
                 case 1:
-                    this.generateMetalPieceScrews(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col);
+                    this.generateSciFiPieceScrews(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col);
                     break;
                 case 2:
-                    this.generateMetalPieceShutter(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col,shutterColor);
+                    this.generateSciFiPieceShutter(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col,shutterColor);
                     break;
             }
             
@@ -602,8 +602,8 @@ class GenBitmapWallClass extends GenBitmapClass
                 shineFactor=5.0;
                 break;
 
-            case this.TYPE_METAL:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high,false);
+            case this.TYPE_SCIFI:
+                this.generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high,false);
                 shineFactor=15.0;
                 break;
                 

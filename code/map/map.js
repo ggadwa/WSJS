@@ -29,12 +29,15 @@ class MapClass
         this.TEXTURE_TYPE_PLATFORM=5;
         this.TEXTURE_TYPE_PILLAR=6;
         this.TEXTURE_TYPE_METAL=7;
-        this.TEXTURE_TYPE_MACHINE=8;
-        this.TEXTURE_TYPE_LIQUID=9;
+        this.TEXTURE_TYPE_DOOR=8;
+        this.TEXTURE_TYPE_MACHINE=9;
+        this.TEXTURE_TYPE_LIQUID=10;
         
         this.genBitmapWall=new GenBitmapWallClass();
         this.genBitmapFloor=new GenBitmapFloorClass();
         this.genBitmapCeiling=new GenBitmapCeilingClass();
+        this.genBitmapDoor=new GenBitmapDoorClass();
+        this.genBitmapMetal=new GenBitmapMetalClass();
         this.genBitmapMachine=new GenBitmapMachineClass();
         this.genBitmapLiquid=new GenBitmapLiquidClass();
         
@@ -102,7 +105,6 @@ class MapClass
             switch (textureType) {
                 case this.TEXTURE_TYPE_WALL:
                 case this.TEXTURE_TYPE_PILLAR:
-                case this.TEXTURE_TYPE_METAL:
                     this.textureBitmapList[textureType]=this.genBitmapWall.generateRandom(false);
                     break;
                     
@@ -113,6 +115,14 @@ class MapClass
                     
                 case this.TEXTURE_TYPE_CEILING:
                     this.textureBitmapList[textureType]=this.genBitmapCeiling.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_METAL:
+                    this.textureBitmapList[textureType]=this.genBitmapMetal.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_DOOR:
+                    this.textureBitmapList[textureType]=this.genBitmapDoor.generateRandom(false);
                     break;
                     
                 case this.TEXTURE_TYPE_MACHINE:
@@ -512,6 +522,11 @@ class MapClass
         }
 
         return(null);
+    }
+    
+    findRandomPlayerPosition()
+    {
+        return(this.rooms[0].findRandomEntityPosition());
     }
     
         //
