@@ -12,6 +12,9 @@ When interface created
 ToDos
 
 
+#### soundBuffer should no longer have name in it, all by indexes/ids
+#### soundbuffer stored directly on objects, get rid of soundbufferlist
+
 #### need to group the lights to better pick the lights in each room
 
 #### item texture is pretty ugly

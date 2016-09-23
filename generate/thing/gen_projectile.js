@@ -16,8 +16,8 @@ class GenProjectileClass
         var projectile=new ProjectileClass(modelList.getModel('projectile_0'));
         
         projectile.setLifeTick(10000);
-        projectile.setFireSound(soundList.getSound('fire'));
-        projectile.setHitSound(soundList.getSound('explosion'));
+        projectile.setFireSoundName('fire');
+        projectile.setHitSoundName('explosion');
         projectile.setDamage((isPlayer?25:15),0,0);
         
             // enemy settings

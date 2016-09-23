@@ -133,7 +133,7 @@ class GenSoundClass
         this.normalize(data,frameCount);
         this.fade(data,frameCount,null,0.1);
         
-        return(new SoundClass(name,this.ctx,buffer,25000));
+        return(new SoundBufferClass(name,buffer,25000));
     }
     
         //
@@ -152,7 +152,7 @@ class GenSoundClass
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.1,0.5);
         
-        return(new SoundClass(name,this.ctx,buffer,50000));
+        return(new SoundBufferClass(name,buffer,50000));
     }
     
         //
@@ -180,7 +180,7 @@ class GenSoundClass
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.05,0.2);
         
-        return(new SoundClass(name,this.ctx,buffer,25000));
+        return(new SoundBufferClass(name,buffer,25000));
     }
     
         //

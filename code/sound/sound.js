@@ -6,67 +6,118 @@
 
 class SoundClass
 {
-    constructor(name,ctx,buffer,maxDistance)
+    constructor()
     {
-        this.name=name;
-        this.ctx=ctx;
-        this.buffer=buffer;
-        this.maxDistance=maxDistance;
+        this.ctx=null;
+
+        this.soundBufferList=null;
+        this.soundPlayList=null;
+        
+        this.currentListenerEntity=null;
+        this.listenerForwardVector=new wsPoint(0.0,0.0,1.0);            // local to global to avoid GC
         
         Object.seal(this);
     }
     
-    close()
+        //
+        // initialize and release
+        //
+        
+    initialize()
     {
-        this.buffer=null;
+            // initialize the audio context
+            
+        var initAudioContext=window.AudioContext||window.webkitAudioContext;
+        this.ctx=new initAudioContext();
+        
+        if (this.ctx===null) {
+            alert('Could not initialize audio context');
+            return(false);
+        }
+        
+            // and the sound buffer and sound play list
+        
+        this.soundBufferList=new SoundBufferListClass();
+        if (!this.soundBufferList.initialize()) return(false);
+        
+        this.soundPlayList=new SoundPlayListClass();
+        if (!this.soundPlayList.initialize()) return(false);
+        
+        return(true);
+    }
+    
+    release()
+    {
+        this.soundBufferList.release();
+        this.soundPlayList.release();
     }
     
         //
-        // play a sound with distance attenuation and panning
+        // utilities
         //
         
-    play(soundPos)
+    getAudioContext()
     {
-            // skip if over max
-            
-        var dist=soundPos.distance(this.ctx.wsTempPosition);
-        if (dist>this.maxDistance) return;
-        
-            // get attenuation
-            
-        var f=((this.maxDistance-dist)/this.maxDistance);
-        
-            // supergumba -- doing a simple inverse linear distance until
-            // panner starts working and/or is implemented correctly
-            
-        var source=this.ctx.createBufferSource();
-        source.buffer=this.buffer;
-        
-        var gainNode=this.ctx.createGain();
-        gainNode.gain.value=f;
-        
-        source.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
-        
-        source.start();
+        return(this.ctx);
     }
     
         //
-        // simple sound play with no change
+        // add a buffer
         //
         
-    playSimple()
+    addBuffer(name,buffer,maxDistance)
     {
-        var source=this.ctx.createBufferSource();
-        source.buffer=this.buffer;
-        
-        var gainNode=this.ctx.createGain();
-        gainNode.gain.value=0.4;
-        
-        source.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
-        
-        source.start();
+        this.soundBufferList.addBuffer(name,buffer,maxDistance);
     }
-
+    
+        //
+        // setup listener
+        //
+        
+    setListenerToEntity(entity)
+    {
+        this.currentListenerEntity=entity;
+    }
+    
+        //
+        // play a sound
+        //
+        
+    play(entity,soundName)
+    {
+        var soundBuffer=this.soundBufferList.getBufferByName(soundName);
+        this.soundPlayList.startSoundPlay(this.ctx,this.currentListenerEntity,entity,soundBuffer);
+    }
+        
+        //
+        // update sounds
+        //
+    
+    update()
+    {
+            // update listener
+            
+        this.listenerForwardVector.setFromValues(0.0,0.0,1.0);
+        this.listenerForwardVector.rotateY(null,this.currentListenerEntity.angle.y);
+        
+        this.ctx.listener.positionX=0;      // always consider listener at 0, and other entities relative to it
+        this.ctx.listener.positionY=0;
+        this.ctx.listener.positionZ=0;
+        this.ctx.listener.forwardX=this.listenerForwardVector.x;
+        this.ctx.listener.forwardY=this.listenerForwardVector.y;
+        this.ctx.listener.forwardZ=this.listenerForwardVector.z;
+        this.ctx.listener.upX=0.0;
+        this.ctx.listener.upY=1.0;
+        this.ctx.listener.upZ=0.0;
+        
+            // update all playing sounds
+            
+        this.soundPlayList.updateSoundPlays(this.currentListenerEntity);
+    }
 }
+
+//
+// the global sound object
+//
+
+var sound=new SoundClass();

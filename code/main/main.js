@@ -54,7 +54,7 @@ class MainClass
 
     initInternal()
     {
-        if (!soundList.initialize()) return;
+        if (!sound.initialize()) return;
         if (!map.initialize()) return;
         if (!modelList.initialize()) return;
         if (!sky.initialize()) return(false);
@@ -66,7 +66,7 @@ class MainClass
 
         this.genBitmapSkin=new GenBitmapSkinClass();
         this.genBitmapItem=new GenBitmapItemClass();
-        this.genSound=new GenSoundClass(soundList.getAudioContext());
+        this.genSound=new GenSoundClass(sound.getAudioContext());
 
             // next step
 
@@ -88,7 +88,7 @@ class MainClass
 
              // generate sound
 
-        soundList.addSound(this.genSound.generate(name,generateType,false));
+        sound.addBuffer(this.genSound.generate(name,generateType,false));
 
             // if more textures, then loop back around
 
@@ -312,9 +312,9 @@ class MainClass
 
         view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT_R,config.MAP_LIGHT_AMBIENT_G,config.MAP_LIGHT_AMBIENT_B);
         
-            // make sure there's an initial sound position
+            // set the listener to this entity
             
-        soundList.setListenerToEntity(entityList.getPlayer());
+        sound.setListenerToEntity(entityList.getPlayer());
 
             // start the input
 
@@ -385,7 +385,10 @@ function mainLoop(timeStamp)
                 view.lastPhysicTimeStamp=view.timeStamp;
             }
 
-            soundList.setListenerToEntity(entityList.getPlayer());
+                // update the listener and all current
+                // playing sound positions
+                
+            sound.update();
         }
     }
     

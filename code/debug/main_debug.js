@@ -27,8 +27,8 @@ class MainDebugClass
         this.genBitmapSky=new GenBitmapSkyClass();
         this.genBitmapParticle=new GenBitmapParticleClass();
         
-        this.debugSoundList=null;
-        this.genSound=null;
+        sound.initialize();
+        this.genSound=new GenSoundClass(sound.getAudioContext());
         
         Object.seal(this);
     }
@@ -250,20 +250,20 @@ class MainDebugClass
         ctx.stroke();
     }
     
-    clickSound(name)
+    clickSound(soundName)
     {
-        this.debugSoundList.getSound(name).playSimple();
+        sound.play(null,soundName);
     }
     
     addSounds(idx)
     {
         var canvas,ctx,div;
-        var debugSound;
+        var soundBuffer;
         
             // generate random sound
 
-        debugSound=this.genSound.generate('test',idx,true);
-        this.debugSoundList.addSound(debugSound);      // so we can play later
+        soundBuffer=this.genSound.generate(GEN_SOUND_TYPE_NAMES[idx],idx,true);
+        sound.addBuffer(soundBuffer);      // so we can play later
 
             // label
 
@@ -287,7 +287,7 @@ class MainDebugClass
         canvas.onclick=this.clickSound.bind(this,GEN_SOUND_TYPE_NAMES[idx]);
 
         var ctx=canvas.getContext('2d');
-        this.drawWave(ctx,this.soundWid,this.soundHigh,debugSound.buffer.getChannelData(0));
+        this.drawWave(ctx,this.soundWid,this.soundHigh,soundBuffer.buffer.getChannelData(0));
 
         document.body.appendChild(canvas);
 
@@ -307,18 +307,6 @@ class MainDebugClass
         
     run()
     {
-            // construct necessary classes
-            
-        this.debugSoundList=new SoundListClass();
-        if (!this.debugSoundList.initialize()) {
-            alert('Sound initialization failed');
-            return;
-        }
-        
-        this.genSound=new GenSoundClass(this.debugSoundList.getAudioContext());
-
-            // start the timed process
-            
         this.addBitmapWall(0);
     }
 }

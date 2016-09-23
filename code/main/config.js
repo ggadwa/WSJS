@@ -125,6 +125,12 @@ class ConfigClass
         this.MONSTER_AI_ON=false;
         
             //
+            // sounds
+            //
+            
+        this.MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
+        
+            //
             // controls
             //
             
