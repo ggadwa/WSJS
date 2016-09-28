@@ -70,7 +70,7 @@ class EntityProjectileClass extends EntityClass
             // explosion and sound
             
         particleList.addExplosionParticles(this.position);
-        sound.play(this,this.projectile.hitSoundName);
+        sound.play(this,this.projectile.hitSoundBuffer);
         
             // handle any damage
         

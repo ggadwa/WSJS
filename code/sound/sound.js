@@ -10,7 +10,6 @@ class SoundClass
     {
         this.ctx=null;
 
-        this.soundBufferList=null;
         this.soundPlayList=null;
         
         this.currentListenerEntity=null;
@@ -35,10 +34,7 @@ class SoundClass
             return(false);
         }
         
-            // and the sound buffer and sound play list
-        
-        this.soundBufferList=new SoundBufferListClass();
-        if (!this.soundBufferList.initialize()) return(false);
+            // and the sound play list
         
         this.soundPlayList=new SoundPlayListClass();
         if (!this.soundPlayList.initialize()) return(false);
@@ -48,8 +44,7 @@ class SoundClass
     
     release()
     {
-        this.soundBufferList.release();
-        this.soundPlayList.release();
+       this.soundPlayList.release();
     }
     
         //
@@ -59,15 +54,6 @@ class SoundClass
     getAudioContext()
     {
         return(this.ctx);
-    }
-    
-        //
-        // add a buffer
-        //
-        
-    addBuffer(name,buffer,maxDistance)
-    {
-        this.soundBufferList.addBuffer(name,buffer,maxDistance);
     }
     
         //
@@ -83,10 +69,9 @@ class SoundClass
         // play a sound
         //
         
-    play(entity,soundName)
+    play(entity,buffer)
     {
-        var soundBuffer=this.soundBufferList.getBufferByName(soundName);
-        this.soundPlayList.startSoundPlay(this.ctx,this.currentListenerEntity,entity,soundBuffer);
+        this.soundPlayList.startSoundPlay(this.ctx,this.currentListenerEntity,entity,buffer);
     }
         
         //

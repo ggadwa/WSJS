@@ -10,6 +10,16 @@ class GenSoundClass
     {
         this.ctx=ctx;
         
+            // types
+        
+        this.TYPE_GUN_FIRE=0;
+        this.TYPE_EXPLOSION=1;
+        this.TYPE_MONSTER_SCREAM=2;
+
+        this.TYPE_NAMES=    [
+                                'Gun Fire','Explosion','Monster Scream'
+                            ];
+        
         Object.seal(this);
     }
     
@@ -121,7 +131,7 @@ class GenSoundClass
         // gun fire sound
         //
     
-    generateGunFire(name)
+    generateGunFire()
     {
         var frameCount=this.ctx.sampleRate*0.25;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
@@ -133,14 +143,14 @@ class GenSoundClass
         this.normalize(data,frameCount);
         this.fade(data,frameCount,null,0.1);
         
-        return(new SoundBufferClass(name,buffer,25000));
+        return(new SoundBufferClass(buffer,25000));
     }
     
         //
         // explosion sound
         //
     
-    generateExplosion(name)
+    generateExplosion()
     {
         var frameCount=this.ctx.sampleRate*2;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
@@ -152,14 +162,14 @@ class GenSoundClass
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.1,0.5);
         
-        return(new SoundBufferClass(name,buffer,50000));
+        return(new SoundBufferClass(buffer,50000));
     }
     
         //
         // monster scream sound
         //
     
-    generateMonsterScream(name)
+    generateMonsterScream()
     {
         var frameCount=this.ctx.sampleRate*1;
         var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
@@ -180,29 +190,29 @@ class GenSoundClass
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.05,0.2);
         
-        return(new SoundBufferClass(name,buffer,25000));
+        return(new SoundBufferClass(buffer,25000));
     }
     
         //
         // generate sound mainline
         //
     
-    generate(name,generateType,inDebug)
+    generate(generateType,inDebug)
     {
         var sound=null;
         
         switch (generateType) {
             
-            case GEN_SOUND_TYPE_GUN_FIRE:
-                sound=this.generateGunFire(name);
+            case this.TYPE_GUN_FIRE:
+                sound=this.generateGunFire();
                 break;
                 
-            case GEN_SOUND_TYPE_EXPLOSION:
-                sound=this.generateExplosion(name);
+            case this.TYPE_EXPLOSION:
+                sound=this.generateExplosion();
                 break;
                 
-            case GEN_SOUND_TYPE_MONSTER_SCREAM:
-                sound=this.generateMonsterScream(name);
+            case this.TYPE_MONSTER_SCREAM:
+                sound=this.generateMonsterScream();
                 break;
         }
         

@@ -11,16 +11,14 @@ When interface created
 
 ToDos
 
-
-#### soundBuffer should no longer have name in it, all by indexes/ids
-#### soundbuffer stored directly on objects, get rid of soundbufferlist
+#### rooms need to be more square
+#### types of extra room: none, left, right, left + right, or double left or double right
+#### better monster scream
 
 #### need to group the lights to better pick the lights in each room
 
 #### item texture is pretty ugly
 #### genBitmapSkin/genBitmapItem in main.js delete later
-#### sound constants in soundgen
-#### remove soundlist also
 
 #### move up to spatial panner (sound_list.setListenerToEntity, sound.play) -- BACK TO REGULAR PANNER (ugh)
 
@@ -30,10 +28,10 @@ ToDos
 
 
 --------------> generation
-  - door and liquid in map overlay
-  - remove ROOM_CONNECT_MODE_DOOR
-  - need long hallways with two doors (10% of time)
+  - doors, lifts, and liquid in map overlay
   - make win button at last room
+
+
 
 #### collisions against slanted walls are bad
 #### weapon models

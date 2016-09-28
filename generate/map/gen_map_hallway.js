@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// map doors
+// map hallways and doors
 //
 
-class GenRoomDoorClass
+class GenRoomHallwayClass
 {
     constructor()
     {
@@ -56,7 +56,7 @@ class GenRoomDoorClass
         // vertices into meshes
         //
         
-    finishDoorMesh(bitmap,vertexList,buildNormals,meshCenterPoint,normalsIn,flags)
+    finishMesh(bitmap,vertexList,buildNormals,meshCenterPoint,normalsIn,flags)
     {
             // build the indexes
             // everything we build is a quad so
@@ -96,14 +96,38 @@ class GenRoomDoorClass
         // create doors
         //
 
-    createDoorX(xBound,yBound,zBound)
+    createDoorXSingle(x,yBound,zBound,thickSize)
+    {
+        var idx,meshIdx,zDoorBound;
+        var vertexList,movement;
+        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
+        
+        xDoorBound=new wsBound((x-thickSize),(x+thickSize));
+            
+        idx=0;
+        vertexList=MeshUtilityClass.createMapVertexList(12);
+        
+        idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zDoorBound);
+        idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zDoorBound);
+        this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zDoorBound);
+        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,MESH_FLAG_DOOR);
+        
+            // and the movement
+        
+        movement=new MovementClass(meshIdx,false,(config.ROOM_BLOCK_WIDTH*2));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
+        
+        map.addMovement(movement); 
+    }
+    
+    createHallwayX(xBound,yBound,zBound,doubleDoor)
     {
         var n,idx,meshIdx;
         var vertexList,movement;
-        var x,xDoorBound,zDoorBound,zThickBound;
+        var x,xHallwayBound,zHallwayBound,zThickBound;
         
         var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
-        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
         
             // need a center point to better
             // create normals
@@ -125,7 +149,7 @@ class GenRoomDoorClass
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.min+thickSize));
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.max-thickSize));
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -138,34 +162,48 @@ class GenRoomDoorClass
         zThickBound=new wsBound((zBound.max-thickSize),zBound.max);
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound);
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
 
            // the ceiling and floor
 
-        zDoorBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
+        zHallwayBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
-        this.createSingleCeilingX(idx,vertexList,xBound,yBound.min,zDoorBound);
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+        this.createSingleCeilingX(idx,vertexList,xBound,yBound.min,zHallwayBound);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
-        this.createSingleCeilingX(idx,vertexList,xBound,yBound.max,zDoorBound);
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
+        this.createSingleCeilingX(idx,vertexList,xBound,yBound.max,zHallwayBound);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
         
             // the door
             
-        x=xBound.getMidPoint();
-        xDoorBound=new wsBound((x-thickSize),(x+thickSize));
-            
+        if (doubleDoor) {
+            this.createDoorXSingle((xBound.min+thickSize),yBound,zBound,thickSize);
+            this.createDoorXSingle((xBound.max-(thickSize*3)),yBound,zBound,thickSize);
+        }
+        else {
+            createDoorXSingle(xBound.getMidPoint(),yBound,zBound,thickSize);
+        }
+    }
+    
+    createHallwayDoorZ(xBound,yBound,z,thickSize)
+    {
+        var idx,meshIdx,zDoorBound;
+        var vertexList,movement;
+        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
+        
+        zDoorBound=new wsBound((z-thickSize),(z+thickSize));
+        
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(12);
         
-        idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zDoorBound);
-        idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zDoorBound);
-        this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zDoorBound);
-        meshIdx=this.finishDoorMesh(doorBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_DOOR);
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z-thickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z+thickSize));
+        this.createSingleCeilingZ(idx,vertexList,xBound,yBound.max,zDoorBound);
+        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,MESH_FLAG_DOOR);
         
             // and the movement
         
@@ -176,14 +214,13 @@ class GenRoomDoorClass
         map.addMovement(movement); 
     }
 
-    createDoorZ(xBound,yBound,zBound)
+    createHallwayZ(xBound,yBound,zBound,doubleDoor)
     {
         var n,idx,meshIdx;
         var vertexList,movement;
-        var z,xDoorBound,zDoorBound,xThickBound;
+        var z,xHallwayBound,zHallwayBound,xThickBound;
         
         var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
-        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
         
             // need a center point to better
             // create normals
@@ -205,7 +242,7 @@ class GenRoomDoorClass
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
         idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBound,zBound);
         idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBound,zBound);
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -218,42 +255,31 @@ class GenRoomDoorClass
         xThickBound=new wsBound((xBound.max-thickSize),xBound.max);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
 
            // the ceiling
            
-        xDoorBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
+        xHallwayBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
-        this.createSingleCeilingZ(idx,vertexList,xDoorBound,yBound.min,zBound);
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+        this.createSingleCeilingZ(idx,vertexList,xHallwayBound,yBound.min,zBound);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
-        this.createSingleCeilingZ(idx,vertexList,xDoorBound,yBound.max,zBound);
-        this.finishDoorMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
+        this.createSingleCeilingZ(idx,vertexList,xHallwayBound,yBound.max,zBound);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
         
             // the door
-            
-        z=zBound.getMidPoint();
-        zDoorBound=new wsBound((z-thickSize),(z+thickSize));
-            
-        idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList(12);
         
-        idx=this.createSingleWallZ(idx,vertexList,xDoorBound,yBound,(z-thickSize));
-        idx=this.createSingleWallZ(idx,vertexList,xDoorBound,yBound,(z+thickSize));
-        this.createSingleCeilingZ(idx,vertexList,xDoorBound,yBound.max,zDoorBound);
-        meshIdx=this.finishDoorMesh(doorBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_DOOR);
-        
-            // and the movement
-        
-        movement=new MovementClass(meshIdx,false,(config.ROOM_BLOCK_WIDTH*2));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
-        
-        map.addMovement(movement); 
+        if (doubleDoor) {
+            this.createHallwayDoorZ(xBound,yBound,(zBound.min+thickSize),thickSize);
+            this.createHallwayDoorZ(xBound,yBound,(zBound.max-(thickSize*3)),thickSize);
+        }
+        else {
+            this.createHallwayDoorZ(xBound,yBound,zBound.getMidPoint(),thickSize);
+        }
     }
 }
 

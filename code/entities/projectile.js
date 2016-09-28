@@ -13,8 +13,8 @@ class ProjectileClass
         this.speed=0;
         this.lifeTick=0;
         
-        this.fireSoundName=null;
-        this.hitSoundName=null;
+        this.fireSoundBuffer=null;
+        this.hitSoundBuffer=null;
         
         this.damage=0;
         this.splashRadius=0;
@@ -39,14 +39,14 @@ class ProjectileClass
         this.lifeTick=lifeTick;
     }
     
-    setFireSoundName(fireSoundName)
+    setFireSoundBuffer(fireSoundBuffer)
     {
-        this.fireSoundName=fireSoundName;
+        this.fireSoundBuffer=fireSoundBuffer;
     }
     
-    setHitSoundName(hitSoundName)
+    setHitSoundBuffer(hitSoundBuffer)
     {
-        this.hitSoundName=hitSoundName;
+        this.hitSoundBuffer=hitSoundBuffer;
     }
     
     setDamage(damage,splashRadius,splashDamage)
@@ -83,7 +83,7 @@ class ProjectileClass
         var entity=new EntityProjectileClass('projectile',parentEntityId,pos,ang,this);
         entityList.addEntity(entity);
         
-        if (this.fireSoundName!==null) sound.play(entity,this.fireSoundName);
+        if (this.fireSoundBuffer!==null) sound.play(entity,this.fireSoundBuffer);
     }
     
 }

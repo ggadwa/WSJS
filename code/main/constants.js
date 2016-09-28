@@ -41,15 +41,6 @@ const ROOM_SIDE_RIGHT=2;
 const ROOM_SIDE_BOTTOM=3;
 
     //
-    // room connection modes
-    //
-
-const ROOM_CONNECT_MODE_NONE=0;
-const ROOM_CONNECT_MODE_UP=1;
-const ROOM_CONNECT_MODE_DOWN=2;
-const ROOM_CONNECT_MODE_DOOR=3;
-
-    //
     // particles
     //
 
@@ -152,16 +143,3 @@ const BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
 const BITMAP_GRID_MIN_BLOCK_HEIGHT=10;
 const BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
 const BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
-
-    //
-    // sound generation types
-    //
-
-const GEN_SOUND_TYPE_GUN_FIRE=0;
-const GEN_SOUND_TYPE_EXPLOSION=1;
-const GEN_SOUND_TYPE_MONSTER_SCREAM=2;
-
-const GEN_SOUND_TYPE_NAMES= [
-                                'Gun Fire','Explosion','Monster Scream'
-                            ];
-

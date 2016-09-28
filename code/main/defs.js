@@ -574,6 +574,10 @@ class wsLine
         this.p1=p1;
         this.p2=p2;
         
+        this.xBound=new wsBound(0,0);   // cached to avoid GC
+        this.yBound=new wsBound(0,0);
+        this.zBound=new wsBound(0,0);
+        
         Object.seal(this);
     }
     
@@ -597,17 +601,20 @@ class wsLine
     
     getXBound()
     {
-        return(new wsBound(this.p1.x,this.p2.x));
+        this.xBound.setFromValues(this.p1.x,this.p2.x);     // these can be dangerous but CG is worse
+        return(this.xBound);
     }
     
     getYBound()
     {
-        return(new wsBound(this.p1.y,this.p2.y));
+        this.yBound.setFromValues(this.p1.y,this.p2.y);
+        return(this.yBound);
     }
     
     getZBound()
     {
-        return(new wsBound(this.p1.z,this.p2.z));
+        this.zBound.setFromValues(this.p1.z,this.p2.z);
+        return(this.zBound);
     }
 }
 
@@ -617,6 +624,9 @@ class ws2DLine
     {
         this.p1=p1;
         this.p2=p2;
+        
+        this.xBound=new wsBound(0,0);   // cached to avoid GC
+        this.yBound=new wsBound(0,0);
         
         Object.seal(this);
     }
@@ -635,12 +645,14 @@ class ws2DLine
     
     getXBound()
     {
-        return(new wsBound(this.p1.x,this.p2.x));
+        this.xBound.setFromValues(this.p1.x,this.p2.x);     // these can be dangerous but CG is worse
+        return(this.xBound);
     }
     
     getYBound()
     {
-        return(new wsBound(this.p1.y,this.p2.y));
+        this.yBound.setFromValues(this.p1.y,this.p2.y);
+        return(this.yBound);
     }
 }
 

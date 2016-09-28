@@ -44,6 +44,8 @@ class ConfigClass
 
         this.ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform will have a secondary turn
         this.ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
+        
+        this.ROOM_LONG_HALLWAY_PERCENTAGE=0.3;          // what percentage of the time the general room path will have a long hallway
 
         this.ROOM_LEDGE_PERCENTAGE=0.5;                // percentage of > 1 story rooms that have ledges
         this.ROOM_LEDGE_MIN_HEIGHT=300;                // minimum height of ledges

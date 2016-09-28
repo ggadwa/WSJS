@@ -6,9 +6,8 @@
 
 class SoundBufferClass
 {
-    constructor(name,buffer,maxDistance)
+    constructor(buffer,maxDistance)
     {
-        this.name=name;
         this.buffer=buffer;
         this.maxDistance=maxDistance;
         

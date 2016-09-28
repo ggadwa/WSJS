@@ -28,6 +28,8 @@ class MainDebugClass
         this.genBitmapParticle=new GenBitmapParticleClass();
         
         sound.initialize();
+        
+        this.soundBuffers=[];
         this.genSound=new GenSoundClass(sound.getAudioContext());
         
         Object.seal(this);
@@ -250,9 +252,9 @@ class MainDebugClass
         ctx.stroke();
     }
     
-    clickSound(soundName)
+    clickSound(soundIdx)
     {
-        sound.play(null,soundName);
+        sound.play(null,this.soundBuffers[soundIdx]);
     }
     
     addSounds(idx)
@@ -262,8 +264,8 @@ class MainDebugClass
         
             // generate random sound
 
-        soundBuffer=this.genSound.generate(GEN_SOUND_TYPE_NAMES[idx],idx,true);
-        sound.addBuffer(soundBuffer);      // so we can play later
+        soundBuffer=this.genSound.generate(idx,true);
+        this.soundBuffers.push(soundBuffer);      // so we can play later
 
             // label
 
@@ -271,7 +273,7 @@ class MainDebugClass
         div.style.position="absolute";
         div.style.left='5px';
         div.style.top=this.drawTop+'px';
-        div.innerHTML=GEN_SOUND_TYPE_NAMES[idx];
+        div.innerHTML=this.genSound.TYPE_NAMES[idx];
         document.body.appendChild(div);
 
         this.drawTop+=25;
@@ -284,7 +286,7 @@ class MainDebugClass
         canvas.width=this.soundWid;
         canvas.height=this.soundHigh;
         canvas.style.cursor='pointer';
-        canvas.onclick=this.clickSound.bind(this,GEN_SOUND_TYPE_NAMES[idx]);
+        canvas.onclick=this.clickSound.bind(this,idx);
 
         var ctx=canvas.getContext('2d');
         this.drawWave(ctx,this.soundWid,this.soundHigh,soundBuffer.buffer.getChannelData(0));
@@ -296,7 +298,7 @@ class MainDebugClass
             // next bitmap
             
         idx++;
-        if (idx>=GEN_SOUND_TYPE_NAMES.length) return;
+        if (idx>=this.genSound.TYPE_NAMES.length) return;
         
         setTimeout(this.addSounds.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }

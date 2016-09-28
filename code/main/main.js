@@ -11,16 +11,7 @@ class MainClass
         this.genBitmapSkin=null;
         this.genBitmapItem=null;
         this.genSound=null;
-        
-            // sound list for the game
-            
-        this.soundBuildList=
-            [
-                ['fire',GEN_SOUND_TYPE_GUN_FIRE],
-                ['explosion',GEN_SOUND_TYPE_EXPLOSION],
-                ['monster scream',config.GEN_SOUND_TYPE_MONSTER_SCREAM]
-            ];
-            
+
         Object.seal(this);
     }
 
@@ -70,37 +61,6 @@ class MainClass
 
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Dynamic Sounds');
-        view.loadingScreenDraw(null);
-
-        setTimeout(this.initBuildSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
-    }
-
-    initBuildSounds(idx)
-    {
-        var soundCount=this.soundBuildList.length;
-
-            // name and type
-
-        var name=this.soundBuildList[idx][0];
-        var generateType=this.soundBuildList[idx][1];
-
-             // generate sound
-
-        sound.addBuffer(this.genSound.generate(name,generateType,false));
-
-            // if more textures, then loop back around
-
-        idx++;
-        if (idx<soundCount) {
-            view.loadingScreenDraw(idx/soundCount);
-            setTimeout(this.initBuildSounds.bind(this,idx),PROCESS_TIMEOUT_MSEC);
-            return;
-        }
-
-                // next step
-                
         view.loadingScreenUpdate();
         view.loadingScreenAddString('Generating Dynamic Map');
         view.loadingScreenDraw(null);
@@ -249,7 +209,7 @@ class MainClass
         var n,monsterType;
         var model,pos,proj;
 
-        var genProjectile=new GenProjectileClass();
+        var genProjectile=new GenProjectileClass(this.genSound);
         var genWeapon=new GenWeaponClass();
         var genAI=new GenAIClass(genProjectile);
 

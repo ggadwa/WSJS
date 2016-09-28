@@ -6,18 +6,20 @@
 
 class GenProjectileClass
 {
-    constructor()
+    constructor(genSound)
     {
+        this.genSound=genSound;
+        
         Object.seal(this);
     }
 
-    generate(isPlayer)
+    generate(isPlayer,genSound)
     {
         var projectile=new ProjectileClass(modelList.getModel('projectile_0'));
         
         projectile.setLifeTick(10000);
-        projectile.setFireSoundName('fire');
-        projectile.setHitSoundName('explosion');
+        projectile.setFireSoundBuffer(this.genSound.generate(this.genSound.TYPE_GUN_FIRE,false));
+        projectile.setHitSoundBuffer(this.genSound.generate(this.genSound.TYPE_EXPLOSION,false));
         projectile.setDamage((isPlayer?25:15),0,0);
         
             // enemy settings
