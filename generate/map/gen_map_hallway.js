@@ -137,7 +137,7 @@ class GenRoomHallwayClass
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.trunc(zBound.getSize()*0.05);
+        var thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
         
             // the door room
             // internal walls
@@ -181,8 +181,8 @@ class GenRoomHallwayClass
             // the door
             
         if (doubleDoor) {
-            this.createDoorXSingle((xBound.min+thickSize),yBound,zBound,thickSize);
-            this.createDoorXSingle((xBound.max-(thickSize*3)),yBound,zBound,thickSize);
+            this.createDoorXSingle((xBound.min+(thickSize*2)),yBound,zBound,thickSize);
+            this.createDoorXSingle((xBound.max-(thickSize*2)),yBound,zBound,thickSize);
         }
         else {
             createDoorXSingle(xBound.getMidPoint(),yBound,zBound,thickSize);
@@ -230,7 +230,7 @@ class GenRoomHallwayClass
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.trunc(zBound.getSize()*0.05);
+        var thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
          
             // the door room
             // internal walls
@@ -274,8 +274,8 @@ class GenRoomHallwayClass
             // the door
         
         if (doubleDoor) {
-            this.createHallwayDoorZ(xBound,yBound,(zBound.min+thickSize),thickSize);
-            this.createHallwayDoorZ(xBound,yBound,(zBound.max-(thickSize*3)),thickSize);
+            this.createHallwayDoorZ(xBound,yBound,(zBound.min+(thickSize*2)),thickSize);
+            this.createHallwayDoorZ(xBound,yBound,(zBound.max-(thickSize*2)),thickSize);
         }
         else {
             this.createHallwayDoorZ(xBound,yBound,zBound.getMidPoint(),thickSize);

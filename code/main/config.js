@@ -25,9 +25,9 @@ class ConfigClass
         this.ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is
         this.ROOM_FLOOR_DEPTH=700;                     // the depth of the area between floors
 
-        this.ROOM_MIN_BLOCK_PER_SIDE=3;                // minimum number of blocks that can make up one side of a room
+        this.ROOM_MIN_BLOCK_PER_SIDE=5;                // minimum number of blocks that can make up one side of a room
         this.ROOM_MAX_BLOCK_PER_SIDE=10;               // maximum number of blocks that can make up one side of a room
-        this.ROOM_MAX_BLOCK_COUNT=50;                  // maximum number of blocks in total for a room (x * z block count)
+        this.ROOM_MAX_BLOCK_COUNT=100;                  // maximum number of blocks in total for a room (x * z block count)
 
         this.ROOM_MAX_CONNECT_TRY=20;                  // maximum times to try to find a place to connect a room to another room
 

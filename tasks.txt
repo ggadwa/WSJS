@@ -11,8 +11,8 @@ When interface created
 
 ToDos
 
-#### rooms need to be more square
-#### types of extra room: none, left, right, left + right, or double left or double right
+#### remove the concept of level and all it flags
+#### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### better monster scream
 
 #### need to group the lights to better pick the lights in each room

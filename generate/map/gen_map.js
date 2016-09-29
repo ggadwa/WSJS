@@ -470,7 +470,7 @@ class GenMapClass
         // build a path of rooms
         //
 
-    buildMapRoomPath(recurseCount,lastRoom,yLastBound,hallwayMode,level,depth)
+    buildMapRoomPath(lastRoom,hallwayMode)
     {
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
@@ -490,11 +490,6 @@ class GenMapClass
             if (xBlockSize>config.ROOM_MIN_BLOCK_PER_SIDE) xBlockSize--;
             if (zBlockSize>config.ROOM_MIN_BLOCK_PER_SIDE) zBlockSize--;
         }
-
-            // can only have a single level
-            // change from a room
-            
-        var noCurrentLevelChange=true;
 
             // get room location
             // if we don't have a previous room,
@@ -606,10 +601,10 @@ class GenMapClass
                 if (tryCount>config.ROOM_MAX_CONNECT_TRY) return;
             }
             
-                // bounds now the same as last room
-                // until any level changes
+                // bounds always the same as last room,
+                // main path is on the same level
                 
-            yBound=yLastBound.copy();
+            yBound=lastRoom.yBound.copy();
         }
 
             // add in hallways and a light
@@ -623,7 +618,7 @@ class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,false,level);
+        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,false,0);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -666,14 +661,14 @@ class GenMapClass
             
         hallwayMode=(genRandom.randomPercentage(config.ROOM_LONG_HALLWAY_PERCENTAGE))?this.HALLWAY_LONG:this.HALLWAY_SHORT;
             
-        this.buildMapRoomPath((recurseCount+1),room,yBound,hallwayMode,level,(depth+1));
+        this.buildMapRoomPath(room,hallwayMode);
     }
     
         //
         // extend any of the rooms along the path
         //
     
-    buildRoomExtensionSingle(lastRoom,yLastBound,stairMode,level,connectSide)
+    buildRoomExtensionSingle(lastRoom,connectSide)
     {
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
@@ -684,22 +679,25 @@ class GenMapClass
             // level changes
             
         var storyAdd=lastRoom.yBound.getSize()+config.ROOM_FLOOR_DEPTH;
-        stairMode=this.STAIR_NONE;
+        var stairMode=this.STAIR_NONE;
+
+        var level=0;
+        yBound=lastRoom.yBound.copy();
 
         if (genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
             
             if (genRandom.randomPercentage(0.5)) {
                 level=1;
-                yLastBound.add(-storyAdd);
+                yBound.add(-storyAdd);
                 stairMode=this.STAIR_UP;
             }
             else {
                 level=0;
-                yLastBound.add(storyAdd);
+                yBound.add(storyAdd);
                 stairMode=this.STAIR_DOWN;
             }
         }
-        
+     
             // get random block size for room
             // and make sure it stays under the max
             // blocks for room
@@ -800,11 +798,6 @@ class GenMapClass
             if (tryCount>config.ROOM_MAX_CONNECT_TRY) return;
         }
 
-            // bounds now the same as last room
-            // until any level changes
-
-        yBound=yLastBound.copy();
-
             // add in any stairs
             
         if (stairMode!==this.STAIR_NONE) {
@@ -867,7 +860,7 @@ class GenMapClass
 
     buildRoomExtensions()
     {
-        var n,room,yLastBound;
+        var n,room;
         var nRoom=map.rooms.length;
         
         for (n=0;n!==nRoom;n++) {
@@ -876,18 +869,16 @@ class GenMapClass
                 // we can add up to two rooms on
                 // either side of the path
                 
-            yLastBound=room.yBound.copy();
-                
             switch(genRandom.randomIndex(4)) {
                 case 1:
-                    this.buildRoomExtensionSingle(room,yLastBound,this.STAIR_NONE,0,ROOM_SIDE_LEFT);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
                     break;          
                 case 2:
-                    this.buildRoomExtensionSingle(room,yLastBound,this.STAIR_NONE,0,ROOM_SIDE_RIGHT);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
                     break;          
                 case 3:
-                    this.buildRoomExtensionSingle(room,yLastBound,this.STAIR_NONE,0,ROOM_SIDE_LEFT);
-                    this.buildRoomExtensionSingle(room,yLastBound,this.STAIR_NONE,0,ROOM_SIDE_RIGHT);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
                     break;          
             }
         }
@@ -989,7 +980,7 @@ class GenMapClass
 
         this.currentRoomCount=0;
         
-        this.buildMapRoomPath(0,null,null,this.HALLWAY_NONE,0,0);
+        this.buildMapRoomPath(null,this.HALLWAY_NONE);
         
         view.loadingScreenDraw(0.1);
         setTimeout(this.buildMapExtensions.bind(this),PROCESS_TIMEOUT_MSEC);
