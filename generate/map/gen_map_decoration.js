@@ -109,7 +109,7 @@ class GenRoomDecorationClass
         machineWid=wid-margin;
         
         machineBoundY=new wsBound((room.yBound.max-high),(room.yBound.max-config.ROOM_FLOOR_DEPTH));
-        topBoundY=new wsBound(room.yStoryBound.min,(room.yStoryBound.min+config.ROOM_FLOOR_DEPTH));
+        topBoundY=new wsBound(room.yBound.min,(room.yBound.min+config.ROOM_FLOOR_DEPTH));
         midBoundY=new wsBound((machineBoundY.min-config.ROOM_FLOOR_DEPTH),machineBoundY.min);
         botBoundY=new wsBound((room.yBound.max-config.ROOM_FLOOR_DEPTH),room.yBound.max);
             
@@ -148,7 +148,7 @@ class GenRoomDecorationClass
 
         centerPt=new wsPoint(0,0,0);
 
-        yPipeBound=new wsBound((room.yStoryBound.min+config.ROOM_FLOOR_DEPTH),(room.yBound.max-(high+config.ROOM_FLOOR_DEPTH)));
+        yPipeBound=new wsBound((room.yBound.min+config.ROOM_FLOOR_DEPTH),(room.yBound.max-(high+config.ROOM_FLOOR_DEPTH)));
 
         ang=0.0;
         angAdd=360.0/nPipe;
@@ -265,18 +265,18 @@ class GenRoomDecorationClass
         
             // the pipe platforms
             
-        ty=room.yStoryBound.min+genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
-        by=room.yStoryBound.max-genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
+        ty=room.yBound.min+genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
+        by=room.yBound.max-genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
         
         wid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.5);
 
         platformBoundX=new wsBound((pos.x-wid),(pos.x+wid));
         platformBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
 
-        platformBoundY=new wsBound(room.yStoryBound.min,ty);
+        platformBoundY=new wsBound(room.yBound.min,ty);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
         
-        platformBoundY=new wsBound(by,room.yStoryBound.max);
+        platformBoundY=new wsBound(by,room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
 
         pipeBoundY=new wsBound(ty,by);

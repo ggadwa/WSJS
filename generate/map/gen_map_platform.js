@@ -10,68 +10,19 @@ class GenRoomPlatformClass
     {
         Object.seal(this);
     }
-    
-        //
-        // add stairs chunk
-        //
         
-    addStairChunk(room,stairX,stairZ,stairDir,platformBitmap)
-    {
-        var xStairBound=new wsBound((room.xBound.min+(stairX*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((stairX+1)*config.ROOM_BLOCK_WIDTH)));
-        var zStairBound=new wsBound((room.zBound.min+(stairZ*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((stairZ+1)*config.ROOM_BLOCK_WIDTH)));
-
-        var genRoomStairs=new GenRoomStairsClass();
-        
-        switch (stairDir) {
-            case 0:
-                genRoomStairs.createStairsX(xStairBound,room.yBound,zStairBound,true,true,true);
-                break;
-            case 1:
-                genRoomStairs.createStairsZ(xStairBound,room.yBound,zStairBound,true,true,true);
-                break;
-            case 2:
-                genRoomStairs.createStairsX(xStairBound,room.yBound,zStairBound,true,true,false);
-                break;
-            case 3:
-                genRoomStairs.createStairsZ(xStairBound,room.yBound,zStairBound,true,true,false);
-                break;
-        }
-        
-            // can't spawn items on this grid spot
-            // or the spot where the stairs empties
-            
-        room.setBlockGrid(stairX,stairZ);
-        
-        switch (stairDir) {
-            case 0:
-                if (stairX>0) room.setBlockGrid((stairX-1),stairZ);
-                break;
-            case 1:
-                if (stairZ>0) room.setBlockGrid(stairX,(stairZ-1));
-                break;
-            case 2:
-                if (stairX<(room.xBlockSize-1)) room.setBlockGrid((stairX+1),stairZ);
-                break;
-            case 3:
-                if (stairZ<(room.zBlockSize-1)) room.setBlockGrid(stairX,(stairZ+1));
-                break;
-        }
-        
-            // add to overlay
-        
-        map.addOverlayPlatform(xStairBound,zStairBound);
-    }
-    
         //
         // add platform chunk
         //
         
     addPlatformChunk(room,x,z,platformBitmap)
     {
+        var y=(room.yBound.max-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH));
+        
         var xPlatformBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
-        var yPlatformBound=new wsBound((room.yBound.min-config.ROOM_FLOOR_DEPTH),room.yBound.min);
+        var yPlatformBound=new wsBound(y,(y+config.ROOM_FLOOR_DEPTH));
         var zPlatformBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
-
+        
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
@@ -188,12 +139,7 @@ class GenRoomPlatformClass
             this.addLiftChunk(room,stairX,stairZ,config.ROOM_BLOCK_WIDTH);
         }
         else {
-            if (genRandom.randomPercentage(0.5)) {
-                this.addStairChunk(room,stairX,stairZ,stairDir,platformBitmap);
-            }
-            else {
-                this.addLiftChunk(room,stairX,stairZ,0);
-            }
+            this.addLiftChunk(room,stairX,stairZ,0);
         }
         
             // expand from the platform

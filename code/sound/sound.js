@@ -9,6 +9,7 @@ class SoundClass
     constructor()
     {
         this.ctx=null;
+        this.listener=null;
 
         this.soundPlayList=null;
         
@@ -38,6 +39,10 @@ class SoundClass
         
         this.soundPlayList=new SoundPlayListClass();
         if (!this.soundPlayList.initialize()) return(false);
+        
+            // get a reference to the listener
+            
+        this.listener=this.ctx.listener;
         
         return(true);
     }
@@ -80,21 +85,26 @@ class SoundClass
     
     update()
     {
+        if (this.listener===null) return;
+        
             // update listener
             
         this.listenerForwardVector.setFromValues(0.0,0.0,1.0);
         this.listenerForwardVector.rotateY(null,this.currentListenerEntity.angle.y);
         
-        this.ctx.listener.positionX=0;      // always consider listener at 0, and other entities relative to it
-        this.ctx.listener.positionY=0;
-        this.ctx.listener.positionZ=0;
-        this.ctx.listener.forwardX=this.listenerForwardVector.x;
-        this.ctx.listener.forwardY=this.listenerForwardVector.y;
-        this.ctx.listener.forwardZ=this.listenerForwardVector.z;
-        this.ctx.listener.upX=0.0;
-        this.ctx.listener.upY=1.0;
-        this.ctx.listener.upZ=0.0;
-        
+            // supergumba -- remove the comments when listener implements the position values
+            
+/*        
+        this.listener.positionX.value=this.currentListenerEntity.position.x;
+        this.listener.positionY.value=this.currentListenerEntity.position.y;
+        this.listener.positionZ.value=this.currentListenerEntity.position.z;
+        this.listener.forwardX.value=this.listenerForwardVector.x;
+        this.listener.forwardY.value=this.listenerForwardVector.y;
+        this.listener.forwardZ.value=this.listenerForwardVector.z;
+        this.listener.upX.value=0.0;
+        this.listener.upY.value=1.0;
+        this.listener.upZ.value=0.0;
+*/        
             // update all playing sounds
             
         this.soundPlayList.updateSoundPlays(this.currentListenerEntity);

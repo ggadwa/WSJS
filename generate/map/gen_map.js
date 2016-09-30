@@ -181,58 +181,68 @@ class GenMapClass
     addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,allowLiquid,level)
     {
         var n,mesh,mesh2;
-        var storyCount,yStoryBound,yFloorBound;
+        var storyCount,yWallBound,yFloorBound;
         var roomIdx,room;
-        var hasStories;
+        var storyCount,liquid;
         var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
-            // stories, platforms, and ledges
+            // anything above lower floor can have
+            // other stories
+        
+        storyCount=1;
+        if (level!==ROOM_LEVEL_LOWER) storyCount=5; //genRandom.randomInt(1,3);
+
+            // determine if this room has a liquid,
+            // and lower it for pool and add a story
+        
+        liquid=(config.ROOM_LIQUIDS)&&(genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&allowLiquid;
+        liquid=allowLiquid;     // supergumba -- forcing liquids for test
+        
+        if (liquid) {
+            yBound.max+=(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+            storyCount++;
+        }
+        
+            // move up Y for stories
             
-        if (level===0) {
-            hasStories=true;
-        }
-        else {
-            hasStories=genRandom.randomPercentage(config.ROOM_UPPER_TALL_PERCENTAGE);
-        }
+        yBound.min=yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*storyCount);
             
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level);
+        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,liquid,level);
         room=map.rooms[roomIdx];
         
-            // liquid flags and floor
-        
-        room.liquid=(config.ROOM_LIQUIDS)&&(genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&(room.level!==1)&&allowLiquid;
-        room.createMeshFloor(map.getTexture(map.TEXTURE_TYPE_FLOOR),yBound);
+            // the floor
+            
+        room.createMeshFloor(map.getTexture(map.TEXTURE_TYPE_FLOOR));
 
             // walls
             
-        storyCount=hasStories?2:1;
-        yStoryBound=yBound.copy();
+        yWallBound=yBound.copy();
             
         for (n=0;n!==storyCount;n++) {
-            mesh=room.createMeshWalls(roomBitmap,yStoryBound);
+            mesh=room.createMeshWalls(roomBitmap,yWallBound);
 
-            yFloorBound=new wsBound((yStoryBound.min-config.ROOM_FLOOR_DEPTH),yStoryBound.min);
+            yFloorBound=new wsBound((yWallBound.min-config.ROOM_FLOOR_DEPTH),yWallBound.min);
             mesh2=room.createMeshWalls(roomBitmap,yFloorBound);
             mesh.combineMesh(mesh2);
             
             map.addMesh(mesh);
             if (n===0) map.addOverlayRoom(room);
             
-            yStoryBound.add(-(yBound.getSize()+config.ROOM_FLOOR_DEPTH));
+            yWallBound.add(-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH));
         }
         
             // the ceiling
         
-        room.openCeiling=(genRandom.randomPercentage(0.5))&&(room.level!==0);
-        room.createMeshCeiling(map.getTexture(map.TEXTURE_TYPE_CEILING),yFloorBound);
+        room.openCeiling=(genRandom.randomPercentage(0.5))&&(storyCount>1);
+        room.createMeshCeiling(map.getTexture(map.TEXTURE_TYPE_CEILING));
         
         return(roomIdx);
     }
 
-    addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,flipDirection,level)
+    addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,flipDirection)
     {
         var genRoomStairs=new GenRoomStairsClass();
         
@@ -398,18 +408,15 @@ class GenMapClass
         
             // locations
             
-        lightY=room.yBound.min-config.ROOM_FLOOR_DEPTH;
-        if (room.hasStories) lightY-=(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH);
+        lightY=room.yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*room.storyCount);
         
         fixturePos=new wsPoint(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
         lightPos=new wsPoint(fixturePos.x,(room.openCeiling?(fixturePos.y-100):(fixturePos.y+1100)),fixturePos.z);
         
             // intensity
-            
-        intensity=Math.trunc((room.xBound.getSize()+room.zBound.getSize())*0.25);   // it's a radius, so 0.5 for half, 0.5 for radius
         
-        intensity*=(config.MAP_LIGHT_FACTOR+(genRandom.random()*config.MAP_LIGHT_FACTOR_EXTRA));
-        if (room.hasStories) intensity*=config.MAP_LIGHT_TWO_STORY_BOOST;
+        intensity=Math.max(room.xBound.getSize(),room.yBound.getSize(),room.zBound.getSize());
+        intensity=Math.trunc((intensity*config.MAP_LIGHT_FACTOR)+(intensity*(genRandom.random()*config.MAP_LIGHT_FACTOR_EXTRA)));
         
             // create the light
             
@@ -618,7 +625,7 @@ class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,false,0);
+        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,false,ROOM_LEVEL_MAIN);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -678,26 +685,26 @@ class GenMapClass
         
             // level changes
             
-        var storyAdd=lastRoom.yBound.getSize()+config.ROOM_FLOOR_DEPTH;
+        var storyAdd=config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH;
         var stairMode=this.STAIR_NONE;
 
-        var level=0;
+        var level=ROOM_LEVEL_MAIN;
         yBound=lastRoom.yBound.copy();
-
+/* supergumba -- always liquid here
         if (genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
             
             if (genRandom.randomPercentage(0.5)) {
-                level=1;
+                level=ROOM_LEVEL_UPPER;
                 yBound.add(-storyAdd);
                 stairMode=this.STAIR_UP;
             }
             else {
-                level=0;
+                level=ROOM_LEVEL_LOWER;
                 yBound.add(storyAdd);
                 stairMode=this.STAIR_DOWN;
             }
         }
-     
+*/     
             // get random block size for room
             // and make sure it stays under the max
             // blocks for room
@@ -801,8 +808,8 @@ class GenMapClass
             // add in any stairs
             
         if (stairMode!==this.STAIR_NONE) {
-            yStairBound=new wsBound(yBound.max,(yBound.max+(yBound.getSize()+config.ROOM_FLOOR_DEPTH)));
-            this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(stairMode===this.STAIR_DOWN),level);
+            yStairBound=new wsBound(yBound.max,(yBound.max+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)));
+            this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(stairMode===this.STAIR_DOWN));
             this.addStairLight(xStairBound,yStairBound,zStairBound);
         }
 
@@ -868,7 +875,7 @@ class GenMapClass
             
                 // we can add up to two rooms on
                 // either side of the path
-                
+                /* supergumba -- always liquid test here
             switch(genRandom.randomIndex(4)) {
                 case 1:
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
@@ -877,10 +884,13 @@ class GenMapClass
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
                     break;          
                 case 3:
+                */
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
+                    /*
                     break;          
             }
+            */
         }
     }
     
@@ -914,7 +924,7 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if ((room.hasStories) && (room.level===0)) platform.createPlatforms(room);
+            if ((room.storyCount>1) && (room.level===0)) platform.createPlatforms(room);
         }
     }
     

@@ -11,8 +11,22 @@ When interface created
 
 ToDos
 
-#### remove the concept of level and all it flags
+
+MAP_LIGHT_TWO_STORY_BOOST
+ROOM_UPPER_TALL_PERCENTAGE
+- closests need to pick random story
+
+
+#### get rid of yStoryBound from room, make it real room size
+#### get rid of supergumba liquid testing stuff
+#### createWalls in room needs to make both walls
+#### better platforms and such (like half room platforms or ones that just go parallel from lift/stairs)
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
+#### stairs out of water don't always appear
+#### need stairs out of water in rooms that edge against water rooms
+
+#### randomize the movement for lifts
+
 #### better monster scream
 
 #### need to group the lights to better pick the lights in each room
@@ -20,7 +34,9 @@ ToDos
 #### item texture is pretty ugly
 #### genBitmapSkin/genBitmapItem in main.js delete later
 
-#### move up to spatial panner (sound_list.setListenerToEntity, sound.play) -- BACK TO REGULAR PANNER (ugh)
+#### certain decorations in certain rooms (like computers and boxes and such in externals)
+
+#### finish "supergumba" sound parts that aren't workable until panner/listener position gets implemented
 
 
 
@@ -55,10 +71,4 @@ ToDos
 
 #### draw closest map meshes first
 
-
-
-
-* more internal re-arrangement
-* fixed Edge browser webgl problem
-* reworked almost all the texture generation
 

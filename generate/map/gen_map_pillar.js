@@ -82,7 +82,7 @@ class GenRoomPillarClass
         
             // ybound
             
-        yBound=room.yStoryBound;
+        yBound=room.yBound;
         
             // texture
             

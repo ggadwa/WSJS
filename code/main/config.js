@@ -19,7 +19,7 @@ class ConfigClass
             // room generation
             //
 
-        this.ROOM_PATH_COUNT=8;                        // how many rooms in the map path
+        this.ROOM_PATH_COUNT=5;                        // how many rooms in the map path
 
         this.ROOM_BLOCK_WIDTH=8000;                    // x/z dimension of a block (rooms are made up of a grid of blocks)
         this.ROOM_FLOOR_HEIGHT=8000;                   // how tall each floor of a room is
@@ -31,9 +31,7 @@ class ConfigClass
 
         this.ROOM_MAX_CONNECT_TRY=20;                  // maximum times to try to find a place to connect a room to another room
 
-        this.ROOM_DOOR_PERCENTAGE=0.33;                // what % of the time a connection to a room is a door
         this.ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;         // what % of the time a connection to a room is up a story
-        this.ROOM_UPPER_TALL_PERCENTAGE=0.5;           // what % of the time an upper level room is taller than normal
 
             //
             // closets, platforms, ledges
@@ -90,9 +88,8 @@ class ConfigClass
         this.MAP_LIGHT_AMBIENT_G=0.2;
         this.MAP_LIGHT_AMBIENT_B=0.2;
 
-        this.MAP_LIGHT_FACTOR=0.8;                     // lights are initially set to room radius, this factor is multipled in
-        this.MAP_LIGHT_FACTOR_EXTRA=0.6;               // random addition to light factor above
-        this.MAP_LIGHT_TWO_STORY_BOOST=1.3;            // multiply boost when a light is in a two story room
+        this.MAP_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
+        this.MAP_LIGHT_FACTOR_EXTRA=0.4;               // random addition to light factor above
 
         this.MAP_LIGHT_EXPONENT_MINIMUM=0.2;           // minimum light exponent (0.0 is completely hard light with no fall off)
         this.MAP_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add

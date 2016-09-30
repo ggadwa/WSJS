@@ -11,12 +11,21 @@ class SoundPlayClass
         this.free=true;
         this.entity=null;
         
+        this.sourceNode=null;
+        this.gainNode=null;
+        this.pannerNode=null;
+        
         Object.seal(this);
     }
     
     close()
     {
     }
+    
+    /*
+     * var panner = audioCtx.createPanner();
+
+     */
     
         //
         // play a sound buffer at this entity
@@ -28,27 +37,51 @@ class SoundPlayClass
         
         if (entity!==null) {
             var dist=entity.position.distance(entityListener.position);
-            if (dist>this.maxDistance) return(false);
+            if (dist>soundBuffer.maxDistance) return(false);
         }
         
-            // get attenuation
+            // set the audio nodes
         
-        var f=0.4;
-        //var f=((this.maxDistance-dist)/this.maxDistance);
+        this.sourceNode=ctx.createBufferSource();
+        this.sourceNode.buffer=soundBuffer.buffer;
+        this.sourceNode.onended=this.ended.bind(this);
         
-            // supergumba -- doing a simple inverse linear distance until
-            // panner starts working and/or is implemented correctly
+            // if no entity, than just add
+            // a gain node, otherwise a panner
             
-        var source=ctx.createBufferSource();
-        source.buffer=soundBuffer.buffer;
-        source.onended=this.ended.bind(this);
+            // supergumba -- waiting for this to be implemented, then remove the comments
+            
+    //    if (entity===null) {
+            this.gainNode=ctx.createGain();
+            this.gainNode.gain.value=0.4;
         
-            var gainNode=ctx.createGain();
-            gainNode.gain.value=f;
-        
-            source.connect(gainNode);
-            gainNode.connect(ctx.destination);
-        
+            this.sourceNode.connect(this.gainNode);
+            this.gainNode.connect(ctx.destination);
+    /*
+        }
+        else {
+            this.pannerNode=ctx.createPanner();
+            
+            this.pannerNode.panningModel='HRTF';
+            this.pannerNode.distanceModel='inverse';
+            this.pannerNode.refDistance=1;
+            this.pannerNode.maxDistance=soundBuffer.maxDistance;
+            this.pannerNode.rolloffFactor=1;
+            this.pannerNode.coneInnerAngle=360;
+            this.pannerNode.coneOuterAngle=0;
+            this.pannerNode.coneOuterGain=0;
+            this.pannerNode.positionX.value=entity.position.x;
+            this.pannerNode.positionY.value=entity.position.y;
+            this.pannerNode.positionZ.value=entity.position.z;
+            this.pannerNode.orientationX.value=1;
+            this.pannerNode.orientationY.value=0;
+            this.pannerNode.orientationZ.value=0;
+
+            this.sourceNode.connect(this.pannerNode);
+            this.pannerNode.connect(ctx.destination);
+        }
+        */
+       
             // set to entity and mark as used
         
         this.entity=entity;
@@ -56,13 +89,16 @@ class SoundPlayClass
         
             // finally play the sound
             
-        source.start();
+        this.sourceNode.start();
     }
     
     ended()
     {
         this.free=true;
         this.entity=null;           // otherwise entities cleared from entity list will be cleaned up late
+        this.sourceNode=null;
+        this.gainNode=null;
+        this.pannerNode=null;
     }
     
         //
@@ -71,7 +107,15 @@ class SoundPlayClass
         
     update(entityListener)
     {
-        
+        // supergumba -- remove these when panner finally works again
+
+        /*
+        if (this.entity!==null) {
+            this.pannerNode.positionX.value=this.entity.position.x;
+            this.pannerNode.positionY.value=this.entity.position.y;
+            this.pannerNode.positionZ.value=this.entity.position.z;
+        }
+        */
     }
 
 }

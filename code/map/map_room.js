@@ -9,29 +9,25 @@
 
 class MapRoomClass
 {
-    constructor(xBlockSize,zBlockSize,xBound,yBound,zBound,hasStories,level)
+    constructor(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,liquid,level)
     {
         this.xBlockSize=xBlockSize;
         this.zBlockSize=zBlockSize;
         this.xBound=xBound;
         this.yBound=yBound;
         this.zBound=zBound;
-        this.hasStories=hasStories;
+        this.storyCount=storyCount;
+        this.liquid=liquid;
         this.level=level;
         
         this.openCeiling=false;
-        this.liquid=false;
-
+        
         this.blockGrid=null;
         this.platformGrid=null;
         
         this.connectSideHasDoor=[false,false,false,false];      // track which connections had a door
-
-        this.yStoryBound=new wsBound((this.yBound.min-config.ROOM_FLOOR_DEPTH),this.yBound.max);
-        if (this.hasStories) this.yStoryBound.min-=(this.yBound.getSize()+config.ROOM_FLOOR_DEPTH);
         
         this.yOpenBound=new wsBound(0,0);
-        this.yLiquidBound=new wsBound(0,0);
         
         this.setupGrid();
         
@@ -377,7 +373,7 @@ class MapRoomClass
         // create polygon walls and floors
         //
         
-    createMeshWalls(bitmap,yStoryBound)
+    createMeshWalls(bitmap,yWallBound)
     {
         var n,nSegment,x,z,x2,z2;
 
@@ -399,17 +395,17 @@ class MapRoomClass
         for (n=0;n!==this.xBlockSize;n++) {
             x2=x+config.ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.min);
-            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.min,this.zBound.min);
-            vertexList[vIdx+2].position.setFromValues(x2,yStoryBound.max,this.zBound.min);
+            vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.min);
+            vertexList[vIdx+1].position.setFromValues(x2,yWallBound.min,this.zBound.min);
+            vertexList[vIdx+2].position.setFromValues(x2,yWallBound.max,this.zBound.min);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.min);
-            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.max,this.zBound.min);
-            vertexList[vIdx+2].position.setFromValues(x,yStoryBound.max,this.zBound.min);
+            vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.min);
+            vertexList[vIdx+1].position.setFromValues(x2,yWallBound.max,this.zBound.min);
+            vertexList[vIdx+2].position.setFromValues(x,yWallBound.max,this.zBound.min);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -425,17 +421,17 @@ class MapRoomClass
         for (n=0;n!==this.zBlockSize;n++) {
             z2=z+config.ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.setFromValues(this.xBound.max,yStoryBound.min,z);
-            vertexList[vIdx+1].position.setFromValues(this.xBound.max,yStoryBound.min,z2);
-            vertexList[vIdx+2].position.setFromValues(this.xBound.max,yStoryBound.max,z2);
+            vertexList[vIdx].position.setFromValues(this.xBound.max,yWallBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.max,yWallBound.min,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.max,yWallBound.max,z2);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.setFromValues(this.xBound.max,yStoryBound.min,z);
-            vertexList[vIdx+1].position.setFromValues(this.xBound.max,yStoryBound.max,z2);
-            vertexList[vIdx+2].position.setFromValues(this.xBound.max,yStoryBound.max,z);
+            vertexList[vIdx].position.setFromValues(this.xBound.max,yWallBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.max,yWallBound.max,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.max,yWallBound.max,z);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -451,17 +447,17 @@ class MapRoomClass
         for (n=0;n!==this.xBlockSize;n++) {
             x2=x+config.ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.max);
-            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.min,this.zBound.max);
-            vertexList[vIdx+2].position.setFromValues(x2,yStoryBound.max,this.zBound.max);
+            vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.max);
+            vertexList[vIdx+1].position.setFromValues(x2,yWallBound.min,this.zBound.max);
+            vertexList[vIdx+2].position.setFromValues(x2,yWallBound.max,this.zBound.max);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.setFromValues(x,yStoryBound.min,this.zBound.max);
-            vertexList[vIdx+1].position.setFromValues(x2,yStoryBound.max,this.zBound.max);
-            vertexList[vIdx+2].position.setFromValues(x,yStoryBound.max,this.zBound.max);
+            vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.max);
+            vertexList[vIdx+1].position.setFromValues(x2,yWallBound.max,this.zBound.max);
+            vertexList[vIdx+2].position.setFromValues(x,yWallBound.max,this.zBound.max);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -477,17 +473,17 @@ class MapRoomClass
         for (n=0;n!==this.zBlockSize;n++) {
             z2=z+config.ROOM_BLOCK_WIDTH;
             
-            vertexList[vIdx].position.setFromValues(this.xBound.min,yStoryBound.min,z);
-            vertexList[vIdx+1].position.setFromValues(this.xBound.min,yStoryBound.min,z2);
-            vertexList[vIdx+2].position.setFromValues(this.xBound.min,yStoryBound.max,z2);
+            vertexList[vIdx].position.setFromValues(this.xBound.min,yWallBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.min,yWallBound.min,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.min,yWallBound.max,z2);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
 
-            vertexList[vIdx].position.setFromValues(this.xBound.min,yStoryBound.min,z);
-            vertexList[vIdx+1].position.setFromValues(this.xBound.min,yStoryBound.max,z2);
-            vertexList[vIdx+2].position.setFromValues(this.xBound.min,yStoryBound.max,z);
+            vertexList[vIdx].position.setFromValues(this.xBound.min,yWallBound.min,z);
+            vertexList[vIdx+1].position.setFromValues(this.xBound.min,yWallBound.max,z2);
+            vertexList[vIdx+2].position.setFromValues(this.xBound.min,yWallBound.max,z);
 
             indexes[iIdx++]=vIdx++;
             indexes[iIdx++]=vIdx++;
@@ -560,21 +556,12 @@ class MapRoomClass
         // create polygon floors or ceilings
         //
         
-    createMeshFloor(bitmap,yStoryBound)
+    createMeshFloor(bitmap)
     {
         var x,z,vx,vz,vx2,vz2;
         var v,nSegment;
         
-        var y=yStoryBound.max;
-        
-            // if liquid, create the pool walls
-        
-        if (this.liquid) {
-            this.yLiquidBound.setFromValues(y,(y+config.ROOM_BLOCK_WIDTH));
-            map.addMesh(this.createMeshWalls(bitmap,this.yLiquidBound));
-            
-            y+=config.ROOM_BLOCK_WIDTH;
-        }
+        var y=this.yBound.max;
         
             // create mesh
             
@@ -641,7 +628,7 @@ class MapRoomClass
         map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
     }
     
-    createMeshCeiling(bitmap,yStoryBound)
+    createMeshCeiling(bitmap)
     {
         var x,z,vx,vz,vx2,vz2;
         var v,nSegment,doBlock,yOpenBound;
@@ -661,7 +648,7 @@ class MapRoomClass
         var vIdx=0;
         var iIdx=0;
         
-        var y=yStoryBound.min;
+        var y=this.yBound.min;
         
         vz=this.zBound.min;
         
@@ -755,7 +742,7 @@ class MapRoomClass
         
     getLiquidY()
     {
-        return(this.yBound.max+config.ROOM_FLOOR_DEPTH);
+        return(this.yBound.max-config.ROOM_FLOOR_HEIGHT);
     }
     
     addTintFromLiquidColor(col)

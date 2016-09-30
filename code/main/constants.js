@@ -41,6 +41,15 @@ const ROOM_SIDE_RIGHT=2;
 const ROOM_SIDE_BOTTOM=3;
 
     //
+    // room levels
+    //
+    
+const ROOM_LEVEL_MAIN=0;
+const ROOM_LEVEL_LOWER=1;
+const ROOM_LEVEL_UPPER=2;
+
+
+    //
     // particles
     //
 

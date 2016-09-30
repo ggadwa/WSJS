@@ -159,7 +159,7 @@ class GenRoomClosetClass
                 // get the Y bound
 
             yClosetBound=room.yBound.copy();
-            if (room.hasStories) {
+            if (room.storyCount>1) {
                 if (genRandom.randomPercentage(config.ROOM_CLOSET_UP_PERCENTAGE)) yClosetBound.add(-(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH));
             }
             
