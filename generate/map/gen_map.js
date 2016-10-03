@@ -15,6 +15,11 @@ class GenMapClass
 
         this.callbackFunc=callbackFunc;
         
+            // the base Y for the path part
+            // of the map
+            
+        this.yBase=Math.trunc(view.OPENGL_FAR_Z/2);
+        
             // some constants
             
         this.HALLWAY_NONE=0;
@@ -178,10 +183,10 @@ class GenMapClass
         // create rooms
         //
 
-    addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,allowLiquid,level)
+    addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,allowLiquid,level)
     {
         var n,mesh,mesh2;
-        var storyCount,yWallBound,yFloorBound;
+        var storyCount,yBound,yWallBound,yFloorBound;
         var roomIdx,room;
         var storyCount,liquid;
         var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
@@ -190,20 +195,35 @@ class GenMapClass
             // other stories
         
         storyCount=1;
-        if (level!==ROOM_LEVEL_LOWER) storyCount=5; //genRandom.randomInt(1,3);
+        if (level!==ROOM_LEVEL_LOWER) storyCount=genRandom.randomInt(1,3);
+        
+            // bottom of room
+        
+        yBound=new wsBound(0,0);
+        
+        switch (level) {
+            case ROOM_LEVEL_LOWER:
+                yBound.max=this.yBase+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+                break;
+            case ROOM_LEVEL_UPPER:
+                yBound.max=this.yBase-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+                break;
+            default:
+                yBound.max=this.yBase;
+                break;
+        }
 
             // determine if this room has a liquid,
             // and lower it for pool and add a story
         
         liquid=(config.ROOM_LIQUIDS)&&(genRandom.randomPercentage(config.ROOM_LIQUID_PERCENTAGE))&&allowLiquid;
-        liquid=allowLiquid;     // supergumba -- forcing liquids for test
         
         if (liquid) {
             yBound.max+=(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
             storyCount++;
         }
         
-            // move up Y for stories
+            // top of room
             
         yBound.min=yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*storyCount);
             
@@ -218,13 +238,14 @@ class GenMapClass
         room.createMeshFloor(map.getTexture(map.TEXTURE_TYPE_FLOOR));
 
             // walls
+            // each wall is a tall piece and a short piece on top
+            // the short piece is for headers on doors and places for platforms
             
-        yWallBound=yBound.copy();
+        yWallBound=new wsBound((yBound.max-config.ROOM_FLOOR_HEIGHT),yBound.max);
+        yFloorBound=new wsBound((yWallBound.min-config.ROOM_FLOOR_DEPTH),yWallBound.min);
             
         for (n=0;n!==storyCount;n++) {
             mesh=room.createMeshWalls(roomBitmap,yWallBound);
-
-            yFloorBound=new wsBound((yWallBound.min-config.ROOM_FLOOR_DEPTH),yWallBound.min);
             mesh2=room.createMeshWalls(roomBitmap,yFloorBound);
             mesh.combineMesh(mesh2);
             
@@ -232,6 +253,7 @@ class GenMapClass
             if (n===0) map.addOverlayRoom(room);
             
             yWallBound.add(-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH));
+            yFloorBound.add(-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH));
         }
         
             // the ceiling
@@ -242,13 +264,28 @@ class GenMapClass
         return(roomIdx);
     }
 
-    addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,flipDirection)
+    addStairRoom(stairMode,connectSide,xStairBound,zStairBound)
     {
         var genRoomStairs=new GenRoomStairsClass();
         
+            // y of stairs
+            
+        var yStairBound=new wsBound(0,0);
+        
+        switch (stairMode) {
+            case this.STAIR_UP:
+                yStairBound.max=this.yBase-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+                break;
+            case this.STAIR_DOWN:
+                yStairBound.max=this.yBase+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+                break;
+        }
+        
+        yStairBound.min=yStairBound.max-config.ROOM_FLOOR_HEIGHT;       // don't count the upper header
+        
             // flip the direction if going down
             
-        if (flipDirection) {
+        if (stairMode===this.STAIR_DOWN) {
             switch (connectSide) {
                 case ROOM_SIDE_LEFT:
                     connectSide=ROOM_SIDE_RIGHT;
@@ -264,7 +301,7 @@ class GenMapClass
                     break;
             }
             
-            yStairBound.add(-yStairBound.getSize());
+            //yStairBound.add(-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH));
         }
 
             // create the stairs
@@ -298,12 +335,13 @@ class GenMapClass
         // hallways and liquid steps
         //
         
-    addHallwayRoom(connectSide,hallwayMode,xHallwayBound,yHallwayBound,zHallwayBound)
+    addHallwayRoom(connectSide,hallwayMode,xHallwayBound,zHallwayBound)
     {
             // build the door
             
         var genRoomHallway=new GenRoomHallwayClass();
-        
+        var yHallwayBound=new wsBound(this.yBase,(this.yBase-config.ROOM_FLOOR_HEIGHT));        // don't count the upper header
+
         if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
             genRoomHallway.createHallwayX(xHallwayBound,yHallwayBound,zHallwayBound,(hallwayMode===this.HALLWAY_LONG));
         }
@@ -423,13 +461,13 @@ class GenMapClass
         this.addGeneralLight(lightPos,(room.openCeiling?null:fixturePos),intensity);
     }
     
-    addHallwayLight(xBound,yBound,zBound)
+    addHallwayLight(xBound,zBound)
     {
         var fixturePos,lightPos,high;
         
             // locations
             
-        fixturePos=new wsPoint(xBound.getMidPoint(),yBound.min,zBound.getMidPoint());
+        fixturePos=new wsPoint(xBound.getMidPoint(),(this.yBase-config.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
         lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
         
             // create the light
@@ -482,9 +520,8 @@ class GenMapClass
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
         var connectSide,connectOffset;
-        var xBound,yBound,zBound;
-        var stairOffset,stairAdd,xStairBound,yStairBound,zStairBound;
-        var doorOffset,doorAdd,xHallwayBound,yHallwayBound,zHallwayBound;
+        var xBound,zBound;
+        var doorOffset,doorAdd,xHallwayBound,zHallwayBound;
         
             // get random block size for room
             // and make sure it stays under the max
@@ -508,9 +545,6 @@ class GenMapClass
 
             var halfSize=Math.trunc((xBlockSize/2)*config.ROOM_BLOCK_WIDTH);
             xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
-
-            var halfSize=Math.trunc(config.ROOM_FLOOR_HEIGHT/2);
-            yBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
 
             var halfSize=Math.trunc((zBlockSize/2)*config.ROOM_BLOCK_WIDTH);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
@@ -541,9 +575,8 @@ class GenMapClass
                 connectOffset*=config.ROOM_BLOCK_WIDTH;
                 
                     // get new room bounds and move it around
-                    // if we need space for stairs or doors
+                    // if we need space for hallways
                 
-                stairAdd=config.ROOM_BLOCK_WIDTH*2;
                 doorAdd=(hallwayMode===this.HALLWAY_LONG)?(config.ROOM_BLOCK_WIDTH*4):config.ROOM_BLOCK_WIDTH;
                 
                 switch (connectSide) {
@@ -607,25 +640,19 @@ class GenMapClass
                 tryCount++;
                 if (tryCount>config.ROOM_MAX_CONNECT_TRY) return;
             }
-            
-                // bounds always the same as last room,
-                // main path is on the same level
-                
-            yBound=lastRoom.yBound.copy();
         }
 
             // add in hallways and a light
             // if the hallway is long
             
         if (hallwayMode!==this.HALLWAY_NONE) {
-            yHallwayBound=new wsBound(yBound.max,(yBound.max-config.ROOM_FLOOR_HEIGHT));
-            this.addHallwayRoom(connectSide,hallwayMode,xHallwayBound,yHallwayBound,zHallwayBound);
-            if (hallwayMode===this.HALLWAY_LONG) this.addHallwayLight(xHallwayBound,yHallwayBound,zHallwayBound);
+            this.addHallwayRoom(connectSide,hallwayMode,xHallwayBound,zHallwayBound);
+            if (hallwayMode===this.HALLWAY_LONG) this.addHallwayLight(xHallwayBound,zHallwayBound);
         }
 
             // the room
             
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,false,ROOM_LEVEL_MAIN);
+        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,false,ROOM_LEVEL_MAIN);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -638,7 +665,7 @@ class GenMapClass
         }
         
             // mask off edges that have collided with
-            // the newest room or stairs leading to a room
+            // the newest room or hallway to room
             // we use this mask to calculate ledges and other
             // outside wall hugging map pieces
         
@@ -646,8 +673,8 @@ class GenMapClass
             switch (hallwayMode) {
                 case this.HALLWAY_SHORT:
                 case this.HALLWAY_LONG:
-                    lastRoom.maskEdgeGridBlockToBounds(xHallwayBound,yHallwayBound,zHallwayBound);
-                    room.maskEdgeGridBlockToBounds(xHallwayBound,yHallwayBound,zHallwayBound);
+                    lastRoom.maskEdgeGridBlockToBounds(xHallwayBound,zHallwayBound);
+                    room.maskEdgeGridBlockToBounds(xHallwayBound,zHallwayBound);
                     break;
                 default:
                     lastRoom.maskEdgeGridBlockToRoom(room);
@@ -681,7 +708,7 @@ class GenMapClass
         var xBlockSize,zBlockSize;
         var connectSide,connectOffset;
         var xBound,yBound,zBound;
-        var stairOffset,stairAdd,xStairBound,yStairBound,zStairBound;
+        var stairOffset,stairAdd,xStairBound,zStairBound;
         
             // level changes
             
@@ -690,7 +717,7 @@ class GenMapClass
 
         var level=ROOM_LEVEL_MAIN;
         yBound=lastRoom.yBound.copy();
-/* supergumba -- always liquid here
+
         if (genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
             
             if (genRandom.randomPercentage(0.5)) {
@@ -704,7 +731,7 @@ class GenMapClass
                 stairMode=this.STAIR_DOWN;
             }
         }
-*/     
+   
             // get random block size for room
             // and make sure it stays under the max
             // blocks for room
@@ -808,9 +835,8 @@ class GenMapClass
             // add in any stairs
             
         if (stairMode!==this.STAIR_NONE) {
-            yStairBound=new wsBound(yBound.max,(yBound.max+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)));
-            this.addStairRoom(connectSide,xStairBound,yStairBound,zStairBound,(stairMode===this.STAIR_DOWN));
-            this.addStairLight(xStairBound,yStairBound,zStairBound);
+            this.addStairRoom(stairMode,connectSide,xStairBound,zStairBound);
+            //this.addStairLight(xStairBound,zStairBound);
         }
 
             // the room
@@ -818,7 +844,7 @@ class GenMapClass
         var allowLiquid=true;
         if (lastRoom!==null) allowLiquid=!lastRoom.liquid;
             
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,allowLiquid,level);
+        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,allowLiquid,level);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -850,8 +876,8 @@ class GenMapClass
             switch (stairMode) {
                 case this.STAIR_UP:
                 case this.STAIR_DOWN:
-                    lastRoom.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
-                    room.maskEdgeGridBlockToBounds(xStairBound,yStairBound,zStairBound);
+                    lastRoom.maskEdgeGridBlockToBounds(xStairBound,zStairBound);
+                    room.maskEdgeGridBlockToBounds(xStairBound,zStairBound);
                     break;
                 default:
                     lastRoom.maskEdgeGridBlockToRoom(room);
@@ -875,7 +901,7 @@ class GenMapClass
             
                 // we can add up to two rooms on
                 // either side of the path
-                /* supergumba -- always liquid test here
+
             switch(genRandom.randomIndex(4)) {
                 case 1:
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
@@ -884,13 +910,10 @@ class GenMapClass
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
                     break;          
                 case 3:
-                */
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
                     this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
-                    /*
                     break;          
             }
-            */
         }
     }
     

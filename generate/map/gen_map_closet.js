@@ -208,7 +208,7 @@ class GenRoomClosetClass
                 this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
                 map.addOverlayCloset(xClosetBound,zClosetBound);
                 
-                room.maskEdgeGridBlockToBounds(xClosetBound,yClosetBound,zClosetBound);    // block off ledges for edge grid
+                room.maskEdgeGridBlockToBounds(xClosetBound,zClosetBound);    // block off ledges for edge grid
                 
                 xClosetBound.add(xAdd);
                 zClosetBound.add(zAdd);

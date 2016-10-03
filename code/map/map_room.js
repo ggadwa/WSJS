@@ -86,14 +86,9 @@ class MapRoomClass
         // rooms or bounds
         //
         
-    maskEdgeGridBlockToBounds(xCollideBound,yCollideBound,zCollideBound)
+    maskEdgeGridBlockToBounds(xCollideBound,zCollideBound)
     {
         var x,z,x1,x2,z1,z2;
-        
-            // no blocking if this collision starts above
-            // the current room
-            
-        if (yCollideBound.min<this.yBound.min) return;
         
             // find the collision bounds within the block
             // width and mark off the edge grid
@@ -157,7 +152,7 @@ class MapRoomClass
     
     maskEdgeGridBlockToRoom(collideRoom)
     {
-        this.maskEdgeGridBlockToBounds(collideRoom.xBound,collideRoom.yBound,collideRoom.zBound);
+        this.maskEdgeGridBlockToBounds(collideRoom.xBound,collideRoom.zBound);
     }
     
     getEdgeGridValue(x,z)

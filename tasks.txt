@@ -11,19 +11,18 @@ When interface created
 
 ToDos
 
-
-MAP_LIGHT_TWO_STORY_BOOST
-ROOM_UPPER_TALL_PERCENTAGE
-- closests need to pick random story
+#### probably can't use random, etc, as globals when we do modules, need to rethink this, need a wsGlobal?
 
 
+#### keep a global of base Y for room
 #### get rid of yStoryBound from room, make it real room size
-#### get rid of supergumba liquid testing stuff
-#### createWalls in room needs to make both walls
+
+#### closets broken; closests need to pick random story
 #### better platforms and such (like half room platforms or ones that just go parallel from lift/stairs)
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### stairs out of water don't always appear
 #### need stairs out of water in rooms that edge against water rooms
+#### ledges can be taller
 
 #### randomize the movement for lifts
 
