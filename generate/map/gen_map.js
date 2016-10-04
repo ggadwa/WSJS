@@ -274,14 +274,14 @@ class GenMapClass
         
         switch (stairMode) {
             case this.STAIR_UP:
-                yStairBound.max=this.yBase-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+                yStairBound.max=this.yBase;
                 break;
             case this.STAIR_DOWN:
                 yStairBound.max=this.yBase+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
                 break;
         }
         
-        yStairBound.min=yStairBound.max-config.ROOM_FLOOR_HEIGHT;       // don't count the upper header
+        yStairBound.min=yStairBound.max-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);       // don't count the upper header
         
             // flip the direction if going down
             
@@ -463,7 +463,7 @@ class GenMapClass
     
     addHallwayLight(xBound,zBound)
     {
-        var fixturePos,lightPos,high;
+        var fixturePos,lightPos;
         
             // locations
             
@@ -475,15 +475,24 @@ class GenMapClass
         this.addGeneralLight(lightPos,fixturePos,(config.ROOM_FLOOR_HEIGHT*1.5));
     }
     
-    addStairLight(xBound,yBound,zBound)
+    addStairLight(stairMode,xBound,zBound)
     {
-        var fixturePos,lightPos,high;
+        var fixturePos,lightPos;
         
             // locations
             
-        high=Math.trunc(config.ROOM_FLOOR_HEIGHT*0.6);
+        var y=0;
+        
+        switch (stairMode) {
+            case this.STAIR_UP:
+                y=this.yBase-Math.trunc(config.ROOM_FLOOR_HEIGHT*1.55);
+                break;
+            case this.STAIR_DOWN:
+                y=this.yBase-Math.trunc(config.ROOM_FLOOR_HEIGHT*0.45);
+                break;
+        }
             
-        fixturePos=new wsPoint(xBound.getMidPoint(),(yBound.min-high),zBound.getMidPoint());
+        fixturePos=new wsPoint(xBound.getMidPoint(),y,zBound.getMidPoint());
         lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
         
             // create the light
@@ -707,7 +716,7 @@ class GenMapClass
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
         var connectSide,connectOffset;
-        var xBound,yBound,zBound;
+        var xBound,zBound;
         var stairOffset,stairAdd,xStairBound,zStairBound;
         
             // level changes
@@ -716,22 +725,18 @@ class GenMapClass
         var stairMode=this.STAIR_NONE;
 
         var level=ROOM_LEVEL_MAIN;
-        yBound=lastRoom.yBound.copy();
 
         if (genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
-            
             if (genRandom.randomPercentage(0.5)) {
                 level=ROOM_LEVEL_UPPER;
-                yBound.add(-storyAdd);
                 stairMode=this.STAIR_UP;
             }
             else {
                 level=ROOM_LEVEL_LOWER;
-                yBound.add(storyAdd);
                 stairMode=this.STAIR_DOWN;
             }
         }
-   
+
             // get random block size for room
             // and make sure it stays under the max
             // blocks for room
@@ -836,7 +841,7 @@ class GenMapClass
             
         if (stairMode!==this.STAIR_NONE) {
             this.addStairRoom(stairMode,connectSide,xStairBound,zStairBound);
-            //this.addStairLight(xStairBound,zStairBound);
+            this.addStairLight(stairMode,xStairBound,zStairBound);
         }
 
             // the room

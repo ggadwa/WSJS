@@ -14,8 +14,8 @@ ToDos
 #### probably can't use random, etc, as globals when we do modules, need to rethink this, need a wsGlobal?
 
 
-#### keep a global of base Y for room
-#### get rid of yStoryBound from room, make it real room size
+
+
 
 #### closets broken; closests need to pick random story
 #### better platforms and such (like half room platforms or ones that just go parallel from lift/stairs)
