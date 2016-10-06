@@ -1,5 +1,5 @@
 EMCA6
-    [ ] modulize the code
+    [ ] modulize the code (do genRandom first)
     [ ] hoist all the vars, eventually use let (safari hold up)
 
 WebGL2
@@ -11,20 +11,18 @@ When interface created
 
 ToDos
 
-#### probably can't use random, etc, as globals when we do modules, need to rethink this, need a wsGlobal?
 
 
 
 
+#### start on platform is broken (needs story marker)
 
-#### closets broken; closests need to pick random story
-#### better platforms and such (like half room platforms or ones that just go parallel from lift/stairs)
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### stairs out of water don't always appear
 #### need stairs out of water in rooms that edge against water rooms
 #### ledges can be taller
 
-#### randomize the movement for lifts
+#### platforms not knocking out main map mesh walls?
 
 #### better monster scream
 

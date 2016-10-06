@@ -38,7 +38,6 @@ class ConfigClass
             //
 
         this.ROOM_CLOSET_MAX_COUNT=5;                  // maximum number of possible closets in room
-        this.ROOM_CLOSET_UP_PERCENTAGE=0.25;           // what % of the time a closet goes to a second level if available
 
         this.ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform will have a secondary turn
         this.ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn

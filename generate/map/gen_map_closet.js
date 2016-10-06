@@ -128,11 +128,16 @@ class GenRoomClosetClass
     addCloset(room)
     {
         var n,k,x,z,xAdd,zAdd;
+        var bottomStory,topStory,storyHigh;
         var connectSide,connectOffset,closetLen;
         var xClosetBound,yClosetBound,zClosetBound;
         
         var closetCount=genRandom.randomIndex(config.ROOM_CLOSET_MAX_COUNT);
         if (closetCount===0) return;
+        
+            // story height
+            
+        storyHigh=config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH;
         
             // create closests
             
@@ -157,11 +162,13 @@ class GenRoomClosetClass
             }
             
                 // get the Y bound
+                // always need to remove on floor depth for top of closet
+                
+            bottomStory=genRandom.randomInt(0,room.storyCount);
+            topStory=bottomStory+1;   
+            if ((room.storyCount-bottomStory)>1) topStory=bottomStory+genRandom.randomInt(1,(room.storyCount-bottomStory));
 
-            yClosetBound=room.yBound.copy();
-            if (room.storyCount>1) {
-                if (genRandom.randomPercentage(config.ROOM_CLOSET_UP_PERCENTAGE)) yClosetBound.add(-(room.yBound.getSize()+config.ROOM_FLOOR_DEPTH));
-            }
+            yClosetBound=new wsBound(((room.yBound.max-(topStory*storyHigh))+config.ROOM_FLOOR_DEPTH),(room.yBound.max-(bottomStory*storyHigh)));
             
                 // get the box
                 
