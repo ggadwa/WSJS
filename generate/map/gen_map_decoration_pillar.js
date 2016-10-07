@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// generate room pillar class
+// generate room pillar decoration class
 //
 
-class GenRoomPillarClass
+class GenRoomDecorationPillarClass
 {
     constructor()
     {
@@ -72,7 +72,7 @@ class GenRoomPillarClass
         // pillars
         //
     
-    addPillars(room)
+    create(room)
     {
         var yBound;
         

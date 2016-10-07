@@ -9,7 +9,7 @@
 
 class MapRoomClass
 {
-    constructor(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,liquid,level)
+    constructor(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,liquid,level)
     {
         this.xBlockSize=xBlockSize;
         this.zBlockSize=zBlockSize;
@@ -17,6 +17,7 @@ class MapRoomClass
         this.yBound=yBound;
         this.zBound=zBound;
         this.storyCount=storyCount;
+        this.decorationType=decorationType;
         this.liquid=liquid;
         this.level=level;
         

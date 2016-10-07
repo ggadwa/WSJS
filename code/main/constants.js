@@ -48,6 +48,17 @@ const ROOM_LEVEL_MAIN=0;
 const ROOM_LEVEL_LOWER=1;
 const ROOM_LEVEL_UPPER=2;
 
+    //
+    // decorations
+    // 
+
+const ROOM_DECORATION_PLATFORM=0;
+const ROOM_DECORATION_PILLARS=1;
+const ROOM_DECORATION_STORAGE=2;
+const ROOM_DECORATION_MACHINES=3;
+const ROOM_DECORATION_COMPUTERS=4;
+
+const ROOM_DECORATION_COUNT=5;
 
     //
     // particles

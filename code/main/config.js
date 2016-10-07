@@ -39,6 +39,7 @@ class ConfigClass
 
         this.ROOM_CLOSET_MAX_COUNT=5;                  // maximum number of possible closets in room
 
+        this.ROOM_PLATFORM_PERCENTAGE=0.5;              // what % of the time a roof has a platform
         this.ROOM_PLATFORM_2ND_PERCENTAGE=0.6;         // what % of the time a platform will have a secondary turn
         this.ROOM_PLATFORM_3RD_PERCENTAGE=0.4;         // what % of the time a platform will have a third turn
         
@@ -53,8 +54,8 @@ class ConfigClass
         this.STAIR_STEP_COUNT=10;
         
         this.ROOM_CLOSETS=true;                         // turns on or off closets
-        this.ROOM_PLATFORMS=true;                       // turns on or off platforms
         this.ROOM_LEDGES=true;                          // turns on or off ledges
+        this.ROOM_DECORATIONS=true;                       // turns on or off decorations
         
             //
             // liquids
@@ -75,9 +76,6 @@ class ConfigClass
 
         this.ROOM_DECORATION_MIN_COUNT=1;              // minimum number of decoration pieces in a room
         this.ROOM_DECORATION_EXTRA_COUNT=3;            // extra number of decoration pieces
-
-        this.ROOM_PILLARS=true;                        // turns on or off pillars
-        this.ROOM_DECORATIONS=true;                    // turns on or off decorations
 
             //
             // lighting

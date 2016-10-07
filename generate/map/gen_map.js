@@ -188,7 +188,7 @@ class GenMapClass
         var n,mesh,mesh2;
         var storyCount,yBound,yWallBound,yFloorBound;
         var roomIdx,room;
-        var storyCount,liquid;
+        var storyCount,decorationType,liquid;
         var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
             // anything above lower floor can have
@@ -223,6 +223,16 @@ class GenMapClass
             storyCount++;
         }
         
+            // determine the decoration type,
+            // liquids always have platforms
+        
+        if (liquid) {
+            decorationType=ROOM_DECORATION_PLATFORM;
+        }
+        else {
+            decorationType=genRandom.randomIndex(ROOM_DECORATION_COUNT);
+        }
+        
             // top of room
             
         yBound.min=yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*storyCount);
@@ -230,7 +240,7 @@ class GenMapClass
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,liquid,level);
+        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,liquid,level);
         room=map.rooms[roomIdx];
         
             // the floor
@@ -711,7 +721,7 @@ class GenMapClass
         // extend any of the rooms along the path
         //
     
-    buildRoomExtensionSingle(lastRoom,connectSide)
+    buildRoomExtensionSingle(lastRoom,connectSide,noLevelChange)
     {
         var n,roomIdx,room,tryCount;
         var xBlockSize,zBlockSize;
@@ -726,17 +736,19 @@ class GenMapClass
 
         var level=ROOM_LEVEL_MAIN;
 
-        if (genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
-            if (genRandom.randomPercentage(0.5)) {
-                level=ROOM_LEVEL_UPPER;
-                stairMode=this.STAIR_UP;
-            }
-            else {
-                level=ROOM_LEVEL_LOWER;
-                stairMode=this.STAIR_DOWN;
+        if (!noLevelChange) {
+            if (genRandom.randomPercentage(config.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
+                if (genRandom.randomPercentage(0.5)) {
+                    level=ROOM_LEVEL_UPPER;
+                    stairMode=this.STAIR_UP;
+                }
+                else {
+                    level=ROOM_LEVEL_LOWER;
+                    stairMode=this.STAIR_DOWN;
+                }
             }
         }
-
+        
             // get random block size for room
             // and make sure it stays under the max
             // blocks for room
@@ -846,10 +858,7 @@ class GenMapClass
 
             // the room
             
-        var allowLiquid=true;
-        if (lastRoom!==null) allowLiquid=!lastRoom.liquid;
-            
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,allowLiquid,level);
+        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,(level===ROOM_LEVEL_MAIN),level);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -899,31 +908,35 @@ class GenMapClass
     buildRoomExtensions()
     {
         var n,room;
+        var noLevelChange;
         var nRoom=map.rooms.length;
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-                // we can add up to two rooms on
-                // either side of the path
-
-            switch(genRandom.randomIndex(4)) {
+            noLevelChange=genRandom.randomPercentage(0.5);
+            
+            switch(genRandom.randomIndex(5)) {
                 case 1:
-                    this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT,noLevelChange);
                     break;          
                 case 2:
-                    this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT,noLevelChange);
                     break;          
                 case 3:
-                    this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT);
-                    this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT,noLevelChange);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT,!noLevelChange);
+                    break;          
+                case 4:
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_LEFT,true);
+                    this.buildRoomExtensionSingle(room,ROOM_SIDE_RIGHT,true);
                     break;          
             }
         }
     }
     
         //
-        // closets, platforms, ledges, pillars and decorations
+        // closets, ledges, and decorations
         //
         
     buildRoomClosets()
@@ -941,21 +954,6 @@ class GenMapClass
         }
     }
     
-    buildRoomPlatforms()
-    {
-        var n,room,platform;
-        var nRoom=map.rooms.length;
-        
-        if (!config.ROOM_PLATFORMS) return;
-        
-        platform=new GenRoomPlatformClass();
-        
-        for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
-            if ((room.storyCount>1) && (room.level===0)) platform.createPlatforms(room);
-        }
-    }
-    
     buildRoomLedges()
     {
         var n,room,ledge;
@@ -967,37 +965,48 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if (!room.liquid) ledge.createLedges(room);
+            ledge.createLedges(room);
         }
     }
     
-    buildRoomPillars()
-    {
-        var n,room,pillar;
-        var nRoom=map.rooms.length;
-        
-        if (!config.ROOM_PILLARS) return;
-        
-        pillar=new GenRoomPillarClass();
-        
-        for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
-            if ((!room.openCeiling) && (!room.liquid)) pillar.addPillars(room);
-        }
-    }
-        
     buildRoomDecorations()
     {
-        var n,room,decoration;
+        var n,room;
+        var platform=null;
+        var pillar=null;
+        var storage=null;
+        var machine=null;
+        var computer=null;
         var nRoom=map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;
         
-        decoration=new GenRoomDecorationClass();
-        
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if (!room.liquid) decoration.addDecorations(room);
+            
+            switch (room.decorationType) {
+                case ROOM_DECORATION_PLATFORM:
+                    if (platform===null) platform=new GenRoomDecorationPlatformClass();
+                    platform.create(room);
+                    break;
+                case ROOM_DECORATION_PILLARS:
+                    if (pillar===null) pillar=new GenRoomDecorationPillarClass();
+                    pillar.create(room);
+                    break;
+                case ROOM_DECORATION_STORAGE:
+                    if (storage===null) storage=new GenRoomDecorationStorageClass();
+                    storage.create(room);
+                    break;
+                case ROOM_DECORATION_MACHINES:
+                    if (machine===null) machine=new GenRoomDecorationMachineClass();
+                    machine.create(room);
+                    break;
+                case ROOM_DECORATION_COMPUTERS:
+                    if (computer===null) computer=new GenRoomDecorationComputerClass();
+                    computer.create(room);
+                    break;
+                
+            }
         }
     }
 
@@ -1046,14 +1055,14 @@ class GenMapClass
             // finish with the callback
 
         view.loadingScreenDraw(0.3);
-        setTimeout(this.buildMapPlatforms.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.buildMapDecorations.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
-    buildMapPlatforms()
+    buildMapDecorations()
     {
-            // build room platforms
+            // build room decorations
             
-        this.buildRoomPlatforms();
+        this.buildRoomDecorations();
         
             // finish with the callback
 
@@ -1114,19 +1123,6 @@ class GenMapClass
             // finish with the callback
             
         view.loadingScreenDraw(0.8);
-        setTimeout(this.buildMapDecorations.bind(this),PROCESS_TIMEOUT_MSEC);
-    }
-    
-    buildMapDecorations()
-    {
-            // build room pillars and decorations
-        
-        this.buildRoomPillars();
-        this.buildRoomDecorations();
-        
-            // finish with the callback
-            
-        view.loadingScreenDraw(0.9);
         setTimeout(this.buildMapFinish.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     

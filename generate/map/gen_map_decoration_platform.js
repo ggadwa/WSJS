@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// map platforms
+// map platform decorations
 //
 
-class GenRoomPlatformClass
+class GenRoomDecorationPlatformClass
 {
     constructor()
     {
@@ -215,7 +215,7 @@ class GenRoomPlatformClass
         // create platforms
         // 
     
-    createPlatforms(room)
+    create(room)
     {
         var n,liftX,liftZ;
         
