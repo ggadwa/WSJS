@@ -31,26 +31,26 @@ class GenBitmapClass
             
         this.primaryColorList=
                 [
-                    [0.8,0.0,0.0],      // red
-                    [0.0,0.8,0.0],      // green
-                    [0.0,0.0,0.8],      // blue
-                    [0.8,0.8,0.0],      // yellow
+                    [0.7,0.0,0.0],      // red
+                    [0.0,0.7,0.0],      // green
+                    [0.0,0.0,0.7],      // blue
+                    [0.7,0.7,0.0],      // yellow
                     [0.8,0.0,0.8],      // purple
                     [0.8,0.8,0.0],      // light blue
-                    [0.0,1.0,0.78],     // sea green
+                    [0.0,0.9,0.6],     // sea green
                     [1.0,0.4,0.0],      // orange
-                    [0.75,0.4,0.0],     // brown
-                    [1.0,0.84,0.0],     // gold
-                    [1.0,0.84,1.0],     // lavender
-                    [1.0,0.82,0.82],    // pink
-                    [0.7,1.0,0.0],      // lime
-                    [0.23,0.5,0.0],     // tree green
+                    [0.7,0.4,0.0],     // brown
+                    [0.8,0.6,0.0],     // gold
+                    [0.8,0.6,0.8],     // lavender
+                    [1.0,0.8,0.8],    // pink
+                    [0.6,0.9,0.0],      // lime
+                    [0.2,0.5,0.0],     // tree green
                     [0.5,0.5,0.5],      // gray
-                    [0.7,0.0,1.0],      // dark purple
+                    [0.6,0.0,0.9],      // dark purple
                     [0.0,0.3,0.5],      // slate blue
-                    [1.0,0.68,0.5],     // peach
-                    [1.0,0.0,0.43],     // muave
-                    [1.0,0.5,0.5],      // dull red
+                    [0.9,0.6,0.4],     // peach
+                    [0.9,0.0,0.4],     // muave
+                    [0.8,0.5,0.5],      // dull red
                 ];
                 
             // we have a default primary color for every instance

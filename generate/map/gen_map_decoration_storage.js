@@ -15,12 +15,12 @@ class GenRoomDecorationStorageClass
         // random boxes
         //
 
-    addBoxes(room)
+    addBoxes(room,pos,yOffset,high)
     {
-        var n,stackLevel,pos,boxPos,boxY,boxCount,rotWid;
+        var n,stackLevel,boxPos,boxY,boxCount,rotWid;
         var ang,angAdd;
-        var wid,high,rotAngle;
-        var boxBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
+        var wid,rotAngle;
+        var boxBitmap=map.getTexture(map.TEXTURE_TYPE_BOX);
         
         var boxBoundX=new wsBound(0,0);
         var boxBoundY=new wsBound(0,0);
@@ -35,16 +35,12 @@ class GenRoomDecorationStorageClass
             // find the middle of the box spot
             // and box sizes
 
-        pos=room.findRandomDecorationLocation(false);
-        if (pos===null) return;
-
-        high=genRandom.randomInt(minWidth,extraWidth);
         wid=Math.trunc(high/2);
 
             // count of boxes, up to 4 levels
 
         boxCount=genRandom.randomInt(1,4);
-        boxY=room.yBound.max;
+        boxY=room.yBound.max+yOffset;
         rotWid=Math.trunc(wid*1.5);
 
             // build the boxes around a rotating axis
@@ -89,9 +85,9 @@ class GenRoomDecorationStorageClass
         // shelves
         //
         
-    addShelf(room)
+    addShelf(room,pos,high,singleStack)
     {
-        var pos,xWid,zWid,legWid,high;
+        var xWid,zWid,legWid;
         var stackLevel,stackCount,boxY;
         var bitmap;
         
@@ -101,9 +97,6 @@ class GenRoomDecorationStorageClass
         
         legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
         bitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
-
-        pos=room.findRandomDecorationLocation(false);
-        if (pos===null) return;
 
             // height and width
 
@@ -115,11 +108,12 @@ class GenRoomDecorationStorageClass
             zWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
             xWid=zWid-Math.trunc(0,Math.trunc(config.ROOM_BLOCK_WIDTH*0.2));
         }
-        high=genRandom.randomInt(Math.trunc(config.ROOM_BLOCK_WIDTH*0.25),1000);
 
         stackCount=1;
-        if (genRandom.randomPercentage(0.75)) stackCount=genRandom.randomInt(2,2);
-
+        if (!singleStack) {
+            if (genRandom.randomPercentage(0.75)) stackCount=genRandom.randomInt(2,2);
+        }
+        
         boxY=room.yBound.max;
 
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
@@ -163,22 +157,38 @@ class GenRoomDecorationStorageClass
 
     create(room)
     {
-        var n,pieceCount;
+        var n,pos,high,pieceCount;
         
         pieceCount=10;//genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
+        
+            // make all pieces in the room have
+            // the same size based on height
+            
+        high=genRandom.randomInt(Math.trunc(config.ROOM_BLOCK_WIDTH*0.2),Math.trunc(config.ROOM_BLOCK_WIDTH*0.25));
 
+            // create the pieces
+            
         for (n=0;n!==pieceCount;n++) {
             
-                // randomly pick a decoration
-                // 0 = nothing
+                // location
+                
+            pos=room.findRandomDecorationLocation(false);
+            if (pos===null) continue;
+            
+                // randomly pick a storage type
 
-            switch (genRandom.randomIndex(2)) {
+            switch (genRandom.randomIndex(3)) {
                 case 0:
-                    this.addBoxes(room);
+                    this.addBoxes(room,pos,0,high);
                     break;
                 case 1:
-                    this.addShelf(room);
+                    this.addShelf(room,pos,high,false);
                     break;
+                case 2:
+                    this.addShelf(room,pos,high,true);
+                    this.addBoxes(room,pos,-high,high);
+                    break;
+                    
             }
         }
     }

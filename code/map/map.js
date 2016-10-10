@@ -19,7 +19,7 @@ class MapClass
         this.rooms=[];
         this.liquids=[];
         
-        this.TEXTURE_COUNT=11;
+        this.TEXTURE_COUNT=12;
         
         this.TEXTURE_TYPE_WALL=0;
         this.TEXTURE_TYPE_FLOOR=1;
@@ -31,7 +31,8 @@ class MapClass
         this.TEXTURE_TYPE_METAL=7;
         this.TEXTURE_TYPE_DOOR=8;
         this.TEXTURE_TYPE_MACHINE=9;
-        this.TEXTURE_TYPE_LIQUID=10;
+        this.TEXTURE_TYPE_BOX=10;
+        this.TEXTURE_TYPE_LIQUID=11;
         
         this.genBitmapWall=new GenBitmapWallClass();
         this.genBitmapFloor=new GenBitmapFloorClass();
@@ -39,6 +40,7 @@ class MapClass
         this.genBitmapDoor=new GenBitmapDoorClass();
         this.genBitmapMetal=new GenBitmapMetalClass();
         this.genBitmapMachine=new GenBitmapMachineClass();
+        this.genBitmapBox=new GenBitmapBoxClass();
         this.genBitmapLiquid=new GenBitmapLiquidClass();
         
         this.textureBitmapList=[];
@@ -127,6 +129,10 @@ class MapClass
                     
                 case this.TEXTURE_TYPE_MACHINE:
                     this.textureBitmapList[textureType]=this.genBitmapMachine.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_BOX:
+                    this.textureBitmapList[textureType]=this.genBitmapBox.generateRandom(false);
                     break;
                     
                 case this.TEXTURE_TYPE_LIQUID:

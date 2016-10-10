@@ -984,6 +984,8 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
+            room.decorationType=ROOM_DECORATION_PILLARS;
+            
             switch (room.decorationType) {
                 case ROOM_DECORATION_PLATFORM:
                     if (platform===null) platform=new GenRoomDecorationPlatformClass();
