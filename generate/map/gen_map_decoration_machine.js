@@ -23,10 +23,6 @@ class GenRoomDecorationMachineClass
         var platformBitmap,pipeBitmap;
         var centerPt;
         
-            // can't have pipes in open ceiling rooms
-            
-        if (room.openCeiling) return;
-            
             // the pipes location
 
         pos=room.findRandomDecorationLocation(true);
@@ -84,7 +80,7 @@ class GenRoomDecorationMachineClass
     {
         var n,pieceCount;
         
-        pieceCount=10;//genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
+        pieceCount=genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
 
         for (n=0;n!==pieceCount;n++) {
             this.addMachine(room);

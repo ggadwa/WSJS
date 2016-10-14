@@ -53,10 +53,6 @@ class ConfigClass
         
         this.STAIR_STEP_COUNT=10;
         
-        this.ROOM_CLOSETS=true;                         // turns on or off closets
-        this.ROOM_LEDGES=true;                          // turns on or off ledges
-        this.ROOM_DECORATIONS=true;                       // turns on or off decorations
-        
             //
             // liquids
             //
@@ -69,10 +65,8 @@ class ConfigClass
         this.ROOM_LIQUIDS=true;                         // turns on or off liquids
 
             //
-            // pillars and decorations
+            // decorations
             //
-
-        this.ROOM_MAX_PILLAR_PERCENTAGE=0.5;           // amount of time a room has pillars
 
         this.ROOM_DECORATION_MIN_COUNT=1;              // minimum number of decoration pieces in a room
         this.ROOM_DECORATION_EXTRA_COUNT=3;            // extra number of decoration pieces

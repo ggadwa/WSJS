@@ -13,15 +13,18 @@ ToDos
 
 
 
-#### Determine decoration type by lists of type depending on room (liquid, story > 1, 1 story, etc)
-
 #### start on platform is broken (needs story marker)
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
 
+#### platforms need more types (half room platforms, random x/z in direction away from light)
+
+#### machine
+        - make grid, random sizes on grid
+        - pipe, square box, or box + pipe (top/bottom)
+
 #### pipes and machines need to be in rows and chunks (patterns), need room types
-         - platform (always when liquid)
          - pillars
          - storage
          - machines

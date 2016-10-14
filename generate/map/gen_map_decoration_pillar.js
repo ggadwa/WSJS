@@ -21,9 +21,9 @@ class GenRoomDecorationPillarClass
         // pillar types
         //
         
-    addPillarsCorners(room,bitmap,yBound)
+    addPillarsCorners(room,bitmap,yBound,inside)
     {
-        var pos;
+        var mx,mz,pos;
         
         pos=room.checkLocationFreeAndBlock(1,1);
         if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
@@ -36,6 +36,23 @@ class GenRoomDecorationPillarClass
         
         pos=room.checkLocationFreeAndBlock(1,(room.zBlockSize-2));
         if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+        
+        if (inside) {
+            mx=Math.trunc(room.xBlockSize/2);
+            mz=Math.trunc(room.zBlockSize/2);
+            
+            pos=room.checkLocationFreeAndBlock((mx-2),(mz-2));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+
+            pos=room.checkLocationFreeAndBlock((mx+1),(mz-2));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+
+            pos=room.checkLocationFreeAndBlock((mx+1),(mz+1));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
+
+            pos=room.checkLocationFreeAndBlock((mx-2),(mz+1));
+            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION)); 
+        }
     }
     
     addPillarsLineX(room,bitmap,yBound)
@@ -76,10 +93,6 @@ class GenRoomDecorationPillarClass
     {
         var yBound;
         
-            // this room have pillars?
-            
-        if (!genRandom.randomPercentage(config.ROOM_MAX_PILLAR_PERCENTAGE)) return;
-        
             // ybound
             
         yBound=room.yBound;
@@ -88,18 +101,25 @@ class GenRoomDecorationPillarClass
             
         var bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
         
-            // room size creates the pillar types
+            // random pillar types
             
-        if (Math.abs(room.xBlockSize-room.zBlockSize)<3) {
-            this.addPillarsCorners(room,bitmap,yBound);
-            return;
-        }
-        
-        if (room.xBlockSize>room.zBlockSize) {
-            this.addPillarsLineX(room,bitmap,yBound);
-        }
-        else {
-            this.addPillarsLineZ(room,bitmap,yBound);
+        switch (genRandom.randomIndex(5)) {
+            case 0:
+                this.addPillarsCorners(room,bitmap,yBound,false);
+                return;
+            case 1:
+                this.addPillarsCorners(room,bitmap,yBound,true);
+                return;
+            case 2:
+                this.addPillarsLineX(room,bitmap,yBound);
+                return;
+            case 3:
+                this.addPillarsLineZ(room,bitmap,yBound);
+                return;
+            case 4:
+                this.addPillarsLineX(room,bitmap,yBound);
+                this.addPillarsLineZ(room,bitmap,yBound);
+                return;
         }
     }
     

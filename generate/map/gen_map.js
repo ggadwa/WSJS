@@ -223,11 +223,10 @@ class GenMapClass
             storyCount++;
         }
         
-            // determine the decoration type,
-            // liquids always have platforms
+            // determine the decoration type
         
         if (liquid) {
-            decorationType=ROOM_DECORATION_PLATFORM;
+            decorationType=ROOM_DECORATION_NONE;
         }
         else {
             decorationType=genRandom.randomIndex(ROOM_DECORATION_COUNT);
@@ -944,8 +943,6 @@ class GenMapClass
         var n,room,closet;
         var nRoom=map.rooms.length;
         
-        if (!config.ROOM_CLOSETS) return;
-        
         closet=new GenRoomClosetClass();
         
         for (n=0;n!==nRoom;n++) {
@@ -959,8 +956,6 @@ class GenMapClass
         var n,room,ledge;
         var nRoom=map.rooms.length;
         
-        if (!config.ROOM_LEDGES) return;
-        
         ledge=new GenRoomLedgeClass();
         
         for (n=0;n!==nRoom;n++) {
@@ -969,28 +964,34 @@ class GenMapClass
         }
     }
     
+    buildRoomPlatforms()
+    {
+        var n,room,platform;
+        var nRoom=map.rooms.length;
+        
+        platform=new GenRoomDecorationPlatformClass();
+        
+        for (n=0;n!==nRoom;n++) {
+            room=map.rooms[n];
+            if ((room.liquid) || (room.storyCount>1)) platform.create(room);
+        }
+    }
+    
     buildRoomDecorations()
     {
         var n,room;
-        var platform=null;
         var pillar=null;
         var storage=null;
         var machine=null;
         var computer=null;
         var nRoom=map.rooms.length;
         
-        if (!config.ROOM_DECORATIONS) return;
-        
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            room.decorationType=ROOM_DECORATION_PILLARS;
+            //room.decorationType=ROOM_DECORATION_MACHINES;
             
             switch (room.decorationType) {
-                case ROOM_DECORATION_PLATFORM:
-                    if (platform===null) platform=new GenRoomDecorationPlatformClass();
-                    platform.create(room);
-                    break;
                 case ROOM_DECORATION_PILLARS:
                     if (pillar===null) pillar=new GenRoomDecorationPillarClass();
                     pillar.create(room);
@@ -1018,7 +1019,7 @@ class GenMapClass
 
     build()
     {
-        view.loadingScreenDraw(0.5);
+        view.loadingScreenDraw(0.1);
         setTimeout(this.buildMapPath.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -1031,7 +1032,7 @@ class GenMapClass
         
         this.buildMapRoomPath(null,this.HALLWAY_NONE);
         
-        view.loadingScreenDraw(0.1);
+        view.loadingScreenDraw(0.2);
         setTimeout(this.buildMapExtensions.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
@@ -1044,43 +1045,22 @@ class GenMapClass
         
         this.buildRoomExtensions();
         
-        view.loadingScreenDraw(0.2);
-        setTimeout(this.buildMapClosets.bind(this),PROCESS_TIMEOUT_MSEC);
+        view.loadingScreenDraw(0.3);
+        setTimeout(this.buildMapRoomPieces.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     
-    buildMapClosets()
+    buildMapRoomPieces()
     {
             // build room closets
             
         this.buildRoomClosets();
-        
-            // finish with the callback
-
-        view.loadingScreenDraw(0.3);
-        setTimeout(this.buildMapDecorations.bind(this),PROCESS_TIMEOUT_MSEC);
-    }
-    
-    buildMapDecorations()
-    {
-            // build room decorations
-            
+        this.buildRoomLedges();
+        this.buildRoomPlatforms();
         this.buildRoomDecorations();
         
             // finish with the callback
 
         view.loadingScreenDraw(0.4);
-        setTimeout(this.buildMapLedges.bind(this),PROCESS_TIMEOUT_MSEC);
-    }
-    
-    buildMapLedges()
-    {
-            // build room platforms
-            
-        this.buildRoomLedges();
-        
-            // finish with the callback
-
-        view.loadingScreenDraw(0.5);
         setTimeout(this.buildMapRemoveSharedTriangles1.bind(this),PROCESS_TIMEOUT_MSEC);
     }
     

@@ -159,7 +159,7 @@ class GenRoomDecorationStorageClass
     {
         var n,pos,high,pieceCount;
         
-        pieceCount=10;//genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
+        pieceCount=genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
         
             // make all pieces in the room have
             // the same size based on height
