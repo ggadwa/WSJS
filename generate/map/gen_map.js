@@ -969,7 +969,7 @@ class GenMapClass
         var n,room,platform;
         var nRoom=map.rooms.length;
         
-        platform=new GenRoomDecorationPlatformClass();
+        platform=new GenRoomPlatformClass();
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];

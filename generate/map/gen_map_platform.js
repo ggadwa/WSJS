@@ -1,10 +1,10 @@
 "use strict";
 
 //
-// map platform decorations
+// map platforms
 //
 
-class GenRoomDecorationPlatformClass
+class GenRoomPlatformClass
 {
     constructor()
     {
@@ -212,6 +212,97 @@ class GenRoomDecorationPlatformClass
     }
     
         //
+        // platform types
+        //
+    
+    addPlatformHalfFloorX(room,liftX,liftZ,story,platformBitmap)
+    {
+        var x,z,sz,ez;
+        
+        if (liftZ<Math.trunc(room.zBlockSize/2)) {
+            sz=0;
+            ez=liftZ;
+        }
+        else {
+            sz=liftZ+1;
+            ez=room.zBlockSize;
+        }
+        
+        for (z=sz;z<ez;z++) {
+            for (x=0;x!=room.xBlockSize;x++) {
+                this.addPlatformChunk(room,x,z,story,platformBitmap);
+            }
+        }
+        
+        for (x=0;x!=room.xBlockSize;x++) {
+            if (x!==liftX) this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
+        }
+    }
+    
+    addPlatformHalfFloorZ(room,liftX,liftZ,story,platformBitmap)
+    {
+        var x,z,sx,ex;
+        
+        if (liftX<Math.trunc(room.xBlockSize/2)) {
+            sx=0;
+            ex=liftX;
+        }
+        else {
+            sx=liftX+1;
+            ex=room.xBlockSize;
+        }
+        
+        for (x=sx;x<ex;x++) {
+            for (z=0;z!=room.zBlockSize;z++) {
+                this.addPlatformChunk(room,x,z,story,platformBitmap);
+            }
+        }
+        
+        for (z=0;z!=room.zBlockSize;z++) {
+            if (z!==liftZ) this.addPlatformChunk(room,liftX,z,story,platformBitmap);
+        }
+    }
+    
+    addPlatformOutsideCircle(room,liftX,liftZ,story,platformBitmap)
+    {
+        var x,z;
+        
+            // outside
+            
+        for (x=0;x!=room.xBlockSize;x++) {
+            this.addPlatformChunk(room,x,0,story,platformBitmap);
+            this.addPlatformChunk(room,x,(room.zBlockSize-1),story,platformBitmap);
+        }
+        for (z=1;z<(room.zBlockSize-1);z++) {
+            this.addPlatformChunk(room,0,z,story,platformBitmap);
+            this.addPlatformChunk(room,(room.xBlockSize-1),z,story,platformBitmap);
+        }
+        
+            // possible connections
+            
+        if (genRandom.randomPercentage(0.5)) {
+            for (x=0;x<liftX;x++) {
+                this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
+            }
+        }
+        if (genRandom.randomPercentage(0.5)) {
+            for (x=(liftX+1);x<room.xBlockSize;x++) {
+                this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
+            }
+        }
+        if (genRandom.randomPercentage(0.5)) {
+            for (z=0;z<liftZ;z++) {
+                this.addPlatformChunk(room,liftX,z,story,platformBitmap);
+            }
+        }
+        if (genRandom.randomPercentage(0.5)) {
+            for (z=(liftZ+1);z<room.zBlockSize;z++) {
+                this.addPlatformChunk(room,liftX,z,story,platformBitmap);
+            }
+        }
+    }
+    
+        //
         // create platforms
         // 
     
@@ -236,11 +327,17 @@ class GenRoomDecorationPlatformClass
             // expand walkways from the lift
         
         for (n=0;n!=(room.storyCount-1);n++) {
-            if (genRandom.randomPercentage(0.5)) {
-                this.addWalkwayOuterPath(room,liftX,liftZ,(n+1),platformBitmap);
-            }
-            else {
-                this.addWalkwayRadial(room,liftX,liftZ,(n+1),platformBitmap);
+            
+            switch (genRandom.randomIndex(3)) {
+                case 0:
+                    this.addPlatformHalfFloorX(room,liftX,liftZ,(n+1),platformBitmap);
+                    break;
+                case 1:
+                    this.addPlatformHalfFloorZ(room,liftX,liftZ,(n+1),platformBitmap);
+                    break;
+                case 2:
+                    this.addPlatformOutsideCircle(room,liftX,liftZ,(n+1),platformBitmap);
+                    break;
             }
         }
         
