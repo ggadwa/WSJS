@@ -195,7 +195,9 @@ class GenMapClass
             // other stories
         
         storyCount=1;
-        if (level!==ROOM_LEVEL_LOWER) storyCount=genRandom.randomInt(1,3);
+        if (level!==ROOM_LEVEL_LOWER) storyCount=genRandom.randomInt(1,4);
+        
+        storyCount=4;   // supergumba -- testing
         
             // bottom of room
         
@@ -983,13 +985,13 @@ class GenMapClass
         var pillar=null;
         var storage=null;
         var machine=null;
-        var computer=null;
+        var equipment=null;
         var nRoom=map.rooms.length;
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            //room.decorationType=ROOM_DECORATION_MACHINES;
+            room.decorationType=ROOM_DECORATION_MACHINES;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case ROOM_DECORATION_PILLARS:
@@ -1004,9 +1006,9 @@ class GenMapClass
                     if (machine===null) machine=new GenRoomDecorationMachineClass();
                     machine.create(room);
                     break;
-                case ROOM_DECORATION_COMPUTERS:
-                    if (computer===null) computer=new GenRoomDecorationComputerClass();
-                    computer.create(room);
+                case ROOM_DECORATION_EQUIPMENT:
+                    if (equipment===null) equipment=new GenRoomDecorationEquipmentClass();
+                    equipment.create(room);
                     break;
                 
             }

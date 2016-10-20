@@ -68,7 +68,7 @@ class GenRoomPlatformClass
 
             // can't span on this
             
-        room.setBlockGrid(x,z);
+        room.setBlockGrid(0,x,z);
 
         map.addOverlayPlatform(xLiftBound,zLiftBound);
     }
@@ -88,129 +88,13 @@ class GenRoomPlatformClass
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
+            // a cleared spot is a spot that's open
             
-        room.setPlatformGrid(x,z);
+        room.clearBlockGrid(story,x,z);
 
         map.addOverlayPlatform(xPlatformBound,zPlatformBound);
     }
-    
-        //
-        // walkways
-        //
         
-    addChunkWalkwayDirPosX(room,liftX,liftZ,story,platformBitmap)
-    {
-        var x;
-        
-        for (x=(liftX+1);x<room.xBlockSize;x++) {
-            this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
-        }
-        
-        return(room.xBlockSize-1);
-    }
-    
-    addChunkWalkwayDirPosZ(room,liftX,liftZ,story,platformBitmap)
-    {
-        var z;
-        
-        for (z=(liftZ+1);z<room.zBlockSize;z++) {
-            this.addPlatformChunk(room,liftX,z,story,platformBitmap);
-        }
-        
-        return(room.zBlockSize-1);
-    }
-    
-    addChunkWalkwayDirNegX(room,liftX,liftZ,story,platformBitmap)
-    {
-        var x;
-        
-        for (x=(liftX-1);x>=0;x--) {
-            this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
-        }
-        
-        return(0);
-    }
-    
-    addChunkWalkwayDirNegZ(room,liftX,liftZ,story,platformBitmap)
-    {
-        var z;
-        
-        for (z=(liftZ-1);z>=0;z--) {
-            this.addPlatformChunk(room,liftX,z,story,platformBitmap);
-        }
-        
-        return(0);
-    }
-    
-    addWalkwayOuterPath(room,liftX,liftZ,story,platformBitmap)
-    {
-        var x,z;
-        
-        switch (genRandom.randomIndex(4)) {
-            
-            case 0:
-                x=this.addChunkWalkwayDirPosX(room,liftX,liftZ,story,platformBitmap);
-                z=this.addChunkWalkwayDirPosZ(room,x,liftZ,story,platformBitmap);
-
-                if (genRandom.randomPercentage(config.ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    x=this.addChunkWalkwayDirNegX(room,x,z,story,platformBitmap);
-                    if (genRandom.randomPercentage(config.ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirNegZ(room,x,z,story,platformBitmap);
-                }
-                break;
-                
-            case 1:
-                z=this.addChunkWalkwayDirPosZ(room,liftX,liftZ,story,platformBitmap);
-                x=this.addChunkWalkwayDirPosX(room,liftX,z,story,platformBitmap);
-
-                if (genRandom.randomPercentage(config.ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    z=this.addChunkWalkwayDirNegZ(room,x,z,story,platformBitmap);
-                    if (genRandom.randomPercentage(config.ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirNegX(room,x,z,story,platformBitmap);
-                }
-                break;
-                
-            case 2:
-                x=this.addChunkWalkwayDirNegX(room,liftX,liftZ,story,platformBitmap);
-                z=this.addChunkWalkwayDirNegZ(room,x,liftZ,story,platformBitmap);
-
-                if (genRandom.randomPercentage(config.ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    x=this.addChunkWalkwayDirPosX(room,x,z,story,platformBitmap);
-                    if (genRandom.randomPercentage(config.ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirPosZ(room,x,z,story,platformBitmap);
-                }
-                break;
-                
-            case 3:
-                z=this.addChunkWalkwayDirNegZ(room,liftX,liftZ,story,platformBitmap);
-                x=this.addChunkWalkwayDirNegX(room,liftX,z,story,platformBitmap);
-
-                if (genRandom.randomPercentage(config.ROOM_PLATFORM_2ND_PERCENTAGE)) {
-                    z=this.addChunkWalkwayDirPosZ(room,x,z,story,platformBitmap);
-                    if (genRandom.randomPercentage(config.ROOM_PLATFORM_3RD_PERCENTAGE)) this.addChunkWalkwayDirPosX(room,x,z,story,platformBitmap);
-                }
-                break;
-
-        }
-    }
-    
-    addWalkwayRadial(room,liftX,liftZ,story,platformBitmap)
-    {
-        switch (genRandom.randomIndex(3)) {
-            case 0:
-                this.addChunkWalkwayDirPosX(room,liftX,liftZ,story,platformBitmap);
-                this.addChunkWalkwayDirNegX(room,liftX,liftZ,story,platformBitmap);
-                break;
-            case 1:
-                this.addChunkWalkwayDirPosZ(room,liftX,liftZ,story,platformBitmap);
-                this.addChunkWalkwayDirNegZ(room,liftX,liftZ,story,platformBitmap);
-                break;
-            case 2:
-                this.addChunkWalkwayDirPosX(room,liftX,liftZ,story,platformBitmap);
-                this.addChunkWalkwayDirNegX(room,liftX,liftZ,story,platformBitmap);
-                this.addChunkWalkwayDirPosZ(room,liftX,liftZ,story,platformBitmap);
-                this.addChunkWalkwayDirNegZ(room,liftX,liftZ,story,platformBitmap);
-                break;
-        }
-    }
-    
         //
         // platform types
         //
@@ -281,24 +165,58 @@ class GenRoomPlatformClass
             // possible connections
             
         if (genRandom.randomPercentage(0.5)) {
-            for (x=0;x<liftX;x++) {
+            for (x=1;x<liftX;x++) {
                 this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
             }
         }
         if (genRandom.randomPercentage(0.5)) {
-            for (x=(liftX+1);x<room.xBlockSize;x++) {
+            for (x=(liftX+1);x<(room.xBlockSize-1);x++) {
                 this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
             }
         }
         if (genRandom.randomPercentage(0.5)) {
-            for (z=0;z<liftZ;z++) {
+            for (z=1;z<liftZ;z++) {
                 this.addPlatformChunk(room,liftX,z,story,platformBitmap);
             }
         }
         if (genRandom.randomPercentage(0.5)) {
-            for (z=(liftZ+1);z<room.zBlockSize;z++) {
+            for (z=(liftZ+1);z<(room.zBlockSize-1);z++) {
                 this.addPlatformChunk(room,liftX,z,story,platformBitmap);
             }
+        }
+    }
+    
+    addPlatformCrossRoomX(room,liftX,liftZ,story,platformBitmap)
+    {
+        var x,z;
+        
+        for (x=1;x<liftX;x++) {
+            this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
+        }
+        for (x=(liftX+1);x<(room.xBlockSize-1);x++) {
+            this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
+        }
+        
+        for (z=0;z<room.zBlockSize;z++) {
+            this.addPlatformChunk(room,0,z,story,platformBitmap);
+            this.addPlatformChunk(room,(room.xBlockSize-1),z,story,platformBitmap);
+        }
+    }
+    
+    addPlatformCrossRoomZ(room,liftX,liftZ,story,platformBitmap)
+    {
+        var x,z;
+        
+        for (z=1;z<liftZ;z++) {
+            this.addPlatformChunk(room,liftX,z,story,platformBitmap);
+        }
+        for (z=(liftZ+1);z<(room.zBlockSize-1);z++) {
+            this.addPlatformChunk(room,liftX,z,story,platformBitmap);
+        }
+        
+        for (x=0;x<room.xBlockSize;x++) {
+            this.addPlatformChunk(room,x,0,story,platformBitmap);
+            this.addPlatformChunk(room,x,(room.zBlockSize-1),story,platformBitmap);
         }
     }
     
@@ -328,7 +246,7 @@ class GenRoomPlatformClass
         
         for (n=0;n!=(room.storyCount-1);n++) {
             
-            switch (genRandom.randomIndex(3)) {
+            switch (genRandom.randomIndex(5)) {
                 case 0:
                     this.addPlatformHalfFloorX(room,liftX,liftZ,(n+1),platformBitmap);
                     break;
@@ -337,6 +255,12 @@ class GenRoomPlatformClass
                     break;
                 case 2:
                     this.addPlatformOutsideCircle(room,liftX,liftZ,(n+1),platformBitmap);
+                    break;
+                case 3:
+                    this.addPlatformCrossRoomX(room,liftX,liftZ,(n+1),platformBitmap);
+                    break;
+                case 4:
+                    this.addPlatformCrossRoomZ(room,liftX,liftZ,(n+1),platformBitmap);
                     break;
             }
         }

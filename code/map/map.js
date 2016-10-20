@@ -30,7 +30,7 @@ class MapClass
         this.TEXTURE_TYPE_PILLAR=6;
         this.TEXTURE_TYPE_METAL=7;
         this.TEXTURE_TYPE_DOOR=8;
-        this.TEXTURE_TYPE_MACHINE=9;
+        this.TEXTURE_TYPE_COMPUTER=9;
         this.TEXTURE_TYPE_BOX=10;
         this.TEXTURE_TYPE_LIQUID=11;
         
@@ -127,7 +127,7 @@ class MapClass
                     this.textureBitmapList[textureType]=this.genBitmapDoor.generateRandom(false);
                     break;
                     
-                case this.TEXTURE_TYPE_MACHINE:
+                case this.TEXTURE_TYPE_COMPUTER:
                     this.textureBitmapList[textureType]=this.genBitmapMachine.generateRandom(false);
                     break;
                     
@@ -507,7 +507,7 @@ class MapClass
         // find positions in map
         //
         
-    findRandomEntityPosition()
+    findAndBlockSpawnPosition()
     {
         var roomIdx;
         var pos;
@@ -521,7 +521,7 @@ class MapClass
         
                 // find a random spot
                 
-            pos=this.rooms[roomIdx].findRandomEntityPosition();
+            pos=this.rooms[roomIdx].findAndBlockSpawnPosition();
             if (pos!==null) return(pos);
             
             findTry++;
@@ -532,7 +532,7 @@ class MapClass
     
     findRandomPlayerPosition()
     {
-        return(this.rooms[0].findRandomEntityPosition());
+        return(this.rooms[0].findAndBlockSpawnPosition());
     }
     
         //

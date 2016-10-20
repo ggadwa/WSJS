@@ -11,14 +11,16 @@ When interface created
 
 ToDos
 
-
+--> PLATFORMS NEED STORIES!
 
 #### start on platform is broken (needs story marker)
+#### things like columns and decorations need to work through floors
+
+#### machines, computers, storage needs to be able to draw on platform
+#### figure out why decorations aren't avoiding edges
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
-
-#### platforms need more types (half room platforms, random x/z in direction away from light)
 
 #### machine
         - make grid, random sizes on grid
@@ -27,9 +29,8 @@ ToDos
 #### pipes and machines need to be in rows and chunks (patterns), need room types
          - pillars
          - storage
-         - machines
-         - computers
-         - probably don't need grid stuff anymore (as they don't mix)
+         - machines (computers + CONTROL PANELS)
+         - equipment
 #### only put closets in areas that have platforms to them?
 
 #### platforms not knocking out main map mesh walls?

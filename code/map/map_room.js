@@ -24,7 +24,7 @@ class MapRoomClass
         this.openCeiling=false;
         
         this.blockGrid=null;
-        this.platformGrid=null;
+        this.edgeGrid=null;
         
         this.connectSideHasDoor=[false,false,false,false];      // track which connections had a door
         
@@ -37,49 +37,54 @@ class MapRoomClass
     
     setupGrid()
     {
-        var x,z;
+        var n,x,z;
         
-            // make two dimensional arrays or
-            // xBlockSize * zBlockSize
-            
+            // make two dimensional arrays of
+            // xBlockSize * zBlockSize for each
+            // story and one for determining room edges
+        
         this.blockGrid=[];
-        this.edgeGrid=[];
-        this.platformGrid=[];
         
-        for (z=0;z!==this.zBlockSize;z++) {
-            this.blockGrid.push(new Uint8Array(this.xBlockSize));
-            this.edgeGrid.push(new Uint8Array(this.xBlockSize));
-            this.platformGrid.push(new Uint8Array(this.xBlockSize));
+        for (n=0;n!=this.storyCount;n++) {
+            this.blockGrid.push(new wsGrid(this.xBlockSize,this.zBlockSize));
         }
         
-            // the block grid has it's outer
+        this.edgeGrid=new wsGrid(this.xBlockSize,this.zBlockSize);
+        
+            // the block grid has it's bottom floor outer
             // ring blocked off because we never want
             // to build pieces there
             
         for (x=0;x!==this.xBlockSize;x++) {
-            this.blockGrid[0][x]=1;
-            this.blockGrid[this.zBlockSize-1][x]=1;
+            this.blockGrid[0].setCell(x,0,1);
+            this.blockGrid[0].setCell(x,(this.zBlockSize-1),1);
         }
             
         for (z=0;z!==this.zBlockSize;z++) {
-            this.blockGrid[z][0]=1;
-            this.blockGrid[z][this.xBlockSize-1]=1;
+            this.blockGrid[0].setCell(0,z,1);
+            this.blockGrid[0].setCell((this.xBlockSize-1),z,1);
         }
         
+            // and all stories above start as blocked
+            // off because there's no platforms
+            
+        for (n=1;n!=this.storyCount;n++) {
+            this.blockGrid[n].setCellAll(1);
+        }
     }
     
         //
         // flip bits on grid space
         //
         
-    setBlockGrid(x,z)
+    setBlockGrid(story,x,z)
     {
-        this.blockGrid[z][x]=1;
+        this.blockGrid[story].setCell(x,z,1);
     }
     
-    setPlatformGrid(x,z)
+    clearBlockGrid(story,x,z)
     {
-        this.platformGrid[z][x]=1;
+        this.blockGrid[story].setCell(x,z,0);
     }
     
         //
@@ -103,7 +108,7 @@ class MapRoomClass
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
             for (z=z1;z<z2;z++) {
-                this.edgeGrid[z][0]=1;
+                this.edgeGrid.setCell(0,z,1);
             }
             return;
         }
@@ -117,7 +122,7 @@ class MapRoomClass
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
             for (z=z1;z<z2;z++) {
-                this.edgeGrid[z][this.xBlockSize-1]=1;
+                this.edgeGrid.setCell((this.xBlockSize-1),z,1);
             }
             return;
         }
@@ -131,7 +136,7 @@ class MapRoomClass
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
             for (x=x1;x<x2;x++) {
-                this.edgeGrid[0][x]=1;
+                this.edgeGrid.setCell(x,0,1);
             }
             return;
         }
@@ -145,7 +150,7 @@ class MapRoomClass
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
             for (x=x1;x<x2;x++) {
-                this.edgeGrid[this.zBlockSize-1][x]=1;
+                this.edgeGrid.setCell(x,(this.zBlockSize-1),1);
             }
             return;
         }
@@ -158,7 +163,7 @@ class MapRoomClass
     
     getEdgeGridValue(x,z)
     {
-        return(this.edgeGrid[z][x]);
+        return(this.edgeGrid.getCell(x,z));
     }
     
         //
@@ -192,34 +197,24 @@ class MapRoomClass
         // find points in blocked grid space
         //
     
-    findRandomEntityPosition()
+    findAndBlockSpawnPosition()
     {
-        var x,z,startX,startZ,bx,bz;
+        var n,x,z,startX,startZ,bx,bz;
         
         x=startX=genRandom.randomInt(0,this.xBlockSize);
         z=startZ=genRandom.randomInt(0,this.zBlockSize);
         
         while (true) {
             
-                // if the grid spot is blocked, then no
-                // entity spawns at all
+                // check all stories of the room
                 
-            if (this.blockGrid[z][x]===0) {
-                
-                this.blockGrid[z][x]=1;
-                
-                    // check to see if we can spawn
-                    // to a platform first
-                    
-                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
-                    
-                if (this.platformGrid[z][x]===1) {
-                    this.platformGrid[z][x]=2;
-                    return(new wsPoint(bx,(this.yBound.min-config.ROOM_FLOOR_DEPTH),bz));
-                }
-                else {
-                    return(new wsPoint(bx,this.yBound.max,bz));
+            for (n=0;n!=this.storyCount;n++) {
+            
+                if (this.blockGrid[n].getCell(x,z)===0) {
+                    this.blockGrid[n].setCell(x,z,1);
+                    bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
+                    bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
+                    return(new wsPoint(bx,(this.yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*n)),bz));
                 }
             }
             
@@ -237,123 +232,20 @@ class MapRoomClass
         
         return(null);
     }
-    
-    findRandomDecorationLocation(checkPlatform)
-    {
-        var x,z,startX,startZ,bx,bz,gridSpot;
         
-        x=startX=genRandom.randomInt(0,this.xBlockSize);
-        z=startZ=genRandom.randomInt(0,this.zBlockSize);
-        
-        while (true) {
-            
-                // decorations only spawn on bottom
-            
-            gridSpot=this.blockGrid[z][x];
-            if (checkPlatform) gridSpot+=this.platformGrid[z][x];
-            
-                // if we are checking platforms, always
-                // skip center grid spot because there's a light there
-                
-            if (checkPlatform) {
-                if ((x===Math.trunc(this.xBlockSize/2)) && (z===Math.trunc(this.zBlockSize/2))) gridSpot=1;
-            }    
-            
-            if (gridSpot===0) {
-                this.blockGrid[z][x]=1;
-                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
-                return(new wsPoint(bx,this.yBound.max,bz));
-            }
-            
-                // move a square over and try again
-                
-            x++;
-            if (x>=this.xBlockSize) {
-                x=0;
-                z++;
-                if (z>=this.zBlockSize) z=0;
-            }
-            
-            if ((x===startX) && (z===startZ)) break;
-        }
-        
-        return(null);
-    }
-    
-    nextDecorationLocation(checkPlatform,curPnt)
-    {
-        var x,z,bx,bz;
-        var gridSpot;
-        
-        x=Math.trunc((curPnt.x-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
-        z=Math.trunc((curPnt.z-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
-        
-            // check four locations
-            
-        if (x>0) {
-            gridSpot=this.blockGrid[z][x-1];
-            if (checkPlatform) gridSpot+=this.platformGrid[z][x-1];
-            
-            if (gridSpot===0) {
-                this.blockGrid[z][x-1]=1;
-                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*(x-1)))+(config.ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
-                return(new wsPoint(bx,this.yBound.max,bz));
-            }
-        }
-        
-        if (z>0) {
-            gridSpot=this.blockGrid[z-1][x];
-            if (checkPlatform) gridSpot+=this.platformGrid[z-1][x];
-            
-            if (gridSpot===0) {
-                this.blockGrid[z-1][x]=1;
-                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*(z-1)))+(config.ROOM_BLOCK_WIDTH/2));
-                return(new wsPoint(bx,this.yBound.max,bz));
-            }
-        }
-        
-        if (x<(this.xBlockSize-1)) {
-            gridSpot=this.blockGrid[z][x+1];
-            if (checkPlatform) gridSpot+=this.platformGrid[z][x+1];
-            
-            if (gridSpot===0) {
-                this.blockGrid[z][x+1]=1;
-                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*(x+1)))+(config.ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
-                return(new wsPoint(bx,this.yBound.max,bz));
-            }
-        }
-        
-        if (z<(this.zBlockSize-1)) {
-            gridSpot=this.blockGrid[z+1][x];
-            if (checkPlatform) gridSpot+=this.platformGrid[z+1][x];
-            
-            if (gridSpot===0) {
-                this.blockGrid[z+1][x]=1;
-                bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
-                bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*(z+1)))+(config.ROOM_BLOCK_WIDTH/2));
-                return(new wsPoint(bx,this.yBound.max,bz));
-            }
-        }
-
-        return(null);
-    }
-    
     checkLocationFreeAndBlock(x,z)
     {
         var bx,bz;
         
-        if ((this.blockGrid[z][x]===0) && (this.platformGrid[z][x]===0)) {
-            this.blockGrid[z][x]=1;
+        // supergumba -- all these needs to be redone for new pillars
+        //if ((this.blockGrid.getCell(x,z)===0) && (this.platformGrid.getCell(x,z)===0)) {
+            this.blockGrid[0].setCell(x,z,1);
             bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
             bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
             return(new wsPoint(bx,this.yBound.max,bz));
-        }
-        
-        return(null);
+        //}
+
+        //return(null);
     }
     
         //
