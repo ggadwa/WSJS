@@ -942,12 +942,12 @@ class wsGrid
     
     setCell(x,z,value)
     {
-        this.grid[(z*this.zSize)+x]=value;
+        this.grid[(z*this.xSize)+x]=value;
     }
     
     getCell(x,z)
     {
-        return(this.grid[(z*this.zSize)+x]);
+        return(this.grid[(z*this.xSize)+x]);
     }
     
     setCellAll(value)
@@ -955,7 +955,7 @@ class wsGrid
         var n;
         var cellSize=this.xSize*this.zSize;
         
-        for (n=0;n!=cellSize;n++) {
+        for (n=0;n!==cellSize;n++) {
             this.grid[n]=value;
         }
     }

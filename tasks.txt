@@ -11,13 +11,6 @@ When interface created
 
 ToDos
 
---> PLATFORMS NEED STORIES!
-
-#### start on platform is broken (needs story marker)
-#### things like columns and decorations need to work through floors
-
-#### machines, computers, storage needs to be able to draw on platform
-#### figure out why decorations aren't avoiding edges
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller

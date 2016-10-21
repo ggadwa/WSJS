@@ -45,7 +45,7 @@ class MapRoomClass
         
         this.blockGrid=[];
         
-        for (n=0;n!=this.storyCount;n++) {
+        for (n=0;n!==this.storyCount;n++) {
             this.blockGrid.push(new wsGrid(this.xBlockSize,this.zBlockSize));
         }
         
@@ -68,7 +68,7 @@ class MapRoomClass
             // and all stories above start as blocked
             // off because there's no platforms
             
-        for (n=1;n!=this.storyCount;n++) {
+        for (n=1;n!==this.storyCount;n++) {
             this.blockGrid[n].setCellAll(1);
         }
     }
@@ -208,7 +208,7 @@ class MapRoomClass
             
                 // check all stories of the room
                 
-            for (n=0;n!=this.storyCount;n++) {
+            for (n=0;n!==this.storyCount;n++) {
             
                 if (this.blockGrid[n].getCell(x,z)===0) {
                     this.blockGrid[n].setCell(x,z,1);
@@ -233,19 +233,32 @@ class MapRoomClass
         return(null);
     }
         
-    checkLocationFreeAndBlock(x,z)
+    checkSpawnAndBlock(x,z)
     {
         var bx,bz;
         
-        // supergumba -- all these needs to be redone for new pillars
-        //if ((this.blockGrid.getCell(x,z)===0) && (this.platformGrid.getCell(x,z)===0)) {
+        if (this.blockGrid[0].getCell(x,z)===0) {
             this.blockGrid[0].setCell(x,z,1);
             bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
             bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
             return(new wsPoint(bx,this.yBound.max,bz));
-        //}
+        }
 
-        //return(null);
+        return(null);
+    }
+    
+    getSpawnToFirstPlatformOrTopBound(x,z)
+    {
+        var n,y;
+        
+        y=this.yBound.max-config.ROOM_FLOOR_HEIGHT;
+        
+        for (n=1;n<this.storyCount;n++) {
+            if (this.blockGrid[n].getCell(x,z)===0) break;
+            y-=(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+        }
+        
+        return(new wsBound(y,this.yBound.max));
     }
     
         //
