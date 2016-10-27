@@ -1,3 +1,5 @@
+/* global config, genRandom, map, MeshPrimitivesClass, MESH_FLAG_DECORATION */
+
 "use strict";
 
 //
@@ -60,8 +62,7 @@ class GenRoomDecorationMachineClass
     {
         var n,pieceCount;
         
-        // supergumba -- testing
-        pieceCount=10;//genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
+        pieceCount=room.getDecorationCount();
 
         for (n=0;n!==pieceCount;n++) {
             this.addComputer(room);

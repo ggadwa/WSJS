@@ -1,3 +1,5 @@
+/* global view, genRandom, PARTICLE_MAX_POINTS */
+
 "use strict";
 
 //

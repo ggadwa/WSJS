@@ -61,13 +61,6 @@ class ConfigClass
         this.ROOM_LIQUIDS=true;                         // turns on or off liquids
 
             //
-            // decorations
-            //
-
-        this.ROOM_DECORATION_MIN_COUNT=1;              // minimum number of decoration pieces in a room
-        this.ROOM_DECORATION_EXTRA_COUNT=3;            // extra number of decoration pieces
-
-            //
             // lighting
             //
 

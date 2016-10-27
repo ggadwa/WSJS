@@ -1,3 +1,5 @@
+/* global DEGREE_TO_RAD, RAD_TO_DEGREE */
+
 "use strict";
 
 //

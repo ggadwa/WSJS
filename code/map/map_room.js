@@ -1,3 +1,5 @@
+/* global config, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM, genRandom, MeshUtilityClass, MESH_FLAG_ROOM_WALL, MESH_FLAG_ROOM_FLOOR, map, MESH_FLAG_ROOM_CEILING */
+
 "use strict";
 
 //
@@ -259,6 +261,14 @@ class MapRoomClass
         }
         
         return(new wsBound(y,this.yBound.max));
+    }
+    
+    getDecorationCount()
+    {
+        var startCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.05);
+        var extraCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.15);
+        
+        return(genRandom.randomInt(startCount,extraCount));
     }
     
         //

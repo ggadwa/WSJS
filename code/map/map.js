@@ -1,3 +1,5 @@
+/* global view, genRandom, config, debug */
+
 "use strict";
 
 //
@@ -44,7 +46,7 @@ class MapClass
         this.genBitmapLiquid=new GenBitmapLiquidClass();
         
         this.textureBitmapList=[];
-        for (n=0;n!=this.TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
+        for (n=0;n!==this.TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
         
         this.lightmapBitmapList=[];
         
@@ -93,7 +95,7 @@ class MapClass
             }
         }
         
-        for (n=0;n!=lightmapBitmapList.length;n++) {
+        for (n=0;n!==lightmapBitmapList.length;n++) {
             this.lightmapBitmapList[n].close();
         }
         

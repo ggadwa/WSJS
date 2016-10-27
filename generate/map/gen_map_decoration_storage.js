@@ -1,3 +1,5 @@
+/* global map, genRandom, MeshPrimitivesClass, MESH_FLAG_DECORATION, config */
+
 "use strict";
 
 //
@@ -29,9 +31,6 @@ class GenRoomDecorationStorageClass
         var boxPos=new wsPoint(0,0,0);
         var rotAngle=new wsPoint(0.0,0.0,0.0);
         
-        var minWidth=Math.trunc(config.ROOM_BLOCK_WIDTH*0.2);
-        var extraWidth=Math.trunc(config.ROOM_BLOCK_WIDTH*0.25);
-
             // find the middle of the box spot
             // and box sizes
 
@@ -159,7 +158,7 @@ class GenRoomDecorationStorageClass
     {
         var n,pos,high,pieceCount;
         
-        pieceCount=genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
+        pieceCount=room.getDecorationCount();
         
             // make all pieces in the room have
             // the same size based on height

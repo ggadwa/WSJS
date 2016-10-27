@@ -1,3 +1,5 @@
+/* global fileCache, view, PROCESS_TIMEOUT_MSEC, sound, map, modelList, sky, entityList, particleList, debug, config, MODEL_TYPE_HUMANOID, MODEL_MONSTER_TYPES, MODEL_TYPE_WEAPON, MODEL_TYPE_PROJECTILE, genRandom, input, PHYSICS_MILLISECONDS, BAIL_MILLISECONDS, DRAW_MILLISECONDS */
+
 "use strict";
 
 //

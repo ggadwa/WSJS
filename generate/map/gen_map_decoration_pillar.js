@@ -1,3 +1,5 @@
+/* global MeshPrimitivesClass, MESH_FLAG_DECORATION, config, genRandom, map */
+
 "use strict";
 
 //

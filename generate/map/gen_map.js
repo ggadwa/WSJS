@@ -1,3 +1,5 @@
+/* global map, ROOM_DECORATION_PILLARS, ROOM_DECORATION_STORAGE, ROOM_DECORATION_MACHINES, ROOM_DECORATION_EQUIPMENT, genRandom, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_LEVEL_MAIN, config, MESH_FLAG_ROOM_WALL, ROOM_SIDE_BOTTOM, ROOM_SIDE_TOP, ROOM_LEVEL_UPPER, ROOM_LEVEL_LOWER, view, MESH_FLAG_LIGHT, MeshPrimitivesClass, ROOM_DECORATION_COUNT, ROOM_DECORATION_NONE, PROCESS_TIMEOUT_MSEC, MESH_FLAG_PLATFORM, MESH_FLAG_LEDGE */
+
 "use strict";
 
 //
@@ -991,7 +993,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            room.decorationType=ROOM_DECORATION_PILLARS;  // supergumba -- testing
+            room.decorationType=ROOM_DECORATION_EQUIPMENT;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case ROOM_DECORATION_PILLARS:

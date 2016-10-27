@@ -1,3 +1,5 @@
+/* global map, config, MeshPrimitivesClass, MESH_FLAG_LIFT, genRandom, MESH_FLAG_PLATFORM */
+
 "use strict";
 
 //
@@ -113,12 +115,12 @@ class GenRoomPlatformClass
         }
         
         for (z=sz;z<ez;z++) {
-            for (x=0;x!=room.xBlockSize;x++) {
+            for (x=0;x!==room.xBlockSize;x++) {
                 this.addPlatformChunk(room,x,z,story,platformBitmap);
             }
         }
         
-        for (x=0;x!=room.xBlockSize;x++) {
+        for (x=0;x!==room.xBlockSize;x++) {
             if (x!==liftX) this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
         }
     }
@@ -137,12 +139,12 @@ class GenRoomPlatformClass
         }
         
         for (x=sx;x<ex;x++) {
-            for (z=0;z!=room.zBlockSize;z++) {
+            for (z=0;z!==room.zBlockSize;z++) {
                 this.addPlatformChunk(room,x,z,story,platformBitmap);
             }
         }
         
-        for (z=0;z!=room.zBlockSize;z++) {
+        for (z=0;z!==room.zBlockSize;z++) {
             if (z!==liftZ) this.addPlatformChunk(room,liftX,z,story,platformBitmap);
         }
     }
@@ -153,7 +155,7 @@ class GenRoomPlatformClass
         
             // outside
             
-        for (x=0;x!=room.xBlockSize;x++) {
+        for (x=0;x!==room.xBlockSize;x++) {
             this.addPlatformChunk(room,x,0,story,platformBitmap);
             this.addPlatformChunk(room,x,(room.zBlockSize-1),story,platformBitmap);
         }
@@ -244,7 +246,7 @@ class GenRoomPlatformClass
         
             // expand walkways from the lift
         
-        for (n=0;n!=(room.storyCount-1);n++) {
+        for (n=0;n!==(room.storyCount-1);n++) {
             
             switch (genRandom.randomIndex(5)) {
                 case 0:

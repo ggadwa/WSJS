@@ -1,3 +1,5 @@
+/* global map, config, MeshPrimitivesClass, MESH_FLAG_DECORATION, genRandom, DEGREE_TO_RAD */
+
 "use strict";
 
 //
@@ -17,7 +19,7 @@ class GenRoomDecorationEquipmentClass
         
     addPipes(room)
     {
-        var n,pos,ty,by,platformBoundX,platformBoundY,platformBoundZ,pipeBoundY;
+        var n,pos,yBound,platformBoundX,platformBoundY,platformBoundZ,pipeBoundY;
         var nPipe,pipeWid,radius,wid;
         var ang,angAdd,rd;
         var platformBitmap,pipeBitmap;
@@ -32,26 +34,25 @@ class GenRoomDecorationEquipmentClass
         pipeBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
             // the pipe platforms
-            
-        ty=room.yBound.min+genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
-        by=room.yBound.max-genRandom.randomInt(config.ROOM_FLOOR_DEPTH,Math.trunc(config.ROOM_BLOCK_WIDTH/4));
+        
+        yBound=room.getSpawnToFirstPlatformOrTopBound(Math.trunc(pos.x/config.ROOM_BLOCK_WIDTH),Math.trunc(pos.z/config.ROOM_BLOCK_WIDTH));
         
         wid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.5);
 
         platformBoundX=new wsBound((pos.x-wid),(pos.x+wid));
         platformBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
 
-        platformBoundY=new wsBound(room.yBound.min,ty);
+        platformBoundY=new wsBound(yBound.min,(yBound.min+config.ROOM_FLOOR_DEPTH));
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,false,true,false,MESH_FLAG_DECORATION));
         
-        platformBoundY=new wsBound(by,room.yBound.max);
+        platformBoundY=new wsBound((yBound.max-config.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
 
-        pipeBoundY=new wsBound(ty,by);
+        pipeBoundY=new wsBound((yBound.min+config.ROOM_FLOOR_DEPTH),(yBound.max-config.ROOM_FLOOR_DEPTH));
         
             // create the pipes
             
-        nPipe=genRandom.randomInt(1,5);
+        nPipe=genRandom.randomInt(2,5);
 
         centerPt=new wsPoint(0,0,0);
 
@@ -80,7 +81,7 @@ class GenRoomDecorationEquipmentClass
     {
         var n,pieceCount;
         
-        pieceCount=genRandom.randomInt(config.ROOM_DECORATION_MIN_COUNT,config.ROOM_DECORATION_EXTRA_COUNT);
+        pieceCount=room.getDecorationCount();
 
         for (n=0;n!==pieceCount;n++) {
             this.addPipes(room);
