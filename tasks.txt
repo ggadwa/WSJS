@@ -13,7 +13,7 @@ ToDos
 
 
 
-#### all the room pos/block/etc need to be BY GRID not coordinates
+#### what's wrong with top/bottom for equipment?
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller

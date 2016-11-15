@@ -171,7 +171,7 @@ class GenRoomDecorationStorageClass
             
                 // location
                 
-            pos=room.findAndBlockSpawnPosition();
+            pos=room.findAndBlockSpawnPosition(true);
             if (pos===null) continue;
             
                 // randomly pick a storage type

@@ -509,7 +509,7 @@ class MapClass
         // find positions in map
         //
         
-    findAndBlockSpawnPosition()
+    findAndBlockSpawnPosition(groundFloorOnly)
     {
         var roomIdx;
         var pos;
@@ -523,7 +523,7 @@ class MapClass
         
                 // find a random spot
                 
-            pos=this.rooms[roomIdx].findAndBlockSpawnPosition();
+            pos=this.rooms[roomIdx].findAndBlockSpawnPosition(groundFloorOnly);
             if (pos!==null) return(pos);
             
             findTry++;
@@ -534,7 +534,7 @@ class MapClass
     
     findRandomPlayerPosition()
     {
-        return(this.rooms[0].findAndBlockSpawnPosition());
+        return(this.rooms[0].findAndBlockSpawnPosition(true));
     }
     
         //

@@ -30,7 +30,7 @@ class GenRoomDecorationMachineClass
         
             // the machine location
 
-        pos=room.findAndBlockSpawnPosition();
+        pos=room.findAndBlockSpawnPosition(true);
         if (pos===null) return;
         
         computerBitmap=map.getTexture(map.TEXTURE_TYPE_COMPUTER);

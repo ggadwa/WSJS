@@ -27,40 +27,40 @@ class GenRoomDecorationPillarClass
     {
         var mx,mz,pos,yBound;
         
-        pos=room.checkSpawnAndBlock(1,1);
-        yBound=room.getSpawnToFirstPlatformOrTopBound(1,1);
+        pos=room.checkGroundFloorSpawnAndBlock(1,1);
+        yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound(1,1);
         if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
-        pos=room.checkSpawnAndBlock((room.xBlockSize-2),1);
-        yBound=room.getSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),1);
+        pos=room.checkGroundFloorSpawnAndBlock((room.xBlockSize-2),1);
+        yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),1);
         if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
-        pos=room.checkSpawnAndBlock((room.xBlockSize-2),(room.zBlockSize-2));
-        yBound=room.getSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),(room.zBlockSize-2));
+        pos=room.checkGroundFloorSpawnAndBlock((room.xBlockSize-2),(room.zBlockSize-2));
+        yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),(room.zBlockSize-2));
         if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
-        pos=room.checkSpawnAndBlock(1,(room.zBlockSize-2));
-        yBound=room.getSpawnToFirstPlatformOrTopBound(1,(room.zBlockSize-2));
+        pos=room.checkGroundFloorSpawnAndBlock(1,(room.zBlockSize-2));
+        yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound(1,(room.zBlockSize-2));
         if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         
         if (inside) {
             mx=Math.trunc(room.xBlockSize/2);
             mz=Math.trunc(room.zBlockSize/2);
             
-            pos=room.checkSpawnAndBlock((mx-2),(mz-2));
-            yBound=room.getSpawnToFirstPlatformOrTopBound((mx-2),(mz-2));
+            pos=room.checkGroundFloorSpawnAndBlock((mx-2),(mz-2));
+            yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound((mx-2),(mz-2));
             if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
 
-            pos=room.checkSpawnAndBlock((mx+1),(mz-2));
-            yBound=room.getSpawnToFirstPlatformOrTopBound((mx+1),(mz-2));
+            pos=room.checkGroundFloorSpawnAndBlock((mx+1),(mz-2));
+            yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound((mx+1),(mz-2));
             if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
 
-            pos=room.checkSpawnAndBlock((mx+1),(mz+1));
-            yBound=room.getSpawnToFirstPlatformOrTopBound((mx+1),(mz+1));
+            pos=room.checkGroundFloorSpawnAndBlock((mx+1),(mz+1));
+            yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound((mx+1),(mz+1));
             if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
 
-            pos=room.checkSpawnAndBlock((mx-2),(mz+1));
-            yBound=room.getSpawnToFirstPlatformOrTopBound((mx-2),(mz+1));
+            pos=room.checkGroundFloorSpawnAndBlock((mx-2),(mz+1));
+            yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound((mx-2),(mz+1));
             if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION)); 
         }
     }
@@ -75,8 +75,8 @@ class GenRoomDecorationPillarClass
         for (x=1;x<=(room.xBlockSize-2);x+=2) {
             if (x===mx) continue;           // never block light
             
-            pos=room.checkSpawnAndBlock(x,mz);
-            yBound=room.getSpawnToFirstPlatformOrTopBound(x,mz);
+            pos=room.checkGroundFloorSpawnAndBlock(x,mz);
+            yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound(x,mz);
             if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
     }
@@ -91,8 +91,8 @@ class GenRoomDecorationPillarClass
         for (z=1;z<=(room.zBlockSize-2);z+=2) {
             if (z===mz) continue;           // never block light
             
-            pos=room.checkSpawnAndBlock(mx,z);
-            yBound=room.getSpawnToFirstPlatformOrTopBound(mx,z);
+            pos=room.checkGroundFloorSpawnAndBlock(mx,z);
+            yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBound(mx,z);
             if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,MESH_FLAG_DECORATION));
         }
     }

@@ -199,7 +199,7 @@ class MapRoomClass
         // find points in blocked grid space
         //
     
-    findAndBlockSpawnPosition()
+    findAndBlockSpawnPosition(groundFloorOnly)
     {
         var n,x,z,startX,startZ,bx,bz;
         
@@ -218,6 +218,8 @@ class MapRoomClass
                     bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
                     return(new wsPoint(bx,(this.yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*n)),bz));
                 }
+                
+                if (groundFloorOnly) break;
             }
             
                 // move a square over and try again
@@ -235,7 +237,7 @@ class MapRoomClass
         return(null);
     }
         
-    checkSpawnAndBlock(x,z)
+    checkGroundFloorSpawnAndBlock(x,z)
     {
         var bx,bz;
         
@@ -249,7 +251,7 @@ class MapRoomClass
         return(null);
     }
     
-    getSpawnToFirstPlatformOrTopBound(x,z)
+    getGruondFloorSpawnToFirstPlatformOrTopBound(x,z)
     {
         var n,y;
         
@@ -261,6 +263,13 @@ class MapRoomClass
         }
         
         return(new wsBound(y,this.yBound.max));
+    }
+    
+    getGruondFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos)
+    {
+        var x=Math.trunc(((pos.x-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
+        var z=Math.trunc(((pos.z-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
+        return(this.getGruondFloorSpawnToFirstPlatformOrTopBound(x,z));
     }
     
     getDecorationCount()

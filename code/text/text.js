@@ -46,7 +46,7 @@ class TextClass
         canvas.width=TEXT_TEXTURE_WIDTH;
         canvas.height=TEXT_TEXTURE_HEIGHT;
         var ctx=canvas.getContext('2d');
-
+        
             // background is black, text is white
             // so it can be colored
 

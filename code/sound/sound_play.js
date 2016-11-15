@@ -51,13 +51,12 @@ class SoundPlayClass
             
             // supergumba -- waiting for this to be implemented, then remove the comments
             
-    //    if (entity===null) {
+        if (entity===null) {
             this.gainNode=ctx.createGain();
             this.gainNode.gain.value=0.4;
         
             this.sourceNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);
-    /*
         }
         else {
             this.pannerNode=ctx.createPanner();
@@ -80,7 +79,6 @@ class SoundPlayClass
             this.sourceNode.connect(this.pannerNode);
             this.pannerNode.connect(ctx.destination);
         }
-        */
        
             // set to entity and mark as used
         

@@ -212,7 +212,7 @@ class ViewClass
             alert('WebGL not available, try a newer browser');
             return(false);
         }
-
+        
             // some initial setups
 
         this.gl.viewport(0,0,this.canvas.width,this.canvas.height);
