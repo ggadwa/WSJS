@@ -1,6 +1,5 @@
 EMCA6
     [ ] modulize the code (do genRandom first)
-    [ ] hoist all the vars, eventually use let (safari hold up)
 
 WebGL2
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
@@ -12,8 +11,12 @@ When interface created
 ToDos
 
 
+#### start doing LET
 
-#### what's wrong with top/bottom for equipment?
+#### some pipes are randomly designed to go into other pipes
+
+#### check texturing u1/u2 on cylinders, might be wrong
+#### fix panner math
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
@@ -40,10 +43,6 @@ ToDos
 #### genBitmapSkin/genBitmapItem in main.js delete later
 
 #### certain decorations in certain rooms (like computers and boxes and such in externals)
-
-#### finish "supergumba" sound parts that aren't workable until panner/listener position gets implemented
-
-
 
 #### machine -> equipment, have 2 to 4 parts (vertical) each part can be pipe or machine
 
