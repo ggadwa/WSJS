@@ -459,18 +459,20 @@ class MapMeshClass
     {
         var n,ny;
         var tIdx;
-        var v0,v1,v2,line;
+        var v0,v1,v2;
         
             // some meshes have simple collision
             // geometery -- these are assumed to be
-            // only walls, not top, no bottom, and
-            // the boundbox
+            // hitting against the bound box
             
         if (this.simpleCollisionGeometry) {
             this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.min)));
             this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.max),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.max)));
             this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.min,this.yBound.max,this.zBound.max)));
             this.collisionLines.push(new wsLine(new wsPoint(this.xBound.max,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.max)));
+            
+            this.collisionFloorRects.push(new wsCollisionRect(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.min));
+            this.collisionCeilingRects.push(new wsCollisionRect(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.max));
             return;
         }
 

@@ -23,7 +23,7 @@ class GenRoomDecorationEquipmentClass
     addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng)
     {
         let n,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
-        let u1,u2;
+        let u1,u2,vfact;
         let ang,ang2,angAdd;
         let mesh,vertexList,indexes,iCount,vIdx;
         let nextPnt=new wsPoint(0,0,0);
@@ -45,6 +45,10 @@ class GenRoomDecorationEquipmentClass
         addPnt.setFromValues(0,len,0);
         addPnt.rotate(pipeAng);
         nextPnt.addPoint(addPnt);
+        
+            // the v factor
+            
+        vfact=len/radius;
         
             // cyliner faces
 
@@ -98,7 +102,7 @@ class GenRoomDecorationEquipmentClass
             v.position.rotateAroundPoint(pnt,pipeAng);
             v.normal.setFromSubPoint(v.position,pnt);
             v.normal.normalize();
-            v.uv.setFromValues(u1,1.0);
+            v.uv.setFromValues(u1,vfact);
 
             v=vertexList[vIdx++];
             v.position.setFromValues(tx2,nextPnt.y,tz2);
@@ -112,14 +116,14 @@ class GenRoomDecorationEquipmentClass
             v.position.rotateAroundPoint(pnt,pipeAng);
             v.normal.setFromSubPoint(v.position,pnt);
             v.normal.normalize();
-            v.uv.setFromValues(u2,1.0);
+            v.uv.setFromValues(u2,vfact);
 
             v=vertexList[vIdx++];
             v.position.setFromValues(bx,pnt.y,bz);
             v.position.rotateAroundPoint(pnt,pipeAng);
             v.normal.setFromSubPoint(v.position,pnt);
             v.normal.normalize();
-            v.uv.setFromValues(u1,1.0);
+            v.uv.setFromValues(u1,vfact);
 
             ang=ang2;
         }
@@ -141,14 +145,14 @@ class GenRoomDecorationEquipmentClass
         map.addMesh(mesh);
     }
 
-    addPipeCornerChunk(bitmap,pnt,radius,xTurn,zTurn)
+    addPipeCornerChunk(bitmap,pnt,radius,xStart,zStart,xTurn,zTurn)
     {
         let n,k,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let yAdd,xTurnAdd,zTurnAdd;
         let u1,u2;
         let ang,ang2,angAdd;
         let mesh,vertexList,indexes,iCount,vIdx,iIdx;
-        let pipeAng=new wsPoint(0,0,0);
+        let pipeAng=new wsPoint(xStart,0,zStart);
         let nextPipeAng=new wsPoint(0,0,0);
         let nextPnt=new wsPoint(0,0,0);
         let addPnt=new wsPoint(0,0,0);
@@ -291,7 +295,7 @@ class GenRoomDecorationEquipmentClass
             // pipes always start up
             
         pipeAng=new wsPoint(0,0,180.0);     // force len to point up
-        len=genRandom.randomInt(config.ROOM_FLOOR_DEPTH,(yBound.getSize()-(config.ROOM_FLOOR_DEPTH+(radius*2))));
+        len=genRandom.randomInt(config.ROOM_FLOOR_HEIGHT,(yBound.getSize()-(config.ROOM_FLOOR_HEIGHT+(radius*2))));
         this.addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng);
         
         pnt.y-=len;
@@ -301,46 +305,54 @@ class GenRoomDecorationEquipmentClass
         switch (dir) {
             
             case ROOM_SIDE_LEFT:  
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0);
 
                 pipeAng.setFromValues(0.0,0.0,90.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.x-=dirLen;
-                //this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0);
                 break;
                 
             case ROOM_SIDE_RIGHT:
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0);
 
                 pipeAng.setFromValues(0.0,0.0,-90.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.x+=dirLen;
-                //this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0);
                 break;
                 
             case ROOM_SIDE_TOP:
-                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0);
 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.z-=dirLen;
-                //this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0);
                 break;
                 
             case ROOM_SIDE_BOTTOM:
-                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0);
 
                 pipeAng.setFromValues(90.0,0.0,0.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.z+=dirLen;
-                //this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0,90.0,0.0);
                 break;
         }
         
+            // final up section of pipe
+        
+        len=pnt.y-yBound.min;
+        
+        if (len>0) {
+            pipeAng=new wsPoint(0,0,180.0);     // force len to point up
+            this.addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng);
+        }
     }
         
         //
@@ -349,22 +361,27 @@ class GenRoomDecorationEquipmentClass
         
     addPipes(room)
     {
-        let n,pos,yBound,platformBoundX,platformBoundY,platformBoundZ,pipeBoundY;
-        let nPipe,pipeWid,radius,wid;
-        let ang,angAdd,rd;
+        let x,z,sx,sz,pos,yBound,platformBoundX,platformBoundY,platformBoundZ;
+        let nPipeGrid,gridSize,radius,wid;
         let platformBitmap,pipeBitmap;
-        let centerPt,dir,dirLen,distLft,distRgt,distTop,distBot;
+        let pnt,dir,dirLen,distLft,distRgt,distTop,distBot;
         
             // the pipes location
 
         pos=room.findAndBlockSpawnPosition(true);
         if (pos===null) return;
         
-        pipeWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.25);
-        radius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
-        
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         pipeBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
+        
+            // get # of pipes (on a grid so they can collide
+            // properly) and their relative sizes
+            
+        nPipeGrid=genRandom.randomInt(2,2);
+        nPipeGrid=2;
+
+        gridSize=Math.trunc(config.ROOM_BLOCK_WIDTH/nPipeGrid);
+        radius=Math.trunc(gridSize*0.3);
         
             // the pipe platform
         
@@ -377,8 +394,6 @@ class GenRoomDecorationEquipmentClass
         
         platformBoundY=new wsBound((yBound.max-config.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
-
-        pipeBoundY=new wsBound((yBound.min+config.ROOM_FLOOR_DEPTH),(yBound.max-config.ROOM_FLOOR_DEPTH));
         
             // determine direction
             
@@ -413,22 +428,19 @@ class GenRoomDecorationEquipmentClass
         
             // create the pipes
             
-        nPipe=genRandom.randomInt(2,5);
+        sx=(pos.x-Math.trunc(config.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sz=(pos.z-Math.trunc(config.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        
+        pnt=new wsPoint(0,0,0);
 
-        centerPt=new wsPoint(0,0,0);
-
-        ang=0.0;
-        angAdd=360.0/nPipe;
-
-        for (n=0;n!==nPipe;n++) {
-            rd=ang*DEGREE_TO_RAD;
-            centerPt.x=pos.x+((pipeWid*Math.sin(rd))+(pipeWid*Math.cos(rd)));
-            centerPt.y=pipeBoundY.max;
-            centerPt.z=pos.z+((pipeWid*Math.cos(rd))-(pipeWid*Math.sin(rd)));
-
-            this.addPipe(pipeBitmap,dir,centerPt,radius,dirLen,pipeBoundY);
-
-            ang+=angAdd;
+        for (z=0;z!==nPipeGrid;z++) {
+            for (x=0;x!==nPipeGrid;x++) {
+                pnt.x=sx+(x*gridSize);
+                pnt.y=yBound.max-config.ROOM_FLOOR_DEPTH;
+                pnt.z=sz+(z*gridSize);
+                
+                this.addPipe(pipeBitmap,dir,pnt,radius,dirLen,yBound);
+            }
         }
     }
     

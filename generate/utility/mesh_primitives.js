@@ -1,3 +1,5 @@
+/* global MeshUtilityClass, genRandom, DEGREE_TO_RAD */
+
 "use strict";
 
 //
@@ -155,6 +157,87 @@ class MeshPrimitivesClass
 
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,normalsIn);
         if (!wholeUV) MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
+
+            // finally create the mesh
+
+        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+    }
+    
+        //
+        // create wedge
+        //
+
+    static createMeshWedge(bitmap,xBound,yBound,zBound,rotAngle,normalsIn,flags)
+    {
+        let n,idx,v,count,quadCount,centerPnt;
+        let vertexList,indexes;
+        
+            // get wedge size
+
+        count=(2*3)+(3*6);
+        vertexList=MeshUtilityClass.createMapVertexList(count);
+
+            // left
+
+        idx=0;
+
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min); 
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
+
+             // right
+
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+
+            // back
+
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
+
+            // top
+
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+
+            // bottom
+
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
+
+        indexes=new Uint16Array(count);
+
+        for (n=0;n!==count;n++) {
+            indexes[n]=n;
+        }
+
+            // rotate
+            
+        if (rotAngle!==null) {
+            centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            MeshUtilityClass.rotateVertexes(vertexList,centerPnt,rotAngle);
+        }
+        
+            // calculate the normals, then use those to
+            // calcualte the uvs, and finally the UVs to
+            // calculate the tangents
+
+        MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,normalsIn);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh

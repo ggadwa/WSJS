@@ -12,24 +12,11 @@ ToDos
 
 
 #### start doing LET
-
-#### some pipes are randomly designed to go into other pipes
-
-#### check texturing u1/u2 on cylinders, might be wrong
 #### fix panner math
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
 
-#### machine
-        - make grid, random sizes on grid
-        - pipe, square box, or box + pipe (top/bottom)
-
-#### pipes and machines need to be in rows and chunks (patterns), need room types
-         - pillars
-         - storage
-         - machines (computers + CONTROL PANELS)
-         - equipment
 #### only put closets in areas that have platforms to them?
 
 #### platforms not knocking out main map mesh walls?
@@ -42,26 +29,12 @@ ToDos
 #### item texture is pretty ugly
 #### genBitmapSkin/genBitmapItem in main.js delete later
 
-#### certain decorations in certain rooms (like computers and boxes and such in externals)
-
-#### machine -> equipment, have 2 to 4 parts (vertical) each part can be pipe or machine
-
-
---------------> generation
-  - doors, lifts, and liquid in map overlay
-  - make win button at last room
-
-
-
 #### collisions against slanted walls are bad
 #### weapon models
 #### get rid of weapon fire hard-coding
 #### monster speed/health random/projectile,no-projectile
 #### implement reflect for projectiles
 
-#### more decorations
-      - benches?
-      - random platform, then bars or walls, then platform?  pedestal
 #### closets more complex?
 #### windows like you do closets
 #### liquid tint colors are hardcoded

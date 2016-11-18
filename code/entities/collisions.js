@@ -1,3 +1,5 @@
+/* global entityList, map, MESH_FLAG_ROOM_CEILING, MESH_FLAG_ROOM_WALL */
+
 "use strict";
 
 //

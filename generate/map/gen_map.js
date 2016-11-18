@@ -199,7 +199,7 @@ class GenMapClass
         storyCount=1;
         if (level!==ROOM_LEVEL_LOWER) storyCount=genRandom.randomInt(1,4);
         
-        storyCount=4;   // supergumba -- testing
+        //storyCount=4;   // supergumba -- testing
         
             // bottom of room
         
@@ -313,8 +313,6 @@ class GenMapClass
                     connectSide=ROOM_SIDE_TOP;
                     break;
             }
-            
-            //yStairBound.add(-(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH));
         }
 
             // create the stairs
@@ -993,7 +991,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            room.decorationType=ROOM_DECORATION_EQUIPMENT;  // supergumba -- testing
+            room.decorationType=ROOM_DECORATION_MACHINES;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case ROOM_DECORATION_PILLARS:
