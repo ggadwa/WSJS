@@ -21,6 +21,7 @@ class MainDebugClass
         this.genBitmapDoor=new GenBitmapDoorClass();
         this.genBitmapMetal=new GenBitmapMetalClass();
         this.genBitmapMachine=new GenBitmapMachineClass();
+        this.genBitmapPanel=new GenBitmapPanelClass();
         this.genBitmapBox=new GenBitmapBoxClass();
         this.genBitmapLiquid=new GenBitmapLiquidClass();
         this.genBitmapSkin=new GenBitmapSkinClass();
@@ -149,11 +150,24 @@ class MainDebugClass
         
         idx++;
         if (idx>=this.genBitmapMachine.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapBox.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapPanel.bind(this,0),PROCESS_TIMEOUT_MSEC);
             return;
         }
         
         setTimeout(this.addBitmapMachine.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+    }
+    
+    addBitmapPanel(idx)
+    {
+        this.drawSingleBitmap('Panel',this.genBitmapPanel.TYPE_NAMES[idx],this.genBitmapPanel.generate(idx,true));
+        
+        idx++;
+        if (idx>=this.genBitmapPanel.TYPE_NAMES.length) {
+            setTimeout(this.addBitmapBox.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            return;
+        }
+        
+        setTimeout(this.addBitmapPanel.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
     addBitmapBox(idx)

@@ -1,4 +1,4 @@
-/* global map, ROOM_DECORATION_PILLARS, ROOM_DECORATION_STORAGE, ROOM_DECORATION_MACHINES, ROOM_DECORATION_EQUIPMENT, genRandom, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_LEVEL_MAIN, config, MESH_FLAG_ROOM_WALL, ROOM_SIDE_BOTTOM, ROOM_SIDE_TOP, ROOM_LEVEL_UPPER, ROOM_LEVEL_LOWER, view, MESH_FLAG_LIGHT, MeshPrimitivesClass, ROOM_DECORATION_COUNT, ROOM_DECORATION_NONE, PROCESS_TIMEOUT_MSEC, MESH_FLAG_PLATFORM, MESH_FLAG_LEDGE */
+/* global map, ROOM_DECORATION_PILLARS, ROOM_DECORATION_STORAGE, ROOM_DECORATION_MACHINES, ROOM_DECORATION_EQUIPMENT, genRandom, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_LEVEL_MAIN, config, MESH_FLAG_ROOM_WALL, ROOM_SIDE_BOTTOM, ROOM_SIDE_TOP, ROOM_LEVEL_UPPER, ROOM_LEVEL_LOWER, view, MESH_FLAG_LIGHT, MeshPrimitivesClass, ROOM_DECORATION_COUNT, ROOM_DECORATION_NONE, PROCESS_TIMEOUT_MSEC, MESH_FLAG_PLATFORM, MESH_FLAG_LEDGE, ROOM_DECORATION_WALLS */
 
 "use strict";
 
@@ -981,17 +981,18 @@ class GenMapClass
     
     buildRoomDecorations()
     {
-        var n,room;
-        var pillar=null;
-        var storage=null;
-        var machine=null;
-        var equipment=null;
-        var nRoom=map.rooms.length;
+        let n,room;
+        let pillar=null;
+        let storage=null;
+        let machine=null;
+        let equipment=null;
+        let walls=null;
+        let nRoom=map.rooms.length;
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            room.decorationType=ROOM_DECORATION_MACHINES;  // supergumba -- testing
+            //room.decorationType=ROOM_DECORATION_WALLS;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case ROOM_DECORATION_PILLARS:
@@ -1009,6 +1010,10 @@ class GenMapClass
                 case ROOM_DECORATION_EQUIPMENT:
                     if (equipment===null) equipment=new GenRoomDecorationEquipmentClass();
                     equipment.create(room);
+                    break;
+                case ROOM_DECORATION_WALLS:
+                    if (walls===null) walls=new GenRoomDecorationWallsClass();
+                    walls.create(room);
                     break;
                 
             }

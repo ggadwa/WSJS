@@ -364,7 +364,7 @@ class GenRoomDecorationEquipmentClass
         let x,z,sx,sz,pos,yBound,platformBoundX,platformBoundY,platformBoundZ;
         let nPipeGrid,gridSize,radius,wid;
         let platformBitmap,pipeBitmap;
-        let pnt,dir,dirLen,distLft,distRgt,distTop,distBot;
+        let pnt,dir,dirLen;
         
             // the pipes location
 
@@ -385,7 +385,7 @@ class GenRoomDecorationEquipmentClass
         
             // the pipe platform
         
-        yBound=room.getGruondFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos);
+        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos);
         
         wid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.5);
 
@@ -396,34 +396,10 @@ class GenRoomDecorationEquipmentClass
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
         
             // determine direction
-            
-        distLft=pos.x-room.xBound.min;
-        distRgt=room.xBound.max-pos.x;
-        distTop=pos.z-room.zBound.min;
-        distBot=room.zBound.max-pos.z;
         
-        if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
-            dir=ROOM_SIDE_LEFT;
-            dirLen=distLft;
-        }
-        else {
-            if ((distRgt<distTop) && (distRgt<distBot)) {
-                dir=ROOM_SIDE_RIGHT;
-                dirLen=distRgt;
-            }
-            else {
-                if (distTop<distBot) {
-                    dir=ROOM_SIDE_TOP;
-                    dirLen=distTop;
-                }
-                else {
-                    dir=ROOM_SIDE_BOTTOM;
-                    dirLen=distBot;
-                }
-            }
-        }
+        dir=room.getDirectionTowardsNearestWall(pos);
         
-        dirLen-=Math.trunc((config.ROOM_BLOCK_WIDTH*0.5)+radius);
+        dirLen=dir.len-Math.trunc((config.ROOM_BLOCK_WIDTH*0.5)+radius);
         if (dirLen<0) dirLen=100;
         
             // create the pipes
@@ -439,7 +415,7 @@ class GenRoomDecorationEquipmentClass
                 pnt.y=yBound.max-config.ROOM_FLOOR_DEPTH;
                 pnt.z=sz+(z*gridSize);
                 
-                this.addPipe(pipeBitmap,dir,pnt,radius,dirLen,yBound);
+                this.addPipe(pipeBitmap,dir.direction,pnt,radius,dirLen,yBound);
             }
         }
     }

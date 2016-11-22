@@ -19,10 +19,13 @@ class MeshPrimitivesClass
 
     static createMeshCube(bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,front,back,top,bottom,normalsIn,flags)
     {
+        let v,vertexList,count,idx,centerPt;
+        let n,indexes,quadCount;
+        
             // get cube size
             // note: why duplicated vertexes?  Because light map UVs
 
-        var count=0;
+        count=0;
         if (left) count+=6;
         if (right) count+=6;
         if (front) count+=6;
@@ -31,12 +34,11 @@ class MeshPrimitivesClass
         if (bottom) count+=6;
         if (count===0) return(null);
 
-        var v;
-        var vertexList=MeshUtilityClass.createMapVertexList(count);
+        vertexList=MeshUtilityClass.createMapVertexList(count);
 
             // left
 
-        var idx=0;
+        idx=0;
 
         if (left) {
             vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
@@ -102,9 +104,7 @@ class MeshPrimitivesClass
             vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
         }
 
-        var n;
-
-        var indexes=new Uint16Array(count);
+        indexes=new Uint16Array(count);
 
         for (n=0;n!==count;n++) {
             indexes[n]=n;
@@ -115,7 +115,7 @@ class MeshPrimitivesClass
         if (wholeUV) {
             
             idx=0;
-            var quadCount=Math.trunc(count/6);
+            quadCount=Math.trunc(count/6);
 
             for (n=0;n!==quadCount;n++) {
                 v=vertexList[idx++];
@@ -147,7 +147,7 @@ class MeshPrimitivesClass
             // rotate
             
         if (rotAngle!==null) {
-            var centerPt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            centerPt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
             MeshUtilityClass.rotateVertexes(vertexList,centerPt,rotAngle);
         }
         
@@ -168,61 +168,141 @@ class MeshPrimitivesClass
         // create wedge
         //
 
-    static createMeshWedge(bitmap,xBound,yBound,zBound,rotAngle,normalsIn,flags)
+    static createMeshWedge(bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,back,top,bottom,normalsIn,flags)
     {
-        let n,idx,v,count,quadCount,centerPnt;
+        let n,v,idx,count,centerPnt,topIdx,botIdx;
         let vertexList,indexes;
         
             // get wedge size
 
-        count=(2*3)+(3*6);
+        count=0;
+        if (left) count+=3;
+        if (right) count+=3;
+        if (back) count+=6;
+        if (top) count+=6;
+        if (bottom) count+=6;
+        if (count===0) return(null);
+
         vertexList=MeshUtilityClass.createMapVertexList(count);
+        
+            // remember these for wholeUVs, right
+            // now we can only do this for top/bottom
+            
+        topIdx=-1;
+        botIdx=-1;
 
             // left
 
         idx=0;
 
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min); 
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
-
+        if (left) {
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min); 
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
+        }
+        
              // right
 
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-
+        if (right) {
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+        }
+        
             // back
 
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
-
+        if (back) {
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
+        }
+        
             // top
 
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
-
+        if (top) {
+            topIdx=idx;
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
+        }
+        
             // bottom
 
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
-        vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
-        vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
-
+        if (bottom) {
+            botIdx=idx;
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
+            vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
+            vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);
+        }
+        
         indexes=new Uint16Array(count);
 
         for (n=0;n!==count;n++) {
             indexes[n]=n;
+        }
+        
+            // build whole UVs
+
+        if (wholeUV) {
+            if (topIdx!==-1) {
+                v=vertexList[topIdx++];
+                v.uv.x=0.0;
+                v.uv.y=0.0;
+                
+                v=vertexList[topIdx++];
+                v.uv.x=1.0;
+                v.uv.y=0.0;
+                
+                v=vertexList[topIdx++];
+                v.uv.x=1.0;
+                v.uv.y=1.0;
+                
+                v=vertexList[topIdx++];
+                v.uv.x=0.0;
+                v.uv.y=0.0;
+                
+                v=vertexList[topIdx++];
+                v.uv.x=1.0;
+                v.uv.y=1.0;
+                
+                v=vertexList[topIdx++];
+                v.uv.x=0.0;
+                v.uv.y=1.0;
+            }  
+            if (botIdx!==-1) {
+                v=vertexList[botIdx++];
+                v.uv.x=0.0;
+                v.uv.y=0.0;
+                
+                v=vertexList[botIdx++];
+                v.uv.x=1.0;
+                v.uv.y=0.0;
+                
+                v=vertexList[botIdx++];
+                v.uv.x=1.0;
+                v.uv.y=1.0;
+                
+                v=vertexList[botIdx++];
+                v.uv.x=0.0;
+                v.uv.y=0.0;
+                
+                v=vertexList[botIdx++];
+                v.uv.x=1.0;
+                v.uv.y=1.0;
+                
+                v=vertexList[botIdx++];
+                v.uv.x=0.0;
+                v.uv.y=1.0;
+            }  
         }
 
             // rotate
@@ -237,7 +317,7 @@ class MeshPrimitivesClass
             // calculate the tangents
 
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,normalsIn);
-        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        if (!wholeUV) MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
@@ -251,12 +331,13 @@ class MeshPrimitivesClass
 
     static createMeshPryamid(bitmap,xBound,yBound,zBound,flags)
     {
-        var x=xBound.getMidPoint();
-        var z=zBound.getMidPoint();
+        let n,idx,vertexList,indexes;
+        let x=xBound.getMidPoint();
+        let z=zBound.getMidPoint();
 
-        var vertexList=MeshUtilityClass.createMapVertexList(12);
+        vertexList=MeshUtilityClass.createMapVertexList(12);
         
-        var idx=0;
+        idx=0;
 
         vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
         vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
@@ -274,8 +355,7 @@ class MeshPrimitivesClass
         vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
         vertexList[idx++].position.setFromValues(x,yBound.max,z);
 
-        var n;
-        var indexes=new Uint16Array(12);
+        indexes=new Uint16Array(12);
 
         for (n=0;n!==12;n++) {
             indexes[n]=n;
@@ -300,9 +380,9 @@ class MeshPrimitivesClass
         
     static createMeshCylinderSegmentList(radius,extraRadius,segmentCount,segmentExtra)
     {
-        var n;
-        var segCount=genRandom.randomInt(segmentCount,segmentExtra);
-        var segments=[];
+        let n;
+        let segCount=genRandom.randomInt(segmentCount,segmentExtra);
+        let segments=[];
         
         segments.push(radius+extraRadius);      // top always biggest
         
@@ -317,28 +397,29 @@ class MeshPrimitivesClass
         
     static createMeshCylinder(bitmap,centerPt,yBound,segments,flags)
     {
-        var n,k,t,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
-        var topRad,botRad;
-        var u1,u2;
+        let n,k,t,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
+        let topRad,botRad;
+        let u1,u2;
+        let vertexList,indexes,mesh,iCount,vIdx,iIdx;
+        let yAdd,ySegBound,ang,ang2,angAdd;
+        let sideCount=12;
+        let segCount=segments.length-1;     // always one extra for top
         
             // get cylder size
         
-        var sideCount=12;
-        var segCount=segments.length-1;     // always one extra for top
-        
-        var vertexList=MeshUtilityClass.createMapVertexList(segCount*(sideCount*6));
-        var indexes=new Uint16Array(segCount*(sideCount*6));
+        vertexList=MeshUtilityClass.createMapVertexList(segCount*(sideCount*6));
+        indexes=new Uint16Array(segCount*(sideCount*6));
 
-        var iCount=sideCount*6;
+        iCount=sideCount*6;
         
-        var vIdx=0;
-        var iIdx=0;
+        vIdx=0;
+        iIdx=0;
         
             // cylinder segments
             
-        var yAdd=Math.trunc(yBound.getSize()/segCount);
+        yAdd=Math.trunc(yBound.getSize()/segCount);
             
-        var ySegBound=yBound.copy();
+        ySegBound=yBound.copy();
         ySegBound.min=ySegBound.max-yAdd;
         
         botRad=segments[0];
@@ -351,9 +432,8 @@ class MeshPrimitivesClass
 
                 // cyliner faces
 
-            var ang=0.0;
-            var ang2;
-            var angAdd=360.0/sideCount;
+            ang=0.0;
+            angAdd=360.0/sideCount;
 
             for (n=0;n!==sideCount;n++) {
                 ang2=ang+angAdd;
@@ -437,7 +517,7 @@ class MeshPrimitivesClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        var mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);
+        mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);
         mesh.simpleCollisionGeometry=true;
         
         return(mesh);
@@ -445,12 +525,13 @@ class MeshPrimitivesClass
     
     static createMeshCylinderSimple(bitmap,centerPt,yBound,radius,flags)
     {
-        var segments=[];
+        let mesh;
+        let segments=[];
         
         segments.push(radius);
         segments.push(radius);
         
-        var mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,flags);
+        mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,flags);
         mesh.simpleCollisionGeometry=true;
         
         return(mesh);

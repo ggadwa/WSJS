@@ -49,8 +49,6 @@ class SoundPlayClass
             // if no entity, than just add
             // a gain node, otherwise a panner
             
-            // supergumba -- waiting for this to be implemented, then remove the comments
-            
         if (entity===null) {
             this.gainNode=ctx.createGain();
             this.gainNode.gain.value=0.4;
@@ -75,7 +73,7 @@ class SoundPlayClass
             this.pannerNode.orientationX.value=1;
             this.pannerNode.orientationY.value=0;
             this.pannerNode.orientationZ.value=0;
-
+            
             this.sourceNode.connect(this.pannerNode);
             this.pannerNode.connect(ctx.destination);
         }
@@ -105,15 +103,11 @@ class SoundPlayClass
         
     update(entityListener)
     {
-        // supergumba -- remove these when panner finally works again
-
-        /*
         if (this.entity!==null) {
-            this.pannerNode.positionX.value=this.entity.position.x;
-            this.pannerNode.positionY.value=this.entity.position.y;
-            this.pannerNode.positionZ.value=this.entity.position.z;
+        //    this.pannerNode.positionX.value=this.entity.position.x;
+        //    this.pannerNode.positionY.value=this.entity.position.y;
+        //    this.pannerNode.positionZ.value=this.entity.position.z;
         }
-        */
     }
 
 }

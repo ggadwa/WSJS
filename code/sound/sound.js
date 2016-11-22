@@ -92,19 +92,22 @@ class SoundClass
         this.listenerForwardVector.setFromValues(0.0,0.0,1.0);
         this.listenerForwardVector.rotateY(null,this.currentListenerEntity.angle.y);
         
-            // supergumba -- remove the comments when listener implements the position values
-            
-/*        
-        this.listener.positionX.value=this.currentListenerEntity.position.x;
-        this.listener.positionY.value=this.currentListenerEntity.position.y;
-        this.listener.positionZ.value=this.currentListenerEntity.position.z;
-        this.listener.forwardX.value=this.listenerForwardVector.x;
-        this.listener.forwardY.value=this.listenerForwardVector.y;
-        this.listener.forwardZ.value=this.listenerForwardVector.z;
-        this.listener.upX.value=0.0;
-        this.listener.upY.value=1.0;
-        this.listener.upZ.value=0.0;
-*/        
+        if (this.listener.positionX) {
+            this.listener.positionX.value=this.currentListenerEntity.position.x;
+            this.listener.positionY.value=this.currentListenerEntity.position.y;
+            this.listener.positionZ.value=this.currentListenerEntity.position.z;
+            this.listener.forwardX.value=this.listenerForwardVector.x;
+            this.listener.forwardY.value=this.listenerForwardVector.y;
+            this.listener.forwardZ.value=this.listenerForwardVector.z;
+            this.listener.upX.value=0.0;
+            this.listener.upY.value=1.0;
+            this.listener.upZ.value=0.0;
+        }
+        else {      // supergumba -- remove all this when firefox stops being stupid
+            this.listener.setPosition(this.currentListenerEntity.position.x,this.currentListenerEntity.position.y,this.currentListenerEntity.position.z);
+            this.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0.0,1.0,0.0);
+        }
+        
             // update all playing sounds
             
         this.soundPlayList.updateSoundPlays(this.currentListenerEntity);

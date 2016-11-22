@@ -68,7 +68,7 @@ class ConfigClass
         this.MAP_LIGHT_AMBIENT_G=0.2;
         this.MAP_LIGHT_AMBIENT_B=0.2;
 
-        this.MAP_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
+        this.MAP_LIGHT_FACTOR=0.45;                    // lights are initially set to room radius, this factor is multipled in
         this.MAP_LIGHT_FACTOR_EXTRA=0.4;               // random addition to light factor above
 
         this.MAP_LIGHT_EXPONENT_MINIMUM=0.2;           // minimum light exponent (0.0 is completely hard light with no fall off)

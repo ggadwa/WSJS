@@ -25,14 +25,14 @@ class MapClass
         
         this.TEXTURE_TYPE_WALL=0;
         this.TEXTURE_TYPE_FLOOR=1;
-        this.TEXTURE_TYPE_WALL=2;
-        this.TEXTURE_TYPE_FLOOR=3;
-        this.TEXTURE_TYPE_CEILING=4;
-        this.TEXTURE_TYPE_PLATFORM=5;
-        this.TEXTURE_TYPE_PILLAR=6;
-        this.TEXTURE_TYPE_METAL=7;
-        this.TEXTURE_TYPE_DOOR=8;
-        this.TEXTURE_TYPE_COMPUTER=9;
+        this.TEXTURE_TYPE_FLOOR=2;
+        this.TEXTURE_TYPE_CEILING=3;
+        this.TEXTURE_TYPE_PLATFORM=4;
+        this.TEXTURE_TYPE_PILLAR=5;
+        this.TEXTURE_TYPE_METAL=6;
+        this.TEXTURE_TYPE_DOOR=7;
+        this.TEXTURE_TYPE_COMPUTER=8;
+        this.TEXTURE_TYPE_PANEL=9;
         this.TEXTURE_TYPE_BOX=10;
         this.TEXTURE_TYPE_LIQUID=11;
         
@@ -42,6 +42,7 @@ class MapClass
         this.genBitmapDoor=new GenBitmapDoorClass();
         this.genBitmapMetal=new GenBitmapMetalClass();
         this.genBitmapMachine=new GenBitmapMachineClass();
+        this.genBitmapPanel=new GenBitmapPanelClass();
         this.genBitmapBox=new GenBitmapBoxClass();
         this.genBitmapLiquid=new GenBitmapLiquidClass();
         
@@ -131,6 +132,10 @@ class MapClass
                     
                 case this.TEXTURE_TYPE_COMPUTER:
                     this.textureBitmapList[textureType]=this.genBitmapMachine.generateRandom(false);
+                    break;
+                    
+                case this.TEXTURE_TYPE_PANEL:
+                    this.textureBitmapList[textureType]=this.genBitmapPanel.generateRandom(false);
                     break;
                     
                 case this.TEXTURE_TYPE_BOX:

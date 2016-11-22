@@ -3,6 +3,22 @@
 "use strict";
 
 //
+// utility class for determining distance and facing
+// for certain items in room
+//
+
+class MapRoomFaceClass
+{
+    constructor(direction,len)
+    {
+        this.direction=direction;
+        this.len=len;
+        
+        Object.seal(this);
+    }
+}
+
+//
 // map room class
 // 
 // this is used to track which meshes count as rooms for later placing
@@ -39,7 +55,7 @@ class MapRoomClass
     
     setupGrid()
     {
-        var n,x,z;
+        let n,x,z;
         
             // make two dimensional arrays of
             // xBlockSize * zBlockSize for each
@@ -96,7 +112,7 @@ class MapRoomClass
         
     maskEdgeGridBlockToBounds(xCollideBound,zCollideBound)
     {
-        var x,z,x1,x2,z1,z2;
+        let x,z,x1,x2,z1,z2;
         
             // find the collision bounds within the block
             // width and mark off the edge grid
@@ -198,10 +214,10 @@ class MapRoomClass
         //
         // find points in blocked grid space
         //
-    
+        
     findAndBlockSpawnPosition(groundFloorOnly)
     {
-        var n,x,z,startX,startZ,bx,bz;
+        let n,x,z,startX,startZ,bx,bz;
         
         x=startX=genRandom.randomInt(0,this.xBlockSize);
         z=startZ=genRandom.randomInt(0,this.zBlockSize);
@@ -239,7 +255,7 @@ class MapRoomClass
         
     checkGroundFloorSpawnAndBlock(x,z)
     {
-        var bx,bz;
+        let bx,bz;
         
         if (this.blockGrid[0].getCell(x,z)===0) {
             this.blockGrid[0].setCell(x,z,1);
@@ -251,9 +267,9 @@ class MapRoomClass
         return(null);
     }
     
-    getGruondFloorSpawnToFirstPlatformOrTopBound(x,z)
+    getGroundFloorSpawnToFirstPlatformOrTopBound(x,z)
     {
-        var n,y;
+        let n,y;
         
         y=this.yBound.max-config.ROOM_FLOOR_HEIGHT;
         
@@ -265,17 +281,17 @@ class MapRoomClass
         return(new wsBound(y,this.yBound.max));
     }
     
-    getGruondFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos)
+    getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos)
     {
-        var x=Math.trunc(((pos.x-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
-        var z=Math.trunc(((pos.z-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
-        return(this.getGruondFloorSpawnToFirstPlatformOrTopBound(x,z));
+        let x=Math.trunc(((pos.x-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
+        let z=Math.trunc(((pos.z-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
+        return(this.getGroundFloorSpawnToFirstPlatformOrTopBound(x,z));
     }
     
     getDecorationCount()
     {
-        var startCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.05);
-        var extraCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.15);
+        let startCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.05);
+        let extraCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.15);
         
         return(genRandom.randomInt(startCount,extraCount));
     }
@@ -290,23 +306,85 @@ class MapRoomClass
     }
     
         //
+        // find direction towards nearest wall
+        //
+    
+    getDirectionTowardsNearestWall(pos)
+    {
+        let distLft=pos.x-this.xBound.min;
+        let distRgt=this.xBound.max-pos.x;
+        let distTop=pos.z-this.zBound.min;
+        let distBot=this.zBound.max-pos.z;
+        
+        if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
+            return(new MapRoomFaceClass(ROOM_SIDE_LEFT,distLft));
+        }
+        else {
+            if ((distRgt<distTop) && (distRgt<distBot)) {
+                return(new MapRoomFaceClass(ROOM_SIDE_RIGHT,distRgt));
+            }
+            else {
+                if (distTop<distBot) {
+                    return(new MapRoomFaceClass(ROOM_SIDE_TOP,distTop));
+                }
+                else {
+                    return(new MapRoomFaceClass(ROOM_SIDE_BOTTOM,distBot));
+                }
+            }
+        }
+        
+        return(null);
+    }
+    
+    getDirectionTowardsCenter(pos)
+    {
+        let cx=this.xBound.getMidPoint();
+        let distLft=Math.abs(pos.x-cx);
+        let distRgt=Math.abs(pos.x-cx);
+        
+        let cz=this.zBound.getMidPoint();
+        let distTop=Math.abs(pos.z-cz);
+        let distBot=Math.abs(pos.z-cz);
+        
+        if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
+            return(new MapRoomFaceClass(ROOM_SIDE_RIGHT,distLft));
+        }
+        else {
+            if ((distRgt<distTop) && (distRgt<distBot)) {
+                return(new MapRoomFaceClass(ROOM_SIDE_LEFT,distRgt));
+            }
+            else {
+                if (distTop<distBot) {
+                    return(new MapRoomFaceClass(ROOM_SIDE_BOTTOM,distTop));
+                }
+                else {
+                    return(new MapRoomFaceClass(ROOM_SIDE_TOP,distBot));
+                }
+            }
+        }
+        
+        return(null);
+    }
+    
+        //
         // create polygon walls and floors
         //
         
     createMeshWalls(bitmap,yWallBound)
     {
-        var n,nSegment,x,z,x2,z2;
+        let n,nSegment,x,z,x2,z2;
+        let vertexList,indexes,vIdx,iIdx;
 
             // build the vertices.  Each triangle gets it's
             // own vertices so normals and light map UVs work
 
         nSegment=(this.xBlockSize*2)+(this.zBlockSize*2);
 
-        var vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
-        var indexes=new Uint16Array(nSegment*6);
+        vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
+        indexes=new Uint16Array(nSegment*6);
         
-        var vIdx=0;
-        var iIdx=0;
+        vIdx=0;
+        iIdx=0;
         
             // top square polygons
         
@@ -426,8 +504,8 @@ class MapRoomClass
         
     createOverlayLineList()
     {
-        var n,x,z,x2,z2;
-        var lineList=[];
+        let n,x,z,x2,z2;
+        let lineList=[];
         
              // top lines
         
@@ -478,20 +556,20 @@ class MapRoomClass
         
     createMeshFloor(bitmap)
     {
-        var x,z,vx,vz,vx2,vz2;
-        var v,nSegment;
-        
-        var y=this.yBound.max;
+        let x,z,vx,vz,vx2,vz2;
+        let v,nSegment;
+        let vertexList,indexes,vIdx,iIdx;
+        let y=this.yBound.max;
         
             // create mesh
             
         nSegment=this.xBlockSize*this.zBlockSize;
         
-        var vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
-        var indexes=new Uint16Array(nSegment*6);
+        vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
+        indexes=new Uint16Array(nSegment*6);
         
-        var vIdx=0;
-        var iIdx=0;
+        vIdx=0;
+        iIdx=0;
         
         vz=this.zBound.min;
         
@@ -550,8 +628,9 @@ class MapRoomClass
     
     createMeshCeiling(bitmap)
     {
-        var x,z,vx,vz,vx2,vz2;
-        var v,nSegment,doBlock,yOpenBound;
+        let x,y,z,vx,vz,vx2,vz2;
+        let v,nSegment,doBlock;
+        let vertexList,indexes,vIdx,iIdx;
         
             // create mesh
         
@@ -562,13 +641,13 @@ class MapRoomClass
             nSegment=(this.xBlockSize*2)+((this.zBlockSize-2)*2);
         }
         
-        var vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
-        var indexes=new Uint16Array(nSegment*6);
+        vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
+        indexes=new Uint16Array(nSegment*6);
         
-        var vIdx=0;
-        var iIdx=0;
+        vIdx=0;
+        iIdx=0;
         
-        var y=this.yBound.min;
+        y=this.yBound.min;
         
         vz=this.zBound.min;
         
