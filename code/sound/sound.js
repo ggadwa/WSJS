@@ -89,7 +89,7 @@ class SoundClass
         
             // update listener
             
-        this.listenerForwardVector.setFromValues(0.0,0.0,1.0);
+        this.listenerForwardVector.setFromValues(0.0,0.0,-1.0);
         this.listenerForwardVector.rotateY(null,this.currentListenerEntity.angle.y);
         
         if (this.listener.positionX) {

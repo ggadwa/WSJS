@@ -14,6 +14,8 @@ ToDos
 #### start doing LET
 #### fix panner math
 
+#### update the walls decorations
+
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
 

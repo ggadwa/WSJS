@@ -61,12 +61,13 @@ class SoundPlayClass
             
             this.pannerNode.panningModel='HRTF';
             this.pannerNode.distanceModel='inverse';
-            this.pannerNode.refDistance=1;
+            this.pannerNode.refDistance=soundBuffer.maxDistance*0.25;
             this.pannerNode.maxDistance=soundBuffer.maxDistance;
             this.pannerNode.rolloffFactor=1;
             this.pannerNode.coneInnerAngle=360;
             this.pannerNode.coneOuterAngle=0;
             this.pannerNode.coneOuterGain=0;
+            
             this.pannerNode.positionX.value=entity.position.x;
             this.pannerNode.positionY.value=entity.position.y;
             this.pannerNode.positionZ.value=entity.position.z;
@@ -101,9 +102,10 @@ class SoundPlayClass
         // handle any entity updates to this sound
         //
         
-    update(entityListener)
+    update(listenerEntity)
     {
         if (this.entity!==null) {
+            // supergumba -- put back when math is right
         //    this.pannerNode.positionX.value=this.entity.position.x;
         //    this.pannerNode.positionY.value=this.entity.position.y;
         //    this.pannerNode.positionZ.value=this.entity.position.z;

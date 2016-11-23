@@ -70,12 +70,12 @@ class SoundPlayListClass
         // update all the sounds attached to entities
         //
         
-    updateSoundPlays(entityListener)
+    updateSoundPlays(listenerEntity)
     {
         var n;
 
         for (n=0;n!==config.MAX_CONCURRENT_SOUNDS;n++) {
-            if (!this.soundPlays[n].free) this.soundPlays[n].update(entityListener);
+            if (!this.soundPlays[n].free) this.soundPlays[n].update(listenerEntity);
         }
         
         return(null);
