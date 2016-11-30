@@ -1,19 +1,17 @@
 "use strict";
 
 //
-// this is a specialized main that just outputs bitmaps and sounds
+// this is a specialized main that just outputs bitmaps
 // so we can check what they look like without running the entire engine
 //
 
-class MainDebugClass
+class DebugBitmapClass
 {
     constructor()
     {
         this.drawTop=5;
         this.bitmapWid=1200;
         this.bitmapHigh=400;
-        this.soundWid=1200;
-        this.soundHigh=250;
         
         this.genBitmapWall=new GenBitmapWallClass();
         this.genBitmapFloor=new GenBitmapFloorClass();
@@ -29,11 +27,6 @@ class MainDebugClass
         this.genBitmapSky=new GenBitmapSkyClass();
         this.genBitmapParticle=new GenBitmapParticleClass();
         
-        sound.initialize();
-        
-        this.soundBuffers=[];
-        this.genSound=new GenSoundClass(sound.getAudioContext());
-        
         Object.seal(this);
     }
     
@@ -43,8 +36,8 @@ class MainDebugClass
         
     drawSingleBitmap(genName,typeName,debugBitmap)
     {
-        var canvas,ctx,div;
-        var wid=Math.trunc(this.bitmapWid/3);
+        let canvas,ctx,div;
+        let wid=Math.trunc(this.bitmapWid/3);
 
             // label
 
@@ -65,7 +58,7 @@ class MainDebugClass
         canvas.width=this.bitmapWid;
         canvas.height=this.bitmapHigh;
 
-        var ctx=canvas.getContext('2d');
+        ctx=canvas.getContext('2d');
         ctx.drawImage(debugBitmap.bitmap,0,0,wid,this.bitmapHigh);
         if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,wid,0,wid,this.bitmapHigh);
         if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,(wid*2),0,wid,this.bitmapHigh);
@@ -240,95 +233,9 @@ class MainDebugClass
         this.drawSingleBitmap('Particle',this.genBitmapParticle.TYPE_NAMES[idx],this.genBitmapParticle.generate(idx,true));
         
         idx++;
-        if (idx>=this.genBitmapParticle.TYPE_NAMES.length) {
-            setTimeout(this.addSounds.bind(this,0),PROCESS_TIMEOUT_MSEC);
-            return;
-        }
+        if (idx>=this.genBitmapParticle.TYPE_NAMES.length) return;
         
         setTimeout(this.addBitmapParticles.bind(this,idx),PROCESS_TIMEOUT_MSEC);
-    }
-   
-        //
-        // sound waves
-        //
-    
-    drawWave(ctx,wid,high,data)
-    {
-        var n,fx,fxAdd,y,halfHigh;
-        var dataLen=data.length;
-
-            // get x divisions
-
-        fx=0;
-        fxAdd=wid/dataLen;
-        halfHigh=Math.trunc(high/2);
-
-            // draw the wave
-
-        ctx.strokeStyle='#0000FF';
-        ctx.beginPath();
-
-        y=halfHigh+Math.trunc(data[0]*halfHigh);
-        ctx.moveTo(Math.trunc(fx),y);
-
-        for (n=1;n<dataLen;n++) {
-            fx+=fxAdd;
-            y=halfHigh+Math.trunc(data[n]*halfHigh);
-            ctx.lineTo(Math.trunc(fx),y);
-        }
-
-        ctx.stroke();
-    }
-    
-    clickSound(soundIdx)
-    {
-        sound.play(null,this.soundBuffers[soundIdx]);
-    }
-    
-    addSounds(idx)
-    {
-        var canvas,ctx,div;
-        var soundBuffer;
-        
-            // generate random sound
-
-        soundBuffer=this.genSound.generate(idx,true);
-        this.soundBuffers.push(soundBuffer);      // so we can play later
-
-            // label
-
-        div=document.createElement('div');
-        div.style.position="absolute";
-        div.style.left='5px';
-        div.style.top=this.drawTop+'px';
-        div.innerHTML=this.genSound.TYPE_NAMES[idx];
-        document.body.appendChild(div);
-
-        this.drawTop+=25;
-
-        canvas=document.createElement('canvas');
-        canvas.style.position="absolute";
-        canvas.style.left='5px';
-        canvas.style.top=this.drawTop+'px';
-        canvas.style.border='1px solid #000000';
-        canvas.width=this.soundWid;
-        canvas.height=this.soundHigh;
-        canvas.style.cursor='pointer';
-        canvas.onclick=this.clickSound.bind(this,idx);
-
-        var ctx=canvas.getContext('2d');
-        this.drawWave(ctx,this.soundWid,this.soundHigh,soundBuffer.buffer.getChannelData(0));
-
-        document.body.appendChild(canvas);
-
-        this.drawTop+=(this.soundHigh+5);
-        
-            // next bitmap
-            
-        idx++;
-        if (idx>=this.genSound.TYPE_NAMES.length) return;
-        
-        setTimeout(this.addSounds.bind(this,idx),PROCESS_TIMEOUT_MSEC);
     }
     
         //
@@ -342,13 +249,13 @@ class MainDebugClass
 }
 
 //
-// the global main debug object
+// the global debug bitmap object
 // and the debug runner
 //
 
-var mainDebug=new MainDebugClass();
+let debugBitmap=new DebugBitmapClass();
 
-function mainDebugRun()
+function debugBitmapRun()
 {
-    mainDebug.run();
+    debugBitmap.run();
 }

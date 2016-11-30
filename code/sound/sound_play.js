@@ -51,7 +51,7 @@ class SoundPlayClass
             
         if (entity===null) {
             this.gainNode=ctx.createGain();
-            this.gainNode.gain.value=0.4;
+            this.gainNode.gain.value=config.VOLUME;
         
             this.sourceNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);
@@ -76,7 +76,12 @@ class SoundPlayClass
             this.pannerNode.orientationZ.value=0;
             
             this.sourceNode.connect(this.pannerNode);
-            this.pannerNode.connect(ctx.destination);
+            
+            this.gainNode=ctx.createGain();
+            this.gainNode.gain.value=config.VOLUME;
+
+            this.pannerNode.connect(this.gainNode);
+            this.gainNode.connect(ctx.destination);
         }
        
             // set to entity and mark as used
@@ -105,10 +110,9 @@ class SoundPlayClass
     update(listenerEntity)
     {
         if (this.entity!==null) {
-            // supergumba -- put back when math is right
-        //    this.pannerNode.positionX.value=this.entity.position.x;
-        //    this.pannerNode.positionY.value=this.entity.position.y;
-        //    this.pannerNode.positionZ.value=this.entity.position.z;
+            this.pannerNode.positionX.value=this.entity.position.x;
+            this.pannerNode.positionY.value=this.entity.position.y;
+            this.pannerNode.positionZ.value=this.entity.position.z;
         }
     }
 

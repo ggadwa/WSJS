@@ -108,6 +108,7 @@ class ConfigClass
             //
             
         this.MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
+        this.VOLUME=0.3;                                // main volume
         
             //
             // controls
