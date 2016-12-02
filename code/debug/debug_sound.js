@@ -29,12 +29,22 @@ class DebugSoundClass
     {
         let n,fx,fxAdd,y,halfHigh;
         let dataLen=data.length;
+        
+            // the midline
+            
+        halfHigh=Math.trunc(high/2);
+            
+        ctx.strokeStyle='#FF0000';
+        
+        ctx.beginPath();
+        ctx.moveTo(0,halfHigh);
+        ctx.lineTo(wid,halfHigh);
+        ctx.stroke();
 
             // get x divisions
 
         fx=0;
         fxAdd=wid/dataLen;
-        halfHigh=Math.trunc(high/2);
 
             // draw the wave
 

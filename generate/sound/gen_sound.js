@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -17,7 +19,7 @@ class GenSoundClass
         this.TYPE_MONSTER_SCREAM=2;
 
         this.TYPE_NAMES=    [
-                                'Gun Fire','Explosion','Monster Scream'
+                                'Gun Fire','Explosion','Monster Scream',
                             ];
         
         Object.seal(this);
@@ -29,9 +31,9 @@ class GenSoundClass
     
     createTone(data,frameStart,frameEnd,cycleCount)
     {
-        var n;
-        var rd=0.0;
-        var rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
+        let n;
+        let rd=0.0;
+        let rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
         
             // tones are always in cycles, so we always
             // start and stop at 0 points to reduce clicks
@@ -45,9 +47,9 @@ class GenSoundClass
     
     mixTone(data,frameStart,frameEnd,cycleCount)
     {
-        var n;
-        var rd=0.0;
-        var rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
+        let n;
+        let rd=0.0;
+        let rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
         
         for (n=frameStart;n<frameEnd;n++) {
             data[n]=(data[n]*0.5)+(Math.sin(rd)*0.5);
@@ -57,19 +59,31 @@ class GenSoundClass
     
     mixWhiteNoise(data,frameStart,frameEnd,range)
     {
-        var n;
-        var doubleRange=range*2.0;
+        let n;
+        let doubleRange=range*2.0;
         
         for (n=frameStart;n<frameEnd;n++) {
             data[n]+=(Math.random()*doubleRange)-range;     // use internal random as white noise doesn't need to be anything that we track and recreate
         }
     }
     
+    lowPassFilter(data,frameStart,frameEnd,factor)
+    {
+        let n;
+        let inverseFactor=1.0-factor;
+        
+        if (frameStart<1) frameStart=1;
+        
+        for (n=frameStart;n<frameEnd;n++) {
+            data[n]+=(factor*data[n])+(inverseFactor*data[n-1]);
+        }
+    }
+    
     delay(data,frameStart,frameEnd,frameCount,delayOffset,mixDest)
     {
-        var n;
-        var mixSource=1.0-mixDest;
-        var delayIdx=frameStart+delayOffset;
+        let n;
+        let mixSource=1.0-mixDest;
+        let delayIdx=frameStart+delayOffset;
         
         for (n=frameEnd;n>=frameStart;n--) {
             if (delayIdx<frameCount) data[delayIdx]=(data[delayIdx]*mixSource)+(data[n]*mixDest);
@@ -77,9 +91,31 @@ class GenSoundClass
         }
     }
     
+    clip(data,frameStart,frameEnd,min,max)
+    {
+        let n;
+        
+        for (n=frameStart;n<frameEnd;n++) {
+            if (data[n]<min) {
+                data[n]=min;
+                continue;
+            }
+            if (data[n]>max) data[n]=max;
+        }
+    }
+    
+    scale(data,frameStart,frameEnd,factor)
+    {
+        let n;
+        
+        for (n=frameStart;n<frameEnd;n++) {
+            data[n]*=factor;
+        }
+    }
+    
     normalize(data,frameCount)
     {
-        var n,k,f,max;
+        let n,k,f,max;
         
             // get max value
             
@@ -103,7 +139,7 @@ class GenSoundClass
     
     fade(data,frameCount,fadeIn,fadeOut)
     {
-        var n,fadeLen,fadeStart;
+        let n,fadeLen,fadeStart;
         
             // fade in
         
@@ -133,13 +169,17 @@ class GenSoundClass
     
     generateGunFire()
     {
-        var frameCount=this.ctx.sampleRate*0.25;
-        var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
-        var data=buffer.getChannelData(0);
+        let frameCount=this.ctx.sampleRate*0.25;
+        let buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
+        let data=buffer.getChannelData(0);
         
         this.createTone(data,0,frameCount,50);
-        this.mixTone(data,0,frameCount,70);
-        this.mixWhiteNoise(data,0,frameCount,0.05);
+        this.mixTone(data,0,frameCount,30);
+        this.mixWhiteNoise(data,0,frameCount,0.1);
+        
+        this.normalize(data,frameCount);
+        this.clip(data,0,frameCount,-0.8,0.2);
+        
         this.normalize(data,frameCount);
         this.fade(data,frameCount,null,0.1);
         
@@ -152,15 +192,30 @@ class GenSoundClass
     
     generateExplosion()
     {
-        var frameCount=this.ctx.sampleRate*2;
-        var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
-        var data=buffer.getChannelData(0);
+        let frameCount=this.ctx.sampleRate*2;
+        let buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
+        let data=buffer.getChannelData(0);
         
+        let bangPosition=Math.trunc(frameCount*(0.1+(genRandom.random()*0.25)));
+        
+            // original tone
+            
         this.createTone(data,0,frameCount,80);
         this.mixTone(data,0,frameCount,150);
         this.mixWhiteNoise(data,0,frameCount,0.25);
+        this.lowPassFilter(data,0,frameCount,0.15);
+        
+            // this part of the clip is the 'bang'
+            // part of the exposion, so clip that
+            // and then scale the rest to match
+        
         this.normalize(data,frameCount);
-        this.fade(data,frameCount,0.1,0.5);
+        this.clip(data,0,bangPosition,-0.5,0.5);
+        this.clip(data,bangPosition,frameCount,-0.9,0.9);
+        this.scale(data,bangPosition,frameCount,0.7);
+        
+        this.normalize(data,frameCount);
+        this.fade(data,frameCount,0.1,0.75);
         
         return(new SoundBufferClass(buffer,30000));
     }
@@ -171,11 +226,11 @@ class GenSoundClass
     
     generateMonsterScream()
     {
-        var frameCount=this.ctx.sampleRate*1;
-        var buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
-        var data=buffer.getChannelData(0);
+        let frameCount=this.ctx.sampleRate*1;
+        let buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
+        let data=buffer.getChannelData(0);
         
-        var frameAdd=Math.trunc(frameCount/5);
+        let frameAdd=Math.trunc(frameCount/5);
         
         this.createTone(data,0,frameCount,50);        
         this.mixTone(data,frameAdd-100,(frameAdd*2),45);
@@ -199,7 +254,7 @@ class GenSoundClass
     
     generate(generateType,inDebug)
     {
-        var sound=null;
+        let sound=null;
         
         switch (generateType) {
             
