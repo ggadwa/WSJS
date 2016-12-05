@@ -27,7 +27,7 @@ class DebugSoundClass
     
     drawWave(ctx,wid,high,data)
     {
-        let n,fx,fxAdd,y,halfHigh;
+        let x,dataSkip,y,idx,halfHigh;
         let dataLen=data.length;
         
             // the midline
@@ -41,10 +41,9 @@ class DebugSoundClass
         ctx.lineTo(wid,halfHigh);
         ctx.stroke();
 
-            // get x divisions
+            // the drawing skip
 
-        fx=0;
-        fxAdd=wid/dataLen;
+        dataSkip=Math.trunc(dataLen/wid);
 
             // draw the wave
 
@@ -52,12 +51,15 @@ class DebugSoundClass
         ctx.beginPath();
 
         y=halfHigh+Math.trunc(data[0]*halfHigh);
-        ctx.moveTo(Math.trunc(fx),y);
+        ctx.moveTo(0,y);
+        
+        idx=0;
 
-        for (n=1;n<dataLen;n++) {
-            fx+=fxAdd;
-            y=halfHigh+Math.trunc(data[n]*halfHigh);
-            ctx.lineTo(Math.trunc(fx),y);
+        for (x=1;x!==wid;x++) {
+            y=halfHigh+Math.trunc(data[idx]*halfHigh);
+            ctx.lineTo(x,y);
+            
+            idx+=dataSkip;
         }
 
         ctx.stroke();

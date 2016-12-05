@@ -3,6 +3,24 @@
 "use strict";
 
 //
+// special class for building sine waves
+//
+
+class SineWaveChunkClass
+{
+    constructor(timePercentage,frequency)
+    {
+        this.timePercentage=timePercentage;
+        this.frequency=frequency;
+        
+        this.frame=0;
+        this.sineAdd=0.0;
+        
+        Object.seal(this);
+    }
+}
+
+//
 // generate sound class
 //
 
@@ -19,44 +37,114 @@ class GenSoundClass
         this.TYPE_MONSTER_SCREAM=2;
 
         this.TYPE_NAMES=    [
-                                'Gun Fire','Explosion','Monster Scream',
+                                'Gun Fire','Explosion','Monster Scream'
                             ];
-        
+                            
         Object.seal(this);
     }
     
         //
-        // sound utilities
+        // waves
         //
-    
-    createTone(data,frameStart,frameEnd,cycleCount)
+        
+    createSineWave(data,frameStart,frameEnd,hzFrequency)
     {
         let n;
         let rd=0.0;
-        let rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
+        let rdAdd=(Math.PI*(hzFrequency*2.0))/this.ctx.sampleRate;
         
-            // tones are always in cycles, so we always
-            // start and stop at 0 points to reduce clicks
-            // which means cycleCount needs to always be an integer
-            
         for (n=frameStart;n<frameEnd;n++) {
             data[n]=Math.sin(rd);
             rd+=rdAdd;
         }
     }
     
-    mixTone(data,frameStart,frameEnd,cycleCount)
+    
+    
+    createSineWave2(data,chunkList)
+    {
+        let n,chunk,idx,rd,chunkFrameLen,chunkSineSize;
+        let chunkLen=chunkList.length;
+        let frameCount=data.length;
+        
+            // convert the chunks from % of position to
+            // absolute frames and the frequency to
+            // the proper sin
+            
+        for (n=0;n!==chunkLen;n++) {
+            chunk=chunkList[n];
+            chunk.frame=Math.trunc(chunk.timePercentage*frameCount);
+            chunk.sineAdd=(Math.PI*(chunk.frequency*2.0))/this.ctx.sampleRate;
+        }
+        
+            // run through all the sin waves
+            
+        idx=0;
+        rd=0.0;
+        
+        chunkFrameLen=chunkList[1].frame-chunkList[0].frame;
+        chunkSineSize=chunkList[1].sineAdd-chunkList[0].sineAdd;
+        
+        for (n=0;n!==frameCount;n++) {
+            data[n]=Math.sin(rd);
+            
+            if ((n!==0) && (n===chunkList[idx+1].frame)) {
+                if (idx<(chunkLen-2)) idx++;
+                chunkFrameLen=chunkList[idx+1].frame-chunkList[idx].frame;
+                chunkSineSize=chunkList[idx+1].sineAdd-chunkList[idx].sineAdd;
+            }
+            
+            rd+=(chunkList[idx].sineAdd+((chunkSineSize*(n-chunkList[idx].frame))/chunkFrameLen));
+        }
+    }
+    
+    
+    
+    createSquareWave(data,frameStart,frameEnd,hzFrequency)
     {
         let n;
         let rd=0.0;
-        let rdAdd=(Math.PI*cycleCount)/(frameEnd-frameStart);
+        let rdAdd=(Math.PI*(hzFrequency*2.0))/this.ctx.sampleRate;
         
         for (n=frameStart;n<frameEnd;n++) {
-            data[n]=(data[n]*0.5)+(Math.sin(rd)*0.5);
+            data[n]=Math.sign(Math.sin(rd));
             rd+=rdAdd;
         }
     }
     
+    createTriangleWave(data,frameStart,frameEnd,hzFrequency)
+    {
+        let n;
+        let period=this.ctx.sampleRate/hzFrequency;
+        
+        for (n=frameStart;n<frameEnd;n++) {
+            data[n]=(Math.abs(((n/period)-Math.floor((n/period)+0.5))*2.0)*2.0)-1.0;
+        }
+    }
+    
+    createSawToothWave(data,frameStart,frameEnd,hzFrequency)
+    {
+        let n;
+        let period=this.ctx.sampleRate/hzFrequency;
+        
+        for (n=frameStart;n<frameEnd;n++) {
+            data[n]=((n/period)-Math.floor((n/period)+0.5))*2.0;
+        }
+    }
+    
+    mixWave(data,mixData,frameStart,frameEnd)
+    {
+        let n;
+        
+        for (n=frameStart;n<frameEnd;n++) {
+            data[n]=(data[n]*0.5)+(mixData[n]*0.5);
+        }
+    }
+    
+        //
+        // effects
+        //
+        
     mixWhiteNoise(data,frameStart,frameEnd,range)
     {
         let n;
@@ -172,9 +260,11 @@ class GenSoundClass
         let frameCount=this.ctx.sampleRate*0.25;
         let buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         let data=buffer.getChannelData(0);
+        let mixData=new Float32Array(data.length);
         
-        this.createTone(data,0,frameCount,50);
-        this.mixTone(data,0,frameCount,30);
+        this.createSineWave(data,0,frameCount,40);
+        this.createSineWave(mixData,0,frameCount,25);
+        this.mixWave(data,mixData,0,frameCount);
         this.mixWhiteNoise(data,0,frameCount,0.1);
         
         this.normalize(data,frameCount);
@@ -195,13 +285,15 @@ class GenSoundClass
         let frameCount=this.ctx.sampleRate*2;
         let buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         let data=buffer.getChannelData(0);
+        let mixData=new Float32Array(data.length);
         
         let bangPosition=Math.trunc(frameCount*(0.1+(genRandom.random()*0.25)));
         
             // original tone
             
-        this.createTone(data,0,frameCount,80);
-        this.mixTone(data,0,frameCount,150);
+        this.createSineWave(data,0,frameCount,30);
+        this.createSineWave(mixData,0,frameCount,55);
+        this.mixWave(data,mixData,0,frameCount);
         this.mixWhiteNoise(data,0,frameCount,0.25);
         this.lowPassFilter(data,0,frameCount,0.15);
         
@@ -214,6 +306,8 @@ class GenSoundClass
         this.clip(data,bangPosition,frameCount,-0.9,0.9);
         this.scale(data,bangPosition,frameCount,0.7);
         
+            // now normalize and fade the start/finish
+            
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.1,0.75);
         
@@ -226,10 +320,37 @@ class GenSoundClass
     
     generateMonsterScream()
     {
-        let frameCount=this.ctx.sampleRate*1;
+        let frameCount=this.ctx.sampleRate*2;
         let buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         let data=buffer.getChannelData(0);
+        let mixData=new Float32Array(data.length);
+        let chunkList=[];
         
+        
+        chunkList.push(new SineWaveChunkClass(0.0,100));
+        chunkList.push(new SineWaveChunkClass(0.3,150));
+        chunkList.push(new SineWaveChunkClass(0.5,250));
+        chunkList.push(new SineWaveChunkClass(0.6,400));
+        chunkList.push(new SineWaveChunkClass(0.8,400));
+        chunkList.push(new SineWaveChunkClass(0.9,200));
+        chunkList.push(new SineWaveChunkClass(1.0,100));
+        
+        this.createSineWave2(data,chunkList);
+        this.createSineWave(mixData,0,frameCount,55);
+        //this.mixWave(data,mixData,0,frameCount);
+        this.normalize(data,frameCount);
+        
+        //this.createSineWave(data,0,frameCount,80);
+        
+        
+        /*
+        this.createSineWave(data,0,frameCount,80);
+        this.createTriangleWave(mixData,0,frameCount,8*6);
+        this.scale(mixData,0,frameCount,0.5);
+        this.mixWave(data,mixData,0,frameCount);
+        */
+        
+        /*
         let frameAdd=Math.trunc(frameCount/5);
         
         this.createTone(data,0,frameCount,50);        
@@ -244,7 +365,7 @@ class GenSoundClass
         //this.mixWhiteNoise(data,0,frameCount,0.5);
         this.normalize(data,frameCount);
         this.fade(data,frameCount,0.05,0.2);
-        
+        */
         return(new SoundBufferClass(buffer,25000));
     }
     
