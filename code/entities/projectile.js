@@ -83,7 +83,7 @@ class ProjectileClass
         var entity=new EntityProjectileClass('projectile',parentEntityId,pos,ang,this);
         entityList.addEntity(entity);
         
-        if (this.fireSoundBuffer!==null) sound.play(entity,this.fireSoundBuffer);
+        sound.play(entity,this.fireSoundBuffer);
     }
     
 }

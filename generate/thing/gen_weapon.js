@@ -1,3 +1,5 @@
+/* global modelList */
+
 "use strict";
 
 //
@@ -6,7 +8,7 @@
 
 class GenWeaponClass
 {
-    constructor(genProjectile)
+    constructor()
     {
         Object.seal(this);
     }

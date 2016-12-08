@@ -84,8 +84,8 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=0;
+        this.MONSTER_TYPE_COUNT=3;
+        this.MONSTER_ENTITY_COUNT=10;
         
         this.MONSTER_FIRE_PERCENTAGE=0.75;              // amount of time a monster can fire
         
@@ -101,7 +101,7 @@ class ConfigClass
         this.MONSTER_MIN_WALK_TURN_SPEED=0.2;
         this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=0.5;
 
-        this.MONSTER_AI_ON=false;
+        this.MONSTER_AI_ON=true;
         
             //
             // sounds
@@ -140,4 +140,4 @@ class ConfigClass
     }
 }
 
-var config=new ConfigClass();
+let config=new ConfigClass();

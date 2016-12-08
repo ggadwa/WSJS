@@ -1,3 +1,5 @@
+/* global genRandom, config */
+
 "use strict";
 
 //
@@ -6,9 +8,10 @@
 
 class GenAIClass
 {
-    constructor(genProjectile)
+    constructor(genProjectile,genSound)
     {
         this.genProjectile=genProjectile;
+        this.genSound=genSound;
         
         Object.seal(this);
     }
@@ -29,6 +32,8 @@ class GenAIClass
         var walkTurnSpeed=genRandom.randomInt(config.MONSTER_MIN_WALK_TURN_SPEED,config.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED);
 
         ai.setSpeed(speed,acceleration,deceleration,standTurnSpeed,walkTurnSpeed);
+        
+        ai.setSoundBuffers(this.genSound.generate(this.genSound.TYPE_MONSTER_WAKE,false),this.genSound.generate(this.genSound.TYPE_MONSTER_HURT,false),this.genSound.generate(this.genSound.TYPE_MONSTER_DIE,false));
         
         return(ai);
     }

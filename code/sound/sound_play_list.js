@@ -1,3 +1,5 @@
+/* global config */
+
 "use strict";
 
 //
@@ -19,7 +21,7 @@ class SoundPlayListClass
         
     initialize()
     {
-        var n;
+        let n;
         
         this.soundPlays=[];
         
@@ -32,7 +34,7 @@ class SoundPlayListClass
     
     release()
     {
-        var n;
+        let n;
         
         for (n=0;n!==config.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays[n].close();
@@ -47,8 +49,12 @@ class SoundPlayListClass
         
     startSoundPlay(ctx,entityListener,entity,soundBuffer)
     {
-        var n;
-        var soundPlay=null;
+        let n;
+        let soundPlay=null;
+        
+            // skip any null buffer
+            
+        if (soundBuffer===null) return;
         
             // find a free sound play
             
@@ -72,7 +78,7 @@ class SoundPlayListClass
         
     updateSoundPlays(listenerEntity)
     {
-        var n;
+        let n;
 
         for (n=0;n!==config.MAX_CONCURRENT_SOUNDS;n++) {
             if (!this.soundPlays[n].free) this.soundPlays[n].update(listenerEntity);

@@ -209,11 +209,11 @@ class MainClass
     initBuildEntities()
     {
         var n,monsterType;
-        var model,pos,proj;
+        var model,pos;
 
         var genProjectile=new GenProjectileClass(this.genSound);
         var genWeapon=new GenWeaponClass();
-        var genAI=new GenAIClass(genProjectile);
+        var genAI=new GenAIClass(genProjectile,this.genSound);
 
             // make player entity
 

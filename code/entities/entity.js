@@ -1,3 +1,5 @@
+/* global view, map */
+
 "use strict";
 
 //
@@ -171,11 +173,13 @@ class EntityClass
     
     moveY(noGravity)
     {
+        let yAdd,fallY,riseY;
+        
             // y movement is the rotated x/z movement
             // (for swimming and flying) plus the natural
             // y movement
 
-         var yAdd=this.movePt.y+this.movement.y;
+        yAdd=this.movePt.y+this.movement.y;
          
             // add in gravity
             
@@ -214,7 +218,7 @@ class EntityClass
         if (yAdd>=0) {
             this.collideCeilingMeshIdx=-1;                         // no ceiling collisions if going down
 
-            var fallY=this.collision.fallObjectInMap(this,yAdd);
+            fallY=this.collision.fallObjectInMap(this,yAdd);
             this.position.addValuesTrunc(0,fallY,0);
         
             if (fallY<=0) this.gravity=this.gravityMinValue;
@@ -222,7 +226,7 @@ class EntityClass
         else {
             this.standOnMeshIdx=-1;                                 // no standing if going up
             
-            var riseY=this.collision.riseObjectInMap(this,yAdd);
+            riseY=this.collision.riseObjectInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);
         }
     }
@@ -356,7 +360,7 @@ class EntityClass
     
     turnTowards(toY,speed)
     {
-        var subway,addway;
+        let subway,addway;
         
         if (this.angle.y===toY) return(0);
         
@@ -430,9 +434,11 @@ class EntityClass
     
     getDamageTintAttenuation()
     {
+        let tick;
+        
         if (this.damageTintStartTick===-1) return(0.0);
         
-        var tick=view.timeStamp-this.damageTintStartTick;
+        tick=view.timeStamp-this.damageTintStartTick;
         if (tick>=1000) {
             this.damageTintStartTick=-1;
             return(0.0);
@@ -481,8 +487,8 @@ class EntityClass
     
     setupCurrentRoom()
     {
-        var n,room;
-        var nRoom=map.rooms.length;
+        let n,room;
+        let nRoom=map.rooms.length;
         
             // check if still in the current
             // room

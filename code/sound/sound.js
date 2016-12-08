@@ -27,7 +27,7 @@ class SoundClass
     {
             // initialize the audio context
             
-        var initAudioContext=window.AudioContext||window.webkitAudioContext;
+        let initAudioContext=window.AudioContext||window.webkitAudioContext;
         this.ctx=new initAudioContext();
         
         if (this.ctx===null) {
@@ -118,4 +118,4 @@ class SoundClass
 // the global sound object
 //
 
-var sound=new SoundClass();
+let sound=new SoundClass();

@@ -34,10 +34,13 @@ class GenSoundClass
         
         this.TYPE_GUN_FIRE=0;
         this.TYPE_EXPLOSION=1;
-        this.TYPE_MONSTER_SCREAM=2;
+        this.TYPE_MONSTER_WAKE=2;
+        this.TYPE_MONSTER_HURT=3;
+        this.TYPE_MONSTER_DIE=4;
 
         this.TYPE_NAMES=    [
-                                'Gun Fire','Explosion','Monster Scream'
+                                'Gun Fire','Explosion','Monster Wake Up',
+                                'Monster Hurt','Monster Die'
                             ];
                             
         Object.seal(this);
@@ -59,9 +62,7 @@ class GenSoundClass
         }
     }
     
-    
-    
-    createSineWave2(data,chunkList)
+    createSineMultipleWaves(data,chunkList)
     {
         let n,chunk,idx,rd,chunkFrameLen,chunkSineSize;
         let chunkLen=chunkList.length;
@@ -97,8 +98,6 @@ class GenSoundClass
             rd+=(chunkList[idx].sineAdd+((chunkSineSize*(n-chunkList[idx].frame))/chunkFrameLen));
         }
     }
-    
-    
     
     createSquareWave(data,frameStart,frameEnd,hzFrequency)
     {
@@ -171,7 +170,7 @@ class GenSoundClass
     {
         let n;
         let mixSource=1.0-mixDest;
-        let delayIdx=frameStart+delayOffset;
+        let delayIdx=frameEnd+delayOffset;
         
         for (n=frameEnd;n>=frameStart;n--) {
             if (delayIdx<frameCount) data[delayIdx]=(data[delayIdx]*mixSource)+(data[n]*mixDest);
@@ -318,55 +317,64 @@ class GenSoundClass
         // monster scream sound
         //
     
-    generateMonsterScream()
+    generateMonster(sampleLength,frequencyMin,frequencyMax,rumbleFrequencyMin,rumbleFrequencyMax)
     {
-        let frameCount=this.ctx.sampleRate*2;
+        let n,waveCount,dataPos,frequency;
+        let frameCount=this.ctx.sampleRate*sampleLength;        // in seconds
         let buffer=this.ctx.createBuffer(1,frameCount,this.ctx.sampleRate);
         let data=buffer.getChannelData(0);
         let mixData=new Float32Array(data.length);
-        let chunkList=[];
+        let chunkList;
         
+        waveCount=genRandom.randomInt(1,3);
         
-        chunkList.push(new SineWaveChunkClass(0.0,100));
-        chunkList.push(new SineWaveChunkClass(0.3,150));
-        chunkList.push(new SineWaveChunkClass(0.5,250));
-        chunkList.push(new SineWaveChunkClass(0.6,400));
-        chunkList.push(new SineWaveChunkClass(0.8,400));
-        chunkList.push(new SineWaveChunkClass(0.9,200));
-        chunkList.push(new SineWaveChunkClass(1.0,100));
+        for (n=0;n!==waveCount;n++) {
+            dataPos=0.0;
+            frequency=frequencyMin+(genRandom.random()*(frequencyMax-frequencyMin));
+
+            chunkList=[];
+
+            while (true) {
+                if (dataPos>1.0) dataPos=1.0;
+
+                chunkList.push(new SineWaveChunkClass(dataPos,frequency));
+
+                if (dataPos===1.0) break;
+                dataPos+=(genRandom.random()*0.2);
+
+                frequency+=(100-(genRandom.random()*200));
+                if (frequency<frequencyMin) frequency=frequencyMin;
+                if (frequency>frequencyMax) frequency=frequencyMax;
+            }
+
+            if (n===0) {
+                this.createSineMultipleWaves(data,chunkList);
+            }
+            else {
+                this.createSineMultipleWaves(mixData,chunkList);
+                this.mixWave(data,mixData,0,frameCount);
+            }
+        }
         
-        this.createSineWave2(data,chunkList);
-        this.createSineWave(mixData,0,frameCount,55);
-        //this.mixWave(data,mixData,0,frameCount);
-        this.normalize(data,frameCount);
-        
-        //this.createSineWave(data,0,frameCount,80);
-        
-        
-        /*
-        this.createSineWave(data,0,frameCount,80);
-        this.createTriangleWave(mixData,0,frameCount,8*6);
-        this.scale(mixData,0,frameCount,0.5);
+            // add in a saw wave to change the timber a bit
+            
+        this.createSawToothWave(mixData,0,0,frameCount,(rumbleFrequencyMin+(genRandom.random()*(rumbleFrequencyMax-rumbleFrequencyMin))));
         this.mixWave(data,mixData,0,frameCount);
-        */
         
-        /*
-        let frameAdd=Math.trunc(frameCount/5);
-        
-        this.createTone(data,0,frameCount,50);        
-        this.mixTone(data,frameAdd-100,(frameAdd*2),45);
-        this.mixTone(data,((frameAdd*2)-100),(frameAdd*3),42);
-        this.mixTone(data,((frameAdd*3)-100),(frameAdd*4),45);
-        this.mixTone(data,((frameAdd*4)-100),frameCount,35);
-        
-        this.delay(data,0,frameCount,frameCount,Math.trunc(frameCount*0.1),0.25);
-        
-        
-        //this.mixWhiteNoise(data,0,frameCount,0.5);
+            // normalize it, randomly clip, low pass, and delay it
+            
         this.normalize(data,frameCount);
-        this.fade(data,frameCount,0.05,0.2);
-        */
-        return(new SoundBufferClass(buffer,25000));
+        this.clip(data,0,frameCount,(-1.0+(genRandom.random()*0.2)),(1.0-(genRandom.random()*0.2)));
+        this.lowPassFilter(data,0,frameCount,genRandom.random());
+        
+        this.delay(data,0,frameCount,frameCount,Math.trunc(frameCount*0.1),(genRandom.random()*0.5));
+        
+            // finally normalize and fade
+            
+        this.normalize(data,frameCount);
+        this.fade(data,frameCount,0.1,0.2);
+
+        return(new SoundBufferClass(buffer,35000));
     }
     
         //
@@ -387,8 +395,16 @@ class GenSoundClass
                 sound=this.generateExplosion();
                 break;
                 
-            case this.TYPE_MONSTER_SCREAM:
-                sound=this.generateMonsterScream();
+            case this.TYPE_MONSTER_WAKE:
+                sound=this.generateMonster(1.5,100.0,600.0,50.0,200.0);
+                break;
+                
+            case this.TYPE_MONSTER_HURT:
+                sound=this.generateMonster(0.5,300.0,700.0,100.0,300.0);
+                break;
+                
+            case this.TYPE_MONSTER_DIE:
+                sound=this.generateMonster(0.75,80.0,180.0,50.0,100.0);
                 break;
         }
         

@@ -1,3 +1,5 @@
+/* global entityList, config, sound, view */
+
 "use strict";
 
 //
@@ -40,6 +42,7 @@ class EntityMonsterClass extends EntityClass
         
     die()
     {
+        sound.play(this,this.ai.dieSoundBuffer);
         this.markAsDelete();
     }
     
@@ -47,8 +50,18 @@ class EntityMonsterClass extends EntityClass
     {
         super.addDamage(hitEntityId,damage);
         
-        this.active=true;                           // always active monsters that take damage
-        if (hitEntityId!==-1) this.enemyId=hitEntityId;     // and switch over enemy to whoever hit me
+            // if we weren't active, play the
+            // active sound instead of the hurt
+        
+        console.log('wake='+this.ai.wakeSoundBuffer);
+        console.log('hurt='+this.ai.hurtSoundBuffer);
+        sound.play(this,(this.active?this.ai.wakeSoundBuffer:this.ai.hurtSoundBuffer));
+        
+            // always wake up and chase the
+            // entity that damaged you
+        
+        this.active=true;
+        if (hitEntityId!==-1) this.enemyId=hitEntityId;
     }
     
         //
@@ -89,7 +102,7 @@ class EntityMonsterClass extends EntityClass
     
     run()
     {
-        var enemy;
+        let enemy,dist;
         
             // if we don't have an enemy yet,
             // make it the player, and if our old
@@ -106,8 +119,10 @@ class EntityMonsterClass extends EntityClass
             // time to activate monster?
         
         if ((!this.active) && (config.MONSTER_AI_ON)) {
-            var dist=enemy.position.distance(this.position);
+            dist=enemy.position.distance(this.position);
             this.active=(dist<25000);
+            
+            if (this.active) sound.play(this,this.ai.wakeSoundBuffer);
         }
         
             // inactive monsters can only turn towards

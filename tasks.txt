@@ -11,7 +11,8 @@ When interface created
 ToDos
 
 
-#### start doing LET
+#### use LET
+#### add in the JSHints so we know what objects are required for each module
 
 #### update the walls decorations
 

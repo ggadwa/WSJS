@@ -1,3 +1,5 @@
+/* global modelList, genRandom */
+
 "use strict";
 
 //
@@ -13,9 +15,9 @@ class GenProjectileClass
         Object.seal(this);
     }
 
-    generate(isPlayer,genSound)
+    generate(isPlayer)
     {
-        var projectile=new ProjectileClass(modelList.getModel('projectile_0'));
+        let projectile=new ProjectileClass(modelList.getModel('projectile_0'));
         
         projectile.setLifeTick(10000);
         projectile.setFireSoundBuffer(this.genSound.generate(this.genSound.TYPE_GUN_FIRE,false));

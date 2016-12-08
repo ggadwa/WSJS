@@ -1,3 +1,5 @@
+/* global config */
+
 "use strict";
 
 //
@@ -6,7 +8,7 @@
 
 class AIClass
 {
-    constructor(projectile)
+    constructor()
     {
         this.speed=config.MONSTER_MIN_SPEED;
         this.acceleration=5;
@@ -20,6 +22,10 @@ class AIClass
         this.fireRechargeTick=0;
         this.fireSlopAngle=0;
         this.lastFireTimeStamp=0;
+        
+        this.wakeSoundBuffer=null;
+        this.hurtSoundBuffer=null;
+        this.dieSoundBuffer=null;
         
         Object.seal(this);
     }
@@ -43,5 +49,12 @@ class AIClass
     {
         this.fireRechargeTick=fireRechargeTick;
         this.fireSlopAngle=fireSlopAngle;
+    }
+    
+    setSoundBuffers(wakeSoundBuffer,hurtSoundBuffer,dieSoundBuffer)
+    {
+        this.wakeSoundBuffer=wakeSoundBuffer;
+        this.hurtSoundBuffer=hurtSoundBuffer;
+        this.dieSoundBuffer=dieSoundBuffer;
     }
 }
