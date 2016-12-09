@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -46,8 +48,6 @@ class InputClass
 
     initialize(playerEntity)
     {
-        var n;
-        
             // set to player entity
             
         this.playerEntity=playerEntity;
@@ -182,7 +182,7 @@ class InputClass
     
     keyClear()
     {
-        var n;
+        let n;
             
         for (n=0;n!==255;n++) {
             this.keyFlags[n]=0;
@@ -211,27 +211,10 @@ class InputClass
             document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
             document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
             view.canvas.requestPointerLock();
-            console.log('did pointer lock');
         }
         else {
-            if (view.canvas.mozRequestPointerLock) {
-                document.addEventListener('mozpointerlockchange',this.pointerLockChangeListener,false);
-                document.addEventListener('mozpointerlockerror',this.pointerLockErrorListener,false);
-                view.canvas.mozRequestPointerLock();
-                console.log('did moz pointer lock');
-            }
-            else {
-                if (view.canvas.webkitRequestPointerLock) {
-                    document.addEventListener('webkitpointerlockchange',pointerLockChangeListener,false);
-                    document.addEventListener('webkitpointerlockerror',this.pointerLockErrorListener,false);
-                    view.canvas.webkitRequestPointerLoc();
-                    console.log('did webkit pointer lock');
-                }
-                else {
-                    console.log('Pointer lock not supported, no mouse control');
-                    return;
-                }
-            }
+            console.log('Pointer lock not supported, no mouse control');
+            return;
         }
     }
     
@@ -244,25 +227,11 @@ class InputClass
             document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
             document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
         }
-        else {
-            if (document.mozExitPointerLock) {
-                document.mozExitPointerLock();
-                document.addEventListener('mozpointerlockchange',this.pointerLockChangeListener,false);
-                document.addEventListener('mozpointerlockerror',this.pointerLockErrorListener,false);
-            }
-            else {
-                if (document.webkitExitPointerLock) {
-                    document.webkitExitPointerLock();
-                    document.addEventListener('webkitpointerlockchange',this.pointerLockChangeListener,false);
-                    document.addEventListener('webkitpointerlockerror',this.pointerLockErrorListener,false);
-                }
-            }
-        }
     }
     
     mouseButtonClear()
     {
-        var n;
+        let n;
         
         this.mouseChangeX=0;
         this.mouseChangeY=0;
@@ -276,7 +245,7 @@ class InputClass
     
     pointerLockChange(event)
     {
-        var elem=null;
+        let elem=null;
         if (document.pointerLockElement) elem=document.pointerLockElement;
         if (document.mozPointerLockElement) elem=document.mozPointerLockElement;
         if (document.webkitPointerLockElement) elem=document.webkitPointerLockElement;
@@ -321,4 +290,4 @@ class InputClass
 // the input global object
 //
 
-var input=new InputClass();
+let input=new InputClass();

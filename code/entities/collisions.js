@@ -33,30 +33,32 @@ class CollisionClass
     
     lineLineXZIntersection(line1,line2,lineIntersectPt)
     {
-        var fx0=line1.p1.x;
-        var fz0=line1.p1.z;
-        var fx1=line1.p2.x;
-        var fz1=line1.p2.z;
-        var fx2=line2.p1.x;
-        var fz2=line2.p1.z;
-        var fx3=line2.p2.x;
-        var fz3=line2.p2.z;
+        let denom,r,s;
+        
+        let fx0=line1.p1.x;
+        let fz0=line1.p1.z;
+        let fx1=line1.p2.x;
+        let fz1=line1.p2.z;
+        let fx2=line2.p1.x;
+        let fz2=line2.p1.z;
+        let fx3=line2.p2.x;
+        let fz3=line2.p2.z;
 
-        var ax=fx0-fx2;
-        var bx=fx1-fx0;
-        var dx=fx3-fx2;
+        let ax=fx0-fx2;
+        let bx=fx1-fx0;
+        let dx=fx3-fx2;
 
-        var az=fz0-fz2;
-        var bz=fz1-fz0;
-        var dz=fz3-fz2;
+        let az=fz0-fz2;
+        let bz=fz1-fz0;
+        let dz=fz3-fz2;
 
-        var denom=(bx*dz)-(bz*dx);
+        denom=(bx*dz)-(bz*dx);
         if (denom===0.0) return(false);
 
-        var r=((az*dx)-(ax*dz))/denom;
+        r=((az*dx)-(ax*dz))/denom;
         if ((r<0.0) || (r>1.0)) return(false);
 
-        var s=((az*bx)-(ax*bz))/denom;
+        s=((az*bx)-(ax*bz))/denom;
         if ((s<0.0) || (s>1.0)) return(false);
 
         if ((r===0.0) && (s===0.0)) return(false);
@@ -72,11 +74,11 @@ class CollisionClass
             // we do it instead of just checking the
             // perpendicular so you can't wade into corners
             
-        var n,dist;
-        var currentDist=-1;
+        let n,dist;
+        let currentDist=-1;
         
-        var rad=0.0;
-        var radAdd=(Math.PI*2.0)/24.0;
+        let rad=0.0;
+        let radAdd=(Math.PI*2.0)/24.0;
         
         this.spokePt.setFromValues(circlePt.x,circlePt.y,circlePt.z);
         this.spokeLine.setFromValues(circlePt,this.spokePt);
@@ -102,8 +104,8 @@ class CollisionClass
     
     circleCircleIntersection(circlePt1,radius1,circlePt2,radius2,circleIntersectPt)
     {
-        var dist;
-        var totalRadius=radius1+radius2;
+        let dist;
+        let totalRadius=radius1+radius2;
         
             // get distance between center points
             // (x,z only, scrub out the Y)
@@ -129,24 +131,24 @@ class CollisionClass
 
     moveObjectInMap(entity,movePt,bump,collideMovePt)
     {
-        var n,k;
-        var mesh,checkEntity,checkEntityPt;
-        var collisionLine,nCollisionLine;        
-        var currentHitPt;        
-        var dist,currentDist;
+        let n,k;
+        let mesh,checkEntity,checkEntityPt;
+        let collisionLine,nCollisionLine;        
+        let currentHitPt;        
+        let dist,currentDist;
         
-        var origPt=entity.position;
-        var radius=entity.radius;
-        var high=entity.high;
+        let origPt=entity.position;
+        let radius=entity.radius;
+        let high=entity.high;
         
-        var nMesh=map.meshes.length;
-        var nEntity=entityList.countEntity();
+        let nMesh=map.meshes.length;
+        let nEntity=entityList.countEntity();
         
             // only bump once
             
-        var bumpOnce=false;
-        var bumpY,entityTopY;
-        var yBound;
+        let bumpOnce=false;
+        let bumpY,entityTopY;
+        let yBound;
         
             // the moved point
             
@@ -297,8 +299,8 @@ class CollisionClass
     
     fallObjectInMap(entity,fallY)
     {
-        var n,k,nMesh,nCollisionRect;
-        var mesh,collisionRect;
+        let n,k,nMesh,nCollisionRect;
+        let mesh,collisionRect;
 
             // the rough collide boxes
             
@@ -347,8 +349,8 @@ class CollisionClass
         
     riseObjectInMap(entity,riseY)
     {
-        var n,k,nMesh,nCollisionRect;
-        var mesh,collisionRect;
+        let n,k,nMesh,nCollisionRect;
+        let mesh,collisionRect;
 
             // the rough collide boxes
             

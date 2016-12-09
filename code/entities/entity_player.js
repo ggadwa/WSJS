@@ -110,7 +110,8 @@ class EntityPlayerClass extends EntityClass
     
     run()
     {
-        var bump,weapon;
+        let bump,weapon;
+        let noGravity;
         
             // fire any weapons that were triggered
             
@@ -156,7 +157,7 @@ class EntityPlayerClass extends EntityClass
         
             // movement
             
-        var noGravity=((config.PLAYER_FLY) || (this.lastInLiquid));
+        noGravity=((config.PLAYER_FLY) || (this.lastInLiquid));
         this.move(bump,true,noGravity,config.PLAYER_CLIP_WALLS);
     }
     

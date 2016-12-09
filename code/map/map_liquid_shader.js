@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -33,7 +35,7 @@ class MapLiquidShaderClass extends ShaderClass
 
             // setup uniforms
 
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.useProgram(this.program);
 
@@ -66,7 +68,7 @@ class MapLiquidShaderClass extends ShaderClass
     {
             // using the map shader
 
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.useProgram(this.program);
 
@@ -84,7 +86,7 @@ class MapLiquidShaderClass extends ShaderClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
             // disable vertex attributes
 

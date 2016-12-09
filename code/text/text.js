@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -7,7 +9,25 @@
 class TextClass
 {
     constructor()
-    {    
+    {
+            // constants
+            
+        this.TEXT_TEXTURE_WIDTH=512;
+        this.TEXT_TEXTURE_HEIGHT=512;
+        this.TEXT_CHAR_PER_ROW=10;
+        this.TEXT_CHAR_WIDTH=50;
+        this.TEXT_CHAR_HEIGHT=50;
+        this.TEXT_FONT_SIZE=48;
+        this.TEXT_FONT_NAME='Arial';
+
+        this.TEXT_MAX_STRING_LEN=256;
+
+        this.TEXT_ALIGN_LEFT=0;
+        this.TEXT_ALIGN_CENTER=1;
+        this.TEXT_ALIGN_RIGHT=2;
+            
+            // variables
+            
         this.textShader=new TextShaderClass();
         this.fontTexture=null;
 
@@ -34,7 +54,9 @@ class TextClass
 
     initialize()
     {
-        var x,y,yAdd,cIdx,charStr,ch;
+        let x,y,yAdd,cIdx,charStr,ch;
+        let canvas,ctx,genBitmapUtility;
+        let gl=view.gl;
 
             // start the shader
 
@@ -42,45 +64,43 @@ class TextClass
 
             // setup the canvas
 
-        var canvas=document.createElement('canvas');
-        canvas.width=TEXT_TEXTURE_WIDTH;
-        canvas.height=TEXT_TEXTURE_HEIGHT;
-        var ctx=canvas.getContext('2d');
+        canvas=document.createElement('canvas');
+        canvas.width=this.TEXT_TEXTURE_WIDTH;
+        canvas.height=this.TEXT_TEXTURE_HEIGHT;
+        ctx=canvas.getContext('2d');
         
             // background is black, text is white
             // so it can be colored
 
-        var genBitmapUtility=new GenBitmapClass();
-        genBitmapUtility.drawRect(ctx,0,0,TEXT_TEXTURE_WIDTH,TEXT_TEXTURE_HEIGHT,new wsColor(0.0,0.0,0.0));
+        genBitmapUtility=new GenBitmapClass();
+        genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,new wsColor(0.0,0.0,0.0));
 
             // draw the text
 
-        ctx.font=(TEXT_FONT_SIZE+'px ')+TEXT_FONT_NAME;
+        ctx.font=(this.TEXT_FONT_SIZE+'px ')+this.TEXT_FONT_NAME;
         ctx.textAlign='left';
         ctx.textBaseline='middle';
         ctx.fillStyle='#FFFFFF';
 
-        yAdd=Math.trunc(TEXT_CHAR_HEIGHT/2);
+        yAdd=Math.trunc(this.TEXT_CHAR_HEIGHT/2);
 
         for (ch=32;ch!==127;ch++) {
             cIdx=ch-32;
-            x=(cIdx%TEXT_CHAR_PER_ROW)*TEXT_CHAR_WIDTH;
-            y=Math.trunc(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT;
+            x=(cIdx%this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_WIDTH;
+            y=Math.trunc(cIdx/this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_HEIGHT;
             y+=yAdd;
 
             charStr=String.fromCharCode(ch);
-            this.fontCharWids[cIdx]=((ctx.measureText(charStr).width+4)/TEXT_CHAR_WIDTH);
+            this.fontCharWids[cIdx]=((ctx.measureText(charStr).width+4)/this.TEXT_CHAR_WIDTH);
             if (this.fontCharWids[cIdx]>1.0) this.fontCharWids[cIdx]=1.0;
 
             ctx.fillText(charStr,(x+2),(y-1));
 
-            x+=TEXT_CHAR_WIDTH;
+            x+=this.TEXT_CHAR_WIDTH;
         }
 
             // finally load into webGL
             
-        var gl=view.gl;
-
         this.fontTexture=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,canvas);
@@ -93,9 +113,9 @@ class TextClass
             // character drawing, we do this because
             // doing this inline would be expensive
             
-        this.vertices=new Float32Array((TEXT_MAX_STRING_LEN*4)*2);
-        this.uvs=new Float32Array((TEXT_MAX_STRING_LEN*4)*2);
-        this.indexes=new Uint16Array((TEXT_MAX_STRING_LEN*2)*3);
+        this.vertices=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
+        this.uvs=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
+        this.indexes=new Uint16Array((this.TEXT_MAX_STRING_LEN*2)*3);
         
             // and finally the vbos
             
@@ -108,7 +128,7 @@ class TextClass
 
     release()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // remove vbos
             
@@ -133,13 +153,13 @@ class TextClass
         
     getStringDrawWidth(charWid,str)
     {
-        var n,cIdx;
-        var wid=0;
+        let n,cIdx,len;
+        let wid=0;
 
             // figure out the size
             // and alignment
 
-        var len=str.length;
+        len=str.length;
         if (len===0) return(0);
         
         for (n=0;n!==len;n++) {
@@ -156,7 +176,7 @@ class TextClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.disable(gl.DEPTH_TEST);
         
@@ -168,7 +188,7 @@ class TextClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         this.textShader.drawEnd();
 
@@ -178,27 +198,29 @@ class TextClass
 
     draw(x,y,charWid,charHigh,str,align,color)
     {
-        var n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
-        var cIdx,gx,gy,gxAdd,gyAdd;
+        let n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
+        let cIdx,gx,gy,gxAdd,gyAdd;
+        let len,drawWid,nTrig;
+        let gl=view.gl;
         
             // get the length and clip if
             // past our pre-set buffer size
             
-        var len=str.length;
+        len=str.length;
         if (len===0) return;
         
-        if (len>TEXT_MAX_STRING_LEN) len=TEXT_MAX_STRING_LEN;
+        if (len>this.TEXT_MAX_STRING_LEN) len=this.TEXT_MAX_STRING_LEN;
 
             // figure out the size
             // and alignment
 
-        var drawWid=this.getStringDrawWidth(charWid,str);
+        drawWid=this.getStringDrawWidth(charWid,str);
 
         switch (align) {
-            case TEXT_ALIGN_CENTER:
+            case this.TEXT_ALIGN_CENTER:
                 x-=Math.trunc(drawWid/2);
                 break;
-            case TEXT_ALIGN_RIGHT:
+            case this.TEXT_ALIGN_RIGHT:
                 x-=drawWid;
                 break;
         }
@@ -210,15 +232,15 @@ class TextClass
 
             // build the vertices
 
-        var nTrig=len*2;            // 2 triangles for every character
+        nTrig=len*2;            // 2 triangles for every character
 
         vIdx=0;
         uvIdx=0;
         iIdx=0;
         elementIdx=0;
 
-        gxAdd=TEXT_CHAR_WIDTH/TEXT_TEXTURE_WIDTH;
-        gyAdd=TEXT_CHAR_HEIGHT/TEXT_TEXTURE_HEIGHT;
+        gxAdd=this.TEXT_CHAR_WIDTH/this.TEXT_TEXTURE_WIDTH;
+        gyAdd=this.TEXT_CHAR_HEIGHT/this.TEXT_TEXTURE_HEIGHT;
 
         for (n=0;n!==len;n++) {
             x2=x+charWid;
@@ -233,8 +255,8 @@ class TextClass
             this.vertices[vIdx++]=by;
 
             cIdx=str.charCodeAt(n)-32;
-            gx=((cIdx%TEXT_CHAR_PER_ROW)*TEXT_CHAR_WIDTH)/TEXT_TEXTURE_WIDTH;
-            gy=(Math.trunc(cIdx/TEXT_CHAR_PER_ROW)*TEXT_CHAR_HEIGHT)/TEXT_TEXTURE_HEIGHT;
+            gx=((cIdx%this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_WIDTH)/this.TEXT_TEXTURE_WIDTH;
+            gy=(Math.trunc(cIdx/this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_HEIGHT)/this.TEXT_TEXTURE_HEIGHT;
 
             this.uvs[uvIdx++]=gx;
             this.uvs[uvIdx++]=gy;
@@ -259,8 +281,6 @@ class TextClass
         }
 
             // set the shader and bitmap
-
-        var gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);

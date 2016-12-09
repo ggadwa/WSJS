@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -8,6 +10,8 @@ class BitmapClass
 {
     constructor(bitmapCanvas,normalMapCanvas,specularMapCanvas,uvScale,shineFactor)
     {
+        let gl=view.gl;
+        
         this.texture=null;
         this.normalMap=null;
         this.specularMap=null;
@@ -16,8 +20,6 @@ class BitmapClass
         this.shineFactor=shineFactor;
 
             // setup the texture
-
-        var gl=view.gl;
 
         this.texture=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -60,7 +62,7 @@ class BitmapClass
     
     close()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         if (this.texture!==null) gl.deleteTexture(this.texture);
         if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
@@ -74,7 +76,7 @@ class BitmapClass
     
     attachAsTexture(shader)
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
             // shine factor in shader
 
@@ -94,7 +96,7 @@ class BitmapClass
     
     attachAsLightmap()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -102,7 +104,7 @@ class BitmapClass
     
     attachAsLiquid()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -110,7 +112,7 @@ class BitmapClass
     
     attachAsParticle()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -118,7 +120,7 @@ class BitmapClass
     
     attachAsSky()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);

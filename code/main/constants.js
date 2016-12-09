@@ -113,24 +113,6 @@ const LIMB_AXIS_Y=1;
 const LIMB_AXIS_Z=2;
 
     //
-    // text drawing
-    //
-
-const TEXT_TEXTURE_WIDTH=512;
-const TEXT_TEXTURE_HEIGHT=512;
-const TEXT_CHAR_PER_ROW=10;
-const TEXT_CHAR_WIDTH=50;
-const TEXT_CHAR_HEIGHT=50;
-const TEXT_FONT_SIZE=48;
-const TEXT_FONT_NAME='Arial';
-
-const TEXT_ALIGN_LEFT=0;
-const TEXT_ALIGN_CENTER=1;
-const TEXT_ALIGN_RIGHT=2;
-
-const TEXT_MAX_STRING_LEN=256;
-
-    //
     // lightmap generation
     //
 

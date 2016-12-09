@@ -72,8 +72,8 @@ class EntityListClass
     
     findEntityById(id)
     {
-        var n,entity;
-        var nEntity=this.entities.length;
+        let n,entity;
+        let nEntity=this.entities.length;
             
         for (n=0;n!==nEntity;n++) {
             entity=this.entities[n];
@@ -89,8 +89,8 @@ class EntityListClass
         
     movementPush(meshIdx,movePnt)
     {
-        var n,entity;
-        var nEntity=this.entities.length;
+        let n,entity;
+        let nEntity=this.entities.length;
         
             // check the entities, skipping
             // any projectiles
@@ -109,8 +109,8 @@ class EntityListClass
         
     run()
     {
-        var n;
-        var nEntity=this.entities.length;
+        let n;
+        let nEntity=this.entities.length;
         
             // run the entities
             
@@ -139,4 +139,4 @@ class EntityListClass
 // the global entitylist
 //
 
-var entityList=new EntityListClass();
+let entityList=new EntityListClass();

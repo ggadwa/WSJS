@@ -80,7 +80,7 @@ class ProjectileClass
     
     fire(parentEntityId,pos,ang)
     {
-        var entity=new EntityProjectileClass('projectile',parentEntityId,pos,ang,this);
+        let entity=new EntityProjectileClass('projectile',parentEntityId,pos,ang,this);
         entityList.addEntity(entity);
         
         sound.play(entity,this.fireSoundBuffer);

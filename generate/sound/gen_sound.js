@@ -166,15 +166,31 @@ class GenSoundClass
         }
     }
     
-    delay(data,frameStart,frameEnd,frameCount,delayOffset,mixDest)
+    delay(data,frameStart,frameEnd,delayOffset,mix)
     {
         let n;
-        let mixSource=1.0-mixDest;
+        let frameCount=data.length;
+        let fadeFrameIndex=frameStart+((frameEnd-frameStart)*0.1);
+        let fadeFactor=mix/(fadeFrameIndex-frameStart);
+        let mixFactor=mix;
         let delayIdx=frameEnd+delayOffset;
         
         for (n=frameEnd;n>=frameStart;n--) {
-            if (delayIdx<frameCount) data[delayIdx]=(data[delayIdx]*mixSource)+(data[n]*mixDest);
+            
+                // the delay
+                
+            if (delayIdx<frameCount) data[delayIdx]=(data[delayIdx]*(1.0-mixFactor))+(data[n]*mixFactor);
             delayIdx--;
+            
+                // ramp down the mix if we are
+                // past the fade start (we run the delay
+                // backwards so the mix doesn't interfere
+                // with the previous delay.)
+            
+            if (n<fadeFrameIndex) {
+                mixFactor-=fadeFactor;
+                if (mixFactor<=0.0) break;
+            }
         }
     }
     
@@ -200,9 +216,10 @@ class GenSoundClass
         }
     }
     
-    normalize(data,frameCount)
+    normalize(data)
     {
         let n,k,f,max;
+        let frameCount=data.length;
         
             // get max value
             
@@ -224,9 +241,10 @@ class GenSoundClass
         }
     }
     
-    fade(data,frameCount,fadeIn,fadeOut)
+    fade(data,fadeIn,fadeOut)
     {
         let n,fadeLen,fadeStart;
+        let frameCount=data.length;
         
             // fade in
         
@@ -266,11 +284,11 @@ class GenSoundClass
         this.mixWave(data,mixData,0,frameCount);
         this.mixWhiteNoise(data,0,frameCount,0.1);
         
-        this.normalize(data,frameCount);
+        this.normalize(data);
         this.clip(data,0,frameCount,-0.8,0.2);
         
-        this.normalize(data,frameCount);
-        this.fade(data,frameCount,null,0.1);
+        this.normalize(data);
+        this.fade(data,null,0.1);
         
         return(new SoundBufferClass(buffer,5000));
     }
@@ -300,15 +318,15 @@ class GenSoundClass
             // part of the exposion, so clip that
             // and then scale the rest to match
         
-        this.normalize(data,frameCount);
+        this.normalize(data);
         this.clip(data,0,bangPosition,-0.5,0.5);
         this.clip(data,bangPosition,frameCount,-0.9,0.9);
         this.scale(data,bangPosition,frameCount,0.7);
         
             // now normalize and fade the start/finish
             
-        this.normalize(data,frameCount);
-        this.fade(data,frameCount,0.1,0.75);
+        this.normalize(data);
+        this.fade(data,0.1,0.75);
         
         return(new SoundBufferClass(buffer,30000));
     }
@@ -363,16 +381,16 @@ class GenSoundClass
         
             // normalize it, randomly clip, low pass, and delay it
             
-        this.normalize(data,frameCount);
+        this.normalize(data);
         this.clip(data,0,frameCount,(-1.0+(genRandom.random()*0.2)),(1.0-(genRandom.random()*0.2)));
         this.lowPassFilter(data,0,frameCount,genRandom.random());
         
-        this.delay(data,0,frameCount,frameCount,Math.trunc(frameCount*0.1),(genRandom.random()*0.5));
+        this.delay(data,0,frameCount,Math.trunc(frameCount*0.1),(genRandom.random()*0.5));
         
             // finally normalize and fade
             
-        this.normalize(data,frameCount);
-        this.fade(data,frameCount,0.1,0.2);
+        this.normalize(data);
+        this.fade(data,0.1,0.2);
 
         return(new SoundBufferClass(buffer,35000));
     }

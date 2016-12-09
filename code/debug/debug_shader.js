@@ -23,7 +23,7 @@ class DebugShaderClass extends ShaderClass
 
     initialize()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -57,7 +57,7 @@ class DebugShaderClass extends ShaderClass
 
     drawStart(color)
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // using the map shader
 
@@ -79,7 +79,7 @@ class DebugShaderClass extends ShaderClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // disable vertex attributes
 

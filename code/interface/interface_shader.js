@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -22,7 +24,7 @@ class InterfaceShaderClass extends ShaderClass
 
     initialize()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -54,7 +56,7 @@ class InterfaceShaderClass extends ShaderClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.useProgram(this.program);
 
@@ -69,7 +71,7 @@ class InterfaceShaderClass extends ShaderClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // disable vertex attributes
 

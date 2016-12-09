@@ -1,3 +1,5 @@
+/* global map, sky, entityList, debug, config, particleList */
+
 "use strict";
 
 //
@@ -35,6 +37,8 @@ class ViewClass
 {
     constructor()
     {
+        let n;
+        
             // the opengl context
 
         this.gl=null;
@@ -83,7 +87,7 @@ class ViewClass
         this.ambient=new wsColor(0.0,0.0,0.0);
 
         this.lights=[];
-        for (var n=0;n!==this.LIGHT_COUNT;n++) {
+        for (n=0;n!==this.LIGHT_COUNT;n++) {
             this.lights.push(null);
         }
 
@@ -161,20 +165,21 @@ class ViewClass
 
     createCanvas()
     {
-        var margin=0;
+        let lft,top,wid,high;
+        let margin=0;
         
             // canvas position
             
-        var wid=window.innerWidth-margin;
-        var high=Math.trunc((wid*9)/16);
+        wid=window.innerWidth-margin;
+        high=Math.trunc((wid*9)/16);
         
         if (high>(window.innerHeight-margin)) {
             high=window.innerHeight-margin;
             wid=Math.trunc((high*16)/9);
         }
         
-        var lft=Math.trunc((window.innerWidth-wid)/2);
-        var top=Math.trunc((window.innerHeight-high)/2);
+        lft=Math.trunc((window.innerWidth-wid)/2);
+        top=Math.trunc((window.innerHeight-high)/2);
         
             // create the canvas
             
@@ -194,7 +199,7 @@ class ViewClass
     
     initialize()
     {
-        var glOptions={
+        let glOptions={
             alpha:false,
             depth:true,
             stencil:false,
@@ -263,13 +268,15 @@ class ViewClass
     
     setPauseState(pause,initState)
     {
+        let timeStamp;
+        
             // set the state
 
         this.paused=pause;
         
             // current timestamp
             
-        var timeStamp=Math.trunc(window.performance.now());
+        timeStamp=Math.trunc(window.performance.now());
         
             // if going into pause, we need
             // to remember the time stamp offsets
@@ -331,8 +338,8 @@ class ViewClass
 
     buildPerspectiveMatrix()
     {
-        var fov=1.0/Math.tan(this.OPENGL_FOV*0.5);
-        var dist=1.0/(this.OPENGL_NEAR_Z-this.OPENGL_FAR_Z);
+        let fov=1.0/Math.tan(this.OPENGL_FOV*0.5);
+        let dist=1.0/(this.OPENGL_NEAR_Z-this.OPENGL_FAR_Z);
         
             // create the perspective matrix
             
@@ -363,9 +370,9 @@ class ViewClass
     
     buildOrthoMatrix(nearZ,farZ)
     {
-        var horz=1.0/this.wid;
-        var vert=1.0/this.high;
-        var dist=1.0/(nearZ-farZ);
+        let horz=1.0/this.wid;
+        let vert=1.0/this.high;
+        let dist=1.0/(nearZ-farZ);
 
         this.orthoMatrix[0]=horz*2.0;
         this.orthoMatrix[1]=0.0;
@@ -391,8 +398,8 @@ class ViewClass
      
     buildLookAtMatrix(centerPos)
     {
-        var x0,x1,x2,y0,y1,y2,z0,z1,z2;
-        var f;
+        let x0,x1,x2,y0,y1,y2,z0,z1,z2;
+        let f;
 
         z0=this.eyePos.x-centerPos.x;
         z1=this.eyePos.y-centerPos.y;
@@ -453,20 +460,20 @@ class ViewClass
         
             // create the inversion
             
-        var m00=(this.modelMatrix[0]*this.modelMatrix[5])-(this.modelMatrix[1]*this.modelMatrix[4]);
-        var m01=(this.modelMatrix[0]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[4]);
-        var m02=(this.modelMatrix[0]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[4]);
-        var m03=(this.modelMatrix[1]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[5]);
-        var m04=(this.modelMatrix[1]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[5]);
-        var m05=(this.modelMatrix[2]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[6]);
-        var m06=(this.modelMatrix[8]*this.modelMatrix[13])-(this.modelMatrix[9]*this.modelMatrix[12]);
-        var m07=(this.modelMatrix[8]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[12]);
-        var m08=(this.modelMatrix[8]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[12]);
-        var m09=(this.modelMatrix[9]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[13]);
-        var m10=(this.modelMatrix[9]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[13]);
-        var m11=(this.modelMatrix[10]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[14]);
+        let m00=(this.modelMatrix[0]*this.modelMatrix[5])-(this.modelMatrix[1]*this.modelMatrix[4]);
+        let m01=(this.modelMatrix[0]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[4]);
+        let m02=(this.modelMatrix[0]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[4]);
+        let m03=(this.modelMatrix[1]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[5]);
+        let m04=(this.modelMatrix[1]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[5]);
+        let m05=(this.modelMatrix[2]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[6]);
+        let m06=(this.modelMatrix[8]*this.modelMatrix[13])-(this.modelMatrix[9]*this.modelMatrix[12]);
+        let m07=(this.modelMatrix[8]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[12]);
+        let m08=(this.modelMatrix[8]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[12]);
+        let m09=(this.modelMatrix[9]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[13]);
+        let m10=(this.modelMatrix[9]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[13]);
+        let m11=(this.modelMatrix[10]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[14]);
 
-        var det=(m00*m11)-(m01*m10)+(m02*m09)+(m03*m08)-(m04*m07)+(m05*m06);
+        let det=(m00*m11)-(m01*m10)+(m02*m09)+(m03*m08)-(m04*m07)+(m05*m06);
         if (det!==0.0) det=1.0/det;
 
         this.normalMatrixTemp[0]=((this.modelMatrix[5]*m11)-(this.modelMatrix[6]*m10)+(this.modelMatrix[7]*m09))*det;
@@ -506,6 +513,8 @@ class ViewClass
         
     buildBillboardXMatrix(ang)
     {
+        let rad;
+        
             // identity
             // we can assume non-touched cells will always be 0
             
@@ -516,7 +525,7 @@ class ViewClass
 
             // rotation
             
-        var rad=ang*DEGREE_TO_RAD;
+        rad=ang*DEGREE_TO_RAD;
         
         this.billboardXMatrix[5]=this.billboardXMatrix[10]=Math.cos(rad);
         this.billboardXMatrix[6]=Math.sin(rad);
@@ -525,6 +534,8 @@ class ViewClass
     
     buildBillboardYMatrix(ang)
     {
+        let rad;
+        
             // identity
             // we can assume non-touched cells will always be 0
             
@@ -535,7 +546,7 @@ class ViewClass
 
             // rotation
             
-        var rad=ang*DEGREE_TO_RAD;
+        rad=ang*DEGREE_TO_RAD;
         
         this.billboardYMatrix[0]=this.billboardYMatrix[10]=Math.cos(rad);
         this.billboardYMatrix[8]=Math.sin(rad);
@@ -548,9 +559,11 @@ class ViewClass
 
     draw()
     {
-        var n,nEntity,entity;
-        var player=entityList.getPlayer();
-        var light,tintOn,tintAtt;
+        let n,nEntity,entity;
+        let light,tintOn,tintAtt;
+        let weapon;
+        let fpsStr,idx;
+        let player=entityList.getPlayer();
          
             // everything overdraws except
             // clear the depth buffer
@@ -659,7 +672,7 @@ class ViewClass
       
             // player weapon
          
-        var weapon=player.getCurrentWeapon();
+        weapon=player.getCurrentWeapon();
         if (weapon!==null) {
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
             weapon.drawStart();
@@ -709,8 +722,8 @@ class ViewClass
         
             // text overlays
 
-        var fpsStr=this.fps.toString();
-        var idx=fpsStr.indexOf('.');
+        fpsStr=this.fps.toString();
+        idx=fpsStr.indexOf('.');
         if (idx===-1) {
             fpsStr+='.0';
         }
@@ -719,10 +732,10 @@ class ViewClass
         }
         
         this.text.drawStart();
-        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
         if (this.paused) {
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',this.text.TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',this.text.TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
         }
         this.text.drawEnd();
     }
@@ -745,10 +758,11 @@ class ViewClass
     
     loadingScreenUpdate()
     {
-        var idx=this.loadingStrings.length-1;
+        let msec;
+        let idx=this.loadingStrings.length-1;
         if (idx<0) return;
         
-        var msec=Date.now()-this.loadingLastAddMsec;
+        msec=Date.now()-this.loadingLastAddMsec;
         
         this.loadingStrings[idx]+=(' ['+msec+'ms]');
         
@@ -757,7 +771,8 @@ class ViewClass
     
     loadingScreenDraw(progress)
     {
-        var n;
+        let n,nLine;
+        let y,col;
         
             // the 2D ortho matrix
 
@@ -770,16 +785,16 @@ class ViewClass
         
             // lines
             
-        var nLine=this.loadingStrings.length;
+        nLine=this.loadingStrings.length;
 
         this.text.drawStart();
         
-        var y=(this.high-30)-((nLine-1)*22);
-        var col=new wsColor(1.0,1.0,1.0);
+        y=(this.high-30)-((nLine-1)*22);
+        col=new wsColor(1.0,1.0,1.0);
         
         for (n=0;n!==nLine;n++) {
             if (n===(nLine-1)) col=new wsColor(1.0,0.3,0.3);
-            this.text.draw(5,y,20,18,this.loadingStrings[n],TEXT_ALIGN_LEFT,col);
+            this.text.draw(5,y,20,18,this.loadingStrings[n],this.text.TEXT_ALIGN_LEFT,col);
             y+=22;
         }
         
@@ -898,4 +913,4 @@ class ViewClass
 // the global view class
 //
 
-var view=new ViewClass();
+let view=new ViewClass();

@@ -129,17 +129,19 @@ class wsPoint
     
     rotateX(centerPt,rotX)
     {
+        let rd,sn,cs,y,z;
+        
         if (centerPt!==null) {
             this.y-=centerPt.y;
             this.z-=centerPt.z;
         }
         
-        var rd=rotX*DEGREE_TO_RAD;
-        var sn=Math.sin(rd);
-        var cs=Math.cos(rd);
+        rd=rotX*DEGREE_TO_RAD;
+        sn=Math.sin(rd);
+        cs=Math.cos(rd);
         
-        var y=(this.y*cs)-(this.z*sn);
-        var z=(this.y*sn)+(this.z*cs);
+        y=(this.y*cs)-(this.z*sn);
+        z=(this.y*sn)+(this.z*cs);
 
         if (centerPt!==null) {
             y+=centerPt.y;
@@ -152,17 +154,19 @@ class wsPoint
     
     rotateY(centerPt,rotY)
     {
+        let rd,sn,cs,x,z;
+        
         if (centerPt!==null) {
             this.x-=centerPt.x;
             this.z-=centerPt.z;
         }
         
-        var rd=rotY*DEGREE_TO_RAD;
-        var sn=Math.sin(rd);
-        var cs=Math.cos(rd);
+        rd=rotY*DEGREE_TO_RAD;
+        sn=Math.sin(rd);
+        cs=Math.cos(rd);
         
-        var x=(this.z*sn)+(this.x*cs);
-        var z=(this.z*cs)-(this.x*sn);
+        x=(this.z*sn)+(this.x*cs);
+        z=(this.z*cs)-(this.x*sn);
 
         if (centerPt!==null) {
             x+=centerPt.x;
@@ -175,17 +179,19 @@ class wsPoint
     
     rotateZ(centerPt,rotZ)
     {
+        let rd,sn,cs,x,y;
+        
         if (centerPt!==null) {
             this.x-=centerPt.x;
             this.y-=centerPt.y;
         }
         
-        var rd=rotZ*DEGREE_TO_RAD;
-        var sn=Math.sin(rd);
-        var cs=Math.cos(rd);
+        rd=rotZ*DEGREE_TO_RAD;
+        sn=Math.sin(rd);
+        cs=Math.cos(rd);
         
-        var x=(this.x*cs)-(this.y*sn);
-        var y=(this.x*sn)+(this.y*cs);
+        x=(this.x*cs)-(this.y*sn);
+        y=(this.x*sn)+(this.y*cs);
         
         if (centerPt!==null) {
             x+=centerPt.x;
@@ -198,7 +204,7 @@ class wsPoint
     
     rotate(ang)
     {
-        var rd,sn,cs,x,y,z;
+        let rd,sn,cs,x,y,z;
         
             // rotate X
         
@@ -245,13 +251,13 @@ class wsPoint
       
     rotateAroundPoint(centerPt,ang)
     {
+        let rd,sn,cs,x,y,z;
+        
         if (centerPt!==null) {
             this.x-=centerPt.x;
             this.y-=centerPt.y;
             this.z-=centerPt.z;
         }
-        
-        var rd,sn,cs,x,y,z;
         
             // rotate X
         
@@ -304,17 +310,17 @@ class wsPoint
                 
     noSquareDistance(pt)
     {
-        var px=this.x-pt.x;
-        var py=this.y-pt.y;
-        var pz=this.z-pt.z;
+        let px=this.x-pt.x;
+        let py=this.y-pt.y;
+        let pz=this.z-pt.z;
         return((px*px)+(py*py)+(pz*pz));
     }
                 
     noSquareDistanceByTriplet(kx,ky,kz)
     {
-        var px=this.x-kx;
-        var py=this.y-ky;
-        var pz=this.z-kz;
+        let px=this.x-kx;
+        let py=this.y-ky;
+        let pz=this.z-kz;
         return((px*px)+(py*py)+(pz*pz));
     }
     
@@ -330,8 +336,8 @@ class wsPoint
     
     distanceScrubY(pt)
     {
-        var px=this.x-pt.x;
-        var pz=this.z-pt.z;
+        let px=this.x-pt.x;
+        let pz=this.z-pt.z;
         return(Math.sqrt((px*px)+(pz*pz)));
     }
     
@@ -342,7 +348,7 @@ class wsPoint
     
     normalize()
     {
-        var f=Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z));
+        let f=Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z));
         if (f!==0.0) f=1.0/f;
         
         this.x*=f;
@@ -357,9 +363,9 @@ class wsPoint
 
     cross(pt)
     {
-        var x=(this.y*pt.z)-(this.z*pt.y);
-        var y=(this.z*pt.x)-(this.x*pt.z);
-        var z=(this.x*pt.y)-(this.y*pt.x);
+        let x=(this.y*pt.z)-(this.z*pt.y);
+        let y=(this.z*pt.x)-(this.x*pt.z);
+        let z=(this.x*pt.y)-(this.y*pt.x);
         this.x=x;
         this.y=y;
         this.z=z;
@@ -381,9 +387,9 @@ class wsPoint
     
     matrixMultiply(mat)
     {
-        var mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8])+mat[12];
-        var my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9])+mat[13];
-        var mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10])+mat[14];
+        let mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8])+mat[12];
+        let my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9])+mat[13];
+        let mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10])+mat[14];
         
         this.x=mx;
         this.y=my;
@@ -392,9 +398,9 @@ class wsPoint
     
     matrixMultiplyIgnoreTransform(mat)
     {
-        var mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8]);
-        var my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9]);
-        var mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10]);
+        let mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8]);
+        let my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9]);
+        let mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10]);
         
         this.x=mx;
         this.y=my;
@@ -407,7 +413,7 @@ class wsPoint
             // so we need the Z up vector (positive) and the vector to pt
             // then subtract them for correct angle
         
-        var fang=(Math.atan2(0,100)-Math.atan2((pt.x-this.x),(pt.z-this.z)))*RAD_TO_DEGREE;
+        let fang=(Math.atan2(0,100)-Math.atan2((pt.x-this.x),(pt.z-this.z)))*RAD_TO_DEGREE;
         
             // now we need to switch it up for which side the x is on
             // (if greater, the #s are 0 to -180, if positive, 180 to 0)
@@ -461,8 +467,8 @@ class ws2DPoint
     
     noSquareDistance(pt)
     {
-        var px=this.x-pt.x;
-        var py=this.y-pt.y;
+        let px=this.x-pt.x;
+        let py=this.y-pt.y;
         return((px*px)+(py*py));
     }
                 
@@ -478,15 +484,17 @@ class ws2DPoint
     
     rotate(centerPt,rot)
     {
+        let rd,x,y;
+        
         if (centerPt!==null) {
             this.x-=centerPt.x;
             this.y-=centerPt.y;
         }
         
-        var rd=rot*DEGREE_TO_RAD;
+        rd=rot*DEGREE_TO_RAD;
         
-        var x=(this.y*Math.sin(rd))+(this.x*Math.cos(rd));
-        var y=(this.y*Math.cos(rd))-(this.x*Math.sin(rd));
+        x=(this.y*Math.sin(rd))+(this.x*Math.cos(rd));
+        y=(this.y*Math.cos(rd))-(this.x*Math.sin(rd));
         
         if (centerPt!==null) {
             x+=centerPt.x;
@@ -527,8 +535,8 @@ class ws2DIntPoint
     
     noSquareDistance(pt)
     {
-        var px=this.x-pt.x;
-        var py=this.y-pt.y;
+        let px=this.x-pt.x;
+        let py=this.y-pt.y;
         return((px*px)+(py*py));
     }
                 
@@ -544,15 +552,17 @@ class ws2DIntPoint
     
     rotate(centerPt,rot)
     {
+        let rd,x,y;
+        
         if (centerPt!==null) {
             this.x-=centerPt.x;
             this.y-=centerPt.y;
         }
         
-        var rd=rot*DEGREE_TO_RAD;
+        rd=rot*DEGREE_TO_RAD;
         
-        var x=(this.y*Math.sin(rd))+(this.x*Math.cos(rd));
-        var y=(this.y*Math.cos(rd))-(this.x*Math.sin(rd));
+        x=(this.y*Math.sin(rd))+(this.x*Math.cos(rd));
+        y=(this.y*Math.cos(rd))-(this.x*Math.sin(rd));
         
         if (centerPt!==null) {
             x+=centerPt.x;
@@ -817,7 +827,7 @@ class wsPlane
     
     normalize()
     {
-        var f=Math.sqrt((this.a*this.a)+(this.b*this.b)+(this.c*this.c));
+        let f=Math.sqrt((this.a*this.a)+(this.b*this.b)+(this.c*this.c));
         if (f===0.0) return;
         this.a/=f;
         this.b/=f;
@@ -885,7 +895,7 @@ class wsColor
                 
     fixOverflow()
     {
-        var f;
+        let f;
         
             // find the largest overflow
             // and reduce that to 1 so we don't
@@ -954,8 +964,8 @@ class wsGrid
     
     setCellAll(value)
     {
-        var n;
-        var cellSize=this.xSize*this.zSize;
+        let n;
+        let cellSize=this.xSize*this.zSize;
         
         for (n=0;n!==cellSize;n++) {
             this.grid[n]=value;

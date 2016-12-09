@@ -36,7 +36,7 @@ class ShaderClass
 
     initialize(name)
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // get the shaders from divs
 
@@ -68,7 +68,7 @@ class ShaderClass
 
     release()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         if (this.program===null) return;
 
@@ -95,11 +95,12 @@ class ShaderClass
     
     loadVertexShader(name)
     {
-        var gl=view.gl;
+        let source;
+        let gl=view.gl;
         
         this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
 
-        var source=fileCache.getFile('shaders/'+name+'.vert');
+        source=fileCache.getFile('shaders/'+name+'.vert');
         gl.shaderSource(this.vertexShader,source);
         gl.compileShader(this.vertexShader);
 
@@ -111,11 +112,12 @@ class ShaderClass
 
     loadFragmentShader(name)
     {
-        var gl=view.gl;
+        let source;
+        let gl=view.gl;
         
         this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
 
-        var source=fileCache.getFile('shaders/'+name+'.frag');
+        source=fileCache.getFile('shaders/'+name+'.frag');
         gl.shaderSource(this.fragmentShader,source);
         gl.compileShader(this.fragmentShader);
 
@@ -131,7 +133,7 @@ class ShaderClass
 
     errorAlert(name,nameType,errStr)
     {
-        var str='Shader Error: '+name+'('+nameType+')\n';
+        let str='Shader Error: '+name+'('+nameType+')\n';
         str+='-----------------------------------------\n';
         str+=errStr;
 

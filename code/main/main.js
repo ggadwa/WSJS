@@ -72,7 +72,7 @@ class MainClass
 
     initBuildMap()
     {
-        var genMap=new GenMapClass(this.initBuildMapFinish.bind(this));
+        let genMap=new GenMapClass(this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 
@@ -110,7 +110,7 @@ class MainClass
             // light maps are a long running
             // process so we need a callback
 
-        var genLightmap=new GenLightmapClass(config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
+        let genLightmap=new GenLightmapClass(config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
         genLightmap.create();
     }
 
@@ -125,12 +125,12 @@ class MainClass
 
     initBuildModelsMesh(idx)
     {
-        var model,genSkeleton,genModelMesh;
-        var monsterType;
+        let model,genSkeleton,genModelMesh,modelBitmap;
+        let monsterType;
 
             // build a bitmap
             
-        var modelBitmap=this.genBitmapSkin.generateRandom(false);
+        modelBitmap=this.genBitmapSkin.generateRandom(false);
 
             // player is -1
             // else a monster
@@ -174,25 +174,27 @@ class MainClass
 
     initBuildWeapons()
     {
+        let model,modelBitmap,genModelWeaponMesh,genModelProjectileMesh;
+        
             // supergumba -- right now this is bad, it'll leak and get closed more than once,
             // deal with this when we have real weapon routines
         
-        var modelBitmap=this.genBitmapItem.generate(0,false);
+        modelBitmap=this.genBitmapItem.generate(0,false);
 
             // weapon
 
-        var model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
+        model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
 
-        var genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap);
+        genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap);
         genModelWeaponMesh.build();
 
         modelList.addModel(model);
 
             // projectile
 
-        var model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
+        model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
 
-        var genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap);
+        genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap);
         genModelProjectileMesh.build();
 
         modelList.addModel(model);
@@ -208,12 +210,13 @@ class MainClass
 
     initBuildEntities()
     {
-        var n,monsterType;
-        var model,pos;
+        let n,monsterType;
+        let model,pos,playerEntity,playerWeapon;
+        let monsterAIs;
 
-        var genProjectile=new GenProjectileClass(this.genSound);
-        var genWeapon=new GenWeaponClass();
-        var genAI=new GenAIClass(genProjectile,this.genSound);
+        let genProjectile=new GenProjectileClass(this.genSound);
+        let genWeapon=new GenWeaponClass();
+        let genAI=new GenAIClass(genProjectile,this.genSound);
 
             // make player entity
 
@@ -223,9 +226,10 @@ class MainClass
             return;
         }
 
-        var playerEntity=new EntityPlayerClass('player',pos,new wsPoint(0.0,0.0,0.0),200,modelList.getModel('player'));
+        playerEntity=new EntityPlayerClass('player',pos,new wsPoint(0.0,0.0,0.0),200,modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
-        var playerWeapon=genWeapon.generate();
+        
+        playerWeapon=genWeapon.generate();
         playerWeapon.addProjectile(genProjectile.generate(true));
         playerEntity.addWeapon(playerWeapon);
         playerEntity.setCurrentWeaponIndex(0);
@@ -234,7 +238,7 @@ class MainClass
         
             // create AI type for each monster
         
-        var monsterAIs=[];
+        monsterAIs=[];
         
         for (n=0;n!==config.MONSTER_TYPE_COUNT;n++) {
             monsterAIs.push(genAI.generate());
@@ -300,7 +304,7 @@ class MainClass
 // single global object is the main class
 //
 
-var main=new MainClass();
+let main=new MainClass();
 
 //
 // main loop
@@ -308,6 +312,8 @@ var main=new MainClass();
 
 function mainLoop(timeStamp)
 {
+    let fpsTime;
+    
         // next frame
         
     if (view.loopCancel) return;
@@ -373,7 +379,7 @@ function mainLoop(timeStamp)
         // the fps
     
     if (!view.paused) {
-        var fpsTime=view.timeStamp-view.fpsStartTimeStamp;
+        fpsTime=view.timeStamp-view.fpsStartTimeStamp;
         if (fpsTime>=1000) {
             view.fps=(view.fpsCount*1000.0)/view.fpsTotal;
             view.fpsStartTimeStamp=view.timeStamp;

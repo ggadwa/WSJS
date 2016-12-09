@@ -60,18 +60,20 @@ class FileCacheClass
     
     loadFile(idx,callback)
     {
+        let req,res,self;
+        
             // ajax the file
 
-        var req=new XMLHttpRequest();
+        req=new XMLHttpRequest();
 
         req.open('GET',this.fileNames[idx],true);
         req.overrideMimeType('text/plain');
 
-        var self=this;
+        self=this;
         
         req.onreadystatechange=function() {
             if (req.readyState!==4) return;
-            var res=req.responseText;
+            res=req.responseText;
             if (res!==null) {
                 if (res.length===0) res=null;
             }
@@ -111,8 +113,8 @@ class FileCacheClass
         
     getFile(name)
     {
-        var n;
-        var nFile=this.files.length;
+        let n;
+        let nFile=this.files.length;
         
         for (n=0;n!==nFile;n++) {
             if (this.files[n].name===name) return(this.files[n].data);
@@ -126,4 +128,4 @@ class FileCacheClass
 // the file cache global
 //
 
-var fileCache=new FileCacheClass();
+let fileCache=new FileCacheClass();

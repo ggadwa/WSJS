@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -42,7 +44,7 @@ class InterfaceClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.disable(gl.DEPTH_TEST);
 
@@ -54,7 +56,7 @@ class InterfaceClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         this.interfaceShader.drawEnd();
 
@@ -64,7 +66,7 @@ class InterfaceClass
     
     drawFrameRect(rect,color,alpha)
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // vertices
             
@@ -100,7 +102,7 @@ class InterfaceClass
     
     drawRect(rect,color,alpha)
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // vertices
             

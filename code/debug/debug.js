@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -33,20 +35,20 @@ class DebugClass
 
     drawMapMeshLines(mesh)
     {
-        var n;
-        var gl=view.gl;
+        let n,vertexPosBuffer,indexBuffer;
+        let gl=view.gl;
 
         this.debugShader.drawStart(new wsColor(1.0,0.0,0.0));
         
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,mesh.drawVertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,mesh.indexes,gl.STREAM_DRAW);
 
@@ -77,16 +79,18 @@ class DebugClass
         
     drawMapMeshNormals(mesh)
     {
-        var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
-        var gl=view.gl;
-        var normalSize=200.0;
+        let n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
+        let vertices,indexes;
+        let vertexPosBuffer,indexBuffer;
+        let gl=view.gl;
+        let normalSize=200.0;
         
             // create the lines
 
         nVertex=mesh.vertexCount;
 
-        var vertices=new Float32Array(nVertex*6);
-        var indexes=new Uint16Array(nVertex*2);
+        vertices=new Float32Array(nVertex*6);
+        indexes=new Uint16Array(nVertex*2);
 
         vertexIdx=0;
         elementIdx=0;
@@ -115,13 +119,13 @@ class DebugClass
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
 
@@ -142,16 +146,18 @@ class DebugClass
     
     drawMapMeshTangents(mesh)
     {
-        var n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
-        var gl=view.gl;
-        var tangentSize=200.0;
+        let n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
+        let vertices,indexes;
+        let vertexPosBuffer,indexBuffer;
+        let gl=view.gl;
+        let tangentSize=200.0;
         
             // create the lines
 
         nVertex=mesh.vertexCount;
 
-        var vertices=new Float32Array(nVertex*6);
-        var indexes=new Uint16Array(nVertex*2);
+        vertices=new Float32Array(nVertex*6);
+        indexes=new Uint16Array(nVertex*2);
 
         vertexIdx=0;
         elementIdx=0;
@@ -180,13 +186,13 @@ class DebugClass
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
 
@@ -211,13 +217,15 @@ class DebugClass
         
     drawModelHitBox(model,radius,high,angle,position)
     {
-        var vIdx,iIdx;
-        var gl=view.gl;
+        let vIdx,iIdx;
+        let vertices,indexes;
+        let vertexPosBuffer,indexBuffer;
+        let gl=view.gl;
         
             // create the lines
 
-        var vertices=new Float32Array(24);      // 8 points
-        var indexes=new Uint16Array(24);        // 12 lines
+        vertices=new Float32Array(24);      // 8 points
+        indexes=new Uint16Array(24);        // 12 lines
         
         vIdx=0;
         
@@ -288,13 +296,13 @@ class DebugClass
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
 
@@ -319,13 +327,16 @@ class DebugClass
 
     drawModelSkeleton(model,angle,position)
     {
-        var n,lineCount,vIdx,iIdx;
-        var gl=view.gl;
+        let n,nBone,lineCount,vIdx,iIdx;
+        let rotVector,particle,pnt;
+        let vertices,indexes;
+        let vertexPosBuffer,indexBuffer;
+        let gl=view.gl; 
+        let skeleton=model.skeleton;
         
-        var skeleton=model.skeleton;
         if (skeleton===null) return;
         
-        var nBone=skeleton.bones.length;
+        nBone=skeleton.bones.length;
         
             // draw all this without depth testing
             
@@ -333,10 +344,10 @@ class DebugClass
 
             // create the lines
 
-        var vertices=new Float32Array(nBone*3);
-        var indexes=new Uint16Array(nBone*2);
+        vertices=new Float32Array(nBone*3);
+        indexes=new Uint16Array(nBone*2);
         
-        var rotVector=new wsPoint(0,0,0);
+        rotVector=new wsPoint(0,0,0);
 
         vIdx=0;
 
@@ -367,13 +378,13 @@ class DebugClass
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
 
@@ -397,10 +408,8 @@ class DebugClass
         
             // now the bones, use the particle engine
         
-        var particle=particleList.addDebugParticles(position,nBone);
+        particle=particleList.addDebugParticles(position,nBone);
         if (particle!==null) {            
-            var pnt;
-
             for (n=0;n!==nBone;n++) {
                 pnt=particle.getPoint(n);
                 pnt.setFromPoint(skeleton.bones[n].curPosePosition);
@@ -415,24 +424,23 @@ class DebugClass
         
     drawModelMeshNormals(model)
     {
-        var n,vIdx,iIdx,drawIdx,nVertex;
-        var gl=view.gl;
-        var normalSize=200.0;
-        
-        var mesh=model.mesh;
+        let n,v,vIdx,iIdx,drawIdx,nVertex;
+        let vertices,indexes;
+        let vertexPosBuffer,indexBuffer;
+        let gl=view.gl;
+        let normalSize=200.0;
+        let mesh=model.mesh;
         
             // create the lines
 
         nVertex=mesh.vertexCount;
 
-        var vertices=new Float32Array(nVertex*6);
-        var indexes=new Uint16Array(nVertex*2);
+        vertices=new Float32Array(nVertex*6);
+        indexes=new Uint16Array(nVertex*2);
 
         vIdx=0;
         iIdx=0;
         drawIdx=0;
-        
-        var v;
 
         for (n=0;n!==nVertex;n++) {
             v=mesh.vertexList[n];
@@ -459,13 +467,13 @@ class DebugClass
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
 
@@ -486,24 +494,23 @@ class DebugClass
     
     drawModelMeshTangents(model)
     {
-        var n,vIdx,iIdx,drawIdx,nVertex;
-        var gl=view.gl;
-        var normalSize=200.0;
-        
-        var mesh=model.mesh;
+        let n,v,vIdx,iIdx,drawIdx,nVertex;
+        let vertices,indexes;
+        let vertexPosBuffer,indexBuffer;
+        let gl=view.gl;
+        let normalSize=200.0;
+        let mesh=model.mesh;
         
             // create the lines
 
         nVertex=mesh.vertexCount;
 
-        var vertices=new Float32Array(nVertex*6);
-        var indexes=new Uint16Array(nVertex*2);
+        vertices=new Float32Array(nVertex*6);
+        indexes=new Uint16Array(nVertex*2);
 
         vIdx=0;
         iIdx=0;
         drawIdx=0;
-        
-        var v;
 
         for (n=0;n!==nVertex;n++) {
             v=mesh.vertexList[n];
@@ -530,13 +537,13 @@ class DebugClass
 
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STREAM_DRAW);
 
@@ -561,19 +568,19 @@ class DebugClass
         
     drawModelMeshLines(model)
     {
-        var n;
-        var gl=view.gl;
-        
-        var mesh=model.mesh;
+        let n,v,nVertex,vIdx;
+        let vertices;
+        let vertexPosBuffer,indexBuffer;
+        let gl=view.gl;
+        let mesh=model.mesh;
         
             // get the offset vertices
         
-        var nVertex=mesh.vertexCount;
+        nVertex=mesh.vertexCount;
         
-        var vertices=new Float32Array(nVertex*3);
+        vertices=new Float32Array(nVertex*3);
 
-        var vIdx=0;
-        var v;
+        vIdx=0;
 
         for (n=0;n!==nVertex;n++) {
             v=mesh.vertexList[n];
@@ -589,13 +596,13 @@ class DebugClass
         
             // setup the buffers
 
-        var vertexPosBuffer=gl.createBuffer();
+        vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STREAM_DRAW);
 
         gl.vertexAttribPointer(this.debugShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        var indexBuffer=gl.createBuffer();
+        indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,mesh.indexes,gl.STREAM_DRAW);
 
@@ -627,7 +634,9 @@ class DebugClass
 
     displayCanvasData(fromCanvas,lft,top,wid,high)
     {
-        var cvs=document.createElement('canvas');
+        let cvs,ctx;
+        
+        cvs=document.createElement('canvas');
         cvs.style.position="absolute";
         cvs.style.left=lft+'px';
         cvs.style.top=top+'px';
@@ -635,7 +644,7 @@ class DebugClass
         cvs.width=wid;
         cvs.height=high;
 
-        var ctx=cvs.getContext('2d');
+        ctx=cvs.getContext('2d');
         ctx.drawImage(fromCanvas,0,0,wid,high);
 
         document.body.appendChild(cvs);
@@ -647,12 +656,11 @@ class DebugClass
 
     displaySoundData(data,lft,top,wid,high)
     {
-        var n,fx,fxAdd,y,halfHigh;
-        var dataLen=data.length;
+        let n,fx,fxAdd,y,halfHigh;
+        let cvs,ctx;
+        let dataLen=data.length;
         
-        console.log(dataLen);
-        
-        var cvs=document.createElement('canvas');
+        cvs=document.createElement('canvas');
         cvs.style.position="absolute";
         cvs.style.left=lft+'px';
         cvs.style.top=top+'px';
@@ -668,7 +676,7 @@ class DebugClass
         
             // draw the wave
 
-        var ctx=cvs.getContext('2d');
+        ctx=cvs.getContext('2d');
         
         ctx.strokeStyle='#0000FF';
         ctx.beginPath();
@@ -692,4 +700,4 @@ class DebugClass
 // the global debug object
 //
 
-var debug=new DebugClass();
+let debug=new DebugClass();

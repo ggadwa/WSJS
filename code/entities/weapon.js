@@ -34,6 +34,8 @@ class WeaponClass
         
     fire(entity)
     {
+        let pos,ang;
+        
             // time to fire again?
             
         if (view.timeStamp<this.lastFireTimeStamp) return;
@@ -42,10 +44,10 @@ class WeaponClass
         
             // create projectile
             
-        var ang=new wsPoint(0,0,0);
+        ang=new wsPoint(0,0,0);
         ang.setFromPoint(entity.angle);
         
-        var pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
+        pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
         pos.rotate(ang);
         pos.addPoint(entity.position);
         pos.y-=2000;        // supergumba -- all this is hardcoded!
@@ -69,8 +71,8 @@ class WeaponClass
 
     draw(entity)
     {
-        var pos=entity.position;
-        var angle=entity.angle;
+        let pos=entity.position;
+        let angle=entity.angle;
         
             // get new position
             

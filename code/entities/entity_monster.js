@@ -53,8 +53,6 @@ class EntityMonsterClass extends EntityClass
             // if we weren't active, play the
             // active sound instead of the hurt
         
-        console.log('wake='+this.ai.wakeSoundBuffer);
-        console.log('hurt='+this.ai.hurtSoundBuffer);
         sound.play(this,(this.active?this.ai.wakeSoundBuffer:this.ai.hurtSoundBuffer));
         
             // always wake up and chase the

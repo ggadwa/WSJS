@@ -13,13 +13,15 @@ class UIConfigClass
     
     createLinkTextDiv(url,str)
     {
+        let aDiv,textSpan;
+        
         if (url!==null) {
-            var aDiv=document.createElement('a');
+            aDiv=document.createElement('a');
             aDiv.style.float='left';
             aDiv.href=url;
         }
         
-        var textSpan=document.createElement('span');
+        textSpan=document.createElement('span');
         if (url===null) textSpan.style.float='left';
         textSpan.style.paddingRight='5px';
         textSpan.appendChild(document.createTextNode(str));
@@ -31,10 +33,10 @@ class UIConfigClass
     
     startGame()
     {
-        var n,ctrl,str;
+        let n,ctrl,str;
 
-        var propList=Object.getOwnPropertyNames(config);
-        var nProp=propList.length;
+        let propList=Object.getOwnPropertyNames(config);
+        let nProp=propList.length;
         
             // reset the config
 
@@ -72,14 +74,15 @@ class UIConfigClass
     
     run()
     {
-        var n,wrapperDiv,nameDiv,ctrl,isCheck;
+        let n,wrapperDiv,nameDiv,ctrl,btn,isCheck;
+        let mainDiv,headerDiv,leftColDiv,rightColDiv;
 
-        var propList=Object.getOwnPropertyNames(config);
-        var nProp=propList.length;
+        let propList=Object.getOwnPropertyNames(config);
+        let nProp=propList.length;
         
             // header
             
-        var headerDiv=document.createElement('div');
+        headerDiv=document.createElement('div');
         headerDiv.id='header';
         headerDiv.style.width='100%';
         headerDiv.style.height='40px';
@@ -101,7 +104,7 @@ class UIConfigClass
         
             // start button
             
-        var btn=document.createElement('div');
+        btn=document.createElement('div');
         btn.style.float='right';
         btn.style.right='5px';
         btn.style.width='100px';
@@ -122,7 +125,7 @@ class UIConfigClass
         
             // setup main div
             
-        var mainDiv=document.createElement('div');
+        mainDiv=document.createElement('div');
         mainDiv.id='main';
         mainDiv.style.float='left';
         mainDiv.style.width='100%';
@@ -131,7 +134,7 @@ class UIConfigClass
         mainDiv.style.fontSize='12pt';
         mainDiv.style.boxSizing='border-box';
         
-        var leftColDiv=document.createElement('div');
+        leftColDiv=document.createElement('div');
         leftColDiv.id='leftCol';
         leftColDiv.style.float='left';
         leftColDiv.style.width='calc(50% - 10px)';
@@ -143,7 +146,7 @@ class UIConfigClass
         
         mainDiv.appendChild(leftColDiv);
         
-        var rightColDiv=document.createElement('div');
+        rightColDiv=document.createElement('div');
         rightColDiv.id='leftCol';
         rightColDiv.style.float='left';
         rightColDiv.style.width='calc(50% - 10px)';
@@ -213,6 +216,6 @@ class UIConfigClass
 
 function uiConfigRun()
 {
-    var uiConfig=new UIConfigClass();
+    let uiConfig=new UIConfigClass();
     uiConfig.run();
 }
