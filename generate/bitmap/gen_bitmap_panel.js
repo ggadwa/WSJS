@@ -1,4 +1,4 @@
-/* global GEN_BITMAP_MAP_TEXTURE_SIZE, genRandom */
+/* global genRandom */
 
 "use strict";
 
@@ -85,18 +85,18 @@ class GenBitmapPanelClass extends GenBitmapClass
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

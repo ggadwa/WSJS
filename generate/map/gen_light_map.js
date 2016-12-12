@@ -1,3 +1,5 @@
+/* global map, view */
+
 "use strict";
 
 //
@@ -8,16 +10,19 @@
 
 class GenLightmapBitmapClass
 {
-    constructor()
+    constructor(genLightmap)
     {
+        let n,x,y,idx;
+        let pixelCount,data;
+
             // setup the canvas
 
         this.canvas=document.createElement('canvas');
-        this.canvas.width=LIGHTMAP_TEXTURE_SIZE;
-        this.canvas.height=LIGHTMAP_TEXTURE_SIZE;
+        this.canvas.width=genLightmap.LIGHTMAP_TEXTURE_SIZE;
+        this.canvas.height=genLightmap.LIGHTMAP_TEXTURE_SIZE;
         this.ctx=this.canvas.getContext('2d');
 
-        this.imgData=this.ctx.getImageData(0,0,LIGHTMAP_TEXTURE_SIZE,LIGHTMAP_TEXTURE_SIZE);
+        this.imgData=this.ctx.getImageData(0,0,genLightmap.LIGHTMAP_TEXTURE_SIZE,genLightmap.LIGHTMAP_TEXTURE_SIZE);
         this.pixelData=this.imgData.data;
 
             // data for blur
@@ -28,11 +33,10 @@ class GenLightmapBitmapClass
             // open alpha (we use this later
             // for smearing)
 
-        var n;
-        var pixelCount=LIGHTMAP_TEXTURE_SIZE*LIGHTMAP_TEXTURE_SIZE;
-        var idx=0;
+        pixelCount=genLightmap.LIGHTMAP_TEXTURE_SIZE*genLightmap.LIGHTMAP_TEXTURE_SIZE;
+        idx=0;
 
-        var data=this.pixelData;
+        data=this.pixelData;
 
         for (n=0;n!==pixelCount;n++) {
             data[idx++]=0;
@@ -43,11 +47,9 @@ class GenLightmapBitmapClass
 
             // the first chunk is always all black
 
-        var x,y;
-
-        for (y=0;y!==LIGHTMAP_CHUNK_SIZE;y++) {
-            idx=(y*LIGHTMAP_TEXTURE_SIZE)*4;
-            for (x=0;x!==LIGHTMAP_CHUNK_SIZE;x++) {
+        for (y=0;y!==genLightmap.LIGHTMAP_CHUNK_SIZE;y++) {
+            idx=(y*genLightmap.LIGHTMAP_TEXTURE_SIZE)*4;
+            for (x=0;x!==genLightmap.LIGHTMAP_CHUNK_SIZE;x++) {
                 data[idx+3]=255;
                 idx+=4;
             }
@@ -55,11 +57,9 @@ class GenLightmapBitmapClass
         
             // the next chunk is always white
             
-        var x,y;
-
-        for (y=0;y!==LIGHTMAP_CHUNK_SIZE;y++) {
-            idx=((y*LIGHTMAP_TEXTURE_SIZE)+LIGHTMAP_CHUNK_SIZE)*4;
-            for (x=0;x!==LIGHTMAP_CHUNK_SIZE;x++) {
+        for (y=0;y!==genLightmap.LIGHTMAP_CHUNK_SIZE;y++) {
+            idx=((y*genLightmap.LIGHTMAP_TEXTURE_SIZE)+genLightmap.LIGHTMAP_CHUNK_SIZE)*4;
+            for (x=0;x!==genLightmap.LIGHTMAP_CHUNK_SIZE;x++) {
                 data[idx++]=255;
                 data[idx++]=255;
                 data[idx++]=255;
@@ -108,6 +108,21 @@ class GenLightmapClass
 {
     constructor(generateLightmap,callbackFunc)
     {
+            // constants
+            
+        this.LIGHTMAP_TEXTURE_SIZE=1024;
+
+        this.LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
+        this.LIGHTMAP_CHUNK_SIZE=Math.trunc(this.LIGHTMAP_TEXTURE_SIZE/this.LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
+        this.LIGHTMAP_CHUNK_PER_TEXTURE=(this.LIGHTMAP_CHUNK_SPLIT*this.LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
+
+        this.LIGHTMAP_RENDER_MARGIN=4;                // margin around each light map triangle
+        this.LIGHTMAP_BLUR_COUNT=3;
+
+            // generating light maps flag, to tell
+            // if we generate full light maps or just
+            // white light maps because we aren't generating them
+            
         this.generateLightmap=generateLightmap;
 
             // chunk is one block available to draw a light map
@@ -129,8 +144,8 @@ class GenLightmapClass
         
             // UVs for all black and all white items
         
-        this.blackChunkUV=new ws2DPoint((LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE),(LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE));
-        this.whiteChunkUV=new ws2DPoint(((LIGHTMAP_CHUNK_SIZE+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE),(LIGHTMAP_RENDER_MARGIN/LIGHTMAP_TEXTURE_SIZE));
+        this.blackChunkUV=new ws2DPoint((this.LIGHTMAP_RENDER_MARGIN/this.LIGHTMAP_TEXTURE_SIZE),(this.LIGHTMAP_RENDER_MARGIN/this.LIGHTMAP_TEXTURE_SIZE));
+        this.whiteChunkUV=new ws2DPoint(((this.LIGHTMAP_CHUNK_SIZE+this.LIGHTMAP_RENDER_MARGIN)/this.LIGHTMAP_TEXTURE_SIZE),(this.LIGHTMAP_RENDER_MARGIN/this.LIGHTMAP_TEXTURE_SIZE));
 
             // global variables to reduce new/GC during light maps
 
@@ -154,14 +169,14 @@ class GenLightmapClass
         
     smudgeChunk(lightBitmap,lft,top)
     {
-        var x,y,idx;
-        var r,g,b;
-        var hasColor;
+        let x,y,idx;
+        let r,g,b;
+        let hasColor;
         
-        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
-        var bot=top+LIGHTMAP_CHUNK_SIZE;
+        let rgt=lft+this.LIGHTMAP_CHUNK_SIZE;
+        let bot=top+this.LIGHTMAP_CHUNK_SIZE;
         
-        var pixelData=lightBitmap.pixelData;
+        let pixelData=lightBitmap.pixelData;
         
             // we run through the entire chunk
             // from left to right, right to left,
@@ -171,7 +186,7 @@ class GenLightmapClass
 
         for (y=top;y!==bot;y++) {
             
-            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
+            idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+lft)*4;
             hasColor=false;
             
             for (x=lft;x!==rgt;x++) {
@@ -194,7 +209,7 @@ class GenLightmapClass
                 idx+=4;
             }
             
-            idx=((y*LIGHTMAP_TEXTURE_SIZE)+(rgt-1))*4;
+            idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+(rgt-1))*4;
             hasColor=false;
             
             for (x=lft;x!==rgt;x++) {
@@ -224,7 +239,7 @@ class GenLightmapClass
             
             for (y=top;y!==bot;y++) {
                 
-                idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
+                idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+x)*4;
                 if (pixelData[idx+3]!==0) {
                     hasColor=true;
                     r=pixelData[idx];
@@ -245,7 +260,7 @@ class GenLightmapClass
             
             for (y=(bot-1);y>=top;y--) {
                 
-                idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
+                idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+x)*4;
                 if (pixelData[idx+3]!==0) {
                     hasColor=true;
                     r=pixelData[idx];
@@ -266,21 +281,21 @@ class GenLightmapClass
     
     blurChunk(lightBitmap,lft,top)
     {
-        var n,idx;
-        var x,y,cx,cy,cxs,cxe,cys,cye;
-        var colCount,fCount,r,g,b;
+        let n,idx;
+        let x,y,cx,cy,cxs,cxe,cys,cye;
+        let colCount,fCount,r,g,b;
         
-        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
-        var bot=top+LIGHTMAP_CHUNK_SIZE;
+        let rgt=lft+this.LIGHTMAP_CHUNK_SIZE;
+        let bot=top+this.LIGHTMAP_CHUNK_SIZE;
         
-        var pixelData=lightBitmap.pixelData;
-        var blurData=lightBitmap.blurData;
+        let pixelData=lightBitmap.pixelData;
+        let blurData=lightBitmap.blurData;
         
             // default to current color if blur
             // fails because of alpha
             
         for (y=top;y!==bot;y++) {
-            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
+            idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+lft)*4;
             for (x=lft;x!==rgt;x++) {       
                 blurData[idx]=pixelData[idx];
                 blurData[idx+1]=pixelData[idx+1];
@@ -291,14 +306,14 @@ class GenLightmapClass
         
             // blur pixels to count
 
-        for (n=0;n!==LIGHTMAP_BLUR_COUNT;n++) {
+        for (n=0;n!==this.LIGHTMAP_BLUR_COUNT;n++) {
 
             for (y=top;y!==bot;y++) {
 
                 cys=y-1;
                 if (cys<0) cys=0;
                 cye=y+2;
-                if (cye>=LIGHTMAP_TEXTURE_SIZE) cye=LIGHTMAP_TEXTURE_SIZE-1;
+                if (cye>=this.LIGHTMAP_TEXTURE_SIZE) cye=this.LIGHTMAP_TEXTURE_SIZE-1;
 
                 for (x=lft;x!==rgt;x++) {
 
@@ -310,7 +325,7 @@ class GenLightmapClass
                     cxs=x-1;
                     if (cxs<0) cxs=0;
                     cxe=x+2;
-                    if (cxe>=LIGHTMAP_TEXTURE_SIZE) cxe=LIGHTMAP_TEXTURE_SIZE-1;
+                    if (cxe>=this.LIGHTMAP_TEXTURE_SIZE) cxe=this.LIGHTMAP_TEXTURE_SIZE-1;
 
                     for (cy=cys;cy!==cye;cy++) {
                         for (cx=cxs;cx!==cxe;cx++) {
@@ -319,7 +334,7 @@ class GenLightmapClass
                                 // add up blur from the
                                 // original pixels
 
-                            idx=((cy*LIGHTMAP_TEXTURE_SIZE)+cx)*4;
+                            idx=((cy*this.LIGHTMAP_TEXTURE_SIZE)+cx)*4;
 
                             if (pixelData[idx+3]!==0) {
                                 r+=pixelData[idx];
@@ -333,7 +348,7 @@ class GenLightmapClass
                     if (colCount!==0) {
                         fCount=1/colCount;
                         
-                        idx=((y*LIGHTMAP_TEXTURE_SIZE)+x)*4;
+                        idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+x)*4;
 
                         blurData[idx]=Math.trunc(r*fCount);
                         blurData[idx+1]=Math.trunc(g*fCount);
@@ -345,7 +360,7 @@ class GenLightmapClass
                 // transfer over the changed pixels
 
             for (y=top;y!==bot;y++) {
-                idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
+                idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+lft)*4;
                 for (x=lft;x!==rgt;x++) {       
                     pixelData[idx]=blurData[idx];
                     pixelData[idx+1]=blurData[idx+1];
@@ -362,6 +377,11 @@ class GenLightmapClass
 
     rayTraceCollision(vx,vy,vz,vctX,vctY,vctZ,trigCache)
     {
+        let perpVectorX,perpVectorY,perpVectorZ;
+        let det,invDet,u,v;
+        let lineToTrigPointVectorX,lineToTrigPointVectorY,lineToTrigPointVectorZ;
+        let lineToTrigPerpVectorX,lineToTrigPerpVectorY,lineToTrigPerpVectorZ;
+        
             // we pass in a single vertex (t0x,t0y,t0z) and
             // these pre-calculated items:
             // v0 = vertex of triangle
@@ -372,11 +392,11 @@ class GenLightmapClass
             // perpVector is cross(vector,v2)
             // det is dot(v1,perpVector)
 
-        var perpVectorX=(vctY*trigCache.v20.z)-(vctZ*trigCache.v20.y);
-        var perpVectorY=(vctZ*trigCache.v20.x)-(vctX*trigCache.v20.z);
-        var perpVectorZ=(vctX*trigCache.v20.y)-(vctY*trigCache.v20.x);
+        perpVectorX=(vctY*trigCache.v20.z)-(vctZ*trigCache.v20.y);
+        perpVectorY=(vctZ*trigCache.v20.x)-(vctX*trigCache.v20.z);
+        perpVectorZ=(vctX*trigCache.v20.y)-(vctY*trigCache.v20.x);
 
-        var det=(trigCache.v10.x*perpVectorX)+(trigCache.v10.y*perpVectorY)+(trigCache.v10.z*perpVectorZ);
+        det=(trigCache.v10.x*perpVectorX)+(trigCache.v10.y*perpVectorY)+(trigCache.v10.z*perpVectorZ);
 
             // is line on the same plane as triangle?
 
@@ -384,28 +404,28 @@ class GenLightmapClass
 
             // get the inverse determinate
 
-        var invDet=1.0/det;
+        invDet=1.0/det;
 
             // calculate triangle U and test
             // lineToTrigPointVector is vector from vertex to triangle point 0
             // u is invDet * dot(lineToTrigPointVector,perpVector)
 
-        var lineToTrigPointVectorX=vx-trigCache.v0.x;
-        var lineToTrigPointVectorY=vy-trigCache.v0.y;
-        var lineToTrigPointVectorZ=vz-trigCache.v0.z;
+        lineToTrigPointVectorX=vx-trigCache.v0.x;
+        lineToTrigPointVectorY=vy-trigCache.v0.y;
+        lineToTrigPointVectorZ=vz-trigCache.v0.z;
 
-        var u=invDet*((lineToTrigPointVectorX*perpVectorX)+(lineToTrigPointVectorY*perpVectorY)+(lineToTrigPointVectorZ*perpVectorZ));
+        u=invDet*((lineToTrigPointVectorX*perpVectorX)+(lineToTrigPointVectorY*perpVectorY)+(lineToTrigPointVectorZ*perpVectorZ));
         if ((u<0.0) || (u>1.0)) return(false);
 
             // calculate triangle V and test
             // lineToTrigPerpVector is cross(lineToTrigPointVector,v1)
             // v is invDet * dot(vector,lineToTrigPerpVector)
 
-        var lineToTrigPerpVectorX=(lineToTrigPointVectorY*trigCache.v10.z)-(lineToTrigPointVectorZ*trigCache.v10.y);
-        var lineToTrigPerpVectorY=(lineToTrigPointVectorZ*trigCache.v10.x)-(lineToTrigPointVectorX*trigCache.v10.z);
-        var lineToTrigPerpVectorZ=(lineToTrigPointVectorX*trigCache.v10.y)-(lineToTrigPointVectorY*trigCache.v10.x);
+        lineToTrigPerpVectorX=(lineToTrigPointVectorY*trigCache.v10.z)-(lineToTrigPointVectorZ*trigCache.v10.y);
+        lineToTrigPerpVectorY=(lineToTrigPointVectorZ*trigCache.v10.x)-(lineToTrigPointVectorX*trigCache.v10.z);
+        lineToTrigPerpVectorZ=(lineToTrigPointVectorX*trigCache.v10.y)-(lineToTrigPointVectorY*trigCache.v10.x);
 
-        var v=invDet*((vctX*lineToTrigPerpVectorX)+(vctY*lineToTrigPerpVectorY)+(vctZ*lineToTrigPerpVectorZ));
+        v=invDet*((vctX*lineToTrigPerpVectorX)+(vctY*lineToTrigPerpVectorY)+(vctZ*lineToTrigPerpVectorZ));
         if ((v<0.0) || ((u+v)>1.0)) return(false);
 
             // t is the point on the line, from the
@@ -415,18 +435,18 @@ class GenLightmapClass
             // hits, we add in an extra 0.01 slop so polygons that are
             // touching each other don't have edges grayed in
 
-        var t=invDet*((trigCache.v20.x*lineToTrigPerpVectorX)+(trigCache.v20.y*lineToTrigPerpVectorY)+(trigCache.v20.z*lineToTrigPerpVectorZ));
+        let t=invDet*((trigCache.v20.x*lineToTrigPerpVectorX)+(trigCache.v20.y*lineToTrigPerpVectorY)+(trigCache.v20.z*lineToTrigPerpVectorZ));
         return((t>0.01)&&(t<1.0));
     }
 
     rayTraceVertex(lightList,vx,vy,vz,col)
     {
-        var n,nLight,lightIdx,trigCount;
-        var light;
-        var k,p,hit,mesh,nMesh;
-        var trigRayTraceCache;
-        var lightVectorX,lightVectorY,lightVectorZ;
-        var dist,att;
+        let n,nLight,lightIdx,trigCount;
+        let light;
+        let k,p,hit,mesh,nMesh;
+        let trigRayTraceCache;
+        let lightVectorX,lightVectorY,lightVectorZ;
+        let dist,att;
         
             // start at black
             
@@ -497,7 +517,7 @@ class GenLightmapClass
                     // skip doors, lifts, and lights as
                     // they either move or project light
                     
-                if ((mesh.flag===MESH_FLAG_DOOR) || (mesh.flag===MESH_FLAG_LIFT) || (mesh.flag===MESH_FLAG_LIGHT)) continue;
+                if ((mesh.flag===map.MESH_FLAG_DOOR) || (mesh.flag===map.MESH_FLAG_LIFT) || (mesh.flag===map.MESH_FLAG_LIGHT)) continue;
 
                     // do all the trigs
                     
@@ -537,12 +557,12 @@ class GenLightmapClass
         
     renderColor(pixelData,r,g,b,lft,top)
     {
-        var x,y,idx;
-        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
-        var bot=top+LIGHTMAP_CHUNK_SIZE;
+        let x,y,idx;
+        let rgt=lft+this.LIGHTMAP_CHUNK_SIZE;
+        let bot=top+this.LIGHTMAP_CHUNK_SIZE;
         
         for (y=top;y!==bot;y++) {
-            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
+            idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+lft)*4;
             for (x=lft;x!==rgt;x++) {
                 pixelData[idx++]=r;
                 pixelData[idx++]=g;
@@ -554,12 +574,12 @@ class GenLightmapClass
     
     clearChunk(pixelData,lft,top)
     {
-        var x,y,idx;
-        var rgt=lft+LIGHTMAP_CHUNK_SIZE;
-        var bot=top+LIGHTMAP_CHUNK_SIZE;
+        let x,y,idx;
+        let rgt=lft+this.LIGHTMAP_CHUNK_SIZE;
+        let bot=top+this.LIGHTMAP_CHUNK_SIZE;
         
         for (y=top;y!==bot;y++) {
-            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lft)*4;
+            idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+lft)*4;
             for (x=lft;x!==rgt;x++) {
                 pixelData[idx++]=0;
                 pixelData[idx++]=0;
@@ -575,12 +595,12 @@ class GenLightmapClass
 
     renderTriangle(lightBitmap,meshIdx,v0,v1,v2,lft,top)
     {
-        var n,x,y,lx,rx,ty,by,idx;
-        var xFactor,yFactor;
-        var vx,vy,vz;
-        var blackCheck;
+        let n,x,y,lx,rx,ty,by,idx;
+        let xFactor,yFactor;
+        let vx,vy,vz;
+        let blackCheck;
         
-        var pixelData=lightBitmap.pixelData;
+        let pixelData=lightBitmap.pixelData;
         
             // create a list of possible lights
             // for this triangle based on the compiled
@@ -588,12 +608,12 @@ class GenLightmapClass
             // determine if the triangle is facing away
             // from the light
             
-        var mesh=map.meshes[meshIdx];
-        var nLight=mesh.lightIntersectList.length;
+        let mesh=map.meshes[meshIdx];
+        let nLight=mesh.lightIntersectList.length;
         
-        var light,lightIdx;
+        let light,lightIdx;
         
-        var lightList=[];
+        let lightList=[];
 
         for (n=0;n!==nLight;n++) {
             lightIdx=mesh.lightIntersectList[n];
@@ -630,19 +650,19 @@ class GenLightmapClass
             // render the triangle by scan
             // lines from top to bottom
 
-        ty=top+LIGHTMAP_RENDER_MARGIN;
-        by=(top+LIGHTMAP_CHUNK_SIZE)-LIGHTMAP_RENDER_MARGIN;
+        ty=top+this.LIGHTMAP_RENDER_MARGIN;
+        by=(top+this.LIGHTMAP_CHUNK_SIZE)-this.LIGHTMAP_RENDER_MARGIN;
         
-        lx=lft+LIGHTMAP_RENDER_MARGIN;
+        lx=lft+this.LIGHTMAP_RENDER_MARGIN;
         
         blackCheck=0;
-
+        
         for (y=ty;y!==by;y++) {
             
                 // get the 2D x line
                 
             yFactor=(y-ty)/(by-ty);
-            rx=lx+Math.trunc((LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN)*(1.0-yFactor));
+            rx=lx+Math.trunc((this.LIGHTMAP_CHUNK_SIZE-this.LIGHTMAP_RENDER_MARGIN)*(1.0-yFactor));
             
                 // get the 3D x line
                 
@@ -656,7 +676,7 @@ class GenLightmapClass
 
                 // get the bitmap data index
 
-            idx=((y*LIGHTMAP_TEXTURE_SIZE)+lx)*4;
+            idx=((y*this.LIGHTMAP_TEXTURE_SIZE)+lx)*4;
             
                 // render the scan line
 
@@ -707,20 +727,21 @@ class GenLightmapClass
 
     writePolyToChunk(lightBitmap,meshIdx,trigIdx,lft,top)
     {
-        var mesh=map.meshes[meshIdx];
+        let hitLight;
+        let mesh=map.meshes[meshIdx];
         
             // get the vertexes for the triangle
             // and one normal
 
-        var tIdx=trigIdx*3;
+        let tIdx=trigIdx*3;
         
-        var v0=mesh.vertexList[mesh.indexes[tIdx]];
-        var v1=mesh.vertexList[mesh.indexes[tIdx+1]];
-        var v2=mesh.vertexList[mesh.indexes[tIdx+2]];
+        let v0=mesh.vertexList[mesh.indexes[tIdx]];
+        let v1=mesh.vertexList[mesh.indexes[tIdx+1]];
+        let v2=mesh.vertexList[mesh.indexes[tIdx+2]];
         
             // lights are always highlighted
 
-        if (mesh.flag===MESH_FLAG_LIGHT) {
+        if (mesh.flag===map.MESH_FLAG_LIGHT) {
             v0.lightmapUV.setFromPoint(this.whiteChunkUV);
             v1.lightmapUV.setFromPoint(this.whiteChunkUV);
             v2.lightmapUV.setFromPoint(this.whiteChunkUV);
@@ -730,7 +751,7 @@ class GenLightmapClass
             // ray trace the 3D triangle onto
             // a 2D triangle in the chunk within the render margin
             
-        var hitLight=this.renderTriangle(lightBitmap,meshIdx,v0,v1,v2,lft,top);
+        hitLight=this.renderTriangle(lightBitmap,meshIdx,v0,v1,v2,lft,top);
 
             // if it didn't hit any lights, UV
             // to the 0 black chunk
@@ -745,14 +766,14 @@ class GenLightmapClass
             // add the UV
             // pt0-pt2 are already moved within the margin
 
-        v0.lightmapUV.x=(lft+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
-        v0.lightmapUV.y=(top+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
+        v0.lightmapUV.x=(lft+this.LIGHTMAP_RENDER_MARGIN)/this.LIGHTMAP_TEXTURE_SIZE;
+        v0.lightmapUV.y=(top+this.LIGHTMAP_RENDER_MARGIN)/this.LIGHTMAP_TEXTURE_SIZE;
 
-        v1.lightmapUV.x=(lft+(LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN))/LIGHTMAP_TEXTURE_SIZE;
-        v1.lightmapUV.y=(top+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
+        v1.lightmapUV.x=(lft+(this.LIGHTMAP_CHUNK_SIZE-this.LIGHTMAP_RENDER_MARGIN))/this.LIGHTMAP_TEXTURE_SIZE;
+        v1.lightmapUV.y=(top+this.LIGHTMAP_RENDER_MARGIN)/this.LIGHTMAP_TEXTURE_SIZE;
 
-        v2.lightmapUV.x=(lft+LIGHTMAP_RENDER_MARGIN)/LIGHTMAP_TEXTURE_SIZE;
-        v2.lightmapUV.y=(top+(LIGHTMAP_CHUNK_SIZE-LIGHTMAP_RENDER_MARGIN))/LIGHTMAP_TEXTURE_SIZE;
+        v2.lightmapUV.x=(lft+this.LIGHTMAP_RENDER_MARGIN)/this.LIGHTMAP_TEXTURE_SIZE;
+        v2.lightmapUV.y=(top+(this.LIGHTMAP_CHUNK_SIZE-this.LIGHTMAP_RENDER_MARGIN))/this.LIGHTMAP_TEXTURE_SIZE;
         
         return(true);
     }
@@ -763,9 +784,9 @@ class GenLightmapClass
 
     createLightmapForMesh(meshIdx)
     {
-        var n,lightmapIdx,chunkIdx,nTrig;
-        var lft,top;
-        var mesh;
+        let n,lightmapIdx,chunkIdx,nTrig;
+        let lft,top;
+        let mesh,lightBitmap;
         
             // run the status bar
 
@@ -778,7 +799,7 @@ class GenLightmapClass
             
         if (!this.generateLightmap) {            
             lightmapIdx=0;
-            if (this.lightmapList.length===0) this.lightmapList[0]=new GenLightmapBitmapClass();     // have no lightmaps yet, so make one
+            if (this.lightmapList.length===0) this.lightmapList[0]=new GenLightmapBitmapClass(this);     // have no lightmaps yet, so make one
         }
         
             // else we need to pack triangles
@@ -793,7 +814,7 @@ class GenLightmapClass
             lightmapIdx=-1;
 
             for (n=0;n!==this.lightmapList.length;n++) {
-                if ((LIGHTMAP_CHUNK_PER_TEXTURE-this.lightmapList[n].chunkIdx)>nTrig) {
+                if ((this.LIGHTMAP_CHUNK_PER_TEXTURE-this.lightmapList[n].chunkIdx)>nTrig) {
                     lightmapIdx=n;
                     break;
                 }
@@ -803,13 +824,13 @@ class GenLightmapClass
 
             if (lightmapIdx===-1) {
                 lightmapIdx=this.lightmapList.length;
-                this.lightmapList[lightmapIdx]=new GenLightmapBitmapClass();
+                this.lightmapList[lightmapIdx]=new GenLightmapBitmapClass(this);
             }
         }
         
             // starting chunk and context
         
-        var lightBitmap=this.lightmapList[lightmapIdx];
+        lightBitmap=this.lightmapList[lightmapIdx];
         chunkIdx=lightBitmap.chunkIdx;
         
             // if no light map, then just create
@@ -833,8 +854,8 @@ class GenLightmapClass
                 // all-black chunk 0
                 
             for (n=0;n!==nTrig;n++) {
-                lft=(chunkIdx%LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
-                top=Math.trunc(chunkIdx/LIGHTMAP_CHUNK_SPLIT)*LIGHTMAP_CHUNK_SIZE;
+                lft=(chunkIdx%this.LIGHTMAP_CHUNK_SPLIT)*this.LIGHTMAP_CHUNK_SIZE;
+                top=Math.trunc(chunkIdx/this.LIGHTMAP_CHUNK_SPLIT)*this.LIGHTMAP_CHUNK_SIZE;
 
                 if (this.writePolyToChunk(lightBitmap,meshIdx,n,lft,top)) chunkIdx++;
             }
@@ -875,9 +896,9 @@ class GenLightmapClass
 
     create()
     {
-        var n;
-        var nMesh=map.meshes.length;
-
+        let n;
+        let nMesh=map.meshes.length;
+        
             // run through the meshes and build
             // cache to speed up ray tracing
 
@@ -902,7 +923,8 @@ class GenLightmapClass
 
     createFinish()
     {
-        var n;
+        let n;
+        let mesh,nMesh;
         
             // put all the pixel data back in
             // the canvases
@@ -923,8 +945,7 @@ class GenLightmapClass
             // and set the light map on the meshes
             // and clear any caches
 
-        var mesh;
-        var nMesh=map.meshes.length;
+        nMesh=map.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshes[n];
@@ -934,7 +955,7 @@ class GenLightmapClass
         
             // debugging
 /*
-        var y=2000;
+        let y=2000;
         for (n=0;n!==this.lightmapList.length;n++) {
             debug.displayCanvasData(this.lightmapList[n].canvas,10,y,1024,1024);
             y+=1034;

@@ -1,3 +1,5 @@
+/* global map, MeshUtilityClass, config */
+
 "use strict";
 
 //
@@ -110,7 +112,7 @@ class GenRoomHallwayClass
         idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zDoorBound);
         idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zDoorBound);
         this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zDoorBound);
-        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,MESH_FLAG_DOOR);
+        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,map.MESH_FLAG_DOOR);
         
             // and the movement
         
@@ -149,7 +151,7 @@ class GenRoomHallwayClass
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.min+thickSize));
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.max-thickSize));
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -162,7 +164,7 @@ class GenRoomHallwayClass
         zThickBound=new wsBound((zBound.max-thickSize),zBound.max);
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_ROOM_WALL);
 
            // the ceiling and floor
 
@@ -171,12 +173,12 @@ class GenRoomHallwayClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingX(idx,vertexList,xBound,yBound.min,zHallwayBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingX(idx,vertexList,xBound,yBound.max,zHallwayBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_FLOOR);
         
             // the door
             
@@ -203,7 +205,7 @@ class GenRoomHallwayClass
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z-thickSize));
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z+thickSize));
         this.createSingleCeilingZ(idx,vertexList,xBound,yBound.max,zDoorBound);
-        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,MESH_FLAG_DOOR);
+        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,map.MESH_FLAG_DOOR);
         
             // and the movement
         
@@ -242,7 +244,7 @@ class GenRoomHallwayClass
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
         idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBound,zBound);
         idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBound,zBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -255,7 +257,7 @@ class GenRoomHallwayClass
         xThickBound=new wsBound((xBound.max-thickSize),xBound.max);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_ROOM_WALL);
 
            // the ceiling
            
@@ -264,12 +266,12 @@ class GenRoomHallwayClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingZ(idx,vertexList,xHallwayBound,yBound.min,zBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingZ(idx,vertexList,xHallwayBound,yBound.max,zBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_FLOOR);
+        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_FLOOR);
         
             // the door
         

@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -135,7 +137,7 @@ class MapMeshClass
 
     close()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -154,7 +156,8 @@ class MapMeshClass
 
     combineMesh(mesh)
     {
-        var n;
+        let n;
+        let iAdd,indexes2;
         
             // add the vertexes
 
@@ -164,10 +167,10 @@ class MapMeshClass
 
             // indexes need to be moved
 
-        var indexes2=new Uint16Array(this.indexes.length+mesh.indexes.length);
+        indexes2=new Uint16Array(this.indexes.length+mesh.indexes.length);
         indexes2.set(this.indexes,0);
 
-        var iAdd=this.indexes.length;
+        iAdd=this.indexes.length;
 
         for (n=0;n!==mesh.indexes.length;n++) {
             indexes2[n+iAdd]=mesh.indexes[n]+iAdd;
@@ -245,8 +248,8 @@ class MapMeshClass
 
     buildSharedTriangleCache()
     {
-        var n,k,vIdx,v0,v1,v2;
-        var cacheItem;
+        let n,v0,v1,v2;
+        let cacheItem;
         
         this.trigSharedTrigCache=[];
         
@@ -295,16 +298,18 @@ class MapMeshClass
 
     removeTriangle(trigIdx)
     {
+        let n,idx,cutIdx;
+        let newIndexes;
+        
         if (this.indexCount===0) return;
         if ((trigIdx<0) || (trigIdx>=this.trigCount)) return;
 
             // rebuild the array
 
-        var newIndexes=new Uint16Array(this.indexCount-3);
+        newIndexes=new Uint16Array(this.indexCount-3);
 
-        var n;
-        var idx=0;
-        var cutIdx=trigIdx*3;
+        idx=0;
+        cutIdx=trigIdx*3;
 
         for (n=0;n<cutIdx;n++) {
             newIndexes[idx++]=this.indexes[n];
@@ -328,14 +333,13 @@ class MapMeshClass
 
     setupBounds()
     {
-        var v=this.vertexList[0];
+        let n;
+        let v=this.vertexList[0];
         
         this.center.setFromValues(v.position.x,v.position.y,v.position.z);
         this.xBound.setFromValues(v.position.x,v.position.x);
         this.yBound.setFromValues(v.position.y,v.position.y);
         this.zBound.setFromValues(v.position.z,v.position.z);
-
-        var n;
 
         for (n=1;n<this.vertexCount;n++) {
             v=this.vertexList[n];
@@ -358,8 +362,8 @@ class MapMeshClass
 
     buildTrigRayTraceCache()
     {
-        var n,tIdx;
-        var vp0,vp1,vp2,v10,v20;
+        let n,tIdx;
+        let vp0,vp1,vp2,v10,v20;
 
             // this builds a specialized cache to
             // speed up ray tracing.  For each triangle
@@ -394,7 +398,7 @@ class MapMeshClass
 
     buildCollisionGeometryLine(v0,v1,v2)
     {
-        var n,nLine,line;
+        let n,nLine,line;
         
             // create the line
 
@@ -420,8 +424,8 @@ class MapMeshClass
     
     buildCollisionGeometryRect(v0,v1,v2,rectList)
     {
-        var n,nRect;
-        var lft,top,rgt,bot;
+        let n,nRect,cRect;
+        let lft,top,rgt,bot;
         
             // get 2D box
             
@@ -440,7 +444,7 @@ class MapMeshClass
         
             // build the rect
         
-        var cRect=new wsCollisionRect(lft,top,rgt,bot,v0.position.y);
+        cRect=new wsCollisionRect(lft,top,rgt,bot,v0.position.y);
         
             // is rect already in list?
             // usually, two triangles make
@@ -457,9 +461,9 @@ class MapMeshClass
     
     buildCollisionGeometry()
     {
-        var n,ny;
-        var tIdx;
-        var v0,v1,v2;
+        let n,ny;
+        let tIdx;
+        let v0,v1,v2;
         
             // some meshes have simple collision
             // geometery -- these are assumed to be
@@ -523,8 +527,8 @@ class MapMeshClass
         
     move(movePnt)
     {
-        var n;
-        var nCollide;
+        let n;
+        let nCollide;
         
             // move the vertexes
             
@@ -571,21 +575,22 @@ class MapMeshClass
 
     setupBuffers()
     {
+        let n,v;
+        let vIdx,uIdx,nIdx,tIdx;
+        let gl=view.gl;
+        
             // build the default data
             // from the vertex list
-        
-        var n;
         
         this.drawVertices=new Float32Array(this.vertexCount*3);
         this.drawNormals=new Float32Array(this.vertexCount*3);
         this.drawTangents=new Float32Array(this.vertexCount*3);
         this.drawPackedUVs=new Float32Array(this.vertexCount*4);
         
-        var vIdx=0;
-        var uIdx=0;
-        var nIdx=0;
-        var tIdx=0;
-        var v;
+        vIdx=0;
+        uIdx=0;
+        nIdx=0;
+        tIdx=0;
         
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
@@ -612,8 +617,6 @@ class MapMeshClass
             // expects buffers to already be Float32Array
             // or Uint16Array
 
-        var gl=view.gl;
-
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.STATIC_DRAW);
@@ -637,7 +640,7 @@ class MapMeshClass
 
     bindBuffers(mapMeshShader)
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.vertexAttribPointer(mapMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
@@ -666,8 +669,8 @@ class MapMeshClass
         
     updateBuffers()
     {
-        var n,v,vIdx;
-        var gl=view.gl;
+        let n,v,vIdx;
+        let gl=view.gl;
         
         if (!this.requiresBufferUpdate) return;
         
@@ -699,8 +702,8 @@ class MapMeshClass
         
     buildNonCulledTriangleIndexes()
     {
-        var n,v,idx;
-        var trigToEyeVector=new wsPoint(0,0,0);
+        let n,v,idx;
+        let trigToEyeVector=new wsPoint(0,0,0);
 
             // if it's the first time, we'll need
             // to create the index array
@@ -742,7 +745,7 @@ class MapMeshClass
 
     draw()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         

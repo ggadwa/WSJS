@@ -1,3 +1,5 @@
+/* global MeshUtilityClass, map, genRandom, config */
+
 "use strict";
 
 //
@@ -68,7 +70,7 @@ class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
@@ -94,7 +96,7 @@ class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_CEILING));
 
             // floor
         
@@ -120,7 +122,7 @@ class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_FLOOR));
     }
 
         // closet mainline
@@ -210,7 +212,7 @@ class GenRoomClosetClass
                 // build the blocks
             
             for (k=0;k!==closetLen;k++) {
-                if (map.boxBoundCollision(xClosetBound,null,zClosetBound,MESH_FLAG_ROOM_WALL)!==-1) break;
+                if (map.boxBoundCollision(xClosetBound,null,zClosetBound,map.MESH_FLAG_ROOM_WALL)!==-1) break;
 
                 this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
                 map.addOverlayCloset(xClosetBound,zClosetBound);

@@ -1,4 +1,4 @@
-/* global map, config, MeshPrimitivesClass, MESH_FLAG_LIFT, genRandom, MESH_FLAG_PLATFORM */
+/* global map, config, MeshPrimitivesClass, genRandom */
 
 "use strict";
 
@@ -27,7 +27,7 @@ class GenRoomPlatformClass
         var yLiftBound=new wsBound((room.yBound.min+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)),room.yBound.max);
         var zLiftBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
 
-        meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,false,false,MESH_FLAG_LIFT));
+        meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_LIFT));
         
             // random wait
             
@@ -87,7 +87,7 @@ class GenRoomPlatformClass
         var yPlatformBound=new wsBound(y,(y+config.ROOM_FLOOR_DEPTH));
         var zPlatformBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
         
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,MESH_FLAG_PLATFORM));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             // a cleared spot is a spot that's open

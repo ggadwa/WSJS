@@ -1,4 +1,4 @@
-/* global entityList, map, MESH_FLAG_ROOM_CEILING, MESH_FLAG_ROOM_WALL */
+/* global entityList, map */
 
 "use strict";
 
@@ -315,8 +315,8 @@ class CollisionClass
             
                 // skip walls or ceilings
                 
-            if (mesh.flag===MESH_FLAG_ROOM_CEILING) continue;
-            if (mesh.flag===MESH_FLAG_ROOM_WALL) continue;
+            if (mesh.flag===map.MESH_FLAG_ROOM_CEILING) continue;
+            if (mesh.flag===map.MESH_FLAG_ROOM_WALL) continue;
 
                 // skip any mesh we don't collide with
 
@@ -367,7 +367,7 @@ class CollisionClass
             
                 // skip walls
                 
-            if (mesh.flag===MESH_FLAG_ROOM_WALL) continue;
+            if (mesh.flag===map.MESH_FLAG_ROOM_WALL) continue;
 
                 // skip any mesh we don't collide with
 

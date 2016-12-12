@@ -18,8 +18,8 @@ class MovementListClass
     
     run()
     {
-        var n;
-        var nMovement=this.movements.length;
+        let n;
+        let nMovement=this.movements.length;
         
         for (n=0;n!==nMovement;n++) {
             this.movements[n].run();

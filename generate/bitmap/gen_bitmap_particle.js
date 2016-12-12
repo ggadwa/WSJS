@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -26,14 +28,14 @@ class GenBitmapParticleClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high;
-        var bitmapCanvas,bitmapCTX;
+        let wid,high;
+        let bitmapCanvas,bitmapCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_PARTICLE_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_PARTICLE_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_PARTICLE_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_PARTICLE_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

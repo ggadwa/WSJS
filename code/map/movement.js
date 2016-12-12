@@ -1,3 +1,5 @@
+/* global map, entityList, view */
+
 "use strict";
 
 //
@@ -47,8 +49,8 @@ class MovementClass
     
     run()
     {
-        var mesh,isOpen,prevIdx;
-        var f,move;
+        let mesh,isOpen,prevIdx;
+        let f,move;
         
             // skip if no moves
             
@@ -67,11 +69,11 @@ class MovementClass
                 isOpen=(mesh.center.distance(entityList.getPlayer().position)<this.approachDistance);
                 
                 if (isOpen) {
-                    if (this.currentMoveIdx==1) return;
+                    if (this.currentMoveIdx===1) return;
                     this.currentMoveIdx=1;
                 }
                 else {
-                    if (this.currentMoveIdx==0) return;
+                    if (this.currentMoveIdx===0) return;
                     this.currentMoveIdx=0;
                 }
                 

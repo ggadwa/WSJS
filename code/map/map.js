@@ -10,7 +10,7 @@ class MapClass
 {
     constructor()
     {
-        var n;
+        let n;
         
         this.mapMeshShader=new MapMeshShaderClass();
         this.mapLiquidShader=new MapLiquidShaderClass();        // shared
@@ -20,6 +20,18 @@ class MapClass
         this.lightmaps=[];
         this.rooms=[];
         this.liquids=[];
+        
+        this.MESH_FLAG_NONE=0;
+        this.MESH_FLAG_ROOM_WALL=1;
+        this.MESH_FLAG_ROOM_FLOOR=2;
+        this.MESH_FLAG_ROOM_CEILING=3;
+        this.MESH_FLAG_PLATFORM=4;
+        this.MESH_FLAG_LEDGE=5;
+        this.MESH_FLAG_STAIR=6;
+        this.MESH_FLAG_DOOR=7;
+        this.MESH_FLAG_LIFT=8;
+        this.MESH_FLAG_LIGHT=9;
+        this.MESH_FLAG_DECORATION=10;
         
         this.TEXTURE_COUNT=12;
         
@@ -87,7 +99,7 @@ class MapClass
     
     releaseTextures()
     {
-        var n;
+        let n;
         
         for (n=0;n!==this.TEXTURE_COUNT;n++) {
             if (this.textureBitmapList[n]!==null) {
@@ -96,7 +108,7 @@ class MapClass
             }
         }
         
-        for (n=0;n!==lightmapBitmapList.length;n++) {
+        for (n=0;n!==this.lightmapBitmapList.length;n++) {
             this.lightmapBitmapList[n].close();
         }
         
@@ -167,10 +179,10 @@ class MapClass
 
     clear()
     {
-        var n;
-        var nMesh=this.meshes.length;
-        var nLiquid=this.liquids.length;
-        var nLightmap=this.lightmaps.length;
+        let n;
+        let nMesh=this.meshes.length;
+        let nLiquid=this.liquids.length;
+        let nLightmap=this.lightmaps.length;
 
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].close();
@@ -238,8 +250,8 @@ class MapClass
 
     boxBoundCollision(xBound,yBound,zBound,onlyFlag)
     {
-        var n;
-        var nMesh=this.meshes.length;
+        let n;
+        let nMesh=this.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
             if (onlyFlag!==null) {
@@ -253,8 +265,8 @@ class MapClass
 
     boxMeshCollision(checkMesh,onlyFlag)
     {
-        var n;
-        var nMesh=this.meshes.length;
+        let n;
+        let nMesh=this.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
             if (onlyFlag!==null) {
@@ -272,12 +284,12 @@ class MapClass
 
     countMeshByFlag(onlyFlag)
     {
-        var n;
-        var nMesh=this.meshes.length;
+        let n,count;
+        let nMesh=this.meshes.length;
 
         if (onlyFlag===null) return(nMesh);
 
-        var count=0;
+        count=0;
 
         for (n=0;n!==nMesh;n++) {
             if (this.meshes[n].flag===onlyFlag) count++;
@@ -292,8 +304,8 @@ class MapClass
 
     pointInLight(pt)
     {
-        var n;
-        var nLight=this.lights.length;
+        let n;
+        let nLight=this.lights.length;
 
         for (n=0;n!==nLight;n++) {
             if (this.lights[n].position.distance(pt)<this.lights[n].intensity) return(true);
@@ -315,10 +327,10 @@ class MapClass
 
     buildLightMeshIntersectLists()
     {
-        var n,k,i,nIntersect,light,mesh;
-        var meshIndexes,lightIndexes;
-        var nLight=this.lights.length;
-        var nMesh=this.meshes.length;
+        let n,k,i,nIntersect,light,mesh;
+        let meshIndexes,lightIndexes;
+        let nLight=this.lights.length;
+        let nMesh=this.meshes.length;
 
             // build the meshes intersecting lights
             // list
@@ -385,9 +397,9 @@ class MapClass
 
     createViewLightsFromMapLights()
     {
-        var n,k,nLight,idx,startIdx;
-        var x,y,z;
-        var light;
+        let n,k,nLight,idx,startIdx;
+        let x,y,z;
+        let light;
 
             // get the distance from the camera
             // to all the lights
@@ -499,8 +511,8 @@ class MapClass
         
     buildCollisionGeometry()
     {
-        var n;
-        var nMesh=this.meshes.length;
+        let n;
+        let nMesh=this.meshes.length;
 
             // setup all the gl
             // buffers and indexes
@@ -516,9 +528,9 @@ class MapClass
         
     findAndBlockSpawnPosition(groundFloorOnly)
     {
-        var roomIdx;
-        var pos;
-        var findTry=0;
+        let roomIdx;
+        let pos;
+        let findTry=0;
         
         while (findTry<25) {
 
@@ -596,9 +608,9 @@ class MapClass
 
     setupBuffers()
     {
-        var n;
-        var nMesh=this.meshes.length;
-        var nLiquid=this.liquids.length;
+        let n;
+        let nMesh=this.meshes.length;
+        let nLiquid=this.liquids.length;
 
             // setup all the mesh and
             // liquid gl buffers
@@ -628,9 +640,9 @@ class MapClass
 
     drawMesh()
     {
-        var n,mesh;
-        var nMesh=this.meshes.length;
-        var currentBitmap,currentLightmap;
+        let n,mesh;
+        let nMesh=this.meshes.length;
+        let currentBitmap,currentLightmap;
 
             // setup map drawing
 
@@ -698,7 +710,7 @@ class MapClass
 
     drawLiquidStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
@@ -708,7 +720,7 @@ class MapClass
 
     drawLiquidEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         this.mapLiquidShader.drawEnd();
         
@@ -717,9 +729,9 @@ class MapClass
 
     drawLiquid()
     {
-        var n,liquid;
-        var nLiquid=this.liquids.length;
-        var currentBitmap;
+        let n,liquid;
+        let nLiquid=this.liquids.length;
+        let currentBitmap;
 
             // setup liquid drawing
 
@@ -756,4 +768,4 @@ class MapClass
 // the global map object
 //
 
-var map=new MapClass();
+let map=new MapClass();

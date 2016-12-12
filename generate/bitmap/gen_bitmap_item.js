@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -26,10 +28,10 @@ class GenBitmapItemClass extends GenBitmapClass
 
     generateMetalWires(bitmapCTX,normalCTX,wid,high,grid,color)
     {
-        var n,k,x,y,split;
-        var lineCount=genRandom.randomInt(1,5);
+        let n,k,x,y,split;
+        let lineCount=genRandom.randomInt(1,5);
         
-        var lineWidth=Math.trunc(wid*0.05);
+        let lineWidth=Math.trunc(wid*0.05);
         if (lineWidth<5) lineWidth=5;
         
         for (n=0;n!==lineCount;n++) {
@@ -60,10 +62,10 @@ class GenBitmapItemClass extends GenBitmapClass
     
     generateMetalButtons(bitmapCTX,normalCTX,wid,high,grid)
     {
-        var n,k,x,y,color;
-        var buttonWid=Math.trunc(wid/16);
-        var buttonHigh=Math.trunc(high/16);
-        var buttonCount=genRandom.randomInt(3,5);
+        let n,k,x,y,color;
+        let buttonWid=Math.trunc(wid/16);
+        let buttonHigh=Math.trunc(high/16);
+        let buttonCount=genRandom.randomInt(3,5);
         
         for (n=0;n!==buttonCount;n++) {
             
@@ -84,16 +86,16 @@ class GenBitmapItemClass extends GenBitmapClass
         }
     }
     
-    generateMetalScrews(bitmapCTX,normalCTX,wid,high,grid,color)
+    generateMetalScrews(bitmapCTX,normalCTX,wid,high,grid,metalColor)
     {
-        var n,k,x,y,color;
-        var screwWid=Math.trunc(wid/16);
-        var screwHigh=Math.trunc(high/16);
-        var screwCount=genRandom.randomInt(2,5);
+        let n,k,x,y,color;
+        let screwWid=Math.trunc(wid/16);
+        let screwHigh=Math.trunc(high/16);
+        let screwCount=genRandom.randomInt(2,5);
         
-        var screwColor=this.boostColor(color,0.05);
-        var borderColor=new wsColor(0,0,0);
-        var screwFlatInnerSize=Math.trunc(screwWid*0.4);
+        let screwColor=this.boostColor(metalColor,0.05);
+        let borderColor=new wsColor(0,0,0);
+        let screwFlatInnerSize=Math.trunc(screwWid*0.4);
         
         for (n=0;n!==screwCount;n++) {
             
@@ -116,24 +118,18 @@ class GenBitmapItemClass extends GenBitmapClass
     
     generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,y,offset;
-        var dx,dy,sx,sy,ex,ey;
-        var streakWid,streakColor,darken;
-        var idx,line,lineStyle;
-        var lines=[];
+        let n,x;
+        let streakWid,streakColor,darken;
         
             // a grid to place items
             
-        var grid=new Uint8Array(16*16);
+        let grid=new Uint8Array(16*16);
 
             // some random values
 
-        var metalColor=this.getDefaultPrimaryColor();
-        var wireColor=this.getRandomColor();
-
-        var edgeSize=genRandom.randomInt(4,8);
-        
-        var streakCount=genRandom.randomInt(15,10);
+        let metalColor=this.getDefaultPrimaryColor();
+        let wireColor=this.getRandomColor();
+        let streakCount=genRandom.randomInt(15,10);
         
             // clear canvases
 
@@ -174,25 +170,25 @@ class GenBitmapItemClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high;
-        var shineFactor=1.0;
-        var bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
+        let wid,high;
+        let shineFactor=1.0;
+        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        normalCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        normalCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        specularCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        specularCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

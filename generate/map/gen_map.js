@@ -1,4 +1,4 @@
-/* global map, ROOM_DECORATION_PILLARS, ROOM_DECORATION_STORAGE, ROOM_DECORATION_MACHINES, ROOM_DECORATION_EQUIPMENT, genRandom, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_LEVEL_MAIN, config, MESH_FLAG_ROOM_WALL, ROOM_SIDE_BOTTOM, ROOM_SIDE_TOP, ROOM_LEVEL_UPPER, ROOM_LEVEL_LOWER, view, MESH_FLAG_LIGHT, MeshPrimitivesClass, ROOM_DECORATION_COUNT, ROOM_DECORATION_NONE, PROCESS_TIMEOUT_MSEC, MESH_FLAG_PLATFORM, MESH_FLAG_LEDGE, ROOM_DECORATION_WALLS */
+/* global map, ROOM_DECORATION_PILLARS, ROOM_DECORATION_STORAGE, ROOM_DECORATION_MACHINES, ROOM_DECORATION_EQUIPMENT, genRandom, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_LEVEL_MAIN, config, ROOM_SIDE_BOTTOM, ROOM_SIDE_TOP, ROOM_LEVEL_UPPER, ROOM_LEVEL_LOWER, view, MeshPrimitivesClass, ROOM_DECORATION_COUNT, ROOM_DECORATION_NONE, PROCESS_TIMEOUT_MSEC, ROOM_DECORATION_WALLS */
 
 "use strict";
 
@@ -427,7 +427,7 @@ class GenMapClass
             var xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
             var yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
             var zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-            map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getTexture(map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,MESH_FLAG_LIGHT));
+            map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getTexture(map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,map.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -655,7 +655,7 @@ class GenMapClass
 
                 }
                 
-                if (map.boxBoundCollision(xBound,null,zBound,MESH_FLAG_ROOM_WALL)===-1) break;
+                if (map.boxBoundCollision(xBound,null,zBound,map.MESH_FLAG_ROOM_WALL)===-1) break;
 
                 tryCount++;
                 if (tryCount>config.ROOM_MAX_CONNECT_TRY) return;
@@ -844,7 +844,7 @@ class GenMapClass
 
             }
 
-            if (map.boxBoundCollision(xBound,null,zBound,MESH_FLAG_ROOM_WALL)===-1) break;
+            if (map.boxBoundCollision(xBound,null,zBound,map.MESH_FLAG_ROOM_WALL)===-1) break;
 
             tryCount++;
             if (tryCount>config.ROOM_MAX_CONNECT_TRY) return;
@@ -1078,7 +1078,7 @@ class GenMapClass
             // remove all the shared trigs between rooms and
             // remove them both
             
-        this.removeSharedTrianglesChunk(MESH_FLAG_ROOM_WALL,MESH_FLAG_ROOM_WALL,true,true);
+        this.removeSharedTrianglesChunk(map.MESH_FLAG_ROOM_WALL,map.MESH_FLAG_ROOM_WALL,true,true);
         
             // finish with the callback
             
@@ -1092,8 +1092,8 @@ class GenMapClass
             // now remove any platforms or ledges that are equal
             // in another platform or ledge wall
             
-        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_PLATFORM,true,true);
-        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_LEDGE,true,true);
+        this.removeSharedTrianglesChunk(map.MESH_FLAG_PLATFORM,map.MESH_FLAG_PLATFORM,true,true);
+        this.removeSharedTrianglesChunk(map.MESH_FLAG_LEDGE,map.MESH_FLAG_LEDGE,true,true);
         
             // finish with the callback
             
@@ -1106,8 +1106,8 @@ class GenMapClass
             // and finally remove any platform or ledge triangles that
             // are enclosed by an outer wall
             
-        this.removeSharedTrianglesChunk(MESH_FLAG_PLATFORM,MESH_FLAG_ROOM_WALL,false,false);
-        this.removeSharedTrianglesChunk(MESH_FLAG_LEDGE,MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(map.MESH_FLAG_PLATFORM,map.MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(map.MESH_FLAG_LEDGE,map.MESH_FLAG_ROOM_WALL,false,false);
         
             // finish with the callback
             

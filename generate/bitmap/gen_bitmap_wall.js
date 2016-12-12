@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -33,13 +35,17 @@ class GenBitmapWallClass extends GenBitmapClass
 
     generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,rect,segments;
-        var drawBrickColor,f;
-        var lft,rgt,top,bot;
-        var sx,ex,streakWid,lineColor;
+        let n,rect,segments;
+        let drawBrickColor,f;
+        let lft,rgt,top,bot;
+        let sx,ex,streakWid,lineColor;
         
-        var edgeSize=genRandom.randomInt(3,7);
-        var paddingSize=genRandom.randomInt(2,10);
+        let edgeSize=genRandom.randomInt(3,7);
+        let paddingSize=genRandom.randomInt(2,10);
+        
+        let brickColor=this.getDefaultPrimaryColor();
+        let groutColor=this.dullColor(brickColor,0.7);
+        let dirtColor=this.darkenColor(brickColor,0.5);
         
         if (genRandom.randomPercentage(0.5)) {
             segments=this.createStackedSegments(wid,high);
@@ -47,13 +53,6 @@ class GenBitmapWallClass extends GenBitmapClass
         else {
             segments=this.createRandomSegments(wid,high);
         }
-
-            // some random values
-
-        var brickColor=this.getDefaultPrimaryColor();
-        var groutColor=this.dullColor(brickColor,0.7);
-        var edgeColor=this.darkenColor(brickColor,0.8);
-        var dirtColor=this.darkenColor(brickColor,0.5);
 
             // clear canvases
 
@@ -119,7 +118,7 @@ class GenBitmapWallClass extends GenBitmapClass
                 if (streakWid>5) {
                     sx=genRandom.randomInt(lft,((rgt-lft)-streakWid));
                     ex=sx+streakWid;
-                    this.drawStreakDirt(bitmapCTX,sx,top,ex,bot,true,2,0.6,dirtColor);
+                    this.drawStreakDirt(bitmapCTX,sx,top,ex,bot,5,2,0.6,dirtColor);
                 }
             }
             
@@ -139,20 +138,20 @@ class GenBitmapWallClass extends GenBitmapClass
 
     generateStone(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,k,rect,edgeSize;
-        var drawStoneColor,drawEdgeColor,lineColor,darken,f;
-        var x,y,x2,y2,lineCount,lineVarient,stoneWid,stoneHigh;
+        let n,k,rect,edgeSize;
+        let drawStoneColor,drawEdgeColor,lineColor,darken,f;
+        let x,y,x2,y2,lineCount,lineVarient,stoneWid,stoneHigh;
 
             // some random values
 
-        var stoneColor=this.getDefaultPrimaryColor();
-        var groutColor=this.dullColor(stoneColor,0.7);
-        var edgeColor=this.darkenColor(stoneColor,0.8);
+        let stoneColor=this.getDefaultPrimaryColor();
+        let groutColor=this.dullColor(stoneColor,0.7);
+        let edgeColor=this.darkenColor(stoneColor,0.8);
         
-        var padding=genRandom.randomInt(3,10);
+        let padding=genRandom.randomInt(3,10);
 
-        var segments=this.createRandomSegments(wid,high);
-        var darkenFactor=0.5;
+        let segments=this.createRandomSegments(wid,high);
+        let darkenFactor=0.5;
 
             // clear canvases
 
@@ -223,13 +222,13 @@ class GenBitmapWallClass extends GenBitmapClass
 
     generateBlock(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,nBlock,flip;
-        var top,bot,ySize,slopeHigh,concreteColor;
-        var sx,ex,streakWid;
+        let n,nBlock,flip;
+        let top,bot,ySize,slopeHigh;
+        let sx,ex,streakWid;
         
-        var concreteColor=this.getDefaultPrimaryColor();
-        var concreteColor2=this.darkenColor(concreteColor,0.8);
-        var dirtColor=this.darkenColor(concreteColor,0.5);
+        let concreteColor=this.getDefaultPrimaryColor();
+        let concreteColor2=this.darkenColor(concreteColor,0.8);
+        let dirtColor=this.darkenColor(concreteColor,0.5);
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
@@ -276,8 +275,8 @@ class GenBitmapWallClass extends GenBitmapClass
             sx=genRandom.randomInt(0,(wid-streakWid));
             ex=sx+streakWid;
 
-            this.drawStreakDirt(bitmapCTX,sx,top,ex,(top+slopeHigh),false,4,0.8,dirtColor);    
-            this.drawStreakDirt(bitmapCTX,sx,(top+slopeHigh),ex,(bot-slopeHigh),true,8,0.8,dirtColor);
+            this.drawStreakDirt(bitmapCTX,sx,top,ex,(top+slopeHigh),0,4,0.8,dirtColor);    
+            this.drawStreakDirt(bitmapCTX,sx,(top+slopeHigh),ex,(bot-slopeHigh),5,8,0.8,dirtColor);
 
             this.blur(bitmapCTX,0,top,wid,bot,3);
            
@@ -295,13 +294,13 @@ class GenBitmapWallClass extends GenBitmapClass
     
     generateSciFiPiecePlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor)
     {
-        var n,x,streakWid;
-        var streakColor,darken;
+        let n,x,streakWid;
+        let streakColor,darken;
         
-        var palteWid=rgt-lft;
-        var plateHigh=bot-top;
+        let palteWid=rgt-lft;
+        let plateHigh=bot-top;
         
-        var streakCount=genRandom.randomInt(15,10);
+        let streakCount=genRandom.randomInt(15,10);
         
             // the plate
             
@@ -322,13 +321,14 @@ class GenBitmapWallClass extends GenBitmapClass
     
     generateSciFiPieceScrews(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor)
     {
-        var n,x,y,xAdd,yAdd,offset,wid,high,screwCount;
+        let n,x,y,xAdd,yAdd,offset,screwCount;
+        let lineWid,lineHigh;
         
-        var screwSize=genRandom.randomInt(10,20);
-        var screenFlatInnerSize=Math.trunc(screwSize*0.4);
+        let screwSize=genRandom.randomInt(10,20);
+        let screenFlatInnerSize=Math.trunc(screwSize*0.4);
 
-        var screwColor=this.darkenColor(metalColor,0.9);
-        var borderColor=new wsColor(0.0,0.0,0.0);
+        let screwColor=this.darkenColor(metalColor,0.9);
+        let borderColor=new wsColor(0.0,0.0,0.0);
         
             // the plate
             
@@ -338,18 +338,18 @@ class GenBitmapWallClass extends GenBitmapClass
             
         if (genRandom.randomPercentage(0.5)) {
             
-            wid=rgt-lft;
-            high=bot-top;
+            lineWid=rgt-lft;
+            lineHigh=bot-top;
             
             screwCount=genRandom.randomInt(2,4);
             
-            if (wid>high) {
+            if (lineWid>lineHigh) {
                 y=top+Math.trunc(((top+bot)*0.5)-(screwSize*0.5));
                 
-                xAdd=Math.trunc(wid/screwCount);
+                xAdd=Math.trunc(lineWid/screwCount);
                 x=lft+Math.trunc((xAdd*0.5)-(screwSize*0.5));
                 
-                for (n=0;n!=screwCount;n++) {
+                for (n=0;n!==screwCount;n++) {
                     this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
                     x+=xAdd;
                 }
@@ -357,10 +357,10 @@ class GenBitmapWallClass extends GenBitmapClass
             else {
                 x=lft+Math.trunc(((lft+rgt)*0.5)-(screwSize*0.5));
                 
-                yAdd=Math.trunc(high/screwCount);
+                yAdd=Math.trunc(lineHigh/screwCount);
                 y=top+Math.trunc((yAdd*0.5)-(screwSize*0.5));
                 
-                for (n=0;n!=screwCount;n++) {
+                for (n=0;n!==screwCount;n++) {
                     this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
                     y+=yAdd;
                 }
@@ -381,14 +381,13 @@ class GenBitmapWallClass extends GenBitmapClass
     
     generateSciFiPieceShutter(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor,shutterColor)
     {
-        var n,nShutter,shutterSize;
-        var y,yAdd;
+        let n,nShutter,shutterSize;
+        let y,yAdd;
         
-        var shutterEdgeColor=this.darkenColor(shutterColor,0.9);
-        var barEdgeSize=genRandom.randomInt(5,5);
+        let shutterEdgeColor=this.darkenColor(shutterColor,0.9);
         
-        var frameXSize=genRandom.randomInt(10,30);
-        var frameYSize=genRandom.randomInt(10,30);
+        let frameXSize=genRandom.randomInt(10,30);
+        let frameYSize=genRandom.randomInt(10,30);
         
             // outer and inner plate
             
@@ -421,17 +420,17 @@ class GenBitmapWallClass extends GenBitmapClass
         }
     }
     
-    generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high,hasBar)
+    generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var x,mx,my,sz,lft,rgt,top,bot,col;
+        let mx,my,sz,lft,rgt,top,bot,col,forceWid,forceHigh;
 
             // some random values
 
-        var metalColor=this.getDefaultPrimaryColor();
-        var darkMetalColor=this.darkenColor(metalColor,0.8);
-        var shutterColor=this.getRandomColor();
+        let metalColor=this.getDefaultPrimaryColor();
+        let darkMetalColor=this.darkenColor(metalColor,0.8);
+        let shutterColor=this.getRandomColor();
 
-        var metalEdgeSize=genRandom.randomInt(4,4);
+        let metalEdgeSize=genRandom.randomInt(4,4);
         
             // clear canvases
 
@@ -441,8 +440,8 @@ class GenBitmapWallClass extends GenBitmapClass
             // so here's a wid/high that if we cross,
             // move to full width/height
             
-        var forceWid=Math.trunc(wid*0.8);
-        var forceHigh=Math.trunc(high*0.8);
+        forceWid=Math.trunc(wid*0.8);
+        forceHigh=Math.trunc(high*0.8);
         
             // draw the chunks of the metal
         
@@ -509,14 +508,14 @@ class GenBitmapWallClass extends GenBitmapClass
 
     generatePlaster(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x;
-        var lineColor,darken,boost;
+        let n,x;
+        let lineColor,darken,boost;
 
             // some random values
 
-        var lineColorBase=this.getDefaultPrimaryColor();
-        var plasterColor=this.dullColor(lineColorBase,0.8);
-        var lineCount=genRandom.randomInt(40,30);
+        let lineColorBase=this.getDefaultPrimaryColor();
+        let plasterColor=this.dullColor(lineColorBase,0.8);
+        let lineCount=genRandom.randomInt(40,30);
 
             // clear canvases
 
@@ -559,25 +558,25 @@ class GenBitmapWallClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high,segments;
-        var shineFactor=1.0;
-        var bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
+        let wid,high;
+        let shineFactor=1.0;
+        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;
@@ -603,7 +602,7 @@ class GenBitmapWallClass extends GenBitmapClass
                 break;
 
             case this.TYPE_SCIFI:
-                this.generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high,false);
+                this.generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
                 

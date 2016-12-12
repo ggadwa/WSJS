@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -26,11 +28,11 @@ class GenBitmapLiquidClass extends GenBitmapClass
     
     drawOvalGradient(bitmapCTX,lft,top,rgt,bot,startColor,endColor)
     {
-        var col=new wsColor(startColor.r,startColor.g,startColor.b);
-        var count,rAdd,gAdd,bAdd;
+        let col=new wsColor(startColor.r,startColor.g,startColor.b);
+        let count,rAdd,gAdd,bAdd;
         
-        var wid=rgt-lft;
-        var high=bot-top;
+        let wid=rgt-lft;
+        let high=bot-top;
         
             // find color changes
             
@@ -56,8 +58,8 @@ class GenBitmapLiquidClass extends GenBitmapClass
 
     generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,y,ovalWid,ovalHigh,startColor,endColor;
-        var color=this.getDefaultPrimaryColor();
+        let n,x,y,ovalWid,ovalHigh,startColor,endColor;
+        let color=this.getDefaultPrimaryColor();
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
@@ -70,7 +72,7 @@ class GenBitmapLiquidClass extends GenBitmapClass
         startColor=this.darkenColor(color,0.98);
         endColor=this.lightenColor(color,0.1);
             
-        for (n=0;n!=20;n++) {
+        for (n=0;n!==20;n++) {
             ovalWid=genRandom.randomInt(50,100);
             ovalHigh=genRandom.randomInt(50,100);
             
@@ -96,25 +98,25 @@ class GenBitmapLiquidClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high,edgeSize,paddingSize,segments;
-        var shineFactor=1.0;
-        var bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
+        let wid,high;
+        let shineFactor=1.0;
+        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

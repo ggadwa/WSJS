@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -30,12 +32,12 @@ class GenBitmapCeilingClass extends GenBitmapClass
         
     generateTile(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var x,y,lft,rgt,top,bot,tileWid,tileHigh;
+        let x,y,lft,rgt,top,bot,tileWid,tileHigh;
 
-        var splitCount=genRandom.randomInt(2,2);
-        var edgeSize=genRandom.randomInt(2,4);
-        var tileInside=genRandom.randomPercentage(0.5);
-        var tileColor=this.getDefaultPrimaryColor();
+        let splitCount=genRandom.randomInt(2,2);
+        let edgeSize=genRandom.randomInt(2,4);
+        let tileInside=genRandom.randomPercentage(0.5);
+        let tileColor=this.getDefaultPrimaryColor();
 
             // clear canvas
 
@@ -83,25 +85,22 @@ class GenBitmapCeilingClass extends GenBitmapClass
     
     generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,y,offset;
-        var dx,dy,sx,sy,ex,ey;
-        var streakWid,streakColor,darken;
-        var idx,line,lineStyle;
-        var lines=[];
+        let n,x,offset;
+        let streakWid,streakColor,darken;
 
             // some random values
 
-        var metalColor=this.getDefaultPrimaryColor();
-        var borderColor=new wsColor(0.0,0.0,0.0);
+        let metalColor=this.getDefaultPrimaryColor();
+        let borderColor=new wsColor(0.0,0.0,0.0);
 
-        var edgeSize=genRandom.randomInt(4,8);
-        var innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
+        let edgeSize=genRandom.randomInt(4,8);
+        let innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
         
-        var screwSize=genRandom.randomInt(10,20);
-        var screenFlatInnerSize=Math.trunc(screwSize*0.4);
+        let screwSize=genRandom.randomInt(10,20);
+        let screenFlatInnerSize=Math.trunc(screwSize*0.4);
         
-        var streakCount=genRandom.randomInt(15,10);
-        var screwColor=this.boostColor(metalColor,0.05);
+        let streakCount=genRandom.randomInt(15,10);
+        let screwColor=this.boostColor(metalColor,0.05);
         
             // clear canvases
 
@@ -149,9 +148,9 @@ class GenBitmapCeilingClass extends GenBitmapClass
 
     generateCement(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,nLine,markCount,x,y,y2;
-        var particleWid,particleHigh,particleDensity,particleRingCount,particleDarken;
-        var edgeSize,concreteColor,lineColor,line2Color;
+        let n,nLine,markCount,x,y,y2;
+        let particleWid,particleHigh,particleDensity,particleRingCount,particleDarken;
+        let edgeSize,concreteColor,lineColor,line2Color;
 
             // some random values
 
@@ -194,7 +193,7 @@ class GenBitmapCeilingClass extends GenBitmapClass
         
             // marks
 
-        var markCount=genRandom.randomInt(5,20);
+        markCount=genRandom.randomInt(5,20);
         
         for (n=0;n!==markCount;n++) {
             particleWid=genRandom.randomInt(100,100);
@@ -231,25 +230,25 @@ class GenBitmapCeilingClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high,segments;
-        var shineFactor=1.0;
-        var bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
+        let wid,high;
+        let shineFactor=1.0;
+        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

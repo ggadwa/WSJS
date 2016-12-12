@@ -1,3 +1,5 @@
+/* global MeshUtilityClass, config, map, MeshPrimitivesClass */
+
 "use strict";
 
 //
@@ -162,7 +164,7 @@ class GenRoomStairsClass
             idx=this.createSingleWallX(idx,vertexList,xBound.max,yBoundBottom,yBoundBottom,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundTop,yBoundBottom,(zBound.min+thickSize));
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundTop,yBoundBottom,(zBound.max-thickSize));
-            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_WALL);
             
                 // external walls
   
@@ -175,7 +177,7 @@ class GenRoomStairsClass
             zThickBound=new wsBound((zBound.max-thickSize),zBound.max);
             idx=this.createSingleWallX(idx,vertexList,xBound.min,yBoundTop,yBoundTop,zThickBound);
             idx=this.createSingleWallX(idx,vertexList,xBound.max,yBoundBottom,yBoundBottom,zThickBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_ROOM_WALL);
 
                // the ceiling
 
@@ -184,7 +186,7 @@ class GenRoomStairsClass
 
             zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundTop,yBoundBottom,zStepBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_CEILING);
         }
         
             // the stair edges
@@ -212,7 +214,7 @@ class GenRoomStairsClass
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
             idx=this.createSingleWallX(idx,vertexList,(flip?xBound.min:xBound.max),yBoundFront,yBoundFront,zStepBound);
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,map.MESH_FLAG_STAIR);
             
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(16);
@@ -223,7 +225,7 @@ class GenRoomStairsClass
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
             idx=this.createSingleWallX(idx,vertexList,(flip?xBound.min:xBound.max),yBoundFront,yBoundFront,zStepBound);
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,map.MESH_FLAG_STAIR);
             
                 // the behind box brace
             
@@ -237,7 +239,7 @@ class GenRoomStairsClass
                 else {
                     xBraceBound=new wsBound(xBound.max,(xBound.max+braceSize));
                 }
-                map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,null,false,!flip,flip,true,true,false,false,false,MESH_FLAG_STAIR));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBraceBound,yBound,zBound,null,false,!flip,flip,true,true,false,false,false,map.MESH_FLAG_STAIR));
             }
         }
         
@@ -278,7 +280,7 @@ class GenRoomStairsClass
             xStepBound.add(stepAdd);
         }
         
-        this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,MESH_FLAG_STAIR);
+        this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,map.MESH_FLAG_STAIR);
     }
 
     createStairsZ(xBound,yBound,zBound,toPlatform,includeBack,flip)
@@ -332,7 +334,7 @@ class GenRoomStairsClass
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundBottom,zBound.max);
             idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBoundTop,yBoundBottom,zBound);
             idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBoundTop,yBoundBottom,zBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_WALL);
 
                 // external walls
             
@@ -345,7 +347,7 @@ class GenRoomStairsClass
             xThickBound=new wsBound((xBound.max-thickSize),xBound.max);
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundTop,yBoundTop,zBound.min);
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundBottom,yBoundBottom,zBound.max);
-            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,MESH_FLAG_ROOM_WALL);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_ROOM_WALL);
            
                // the ceiling
 
@@ -354,7 +356,7 @@ class GenRoomStairsClass
 
             xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundTop,yBoundBottom,zBound);
-            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,MESH_FLAG_ROOM_CEILING);
+            this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_CEILING);
         }
         
             // the stair edges
@@ -382,7 +384,7 @@ class GenRoomStairsClass
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xStepBound,yBoundFront,yBoundFront,(flip?zBound.min:zBound.max));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundBottom,yBoundTop,zBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,map.MESH_FLAG_STAIR);
             
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(16);
@@ -393,7 +395,7 @@ class GenRoomStairsClass
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallZ(idx,vertexList,xStepBound,yBoundFront,yBoundFront,(flip?zBound.min:zBound.max));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundBottom,yBoundTop,zBound);
-            this.finishStairMesh(stairBitmap,vertexList,true,null,false,MESH_FLAG_STAIR);
+            this.finishStairMesh(stairBitmap,vertexList,true,null,false,map.MESH_FLAG_STAIR);
             
                 // the behind box brace
             
@@ -407,7 +409,7 @@ class GenRoomStairsClass
                 else {
                     zBraceBound=new wsBound(zBound.max,(zBound.max+braceSize));
                 }
-                map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,null,false,true,true,!flip,flip,false,false,false,MESH_FLAG_STAIR));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(stairBitmap,xBound,yBound,zBraceBound,null,false,true,true,!flip,flip,false,false,false,map.MESH_FLAG_STAIR));
             }
         }
         
@@ -449,7 +451,7 @@ class GenRoomStairsClass
             zStepBound.add(stepAdd);
         }
         
-        this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,MESH_FLAG_STAIR);
+        this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,map.MESH_FLAG_STAIR);
     }
 }
 

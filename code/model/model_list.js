@@ -49,8 +49,8 @@ class ModelListClass
 
     getModel(name)
     {
-        var n;
-        var nModel=this.models.length;
+        let n;
+        let nModel=this.models.length;
 
         for (n=0;n!==nModel;n++) {
             if (this.models[n].name===name) return(this.models[n]);
@@ -65,10 +65,12 @@ class ModelListClass
         
     cloneModel(name)
     {
-        var model=this.getModel(name);
+        let model,cloneModel;
+        
+        model=this.getModel(name);
         if (model===null) return(null);
         
-        var cloneModel=model.clone();
+        cloneModel=model.clone();
         cloneModel.mesh.setupBuffers();
         
         this.models.push(cloneModel);
@@ -82,4 +84,4 @@ class ModelListClass
 // the modelList global object
 //
 
-var modelList=new ModelListClass();
+let modelList=new ModelListClass();

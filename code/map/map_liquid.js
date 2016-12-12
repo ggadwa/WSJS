@@ -1,3 +1,5 @@
+/* global view, config */
+
 "use strict";
 
 //
@@ -48,7 +50,7 @@ class MapLiquidClass
         
     close()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -65,15 +67,15 @@ class MapLiquidClass
 
     updateBuffers()
     {
-        var x,z,vx,vz,gx,gz;
-        var vIdx,uvIdx;
-        var offRow,offCol;
+        let x,z,vx,vz,gx,gz;
+        let vIdx,uvIdx;
+        let offRow,offCol;
         
             // get the y offsets for waves
         
-        var freq=((view.timeStamp%config.ROOM_LIQUID_WAVE_FREQUENCY)/config.ROOM_LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
-        var cs=Math.cos(freq);
-        var offY=Math.trunc(cs*config.ROOM_LIQUID_WAVE_HEIGHT);
+        let freq=((view.timeStamp%config.ROOM_LIQUID_WAVE_FREQUENCY)/config.ROOM_LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
+        let cs=Math.cos(freq);
+        let offY=Math.trunc(cs*config.ROOM_LIQUID_WAVE_HEIGHT);
         
             // create mesh
             
@@ -115,9 +117,9 @@ class MapLiquidClass
     
     setupBuffers()
     {
-        var x,z,iIdx,vIdx,vTopIdx,vBotIdx;
-        var nVertex,nSegment,indexes;
-        var gl=view.gl;
+        let x,z,iIdx,vIdx,vTopIdx,vBotIdx;
+        let nVertex,nSegment,indexes;
+        let gl=view.gl;
         
             // create the buffers
             
@@ -172,7 +174,7 @@ class MapLiquidClass
     
     bindBuffers(mapLiquidShader)
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
             // water vertices and UVs are always moving
             // so always update these buffers
@@ -196,7 +198,7 @@ class MapLiquidClass
 
     draw()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
         

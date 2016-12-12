@@ -1,4 +1,4 @@
-/* global config, genRandom, map, MeshPrimitivesClass, MESH_FLAG_DECORATION, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
+/* global config, genRandom, map, MeshPrimitivesClass, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
 
 "use strict";
 
@@ -55,7 +55,7 @@ class GenRoomDecorationWallsClass
         
         yBound=new wsBound((room.yBound.max-config.ROOM_FLOOR_HEIGHT),room.yBound.max);
 
-        map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,false,false,false,MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION));
     }
     
         //

@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -8,6 +10,26 @@ class GenBitmapClass
 {
     constructor()
     {
+            // constants
+            
+        this.BITMAP_MAP_TEXTURE_SIZE=512;
+        this.BITMAP_MODEL_TEXTURE_SIZE=512;
+        this.BITMAP_SKY_TEXTURE_SIZE=512;
+        this.BITMAP_PARTICLE_TEXTURE_SIZE=32;
+        
+        this.BITMAP_STACKED_X_MIN_COUNT=1;
+        this.BITMAP_STACKED_X_EXTRA_COUNT=4;
+        this.BITMAP_STACKED_Y_MIN_COUNT=3;
+        this.BITMAP_STACKED_Y_EXTRA_COUNT=4;
+
+        this.BITMAP_GRID_DIVISION=100;
+        this.BITMAP_GRID_MIN_BLOCK_WIDTH=30;
+        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=10;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
+        this.BITMAP_GRID_MIN_BLOCK_HEIGHT=10;
+        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
+
             // some precalced normals
 
         this.NORMAL_CLEAR=new wsPoint(0.0,0.0,1.0);
@@ -67,17 +89,17 @@ class GenBitmapClass
 
     createStackedSegments(cvsWid,cvsHigh)
     {
-        var x,y;
-        var lft,top;
-        var halfBrick;
-        var segments=[];
+        let x,y;
+        let lft,top;
+        let halfBrick;
+        let segments=[];
 
-        var xCount=BITMAP_STACKED_X_MIN_COUNT+Math.trunc(genRandom.random()*BITMAP_STACKED_X_EXTRA_COUNT);
-        var wid=Math.trunc(cvsWid/xCount);
-        var halfWid=Math.trunc(wid/2);
+        let xCount=this.BITMAP_STACKED_X_MIN_COUNT+Math.trunc(genRandom.random()*this.BITMAP_STACKED_X_EXTRA_COUNT);
+        let wid=Math.trunc(cvsWid/xCount);
+        let halfWid=Math.trunc(wid/2);
 
-        var yCount=BITMAP_STACKED_Y_MIN_COUNT+Math.trunc(genRandom.random()*BITMAP_STACKED_Y_EXTRA_COUNT);
-        var high=Math.trunc(cvsHigh/yCount);
+        let yCount=this.BITMAP_STACKED_Y_MIN_COUNT+Math.trunc(genRandom.random()*this.BITMAP_STACKED_Y_EXTRA_COUNT);
+        let high=Math.trunc(cvsHigh/yCount);
 
         top=0;
         halfBrick=false;
@@ -102,16 +124,16 @@ class GenBitmapClass
 
     createRandomSegments(cvsWid,cvsHigh)
     {
-        var x,y,x2,y2,hit;
-        var wid,high,startWid,startHigh;
-        var top,lft,bot,rgt;
-        var segments=[];
+        let x,y,x2,y2,hit;
+        let wid,high,startWid,startHigh;
+        let top,lft,bot,rgt;
+        let segments=[];
 
             // create a grid to
             // build segments in
             // typed arrays initialize to 0
 
-        var grid=new Uint16Array(BITMAP_GRID_DIVISION*BITMAP_GRID_DIVISION);
+        let grid=new Uint16Array(this.BITMAP_GRID_DIVISION*this.BITMAP_GRID_DIVISION);
 
             // start making the segments
 
@@ -123,15 +145,15 @@ class GenBitmapClass
             hit=false;
 
             while (true) {
-                if (grid[(y*BITMAP_GRID_DIVISION)+x]===0) {
+                if (grid[(y*this.BITMAP_GRID_DIVISION)+x]===0) {
                     hit=true;
                     break;
                 }
                 x++;
-                if (x===BITMAP_GRID_DIVISION) {
+                if (x===this.BITMAP_GRID_DIVISION) {
                     x=0;
                     y++;
-                    if (y===BITMAP_GRID_DIVISION) break;
+                    if (y===this.BITMAP_GRID_DIVISION) break;
                 }
             }
 
@@ -141,55 +163,55 @@ class GenBitmapClass
 
                 // random size
 
-            startWid=BITMAP_GRID_MIN_BLOCK_WIDTH+Math.trunc(genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_WIDTH);
-            if ((x+startWid)>=BITMAP_GRID_DIVISION) startWid=BITMAP_GRID_DIVISION-x;
+            startWid=this.BITMAP_GRID_MIN_BLOCK_WIDTH+Math.trunc(genRandom.random()*this.BITMAP_GRID_EXTRA_BLOCK_WIDTH);
+            if ((x+startWid)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
 
-            startHigh=BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.trunc(genRandom.random()*BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
-            if ((y+startHigh)>=BITMAP_GRID_DIVISION) startHigh=BITMAP_GRID_DIVISION-y;
+            startHigh=this.BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.trunc(genRandom.random()*this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
+            if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
                 // make sure we aren't leaving a little sliver
                 // at the end
 
-            if (((x+startWid)+BITMAP_GRID_MIN_BLOCK_WIDTH)>=BITMAP_GRID_DIVISION) startWid=BITMAP_GRID_DIVISION-x;
-            if (((y+startHigh)+BITMAP_GRID_MIN_BLOCK_HEIGHT)>=BITMAP_GRID_DIVISION) startHigh=BITMAP_GRID_DIVISION-y;
+            if (((x+startWid)+this.BITMAP_GRID_MIN_BLOCK_WIDTH)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
+            if (((y+startHigh)+this.BITMAP_GRID_MIN_BLOCK_HEIGHT)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
                 // determine what can fit
 
             wid=1;
 
             while (wid<startWid) {
-                if (grid[(y*BITMAP_GRID_DIVISION)+(x+wid)]!==0) break;
+                if (grid[(y*this.BITMAP_GRID_DIVISION)+(x+wid)]!==0) break;
                 wid++;
             }
 
             high=1;
 
             while (high<startHigh) {
-                if (grid[((y+high)*BITMAP_GRID_DIVISION)+x]!==0) break;
+                if (grid[((y+high)*this.BITMAP_GRID_DIVISION)+x]!==0) break;
                 high++;
             }
 
                 // if segment is too small, just block off
                 // the single grid item and try again
 
-            if ((wid<BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH) || (high<BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)) {
-                grid[(y*BITMAP_GRID_DIVISION)+x]=1;
+            if ((wid<this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH) || (high<this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)) {
+                grid[(y*this.BITMAP_GRID_DIVISION)+x]=1;
                 continue;
             }
 
                 // create the segment and block off
                 // the grid
 
-            lft=Math.trunc(x*(cvsWid/BITMAP_GRID_DIVISION));
-            top=Math.trunc(y*(cvsHigh/BITMAP_GRID_DIVISION));
-            rgt=Math.trunc((x+wid)*(cvsWid/BITMAP_GRID_DIVISION));
-            bot=Math.trunc((y+high)*(cvsHigh/BITMAP_GRID_DIVISION));
+            lft=Math.trunc(x*(cvsWid/this.BITMAP_GRID_DIVISION));
+            top=Math.trunc(y*(cvsHigh/this.BITMAP_GRID_DIVISION));
+            rgt=Math.trunc((x+wid)*(cvsWid/this.BITMAP_GRID_DIVISION));
+            bot=Math.trunc((y+high)*(cvsHigh/this.BITMAP_GRID_DIVISION));
 
             segments.push(new wsRect(lft,top,rgt,bot));
 
             for (y2=0;y2!==high;y2++) {
                 for (x2=0;x2!==wid;x2++) {
-                    grid[((y+y2)*BITMAP_GRID_DIVISION)+(x+x2)]=1;
+                    grid[((y+y2)*this.BITMAP_GRID_DIVISION)+(x+x2)]=1;
                 }
             }
         }
@@ -203,16 +225,16 @@ class GenBitmapClass
 
     getDefaultPrimaryColor()
     {
-        var col=this.primaryColorList[this.defaultPrimaryColorIdx];
-        var darken=0.1-(genRandom.random()*0.2);
+        let col=this.primaryColorList[this.defaultPrimaryColorIdx];
+        let darken=0.1-(genRandom.random()*0.2);
         
         return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
     
     getRandomColor()
     {
-        var col=this.primaryColorList[genRandom.randomIndex(this.primaryColorList.length)];
-        var darken=0.1-(genRandom.random()*0.2);
+        let col=this.primaryColorList[genRandom.randomIndex(this.primaryColorList.length)];
+        let darken=0.1-(genRandom.random()*0.2);
         
         return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
@@ -236,20 +258,20 @@ class GenBitmapClass
     {
             // find the midpoint
             
-        var midPoint=(color.r+color.g+color.b)/3.0;
+        let midPoint=(color.r+color.g+color.b)/3.0;
         
             // move towards it
             
-        var r=color.r+(midPoint-color.r)*dullFactor;
-        var g=color.g+(midPoint-color.g)*dullFactor;
-        var b=color.b+(midPoint-color.b)*dullFactor;
+        let r=color.r+(midPoint-color.r)*dullFactor;
+        let g=color.g+(midPoint-color.g)*dullFactor;
+        let b=color.b+(midPoint-color.b)*dullFactor;
 
         return(new wsColor(r,g,b));
     }
 
     colorToRGBColor(color)
     {
-        var colorStr='rgb(';
+        let colorStr='rgb(';
         colorStr+=Math.trunc(color.r*255.0);
         colorStr+=',';
         colorStr+=Math.trunc(color.g*255.0);
@@ -262,7 +284,7 @@ class GenBitmapClass
     
     colorToRGBAColor(color,alpha)
     {
-        var colorStr='rgba(';
+        let colorStr='rgba(';
         colorStr+=Math.trunc(color.r*255.0);
         colorStr+=',';
         colorStr+=Math.trunc(color.g*255.0);
@@ -277,7 +299,7 @@ class GenBitmapClass
 
     normalToRGBColor(normal)
     {
-        var colorStr='rgb(';
+        let colorStr='rgb(';
         colorStr+=Math.trunc((normal.x+1.0)*127.0);
         colorStr+=',';
         colorStr+=Math.trunc((normal.y+1.0)*127.0);
@@ -290,9 +312,9 @@ class GenBitmapClass
 
     createRandomColorStripeArray(factor,baseColor)
     {
-        var n,f,count;
-        var r,g,b,color;
-        var colors=[];
+        let n,f,count;
+        let r,g,b,color;
+        let colors=[];
 
             // make stripes of varying sizes and colors
 
@@ -345,18 +367,19 @@ class GenBitmapClass
 
     addNoiseRect(bitmapCTX,lft,top,rgt,bot,minDarken,maxDarken,percentage)
     {    
-        if ((lft>=rgt) || (top>=bot)) return;
-        
-        var n,nPixel,idx;
-        var col,fct;
-        var wid=rgt-lft;
-        var high=bot-top;    
-        var darkenDif=maxDarken-minDarken;
+        let n,nPixel,idx;
+        let col,fct;
+        let wid=rgt-lft;
+        let high=bot-top;    
+        let darkenDif=maxDarken-minDarken;
+        let bitmapImgData,bitmapData;
 
             // get the image data to add noise to
+        
+        if ((lft>=rgt) || (top>=bot)) return;
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
 
             // get the image data to add noise to
 
@@ -396,20 +419,20 @@ class GenBitmapClass
     
     addNormalNoiseRect(normalCTX,lft,top,rgt,bot,percentage)
     {    
-        if ((lft>=rgt) || (top>=bot)) return;
-        
-        var n,nPixel,idx;
-        var wid=rgt-lft;
-        var high=bot-top;    
-        
-        var normal;
-        var normals=[this.NORMAL_LEFT_10,this.NORMAL_RIGHT_10,this.NORMAL_TOP_10,this.NORMAL_BOTTOM_10];
+        let n,nPixel,idx;
+        let wid=rgt-lft;
+        let high=bot-top;    
+        let normalImgData,normalData;
+        let normal;
+        let normals=[this.NORMAL_LEFT_10,this.NORMAL_RIGHT_10,this.NORMAL_TOP_10,this.NORMAL_BOTTOM_10];
 
             // get the image data to add noise to
 
-        var normalImgData=normalCTX.getImageData(lft,top,wid,high);
-        var normalData=normalImgData.data;
+        if ((lft>=rgt) || (top>=bot)) return;
 
+        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
+        
             // get the image data to add noise to
 
         idx=0;
@@ -442,18 +465,19 @@ class GenBitmapClass
         
     blur(bitmapCTX,lft,top,rgt,bot,blurCount)
     {
-        var n,idx;
-        var x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
-        var r,g,b;
-        var wid=rgt-lft;
-        var high=bot-top;
+        let n,idx;
+        let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
+        let r,g,b;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData,blurData;
         
         if ((wid<=0) || (high<=0)) return;
+
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
         
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
-        var bitmapData=bitmapImgData.data;
-        
-        var blurData=new Uint8ClampedArray(bitmapData.length);
+        blurData=new Uint8ClampedArray(bitmapData.length);
         
             // blur pixels to count
 
@@ -527,14 +551,14 @@ class GenBitmapClass
 
     createSpecularMap(bitmapCTX,specularCTX,wid,high,clamp)
     {
-        var n,idx,nPixel;
-        var f,fMin,fMax,fDif;
+        let n,idx,nPixel;
+        let f,fMin,fMax,fDif;
 
-        var bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
-        var bitmapData=bitmapImgData.data;
+        let bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapData=bitmapImgData.data;
 
-        var specularImgData=specularCTX.getImageData(0,0,wid,high);
-        var specularData=specularImgData.data;
+        let specularImgData=specularCTX.getImageData(0,0,wid,high);
+        let specularData=specularImgData.data;
 
         idx=0;
         nPixel=wid*high;
@@ -587,10 +611,10 @@ class GenBitmapClass
         
     swapRedToAlpha(bitmapCTX,wid,high)
     {
-        var n,nPixel,idx;
+        let n,nPixel,idx;
         
-        var bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
-        var bitmapData=bitmapImgData.data;
+        let bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapData=bitmapImgData.data;
         
         idx=0;
         nPixel=wid*high;
@@ -618,8 +642,8 @@ class GenBitmapClass
 
     draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,color,faceOut)
     {
-        var n,lx,rx,ty,by;
-        var colFactor,edgeColor,fillColor;
+        let n,lx,rx,ty,by;
+        let colFactor,edgeColor,fillColor;
 
             // draw the edges
 
@@ -709,22 +733,22 @@ class GenBitmapClass
 
     draw3DComplexRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
-        var n,k,k2,add;
-        var darkenFactor,darkColor;
+        let n,k,k2,add;
+        let darkenFactor,darkColor;
 
-        var wid=rgt-lft;
-        var high=bot-top;
+        let wid=rgt-lft;
+        let high=bot-top;
 
-        var mx=Math.trunc((lft+rgt)/2);
-        var my=Math.trunc((top+bot)/2);
+        let mx=Math.trunc((lft+rgt)/2);
+        let my=Math.trunc((top+bot)/2);
         
-        var sidePointCount=15;
-        var totalPointCount=sidePointCount*4;
+        let sidePointCount=15;
+        let totalPointCount=sidePointCount*4;
 
             // build the polygon
 
-        var x=new Uint16Array(totalPointCount);
-        var y=new Uint16Array(totalPointCount);
+        let x=new Uint16Array(totalPointCount);
+        let y=new Uint16Array(totalPointCount);
         
         for (n=0;n!==sidePointCount;n++) {
             add=Math.trunc((wid/sidePointCount)*n);
@@ -899,8 +923,8 @@ class GenBitmapClass
     
     draw3DHexagon(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
-        var n,lx,rx,my,xAdd;
-        var darkenFactor,darkColor;
+        let n,lx,rx,my,xAdd;
+        let darkenFactor,darkColor;
 
             // build the polygon
 
@@ -1054,7 +1078,7 @@ class GenBitmapClass
     
     drawDiamond(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
-        var mx,my;
+        let mx,my;
 
         mx=Math.trunc((lft+rgt)/2);
         my=Math.trunc((top+bot)/2);
@@ -1074,7 +1098,7 @@ class GenBitmapClass
     
     drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
-        var mx,my,radius;
+        let mx,my,radius;
 
         mx=Math.trunc((lft+rgt)/2);
         my=Math.trunc((top+bot)/2);
@@ -1092,8 +1116,11 @@ class GenBitmapClass
 
     draw3DOval(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
     {
-        var n,x,y,halfWid,halfHigh;
-        var rad,fx,fy,col,idx;
+        let n,x,y,mx,my,halfWid,halfHigh;
+        let rad,fx,fy,col,idx;
+        let orgWid,orgHigh,wid,high;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
         
             // start and end arc
             
@@ -1103,20 +1130,20 @@ class GenBitmapClass
         
             // the drawing size
             
-        var orgWid=rgt-lft;
-        var orgHigh=bot-top;
-        var wid=orgWid-1;
-        var high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
-        var mx=Math.trunc(wid/2);
-        var my=Math.trunc(high/2);
+        orgWid=rgt-lft;
+        orgHigh=bot-top;
+        wid=orgWid-1;
+        high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
+        mx=Math.trunc(wid/2);
+        my=Math.trunc(high/2);
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
+        bitmapData=bitmapImgData.data;
 
-        var normalImgData=normalCTX.getImageData(lft,top,orgWid,orgHigh);
-        var normalData=normalImgData.data;
+        normalImgData=normalCTX.getImageData(lft,top,orgWid,orgHigh);
+        normalData=normalImgData.data;
 
-        var edgeCount=edgeSize;
+        let edgeCount=edgeSize;
         
             // fill the oval
 
@@ -1182,7 +1209,7 @@ class GenBitmapClass
     
     drawLine(bitmapCTX,normalCTX,x,y,x2,y2,color,lightLine)
     {
-        var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
+        let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
             // line itself
             
@@ -1261,12 +1288,12 @@ class GenBitmapClass
     
     drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color,lightLine)
     {
-        var n,sx,sy,ex,ey,r;
-        var segCount=genRandom.randomInt(2,5);
-        var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
+        let n,sx,sy,ex,ey,r;
+        let segCount=genRandom.randomInt(2,5);
+        let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
-        var xAdd=Math.trunc((x2-x)/segCount);
-        var yAdd=Math.trunc((y2-y)/segCount);
+        let xAdd=Math.trunc((x2-x)/segCount);
+        let yAdd=Math.trunc((y2-y)/segCount);
         
         sx=x;
         sy=y;
@@ -1300,14 +1327,14 @@ class GenBitmapClass
     
     drawBumpLine(bitmapCTX,normalCTX,x,y,x2,y2,wid,color)
     {
-        var n;
-        var halfWid=Math.trunc(wid*0.5);
-        var chunkOne=Math.trunc(wid*0.33);
-        var chunkTwo=Math.trunc(wid*0.66);
+        let n;
+        let halfWid=Math.trunc(wid*0.5);
+        let chunkOne=Math.trunc(wid*0.33);
+        let chunkTwo=Math.trunc(wid*0.66);
         
-        var darkColor=this.darkenColor(color,0.9);
+        let darkColor=this.darkenColor(color,0.9);
         
-        var horizontal=Math.abs(x2-x)>Math.abs(y2-y);
+        let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
         if (!horizontal) {
             x-=halfWid;
@@ -1435,9 +1462,9 @@ class GenBitmapClass
         
     drawSlope(bitmapCTX,normalCTX,lft,top,rgt,bot,color,up)
     {
-        var y;
-        var darkenFactor,darkColor;
-        var high=bot-top;
+        let y;
+        let darkenFactor,darkColor;
+        let high=bot-top;
         
         normalCTX.strokeStyle=this.normalToRGBColor(up?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
         
@@ -1467,41 +1494,47 @@ class GenBitmapClass
 
     drawParticle(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
     {
-        if ((lft>=rgt) || (top>=bot)) return;
+        
 
-        var n,k,px,py,idx;
-        var rad,fx,fy,fsz;
-        var col;
+        let n,k,px,py,mx,my,idx;
+        let rad,fx,fy,fsz;
+        let col;
+        let wid,high;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+        let ringWid,ringWidSub,ringHigh,ringHighSub;
 
             // get the image data
             // note - particles always get the entire image
             // because they might need to wrap around edges
+            
+        if ((lft>=rgt) || (top>=bot)) return;
 
-        var wid=rgt-lft;
-        var high=bot-top;
+        wid=rgt-lft;
+        high=bot-top;
 
-        var bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        bitmapData=bitmapImgData.data;
 
         if (normalCTX!==null) {
-            var normalImgData=normalCTX.getImageData(0,0,imgWid,imgHigh);
-            var normalData=normalImgData.data;
+            normalImgData=normalCTX.getImageData(0,0,imgWid,imgHigh);
+            normalData=normalImgData.data;
         }
             // get the center
             // remember this is a clip so
             // it always starts at 0,0
 
-        var mx=lft+Math.trunc(wid/2);
-        var my=top+Math.trunc(high/2);
+        mx=lft+Math.trunc(wid/2);
+        my=top+Math.trunc(high/2);
 
             // create the rings of
             // particles
 
-        var ringWid=wid;
-        var ringWidSub=Math.trunc(wid/(ringCount+1));
+        ringWid=wid;
+        ringWidSub=Math.trunc(wid/(ringCount+1));
 
-        var ringHigh=high;
-        var ringHighSub=Math.trunc(high/(ringCount+1));
+        ringHigh=high;
+        ringHighSub=Math.trunc(high/(ringCount+1));
 
         for (n=0;n!==ringCount;n++) {
 
@@ -1575,21 +1608,23 @@ class GenBitmapClass
 
     drawStreakMetal(bitmapCTX,imgWid,imgHigh,x,top,bot,streakWid,baseColor)
     {
-        var n,lx,rx,y,idx;
+        let n,lx,rx,y,idx;
+        let bitmapImgData,bitmapData;
+        let density,densityReduce;
         
         if (top>=bot) return;
         if (streakWid<=0) return;
         
             // get the image data
 
-        var bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        bitmapData=bitmapImgData.data;
         
             // start with 100 density and reduce
             // as we go across the width
             
-        var density=100;
-        var densityReduce=Math.trunc(90/streakWid);
+        density=100;
+        densityReduce=Math.trunc(90/streakWid);
         
             // write the streaks
             
@@ -1630,17 +1665,18 @@ class GenBitmapClass
     
     drawStreakDirtSingle(bitmapCTX,lft,top,rgt,bot,reduceStreak,density,dirtColorAvg)
     {
-        var lx,rx,xAdd,x,y,idx;
-        var factor,lineDensity,dirtWidReduce;
-        var wid=rgt-lft;
-        var high=bot-top;
+        let lx,rx,xAdd,x,y,idx;
+        let factor,lineDensity,dirtWidReduce;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
         
         if ((wid<=0) || (high<=0)) return;
         
             // get the image data
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
         
             // random dirt reductions
         
@@ -1681,8 +1717,8 @@ class GenBitmapClass
     
     drawStreakDirt(bitmapCTX,lft,top,rgt,bot,additionalStreakCount,reduceStreak,density,color)
     {
-        var n,sx,ex,ey;
-        var dirtColorAvg;
+        let n,sx,ex,ey;
+        let dirtColorAvg;
         
             // get dirt color as ints
             
@@ -1694,7 +1730,7 @@ class GenBitmapClass
         
             // additional streaks
             
-        for (n=0;n!=additionalStreakCount;n++) {
+        for (n=0;n!==additionalStreakCount;n++) {
             sx=genRandom.randomInBetween(lft,rgt);
             ex=genRandom.randomInBetween(sx,rgt);
             if (sx>=ex) continue;
@@ -1714,17 +1750,18 @@ class GenBitmapClass
         
     drawVerticalGradient(bitmapCTX,lft,top,rgt,bot,topColor,botColor)
     {
-        var x,y,idx;
-        var colorDif,factor,redByte,greenByte,blueByte;
+        let x,y,idx;
+        let colorDif,factor,redByte,greenByte,blueByte;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
 
             // get the image data
 
-        var wid=rgt-lft;
-        var high=bot-top;
         if ((wid<1) || (high<1)) return;
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
         
         colorDif=new wsColor((botColor.r-topColor.r),(botColor.g-topColor.g),(botColor.b-topColor.b));
 
@@ -1755,24 +1792,26 @@ class GenBitmapClass
 
     drawColorStripeHorizontal(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
-        var x,y,idx;
-        var color,redByte,greenByte,blueByte;
-        var colors=this.createRandomColorStripeArray(factor,baseColor);
+        let x,y,nx,nz,idx;
+        let color,redByte,greenByte,blueByte;
+        let colors=this.createRandomColorStripeArray(factor,baseColor);
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
 
             // get the image data
 
-        var wid=rgt-lft;
-        var high=bot-top;
         if ((wid<1) || (high<1)) return;
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
 
-        var normalImgData=normalCTX.getImageData(lft,top,wid,high);
-        var normalData=normalImgData.data;
+        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
 
-        var nx=Math.trunc((0.10+1.0)*127.0);
-        var nz=Math.trunc((0.90+1.0)*127.0);
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
 
             // write the stripe
 
@@ -1808,24 +1847,26 @@ class GenBitmapClass
 
     drawColorStripeVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
-        var x,y,idx;
-        var color,redByte,greenByte,blueByte;
-        var colors=this.createRandomColorStripeArray(factor,baseColor);
+        let x,y,nx,nz,idx;
+        let color,redByte,greenByte,blueByte;
+        let colors=this.createRandomColorStripeArray(factor,baseColor);
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
 
             // get the image data
 
-        var wid=rgt-lft;
-        var high=bot-top;
         if ((wid<1) || (high<1)) return;
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
 
-        var normalImgData=normalCTX.getImageData(lft,top,wid,high);
-        var normalData=normalImgData.data;
+        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
 
-        var nx=Math.trunc((0.10+1.0)*127.0);
-        var nz=Math.trunc((0.90+1.0)*127.0);
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
 
             // write the stripe
 
@@ -1858,24 +1899,26 @@ class GenBitmapClass
 
     drawColorStripeSlant(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
     {
-        var x,y,idx,cIdx;
-        var color;
-        var colors=this.createRandomColorStripeArray(factor,baseColor);
+        let x,y,nx,nz,idx,cIdx;
+        let color;
+        let colors=this.createRandomColorStripeArray(factor,baseColor);
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
 
             // get the image data
 
-        var wid=rgt-lft;
-        var high=bot-top;
         if ((wid<1) || (high<1)) return;
 
-        var bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
-        var bitmapData=bitmapImgData.data;
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
 
-        var normalImgData=normalCTX.getImageData(lft,top,wid,high);
-        var normalData=normalImgData.data;
+        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
 
-        var nx=Math.trunc((0.10+1.0)*127.0);
-        var nz=Math.trunc((0.90+1.0)*127.0);
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
 
             // write the stripe
 
@@ -1909,8 +1952,8 @@ class GenBitmapClass
     
     drawUVTest(bitmapCTX,lft,top,rgt,bot)
     {
-        var xMid=Math.trunc((lft+rgt)/2);
-        var yMid=Math.trunc((top+bot)/2);
+        let xMid=Math.trunc((lft+rgt)/2);
+        let yMid=Math.trunc((top+bot)/2);
         
         this.drawRect(bitmapCTX,lft,top,xMid,yMid,new wsColor(1,1,0));
         this.drawRect(bitmapCTX,xMid,top,rgt,yMid,new wsColor(1,0,0));

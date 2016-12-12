@@ -1,4 +1,4 @@
-/* global map, config, MeshPrimitivesClass, MESH_FLAG_DECORATION, genRandom, DEGREE_TO_RAD, MeshUtilityClass, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
+/* global map, config, MeshPrimitivesClass, genRandom, DEGREE_TO_RAD, MeshUtilityClass, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
 
 "use strict";
 
@@ -139,7 +139,7 @@ class GenRoomDecorationEquipmentClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_DECORATION);
+        mesh=new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
         map.addMesh(mesh);
@@ -282,7 +282,7 @@ class GenRoomDecorationEquipmentClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_DECORATION);
+        mesh=new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
         map.addMesh(mesh);
@@ -393,7 +393,7 @@ class GenRoomDecorationEquipmentClass
         platformBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
         
         platformBoundY=new wsBound((yBound.max-config.ROOM_FLOOR_DEPTH),room.yBound.max);
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // determine direction
         
@@ -428,7 +428,7 @@ class GenRoomDecorationEquipmentClass
     {
         let n,pieceCount;
         
-        pieceCount=room.getDecorationCount();
+        pieceCount=Math.trunc(room.getDecorationCount()*0.7);       // supergumba -- we need to calculate this better
 
         for (n=0;n!==pieceCount;n++) {
             this.addPipes(room);

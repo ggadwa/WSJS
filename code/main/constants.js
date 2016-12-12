@@ -16,22 +16,6 @@ const RAD_TO_DEGREE=180.0/Math.PI;
 const PROCESS_TIMEOUT_MSEC=1;           // this is used when using a timeout to keep browser active during long processes
 
     //
-    // map mesh flags
-    //
-
-const MESH_FLAG_NONE=0;
-const MESH_FLAG_ROOM_WALL=1;
-const MESH_FLAG_ROOM_FLOOR=2;
-const MESH_FLAG_ROOM_CEILING=3;
-const MESH_FLAG_PLATFORM=4;
-const MESH_FLAG_LEDGE=5;
-const MESH_FLAG_STAIR=6;
-const MESH_FLAG_DOOR=7;
-const MESH_FLAG_LIFT=8;
-const MESH_FLAG_LIGHT=9;
-const MESH_FLAG_DECORATION=10;
-
-    //
     // room sides
     //
 
@@ -111,38 +95,3 @@ const LIMB_TYPE_HEAD_JAW=14;
 const LIMB_AXIS_X=0;
 const LIMB_AXIS_Y=1;
 const LIMB_AXIS_Z=2;
-
-    //
-    // lightmap generation
-    //
-
-const LIGHTMAP_TEXTURE_SIZE=1024;
-
-const LIGHTMAP_CHUNK_SPLIT=16;                  // how many chunks in both the X and Y direction
-const LIGHTMAP_CHUNK_SIZE=Math.trunc(LIGHTMAP_TEXTURE_SIZE/LIGHTMAP_CHUNK_SPLIT);    // square pixel size of chunks
-const LIGHTMAP_CHUNK_PER_TEXTURE=(LIGHTMAP_CHUNK_SPLIT*LIGHTMAP_CHUNK_SPLIT);        // how many chunks in a single texture
-
-const LIGHTMAP_RENDER_MARGIN=4;                // margin around each light map triangle
-const LIGHTMAP_BLUR_COUNT=3;
-
-    //
-    // bitmap generation
-    //
-
-const GEN_BITMAP_MAP_TEXTURE_SIZE=512;
-const GEN_BITMAP_MODEL_TEXTURE_SIZE=512;
-const GEN_BITMAP_SKY_TEXTURE_SIZE=512;
-const GEN_BITMAP_PARTICLE_TEXTURE_SIZE=32;
-
-const BITMAP_STACKED_X_MIN_COUNT=1;
-const BITMAP_STACKED_X_EXTRA_COUNT=4;
-const BITMAP_STACKED_Y_MIN_COUNT=3;
-const BITMAP_STACKED_Y_EXTRA_COUNT=4;
-
-const BITMAP_GRID_DIVISION=100;
-const BITMAP_GRID_MIN_BLOCK_WIDTH=30;
-const BITMAP_GRID_EXTRA_BLOCK_WIDTH=10;
-const BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
-const BITMAP_GRID_MIN_BLOCK_HEIGHT=10;
-const BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
-const BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;

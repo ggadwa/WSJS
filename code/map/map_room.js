@@ -1,4 +1,4 @@
-/* global config, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM, genRandom, MeshUtilityClass, MESH_FLAG_ROOM_WALL, MESH_FLAG_ROOM_FLOOR, map, MESH_FLAG_ROOM_CEILING */
+/* global config, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM, genRandom, MeshUtilityClass, map */
 
 "use strict";
 
@@ -495,7 +495,7 @@ class MapRoomClass
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,true);
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        return(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_WALL));
+        return(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_WALL));
     }
     
         //
@@ -623,7 +623,7 @@ class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_FLOOR));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_FLOOR));
     }
     
     createMeshCeiling(bitmap)
@@ -708,7 +708,7 @@ class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_ROOM_CEILING));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_CEILING));
         
             // if open ceiling, create the walls
         

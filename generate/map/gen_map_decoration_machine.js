@@ -1,4 +1,4 @@
-/* global config, genRandom, map, MeshPrimitivesClass, MESH_FLAG_DECORATION, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
+/* global config, genRandom, map, MeshPrimitivesClass, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
 
 "use strict";
 
@@ -45,14 +45,14 @@ class GenRoomDecorationMachineClass
         boundY=new wsBound((pos.y-config.ROOM_FLOOR_DEPTH),((pos.y-config.ROOM_FLOOR_HEIGHT)+config.ROOM_FLOOR_DEPTH));
         boundZ=new wsBound((pos.z-computerWid),(pos.z+computerWid));
 
-        map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // the base
 
         boundX=new wsBound((pos.x-wid),(pos.x+wid));
         boundZ=new wsBound((pos.z-wid),(pos.z+wid));
 
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,boundX,baseBoundY,boundZ,null,false,true,true,true,true,true,false,false,MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,boundX,baseBoundY,boundZ,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
     }
     
         //
@@ -98,16 +98,16 @@ class GenRoomDecorationMachineClass
         y=pos.y-Math.trunc(config.ROOM_FLOOR_HEIGHT*0.3);
 
         boundY=new wsBound(pos.y,y);
-        mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,false,false,false,MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
 
         boundY.max=boundY.min;
         boundY.min=boundY.max-config.ROOM_FLOOR_DEPTH;
-        mesh2=MeshPrimitivesClass.createMeshWedge(baseBitmap,boundX,boundY,boundZ,ang,false,true,true,true,false,false,false,MESH_FLAG_DECORATION);
+        mesh2=MeshPrimitivesClass.createMeshWedge(baseBitmap,boundX,boundY,boundZ,ang,false,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
 
         mesh.combineMesh(mesh2);
         map.addMesh(mesh);
 
-        map.addMesh(MeshPrimitivesClass.createMeshWedge(computerBitmap,boundX,boundY,boundZ,ang,true,false,false,false,true,true,false,MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshWedge(computerBitmap,boundX,boundY,boundZ,ang,true,false,false,false,true,true,false,map.MESH_FLAG_DECORATION));
     }
     
         //

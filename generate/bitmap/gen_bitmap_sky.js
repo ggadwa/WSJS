@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -26,11 +28,11 @@ class GenBitmapSkyClass extends GenBitmapClass
     
     generateCloud(bitmapCTX,lft,top,rgt,bot,cloudColor)
     {
-        var n,x,y,xsz,ysz;
-        var wid=rgt-lft;
-        var high=bot-top;
-        var quarterWid=Math.trunc(wid*0.25);
-        var quarterHigh=Math.trunc(high*0.25);
+        let n,x,y,xsz,ysz;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let quarterWid=Math.trunc(wid*0.25);
+        let quarterHigh=Math.trunc(high*0.25);
         
         for (n=0;n!==20;n++) {
             xsz=genRandom.randomInt(quarterWid,quarterWid);
@@ -45,15 +47,15 @@ class GenBitmapSkyClass extends GenBitmapClass
 
     generateSkyClouds(bitmapCTX,wid,high)
     {
-        var n,nCloud;
-        var x,y,xsz,ysz;
+        let n,nCloud;
+        let x,y,xsz,ysz;
         
-        var mx=Math.trunc(wid*0.5);
-        var my=Math.trunc(high*0.5);
-        var cloudWid=Math.trunc(mx*0.25);
-        var cloudHigh=Math.trunc(my*0.25);
+        let mx=Math.trunc(wid*0.5);
+        let my=Math.trunc(high*0.5);
+        let cloudWid=Math.trunc(mx*0.25);
+        let cloudHigh=Math.trunc(my*0.25);
         
-        var cloudColor=new wsColor(1,1,1);
+        let cloudColor=new wsColor(1,1,1);
         
             // top
             // color the whole thing in first
@@ -90,14 +92,14 @@ class GenBitmapSkyClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high;
-        var bitmapCanvas,bitmapCTX;
+        let wid,high;
+        let bitmapCanvas,bitmapCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_SKY_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_SKY_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_SKY_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_SKY_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

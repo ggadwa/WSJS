@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -22,7 +24,7 @@ class MapOverlayShaderClass extends ShaderClass
 
     initialize()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -54,7 +56,7 @@ class MapOverlayShaderClass extends ShaderClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.useProgram(this.program);
 
@@ -69,13 +71,13 @@ class MapOverlayShaderClass extends ShaderClass
     
     drawColor(color)
     {
-        var gl=view.gl;
+        let gl=view.gl;
         gl.uniform3f(this.colorUniform,color.r,color.g,color.b);
     }
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // disable vertex attributes
 

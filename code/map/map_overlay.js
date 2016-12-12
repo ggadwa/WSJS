@@ -1,3 +1,5 @@
+/* global view, entityList, EntityProjectileClass */
+
 "use strict";
 
 //
@@ -38,7 +40,7 @@ class MapOverlayClass
 
     initialize()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         if (!this.mapOverlayShader.initialize()) return(false);
         
@@ -53,7 +55,7 @@ class MapOverlayClass
 
     release()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.deleteBuffer(this.roomVertexPosBuffer);
         gl.deleteBuffer(this.extraVertexPosBuffer);
@@ -70,8 +72,8 @@ class MapOverlayClass
         
     addLines(lineList,lines)
     {
-        var n,k;
-        var isDup;
+        let n,k;
+        let isDup;
         
             // add to line list, removing duplicates
             
@@ -106,7 +108,7 @@ class MapOverlayClass
     
     addCloset(xBound,zBound)
     {
-        var lines=[];
+        let lines=[];
         
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
@@ -118,7 +120,7 @@ class MapOverlayClass
     
     addConnection(xBound,zBound)
     {
-        var lines=[];
+        let lines=[];
         
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
@@ -130,7 +132,7 @@ class MapOverlayClass
     
     addPlatform(xBound,zBound)
     {
-        var lines=[];
+        let lines=[];
         
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
@@ -146,10 +148,11 @@ class MapOverlayClass
     
     precalcDrawValues()
     {
-        var n,idx,line;
-        var xBound,yBound;
-        var gl=view.gl;
-        var nLine=this.roomLineList.length;
+        let n,idx,line,maxSize;
+        let xBound,yBound;
+        let roomVertexList,extraVertexList;
+        let gl=view.gl;
+        let nLine=this.roomLineList.length;
         
             // get the total size
             
@@ -170,7 +173,7 @@ class MapOverlayClass
             // the max size of the overlay
             // is based on the view
             
-        var maxSize=view.high-150;
+        maxSize=view.high-150;
         
             // get the scale
             // and remember offset to put entities in later
@@ -196,7 +199,7 @@ class MapOverlayClass
             // create the room vertex buffer
         
         idx=0;
-        var roomVertexList=new Float32Array(nLine*4);
+        roomVertexList=new Float32Array(nLine*4);
         
         for (n=0;n!==nLine;n++) {
             line=this.roomLineList[n];
@@ -216,7 +219,7 @@ class MapOverlayClass
         idx=0;
         nLine=this.extraLineList.length;
         
-        var extraVertexList=new Float32Array(nLine*4);
+        extraVertexList=new Float32Array(nLine*4);
         
         for (n=0;n!==nLine;n++) {
             line=this.extraLineList[n];
@@ -238,8 +241,12 @@ class MapOverlayClass
         
     draw()
     {
-        var n;
-        var gl=view.gl;
+        let n,x,y;
+        let p1,p2,p3;
+        let entity,ang,pos,nEntity;
+        let playerColor=new wsColor(0.5,1.0,0.5);
+        let monsterColor=new wsColor(1.0,0.5,0.5);
+        let gl=view.gl;
 
         this.mapOverlayShader.drawStart();
         gl.disable(gl.DEPTH_TEST);
@@ -265,18 +272,12 @@ class MapOverlayClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.entityVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             
-        var x,y;
-        
-        var p1=new ws2DIntPoint(0,0);
-        var p2=new ws2DIntPoint(0,0);
-        var p3=new ws2DIntPoint(0,0);
-        
-        var entity,ang,pos;
-        var nEntity=entityList.countEntity();
-        
-        var playerColor=new wsColor(0.5,1.0,0.5);
-        var monsterColor=new wsColor(1.0,0.5,0.5);
+        p1=new ws2DIntPoint(0,0);
+        p2=new ws2DIntPoint(0,0);
+        p3=new ws2DIntPoint(0,0);
 
+        nEntity=entityList.countEntity();
+        
         for (n=0;n!==nEntity;n++) {
             entity=entityList.getEntity(n);
             if (entity instanceof EntityProjectileClass) continue;

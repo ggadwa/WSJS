@@ -33,7 +33,7 @@ class ModelClass
         
     clone()
     {
-        var model=new ModelClass(this.name,this.modelType);
+        let model=new ModelClass(this.name,this.modelType);
         
         model.modelMeshShader=this.modelMeshShader;
         model.mesh=this.mesh.clone();
@@ -72,7 +72,7 @@ class ModelClass
 
     draw()
     {
-        var mesh=this.mesh;
+        let mesh=this.mesh;
 
         mesh.bitmap.attachAsTexture(this.modelMeshShader);
         

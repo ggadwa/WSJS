@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -28,15 +30,15 @@ class GenBitmapSkinClass extends GenBitmapClass
 
     generateScale(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var x,y,dx,dy;
-        var xCount;
+        let x,y,dx,dy;
+        let xCount;
 
-        var scaleCount=genRandom.randomInt(5,10);
-        var skinColor=this.getRandomColor();
-        var borderColor=this.darkenColor(skinColor,0.8);
+        let scaleCount=genRandom.randomInt(5,10);
+        let skinColor=this.getRandomColor();
+        let borderColor=this.darkenColor(skinColor,0.8);
 
-        var sWid=wid/scaleCount;
-        var sHigh=high/scaleCount;
+        let sWid=wid/scaleCount;
+        let sHigh=high/scaleCount;
          
             // clear canvases
 
@@ -79,11 +81,11 @@ class GenBitmapSkinClass extends GenBitmapClass
         
     generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,y,y2,lineCount;
-        var darken,lineColor,markCount;
-        var particleWid,particleHigh,particleDensity;
+        let n,x,y,y2,lineCount;
+        let darken,lineColor,markCount;
+        let particleWid,particleHigh,particleDensity;
         
-        var clothColor=this.getRandomColor();
+        let clothColor=this.getRandomColor();
          
             // clear canvases
 
@@ -137,11 +139,11 @@ class GenBitmapSkinClass extends GenBitmapClass
         
     generateFur(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,y;
-        var darken,boost,lineColor;
-        var halfHigh=Math.trunc(high*0.5);
+        let n,x,y;
+        let darken,boost,lineColor;
+        let halfHigh=Math.trunc(high*0.5);
 
-        var furColor=this.getRandomColor();
+        let furColor=this.getRandomColor();
          
             // clear canvases
 
@@ -197,25 +199,25 @@ class GenBitmapSkinClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high;
-        var shineFactor=1.0;
-        var bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
+        let wid,high;
+        let shineFactor=1.0;
+        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        normalCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        normalCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_MODEL_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_MODEL_TEXTURE_SIZE;
+        specularCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        specularCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;

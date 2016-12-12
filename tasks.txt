@@ -13,6 +13,7 @@ ToDos
 
 #### use LET
 #### add in the JSHints so we know what objects are required for each module
+#### see if we can remove constants and put them in classes
 
 #### update the walls decorations
 

@@ -1,3 +1,5 @@
+/* global MeshUtilityClass, map, genRandom, config */
+
 "use strict";
 
 //
@@ -75,7 +77,7 @@ class GenRoomLedgeClass
 
             // finally create the mesh
 
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,MESH_FLAG_LEDGE));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_LEDGE));
     }
         
         //

@@ -1,3 +1,5 @@
+/* global genRandom */
+
 "use strict";
 
 //
@@ -29,25 +31,22 @@ class GenBitmapBoxClass extends GenBitmapClass
     
     generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,x,y,offset;
-        var dx,dy,sx,sy,ex,ey;
-        var streakWid,streakColor,darken;
-        var idx,line,lineStyle;
-        var lines=[];
+        let n,x,offset;
+        let streakWid,streakColor,darken;
 
             // some random values
 
-        var metalColor=this.getDefaultPrimaryColor();
-        var borderColor=new wsColor(0.0,0.0,0.0);
+        let metalColor=this.getDefaultPrimaryColor();
+        let borderColor=new wsColor(0.0,0.0,0.0);
 
-        var edgeSize=genRandom.randomInt(4,8);
-        var innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
+        let edgeSize=genRandom.randomInt(4,8);
+        let innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
         
-        var screwSize=genRandom.randomInt(10,20);
-        var screenFlatInnerSize=Math.trunc(screwSize*0.4);
+        let screwSize=genRandom.randomInt(10,20);
+        let screenFlatInnerSize=Math.trunc(screwSize*0.4);
         
-        var streakCount=genRandom.randomInt(15,10);
-        var screwColor=this.boostColor(metalColor,0.05);
+        let streakCount=genRandom.randomInt(15,10);
+        let screwColor=this.boostColor(metalColor,0.05);
         
             // clear canvases
 
@@ -95,8 +94,8 @@ class GenBitmapBoxClass extends GenBitmapClass
 
     generateWoodDrawBoard(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,woodColor)
     {
-        var woodFactor=0.8+(genRandom.random()*0.2);
-        var col=this.darkenColor(woodColor,woodFactor);
+        let woodFactor=0.8+(genRandom.random()*0.2);
+        let col=this.darkenColor(woodColor,woodFactor);
 
         this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
         this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
@@ -105,15 +104,15 @@ class GenBitmapBoxClass extends GenBitmapClass
     
     generateWood(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        var n,k,lft,rgt,top,bot;
-        var halfSize,boardSplit,boardHigh,woodFactor;
+        let n,lft,rgt,top,bot;
+        let boardSplit,boardHigh;
         
             // some random values
 
-        var boardCount=genRandom.randomInt(4,8);
-        var boardSize=Math.trunc(wid/boardCount);
-        var edgeSize=genRandom.randomInt(3,3);
-        var woodColor=this.getDefaultPrimaryColor();
+        let boardCount=genRandom.randomInt(4,8);
+        let boardSize=Math.trunc(wid/boardCount);
+        let edgeSize=genRandom.randomInt(3,3);
+        let woodColor=this.getDefaultPrimaryColor();
 
             // clear canvases
 
@@ -164,25 +163,25 @@ class GenBitmapBoxClass extends GenBitmapClass
 
     generate(generateType,inDebug)
     {
-        var wid,high,segments;
-        var shineFactor=1.0;
-        var bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
+        let wid,high;
+        let shineFactor=1.0;
+        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
 
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         normalCanvas=document.createElement('canvas');
-        normalCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         normalCTX=normalCanvas.getContext('2d');
 
         specularCanvas=document.createElement('canvas');
-        specularCanvas.width=GEN_BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=GEN_BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;
