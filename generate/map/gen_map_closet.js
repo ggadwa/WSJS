@@ -1,4 +1,4 @@
-/* global MeshUtilityClass, map, genRandom, config */
+/* global MeshUtilityClass, map, genRandom, config, mapRoomConstants */
 
 "use strict";
 
@@ -17,13 +17,13 @@ class GenRoomClosetClass
         
     createClosetCube(xBound,yBound,zBound)
     {
-        var n,idx;
-        var vertexList,indexes;
-        var bitmap;
+        let n,idx;
+        let vertexList,indexes;
+        let bitmap;
         
             // center point for normal creation
             
-        var centerPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        let centerPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
 
             // the walls
             
@@ -129,12 +129,12 @@ class GenRoomClosetClass
         
     addCloset(room)
     {
-        var n,k,x,z,xAdd,zAdd;
-        var bottomStory,topStory,storyHigh;
-        var connectSide,connectOffset,closetLen;
-        var xClosetBound,yClosetBound,zClosetBound;
+        let n,k,x,z,xAdd,zAdd;
+        let bottomStory,topStory,storyHigh;
+        let connectSide,connectOffset,closetLen;
+        let xClosetBound,yClosetBound,zClosetBound;
         
-        var closetCount=genRandom.randomIndex(config.ROOM_CLOSET_MAX_COUNT);
+        let closetCount=genRandom.randomIndex(config.ROOM_CLOSET_MAX_COUNT);
         if (closetCount===0) return;
         
             // story height
@@ -154,7 +154,7 @@ class GenRoomClosetClass
             
                 // get length and offset
             
-            if ((connectSide===ROOM_SIDE_LEFT) || (connectSide===ROOM_SIDE_RIGHT)) {
+            if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
                 closetLen=genRandom.randomInt(2,(room.zBlockSize-2));
                 connectOffset=genRandom.randomInt(0,(room.zBlockSize-closetLen));
             }
@@ -176,7 +176,7 @@ class GenRoomClosetClass
                 
             switch (connectSide) {
                 
-                case ROOM_SIDE_LEFT:
+                case mapRoomConstants.ROOM_SIDE_LEFT:
                     xAdd=0;
                     zAdd=config.ROOM_BLOCK_WIDTH;
                     z=room.zBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
@@ -184,7 +184,7 @@ class GenRoomClosetClass
                     zClosetBound=new wsBound(z,(z+config.ROOM_BLOCK_WIDTH));
                     break;
                     
-                case ROOM_SIDE_TOP:
+                case mapRoomConstants.ROOM_SIDE_TOP:
                     xAdd=config.ROOM_BLOCK_WIDTH;
                     zAdd=0;
                     x=room.xBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
@@ -192,7 +192,7 @@ class GenRoomClosetClass
                     zClosetBound=new wsBound((room.zBound.min-config.ROOM_BLOCK_WIDTH),room.zBound.min);
                     break;
                     
-                case ROOM_SIDE_RIGHT:
+                case mapRoomConstants.ROOM_SIDE_RIGHT:
                     xAdd=0;
                     zAdd=config.ROOM_BLOCK_WIDTH;
                     z=room.zBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
@@ -200,7 +200,7 @@ class GenRoomClosetClass
                     zClosetBound=new wsBound(z,(z+config.ROOM_BLOCK_WIDTH));
                     break;
                     
-                case ROOM_SIDE_BOTTOM:
+                case mapRoomConstants.ROOM_SIDE_BOTTOM:
                     xAdd=config.ROOM_BLOCK_WIDTH;
                     zAdd=0;
                     x=room.xBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);

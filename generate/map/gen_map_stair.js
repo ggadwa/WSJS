@@ -59,7 +59,7 @@ class GenRoomStairsClass
         
     createNormalsForPolygon(nIdx,vertexList,nx,ny,nz)
     {
-        var n;
+        let n;
         
         for (n=0;n!==4;n++) {
             vertexList[nIdx++].normal.setFromValues(nx,ny,nz);
@@ -79,12 +79,12 @@ class GenRoomStairsClass
             // everything we build is a quad so
             // we have 6 * # of quads in indexes
             
-        var n;
-        var iCount=Math.trunc(Math.trunc(vertexList.length)/4)*6;
+        let n,mesh;
+        let iCount=Math.trunc(Math.trunc(vertexList.length)/4)*6;
 
-        var indexes=new Uint16Array(iCount);
+        let indexes=new Uint16Array(iCount);
         
-        var vIdx=0;
+        let vIdx=0;
 
         for (n=0;n!==iCount;n+=6) {
             indexes[n]=vIdx;
@@ -105,7 +105,7 @@ class GenRoomStairsClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
-        var mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
+        mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
         map.addMesh(mesh);
     }
 
@@ -115,27 +115,29 @@ class GenRoomStairsClass
 
     createStairsX(xBound,yBound,zBound,toPlatform,includeBack,flip)
     {
-        var n,idx,stepAdd;
-        var vertexList;
-        var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,zThickBound;
+        let n,idx,stepAdd,yBoundFront,nIdx;
+        let vertexList;
+        let xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,zThickBound;
+        let meshCenterPoint,thickSize,stairHigh,stepDrop;
+        let xBraceBound,braceSize;
         
-        var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
-        var stairBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        let stairBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
             // need a center point to better
             // create normals
             
-        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.trunc(zBound.getSize()*0.05);
+        thickSize=Math.trunc(zBound.getSize()*0.05);
         
             // height of stairs and steps
             
-        var stairHigh=yBound.getSize();
-        var stepDrop=stairHigh/config.STAIR_STEP_COUNT;
+        stairHigh=yBound.getSize();
+        stepDrop=stairHigh/config.STAIR_STEP_COUNT;
         
             // the stair room
 
@@ -201,7 +203,7 @@ class GenRoomStairsClass
                 yBoundBottom=new wsBound((yBound.max-stepDrop),yBound.max);
             }
             
-            var yBoundFront=new wsBound((yBound.max-stepDrop),yBound.max);
+            yBoundFront=new wsBound((yBound.max-stepDrop),yBound.max);
             
                 // the edges
                 
@@ -230,8 +232,7 @@ class GenRoomStairsClass
                 // the behind box brace
             
             if (includeBack) {
-                var xBraceBound;
-                var braceSize=Math.trunc(xBound.getSize()*0.4);
+                braceSize=Math.trunc(xBound.getSize()*0.4);
 
                 if (!flip) {
                     xBraceBound=new wsBound((xBound.min-braceSize),xBound.min);
@@ -248,7 +249,7 @@ class GenRoomStairsClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList((config.STAIR_STEP_COUNT*4)*2);
         
-        var nIdx=0;
+        nIdx=0;
         if (!flip) {
             stepAdd=xBound.getSize()/config.STAIR_STEP_COUNT;
             xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
@@ -285,27 +286,27 @@ class GenRoomStairsClass
 
     createStairsZ(xBound,yBound,zBound,toPlatform,includeBack,flip)
     {
-        var n,idx,stepAdd;
-        var vertexList;
-        var xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,xThickBound;
-        
-        var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
-        var stairBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let n,idx,stepAdd,yBoundFront,nIdx;
+        let vertexList,meshCenterPoint,thickSize,stairHigh,stepDrop;
+        let xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,xThickBound;
+        let zBraceBound,braceSize;
+        let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        let stairBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
             // need a center point to better
             // create normals
             
-        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.trunc(zBound.getSize()*0.05);
+        thickSize=Math.trunc(zBound.getSize()*0.05);
         
             // height of stairs and steps
             
-        var stairHigh=yBound.getSize();
-        var stepDrop=stairHigh/config.STAIR_STEP_COUNT;
+        stairHigh=yBound.getSize();
+        stepDrop=stairHigh/config.STAIR_STEP_COUNT;
         
             // the stair room
             
@@ -371,7 +372,7 @@ class GenRoomStairsClass
                 yBoundBottom=new wsBound((yBound.max-stepDrop),yBound.max);
             }
             
-            var yBoundFront=new wsBound((yBound.max-stepDrop),yBound.max);
+            yBoundFront=new wsBound((yBound.max-stepDrop),yBound.max);
             
                 // the edges
                 
@@ -400,8 +401,7 @@ class GenRoomStairsClass
                 // the behind box brace
             
             if (includeBack) {
-                var zBraceBound;
-                var braceSize=Math.trunc(zBound.getSize()*0.4);
+                braceSize=Math.trunc(zBound.getSize()*0.4);
 
                 if (!flip) {
                     zBraceBound=new wsBound((zBound.min-braceSize),zBound.min);
@@ -418,7 +418,7 @@ class GenRoomStairsClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList((config.STAIR_STEP_COUNT*4)*2);
         
-        var nIdx=0;
+        nIdx=0;
         if (!flip) {
             stepAdd=zBound.getSize()/config.STAIR_STEP_COUNT;
             zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));

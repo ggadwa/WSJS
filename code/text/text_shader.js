@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -24,7 +26,7 @@ class TextShaderClass extends ShaderClass
 
     initialize()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -61,7 +63,7 @@ class TextShaderClass extends ShaderClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.useProgram(this.program);
 
@@ -77,7 +79,7 @@ class TextShaderClass extends ShaderClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // disable vertex attributes
 

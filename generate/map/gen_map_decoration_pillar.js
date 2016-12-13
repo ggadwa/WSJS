@@ -10,10 +10,10 @@ class GenRoomDecorationPillarClass
 {
     constructor()
     {
-        var minRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.08);
-        var maxRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.14);
+        let minRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.08);
+        let maxRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.14);
 
-        var radius=genRandom.randomInBetween(minRadius,maxRadius);
+        let radius=genRandom.randomInBetween(minRadius,maxRadius);
         this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(radius,radius,1,4);
         
         Object.seal(this);
@@ -25,7 +25,7 @@ class GenRoomDecorationPillarClass
         
     addPillarsCorners(room,bitmap,inside)
     {
-        var mx,mz,pos,yBound;
+        let mx,mz,pos,yBound;
         
         pos=room.checkGroundFloorSpawnAndBlock(1,1);
         yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(1,1);
@@ -67,7 +67,7 @@ class GenRoomDecorationPillarClass
     
     addPillarsLineX(room,bitmap)
     {
-        var x,mx,mz,pos,yBound;
+        let x,mx,mz,pos,yBound;
         
         mx=Math.trunc(room.xBlockSize/2);
         mz=Math.trunc(room.zBlockSize/2);
@@ -83,7 +83,7 @@ class GenRoomDecorationPillarClass
     
     addPillarsLineZ(room,bitmap)
     {
-        var z,mx,mz,pos,yBound;
+        let z,mx,mz,pos,yBound;
         
         mx=Math.trunc(room.xBlockSize/2);
         mz=Math.trunc(room.zBlockSize/2);
@@ -105,7 +105,7 @@ class GenRoomDecorationPillarClass
     {
             // texture
             
-        var bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
+        let bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
         
             // random pillar types
             

@@ -400,6 +400,27 @@ class EntityClass
         return(this.turnTowards(this.position.angleYTo(pos),speed));
     }
     
+    getAngleDifferenceTowardsPosition(pos)
+    {
+        let subway,addway;
+        let toY=this.position.angleYTo(pos);
+        
+        if (this.angle.y===toY) return(0);
+        
+            // which way is faster?
+	
+	if (this.angle.y>toY) {
+            addway=360.0-(this.angle.y-toY);
+            subway=this.angle.y-toY;
+	}
+	else {
+            addway=toY-this.angle.y;
+            subway=360.0-(toY-this.angle.y);
+	}
+        
+        return((addway<subway)?addway:subway);
+    }
+    
         //
         // look (x angle)
         //

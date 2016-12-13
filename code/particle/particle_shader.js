@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -25,7 +27,7 @@ class ParticleShaderClass extends ShaderClass
 
     initialize()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -64,7 +66,7 @@ class ParticleShaderClass extends ShaderClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // using the map shader
 
@@ -83,7 +85,7 @@ class ParticleShaderClass extends ShaderClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // disable vertex attributes
 

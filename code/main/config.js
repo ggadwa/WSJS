@@ -87,27 +87,12 @@ class ConfigClass
         this.MONSTER_TYPE_COUNT=3;
         this.MONSTER_ENTITY_COUNT=10;
         
-        this.MONSTER_FIRE_PERCENTAGE=0.75;              // amount of time a monster can fire
-        
-        this.MONSTER_MIN_SPEED=15;                      // minimum speed for monster
-        this.MONSTER_RANDOM_EXTRA_SPEED=60;             // additional random speed for monster
-        this.MONSTER_MIN_ACCELERATION=1;                // minimum acceleration
-        this.MONSTER_RANDOM_EXTRA_ACCELERATION=20;
-        this.MONSTER_MIN_DECLERATION=1;                 // minimum deceleration
-        this.MONSTER_RANDOM_EXTRA_DECELERATION=20;
-        
-        this.MONSTER_MIN_STAND_TURN_SPEED=0.2;
-        this.MONSTER_RANDOM_EXTRA_STAND_TURN_SPEED=0.5;
-        this.MONSTER_MIN_WALK_TURN_SPEED=0.2;
-        this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=0.5;
-
         this.MONSTER_AI_ON=true;
         
             //
             // sounds
             //
             
-        this.MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
         this.VOLUME=0.3;                                // main volume
         
             //

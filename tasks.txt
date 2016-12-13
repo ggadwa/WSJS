@@ -1,5 +1,6 @@
-EMCA6
+ES6
     [ ] modulize the code (do genRandom first)
+    [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass
 
 WebGL2
     [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
@@ -10,45 +11,33 @@ When interface created
 
 ToDos
 
+#### move a lot of config stuff
 
-#### use LET
-#### add in the JSHints so we know what objects are required for each module
-#### see if we can remove constants and put them in classes
+#### monsters only wake if they see you or get within min wake distance
+      -> test all this, and give field of vision to AI
 
+#### for connected rooms, if lower or upper, try to wedge a room in between the staircase and other room to create open access
 #### update the walls decorations
-
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
-
 #### only put closets in areas that have platforms to them?
-
 #### platforms not knocking out main map mesh walls?
 #### ledges on top and bottom?
-
-#### better monster scream
-
 #### need to group the lights to better pick the lights in each room
-
 #### item texture is pretty ugly
-#### genBitmapSkin/genBitmapItem in main.js delete later
-
 #### collisions against slanted walls are bad
 #### weapon models
 #### get rid of weapon fire hard-coding
 #### monster speed/health random/projectile,no-projectile
 #### implement reflect for projectiles
-
 #### closets more complex?
 #### windows like you do closets
 #### liquid tint colors are hardcoded
 #### be able to attach rounded sections or just use rounded rooms at end of path
-
 #### outside sections
-
 #### model spikes
 #### other leg positions
 #### flyers models
-
 #### draw closest map meshes first
 
 

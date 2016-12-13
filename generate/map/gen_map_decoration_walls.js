@@ -1,4 +1,4 @@
-/* global config, genRandom, map, MeshPrimitivesClass, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
+/* global config, genRandom, map, MeshPrimitivesClass */
 
 "use strict";
 

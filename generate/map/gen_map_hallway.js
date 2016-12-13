@@ -64,12 +64,12 @@ class GenRoomHallwayClass
             // everything we build is a quad so
             // we have 6 * # of quads in indexes
             
-        var n;
-        var iCount=Math.trunc(Math.trunc(vertexList.length)/4)*6;
+        let n,mesh;
+        let iCount=Math.trunc(Math.trunc(vertexList.length)/4)*6;
 
-        var indexes=new Uint16Array(iCount);
+        let indexes=new Uint16Array(iCount);
         
-        var vIdx=0;
+        let vIdx=0;
 
         for (n=0;n!==iCount;n+=6) {
             indexes[n]=vIdx;
@@ -90,7 +90,7 @@ class GenRoomHallwayClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
-        var mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
+        mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
         return(map.addMesh(mesh));
     }
 
@@ -100,9 +100,9 @@ class GenRoomHallwayClass
 
     createDoorXSingle(x,yBound,zBound,thickSize)
     {
-        var idx,meshIdx,zDoorBound;
-        var vertexList,movement;
-        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
+        let idx,meshIdx,zDoorBound;
+        let vertexList,movement;
+        let doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
         
         xDoorBound=new wsBound((x-thickSize),(x+thickSize));
             
@@ -125,21 +125,21 @@ class GenRoomHallwayClass
     
     createHallwayX(xBound,yBound,zBound,doubleDoor)
     {
-        var n,idx,meshIdx;
-        var vertexList,movement;
-        var x,xHallwayBound,zHallwayBound,zThickBound;
+        let idx,meshCenterPoint,thickSize;
+        let vertexList;
+        let zHallwayBound,zThickBound;
         
-        var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
             // need a center point to better
             // create normals
             
-        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
+        thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
         
             // the door room
             // internal walls
@@ -193,9 +193,9 @@ class GenRoomHallwayClass
     
     createHallwayDoorZ(xBound,yBound,z,thickSize)
     {
-        var idx,meshIdx,zDoorBound;
-        var vertexList,movement;
-        var doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
+        let idx,meshIdx,zDoorBound;
+        let vertexList,movement;
+        let doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
         
         zDoorBound=new wsBound((z-thickSize),(z+thickSize));
         
@@ -218,21 +218,21 @@ class GenRoomHallwayClass
 
     createHallwayZ(xBound,yBound,zBound,doubleDoor)
     {
-        var n,idx,meshIdx;
-        var vertexList,movement;
-        var z,xHallwayBound,zHallwayBound,xThickBound;
+        let idx,meshCenterPoint,thickSize;
+        let vertexList;
+        let xHallwayBound,xThickBound;
         
-        var roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
             // need a center point to better
             // create normals
             
-        var meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        var thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
+        thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
          
             // the door room
             // internal walls

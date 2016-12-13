@@ -1,4 +1,4 @@
-/* global view, genRandom, PARTICLE_MAX_POINTS */
+/* global view, genRandom */
 
 "use strict";
 
@@ -10,6 +10,8 @@ class ParticleClass
 {
     constructor()
     {
+        this.PARTICLE_MAX_POINTS=200;
+
         this.radiusStart=0;
         this.radiusEnd=0;
 
@@ -41,9 +43,9 @@ class ParticleClass
 
         this.randomRot=new wsPoint(0.0,0.0,0.0);
 
-        this.vertices=new Float32Array((PARTICLE_MAX_POINTS*4)*3);
-        this.uvs=new Float32Array((PARTICLE_MAX_POINTS*4)*2);
-        this.indexes=new Uint16Array((PARTICLE_MAX_POINTS*2)*3);
+        this.vertices=new Float32Array((this.PARTICLE_MAX_POINTS*4)*3);
+        this.uvs=new Float32Array((this.PARTICLE_MAX_POINTS*4)*2);
+        this.indexes=new Uint16Array((this.PARTICLE_MAX_POINTS*2)*3);
         
         this.vertexPosBuffer=null;
         this.vertexUVBuffer=null;
@@ -58,9 +60,10 @@ class ParticleClass
         
     initialize()
     {
-        var gl=view.gl;
+        let n;
+        let gl=view.gl;
         
-        for (var n=0;n!==PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
+        for (n=0;n!==this.PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
             this.points.push(new wsPoint(0,0,0));
         }
 
@@ -71,7 +74,7 @@ class ParticleClass
     
     release()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         this.points=[];
 
@@ -164,7 +167,7 @@ class ParticleClass
         
     createRandomGlobePoints(pointCount)
     {
-        var n,pnt;
+        let n,pnt;
         
         for (n=0;n!==pointCount;n++) {
             pnt=this.points[n];
@@ -183,9 +186,9 @@ class ParticleClass
 
     draw(particleShader)
     {
-        var n,pnt,vIdx,uvIdx,iIdx,elementIdx;
-        var timeFactor,radius,moveFactor,r,g,b,alpha;
-        var gl=view.gl;
+        let n,nTrig,pnt,vIdx,uvIdx,iIdx,elementIdx;
+        let timeFactor,radius,moveFactor,r,g,b,alpha;
+        let gl=view.gl;
         
             // get the radius and color
         
@@ -203,7 +206,7 @@ class ParticleClass
         
             // get # of trigs
         
-        var nTrig=this.count*2;
+        nTrig=this.count*2;
 
             // build the vertices
 

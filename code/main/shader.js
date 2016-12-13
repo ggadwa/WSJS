@@ -1,3 +1,5 @@
+/* global view, fileCache */
+
 "use strict";
 
 //

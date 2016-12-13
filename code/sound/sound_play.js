@@ -1,3 +1,5 @@
+/* global config */
+
 "use strict";
 
 //
@@ -22,21 +24,18 @@ class SoundPlayClass
     {
     }
     
-    /*
-     * var panner = audioCtx.createPanner();
-
-     */
-    
         //
         // play a sound buffer at this entity
         //
         
     play(ctx,entityListener,entity,soundBuffer)
     {
+        let dist;
+        
             // skip if over max distance from entity
         
         if (entity!==null) {
-            var dist=entity.position.distance(entityListener.position);
+            dist=entity.position.distance(entityListener.position);
             if (dist>soundBuffer.maxDistance) return(false);
         }
         

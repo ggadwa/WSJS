@@ -17,8 +17,8 @@ class MeshUtilityClass
         
     static createMapVertexList(nVertex)
     {
-        var n;
-        var vertexList=[];
+        let n;
+        let vertexList=[];
         
         for (n=0;n!==nVertex;n++) {
             vertexList.push(new MapMeshVertexClass());
@@ -29,8 +29,8 @@ class MeshUtilityClass
     
     static createModelVertexList(nVertex)
     {
-        var n;
-        var vertexList=[];
+        let n;
+        let vertexList=[];
         
         for (n=0;n!==nVertex;n++) {
             vertexList.push(new ModelMeshVertexClass());
@@ -45,8 +45,8 @@ class MeshUtilityClass
     
     static combineVertexLists(vertexList1,vertexList2)
     {
-        var n;
-        var vertexList=[];
+        let n;
+        let vertexList=[];
         
         for (n=0;n!==vertexList1.length;n++) {
             vertexList.push(vertexList1[n]);
@@ -60,10 +60,10 @@ class MeshUtilityClass
     
     static combineIndexes(indexes1,indexes2,index2Offset)
     {
-        var n;
-        var indexes=new Uint16Array(indexes1.length+indexes2.length);
+        let n;
+        let indexes=new Uint16Array(indexes1.length+indexes2.length);
         
-        var idx=0;
+        let idx=0;
         
         for (n=0;n!==indexes1.length;n++) {
             indexes[idx++]=indexes1[n];
@@ -82,8 +82,10 @@ class MeshUtilityClass
     
     static buildVertexListNormals(vertexList,indexes,meshCenterPoint,normalsIn)
     {
-        var n,flip,nTrig,nVertex,trigIdx;
-        var v0,v1,v2;
+        let n,flip,nTrig,nVertex,trigIdx;
+        let v0,v1,v2;
+        let meshCenter,trigCenter,faceVct;
+        let p10,p20,normal;
 
         nVertex=vertexList.length;
 
@@ -91,8 +93,6 @@ class MeshUtilityClass
             // this will be used later to determine if
             // normals should be flipped (for models
             // normals always face out)
-
-        var meshCenter;
         
         if (meshCenterPoint!==null) {
             meshCenter=meshCenterPoint;
@@ -109,8 +109,8 @@ class MeshUtilityClass
             meshCenter.z/=nVertex;
         }
         
-        var trigCenter=new wsPoint(0.0,0.0,0.0);
-        var faceVct=new wsPoint(0.0,0.0,0.0);
+        trigCenter=new wsPoint(0.0,0.0,0.0);
+        faceVct=new wsPoint(0.0,0.0,0.0);
 
             // generate normals by the trigs
             // sometimes we will end up overwriting
@@ -118,9 +118,9 @@ class MeshUtilityClass
             // constant shared vertices against
             // triangle normals
 
-        var p10=new wsPoint(0.0,0.0,0.0);
-        var p20=new wsPoint(0.0,0.0,0.0);
-        var normal=new wsPoint(0.0,0.0,0.0);
+        p10=new wsPoint(0.0,0.0,0.0);
+        p20=new wsPoint(0.0,0.0,0.0);
+        normal=new wsPoint(0.0,0.0,0.0);
 
         nTrig=Math.trunc(indexes.length/3);
 
@@ -172,21 +172,22 @@ class MeshUtilityClass
             
     static buildVertexListUVs(bitmap,vertexList)
     {
-        var n,v,nVertex;
-        var x,y,ang;
+        let n,v,i,nVertex;
+        let x,y,ang,uvScale,mapUp;
+        let minIntX,minIntY;
 
         nVertex=vertexList.length;
 
             // get the UV scale for this
             // bitmap
 
-        var uvScale=bitmap.uvScale;
+        uvScale=bitmap.uvScale;
 
             // determine floor/wall like by
             // the dot product of the normal
             // and an up vector
 
-        var mapUp=new wsPoint(0.0,-1.0,0.0);
+        mapUp=new wsPoint(0.0,-1.0,0.0);
 
             // run through the vertices
             // remember, both this and normals
@@ -226,11 +227,9 @@ class MeshUtilityClass
             // reduce all the UVs to
             // their minimum integers
             
-        var i;
-        
         v=vertexList[0];
-        var minIntX=Math.trunc(v.uv.x);
-        var minIntY=Math.trunc(v.uv.y);
+        minIntX=Math.trunc(v.uv.x);
+        minIntY=Math.trunc(v.uv.y);
         
         for (n=1;n!==nVertex;n++) {
             v=vertexList[n];
@@ -254,8 +253,8 @@ class MeshUtilityClass
         
     static transformUVs(vertexList,uAdd,vAdd,uReduce,vReduce)
     {
-        var n,nVertex;
-        var v;
+        let n,nVertex;
+        let v;
         
         nVertex=vertexList.length;
         
@@ -272,9 +271,9 @@ class MeshUtilityClass
 
     static buildVertexListTangents(vertexList,indexes)
     {
-        var n,nTrig,trigIdx;
-        var v0,v1,v2;
-        var u10,u20,v10,v20;
+        let n,nTrig,trigIdx;
+        let v0,v1,v2;
+        let u10,u20,v10,v20;
 
             // generate tangents by the trigs
             // sometimes we will end up overwriting
@@ -286,13 +285,13 @@ class MeshUtilityClass
             // goes on to create the normal, because
             // we need that first to make the UVs
 
-        var p10=new wsPoint(0.0,0.0,0.0);
-        var p20=new wsPoint(0.0,0.0,0.0);
-        var vLeft=new wsPoint(0.0,0.0,0.0);
-        var vRight=new wsPoint(0.0,0.0,0.0);
-        var vNum=new wsPoint(0.0,0.0,0.0);
-        var denom;
-        var tangent=new wsPoint(0.0,0.0,0.0);
+        let p10=new wsPoint(0.0,0.0,0.0);
+        let p20=new wsPoint(0.0,0.0,0.0);
+        let vLeft=new wsPoint(0.0,0.0,0.0);
+        let vRight=new wsPoint(0.0,0.0,0.0);
+        let vNum=new wsPoint(0.0,0.0,0.0);
+        let denom;
+        let tangent=new wsPoint(0.0,0.0,0.0);
 
         nTrig=Math.trunc(indexes.length/3);
 
@@ -346,7 +345,7 @@ class MeshUtilityClass
         
     static rotateVertexes(vertexList,centerPt,ang)
     {
-        var n,nVertex;
+        let n,nVertex;
         
         nVertex=vertexList.length;
         

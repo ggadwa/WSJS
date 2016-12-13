@@ -1,6 +1,38 @@
-/* global config, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM, genRandom, MeshUtilityClass, map */
+/* global config, genRandom, MeshUtilityClass, map */
 
 "use strict";
+
+//
+// special class that contains some constants
+// we can change this when we can get
+// static properties on classes
+//
+
+class MapRoomConstantsClass
+{
+    constructor()
+    {
+        this.ROOM_SIDE_LEFT=0;
+        this.ROOM_SIDE_TOP=1;
+        this.ROOM_SIDE_RIGHT=2;
+        this.ROOM_SIDE_BOTTOM=3;
+        
+        this.ROOM_LEVEL_MAIN=0;
+        this.ROOM_LEVEL_LOWER=1;
+        this.ROOM_LEVEL_UPPER=2;
+
+        this.ROOM_DECORATION_NONE=-1;
+        this.ROOM_DECORATION_PILLARS=0;
+        this.ROOM_DECORATION_STORAGE=1;
+        this.ROOM_DECORATION_MACHINES=2;
+        this.ROOM_DECORATION_EQUIPMENT=3;
+        this.ROOM_DECORATION_WALLS=4;
+
+        this.ROOM_DECORATION_COUNT=5;
+    }
+}
+
+let mapRoomConstants=new MapRoomConstantsClass();
 
 //
 // utility class for determining distance and facing
@@ -191,17 +223,17 @@ class MapRoomClass
     markDoorOnConnectionSide(connectSide,flipSide)
     {
         switch (connectSide) {
-            case ROOM_SIDE_LEFT:
-                this.connectSideHasDoor[flipSide?ROOM_SIDE_RIGHT:ROOM_SIDE_LEFT]=true;
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_RIGHT:mapRoomConstants.ROOM_SIDE_LEFT]=true;
                 break;
-            case ROOM_SIDE_RIGHT:
-                this.connectSideHasDoor[flipSide?ROOM_SIDE_LEFT:ROOM_SIDE_RIGHT]=true;
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT]=true;
                 break;
-            case ROOM_SIDE_TOP:
-                this.connectSideHasDoor[flipSide?ROOM_SIDE_BOTTOM:ROOM_SIDE_TOP]=true;
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_BOTTOM:mapRoomConstants.ROOM_SIDE_TOP]=true;
                 break;
-            case ROOM_SIDE_BOTTOM:
-                this.connectSideHasDoor[flipSide?ROOM_SIDE_TOP:ROOM_SIDE_BOTTOM]=true;
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_TOP:mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
                 break;
         }
     }
@@ -317,18 +349,18 @@ class MapRoomClass
         let distBot=this.zBound.max-pos.z;
         
         if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
-            return(new MapRoomFaceClass(ROOM_SIDE_LEFT,distLft));
+            return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_LEFT,distLft));
         }
         else {
             if ((distRgt<distTop) && (distRgt<distBot)) {
-                return(new MapRoomFaceClass(ROOM_SIDE_RIGHT,distRgt));
+                return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_RIGHT,distRgt));
             }
             else {
                 if (distTop<distBot) {
-                    return(new MapRoomFaceClass(ROOM_SIDE_TOP,distTop));
+                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_TOP,distTop));
                 }
                 else {
-                    return(new MapRoomFaceClass(ROOM_SIDE_BOTTOM,distBot));
+                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_BOTTOM,distBot));
                 }
             }
         }
@@ -347,18 +379,18 @@ class MapRoomClass
         let distBot=Math.abs(pos.z-cz);
         
         if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
-            return(new MapRoomFaceClass(ROOM_SIDE_RIGHT,distLft));
+            return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_RIGHT,distLft));
         }
         else {
             if ((distRgt<distTop) && (distRgt<distBot)) {
-                return(new MapRoomFaceClass(ROOM_SIDE_LEFT,distRgt));
+                return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_LEFT,distRgt));
             }
             else {
                 if (distTop<distBot) {
-                    return(new MapRoomFaceClass(ROOM_SIDE_BOTTOM,distTop));
+                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_BOTTOM,distTop));
                 }
                 else {
-                    return(new MapRoomFaceClass(ROOM_SIDE_TOP,distBot));
+                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_TOP,distBot));
                 }
             }
         }

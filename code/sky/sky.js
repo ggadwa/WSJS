@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -29,8 +31,8 @@ class SkyClass
 
     initialize()
     {
-        var gl=view.gl;
-        var genBitmapSky;
+        let gl=view.gl;
+        let genBitmapSky;
 
         if (!this.skyShader.initialize()) return(false);
         
@@ -54,7 +56,7 @@ class SkyClass
 
     release()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.deleteBuffer(this.vertexPosBuffer);
         gl.deleteBuffer(this.uvPosBuffer);
@@ -71,7 +73,7 @@ class SkyClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.disable(gl.DEPTH_TEST);
 
@@ -80,7 +82,7 @@ class SkyClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         this.skyShader.drawEnd();
 
@@ -154,9 +156,9 @@ class SkyClass
         
     draw()
     {
-        var gl=view.gl;
-        var cameraPos=view.camera.position;
-        var skyRadius=25000;
+        let gl=view.gl;
+        let cameraPos=view.camera.position;
+        let skyRadius=25000;
         
         this.bitmap.attachAsSky();
         
@@ -187,4 +189,4 @@ class SkyClass
 // the global sky object
 //
 
-var sky=new SkyClass();
+let sky=new SkyClass();

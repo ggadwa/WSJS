@@ -1,3 +1,5 @@
+/* global config */
+
 "use strict";
 
 //

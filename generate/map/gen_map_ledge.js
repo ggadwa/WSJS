@@ -19,13 +19,13 @@ class GenRoomLedgeClass
 
     addLedgeChunk(room,pts,nSide,high,bitmap)
     {
-        var n,k,idx;
-        var vertexCount,vertexList;
+        let n,k,idx,indexes;
+        let vertexCount,vertexList;
         
             // height
             
-        var by=room.yBound.max;
-        var ty=by-high;
+        let by=room.yBound.max;
+        let ty=by-high;
         
             // get vertex count
         
@@ -59,9 +59,7 @@ class GenRoomLedgeClass
             vertexList[idx++].position.setFromValues(pts[n+2].x,ty,pts[n+2].z);
         }
 
-        var n;
-
-        var indexes=new Uint16Array(vertexCount);
+        indexes=new Uint16Array(vertexCount);
 
         for (n=0;n!==vertexCount;n++) {
             indexes[n]=n;
@@ -86,8 +84,11 @@ class GenRoomLedgeClass
     
     createLedges(room)
     {
-        var x,z;
-        var ledgeBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let x,z;
+        let ledgeBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let wid,high;
+        let xMax,zMax;
+        let pts;
         
             // does this room have a ledge?
             
@@ -95,13 +96,13 @@ class GenRoomLedgeClass
         
             // ledge width and height
             
-        var wid=genRandom.randomInt(config.ROOM_LEDGE_MIN_WIDTH,config.ROOM_LEDGE_EXTRA_WIDTH);
-        var high=genRandom.randomInt(config.ROOM_LEDGE_MIN_HEIGHT,config.ROOM_LEDGE_EXTRA_HEIGHT);
+        wid=genRandom.randomInt(config.ROOM_LEDGE_MIN_WIDTH,config.ROOM_LEDGE_EXTRA_WIDTH);
+        high=genRandom.randomInt(config.ROOM_LEDGE_MIN_HEIGHT,config.ROOM_LEDGE_EXTRA_HEIGHT);
         
-        var xMax=room.xBlockSize*config.ROOM_BLOCK_WIDTH;
-        var zMax=room.zBlockSize*config.ROOM_BLOCK_WIDTH;
+        xMax=room.xBlockSize*config.ROOM_BLOCK_WIDTH;
+        zMax=room.zBlockSize*config.ROOM_BLOCK_WIDTH;
         
-        var pts=[new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0)];
+        pts=[new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0)];
 
             // left and right sides
         

@@ -1,4 +1,4 @@
-/* global config, genRandom, map, MeshPrimitivesClass, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
+/* global config, genRandom, map, MeshPrimitivesClass, mapRoomConstants */
 
 "use strict";
 
@@ -81,13 +81,13 @@ class GenRoomDecorationMachineClass
         dir=room.getDirectionTowardsCenter(pos);
 
         switch (dir.direction) {
-            case ROOM_SIDE_BOTTOM:
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 ang=new wsPoint(0.0,180.0,0.0);
                 break;
-            case ROOM_SIDE_LEFT:
+            case mapRoomConstants.ROOM_SIDE_LEFT:
                 ang=new wsPoint(0.0,270.0,0.0);
                 break;
-            case ROOM_SIDE_RIGHT:
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
                 ang=new wsPoint(0.0,90.0,0.0);
                 break;
         }

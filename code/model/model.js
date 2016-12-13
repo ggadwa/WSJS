@@ -1,6 +1,25 @@
 "use strict";
 
 //
+// class for some model constants
+// redo when static properities come to classes
+//
+
+class ModelConstantsClass
+{
+    constructor()
+    {
+        this.MODEL_TYPE_HUMANOID=0;
+        this.MODEL_TYPE_ANIMAL=1;
+        this.MODEL_TYPE_BLOB=2;
+        this.MODEL_TYPE_WEAPON=3;
+        this.MODEL_TYPE_PROJECTILE=4;
+    }
+}
+
+let modelConstants=new ModelConstantsClass();
+
+//
 // model object
 //
 

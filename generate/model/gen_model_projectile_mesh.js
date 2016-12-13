@@ -1,3 +1,5 @@
+/* global MeshUtilityClass */
+
 "use strict";
 
 //
@@ -16,12 +18,12 @@ class GenModelProjectileMeshClass
     
     buildBoxAroundPoint(centerPt,sz,vertexList,indexes)
     {
-        var n,v;
-        var idx=0;
+        let n,v;
+        let idx=0;
         
-        var xBound=new wsBound((centerPt.x-sz),(centerPt.x+sz));
-        var yBound=new wsBound((centerPt.y-(sz*2)),centerPt.y);
-        var zBound=new wsBound((centerPt.z-sz),(centerPt.z+sz));
+        let xBound=new wsBound((centerPt.x-sz),(centerPt.x+sz));
+        let yBound=new wsBound((centerPt.y-(sz*2)),centerPt.y);
+        let zBound=new wsBound((centerPt.z-sz),(centerPt.z+sz));
         
             // left
             
@@ -123,8 +125,8 @@ class GenModelProjectileMeshClass
 
     build()
     {
-        var vertexList=MeshUtilityClass.createModelVertexList(36);
-        var indexes=new Uint16Array(36);
+        let vertexList=MeshUtilityClass.createModelVertexList(36);
+        let indexes=new Uint16Array(36);
         
         this.buildBoxAroundPoint(new wsPoint(0,0,0),200,vertexList,indexes);
         

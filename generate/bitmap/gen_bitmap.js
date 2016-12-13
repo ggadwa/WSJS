@@ -72,7 +72,7 @@ class GenBitmapClass
                     [0.0,0.3,0.5],      // slate blue
                     [0.9,0.6,0.4],     // peach
                     [0.9,0.0,0.4],     // muave
-                    [0.8,0.5,0.5],      // dull red
+                    [0.8,0.5,0.5]      // dull red
                 ];
                 
             // we have a default primary color for every instance

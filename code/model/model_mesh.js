@@ -1,3 +1,5 @@
+/* global LIMB_TYPE_LEG_BACK, modelLimbConstants, view */
+
 "use strict";
 
 //
@@ -88,7 +90,7 @@ class ModelMeshClass
 
     close()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -115,7 +117,7 @@ class ModelMeshClass
             // only the internal gl arrays so we can just re-use the
             // data
         
-        var mesh=new ModelMeshClass(this.bitmap,this.vertexList,this.indexes,this.flag);
+        let mesh=new ModelMeshClass(this.bitmap,this.vertexList,this.indexes,this.flag);
         mesh.isClone=true;
         
         return(mesh);
@@ -127,10 +129,12 @@ class ModelMeshClass
         
     calculateRadius(skeleton)
     {
+        let n,v,limbType;
+        let xBound,zBound;
+        
         if (this.cacheRadius===-1) {
-            var n,v,limbType;
-            var xBound=new wsBound(0,0);
-            var zBound=new wsBound(0,0);
+            xBound=new wsBound(0,0);
+            zBound=new wsBound(0,0);
             
                 // no skeleton, do all vertexes
                 
@@ -150,7 +154,7 @@ class ModelMeshClass
                     v=this.vertexList[n];
                     limbType=skeleton.getBoneLimbType(v.boneIdx);
 
-                    if ((limbType===LIMB_TYPE_BODY) || (limbType===LIMB_TYPE_HEAD) || (limbType===LIMB_TYPE_LEG_LEFT) || (limbType===LIMB_TYPE_LEG_RIGHT) || (limbType===LIMB_TYPE_LEG_FRONT) || (limbType===LIMB_TYPE_LEG_BACK)) {
+                    if ((limbType===modelLimbConstants.LIMB_TYPE_BODY) || (limbType===modelLimbConstants.LIMB_TYPE_HEAD) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_LEFT) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_RIGHT) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_FRONT) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_BACK)) {
                         xBound.adjust(v.position.x);
                         zBound.adjust(v.position.z);
                     }
@@ -165,9 +169,11 @@ class ModelMeshClass
     
     calculateHeight()
     {
+        let n,v;
+        let high;
+        
         if (this.cacheHigh===-1) {
-            var n,v;
-            var high=0;
+            high=0;
 
             for (n=0;n!==this.vertexCount;n++) {
                 v=this.vertexList[n];
@@ -186,7 +192,7 @@ class ModelMeshClass
         
     precalcAnimationValues(skeleton)
     {
-        var n,v,bone,parentBone;
+        let n,v,bone,parentBone;
 
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
@@ -209,13 +215,14 @@ class ModelMeshClass
         
     updateVertexesToPoseAndPosition(skeleton,angle,position)
     {
-        var n,v;
-        var bone,parentBone;
+        let n,v,vIdx,nIdx;
+        let bone,parentBone;
+        let gl=view.gl;
         
             // move all the vertexes
             
-        var vIdx=0;
-        var nIdx=0;
+        vIdx=0;
+        nIdx=0;
         
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
@@ -270,7 +277,6 @@ class ModelMeshClass
         
             // set the buffers
             
-        var gl=view.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
         
@@ -284,12 +290,13 @@ class ModelMeshClass
         
     updateVertexesToAngleAndPosition(angle,position)
     {
-        var n,v;
+        let n,v,vIdx,nIdx;
+        let gl=view.gl;
         
             // move all the vertexes
             
-        var vIdx=0;
-        var nIdx=0;
+        vIdx=0;
+        nIdx=0;
         
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
@@ -311,7 +318,6 @@ class ModelMeshClass
         
             // set the buffers
             
-        var gl=view.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
         
@@ -325,21 +331,21 @@ class ModelMeshClass
 
     setupBuffers()
     {
+        let n,v,vIdx,uIdx,nIdx,tIdx;
+        let gl=view.gl;
+        
             // build the default buffer data
             // from the vertex list
-        
-        var n;
         
         this.drawVertices=new Float32Array(this.vertexCount*3);
         this.drawNormals=new Float32Array(this.vertexCount*3);
         this.drawTangents=new Float32Array(this.vertexCount*3);
         this.drawUVs=new Float32Array(this.vertexCount*2);
         
-        var vIdx=0;
-        var uIdx=0;
-        var nIdx=0;
-        var tIdx=0;
-        var v;
+        vIdx=0;
+        uIdx=0;
+        nIdx=0;
+        tIdx=0;
         
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
@@ -361,8 +367,6 @@ class ModelMeshClass
         }
 
             // create all the buffers
-
-        var gl=view.gl;
 
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
@@ -387,7 +391,7 @@ class ModelMeshClass
 
     bindBuffers(modelMeshShader)
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.vertexAttribPointer(modelMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
@@ -414,10 +418,10 @@ class ModelMeshClass
         
     buildNonCulledTriangleIndexes()
     {
-        var n,k,idx,vIdx;
-        var pnt=new wsPoint(0,0,0);
-        var normal=new wsPoint(0,0,0);
-        var trigToEyeVector=new wsPoint(0,0,0);
+        let n,idx,vIdx;
+        let pnt=new wsPoint(0,0,0);
+        let normal=new wsPoint(0,0,0);
+        let trigToEyeVector=new wsPoint(0,0,0);
         
             // we build a list of array the vertexes
             // that aren't culled, if it's the first
@@ -472,7 +476,7 @@ class ModelMeshClass
 
     draw()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         

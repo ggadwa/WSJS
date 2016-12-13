@@ -1,3 +1,5 @@
+/* global sound */
+
 "use strict";
 
 //
@@ -113,7 +115,7 @@ class DebugSoundClass
         idx++;
         if (idx>=this.genSound.TYPE_NAMES.length) return;
         
-        setTimeout(this.addSounds.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addSounds.bind(this,idx),1);
     }
     
         //

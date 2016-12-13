@@ -1,6 +1,11 @@
-/* global DEGREE_TO_RAD, RAD_TO_DEGREE */
-
 "use strict";
+
+//
+// some math constants
+//
+
+const DEGREE_TO_RAD=Math.PI/180.0;
+const RAD_TO_DEGREE=180.0/Math.PI;
 
 //
 // utility classes

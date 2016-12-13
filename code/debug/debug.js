@@ -1,4 +1,4 @@
-/* global view */
+/* global view, particleList */
 
 "use strict";
 

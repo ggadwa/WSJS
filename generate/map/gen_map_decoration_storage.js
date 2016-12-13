@@ -19,17 +19,17 @@ class GenRoomDecorationStorageClass
 
     addBoxes(room,pos,yOffset,high)
     {
-        var n,stackLevel,boxPos,boxY,boxCount,rotWid;
-        var ang,angAdd;
-        var wid,rotAngle;
-        var boxBitmap=map.getTexture(map.TEXTURE_TYPE_BOX);
+        let n,stackLevel,boxY,boxCount,rotWid;
+        let ang,angAdd;
+        let wid,boxPos,rotAngle;
+        let boxBitmap=map.getTexture(map.TEXTURE_TYPE_BOX);
         
-        var boxBoundX=new wsBound(0,0);
-        var boxBoundY=new wsBound(0,0);
-        var boxBoundZ=new wsBound(0,0);
+        let boxBoundX=new wsBound(0,0);
+        let boxBoundY=new wsBound(0,0);
+        let boxBoundZ=new wsBound(0,0);
         
-        var boxPos=new wsPoint(0,0,0);
-        var rotAngle=new wsPoint(0.0,0.0,0.0);
+        boxPos=new wsPoint(0,0,0);
+        rotAngle=new wsPoint(0.0,0.0,0.0);
         
             // find the middle of the box spot
             // and box sizes
@@ -86,13 +86,13 @@ class GenRoomDecorationStorageClass
         
     addShelf(room,pos,high,singleStack)
     {
-        var xWid,zWid,legWid,mesh,mesh2;
-        var stackLevel,stackCount,boxY;
-        var bitmap;
+        let xWid,zWid,legWid,mesh,mesh2;
+        let stackLevel,stackCount,boxY;
+        let bitmap;
         
-        var boxBoundX=new wsBound(0,0);
-        var boxBoundY=new wsBound(0,0);
-        var boxBoundZ=new wsBound(0,0);
+        let boxBoundX=new wsBound(0,0);
+        let boxBoundY=new wsBound(0,0);
+        let boxBoundZ=new wsBound(0,0);
         
         legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
         bitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
@@ -162,7 +162,7 @@ class GenRoomDecorationStorageClass
 
     create(room)
     {
-        var n,pos,high,pieceCount;
+        let n,pos,high,pieceCount;
         
         pieceCount=room.getDecorationCount();
         

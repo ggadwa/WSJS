@@ -1,3 +1,5 @@
+/* global config */
+
 "use strict";
 
 //
@@ -20,9 +22,11 @@ class GenRandomClass
 
     random()
     {
+        let r;
+        
         this.mwcZ=(36969*(this.mwcZ&0xFFFF)+(this.mwcZ>>16))&0xFFFFFFFF;
         this.mwcW=(18000*(this.mwcW&0xFFFF)+(this.mwcW>>16))&0xFFFFFFFF;
-        var r=((this.mwcZ<<16)+this.mwcW)&0xFFFFFFFF;
+        r=((this.mwcZ<<16)+this.mwcW)&0xFFFFFFFF;
         return((r/=0xFFFFFFFF)+0.5);
     }
 
@@ -48,4 +52,4 @@ class GenRandomClass
 
 }
 
-var genRandom=new GenRandomClass(config.SEED);
+let genRandom=new GenRandomClass(config.SEED);

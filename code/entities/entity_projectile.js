@@ -1,3 +1,5 @@
+/* global view, particleList, sound */
+
 "use strict";
 
 //

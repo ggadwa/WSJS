@@ -1,4 +1,4 @@
-/* global map, config, MeshPrimitivesClass, genRandom, DEGREE_TO_RAD, MeshUtilityClass, ROOM_SIDE_LEFT, ROOM_SIDE_RIGHT, ROOM_SIDE_TOP, ROOM_SIDE_BOTTOM */
+/* global map, config, MeshPrimitivesClass, genRandom, DEGREE_TO_RAD, MeshUtilityClass, mapRoomConstants */
 
 "use strict";
 
@@ -304,7 +304,7 @@ class GenRoomDecorationEquipmentClass
             
         switch (dir) {
             
-            case ROOM_SIDE_LEFT:  
+            case mapRoomConstants.ROOM_SIDE_LEFT:  
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0);
 
                 pipeAng.setFromValues(0.0,0.0,90.0);
@@ -314,7 +314,7 @@ class GenRoomDecorationEquipmentClass
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0);
                 break;
                 
-            case ROOM_SIDE_RIGHT:
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0);
 
                 pipeAng.setFromValues(0.0,0.0,-90.0);
@@ -324,7 +324,7 @@ class GenRoomDecorationEquipmentClass
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0);
                 break;
                 
-            case ROOM_SIDE_TOP:
+            case mapRoomConstants.ROOM_SIDE_TOP:
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0);
 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
@@ -334,7 +334,7 @@ class GenRoomDecorationEquipmentClass
                 this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0);
                 break;
                 
-            case ROOM_SIDE_BOTTOM:
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0);
 
                 pipeAng.setFromValues(90.0,0.0,0.0);

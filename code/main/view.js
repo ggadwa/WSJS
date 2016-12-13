@@ -1,4 +1,4 @@
-/* global map, sky, entityList, debug, config, particleList */
+/* global map, sky, entityList, debug, config, particleList, DEGREE_TO_RAD, input */
 
 "use strict";
 

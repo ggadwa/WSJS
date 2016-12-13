@@ -95,12 +95,52 @@ class EntityMonsterClass extends EntityClass
     }
     
         //
+        // wake up
+        //
+        
+    wakeUp(enemy)
+    {
+        let dist;
+        
+            // if we are already awake, skip
+            // also never awake if AI is off
+            
+        if ((this.active) || (!config.MONSTER_AI_ON)) return;
+        
+            // get distance, near wake distance always
+            // wakes, far only if seen
+            
+        dist=enemy.position.distance(this.position);
+        if (dist>this.ai.farWakeDistance) return;
+        
+            // if within near, wake up
+            // otherwise, wake up if looking at you
+            
+        if (dist<this.ai.nearWakeDistance) {
+            this.active=true;
+        }
+        else {
+            this.active=(this.getAngleDifferenceTowardsPosition(enemy.position)<this.ai.fireSlopAngle);
+        }
+        
+        if (!this.active) return;
+        
+            // play sound and reset last fire
+            // time so it doesn't fire immediately
+            
+            console.log('WAKE '+this.id);
+            
+        sound.play(this,this.ai.wakeSoundBuffer);
+        this.lastShotTimeStamp=view.timeStamp+this.ai.fireRechargeTick;
+    }
+    
+        //
         // run monster
         //
     
     run()
     {
-        let enemy,dist;
+        let enemy;
         
             // if we don't have an enemy yet,
             // make it the player, and if our old
@@ -115,23 +155,16 @@ class EntityMonsterClass extends EntityClass
         }
         
             // time to activate monster?
-        
-        if ((!this.active) && (config.MONSTER_AI_ON)) {
-            dist=enemy.position.distance(this.position);
-            this.active=(dist<25000);
             
-            if (this.active) sound.play(this,this.ai.wakeSoundBuffer);
-        }
+        this.wakeUp(enemy);
         
-            // inactive monsters can only turn towards
-            // the player if standing on a floor
+            // inactive monsters currently just stand
             
         if (!this.active) {
             this.model.skeleton.idlePose(this.model.modelType);
             
             this.setMovementForward(false);
             this.move(true,false,false);
-            if (this.isStandingOnFloor()) this.lastAngleDifToEnemy=this.turnTowardsPosition(enemy.position,this.ai.standTurnSpeed);
         }
         
             // active monsters stalk the player

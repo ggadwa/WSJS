@@ -1,3 +1,5 @@
+/* global entityList, sound */
+
 "use strict";
 
 //

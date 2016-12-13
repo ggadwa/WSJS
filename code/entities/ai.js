@@ -10,12 +10,15 @@ class AIClass
 {
     constructor()
     {
-        this.speed=config.MONSTER_MIN_SPEED;
-        this.acceleration=5;
-        this.deceleration=10;
+        this.speed=0;
+        this.acceleration=0;
+        this.deceleration=0;
         
-        this.standTurnSpeed=0.2;
-        this.walkTurnSpeed=0.4;
+        this.standTurnSpeed=0;
+        this.walkTurnSpeed=0;
+        
+        this.nearWakeDistance=0;
+        this.farWakeDistance=0;
         
         this.projectile=null;
         
@@ -38,6 +41,12 @@ class AIClass
 
         this.standTurnSpeed=standTurnSpeed;
         this.walkTurnSpeed=walkTurnSpeed;
+    }
+    
+    setWakeDistance(nearWakeDistance,farWakeDistance)
+    {
+        this.nearWakeDistance=nearWakeDistance;
+        this.farWakeDistance=farWakeDistance;
     }
     
     setProjectile(projectile)

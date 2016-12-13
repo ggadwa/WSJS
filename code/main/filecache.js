@@ -104,7 +104,7 @@ class FileCacheClass
 
             // next file
 
-        setTimeout(this.loadFile.bind(this,idx,callback),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.loadFile.bind(this,idx,callback),1);
     }
 
         //

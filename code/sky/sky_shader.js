@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -24,7 +26,7 @@ class SkyShaderClass extends ShaderClass
 
     initialize()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -57,7 +59,7 @@ class SkyShaderClass extends ShaderClass
 
     drawStart()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
         gl.useProgram(this.program);
 
@@ -74,7 +76,7 @@ class SkyShaderClass extends ShaderClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
         
             // disable vertex attributes
 

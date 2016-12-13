@@ -19,13 +19,13 @@ class GenRoomPlatformClass
         
     addLiftChunk(room,x,z)
     {
-        var n,y;
-        var meshIdx,movement,waitMSec;
-        var liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
+        let n,y;
+        let meshIdx,movement,waitMSec;
+        let liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-        var xLiftBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
-        var yLiftBound=new wsBound((room.yBound.min+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)),room.yBound.max);
-        var zLiftBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
+        let xLiftBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
+        let yLiftBound=new wsBound((room.yBound.min+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)),room.yBound.max);
+        let zLiftBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
 
         meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_LIFT));
         
@@ -81,11 +81,11 @@ class GenRoomPlatformClass
         
     addPlatformChunk(room,x,z,story,platformBitmap)
     {
-        var y=(room.yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*story));
+        let y=(room.yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*story));
         
-        var xPlatformBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
-        var yPlatformBound=new wsBound(y,(y+config.ROOM_FLOOR_DEPTH));
-        var zPlatformBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
+        let xPlatformBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
+        let yPlatformBound=new wsBound(y,(y+config.ROOM_FLOOR_DEPTH));
+        let zPlatformBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
         
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
 
@@ -103,7 +103,7 @@ class GenRoomPlatformClass
     
     addPlatformHalfFloorX(room,liftX,liftZ,story,platformBitmap)
     {
-        var x,z,sz,ez;
+        let x,z,sz,ez;
         
         if (liftZ<Math.trunc(room.zBlockSize/2)) {
             sz=0;
@@ -127,7 +127,7 @@ class GenRoomPlatformClass
     
     addPlatformHalfFloorZ(room,liftX,liftZ,story,platformBitmap)
     {
-        var x,z,sx,ex;
+        let x,z,sx,ex;
         
         if (liftX<Math.trunc(room.xBlockSize/2)) {
             sx=0;
@@ -151,7 +151,7 @@ class GenRoomPlatformClass
     
     addPlatformOutsideCircle(room,liftX,liftZ,story,platformBitmap)
     {
-        var x,z;
+        let x,z;
         
             // outside
             
@@ -190,7 +190,7 @@ class GenRoomPlatformClass
     
     addPlatformCrossRoomX(room,liftX,liftZ,story,platformBitmap)
     {
-        var x,z;
+        let x,z;
         
         for (x=1;x<liftX;x++) {
             this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
@@ -207,7 +207,7 @@ class GenRoomPlatformClass
     
     addPlatformCrossRoomZ(room,liftX,liftZ,story,platformBitmap)
     {
-        var x,z;
+        let x,z;
         
         for (z=1;z<liftZ;z++) {
             this.addPlatformChunk(room,liftX,z,story,platformBitmap);
@@ -228,9 +228,9 @@ class GenRoomPlatformClass
     
     create(room)
     {
-        var n,liftX,liftZ;
+        let n,liftX,liftZ;
         
-        var platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
             // random stair direction
             

@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -33,14 +35,15 @@ class ModelMeshShaderClass extends ShaderClass
 
     initialize()
     {
+        let n,name;
+        let gl=view.gl;
+
             // get a new shader object
             // and load/compile it
 
         if (!super.initialize('model_mesh')) return(false);
 
             // setup uniforms
-
-        var gl=view.gl;
 
         gl.useProgram(this.program);
 
@@ -55,8 +58,6 @@ class ModelMeshShaderClass extends ShaderClass
 
         this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');    
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
-
-        var n,name;
 
         for (n=0;n!==view.LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
@@ -88,12 +89,11 @@ class ModelMeshShaderClass extends ShaderClass
 
     drawStart()
     {
-        var n;
-        var light,viewLight;
+        let n;
+        let light,viewLight;
+        let gl=view.gl;
 
             // using the model shader
-
-        var gl=view.gl;
 
         gl.useProgram(this.program);
 
@@ -139,7 +139,7 @@ class ModelMeshShaderClass extends ShaderClass
 
     drawEnd()
     {
-        var gl=view.gl;
+        let gl=view.gl;
 
             // disable vertex attributes
 

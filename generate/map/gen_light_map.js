@@ -878,14 +878,14 @@ class GenLightmapClass
 
         meshIdx++;
         if (meshIdx>=map.meshes.length) {
-            setTimeout(this.createFinish.bind(this),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.createFinish.bind(this),1);
             return;
         }
 
             // next mesh
 
         view.loadingScreenDraw(meshIdx/(map.meshes.length+2.0));
-        setTimeout(this.createLightmapForMesh.bind(this,meshIdx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.createLightmapForMesh.bind(this,meshIdx),1);
     }
 
         //
@@ -918,7 +918,7 @@ class GenLightmapClass
             // script time out problem   
 
         view.loadingScreenDraw(1.0/(nMesh+2.0));
-        setTimeout(this.createLightmapForMesh.bind(this,0),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.createLightmapForMesh.bind(this,0),1);
     }
 
     createFinish()

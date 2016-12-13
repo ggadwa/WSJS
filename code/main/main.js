@@ -1,4 +1,4 @@
-/* global fileCache, view, PROCESS_TIMEOUT_MSEC, sound, map, modelList, sky, entityList, particleList, debug, config, MODEL_TYPE_HUMANOID, MODEL_MONSTER_TYPES, MODEL_TYPE_WEAPON, MODEL_TYPE_PROJECTILE, genRandom, input, PHYSICS_MILLISECONDS, BAIL_MILLISECONDS, DRAW_MILLISECONDS */
+/* global fileCache, view, sound, map, modelList, sky, entityList, particleList, debug, config, genRandom, input, modelConstants */
 
 "use strict";
 
@@ -10,10 +10,6 @@ class MainClass
 {
     constructor()
     {
-        this.genBitmapSkin=null;
-        this.genBitmapItem=null;
-        this.genSound=null;
-
         Object.seal(this);
     }
 
@@ -26,7 +22,7 @@ class MainClass
     {
         view.createCanvas();
         
-        setTimeout(this.initGL.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initGL.bind(this),1);
     }
 
     initGL()
@@ -42,7 +38,7 @@ class MainClass
         view.loadingScreenAddString('Initializing Internal Structures');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initInternal.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initInternal.bind(this),1);
     }
 
     initInternal()
@@ -55,19 +51,13 @@ class MainClass
         if (!particleList.initialize()) return(false);
         if (!debug.initialize()) return;
 
-            // dynamic creation classes
-
-        this.genBitmapSkin=new GenBitmapSkinClass();
-        this.genBitmapItem=new GenBitmapItemClass();
-        this.genSound=new GenSoundClass(sound.getAudioContext());
-
             // next step
 
         view.loadingScreenUpdate();
         view.loadingScreenAddString('Generating Dynamic Map');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildMap.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildMap.bind(this),1);
     }
 
     initBuildMap()
@@ -82,7 +72,7 @@ class MainClass
         view.loadingScreenAddString('Building Collision Geometry');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildCollisionGeometry.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildCollisionGeometry.bind(this),1);
     }
 
     initBuildCollisionGeometry()
@@ -101,7 +91,7 @@ class MainClass
         view.loadingScreenAddString('Building Light Map');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildLightmap.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildLightmap.bind(this),1);
     }
 
     initBuildLightmap()
@@ -120,27 +110,29 @@ class MainClass
         view.loadingScreenAddString('Generating Dynamic Models');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildModelsMesh.bind(this,-1),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildModelsMesh.bind(this,-1,null),1);
     }
 
-    initBuildModelsMesh(idx)
+    initBuildModelsMesh(idx,genBitmapSkin)
     {
         let model,genSkeleton,genModelMesh,modelBitmap;
         let monsterType;
+        let modelMonsterTypes=[modelConstants.MODEL_TYPE_HUMANOID,modelConstants.MODEL_TYPE_ANIMAL,modelConstants.MODEL_TYPE_BLOB];
 
             // build a bitmap
-            
-        modelBitmap=this.genBitmapSkin.generateRandom(false);
+        
+        if (genBitmapSkin===null) genBitmapSkin=new GenBitmapSkinClass();
+        modelBitmap=genBitmapSkin.generateRandom(false);
 
             // player is -1
             // else a monster
 
         if (idx===-1) {
-            model=new ModelClass('player',MODEL_TYPE_HUMANOID);
+            model=new ModelClass('player',modelConstants.MODEL_TYPE_HUMANOID);
         }
         else {
-            monsterType=MODEL_MONSTER_TYPES[idx%(MODEL_MONSTER_TYPES.length)];        // supergumba -- TESTING -- always make at least one of each type
-            //monsterType=MODEL_TYPE_ANIMAL;      // supergumba -- testing
+            monsterType=modelMonsterTypes[idx%(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
+            //monsterType=modelConstants.MODEL_TYPE_ANIMAL;      // supergumba -- testing
             model=new ModelClass(('monster_'+idx),monsterType);
         }
 
@@ -159,7 +151,7 @@ class MainClass
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
             view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
-            setTimeout(this.initBuildModelsMesh.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.initBuildModelsMesh.bind(this,idx,genBitmapSkin),1);
             return;
         }
 
@@ -169,21 +161,22 @@ class MainClass
         view.loadingScreenAddString('Generating Dynamic Weapons');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildWeapons.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildWeapons.bind(this,null),1);
     }
 
-    initBuildWeapons()
+    initBuildWeapons(genBitmapItem)
     {
         let model,modelBitmap,genModelWeaponMesh,genModelProjectileMesh;
         
             // supergumba -- right now this is bad, it'll leak and get closed more than once,
             // deal with this when we have real weapon routines
         
-        modelBitmap=this.genBitmapItem.generate(0,false);
+        if (genBitmapItem===null) genBitmapItem=new GenBitmapItemClass();
+        modelBitmap=genBitmapItem.generate(0,false);
 
             // weapon
 
-        model=new ModelClass('weapon_0',MODEL_TYPE_WEAPON);
+        model=new ModelClass('weapon_0',modelConstants.MODEL_TYPE_WEAPON);
 
         genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap);
         genModelWeaponMesh.build();
@@ -192,7 +185,7 @@ class MainClass
 
             // projectile
 
-        model=new ModelClass('projectile_0',MODEL_TYPE_PROJECTILE);
+        model=new ModelClass('projectile_0',modelConstants.MODEL_TYPE_PROJECTILE);
 
         genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap);
         genModelProjectileMesh.build();
@@ -205,7 +198,7 @@ class MainClass
         view.loadingScreenAddString('Generating Dynamic Entities');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildEntities.bind(this),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.initBuildEntities.bind(this),1);
     }
 
     initBuildEntities()
@@ -213,10 +206,11 @@ class MainClass
         let n,monsterType;
         let model,pos,playerEntity,playerWeapon;
         let monsterAIs;
-
-        let genProjectile=new GenProjectileClass(this.genSound);
+        
+        let genSound=new GenSoundClass(sound.getAudioContext());
+        let genProjectile=new GenProjectileClass(genSound);
         let genWeapon=new GenWeaponClass();
-        let genAI=new GenAIClass(genProjectile,this.genSound);
+        let genAI=new GenAIClass(genProjectile,genSound);
 
             // make player entity
 
@@ -253,7 +247,6 @@ class MainClass
             if (pos===null) continue;
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
-            //monsterType=MODEL_TYPE_ANIMAL;      // testing
             model=modelList.cloneModel('monster_'+monsterType);
             entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
@@ -264,7 +257,7 @@ class MainClass
         view.loadingScreenAddString('Running');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initFinish.bind(this),PROCESS_TIMEOUT_MSEC);    
+        setTimeout(this.initFinish.bind(this),1);    
     }
 
     initFinish()
@@ -309,6 +302,10 @@ let main=new MainClass();
 //
 // main loop
 //
+
+const PHYSICS_MILLISECONDS=16;
+const DRAW_MILLISECONDS=16;
+const BAIL_MILLISECONDS=5000;
 
 function mainLoop(timeStamp)
 {

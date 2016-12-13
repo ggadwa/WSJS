@@ -78,11 +78,11 @@ class DebugBitmapClass
 
         idx++;
         if (idx>=this.genBitmapWall.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapFloor.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapFloor.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapWall.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapWall.bind(this,idx),1);
     }
     
     addBitmapFloor(idx)
@@ -91,11 +91,11 @@ class DebugBitmapClass
 
         idx++;
         if (idx>=this.genBitmapFloor.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapCeiling.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapCeiling.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapFloor.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapFloor.bind(this,idx),1);
     }
     
     addBitmapCeiling(idx)
@@ -104,11 +104,11 @@ class DebugBitmapClass
 
         idx++;
         if (idx>=this.genBitmapCeiling.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapDoor.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapDoor.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapCeiling.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapCeiling.bind(this,idx),1);
     }
     
     addBitmapDoor(idx)
@@ -117,11 +117,11 @@ class DebugBitmapClass
 
         idx++;
         if (idx>=this.genBitmapDoor.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapMetal.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapMetal.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapDoor.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapDoor.bind(this,idx),1);
     }
     
     addBitmapMetal(idx)
@@ -130,11 +130,11 @@ class DebugBitmapClass
 
         idx++;
         if (idx>=this.genBitmapMetal.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapMachine.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapMachine.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapMetal.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapMetal.bind(this,idx),1);
     }
    
     addBitmapMachine(idx)
@@ -143,11 +143,11 @@ class DebugBitmapClass
         
         idx++;
         if (idx>=this.genBitmapMachine.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapPanel.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapPanel.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapMachine.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapMachine.bind(this,idx),1);
     }
     
     addBitmapPanel(idx)
@@ -156,11 +156,11 @@ class DebugBitmapClass
         
         idx++;
         if (idx>=this.genBitmapPanel.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapBox.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapBox.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapPanel.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapPanel.bind(this,idx),1);
     }
     
     addBitmapBox(idx)
@@ -169,11 +169,11 @@ class DebugBitmapClass
         
         idx++;
         if (idx>=this.genBitmapBox.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapLiquids.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapLiquids.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapBox.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapBox.bind(this,idx),1);
     }
     
     addBitmapLiquids(idx)
@@ -182,11 +182,11 @@ class DebugBitmapClass
         
         idx++;
         if (idx>=this.genBitmapLiquid.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapSkins.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapSkins.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapLiquids.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapLiquids.bind(this,idx),1);
     }
     
     addBitmapSkins(idx)
@@ -195,11 +195,11 @@ class DebugBitmapClass
         
         idx++;
         if (idx>=this.genBitmapSkin.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapItems.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapItems.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapSkins.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapSkins.bind(this,idx),1);
     }
     
     addBitmapItems(idx)
@@ -208,11 +208,11 @@ class DebugBitmapClass
         
         idx++;
         if (idx>=this.genBitmapItem.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapSkies.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapSkies.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapSkin.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapSkin.bind(this,idx),1);
     }
    
     addBitmapSkies(idx)
@@ -221,11 +221,11 @@ class DebugBitmapClass
         
         idx++;
         if (idx>=this.genBitmapSky.TYPE_NAMES.length) {
-            setTimeout(this.addBitmapParticles.bind(this,0),PROCESS_TIMEOUT_MSEC);
+            setTimeout(this.addBitmapParticles.bind(this,0),1);
             return;
         }
         
-        setTimeout(this.addBitmapSkies.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapSkies.bind(this,idx),1);
     }
     
     addBitmapParticles(idx)
@@ -235,7 +235,7 @@ class DebugBitmapClass
         idx++;
         if (idx>=this.genBitmapParticle.TYPE_NAMES.length) return;
         
-        setTimeout(this.addBitmapParticles.bind(this,idx),PROCESS_TIMEOUT_MSEC);
+        setTimeout(this.addBitmapParticles.bind(this,idx),1);
     }
     
         //

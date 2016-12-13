@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
@@ -8,6 +10,8 @@ class ParticleListClass
 {
     constructor()
     {
+        this.PARTICLE_MAX_COUNT=50;
+        
         this.particleShader=new ParticleShaderClass();
         
         this.particleBitmap=null;
@@ -24,8 +28,8 @@ class ParticleListClass
 
     initialize()
     {
-        var n,particle;
-        var genBitmapParticle;
+        let n,particle;
+        let genBitmapParticle;
 
             // create the shader
             
@@ -35,7 +39,7 @@ class ParticleListClass
             
         this.particles=[];
         
-        for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
+        for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
             particle=new ParticleClass();
             particle.initialize();
             this.particles.push(particle);
@@ -51,9 +55,9 @@ class ParticleListClass
 
     release()
     {
-        var n;
+        let n;
         
-        for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
+        for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
             this.particles[n].release();
         }
         
@@ -68,7 +72,7 @@ class ParticleListClass
 
     countParticle()
     {
-        return(PARTICLE_MAX_COUNT);
+        return(this.PARTICLE_MAX_COUNT);
     }
 
     getParticle(particleIdx)
@@ -78,9 +82,9 @@ class ParticleListClass
     
     getFree()
     {
-        var n;
+        let n;
         
-        for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
+        for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
             if (this.particles[n].isFree()) return(this.particles[n]);
         }
         
@@ -93,7 +97,7 @@ class ParticleListClass
         
     addExplosionParticles(centerPt)
     {
-        var particle;
+        let particle;
         
             // red particles
             
@@ -140,7 +144,7 @@ class ParticleListClass
     
     addDebugParticles(centerPt,count)
     {
-        var particle;
+        let particle;
         
         particle=this.getFree();
         if (particle===null) return(null);
@@ -164,15 +168,15 @@ class ParticleListClass
         
     draw()
     {
-        var n,needDraw;
-        var gl=view.gl;
+        let n,needDraw;
+        let gl=view.gl;
         
             // check if any particles are
             // active, if not, skip out
         
         needDraw=false;
         
-        for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
+        for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
             if (!this.particles[n].isFree()) {
                 needDraw=true;
                 break;
@@ -192,7 +196,7 @@ class ParticleListClass
             // setup, draw, and timeout any
             // particles
             
-        for (n=0;n!==PARTICLE_MAX_COUNT;n++) {
+        for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
             if (!this.particles[n].isFree()) {
                 this.particles[n].draw(this.particleShader);
                 this.particles[n].timeout();
@@ -210,4 +214,4 @@ class ParticleListClass
 // the global particlelist object
 //
 
-var particleList=new ParticleListClass();
+let particleList=new ParticleListClass();

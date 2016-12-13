@@ -1,5 +1,3 @@
-/* global config */
-
 "use strict";
 
 //
@@ -10,6 +8,8 @@ class SoundPlayListClass
 {
     constructor()
     {
+        this.MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
+
         this.soundPlays=null;
         
         Object.seal(this);
@@ -25,7 +25,7 @@ class SoundPlayListClass
         
         this.soundPlays=[];
         
-        for (n=0;n!==config.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays.push(new SoundPlayClass());
         }
         
@@ -36,7 +36,7 @@ class SoundPlayListClass
     {
         let n;
         
-        for (n=0;n!==config.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays[n].close();
         }
         
@@ -58,7 +58,7 @@ class SoundPlayListClass
         
             // find a free sound play
             
-        for (n=0;n!==config.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             if (this.soundPlays[n].free) {
                 soundPlay=this.soundPlays[n];
                 break;
@@ -80,7 +80,7 @@ class SoundPlayListClass
     {
         let n;
 
-        for (n=0;n!==config.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
             if (!this.soundPlays[n].free) this.soundPlays[n].update(listenerEntity);
         }
         

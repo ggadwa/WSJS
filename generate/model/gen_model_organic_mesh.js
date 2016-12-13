@@ -1,3 +1,5 @@
+/* global DEGREE_TO_RAD, genRandom, MeshUtilityClass, modelLimbConstants */
+
 "use strict";
 
 //
@@ -39,8 +41,8 @@ class GenModelOrganicMeshClass
         
     findBoundsForBoneList(boneList,xBound,yBound,zBound)
     {
-        var n,pos;
-        var nBone=boneList.length;
+        let n,pos;
+        let nBone=boneList.length;
         
         pos=boneList[0].position;
         xBound.min=xBound.max=pos.x;
@@ -57,9 +59,9 @@ class GenModelOrganicMeshClass
     
     findMaxGravityForBoneList(boneList)
     {
-        var n;
-        var nBone=boneList.length;
-        var maxGravityDist=0;
+        let n;
+        let nBone=boneList.length;
+        let maxGravityDist=0;
         
         for (n=0;n!==nBone;n++) {
             if (boneList[n].gravityLockDistance>maxGravityDist) maxGravityDist=boneList[n].gravityLockDistance;
@@ -75,21 +77,20 @@ class GenModelOrganicMeshClass
         
     buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
-        var x,yz;
-        var rd,radius,px;
-        var vAng;
-        var v;
+        let x,yz,v,vIdx,iIdx;
+        let vNextIdx,v2Idx,v2NextIdx;
+        let minIdx,maxIdx,maxOff;
+        let rd,radius,px;
+        let vAng,xAng,yzAng,yzAngAdd,xAngAdd;
         
             // create the globe without a top
             // or bottom and build that with trigs later
             
-        var yzAngAdd=360.0/aroundSurfaceCount;
-        var xAngAdd=180.0/(acrossSurfaceCount-1);
-
-        var yzAng;
-        var xAng=xAngAdd;
+        yzAngAdd=360.0/aroundSurfaceCount;
+        xAngAdd=180.0/(acrossSurfaceCount-1);
+        xAng=xAngAdd;
         
-        var vIdx=0;
+        vIdx=0;
         
         for (x=1;x!==(acrossSurfaceCount-1);x++) {
             
@@ -126,13 +127,13 @@ class GenModelOrganicMeshClass
         
             // end points
         
-        var minIdx=vIdx;
+        minIdx=vIdx;
         
         v=vertexList[vIdx++];
         v.position.setFromValues((centerPnt.x-acrossRadius),centerPnt.y,centerPnt.z);
         v.uv.setFromValues(0.5,0.0);
         
-        var maxIdx=vIdx;
+        maxIdx=vIdx;
        
         v=vertexList[vIdx++];
         v.position.setFromValues((centerPnt.x+acrossRadius),centerPnt.y,centerPnt.z);
@@ -142,8 +143,7 @@ class GenModelOrganicMeshClass
             // all the strips except the
             // end points
             
-        var vNextIdx,v2Idx,v2NextIdx;
-        var iIdx=0;
+        iIdx=0;
         
         for (x=0;x!==(acrossSurfaceCount-3);x++) {
             
@@ -175,7 +175,7 @@ class GenModelOrganicMeshClass
         
             // max end point
             
-        var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
+        maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (yz=0;yz!==aroundSurfaceCount;yz++) {
             indexes[iIdx++]=maxOff+yz;
@@ -186,21 +186,20 @@ class GenModelOrganicMeshClass
     
     buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
-        var xz,y;
-        var rd,radius,py;
-        var vAng;
-        var v;
-        
+        let xz,y,v,vIdx,iIdx;
+        let vNextIdx,v2Idx,v2NextIdx;
+        let minIdx,maxIdx,maxOff;
+        let rd,radius,py;
+        let vAng,xzAng,yAng,xzAngAdd,yAngAdd;
+
             // create the globe without a top
             // or bottom and build that with trigs later
             
-        var xzAngAdd=360.0/aroundSurfaceCount;
-        var yAngAdd=180.0/(acrossSurfaceCount-1);
-
-        var xzAng;
-        var yAng=yAngAdd;
+        xzAngAdd=360.0/aroundSurfaceCount;
+        yAngAdd=180.0/(acrossSurfaceCount-1);
+        yAng=yAngAdd;
         
-        var vIdx=0;
+        vIdx=0;
         
         for (y=1;y!==(acrossSurfaceCount-1);y++) {
             
@@ -237,13 +236,13 @@ class GenModelOrganicMeshClass
         
             // end points
         
-        var minIdx=vIdx;
+        minIdx=vIdx;
         
         v=vertexList[vIdx++];
         v.position.setFromValues(centerPnt.x,(centerPnt.y-acrossRadius),centerPnt.z);
         v.uv.setFromValues(0.5,0.0);
         
-        var maxIdx=vIdx;
+        maxIdx=vIdx;
        
         v=vertexList[vIdx++];
         v.position.setFromValues(centerPnt.x,(centerPnt.y+acrossRadius),centerPnt.z);
@@ -253,8 +252,7 @@ class GenModelOrganicMeshClass
             // all the strips except the
             // end points
             
-        var vNextIdx,v2Idx,v2NextIdx;
-        var iIdx=0;
+        iIdx=0;
         
         for (y=0;y!==(acrossSurfaceCount-3);y++) {
             
@@ -286,7 +284,7 @@ class GenModelOrganicMeshClass
         
             // max end point
             
-        var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
+        maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (xz=0;xz!==aroundSurfaceCount;xz++) {
             indexes[iIdx++]=maxOff+xz;
@@ -297,21 +295,20 @@ class GenModelOrganicMeshClass
     
     buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
-        var xy,z;
-        var rd,radius,pz;
-        var vAng;
-        var v;
+        let xy,z,v,vIdx,iIdx;
+        let vNextIdx,v2Idx,v2NextIdx;
+        let minIdx,maxIdx,maxOff;
+        let rd,radius,pz;
+        let vAng,xyAng,zAng,xyAngAdd,zAngAdd;
         
             // create the globe without a top
             // or bottom and build that with trigs later
             
-        var xyAngAdd=360.0/aroundSurfaceCount;
-        var zAngAdd=180.0/(acrossSurfaceCount-1);
-
-        var xyAng;
-        var zAng=zAngAdd;
+        xyAngAdd=360.0/aroundSurfaceCount;
+        zAngAdd=180.0/(acrossSurfaceCount-1);
+        zAng=zAngAdd;
         
-        var vIdx=0;
+        vIdx=0;
         
         for (z=1;z!==(acrossSurfaceCount-1);z++) {
             
@@ -348,13 +345,13 @@ class GenModelOrganicMeshClass
         
             // end points
         
-        var minIdx=vIdx;
+        minIdx=vIdx;
         
         v=vertexList[vIdx++];
         v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z-acrossRadius));
         v.uv.setFromValues(0.5,0.0);
         
-        var maxIdx=vIdx;
+        maxIdx=vIdx;
        
         v=vertexList[vIdx++];
         v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z+acrossRadius));
@@ -364,8 +361,7 @@ class GenModelOrganicMeshClass
             // all the strips except the
             // end points
             
-        var vNextIdx,v2Idx,v2NextIdx;
-        var iIdx=0;
+        iIdx=0;
         
         for (z=0;z!==(acrossSurfaceCount-3);z++) {
             
@@ -397,7 +393,7 @@ class GenModelOrganicMeshClass
         
             // max end point
             
-        var maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
+        maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
             
         for (xy=0;xy!==aroundSurfaceCount;xy++) {
             indexes[iIdx++]=maxOff+xy;
@@ -413,22 +409,26 @@ class GenModelOrganicMeshClass
         
     shrinkWrapGlobe(vertexList,boneList,centerPnt)
     {
-        var n,k;
-        var v,bone,dist;
-        var nVertex=vertexList.length;
-        var nBone=boneList.length;
+        let n,k;
+        let v,bone,dist,shrinkDist,gravityMaxDistance;
+        let nVertex=vertexList.length;
+        let nBone=boneList.length;
+        let moving=[];
+        let anyMove;
+        let moveVector=new wsPoint(0,0,0);
+        let gravityVector=new wsPoint(0,0,0);
+        let moveCount=0;
+        let boneHit;
         
             // move distance for shrinking bones
             
-        var shrinkDist=10.0;
-        var gravityMaxDistance=5000;
+        shrinkDist=10.0;
+        gravityMaxDistance=5000;
         
             // keep a parallel list of
             // what bones are moving (bones
             // stop when they get within the
             // gravity min distance of all gravity bones)
-        
-        var moving=[];
         
         for (n=0;n!==nVertex;n++) {
             moving.push(true);
@@ -436,12 +436,6 @@ class GenModelOrganicMeshClass
         
             // loop the moves
             
-        var anyMove;
-        var moveVector=new wsPoint(0,0,0);
-        var gravityVector=new wsPoint(0,0,0);
-        var moveCount=0;
-        var boneHit;
-        
         while (moveCount<1000) {
             
             moveCount++;
@@ -524,10 +518,10 @@ class GenModelOrganicMeshClass
         
     attachVertexToBones(vertexList,boneList,centerPnt)
     {
-        var n,k,v;
-        var bone,boneIdx,d,dist;
-        var nVertex=vertexList.length;
-        var nBone=boneList.length;
+        let n,k,v;
+        let bone,boneIdx,d,dist;
+        let nVertex=vertexList.length;
+        let nBone=boneList.length;
         
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
@@ -564,10 +558,10 @@ class GenModelOrganicMeshClass
         
     scaleVertexToBones(vertexList)
     {
-        var n,v;
-        var bone;
-        var nVertex=vertexList.length;
-        var bones=this.model.skeleton.bones;
+        let n,v;
+        let bone;
+        let nVertex=vertexList.length;
+        let bones=this.model.skeleton.bones;
         
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
@@ -584,9 +578,9 @@ class GenModelOrganicMeshClass
         
     buildNormalsToBones(vertexList,boneList,centerPnt)
     {
-        var n,k,v,bone,bonePos,dist,curDist;
-        var nVertex=vertexList.length;
-        var nBone=boneList.length;
+        let n,k,v,bone,bonePos,dist,curDist;
+        let nVertex=vertexList.length;
+        let nBone=boneList.length;
         
             // find the closest bone in the bone list,
             // even though we have attachments, we need to
@@ -629,12 +623,12 @@ class GenModelOrganicMeshClass
         
     randomScaleVertexToBones(vertexList)
     {
-        var n,k,v,v2,f,len;
-        var bone,pos;
-        var nVertex=vertexList.length;
-        var bones=this.model.skeleton.bones;
+        let n,k,v,v2,f;
+        let bone,pos;
+        let nVertex=vertexList.length;
+        let bones=this.model.skeleton.bones;
         
-        var prevMove=new Uint8Array(nVertex);
+        let prevMove=new Uint8Array(nVertex);
         
         pos=new wsPoint(0,0,0);
 
@@ -677,15 +671,16 @@ class GenModelOrganicMeshClass
         
     buildAroundBoneList(axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
     {
-        var n,k,f,boneIdx,bone,parentBone,listBone;
-        var acrossRadius,aroundRadius;
-        var extraBoneCount;
-        var parentListIdx;
+        let n,k,f,boneIdx,bone,parentBone,listBone;
+        let acrossRadius,aroundRadius;
+        let extraBoneCount;
+        let parentListIdx,maxGravity;
+        let xBound,yBound,zBound,centerPnt;
         
             // create list of bones
             
-        var boneList=[];
-        var boneCount=skeletonBoneIndexes.length;
+        let boneList=[];
+        let boneCount=skeletonBoneIndexes.length;
         
         for (n=0;n!==boneCount;n++) {
             boneIdx=skeletonBoneIndexes[n];
@@ -748,30 +743,30 @@ class GenModelOrganicMeshClass
 
             // find the bounds for this list of bones
             
-        var xBound=new wsBound(0,0);
-        var yBound=new wsBound(0,0);
-        var zBound=new wsBound(0,0);
+        xBound=new wsBound(0,0);
+        yBound=new wsBound(0,0);
+        zBound=new wsBound(0,0);
         
         this.findBoundsForBoneList(boneList,xBound,yBound,zBound);
-        var centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // build the globe and shrink
             // wrap it to bones
             
-        var maxGravity=this.findMaxGravityForBoneList(boneList);
+        maxGravity=this.findMaxGravityForBoneList(boneList);
         
         switch (axis) {
-            case LIMB_AXIS_X:
+            case modelLimbConstants.LIMB_AXIS_X:
                 acrossRadius=(xBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(yBound.getSize()>zBound.getSize())?((yBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
                 this.buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
-            case LIMB_AXIS_Y:
+            case modelLimbConstants.LIMB_AXIS_Y:
                 acrossRadius=(yBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>zBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
                 this.buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
-            case LIMB_AXIS_Z:
+            case modelLimbConstants.LIMB_AXIS_Z:
                 acrossRadius=(zBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>yBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((yBound.getSize()*0.5)+maxGravity);
                 this.buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
@@ -795,14 +790,14 @@ class GenModelOrganicMeshClass
 
     build()
     {
-        var n,limb;
-        var indexOffset;
+        let n,limb;
+        let indexOffset;
         
-        var skeleton=this.model.skeleton;
+        let skeleton=this.model.skeleton;
 
-        var vertexList,indexes;
-        var modelVertexList=null;
-        var modelIndexes=null;
+        let vertexList,indexes;
+        let modelVertexList=null;
+        let modelIndexes=null;
         
             // wrap all the limbs
             
