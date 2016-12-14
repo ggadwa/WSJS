@@ -72,6 +72,12 @@ class MapClass
         this.lightYBound=new wsBound(0,0);
         this.lightZBound=new wsBound(0,0);
         
+            // room size constants
+            
+        this.ROOM_BLOCK_WIDTH=8000;                     // x/z dimension of a block (rooms are made up of a grid of blocks)
+        this.ROOM_FLOOR_HEIGHT=8000;                    // how tall each floor of a room is
+        this.ROOM_FLOOR_DEPTH=700;                      // the depth of the area between floors
+        
         Object.seal(this);
     }
     

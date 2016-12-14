@@ -120,15 +120,13 @@ class EntityMonsterClass extends EntityClass
             this.active=true;
         }
         else {
-            this.active=(this.getAngleDifferenceTowardsPosition(enemy.position)<this.ai.fireSlopAngle);
+            this.active=(this.getAngleDifferenceTowardsPosition(enemy.position)<this.ai.farWakeHalfAngleFieldOfVision);
         }
         
         if (!this.active) return;
         
             // play sound and reset last fire
             // time so it doesn't fire immediately
-            
-            console.log('WAKE '+this.id);
             
         sound.play(this,this.ai.wakeSoundBuffer);
         this.lastShotTimeStamp=view.timeStamp+this.ai.fireRechargeTick;

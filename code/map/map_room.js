@@ -152,8 +152,8 @@ class MapRoomClass
             // collide on our left
             
         if (xCollideBound.max===this.xBound.min) {
-            z1=Math.trunc((zCollideBound.min-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
-            z2=z1+Math.trunc(zCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -166,8 +166,8 @@ class MapRoomClass
             // collide on our right
             
         if (xCollideBound.min===this.xBound.max) {
-            z1=Math.trunc((zCollideBound.min-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
-            z2=z1+Math.trunc(zCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -180,8 +180,8 @@ class MapRoomClass
             // collide on our top
             
         if (zCollideBound.max===this.zBound.min) {
-            x1=Math.trunc((xCollideBound.min-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
-            x2=x1+Math.trunc(xCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -194,8 +194,8 @@ class MapRoomClass
             // collide on our bottom
             
         if (zCollideBound.min===this.zBound.max) {
-            x1=Math.trunc((xCollideBound.min-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
-            x2=x1+Math.trunc(xCollideBound.getSize()/config.ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -262,9 +262,9 @@ class MapRoomClass
             
                 if (this.blockGrid[n].getCell(x,z)===0) {
                     this.blockGrid[n].setCell(x,z,1);
-                    bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
-                    bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
-                    return(new wsPoint(bx,(this.yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*n)),bz));
+                    bx=Math.trunc((this.xBound.min+(map.ROOM_BLOCK_WIDTH*x))+(map.ROOM_BLOCK_WIDTH/2));
+                    bz=Math.trunc((this.zBound.min+(map.ROOM_BLOCK_WIDTH*z))+(map.ROOM_BLOCK_WIDTH/2));
+                    return(new wsPoint(bx,(this.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*n)),bz));
                 }
                 
                 if (groundFloorOnly) break;
@@ -291,8 +291,8 @@ class MapRoomClass
         
         if (this.blockGrid[0].getCell(x,z)===0) {
             this.blockGrid[0].setCell(x,z,1);
-            bx=Math.trunc((this.xBound.min+(config.ROOM_BLOCK_WIDTH*x))+(config.ROOM_BLOCK_WIDTH/2));
-            bz=Math.trunc((this.zBound.min+(config.ROOM_BLOCK_WIDTH*z))+(config.ROOM_BLOCK_WIDTH/2));
+            bx=Math.trunc((this.xBound.min+(map.ROOM_BLOCK_WIDTH*x))+(map.ROOM_BLOCK_WIDTH/2));
+            bz=Math.trunc((this.zBound.min+(map.ROOM_BLOCK_WIDTH*z))+(map.ROOM_BLOCK_WIDTH/2));
             return(new wsPoint(bx,this.yBound.max,bz));
         }
 
@@ -303,11 +303,11 @@ class MapRoomClass
     {
         let n,y;
         
-        y=this.yBound.max-config.ROOM_FLOOR_HEIGHT;
+        y=this.yBound.max-map.ROOM_FLOOR_HEIGHT;
         
         for (n=1;n<this.storyCount;n++) {
             if (this.blockGrid[n].getCell(x,z)===0) break;
-            y-=(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+            y-=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
         }
         
         return(new wsBound(y,this.yBound.max));
@@ -315,8 +315,8 @@ class MapRoomClass
     
     getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos)
     {
-        let x=Math.trunc(((pos.x-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/config.ROOM_BLOCK_WIDTH);
-        let z=Math.trunc(((pos.z-Math.trunc(config.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/config.ROOM_BLOCK_WIDTH);
+        let x=Math.trunc(((pos.x-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
+        let z=Math.trunc(((pos.z-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
         return(this.getGroundFloorSpawnToFirstPlatformOrTopBound(x,z));
     }
     
@@ -423,7 +423,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+config.ROOM_BLOCK_WIDTH;
+            x2=x+map.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.min);
             vertexList[vIdx+1].position.setFromValues(x2,yWallBound.min,this.zBound.min);
@@ -449,7 +449,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+config.ROOM_BLOCK_WIDTH;
+            z2=z+map.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(this.xBound.max,yWallBound.min,z);
             vertexList[vIdx+1].position.setFromValues(this.xBound.max,yWallBound.min,z2);
@@ -475,7 +475,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+config.ROOM_BLOCK_WIDTH;
+            x2=x+map.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.max);
             vertexList[vIdx+1].position.setFromValues(x2,yWallBound.min,this.zBound.max);
@@ -501,7 +501,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+config.ROOM_BLOCK_WIDTH;
+            z2=z+map.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(this.xBound.min,yWallBound.min,z);
             vertexList[vIdx+1].position.setFromValues(this.xBound.min,yWallBound.min,z2);
@@ -544,7 +544,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+config.ROOM_BLOCK_WIDTH;
+            x2=x+map.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(x,this.zBound.min),new ws2DIntPoint(x2,this.zBound.min)));
             x=x2;
         }
@@ -554,7 +554,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+config.ROOM_BLOCK_WIDTH;
+            z2=z+map.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(this.xBound.max,z),new ws2DIntPoint(this.xBound.max,z2)));
             z=z2;
         }
@@ -564,7 +564,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+config.ROOM_BLOCK_WIDTH;
+            x2=x+map.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(x,this.zBound.max),new ws2DIntPoint(x2,this.zBound.max)));
             x=x2;
         }
@@ -574,7 +574,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+config.ROOM_BLOCK_WIDTH;
+            z2=z+map.ROOM_BLOCK_WIDTH;
             lineList.push(new ws2DLine(new ws2DIntPoint(this.xBound.min,z),new ws2DIntPoint(this.xBound.min,z2)));
             z=z2;
         }
@@ -606,12 +606,12 @@ class MapRoomClass
         vz=this.zBound.min;
         
         for (z=0;z!==this.zBlockSize;z++) {
-            vz2=vz+config.ROOM_BLOCK_WIDTH;
+            vz2=vz+map.ROOM_BLOCK_WIDTH;
             
             vx=this.xBound.min;
             
             for (x=0;x!==this.xBlockSize;x++) {
-                vx2=vx+config.ROOM_BLOCK_WIDTH;
+                vx2=vx+map.ROOM_BLOCK_WIDTH;
                 
                 v=vertexList[vIdx];
                 v.position.setFromValues(vx,y,vz);
@@ -684,12 +684,12 @@ class MapRoomClass
         vz=this.zBound.min;
         
         for (z=0;z!==this.zBlockSize;z++) {
-            vz2=vz+config.ROOM_BLOCK_WIDTH;
+            vz2=vz+map.ROOM_BLOCK_WIDTH;
             
             vx=this.xBound.min;
             
             for (x=0;x!==this.xBlockSize;x++) {
-                vx2=vx+config.ROOM_BLOCK_WIDTH;
+                vx2=vx+map.ROOM_BLOCK_WIDTH;
                 
                 doBlock=true;
                 if (this.openCeiling) {
@@ -746,24 +746,24 @@ class MapRoomClass
         
         if (this.openCeiling) {
             this.xBlockSize-=2;
-            this.xBound.min+=config.ROOM_BLOCK_WIDTH;
-            this.xBound.max-=config.ROOM_BLOCK_WIDTH;
+            this.xBound.min+=map.ROOM_BLOCK_WIDTH;
+            this.xBound.max-=map.ROOM_BLOCK_WIDTH;
             
             this.zBlockSize-=2;
-            this.zBound.min+=config.ROOM_BLOCK_WIDTH;
-            this.zBound.max-=config.ROOM_BLOCK_WIDTH;
+            this.zBound.min+=map.ROOM_BLOCK_WIDTH;
+            this.zBound.max-=map.ROOM_BLOCK_WIDTH;
             
-            this.yOpenBound.setFromValues((y-config.ROOM_BLOCK_WIDTH),y);
+            this.yOpenBound.setFromValues((y-map.ROOM_BLOCK_WIDTH),y);
             
             map.addMesh(this.createMeshWalls(bitmap,this.yOpenBound));
 
             this.xBlockSize+=2;
-            this.xBound.min-=config.ROOM_BLOCK_WIDTH;
-            this.xBound.max+=config.ROOM_BLOCK_WIDTH;
+            this.xBound.min-=map.ROOM_BLOCK_WIDTH;
+            this.xBound.max+=map.ROOM_BLOCK_WIDTH;
             
             this.zBlockSize+=2;
-            this.zBound.min-=config.ROOM_BLOCK_WIDTH;
-            this.zBound.max+=config.ROOM_BLOCK_WIDTH;
+            this.zBound.min-=map.ROOM_BLOCK_WIDTH;
+            this.zBound.max+=map.ROOM_BLOCK_WIDTH;
         }
     }
     
@@ -773,7 +773,7 @@ class MapRoomClass
         
     getLiquidY()
     {
-        return(this.yBound.max-config.ROOM_FLOOR_HEIGHT);
+        return(this.yBound.max-map.ROOM_FLOOR_HEIGHT);
     }
     
     addTintFromLiquidColor(col)

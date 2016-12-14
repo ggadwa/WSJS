@@ -295,7 +295,7 @@ class GenRoomDecorationEquipmentClass
             // pipes always start up
             
         pipeAng=new wsPoint(0,0,180.0);     // force len to point up
-        len=genRandom.randomInt(config.ROOM_FLOOR_HEIGHT,(yBound.getSize()-(config.ROOM_FLOOR_HEIGHT+(radius*2))));
+        len=genRandom.randomInt(map.ROOM_FLOOR_HEIGHT,(yBound.getSize()-(map.ROOM_FLOOR_HEIGHT+(radius*2))));
         this.addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng);
         
         pnt.y-=len;
@@ -380,39 +380,39 @@ class GenRoomDecorationEquipmentClass
         nPipeGrid=genRandom.randomInt(2,2);
         nPipeGrid=2;
 
-        gridSize=Math.trunc(config.ROOM_BLOCK_WIDTH/nPipeGrid);
+        gridSize=Math.trunc(map.ROOM_BLOCK_WIDTH/nPipeGrid);
         radius=Math.trunc(gridSize*0.3);
         
             // the pipe platform
         
         yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos);
         
-        wid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.5);
+        wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
 
         platformBoundX=new wsBound((pos.x-wid),(pos.x+wid));
         platformBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
         
-        platformBoundY=new wsBound((yBound.max-config.ROOM_FLOOR_DEPTH),room.yBound.max);
+        platformBoundY=new wsBound((yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // determine direction
         
         dir=room.getDirectionTowardsNearestWall(pos);
         
-        dirLen=dir.len-Math.trunc((config.ROOM_BLOCK_WIDTH*0.5)+radius);
+        dirLen=dir.len-Math.trunc((map.ROOM_BLOCK_WIDTH*0.5)+radius);
         if (dirLen<0) dirLen=100;
         
             // create the pipes
             
-        sx=(pos.x-Math.trunc(config.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
-        sz=(pos.z-Math.trunc(config.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sx=(pos.x-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sz=(pos.z-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
         
         pnt=new wsPoint(0,0,0);
 
         for (z=0;z!==nPipeGrid;z++) {
             for (x=0;x!==nPipeGrid;x++) {
                 pnt.x=sx+(x*gridSize);
-                pnt.y=yBound.max-config.ROOM_FLOOR_DEPTH;
+                pnt.y=yBound.max-map.ROOM_FLOOR_DEPTH;
                 pnt.z=sz+(z*gridSize);
                 
                 this.addPipe(pipeBitmap,dir.direction,pnt,radius,dirLen,yBound);

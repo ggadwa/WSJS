@@ -10,6 +10,8 @@ class GenRoomStairsClass
 {
     constructor()
     {
+        this.STAIR_STEP_COUNT=10;
+        
         Object.seal(this);
     }
     
@@ -137,7 +139,7 @@ class GenRoomStairsClass
             // height of stairs and steps
             
         stairHigh=yBound.getSize();
-        stepDrop=stairHigh/config.STAIR_STEP_COUNT;
+        stepDrop=stairHigh/this.STAIR_STEP_COUNT;
         
             // the stair room
 
@@ -154,8 +156,8 @@ class GenRoomStairsClass
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=config.ROOM_FLOOR_DEPTH;
-            yBoundBottom.min+=config.ROOM_FLOOR_DEPTH;
+            yBoundTop.min+=map.ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=map.ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -247,24 +249,24 @@ class GenRoomStairsClass
             // the steps
         
         idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList((config.STAIR_STEP_COUNT*4)*2);
+        vertexList=MeshUtilityClass.createMapVertexList((this.STAIR_STEP_COUNT*4)*2);
         
         nIdx=0;
         if (!flip) {
-            stepAdd=xBound.getSize()/config.STAIR_STEP_COUNT;
+            stepAdd=xBound.getSize()/this.STAIR_STEP_COUNT;
             xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
         }
         else {
-            stepAdd=-(xBound.getSize()/config.STAIR_STEP_COUNT);
+            stepAdd=-(xBound.getSize()/this.STAIR_STEP_COUNT);
             xStepBound=new wsBound((xBound.max+stepAdd),xBound.max);
         }
         
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-config.ROOM_FLOOR_DEPTH);
+        if (!toPlatform) yStepBound.add(-map.ROOM_FLOOR_DEPTH);
         
         zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
 
-        for (n=0;n!==config.STAIR_STEP_COUNT;n++) {
+        for (n=0;n!==this.STAIR_STEP_COUNT;n++) {
             if (!flip) {
                 idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yStepBound,yStepBound,zStepBound);
                 nIdx=this.createNormalsForPolygon(nIdx,vertexList,1.0,0.0,0.0);
@@ -306,7 +308,7 @@ class GenRoomStairsClass
             // height of stairs and steps
             
         stairHigh=yBound.getSize();
-        stepDrop=stairHigh/config.STAIR_STEP_COUNT;
+        stepDrop=stairHigh/this.STAIR_STEP_COUNT;
         
             // the stair room
             
@@ -323,8 +325,8 @@ class GenRoomStairsClass
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=config.ROOM_FLOOR_DEPTH;
-            yBoundBottom.min+=config.ROOM_FLOOR_DEPTH;
+            yBoundTop.min+=map.ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=map.ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -416,25 +418,25 @@ class GenRoomStairsClass
             // the steps
         
         idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList((config.STAIR_STEP_COUNT*4)*2);
+        vertexList=MeshUtilityClass.createMapVertexList((this.STAIR_STEP_COUNT*4)*2);
         
         nIdx=0;
         if (!flip) {
-            stepAdd=zBound.getSize()/config.STAIR_STEP_COUNT;
+            stepAdd=zBound.getSize()/this.STAIR_STEP_COUNT;
             zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));
 
         }
         else {
-            stepAdd=-(zBound.getSize()/config.STAIR_STEP_COUNT);
+            stepAdd=-(zBound.getSize()/this.STAIR_STEP_COUNT);
             zStepBound=new wsBound((zBound.max+stepAdd),zBound.max);
         }
         
         yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-config.ROOM_FLOOR_DEPTH);
+        if (!toPlatform) yStepBound.add(-map.ROOM_FLOOR_DEPTH);
         
         xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
 
-        for (n=0;n!==config.STAIR_STEP_COUNT;n++) {
+        for (n=0;n!==this.STAIR_STEP_COUNT;n++) {
             if (!flip) {
                 idx=this.createSingleWallZ(idx,vertexList,xStepBound,yStepBound,yStepBound,zStepBound.max);
                 nIdx=this.createNormalsForPolygon(nIdx,vertexList,0.0,0.0,1.0);

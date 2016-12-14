@@ -11,10 +11,7 @@ When interface created
 
 ToDos
 
-#### move a lot of config stuff
-
-#### monsters only wake if they see you or get within min wake distance
-      -> test all this, and give field of vision to AI
+#### liquids seem broken
 
 #### for connected rooms, if lower or upper, try to wedge a room in between the staircase and other room to create open access
 #### update the walls decorations

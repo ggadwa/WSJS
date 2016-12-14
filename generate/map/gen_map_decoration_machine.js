@@ -25,7 +25,7 @@ class GenRoomDecorationMachineClass
             
             // computer size setup
             
-        wid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
+        wid=Math.trunc(map.ROOM_BLOCK_WIDTH/2);
         
             // the machine location
 
@@ -35,14 +35,14 @@ class GenRoomDecorationMachineClass
         computerBitmap=map.getTexture(map.TEXTURE_TYPE_COMPUTER);
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
-        baseBoundY=new wsBound(pos.y,(pos.y-config.ROOM_FLOOR_DEPTH));
+        baseBoundY=new wsBound(pos.y,(pos.y-map.ROOM_FLOOR_DEPTH));
         
             // computer
             
-        computerWid=wid-genRandom.randomInt(0,Math.trunc(config.ROOM_BLOCK_WIDTH/8));
+        computerWid=wid-genRandom.randomInt(0,Math.trunc(map.ROOM_BLOCK_WIDTH/8));
 
         boundX=new wsBound((pos.x-computerWid),(pos.x+computerWid));
-        boundY=new wsBound((pos.y-config.ROOM_FLOOR_DEPTH),((pos.y-config.ROOM_FLOOR_HEIGHT)+config.ROOM_FLOOR_DEPTH));
+        boundY=new wsBound((pos.y-map.ROOM_FLOOR_DEPTH),((pos.y-map.ROOM_FLOOR_HEIGHT)+map.ROOM_FLOOR_DEPTH));
         boundZ=new wsBound((pos.z-computerWid),(pos.z+computerWid));
 
         map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
@@ -75,7 +75,7 @@ class GenRoomDecorationMachineClass
         
             // panel
             
-        panelWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2)-genRandom.randomInt(Math.trunc(config.ROOM_BLOCK_WIDTH/5),Math.trunc(config.ROOM_BLOCK_WIDTH/8));
+        panelWid=Math.trunc(map.ROOM_BLOCK_WIDTH/2)-genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH/5),Math.trunc(map.ROOM_BLOCK_WIDTH/8));
 
         ang=null;
         dir=room.getDirectionTowardsCenter(pos);
@@ -95,13 +95,13 @@ class GenRoomDecorationMachineClass
         boundX=new wsBound((pos.x-panelWid),(pos.x+panelWid));
         boundZ=new wsBound((pos.z-panelWid),(pos.z+panelWid));
 
-        y=pos.y-Math.trunc(config.ROOM_FLOOR_HEIGHT*0.3);
+        y=pos.y-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3);
 
         boundY=new wsBound(pos.y,y);
         mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
 
         boundY.max=boundY.min;
-        boundY.min=boundY.max-config.ROOM_FLOOR_DEPTH;
+        boundY.min=boundY.max-map.ROOM_FLOOR_DEPTH;
         mesh2=MeshPrimitivesClass.createMeshWedge(baseBitmap,boundX,boundY,boundZ,ang,false,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
 
         mesh.combineMesh(mesh2);

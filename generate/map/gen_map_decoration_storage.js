@@ -94,18 +94,18 @@ class GenRoomDecorationStorageClass
         let boxBoundY=new wsBound(0,0);
         let boxBoundZ=new wsBound(0,0);
         
-        legWid=Math.trunc(config.ROOM_BLOCK_WIDTH*0.1);
+        legWid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
         bitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
 
             // height and width
 
         if (genRandom.randomPercentage(0.5)) {
-            xWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
-            zWid=xWid-Math.trunc(0,Math.trunc(config.ROOM_BLOCK_WIDTH*0.2));
+            xWid=Math.trunc(map.ROOM_BLOCK_WIDTH/2);
+            zWid=xWid-Math.trunc(0,Math.trunc(map.ROOM_BLOCK_WIDTH*0.2));
         }
         else {
-            zWid=Math.trunc(config.ROOM_BLOCK_WIDTH/2);
-            xWid=zWid-Math.trunc(0,Math.trunc(config.ROOM_BLOCK_WIDTH*0.2));
+            zWid=Math.trunc(map.ROOM_BLOCK_WIDTH/2);
+            xWid=zWid-Math.trunc(0,Math.trunc(map.ROOM_BLOCK_WIDTH*0.2));
         }
 
         stackCount=1;
@@ -120,14 +120,14 @@ class GenRoomDecorationStorageClass
                 // the table
 
             boxBoundX=new wsBound((pos.x-xWid),(pos.x+xWid));
-            boxBoundY=new wsBound((boxY-high),((boxY-high)+config.ROOM_FLOOR_DEPTH));
+            boxBoundY=new wsBound((boxY-high),((boxY-high)+map.ROOM_FLOOR_DEPTH));
             boxBoundZ=new wsBound((pos.z-zWid),(pos.z+zWid));
 
             mesh=MeshPrimitivesClass.createMeshCube(bitmap,boxBoundX,boxBoundY,boxBoundZ,null,true,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
 
                 // legs
 
-            boxBoundY=new wsBound(((boxY-high)+config.ROOM_FLOOR_DEPTH),boxY);
+            boxBoundY=new wsBound(((boxY-high)+map.ROOM_FLOOR_DEPTH),boxY);
 
             boxBoundX=new wsBound((pos.x-xWid),((pos.x-xWid)+legWid));
             boxBoundZ=new wsBound((pos.z-zWid),((pos.z-zWid)+legWid));            
@@ -169,7 +169,7 @@ class GenRoomDecorationStorageClass
             // make all pieces in the room have
             // the same size based on height
             
-        high=genRandom.randomInt(Math.trunc(config.ROOM_BLOCK_WIDTH*0.2),Math.trunc(config.ROOM_BLOCK_WIDTH*0.25));
+        high=genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH*0.2),Math.trunc(map.ROOM_BLOCK_WIDTH*0.25));
 
             // create the pieces
             

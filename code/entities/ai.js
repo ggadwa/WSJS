@@ -19,6 +19,7 @@ class AIClass
         
         this.nearWakeDistance=0;
         this.farWakeDistance=0;
+        this.farWakeHalfAngleFieldOfVision=0;
         
         this.projectile=null;
         
@@ -43,10 +44,11 @@ class AIClass
         this.walkTurnSpeed=walkTurnSpeed;
     }
     
-    setWakeDistance(nearWakeDistance,farWakeDistance)
+    setWakeDistance(nearWakeDistance,farWakeDistance,farWakeHalfAngleFieldOfVision)
     {
         this.nearWakeDistance=nearWakeDistance;
         this.farWakeDistance=farWakeDistance;
+        this.farWakeHalfAngleFieldOfVision=farWakeHalfAngleFieldOfVision;
     }
     
     setProjectile(projectile)

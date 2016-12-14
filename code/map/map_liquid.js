@@ -1,4 +1,4 @@
-/* global view, config */
+/* global view, config, map */
 
 "use strict";
 
@@ -40,6 +40,11 @@ class MapLiquidClass
         this.uvs=null;
         
         this.indexCount=0;
+        
+            // constants
+            
+        this.ROOM_LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
+        this.ROOM_LIQUID_WAVE_HEIGHT=400;               // pixel height of waves
 
         Object.seal(this);
     }
@@ -73,9 +78,9 @@ class MapLiquidClass
         
             // get the y offsets for waves
         
-        let freq=((view.timeStamp%config.ROOM_LIQUID_WAVE_FREQUENCY)/config.ROOM_LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
+        let freq=((view.timeStamp%this.LIQUID_WAVE_FREQUENCY)/this.LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
         let cs=Math.cos(freq);
-        let offY=Math.trunc(cs*config.ROOM_LIQUID_WAVE_HEIGHT);
+        let offY=Math.trunc(cs*this.LIQUID_WAVE_HEIGHT);
         
             // create mesh
             
@@ -85,14 +90,14 @@ class MapLiquidClass
         vz=this.zBound.min;
         gz=0.0;
         
-        offRow=Math.trunc(vz/config.ROOM_BLOCK_WIDTH);
+        offRow=Math.trunc(vz/map.ROOM_BLOCK_WIDTH);
         
         for (z=0;z!==(this.zBlockSize+1);z++) {
             
             vx=this.xBound.min;
             gx=0.0;
             
-            offCol=Math.trunc(vx/config.ROOM_BLOCK_WIDTH);
+            offCol=Math.trunc(vx/map.ROOM_BLOCK_WIDTH);
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
@@ -102,13 +107,13 @@ class MapLiquidClass
                 this.uvs[uvIdx++]=gx;
                 this.uvs[uvIdx++]=gz;
                 
-                vx+=config.ROOM_BLOCK_WIDTH;
+                vx+=map.ROOM_BLOCK_WIDTH;
                 gx+=1.0;
                 
                 offCol++;
             }
             
-            vz+=config.ROOM_BLOCK_WIDTH;
+            vz+=map.ROOM_BLOCK_WIDTH;
             gz+=1.0;
             
             offRow++;

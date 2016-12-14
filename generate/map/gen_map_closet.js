@@ -9,7 +9,9 @@
 class GenRoomClosetClass
 {
     constructor()
-    {    
+    {
+        this.CLOSET_MAX_COUNT=5;            // maximum number of possible closets in room
+        
         Object.seal(this);
     }
     
@@ -134,12 +136,12 @@ class GenRoomClosetClass
         let connectSide,connectOffset,closetLen;
         let xClosetBound,yClosetBound,zClosetBound;
         
-        let closetCount=genRandom.randomIndex(config.ROOM_CLOSET_MAX_COUNT);
+        let closetCount=genRandom.randomIndex(this.CLOSET_MAX_COUNT);
         if (closetCount===0) return;
         
             // story height
             
-        storyHigh=config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH;
+        storyHigh=map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH;
         
             // create closests
             
@@ -170,7 +172,7 @@ class GenRoomClosetClass
             topStory=bottomStory+1;   
             if ((room.storyCount-bottomStory)>1) topStory=bottomStory+genRandom.randomInt(1,(room.storyCount-bottomStory));
 
-            yClosetBound=new wsBound(((room.yBound.max-(topStory*storyHigh))+config.ROOM_FLOOR_DEPTH),(room.yBound.max-(bottomStory*storyHigh)));
+            yClosetBound=new wsBound(((room.yBound.max-(topStory*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(bottomStory*storyHigh)));
             
                 // get the box
                 
@@ -178,34 +180,34 @@ class GenRoomClosetClass
                 
                 case mapRoomConstants.ROOM_SIDE_LEFT:
                     xAdd=0;
-                    zAdd=config.ROOM_BLOCK_WIDTH;
-                    z=room.zBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound((room.xBound.min-config.ROOM_BLOCK_WIDTH),room.xBound.min);
-                    zClosetBound=new wsBound(z,(z+config.ROOM_BLOCK_WIDTH));
+                    zAdd=map.ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound((room.xBound.min-map.ROOM_BLOCK_WIDTH),room.xBound.min);
+                    zClosetBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_TOP:
-                    xAdd=config.ROOM_BLOCK_WIDTH;
+                    xAdd=map.ROOM_BLOCK_WIDTH;
                     zAdd=0;
-                    x=room.xBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound(x,(x+config.ROOM_BLOCK_WIDTH));
-                    zClosetBound=new wsBound((room.zBound.min-config.ROOM_BLOCK_WIDTH),room.zBound.min);
+                    x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound((room.zBound.min-map.ROOM_BLOCK_WIDTH),room.zBound.min);
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_RIGHT:
                     xAdd=0;
-                    zAdd=config.ROOM_BLOCK_WIDTH;
-                    z=room.zBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound(room.xBound.max,(room.xBound.max+config.ROOM_BLOCK_WIDTH));
-                    zClosetBound=new wsBound(z,(z+config.ROOM_BLOCK_WIDTH));
+                    zAdd=map.ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(room.xBound.max,(room.xBound.max+map.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                    xAdd=config.ROOM_BLOCK_WIDTH;
+                    xAdd=map.ROOM_BLOCK_WIDTH;
                     zAdd=0;
-                    x=room.xBound.min+(connectOffset*config.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new wsBound(x,(x+config.ROOM_BLOCK_WIDTH));
-                    zClosetBound=new wsBound(room.zBound.max,(room.zBound.max+config.ROOM_BLOCK_WIDTH));
+                    x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new wsBound(room.zBound.max,(room.zBound.max+map.ROOM_BLOCK_WIDTH));
                     break;
             }
             

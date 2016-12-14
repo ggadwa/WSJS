@@ -23,9 +23,9 @@ class GenRoomPlatformClass
         let meshIdx,movement,waitMSec;
         let liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-        let xLiftBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
-        let yLiftBound=new wsBound((room.yBound.min+(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)),room.yBound.max);
-        let zLiftBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
+        let xLiftBound=new wsBound((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
+        let yLiftBound=new wsBound((room.yBound.min+(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),room.yBound.max);
+        let zLiftBound=new wsBound((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
 
         meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_LIFT));
         
@@ -45,25 +45,25 @@ class GenRoomPlatformClass
             movement.addMove(new MoveClass(1500,new wsPoint(0,y,0)));
             movement.addMove(new MoveClass(waitMSec,new wsPoint(0,y,0)));
             
-            y+=(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+            y+=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
         }
         
             // the bottom
 
-        y-=config.ROOM_FLOOR_DEPTH;
+        y-=map.ROOM_FLOOR_DEPTH;
         
         movement.addMove(new MoveClass(1500,new wsPoint(0,y,0)));
         movement.addMove(new MoveClass(waitMSec,new wsPoint(0,y,0)));
         
             // going up
         
-        y-=config.ROOM_FLOOR_HEIGHT;
+        y-=map.ROOM_FLOOR_HEIGHT;
         
         for (n=0;n<(room.storyCount-2);n++) {
             movement.addMove(new MoveClass(1500,new wsPoint(0,y,0)));
             movement.addMove(new MoveClass(waitMSec,new wsPoint(0,y,0)));
             
-            y-=(config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH);
+            y-=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
         }
         
         map.addMovement(movement); 
@@ -81,11 +81,11 @@ class GenRoomPlatformClass
         
     addPlatformChunk(room,x,z,story,platformBitmap)
     {
-        let y=(room.yBound.max-((config.ROOM_FLOOR_HEIGHT+config.ROOM_FLOOR_DEPTH)*story));
+        let y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*story));
         
-        let xPlatformBound=new wsBound((room.xBound.min+(x*config.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*config.ROOM_BLOCK_WIDTH)));
-        let yPlatformBound=new wsBound(y,(y+config.ROOM_FLOOR_DEPTH));
-        let zPlatformBound=new wsBound((room.zBound.min+(z*config.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*config.ROOM_BLOCK_WIDTH)));
+        let xPlatformBound=new wsBound((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
+        let yPlatformBound=new wsBound(y,(y+map.ROOM_FLOOR_DEPTH));
+        let zPlatformBound=new wsBound((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
         
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
 

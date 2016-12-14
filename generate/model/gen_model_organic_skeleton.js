@@ -213,16 +213,16 @@ class GenModelOrganicSkeletonClass
             // random heights
             // can never be taller than a single floor height
             
-        hipHigh=genRandom.randomInt(600,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.4));
-        waistHigh=hipHigh+genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.15));
-        torsoHigh=waistHigh+genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.2));
-        torsoTopHigh=torsoHigh+genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.15));
+        hipHigh=genRandom.randomInt(600,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.4));
+        waistHigh=hipHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15));
+        torsoHigh=waistHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2));
+        torsoTopHigh=torsoHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15));
         neckHigh=torsoTopHigh+Math.trunc(topBodyRadius*0.25);
-        jawHigh=neckHigh+genRandom.randomInt(100,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.1));
-        headHigh=jawHigh+genRandom.randomInt(200,Math.trunc(config.ROOM_FLOOR_HEIGHT*0.2));
+        jawHigh=neckHigh+genRandom.randomInt(100,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.1));
+        headHigh=jawHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2));
         
         while (true) {
-            if (headHigh<config.ROOM_FLOOR_HEIGHT) break;
+            if (headHigh<map.ROOM_FLOOR_HEIGHT) break;
             
             hipHigh-=5;
             waistHigh-=10;
@@ -456,7 +456,7 @@ class GenModelOrganicSkeletonClass
             // can never be taller than a single floor height
             // and always shorter than humanoids (no legs)
         
-        totalHigh=genRandom.randomInt(Math.trunc(config.ROOM_FLOOR_HEIGHT*0.05),Math.trunc(config.ROOM_FLOOR_HEIGHT*0.8));
+        totalHigh=genRandom.randomInt(Math.trunc(map.ROOM_FLOOR_HEIGHT*0.05),Math.trunc(map.ROOM_FLOOR_HEIGHT*0.8));
         
             // the base bone
             

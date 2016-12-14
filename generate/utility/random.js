@@ -35,6 +35,11 @@ class GenRandomClass
         return(startInt+Math.trunc(this.random()*extraInt));
     }
     
+    randomFloat(startFloat,extraFloat)
+    {
+        return(startFloat+(this.random()*extraFloat));
+    }
+    
     randomIndex(maxIndex)
     {
         return(Math.trunc(this.random()*maxIndex));

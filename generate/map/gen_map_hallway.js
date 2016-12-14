@@ -116,9 +116,9 @@ class GenRoomHallwayClass
         
             // and the movement
         
-        movement=new MovementClass(meshIdx,false,(config.ROOM_BLOCK_WIDTH*2));
+        movement=new MovementClass(meshIdx,false,(map.ROOM_BLOCK_WIDTH*2));
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-(map.ROOM_FLOOR_HEIGHT-map.ROOM_FLOOR_DEPTH),0)));
         
         map.addMovement(movement); 
     }
@@ -139,7 +139,7 @@ class GenRoomHallwayClass
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
+        thickSize=Math.trunc(map.ROOM_BLOCK_WIDTH*0.05);
         
             // the door room
             // internal walls
@@ -209,9 +209,9 @@ class GenRoomHallwayClass
         
             // and the movement
         
-        movement=new MovementClass(meshIdx,false,(config.ROOM_BLOCK_WIDTH*2));
+        movement=new MovementClass(meshIdx,false,(map.ROOM_BLOCK_WIDTH*2));
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(1500,new wsPoint(0,-(config.ROOM_FLOOR_HEIGHT-config.ROOM_FLOOR_DEPTH),0)));
+        movement.addMove(new MoveClass(1500,new wsPoint(0,-(map.ROOM_FLOOR_HEIGHT-map.ROOM_FLOOR_DEPTH),0)));
         
         map.addMovement(movement); 
     }
@@ -232,7 +232,7 @@ class GenRoomHallwayClass
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        thickSize=Math.trunc(config.ROOM_BLOCK_WIDTH*0.05);
+        thickSize=Math.trunc(map.ROOM_BLOCK_WIDTH*0.05);
          
             // the door room
             // internal walls

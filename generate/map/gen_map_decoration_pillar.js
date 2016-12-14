@@ -10,8 +10,8 @@ class GenRoomDecorationPillarClass
 {
     constructor()
     {
-        let minRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.08);
-        let maxRadius=Math.trunc(config.ROOM_BLOCK_WIDTH*0.14);
+        let minRadius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.08);
+        let maxRadius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.14);
 
         let radius=genRandom.randomInBetween(minRadius,maxRadius);
         this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(radius,radius,1,4);
