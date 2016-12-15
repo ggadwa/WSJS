@@ -25,40 +25,57 @@ class GenBitmapSkinClass extends GenBitmapClass
     }
     
         //
+        // face chunks
+        //
+        
+    generateFaceChunkEye(bitmapCTX,normalCTX,x,top,bot)
+    {
+        this.draw3DOval(bitmapCTX,normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
+        this.drawOval(bitmapCTX,(x+10),(top+80),(x+20),(top+90),this.blackColor,this.blackColor);
+    }
+    
+    generateFaceChunk(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    {
+        this.generateFaceChunkEye(bitmapCTX,normalCTX,480,top,bot);
+        this.generateFaceChunkEye(bitmapCTX,normalCTX,430,top,bot);
+    }
+    
+        //
         // scales
         //
-
-    generateScale(bitmapCTX,normalCTX,specularCTX,wid,high)
+        
+    generateScaleChunk(bitmapCTX,normalCTX,lft,top,rgt,bot,skinColor,scaleCount)
     {
         let x,y,dx,dy;
         let xCount;
 
-        let scaleCount=genRandom.randomInt(5,10);
-        let skinColor=this.getRandomColor();
-        let borderColor=this.darkenColor(skinColor,0.8);
+        let borderColor=this.darkenColor(skinColor,0.7);
 
+        let wid=rgt-lft;
+        let high=bot-top;
         let sWid=wid/scaleCount;
         let sHigh=high/scaleCount;
+        
+        this.startClip(bitmapCTX,lft,top,rgt,bot);
          
-            // clear canvases
+            // background
 
-        this.drawRect(bitmapCTX,0,0,wid,high,skinColor);
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.5,0.7,0.6);
-        this.blur(bitmapCTX,0,0,wid,high,5);
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.drawRect(bitmapCTX,lft,top,rgt,bot,skinColor);
+        this.addNoiseRect(bitmapCTX,lft,top,rgt,bot,0.5,0.7,0.6);
+        this.blur(bitmapCTX,lft,top,rgt,bot,5);
         
             // scales
 
-        dy=-sHigh;
+        dy=top-sHigh;
         
         for (y=0;y!==scaleCount;y++) {
 
             if ((y%2)===0) {
-                dx=0;
+                dx=lft;
                 xCount=scaleCount;
             }
             else {
-                dx=-Math.trunc(sWid*0.5);
+                dx=lft-Math.trunc(sWid*0.5);
                 xCount=scaleCount+1;
             }
             
@@ -69,6 +86,35 @@ class GenBitmapSkinClass extends GenBitmapClass
             
             dy+=sHigh;
         }
+        
+        this.endClip(bitmapCTX);
+    }
+
+    generateScale(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        let skinColor,scaleCount;
+        let mx=Math.trunc(wid*0.5);
+        let my=Math.trunc(high*0.5);
+        
+            // scales and skin settings
+            
+        skinColor=this.getRandomColor();
+        scaleCount=genRandom.randomInt(3,5);
+         
+            // clear canvases
+        
+        this.drawRect(bitmapCTX,0,0,wid,high,skinColor);
+        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        
+            // scales
+        
+        this.generateScaleChunk(bitmapCTX,normalCTX,0,0,mx,my,skinColor,scaleCount);
+        
+        this.generateScaleChunk(bitmapCTX,normalCTX,mx,0,wid,my,skinColor,scaleCount);
+        this.generateFaceChunk(bitmapCTX,normalCTX,mx,0,wid,my);
+        
+        skinColor=this.darkenColor(skinColor,0.8);
+        this.generateScaleChunk(bitmapCTX,normalCTX,0,my,mx,high,skinColor,scaleCount);
 
             // finish with the specular
 
@@ -222,24 +268,31 @@ class GenBitmapSkinClass extends GenBitmapClass
 
         wid=bitmapCanvas.width;
         high=bitmapCanvas.height;
+        
+            // skin bitmaps have four chunks:
+            // top-left: regular
+            // top-right: face
+            // bottom-left: darker
 
             // create the bitmap
-
+            
+        generateType=this.TYPE_SCALE;   // supergumba -- testing
+            
         switch (generateType) {
 
             case this.TYPE_SCALE:
                 this.generateScale(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
+                shineFactor=2.0;
                 break;
                 
             case this.TYPE_LEATHER:
                 this.generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=2.0;
+                shineFactor=1.0;
                 break;
                 
             case this.TYPE_FUR:
                 this.generateFur(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=1.0;
+                shineFactor=0.5;
                 break;
                 
         }

@@ -49,6 +49,11 @@ class GenBitmapClass
         this.NORMAL_BOTTOM_LEFT_45=new wsPoint(-0.30,-0.30,0.70);
         this.NORMAL_BOTTOM_RIGHT_45=new wsPoint(0.30,-0.30,0.70);
         
+            // some precalced colors
+            
+        this.blackColor=new wsColor(0.0,0.0,0.0);
+        this.whiteColor=new wsColor(1.0,1.0,1.0);
+        
             // some primary colors
             
         this.primaryColorList=
@@ -217,6 +222,22 @@ class GenBitmapClass
         }
 
         return(segments);
+    }
+    
+        //
+        // clipping
+        //
+        
+    startClip(bitmapCTX,lft,top,rgt,bot)
+    {
+        bitmapCTX.save();
+        bitmapCTX.rect(lft,top,(rgt-lft),(bot-top));
+        bitmapCTX.clip();
+    }
+    
+    endClip(bitmapCTX)
+    {
+        bitmapCTX.restore();
     }
 
         //
@@ -1098,18 +1119,19 @@ class GenBitmapClass
     
     drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
-        let mx,my,radius;
+        let mx,my,xRadius,yRadius;
 
         mx=Math.trunc((lft+rgt)/2);
         my=Math.trunc((top+bot)/2);
         
-        radius=Math.trunc((rgt-lft)/2);
+        xRadius=Math.trunc((rgt-lft)*0.5);
+        yRadius=Math.trunc((bot-top)*0.5);
 
         bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
         if (borderRGBColor!==null) bitmapCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
         
         bitmapCTX.beginPath();
-        bitmapCTX.arc(mx,my,radius,0.0,(Math.PI*2));
+        bitmapCTX.ellipse(mx,my,xRadius,yRadius,0.0,0.0,(Math.PI*2));
         bitmapCTX.fill();
         if (borderRGBColor!==null) bitmapCTX.stroke();
     }
@@ -1494,8 +1516,6 @@ class GenBitmapClass
 
     drawParticle(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
     {
-        
-
         let n,k,px,py,mx,my,idx;
         let rad,fx,fy,fsz;
         let col;

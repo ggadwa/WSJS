@@ -11,8 +11,6 @@ When interface created
 
 ToDos
 
-#### liquids seem broken
-
 #### for connected rooms, if lower or upper, try to wedge a room in between the staircase and other room to create open access
 #### update the walls decorations
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
@@ -25,7 +23,6 @@ ToDos
 #### collisions against slanted walls are bad
 #### weapon models
 #### get rid of weapon fire hard-coding
-#### monster speed/health random/projectile,no-projectile
 #### implement reflect for projectiles
 #### closets more complex?
 #### windows like you do closets

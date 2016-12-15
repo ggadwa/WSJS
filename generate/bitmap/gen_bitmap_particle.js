@@ -43,8 +43,8 @@ class GenBitmapParticleClass extends GenBitmapClass
 
             // no types yet
             
-        this.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.0,0.0,0.0));
-        this.drawOval(bitmapCTX,0,0,wid,high,new wsColor(1.0,1.0,1.0),null);
+        this.drawRect(bitmapCTX,0,0,wid,high,this.blackColor);
+        this.drawOval(bitmapCTX,0,0,wid,high,this.whiteColor,null);
 
             // debug just displays the canvases, so send
             // them back

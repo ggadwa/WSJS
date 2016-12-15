@@ -16,32 +16,31 @@ class ConfigClass
             
         this.ROOM_PATH_COUNT=5;                     // how many rooms in the map path
 
-        this.ROOM_LIQUIDS=true;                     // turns on or off liquids
-        this.MAP_LIGHT_ALWAYS_WHITE=false;          // make sure map lights are always white
         this.MAP_GENERATE_LIGHTMAP=false;           // set to true to generate light maps
+        
+        this.ROOM_LIQUIDS=true;                     // turns on or off liquids
+        this.SIMPLE_TEST_MAP=true;                  // a special simple map for testing other elements
 
             //
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT_R=0.2;                   // all over ambient light [r,g,b]
-        this.MAP_LIGHT_AMBIENT_G=0.2;
-        this.MAP_LIGHT_AMBIENT_B=0.2;
+        this.MAP_LIGHT_AMBIENT=0.2;                 // all over ambient light [r,g,b]
 
             //
             // monsters
             //
 
         this.MONSTER_TYPE_COUNT=3;
-        this.MONSTER_ENTITY_COUNT=10;
+        this.MONSTER_ENTITY_COUNT=3;
         
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
         
             //
             // sounds
             //
             
-        this.VOLUME=0.3;                                // main volume
+        this.VOLUME=0.3;                            // main volume
         
             //
             // controls

@@ -43,8 +43,8 @@ class MapLiquidClass
         
             // constants
             
-        this.ROOM_LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
-        this.ROOM_LIQUID_WAVE_HEIGHT=400;               // pixel height of waves
+        this.LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
+        this.LIQUID_WAVE_HEIGHT=400;               // pixel height of waves
 
         Object.seal(this);
     }

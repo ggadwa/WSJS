@@ -94,7 +94,6 @@ class GenBitmapItemClass extends GenBitmapClass
         let screwCount=genRandom.randomInt(2,5);
         
         let screwColor=this.boostColor(metalColor,0.05);
-        let borderColor=new wsColor(0,0,0);
         let screwFlatInnerSize=Math.trunc(screwWid*0.4);
         
         for (n=0;n!==screwCount;n++) {
@@ -110,7 +109,7 @@ class GenBitmapItemClass extends GenBitmapClass
                 
                 x*=screwWid;
                 y*=screwHigh;
-                this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwWid),(y+screwHigh),0.0,1.0,2,screwFlatInnerSize,screwColor,borderColor);
+                this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwWid),(y+screwHigh),0.0,1.0,2,screwFlatInnerSize,screwColor,this.blackColor);
                 break;
             }
         }

@@ -268,17 +268,15 @@ class GenModelOrganicSkeletonClass
         
             // create head limbs
         
-        if (genRandom.randomPercentage(0.9)) {
-            neckBoneIdx=bones.push(new ModelBoneClass('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
-            jawBoneIdx=bones.push(new ModelBoneClass('Neck',neckBoneIdx,new wsPoint(0,-jawHigh,0)))-1;
-            headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new wsPoint(0,-headHigh,0)))-1;
+        neckBoneIdx=bones.push(new ModelBoneClass('Neck',torsoTopBoneIdx,new wsPoint(0,-neckHigh,0)))-1;
+        jawBoneIdx=bones.push(new ModelBoneClass('Neck',neckBoneIdx,new wsPoint(0,-jawHigh,0)))-1;
+        headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new wsPoint(0,-headHigh,0)))-1;
 
-            bones[headBoneIdx].gravityLockDistance=genRandom.randomInt(300,400);
-            bones[jawBoneIdx].gravityLockDistance=genRandom.randomInt(300,400);
-            bones[neckBoneIdx].gravityLockDistance=genRandom.randomInt(100,150);
+        bones[headBoneIdx].gravityLockDistance=genRandom.randomInt(300,400);
+        bones[jawBoneIdx].gravityLockDistance=genRandom.randomInt(300,400);
+        bones[neckBoneIdx].gravityLockDistance=genRandom.randomInt(100,150);
 
-            this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_HEAD,modelLimbConstants.LIMB_AXIS_Y,10,10,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
-        }
+        this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_HEAD,modelLimbConstants.LIMB_AXIS_Y,10,10,[headBoneIdx,jawBoneIdx,neckBoneIdx]));
         
             // create arm limbs
             // arm length is about quarter body size + some random

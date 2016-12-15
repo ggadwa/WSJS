@@ -69,7 +69,6 @@ class GenBitmapFloorClass extends GenBitmapClass
     {
         let x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh;
         let col,padding;
-        let borderColor=new wsColor(0.0,0.0,0.0);
 
             // tile style
 
@@ -136,10 +135,10 @@ class GenBitmapFloorClass extends GenBitmapClass
                     
                     switch (genRandom.randomIndex(3)) {
                         case 1:
-                            this.drawOval(bitmapCTX,(dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),col,borderColor);
+                            this.drawOval(bitmapCTX,(dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),col,this.blackColor);
                             break;
                         case 2:
-                            this.drawDiamond(bitmapCTX,(dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),col,borderColor);
+                            this.drawDiamond(bitmapCTX,(dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),col,this.blackColor);
                             break;
                     }
                 }
@@ -257,7 +256,6 @@ class GenBitmapFloorClass extends GenBitmapClass
             // some random values
 
         let metalColor=this.getDefaultPrimaryColor();
-        let borderColor=new wsColor(0.0,0.0,0.0);
 
         let edgeSize=genRandom.randomInt(4,8);
         let innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
@@ -293,10 +291,10 @@ class GenBitmapFloorClass extends GenBitmapClass
         if (genRandom.randomPercentage(0.5)) {
             offset=edgeSize+4;
             
-            this.draw3DOval(bitmapCTX,normalCTX,offset,offset,(offset+screwSize),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,offset,((high-offset)-screwSize),(offset+screwSize),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),offset,(wid-offset),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),((high-offset)-screwSize),(wid-offset),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
+            this.draw3DOval(bitmapCTX,normalCTX,offset,offset,(offset+screwSize),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,offset,((high-offset)-screwSize),(offset+screwSize),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),offset,(wid-offset),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),((high-offset)-screwSize),(wid-offset),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
             
             innerEdgeSize+=screwSize;
         }

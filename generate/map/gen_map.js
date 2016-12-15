@@ -53,7 +53,8 @@ class GenMapClass
         this.ROOM_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for map lights
         this.ROOM_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 
-        
+        this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
+
         Object.seal(this);
     }
     
@@ -241,7 +242,7 @@ class GenMapClass
             // determine if this room has a liquid,
             // and lower it for pool and add a story
         
-        liquid=(config.ROOM_LIQUIDS)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&allowLiquid;
+        liquid=(config.ROOM_LIQUIDS)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP)&&allowLiquid;
         
         if (liquid) {
             yBound.max+=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
@@ -455,7 +456,7 @@ class GenMapClass
             // the color
 
         red=this.ROOM_LIGHT_RGB_MINIMUM+(genRandom.random()*this.ROOM_LIGHT_RGB_MINIMUM_EXTRA);
-        if (config.MAP_LIGHT_ALWAYS_WHITE) {
+        if (this.MAP_LIGHT_ALWAYS_WHITE) {
             green=blue=red;
         }
         else {
@@ -487,7 +488,7 @@ class GenMapClass
             // intensity
         
         intensity=Math.max(room.xBound.getSize(),room.yBound.getSize(),room.zBound.getSize());
-        intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
+        if (!config.SIMPLE_TEST_MAP) intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
         
             // create the light
             
@@ -570,14 +571,20 @@ class GenMapClass
             // and make sure it stays under the max
             // blocks for room
         
-        xBlockSize=genRandom.randomInt(this.ROOM_MIN_BLOCK_PER_SIDE,this.ROOM_MAX_BLOCK_PER_SIDE);
-        zBlockSize=genRandom.randomInt(this.ROOM_MIN_BLOCK_PER_SIDE,this.ROOM_MAX_BLOCK_PER_SIDE);
-        
-        while ((xBlockSize*zBlockSize)>this.ROOM_MAX_BLOCK_COUNT) {
-            if (xBlockSize>this.ROOM_MIN_BLOCK_PER_SIDE) xBlockSize--;
-            if (zBlockSize>this.ROOM_MIN_BLOCK_PER_SIDE) zBlockSize--;
+        if (config.SIMPLE_TEST_MAP) {
+            xBlockSize=10;
+            zBlockSize=10;
         }
+        else {
+            xBlockSize=genRandom.randomInt(this.ROOM_MIN_BLOCK_PER_SIDE,this.ROOM_MAX_BLOCK_PER_SIDE);
+            zBlockSize=genRandom.randomInt(this.ROOM_MIN_BLOCK_PER_SIDE,this.ROOM_MAX_BLOCK_PER_SIDE);
 
+            while ((xBlockSize*zBlockSize)>this.ROOM_MAX_BLOCK_COUNT) {
+                if (xBlockSize>this.ROOM_MIN_BLOCK_PER_SIDE) xBlockSize--;
+                if (zBlockSize>this.ROOM_MIN_BLOCK_PER_SIDE) zBlockSize--;
+            }
+        }
+        
             // get room location
             // if we don't have a previous room,
             // then it's the first room and it's
@@ -732,7 +739,7 @@ class GenMapClass
         
             // at end of path?
             
-        if (map.rooms.length>=config.ROOM_PATH_COUNT) return;
+        if ((map.rooms.length>=config.ROOM_PATH_COUNT) || (config.SIMPLE_TEST_MAP)) return;
 
             // next room in path
             
@@ -1062,7 +1069,13 @@ class GenMapClass
         this.buildMapRoomPath(null,this.HALLWAY_NONE);
         
         view.loadingScreenDraw(0.2);
-        setTimeout(this.buildMapExtensions.bind(this),1);
+        
+        if (config.SIMPLE_TEST_MAP) {
+            setTimeout(this.buildMapFinish.bind(this),1);
+        }
+        else {
+            setTimeout(this.buildMapExtensions.bind(this),1);
+        }
     }
     
     buildMapExtensions()

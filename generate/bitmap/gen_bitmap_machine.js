@@ -125,7 +125,6 @@ class GenBitmapMachineClass extends GenBitmapClass
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         let color;
-        let borderColor=new wsColor(0.0,0.0,0.0);
         
         wid=genRandom.randomInt(30,25);
         
@@ -147,7 +146,7 @@ class GenBitmapMachineClass extends GenBitmapClass
                 color=this.getRandomColor();
                 if (genRandom.randomPercentage(0.5)) this.darkenColor(color,0.7);
                 
-                this.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,borderColor);
+                this.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,this.blackColor);
             }
         }
     }

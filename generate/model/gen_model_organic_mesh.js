@@ -669,7 +669,7 @@ class GenModelOrganicMeshClass
         // build around bone list
         //
         
-    buildAroundBoneList(axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
+    buildAroundBoneList(limbType,axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
     {
         let n,k,f,boneIdx,bone,parentBone,listBone;
         let acrossRadius,aroundRadius;
@@ -750,8 +750,7 @@ class GenModelOrganicMeshClass
         this.findBoundsForBoneList(boneList,xBound,yBound,zBound);
         centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
-            // build the globe and shrink
-            // wrap it to bones
+            // build the globe around the bones
             
         maxGravity=this.findMaxGravityForBoneList(boneList);
         
@@ -772,6 +771,24 @@ class GenModelOrganicMeshClass
                 this.buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
         }
+        
+            // reset the UVs to work within the
+            // texture chunks
+        
+        switch (limbType) {
+            case modelLimbConstants.LIMB_TYPE_BODY:
+                MeshUtilityClass.transformUVs(vertexList,0.0,0.5,0.5,0.5);
+                break;
+            case modelLimbConstants.LIMB_TYPE_HEAD:
+                MeshUtilityClass.transformUVs(vertexList,0.5,0.0,0.5,0.5);
+                break;
+            default:
+                MeshUtilityClass.transformUVs(vertexList,0.0,0.0,0.5,0.5);
+                break;
+        }
+            
+            // shrink wrap the globe and rebuild
+            // any normals, etc
 
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
@@ -809,7 +826,7 @@ class GenModelOrganicMeshClass
             vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point (around+1 for extra vertexes to stop UV wrapping)
             indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-3))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-3))*6 for quads, (around*2)*3 for top and bottom trigs
             
-            this.buildAroundBoneList(limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
+            this.buildAroundBoneList(limb.limbType,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
 
             if (modelVertexList===null) {
                 modelVertexList=vertexList;

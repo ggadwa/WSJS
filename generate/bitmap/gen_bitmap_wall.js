@@ -328,7 +328,6 @@ class GenBitmapWallClass extends GenBitmapClass
         let screenFlatInnerSize=Math.trunc(screwSize*0.4);
 
         let screwColor=this.darkenColor(metalColor,0.9);
-        let borderColor=new wsColor(0.0,0.0,0.0);
         
             // the plate
             
@@ -350,7 +349,7 @@ class GenBitmapWallClass extends GenBitmapClass
                 x=lft+Math.trunc((xAdd*0.5)-(screwSize*0.5));
                 
                 for (n=0;n!==screwCount;n++) {
-                    this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
+                    this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
                     x+=xAdd;
                 }
             }
@@ -361,7 +360,7 @@ class GenBitmapWallClass extends GenBitmapClass
                 y=top+Math.trunc((yAdd*0.5)-(screwSize*0.5));
                 
                 for (n=0;n!==screwCount;n++) {
-                    this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
+                    this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
                     y+=yAdd;
                 }
             }
@@ -372,10 +371,10 @@ class GenBitmapWallClass extends GenBitmapClass
         else {
             offset=edgeSize+4;
 
-            this.draw3DOval(bitmapCTX,normalCTX,(lft+offset),(top+offset),((lft+offset)+screwSize),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,(lft+offset),((bot-offset)-screwSize),((lft+offset)+screwSize),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((rgt-offset)-screwSize),(top+offset),(rgt-offset),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((rgt-offset)-screwSize),((bot-offset)-screwSize),(rgt-offset),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,borderColor);
+            this.draw3DOval(bitmapCTX,normalCTX,(lft+offset),(top+offset),((lft+offset)+screwSize),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,(lft+offset),((bot-offset)-screwSize),((lft+offset)+screwSize),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,((rgt-offset)-screwSize),(top+offset),(rgt-offset),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,((rgt-offset)-screwSize),((bot-offset)-screwSize),(rgt-offset),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
         }
     }
     
