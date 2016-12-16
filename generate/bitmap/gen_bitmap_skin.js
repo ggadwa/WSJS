@@ -28,16 +28,18 @@ class GenBitmapSkinClass extends GenBitmapClass
         // face chunks
         //
         
-    generateFaceChunkEye(bitmapCTX,normalCTX,x,top,bot)
+    generateFaceChunkEye(bitmapCTX,normalCTX,x,top,bot,eyeColor)
     {
         this.draw3DOval(bitmapCTX,normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
-        this.drawOval(bitmapCTX,(x+10),(top+80),(x+20),(top+90),this.blackColor,this.blackColor);
+        this.drawOval(bitmapCTX,(x+10),(top+81),(x+20),(top+89),eyeColor,null);
     }
     
     generateFaceChunk(bitmapCTX,normalCTX,lft,top,rgt,bot)
     {
-        this.generateFaceChunkEye(bitmapCTX,normalCTX,480,top,bot);
-        this.generateFaceChunkEye(bitmapCTX,normalCTX,430,top,bot);
+        let eyeColor=this.getRandomColor();
+        
+        this.generateFaceChunkEye(bitmapCTX,normalCTX,480,top,bot,eyeColor);
+        this.generateFaceChunkEye(bitmapCTX,normalCTX,430,top,bot,eyeColor);
     }
     
         //
@@ -125,12 +127,52 @@ class GenBitmapSkinClass extends GenBitmapClass
         // leather
         //
         
+    generateLeatherChunk(bitmapCTX,normalCTX,lft,top,rgt,bot,clothColor)
+    {
+        let n,x,x2,y,y2,lineCount;
+        let darken,lineColor;
+        let wid=rgt-lft;
+        let high=bot-top;
+         
+        this.addNoiseRect(bitmapCTX,lft,top,rgt,bot,0.8,0.9,0.5);        
+ 
+            // lines
+            
+        lineCount=genRandom.randomInt(30,30);
+            
+        for (n=0;n!==lineCount;n++) {
+            x=genRandom.randomInt(lft,wid);
+            y=genRandom.randomInt(top,high);
+            y2=genRandom.randomInt(top,high);
+            
+            darken=0.6+(genRandom.random()*0.25);
+            lineColor=this.darkenColor(clothColor,darken);
+            
+            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor,false);
+        }
+        
+        lineCount=genRandom.randomInt(30,30);
+            
+        for (n=0;n!==lineCount;n++) {
+            x=genRandom.randomInt(lft,wid);
+            x2=genRandom.randomInt(lft,wid);
+            y=genRandom.randomInt(top,high);
+            
+            darken=0.6+(genRandom.random()*0.25);
+            lineColor=this.darkenColor(clothColor,darken);
+            
+            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y,30,lineColor,false);
+        }
+        
+            // blur it
+            
+        this.blur(bitmapCTX,lft,top,rgt,bot,25);
+    }
+        
     generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,x,y,y2,lineCount;
-        let darken,lineColor,markCount;
-        let particleWid,particleHigh,particleDensity;
-        
+        let mx=Math.trunc(wid*0.5);
+        let my=Math.trunc(high*0.5);
         let clothColor=this.getRandomColor();
          
             // clear canvases
@@ -138,41 +180,15 @@ class GenBitmapSkinClass extends GenBitmapClass
         this.drawRect(bitmapCTX,0,0,wid,high,clothColor);
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.5);        
- 
-            // lines
+            // leather
             
-        lineCount=genRandom.randomInt(30,30);
-            
-        for (n=0;n!==lineCount;n++) {
-            x=genRandom.randomInt(0,wid);
-            y=genRandom.randomInt(0,high);
-            y2=genRandom.randomInt(0,high);
-            
-            darken=0.6+(genRandom.random()*0.25);
-            lineColor=this.darkenColor(clothColor,darken);
-            
-            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor,false);
-        }
-
-            // marks
-            
-        markCount=genRandom.randomInt(20,20);
-
-        for (n=0;n!==markCount;n++) {
-            particleWid=genRandom.randomInt(30,60);
-            particleHigh=genRandom.randomInt(30,60);
-            particleDensity=genRandom.randomInt(50,150);
-
-            x=genRandom.randomInt(0,wid);
-            y=genRandom.randomInt(0,high);
-
-            this.drawParticle(bitmapCTX,normalCTX,wid,high,x,y,(x+particleWid),(y+particleHigh),10,0.9,particleDensity,false);
-        }
+        this.generateLeatherChunk(bitmapCTX,normalCTX,0,0,mx,my,clothColor);
         
-            // blur it
-            
-        this.blur(bitmapCTX,0,0,wid,high,25);
+        this.generateLeatherChunk(bitmapCTX,normalCTX,mx,0,wid,my,clothColor);
+        this.generateFaceChunk(bitmapCTX,normalCTX,mx,0,wid,my);
+        
+        clothColor=this.darkenColor(clothColor,0.8);
+        this.generateLeatherChunk(bitmapCTX,normalCTX,0,my,mx,high,clothColor);
 
             // finish with the specular
 
@@ -183,13 +199,13 @@ class GenBitmapSkinClass extends GenBitmapClass
         // fur
         //
         
-    generateFur(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateFurChunk(bitmapCTX,normalCTX,lft,top,rgt,bot,furColor)
     {
         let n,x,y;
         let darken,boost,lineColor;
+        let wid=rgt-lft;
+        let high=bot-top;
         let halfHigh=Math.trunc(high*0.5);
-
-        let furColor=this.getRandomColor();
          
             // clear canvases
 
@@ -198,7 +214,7 @@ class GenBitmapSkinClass extends GenBitmapClass
 
             // hair
             
-        for (x=0;x!==wid;x++) {
+        for (x=lft;x!==rgt;x++) {
             
                 // hair color
                 
@@ -213,14 +229,36 @@ class GenBitmapSkinClass extends GenBitmapClass
             
                 // hair half from top
                 
-            y=halfHigh+genRandom.randomInt(0,halfHigh);
-            this.drawRandomLine(bitmapCTX,normalCTX,x,-5,x,(y+5),10,lineColor,false);
+            y=halfHigh+genRandom.randomInt(top,halfHigh);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,(top-5),x,(y+5),10,lineColor,false);
             
                 // hair half from bottom
                 
-            y=high-(halfHigh+genRandom.randomInt(0,halfHigh));
-            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(high+5),10,lineColor,false);
+            y=high-(halfHigh+genRandom.randomInt(top,halfHigh));
+            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(bot+5),10,lineColor,false);
         }
+    }
+        
+    generateFur(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        let mx=Math.trunc(wid*0.5);
+        let my=Math.trunc(high*0.5);
+        let furColor=this.getRandomColor();
+         
+            // clear canvases
+
+        this.drawRect(bitmapCTX,0,0,wid,high,furColor);       
+        this.clearNormalsRect(normalCTX,0,0,wid,high);
+
+            // fur
+            
+        this.generateFurChunk(bitmapCTX,normalCTX,0,0,mx,my,furColor);
+        
+        this.generateFurChunk(bitmapCTX,normalCTX,mx,0,wid,my,furColor);
+        this.generateFaceChunk(bitmapCTX,normalCTX,mx,0,wid,my);
+        
+        furColor=this.darkenColor(furColor,0.8);
+        this.generateFurChunk(bitmapCTX,normalCTX,0,my,mx,high,furColor);
 
             // finish with the specular
             // fur isn't shiney so this specular is very low
@@ -275,8 +313,6 @@ class GenBitmapSkinClass extends GenBitmapClass
             // bottom-left: darker
 
             // create the bitmap
-            
-        generateType=this.TYPE_SCALE;   // supergumba -- testing
             
         switch (generateType) {
 

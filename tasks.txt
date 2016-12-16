@@ -11,6 +11,8 @@ When interface created
 
 ToDos
 
+#### need a combine mesh that moves similiar vertices together in secondary mesh
+
 #### for connected rooms, if lower or upper, try to wedge a room in between the staircase and other room to create open access
 #### update the walls decorations
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions

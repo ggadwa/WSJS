@@ -664,7 +664,7 @@ class GenModelOrganicMeshClass
             }
         }
     }
-    
+        
         //
         // build around bone list
         //
@@ -780,6 +780,7 @@ class GenModelOrganicMeshClass
                 MeshUtilityClass.transformUVs(vertexList,0.0,0.5,0.5,0.5);
                 break;
             case modelLimbConstants.LIMB_TYPE_HEAD:
+            case modelLimbConstants.LIMB_TYPE_HEAD_SNOUT:
                 MeshUtilityClass.transformUVs(vertexList,0.5,0.0,0.5,0.5);
                 break;
             default:
@@ -807,11 +808,12 @@ class GenModelOrganicMeshClass
 
     build()
     {
-        let n,limb;
-        let indexOffset;
+        let n,k,limb,limb2,indexOffset;
         
         let skeleton=this.model.skeleton;
 
+        let limbVertexList=[];
+        let limbIndexes=[];
         let vertexList,indexes;
         let modelVertexList=null;
         let modelIndexes=null;
@@ -827,17 +829,55 @@ class GenModelOrganicMeshClass
             indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-3))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-3))*6 for quads, (around*2)*3 for top and bottom trigs
             
             this.buildAroundBoneList(limb.limbType,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
-
-            if (modelVertexList===null) {
-                modelVertexList=vertexList;
-                modelIndexes=indexes;
-            }
-            else {
-                modelVertexList=MeshUtilityClass.combineVertexLists(modelVertexList,vertexList);
-                modelIndexes=MeshUtilityClass.combineIndexes(modelIndexes,indexes,indexOffset);
-            }
             
+            limbVertexList.push(vertexList);
+            limbIndexes.push(indexes);
+        }
+        
+            // combine similiar vertices for specific
+            // parts
+/* supergumba -- maybe rethink all of this            
+        for (n=0;n!==skeleton.limbs.length;n++) {
+            limb=skeleton.limbs[n];
+            
+            for (k=0;k!==skeleton.limbs.length;k++) {
+                if (n===k) continue;
+                
+                limb2=skeleton.limbs[k];
+                
+                if (limb.limbType===modelLimbConstants.LIMB_TYPE_BODY) {
+                    if ((limb2.limbType===modelLimbConstants.LIMB_TYPE_ARM_LEFT) || (limb2.limbType===modelLimbConstants.LIMB_TYPE_ARM_RIGHT)) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],500);
+                    if ((limb2.limbType===modelLimbConstants.LIMB_TYPE_LEG_LEFT) || (limb2.limbType===modelLimbConstants.LIMB_TYPE_LEG_RIGHT)) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],500);
+                }
+                
+                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_ARM_LEFT) || (limb.limbType===modelLimbConstants.LIMB_TYPE_ARM_RIGHT)) {
+                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_HAND) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],200);
+                }
+                
+                if (limb.limbType===modelLimbConstants.LIMB_TYPE_HAND) {
+                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_FINGER) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],150);
+                }
+                
+                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_LEG_LEFT) || (limb.limbType===modelLimbConstants.LIMB_TYPE_LEG_RIGHT)) {
+                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_FOOT) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],200);
+                }
+                
+                if (limb.limbType===modelLimbConstants.LIMB_TYPE_FOOT) {
+                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_TOE) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],150);
+                }
+                
+            }
+        }
+*/        
+            // combine all the lists into one
+            
+        modelVertexList=limbVertexList[0];
+        modelIndexes=limbIndexes[0];
+            
+        for (n=1;n<skeleton.limbs.length;n++) {
             indexOffset=modelVertexList.length;
+            modelVertexList=MeshUtilityClass.combineVertexLists(modelVertexList,limbVertexList[n]);
+            modelIndexes=MeshUtilityClass.combineIndexes(modelIndexes,limbIndexes[n],indexOffset);
         }
         
             // add mesh to model
