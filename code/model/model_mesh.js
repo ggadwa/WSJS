@@ -1,4 +1,4 @@
-/* global LIMB_TYPE_LEG_BACK, modelLimbConstants, view */
+/* global modelLimbConstants, view */
 
 "use strict";
 
@@ -20,6 +20,8 @@ class ModelMeshVertexClass
 
         this.parentBoneIdx=-1;
         this.vectorFromParentBone=new wsPoint(0.0,0.0,0.0);
+        
+        this.modelSnap=false;
         
         Object.seal(this);
     }
@@ -154,7 +156,7 @@ class ModelMeshClass
                     v=this.vertexList[n];
                     limbType=skeleton.getBoneLimbType(v.boneIdx);
 
-                    if ((limbType===modelLimbConstants.LIMB_TYPE_BODY) || (limbType===modelLimbConstants.LIMB_TYPE_HEAD) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_LEFT) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_RIGHT) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_FRONT) || (limbType===modelLimbConstants.LIMB_TYPE_LEG_BACK)) {
+                    if ((limbType===modelLimbConstants.LIMB_TYPE_BODY) || (limbType===modelLimbConstants.LIMB_TYPE_HEAD) || (limbType===modelLimbConstants.LIMB_TYPE_LEG)) {
                         xBound.adjust(v.position.x);
                         zBound.adjust(v.position.z);
                     }

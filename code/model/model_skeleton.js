@@ -61,25 +61,26 @@ class ModelLimbConstantsClass
     {
         this.LIMB_TYPE_BODY=0;
         this.LIMB_TYPE_HEAD=1;
-        this.LIMB_TYPE_ARM_LEFT=2;
-        this.LIMB_TYPE_ARM_RIGHT=3;
-        this.LIMB_TYPE_LEG_LEFT=4;
-        this.LIMB_TYPE_LEG_RIGHT=5;
-        this.LIMB_TYPE_LEG_FRONT=6;
-        this.LIMB_TYPE_LEG_BACK=7;
-        this.LIMB_TYPE_HAND_LEFT=8;
-        this.LIMB_TYPE_HAND_RIGHT=9;
-        this.LIMB_TYPE_FINGER_LEFT=10;
-        this.LIMB_TYPE_FINGER_RIGHT=11;
-        this.LIMB_TYPE_FOOT=12;
-        this.LIMB_TYPE_TOE=13;
-        this.LIMB_TYPE_WHIP=14;
-        this.LIMB_TYPE_HEAD_SNOUT=15;
-        this.LIMB_TYPE_HEAD_JAW=16;
+        this.LIMB_TYPE_ARM=2;
+        this.LIMB_TYPE_HAND=3;
+        this.LIMB_TYPE_FINGER=4;
+        this.LIMB_TYPE_LEG=5;
+        this.LIMB_TYPE_FOOT=6;
+        this.LIMB_TYPE_TOE=7;
+        this.LIMB_TYPE_WHIP=8;
+        this.LIMB_TYPE_HEAD_SNOUT=9;
+        this.LIMB_TYPE_HEAD_JAW=10;
 
         this.LIMB_AXIS_X=0;
         this.LIMB_AXIS_Y=1;
         this.LIMB_AXIS_Z=2;
+        
+        this.LIMB_SIDE_LEFT=0;
+        this.LIMB_SIDE_RIGHT=1;
+        this.LIMB_SIDE_FRONT_LEFT=2;
+        this.LIMB_SIDE_BACK_LEFT=3;
+        this.LIMB_SIDE_FRONT_RIGHT=4;
+        this.LIMB_SIDE_BACK_RIGHT=5;
     }
 }
 
@@ -91,9 +92,11 @@ let modelLimbConstants=new ModelLimbConstantsClass();
 
 class ModelLimbClass
 {
-    constructor(limbType,axis,acrossSurfaceCount,aroundSurfaceCount,boneIndexes)
+    constructor(limbType,side,index,axis,acrossSurfaceCount,aroundSurfaceCount,boneIndexes)
     {
         this.limbType=limbType;
+        this.side=side;
+        this.index=index;
         this.axis=axis;
         this.acrossSurfaceCount=acrossSurfaceCount;
         this.aroundSurfaceCount=aroundSurfaceCount;
@@ -393,21 +396,28 @@ class ModelSkeletonClass
         this.rotatePoseBoneRecursive(this.baseBoneIdx,new wsPoint(0.0,0.0,0.0));
     }
     
+    resetAnimation()
+    {
+        this.lastAnimationTick=0;
+        this.lastAnimationMillisec=1;
+        this.lastAnimationFlip=false;
+    }
+    
         //
         // pose utilities
         //
         
-    poseSetLeftRightLeg(limb,walking)
+    poseSetLeg(limb,walking)
     {
-        let r,backLeg;
+        let r,flipLeg;
 
         r=0.0;
         if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
-        backLeg=(limb.limbType===modelLimbConstants.LIMB_TYPE_LEG_LEFT);
-        if (this.lastAnimationFlip) backLeg=!backLeg;
+        flipLeg=(limb.side===modelLimbConstants.LIMB_SIDE_LEFT)||(limb.side===modelLimbConstants.LIMB_SIDE_FRONT_LEFT)||(limb.side===modelLimbConstants.LIMB_SIDE_BACK_RIGHT);
+        if (this.lastAnimationFlip) flipLeg=!flipLeg;
         
-        if (backLeg) {
+        if (flipLeg) {
             this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
             this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*0.7),0.0,0.0);
             this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues((r*0.5),0.0,0.0);
@@ -419,40 +429,15 @@ class ModelSkeletonClass
         }
     }
     
-    poseSetFrontBackLeg(limb,walking)
-    {
-        let r,m0,m1,m2;
-
-        r=0.0;
-        if (walking) r=genRandom.randomInBetween(10.0,20.0);
-        
-        if (limb.limbType===modelLimbConstants.LIMB_TYPE_LEG_BACK) {
-            if (this.lastAnimationFlip) r*=0.2;
-            m0=1.0;
-            m1=0.7;
-            m2=0.5;
-        }
-        else {
-            if (this.lastAnimationFlip) r*=0.2;
-            m0=-1.0;
-            m1=-2.0;
-            m2=0.0;
-        }
-        
-        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues((r*m0),0.0,0.0);
-        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*m1),0.0,0.0);
-        this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues((r*m2),0.0,0.0);
-    }
-    
     poseSetArm(limb,armAngle,walking)
     {
         let r,z;
-
+        
         r=0.0;
         if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
         z=-armAngle;
-        if (limb.limbType===modelLimbConstants.LIMB_TYPE_ARM_LEFT) z=-z;
+        if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) z=-z;
         
         if (this.lastAnimationFlip) r=-r;
         
@@ -559,21 +544,18 @@ class ModelSkeletonClass
                         break;
                     }
                     break;
-                case modelLimbConstants.LIMB_TYPE_LEG_LEFT:
-                case modelLimbConstants.LIMB_TYPE_LEG_RIGHT:
-                    this.poseSetLeftRightLeg(limb,true);
+                case modelLimbConstants.LIMB_TYPE_LEG:
+                    this.poseSetLeg(limb,true);
                     break;
-                case modelLimbConstants.LIMB_TYPE_LEG_FRONT:
-                case modelLimbConstants.LIMB_TYPE_LEG_BACK:
-                    this.poseSetFrontBackLeg(limb,true);
-                    break;
-                case modelLimbConstants.LIMB_TYPE_ARM_LEFT:
-                    this.poseSetArm(limb,armLeftZAngle,true);
-                    armLeftZAngle+=5.0;
-                    break;
-                case modelLimbConstants.LIMB_TYPE_ARM_RIGHT:
-                    this.poseSetArm(limb,armRightZAngle,true);
-                    armRightZAngle+=5.0;
+                case modelLimbConstants.LIMB_TYPE_ARM:
+                    if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) {
+                        this.poseSetArm(limb,armLeftZAngle,true);
+                        armLeftZAngle+=5.0;
+                    }
+                    else {
+                        this.poseSetArm(limb,armRightZAngle,true);
+                        armRightZAngle+=5.0;
+                    }
                     break;
                 case modelLimbConstants.LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);
@@ -598,7 +580,7 @@ class ModelSkeletonClass
         
             // next pose 3 seconds away (testing)
         
-        this.lastAnimationMillisec=3000;
+        this.lastAnimationMillisec=2000;
         this.lastAnimationTick=view.timeStamp+this.lastAnimationMillisec;
         
             // move current next pose to last pose
@@ -643,21 +625,18 @@ class ModelSkeletonClass
                         break;
                     }
                     break;
-                case modelLimbConstants.LIMB_TYPE_LEG_LEFT:
-                case modelLimbConstants.LIMB_TYPE_LEG_RIGHT:
-                    this.poseSetLeftRightLeg(limb,false);
+                case modelLimbConstants.LIMB_TYPE_LEG:
+                    this.poseSetLeg(limb,false);
                     break;
-                case modelLimbConstants.LIMB_TYPE_LEG_FRONT:
-                case modelLimbConstants.LIMB_TYPE_LEG_BACK:
-                    this.poseSetFrontBackLeg(limb,false);
-                    break;
-                case modelLimbConstants.LIMB_TYPE_ARM_LEFT:
-                    this.poseSetArm(limb,armLeftZAngle,false);
-                    armLeftZAngle+=5.0;
-                    break;
-                case modelLimbConstants.LIMB_TYPE_ARM_RIGHT:
-                    this.poseSetArm(limb,armRightZAngle,false);
-                    armRightZAngle+=5.0;
+                case modelLimbConstants.LIMB_TYPE_ARM:
+                    if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) {
+                        this.poseSetArm(limb,armLeftZAngle,false);
+                        armLeftZAngle+=5.0;
+                    }
+                    else {
+                        this.poseSetArm(limb,armRightZAngle,false);
+                        armRightZAngle+=5.0;
+                    }
                     break;
                 case modelLimbConstants.LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);

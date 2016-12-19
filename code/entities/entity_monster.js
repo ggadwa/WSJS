@@ -129,7 +129,9 @@ class EntityMonsterClass extends EntityClass
             // time so it doesn't fire immediately
             
         sound.play(this,this.ai.wakeSoundBuffer);
-        this.lastShotTimeStamp=view.timeStamp+this.ai.fireRechargeTick;
+        this.lastShotTimeStamp=view.timeStamp;
+        
+        this.model.skeleton.resetAnimation();
     }
     
         //

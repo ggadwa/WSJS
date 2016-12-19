@@ -75,40 +75,6 @@ class MeshUtilityClass
         
         return(indexes);
     }
-    
-        //
-        // move vertices to similiar points
-        //
-        
-    static moveSimiliarVertices(vertexList1,vertexList2,minDist)
-    {
-        let n,k,idx,v1,v2,d,dist;
-        let count=0;
-        
-        for (n=0;n!==vertexList2.length;n++) {
-            v2=vertexList2[n];
-            
-            idx=-1;
-            dist=minDist;
-            
-            for (k=0;k!==vertexList1.length;k++) {
-                v1=vertexList1[k];
-                
-                d=v1.position.distance(v2.position);
-                if (d<dist) {
-                    dist=d;
-                    idx=k;
-                }
-            }
-            
-            if (idx!==-1) {
-                count++;
-                v2.position.setFromPoint(vertexList1[idx].position);
-            }
-        }
-        
-        console.log('move='+count);
-    }
         
         //
         // build normals for vertex lists

@@ -11,6 +11,10 @@ When interface created
 
 ToDos
 
+#### need to determine limb movement by body side
+#### need to redo all leg movements
+       #### put arm stuff in pose arm, so we don't have the if in the case
+
 #### model changes
        #### wrapper needs open positive/negative end flags
        #### vertexes need flags to tell if they are limbAttachVertex

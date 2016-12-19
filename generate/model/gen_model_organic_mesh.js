@@ -120,6 +120,13 @@ class GenModelOrganicMeshClass
                 v.uv.y=vAng;
 
                 yzAng+=yzAngAdd;
+                
+                if (!minEnd) {
+                    if (x===1) v.modelSnap=true;
+                }
+                if (!maxEnd) {
+                    if (x===(acrossSurfaceCount-2)) v.modelSnap=true;
+                }
             }
             
             xAng+=xAngAdd;
@@ -237,6 +244,13 @@ class GenModelOrganicMeshClass
                 v.uv.y=vAng;
                 
                 xzAng+=xzAngAdd;
+                
+                if (!minEnd) {
+                    if (y===1) v.modelSnap=true;
+                }
+                if (!maxEnd) {
+                    if (y===(acrossSurfaceCount-2)) v.modelSnap=true;
+                }
             }
             
             yAng+=yAngAdd;
@@ -354,6 +368,13 @@ class GenModelOrganicMeshClass
                 v.uv.y=vAng;
 
                 xyAng+=xyAngAdd;
+                
+                if (!minEnd) {
+                    if (z===1) v.modelSnap=true;
+                }
+                if (!maxEnd) {
+                    if (z===(acrossSurfaceCount-2)) v.modelSnap=true;
+                }
             }
             
             zAng+=zAngAdd;
@@ -597,50 +618,6 @@ class GenModelOrganicMeshClass
     }
     
         //
-        // builds the normals based on bones
-        //
-        
-    buildNormalsToBones(vertexList,boneList,centerPnt)
-    {
-        let n,k,v,bone,bonePos,dist,curDist;
-        let nVertex=vertexList.length;
-        let nBone=boneList.length;
-        
-            // find the closest bone in the bone list,
-            // even though we have attachments, we need to
-            // use the enlarged bone list because it
-            // gives up better normals
-        
-        for (n=0;n!==nVertex;n++) {
-            v=vertexList[n];
-            
-            curDist=-1;
-            bonePos=null;
-            
-            for (k=0;k!==nBone;k++) {
-                bone=boneList[k];
-                dist=bone.position.distance(v.position);
-                
-                if ((dist<curDist) || (curDist===-1)) {
-                    curDist=dist;
-                    bonePos=bone.position;
-                }
-            }
-            
-                // rebuild the normals
-                
-            if (bonePos===null) {
-                v.normal.setFromSubPoint(v.position,centerPnt);
-            }
-            else {
-                v.normal.setFromSubPoint(v.position,bonePos);
-            }
-            
-            v.normal.normalize();
-        }
-    }
-    
-        //
         // random vertex moves along
         // the line to the attached bone
         //
@@ -693,7 +670,7 @@ class GenModelOrganicMeshClass
         // build around bone list
         //
         
-    buildAroundBoneList(limbType,axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
+    buildAroundBoneList(limbType,side,axis,acrossSurfaceCount,aroundSurfaceCount,skeletonBoneIndexes,vertexList,indexes)
     {
         let n,k,f,boneIdx,bone,parentBone,listBone;
         let acrossRadius,aroundRadius;
@@ -780,22 +757,21 @@ class GenModelOrganicMeshClass
         maxEnd=true;
         
         switch (limbType) {
-            case modelLimbConstants.LIMB_TYPE_ARM_LEFT:
-            case modelLimbConstants.LIMB_TYPE_ARM_RIGHT:
-            case modelLimbConstants.LIMB_TYPE_LEFT_LEFT:
-            case modelLimbConstants.LIMB_TYPE_LEFT_RIGHT:
-            case modelLimbConstants.LIMB_TYPE_LEG_FRONT:
-            case modelLimbConstants.LIMB_TYPE_LEG_BACK:
+            case modelLimbConstants.LIMB_TYPE_ARM:
+            case modelLimbConstants.LIMB_TYPE_LEFT:
                 minEnd=maxEnd=false;
                 break;
-            case modelLimbConstants.LIMB_TYPE_HAND_LEFT:
-            case modelLimbConstants.LIMB_TYPE_FINGER_LEFT:
+            case modelLimbConstants.LIMB_TYPE_HAND:
+            case modelLimbConstants.LIMB_TYPE_FINGER:
+                if (side===modelLimbConstants.LIMB_SIDE_LEFT) {
+                    minEnd=false;
+                }
+                else {
+                    maxEnd=false;
+                }
+                break;
             case modelLimbConstants.LIMB_TYPE_TOE:
                 minEnd=false;
-                break;
-            case modelLimbConstants.LIMB_TYPE_HAND_RIGHT:
-            case modelLimbConstants.LIMB_TYPE_FINGER_RIGHT:
-                maxEnd=false;
                 break;
         }
         
@@ -844,11 +820,95 @@ class GenModelOrganicMeshClass
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList);
         this.randomScaleVertexToBones(vertexList);
-        this.buildNormalsToBones(vertexList,boneList,centerPnt);
+    }
+    
+        //
+        // move vertices to similiar points
+        //
         
-            // complete the tangent space vectors
+    snapModelVertexes(vertexList1,vertexList2,minDist)
+    {
+        let n,k,idx,v1,v2,d,dist;
         
-        MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
+        for (n=0;n!==vertexList2.length;n++) {
+            v2=vertexList2[n];
+            if (!v2.modelSnap) continue;
+            
+            idx=-1;
+            dist=minDist;
+            
+            for (k=0;k!==vertexList1.length;k++) {
+                v1=vertexList1[k];
+                
+                d=v1.position.distance(v2.position);
+                if (d<dist) {
+                    dist=d;
+                    idx=k;
+                }
+            }
+            
+            if (idx!==-1) {
+                v1=vertexList1[idx];
+                v2.position.setFromPoint(v1.position);
+                v2.boneIdx=v1.boneIdx;
+            }
+        }
+    }
+    
+        //
+        // builds the normals based on bones
+        //
+        
+    buildNormalsToBones(vertexList)
+    {
+        let n,k,v,bone,bonePos,dist,curDist;
+        let xBound,yBound,zBound,centerPnt;
+        let nVertex=vertexList.length;
+        let bones=this.model.skeleton.bones;
+        let nBone=bones.length;
+        
+            // get the center in case there's a no-attachment
+            // bone (this shouldn't happen right now)
+            
+        xBound=new wsBound(0,0);
+        yBound=new wsBound(0,0);
+        zBound=new wsBound(0,0);
+        
+        this.findBoundsForBoneList(bones,xBound,yBound,zBound);
+        centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        
+            // find the closest bone in the bone list,
+            // even though we have attachments, we need to
+            // use the enlarged bone list because it
+            // gives up better normals
+        
+        for (n=0;n!==nVertex;n++) {
+            v=vertexList[n];
+            
+            curDist=-1;
+            bonePos=null;
+            
+            for (k=0;k!==nBone;k++) {
+                bone=bones[k];
+                dist=bone.position.distance(v.position);
+                
+                if ((dist<curDist) || (curDist===-1)) {
+                    curDist=dist;
+                    bonePos=bone.position;
+                }
+            }
+            
+                // rebuild the normals
+                
+            if (bonePos===null) {
+                v.normal.setFromSubPoint(v.position,centerPnt);
+            }
+            else {
+                v.normal.setFromSubPoint(v.position,bonePos);
+            }
+            
+            v.normal.normalize();
+        }
     }
     
         //
@@ -877,7 +937,7 @@ class GenModelOrganicMeshClass
             vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point (around+1 for extra vertexes to stop UV wrapping)
             indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-3))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-3))*6 for quads, (around*2)*3 for top and bottom trigs
             
-            this.buildAroundBoneList(limb.limbType,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
+            this.buildAroundBoneList(limb.limbType,limb.side,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.boneIndexes,vertexList,indexes);
             
             limbVertexList.push(vertexList);
             limbIndexes.push(indexes);
@@ -885,7 +945,7 @@ class GenModelOrganicMeshClass
         
             // combine similiar vertices for specific
             // parts
-/* supergumba -- maybe rethink all of this            
+          
         for (n=0;n!==skeleton.limbs.length;n++) {
             limb=skeleton.limbs[n];
             
@@ -894,30 +954,23 @@ class GenModelOrganicMeshClass
                 
                 limb2=skeleton.limbs[k];
                 
+                    // any arm or any leg snaps to body
+                    
                 if (limb.limbType===modelLimbConstants.LIMB_TYPE_BODY) {
-                    if ((limb2.limbType===modelLimbConstants.LIMB_TYPE_ARM_LEFT) || (limb2.limbType===modelLimbConstants.LIMB_TYPE_ARM_RIGHT)) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],500);
-                    if ((limb2.limbType===modelLimbConstants.LIMB_TYPE_LEG_LEFT) || (limb2.limbType===modelLimbConstants.LIMB_TYPE_LEG_RIGHT)) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],500);
+                    if ((limb2.limbType===modelLimbConstants.LIMB_TYPE_ARM) || (limb2.limbType===modelLimbConstants.LIMB_TYPE_LEG)) this.snapModelVertexes(limbVertexList[n],limbVertexList[k],200);    // arm, leg to body
                 }
                 
-                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_ARM_LEFT) || (limb.limbType===modelLimbConstants.LIMB_TYPE_ARM_RIGHT)) {
-                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_HAND) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],200);
-                }
+                    // everything else has to be in same limb
+                    
+                if (!((limb.side===limb2.side) && (limb.index===limb2.index))) continue;
                 
-                if (limb.limbType===modelLimbConstants.LIMB_TYPE_HAND) {
-                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_FINGER) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],150);
-                }
-                
-                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_LEG_LEFT) || (limb.limbType===modelLimbConstants.LIMB_TYPE_LEG_RIGHT)) {
-                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_FOOT) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],200);
-                }
-                
-                if (limb.limbType===modelLimbConstants.LIMB_TYPE_FOOT) {
-                    if (limb2.limbType===modelLimbConstants.LIMB_TYPE_TOE) MeshUtilityClass.moveSimiliarVertices(limbVertexList[n],limbVertexList[k],150);
-                }
-                
+                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_ARM) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_HAND)) this.snapModelVertexes(limbVertexList[k],limbVertexList[n],200);    // arm to hand
+                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_HAND) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_FINGER)) this.snapModelVertexes(limbVertexList[n],limbVertexList[k],200); // finger to hand
+                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_LEG) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_FOOT)) this.snapModelVertexes(limbVertexList[k],limbVertexList[n],300);    // leg to foot
+                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_FOOT) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_TOE)) this.snapModelVertexes(limbVertexList[n],limbVertexList[k],200);    // toe to foot
             }
         }
-*/        
+
             // combine all the lists into one
             
         modelVertexList=limbVertexList[0];
@@ -928,6 +981,11 @@ class GenModelOrganicMeshClass
             modelVertexList=MeshUtilityClass.combineVertexLists(modelVertexList,limbVertexList[n]);
             modelIndexes=MeshUtilityClass.combineIndexes(modelIndexes,limbIndexes[n],indexOffset);
         }
+        
+            // do the tangent space
+            
+        this.buildNormalsToBones(modelVertexList);
+        MeshUtilityClass.buildVertexListTangents(modelVertexList,modelIndexes);
         
             // add mesh to model
             
