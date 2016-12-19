@@ -3,7 +3,7 @@ ES6
     [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass
 
 WebGL2
-    [ ] http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
+    [ ] vertex array objects
 
 When interface created
     [ ] close gl
@@ -11,7 +11,10 @@ When interface created
 
 ToDos
 
-#### need a combine mesh that moves similiar vertices together in secondary mesh
+#### model changes
+       #### wrapper needs open positive/negative end flags
+       #### vertexes need flags to tell if they are limbAttachVertex
+       #### only move those vertexes against the attachment mesh
 
 #### for connected rooms, if lower or upper, try to wedge a room in between the staircase and other room to create open access
 #### update the walls decorations

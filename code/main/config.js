@@ -16,10 +16,9 @@ class ConfigClass
             
         this.ROOM_PATH_COUNT=4;                     // how many rooms in the map path
 
-        this.MAP_GENERATE_LIGHTMAP=true;           // set to true to generate light maps
-        
+        this.MAP_GENERATE_LIGHTMAP=false;           // set to true to generate light maps
         this.ROOM_LIQUIDS=true;                     // turns on or off liquids
-        this.SIMPLE_TEST_MAP=false;                  // a special simple map for testing other elements
+        this.SIMPLE_TEST_MAP=true;                  // a special simple map for testing other elements
 
             //
             // lighting
@@ -31,10 +30,10 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=6;
-        this.MONSTER_ENTITY_COUNT=20;
+        this.MONSTER_TYPE_COUNT=3;
+        this.MONSTER_ENTITY_COUNT=3;
         
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
         
             //
             // sounds
@@ -66,7 +65,7 @@ class ConfigClass
 
         this.DEBUG_DRAW_MODEL_HITBOX=false;
         this.DEBUG_DRAW_MODEL_SKELETON=false;
-        this.DEBUG_DRAW_MODEL_MESH_LINES=false;
+        this.DEBUG_DRAW_MODEL_MESH_LINES=true;
         this.DEBUG_DRAW_MODEL_MESH_NORMALS=false;
         this.DEBUG_DRAW_MODEL_MESH_TANGENTS=false;
     }

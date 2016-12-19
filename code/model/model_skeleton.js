@@ -67,13 +67,15 @@ class ModelLimbConstantsClass
         this.LIMB_TYPE_LEG_RIGHT=5;
         this.LIMB_TYPE_LEG_FRONT=6;
         this.LIMB_TYPE_LEG_BACK=7;
-        this.LIMB_TYPE_HAND=8;
-        this.LIMB_TYPE_FINGER=9;
-        this.LIMB_TYPE_FOOT=10;
-        this.LIMB_TYPE_TOE=11;
-        this.LIMB_TYPE_WHIP=12;
-        this.LIMB_TYPE_HEAD_SNOUT=13;
-        this.LIMB_TYPE_HEAD_JAW=14;
+        this.LIMB_TYPE_HAND_LEFT=8;
+        this.LIMB_TYPE_HAND_RIGHT=9;
+        this.LIMB_TYPE_FINGER_LEFT=10;
+        this.LIMB_TYPE_FINGER_RIGHT=11;
+        this.LIMB_TYPE_FOOT=12;
+        this.LIMB_TYPE_TOE=13;
+        this.LIMB_TYPE_WHIP=14;
+        this.LIMB_TYPE_HEAD_SNOUT=15;
+        this.LIMB_TYPE_HEAD_JAW=16;
 
         this.LIMB_AXIS_X=0;
         this.LIMB_AXIS_Y=1;
