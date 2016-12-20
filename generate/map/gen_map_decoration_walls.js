@@ -19,7 +19,7 @@ class GenRoomDecorationWallsClass
         
     addWall(room)
     {
-        let x,z,wid;
+        let x,z,yAdd,wid;
         let xBound,yBound,zBound;
         let bitmap;
             
@@ -53,7 +53,8 @@ class GenRoomDecorationWallsClass
                 break;
         }
         
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),room.yBound.max);
+        yAdd=(map.ROOM_FLOOR_HEIGHT*room.storyCount)+(map.ROOM_FLOOR_DEPTH*(room.storyCount-1));
+        yBound=new wsBound((room.yBound.max-yAdd),room.yBound.max);
 
         map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION));
     }

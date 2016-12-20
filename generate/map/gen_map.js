@@ -28,9 +28,10 @@ class GenMapClass
         this.HALLWAY_SHORT=1;
         this.HALLWAY_LONG=2;
         
-        this.STAIR_NONE=0;
-        this.STAIR_UP=1;
-        this.STAIR_DOWN=2;
+        this.LEVEL_NORMAL=0;
+        this.LEVEL_LOWER=1;
+        
+        this.EXTENSION_COUNT=3;
         
             // generation constants
 
@@ -40,9 +41,8 @@ class GenMapClass
             
         this.ROOM_MAX_CONNECT_TRY=20;                   // number of times we try to find a place to connect rooms
         
-        this.ROOM_LEVEL_CHANGE_PERCENTAGE=0.5;          // what % of the time a connection to a room is up a story
         this.ROOM_LONG_HALLWAY_PERCENTAGE=0.3;          // what percentage of the time the general room path will have a long hallway
-        this.ROOM_LIQUID_PERCENTAGE=0.2;                // what % of time a two story room can have a liquid
+        this.ROOM_LIQUID_PERCENTAGE=0.3;                // what % of time a lower room can have a liquid
         
         this.ROOM_LIGHT_FACTOR=0.45;                    // lights are initially set to room radius, this factor is multipled in
         this.ROOM_LIGHT_FACTOR_EXTRA=0.4;               // random addition to light factor above
@@ -207,47 +207,32 @@ class GenMapClass
         // create rooms
         //
 
-    addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,allowLiquid,level)
+    addRegularRoom(level,xBlockSize,zBlockSize,xBound,zBound,mainPath)
     {
         let n,mesh,mesh2;
-        let yBound,yWallBound,yFloorBound;
+        let yAdd,yBound,yWallBound,yFloorBound;
         let roomIdx,room;
         let storyCount,decorationType,liquid;
         let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
-            // anything above lower floor can have
-            // other stories
-        
-        storyCount=1;
-        if (level!==mapRoomConstants.ROOM_LEVEL_LOWER) storyCount=genRandom.randomInt(1,4);
-        
-        //storyCount=4;   // supergumba -- testing
-        
-            // bottom of room
-        
-        yBound=new wsBound(0,0);
-        
+            // figure out room Y size from extension mode
+            
         switch (level) {
-            case mapRoomConstants.ROOM_LEVEL_LOWER:
-                yBound.max=this.yBase+(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
-                break;
-            case mapRoomConstants.ROOM_LEVEL_UPPER:
-                yBound.max=this.yBase-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
+            case this.LEVEL_LOWER:
+                storyCount=genRandom.randomInt(2,3);        // need at least two stories
+                yAdd=(genRandom.randomInBetween(1,(storyCount-1)));
+                yBound=new wsBound(0,this.yBase+((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*yAdd));
                 break;
             default:
-                yBound.max=this.yBase;
+                storyCount=genRandom.randomInt(1,4);
+                yBound=new wsBound(0,this.yBase);
                 break;
         }
-
+        
             // determine if this room has a liquid,
             // and lower it for pool and add a story
         
-        liquid=(config.ROOM_LIQUIDS)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP)&&allowLiquid;
-        
-        if (liquid) {
-            yBound.max+=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
-            storyCount++;
-        }
+        liquid=(config.ROOM_LIQUIDS)&&(level===this.LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
         
             // determine the decoration type
         
@@ -265,7 +250,7 @@ class GenMapClass
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,liquid,level);
+        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,liquid);
         room=map.rooms[roomIdx];
         
             // the floor
@@ -298,8 +283,8 @@ class GenMapClass
         
         return(roomIdx);
     }
-
-    addStairRoom(stairMode,connectSide,xStairBound,zStairBound)
+/* supergumba -- deactivated for now
+    addStairRoom(level,connectSide,xStairBound,zStairBound)
     {
         let genRoomStairs=new GenRoomStairsClass();
         
@@ -307,11 +292,11 @@ class GenMapClass
             
         let yStairBound=new wsBound(0,0);
         
-        switch (stairMode) {
-            case this.STAIR_UP:
+        switch (level) {
+            case this.EXTENSION_STAIR_UP:
                 yStairBound.max=this.yBase;
                 break;
-            case this.STAIR_DOWN:
+            case this.EXTENSION_STAIR_DOWN:
                 yStairBound.max=this.yBase+(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
                 break;
         }
@@ -320,7 +305,7 @@ class GenMapClass
         
             // flip the direction if going down
             
-        if (stairMode===this.STAIR_DOWN) {
+        if (level===this.EXTENSION_STAIR_DOWN) {
             switch (connectSide) {
                 case mapRoomConstants.ROOM_SIDE_LEFT:
                     connectSide=mapRoomConstants.ROOM_SIDE_RIGHT;
@@ -363,7 +348,7 @@ class GenMapClass
             
         map.addOverlayConnection(xStairBound,zStairBound);
     }
-    
+*/    
         //
         // hallways and liquid steps
         //
@@ -508,8 +493,8 @@ class GenMapClass
             
         this.addGeneralLight(lightPos,fixturePos,(map.ROOM_FLOOR_HEIGHT*1.5));
     }
-    
-    addStairLight(stairMode,xBound,zBound)
+/* supergumba -- deactivated for now    
+    addStairLight(level,xBound,zBound)
     {
         let fixturePos,lightPos;
         
@@ -517,11 +502,11 @@ class GenMapClass
             
         let y=0;
         
-        switch (stairMode) {
-            case this.STAIR_UP:
+        switch (level) {
+            case this.EXTENSION_STAIR_UP:
                 y=this.yBase-Math.trunc(map.ROOM_FLOOR_HEIGHT*1.55);
                 break;
-            case this.STAIR_DOWN:
+            case this.EXTENSION_STAIR_DOWN:
                 y=this.yBase-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.45);
                 break;
         }
@@ -533,7 +518,7 @@ class GenMapClass
             
         this.addGeneralLight(lightPos,fixturePos,(map.ROOM_FLOOR_HEIGHT*1.5));
     }
-    
+*/    
         //
         // finds a single random block offset between two bounds
         //
@@ -702,7 +687,7 @@ class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,false,mapRoomConstants.ROOM_LEVEL_MAIN);
+        roomIdx=this.addRegularRoom(this.LEVEL_NORMAL,xBlockSize,zBlockSize,xBound,zBound,true);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -752,32 +737,13 @@ class GenMapClass
         // extend any of the rooms along the path
         //
     
-    buildRoomExtensionSingle(lastRoom,connectSide,noLevelChange)
+    buildRoomExtensionSingle(level,lastRoom,connectSide)
     {
         let roomIdx,room,tryCount;
         let xBlockSize,zBlockSize;
         let connectOffset;
         let xBound,zBound;
-        let stairOffset,stairAdd,xStairBound,zStairBound;
-        
-            // level changes
-            
-        let stairMode=this.STAIR_NONE;
-
-        let level=mapRoomConstants.ROOM_LEVEL_MAIN;
-
-        if (!noLevelChange) {
-            if (genRandom.randomPercentage(this.ROOM_LEVEL_CHANGE_PERCENTAGE)) {
-                if (genRandom.randomPercentage(0.5)) {
-                    level=mapRoomConstants.ROOM_LEVEL_UPPER;
-                    stairMode=this.STAIR_UP;
-                }
-                else {
-                    level=mapRoomConstants.ROOM_LEVEL_LOWER;
-                    stairMode=this.STAIR_DOWN;
-                }
-            }
-        }
+        let stairOffset,stairAdd,xStairBound,zStairBound;   // supergumba -- deal with unused variables
         
             // get random block size for room
             // and make sure it stays under the max
@@ -822,53 +788,21 @@ class GenMapClass
                 case mapRoomConstants.ROOM_SIDE_LEFT:
                     xBound=new wsBound((lastRoom.xBound.min-(xBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
                     zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
-
-                    if (stairMode!==this.STAIR_NONE) {
-                        xBound.add(-stairAdd);
-                        stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
-                        xStairBound=new wsBound((lastRoom.xBound.min-stairAdd),lastRoom.xBound.min);
-                        zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+map.ROOM_BLOCK_WIDTH));
-                    }
-
                     break;
 
                 case mapRoomConstants.ROOM_SIDE_TOP:
                     xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
                     zBound=new wsBound((lastRoom.zBound.min-(zBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
-
-                    if (stairMode!==this.STAIR_NONE) {
-                        zBound.add(-stairAdd);
-                        stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                        xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+map.ROOM_BLOCK_WIDTH));
-                        zStairBound=new wsBound((lastRoom.zBound.min-stairAdd),lastRoom.zBound.min);
-                    }
-
                     break;
 
                 case mapRoomConstants.ROOM_SIDE_RIGHT:
                     xBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
                     zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
-
-                    if (stairMode!==this.STAIR_NONE) {
-                        xBound.add(stairAdd);
-                        stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
-                        xStairBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+stairAdd));
-                        zStairBound=new wsBound((lastRoom.zBound.min+stairOffset),((lastRoom.zBound.min+stairOffset)+map.ROOM_BLOCK_WIDTH));
-                    }
-
                     break;
 
                 case mapRoomConstants.ROOM_SIDE_BOTTOM:
                     xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
                     zBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
-
-                    if (stairMode!==this.STAIR_NONE) {
-                        zBound.add(stairAdd);
-                        stairOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                        xStairBound=new wsBound((lastRoom.xBound.min+stairOffset),((lastRoom.xBound.min+stairOffset)+map.ROOM_BLOCK_WIDTH));
-                        zStairBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+stairAdd));
-                    }
-
                     break;
 
             }
@@ -879,16 +813,9 @@ class GenMapClass
             if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
         }
 
-            // add in any stairs
-            
-        if (stairMode!==this.STAIR_NONE) {
-            this.addStairRoom(stairMode,connectSide,xStairBound,zStairBound);
-            this.addStairLight(stairMode,xStairBound,zStairBound);
-        }
-
             // the room
             
-        roomIdx=this.addRegularRoom(xBlockSize,zBlockSize,xBound,zBound,(level===mapRoomConstants.ROOM_LEVEL_MAIN),level);
+        roomIdx=this.addRegularRoom(level,xBlockSize,zBlockSize,xBound,zBound,false);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -897,16 +824,16 @@ class GenMapClass
             // to the connection point or complete stairs down into
             // the liquid (depending on the stair direction, it's either
             // this room or the previous room)
-            
-        switch (stairMode) {
-            case this.STAIR_UP:
+       /* supergumba -- deal with this     
+        switch (level) {
+            case this.EXTENSION_STAIR_UP:
                 if (lastRoom.liquid) this.addLiquidStairRoom(lastRoom,connectSide,xStairBound,zStairBound,false);
                 break;
-            case this.STAIR_DOWN:
+            case this.EXTENSION_STAIR_DOWN:
                 if (room.liquid) this.addLiquidStairRoom(room,connectSide,xStairBound,zStairBound,true);
                 break;
         }
-        
+        */
             // finally add the liquid
         
         if (room.liquid) map.addLiquid(new MapLiquidClass(map.getTexture(map.TEXTURE_TYPE_LIQUID),room));
@@ -917,12 +844,14 @@ class GenMapClass
             // outside wall hugging map pieces
         
         if (lastRoom!==null) {
-            switch (stairMode) {
-                case this.STAIR_UP:
-                case this.STAIR_DOWN:
+            switch (level) {
+                /* supergumba -- deal with this
+                case this.EXTENSION_STAIR_UP:
+                case this.EXTENSION_STAIR_DOWN:
                     lastRoom.maskEdgeGridBlockToBounds(xStairBound,zStairBound);
                     room.maskEdgeGridBlockToBounds(xStairBound,zStairBound);
                     break;
+                    */
                 default:
                     lastRoom.maskEdgeGridBlockToRoom(room);
                     room.maskEdgeGridBlockToRoom(lastRoom);
@@ -938,30 +867,12 @@ class GenMapClass
     buildRoomExtensions()
     {
         let n,room;
-        let noLevelChange;
         let nRoom=map.rooms.length;
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            
-            noLevelChange=genRandom.randomPercentage(0.5);
-            
-            switch(genRandom.randomIndex(5)) {
-                case 1:
-                    this.buildRoomExtensionSingle(room,mapRoomConstants.ROOM_SIDE_LEFT,noLevelChange);
-                    break;          
-                case 2:
-                    this.buildRoomExtensionSingle(room,mapRoomConstants.ROOM_SIDE_RIGHT,noLevelChange);
-                    break;          
-                case 3:
-                    this.buildRoomExtensionSingle(room,mapRoomConstants.ROOM_SIDE_LEFT,noLevelChange);
-                    this.buildRoomExtensionSingle(room,mapRoomConstants.ROOM_SIDE_RIGHT,!noLevelChange);
-                    break;          
-                case 4:
-                    this.buildRoomExtensionSingle(room,mapRoomConstants.ROOM_SIDE_LEFT,true);
-                    this.buildRoomExtensionSingle(room,mapRoomConstants.ROOM_SIDE_RIGHT,true);
-                    break;          
-            }
+            this.buildRoomExtensionSingle(genRandom.randomIndex(this.EXTENSION_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
+            this.buildRoomExtensionSingle(genRandom.randomIndex(this.EXTENSION_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
         }
     }
     
@@ -1004,7 +915,7 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if ((room.liquid) || (room.storyCount>1)) platform.create(room);
+            if (((room.liquid) || (room.storyCount>1)) && (!room.mainPath)) platform.create(room);
         }
     }
     

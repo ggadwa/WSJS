@@ -42,7 +42,12 @@ class GenRandomClass
     
     randomIndex(maxIndex)
     {
-        return(Math.trunc(this.random()*maxIndex));
+            // always returns 0...(maxIndex-1)
+            
+        let idx=Math.trunc(this.random()*maxIndex);
+        if (idx===maxIndex) idx=0;
+        
+        return(idx);
     }
     
     randomPercentage(percentage)

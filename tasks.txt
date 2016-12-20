@@ -11,21 +11,15 @@ When interface created
 
 ToDos
 
-#### need to determine limb movement by body side
-#### need to redo all leg movements
-       #### put arm stuff in pose arm, so we don't have the if in the case
+#### all the supergumba in map creation
+#### stairs for platforms again
 
-#### model changes
-       #### wrapper needs open positive/negative end flags
-       #### vertexes need flags to tell if they are limbAttachVertex
-       #### only move those vertexes against the attachment mesh
-
-#### for connected rooms, if lower or upper, try to wedge a room in between the staircase and other room to create open access
 #### update the walls decorations
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
+#### closets in lower rooms with two stories don't connect
 #### ledges on top and bottom?
 #### need to group the lights to better pick the lights in each room
 #### item texture is pretty ugly
