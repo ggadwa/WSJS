@@ -1,4 +1,4 @@
-/* global map, config, MeshPrimitivesClass, genRandom */
+/* global map, config, MeshPrimitivesClass, genRandom, mapRoomConstants */
 
 "use strict";
 
@@ -73,6 +73,44 @@ class GenRoomPlatformClass
         room.setBlockGrid(0,x,z);
 
         map.addOverlayPlatform(xLiftBound,zLiftBound);
+    }
+    
+        //
+        // add stair chunk
+        //
+        
+    addStairChunk(room,dir,x,z,story)
+    {
+        let rx,rz,xBound,yBound,zBound;
+        let y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*story));
+        let genRoomStairs=new GenRoomStairsClass();
+
+        rx=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
+        xBound=new wsBound(rx,(rx+map.ROOM_BLOCK_WIDTH));
+        
+        yBound=new wsBound((y-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),y);
+        
+        rz=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
+        zBound=new wsBound(rz,(rz+map.ROOM_BLOCK_WIDTH));
+        
+        switch (dir) {
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,false);
+                break;
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,true);
+                break;
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,false);
+                break;
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,true);
+                break;
+        }
+        
+            // block the stairs off from any decorations
+            
+        room.setBlockGrid(0,x,z);
     }
         
         //
@@ -223,48 +261,112 @@ class GenRoomPlatformClass
     }
     
         //
+        // utilities to move x/z for direction
+        //
+        
+    moveDirX(dir,x)
+    {
+        if (dir===mapRoomConstants.ROOM_SIDE_LEFT) return(x-1);
+        if (dir===mapRoomConstants.ROOM_SIDE_RIGHT) return(x+1);
+        return(x);
+    }
+    
+    moveDirZ(dir,z)
+    {
+        if (dir===mapRoomConstants.ROOM_SIDE_TOP) return(z-1);
+        if (dir===mapRoomConstants.ROOM_SIDE_BOTTOM) return(z+1);
+        return(z);
+    }
+    
+        //
         // create platforms
         // 
     
-    create(room)
+    create(room,yBase)
     {
-        let n,liftX,liftZ;
-        
+        let n,k,x,z,x2,z2,y,stairX,stairZ,dir,orgDir;
         let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
             // random stair direction
             
         
-            // find a spot for the lifts and add
-            // platforms are the first thing we do so we don't need
-            // to check for open spots
+            // starting spot for first staircase
         
-        liftX=genRandom.randomInt(1,(room.xBlockSize-2));
-        liftZ=genRandom.randomInt(1,(room.zBlockSize-2));
+        x=genRandom.randomInt(2,(room.xBlockSize-3));
+        z=genRandom.randomInt(2,(room.zBlockSize-3));
         
-        this.addLiftChunk(room,liftX,liftZ);
+            // start with a random direction, the next
+            // stairs up has to be same direction as platform
+            // travel
+            
+        dir=genRandom.randomIndex(4);
         
-            // expand walkways from the lift
+            // build up the stories
         
         for (n=0;n!==(room.storyCount-1);n++) {
             
-            switch (genRandom.randomIndex(5)) {
-                case 0:
-                    this.addPlatformHalfFloorX(room,liftX,liftZ,(n+1),platformBitmap);
+                // stair to next level
+                // remember stairs so we don't cross it
+                
+            this.addStairChunk(room,dir,x,z,n);
+            
+            stairX=x;
+            stairZ=z;
+            
+                // platform connected to stairs
+                
+            x=this.moveDirX(dir,x);
+            z=this.moveDirZ(dir,z);
+            
+            this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+            
+                // random platform chunks
+            
+            for (k=0;k!==8;k++) {
+                
+                    // find a place that's legal
+                    // don't cross over self or stairs
+                    
+                dir=orgDir=genRandom.randomIndex(4);
+                
+                while (true) {
+                    x2=this.moveDirX(dir,x);
+                    z2=this.moveDirZ(dir,z);
+
+                    if (((x2===stairX) && (z2===stairZ)) || (!room.checkBlockGrid((n+1),x2,z2)) || (x2<2) || (z2<2) || (x2>(room.xBlockSize-3)) || (z2>(room.zBlockSize-3))) {
+                        dir++;
+                        if (dir>3) dir=0;
+                        if (dir===orgDir) return;           // we failed here, the platform wrapped in on itself
+                        
+                        continue;
+                    }
+                    
                     break;
-                case 1:
-                    this.addPlatformHalfFloorZ(room,liftX,liftZ,(n+1),platformBitmap);
-                    break;
-                case 2:
-                    this.addPlatformOutsideCircle(room,liftX,liftZ,(n+1),platformBitmap);
-                    break;
-                case 3:
-                    this.addPlatformCrossRoomX(room,liftX,liftZ,(n+1),platformBitmap);
-                    break;
-                case 4:
-                    this.addPlatformCrossRoomZ(room,liftX,liftZ,(n+1),platformBitmap);
-                    break;
+                }
+                
+                    // create the platform
+                    
+                x=x2;
+                z=z2;
+                
+                this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+                
+                    // if this platform is at the base level
+                    // then try to connect to left/right
+                /*    
+                y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*(n+1)));
+                if (y===yBase) {
+                    for (x2=0;x2<x;x2++) {
+                        this.addPlatformChunk(room,x2,z,(n+1),platformBitmap);
+                    }
+                }
+                */
             }
+            
+                // move forward for the next stairs
+                
+            x=this.moveDirX(dir,x);
+            z=this.moveDirZ(dir,z);
         }
         
     }

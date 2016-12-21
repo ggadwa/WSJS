@@ -128,6 +128,11 @@ class MapRoomClass
         this.blockGrid[story].setCell(x,z,1);
     }
     
+    checkBlockGrid(story,x,z)
+    {
+        return(this.blockGrid[story].getCell(x,z)===1);
+    }
+    
     clearBlockGrid(story,x,z)
     {
         this.blockGrid[story].setCell(x,z,0);

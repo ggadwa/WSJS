@@ -31,7 +31,7 @@ class GenMapClass
         this.LEVEL_NORMAL=0;
         this.LEVEL_LOWER=1;
         
-        this.EXTENSION_COUNT=3;
+        this.LEVEL_COUNT=3;
         
             // generation constants
 
@@ -870,9 +870,9 @@ class GenMapClass
         let nRoom=map.rooms.length;
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
-            this.buildRoomExtensionSingle(genRandom.randomIndex(this.EXTENSION_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
-            this.buildRoomExtensionSingle(genRandom.randomIndex(this.EXTENSION_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
+            room=map.rooms[n];  // supergumba -- testing
+            /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(this.LEVEL_LOWER /*genRandom.randomIndex(this.LEVEL_COUNT)*/,room,mapRoomConstants.ROOM_SIDE_LEFT);
+            /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(this.LEVEL_LOWER /*genRandom.randomIndex(this.LEVEL_COUNT)*/,room,mapRoomConstants.ROOM_SIDE_RIGHT);
         }
     }
     
@@ -915,7 +915,7 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if (((room.liquid) || (room.storyCount>1)) && (!room.mainPath)) platform.create(room);
+            if (((room.liquid) || (room.storyCount>1)) && (!room.mainPath)) platform.create(room,this.yBase);
         }
     }
     
@@ -928,6 +928,8 @@ class GenMapClass
         let equipment=null;
         let walls=null;
         let nRoom=map.rooms.length;
+        
+        if (!config.ROOM_DECORATIONS) return;
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
