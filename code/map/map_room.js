@@ -55,7 +55,7 @@ class MapRoomFaceClass
 
 class MapRoomClass
 {
-    constructor(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,liquid)
+    constructor(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid)
     {
         this.xBlockSize=xBlockSize;
         this.zBlockSize=zBlockSize;
@@ -65,6 +65,8 @@ class MapRoomClass
         this.storyCount=storyCount;
         this.decorationType=decorationType;
         this.mainPath=mainPath;
+        this.mainPathSide=mainPathSide;
+        this.mainPathConnectedRoom=mainPathConnectedRoom;
         this.liquid=liquid;
         
         this.openCeiling=false;

@@ -11,9 +11,7 @@ When interface created
 
 ToDos
 
-#### all the supergumba in map creation
-#### finish the stairs stuff with connections to edges (do it while making platform,
-     first platform chunk with access to hit side draws to side)
+#### always block off area right in front of steps
 
 #### update the walls decorations
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions

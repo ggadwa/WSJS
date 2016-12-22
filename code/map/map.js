@@ -244,9 +244,9 @@ class MapClass
         // tracking rooms
         //
         
-    addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,liquid)
+    addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid)
     {
-        this.rooms.push(new MapRoomClass(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,liquid));
+        this.rooms.push(new MapRoomClass(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid));
         return(this.rooms.length-1);
     }
 

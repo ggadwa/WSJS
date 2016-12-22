@@ -12,74 +12,12 @@ class GenRoomPlatformClass
     {
         Object.seal(this);
     }
-    
-        //
-        // add lift chunk
-        //
         
-    addLiftChunk(room,x,z)
-    {
-        let n,y;
-        let meshIdx,movement,waitMSec;
-        let liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
-        
-        let xLiftBound=new wsBound((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
-        let yLiftBound=new wsBound((room.yBound.min+(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),room.yBound.max);
-        let zLiftBound=new wsBound((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
-
-        meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_LIFT));
-        
-            // random wait
-            
-        waitMSec=genRandom.randomInt(1000,1500);
-
-            // the movement
-        
-        movement=new MovementClass(meshIdx,true,0);
-        
-            // going down
-        
-        y=0;
-        
-        for (n=0;n<(room.storyCount-1);n++) {
-            movement.addMove(new MoveClass(1500,new wsPoint(0,y,0)));
-            movement.addMove(new MoveClass(waitMSec,new wsPoint(0,y,0)));
-            
-            y+=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
-        }
-        
-            // the bottom
-
-        y-=map.ROOM_FLOOR_DEPTH;
-        
-        movement.addMove(new MoveClass(1500,new wsPoint(0,y,0)));
-        movement.addMove(new MoveClass(waitMSec,new wsPoint(0,y,0)));
-        
-            // going up
-        
-        y-=map.ROOM_FLOOR_HEIGHT;
-        
-        for (n=0;n<(room.storyCount-2);n++) {
-            movement.addMove(new MoveClass(1500,new wsPoint(0,y,0)));
-            movement.addMove(new MoveClass(waitMSec,new wsPoint(0,y,0)));
-            
-            y-=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
-        }
-        
-        map.addMovement(movement); 
-
-            // can't span on this
-            
-        room.setBlockGrid(0,x,z);
-
-        map.addOverlayPlatform(xLiftBound,zLiftBound);
-    }
-    
         //
         // add stair chunk
         //
         
-    addStairChunk(room,dir,x,z,story)
+    addStairChunk(room,dir,x,z,story,platformBitmap)
     {
         let rx,rz,xBound,yBound,zBound;
         let y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*story));
@@ -106,6 +44,15 @@ class GenRoomPlatformClass
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,true);
                 break;
+        }
+        
+            // if not at the bottom story, then we need to build a
+            // tower to the stairs
+            
+        if (story!==0) {
+            yBound.min=yBound.max;
+            yBound.max=room.yBound.max;
+            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,false,false,false,map.MESH_FLAG_STAIR));
         }
         
             // block the stairs off from any decorations
@@ -136,131 +83,6 @@ class GenRoomPlatformClass
     }
         
         //
-        // platform types
-        //
-    
-    addPlatformHalfFloorX(room,liftX,liftZ,story,platformBitmap)
-    {
-        let x,z,sz,ez;
-        
-        if (liftZ<Math.trunc(room.zBlockSize/2)) {
-            sz=0;
-            ez=liftZ;
-        }
-        else {
-            sz=liftZ+1;
-            ez=room.zBlockSize;
-        }
-        
-        for (z=sz;z<ez;z++) {
-            for (x=0;x!==room.xBlockSize;x++) {
-                this.addPlatformChunk(room,x,z,story,platformBitmap);
-            }
-        }
-        
-        for (x=0;x!==room.xBlockSize;x++) {
-            if (x!==liftX) this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
-        }
-    }
-    
-    addPlatformHalfFloorZ(room,liftX,liftZ,story,platformBitmap)
-    {
-        let x,z,sx,ex;
-        
-        if (liftX<Math.trunc(room.xBlockSize/2)) {
-            sx=0;
-            ex=liftX;
-        }
-        else {
-            sx=liftX+1;
-            ex=room.xBlockSize;
-        }
-        
-        for (x=sx;x<ex;x++) {
-            for (z=0;z!==room.zBlockSize;z++) {
-                this.addPlatformChunk(room,x,z,story,platformBitmap);
-            }
-        }
-        
-        for (z=0;z!==room.zBlockSize;z++) {
-            if (z!==liftZ) this.addPlatformChunk(room,liftX,z,story,platformBitmap);
-        }
-    }
-    
-    addPlatformOutsideCircle(room,liftX,liftZ,story,platformBitmap)
-    {
-        let x,z;
-        
-            // outside
-            
-        for (x=0;x!==room.xBlockSize;x++) {
-            this.addPlatformChunk(room,x,0,story,platformBitmap);
-            this.addPlatformChunk(room,x,(room.zBlockSize-1),story,platformBitmap);
-        }
-        for (z=1;z<(room.zBlockSize-1);z++) {
-            this.addPlatformChunk(room,0,z,story,platformBitmap);
-            this.addPlatformChunk(room,(room.xBlockSize-1),z,story,platformBitmap);
-        }
-        
-            // possible connections
-            
-        if (genRandom.randomPercentage(0.5)) {
-            for (x=1;x<liftX;x++) {
-                this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
-            }
-        }
-        if (genRandom.randomPercentage(0.5)) {
-            for (x=(liftX+1);x<(room.xBlockSize-1);x++) {
-                this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
-            }
-        }
-        if (genRandom.randomPercentage(0.5)) {
-            for (z=1;z<liftZ;z++) {
-                this.addPlatformChunk(room,liftX,z,story,platformBitmap);
-            }
-        }
-        if (genRandom.randomPercentage(0.5)) {
-            for (z=(liftZ+1);z<(room.zBlockSize-1);z++) {
-                this.addPlatformChunk(room,liftX,z,story,platformBitmap);
-            }
-        }
-    }
-    
-    addPlatformCrossRoomX(room,liftX,liftZ,story,platformBitmap)
-    {
-        let x,z;
-        
-        for (x=1;x<liftX;x++) {
-            this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
-        }
-        for (x=(liftX+1);x<(room.xBlockSize-1);x++) {
-            this.addPlatformChunk(room,x,liftZ,story,platformBitmap);
-        }
-        
-        for (z=0;z<room.zBlockSize;z++) {
-            this.addPlatformChunk(room,0,z,story,platformBitmap);
-            this.addPlatformChunk(room,(room.xBlockSize-1),z,story,platformBitmap);
-        }
-    }
-    
-    addPlatformCrossRoomZ(room,liftX,liftZ,story,platformBitmap)
-    {
-        let x,z;
-        
-        for (z=1;z<liftZ;z++) {
-            this.addPlatformChunk(room,liftX,z,story,platformBitmap);
-        }
-        for (z=(liftZ+1);z<(room.zBlockSize-1);z++) {
-            this.addPlatformChunk(room,liftX,z,story,platformBitmap);
-        }
-        
-        for (x=0;x<room.xBlockSize;x++) {
-            this.addPlatformChunk(room,x,0,story,platformBitmap);
-            this.addPlatformChunk(room,x,(room.zBlockSize-1),story,platformBitmap);
-        }
-    }
-    
-        //
         // utilities to move x/z for direction
         //
         
@@ -282,18 +104,15 @@ class GenRoomPlatformClass
         // create platforms
         // 
     
-    create(room,yBase)
+    create(room)
     {
-        let n,k,x,z,x2,z2,y,stairX,stairZ,dir,orgDir;
+        let n,k,x,z,x2,z2,y,stairX,stairZ,dir,orgDir,dirCount;
         let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
-        
-            // random stair direction
-            
         
             // starting spot for first staircase
         
-        x=genRandom.randomInt(2,(room.xBlockSize-3));
-        z=genRandom.randomInt(2,(room.zBlockSize-3));
+        x=genRandom.randomInBetween(2,(room.xBlockSize-2));
+        z=genRandom.randomInBetween(2,(room.zBlockSize-2));
         
             // start with a random direction, the next
             // stairs up has to be same direction as platform
@@ -308,7 +127,7 @@ class GenRoomPlatformClass
                 // stair to next level
                 // remember stairs so we don't cross it
                 
-            this.addStairChunk(room,dir,x,z,n);
+            this.addStairChunk(room,dir,x,z,n,platformBitmap);
             
             stairX=x;
             stairZ=z;
@@ -321,11 +140,13 @@ class GenRoomPlatformClass
             this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
             
                 // random platform chunks
+                
+            dirCount=genRandom.randomInt(3,6);
             
-            for (k=0;k!==8;k++) {
+            for (k=0;k!==dirCount;k++) {
                 
                     // find a place that's legal
-                    // don't cross over self or stairs
+                    // don't cross over self, or stairs, or lifts
                     
                 dir=orgDir=genRandom.randomIndex(4);
                 
@@ -333,7 +154,7 @@ class GenRoomPlatformClass
                     x2=this.moveDirX(dir,x);
                     z2=this.moveDirZ(dir,z);
 
-                    if (((x2===stairX) && (z2===stairZ)) || (!room.checkBlockGrid((n+1),x2,z2)) || (x2<2) || (z2<2) || (x2>(room.xBlockSize-3)) || (z2>(room.zBlockSize-3))) {
+                    if (((x2===stairX) && (z2===stairZ)) || (!room.checkBlockGrid((n+1),x2,z2)) || (room.checkBlockGrid(0,x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
                         dir++;
                         if (dir>3) dir=0;
                         if (dir===orgDir) return;           // we failed here, the platform wrapped in on itself
@@ -350,17 +171,6 @@ class GenRoomPlatformClass
                 z=z2;
                 
                 this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
-                
-                    // if this platform is at the base level
-                    // then try to connect to left/right
-                /*    
-                y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*(n+1)));
-                if (y===yBase) {
-                    for (x2=0;x2<x;x2++) {
-                        this.addPlatformChunk(room,x2,z,(n+1),platformBitmap);
-                    }
-                }
-                */
             }
             
                 // move forward for the next stairs
