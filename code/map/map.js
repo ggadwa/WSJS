@@ -32,6 +32,7 @@ class MapClass
         this.MESH_FLAG_LIFT=8;
         this.MESH_FLAG_LIGHT=9;
         this.MESH_FLAG_DECORATION=10;
+        this.MESH_FLAG_WINDOW=11;
         
         this.TEXTURE_COUNT=12;
         

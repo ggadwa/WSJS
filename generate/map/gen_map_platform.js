@@ -56,8 +56,28 @@ class GenRoomPlatformClass
         }
         
             // block the stairs off from any decorations
+            // and block off in front of the stairs
             
         room.setBlockGrid(0,x,z);
+        
+        switch (dir) {
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                x++;
+                if (x<room.xBlockSize) room.setBlockGrid(0,x,z);
+                break;
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                x--;
+                if (x>=0) room.setBlockGrid(0,x,z);
+                break;
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                z++;
+                if (z<room.zBlockSize) room.setBlockGrid(0,x,z);
+                break;
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                z--;
+                if (z>=0) room.setBlockGrid(0,x,z);
+                break;
+        }
     }
         
         //

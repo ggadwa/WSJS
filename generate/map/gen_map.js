@@ -728,6 +728,19 @@ class GenMapClass
         }
     }
     
+    buildRoomWindows()
+    {
+        let n,room,windows;
+        let nRoom=map.rooms.length;
+        
+        windows=new GenRoomWindowClass();
+        
+        for (n=0;n!==nRoom;n++) {
+            room=map.rooms[n];
+            if (!room.liquid) windows.addWindow(room);
+        }
+    }
+    
     buildRoomLedges()
     {
         let n,room,ledge;
@@ -848,6 +861,7 @@ class GenMapClass
             // build room closets
             
         this.buildRoomClosets();
+        this.buildRoomWindows();
         this.buildRoomLedges();
         this.buildRoomPlatforms();
         this.buildRoomDecorations();

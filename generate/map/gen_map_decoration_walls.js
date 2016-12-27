@@ -17,46 +17,58 @@ class GenRoomDecorationWallsClass
         // wall
         //
         
-    addWall(room)
+    addWall(room,high)
     {
-        let x,z,yAdd,wid;
+        let n,x,z,wid;
         let xBound,yBound,zBound;
         let bitmap;
             
             // the wall location
-            
-        x=room.xBound.min+(genRandom.randomInt(1,(room.xBlockSize-2))*map.ROOM_BLOCK_WIDTH);
-        z=room.zBound.min+(genRandom.randomInt(1,(room.zBlockSize-2))*map.ROOM_BLOCK_WIDTH);
+
+        x=genRandom.randomInt(1,(room.xBlockSize-2));
+        z=genRandom.randomInt(1,(room.zBlockSize-2));
         
+        if (room.checkBlockGrid(0,x,z)) return;
+        
+        for (n=1;n!==room.storyCount;n++) {
+            if (!room.checkBlockGrid(n,x,z)) return;
+        }
+        
+        x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
+        z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
+
+            // size and bitmap
+            
         wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        yBound=new wsBound((room.yBound.max-high),room.yBound.max);
 
         bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
         
-            // the wall
+            // the walls
         
-        switch (genRandom.randomIndex(3)) {
-            case 0:
-                xBound=new wsBound(x,(x+wid));
-                zBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
-                break;
-            case 1:
-                xBound=new wsBound(((x+map.ROOM_BLOCK_WIDTH)-wid),(x+map.ROOM_BLOCK_WIDTH));
-                zBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
-                break;
-            case 2:
-                xBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
-                zBound=new wsBound(z,(z+wid));
-                break;
-            case 3:
-                xBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
-                zBound=new wsBound(((z+map.ROOM_BLOCK_WIDTH)-wid),(z+map.ROOM_BLOCK_WIDTH));
-                break;
+        if (genRandom.randomPercentage(0.5)) {
+            xBound=new wsBound(x,(x+wid));
+            zBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         }
         
-        yAdd=(map.ROOM_FLOOR_HEIGHT*room.storyCount)+(map.ROOM_FLOOR_DEPTH*(room.storyCount-1));
-        yBound=new wsBound((room.yBound.max-yAdd),room.yBound.max);
-
-        map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION));
+        if (genRandom.randomPercentage(0.5)) {
+            xBound=new wsBound(((x+map.ROOM_BLOCK_WIDTH)-wid),(x+map.ROOM_BLOCK_WIDTH));
+            zBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        }
+        
+        if (genRandom.randomPercentage(0.5)) {
+            xBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
+            zBound=new wsBound(z,(z+wid));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        }
+        
+        if (genRandom.randomPercentage(0.5)) {
+            xBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
+            zBound=new wsBound(((z+map.ROOM_BLOCK_WIDTH)-wid),(z+map.ROOM_BLOCK_WIDTH));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        }
     }
     
         //
@@ -65,12 +77,24 @@ class GenRoomDecorationWallsClass
 
     create(room)
     {
-        let n,pieceCount;
+        let n,storyAdd,high,pieceCount;
         
+            // get random height
+        
+        storyAdd=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
+        if (room.storyCount<=1) {
+            high=storyAdd;
+        }
+        else {
+            high=genRandom.randomInt(storyAdd,(storyAdd*(room.storyCount-1)));
+        }
+        
+            // wall panels
+            
         pieceCount=room.getDecorationCount();
         
         for (n=0;n!==pieceCount;n++) {
-            this.addWall(room);
+            this.addWall(room,high);
         }
     }
 

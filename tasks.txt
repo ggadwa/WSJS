@@ -11,14 +11,15 @@ When interface created
 
 ToDos
 
-#### always block off area right in front of steps
+#### windows
+#### better ceilings (not open, but have patterns)
+#### office decorations?
+#### if platform stair is touching wall, then always turn it against the wall
 
-#### update the walls decorations
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
-#### closets in lower rooms with two stories don't connect
 #### ledges on top and bottom?
 #### need to group the lights to better pick the lights in each room
 #### item texture is pretty ugly
@@ -27,12 +28,9 @@ ToDos
 #### get rid of weapon fire hard-coding
 #### implement reflect for projectiles
 #### closets more complex?
-#### windows like you do closets
-#### liquid tint colors are hardcoded
-#### be able to attach rounded sections or just use rounded rooms at end of path
+#### liquid tint colors are hard-coded
 #### outside sections
 #### model spikes
-#### other leg positions
 #### flyers models
 #### draw closest map meshes first
 

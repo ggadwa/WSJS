@@ -170,7 +170,6 @@ class GenRoomClosetClass
                 
             bottomStory=genRandom.randomInt(0,room.storyCount);
             topStory=bottomStory+1;   
-            if ((room.storyCount-bottomStory)>1) topStory=bottomStory+genRandom.randomInt(1,(room.storyCount-bottomStory));
 
             yClosetBound=new wsBound(((room.yBound.max-(topStory*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(bottomStory*storyHigh)));
             
