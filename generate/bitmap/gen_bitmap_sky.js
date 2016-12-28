@@ -26,7 +26,7 @@ class GenBitmapSkyClass extends GenBitmapClass
         // sky
         //
     
-    generateCloud(bitmapCTX,lft,top,rgt,bot,cloudColor)
+    generateClouds(bitmapCTX,lft,top,rgt,bot,cloudColor)
     {
         let n,x,y,xsz,ysz;
         let wid=rgt-lft;
@@ -34,56 +34,71 @@ class GenBitmapSkyClass extends GenBitmapClass
         let quarterWid=Math.trunc(wid*0.25);
         let quarterHigh=Math.trunc(high*0.25);
         
+            // random clouds
+            
         for (n=0;n!==20;n++) {
             xsz=genRandom.randomInt(quarterWid,quarterWid);
             ysz=genRandom.randomInt(quarterHigh,quarterHigh);
             
             x=genRandom.randomInt(lft,(wid-xsz));
-            y=genRandom.randomInt(top,(high-ysz));
+            y=top-Math.trunc(ysz*0.5);
             
             this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+        }
+        
+            // side cloud to complete wrapping
+            
+        this.drawOval(bitmapCTX,(lft-20),(top-20),(lft+20),(top+20),cloudColor,null);
+        this.drawOval(bitmapCTX,(rgt-20),(top-20),(rgt+20),(top+20),cloudColor,null);
+    }
+    
+    generateMountains(bitmapCTX,lft,top,rgt,bot,mountainColor)
+    {
+        let x,y,xFix,yStart;
+        
+        bitmapCTX.strokeStyle=this.colorToRGBColor(mountainColor);
+        
+        xFix=rgt-Math.trunc((rgt-lft)*0.025);
+        y=yStart=bot-Math.trunc((bot-top)*0.5);
+
+        for (x=lft;x!==rgt;x++) {
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(x,y);
+            bitmapCTX.lineTo(x,bot);
+            bitmapCTX.stroke();
+            
+            if (x<xFix) {
+                y+=(genRandom.randomPercentage(0.5)?1:-1);
+            }
+            else {
+                if (y!==yStart) y+=((y<yStart)?1:-1);
+            }
         }
     }
 
     generateSkyClouds(bitmapCTX,wid,high)
     {
-        let n,nCloud;
-        let x,y,xsz,ysz;
-        
         let mx=Math.trunc(wid*0.5);
         let my=Math.trunc(high*0.5);
-        let cloudWid=Math.trunc(mx*0.25);
-        let cloudHigh=Math.trunc(my*0.25);
         
         let cloudColor=new wsColor(1,1,1);
+        let mountainColor=new wsColor(0.7,0.4,0.0);
         
-            // top
-            // color the whole thing in first
-            // so the cloud blur doesn't produce lines
-            
-        this.drawRect(bitmapCTX,0,0,wid,high,new wsColor(0.1,0.95,1.0));
-        
-        nCloud=genRandom.randomInt(5,10);
-        
-        for (n=0;n!==nCloud;n++) {
-            xsz=genRandom.randomInt(cloudWid,cloudWid);
-            ysz=genRandom.randomInt(cloudHigh,cloudHigh);
-            
-            x=genRandom.randomInt(0,(mx-xsz));
-            y=genRandom.randomInt(0,(my-ysz));
-            
-            this.generateCloud(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor);
-        }
-        
-        this.blur(bitmapCTX,0,0,wid,high,5);
-        
-            // bottom
-            
-        this.drawRect(bitmapCTX,mx,0,wid,my,new wsColor(0.0,0.2,1.0));
+        this.drawRect(bitmapCTX,0,0,wid,high,cloudColor);
         
             // side
             
         this.drawVerticalGradient(bitmapCTX,0,my,mx,high,new wsColor(0.1,0.95,1.0),new wsColor(0.0,0.2,1.0));
+        this.generateClouds(bitmapCTX,0,my,mx,high,cloudColor);
+        this.blur(bitmapCTX,0,my,mx,high,3,true);
+        
+        this.generateMountains(bitmapCTX,0,my,mx,high,mountainColor);
+        this.blur(bitmapCTX,0,my,mx,high,2,true);
+        
+            // top and bottom
+            
+        this.drawRect(bitmapCTX,0,0,mx,my,cloudColor);
+        this.drawRect(bitmapCTX,mx,0,wid,my,mountainColor);
     }
 
         //

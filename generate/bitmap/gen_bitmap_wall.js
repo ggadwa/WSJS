@@ -124,7 +124,7 @@ class GenBitmapWallClass extends GenBitmapClass
             
                 // and blur it
                 
-            this.blur(bitmapCTX,lft,top,rgt,bot,4);
+            this.blur(bitmapCTX,lft,top,rgt,bot,4,false);
         }
 
             // finish with the specular
@@ -157,7 +157,7 @@ class GenBitmapWallClass extends GenBitmapClass
 
         this.drawRect(bitmapCTX,0,0,wid,high,groutColor);
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,5);
+        this.blur(bitmapCTX,0,0,wid,high,5,false);
 
         this.clearNormalsRect(normalCTX,0,0,wid,high);
 
@@ -178,7 +178,7 @@ class GenBitmapWallClass extends GenBitmapClass
             edgeSize=genRandom.randomInt(5,12);     // new edge size as stones aren't the same
 
             this.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
-            this.blur(bitmapCTX,(rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4);
+            this.blur(bitmapCTX,(rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4,false);
             
                 // cracked lines
                 
@@ -262,10 +262,10 @@ class GenBitmapWallClass extends GenBitmapClass
                 // and random conrete noise
 
             this.addNoiseRect(bitmapCTX,0,top,wid,bot,0.6,0.8,0.8);
-            this.blur(bitmapCTX,0,top,wid,bot,3);
+            this.blur(bitmapCTX,0,top,wid,bot,3,false);
 
             this.addNoiseRect(bitmapCTX,0,top,wid,bot,0.8,0.9,0.7);
-            this.blur(bitmapCTX,0,top,wid,bot,3);
+            this.blur(bitmapCTX,0,top,wid,bot,3,false);
 
                 // final noise has the streak in it
                 
@@ -278,7 +278,7 @@ class GenBitmapWallClass extends GenBitmapClass
             this.drawStreakDirt(bitmapCTX,sx,top,ex,(top+slopeHigh),0,4,0.8,dirtColor);    
             this.drawStreakDirt(bitmapCTX,sx,(top+slopeHigh),ex,(bot-slopeHigh),5,8,0.8,dirtColor);
 
-            this.blur(bitmapCTX,0,top,wid,bot,3);
+            this.blur(bitmapCTX,0,top,wid,bot,3,false);
            
             top=bot;
         }
@@ -544,7 +544,7 @@ class GenBitmapWallClass extends GenBitmapClass
             // plaster noise
             
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.8);
-        this.blur(bitmapCTX,0,0,wid,high,5);
+        this.blur(bitmapCTX,0,0,wid,high,5,false);
 
             // finish with the specular
 

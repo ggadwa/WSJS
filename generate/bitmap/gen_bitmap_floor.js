@@ -178,7 +178,7 @@ class GenBitmapFloorClass extends GenBitmapClass
         this.drawRect(bitmapCTX,0,0,wid,high,groutColor);
         
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,5);
+        this.blur(bitmapCTX,0,0,wid,high,5,false);
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
 
@@ -420,13 +420,13 @@ class GenBitmapFloorClass extends GenBitmapClass
             // noise
             
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.8);
-        this.blur(bitmapCTX,0,0,wid,high,3);
+        this.blur(bitmapCTX,0,0,wid,high,3,false);
         
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.7);
-        this.blur(bitmapCTX,0,0,wid,high,3);
+        this.blur(bitmapCTX,0,0,wid,high,3,false);
         
         this.addNoiseRect(bitmapCTX,0,0,wid,high,1.0,1.2,0.6);
-        this.blur(bitmapCTX,0,0,wid,high,3);
+        this.blur(bitmapCTX,0,0,wid,high,3,false);
         
             // finish with the specular
 
@@ -495,7 +495,7 @@ class GenBitmapFloorClass extends GenBitmapClass
                     // noise and blur
                 
                 this.addNoiseRect(bitmapCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),1.1,1.3,0.5);
-                this.blur(bitmapCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),3);
+                this.blur(bitmapCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),3,false);
                 
                     // any cracks
                     

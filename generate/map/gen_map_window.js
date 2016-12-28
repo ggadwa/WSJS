@@ -27,14 +27,12 @@ class GenRoomWindowClass
             
         let centerPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
 
-            // the walls
+            // the inside walls
             
         bitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(30);
-        
-            // sides
             
         if (connectSide!==mapRoomConstants.ROOM_SIDE_LEFT) {
             vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
@@ -98,15 +96,19 @@ class GenRoomWindowClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_WINDOW));
+        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_WALL));
+        
+            // the window casing
+            
+        // supergumba -- to do
     }
 
         // windows mainline
         
     addWindow(room)
     {
-        let n,x,z;
-        let bottomStory,topStory,storyHigh;
+        let x,z,count,failCount;
+        let wid,story,storyHigh;
         let connectSide,connectOffset;
         let xWindowBound,yWindowBound,zWindowBound;
         
@@ -114,19 +116,26 @@ class GenRoomWindowClass
         if (windowCount===0) return;
         
             // story height
-            
+        
+        wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
         storyHigh=map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH;
         
             // create windows
             
-        for (n=0;n!==windowCount;n++) {
+        count=0;
+        failCount=0;
+        
+        while ((count<windowCount) && (failCount<(windowCount*10))) {
             
                 // find a connection side, skip if
                 // there's a door on this side
                 
             connectSide=genRandom.randomIndex(4);
             
-            if (room.isDoorOnConnectionSide(connectSide)) continue;
+            if (room.isDoorOnConnectionSide(connectSide)) {
+                failCount++;
+                continue;
+            }
             
                 // get length and offset
             
@@ -140,11 +149,8 @@ class GenRoomWindowClass
                 // get the Y bound
                 // always need to remove on floor depth for top of window
                 
-            bottomStory=genRandom.randomInt(0,room.storyCount);
-            topStory=bottomStory+1;   
-            if ((room.storyCount-bottomStory)>1) topStory=bottomStory+genRandom.randomInt(1,(room.storyCount-bottomStory));
-
-            yWindowBound=new wsBound(((room.yBound.max-(topStory*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(bottomStory*storyHigh)));
+            story=genRandom.randomInt(0,room.storyCount);
+            yWindowBound=new wsBound(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
             
                 // get the box
                 
@@ -152,34 +158,42 @@ class GenRoomWindowClass
                 
                 case mapRoomConstants.ROOM_SIDE_LEFT:
                     z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound((room.xBound.min-map.ROOM_BLOCK_WIDTH),room.xBound.min);
+                    xWindowBound=new wsBound((room.xBound.min-wid),room.xBound.min);
                     zWindowBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_TOP:
                     x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
+                    xWindowBound=new wsBound(x,(x+wid));
                     zWindowBound=new wsBound((room.zBound.min-map.ROOM_BLOCK_WIDTH),room.zBound.min);
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_RIGHT:
                     z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
                     xWindowBound=new wsBound(room.xBound.max,(room.xBound.max+map.ROOM_BLOCK_WIDTH));
-                    zWindowBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
+                    zWindowBound=new wsBound(z,(z+wid));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_BOTTOM:
                     x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
                     xWindowBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
-                    zWindowBound=new wsBound(room.zBound.max,(room.zBound.max+map.ROOM_BLOCK_WIDTH));
+                    zWindowBound=new wsBound(room.zBound.max,(room.zBound.max+wid));
                     break;
             }
             
                 // build the blocks
             
-            if (map.boxBoundCollision(xWindowBound,null,zWindowBound,map.MESH_FLAG_ROOM_WALL)===-1) this.createWindowMesh(xWindowBound,yWindowBound,zWindowBound,connectSide);
+            if (map.boxBoundCollision(xWindowBound,null,zWindowBound,map.MESH_FLAG_ROOM_WALL)!==-1) {
+                failCount++;
+                continue;
+            }
+            
+            this.createWindowMesh(xWindowBound,yWindowBound,zWindowBound,connectSide);
+            
+            if (story===0) room.maskEdgeGridBlockToBounds(xWindowBound,zWindowBound);
+            
+            count++;
         }
-        
     }
 
 }

@@ -132,7 +132,7 @@ class GenRoomClosetClass
     addCloset(room)
     {
         let n,k,x,z,xAdd,zAdd;
-        let bottomStory,topStory,storyHigh;
+        let story,storyHigh;
         let connectSide,connectOffset,closetLen;
         let xClosetBound,yClosetBound,zClosetBound;
         
@@ -168,10 +168,8 @@ class GenRoomClosetClass
                 // get the Y bound
                 // always need to remove on floor depth for top of closet
                 
-            bottomStory=genRandom.randomInt(0,room.storyCount);
-            topStory=bottomStory+1;   
-
-            yClosetBound=new wsBound(((room.yBound.max-(topStory*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(bottomStory*storyHigh)));
+            story=genRandom.randomInt(0,room.storyCount);
+            yClosetBound=new wsBound(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
             
                 // get the box
                 
@@ -218,7 +216,7 @@ class GenRoomClosetClass
                 this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
                 map.addOverlayCloset(xClosetBound,zClosetBound);
                 
-                room.maskEdgeGridBlockToBounds(xClosetBound,zClosetBound);    // block off ledges for edge grid
+                if (story===0) room.maskEdgeGridBlockToBounds(xClosetBound,zClosetBound);    // block off ledges for edge grid
                 
                 xClosetBound.add(xAdd);
                 zClosetBound.add(zAdd);

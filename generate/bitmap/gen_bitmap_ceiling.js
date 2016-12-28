@@ -210,13 +210,13 @@ class GenBitmapCeilingClass extends GenBitmapClass
             // noise
             
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.8);
-        this.blur(bitmapCTX,0,0,wid,high,3);
+        this.blur(bitmapCTX,0,0,wid,high,3,false);
         
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.7);
-        this.blur(bitmapCTX,0,0,wid,high,3);
+        this.blur(bitmapCTX,0,0,wid,high,3,false);
         
         this.addNoiseRect(bitmapCTX,0,0,wid,high,1.0,1.2,0.6);
-        this.blur(bitmapCTX,0,0,wid,high,3);
+        this.blur(bitmapCTX,0,0,wid,high,3,false);
         
             // finish with the specular
 

@@ -64,7 +64,7 @@ class GenBitmapSkinClass extends GenBitmapClass
 
         this.drawRect(bitmapCTX,lft,top,rgt,bot,skinColor);
         this.addNoiseRect(bitmapCTX,lft,top,rgt,bot,0.5,0.7,0.6);
-        this.blur(bitmapCTX,lft,top,rgt,bot,5);
+        this.blur(bitmapCTX,lft,top,rgt,bot,5,false);
         
             // scales
 
@@ -166,7 +166,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         
             // blur it
             
-        this.blur(bitmapCTX,lft,top,rgt,bot,25);
+        this.blur(bitmapCTX,lft,top,rgt,bot,25,false);
     }
         
     generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high)

@@ -85,9 +85,9 @@ class GenBitmapLiquidClass extends GenBitmapClass
             // noise and blurs
             
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.7,0.8,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,10);
+        this.blur(bitmapCTX,0,0,wid,high,10,false);
         this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,5);
+        this.blur(bitmapCTX,0,0,wid,high,5,false);
         
         this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
     }

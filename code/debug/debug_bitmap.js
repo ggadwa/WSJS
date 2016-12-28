@@ -245,7 +245,7 @@ class DebugBitmapClass
     run()
     {
         this.addBitmapWall(0);
-        //this.addBitmapSkins(0);     // supergumba -- testing
+        //this.addBitmapSkies(0);     // supergumba -- testing
     }
 }
 

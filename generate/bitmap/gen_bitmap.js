@@ -484,7 +484,7 @@ class GenBitmapClass
         // blur routines
         //
         
-    blur(bitmapCTX,lft,top,rgt,bot,blurCount)
+    blur(bitmapCTX,lft,top,rgt,bot,blurCount,clamp)
     {
         let n,idx;
         let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
@@ -521,16 +521,28 @@ class GenBitmapClass
                     for (cy=cys;cy!==cye;cy++) {
                         
                         dy=cy;
-                        if (dy<0) dy=high+dy;
-                        if (dy>=high) dy=dy-high;
-                                
+                        if (!clamp) {
+                            if (dy<0) dy=high+dy;
+                            if (dy>=high) dy=dy-high;
+                        }
+                        else {
+                            if (dy<0) dy=0;
+                            if (dy>=high) dy=high-1;
+                        }
+                        
                         for (cx=cxs;cx!==cxe;cx++) {
                             if ((cy===y) && (cx===x)) continue;       // ignore self
                             
                             dx=cx;
-                            if (dx<0) dx=wid+dx;
-                            if (dx>=wid) dx=dx-wid;
-
+                            if (!clamp) {
+                                if (dx<0) dx=wid+dx;
+                                if (dx>=wid) dx=dx-wid;
+                            }
+                            else {
+                                if (dx<0) dx=0;
+                                if (dx>=wid) dx=wid-1;
+                            }
+                            
                                 // add up blur from the
                                 // original pixels
 

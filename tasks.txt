@@ -15,19 +15,20 @@ ToDos
 #### better ceilings (not open, but have patterns)
 #### office decorations?
 #### if platform stair is touching wall, then always turn it against the wall
+#### position windows so they don't face other rooms
+#### window casings
+#### sky textures better
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
-#### ledges on top and bottom?
 #### need to group the lights to better pick the lights in each room
 #### item texture is pretty ugly
 #### collisions against slanted walls are bad
 #### weapon models
 #### get rid of weapon fire hard-coding
 #### implement reflect for projectiles
-#### closets more complex?
 #### liquid tint colors are hard-coded
 #### outside sections
 #### model spikes
