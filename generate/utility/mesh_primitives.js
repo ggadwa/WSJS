@@ -537,4 +537,98 @@ class MeshPrimitivesClass
         return(mesh);
     }
     
+        //
+        // frames
+        //
+        
+    static createFrameX(bitmap,xBound,yBound,zBound,flip,bars)
+    {
+        let xFrameBound=new wsBound(0,0);
+        let yFrameBound=new wsBound(0,0);
+        let zFrameBound=new wsBound(0,0);
+        let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        let halfSz=Math.trunc(sz*0.5);
+        let y,z,mesh;
+        
+            // the outside frame
+            
+        xFrameBound.setFromValues(xBound.max,(xBound.max+sz));
+        if (flip) xFrameBound.add(-(xBound.getSize()+sz));          // flip if window is on other side
+        
+        yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
+        zFrameBound.setFromValues((zBound.min-halfSz),(zBound.min+halfSz));
+        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+        
+        zFrameBound.setFromValues((zBound.max-halfSz),(zBound.max+halfSz));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+        yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
+        zFrameBound.setFromValues((zBound.min-halfSz),(zBound.max+halfSz));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+        yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+            // the inner bars
+
+        if (bars) {
+            y=yBound.getMidPoint();
+            yFrameBound.setFromValues((y-halfSz),(y+halfSz));
+            zFrameBound.setFromValues((zBound.min+halfSz),(zBound.max-halfSz));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+            z=zBound.getMidPoint();
+            yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
+            zFrameBound.setFromValues((z-halfSz),(z+halfSz));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        }
+        
+        return(mesh);
+    }
+    
+    static createFrameZ(bitmap,xBound,yBound,zBound,flip,bars)
+    {
+        let xFrameBound=new wsBound(0,0);
+        let yFrameBound=new wsBound(0,0);
+        let zFrameBound=new wsBound(0,0);
+        let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        let halfSz=Math.trunc(sz*0.5);
+        let x,y,mesh;
+        
+            // the outside frame
+            
+        zFrameBound.setFromValues(zBound.max,(zBound.max+sz));
+        if (flip) zFrameBound.add(-(zBound.getSize()+sz));          // flip if window is on other side
+        
+        yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
+        xFrameBound.setFromValues((xBound.min-halfSz),(xBound.min+halfSz));
+        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+        
+        xFrameBound.setFromValues((xBound.max-halfSz),(xBound.max+halfSz));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+        yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
+        xFrameBound.setFromValues((xBound.min-halfSz),(xBound.max+halfSz));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+        yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+            // the inner bars
+
+        if (bars) {
+            y=yBound.getMidPoint();
+            yFrameBound.setFromValues((y-halfSz),(y+halfSz));
+            xFrameBound.setFromValues((xBound.min+halfSz),(xBound.max-halfSz));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        
+            x=xBound.getMidPoint();
+            yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
+            xFrameBound.setFromValues((x-halfSz),(x+halfSz));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        }
+        
+        return(mesh);
+    }
+    
 }

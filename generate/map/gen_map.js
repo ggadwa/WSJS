@@ -278,7 +278,6 @@ class GenMapClass
         
             // the ceiling
         
-        room.openCeiling=(genRandom.randomPercentage(0.5))&&(storyCount>1);
         room.createMeshCeiling(map.getTexture(map.TEXTURE_TYPE_CEILING));
         
         return(roomIdx);
@@ -355,7 +354,7 @@ class GenMapClass
         lightY=room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*room.storyCount);
         
         fixturePos=new wsPoint(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
-        lightPos=new wsPoint(fixturePos.x,(room.openCeiling?(fixturePos.y-100):(fixturePos.y+1100)),fixturePos.z);
+        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
         
             // intensity
         
@@ -364,7 +363,7 @@ class GenMapClass
         
             // create the light
             
-        this.addGeneralLight(lightPos,(room.openCeiling?null:fixturePos),intensity);
+        this.addGeneralLight(lightPos,fixturePos,intensity);
     }
     
     addHallwayLight(xBound,zBound)

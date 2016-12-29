@@ -161,7 +161,7 @@ class GenRoomPlatformClass
             
                 // random platform chunks
                 
-            dirCount=genRandom.randomInt(3,6);
+            dirCount=genRandom.randomInt(4,8);
             
             for (k=0;k!==dirCount;k++) {
                 
@@ -197,6 +197,44 @@ class GenRoomPlatformClass
                 
             x=this.moveDirX(dir,x);
             z=this.moveDirZ(dir,z);
+            
+                // if the stairs will head into a wall, put down an extra platform
+                // chunk and turn the stairs against the wall
+            
+            switch (dir) {
+                case mapRoomConstants.ROOM_SIDE_LEFT:
+                    if (x===0) {
+                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+                        dir=(z>Math.trunc(room.zBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_TOP:mapRoomConstants.ROOM_SIDE_BOTTOM;
+                        x=this.moveDirX(dir,x);
+                        z=this.moveDirZ(dir,z);
+                    }
+                    break;
+                case mapRoomConstants.ROOM_SIDE_RIGHT:
+                    if (x===(room.xBlockSize-1)) {
+                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+                        dir=(z>Math.trunc(room.zBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_TOP:mapRoomConstants.ROOM_SIDE_BOTTOM;
+                        x=this.moveDirX(dir,x);
+                        z=this.moveDirZ(dir,z);
+                    }
+                    break;
+                case mapRoomConstants.ROOM_SIDE_TOP:
+                    if (z===0) {
+                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+                        dir=(x>Math.trunc(room.xBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT;
+                        x=this.moveDirX(dir,x);
+                        z=this.moveDirZ(dir,z);
+                    }
+                    break;
+                case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                    if (z===(room.zBlockSize-1)) {
+                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+                        dir=(x>Math.trunc(room.xBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT;
+                        x=this.moveDirX(dir,x);
+                        z=this.moveDirZ(dir,z);
+                    }
+                    break;
+            }
         }
         
     }

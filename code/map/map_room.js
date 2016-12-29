@@ -69,8 +69,6 @@ class MapRoomClass
         this.mainPathConnectedRoom=mainPathConnectedRoom;
         this.liquid=liquid;
         
-        this.openCeiling=false;
-        
         this.blockGrid=null;
         this.edgeGrid=null;
         
@@ -664,17 +662,12 @@ class MapRoomClass
     createMeshCeiling(bitmap)
     {
         let x,y,z,vx,vz,vx2,vz2;
-        let v,nSegment,doBlock;
+        let v,nSegment;
         let vertexList,indexes,vIdx,iIdx;
         
             // create mesh
         
-        if (!this.openCeiling) {
-            nSegment=this.xBlockSize*this.zBlockSize;
-        }
-        else {
-            nSegment=(this.xBlockSize*2)+((this.zBlockSize-2)*2);
-        }
+        nSegment=this.xBlockSize*this.zBlockSize;
         
         vertexList=MeshUtilityClass.createMapVertexList(nSegment*6);
         indexes=new Uint16Array(nSegment*6);
@@ -694,44 +687,37 @@ class MapRoomClass
             for (x=0;x!==this.xBlockSize;x++) {
                 vx2=vx+map.ROOM_BLOCK_WIDTH;
                 
-                doBlock=true;
-                if (this.openCeiling) {
-                    doBlock=((z===0) || (z===(this.zBlockSize-1)) || (x===0) || (x===(this.xBlockSize-1)));
-                }
-                
-                if (doBlock) {
-                    v=vertexList[vIdx];
-                    v.position.setFromValues(vx,y,vz);
-                    v.normal.setFromValues(0.0,1.0,0.0);
+                v=vertexList[vIdx];
+                v.position.setFromValues(vx,y,vz);
+                v.normal.setFromValues(0.0,1.0,0.0);
 
-                    v=vertexList[vIdx+1];
-                    v.position.setFromValues(vx2,y,vz);
-                    v.normal.setFromValues(0.0,1.0,0.0);
+                v=vertexList[vIdx+1];
+                v.position.setFromValues(vx2,y,vz);
+                v.normal.setFromValues(0.0,1.0,0.0);
 
-                    v=vertexList[vIdx+2];
-                    v.position.setFromValues(vx2,y,vz2);
-                    v.normal.setFromValues(0.0,1.0,0.0);
+                v=vertexList[vIdx+2];
+                v.position.setFromValues(vx2,y,vz2);
+                v.normal.setFromValues(0.0,1.0,0.0);
 
-                    indexes[iIdx++]=vIdx++;
-                    indexes[iIdx++]=vIdx++;
-                    indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
 
-                    v=vertexList[vIdx];
-                    v.position.setFromValues(vx,y,vz);
-                    v.normal.setFromValues(0.0,1.0,0.0);
+                v=vertexList[vIdx];
+                v.position.setFromValues(vx,y,vz);
+                v.normal.setFromValues(0.0,1.0,0.0);
 
-                    v=vertexList[vIdx+1];
-                    v.position.setFromValues(vx2,y,vz2);
-                    v.normal.setFromValues(0.0,1.0,0.0);
+                v=vertexList[vIdx+1];
+                v.position.setFromValues(vx2,y,vz2);
+                v.normal.setFromValues(0.0,1.0,0.0);
 
-                    v=vertexList[vIdx+2];
-                    v.position.setFromValues(vx,y,vz2);
-                    v.normal.setFromValues(0.0,1.0,0.0);
+                v=vertexList[vIdx+2];
+                v.position.setFromValues(vx,y,vz2);
+                v.normal.setFromValues(0.0,1.0,0.0);
 
-                    indexes[iIdx++]=vIdx++;
-                    indexes[iIdx++]=vIdx++;
-                    indexes[iIdx++]=vIdx++;
-                }
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
+                indexes[iIdx++]=vIdx++;
                 
                 vx=vx2;
             }
@@ -744,30 +730,6 @@ class MapRoomClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_CEILING));
-        
-            // if open ceiling, create the walls
-        
-        if (this.openCeiling) {
-            this.xBlockSize-=2;
-            this.xBound.min+=map.ROOM_BLOCK_WIDTH;
-            this.xBound.max-=map.ROOM_BLOCK_WIDTH;
-            
-            this.zBlockSize-=2;
-            this.zBound.min+=map.ROOM_BLOCK_WIDTH;
-            this.zBound.max-=map.ROOM_BLOCK_WIDTH;
-            
-            this.yOpenBound.setFromValues((y-map.ROOM_BLOCK_WIDTH),y);
-            
-            map.addMesh(this.createMeshWalls(bitmap,this.yOpenBound));
-
-            this.xBlockSize+=2;
-            this.xBound.min-=map.ROOM_BLOCK_WIDTH;
-            this.xBound.max+=map.ROOM_BLOCK_WIDTH;
-            
-            this.zBlockSize+=2;
-            this.zBound.min-=map.ROOM_BLOCK_WIDTH;
-            this.zBound.max+=map.ROOM_BLOCK_WIDTH;
-        }
     }
     
         //

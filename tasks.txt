@@ -11,13 +11,9 @@ When interface created
 
 ToDos
 
-#### windows
-#### better ceilings (not open, but have patterns)
 #### office decorations?
-#### if platform stair is touching wall, then always turn it against the wall
 #### position windows so they don't face other rooms
-#### window casings
-#### sky textures better
+#### frame doors?
 
 #### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller

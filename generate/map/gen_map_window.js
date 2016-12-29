@@ -1,4 +1,4 @@
-/* global MeshUtilityClass, map, genRandom, config, mapRoomConstants */
+/* global MeshUtilityClass, map, genRandom, config, mapRoomConstants, MeshPrimitivesClass */
 
 "use strict";
 
@@ -22,7 +22,7 @@ class GenRoomWindowClass
         let n,idx;
         let vertexList,indexes;
         let bitmap;
-        
+
             // center point for normal creation
             
         let centerPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
@@ -97,10 +97,23 @@ class GenRoomWindowClass
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
         map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_WALL));
-        
+
             // the window casing
-            
-        // supergumba -- to do
+        
+        switch (connectSide) {
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,false,true));
+                break;
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,true,true));
+                break;
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,false,true));
+                break;
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,true,true));
+                break;
+        }
     }
 
         // windows mainline
@@ -164,14 +177,14 @@ class GenRoomWindowClass
                     
                 case mapRoomConstants.ROOM_SIDE_TOP:
                     x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound(x,(x+wid));
-                    zWindowBound=new wsBound((room.zBound.min-map.ROOM_BLOCK_WIDTH),room.zBound.min);
+                    xWindowBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
+                    zWindowBound=new wsBound((room.zBound.min-wid),room.zBound.min);
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_RIGHT:
                     z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound(room.xBound.max,(room.xBound.max+map.ROOM_BLOCK_WIDTH));
-                    zWindowBound=new wsBound(z,(z+wid));
+                    xWindowBound=new wsBound(room.xBound.max,(room.xBound.max+wid));
+                    zWindowBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_BOTTOM:

@@ -83,6 +83,7 @@ class GenBitmapSkyClass extends GenBitmapClass
         
         let cloudColor=new wsColor(1,1,1);
         let mountainColor=new wsColor(0.7,0.4,0.0);
+        let groundColor=new wsColor(0.52,0.35,0.25);
         
         this.drawRect(bitmapCTX,0,0,wid,high,cloudColor);
         
@@ -98,7 +99,7 @@ class GenBitmapSkyClass extends GenBitmapClass
             // top and bottom
             
         this.drawRect(bitmapCTX,0,0,mx,my,cloudColor);
-        this.drawRect(bitmapCTX,mx,0,wid,my,mountainColor);
+        this.drawRect(bitmapCTX,mx,0,wid,my,groundColor);
     }
 
         //
