@@ -17,87 +17,82 @@ class GenRoomDecorationMachineClass
         // computers
         //
         
-    addComputer(room)
+    addComputer(room,pnt)
     {
-        let pos,wid,y,computerWid;
-        let boundX,boundY,boundZ,baseBoundY;
+        let computerWid;
+        let boundX,boundY,boundZ;
         let computerBitmap,platformBitmap;
             
-            // computer size setup
-            
-        wid=Math.trunc(map.ROOM_BLOCK_WIDTH/2);
-        
-            // the machine location
+            // the machine textures
 
-        pos=room.findAndBlockSpawnPosition(true);
-        if (pos===null) return;
-        
         computerBitmap=map.getTexture(map.TEXTURE_TYPE_COMPUTER);
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
-        baseBoundY=new wsBound(pos.y,(pos.y-map.ROOM_FLOOR_DEPTH));
-        
             // computer
             
-        computerWid=wid-genRandom.randomInt(0,Math.trunc(map.ROOM_BLOCK_WIDTH/8));
+        computerWid=map.ROOM_BLOCK_WIDTH-genRandom.randomInt(0,Math.trunc(map.ROOM_BLOCK_WIDTH/8));
 
-        boundX=new wsBound((pos.x-computerWid),(pos.x+computerWid));
-        boundY=new wsBound((pos.y-map.ROOM_FLOOR_DEPTH),((pos.y-map.ROOM_FLOOR_HEIGHT)+map.ROOM_FLOOR_DEPTH));
-        boundZ=new wsBound((pos.z-computerWid),(pos.z+computerWid));
+        boundX=new wsBound(pnt.x,(pnt.x+computerWid));
+        boundY=new wsBound((pnt.y-map.ROOM_FLOOR_DEPTH),((pnt.y-map.ROOM_FLOOR_HEIGHT)+map.ROOM_FLOOR_DEPTH));
+        boundZ=new wsBound(pnt.z,(pnt.z+computerWid));
 
         map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // the base
 
-        boundX=new wsBound((pos.x-wid),(pos.x+wid));
-        boundZ=new wsBound((pos.z-wid),(pos.z+wid));
+        boundX=new wsBound(pnt.x,(pnt.x+map.ROOM_BLOCK_WIDTH));
+        boundY=new wsBound(pnt.y,(pnt.y-map.ROOM_FLOOR_DEPTH));
+        boundZ=new wsBound(pnt.z,(pnt.z+map.ROOM_BLOCK_WIDTH));
 
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,boundX,baseBoundY,boundZ,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,boundX,boundY,boundZ,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
     }
     
         //
         // panels
         //
         
-    addPanel(room)
+    addPanel(room,pnt,dir)
     {
-        let pos,y,panelWid,ang,dir,mesh,mesh2;
+        let panelWid,ang,mesh,mesh2;
         let boundX,boundY,boundZ;
         let computerBitmap,baseBitmap;
             
             // the machine location
-
-        pos=room.findAndBlockSpawnPosition(true);
-        if (pos===null) return;
         
         computerBitmap=map.getTexture(map.TEXTURE_TYPE_PANEL);
         baseBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-            // panel
+            // panel directions and size
             
-        panelWid=Math.trunc(map.ROOM_BLOCK_WIDTH/2)-genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH/5),Math.trunc(map.ROOM_BLOCK_WIDTH/8));
+        panelWid=map.ROOM_BLOCK_WIDTH-genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH/5),Math.trunc(map.ROOM_BLOCK_WIDTH/8));
 
         ang=null;
-        dir=room.getDirectionTowardsCenter(pos);
+        
+        boundX=new wsBound(pnt.x,(pnt.x+panelWid));
+        boundY=new wsBound(pnt.y,(pnt.y-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3)));
+        boundZ=new wsBound(pnt.z,(pnt.z+panelWid));
 
-        switch (dir.direction) {
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                ang=new wsPoint(0.0,180.0,0.0);
-                break;
+        switch (dir) {
             case mapRoomConstants.ROOM_SIDE_LEFT:
-                ang=new wsPoint(0.0,270.0,0.0);
+                ang=new wsPoint(0.0,90.0,0.0);
+                boundX.max=boundX.min+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
+                break;
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                boundZ.max=boundZ.min+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
                 break;
             case mapRoomConstants.ROOM_SIDE_RIGHT:
-                ang=new wsPoint(0.0,90.0,0.0);
+                ang=new wsPoint(0.0,270.0,0.0);
+                
+                boundX.min=boundX.max-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
+                break;
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                ang=new wsPoint(0.0,180.0,0.0);
+                boundZ.min=boundZ.max-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
                 break;
         }
 
-        boundX=new wsBound((pos.x-panelWid),(pos.x+panelWid));
-        boundZ=new wsBound((pos.z-panelWid),(pos.z+panelWid));
-
-        y=pos.y-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3);
-
-        boundY=new wsBound(pos.y,y);
+            // create mesh
+            
         mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
 
         boundY.max=boundY.min;
@@ -111,22 +106,51 @@ class GenRoomDecorationMachineClass
     }
     
         //
+        // single spot machine
+        //
+        
+    addMachine(room,x,z,xAdd,zAdd,dir)
+    {
+        let pnt;
+        
+            // skip any doors or other such blocks
+        
+        //if (room.checkBlockGrid(0,x,z)) return;
+        
+            // machine item
+            
+        pnt=new wsPoint(((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH))+xAdd),room.yBound.max,((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH))+zAdd));
+                
+        room.setBlockGrid(0,x,z);
+                    
+        if (genRandom.randomPercentage(0.5)) {
+            this.addComputer(room,pnt);
+        }
+        else {
+            this.addPanel(room,pnt,dir);
+        }
+    }
+    
+        //
         // computer decorations mainline
         //
 
     create(room)
     {
-        let n,pieceCount;
+        let x,z,pushAdd;
         
-        pieceCount=room.getDecorationCount();
-
-        for (n=0;n!==pieceCount;n++) {
-            if (genRandom.randomPercentage(0.5)) {
-                this.addComputer(room);
-            }
-            else {
-                this.addPanel(room);
-            }
+        pushAdd=Math.trunc(map.ROOM_BLOCK_WIDTH/2);
+        
+            // machines are against the edges
+            
+        for (z=1;z<(room.zBlockSize-1);z++) {
+            this.addMachine(room,0,z,-pushAdd,0,mapRoomConstants.ROOM_SIDE_RIGHT);
+            this.addMachine(room,(room.xBlockSize-1),z,pushAdd,0,mapRoomConstants.ROOM_SIDE_LEFT);
+        }
+        
+        for (x=1;x<(room.xBlockSize-1);x++) {
+            this.addMachine(room,x,0,0,-pushAdd,mapRoomConstants.ROOM_SIDE_BOTTOM);
+            this.addMachine(room,x,(room.zBlockSize-1),0,pushAdd,mapRoomConstants.ROOM_SIDE_TOP);
         }
     }
 

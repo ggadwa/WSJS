@@ -1,5 +1,5 @@
 ES6
-    [ ] modulize the code (do genRandom first)
+    [ ] modularize the code (do genRandom first)
     [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass
 
 WebGL2
@@ -10,6 +10,9 @@ When interface created
     [ ] all the object release()
 
 ToDos
+
+- computers need to be on outside walls, facing in
+- mark off computer sections by meshes with no room collisions (need to count doors, to)
 
 #### office decorations?
 #### position windows so they don't face other rooms

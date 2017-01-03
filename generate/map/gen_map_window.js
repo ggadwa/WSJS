@@ -150,13 +150,14 @@ class GenRoomWindowClass
                 continue;
             }
             
-                // get length and offset
+                // get position
+                // never put in corner
             
             if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
-                connectOffset=genRandom.randomInt(0,(room.zBlockSize-2));
+                connectOffset=genRandom.randomInt(1,(room.zBlockSize-3));
             }
             else {
-                connectOffset=genRandom.randomInt(0,(room.xBlockSize-2));
+                connectOffset=genRandom.randomInt(1,(room.xBlockSize-3));
             }
             
                 // get the Y bound

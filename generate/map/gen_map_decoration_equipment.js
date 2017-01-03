@@ -145,7 +145,7 @@ class GenRoomDecorationEquipmentClass
         map.addMesh(mesh);
     }
 
-    addPipeCornerChunk(bitmap,pnt,radius,xStart,zStart,xTurn,zTurn)
+    addPipeCornerChunk(bitmap,pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
     {
         let n,k,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let yAdd,xTurnAdd,zTurnAdd;
@@ -170,6 +170,8 @@ class GenRoomDecorationEquipmentClass
             // turn segments
             
         yAdd=Math.trunc((radius*2)/this.PIPE_CURVE_SEGMENT_COUNT);
+        if (yFlip) yAdd=-yAdd;
+        
         xTurnAdd=xTurn/this.PIPE_CURVE_SEGMENT_COUNT;
         zTurnAdd=zTurn/this.PIPE_CURVE_SEGMENT_COUNT;
         
@@ -313,43 +315,43 @@ class GenRoomDecorationEquipmentClass
         switch (dir) {
             
             case mapRoomConstants.ROOM_SIDE_LEFT:  
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0,false);
 
                 pipeAng.setFromValues(0.0,0.0,90.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.x-=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0,false);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0,false);
 
                 pipeAng.setFromValues(0.0,0.0,-90.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.x+=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0,false);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0,false);
 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.z-=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0,false);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0,false);
 
                 pipeAng.setFromValues(90.0,0.0,0.0);
                 this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
                 
                 pnt.z+=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0,90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0,90.0,0.0,false);
                 break;
         }
         
@@ -380,25 +382,25 @@ class GenRoomDecorationEquipmentClass
                 // to left
                 
             if (z===0) {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0,false);
                 
                 pipeAng.setFromValues(0.0,0.0,90.0);
                 this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
                 
                 pnt.x-=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0,true);
             }
             
                 // to bottom
                 
             else {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0,false);
                 
                 pipeAng.setFromValues(90.0,0.0,0.0);
                 this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
                 
                 pnt.z+=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0,90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0,true);
             }
         }
         else {
@@ -406,27 +408,32 @@ class GenRoomDecorationEquipmentClass
                 // to top
                 
             if (z===0) {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0,false);
                 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
                 this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
                 
                 pnt.z-=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0,90.0,0.0,true);
             }
             
                 // to right
                 
             else {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0,false);
                 
                 pipeAng.setFromValues(0.0,0.0,-90.0);
                 this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
                 
                 pnt.x+=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0);
+                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0,true);
             }
         }
+        
+            // finally down to ground
+            
+        pipeAng.setFromValues(0.0,0.0,0.0);
+        this.addPipeStraightChunk(bitmap,pnt,(yBound.max-pnt.y),radius,pipeAng);
     }
         
         //

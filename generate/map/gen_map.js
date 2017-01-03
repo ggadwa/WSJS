@@ -785,7 +785,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            room.decorationType=mapRoomConstants.ROOM_DECORATION_EQUIPMENT;  // supergumba -- testing
+            room.decorationType=mapRoomConstants.ROOM_DECORATION_MACHINES;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case mapRoomConstants.ROOM_DECORATION_PILLARS:
