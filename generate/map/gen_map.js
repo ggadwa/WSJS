@@ -31,7 +31,7 @@ class GenMapClass
         this.LEVEL_NORMAL=0;
         this.LEVEL_LOWER=1;
         
-        this.LEVEL_COUNT=3;
+        this.LEVEL_COUNT=2;
         
             // generation constants
 
@@ -785,7 +785,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            //room.decorationType=mapRoomConstants.ROOM_DECORATION_WALLS;  // supergumba -- testing
+            room.decorationType=mapRoomConstants.ROOM_DECORATION_EQUIPMENT;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case mapRoomConstants.ROOM_DECORATION_PILLARS:
