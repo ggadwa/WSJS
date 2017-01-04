@@ -11,9 +11,6 @@ When interface created
 
 ToDos
 
-- computers need to be on outside walls, facing in
-- mark off computer sections by meshes with no room collisions (need to count doors, to)
-
 #### office decorations?
 #### position windows so they don't face other rooms
 #### frame doors?

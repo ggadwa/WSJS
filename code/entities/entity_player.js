@@ -14,10 +14,10 @@ class EntityPlayerClass extends EntityClass
         
             // entity setup
             
-        this.movementForwardMaxSpeed=125;
+        this.movementForwardMaxSpeed=175;
         this.movementForwardAcceleration=10;
         this.movementForwardDeceleration=20;
-        this.movementSideMaxSpeed=75;
+        this.movementSideMaxSpeed=125;
         this.movementSideAcceleration=20;
         this.movementSideDeceleration=40;
         

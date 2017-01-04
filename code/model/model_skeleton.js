@@ -60,16 +60,17 @@ class ModelLimbConstantsClass
     constructor()
     {
         this.LIMB_TYPE_BODY=0;
-        this.LIMB_TYPE_HEAD=1;
-        this.LIMB_TYPE_ARM=2;
-        this.LIMB_TYPE_HAND=3;
-        this.LIMB_TYPE_FINGER=4;
-        this.LIMB_TYPE_LEG=5;
-        this.LIMB_TYPE_FOOT=6;
-        this.LIMB_TYPE_TOE=7;
-        this.LIMB_TYPE_WHIP=8;
-        this.LIMB_TYPE_HEAD_SNOUT=9;
-        this.LIMB_TYPE_HEAD_JAW=10;
+        this.LIMB_TYPE_NECK=1;
+        this.LIMB_TYPE_HEAD=2;
+        this.LIMB_TYPE_HEAD_SNOUT=3;
+        this.LIMB_TYPE_HEAD_JAW=4;
+        this.LIMB_TYPE_ARM=5;
+        this.LIMB_TYPE_HAND=6;
+        this.LIMB_TYPE_FINGER=7;
+        this.LIMB_TYPE_LEG=8;
+        this.LIMB_TYPE_FOOT=9;
+        this.LIMB_TYPE_TOE=10;
+        this.LIMB_TYPE_WHIP=11;
 
         this.LIMB_AXIS_X=0;
         this.LIMB_AXIS_Y=1;
@@ -92,7 +93,7 @@ let modelLimbConstants=new ModelLimbConstantsClass();
 
 class ModelLimbClass
 {
-    constructor(limbType,side,index,axis,acrossSurfaceCount,aroundSurfaceCount,boneIndexes)
+    constructor(limbType,side,index,axis,acrossSurfaceCount,aroundSurfaceCount,scale,boneIndexes)
     {
         this.limbType=limbType;
         this.side=side;
@@ -100,6 +101,7 @@ class ModelLimbClass
         this.axis=axis;
         this.acrossSurfaceCount=acrossSurfaceCount;
         this.aroundSurfaceCount=aroundSurfaceCount;
+        this.scale=scale;
         this.boneIndexes=boneIndexes;
         
         this.hunchAngle=0.0;
