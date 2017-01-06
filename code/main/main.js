@@ -243,7 +243,7 @@ class MainClass
             // it's own model
 
         for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
-            pos=map.findAndBlockSpawnPosition(false);
+            pos=map.findRandomMonsterPosition();
             if (pos===null) continue;
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type

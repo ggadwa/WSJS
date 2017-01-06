@@ -11,15 +11,15 @@ When interface created
 
 ToDos
 
+#### end room big enough for boss?  boss monster?  need boss flag?
+
 #### office decorations?
 #### position windows so they don't face other rooms
 #### frame doors?
 
-#### path needs to be able to turn corner (and remember if it's top/bottom or left/right for extensions
 #### ledges can be taller
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
-#### need to group the lights to better pick the lights in each room
 #### item texture is pretty ugly
 #### collisions against slanted walls are bad
 #### weapon models

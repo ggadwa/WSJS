@@ -245,9 +245,9 @@ class MapClass
         // tracking rooms
         //
         
-    addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid)
+    addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid)
     {
-        this.rooms.push(new MapRoomClass(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid));
+        this.rooms.push(new MapRoomClass(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid));
         return(this.rooms.length-1);
     }
 
@@ -533,7 +533,7 @@ class MapClass
         // find positions in map
         //
         
-    findAndBlockSpawnPosition(groundFloorOnly)
+    findRandomMonsterPosition()
     {
         let roomIdx;
         let pos;
@@ -541,13 +541,13 @@ class MapClass
         
         while (findTry<25) {
 
-                // find a random room
+                // find a random room, but skip start room
 
-            roomIdx=genRandom.randomIndex(this.rooms.length);
-        
-                // find a random spot
+            roomIdx=genRandom.randomIndex(this.rooms.length-1)+1;
+            
+                // find a random spot in room
                 
-            pos=this.rooms[roomIdx].findAndBlockSpawnPosition(groundFloorOnly);
+            pos=this.rooms[roomIdx].findAndBlockSpawnPosition(false);
             if (pos!==null) return(pos);
             
             findTry++;

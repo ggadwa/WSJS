@@ -100,7 +100,7 @@ class GenRoomHallwayClass
 
     createDoorXSingle(x,yBound,zBound,thickSize)
     {
-        let idx,meshIdx,zDoorBound;
+        let idx,meshIdx,xDoorBound;
         let vertexList,movement;
         let doorBitmap=map.getTexture(map.TEXTURE_TYPE_DOOR);
         
@@ -109,9 +109,9 @@ class GenRoomHallwayClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(12);
         
-        idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zDoorBound);
-        idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zDoorBound);
-        this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zDoorBound);
+        idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zBound);
+        this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zBound);
         meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,map.MESH_FLAG_DOOR);
         
             // and the movement
@@ -187,7 +187,7 @@ class GenRoomHallwayClass
             this.createDoorXSingle((xBound.max-(thickSize*2)),yBound,zBound,thickSize);
         }
         else {
-            createDoorXSingle(xBound.getMidPoint(),yBound,zBound,thickSize);
+            this.createDoorXSingle(xBound.getMidPoint(),yBound,zBound,thickSize);
         }
     }
     

@@ -14,7 +14,7 @@ class ConfigClass
             // map generation
             //
             
-        this.ROOM_PATH_COUNT=4;                     // how many rooms in the map path
+        this.ROOM_PATH_COUNT=6;                     // how many rooms in the map path
 
         this.MAP_GENERATE_LIGHTMAP=false;           // set to true to generate light maps
         this.ROOM_DECORATIONS=true;                // if the room has decorations
@@ -34,7 +34,7 @@ class ConfigClass
         this.MONSTER_TYPE_COUNT=3;
         this.MONSTER_ENTITY_COUNT=20;
         
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
         
             //
             // sounds

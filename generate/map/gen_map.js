@@ -207,7 +207,7 @@ class GenMapClass
         // create rooms
         //
 
-    addRegularRoom(level,xBlockSize,zBlockSize,xBound,zBound,mainPath,mainPathSide,mainPathConnectedRoom)
+    addRegularRoom(level,pathType,xBlockSize,zBlockSize,xBound,zBound,mainPath,mainPathSide,mainPathConnectedRoom,extensionDirection)
     {
         let n,mesh,mesh2;
         let yAdd,yBound,yWallBound,yFloorBound;
@@ -250,7 +250,7 @@ class GenMapClass
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=map.addRoom(xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid);
+        roomIdx=map.addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid);
         room=map.rooms[roomIdx];
         
             // the floor
@@ -408,7 +408,7 @@ class GenMapClass
     {
         let roomIdx,room,tryCount;
         let xBlockSize,zBlockSize;
-        let connectSide,connectOffset;
+        let connectSide,connectOffset,pathType,extensionDirection;
         let xBound,zBound;
         let doorOffset,doorAdd,xHallwayBound,zHallwayBound;
         let mapMid,halfSize;
@@ -444,11 +444,12 @@ class GenMapClass
 
             halfSize=Math.trunc((zBlockSize/2)*map.ROOM_BLOCK_WIDTH);
             zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
+            
+            pathType=mapRoomConstants.ROOM_PATH_TYPE_START;
+            extensionDirection=mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT;
         }
 
-            // otherwise we connect to the previous
-            // room by picking a side, and an offset into
-            // that side
+            // otherwise we connect to the previous room
 
         else {
 
@@ -456,11 +457,18 @@ class GenMapClass
             
             while (true) {
                 
-                    // for right now, we always head up, but we leave
-                    // this code here in case we want turns in the path
-                    //connectSide=genRandom.randomIndex(4); // supergumba
-                    
-                connectSide=mapRoomConstants.ROOM_SIDE_TOP;
+                    // most of the time we always path up, but 1/3rd
+                    // of the time we can jog left or right, and this changes
+                    // where the extension rooms go
+                
+                if (genRandom.randomPercentage(0.33)) {
+                    connectSide=(genRandom.randomPercentage(0.5))?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT;
+                    extensionDirection=mapRoomConstants.ROOM_EXTENSION_DIRECTION_TOP_BOTTOM;
+                }
+                else {
+                    connectSide=mapRoomConstants.ROOM_SIDE_TOP;
+                    extensionDirection=mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT;
+                }
                 
                 if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
                     connectOffset=genRandom.randomInt(-Math.trunc(zBlockSize*0.5),lastRoom.zBlockSize);
@@ -468,6 +476,7 @@ class GenMapClass
                 else {
                     connectOffset=genRandom.randomInt(-Math.trunc(xBlockSize*0.5),lastRoom.xBlockSize);
                 }
+                
                 connectOffset*=map.ROOM_BLOCK_WIDTH;
                 
                     // get new room bounds and move it around
@@ -536,6 +545,11 @@ class GenMapClass
                 tryCount++;
                 if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
             }
+                
+                // path type for rooms on path is normal unless
+                // this is the final room
+
+            pathType=((map.rooms.length+1)>=config.ROOM_PATH_COUNT)?mapRoomConstants.ROOM_PATH_TYPE_GOAL:mapRoomConstants.ROOM_PATH_TYPE_NORMAL;
         }
 
             // add in hallways and a light
@@ -548,7 +562,7 @@ class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(this.LEVEL_NORMAL,xBlockSize,zBlockSize,xBound,zBound,true,-1,null);
+        roomIdx=this.addRegularRoom(this.LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -672,7 +686,7 @@ class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(level,xBlockSize,zBlockSize,xBound,zBound,false,connectSide,lastRoom);
+        roomIdx=this.addRegularRoom(level,mapRoomConstants.ROOM_PATH_TYPE_NORMAL,xBlockSize,zBlockSize,xBound,zBound,false,connectSide,lastRoom,lastRoom.extensionDirection);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -703,8 +717,21 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
-            if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
+            
+                // only do extensions on normal rooms
+                
+            if (room.pathType!==mapRoomConstants.ROOM_PATH_TYPE_NORMAL) continue;
+            
+                // extensions on side of path direction
+            
+            if (room.extensionDirection===mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
+            }
+            else {
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
+            }
         }
     }
     
