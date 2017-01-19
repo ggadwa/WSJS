@@ -17,6 +17,11 @@ class MapRoomConstantsClass
         this.ROOM_SIDE_RIGHT=2;
         this.ROOM_SIDE_BOTTOM=3;
         
+        this.LEVEL_NORMAL=0;
+        this.LEVEL_LOWER=1;
+        this.LEVEL_HIGHER=2;
+        this.LEVEL_COUNT=3;
+        
         this.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT=0;
         this.ROOM_EXTENSION_DIRECTION_TOP_BOTTOM=1;
         
@@ -62,7 +67,7 @@ class MapRoomFaceClass
 
 class MapRoomClass
 {
-    constructor(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid)
+    constructor(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
     {
         this.pathType=pathType;
         this.xBlockSize=xBlockSize;
@@ -76,6 +81,7 @@ class MapRoomClass
         this.mainPath=mainPath;
         this.mainPathSide=mainPathSide;
         this.mainPathConnectedRoom=mainPathConnectedRoom;
+        this.level=level;
         this.liquid=liquid;
         
         this.blockGrid=null;

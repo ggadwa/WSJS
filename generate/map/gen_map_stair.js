@@ -451,5 +451,69 @@ class GenRoomStairsClass
         
         this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,map.MESH_FLAG_STAIR);
     }
+    
+    createStairsExtension(room)
+    {
+        let x,z,min,max;
+        let xBound,yBound,zBound;
+        
+            // find place for stairs based on connection side
+            
+        switch (room.mainPathSide) {
+
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                x=room.mainPathConnectedRoom.xBlockSize-1;
+                break;
+
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                z=room.mainPathConnectedRoom.zBlockSize-1;
+                return;
+
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                x=0;
+                break;
+
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                z=0;
+                return;
+
+        }
+        
+        if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            min=0;
+            if (room.mainPathConnectedRoom.zBound.min>room.zBound.min) min=Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            max=room.zBlockSize;
+            if (room.mainPathConnectedRoom.zBound.max<room.zBound.max) max=Math.trunc((room.mainPathConnectedRoom.zBound.max-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            z=genRandom.randomInBetween(min,(max-1));
+        }
+        else {
+            min=0;
+            if (room.mainPathConnectedRoom.xBound.min>room.xBound.min) min=Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            max=room.xBlockSize;
+            if (room.mainPathConnectedRoom.xBound.max<room.xBound.max) max=Math.trunc((room.mainPathConnectedRoom.xBound.max-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            x=genRandom.randomInBetween(min,(max-1));
+        }
+        
+            // create stairs
+       
+        xBound=new wsBound((room.mainPathConnectedRoom.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
+        yBound=new wsBound(room.mainPathConnectedRoom.yBound.max,room.yBound.max);
+        zBound=new wsBound((room.mainPathConnectedRoom.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
+        
+        if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            this.createStairsX(xBound,yBound,zBound,true,false,(room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT));
+        }
+        else {
+            this.createStairsZ(xBound,yBound,zBound,true,false,(room.mainPathSide===mapRoomConstants.ROOM_SIDE_BOTTOM));
+        }
+        
+            // block off from decorations
+            
+        room.mainPathConnectedRoom.setBlockGrid(0,x,z);
+    }
 }
 

@@ -28,11 +28,6 @@ class GenMapClass
         this.HALLWAY_SHORT=1;
         this.HALLWAY_LONG=2;
         
-        this.LEVEL_NORMAL=0;
-        this.LEVEL_LOWER=1;
-        
-        this.LEVEL_COUNT=2;
-        
             // generation constants
 
         this.ROOM_MIN_BLOCK_PER_SIDE=5;                 // minimum number of blocks that can make up one side of a room
@@ -216,15 +211,20 @@ class GenMapClass
         let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
             // figure out room Y size from extension mode
+            // all rooms need at least 2 stories
             
         switch (level) {
-            case this.LEVEL_LOWER:
-                storyCount=genRandom.randomInt(2,3);        // need at least two stories
+            case mapRoomConstants.LEVEL_LOWER:
+                storyCount=genRandom.randomInt(2,4);
                 yAdd=(genRandom.randomInBetween(1,(storyCount-1)));
                 yBound=new wsBound(0,this.yBase+((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*yAdd));
                 break;
+            case mapRoomConstants.LEVEL_HIGHER:
+                storyCount=genRandom.randomInt(2,4);
+                yBound=new wsBound(0,this.yBase-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
+                break;
             default:
-                storyCount=genRandom.randomInt(1,4);
+                storyCount=genRandom.randomInt(2,3);
                 yBound=new wsBound(0,this.yBase);
                 break;
         }
@@ -232,7 +232,7 @@ class GenMapClass
             // determine if this room has a liquid,
             // and lower it for pool and add a story
         
-        liquid=(config.ROOM_LIQUIDS)&&(level===this.LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
+        liquid=(config.ROOM_LIQUIDS)&&(level===mapRoomConstants.LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
         
             // determine the decoration type
         
@@ -250,7 +250,7 @@ class GenMapClass
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=map.addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,liquid);
+        roomIdx=map.addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
         room=map.rooms[roomIdx];
         
             // the floor
@@ -562,7 +562,7 @@ class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(this.LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
+        roomIdx=this.addRegularRoom(mapRoomConstants.LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
         this.currentRoomCount++;
         
         room=map.rooms[roomIdx];
@@ -618,6 +618,8 @@ class GenMapClass
         let xBlockSize,zBlockSize;
         let connectOffset;
         let xBound,zBound;
+        
+        //level=mapRoomConstants.LEVEL_HIGHER;        // supergumba -- testing
         
             // get random block size for room
             // and make sure it stays under the max
@@ -683,7 +685,7 @@ class GenMapClass
             tryCount++;
             if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
         }
-
+        
             // the room
             
         roomIdx=this.addRegularRoom(level,mapRoomConstants.ROOM_PATH_TYPE_NORMAL,xBlockSize,zBlockSize,xBound,zBound,false,connectSide,lastRoom,lastRoom.extensionDirection);
@@ -725,12 +727,12 @@ class GenMapClass
                 // extensions on side of path direction
             
             if (room.extensionDirection===mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
             }
             else {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(this.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
             }
         }
     }
@@ -780,17 +782,24 @@ class GenMapClass
     
     buildRoomPlatforms()
     {
-        let n,room,platform,lift;
+        let n,room,platform,lift,stair;
         let nRoom=map.rooms.length;
         
         platform=new GenRoomPlatformClass();
         lift=new GenRoomLiftClass();
+        stair=new GenRoomStairsClass();
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if (((room.liquid) || (room.storyCount>1)) && (!room.mainPath)) {
-                lift.create(room,this.yBase);
-                platform.create(room);
+            
+            switch (room.level) {
+                case mapRoomConstants.LEVEL_LOWER:
+                    lift.create(room,this.yBase);
+                    platform.create(room);
+                    break;
+                case mapRoomConstants.LEVEL_HIGHER:
+                    stair.createStairsExtension(room);
+                    break;
             }
         }
     }
