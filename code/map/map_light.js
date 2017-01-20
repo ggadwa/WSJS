@@ -26,6 +26,14 @@ class MapLightClass
         Object.seal(this);
     }
     
+    changeIntensity(intensityAdd)
+    {
+        this.intensity+=intensityAdd;
+        if (this.intensity<1) this.intensity=1;
+        
+        this.invertIntensity=1.0/this.intensity;
+    }
+    
     distance(pt)
     {
         return(this.position.distance(pt));

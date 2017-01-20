@@ -84,6 +84,8 @@ class MapRoomClass
         this.level=level;
         this.liquid=liquid;
         
+        this.mainLight=null;                    // used to track main light for room
+        
         this.blockGrid=null;
         this.edgeGrid=null;
         

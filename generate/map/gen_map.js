@@ -39,16 +39,21 @@ class GenMapClass
         this.ROOM_LONG_HALLWAY_PERCENTAGE=0.3;          // what percentage of the time the general room path will have a long hallway
         this.ROOM_LIQUID_PERCENTAGE=0.3;                // what % of time a lower room can have a liquid
         
-        this.ROOM_LIGHT_FACTOR=0.45;                    // lights are initially set to room radius, this factor is multipled in
-        this.ROOM_LIGHT_FACTOR_EXTRA=0.4;               // random addition to light factor above
+        this.ROOM_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
+        this.ROOM_LIGHT_FACTOR_EXTRA=0.3;               // random addition to light factor above
 
-        this.ROOM_LIGHT_EXPONENT_MINIMUM=0.2;           // minimum light exponent (0.0 is completely hard light with no fall off)
+        this.ROOM_LIGHT_EXPONENT_MINIMUM=1.0;           // minimum light exponent (0.0 is completely hard light with no fall off)
         this.ROOM_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
 
         this.ROOM_LIGHT_RGB_MINIMUM=0.7;                // minimum r, g, or b value for map lights
         this.ROOM_LIGHT_RGB_MINIMUM_EXTRA=0.3;          // random r, g, b add for map lights
 
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
+        
+        this.HALLWAY_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.5;                 // intensity of hallway lights
+        this.DOOR_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*0.7;                    // intensity of lights over doors
+        this.WINDOW_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*3.0;                  // intensity of window light
+        this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=map.ROOM_FLOOR_HEIGHT*0.3;         // how much to cut main room light for each window
 
         Object.seal(this);
     }
@@ -310,9 +315,9 @@ class GenMapClass
         // lights
         //
 
-    addGeneralLight(lightPos,fixturePos,intensity)
+    addGeneralLight(lightPos,fixturePos,rotAngle,intensity)
     {
-        let red,green,blue,exponent;
+        let light,red,green,blue,exponent;
         let xFixtureBound,yFixtureBound,zFixtureBound;
 
             // light fixture
@@ -321,7 +326,7 @@ class GenMapClass
             xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
             yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
             zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
-            map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getTexture(map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,map.MESH_FLAG_LIGHT));
+            map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getTexture(map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,map.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -341,7 +346,10 @@ class GenMapClass
 
             // add light to map
 
-        map.addLight(new MapLightClass(lightPos,new wsColor(red,green,blue),config.MAP_GENERATE_LIGHTMAP,intensity,exponent));
+        light=new MapLightClass(lightPos,new wsColor(red,green,blue),config.MAP_GENERATE_LIGHTMAP,intensity,exponent);
+        map.addLight(light);
+
+        return(light);
     }
     
     addRoomLight(roomIdx)
@@ -362,22 +370,48 @@ class GenMapClass
         if (!config.SIMPLE_TEST_MAP) intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
         
             // create the light
+            // remember this because later windows can reduce light
             
-        this.addGeneralLight(lightPos,fixturePos,intensity);
+        room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity);
     }
     
-    addHallwayLight(xBound,zBound)
+    addHallwayLight(connectSide,hallwayMode,hallwaySize,xBound,zBound)
     {
-        let fixturePos,lightPos;
+        let xAdd,zAdd,y,fixturePos,lightPos;
+        let rot1,rot2;
         
-            // locations
+            // middle of hallway
             
-        fixturePos=new wsPoint(xBound.getMidPoint(),(this.yBase-map.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
+        if (hallwayMode===this.HALLWAY_LONG) {
+            fixturePos=new wsPoint(xBound.getMidPoint(),(this.yBase-map.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
+            lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+            this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY);
+        }
+        
+            // ends
+        
+        y=this.yBase-(map.ROOM_FLOOR_HEIGHT+550);
+        
+        if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            xAdd=Math.trunc(hallwaySize*0.5)+(map.ROOM_FLOOR_DEPTH);
+            zAdd=0;
+            rot1=new wsPoint(0,180,90);
+            rot2=new wsPoint(0,90,90);
+        }
+        else {
+            xAdd=0;
+            zAdd=Math.trunc(hallwaySize*0.5);
+            rot1=new wsPoint(0,270,90);
+            rot2=new wsPoint(0,0,90);
+        }
+        
+        fixturePos=new wsPoint((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
         lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY);
         
-            // create the light
-            
-        this.addGeneralLight(lightPos,fixturePos,(map.ROOM_FLOOR_HEIGHT*1.5));
+        fixturePos=new wsPoint((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
+        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY);
     }
   
         //
@@ -557,7 +591,7 @@ class GenMapClass
             
         if (hallwayMode!==this.HALLWAY_NONE) {
             this.addHallwayRoom(connectSide,hallwayMode,xHallwayBound,zHallwayBound);
-            if (hallwayMode===this.HALLWAY_LONG) this.addHallwayLight(xHallwayBound,zHallwayBound);
+            this.addHallwayLight(connectSide,hallwayMode,doorAdd,xHallwayBound,zHallwayBound);
         }
 
             // the room
@@ -619,7 +653,7 @@ class GenMapClass
         let connectOffset;
         let xBound,zBound;
         
-        //level=mapRoomConstants.LEVEL_HIGHER;        // supergumba -- testing
+        level=mapRoomConstants.LEVEL_HIGHER;        // supergumba -- testing
         
             // get random block size for room
             // and make sure it stays under the max
@@ -727,12 +761,12 @@ class GenMapClass
                 // extensions on side of path direction
             
             if (room.extensionDirection===mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
+                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
+                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
             }
             else {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
+                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
+                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
             }
         }
     }
@@ -763,7 +797,7 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
-            if (!room.liquid) windows.addWindow(room);
+            if (!room.liquid) windows.addWindow(this,room);
         }
     }
     

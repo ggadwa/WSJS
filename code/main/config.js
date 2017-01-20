@@ -8,7 +8,7 @@ class ConfigClass
 {
     constructor()
     {
-        this.SEED=Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
+        this.SEED=500; //Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
 
             //
             // map generation
@@ -25,14 +25,14 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=0.2;                 // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=0.15;                 // all over ambient light [r,g,b]
 
             //
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=0;
+        this.MONSTER_TYPE_COUNT=3;
+        this.MONSTER_ENTITY_COUNT=20;
         
         this.MONSTER_AI_ON=false;
         

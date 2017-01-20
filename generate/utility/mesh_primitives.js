@@ -329,9 +329,9 @@ class MeshPrimitivesClass
         // create pryamid
         //
 
-    static createMeshPryamid(bitmap,xBound,yBound,zBound,flags)
+    static createMeshPryamid(bitmap,xBound,yBound,zBound,rotAngle,flags)
     {
-        let n,idx,vertexList,indexes;
+        let n,idx,centerPnt,vertexList,indexes;
         let x=xBound.getMidPoint();
         let z=zBound.getMidPoint();
 
@@ -359,6 +359,13 @@ class MeshPrimitivesClass
 
         for (n=0;n!==12;n++) {
             indexes[n]=n;
+        }
+        
+            // rotate
+            
+        if (rotAngle!==null) {
+            centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            MeshUtilityClass.rotateVertexes(vertexList,centerPnt,rotAngle);
         }
 
             // calculate the normals, then use those to

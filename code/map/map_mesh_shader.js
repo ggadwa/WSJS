@@ -62,7 +62,7 @@ class MapMeshShaderClass extends ShaderClass
         for (n=0;n!==view.LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
 
-            name='light_'+n;
+            name='lights['+n+']';
             this.lights[n].positionIntensityUniform=gl.getUniformLocation(this.program,name+'.positionIntensity');
             this.lights[n].colorExponentUniform=gl.getUniformLocation(this.program,name+'.colorExponent');
         }

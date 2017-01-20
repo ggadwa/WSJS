@@ -10,34 +10,17 @@ struct lightType {
     mediump vec4 colorExponent;
 };
 
-uniform lightType light_0;
-uniform lightType light_1;
-uniform lightType light_2;
-uniform lightType light_3;
-uniform lightType light_4;
-uniform lightType light_5;
+uniform lightType lights[24];
 
-varying highp vec3 eyeVector;
+varying highp vec3 eyeVector,eyePosition;
 varying highp vec2 fragUV;
-
-varying highp vec3 lightVector_0;
-varying highp vec3 lightVector_1;
-varying highp vec3 lightVector_2;
-varying highp vec3 lightVector_3;
-varying highp vec3 lightVector_4;
-varying highp vec3 lightVector_5;
-
-varying highp vec3 lightVertexVector_0;
-varying highp vec3 lightVertexVector_1;
-varying highp vec3 lightVertexVector_2;
-varying highp vec3 lightVertexVector_3;
-varying highp vec3 lightVertexVector_4;
-varying highp vec3 lightVertexVector_5;
+varying mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 void main(void)
 {
     lowp float att;
     highp float dist;
+    highp vec3 lightVector,lightVertexVector;
 
         // the default light color is the ambient
 
@@ -61,142 +44,38 @@ void main(void)
     lowp vec3 specMap=texture2D(specularTex,fragUV.xy).rgb;
     lowp float specFactor;
 
-        // light 0
+        // lights
 
-    dist=length(lightVector_0);
-    if (dist<light_0.positionIntensity.w) {
+    for (int n=0;n!=24;n++) {
 
-            // the lighting attenuation
+            // get vector for light
 
-        att=1.0-(dist/light_0.positionIntensity.w);
-        att+=pow(att,light_0.colorExponent.w);
-        lightCol+=(light_0.colorExponent.rgb*att);
+        lightVector=lights[n].positionIntensity.xyz-eyePosition;
 
-            // per-light bump calc
+        dist=length(lightVector);
+        if (dist<lights[n].positionIntensity.w) {
 
-        bumpLightVertexVector=normalize(lightVertexVector_0);
-        bump+=(dot(bumpLightVertexVector,bumpMap)*att);
+                // the lighting attenuation
 
-            // per-light spec count
+            att=1.0-(dist/lights[n].positionIntensity.w);
+            att+=pow(att,lights[n].colorExponent.w);
+            lightCol+=(lights[n].colorExponent.rgb*att);
 
-        specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-        specFactor=max(dot(bumpMap,specHalfVector),0.0);
-        spec+=((specMap*pow(specFactor,shineFactor))*att);
-    }
+                // per-light bump calc (in tangent space)
 
-        // light 1
+            lightVertexVector.x=dot(lightVector,tangentSpaceTangent);
+            lightVertexVector.y=dot(lightVector,tangentSpaceBinormal);
+            lightVertexVector.z=dot(lightVector,tangentSpaceNormal);
 
-    dist=length(lightVector_1);
-    if (dist<light_1.positionIntensity.w) {
+            bumpLightVertexVector=normalize(lightVertexVector);
+            bump+=(dot(bumpLightVertexVector,bumpMap)*att);
 
-            // the lighting attenuation
+                // per-light spec count
 
-        att=1.0-(dist/light_1.positionIntensity.w);
-        att+=pow(att,light_1.colorExponent.w);
-        lightCol+=(light_1.colorExponent.rgb*att);
-
-            // per-light bump calc
-
-        bumpLightVertexVector=normalize(lightVertexVector_1);
-        bump+=(dot(bumpLightVertexVector,bumpMap)*att);
-
-            // per-light spec count
-
-        specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-        specFactor=max(dot(bumpMap,specHalfVector),0.0);
-        spec+=((specMap*pow(specFactor,shineFactor))*att);
-    }
-
-        // light 2
-
-    dist=length(lightVector_2);
-    if (dist<light_2.positionIntensity.w) {
-
-            // the lighting attenuation
-
-        att=1.0-(dist/light_2.positionIntensity.w);
-        att+=pow(att,light_2.colorExponent.w);
-        lightCol+=(light_2.colorExponent.rgb*att);
-
-            // per-light bump calc
-
-        bumpLightVertexVector=normalize(lightVertexVector_2);
-        bump+=(dot(bumpLightVertexVector,bumpMap)*att);
-
-            // per-light spec count
-
-        specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-        specFactor=max(dot(bumpMap,specHalfVector),0.0);
-        spec+=((specMap*pow(specFactor,shineFactor))*att);
-    }
-
-        // light 3
-
-    dist=length(lightVector_3);
-    if (dist<light_3.positionIntensity.w) {
-
-            // the lighting attenuation
-
-        att=1.0-(dist/light_3.positionIntensity.w);
-        att+=pow(att,light_3.colorExponent.w);
-        lightCol+=(light_3.colorExponent.rgb*att);
-
-            // per-light bump calc
-
-        bumpLightVertexVector=normalize(lightVertexVector_3);
-        bump+=(dot(bumpLightVertexVector,bumpMap)*att);
-
-            // per-light spec count
-
-        specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-        specFactor=max(dot(bumpMap,specHalfVector),0.0);
-        spec+=((specMap*pow(specFactor,shineFactor))*att);
-    }
-
-        // light 4
-
-    dist=length(lightVector_4);
-    if (dist<light_4.positionIntensity.w) {
-
-            // the lighting attenuation
-
-        att=1.0-(dist/light_4.positionIntensity.w);
-        att+=pow(att,light_4.colorExponent.w);
-        lightCol+=(light_4.colorExponent.rgb*att);
-
-            // per-light bump calc
-
-        bumpLightVertexVector=normalize(lightVertexVector_4);
-        bump+=(dot(bumpLightVertexVector,bumpMap)*att);
-
-            // per-light spec count
-
-        specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-        specFactor=max(dot(bumpMap,specHalfVector),0.0);
-        spec+=((specMap*pow(specFactor,shineFactor))*att);
-    }
-
-        // light 5
-
-    dist=length(lightVector_5);
-    if (dist<light_5.positionIntensity.w) {
-
-            // the lighting attenuation
-
-        att=1.0-(dist/light_5.positionIntensity.w);
-        att+=pow(att,light_5.colorExponent.w);
-        lightCol+=(light_5.colorExponent.rgb*att);
-
-            // per-light bump calc
-
-        bumpLightVertexVector=normalize(lightVertexVector_5);
-        bump+=(dot(bumpLightVertexVector,bumpMap)*att);
-
-            // per-light spec count
-
-        specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
-        specFactor=max(dot(bumpMap,specHalfVector),0.0);
-        spec+=((specMap*pow(specFactor,shineFactor))*att);
+            specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+            specFactor=max(dot(bumpMap,specHalfVector),0.0);
+            spec+=((specMap*pow(specFactor,shineFactor))*att);
+        }
     }
 
         // finish the spec by making sure

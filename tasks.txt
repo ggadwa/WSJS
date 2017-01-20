@@ -11,8 +11,16 @@ When interface created
 
 ToDos
 
+#### flipped triangle lights for doors
+
+#### no outside type elements in extension rooms (computers for one, can't track extra connections)
+
+#### fix lifts and stairs not appearing to extended rooms
+#### map display needs to blank out inside of map (too hard to see)
+
 #### end room big enough for boss?  boss monster?  need boss flag?
 
+#### better internal walls
 #### office decorations?
 #### position windows so they don't face other rooms
 #### frame doors?

@@ -118,12 +118,13 @@ class GenRoomWindowClass
 
         // windows mainline
         
-    addWindow(room)
+    addWindow(genMap,room)
     {
         let x,z,count,failCount;
         let wid,story,storyHigh;
         let connectSide,connectOffset;
         let xWindowBound,yWindowBound,zWindowBound;
+        let lightPos;
         
         let windowCount=genRandom.randomIndex(this.WINDOW_MAX_COUNT);
         if (windowCount===0) return;
@@ -180,24 +181,28 @@ class GenRoomWindowClass
                     z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
                     xWindowBound=new wsBound((room.xBound.min-wid),room.xBound.min);
                     zWindowBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
+                    lightPos=new wsPoint((room.xBound.min-(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_TOP:
                     x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
                     xWindowBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
                     zWindowBound=new wsBound((room.zBound.min-wid),room.zBound.min);
+                    lightPos=new wsPoint((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.min-(wid*2)));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_RIGHT:
                     z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
                     xWindowBound=new wsBound(room.xBound.max,(room.xBound.max+wid));
                     zWindowBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
+                    lightPos=new wsPoint((room.xBound.max+(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_BOTTOM:
                     x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
                     xWindowBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
                     zWindowBound=new wsBound(room.zBound.max,(room.zBound.max+wid));
+                    lightPos=new wsPoint((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.max+(wid*2)));
                     break;
             }
             
@@ -210,6 +215,14 @@ class GenRoomWindowClass
             
             this.createWindowMesh(xWindowBound,yWindowBound,zWindowBound,connectSide);
             
+                // light from window
+                // cut the main light if there's extra lights
+                
+            genMap.addGeneralLight(lightPos,null,null,genMap.WINDOW_LIGHT_INTENSITY);
+            room.mainLight.changeIntensity(-genMap.WINDOW_MAIN_LIGHT_INTENSITY_CUT);
+            
+                // if window at bottom, mask off
+                
             if (story===0) room.maskEdgeGridBlockToBounds(xWindowBound,zWindowBound);
             
             count++;
