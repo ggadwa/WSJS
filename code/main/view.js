@@ -82,14 +82,10 @@ class ViewClass
 
             // view lighting
 
-        this.LIGHT_COUNT=24;
-
         this.ambient=new wsColor(0.0,0.0,0.0);
 
+        this.LIGHT_COUNT=24;
         this.lights=[];
-        for (n=0;n!==this.LIGHT_COUNT;n++) {
-            this.lights.push(null);
-        }
 
             // frustum planes
 

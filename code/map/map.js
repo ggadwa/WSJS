@@ -68,7 +68,6 @@ class MapClass
         this.overlay=new MapOverlayClass();
 
         this.cameraVector=new wsPoint(0,0,0);           // global not local so they won't get GCd
-        this.lightVector=new wsPoint(0,0,0);
         this.lightXBound=new wsBound(0,0);
         this.lightYBound=new wsBound(0,0);
         this.lightZBound=new wsBound(0,0);
@@ -397,9 +396,7 @@ class MapClass
 
         //
         // find all the map lights in this view
-        // that we need to pass to glsl.  Ignore
-        // lights that are behind the player and
-        // outside the light cone
+        // that we need to pass to glsl
         //
 
     createViewLightsFromMapLights()
@@ -435,20 +432,18 @@ class MapClass
             // find the view.LIGHT_COUNT closest lights
             // and put them into the view list
 
-        for (k=0;k!==view.LIGHT_COUNT;k++) {
-            view.lights[k]=null;
-        }
-
         view.lights=[];
         
-            // first, we put in all lights where
-            // we are within the light cone, this are
-            // must do lights
-            
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
-            if (light.dist>light.intensity) continue;
             
+                // calculate if this lights bounds
+                // are within the frustrum and eliminate if they arent
+                
+            if (!light.isInsideFrustrum()) continue;
+
+                // find the light place
+                
             idx=-1;
 
             for (k=0;k!==view.lights.length;k++) {
@@ -471,39 +466,6 @@ class MapClass
             light.usedInList=true;
         }
         
-            // if we have spots left, then closests lights
-            // that aren't behind the player
-            
-        startIdx=view.lights.length;    
-            
-        for (n=0;n!==nLight;n++) {
-            light=this.lights[n];
-            if (light.usedInList) continue;
-            
-            this.lightVector.setFromSubPoint(view.camera.position,light.position);   
-            this.lightVector.normalize();
-            if (this.lightVector.dot(this.cameraVector)>0.0) continue;
-            
-            idx=-1;
-
-            for (k=startIdx;k<view.lights.length;k++) {
-                if (view.lights[k].dist>light.dist) {
-                    idx=k;
-                    break;
-                }
-            }
-            
-                // add the light
-                
-            if (idx===-1) {
-                if (view.lights.length<view.LIGHT_COUNT) view.lights.push(light);
-            }
-            else {
-                view.lights.splice(idx,0,light);
-                if (view.lights.length>view.LIGHT_COUNT) view.lights.pop();
-            }
-        }
-
             // fill in any missing lights
 
         while (view.lights.length<view.LIGHT_COUNT) {

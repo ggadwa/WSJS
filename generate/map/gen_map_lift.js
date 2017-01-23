@@ -82,7 +82,7 @@ class GenRoomLiftClass
 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 z=0;
-                return;
+                break;
 
         }
         

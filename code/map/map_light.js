@@ -20,6 +20,10 @@ class MapLightClass
         this.origIndex=0;           // used to sort lights
         this.dist=0.0;
         this.usedInList=false;
+        
+        this.frustumXBound=new wsBound(0,0);        // set here to avoid gc
+        this.frustumYBound=new wsBound(0,0);
+        this.frustumZBound=new wsBound(0,0);
 
         this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
         
@@ -62,6 +66,15 @@ class MapLightClass
     getZBound(zBound)
     {
         zBound.setFromValues((this.position.z-this.intensity),(this.position.z+this.intensity));
+    }
+    
+    isInsideFrustrum()
+    {
+        this.frustumXBound.setFromValues((this.position.x-this.intensity),(this.position.x+this.intensity));
+        this.frustumYBound.setFromValues((this.position.y-this.intensity),(this.position.y+this.intensity));
+        this.frustumZBound.setFromValues((this.position.z-this.intensity),(this.position.z+this.intensity));
+        
+        return(view.boundBoxInFrustum(this.frustumXBound,this.frustumYBound,this.frustumZBound));
     }
 }
 

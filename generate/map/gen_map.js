@@ -377,7 +377,7 @@ class GenMapClass
     
     addHallwayLight(connectSide,hallwayMode,hallwaySize,xBound,zBound)
     {
-        let xAdd,zAdd,y,fixturePos,lightPos;
+        let xAdd,zAdd,xAdd2,zAdd2,y,fixturePos,lightPos;
         let rot1,rot2;
         
             // middle of hallway
@@ -390,27 +390,29 @@ class GenMapClass
         
             // ends
         
-        y=this.yBase-(map.ROOM_FLOOR_HEIGHT+550);
+        y=this.yBase-(map.ROOM_FLOOR_HEIGHT+1000);
         
         if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
-            xAdd=Math.trunc(hallwaySize*0.5)+(map.ROOM_FLOOR_DEPTH);
-            zAdd=0;
-            rot1=new wsPoint(0,180,90);
+            xAdd=Math.trunc(hallwaySize*0.5)+map.ROOM_FLOOR_DEPTH;
+            xAdd2=1000;
+            zAdd=zAdd2=0;
+            rot1=new wsPoint(90,90,0);
             rot2=new wsPoint(0,90,90);
         }
         else {
-            xAdd=0;
-            zAdd=Math.trunc(hallwaySize*0.5);
-            rot1=new wsPoint(0,270,90);
-            rot2=new wsPoint(0,0,90);
+            xAdd=xAdd2=0;
+            zAdd=Math.trunc(hallwaySize*0.5)+map.ROOM_FLOOR_DEPTH;
+            zAdd2=1000;
+            rot1=new wsPoint(90,0,0);
+            rot2=new wsPoint(90,180,0);
         }
         
         fixturePos=new wsPoint((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
-        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        lightPos=new wsPoint((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
         this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY);
         
         fixturePos=new wsPoint((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
-        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        lightPos=new wsPoint((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
         this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY);
     }
   
@@ -761,7 +763,7 @@ class GenMapClass
                 // extensions on side of path direction
             
             if (room.extensionDirection===mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
-                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
+                /* if (genRandom.randomPercentage(0.5)) supergumba -- testing */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
                 /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
             }
             else {
@@ -825,6 +827,7 @@ class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
+            if (room.mainPath) continue;
             
             switch (room.level) {
                 case mapRoomConstants.LEVEL_LOWER:

@@ -11,11 +11,16 @@ When interface created
 
 ToDos
 
-#### flipped triangle lights for doors
+#### window rules
+       - have a 4-boolean value to tell where window can be
+       - extensions can put windows on opposite side of connection
+       - path rooms can put windows on connection sides that don't have extensions
+       - if window, no central light
 
 #### no outside type elements in extension rooms (computers for one, can't track extra connections)
 
 #### fix lifts and stairs not appearing to extended rooms
+
 #### map display needs to blank out inside of map (too hard to see)
 
 #### end room big enough for boss?  boss monster?  need boss flag?

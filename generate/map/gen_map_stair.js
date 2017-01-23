@@ -389,7 +389,7 @@ class GenRoomStairsClass
             this.finishStairMesh(stairBitmap,vertexList,true,null,false,map.MESH_FLAG_STAIR);
             
             idx=0;
-            vertexList=MeshUtilityClass.createMapVertexList(includeBack?20:16);
+            vertexList=MeshUtilityClass.createMapVertexList(20);
             
             xStepBound=new wsBound((xBound.max-thickSize),xBound.max);
             
@@ -402,7 +402,7 @@ class GenRoomStairsClass
             
             if (includeBack) {
                 idx=0;
-                vertexList=MeshUtilityClass.createMapVertexList(includeBack?20:16);
+                vertexList=MeshUtilityClass.createMapVertexList(4);
 
                 xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
 
@@ -475,25 +475,25 @@ class GenRoomStairsClass
 
             case mapRoomConstants.ROOM_SIDE_TOP:
                 z=0;
-                return;
+                break;
 
         }
         
         if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
             min=0;
-            if (room.mainPathConnectedRoom.zBound.min>room.zBound.min) min=Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.zBound.min>room.mainPathConnectedRoom.zBound.min) min=Math.trunc((room.zBound.min-room.mainPathConnectedRoom.zBound.min)/map.ROOM_BLOCK_WIDTH);
             
             max=room.zBlockSize;
-            if (room.mainPathConnectedRoom.zBound.max<room.zBound.max) max=Math.trunc((room.mainPathConnectedRoom.zBound.max-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.zBound.max<room.mainPathConnectedRoom.zBound.max) max=Math.trunc((room.zBound.max-room.mainPathConnectedRoom.zBound.min)/map.ROOM_BLOCK_WIDTH);
             
             z=genRandom.randomInBetween(min,(max-1));
         }
         else {
             min=0;
-            if (room.mainPathConnectedRoom.xBound.min>room.xBound.min) min=Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.xBound.min>room.mainPathConnectedRoom.xBound.min) min=Math.trunc((room.xBound.min-room.mainPathConnectedRoom.xBound.min)/map.ROOM_BLOCK_WIDTH);
             
             max=room.xBlockSize;
-            if (room.mainPathConnectedRoom.xBound.max<room.xBound.max) max=Math.trunc((room.mainPathConnectedRoom.xBound.max-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.xBound.max<room.mainPathConnectedRoom.xBound.max) max=Math.trunc((room.xBound.max-room.mainPathConnectedRoom.xBound.min)/map.ROOM_BLOCK_WIDTH);
             
             x=genRandom.randomInBetween(min,(max-1));
         }
@@ -501,7 +501,7 @@ class GenRoomStairsClass
             // create stairs
        
         xBound=new wsBound((room.mainPathConnectedRoom.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
-        yBound=new wsBound(room.mainPathConnectedRoom.yBound.max,room.yBound.max);
+        yBound=new wsBound(room.yBound.max,room.mainPathConnectedRoom.yBound.max);
         zBound=new wsBound((room.mainPathConnectedRoom.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
         
         if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
