@@ -17,9 +17,7 @@ ToDos
        - path rooms can put windows on connection sides that don't have extensions
        - if window, no central light
 
-#### no outside type elements in extension rooms (computers for one, can't track extra connections)
-
-#### fix lifts and stairs not appearing to extended rooms
+#### no outside type elements in higher extension rooms (computers for one, can't track extra connections)
 
 #### map display needs to blank out inside of map (too hard to see)
 

@@ -12,6 +12,7 @@ class MapOverlayClass
     {
         this.mapOverlayShader=new MapOverlayShaderClass();
 
+        this.quadList=[];
         this.roomLineList=[];
         this.extraLineList=[];
 
@@ -25,6 +26,7 @@ class MapOverlayClass
         this.drawWid=0;
         this.drawHigh=0;
 
+        this.quadVertexPosBuffer=null;
         this.roomVertexPosBuffer=null;
         this.extraVertexPosBuffer=null;
         this.entityVertexPosBuffer=null;
@@ -44,6 +46,7 @@ class MapOverlayClass
         
         if (!this.mapOverlayShader.initialize()) return(false);
         
+        this.quadVertexPosBuffer=gl.createBuffer();
         this.roomVertexPosBuffer=gl.createBuffer();
         this.extraVertexPosBuffer=gl.createBuffer();
         this.entityVertexPosBuffer=gl.createBuffer();
@@ -57,6 +60,7 @@ class MapOverlayClass
     {
         let gl=view.gl;
         
+        gl.deleteBuffer(this.quadVertexPosBuffer);
         gl.deleteBuffer(this.roomVertexPosBuffer);
         gl.deleteBuffer(this.extraVertexPosBuffer);
         gl.deleteBuffer(this.entityVertexPosBuffer);
@@ -103,12 +107,15 @@ class MapOverlayClass
         
     addRoom(room)
     {
+        this.quadList.push(new wsRect(room.xBound.min,room.zBound.min,room.xBound.max,room.zBound.max));
         this.addLines(this.roomLineList,room.createOverlayLineList());
     }
     
     addCloset(xBound,zBound)
     {
         let lines=[];
+        
+        this.quadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
         
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
@@ -142,16 +149,28 @@ class MapOverlayClass
         this.addLines(this.extraLineList,lines);
     }
     
+    addLift(xBound,zBound)
+    {
+        this.addPlatform(xBound,zBound);
+    }
+    
+    addStair(xBound,zBound)
+    {
+        this.addPlatform(xBound,zBound);
+    }
+    
         //
         // precalc the drawing values
         //
     
     precalcDrawValues()
     {
-        let n,idx,line,maxSize;
+        let n,idx,line,rect,maxSize;
+        let lft,top,rgt,bot;
         let xBound,yBound;
-        let roomVertexList,extraVertexList;
+        let quadVertexList,roomVertexList,extraVertexList;
         let gl=view.gl;
+        let nQuad=this.quadList.length;
         let nLine=this.roomLineList.length;
         
             // get the total size
@@ -195,6 +214,38 @@ class MapOverlayClass
         
         this.drawX=(view.wid-5)-this.drawWid;
         this.drawY=Math.trunc((view.high-this.drawHigh)/2);
+        
+            // create the background quad vertex buffer
+            
+        idx=0;
+        quadVertexList=new Float32Array(nQuad*12);
+        
+        for (n=0;n!==nQuad;n++) {
+            rect=this.quadList[n];
+            
+            lft=((rect.lft-this.mapOffsetX)*this.mapScale)+this.drawX;
+            top=(this.drawHigh-((rect.top-this.mapOffsetZ)*this.mapScale))+this.drawY;
+            rgt=((rect.rgt-this.mapOffsetX)*this.mapScale)+this.drawX;
+            bot=(this.drawHigh-((rect.bot-this.mapOffsetZ)*this.mapScale))+this.drawY;
+            
+            quadVertexList[idx++]=lft;
+            quadVertexList[idx++]=top;
+            quadVertexList[idx++]=rgt;
+            quadVertexList[idx++]=top;
+            quadVertexList[idx++]=lft;
+            quadVertexList[idx++]=bot;
+            
+            quadVertexList[idx++]=rgt;
+            quadVertexList[idx++]=top;
+            quadVertexList[idx++]=rgt;
+            quadVertexList[idx++]=bot;
+            quadVertexList[idx++]=lft;
+            quadVertexList[idx++]=bot;
+        }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.quadVertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,quadVertexList,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
         
             // create the room vertex buffer
         
@@ -250,6 +301,17 @@ class MapOverlayClass
 
         this.mapOverlayShader.drawStart();
         gl.disable(gl.DEPTH_TEST);
+        
+            // background quads
+            
+        this.mapOverlayShader.drawColor(new wsColor(0.0,1.0,0.0));
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.quadVertexPosBuffer);
+        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        //gl.drawArrays(gl.TRIANGLES,0,(this.quadList.length*6));
+        
+        gl.drawArrays(gl.LINE_LOOP,0,(this.quadList.length*6));
+        
         
             // extra lines
             

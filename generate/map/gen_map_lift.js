@@ -49,7 +49,7 @@ class GenRoomLiftClass
             
         room.setBlockGrid(0,x,z);
 
-        map.addOverlayPlatform(xLiftBound,zLiftBound);
+        map.addOverlayLift(xLiftBound,zLiftBound);
     }
     
         //
@@ -74,7 +74,7 @@ class GenRoomLiftClass
 
             case mapRoomConstants.ROOM_SIDE_TOP:
                 z=room.zBlockSize-1;
-                return;
+                break;
 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
                 x=0;

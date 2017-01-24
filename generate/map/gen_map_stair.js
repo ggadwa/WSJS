@@ -1,4 +1,4 @@
-/* global MeshUtilityClass, config, map, MeshPrimitivesClass */
+/* global MeshUtilityClass, config, map, MeshPrimitivesClass, mapRoomConstants, genRandom */
 
 "use strict";
 
@@ -282,6 +282,10 @@ class GenRoomStairsClass
         }
         
         this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,map.MESH_FLAG_STAIR);
+        
+            // overlay
+            
+        map.addOverlayStair(xBound,zBound);
     }
 
     createStairsZ(xBound,yBound,zBound,toPlatform,includeBack,flip)
@@ -450,6 +454,10 @@ class GenRoomStairsClass
         }
         
         this.finishStairMesh(stairBitmap,vertexList,false,meshCenterPoint,true,map.MESH_FLAG_STAIR);
+        
+            // overlay
+            
+        map.addOverlayStair(xBound,zBound);
     }
     
     createStairsExtension(room)
@@ -467,7 +475,7 @@ class GenRoomStairsClass
 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 z=room.mainPathConnectedRoom.zBlockSize-1;
-                return;
+                break;
 
             case mapRoomConstants.ROOM_SIDE_LEFT:
                 x=0;

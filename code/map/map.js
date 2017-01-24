@@ -570,6 +570,16 @@ class MapClass
     {
         this.overlay.addPlatform(xBound,zBound);
     }
+    
+    addOverlayLift(xBound,zBound)
+    {
+        this.overlay.addLift(xBound,zBound);
+    }
+    
+    addOverlayStair(xBound,zBound)
+    {
+        this.overlay.addStair(xBound,zBound);
+    }
 
         //
         // setup all the mesh buffers

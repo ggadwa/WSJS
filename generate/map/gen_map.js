@@ -50,9 +50,9 @@ class GenMapClass
 
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
         
-        this.HALLWAY_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.5;                 // intensity of hallway lights
-        this.DOOR_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*0.7;                    // intensity of lights over doors
-        this.WINDOW_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*3.0;                  // intensity of window light
+        this.HALLWAY_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.6;                 // intensity of hallway lights
+        this.DOOR_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.2;                    // intensity of lights over doors
+        this.WINDOW_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*3.5;                  // intensity of window light
         this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=map.ROOM_FLOOR_HEIGHT*0.3;         // how much to cut main room light for each window
 
         Object.seal(this);
