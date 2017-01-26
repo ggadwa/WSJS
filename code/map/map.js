@@ -580,6 +580,11 @@ class MapClass
     {
         this.overlay.addStair(xBound,zBound);
     }
+    
+    addOverlayDoor(xBound,zBound)
+    {
+        this.overlay.addDoor(xBound,zBound);
+    }
 
         //
         // setup all the mesh buffers

@@ -11,6 +11,9 @@ When interface created
 
 ToDos
 
+#### need room/room wall collisions to show as light blue
+#### add doors
+
 #### window rules
        - have a 4-boolean value to tell where window can be
        - extensions can put windows on opposite side of connection
@@ -18,8 +21,6 @@ ToDos
        - if window, no central light
 
 #### no outside type elements in higher extension rooms (computers for one, can't track extra connections)
-
-#### map display needs to blank out inside of map (too hard to see)
 
 #### end room big enough for boss?  boss monster?  need boss flag?
 

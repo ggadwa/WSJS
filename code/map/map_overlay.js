@@ -12,9 +12,10 @@ class MapOverlayClass
     {
         this.mapOverlayShader=new MapOverlayShaderClass();
 
-        this.quadList=[];
+        this.roomQuadList=[];
         this.roomLineList=[];
         this.extraLineList=[];
+        this.doorQuadList=[];
 
         this.mapOffsetX=0;
         this.mapOffsetZ=0;
@@ -26,9 +27,10 @@ class MapOverlayClass
         this.drawWid=0;
         this.drawHigh=0;
 
-        this.quadVertexPosBuffer=null;
+        this.roomQuadVertexPosBuffer=null;
         this.roomVertexPosBuffer=null;
         this.extraVertexPosBuffer=null;
+        this.doorQuadVertexPosBuffer=null;
         this.entityVertexPosBuffer=null;
 
         this.entityVertices=null;
@@ -46,9 +48,10 @@ class MapOverlayClass
         
         if (!this.mapOverlayShader.initialize()) return(false);
         
-        this.quadVertexPosBuffer=gl.createBuffer();
+        this.roomQuadVertexPosBuffer=gl.createBuffer();
         this.roomVertexPosBuffer=gl.createBuffer();
         this.extraVertexPosBuffer=gl.createBuffer();
+        this.doorQuadVertexPosBuffer=gl.createBuffer();
         this.entityVertexPosBuffer=gl.createBuffer();
         
         this.entityVertices=new Float32Array(6);
@@ -60,9 +63,10 @@ class MapOverlayClass
     {
         let gl=view.gl;
         
-        gl.deleteBuffer(this.quadVertexPosBuffer);
+        gl.deleteBuffer(this.roomQuadVertexPosBuffer);
         gl.deleteBuffer(this.roomVertexPosBuffer);
         gl.deleteBuffer(this.extraVertexPosBuffer);
+        gl.deleteBuffer(this.doorQuadVertexPosBuffer);
         gl.deleteBuffer(this.entityVertexPosBuffer);
         
         this.entityVertices=null;
@@ -73,31 +77,63 @@ class MapOverlayClass
         //
         // add lines to specific line lists
         //
-        
-    addLines(lineList,lines)
+    
+    isLineADuplicate(lineList,line)
     {
-        let n,k;
-        let isDup;
+        var n;
+        
+        for (n=0;n!==lineList.length;n++) {
+            if (lineList[n].equals(line)) return(n);
+        }
+        
+        return(-1);
+    }
+    
+    addRoomLines(lines,pushDupToExtra)
+    {
+        let n,dupIdx;
+        let line;
         
             // add to line list, removing duplicates
             
         for (n=0;n!==lines.length;n++) {
+            line=lines[n];
             
-                // check for dups
+            dupIdx=this.isLineADuplicate(this.roomLineList,line);
+            if (dupIdx!==-1) {
+                this.roomLineList.splice(dupIdx,1);
                 
-            isDup=false;
-            
-            for (k=0;k!==lineList.length;k++) {
-                if (lineList[k].equals(lines[n])) {
-                    isDup=true;
-                    lineList.splice(k,1);
-                    break;
+                if (pushDupToExtra) {
+                    if (this.isLineADuplicate(this.extraLineList,line)===-1) this.extraLineList.push(line);
+                }
+                else {
+                    dupIdx=this.isLineADuplicate(this.extraLineList,line);      // if we aren't pushing duplicates, clear any lines in duplicate list
+                    if (dupIdx!==-1) this.extraLineList.splice(dupIdx,1);
                 }
             }
+            else {
+                this.roomLineList.push(line);
+            }
+        }
+    }
+    
+    addExtraLines(lines)
+    {
+        let n,dupIdx;
+        let line;
+        
+            // add to line list, removing duplicates
             
-                // add it
-                
-            if (!isDup) lineList.push(lines[n]);
+        for (n=0;n!==lines.length;n++) {
+            line=lines[n];
+            
+            dupIdx=this.isLineADuplicate(this.extraLineList,line);
+            if (dupIdx!==-1) {
+                this.extraLineList.splice(dupIdx,1);
+            }
+            else {
+                this.extraLineList.push(lines[n]);
+            }
         }
     }
     
@@ -107,34 +143,36 @@ class MapOverlayClass
         
     addRoom(room)
     {
-        this.quadList.push(new wsRect(room.xBound.min,room.zBound.min,room.xBound.max,room.zBound.max));
-        this.addLines(this.roomLineList,room.createOverlayLineList());
+        this.roomQuadList.push(new wsRect(room.xBound.min,room.zBound.min,room.xBound.max,room.zBound.max));
+        this.addRoomLines(room.createOverlayLineList(),true);
     }
     
     addCloset(xBound,zBound)
     {
         let lines=[];
         
-        this.quadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
+        this.roomQuadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
         
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
-        this.addLines(this.roomLineList,lines);
+        this.addRoomLines(lines,false);
     }
     
     addConnection(xBound,zBound)
     {
         let lines=[];
         
+        this.roomQuadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
+        
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
-        this.addLines(this.roomLineList,lines);
+        this.addRoomLines(lines,false);
     }
     
     addPlatform(xBound,zBound)
@@ -146,7 +184,7 @@ class MapOverlayClass
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
         lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
         
-        this.addLines(this.extraLineList,lines);
+        this.addExtraLines(lines);
     }
     
     addLift(xBound,zBound)
@@ -159,21 +197,26 @@ class MapOverlayClass
         this.addPlatform(xBound,zBound);
     }
     
+    addDoor(xBound,zBound)
+    {
+        this.doorQuadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
+    }
+    
         //
         // precalc the drawing values
         //
     
     precalcDrawValues()
     {
-        let n,idx,line,rect,maxSize;
+        let n,idx,line,rect,maxSize,nQuad,nLine;
         let lft,top,rgt,bot;
         let xBound,yBound;
         let quadVertexList,roomVertexList,extraVertexList;
         let gl=view.gl;
-        let nQuad=this.quadList.length;
-        let nLine=this.roomLineList.length;
         
             // get the total size
+            
+        nLine=this.roomLineList.length;
             
         for (n=0;n!==nLine;n++) {
             line=this.roomLineList[n];
@@ -215,13 +258,15 @@ class MapOverlayClass
         this.drawX=(view.wid-5)-this.drawWid;
         this.drawY=Math.trunc((view.high-this.drawHigh)/2);
         
-            // create the background quad vertex buffer
+            // create the room quad vertex buffer
             
         idx=0;
+        
+        nQuad=this.roomQuadList.length;
         quadVertexList=new Float32Array(nQuad*12);
         
         for (n=0;n!==nQuad;n++) {
-            rect=this.quadList[n];
+            rect=this.roomQuadList[n];
             
             lft=((rect.lft-this.mapOffsetX)*this.mapScale)+this.drawX;
             top=(this.drawHigh-((rect.top-this.mapOffsetZ)*this.mapScale))+this.drawY;
@@ -243,13 +288,15 @@ class MapOverlayClass
             quadVertexList[idx++]=bot;
         }
         
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.quadVertexPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.roomQuadVertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,quadVertexList,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         
             // create the room vertex buffer
         
         idx=0;
+        
+        nLine=this.roomLineList.length;
         roomVertexList=new Float32Array(nLine*4);
         
         for (n=0;n!==nLine;n++) {
@@ -268,8 +315,8 @@ class MapOverlayClass
             // create the extra vertex buffer
         
         idx=0;
-        nLine=this.extraLineList.length;
         
+        nLine=this.extraLineList.length; 
         extraVertexList=new Float32Array(nLine*4);
         
         for (n=0;n!==nLine;n++) {
@@ -283,6 +330,40 @@ class MapOverlayClass
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,extraVertexList,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        
+            // create the door quad vertex buffer
+            
+        idx=0;
+        
+        nQuad=this.doorQuadList.length;
+        quadVertexList=new Float32Array(nQuad*12);
+        
+        for (n=0;n!==nQuad;n++) {
+            rect=this.doorQuadList[n];
+            
+            lft=((rect.lft-this.mapOffsetX)*this.mapScale)+this.drawX;
+            top=(this.drawHigh-((rect.top-this.mapOffsetZ)*this.mapScale))+this.drawY;
+            rgt=((rect.rgt-this.mapOffsetX)*this.mapScale)+this.drawX;
+            bot=(this.drawHigh-((rect.bot-this.mapOffsetZ)*this.mapScale))+this.drawY;
+            
+            quadVertexList[idx++]=lft;
+            quadVertexList[idx++]=top;
+            quadVertexList[idx++]=rgt;
+            quadVertexList[idx++]=top;
+            quadVertexList[idx++]=lft;
+            quadVertexList[idx++]=bot;
+            
+            quadVertexList[idx++]=rgt;
+            quadVertexList[idx++]=top;
+            quadVertexList[idx++]=rgt;
+            quadVertexList[idx++]=bot;
+            quadVertexList[idx++]=lft;
+            quadVertexList[idx++]=bot;
+        }
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.doorQuadVertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,quadVertexList,gl.STATIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
     }
     
@@ -302,19 +383,16 @@ class MapOverlayClass
         this.mapOverlayShader.drawStart();
         gl.disable(gl.DEPTH_TEST);
         
-            // background quads
+            // room quads
             
-        this.mapOverlayShader.drawColor(new wsColor(0.0,1.0,0.0));
+        this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,0.0));
             
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.quadVertexPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.roomQuadVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        //gl.drawArrays(gl.TRIANGLES,0,(this.quadList.length*6));
-        
-        gl.drawArrays(gl.LINE_LOOP,0,(this.quadList.length*6));
-        
+        gl.drawArrays(gl.TRIANGLES,0,(this.roomQuadList.length*6));
         
             // extra lines
-            
+  
         this.mapOverlayShader.drawColor(new wsColor(0.5,0.5,1.0));
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
@@ -329,6 +407,14 @@ class MapOverlayClass
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         gl.drawArrays(gl.LINES,0,(this.roomLineList.length*2));
         
+            // door quads
+            
+        this.mapOverlayShader.drawColor(new wsColor(1.0,0.2,0.2));
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.doorQuadVertexPosBuffer);
+        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        gl.drawArrays(gl.TRIANGLES,0,(this.doorQuadList.length*6));
+
             // entities
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.entityVertexPosBuffer);

@@ -78,7 +78,7 @@ class ViewClass
 
             // overlay drawing
 
-        this.drawOverlay=false;
+        this.drawOverlay=config.SHOW_OVERLAY_MAP;
 
             // view lighting
 
