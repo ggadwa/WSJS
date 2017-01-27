@@ -1,22 +1,17 @@
-attribute highp vec3 vertexPosition;
-attribute highp vec3 vertexNormal;
-attribute highp vec3 vertexTangent;
-attribute highp vec4 vertexAndLightmapUV;
+#version 300 es
+
+in highp vec3 vertexPosition;
+in highp vec3 vertexNormal;
+in highp vec3 vertexTangent;
+in highp vec4 vertexAndLightmapUV;
 
 uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 modelMatrix;
 uniform highp mat3 normalMatrix;
 
-struct lightType {
-    highp vec4 positionIntensity;
-    mediump vec4 colorExponent;
-};
-
-uniform lightType lights[24];
-
-varying highp vec3 eyeVector,eyePosition;
-varying highp vec4 fragUV;
-varying mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
+out highp vec3 eyeVector,eyePosition;
+out highp vec4 fragUV;
+out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 void main(void)
 {

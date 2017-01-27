@@ -1,13 +1,17 @@
+#version 300 es
+
 uniform lowp sampler2D baseTex;
 uniform lowp vec3 color;
 
-varying highp vec2 fragUV;
+in highp vec2 fragUV;
+
+out lowp vec4 outputPixel;
 
 void main(void)
 {
-    lowp vec4 tex=texture2D(baseTex,fragUV);
+    lowp vec4 tex=texture(baseTex,fragUV);
 
-    gl_FragColor.rgb=color;       // treat as gray scale, use that for alpha, fill rest with color
-    gl_FragColor.a=tex.r;
+    outputPixel.rgb=color;       // treat as gray scale, use that for alpha, fill rest with color
+    outputPixel.a=tex.r;
 }
 

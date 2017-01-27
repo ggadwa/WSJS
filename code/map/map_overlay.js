@@ -347,6 +347,9 @@ class MapOverlayClass
             rgt=((rect.rgt-this.mapOffsetX)*this.mapScale)+this.drawX;
             bot=(this.drawHigh-((rect.bot-this.mapOffsetZ)*this.mapScale))+this.drawY;
             
+            if (Math.abs(rgt-lft)<2) rgt=lft+2;
+            if (Math.abs(bot-top)<2) bot=top+2;
+            
             quadVertexList[idx++]=lft;
             quadVertexList[idx++]=top;
             quadVertexList[idx++]=rgt;
@@ -390,7 +393,7 @@ class MapOverlayClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.roomQuadVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         gl.drawArrays(gl.TRIANGLES,0,(this.roomQuadList.length*6));
-        
+
             // extra lines
   
         this.mapOverlayShader.drawColor(new wsColor(0.5,0.5,1.0));
@@ -406,7 +409,7 @@ class MapOverlayClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         gl.drawArrays(gl.LINES,0,(this.roomLineList.length*2));
-        
+
             // door quads
             
         this.mapOverlayShader.drawColor(new wsColor(1.0,0.2,0.2));

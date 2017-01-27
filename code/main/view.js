@@ -84,7 +84,7 @@ class ViewClass
 
         this.ambient=new wsColor(0.0,0.0,0.0);
 
-        this.LIGHT_COUNT=24;
+        this.MAX_LIGHT_COUNT=24;
         this.lights=[];
 
             // frustum planes
@@ -207,10 +207,9 @@ class ViewClass
         
             // get the gl context
 
-        this.gl=this.canvas.getContext("webgl",glOptions);
-        if (this.gl===null) this.gl=this.canvas.getContext("experimental-webgl",glOptions);
+        this.gl=this.canvas.getContext("webgl2",glOptions);
         if (this.gl===null) {
-            alert('WebGL not available, try a newer browser');
+            alert('WebGL2 not available, try a newer browser');
             return(false);
         }
         
@@ -608,7 +607,7 @@ class ViewClass
 
         map.createViewLightsFromMapLights();
         
-        for (n=0;n!==this.LIGHT_COUNT;n++) {
+        for (n=0;n!==this.MAX_LIGHT_COUNT;n++) {
             light=this.lights[n];
             if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
         }

@@ -242,10 +242,20 @@ class GenMapClass
             // determine the decoration type
         
         if (liquid) {
-            decorationType=mapRoomConstants.ROOM_DECORATION_NONE;
+            decorationType=mapRoomConstants.ROOM_DECORATION_LIQUID_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LIQUID_LIST.length)];
         }
         else {
-            decorationType=genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_COUNT);
+            switch (level) {
+                case mapRoomConstants.LEVEL_LOWER:
+                    decorationType=mapRoomConstants.ROOM_DECORATION_LOWER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LOWER_LIST.length)];
+                    break;
+                case mapRoomConstants.LEVEL_HIGHER:
+                    decorationType=mapRoomConstants.ROOM_DECORATION_HIGHER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_HIGHER_LIST.length)];
+                    break;
+                default:
+                    decorationType=mapRoomConstants.ROOM_DECORATION_PATH_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_PATH_LIST.length)];
+                    break;
+            }
         }
         
             // top of room
@@ -655,8 +665,6 @@ class GenMapClass
         let connectOffset;
         let xBound,zBound;
         
-        level=mapRoomConstants.LEVEL_HIGHER;        // supergumba -- testing
-        
             // get random block size for room
             // and make sure it stays under the max
             // blocks for room
@@ -729,6 +737,10 @@ class GenMapClass
         
         room=map.rooms[roomIdx];
         
+            // mark where windows can be
+        
+        room.markExtensionLegalWindowSide(connectSide,lastRoom);
+        
             // finally add the liquid
         
         if (room.liquid) map.addLiquid(new MapLiquidClass(map.getTexture(map.TEXTURE_TYPE_LIQUID),room));
@@ -763,12 +775,12 @@ class GenMapClass
                 // extensions on side of path direction
             
             if (room.extensionDirection===mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
-                /* if (genRandom.randomPercentage(0.5)) supergumba -- testing */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
-                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
             }
             else {
-                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
-                /* if (genRandom.randomPercentage(0.5)) */ this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
             }
         }
     }

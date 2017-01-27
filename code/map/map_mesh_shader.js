@@ -20,7 +20,7 @@ class MapMeshShaderClass extends ShaderClass
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;
         this.normalMatrixUniform=null;
-
+        
         this.shineFactorUniform=null;
         this.ambientUniform=null;
 
@@ -58,8 +58,8 @@ class MapMeshShaderClass extends ShaderClass
 
         this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');    
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
-
-        for (n=0;n!==view.LIGHT_COUNT;n++) {
+        
+        for (n=0;n!==view.MAX_LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
 
             name='lights['+n+']';
@@ -107,8 +107,8 @@ class MapMeshShaderClass extends ShaderClass
             // and the second vec4 is r,g,b,exponent (color and exponent)
 
         gl.uniform3f(this.ambientUniform,view.ambient.r,view.ambient.g,view.ambient.b);
-
-        for (n=0;n!==view.LIGHT_COUNT;n++) {
+        
+        for (n=0;n!==view.MAX_LIGHT_COUNT;n++) {
 
             light=this.lights[n];
             viewLight=view.lights[n];

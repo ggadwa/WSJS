@@ -1,9 +1,13 @@
+#version 300 es
+
 uniform lowp sampler2D baseTex;
 
-varying highp vec2 fragUV;
+in highp vec2 fragUV;
+
+out lowp vec4 outputPixel;
 
 void main(void)
 {
-    gl_FragColor=texture2D(baseTex,fragUV);;
+    outputPixel=texture(baseTex,fragUV);;
 }
 

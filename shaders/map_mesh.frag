@@ -1,3 +1,5 @@
+#version 300 es
+
 uniform lowp sampler2D baseTex;
 uniform lowp sampler2D normalTex;
 uniform lowp sampler2D specularTex;
@@ -13,9 +15,11 @@ struct lightType {
 
 uniform lightType lights[24];
 
-varying highp vec3 eyeVector,eyePosition;
-varying highp vec4 fragUV;
-varying mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
+in highp vec3 eyeVector,eyePosition;
+in highp vec4 fragUV;
+in mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
+
+out lowp vec4 outputPixel;
 
 void main(void)
 {
@@ -26,24 +30,24 @@ void main(void)
         // the default light color is the lightmap
         // plus the ambient
 
-    lowp vec3 lightCol=texture2D(lightmapTex,fragUV.zw).rgb+ambient;
+    lowp vec3 lightCol=texture(lightmapTex,fragUV.zw).rgb+ambient;
 
         // the texture fragment
 
-    lowp vec4 tex=texture2D(baseTex,fragUV.xy);
+    lowp vec4 tex=texture(baseTex,fragUV.xy);
 
         // the starting bump map
         // since it will be created by going through the
         // lights, we need a default value
 
     highp vec3 bumpLightVertexVector;
-    lowp vec3 bumpMap=normalize((texture2D(normalTex,fragUV.xy).rgb*2.0)-1.0);
+    lowp vec3 bumpMap=normalize((texture(normalTex,fragUV.xy).rgb*2.0)-1.0);
     lowp float bump=dot(vec3(0.33,0.33,0.33),bumpMap);
 
         // the starting spec map
 
     lowp vec3 spec=vec3(0.0,0.0,0.0),specHalfVector;
-    lowp vec3 specMap=texture2D(specularTex,fragUV.xy).rgb;
+    lowp vec3 specMap=texture(specularTex,fragUV.xy).rgb;
     lowp float specFactor;
 
         // lights
@@ -93,11 +97,12 @@ void main(void)
 
         // finally create the pixel
 
-    //gl_FragColor.rgb=lightCol;          // light only test
-    //gl_FragColor.rgb=texture2D(lightmapTex,fragUV.zw).rgb; // light map test
-    //gl_FragColor.rgb=tex.rgb*texture2D(lightmapTex,fragUV.zw).rgb; // texture + light map test
-    //gl_FragColor.rgb=tex.rgb*pixelAmbient;      // texture + light map + bump
-    gl_FragColor.rgb=(tex.rgb*pixelAmbient)+spec;
-    gl_FragColor.a=tex.a;
+    //outputPixel.rgb=lightCol;          // light only test
+    //outputPixel.rgb=texture(lightmapTex,fragUV.zw).rgb; // light map test
+    //outputPixel.rgb=tex.rgb*texture(lightmapTex,fragUV.zw).rgb; // texture + light map test
+    //outputPixel.rgb=tex.rgb*pixelAmbient;      // texture + light map + bump
+
+    outputPixel.rgb=(tex.rgb*pixelAmbient)+spec;
+    outputPixel.a=tex.a;
 }
 

@@ -114,7 +114,7 @@ class GenRoomHallwayClass
         this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zBound);
         meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,map.MESH_FLAG_DOOR);
         
-        map.addOverlayStair(xDoorBound,zBound);
+        map.addOverlayDoor(xDoorBound,zBound);
         
             // and the movement
         
@@ -209,7 +209,7 @@ class GenRoomHallwayClass
         this.createSingleCeilingZ(idx,vertexList,xBound,yBound.max,zDoorBound);
         meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,map.MESH_FLAG_DOOR);
         
-        map.addOverlayStair(xBound,zDoorBound);
+        map.addOverlayDoor(xBound,zDoorBound);
         
             // and the movement
         

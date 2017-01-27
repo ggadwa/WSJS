@@ -142,9 +142,14 @@ class GenRoomWindowClass
         while ((count<windowCount) && (failCount<(windowCount*10))) {
             
                 // find a connection side, skip if
-                // there's a door on this side
+                // there's a door or windows no legal on this side
                 
             connectSide=genRandom.randomIndex(4);
+            
+            if (!room.legalWindowSide[connectSide]) {
+                failCount++;
+                continue;
+            }
             
             if (room.isDoorOnConnectionSide(connectSide)) {
                 failCount++;

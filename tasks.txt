@@ -2,31 +2,26 @@ ES6
     [ ] modularize the code (do genRandom first)
     [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass
 
-WebGL2
-    [ ] vertex array objects
-
 When interface created
     [ ] close gl
     [ ] all the object release()
 
+
+WebGL2
+    [ ] vertex array objects
+    [ ] uniform buffers for lights & matrixes
+
+https://webgl2fundamentals.org/webgl/lessons/webgl1-to-webgl2.html
+https://webgl2fundamentals.org/webgl/lessons/webgl2-whats-new.html
+
+
 ToDos
 
-#### need room/room wall collisions to show as light blue
-#### add doors
-
-#### window rules
-       - have a 4-boolean value to tell where window can be
-       - extensions can put windows on opposite side of connection
-       - path rooms can put windows on connection sides that don't have extensions
-       - if window, no central light
-
-#### no outside type elements in higher extension rooms (computers for one, can't track extra connections)
-
+#### liquid in overlay
 #### end room big enough for boss?  boss monster?  need boss flag?
 
 #### better internal walls
 #### office decorations?
-#### position windows so they don't face other rooms
 #### frame doors?
 
 #### ledges can be taller

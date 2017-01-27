@@ -1,8 +1,12 @@
+#version 300 es
+
 uniform lowp vec3 color;
+
+out lowp vec4 outputPixel;
 
 void main(void)
 {
-    gl_FragColor.rgb=color;
-    gl_FragColor.a=1.0;
+    outputPixel.rgb=color;
+    outputPixel.a=1.0;
 }
 

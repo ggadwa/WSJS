@@ -429,7 +429,7 @@ class MapClass
         this.cameraVector.rotateX(null,view.camera.angle.x);
         this.cameraVector.rotateY(null,view.camera.angle.y);
         
-            // find the view.LIGHT_COUNT closest lights
+            // find the view.MAX_LIGHT_COUNT closest lights
             // and put them into the view list
 
         view.lights=[];
@@ -456,11 +456,11 @@ class MapClass
                 // add the light
                 
             if (idx===-1) {
-                if (view.lights.length<view.LIGHT_COUNT) view.lights.push(light);
+                if (view.lights.length<view.MAX_LIGHT_COUNT) view.lights.push(light);
             }
             else {
                 view.lights.splice(idx,0,light);
-                if (view.lights.length>view.LIGHT_COUNT) view.lights.pop();
+                if (view.lights.length>view.MAX_LIGHT_COUNT) view.lights.pop();
             }
             
             light.usedInList=true;
@@ -468,7 +468,7 @@ class MapClass
         
             // fill in any missing lights
 
-        while (view.lights.length<view.LIGHT_COUNT) {
+        while (view.lights.length<view.MAX_LIGHT_COUNT) {
             view.lights.push(null);
         }
     }

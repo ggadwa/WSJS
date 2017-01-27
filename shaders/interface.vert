@@ -1,4 +1,6 @@
-attribute highp vec3 vertexPosition;
+#version 300 es
+
+in highp vec3 vertexPosition;
 
 uniform highp mat4 orthoMatrix;
 

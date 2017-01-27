@@ -1,9 +1,11 @@
-attribute highp vec3 vertexPosition;
-attribute highp vec2 vertexUV;
+#version 300 es
+
+in highp vec3 vertexPosition;
+in highp vec2 vertexUV;
 
 uniform highp mat4 orthoMatrix;
 
-varying highp vec2 fragUV;
+out highp vec2 fragUV;
 
 void main(void)
 {

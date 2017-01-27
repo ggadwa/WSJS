@@ -36,7 +36,10 @@ class MapRoomConstantsClass
         this.ROOM_DECORATION_EQUIPMENT=3;
         this.ROOM_DECORATION_WALLS=4;
 
-        this.ROOM_DECORATION_COUNT=5;
+        this.ROOM_DECORATION_PATH_LIST=[this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_MACHINES,this.ROOM_DECORATION_EQUIPMENT,this.ROOM_DECORATION_WALLS];
+        this.ROOM_DECORATION_LOWER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_MACHINES,this.ROOM_DECORATION_EQUIPMENT];
+        this.ROOM_DECORATION_HIGHER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE];
+        this.ROOM_DECORATION_LIQUID_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS];
     }
 }
 
@@ -90,6 +93,7 @@ class MapRoomClass
         this.edgeGrid=null;
         
         this.connectSideHasDoor=[false,false,false,false];      // track which connections had a door
+        this.legalWindowSide=[true,true,true,true];             // track where windows can be
         
         this.yOpenBound=new wsBound(0,0);
         
@@ -259,6 +263,52 @@ class MapRoomClass
     isDoorOnConnectionSide(connectSide)
     {
         return(this.connectSideHasDoor[connectSide]);
+    }
+    
+        //
+        // window spots
+        //
+        
+    markExtensionLegalWindowSide(connectSide,connectedPathRoom)
+    {
+        switch (connectSide) {
+            
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=false;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
+                
+                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=false;
+                return;
+                
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=false;
+                
+                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=false;
+                return;
+                
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=false;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
+                
+                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=false;
+                return;
+            
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=false;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=true;
+                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
+                
+                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=false;
+                return;
+        }
     }
     
         //

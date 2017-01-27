@@ -34,7 +34,7 @@ class MainClass
             // next step
 
         view.loadingScreenUpdate();
-        view.loadingScreenAddString('Initialized WebGL');
+        view.loadingScreenAddString('Initialized WebGL2');
         view.loadingScreenAddString('Initializing Internal Structures');
         view.loadingScreenDraw(null);
 
