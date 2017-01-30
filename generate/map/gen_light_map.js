@@ -106,7 +106,7 @@ class GetLightmapLastBlockClass
 
 class GenLightmapClass
 {
-    constructor(generateLightmap,callbackFunc)
+    constructor(callbackFunc)
     {
             // constants
             
@@ -118,12 +118,6 @@ class GenLightmapClass
 
         this.LIGHTMAP_RENDER_MARGIN=4;                // margin around each light map triangle
         this.LIGHTMAP_BLUR_COUNT=3;
-
-            // generating light maps flag, to tell
-            // if we generate full light maps or just
-            // white light maps because we aren't generating them
-            
-        this.generateLightmap=generateLightmap;
 
             // chunk is one block available to draw a light map
 
@@ -793,39 +787,24 @@ class GenLightmapClass
         mesh=map.meshes[meshIdx];
         nTrig=mesh.trigCount;
         
-            // if we aren't generating lightmaps,
-            // then always use the same single lightmap
-            // and the default black chunk
-            
-        if (!this.generateLightmap) {            
-            lightmapIdx=0;
-            if (this.lightmapList.length===0) this.lightmapList[0]=new GenLightmapBitmapClass(this);     // have no lightmaps yet, so make one
+            // find a lightmap to put mesh into
+            // we do this by checking if we have enough
+            // room for the set of triangles
+
+        lightmapIdx=-1;
+
+        for (n=0;n!==this.lightmapList.length;n++) {
+            if ((this.LIGHTMAP_CHUNK_PER_TEXTURE-this.lightmapList[n].chunkIdx)>nTrig) {
+                lightmapIdx=n;
+                break;
+            }
         }
-        
-            // else we need to pack triangles
-            // into lightmaps
-            
-        else {
 
-                // find a lightmap to put mesh into
-                // we do this by checking if we have enough
-                // room for the set of triangles
+            // if we didn't find a lightmap, make a new one
 
-            lightmapIdx=-1;
-
-            for (n=0;n!==this.lightmapList.length;n++) {
-                if ((this.LIGHTMAP_CHUNK_PER_TEXTURE-this.lightmapList[n].chunkIdx)>nTrig) {
-                    lightmapIdx=n;
-                    break;
-                }
-            }
-
-                // if we didn't find a lightmap, make a new one
-
-            if (lightmapIdx===-1) {
-                lightmapIdx=this.lightmapList.length;
-                this.lightmapList[lightmapIdx]=new GenLightmapBitmapClass(this);
-            }
+        if (lightmapIdx===-1) {
+            lightmapIdx=this.lightmapList.length;
+            this.lightmapList[lightmapIdx]=new GenLightmapBitmapClass(this);
         }
         
             // starting chunk and context
@@ -833,32 +812,16 @@ class GenLightmapClass
         lightBitmap=this.lightmapList[lightmapIdx];
         chunkIdx=lightBitmap.chunkIdx;
         
-            // if no light map, then just create
-            // UVs for the top-left white map (in a real
-            // generation, this would be the black map but we
-            // just reuse the UV here.)
-            
-        if (!this.generateLightmap) {
-            for (n=0;n!==mesh.vertexCount;n++) {
-                mesh.vertexList[n].lightmapUV.setFromPoint(this.blackChunkUV);
-            }
-        }
+            // write polys to chunk
+            // only advance the chunk if this trig
+            // hit a light, otherwise it's using the
+            // all-black chunk 0
 
-            // otherwise render the triangles
+        for (n=0;n!==nTrig;n++) {
+            lft=(chunkIdx%this.LIGHTMAP_CHUNK_SPLIT)*this.LIGHTMAP_CHUNK_SIZE;
+            top=Math.trunc(chunkIdx/this.LIGHTMAP_CHUNK_SPLIT)*this.LIGHTMAP_CHUNK_SIZE;
 
-        else {
-            
-                // write polys to chunk
-                // only advance the chunk if this trig
-                // hit a light, otherwise it's using the
-                // all-black chunk 0
-                
-            for (n=0;n!==nTrig;n++) {
-                lft=(chunkIdx%this.LIGHTMAP_CHUNK_SPLIT)*this.LIGHTMAP_CHUNK_SIZE;
-                top=Math.trunc(chunkIdx/this.LIGHTMAP_CHUNK_SPLIT)*this.LIGHTMAP_CHUNK_SIZE;
-
-                if (this.writePolyToChunk(lightBitmap,meshIdx,n,lft,top)) chunkIdx++;
-            }
+            if (this.writePolyToChunk(lightBitmap,meshIdx,n,lft,top)) chunkIdx++;
         }
         
             // mark off the chunks we used
@@ -887,7 +850,7 @@ class GenLightmapClass
         view.loadingScreenDraw(meshIdx/(map.meshes.length+2.0));
         setTimeout(this.createLightmapForMesh.bind(this,meshIdx),1);
     }
-
+    
         //
         // create lightmap
         // creation has to be done by a timer because this
@@ -962,6 +925,46 @@ class GenLightmapClass
         }
 */
             // finish with the callback
+
+        view.loadingScreenDraw(1.0);
+        this.callbackFunc();
+    }
+    
+        //
+        // special version that creates simple all white
+        // lightmap for the no-light map switch
+        //
+        
+    createNone()
+    {
+        let n,k,mesh;
+        let nMesh=map.meshes.length;
+        
+        view.loadingScreenDraw(0.33);
+        
+            // one simple B&W lightmap
+            
+        this.lightmapList[0]=new GenLightmapBitmapClass(this);
+        
+        for (n=0;n!==nMesh;n++) {
+            mesh=map.meshes[n];
+
+            for (k=0;k!==mesh.vertexCount;k++) {
+                mesh.vertexList[k].lightmapUV.setFromPoint(this.blackChunkUV);
+            }
+       }
+       
+       view.loadingScreenDraw(0.66);
+       
+       this.lightmapList[0].fixCanvasImageData();
+       map.addLightmapBitmap(new BitmapClass(this.lightmapList[0].canvas,null,null,1.0,0.0));
+       
+        for (n=0;n!==nMesh;n++) {
+            mesh=map.meshes[n];
+            mesh.lightmap=map.getLightmapBitmap(0);
+        }
+       
+            // finished 
 
         view.loadingScreenDraw(1.0);
         this.callbackFunc();

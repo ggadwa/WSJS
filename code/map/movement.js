@@ -28,7 +28,7 @@ class MovementClass
         this.looping=looping;
         this.approachDistance=approachDistance;
         
-        this.currentMoveIdx=-1;
+        this.currentMoveIdx=0;
         this.nextMoveNextTick=0;
         
         this.moving=looping;            // looping movements are always moving

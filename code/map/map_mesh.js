@@ -686,7 +686,6 @@ class MapMeshClass
             this.drawVertices[vIdx++]=v.position.z;
         }
 
-        this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
 

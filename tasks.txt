@@ -6,9 +6,8 @@ When interface created
     [ ] close gl
     [ ] all the object release()
 
-
 WebGL2
-    [ ] vertex array objects
+    [ ] vertex array objects (liquids, models, map)
     [ ] uniform buffers for lights & matrixes
 
 https://webgl2fundamentals.org/webgl/lessons/webgl1-to-webgl2.html
@@ -17,10 +16,13 @@ https://webgl2fundamentals.org/webgl/lessons/webgl2-whats-new.html
 
 ToDos
 
+#### better internal walls
+      -> start randomly, can only continue wall if spot has 0 or 1 walls on it
+
 #### liquid in overlay
 #### end room big enough for boss?  boss monster?  need boss flag?
 
-#### better internal walls
+
 #### office decorations?
 #### frame doors?
 

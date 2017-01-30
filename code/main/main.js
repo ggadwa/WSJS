@@ -100,8 +100,14 @@ class MainClass
             // light maps are a long running
             // process so we need a callback
 
-        let genLightmap=new GenLightmapClass(config.MAP_GENERATE_LIGHTMAP,this.initBuildLightmapFinish.bind(this));
-        genLightmap.create();
+        let genLightmap=new GenLightmapClass(this.initBuildLightmapFinish.bind(this));
+        
+        if (config.MAP_GENERATE_LIGHTMAP) {
+            genLightmap.create();
+        }
+        else {
+            genLightmap.createNone();
+        }
     }
 
     initBuildLightmapFinish()
