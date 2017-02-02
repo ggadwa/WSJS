@@ -1,6 +1,6 @@
 ES6
     [ ] modularize the code (do genRandom first)
-    [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass
+    [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass (search all constants)
 
 When interface created
     [ ] close gl
@@ -10,18 +10,17 @@ WebGL2
     [ ] vertex array objects (liquids, models, map)
     [ ] uniform buffers for lights & matrixes
 
-https://webgl2fundamentals.org/webgl/lessons/webgl1-to-webgl2.html
-https://webgl2fundamentals.org/webgl/lessons/webgl2-whats-new.html
-
 
 ToDos
 
 #### better internal walls
       -> start randomly, can only continue wall if spot has 0 or 1 walls on it
+      -> or by pattern?
 
 #### liquid in overlay
 #### end room big enough for boss?  boss monster?  need boss flag?
 
+#### eventuall remove getDecorationCount() -- this can't work for all of them
 
 #### office decorations?
 #### frame doors?

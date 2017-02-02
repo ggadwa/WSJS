@@ -175,6 +175,11 @@ class MapOverlayClass
         this.addRoomLines(lines,false);
     }
     
+    addDecorationWall(x,z,x2,z2)
+    {
+        this.addRoomLines([new ws2DLine(new ws2DIntPoint(x,z),new ws2DIntPoint(x2,z2))]);
+    }
+    
     addPlatform(xBound,zBound)
     {
         let lines=[];

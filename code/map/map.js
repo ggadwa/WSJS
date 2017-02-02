@@ -566,6 +566,11 @@ class MapClass
         this.overlay.addConnection(xBound,zBound);
     };
     
+    addOverlayDecorationWall(x,z,x2,z2)
+    {
+        this.overlay.addDecorationWall(x,z,x2,z2);
+    }
+    
     addOverlayPlatform(xBound,zBound)
     {
         this.overlay.addPlatform(xBound,zBound);
