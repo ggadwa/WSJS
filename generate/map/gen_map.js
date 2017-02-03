@@ -41,6 +41,7 @@ class GenMapClass
         
         this.ROOM_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
         this.ROOM_LIGHT_FACTOR_EXTRA=0.3;               // random addition to light factor above
+        this.ROOM_LIGHT_PER_STORY_BOOST=0.1;            // add in for each extra story
 
         this.ROOM_LIGHT_EXPONENT_MINIMUM=1.0;           // minimum light exponent (0.0 is completely hard light with no fall off)
         this.ROOM_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add
@@ -377,6 +378,7 @@ class GenMapClass
             // intensity
         
         intensity=Math.max(room.xBound.getSize(),room.yBound.getSize(),room.zBound.getSize());
+        intensity+=(room.storyCount-1)*this.ROOM_LIGHT_PER_STORY_BOOST;
         if (!config.SIMPLE_TEST_MAP) intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
         
             // create the light
@@ -868,7 +870,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            room.decorationType=mapRoomConstants.ROOM_DECORATION_WALLS;  // supergumba -- testing
+            //room.decorationType=mapRoomConstants.ROOM_DECORATION_CUBICALS;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case mapRoomConstants.ROOM_DECORATION_PILLARS:
@@ -887,8 +889,8 @@ class GenMapClass
                     if (equipment===null) equipment=new GenRoomDecorationEquipmentClass();
                     equipment.create(room);
                     break;
-                case mapRoomConstants.ROOM_DECORATION_WALLS:
-                    if (walls===null) walls=new GenRoomDecorationWallsClass();
+                case mapRoomConstants.ROOM_DECORATION_CUBICALS:
+                    if (walls===null) walls=new GenRoomDecorationCubicalsClass();
                     walls.create(room);
                     break;
                 

@@ -13,14 +13,10 @@ WebGL2
 
 ToDos
 
-#### better internal walls
-      -> start randomly, can only continue wall if spot has 0 or 1 walls on it
-      -> or by pattern?
-
 #### liquid in overlay
-#### end room big enough for boss?  boss monster?  need boss flag?
+#### end room big enough for boss?  boss monster?  need boss flag? (config.MONSTER_BOSS)
 
-#### eventuall remove getDecorationCount() -- this can't work for all of them
+#### eventually remove getDecorationCount() -- this can't work for all of them
 
 #### office decorations?
 #### frame doors?
