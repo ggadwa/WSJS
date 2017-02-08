@@ -13,6 +13,11 @@ WebGL2
 
 ToDos
 
+#### cubicles are still touching each other in places
+#### for computers, make computer 50% of time, 25% for control panel or junction box
+#### window needs own texture (frame texture)
+#### platforms always extend to parent room
+
 #### liquid in overlay
 #### end room big enough for boss?  boss monster?  need boss flag? (config.MONSTER_BOSS)
 

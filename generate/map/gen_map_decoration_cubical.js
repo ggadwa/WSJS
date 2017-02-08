@@ -21,7 +21,17 @@ class GenRoomDecorationCubicalsClass
     {
         let n,dx,dz;
         let xBound,zBound;
+        let skipIdx;
         let skipWall=genRandom.randomIndex(4);
+        
+            // skip index
+            
+        if ((skipWall===mapRoomConstants.ROOM_SIDE_LEFT) || (skipWall===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            skipIdx=genRandom.randomIndex(rect.bot-rect.top);
+        }
+        else {
+            skipIdx=genRandom.randomIndex(rect.rgt-rect.lft);
+        }
         
             // left and right walls
             
@@ -29,14 +39,14 @@ class GenRoomDecorationCubicalsClass
             dz=room.zBound.min+(n*map.ROOM_BLOCK_WIDTH);
             zBound=new wsBound(dz,(dz+map.ROOM_BLOCK_WIDTH));
             
-            if (skipWall!==mapRoomConstants.ROOM_SIDE_LEFT) {
+            if (!((skipWall===mapRoomConstants.ROOM_SIDE_LEFT) && (skipIdx===n))) {
                 dx=room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH);
                 xBound=new wsBound(dx,(dx+wid));
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
                 map.addOverlayDecorationWall(dx,dz,dx,(dz+map.ROOM_BLOCK_WIDTH));
             }
             
-            if (skipWall!==mapRoomConstants.ROOM_SIDE_RIGHT) {
+            if (!((skipWall===mapRoomConstants.ROOM_SIDE_RIGHT) && (skipIdx===n))) {
                 dx=room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH);
                 xBound=new wsBound((dx-wid),dx);
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
@@ -50,14 +60,14 @@ class GenRoomDecorationCubicalsClass
             dx=room.xBound.min+(n*map.ROOM_BLOCK_WIDTH);
             xBound=new wsBound(dx,(dx+map.ROOM_BLOCK_WIDTH));
             
-            if (skipWall!==mapRoomConstants.ROOM_SIDE_TOP) {
+            if (!((skipWall===mapRoomConstants.ROOM_SIDE_TOP) && (skipIdx===n))) {
                 dz=room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH);
                 zBound=new wsBound(dz,(dz+wid));
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
                 map.addOverlayDecorationWall(dx,dz,(dx+map.ROOM_BLOCK_WIDTH),dz);
             }
             
-            if (skipWall!==mapRoomConstants.ROOM_SIDE_BOTTOM) {
+            if (!((skipWall===mapRoomConstants.ROOM_SIDE_BOTTOM) && (skipIdx===n))) {
                 dz=room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH);
                 zBound=new wsBound((dz-wid),dz);
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
@@ -74,7 +84,8 @@ class GenRoomDecorationCubicalsClass
     createRandomCubicals(room)
     {
         let x,z,x2,z2,hit;
-        let wid,high,startWid,startHigh,xBlock,zBlock;
+        let wid,high,startWid,startHigh;
+        let xBlockStart,xBlockEnd,zBlockStart,zBlockEnd;
         let xSize=room.xBlockSize-2;
         let zSize=room.zBlockSize-2;
         let cubes=[];
@@ -131,6 +142,14 @@ class GenRoomDecorationCubicalsClass
                 if (grid[((z+high)*xSize)+x]!==0) break;
                 high++;
             }
+            
+                // if wid or high === 0, then skip it
+                // (possibly because we collided with another 
+                
+            if ((wid===0) || (high===0)) {
+            //    grid[(z*xSize)+x]=1;
+            //    continue;
+            }
 
                 // create the cubical which is always
                 // 1 over because we are leaving a gutter
@@ -140,15 +159,19 @@ class GenRoomDecorationCubicalsClass
             
                 // always block off +1 so there's a corridor
                 // in between
-                
-            xBlock=(x+1)+wid;
-            if (xBlock>xSize) xBlock=xSize;
             
-            zBlock=(z+1)+high;
-            if (zBlock>zSize) zBlock=zSize;
+            xBlockStart=(x===0)?0:(x-1);
+            
+            xBlockEnd=(x+1)+wid;
+            if (xBlockEnd>xSize) xBlockEnd=xSize;
+            
+            zBlockStart=(z===0)?0:(z-1);
+            
+            zBlockEnd=(z+1)+high;
+            if (zBlockEnd>zSize) zBlockEnd=zSize;
                 
-            for (z2=z;z2<zBlock;z2++) {
-                for (x2=x;x2<xBlock;x2++) {
+            for (z2=zBlockStart;z2<zBlockEnd;z2++) {
+                for (x2=xBlockStart;x2<xBlockEnd;x2++) {
                     grid[(z2*xSize)+x2]=1;
                 }
             }
