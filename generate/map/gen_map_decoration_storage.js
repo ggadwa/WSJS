@@ -162,9 +162,10 @@ class GenRoomDecorationStorageClass
 
     create(room)
     {
-        let n,pos,high,pieceCount;
-        
-        pieceCount=room.getDecorationCount();
+        let n,pos,high;
+        let startCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.05);
+        let extraCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.15);
+        let pieceCount=genRandom.randomInt(startCount,extraCount);
         
             // make all pieces in the room have
             // the same size based on height

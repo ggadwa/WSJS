@@ -135,8 +135,14 @@ class GenRoomDecorationMachineClass
         pipeHigh=Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3);
 
         boundY=new wsBound((pnt.y-pipeHigh),(pnt.y-map.ROOM_FLOOR_HEIGHT));
-        pipeBoundY=new wsBound(pnt.y,(pnt.y-pipeHigh));
-
+        
+        if (genRandom.randomPercentage(0.5)) {
+            pipeBoundY=new wsBound((pnt.y-pipeHigh),pnt.y);
+        }
+        else {
+            pipeBoundY=new wsBound(room.yBound.min,(pnt.y-pipeHigh));
+        }
+        
             // the junction
             
         switch (dir) {
@@ -192,12 +198,13 @@ class GenRoomDecorationMachineClass
         
         switch (genRandom.randomIndex(4)) {
             case 0:
-                this.addComputer(room,pnt,dir);
-                break;
             case 1:
-                this.addPanel(room,pnt,dir);
+                this.addComputer(room,pnt,dir);         // appears twice as much as others
                 break;
             case 2:
+                this.addPanel(room,pnt,dir);
+                break;
+            case 3:
                 this.addJunction(room,pnt,dir);
                 break;
         }

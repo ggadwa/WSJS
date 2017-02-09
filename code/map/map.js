@@ -38,12 +38,12 @@ class MapClass
         
         this.TEXTURE_TYPE_WALL=0;
         this.TEXTURE_TYPE_FLOOR=1;
-        this.TEXTURE_TYPE_FLOOR=2;
-        this.TEXTURE_TYPE_CEILING=3;
-        this.TEXTURE_TYPE_PLATFORM=4;
-        this.TEXTURE_TYPE_PILLAR=5;
-        this.TEXTURE_TYPE_METAL=6;
-        this.TEXTURE_TYPE_DOOR=7;
+        this.TEXTURE_TYPE_CEILING=2;
+        this.TEXTURE_TYPE_PLATFORM=3;
+        this.TEXTURE_TYPE_PILLAR=4;
+        this.TEXTURE_TYPE_METAL=5;
+        this.TEXTURE_TYPE_DOOR=6;
+        this.TEXTURE_TYPE_FRAME=7;
         this.TEXTURE_TYPE_COMPUTER=8;
         this.TEXTURE_TYPE_PANEL=9;
         this.TEXTURE_TYPE_BOX=10;
@@ -145,6 +145,7 @@ class MapClass
                     break;
                     
                 case this.TEXTURE_TYPE_DOOR:
+                case this.TEXTURE_TYPE_FRAME:
                     this.textureBitmapList[textureType]=this.genBitmapDoor.generateRandom(false);
                     break;
                     

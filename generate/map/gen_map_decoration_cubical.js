@@ -27,10 +27,10 @@ class GenRoomDecorationCubicalsClass
             // skip index
             
         if ((skipWall===mapRoomConstants.ROOM_SIDE_LEFT) || (skipWall===mapRoomConstants.ROOM_SIDE_RIGHT)) {
-            skipIdx=genRandom.randomIndex(rect.bot-rect.top);
+            skipIdx=rect.top+genRandom.randomIndex(rect.bot-rect.top);
         }
         else {
-            skipIdx=genRandom.randomIndex(rect.rgt-rect.lft);
+            skipIdx=rect.lft+genRandom.randomIndex(rect.rgt-rect.lft);
         }
         
             // left and right walls
@@ -142,14 +142,6 @@ class GenRoomDecorationCubicalsClass
                 if (grid[((z+high)*xSize)+x]!==0) break;
                 high++;
             }
-            
-                // if wid or high === 0, then skip it
-                // (possibly because we collided with another 
-                
-            if ((wid===0) || (high===0)) {
-            //    grid[(z*xSize)+x]=1;
-            //    continue;
-            }
 
                 // create the cubical which is always
                 // 1 over because we are leaving a gutter
@@ -207,6 +199,14 @@ class GenRoomDecorationCubicalsClass
             // create cubical walls
         
         for (n=0;n!==cubes.length;n++) {
+                        
+            if (genRandom.randomPercentage(0.5)) {
+                yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),room.yBound.max);
+            }
+            else {
+                yBound=new wsBound((room.yBound.max-((room.storyCount-1)*map.ROOM_FLOOR_HEIGHT)),room.yBound.max);
+            }
+            
             this.addCubicalWall(room,bitmap,cubes[n],wid,yBound);
         }
     }

@@ -102,16 +102,16 @@ class GenRoomWindowClass
         
         switch (connectSide) {
             case mapRoomConstants.ROOM_SIDE_LEFT:
-                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,false,true));
+                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true));
                 break;
             case mapRoomConstants.ROOM_SIDE_RIGHT:
-                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,true,true));
+                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true));
                 break;
             case mapRoomConstants.ROOM_SIDE_TOP:
-                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,false,true));
+                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true));
                 break;
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,true,true));
+                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true));
                 break;
         }
     }

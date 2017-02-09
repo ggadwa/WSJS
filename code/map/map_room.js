@@ -388,14 +388,6 @@ class MapRoomClass
         return(this.getGroundFloorSpawnToFirstPlatformOrTopBound(x,z));
     }
     
-    getDecorationCount()
-    {
-        let startCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.05);
-        let extraCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.15);
-        
-        return(genRandom.randomInt(startCount,extraCount));
-    }
-    
         //
         // position utilities
         //

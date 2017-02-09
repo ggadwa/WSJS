@@ -18,7 +18,7 @@ class GenBitmapDoorClass extends GenBitmapClass
 
         this.TYPE_NAMES=
                 [
-                    'Metal'
+                    'Metal','Wood'
                 ];
         
         Object.seal(this);
@@ -85,6 +85,57 @@ class GenBitmapDoorClass extends GenBitmapClass
 
         this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
     }
+    
+        //
+        // wood bitmaps
+        //
+
+    generateWoodDrawBoard(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,woodColor)
+    {
+        let woodFactor=0.8+(genRandom.random()*0.2);
+        let col=this.darkenColor(woodColor,woodFactor);
+
+        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
+        this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+        this.addNoiseRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
+    }
+    
+    generateWood(bitmapCTX,normalCTX,specularCTX,wid,high)
+    {
+        let n,lft,rgt;
+        let boardSplit,boardHigh;
+        
+            // some random values
+
+        let boardCount=genRandom.randomInt(4,8);
+        let boardSize=Math.trunc(wid/boardCount);
+        let edgeSize=genRandom.randomInt(3,3);
+        let woodColor=this.getDefaultPrimaryColor();
+
+            // clear canvases
+
+        this.clearNormalsRect(normalCTX,0,0,wid,high);
+
+            // regular wood planking
+
+        lft=0;
+
+        for (n=0;n!==boardCount;n++) {
+            rgt=lft+boardSize;
+            if (n===(boardCount-1)) rgt=wid;
+            
+            boardSplit=genRandom.randomInt(1,3);
+            boardHigh=Math.trunc(high/boardSplit);
+            
+            this.generateWoodDrawBoard(bitmapCTX,normalCTX,lft,0,rgt,high,edgeSize,woodColor);
+            
+            lft=rgt;
+        }
+
+            // finish with the specular
+
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.2);
+    }
             
         //
         // generate mainline
@@ -123,6 +174,11 @@ class GenBitmapDoorClass extends GenBitmapClass
             case this.TYPE_METAL:
                 this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
+                break;
+                
+            case this.TYPE_WOOD:
+                this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=2.0;
                 break;
 
         }

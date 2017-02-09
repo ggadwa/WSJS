@@ -514,9 +514,10 @@ class GenRoomDecorationEquipmentClass
 
     create(room)
     {
-        let n,pieceCount;
-        
-        pieceCount=Math.trunc(room.getDecorationCount()*0.7);       // supergumba -- we need to calculate this better
+        let n;
+        let startCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.035);
+        let extraCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.1);
+        let pieceCount=genRandom.randomInt(startCount,extraCount);
 
         for (n=0;n!==pieceCount;n++) {
             this.addPipes(room);
