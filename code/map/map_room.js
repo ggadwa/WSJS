@@ -32,14 +32,16 @@ class MapRoomConstantsClass
         this.ROOM_DECORATION_NONE=-1;
         this.ROOM_DECORATION_PILLARS=0;
         this.ROOM_DECORATION_STORAGE=1;
-        this.ROOM_DECORATION_MACHINES=2;
-        this.ROOM_DECORATION_EQUIPMENT=3;
-        this.ROOM_DECORATION_CUBICALS=4;
+        this.ROOM_DECORATION_COMPUTER=2;
+        this.ROOM_DECORATION_PIPE=3;
+        this.ROOM_DECORATION_CUBICAL=4;
+        this.ROOM_DECORATION_LAB=5;
 
-        this.ROOM_DECORATION_PATH_LIST=[this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_MACHINES,this.ROOM_DECORATION_EQUIPMENT,this.ROOM_DECORATION_CUBICALS];
-        this.ROOM_DECORATION_LOWER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_MACHINES,this.ROOM_DECORATION_EQUIPMENT];
-        this.ROOM_DECORATION_HIGHER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE];
-        this.ROOM_DECORATION_LIQUID_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS];
+        this.ROOM_DECORATION_PATH_LIST=[this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_PIPE,this.ROOM_DECORATION_CUBICAL,this.ROOM_DECORATION_LAB];
+        this.ROOM_DECORATION_NORMAL_LIST=[this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_LAB];
+        this.ROOM_DECORATION_LOWER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_PIPE];
+        this.ROOM_DECORATION_HIGHER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_LAB];
+        this.ROOM_DECORATION_LIQUID_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_PIPE];
     }
 }
 
@@ -456,6 +458,37 @@ class MapRoomClass
         }
         
         return(null);
+    }
+    
+        //
+        // find if a side is a side that is connected to another room
+        //
+        
+    isSideOpenToOtherRoom(connectSide)
+    {
+        let n,room;
+        let nRoom=map.rooms.length;
+
+        for (n=0;n!==nRoom;n++) {
+            room=map.rooms[n];
+            
+            switch (connectSide) {
+                case mapRoomConstants.ROOM_SIDE_LEFT:
+                    if (room.xBound.max===this.xBound.min) return(true);
+                    break;
+                case mapRoomConstants.ROOM_SIDE_TOP:
+                    if (room.zBound.max===this.zBound.min) return(true);
+                    break;
+                case mapRoomConstants.ROOM_SIDE_RIGHT:
+                    if (room.xBound.min===this.xBound.max) return(true);
+                    break;
+                case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                    if (room.zBound.min===this.zBound.max) return(true);
+                    break;
+            }
+        }
+        
+        return(false);
     }
     
         //

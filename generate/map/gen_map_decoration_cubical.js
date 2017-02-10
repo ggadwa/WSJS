@@ -6,7 +6,7 @@
 // generate room cubical decoration class
 //
 
-class GenRoomDecorationCubicalsClass
+class GenRoomDecorationCubicalClass
 {
     constructor()
     {

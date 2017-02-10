@@ -3,10 +3,10 @@
 "use strict";
 
 //
-// generate room machine decoration class
+// generate room computer decoration class
 //
 
-class GenRoomDecorationMachineClass
+class GenRoomDecorationComputerClass
 {
     constructor()
     {
@@ -179,10 +179,10 @@ class GenRoomDecorationMachineClass
     }
     
         //
-        // single spot machine
+        // single spot piece
         //
         
-    addMachine(room,x,z,dir)
+    addPiece(room,x,z,dir)
     {
         let pnt;
         
@@ -218,16 +218,21 @@ class GenRoomDecorationMachineClass
     {
         let x,z;
         
+        let leftOpen=room.isSideOpenToOtherRoom(mapRoomConstants.ROOM_SIDE_LEFT);
+        let topOpen=room.isSideOpenToOtherRoom(mapRoomConstants.ROOM_SIDE_TOP);
+        let rightOpen=room.isSideOpenToOtherRoom(mapRoomConstants.ROOM_SIDE_RIGHT);
+        let bottomOpen=room.isSideOpenToOtherRoom(mapRoomConstants.ROOM_SIDE_BOTTOM);
+        
             // machines are against the edges
             
         for (z=1;z<(room.zBlockSize-1);z++) {
-            this.addMachine(room,0,z,mapRoomConstants.ROOM_SIDE_LEFT);
-            this.addMachine(room,(room.xBlockSize-1),z,mapRoomConstants.ROOM_SIDE_RIGHT);
+            if (!leftOpen) this.addPiece(room,0,z,mapRoomConstants.ROOM_SIDE_LEFT);
+            if (!rightOpen) this.addPiece(room,(room.xBlockSize-1),z,mapRoomConstants.ROOM_SIDE_RIGHT);
         }
         
         for (x=1;x<(room.xBlockSize-1);x++) {
-            this.addMachine(room,x,0,mapRoomConstants.ROOM_SIDE_TOP);
-            this.addMachine(room,x,(room.zBlockSize-1),mapRoomConstants.ROOM_SIDE_BOTTOM);
+            if (!topOpen) this.addPiece(room,x,0,mapRoomConstants.ROOM_SIDE_TOP);
+            if (!bottomOpen) this.addPiece(room,x,(room.zBlockSize-1),mapRoomConstants.ROOM_SIDE_BOTTOM);
         }
     }
 

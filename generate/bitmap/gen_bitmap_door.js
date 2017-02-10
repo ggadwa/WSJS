@@ -15,6 +15,7 @@ class GenBitmapDoorClass extends GenBitmapClass
             // types
             
         this.TYPE_METAL=0;
+        this.TYPE_WOOD=1;
 
         this.TYPE_NAMES=
                 [

@@ -3,10 +3,10 @@
 "use strict";
 
 //
-// generate room equipment decoration class
+// generate room pipe decoration class
 //
 
-class GenRoomDecorationEquipmentClass
+class GenRoomDecorationPipeClass
 {
     constructor()
     {
@@ -509,14 +509,14 @@ class GenRoomDecorationEquipmentClass
     }
     
         //
-        // machine decorations mainline
+        // pipe decorations mainline
         //
 
     create(room)
     {
         let n;
-        let startCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.035);
-        let extraCount=Math.trunc((this.xBlockSize*this.zBlockSize)*0.1);
+        let startCount=Math.trunc((room.xBlockSize*room.zBlockSize)*0.035);
+        let extraCount=Math.trunc((room.xBlockSize*room.zBlockSize)*0.1);
         let pieceCount=genRandom.randomInt(startCount,extraCount);
 
         for (n=0;n!==pieceCount;n++) {

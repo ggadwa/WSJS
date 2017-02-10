@@ -13,12 +13,16 @@ WebGL2
 
 ToDos
 
-#### platforms always extend to parent room
+#### 2nd room platform doesn't reach top, what is problem
+#### platforms always extend to parent room (need to check opposite way to see if we hit something)
 
 #### liquid in overlay
 #### end room big enough for boss?  boss monster?  need boss flag? (config.MONSTER_BOSS)
 
-#### vat/lab decorations
+#### lab decorations
+
+
+
 #### office decorations?
 #### frame doors?
 

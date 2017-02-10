@@ -247,6 +247,9 @@ class GenMapClass
         }
         else {
             switch (level) {
+                case mapRoomConstants.LEVEL_NORMAL:
+                    decorationType=mapRoomConstants.ROOM_DECORATION_NORMAL_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_NORMAL_LIST.length)];
+                    break;
                 case mapRoomConstants.LEVEL_LOWER:
                     decorationType=mapRoomConstants.ROOM_DECORATION_LOWER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LOWER_LIST.length)];
                     break;
@@ -667,6 +670,8 @@ class GenMapClass
         let connectOffset;
         let xBound,zBound;
         
+        level=mapRoomConstants.LEVEL_LOWER;         // supergumba -- testing
+        
             // get random block size for room
             // and make sure it stays under the max
             // blocks for room
@@ -832,11 +837,10 @@ class GenMapClass
     
     buildRoomPlatforms()
     {
-        let n,room,platform,lift,stair;
+        let n,room,platform,stair;
         let nRoom=map.rooms.length;
         
         platform=new GenRoomPlatformClass();
-        lift=new GenRoomLiftClass();
         stair=new GenRoomStairsClass();
         
         for (n=0;n!==nRoom;n++) {
@@ -845,7 +849,6 @@ class GenMapClass
             
             switch (room.level) {
                 case mapRoomConstants.LEVEL_LOWER:
-                    lift.create(room,this.yBase);
                     platform.create(room);
                     break;
                 case mapRoomConstants.LEVEL_HIGHER:
@@ -860,9 +863,10 @@ class GenMapClass
         let n,room;
         let pillar=null;
         let storage=null;
-        let machine=null;
-        let equipment=null;
-        let walls=null;
+        let computer=null;
+        let pipe=null;
+        let cubicle=null;
+        let lab=null;
         let nRoom=map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;
@@ -870,7 +874,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            //room.decorationType=mapRoomConstants.ROOM_DECORATION_MACHINES;  // supergumba -- testing
+            //room.decorationType=mapRoomConstants.ROOM_DECORATION_COMPUTER;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case mapRoomConstants.ROOM_DECORATION_PILLARS:
@@ -881,17 +885,21 @@ class GenMapClass
                     if (storage===null) storage=new GenRoomDecorationStorageClass();
                     storage.create(room);
                     break;
-                case mapRoomConstants.ROOM_DECORATION_MACHINES:
-                    if (machine===null) machine=new GenRoomDecorationMachineClass();
-                    machine.create(room);
+                case mapRoomConstants.ROOM_DECORATION_COMPUTER:
+                    if (computer===null) computer=new GenRoomDecorationComputerClass();
+                    computer.create(room);
                     break;
-                case mapRoomConstants.ROOM_DECORATION_EQUIPMENT:
-                    if (equipment===null) equipment=new GenRoomDecorationEquipmentClass();
-                    equipment.create(room);
+                case mapRoomConstants.ROOM_DECORATION_PIPE:
+                    if (pipe===null) pipe=new GenRoomDecorationPipeClass();
+                    pipe.create(room);
                     break;
-                case mapRoomConstants.ROOM_DECORATION_CUBICALS:
-                    if (walls===null) walls=new GenRoomDecorationCubicalsClass();
-                    walls.create(room);
+                case mapRoomConstants.ROOM_DECORATION_CUBICAL:
+                    if (cubicle===null) cublice=new GenRoomDecorationCubicalClass();
+                    cubicle.create(room);
+                    break;
+                case mapRoomConstants.ROOM_DECORATION_LAB:
+                    if (lab===null) lab=new GenRoomDecorationLabClass();
+                    lab.create(room);
                     break;
                 
             }

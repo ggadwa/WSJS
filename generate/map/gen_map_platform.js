@@ -121,13 +121,97 @@ class GenRoomPlatformClass
     }
     
         //
-        // create platforms
+        // platform from connecting room
+        //
+        
+    createConnectRoomPlatform(room,platformBitmap)
+    {
+        let x,z,min,max,yBound;
+        let xAdd,zAdd,xEnd,zEnd;
+        let connectStory;
+        
+            // find place to start platform
+            
+        switch (room.mainPathSide) {
+
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                x=room.xBlockSize-1;
+                xAdd=-1;
+                zAdd=0;
+                xEnd=0;
+                zEnd=0;
+                break;
+
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                z=room.zBlockSize-1;
+                xAdd=0;
+                zAdd=-1;
+                xEnd=0;
+                zEnd=0;
+                break;
+
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                x=0;
+                xAdd=1;
+                zAdd=0;
+                xEnd=room.xBlockSize-1;
+                zEnd=0;
+                break;
+
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                z=0;
+                xAdd=0;
+                zAdd=1;
+                xEnd=0;
+                zEnd=room.zBlockSize-1;
+                break;
+
+        }
+        
+        if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            min=0;
+            if (room.mainPathConnectedRoom.zBound.min>room.zBound.min) min=Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            max=room.zBlockSize;
+            if (room.mainPathConnectedRoom.zBound.max<room.zBound.max) max=Math.trunc((room.mainPathConnectedRoom.zBound.max-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            z=genRandom.randomInBetween(min,(max-1));
+        }
+        else {
+            min=0;
+            if (room.mainPathConnectedRoom.xBound.min>room.xBound.min) min=Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            max=room.xBlockSize;
+            if (room.mainPathConnectedRoom.xBound.max<room.xBound.max) max=Math.trunc((room.mainPathConnectedRoom.xBound.max-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            
+            x=genRandom.randomInBetween(min,(max-1));
+        }
+        
+            // get story for this platform
+            
+        connectStory=Math.trunc((room.yBound.max-room.mainPathConnectedRoom.yBound.max)/(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
+        
+            // now build towards other side
+            
+        while (true) {
+           if  (!room.checkBlockGrid(connectStory,x,z)) break;
+           
+            this.addPlatformChunk(room,x,z,connectStory,platformBitmap);
+            x+=xAdd;
+            if (x===xEnd) break;
+            z+=zAdd;
+            if (z===zEnd) break;
+        }
+    }
+    
+        //
+        // create random platforms
         // 
     
-    create(room)
+    createRandomPlatforms(room,platformBitmap)
     {
-        let n,k,x,z,x2,z2,y,stairX,stairZ,dir,orgDir,dirCount;
-        let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let n,k,x,z,x2,z2,stairX,stairZ,dir,orgDir,dirCount;
+        let dirStack,item;
         
             // starting spot for first staircase
         
@@ -159,6 +243,12 @@ class GenRoomPlatformClass
             
             this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
             
+                // we keep a list of the platform
+                // chunks we've made so we can backup
+                // the stack if we get caught
+                
+            dirStack=[];
+            
                 // random platform chunks
                 
             dirCount=genRandom.randomInt(4,8);
@@ -166,7 +256,7 @@ class GenRoomPlatformClass
             for (k=0;k!==dirCount;k++) {
                 
                     // find a place that's legal
-                    // don't cross over self, or stairs, or lifts
+                    // don't cross over self or stairs
                     
                 dir=orgDir=genRandom.randomIndex(4);
                 
@@ -177,7 +267,18 @@ class GenRoomPlatformClass
                     if (((x2===stairX) && (z2===stairZ)) || (!room.checkBlockGrid((n+1),x2,z2)) || (room.checkBlockGrid(0,x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
                         dir++;
                         if (dir>3) dir=0;
-                        if (dir===orgDir) return;           // we failed here, the platform wrapped in on itself
+                        
+                            // if we get back to the original direction,
+                            // then we've wrapped back in on ourselves
+                            // so back one up on the list
+                            
+                        if (dir===orgDir) {
+                            if (dirStack.length===0) return;        // completely out of options, bail
+                            item=dirStack.pop();
+                            x=item.x;
+                            z=item.z;
+                            continue;
+                        }
                         
                         continue;
                     }
@@ -191,6 +292,8 @@ class GenRoomPlatformClass
                 z=z2;
                 
                 this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+                
+                dirStack.push({x:x,z:z});
             }
             
                 // move forward for the next stairs
@@ -236,8 +339,18 @@ class GenRoomPlatformClass
                     break;
             }
         }
-        
     }
     
+        //
+        // create mainline
+        //
+        
+    create(room)
+    {
+        let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+
+        this.createRandomPlatforms(room,platformBitmap);
+        this.createConnectRoomPlatform(room,platformBitmap);
+    }
 }
 
