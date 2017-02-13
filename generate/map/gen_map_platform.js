@@ -126,7 +126,7 @@ class GenRoomPlatformClass
         
     createConnectRoomPlatform(room,platformBitmap)
     {
-        let x,z,min,max,yBound;
+        let x,z,min,max;
         let xAdd,zAdd,xEnd,zEnd;
         let connectStory;
         
@@ -211,12 +211,16 @@ class GenRoomPlatformClass
     createRandomPlatforms(room,platformBitmap)
     {
         let n,k,x,z,x2,z2,stairX,stairZ,dir,orgDir,dirCount;
-        let dirStack,item;
+        let dirStack,item,connectStory;
         
             // starting spot for first staircase
         
         x=genRandom.randomInBetween(2,(room.xBlockSize-2));
         z=genRandom.randomInBetween(2,(room.zBlockSize-2));
+        
+            // the story that the connecting room is on
+            
+        connectStory=Math.trunc((room.yBound.max-room.mainPathConnectedRoom.yBound.max)/(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
         
             // start with a random direction, the next
             // stairs up has to be same direction as platform
@@ -226,7 +230,7 @@ class GenRoomPlatformClass
         
             // build up the stories
         
-        for (n=0;n!==(room.storyCount-1);n++) {
+        for (n=0;n<connectStory;n++) {
             
                 // stair to next level
                 // remember stairs so we don't cross it
@@ -248,6 +252,7 @@ class GenRoomPlatformClass
                 // the stack if we get caught
                 
             dirStack=[];
+            dirStack.push({x:x,z:z});
             
                 // random platform chunks
                 
@@ -277,6 +282,7 @@ class GenRoomPlatformClass
                             item=dirStack.pop();
                             x=item.x;
                             z=item.z;
+                            dir=orgDir;
                             continue;
                         }
                         

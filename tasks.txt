@@ -13,7 +13,6 @@ WebGL2
 
 ToDos
 
-#### 2nd room platform doesn't reach top, what is problem
 #### platforms always extend to parent room (need to check opposite way to see if we hit something)
 
 #### liquid in overlay

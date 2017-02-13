@@ -150,25 +150,25 @@ class GenRoomDecorationComputerClass
             case mapRoomConstants.ROOM_SIDE_LEFT:
                 boundX=new wsBound(pnt.x,(pnt.x+juncWid));
                 boundZ=new wsBound((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,false,true,true,true,false,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,false,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
                 boundX=new wsBound((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
                 boundZ=new wsBound(pnt.z,(pnt.z+juncWid));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,false,true,false,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,false,true,true,true,false,map.MESH_FLAG_DECORATION));
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
                 boundX=new wsBound(((pnt.x+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.x+map.ROOM_BLOCK_WIDTH));
                 boundZ=new wsBound((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,false,true,true,false,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,false,true,true,true,true,false,map.MESH_FLAG_DECORATION));
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 boundX=new wsBound((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
                 boundZ=new wsBound(((pnt.z+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.z+map.ROOM_BLOCK_WIDTH));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,false,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,true,true,false,map.MESH_FLAG_DECORATION));
                 break;
         }
         
