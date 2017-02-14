@@ -19,7 +19,7 @@ ToDos
 #### end room big enough for boss?  boss monster?  need boss flag? (config.MONSTER_BOSS)
 
 #### lab decorations
-
+#### stairs need blocks at top
 
 
 #### office decorations?

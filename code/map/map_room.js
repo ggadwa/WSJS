@@ -161,6 +161,11 @@ class MapRoomClass
         this.blockGrid[story].setCell(x,z,0);
     }
     
+    copyGrid(story)
+    {
+        return(this.blockGrid[story].copy());
+    }
+    
         //
         // mask edge grid based on collisions with other
         // rooms or bounds

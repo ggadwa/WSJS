@@ -976,5 +976,19 @@ class wsGrid
             this.grid[n]=value;
         }
     }
+    
+    copy()
+    {
+        let copyGrid=new wsGrid(this.xSize,this.zSize);
+        
+        let n;
+        let cellSize=this.xSize*this.zSize;
+        
+        for (n=0;n!==cellSize;n++) {
+            copyGrid.grid[n]=this.grid[n];
+        }
+        
+        return(copyGrid);
+    }
 
 }
