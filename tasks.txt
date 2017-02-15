@@ -13,17 +13,13 @@ WebGL2
 
 ToDos
 
-#### platforms always extend to parent room (need to check opposite way to see if we hit something)
+#### connecting platforms fail a lot, figure this out
 
-#### liquid in overlay
 #### end room big enough for boss?  boss monster?  need boss flag? (config.MONSTER_BOSS)
-
 #### lab decorations
-#### stairs need blocks at top
-
-
-#### office decorations?
+#### stairs need quads or blocks at top
 #### frame doors?
+#### office decorations (outside like computers)
 
 #### ledges can be taller
 #### only put closets in areas that have platforms to them?

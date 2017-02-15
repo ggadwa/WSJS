@@ -121,7 +121,7 @@ class GenRoomPlatformClass
     }
     
         //
-        // platform from connecting room
+        // platform from connecting room to random platforms
         //
         
     createConnectRoomPlatform(room,platformBitmap)
@@ -180,6 +180,7 @@ class GenRoomPlatformClass
                 // find a place that's legal
                 // don't cross over self or stairs
 
+            item=null;
             dir=orgDir=genRandom.randomIndex(4);
 
             while (true) {
@@ -189,13 +190,13 @@ class GenRoomPlatformClass
                     // have we hit original grid?
                     // if so we are done
                 
-                if ((x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
-                    if (hitGrid.getCell(x2,z2)!==0) return;
+                if ((x2>=0) || (z2>=0) || (x2<room.xBlockSize) || (z2<room.zBlockSize)) {
+                    if (hitGrid.getCell(x2,z2)===0) return;
                 }
                 
                     // see if we've cross ourselves
                     
-                if ((!room.checkBlockGrid(connectStory,x2,z2)) || (room.checkBlockGrid(0,x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
+                if ((!room.checkBlockGrid(connectStory,x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
                     dir++;
                     if (dir>3) dir=0;
 
@@ -217,6 +218,13 @@ class GenRoomPlatformClass
 
                 break;
             }
+            
+                // if we had to pop the stack, whatever the
+                // last one we popped off the stack needs to
+                // go back on so it isn't skipped if we have to
+                // reverse again as it may have openings left
+            
+            if (item!==null) dirStack.push(item);
 
                 // create the platform
 
@@ -293,8 +301,8 @@ class GenRoomPlatformClass
                 while (true) {
                     x2=this.moveDirX(dir,x);
                     z2=this.moveDirZ(dir,z);
-
-                    if (((x2===stairX) && (z2===stairZ)) || (!room.checkBlockGrid((n+1),x2,z2)) || (room.checkBlockGrid(0,x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
+                    
+                    if (((x2===stairX) && (z2===stairZ)) || (!room.checkBlockGrid((n+1),x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
                         dir++;
                         if (dir>3) dir=0;
                         
@@ -328,47 +336,18 @@ class GenRoomPlatformClass
             }
             
                 // move forward for the next stairs
+                // you need to turn if we are against a wall
+                
+            if ((x===0) || (x===(room.xBlockSize-1))) {
+                dir=(z<Math.trunc(room.zBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_BOTTOM:mapRoomConstants.ROOM_SIDE_TOP;
+            }
+            
+            if ((z===0) || (z===(room.zBlockSize-1))) {
+                dir=(x<Math.trunc(room.xBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_RIGHT:mapRoomConstants.ROOM_SIDE_LEFT;
+            }
                 
             x=this.moveDirX(dir,x);
             z=this.moveDirZ(dir,z);
-            
-                // if the stairs will head into a wall, put down an extra platform
-                // chunk and turn the stairs against the wall
-            
-            switch (dir) {
-                case mapRoomConstants.ROOM_SIDE_LEFT:
-                    if (x===0) {
-                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
-                        dir=(z>Math.trunc(room.zBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_TOP:mapRoomConstants.ROOM_SIDE_BOTTOM;
-                        x=this.moveDirX(dir,x);
-                        z=this.moveDirZ(dir,z);
-                    }
-                    break;
-                case mapRoomConstants.ROOM_SIDE_RIGHT:
-                    if (x===(room.xBlockSize-1)) {
-                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
-                        dir=(z>Math.trunc(room.zBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_TOP:mapRoomConstants.ROOM_SIDE_BOTTOM;
-                        x=this.moveDirX(dir,x);
-                        z=this.moveDirZ(dir,z);
-                    }
-                    break;
-                case mapRoomConstants.ROOM_SIDE_TOP:
-                    if (z===0) {
-                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
-                        dir=(x>Math.trunc(room.xBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT;
-                        x=this.moveDirX(dir,x);
-                        z=this.moveDirZ(dir,z);
-                    }
-                    break;
-                case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                    if (z===(room.zBlockSize-1)) {
-                        this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
-                        dir=(x>Math.trunc(room.xBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT;
-                        x=this.moveDirX(dir,x);
-                        z=this.moveDirZ(dir,z);
-                    }
-                    break;
-            }
         }
     }
     

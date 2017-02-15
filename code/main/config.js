@@ -8,7 +8,7 @@ class ConfigClass
 {
     constructor()
     {
-        this.SEED=505; // 500 = has liquid // Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
+        this.SEED=500; // 500 = has liquid, 505 = bad platform // Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
 
             //
             // map generation
