@@ -124,7 +124,7 @@ class GenRoomPlatformClass
         // platform from connecting room to random platforms
         //
         
-    createConnectRoomPlatform(room,platformBitmap)
+    createConnectRoomPlatform(room,platformBitmap,lastStairPos)
     {
         let x,z,x2,z2,min,max;
         let connectStory,dir,orgDir,dirStack,item;
@@ -190,13 +190,13 @@ class GenRoomPlatformClass
                     // have we hit original grid?
                     // if so we are done
                 
-                if ((x2>=0) || (z2>=0) || (x2<room.xBlockSize) || (z2<room.zBlockSize)) {
+                if ((x2>=0) && (z2>=0) && (x2<room.xBlockSize) && (z2<room.zBlockSize)) {
                     if (hitGrid.getCell(x2,z2)===0) return;
                 }
                 
                     // see if we've cross ourselves
                     
-                if ((!room.checkBlockGrid(connectStory,x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
+                if (((lastStairPos.x===x2) && (lastStairPos.z===z2)) || (!room.checkBlockGrid(connectStory,x2,z2)) || (x2<0) || (z2<0) || (x2>(room.xBlockSize-1)) || (z2>(room.zBlockSize-1))) {
                     dir++;
                     if (dir>3) dir=0;
 
@@ -205,7 +205,7 @@ class GenRoomPlatformClass
                         // so back one up on the list
 
                     if (dir===orgDir) {
-                        if (dirStack.length===0) return;        // completely out of options, bail
+                        if (dirStack.length===0)  return;       // completely out of options, bail
                         item=dirStack.pop();
                         x=item.x;
                         z=item.z;
@@ -230,7 +230,7 @@ class GenRoomPlatformClass
 
             x=x2;
             z=z2;
-
+            
             this.addPlatformChunk(room,x,z,connectStory,platformBitmap);
 
             dirStack.push({x:x,z:z});
@@ -349,6 +349,11 @@ class GenRoomPlatformClass
             x=this.moveDirX(dir,x);
             z=this.moveDirZ(dir,z);
         }
+        
+            // always return the last stair position
+            // so we can block that when connecting
+            
+        return({x:stairX,z:stairZ});
     }
     
         //
@@ -357,10 +362,11 @@ class GenRoomPlatformClass
         
     create(room)
     {
+        let lastStairPos;
         let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
 
-        this.createRandomPlatforms(room,platformBitmap);
-        this.createConnectRoomPlatform(room,platformBitmap);
+        lastStairPos=this.createRandomPlatforms(room,platformBitmap);
+        this.createConnectRoomPlatform(room,platformBitmap,lastStairPos);
     }
 }
 

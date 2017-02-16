@@ -432,45 +432,55 @@ class MapOverlayClass
         gl.disable(gl.DEPTH_TEST);
         
             // room quads
-            
-        this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,0.0));
-            
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.roomQuadVertexPosBuffer);
-        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        gl.drawArrays(gl.TRIANGLES,0,(this.roomQuadList.length*6));
+        
+        if (this.roomQuadList.length!==0) {
+            this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,0.0));
+
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.roomQuadVertexPosBuffer);
+            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.drawArrays(gl.TRIANGLES,0,(this.roomQuadList.length*6));
+        }
         
             // liquid quads
-            
-        this.mapOverlayShader.drawColor(new wsColor(0.7,0.0,0.5));
-            
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.liquidQuadVertexPosBuffer);
-        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        gl.drawArrays(gl.TRIANGLES,0,(this.liquidQuadList.length*6));
+        
+        if (this.liquidQuadList.length!==0) {
+            this.mapOverlayShader.drawColor(new wsColor(0.5,0.0,0.4));
 
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.liquidQuadVertexPosBuffer);
+            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.drawArrays(gl.TRIANGLES,0,(this.liquidQuadList.length*6));
+        }
+        
             // extra lines
   
-        this.mapOverlayShader.drawColor(new wsColor(0.5,0.5,1.0));
-            
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
-        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        gl.drawArrays(gl.LINES,0,(this.extraLineList.length*2));
+        if (this.extraLineList.length!==0) {
+            this.mapOverlayShader.drawColor(new wsColor(0.5,0.5,1.0));
+
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
+            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.drawArrays(gl.LINES,0,(this.extraLineList.length*2));
+        }
         
             // room lines
-            
-        this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,1.0));
-            
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
-        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        gl.drawArrays(gl.LINES,0,(this.roomLineList.length*2));
+        
+        if (this.roomLineList.length!==0) {
+            this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,1.0));
 
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
+            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.drawArrays(gl.LINES,0,(this.roomLineList.length*2));
+        }
+        
             // door quads
-            
-        this.mapOverlayShader.drawColor(new wsColor(1.0,0.2,0.2));
-            
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.doorQuadVertexPosBuffer);
-        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
-        gl.drawArrays(gl.TRIANGLES,0,(this.doorQuadList.length*6));
+        
+        if (this.doorQuadList.length!==0) {
+            this.mapOverlayShader.drawColor(new wsColor(1.0,0.2,0.2));
 
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.doorQuadVertexPosBuffer);
+            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.drawArrays(gl.TRIANGLES,0,(this.doorQuadList.length*6));
+        }
+        
             // entities
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.entityVertexPosBuffer);

@@ -8,7 +8,7 @@ class ConfigClass
 {
     constructor()
     {
-        this.SEED=500; // 500 = has liquid, 505 = bad platform // Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
+        this.SEED=505; // 500 = has liquid, 505 = bad platform // Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
 
             //
             // map generation
@@ -55,8 +55,8 @@ class ConfigClass
             // play testing
             //
 
-        this.PLAYER_CLIP_WALLS=false;
-        this.PLAYER_FLY=false;
+        this.PLAYER_CLIP_WALLS=true;
+        this.PLAYER_FLY=true;
 
             //
             // draw debuging
