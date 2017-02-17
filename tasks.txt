@@ -13,12 +13,12 @@ WebGL2
 
 ToDos
 
-#### end room big enough for boss?  boss monster?  need boss flag? (config.MONSTER_BOSS)
+#### end room big enough for boss?  boss monster?  "goal room" getting set (boss not appearing)
 #### lab decorations
 #### stairs need quads or blocks at top
 #### frame doors?
 #### office decorations (outside like computers)
-#### lifts intead of platforms?
+#### lifts instead of platforms?
 
 #### much better landscape
 

@@ -113,34 +113,54 @@ class MainClass
     initBuildLightmapFinish()
     {
         view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Dynamic Models');
+        view.loadingScreenAddString('Generating Player Model');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildModelsMesh.bind(this,-1,null),1);
+        setTimeout(this.initBuildPlayerModel.bind(this,new GenBitmapSkinClass()),1);
+    }
+    
+    initBuildPlayerModel(genBitmapSkin)
+    {
+        let model,genSkeleton,genModelMesh,modelBitmap;
+
+            // build the player model
+        
+        modelBitmap=genBitmapSkin.generateRandom(false);
+        
+        model=new ModelClass('player',modelConstants.MODEL_TYPE_HUMANOID);
+
+            // build the skeleton and mesh
+
+        genSkeleton=new GenModelOrganicSkeletonClass(model);
+        genSkeleton.build();
+
+        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
+        genModelMesh.build();
+
+        modelList.addModel(model);
+
+            // next step
+
+        view.loadingScreenUpdate();
+        view.loadingScreenAddString('Generating Monster Models');
+        view.loadingScreenDraw(null);
+        
+        setTimeout(this.initBuildMonsterModels.bind(this,-1,genBitmapSkin),1);
     }
 
-    initBuildModelsMesh(idx,genBitmapSkin)
+    initBuildMonsterModels(idx,genBitmapSkin)
     {
         let model,genSkeleton,genModelMesh,modelBitmap;
         let monsterType;
         let modelMonsterTypes=[modelConstants.MODEL_TYPE_HUMANOID,modelConstants.MODEL_TYPE_ANIMAL,modelConstants.MODEL_TYPE_BLOB];
 
-            // build a bitmap
+            // build the model
         
-        if (genBitmapSkin===null) genBitmapSkin=new GenBitmapSkinClass();
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-            // player is -1
-            // else a monster
-
-        if (idx===-1) {
-            model=new ModelClass('player',modelConstants.MODEL_TYPE_HUMANOID);
-        }
-        else {
-            monsterType=modelMonsterTypes[idx%(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
-            //monsterType=modelConstants.MODEL_TYPE_BLOB;      // supergumba -- testing
-            model=new ModelClass(('monster_'+idx),monsterType);
-        }
+        monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];
+        //monsterType=modelConstants.MODEL_TYPE_BLOB;      // supergumba -- testing
+        model=new ModelClass(('monster_'+idx),monsterType);
 
             // build the skeleton and mesh
 
@@ -157,14 +177,55 @@ class MainClass
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
             view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
-            setTimeout(this.initBuildModelsMesh.bind(this,idx,genBitmapSkin),1);
+            setTimeout(this.initBuildMonsterModels.bind(this,idx,genBitmapSkin),1);
             return;
         }
 
             // next step
 
+        if (config.BOSS_MONSTER) {
+            view.loadingScreenUpdate();
+            view.loadingScreenAddString('Generating Boss Model');
+            view.loadingScreenDraw(null);
+
+            setTimeout(this.initBuildBossModel.bind(this,genBitmapSkin),1);
+        }
+        else {
+            view.loadingScreenUpdate();
+            view.loadingScreenAddString('Generating Weapons');
+            view.loadingScreenDraw(null);
+
+            setTimeout(this.initBuildWeapons.bind(this,null),1);
+        }
+    }
+    
+    initBuildBossModel(genBitmapSkin)
+    {
+        let model,genSkeleton,genModelMesh,modelBitmap;
+        let monsterType;
+        let modelMonsterTypes=[modelConstants.MODEL_TYPE_HUMANOID,modelConstants.MODEL_TYPE_ANIMAL,modelConstants.MODEL_TYPE_BLOB];
+
+            // build monster
+        
+        modelBitmap=genBitmapSkin.generateRandom(false);
+
+        monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
+        model=new ModelClass(('boss_'+idx),monsterType);
+
+            // build the skeleton and mesh
+
+        genSkeleton=new GenModelOrganicSkeletonClass(model);
+        genSkeleton.build();
+
+        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
+        genModelMesh.build();
+
+        modelList.addModel(model);
+
+            // next step
+
         view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Dynamic Weapons');
+        view.loadingScreenAddString('Generating Weapons');
         view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildWeapons.bind(this,null),1);
@@ -255,6 +316,13 @@ class MainClass
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
             model=modelList.cloneModel('monster_'+monsterType);
             entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+        }
+        
+            // boss monster
+            
+        if (config.BOSS_MONSTER) {
+            pos=map.findRandomBossPosition();
+            if (pos!==null) entityList.addEntity(new EntityMonsterClass(('boss_'+n),pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,genAI.generate()));
         }
 
             // finished

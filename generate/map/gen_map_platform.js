@@ -311,7 +311,7 @@ class GenRoomPlatformClass
                             // so back one up on the list
                             
                         if (dir===orgDir) {
-                            if (dirStack.length===0) return;        // completely out of options, bail
+                            if (dirStack.length===0) return({x:stairX,z:stairZ});        // completely out of options, bail
                             item=dirStack.pop();
                             x=item.x;
                             z=item.z;

@@ -495,7 +495,19 @@ class MapClass
         //
         // find positions in map
         //
+    
+    findRoomForPathType(pathType)
+    {
+        let n;
+        let nRoom=this.rooms.length;
         
+        for (n=0;n!==nRoom;n++) {
+            if (this.rooms[n].pathType===pathType) return(n);
+        }
+        
+        return(-1);
+    }
+    
     findRandomMonsterPosition()
     {
         let roomIdx;
@@ -504,9 +516,14 @@ class MapClass
         
         while (findTry<25) {
 
-                // find a random room, but skip start room
+                // find a random room,
+                // but skip start and goal room
 
-            roomIdx=genRandom.randomIndex(this.rooms.length-1)+1;
+            roomIdx=genRandom.randomIndex(this.rooms.length);
+            if (this.rooms[roomIdx].pathType!==mapRoomConstants.ROOM_PATH_TYPE_NORMAL) {
+                findTry++;
+                continue;
+            }
             
                 // find a random spot in room
                 
@@ -521,7 +538,14 @@ class MapClass
     
     findRandomPlayerPosition()
     {
-        return(this.rooms[0].findAndBlockSpawnPosition(true));
+        let roomIdx=this.findRoomForPathType(mapRoomConstants.ROOM_PATH_TYPE_START);
+        return(this.rooms[roomIdx].findAndBlockSpawnPosition(true));
+    }
+    
+    findRandomBossPosition()
+    {
+        let roomIdx=this.findRoomForPathType(mapRoomConstants.ROOM_PATH_TYPE_GOAL);
+        return(this.rooms[roomIdx].findAndBlockSpawnPosition(true));
     }
     
         //
