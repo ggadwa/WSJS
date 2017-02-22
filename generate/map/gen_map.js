@@ -235,6 +235,14 @@ class GenMapClass
                 break;
         }
         
+            // if a goal room, and we have a boss, always
+            // make room taller
+            
+        if (pathType===mapRoomConstants.ROOM_PATH_TYPE_GOAL) {
+            console.log('MADE GOAL ROOM');
+            if (storyCount<4) storyCount=4;
+        }
+        
             // determine if this room has a liquid,
             // and lower it for pool and add a story
         
@@ -600,7 +608,7 @@ class GenMapClass
                 // path type for rooms on path is normal unless
                 // this is the final room
 
-            pathType=((map.rooms.length-1)>=config.ROOM_PATH_COUNT)?mapRoomConstants.ROOM_PATH_TYPE_GOAL:mapRoomConstants.ROOM_PATH_TYPE_NORMAL;
+            pathType=((map.rooms.length+1)>=config.ROOM_PATH_COUNT)?mapRoomConstants.ROOM_PATH_TYPE_GOAL:mapRoomConstants.ROOM_PATH_TYPE_NORMAL;
         }
 
             // add in hallways and a light

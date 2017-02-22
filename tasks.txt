@@ -13,14 +13,15 @@ WebGL2
 
 ToDos
 
-#### end room big enough for boss?  boss monster?  "goal room" getting set (boss not appearing)
+#### ai types (charge, sniper, boss?) - boss slower, more health
 #### lab decorations
 #### stairs need quads or blocks at top
 #### frame doors?
 #### office decorations (outside like computers)
 #### lifts instead of platforms?
+#### animals need to have better necks
 
-#### much better landscape
+#### much better landscape texture
 
 #### ledges can be taller
 #### only put closets in areas that have platforms to them?

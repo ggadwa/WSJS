@@ -8,9 +8,10 @@
 
 class GenModelOrganicSkeletonClass
 {
-    constructor(model)
+    constructor(model,sizeFactor)
     {
         this.model=model;
+        this.sizeFactor=sizeFactor;
         
         Object.seal(this);
     }
@@ -216,25 +217,13 @@ class GenModelOrganicSkeletonClass
         bones=this.model.skeleton.bones;
         
             // random heights
-            // can never be taller than a single floor height
             
-        hipHigh=genRandom.randomInt(600,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.4));
-        waistHigh=hipHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15));
-        torsoHigh=waistHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2));
-        torsoTopHigh=torsoHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15));
-        jawHigh=torsoTopHigh+genRandom.randomInt(100,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.1));
-        headHigh=jawHigh+genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2));
-        
-        while (true) {
-            if (headHigh<map.ROOM_FLOOR_HEIGHT) break;
-            
-            hipHigh-=5;
-            waistHigh-=10;
-            torsoHigh-=15;
-            torsoTopHigh-=20;
-            jawHigh-=30;
-            headHigh-=35;
-        }
+        hipHigh=Math.trunc(genRandom.randomInt(600,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.4))*this.sizeFactor);
+        waistHigh=hipHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15))*this.sizeFactor);
+        torsoHigh=waistHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2))*this.sizeFactor);
+        torsoTopHigh=torsoHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15))*this.sizeFactor);
+        jawHigh=torsoTopHigh+Math.trunc(genRandom.randomInt(100,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.1))*this.sizeFactor);
+        headHigh=jawHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2))*this.sizeFactor);
         
             // the base bone
             
@@ -247,10 +236,10 @@ class GenModelOrganicSkeletonClass
         torsoBoneIdx=bones.push(new ModelBoneClass('Torso',waistBoneIdx,new wsPoint(0,-torsoHigh,0)))-1;
         torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso Top',torsoBoneIdx,new wsPoint(0,-torsoTopHigh,0)))-1;
         
-        bones[hipBoneIdx].gravityLockDistance=genRandom.randomInt(300,1000);
-        bones[waistBoneIdx].gravityLockDistance=genRandom.randomInt(300,1000);
-        bones[torsoBoneIdx].gravityLockDistance=genRandom.randomInt(300,1000);
-        bones[torsoTopBoneIdx].gravityLockDistance=genRandom.randomInt(300,1000);
+        bones[hipBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,1000)*this.sizeFactor);
+        bones[waistBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,1000)*this.sizeFactor);
+        bones[torsoBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,1000)*this.sizeFactor);
+        bones[torsoTopBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,1000)*this.sizeFactor);
         
         bones[hipBoneIdx].gravityScale.setFromValues(1.0,0.3,0.7);
         bones[waistBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
@@ -267,8 +256,8 @@ class GenModelOrganicSkeletonClass
         jawBoneIdx=bones.push(new ModelBoneClass('Jaw',torsoTopBoneIdx,new wsPoint(0,-jawHigh,0)))-1;
         headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new wsPoint(0,-headHigh,0)))-1;
 
-        bones[headBoneIdx].gravityLockDistance=genRandom.randomInt(300,400);
-        bones[jawBoneIdx].gravityLockDistance=genRandom.randomInt(300,400);
+        bones[headBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,400)*this.sizeFactor);
+        bones[jawBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,400)*this.sizeFactor);
         
         bones[headBoneIdx].gravityScale.setFromValues(1.0,0.7,0.8);
         bones[jawBoneIdx].gravityScale.setFromValues(1.0,0.7,0.8);
@@ -287,9 +276,8 @@ class GenModelOrganicSkeletonClass
 
         rotOffset=(genRandom.random()*20.0)-10.0;
 
-        armRadius=Math.trunc(bones[torsoTopBoneIdx].gravityLockDistance*0.35);
+        armRadius=Math.trunc(bones[torsoTopBoneIdx].gravityLockDistance*0.45);
         if (armRadius<250) armRadius=250;
-        if (armRadius>350) armRadius=350;
 
         shoulderLength=Math.trunc(bones[torsoTopBoneIdx].gravityLockDistance*0.75);
         elbowLength=shoulderLength+Math.trunc(armLength*0.42);
@@ -321,7 +309,7 @@ class GenModelOrganicSkeletonClass
         
             // create leg limbs
         
-        legRadius=Math.trunc(bones[hipBoneIdx].gravityLockDistance*0.35);
+        legRadius=Math.trunc(bones[hipBoneIdx].gravityLockDistance*0.45);
         if (legRadius<250) legRadius=250;
         footLength=Math.trunc(legRadius*1.5);
        
@@ -342,7 +330,7 @@ class GenModelOrganicSkeletonClass
         let torsoBoneIdx,waistBoneIdx,hipBoneIdx,torsoTopBoneIdx;
         let headRadius,snoutRadius,neckLength,headLength,jawPivotLength,jawLength,jawHigh,headHigh;
         let headBoneIdx,snoutBoneIdx,jawPivotBoneIdx,jawBoneIdx;
-        let rotOffset,footLength;
+        let rotOffset,legRadius,footLength;
         
         this.model.skeleton=new ModelSkeletonClass();
         bones=this.model.skeleton.bones;
@@ -353,19 +341,19 @@ class GenModelOrganicSkeletonClass
 
             // create body limbs
         
-        totalHigh=genRandom.randomInt(800,2500);
-        bodyLength=genRandom.randomInt(600,2000);
-        high=totalHigh+genRandom.randomInt(0,400);
+        totalHigh=Math.trunc(genRandom.randomInt(800,2500)*this.sizeFactor);
+        bodyLength=Math.trunc(genRandom.randomInt(600,2000)*this.sizeFactor);
+        high=totalHigh+Math.trunc(genRandom.randomInt(0,400)*this.sizeFactor);
         
         hipBoneIdx=bones.push(new ModelBoneClass('Hip',baseBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.5))))-1;
         waistBoneIdx=bones.push(new ModelBoneClass('Waist',hipBoneIdx,new wsPoint(0,-high,-Math.trunc(bodyLength*0.25))))-1;
         torsoBoneIdx=bones.push(new ModelBoneClass('Torso',waistBoneIdx,new wsPoint(0,-high,Math.trunc(bodyLength*0.25))))-1;
         torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso Top',torsoBoneIdx,new wsPoint(0,-high,Math.trunc(bodyLength*0.5))))-1;
         
-        bones[hipBoneIdx].gravityLockDistance=genRandom.randomInt(300,700);
-        bones[waistBoneIdx].gravityLockDistance=genRandom.randomInt(300,700);
-        bones[torsoBoneIdx].gravityLockDistance=genRandom.randomInt(300,700);
-        bones[torsoTopBoneIdx].gravityLockDistance=genRandom.randomInt(300,700);
+        bones[hipBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,700)*this.sizeFactor);
+        bones[waistBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,700)*this.sizeFactor);
+        bones[torsoBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,700)*this.sizeFactor);
+        bones[torsoTopBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(300,700)*this.sizeFactor);
         
         bones[hipBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[waistBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
@@ -376,8 +364,8 @@ class GenModelOrganicSkeletonClass
         
             // create the head and jaw limbs
 
-        headRadius=genRandom.randomInt(300,700);
-        snoutRadius=genRandom.randomInt(300,700);
+        headRadius=Math.trunc(genRandom.randomInt(300,700)*this.sizeFactor);
+        snoutRadius=Math.trunc(genRandom.randomInt(300,700)*this.sizeFactor);
         
         high=-bones[torsoTopBoneIdx].position.y;
         neckLength=Math.trunc(bodyLength*0.5)+genRandom.randomInt(400,600);
@@ -408,16 +396,19 @@ class GenModelOrganicSkeletonClass
             // create legs
         
         rotOffset=(genRandom.random()*20.0)-10.0;
-        footLength=genRandom.randomInt(150,150);
         
-        this.buildLimbLegSet(modelLimbConstants.LIMB_SIDE_BACK_LEFT,modelLimbConstants.LIMB_SIDE_BACK_RIGHT,hipBoneIdx,0,bones[hipBoneIdx].position.z,rotOffset,Math.trunc(bones[hipBoneIdx].gravityLockDistance*0.8),bones[hipBoneIdx].position.y,200,footLength);
-        this.buildLimbLegSet(modelLimbConstants.LIMB_SIDE_FRONT_LEFT,modelLimbConstants.LIMB_SIDE_FRONT_RIGHT,torsoTopBoneIdx,0,bones[torsoTopBoneIdx].position.z,rotOffset,Math.trunc(bones[torsoTopBoneIdx].gravityLockDistance*0.5),bones[torsoTopBoneIdx].position.y,200,footLength);
+        legRadius=Math.trunc(bones[hipBoneIdx].gravityLockDistance*0.45);
+        if (legRadius<250) legRadius=250;
+        footLength=Math.trunc(legRadius*1.5);
+        
+        this.buildLimbLegSet(modelLimbConstants.LIMB_SIDE_BACK_LEFT,modelLimbConstants.LIMB_SIDE_BACK_RIGHT,hipBoneIdx,0,bones[hipBoneIdx].position.z,rotOffset,Math.trunc(bones[hipBoneIdx].gravityLockDistance*0.8),bones[hipBoneIdx].position.y,legRadius,footLength);
+        this.buildLimbLegSet(modelLimbConstants.LIMB_SIDE_FRONT_LEFT,modelLimbConstants.LIMB_SIDE_FRONT_RIGHT,torsoTopBoneIdx,0,bones[torsoTopBoneIdx].position.z,rotOffset,Math.trunc(bones[torsoTopBoneIdx].gravityLockDistance*0.5),bones[torsoTopBoneIdx].position.y,legRadius,footLength);
 
             // tail
             
         if (genRandom.randomPercentage(0.75)) {
-            whipRadius=genRandom.randomInt(250,300);
-            whipLength=genRandom.randomInt(400,2000);
+            whipRadius=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
+            whipLength=Math.trunc(genRandom.randomInt(400,2000)*this.sizeFactor);
             
             this.buildLimbWhip(0,hipBoneIdx,whipRadius,bones[hipBoneIdx].position.y,whipLength,90.0,true);
         }
@@ -445,7 +436,7 @@ class GenModelOrganicSkeletonClass
             // can never be taller than a single floor height
             // and always shorter than humanoids (no legs)
         
-        totalHigh=genRandom.randomInt(Math.trunc(map.ROOM_FLOOR_HEIGHT*0.05),Math.trunc(map.ROOM_FLOOR_HEIGHT*0.8));
+        totalHigh=Math.trunc(genRandom.randomInt(Math.trunc(map.ROOM_FLOOR_HEIGHT*0.05),Math.trunc(map.ROOM_FLOOR_HEIGHT*0.8))*this.sizeFactor);
         
             // the base bone
             
@@ -458,13 +449,13 @@ class GenModelOrganicSkeletonClass
         torsoBoneIdx=bones.push(new ModelBoneClass('Torso',waistBoneIdx,new wsPoint(0,-Math.trunc(totalHigh*0.5),0)))-1;
         torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso Top',torsoBoneIdx,new wsPoint(0,-Math.trunc(totalHigh*0.75),0)))-1;
         
-        bones[hipBoneIdx].gravityLockDistance=genRandom.randomInt(200,2000);
-        bones[waistBoneIdx].gravityLockDistance=genRandom.randomInt(200,2000);
-        bones[torsoBoneIdx].gravityLockDistance=genRandom.randomInt(200,2000);
-        bones[torsoTopBoneIdx].gravityLockDistance=genRandom.randomInt(200,2000);
+        bones[hipBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(200,2000)*this.sizeFactor);
+        bones[waistBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(200,2000)*this.sizeFactor);
+        bones[torsoBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(200,2000)*this.sizeFactor);
+        bones[torsoTopBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(200,2000)*this.sizeFactor);
         
-        xScale=genRandom.randomInt(70,50)/100.0;
-        zScale=genRandom.randomInt(70,50)/100.0;
+        xScale=(genRandom.randomInt(70,50)/100.0)*this.sizeFactor;
+        zScale=(genRandom.randomInt(70,50)/100.0)*this.sizeFactor;
         bones[hipBoneIdx].gravityScale.setFromValues(xScale,0.5,zScale);
         bones[waistBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
         bones[torsoBoneIdx].gravityScale.setFromValues(xScale,1.0,zScale);
@@ -497,8 +488,8 @@ class GenModelOrganicSkeletonClass
             boneIdx=bodyLimb.getRandomBoneIndex();
             rotOffset=genRandom.random()*360.0;
             
-            whipRadius=genRandom.randomInt(250,300);
-            whipLength=genRandom.randomInt(400,2000);
+            whipRadius=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
+            whipLength=Math.trunc(genRandom.randomInt(400,2000)*this.sizeFactor);
             
             this.buildLimbWhip(n,boneIdx,whipRadius,bones[boneIdx].position.y,whipLength,rotOffset,true);
         }

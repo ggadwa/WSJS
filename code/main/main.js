@@ -131,7 +131,7 @@ class MainClass
 
             // build the skeleton and mesh
 
-        genSkeleton=new GenModelOrganicSkeletonClass(model);
+        genSkeleton=new GenModelOrganicSkeletonClass(model,1.0);
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
@@ -164,7 +164,7 @@ class MainClass
 
             // build the skeleton and mesh
 
-        genSkeleton=new GenModelOrganicSkeletonClass(model);
+        genSkeleton=new GenModelOrganicSkeletonClass(model,1.0);
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
@@ -183,7 +183,7 @@ class MainClass
 
             // next step
 
-        if (config.BOSS_MONSTER) {
+        if (config.MONSTER_BOSS) {
             view.loadingScreenUpdate();
             view.loadingScreenAddString('Generating Boss Model');
             view.loadingScreenDraw(null);
@@ -210,11 +210,12 @@ class MainClass
         modelBitmap=genBitmapSkin.generateRandom(false);
 
         monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
-        model=new ModelClass(('boss_'+idx),monsterType);
+        //monsterType=modelConstants.MODEL_TYPE_BLOB;      // supergumba -- testing
+        model=new ModelClass('boss',monsterType);
 
             // build the skeleton and mesh
 
-        genSkeleton=new GenModelOrganicSkeletonClass(model);
+        genSkeleton=new GenModelOrganicSkeletonClass(model,genRandom.randomFloat(2.0,3.0));
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
@@ -320,9 +321,10 @@ class MainClass
         
             // boss monster
             
-        if (config.BOSS_MONSTER) {
+        if (config.MONSTER_BOSS) {
             pos=map.findRandomBossPosition();
-            if (pos!==null) entityList.addEntity(new EntityMonsterClass(('boss_'+n),pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,genAI.generate()));
+            model=modelList.cloneModel('boss');
+            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,genAI.generate()));
         }
 
             // finished
