@@ -52,9 +52,9 @@ class GenMapClass
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
         
         this.HALLWAY_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.6;                 // intensity of hallway lights
-        this.DOOR_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.2;                    // intensity of lights over doors
-        this.WINDOW_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*3.5;                  // intensity of window light
-        this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=map.ROOM_FLOOR_HEIGHT*0.3;         // how much to cut main room light for each window
+        this.DOOR_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.3;                    // intensity of lights over doors
+        this.WINDOW_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*3.6;                  // intensity of window light
+        this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=map.ROOM_FLOOR_HEIGHT*0.15;         // how much to cut main room light for each window
 
         Object.seal(this);
     }
@@ -239,7 +239,6 @@ class GenMapClass
             // make room taller
             
         if (pathType===mapRoomConstants.ROOM_PATH_TYPE_GOAL) {
-            console.log('MADE GOAL ROOM');
             if (storyCount<4) storyCount=4;
         }
         
@@ -389,7 +388,7 @@ class GenMapClass
             // intensity
         
         intensity=Math.max(room.xBound.getSize(),room.yBound.getSize(),room.zBound.getSize());
-        intensity+=(room.storyCount-1)*this.ROOM_LIGHT_PER_STORY_BOOST;
+        if (room.storyCount>=2) intensity+=(intensity*((room.storyCount-1)*this.ROOM_LIGHT_PER_STORY_BOOST));
         if (!config.SIMPLE_TEST_MAP) intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
         
             // create the light
@@ -413,7 +412,7 @@ class GenMapClass
         
             // ends
         
-        y=this.yBase-(map.ROOM_FLOOR_HEIGHT+1000);
+        y=this.yBase-(map.ROOM_FLOOR_HEIGHT+(map.ROOM_FLOOR_DEPTH*4));
         
         if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
             xAdd=Math.trunc(hallwaySize*0.5)+map.ROOM_FLOOR_DEPTH;
@@ -678,7 +677,7 @@ class GenMapClass
         let connectOffset;
         let xBound,zBound;
         
-        level=mapRoomConstants.LEVEL_LOWER;         // supergumba -- testing
+        //level=mapRoomConstants.LEVEL_LOWER;         // supergumba -- testing
         
             // get random block size for room
             // and make sure it stays under the max
@@ -882,7 +881,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            //room.decorationType=mapRoomConstants.ROOM_DECORATION_COMPUTER;  // supergumba -- testing
+            //room.decorationType=mapRoomConstants.ROOM_DECORATION_LAB;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case mapRoomConstants.ROOM_DECORATION_PILLARS:

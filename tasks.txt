@@ -14,12 +14,12 @@ WebGL2
 ToDos
 
 #### ai types (charge, sniper, boss?) - boss slower, more health
-#### lab decorations
 #### stairs need quads or blocks at top
-#### frame doors?
 #### office decorations (outside like computers)
 #### lifts instead of platforms?
 #### animals need to have better necks
+#### windows not all way to top of ceiling
+#### windows have different bar types
 
 #### much better landscape texture
 

@@ -1,4 +1,4 @@
-/* global map, MeshUtilityClass, config */
+/* global map, MeshUtilityClass, config, MeshPrimitivesClass */
 
 "use strict";
 
@@ -122,14 +122,14 @@ class GenRoomHallwayClass
         movement.addMove(new MoveClass(1500,new wsPoint(0,0,0)));
         movement.addMove(new MoveClass(1500,new wsPoint(0,-(map.ROOM_FLOOR_HEIGHT-map.ROOM_FLOOR_DEPTH),0)));
         
-        map.addMovement(movement); 
+        map.addMovement(movement);
     }
     
     createHallwayX(xBound,yBound,zBound,doubleDoor)
     {
         let idx,meshCenterPoint,thickSize;
         let vertexList;
-        let zHallwayBound,zThickBound;
+        let zHallwayBound,zThickBound,xFrameBound;
         
         let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
@@ -191,6 +191,14 @@ class GenRoomHallwayClass
         else {
             this.createDoorXSingle(xBound.getMidPoint(),yBound,zBound,thickSize);
         }
+        
+            // the frame
+        
+        xFrameBound=new wsBound(xBound.min,xBound.min);
+        map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
+        
+        xFrameBound=new wsBound(xBound.max,xBound.max);
+        map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
     }
     
     createHallwayDoorZ(xBound,yBound,z,thickSize)
@@ -224,7 +232,7 @@ class GenRoomHallwayClass
     {
         let idx,meshCenterPoint,thickSize;
         let vertexList;
-        let xHallwayBound,xThickBound;
+        let xHallwayBound,xThickBound,zFrameBound;
         
         let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
         
@@ -286,6 +294,14 @@ class GenRoomHallwayClass
         else {
             this.createHallwayDoorZ(xBound,yBound,zBound.getMidPoint(),thickSize);
         }
+        
+            // the frame
+        
+        zFrameBound=new wsBound(zBound.min,zBound.min);
+        map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,true,false,true));
+        
+        zFrameBound=new wsBound(zBound.max,zBound.max);
+        map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,false,false,true));
     }
 }
 

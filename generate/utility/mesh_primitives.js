@@ -548,7 +548,7 @@ class MeshPrimitivesClass
         // frames
         //
         
-    static createFrameX(bitmap,xBound,yBound,zBound,flip,bars)
+    static createFrameX(bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
     {
         let xFrameBound=new wsBound(0,0);
         let yFrameBound=new wsBound(0,0);
@@ -556,6 +556,10 @@ class MeshPrimitivesClass
         let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
         let halfSz=Math.trunc(sz*0.5);
         let y,z,mesh;
+        
+            // if skip bottom, enlarge the frame
+            
+        if (skipBottom) yBound.max+=halfSz;
         
             // the outside frame
             
@@ -573,8 +577,10 @@ class MeshPrimitivesClass
         zFrameBound.setFromValues((zBound.min-halfSz),(zBound.max+halfSz));
         mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
-        yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        if (!skipBottom) {
+            yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        }
         
             // the inner bars
 
@@ -593,7 +599,7 @@ class MeshPrimitivesClass
         return(mesh);
     }
     
-    static createFrameZ(bitmap,xBound,yBound,zBound,flip,bars)
+    static createFrameZ(bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
     {
         let xFrameBound=new wsBound(0,0);
         let yFrameBound=new wsBound(0,0);
@@ -601,6 +607,10 @@ class MeshPrimitivesClass
         let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
         let halfSz=Math.trunc(sz*0.5);
         let x,y,mesh;
+        
+            // if skip bottom, enlarge the frame
+            
+        if (skipBottom) yBound.max+=halfSz;
         
             // the outside frame
             
@@ -618,8 +628,10 @@ class MeshPrimitivesClass
         xFrameBound.setFromValues((xBound.min-halfSz),(xBound.max+halfSz));
         mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
-        yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        if (!skipBottom) {
+            yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        }
         
             // the inner bars
 

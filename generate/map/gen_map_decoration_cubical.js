@@ -78,102 +78,6 @@ class GenRoomDecorationCubicalClass
     }
     
         //
-        // build array of random cubicals
-        //
-        
-    createRandomCubicals(room)
-    {
-        let x,z,x2,z2,hit;
-        let wid,high,startWid,startHigh;
-        let xBlockStart,xBlockEnd,zBlockStart,zBlockEnd;
-        let xSize=room.xBlockSize-2;
-        let zSize=room.zBlockSize-2;
-        let cubes=[];
-
-            // create a grid to
-            // build cubicals in
-            // typed arrays initialize to 0
-
-        let grid=new Uint16Array(xSize*zSize);
-
-            // start making the cubicals
-
-        while (true) {
-
-                // find first open spot
-
-            x=z=0;
-            hit=false;
-
-            while (true) {
-                if (grid[(z*xSize)+x]===0) {
-                    hit=true;
-                    break;
-                }
-                x++;
-                if (x===xSize) {
-                    x=0;
-                    z++;
-                    if (z===zSize) break;
-                }
-            }
-
-                // no more open spots!
-
-            if (!hit) break;
-
-                // random size
-
-            startWid=genRandom.randomIndex(xSize-x);
-            startHigh=genRandom.randomIndex(zSize-z);
-
-                // determine what can fit
-
-            wid=1;
-
-            while (wid<startWid) {
-                if (grid[(z*xSize)+(x+wid)]!==0) break;
-                wid++;
-            }
-
-            high=1;
-
-            while (high<startHigh) {
-                if (grid[((z+high)*xSize)+x]!==0) break;
-                high++;
-            }
-
-                // create the cubical which is always
-                // 1 over because we are leaving a gutter
-                // for the doors
-
-            cubes.push(new wsRect((x+1),(z+1),((x+1)+wid),((z+1)+high)));
-            
-                // always block off +1 so there's a corridor
-                // in between
-            
-            xBlockStart=(x===0)?0:(x-1);
-            
-            xBlockEnd=(x+1)+wid;
-            if (xBlockEnd>xSize) xBlockEnd=xSize;
-            
-            zBlockStart=(z===0)?0:(z-1);
-            
-            zBlockEnd=(z+1)+high;
-            if (zBlockEnd>zSize) zBlockEnd=zSize;
-                
-            for (z2=zBlockStart;z2<zBlockEnd;z2++) {
-                for (x2=xBlockStart;x2<xBlockEnd;x2++) {
-                    grid[(z2*xSize)+x2]=1;
-                }
-            }
-        }
-
-        return(cubes);
-    }
-
-    
-        //
         // cubical decorations mainline
         //
 
@@ -185,7 +89,7 @@ class GenRoomDecorationCubicalClass
         
             // the cubes
             
-        cubes=this.createRandomCubicals(room);
+        cubes=room.createRandomCubes(room);
         
             // get width and height
             

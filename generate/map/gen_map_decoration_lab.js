@@ -10,124 +10,70 @@ class GenRoomDecorationLabClass
 {
     constructor()
     {
-        let minRadius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.08);
-        let maxRadius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.14);
-
-        let radius=genRandom.randomInBetween(minRadius,maxRadius);
-        this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(radius,radius,1,4);
-        
         Object.seal(this);
     }
     
         //
-        // pillar types
+        // lab tube
         //
         
-    addPillarsCorners(room,bitmap,inside)
+    addTube(room,pnt)
     {
-        let mx,mz,pos,yBound;
-        
-        pos=room.checkGroundFloorSpawnAndBlock(1,1);
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(1,1);
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        pos=room.checkGroundFloorSpawnAndBlock((room.xBlockSize-2),1);
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),1);
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        pos=room.checkGroundFloorSpawnAndBlock((room.xBlockSize-2),(room.zBlockSize-2));
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),(room.zBlockSize-2));
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        pos=room.checkGroundFloorSpawnAndBlock(1,(room.zBlockSize-2));
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(1,(room.zBlockSize-2));
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        if (inside) {
-            mx=Math.trunc(room.xBlockSize/2);
-            mz=Math.trunc(room.zBlockSize/2);
-            
-            pos=room.checkGroundFloorSpawnAndBlock((mx-2),(mz-2));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx-2),(mz-2));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
+        let xBound,yBound,zBound;
+        let wid,centerPnt,radius;
+        let platformBitmap,metalBitmap;
 
-            pos=room.checkGroundFloorSpawnAndBlock((mx+1),(mz-2));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx+1),(mz-2));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-
-            pos=room.checkGroundFloorSpawnAndBlock((mx+1),(mz+1));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx+1),(mz+1));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-
-            pos=room.checkGroundFloorSpawnAndBlock((mx-2),(mz+1));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx-2),(mz+1));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION)); 
-        }
-    }
-    
-    addPillarsLineX(room,bitmap)
-    {
-        let x,mx,mz,pos,yBound;
+        platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        metalBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-        mx=Math.trunc(room.xBlockSize/2);
-        mz=Math.trunc(room.zBlockSize/2);
-        
-        for (x=1;x<=(room.xBlockSize-2);x+=2) {
-            if (x===mx) continue;           // never block light
+            // the top and bottom base
             
-            pos=room.checkGroundFloorSpawnAndBlock(x,mz);
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(x,mz);
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        }
-    }
-    
-    addPillarsLineZ(room,bitmap)
-    {
-        let z,mx,mz,pos,yBound;
+        wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.9);
+
+        xBound=new wsBound(pnt.x,(pnt.x+wid));
+        zBound=new wsBound(pnt.z,(pnt.z+wid));
+
+        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+
+        yBound=new wsBound((room.yBound.max-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),(room.yBound.max-map.ROOM_FLOOR_HEIGHT));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+
+            // the tube
         
-        mx=Math.trunc(room.xBlockSize/2);
-        mz=Math.trunc(room.zBlockSize/2);
+        centerPnt=new wsPoint(xBound.getMidPoint(),room.yBound.max,zBound.getMidPoint());
+        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
         
-        for (z=1;z<=(room.zBlockSize-2);z+=2) {
-            if (z===mz) continue;           // never block light
-            
-            pos=room.checkGroundFloorSpawnAndBlock(mx,z);
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(mx,z);
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        }
+        radius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.3);
+        
+        map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(metalBitmap,centerPnt,yBound,radius,map.MESH_FLAG_DECORATION));
     }
-    
+        
         //
         // lab
         //
     
     create(room)
     {
-        return;
+        let n,x,z,cubes,rect;
+        let pnt=new wsPoint(0,0);
         
-            // texture
+            // the cubes
             
-        let bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
+        cubes=room.createRandomCubes(room);
         
-            // random pillar types
+            // create cubical walls
+        
+        for (n=0;n!==cubes.length;n++) {
+            rect=cubes[n];
             
-        switch (genRandom.randomIndex(5)) {
-            case 0:
-                this.addPillarsCorners(room,bitmap,false);
-                return;
-            case 1:
-                this.addPillarsCorners(room,bitmap,true);
-                return;
-            case 2:
-                this.addPillarsLineX(room,bitmap);
-                return;
-            case 3:
-                this.addPillarsLineZ(room,bitmap);
-                return;
-            case 4:
-                this.addPillarsLineX(room,bitmap);
-                this.addPillarsLineZ(room,bitmap);
-                return;
+            for (z=rect.top;z<rect.bot;z++) {
+                for (x=rect.lft;x<rect.rgt;x++) {
+                    room.setBlockGrid(0,x,z);
+                    pnt.setFromValues((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),room.yBound.min,(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)));
+                    this.addTube(room,pnt);
+                }
+            }
         }
     }
     
