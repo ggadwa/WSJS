@@ -1783,7 +1783,7 @@ class GenBitmapClass
     drawVerticalGradient(bitmapCTX,lft,top,rgt,bot,topColor,botColor)
     {
         let x,y,idx;
-        let colorDif,factor,redByte,greenByte,blueByte;
+        let rDif,gDif,bDif,factor,redByte,greenByte,blueByte;
         let wid=rgt-lft;
         let high=bot-top;
         let bitmapImgData,bitmapData;
@@ -1795,7 +1795,9 @@ class GenBitmapClass
         bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
         
-        colorDif=new wsColor((botColor.r-topColor.r),(botColor.g-topColor.g),(botColor.b-topColor.b));
+        rDif=botColor.r-topColor.r;
+        gDif=botColor.g-topColor.g;
+        bDif=botColor.b-topColor.b;
 
             // write the stripe
 
@@ -1803,9 +1805,9 @@ class GenBitmapClass
 
             factor=y/high;
             
-            redByte=Math.trunc((topColor.r+(colorDif.r*factor))*255.0);
-            greenByte=Math.trunc((topColor.g+(colorDif.g*factor))*255.0);
-            blueByte=Math.trunc((topColor.b+(colorDif.b*factor))*255.0);
+            redByte=Math.trunc((topColor.r+(rDif*factor))*255.0);
+            greenByte=Math.trunc((topColor.g+(gDif*factor))*255.0);
+            blueByte=Math.trunc((topColor.b+(bDif*factor))*255.0);
             
             idx=(y*wid)*4;
 

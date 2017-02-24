@@ -16,14 +16,9 @@ ToDos
 #### ai types (charge, sniper, boss?) - boss slower, more health
 #### stairs need quads or blocks at top
 #### office decorations (outside like computers)
-#### lifts instead of platforms?
+#### lifts instead of platforms in lower levels
 #### animals need to have better necks
-#### windows not all way to top of ceiling
 #### windows have different bar types
-
-#### much better landscape texture
-
-#### ledges can be taller
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
 #### item texture is pretty ugly
@@ -32,7 +27,6 @@ ToDos
 #### get rid of weapon fire hard-coding
 #### implement reflect for projectiles
 #### liquid tint colors are hard-coded
-#### outside sections
 #### model spikes
 #### flyers models
 #### draw closest map meshes first

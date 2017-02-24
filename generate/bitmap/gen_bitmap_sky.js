@@ -52,49 +52,111 @@ class GenBitmapSkyClass extends GenBitmapClass
         this.drawOval(bitmapCTX,(rgt-20),(top-20),(rgt+20),(top+20),cloudColor,null);
     }
     
-    generateMountains(bitmapCTX,lft,top,rgt,bot,mountainColor)
+    generateMountainsBuildRange(top,bot,yPercStart,rangeCount,rangeSize)
     {
-        let x,y,xFix,yStart;
+        let n,yStart;
+        let high=bot-top;
+        let rangeY=[];
         
-        bitmapCTX.strokeStyle=this.colorToRGBColor(mountainColor);
-        
-        xFix=rgt-Math.trunc((rgt-lft)*0.025);
-        y=yStart=bot-Math.trunc((bot-top)*0.5);
+        yStart=high-Math.trunc(high*yPercStart);
 
-        for (x=lft;x!==rgt;x++) {
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x,y);
-            bitmapCTX.lineTo(x,bot);
-            bitmapCTX.stroke();
+        for (n=0;n<(rangeCount-1);n++) {
+            rangeY.push(yStart+genRandom.randomInt(0,rangeSize));
+        }
+        
+        rangeY.push(yStart);
+    
+        return(rangeY);
+    }
+    
+    generateMountainsDraw(bitmapCTX,lft,top,rgt,bot,rangeY,yOffset,lineDepth,col)
+    {
+        let x,y,idx;
+        let xSize,prevX,nextX,prevY,nextY,slopeY,rangeIdx;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
+        
+        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
+        
+            // run through the ranges
             
-            if (x<xFix) {
-                y+=(genRandom.randomPercentage(0.5)?1:-1);
+        xSize=Math.trunc(wid/(rangeY.length+1));
+        nextX=0;
+        
+        nextY=rangeY[0];
+        
+        rangeIdx=0;
+
+        for (x=0;x!==wid;x++) {
+            
+                // time for new slope
+                
+            if (x===nextX) {
+                prevX=nextX;
+                nextX=prevX+xSize;
+                
+                prevY=nextY;
+                
+                if (rangeY.length>rangeIdx) {
+                    nextY=rangeY[rangeIdx];
+                    rangeIdx++;
+                }
+                else {
+                    nextY=rangeY[0];
+                }
             }
-            else {
-                if (y!==yStart) y+=((y<yStart)?1:-1);
+            
+                // get the Y for the slope
+
+            slopeY=(prevY+Math.trunc((nextY-prevY)*((x-prevX)/xSize)))+yOffset;
+            
+                // draw the line
+                
+            for (y=slopeY;y<bot;y++) {
+                idx=((y*wid)+x)*4;
+                
+                if ((y-slopeY)<lineDepth) {
+                    bitmapData[idx]=0;
+                    bitmapData[idx+1]=0;
+                    bitmapData[idx+2]=0;
+                    continue;
+                }
+
+                bitmapData[idx]=Math.trunc(col.r*255.0);
+                bitmapData[idx+1]=Math.trunc(col.g*255.0);
+                bitmapData[idx+2]=Math.trunc(col.b*255.0);
             }
         }
+        
+        bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
 
     generateSkyClouds(bitmapCTX,wid,high)
     {
         let mx=Math.trunc(wid*0.5);
         let my=Math.trunc(high*0.5);
+        let rangeY;
         
-        let cloudColor=new wsColor(1,1,1);
-        let mountainColor=new wsColor(0.7,0.4,0.0);
-        let groundColor=new wsColor(0.52,0.35,0.25);
+        let cloudColor=this.getRandomColor();//new wsColor(1,1,1);
+        let skyColor=this.getRandomColor();//new wsColor(0.1,0.95,1.0)
+        let mountainColor=this.getRandomColor();//new wsColor(0.65,0.35,0.0);
+        let groundColor=this.darkenColor(mountainColor,0.8);
         
         this.drawRect(bitmapCTX,0,0,wid,high,cloudColor);
         
             // side
             
-        this.drawVerticalGradient(bitmapCTX,0,my,mx,high,new wsColor(0.1,0.95,1.0),new wsColor(0.0,0.2,1.0));
-        this.generateClouds(bitmapCTX,0,my,mx,high,cloudColor);
-        this.blur(bitmapCTX,0,my,mx,high,3,true);
+        this.drawVerticalGradient(bitmapCTX,0,my,wid,high,skyColor,this.darkenColor(skyColor,0.5));
+        this.generateClouds(bitmapCTX,0,my,wid,high,cloudColor);
+        this.blur(bitmapCTX,0,my,wid,high,3,true);
         
-        this.generateMountains(bitmapCTX,0,my,mx,high,mountainColor);
-        this.blur(bitmapCTX,0,my,mx,high,2,true);
+        rangeY=this.generateMountainsBuildRange(my,high,0.5,genRandom.randomInt(20,10),30);
+        this.generateMountainsDraw(bitmapCTX,0,my,wid,high,rangeY,0,3,mountainColor);
+        
+        rangeY=this.generateMountainsBuildRange(my,high,0.35,genRandom.randomInt(15,5),20);
+        this.generateMountainsDraw(bitmapCTX,0,my,wid,high,rangeY,0,3,groundColor);
         
             // top and bottom
             
