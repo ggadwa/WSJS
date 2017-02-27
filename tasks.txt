@@ -13,7 +13,9 @@ WebGL2
 
 ToDos
 
+#### ai needs to fire down
 #### ai types (charge, sniper, boss?) - boss slower, more health
+#### need to be able to block off meshes/models outside view?
 #### stairs need quads or blocks at top
 #### office decorations (outside like computers)
 #### lifts instead of platforms in lower levels

@@ -210,12 +210,12 @@ class MainClass
         modelBitmap=genBitmapSkin.generateRandom(false);
 
         monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
-        //monsterType=modelConstants.MODEL_TYPE_BLOB;      // supergumba -- testing
+        monsterType=modelConstants.MODEL_TYPE_HUMANOID;      // supergumba -- testing
         model=new ModelClass('boss',monsterType);
 
             // build the skeleton and mesh
 
-        genSkeleton=new GenModelOrganicSkeletonClass(model,genRandom.randomFloat(2.0,3.0));
+        genSkeleton=new GenModelOrganicSkeletonClass(model,genRandom.randomFloat(2.5,3.0));
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
@@ -324,7 +324,7 @@ class MainClass
         if (config.MONSTER_BOSS) {
             pos=map.findRandomBossPosition();
             model=modelList.cloneModel('boss');
-            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,genAI.generate()));
+            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate()));
         }
 
             // finished

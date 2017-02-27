@@ -20,23 +20,23 @@ class ConfigClass
         this.ROOM_DECORATIONS=true;                // if the room has decorations
         this.ROOM_LIQUIDS=true;                     // turns on or off liquids
         this.SIMPLE_TEST_MAP=false;                  // a special simple map for testing other elements
-        this.SHOW_OVERLAY_MAP=true;                 // to turn on/off the overlay map
+        this.SHOW_OVERLAY_MAP=false;                 // to turn on/off the overlay map
 
             //
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=0.15;                 // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=0.0;                 // all over ambient light [r,g,b]
 
             //
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=0;
+        this.MONSTER_TYPE_COUNT=3;
+        this.MONSTER_ENTITY_COUNT=10;
         
-        this.MONSTER_AI_ON=false;
-        this.MONSTER_BOSS=false;
+        this.MONSTER_AI_ON=true;
+        this.MONSTER_BOSS=true;
         
             //
             // sounds
@@ -55,8 +55,8 @@ class ConfigClass
             // play testing
             //
 
-        this.PLAYER_CLIP_WALLS=true;
-        this.PLAYER_FLY=true;
+        this.PLAYER_CLIP_WALLS=false;
+        this.PLAYER_FLY=false;
 
             //
             // draw debuging

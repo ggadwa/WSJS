@@ -249,25 +249,23 @@ class GenMapClass
         
             // determine the decoration type
         
-        if (liquid) {
-            decorationType=mapRoomConstants.ROOM_DECORATION_LIQUID_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LIQUID_LIST.length)];
+        switch (level) {
+            case mapRoomConstants.LEVEL_NORMAL:
+                decorationType=mapRoomConstants.ROOM_DECORATION_NORMAL_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_NORMAL_LIST.length)];
+                break;
+            case mapRoomConstants.LEVEL_LOWER:
+                decorationType=mapRoomConstants.ROOM_DECORATION_LOWER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LOWER_LIST.length)];
+                break;
+            case mapRoomConstants.LEVEL_HIGHER:
+                decorationType=mapRoomConstants.ROOM_DECORATION_HIGHER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_HIGHER_LIST.length)];
+                break;
+            default:
+                decorationType=mapRoomConstants.ROOM_DECORATION_PATH_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_PATH_LIST.length)];
+                break;
         }
-        else {
-            switch (level) {
-                case mapRoomConstants.LEVEL_NORMAL:
-                    decorationType=mapRoomConstants.ROOM_DECORATION_NORMAL_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_NORMAL_LIST.length)];
-                    break;
-                case mapRoomConstants.LEVEL_LOWER:
-                    decorationType=mapRoomConstants.ROOM_DECORATION_LOWER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LOWER_LIST.length)];
-                    break;
-                case mapRoomConstants.LEVEL_HIGHER:
-                    decorationType=mapRoomConstants.ROOM_DECORATION_HIGHER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_HIGHER_LIST.length)];
-                    break;
-                default:
-                    decorationType=mapRoomConstants.ROOM_DECORATION_PATH_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_PATH_LIST.length)];
-                    break;
-            }
-        }
+        
+        if (liquid) decorationType=mapRoomConstants.ROOM_DECORATION_LIQUID_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LIQUID_LIST.length)];
+        if (pathType===mapRoomConstants.ROOM_PATH_TYPE_GOAL) decorationType=mapRoomConstants.ROOM_DECORATION_NONE;
         
             // top of room
             
@@ -881,7 +879,7 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            room.decorationType=mapRoomConstants.ROOM_DECORATION_LAB;  // supergumba -- testing
+            //room.decorationType=mapRoomConstants.ROOM_DECORATION_LAB;  // supergumba -- testing
             
             switch (room.decorationType) {
                 case mapRoomConstants.ROOM_DECORATION_PILLARS:
