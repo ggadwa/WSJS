@@ -899,7 +899,7 @@ class GenMapClass
                     pipe.create(room);
                     break;
                 case mapRoomConstants.ROOM_DECORATION_CUBICAL:
-                    if (cubicle===null) cublice=new GenRoomDecorationCubicalClass();
+                    if (cubicle===null) cubicle=new GenRoomDecorationCubicalClass();
                     cubicle.create(room);
                     break;
                 case mapRoomConstants.ROOM_DECORATION_LAB:
