@@ -422,7 +422,7 @@ class ModelSkeletonClass
         if (flipLeg) {
             this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
             this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*0.7),0.0,0.0);
-            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues((r*0.5),0.0,0.0);
+            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(-(r*0.8),0.0,0.0);
         }
         else {
             this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(-r,0.0,0.0);

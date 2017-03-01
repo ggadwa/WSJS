@@ -15,6 +15,10 @@ class CollisionClass
         this.spokePt=new wsPoint(0,0,0);        // these are global to avoid it being local and GCd
         this.spokeHitPt=new wsPoint(0,0,0);
         this.spokeLine=new wsLine(null,null);
+        
+        this.spokeCalcSin=new Float32Array(24);    // circular collision pre-calcs
+        this.spokeCalcCos=new Float32Array(24);
+        this.preCalcSpokes();
 
         this.testPt=new wsPoint(0,0,0);
         this.moveIntersectPt=new wsPoint(0,0,0);
@@ -27,13 +31,26 @@ class CollisionClass
         Object.seal(this);
     }
     
+    preCalcSpokes()
+    {
+        let n;
+        let rad=0.0;
+        let radAdd=(Math.PI*2.0)/24.0;
+        
+        for (n=0;n!==24;n++) {
+            this.spokeCalcSin[n]=Math.sin(rad);
+            this.spokeCalcCos[n]=Math.cos(rad);
+            rad+=radAdd;
+        }
+    }
+    
         //
         // collision routines
         //
     
     lineLineXZIntersection(line1,line2,lineIntersectPt)
     {
-        let denom,r,s;
+        let denom,r,s,ax,az;
         
         let fx0=line1.p1.x;
         let fz0=line1.p1.z;
@@ -44,16 +61,17 @@ class CollisionClass
         let fx3=line2.p2.x;
         let fz3=line2.p2.z;
 
-        let ax=fx0-fx2;
         let bx=fx1-fx0;
         let dx=fx3-fx2;
 
-        let az=fz0-fz2;
         let bz=fz1-fz0;
         let dz=fz3-fz2;
 
         denom=(bx*dz)-(bz*dx);
         if (denom===0.0) return(false);
+        
+        ax=fx0-fx2;
+        az=fz0-fz2;
 
         r=((az*dx)-(ax*dz))/denom;
         if ((r<0.0) || (r>1.0)) return(false);
@@ -77,16 +95,12 @@ class CollisionClass
         let n,dist;
         let currentDist=-1;
         
-        let rad=0.0;
-        let radAdd=(Math.PI*2.0)/24.0;
-        
         this.spokePt.setFromValues(circlePt.x,circlePt.y,circlePt.z);
         this.spokeLine.setFromValues(circlePt,this.spokePt);
 
         for (n=0;n!==24;n++) {
-            
-            this.spokePt.x=circlePt.x+(radius*Math.sin(rad));
-            this.spokePt.z=circlePt.z-(radius*Math.cos(rad));   // everything is passed by pointer so this will change the spoke line
+            this.spokePt.x=circlePt.x+(radius*this.spokeCalcSin[n]);
+            this.spokePt.z=circlePt.z-(radius*this.spokeCalcCos[n]);   // everything is passed by pointer so this will change the spoke line
 
             if (this.lineLineXZIntersection(line,this.spokeLine,this.spokeHitPt)) {
                 dist=circlePt.noSquareDistance(this.spokeHitPt);
@@ -95,8 +109,6 @@ class CollisionClass
                     currentDist=dist;
                 }
             }
-
-            rad+=radAdd;
         }
         
         return(currentDist!==-1);
@@ -164,6 +176,7 @@ class CollisionClass
             // no collisions yet
             
         entity.collideWallMeshIdx=-1;
+        entity.collideWallLineIdx=-1;
         
             // we need to possible run through
             // this multiple times to deal with
@@ -208,6 +221,7 @@ class CollisionClass
                     dist=this.testPt.noSquareDistance(this.moveIntersectPt);
                     if ((dist<currentDist) || (currentDist===-1)) {
                         entity.collideWallMeshIdx=n;
+                        entity.collideWallLineIdx=k;
                         currentHitPt=this.moveIntersectPt;
                         currentDist=dist;
                         bumpY=-1;

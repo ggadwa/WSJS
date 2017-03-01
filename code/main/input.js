@@ -199,7 +199,6 @@ class InputClass
     }
     
         // start/stop mouse events
-        // supergumba -- eventually get rid of moz/webkit stuff
     
     mouseStart()
     {

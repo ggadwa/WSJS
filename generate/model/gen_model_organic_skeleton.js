@@ -137,7 +137,7 @@ class GenModelOrganicSkeletonClass
         let toeCount,toeLength;
         let vct;
         let kneeHigh=Math.trunc(hipHigh*0.5);
-        let ankleHigh=Math.trunc(hipHigh*0.05);
+        let ankleHigh=-Math.trunc(legRadius*0.5);
         
         if (genRandom.randomPercentage(0.2)) {
             toeCount=0;

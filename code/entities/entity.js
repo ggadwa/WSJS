@@ -19,6 +19,8 @@ class EntityClass
         this.radius=this.model.calculateRadius();
         this.high=this.model.calculateHeight();
         
+        this.positionBackup=new wsPoint(0,0,0);
+        
         this.eyeOffset=3000;
 
         this.id=-1;
@@ -52,6 +54,7 @@ class EntityClass
         this.touchEntity=null;
         
         this.collideWallMeshIdx=-1;
+        this.collideWallLineIdx=-1;
         this.collideCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
         
@@ -61,6 +64,8 @@ class EntityClass
         this.checkMovePt=new wsPoint(0,0,0);
         this.collideMovePt=new wsPoint(0,0,0);
         this.collideSlideMovePt=new wsPoint(0,0,0);
+        this.reflectMovementVector=new wsPoint(0,0,0);
+        this.reflectLineVector=new wsPoint(0,0,0);
 
         this.xFrustumBound=new wsBound(0,0);
         this.yFrustumBound=new wsBound(0,0);
@@ -119,6 +124,20 @@ class EntityClass
     setMovementSideRight(on)
     {
         this.movementSideRightOn=on;
+    }
+    
+        //
+        // utility to backup and restore position
+        //
+        
+    backupPosition()
+    {
+        this.positionBackup.setFromPoint(this.position);
+    }
+    
+    restorePosition()
+    {
+        this.position.setFromPoint(this.positionBackup);
     }
     
         //
@@ -233,6 +252,13 @@ class EntityClass
     
     move(bump,slide,noGravity,clipping)
     {
+            // clear collision flags
+            
+        this.touchEntity=null;
+        this.collideWallMeshIdx=-1;
+        this.collideCeilingMeshIdx=-1;
+        this.standOnMeshIdx=-1;
+
             // calculate the movement, add in
             // acceleration and deceleration
         
@@ -345,6 +371,41 @@ class EntityClass
     {
         this.gravity=this.gravityMinValue;
         this.movement.y=-jumpValue;
+    }
+    
+    movementReflect()
+    {
+        let f,ang;
+        let collisionLine;
+        
+            // get the movement vector from the hit
+            // point, which is the inverse
+
+        this.reflectMovementVector.setFromValues(this.movement.x,0,this.movement.z);
+        this.reflectMovementVector.rotateY(null,this.angle.y);
+        this.reflectMovementVector.trunc();
+        this.reflectMovementVector.scale(-1.0);
+        
+            // get the collision line vector
+        
+        collisionLine=map.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
+        this.reflectLineVector.setFromSubPoint(collisionLine.p1,collisionLine.p2);
+	
+            // now get the angle between them,
+            // checking both directions of wall
+            
+        this.reflectMovementVector.normalize();
+        this.reflectLineVector.normalize();
+            
+        f=this.reflectLineVector.dot(this.reflectMovementVector);
+        ang=Math.acos(f)*RAD_TO_DEGREE;
+
+            // calculate the reflection angle
+		
+	ang=this.angle.y-(180.0-(ang*2.0));
+	if (ang===this.angle.y) ang=this.angle.y+180.0;          // special check for straight hits
+
+	this.angle.y=ang;
     }
     
         //

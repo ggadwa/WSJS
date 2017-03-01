@@ -26,6 +26,7 @@ class EntityMonsterClass extends EntityClass
         this.lastShotTimeStamp=0;
         
         this.enemyId=-1;
+        this.currentDistanceToEnemy=0;
         this.lastAngleDifToEnemy=360;
         
             // global to stop GC
@@ -77,8 +78,10 @@ class EntityMonsterClass extends EntityClass
         if (view.timeStamp<this.lastShotTimeStamp) return;
         
             // check if we are within fire slop angle
+            // or too far away
             
         if (this.lastAngleDifToEnemy>this.ai.fireSlopAngle) return;
+        if (this.currentDistanceToEnemy>this.ai.fireMaxDistance) return;
         
             // fire
 
@@ -95,28 +98,38 @@ class EntityMonsterClass extends EntityClass
     }
     
         //
-        // wake up
+        // wake up or sleep
         //
         
-    wakeUp(enemy)
+    wakeUpOrSleep(enemy)
     {
-        let dist;
-        
-            // if we are already awake, skip
-            // also never awake if AI is off
+            // if monster AI is off, just keep sleeping
             
-        if ((this.active) || (!config.MONSTER_AI_ON)) return;
+        if (!config.MONSTER_AI_ON) return;
+        
+            // if active, see if time to sleep
+            
+        if (this.active) {
+            if (this.ai.sleepDistance===-1) return;         // some monsters never sleep
+            
+            if (this.currentDistanceToEnemy>this.ai.sleepDistance) {
+                this.active=false;
+                this.model.skeleton.resetAnimation();
+                return;
+            }
+            
+            return;
+        }
         
             // get distance, near wake distance always
             // wakes, far only if seen
             
-        dist=enemy.position.distance(this.position);
-        if (dist>this.ai.farWakeDistance) return;
+        if (this.currentDistanceToEnemy>this.ai.farWakeDistance) return;
         
             // if within near, wake up
             // otherwise, wake up if looking at you
             
-        if (dist<this.ai.nearWakeDistance) {
+        if (this.currentDistanceToEnemy<this.ai.nearWakeDistance) {
             this.active=true;
         }
         else {
@@ -154,9 +167,13 @@ class EntityMonsterClass extends EntityClass
             this.enemyId=enemy.id;
         }
         
-            // time to activate monster?
+            // always mark last distance to enemy
             
-        this.wakeUp(enemy);
+        this.currentDistanceToEnemy=enemy.position.distance(this.position);
+        
+            // time to wake or sleep monster?
+            
+        this.wakeUpOrSleep(enemy);
         
             // inactive monsters currently just stand
             

@@ -20,11 +20,13 @@ class AIClass
         this.nearWakeDistance=0;
         this.farWakeDistance=0;
         this.farWakeHalfAngleFieldOfVision=0;
+        this.sleepDistance=0;
         
         this.projectile=null;
         
         this.fireRechargeTick=0;
         this.fireSlopAngle=0;
+        this.fireMaxDistance=0;
         this.lastFireTimeStamp=0;
         
         this.wakeSoundBuffer=null;
@@ -44,11 +46,12 @@ class AIClass
         this.walkTurnSpeed=walkTurnSpeed;
     }
     
-    setWakeDistance(nearWakeDistance,farWakeDistance,farWakeHalfAngleFieldOfVision)
+    setWakeSleepDistance(nearWakeDistance,farWakeDistance,farWakeHalfAngleFieldOfVision,sleepDistance)
     {
         this.nearWakeDistance=nearWakeDistance;
         this.farWakeDistance=farWakeDistance;
         this.farWakeHalfAngleFieldOfVision=farWakeHalfAngleFieldOfVision;
+        this.sleepDistance=sleepDistance;
     }
     
     setProjectile(projectile)
@@ -56,10 +59,11 @@ class AIClass
         this.projectile=projectile;
     }
     
-    setProjectileFire(fireRechargeTick,fireSlopAngle)
+    setProjectileFire(fireRechargeTick,fireSlopAngle,fireMaxDistance)
     {
         this.fireRechargeTick=fireRechargeTick;
         this.fireSlopAngle=fireSlopAngle;
+        this.fireMaxDistance=fireMaxDistance;
     }
     
     setSoundBuffers(wakeSoundBuffer,hurtSoundBuffer,dieSoundBuffer)

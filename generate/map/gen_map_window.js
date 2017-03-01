@@ -133,6 +133,18 @@ class GenRoomWindowClass
         
         wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
         storyHigh=map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH;
+            
+            // get the Y bound
+            // always need to remove on floor depth for top of window
+            // if story > 1, then we never put window on lowest story
+
+        if (room.storyCount>1) {
+            story=genRandom.randomInt(1,(room.storyCount-1));
+        }
+        else {
+            story=genRandom.randomInt(0,room.storyCount);
+        }
+        yWindowBound=new wsBound(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
         
             // create windows
             
@@ -165,18 +177,6 @@ class GenRoomWindowClass
             else {
                 connectOffset=genRandom.randomInt(1,(room.xBlockSize-3));
             }
-            
-                // get the Y bound
-                // always need to remove on floor depth for top of window
-                // if story > 1, then we never put window on lowest story
-            
-            if (room.storyCount>1) {
-                story=genRandom.randomInt(1,(room.storyCount-1));
-            }
-            else {
-                story=genRandom.randomInt(0,room.storyCount);
-            }
-            yWindowBound=new wsBound(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
             
                 // get the box
                 

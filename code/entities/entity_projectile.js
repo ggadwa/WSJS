@@ -49,6 +49,7 @@ class EntityProjectileClass extends EntityClass
         
     bounce()
     {
+        this.restorePosition();
         if (!this.movementBounce(this.projectile.bounceFactor)) {
             this.movementForwardMaxSpeed=0;         // if we can't bounce, then stop
         }
@@ -56,7 +57,8 @@ class EntityProjectileClass extends EntityClass
     
     reflect()
     {
-        
+        this.restorePosition();
+        this.movementReflect();
     }
     
         //
@@ -95,11 +97,18 @@ class EntityProjectileClass extends EntityClass
             // move it
         
         this.setMovementForward(true);
+        this.backupPosition();
         this.move(false,false,this.projectile.noGravity,false);
         
             // check collisions
         
         if (this.isAnyCollision()) {
+            
+                // skip any collisions with parentEntity
+
+            if (this.touchEntity!==null) {
+                if (this.touchEntity.id===this.parentEntityId) return;
+            }
             
                 // bouncing
                 

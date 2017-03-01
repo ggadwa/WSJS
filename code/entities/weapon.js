@@ -8,7 +8,7 @@
 
 class WeaponClass
 {
-    constructor(model,projectile)
+    constructor(model)
     {
         this.model=model;
         this.projectiles=[];

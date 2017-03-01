@@ -303,7 +303,7 @@ class MainClass
         monsterAIs=[];
         
         for (n=0;n!==config.MONSTER_TYPE_COUNT;n++) {
-            monsterAIs.push(genAI.generate());
+            monsterAIs.push(genAI.generate(false));
         }
 
             // make monster entities
@@ -324,7 +324,7 @@ class MainClass
         if (config.MONSTER_BOSS) {
             pos=map.findRandomBossPosition();
             model=modelList.cloneModel('boss');
-            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate()));
+            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 
             // finished
