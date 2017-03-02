@@ -436,6 +436,30 @@ class wsPoint
         return(fang);
     }
     
+    angleXTo(pt)
+    {
+            // z is pointing up, atan2 gives us the angle to the y vector,
+            // so we need the Z up vector (positive) and the vector to pt
+            // then subtract them for correct angle
+        
+        let fang=(Math.atan2(0,100)-Math.atan2((pt.y-this.y),(pt.z-this.z)))*RAD_TO_DEGREE;
+        
+            // now we need to switch it up for which side the y is on
+            // (if greater, the #s are 0 to -180, if positive, 180 to 0)
+            
+        if (this.y>pt.y) {
+            fang=-fang;
+        }
+        else {
+            fang=(180.0-fang)+180.0;
+        }
+        
+        if (fang<0) fang=360.0+fang;
+        if (fang>=360.0) fang-=360.0;
+        
+        return(fang);
+    }
+    
     copy()
     {
         return(new wsPoint(this.x,this.y,this.z));

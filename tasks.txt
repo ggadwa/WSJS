@@ -13,8 +13,6 @@ WebGL2
 
 ToDos
 
-#### better lab decoration
-#### projectiles need Y aim
 #### monsters still getting hit by own projectiles
 #### need meeles for monsters
 

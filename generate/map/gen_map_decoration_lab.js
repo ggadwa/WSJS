@@ -14,13 +14,13 @@ class GenRoomDecorationLabClass
     }
     
         //
-        // lab tube
+        // lab tubes
         //
         
-    addTube(room,pnt)
+    addTube(room,pnt,largeBase)
     {
         let xBound,yBound,zBound;
-        let wid,centerPnt,radius;
+        let wid,yMid,centerPnt,radius;
         let platformBitmap,metalBitmap;
 
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
@@ -33,7 +33,13 @@ class GenRoomDecorationLabClass
         xBound=new wsBound(pnt.x,(pnt.x+wid));
         zBound=new wsBound(pnt.z,(pnt.z+wid));
 
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        if (!largeBase) {
+            yMid=(room.yBound.max-map.ROOM_FLOOR_DEPTH);
+        }
+        else {
+            yMid=room.yBound.max-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.5);
+        }
+        yBound=new wsBound(yMid,room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
 
         yBound=new wsBound((room.yBound.max-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),(room.yBound.max-map.ROOM_FLOOR_HEIGHT));
@@ -42,7 +48,7 @@ class GenRoomDecorationLabClass
             // the tube
         
         centerPnt=new wsPoint(xBound.getMidPoint(),room.yBound.max,zBound.getMidPoint());
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
+        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),yMid);
         
         radius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.3);
         
@@ -56,13 +62,13 @@ class GenRoomDecorationLabClass
     addPump(room,pnt)
     {
         let xBound,yBound,zBound;
-        let wid,centerPnt,radius;
+        let wid,reduceSize;
         let platformBitmap,metalBitmap;
 
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         metalBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-            // the top and bottom base
+            // the top \base
             
         wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.9);
 
@@ -71,18 +77,17 @@ class GenRoomDecorationLabClass
 
         yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        
+            // the pump
+        
+        reduceSize=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        xBound.min+=reduceSize;
+        xBound.max-=reduceSize;
+        zBound.min+=reduceSize;
+        zBound.max-=reduceSize;
 
-        yBound=new wsBound((room.yBound.max-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),(room.yBound.max-map.ROOM_FLOOR_HEIGHT));
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
-
-            // the tube
-        
-        centerPnt=new wsPoint(xBound.getMidPoint(),room.yBound.max,zBound.getMidPoint());
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
-        
-        radius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.3);
-        
-        map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(metalBitmap,centerPnt,yBound,radius,map.MESH_FLAG_DECORATION));
+        yBound=new wsBound((room.yBound.max-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.5)),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
     }
         
         //
@@ -107,7 +112,19 @@ class GenRoomDecorationLabClass
                 for (x=rect.lft;x<rect.rgt;x++) {
                     room.setBlockGrid(0,x,z);
                     pnt.setFromValues((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),room.yBound.min,(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)));
-                    this.addTube(room,pnt);
+                    
+                    switch (genRandom.randomIndex(3)) {
+                        case 0:
+                            this.addTube(room,pnt,false);
+                            break;
+                        case 1:
+                            this.addTube(room,pnt,true);
+                            break;
+                        case 2:
+                            this.addPump(room,pnt);
+                            break;
+                    }
+                    
                 }
             }
         }

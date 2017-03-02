@@ -83,7 +83,7 @@ class EntityMonsterClass extends EntityClass
         if (this.lastAngleDifToEnemy>this.ai.fireSlopAngle) return;
         if (this.currentDistanceToEnemy>this.ai.fireMaxDistance) return;
         
-            // fire
+            // setup fire position
 
         this.lastShotTimeStamp=view.timeStamp+this.ai.fireRechargeTick;
 
@@ -93,6 +93,10 @@ class EntityMonsterClass extends EntityClass
         this.firePosition.rotate(this.fireAngle);
         this.firePosition.addPoint(this.position);
         this.firePosition.y-=Math.trunc(this.high*0.5);        // supergumba -- all this is hardcoded!
+        
+        this.fireAngle.x=-(this.firePosition.angleXTo(enemy.position)*0.7);     // need to calculate this better for speed
+        
+            // fire
 
         this.ai.projectile.fire(this.id,this.firePosition,this.fireAngle);
     }
