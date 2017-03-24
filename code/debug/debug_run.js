@@ -1,19 +1,31 @@
 "use strict";
 
+class DebugItemClass
+{
+    constructor(name,objType,obj)
+    {
+        this.name=name;
+        this.objType=objType;
+        this.obj=obj;
+    }
+}
 //
-// this is a specialized main that just outputs bitmaps
-// so we can check what they look like without running the entire engine
+// this is a specialized main that debug outputs some
+// generated items
 //
 
-class DebugBitmapClass
+class DebugRunClass
 {
     constructor()
     {
+        this.listDiv=null;
+        this.canvas=null;
+        
         this.drawTop=5;
         this.bitmapWid=1200;
         this.bitmapHigh=400;
         
-        this.genBitmapWall=new GenBitmapWallClass();
+        this.genBitmapWall=new GenBitmapWallClass();        // supergumba -- delete me later
         this.genBitmapFloor=new GenBitmapFloorClass();
         this.genBitmapCeiling=new GenBitmapCeilingClass();
         this.genBitmapDoor=new GenBitmapDoorClass();
@@ -26,6 +38,26 @@ class DebugBitmapClass
         this.genBitmapItem=new GenBitmapItemClass();
         this.genBitmapSky=new GenBitmapSkyClass();
         this.genBitmapParticle=new GenBitmapParticleClass();
+        
+        this.DEBUG_ITEM_TYPE_BITMAP=0;
+        this.DEBUG_ITEM_TYPE_SOUND=1;
+        this.DEBUG_ITEM_TYPE_MODEL=2;
+        
+        this.list=[];
+
+        this.list.push(new DebugItemClass('Wall',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapWallClass()));
+        this.list.push(new DebugItemClass('Floor',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapFloorClass()));
+        this.list.push(new DebugItemClass('Ceiling',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapCeilingClass()));
+        this.list.push(new DebugItemClass('Door',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapDoorClass()));
+        this.list.push(new DebugItemClass('Metal',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMetalClass()));
+        this.list.push(new DebugItemClass('Machine',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMachineClass()));
+        this.list.push(new DebugItemClass('Panel',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapPanelClass()));
+        this.list.push(new DebugItemClass('Box',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapBoxClass()));
+        this.list.push(new DebugItemClass('Liquid',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapLiquidClass()));
+        this.list.push(new DebugItemClass('Skin',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinClass()));
+        this.list.push(new DebugItemClass('Item',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapItemClass()));
+        this.list.push(new DebugItemClass('Sky',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkyClass()));
+        this.list.push(new DebugItemClass('Particle',this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapParticleClass()));
         
         Object.seal(this);
     }
@@ -239,12 +271,93 @@ class DebugBitmapClass
     }
     
         //
+        // list clicking
+        //
+        
+    clickList(idx)
+    {
+        console.log(idx);
+    }
+    
+        //
+        // add interface
+        //
+        
+    createInterface()
+    {
+        let n,item,name;
+        let itemDiv;
+        
+            // the list
+            
+        this.listDiv=document.createElement('div');
+        this.listDiv.style.position="absolute";
+        this.listDiv.style.left='0px';
+        this.listDiv.style.top='0px';
+        this.listDiv.style.width='300px';
+        this.listDiv.style.height='100%';
+        this.listDiv.style.backgroundColor='#CCCCFF';
+        this.listDiv.style.fontFamily='Arial';
+        this.listDiv.style.fontSize='14pt';
+        this.listDiv.style.whiteSpace='nowrap';
+        this.listDiv.style.paddingLeft='4px';
+        this.listDiv.style.paddingTop='4px';
+        this.listDiv.style.boxSizing='border-box';
+        this.listDiv.style.border='1px solid #AAAAAA';
+        this.listDiv.style.overflowX='hidden';
+        this.listDiv.style.overflowY='auto';
+        
+            // the items
+            
+        for (n=0;n!==this.list.length;n++) {
+            item=this.list[n];
+            
+            switch (item.objType) {
+                case this.DEBUG_ITEM_TYPE_BITMAP:
+                    name='Bitmap:'+item.name;
+                    break;
+                case this.DEBUG_ITEM_TYPE_SOUND:
+                    name='Sound:'+item.name;
+                    break;
+                case this.DEBUG_ITEM_TYPE_MODEL:
+                    name='Model:'+item.name;
+                    break;
+            }
+            
+            itemDiv=document.createElement('div');
+            itemDiv.style.cursor='pointer';
+            itemDiv.appendChild(document.createTextNode(name));
+            itemDiv.onclick=this.clickList.bind(this,n);
+            
+            this.listDiv.appendChild(itemDiv);
+        }
+        
+        document.body.appendChild(this.listDiv);
+        
+            // the drawing canvas
+            
+        this.canvas=document.createElement('canvas');
+        this.canvas.style.position="absolute";
+        this.canvas.style.left='305px';
+        this.canvas.style.top='0px';
+        this.canvas.style.border='1px solid #000000';
+        this.canvas.width=800;
+        this.canvas.height=800;
+        
+        document.body.appendChild(this.canvas);
+
+        //ctx=cvs.getContext('2d');
+        //ctx.drawImage(fromCanvas,0,0,wid,high);
+    }
+    
+        //
         // main run for debug
         //
         
     run()
     {
-        this.addBitmapWall(0);
+        this.createInterface();
+        //this.addBitmapWall(0);
         //this.addBitmapSkies(0);     // supergumba -- testing
     }
 }
@@ -254,9 +367,10 @@ class DebugBitmapClass
 // and the debug runner
 //
 
-let debugBitmap=new DebugBitmapClass();
+let debugRun=new DebugRunClass();
 
-function debugBitmapRun()
+function debugStart()
 {
-    debugBitmap.run();
+    
+    debugRun.run();
 }

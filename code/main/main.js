@@ -145,7 +145,7 @@ class MainClass
         view.loadingScreenAddString('Generating Monster Models');
         view.loadingScreenDraw(null);
         
-        setTimeout(this.initBuildMonsterModels.bind(this,-1,genBitmapSkin),1);
+        setTimeout(this.initBuildMonsterModels.bind(this,0,genBitmapSkin),1);
     }
 
     initBuildMonsterModels(idx,genBitmapSkin)
@@ -158,7 +158,8 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-        monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];
+        //monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];
+        monsterType=modelMonsterTypes[idx%modelMonsterTypes.length];        // supergumba -- testing
         //monsterType=modelConstants.MODEL_TYPE_BLOB;      // supergumba -- testing
         model=new ModelClass(('monster_'+idx),monsterType);
 

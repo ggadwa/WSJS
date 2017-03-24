@@ -516,13 +516,20 @@ class MapClass
         
         while (findTry<25) {
 
-                // find a random room,
-                // but skip start and goal room
-
-            roomIdx=genRandom.randomIndex(this.rooms.length);
-            if (this.rooms[roomIdx].pathType!==mapRoomConstants.ROOM_PATH_TYPE_NORMAL) {
-                findTry++;
-                continue;
+                // find a random room,            
+                // only put in normal rooms, unless we are in
+                // simple map mode where there's only one room
+                
+            if (config.SIMPLE_TEST_MAP) {
+                roomIdx=0;
+            }
+            else {
+                roomIdx=genRandom.randomIndex(this.rooms.length);
+                
+                if (this.rooms[roomIdx].pathType!==mapRoomConstants.ROOM_PATH_TYPE_NORMAL) {
+                    findTry++;
+                    continue;
+                }
             }
             
                 // find a random spot in room
