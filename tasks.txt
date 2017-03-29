@@ -11,6 +11,10 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
+debug
+  -> display base color
+  -> type names
+
 ToDos
 
 #### monsters still getting hit by own projectiles
