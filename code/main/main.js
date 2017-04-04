@@ -127,7 +127,7 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
         
-        model=new ModelClass('player',modelConstants.MODEL_TYPE_HUMANOID);
+        model=new ModelClass('player',modelConstants.TYPE_HUMANOID);
 
             // build the skeleton and mesh
 
@@ -135,7 +135,7 @@ class MainClass
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
-        genModelMesh.build();
+        genModelMesh.build(false);
 
         modelList.addModel(model);
 
@@ -152,7 +152,7 @@ class MainClass
     {
         let model,genSkeleton,genModelMesh,modelBitmap;
         let monsterType;
-        let modelMonsterTypes=[modelConstants.MODEL_TYPE_HUMANOID,modelConstants.MODEL_TYPE_ANIMAL,modelConstants.MODEL_TYPE_BLOB];
+        let modelMonsterTypes=[modelConstants.TYPE_HUMANOID,modelConstants.TYPE_ANIMAL,modelConstants.TYPE_BLOB];
 
             // build the model
         
@@ -160,7 +160,7 @@ class MainClass
 
         //monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];
         monsterType=modelMonsterTypes[idx%modelMonsterTypes.length];        // supergumba -- testing
-        //monsterType=modelConstants.MODEL_TYPE_BLOB;      // supergumba -- testing
+        //monsterType=modelConstants.TYPE_BLOB;      // supergumba -- testing
         model=new ModelClass(('monster_'+idx),monsterType);
 
             // build the skeleton and mesh
@@ -169,7 +169,7 @@ class MainClass
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
-        genModelMesh.build();
+        genModelMesh.build(false);
 
         modelList.addModel(model);
 
@@ -204,14 +204,14 @@ class MainClass
     {
         let model,genSkeleton,genModelMesh,modelBitmap;
         let monsterType;
-        let modelMonsterTypes=[modelConstants.MODEL_TYPE_HUMANOID,modelConstants.MODEL_TYPE_ANIMAL,modelConstants.MODEL_TYPE_BLOB];
+        let modelMonsterTypes=[modelConstants.TYPE_HUMANOID,modelConstants.TYPE_ANIMAL,modelConstants.TYPE_BLOB];
 
             // build monster
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
         monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
-        monsterType=modelConstants.MODEL_TYPE_HUMANOID;      // supergumba -- testing
+        monsterType=modelConstants.TYPE_HUMANOID;      // supergumba -- testing
         model=new ModelClass('boss',monsterType);
 
             // build the skeleton and mesh
@@ -220,7 +220,7 @@ class MainClass
         genSkeleton.build();
 
         genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
-        genModelMesh.build();
+        genModelMesh.build(false);
 
         modelList.addModel(model);
 
@@ -245,19 +245,19 @@ class MainClass
 
             // weapon
 
-        model=new ModelClass('weapon_0',modelConstants.MODEL_TYPE_WEAPON);
+        model=new ModelClass('weapon_0',modelConstants.TYPE_WEAPON);
 
         genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap);
-        genModelWeaponMesh.build();
+        genModelWeaponMesh.build(false);
 
         modelList.addModel(model);
 
             // projectile
 
-        model=new ModelClass('projectile_0',modelConstants.MODEL_TYPE_PROJECTILE);
+        model=new ModelClass('projectile_0',modelConstants.TYPE_PROJECTILE);
 
         genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap);
-        genModelProjectileMesh.build();
+        genModelProjectileMesh.build(false);
 
         modelList.addModel(model);
 

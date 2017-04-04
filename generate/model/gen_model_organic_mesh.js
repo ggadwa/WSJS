@@ -918,7 +918,7 @@ class GenModelOrganicMeshClass
         // build mesh around skeleton
         //
 
-    build()
+    build(inDebug)
     {
         let n,k,limb,limb2,indexOffset;
         
@@ -993,7 +993,7 @@ class GenModelOrganicMeshClass
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.bitmap,modelVertexList,modelIndexes,0);
-        this.model.mesh.setupBuffers();
+        if (!inDebug) this.model.mesh.setupBuffers();
         this.model.mesh.precalcAnimationValues(this.model.skeleton);
     }
     

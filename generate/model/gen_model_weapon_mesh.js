@@ -103,7 +103,7 @@ class GenModelWeaponMeshClass
         // build weapon mesh
         //
 
-    build()
+    build(inDebug)
     {
         let vertexList=MeshUtilityClass.createModelVertexList(this.CYLINDER_VERTEX_COUNT);
         let indexes=new Uint16Array(this.CYLINDER_INDEX_COUNT);
@@ -116,7 +116,7 @@ class GenModelWeaponMeshClass
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.bitmap,vertexList,indexes,0);
-        this.model.mesh.setupBuffers();
+        if (!inDebug) this.model.mesh.setupBuffers();
     }
     
 }

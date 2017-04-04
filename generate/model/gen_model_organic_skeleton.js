@@ -13,6 +13,8 @@ class GenModelOrganicSkeletonClass
         this.model=model;
         this.sizeFactor=sizeFactor;
         
+        this.SKELETON_GENERAL_HEIGHT=8000;
+        
         Object.seal(this);
     }
     
@@ -218,12 +220,12 @@ class GenModelOrganicSkeletonClass
         
             // random heights
             
-        hipHigh=Math.trunc(genRandom.randomInt(600,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.4))*this.sizeFactor);
-        waistHigh=hipHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15))*this.sizeFactor);
-        torsoHigh=waistHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2))*this.sizeFactor);
-        torsoTopHigh=torsoHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.15))*this.sizeFactor);
-        jawHigh=torsoTopHigh+Math.trunc(genRandom.randomInt(100,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.1))*this.sizeFactor);
-        headHigh=jawHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(map.ROOM_FLOOR_HEIGHT*0.2))*this.sizeFactor);
+        hipHigh=Math.trunc(genRandom.randomInt(600,Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.4))*this.sizeFactor);
+        waistHigh=hipHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.15))*this.sizeFactor);
+        torsoHigh=waistHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.2))*this.sizeFactor);
+        torsoTopHigh=torsoHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.15))*this.sizeFactor);
+        jawHigh=torsoTopHigh+Math.trunc(genRandom.randomInt(100,Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.1))*this.sizeFactor);
+        headHigh=jawHigh+Math.trunc(genRandom.randomInt(200,Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.2))*this.sizeFactor);
         
             // the base bone
             
@@ -436,7 +438,7 @@ class GenModelOrganicSkeletonClass
             // can never be taller than a single floor height
             // and always shorter than humanoids (no legs)
         
-        totalHigh=Math.trunc(genRandom.randomInt(Math.trunc(map.ROOM_FLOOR_HEIGHT*0.05),Math.trunc(map.ROOM_FLOOR_HEIGHT*0.8))*this.sizeFactor);
+        totalHigh=Math.trunc(genRandom.randomInt(Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.05),Math.trunc(this.SKELETON_GENERAL_HEIGHT*0.8))*this.sizeFactor);
         
             // the base bone
             
@@ -504,13 +506,13 @@ class GenModelOrganicSkeletonClass
             // build each type of skeleton
             
         switch (this.model.modelType) {
-            case modelConstants.MODEL_TYPE_HUMANOID:
+            case modelConstants.TYPE_HUMANOID:
                 this.buildHumanoid();
                 break;
-            case modelConstants.MODEL_TYPE_ANIMAL:
+            case modelConstants.TYPE_ANIMAL:
                 this.buildAnimal();
                 break;
-            case modelConstants.MODEL_TYPE_BLOB:
+            case modelConstants.TYPE_BLOB:
                 this.buildBlob();
                 break;
         }

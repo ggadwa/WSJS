@@ -25,6 +25,7 @@ class DebugRunClass
         this.lastItemDiv=null;
         this.bitmapCanvas=null;
         this.soundCanvas=null;
+        this.modelCanvas=null;
         this.currentSoundBuffer=null;
         
         this.DEBUG_ITEM_TYPE_BITMAP=0;
@@ -32,6 +33,8 @@ class DebugRunClass
         this.DEBUG_ITEM_TYPE_MODEL=2;
         
         this.list=[];
+        
+        this.fillListWithModelGenerator();
 
         this.fillListWithBitmapGenerator('Wall',new GenBitmapWallClass());
         this.fillListWithBitmapGenerator('Floor',new GenBitmapFloorClass());
@@ -74,6 +77,15 @@ class DebugRunClass
             this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_SOUND,obj));
         }
     }
+    
+    fillListWithModelGenerator()
+    {
+        let n;
+        
+        for (n=0;n!==modelConstants.TYPE_NAMES.length;n++) {
+            this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_MODEL,modelConstants));
+        }
+    }
         
         //
         // item drawing
@@ -102,13 +114,14 @@ class DebugRunClass
             // show the canvas
             
         this.soundCanvas.style.display='none';
+        this.modelCanvas.style.display='none';
         this.bitmapCanvas.style.display='';
     }
     
     drawSound(item)
     {
         let x,dataSkip,dataLen,y,idx,halfHigh;
-        let soundBuffer,data;
+        let data;
         let ctx;
         let wid=this.soundCanvas.width;
         let high=this.soundCanvas.height;
@@ -158,12 +171,43 @@ class DebugRunClass
             // show the canvas
             
         this.bitmapCanvas.style.display='none';
+        this.modelCanvas.style.display='none';
         this.soundCanvas.style.display='';
     }
     
     playSound()
     {
         sound.play(null,this.currentSoundBuffer);
+    }
+    
+    drawModel(item)
+    {
+        let ctx;
+        let model,genSkeleton,genModelMesh;
+        let wid=this.modelCanvas.width;
+        let high=this.modelCanvas.height;
+        
+            // build the odel
+        
+        model=new ModelClass('test',item.typeIdx);
+
+        genSkeleton=new GenModelOrganicSkeletonClass(model,1.0);
+        genSkeleton.build();
+
+        genModelMesh=new GenModelOrganicMeshClass(model,null);
+        genModelMesh.build(true);
+
+            // draw it
+            
+        ctx=this.modelCanvas.getContext('2d');
+        ctx.fillStyle='#FF00FF';
+        ctx.fillRect(0,0,wid,high);
+        
+            // show the canvas
+            
+        this.bitmapCanvas.style.display='none';
+        this.soundCanvas.style.display='none';
+        this.modelCanvas.style.display='';
     }
     
         //
@@ -195,6 +239,7 @@ class DebugRunClass
                 this.drawSound(item);
                 break;
             case this.DEBUG_ITEM_TYPE_MODEL:
+                this.drawModel(item);
                 break;
         }
     }
@@ -238,7 +283,7 @@ class DebugRunClass
                     name='Sound>'+item.obj.TYPE_NAMES[item.typeIdx];
                     break;
                 case this.DEBUG_ITEM_TYPE_MODEL:
-                    name='Model>'+item.name;
+                    name='Model>'+item.obj.TYPE_NAMES[item.typeIdx];
                     break;
             }
             
@@ -280,6 +325,19 @@ class DebugRunClass
         this.soundCanvas.onclick=this.playSound.bind(this);
         
         document.body.appendChild(this.soundCanvas);
+        
+            // the model canvas
+            
+        this.modelCanvas=document.createElement('canvas');
+        this.modelCanvas.style.position="absolute";
+        this.modelCanvas.style.left='305px';
+        this.modelCanvas.style.top='0px';
+        this.modelCanvas.style.border='1px solid #000000';
+        this.modelCanvas.style.display='none';
+        this.modelCanvas.width=512;
+        this.modelCanvas.height=512;
+        
+        document.body.appendChild(this.modelCanvas);
     }
     
         //

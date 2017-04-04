@@ -531,17 +531,17 @@ class ModelSkeletonClass
             
             switch (limb.limbType) {
                 case modelLimbConstants.LIMB_TYPE_BODY:
-                    if (modelType===modelConstants.MODEL_TYPE_HUMANOID) {
+                    if (modelType===modelConstants.TYPE_HUMANOID) {
                         this.poseSetBody(limb,5.0,5.0,limb.hunchAngle);
                         break;
                     }
-                    if (modelType===modelConstants.MODEL_TYPE_BLOB) {
+                    if (modelType===modelConstants.TYPE_BLOB) {
                         this.poseSetBody(limb,15.0,30.0,0.0);
                         break;
                     }
                     break;
                 case modelLimbConstants.LIMB_TYPE_HEAD:
-                    if (modelType===modelConstants.MODEL_TYPE_ANIMAL) {
+                    if (modelType===modelConstants.TYPE_ANIMAL) {
                         this.poseSetBody(limb,5.0,15.0,0.0);
                         break;
                     }
@@ -612,17 +612,17 @@ class ModelSkeletonClass
             
             switch (limb.limbType) {
                 case modelLimbConstants.LIMB_TYPE_BODY:
-                    if (modelType===modelConstants.MODEL_TYPE_HUMANOID) {
+                    if (modelType===modelConstants.TYPE_HUMANOID) {
                         this.poseSetBody(limb,3.0,3.0,limb.hunchAngle);
                         break;
                     }
-                    if (modelType===modelConstants.MODEL_TYPE_BLOB) {
+                    if (modelType===modelConstants.TYPE_BLOB) {
                         this.poseSetBody(limb,5.0,5.0,0.0);
                         break;
                     }
                     break;
                 case modelLimbConstants.LIMB_TYPE_HEAD:
-                    if (modelType===modelConstants.MODEL_TYPE_ANIMAL) {
+                    if (modelType===modelConstants.TYPE_ANIMAL) {
                         this.poseSetBody(limb,0.0,10.0,0.0);
                         break;
                     }

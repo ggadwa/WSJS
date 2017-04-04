@@ -123,7 +123,7 @@ class GenModelProjectileMeshClass
         // build projectile mesh
         //
 
-    build()
+    build(inDebug)
     {
         let vertexList=MeshUtilityClass.createModelVertexList(36);
         let indexes=new Uint16Array(36);
@@ -133,7 +133,7 @@ class GenModelProjectileMeshClass
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.bitmap,vertexList,indexes,0);
-        this.model.mesh.setupBuffers();
+        if (!inDebug) this.model.mesh.setupBuffers();
     }
     
 }
