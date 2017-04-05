@@ -121,21 +121,15 @@ class MainClass
     
     initBuildPlayerModel(genBitmapSkin)
     {
-        let model,genSkeleton,genModelMesh,modelBitmap;
+        let model,modelBitmap;
+        let genModel=new GenModelClass();
 
             // build the player model
         
         modelBitmap=genBitmapSkin.generateRandom(false);
         
         model=new ModelClass('player',modelConstants.TYPE_HUMANOID);
-
-            // build the skeleton and mesh
-
-        genSkeleton=new GenModelOrganicSkeletonClass(model,1.0);
-        genSkeleton.build();
-
-        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
-        genModelMesh.build(false);
+        genModel.build(model,modelBitmap,1.0,false);
 
         modelList.addModel(model);
 
@@ -145,12 +139,12 @@ class MainClass
         view.loadingScreenAddString('Generating Monster Models');
         view.loadingScreenDraw(null);
         
-        setTimeout(this.initBuildMonsterModels.bind(this,0,genBitmapSkin),1);
+        setTimeout(this.initBuildMonsterModels.bind(this,0,genModel,genBitmapSkin),1);
     }
 
-    initBuildMonsterModels(idx,genBitmapSkin)
+    initBuildMonsterModels(idx,genModel,genBitmapSkin)
     {
-        let model,genSkeleton,genModelMesh,modelBitmap;
+        let model,modelBitmap;
         let monsterType;
         let modelMonsterTypes=[modelConstants.TYPE_HUMANOID,modelConstants.TYPE_ANIMAL,modelConstants.TYPE_BLOB];
 
@@ -161,15 +155,9 @@ class MainClass
         //monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];
         monsterType=modelMonsterTypes[idx%modelMonsterTypes.length];        // supergumba -- testing
         //monsterType=modelConstants.TYPE_BLOB;      // supergumba -- testing
+        
         model=new ModelClass(('monster_'+idx),monsterType);
-
-            // build the skeleton and mesh
-
-        genSkeleton=new GenModelOrganicSkeletonClass(model,1.0);
-        genSkeleton.build();
-
-        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
-        genModelMesh.build(false);
+        genModel.build(model,modelBitmap,1.0,false);
 
         modelList.addModel(model);
 
@@ -178,7 +166,7 @@ class MainClass
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
             view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
-            setTimeout(this.initBuildMonsterModels.bind(this,idx,genBitmapSkin),1);
+            setTimeout(this.initBuildMonsterModels.bind(this,idx,genModel,genBitmapSkin),1);
             return;
         }
 
@@ -189,20 +177,20 @@ class MainClass
             view.loadingScreenAddString('Generating Boss Model');
             view.loadingScreenDraw(null);
 
-            setTimeout(this.initBuildBossModel.bind(this,genBitmapSkin),1);
+            setTimeout(this.initBuildBossModel.bind(this,genModel,genBitmapSkin),1);
         }
         else {
             view.loadingScreenUpdate();
             view.loadingScreenAddString('Generating Weapons');
             view.loadingScreenDraw(null);
 
-            setTimeout(this.initBuildWeapons.bind(this,null),1);
+            setTimeout(this.initBuildWeapons.bind(this,genModel,null),1);
         }
     }
     
-    initBuildBossModel(genBitmapSkin)
+    initBuildBossModel(genModel,genBitmapSkin)
     {
-        let model,genSkeleton,genModelMesh,modelBitmap;
+        let model,modelBitmap;
         let monsterType;
         let modelMonsterTypes=[modelConstants.TYPE_HUMANOID,modelConstants.TYPE_ANIMAL,modelConstants.TYPE_BLOB];
 
@@ -212,15 +200,9 @@ class MainClass
 
         monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
         monsterType=modelConstants.TYPE_HUMANOID;      // supergumba -- testing
+        
         model=new ModelClass('boss',monsterType);
-
-            // build the skeleton and mesh
-
-        genSkeleton=new GenModelOrganicSkeletonClass(model,genRandom.randomFloat(2.5,3.0));
-        genSkeleton.build();
-
-        genModelMesh=new GenModelOrganicMeshClass(model,modelBitmap);
-        genModelMesh.build(false);
+        genModel.build(model,modelBitmap,genRandom.randomFloat(2.5,3.0),false);
 
         modelList.addModel(model);
 
@@ -230,12 +212,12 @@ class MainClass
         view.loadingScreenAddString('Generating Weapons');
         view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildWeapons.bind(this,null),1);
+        setTimeout(this.initBuildWeapons.bind(this,genModel,null),1);
     }
 
-    initBuildWeapons(genBitmapItem)
+    initBuildWeapons(genModel,genBitmapItem)
     {
-        let model,modelBitmap,genModelWeaponMesh,genModelProjectileMesh;
+        let model,modelBitmap;
         
             // supergumba -- right now this is bad, it'll leak and get closed more than once,
             // deal with this when we have real weapon routines
@@ -246,18 +228,14 @@ class MainClass
             // weapon
 
         model=new ModelClass('weapon_0',modelConstants.TYPE_WEAPON);
-
-        genModelWeaponMesh=new GenModelWeaponMeshClass(model,modelBitmap);
-        genModelWeaponMesh.build(false);
+        genModel.build(model,modelBitmap,1.0,false);
 
         modelList.addModel(model);
 
             // projectile
 
         model=new ModelClass('projectile_0',modelConstants.TYPE_PROJECTILE);
-
-        genModelProjectileMesh=new GenModelProjectileMeshClass(model,modelBitmap);
-        genModelProjectileMesh.build(false);
+        genModel.build(model,modelBitmap,1.0,false);
 
         modelList.addModel(model);
 

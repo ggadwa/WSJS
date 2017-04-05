@@ -19,7 +19,7 @@ class ConfigClass
         this.MAP_GENERATE_LIGHTMAP=false;           // set to true to generate light maps
         this.ROOM_DECORATIONS=true;                // if the room has decorations
         this.ROOM_LIQUIDS=true;                     // turns on or off liquids
-        this.SIMPLE_TEST_MAP=true;                  // a special simple map for testing other elements
+        this.SIMPLE_TEST_MAP=false;                  // a special simple map for testing other elements
         this.SHOW_OVERLAY_MAP=false;                 // to turn on/off the overlay map
 
             //
@@ -33,10 +33,10 @@ class ConfigClass
             //
 
         this.MONSTER_TYPE_COUNT=3;
-        this.MONSTER_ENTITY_COUNT=3;
+        this.MONSTER_ENTITY_COUNT=20;
         
-        this.MONSTER_AI_ON=false;
-        this.MONSTER_BOSS=false;
+        this.MONSTER_AI_ON=true;
+        this.MONSTER_BOSS=true;
         
             //
             // sounds
