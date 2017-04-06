@@ -11,11 +11,11 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-debug
-  -> display base color
-  -> type names
-
 ToDos
+
+#### better connecting limbs to body
+#### humanoid: necks are bad
+#### animals: legs always to far into body
 
 #### monsters still getting hit by own projectiles
 #### need meeles for monsters

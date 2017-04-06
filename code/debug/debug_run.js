@@ -33,6 +33,10 @@ class DebugRunClass
         this.DEBUG_ITEM_TYPE_SOUND=1;
         this.DEBUG_ITEM_TYPE_MODEL=2;
         
+        this.DEBUG_MODEL_XY=0;
+        this.DEBUG_MODEL_XZ=1;
+        this.DEBUG_MODEL_ZY=2;
+        
         this.list=[];
         
         this.list.push(new DebugItemClass('Models',-1,-1,null,true));
@@ -184,22 +188,55 @@ class DebugRunClass
         sound.play(null,this.currentSoundBuffer);
     }
     
-    drawModelMesh(ctx,mesh,wid,high)
+    drawModelMeshGetX(axisType,v)
     {
-        let n,v,x,y,x1,y1,x2,y2,midX,idx,trigCount;
-        let minX,maxX,minY,maxY;
+        switch (axisType) {
+            case this.DEBUG_MODEL_XY:
+                return(v.position.x);
+            case this.DEBUG_MODEL_XZ:
+                return(v.position.x);
+            case this.DEBUG_MODEL_ZY:
+                return(v.position.z);
+        }
+        
+        return(0);
+    }
+    
+    drawModelMeshGetY(axisType,v)
+    {
+        switch (axisType) {
+            case this.DEBUG_MODEL_XY:
+                return(v.position.y);
+            case this.DEBUG_MODEL_XZ:
+                return(v.position.z);
+            case this.DEBUG_MODEL_ZY:
+                return(v.position.y);
+        }
+        
+        return(0);
+    }
+    
+    drawModelMesh(ctx,mesh,axisType,lft,top,wid,high,backgroundColor)
+    {
+        let n,v,x,y,x1,y1,x2,y2,idx,trigCount;
+        let minX,maxX,minY,maxY,xOffset,yOffset;
         let xFactor,yFactor,factor;
+        
+            // erase canvas
+            
+        ctx=this.modelCanvas.getContext('2d');
+        ctx.fillStyle=backgroundColor;
+        ctx.fillRect(lft,top,wid,high);
         
             // get the total size
             
-        minX=maxX=0;
-        minY=maxY=0;
+        minX=minY=1000000;
+        maxX=maxY=-1000000;
         
         for (n=0;n!==mesh.vertexCount;n++) {
             v=mesh.vertexList[n];
-            
-            x=v.position.x;
-            y=v.position.y;
+            x=this.drawModelMeshGetX(axisType,v);
+            y=this.drawModelMeshGetY(axisType,v);
             
             if (x<minX) minX=x;
             if (x>maxX) maxX=x;
@@ -207,34 +244,49 @@ class DebugRunClass
             if (y>maxY) maxY=y;
         }
         
-        xFactor=wid/(maxX-minX);
-        yFactor=high/(maxY-minY);
+        xFactor=wid/Math.abs(maxX-minX);
+        yFactor=high/Math.abs(maxY-minY);
         
         factor=xFactor;
-        if (yFactor>factor) factor=yFactor;
+        if (yFactor<factor) factor=yFactor;
+        
+            // get the offsets
+            
+        switch (axisType) {
+            case this.DEBUG_MODEL_XY:
+                xOffset=Math.trunc(wid*0.5);
+                yOffset=high;
+                break;
+            case this.DEBUG_MODEL_XZ:
+                xOffset=Math.trunc(wid*0.5);
+                yOffset=Math.trunc(high*0.5);
+                break;
+            case this.DEBUG_MODEL_ZY:
+                xOffset=Math.trunc(wid*0.5);
+                yOffset=high;
+                break;
+        }
         
             // draw the trigs
         
-        midX=Math.trunc(wid*0.5);
-        
         idx=0;
-        trigCount=Math.trunc(mesh.vertexCount/3);
+        trigCount=Math.trunc(mesh.indexCount/3);
         
         ctx.strokeStyle='#00AA00';
         
         for (n=0;n!==trigCount;n++) {
             
-            v=mesh.vertexList[idx++];
-            x=midX+(v.position.x*factor);
-            y=high+(v.position.y*factor);
+            v=mesh.vertexList[mesh.indexes[idx++]];
+            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,v)*factor));
+            y=top+(yOffset+(this.drawModelMeshGetY(axisType,v)*factor));
             
-            v=mesh.vertexList[idx++];
-            x1=midX+(v.position.x*factor);
-            y1=high+(v.position.y*factor);
+            v=mesh.vertexList[mesh.indexes[idx++]];
+            x1=lft+(xOffset+(this.drawModelMeshGetX(axisType,v)*factor));
+            y1=top+(yOffset+(this.drawModelMeshGetY(axisType,v)*factor));
             
-            v=mesh.vertexList[idx++];
-            x2=midX+(v.position.x*factor);
-            y2=high+(v.position.y*factor);
+            v=mesh.vertexList[mesh.indexes[idx++]];
+            x2=lft+(xOffset+(this.drawModelMeshGetX(axisType,v)*factor));
+            y2=top+(yOffset+(this.drawModelMeshGetY(axisType,v)*factor));
 
             ctx.beginPath();
             ctx.moveTo(x,y);
@@ -248,7 +300,7 @@ class DebugRunClass
     drawModel(item)
     {
         let ctx;
-        let model,genModel;
+        let model,genModel,halfWid,halfHigh;
         let wid=this.modelCanvas.width;
         let high=this.modelCanvas.height;
         
@@ -262,12 +314,17 @@ class DebugRunClass
             // erase canvas
             
         ctx=this.modelCanvas.getContext('2d');
-        ctx.fillStyle='#CCCCCC';
+        ctx.fillStyle='#FFFFFF';
         ctx.fillRect(0,0,wid,high);
         
-            // draw axis
-            
-        this.drawModelMesh(ctx,model.mesh,wid,high);
+            // draw axises
+        
+        halfWid=Math.trunc(wid*0.5);
+        halfHigh=Math.trunc(high*0.5);
+        
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XY,0,0,halfWid,halfHigh,'#CCCCCC');
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XZ,halfWid,0,halfWid,halfHigh,'#EEEEEE');
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_ZY,0,halfHigh,halfWid,halfHigh,'#EEEEEE');
         
             // show the canvas
             
@@ -435,8 +492,8 @@ class DebugRunClass
         this.modelCanvas.style.top='5px';
         this.modelCanvas.style.border='1px solid #000000';
         this.modelCanvas.style.display='none';
-        this.modelCanvas.width=1024;
-        this.modelCanvas.height=1024;
+        this.modelCanvas.width=2048;
+        this.modelCanvas.height=2048;
         
         document.body.appendChild(this.modelCanvas);
     }
