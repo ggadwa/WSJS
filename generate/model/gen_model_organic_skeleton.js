@@ -49,7 +49,7 @@ class GenModelOrganicSkeletonClass
         bones[handBoneIdx].gravityLockDistance=handRadius;
         bones[handBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_HAND,side,index,modelLimbConstants.LIMB_AXIS_X,8,8,null,[handBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_HAND,side,index,modelLimbConstants.LIMB_AXIS_X,5,5,null,[handBoneIdx]));
         
             // add fingers to hand
             
@@ -104,7 +104,7 @@ class GenModelOrganicSkeletonClass
         bones[footBoneIdx].gravityLockDistance=legRadius;
         bones[footBoneIdx].gravityScale.setFromValues(1.0,0.7,1.0);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_FOOT,side,index,modelLimbConstants.LIMB_AXIS_Z,8,8,null,[ankleBoneIdx,footBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_FOOT,side,index,modelLimbConstants.LIMB_AXIS_Z,5,5,null,[ankleBoneIdx,footBoneIdx]));
         
             // add toes to foot
             

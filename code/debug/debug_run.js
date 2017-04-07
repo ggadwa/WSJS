@@ -101,7 +101,7 @@ class DebugRunClass
         
     drawBitmap(item)
     {
-        let ctx,debugBitmap;
+        let ctx,debugBitmap,thirdWid;
         let wid=this.bitmapCanvas.width;
         let high=this.bitmapCanvas.height;
         
@@ -115,9 +115,11 @@ class DebugRunClass
         ctx.fillStyle='#FFFFFF';
         ctx.fillRect(0,0,wid,high);
         
-        ctx.drawImage(debugBitmap.bitmap,0,0,Math.trunc(wid/2),Math.trunc(high/2));
-        if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,Math.trunc(wid/2),0,Math.trunc(wid/2),Math.trunc(high/2));
-        if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,0,Math.trunc(high/2),Math.trunc(wid/2),Math.trunc(high/2));
+        thirdWid=Math.trunc(wid/3);
+        
+        ctx.drawImage(debugBitmap.bitmap,0,0,thirdWid,high);
+        if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,thirdWid,0,thirdWid,high);
+        if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,(thirdWid*2),0,thirdWid,high);
         
             // show the canvas
             
@@ -188,55 +190,74 @@ class DebugRunClass
         sound.play(null,this.currentSoundBuffer);
     }
     
-    drawModelMeshGetX(axisType,v)
+    drawModelMeshGetX(axisType,pos)
     {
         switch (axisType) {
             case this.DEBUG_MODEL_XY:
-                return(v.position.x);
+                return(pos.x);
             case this.DEBUG_MODEL_XZ:
-                return(v.position.x);
+                return(pos.x);
             case this.DEBUG_MODEL_ZY:
-                return(v.position.z);
+                return(pos.z);
         }
         
         return(0);
     }
     
-    drawModelMeshGetY(axisType,v)
+    drawModelMeshGetY(axisType,pos)
     {
         switch (axisType) {
             case this.DEBUG_MODEL_XY:
-                return(v.position.y);
+                return(pos.y);
             case this.DEBUG_MODEL_XZ:
-                return(v.position.z);
+                return(pos.z);
             case this.DEBUG_MODEL_ZY:
-                return(v.position.y);
+                return(pos.y);
         }
         
         return(0);
     }
     
-    drawModelMesh(ctx,mesh,axisType,lft,top,wid,high,backgroundColor)
+    drawModelGetOffsetX(axisType,wid)
     {
-        let n,v,x,y,x1,y1,x2,y2,idx,trigCount;
-        let minX,maxX,minY,maxY,xOffset,yOffset;
-        let xFactor,yFactor,factor;
+        switch (axisType) {
+            case this.DEBUG_MODEL_XY:
+                return(Math.trunc(wid*0.5));
+            case this.DEBUG_MODEL_XZ:
+                return(Math.trunc(wid*0.5));
+            case this.DEBUG_MODEL_ZY:
+                return(Math.trunc(wid*0.5));
+        }
         
-            // erase canvas
-            
-        ctx=this.modelCanvas.getContext('2d');
-        ctx.fillStyle=backgroundColor;
-        ctx.fillRect(lft,top,wid,high);
+        return(0);
+    }
+    
+    drawModelGetOffsetY(axisType,high)
+    {
+        switch (axisType) {
+            case this.DEBUG_MODEL_XY:
+                return(high);
+            case this.DEBUG_MODEL_XZ:
+                return(Math.trunc(high*0.5));
+            case this.DEBUG_MODEL_ZY:
+                return(high);
+        }
         
-            // get the total size
-            
+        return(0);
+    }
+    
+    drawModelGetFactor(mesh,axisType,wid,high)
+    {
+        let n,x,y,minX,minY,maxX,maxY,v;
+        let xFactor,yFactor;
+        
         minX=minY=1000000;
         maxX=maxY=-1000000;
         
         for (n=0;n!==mesh.vertexCount;n++) {
             v=mesh.vertexList[n];
-            x=this.drawModelMeshGetX(axisType,v);
-            y=this.drawModelMeshGetY(axisType,v);
+            x=this.drawModelMeshGetX(axisType,v.position);
+            y=this.drawModelMeshGetY(axisType,v.position);
             
             if (x<minX) minX=x;
             if (x>maxX) maxX=x;
@@ -247,25 +268,18 @@ class DebugRunClass
         xFactor=wid/Math.abs(maxX-minX);
         yFactor=high/Math.abs(maxY-minY);
         
-        factor=xFactor;
-        if (yFactor<factor) factor=yFactor;
-        
-            // get the offsets
-            
-        switch (axisType) {
-            case this.DEBUG_MODEL_XY:
-                xOffset=Math.trunc(wid*0.5);
-                yOffset=high;
-                break;
-            case this.DEBUG_MODEL_XZ:
-                xOffset=Math.trunc(wid*0.5);
-                yOffset=Math.trunc(high*0.5);
-                break;
-            case this.DEBUG_MODEL_ZY:
-                xOffset=Math.trunc(wid*0.5);
-                yOffset=high;
-                break;
-        }
+        return((xFactor<yFactor)?xFactor:yFactor);
+    }
+    
+    drawModelBackground(ctx,lft,top,wid,high,backgroundColor)
+    {
+        ctx.fillStyle=backgroundColor;
+        ctx.fillRect(lft,top,wid,high);
+    }
+    
+    drawModelMesh(ctx,mesh,axisType,factor,xOffset,yOffset,lft,top,wid,high)
+    {
+        let n,v,x,y,x1,y1,x2,y2,idx,trigCount;
         
             // draw the trigs
         
@@ -277,16 +291,16 @@ class DebugRunClass
         for (n=0;n!==trigCount;n++) {
             
             v=mesh.vertexList[mesh.indexes[idx++]];
-            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,v)*factor));
-            y=top+(yOffset+(this.drawModelMeshGetY(axisType,v)*factor));
+            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,v.position)*factor));
+            y=top+(yOffset+(this.drawModelMeshGetY(axisType,v.position)*factor));
             
             v=mesh.vertexList[mesh.indexes[idx++]];
-            x1=lft+(xOffset+(this.drawModelMeshGetX(axisType,v)*factor));
-            y1=top+(yOffset+(this.drawModelMeshGetY(axisType,v)*factor));
+            x1=lft+(xOffset+(this.drawModelMeshGetX(axisType,v.position)*factor));
+            y1=top+(yOffset+(this.drawModelMeshGetY(axisType,v.position)*factor));
             
             v=mesh.vertexList[mesh.indexes[idx++]];
-            x2=lft+(xOffset+(this.drawModelMeshGetX(axisType,v)*factor));
-            y2=top+(yOffset+(this.drawModelMeshGetY(axisType,v)*factor));
+            x2=lft+(xOffset+(this.drawModelMeshGetX(axisType,v.position)*factor));
+            y2=top+(yOffset+(this.drawModelMeshGetY(axisType,v.position)*factor));
 
             ctx.beginPath();
             ctx.moveTo(x,y);
@@ -297,10 +311,53 @@ class DebugRunClass
         }
     }
     
+    drawModelSkeleton(ctx,skeleton,axisType,factor,xOffset,yOffset,lft,top,wid,high)
+    {
+        let n,nBone,bone,x,y,x1,y1;
+        
+        nBone=skeleton.bones.length;
+        
+            // bones
+            
+        ctx.strokeStyle='#AA00AA';
+        ctx.lineWidth=3;
+
+        for (n=0;n!==nBone;n++) {
+            if (skeleton.bones[n].parentBoneIdx===-1) continue;
+
+            bone=skeleton.bones[n];
+            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,bone.position)*factor));
+            y=top+(yOffset+(this.drawModelMeshGetY(axisType,bone.position)*factor));
+            
+            bone=skeleton.bones[skeleton.bones[n].parentBoneIdx];
+            x1=lft+(xOffset+(this.drawModelMeshGetX(axisType,bone.position)*factor));
+            y1=top+(yOffset+(this.drawModelMeshGetY(axisType,bone.position)*factor));
+
+            ctx.beginPath();
+            ctx.moveTo(x,y);
+            ctx.lineTo(x1,y1);
+            ctx.stroke();
+        }
+        
+        ctx.lineWidth=1;
+        
+            // points
+            
+        ctx.fillStyle='#AA0000';
+        
+        for (n=0;n!==nBone;n++) {
+            bone=skeleton.bones[n];
+            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,bone.position)*factor));
+            y=top+(yOffset+(this.drawModelMeshGetY(axisType,bone.position)*factor));
+            
+            ctx.fillRect((x-4),(y-4),8,8);
+        }
+    }
+    
     drawModel(item)
     {
         let ctx;
-        let model,genModel,halfWid,halfHigh;
+        let model,genModel,factor,xOffset,yOffset,thirdWid;
         let wid=this.modelCanvas.width;
         let high=this.modelCanvas.height;
         
@@ -310,21 +367,33 @@ class DebugRunClass
         
         genModel=new GenModelClass();
         genModel.build(model,null,1.0,true);
-
-            // erase canvas
-            
-        ctx=this.modelCanvas.getContext('2d');
-        ctx.fillStyle='#FFFFFF';
-        ctx.fillRect(0,0,wid,high);
         
             // draw axises
         
-        halfWid=Math.trunc(wid*0.5);
-        halfHigh=Math.trunc(high*0.5);
+        thirdWid=Math.trunc(wid/3);
         
-        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XY,0,0,halfWid,halfHigh,'#CCCCCC');
-        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XZ,halfWid,0,halfWid,halfHigh,'#EEEEEE');
-        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_ZY,0,halfHigh,halfWid,halfHigh,'#EEEEEE');
+        ctx=this.modelCanvas.getContext('2d');
+
+        this.drawModelBackground(ctx,0,0,thirdWid,high,'#CCCCCC');
+        factor=this.drawModelGetFactor(model.mesh,this.DEBUG_MODEL_XY,thirdWid,high);
+        xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XY,thirdWid);
+        yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XY,high);
+        this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
+        
+        this.drawModelBackground(ctx,thirdWid,0,thirdWid,high,'#EEEEEE');
+        factor=this.drawModelGetFactor(model.mesh,this.DEBUG_MODEL_ZY,thirdWid,high);
+        xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_ZY,thirdWid);
+        yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_ZY,high);
+        this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
+        
+        this.drawModelBackground(ctx,(thirdWid*2),0,thirdWid,high,'#CCCCCC');
+        factor=this.drawModelGetFactor(model.mesh,this.DEBUG_MODEL_XZ,thirdWid,high);
+        xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XZ,thirdWid);
+        yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XZ,high);
+        this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);
         
             // show the canvas
             
@@ -457,24 +526,37 @@ class DebugRunClass
         
         document.body.appendChild(this.listDiv);
         
+            // the scrolling div
+            
+        parentDiv=document.createElement('div');
+        parentDiv.style.position="absolute";
+        parentDiv.style.left='300px';
+        parentDiv.style.top='0px';
+        parentDiv.style.overflowX='auto';
+        parentDiv.style.overflowY='hidden';
+        parentDiv.style.width='calc(100% - 300px)';
+        parentDiv.style.height='100%';
+            
+        document.body.appendChild(parentDiv);
+        
             // the bitmap canvas
             
         this.bitmapCanvas=document.createElement('canvas');
         this.bitmapCanvas.style.position="absolute";
-        this.bitmapCanvas.style.left='305px';
+        this.bitmapCanvas.style.left='5px';
         this.bitmapCanvas.style.top='5px';
         this.bitmapCanvas.style.border='1px solid #000000';
         this.bitmapCanvas.style.display='none';
-        this.bitmapCanvas.width=1024;
-        this.bitmapCanvas.height=1024;
+        this.bitmapCanvas.width=512*3;
+        this.bitmapCanvas.height=512;
         
-        document.body.appendChild(this.bitmapCanvas);
+        parentDiv.appendChild(this.bitmapCanvas);
         
             // the sound canvas
             
         this.soundCanvas=document.createElement('canvas');
         this.soundCanvas.style.position="absolute";
-        this.soundCanvas.style.left='305px';
+        this.soundCanvas.style.left='5px';
         this.soundCanvas.style.top='5px';
         this.soundCanvas.style.border='1px solid #000000';
         this.soundCanvas.style.display='none';
@@ -482,20 +564,20 @@ class DebugRunClass
         this.soundCanvas.height=256;
         this.soundCanvas.onclick=this.playSound.bind(this);
         
-        document.body.appendChild(this.soundCanvas);
+        parentDiv.appendChild(this.soundCanvas);
         
             // the model canvas
             
         this.modelCanvas=document.createElement('canvas');
         this.modelCanvas.style.position="absolute";
-        this.modelCanvas.style.left='305px';
+        this.modelCanvas.style.left='5px';
         this.modelCanvas.style.top='5px';
         this.modelCanvas.style.border='1px solid #000000';
         this.modelCanvas.style.display='none';
-        this.modelCanvas.width=2048;
-        this.modelCanvas.height=2048;
+        this.modelCanvas.width=768*3;
+        this.modelCanvas.height=768;
         
-        document.body.appendChild(this.modelCanvas);
+        parentDiv.appendChild(this.modelCanvas);
     }
     
         //

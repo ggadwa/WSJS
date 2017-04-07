@@ -760,7 +760,7 @@ class GenModelOrganicMeshClass
         switch (limbType) {
             case modelLimbConstants.LIMB_TYPE_NECK:
             case modelLimbConstants.LIMB_TYPE_ARM:
-            case modelLimbConstants.LIMB_TYPE_LEFT:
+            case modelLimbConstants.LIMB_TYPE_LEG:
                 minEnd=maxEnd=false;
                 break;
             case modelLimbConstants.LIMB_TYPE_HAND:

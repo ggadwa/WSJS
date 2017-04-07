@@ -13,7 +13,9 @@ WebGL2
 
 ToDos
 
-#### better connecting limbs to body
+#### cylinder generation needs to stop at top and bottom bone, so legs line up better
+#### arms and hands/legs/etc all need to stop at radius points
+
 #### humanoid: necks are bad
 #### animals: legs always to far into body
 
