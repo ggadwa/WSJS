@@ -121,12 +121,8 @@ class GenModelOrganicMeshClass
 
                 yzAng+=yzAngAdd;
                 
-                if (!minEnd) {
-                    if (x===1) v.modelSnap=true;
-                }
-                if (!maxEnd) {
-                    if (x===(acrossSurfaceCount-2)) v.modelSnap=true;
-                }
+                if ((!minEnd) && (x===1)) v.minModelSnap=true;     // open ends can snap to their parents
+                if ((!maxEnd) && (x===(acrossSurfaceCount-2))) v.maxModelSnap=true;
             }
             
             xAng+=xAngAdd;
@@ -245,12 +241,8 @@ class GenModelOrganicMeshClass
                 
                 xzAng+=xzAngAdd;
                 
-                if (!minEnd) {
-                    if (y===1) v.modelSnap=true;
-                }
-                if (!maxEnd) {
-                    if (y===(acrossSurfaceCount-2)) v.modelSnap=true;
-                }
+                if ((!minEnd) && (y===1)) v.minModelSnap=true;     // open min ends can always snap vertices to their parents
+                if ((!maxEnd) && (y===(acrossSurfaceCount-2))) v.maxModelSnap=true;
             }
             
             yAng+=yAngAdd;
@@ -369,12 +361,8 @@ class GenModelOrganicMeshClass
 
                 xyAng+=xyAngAdd;
                 
-                if (!minEnd) {
-                    if (z===1) v.modelSnap=true;
-                }
-                if (!maxEnd) {
-                    if (z===(acrossSurfaceCount-2)) v.modelSnap=true;
-                }
+                if ((!minEnd) && (z===1)) v.minModelSnap=true;     // open min ends can always snap vertices to their parents
+                if ((!maxEnd) && (z===(acrossSurfaceCount-2))) v.maxModelSnap=true;
             }
             
             zAng+=zAngAdd;
@@ -829,16 +817,22 @@ class GenModelOrganicMeshClass
         // move vertices to similiar points
         //
         
-    snapModelVertexes(vertexList1,vertexList2,minDist)
+    snapModelVertexes(vertexList1,vertexList2,isMin)
     {
         let n,k,idx,v1,v2,d,dist;
         
         for (n=0;n!==vertexList2.length;n++) {
             v2=vertexList2[n];
-            if (!v2.modelSnap) continue;
+            
+            if (isMin) {
+                if (!v2.minModelSnap) continue;
+            }
+            else {
+                if (!v2.maxModelSnap) continue;
+            }
             
             idx=-1;
-            dist=minDist;
+            dist=1000000;
             
             for (k=0;k!==vertexList1.length;k++) {
                 v1=vertexList1[k];
@@ -920,7 +914,7 @@ class GenModelOrganicMeshClass
 
     build(inDebug)
     {
-        let n,k,limb,limb2,indexOffset;
+        let n,limb,indexOffset;
         
         let skeleton=this.model.skeleton;
 
@@ -946,32 +940,13 @@ class GenModelOrganicMeshClass
             limbIndexes.push(indexes);
         }
         
-            // combine similiar vertices for specific
-            // parts
+            // combine open ends of limbs to
+            // their parents
           
         for (n=0;n!==skeleton.limbs.length;n++) {
             limb=skeleton.limbs[n];
-            
-            for (k=0;k!==skeleton.limbs.length;k++) {
-                if (n===k) continue;
-                
-                limb2=skeleton.limbs[k];
-                
-                    // any arm or any leg snaps to body
-                    
-                if (limb.limbType===modelLimbConstants.LIMB_TYPE_BODY) {
-                    if ((limb2.limbType===modelLimbConstants.LIMB_TYPE_ARM) || (limb2.limbType===modelLimbConstants.LIMB_TYPE_LEG)) this.snapModelVertexes(limbVertexList[n],limbVertexList[k],200);    // arm, leg to body
-                }
-                
-                    // everything else has to be in same limb
-                    
-                if (!((limb.side===limb2.side) && (limb.index===limb2.index))) continue;
-                
-                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_ARM) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_HAND)) this.snapModelVertexes(limbVertexList[k],limbVertexList[n],200);    // arm to hand
-                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_HAND) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_FINGER)) this.snapModelVertexes(limbVertexList[n],limbVertexList[k],200); // finger to hand
-                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_LEG) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_FOOT)) this.snapModelVertexes(limbVertexList[k],limbVertexList[n],300);    // leg to foot
-                if ((limb.limbType===modelLimbConstants.LIMB_TYPE_FOOT) && (limb2.limbType===modelLimbConstants.LIMB_TYPE_TOE)) this.snapModelVertexes(limbVertexList[n],limbVertexList[k],200);    // toe to foot
-            }
+            if (limb.minParentLimbIdx!==-1) this.snapModelVertexes(limbVertexList[limb.minParentLimbIdx],limbVertexList[n],true);
+            if (limb.maxParentLimbIdx!==-1) this.snapModelVertexes(limbVertexList[limb.maxParentLimbIdx],limbVertexList[n],false);
         }
 
             // combine all the lists into one

@@ -93,7 +93,7 @@ let modelLimbConstants=new ModelLimbConstantsClass();
 
 class ModelLimbClass
 {
-    constructor(limbType,side,index,axis,acrossSurfaceCount,aroundSurfaceCount,scale,boneIndexes)
+    constructor(limbType,side,index,axis,acrossSurfaceCount,aroundSurfaceCount,scale,boneIndexes,minParentLimbIdx,maxParentLimbIdx)
     {
         this.limbType=limbType;
         this.side=side;
@@ -103,6 +103,8 @@ class ModelLimbClass
         this.aroundSurfaceCount=aroundSurfaceCount;
         this.scale=scale;
         this.boneIndexes=boneIndexes;
+        this.minParentLimbIdx=minParentLimbIdx;
+        this.maxParentLimbIdx=maxParentLimbIdx;
         
         this.hunchAngle=0.0;
         
