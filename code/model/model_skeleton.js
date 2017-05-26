@@ -533,20 +533,10 @@ class ModelSkeletonClass
             
             switch (limb.limbType) {
                 case modelLimbConstants.LIMB_TYPE_BODY:
-                    if (modelType===modelConstants.TYPE_HUMANOID) {
-                        this.poseSetBody(limb,5.0,5.0,limb.hunchAngle);
-                        break;
-                    }
-                    if (modelType===modelConstants.TYPE_BLOB) {
-                        this.poseSetBody(limb,15.0,30.0,0.0);
-                        break;
-                    }
+                    this.poseSetBody(limb,5.0,5.0,limb.hunchAngle);
                     break;
                 case modelLimbConstants.LIMB_TYPE_HEAD:
-                    if (modelType===modelConstants.TYPE_ANIMAL) {
-                        this.poseSetBody(limb,5.0,15.0,0.0);
-                        break;
-                    }
+                    this.poseSetBody(limb,5.0,15.0,0.0);
                     break;
                 case modelLimbConstants.LIMB_TYPE_LEG:
                     this.poseSetLeg(limb,true);
@@ -614,20 +604,10 @@ class ModelSkeletonClass
             
             switch (limb.limbType) {
                 case modelLimbConstants.LIMB_TYPE_BODY:
-                    if (modelType===modelConstants.TYPE_HUMANOID) {
-                        this.poseSetBody(limb,3.0,3.0,limb.hunchAngle);
-                        break;
-                    }
-                    if (modelType===modelConstants.TYPE_BLOB) {
-                        this.poseSetBody(limb,5.0,5.0,0.0);
-                        break;
-                    }
+                    this.poseSetBody(limb,3.0,3.0,limb.hunchAngle);
                     break;
                 case modelLimbConstants.LIMB_TYPE_HEAD:
-                    if (modelType===modelConstants.TYPE_ANIMAL) {
-                        this.poseSetBody(limb,0.0,10.0,0.0);
-                        break;
-                    }
+                    this.poseSetBody(limb,0.0,10.0,0.0);
                     break;
                 case modelLimbConstants.LIMB_TYPE_LEG:
                     this.poseSetLeg(limb,false);

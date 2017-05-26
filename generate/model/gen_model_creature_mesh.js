@@ -6,7 +6,7 @@
 // helper class for globe shrinking
 //
 
-class GenModelOrganicBoneClass
+class GenModelCreatureBoneClass
 {
     constructor()
     {
@@ -19,10 +19,10 @@ class GenModelOrganicBoneClass
 }
 
 //
-// gen organic mesh class
+// gen creature mesh class
 //
 
-class GenModelOrganicMeshClass
+class GenModelCreatureMeshClass
 {
     constructor(model,bitmap)
     {
@@ -676,7 +676,7 @@ class GenModelOrganicMeshClass
             boneIdx=skeletonBoneIndexes[n];
             bone=this.model.skeleton.bones[boneIdx];
             
-            listBone=new GenModelOrganicBoneClass();
+            listBone=new GenModelCreatureBoneClass();
             listBone.idx=boneIdx;
             listBone.position=bone.position.copy();
             listBone.gravityLockDistance=bone.gravityLockDistance;
@@ -716,7 +716,7 @@ class GenModelOrganicMeshClass
             for (k=1;k!==extraBoneCount;k++) {
                 f=k/extraBoneCount;
                 
-                listBone=new GenModelOrganicBoneClass();
+                listBone=new GenModelCreatureBoneClass();
                 listBone.idx=-1;
                 
                 listBone.position=new wsPoint(0,0,0);
@@ -810,7 +810,7 @@ class GenModelOrganicMeshClass
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList,limbScale);
-        this.randomScaleVertexToBones(vertexList);
+        // this.randomScaleVertexToBones(vertexList);       // supergumba -- this makes a mess, think of something better
     }
     
         //

@@ -17,6 +17,8 @@ class WeaponClass
 
         this.handOffset=new wsPoint(0,0,0);     // global to stop GCd
         this.handAngle=new wsPoint(0,0,0);
+        this.fireAngle=new wsPoint(0,0,0);
+        this.firePos=new wsPoint(0,0,0);
         
         Object.seal(this);
     }
@@ -36,8 +38,6 @@ class WeaponClass
         
     fire(entity)
     {
-        let pos,ang;
-        
             // time to fire again?
             
         if (view.timeStamp<this.lastFireTimeStamp) return;
@@ -46,15 +46,14 @@ class WeaponClass
         
             // create projectile
             
-        ang=new wsPoint(0,0,0);
-        ang.setFromPoint(entity.angle);
+        this.fireAngle.setFromPoint(entity.angle);
         
-        pos=new wsPoint(0,0,4000);      // supergumba -- all this is hardcoded!
-        pos.rotate(ang);
-        pos.addPoint(entity.position);
-        pos.y-=2000;        // supergumba -- all this is hardcoded!
+        this.firePos.setFromValues(0,0,4000);      // supergumba -- all this is hardcoded!
+        this.firePos.rotate(this.fireAngle);
+        this.firePos.addPoint(entity.position);
+        this.firePos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        this.projectiles[0].fire(entity.id,pos,ang);
+        this.projectiles[0].fire(entity.id,this.firePos,this.fireAngle);
     }
     
         //

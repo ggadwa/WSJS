@@ -9,15 +9,12 @@ class ModelConstantsClass
 {
     constructor()
     {
-        this.TYPE_HUMANOID=0;
-        this.TYPE_ANIMAL=1;
-        this.TYPE_BLOB=2;
-        this.TYPE_WEAPON=3;
-        this.TYPE_PROJECTILE=4;
+        this.TYPE_CREATURE=0;
+        this.TYPE_WEAPON=1;
+        this.TYPE_PROJECTILE=2;
         
         this.TYPE_NAMES=    [
-                                'Humanoid','Animal','Blob',
-                                'Weapon','Projectile'
+                                'Creature','Weapon','Projectile'
                             ];
     }
 }

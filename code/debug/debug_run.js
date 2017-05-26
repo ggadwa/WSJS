@@ -246,18 +246,35 @@ class DebugRunClass
         return(0);
     }
     
-    drawModelGetFactor(mesh,axisType,wid,high)
+    drawModelGetFactor(model,axisType,wid,high)
     {
         let n,x,y,minX,minY,maxX,maxY,v;
+        let mesh,bone,nBone;
         let xFactor,yFactor;
         
         minX=minY=1000000;
         maxX=maxY=-1000000;
         
+        mesh=model.mesh;
+        
         for (n=0;n!==mesh.vertexCount;n++) {
             v=mesh.vertexList[n];
             x=this.drawModelMeshGetX(axisType,v.position);
             y=this.drawModelMeshGetY(axisType,v.position);
+            
+            if (x<minX) minX=x;
+            if (x>maxX) maxX=x;
+            if (y<minY) minY=y;
+            if (y>maxY) maxY=y;
+        }
+        
+        nBone=model.skeleton.bones.length;
+        
+        for (n=0;n!==nBone;n++) {
+            bone=model.skeleton.bones[n];
+            
+            x=this.drawModelMeshGetX(axisType,bone.position);
+            y=this.drawModelMeshGetY(axisType,bone.position);
             
             if (x<minX) minX=x;
             if (x>maxX) maxX=x;
@@ -375,21 +392,21 @@ class DebugRunClass
         ctx=this.modelCanvas.getContext('2d');
 
         this.drawModelBackground(ctx,0,0,thirdWid,high,'#CCCCCC');
-        factor=this.drawModelGetFactor(model.mesh,this.DEBUG_MODEL_XY,thirdWid,high);
+        factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_XY,thirdWid,high);
         xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XY,thirdWid);
         yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XY,high);
         this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
         this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
         
         this.drawModelBackground(ctx,thirdWid,0,thirdWid,high,'#EEEEEE');
-        factor=this.drawModelGetFactor(model.mesh,this.DEBUG_MODEL_ZY,thirdWid,high);
+        factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_ZY,thirdWid,high);
         xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_ZY,thirdWid);
         yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_ZY,high);
         this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
         this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
         
         this.drawModelBackground(ctx,(thirdWid*2),0,thirdWid,high,'#CCCCCC');
-        factor=this.drawModelGetFactor(model.mesh,this.DEBUG_MODEL_XZ,thirdWid,high);
+        factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_XZ,thirdWid,high);
         xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XZ,thirdWid);
         yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XZ,high);
         this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);

@@ -128,7 +128,7 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
         
-        model=new ModelClass('player',modelConstants.TYPE_HUMANOID);
+        model=new ModelClass('player',modelConstants.TYPE_CREATURE);
         genModel.build(model,modelBitmap,1.0,false);
 
         modelList.addModel(model);
@@ -145,18 +145,12 @@ class MainClass
     initBuildMonsterModels(idx,genModel,genBitmapSkin)
     {
         let model,modelBitmap;
-        let monsterType;
-        let modelMonsterTypes=[modelConstants.TYPE_HUMANOID,modelConstants.TYPE_ANIMAL,modelConstants.TYPE_BLOB];
 
             // build the model
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-        //monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];
-        monsterType=modelMonsterTypes[idx%modelMonsterTypes.length];        // supergumba -- testing
-        //monsterType=modelConstants.TYPE_BLOB;      // supergumba -- testing
-        
-        model=new ModelClass(('monster_'+idx),monsterType);
+        model=new ModelClass(('monster_'+idx),modelConstants.TYPE_CREATURE);
         genModel.build(model,modelBitmap,1.0,false);
 
         modelList.addModel(model);
@@ -191,17 +185,12 @@ class MainClass
     initBuildBossModel(genModel,genBitmapSkin)
     {
         let model,modelBitmap;
-        let monsterType;
-        let modelMonsterTypes=[modelConstants.TYPE_HUMANOID,modelConstants.TYPE_ANIMAL,modelConstants.TYPE_BLOB];
 
             // build monster
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-        monsterType=modelMonsterTypes[genRandom.randomIndex(modelMonsterTypes.length)];        // supergumba -- TESTING -- always make at least one of each type
-        monsterType=modelConstants.TYPE_HUMANOID;      // supergumba -- testing
-        
-        model=new ModelClass('boss',monsterType);
+        model=new ModelClass('boss',modelConstants.TYPE_CREATURE);
         genModel.build(model,modelBitmap,genRandom.randomFloat(2.5,3.0),false);
 
         modelList.addModel(model);

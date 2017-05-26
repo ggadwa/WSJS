@@ -421,11 +421,8 @@ class ModelMeshClass
         
     buildNonCulledTriangleIndexes()
     {
-        let n,idx,vIdx;
-        let pnt=new wsPoint(0,0,0);
-        let normal=new wsPoint(0,0,0);
-        let trigToEyeVector=new wsPoint(0,0,0);
-        
+        let n,x,y,z,f,idx,vIdx;
+       
             // we build a list of array the vertexes
             // that aren't culled, if it's the first
             // time we need to create the array
@@ -442,18 +439,28 @@ class ModelMeshClass
             // have normals facing away from the eye
             // which is the dot product between the normal
             // and the vector from trig to eye point
+            
+            // all this is unwrapped for speed (instead
+            // of using objects)
         
         vIdx=0;
         
         for (n=0;n!==this.vertexCount;n++) {
-            pnt.setFromValues(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
-            trigToEyeVector.setFromSubPoint(pnt,view.camera.position);
-            trigToEyeVector.normalize();
-                
-            normal.setFromValues(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]);
-            this.nonCulledVertexes[n]=(trigToEyeVector.dot(normal)<=view.VIEW_NORMAL_CULL_LIMIT);
             
-            vIdx+=3;
+            x=this.drawVertices[vIdx]-view.camera.position.x;      // cullPnt.setFromValues(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
+            y=this.drawVertices[vIdx+1]-view.camera.position.y;     // cullTrigToEyeVector.setFromSubPoint(this.cullPnt,view.camera.position);
+            z=this.drawVertices[vIdx+2]-view.camera.position.z;
+            
+            f=Math.sqrt((x*x)+(y*y)+(z*z));   // cullTrigToEyeVector.normalize();
+            if (f!==0.0) f=1.0/f;
+        
+            x=x*f;
+            y=y*f;
+            z=z*f;
+
+            this.nonCulledVertexes[n]=(((x*this.drawNormals[vIdx])+(y*this.drawNormals[vIdx+1])+(z*this.drawNormals[vIdx+2]))<=view.VIEW_NORMAL_CULL_LIMIT);     // cullTrigToEyeVector.dot( ... cullNormal.setFromValues(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]) ...)
+            
+            vIdx=vIdx+3;      // supergumba -- chrome complains about idx+=3, so we do this for now
         }
         
             // rebuild the index list for any trig
@@ -468,7 +475,7 @@ class ModelMeshClass
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
             }
             else {
-                idx+=3;
+                idx=idx+3;      // supergumba -- chrome complains about idx+=3, so we do this for now
             }
         }
     }

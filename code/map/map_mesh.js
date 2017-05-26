@@ -701,8 +701,7 @@ class MapMeshClass
         
     buildNonCulledTriangleIndexes()
     {
-        let n,v,idx;
-        let trigToEyeVector=new wsPoint(0,0,0);
+        let n,v,x,y,z,f,idx;
 
             // if it's the first time, we'll need
             // to create the index array
@@ -715,6 +714,9 @@ class MapMeshClass
             // have normals facing away from the eye
             // which is the dot product between the normal
             // and the vector from trig to eye point
+            
+            // all this is unwrapped (instead of using classes)
+            // for speed reasons
         
         idx=0;
         
@@ -723,18 +725,27 @@ class MapMeshClass
                 // vector from trig to eye point
                 
             v=this.vertexList[this.indexes[idx]];
-            trigToEyeVector.setFromSubPoint(v.position,view.camera.position);
-            trigToEyeVector.normalize();
+            
+            x=v.position.x-view.camera.position.x;      // cullTrigToEyeVector.setFromSubPoint(v.position,view.camera.position)
+            y=v.position.y-view.camera.position.y;
+            z=v.position.z-view.camera.position.z;
+            
+            f=Math.sqrt((x*x)+(y*y)+(z*z));   // cullTrigToEyeVector.normalize();
+            if (f!==0.0) f=1.0/f;
+        
+            x=x*f;
+            y=y*f;
+            z=z*f;
             
                 // dot product
                 
-            if (trigToEyeVector.dot(v.normal)<=view.VIEW_NORMAL_CULL_LIMIT) {
+            if (((x*v.normal.x)+(y*v.normal.y)+(z*v.normal.z))<=view.VIEW_NORMAL_CULL_LIMIT) {      // this.cullTrigToEyeVector.dot(v.normal)
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+1];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+2];
             }    
         
-            idx+=3;
+            idx=idx+3;      // supergumba -- chrome complains about idx+=3, so we do this for now
         }
     }
     

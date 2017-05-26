@@ -13,9 +13,9 @@ WebGL2
 
 ToDos
 
+#### start all over with random body, random limbs, random skeleton, etc
 
-#### connect open MIN ends to parents (always do min ends as first bone)
-#### animals are just awful all over
+
 
 #### monsters still getting hit by own projectiles
 #### need meeles for monsters
@@ -25,7 +25,6 @@ ToDos
 #### ai types (charge, sniper, etc)
 #### office decorations (outside like computers)
 #### lifts instead of platforms in lower levels
-#### animals need to have better necks
 #### windows have different bar types
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
@@ -35,7 +34,6 @@ ToDos
 #### get rid of weapon fire hard-coding
 #### liquid tint colors are hard-coded
 #### model spikes
-#### flyers models
 #### draw closest map meshes first
 #### eliminate off meshes/models outside view distance
 
