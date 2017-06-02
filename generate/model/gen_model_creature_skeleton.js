@@ -182,44 +182,6 @@ class GenModelCreatureSkeletonClass
         vct.z+=boneOffset;
         this.buildLimbLeg(sideRight,legIndex,('Right'+legIndex),vct,boneIdx,hipHigh,kneeHigh,ankleHigh,footHigh,legRadius,footLength,toeCount,toeLength,bodyLimbIdx);
     }
-        
-    buildLimbWhip(whipCount,parentBoneIdx,whipRadius,y,whipLength,rotOffset,pushBoneRadius,bodyLimbIdx)
-    {
-        let whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx;
-        let vct,pushVct,pnt;
-        let skeleton=this.model.skeleton;
-        let bones=skeleton.bones;
-        
-            // direction
-            
-        vct=new wsPoint(whipLength,0.0,0.0);
-        vct.rotateY(null,rotOffset);
-        
-            // starting point, some whips are pushed
-            // past the radius (graviy lock distance) or their
-            // host bones
-            
-        pnt=new wsPoint(bones[parentBoneIdx].position.x,bones[parentBoneIdx].position.y,bones[parentBoneIdx].position.z);
-        if (pushBoneRadius) {
-            pushVct=new wsPoint(Math.trunc(bones[parentBoneIdx].gravityLockDistance*0.75),0.0,0.0);
-            pushVct.rotateY(null,rotOffset);
-            pnt.addPoint(pushVct);
-        }
-        
-            // the whip
-            
-        whip0BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_0'),parentBoneIdx,new wsPoint(pnt.x,y,pnt.z)))-1;
-        whip1BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_1'),whip0BoneIdx,new wsPoint((pnt.x+(vct.x*0.33)),y,(pnt.z+(vct.z*0.33)))))-1;
-        whip2BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_2'),whip1BoneIdx,new wsPoint((pnt.x+(vct.x*0.66)),y,(pnt.z+(vct.z*0.66)))))-1;
-        whip3BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipCount+'_3'),whip2BoneIdx,new wsPoint((pnt.x+vct.x),y,(pnt.z+vct.z))))-1;
-
-        bones[whip0BoneIdx].gravityLockDistance=whipRadius;
-        bones[whip1BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.8);
-        bones[whip2BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.6);
-        bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.1);
-
-        skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_WHIP,modelLimbConstants.LIMB_SIDE_NONE,whipCount,modelLimbConstants.LIMB_AXIS_Z,8,5,null,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx],bodyLimbIdx,-1));
-    }
     
         //
         // build skeleton body
@@ -436,7 +398,7 @@ class GenModelCreatureSkeletonClass
             whipRadius=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
             whipLength=Math.trunc(genRandom.randomInt(400,2000)*this.sizeFactor);
             
-            this.buildLimbWhip(0,hipBoneIdx,whipRadius,bones[hipBoneIdx].position.y,whipLength,90.0,true);
+            //this.buildLimbWhip(0,hipBoneIdx,whipRadius,bones[hipBoneIdx].position.y,whipLength,90.0,true);
         }
     }
      
@@ -522,8 +484,59 @@ class GenModelCreatureSkeletonClass
             whipRadius=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
             whipLength=Math.trunc(genRandom.randomInt(400,2000)*this.sizeFactor);
             
-            this.buildLimbWhip(n,boneIdx,whipRadius,bones[boneIdx].position.y,whipLength,rotOffset,true);
+            //this.buildLimbWhip(n,boneIdx,whipRadius,bones[boneIdx].position.y,whipLength,rotOffset,true);
         }
+    }
+
+    
+    
+    
+        //
+        // whip limbs
+        //
+    
+    buildLimbWhip(whipIdx,parentBoneIdx,axis,whipRadius,y,whipLength,rotOffset,pushPastParentBoneGravity,bodyLimbIdx)
+    {
+        let whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx;
+        let vct,pushVct,pnt,pos;
+        let skeleton=this.model.skeleton;
+        let bones=skeleton.bones;
+        
+            // direction and a push vector off the
+            // parent bone
+            
+        if (axis!==modelLimbConstants.LIMB_AXIS_Y) {
+            vct=new wsPoint(whipLength,0.0,0.0);
+            vct.rotateY(null,rotOffset);
+            
+            pushVct=new wsPoint(Math.trunc(bones[parentBoneIdx].gravityLockDistance*0.75),0.0,0.0);
+            pushVct.rotateY(null,rotOffset);
+        }
+        else {
+            vct=new wsPoint(0.0,whipLength,0.0);
+            vct.rotateX(null,rotOffset);
+            
+            pushVct=new wsPoint(Math.trunc(0.0,bones[parentBoneIdx].gravityLockDistance*0.75),0.0);
+            pushVct.rotateX(null,rotOffset);
+        }
+
+        pos=bones[parentBoneIdx].position;
+        pnt=new wsPoint(pos.x,pos.y,pos.z);
+        if (pushPastParentBoneGravity) pnt.addPoint(pushVct);
+        
+            // the whip
+            
+        whip0BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipIdx+'_0'),parentBoneIdx,new wsPoint(pnt.x,y,pnt.z)))-1;
+        whip1BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipIdx+'_1'),whip0BoneIdx,new wsPoint((pnt.x+(vct.x*0.33)),(pnt.y+(vct.y*0.33)),(pnt.z+(vct.z*0.33)))))-1;
+        whip2BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipIdx+'_2'),whip1BoneIdx,new wsPoint((pnt.x+(vct.x*0.66)),(pnt.y+(vct.y*0.66)),(pnt.z+(vct.z*0.66)))))-1;
+        whip3BoneIdx=bones.push(new ModelBoneClass(('Whip'+whipIdx+'_3'),whip2BoneIdx,new wsPoint((pnt.x+vct.x),(pnt.y+vct.y),(pnt.z+vct.z))))-1;
+
+        bones[whip0BoneIdx].gravityLockDistance=whipRadius;
+        bones[whip1BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.8);
+        bones[whip2BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.6);
+        bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.1);
+
+        skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_WHIP,modelLimbConstants.LIMB_SIDE_NONE,whipIdx,axis,8,5,null,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx],bodyLimbIdx,-1));
     }
     
         //
@@ -535,7 +548,9 @@ class GenModelCreatureSkeletonClass
         let bones;
         let bodyLimb,bodyLimbIdx;
         let hipHigh,waistHigh,torsoHigh,torsoTopHigh;
+        let shoulderSize,hipSize;
         let baseBoneIdx,hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx;
+        let leftShoulderBoneIdx,rightShoulderBoneIdx,leftHipBoneIdx,rightHipBoneIdx;
         
         this.model.skeleton=new ModelSkeletonClass();
         bones=this.model.skeleton.bones;
@@ -551,7 +566,7 @@ class GenModelCreatureSkeletonClass
             
         baseBoneIdx=bones.push(new ModelBoneClass('Base',-1,new wsPoint(0,0,0)))-1;
 
-            // create body limb
+            // the spine
             
         hipBoneIdx=bones.push(new ModelBoneClass('Hip',baseBoneIdx,new wsPoint(0,-hipHigh,0)))-1;
         waistBoneIdx=bones.push(new ModelBoneClass('Waist',hipBoneIdx,new wsPoint(0,-waistHigh,0)))-1;
@@ -568,7 +583,33 @@ class GenModelCreatureSkeletonClass
         bones[torsoBoneIdx].gravityScale.setFromValues(1.0,1.0,0.7);
         bones[torsoTopBoneIdx].gravityScale.setFromValues(1.0,0.5,0.7);
         
-        bodyLimb=new ModelLimbClass(modelLimbConstants.LIMB_TYPE_BODY,modelLimbConstants.LIMB_SIDE_NONE,0,modelLimbConstants.LIMB_AXIS_Y,10,10,null,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx],-1,-1);
+            // the shoulders
+            
+        leftShoulderBoneIdx=bones.push(new ModelBoneClass('Left Shoulder',torsoTopBoneIdx,new wsPoint(500,-torsoTopHigh,0)))-1;
+        rightShoulderBoneIdx=bones.push(new ModelBoneClass('Right Shoulder',torsoTopBoneIdx,new wsPoint(-500,-torsoTopHigh,0)))-1;
+        
+        shoulderSize=genRandom.randomInt(300,300)*this.sizeFactor;
+        bones[leftShoulderBoneIdx].gravityLockDistance=Math.trunc(shoulderSize);
+        bones[rightShoulderBoneIdx].gravityLockDistance=Math.trunc(shoulderSize);
+        
+        bones[leftShoulderBoneIdx].gravityScale.setFromValues(0.5,0.3,1.0);
+        bones[rightShoulderBoneIdx].gravityScale.setFromValues(0.5,0.3,1.0);
+        
+            // the hips
+            
+        leftHipBoneIdx=bones.push(new ModelBoneClass('Left Hip',hipBoneIdx,new wsPoint(500,-hipHigh,0)))-1;
+        rightHipBoneIdx=bones.push(new ModelBoneClass('Right Hip',hipBoneIdx,new wsPoint(-500,-hipHigh,0)))-1;
+        
+        hipSize=genRandom.randomInt(300,300)*this.sizeFactor;
+        bones[leftHipBoneIdx].gravityLockDistance=Math.trunc(hipSize);
+        bones[rightHipBoneIdx].gravityLockDistance=Math.trunc(hipSize);
+        
+        bones[leftHipBoneIdx].gravityScale.setFromValues(0.5,0.3,1.0);
+        bones[rightHipBoneIdx].gravityScale.setFromValues(0.5,0.3,1.0);
+
+            // the body limb
+            
+        bodyLimb=new ModelLimbClass(modelLimbConstants.LIMB_TYPE_BODY,modelLimbConstants.LIMB_SIDE_NONE,0,modelLimbConstants.LIMB_AXIS_Y,12,12,null,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx,leftShoulderBoneIdx,rightShoulderBoneIdx,leftHipBoneIdx,rightHipBoneIdx],-1,-1);
         bodyLimbIdx=this.model.skeleton.limbs.push(bodyLimb)-1;
         
         bodyLimb.hunchAngle=genRandom.randomInt(0,20);
@@ -583,23 +624,67 @@ class GenModelCreatureSkeletonClass
     buildLimbs(bodyLimb)
     {
         let n,limbCount;
-        let boneIdx,rotOffset;
-        let whipRadius,whipLength;
+        let bone,boneIdx,rotOffset,pushPastParentBoneGravity;
+        let axis,radius,length;
         let bones=this.model.skeleton.bones;
 
-                // create any whips
+                // random limb count
             
-        limbCount=genRandom.randomInt(0,10);
+        limbCount=genRandom.randomInt(2,10);
             
         for (n=0;n!==limbCount;n++) {
             boneIdx=bodyLimb.getRandomBoneIndex();
             
-            rotOffset=genRandom.random()*360.0;
+                // random positioning
+                
+            radius=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
+            length=Math.trunc(genRandom.randomInt(400,2000)*this.sizeFactor);
             
-            whipRadius=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
-            whipLength=Math.trunc(genRandom.randomInt(400,2000)*this.sizeFactor);
+                // special directions for types
+                
+            bone=this.model.skeleton.bones[boneIdx];
+            switch (bone.name) {
+                
+                case 'Left Shoulder':
+                    axis=modelLimbConstants.LIMB_AXIS_X;
+                    rotOffset=rotOffset=genRandom.randomInt(0,15)-30;
+                    pushPastParentBoneGravity=false;
+                    break;
+                    
+                case 'Right Shoulder':
+                    axis=modelLimbConstants.LIMB_AXIS_X;
+                    rotOffset=rotOffset=genRandom.randomInt(180,15)-30;
+                    pushPastParentBoneGravity=false;
+                    break;
+                    
+                case 'Left Hip':
+                    axis=modelLimbConstants.LIMB_AXIS_Y;
+                    rotOffset=genRandom.randomInt(0,15)-30;
+                    pushPastParentBoneGravity=false;
+                    break;
+                    
+                case 'Right Hip':
+                    axis=modelLimbConstants.LIMB_AXIS_Y;
+                    rotOffset=genRandom.randomInt(0,15)-30;
+                    pushPastParentBoneGravity=false;
+                    break;
+                    
+                default:
+                    if (genRandom.randomPercentage(0.5)) {
+                        axis=modelLimbConstants.LIMB_AXIS_X;
+                        rotOffset=genRandom.randomInt(0,15)-30;
+                    }
+                    else {
+                        axis=modelLimbConstants.LIMB_AXIS_Z;
+                        rotOffset=genRandom.randomInt(90,15)-30;
+                    }
+                    if (genRandom.randomPercentage(0.5)) rotOffset+=180;
+                    
+                    pushPastParentBoneGravity=true;
+                    break;
+            }
             
-            this.buildLimbWhip(n,boneIdx,whipRadius,bones[boneIdx].position.y,whipLength,rotOffset,true);
+            this.buildLimbWhip(n,boneIdx,axis,radius,bones[boneIdx].position.y,length,rotOffset,pushPastParentBoneGravity);
         }
     }
     
@@ -612,7 +697,7 @@ class GenModelCreatureSkeletonClass
         let bodyLimb;
         
             // build the skeleton
-            
+        
         bodyLimb=this.buildBody();
         this.buildLimbs(bodyLimb);
         
