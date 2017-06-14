@@ -13,6 +13,9 @@ WebGL2
 
 ToDos
 
+
+---> genModel.build freeze
+
 #### start all over with random body, random limbs, random skeleton, etc
 
 

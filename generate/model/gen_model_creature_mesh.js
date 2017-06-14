@@ -730,7 +730,7 @@ class GenModelCreatureMeshClass
                 boneList.push(listBone);
             }
         }
-
+        
             // find the bounds for this list of bones
             
         xBound=new wsBound(0,0);
@@ -806,7 +806,7 @@ class GenModelCreatureMeshClass
             
             // shrink wrap the globe and rebuild
             // any normals, etc
-
+            
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList,limbScale);

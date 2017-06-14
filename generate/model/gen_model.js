@@ -16,12 +16,13 @@ class GenModelClass
     {
         let genSkeleton,genMesh;
         
+        console.log('in build!');
+        
         switch (model.modelType) {
         
             case modelConstants.TYPE_CREATURE:
                 genSkeleton=new GenModelCreatureSkeletonClass(model,sizeFactor);
                 genSkeleton.build();
-
                 genMesh=new GenModelCreatureMeshClass(model,modelBitmap);
                 genMesh.build(inDebug);
                 break;

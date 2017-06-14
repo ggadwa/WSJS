@@ -377,6 +377,7 @@ class DebugRunClass
         let model,genModel,factor,xOffset,yOffset,thirdWid;
         let wid=this.modelCanvas.width;
         let high=this.modelCanvas.height;
+
         
             // build the model
         
@@ -388,9 +389,9 @@ class DebugRunClass
             // draw axises
         
         thirdWid=Math.trunc(wid/3);
-        
-        ctx=this.modelCanvas.getContext('2d');
 
+        ctx=this.modelCanvas.getContext('2d');
+        
         this.drawModelBackground(ctx,0,0,thirdWid,high,'#CCCCCC');
         factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_XY,thirdWid,high);
         xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XY,thirdWid);
