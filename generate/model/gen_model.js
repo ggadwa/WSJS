@@ -16,8 +16,6 @@ class GenModelClass
     {
         let genSkeleton,genMesh;
         
-        console.log('in build!');
-        
         switch (model.modelType) {
         
             case modelConstants.TYPE_CREATURE:

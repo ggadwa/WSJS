@@ -75,13 +75,6 @@ class ModelLimbConstantsClass
         this.LIMB_AXIS_X=0;
         this.LIMB_AXIS_Y=1;
         this.LIMB_AXIS_Z=2;
-        
-        this.LIMB_SIDE_LEFT=0;
-        this.LIMB_SIDE_RIGHT=1;
-        this.LIMB_SIDE_FRONT_LEFT=2;
-        this.LIMB_SIDE_BACK_LEFT=3;
-        this.LIMB_SIDE_FRONT_RIGHT=4;
-        this.LIMB_SIDE_BACK_RIGHT=5;
     }
 }
 
@@ -93,10 +86,9 @@ let modelLimbConstants=new ModelLimbConstantsClass();
 
 class ModelLimbClass
 {
-    constructor(limbType,side,index,axis,acrossSurfaceCount,aroundSurfaceCount,scale,boneIndexes,minParentLimbIdx,maxParentLimbIdx)
+    constructor(limbType,index,axis,acrossSurfaceCount,aroundSurfaceCount,scale,boneIndexes,minParentLimbIdx,maxParentLimbIdx)
     {
         this.limbType=limbType;
-        this.side=side;
         this.index=index;
         this.axis=axis;
         this.acrossSurfaceCount=acrossSurfaceCount;
