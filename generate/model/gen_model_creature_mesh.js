@@ -120,9 +120,6 @@ class GenModelCreatureMeshClass
                 v.uv.y=vAng;
 
                 yzAng+=yzAngAdd;
-                
-                if ((!minEnd) && (x===1)) v.minModelSnap=true;     // open ends can snap to their parents
-                if ((!maxEnd) && (x===(acrossSurfaceCount-2))) v.maxModelSnap=true;
             }
             
             xAng+=xAngAdd;
@@ -240,9 +237,6 @@ class GenModelCreatureMeshClass
                 v.uv.y=vAng;
                 
                 xzAng+=xzAngAdd;
-                
-                if ((!minEnd) && (y===1)) v.minModelSnap=true;     // open min ends can always snap vertices to their parents
-                if ((!maxEnd) && (y===(acrossSurfaceCount-2))) v.maxModelSnap=true;
             }
             
             yAng+=yAngAdd;
@@ -360,9 +354,6 @@ class GenModelCreatureMeshClass
                 v.uv.y=vAng;
 
                 xyAng+=xyAngAdd;
-                
-                if ((!minEnd) && (z===1)) v.minModelSnap=true;     // open min ends can always snap vertices to their parents
-                if ((!maxEnd) && (z===(acrossSurfaceCount-2))) v.maxModelSnap=true;
             }
             
             zAng+=zAngAdd;
@@ -591,19 +582,18 @@ class GenModelCreatureMeshClass
         
     scaleVertexToBones(vertexList,limbScale)
     {
+        /* supergumba -- do this at end, to everything at once, it messes up models to do it on the fly
         let n,v;
-        let bone;
         let nVertex=vertexList.length;
         let bones=this.model.skeleton.bones;
         
+        if (limbScale===null) return;
+        
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
-            if (v.boneIdx===-1) continue;
-            
-            bone=bones[v.boneIdx];
-            v.position.scaleFromPoint(bone.position,bone.gravityScale);
-            if (limbScale!==null) v.position.scaleFromPoint(bone.position,limbScale);
+            if (v.boneIdx!==-1) v.position.scaleFromPoint(bones[v.boneIdx].position,limbScale);
         }
+        */
     }
     
         //
@@ -742,26 +732,26 @@ class GenModelCreatureMeshClass
         
             // figure out if there is min and max ends
             
-        minEnd=true;
+        minEnd=true;        // supergumba -- do away with all the connection stuff, it'll never get right
         maxEnd=true;
         
         switch (limbType) {
             case modelLimbConstants.LIMB_TYPE_NECK:
             case modelLimbConstants.LIMB_TYPE_ARM:
             case modelLimbConstants.LIMB_TYPE_LEG:
-                minEnd=maxEnd=false;
+            //    minEnd=maxEnd=false;
                 break;
             case modelLimbConstants.LIMB_TYPE_HAND:
             case modelLimbConstants.LIMB_TYPE_FINGER:
                 if (side===modelLimbConstants.LIMB_SIDE_LEFT) {
-                    minEnd=false;
+            //        minEnd=false;
                 }
                 else {
-                    maxEnd=false;
+            //        maxEnd=false;
                 }
                 break;
             case modelLimbConstants.LIMB_TYPE_TOE:
-                minEnd=false;
+            //    minEnd=false;
                 break;
         }
         
@@ -811,45 +801,6 @@ class GenModelCreatureMeshClass
         this.attachVertexToBones(vertexList,boneList,centerPnt);
         this.scaleVertexToBones(vertexList,limbScale);
         // this.randomScaleVertexToBones(vertexList);       // supergumba -- this makes a mess, think of something better
-    }
-    
-        //
-        // move vertices to similiar points
-        //
-        
-    snapModelVertexes(vertexList1,vertexList2,isMin)
-    {
-        let n,k,idx,v1,v2,d,dist;
-        
-        for (n=0;n!==vertexList2.length;n++) {
-            v2=vertexList2[n];
-            
-            if (isMin) {
-                if (!v2.minModelSnap) continue;
-            }
-            else {
-                if (!v2.maxModelSnap) continue;
-            }
-            
-            idx=-1;
-            dist=1000000;
-            
-            for (k=0;k!==vertexList1.length;k++) {
-                v1=vertexList1[k];
-                
-                d=v1.position.distance(v2.position);
-                if (d<dist) {
-                    dist=d;
-                    idx=k;
-                }
-            }
-            
-            if (idx!==-1) {
-                v1=vertexList1[idx];
-                v2.position.setFromPoint(v1.position);
-                v2.boneIdx=v1.boneIdx;
-            }
-        }
     }
     
         //
@@ -939,16 +890,7 @@ class GenModelCreatureMeshClass
             limbVertexList.push(vertexList);
             limbIndexes.push(indexes);
         }
-        
-            // combine open ends of limbs to
-            // their parents
-          
-        for (n=0;n!==skeleton.limbs.length;n++) {
-            limb=skeleton.limbs[n];
-            if (limb.minParentLimbIdx!==-1) this.snapModelVertexes(limbVertexList[limb.minParentLimbIdx],limbVertexList[n],true);
-            if (limb.maxParentLimbIdx!==-1) this.snapModelVertexes(limbVertexList[limb.maxParentLimbIdx],limbVertexList[n],false);
-        }
-
+       
             // combine all the lists into one
             
         modelVertexList=limbVertexList[0];

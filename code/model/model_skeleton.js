@@ -22,7 +22,6 @@ class ModelBoneClass
             // mesh creation
 
         this.gravityLockDistance=500;
-        this.gravityScale=new wsPoint(1.0,1.0,1.0);
 
             // pose
 
@@ -86,17 +85,14 @@ let modelLimbConstants=new ModelLimbConstantsClass();
 
 class ModelLimbClass
 {
-    constructor(limbType,index,axis,acrossSurfaceCount,aroundSurfaceCount,scale,boneIndexes,minParentLimbIdx,maxParentLimbIdx)
+    constructor(limbType,index,axis,acrossSurfaceCount,aroundSurfaceCount,boneIndexes)
     {
         this.limbType=limbType;
         this.index=index;
         this.axis=axis;
         this.acrossSurfaceCount=acrossSurfaceCount;
         this.aroundSurfaceCount=aroundSurfaceCount;
-        this.scale=scale;
         this.boneIndexes=boneIndexes;
-        this.minParentLimbIdx=minParentLimbIdx;
-        this.maxParentLimbIdx=maxParentLimbIdx;
         
         this.hunchAngle=0.0;
         

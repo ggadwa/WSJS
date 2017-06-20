@@ -21,9 +21,6 @@ class ModelMeshVertexClass
         this.parentBoneIdx=-1;
         this.vectorFromParentBone=new wsPoint(0.0,0.0,0.0);
         
-        this.minModelSnap=false;
-        this.maxModelSnap=false;
-        
         Object.seal(this);
     }
 }

@@ -15,6 +15,9 @@ ToDos
 
 
 #### start all over with random body, random limbs, random skeleton, etc
+#### globes not come to tip?  Or flatter, somehow?
+
+-> gravity squishes at end, it meshes up models too much to do during limb creation
 
 
 #### monsters still getting hit by own projectiles
