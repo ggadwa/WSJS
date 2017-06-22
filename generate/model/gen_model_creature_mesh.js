@@ -75,7 +75,7 @@ class GenModelCreatureMeshClass
         // center point
         //
         
-    buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,minEnd,maxEnd,vertexList,indexes)
+    buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
         let x,yz,v,vIdx,iIdx;
         let vNextIdx,v2Idx,v2NextIdx;
@@ -127,21 +127,17 @@ class GenModelCreatureMeshClass
         
             // end points
        
-        if (minEnd) {
-            minIdx=vIdx;
+        minIdx=vIdx;
 
-            v=vertexList[vIdx++];
-            v.position.setFromValues((centerPnt.x-acrossRadius),centerPnt.y,centerPnt.z);
-            v.uv.setFromValues(0.5,0.0);
-        }
-        
-        if (maxEnd) {
-            maxIdx=vIdx;
+        v=vertexList[vIdx++];
+        v.position.setFromValues((centerPnt.x-acrossRadius),centerPnt.y,centerPnt.z);
+        v.uv.setFromValues(0.5,0.0);
 
-            v=vertexList[vIdx++];
-            v.position.setFromValues((centerPnt.x+acrossRadius),centerPnt.y,centerPnt.z);
-            v.uv.setFromValues(0.5,1.0);
-        }
+        maxIdx=vIdx;
+
+        v=vertexList[vIdx++];
+        v.position.setFromValues((centerPnt.x+acrossRadius),centerPnt.y,centerPnt.z);
+        v.uv.setFromValues(0.5,1.0);
         
             // build the triangles on
             // all the strips except the
@@ -171,28 +167,24 @@ class GenModelCreatureMeshClass
         
             // min end point
         
-        if (minEnd) {
-            for (yz=0;yz!==aroundSurfaceCount;yz++) {
-                indexes[iIdx++]=yz;
-                indexes[iIdx++]=minIdx;
-                indexes[iIdx++]=yz+1;
-            }
+        for (yz=0;yz!==aroundSurfaceCount;yz++) {
+            indexes[iIdx++]=yz;
+            indexes[iIdx++]=minIdx;
+            indexes[iIdx++]=yz+1;
         }
         
             // max end point
             
-        if (maxEnd) {
-            maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
-            
-            for (yz=0;yz!==aroundSurfaceCount;yz++) {
-                indexes[iIdx++]=maxOff+yz;
-                indexes[iIdx++]=maxIdx;
-                indexes[iIdx++]=maxOff+(yz+1);
-            }
+        maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
+
+        for (yz=0;yz!==aroundSurfaceCount;yz++) {
+            indexes[iIdx++]=maxOff+yz;
+            indexes[iIdx++]=maxIdx;
+            indexes[iIdx++]=maxOff+(yz+1);
         }
     }
     
-    buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,minEnd,maxEnd,vertexList,indexes)
+    buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
         let xz,y,v,vIdx,iIdx;
         let vNextIdx,v2Idx,v2NextIdx;
@@ -244,21 +236,17 @@ class GenModelCreatureMeshClass
         
             // end points
         
-        if (minEnd) {
-            minIdx=vIdx;
+        minIdx=vIdx;
 
-            v=vertexList[vIdx++];
-            v.position.setFromValues(centerPnt.x,(centerPnt.y-acrossRadius),centerPnt.z);
-            v.uv.setFromValues(0.5,0.0);
-        }
+        v=vertexList[vIdx++];
+        v.position.setFromValues(centerPnt.x,(centerPnt.y-acrossRadius),centerPnt.z);
+        v.uv.setFromValues(0.5,0.0);
     
-        if (maxEnd) {
-            maxIdx=vIdx;
+        maxIdx=vIdx;
 
-            v=vertexList[vIdx++];
-            v.position.setFromValues(centerPnt.x,(centerPnt.y+acrossRadius),centerPnt.z);
-            v.uv.setFromValues(0.5,1.0);
-        }
+        v=vertexList[vIdx++];
+        v.position.setFromValues(centerPnt.x,(centerPnt.y+acrossRadius),centerPnt.z);
+        v.uv.setFromValues(0.5,1.0);
     
             // build the triangles on
             // all the strips except the
@@ -288,28 +276,24 @@ class GenModelCreatureMeshClass
         
             // min end point
         
-        if (minEnd) {
-            for (xz=0;xz!==aroundSurfaceCount;xz++) {
-                indexes[iIdx++]=xz;
-                indexes[iIdx++]=minIdx;
-                indexes[iIdx++]=xz+1;
-            }
+        for (xz=0;xz!==aroundSurfaceCount;xz++) {
+            indexes[iIdx++]=xz;
+            indexes[iIdx++]=minIdx;
+            indexes[iIdx++]=xz+1;
         }
         
             // max end point
         
-        if (maxEnd) {
-            maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
+        maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
-            for (xz=0;xz!==aroundSurfaceCount;xz++) {
-                indexes[iIdx++]=maxOff+xz;
-                indexes[iIdx++]=maxIdx;
-                indexes[iIdx++]=maxOff+(xz+1);
-            }
+        for (xz=0;xz!==aroundSurfaceCount;xz++) {
+            indexes[iIdx++]=maxOff+xz;
+            indexes[iIdx++]=maxIdx;
+            indexes[iIdx++]=maxOff+(xz+1);
         }
     }
     
-    buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,minEnd,maxEnd,vertexList,indexes)
+    buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes)
     {
         let xy,z,v,vIdx,iIdx;
         let vNextIdx,v2Idx,v2NextIdx;
@@ -361,21 +345,17 @@ class GenModelCreatureMeshClass
         
             // end points
         
-        if (minEnd) {
-            minIdx=vIdx;
+        minIdx=vIdx;
 
-            v=vertexList[vIdx++];
-            v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z-acrossRadius));
-            v.uv.setFromValues(0.5,0.0);
-        }
+        v=vertexList[vIdx++];
+        v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z-acrossRadius));
+        v.uv.setFromValues(0.5,0.0);
     
-        if (maxEnd) {
-            maxIdx=vIdx;
+        maxIdx=vIdx;
 
-            v=vertexList[vIdx++];
-            v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z+acrossRadius));
-            v.uv.setFromValues(0.5,1.0);
-        }
+        v=vertexList[vIdx++];
+        v.position.setFromValues(centerPnt.x,centerPnt.y,(centerPnt.z+acrossRadius));
+        v.uv.setFromValues(0.5,1.0);
         
             // build the triangles on
             // all the strips except the
@@ -405,24 +385,20 @@ class GenModelCreatureMeshClass
         
             // min end point
         
-        if (minEnd) {
-            for (xy=0;xy!==aroundSurfaceCount;xy++) {
-                indexes[iIdx++]=xy;
-                indexes[iIdx++]=minIdx;
-                indexes[iIdx++]=xy+1;
-            }
+        for (xy=0;xy!==aroundSurfaceCount;xy++) {
+            indexes[iIdx++]=xy;
+            indexes[iIdx++]=minIdx;
+            indexes[iIdx++]=xy+1;
         }
         
             // max end point
         
-        if (maxEnd) {
-            maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
+        maxOff=(aroundSurfaceCount+1)*(acrossSurfaceCount-3);
 
-            for (xy=0;xy!==aroundSurfaceCount;xy++) {
-                indexes[iIdx++]=maxOff+xy;
-                indexes[iIdx++]=maxIdx;
-                indexes[iIdx++]=maxOff+(xy+1);
-            }
+        for (xy=0;xy!==aroundSurfaceCount;xy++) {
+            indexes[iIdx++]=maxOff+xy;
+            indexes[iIdx++]=maxIdx;
+            indexes[iIdx++]=maxOff+(xy+1);
         }
     }
 
@@ -653,7 +629,7 @@ class GenModelCreatureMeshClass
     {
         let n,k,f,boneIdx,bone,parentBone,listBone;
         let acrossRadius,aroundRadius;
-        let extraBoneCount,minEnd,maxEnd;
+        let extraBoneCount;
         let parentListIdx,maxGravity;
         let xBound,yBound,zBound,centerPnt;
         
@@ -730,31 +706,6 @@ class GenModelCreatureMeshClass
         this.findBoundsForBoneList(boneList,xBound,yBound,zBound);
         centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
-            // figure out if there is min and max ends
-            
-        minEnd=true;        // supergumba -- do away with all the connection stuff, it'll never get right
-        maxEnd=true;
-        
-        switch (limbType) {
-            case modelLimbConstants.LIMB_TYPE_NECK:
-            case modelLimbConstants.LIMB_TYPE_ARM:
-            case modelLimbConstants.LIMB_TYPE_LEG:
-            //    minEnd=maxEnd=false;
-                break;
-            case modelLimbConstants.LIMB_TYPE_HAND:
-            case modelLimbConstants.LIMB_TYPE_FINGER:
-                if (side===modelLimbConstants.LIMB_SIDE_LEFT) {
-            //        minEnd=false;
-                }
-                else {
-            //        maxEnd=false;
-                }
-                break;
-            case modelLimbConstants.LIMB_TYPE_TOE:
-            //    minEnd=false;
-                break;
-        }
-        
             // build the globe around the bones
             
         maxGravity=this.findMaxGravityForBoneList(boneList);
@@ -763,17 +714,17 @@ class GenModelCreatureMeshClass
             case modelLimbConstants.LIMB_AXIS_X:
                 acrossRadius=(xBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(yBound.getSize()>zBound.getSize())?((yBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,minEnd,maxEnd,vertexList,indexes);
+                this.buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
             case modelLimbConstants.LIMB_AXIS_Y:
                 acrossRadius=(yBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>zBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,minEnd,maxEnd,vertexList,indexes);
+                this.buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
             case modelLimbConstants.LIMB_AXIS_Z:
                 acrossRadius=(zBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>yBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((yBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,minEnd,maxEnd,vertexList,indexes);
+                this.buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
         }
         
