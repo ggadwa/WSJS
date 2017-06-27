@@ -399,14 +399,14 @@ class ModelSkeletonClass
         // pose utilities
         //
         
-    poseSetLeg(limb,walking)
+    poseSetLeg(limb,legOffset,walking)
     {
         let r,flipLeg;
 
         r=0.0;
         if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
-        flipLeg=(limb.side===modelLimbConstants.LIMB_SIDE_LEFT)||(limb.side===modelLimbConstants.LIMB_SIDE_FRONT_LEFT)||(limb.side===modelLimbConstants.LIMB_SIDE_BACK_RIGHT);
+        flipLeg=((legOffset&0x1)!==0x0);
         if (this.lastAnimationFlip) flipLeg=!flipLeg;
         
         if (flipLeg) {
@@ -508,9 +508,10 @@ class ModelSkeletonClass
         // walk poses
         //
         
-    walkNextPose(modelType)
+    walkNextPose()
     {
         let n,limb;
+        let legOffset=0;
         let nLimb=this.limbs.length;
         
         let armLeftZAngle=45.0;
@@ -527,7 +528,8 @@ class ModelSkeletonClass
                     this.poseSetBody(limb,5.0,15.0,0.0);
                     break;
                 case modelLimbConstants.LIMB_TYPE_LEG:
-                    this.poseSetLeg(limb,true);
+                    this.poseSetLeg(limb,legOffset,true);
+                    legOffset++;
                     break;
                 case modelLimbConstants.LIMB_TYPE_ARM:
                     if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) {
@@ -554,7 +556,7 @@ class ModelSkeletonClass
         this.lastAnimationFlip=!this.lastAnimationFlip;
     }
     
-    walkPose(modelType)
+    walkPose()
     {
             // time for a new pose?
             
@@ -572,16 +574,17 @@ class ModelSkeletonClass
             // construct new pose
 
         this.clearNextPose();
-        this.walkNextPose(modelType);
+        this.walkNextPose();
     }
     
         //
         // idle poses
         //
         
-    idleNextPose(modelType)
+    idleNextPose()
     {
         let n,limb;
+        let legOffset=0;
         let nLimb=this.limbs.length;
         
         let armLeftZAngle=45.0;
@@ -598,7 +601,8 @@ class ModelSkeletonClass
                     this.poseSetBody(limb,0.0,10.0,0.0);
                     break;
                 case modelLimbConstants.LIMB_TYPE_LEG:
-                    this.poseSetLeg(limb,false);
+                    this.poseSetLeg(limb,legOffset,false);
+                    legOffset++;
                     break;
                 case modelLimbConstants.LIMB_TYPE_ARM:
                     if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) {
@@ -625,7 +629,7 @@ class ModelSkeletonClass
         this.lastAnimationFlip=!this.lastAnimationFlip;
     }
         
-    idlePose(modelType)
+    idlePose()
     {
             // time for a new pose?
             
@@ -643,7 +647,7 @@ class ModelSkeletonClass
             // construct new pose
 
         this.clearNextPose();
-        this.idleNextPose(modelType);
+        this.idleNextPose();
     }
 
 }

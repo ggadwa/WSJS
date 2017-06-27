@@ -14,12 +14,10 @@ WebGL2
 ToDos
 
 
+
 #### start all over with random body, random limbs, random skeleton, etc
 #### globes not come to tip?  Or flatter, somehow?
 
--> rethink squish as whole model
--> legs
--> spikes
 
 
 -> maps decorations need to be random blocks, not whole room
