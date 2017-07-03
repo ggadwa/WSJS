@@ -13,14 +13,8 @@ WebGL2
 
 ToDos
 
-
-
-#### start all over with random body, random limbs, random skeleton, etc
-#### globes not come to tip?  Or flatter, somehow?
-
-
-
--> maps decorations need to be random blocks, not whole room
+--> glow maps
+--> maps decorations need to be random blocks, not whole room
 
 
 #### monsters still getting hit by own projectiles

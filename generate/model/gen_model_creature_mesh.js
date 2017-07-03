@@ -556,20 +556,16 @@ class GenModelCreatureMeshClass
         // squishes the shrunk globe in a direction
         //
         
-    scaleVertexToBones(vertexList,limbScale)
+    scaleVertexToBones(vertexList,fullBodyScale)
     {
-        /* supergumba -- do this at end, to everything at once, it messes up models to do it on the fly
         let n,v;
         let nVertex=vertexList.length;
         let bones=this.model.skeleton.bones;
         
-        if (limbScale===null) return;
-        
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
-            if (v.boneIdx!==-1) v.position.scaleFromPoint(bones[v.boneIdx].position,limbScale);
+            if (v.boneIdx!==-1) v.position.scaleFromPoint(bones[v.boneIdx].position,fullBodyScale);
         }
-        */
     }
     
         //
@@ -625,7 +621,7 @@ class GenModelCreatureMeshClass
         // build around bone list
         //
         
-    buildAroundBoneList(limbType,axis,acrossSurfaceCount,aroundSurfaceCount,limbScale,skeletonBoneIndexes,vertexList,indexes)
+    buildAroundBoneList(limbType,axis,acrossSurfaceCount,aroundSurfaceCount,fullBodyScale,skeletonBoneIndexes,vertexList,indexes)
     {
         let n,k,f,boneIdx,bone,parentBone,listBone;
         let acrossRadius,aroundRadius;
@@ -750,8 +746,8 @@ class GenModelCreatureMeshClass
             
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
-        this.scaleVertexToBones(vertexList,limbScale);
-        // this.randomScaleVertexToBones(vertexList);       // supergumba -- this makes a mess, think of something better
+        this.scaleVertexToBones(vertexList,fullBodyScale);
+        this.randomScaleVertexToBones(vertexList);
     }
     
         //
@@ -817,7 +813,7 @@ class GenModelCreatureMeshClass
     build(inDebug)
     {
         let n,limb,indexOffset;
-        
+        let fullBodyScale;
         let skeleton=this.model.skeleton;
 
         let limbVertexList=[];
@@ -825,6 +821,10 @@ class GenModelCreatureMeshClass
         let vertexList,indexes;
         let modelVertexList=null;
         let modelIndexes=null;
+        
+            // random body scaling
+            
+        fullBodyScale=new wsPoint(1.0,1.0,(1.0-genRandom.randomFloat(0.0,0.2)));
         
             // wrap all the limbs
             
@@ -836,7 +836,7 @@ class GenModelCreatureMeshClass
             vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point (around+1 for extra vertexes to stop UV wrapping)
             indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-3))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-3))*6 for quads, (around*2)*3 for top and bottom trigs
             
-            this.buildAroundBoneList(limb.limbType,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,limb.scale,limb.boneIndexes,vertexList,indexes);
+            this.buildAroundBoneList(limb.limbType,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,fullBodyScale,limb.boneIndexes,vertexList,indexes);
             
             limbVertexList.push(vertexList);
             limbIndexes.push(indexes);

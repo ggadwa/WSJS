@@ -252,8 +252,8 @@ class GenModelCreatureSkeletonClass
     buildLimbHead(limbIdx,parentBoneIdx)
     {
         let pnt,vct,pushVct;
-        let neckStartBoneIdx,neckEndBoneIdx,headBoneIdx;
-        let neckLength,neckRadius;
+        let neckStartBoneIdx,neckEndBoneIdx,jawBoneIdx,headBoneIdx;
+        let neckLength,neckRadius,jawLength,jawRadius,headLength,headRadius;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
         let parentBone=bones[parentBoneIdx];
@@ -261,21 +261,17 @@ class GenModelCreatureSkeletonClass
             // size and position around body
 
         neckLength=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
-        neckRadius=Math.trunc(genRandom.randomInt(250,300)*this.sizeFactor);
+        neckRadius=Math.trunc(genRandom.randomInt(150,200)*this.sizeFactor);
         
         pushVct=new wsPoint(0.0,-(parentBone.gravityLockDistance-Math.trunc(neckRadius*0.5)),0.0);
         
         pnt=parentBone.position.copy();
         pnt.addPoint(pushVct);
         
-            // head always faces up
-            
-        vct=new wsPoint(0.0,-neckLength,0.0);
-        
             // create the neck
             
         neckStartBoneIdx=bones.push(new ModelBoneClass(('Neck_Start_'+limbIdx),parentBoneIdx,new wsPoint(pnt.x,pnt.y,pnt.z)))-1;
-        neckEndBoneIdx=bones.push(new ModelBoneClass(('Neck_End_'+limbIdx),neckStartBoneIdx,new wsPoint((pnt.x+(vct.x*0.9)),(pnt.y+(vct.y*0.9)),(pnt.z+(vct.z*0.9)))))-1;
+        neckEndBoneIdx=bones.push(new ModelBoneClass(('Neck_End_'+limbIdx),neckStartBoneIdx,new wsPoint(pnt.x,(pnt.y-neckLength),pnt.z)))-1;
         
         bones[neckStartBoneIdx].gravityLockDistance=neckRadius;
         bones[neckEndBoneIdx].gravityLockDistance=neckRadius;
@@ -284,10 +280,19 @@ class GenModelCreatureSkeletonClass
         
             // create the head
             
-        headBoneIdx=bones.push(new ModelBoneClass('Head',neckEndBoneIdx,new wsPoint((pnt.x+(vct.x*0.95)),(pnt.y+(vct.y*0.95)),(pnt.z+(vct.z*0.95)))))-1;
-        bones[headBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(neckRadius,Math.trunc(400*this.sizeFactor)));
+        jawRadius=Math.trunc(genRandom.randomInt((neckRadius+100),400)*this.sizeFactor);
+        headRadius=Math.trunc(genRandom.randomInt(neckRadius,400)*this.sizeFactor);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_HEAD,0,modelLimbConstants.LIMB_AXIS_Y,10,10,[headBoneIdx]));
+        jawLength=neckLength+Math.trunc(jawRadius*0.5);
+        headLength=jawLength+Math.trunc(headRadius*0.5);
+        
+        jawBoneIdx=bones.push(new ModelBoneClass('Jaw',neckEndBoneIdx,new wsPoint(pnt.x,(pnt.y-jawLength),pnt.z)))-1;
+        headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new wsPoint(pnt.x,(pnt.y-headLength),pnt.z)))-1;
+        
+        bones[jawBoneIdx].gravityLockDistance=jawRadius;
+        bones[headBoneIdx].gravityLockDistance=headRadius;
+        
+        this.model.skeleton.limbs.push(new ModelLimbClass(modelLimbConstants.LIMB_TYPE_HEAD,0,modelLimbConstants.LIMB_AXIS_Y,10,10,[jawBoneIdx,headBoneIdx]));
     }
     
         //
@@ -341,26 +346,35 @@ class GenModelCreatureSkeletonClass
     
     buildLimbs(bodyLimbIdx)
     {
-        let n,k,idx,limbCount,limbAng;
+        let n,k,idx,limbCount,limbType,limbAng;
         let boneOffset,boneIdx,boneFlags;
         let skeleton=this.model.skeleton;
         let bodyLimb=skeleton.limbs[bodyLimbIdx];
         
-        let randomLimbType=[modelLimbConstants.LIMB_TYPE_ARM,modelLimbConstants.LIMB_TYPE_LEG,modelLimbConstants.LIMB_TYPE_WHIP];
+        let randomLimbType=[modelLimbConstants.LIMB_TYPE_ARM,modelLimbConstants.LIMB_TYPE_WHIP];
         
             // random limb count
             
-        limbCount=genRandom.randomInt(2,10);
+        limbCount=genRandom.randomInt(3,10);
         
             // we pick one of 8 45-degree angles and any
             // bone but the top one, we use a mask to only
             // pick them once
             
-        boneFlags=new Uint16Array(3*8);
+        boneFlags=new Uint16Array(4*8);
             
             // the random limbs
         
         for (n=0;n!==limbCount;n++) {
+            
+                // always need two legs
+                
+            if (n<2) {
+                limbType=modelLimbConstants.LIMB_TYPE_LEG;
+            }
+            else {
+                limbType=randomLimbType[genRandom.randomIndex(randomLimbType.length)];
+            }
             
                 // find one that hasn't been used
             
@@ -368,7 +382,7 @@ class GenModelCreatureSkeletonClass
             limbAng=0.0;
             
             for (k=0;k!==20;k++) {
-                idx=genRandom.randomIndex(3*8);
+                idx=genRandom.randomIndex(4*8);
                 if (boneFlags[idx]===0) {
                     boneFlags[idx]=1;
                     boneOffset=Math.trunc(idx/8);
@@ -376,13 +390,13 @@ class GenModelCreatureSkeletonClass
                 }
             }
             
-            if (boneOffset===-1) break;            // can't find a place, stop making limbs
+           if (boneOffset===-1) break;            // can't find a place, stop making limbs
             
             boneIdx=bodyLimb.boneIndexes[boneOffset];
             
                 // create the limb
                 
-            switch (randomLimbType[genRandom.randomIndex(randomLimbType.length)]) {
+            switch (limbType) {
                 case modelLimbConstants.LIMB_TYPE_ARM:
                     this.buildLimbArm(n,boneIdx,limbAng);
                     break;
