@@ -49,12 +49,12 @@ class GenBitmapParticleClass extends GenBitmapClass
             // debug just displays the canvases, so send
             // them back
         
-        if (inDebug) return({bitmap:bitmapCanvas,normal:null,specular:null});
+        if (inDebug) return({bitmap:bitmapCanvas,normal:null,specular:null,glow:null});
         
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(bitmapCanvas,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+        return(new BitmapClass(bitmapCanvas,null,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
     }
     
     generateRandom(inDebug)

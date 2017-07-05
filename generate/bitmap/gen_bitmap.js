@@ -369,9 +369,9 @@ class GenBitmapClass
 
         return(colors);
     }
-
+    
         //
-        // normal clearing
+        // normal and glow clearing
         //
 
     clearNormalsRect(normalCTX,lft,top,rgt,bot)
@@ -380,6 +380,14 @@ class GenBitmapClass
 
         normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
         normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+    }
+    
+    clearGlowRect(glowCTX,lft,top,rgt,bot)
+    {
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        glowCTX.fillStyle='#000000';
+        glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
 
         //

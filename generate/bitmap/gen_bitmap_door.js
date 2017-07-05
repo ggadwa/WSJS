@@ -146,7 +146,7 @@ class GenBitmapDoorClass extends GenBitmapClass
     {
         let wid,high;
         let shineFactor=1.0;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX;
+        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
             // setup the canvas
 
@@ -164,6 +164,12 @@ class GenBitmapDoorClass extends GenBitmapClass
         specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
         specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         specularCTX=specularCanvas.getContext('2d');
+        
+        glowCanvas=document.createElement('canvas');
+        glowCanvas.width=2;
+        glowCanvas.height=2;
+        glowCTX=glowCanvas.getContext('2d');
+        this.clearGlowRect(glowCTX,0,0,2,2);
 
         wid=bitmapCanvas.width;
         high=bitmapCanvas.height;
@@ -187,12 +193,12 @@ class GenBitmapDoorClass extends GenBitmapClass
             // debug just displays the canvases, so send
             // them back
         
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas});
+        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
         
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(bitmapCanvas,normalCanvas,specularCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
     
     generateRandom(inDebug)

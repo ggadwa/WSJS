@@ -101,7 +101,7 @@ class DebugRunClass
         
     drawBitmap(item)
     {
-        let ctx,debugBitmap,thirdWid;
+        let ctx,debugBitmap,fourWid;
         let wid=this.bitmapCanvas.width;
         let high=this.bitmapCanvas.height;
         
@@ -115,11 +115,12 @@ class DebugRunClass
         ctx.fillStyle='#FFFFFF';
         ctx.fillRect(0,0,wid,high);
         
-        thirdWid=Math.trunc(wid/3);
+        fourWid=Math.trunc(wid/4);
         
-        ctx.drawImage(debugBitmap.bitmap,0,0,thirdWid,high);
-        if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,thirdWid,0,thirdWid,high);
-        if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,(thirdWid*2),0,thirdWid,high);
+        ctx.drawImage(debugBitmap.bitmap,0,0,fourWid,high);
+        if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,fourWid,0,fourWid,high);
+        if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,(fourWid*2),0,fourWid,high);
+        if (debugBitmap.glow!==null) ctx.drawImage(debugBitmap.glow,(fourWid*3),0,fourWid,high);
         
             // show the canvas
             
@@ -565,7 +566,7 @@ class DebugRunClass
         this.bitmapCanvas.style.top='5px';
         this.bitmapCanvas.style.border='1px solid #000000';
         this.bitmapCanvas.style.display='none';
-        this.bitmapCanvas.width=512*3;
+        this.bitmapCanvas.width=512*4;
         this.bitmapCanvas.height=512;
         
         parentDiv.appendChild(this.bitmapCanvas);

@@ -902,7 +902,7 @@ class GenLightmapClass
             // the index is used as the id
 
         for (n=0;n!==this.lightmapList.length;n++) {
-            map.addLightmapBitmap(new BitmapClass(this.lightmapList[n].canvas,null,null,1.0,0.0));
+            map.addLightmapBitmap(new BitmapClass(this.lightmapList[n].canvas,null,null,null,1.0,0.0));
         }
         
             // and set the light map on the meshes
@@ -957,7 +957,7 @@ class GenLightmapClass
        view.loadingScreenDraw(0.66);
        
        this.lightmapList[0].fixCanvasImageData();
-       map.addLightmapBitmap(new BitmapClass(this.lightmapList[0].canvas,null,null,1.0,0.0));
+       map.addLightmapBitmap(new BitmapClass(this.lightmapList[0].canvas,null,null,null,1.0,0.0));
        
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshes[n];
