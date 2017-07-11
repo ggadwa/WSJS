@@ -3,9 +3,11 @@
 uniform lowp sampler2D baseTex;
 uniform lowp sampler2D normalTex;
 uniform lowp sampler2D specularTex;
+uniform lowp sampler2D glowTex;
 
 uniform lowp vec3 ambient;
 uniform mediump float shineFactor;
+uniform mediump float glowFactor;
 
 struct lightType {
     highp vec4 positionIntensity;
@@ -95,7 +97,7 @@ void main(void)
 
         // finally create the pixel
 
-    outputPixel.rgb=(tex.rgb*pixelAmbient)+spec;
+    outputPixel.rgb=((tex.rgb*pixelAmbient)+spec)+(texture(glowTex,fragUV.xy).rgb*glowFactor);
     outputPixel.a=tex.a;
 }
 

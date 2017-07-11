@@ -121,7 +121,7 @@ class GenBitmapMachineClass extends GenBitmapClass
         }
     }
     
-    generateComputerComponentLights(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateComputerComponentLights(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         let color;
@@ -146,12 +146,18 @@ class GenBitmapMachineClass extends GenBitmapClass
                 color=this.getRandomColor();
                 if (genRandom.randomPercentage(0.5)) this.darkenColor(color,0.7);
                 
+                    // the light
+                    
                 this.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,this.blackColor);
+                
+                    // the possible glow
+                    
+                if (genRandom.randomPercentage(0.5)) this.drawOval(glowCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),this.getRandomGray(0.1,0.15),null);
             }
         }
     }
     
-    generateComputerComponentButtons(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateComputerComponentButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         
@@ -181,7 +187,7 @@ class GenBitmapMachineClass extends GenBitmapClass
         // computer
         //
         
-    generateComputer(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateComputer(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let mx,my,sz,lft,top,rgt,bot;
         let componentType,hadBlank,hadMonitor,hadShutter;
@@ -251,10 +257,10 @@ class GenBitmapMachineClass extends GenBitmapClass
                     this.generateComputerComponentShutter(bitmapCTX,normalCTX,lft,top,rgt,bot);
                     break;
                 case 3:
-                    this.generateComputerComponentLights(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                    this.generateComputerComponentLights(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
                     break;
                 case 4:
-                    this.generateComputerComponentButtons(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                    this.generateComputerComponentButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
                     break;
             }
             
@@ -296,10 +302,10 @@ class GenBitmapMachineClass extends GenBitmapClass
         specularCTX=specularCanvas.getContext('2d');
         
         glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
+        glowCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        glowCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
+        this.clearGlowRect(glowCTX,0,0,this.BITMAP_MAP_TEXTURE_SIZE,this.BITMAP_MAP_TEXTURE_SIZE);
 
         wid=bitmapCanvas.width;
         high=bitmapCanvas.height;
@@ -309,7 +315,7 @@ class GenBitmapMachineClass extends GenBitmapClass
         switch (generateType) {
 
             case this.TYPE_COMPUTER:
-                this.generateComputer(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generateComputer(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
                 shineFactor=1.5;
                 break;
 

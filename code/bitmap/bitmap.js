@@ -59,7 +59,7 @@ class BitmapClass
         if (glowMapCanvas!==null) {
             this.glowMap=gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D,this.glowMap);
-            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,specularMapCanvas);
+            gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,glowMapCanvas);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
             gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
             gl.generateMipmap(gl.TEXTURE_2D);
@@ -84,8 +84,7 @@ class BitmapClass
     }
 
         //
-        // attach bitmap to shader as a texture
-        // or as a lightmap
+        // attach bitmap to shader in different formats
         //
     
     attachAsTexture(shader)
@@ -95,6 +94,7 @@ class BitmapClass
             // shine factor in shader
 
         gl.uniform1f(shader.shineFactorUniform,this.shineFactor);
+        gl.uniform1f(shader.glowFactorUniform,view.glowFactor);
 
             // the textures
             
@@ -115,7 +115,7 @@ class BitmapClass
     {
         let gl=view.gl;
 
-        gl.activeTexture(gl.TEXTURE3);
+        gl.activeTexture(gl.TEXTURE4);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
     

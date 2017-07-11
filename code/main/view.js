@@ -37,8 +37,6 @@ class ViewClass
 {
     constructor()
     {
-        let n;
-        
             // the opengl context
 
         this.gl=null;
@@ -86,6 +84,8 @@ class ViewClass
 
         this.MAX_LIGHT_COUNT=24;
         this.lights=[];
+        
+        this.glowFactor=0.0;
 
             // frustum planes
 
@@ -615,6 +615,10 @@ class ViewClass
             // build the culling frustum
 
         this.buildCullingFrustum();
+        
+            // the glow
+            
+        this.glowFactor=Math.abs(Math.cos(this.timeStamp/500.0));
         
             // draw the sky
             

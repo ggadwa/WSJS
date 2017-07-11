@@ -22,6 +22,7 @@ class ModelMeshShaderClass extends ShaderClass
         this.normalMatrixUniform=null;
 
         this.shineFactorUniform=null;
+        this.glowFactorUniform=null;
         this.ambientUniform=null;
 
         this.lights=[];
@@ -49,14 +50,15 @@ class ModelMeshShaderClass extends ShaderClass
 
         this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
         this.vertexNormalAttribute=gl.getAttribLocation(this.program,'vertexNormal');
-        this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');    
+        this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');
         this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
 
-        this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');    
+        this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');
+        this.glowFactorUniform=gl.getUniformLocation(this.program,'glowFactor');
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
 
         for (n=0;n!==view.MAX_LIGHT_COUNT;n++) {
@@ -72,6 +74,7 @@ class ModelMeshShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
         gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
         gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
+        gl.uniform1i(gl.getUniformLocation(this.program,'glowTex'),3);
 
         gl.useProgram(null);
 

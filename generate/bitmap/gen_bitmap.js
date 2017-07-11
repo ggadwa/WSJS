@@ -260,6 +260,12 @@ class GenBitmapClass
         return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
     
+    getRandomGray(min,max)
+    {
+        let col=min+(genRandom.random()*(max-min));
+        return(new wsColor(col,col,col));
+    }
+    
     darkenColor(color,darkenFactor)
     {
         return(new wsColor((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
