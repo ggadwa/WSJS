@@ -28,25 +28,26 @@ class GenBitmapSkinClass extends GenBitmapClass
         // face chunks
         //
         
-    generateFaceChunkEye(bitmapCTX,normalCTX,x,top,bot,eyeColor)
+    generateFaceChunkEye(bitmapCTX,normalCTX,glowCTX,x,top,bot,eyeColor)
     {
         this.draw3DOval(bitmapCTX,normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
         this.drawOval(bitmapCTX,(x+10),(top+81),(x+20),(top+89),eyeColor,null);
+        this.drawOval(glowCTX,(x+10),(top+81),(x+20),(top+89),this.darkenColor(eyeColor,0.5),null);
     }
     
-    generateFaceChunk(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateFaceChunk(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
     {
         let eyeColor=this.getRandomColor();
         
-        this.generateFaceChunkEye(bitmapCTX,normalCTX,480,top,bot,eyeColor);
-        this.generateFaceChunkEye(bitmapCTX,normalCTX,430,top,bot,eyeColor);
+        this.generateFaceChunkEye(bitmapCTX,normalCTX,glowCTX,480,top,bot,eyeColor);
+        this.generateFaceChunkEye(bitmapCTX,normalCTX,glowCTX,430,top,bot,eyeColor);
     }
     
         //
         // scales
         //
         
-    generateScaleChunk(bitmapCTX,normalCTX,lft,top,rgt,bot,skinColor,scaleCount)
+    generateScaleChunk(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot,skinColor,scaleCount)
     {
         let x,y,dx,dy;
         let xCount;
@@ -92,7 +93,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         this.endClip(bitmapCTX);
     }
 
-    generateScale(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateScale(bitmapCTX,normalCTX,glowCTX,specularCTX,wid,high)
     {
         let skinColor,scaleCount;
         let mx=Math.trunc(wid*0.5);
@@ -113,7 +114,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         this.generateScaleChunk(bitmapCTX,normalCTX,0,0,mx,my,skinColor,scaleCount);
         
         this.generateScaleChunk(bitmapCTX,normalCTX,mx,0,wid,my,skinColor,scaleCount);
-        this.generateFaceChunk(bitmapCTX,normalCTX,mx,0,wid,my);
+        this.generateFaceChunk(bitmapCTX,normalCTX,glowCTX,mx,0,wid,my);
         
         skinColor=this.darkenColor(skinColor,0.8);
         this.generateScaleChunk(bitmapCTX,normalCTX,0,my,mx,high,skinColor,scaleCount);
@@ -169,7 +170,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         this.blur(bitmapCTX,lft,top,rgt,bot,25,false);
     }
         
-    generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateLeather(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let mx=Math.trunc(wid*0.5);
         let my=Math.trunc(high*0.5);
@@ -185,7 +186,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         this.generateLeatherChunk(bitmapCTX,normalCTX,0,0,mx,my,clothColor);
         
         this.generateLeatherChunk(bitmapCTX,normalCTX,mx,0,wid,my,clothColor);
-        this.generateFaceChunk(bitmapCTX,normalCTX,mx,0,wid,my);
+        this.generateFaceChunk(bitmapCTX,normalCTX,glowCTX,mx,0,wid,my);
         
         clothColor=this.darkenColor(clothColor,0.8);
         this.generateLeatherChunk(bitmapCTX,normalCTX,0,my,mx,high,clothColor);
@@ -239,7 +240,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         }
     }
         
-    generateFur(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateFur(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let mx=Math.trunc(wid*0.5);
         let my=Math.trunc(high*0.5);
@@ -255,7 +256,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         this.generateFurChunk(bitmapCTX,normalCTX,0,0,mx,my,furColor);
         
         this.generateFurChunk(bitmapCTX,normalCTX,mx,0,wid,my,furColor);
-        this.generateFaceChunk(bitmapCTX,normalCTX,mx,0,wid,my);
+        this.generateFaceChunk(bitmapCTX,normalCTX,glowCTX,mx,0,wid,my);
         
         furColor=this.darkenColor(furColor,0.8);
         this.generateFurChunk(bitmapCTX,normalCTX,0,my,mx,high,furColor);
@@ -305,8 +306,8 @@ class GenBitmapSkinClass extends GenBitmapClass
         specularCTX=specularCanvas.getContext('2d');
         
         glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
+        glowCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        glowCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         glowCTX=glowCanvas.getContext('2d');
         this.clearGlowRect(glowCTX,0,0,2,2);
 
@@ -323,17 +324,17 @@ class GenBitmapSkinClass extends GenBitmapClass
         switch (generateType) {
 
             case this.TYPE_SCALE:
-                this.generateScale(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generateScale(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
                 shineFactor=2.0;
                 break;
                 
             case this.TYPE_LEATHER:
-                this.generateLeather(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generateLeather(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
                 shineFactor=1.0;
                 break;
                 
             case this.TYPE_FUR:
-                this.generateFur(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generateFur(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
                 shineFactor=0.5;
                 break;
                 

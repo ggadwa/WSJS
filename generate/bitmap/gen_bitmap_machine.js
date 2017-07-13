@@ -28,10 +28,10 @@ class GenBitmapMachineClass extends GenBitmapClass
         // components
         //
         
-    generateComputerComponentMonitor(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateComputerComponentMonitor(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
     {
         let x,y,mx,my,lx,ly,dx,dy,meterSize,meterHalfSize;
-        let horz,color;
+        let horz,color,glowColor;
         let monitorColor=new wsColor(0.2,0.2,0.2);
         
             // monitor background
@@ -44,6 +44,7 @@ class GenBitmapMachineClass extends GenBitmapClass
         this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,3,monitorColor,false);
         
         color=this.getRandomColor();
+        glowColor=this.darkenColor(color,0.5);
         
             // determine if horz or vertical
             
@@ -68,6 +69,7 @@ class GenBitmapMachineClass extends GenBitmapClass
                 dy=my+(genRandom.randomInt(0,meterSize)-meterHalfSize);
 
                 this.drawLine(bitmapCTX,normalCTX,lx,ly,x,dy,color,true);
+                this.drawLine(glowCTX,null,lx,ly,x,dy,glowColor,true);
 
                 lx=x;
                 ly=dy;
@@ -86,6 +88,7 @@ class GenBitmapMachineClass extends GenBitmapClass
                 dx=mx+(genRandom.randomInt(0,meterSize)-meterHalfSize);
 
                 this.drawLine(bitmapCTX,normalCTX,lx,ly,dx,y,color,true);
+                this.drawLine(glowCTX,null,lx,ly,dx,y,glowColor,true);
 
                 lx=dx;
                 ly=y;
@@ -143,16 +146,16 @@ class GenBitmapMachineClass extends GenBitmapClass
             
             for (x=0;x!==xCount;x++) {
                 dx=xOff+(x*wid);
-                color=this.getRandomColor();
-                if (genRandom.randomPercentage(0.5)) this.darkenColor(color,0.7);
                 
                     // the light
                     
+                color=this.getRandomColor();
+                if (genRandom.randomPercentage(0.5)) color=this.darkenColor(color,0.7);
                 this.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,this.blackColor);
                 
                     // the possible glow
                     
-                if (genRandom.randomPercentage(0.5)) this.drawOval(glowCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),this.getRandomGray(0.1,0.15),null);
+                if (genRandom.randomPercentage(0.5)) this.drawOval(glowCTX,(dx+2),(dy+2),(dx+(wid-6)),(dy+(wid-6)),this.darkenColor(color,0.7),null);
             }
         }
     }
@@ -160,6 +163,7 @@ class GenBitmapMachineClass extends GenBitmapClass
     generateComputerComponentButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
+        let color;
         
         wid=genRandom.randomInt(30,25);
         
@@ -178,7 +182,15 @@ class GenBitmapMachineClass extends GenBitmapClass
             
             for (x=0;x!==xCount;x++) {
                 dx=xOff+(x*wid);
+                
+                    // the button
+                
+                color=this.getRandomColor();
                 this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+wid),2,this.getRandomColor(),false);
+                
+                    // the possible glow
+                    
+                if (genRandom.randomPercentage(0.5)) this.drawRect(glowCTX,dx,dy,(dx+wid),(dy+wid),this.darkenColor(color,0.5));
             }
         }
     }
@@ -250,7 +262,7 @@ class GenBitmapMachineClass extends GenBitmapClass
                     break;
                 case 1:
                     hadMonitor=true;
-                    this.generateComputerComponentMonitor(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                    this.generateComputerComponentMonitor(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
                     break;
                 case 2:
                     hadShutter=true;

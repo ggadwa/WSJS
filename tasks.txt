@@ -13,13 +13,8 @@ WebGL2
 
 ToDos
 
---> glow maps
-      - computer buttons
-      - panel buttons
-      - glowing eyes
-
 --> two classes of items, ones in center of room, ones on edges (panels, control panels, ?)
-
+--> right panel is messed up
 
 #### monsters still getting hit by own projectiles
 #### need meeles for monsters

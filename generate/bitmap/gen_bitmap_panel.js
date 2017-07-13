@@ -28,7 +28,7 @@ class GenBitmapPanelClass extends GenBitmapClass
         // machine
         //
     
-    generatePanelButtons(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generatePanelButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         let color;
@@ -50,22 +50,31 @@ class GenBitmapPanelClass extends GenBitmapClass
         for (y=0;y!==yCount;y++) {
             dy=yOff+(y*wid);
             
+            if (genRandom.randomPercentage(0.25)) continue;
+            
             for (x=0;x!==xCount;x++) {
                 dx=xOff+(x*wid);
+                
+                    // the button
+                    
                 color=this.getRandomColor();
                 this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+wid),2,color,false);
+                
+                    // the possible glow
+                    
+                if (genRandom.randomPercentage(0.5)) this.drawRect(glowCTX,(dx+1),(dy+1),(dx+(wid-1)),(dy+(wid-1)),this.darkenColor(color,0.5));
             }
         }
     }
     
-    generatePanel(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generatePanel(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let metalColor=this.getDefaultPrimaryColor();
        
             // face plate
             
         this.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,8,metalColor,true);
-        this.generatePanelButtons(bitmapCTX,normalCTX,5,5,(wid-5),(high-5));
+        this.generatePanelButtons(bitmapCTX,normalCTX,glowCTX,5,5,(wid-5),(high-5));
         
             // finish with the specular
 
@@ -100,8 +109,8 @@ class GenBitmapPanelClass extends GenBitmapClass
         specularCTX=specularCanvas.getContext('2d');
         
         glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
+        glowCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        glowCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         glowCTX=glowCanvas.getContext('2d');
         this.clearGlowRect(glowCTX,0,0,2,2);
 
@@ -113,7 +122,7 @@ class GenBitmapPanelClass extends GenBitmapClass
         switch (generateType) {
 
             case this.TYPE_PANEL:
-                this.generatePanel(bitmapCTX,normalCTX,specularCTX,wid,high);
+                this.generatePanel(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
                 shineFactor=1.0;
                 break;
 
