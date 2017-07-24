@@ -47,7 +47,7 @@ class GenBitmapSkinClass extends GenBitmapClass
         // scales
         //
         
-    generateScaleChunk(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot,skinColor,scaleCount)
+    generateScaleChunk(bitmapCTX,normalCTX,lft,top,rgt,bot,skinColor,scaleCount)
     {
         let x,y,dx,dy;
         let xCount;

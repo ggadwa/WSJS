@@ -15,7 +15,7 @@ class MapMeshShaderClass extends ShaderClass
         this.vertexPositionAttribute=null;
         this.vertexNormalAttribute=null;
         this.vertexTangentAttribute=null;    
-        this.vertexAndLightmapUVAttribute=null;
+        this.vertexUVAttribute=null;
 
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;
@@ -51,7 +51,7 @@ class MapMeshShaderClass extends ShaderClass
         this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
         this.vertexNormalAttribute=gl.getAttribLocation(this.program,'vertexNormal');
         this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');
-        this.vertexAndLightmapUVAttribute=gl.getAttribLocation(this.program,'vertexAndLightmapUV');
+        this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
@@ -75,7 +75,6 @@ class MapMeshShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
         gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
         gl.uniform1i(gl.getUniformLocation(this.program,'glowTex'),3);
-        gl.uniform1i(gl.getUniformLocation(this.program,'lightmapTex'),4);
 
         gl.useProgram(null);
 
@@ -127,12 +126,7 @@ class MapMeshShaderClass extends ShaderClass
                 // otherwise setup the light
 
             gl.uniform4f(light.positionIntensityUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,viewLight.intensity);
-            if (viewLight.inLightmap) {
-                gl.uniform4f(light.colorExponentUniform,0.0,0.0,0.0,1.0);     // if in light map, then we set color to zero so it doesn't effect the pixel
-            }
-            else {
-                gl.uniform4f(light.colorExponentUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,viewLight.exponent);
-            }
+            gl.uniform4f(light.colorExponentUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,viewLight.exponent);
         }
 
             // enable the vertex attributes
@@ -140,7 +134,7 @@ class MapMeshShaderClass extends ShaderClass
         gl.enableVertexAttribArray(this.vertexPositionAttribute);
         gl.enableVertexAttribArray(this.vertexNormalAttribute);
         gl.enableVertexAttribArray(this.vertexTangentAttribute);
-        gl.enableVertexAttribArray(this.vertexAndLightmapUVAttribute);
+        gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
     drawEnd()
@@ -152,7 +146,7 @@ class MapMeshShaderClass extends ShaderClass
         gl.disableVertexAttribArray(this.vertexPositionAttribute);
         gl.disableVertexAttribArray(this.vertexNormalAttribute);
         gl.disableVertexAttribArray(this.vertexTangentAttribute);
-        gl.disableVertexAttribArray(this.vertexAndLightmapUVAttribute);
+        gl.disableVertexAttribArray(this.vertexUVAttribute);
 
             // no longer using shader
 

@@ -30,6 +30,9 @@ class ParticleClass
         this.lifeTime=0;
 
         this.noDepthTest=false;
+        
+        this.light=new LightClass(new wsPoint(0,0,0),new wsColor(0.0,0.0,0.0),0.0,1.0);
+        this.lightMaxIntensity=0.0;
 
         this.centerPt=new wsPoint(0,0,0);
 
@@ -141,6 +144,11 @@ class ParticleClass
         this.endTimeStamp=timeStamp+lifeTime;
     }
     
+    setLightMaxItensity(lightMaxIntensity)
+    {
+        this.lightMaxIntensity=lightMaxIntensity;
+    }
+    
     setNoDepthTest(noDepthTest)
     {
         this.noDepthTest=noDepthTest;
@@ -178,6 +186,31 @@ class ParticleClass
         }
         
         this.count=pointCount;
+    }
+    
+        //
+        // calculate light intensity
+        //
+        
+    calcLightIntensity()
+    {
+        let tick,halfTick;
+        
+        tick=view.timeStamp-this.startTimeStamp;
+        
+        if ((this.lightMaxIntensity===0) || (tick>this.lifeTime)) {
+            this.light.setIntensity(0);
+            return;
+        }
+        
+        halfTick=Math.trunc(this.lifeTime*0.5);
+        
+        if (tick<halfTick) {
+            this.light.setIntensity((this.lightMaxIntensity*tick)/halfTick);
+        }
+        else {
+            this.light.setIntensity(this.lightMaxIntensity*(1.0-((tick-halfTick)/halfTick)));
+        }
     }
 
         //

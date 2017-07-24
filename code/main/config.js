@@ -8,7 +8,7 @@ class ConfigClass
 {
     constructor()
     {
-        this.SEED=5; //Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
+        this.SEED=205; //Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
 
             //
             // map generation
@@ -16,7 +16,6 @@ class ConfigClass
             
         this.ROOM_PATH_COUNT=6;                     // how many rooms in the map path
 
-        this.MAP_GENERATE_LIGHTMAP=false;           // set to true to generate light maps
         this.ROOM_DECORATIONS=true;                // if the room has decorations
         this.ROOM_LIQUIDS=true;                     // turns on or off liquids
         this.SIMPLE_TEST_MAP=false;                  // a special simple map for testing other elements

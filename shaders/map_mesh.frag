@@ -4,7 +4,6 @@ uniform lowp sampler2D baseTex;
 uniform lowp sampler2D normalTex;
 uniform lowp sampler2D specularTex;
 uniform lowp sampler2D glowTex;
-uniform lowp sampler2D lightmapTex;
 
 uniform lowp vec3 ambient;
 uniform mediump float shineFactor;
@@ -18,7 +17,7 @@ struct lightType {
 uniform lightType lights[24];
 
 in highp vec3 eyeVector,eyePosition;
-in highp vec4 fragUV;
+in highp vec2 fragUV;
 in mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 out lowp vec4 outputPixel;
@@ -29,27 +28,26 @@ void main(void)
     highp float dist;
     highp vec3 lightVector,lightVertexVector;
 
-        // the default light color is the lightmap
-        // plus the ambient
+        // the default light color is the ambient
 
-    lowp vec3 lightCol=texture(lightmapTex,fragUV.zw).rgb+ambient;
+    lowp vec3 lightCol=ambient;
 
         // the texture fragment
 
-    lowp vec4 tex=texture(baseTex,fragUV.xy);
+    lowp vec4 tex=texture(baseTex,fragUV);
 
         // the starting bump map
         // since it will be created by going through the
         // lights, we need a default value
 
     highp vec3 bumpLightVertexVector;
-    lowp vec3 bumpMap=normalize((texture(normalTex,fragUV.xy).rgb*2.0)-1.0);
+    lowp vec3 bumpMap=normalize((texture(normalTex,fragUV).rgb*2.0)-1.0);
     lowp float bump=dot(vec3(0.33,0.33,0.33),bumpMap);
 
         // the starting spec map
 
     lowp vec3 spec=vec3(0.0,0.0,0.0),specHalfVector;
-    lowp vec3 specMap=texture(specularTex,fragUV.xy).rgb;
+    lowp vec3 specMap=texture(specularTex,fragUV).rgb;
     lowp float specFactor;
 
         // lights
@@ -99,12 +97,7 @@ void main(void)
 
         // finally create the pixel
 
-    //outputPixel.rgb=lightCol;          // light only test
-    //outputPixel.rgb=texture(lightmapTex,fragUV.zw).rgb; // light map test
-    //outputPixel.rgb=tex.rgb*texture(lightmapTex,fragUV.zw).rgb; // texture + light map test
-    //outputPixel.rgb=tex.rgb*pixelAmbient;      // texture + light map + bump
-
-    outputPixel.rgb=((tex.rgb*pixelAmbient)+spec)+(texture(glowTex,fragUV.xy).rgb*glowFactor);
+    outputPixel.rgb=((tex.rgb*pixelAmbient)+spec)+(texture(glowTex,fragUV).rgb*glowFactor);
     outputPixel.a=tex.a;
 }
 

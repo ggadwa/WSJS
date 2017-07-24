@@ -67,8 +67,7 @@ class MapClass
         this.movementList=new MovementListClass();
         this.overlay=new MapOverlayClass();
 
-        this.cameraVector=new wsPoint(0,0,0);           // global not local so they won't get GCd
-        this.lightXBound=new wsBound(0,0);
+        this.lightXBound=new wsBound(0,0);           // global not local so they won't get GCd
         this.lightYBound=new wsBound(0,0);
         this.lightZBound=new wsBound(0,0);
         
@@ -327,82 +326,13 @@ class MapClass
     }
 
         //
-        // build list of meshes that intersect with
-        // light and a list of lights that intersect with
-        // meshes
-        //
-
-    buildLightMeshIntersectLists()
-    {
-        let n,k,i,nIntersect,light,mesh;
-        let meshIndexes,lightIndexes;
-        let nLight=this.lights.length;
-        let nMesh=this.meshes.length;
-
-            // build the meshes intersecting lights
-            // list
-
-        for (n=0;n!==nLight;n++) {
-            light=this.lights[n];
-            
-            light.getXBound(this.lightXBound);
-            light.getYBound(this.lightYBound);
-            light.getZBound(this.lightZBound);
-
-            meshIndexes=[];
-
-                // check the 8 corners of the cube
-
-            for (k=0;k!==nMesh;k++) {
-                mesh=this.meshes[k];
-                
-                if (this.lightXBound.max<mesh.xBound.min) continue;
-                if (this.lightXBound.min>mesh.xBound.max) continue;
-                if (this.lightYBound.max<mesh.yBound.min) continue;
-                if (this.lightYBound.min>mesh.yBound.max) continue;
-                if (this.lightZBound.max<mesh.zBound.min) continue;
-                if (this.lightZBound.min>mesh.zBound.max) continue;
-                
-                meshIndexes.push(k);
-            }
-
-                // add to the list
-
-            light.meshIntersectList=new Uint16Array(meshIndexes);
-        }
-
-            // now reverse the list for lights
-            // intersecting meshes list
-
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.meshes[n];
-
-            lightIndexes=[];
-
-            for (k=0;k!==nLight;k++) {
-                light=this.lights[k];
-
-                nIntersect=light.meshIntersectList.length;
-                for (i=0;i!==nIntersect;i++) {
-                    if (light.meshIntersectList[i]===n) {
-                        lightIndexes.push(k);
-                        break;
-                    }
-                }
-            }
-
-            mesh.lightIntersectList=new Uint16Array(lightIndexes);
-        }
-    }
-
-        //
         // find all the map lights in this view
-        // that we need to pass to glsl
+        // and add them to the view light list
         //
 
-    createViewLightsFromMapLights()
+    addViewLightsFromMapLights()
     {
-        let n,k,nLight,idx,startIdx;
+        let n,k,nLight,idx;
         let x,y,z;
         let light;
 
@@ -414,27 +344,15 @@ class MapClass
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
 
-            light.origIndex=n;
-
             x=view.camera.position.x-light.position.x;
             y=view.camera.position.y-light.position.y;
             z=view.camera.position.z-light.position.z;
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
-            
-            light.usedInList=false;         // to make sure we don't add lights twice
         }
-        
-            // the camera normal
-            
-        this.cameraVector.setFromValues(0.0,0.0,1.0);
-        this.cameraVector.rotateX(null,view.camera.angle.x);
-        this.cameraVector.rotateY(null,view.camera.angle.y);
         
             // find the view.MAX_LIGHT_COUNT closest lights
             // and put them into the view list
 
-        view.lights=[];
-        
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
             
@@ -463,14 +381,6 @@ class MapClass
                 view.lights.splice(idx,0,light);
                 if (view.lights.length>view.MAX_LIGHT_COUNT) view.lights.pop();
             }
-            
-            light.usedInList=true;
-        }
-        
-            // fill in any missing lights
-
-        while (view.lights.length<view.MAX_LIGHT_COUNT) {
-            view.lights.push(null);
         }
     }
     

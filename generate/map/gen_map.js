@@ -365,7 +365,7 @@ class GenMapClass
 
             // add light to map
 
-        light=new MapLightClass(lightPos,new wsColor(red,green,blue),config.MAP_GENERATE_LIGHTMAP,intensity,exponent);
+        light=new LightClass(lightPos,new wsColor(red,green,blue),intensity,exponent);
         map.addLight(light);
 
         return(light);

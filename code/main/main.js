@@ -81,37 +81,8 @@ class MainClass
 
         map.buildCollisionGeometry();
 
-            // build the light/mesh intersection lists
-
-        map.buildLightMeshIntersectLists();
-
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Building Light Map');
-        view.loadingScreenDraw(null);
-
-        setTimeout(this.initBuildLightmap.bind(this),1);
-    }
-
-    initBuildLightmap()
-    {
-            // build the light map
-            // light maps are a long running
-            // process so we need a callback
-
-        let genLightmap=new GenLightmapClass(this.initBuildLightmapFinish.bind(this));
-        
-        if (config.MAP_GENERATE_LIGHTMAP) {
-            genLightmap.create();
-        }
-        else {
-            genLightmap.createNone();
-        }
-    }
-
-    initBuildLightmapFinish()
-    {
         view.loadingScreenUpdate();
         view.loadingScreenAddString('Generating Player Model');
         view.loadingScreenDraw(null);

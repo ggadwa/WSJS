@@ -14,7 +14,6 @@ class MapMeshVertexClass
         this.normal=new wsPoint(0.0,0.0,0.0);
         this.tangent=new wsPoint(0.0,0.0,0.0);
         this.uv=new ws2DPoint(0.0,0.0);
-        this.lightmapUV=new ws2DPoint(0.0,0.0);
         
         Object.seal(this);
     }
@@ -92,24 +91,20 @@ class MapMeshClass
         this.drawVertices=null;
         this.drawNormals=null;
         this.drawTangents=null;
-        this.drawPackedUVs=null;
+        this.drawUVs=null;
 
             // null buffers
 
         this.vertexPosBuffer=null;
         this.vertexNormalBuffer=null;
         this.vertexTangentBuffer=null;
-        this.vertexAndLightmapUVBuffer=null;
+        this.vertexUVBuffer=null;
         this.indexBuffer=null;
 
             // special caches for light map building
 
         this.trigRayTraceCache=null;
         this.trigSharedTrigCache=null;
-        
-            // light intersection lists
-            
-        this.lightIntersectList=null;
 
             // collision lists
 
@@ -145,7 +140,7 @@ class MapMeshClass
         if (this.vertexPosBuffer!==null) gl.deleteBuffer(this.vertexPosBuffer);
         if (this.vertexNormalBuffer!==null) gl.deleteBuffer(this.vertexNormalBuffer);
         if (this.vertexTangentBuffer!==null) gl.deleteBuffer(this.vertexTangentBuffer);
-        if (this.vertexAndLightmapUVBuffer!==null) gl.deleteBuffer(this.vertexAndLightmapUVBuffer);
+        if (this.vertexUVBuffer!==null) gl.deleteBuffer(this.vertexUVBuffer);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     }
@@ -585,7 +580,7 @@ class MapMeshClass
         this.drawVertices=new Float32Array(this.vertexCount*3);
         this.drawNormals=new Float32Array(this.vertexCount*3);
         this.drawTangents=new Float32Array(this.vertexCount*3);
-        this.drawPackedUVs=new Float32Array(this.vertexCount*4);
+        this.drawUVs=new Float32Array(this.vertexCount*2);
         
         vIdx=0;
         uIdx=0;
@@ -607,10 +602,8 @@ class MapMeshClass
             this.drawTangents[tIdx++]=v.tangent.y;
             this.drawTangents[tIdx++]=v.tangent.z;
             
-            this.drawPackedUVs[uIdx++]=v.uv.x;           // texture UV and light map UV pakced into a 4 part vector
-            this.drawPackedUVs[uIdx++]=v.uv.y;
-            this.drawPackedUVs[uIdx++]=v.lightmapUV.x;
-            this.drawPackedUVs[uIdx++]=v.lightmapUV.y;
+            this.drawUVs[uIdx++]=v.uv.x;
+            this.drawUVs[uIdx++]=v.uv.y;
         }
 
             // create all the buffers
@@ -629,9 +622,9 @@ class MapMeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawTangents,gl.STATIC_DRAW);
 
-        this.vertexAndLightmapUVBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawPackedUVs,gl.STATIC_DRAW);
+        this.vertexUVBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawUVs,gl.STATIC_DRAW);
 
             // indexes are dynamic
             
@@ -651,8 +644,8 @@ class MapMeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
         gl.vertexAttribPointer(mapMeshShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexAndLightmapUVBuffer);
-        gl.vertexAttribPointer(mapMeshShader.vertexAndLightmapUVAttribute,4,gl.FLOAT,false,0,0);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
+        gl.vertexAttribPointer(mapMeshShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
             // need to always rebuild the array from the culled list
             

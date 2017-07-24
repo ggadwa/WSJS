@@ -92,6 +92,71 @@ class ParticleListClass
     }
     
         //
+        // find all the particle lights in this view
+        // and add them to the view light list
+        //
+
+    addViewLightsFromParticleLights()
+    {
+        let n,k,idx;
+        let x,y,z;
+        let light;
+
+            // get the distance from the camera
+            // to all the particle lights
+
+        for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
+            if (this.particles[n].isFree()) continue;
+            
+            this.particles[n].calcLightIntensity();
+
+            light=this.particles[n].light;
+            if (light.intensity===0.0) continue;
+
+            x=view.camera.position.x-light.position.x;
+            y=view.camera.position.y-light.position.y;
+            z=view.camera.position.z-light.position.z;
+            light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
+        }
+        
+            // find the view.MAX_LIGHT_COUNT closest lights
+            // and put them into the view list
+
+        for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
+            if (this.particles[n].isFree()) continue;
+
+            light=this.particles[n].light;
+            if (light.intensity===0.0) continue;
+            
+                // calculate if this lights bounds
+                // are within the frustrum and eliminate if they arent
+                
+            if (!light.isInsideFrustrum()) continue;
+
+                // find the light place
+                
+            idx=-1;
+
+            for (k=0;k!==view.lights.length;k++) {
+                if (view.lights[k].dist>light.dist) {
+                    idx=k;
+                    break;
+                }
+            }
+            
+                // add the light
+                
+            if (idx===-1) {
+                if (view.lights.length<view.MAX_LIGHT_COUNT) view.lights.push(light);
+            }
+            else {
+                view.lights.splice(idx,0,light);
+                if (view.lights.length>view.MAX_LIGHT_COUNT) view.lights.pop();
+            }
+        }
+    }
+    
+        //
         // some particle types
         //
         
@@ -112,6 +177,12 @@ class ParticleListClass
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,0.0,0.0,0.7,0.0,0.0);
         particle.setTiming(view.timeStamp,1500);
+        
+            // the light
+            
+        particle.light.setPosition(centerPt.x,centerPt.y,centerPt.z);
+        particle.light.setColor(1.0,0.2,0.0); 
+        particle.setLightMaxItensity(5000);
 
             // orange particles
             
@@ -127,6 +198,8 @@ class ParticleListClass
         particle.setColor(1.0,0.5,0.0,1.0,0.5,0.0);
         particle.setTiming(view.timeStamp,1500);
         
+        particle.setLightMaxItensity(0);
+        
             // yellow particles
             
         particle=this.getFree();
@@ -140,6 +213,8 @@ class ParticleListClass
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,1.0,0.0,0.7,0.7,0.0);
         particle.setTiming(view.timeStamp,1500);
+        
+        particle.setLightMaxItensity(0);
     }
     
     addDebugParticles(centerPt,count)
@@ -158,6 +233,9 @@ class ParticleListClass
         particle.setColor(0.0,1.0,1.0,0.0,1.0,1.0);
         particle.setTiming(view.timeStamp,0);
         particle.setNoDepthTest(true);
+        
+        particle.light.clear();
+        particle.setLightMaxItensity(0);
         
         return(particle);
     }

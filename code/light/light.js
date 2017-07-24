@@ -2,11 +2,13 @@
 
 //
 // map light class
+// 
+// generic class for map, particle, etc lights
 //
 
-class MapLightClass
+class LightClass
 {
-    constructor(position,color,inLightmap,intensity,exponent)
+    constructor(position,color,intensity,exponent)
     {
         this.position=position;                 // should be wsPoint
         this.eyePosition=new wsPoint(0,0,0);    // the eye position in the current render, set by the view
@@ -15,19 +17,29 @@ class MapLightClass
         this.invertIntensity=1.0/intensity;
         this.exponent=exponent;
 
-        this.inLightmap=inLightmap; // if used to generate the light map (color component ignored in shaders)
-
-        this.origIndex=0;           // used to sort lights
-        this.dist=0.0;
-        this.usedInList=false;
+        this.dist=0.0;           // used to sort lights
         
         this.frustumXBound=new wsBound(0,0);        // set here to avoid gc
         this.frustumYBound=new wsBound(0,0);
         this.frustumZBound=new wsBound(0,0);
-
-        this.meshIntersectList=null;      // list of mesh indexes that intersect with this light, is a Uint16Array
         
         Object.seal(this);
+    }
+    
+    setPosition(x,y,z)
+    {
+        this.position.setFromValues(x,y,z);
+    }
+    
+    setColor(r,g,b)
+    {
+        this.color.setFromValues(r,g,b);
+    }
+    
+    setIntensity(intensity)
+    {
+        this.intensity=intensity;
+        this.invertIntensity=1.0/intensity;
     }
     
     changeIntensity(intensityAdd)
@@ -36,6 +48,12 @@ class MapLightClass
         if (this.intensity<1) this.intensity=1;
         
         this.invertIntensity=1.0/this.intensity;
+    }
+    
+    clear()
+    {
+        this.intensity=0.0;
+        this.invertIntensity=0.0;
     }
     
     distance(pt)

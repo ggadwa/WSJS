@@ -604,9 +604,20 @@ class ViewClass
             // convert view lights to shader lights
             // all lights need a eye coordinate, so calc
             // that here
+            
+        view.lights=[];
 
-        map.createViewLightsFromMapLights();
+        map.addViewLightsFromMapLights();
+        particleList.addViewLightsFromParticleLights();
         
+            // fill in any missing lights with NULL
+
+        while (view.lights.length<view.MAX_LIGHT_COUNT) {
+            view.lights.push(null);
+        }
+        
+            // and finally make the eye coordinate
+
         for (n=0;n!==this.MAX_LIGHT_COUNT;n++) {
             light=this.lights[n];
             if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);

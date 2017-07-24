@@ -3,14 +3,14 @@
 in highp vec3 vertexPosition;
 in highp vec3 vertexNormal;
 in highp vec3 vertexTangent;
-in highp vec4 vertexAndLightmapUV;
+in highp vec2 vertexUV;
 
 uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 modelMatrix;
 uniform highp mat3 normalMatrix;
 
 out highp vec3 eyeVector,eyePosition;
-out highp vec4 fragUV;
+out highp vec2 fragUV;
 out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 void main(void)
@@ -34,6 +34,6 @@ void main(void)
 
         // the varying uv
 
-    fragUV=vertexAndLightmapUV;
+    fragUV=vertexUV;
 }
 
