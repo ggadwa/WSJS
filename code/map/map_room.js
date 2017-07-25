@@ -497,17 +497,17 @@ class MapRoomClass
     }
     
         //
-        // build array of random cubes for decorations
+        // build array of random rectangles for decorations
         //
         
-    createRandomCubes()
+    createRandomRects()
     {
         let x,z,x2,z2,hit;
         let wid,high,startWid,startHigh;
         let xBlockStart,xBlockEnd,zBlockStart,zBlockEnd;
         let xSize=this.xBlockSize-2;
         let zSize=this.zBlockSize-2;
-        let cubes=[];
+        let rects=[];
 
             // create a grid to
             // build cubicals in
@@ -562,11 +562,11 @@ class MapRoomClass
                 high++;
             }
 
-                // create the cubical which is always
+                // create the rectangle which is always
                 // 1 over because we are leaving a gutter
                 // for the doors
 
-            cubes.push(new wsRect((x+1),(z+1),((x+1)+wid),((z+1)+high)));
+            rects.push(new wsRect((x+1),(z+1),((x+1)+wid),((z+1)+high)));
             
                 // always block off +1 so there's a corridor
                 // in between
@@ -588,7 +588,18 @@ class MapRoomClass
             }
         }
 
-        return(cubes);
+        return(rects);
+    }
+    
+    blockGridForRect(rect)
+    {
+        let x,z;
+        
+        for (x=rect.lft;x!==rect.rgt;x++) {
+            for (z=rect.top;z!==rect.bot;z++) {
+                this.setBlockGrid(0,x,z);
+            }
+        }
     }
     
         //

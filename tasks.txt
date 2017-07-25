@@ -15,15 +15,23 @@ WebGL2
 
 
 
-
-
 ToDos
 
---> why is particle light yellow?
+[DECORATIONS]
+    * random rects
+        mapRoomConstants.ROOM_DECORATION_PILLARS:
+        mapRoomConstants.ROOM_DECORATION_STORAGE:
+        [ ] mapRoomConstants.ROOM_DECORATION_COMPUTER:
+        mapRoomConstants.ROOM_DECORATION_PIPE:
+        mapRoomConstants.ROOM_DECORATION_CUBICAL:
+        mapRoomConstants.ROOM_DECORATION_LAB:
+    * remove decoration type from room class
+    * types for low/high rooms
+    * special edge ones (panels, conduits)
+    * computers and panels are part of same item
+    * animated decorative items
+
 --> models cast light
---> animated decoration items
---> two classes of items, ones in center of room, ones on edges (panels, control panels, ?)
---> right panel is messed up
 --> models get hunch as part of body skeleton, not variable
 
 

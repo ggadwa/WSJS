@@ -107,11 +107,11 @@ class ParticleListClass
 
         for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
             if (this.particles[n].isFree()) continue;
+            if (!this.particles[n].castsLight()) continue;
             
             this.particles[n].calcLightIntensity();
 
             light=this.particles[n].light;
-            if (light.intensity===0.0) continue;
 
             x=view.camera.position.x-light.position.x;
             y=view.camera.position.y-light.position.y;
@@ -124,9 +124,9 @@ class ParticleListClass
 
         for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
             if (this.particles[n].isFree()) continue;
+            if (!this.particles[n].castsLight()) continue;
 
             light=this.particles[n].light;
-            if (light.intensity===0.0) continue;
             
                 // calculate if this lights bounds
                 // are within the frustrum and eliminate if they arent

@@ -865,13 +865,14 @@ class GenMapClass
     
     buildRoomDecorations()
     {
-        let n,room;
-        let pillar=null;
-        let storage=null;
-        let computer=null;
-        let pipe=null;
-        let cubicle=null;
-        let lab=null;
+        let n,room,rects;
+        let k,nRect,decorationType;
+        let pillar=new GenRoomDecorationPillarClass();
+        let storage=new GenRoomDecorationStorageClass();
+        let computer=new GenRoomDecorationComputerClass();
+        let pipe=new GenRoomDecorationPipeClass();
+        let cubicle=new GenRoomDecorationCubicalClass();
+        let lab=new GenRoomDecorationLabClass();
         let nRoom=map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;
@@ -879,34 +880,46 @@ class GenMapClass
         for (n=0;n!==nRoom;n++) {
             room=map.rooms[n];
             
-            //room.decorationType=mapRoomConstants.ROOM_DECORATION_LAB;  // supergumba -- testing
-            
-            switch (room.decorationType) {
-                case mapRoomConstants.ROOM_DECORATION_PILLARS:
-                    if (pillar===null) pillar=new GenRoomDecorationPillarClass();
-                    pillar.create(room);
-                    break;
-                case mapRoomConstants.ROOM_DECORATION_STORAGE:
-                    if (storage===null) storage=new GenRoomDecorationStorageClass();
-                    storage.create(room);
-                    break;
-                case mapRoomConstants.ROOM_DECORATION_COMPUTER:
-                    if (computer===null) computer=new GenRoomDecorationComputerClass();
-                    computer.create(room);
-                    break;
-                case mapRoomConstants.ROOM_DECORATION_PIPE:
-                    if (pipe===null) pipe=new GenRoomDecorationPipeClass();
-                    pipe.create(room);
-                    break;
-                case mapRoomConstants.ROOM_DECORATION_CUBICAL:
-                    if (cubicle===null) cubicle=new GenRoomDecorationCubicalClass();
-                    cubicle.create(room);
-                    break;
-                case mapRoomConstants.ROOM_DECORATION_LAB:
-                    if (lab===null) lab=new GenRoomDecorationLabClass();
-                    lab.create(room);
-                    break;
+                // a random series of rectangles in the room
+                // to place decorations
                 
+            rects=room.createRandomRects(room);
+            
+                // put items in the rects
+            
+            nRect=rects.length;
+            
+            for (k=0;k!==nRect;k++) {
+            
+                decorationType=mapRoomConstants.ROOM_DECORATION_COMPUTER; // genRandom.randomIndex(7);        // +1 for a skip version
+            
+                switch (decorationType) {
+                    case mapRoomConstants.ROOM_DECORATION_PILLARS:
+                        pillar.create(room);
+                        room.blockGridForRect(rects[k]);
+                        break;
+                    case mapRoomConstants.ROOM_DECORATION_STORAGE:
+                        storage.create(room);
+                        room.blockGridForRect(rects[k]);
+                        break;
+                    case mapRoomConstants.ROOM_DECORATION_COMPUTER:
+                        computer.create(room,rects[k]);
+                        room.blockGridForRect(rects[k]);
+                        break;
+                    case mapRoomConstants.ROOM_DECORATION_PIPE:
+                        pipe.create(room);
+                        room.blockGridForRect(rects[k]);
+                        break;
+                    case mapRoomConstants.ROOM_DECORATION_CUBICAL:
+                        cubicle.create(room);
+                        room.blockGridForRect(rects[k]);
+                        break;
+                    case mapRoomConstants.ROOM_DECORATION_LAB:
+                        lab.create(room);
+                        room.blockGridForRect(rects[k]);
+                        break;
+
+                }
             }
         }
     }

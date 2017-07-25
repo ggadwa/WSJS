@@ -191,7 +191,12 @@ class ParticleClass
         //
         // calculate light intensity
         //
-        
+    
+    castsLight()
+    {
+        return(this.lightMaxIntensity!==0);
+    }
+    
     calcLightIntensity()
     {
         let tick,halfTick;

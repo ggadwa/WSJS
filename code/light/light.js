@@ -1,3 +1,5 @@
+/* global view */
+
 "use strict";
 
 //
