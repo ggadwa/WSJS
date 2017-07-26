@@ -773,6 +773,16 @@ class wsRect
         this.bot=bot;
     }
     
+    isSquare()
+    {
+        return((this.rgt-this.lft)===(this.bot-this.top));
+    }
+    
+    isXLarger()
+    {
+        return((this.rgt-this.lft)>(this.bot-this.top));
+    }
+    
     overlap(rect)
     {
         if (this.lft>=rect.rgt) return(false);

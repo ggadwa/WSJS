@@ -895,7 +895,7 @@ class GenMapClass
             
                 switch (decorationType) {
                     case mapRoomConstants.ROOM_DECORATION_PILLARS:
-                        pillar.create(room);
+                        pillar.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_STORAGE:

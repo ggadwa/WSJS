@@ -32,10 +32,16 @@ class GenRoomDecorationComputerClass
         // computers
         //
         
-    addComputer(room,x,z,margin)
+    addComputer(room,x,z,margin,dir)
     {
         let wid;
-        let boundX,boundY,boundZ;
+        let boundX,boundY,boundZ,boundX2,boundZ2;
+        let computerBitmap,metalBitmap;
+        
+            // textures
+            
+        computerBitmap=map.getTexture(map.TEXTURE_TYPE_COMPUTER);
+        metalBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
        
             // computer
 
@@ -47,8 +53,38 @@ class GenRoomDecorationComputerClass
         boundX=new wsBound((x+margin),(x+wid));
         boundZ=new wsBound((z+margin),(z+wid));
         boundY=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
+        
+        switch (dir) {
+            
+            case mapRoomConstants.ROOM_SIDE_LEFT:
+                boundX2=new wsBound((boundX.min+map.ROOM_FLOOR_DEPTH),boundX.max);
+                boundX.max=boundX2.min;
+                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX2,boundY,boundZ,null,true,false,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,false,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                break;
+                
+            case mapRoomConstants.ROOM_SIDE_TOP:
+                boundZ2=new wsBound((boundZ.min+map.ROOM_FLOOR_DEPTH),boundZ.max);
+                boundZ.max=boundZ2.min;
+                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX,boundY,boundZ2,null,true,true,true,false,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,true,false,false,map.MESH_FLAG_DECORATION));
+                break;
+                
+            case mapRoomConstants.ROOM_SIDE_RIGHT:
+                boundX2=new wsBound(boundX.min,(boundX.max-map.ROOM_FLOOR_DEPTH));
+                boundX.min=boundX2.max;
+                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX2,boundY,boundZ,null,true,true,false,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,false,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                break;
+                
+            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                boundZ2=new wsBound(boundZ.min,(boundZ.max-map.ROOM_FLOOR_DEPTH));
+                boundZ.min=boundZ2.max;
+                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX,boundY,boundZ2,null,true,true,true,false,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,true,false,false,map.MESH_FLAG_DECORATION));
+                break;
 
-        map.addMesh(MeshPrimitivesClass.createMeshCube(map.getTexture(map.TEXTURE_TYPE_COMPUTER),boundX,boundY,boundZ,null,true,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        }
     }
     
         //
@@ -201,7 +237,7 @@ class GenRoomDecorationComputerClass
         switch (genRandom.randomIndex(4)) {
             case 0:
             case 1:
-                this.addComputer(room,x,z,margin);         // appears twice as much as the others
+                this.addComputer(room,x,z,margin,dir);         // appears twice as much as the others
                 break;
             case 2:
                 this.addPanel(room,pnt,dir);
@@ -235,19 +271,19 @@ class GenRoomDecorationComputerClass
             for (z=rect.top;z!==rect.bot;z++) {
                 
                 if (x===rect.lft) {
-                    this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_RIGHT);
+                    this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_LEFT);
                 }
                 else {
                     if (x===(rect.rgt-1)) {
-                        this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_LEFT);
+                        this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_RIGHT);
                     }
                     else {
                         if (z===(rect.top)) {
-                            this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_BOTTOM);
+                            this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_TOP);
                         }
                         else {
                             if (z===(rect.bot-1)) {
-                                this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_TOP);
+                                this.addPiece(room,x,z,margin,mapRoomConstants.ROOM_SIDE_BOTTOM);
                             }
                         }
                     }

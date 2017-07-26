@@ -19,16 +19,17 @@ ToDos
 
 [DECORATIONS]
     * random rects
-        mapRoomConstants.ROOM_DECORATION_PILLARS:
+        [X] mapRoomConstants.ROOM_DECORATION_PILLARS:
         mapRoomConstants.ROOM_DECORATION_STORAGE:
         [ ] mapRoomConstants.ROOM_DECORATION_COMPUTER:
+              * change computer texture to have stripe for sides?
         mapRoomConstants.ROOM_DECORATION_PIPE:
         mapRoomConstants.ROOM_DECORATION_CUBICAL:
         mapRoomConstants.ROOM_DECORATION_LAB:
+        > pits (wires, pipes)
     * remove decoration type from room class
-    * types for low/high rooms
+    * types for low/high/water rooms
     * special edge ones (panels, conduits)
-    * computers and panels are part of same item
     * animated decorative items
 
 --> models cast light

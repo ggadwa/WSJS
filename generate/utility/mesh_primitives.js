@@ -385,24 +385,24 @@ class MeshPrimitivesClass
         // cylinders
         //
         
-    static createMeshCylinderSegmentList(radius,extraRadius,segmentCount,segmentExtra)
+    static createMeshCylinderSegmentList(segmentCount,segmentExtra)
     {
         let n;
         let segCount=genRandom.randomInt(segmentCount,segmentExtra);
         let segments=[];
         
-        segments.push(radius+extraRadius);      // top always biggest
+        segments.push(1.0);      // top always biggest
         
         for (n=0;n!==segCount;n++) {
-            segments.push(genRandom.randomInt(radius,extraRadius));
+            segments.push(genRandom.randomFloat(0.5,0.5));
         }
         
-        segments.push(radius+extraRadius);      // and bottom
+        segments.push(1.0);      // and bottom
         
         return(segments);
     }
         
-    static createMeshCylinder(bitmap,centerPt,yBound,segments,flags)
+    static createMeshCylinder(bitmap,centerPt,yBound,segments,radius,flags)
     {
         let n,k,t,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let topRad,botRad;
@@ -429,13 +429,13 @@ class MeshPrimitivesClass
         ySegBound=yBound.copy();
         ySegBound.min=ySegBound.max-yAdd;
         
-        botRad=segments[0];
+        botRad=segments[0]*radius;
             
         for (k=0;k!==segCount;k++) {
             
                 // new radius
                 
-            topRad=segments[k+1];
+            topRad=segments[k+1]*radius;
 
                 // cyliner faces
 
@@ -533,12 +533,9 @@ class MeshPrimitivesClass
     static createMeshCylinderSimple(bitmap,centerPt,yBound,radius,flags)
     {
         let mesh;
-        let segments=[];
+        let segments=[1.0,1.0];
         
-        segments.push(radius);
-        segments.push(radius);
-        
-        mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,flags);
+        mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,radius,flags);
         mesh.simpleCollisionGeometry=true;
         
         return(mesh);

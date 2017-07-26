@@ -10,11 +10,8 @@ class GenRoomDecorationPillarClass
 {
     constructor()
     {
-        let minRadius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.08);
-        let maxRadius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.14);
-
-        let radius=genRandom.randomInBetween(minRadius,maxRadius);
-        this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(radius,radius,1,4);
+        this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(1,4);         // all pilars in this map use same setup
+        this.hasPlatform=genRandom.randomPercentage(0.5);
         
         Object.seal(this);
     }
@@ -23,77 +20,64 @@ class GenRoomDecorationPillarClass
         // pillar types
         //
         
-    addPillarsCorners(room,bitmap,inside)
+    addPillarSingle(room,rect,pillarBitmap,platformBitmap)
     {
-        let mx,mz,pos,yBound;
-        
-        pos=room.checkGroundFloorSpawnAndBlock(1,1);
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(1,1);
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        pos=room.checkGroundFloorSpawnAndBlock((room.xBlockSize-2),1);
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),1);
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        pos=room.checkGroundFloorSpawnAndBlock((room.xBlockSize-2),(room.zBlockSize-2));
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((room.xBlockSize-2),(room.zBlockSize-2));
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        pos=room.checkGroundFloorSpawnAndBlock(1,(room.zBlockSize-2));
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(1,(room.zBlockSize-2));
-        if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        
-        if (inside) {
-            mx=Math.trunc(room.xBlockSize/2);
-            mz=Math.trunc(room.zBlockSize/2);
+        let x,z,yBound,pos,radius;
+        let platformXBound,platformYBound,platformZBound;
+
+            // position
             
-            pos=room.checkGroundFloorSpawnAndBlock((mx-2),(mz-2));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx-2),(mz-2));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
+        x=room.xBound.min+Math.trunc(((rect.lft+rect.rgt)*map.ROOM_BLOCK_WIDTH)*0.5);
+        z=room.zBound.min+Math.trunc(((rect.top+rect.bot)*map.ROOM_BLOCK_WIDTH)*0.5);
+        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(rect.lft,rect.top);
+        
+            // possible platforms
+            
+        if (this.hasPlatform) {
+            platformXBound=new wsBound((room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH)));
+            platformZBound=new wsBound((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
+            
+            platformYBound=new wsBound(yBound.min,(yBound.min+map.ROOM_FLOOR_DEPTH));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,null,false,true,true,true,true,false,true,false,map.MESH_FLAG_DECORATION));
 
-            pos=room.checkGroundFloorSpawnAndBlock((mx+1),(mz-2));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx+1),(mz-2));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
+            platformYBound=new wsBound((yBound.max-map.ROOM_FLOOR_DEPTH),yBound.max);
+            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
 
-            pos=room.checkGroundFloorSpawnAndBlock((mx+1),(mz+1));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx+1),(mz+1));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-
-            pos=room.checkGroundFloorSpawnAndBlock((mx-2),(mz+1));
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound((mx-2),(mz+1));
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION)); 
+            yBound.min+=map.ROOM_FLOOR_DEPTH;
+            yBound.max-=map.ROOM_FLOOR_DEPTH;
+        }
+        
+            // the pillar itself
+            
+        pos=new wsPoint(x,yBound.max,z);
+        radius=Math.trunc(((rect.rgt-rect.lft)*map.ROOM_BLOCK_WIDTH)*0.3);
+        
+        map.addMesh(MeshPrimitivesClass.createMeshCylinder(pillarBitmap,pos,yBound,this.segments,radius,map.MESH_FLAG_DECORATION));
+    }
+    
+    addPillarLineX(room,rect,pillarBitmap,platformBitmap)
+    {
+        let x,z;
+        let pillarRect=new wsRect(0,0,0,0);
+        
+        z=Math.trunc((rect.top+rect.bot)*0.5);
+        
+        for (x=rect.lft;x!==rect.rgt;x++) {
+            pillarRect.setFromValues(x,z,(x+1),(z+1));
+            this.addPillarSingle(room,pillarRect,pillarBitmap,platformBitmap);
         }
     }
     
-    addPillarsLineX(room,bitmap)
+    addPillarLineZ(room,rect,pillarBitmap,platformBitmap)
     {
-        let x,mx,mz,pos,yBound;
+        let x,z;
+        let pillarRect=new wsRect(0,0,0,0);
         
-        mx=Math.trunc(room.xBlockSize/2);
-        mz=Math.trunc(room.zBlockSize/2);
+        x=Math.trunc((rect.lft+rect.rgt)*0.5);
         
-        for (x=1;x<=(room.xBlockSize-2);x+=2) {
-            if (x===mx) continue;           // never block light
-            
-            pos=room.checkGroundFloorSpawnAndBlock(x,mz);
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(x,mz);
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
-        }
-    }
-    
-    addPillarsLineZ(room,bitmap)
-    {
-        let z,mx,mz,pos,yBound;
-        
-        mx=Math.trunc(room.xBlockSize/2);
-        mz=Math.trunc(room.zBlockSize/2);
-        
-        for (z=1;z<=(room.zBlockSize-2);z+=2) {
-            if (z===mz) continue;           // never block light
-            
-            pos=room.checkGroundFloorSpawnAndBlock(mx,z);
-            yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(mx,z);
-            if (pos!==null) map.addMesh(MeshPrimitivesClass.createMeshCylinder(bitmap,pos,yBound,this.segments,map.MESH_FLAG_DECORATION));
+        for (z=rect.top;z!==rect.bot;z++) {
+            pillarRect.setFromValues(x,z,(x+1),(z+1));
+            this.addPillarSingle(room,pillarRect,pillarBitmap,platformBitmap);
         }
     }
     
@@ -101,31 +85,28 @@ class GenRoomDecorationPillarClass
         // pillars
         //
     
-    create(room)
+    create(room,rect)
     {
             // texture
             
-        let bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
+        let pillarBitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
+        let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         
-            // random pillar types
+            // determine if this is a square rect
+            // if so, one big pillar
             
-        switch (genRandom.randomIndex(5)) {
-            case 0:
-                this.addPillarsCorners(room,bitmap,false);
-                return;
-            case 1:
-                this.addPillarsCorners(room,bitmap,true);
-                return;
-            case 2:
-                this.addPillarsLineX(room,bitmap);
-                return;
-            case 3:
-                this.addPillarsLineZ(room,bitmap);
-                return;
-            case 4:
-                this.addPillarsLineX(room,bitmap);
-                this.addPillarsLineZ(room,bitmap);
-                return;
+        if (rect.isSquare()) {
+            this.addPillarSingle(room,rect,pillarBitmap,platformBitmap);
+            return;
+        }
+        
+            // otherwise a line across the rect
+        
+        if (rect.isXLarger()) {
+            this.addPillarLineX(room,rect,pillarBitmap,platformBitmap);
+        }
+        else {
+            this.addPillarLineZ(room,rect,pillarBitmap,platformBitmap);
         }
     }
     
