@@ -52,7 +52,7 @@ class GenRoomPlatformClass
         if (story!==0) {
             yBound.min=yBound.max;
             yBound.max=room.yBound.max;
-            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,false,false,false,map.MESH_FLAG_STAIR));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,map.MESH_FLAG_STAIR));
         }
         
             // block the stairs off from any decorations
@@ -92,7 +92,7 @@ class GenRoomPlatformClass
         let yPlatformBound=new wsBound(y,(y+map.ROOM_FLOOR_DEPTH));
         let zPlatformBound=new wsBound((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
         
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             // a cleared spot is a spot that's open

@@ -25,16 +25,16 @@ class GenRoomDecorationComputerClass
         boundZ=new wsBound((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
         boundY=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
 
-        map.addMesh(MeshPrimitivesClass.createMeshCube(map.getTexture(map.TEXTURE_TYPE_PLATFORM),boundX,boundY,boundZ,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(map.getTexture(map.TEXTURE_TYPE_PLATFORM),boundX,boundY,boundZ,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
     }
         
         //
-        // computers
+        // computer banks
         //
         
-    addComputer(room,x,z,margin,dir)
+    addBank(room,x,z,margin,dir)
     {
-        let wid;
+        let wid,mesh;
         let boundX,boundY,boundZ,boundX2,boundZ2;
         let computerBitmap,metalBitmap;
         
@@ -54,44 +54,83 @@ class GenRoomDecorationComputerClass
         boundZ=new wsBound((z+margin),(z+wid));
         boundY=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
         
+            // create meshes that point right way
+            
         switch (dir) {
             
             case mapRoomConstants.ROOM_SIDE_LEFT:
                 boundX2=new wsBound((boundX.min+map.ROOM_FLOOR_DEPTH),boundX.max);
                 boundX.max=boundX2.min;
-                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX2,boundY,boundZ,null,true,false,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,false,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                
+                mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,boundX2,boundY,boundZ,false,true,true,true,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
+                
+                mesh=MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,true,false,true,true,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
                 boundZ2=new wsBound((boundZ.min+map.ROOM_FLOOR_DEPTH),boundZ.max);
                 boundZ.max=boundZ2.min;
-                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX,boundY,boundZ2,null,true,true,true,false,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,true,false,false,map.MESH_FLAG_DECORATION));
+                
+                mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,boundX,boundY,boundZ2,true,true,false,true,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
+                
+                mesh=MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,true,true,true,false,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                map.addMesh(mesh);
+                
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
                 boundX2=new wsBound(boundX.min,(boundX.max-map.ROOM_FLOOR_DEPTH));
                 boundX.min=boundX2.max;
-                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX2,boundY,boundZ,null,true,true,false,true,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,false,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                
+                mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,boundX2,boundY,boundZ,true,false,true,true,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
+                
+                mesh=MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,false,true,true,true,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 boundZ2=new wsBound(boundZ.min,(boundZ.max-map.ROOM_FLOOR_DEPTH));
                 boundZ.min=boundZ2.max;
-                map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,boundX,boundY,boundZ2,null,true,true,true,false,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,true,false,false,map.MESH_FLAG_DECORATION));
+                
+                mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,boundX,boundY,boundZ2,true,true,true,false,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
+                
+                mesh=MeshPrimitivesClass.createMeshCube(computerBitmap,boundX,boundY,boundZ,true,true,false,true,true,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                map.addMesh(mesh);
                 break;
 
         }
     }
     
         //
-        // control panels
+        // terminals
         //
         
-    addPanel(room,pnt,dir)
+    addTerminal(room,pnt,dir)
     {
         let panelMargin,ang,mesh,mesh2;
         let boundX,boundY,boundZ;
@@ -106,36 +145,34 @@ class GenRoomDecorationComputerClass
             
         panelMargin=genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH/5),Math.trunc(map.ROOM_BLOCK_WIDTH/8));
 
+        boundX=new wsBound((pnt.x+panelMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-panelMargin));
+        boundZ=new wsBound((pnt.z+panelMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-panelMargin));
         boundY=new wsBound(pnt.y,(pnt.y-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3)));
 
         switch (dir) {
             
             case mapRoomConstants.ROOM_SIDE_LEFT:
-                ang=new wsPoint(0.0,270.0,0.0);
-                boundX=new wsBound(pnt.x,((pnt.x+map.ROOM_BLOCK_WIDTH)-(panelMargin*2)));
-                boundZ=new wsBound((pnt.z+panelMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-panelMargin));
-                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,false,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+                ang=new wsPoint(0.0,90.0,0.0);
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
-                ang=new wsPoint(0.0,180.0,0.0);
-                boundX=new wsBound((pnt.x+panelMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-panelMargin));
-                boundZ=new wsBound(pnt.z,((pnt.z+map.ROOM_BLOCK_WIDTH)-(panelMargin*2)));
-                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,false,true,false,false,false,map.MESH_FLAG_DECORATION);
+                ang=new wsPoint(0.0,0.0,0.0);
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
-                ang=new wsPoint(0.0,90.0,0.0);
-                boundX=new wsBound(((pnt.x+map.ROOM_BLOCK_WIDTH)-(panelMargin*2)),(pnt.x+map.ROOM_BLOCK_WIDTH));
-                boundZ=new wsBound((pnt.z+panelMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-panelMargin));
-                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,false,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+                ang=new wsPoint(0.0,270.0,0.0);
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                ang=new wsPoint(0.0,0.0,0.0);
-                boundX=new wsBound((pnt.x+panelMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-panelMargin));
-                boundZ=new wsBound(((pnt.z+map.ROOM_BLOCK_WIDTH)-(panelMargin*2)),(pnt.z+map.ROOM_BLOCK_WIDTH));
-                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,false,false,false,map.MESH_FLAG_DECORATION);
+                ang=new wsPoint(0.0,180.0,0.0);
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
         }
 
@@ -157,7 +194,7 @@ class GenRoomDecorationComputerClass
         
     addJunction(room,pnt,dir)
     {
-        let juncMargin,juncWid,pipeRadius,pipeHigh;
+        let juncMargin,juncWid,pipeRadius,pipeHigh,mesh;
         let boundX,boundY,boundZ,pipeBoundY,centerPnt;
         let baseBitmap,pipeBitmap,upperPipe,lowerPipe;
             
@@ -183,25 +220,33 @@ class GenRoomDecorationComputerClass
             case mapRoomConstants.ROOM_SIDE_LEFT:
                 boundX=new wsBound(pnt.x,(pnt.x+juncWid));
                 boundZ=new wsBound((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,false,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
                 boundX=new wsBound((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
                 boundZ=new wsBound(pnt.z,(pnt.z+juncWid));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,false,true,true,true,false,map.MESH_FLAG_DECORATION));
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
                 boundX=new wsBound(((pnt.x+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.x+map.ROOM_BLOCK_WIDTH));
                 boundZ=new wsBound((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,false,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
                 boundX=new wsBound((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
                 boundZ=new wsBound(((pnt.z+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.z+map.ROOM_BLOCK_WIDTH));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,null,true,true,true,true,false,true,true,false,map.MESH_FLAG_DECORATION));
+                mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,boundX,boundY,boundZ,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+                map.addMesh(mesh);
                 break;
         }
         
@@ -237,10 +282,10 @@ class GenRoomDecorationComputerClass
         switch (genRandom.randomIndex(4)) {
             case 0:
             case 1:
-                this.addComputer(room,x,z,margin,dir);         // appears twice as much as the others
+                this.addBank(room,x,z,margin,dir);         // appears twice as much as the others
                 break;
             case 2:
-                this.addPanel(room,pnt,dir);
+                this.addTerminal(room,pnt,dir);
                 break;
             case 3:
                 this.addJunction(room,pnt,dir);

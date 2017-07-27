@@ -1,4 +1,4 @@
-/* global MeshUtilityClass, genRandom, DEGREE_TO_RAD */
+/* global MeshUtilityClass, genRandom, DEGREE_TO_RAD, map */
 
 "use strict";
 
@@ -17,10 +17,10 @@ class MeshPrimitivesClass
         // create cube
         //
 
-    static createMeshCube(bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,front,back,top,bottom,normalsIn,flags)
+    static createMeshRotatedCube(bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,flags)
     {
-        let v,vertexList,count,idx,centerPt;
-        let n,indexes,quadCount;
+        let vertexList,count,idx,centerPt;
+        let n,indexes;
         
             // get cube size
             // note: why duplicated vertexes?  Because light map UVs
@@ -110,40 +110,6 @@ class MeshPrimitivesClass
             indexes[n]=n;
         }
 
-            // build whole UVs
-
-        if (wholeUV) {
-            
-            idx=0;
-            quadCount=Math.trunc(count/6);
-
-            for (n=0;n!==quadCount;n++) {
-                v=vertexList[idx++];
-                v.uv.x=0.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[idx++];
-                v.uv.x=1.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[idx++];
-                v.uv.x=1.0;
-                v.uv.y=1.0;
-                
-                v=vertexList[idx++];
-                v.uv.x=0.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[idx++];
-                v.uv.x=1.0;
-                v.uv.y=1.0;
-                
-                v=vertexList[idx++];
-                v.uv.x=0.0;
-                v.uv.y=1.0;
-            }  
-        }
-        
             // rotate
             
         if (rotAngle!==null) {
@@ -156,12 +122,83 @@ class MeshPrimitivesClass
             // calculate the tangents
 
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,normalsIn);
-        if (!wholeUV) MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
         return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+    }
+    
+    static createMeshCube(bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,flags)
+    {
+        return(this.createMeshRotatedCube(bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,flags));
+    }
+    
+    static meshCubeSetWholeUV(mesh)
+    {
+        let n,v,idx,quadCount;
+        let vertexList=mesh.vertexList;
+        
+        idx=0;
+        quadCount=Math.trunc(vertexList.length/6);
+
+        for (n=0;n!==quadCount;n++) {
+            v=vertexList[idx++];
+            v.uv.x=0.0;
+            v.uv.y=0.0;
+
+            v=vertexList[idx++];
+            v.uv.x=1.0;
+            v.uv.y=0.0;
+
+            v=vertexList[idx++];
+            v.uv.x=1.0;
+            v.uv.y=1.0;
+
+            v=vertexList[idx++];
+            v.uv.x=0.0;
+            v.uv.y=0.0;
+
+            v=vertexList[idx++];
+            v.uv.x=1.0;
+            v.uv.y=1.0;
+
+            v=vertexList[idx++];
+            v.uv.x=0.0;
+            v.uv.y=1.0;
+        }
+    }
+    
+    static meshCubeScaleUV(mesh,quadIndex,xOffset,xScale,yOffset,yScale)
+    {
+        let v;
+        let idx=quadIndex*6;
+        let vertexList=mesh.vertexList;
+        
+        v=vertexList[idx++];
+        v.uv.x+=xOffset;
+        v.uv.y+=yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x=(v.uv.x*xScale)+xOffset;
+        v.uv.y+=yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x=(v.uv.x*xScale)+xOffset;
+        v.uv.y=(v.uv.y*yScale)+yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x+=xOffset;
+        v.uv.y+=yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x=(v.uv.x*xScale)+xOffset;
+        v.uv.y=(v.uv.y*yScale)+yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x+=xOffset;
+        v.uv.y=(v.uv.y*yScale)+yOffset;
     }
     
         //
@@ -565,18 +602,18 @@ class MeshPrimitivesClass
         
         yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
         zFrameBound.setFromValues((zBound.min-halfSz),(zBound.min+halfSz));
-        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
         
         zFrameBound.setFromValues((zBound.max-halfSz),(zBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
         yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
         zFrameBound.setFromValues((zBound.min-halfSz),(zBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
         if (!skipBottom) {
             yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         }
         
             // the inner bars
@@ -585,12 +622,12 @@ class MeshPrimitivesClass
             y=yBound.getMidPoint();
             yFrameBound.setFromValues((y-halfSz),(y+halfSz));
             zFrameBound.setFromValues((zBound.min+halfSz),(zBound.max-halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
             z=zBound.getMidPoint();
             yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
             zFrameBound.setFromValues((z-halfSz),(z+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         }
         
         return(mesh);
@@ -616,18 +653,18 @@ class MeshPrimitivesClass
         
         yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
         xFrameBound.setFromValues((xBound.min-halfSz),(xBound.min+halfSz));
-        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
         
         xFrameBound.setFromValues((xBound.max-halfSz),(xBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
         yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
         xFrameBound.setFromValues((xBound.min-halfSz),(xBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
         if (!skipBottom) {
             yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         }
         
             // the inner bars
@@ -636,12 +673,12 @@ class MeshPrimitivesClass
             y=yBound.getMidPoint();
             yFrameBound.setFromValues((y-halfSz),(y+halfSz));
             xFrameBound.setFromValues((xBound.min+halfSz),(xBound.max-halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         
             x=xBound.getMidPoint();
             yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
             xFrameBound.setFromValues((x-halfSz),(x+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
         }
         
         return(mesh);

@@ -42,14 +42,14 @@ class GenRoomDecorationCubicalClass
             if (!((skipWall===mapRoomConstants.ROOM_SIDE_LEFT) && (skipIdx===n))) {
                 dx=room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH);
                 xBound=new wsBound(dx,(dx+wid));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
                 map.addOverlayDecorationWall(dx,dz,dx,(dz+map.ROOM_BLOCK_WIDTH));
             }
             
             if (!((skipWall===mapRoomConstants.ROOM_SIDE_RIGHT) && (skipIdx===n))) {
                 dx=room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH);
                 xBound=new wsBound((dx-wid),dx);
-                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
                 map.addOverlayDecorationWall(dx,dz,dx,(dz+map.ROOM_BLOCK_WIDTH));
             }
         }
@@ -63,14 +63,14 @@ class GenRoomDecorationCubicalClass
             if (!((skipWall===mapRoomConstants.ROOM_SIDE_TOP) && (skipIdx===n))) {
                 dz=room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH);
                 zBound=new wsBound(dz,(dz+wid));
-                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
                 map.addOverlayDecorationWall(dx,dz,(dx+map.ROOM_BLOCK_WIDTH),dz);
             }
             
             if (!((skipWall===mapRoomConstants.ROOM_SIDE_BOTTOM) && (skipIdx===n))) {
                 dz=room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH);
                 zBound=new wsBound((dz-wid),dz);
-                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+                map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
                 map.addOverlayDecorationWall(dx,dz,(dx+map.ROOM_BLOCK_WIDTH),dz);
             }
         }
@@ -107,7 +107,7 @@ class GenRoomDecorationCubicalClass
             xBound=new wsBound((room.xBound.min+(cubes[n].lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(cubes[n].rgt*map.ROOM_BLOCK_WIDTH)));
             zBound=new wsBound((room.zBound.min+(cubes[n].top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(cubes[n].bot*map.ROOM_BLOCK_WIDTH)));
             yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
-            map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
 
               /*          
             if (genRandom.randomPercentage(0.5)) {

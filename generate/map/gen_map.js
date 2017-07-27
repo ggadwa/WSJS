@@ -891,7 +891,7 @@ class GenMapClass
             
             for (k=0;k!==nRect;k++) {
             
-                decorationType=mapRoomConstants.ROOM_DECORATION_COMPUTER; // genRandom.randomIndex(7);        // +1 for a skip version
+                decorationType=mapRoomConstants.ROOM_DECORATION_STORAGE; // genRandom.randomIndex(7);        // +1 for a skip version
             
                 switch (decorationType) {
                     case mapRoomConstants.ROOM_DECORATION_PILLARS:
@@ -899,7 +899,7 @@ class GenMapClass
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_STORAGE:
-                        storage.create(room);
+                        storage.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_COMPUTER:

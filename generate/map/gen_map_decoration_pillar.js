@@ -38,10 +38,10 @@ class GenRoomDecorationPillarClass
             platformZBound=new wsBound((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
             
             platformYBound=new wsBound(yBound.min,(yBound.min+map.ROOM_FLOOR_DEPTH));
-            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,null,false,true,true,true,true,false,true,false,map.MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,false,true,false,map.MESH_FLAG_DECORATION));
 
             platformYBound=new wsBound((yBound.max-map.ROOM_FLOOR_DEPTH),yBound.max);
-            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
 
             yBound.min+=map.ROOM_FLOOR_DEPTH;
             yBound.max-=map.ROOM_FLOOR_DEPTH;

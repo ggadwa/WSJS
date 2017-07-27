@@ -471,7 +471,7 @@ class GenRoomDecorationPipeClass
         platformBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
         
         platformBoundY=new wsBound((yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // determine direction
         

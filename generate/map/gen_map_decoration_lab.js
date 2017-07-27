@@ -40,10 +40,10 @@ class GenRoomDecorationLabClass
             yMid=room.yBound.max-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.5);
         }
         yBound=new wsBound(yMid,room.yBound.max);
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
 
         yBound=new wsBound((room.yBound.max-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),(room.yBound.max-map.ROOM_FLOOR_HEIGHT));
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
 
             // the tube
         
@@ -76,7 +76,7 @@ class GenRoomDecorationLabClass
         zBound=new wsBound(pnt.z,(pnt.z+wid));
 
         yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // the pump
         
@@ -87,7 +87,7 @@ class GenRoomDecorationLabClass
         zBound.max-=reduceSize;
 
         yBound=new wsBound((room.yBound.max-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.5)),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
-        map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,xBound,yBound,zBound,null,false,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
     }
         
         //

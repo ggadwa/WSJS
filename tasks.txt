@@ -20,9 +20,10 @@ ToDos
 [DECORATIONS]
     * random rects
         [X] mapRoomConstants.ROOM_DECORATION_PILLARS:
-        mapRoomConstants.ROOM_DECORATION_STORAGE:
-        [ ] mapRoomConstants.ROOM_DECORATION_COMPUTER:
-              * change computer texture to have stripe for sides?
+        [ ] mapRoomConstants.ROOM_DECORATION_STORAGE:
+             - stuff on shelfs
+             - boxes spread across rect
+        [X] mapRoomConstants.ROOM_DECORATION_COMPUTER:
         mapRoomConstants.ROOM_DECORATION_PIPE:
         mapRoomConstants.ROOM_DECORATION_CUBICAL:
         mapRoomConstants.ROOM_DECORATION_LAB:
