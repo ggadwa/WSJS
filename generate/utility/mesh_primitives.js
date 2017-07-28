@@ -578,6 +578,11 @@ class MeshPrimitivesClass
         return(mesh);
     }
     
+    static meshCylinderScaleU(mesh,uScale)
+    {
+        MeshUtilityClass.transformUVs(mesh.vertexList,0.0,0.0,uScale,1.0);
+    }
+    
         //
         // frames
         //

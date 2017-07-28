@@ -81,45 +81,25 @@ class GenRoomDecorationCubicalClass
         // cubical decorations mainline
         //
 
-    create(room)
+    create(room,rect)
     {
-        let wid,xBound,yBound,zBound;
-        let bitmap;
-        let n,cubes;
+        let wid,yBound;
+        let bitmap=map.getTexture(map.TEXTURE_TYPE_FRAME);
         
-            // the cubes
-            
-        cubes=room.createRandomCubes(room);
-        
-            // get width and height
+            // get width
             
         wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),room.yBound.max);
-        
-            // wall bitmap
-            
-        bitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
         
             // create cubical walls
         
-        for (n=0;n!==cubes.length;n++) {
-            
-            xBound=new wsBound((room.xBound.min+(cubes[n].lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(cubes[n].rgt*map.ROOM_BLOCK_WIDTH)));
-            zBound=new wsBound((room.zBound.min+(cubes[n].top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(cubes[n].bot*map.ROOM_BLOCK_WIDTH)));
-            yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
-            map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
-
-              /*          
-            if (genRandom.randomPercentage(0.5)) {
-                yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),room.yBound.max);
-            }
-            else {
-                yBound=new wsBound((room.yBound.max-((room.storyCount-1)*map.ROOM_FLOOR_HEIGHT)),room.yBound.max);
-            }
-            
-            this.addCubicalWall(room,bitmap,cubes[n],wid,yBound);
-            */
+        if (genRandom.randomPercentage(0.5)) {
+            yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),room.yBound.max);
         }
+        else {
+            yBound=new wsBound((room.yBound.max-((room.storyCount-1)*map.ROOM_FLOOR_HEIGHT)),room.yBound.max);
+        }
+            
+        this.addCubicalWall(room,bitmap,rect,wid,yBound);
     }
 
 }

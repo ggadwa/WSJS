@@ -19,7 +19,7 @@ class GenRoomDecorationLabClass
         
     addTube(room,pnt,largeBase)
     {
-        let xBound,yBound,zBound;
+        let xBound,yBound,zBound,mesh;
         let wid,yMid,centerPnt,radius;
         let platformBitmap,metalBitmap;
 
@@ -52,7 +52,9 @@ class GenRoomDecorationLabClass
         
         radius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.3);
         
-        map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(metalBitmap,centerPnt,yBound,radius,map.MESH_FLAG_DECORATION));
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(metalBitmap,centerPnt,yBound,radius,map.MESH_FLAG_DECORATION);
+        MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
+        map.addMesh(mesh);
     }
     
         //
@@ -68,7 +70,7 @@ class GenRoomDecorationLabClass
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         metalBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-            // the top \base
+            // the top base
             
         wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.9);
 
@@ -94,38 +96,30 @@ class GenRoomDecorationLabClass
         // lab
         //
     
-    create(room)
+    create(room,rect)
     {
-        let n,x,z,cubes,rect;
+        let x,z;
         let pnt=new wsPoint(0,0);
         
-            // the cubes
-            
-        cubes=room.createRandomCubes(room);
-        
-            // create cubical walls
-        
-        for (n=0;n!==cubes.length;n++) {
-            rect=cubes[n];
-            
-            for (z=rect.top;z<rect.bot;z++) {
-                for (x=rect.lft;x<rect.rgt;x++) {
-                    room.setBlockGrid(0,x,z);
-                    pnt.setFromValues((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),room.yBound.min,(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)));
-                    
-                    switch (genRandom.randomIndex(3)) {
-                        case 0:
-                            this.addTube(room,pnt,false);
-                            break;
-                        case 1:
-                            this.addTube(room,pnt,true);
-                            break;
-                        case 2:
-                            this.addPump(room,pnt);
-                            break;
-                    }
-                    
+        for (z=rect.top;z!==rect.bot;z++) {
+            for (x=rect.lft;x!==rect.rgt;x++) {
+                pnt.setFromValues((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),room.yBound.min,(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)));
+                
+                this.addTube(room,pnt,false);
+                /*
+                switch (genRandom.randomIndex(3)) {
+                    case 0:
+                        this.addTube(room,pnt,false);
+                        break;
+                    case 1:
+                        this.addTube(room,pnt,true);
+                        break;
+                    case 2:
+                        this.addPump(room,pnt);
+                        break;
                 }
+                */
+
             }
         }
     }

@@ -891,7 +891,8 @@ class GenMapClass
             
             for (k=0;k!==nRect;k++) {
             
-                decorationType=mapRoomConstants.ROOM_DECORATION_STORAGE; // genRandom.randomIndex(7);        // +1 for a skip version
+                decorationType=genRandom.randomIndex(6);
+                decorationType=mapRoomConstants.ROOM_DECORATION_LAB; // genRandom.randomIndex(7);        // +1 for a skip version
             
                 switch (decorationType) {
                     case mapRoomConstants.ROOM_DECORATION_PILLARS:
@@ -907,15 +908,15 @@ class GenMapClass
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_PIPE:
-                        pipe.create(room);
+                        //pipe.create(room);
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_CUBICAL:
-                        cubicle.create(room);
+                        cubicle.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_LAB:
-                        lab.create(room);
+                        lab.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
 
