@@ -25,8 +25,7 @@ ToDos
         [ ] mapRoomConstants.ROOM_DECORATION_PIPE:
         [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
         [ ] mapRoomConstants.ROOM_DECORATION_LAB:
-              - corner pipes
-              - need pipe ends
+              - glowing vat texture
         > pits (wires, pipes)
     * remove decoration type from room class
     * types for low/high/water rooms

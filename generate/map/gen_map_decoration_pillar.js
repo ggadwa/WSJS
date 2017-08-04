@@ -52,7 +52,7 @@ class GenRoomDecorationPillarClass
         pos=new wsPoint(x,yBound.max,z);
         radius=Math.trunc(((rect.rgt-rect.lft)*map.ROOM_BLOCK_WIDTH)*0.3);
         
-        map.addMesh(MeshPrimitivesClass.createMeshCylinder(pillarBitmap,pos,yBound,this.segments,radius,map.MESH_FLAG_DECORATION));
+        map.addMesh(MeshPrimitivesClass.createMeshCylinder(pillarBitmap,pos,yBound,this.segments,radius,false,false,map.MESH_FLAG_DECORATION));
     }
     
     addPillarLineX(room,rect,pillarBitmap,platformBitmap)

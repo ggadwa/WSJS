@@ -439,27 +439,36 @@ class MeshPrimitivesClass
         return(segments);
     }
         
-    static createMeshCylinder(bitmap,centerPt,yBound,segments,radius,flags)
+    static createMeshCylinder(bitmap,centerPt,yBound,segments,radius,top,bot,flags)
     {
         let n,k,t,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let topRad,botRad;
         let u1,u2;
-        let vertexList,indexes,mesh,iCount,vIdx,iIdx;
+        let vertexList,indexes,mesh,vertexSize,indexSize,iCount,vIdx,iIdx,vStartIdx;
         let yAdd,ySegBound,ang,ang2,angAdd;
         let sideCount=12;
         let segCount=segments.length-1;     // always one extra for top
         
             // get cylder size
         
-        vertexList=MeshUtilityClass.createMapVertexList(segCount*(sideCount*6));
-        indexes=new Uint16Array(segCount*(sideCount*6));
+        vertexSize=segCount*(sideCount*6);
+        if (top) vertexSize+=sideCount;
+        if (bot) vertexSize+=sideCount;
+        vertexList=MeshUtilityClass.createMapVertexList(vertexSize);
+        
+        indexSize=segCount*(sideCount*6);
+        if (top) indexSize+=((sideCount-2)*3);
+        if (bot) indexSize+=((sideCount-2)*3);
+        indexes=new Uint16Array(indexSize);
 
         iCount=sideCount*6;
         
         vIdx=0;
         iIdx=0;
         
-            // cylinder segments
+        angAdd=360.0/sideCount;
+        
+            // cylinder side triangles
             
         yAdd=Math.trunc(yBound.getSize()/segCount);
             
@@ -477,7 +486,6 @@ class MeshPrimitivesClass
                 // cyliner faces
 
             ang=0.0;
-            angAdd=360.0/sideCount;
 
             for (n=0;n!==sideCount;n++) {
                 ang2=ang+angAdd;
@@ -554,6 +562,72 @@ class MeshPrimitivesClass
             ySegBound.min-=yAdd;
         }
         
+            // top and bottom triangles
+            
+        if (top) {
+            vStartIdx=vIdx;
+            
+            ang=0.0;
+            topRad=segments[0]*radius;
+
+            for (n=0;n!==sideCount;n++) {
+                rd=ang*DEGREE_TO_RAD;
+                
+                u1=(Math.sin(rd)*0.5)+0.5;
+                u2=(Math.cos(rd)*0.5)+0.5;
+
+                tx=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
+                tz=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
+                
+                    // the points
+                
+                v=vertexList[vIdx++];
+                v.position.setFromValues(tx,yBound.min,tz);
+                v.uv.setFromValues(u1,u2);
+                v.normal.setFromValues(0.0,-1.0,0.0);
+                
+                ang+=angAdd;
+            }
+
+            for (n=0;n!==(sideCount-2);n++) {
+                indexes[iIdx++]=vStartIdx;
+                indexes[iIdx++]=vStartIdx+(n+1);
+                indexes[iIdx++]=vStartIdx+(n+2);
+            }
+        }
+        
+        if (bot) {
+            vStartIdx=vIdx;
+            
+            ang=0.0;
+            botRad=segments[segments.length-1]*radius;
+
+            for (n=0;n!==sideCount;n++) {
+                rd=ang*DEGREE_TO_RAD;
+                
+                u1=(Math.sin(rd)*0.5)+0.5;
+                u2=(Math.cos(rd)*0.5)+0.5;
+
+                bx=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
+                bz=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
+                
+                    // the points
+                
+                v=vertexList[vIdx++];
+                v.position.setFromValues(bx,yBound.max,bz);
+                v.uv.setFromValues(u1,u2);
+                v.normal.setFromValues(0.0,1.0,0.0);
+                
+                ang+=angAdd;
+            }
+
+            for (n=0;n!==(sideCount-2);n++) {
+                indexes[iIdx++]=vStartIdx;
+                indexes[iIdx++]=vStartIdx+(n+1);
+                indexes[iIdx++]=vStartIdx+(n+2);
+            }
+        }
+        
             // calcualte the tangents
 
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
@@ -567,12 +641,12 @@ class MeshPrimitivesClass
         return(mesh);
     }
     
-    static createMeshCylinderSimple(bitmap,centerPt,yBound,radius,flags)
+    static createMeshCylinderSimple(bitmap,centerPt,yBound,radius,top,bot,flags)
     {
         let mesh;
         let segments=[1.0,1.0];
         
-        mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,radius,flags);
+        mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,radius,top,bot,flags);
         mesh.simpleCollisionGeometry=true;
         
         return(mesh);

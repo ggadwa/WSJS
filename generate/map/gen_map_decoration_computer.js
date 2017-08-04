@@ -259,11 +259,11 @@ class GenRoomDecorationComputerClass
         
         if (upperPipe) {
             pipeYBound=new wsBound(room.yBound.min,yBound.min);
-            map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPnt,pipeYBound,pipeRadius,map.MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,map.MESH_FLAG_DECORATION));
         }
         if (lowerPipe) {
             pipeYBound=new wsBound(yBound.max,pnt.y);
-            map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPnt,pipeYBound,pipeRadius,map.MESH_FLAG_DECORATION));
+            map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,map.MESH_FLAG_DECORATION));
         }
     }
     
