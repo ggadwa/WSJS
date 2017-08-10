@@ -1,12 +1,10 @@
-/* global view */
-
-"use strict";
+import view from '../../code/main/view.js';
 
 //
 // interface class
 //
 
-class InterfaceClass
+export default class InterfaceClass
 {
     constructor()
     {

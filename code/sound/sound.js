@@ -1,10 +1,10 @@
-"use strict";
+import wsPoint from '../../code/utility/point.js';
 
 //
 // sound class
 //
 
-class SoundClass
+export default class SoundClass
 {
     constructor()
     {

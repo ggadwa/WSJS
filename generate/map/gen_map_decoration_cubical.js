@@ -1,12 +1,12 @@
-/* global config, genRandom, map, MeshPrimitivesClass, mapRoomConstants */
-
-"use strict";
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // generate room cubical decoration class
 //
 
-class GenRoomDecorationCubicalClass
+export default class GenRoomDecorationCubicalClass
 {
     constructor()
     {

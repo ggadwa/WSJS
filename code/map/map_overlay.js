@@ -1,12 +1,14 @@
-/* global view, entityList, EntityProjectileClass */
-
-"use strict";
+import ws2DIntPoint from '../../code/utility/2D_int_point.js';
+import ws2DLine from '../../code/utility/2D_line.js';
+import wsRect from '../../code/utility/rect.js';
+import wsColor from '../../code/utility/color.js';
+import view from '../../code/main/view.js';
 
 //
 // map overlay class
 //
 
-class MapOverlayClass
+export default class MapOverlayClass
 {
     constructor()
     {

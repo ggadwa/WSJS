@@ -1,6 +1,4 @@
-/* global sound */
-
-"use strict";
+import sound from '../../code/sound/sound.js';
 
 class DebugItemClass
 {
@@ -18,7 +16,7 @@ class DebugItemClass
 // generated items
 //
 
-class DebugRunClass
+export default class DebugRunClass
 {
     constructor()
     {
@@ -607,17 +605,4 @@ class DebugRunClass
     {
         this.createInterface();
     }
-}
-
-//
-// the global debug bitmap object
-// and the debug runner
-//
-
-let debugRun=new DebugRunClass();
-
-function debugStart()
-{
-    
-    debugRun.run();
 }

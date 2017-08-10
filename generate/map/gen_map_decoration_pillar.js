@@ -1,12 +1,14 @@
-/* global MeshPrimitivesClass, config, genRandom, map */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import wsRect from '../../code/utility/rect.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // generate room pillar decoration class
 //
 
-class GenRoomDecorationPillarClass
+export default class GenRoomDecorationPillarClass
 {
     constructor()
     {

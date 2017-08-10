@@ -1,6 +1,4 @@
-/* global genRandom */
-
-"use strict";
+import genRandom from '../../generate/utility/random.js';
 
 //
 // special class for building sine waves
@@ -24,7 +22,7 @@ class SineWaveChunkClass
 // generate sound class
 //
 
-class GenSoundClass
+export default class GenSoundClass
 {
     constructor(ctx)
     {

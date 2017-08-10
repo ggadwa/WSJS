@@ -1,12 +1,12 @@
-/* global MeshUtilityClass, map, genRandom, config */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // map ledges
 //
 
-class GenRoomLedgeClass
+export default class GenRoomLedgeClass
 {
     constructor()
     {

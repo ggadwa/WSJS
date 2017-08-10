@@ -1,12 +1,11 @@
-/* global view */
-
-"use strict";
+import ShaderClass from '../../code/main/shader.js';
+import view from '../../code/main/view.js';
 
 //
 // map shader object
 //
 
-class MapLiquidShaderClass extends ShaderClass
+export default class MapLiquidShaderClass extends ShaderClass
 {
     constructor()
     {

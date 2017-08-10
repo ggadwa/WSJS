@@ -1,12 +1,16 @@
-/* global map, genRandom, config, view, MeshPrimitivesClass, mapRoomConstants */
-
-"use strict";
+import config from '../../code/main/config.js';
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import wsColor from '../../code/utility/color.js';
+import view from '../../code/main/view.js';
+import map from '../../code/map/map.js';
 
 //
 // generate map class
 //
 
-class GenMapClass
+export default class GenMapClass
 {
     constructor(callbackFunc)
     {
@@ -891,8 +895,8 @@ class GenMapClass
             
             for (k=0;k!==nRect;k++) {
             
-                decorationType=genRandom.randomIndex(6);
-                decorationType=mapRoomConstants.ROOM_DECORATION_LAB; // genRandom.randomIndex(7);        // +1 for a skip version
+                decorationType=genRandom.randomIndex(7);        // +1 for a skip version
+                //decorationType=mapRoomConstants.ROOM_DECORATION_PIPE; // supergumba -- testing
             
                 switch (decorationType) {
                     case mapRoomConstants.ROOM_DECORATION_PILLARS:
@@ -908,7 +912,7 @@ class GenMapClass
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_PIPE:
-                        //pipe.create(room);
+                        pipe.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
                     case mapRoomConstants.ROOM_DECORATION_CUBICAL:

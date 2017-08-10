@@ -1,5 +1,3 @@
-"use strict";
-
 //
 // class for some model constants
 // redo when static properities come to classes
@@ -25,7 +23,7 @@ let modelConstants=new ModelConstantsClass();
 // model object
 //
 
-class ModelClass
+export default class ModelClass
 {
     constructor(name,modelType)
     {

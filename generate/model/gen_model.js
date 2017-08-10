@@ -1,12 +1,8 @@
-/* global modelConstants */
-
-"use strict";
-
 //
 // generate a model
 //
 
-class GenModelClass
+export default class GenModelClass
 {
     constructor()
     {

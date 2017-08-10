@@ -1,6 +1,7 @@
-/* global modelLimbConstants, view */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import ws2DPoint from '../../code/utility/2D_point.js';
+import wsBound from '../../code/utility/bound.js';
+import view from '../../code/main/view.js';
 
 //
 // model mesh vertex
@@ -29,7 +30,7 @@ class ModelMeshVertexClass
 // model mesh class
 //
 
-class ModelMeshClass
+export default class ModelMeshClass
 {
     constructor(bitmap,vertexList,indexes,flag)
     {

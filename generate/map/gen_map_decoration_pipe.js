@@ -1,12 +1,15 @@
-/* global map, config, MeshPrimitivesClass, genRandom, DEGREE_TO_RAD, MeshUtilityClass, mapRoomConstants */
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
-"use strict";
+const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // generate room pipe decoration class
 //
 
-class GenRoomDecorationPipeClass
+export default class GenRoomDecorationPipeClass
 {
     constructor()
     {
@@ -440,18 +443,15 @@ class GenRoomDecorationPipeClass
         // pipes
         //
         
-    addPipes(room)
+    addPipeSet(room,x,z)
     {
-        let x,z,sx,sz,pos,yBound,platformBoundX,platformBoundY,platformBoundZ;
+        let px,pz,sx,sz,pos,yBound,platformBoundX,platformBoundY,platformBoundZ;
         let gridSize,radius,wid;
         let platformBitmap,pipeBitmap;
         let pnt,dir,dirLen;
         
-            // the pipes location
+            // bitmaps
 
-        pos=room.findAndBlockSpawnPosition(true);
-        if (pos===null) return;
-        
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
         pipeBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
@@ -463,35 +463,38 @@ class GenRoomDecorationPipeClass
         
             // the pipe platform
         
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos);
+        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(x,z);
         
         wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
 
-        platformBoundX=new wsBound((pos.x-wid),(pos.x+wid));
-        platformBoundZ=new wsBound((pos.z-wid),(pos.z+wid));
+        x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
+        z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
+        
+        platformBoundX=new wsBound((x-wid),(x+wid));
+        platformBoundZ=new wsBound((z-wid),(z+wid));
         
         platformBoundY=new wsBound((yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // determine direction
         
-        dir=room.getDirectionTowardsNearestWall(pos);
+        dir=room.getDirectionTowardsNearestWall(x,z);
         
         dirLen=dir.len-Math.trunc((map.ROOM_BLOCK_WIDTH*0.5)+(radius*2));
         if (dirLen<0) dirLen=100;
         
             // create the pipes
             
-        sx=(pos.x-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
-        sz=(pos.z-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sx=(x-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sz=(z-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
         
         pnt=new wsPoint(0,0,0);
 
-        for (z=0;z!==2;z++) {
-            for (x=0;x!==2;x++) {
-                pnt.x=sx+(x*gridSize);
+        for (pz=0;pz!==2;pz++) {
+            for (px=0;px!==2;px++) {
+                pnt.x=sx+(px*gridSize);
                 pnt.y=yBound.max-map.ROOM_FLOOR_DEPTH;
-                pnt.z=sz+(z*gridSize);
+                pnt.z=sz+(pz*gridSize);
                 
                 switch (genRandom.randomIndex(4)) {
                     case 0:
@@ -501,7 +504,7 @@ class GenRoomDecorationPipeClass
                         this.addPipeUp(room,pipeBitmap,pnt,radius,yBound);
                         break;
                     case 2:
-                        this.addPipeDown(room,pipeBitmap,x,z,pnt,radius,yBound);
+                        this.addPipeDown(room,pipeBitmap,px,pz,pnt,radius,yBound);
                         break;
                 }
             }
@@ -512,15 +515,14 @@ class GenRoomDecorationPipeClass
         // pipe decorations mainline
         //
 
-    create(room)
+    create(room,rect)
     {
-        let n;
-        let startCount=Math.trunc((room.xBlockSize*room.zBlockSize)*0.035);
-        let extraCount=Math.trunc((room.xBlockSize*room.zBlockSize)*0.1);
-        let pieceCount=genRandom.randomInt(startCount,extraCount);
-
-        for (n=0;n!==pieceCount;n++) {
-            this.addPipes(room);
+        let x,z;
+        
+        for (z=rect.top;z!==rect.bot;z++) {
+            for (x=rect.lft;x!==rect.rgt;x++) {
+                this.addPipeSet(room,x,z);
+            }
         }
     }
 

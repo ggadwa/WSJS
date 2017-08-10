@@ -1,12 +1,11 @@
-/* global view */
-
-"use strict";
+import ShaderClass from '../../code/main/shader.js';
+import view from '../../code/main/view.js';
 
 //
 // map shader object
 //
 
-class MapMeshShaderClass extends ShaderClass
+export default class MapMeshShaderClass extends ShaderClass
 {
     constructor()
     {

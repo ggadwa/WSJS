@@ -1,12 +1,13 @@
-/* global config, genRandom, map, MeshPrimitivesClass, mapRoomConstants */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // generate room computer decoration class
 //
 
-class GenRoomDecorationComputerClass
+export default class GenRoomDecorationComputerClass
 {
     constructor()
     {

@@ -6,103 +6,20 @@
 <meta charset="utf-8">
 <title>WSJS</title>
 
-<!-- the scripts -->
+<!-- the script -->
 
-<script type="text/javascript" src="code/main/config.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/defs.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/filecache.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/debug/debug_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/debug/debug.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/utility/random.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_wall.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_floor.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_ceiling.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_door.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_metal.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_machine.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_panel.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_box.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_liquid.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_skin.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_item.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_sky.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/bitmap/gen_bitmap_particle.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/view.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/input.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/bitmap/bitmap.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/sky/sky_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/sky/sky.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/light/light.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map_mesh_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map_mesh.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map_room.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map_liquid_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map_liquid.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map_overlay.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map_overlay_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/movement.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/movement_list.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/map/map.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/model/model_mesh_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/model/model.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/model/model_skeleton.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/model/model_mesh.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/model/model_list.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/ai.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/collisions.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/projectile.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/weapon.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/entity.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/entity_player.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/entity_monster.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/entity_projectile.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/entities/entity_list.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/particle/particle_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/particle/particle.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/particle/particle_list.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/text/text.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/text/text_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/interface/interface.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/interface/interface_shader.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/sound/sound.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/sound/sound_buffer.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/sound/sound_play.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/sound/sound_play_list.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/utility/mesh_utility.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/utility/mesh_primitives.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_hallway.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_stair.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_ledge.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_closet.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_window.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_platform.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_lift.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_decoration_pillar.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_decoration_storage.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_decoration_computer.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_decoration_pipe.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_decoration_cubical.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/map/gen_map_decoration_lab.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/model/gen_model.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/model/gen_model_creature_skeleton.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/model/gen_model_creature_mesh.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/model/gen_model_weapon_mesh.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/model/gen_model_projectile_mesh.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/thing/gen_ai.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/thing/gen_weapon.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/thing/gen_projectile.js" charset="utf-8"></script>
-<script type="text/javascript" src="generate/sound/gen_sound.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/ui_config.js" charset="utf-8"></script>
-<script type="text/javascript" src="code/main/main.js" charset="utf-8"></script>
+<script type="module">
+    import UIConfigClass from './code/main/ui_config.js';
+
+    let uiConfig=new UIConfigClass();
+    uiConfig.run();
+</script>
 
 </head>
 
 <!-- the body -->
 
-<body onload="uiConfigRun()">
+<body>
     
 <!-- google analytics -->
 <!-- this is just for me to track usages, you'll want to leave this commented out -->

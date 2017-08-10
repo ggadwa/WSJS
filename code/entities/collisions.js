@@ -1,12 +1,13 @@
-/* global entityList, map */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsLine from '../../code/utility/line.js';
+import wsBound from '../../code/utility/bound.js';
+import map from '../../code/map/map.js';
 
 //
 // collision class
 //
 
-class CollisionClass
+export default class CollisionClass
 {
     constructor()
     {

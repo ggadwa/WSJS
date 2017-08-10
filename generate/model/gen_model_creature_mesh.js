@@ -1,6 +1,8 @@
-/* global DEGREE_TO_RAD, genRandom, MeshUtilityClass, modelLimbConstants */
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
 
-"use strict";
+const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // helper class for globe shrinking
@@ -22,7 +24,7 @@ class GenModelCreatureBoneClass
 // gen creature mesh class
 //
 
-class GenModelCreatureMeshClass
+export default class GenModelCreatureMeshClass
 {
     constructor(model,bitmap)
     {

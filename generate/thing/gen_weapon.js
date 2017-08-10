@@ -1,12 +1,8 @@
-/* global modelList */
-
-"use strict";
-
 //
 // generate weapon class
 //
 
-class GenWeaponClass
+export default class GenWeaponClass
 {
     constructor()
     {

@@ -1,12 +1,10 @@
-/* global view */
-
-"use strict";
+import view from '../../code/main/view.js';
 
 //
 // bitmap class
 //
 
-class BitmapClass
+export default class BitmapClass
 {
     constructor(bitmapCanvas,normalMapCanvas,specularMapCanvas,glowMapCanvas,uvScale,shineFactor)
     {

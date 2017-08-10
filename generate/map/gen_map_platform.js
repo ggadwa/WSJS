@@ -1,12 +1,12 @@
-/* global map, config, MeshPrimitivesClass, genRandom, mapRoomConstants */
-
-"use strict";
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // map platforms
 //
 
-class GenRoomPlatformClass
+export default class GenRoomPlatformClass
 {
     constructor()
     {

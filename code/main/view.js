@@ -1,33 +1,13 @@
-/* global map, sky, entityList, debug, config, particleList, DEGREE_TO_RAD, input */
+import config from '../../code/main/config.js';
+import wsPoint from '../../code/utility/point.js';
+import wsRect from '../../code/utility/rect.js';
+import wsPlane from '../../code/utility/plane.js';
+import wsColor from '../../code/utility/color.js';
+import map from '../../code/map/map.js';
+import input from '../../code/main/input.js';
+import ViewCameraClass from '../../code/main/view_camera.js';
 
-"use strict";
-
-//
-// view camera class
-//
-
-class ViewCameraClass
-{
-    constructor()
-    {
-        this.position=new wsPoint(0.0,0.0,0.0);
-        this.angle=new wsPoint(0.0,0.0,0.0);
-        
-        Object.seal(this);
-    }
-    
-        //
-        // set camera to entity
-        //
-        
-    setToEntity(entity,eyeHigh)
-    {
-        this.position.setFromPoint(entity.position);
-        this.position.y-=eyeHigh;
-        this.angle.setFromPoint(entity.angle);
-    }
-    
-}
+const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // view class
@@ -924,3 +904,5 @@ class ViewClass
 //
 
 let view=new ViewClass();
+
+export default view;

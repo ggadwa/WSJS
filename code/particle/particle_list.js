@@ -1,6 +1,4 @@
-/* global view */
-
-"use strict";
+import view from '../../code/main/view.js';
 
 //
 // particle list class
@@ -293,3 +291,5 @@ class ParticleListClass
 //
 
 let particleList=new ParticleListClass();
+
+export default particleList;

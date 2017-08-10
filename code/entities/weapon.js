@@ -1,12 +1,11 @@
-/* global view */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import view from '../../code/main/view.js';
 
 //
 // weapon class
 //
 
-class WeaponClass
+export default class WeaponClass
 {
     constructor(model)
     {

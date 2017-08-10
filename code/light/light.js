@@ -1,6 +1,7 @@
-/* global view */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import wsColor from '../../code/utility/color.js';
+import view from '../../code/main/view.js';
 
 //
 // map light class
@@ -8,7 +9,7 @@
 // generic class for map, particle, etc lights
 //
 
-class LightClass
+export default class LightClass
 {
     constructor(position,color,intensity,exponent)
     {

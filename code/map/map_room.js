@@ -1,6 +1,11 @@
-/* global config, genRandom, MeshUtilityClass, map */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import ws2DIntPoint from '../../code/utility/2D_int_point.js';
+import ws2DLine from '../../code/utility/2D_line.js';
+import wsBound from '../../code/utility/bound.js';
+import wsRect from '../../code/utility/rect.js';
+import wsGrid from '../../code/utility/grid.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // special class that contains some constants
@@ -388,10 +393,10 @@ class MapRoomClass
         return(new wsBound(y,this.yBound.max));
     }
     
-    getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(pos)
+    getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(x,z)
     {
-        let x=Math.trunc(((pos.x-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
-        let z=Math.trunc(((pos.z-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
+        x=Math.trunc(((x-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
+        z=Math.trunc(((z-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
         return(this.getGroundFloorSpawnToFirstPlatformOrTopBound(x,z));
     }
     
@@ -408,12 +413,12 @@ class MapRoomClass
         // find direction towards nearest wall
         //
     
-    getDirectionTowardsNearestWall(pos)
+    getDirectionTowardsNearestWall(x,z)
     {
-        let distLft=pos.x-this.xBound.min;
-        let distRgt=this.xBound.max-pos.x;
-        let distTop=pos.z-this.zBound.min;
-        let distBot=this.zBound.max-pos.z;
+        let distLft=x-this.xBound.min;
+        let distRgt=this.xBound.max-x;
+        let distTop=z-this.zBound.min;
+        let distBot=this.zBound.max-z;
         
         if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
             return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_LEFT,distLft));

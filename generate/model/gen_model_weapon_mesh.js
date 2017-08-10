@@ -1,12 +1,12 @@
-/* global DEGREE_TO_RAD, MeshUtilityClass */
+import wsPoint from '../../code/utility/point.js';
 
-"use strict";
+const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // gen weapon mesh class
 //
 
-class GenModelWeaponMeshClass
+export default class GenModelWeaponMeshClass
 {
     constructor(model,bitmap)
     {

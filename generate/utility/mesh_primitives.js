@@ -1,12 +1,15 @@
-/* global MeshUtilityClass, genRandom, DEGREE_TO_RAD, map */
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
-"use strict";
+const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // mesh primitives class (static)
 //
 
-class MeshPrimitivesClass
+export default class MeshPrimitivesClass
 {
     constructor()
     {

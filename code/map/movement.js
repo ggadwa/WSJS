@@ -1,6 +1,6 @@
-/* global map, entityList, view */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import view from '../../code/main/view.js';
+import map from '../../code/map/map.js';
 
 //
 // single move class
@@ -20,7 +20,7 @@ class MoveClass
 // movement class
 //
 
-class MovementClass
+export default class MovementClass
 {
     constructor(meshIdx,looping,approachDistance)
     {

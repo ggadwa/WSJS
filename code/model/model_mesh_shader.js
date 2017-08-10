@@ -1,12 +1,11 @@
-/* global view */
-
-"use strict";
+import ShaderClass from '../../code/main/shader.js';
+import view from '../../code/main/view.js';
 
 //
 // model shader class
 //
 
-class ModelMeshShaderClass extends ShaderClass
+export default class ModelMeshShaderClass extends ShaderClass
 {
     constructor()
     {

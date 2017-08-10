@@ -1,6 +1,9 @@
-/* global view */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import ws2DPoint from '../../code/utility/2D_point.js';
+import wsLine from '../../code/utility/line.js';
+import wsBound from '../../code/utility/bound.js';
+import wsCollisionRect from '../../code/utility/collision_rect.js';
+import view from '../../code/main/view.js';
 
 //
 // map mesh vertex
@@ -58,7 +61,7 @@ class MapMeshSharedTrigCacheClass
 // map mesh class
 //
 
-class MapMeshClass
+export default class MapMeshClass
 {
     constructor(bitmap,vertexList,indexes,flag)
     {

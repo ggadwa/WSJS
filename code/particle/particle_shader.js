@@ -1,12 +1,11 @@
-/* global view */
-
-"use strict";
+import ShaderClass from '../../code/main/shader.js';
+import view from '../../code/main/view.js';
 
 //
 // particle shader class
 //
 
-class ParticleShaderClass extends ShaderClass
+export default class ParticleShaderClass extends ShaderClass
 {
     constructor()
     {

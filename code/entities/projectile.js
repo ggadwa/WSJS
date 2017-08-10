@@ -1,12 +1,10 @@
-/* global entityList, sound */
-
-"use strict";
+import sound from '../../code/sound/sound.js';
 
 //
 // projectile class
 //
 
-class ProjectileClass
+export default class ProjectileClass
 {
     constructor(model)
     {

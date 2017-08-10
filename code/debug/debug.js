@@ -1,6 +1,6 @@
-/* global view, particleList */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsColor from '../../code/utility/color.js';
+import view from '../../code/main/view.js';
 
 //
 // debug class
@@ -701,3 +701,5 @@ class DebugClass
 //
 
 let debug=new DebugClass();
+
+export default debug;

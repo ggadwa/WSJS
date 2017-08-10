@@ -1,12 +1,10 @@
-/* global view */
-
-"use strict";
+import view from '../../code/main/view.js';
 
 //
 // interface shader class
 //
 
-class InterfaceShaderClass extends ShaderClass
+export default class InterfaceShaderClass extends ShaderClass
 {
     constructor()
     {

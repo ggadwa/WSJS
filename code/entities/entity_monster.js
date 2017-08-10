@@ -1,12 +1,13 @@
-/* global entityList, config, sound, view */
-
-"use strict";
+import config from '../../code/main/config.js';
+import wsPoint from '../../code/utility/point.js';
+import view from '../../code/main/view.js';
+import sound from '../../code/sound/sound.js';
 
 //
 // monster entity class
 //
 
-class EntityMonsterClass extends EntityClass
+export default class EntityMonsterClass extends EntityClass
 {
     constructor(name,position,angle,maxHealth,model,ai)
     {

@@ -1,12 +1,12 @@
-/* global map, MeshUtilityClass, config, MeshPrimitivesClass */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import map from '../../code/map/map.js';
 
 //
 // map hallways and doors
 //
 
-class GenRoomHallwayClass
+export default class GenRoomHallwayClass
 {
     constructor()
     {

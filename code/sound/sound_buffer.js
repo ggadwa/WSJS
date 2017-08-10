@@ -1,10 +1,8 @@
-"use strict";
-
 //
 // sound buffer class
 //
 
-class SoundBufferClass
+export default class SoundBufferClass
 {
     constructor(buffer,maxDistance)
     {

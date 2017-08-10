@@ -1,12 +1,11 @@
-/* global view, particleList, sound */
-
-"use strict";
+import view from '../../code/main/view.js';
+import sound from '../../code/sound/sound.js';
 
 //
 // entity projectile object
 //
 
-class EntityProjectileClass extends EntityClass
+export default class EntityProjectileClass extends EntityClass
 {
     constructor(name,parentEntityId,position,angle,projectile)
     {

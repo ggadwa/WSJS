@@ -1,12 +1,10 @@
-/* global config */
-
-"use strict";
+import config from '../../code/main/config.js';
 
 //
 // player entity class
 //
 
-class EntityPlayerClass extends EntityClass
+export default class EntityPlayerClass extends EntityClass
 {
     constructor(name,position,angle,maxHealth,model)
     {

@@ -1,10 +1,8 @@
-"use strict";
-
 //
 // sound play list class
 //
 
-class SoundPlayListClass
+export default class SoundPlayListClass
 {
     constructor()
     {

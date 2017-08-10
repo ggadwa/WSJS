@@ -1,12 +1,10 @@
-/* global config */
-
-"use strict";
+import config from '../../code/main/config.js';
 
 //
 // sound play class
 //
 
-class SoundPlayClass
+export default class SoundPlayClass
 {
     constructor()
     {

@@ -1,12 +1,10 @@
-/* global view */
-
-"use strict";
+import view from '../../code/main/view.js';
 
 //
 // debug shader class
 //
 
-class DebugShaderClass extends ShaderClass
+export default class DebugShaderClass extends ShaderClass
 {
     constructor()
     {

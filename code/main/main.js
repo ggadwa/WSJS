@@ -1,6 +1,33 @@
-/* global fileCache, view, sound, map, modelList, sky, entityList, particleList, debug, config, genRandom, input, modelConstants */
+import config from '../../code/main/config.js';
+import wsPoint from '../../code/utility/point.js';
+import genRandom from '../../generate/utility/random.js';
+import fileCache from '../../code/main/filecache.js';
+import view from '../../code/main/view.js';
+import map from '../../code/map/map.js';
+import sound from '../../code/sound/sound.js';
+import input from '../../code/main/input.js';
 
-"use strict";
+
+// supergumba -- testing
+
+class MainClass
+{
+    constructor()
+    {
+    }
+    
+    run()
+    {
+        console.log('HERE');
+    }
+}
+
+
+/*
+
+
+
+
 
 //
 // main class
@@ -309,12 +336,6 @@ class MainClass
 }
 
 //
-// single global object is the main class
-//
-
-let main=new MainClass();
-
-//
 // main loop
 //
 
@@ -401,8 +422,12 @@ function mainLoop(timeStamp)
         }
     }
 }
+*/
 
-function mainRun()
-{
-    main.run();
-}
+//
+// single global object is the main class
+//
+
+let main=new MainClass();
+
+export default main;

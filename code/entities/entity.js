@@ -1,12 +1,15 @@
-/* global view, map */
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import view from '../../code/main/view.js';
+import map from '../../code/map/map.js';
 
-"use strict";
+const RAD_TO_DEGREE=180.0/Math.PI;
 
 //
 // entity base class
 //
 
-class EntityClass
+export default class EntityClass
 {
     constructor(name,position,angle,maxHealth,model)
     {

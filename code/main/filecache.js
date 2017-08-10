@@ -1,5 +1,3 @@
-"use strict";
-
 // these functions are used so we can asyc load up the files
 // we need without breaking the initialization process up
 
@@ -129,3 +127,5 @@ class FileCacheClass
 //
 
 let fileCache=new FileCacheClass();
+
+export default fileCache;

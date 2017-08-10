@@ -1,10 +1,10 @@
-"use strict";
+import wsPoint from '../../code/utility/point.js';
 
 //
 // mesh utility class (static)
 //
 
-class MeshUtilityClass
+export default class MeshUtilityClass
 {
     constructor()
     {

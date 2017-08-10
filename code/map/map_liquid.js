@@ -1,6 +1,6 @@
-/* global view, config, map */
-
-"use strict";
+import wsBound from '../../code/utility/bound.js';
+import view from '../../code/main/view.js';
+import map from '../../code/map/map.js';
 
 //
 // map liquid class
@@ -9,7 +9,7 @@
 // Y past the single top Y
 //
 
-class MapLiquidClass
+export default class MapLiquidClass
 {
     constructor(bitmap,room)
     {

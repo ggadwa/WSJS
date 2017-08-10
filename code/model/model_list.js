@@ -1,5 +1,3 @@
-"use strict";
-
 //
 // model list class
 //
@@ -85,3 +83,5 @@ class ModelListClass
 //
 
 let modelList=new ModelListClass();
+
+export default modelList;

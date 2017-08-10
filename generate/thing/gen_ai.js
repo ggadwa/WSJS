@@ -1,12 +1,10 @@
-/* global genRandom, config */
-
-"use strict";
+import genRandom from '../../generate/utility/random.js';
 
 //
 // generate projectile class
 //
 
-class GenAIClass
+export default class GenAIClass
 {
     constructor(genProjectile,genSound)
     {

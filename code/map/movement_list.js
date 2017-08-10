@@ -1,10 +1,8 @@
-"use strict";
-
 //
 // movement list class
 //
 
-class MovementListClass
+export default class MovementListClass
 {
     constructor()
     {

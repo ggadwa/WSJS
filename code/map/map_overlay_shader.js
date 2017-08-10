@@ -1,12 +1,11 @@
-/* global view */
-
-"use strict";
+import ShaderClass from '../../code/main/shader.js';
+import view from '../../code/main/view.js';
 
 //
 // map overlay shader class
 //
 
-class MapOverlayShaderClass extends ShaderClass
+export default class MapOverlayShaderClass extends ShaderClass
 {
     constructor()
     {

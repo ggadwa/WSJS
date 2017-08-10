@@ -1,6 +1,18 @@
-/* global view, genRandom, config, debug */
-
-"use strict";
+import config from '../../code/main/config.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
+import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
+import GenBitmapWallClass from '../../generate/bitmap/gen_bitmap_wall.js';
+import GenBitmapFloorClass from '../../generate/bitmap/gen_bitmap_floor.js';
+import GenBitmapCeilingClass from '../../generate/bitmap/gen_bitmap_ceiling.js';
+import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
+import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
+import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
+import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
+import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
+import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
+import view from '../../code/main/view.js';
 
 //
 // map class
@@ -700,3 +712,5 @@ class MapClass
 //
 
 let map=new MapClass();
+
+export default map;

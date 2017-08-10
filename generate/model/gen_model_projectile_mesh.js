@@ -1,12 +1,11 @@
-/* global MeshUtilityClass */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
 
 //
 // gen projectile mesh class
 //
 
-class GenModelProjectileMeshClass
+export default class GenModelProjectileMeshClass
 {
     constructor(model,bitmap)
     {

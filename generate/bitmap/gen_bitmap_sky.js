@@ -1,12 +1,12 @@
-/* global genRandom */
-
-"use strict";
+import wsColor from '../../code/utility/color.js';\
+import genRandom from '../../generate/utility/random.js';
+import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
 //
 // generate sky bitmap class
 //
 
-class GenBitmapSkyClass extends GenBitmapClass
+export default class GenBitmapSkyClass extends GenBitmapClass
 {
     constructor()
     {    

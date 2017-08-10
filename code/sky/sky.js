@@ -1,12 +1,10 @@
-/* global view */
-
-"use strict";
+import view from '../../code/main/view.js';
 
 //
 // sky class
 //
 
-class SkyClass
+export default class SkyClass
 {
     constructor()
     {

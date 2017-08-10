@@ -1,12 +1,13 @@
-/* global view, genRandom */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsColor from '../../code/utility/color.js';
+import genRandom from '../../generate/utility/random.js';
+import view from '../../code/main/view.js';
 
 //
 // particle class
 //
 
-class ParticleClass
+export default class ParticleClass
 {
     constructor()
     {

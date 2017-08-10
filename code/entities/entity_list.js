@@ -1,5 +1,3 @@
-"use strict";
-
 //
 // entity list class
 //
@@ -140,3 +138,5 @@ class EntityListClass
 //
 
 let entityList=new EntityListClass();
+
+export default entityList;

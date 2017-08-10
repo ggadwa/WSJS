@@ -1,6 +1,5 @@
-/* global view, fileCache */
-
-"use strict";
+import fileCache from '../../code/main/filecache.js';
+import view from '../../code/main/view.js';
 
 //
 // generic shader light class
@@ -21,7 +20,7 @@ class ShaderLightClass
 // generic shader class
 //
 
-class ShaderClass
+export default class ShaderClass
 {
     constructor()
     {

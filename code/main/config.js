@@ -1,5 +1,3 @@
-"use strict";
-
 //
 // Configuration Class
 //
@@ -74,3 +72,5 @@ class ConfigClass
 }
 
 let config=new ConfigClass();
+
+export default config;

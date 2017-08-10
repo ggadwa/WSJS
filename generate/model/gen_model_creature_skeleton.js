@@ -1,12 +1,11 @@
-/* global modelLimbConstants, genRandom, config, modelConstants, map */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import genRandom from '../../generate/utility/random.js';
 
 //
 // gen creature skeleton class
 //
 
-class GenModelCreatureSkeletonClass
+export default class GenModelCreatureSkeletonClass
 {
     constructor(model,sizeFactor)
     {

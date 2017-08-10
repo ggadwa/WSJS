@@ -1,12 +1,12 @@
-/* global view */
-
-"use strict";
+import wsColor from '../../code/utility/color.js';
+import view from '../../code/main/view.js';
+import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
 //
 // text class
 //
 
-class TextClass
+export default class TextClass
 {
     constructor()
     {

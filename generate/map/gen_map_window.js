@@ -1,12 +1,13 @@
-/* global MeshUtilityClass, map, genRandom, config, mapRoomConstants, MeshPrimitivesClass */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // generate room window class
 //
 
-class GenRoomWindowClass
+export default class GenRoomWindowClass
 {
     constructor()
     {

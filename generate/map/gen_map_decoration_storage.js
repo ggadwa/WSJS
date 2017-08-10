@@ -1,12 +1,13 @@
-/* global map, genRandom, MeshPrimitivesClass, config */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // generate room storage decoration class
 //
 
-class GenRoomDecorationStorageClass
+export default class GenRoomDecorationStorageClass
 {
     constructor()
     {

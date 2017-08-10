@@ -1,6 +1,4 @@
-/* global view */
-
-"use strict";
+import view from '../../code/main/view.js';
 
 //
 // input class
@@ -290,3 +288,5 @@ class InputClass
 //
 
 let input=new InputClass();
+
+export default input;

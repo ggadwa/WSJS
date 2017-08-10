@@ -1,12 +1,8 @@
-/* global config */
-
-"use strict";
-
 //
 // AI class
 //
 
-class AIClass
+export default class AIClass
 {
     constructor()
     {

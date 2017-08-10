@@ -1,6 +1,4 @@
-/* global config */
-
-"use strict";
+import config from '../../code/main/config.js';
 
 //
 // gen random object
@@ -63,3 +61,5 @@ class GenRandomClass
 }
 
 let genRandom=new GenRandomClass(config.SEED);
+
+export default genRandom;

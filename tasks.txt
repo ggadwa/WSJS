@@ -1,5 +1,4 @@
 ES6
-    [ ] modularize the code (do genRandom first)
     [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass (search all constants)
 
 When interface created
@@ -13,6 +12,21 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
+particleList
+entityList
+fileCache
+modelList
+sky
+debug
+modelConstants
+ModelLimbConstants
+EntityProjectileClass
+MeshPrimitivesClass
+mapRoomConstants
+MeshUtilityClass
+
+----> all wsPoint/etc needs to be PointClass and such
+----> break up all the multi-class modules
 
 
 ToDos
@@ -25,8 +39,8 @@ ToDos
         [ ] mapRoomConstants.ROOM_DECORATION_PIPE:
         [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
         [ ] mapRoomConstants.ROOM_DECORATION_LAB:
-              - glowing vat texture
-        > pits (wires, pipes)
+              - glowing vat texture, glass cylinders
+        [ ] pits (wires, pipes)
     * remove decoration type from room class
     * types for low/high/water rooms
     * special edge ones (panels, conduits)

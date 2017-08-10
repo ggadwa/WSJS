@@ -1,6 +1,7 @@
-/* global genRandom, view, modelConstants */
+import wsPoint from '../../code/utility/point.js';
+import view from '../../code/main/view.js';
+import genRandom from '../../generate/utility/random.js';
 
-"use strict";
 
 //
 // model bone class
@@ -109,7 +110,7 @@ class ModelLimbClass
 // model skeleton class
 //
 
-class ModelSkeletonClass
+export default class ModelSkeletonClass
 {
     constructor()
     {

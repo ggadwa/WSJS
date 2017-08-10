@@ -1,12 +1,13 @@
-/* global MeshPrimitivesClass, config, genRandom, map */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // generate room lab decoration class
 //
 
-class GenRoomDecorationLabClass
+export default class GenRoomDecorationLabClass
 {
     constructor()
     {
@@ -43,7 +44,7 @@ class GenRoomDecorationLabClass
         map.addMesh(mesh);
 
         yBound=new wsBound((room.yBound.max-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),(room.yBound.max-map.ROOM_FLOOR_HEIGHT));
-        mesh=MeshPrimitivesClass.createMeshCylinderSimple(platformBitmap,centerPnt,yBound,radius,false,true,map.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(platformBitmap,centerPnt,yBound,radius,true,true,map.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         map.addMesh(mesh);
 
@@ -62,10 +63,10 @@ class GenRoomDecorationLabClass
         // lab pump
         //
 
-    addPump(room,pnt)
+    addPump(room,x,z)
     {
         let xBound,yBound,zBound;
-        let wid,reduceSize;
+        let reduceSize;
         let platformBitmap,metalBitmap;
 
         platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
@@ -73,10 +74,11 @@ class GenRoomDecorationLabClass
         
             // the top base
             
-        wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.9);
+        x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
+        z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
 
-        xBound=new wsBound(pnt.x,(pnt.x+wid));
-        zBound=new wsBound(pnt.z,(pnt.z+wid));
+        xBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
+        zBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
 
         yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
@@ -100,27 +102,17 @@ class GenRoomDecorationLabClass
     create(room,rect)
     {
         let x,z;
-        let pnt=new wsPoint(0,0);
         
         for (z=rect.top;z!==rect.bot;z++) {
             for (x=rect.lft;x!==rect.rgt;x++) {
-                pnt.setFromValues((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),room.yBound.min,(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)));
-                
-                this.addTube(room,x,z);
-                /*
-                switch (genRandom.randomIndex(3)) {
+                switch (genRandom.randomIndex(2)) {
                     case 0:
-                        this.addTube(room,pnt,false);
+                        this.addTube(room,x,z);
                         break;
                     case 1:
-                        this.addTube(room,pnt,true);
-                        break;
-                    case 2:
-                        this.addPump(room,pnt);
+                        this.addPump(room,x,z);
                         break;
                 }
-                */
-
             }
         }
     }

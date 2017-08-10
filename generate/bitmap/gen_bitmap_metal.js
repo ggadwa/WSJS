@@ -1,12 +1,11 @@
-/* global genRandom */
-
-"use strict";
+import genRandom from '../../generate/utility/random.js';
+import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
 //
 // generate metal bitmap class
 //
 
-class GenBitmapMetalClass extends GenBitmapClass
+export default class GenBitmapMetalClass extends GenBitmapClass
 {
     constructor()
     {

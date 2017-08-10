@@ -1,12 +1,11 @@
-/* global view */
-
-"use strict";
+import ShaderClass from '../../code/main/shader.js';
+import view from '../../code/main/view.js';
 
 //
 // sky shader class
 //
 
-class SkyShaderClass extends ShaderClass
+export default class SkyShaderClass extends ShaderClass
 {
     constructor()
     {

@@ -1,12 +1,13 @@
-/* global map, config, MeshPrimitivesClass, genRandom, mapRoomConstants */
-
-"use strict";
+import wsPoint from '../../code/utility/point.js';
+import wsBound from '../../code/utility/bound.js';
+import genRandom from '../../generate/utility/random.js';
+import map from '../../code/map/map.js';
 
 //
 // map lifts
 //
 
-class GenRoomLiftClass
+export default class GenRoomLiftClass
 {
     constructor()
     {

@@ -1,11 +1,12 @@
-"use strict";
+import config from '../../code/main/config.js';
+import main from '../../code/main/main.js';
 
 //
 // startup UI configuring class
 // this is probably temporary
 //
 
-class UIConfigClass
+export default class UIConfigClass
 {
     constructor()
     {
@@ -69,7 +70,7 @@ class UIConfigClass
         
             // start game
             
-        mainRun();
+        main.run();
     }
     
     run()
@@ -212,10 +213,4 @@ class UIConfigClass
         document.body.appendChild(mainDiv);
         
     }
-}
-
-function uiConfigRun()
-{
-    let uiConfig=new UIConfigClass();
-    uiConfig.run();
 }
