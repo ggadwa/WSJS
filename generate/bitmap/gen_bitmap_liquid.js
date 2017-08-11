@@ -1,4 +1,4 @@
-import wsColor from '../../code/utility/color.js';
+import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
@@ -28,7 +28,7 @@ export default class GenBitmapLiquidClass extends GenBitmapClass
     
     drawOvalGradient(bitmapCTX,lft,top,rgt,bot,startColor,endColor)
     {
-        let col=new wsColor(startColor.r,startColor.g,startColor.b);
+        let col=new ColorClass(startColor.r,startColor.g,startColor.b);
         let count,rAdd,gAdd,bAdd;
         
         let wid=rgt-lft;

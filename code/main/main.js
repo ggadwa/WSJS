@@ -1,5 +1,5 @@
 import config from '../../code/main/config.js';
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 import genRandom from '../../generate/utility/random.js';
 import fileCache from '../../code/main/filecache.js';
 import view from '../../code/main/view.js';
@@ -254,7 +254,7 @@ class MainClass
             return;
         }
 
-        playerEntity=new EntityPlayerClass('player',pos,new wsPoint(0.0,0.0,0.0),200,modelList.getModel('player'));
+        playerEntity=new EntityPlayerClass('player',pos,new PointClass(0.0,0.0,0.0),200,modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
         playerWeapon=genWeapon.generate();
@@ -282,7 +282,7 @@ class MainClass
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
             model=modelList.cloneModel('monster_'+monsterType);
-            entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
         
             // boss monster
@@ -290,7 +290,7 @@ class MainClass
         if (config.MONSTER_BOSS) {
             pos=map.findRandomBossPosition();
             model=modelList.cloneModel('boss');
-            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new wsPoint(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
+            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 
             // finished

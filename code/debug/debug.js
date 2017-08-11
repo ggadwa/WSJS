@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsColor from '../../code/utility/color.js';
+import PointClass from '../../code/utility/point.js';
+import ColorClass from '../../code/utility/color.js';
 import view from '../../code/main/view.js';
 
 //
@@ -38,7 +38,7 @@ class DebugClass
         let n,vertexPosBuffer,indexBuffer;
         let gl=view.gl;
 
-        this.debugShader.drawStart(new wsColor(1.0,0.0,0.0));
+        this.debugShader.drawStart(new ColorClass(1.0,0.0,0.0));
         
             // setup the buffers
 
@@ -115,7 +115,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(new wsColor(1.0,0.0,1.0));
+        this.debugShader.drawStart(new ColorClass(1.0,0.0,1.0));
 
             // setup the buffers
 
@@ -182,7 +182,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(new wsColor(0.0,0.0,1.0));
+        this.debugShader.drawStart(new ColorClass(0.0,0.0,1.0));
 
             // setup the buffers
 
@@ -292,7 +292,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(new wsColor(1.0,1.0,0.0));
+        this.debugShader.drawStart(new ColorClass(1.0,1.0,0.0));
 
             // setup the buffers
 
@@ -347,7 +347,7 @@ class DebugClass
         vertices=new Float32Array(nBone*3);
         indexes=new Uint16Array(nBone*2);
         
-        rotVector=new wsPoint(0,0,0);
+        rotVector=new PointClass(0,0,0);
 
         vIdx=0;
 
@@ -374,7 +374,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(new wsColor(0.0,1.0,0.0));
+        this.debugShader.drawStart(new ColorClass(0.0,1.0,0.0));
 
             // setup the buffers
 
@@ -463,7 +463,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(new wsColor(1.0,0.0,1.0));
+        this.debugShader.drawStart(new ColorClass(1.0,0.0,1.0));
 
             // setup the buffers
 
@@ -533,7 +533,7 @@ class DebugClass
 
             // set the shader
 
-        this.debugShader.drawStart(new wsColor(0.0,0.0,1.0));
+        this.debugShader.drawStart(new ColorClass(0.0,0.0,1.0));
 
             // setup the buffers
 
@@ -592,7 +592,7 @@ class DebugClass
 
             // start the shader
             
-        this.debugShader.drawStart(new wsColor(1.0,0.0,0.0));
+        this.debugShader.drawStart(new ColorClass(1.0,0.0,0.0));
         
             // setup the buffers
 

@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -41,12 +41,12 @@ export default class GenRoomDecorationStorageClass
         x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
         z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
             
-        boxXBound=new wsBound((x+this.boxMargin),((x+map.ROOM_BLOCK_WIDTH)-this.boxMargin));
-        boxYBound=new wsBound((room.yBound.max-this.boxHigh),room.yBound.max);
-        boxZBound=new wsBound((z+this.boxMargin),((z+map.ROOM_BLOCK_WIDTH)-this.boxMargin));
+        boxXBound=new BoundClass((x+this.boxMargin),((x+map.ROOM_BLOCK_WIDTH)-this.boxMargin));
+        boxYBound=new BoundClass((room.yBound.max-this.boxHigh),room.yBound.max);
+        boxZBound=new BoundClass((z+this.boxMargin),((z+map.ROOM_BLOCK_WIDTH)-this.boxMargin));
         
-        boxPos=new wsPoint(0,0,0);
-        rotAngle=new wsPoint(0.0,0.0,0.0);
+        boxPos=new PointClass(0,0,0);
+        rotAngle=new PointClass(0.0,0.0,0.0);
         
             // stacks of boxes
             
@@ -95,22 +95,22 @@ export default class GenRoomDecorationStorageClass
             // some preset bounds
             
         mesh=null;
-        rotAngle=new wsPoint(0,0,0);
+        rotAngle=new PointClass(0,0,0);
         
-        tableXBound=new wsBound((x+this.xShelfMargin),((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
-        tableYBound=new wsBound((room.yBound.max-this.shelfHigh),((room.yBound.max-this.shelfHigh)+map.ROOM_FLOOR_DEPTH));
-        tableZBound=new wsBound((z+this.zShelfMargin),((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
+        tableXBound=new BoundClass((x+this.xShelfMargin),((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
+        tableYBound=new BoundClass((room.yBound.max-this.shelfHigh),((room.yBound.max-this.shelfHigh)+map.ROOM_FLOOR_DEPTH));
+        tableZBound=new BoundClass((z+this.zShelfMargin),((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
 
-        legXMinBound=new wsBound((x+this.xShelfMargin),((x+this.xShelfMargin)+legWid));
-        legXMaxBound=new wsBound((((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin)-legWid),((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
-        legZMinBound=new wsBound((z+this.zShelfMargin),((z+this.zShelfMargin)+legWid));
-        legZMaxBound=new wsBound((((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin)-legWid),((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
+        legXMinBound=new BoundClass((x+this.xShelfMargin),((x+this.xShelfMargin)+legWid));
+        legXMaxBound=new BoundClass((((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin)-legWid),((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
+        legZMinBound=new BoundClass((z+this.zShelfMargin),((z+this.zShelfMargin)+legWid));
+        legZMaxBound=new BoundClass((((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin)-legWid),((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
         
-        legYBound=new wsBound(((room.yBound.max-this.shelfHigh)+map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        legYBound=new BoundClass(((room.yBound.max-this.shelfHigh)+map.ROOM_FLOOR_DEPTH),room.yBound.max);
         
-        boxXBound=new wsBound(0,0,0);
-        boxYBound=new wsBound(0,0,0);
-        boxZBound=new wsBound(0,0,0);
+        boxXBound=new BoundClass(0,0,0);
+        boxYBound=new BoundClass(0,0,0);
+        boxZBound=new BoundClass(0,0,0);
         
         minBoxHigh=Math.trunc(this.shelfHigh*0.5);
         extraBoxHigh=Math.trunc(this.shelfHigh*0.25);

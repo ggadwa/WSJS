@@ -1,5 +1,5 @@
 import config from '../../code/main/config.js';
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 import view from '../../code/main/view.js';
 import sound from '../../code/sound/sound.js';
 
@@ -32,8 +32,8 @@ export default class EntityMonsterClass extends EntityClass
         
             // global to stop GC
             
-        this.fireAngle=new wsPoint(0,0,0);
-        this.firePosition=new wsPoint(0,0,0);
+        this.fireAngle=new PointClass(0,0,0);
+        this.firePosition=new PointClass(0,0,0);
         
         Object.seal(this);
     }

@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -108,7 +108,7 @@ export default class GenRoomLedgeClass
         xMax=room.xBlockSize*map.ROOM_BLOCK_WIDTH;
         zMax=room.zBlockSize*map.ROOM_BLOCK_WIDTH;
         
-        pts=[new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0),new wsPoint(0,0,0)];
+        pts=[new PointClass(0,0,0),new PointClass(0,0,0),new PointClass(0,0,0),new PointClass(0,0,0),new PointClass(0,0,0)];
 
             // left and right sides
         

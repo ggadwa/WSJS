@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 
 const DEGREE_TO_RAD=Math.PI/180.0;
@@ -417,8 +417,8 @@ export default class GenModelCreatureMeshClass
         let nBone=boneList.length;
         let moving=[];
         let anyMove;
-        let moveVector=new wsPoint(0,0,0);
-        let gravityVector=new wsPoint(0,0,0);
+        let moveVector=new PointClass(0,0,0);
+        let gravityVector=new PointClass(0,0,0);
         let moveCount=0;
         let boneHit;
         
@@ -584,7 +584,7 @@ export default class GenModelCreatureMeshClass
         
         let prevMove=new Uint8Array(nVertex);
         
-        pos=new wsPoint(0,0,0);
+        pos=new PointClass(0,0,0);
 
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
@@ -683,7 +683,7 @@ export default class GenModelCreatureMeshClass
                 listBone=new GenModelCreatureBoneClass();
                 listBone.idx=-1;
                 
-                listBone.position=new wsPoint(0,0,0);
+                listBone.position=new PointClass(0,0,0);
                 
                 listBone.position.x=bone.position.x+((parentBone.position.x-bone.position.x)*f);
                 listBone.position.y=bone.position.y+((parentBone.position.y-bone.position.y)*f);
@@ -697,12 +697,12 @@ export default class GenModelCreatureMeshClass
         
             // find the bounds for this list of bones
             
-        xBound=new wsBound(0,0);
-        yBound=new wsBound(0,0);
-        zBound=new wsBound(0,0);
+        xBound=new BoundClass(0,0);
+        yBound=new BoundClass(0,0);
+        zBound=new BoundClass(0,0);
         
         this.findBoundsForBoneList(boneList,xBound,yBound,zBound);
-        centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // build the globe around the bones
             
@@ -767,12 +767,12 @@ export default class GenModelCreatureMeshClass
             // get the center in case there's a no-attachment
             // bone (this shouldn't happen right now)
             
-        xBound=new wsBound(0,0);
-        yBound=new wsBound(0,0);
-        zBound=new wsBound(0,0);
+        xBound=new BoundClass(0,0);
+        yBound=new BoundClass(0,0);
+        zBound=new BoundClass(0,0);
         
         this.findBoundsForBoneList(bones,xBound,yBound,zBound);
-        centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // find the closest bone in the bone list,
             // even though we have attachments, we need to
@@ -826,7 +826,7 @@ export default class GenModelCreatureMeshClass
         
             // random body scaling
             
-        fullBodyScale=new wsPoint(1.0,1.0,(1.0-genRandom.randomFloat(0.0,0.2)));
+        fullBodyScale=new PointClass(1.0,1.0,(1.0-genRandom.randomFloat(0.0,0.2)));
         
             // wrap all the limbs
             

@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -29,8 +29,8 @@ export default class GenRoomDecorationPipeClass
         let u1,u2,vfact;
         let ang,ang2,angAdd;
         let mesh,vertexList,indexes,iCount,vIdx;
-        let nextPnt=new wsPoint(0,0,0);
-        let addPnt=new wsPoint(0,0,0);
+        let nextPnt=new PointClass(0,0,0);
+        let addPnt=new PointClass(0,0,0);
         
             // get turn pieces
         
@@ -155,10 +155,10 @@ export default class GenRoomDecorationPipeClass
         let u1,u2;
         let ang,ang2,angAdd;
         let mesh,vertexList,indexes,iCount,vIdx,iIdx;
-        let pipeAng=new wsPoint(xStart,0,zStart);
-        let nextPipeAng=new wsPoint(0,0,0);
-        let nextPnt=new wsPoint(0,0,0);
-        let addPnt=new wsPoint(0,0,0);
+        let pipeAng=new PointClass(xStart,0,zStart);
+        let nextPipeAng=new PointClass(0,0,0);
+        let nextPnt=new PointClass(0,0,0);
+        let addPnt=new PointClass(0,0,0);
         
             // get turn pieces
         
@@ -304,7 +304,7 @@ export default class GenRoomDecorationPipeClass
             // pipes always start up
             // length of up has to be a multiple of story size
             
-        pipeAng=new wsPoint(0,0,180.0);     // force len to point up
+        pipeAng=new PointClass(0,0,180.0);     // force len to point up
         
         len=genRandom.randomInt(1,(room.storyCount-1));
         len=(len*(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH))-((radius*2)+map.ROOM_FLOOR_DEPTH);
@@ -363,7 +363,7 @@ export default class GenRoomDecorationPipeClass
         len=(pnt.y-yBound.min)+map.ROOM_FLOOR_DEPTH;
         
         if (len>0) {
-            pipeAng=new wsPoint(0,0,180.0);     // force len to point up
+            pipeAng=new PointClass(0,0,180.0);     // force len to point up
             this.addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng);
         }
     }
@@ -372,13 +372,13 @@ export default class GenRoomDecorationPipeClass
     {
         let pipeAng;
         
-        pipeAng=new wsPoint(0,0,180.0);     // force len to point up
+        pipeAng=new PointClass(0,0,180.0);     // force len to point up
         this.addPipeStraightChunk(bitmap,pnt,(pnt.y-yBound.min),radius,pipeAng);
     }
         
     addPipeDown(room,bitmap,x,z,pnt,radius,yBound)
     {
-        let pipeAng=new wsPoint(0,0,0);
+        let pipeAng=new PointClass(0,0,0);
         
         if (x===0) {
             
@@ -470,10 +470,10 @@ export default class GenRoomDecorationPipeClass
         x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
         z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
         
-        platformBoundX=new wsBound((x-wid),(x+wid));
-        platformBoundZ=new wsBound((z-wid),(z+wid));
+        platformBoundX=new BoundClass((x-wid),(x+wid));
+        platformBoundZ=new BoundClass((z-wid),(z+wid));
         
-        platformBoundY=new wsBound((yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        platformBoundY=new BoundClass((yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // determine direction
@@ -488,7 +488,7 @@ export default class GenRoomDecorationPipeClass
         sx=(x-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
         sz=(z-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
         
-        pnt=new wsPoint(0,0,0);
+        pnt=new PointClass(0,0,0);
 
         for (pz=0;pz!==2;pz++) {
             for (px=0;px!==2;px++) {

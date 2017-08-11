@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 
 //
 // mesh utility class (static)
@@ -98,7 +98,7 @@ export default class MeshUtilityClass
             meshCenter=meshCenterPoint;
         }
         else {
-            meshCenter=new wsPoint(0.0,0.0,0.0);
+            meshCenter=new PointClass(0.0,0.0,0.0);
             
             for (n=0;n!==nVertex;n++) {
                 meshCenter.addPoint(vertexList[n].position);
@@ -109,8 +109,8 @@ export default class MeshUtilityClass
             meshCenter.z/=nVertex;
         }
         
-        trigCenter=new wsPoint(0.0,0.0,0.0);
-        faceVct=new wsPoint(0.0,0.0,0.0);
+        trigCenter=new PointClass(0.0,0.0,0.0);
+        faceVct=new PointClass(0.0,0.0,0.0);
 
             // generate normals by the trigs
             // sometimes we will end up overwriting
@@ -118,9 +118,9 @@ export default class MeshUtilityClass
             // constant shared vertices against
             // triangle normals
 
-        p10=new wsPoint(0.0,0.0,0.0);
-        p20=new wsPoint(0.0,0.0,0.0);
-        normal=new wsPoint(0.0,0.0,0.0);
+        p10=new PointClass(0.0,0.0,0.0);
+        p20=new PointClass(0.0,0.0,0.0);
+        normal=new PointClass(0.0,0.0,0.0);
 
         nTrig=Math.trunc(indexes.length/3);
 
@@ -187,7 +187,7 @@ export default class MeshUtilityClass
             // the dot product of the normal
             // and an up vector
 
-        mapUp=new wsPoint(0.0,-1.0,0.0);
+        mapUp=new PointClass(0.0,-1.0,0.0);
 
             // run through the vertices
             // remember, both this and normals
@@ -285,13 +285,13 @@ export default class MeshUtilityClass
             // goes on to create the normal, because
             // we need that first to make the UVs
 
-        let p10=new wsPoint(0.0,0.0,0.0);
-        let p20=new wsPoint(0.0,0.0,0.0);
-        let vLeft=new wsPoint(0.0,0.0,0.0);
-        let vRight=new wsPoint(0.0,0.0,0.0);
-        let vNum=new wsPoint(0.0,0.0,0.0);
+        let p10=new PointClass(0.0,0.0,0.0);
+        let p20=new PointClass(0.0,0.0,0.0);
+        let vLeft=new PointClass(0.0,0.0,0.0);
+        let vRight=new PointClass(0.0,0.0,0.0);
+        let vNum=new PointClass(0.0,0.0,0.0);
         let denom;
-        let tangent=new wsPoint(0.0,0.0,0.0);
+        let tangent=new PointClass(0.0,0.0,0.0);
 
         nTrig=Math.trunc(indexes.length/3);
 

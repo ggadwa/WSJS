@@ -1,9 +1,7 @@
-import wsBound from '../../code/utility/bound.js';
-
 const DEGREE_TO_RAD=Math.PI/180.0;
 const RAD_TO_DEGREE=180.0/Math.PI;
 
-export default class ws2DPoint
+export default class Point2DClass
 {
     constructor(x,y)
     {
@@ -73,6 +71,6 @@ export default class ws2DPoint
     
     copy()
     {
-        return(new ws2DPoint(this.x,this.y));
+        return(new Point2DClass(this.x,this.y));
     }
 }

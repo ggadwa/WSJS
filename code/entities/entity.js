@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import view from '../../code/main/view.js';
 import map from '../../code/map/map.js';
 
@@ -22,7 +22,7 @@ export default class EntityClass
         this.radius=this.model.calculateRadius();
         this.high=this.model.calculateHeight();
         
-        this.positionBackup=new wsPoint(0,0,0);
+        this.positionBackup=new PointClass(0,0,0);
         
         this.eyeOffset=3000;
 
@@ -47,7 +47,7 @@ export default class EntityClass
         this.movementSideLeftOn=false;
         this.movementSideRightOn=false;
         
-        this.movement=new wsPoint(0,0,0);
+        this.movement=new PointClass(0,0,0);
         this.gravity=this.gravityMinValue;
         
         this.currentRoom=null;
@@ -63,16 +63,16 @@ export default class EntityClass
         
         this.damageTintStartTick=-1;
 
-        this.movePt=new wsPoint(0,0,0);     // this are global to stop them being local and GC'd
-        this.checkMovePt=new wsPoint(0,0,0);
-        this.collideMovePt=new wsPoint(0,0,0);
-        this.collideSlideMovePt=new wsPoint(0,0,0);
-        this.reflectMovementVector=new wsPoint(0,0,0);
-        this.reflectLineVector=new wsPoint(0,0,0);
+        this.movePt=new PointClass(0,0,0);     // this are global to stop them being local and GC'd
+        this.checkMovePt=new PointClass(0,0,0);
+        this.collideMovePt=new PointClass(0,0,0);
+        this.collideSlideMovePt=new PointClass(0,0,0);
+        this.reflectMovementVector=new PointClass(0,0,0);
+        this.reflectLineVector=new PointClass(0,0,0);
 
-        this.xFrustumBound=new wsBound(0,0);
-        this.yFrustumBound=new wsBound(0,0);
-        this.zFrustumBound=new wsBound(0,0);
+        this.xFrustumBound=new BoundClass(0,0);
+        this.yFrustumBound=new BoundClass(0,0);
+        this.zFrustumBound=new BoundClass(0,0);
         
         this.pushMesh=null;
 

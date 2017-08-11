@@ -1,4 +1,4 @@
-import wsColor from '../../code/utility/color.js';
+import ColorClass from '../../code/utility/color.js';
 import view from '../../code/main/view.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
@@ -33,7 +33,7 @@ export default class TextClass
 
         this.fontCharWids=new Array(128);
 
-        this.shadowColor=new wsColor(0.0,0.0,0.0);
+        this.shadowColor=new ColorClass(0.0,0.0,0.0);
 
             // drawing objects
 
@@ -73,7 +73,7 @@ export default class TextClass
             // so it can be colored
 
         genBitmapUtility=new GenBitmapClass();
-        genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,new wsColor(0.0,0.0,0.0));
+        genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,new ColorClass(0.0,0.0,0.0));
 
             // draw the text
 

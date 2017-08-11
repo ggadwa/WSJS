@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -116,7 +116,7 @@ export default class MeshPrimitivesClass
             // rotate
             
         if (rotAngle!==null) {
-            centerPt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            centerPt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
             MeshUtilityClass.rotateVertexes(vertexList,centerPt,rotAngle);
         }
         
@@ -348,7 +348,7 @@ export default class MeshPrimitivesClass
             // rotate
             
         if (rotAngle!==null) {
-            centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
             MeshUtilityClass.rotateVertexes(vertexList,centerPnt,rotAngle);
         }
         
@@ -404,7 +404,7 @@ export default class MeshPrimitivesClass
             // rotate
             
         if (rotAngle!==null) {
-            centerPnt=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
             MeshUtilityClass.rotateVertexes(vertexList,centerPnt,rotAngle);
         }
 
@@ -666,9 +666,9 @@ export default class MeshPrimitivesClass
         
     static createFrameX(bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
     {
-        let xFrameBound=new wsBound(0,0);
-        let yFrameBound=new wsBound(0,0);
-        let zFrameBound=new wsBound(0,0);
+        let xFrameBound=new BoundClass(0,0);
+        let yFrameBound=new BoundClass(0,0);
+        let zFrameBound=new BoundClass(0,0);
         let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
         let halfSz=Math.trunc(sz*0.5);
         let y,z,mesh;
@@ -717,9 +717,9 @@ export default class MeshPrimitivesClass
     
     static createFrameZ(bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
     {
-        let xFrameBound=new wsBound(0,0);
-        let yFrameBound=new wsBound(0,0);
-        let zFrameBound=new wsBound(0,0);
+        let xFrameBound=new BoundClass(0,0);
+        let yFrameBound=new BoundClass(0,0);
+        let zFrameBound=new BoundClass(0,0);
         let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
         let halfSz=Math.trunc(sz*0.5);
         let x,y,mesh;

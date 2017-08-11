@@ -1,7 +1,7 @@
 const DEGREE_TO_RAD=Math.PI/180.0;
 const RAD_TO_DEGREE=180.0/Math.PI;
 
-export default class wsPoint
+export default class PointClass
 {
     constructor(x,y,z)
     {
@@ -452,6 +452,6 @@ export default class wsPoint
     
     copy()
     {
-        return(new wsPoint(this.x,this.y,this.z));
+        return(new PointClass(this.x,this.y,this.z));
     }
 }

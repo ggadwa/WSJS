@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 
 //
 // view camera class
@@ -8,8 +8,8 @@ export default class ViewCameraClass
 {
     constructor()
     {
-        this.position=new wsPoint(0.0,0.0,0.0);
-        this.angle=new wsPoint(0.0,0.0,0.0);
+        this.position=new PointClass(0.0,0.0,0.0);
+        this.angle=new PointClass(0.0,0.0,0.0);
         
         Object.seal(this);
     }

@@ -1,4 +1,4 @@
-import wsBound from '../../code/utility/bound.js';
+import BoundClass from '../../code/utility/bound.js';
 import view from '../../code/main/view.js';
 import map from '../../code/map/map.js';
 
@@ -28,7 +28,7 @@ export default class MapLiquidClass
             // so the frustum calcs can use it
             
         this.y=room.getLiquidY();
-        this.yBound=new wsBound(this.y,this.y);
+        this.yBound=new BoundClass(this.y,this.y);
         
             // null buffers
 

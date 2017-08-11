@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -23,8 +23,8 @@ export default class GenRoomLiftClass
         let len,meshIdx,movement,moveMSec,waitMSec;
         let liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-        let xLiftBound=new wsBound((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
-        let zLiftBound=new wsBound((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
+        let xLiftBound=new BoundClass((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
+        let zLiftBound=new BoundClass((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
 
         meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,map.MESH_FLAG_LIFT));
         
@@ -39,10 +39,10 @@ export default class GenRoomLiftClass
         
         len=yLiftBound.getSize()-map.ROOM_FLOOR_DEPTH;
         
-        movement.addMove(new MoveClass(moveMSec,new wsPoint(0,len,0)));
-        movement.addMove(new MoveClass(waitMSec,new wsPoint(0,len,0)));
-        movement.addMove(new MoveClass(moveMSec,new wsPoint(0,0,0)));
-        movement.addMove(new MoveClass(waitMSec,new wsPoint(0,0,0)));
+        movement.addMove(new MoveClass(moveMSec,new PointClass(0,len,0)));
+        movement.addMove(new MoveClass(waitMSec,new PointClass(0,len,0)));
+        movement.addMove(new MoveClass(moveMSec,new PointClass(0,0,0)));
+        movement.addMove(new MoveClass(waitMSec,new PointClass(0,0,0)));
         
         map.addMovement(movement); 
 
@@ -108,7 +108,7 @@ export default class GenRoomLiftClass
         
             // create lift
             
-        yBound=new wsBound(room.yBound.max,room.mainPathConnectedRoom.yBound.max);
+        yBound=new BoundClass(room.yBound.max,room.mainPathConnectedRoom.yBound.max);
         
         this.addLiftChunk(room,x,yBound,z);
     }

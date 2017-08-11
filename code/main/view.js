@@ -1,8 +1,8 @@
 import config from '../../code/main/config.js';
-import wsPoint from '../../code/utility/point.js';
-import wsRect from '../../code/utility/rect.js';
-import wsPlane from '../../code/utility/plane.js';
-import wsColor from '../../code/utility/color.js';
+import PointClass from '../../code/utility/point.js';
+import RectClass from '../../code/utility/rect.js';
+import PlaneClass from '../../code/utility/plane.js';
+import ColorClass from '../../code/utility/color.js';
 import map from '../../code/map/map.js';
 import input from '../../code/main/input.js';
 import ViewCameraClass from '../../code/main/view_camera.js';
@@ -37,9 +37,9 @@ class ViewClass
         this.wid=0;
         this.high=0;
         this.aspect=0.0;
-        this.lookAtUpVector=new wsPoint(0.0,1.0,0.0);
+        this.lookAtUpVector=new PointClass(0.0,1.0,0.0);
 
-        this.eyePos=new wsPoint(0.0,0.0,0.0);
+        this.eyePos=new PointClass(0.0,0.0,0.0);
 
             // the gl matrixes
 
@@ -60,7 +60,7 @@ class ViewClass
 
             // view lighting
 
-        this.ambient=new wsColor(0.0,0.0,0.0);
+        this.ambient=new ColorClass(0.0,0.0,0.0);
 
         this.MAX_LIGHT_COUNT=24;
         this.lights=[];
@@ -71,12 +71,12 @@ class ViewClass
 
         this.clipPlane=new Float32Array(16);            // global to avoid GCd
 
-        this.frustumLeftPlane=new wsPlane(0.0,0.0,0.0,0.0);
-        this.frustumRightPlane=new wsPlane(0.0,0.0,0.0,0.0);
-        this.frustumTopPlane=new wsPlane(0.0,0.0,0.0,0.0);
-        this.frustumBottomPlane=new wsPlane(0.0,0.0,0.0,0.0);
-        this.frustumNearPlane=new wsPlane(0.0,0.0,0.0,0.0);
-        this.frustumFarPlane=new wsPlane(0.0,0.0,0.0,0.0);
+        this.frustumLeftPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumRightPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumTopPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumBottomPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumNearPlane=new PlaneClass(0.0,0.0,0.0,0.0);
+        this.frustumFarPlane=new PlaneClass(0.0,0.0,0.0,0.0);
 
             // additional view classes
 
@@ -112,25 +112,25 @@ class ViewClass
             // health
         
         this.uiHealthHigh=0;
-        this.uiHealthRect=new wsRect(0,0,0,0);
-        this.uiHealthColor=new wsColor(1.0,0.0,0.0);
-        this.uiHealthFrameRect=new wsRect(0,0,0,0);
-        this.uiHealthFrameColor=new wsColor(1.0,1.0,1.0);
+        this.uiHealthRect=new RectClass(0,0,0,0);
+        this.uiHealthColor=new ColorClass(1.0,0.0,0.0);
+        this.uiHealthFrameRect=new RectClass(0,0,0,0);
+        this.uiHealthFrameColor=new ColorClass(1.0,1.0,1.0);
         this.uiHealthAlpha=0.7;
         
             // tinting
             
-        this.uiTintRect=new wsRect(0,0,0,0);
-        this.uiTintColor=new wsColor(1.0,0.0,0.0);
+        this.uiTintRect=new RectClass(0,0,0,0);
+        this.uiTintColor=new ColorClass(1.0,0.0,0.0);
 
             // loading screen
 
         this.loadingStrings=[];
         this.loadingLastAddMsec=0;
-        this.loadingBarRect=new wsRect(0,0,0,0);
-        this.loadingBarColor=new wsColor(0.3,0.1,1.0);
-        this.loadingBarFrameRect=new wsRect(0,0,0,0);
-        this.loadingBarFrameColor=new wsColor(1.0,1.0,1.0);
+        this.loadingBarRect=new RectClass(0,0,0,0);
+        this.loadingBarColor=new ColorClass(0.3,0.1,1.0);
+        this.loadingBarFrameRect=new RectClass(0,0,0,0);
+        this.loadingBarFrameColor=new ColorClass(1.0,1.0,1.0);
         
         Object.seal(this);
     }
@@ -722,10 +722,10 @@ class ViewClass
         }
         
         this.text.drawStart();
-        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new wsColor(1.0,1.0,0.0));
+        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new ColorClass(1.0,1.0,0.0));
         if (this.paused) {
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',this.text.TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',this.text.TEXT_ALIGN_CENTER,new wsColor(1.0,1.0,0.0));
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',this.text.TEXT_ALIGN_CENTER,new ColorClass(1.0,1.0,0.0));
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',this.text.TEXT_ALIGN_CENTER,new ColorClass(1.0,1.0,0.0));
         }
         this.text.drawEnd();
     }
@@ -780,10 +780,10 @@ class ViewClass
         this.text.drawStart();
         
         y=(this.high-30)-((nLine-1)*22);
-        col=new wsColor(1.0,1.0,1.0);
+        col=new ColorClass(1.0,1.0,1.0);
         
         for (n=0;n!==nLine;n++) {
-            if (n===(nLine-1)) col=new wsColor(1.0,0.3,0.3);
+            if (n===(nLine-1)) col=new ColorClass(1.0,0.3,0.3);
             this.text.draw(5,y,20,18,this.loadingStrings[n],this.text.TEXT_ALIGN_LEFT,col);
             y+=22;
         }

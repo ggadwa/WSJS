@@ -25,7 +25,6 @@ MeshPrimitivesClass
 mapRoomConstants
 MeshUtilityClass
 
-----> all wsPoint/etc needs to be PointClass and such
 ----> break up all the multi-class modules
 
 

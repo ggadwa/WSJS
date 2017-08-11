@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -129,7 +129,7 @@ export default class GenRoomStairsClass
             // need a center point to better
             // create normals
             
-        meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        meshCenterPoint=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
@@ -175,10 +175,10 @@ export default class GenRoomStairsClass
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(16);
             
-            zThickBound=new wsBound(zBound.min,(zBound.min+thickSize));
+            zThickBound=new BoundClass(zBound.min,(zBound.min+thickSize));
             idx=this.createSingleWallX(idx,vertexList,xBound.min,yBoundTop,yBoundTop,zThickBound);
             idx=this.createSingleWallX(idx,vertexList,xBound.max,yBoundBottom,yBoundBottom,zThickBound); 
-            zThickBound=new wsBound((zBound.max-thickSize),zBound.max);
+            zThickBound=new BoundClass((zBound.max-thickSize),zBound.max);
             idx=this.createSingleWallX(idx,vertexList,xBound.min,yBoundTop,yBoundTop,zThickBound);
             idx=this.createSingleWallX(idx,vertexList,xBound.max,yBoundBottom,yBoundBottom,zThickBound);
             this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_ROOM_WALL);
@@ -188,7 +188,7 @@ export default class GenRoomStairsClass
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(4);
 
-            zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
+            zStepBound=new BoundClass((zBound.min+thickSize),(zBound.max-thickSize));
             this.createSingleCeilingX(idx,vertexList,xBound,yBoundTop,yBoundBottom,zStepBound);
             this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_CEILING);
         }
@@ -197,23 +197,23 @@ export default class GenRoomStairsClass
         
         if (toPlatform) {
             if (!flip) {
-                yBoundTop=new wsBound((yBound.max-stepDrop),yBound.max);
-                yBoundBottom=new wsBound((yBound.min-stepDrop),yBound.max);
+                yBoundTop=new BoundClass((yBound.max-stepDrop),yBound.max);
+                yBoundBottom=new BoundClass((yBound.min-stepDrop),yBound.max);
             }
             else {
-                yBoundTop=new wsBound((yBound.min-stepDrop),yBound.max);
-                yBoundBottom=new wsBound((yBound.max-stepDrop),yBound.max);
+                yBoundTop=new BoundClass((yBound.min-stepDrop),yBound.max);
+                yBoundBottom=new BoundClass((yBound.max-stepDrop),yBound.max);
             }
             
-            yBoundFront=new wsBound((yBound.max-stepDrop),yBound.max);
-            yBoundBack=new wsBound((yBound.max-stairHigh),yBound.max);
+            yBoundFront=new BoundClass((yBound.max-stepDrop),yBound.max);
+            yBoundBack=new BoundClass((yBound.max-stairHigh),yBound.max);
             
                 // the edges
                 
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(20);
             
-            zStepBound=new wsBound(zBound.min,(zBound.min+thickSize));
+            zStepBound=new BoundClass(zBound.min,(zBound.min+thickSize));
             
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.min);
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
@@ -225,7 +225,7 @@ export default class GenRoomStairsClass
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(20);
             
-            zStepBound=new wsBound((zBound.max-thickSize),zBound.max);
+            zStepBound=new BoundClass((zBound.max-thickSize),zBound.max);
             
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.min);
             idx=this.createSingleWallZ(idx,vertexList,xBound,yBoundBottom,yBoundTop,zStepBound.max);
@@ -238,7 +238,7 @@ export default class GenRoomStairsClass
                 idx=0;
                 vertexList=MeshUtilityClass.createMapVertexList(4);
                 
-                zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
+                zStepBound=new BoundClass((zBound.min+thickSize),(zBound.max-thickSize));
 
                 this.createSingleWallX(idx,vertexList,(flip?xBound.max:xBound.min),yBoundBack,yBoundBack,zStepBound);
                 this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_STAIR);
@@ -253,17 +253,17 @@ export default class GenRoomStairsClass
         nIdx=0;
         if (!flip) {
             stepAdd=xBound.getSize()/this.STAIR_STEP_COUNT;
-            xStepBound=new wsBound(xBound.min,(xBound.min+stepAdd));
+            xStepBound=new BoundClass(xBound.min,(xBound.min+stepAdd));
         }
         else {
             stepAdd=-(xBound.getSize()/this.STAIR_STEP_COUNT);
-            xStepBound=new wsBound((xBound.max+stepAdd),xBound.max);
+            xStepBound=new BoundClass((xBound.max+stepAdd),xBound.max);
         }
         
-        yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
+        yStepBound=new BoundClass(yBound.min,(yBound.min+stepDrop));
         if (!toPlatform) yStepBound.add(-map.ROOM_FLOOR_DEPTH);
         
-        zStepBound=new wsBound((zBound.min+thickSize),(zBound.max-thickSize));
+        zStepBound=new BoundClass((zBound.min+thickSize),(zBound.max-thickSize));
 
         for (n=0;n!==this.STAIR_STEP_COUNT;n++) {
             if (!flip) {
@@ -300,7 +300,7 @@ export default class GenRoomStairsClass
             // need a center point to better
             // create normals
             
-        meshCenterPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        meshCenterPoint=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
             // stairs need to be pushed in on
             // the edges so they have a wall thickness
@@ -346,10 +346,10 @@ export default class GenRoomStairsClass
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(16);
             
-            xThickBound=new wsBound(xBound.min,(xBound.min+thickSize));
+            xThickBound=new BoundClass(xBound.min,(xBound.min+thickSize));
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundTop,yBoundTop,zBound.min);
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundBottom,yBoundBottom,zBound.max);
-            xThickBound=new wsBound((xBound.max-thickSize),xBound.max);
+            xThickBound=new BoundClass((xBound.max-thickSize),xBound.max);
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundTop,yBoundTop,zBound.min);
             idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBoundBottom,yBoundBottom,zBound.max);
             this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_ROOM_WALL);
@@ -359,7 +359,7 @@ export default class GenRoomStairsClass
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(4);
 
-            xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
+            xStepBound=new BoundClass((xBound.min+thickSize),(xBound.max-thickSize));
             this.createSingleCeilingZ(idx,vertexList,xStepBound,yBoundTop,yBoundBottom,zBound);
             this.finishStairMesh(roomBitmap,vertexList,true,meshCenterPoint,true,map.MESH_FLAG_ROOM_CEILING);
         }
@@ -368,23 +368,23 @@ export default class GenRoomStairsClass
         
         if (toPlatform) {
             if (!flip) {
-                yBoundTop=new wsBound((yBound.max-stepDrop),yBound.max);
-                yBoundBottom=new wsBound((yBound.min-stepDrop),yBound.max);
+                yBoundTop=new BoundClass((yBound.max-stepDrop),yBound.max);
+                yBoundBottom=new BoundClass((yBound.min-stepDrop),yBound.max);
             }
             else {
-                yBoundTop=new wsBound((yBound.min-stepDrop),yBound.max);
-                yBoundBottom=new wsBound((yBound.max-stepDrop),yBound.max);
+                yBoundTop=new BoundClass((yBound.min-stepDrop),yBound.max);
+                yBoundBottom=new BoundClass((yBound.max-stepDrop),yBound.max);
             }
             
-            yBoundFront=new wsBound((yBound.max-stepDrop),yBound.max);
-            yBoundBack=new wsBound((yBound.max-stairHigh),yBound.max);
+            yBoundFront=new BoundClass((yBound.max-stepDrop),yBound.max);
+            yBoundBack=new BoundClass((yBound.max-stairHigh),yBound.max);
             
                 // the edges
                 
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(20);
             
-            xStepBound=new wsBound(xBound.min,(xBound.min+thickSize));
+            xStepBound=new BoundClass(xBound.min,(xBound.min+thickSize));
             
             idx=this.createSingleWallX(idx,vertexList,xStepBound.min,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
@@ -396,7 +396,7 @@ export default class GenRoomStairsClass
             idx=0;
             vertexList=MeshUtilityClass.createMapVertexList(20);
             
-            xStepBound=new wsBound((xBound.max-thickSize),xBound.max);
+            xStepBound=new BoundClass((xBound.max-thickSize),xBound.max);
             
             idx=this.createSingleWallX(idx,vertexList,xStepBound.min,yBoundBottom,yBoundTop,zBound);
             idx=this.createSingleWallX(idx,vertexList,xStepBound.max,yBoundBottom,yBoundTop,zBound);
@@ -409,7 +409,7 @@ export default class GenRoomStairsClass
                 idx=0;
                 vertexList=MeshUtilityClass.createMapVertexList(4);
 
-                xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
+                xStepBound=new BoundClass((xBound.min+thickSize),(xBound.max-thickSize));
 
                 this.createSingleWallZ(idx,vertexList,xStepBound,yBoundBack,yBoundBack,(flip?zBound.max:zBound.min));
                 this.finishStairMesh(stairBitmap,vertexList,true,meshCenterPoint,false,map.MESH_FLAG_STAIR);
@@ -424,18 +424,18 @@ export default class GenRoomStairsClass
         nIdx=0;
         if (!flip) {
             stepAdd=zBound.getSize()/this.STAIR_STEP_COUNT;
-            zStepBound=new wsBound(zBound.min,(zBound.min+stepAdd));
+            zStepBound=new BoundClass(zBound.min,(zBound.min+stepAdd));
 
         }
         else {
             stepAdd=-(zBound.getSize()/this.STAIR_STEP_COUNT);
-            zStepBound=new wsBound((zBound.max+stepAdd),zBound.max);
+            zStepBound=new BoundClass((zBound.max+stepAdd),zBound.max);
         }
         
-        yStepBound=new wsBound(yBound.min,(yBound.min+stepDrop));
+        yStepBound=new BoundClass(yBound.min,(yBound.min+stepDrop));
         if (!toPlatform) yStepBound.add(-map.ROOM_FLOOR_DEPTH);
         
-        xStepBound=new wsBound((xBound.min+thickSize),(xBound.max-thickSize));
+        xStepBound=new BoundClass((xBound.min+thickSize),(xBound.max-thickSize));
 
         for (n=0;n!==this.STAIR_STEP_COUNT;n++) {
             if (!flip) {
@@ -509,9 +509,9 @@ export default class GenRoomStairsClass
         
             // create stairs
        
-        xBound=new wsBound((room.mainPathConnectedRoom.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
-        yBound=new wsBound(room.yBound.max,room.mainPathConnectedRoom.yBound.max);
-        zBound=new wsBound((room.mainPathConnectedRoom.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
+        xBound=new BoundClass((room.mainPathConnectedRoom.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
+        yBound=new BoundClass(room.yBound.max,room.mainPathConnectedRoom.yBound.max);
+        zBound=new BoundClass((room.mainPathConnectedRoom.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
         
         if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
             this.createStairsX(xBound,yBound,zBound,true,false,(room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT));

@@ -1,9 +1,9 @@
-import wsPoint from '../../code/utility/point.js';
-import ws2DIntPoint from '../../code/utility/2D_int_point.js';
-import ws2DLine from '../../code/utility/2D_line.js';
-import wsBound from '../../code/utility/bound.js';
-import wsRect from '../../code/utility/rect.js';
-import wsGrid from '../../code/utility/grid.js';
+import PointClass from '../../code/utility/point.js';
+import Point2DIntClass from '../../code/utility/2D_int_point.js';
+import Line2DClass from '../../code/utility/2D_line.js';
+import BoundClass from '../../code/utility/bound.js';
+import RectClass from '../../code/utility/rect.js';
+import GridClass from '../../code/utility/grid.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -102,7 +102,7 @@ class MapRoomClass
         this.connectSideHasDoor=[false,false,false,false];      // track which connections had a door
         this.legalWindowSide=[true,true,true,true];             // track where windows can be
         
-        this.yOpenBound=new wsBound(0,0);
+        this.yOpenBound=new BoundClass(0,0);
         
         this.setupGrid();
         
@@ -120,10 +120,10 @@ class MapRoomClass
         this.blockGrid=[];
         
         for (n=0;n!==this.storyCount;n++) {
-            this.blockGrid.push(new wsGrid(this.xBlockSize,this.zBlockSize));
+            this.blockGrid.push(new GridClass(this.xBlockSize,this.zBlockSize));
         }
         
-        this.edgeGrid=new wsGrid(this.xBlockSize,this.zBlockSize);
+        this.edgeGrid=new GridClass(this.xBlockSize,this.zBlockSize);
         
             // the block grid has it's bottom floor outer
             // ring blocked off because we never want
@@ -344,7 +344,7 @@ class MapRoomClass
                     this.blockGrid[n].setCell(x,z,1);
                     bx=Math.trunc((this.xBound.min+(map.ROOM_BLOCK_WIDTH*x))+(map.ROOM_BLOCK_WIDTH/2));
                     bz=Math.trunc((this.zBound.min+(map.ROOM_BLOCK_WIDTH*z))+(map.ROOM_BLOCK_WIDTH/2));
-                    return(new wsPoint(bx,(this.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*n)),bz));
+                    return(new PointClass(bx,(this.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*n)),bz));
                 }
                 
                 if (groundFloorOnly) break;
@@ -373,7 +373,7 @@ class MapRoomClass
             this.blockGrid[0].setCell(x,z,1);
             bx=Math.trunc((this.xBound.min+(map.ROOM_BLOCK_WIDTH*x))+(map.ROOM_BLOCK_WIDTH/2));
             bz=Math.trunc((this.zBound.min+(map.ROOM_BLOCK_WIDTH*z))+(map.ROOM_BLOCK_WIDTH/2));
-            return(new wsPoint(bx,this.yBound.max,bz));
+            return(new PointClass(bx,this.yBound.max,bz));
         }
 
         return(null);
@@ -390,7 +390,7 @@ class MapRoomClass
             y-=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
         }
         
-        return(new wsBound(y,this.yBound.max));
+        return(new BoundClass(y,this.yBound.max));
     }
     
     getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(x,z)
@@ -571,7 +571,7 @@ class MapRoomClass
                 // 1 over because we are leaving a gutter
                 // for the doors
 
-            rects.push(new wsRect((x+1),(z+1),((x+1)+wid),((z+1)+high)));
+            rects.push(new RectClass((x+1),(z+1),((x+1)+wid),((z+1)+high)));
             
                 // always block off +1 so there's a corridor
                 // in between
@@ -754,7 +754,7 @@ class MapRoomClass
         
         for (n=0;n!==this.xBlockSize;n++) {
             x2=x+map.ROOM_BLOCK_WIDTH;
-            lineList.push(new ws2DLine(new ws2DIntPoint(x,this.zBound.min),new ws2DIntPoint(x2,this.zBound.min)));
+            lineList.push(new Line2DClass(new Point2DIntClass(x,this.zBound.min),new Point2DIntClass(x2,this.zBound.min)));
             x=x2;
         }
 
@@ -764,7 +764,7 @@ class MapRoomClass
         
         for (n=0;n!==this.zBlockSize;n++) {
             z2=z+map.ROOM_BLOCK_WIDTH;
-            lineList.push(new ws2DLine(new ws2DIntPoint(this.xBound.max,z),new ws2DIntPoint(this.xBound.max,z2)));
+            lineList.push(new Line2DClass(new Point2DIntClass(this.xBound.max,z),new Point2DIntClass(this.xBound.max,z2)));
             z=z2;
         }
         
@@ -774,7 +774,7 @@ class MapRoomClass
         
         for (n=0;n!==this.xBlockSize;n++) {
             x2=x+map.ROOM_BLOCK_WIDTH;
-            lineList.push(new ws2DLine(new ws2DIntPoint(x,this.zBound.max),new ws2DIntPoint(x2,this.zBound.max)));
+            lineList.push(new Line2DClass(new Point2DIntClass(x,this.zBound.max),new Point2DIntClass(x2,this.zBound.max)));
             x=x2;
         }
 
@@ -784,7 +784,7 @@ class MapRoomClass
         
         for (n=0;n!==this.zBlockSize;n++) {
             z2=z+map.ROOM_BLOCK_WIDTH;
-            lineList.push(new ws2DLine(new ws2DIntPoint(this.xBound.min,z),new ws2DIntPoint(this.xBound.min,z2)));
+            lineList.push(new Line2DClass(new Point2DIntClass(this.xBound.min,z),new Point2DIntClass(this.xBound.min,z2)));
             z=z2;
         }
 

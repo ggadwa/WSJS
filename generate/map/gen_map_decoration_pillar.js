@@ -1,6 +1,6 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
-import wsRect from '../../code/utility/rect.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
+import RectClass from '../../code/utility/rect.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -36,13 +36,13 @@ export default class GenRoomDecorationPillarClass
             // possible platforms
             
         if (this.hasPlatform) {
-            platformXBound=new wsBound((room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH)));
-            platformZBound=new wsBound((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
+            platformXBound=new BoundClass((room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH)));
+            platformZBound=new BoundClass((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
             
-            platformYBound=new wsBound(yBound.min,(yBound.min+map.ROOM_FLOOR_DEPTH));
+            platformYBound=new BoundClass(yBound.min,(yBound.min+map.ROOM_FLOOR_DEPTH));
             map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,false,true,false,map.MESH_FLAG_DECORATION));
 
-            platformYBound=new wsBound((yBound.max-map.ROOM_FLOOR_DEPTH),yBound.max);
+            platformYBound=new BoundClass((yBound.max-map.ROOM_FLOOR_DEPTH),yBound.max);
             map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
 
             yBound.min+=map.ROOM_FLOOR_DEPTH;
@@ -51,7 +51,7 @@ export default class GenRoomDecorationPillarClass
         
             // the pillar itself
             
-        pos=new wsPoint(x,yBound.max,z);
+        pos=new PointClass(x,yBound.max,z);
         radius=Math.trunc(((rect.rgt-rect.lft)*map.ROOM_BLOCK_WIDTH)*0.3);
         
         map.addMesh(MeshPrimitivesClass.createMeshCylinder(pillarBitmap,pos,yBound,this.segments,radius,false,false,map.MESH_FLAG_DECORATION));
@@ -60,7 +60,7 @@ export default class GenRoomDecorationPillarClass
     addPillarLineX(room,rect,pillarBitmap,platformBitmap)
     {
         let x,z;
-        let pillarRect=new wsRect(0,0,0,0);
+        let pillarRect=new RectClass(0,0,0,0);
         
         z=Math.trunc((rect.top+rect.bot)*0.5);
         
@@ -73,7 +73,7 @@ export default class GenRoomDecorationPillarClass
     addPillarLineZ(room,rect,pillarBitmap,platformBitmap)
     {
         let x,z;
-        let pillarRect=new wsRect(0,0,0,0);
+        let pillarRect=new RectClass(0,0,0,0);
         
         x=Math.trunc((rect.lft+rect.rgt)*0.5);
         

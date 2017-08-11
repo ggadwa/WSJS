@@ -1,6 +1,6 @@
-import wsPoint from '../../code/utility/point.js';
-import wsLine from '../../code/utility/line.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import LineClass from '../../code/utility/line.js';
+import BoundClass from '../../code/utility/bound.js';
 import map from '../../code/map/map.js';
 
 //
@@ -13,21 +13,21 @@ export default class CollisionClass
     {
         this.BUMP_HIGH=1000;
 
-        this.spokePt=new wsPoint(0,0,0);        // these are global to avoid it being local and GCd
-        this.spokeHitPt=new wsPoint(0,0,0);
-        this.spokeLine=new wsLine(null,null);
+        this.spokePt=new PointClass(0,0,0);        // these are global to avoid it being local and GCd
+        this.spokeHitPt=new PointClass(0,0,0);
+        this.spokeLine=new LineClass(null,null);
         
         this.spokeCalcSin=new Float32Array(24);    // circular collision pre-calcs
         this.spokeCalcCos=new Float32Array(24);
         this.preCalcSpokes();
 
-        this.testPt=new wsPoint(0,0,0);
-        this.moveIntersectPt=new wsPoint(0,0,0);
-        this.radiusPt=new wsPoint(0,0,0);
+        this.testPt=new PointClass(0,0,0);
+        this.moveIntersectPt=new PointClass(0,0,0);
+        this.radiusPt=new PointClass(0,0,0);
 
-        this.objXBound=new wsBound(0,0);
-        this.objYBound=new wsBound(0,0);
-        this.objZBound=new wsBound(0,0);
+        this.objXBound=new BoundClass(0,0);
+        this.objYBound=new BoundClass(0,0);
+        this.objZBound=new BoundClass(0,0);
         
         Object.seal(this);
     }

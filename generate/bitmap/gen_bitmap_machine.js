@@ -1,4 +1,4 @@
-import wsColor from '../../code/utility/color.js';
+import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
@@ -32,7 +32,7 @@ export default class GenBitmapMachineClass extends GenBitmapClass
     {
         let x,y,mx,my,lx,ly,dx,dy,meterSize,meterHalfSize;
         let horz,color,glowColor;
-        let monitorColor=new wsColor(0.2,0.2,0.2);
+        let monitorColor=new ColorClass(0.2,0.2,0.2);
         
             // monitor background
             

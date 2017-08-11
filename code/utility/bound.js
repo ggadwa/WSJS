@@ -1,4 +1,4 @@
-export default class wsBound
+export default class BoundClass
 {
     constructor(value1,value2)
     {
@@ -50,6 +50,6 @@ export default class wsBound
     
     copy()
     {
-        return(new wsBound(this.min,this.max));
+        return(new BoundClass(this.min,this.max));
     }
 }

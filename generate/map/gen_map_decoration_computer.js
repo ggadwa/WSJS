@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -22,9 +22,9 @@ export default class GenRoomDecorationComputerClass
     {
         let xBound,yBound,zBound;
         
-        xBound=new wsBound((room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH)));
-        zBound=new wsBound((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        xBound=new BoundClass((room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH)));
+        zBound=new BoundClass((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
+        yBound=new BoundClass((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
 
         map.addMesh(MeshPrimitivesClass.createMeshCube(map.getTexture(map.TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
     }
@@ -51,16 +51,16 @@ export default class GenRoomDecorationComputerClass
         x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
         z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
         
-        xBound=new wsBound((x+margin),(x+wid));
-        zBound=new wsBound((z+margin),(z+wid));
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
+        xBound=new BoundClass((x+margin),(x+wid));
+        zBound=new BoundClass((z+margin),(z+wid));
+        yBound=new BoundClass((room.yBound.max-map.ROOM_FLOOR_HEIGHT),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
         
             // create meshes that point right way
             
         switch (dir) {
             
             case mapRoomConstants.ROOM_SIDE_LEFT:
-                xBound2=new wsBound((xBound.min+map.ROOM_FLOOR_DEPTH),xBound.max);
+                xBound2=new BoundClass((xBound.min+map.ROOM_FLOOR_DEPTH),xBound.max);
                 xBound.max=xBound2.min;
                 
                 mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,xBound2,yBound,zBound,false,true,true,true,true,false,false,map.MESH_FLAG_DECORATION);
@@ -76,7 +76,7 @@ export default class GenRoomDecorationComputerClass
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
-                zBound2=new wsBound((zBound.min+map.ROOM_FLOOR_DEPTH),zBound.max);
+                zBound2=new BoundClass((zBound.min+map.ROOM_FLOOR_DEPTH),zBound.max);
                 zBound.max=zBound2.min;
                 
                 mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,xBound,yBound,zBound2,true,true,false,true,true,false,false,map.MESH_FLAG_DECORATION);
@@ -93,7 +93,7 @@ export default class GenRoomDecorationComputerClass
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
-                xBound2=new wsBound(xBound.min,(xBound.max-map.ROOM_FLOOR_DEPTH));
+                xBound2=new BoundClass(xBound.min,(xBound.max-map.ROOM_FLOOR_DEPTH));
                 xBound.min=xBound2.max;
                 
                 mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,xBound2,yBound,zBound,true,false,true,true,true,false,false,map.MESH_FLAG_DECORATION);
@@ -109,7 +109,7 @@ export default class GenRoomDecorationComputerClass
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                zBound2=new wsBound(zBound.min,(zBound.max-map.ROOM_FLOOR_DEPTH));
+                zBound2=new BoundClass(zBound.min,(zBound.max-map.ROOM_FLOOR_DEPTH));
                 zBound.min=zBound2.max;
                 
                 mesh=MeshPrimitivesClass.createMeshCube(metalBitmap,xBound,yBound,zBound2,true,true,true,false,true,false,false,map.MESH_FLAG_DECORATION);
@@ -146,32 +146,32 @@ export default class GenRoomDecorationComputerClass
             
         panelMargin=genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH/5),Math.trunc(map.ROOM_BLOCK_WIDTH/8));
 
-        xBound=new wsBound((pnt.x+panelMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-panelMargin));
-        zBound=new wsBound((pnt.z+panelMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-panelMargin));
-        yBound=new wsBound(pnt.y,(pnt.y-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3)));
+        xBound=new BoundClass((pnt.x+panelMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-panelMargin));
+        zBound=new BoundClass((pnt.z+panelMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-panelMargin));
+        yBound=new BoundClass(pnt.y,(pnt.y-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3)));
 
         switch (dir) {
             
             case mapRoomConstants.ROOM_SIDE_LEFT:
-                ang=new wsPoint(0.0,90.0,0.0);
+                ang=new PointClass(0.0,90.0,0.0);
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
-                ang=new wsPoint(0.0,0.0,0.0);
+                ang=new PointClass(0.0,0.0,0.0);
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
-                ang=new wsPoint(0.0,270.0,0.0);
+                ang=new PointClass(0.0,270.0,0.0);
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                ang=new wsPoint(0.0,180.0,0.0);
+                ang=new PointClass(0.0,180.0,0.0);
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 break;
@@ -212,39 +212,39 @@ export default class GenRoomDecorationComputerClass
         pipeRadius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.05);
         pipeHigh=Math.trunc(map.ROOM_FLOOR_HEIGHT*0.3);
 
-        yBound=new wsBound((pnt.y-pipeHigh),(pnt.y-map.ROOM_FLOOR_HEIGHT));
+        yBound=new BoundClass((pnt.y-pipeHigh),(pnt.y-map.ROOM_FLOOR_HEIGHT));
         
             // the junction
             
         switch (dir) {
             
             case mapRoomConstants.ROOM_SIDE_LEFT:
-                xBound=new wsBound(pnt.x,(pnt.x+juncWid));
-                zBound=new wsBound((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
+                xBound=new BoundClass(pnt.x,(pnt.x+juncWid));
+                zBound=new BoundClass((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_TOP:
-                xBound=new wsBound((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
-                zBound=new wsBound(pnt.z,(pnt.z+juncWid));
+                xBound=new BoundClass((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
+                zBound=new BoundClass(pnt.z,(pnt.z+juncWid));
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_RIGHT:
-                xBound=new wsBound(((pnt.x+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.x+map.ROOM_BLOCK_WIDTH));
-                zBound=new wsBound((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
+                xBound=new BoundClass(((pnt.x+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.x+map.ROOM_BLOCK_WIDTH));
+                zBound=new BoundClass((pnt.z+juncMargin),((pnt.z+map.ROOM_BLOCK_WIDTH)-juncMargin));
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 map.addMesh(mesh);
                 break;
                 
             case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                xBound=new wsBound((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
-                zBound=new wsBound(((pnt.z+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.z+map.ROOM_BLOCK_WIDTH));
+                xBound=new BoundClass((pnt.x+juncMargin),((pnt.x+map.ROOM_BLOCK_WIDTH)-juncMargin));
+                zBound=new BoundClass(((pnt.z+map.ROOM_BLOCK_WIDTH)-juncWid),(pnt.z+map.ROOM_BLOCK_WIDTH));
                 mesh=MeshPrimitivesClass.createMeshCube(baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 map.addMesh(mesh);
@@ -256,14 +256,14 @@ export default class GenRoomDecorationComputerClass
         upperPipe=genRandom.randomPercentage(0.5);
         lowerPipe=((genRandom.randomPercentage(0.5))||(!upperPipe));
         
-        centerPnt=new wsPoint(xBound.getMidPoint(),pnt.y,zBound.getMidPoint());
+        centerPnt=new PointClass(xBound.getMidPoint(),pnt.y,zBound.getMidPoint());
         
         if (upperPipe) {
-            pipeYBound=new wsBound(room.yBound.min,yBound.min);
+            pipeYBound=new BoundClass(room.yBound.min,yBound.min);
             map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,map.MESH_FLAG_DECORATION));
         }
         if (lowerPipe) {
-            pipeYBound=new wsBound(yBound.max,pnt.y);
+            pipeYBound=new BoundClass(yBound.max,pnt.y);
             map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,map.MESH_FLAG_DECORATION));
         }
     }
@@ -278,7 +278,7 @@ export default class GenRoomDecorationComputerClass
         
             // computer item
             
-        pnt=new wsPoint((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),room.yBound.max,(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)));
+        pnt=new PointClass((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),room.yBound.max,(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)));
         
         switch (genRandom.randomIndex(4)) {
             case 0:

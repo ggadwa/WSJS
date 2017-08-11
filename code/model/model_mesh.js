@@ -1,6 +1,6 @@
-import wsPoint from '../../code/utility/point.js';
-import ws2DPoint from '../../code/utility/2D_point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import Point2DClass from '../../code/utility/2D_point.js';
+import BoundClass from '../../code/utility/bound.js';
 import view from '../../code/main/view.js';
 
 //
@@ -11,16 +11,16 @@ class ModelMeshVertexClass
 {
     constructor()
     {
-        this.position=new wsPoint(0,0,0);
-        this.normal=new wsPoint(0.0,0.0,0.0);
-        this.tangent=new wsPoint(0.0,0.0,0.0);
-        this.uv=new ws2DPoint(0.0,0.0);
+        this.position=new PointClass(0,0,0);
+        this.normal=new PointClass(0.0,0.0,0.0);
+        this.tangent=new PointClass(0.0,0.0,0.0);
+        this.uv=new Point2DClass(0.0,0.0);
 
         this.boneIdx=-1;
-        this.vectorFromBone=new wsPoint(0.0,0.0,0.0);
+        this.vectorFromBone=new PointClass(0.0,0.0,0.0);
 
         this.parentBoneIdx=-1;
-        this.vectorFromParentBone=new wsPoint(0.0,0.0,0.0);
+        this.vectorFromParentBone=new PointClass(0.0,0.0,0.0);
         
         Object.seal(this);
     }
@@ -77,10 +77,10 @@ export default class ModelMeshClass
 
             // global variables to stop GCd
 
-        this.rotVector=new wsPoint(0.0,0.0,0.0);
-        this.rotNormal=new wsPoint(0.0,0.0,0.0);
-        this.parentRotVector=new wsPoint(0.0,0.0,0.0);
-        this.parentRotNormal=new wsPoint(0.0,0.0,0.0);
+        this.rotVector=new PointClass(0.0,0.0,0.0);
+        this.rotNormal=new PointClass(0.0,0.0,0.0);
+        this.parentRotVector=new PointClass(0.0,0.0,0.0);
+        this.parentRotNormal=new PointClass(0.0,0.0,0.0);
         
         Object.seal(this);
     }
@@ -134,8 +134,8 @@ export default class ModelMeshClass
         let xBound,zBound;
         
         if (this.cacheRadius===-1) {
-            xBound=new wsBound(0,0);
-            zBound=new wsBound(0,0);
+            xBound=new BoundClass(0,0);
+            zBound=new BoundClass(0,0);
             
                 // no skeleton, do all vertexes
                 

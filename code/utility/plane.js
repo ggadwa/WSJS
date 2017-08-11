@@ -1,4 +1,4 @@
-export default class wsPlane
+export default class PlaneClass
 {
     constructor(a,b,c,d)
     {

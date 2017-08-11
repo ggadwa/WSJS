@@ -1,7 +1,7 @@
-import ws2DIntPoint from '../../code/utility/2D_int_point.js';
-import ws2DLine from '../../code/utility/2D_line.js';
-import wsRect from '../../code/utility/rect.js';
-import wsColor from '../../code/utility/color.js';
+import Point2DIntClass from '../../code/utility/2D_int_point.js';
+import Line2DClass from '../../code/utility/2D_line.js';
+import RectClass from '../../code/utility/rect.js';
+import ColorClass from '../../code/utility/color.js';
 import view from '../../code/main/view.js';
 
 //
@@ -149,22 +149,22 @@ export default class MapOverlayClass
         
     addRoom(room)
     {
-        this.roomQuadList.push(new wsRect(room.xBound.min,room.zBound.min,room.xBound.max,room.zBound.max));
+        this.roomQuadList.push(new RectClass(room.xBound.min,room.zBound.min,room.xBound.max,room.zBound.max));
         this.addRoomLines(room.createOverlayLineList(),true);
         
-        if (room.liquid) this.liquidQuadList.push(new wsRect(room.xBound.min,room.zBound.min,room.xBound.max,room.zBound.max));
+        if (room.liquid) this.liquidQuadList.push(new RectClass(room.xBound.min,room.zBound.min,room.xBound.max,room.zBound.max));
     }
     
     addCloset(xBound,zBound)
     {
         let lines=[];
         
-        this.roomQuadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
+        this.roomQuadList.push(new RectClass(xBound.min,zBound.min,xBound.max,zBound.max));
         
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.min,zBound.min),new Point2DIntClass(xBound.max,zBound.min)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.max,zBound.min),new Point2DIntClass(xBound.max,zBound.max)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.max,zBound.max),new Point2DIntClass(xBound.min,zBound.max)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.min,zBound.max),new Point2DIntClass(xBound.min,zBound.min)));
         
         this.addRoomLines(lines,false);
     }
@@ -173,29 +173,29 @@ export default class MapOverlayClass
     {
         let lines=[];
         
-        this.roomQuadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
+        this.roomQuadList.push(new RectClass(xBound.min,zBound.min,xBound.max,zBound.max));
         
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.min,zBound.min),new Point2DIntClass(xBound.max,zBound.min)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.max,zBound.min),new Point2DIntClass(xBound.max,zBound.max)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.max,zBound.max),new Point2DIntClass(xBound.min,zBound.max)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.min,zBound.max),new Point2DIntClass(xBound.min,zBound.min)));
         
         this.addRoomLines(lines,false);
     }
     
     addDecorationWall(x,z,x2,z2)
     {
-        this.addRoomLines([new ws2DLine(new ws2DIntPoint(x,z),new ws2DIntPoint(x2,z2))]);
+        this.addRoomLines([new Line2DClass(new Point2DIntClass(x,z),new Point2DIntClass(x2,z2))]);
     }
     
     addPlatform(xBound,zBound)
     {
         let lines=[];
         
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.min),new ws2DIntPoint(xBound.max,zBound.min)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.min),new ws2DIntPoint(xBound.max,zBound.max)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.max,zBound.max),new ws2DIntPoint(xBound.min,zBound.max)));
-        lines.push(new ws2DLine(new ws2DIntPoint(xBound.min,zBound.max),new ws2DIntPoint(xBound.min,zBound.min)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.min,zBound.min),new Point2DIntClass(xBound.max,zBound.min)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.max,zBound.min),new Point2DIntClass(xBound.max,zBound.max)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.max,zBound.max),new Point2DIntClass(xBound.min,zBound.max)));
+        lines.push(new Line2DClass(new Point2DIntClass(xBound.min,zBound.max),new Point2DIntClass(xBound.min,zBound.min)));
         
         this.addExtraLines(lines);
     }
@@ -212,7 +212,7 @@ export default class MapOverlayClass
     
     addDoor(xBound,zBound)
     {
-        this.doorQuadList.push(new wsRect(xBound.min,zBound.min,xBound.max,zBound.max));
+        this.doorQuadList.push(new RectClass(xBound.min,zBound.min,xBound.max,zBound.max));
     }
     
         //
@@ -426,8 +426,8 @@ export default class MapOverlayClass
         let n,x,y;
         let p1,p2,p3;
         let entity,ang,pos,nEntity;
-        let playerColor=new wsColor(0.5,1.0,0.5);
-        let monsterColor=new wsColor(1.0,0.5,0.5);
+        let playerColor=new ColorClass(0.5,1.0,0.5);
+        let monsterColor=new ColorClass(1.0,0.5,0.5);
         let gl=view.gl;
 
         this.mapOverlayShader.drawStart();
@@ -436,7 +436,7 @@ export default class MapOverlayClass
             // room quads
         
         if (this.roomQuadList.length!==0) {
-            this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,0.0));
+            this.mapOverlayShader.drawColor(new ColorClass(0.0,0.0,0.0));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.roomQuadVertexPosBuffer);
             gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -446,7 +446,7 @@ export default class MapOverlayClass
             // liquid quads
         
         if (this.liquidQuadList.length!==0) {
-            this.mapOverlayShader.drawColor(new wsColor(0.5,0.0,0.4));
+            this.mapOverlayShader.drawColor(new ColorClass(0.5,0.0,0.4));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.liquidQuadVertexPosBuffer);
             gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -456,7 +456,7 @@ export default class MapOverlayClass
             // extra lines
   
         if (this.extraLineList.length!==0) {
-            this.mapOverlayShader.drawColor(new wsColor(0.5,0.5,1.0));
+            this.mapOverlayShader.drawColor(new ColorClass(0.5,0.5,1.0));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
             gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -466,7 +466,7 @@ export default class MapOverlayClass
             // room lines
         
         if (this.roomLineList.length!==0) {
-            this.mapOverlayShader.drawColor(new wsColor(0.0,0.0,1.0));
+            this.mapOverlayShader.drawColor(new ColorClass(0.0,0.0,1.0));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
             gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -476,7 +476,7 @@ export default class MapOverlayClass
             // door quads
         
         if (this.doorQuadList.length!==0) {
-            this.mapOverlayShader.drawColor(new wsColor(1.0,0.2,0.2));
+            this.mapOverlayShader.drawColor(new ColorClass(1.0,0.2,0.2));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.doorQuadVertexPosBuffer);
             gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -488,9 +488,9 @@ export default class MapOverlayClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.entityVertexPosBuffer);
         gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             
-        p1=new ws2DIntPoint(0,0);
-        p2=new ws2DIntPoint(0,0);
-        p3=new ws2DIntPoint(0,0);
+        p1=new Point2DIntClass(0,0);
+        p2=new Point2DIntClass(0,0);
+        p3=new Point2DIntClass(0,0);
 
         nEntity=entityList.countEntity();
         

@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 
 //
 // gen projectile mesh class
@@ -20,9 +20,9 @@ export default class GenModelProjectileMeshClass
         let n,v;
         let idx=0;
         
-        let xBound=new wsBound((centerPt.x-sz),(centerPt.x+sz));
-        let yBound=new wsBound((centerPt.y-(sz*2)),centerPt.y);
-        let zBound=new wsBound((centerPt.z-sz),(centerPt.z+sz));
+        let xBound=new BoundClass((centerPt.x-sz),(centerPt.x+sz));
+        let yBound=new BoundClass((centerPt.y-(sz*2)),centerPt.y);
+        let zBound=new BoundClass((centerPt.z-sz),(centerPt.z+sz));
         
             // left
             
@@ -127,7 +127,7 @@ export default class GenModelProjectileMeshClass
         let vertexList=MeshUtilityClass.createModelVertexList(36);
         let indexes=new Uint16Array(36);
         
-        this.buildBoxAroundPoint(new wsPoint(0,0,0),200,vertexList,indexes);
+        this.buildBoxAroundPoint(new PointClass(0,0,0),200,vertexList,indexes);
         
             // add mesh to model
             

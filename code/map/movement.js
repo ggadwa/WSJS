@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 import view from '../../code/main/view.js';
 import map from '../../code/map/map.js';
 
@@ -33,9 +33,9 @@ export default class MovementClass
         
         this.moving=looping;            // looping movements are always moving
         
-        this.movePnt=new wsPoint(0,0,0);
-        this.nextOffsetPnt=new wsPoint(0,0,0);
-        this.lastOffsetPnt=new wsPoint(0,0,0);
+        this.movePnt=new PointClass(0,0,0);
+        this.nextOffsetPnt=new PointClass(0,0,0);
+        this.lastOffsetPnt=new PointClass(0,0,0);
         
         this.moves=[];
         

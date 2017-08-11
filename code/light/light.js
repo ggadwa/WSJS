@@ -1,6 +1,6 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
-import wsColor from '../../code/utility/color.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
+import ColorClass from '../../code/utility/color.js';
 import view from '../../code/main/view.js';
 
 //
@@ -13,18 +13,18 @@ export default class LightClass
 {
     constructor(position,color,intensity,exponent)
     {
-        this.position=position;                 // should be wsPoint
-        this.eyePosition=new wsPoint(0,0,0);    // the eye position in the current render, set by the view
-        this.color=color;                       // should be wsColor
+        this.position=position;                 // should be PointClass
+        this.eyePosition=new PointClass(0,0,0);    // the eye position in the current render, set by the view
+        this.color=color;                       // should be ColorClass
         this.intensity=intensity;
         this.invertIntensity=1.0/intensity;
         this.exponent=exponent;
 
         this.dist=0.0;           // used to sort lights
         
-        this.frustumXBound=new wsBound(0,0);        // set here to avoid gc
-        this.frustumYBound=new wsBound(0,0);
-        this.frustumZBound=new wsBound(0,0);
+        this.frustumXBound=new BoundClass(0,0);        // set here to avoid gc
+        this.frustumYBound=new BoundClass(0,0);
+        this.frustumZBound=new BoundClass(0,0);
         
         Object.seal(this);
     }

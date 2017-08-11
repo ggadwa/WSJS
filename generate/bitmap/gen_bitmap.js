@@ -1,6 +1,6 @@
-import wsPoint from '../../code/utility/point.js';
-import wsRect from '../../code/utility/rect.js';
-import wsColor from '../../code/utility/color.js';
+import PointClass from '../../code/utility/point.js';
+import RectClass from '../../code/utility/rect.js';
+import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -33,27 +33,27 @@ export default class GenBitmapClass
 
             // some precalced normals
 
-        this.NORMAL_CLEAR=new wsPoint(0.0,0.0,1.0);
+        this.NORMAL_CLEAR=new PointClass(0.0,0.0,1.0);
 
-        this.NORMAL_LEFT_45=new wsPoint(-0.60,0.02,0.70);
-        this.NORMAL_RIGHT_45=new wsPoint(0.60,-0.02,0.70);
-        this.NORMAL_TOP_45=new wsPoint(-0.02,0.60,0.70);
-        this.NORMAL_BOTTOM_45=new wsPoint(0.02,-0.60,0.70);
+        this.NORMAL_LEFT_45=new PointClass(-0.60,0.02,0.70);
+        this.NORMAL_RIGHT_45=new PointClass(0.60,-0.02,0.70);
+        this.NORMAL_TOP_45=new PointClass(-0.02,0.60,0.70);
+        this.NORMAL_BOTTOM_45=new PointClass(0.02,-0.60,0.70);
 
-        this.NORMAL_LEFT_10=new wsPoint(-0.1,0.0,0.90);
-        this.NORMAL_RIGHT_10=new wsPoint(0.1,0.0,0.90);
-        this.NORMAL_TOP_10=new wsPoint(0.0,0.1,0.90);
-        this.NORMAL_BOTTOM_10=new wsPoint(0.0,-0.1,0.90);
+        this.NORMAL_LEFT_10=new PointClass(-0.1,0.0,0.90);
+        this.NORMAL_RIGHT_10=new PointClass(0.1,0.0,0.90);
+        this.NORMAL_TOP_10=new PointClass(0.0,0.1,0.90);
+        this.NORMAL_BOTTOM_10=new PointClass(0.0,-0.1,0.90);
         
-        this.NORMAL_TOP_LEFT_45=new wsPoint(-0.30,0.30,0.70);
-        this.NORMAL_TOP_RIGHT_45=new wsPoint(0.30,0.30,0.70);
-        this.NORMAL_BOTTOM_LEFT_45=new wsPoint(-0.30,-0.30,0.70);
-        this.NORMAL_BOTTOM_RIGHT_45=new wsPoint(0.30,-0.30,0.70);
+        this.NORMAL_TOP_LEFT_45=new PointClass(-0.30,0.30,0.70);
+        this.NORMAL_TOP_RIGHT_45=new PointClass(0.30,0.30,0.70);
+        this.NORMAL_BOTTOM_LEFT_45=new PointClass(-0.30,-0.30,0.70);
+        this.NORMAL_BOTTOM_RIGHT_45=new PointClass(0.30,-0.30,0.70);
         
             // some precalced colors
             
-        this.blackColor=new wsColor(0.0,0.0,0.0);
-        this.whiteColor=new wsColor(1.0,1.0,1.0);
+        this.blackColor=new ColorClass(0.0,0.0,0.0);
+        this.whiteColor=new ColorClass(1.0,1.0,1.0);
         
             // some primary colors
             
@@ -115,11 +115,11 @@ export default class GenBitmapClass
             lft=halfBrick?-halfWid:0;
 
             for (x=0;x!==xCount;x++) {
-                segments.push(new wsRect(lft,top,(lft+wid),(top+high)));
+                segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
                 lft+=wid;
             }
 
-            if (halfWid) segments.push(new wsRect(lft,top,(lft+wid),(top+high)));
+            if (halfWid) segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
 
             top+=high;
             halfBrick=!halfBrick;
@@ -213,7 +213,7 @@ export default class GenBitmapClass
             rgt=Math.trunc((x+wid)*(cvsWid/this.BITMAP_GRID_DIVISION));
             bot=Math.trunc((y+high)*(cvsHigh/this.BITMAP_GRID_DIVISION));
 
-            segments.push(new wsRect(lft,top,rgt,bot));
+            segments.push(new RectClass(lft,top,rgt,bot));
 
             for (y2=0;y2!==high;y2++) {
                 for (x2=0;x2!==wid;x2++) {
@@ -250,7 +250,7 @@ export default class GenBitmapClass
         let col=this.primaryColorList[this.defaultPrimaryColorIdx];
         let darken=0.1-(genRandom.random()*0.2);
         
-        return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
     
     getRandomColor()
@@ -258,28 +258,28 @@ export default class GenBitmapClass
         let col=this.primaryColorList[genRandom.randomIndex(this.primaryColorList.length)];
         let darken=0.1-(genRandom.random()*0.2);
         
-        return(new wsColor((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
     }
     
     getRandomGray(min,max)
     {
         let col=min+(genRandom.random()*(max-min));
-        return(new wsColor(col,col,col));
+        return(new ColorClass(col,col,col));
     }
     
     darkenColor(color,darkenFactor)
     {
-        return(new wsColor((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
+        return(new ColorClass((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
     }
     
     lightenColor(color,lightenFactor)
     {
-        return(new wsColor((color.r+(color.r*lightenFactor)),(color.g+(color.g*lightenFactor)),(color.b+(color.b*lightenFactor))));
+        return(new ColorClass((color.r+(color.r*lightenFactor)),(color.g+(color.g*lightenFactor)),(color.b+(color.b*lightenFactor))));
     }
     
     boostColor(color,boostAdd)
     {
-        return(new wsColor((color.r+boostAdd),(color.g+boostAdd),(color.b+boostAdd)));
+        return(new ColorClass((color.r+boostAdd),(color.g+boostAdd),(color.b+boostAdd)));
     }
     
     dullColor(color,dullFactor)
@@ -294,7 +294,7 @@ export default class GenBitmapClass
         let g=color.g+(midPoint-color.g)*dullFactor;
         let b=color.b+(midPoint-color.b)*dullFactor;
 
-        return(new wsColor(r,g,b));
+        return(new ColorClass(r,g,b));
     }
 
     colorToRGBColor(color)
@@ -368,7 +368,7 @@ export default class GenBitmapClass
                 if (b<0.0) b=0.0;
                 if (b>1.0) b=1.0;
                 
-                color=new wsColor(r,g,b);
+                color=new ColorClass(r,g,b);
             }
 
             colors.push(color);
@@ -2004,9 +2004,9 @@ export default class GenBitmapClass
         let xMid=Math.trunc((lft+rgt)/2);
         let yMid=Math.trunc((top+bot)/2);
         
-        this.drawRect(bitmapCTX,lft,top,xMid,yMid,new wsColor(1,1,0));
-        this.drawRect(bitmapCTX,xMid,top,rgt,yMid,new wsColor(1,0,0));
-        this.drawRect(bitmapCTX,lft,yMid,xMid,bot,new wsColor(0,1,0));
-        this.drawRect(bitmapCTX,xMid,yMid,rgt,bot,new wsColor(0,0,1));
+        this.drawRect(bitmapCTX,lft,top,xMid,yMid,new ColorClass(1,1,0));
+        this.drawRect(bitmapCTX,xMid,top,rgt,yMid,new ColorClass(1,0,0));
+        this.drawRect(bitmapCTX,lft,yMid,xMid,bot,new ColorClass(0,1,0));
+        this.drawRect(bitmapCTX,xMid,yMid,rgt,bot,new ColorClass(0,0,1));
     }
 }

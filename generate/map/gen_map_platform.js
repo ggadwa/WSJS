@@ -1,4 +1,4 @@
-import wsBound from '../../code/utility/bound.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -24,12 +24,12 @@ export default class GenRoomPlatformClass
         let genRoomStairs=new GenRoomStairsClass();
 
         rx=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
-        xBound=new wsBound(rx,(rx+map.ROOM_BLOCK_WIDTH));
+        xBound=new BoundClass(rx,(rx+map.ROOM_BLOCK_WIDTH));
         
-        yBound=new wsBound((y-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),y);
+        yBound=new BoundClass((y-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),y);
         
         rz=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
-        zBound=new wsBound(rz,(rz+map.ROOM_BLOCK_WIDTH));
+        zBound=new BoundClass(rz,(rz+map.ROOM_BLOCK_WIDTH));
         
         switch (dir) {
             case mapRoomConstants.ROOM_SIDE_LEFT:
@@ -88,9 +88,9 @@ export default class GenRoomPlatformClass
     {
         let y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*story));
         
-        let xPlatformBound=new wsBound((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
-        let yPlatformBound=new wsBound(y,(y+map.ROOM_FLOOR_DEPTH));
-        let zPlatformBound=new wsBound((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
+        let xPlatformBound=new BoundClass((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
+        let yPlatformBound=new BoundClass(y,(y+map.ROOM_FLOOR_DEPTH));
+        let zPlatformBound=new BoundClass((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
         
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
 

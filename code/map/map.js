@@ -1,5 +1,5 @@
 import config from '../../code/main/config.js';
-import wsBound from '../../code/utility/bound.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
@@ -79,9 +79,9 @@ class MapClass
         this.movementList=new MovementListClass();
         this.overlay=new MapOverlayClass();
 
-        this.lightXBound=new wsBound(0,0);           // global not local so they won't get GCd
-        this.lightYBound=new wsBound(0,0);
-        this.lightZBound=new wsBound(0,0);
+        this.lightXBound=new BoundClass(0,0);           // global not local so they won't get GCd
+        this.lightYBound=new BoundClass(0,0);
+        this.lightZBound=new BoundClass(0,0);
         
             // room size constants
             

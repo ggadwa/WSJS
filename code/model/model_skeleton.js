@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 import view from '../../code/main/view.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -17,7 +17,7 @@ class ModelBoneClass
 
             // parenting
 
-        this.vectorFromParent=new wsPoint(0.0,0,0,0,0);
+        this.vectorFromParent=new PointClass(0.0,0,0,0,0);
         this.childBoneIndexes=[];
 
             // mesh creation
@@ -26,11 +26,11 @@ class ModelBoneClass
 
             // pose
 
-        this.curPoseAngle=new wsPoint(0.0,0.0,0.0);
+        this.curPoseAngle=new PointClass(0.0,0.0,0.0);
         this.curPosePosition=this.position.copy();
 
-        this.prevPoseAngle=new wsPoint(0.0,0.0,0.0);
-        this.nextPoseAngle=new wsPoint(0.0,0.0,0.0);
+        this.prevPoseAngle=new PointClass(0.0,0.0,0.0);
+        this.nextPoseAngle=new PointClass(0.0,0.0,0.0);
         
         Object.seal(this);
     }
@@ -199,7 +199,7 @@ export default class ModelSkeletonClass
         let bone2=this.findBone(name2);
         
         if ((bone1===null) || (bone2===null)) return(null);
-        return(new wsPoint(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
+        return(new PointClass(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
     }
     
     getBoneLimbType(boneIdx)
@@ -243,7 +243,7 @@ export default class ModelSkeletonClass
         let n;
         let nBone=this.bones.length;
         
-        let pt=new wsPoint(0,0,0);
+        let pt=new PointClass(0,0,0);
         
         for (n=0;n!==nBone;n++) {
             pt.addPoint(this.bones[n].position);
@@ -344,7 +344,7 @@ export default class ModelSkeletonClass
         if (bone.parentBoneIdx!==-1) {
             parentBone=this.bones[bone.parentBoneIdx];
             
-            rotVector=new wsPoint(bone.vectorFromParent.x,bone.vectorFromParent.y,bone.vectorFromParent.z);
+            rotVector=new PointClass(bone.vectorFromParent.x,bone.vectorFromParent.y,bone.vectorFromParent.z);
             rotVector.rotate(ang);
             
             bone.curPosePosition.setFromAddPoint(parentBone.curPosePosition,rotVector);
@@ -386,7 +386,7 @@ export default class ModelSkeletonClass
             // now move all the bones, starting at
             // the base
             
-        this.rotatePoseBoneRecursive(this.baseBoneIdx,new wsPoint(0.0,0.0,0.0));
+        this.rotatePoseBoneRecursive(this.baseBoneIdx,new PointClass(0.0,0.0,0.0));
     }
     
     resetAnimation()

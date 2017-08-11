@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -26,7 +26,7 @@ export default class GenRoomWindowClass
 
             // center point for normal creation
             
-        let centerPoint=new wsPoint(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+        let centerPoint=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
 
             // the inside walls
             
@@ -145,7 +145,7 @@ export default class GenRoomWindowClass
         else {
             story=genRandom.randomInt(0,room.storyCount);
         }
-        yWindowBound=new wsBound(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
+        yWindowBound=new BoundClass(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
         
             // create windows
             
@@ -185,30 +185,30 @@ export default class GenRoomWindowClass
                 
                 case mapRoomConstants.ROOM_SIDE_LEFT:
                     z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound((room.xBound.min-wid),room.xBound.min);
-                    zWindowBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
-                    lightPos=new wsPoint((room.xBound.min-(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
+                    xWindowBound=new BoundClass((room.xBound.min-wid),room.xBound.min);
+                    zWindowBound=new BoundClass(z,(z+map.ROOM_BLOCK_WIDTH));
+                    lightPos=new PointClass((room.xBound.min-(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_TOP:
                     x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
-                    zWindowBound=new wsBound((room.zBound.min-wid),room.zBound.min);
-                    lightPos=new wsPoint((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.min-(wid*2)));
+                    xWindowBound=new BoundClass(x,(x+map.ROOM_BLOCK_WIDTH));
+                    zWindowBound=new BoundClass((room.zBound.min-wid),room.zBound.min);
+                    lightPos=new PointClass((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.min-(wid*2)));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_RIGHT:
                     z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound(room.xBound.max,(room.xBound.max+wid));
-                    zWindowBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
-                    lightPos=new wsPoint((room.xBound.max+(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
+                    xWindowBound=new BoundClass(room.xBound.max,(room.xBound.max+wid));
+                    zWindowBound=new BoundClass(z,(z+map.ROOM_BLOCK_WIDTH));
+                    lightPos=new PointClass((room.xBound.max+(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
                     break;
                     
                 case mapRoomConstants.ROOM_SIDE_BOTTOM:
                     x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
-                    zWindowBound=new wsBound(room.zBound.max,(room.zBound.max+wid));
-                    lightPos=new wsPoint((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.max+(wid*2)));
+                    xWindowBound=new BoundClass(x,(x+map.ROOM_BLOCK_WIDTH));
+                    zWindowBound=new BoundClass(room.zBound.max,(room.zBound.max+wid));
+                    lightPos=new PointClass((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.max+(wid*2)));
                     break;
             }
             

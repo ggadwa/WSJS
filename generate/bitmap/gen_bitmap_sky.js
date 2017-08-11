@@ -1,4 +1,4 @@
-import wsColor from '../../code/utility/color.js';\
+import ColorClass from '../../code/utility/color.js';\
 import genRandom from '../../generate/utility/random.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
@@ -139,9 +139,9 @@ export default class GenBitmapSkyClass extends GenBitmapClass
         let my=Math.trunc(high*0.5);
         let rangeY;
         
-        let cloudColor=this.getRandomColor();//new wsColor(1,1,1);
-        let skyColor=this.getRandomColor();//new wsColor(0.1,0.95,1.0)
-        let mountainColor=this.getRandomColor();//new wsColor(0.65,0.35,0.0);
+        let cloudColor=this.getRandomColor();//new ColorClass(1,1,1);
+        let skyColor=this.getRandomColor();//new ColorClass(0.1,0.95,1.0)
+        let mountainColor=this.getRandomColor();//new ColorClass(0.65,0.35,0.0);
         let groundColor=this.darkenColor(mountainColor,0.8);
         
         this.drawRect(bitmapCTX,0,0,wid,high,cloudColor);

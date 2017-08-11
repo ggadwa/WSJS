@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 
 const DEGREE_TO_RAD=Math.PI/180.0;
 
@@ -108,8 +108,8 @@ export default class GenModelWeaponMeshClass
         let vertexList=MeshUtilityClass.createModelVertexList(this.CYLINDER_VERTEX_COUNT);
         let indexes=new Uint16Array(this.CYLINDER_INDEX_COUNT);
         
-        let pos1=new wsPoint(0,0,1500);
-        let pos2=new wsPoint(0,0,-1500);
+        let pos1=new PointClass(0,0,1500);
+        let pos2=new PointClass(0,0,-1500);
         
         this.buildCylinderAroundTwoPoints(pos1,pos2,500,500,vertexList,indexes);
         

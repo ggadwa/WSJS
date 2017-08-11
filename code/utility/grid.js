@@ -1,4 +1,4 @@
-export default class wsGrid
+export default class GridClass
 {
     constructor(xSize,zSize)
     {
@@ -32,7 +32,7 @@ export default class wsGrid
     
     copy()
     {
-        let copyGrid=new wsGrid(this.xSize,this.zSize);
+        let copyGrid=new GridClass(this.xSize,this.zSize);
         
         let n;
         let cellSize=this.xSize*this.zSize;

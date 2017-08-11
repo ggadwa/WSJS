@@ -1,4 +1,4 @@
-export default class wsRect
+export default class RectClass
 {
     constructor(lft,top,rgt,bot)
     {
@@ -51,6 +51,6 @@ export default class wsRect
                 
     copy()
     {
-        return(new wsRect(this.lft,this.top,this.rgt,this.bot));
+        return(new RectClass(this.lft,this.top,this.rgt,this.bot));
     }
 }

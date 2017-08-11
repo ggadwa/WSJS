@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsColor from '../../code/utility/color.js';
+import PointClass from '../../code/utility/point.js';
+import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 import view from '../../code/main/view.js';
 
@@ -18,8 +18,8 @@ export default class ParticleClass
 
         this.movement=0.0;
 
-        this.colorStart=new wsColor(0,0,0);
-        this.colorEnd=new wsColor(0,0,0);
+        this.colorStart=new ColorClass(0,0,0);
+        this.colorEnd=new ColorClass(0,0,0);
 
         this.alphaStart=0.0;
         this.alphaEnd=0.0;
@@ -32,20 +32,20 @@ export default class ParticleClass
 
         this.noDepthTest=false;
         
-        this.light=new LightClass(new wsPoint(0,0,0),new wsColor(0.0,0.0,0.0),0.0,1.0);
+        this.light=new LightClass(new PointClass(0,0,0),new ColorClass(0.0,0.0,0.0),0.0,1.0);
         this.lightMaxIntensity=0.0;
 
-        this.centerPt=new wsPoint(0,0,0);
+        this.centerPt=new PointClass(0,0,0);
 
         this.count=0;
         this.points=[];
 
-        this.topLeft=new wsPoint(0,0,0);            // global variables so we don't GC
-        this.topRight=new wsPoint(0,0,0);
-        this.bottomLeft=new wsPoint(0,0,0);
-        this.bottomRight=new wsPoint(0,0,0);
+        this.topLeft=new PointClass(0,0,0);            // global variables so we don't GC
+        this.topRight=new PointClass(0,0,0);
+        this.bottomLeft=new PointClass(0,0,0);
+        this.bottomRight=new PointClass(0,0,0);
 
-        this.randomRot=new wsPoint(0.0,0.0,0.0);
+        this.randomRot=new PointClass(0.0,0.0,0.0);
 
         this.vertices=new Float32Array((this.PARTICLE_MAX_POINTS*4)*3);
         this.uvs=new Float32Array((this.PARTICLE_MAX_POINTS*4)*2);
@@ -68,7 +68,7 @@ export default class ParticleClass
         let gl=view.gl;
         
         for (n=0;n!==this.PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
-            this.points.push(new wsPoint(0,0,0));
+            this.points.push(new PointClass(0,0,0));
         }
 
         this.vertexPosBuffer=gl.createBuffer();

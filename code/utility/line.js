@@ -1,15 +1,15 @@
-import wsBound from '../../code/utility/bound.js';
+import BoundClass from '../../code/utility/bound.js';
 
-export default class wsLine
+export default class LineClass
 {
     constructor(p1,p2)
     {
         this.p1=p1;
         this.p2=p2;
         
-        this.xBound=new wsBound(0,0);   // cached to avoid GC
-        this.yBound=new wsBound(0,0);
-        this.zBound=new wsBound(0,0);
+        this.xBound=new BoundClass(0,0);   // cached to avoid GC
+        this.yBound=new BoundClass(0,0);
+        this.zBound=new BoundClass(0,0);
         
         Object.seal(this);
     }

@@ -1,8 +1,8 @@
-import wsPoint from '../../code/utility/point.js';
-import ws2DPoint from '../../code/utility/2D_point.js';
-import wsLine from '../../code/utility/line.js';
-import wsBound from '../../code/utility/bound.js';
-import wsCollisionRect from '../../code/utility/collision_rect.js';
+import PointClass from '../../code/utility/point.js';
+import Point2DClass from '../../code/utility/2D_point.js';
+import LineClass from '../../code/utility/line.js';
+import BoundClass from '../../code/utility/bound.js';
+import CollisionRectClass from '../../code/utility/collision_rect.js';
 import view from '../../code/main/view.js';
 
 //
@@ -13,10 +13,10 @@ class MapMeshVertexClass
 {
     constructor()
     {
-        this.position=new wsPoint(0,0,0);
-        this.normal=new wsPoint(0.0,0.0,0.0);
-        this.tangent=new wsPoint(0.0,0.0,0.0);
-        this.uv=new ws2DPoint(0.0,0.0);
+        this.position=new PointClass(0,0,0);
+        this.normal=new PointClass(0.0,0.0,0.0);
+        this.tangent=new PointClass(0.0,0.0,0.0);
+        this.uv=new Point2DClass(0.0,0.0);
         
         Object.seal(this);
     }
@@ -79,10 +79,10 @@ export default class MapMeshClass
         
             // center and bounds
             
-        this.center=new wsPoint(0,0,0);
-        this.xBound=new wsBound(0,0);
-        this.yBound=new wsBound(0,0);
-        this.zBound=new wsBound(0,0);
+        this.center=new PointClass(0,0,0);
+        this.xBound=new BoundClass(0,0);
+        this.yBound=new BoundClass(0,0);
+        this.zBound=new BoundClass(0,0);
 
             // non-culled index list
 
@@ -266,15 +266,15 @@ export default class MapMeshClass
             
                 // the bounds
             
-            cacheItem.xBound=new wsBound(v0.position.x,v0.position.x);
+            cacheItem.xBound=new BoundClass(v0.position.x,v0.position.x);
             cacheItem.xBound.adjust(v1.position.x);
             cacheItem.xBound.adjust(v2.position.x);
             
-            cacheItem.yBound=new wsBound(v0.position.y,v0.position.y);
+            cacheItem.yBound=new BoundClass(v0.position.y,v0.position.y);
             cacheItem.yBound.adjust(v1.position.y);
             cacheItem.yBound.adjust(v2.position.y);
             
-            cacheItem.zBound=new wsBound(v0.position.z,v0.position.z);
+            cacheItem.zBound=new BoundClass(v0.position.z,v0.position.z);
             cacheItem.zBound.adjust(v1.position.z);
             cacheItem.zBound.adjust(v2.position.z);
             
@@ -378,8 +378,8 @@ export default class MapMeshClass
             vp1=this.vertexList[this.indexes[tIdx++]].position;
             vp2=this.vertexList[this.indexes[tIdx++]].position;
             
-            v10=new wsPoint((vp1.x-vp0.x),(vp1.y-vp0.y),(vp1.z-vp0.z));
-            v20=new wsPoint((vp2.x-vp0.x),(vp2.y-vp0.y),(vp2.z-vp0.z));
+            v10=new PointClass((vp1.x-vp0.x),(vp1.y-vp0.y),(vp1.z-vp0.z));
+            v20=new PointClass((vp2.x-vp0.x),(vp2.y-vp0.y),(vp2.z-vp0.z));
             
             this.trigRayTraceCache.push(new MapMeshLightMapTrigCacheClass(vp0,v10,v20));
         }
@@ -401,10 +401,10 @@ export default class MapMeshClass
             // create the line
 
         if (v0.y===v1.y) {
-            line=new wsLine(v0.position.copy(),v2.position.copy());
+            line=new LineClass(v0.position.copy(),v2.position.copy());
         }
         else {
-            line=new wsLine(v0.position.copy(),v1.position.copy());
+            line=new LineClass(v0.position.copy(),v1.position.copy());
         }
 
             // is line already in list?
@@ -442,7 +442,7 @@ export default class MapMeshClass
         
             // build the rect
         
-        cRect=new wsCollisionRect(lft,top,rgt,bot,v0.position.y);
+        cRect=new CollisionRectClass(lft,top,rgt,bot,v0.position.y);
         
             // is rect already in list?
             // usually, two triangles make
@@ -468,13 +468,13 @@ export default class MapMeshClass
             // hitting against the bound box
             
         if (this.simpleCollisionGeometry) {
-            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.min)));
-            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.max),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.max)));
-            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.min,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.min,this.yBound.max,this.zBound.max)));
-            this.collisionLines.push(new wsLine(new wsPoint(this.xBound.max,this.yBound.min,this.zBound.min),new wsPoint(this.xBound.max,this.yBound.max,this.zBound.max)));
+            this.collisionLines.push(new LineClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.min)));
+            this.collisionLines.push(new LineClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max)));
+            this.collisionLines.push(new LineClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max)));
+            this.collisionLines.push(new LineClass(new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max)));
             
-            this.collisionFloorRects.push(new wsCollisionRect(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.min));
-            this.collisionCeilingRects.push(new wsCollisionRect(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.max));
+            this.collisionFloorRects.push(new CollisionRectClass(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.min));
+            this.collisionCeilingRects.push(new CollisionRectClass(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.max));
             return;
         }
 

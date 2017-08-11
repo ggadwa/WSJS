@@ -1,4 +1,4 @@
-export default class wsColor
+export default class ColorClass
 {
     constructor(r,g,b)
     {

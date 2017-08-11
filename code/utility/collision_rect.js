@@ -1,6 +1,4 @@
-import wsBound from '../../code/utility/bound.js';
-
-export default class wsCollisionRect
+export default class CollisionRectClass
 {
     constructor(lft,top,rgt,bot,y)
     {

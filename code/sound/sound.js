@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 
 //
 // sound class
@@ -14,7 +14,7 @@ export default class SoundClass
         this.soundPlayList=null;
         
         this.currentListenerEntity=null;
-        this.listenerForwardVector=new wsPoint(0.0,0.0,1.0);            // local to global to avoid GC
+        this.listenerForwardVector=new PointClass(0.0,0.0,1.0);            // local to global to avoid GC
         
         Object.seal(this);
     }

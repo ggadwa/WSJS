@@ -1,4 +1,4 @@
-import wsPoint from '../../code/utility/point.js';
+import PointClass from '../../code/utility/point.js';
 import view from '../../code/main/view.js';
 
 //
@@ -14,10 +14,10 @@ export default class WeaponClass
 
         this.lastFireTimeStamp=0;
 
-        this.handOffset=new wsPoint(0,0,0);     // global to stop GCd
-        this.handAngle=new wsPoint(0,0,0);
-        this.fireAngle=new wsPoint(0,0,0);
-        this.firePos=new wsPoint(0,0,0);
+        this.handOffset=new PointClass(0,0,0);     // global to stop GCd
+        this.handAngle=new PointClass(0,0,0);
+        this.fireAngle=new PointClass(0,0,0);
+        this.firePos=new PointClass(0,0,0);
         
         Object.seal(this);
     }

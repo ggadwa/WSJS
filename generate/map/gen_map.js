@@ -1,8 +1,8 @@
 import config from '../../code/main/config.js';
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
-import wsColor from '../../code/utility/color.js';
+import ColorClass from '../../code/utility/color.js';
 import view from '../../code/main/view.js';
 import map from '../../code/map/map.js';
 
@@ -227,15 +227,15 @@ export default class GenMapClass
             case mapRoomConstants.LEVEL_LOWER:
                 storyCount=genRandom.randomInt(2,4);
                 yAdd=(genRandom.randomInBetween(1,(storyCount-1)));
-                yBound=new wsBound(0,this.yBase+((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*yAdd));
+                yBound=new BoundClass(0,this.yBase+((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*yAdd));
                 break;
             case mapRoomConstants.LEVEL_HIGHER:
                 storyCount=genRandom.randomInt(2,4);
-                yBound=new wsBound(0,this.yBase-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
+                yBound=new BoundClass(0,this.yBase-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
                 break;
             default:
                 storyCount=genRandom.randomInt(2,3);
-                yBound=new wsBound(0,this.yBase);
+                yBound=new BoundClass(0,this.yBase);
                 break;
         }
         
@@ -289,8 +289,8 @@ export default class GenMapClass
             // each wall is a tall piece and a short piece on top
             // the short piece is for headers on doors and places for platforms
             
-        yWallBound=new wsBound((yBound.max-map.ROOM_FLOOR_HEIGHT),yBound.max);
-        yFloorBound=new wsBound((yWallBound.min-map.ROOM_FLOOR_DEPTH),yWallBound.min);
+        yWallBound=new BoundClass((yBound.max-map.ROOM_FLOOR_HEIGHT),yBound.max);
+        yFloorBound=new BoundClass((yWallBound.min-map.ROOM_FLOOR_DEPTH),yWallBound.min);
             
         for (n=0;n!==storyCount;n++) {
             mesh=room.createMeshWalls(roomBitmap,yWallBound);
@@ -320,7 +320,7 @@ export default class GenMapClass
             // build the door
             
         let genRoomHallway=new GenRoomHallwayClass();
-        let yHallwayBound=new wsBound(this.yBase,(this.yBase-map.ROOM_FLOOR_HEIGHT));        // don't count the upper header
+        let yHallwayBound=new BoundClass(this.yBase,(this.yBase-map.ROOM_FLOOR_HEIGHT));        // don't count the upper header
 
         if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
             genRoomHallway.createHallwayX(xHallwayBound,yHallwayBound,zHallwayBound,(hallwayMode===this.HALLWAY_LONG));
@@ -346,9 +346,9 @@ export default class GenMapClass
             // light fixture
 
         if (fixturePos!==null) {
-            xFixtureBound=new wsBound((fixturePos.x-400),(fixturePos.x+400));
-            yFixtureBound=new wsBound(fixturePos.y,(fixturePos.y+1000));
-            zFixtureBound=new wsBound((fixturePos.z-400),(fixturePos.z+400));
+            xFixtureBound=new BoundClass((fixturePos.x-400),(fixturePos.x+400));
+            yFixtureBound=new BoundClass(fixturePos.y,(fixturePos.y+1000));
+            zFixtureBound=new BoundClass((fixturePos.z-400),(fixturePos.z+400));
             map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getTexture(map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,map.MESH_FLAG_LIGHT));
         }
         
@@ -369,7 +369,7 @@ export default class GenMapClass
 
             // add light to map
 
-        light=new LightClass(lightPos,new wsColor(red,green,blue),intensity,exponent);
+        light=new LightClass(lightPos,new ColorClass(red,green,blue),intensity,exponent);
         map.addLight(light);
 
         return(light);
@@ -384,8 +384,8 @@ export default class GenMapClass
             
         lightY=room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*room.storyCount);
         
-        fixturePos=new wsPoint(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
-        lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+        fixturePos=new PointClass(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
+        lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
         
             // intensity
         
@@ -407,8 +407,8 @@ export default class GenMapClass
             // middle of hallway
             
         if (hallwayMode===this.HALLWAY_LONG) {
-            fixturePos=new wsPoint(xBound.getMidPoint(),(this.yBase-map.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
-            lightPos=new wsPoint(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+            fixturePos=new PointClass(xBound.getMidPoint(),(this.yBase-map.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
+            lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
             this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY);
         }
         
@@ -420,23 +420,23 @@ export default class GenMapClass
             xAdd=Math.trunc(hallwaySize*0.5)+map.ROOM_FLOOR_DEPTH;
             xAdd2=1000;
             zAdd=zAdd2=0;
-            rot1=new wsPoint(90,90,0);
-            rot2=new wsPoint(0,90,90);
+            rot1=new PointClass(90,90,0);
+            rot2=new PointClass(0,90,90);
         }
         else {
             xAdd=xAdd2=0;
             zAdd=Math.trunc(hallwaySize*0.5)+map.ROOM_FLOOR_DEPTH;
             zAdd2=1000;
-            rot1=new wsPoint(90,0,0);
-            rot2=new wsPoint(90,180,0);
+            rot1=new PointClass(90,0,0);
+            rot2=new PointClass(90,180,0);
         }
         
-        fixturePos=new wsPoint((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
-        lightPos=new wsPoint((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
+        fixturePos=new PointClass((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
+        lightPos=new PointClass((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
         this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY);
         
-        fixturePos=new wsPoint((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
-        lightPos=new wsPoint((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
+        fixturePos=new PointClass((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
+        lightPos=new PointClass((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
         this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY);
     }
   
@@ -500,10 +500,10 @@ export default class GenMapClass
             mapMid=Math.trunc(view.OPENGL_FAR_Z/2);
 
             halfSize=Math.trunc((xBlockSize/2)*map.ROOM_BLOCK_WIDTH);
-            xBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
+            xBound=new BoundClass((mapMid-halfSize),(mapMid+halfSize));
 
             halfSize=Math.trunc((zBlockSize/2)*map.ROOM_BLOCK_WIDTH);
-            zBound=new wsBound((mapMid-halfSize),(mapMid+halfSize));
+            zBound=new BoundClass((mapMid-halfSize),(mapMid+halfSize));
             
             pathType=mapRoomConstants.ROOM_PATH_TYPE_START;
             extensionDirection=mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT;
@@ -547,53 +547,53 @@ export default class GenMapClass
                 switch (connectSide) {
 
                     case mapRoomConstants.ROOM_SIDE_LEFT:
-                        xBound=new wsBound((lastRoom.xBound.min-(xBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
-                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                        xBound=new BoundClass((lastRoom.xBound.min-(xBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
+                        zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             xBound.add(-doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
-                            xHallwayBound=new wsBound((lastRoom.xBound.min-doorAdd),lastRoom.xBound.min);
-                            zHallwayBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            xHallwayBound=new BoundClass((lastRoom.xBound.min-doorAdd),lastRoom.xBound.min);
+                            zHallwayBound=new BoundClass((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
                         }
                         
                         break;
 
                     case mapRoomConstants.ROOM_SIDE_TOP:
-                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                        zBound=new wsBound((lastRoom.zBound.min-(zBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
+                        xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
+                        zBound=new BoundClass((lastRoom.zBound.min-(zBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             zBound.add(-doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                            xHallwayBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
-                            zHallwayBound=new wsBound((lastRoom.zBound.min-doorAdd),lastRoom.zBound.min);
+                            xHallwayBound=new BoundClass((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            zHallwayBound=new BoundClass((lastRoom.zBound.min-doorAdd),lastRoom.zBound.min);
                         }
                         
                         break;
 
                     case mapRoomConstants.ROOM_SIDE_RIGHT:
-                        xBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                        zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                        xBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
+                        zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             xBound.add(doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
-                            xHallwayBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+doorAdd));
-                            zHallwayBound=new wsBound((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            xHallwayBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+doorAdd));
+                            zHallwayBound=new BoundClass((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
                         }
                         
                         break;
 
                     case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                        xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                        zBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                        xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
+                        zBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             zBound.add(doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                            xHallwayBound=new wsBound((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
-                            zHallwayBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+doorAdd));
+                            xHallwayBound=new BoundClass((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            zHallwayBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+doorAdd));
                         }
                         
                         break;
@@ -719,23 +719,23 @@ export default class GenMapClass
             switch (connectSide) {
 
                 case mapRoomConstants.ROOM_SIDE_LEFT:
-                    xBound=new wsBound((lastRoom.xBound.min-(xBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
-                    zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    xBound=new BoundClass((lastRoom.xBound.min-(xBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
+                    zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
                     break;
 
                 case mapRoomConstants.ROOM_SIDE_TOP:
-                    xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                    zBound=new wsBound((lastRoom.zBound.min-(zBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
+                    xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    zBound=new BoundClass((lastRoom.zBound.min-(zBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
                     break;
 
                 case mapRoomConstants.ROOM_SIDE_RIGHT:
-                    xBound=new wsBound(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                    zBound=new wsBound((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    xBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
                     break;
 
                 case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                    xBound=new wsBound((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                    zBound=new wsBound(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    zBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
                     break;
 
             }

@@ -1,5 +1,5 @@
-import wsPoint from '../../code/utility/point.js';
-import wsBound from '../../code/utility/bound.js';
+import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
 import map from '../../code/map/map.js';
 
@@ -33,24 +33,24 @@ export default class GenRoomDecorationLabClass
 
         x=(room.xBound.min+(x*map.ROOM_BLOCK_WIDTH))+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
         z=(room.zBound.min+(z*map.ROOM_BLOCK_WIDTH))+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
-        centerPnt=new wsPoint(x,room.yBound.max,z);
+        centerPnt=new PointClass(x,room.yBound.max,z);
       
         radius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.35);
         
         yMid=(room.yBound.max-this.tubeBaseSize);
-        yBound=new wsBound(yMid,room.yBound.max);
+        yBound=new BoundClass(yMid,room.yBound.max);
         mesh=MeshPrimitivesClass.createMeshCylinderSimple(platformBitmap,centerPnt,yBound,radius,true,false,map.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         map.addMesh(mesh);
 
-        yBound=new wsBound((room.yBound.max-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),(room.yBound.max-map.ROOM_FLOOR_HEIGHT));
+        yBound=new BoundClass((room.yBound.max-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),(room.yBound.max-map.ROOM_FLOOR_HEIGHT));
         mesh=MeshPrimitivesClass.createMeshCylinderSimple(platformBitmap,centerPnt,yBound,radius,true,true,map.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         map.addMesh(mesh);
 
             // the tube
         
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_HEIGHT),yMid);
+        yBound=new BoundClass((room.yBound.max-map.ROOM_FLOOR_HEIGHT),yMid);
         
         radius=Math.trunc(map.ROOM_BLOCK_WIDTH*0.3);
 
@@ -77,10 +77,10 @@ export default class GenRoomDecorationLabClass
         x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
         z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
 
-        xBound=new wsBound(x,(x+map.ROOM_BLOCK_WIDTH));
-        zBound=new wsBound(z,(z+map.ROOM_BLOCK_WIDTH));
+        xBound=new BoundClass(x,(x+map.ROOM_BLOCK_WIDTH));
+        zBound=new BoundClass(z,(z+map.ROOM_BLOCK_WIDTH));
 
-        yBound=new wsBound((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        yBound=new BoundClass((room.yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // the pump
@@ -91,7 +91,7 @@ export default class GenRoomDecorationLabClass
         zBound.min+=reduceSize;
         zBound.max-=reduceSize;
 
-        yBound=new wsBound((room.yBound.max-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.5)),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
+        yBound=new BoundClass((room.yBound.max-Math.trunc(map.ROOM_FLOOR_HEIGHT*0.5)),(room.yBound.max-map.ROOM_FLOOR_DEPTH));
         map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
     }
         
