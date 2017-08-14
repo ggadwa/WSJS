@@ -2,6 +2,7 @@ import Point2DIntClass from '../../code/utility/2D_int_point.js';
 import Line2DClass from '../../code/utility/2D_line.js';
 import RectClass from '../../code/utility/rect.js';
 import ColorClass from '../../code/utility/color.js';
+import MapOverlayShaderClass from '../../code/map/map_overlay_shader.js';
 import view from '../../code/main/view.js';
 
 //

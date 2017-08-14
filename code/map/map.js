@@ -1,6 +1,4 @@
-import config from '../../code/main/config.js';
 import BoundClass from '../../code/utility/bound.js';
-import genRandom from '../../generate/utility/random.js';
 import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
 import GenBitmapWallClass from '../../generate/bitmap/gen_bitmap_wall.js';
@@ -12,7 +10,11 @@ import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
 import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
 import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
+import MovementListClass from '../../code/map/movement_list.js';
+import MapOverlayClass from '../../code/map/map_overlay.js';
+import config from '../../code/main/config.js';
 import view from '../../code/main/view.js';
+import genRandom from '../../generate/utility/random.js';
 
 //
 // map class

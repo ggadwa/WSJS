@@ -1,10 +1,11 @@
 import PointClass from '../../code/utility/point.js';
+import SoundPlayListClass from '../../code/sound/sound_play_list.js';
 
 //
 // sound class
 //
 
-export default class SoundClass
+class SoundClass
 {
     constructor()
     {
@@ -119,3 +120,5 @@ export default class SoundClass
 //
 
 let sound=new SoundClass();
+
+export default sound;

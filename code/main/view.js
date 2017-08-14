@@ -6,6 +6,8 @@ import ColorClass from '../../code/utility/color.js';
 import map from '../../code/map/map.js';
 import input from '../../code/main/input.js';
 import ViewCameraClass from '../../code/main/view_camera.js';
+import TextClass from '../../code/text/text.js';
+import InterfaceClass from '../../code/interface/interface.js';
 
 const DEGREE_TO_RAD=Math.PI/180.0;
 

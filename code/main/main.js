@@ -2,32 +2,11 @@ import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import genRandom from '../../generate/utility/random.js';
 import fileCache from '../../code/main/filecache.js';
+import ModelListClass from '../../code/model/model_list.js';
 import view from '../../code/main/view.js';
 import map from '../../code/map/map.js';
 import sound from '../../code/sound/sound.js';
 import input from '../../code/main/input.js';
-
-
-// supergumba -- testing
-
-class MainClass
-{
-    constructor()
-    {
-    }
-    
-    run()
-    {
-        console.log('HERE');
-    }
-}
-
-
-/*
-
-
-
-
 
 //
 // main class
@@ -422,7 +401,6 @@ function mainLoop(timeStamp)
         }
     }
 }
-*/
 
 //
 // single global object is the main class

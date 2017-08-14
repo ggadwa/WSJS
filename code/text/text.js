@@ -1,6 +1,7 @@
 import ColorClass from '../../code/utility/color.js';
-import view from '../../code/main/view.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import TextShaderClass from '../../code/text/text_shader.js';
+import view from '../../code/main/view.js';
 
 //
 // text class

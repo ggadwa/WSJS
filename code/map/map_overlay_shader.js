@@ -1,4 +1,4 @@
-import ShaderClass from '../../code/main/shader.js';
+import ShaderClass from '../../code/shader/shader.js';
 import view from '../../code/main/view.js';
 
 //

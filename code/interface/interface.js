@@ -1,3 +1,4 @@
+import InterfaceShaderClass from '../../code/interface/interface_shader.js';
 import view from '../../code/main/view.js';
 
 //

@@ -1,3 +1,5 @@
+import ModelMeshShaderClass from '../../code/model/model_mesh_shader.js';
+
 //
 // model list class
 //
