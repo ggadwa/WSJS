@@ -1,7 +1,6 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
-import map from '../../code/map/map.js';
 
 //
 // map stairs

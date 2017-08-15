@@ -9,8 +9,10 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenBitmapClass
 {
-    constructor()
+    constructor(view)
     {
+        this.view=view;
+        
             // constants
             
         this.BITMAP_MAP_TEXTURE_SIZE=512;

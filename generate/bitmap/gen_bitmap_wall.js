@@ -7,9 +7,9 @@ import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
 export default class GenBitmapWallClass extends GenBitmapClass
 {
-    constructor()
+    constructor(view)
     {
-        super();
+        super(view);
         
             // types
             
@@ -625,7 +625,7 @@ export default class GenBitmapWallClass extends GenBitmapClass
             // otherwise, create the wenGL
             // bitmap object
 
-        return(new BitmapClass(bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
     
     generateRandom(inDebug)

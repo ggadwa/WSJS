@@ -3,7 +3,6 @@ import Line2DClass from '../../code/utility/2D_line.js';
 import RectClass from '../../code/utility/rect.js';
 import ColorClass from '../../code/utility/color.js';
 import MapOverlayShaderClass from '../../code/map/map_overlay_shader.js';
-import view from '../../code/main/view.js';
 
 //
 // map overlay class
@@ -11,9 +10,10 @@ import view from '../../code/main/view.js';
 
 export default class MapOverlayClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        this.mapOverlayShader=new MapOverlayShaderClass();
+        this.view=view;
+        this.mapOverlayShader=new MapOverlayShaderClass(view,fileCache);
 
         this.roomQuadList=[];
         this.liquidQuadList=[];
@@ -49,7 +49,7 @@ export default class MapOverlayClass
 
     initialize()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         if (!this.mapOverlayShader.initialize()) return(false);
         
@@ -67,7 +67,7 @@ export default class MapOverlayClass
 
     release()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.deleteBuffer(this.roomQuadVertexPosBuffer);
         gl.deleteBuffer(this.liquidQuadVertexPosBuffer);
@@ -226,7 +226,7 @@ export default class MapOverlayClass
         let lft,top,rgt,bot;
         let xBound,yBound;
         let quadVertexList,roomVertexList,extraVertexList;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // get the total size
             
@@ -249,7 +249,7 @@ export default class MapOverlayClass
             // the max size of the overlay
             // is based on the view
             
-        maxSize=view.high-150;
+        maxSize=this.view.high-150;
         
             // get the scale
             // and remember offset to put entities in later
@@ -269,8 +269,8 @@ export default class MapOverlayClass
         this.drawWid=Math.trunc(xBound.getSize()*this.mapScale);
         this.drawHigh=Math.trunc(yBound.getSize()*this.mapScale);
         
-        this.drawX=(view.wid-5)-this.drawWid;
-        this.drawY=Math.trunc((view.high-this.drawHigh)/2);
+        this.drawX=(this.view.wid-5)-this.drawWid;
+        this.drawY=Math.trunc((this.view.high-this.drawHigh)/2);
         
             // create the room quad vertex buffer
             
@@ -429,7 +429,7 @@ export default class MapOverlayClass
         let entity,ang,pos,nEntity;
         let playerColor=new ColorClass(0.5,1.0,0.5);
         let monsterColor=new ColorClass(1.0,0.5,0.5);
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         this.mapOverlayShader.drawStart();
         gl.disable(gl.DEPTH_TEST);

@@ -1,5 +1,4 @@
 import ShaderClass from '../../code/shader/shader.js';
-import view from '../../code/main/view.js';
 
 //
 // sky shader class
@@ -7,9 +6,9 @@ import view from '../../code/main/view.js';
 
 export default class SkyShaderClass extends ShaderClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        super();
+        super(view,fileCache);
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
@@ -25,7 +24,7 @@ export default class SkyShaderClass extends ShaderClass
 
     initialize()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -58,14 +57,14 @@ export default class SkyShaderClass extends ShaderClass
 
     drawStart()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.useProgram(this.program);
 
             // setup the uniforms
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-        gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix);
+        gl.uniformMatrix4fv(this.modelMatrixUniform,false,this.view.modelMatrix);
 
             // enable the vertex attributes
 
@@ -75,7 +74,7 @@ export default class SkyShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // disable vertex attributes
 

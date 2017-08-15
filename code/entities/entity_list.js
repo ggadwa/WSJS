@@ -2,7 +2,7 @@
 // entity list class
 //
 
-class EntityListClass
+export default class EntityListClass
 {
     constructor()
     {
@@ -132,11 +132,3 @@ class EntityListClass
     }
 
 }
-    
-//
-// the global entitylist
-//
-
-let entityList=new EntityListClass();
-
-export default entityList;

@@ -1,16 +1,22 @@
-import view from '../../code/main/view.js';
+import ParticleShaderClass from '../../code/particle/particle_shader.js';
 
 //
 // particle list class
 //
 
-class ParticleListClass
+export default class ParticleListClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
+        this.view=view;
+        
+            // constants
+            
         this.PARTICLE_MAX_COUNT=50;
         
-        this.particleShader=new ParticleShaderClass();
+            // variables
+            
+        this.particleShader=new ParticleShaderClass(view,fileCache);
         
         this.particleBitmap=null;
         this.particleBitmapSize=32;
@@ -45,7 +51,7 @@ class ParticleListClass
         
             // construct a particle bitmap
             
-        genBitmapParticle=new GenBitmapParticleClass();  
+        genBitmapParticle=new GenBitmapParticleClass(this.view);  
         this.particleBitmap=genBitmapParticle.generate(genBitmapParticle.TYPE_OVAL,false);
        
         return(true);
@@ -111,9 +117,9 @@ class ParticleListClass
 
             light=this.particles[n].light;
 
-            x=view.camera.position.x-light.position.x;
-            y=view.camera.position.y-light.position.y;
-            z=view.camera.position.z-light.position.z;
+            x=this.view.camera.position.x-light.position.x;
+            y=this.view.camera.position.y-light.position.y;
+            z=this.view.camera.position.z-light.position.z;
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
         }
         
@@ -135,8 +141,8 @@ class ParticleListClass
                 
             idx=-1;
 
-            for (k=0;k!==view.lights.length;k++) {
-                if (view.lights[k].dist>light.dist) {
+            for (k=0;k!==this.view.lights.length;k++) {
+                if (this.view.lights[k].dist>light.dist) {
                     idx=k;
                     break;
                 }
@@ -145,11 +151,11 @@ class ParticleListClass
                 // add the light
                 
             if (idx===-1) {
-                if (view.lights.length<view.MAX_LIGHT_COUNT) view.lights.push(light);
+                if (this.view.lights.length<this.view.MAX_LIGHT_COUNT) this.view.lights.push(light);
             }
             else {
-                view.lights.splice(idx,0,light);
-                if (view.lights.length>view.MAX_LIGHT_COUNT) view.lights.pop();
+                this.view.lights.splice(idx,0,light);
+                if (this.view.lights.length>this.view.MAX_LIGHT_COUNT) this.view.lights.pop();
             }
         }
     }
@@ -174,7 +180,7 @@ class ParticleListClass
         particle.setBitmap(this.particleBitmap);
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,0.0,0.0,0.7,0.0,0.0);
-        particle.setTiming(view.timeStamp,1500);
+        particle.setTiming(this.view.timeStamp,1500);
         
             // the light
             
@@ -194,7 +200,7 @@ class ParticleListClass
         particle.setBitmap(this.particleBitmap);
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,0.5,0.0,1.0,0.5,0.0);
-        particle.setTiming(view.timeStamp,1500);
+        particle.setTiming(this.view.timeStamp,1500);
         
         particle.setLightMaxItensity(0);
         
@@ -210,7 +216,7 @@ class ParticleListClass
         particle.setBitmap(this.particleBitmap);
         particle.setAlpha(1.0,0.1);
         particle.setColor(1.0,1.0,0.0,0.7,0.7,0.0);
-        particle.setTiming(view.timeStamp,1500);
+        particle.setTiming(this.view.timeStamp,1500);
         
         particle.setLightMaxItensity(0);
     }
@@ -229,7 +235,7 @@ class ParticleListClass
         particle.setBitmap(this.particleBitmap);
         particle.setAlpha(1.0,1.0);
         particle.setColor(0.0,1.0,1.0,0.0,1.0,1.0);
-        particle.setTiming(view.timeStamp,0);
+        particle.setTiming(this.view.timeStamp,0);
         particle.setNoDepthTest(true);
         
         particle.light.clear();
@@ -245,7 +251,7 @@ class ParticleListClass
     draw()
     {
         let n,needDraw;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // check if any particles are
             // active, if not, skip out
@@ -285,11 +291,3 @@ class ParticleListClass
     }
 
 }
-    
-//
-// the global particlelist object
-//
-
-let particleList=new ParticleListClass();
-
-export default particleList;

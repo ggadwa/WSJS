@@ -1,7 +1,6 @@
 import PointClass from '../../code/utility/point.js';
 import Point2DClass from '../../code/utility/2D_point.js';
 import BoundClass from '../../code/utility/bound.js';
-import view from '../../code/main/view.js';
 
 //
 // model mesh vertex

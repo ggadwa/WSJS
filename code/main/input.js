@@ -1,13 +1,13 @@
-import view from '../../code/main/view.js';
-
 //
 // input class
 //
 
-class InputClass
+export default class InputClass
 {
-    constructor()
+    constructor(view)
     {
+        this.view=view;
+
             // the single player entity
             
         this.playerEntity=null;
@@ -68,6 +68,12 @@ class InputClass
         // pause state
         //
         
+    clickResume()
+    {
+        this.view.setPauseState(false,false);
+        this.setPauseState(false);
+    }
+        
     setPauseState(pause)
     {
         if (pause) {
@@ -83,13 +89,13 @@ class InputClass
                 // and make sure a click
                 // unpaused
                 
-            view.canvas.onclick=view.setPauseState.bind(view,false,false);
+            this.view.canvas.onclick=this.clickResume.bind();
         }
         else {
             
                 // clear the unpause click
                 
-            view.canvas.onclick=null;
+            this.view.canvas.onclick=null;
             
                 // attach events
                 
@@ -139,7 +145,7 @@ class InputClass
             
         if (this.keyFlags[77]) {
             this.keyFlags[77]=0;        // force it up
-            view.mapOverlayStateFlip();
+            this.view.mapOverlayStateFlip();
         }
 
             // mouse turning
@@ -204,10 +210,10 @@ class InputClass
         
             // request the pointer lock
             
-        if (view.canvas.requestPointerLock) {
+        if (this.view.canvas.requestPointerLock) {
             document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
             document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-            view.canvas.requestPointerLock();
+            this.view.canvas.requestPointerLock();
         }
         else {
             console.log('Pointer lock not supported, no mouse control');
@@ -247,7 +253,7 @@ class InputClass
         if (document.mozPointerLockElement) elem=document.mozPointerLockElement;
         if (document.webkitPointerLockElement) elem=document.webkitPointerLockElement;
         
-        if (elem===view.canvas) {
+        if (elem===this.view.canvas) {
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('mousemove',this.mouseMovedListener,false);
@@ -256,7 +262,8 @@ class InputClass
             document.removeEventListener('mousedown',this.mouseDownListener,false);
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            view.setPauseState(true,false);       // go into pause
+            this.view.setPauseState(true,false);       // go into pause
+            this.setPauseState(true);
         }
     }
     
@@ -282,11 +289,3 @@ class InputClass
     }
 
 }
-
-//
-// the input global object
-//
-
-let input=new InputClass();
-
-export default input;

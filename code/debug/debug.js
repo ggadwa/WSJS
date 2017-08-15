@@ -1,16 +1,17 @@
 import PointClass from '../../code/utility/point.js';
 import ColorClass from '../../code/utility/color.js';
-import view from '../../code/main/view.js';
+import DebugShaderClass from '../../code/debug/debug_shader.js';
 
 //
 // debug class
 //
 
-class DebugClass
+export default class DebugClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        this.debugShader=new DebugShaderClass();
+        this.view=view;
+        this.debugShader=new DebugShaderClass(view,fileCache);
         
         Object.seal(this);
     }
@@ -36,7 +37,7 @@ class DebugClass
     drawMapMeshLines(mesh)
     {
         let n,vertexPosBuffer,indexBuffer;
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         this.debugShader.drawStart(new ColorClass(1.0,0.0,0.0));
         
@@ -82,7 +83,7 @@ class DebugClass
         let n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
         let vertices,indexes;
         let vertexPosBuffer,indexBuffer;
-        let gl=view.gl;
+        let gl=this.view.gl;
         let normalSize=200.0;
         
             // create the lines
@@ -149,7 +150,7 @@ class DebugClass
         let n,vertexIdx,elementIdx,vIdx,iIdx,nVertex;
         let vertices,indexes;
         let vertexPosBuffer,indexBuffer;
-        let gl=view.gl;
+        let gl=this.view.gl;
         let tangentSize=200.0;
         
             // create the lines
@@ -220,7 +221,7 @@ class DebugClass
         let vIdx,iIdx;
         let vertices,indexes;
         let vertexPosBuffer,indexBuffer;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // create the lines
 
@@ -331,7 +332,7 @@ class DebugClass
         let rotVector,particle,pnt;
         let vertices,indexes;
         let vertexPosBuffer,indexBuffer;
-        let gl=view.gl; 
+        let gl=this.view.gl; 
         let skeleton=model.skeleton;
         
         if (skeleton===null) return;
@@ -427,7 +428,7 @@ class DebugClass
         let n,v,vIdx,iIdx,drawIdx,nVertex;
         let vertices,indexes;
         let vertexPosBuffer,indexBuffer;
-        let gl=view.gl;
+        let gl=this.view.gl;
         let normalSize=200.0;
         let mesh=model.mesh;
         
@@ -497,7 +498,7 @@ class DebugClass
         let n,v,vIdx,iIdx,drawIdx,nVertex;
         let vertices,indexes;
         let vertexPosBuffer,indexBuffer;
-        let gl=view.gl;
+        let gl=this.view.gl;
         let normalSize=200.0;
         let mesh=model.mesh;
         
@@ -571,7 +572,7 @@ class DebugClass
         let n,v,nVertex,vIdx;
         let vertices;
         let vertexPosBuffer,indexBuffer;
-        let gl=view.gl;
+        let gl=this.view.gl;
         let mesh=model.mesh;
         
             // get the offset vertices
@@ -695,11 +696,3 @@ class DebugClass
         document.body.appendChild(cvs);
     }
 }
-
-//
-// the global debug object
-//
-
-let debug=new DebugClass();
-
-export default debug;

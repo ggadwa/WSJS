@@ -1,6 +1,5 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-import map from '../../code/map/map.js';
 
 //
 // map hallways and doors

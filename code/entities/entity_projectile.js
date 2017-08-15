@@ -1,6 +1,3 @@
-import view from '../../code/main/view.js';
-import sound from '../../code/sound/sound.js';
-
 //
 // entity projectile object
 //

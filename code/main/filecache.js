@@ -14,7 +14,7 @@ class FileClass
     }
 }
 
-class FileCacheClass
+export default class FileCacheClass
 {
     constructor()
     {
@@ -121,11 +121,3 @@ class FileCacheClass
         return(null);
     }
 }
-
-//
-// the file cache global
-//
-
-let fileCache=new FileCacheClass();
-
-export default fileCache;

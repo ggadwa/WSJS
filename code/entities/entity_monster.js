@@ -1,7 +1,5 @@
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
-import view from '../../code/main/view.js';
-import sound from '../../code/sound/sound.js';
 
 //
 // monster entity class

@@ -3,8 +3,6 @@ import PointClass from '../../code/utility/point.js';
 import RectClass from '../../code/utility/rect.js';
 import PlaneClass from '../../code/utility/plane.js';
 import ColorClass from '../../code/utility/color.js';
-import map from '../../code/map/map.js';
-import input from '../../code/main/input.js';
 import ViewCameraClass from '../../code/main/view_camera.js';
 import TextClass from '../../code/text/text.js';
 import InterfaceClass from '../../code/interface/interface.js';
@@ -15,10 +13,12 @@ const DEGREE_TO_RAD=Math.PI/180.0;
 // view class
 //
 
-class ViewClass
+export default class ViewClass
 {
-    constructor()
+    constructor(fileCache)
     {
+        this.fileCache=fileCache;
+        
             // the opengl context
 
         this.gl=null;
@@ -210,8 +210,8 @@ class ViewClass
         
             // create needed objects
             
-        this.text=new TextClass();
-        this.interface=new InterfaceClass();
+        this.text=new TextClass(this,this.fileCache);
+        this.interface=new InterfaceClass(this,this.fileCache);
         this.camera=new ViewCameraClass();
 
             // initialize other drawing objects
@@ -283,10 +283,6 @@ class ViewClass
         this.fpsTotal=0;
         this.fpsCount=0;
         this.fpsStartTimeStamp=timeStamp;
-        
-            // and start/stop input
-            
-        input.setPauseState(pause);
     }
     
         //
@@ -534,7 +530,7 @@ class ViewClass
         // draw view
         //
 
-    draw()
+    draw(map,sky)
     {
         let n,nEntity,entity;
         let light,tintOn,tintAtt;
@@ -615,9 +611,9 @@ class ViewClass
         
             // draw the sky
             
-        sky.drawStart();
-        sky.draw();
-        sky.drawEnd();
+        this.sky.drawStart();
+        this.sky.draw();
+        this.sky.drawEnd();
         
             // draw the map
        
@@ -900,11 +896,3 @@ class ViewClass
     }
     
 }
-    
-//
-// the global view class
-//
-
-let view=new ViewClass();
-
-export default view;

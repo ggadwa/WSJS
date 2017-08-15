@@ -1,12 +1,18 @@
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
-import genRandom from '../../generate/utility/random.js';
-import fileCache from '../../code/main/filecache.js';
+import FileCacheClass from '../../code/main/filecache.js';
+import ViewClass from '../../code/main/view.js';
+import MapClass from '../../code/map/map.js';
 import ModelListClass from '../../code/model/model_list.js';
-import view from '../../code/main/view.js';
-import map from '../../code/map/map.js';
-import sound from '../../code/sound/sound.js';
-import input from '../../code/main/input.js';
+import SkyClass from '../../code/sky/sky.js';
+import EntityListClass from '../../code/entities/entity_list.js';
+import ParticleListClass from '../../code/particle/particle_list.js';
+import DebugClass from '../../code/debug/debug.js';
+import InputClass from '../../code/main/input.js';
+import SoundClass from '../../code/sound/sound.js';
+import GenWeaponClass from '../../generate/thing/gen_weapon.js';
+import GenProjectileClass from '../../generate/thing/gen_projectile.js';
+import genRandom from '../../generate/utility/random.js';
 
 //
 // main class
@@ -16,17 +22,30 @@ class MainClass
 {
     constructor()
     {
+            // game globals
+            
+        this.fileCache=new FileCacheClass();
+        this.view=new ViewClass(this.fileCache);
+        this.map=new MapClass(this.view,this.fileCache);
+        this.modelList=new ModelListClass(this.view,this.fileCache);
+        this.sky=new SkyClass(this.view,this.fileCache);
+        this.entityList=new EntityListClass();
+        this.particleList=new ParticleListClass(this.view,this.fileCache);
+        this.debug=new DebugClass(this.view,this.fileCache);
+        this.input=new InputClass(this.view);
+        this.sound=new SoundClass();
+        
         Object.seal(this);
     }
 
     run()
     {
-        fileCache.fillCache(this.initCanvas.bind(this));       // this contains all the shader code, needs to be loaded first
+        this.fileCache.fillCache(this.initCanvas.bind(this));       // this contains all the shader code, needs to be loaded first
     }
     
     initCanvas()
     {
-        view.createCanvas();
+        this.view.createCanvas();
         
         setTimeout(this.initGL.bind(this),1);
     }
@@ -35,33 +54,33 @@ class MainClass
     {
             // init view ang webgl
         
-        if (!view.initialize()) return;
+        if (!this.view.initialize()) return;
 
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Initialized WebGL2');
-        view.loadingScreenAddString('Initializing Internal Structures');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Initialized WebGL2');
+        this.view.loadingScreenAddString('Initializing Internal Structures');
+        this.view.loadingScreenDraw(null);
 
         setTimeout(this.initInternal.bind(this),1);
     }
 
     initInternal()
     {
-        if (!sound.initialize()) return;
-        if (!map.initialize()) return;
-        if (!modelList.initialize()) return;
-        if (!sky.initialize()) return(false);
+        if (!this.sound.initialize()) return;
+        if (!this.map.initialize()) return;
+        if (!this.modelList.initialize()) return;
+        if (!this.sky.initialize()) return(false);
         if (!entityList.initialize()) return;
         if (!particleList.initialize()) return(false);
         if (!debug.initialize()) return;
 
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Dynamic Map');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Map');
+        this.view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildMap.bind(this),1);
     }
@@ -74,9 +93,9 @@ class MainClass
 
     initBuildMapFinish()
     {
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Building Collision Geometry');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Building Collision Geometry');
+        this.view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildCollisionGeometry.bind(this),1);
     }
@@ -85,15 +104,15 @@ class MainClass
     {
             // build the collision geometry
 
-        map.buildCollisionGeometry();
+        this.map.buildCollisionGeometry();
 
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Player Model');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Player Model');
+        this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildPlayerModel.bind(this,new GenBitmapSkinClass()),1);
+        setTimeout(this.initBuildPlayerModel.bind(this,new GenBitmapSkinClass(this.view)),1);
     }
     
     initBuildPlayerModel(genBitmapSkin)
@@ -108,13 +127,13 @@ class MainClass
         model=new ModelClass('player',modelConstants.TYPE_CREATURE);
         genModel.build(model,modelBitmap,1.0,false);
 
-        modelList.addModel(model);
+        this.modelList.addModel(model);
 
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Monster Models');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Monster Models');
+        this.view.loadingScreenDraw(null);
         
         setTimeout(this.initBuildMonsterModels.bind(this,0,genModel,genBitmapSkin),1);
     }
@@ -130,13 +149,13 @@ class MainClass
         model=new ModelClass(('monster_'+idx),modelConstants.TYPE_CREATURE);
         genModel.build(model,modelBitmap,1.0,false);
 
-        modelList.addModel(model);
+        this.modelList.addModel(model);
 
             // if more models, then loop back around
 
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
-            view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
+            this.view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
             setTimeout(this.initBuildMonsterModels.bind(this,idx,genModel,genBitmapSkin),1);
             return;
         }
@@ -144,16 +163,16 @@ class MainClass
             // next step
 
         if (config.MONSTER_BOSS) {
-            view.loadingScreenUpdate();
-            view.loadingScreenAddString('Generating Boss Model');
-            view.loadingScreenDraw(null);
+            this.view.loadingScreenUpdate();
+            this.view.loadingScreenAddString('Generating Boss Model');
+            this.view.loadingScreenDraw(null);
 
             setTimeout(this.initBuildBossModel.bind(this,genModel,genBitmapSkin),1);
         }
         else {
-            view.loadingScreenUpdate();
-            view.loadingScreenAddString('Generating Weapons');
-            view.loadingScreenDraw(null);
+            this.view.loadingScreenUpdate();
+            this.view.loadingScreenAddString('Generating Weapons');
+            this.view.loadingScreenDraw(null);
 
             setTimeout(this.initBuildWeapons.bind(this,genModel,null),1);
         }
@@ -170,13 +189,13 @@ class MainClass
         model=new ModelClass('boss',modelConstants.TYPE_CREATURE);
         genModel.build(model,modelBitmap,genRandom.randomFloat(2.5,3.0),false);
 
-        modelList.addModel(model);
+        this.modelList.addModel(model);
 
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Weapons');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Weapons');
+        this.view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildWeapons.bind(this,genModel,null),1);
     }
@@ -188,7 +207,7 @@ class MainClass
             // supergumba -- right now this is bad, it'll leak and get closed more than once,
             // deal with this when we have real weapon routines
         
-        if (genBitmapItem===null) genBitmapItem=new GenBitmapItemClass();
+        if (genBitmapItem===null) genBitmapItem=new GenBitmapItemClass(this.view);
         modelBitmap=genBitmapItem.generate(0,false);
 
             // weapon
@@ -196,20 +215,20 @@ class MainClass
         model=new ModelClass('weapon_0',modelConstants.TYPE_WEAPON);
         genModel.build(model,modelBitmap,1.0,false);
 
-        modelList.addModel(model);
+        this.modelList.addModel(model);
 
             // projectile
 
         model=new ModelClass('projectile_0',modelConstants.TYPE_PROJECTILE);
         genModel.build(model,modelBitmap,1.0,false);
 
-        modelList.addModel(model);
+        this.modelList.addModel(model);
 
             // next step
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Generating Dynamic Entities');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Dynamic Entities');
+        this.view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildEntities.bind(this),1);
     }
@@ -220,20 +239,20 @@ class MainClass
         let model,pos,playerEntity,playerWeapon;
         let monsterAIs;
         
-        let genSound=new GenSoundClass(sound.getAudioContext());
-        let genProjectile=new GenProjectileClass(genSound);
-        let genWeapon=new GenWeaponClass();
+        let genSound=new GenSoundClass(this.sound.getAudioContext());
+        let genProjectile=new GenProjectileClass(this.modelList,genSound);
+        let genWeapon=new GenWeaponClass(this.modelList,genSound);
         let genAI=new GenAIClass(genProjectile,genSound);
 
             // make player entity
 
-        pos=map.findRandomPlayerPosition();
+        pos=this.map.findRandomPlayerPosition();
         if (pos===null) {
             alert('Couldn\'t find a place to spawn player!');
             return;
         }
 
-        playerEntity=new EntityPlayerClass('player',pos,new PointClass(0.0,0.0,0.0),200,modelList.getModel('player'));
+        playerEntity=new EntityPlayerClass('player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
         playerWeapon=genWeapon.generate();
@@ -256,27 +275,27 @@ class MainClass
             // it's own model
 
         for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
-            pos=map.findRandomMonsterPosition();
+            pos=this.map.findRandomMonsterPosition();
             if (pos===null) continue;
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
-            model=modelList.cloneModel('monster_'+monsterType);
+            model=this.modelList.cloneModel('monster_'+monsterType);
             entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
         
             // boss monster
             
         if (config.MONSTER_BOSS) {
-            pos=map.findRandomBossPosition();
-            model=modelList.cloneModel('boss');
+            pos=this.map.findRandomBossPosition();
+            model=this.modelList.cloneModel('boss');
             if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 
             // finished
 
-        view.loadingScreenUpdate();
-        view.loadingScreenAddString('Running');
-        view.loadingScreenDraw(null);
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Running');
+        this.view.loadingScreenDraw(null);
 
         setTimeout(this.initFinish.bind(this),1);    
     }
@@ -286,33 +305,43 @@ class MainClass
             // finish by setting up all the mesh
             // buffers and indexes
 
-        map.setupBuffers();
+        this.map.setupBuffers();
 
             // ambient
 
-        view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT);
+        this.view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT);
         
             // set the listener to this entity
             
-        sound.setListenerToEntity(entityList.getPlayer());
+        this.sound.setListenerToEntity(entityList.getPlayer());
 
             // start the input
 
-        input.initialize(entityList.getPlayer());
+        this.input.initialize(entityList.getPlayer());
         
             // the cancel loop flag
             
-        view.loopCancel=false;
+        this.view.loopCancel=false;
         
             // start the main loop in paused mode
 
-        view.setPauseState(true,true);
+        this.view.setPauseState(true,true);
+        this.input.setPauseState(true);
         
             // and now start the loop
             
         window.requestAnimationFrame(mainLoop);
     }
 }
+
+//
+// single global object is the main class
+// and contains all other global objects
+// (this elimates a bunch of circular logic
+// and simplifies imports)
+//
+
+let main=new MainClass();
 
 //
 // main loop
@@ -325,6 +354,7 @@ const BAIL_MILLISECONDS=5000;
 function mainLoop(timeStamp)
 {
     let fpsTime;
+    let view=main.view;
     
         // next frame
         
@@ -337,7 +367,7 @@ function mainLoop(timeStamp)
     
         // run the input
         
-    if (!view.paused) input.run();
+    if (!view.paused) this.input.run();
     
         // map movement, entities, and
         // other physics, we only do this if we've
@@ -350,7 +380,7 @@ function mainLoop(timeStamp)
         view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
 
         if (view.physicsTick>PHYSICS_MILLISECONDS) {
-            map.runMovements();
+            this.map.runMovements();
 
             if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
@@ -368,7 +398,7 @@ function mainLoop(timeStamp)
                 // update the listener and all current
                 // playing sound positions
                 
-            sound.update();
+            this.sound.update();
         }
     }
     
@@ -382,7 +412,7 @@ function mainLoop(timeStamp)
     if (view.drawTick>DRAW_MILLISECONDS) {
         view.lastDrawTimeStamp=view.timeStamp; 
 
-        view.draw();
+        view.draw(map,sky);
         
         view.fpsTotal+=view.drawTick;
         view.fpsCount++;
@@ -403,9 +433,7 @@ function mainLoop(timeStamp)
 }
 
 //
-// single global object is the main class
+// export the global main
 //
-
-let main=new MainClass();
 
 export default main;

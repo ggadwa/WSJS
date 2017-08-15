@@ -1,5 +1,4 @@
 import InterfaceShaderClass from '../../code/interface/interface_shader.js';
-import view from '../../code/main/view.js';
 
 //
 // interface class
@@ -7,9 +6,11 @@ import view from '../../code/main/view.js';
 
 export default class InterfaceClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        this.interfaceShader=new InterfaceShaderClass();
+        this.view=view;
+        
+        this.interfaceShader=new InterfaceShaderClass(view,fileCache);
 
         this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
         this.vertexPosBuffer=null;
@@ -25,14 +26,14 @@ export default class InterfaceClass
     {
         if (!this.interfaceShader.initialize()) return(false);
         
-        this.vertexPosBuffer=view.gl.createBuffer();
+        this.vertexPosBuffer=this.view.gl.createBuffer();
         
         return(true);
     }
 
     release()
     {
-        view.gl.deleteBuffer(this.vertexPosBuffer);
+        this.view.gl.deleteBuffer(this.vertexPosBuffer);
         
         this.interfaceShader.release();
     }
@@ -43,7 +44,7 @@ export default class InterfaceClass
 
     drawStart()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.disable(gl.DEPTH_TEST);
 
@@ -55,7 +56,7 @@ export default class InterfaceClass
 
     drawEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         this.interfaceShader.drawEnd();
 
@@ -65,7 +66,7 @@ export default class InterfaceClass
     
     drawFrameRect(rect,color,alpha)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // vertices
             
@@ -101,7 +102,7 @@ export default class InterfaceClass
     
     drawRect(rect,color,alpha)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // vertices
             

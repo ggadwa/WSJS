@@ -1,7 +1,5 @@
 import PointClass from '../../code/utility/point.js';
-import view from '../../code/main/view.js';
 import genRandom from '../../generate/utility/random.js';
-
 
 //
 // model bone class

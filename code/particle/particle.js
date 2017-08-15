@@ -1,7 +1,6 @@
 import PointClass from '../../code/utility/point.js';
 import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
-import view from '../../code/main/view.js';
 
 //
 // particle class

@@ -1,7 +1,5 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-import view from '../../code/main/view.js';
-import map from '../../code/map/map.js';
 
 const RAD_TO_DEGREE=180.0/Math.PI;
 

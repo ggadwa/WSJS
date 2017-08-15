@@ -1,5 +1,4 @@
 import ShaderClass from '../../code/shader/shader.js';
-import view from '../../code/main/view.js';
 
 //
 // map overlay shader class
@@ -7,9 +6,10 @@ import view from '../../code/main/view.js';
 
 export default class MapOverlayShaderClass extends ShaderClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        super();
+        super(view,fileCache);
+        
         this.vertexPositionAttribute=null;
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
@@ -23,7 +23,7 @@ export default class MapOverlayShaderClass extends ShaderClass
 
     initialize()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -55,13 +55,13 @@ export default class MapOverlayShaderClass extends ShaderClass
 
     drawStart()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.useProgram(this.program);
 
             // setup the uniforms
 
-        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
+        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,this.view.orthoMatrix);
 
             // enable the vertex attributes
 
@@ -70,13 +70,13 @@ export default class MapOverlayShaderClass extends ShaderClass
     
     drawColor(color)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         gl.uniform3f(this.colorUniform,color.r,color.g,color.b);
     }
 
     drawEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // disable vertex attributes
 

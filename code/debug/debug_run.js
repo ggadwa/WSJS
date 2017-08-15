@@ -1,4 +1,4 @@
-import sound from '../../code/sound/sound.js';
+import SoundClass from '../../code/sound/sound.js';
 
 class DebugItemClass
 {
@@ -41,19 +41,19 @@ export default class DebugRunClass
         this.fillListWithModelGenerator();
 
         this.list.push(new DebugItemClass('Bitmaps',-1,-1,null,true));
-        this.fillListWithBitmapGenerator('Wall',new GenBitmapWallClass());
-        this.fillListWithBitmapGenerator('Floor',new GenBitmapFloorClass());
-        this.fillListWithBitmapGenerator('Ceiling',new GenBitmapCeilingClass());
-        this.fillListWithBitmapGenerator('Door',new GenBitmapDoorClass());
-        this.fillListWithBitmapGenerator('Metal',new GenBitmapMetalClass());
-        this.fillListWithBitmapGenerator('Machine',new GenBitmapMachineClass());
-        this.fillListWithBitmapGenerator('Panel',new GenBitmapPanelClass());
-        this.fillListWithBitmapGenerator('Box',new GenBitmapBoxClass());
-        this.fillListWithBitmapGenerator('Liquid',new GenBitmapLiquidClass());
-        this.fillListWithBitmapGenerator('Skin',new GenBitmapSkinClass());
-        this.fillListWithBitmapGenerator('Item',new GenBitmapItemClass());
-        this.fillListWithBitmapGenerator('Sky',new GenBitmapSkyClass());
-        this.fillListWithBitmapGenerator('Particle',new GenBitmapParticleClass());
+        this.fillListWithBitmapGenerator('Wall',new GenBitmapWallClass(view));
+        this.fillListWithBitmapGenerator('Floor',new GenBitmapFloorClass(view));
+        this.fillListWithBitmapGenerator('Ceiling',new GenBitmapCeilingClass(view));
+        this.fillListWithBitmapGenerator('Door',new GenBitmapDoorClass(view));
+        this.fillListWithBitmapGenerator('Metal',new GenBitmapMetalClass(view));
+        this.fillListWithBitmapGenerator('Machine',new GenBitmapMachineClass(view));
+        this.fillListWithBitmapGenerator('Panel',new GenBitmapPanelClass(view));
+        this.fillListWithBitmapGenerator('Box',new GenBitmapBoxClass(view));
+        this.fillListWithBitmapGenerator('Liquid',new GenBitmapLiquidClass(view));
+        this.fillListWithBitmapGenerator('Skin',new GenBitmapSkinClass(view));
+        this.fillListWithBitmapGenerator('Item',new GenBitmapItemClass(view));
+        this.fillListWithBitmapGenerator('Sky',new GenBitmapSkyClass(view));
+        this.fillListWithBitmapGenerator('Particle',new GenBitmapParticleClass(view));
         
         sound.initialize();
         this.list.push(new DebugItemClass('Sounds',-1,-1,null,true));

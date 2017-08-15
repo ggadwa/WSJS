@@ -4,13 +4,16 @@
 
 export default class GenWeaponClass
 {
-    constructor()
+    constructor(modelList,genSound)
     {
+        this.modelList=modelList;
+        this.genSound=genSound;
+        
         Object.seal(this);
     }
     
     generate()
     {
-        return(new WeaponClass(modelList.getModel('weapon_0')));
+        return(new WeaponClass(this.modelList.getModel('weapon_0')));
     }
 }

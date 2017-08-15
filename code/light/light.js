@@ -1,7 +1,6 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import ColorClass from '../../code/utility/color.js';
-import view from '../../code/main/view.js';
 
 //
 // map light class

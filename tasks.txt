@@ -12,6 +12,58 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
+---> SOUNDCLASS is different from the other classes (make part of soundlist?)
+---> turn FileClass into a MAP and remove
+
+particle_list
+debug_run
+debug
+debug_shader
+entity
+entity_monster
+entity_projectile
+weapon
+interface
+interface_shader
+light
+input
+main
+view
+map
+map_liquid
+map_liquid_shader
+map_mesh
+map_mesh_shader
+map_overlay
+map_overlay_shader
+movement
+model_mesh
+model_mesh_shader
+model_skeleton
+particle
+particle_list
+particle_shader
+shader
+sky_shader
+text
+text_shader
+gen_map
+
+  
+----globals----
+view
+map
+sky
+lists
+filecache
+sound
+input
+config
+genRandom
+
+
+
+
 particleList
 entityList
 fileCache

@@ -4,12 +4,12 @@ import ModelMeshShaderClass from '../../code/model/model_mesh_shader.js';
 // model list class
 //
 
-class ModelListClass
+export default class ModelListClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
         this.models=[];
-        this.modelMeshShader=new ModelMeshShaderClass();
+        this.modelMeshShader=new ModelMeshShaderClass(view,fileCache);
         
         Object.seal(this);
     }
@@ -79,11 +79,3 @@ class ModelListClass
     }
 
 }
-    
-//
-// the modelList global object
-//
-
-let modelList=new ModelListClass();
-
-export default modelList;

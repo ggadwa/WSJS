@@ -1,6 +1,4 @@
 import PointClass from '../../code/utility/point.js';
-import view from '../../code/main/view.js';
-import map from '../../code/map/map.js';
 
 //
 // single move class

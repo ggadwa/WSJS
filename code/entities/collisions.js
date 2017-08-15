@@ -1,7 +1,6 @@
 import PointClass from '../../code/utility/point.js';
 import LineClass from '../../code/utility/line.js';
 import BoundClass from '../../code/utility/bound.js';
-import map from '../../code/map/map.js';
 
 //
 // collision class

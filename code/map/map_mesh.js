@@ -3,7 +3,6 @@ import Point2DClass from '../../code/utility/2D_point.js';
 import LineClass from '../../code/utility/line.js';
 import BoundClass from '../../code/utility/bound.js';
 import CollisionRectClass from '../../code/utility/collision_rect.js';
-import view from '../../code/main/view.js';
 
 //
 // map mesh vertex

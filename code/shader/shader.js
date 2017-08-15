@@ -1,14 +1,14 @@
-import fileCache from '../../code/main/filecache.js';
-import view from '../../code/main/view.js';
-
 //
-// generic shader class
+// shader base class
 //
 
 export default class ShaderClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
+        this.view=view;
+        this.fileCache=fileCache;
+        
         this.vertexShader=null;
         this.fragmentShader=null;
         this.program=null;
@@ -22,7 +22,7 @@ export default class ShaderClass
 
     initialize(name)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // get the shaders from divs
 
@@ -54,7 +54,7 @@ export default class ShaderClass
 
     release()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         if (this.program===null) return;
 
@@ -82,11 +82,11 @@ export default class ShaderClass
     loadVertexShader(name)
     {
         let source;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
 
-        source=fileCache.getFile('shaders/'+name+'.vert');
+        source=this.fileCache.getFile('shaders/'+name+'.vert');
         gl.shaderSource(this.vertexShader,source);
         gl.compileShader(this.vertexShader);
 
@@ -99,11 +99,11 @@ export default class ShaderClass
     loadFragmentShader(name)
     {
         let source;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
 
-        source=fileCache.getFile('shaders/'+name+'.frag');
+        source=this.fileCache.getFile('shaders/'+name+'.frag');
         gl.shaderSource(this.fragmentShader,source);
         gl.compileShader(this.fragmentShader);
 
@@ -127,3 +127,4 @@ export default class ShaderClass
     }
 
 }
+

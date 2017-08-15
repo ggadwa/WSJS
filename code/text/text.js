@@ -1,7 +1,6 @@
 import ColorClass from '../../code/utility/color.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 import TextShaderClass from '../../code/text/text_shader.js';
-import view from '../../code/main/view.js';
 
 //
 // text class
@@ -9,8 +8,10 @@ import view from '../../code/main/view.js';
 
 export default class TextClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
+        this.view=view;
+        
             // constants
             
         this.TEXT_TEXTURE_WIDTH=512;
@@ -29,7 +30,7 @@ export default class TextClass
             
             // variables
             
-        this.textShader=new TextShaderClass();
+        this.textShader=new TextShaderClass(view,fileCache);
         this.fontTexture=null;
 
         this.fontCharWids=new Array(128);
@@ -57,7 +58,7 @@ export default class TextClass
     {
         let x,y,yAdd,cIdx,charStr,ch;
         let canvas,ctx,genBitmapUtility;
-        let gl=view.gl;
+        let gl=this.view.gl;
 
             // start the shader
 
@@ -73,7 +74,7 @@ export default class TextClass
             // background is black, text is white
             // so it can be colored
 
-        genBitmapUtility=new GenBitmapClass();
+        genBitmapUtility=new GenBitmapClass(this.view);
         genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,new ColorClass(0.0,0.0,0.0));
 
             // draw the text
@@ -129,7 +130,7 @@ export default class TextClass
 
     release()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // remove vbos
             
@@ -177,7 +178,7 @@ export default class TextClass
 
     drawStart()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.disable(gl.DEPTH_TEST);
         
@@ -189,7 +190,7 @@ export default class TextClass
 
     drawEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         this.textShader.drawEnd();
 
@@ -202,7 +203,7 @@ export default class TextClass
         let n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
         let cIdx,gx,gy,gxAdd,gyAdd;
         let len,drawWid,nTrig;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // get the length and clip if
             // past our pre-set buffer size

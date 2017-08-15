@@ -1,5 +1,4 @@
 import ShaderClass from '../../code/shader/shader.js';
-import view from '../../code/main/view.js';
 
 //
 // interface shader class
@@ -7,9 +6,10 @@ import view from '../../code/main/view.js';
 
 export default class InterfaceShaderClass extends ShaderClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        super();
+        super(view,fileCache);
+        
         this.vertexPositionAttribute=null;
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
@@ -23,7 +23,7 @@ export default class InterfaceShaderClass extends ShaderClass
 
     initialize()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // get a new shader object
             // and load/compile it
@@ -55,13 +55,13 @@ export default class InterfaceShaderClass extends ShaderClass
 
     drawStart()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.useProgram(this.program);
 
             // setup the uniforms
 
-        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,view.orthoMatrix);
+        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,this.view.orthoMatrix);
 
             // enable the vertex attributes
 
@@ -70,7 +70,7 @@ export default class InterfaceShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // disable vertex attributes
 

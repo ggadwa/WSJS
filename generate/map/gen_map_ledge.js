@@ -1,6 +1,5 @@
 import PointClass from '../../code/utility/point.js';
 import genRandom from '../../generate/utility/random.js';
-import map from '../../code/map/map.js';
 
 //
 // map ledges

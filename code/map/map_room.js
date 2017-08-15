@@ -5,7 +5,6 @@ import BoundClass from '../../code/utility/bound.js';
 import RectClass from '../../code/utility/rect.js';
 import GridClass from '../../code/utility/grid.js';
 import genRandom from '../../generate/utility/random.js';
-import map from '../../code/map/map.js';
 
 //
 // special class that contains some constants

@@ -5,7 +5,7 @@ import SoundPlayListClass from '../../code/sound/sound_play_list.js';
 // sound class
 //
 
-class SoundClass
+export default class SoundClass
 {
     constructor()
     {
@@ -114,11 +114,3 @@ class SoundClass
         this.soundPlayList.updateSoundPlays(this.currentListenerEntity);
     }
 }
-
-//
-// the global sound object
-//
-
-let sound=new SoundClass();
-
-export default sound;

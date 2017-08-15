@@ -1,6 +1,4 @@
 import BoundClass from '../../code/utility/bound.js';
-import view from '../../code/main/view.js';
-import map from '../../code/map/map.js';
 
 //
 // map liquid class

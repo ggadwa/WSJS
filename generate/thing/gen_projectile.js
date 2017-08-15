@@ -6,8 +6,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenProjectileClass
 {
-    constructor(genSound)
+    constructor(modelList,genSound)
     {
+        this.modelList=modelList;
         this.genSound=genSound;
         
         Object.seal(this);
@@ -15,7 +16,7 @@ export default class GenProjectileClass
 
     generate(isPlayer)
     {
-        let projectile=new ProjectileClass(modelList.getModel('projectile_0'));
+        let projectile=new ProjectileClass(this.modelList.getModel('projectile_0'));
         
         projectile.setLifeTick(10000);
         projectile.setFireSoundBuffer(this.genSound.generate(this.genSound.TYPE_GUN_FIRE,false));

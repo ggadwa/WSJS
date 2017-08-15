@@ -1,4 +1,4 @@
-import view from '../../code/main/view.js';
+import SkyShaderClass from '../../code/sky/sky_shader.js';
 
 //
 // sky class
@@ -6,9 +6,10 @@ import view from '../../code/main/view.js';
 
 export default class SkyClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        this.skyShader=new SkyShaderClass();
+        this.view=view;
+        this.skyShader=new SkyShaderClass(view,fileCache);
 
         this.vertexes=null;
         this.uvs=null;
@@ -29,7 +30,7 @@ export default class SkyClass
 
     initialize()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         let genBitmapSky;
 
         if (!this.skyShader.initialize()) return(false);
@@ -46,7 +47,7 @@ export default class SkyClass
         
             // create bitmaps
         
-        genBitmapSky=new GenBitmapSkyClass();
+        genBitmapSky=new GenBitmapSkyClass(this.view);
         this.bitmap=genBitmapSky.generateRandom(false);
         
         return(true);
@@ -54,7 +55,7 @@ export default class SkyClass
 
     release()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.deleteBuffer(this.vertexPosBuffer);
         gl.deleteBuffer(this.uvPosBuffer);
@@ -71,7 +72,7 @@ export default class SkyClass
 
     drawStart()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.disable(gl.DEPTH_TEST);
 
@@ -80,7 +81,7 @@ export default class SkyClass
 
     drawEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         this.skyShader.drawEnd();
 
@@ -148,8 +149,8 @@ export default class SkyClass
         
     draw()
     {
-        let gl=view.gl;
-        let cameraPos=view.camera.position;
+        let gl=this.view.gl;
+        let cameraPos=this.view.camera.position;
         let skyRadius=25000;
         
         this.bitmap.attachAsSky();
@@ -177,8 +178,3 @@ export default class SkyClass
     
 }
 
-//
-// the global sky object
-//
-
-let sky=new SkyClass();

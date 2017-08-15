@@ -1,5 +1,4 @@
 import ShaderClass from '../../code/shader/shader.js';
-import view from '../../code/main/view.js';
 
 //
 // map shader object
@@ -7,9 +6,9 @@ import view from '../../code/main/view.js';
 
 export default class MapLiquidShaderClass extends ShaderClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
-        super();
+        super(view,fileCache);
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
@@ -34,7 +33,7 @@ export default class MapLiquidShaderClass extends ShaderClass
 
             // setup uniforms
 
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.useProgram(this.program);
 
@@ -67,15 +66,15 @@ export default class MapLiquidShaderClass extends ShaderClass
     {
             // using the map shader
 
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.useProgram(this.program);
 
             // matrix
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,view.perspectiveMatrix);
-        gl.uniformMatrix4fv(this.modelMatrixUniform,false,view.modelMatrix);
-        gl.uniformMatrix3fv(this.normalMatrixUniform,false,view.normalMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix);
+        gl.uniformMatrix4fv(this.modelMatrixUniform,false,this.view.modelMatrix);
+        gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.view.normalMatrix);
 
             // enable the vertex attributes
 
@@ -85,7 +84,7 @@ export default class MapLiquidShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
             // disable vertex attributes
 

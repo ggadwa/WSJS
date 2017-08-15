@@ -13,21 +13,22 @@ import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import MovementListClass from '../../code/map/movement_list.js';
 import MapOverlayClass from '../../code/map/map_overlay.js';
 import config from '../../code/main/config.js';
-import view from '../../code/main/view.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
 // map class
 //
 
-class MapClass
+export default class MapClass
 {
-    constructor()
+    constructor(view,fileCache)
     {
         let n;
         
-        this.mapMeshShader=new MapMeshShaderClass();
-        this.mapLiquidShader=new MapLiquidShaderClass();        // shared
+        this.view=view;
+        
+        this.mapMeshShader=new MapMeshShaderClass(view,fileCache);
+        this.mapLiquidShader=new MapLiquidShaderClass(view,fileCache);        // shared
 
         this.meshes=[];
         this.lights=[];
@@ -63,15 +64,15 @@ class MapClass
         this.TEXTURE_TYPE_BOX=10;
         this.TEXTURE_TYPE_LIQUID=11;
         
-        this.genBitmapWall=new GenBitmapWallClass();
-        this.genBitmapFloor=new GenBitmapFloorClass();
-        this.genBitmapCeiling=new GenBitmapCeilingClass();
-        this.genBitmapDoor=new GenBitmapDoorClass();
-        this.genBitmapMetal=new GenBitmapMetalClass();
-        this.genBitmapMachine=new GenBitmapMachineClass();
-        this.genBitmapPanel=new GenBitmapPanelClass();
-        this.genBitmapBox=new GenBitmapBoxClass();
-        this.genBitmapLiquid=new GenBitmapLiquidClass();
+        this.genBitmapWall=new GenBitmapWallClass(view);
+        this.genBitmapFloor=new GenBitmapFloorClass(view);
+        this.genBitmapCeiling=new GenBitmapCeilingClass(view);
+        this.genBitmapDoor=new GenBitmapDoorClass(view);
+        this.genBitmapMetal=new GenBitmapMetalClass(view);
+        this.genBitmapMachine=new GenBitmapMachineClass(view);
+        this.genBitmapPanel=new GenBitmapPanelClass(view);
+        this.genBitmapBox=new GenBitmapBoxClass(view);
+        this.genBitmapLiquid=new GenBitmapLiquidClass(view);
         
         this.textureBitmapList=[];
         for (n=0;n!==this.TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
@@ -79,7 +80,7 @@ class MapClass
         this.lightmapBitmapList=[];
         
         this.movementList=new MovementListClass();
-        this.overlay=new MapOverlayClass();
+        this.overlay=new MapOverlayClass(view);
 
         this.lightXBound=new BoundClass(0,0);           // global not local so they won't get GCd
         this.lightYBound=new BoundClass(0,0);
@@ -358,9 +359,9 @@ class MapClass
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
 
-            x=view.camera.position.x-light.position.x;
-            y=view.camera.position.y-light.position.y;
-            z=view.camera.position.z-light.position.z;
+            x=this.view.camera.position.x-light.position.x;
+            y=this.view.camera.position.y-light.position.y;
+            z=this.view.camera.position.z-light.position.z;
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
         }
         
@@ -379,8 +380,8 @@ class MapClass
                 
             idx=-1;
 
-            for (k=0;k!==view.lights.length;k++) {
-                if (view.lights[k].dist>light.dist) {
+            for (k=0;k!==this.view.lights.length;k++) {
+                if (this.view.lights[k].dist>light.dist) {
                     idx=k;
                     break;
                 }
@@ -389,11 +390,11 @@ class MapClass
                 // add the light
                 
             if (idx===-1) {
-                if (view.lights.length<view.MAX_LIGHT_COUNT) view.lights.push(light);
+                if (this.view.lights.length<this.view.MAX_LIGHT_COUNT) this.view.lights.push(light);
             }
             else {
-                view.lights.splice(idx,0,light);
-                if (view.lights.length>view.MAX_LIGHT_COUNT) view.lights.pop();
+                this.view.lights.splice(idx,0,light);
+                if (this.view.lights.length>this.view.MAX_LIGHT_COUNT) this.view.lights.pop();
             }
         }
     }
@@ -601,7 +602,7 @@ class MapClass
 
                 // skip if not in view frustum
 
-            if (!view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
 
                 // time to change bitmap
                 // or lightmap?
@@ -629,21 +630,21 @@ class MapClass
         if (config.DEBUG_DRAW_MAP_MESH_LINES) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(mesh);
+                if (this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(mesh);
             }
         }
         
         if (config.DEBUG_DRAW_MAP_MESH_TANGENTS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(mesh);
+                if (this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(mesh);
             }
         }
         
         if (config.DEBUG_DRAW_MAP_MESH_NORMALS) {
             for (n=0;n!==nMesh;n++) {
                 mesh=this.meshes[n];
-                if (view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(mesh);
+                if (this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(mesh);
             }
         }
         
@@ -655,7 +656,7 @@ class MapClass
 
     drawLiquidStart()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
@@ -665,7 +666,7 @@ class MapClass
 
     drawLiquidEnd()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         this.mapLiquidShader.drawEnd();
         
@@ -689,7 +690,7 @@ class MapClass
 
                 // skip if not in view frustum
 
-            if (!view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
+            if (!this.view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
 
                 // time to change bitmap
                 // or lightmap?
@@ -708,11 +709,3 @@ class MapClass
     }
     
 }
-
-//
-// the global map object
-//
-
-let map=new MapClass();
-
-export default map;

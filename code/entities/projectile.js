@@ -1,5 +1,3 @@
-import sound from '../../code/sound/sound.js';
-
 //
 // projectile class
 //

@@ -1,14 +1,12 @@
-import view from '../../code/main/view.js';
-
 //
-// bitmap class
+// bitmap base class
 //
 
 export default class BitmapClass
 {
-    constructor(bitmapCanvas,normalMapCanvas,specularMapCanvas,glowMapCanvas,uvScale,shineFactor)
+    constructor(view,bitmapCanvas,normalMapCanvas,specularMapCanvas,glowMapCanvas,uvScale,shineFactor)
     {
-        let gl=view.gl;
+        this.view=view;
         
         this.texture=null;
         this.normalMap=null;
@@ -19,7 +17,9 @@ export default class BitmapClass
         this.shineFactor=shineFactor;
 
             // setup the texture
-
+            
+        let gl=this.view.gl;
+        
         this.texture=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,bitmapCanvas);
@@ -73,7 +73,7 @@ export default class BitmapClass
     
     close()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         if (this.texture!==null) gl.deleteTexture(this.texture);
         if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
@@ -87,12 +87,12 @@ export default class BitmapClass
     
     attachAsTexture(shader)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
             // shine factor in shader
 
         gl.uniform1f(shader.shineFactorUniform,this.shineFactor);
-        gl.uniform1f(shader.glowFactorUniform,view.glowFactor);
+        gl.uniform1f(shader.glowFactorUniform,this.view.glowFactor);
 
             // the textures
             
@@ -111,7 +111,7 @@ export default class BitmapClass
     
     attachAsLightmap()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.activeTexture(gl.TEXTURE4);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -119,7 +119,7 @@ export default class BitmapClass
     
     attachAsLiquid()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -127,7 +127,7 @@ export default class BitmapClass
     
     attachAsParticle()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -135,7 +135,7 @@ export default class BitmapClass
     
     attachAsSky()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
