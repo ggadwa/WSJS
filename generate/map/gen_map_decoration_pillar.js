@@ -1,6 +1,7 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import RectClass from '../../code/utility/rect.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -28,30 +29,30 @@ export default class GenRoomDecorationPillarClass
 
             // position
             
-        x=room.xBound.min+Math.trunc(((rect.lft+rect.rgt)*map.ROOM_BLOCK_WIDTH)*0.5);
-        z=room.zBound.min+Math.trunc(((rect.top+rect.bot)*map.ROOM_BLOCK_WIDTH)*0.5);
+        x=room.xBound.min+Math.trunc(((rect.lft+rect.rgt)*constants.ROOM_BLOCK_WIDTH)*0.5);
+        z=room.zBound.min+Math.trunc(((rect.top+rect.bot)*constants.ROOM_BLOCK_WIDTH)*0.5);
         yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(rect.lft,rect.top);
         
             // possible platforms
             
         if (this.hasPlatform) {
-            platformXBound=new BoundClass((room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH)));
-            platformZBound=new BoundClass((room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH)));
+            platformXBound=new BoundClass((room.xBound.min+(rect.lft*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*constants.ROOM_BLOCK_WIDTH)));
+            platformZBound=new BoundClass((room.zBound.min+(rect.top*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*constants.ROOM_BLOCK_WIDTH)));
             
-            platformYBound=new BoundClass(yBound.min,(yBound.min+map.ROOM_FLOOR_DEPTH));
+            platformYBound=new BoundClass(yBound.min,(yBound.min+constants.ROOM_FLOOR_DEPTH));
             map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,false,true,false,map.MESH_FLAG_DECORATION));
 
-            platformYBound=new BoundClass((yBound.max-map.ROOM_FLOOR_DEPTH),yBound.max);
+            platformYBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),yBound.max);
             map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
 
-            yBound.min+=map.ROOM_FLOOR_DEPTH;
-            yBound.max-=map.ROOM_FLOOR_DEPTH;
+            yBound.min+=constants.ROOM_FLOOR_DEPTH;
+            yBound.max-=constants.ROOM_FLOOR_DEPTH;
         }
         
             // the pillar itself
             
         pos=new PointClass(x,yBound.max,z);
-        radius=Math.trunc(((rect.rgt-rect.lft)*map.ROOM_BLOCK_WIDTH)*0.3);
+        radius=Math.trunc(((rect.rgt-rect.lft)*constants.ROOM_BLOCK_WIDTH)*0.3);
         
         map.addMesh(MeshPrimitivesClass.createMeshCylinder(pillarBitmap,pos,yBound,this.segments,radius,false,false,map.MESH_FLAG_DECORATION));
     }

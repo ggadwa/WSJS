@@ -1,6 +1,7 @@
 import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate machine bitmap class

@@ -1,5 +1,6 @@
 import PointClass from '../../code/utility/point.js';
 import ColorClass from '../../code/utility/color.js';
+import LightClass from '../../code/light/light.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -8,8 +9,10 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class ParticleClass
 {
-    constructor()
+    constructor(view)
     {
+        this.view=view;
+        
         this.PARTICLE_MAX_POINTS=200;
 
         this.radiusStart=0;
@@ -64,7 +67,7 @@ export default class ParticleClass
     initialize()
     {
         let n;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         for (n=0;n!==this.PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
             this.points.push(new PointClass(0,0,0));
@@ -77,7 +80,7 @@ export default class ParticleClass
     
     release()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         this.points=[];
 
@@ -97,7 +100,7 @@ export default class ParticleClass
     
     timeout()
     {
-        if (view.timeStamp>this.endTimeStamp) this.count=0;
+        if (this.view.timeStamp>this.endTimeStamp) this.count=0;
     }
     
         //
@@ -201,7 +204,7 @@ export default class ParticleClass
     {
         let tick,halfTick;
         
-        tick=view.timeStamp-this.startTimeStamp;
+        tick=this.view.timeStamp-this.startTimeStamp;
         
         if ((this.lightMaxIntensity===0) || (tick>this.lifeTime)) {
             this.light.setIntensity(0);
@@ -226,12 +229,12 @@ export default class ParticleClass
     {
         let n,nTrig,pnt,vIdx,uvIdx,iIdx,elementIdx;
         let timeFactor,radius,moveFactor,r,g,b,alpha;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // get the radius and color
         
         timeFactor=0.0;
-        if (this.lifeTime!==0) timeFactor=(view.timeStamp-this.startTimeStamp)/this.lifeTime;
+        if (this.lifeTime!==0) timeFactor=(this.view.timeStamp-this.startTimeStamp)/this.lifeTime;
         
         radius=this.radiusStart+(this.radiusEnd-this.radiusStart)*timeFactor;
         moveFactor=this.movement*timeFactor;
@@ -261,8 +264,8 @@ export default class ParticleClass
             this.topLeft.x=-radius;
             this.topLeft.y=-radius;
             this.topLeft.z=0.0;
-            this.topLeft.matrixMultiplyIgnoreTransform(view.billboardXMatrix);
-            this.topLeft.matrixMultiplyIgnoreTransform(view.billboardYMatrix);
+            this.topLeft.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            this.topLeft.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
             
             this.vertices[vIdx++]=this.topLeft.x+(pnt.x*moveFactor)+this.centerPt.x;
             this.vertices[vIdx++]=this.topLeft.y+(pnt.y*moveFactor)+this.centerPt.y;
@@ -274,8 +277,8 @@ export default class ParticleClass
             this.topRight.x=radius;
             this.topRight.y=-radius;
             this.topRight.z=0.0;
-            this.topRight.matrixMultiplyIgnoreTransform(view.billboardXMatrix);
-            this.topRight.matrixMultiplyIgnoreTransform(view.billboardYMatrix);
+            this.topRight.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            this.topRight.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
             
             this.vertices[vIdx++]=this.topRight.x+(pnt.x*moveFactor)+this.centerPt.x;
             this.vertices[vIdx++]=this.topRight.y+(pnt.y*moveFactor)+this.centerPt.y;
@@ -287,8 +290,8 @@ export default class ParticleClass
             this.bottomRight.x=radius;
             this.bottomRight.y=radius;
             this.bottomRight.z=0.0;
-            this.bottomRight.matrixMultiplyIgnoreTransform(view.billboardXMatrix);
-            this.bottomRight.matrixMultiplyIgnoreTransform(view.billboardYMatrix);
+            this.bottomRight.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            this.bottomRight.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
             
             this.vertices[vIdx++]=this.bottomRight.x+(pnt.x*moveFactor)+this.centerPt.x;
             this.vertices[vIdx++]=this.bottomRight.y+(pnt.y*moveFactor)+this.centerPt.y;
@@ -300,8 +303,8 @@ export default class ParticleClass
             this.bottomLeft.x=-radius;
             this.bottomLeft.y=radius;
             this.bottomLeft.z=0.0;
-            this.bottomLeft.matrixMultiplyIgnoreTransform(view.billboardXMatrix);
-            this.bottomLeft.matrixMultiplyIgnoreTransform(view.billboardYMatrix);
+            this.bottomLeft.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            this.bottomLeft.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
             
             this.vertices[vIdx++]=this.bottomLeft.x+(pnt.x*moveFactor)+this.centerPt.x;
             this.vertices[vIdx++]=this.bottomLeft.y+(pnt.y*moveFactor)+this.centerPt.y;

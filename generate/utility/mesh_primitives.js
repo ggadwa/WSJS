@@ -1,5 +1,7 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
 const DEGREE_TO_RAD=Math.PI/180.0;
@@ -668,7 +670,7 @@ export default class MeshPrimitivesClass
         let xFrameBound=new BoundClass(0,0);
         let yFrameBound=new BoundClass(0,0);
         let zFrameBound=new BoundClass(0,0);
-        let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        let sz=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
         let halfSz=Math.trunc(sz*0.5);
         let y,z,mesh;
         
@@ -719,7 +721,7 @@ export default class MeshPrimitivesClass
         let xFrameBound=new BoundClass(0,0);
         let yFrameBound=new BoundClass(0,0);
         let zFrameBound=new BoundClass(0,0);
-        let sz=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        let sz=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
         let halfSz=Math.trunc(sz*0.5);
         let x,y,mesh;
         

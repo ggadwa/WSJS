@@ -1,4 +1,6 @@
 import ParticleShaderClass from '../../code/particle/particle_shader.js';
+import ParticleClass from '../../code/particle/particle.js';
+import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
 
 //
 // particle list class
@@ -44,7 +46,7 @@ export default class ParticleListClass
         this.particles=[];
         
         for (n=0;n!==this.PARTICLE_MAX_COUNT;n++) {
-            particle=new ParticleClass();
+            particle=new ParticleClass(this.view);
             particle.initialize();
             this.particles.push(particle);
         }

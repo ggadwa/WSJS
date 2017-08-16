@@ -1,5 +1,6 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -13,13 +14,13 @@ export default class GenRoomDecorationStorageClass
             // give all these decorations the same general
             // width and height no matter where in the map
             
-        this.shelfHigh=genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH*0.2),Math.trunc(map.ROOM_BLOCK_WIDTH*0.3));
+        this.shelfHigh=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3));
             
-        this.xShelfMargin=genRandom.randomInt(0,Math.trunc(map.ROOM_BLOCK_WIDTH/8));
-        this.zShelfMargin=genRandom.randomInt(0,Math.trunc(map.ROOM_BLOCK_WIDTH/8));
+        this.xShelfMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
+        this.zShelfMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
         
-        this.boxMargin=genRandom.randomInt(0,Math.trunc(map.ROOM_BLOCK_WIDTH/8));
-        this.boxHigh=genRandom.randomInt(Math.trunc(map.ROOM_BLOCK_WIDTH*0.3),Math.trunc(map.ROOM_BLOCK_WIDTH*0.3));
+        this.boxMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
+        this.boxHigh=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3));
 
         Object.seal(this);
     }
@@ -37,12 +38,12 @@ export default class GenRoomDecorationStorageClass
         
             // box size
             
-        x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
-        z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
+        x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
+        z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
             
-        boxXBound=new BoundClass((x+this.boxMargin),((x+map.ROOM_BLOCK_WIDTH)-this.boxMargin));
+        boxXBound=new BoundClass((x+this.boxMargin),((x+constants.ROOM_BLOCK_WIDTH)-this.boxMargin));
         boxYBound=new BoundClass((room.yBound.max-this.boxHigh),room.yBound.max);
-        boxZBound=new BoundClass((z+this.boxMargin),((z+map.ROOM_BLOCK_WIDTH)-this.boxMargin));
+        boxZBound=new BoundClass((z+this.boxMargin),((z+constants.ROOM_BLOCK_WIDTH)-this.boxMargin));
         
         boxPos=new PointClass(0,0,0);
         rotAngle=new PointClass(0.0,0.0,0.0);
@@ -82,10 +83,10 @@ export default class GenRoomDecorationStorageClass
         let shelfBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         let boxBitmap=map.getTexture(map.TEXTURE_TYPE_BOX);
         
-        x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
-        z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
+        x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
+        z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
         
-        legWid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        legWid=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
 
             // height and width
 
@@ -96,16 +97,16 @@ export default class GenRoomDecorationStorageClass
         mesh=null;
         rotAngle=new PointClass(0,0,0);
         
-        tableXBound=new BoundClass((x+this.xShelfMargin),((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
-        tableYBound=new BoundClass((room.yBound.max-this.shelfHigh),((room.yBound.max-this.shelfHigh)+map.ROOM_FLOOR_DEPTH));
-        tableZBound=new BoundClass((z+this.zShelfMargin),((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
+        tableXBound=new BoundClass((x+this.xShelfMargin),((x+constants.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
+        tableYBound=new BoundClass((room.yBound.max-this.shelfHigh),((room.yBound.max-this.shelfHigh)+constants.ROOM_FLOOR_DEPTH));
+        tableZBound=new BoundClass((z+this.zShelfMargin),((z+constants.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
 
         legXMinBound=new BoundClass((x+this.xShelfMargin),((x+this.xShelfMargin)+legWid));
-        legXMaxBound=new BoundClass((((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin)-legWid),((x+map.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
+        legXMaxBound=new BoundClass((((x+constants.ROOM_BLOCK_WIDTH)-this.xShelfMargin)-legWid),((x+constants.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
         legZMinBound=new BoundClass((z+this.zShelfMargin),((z+this.zShelfMargin)+legWid));
-        legZMaxBound=new BoundClass((((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin)-legWid),((z+map.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
+        legZMaxBound=new BoundClass((((z+constants.ROOM_BLOCK_WIDTH)-this.zShelfMargin)-legWid),((z+constants.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
         
-        legYBound=new BoundClass(((room.yBound.max-this.shelfHigh)+map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        legYBound=new BoundClass(((room.yBound.max-this.shelfHigh)+constants.ROOM_FLOOR_DEPTH),room.yBound.max);
         
         boxXBound=new BoundClass(0,0,0);
         boxYBound=new BoundClass(0,0,0);
@@ -114,8 +115,8 @@ export default class GenRoomDecorationStorageClass
         minBoxHigh=Math.trunc(this.shelfHigh*0.5);
         extraBoxHigh=Math.trunc(this.shelfHigh*0.25);
         
-        minBoxSize=Math.trunc(map.ROOM_BLOCK_WIDTH*0.05);
-        extraBoxSize=Math.trunc(map.ROOM_BLOCK_WIDTH*0.15);
+        minBoxSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
+        extraBoxSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.15);
 
             // the stacked shelves
             

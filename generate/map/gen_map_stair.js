@@ -1,6 +1,8 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 //
 // map stairs
@@ -155,8 +157,8 @@ export default class GenRoomStairsClass
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=map.ROOM_FLOOR_DEPTH;
-            yBoundBottom.min+=map.ROOM_FLOOR_DEPTH;
+            yBoundTop.min+=constants.ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=constants.ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -260,7 +262,7 @@ export default class GenRoomStairsClass
         }
         
         yStepBound=new BoundClass(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-map.ROOM_FLOOR_DEPTH);
+        if (!toPlatform) yStepBound.add(-constants.ROOM_FLOOR_DEPTH);
         
         zStepBound=new BoundClass((zBound.min+thickSize),(zBound.max-thickSize));
 
@@ -326,8 +328,8 @@ export default class GenRoomStairsClass
                 yBoundBottom.add(-stairHigh);
             }
             
-            yBoundTop.min+=map.ROOM_FLOOR_DEPTH;
-            yBoundBottom.min+=map.ROOM_FLOOR_DEPTH;
+            yBoundTop.min+=constants.ROOM_FLOOR_DEPTH;
+            yBoundBottom.min+=constants.ROOM_FLOOR_DEPTH;
 
                 // internal walls
 
@@ -432,7 +434,7 @@ export default class GenRoomStairsClass
         }
         
         yStepBound=new BoundClass(yBound.min,(yBound.min+stepDrop));
-        if (!toPlatform) yStepBound.add(-map.ROOM_FLOOR_DEPTH);
+        if (!toPlatform) yStepBound.add(-constants.ROOM_FLOOR_DEPTH);
         
         xStepBound=new BoundClass((xBound.min+thickSize),(xBound.max-thickSize));
 
@@ -469,54 +471,54 @@ export default class GenRoomStairsClass
             
         switch (room.mainPathSide) {
 
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
+            case constants.ROOM_SIDE_RIGHT:
                 x=room.mainPathConnectedRoom.xBlockSize-1;
                 break;
 
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+            case constants.ROOM_SIDE_BOTTOM:
                 z=room.mainPathConnectedRoom.zBlockSize-1;
                 break;
 
-            case mapRoomConstants.ROOM_SIDE_LEFT:
+            case constants.ROOM_SIDE_LEFT:
                 x=0;
                 break;
 
-            case mapRoomConstants.ROOM_SIDE_TOP:
+            case constants.ROOM_SIDE_TOP:
                 z=0;
                 break;
 
         }
         
-        if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+        if ((room.mainPathSide===constants.ROOM_SIDE_LEFT) || (room.mainPathSide===constants.ROOM_SIDE_RIGHT)) {
             min=0;
-            if (room.zBound.min>room.mainPathConnectedRoom.zBound.min) min=Math.trunc((room.zBound.min-room.mainPathConnectedRoom.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.zBound.min>room.mainPathConnectedRoom.zBound.min) min=Math.trunc((room.zBound.min-room.mainPathConnectedRoom.zBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             max=room.zBlockSize;
-            if (room.zBound.max<room.mainPathConnectedRoom.zBound.max) max=Math.trunc((room.zBound.max-room.mainPathConnectedRoom.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.zBound.max<room.mainPathConnectedRoom.zBound.max) max=Math.trunc((room.zBound.max-room.mainPathConnectedRoom.zBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             z=genRandom.randomInBetween(min,(max-1));
         }
         else {
             min=0;
-            if (room.xBound.min>room.mainPathConnectedRoom.xBound.min) min=Math.trunc((room.xBound.min-room.mainPathConnectedRoom.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.xBound.min>room.mainPathConnectedRoom.xBound.min) min=Math.trunc((room.xBound.min-room.mainPathConnectedRoom.xBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             max=room.xBlockSize;
-            if (room.xBound.max<room.mainPathConnectedRoom.xBound.max) max=Math.trunc((room.xBound.max-room.mainPathConnectedRoom.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.xBound.max<room.mainPathConnectedRoom.xBound.max) max=Math.trunc((room.xBound.max-room.mainPathConnectedRoom.xBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             x=genRandom.randomInBetween(min,(max-1));
         }
         
             // create stairs
        
-        xBound=new BoundClass((room.mainPathConnectedRoom.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
+        xBound=new BoundClass((room.mainPathConnectedRoom.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
         yBound=new BoundClass(room.yBound.max,room.mainPathConnectedRoom.yBound.max);
-        zBound=new BoundClass((room.mainPathConnectedRoom.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
+        zBound=new BoundClass((room.mainPathConnectedRoom.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.mainPathConnectedRoom.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
         
-        if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
-            this.createStairsX(xBound,yBound,zBound,true,false,(room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT));
+        if ((room.mainPathSide===constants.ROOM_SIDE_LEFT) || (room.mainPathSide===constants.ROOM_SIDE_RIGHT)) {
+            this.createStairsX(xBound,yBound,zBound,true,false,(room.mainPathSide===constants.ROOM_SIDE_RIGHT));
         }
         else {
-            this.createStairsZ(xBound,yBound,zBound,true,false,(room.mainPathSide===mapRoomConstants.ROOM_SIDE_BOTTOM));
+            this.createStairsZ(xBound,yBound,zBound,true,false,(room.mainPathSide===constants.ROOM_SIDE_BOTTOM));
         }
         
             // block off from decorations

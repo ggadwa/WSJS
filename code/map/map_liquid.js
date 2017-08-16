@@ -88,14 +88,14 @@ export default class MapLiquidClass
         vz=this.zBound.min;
         gz=0.0;
         
-        offRow=Math.trunc(vz/map.ROOM_BLOCK_WIDTH);
+        offRow=Math.trunc(vz/constants.ROOM_BLOCK_WIDTH);
         
         for (z=0;z!==(this.zBlockSize+1);z++) {
             
             vx=this.xBound.min;
             gx=0.0;
             
-            offCol=Math.trunc(vx/map.ROOM_BLOCK_WIDTH);
+            offCol=Math.trunc(vx/constants.ROOM_BLOCK_WIDTH);
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
@@ -105,13 +105,13 @@ export default class MapLiquidClass
                 this.uvs[uvIdx++]=gx;
                 this.uvs[uvIdx++]=gz;
                 
-                vx+=map.ROOM_BLOCK_WIDTH;
+                vx+=constants.ROOM_BLOCK_WIDTH;
                 gx+=1.0;
                 
                 offCol++;
             }
             
-            vz+=map.ROOM_BLOCK_WIDTH;
+            vz+=constants.ROOM_BLOCK_WIDTH;
             gz+=1.0;
             
             offRow++;

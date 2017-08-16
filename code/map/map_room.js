@@ -4,52 +4,10 @@ import Line2DClass from '../../code/utility/2D_line.js';
 import BoundClass from '../../code/utility/bound.js';
 import RectClass from '../../code/utility/rect.js';
 import GridClass from '../../code/utility/grid.js';
+import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
-
-//
-// special class that contains some constants
-// we can change this when we can get
-// static properties on classes
-//
-
-class MapRoomConstantsClass
-{
-    constructor()
-    {
-        this.ROOM_SIDE_LEFT=0;
-        this.ROOM_SIDE_TOP=1;
-        this.ROOM_SIDE_RIGHT=2;
-        this.ROOM_SIDE_BOTTOM=3;
-        
-        this.LEVEL_NORMAL=0;
-        this.LEVEL_LOWER=1;
-        this.LEVEL_HIGHER=2;
-        this.LEVEL_COUNT=3;
-        
-        this.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT=0;
-        this.ROOM_EXTENSION_DIRECTION_TOP_BOTTOM=1;
-        
-        this.ROOM_PATH_TYPE_NORMAL=0;
-        this.ROOM_PATH_TYPE_START=1;
-        this.ROOM_PATH_TYPE_GOAL=2;
-
-        this.ROOM_DECORATION_NONE=-1;
-        this.ROOM_DECORATION_PILLARS=0;
-        this.ROOM_DECORATION_STORAGE=1;
-        this.ROOM_DECORATION_COMPUTER=2;
-        this.ROOM_DECORATION_PIPE=3;
-        this.ROOM_DECORATION_CUBICAL=4;
-        this.ROOM_DECORATION_LAB=5;
-
-        this.ROOM_DECORATION_PATH_LIST=[this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_PIPE,this.ROOM_DECORATION_CUBICAL,this.ROOM_DECORATION_LAB];
-        this.ROOM_DECORATION_NORMAL_LIST=[this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_PIPE,this.ROOM_DECORATION_CUBICAL,this.ROOM_DECORATION_LAB];
-        this.ROOM_DECORATION_LOWER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_LAB];
-        this.ROOM_DECORATION_HIGHER_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_STORAGE,this.ROOM_DECORATION_COMPUTER,this.ROOM_DECORATION_CUBICAL,this.ROOM_DECORATION_LAB];
-        this.ROOM_DECORATION_LIQUID_LIST=[this.ROOM_DECORATION_NONE,this.ROOM_DECORATION_PILLARS,this.ROOM_DECORATION_PIPE];
-    }
-}
-
-let mapRoomConstants=new MapRoomConstantsClass();
+import constants from '../../code/main/constants.js';
 
 //
 // utility class for determining distance and facing
@@ -74,10 +32,12 @@ class MapRoomFaceClass
 // entities or decorations or objectives
 //
 
-class MapRoomClass
+export default class MapRoomClass
 {
-    constructor(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
+    constructor(map,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
     {
+        this.map=map;
+        
         this.pathType=pathType;
         this.xBlockSize=xBlockSize;
         this.zBlockSize=zBlockSize;
@@ -86,7 +46,6 @@ class MapRoomClass
         this.zBound=zBound;
         this.storyCount=storyCount;
         this.extensionDirection=extensionDirection;
-        this.decorationType=decorationType;
         this.mainPath=mainPath;
         this.mainPathSide=mainPathSide;
         this.mainPathConnectedRoom=mainPathConnectedRoom;
@@ -185,8 +144,8 @@ class MapRoomClass
             // collide on our left
             
         if (xCollideBound.max===this.xBound.min) {
-            z1=Math.trunc((zCollideBound.min-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
-            z2=z1+Math.trunc(zCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/constants.ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/constants.ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -199,8 +158,8 @@ class MapRoomClass
             // collide on our right
             
         if (xCollideBound.min===this.xBound.max) {
-            z1=Math.trunc((zCollideBound.min-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
-            z2=z1+Math.trunc(zCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
+            z1=Math.trunc((zCollideBound.min-this.zBound.min)/constants.ROOM_BLOCK_WIDTH);
+            z2=z1+Math.trunc(zCollideBound.getSize()/constants.ROOM_BLOCK_WIDTH);
             if (z1<0) z1=0;
             if (z2>this.zBlockSize) z2=this.zBlockSize;
             
@@ -213,8 +172,8 @@ class MapRoomClass
             // collide on our top
             
         if (zCollideBound.max===this.zBound.min) {
-            x1=Math.trunc((xCollideBound.min-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
-            x2=x1+Math.trunc(xCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/constants.ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/constants.ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -227,8 +186,8 @@ class MapRoomClass
             // collide on our bottom
             
         if (zCollideBound.min===this.zBound.max) {
-            x1=Math.trunc((xCollideBound.min-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
-            x2=x1+Math.trunc(xCollideBound.getSize()/map.ROOM_BLOCK_WIDTH);
+            x1=Math.trunc((xCollideBound.min-this.xBound.min)/constants.ROOM_BLOCK_WIDTH);
+            x2=x1+Math.trunc(xCollideBound.getSize()/constants.ROOM_BLOCK_WIDTH);
             if (x1<0) x1=0;
             if (x2>this.xBlockSize) x2=this.xBlockSize;
             
@@ -256,17 +215,17 @@ class MapRoomClass
     markDoorOnConnectionSide(connectSide,flipSide)
     {
         switch (connectSide) {
-            case mapRoomConstants.ROOM_SIDE_LEFT:
-                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_RIGHT:mapRoomConstants.ROOM_SIDE_LEFT]=true;
+            case constants.ROOM_SIDE_LEFT:
+                this.connectSideHasDoor[flipSide?constants.ROOM_SIDE_RIGHT:constants.ROOM_SIDE_LEFT]=true;
                 break;
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
-                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT]=true;
+            case constants.ROOM_SIDE_RIGHT:
+                this.connectSideHasDoor[flipSide?constants.ROOM_SIDE_LEFT:constants.ROOM_SIDE_RIGHT]=true;
                 break;
-            case mapRoomConstants.ROOM_SIDE_TOP:
-                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_BOTTOM:mapRoomConstants.ROOM_SIDE_TOP]=true;
+            case constants.ROOM_SIDE_TOP:
+                this.connectSideHasDoor[flipSide?constants.ROOM_SIDE_BOTTOM:constants.ROOM_SIDE_TOP]=true;
                 break;
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                this.connectSideHasDoor[flipSide?mapRoomConstants.ROOM_SIDE_TOP:mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
+            case constants.ROOM_SIDE_BOTTOM:
+                this.connectSideHasDoor[flipSide?constants.ROOM_SIDE_TOP:constants.ROOM_SIDE_BOTTOM]=true;
                 break;
         }
     }
@@ -284,40 +243,40 @@ class MapRoomClass
     {
         switch (connectSide) {
             
-            case mapRoomConstants.ROOM_SIDE_LEFT:
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=false;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
+            case constants.ROOM_SIDE_LEFT:
+                this.legalWindowSide[constants.ROOM_SIDE_LEFT]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_TOP]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_RIGHT]=false;
+                this.legalWindowSide[constants.ROOM_SIDE_BOTTOM]=true;
                 
-                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=false;
+                connectedPathRoom.legalWindowSide[constants.ROOM_SIDE_LEFT]=false;
                 return;
                 
-            case mapRoomConstants.ROOM_SIDE_TOP:
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=false;
+            case constants.ROOM_SIDE_TOP:
+                this.legalWindowSide[constants.ROOM_SIDE_LEFT]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_TOP]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_RIGHT]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_BOTTOM]=false;
                 
-                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=false;
+                connectedPathRoom.legalWindowSide[constants.ROOM_SIDE_TOP]=false;
                 return;
                 
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=false;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
+            case constants.ROOM_SIDE_RIGHT:
+                this.legalWindowSide[constants.ROOM_SIDE_LEFT]=false;
+                this.legalWindowSide[constants.ROOM_SIDE_RIGHT]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_TOP]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_BOTTOM]=true;
                 
-                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=false;
+                connectedPathRoom.legalWindowSide[constants.ROOM_SIDE_RIGHT]=false;
                 return;
             
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_LEFT]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_TOP]=false;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_RIGHT]=true;
-                this.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=true;
+            case constants.ROOM_SIDE_BOTTOM:
+                this.legalWindowSide[constants.ROOM_SIDE_LEFT]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_TOP]=false;
+                this.legalWindowSide[constants.ROOM_SIDE_RIGHT]=true;
+                this.legalWindowSide[constants.ROOM_SIDE_BOTTOM]=true;
                 
-                connectedPathRoom.legalWindowSide[mapRoomConstants.ROOM_SIDE_BOTTOM]=false;
+                connectedPathRoom.legalWindowSide[constants.ROOM_SIDE_BOTTOM]=false;
                 return;
         }
     }
@@ -341,9 +300,9 @@ class MapRoomClass
             
                 if (this.blockGrid[n].getCell(x,z)===0) {
                     this.blockGrid[n].setCell(x,z,1);
-                    bx=Math.trunc((this.xBound.min+(map.ROOM_BLOCK_WIDTH*x))+(map.ROOM_BLOCK_WIDTH/2));
-                    bz=Math.trunc((this.zBound.min+(map.ROOM_BLOCK_WIDTH*z))+(map.ROOM_BLOCK_WIDTH/2));
-                    return(new PointClass(bx,(this.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*n)),bz));
+                    bx=Math.trunc((this.xBound.min+(constants.ROOM_BLOCK_WIDTH*x))+(constants.ROOM_BLOCK_WIDTH/2));
+                    bz=Math.trunc((this.zBound.min+(constants.ROOM_BLOCK_WIDTH*z))+(constants.ROOM_BLOCK_WIDTH/2));
+                    return(new PointClass(bx,(this.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*n)),bz));
                 }
                 
                 if (groundFloorOnly) break;
@@ -370,8 +329,8 @@ class MapRoomClass
         
         if (this.blockGrid[0].getCell(x,z)===0) {
             this.blockGrid[0].setCell(x,z,1);
-            bx=Math.trunc((this.xBound.min+(map.ROOM_BLOCK_WIDTH*x))+(map.ROOM_BLOCK_WIDTH/2));
-            bz=Math.trunc((this.zBound.min+(map.ROOM_BLOCK_WIDTH*z))+(map.ROOM_BLOCK_WIDTH/2));
+            bx=Math.trunc((this.xBound.min+(constants.ROOM_BLOCK_WIDTH*x))+(constants.ROOM_BLOCK_WIDTH/2));
+            bz=Math.trunc((this.zBound.min+(constants.ROOM_BLOCK_WIDTH*z))+(constants.ROOM_BLOCK_WIDTH/2));
             return(new PointClass(bx,this.yBound.max,bz));
         }
 
@@ -382,11 +341,11 @@ class MapRoomClass
     {
         let n,y;
         
-        y=this.yBound.max-map.ROOM_FLOOR_HEIGHT;
+        y=this.yBound.max-constants.ROOM_FLOOR_HEIGHT;
         
         for (n=1;n<this.storyCount;n++) {
             if (this.blockGrid[n].getCell(x,z)===0) break;
-            y-=(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH);
+            y-=(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH);
         }
         
         return(new BoundClass(y,this.yBound.max));
@@ -394,8 +353,8 @@ class MapRoomClass
     
     getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(x,z)
     {
-        x=Math.trunc(((x-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/map.ROOM_BLOCK_WIDTH);
-        z=Math.trunc(((z-Math.trunc(map.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/map.ROOM_BLOCK_WIDTH);
+        x=Math.trunc(((x-Math.trunc(constants.ROOM_BLOCK_WIDTH/2))-this.xBound.min)/constants.ROOM_BLOCK_WIDTH);
+        z=Math.trunc(((z-Math.trunc(constants.ROOM_BLOCK_WIDTH/2))-this.zBound.min)/constants.ROOM_BLOCK_WIDTH);
         return(this.getGroundFloorSpawnToFirstPlatformOrTopBound(x,z));
     }
     
@@ -420,18 +379,18 @@ class MapRoomClass
         let distBot=this.zBound.max-z;
         
         if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
-            return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_LEFT,distLft));
+            return(new MapRoomFaceClass(constants.ROOM_SIDE_LEFT,distLft));
         }
         else {
             if ((distRgt<distTop) && (distRgt<distBot)) {
-                return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_RIGHT,distRgt));
+                return(new MapRoomFaceClass(constants.ROOM_SIDE_RIGHT,distRgt));
             }
             else {
                 if (distTop<distBot) {
-                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_TOP,distTop));
+                    return(new MapRoomFaceClass(constants.ROOM_SIDE_TOP,distTop));
                 }
                 else {
-                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_BOTTOM,distBot));
+                    return(new MapRoomFaceClass(constants.ROOM_SIDE_BOTTOM,distBot));
                 }
             }
         }
@@ -450,18 +409,18 @@ class MapRoomClass
         let distBot=Math.abs(pos.z-cz);
         
         if ((distLft<distRgt) && (distLft<distTop) && (distLft<distBot)) {
-            return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_RIGHT,distLft));
+            return(new MapRoomFaceClass(constants.ROOM_SIDE_RIGHT,distLft));
         }
         else {
             if ((distRgt<distTop) && (distRgt<distBot)) {
-                return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_LEFT,distRgt));
+                return(new MapRoomFaceClass(constants.ROOM_SIDE_LEFT,distRgt));
             }
             else {
                 if (distTop<distBot) {
-                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_BOTTOM,distTop));
+                    return(new MapRoomFaceClass(constants.ROOM_SIDE_BOTTOM,distTop));
                 }
                 else {
-                    return(new MapRoomFaceClass(mapRoomConstants.ROOM_SIDE_TOP,distBot));
+                    return(new MapRoomFaceClass(constants.ROOM_SIDE_TOP,distBot));
                 }
             }
         }
@@ -476,22 +435,22 @@ class MapRoomClass
     isSideOpenToOtherRoom(connectSide)
     {
         let n,room;
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
 
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             
             switch (connectSide) {
-                case mapRoomConstants.ROOM_SIDE_LEFT:
+                case constants.ROOM_SIDE_LEFT:
                     if (room.xBound.max===this.xBound.min) return(true);
                     break;
-                case mapRoomConstants.ROOM_SIDE_TOP:
+                case constants.ROOM_SIDE_TOP:
                     if (room.zBound.max===this.zBound.min) return(true);
                     break;
-                case mapRoomConstants.ROOM_SIDE_RIGHT:
+                case constants.ROOM_SIDE_RIGHT:
                     if (room.xBound.min===this.xBound.max) return(true);
                     break;
-                case mapRoomConstants.ROOM_SIDE_BOTTOM:
+                case constants.ROOM_SIDE_BOTTOM:
                     if (room.zBound.min===this.zBound.max) return(true);
                     break;
             }
@@ -631,7 +590,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+map.ROOM_BLOCK_WIDTH;
+            x2=x+constants.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.min);
             vertexList[vIdx+1].position.setFromValues(x2,yWallBound.min,this.zBound.min);
@@ -657,7 +616,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+map.ROOM_BLOCK_WIDTH;
+            z2=z+constants.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(this.xBound.max,yWallBound.min,z);
             vertexList[vIdx+1].position.setFromValues(this.xBound.max,yWallBound.min,z2);
@@ -683,7 +642,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+map.ROOM_BLOCK_WIDTH;
+            x2=x+constants.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(x,yWallBound.min,this.zBound.max);
             vertexList[vIdx+1].position.setFromValues(x2,yWallBound.min,this.zBound.max);
@@ -709,7 +668,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+map.ROOM_BLOCK_WIDTH;
+            z2=z+constants.ROOM_BLOCK_WIDTH;
             
             vertexList[vIdx].position.setFromValues(this.xBound.min,yWallBound.min,z);
             vertexList[vIdx+1].position.setFromValues(this.xBound.min,yWallBound.min,z2);
@@ -735,7 +694,7 @@ class MapRoomClass
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,true);
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        return(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_WALL));
+        return(new MapMeshClass(bitmap,vertexList,indexes,this.map.MESH_FLAG_ROOM_WALL));
     }
     
         //
@@ -752,7 +711,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+map.ROOM_BLOCK_WIDTH;
+            x2=x+constants.ROOM_BLOCK_WIDTH;
             lineList.push(new Line2DClass(new Point2DIntClass(x,this.zBound.min),new Point2DIntClass(x2,this.zBound.min)));
             x=x2;
         }
@@ -762,7 +721,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+map.ROOM_BLOCK_WIDTH;
+            z2=z+constants.ROOM_BLOCK_WIDTH;
             lineList.push(new Line2DClass(new Point2DIntClass(this.xBound.max,z),new Point2DIntClass(this.xBound.max,z2)));
             z=z2;
         }
@@ -772,7 +731,7 @@ class MapRoomClass
         x=this.xBound.min;
         
         for (n=0;n!==this.xBlockSize;n++) {
-            x2=x+map.ROOM_BLOCK_WIDTH;
+            x2=x+constants.ROOM_BLOCK_WIDTH;
             lineList.push(new Line2DClass(new Point2DIntClass(x,this.zBound.max),new Point2DIntClass(x2,this.zBound.max)));
             x=x2;
         }
@@ -782,7 +741,7 @@ class MapRoomClass
         z=this.zBound.min;
         
         for (n=0;n!==this.zBlockSize;n++) {
-            z2=z+map.ROOM_BLOCK_WIDTH;
+            z2=z+constants.ROOM_BLOCK_WIDTH;
             lineList.push(new Line2DClass(new Point2DIntClass(this.xBound.min,z),new Point2DIntClass(this.xBound.min,z2)));
             z=z2;
         }
@@ -814,12 +773,12 @@ class MapRoomClass
         vz=this.zBound.min;
         
         for (z=0;z!==this.zBlockSize;z++) {
-            vz2=vz+map.ROOM_BLOCK_WIDTH;
+            vz2=vz+constants.ROOM_BLOCK_WIDTH;
             
             vx=this.xBound.min;
             
             for (x=0;x!==this.xBlockSize;x++) {
-                vx2=vx+map.ROOM_BLOCK_WIDTH;
+                vx2=vx+constants.ROOM_BLOCK_WIDTH;
                 
                 v=vertexList[vIdx];
                 v.position.setFromValues(vx,y,vz);
@@ -863,7 +822,7 @@ class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,this.map.MESH_FLAG_ROOM_FLOOR));
     }
     
     createMeshCeiling(bitmap)
@@ -887,12 +846,12 @@ class MapRoomClass
         vz=this.zBound.min;
         
         for (z=0;z!==this.zBlockSize;z++) {
-            vz2=vz+map.ROOM_BLOCK_WIDTH;
+            vz2=vz+constants.ROOM_BLOCK_WIDTH;
             
             vx=this.xBound.min;
             
             for (x=0;x!==this.xBlockSize;x++) {
-                vx2=vx+map.ROOM_BLOCK_WIDTH;
+                vx2=vx+constants.ROOM_BLOCK_WIDTH;
                 
                 v=vertexList[vIdx];
                 v.position.setFromValues(vx,y,vz);
@@ -936,7 +895,7 @@ class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,this.map.MESH_FLAG_ROOM_CEILING));
     }
     
         //
@@ -945,7 +904,7 @@ class MapRoomClass
         
     getLiquidY()
     {
-        return(this.yBound.max-map.ROOM_FLOOR_HEIGHT);
+        return(this.yBound.max-constants.ROOM_FLOOR_HEIGHT);
     }
     
     addTintFromLiquidColor(col)

@@ -1,4 +1,5 @@
 import SkyShaderClass from '../../code/sky/sky_shader.js';
+import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
 
 //
 // sky class

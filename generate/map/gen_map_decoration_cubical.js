@@ -1,5 +1,7 @@
 import BoundClass from '../../code/utility/bound.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 //
 // generate room cubical decoration class
@@ -25,7 +27,7 @@ export default class GenRoomDecorationCubicalClass
         
             // skip index
             
-        if ((skipWall===mapRoomConstants.ROOM_SIDE_LEFT) || (skipWall===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+        if ((skipWall===constants.ROOM_SIDE_LEFT) || (skipWall===constants.ROOM_SIDE_RIGHT)) {
             skipIdx=rect.top+genRandom.randomIndex(rect.bot-rect.top);
         }
         else {
@@ -35,42 +37,42 @@ export default class GenRoomDecorationCubicalClass
             // left and right walls
             
         for (n=rect.top;n<rect.bot;n++) {
-            dz=room.zBound.min+(n*map.ROOM_BLOCK_WIDTH);
-            zBound=new BoundClass(dz,(dz+map.ROOM_BLOCK_WIDTH));
+            dz=room.zBound.min+(n*constants.ROOM_BLOCK_WIDTH);
+            zBound=new BoundClass(dz,(dz+constants.ROOM_BLOCK_WIDTH));
             
-            if (!((skipWall===mapRoomConstants.ROOM_SIDE_LEFT) && (skipIdx===n))) {
-                dx=room.xBound.min+(rect.lft*map.ROOM_BLOCK_WIDTH);
+            if (!((skipWall===constants.ROOM_SIDE_LEFT) && (skipIdx===n))) {
+                dx=room.xBound.min+(rect.lft*constants.ROOM_BLOCK_WIDTH);
                 xBound=new BoundClass(dx,(dx+wid));
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addOverlayDecorationWall(dx,dz,dx,(dz+map.ROOM_BLOCK_WIDTH));
+                map.addOverlayDecorationWall(dx,dz,dx,(dz+constants.ROOM_BLOCK_WIDTH));
             }
             
-            if (!((skipWall===mapRoomConstants.ROOM_SIDE_RIGHT) && (skipIdx===n))) {
-                dx=room.xBound.min+(rect.rgt*map.ROOM_BLOCK_WIDTH);
+            if (!((skipWall===constants.ROOM_SIDE_RIGHT) && (skipIdx===n))) {
+                dx=room.xBound.min+(rect.rgt*constants.ROOM_BLOCK_WIDTH);
                 xBound=new BoundClass((dx-wid),dx);
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addOverlayDecorationWall(dx,dz,dx,(dz+map.ROOM_BLOCK_WIDTH));
+                map.addOverlayDecorationWall(dx,dz,dx,(dz+constants.ROOM_BLOCK_WIDTH));
             }
         }
             
             // top and bottom walls
             
         for (n=rect.lft;n<rect.rgt;n++) {
-            dx=room.xBound.min+(n*map.ROOM_BLOCK_WIDTH);
-            xBound=new BoundClass(dx,(dx+map.ROOM_BLOCK_WIDTH));
+            dx=room.xBound.min+(n*constants.ROOM_BLOCK_WIDTH);
+            xBound=new BoundClass(dx,(dx+constants.ROOM_BLOCK_WIDTH));
             
-            if (!((skipWall===mapRoomConstants.ROOM_SIDE_TOP) && (skipIdx===n))) {
-                dz=room.zBound.min+(rect.top*map.ROOM_BLOCK_WIDTH);
+            if (!((skipWall===constants.ROOM_SIDE_TOP) && (skipIdx===n))) {
+                dz=room.zBound.min+(rect.top*constants.ROOM_BLOCK_WIDTH);
                 zBound=new BoundClass(dz,(dz+wid));
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addOverlayDecorationWall(dx,dz,(dx+map.ROOM_BLOCK_WIDTH),dz);
+                map.addOverlayDecorationWall(dx,dz,(dx+constants.ROOM_BLOCK_WIDTH),dz);
             }
             
-            if (!((skipWall===mapRoomConstants.ROOM_SIDE_BOTTOM) && (skipIdx===n))) {
-                dz=room.zBound.min+(rect.bot*map.ROOM_BLOCK_WIDTH);
+            if (!((skipWall===constants.ROOM_SIDE_BOTTOM) && (skipIdx===n))) {
+                dz=room.zBound.min+(rect.bot*constants.ROOM_BLOCK_WIDTH);
                 zBound=new BoundClass((dz-wid),dz);
                 map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
-                map.addOverlayDecorationWall(dx,dz,(dx+map.ROOM_BLOCK_WIDTH),dz);
+                map.addOverlayDecorationWall(dx,dz,(dx+constants.ROOM_BLOCK_WIDTH),dz);
             }
         }
             
@@ -87,15 +89,15 @@ export default class GenRoomDecorationCubicalClass
         
             // get width
             
-        wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
+        wid=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
         
             // create cubical walls
         
         if (genRandom.randomPercentage(0.5)) {
-            yBound=new BoundClass((room.yBound.max-map.ROOM_FLOOR_HEIGHT),room.yBound.max);
+            yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_HEIGHT),room.yBound.max);
         }
         else {
-            yBound=new BoundClass((room.yBound.max-((room.storyCount-1)*map.ROOM_FLOOR_HEIGHT)),room.yBound.max);
+            yBound=new BoundClass((room.yBound.max-((room.storyCount-1)*constants.ROOM_FLOOR_HEIGHT)),room.yBound.max);
         }
             
         this.addCubicalWall(room,bitmap,rect,wid,yBound);

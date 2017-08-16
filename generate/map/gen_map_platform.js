@@ -1,5 +1,7 @@
 import BoundClass from '../../code/utility/bound.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 //
 // map platforms
@@ -19,28 +21,28 @@ export default class GenRoomPlatformClass
     addStairChunk(room,dir,x,z,story,platformBitmap)
     {
         let rx,rz,xBound,yBound,zBound;
-        let y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*story));
+        let y=(room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*story));
         let genRoomStairs=new GenRoomStairsClass();
 
-        rx=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
-        xBound=new BoundClass(rx,(rx+map.ROOM_BLOCK_WIDTH));
+        rx=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
+        xBound=new BoundClass(rx,(rx+constants.ROOM_BLOCK_WIDTH));
         
-        yBound=new BoundClass((y-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)),y);
+        yBound=new BoundClass((y-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)),y);
         
-        rz=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
-        zBound=new BoundClass(rz,(rz+map.ROOM_BLOCK_WIDTH));
+        rz=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
+        zBound=new BoundClass(rz,(rz+constants.ROOM_BLOCK_WIDTH));
         
         switch (dir) {
-            case mapRoomConstants.ROOM_SIDE_LEFT:
+            case constants.ROOM_SIDE_LEFT:
                 genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,false);
                 break;
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
+            case constants.ROOM_SIDE_RIGHT:
                 genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,true);
                 break;
-            case mapRoomConstants.ROOM_SIDE_TOP:
+            case constants.ROOM_SIDE_TOP:
                 genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,false);
                 break;
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+            case constants.ROOM_SIDE_BOTTOM:
                 genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,true);
                 break;
         }
@@ -60,19 +62,19 @@ export default class GenRoomPlatformClass
         room.setBlockGrid(0,x,z);
         
         switch (dir) {
-            case mapRoomConstants.ROOM_SIDE_LEFT:
+            case constants.ROOM_SIDE_LEFT:
                 x++;
                 if (x<room.xBlockSize) room.setBlockGrid(0,x,z);
                 break;
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
+            case constants.ROOM_SIDE_RIGHT:
                 x--;
                 if (x>=0) room.setBlockGrid(0,x,z);
                 break;
-            case mapRoomConstants.ROOM_SIDE_TOP:
+            case constants.ROOM_SIDE_TOP:
                 z++;
                 if (z<room.zBlockSize) room.setBlockGrid(0,x,z);
                 break;
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+            case constants.ROOM_SIDE_BOTTOM:
                 z--;
                 if (z>=0) room.setBlockGrid(0,x,z);
                 break;
@@ -85,11 +87,11 @@ export default class GenRoomPlatformClass
         
     addPlatformChunk(room,x,z,story,platformBitmap)
     {
-        let y=(room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*story));
+        let y=(room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*story));
         
-        let xPlatformBound=new BoundClass((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
-        let yPlatformBound=new BoundClass(y,(y+map.ROOM_FLOOR_DEPTH));
-        let zPlatformBound=new BoundClass((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
+        let xPlatformBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
+        let yPlatformBound=new BoundClass(y,(y+constants.ROOM_FLOOR_DEPTH));
+        let zPlatformBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
         
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
 
@@ -107,15 +109,15 @@ export default class GenRoomPlatformClass
         
     moveDirX(dir,x)
     {
-        if (dir===mapRoomConstants.ROOM_SIDE_LEFT) return(x-1);
-        if (dir===mapRoomConstants.ROOM_SIDE_RIGHT) return(x+1);
+        if (dir===constants.ROOM_SIDE_LEFT) return(x-1);
+        if (dir===constants.ROOM_SIDE_RIGHT) return(x+1);
         return(x);
     }
     
     moveDirZ(dir,z)
     {
-        if (dir===mapRoomConstants.ROOM_SIDE_TOP) return(z-1);
-        if (dir===mapRoomConstants.ROOM_SIDE_BOTTOM) return(z+1);
+        if (dir===constants.ROOM_SIDE_TOP) return(z-1);
+        if (dir===constants.ROOM_SIDE_BOTTOM) return(z+1);
         return(z);
     }
     
@@ -131,30 +133,30 @@ export default class GenRoomPlatformClass
         
             // find place to start platform
             
-        if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+        if ((room.mainPathSide===constants.ROOM_SIDE_LEFT) || (room.mainPathSide===constants.ROOM_SIDE_RIGHT)) {
             min=0;
-            if (room.mainPathConnectedRoom.zBound.min>room.zBound.min) min=Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.zBound.min>room.zBound.min) min=Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             max=room.zBlockSize;
-            if (room.mainPathConnectedRoom.zBound.max<room.zBound.max) max=Math.trunc((room.mainPathConnectedRoom.zBound.max-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.zBound.max<room.zBound.max) max=Math.trunc((room.mainPathConnectedRoom.zBound.max-room.zBound.min)/constants.ROOM_BLOCK_WIDTH);
             
-            x=(room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT)?(room.xBlockSize-1):0;
+            x=(room.mainPathSide===constants.ROOM_SIDE_LEFT)?(room.xBlockSize-1):0;
             z=genRandom.randomInBetween(min,(max-1));
         }
         else {
             min=0;
-            if (room.mainPathConnectedRoom.xBound.min>room.xBound.min) min=Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.xBound.min>room.xBound.min) min=Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             max=room.xBlockSize;
-            if (room.mainPathConnectedRoom.xBound.max<room.xBound.max) max=Math.trunc((room.mainPathConnectedRoom.xBound.max-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.xBound.max<room.xBound.max) max=Math.trunc((room.mainPathConnectedRoom.xBound.max-room.xBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             x=genRandom.randomInBetween(min,(max-1));
-            z=(room.mainPathSide===mapRoomConstants.ROOM_SIDE_TOP)?(room.zBlockSize-1):0;
+            z=(room.mainPathSide===constants.ROOM_SIDE_TOP)?(room.zBlockSize-1):0;
         }
         
             // get story for this platform
             
-        connectStory=Math.trunc((room.yBound.max-room.mainPathConnectedRoom.yBound.max)/(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
+        connectStory=Math.trunc((room.yBound.max-room.mainPathConnectedRoom.yBound.max)/(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
         
             // if this spot is already taken, then we've
             // already connected, so skip
@@ -252,7 +254,7 @@ export default class GenRoomPlatformClass
         
             // the story that the connecting room is on
             
-        connectStory=Math.trunc((room.yBound.max-room.mainPathConnectedRoom.yBound.max)/(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
+        connectStory=Math.trunc((room.yBound.max-room.mainPathConnectedRoom.yBound.max)/(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
         
             // start with a random direction, the next
             // stairs up has to be same direction as platform
@@ -338,11 +340,11 @@ export default class GenRoomPlatformClass
                 // you need to turn if we are against a wall
                 
             if ((x===0) || (x===(room.xBlockSize-1))) {
-                dir=(z<Math.trunc(room.zBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_BOTTOM:mapRoomConstants.ROOM_SIDE_TOP;
+                dir=(z<Math.trunc(room.zBlockSize*0.5))?constants.ROOM_SIDE_BOTTOM:constants.ROOM_SIDE_TOP;
             }
             
             if ((z===0) || (z===(room.zBlockSize-1))) {
-                dir=(x<Math.trunc(room.xBlockSize*0.5))?mapRoomConstants.ROOM_SIDE_RIGHT:mapRoomConstants.ROOM_SIDE_LEFT;
+                dir=(x<Math.trunc(room.xBlockSize*0.5))?constants.ROOM_SIDE_RIGHT:constants.ROOM_SIDE_LEFT;
             }
                 
             x=this.moveDirX(dir,x);

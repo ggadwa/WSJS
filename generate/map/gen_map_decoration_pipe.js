@@ -1,6 +1,9 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 const DEGREE_TO_RAD=Math.PI/180.0;
 
@@ -306,7 +309,7 @@ export default class GenRoomDecorationPipeClass
         pipeAng=new PointClass(0,0,180.0);     // force len to point up
         
         len=genRandom.randomInt(1,(room.storyCount-1));
-        len=(len*(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH))-((radius*2)+map.ROOM_FLOOR_DEPTH);
+        len=(len*(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH))-((radius*2)+constants.ROOM_FLOOR_DEPTH);
         
         this.addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng);
         
@@ -316,7 +319,7 @@ export default class GenRoomDecorationPipeClass
             
         switch (dir) {
             
-            case mapRoomConstants.ROOM_SIDE_LEFT:  
+            case constants.ROOM_SIDE_LEFT:  
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0,false);
 
                 pipeAng.setFromValues(0.0,0.0,90.0);
@@ -326,7 +329,7 @@ export default class GenRoomDecorationPipeClass
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0,false);
                 break;
                 
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
+            case constants.ROOM_SIDE_RIGHT:
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0,false);
 
                 pipeAng.setFromValues(0.0,0.0,-90.0);
@@ -336,7 +339,7 @@ export default class GenRoomDecorationPipeClass
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0,false);
                 break;
                 
-            case mapRoomConstants.ROOM_SIDE_TOP:
+            case constants.ROOM_SIDE_TOP:
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0,false);
 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
@@ -346,7 +349,7 @@ export default class GenRoomDecorationPipeClass
                 this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0,false);
                 break;
                 
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+            case constants.ROOM_SIDE_BOTTOM:
                 this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0,false);
 
                 pipeAng.setFromValues(90.0,0.0,0.0);
@@ -359,7 +362,7 @@ export default class GenRoomDecorationPipeClass
         
             // final up section of pipe
         
-        len=(pnt.y-yBound.min)+map.ROOM_FLOOR_DEPTH;
+        len=(pnt.y-yBound.min)+constants.ROOM_FLOOR_DEPTH;
         
         if (len>0) {
             pipeAng=new PointClass(0,0,180.0);     // force len to point up
@@ -457,42 +460,42 @@ export default class GenRoomDecorationPipeClass
             // get # of pipes (on a grid so they can collide
             // properly) and their relative sizes
             
-        gridSize=Math.trunc(map.ROOM_BLOCK_WIDTH/2);
+        gridSize=Math.trunc(constants.ROOM_BLOCK_WIDTH/2);
         radius=Math.trunc(gridSize*0.3);
         
             // the pipe platform
         
         yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(x,z);
         
-        wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.5);
+        wid=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5);
 
-        x=room.xBound.min+(x*map.ROOM_BLOCK_WIDTH);
-        z=room.zBound.min+(z*map.ROOM_BLOCK_WIDTH);
+        x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
+        z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
         
         platformBoundX=new BoundClass((x-wid),(x+wid));
         platformBoundZ=new BoundClass((z-wid),(z+wid));
         
-        platformBoundY=new BoundClass((yBound.max-map.ROOM_FLOOR_DEPTH),room.yBound.max);
+        platformBoundY=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
         map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
         
             // determine direction
         
         dir=room.getDirectionTowardsNearestWall(x,z);
         
-        dirLen=dir.len-Math.trunc((map.ROOM_BLOCK_WIDTH*0.5)+(radius*2));
+        dirLen=dir.len-Math.trunc((constants.ROOM_BLOCK_WIDTH*0.5)+(radius*2));
         if (dirLen<0) dirLen=100;
         
             // create the pipes
             
-        sx=(x-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
-        sz=(z-Math.trunc(map.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sx=(x-Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sz=(z-Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
         
         pnt=new PointClass(0,0,0);
 
         for (pz=0;pz!==2;pz++) {
             for (px=0;px!==2;px++) {
                 pnt.x=sx+(px*gridSize);
-                pnt.y=yBound.max-map.ROOM_FLOOR_DEPTH;
+                pnt.y=yBound.max-constants.ROOM_FLOOR_DEPTH;
                 pnt.z=sz+(pz*gridSize);
                 
                 switch (genRandom.randomIndex(4)) {

@@ -1,4 +1,5 @@
 import PointClass from '../../code/utility/point.js';
+import MapMeshVertexClass from '../../code/map/map_mesh_vertex.js';
 
 //
 // mesh utility class (static)

@@ -1,4 +1,5 @@
 import PointClass from '../../code/utility/point.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -104,8 +105,8 @@ export default class GenRoomLedgeClass
         wid=genRandom.randomInt(this.LEDGE_MIN_WIDTH,this.LEDGE_EXTRA_WIDTH);
         high=genRandom.randomInt(this.LEDGE_MIN_HEIGHT,this.LEDGE_EXTRA_HEIGHT);
         
-        xMax=room.xBlockSize*map.ROOM_BLOCK_WIDTH;
-        zMax=room.zBlockSize*map.ROOM_BLOCK_WIDTH;
+        xMax=room.xBlockSize*constants.ROOM_BLOCK_WIDTH;
+        zMax=room.zBlockSize*constants.ROOM_BLOCK_WIDTH;
         
         pts=[new PointClass(0,0,0),new PointClass(0,0,0),new PointClass(0,0,0),new PointClass(0,0,0),new PointClass(0,0,0)];
 
@@ -114,32 +115,32 @@ export default class GenRoomLedgeClass
         for (z=1;z<(room.zBlockSize-1);z++) {
             
             if (room.getEdgeGridValue(0,z)===0) {
-                pts[0].setFromValues(0,0,(z*map.ROOM_BLOCK_WIDTH));
+                pts[0].setFromValues(0,0,(z*constants.ROOM_BLOCK_WIDTH));
                 pts[0].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].setFromValues(wid,0,(z*map.ROOM_BLOCK_WIDTH));
+                pts[1].setFromValues(wid,0,(z*constants.ROOM_BLOCK_WIDTH));
                 pts[1].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].setFromValues(wid,0,((z+1)*map.ROOM_BLOCK_WIDTH));
+                pts[2].setFromValues(wid,0,((z+1)*constants.ROOM_BLOCK_WIDTH));
                 pts[2].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].setFromValues(0,0,((z+1)*map.ROOM_BLOCK_WIDTH));
+                pts[3].setFromValues(0,0,((z+1)*constants.ROOM_BLOCK_WIDTH));
                 pts[3].addValues(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
             }
             
             if (room.getEdgeGridValue((room.xBlockSize-1),z)===0) {
-                pts[0].setFromValues((xMax-wid),0,(z*map.ROOM_BLOCK_WIDTH));
+                pts[0].setFromValues((xMax-wid),0,(z*constants.ROOM_BLOCK_WIDTH));
                 pts[0].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].setFromValues(xMax,0,(z*map.ROOM_BLOCK_WIDTH));
+                pts[1].setFromValues(xMax,0,(z*constants.ROOM_BLOCK_WIDTH));
                 pts[1].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].setFromValues(xMax,0,((z+1)*map.ROOM_BLOCK_WIDTH));
+                pts[2].setFromValues(xMax,0,((z+1)*constants.ROOM_BLOCK_WIDTH));
                 pts[2].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].setFromValues((xMax-wid),0,((z+1)*map.ROOM_BLOCK_WIDTH));
+                pts[3].setFromValues((xMax-wid),0,((z+1)*constants.ROOM_BLOCK_WIDTH));
                 pts[3].addValues(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
@@ -151,32 +152,32 @@ export default class GenRoomLedgeClass
         for (x=1;x<(room.xBlockSize-1);x++) {
             
             if (room.getEdgeGridValue(x,0)===0) {
-                pts[0].setFromValues((x*map.ROOM_BLOCK_WIDTH),0,0);
+                pts[0].setFromValues((x*constants.ROOM_BLOCK_WIDTH),0,0);
                 pts[0].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].setFromValues((x*map.ROOM_BLOCK_WIDTH),0,wid);
+                pts[1].setFromValues((x*constants.ROOM_BLOCK_WIDTH),0,wid);
                 pts[1].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].setFromValues(((x+1)*map.ROOM_BLOCK_WIDTH),0,wid);
+                pts[2].setFromValues(((x+1)*constants.ROOM_BLOCK_WIDTH),0,wid);
                 pts[2].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].setFromValues(((x+1)*map.ROOM_BLOCK_WIDTH),0,0);
+                pts[3].setFromValues(((x+1)*constants.ROOM_BLOCK_WIDTH),0,0);
                 pts[3].addValues(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
             }
             
             if (room.getEdgeGridValue(x,(room.zBlockSize-1))===0) {
-                pts[0].setFromValues((x*map.ROOM_BLOCK_WIDTH),0,(zMax-wid));
+                pts[0].setFromValues((x*constants.ROOM_BLOCK_WIDTH),0,(zMax-wid));
                 pts[0].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[1].setFromValues((x*map.ROOM_BLOCK_WIDTH),0,zMax);
+                pts[1].setFromValues((x*constants.ROOM_BLOCK_WIDTH),0,zMax);
                 pts[1].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[2].setFromValues(((x+1)*map.ROOM_BLOCK_WIDTH),0,zMax);
+                pts[2].setFromValues(((x+1)*constants.ROOM_BLOCK_WIDTH),0,zMax);
                 pts[2].addValues(room.xBound.min,0,room.zBound.min);
                 
-                pts[3].setFromValues(((x+1)*map.ROOM_BLOCK_WIDTH),0,(zMax-wid));
+                pts[3].setFromValues(((x+1)*constants.ROOM_BLOCK_WIDTH),0,(zMax-wid));
                 pts[3].addValues(room.xBound.min,0,room.zBound.min);
                 
                 this.addLedgeChunk(room,pts,4,high,ledgeBitmap);
@@ -192,70 +193,70 @@ export default class GenRoomLedgeClass
             pts[0].setFromValues(0,0,0);
             pts[0].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[1].setFromValues(map.ROOM_BLOCK_WIDTH,0,0);
+            pts[1].setFromValues(constants.ROOM_BLOCK_WIDTH,0,0);
             pts[1].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[2].setFromValues(map.ROOM_BLOCK_WIDTH,0,wid);
+            pts[2].setFromValues(constants.ROOM_BLOCK_WIDTH,0,wid);
             pts[2].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[3].setFromValues(wid,0,map.ROOM_BLOCK_WIDTH);
+            pts[3].setFromValues(wid,0,constants.ROOM_BLOCK_WIDTH);
             pts[3].addValues(room.xBound.min,0,room.zBound.min);
             
-            pts[4].setFromValues(0,0,map.ROOM_BLOCK_WIDTH);
+            pts[4].setFromValues(0,0,constants.ROOM_BLOCK_WIDTH);
             pts[4].addValues(room.xBound.min,0,room.zBound.min);
 
             this.addLedgeChunk(room,pts,5,high,ledgeBitmap);
         }
         
         if (room.getEdgeGridValue((room.xBlockSize-1),0)===0) {
-            pts[0].setFromValues((xMax-map.ROOM_BLOCK_WIDTH),0,0);
+            pts[0].setFromValues((xMax-constants.ROOM_BLOCK_WIDTH),0,0);
             pts[0].addValues(room.xBound.min,0,room.zBound.min);
 
             pts[1].setFromValues(xMax,0,0);
             pts[1].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[2].setFromValues(xMax,0,map.ROOM_BLOCK_WIDTH);
+            pts[2].setFromValues(xMax,0,constants.ROOM_BLOCK_WIDTH);
             pts[2].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[3].setFromValues((xMax-wid),0,map.ROOM_BLOCK_WIDTH);
+            pts[3].setFromValues((xMax-wid),0,constants.ROOM_BLOCK_WIDTH);
             pts[3].addValues(room.xBound.min,0,room.zBound.min);
             
-            pts[4].setFromValues((xMax-map.ROOM_BLOCK_WIDTH),0,wid);
+            pts[4].setFromValues((xMax-constants.ROOM_BLOCK_WIDTH),0,wid);
             pts[4].addValues(room.xBound.min,0,room.zBound.min);
 
             this.addLedgeChunk(room,pts,5,high,ledgeBitmap);
         }
         
         if (room.getEdgeGridValue((room.xBlockSize-1),(room.zBlockSize-1))===0) {
-            pts[0].setFromValues((xMax-wid),0,(zMax-map.ROOM_BLOCK_WIDTH));
+            pts[0].setFromValues((xMax-wid),0,(zMax-constants.ROOM_BLOCK_WIDTH));
             pts[0].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[1].setFromValues(xMax,0,(zMax-map.ROOM_BLOCK_WIDTH));
+            pts[1].setFromValues(xMax,0,(zMax-constants.ROOM_BLOCK_WIDTH));
             pts[1].addValues(room.xBound.min,0,room.zBound.min);
 
             pts[2].setFromValues(xMax,0,zMax);
             pts[2].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[3].setFromValues((xMax-map.ROOM_BLOCK_WIDTH),0,zMax);
+            pts[3].setFromValues((xMax-constants.ROOM_BLOCK_WIDTH),0,zMax);
             pts[3].addValues(room.xBound.min,0,room.zBound.min);
             
-            pts[4].setFromValues((xMax-map.ROOM_BLOCK_WIDTH),0,(zMax-wid));
+            pts[4].setFromValues((xMax-constants.ROOM_BLOCK_WIDTH),0,(zMax-wid));
             pts[4].addValues(room.xBound.min,0,room.zBound.min);
 
             this.addLedgeChunk(room,pts,5,high,ledgeBitmap);
         }
         
         if (room.getEdgeGridValue(0,(room.zBlockSize-1))===0) {
-            pts[0].setFromValues(0,0,(zMax-map.ROOM_BLOCK_WIDTH));
+            pts[0].setFromValues(0,0,(zMax-constants.ROOM_BLOCK_WIDTH));
             pts[0].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[1].setFromValues(wid,0,(zMax-map.ROOM_BLOCK_WIDTH));
+            pts[1].setFromValues(wid,0,(zMax-constants.ROOM_BLOCK_WIDTH));
             pts[1].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[2].setFromValues(map.ROOM_BLOCK_WIDTH,0,(zMax-wid));
+            pts[2].setFromValues(constants.ROOM_BLOCK_WIDTH,0,(zMax-wid));
             pts[2].addValues(room.xBound.min,0,room.zBound.min);
 
-            pts[3].setFromValues(map.ROOM_BLOCK_WIDTH,0,zMax);
+            pts[3].setFromValues(constants.ROOM_BLOCK_WIDTH,0,zMax);
             pts[3].addValues(room.xBound.min,0,room.zBound.min);
             
             pts[4].setFromValues(0,0,zMax);

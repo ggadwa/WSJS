@@ -1,5 +1,7 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 
 //
 // map hallways and doors
@@ -117,9 +119,9 @@ export default class GenRoomHallwayClass
         
             // and the movement
         
-        movement=new MovementClass(meshIdx,false,(map.ROOM_BLOCK_WIDTH*2));
+        movement=new MovementClass(meshIdx,false,(constants.ROOM_BLOCK_WIDTH*2));
         movement.addMove(new MoveClass(1500,new PointClass(0,0,0)));
-        movement.addMove(new MoveClass(1500,new PointClass(0,-(map.ROOM_FLOOR_HEIGHT-map.ROOM_FLOOR_DEPTH),0)));
+        movement.addMove(new MoveClass(1500,new PointClass(0,-(constants.ROOM_FLOOR_HEIGHT-constants.ROOM_FLOOR_DEPTH),0)));
         
         map.addMovement(movement);
     }
@@ -140,7 +142,7 @@ export default class GenRoomHallwayClass
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        thickSize=Math.trunc(map.ROOM_BLOCK_WIDTH*0.05);
+        thickSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
         
             // the door room
             // internal walls
@@ -220,9 +222,9 @@ export default class GenRoomHallwayClass
         
             // and the movement
         
-        movement=new MovementClass(meshIdx,false,(map.ROOM_BLOCK_WIDTH*2));
+        movement=new MovementClass(meshIdx,false,(constants.ROOM_BLOCK_WIDTH*2));
         movement.addMove(new MoveClass(1500,new PointClass(0,0,0)));
-        movement.addMove(new MoveClass(1500,new PointClass(0,-(map.ROOM_FLOOR_HEIGHT-map.ROOM_FLOOR_DEPTH),0)));
+        movement.addMove(new MoveClass(1500,new PointClass(0,-(constants.ROOM_FLOOR_HEIGHT-constants.ROOM_FLOOR_DEPTH),0)));
         
         map.addMovement(movement); 
     }
@@ -243,7 +245,7 @@ export default class GenRoomHallwayClass
             // doors need to be pushed in on
             // the edges so they have a wall thickness
             
-        thickSize=Math.trunc(map.ROOM_BLOCK_WIDTH*0.05);
+        thickSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
          
             // the door room
             // internal walls

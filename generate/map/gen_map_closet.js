@@ -1,6 +1,8 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 //
 // generate room closet class
@@ -141,7 +143,7 @@ export default class GenRoomClosetClass
         
             // story height
             
-        storyHigh=map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH;
+        storyHigh=constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH;
         
             // create closests
             
@@ -156,7 +158,7 @@ export default class GenRoomClosetClass
             
                 // get length and offset
             
-            if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
                 closetLen=genRandom.randomInt(2,(room.zBlockSize-2));
                 connectOffset=genRandom.randomInt(0,(room.zBlockSize-closetLen));
             }
@@ -169,42 +171,42 @@ export default class GenRoomClosetClass
                 // always need to remove on floor depth for top of closet
                 
             story=genRandom.randomInt(0,room.storyCount);
-            yClosetBound=new BoundClass(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
+            yClosetBound=new BoundClass(((room.yBound.max-((story+1)*storyHigh))+constants.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
             
                 // get the box
                 
             switch (connectSide) {
                 
-                case mapRoomConstants.ROOM_SIDE_LEFT:
+                case constants.ROOM_SIDE_LEFT:
                     xAdd=0;
-                    zAdd=map.ROOM_BLOCK_WIDTH;
-                    z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new BoundClass((room.xBound.min-map.ROOM_BLOCK_WIDTH),room.xBound.min);
-                    zClosetBound=new BoundClass(z,(z+map.ROOM_BLOCK_WIDTH));
+                    zAdd=constants.ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new BoundClass((room.xBound.min-constants.ROOM_BLOCK_WIDTH),room.xBound.min);
+                    zClosetBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
                     break;
                     
-                case mapRoomConstants.ROOM_SIDE_TOP:
-                    xAdd=map.ROOM_BLOCK_WIDTH;
+                case constants.ROOM_SIDE_TOP:
+                    xAdd=constants.ROOM_BLOCK_WIDTH;
                     zAdd=0;
-                    x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new BoundClass(x,(x+map.ROOM_BLOCK_WIDTH));
-                    zClosetBound=new BoundClass((room.zBound.min-map.ROOM_BLOCK_WIDTH),room.zBound.min);
+                    x=room.xBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new BoundClass(x,(x+constants.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new BoundClass((room.zBound.min-constants.ROOM_BLOCK_WIDTH),room.zBound.min);
                     break;
                     
-                case mapRoomConstants.ROOM_SIDE_RIGHT:
+                case constants.ROOM_SIDE_RIGHT:
                     xAdd=0;
-                    zAdd=map.ROOM_BLOCK_WIDTH;
-                    z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new BoundClass(room.xBound.max,(room.xBound.max+map.ROOM_BLOCK_WIDTH));
-                    zClosetBound=new BoundClass(z,(z+map.ROOM_BLOCK_WIDTH));
+                    zAdd=constants.ROOM_BLOCK_WIDTH;
+                    z=room.zBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new BoundClass(room.xBound.max,(room.xBound.max+constants.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
                     break;
                     
-                case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                    xAdd=map.ROOM_BLOCK_WIDTH;
+                case constants.ROOM_SIDE_BOTTOM:
+                    xAdd=constants.ROOM_BLOCK_WIDTH;
                     zAdd=0;
-                    x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xClosetBound=new BoundClass(x,(x+map.ROOM_BLOCK_WIDTH));
-                    zClosetBound=new BoundClass(room.zBound.max,(room.zBound.max+map.ROOM_BLOCK_WIDTH));
+                    x=room.xBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
+                    xClosetBound=new BoundClass(x,(x+constants.ROOM_BLOCK_WIDTH));
+                    zClosetBound=new BoundClass(room.zBound.max,(room.zBound.max+constants.ROOM_BLOCK_WIDTH));
                     break;
             }
             

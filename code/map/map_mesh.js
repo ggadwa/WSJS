@@ -2,41 +2,8 @@ import PointClass from '../../code/utility/point.js';
 import Point2DClass from '../../code/utility/2D_point.js';
 import LineClass from '../../code/utility/line.js';
 import BoundClass from '../../code/utility/bound.js';
+import MapMeshVertexClass from '../../code/map/map_mesh_vertex.js';
 import CollisionRectClass from '../../code/utility/collision_rect.js';
-
-//
-// map mesh vertex
-//
-
-class MapMeshVertexClass
-{
-    constructor()
-    {
-        this.position=new PointClass(0,0,0);
-        this.normal=new PointClass(0.0,0.0,0.0);
-        this.tangent=new PointClass(0.0,0.0,0.0);
-        this.uv=new Point2DClass(0.0,0.0);
-        
-        Object.seal(this);
-    }
-}
-
-//
-// special class used to pre-calc some
-// light map calculations
-//
-
-class MapMeshLightMapTrigCacheClass
-{
-    constructor(v0,v10,v20)
-    {
-        this.v0=v0;        // point 0 on the triangle
-        this.v10=v10;      // vector of point 1-point 0
-        this.v20=v20;      // vector of point 2-point 0
-        
-        Object.seal(this);
-    }
-}
 
 //
 // special class used to pre-calc some
@@ -103,9 +70,9 @@ export default class MapMeshClass
         this.vertexUVBuffer=null;
         this.indexBuffer=null;
 
-            // special caches for light map building
+            // cache for eliminating triangles
+            // that share the same space
 
-        this.trigRayTraceCache=null;
         this.trigSharedTrigCache=null;
 
             // collision lists
@@ -351,42 +318,6 @@ export default class MapMeshClass
         this.center.x/=this.vertexCount;
         this.center.y/=this.vertexCount;
         this.center.z/=this.vertexCount;
-    }
-
-        //
-        // special cache for ray tracing
-        //
-
-    buildTrigRayTraceCache()
-    {
-        let n,tIdx;
-        let vp0,vp1,vp2,v10,v20;
-
-            // this builds a specialized cache to
-            // speed up ray tracing.  For each triangle
-            // in the mesh it stores a vertex, and the
-            // vectors to the other two vertexes
-
-        this.trigRayTraceCache=[];
-        
-        tIdx=0;
-
-        for (n=0;n!==this.trigCount;n++) {
-
-            vp0=this.vertexList[this.indexes[tIdx++]].position;
-            vp1=this.vertexList[this.indexes[tIdx++]].position;
-            vp2=this.vertexList[this.indexes[tIdx++]].position;
-            
-            v10=new PointClass((vp1.x-vp0.x),(vp1.y-vp0.y),(vp1.z-vp0.z));
-            v20=new PointClass((vp2.x-vp0.x),(vp2.y-vp0.y),(vp2.z-vp0.z));
-            
-            this.trigRayTraceCache.push(new MapMeshLightMapTrigCacheClass(vp0,v10,v20));
-        }
-    }
-    
-    clearTrigRayTraceCache()
-    {
-        this.trigRayTraceCache=null;
     }
 
         //

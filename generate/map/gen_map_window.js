@@ -1,6 +1,9 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 //
 // generate room window class
@@ -34,7 +37,7 @@ export default class GenRoomWindowClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(30);
             
-        if (connectSide!==mapRoomConstants.ROOM_SIDE_LEFT) {
+        if (connectSide!==constants.ROOM_SIDE_LEFT) {
             vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min); 
             vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);        
             vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.max);     
@@ -43,7 +46,7 @@ export default class GenRoomWindowClass
             vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
         }
         
-        if (connectSide!==mapRoomConstants.ROOM_SIDE_RIGHT) {
+        if (connectSide!==constants.ROOM_SIDE_RIGHT) {
             vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
             vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
             vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
@@ -52,7 +55,7 @@ export default class GenRoomWindowClass
             vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
         }
     
-        if (connectSide!==mapRoomConstants.ROOM_SIDE_TOP) {
+        if (connectSide!==constants.ROOM_SIDE_TOP) {
             vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.min);
             vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.min);
             vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.min);
@@ -61,7 +64,7 @@ export default class GenRoomWindowClass
             vertexList[idx++].position.setFromValues(xBound.min,yBound.max,zBound.min);
         }
         
-        if (connectSide!==mapRoomConstants.ROOM_SIDE_BOTTOM) {
+        if (connectSide!==constants.ROOM_SIDE_BOTTOM) {
             vertexList[idx++].position.setFromValues(xBound.min,yBound.min,zBound.max);
             vertexList[idx++].position.setFromValues(xBound.max,yBound.min,zBound.max);
             vertexList[idx++].position.setFromValues(xBound.max,yBound.max,zBound.max);
@@ -101,16 +104,16 @@ export default class GenRoomWindowClass
             // the window casing
         
         switch (connectSide) {
-            case mapRoomConstants.ROOM_SIDE_LEFT:
+            case constants.ROOM_SIDE_LEFT:
                 map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
                 break;
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
+            case constants.ROOM_SIDE_RIGHT:
                 map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
                 break;
-            case mapRoomConstants.ROOM_SIDE_TOP:
+            case constants.ROOM_SIDE_TOP:
                 map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
                 break;
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+            case constants.ROOM_SIDE_BOTTOM:
                 map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
                 break;
         }
@@ -131,8 +134,8 @@ export default class GenRoomWindowClass
         
             // story height
         
-        wid=Math.trunc(map.ROOM_BLOCK_WIDTH*0.1);
-        storyHigh=map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH;
+        wid=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
+        storyHigh=constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH;
             
             // get the Y bound
             // always need to remove on floor depth for top of window
@@ -144,7 +147,7 @@ export default class GenRoomWindowClass
         else {
             story=genRandom.randomInt(0,room.storyCount);
         }
-        yWindowBound=new BoundClass(((room.yBound.max-((story+1)*storyHigh))+map.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
+        yWindowBound=new BoundClass(((room.yBound.max-((story+1)*storyHigh))+constants.ROOM_FLOOR_DEPTH),(room.yBound.max-(story*storyHigh)));
         
             // create windows
             
@@ -171,7 +174,7 @@ export default class GenRoomWindowClass
                 // get position
                 // never put in corner
             
-            if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
                 connectOffset=genRandom.randomInt(1,(room.zBlockSize-3));
             }
             else {
@@ -182,32 +185,32 @@ export default class GenRoomWindowClass
                 
             switch (connectSide) {
                 
-                case mapRoomConstants.ROOM_SIDE_LEFT:
-                    z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
+                case constants.ROOM_SIDE_LEFT:
+                    z=room.zBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
                     xWindowBound=new BoundClass((room.xBound.min-wid),room.xBound.min);
-                    zWindowBound=new BoundClass(z,(z+map.ROOM_BLOCK_WIDTH));
-                    lightPos=new PointClass((room.xBound.min-(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
+                    zWindowBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
+                    lightPos=new PointClass((room.xBound.min-(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5)));
                     break;
                     
-                case mapRoomConstants.ROOM_SIDE_TOP:
-                    x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new BoundClass(x,(x+map.ROOM_BLOCK_WIDTH));
+                case constants.ROOM_SIDE_TOP:
+                    x=room.xBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
+                    xWindowBound=new BoundClass(x,(x+constants.ROOM_BLOCK_WIDTH));
                     zWindowBound=new BoundClass((room.zBound.min-wid),room.zBound.min);
-                    lightPos=new PointClass((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.min-(wid*2)));
+                    lightPos=new PointClass((x+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.min-(wid*2)));
                     break;
                     
-                case mapRoomConstants.ROOM_SIDE_RIGHT:
-                    z=room.zBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
+                case constants.ROOM_SIDE_RIGHT:
+                    z=room.zBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
                     xWindowBound=new BoundClass(room.xBound.max,(room.xBound.max+wid));
-                    zWindowBound=new BoundClass(z,(z+map.ROOM_BLOCK_WIDTH));
-                    lightPos=new PointClass((room.xBound.max+(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)));
+                    zWindowBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
+                    lightPos=new PointClass((room.xBound.max+(wid*2)),yWindowBound.getMidPoint(),(z+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5)));
                     break;
                     
-                case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                    x=room.xBound.min+(connectOffset*map.ROOM_BLOCK_WIDTH);
-                    xWindowBound=new BoundClass(x,(x+map.ROOM_BLOCK_WIDTH));
+                case constants.ROOM_SIDE_BOTTOM:
+                    x=room.xBound.min+(connectOffset*constants.ROOM_BLOCK_WIDTH);
+                    xWindowBound=new BoundClass(x,(x+constants.ROOM_BLOCK_WIDTH));
                     zWindowBound=new BoundClass(room.zBound.max,(room.zBound.max+wid));
-                    lightPos=new PointClass((x+Math.trunc(map.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.max+(wid*2)));
+                    lightPos=new PointClass((x+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5)),yWindowBound.getMidPoint(),(room.zBound.max+(wid*2)));
                     break;
             }
             

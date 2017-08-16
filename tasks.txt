@@ -73,9 +73,7 @@ debug
 modelConstants
 ModelLimbConstants
 EntityProjectileClass
-MeshPrimitivesClass
-mapRoomConstants
-MeshUtilityClass
+
 
 ----> break up all the multi-class modules
 
@@ -89,6 +87,8 @@ ToDos
         [X] mapRoomConstants.ROOM_DECORATION_COMPUTER:
         [ ] mapRoomConstants.ROOM_DECORATION_PIPE:
         [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
+              - raised chunk of floor with stairs
+              - bunch of squares you can jump climb?
         [ ] mapRoomConstants.ROOM_DECORATION_LAB:
               - glowing vat texture, glass cylinders
         [ ] pits (wires, pipes)

@@ -10,10 +10,12 @@ import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
 import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
 import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
+import MapRoomClass from '../../code/map/map_room.js';
 import MovementListClass from '../../code/map/movement_list.js';
 import MapOverlayClass from '../../code/map/map_overlay.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 //
 // map class
@@ -26,6 +28,7 @@ export default class MapClass
         let n;
         
         this.view=view;
+        this.fileCache=this.fileCache;
         
         this.mapMeshShader=new MapMeshShaderClass(view,fileCache);
         this.mapLiquidShader=new MapLiquidShaderClass(view,fileCache);        // shared
@@ -80,17 +83,11 @@ export default class MapClass
         this.lightmapBitmapList=[];
         
         this.movementList=new MovementListClass();
-        this.overlay=new MapOverlayClass(view);
+        this.overlay=new MapOverlayClass(view,fileCache);
 
         this.lightXBound=new BoundClass(0,0);           // global not local so they won't get GCd
         this.lightYBound=new BoundClass(0,0);
         this.lightZBound=new BoundClass(0,0);
-        
-            // room size constants
-            
-        this.ROOM_BLOCK_WIDTH=8000;                     // x/z dimension of a block (rooms are made up of a grid of blocks)
-        this.ROOM_FLOOR_HEIGHT=8000;                    // how tall each floor of a room is
-        this.ROOM_FLOOR_DEPTH=700;                      // the depth of the area between floors
         
         Object.seal(this);
     }
@@ -259,9 +256,9 @@ export default class MapClass
         // tracking rooms
         //
         
-    addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
+    addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
     {
-        this.rooms.push(new MapRoomClass(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid));
+        this.rooms.push(new MapRoomClass(this,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid));
         return(this.rooms.length-1);
     }
 
@@ -451,7 +448,7 @@ export default class MapClass
             else {
                 roomIdx=genRandom.randomIndex(this.rooms.length);
                 
-                if (this.rooms[roomIdx].pathType!==mapRoomConstants.ROOM_PATH_TYPE_NORMAL) {
+                if (this.rooms[roomIdx].pathType!==constants.ROOM_PATH_TYPE_NORMAL) {
                     findTry++;
                     continue;
                 }
@@ -470,13 +467,13 @@ export default class MapClass
     
     findRandomPlayerPosition()
     {
-        let roomIdx=this.findRoomForPathType(mapRoomConstants.ROOM_PATH_TYPE_START);
+        let roomIdx=this.findRoomForPathType(constants.ROOM_PATH_TYPE_START);
         return(this.rooms[roomIdx].findAndBlockSpawnPosition(true));
     }
     
     findRandomBossPosition()
     {
-        let roomIdx=this.findRoomForPathType(mapRoomConstants.ROOM_PATH_TYPE_GOAL);
+        let roomIdx=this.findRoomForPathType(constants.ROOM_PATH_TYPE_GOAL);
         return(this.rooms[roomIdx].findAndBlockSpawnPosition(true));
     }
     

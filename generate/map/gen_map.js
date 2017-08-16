@@ -1,8 +1,23 @@
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-import genRandom from '../../generate/utility/random.js';
 import ColorClass from '../../code/utility/color.js';
+import LightClass from '../../code/light/light.js';
+import GenRoomHallwayClass from '../../generate/map/gen_map_hallway.js';
+import GenRoomClosetClass from '../../generate/map/gen_map_closet.js';
+import GenRoomWindowClass from '../../generate/map/gen_map_window.js';
+import GenRoomLedgeClass from '../../generate/map/gen_map_ledge.js';
+import GenRoomPlatformClass from '../../generate/map/gen_map_platform.js';
+import GenRoomStairsClass from '../../generate/map/gen_map_stair.js';
+import GenRoomDecorationPillarClass from '../../generate/map/gen_map_decoration_pillar.js';
+import GenRoomDecorationStorageClass from '../../generate/map/gen_map_decoration_storage.js';
+import GenRoomDecorationComputerClass from '../../generate/map/gen_map_decoration_computer.js';
+import GenRoomDecorationPipeClass from '../../generate/map/gen_map_decoration_pipe.js';
+import GenRoomDecorationCubicalClass from '../../generate/map/gen_map_decoration_cubical.js';
+import GenRoomDecorationLabClass from '../../generate/map/gen_map_decoration_lab.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
+import constants from '../../code/main/constants.js';
+import genRandom from '../../generate/utility/random.js';
 
 //
 // generate map class
@@ -10,9 +25,10 @@ import ColorClass from '../../code/utility/color.js';
 
 export default class GenMapClass
 {
-    constructor(callbackFunc)
+    constructor(view,map,callbackFunc)
     {
-        this.currentRoomCount=0;
+        this.view=view;
+        this.map=map;
 
             // the callback function when
             // generation concludes
@@ -22,7 +38,9 @@ export default class GenMapClass
             // the base Y for the path part
             // of the map
             
-        this.yBase=Math.trunc(view.OPENGL_FAR_Z/2);
+        this.yBase=Math.trunc(this.view.OPENGL_FAR_Z/2);
+        
+        this.currentRoomCount=0;
         
             // constants
             
@@ -53,10 +71,10 @@ export default class GenMapClass
 
         this.MAP_LIGHT_ALWAYS_WHITE=false;              // make sure map lights are always white
         
-        this.HALLWAY_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.6;                 // intensity of hallway lights
-        this.DOOR_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*1.3;                    // intensity of lights over doors
-        this.WINDOW_LIGHT_INTENSITY=map.ROOM_FLOOR_HEIGHT*3.6;                  // intensity of window light
-        this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=map.ROOM_FLOOR_HEIGHT*0.15;         // how much to cut main room light for each window
+        this.HALLWAY_LIGHT_INTENSITY=constants.ROOM_FLOOR_HEIGHT*1.6;                 // intensity of hallway lights
+        this.DOOR_LIGHT_INTENSITY=constants.ROOM_FLOOR_HEIGHT*1.3;                    // intensity of lights over doors
+        this.WINDOW_LIGHT_INTENSITY=constants.ROOM_FLOOR_HEIGHT*3.6;                  // intensity of window light
+        this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=constants.ROOM_FLOOR_HEIGHT*0.15;         // how much to cut main room light for each window
 
         Object.seal(this);
     }
@@ -76,10 +94,10 @@ export default class GenMapClass
             // this function calculates if a triangle
             // is wall like, and it's bounds, and caches it
             
-        nMesh=map.meshes.length;
+        nMesh=this.map.meshes.length;
             
         for (n=0;n!==nMesh;n++) {
-            map.meshes[n].buildSharedTriangleCache();
+            this.map.meshes[n].buildSharedTriangleCache();
         }
 
             // create a list of triangles
@@ -103,7 +121,7 @@ export default class GenMapClass
         targetMeshList=new Uint16Array(nMesh);
 
         for (n=0;n!==nMesh;n++) {
-            mesh=map.meshes[n];
+            mesh=this.map.meshes[n];
             if (mesh.flag!==meshFlag) continue;
             
                 // build a list of meshes that
@@ -122,7 +140,7 @@ export default class GenMapClass
             
             if (meshFlag===compareMeshFlag) {
                 for (k=(n+1);k<nMesh;k++) {
-                    otherMesh=map.meshes[k];
+                    otherMesh=this.map.meshes[k];
                     if (otherMesh.flag!==compareMeshFlag) continue;
 
                     if (mesh.boxTouchOtherMeshOutside(otherMesh)) targetMeshList[targetMeshCount++]=k;
@@ -130,7 +148,7 @@ export default class GenMapClass
             }
             else {
                 for (k=0;k!==nMesh;k++) {
-                    otherMesh=map.meshes[k];
+                    otherMesh=this.map.meshes[k];
                     if (otherMesh.flag!==compareMeshFlag) continue;
 
                     if (mesh.boxTouchOtherMeshInside(otherMesh)) targetMeshList[targetMeshCount++]=k;
@@ -149,7 +167,7 @@ export default class GenMapClass
                 hit=false;
 
                 for (k=0;k!==targetMeshCount;k++) {
-                    otherMesh=map.meshes[targetMeshList[k]];
+                    otherMesh=this.map.meshes[targetMeshList[k]];
 
                     for (t2=0;t2!==otherMesh.trigCount;t2++) {
                         
@@ -180,7 +198,7 @@ export default class GenMapClass
             // clear the caches
             
         for (n=0;n!==nMesh;n++) {
-            map.meshes[n].clearSharedTriangleCache();
+            this.map.meshes[n].clearSharedTriangleCache();
         }
         
             // finally delete the triangles
@@ -193,7 +211,7 @@ export default class GenMapClass
                 // remove the trig
 
             aTrig=trigList[n];
-            map.meshes[aTrig[0]].removeTriangle(aTrig[1]);
+            this.map.meshes[aTrig[0]].removeTriangle(aTrig[1]);
 
                 // shift other indexes
 
@@ -215,21 +233,21 @@ export default class GenMapClass
         let n,mesh,mesh2;
         let yAdd,yBound,yWallBound,yFloorBound;
         let roomIdx,room;
-        let storyCount,decorationType,liquid;
-        let roomBitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        let storyCount,liquid;
+        let roomBitmap=this.map.getTexture(this.map.TEXTURE_TYPE_WALL);
         
             // figure out room Y size from extension mode
             // all rooms need at least 2 stories
             
         switch (level) {
-            case mapRoomConstants.LEVEL_LOWER:
+            case constants.LEVEL_LOWER:
                 storyCount=genRandom.randomInt(2,4);
                 yAdd=(genRandom.randomInBetween(1,(storyCount-1)));
-                yBound=new BoundClass(0,this.yBase+((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*yAdd));
+                yBound=new BoundClass(0,this.yBase+((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*yAdd));
                 break;
-            case mapRoomConstants.LEVEL_HIGHER:
+            case constants.LEVEL_HIGHER:
                 storyCount=genRandom.randomInt(2,4);
-                yBound=new BoundClass(0,this.yBase-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
+                yBound=new BoundClass(0,this.yBase-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
                 break;
             default:
                 storyCount=genRandom.randomInt(2,3);
@@ -240,71 +258,51 @@ export default class GenMapClass
             // if a goal room, and we have a boss, always
             // make room taller
             
-        if (pathType===mapRoomConstants.ROOM_PATH_TYPE_GOAL) {
+        if (pathType===constants.ROOM_PATH_TYPE_GOAL) {
             if (storyCount<4) storyCount=4;
         }
         
             // determine if this room has a liquid,
             // and lower it for pool and add a story
         
-        liquid=(config.ROOM_LIQUIDS)&&(level===mapRoomConstants.LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
-        
-            // determine the decoration type
-        
-        switch (level) {
-            case mapRoomConstants.LEVEL_NORMAL:
-                decorationType=mapRoomConstants.ROOM_DECORATION_NORMAL_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_NORMAL_LIST.length)];
-                break;
-            case mapRoomConstants.LEVEL_LOWER:
-                decorationType=mapRoomConstants.ROOM_DECORATION_LOWER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LOWER_LIST.length)];
-                break;
-            case mapRoomConstants.LEVEL_HIGHER:
-                decorationType=mapRoomConstants.ROOM_DECORATION_HIGHER_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_HIGHER_LIST.length)];
-                break;
-            default:
-                decorationType=mapRoomConstants.ROOM_DECORATION_PATH_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_PATH_LIST.length)];
-                break;
-        }
-        
-        if (liquid) decorationType=mapRoomConstants.ROOM_DECORATION_LIQUID_LIST[genRandom.randomIndex(mapRoomConstants.ROOM_DECORATION_LIQUID_LIST.length)];
-        if (pathType===mapRoomConstants.ROOM_PATH_TYPE_GOAL) decorationType=mapRoomConstants.ROOM_DECORATION_NONE;
+        liquid=(config.ROOM_LIQUIDS)&&(level===constants.LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
         
             // top of room
             
-        yBound.min=yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*storyCount);
+        yBound.min=yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*storyCount);
             
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=map.addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,decorationType,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
-        room=map.rooms[roomIdx];
+        roomIdx=this.map.addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
+        room=this.map.rooms[roomIdx];
         
             // the floor
             
-        room.createMeshFloor(map.getTexture(map.TEXTURE_TYPE_FLOOR));
+        room.createMeshFloor(this.map.getTexture(this.map.TEXTURE_TYPE_FLOOR));
 
             // walls
             // each wall is a tall piece and a short piece on top
             // the short piece is for headers on doors and places for platforms
             
-        yWallBound=new BoundClass((yBound.max-map.ROOM_FLOOR_HEIGHT),yBound.max);
-        yFloorBound=new BoundClass((yWallBound.min-map.ROOM_FLOOR_DEPTH),yWallBound.min);
+        yWallBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_HEIGHT),yBound.max);
+        yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
             
         for (n=0;n!==storyCount;n++) {
             mesh=room.createMeshWalls(roomBitmap,yWallBound);
             mesh2=room.createMeshWalls(roomBitmap,yFloorBound);
             mesh.combineMesh(mesh2);
             
-            map.addMesh(mesh);
-            if (n===0) map.addOverlayRoom(room);
+            this.map.addMesh(mesh);
+            if (n===0) this.map.addOverlayRoom(room);
             
-            yWallBound.add(-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
-            yFloorBound.add(-(map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH));
+            yWallBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
+            yFloorBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
         }
         
             // the ceiling
         
-        room.createMeshCeiling(map.getTexture(map.TEXTURE_TYPE_CEILING));
+        room.createMeshCeiling(this.map.getTexture(this.map.TEXTURE_TYPE_CEILING));
         
         return(roomIdx);
     }
@@ -318,9 +316,9 @@ export default class GenMapClass
             // build the door
             
         let genRoomHallway=new GenRoomHallwayClass();
-        let yHallwayBound=new BoundClass(this.yBase,(this.yBase-map.ROOM_FLOOR_HEIGHT));        // don't count the upper header
+        let yHallwayBound=new BoundClass(this.yBase,(this.yBase-constants.ROOM_FLOOR_HEIGHT));        // don't count the upper header
 
-        if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+        if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
             genRoomHallway.createHallwayX(xHallwayBound,yHallwayBound,zHallwayBound,(hallwayMode===this.HALLWAY_LONG));
         }
         else {
@@ -329,7 +327,7 @@ export default class GenMapClass
         
             // add to overlay
             
-        map.addOverlayConnection(xHallwayBound,zHallwayBound);
+        this.map.addOverlayConnection(xHallwayBound,zHallwayBound);
     }
         
         //
@@ -347,7 +345,7 @@ export default class GenMapClass
             xFixtureBound=new BoundClass((fixturePos.x-400),(fixturePos.x+400));
             yFixtureBound=new BoundClass(fixturePos.y,(fixturePos.y+1000));
             zFixtureBound=new BoundClass((fixturePos.z-400),(fixturePos.z+400));
-            map.addMesh(MeshPrimitivesClass.createMeshPryamid(map.getTexture(map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,map.MESH_FLAG_LIGHT));
+            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.map.getTexture(this.map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,this.map.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -368,7 +366,7 @@ export default class GenMapClass
             // add light to map
 
         light=new LightClass(lightPos,new ColorClass(red,green,blue),intensity,exponent);
-        map.addLight(light);
+        this.map.addLight(light);
 
         return(light);
     }
@@ -376,11 +374,11 @@ export default class GenMapClass
     addRoomLight(roomIdx)
     {
         let lightY,fixturePos,lightPos,intensity;
-        let room=map.rooms[roomIdx];
+        let room=this.map.rooms[roomIdx];
         
             // locations
             
-        lightY=room.yBound.max-((map.ROOM_FLOOR_HEIGHT+map.ROOM_FLOOR_DEPTH)*room.storyCount);
+        lightY=room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*room.storyCount);
         
         fixturePos=new PointClass(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
         lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
@@ -405,17 +403,17 @@ export default class GenMapClass
             // middle of hallway
             
         if (hallwayMode===this.HALLWAY_LONG) {
-            fixturePos=new PointClass(xBound.getMidPoint(),(this.yBase-map.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
+            fixturePos=new PointClass(xBound.getMidPoint(),(this.yBase-constants.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
             lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
             this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY);
         }
         
             // ends
         
-        y=this.yBase-(map.ROOM_FLOOR_HEIGHT+(map.ROOM_FLOOR_DEPTH*4));
+        y=this.yBase-(constants.ROOM_FLOOR_HEIGHT+(constants.ROOM_FLOOR_DEPTH*4));
         
-        if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
-            xAdd=Math.trunc(hallwaySize*0.5)+map.ROOM_FLOOR_DEPTH;
+        if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
+            xAdd=Math.trunc(hallwaySize*0.5)+constants.ROOM_FLOOR_DEPTH;
             xAdd2=1000;
             zAdd=zAdd2=0;
             rot1=new PointClass(90,90,0);
@@ -423,7 +421,7 @@ export default class GenMapClass
         }
         else {
             xAdd=xAdd2=0;
-            zAdd=Math.trunc(hallwaySize*0.5)+map.ROOM_FLOOR_DEPTH;
+            zAdd=Math.trunc(hallwaySize*0.5)+constants.ROOM_FLOOR_DEPTH;
             zAdd2=1000;
             rot1=new PointClass(90,0,0);
             rot2=new PointClass(90,180,0);
@@ -451,8 +449,8 @@ export default class GenMapClass
         if (bound2.min>min) min=bound2.min;
         if (bound2.max<max) max=bound2.max;
         
-        count=Math.trunc((max-min)/map.ROOM_BLOCK_WIDTH);
-        offset=genRandom.randomIndex(count)*map.ROOM_BLOCK_WIDTH;
+        count=Math.trunc((max-min)/constants.ROOM_BLOCK_WIDTH);
+        offset=genRandom.randomIndex(count)*constants.ROOM_BLOCK_WIDTH;
         if (bound1.min<bound2.min) offset+=(bound2.min-bound1.min);           // need to align offset with bounds1
         
         return(offset);
@@ -495,16 +493,16 @@ export default class GenMapClass
             // centered in the map
 
         if (lastRoom===null) {
-            mapMid=Math.trunc(view.OPENGL_FAR_Z/2);
+            mapMid=Math.trunc(this.view.OPENGL_FAR_Z/2);
 
-            halfSize=Math.trunc((xBlockSize/2)*map.ROOM_BLOCK_WIDTH);
+            halfSize=Math.trunc((xBlockSize/2)*constants.ROOM_BLOCK_WIDTH);
             xBound=new BoundClass((mapMid-halfSize),(mapMid+halfSize));
 
-            halfSize=Math.trunc((zBlockSize/2)*map.ROOM_BLOCK_WIDTH);
+            halfSize=Math.trunc((zBlockSize/2)*constants.ROOM_BLOCK_WIDTH);
             zBound=new BoundClass((mapMid-halfSize),(mapMid+halfSize));
             
-            pathType=mapRoomConstants.ROOM_PATH_TYPE_START;
-            extensionDirection=mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT;
+            pathType=constants.ROOM_PATH_TYPE_START;
+            extensionDirection=constants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT;
         }
 
             // otherwise we connect to the previous room
@@ -520,77 +518,77 @@ export default class GenMapClass
                     // where the extension rooms go
                 
                 if (genRandom.randomPercentage(0.33)) {
-                    connectSide=(genRandom.randomPercentage(0.5))?mapRoomConstants.ROOM_SIDE_LEFT:mapRoomConstants.ROOM_SIDE_RIGHT;
-                    extensionDirection=mapRoomConstants.ROOM_EXTENSION_DIRECTION_TOP_BOTTOM;
+                    connectSide=(genRandom.randomPercentage(0.5))?constants.ROOM_SIDE_LEFT:constants.ROOM_SIDE_RIGHT;
+                    extensionDirection=constants.ROOM_EXTENSION_DIRECTION_TOP_BOTTOM;
                 }
                 else {
-                    connectSide=mapRoomConstants.ROOM_SIDE_TOP;
-                    extensionDirection=mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT;
+                    connectSide=constants.ROOM_SIDE_TOP;
+                    extensionDirection=constants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT;
                 }
                 
-                if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+                if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
                     connectOffset=genRandom.randomInt(-Math.trunc(zBlockSize*0.5),lastRoom.zBlockSize);
                 }
                 else {
                     connectOffset=genRandom.randomInt(-Math.trunc(xBlockSize*0.5),lastRoom.xBlockSize);
                 }
                 
-                connectOffset*=map.ROOM_BLOCK_WIDTH;
+                connectOffset*=constants.ROOM_BLOCK_WIDTH;
                 
                     // get new room bounds and move it around
                     // if we need space for hallways
                 
-                doorAdd=(hallwayMode===this.HALLWAY_LONG)?(map.ROOM_BLOCK_WIDTH*4):map.ROOM_BLOCK_WIDTH;
+                doorAdd=(hallwayMode===this.HALLWAY_LONG)?(constants.ROOM_BLOCK_WIDTH*4):constants.ROOM_BLOCK_WIDTH;
                 
                 switch (connectSide) {
 
-                    case mapRoomConstants.ROOM_SIDE_LEFT:
-                        xBound=new BoundClass((lastRoom.xBound.min-(xBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
-                        zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    case constants.ROOM_SIDE_LEFT:
+                        xBound=new BoundClass((lastRoom.xBound.min-(xBlockSize*constants.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
+                        zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*constants.ROOM_BLOCK_WIDTH)));
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             xBound.add(-doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
                             xHallwayBound=new BoundClass((lastRoom.xBound.min-doorAdd),lastRoom.xBound.min);
-                            zHallwayBound=new BoundClass((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            zHallwayBound=new BoundClass((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+constants.ROOM_BLOCK_WIDTH));
                         }
                         
                         break;
 
-                    case mapRoomConstants.ROOM_SIDE_TOP:
-                        xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                        zBound=new BoundClass((lastRoom.zBound.min-(zBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
+                    case constants.ROOM_SIDE_TOP:
+                        xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*constants.ROOM_BLOCK_WIDTH)));
+                        zBound=new BoundClass((lastRoom.zBound.min-(zBlockSize*constants.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             zBound.add(-doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                            xHallwayBound=new BoundClass((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            xHallwayBound=new BoundClass((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+constants.ROOM_BLOCK_WIDTH));
                             zHallwayBound=new BoundClass((lastRoom.zBound.min-doorAdd),lastRoom.zBound.min);
                         }
                         
                         break;
 
-                    case mapRoomConstants.ROOM_SIDE_RIGHT:
-                        xBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                        zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    case constants.ROOM_SIDE_RIGHT:
+                        xBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*constants.ROOM_BLOCK_WIDTH)));
+                        zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*constants.ROOM_BLOCK_WIDTH)));
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             xBound.add(doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.zBound,zBound);
                             xHallwayBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+doorAdd));
-                            zHallwayBound=new BoundClass((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            zHallwayBound=new BoundClass((lastRoom.zBound.min+doorOffset),((lastRoom.zBound.min+doorOffset)+constants.ROOM_BLOCK_WIDTH));
                         }
                         
                         break;
 
-                    case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                        xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                        zBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                    case constants.ROOM_SIDE_BOTTOM:
+                        xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*constants.ROOM_BLOCK_WIDTH)));
+                        zBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*constants.ROOM_BLOCK_WIDTH)));
                         
                         if (hallwayMode!==this.HALLWAY_NONE) {
                             zBound.add(doorAdd);
                             doorOffset=this.findRandomBlockOffsetBetweenTwoBounds(lastRoom.xBound,xBound);
-                            xHallwayBound=new BoundClass((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+map.ROOM_BLOCK_WIDTH));
+                            xHallwayBound=new BoundClass((lastRoom.xBound.min+doorOffset),((lastRoom.xBound.min+doorOffset)+constants.ROOM_BLOCK_WIDTH));
                             zHallwayBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+doorAdd));
                         }
                         
@@ -598,7 +596,7 @@ export default class GenMapClass
 
                 }
                 
-                if (map.boxBoundCollision(xBound,null,zBound,map.MESH_FLAG_ROOM_WALL)===-1) break;
+                if (this.map.boxBoundCollision(xBound,null,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) break;
 
                 tryCount++;
                 if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
@@ -607,7 +605,7 @@ export default class GenMapClass
                 // path type for rooms on path is normal unless
                 // this is the final room
 
-            pathType=((map.rooms.length+1)>=config.ROOM_PATH_COUNT)?mapRoomConstants.ROOM_PATH_TYPE_GOAL:mapRoomConstants.ROOM_PATH_TYPE_NORMAL;
+            pathType=((this.map.rooms.length+1)>=config.ROOM_PATH_COUNT)?constants.ROOM_PATH_TYPE_GOAL:constants.ROOM_PATH_TYPE_NORMAL;
         }
 
             // add in hallways and a light
@@ -620,10 +618,10 @@ export default class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(mapRoomConstants.LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
+        roomIdx=this.addRegularRoom(constants.LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
         this.currentRoomCount++;
         
-        room=map.rooms[roomIdx];
+        room=this.map.rooms[roomIdx];
         
             // mark off any doors we made
             
@@ -657,7 +655,7 @@ export default class GenMapClass
         
             // at end of path?
             
-        if ((map.rooms.length>=config.ROOM_PATH_COUNT) || (config.SIMPLE_TEST_MAP)) return;
+        if ((this.map.rooms.length>=config.ROOM_PATH_COUNT) || (config.SIMPLE_TEST_MAP)) return;
 
             // next room in path
             
@@ -677,7 +675,7 @@ export default class GenMapClass
         let connectOffset;
         let xBound,zBound;
         
-        //level=mapRoomConstants.LEVEL_LOWER;         // supergumba -- testing
+        //level=constants.LEVEL_LOWER;         // supergumba -- testing
         
             // get random block size for room
             // and make sure it stays under the max
@@ -704,41 +702,41 @@ export default class GenMapClass
                 // side and up the last room's side size
 
 
-            if ((connectSide===mapRoomConstants.ROOM_SIDE_LEFT) || (connectSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+            if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
                 connectOffset=genRandom.randomInt(-Math.trunc(zBlockSize*0.5),lastRoom.zBlockSize);
             }
             else {
                 connectOffset=genRandom.randomInt(-Math.trunc(xBlockSize*0.5),lastRoom.xBlockSize);
             }
-            connectOffset*=map.ROOM_BLOCK_WIDTH;
+            connectOffset*=constants.ROOM_BLOCK_WIDTH;
 
                 // get new room bounds
 
             switch (connectSide) {
 
-                case mapRoomConstants.ROOM_SIDE_LEFT:
-                    xBound=new BoundClass((lastRoom.xBound.min-(xBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
-                    zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                case constants.ROOM_SIDE_LEFT:
+                    xBound=new BoundClass((lastRoom.xBound.min-(xBlockSize*constants.ROOM_BLOCK_WIDTH)),lastRoom.xBound.min);
+                    zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*constants.ROOM_BLOCK_WIDTH)));
                     break;
 
-                case mapRoomConstants.ROOM_SIDE_TOP:
-                    xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                    zBound=new BoundClass((lastRoom.zBound.min-(zBlockSize*map.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
+                case constants.ROOM_SIDE_TOP:
+                    xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*constants.ROOM_BLOCK_WIDTH)));
+                    zBound=new BoundClass((lastRoom.zBound.min-(zBlockSize*constants.ROOM_BLOCK_WIDTH)),lastRoom.zBound.min);
                     break;
 
-                case mapRoomConstants.ROOM_SIDE_RIGHT:
-                    xBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                    zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                case constants.ROOM_SIDE_RIGHT:
+                    xBound=new BoundClass(lastRoom.xBound.max,(lastRoom.xBound.max+(xBlockSize*constants.ROOM_BLOCK_WIDTH)));
+                    zBound=new BoundClass((lastRoom.zBound.min+connectOffset),((lastRoom.zBound.min+connectOffset)+(zBlockSize*constants.ROOM_BLOCK_WIDTH)));
                     break;
 
-                case mapRoomConstants.ROOM_SIDE_BOTTOM:
-                    xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*map.ROOM_BLOCK_WIDTH)));
-                    zBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*map.ROOM_BLOCK_WIDTH)));
+                case constants.ROOM_SIDE_BOTTOM:
+                    xBound=new BoundClass((lastRoom.xBound.min+connectOffset),((lastRoom.xBound.min+connectOffset)+(xBlockSize*constants.ROOM_BLOCK_WIDTH)));
+                    zBound=new BoundClass(lastRoom.zBound.max,(lastRoom.zBound.max+(zBlockSize*constants.ROOM_BLOCK_WIDTH)));
                     break;
 
             }
 
-            if (map.boxBoundCollision(xBound,null,zBound,map.MESH_FLAG_ROOM_WALL)===-1) break;
+            if (this.map.boxBoundCollision(xBound,null,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) break;
 
             tryCount++;
             if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
@@ -746,10 +744,10 @@ export default class GenMapClass
         
             // the room
             
-        roomIdx=this.addRegularRoom(level,mapRoomConstants.ROOM_PATH_TYPE_NORMAL,xBlockSize,zBlockSize,xBound,zBound,false,connectSide,lastRoom,lastRoom.extensionDirection);
+        roomIdx=this.addRegularRoom(level,constants.ROOM_PATH_TYPE_NORMAL,xBlockSize,zBlockSize,xBound,zBound,false,connectSide,lastRoom,lastRoom.extensionDirection);
         this.currentRoomCount++;
         
-        room=map.rooms[roomIdx];
+        room=this.map.rooms[roomIdx];
         
             // mark where windows can be
         
@@ -757,7 +755,7 @@ export default class GenMapClass
         
             // finally add the liquid
         
-        if (room.liquid) map.addLiquid(new MapLiquidClass(map.getTexture(map.TEXTURE_TYPE_LIQUID),room));
+        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.map.getTexture(this.map.TEXTURE_TYPE_LIQUID),room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room
@@ -777,24 +775,24 @@ export default class GenMapClass
     buildRoomExtensions()
     {
         let n,room;
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             
                 // only do extensions on normal rooms
                 
-            if (room.pathType!==mapRoomConstants.ROOM_PATH_TYPE_NORMAL) continue;
+            if (room.pathType!==constants.ROOM_PATH_TYPE_NORMAL) continue;
             
                 // extensions on side of path direction
             
-            if (room.extensionDirection===mapRoomConstants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_LEFT);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_RIGHT);
+            if (room.extensionDirection===constants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_LEFT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_RIGHT);
             }
             else {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_TOP);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(mapRoomConstants.LEVEL_COUNT),room,mapRoomConstants.ROOM_SIDE_BOTTOM);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_TOP);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_BOTTOM);
             }
         }
     }
@@ -806,12 +804,12 @@ export default class GenMapClass
     buildRoomClosets()
     {
         let n,room,closet;
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
         
         closet=new GenRoomClosetClass();
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             if (!room.liquid) closet.addCloset(room);
         }
     }
@@ -819,12 +817,12 @@ export default class GenMapClass
     buildRoomWindows()
     {
         let n,room,windows;
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
         
         windows=new GenRoomWindowClass();
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             if (!room.liquid) windows.addWindow(this,room);
         }
     }
@@ -832,12 +830,12 @@ export default class GenMapClass
     buildRoomLedges()
     {
         let n,room,ledge;
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
         
         ledge=new GenRoomLedgeClass();
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             ledge.createLedges(room);
         }
     }
@@ -845,20 +843,20 @@ export default class GenMapClass
     buildRoomPlatforms()
     {
         let n,room,platform,stair;
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
         
         platform=new GenRoomPlatformClass();
         stair=new GenRoomStairsClass();
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             if (room.mainPath) continue;
             
             switch (room.level) {
-                case mapRoomConstants.LEVEL_LOWER:
+                case constants.LEVEL_LOWER:
                     platform.create(room);
                     break;
-                case mapRoomConstants.LEVEL_HIGHER:
+                case constants.LEVEL_HIGHER:
                     stair.createStairsExtension(room);
                     break;
             }
@@ -875,12 +873,12 @@ export default class GenMapClass
         let pipe=new GenRoomDecorationPipeClass();
         let cubicle=new GenRoomDecorationCubicalClass();
         let lab=new GenRoomDecorationLabClass();
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             
                 // a random series of rectangles in the room
                 // to place decorations
@@ -894,30 +892,30 @@ export default class GenMapClass
             for (k=0;k!==nRect;k++) {
             
                 decorationType=genRandom.randomIndex(7);        // +1 for a skip version
-                //decorationType=mapRoomConstants.ROOM_DECORATION_PIPE; // supergumba -- testing
+                //decorationType=constants.ROOM_DECORATION_PIPE; // supergumba -- testing
             
                 switch (decorationType) {
-                    case mapRoomConstants.ROOM_DECORATION_PILLARS:
+                    case constants.ROOM_DECORATION_PILLARS:
                         pillar.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case mapRoomConstants.ROOM_DECORATION_STORAGE:
+                    case constants.ROOM_DECORATION_STORAGE:
                         storage.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case mapRoomConstants.ROOM_DECORATION_COMPUTER:
+                    case constants.ROOM_DECORATION_COMPUTER:
                         computer.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case mapRoomConstants.ROOM_DECORATION_PIPE:
+                    case constants.ROOM_DECORATION_PIPE:
                         pipe.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case mapRoomConstants.ROOM_DECORATION_CUBICAL:
+                    case constants.ROOM_DECORATION_CUBICAL:
                         cubicle.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case mapRoomConstants.ROOM_DECORATION_LAB:
+                    case constants.ROOM_DECORATION_LAB:
                         lab.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
@@ -933,7 +931,7 @@ export default class GenMapClass
 
     build()
     {
-        view.loadingScreenDraw(0.1);
+        this.view.loadingScreenDraw(0.1);
         setTimeout(this.buildMapPath.bind(this),1);
     }
     
@@ -946,7 +944,7 @@ export default class GenMapClass
         
         this.buildMapRoomPath(null,this.HALLWAY_NONE);
         
-        view.loadingScreenDraw(0.2);
+        this.view.loadingScreenDraw(0.2);
         
         if (config.SIMPLE_TEST_MAP) {
             setTimeout(this.buildMapFinish.bind(this),1);
@@ -965,7 +963,7 @@ export default class GenMapClass
         
         this.buildRoomExtensions();
         
-        view.loadingScreenDraw(0.3);
+        this.view.loadingScreenDraw(0.3);
         setTimeout(this.buildMapRoomPieces.bind(this),1);
     }
     
@@ -981,7 +979,7 @@ export default class GenMapClass
         
             // finish with the callback
 
-        view.loadingScreenDraw(0.4);
+        this.view.loadingScreenDraw(0.4);
         setTimeout(this.buildMapRemoveSharedTriangles1.bind(this),1);
     }
     
@@ -992,11 +990,11 @@ export default class GenMapClass
             // remove all the shared trigs between rooms and
             // remove them both
             
-        this.removeSharedTrianglesChunk(map.MESH_FLAG_ROOM_WALL,map.MESH_FLAG_ROOM_WALL,true,true);
+        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_ROOM_WALL,this.map.MESH_FLAG_ROOM_WALL,true,true);
         
             // finish with the callback
             
-        view.loadingScreenDraw(0.6);
+        this.view.loadingScreenDraw(0.6);
         setTimeout(this.buildMapRemoveSharedTriangles2.bind(this),1);
     }
     
@@ -1006,12 +1004,12 @@ export default class GenMapClass
             // now remove any platforms or ledges that are equal
             // in another platform or ledge wall
             
-        this.removeSharedTrianglesChunk(map.MESH_FLAG_PLATFORM,map.MESH_FLAG_PLATFORM,true,true);
-        this.removeSharedTrianglesChunk(map.MESH_FLAG_LEDGE,map.MESH_FLAG_LEDGE,true,true);
+        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_PLATFORM,this.map.MESH_FLAG_PLATFORM,true,true);
+        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_LEDGE,this.map.MESH_FLAG_LEDGE,true,true);
         
             // finish with the callback
             
-        view.loadingScreenDraw(0.7);
+        this.view.loadingScreenDraw(0.7);
         setTimeout(this.buildMapRemoveSharedTriangles3.bind(this),1);
     }
 
@@ -1020,12 +1018,12 @@ export default class GenMapClass
             // and finally remove any platform or ledge triangles that
             // are enclosed by an outer wall
             
-        this.removeSharedTrianglesChunk(map.MESH_FLAG_PLATFORM,map.MESH_FLAG_ROOM_WALL,false,false);
-        this.removeSharedTrianglesChunk(map.MESH_FLAG_LEDGE,map.MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_PLATFORM,this.map.MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_LEDGE,this.map.MESH_FLAG_ROOM_WALL,false,false);
         
             // finish with the callback
             
-        view.loadingScreenDraw(0.8);
+        this.view.loadingScreenDraw(0.8);
         setTimeout(this.buildMapFinish.bind(this),1);
     }
     
@@ -1033,11 +1031,11 @@ export default class GenMapClass
     {
             // overlay precalc
             
-        map.precalcOverlayDrawValues();
+        this.map.precalcOverlayDrawValues();
         
             // finish with the callback
             
-        view.loadingScreenDraw(1.0);
+        this.view.loadingScreenDraw(1.0);
         this.callbackFunc();
     }
 

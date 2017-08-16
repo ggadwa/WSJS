@@ -10,6 +10,7 @@ import ParticleListClass from '../../code/particle/particle_list.js';
 import DebugClass from '../../code/debug/debug.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
+import GenMapClass from '../../generate/map/gen_map.js';
 import GenWeaponClass from '../../generate/thing/gen_weapon.js';
 import GenProjectileClass from '../../generate/thing/gen_projectile.js';
 import genRandom from '../../generate/utility/random.js';
@@ -72,9 +73,9 @@ class MainClass
         if (!this.map.initialize()) return;
         if (!this.modelList.initialize()) return;
         if (!this.sky.initialize()) return(false);
-        if (!entityList.initialize()) return;
-        if (!particleList.initialize()) return(false);
-        if (!debug.initialize()) return;
+        if (!this.entityList.initialize()) return;
+        if (!this.particleList.initialize()) return(false);
+        if (!this.debug.initialize()) return;
 
             // next step
 
@@ -87,7 +88,7 @@ class MainClass
 
     initBuildMap()
     {
-        let genMap=new GenMapClass(this.initBuildMapFinish.bind(this));
+        let genMap=new GenMapClass(this.view,this.map,this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 
@@ -260,7 +261,7 @@ class MainClass
         playerEntity.addWeapon(playerWeapon);
         playerEntity.setCurrentWeaponIndex(0);
 
-        entityList.setPlayer(playerEntity);
+        this.entityList.setPlayer(playerEntity);
         
             // create AI type for each monster
         
@@ -280,7 +281,7 @@ class MainClass
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
             model=this.modelList.cloneModel('monster_'+monsterType);
-            entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            this.entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
         
             // boss monster
@@ -288,7 +289,7 @@ class MainClass
         if (config.MONSTER_BOSS) {
             pos=this.map.findRandomBossPosition();
             model=this.modelList.cloneModel('boss');
-            if (pos!==null) entityList.addEntity(new EntityMonsterClass('boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
+            if (pos!==null) this.entityList.addEntity(new EntityMonsterClass('boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 
             // finished
@@ -313,11 +314,11 @@ class MainClass
         
             // set the listener to this entity
             
-        this.sound.setListenerToEntity(entityList.getPlayer());
+        this.sound.setListenerToEntity(this.entityList.getPlayer());
 
             // start the input
 
-        this.input.initialize(entityList.getPlayer());
+        this.input.initialize(this.entityList.getPlayer());
         
             // the cancel loop flag
             
@@ -388,7 +389,7 @@ function mainLoop(timeStamp)
                     view.physicsTick-=PHYSICS_MILLISECONDS;
                     view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
 
-                    entityList.run();
+                    this.entityList.run();
                 }
             }
             else {

@@ -1,6 +1,8 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
+import constants from '../../code/main/constants.js';
 
 //
 // map lifts
@@ -22,8 +24,8 @@ export default class GenRoomLiftClass
         let len,meshIdx,movement,moveMSec,waitMSec;
         let liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
         
-        let xLiftBound=new BoundClass((room.xBound.min+(x*map.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*map.ROOM_BLOCK_WIDTH)));
-        let zLiftBound=new BoundClass((room.zBound.min+(z*map.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*map.ROOM_BLOCK_WIDTH)));
+        let xLiftBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
+        let zLiftBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
 
         meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,map.MESH_FLAG_LIFT));
         
@@ -36,7 +38,7 @@ export default class GenRoomLiftClass
         
         movement=new MovementClass(meshIdx,true,0);
         
-        len=yLiftBound.getSize()-map.ROOM_FLOOR_DEPTH;
+        len=yLiftBound.getSize()-constants.ROOM_FLOOR_DEPTH;
         
         movement.addMove(new MoveClass(moveMSec,new PointClass(0,len,0)));
         movement.addMove(new MoveClass(waitMSec,new PointClass(0,len,0)));
@@ -68,39 +70,39 @@ export default class GenRoomLiftClass
             
         switch (room.mainPathSide) {
 
-            case mapRoomConstants.ROOM_SIDE_LEFT:
+            case constants.ROOM_SIDE_LEFT:
                 x=room.xBlockSize-1;
                 break;
 
-            case mapRoomConstants.ROOM_SIDE_TOP:
+            case constants.ROOM_SIDE_TOP:
                 z=room.zBlockSize-1;
                 break;
 
-            case mapRoomConstants.ROOM_SIDE_RIGHT:
+            case constants.ROOM_SIDE_RIGHT:
                 x=0;
                 break;
 
-            case mapRoomConstants.ROOM_SIDE_BOTTOM:
+            case constants.ROOM_SIDE_BOTTOM:
                 z=0;
                 break;
 
         }
         
-        if ((room.mainPathSide===mapRoomConstants.ROOM_SIDE_LEFT) || (room.mainPathSide===mapRoomConstants.ROOM_SIDE_RIGHT)) {
+        if ((room.mainPathSide===constants.ROOM_SIDE_LEFT) || (room.mainPathSide===constants.ROOM_SIDE_RIGHT)) {
             min=0;
-            if (room.mainPathConnectedRoom.zBound.min>room.zBound.min) min=Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.zBound.min>room.zBound.min) min=Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             max=room.zBlockSize;
-            if (room.mainPathConnectedRoom.zBound.max<room.zBound.max) max=Math.trunc((room.mainPathConnectedRoom.zBound.max-room.zBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.zBound.max<room.zBound.max) max=Math.trunc((room.mainPathConnectedRoom.zBound.max-room.zBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             z=genRandom.randomInBetween(min,(max-1));
         }
         else {
             min=0;
-            if (room.mainPathConnectedRoom.xBound.min>room.xBound.min) min=Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.xBound.min>room.xBound.min) min=Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             max=room.xBlockSize;
-            if (room.mainPathConnectedRoom.xBound.max<room.xBound.max) max=Math.trunc((room.mainPathConnectedRoom.xBound.max-room.xBound.min)/map.ROOM_BLOCK_WIDTH);
+            if (room.mainPathConnectedRoom.xBound.max<room.xBound.max) max=Math.trunc((room.mainPathConnectedRoom.xBound.max-room.xBound.min)/constants.ROOM_BLOCK_WIDTH);
             
             x=genRandom.randomInBetween(min,(max-1));
         }

@@ -1,4 +1,5 @@
 import PointClass from '../../code/utility/point.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 
 const DEGREE_TO_RAD=Math.PI/180.0;
 
