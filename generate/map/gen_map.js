@@ -1,8 +1,10 @@
+import * as constants from '../../code/main/constants.js';
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import ColorClass from '../../code/utility/color.js';
 import LightClass from '../../code/light/light.js';
+import MapLiquidClass from '../../code/map/map_liquid.js';
 import GenRoomHallwayClass from '../../generate/map/gen_map_hallway.js';
 import GenRoomClosetClass from '../../generate/map/gen_map_closet.js';
 import GenRoomWindowClass from '../../generate/map/gen_map_window.js';
@@ -16,7 +18,6 @@ import GenRoomDecorationPipeClass from '../../generate/map/gen_map_decoration_pi
 import GenRoomDecorationCubicalClass from '../../generate/map/gen_map_decoration_cubical.js';
 import GenRoomDecorationLabClass from '../../generate/map/gen_map_decoration_lab.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
-import constants from '../../code/main/constants.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -234,18 +235,18 @@ export default class GenMapClass
         let yAdd,yBound,yWallBound,yFloorBound;
         let roomIdx,room;
         let storyCount,liquid;
-        let roomBitmap=this.map.getTexture(this.map.TEXTURE_TYPE_WALL);
+        let roomBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
         
             // figure out room Y size from extension mode
             // all rooms need at least 2 stories
             
         switch (level) {
-            case constants.LEVEL_LOWER:
+            case constants.ROOM_LEVEL_LOWER:
                 storyCount=genRandom.randomInt(2,4);
                 yAdd=(genRandom.randomInBetween(1,(storyCount-1)));
                 yBound=new BoundClass(0,this.yBase+((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*yAdd));
                 break;
-            case constants.LEVEL_HIGHER:
+            case constants.ROOM_LEVEL_HIGHER:
                 storyCount=genRandom.randomInt(2,4);
                 yBound=new BoundClass(0,this.yBase-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
                 break;
@@ -265,7 +266,7 @@ export default class GenMapClass
             // determine if this room has a liquid,
             // and lower it for pool and add a story
         
-        liquid=(config.ROOM_LIQUIDS)&&(level===constants.LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
+        liquid=(config.ROOM_LIQUIDS)&&(level===constants.ROOM_LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
         
             // top of room
             
@@ -279,7 +280,7 @@ export default class GenMapClass
         
             // the floor
             
-        room.createMeshFloor(this.map.getTexture(this.map.TEXTURE_TYPE_FLOOR));
+        room.createMeshFloor(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FLOOR));
 
             // walls
             // each wall is a tall piece and a short piece on top
@@ -302,7 +303,7 @@ export default class GenMapClass
         
             // the ceiling
         
-        room.createMeshCeiling(this.map.getTexture(this.map.TEXTURE_TYPE_CEILING));
+        room.createMeshCeiling(this.map.getTexture(constants.MAP_TEXTURE_TYPE_CEILING));
         
         return(roomIdx);
     }
@@ -315,7 +316,7 @@ export default class GenMapClass
     {
             // build the door
             
-        let genRoomHallway=new GenRoomHallwayClass();
+        let genRoomHallway=new GenRoomHallwayClass(this.map);
         let yHallwayBound=new BoundClass(this.yBase,(this.yBase-constants.ROOM_FLOOR_HEIGHT));        // don't count the upper header
 
         if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
@@ -345,7 +346,7 @@ export default class GenMapClass
             xFixtureBound=new BoundClass((fixturePos.x-400),(fixturePos.x+400));
             yFixtureBound=new BoundClass(fixturePos.y,(fixturePos.y+1000));
             zFixtureBound=new BoundClass((fixturePos.z-400),(fixturePos.z+400));
-            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.map.getTexture(this.map.TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,this.map.MESH_FLAG_LIGHT));
+            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -596,7 +597,7 @@ export default class GenMapClass
 
                 }
                 
-                if (this.map.boxBoundCollision(xBound,null,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) break;
+                if (this.map.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
 
                 tryCount++;
                 if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
@@ -618,7 +619,7 @@ export default class GenMapClass
 
             // the room
             
-        roomIdx=this.addRegularRoom(constants.LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
+        roomIdx=this.addRegularRoom(constants.ROOM_LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
         this.currentRoomCount++;
         
         room=this.map.rooms[roomIdx];
@@ -675,7 +676,7 @@ export default class GenMapClass
         let connectOffset;
         let xBound,zBound;
         
-        //level=constants.LEVEL_LOWER;         // supergumba -- testing
+        //level=constants.ROOM_LEVEL_LOWER;         // supergumba -- testing
         
             // get random block size for room
             // and make sure it stays under the max
@@ -736,7 +737,7 @@ export default class GenMapClass
 
             }
 
-            if (this.map.boxBoundCollision(xBound,null,zBound,this.map.MESH_FLAG_ROOM_WALL)===-1) break;
+            if (this.map.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
 
             tryCount++;
             if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
@@ -755,7 +756,7 @@ export default class GenMapClass
         
             // finally add the liquid
         
-        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.map.getTexture(this.map.TEXTURE_TYPE_LIQUID),room));
+        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.map.getTexture(constants.MAP_TEXTURE_TYPE_LIQUID),room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room
@@ -787,12 +788,12 @@ export default class GenMapClass
                 // extensions on side of path direction
             
             if (room.extensionDirection===constants.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT) {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_LEFT);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_RIGHT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.ROOM_LEVEL_COUNT),room,constants.ROOM_SIDE_LEFT);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.ROOM_LEVEL_COUNT),room,constants.ROOM_SIDE_RIGHT);
             }
             else {
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_TOP);
-                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.LEVEL_COUNT),room,constants.ROOM_SIDE_BOTTOM);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.ROOM_LEVEL_COUNT),room,constants.ROOM_SIDE_TOP);
+                if (genRandom.randomPercentage(0.5)) this.buildRoomExtensionSingle(genRandom.randomIndex(constants.ROOM_LEVEL_COUNT),room,constants.ROOM_SIDE_BOTTOM);
             }
         }
     }
@@ -806,7 +807,7 @@ export default class GenMapClass
         let n,room,closet;
         let nRoom=this.map.rooms.length;
         
-        closet=new GenRoomClosetClass();
+        closet=new GenRoomClosetClass(this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -819,7 +820,7 @@ export default class GenMapClass
         let n,room,windows;
         let nRoom=this.map.rooms.length;
         
-        windows=new GenRoomWindowClass();
+        windows=new GenRoomWindowClass(this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -832,7 +833,7 @@ export default class GenMapClass
         let n,room,ledge;
         let nRoom=this.map.rooms.length;
         
-        ledge=new GenRoomLedgeClass();
+        ledge=new GenRoomLedgeClass(this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -845,18 +846,18 @@ export default class GenMapClass
         let n,room,platform,stair;
         let nRoom=this.map.rooms.length;
         
-        platform=new GenRoomPlatformClass();
-        stair=new GenRoomStairsClass();
+        platform=new GenRoomPlatformClass(this.map);
+        stair=new GenRoomStairsClass(this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
             if (room.mainPath) continue;
             
             switch (room.level) {
-                case constants.LEVEL_LOWER:
+                case constants.ROOM_LEVEL_LOWER:
                     platform.create(room);
                     break;
-                case constants.LEVEL_HIGHER:
+                case constants.ROOM_LEVEL_HIGHER:
                     stair.createStairsExtension(room);
                     break;
             }
@@ -867,12 +868,12 @@ export default class GenMapClass
     {
         let n,room,rects;
         let k,nRect,decorationType;
-        let pillar=new GenRoomDecorationPillarClass();
-        let storage=new GenRoomDecorationStorageClass();
-        let computer=new GenRoomDecorationComputerClass();
-        let pipe=new GenRoomDecorationPipeClass();
-        let cubicle=new GenRoomDecorationCubicalClass();
-        let lab=new GenRoomDecorationLabClass();
+        let pillar=new GenRoomDecorationPillarClass(this.map);
+        let storage=new GenRoomDecorationStorageClass(this.map);
+        let computer=new GenRoomDecorationComputerClass(this.map);
+        let pipe=new GenRoomDecorationPipeClass(this.map);
+        let cubicle=new GenRoomDecorationCubicalClass(this.map);
+        let lab=new GenRoomDecorationLabClass(this.map);
         let nRoom=this.map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;
@@ -990,7 +991,7 @@ export default class GenMapClass
             // remove all the shared trigs between rooms and
             // remove them both
             
-        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_ROOM_WALL,this.map.MESH_FLAG_ROOM_WALL,true,true);
+        this.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_WALL,true,true);
         
             // finish with the callback
             
@@ -1004,8 +1005,8 @@ export default class GenMapClass
             // now remove any platforms or ledges that are equal
             // in another platform or ledge wall
             
-        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_PLATFORM,this.map.MESH_FLAG_PLATFORM,true,true);
-        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_LEDGE,this.map.MESH_FLAG_LEDGE,true,true);
+        this.removeSharedTrianglesChunk(constants.MESH_FLAG_PLATFORM,constants.MESH_FLAG_PLATFORM,true,true);
+        this.removeSharedTrianglesChunk(constants.MESH_FLAG_LEDGE,constants.MESH_FLAG_LEDGE,true,true);
         
             // finish with the callback
             
@@ -1018,8 +1019,8 @@ export default class GenMapClass
             // and finally remove any platform or ledge triangles that
             // are enclosed by an outer wall
             
-        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_PLATFORM,this.map.MESH_FLAG_ROOM_WALL,false,false);
-        this.removeSharedTrianglesChunk(this.map.MESH_FLAG_LEDGE,this.map.MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(constants.MESH_FLAG_PLATFORM,constants.MESH_FLAG_ROOM_WALL,false,false);
+        this.removeSharedTrianglesChunk(constants.MESH_FLAG_LEDGE,constants.MESH_FLAG_ROOM_WALL,false,false);
         
             // finish with the callback
             

@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import RectClass from '../../code/utility/rect.js';
@@ -6,8 +7,6 @@ import ColorClass from '../../code/utility/color.js';
 import ViewCameraClass from '../../code/main/view_camera.js';
 import TextClass from '../../code/text/text.js';
 import InterfaceClass from '../../code/interface/interface.js';
-
-const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // view class
@@ -498,7 +497,7 @@ export default class ViewClass
 
             // rotation
             
-        rad=ang*DEGREE_TO_RAD;
+        rad=ang*constants.DEGREE_TO_RAD;
         
         this.billboardXMatrix[5]=this.billboardXMatrix[10]=Math.cos(rad);
         this.billboardXMatrix[6]=Math.sin(rad);
@@ -519,7 +518,7 @@ export default class ViewClass
 
             // rotation
             
-        rad=ang*DEGREE_TO_RAD;
+        rad=ang*constants.DEGREE_TO_RAD;
         
         this.billboardYMatrix[0]=this.billboardYMatrix[10]=Math.cos(rad);
         this.billboardYMatrix[8]=Math.sin(rad);

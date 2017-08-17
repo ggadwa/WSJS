@@ -1,9 +1,10 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MapMeshClass from '../../code/map/map_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
-import constants from '../../code/main/constants.js';
 
 //
 // generate room window class
@@ -11,9 +12,9 @@ import constants from '../../code/main/constants.js';
 
 export default class GenRoomWindowClass
 {
-    constructor()
+    constructor(map)
     {
-        this.WINDOW_MAX_COUNT=5;            // maximum number of possible windows in room
+        this.map=map;
         
         Object.seal(this);
     }
@@ -32,7 +33,7 @@ export default class GenRoomWindowClass
 
             // the inside walls
             
-        bitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(30);
@@ -99,22 +100,22 @@ export default class GenRoomWindowClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_WALL));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // the window casing
         
         switch (connectSide) {
             case constants.ROOM_SIDE_LEFT:
-                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_RIGHT:
-                map.addMesh(MeshPrimitivesClass.createFrameX(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
                 break;
             case constants.ROOM_SIDE_TOP:
-                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_BOTTOM:
-                map.addMesh(MeshPrimitivesClass.createFrameZ(map.getTexture(map.TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
                 break;
         }
     }
@@ -129,7 +130,7 @@ export default class GenRoomWindowClass
         let xWindowBound,yWindowBound,zWindowBound;
         let lightPos;
         
-        let windowCount=genRandom.randomIndex(this.WINDOW_MAX_COUNT);
+        let windowCount=genRandom.randomIndex(constants.WINDOW_MAX_COUNT);
         if (windowCount===0) return;
         
             // story height
@@ -216,7 +217,7 @@ export default class GenRoomWindowClass
             
                 // build the blocks
             
-            if (map.boxBoundCollision(xWindowBound,null,zWindowBound,map.MESH_FLAG_ROOM_WALL)!==-1) {
+            if (this.map.boxBoundCollision(xWindowBound,null,zWindowBound,constants.MESH_FLAG_ROOM_WALL)!==-1) {
                 failCount++;
                 continue;
             }

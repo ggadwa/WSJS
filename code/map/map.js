@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
 import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
@@ -15,7 +16,6 @@ import MovementListClass from '../../code/map/movement_list.js';
 import MapOverlayClass from '../../code/map/map_overlay.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../generate/utility/random.js';
-import constants from '../../code/main/constants.js';
 
 //
 // map class
@@ -38,35 +38,7 @@ export default class MapClass
         this.lightmaps=[];
         this.rooms=[];
         this.liquids=[];
-        
-        this.MESH_FLAG_NONE=0;
-        this.MESH_FLAG_ROOM_WALL=1;
-        this.MESH_FLAG_ROOM_FLOOR=2;
-        this.MESH_FLAG_ROOM_CEILING=3;
-        this.MESH_FLAG_PLATFORM=4;
-        this.MESH_FLAG_LEDGE=5;
-        this.MESH_FLAG_STAIR=6;
-        this.MESH_FLAG_DOOR=7;
-        this.MESH_FLAG_LIFT=8;
-        this.MESH_FLAG_LIGHT=9;
-        this.MESH_FLAG_DECORATION=10;
-        this.MESH_FLAG_WINDOW=11;
-        
-        this.TEXTURE_COUNT=12;
-        
-        this.TEXTURE_TYPE_WALL=0;
-        this.TEXTURE_TYPE_FLOOR=1;
-        this.TEXTURE_TYPE_CEILING=2;
-        this.TEXTURE_TYPE_PLATFORM=3;
-        this.TEXTURE_TYPE_PILLAR=4;
-        this.TEXTURE_TYPE_METAL=5;
-        this.TEXTURE_TYPE_DOOR=6;
-        this.TEXTURE_TYPE_FRAME=7;
-        this.TEXTURE_TYPE_COMPUTER=8;
-        this.TEXTURE_TYPE_PANEL=9;
-        this.TEXTURE_TYPE_BOX=10;
-        this.TEXTURE_TYPE_LIQUID=11;
-        
+
         this.genBitmapWall=new GenBitmapWallClass(view);
         this.genBitmapFloor=new GenBitmapFloorClass(view);
         this.genBitmapCeiling=new GenBitmapCeilingClass(view);
@@ -76,19 +48,19 @@ export default class MapClass
         this.genBitmapPanel=new GenBitmapPanelClass(view);
         this.genBitmapBox=new GenBitmapBoxClass(view);
         this.genBitmapLiquid=new GenBitmapLiquidClass(view);
-        
+
         this.textureBitmapList=[];
-        for (n=0;n!==this.TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
+        for (n=0;n!==constants.MAP_TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
         
         this.lightmapBitmapList=[];
-        
+
         this.movementList=new MovementListClass();
         this.overlay=new MapOverlayClass(view,fileCache);
 
         this.lightXBound=new BoundClass(0,0);           // global not local so they won't get GCd
         this.lightYBound=new BoundClass(0,0);
         this.lightZBound=new BoundClass(0,0);
-        
+
         Object.seal(this);
     }
     
@@ -118,7 +90,7 @@ export default class MapClass
     {
         let n;
         
-        for (n=0;n!==this.TEXTURE_COUNT;n++) {
+        for (n=0;n!==constants.MAP_TEXTURE_COUNT;n++) {
             if (this.textureBitmapList[n]!==null) {
                 this.textureBitmapList[n].close();
                 this.textureBitmapList[n]=null;
@@ -134,48 +106,47 @@ export default class MapClass
     
     getTexture(textureType)
     {
-        if (this.textureBitmapList[textureType]===null) {
+        if (this.textureBitmapList[textureType]!==null) return(this.textureBitmapList[textureType]);
             
-            switch (textureType) {
-                case this.TEXTURE_TYPE_WALL:
-                case this.TEXTURE_TYPE_PILLAR:
-                    this.textureBitmapList[textureType]=this.genBitmapWall.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_FLOOR:
-                case this.TEXTURE_TYPE_PLATFORM:
-                    this.textureBitmapList[textureType]=this.genBitmapFloor.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_CEILING:
-                    this.textureBitmapList[textureType]=this.genBitmapCeiling.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_METAL:
-                    this.textureBitmapList[textureType]=this.genBitmapMetal.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_DOOR:
-                case this.TEXTURE_TYPE_FRAME:
-                    this.textureBitmapList[textureType]=this.genBitmapDoor.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_COMPUTER:
-                    this.textureBitmapList[textureType]=this.genBitmapMachine.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_PANEL:
-                    this.textureBitmapList[textureType]=this.genBitmapPanel.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_BOX:
-                    this.textureBitmapList[textureType]=this.genBitmapBox.generateRandom(false);
-                    break;
-                    
-                case this.TEXTURE_TYPE_LIQUID:
-                    this.textureBitmapList[textureType]=this.genBitmapLiquid.generateRandom(false);
-                    break;
-            }
+        switch (textureType) {
+            case constants.MAP_TEXTURE_TYPE_WALL:
+            case constants.MAP_TEXTURE_TYPE_PILLAR:
+                this.textureBitmapList[textureType]=this.genBitmapWall.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_FLOOR:
+            case constants.MAP_TEXTURE_TYPE_PLATFORM:
+                this.textureBitmapList[textureType]=this.genBitmapFloor.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_CEILING:
+                this.textureBitmapList[textureType]=this.genBitmapCeiling.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_METAL:
+                this.textureBitmapList[textureType]=this.genBitmapMetal.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_DOOR:
+            case constants.MAP_TEXTURE_TYPE_FRAME:
+                this.textureBitmapList[textureType]=this.genBitmapDoor.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_COMPUTER:
+                this.textureBitmapList[textureType]=this.genBitmapMachine.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_PANEL:
+                this.textureBitmapList[textureType]=this.genBitmapPanel.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_BOX:
+                this.textureBitmapList[textureType]=this.genBitmapBox.generateRandom(false);
+                break;
+
+            case constants.MAP_TEXTURE_TYPE_LIQUID:
+                this.textureBitmapList[textureType]=this.genBitmapLiquid.generateRandom(false);
+                break;
         }
         
         return(this.textureBitmapList[textureType]);
@@ -486,9 +457,9 @@ export default class MapClass
         this.movementList.addMovement(movement);
     }
     
-    runMovements()
+    runMovements(entityList)
     {
-        this.movementList.run(this);
+        this.movementList.run(this.view,this,entityList);
     }
     
         //

@@ -1,8 +1,9 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MapMeshClass from '../../code/map/map_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
-import constants from '../../code/main/constants.js';
 
 //
 // generate room closet class
@@ -10,9 +11,9 @@ import constants from '../../code/main/constants.js';
 
 export default class GenRoomClosetClass
 {
-    constructor()
+    constructor(map)
     {
-        this.CLOSET_MAX_COUNT=5;            // maximum number of possible closets in room
+        this.map=map;
         
         Object.seal(this);
     }
@@ -31,7 +32,7 @@ export default class GenRoomClosetClass
 
             // the walls
             
-        bitmap=map.getTexture(map.TEXTURE_TYPE_WALL);
+        bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(24);
@@ -74,11 +75,11 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_WALL));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
-        bitmap=map.getTexture(map.TEXTURE_TYPE_CEILING);
+        bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);
@@ -100,11 +101,11 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
 
             // floor
         
-        bitmap=map.getTexture(map.TEXTURE_TYPE_FLOOR);
+        bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_FLOOR);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);
@@ -126,7 +127,7 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
     }
 
         // closet mainline
@@ -138,7 +139,7 @@ export default class GenRoomClosetClass
         let connectSide,connectOffset,closetLen;
         let xClosetBound,yClosetBound,zClosetBound;
         
-        let closetCount=genRandom.randomIndex(this.CLOSET_MAX_COUNT);
+        let closetCount=genRandom.randomIndex(constants.CLOSET_MAX_COUNT);
         if (closetCount===0) return;
         
             // story height
@@ -213,10 +214,10 @@ export default class GenRoomClosetClass
                 // build the blocks
             
             for (k=0;k!==closetLen;k++) {
-                if (map.boxBoundCollision(xClosetBound,null,zClosetBound,map.MESH_FLAG_ROOM_WALL)!==-1) break;
+                if (this.map.boxBoundCollision(xClosetBound,null,zClosetBound,constants.MESH_FLAG_ROOM_WALL)!==-1) break;
 
                 this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
-                map.addOverlayCloset(xClosetBound,zClosetBound);
+                this.map.addOverlayCloset(xClosetBound,zClosetBound);
                 
                 if (story===0) room.maskEdgeGridBlockToBounds(xClosetBound,zClosetBound);    // block off ledges for edge grid
                 

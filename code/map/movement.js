@@ -1,18 +1,5 @@
 import PointClass from '../../code/utility/point.js';
-
-//
-// single move class
-//
-
-class MoveClass
-{
-    constructor(lifeTick,movePnt)
-    {
-        this.lifeTick=lifeTick;
-        this.movePnt=movePnt;
-    }
-    
-}
+import MoveClass from '../../code/map/move.js';
 
 //
 // movement class
@@ -45,7 +32,7 @@ export default class MovementClass
         this.moves.push(move);
     }
     
-    run()
+    run(view,map,entityList)
     {
         let mesh,isOpen,prevIdx;
         let f,move;

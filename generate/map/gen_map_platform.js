@@ -1,7 +1,8 @@
+import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
+import GenRoomStairsClass from '../../generate/map/gen_map_stair.js';
 import genRandom from '../../generate/utility/random.js';
-import constants from '../../code/main/constants.js';
 
 //
 // map platforms
@@ -9,8 +10,10 @@ import constants from '../../code/main/constants.js';
 
 export default class GenRoomPlatformClass
 {
-    constructor()
+    constructor(map)
     {
+        this.map=map;
+        
         Object.seal(this);
     }
         
@@ -53,7 +56,7 @@ export default class GenRoomPlatformClass
         if (story!==0) {
             yBound.min=yBound.max;
             yBound.max=room.yBound.max;
-            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,map.MESH_FLAG_STAIR));
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_STAIR));
         }
         
             // block the stairs off from any decorations
@@ -93,14 +96,14 @@ export default class GenRoomPlatformClass
         let yPlatformBound=new BoundClass(y,(y+constants.ROOM_FLOOR_DEPTH));
         let zPlatformBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
         
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,map.MESH_FLAG_PLATFORM));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,constants.MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             // a cleared spot is a spot that's open
             
         room.clearBlockGrid(story,x,z);
 
-        map.addOverlayPlatform(xPlatformBound,zPlatformBound);
+        this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
     }
         
         //
@@ -364,7 +367,7 @@ export default class GenRoomPlatformClass
     create(room)
     {
         let lastStairPos;
-        let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let platformBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
 
         lastStairPos=this.createRandomPlatforms(room,platformBitmap);
         this.createConnectRoomPlatform(room,platformBitmap,lastStairPos);

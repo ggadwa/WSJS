@@ -1,49 +1,93 @@
 //
-// Constants Class
+// Constants
 // 
-// supergumba!
-// Remove all this and move these constants to classes
-// when javascript gets class fields
-//
 
-class ConstantsClass
-{
-    constructor()
-    {
-        
-            // to MapRoomClass
+    // misc math
+    
+export const DEGREE_TO_RAD=Math.PI/180.0;
+export const RAD_TO_DEGREE=180.0/Math.PI;
+
+    // loop timing
+    
+export const PHYSICS_MILLISECONDS=16;
+export const DRAW_MILLISECONDS=16;
+export const BAIL_MILLISECONDS=5000;
+
+    // room settings
+    
+export const ROOM_BLOCK_WIDTH=8000;                     // x/z dimension of a block (rooms are made up of a grid of blocks)
+export const ROOM_FLOOR_HEIGHT=8000;                    // how tall each floor of a room is
+export const ROOM_FLOOR_DEPTH=700;                      // the depth of the area between floors
             
-        this.ROOM_BLOCK_WIDTH=8000;                     // x/z dimension of a block (rooms are made up of a grid of blocks)
-        this.ROOM_FLOOR_HEIGHT=8000;                    // how tall each floor of a room is
-        this.ROOM_FLOOR_DEPTH=700;                      // the depth of the area between floors
-            
-        this.ROOM_SIDE_LEFT=0;
-        this.ROOM_SIDE_TOP=1;
-        this.ROOM_SIDE_RIGHT=2;
-        this.ROOM_SIDE_BOTTOM=3;
+export const ROOM_SIDE_LEFT=0;
+export const ROOM_SIDE_TOP=1;
+export const ROOM_SIDE_RIGHT=2;
+export const ROOM_SIDE_BOTTOM=3;
         
-        this.LEVEL_NORMAL=0;
-        this.LEVEL_LOWER=1;
-        this.LEVEL_HIGHER=2;
-        this.LEVEL_COUNT=3;
+export const ROOM_LEVEL_NORMAL=0;
+export const ROOM_LEVEL_LOWER=1;
+export const ROOM_LEVEL_HIGHER=2;
+export const ROOM_LEVEL_COUNT=3;
         
-        this.ROOM_EXTENSION_DIRECTION_LEFT_RIGHT=0;
-        this.ROOM_EXTENSION_DIRECTION_TOP_BOTTOM=1;
+export const ROOM_EXTENSION_DIRECTION_LEFT_RIGHT=0;
+export const ROOM_EXTENSION_DIRECTION_TOP_BOTTOM=1;
         
-        this.ROOM_PATH_TYPE_NORMAL=0;
-        this.ROOM_PATH_TYPE_START=1;
-        this.ROOM_PATH_TYPE_GOAL=2;
+export const ROOM_PATH_TYPE_NORMAL=0;
+export const ROOM_PATH_TYPE_START=1;
+export const ROOM_PATH_TYPE_GOAL=2;
 
-        this.ROOM_DECORATION_NONE=-1;
-        this.ROOM_DECORATION_PILLARS=0;
-        this.ROOM_DECORATION_STORAGE=1;
-        this.ROOM_DECORATION_COMPUTER=2;
-        this.ROOM_DECORATION_PIPE=3;
-        this.ROOM_DECORATION_CUBICAL=4;
-        this.ROOM_DECORATION_LAB=5;
-    }
-}
+export const ROOM_DECORATION_NONE=-1;
+export const ROOM_DECORATION_PILLARS=0;
+export const ROOM_DECORATION_STORAGE=1;
+export const ROOM_DECORATION_COMPUTER=2;
+export const ROOM_DECORATION_PIPE=3;
+export const ROOM_DECORATION_CUBICAL=4;
+export const ROOM_DECORATION_LAB=5;
 
-let constants=new ConstantsClass();
+    // map mesh flag types
 
-export default constants;
+export const MESH_FLAG_NONE=0;
+export const MESH_FLAG_ROOM_WALL=1;
+export const MESH_FLAG_ROOM_FLOOR=2;
+export const MESH_FLAG_ROOM_CEILING=3;
+export const MESH_FLAG_PLATFORM=4;
+export const MESH_FLAG_LEDGE=5;
+export const MESH_FLAG_STAIR=6;
+export const MESH_FLAG_DOOR=7;
+export const MESH_FLAG_LIFT=8;
+export const MESH_FLAG_LIGHT=9;
+export const MESH_FLAG_DECORATION=10;
+export const MESH_FLAG_WINDOW=11;
+
+    // map textures
+    
+export const MAP_TEXTURE_COUNT=12;
+        
+export const MAP_TEXTURE_TYPE_WALL=0;
+export const MAP_TEXTURE_TYPE_FLOOR=1;
+export const MAP_TEXTURE_TYPE_CEILING=2;
+export const MAP_TEXTURE_TYPE_PLATFORM=3;
+export const MAP_TEXTURE_TYPE_PILLAR=4;
+export const MAP_TEXTURE_TYPE_METAL=5;
+export const MAP_TEXTURE_TYPE_DOOR=6;
+export const MAP_TEXTURE_TYPE_FRAME=7;
+export const MAP_TEXTURE_TYPE_COMPUTER=8;
+export const MAP_TEXTURE_TYPE_PANEL=9;
+export const MAP_TEXTURE_TYPE_LIQUID=11;
+
+    // extra room features
+    
+export const STAIR_STEP_COUNT=10;
+        
+export const LEDGE_PERCENTAGE=0.5;              // percentage of > 1 story rooms that have ledges
+export const LEDGE_MIN_HEIGHT=300;              // minimum height of ledges
+export const LEDGE_EXTRA_HEIGHT=1500;           // extra height of ledges
+export const LEDGE_MIN_WIDTH=2000;              // minum width of ledges
+export const LEDGE_EXTRA_WIDTH=3000;            // extra width
+
+export const WINDOW_MAX_COUNT=5;            // maximum number of possible windows in room
+export const CLOSET_MAX_COUNT=5;            // maximum number of possible closets in room
+
+export const PIPE_SIDE_COUNT=12;
+export const PIPE_CURVE_SEGMENT_COUNT=5;
+        

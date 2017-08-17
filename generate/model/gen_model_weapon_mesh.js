@@ -1,7 +1,6 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
-
-const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // gen weapon mesh class
@@ -49,7 +48,7 @@ export default class GenModelWeaponMeshClass
         angAdd=360.0/this.CYLINDER_SIDE_COUNT;
 
         for (n=0;n!==this.CYLINDER_SIDE_COUNT;n++) {
-            rd=ang*DEGREE_TO_RAD;
+            rd=ang*constants.DEGREE_TO_RAD;
             tx=pt1.x+((radius1*Math.sin(rd))+(radius1*Math.cos(rd)));
             ty=pt1.y+((radius1*Math.cos(rd))-(radius1*Math.sin(rd)));
 

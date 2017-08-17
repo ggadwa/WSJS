@@ -1,8 +1,8 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
-import constants from '../../code/main/constants.js';
 
 //
 // map lifts
@@ -10,8 +10,10 @@ import constants from '../../code/main/constants.js';
 
 export default class GenRoomLiftClass
 {
-    constructor()
+    constructor(map)
     {
+        this.map=map;
+        
         Object.seal(this);
     }
     
@@ -22,12 +24,12 @@ export default class GenRoomLiftClass
     addLiftChunk(room,x,yLiftBound,z)
     {
         let len,meshIdx,movement,moveMSec,waitMSec;
-        let liftBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
+        let liftBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
         
         let xLiftBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
         let zLiftBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
 
-        meshIdx=map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,map.MESH_FLAG_LIFT));
+        meshIdx=this.map.addMesh(MeshPrimitivesClass.createMeshCube(liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,constants.MESH_FLAG_LIFT));
         
             // random wait
         
@@ -45,13 +47,13 @@ export default class GenRoomLiftClass
         movement.addMove(new MoveClass(moveMSec,new PointClass(0,0,0)));
         movement.addMove(new MoveClass(waitMSec,new PointClass(0,0,0)));
         
-        map.addMovement(movement); 
+        this.map.addMovement(movement); 
 
             // can't span on this
             
         room.setBlockGrid(0,x,z);
 
-        map.addOverlayLift(xLiftBound,zLiftBound);
+        this.map.addOverlayLift(xLiftBound,zLiftBound);
     }
     
         //

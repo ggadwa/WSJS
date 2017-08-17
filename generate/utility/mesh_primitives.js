@@ -1,10 +1,9 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import MapMeshClass from '../../code/map/map_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
-
-const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // mesh primitives class (static)
@@ -503,14 +502,14 @@ export default class MeshPrimitivesClass
                     
                 if (n===(sideCount-1)) ang2=0.0;
 
-                rd=ang*DEGREE_TO_RAD;
+                rd=ang*constants.DEGREE_TO_RAD;
                 tx=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
                 tz=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
                 
                 bx=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
                 bz=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
 
-                rd=ang2*DEGREE_TO_RAD;
+                rd=ang2*constants.DEGREE_TO_RAD;
                 tx2=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
                 tz2=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
                 
@@ -575,7 +574,7 @@ export default class MeshPrimitivesClass
             topRad=segments[0]*radius;
 
             for (n=0;n!==sideCount;n++) {
-                rd=ang*DEGREE_TO_RAD;
+                rd=ang*constants.DEGREE_TO_RAD;
                 
                 u1=(Math.sin(rd)*0.5)+0.5;
                 u2=(Math.cos(rd)*0.5)+0.5;
@@ -607,7 +606,7 @@ export default class MeshPrimitivesClass
             botRad=segments[segments.length-1]*radius;
 
             for (n=0;n!==sideCount;n++) {
-                rd=ang*DEGREE_TO_RAD;
+                rd=ang*constants.DEGREE_TO_RAD;
                 
                 u1=(Math.sin(rd)*0.5)+0.5;
                 u2=(Math.cos(rd)*0.5)+0.5;
@@ -685,18 +684,18 @@ export default class MeshPrimitivesClass
         
         yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
         zFrameBound.setFromValues((zBound.min-halfSz),(zBound.min+halfSz));
-        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
         
         zFrameBound.setFromValues((zBound.max-halfSz),(zBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
         zFrameBound.setFromValues((zBound.min-halfSz),(zBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         if (!skipBottom) {
             yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
             // the inner bars
@@ -705,12 +704,12 @@ export default class MeshPrimitivesClass
             y=yBound.getMidPoint();
             yFrameBound.setFromValues((y-halfSz),(y+halfSz));
             zFrameBound.setFromValues((zBound.min+halfSz),(zBound.max-halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
             z=zBound.getMidPoint();
             yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
             zFrameBound.setFromValues((z-halfSz),(z+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
         return(mesh);
@@ -736,18 +735,18 @@ export default class MeshPrimitivesClass
         
         yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
         xFrameBound.setFromValues((xBound.min-halfSz),(xBound.min+halfSz));
-        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
         
         xFrameBound.setFromValues((xBound.max-halfSz),(xBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
         xFrameBound.setFromValues((xBound.min-halfSz),(xBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         if (!skipBottom) {
             yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
             // the inner bars
@@ -756,12 +755,12 @@ export default class MeshPrimitivesClass
             y=yBound.getMidPoint();
             yFrameBound.setFromValues((y-halfSz),(y+halfSz));
             xFrameBound.setFromValues((xBound.min+halfSz),(xBound.max-halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
             x=xBound.getMidPoint();
             yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
             xFrameBound.setFromValues((x-halfSz),(x+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
         return(mesh);

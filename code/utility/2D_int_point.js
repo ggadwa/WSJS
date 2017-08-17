@@ -1,5 +1,4 @@
-const DEGREE_TO_RAD=Math.PI/180.0;
-const RAD_TO_DEGREE=180.0/Math.PI;
+import * as constants from '../../code/main/constants.js';
 
 export default class Point2DIntClass
 {
@@ -49,7 +48,7 @@ export default class Point2DIntClass
             this.y-=centerPt.y;
         }
         
-        rd=rot*DEGREE_TO_RAD;
+        rd=rot*constants.DEGREE_TO_RAD;
         
         x=(this.y*Math.sin(rd))+(this.x*Math.cos(rd));
         y=(this.y*Math.cos(rd))-(this.x*Math.sin(rd));

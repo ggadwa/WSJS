@@ -10,8 +10,10 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationPillarClass
 {
-    constructor()
+    constructor(map)
     {
+        this.map=map;
+        
         this.segments=MeshPrimitivesClass.createMeshCylinderSegmentList(1,4);         // all pilars in this map use same setup
         this.hasPlatform=genRandom.randomPercentage(0.5);
         
@@ -40,10 +42,10 @@ export default class GenRoomDecorationPillarClass
             platformZBound=new BoundClass((room.zBound.min+(rect.top*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*constants.ROOM_BLOCK_WIDTH)));
             
             platformYBound=new BoundClass(yBound.min,(yBound.min+constants.ROOM_FLOOR_DEPTH));
-            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,false,true,false,map.MESH_FLAG_DECORATION));
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,false,true,false,constants.MESH_FLAG_DECORATION));
 
             platformYBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),yBound.max);
-            map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
 
             yBound.min+=constants.ROOM_FLOOR_DEPTH;
             yBound.max-=constants.ROOM_FLOOR_DEPTH;
@@ -54,7 +56,7 @@ export default class GenRoomDecorationPillarClass
         pos=new PointClass(x,yBound.max,z);
         radius=Math.trunc(((rect.rgt-rect.lft)*constants.ROOM_BLOCK_WIDTH)*0.3);
         
-        map.addMesh(MeshPrimitivesClass.createMeshCylinder(pillarBitmap,pos,yBound,this.segments,radius,false,false,map.MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCylinder(pillarBitmap,pos,yBound,this.segments,radius,false,false,constants.MESH_FLAG_DECORATION));
     }
     
     addPillarLineX(room,rect,pillarBitmap,platformBitmap)
@@ -91,8 +93,8 @@ export default class GenRoomDecorationPillarClass
     {
             // texture
             
-        let pillarBitmap=map.getTexture(map.TEXTURE_TYPE_PILLAR);
-        let platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let pillarBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PILLAR);
+        let platformBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
         
             // determine if this is a square rect
             // if so, one big pillar

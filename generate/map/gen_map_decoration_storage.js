@@ -9,8 +9,10 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationStorageClass
 {
-    constructor()
+    constructor(map)
     {
+        this.map=map;
+        
             // give all these decorations the same general
             // width and height no matter where in the map
             
@@ -34,7 +36,7 @@ export default class GenRoomDecorationStorageClass
         let stackLevel,stackCount,mesh;
         let boxXBound,boxYBound,boxZBound;
         let boxPos,rotAngle;
-        let boxBitmap=map.getTexture(map.TEXTURE_TYPE_BOX);
+        let boxBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_BOX);
         
             // box size
             
@@ -57,9 +59,9 @@ export default class GenRoomDecorationStorageClass
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
             
             rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-            mesh=MeshPrimitivesClass.createMeshRotatedCube(boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,map.MESH_FLAG_DECORATION);
+            mesh=MeshPrimitivesClass.createMeshRotatedCube(boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
             MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-            map.addMesh(mesh);
+            this.map.addMesh(mesh);
 
                 // go up one level
 
@@ -80,8 +82,8 @@ export default class GenRoomDecorationStorageClass
         let tableXBound,tableYBound,tableZBound;
         let legXMinBound,legXMaxBound,legZMinBound,legZMaxBound,legYBound;
         let boxXBound,boxYBound,boxZBound;
-        let shelfBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
-        let boxBitmap=map.getTexture(map.TEXTURE_TYPE_BOX);
+        let shelfBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
+        let boxBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_BOX);
         
         x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
         z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
@@ -124,7 +126,7 @@ export default class GenRoomDecorationStorageClass
 
                 // the table
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,tableXBound,tableYBound,tableZBound,true,true,true,true,true,true,false,map.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,tableXBound,tableYBound,tableZBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
             if (mesh===null) {
                 mesh=mesh2;
             }
@@ -134,16 +136,16 @@ export default class GenRoomDecorationStorageClass
             
                 // legs
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMinBound,legYBound,legZMinBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMinBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMinBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMinBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMaxBound,legYBound,legZMinBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMaxBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMaxBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,map.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMaxBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
             
                 // items on self
@@ -160,9 +162,9 @@ export default class GenRoomDecorationStorageClass
                 boxZBound.setFromValues((bz-boxSize),(bz+boxSize));
 
                 rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-                boxMesh=MeshPrimitivesClass.createMeshRotatedCube(boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION);
+                boxMesh=MeshPrimitivesClass.createMeshRotatedCube(boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(boxMesh);
-                map.addMesh(boxMesh);
+                this.map.addMesh(boxMesh);
             }
 
                 // go up one level
@@ -173,7 +175,7 @@ export default class GenRoomDecorationStorageClass
             legYBound.add(-this.shelfHigh);
         }
         
-        map.addMesh(mesh);
+        this.map.addMesh(mesh);
     }
     
         //

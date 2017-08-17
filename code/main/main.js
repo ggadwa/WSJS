@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import FileCacheClass from '../../code/main/filecache.js';
@@ -24,7 +25,7 @@ class MainClass
     constructor()
     {
             // game globals
-            
+
         this.fileCache=new FileCacheClass();
         this.view=new ViewClass(this.fileCache);
         this.map=new MapClass(this.view,this.fileCache);
@@ -35,7 +36,7 @@ class MainClass
         this.debug=new DebugClass(this.view,this.fileCache);
         this.input=new InputClass(this.view);
         this.sound=new SoundClass();
-        
+
         Object.seal(this);
     }
 
@@ -348,14 +349,13 @@ let main=new MainClass();
 // main loop
 //
 
-const PHYSICS_MILLISECONDS=16;
-const DRAW_MILLISECONDS=16;
-const BAIL_MILLISECONDS=5000;
-
 function mainLoop(timeStamp)
 {
     let fpsTime;
     let view=main.view;
+    let map=main.map;
+    let entityList=main.entityList;
+    let sky=main.sky;
     
         // next frame
         
@@ -380,14 +380,14 @@ function mainLoop(timeStamp)
     if (!view.paused) {
         view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
 
-        if (view.physicsTick>PHYSICS_MILLISECONDS) {
-            this.map.runMovements();
+        if (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
+            map.runMovements(entityList);
 
-            if (view.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+            if (view.physicsTick<constants.BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
-                while (view.physicsTick>PHYSICS_MILLISECONDS) {
-                    view.physicsTick-=PHYSICS_MILLISECONDS;
-                    view.lastPhysicTimeStamp+=PHYSICS_MILLISECONDS;
+                while (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
+                    view.physicsTick-=constants.PHYSICS_MILLISECONDS;
+                    view.lastPhysicTimeStamp+=constants.PHYSICS_MILLISECONDS;
 
                     this.entityList.run();
                 }
@@ -410,7 +410,7 @@ function mainLoop(timeStamp)
         
     view.drawTick=view.timeStamp-view.lastDrawTimeStamp;
     
-    if (view.drawTick>DRAW_MILLISECONDS) {
+    if (view.drawTick>constants.DRAW_MILLISECONDS) {
         view.lastDrawTimeStamp=view.timeStamp; 
 
         view.draw(map,sky);

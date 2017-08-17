@@ -1,4 +1,6 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
+import MapMeshClass from '../../code/map/map_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -8,14 +10,10 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomLedgeClass
 {
-    constructor()
+    constructor(map)
     {
-        this.LEDGE_PERCENTAGE=0.5;              // percentage of > 1 story rooms that have ledges
-        this.LEDGE_MIN_HEIGHT=300;              // minimum height of ledges
-        this.LEDGE_EXTRA_HEIGHT=1500;           // extra height of ledges
-        this.LEDGE_MIN_WIDTH=2000;              // minum width of ledges
-        this.LEDGE_EXTRA_WIDTH=3000;            // extra width
-
+        this.map=map;
+        
         Object.seal(this);
     }
     
@@ -81,7 +79,7 @@ export default class GenRoomLedgeClass
 
             // finally create the mesh
 
-        map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_LEDGE));
+        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_LEDGE));
     }
         
         //
@@ -91,19 +89,19 @@ export default class GenRoomLedgeClass
     createLedges(room)
     {
         let x,z;
-        let ledgeBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
+        let ledgeBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
         let wid,high;
         let xMax,zMax;
         let pts;
         
             // does this room have a ledge?
             
-        if (!genRandom.randomPercentage(this.LEDGE_PERCENTAGE)) return;
+        if (!genRandom.randomPercentage(constants.LEDGE_PERCENTAGE)) return;
         
             // ledge width and height
             
-        wid=genRandom.randomInt(this.LEDGE_MIN_WIDTH,this.LEDGE_EXTRA_WIDTH);
-        high=genRandom.randomInt(this.LEDGE_MIN_HEIGHT,this.LEDGE_EXTRA_HEIGHT);
+        wid=genRandom.randomInt(constants.LEDGE_MIN_WIDTH,constants.LEDGE_EXTRA_WIDTH);
+        high=genRandom.randomInt(constants.LEDGE_MIN_HEIGHT,constants.LEDGE_EXTRA_HEIGHT);
         
         xMax=room.xBlockSize*constants.ROOM_BLOCK_WIDTH;
         zMax=room.zBlockSize*constants.ROOM_BLOCK_WIDTH;
@@ -187,7 +185,7 @@ export default class GenRoomLedgeClass
             // corners
             // they can have different heights
             
-        high=genRandom.randomInt(this.LEDGE_MIN_HEIGHT,this.LEDGE_EXTRA_HEIGHT);
+        high=genRandom.randomInt(constants.LEDGE_MIN_HEIGHT,constants.LEDGE_EXTRA_HEIGHT);
             
         if (room.getEdgeGridValue(0,0)===0) {
             pts[0].setFromValues(0,0,0);

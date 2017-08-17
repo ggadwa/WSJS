@@ -1,7 +1,6 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-
-const RAD_TO_DEGREE=180.0/Math.PI;
 
 //
 // entity base class
@@ -399,7 +398,7 @@ export default class EntityClass
         this.reflectLineVector.normalize();
             
         f=this.reflectLineVector.dot(this.reflectMovementVector);
-        ang=Math.acos(f)*RAD_TO_DEGREE;
+        ang=Math.acos(f)*constants.RAD_TO_DEGREE;
 
             // calculate the reflection angle
 		

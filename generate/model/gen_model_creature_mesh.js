@@ -1,9 +1,8 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
-
-const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // helper class for globe shrinking
@@ -100,7 +99,7 @@ export default class GenModelCreatureMeshClass
                 // get x position and radius
                 // from angle
             
-            rd=xAng*DEGREE_TO_RAD;
+            rd=xAng*constants.DEGREE_TO_RAD;
             radius=aroundRadius*Math.sin(rd);
             px=centerPnt.x-(acrossRadius*Math.cos(rd));
             
@@ -113,7 +112,7 @@ export default class GenModelCreatureMeshClass
             for (yz=0;yz<=aroundSurfaceCount;yz++) {
                 v=vertexList[vIdx++];
                 
-                rd=(yz!==aroundSurfaceCount)?(yzAng*DEGREE_TO_RAD):0.0;
+                rd=(yz!==aroundSurfaceCount)?(yzAng*constants.DEGREE_TO_RAD):0.0;
                 
                 v.position.x=px;
                 v.position.y=centerPnt.y+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
@@ -209,7 +208,7 @@ export default class GenModelCreatureMeshClass
                 // get y position and radius
                 // from angle
             
-            rd=yAng*DEGREE_TO_RAD;
+            rd=yAng*constants.DEGREE_TO_RAD;
             radius=aroundRadius*Math.sin(rd);
             py=centerPnt.y-(acrossRadius*Math.cos(rd));
             
@@ -222,7 +221,7 @@ export default class GenModelCreatureMeshClass
             for (xz=0;xz<=aroundSurfaceCount;xz++) {
                 v=vertexList[vIdx++];
                 
-                rd=(xz!==aroundSurfaceCount)?(xzAng*DEGREE_TO_RAD):0.0;
+                rd=(xz!==aroundSurfaceCount)?(xzAng*constants.DEGREE_TO_RAD):0.0;
                 
                 v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 v.position.y=py;
@@ -318,7 +317,7 @@ export default class GenModelCreatureMeshClass
                 // get y position and radius
                 // from angle
             
-            rd=zAng*DEGREE_TO_RAD;
+            rd=zAng*constants.DEGREE_TO_RAD;
             radius=aroundRadius*Math.sin(rd);
             pz=centerPnt.z-(acrossRadius*Math.cos(rd));
             
@@ -331,7 +330,7 @@ export default class GenModelCreatureMeshClass
             for (xy=0;xy<=aroundSurfaceCount;xy++) {
                 v=vertexList[vIdx++];
                 
-                rd=(xy!==aroundSurfaceCount)?(xyAng*DEGREE_TO_RAD):0.0;
+                rd=(xy!==aroundSurfaceCount)?(xyAng*constants.DEGREE_TO_RAD):0.0;
                 
                 v.position.x=centerPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 v.position.y=centerPnt.y+((radius*Math.cos(rd))-(radius*Math.sin(rd)));

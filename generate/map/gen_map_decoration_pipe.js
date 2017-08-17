@@ -1,11 +1,9 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
-import constants from '../../code/main/constants.js';
-
-const DEGREE_TO_RAD=Math.PI/180.0;
 
 //
 // generate room pipe decoration class
@@ -13,10 +11,9 @@ const DEGREE_TO_RAD=Math.PI/180.0;
 
 export default class GenRoomDecorationPipeClass
 {
-    constructor()
+    constructor(map)
     {
-        this.PIPE_SIDE_COUNT=12;
-        this.PIPE_CURVE_SEGMENT_COUNT=5;
+        this.map=map;
         
         Object.seal(this);
     }
@@ -36,10 +33,10 @@ export default class GenRoomDecorationPipeClass
         
             // get turn pieces
         
-        vertexList=MeshUtilityClass.createMapVertexList(this.PIPE_SIDE_COUNT*6);
-        indexes=new Uint16Array(this.PIPE_SIDE_COUNT*6);
+        vertexList=MeshUtilityClass.createMapVertexList(constants.PIPE_SIDE_COUNT*6);
+        indexes=new Uint16Array(constants.PIPE_SIDE_COUNT*6);
 
-        iCount=this.PIPE_SIDE_COUNT*6;
+        iCount=constants.PIPE_SIDE_COUNT*6;
         
         vIdx=0;
         
@@ -58,28 +55,28 @@ export default class GenRoomDecorationPipeClass
             // cyliner faces
 
         ang=0.0;
-        angAdd=360.0/this.PIPE_SIDE_COUNT;
+        angAdd=360.0/constants.PIPE_SIDE_COUNT;
 
-        for (n=0;n!==this.PIPE_SIDE_COUNT;n++) {
+        for (n=0;n!==constants.PIPE_SIDE_COUNT;n++) {
             ang2=ang+angAdd;
 
                 // the two Us
 
-            u1=(ang*this.PIPE_SIDE_COUNT)/360.0;
-            u2=(ang2*this.PIPE_SIDE_COUNT)/360.0;
+            u1=(ang*constants.PIPE_SIDE_COUNT)/360.0;
+            u2=(ang2*constants.PIPE_SIDE_COUNT)/360.0;
 
                 // force last segment to wrap
 
-            if (n===(this.PIPE_SIDE_COUNT-1)) ang2=0.0;
+            if (n===(constants.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
-            rd=ang*DEGREE_TO_RAD;
+            rd=ang*constants.DEGREE_TO_RAD;
             tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
             tz=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
             bx=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
             bz=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-            rd=ang2*DEGREE_TO_RAD;
+            rd=ang2*constants.DEGREE_TO_RAD;
             tx2=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
             tz2=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
@@ -144,10 +141,10 @@ export default class GenRoomDecorationPipeClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_DECORATION);
+        mesh=new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
-        map.addMesh(mesh);
+        this.map.addMesh(mesh);
     }
 
     addPipeCornerChunk(bitmap,pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
@@ -164,25 +161,25 @@ export default class GenRoomDecorationPipeClass
         
             // get turn pieces
         
-        vertexList=MeshUtilityClass.createMapVertexList(this.PIPE_CURVE_SEGMENT_COUNT*(this.PIPE_SIDE_COUNT*6));
-        indexes=new Uint16Array(this.PIPE_CURVE_SEGMENT_COUNT*(this.PIPE_SIDE_COUNT*6));
+        vertexList=MeshUtilityClass.createMapVertexList(constants.PIPE_CURVE_SEGMENT_COUNT*(constants.PIPE_SIDE_COUNT*6));
+        indexes=new Uint16Array(constants.PIPE_CURVE_SEGMENT_COUNT*(constants.PIPE_SIDE_COUNT*6));
 
-        iCount=this.PIPE_SIDE_COUNT*6;
+        iCount=constants.PIPE_SIDE_COUNT*6;
         
         vIdx=0;
         iIdx=0;
         
             // turn segments
             
-        yAdd=Math.trunc((radius*2)/this.PIPE_CURVE_SEGMENT_COUNT);
+        yAdd=Math.trunc((radius*2)/constants.PIPE_CURVE_SEGMENT_COUNT);
         if (yFlip) yAdd=-yAdd;
         
-        xTurnAdd=xTurn/this.PIPE_CURVE_SEGMENT_COUNT;
-        zTurnAdd=zTurn/this.PIPE_CURVE_SEGMENT_COUNT;
+        xTurnAdd=xTurn/constants.PIPE_CURVE_SEGMENT_COUNT;
+        zTurnAdd=zTurn/constants.PIPE_CURVE_SEGMENT_COUNT;
         
-        angAdd=360.0/this.PIPE_SIDE_COUNT;
+        angAdd=360.0/constants.PIPE_SIDE_COUNT;
         
-        for (k=0;k!==this.PIPE_CURVE_SEGMENT_COUNT;k++) {
+        for (k=0;k!==constants.PIPE_CURVE_SEGMENT_COUNT;k++) {
             
             nextPnt.setFromPoint(pnt);
             
@@ -199,26 +196,26 @@ export default class GenRoomDecorationPipeClass
 
             ang=0.0;
 
-            for (n=0;n!==this.PIPE_SIDE_COUNT;n++) {
+            for (n=0;n!==constants.PIPE_SIDE_COUNT;n++) {
                 ang2=ang+angAdd;
                 
                     // the two Us
                     
-                u1=(ang*this.PIPE_SIDE_COUNT)/360.0;
-                u2=(ang2*this.PIPE_SIDE_COUNT)/360.0;
+                u1=(ang*constants.PIPE_SIDE_COUNT)/360.0;
+                u2=(ang2*constants.PIPE_SIDE_COUNT)/360.0;
 
                     // force last segment to wrap
                     
-                if (n===(this.PIPE_SIDE_COUNT-1)) ang2=0.0;
+                if (n===(constants.PIPE_SIDE_COUNT-1)) ang2=0.0;
 
-                rd=ang*DEGREE_TO_RAD;
+                rd=ang*constants.DEGREE_TO_RAD;
                 tx=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 tz=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
                 
                 bx=pnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 bz=pnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
 
-                rd=ang2*DEGREE_TO_RAD;
+                rd=ang2*constants.DEGREE_TO_RAD;
                 tx2=nextPnt.x+((radius*Math.sin(rd))+(radius*Math.cos(rd)));
                 tz2=nextPnt.z+((radius*Math.cos(rd))-(radius*Math.sin(rd)));
                 
@@ -289,10 +286,10 @@ export default class GenRoomDecorationPipeClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(bitmap,vertexList,indexes,map.MESH_FLAG_DECORATION);
+        mesh=new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
-        map.addMesh(mesh);
+        this.map.addMesh(mesh);
     }
     
         //
@@ -454,8 +451,8 @@ export default class GenRoomDecorationPipeClass
         
             // bitmaps
 
-        platformBitmap=map.getTexture(map.TEXTURE_TYPE_PLATFORM);
-        pipeBitmap=map.getTexture(map.TEXTURE_TYPE_METAL);
+        platformBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
+        pipeBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
         
             // get # of pipes (on a grid so they can collide
             // properly) and their relative sizes
@@ -476,7 +473,7 @@ export default class GenRoomDecorationPipeClass
         platformBoundZ=new BoundClass((z-wid),(z+wid));
         
         platformBoundY=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,map.MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
         
             // determine direction
         
