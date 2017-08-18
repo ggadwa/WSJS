@@ -709,17 +709,17 @@ export default class GenModelCreatureMeshClass
         maxGravity=this.findMaxGravityForBoneList(boneList);
         
         switch (axis) {
-            case modelLimbConstants.LIMB_AXIS_X:
+            case constants.LIMB_AXIS_X:
                 acrossRadius=(xBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(yBound.getSize()>zBound.getSize())?((yBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
                 this.buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
-            case modelLimbConstants.LIMB_AXIS_Y:
+            case constants.LIMB_AXIS_Y:
                 acrossRadius=(yBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>zBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
                 this.buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
-            case modelLimbConstants.LIMB_AXIS_Z:
+            case constants.LIMB_AXIS_Z:
                 acrossRadius=(zBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>yBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((yBound.getSize()*0.5)+maxGravity);
                 this.buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
@@ -730,12 +730,12 @@ export default class GenModelCreatureMeshClass
             // texture chunks
         
         switch (limbType) {
-            case modelLimbConstants.LIMB_TYPE_BODY:
-            case modelLimbConstants.LIMB_TYPE_NECK:
+            case constants.LIMB_TYPE_BODY:
+            case constants.LIMB_TYPE_NECK:
                 MeshUtilityClass.transformUVs(vertexList,0.0,0.5,0.5,0.5);
                 break;
-            case modelLimbConstants.LIMB_TYPE_HEAD:
-            case modelLimbConstants.LIMB_TYPE_HEAD_SNOUT:
+            case constants.LIMB_TYPE_HEAD:
+            case constants.LIMB_TYPE_HEAD_SNOUT:
                 MeshUtilityClass.transformUVs(vertexList,0.5,0.0,0.5,0.5);
                 break;
             default:

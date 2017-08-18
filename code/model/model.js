@@ -1,25 +1,4 @@
 //
-// class for some model constants
-// redo when static properities come to classes
-//
-
-class ModelConstantsClass
-{
-    constructor()
-    {
-        this.TYPE_CREATURE=0;
-        this.TYPE_WEAPON=1;
-        this.TYPE_PROJECTILE=2;
-        
-        this.TYPE_NAMES=    [
-                                'Creature','Weapon','Projectile'
-                            ];
-    }
-}
-
-let modelConstants=new ModelConstantsClass();
-
-//
 // model object
 //
 

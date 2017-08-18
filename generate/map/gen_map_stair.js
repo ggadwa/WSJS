@@ -1,6 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import MapMeshClass from '../../code/map/map_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -420,7 +421,7 @@ export default class GenRoomStairsClass
             // the steps
         
         idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList((this.STAIR_STEP_COUNT*4)*2);
+        vertexList=MeshUtilityClass.createMapVertexList((constants.STAIR_STEP_COUNT*4)*2);
         
         nIdx=0;
         if (!flip) {

@@ -986,7 +986,7 @@ export default class GenMapClass
     
     buildMapRemoveSharedTriangles1()
     {
-             // we do this in separate passes as some polygons
+            // we do this in separate passes as some polygons
             // shouldn't remove others, and vice versa.  first
             // remove all the shared trigs between rooms and
             // remove them both

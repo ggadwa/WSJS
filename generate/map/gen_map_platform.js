@@ -25,7 +25,7 @@ export default class GenRoomPlatformClass
     {
         let rx,rz,xBound,yBound,zBound;
         let y=(room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*story));
-        let genRoomStairs=new GenRoomStairsClass();
+        let genRoomStairs=new GenRoomStairsClass(this.map);
 
         rx=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
         xBound=new BoundClass(rx,(rx+constants.ROOM_BLOCK_WIDTH));

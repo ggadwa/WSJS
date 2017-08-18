@@ -106,7 +106,7 @@ export default class MapClass
     
     getTexture(textureType)
     {
-        if (this.textureBitmapList[textureType]!==null) return(this.textureBitmapList[textureType]);
+       if (this.textureBitmapList[textureType]!==null) return(this.textureBitmapList[textureType]);
             
         switch (textureType) {
             case constants.MAP_TEXTURE_TYPE_WALL:

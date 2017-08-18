@@ -14,6 +14,7 @@ import SoundClass from '../../code/sound/sound.js';
 import GenMapClass from '../../generate/map/gen_map.js';
 import GenWeaponClass from '../../generate/thing/gen_weapon.js';
 import GenProjectileClass from '../../generate/thing/gen_projectile.js';
+import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -126,7 +127,7 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
         
-        model=new ModelClass('player',modelConstants.TYPE_CREATURE);
+        model=new ModelClass('player',constants.MODEL_TYPE_CREATURE);
         genModel.build(model,modelBitmap,1.0,false);
 
         this.modelList.addModel(model);
@@ -148,7 +149,7 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-        model=new ModelClass(('monster_'+idx),modelConstants.TYPE_CREATURE);
+        model=new ModelClass(('monster_'+idx),constants.MODEL_TYPE_CREATURE);
         genModel.build(model,modelBitmap,1.0,false);
 
         this.modelList.addModel(model);
@@ -188,7 +189,7 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-        model=new ModelClass('boss',modelConstants.TYPE_CREATURE);
+        model=new ModelClass('boss',constants.MODEL_TYPE_CREATURE);
         genModel.build(model,modelBitmap,genRandom.randomFloat(2.5,3.0),false);
 
         this.modelList.addModel(model);
@@ -214,14 +215,14 @@ class MainClass
 
             // weapon
 
-        model=new ModelClass('weapon_0',modelConstants.TYPE_WEAPON);
+        model=new ModelClass('weapon_0',constants.MODEL_TYPE_WEAPON);
         genModel.build(model,modelBitmap,1.0,false);
 
         this.modelList.addModel(model);
 
             // projectile
 
-        model=new ModelClass('projectile_0',modelConstants.TYPE_PROJECTILE);
+        model=new ModelClass('projectile_0',constants.MODEL_TYPE_PROJECTILE);
         genModel.build(model,modelBitmap,1.0,false);
 
         this.modelList.addModel(model);

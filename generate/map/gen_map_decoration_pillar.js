@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import RectClass from '../../code/utility/rect.js';

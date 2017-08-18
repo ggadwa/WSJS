@@ -1,108 +1,7 @@
 import PointClass from '../../code/utility/point.js';
+import ModelBoneClass from '../../code/model/model_bone.js';
+import ModelLimbClass from '../../code/model/model_limb.js';
 import genRandom from '../../generate/utility/random.js';
-
-//
-// model bone class
-//
-
-class ModelBoneClass
-{
-    constructor(name,parentBoneIdx,position)
-    {
-        this.name=name;
-        this.parentBoneIdx=parentBoneIdx;
-        this.position=position;
-
-            // parenting
-
-        this.vectorFromParent=new PointClass(0.0,0,0,0,0);
-        this.childBoneIndexes=[];
-
-            // mesh creation
-
-        this.gravityLockDistance=500;
-
-            // pose
-
-        this.curPoseAngle=new PointClass(0.0,0.0,0.0);
-        this.curPosePosition=this.position.copy();
-
-        this.prevPoseAngle=new PointClass(0.0,0.0,0.0);
-        this.nextPoseAngle=new PointClass(0.0,0.0,0.0);
-        
-        Object.seal(this);
-    }
-    
-        //
-        // bone types and flags
-        //
-        
-    isBase()
-    {
-        return(this.name==='Base');
-    }
-    
-    hasParent()
-    {
-        return(this.parentBoneIdx!==-1);
-    }
-}
-
-//
-// limb class constants, redo this when
-// we get static properties for classes
-//
-
-class ModelLimbConstantsClass
-{
-    constructor()
-    {
-        this.LIMB_TYPE_BODY=0;
-        this.LIMB_TYPE_NECK=1;
-        this.LIMB_TYPE_HEAD=2;
-        this.LIMB_TYPE_HEAD_SNOUT=3;
-        this.LIMB_TYPE_HEAD_JAW=4;
-        this.LIMB_TYPE_ARM=5;
-        this.LIMB_TYPE_HAND=6;
-        this.LIMB_TYPE_FINGER=7;
-        this.LIMB_TYPE_LEG=8;
-        this.LIMB_TYPE_FOOT=9;
-        this.LIMB_TYPE_TOE=10;
-        this.LIMB_TYPE_WHIP=11;
-
-        this.LIMB_AXIS_X=0;
-        this.LIMB_AXIS_Y=1;
-        this.LIMB_AXIS_Z=2;
-    }
-}
-
-let modelLimbConstants=new ModelLimbConstantsClass();
-
-//
-// limb class
-//
-
-class ModelLimbClass
-{
-    constructor(limbType,index,axis,acrossSurfaceCount,aroundSurfaceCount,boneIndexes)
-    {
-        this.limbType=limbType;
-        this.index=index;
-        this.axis=axis;
-        this.acrossSurfaceCount=acrossSurfaceCount;
-        this.aroundSurfaceCount=aroundSurfaceCount;
-        this.boneIndexes=boneIndexes;
-        
-        this.hunchAngle=0.0;
-        
-        Object.seal(this);
-    }
-    
-    getRandomBoneIndex()
-    {
-        return(this.boneIndexes[genRandom.randomIndex(this.boneIndexes.length)]);
-    }
-};
 
 //
 // model skeleton class
@@ -428,7 +327,7 @@ export default class ModelSkeletonClass
         if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
         z=-armAngle;
-        if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) z=-z;
+        if (limb.side===constants.LIMB_SIDE_LEFT) z=-z;
         
         if (this.lastAnimationFlip) r=-r;
         
@@ -520,18 +419,18 @@ export default class ModelSkeletonClass
             limb=this.limbs[n];
             
             switch (limb.limbType) {
-                case modelLimbConstants.LIMB_TYPE_BODY:
+                case constants.LIMB_TYPE_BODY:
                     this.poseSetBody(limb,5.0,5.0,limb.hunchAngle);
                     break;
-                case modelLimbConstants.LIMB_TYPE_HEAD:
+                case constants.LIMB_TYPE_HEAD:
                     this.poseSetBody(limb,5.0,15.0,0.0);
                     break;
-                case modelLimbConstants.LIMB_TYPE_LEG:
+                case constants.LIMB_TYPE_LEG:
                     this.poseSetLeg(limb,legOffset,true);
                     legOffset++;
                     break;
-                case modelLimbConstants.LIMB_TYPE_ARM:
-                    if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) {
+                case constants.LIMB_TYPE_ARM:
+                    if (limb.side===constants.LIMB_SIDE_LEFT) {
                         this.poseSetArm(limb,armLeftZAngle,true);
                         armLeftZAngle+=5.0;
                     }
@@ -540,13 +439,13 @@ export default class ModelSkeletonClass
                         armRightZAngle+=5.0;
                     }
                     break;
-                case modelLimbConstants.LIMB_TYPE_WHIP:
+                case constants.LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);
                     break;
-                case modelLimbConstants.LIMB_TYPE_HEAD_SNOUT:
+                case constants.LIMB_TYPE_HEAD_SNOUT:
                     this.poseSetHeadSnout(limb);
                     break;
-                case modelLimbConstants.LIMB_TYPE_HEAD_JAW:
+                case constants.LIMB_TYPE_HEAD_JAW:
                     this.poseSetHeadJaw(limb);
                     break;
             }
@@ -593,18 +492,18 @@ export default class ModelSkeletonClass
             limb=this.limbs[n];
             
             switch (limb.limbType) {
-                case modelLimbConstants.LIMB_TYPE_BODY:
+                case constants.LIMB_TYPE_BODY:
                     this.poseSetBody(limb,3.0,3.0,limb.hunchAngle);
                     break;
-                case modelLimbConstants.LIMB_TYPE_HEAD:
+                case constants.LIMB_TYPE_HEAD:
                     this.poseSetBody(limb,0.0,10.0,0.0);
                     break;
-                case modelLimbConstants.LIMB_TYPE_LEG:
+                case constants.LIMB_TYPE_LEG:
                     this.poseSetLeg(limb,legOffset,false);
                     legOffset++;
                     break;
-                case modelLimbConstants.LIMB_TYPE_ARM:
-                    if (limb.side===modelLimbConstants.LIMB_SIDE_LEFT) {
+                case constants.LIMB_TYPE_ARM:
+                    if (limb.side===constants.LIMB_SIDE_LEFT) {
                         this.poseSetArm(limb,armLeftZAngle,false);
                         armLeftZAngle+=5.0;
                     }
@@ -613,13 +512,13 @@ export default class ModelSkeletonClass
                         armRightZAngle+=5.0;
                     }
                     break;
-                case modelLimbConstants.LIMB_TYPE_WHIP:
+                case constants.LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);
                     break;
-                case modelLimbConstants.LIMB_TYPE_HEAD_SNOUT:
+                case constants.LIMB_TYPE_HEAD_SNOUT:
                     this.poseSetHeadSnout(limb);
                     break;
-                case modelLimbConstants.LIMB_TYPE_HEAD_JAW:
+                case constants.LIMB_TYPE_HEAD_JAW:
                     this.poseSetHeadJaw(limb);
                     break;
             }

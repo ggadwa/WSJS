@@ -73,6 +73,7 @@ export const MAP_TEXTURE_TYPE_DOOR=6;
 export const MAP_TEXTURE_TYPE_FRAME=7;
 export const MAP_TEXTURE_TYPE_COMPUTER=8;
 export const MAP_TEXTURE_TYPE_PANEL=9;
+export const MAP_TEXTURE_TYPE_BOX=10;
 export const MAP_TEXTURE_TYPE_LIQUID=11;
 
     // extra room features
@@ -91,3 +92,31 @@ export const CLOSET_MAX_COUNT=5;            // maximum number of possible closet
 export const PIPE_SIDE_COUNT=12;
 export const PIPE_CURVE_SEGMENT_COUNT=5;
         
+    // model types
+  
+export const MODEL_TYPE_CREATURE=0;
+export const MODEL_TYPE_WEAPON=1;
+export const MODEL_TYPE_PROJECTILE=2;
+        
+export const MODEL_TYPE_NAMES=  [
+                                    'Creature','Weapon','Projectile'
+                                ];
+
+    // model limb types
+    
+export const LIMB_TYPE_BODY=0;
+export const LIMB_TYPE_NECK=1;
+export const LIMB_TYPE_HEAD=2;
+export const LIMB_TYPE_HEAD_SNOUT=3;
+export const LIMB_TYPE_HEAD_JAW=4;
+export const LIMB_TYPE_ARM=5;
+export const LIMB_TYPE_HAND=6;
+export const LIMB_TYPE_FINGER=7;
+export const LIMB_TYPE_LEG=8;
+export const LIMB_TYPE_FOOT=9;
+export const LIMB_TYPE_TOE=10;
+export const LIMB_TYPE_WHIP=11;
+
+export const LIMB_AXIS_X=0;
+export const LIMB_AXIS_Y=1;
+export const LIMB_AXIS_Z=2;

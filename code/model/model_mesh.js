@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import Point2DClass from '../../code/utility/2D_point.js';
 import BoundClass from '../../code/utility/bound.js';
@@ -132,7 +133,7 @@ export default class ModelMeshClass
                     v=this.vertexList[n];
                     limbType=skeleton.getBoneLimbType(v.boneIdx);
 
-                    if ((limbType===modelLimbConstants.LIMB_TYPE_BODY) || (limbType===modelLimbConstants.LIMB_TYPE_HEAD) || (limbType===modelLimbConstants.LIMB_TYPE_LEG)) {
+                    if ((limbType===constants.LIMB_TYPE_BODY) || (limbType===constants.LIMB_TYPE_HEAD) || (limbType===constants.LIMB_TYPE_LEG)) {
                         xBound.adjust(v.position.x);
                         zBound.adjust(v.position.z);
                     }

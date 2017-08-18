@@ -88,8 +88,8 @@ export default class DebugRunClass
     {
         let n;
         
-        for (n=0;n!==modelConstants.TYPE_NAMES.length;n++) {
-            this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_MODEL,modelConstants,false));
+        for (n=0;n!==constants.MODEL_TYPE_NAMES.length;n++) {
+            this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_MODEL,null,false));
         }
     }
         
