@@ -1,4 +1,8 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
+import ModelBoneClass from '../../code/model/model_bone.js';
+import ModelLimbClass from '../../code/model/model_limb.js';
+import ModelSkeletonClass from '../../code/model/model_skeleton.js';
 import genRandom from '../../generate/utility/random.js';
 
 //

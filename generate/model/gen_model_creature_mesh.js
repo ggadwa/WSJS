@@ -1,6 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import ModelMeshClass from '../../code/model/model_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 

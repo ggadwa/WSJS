@@ -12,6 +12,7 @@ import DebugClass from '../../code/debug/debug.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
 import GenMapClass from '../../generate/map/gen_map.js';
+import GenModelClass from '../../generate/model/gen_model.js';
 import GenWeaponClass from '../../generate/thing/gen_weapon.js';
 import GenProjectileClass from '../../generate/thing/gen_projectile.js';
 import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
@@ -127,8 +128,8 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
         
-        model=new ModelClass('player',constants.MODEL_TYPE_CREATURE);
-        genModel.build(model,modelBitmap,1.0,false);
+        model=new ModelClass('player');
+        genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,1.0,false);
 
         this.modelList.addModel(model);
 
@@ -149,8 +150,8 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-        model=new ModelClass(('monster_'+idx),constants.MODEL_TYPE_CREATURE);
-        genModel.build(model,modelBitmap,1.0,false);
+        model=new ModelClass(('monster_'+idx));
+        genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,1.0,false);
 
         this.modelList.addModel(model);
 
@@ -189,8 +190,8 @@ class MainClass
         
         modelBitmap=genBitmapSkin.generateRandom(false);
 
-        model=new ModelClass('boss',constants.MODEL_TYPE_CREATURE);
-        genModel.build(model,modelBitmap,genRandom.randomFloat(2.5,3.0),false);
+        model=new ModelClass('boss');
+        genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,genRandom.randomFloat(2.5,3.0),false);
 
         this.modelList.addModel(model);
 
@@ -215,15 +216,15 @@ class MainClass
 
             // weapon
 
-        model=new ModelClass('weapon_0',constants.MODEL_TYPE_WEAPON);
-        genModel.build(model,modelBitmap,1.0,false);
+        model=new ModelClass('weapon_0');
+        genModel.build(model,modelBitmap,genModel.TYPE_WEAPON,1.0,false);
 
         this.modelList.addModel(model);
 
             // projectile
 
-        model=new ModelClass('projectile_0',constants.MODEL_TYPE_PROJECTILE);
-        genModel.build(model,modelBitmap,1.0,false);
+        model=new ModelClass('projectile_0');
+        genModel.build(model,modelBitmap,genModel.TYPE_PROJECTILE,1.0,false);
 
         this.modelList.addModel(model);
 

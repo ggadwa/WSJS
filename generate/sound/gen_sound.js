@@ -1,3 +1,4 @@
+import SoundBufferClass from '../../code/sound/sound_buffer.js';
 import genRandom from '../../generate/utility/random.js';
 
 //

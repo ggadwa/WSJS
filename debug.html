@@ -9,17 +9,20 @@
 <!-- the script -->
 
 <script type="module">
-    import debugRunClass from './code/debug/debug_run.js';
+    import DebugRunClass from './code/debug/debug_run.js';
   
     let debugRun=new DebugRunClass();
     debugRun.run();
+</script>
+<script nomodule>
+    alert('Browser is module support required.')
 </script>
 
 </head>
 
 <!-- the body -->
 
-<body onload="debugStart()">
-
+<body>
 </body>
+
 </html>

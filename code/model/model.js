@@ -4,10 +4,9 @@
 
 export default class ModelClass
 {
-    constructor(name,modelType)
+    constructor(name)
     {
         this.name=name;
-        this.modelType=modelType;
         this.modelMeshShader=null;          // this gets set when model is attached to model list
         this.mesh=null;
         this.skeleton=null;
@@ -31,7 +30,7 @@ export default class ModelClass
         
     clone()
     {
-        let model=new ModelClass(this.name,this.modelType);
+        let model=new ModelClass(this.name);
         
         model.modelMeshShader=this.modelMeshShader;
         model.mesh=this.mesh.clone();

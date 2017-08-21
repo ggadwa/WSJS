@@ -91,16 +91,6 @@ export const CLOSET_MAX_COUNT=5;            // maximum number of possible closet
 
 export const PIPE_SIDE_COUNT=12;
 export const PIPE_CURVE_SEGMENT_COUNT=5;
-        
-    // model types
-  
-export const MODEL_TYPE_CREATURE=0;
-export const MODEL_TYPE_WEAPON=1;
-export const MODEL_TYPE_PROJECTILE=2;
-        
-export const MODEL_TYPE_NAMES=  [
-                                    'Creature','Weapon','Projectile'
-                                ];
 
     // model limb types
     

@@ -1,4 +1,27 @@
+import * as constants from '../../code/main/constants.js';
+import FileCacheClass from '../../code/main/filecache.js';
+import ViewClass from '../../code/main/view.js';
+import ModelClass from '../../code/model/model.js';
 import SoundClass from '../../code/sound/sound.js';
+import GenBitmapWallClass from '../../generate/bitmap/gen_bitmap_wall.js';
+import GenBitmapFloorClass from '../../generate/bitmap/gen_bitmap_floor.js';
+import GenBitmapCeilingClass from '../../generate/bitmap/gen_bitmap_ceiling.js';
+import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
+import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
+import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
+import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
+import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
+import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
+import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
+import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
+import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
+import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
+import GenModelClass from '../../generate/model/gen_model.js';
+import GenSoundClass from '../../generate/sound/gen_sound.js';
+
+//
+// object for single debug item
+//
 
 class DebugItemClass
 {
@@ -11,6 +34,7 @@ class DebugItemClass
         this.isHeader=isHeader;
     }
 }
+
 //
 // this is a specialized main that debug outputs some
 // generated items
@@ -20,6 +44,10 @@ export default class DebugRunClass
 {
     constructor()
     {
+        this.fileCache=new FileCacheClass();
+        this.view=new ViewClass(this.fileCache);
+        this.sound=new SoundClass();
+
         this.listDiv=null;
         this.lastItemDiv=null;
         this.bitmapCanvas=null;
@@ -38,26 +66,26 @@ export default class DebugRunClass
         this.list=[];
         
         this.list.push(new DebugItemClass('Models',-1,-1,null,true));
-        this.fillListWithModelGenerator();
+        this.fillListWithModelGenerator(new GenModelClass());
 
         this.list.push(new DebugItemClass('Bitmaps',-1,-1,null,true));
-        this.fillListWithBitmapGenerator('Wall',new GenBitmapWallClass(view));
-        this.fillListWithBitmapGenerator('Floor',new GenBitmapFloorClass(view));
-        this.fillListWithBitmapGenerator('Ceiling',new GenBitmapCeilingClass(view));
-        this.fillListWithBitmapGenerator('Door',new GenBitmapDoorClass(view));
-        this.fillListWithBitmapGenerator('Metal',new GenBitmapMetalClass(view));
-        this.fillListWithBitmapGenerator('Machine',new GenBitmapMachineClass(view));
-        this.fillListWithBitmapGenerator('Panel',new GenBitmapPanelClass(view));
-        this.fillListWithBitmapGenerator('Box',new GenBitmapBoxClass(view));
-        this.fillListWithBitmapGenerator('Liquid',new GenBitmapLiquidClass(view));
-        this.fillListWithBitmapGenerator('Skin',new GenBitmapSkinClass(view));
-        this.fillListWithBitmapGenerator('Item',new GenBitmapItemClass(view));
-        this.fillListWithBitmapGenerator('Sky',new GenBitmapSkyClass(view));
-        this.fillListWithBitmapGenerator('Particle',new GenBitmapParticleClass(view));
+        this.fillListWithBitmapGenerator('Wall',new GenBitmapWallClass(this.view));
+        this.fillListWithBitmapGenerator('Floor',new GenBitmapFloorClass(this.view));
+        this.fillListWithBitmapGenerator('Ceiling',new GenBitmapCeilingClass(this.view));
+        this.fillListWithBitmapGenerator('Door',new GenBitmapDoorClass(this.view));
+        this.fillListWithBitmapGenerator('Metal',new GenBitmapMetalClass(this.view));
+        this.fillListWithBitmapGenerator('Machine',new GenBitmapMachineClass(this.view));
+        this.fillListWithBitmapGenerator('Panel',new GenBitmapPanelClass(this.view));
+        this.fillListWithBitmapGenerator('Box',new GenBitmapBoxClass(this.view));
+        this.fillListWithBitmapGenerator('Liquid',new GenBitmapLiquidClass(this.view));
+        this.fillListWithBitmapGenerator('Skin',new GenBitmapSkinClass(this.view));
+        this.fillListWithBitmapGenerator('Item',new GenBitmapItemClass(this.view));
+        this.fillListWithBitmapGenerator('Sky',new GenBitmapSkyClass(this.view));
+        this.fillListWithBitmapGenerator('Particle',new GenBitmapParticleClass(this.view));
         
-        sound.initialize();
+        this.sound.initialize();
         this.list.push(new DebugItemClass('Sounds',-1,-1,null,true));
-        this.fillListWithSoundGenerator(new GenSoundClass(sound.getAudioContext()));
+        this.fillListWithSoundGenerator(new GenSoundClass(this.sound.getAudioContext()));
         
         Object.seal(this);
     }
@@ -84,12 +112,12 @@ export default class DebugRunClass
         }
     }
     
-    fillListWithModelGenerator()
+    fillListWithModelGenerator(obj)
     {
         let n;
         
-        for (n=0;n!==constants.MODEL_TYPE_NAMES.length;n++) {
-            this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_MODEL,null,false));
+        for (n=0;n!==obj.TYPE_NAMES.length;n++) {
+            this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_MODEL,obj,false));
         }
     }
         
@@ -186,7 +214,7 @@ export default class DebugRunClass
     
     playSound()
     {
-        sound.play(null,this.currentSoundBuffer);
+        this.sound.play(null,this.currentSoundBuffer);
     }
     
     drawModelMeshGetX(axisType,pos)
@@ -267,18 +295,21 @@ export default class DebugRunClass
             if (y>maxY) maxY=y;
         }
         
-        nBone=model.skeleton.bones.length;
+        if (model.skeleton!==null) {
         
-        for (n=0;n!==nBone;n++) {
-            bone=model.skeleton.bones[n];
-            
-            x=this.drawModelMeshGetX(axisType,bone.position);
-            y=this.drawModelMeshGetY(axisType,bone.position);
-            
-            if (x<minX) minX=x;
-            if (x>maxX) maxX=x;
-            if (y<minY) minY=y;
-            if (y>maxY) maxY=y;
+            nBone=model.skeleton.bones.length;
+
+            for (n=0;n!==nBone;n++) {
+                bone=model.skeleton.bones[n];
+
+                x=this.drawModelMeshGetX(axisType,bone.position);
+                y=this.drawModelMeshGetY(axisType,bone.position);
+
+                if (x<minX) minX=x;
+                if (x>maxX) maxX=x;
+                if (y<minY) minY=y;
+                if (y>maxY) maxY=y;
+            }
         }
         
         xFactor=wid/Math.abs(maxX-minX);
@@ -380,10 +411,10 @@ export default class DebugRunClass
         
             // build the model
         
-        model=new ModelClass('test',item.typeIdx);
+        model=new ModelClass('test');
         
         genModel=new GenModelClass();
-        genModel.build(model,null,1.0,true);
+        genModel.build(model,null,item.typeIdx,1.0,true);
         
             // draw axises
         
@@ -395,21 +426,21 @@ export default class DebugRunClass
         factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_XY,thirdWid,high);
         xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XY,thirdWid);
         yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XY,high);
-        this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
+        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
         this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
         
         this.drawModelBackground(ctx,thirdWid,0,thirdWid,high,'#EEEEEE');
         factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_ZY,thirdWid,high);
         xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_ZY,thirdWid);
         yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_ZY,high);
-        this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
+        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
         this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
         
         this.drawModelBackground(ctx,(thirdWid*2),0,thirdWid,high,'#CCCCCC');
         factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_XZ,thirdWid,high);
         xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XZ,thirdWid);
         yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XZ,high);
-        this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);
+        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);
         this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);
         
             // show the canvas

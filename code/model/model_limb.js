@@ -5,7 +5,7 @@ import genRandom from '../../generate/utility/random.js';
 // limb class
 //
 
-class ModelLimbClass
+export default class ModelLimbClass
 {
     constructor(limbType,index,axis,acrossSurfaceCount,aroundSurfaceCount,boneIndexes)
     {
