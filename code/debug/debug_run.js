@@ -413,7 +413,7 @@ export default class DebugRunClass
         
         model=new ModelClass('test');
         
-        genModel=new GenModelClass();
+        genModel=new GenModelClass(this.view);
         genModel.build(model,null,item.typeIdx,1.0,true);
         
             // draw axises

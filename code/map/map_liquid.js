@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
 
 //
@@ -9,8 +10,9 @@ import BoundClass from '../../code/utility/bound.js';
 
 export default class MapLiquidClass
 {
-    constructor(bitmap,room)
+    constructor(view,bitmap,room)
     {
+        this.view=view;
         this.bitmap=bitmap;
         
             // pick up some variables from the room
@@ -53,7 +55,7 @@ export default class MapLiquidClass
         
     close()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -76,7 +78,7 @@ export default class MapLiquidClass
         
             // get the y offsets for waves
         
-        let freq=((view.timeStamp%this.LIQUID_WAVE_FREQUENCY)/this.LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
+        let freq=((this.view.timeStamp%this.LIQUID_WAVE_FREQUENCY)/this.LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
         let cs=Math.cos(freq);
         let offY=Math.trunc(cs*this.LIQUID_WAVE_HEIGHT);
         
@@ -122,7 +124,7 @@ export default class MapLiquidClass
     {
         let x,z,iIdx,vIdx,vTopIdx,vBotIdx;
         let nVertex,nSegment,indexes;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // create the buffers
             
@@ -177,7 +179,7 @@ export default class MapLiquidClass
     
     bindBuffers(mapLiquidShader)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
             // water vertices and UVs are always moving
             // so always update these buffers
@@ -201,12 +203,12 @@ export default class MapLiquidClass
 
     draw()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
         
-        view.drawMeshCount++;
-        view.drawMeshTrigCount+=Math.trunc(this.indexCount/3);
+        this.view.drawMeshCount++;
+        this.view.drawMeshTrigCount+=Math.trunc(this.indexCount/3);
     }
     
 }

@@ -27,8 +27,9 @@ class GenModelCreatureBoneClass
 
 export default class GenModelCreatureMeshClass
 {
-    constructor(model,bitmap)
+    constructor(view,model,bitmap)
     {
+        this.view=view;
         this.model=model;
         this.bitmap=bitmap;
         
@@ -863,7 +864,7 @@ export default class GenModelCreatureMeshClass
         
             // add mesh to model
             
-        this.model.mesh=new ModelMeshClass(this.bitmap,modelVertexList,modelIndexes,0);
+        this.model.mesh=new ModelMeshClass(this.view,this.bitmap,modelVertexList,modelIndexes,0);
         if (!inDebug) this.model.mesh.setupBuffers();
         this.model.mesh.precalcAnimationValues(this.model.skeleton);
     }

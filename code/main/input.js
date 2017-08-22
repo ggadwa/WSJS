@@ -89,7 +89,7 @@ export default class InputClass
                 // and make sure a click
                 // unpaused
                 
-            this.view.canvas.onclick=this.clickResume.bind();
+            this.view.canvas.onclick=this.clickResume.bind(this);
         }
         else {
             

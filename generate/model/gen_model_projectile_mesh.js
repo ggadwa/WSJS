@@ -9,8 +9,9 @@ import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 
 export default class GenModelProjectileMeshClass
 {
-    constructor(model,bitmap)
+    constructor(view,model,bitmap)
     {
+        this.view=view;
         this.model=model;
         this.bitmap=bitmap;
         
@@ -133,7 +134,7 @@ export default class GenModelProjectileMeshClass
         
             // add mesh to model
             
-        this.model.mesh=new ModelMeshClass(this.bitmap,vertexList,indexes,0);
+        this.model.mesh=new ModelMeshClass(this.view,this.bitmap,vertexList,indexes,0);
         if (!inDebug) this.model.mesh.setupBuffers();
     }
     

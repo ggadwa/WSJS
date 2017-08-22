@@ -11,8 +11,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomClosetClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         Object.seal(this);
@@ -75,7 +76,7 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
@@ -101,7 +102,7 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
 
             // floor
         
@@ -127,7 +128,7 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
     }
 
         // closet mainline

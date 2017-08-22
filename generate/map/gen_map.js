@@ -316,7 +316,7 @@ export default class GenMapClass
     {
             // build the door
             
-        let genRoomHallway=new GenRoomHallwayClass(this.map);
+        let genRoomHallway=new GenRoomHallwayClass(this.view,this.map);
         let yHallwayBound=new BoundClass(this.yBase,(this.yBase-constants.ROOM_FLOOR_HEIGHT));        // don't count the upper header
 
         if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
@@ -346,7 +346,7 @@ export default class GenMapClass
             xFixtureBound=new BoundClass((fixturePos.x-400),(fixturePos.x+400));
             yFixtureBound=new BoundClass(fixturePos.y,(fixturePos.y+1000));
             zFixtureBound=new BoundClass((fixturePos.z-400),(fixturePos.z+400));
-            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
+            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -756,7 +756,7 @@ export default class GenMapClass
         
             // finally add the liquid
         
-        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.map.getTexture(constants.MAP_TEXTURE_TYPE_LIQUID),room));
+        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_LIQUID),room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room
@@ -807,7 +807,7 @@ export default class GenMapClass
         let n,room,closet;
         let nRoom=this.map.rooms.length;
         
-        closet=new GenRoomClosetClass(this.map);
+        closet=new GenRoomClosetClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -820,7 +820,7 @@ export default class GenMapClass
         let n,room,windows;
         let nRoom=this.map.rooms.length;
         
-        windows=new GenRoomWindowClass(this.map);
+        windows=new GenRoomWindowClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -833,7 +833,7 @@ export default class GenMapClass
         let n,room,ledge;
         let nRoom=this.map.rooms.length;
         
-        ledge=new GenRoomLedgeClass(this.map);
+        ledge=new GenRoomLedgeClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -846,8 +846,8 @@ export default class GenMapClass
         let n,room,platform,stair;
         let nRoom=this.map.rooms.length;
         
-        platform=new GenRoomPlatformClass(this.map);
-        stair=new GenRoomStairsClass(this.map);
+        platform=new GenRoomPlatformClass(this.view,this.map);
+        stair=new GenRoomStairsClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.rooms[n];
@@ -868,12 +868,12 @@ export default class GenMapClass
     {
         let n,room,rects;
         let k,nRect,decorationType;
-        let pillar=new GenRoomDecorationPillarClass(this.map);
-        let storage=new GenRoomDecorationStorageClass(this.map);
-        let computer=new GenRoomDecorationComputerClass(this.map);
-        let pipe=new GenRoomDecorationPipeClass(this.map);
-        let cubicle=new GenRoomDecorationCubicalClass(this.map);
-        let lab=new GenRoomDecorationLabClass(this.map);
+        let pillar=new GenRoomDecorationPillarClass(this.view,this.map);
+        let storage=new GenRoomDecorationStorageClass(this.view,this.map);
+        let computer=new GenRoomDecorationComputerClass(this.view,this.map);
+        let pipe=new GenRoomDecorationPipeClass(this.view,this.map);
+        let cubicle=new GenRoomDecorationCubicalClass(this.view,this.map);
+        let lab=new GenRoomDecorationLabClass(this.view,this.map);
         let nRoom=this.map.rooms.length;
         
         if (!config.ROOM_DECORATIONS) return;

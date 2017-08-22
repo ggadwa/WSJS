@@ -13,8 +13,9 @@ import MovementClass from '../../code/map/movement.js';
 
 export default class GenRoomHallwayClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         Object.seal(this);
@@ -97,7 +98,7 @@ export default class GenRoomHallwayClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
-        mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
+        mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,flags);        
         return(this.map.addMesh(mesh));
     }
 
@@ -202,10 +203,10 @@ export default class GenRoomHallwayClass
             // the frame
         
         xFrameBound=new BoundClass(xBound.min,xBound.min);
-        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
         
         xFrameBound=new BoundClass(xBound.max,xBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
     }
     
     createHallwayDoorZ(xBound,yBound,z,thickSize)
@@ -305,10 +306,10 @@ export default class GenRoomHallwayClass
             // the frame
         
         zFrameBound=new BoundClass(zBound.min,zBound.min);
-        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,true,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,true,false,true));
         
         zFrameBound=new BoundClass(zBound.max,zBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,false,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,false,false,true));
     }
 }
 

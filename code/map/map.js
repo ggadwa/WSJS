@@ -25,8 +25,6 @@ export default class MapClass
 {
     constructor(view,fileCache)
     {
-        let n;
-        
         this.view=view;
         this.fileCache=this.fileCache;
         
@@ -35,7 +33,6 @@ export default class MapClass
 
         this.meshes=[];
         this.lights=[];
-        this.lightmaps=[];
         this.rooms=[];
         this.liquids=[];
 
@@ -49,10 +46,7 @@ export default class MapClass
         this.genBitmapBox=new GenBitmapBoxClass(view);
         this.genBitmapLiquid=new GenBitmapLiquidClass(view);
 
-        this.textureBitmapList=[];
-        for (n=0;n!==constants.MAP_TEXTURE_COUNT;n++) this.textureBitmapList.push(null);      // textures are loaded dynamically as map is made
-        
-        this.lightmapBitmapList=[];
+        this.textureBitmaps=new Map();
 
         this.movementList=new MovementListClass();
         this.overlay=new MapOverlayClass(view,fileCache);
@@ -88,78 +82,62 @@ export default class MapClass
     
     releaseTextures()
     {
-        let n;
-        
-        for (n=0;n!==constants.MAP_TEXTURE_COUNT;n++) {
-            if (this.textureBitmapList[n]!==null) {
-                this.textureBitmapList[n].close();
-                this.textureBitmapList[n]=null;
-            }
+        for (let bitmap of this.textureBitmaps.values()) {
+            bitmap.close();
         }
         
-        for (n=0;n!==this.lightmapBitmapList.length;n++) {
-            this.lightmapBitmapList[n].close();
-        }
-        
-        this.lightmapBitmapList=[];
+        this.textureBitmaps.clear();
     }
     
     getTexture(textureType)
     {
-       if (this.textureBitmapList[textureType]!==null) return(this.textureBitmapList[textureType]);
+        let bitmap=this.textureBitmaps.get(textureType);
+        if (bitmap!==undefined) return(bitmap);
             
         switch (textureType) {
             case constants.MAP_TEXTURE_TYPE_WALL:
             case constants.MAP_TEXTURE_TYPE_PILLAR:
-                this.textureBitmapList[textureType]=this.genBitmapWall.generateRandom(false);
+                bitmap=this.genBitmapWall.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_FLOOR:
             case constants.MAP_TEXTURE_TYPE_PLATFORM:
-                this.textureBitmapList[textureType]=this.genBitmapFloor.generateRandom(false);
+                bitmap=this.genBitmapFloor.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_CEILING:
-                this.textureBitmapList[textureType]=this.genBitmapCeiling.generateRandom(false);
+                bitmap=this.genBitmapCeiling.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_METAL:
-                this.textureBitmapList[textureType]=this.genBitmapMetal.generateRandom(false);
+                bitmap=this.genBitmapMetal.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_DOOR:
             case constants.MAP_TEXTURE_TYPE_FRAME:
-                this.textureBitmapList[textureType]=this.genBitmapDoor.generateRandom(false);
+                bitmap=this.genBitmapDoor.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_COMPUTER:
-                this.textureBitmapList[textureType]=this.genBitmapMachine.generateRandom(false);
+                bitmap=this.genBitmapMachine.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_PANEL:
-                this.textureBitmapList[textureType]=this.genBitmapPanel.generateRandom(false);
+                bitmap=this.genBitmapPanel.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_BOX:
-                this.textureBitmapList[textureType]=this.genBitmapBox.generateRandom(false);
+                bitmap=this.genBitmapBox.generateRandom(false);
                 break;
 
             case constants.MAP_TEXTURE_TYPE_LIQUID:
-                this.textureBitmapList[textureType]=this.genBitmapLiquid.generateRandom(false);
+                bitmap=this.genBitmapLiquid.generateRandom(false);
                 break;
         }
         
-        return(this.textureBitmapList[textureType]);
-    }
-    
-    addLightmapBitmap(bitmap)
-    {
-        this.lightmapBitmapList.push(bitmap);
-    }
-    
-    getLightmapBitmap(idx)
-    {
-        return(this.lightmapBitmapList[idx]);
+        this.textureBitmaps.set(textureType,bitmap);
+        
+        return(bitmap);
     }
     
         //
@@ -171,7 +149,6 @@ export default class MapClass
         let n;
         let nMesh=this.meshes.length;
         let nLiquid=this.liquids.length;
-        let nLightmap=this.lightmaps.length;
 
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].close();
@@ -181,13 +158,8 @@ export default class MapClass
             this.liquids[n].close();
         }
 
-        for (n=0;n!==nLightmap;n++) {
-            this.lightmaps[n].close();
-        }
-
         this.meshes=[];
         this.lights=[];
-        this.lightmaps=[];
         this.rooms=[];
         this.liquids=[];
     }
@@ -211,11 +183,6 @@ export default class MapClass
     {
         this.lights.push(light);
     }
-
-    addLightmap(lightmap)
-    {
-        this.lightmaps.push(lightmap);
-    }
     
     addLiquid(liquid)
     {
@@ -229,7 +196,7 @@ export default class MapClass
         
     addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
     {
-        this.rooms.push(new MapRoomClass(this,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid));
+        this.rooms.push(new MapRoomClass(this.view,this,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid));
         return(this.rooms.length-1);
     }
 
@@ -342,7 +309,7 @@ export default class MapClass
                 // calculate if this lights bounds
                 // are within the frustrum and eliminate if they arent
                 
-            if (!light.isInsideFrustrum()) continue;
+            if (!light.isInsideFrustrum(this.view)) continue;
 
                 // find the light place
                 
@@ -471,9 +438,9 @@ export default class MapClass
         this.overlay.precalcDrawValues();
     }
         
-    overlayDraw()
+    overlayDraw(entityList)
     {
-        this.overlay.draw();
+        this.overlay.draw(entityList);
     }
     
     addOverlayRoom(room)
@@ -556,12 +523,11 @@ export default class MapClass
     {
         let n,mesh;
         let nMesh=this.meshes.length;
-        let currentBitmap,currentLightmap;
+        let currentBitmap;
 
             // setup map drawing
 
         currentBitmap=null;
-        currentLightmap=null;
 
             // draw the meshes
 
@@ -573,16 +539,10 @@ export default class MapClass
             if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
 
                 // time to change bitmap
-                // or lightmap?
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
                 mesh.bitmap.attachAsTexture(this.mapMeshShader);
-            }
-
-            if (mesh.lightmap!==currentLightmap) {
-                currentLightmap=mesh.lightmap;
-                mesh.lightmap.attachAsLightmap();
             }
 
                 // draw the mesh
@@ -661,7 +621,6 @@ export default class MapClass
             if (!this.view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
 
                 // time to change bitmap
-                // or lightmap?
 
             if (liquid.bitmap!==currentBitmap) {
                 currentBitmap=liquid.bitmap;

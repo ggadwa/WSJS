@@ -1,6 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import CollisionClass from '../../code/entities/collisions.js';
 
 //
 // entity base class
@@ -8,8 +9,13 @@ import BoundClass from '../../code/utility/bound.js';
 
 export default class EntityClass
 {
-    constructor(name,position,angle,maxHealth,model)
+    constructor(view,map,entityList,sound,name,position,angle,maxHealth,model)
     {
+        this.view=view;
+        this.map=map;
+        this.entityList=entityList;
+        this.sound=sound;
+        
         this.name=name;
         this.position=position;
         this.angle=angle;
@@ -73,7 +79,7 @@ export default class EntityClass
         
         this.pushMesh=null;
 
-        this.collision=new CollisionClass();
+        this.collision=new CollisionClass(map,entityList);
         
         // no seal, as this object is extended
     }
@@ -349,7 +355,7 @@ export default class EntityClass
             
         if (movePnt.y<0) {
             if (this.standOnMeshIdx===meshIdx) {
-                this.pushMesh=map.getMesh(meshIdx);
+                this.pushMesh=this.map.getMesh(meshIdx);
                 if (this.position.y>=this.pushMesh.yBound.min) {
                     this.position.y=Math.trunc(this.pushMesh.yBound.min)-1;
                 }
@@ -388,7 +394,7 @@ export default class EntityClass
         
             // get the collision line vector
         
-        collisionLine=map.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
+        collisionLine=this.map.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
         this.reflectLineVector.setFromSubPoint(collisionLine.p1,collisionLine.p2);
 	
             // now get the angle between them,
@@ -570,7 +576,7 @@ export default class EntityClass
     setupCurrentRoom()
     {
         let n,room;
-        let nRoom=map.rooms.length;
+        let nRoom=this.map.rooms.length;
         
             // check if still in the current
             // room
@@ -580,7 +586,7 @@ export default class EntityClass
         }
         
         for (n=0;n!==nRoom;n++) {
-            room=map.rooms[n];
+            room=this.map.rooms[n];
             if (room.posInRoom(this.position)) {
                 this.currentRoom=room;
                 return;

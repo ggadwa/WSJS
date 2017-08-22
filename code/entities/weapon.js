@@ -6,9 +6,11 @@ import PointClass from '../../code/utility/point.js';
 
 export default class WeaponClass
 {
-    constructor(model)
+    constructor(view,model)
     {
+        this.view=view;
         this.model=model;
+        
         this.projectiles=[];
 
         this.lastFireTimeStamp=0;
@@ -38,9 +40,9 @@ export default class WeaponClass
     {
             // time to fire again?
             
-        if (view.timeStamp<this.lastFireTimeStamp) return;
+        if (this.view.timeStamp<this.lastFireTimeStamp) return;
         
-        this.lastFireTimeStamp=view.timeStamp+1000;
+        this.lastFireTimeStamp=this.view.timeStamp+1000;
         
             // create projectile
             

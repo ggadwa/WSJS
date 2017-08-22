@@ -10,8 +10,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomPlatformClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         Object.seal(this);
@@ -25,7 +26,7 @@ export default class GenRoomPlatformClass
     {
         let rx,rz,xBound,yBound,zBound;
         let y=(room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*story));
-        let genRoomStairs=new GenRoomStairsClass(this.map);
+        let genRoomStairs=new GenRoomStairsClass(this.view,this.map);
 
         rx=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
         xBound=new BoundClass(rx,(rx+constants.ROOM_BLOCK_WIDTH));
@@ -56,7 +57,7 @@ export default class GenRoomPlatformClass
         if (story!==0) {
             yBound.min=yBound.max;
             yBound.max=room.yBound.max;
-            this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_STAIR));
+            this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_STAIR));
         }
         
             // block the stairs off from any decorations
@@ -96,7 +97,7 @@ export default class GenRoomPlatformClass
         let yPlatformBound=new BoundClass(y,(y+constants.ROOM_FLOOR_DEPTH));
         let zPlatformBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
         
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,constants.MESH_FLAG_PLATFORM));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,constants.MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             // a cleared spot is a spot that's open

@@ -1,3 +1,5 @@
+import EntityProjectileClass from '../../code/entities/entity_projectile.js';
+
 //
 // entity list class
 //

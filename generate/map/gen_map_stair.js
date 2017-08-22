@@ -11,8 +11,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomStairsClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         Object.seal(this);
@@ -110,7 +111,7 @@ export default class GenRoomStairsClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
-        mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);        
+        mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,flags);        
         this.map.addMesh(mesh);
     }
 

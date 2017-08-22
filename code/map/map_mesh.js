@@ -29,15 +29,13 @@ class MapMeshSharedTrigCacheClass
 
 export default class MapMeshClass
 {
-    constructor(bitmap,vertexList,indexes,flag)
+    constructor(view,bitmap,vertexList,indexes,flag)
     {
+        this.view=view;
         this.bitmap=bitmap;
-        this.lightmap=null;
         this.vertexList=vertexList;
         this.indexes=indexes;
         this.flag=flag;
-
-        this.tempLightmapIdx=0;         // used to track light maps when building them, not used otherwise
 
         this.vertexCount=this.vertexList.length;
         this.indexCount=this.indexes.length;
@@ -101,7 +99,7 @@ export default class MapMeshClass
 
     close()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -505,7 +503,7 @@ export default class MapMeshClass
     {
         let n,v;
         let vIdx,uIdx,nIdx,tIdx;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // build the default data
             // from the vertex list
@@ -566,7 +564,7 @@ export default class MapMeshClass
 
     bindBuffers(mapMeshShader)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.vertexAttribPointer(mapMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
@@ -596,7 +594,7 @@ export default class MapMeshClass
     updateBuffers()
     {
         let n,v,vIdx;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
         if (!this.requiresBufferUpdate) return;
         
@@ -652,9 +650,9 @@ export default class MapMeshClass
                 
             v=this.vertexList[this.indexes[idx]];
             
-            x=v.position.x-view.camera.position.x;      // cullTrigToEyeVector.setFromSubPoint(v.position,view.camera.position)
-            y=v.position.y-view.camera.position.y;
-            z=v.position.z-view.camera.position.z;
+            x=v.position.x-this.view.camera.position.x;      // cullTrigToEyeVector.setFromSubPoint(v.position,this.view.camera.position)
+            y=v.position.y-this.view.camera.position.y;
+            z=v.position.z-this.view.camera.position.z;
             
             f=Math.sqrt((x*x)+(y*y)+(z*z));   // cullTrigToEyeVector.normalize();
             if (f!==0.0) f=1.0/f;
@@ -665,7 +663,7 @@ export default class MapMeshClass
             
                 // dot product
                 
-            if (((x*v.normal.x)+(y*v.normal.y)+(z*v.normal.z))<=view.VIEW_NORMAL_CULL_LIMIT) {      // this.cullTrigToEyeVector.dot(v.normal)
+            if (((x*v.normal.x)+(y*v.normal.y)+(z*v.normal.z))<=this.view.VIEW_NORMAL_CULL_LIMIT) {      // this.cullTrigToEyeVector.dot(v.normal)
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+1];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+2];
@@ -681,11 +679,11 @@ export default class MapMeshClass
 
     draw()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         
-        view.drawMeshCount++;
-        view.drawMeshTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
+        this.view.drawMeshCount++;
+        this.view.drawMeshTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
     }
 }

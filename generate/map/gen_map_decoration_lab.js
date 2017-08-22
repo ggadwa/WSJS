@@ -10,8 +10,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationLabClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         this.tubeBaseSize=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.25));
@@ -42,12 +43,12 @@ export default class GenRoomDecorationLabClass
         
         yMid=(room.yBound.max-this.tubeBaseSize);
         yBound=new BoundClass(yMid,room.yBound.max);
-        mesh=MeshPrimitivesClass.createMeshCylinderSimple(platformBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,platformBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         this.map.addMesh(mesh);
 
         yBound=new BoundClass((room.yBound.max-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)),(room.yBound.max-constants.ROOM_FLOOR_HEIGHT));
-        mesh=MeshPrimitivesClass.createMeshCylinderSimple(platformBitmap,centerPnt,yBound,radius,true,true,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,platformBitmap,centerPnt,yBound,radius,true,true,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         this.map.addMesh(mesh);
 
@@ -57,7 +58,7 @@ export default class GenRoomDecorationLabClass
         
         radius=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3);
 
-        mesh=MeshPrimitivesClass.createMeshCylinderSimple(metalBitmap,centerPnt,yBound,radius,false,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,metalBitmap,centerPnt,yBound,radius,false,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         this.map.addMesh(mesh);
     }
@@ -84,7 +85,7 @@ export default class GenRoomDecorationLabClass
         zBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
 
         yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
         
             // the pump
         
@@ -95,7 +96,7 @@ export default class GenRoomDecorationLabClass
         zBound.max-=reduceSize;
 
         yBound=new BoundClass((room.yBound.max-Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.5)),(room.yBound.max-constants.ROOM_FLOOR_DEPTH));
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
     }
         
         //

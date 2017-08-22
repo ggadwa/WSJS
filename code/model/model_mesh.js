@@ -10,8 +10,9 @@ import ModelMeshVertexClass from '../../code/model/model_mesh_vertex.js';
 
 export default class ModelMeshClass
 {
-    constructor(bitmap,vertexList,indexes,flag)
+    constructor(view,bitmap,vertexList,indexes,flag)
     {
+        this.view=view;
         this.bitmap=bitmap;
         this.vertexList=vertexList;
         this.indexes=indexes;
@@ -69,7 +70,7 @@ export default class ModelMeshClass
 
     close()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -96,7 +97,7 @@ export default class ModelMeshClass
             // only the internal gl arrays so we can just re-use the
             // data
         
-        let mesh=new ModelMeshClass(this.bitmap,this.vertexList,this.indexes,this.flag);
+        let mesh=new ModelMeshClass(this.view,this.bitmap,this.vertexList,this.indexes,this.flag);
         mesh.isClone=true;
         
         return(mesh);
@@ -196,7 +197,7 @@ export default class ModelMeshClass
     {
         let n,v,vIdx,nIdx;
         let bone,parentBone;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // move all the vertexes
             
@@ -270,7 +271,7 @@ export default class ModelMeshClass
     updateVertexesToAngleAndPosition(angle,position)
     {
         let n,v,vIdx,nIdx;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // move all the vertexes
             
@@ -311,7 +312,7 @@ export default class ModelMeshClass
     setupBuffers()
     {
         let n,v,vIdx,uIdx,nIdx,tIdx;
-        let gl=view.gl;
+        let gl=this.view.gl;
         
             // build the default buffer data
             // from the vertex list
@@ -370,7 +371,7 @@ export default class ModelMeshClass
 
     bindBuffers(modelMeshShader)
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.vertexAttribPointer(modelMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
@@ -423,9 +424,9 @@ export default class ModelMeshClass
         
         for (n=0;n!==this.vertexCount;n++) {
             
-            x=this.drawVertices[vIdx]-view.camera.position.x;      // cullPnt.setFromValues(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
-            y=this.drawVertices[vIdx+1]-view.camera.position.y;     // cullTrigToEyeVector.setFromSubPoint(this.cullPnt,view.camera.position);
-            z=this.drawVertices[vIdx+2]-view.camera.position.z;
+            x=this.drawVertices[vIdx]-this.view.camera.position.x;      // cullPnt.setFromValues(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
+            y=this.drawVertices[vIdx+1]-this.view.camera.position.y;     // cullTrigToEyeVector.setFromSubPoint(this.cullPnt,this.view.camera.position);
+            z=this.drawVertices[vIdx+2]-this.view.camera.position.z;
             
             f=Math.sqrt((x*x)+(y*y)+(z*z));   // cullTrigToEyeVector.normalize();
             if (f!==0.0) f=1.0/f;
@@ -434,7 +435,7 @@ export default class ModelMeshClass
             y=y*f;
             z=z*f;
 
-            this.nonCulledVertexes[n]=(((x*this.drawNormals[vIdx])+(y*this.drawNormals[vIdx+1])+(z*this.drawNormals[vIdx+2]))<=view.VIEW_NORMAL_CULL_LIMIT);     // cullTrigToEyeVector.dot( ... cullNormal.setFromValues(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]) ...)
+            this.nonCulledVertexes[n]=(((x*this.drawNormals[vIdx])+(y*this.drawNormals[vIdx+1])+(z*this.drawNormals[vIdx+2]))<=this.view.VIEW_NORMAL_CULL_LIMIT);     // cullTrigToEyeVector.dot( ... cullNormal.setFromValues(this.drawNormals[vIdx],this.drawNormals[vIdx+1],this.drawNormals[vIdx+2]) ...)
             
             vIdx=vIdx+3;      // supergumba -- chrome complains about idx+=3, so we do this for now
         }
@@ -462,12 +463,12 @@ export default class ModelMeshClass
 
     draw()
     {
-        let gl=view.gl;
+        let gl=this.view.gl;
 
         gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         
-        view.drawModelCount++;
-        view.drawModelTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
+        this.view.drawModelCount++;
+        this.view.drawModelTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
     }
 
 }

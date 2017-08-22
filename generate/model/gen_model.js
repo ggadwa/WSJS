@@ -10,8 +10,10 @@ import GenModelProjectileMeshClass from '../../generate/model/gen_model_projecti
 
 export default class GenModelClass
 {
-    constructor()
+    constructor(view)
     {
+        this.view=view;
+        
         this.TYPE_CREATURE=0;
         this.TYPE_WEAPON=1;
         this.TYPE_PROJECTILE=2;
@@ -31,17 +33,17 @@ export default class GenModelClass
             case this.TYPE_CREATURE:
                 genSkeleton=new GenModelCreatureSkeletonClass(model,sizeFactor);
                 genSkeleton.build();
-                genMesh=new GenModelCreatureMeshClass(model,modelBitmap);
+                genMesh=new GenModelCreatureMeshClass(this.view,model,modelBitmap);
                 genMesh.build(inDebug);
                 break;
                 
             case this.TYPE_WEAPON:
-                genMesh=new GenModelWeaponMeshClass(model,modelBitmap);
+                genMesh=new GenModelWeaponMeshClass(this.view,model,modelBitmap);
                 genMesh.build(inDebug);
                 break;
                 
             case this.TYPE_PROJECTILE:
-                genMesh=new GenModelProjectileMeshClass(model,modelBitmap);
+                genMesh=new GenModelProjectileMeshClass(this.view,model,modelBitmap);
                 genMesh.build(inDebug);
                 break;
         }

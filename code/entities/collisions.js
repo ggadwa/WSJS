@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import LineClass from '../../code/utility/line.js';
 import BoundClass from '../../code/utility/bound.js';
@@ -8,8 +9,11 @@ import BoundClass from '../../code/utility/bound.js';
 
 export default class CollisionClass
 {
-    constructor()
+    constructor(map,entityList)
     {
+        this.map=map;
+        this.entityList=entityList;
+        
         this.BUMP_HIGH=1000;
 
         this.spokePt=new PointClass(0,0,0);        // these are global to avoid it being local and GCd
@@ -153,8 +157,8 @@ export default class CollisionClass
         let radius=entity.radius;
         let high=entity.high;
         
-        let nMesh=map.meshes.length;
-        let nEntity=entityList.countEntity();
+        let nMesh=this.map.meshes.length;
+        let nEntity=this.entityList.countEntity();
         
             // only bump once
             
@@ -193,7 +197,7 @@ export default class CollisionClass
                 // check against collision lines
 
             for (n=0;n!==nMesh;n++) {
-                mesh=map.meshes[n];
+                mesh=this.map.meshes[n];
                 
                     // skip any mesh we don't collide with
                     
@@ -233,7 +237,7 @@ export default class CollisionClass
                 // check other entities
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=entityList.getEntity(n);
+                checkEntity=this.entityList.getEntity(n);
                 if (checkEntity.id===entity.id) continue;
                 
                 checkEntityPt=checkEntity.position;
@@ -322,10 +326,10 @@ export default class CollisionClass
         this.objYBound.setFromValues((entity.position.y-fallY),(entity.position.y+fallY));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
-        nMesh=map.meshes.length;
+        nMesh=this.map.meshes.length;
         
         for (n=0;n!==nMesh;n++) {
-            mesh=map.meshes[n];
+            mesh=this.map.meshes[n];
             
                 // skip walls or ceilings
                 
@@ -374,10 +378,10 @@ export default class CollisionClass
         
             // run through the meshes
         
-        nMesh=map.meshes.length;
+        nMesh=this.map.meshes.length;
         
         for (n=0;n!==nMesh;n++) {
-            mesh=map.meshes[n];
+            mesh=this.map.meshes[n];
             
                 // skip walls
                 

@@ -34,8 +34,9 @@ class MapRoomFaceClass
 
 export default class MapRoomClass
 {
-    constructor(map,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
+    constructor(view,map,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
     {
+        this.view=view;
         this.map=map;
         
         this.pathType=pathType;
@@ -694,7 +695,7 @@ export default class MapRoomClass
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,true);
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        return(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
     }
     
         //
@@ -822,7 +823,7 @@ export default class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
+        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
     }
     
     createMeshCeiling(bitmap)
@@ -895,7 +896,7 @@ export default class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
+        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
     }
     
         //

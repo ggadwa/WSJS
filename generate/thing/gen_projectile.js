@@ -1,3 +1,4 @@
+import ProjectileClass from '../../code/entities/projectile.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -6,8 +7,12 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenProjectileClass
 {
-    constructor(modelList,genSound)
+    constructor(view,map,entityList,sound,modelList,genSound)
     {
+        this.view=view;
+        this.map=map;
+        this.entityList=entityList;
+        this.sound=sound;
         this.modelList=modelList;
         this.genSound=genSound;
         
@@ -16,7 +21,7 @@ export default class GenProjectileClass
 
     generate(isPlayer)
     {
-        let projectile=new ProjectileClass(this.modelList.getModel('projectile_0'));
+        let projectile=new ProjectileClass(this.view,this.map,this.entityList,this.sound,this.modelList.getModel('projectile_0'));
         
         projectile.setLifeTick(10000);
         projectile.setFireSoundBuffer(this.genSound.generate(this.genSound.TYPE_GUN_FIRE,false));

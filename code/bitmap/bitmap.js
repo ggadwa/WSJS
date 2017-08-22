@@ -109,14 +109,6 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
     
-    attachAsLightmap()
-    {
-        let gl=this.view.gl;
-
-        gl.activeTexture(gl.TEXTURE4);
-        gl.bindTexture(gl.TEXTURE_2D,this.texture);
-    }
-    
     attachAsLiquid()
     {
         let gl=this.view.gl;

@@ -1,6 +1,3 @@
-ES6
-    [ ] static properties on class, redo these: MapRoomConstantsClass, ModelLimbConstantsClass, ModelConstantsClass (search all constants)
-
 When interface created
     [ ] close gl
     [ ] all the object release()
@@ -12,15 +9,10 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
----> make calls to separate bitmap generators part of bitmap (like model, get rid of all the import references)
 
----> SOUNDCLASS is different from the other classes (make part of soundlist?)
----> turn FileClass into a MAP and remove
----> machine computer is weird
-
-
-
-
+--> change around sound, so we have soundList, not sound.xxx
+--> replace all MAP_TEXTURE_TYPE_ with generic bitmap types, in constants
+--> make genBitmap be a single call, like genModel/genSound
 
 
 
@@ -31,6 +23,7 @@ ToDos
         [X] mapRoomConstants.ROOM_DECORATION_PILLARS:
         [X] mapRoomConstants.ROOM_DECORATION_STORAGE:
         [X] mapRoomConstants.ROOM_DECORATION_COMPUTER:
+              - computer panel has square around lights
         [ ] mapRoomConstants.ROOM_DECORATION_PIPE:
         [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
               - raised chunk of floor with stairs

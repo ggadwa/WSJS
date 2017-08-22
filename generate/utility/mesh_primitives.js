@@ -20,7 +20,7 @@ export default class MeshPrimitivesClass
         // create cube
         //
 
-    static createMeshRotatedCube(bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,flags)
+    static createMeshRotatedCube(view,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,flags)
     {
         let vertexList,count,idx,centerPt;
         let n,indexes;
@@ -130,12 +130,12 @@ export default class MeshPrimitivesClass
 
             // finally create the mesh
 
-        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+        return(new MapMeshClass(view,bitmap,vertexList,indexes,flags));
     }
     
-    static createMeshCube(bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,flags)
+    static createMeshCube(view,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,flags)
     {
-        return(this.createMeshRotatedCube(bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,flags));
+        return(this.createMeshRotatedCube(view,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,flags));
     }
     
     static meshCubeSetWholeUV(mesh)
@@ -208,7 +208,7 @@ export default class MeshPrimitivesClass
         // create wedge
         //
 
-    static createMeshWedge(bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,back,top,bottom,normalsIn,flags)
+    static createMeshWedge(view,bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,back,top,bottom,normalsIn,flags)
     {
         let n,v,idx,count,centerPnt,topIdx,botIdx;
         let vertexList,indexes;
@@ -362,14 +362,14 @@ export default class MeshPrimitivesClass
 
             // finally create the mesh
 
-        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+        return(new MapMeshClass(view,bitmap,vertexList,indexes,flags));
     }
 
         //
         // create pryamid
         //
 
-    static createMeshPryamid(bitmap,xBound,yBound,zBound,rotAngle,flags)
+    static createMeshPryamid(view,bitmap,xBound,yBound,zBound,rotAngle,flags)
     {
         let n,idx,centerPnt,vertexList,indexes;
         let x=xBound.getMidPoint();
@@ -418,7 +418,7 @@ export default class MeshPrimitivesClass
 
             // finally create the mesh
 
-        return(new MapMeshClass(bitmap,vertexList,indexes,flags));
+        return(new MapMeshClass(view,bitmap,vertexList,indexes,flags));
     }
     
         //
@@ -442,7 +442,7 @@ export default class MeshPrimitivesClass
         return(segments);
     }
         
-    static createMeshCylinder(bitmap,centerPt,yBound,segments,radius,top,bot,flags)
+    static createMeshCylinder(view,bitmap,centerPt,yBound,segments,radius,top,bot,flags)
     {
         let n,k,t,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let topRad,botRad;
@@ -638,18 +638,18 @@ export default class MeshPrimitivesClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(bitmap,vertexList,indexes,flags);
+        mesh=new MapMeshClass(view,bitmap,vertexList,indexes,flags);
         mesh.simpleCollisionGeometry=true;
         
         return(mesh);
     }
     
-    static createMeshCylinderSimple(bitmap,centerPt,yBound,radius,top,bot,flags)
+    static createMeshCylinderSimple(view,bitmap,centerPt,yBound,radius,top,bot,flags)
     {
         let mesh;
         let segments=[1.0,1.0];
         
-        mesh=this.createMeshCylinder(bitmap,centerPt,yBound,segments,radius,top,bot,flags);
+        mesh=this.createMeshCylinder(view,bitmap,centerPt,yBound,segments,radius,top,bot,flags);
         mesh.simpleCollisionGeometry=true;
         
         return(mesh);
@@ -664,7 +664,7 @@ export default class MeshPrimitivesClass
         // frames
         //
         
-    static createFrameX(bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
+    static createFrameX(view,bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
     {
         let xFrameBound=new BoundClass(0,0);
         let yFrameBound=new BoundClass(0,0);
@@ -684,18 +684,18 @@ export default class MeshPrimitivesClass
         
         yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
         zFrameBound.setFromValues((zBound.min-halfSz),(zBound.min+halfSz));
-        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
         
         zFrameBound.setFromValues((zBound.max-halfSz),(zBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
         zFrameBound.setFromValues((zBound.min-halfSz),(zBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         if (!skipBottom) {
             yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
             // the inner bars
@@ -704,18 +704,18 @@ export default class MeshPrimitivesClass
             y=yBound.getMidPoint();
             yFrameBound.setFromValues((y-halfSz),(y+halfSz));
             zFrameBound.setFromValues((zBound.min+halfSz),(zBound.max-halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
             z=zBound.getMidPoint();
             yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
             zFrameBound.setFromValues((z-halfSz),(z+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
         return(mesh);
     }
     
-    static createFrameZ(bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
+    static createFrameZ(view,bitmap,xBound,yBound,zBound,flip,bars,skipBottom)
     {
         let xFrameBound=new BoundClass(0,0);
         let yFrameBound=new BoundClass(0,0);
@@ -735,18 +735,18 @@ export default class MeshPrimitivesClass
         
         yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
         xFrameBound.setFromValues((xBound.min-halfSz),(xBound.min+halfSz));
-        mesh=MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
         
         xFrameBound.setFromValues((xBound.max-halfSz),(xBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         yFrameBound.setFromValues((yBound.min-halfSz),(yBound.min+halfSz));
         xFrameBound.setFromValues((xBound.min-halfSz),(xBound.max+halfSz));
-        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
         if (!skipBottom) {
             yFrameBound.setFromValues((yBound.max-halfSz),(yBound.max+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
             // the inner bars
@@ -755,12 +755,12 @@ export default class MeshPrimitivesClass
             y=yBound.getMidPoint();
             yFrameBound.setFromValues((y-halfSz),(y+halfSz));
             xFrameBound.setFromValues((xBound.min+halfSz),(xBound.max-halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
             x=xBound.getMidPoint();
             yFrameBound.setFromValues((yBound.min+halfSz),(yBound.max-halfSz));
             xFrameBound.setFromValues((x-halfSz),(x+halfSz));
-            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+            mesh.combineMesh(MeshPrimitivesClass.createMeshCube(view,bitmap,xFrameBound,yFrameBound,zFrameBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         }
         
         return(mesh);

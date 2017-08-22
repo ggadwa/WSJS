@@ -1,11 +1,14 @@
+import WeaponClass from '../../code/entities/weapon.js';
+
 //
 // generate weapon class
 //
 
 export default class GenWeaponClass
 {
-    constructor(modelList,genSound)
+    constructor(view,modelList,genSound)
     {
+        this.view=view;
         this.modelList=modelList;
         this.genSound=genSound;
         
@@ -14,6 +17,6 @@ export default class GenWeaponClass
     
     generate()
     {
-        return(new WeaponClass(this.modelList.getModel('weapon_0')));
+        return(new WeaponClass(this.view,this.modelList.getModel('weapon_0')));
     }
 }

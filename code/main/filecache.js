@@ -1,24 +1,11 @@
 // these functions are used so we can asyc load up the files
 // we need without breaking the initialization process up
 
-// the files to cache
-
-class FileClass
-{
-    constructor(name,data)
-    {
-        this.name=name;
-        this.data=data;
-        
-        Object.seal(this);
-    }
-}
-
 export default class FileCacheClass
 {
     constructor()
     {
-        this.files=[];
+        this.files=new Map();
         
             // all the files we need to load for this
             // engine, all fragment and vertex shaders
@@ -90,7 +77,7 @@ export default class FileCacheClass
     {
             // put file in cache
 
-        this.files.push(new FileClass(this.fileNames[idx],data));
+        this.files.set(this.fileNames[idx],data);
 
             // finished?
 
@@ -111,13 +98,6 @@ export default class FileCacheClass
         
     getFile(name)
     {
-        let n;
-        let nFile=this.files.length;
-        
-        for (n=0;n!==nFile;n++) {
-            if (this.files[n].name===name) return(this.files[n].data);
-        }
-
-        return(null);
+        return(this.files.get(name));
     }
 }

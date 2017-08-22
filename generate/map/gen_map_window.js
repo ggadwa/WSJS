@@ -12,8 +12,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomWindowClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         Object.seal(this);
@@ -100,22 +101,22 @@ export default class GenRoomWindowClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // the window casing
         
         switch (connectSide) {
             case constants.ROOM_SIDE_LEFT:
-                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_RIGHT:
-                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
                 break;
             case constants.ROOM_SIDE_TOP:
-                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_BOTTOM:
-                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
+                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zBound,true,true,false));
                 break;
         }
     }

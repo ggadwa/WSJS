@@ -4,6 +4,7 @@ import PointClass from '../../code/utility/point.js';
 import FileCacheClass from '../../code/main/filecache.js';
 import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
+import ModelClass from '../../code/model/model.js';
 import ModelListClass from '../../code/model/model_list.js';
 import SkyClass from '../../code/sky/sky.js';
 import EntityListClass from '../../code/entities/entity_list.js';
@@ -15,7 +16,11 @@ import GenMapClass from '../../generate/map/gen_map.js';
 import GenModelClass from '../../generate/model/gen_model.js';
 import GenWeaponClass from '../../generate/thing/gen_weapon.js';
 import GenProjectileClass from '../../generate/thing/gen_projectile.js';
+import GenSoundClass from '../../generate/sound/gen_sound.js';
+import GenAIClass from '../../generate/thing/gen_ai.js';
+import EntityPlayerClass from '../../code/entities/entity_player.js';
 import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
+import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -122,7 +127,7 @@ class MainClass
     initBuildPlayerModel(genBitmapSkin)
     {
         let model,modelBitmap;
-        let genModel=new GenModelClass();
+        let genModel=new GenModelClass(this.view);
 
             // build the player model
         
@@ -244,8 +249,8 @@ class MainClass
         let monsterAIs;
         
         let genSound=new GenSoundClass(this.sound.getAudioContext());
-        let genProjectile=new GenProjectileClass(this.modelList,genSound);
-        let genWeapon=new GenWeaponClass(this.modelList,genSound);
+        let genProjectile=new GenProjectileClass(this.view,this.map,this.entityList,this.sound,this.modelList,genSound);
+        let genWeapon=new GenWeaponClass(this.view,this.modelList,genSound);
         let genAI=new GenAIClass(genProjectile,genSound);
 
             // make player entity
@@ -256,7 +261,7 @@ class MainClass
             return;
         }
 
-        playerEntity=new EntityPlayerClass('player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
+        playerEntity=new EntityPlayerClass(this.map,this.map,this.entityList,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
         playerWeapon=genWeapon.generate();
@@ -284,7 +289,7 @@ class MainClass
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
             model=this.modelList.cloneModel('monster_'+monsterType);
-            this.entityList.addEntity(new EntityMonsterClass(('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            this.entityList.addEntity(new EntityMonsterClass(this.view,this.map,this.entityList,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
         
             // boss monster
@@ -292,7 +297,7 @@ class MainClass
         if (config.MONSTER_BOSS) {
             pos=this.map.findRandomBossPosition();
             model=this.modelList.cloneModel('boss');
-            if (pos!==null) this.entityList.addEntity(new EntityMonsterClass('boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
+            if (pos!==null) this.entityList.addEntity(new EntityMonsterClass(this.view,this.map,this.entityList,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 
             // finished
@@ -357,7 +362,9 @@ function mainLoop(timeStamp)
     let view=main.view;
     let map=main.map;
     let entityList=main.entityList;
+    let particleList=main.particleList;
     let sky=main.sky;
+    let sound=main.sound;
     
         // next frame
         
@@ -370,7 +377,7 @@ function mainLoop(timeStamp)
     
         // run the input
         
-    if (!view.paused) this.input.run();
+    if (!view.paused) main.input.run();
     
         // map movement, entities, and
         // other physics, we only do this if we've
@@ -391,7 +398,7 @@ function mainLoop(timeStamp)
                     view.physicsTick-=constants.PHYSICS_MILLISECONDS;
                     view.lastPhysicTimeStamp+=constants.PHYSICS_MILLISECONDS;
 
-                    this.entityList.run();
+                    entityList.run();
                 }
             }
             else {
@@ -401,7 +408,7 @@ function mainLoop(timeStamp)
                 // update the listener and all current
                 // playing sound positions
                 
-            this.sound.update();
+            sound.update();
         }
     }
     
@@ -415,7 +422,7 @@ function mainLoop(timeStamp)
     if (view.drawTick>constants.DRAW_MILLISECONDS) {
         view.lastDrawTimeStamp=view.timeStamp; 
 
-        view.draw(map,sky);
+        view.draw(map,sky,entityList,particleList);
         
         view.fpsTotal+=view.drawTick;
         view.fpsCount++;

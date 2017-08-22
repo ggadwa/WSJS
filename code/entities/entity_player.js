@@ -1,4 +1,5 @@
 import config from '../../code/main/config.js';
+import EntityClass from '../../code/entities/entity.js';
 
 //
 // player entity class
@@ -6,9 +7,9 @@ import config from '../../code/main/config.js';
 
 export default class EntityPlayerClass extends EntityClass
 {
-    constructor(name,position,angle,maxHealth,model)
+    constructor(view,map,entityList,sound,name,position,angle,maxHealth,model)
     {
-        super(name,position,angle,maxHealth,model);
+        super(view,map,entityList,sound,name,position,angle,maxHealth,model);
         
             // entity setup
             

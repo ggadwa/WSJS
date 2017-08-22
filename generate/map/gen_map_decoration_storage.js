@@ -10,8 +10,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationStorageClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
             // give all these decorations the same general
@@ -60,7 +61,7 @@ export default class GenRoomDecorationStorageClass
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
             
             rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-            mesh=MeshPrimitivesClass.createMeshRotatedCube(boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
+            mesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
             MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
             this.map.addMesh(mesh);
 
@@ -127,7 +128,7 @@ export default class GenRoomDecorationStorageClass
 
                 // the table
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,tableXBound,tableYBound,tableZBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,shelfBitmap,tableXBound,tableYBound,tableZBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
             if (mesh===null) {
                 mesh=mesh2;
             }
@@ -137,16 +138,16 @@ export default class GenRoomDecorationStorageClass
             
                 // legs
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMinBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,shelfBitmap,legXMinBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMinBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,shelfBitmap,legXMinBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMaxBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,shelfBitmap,legXMaxBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(shelfBitmap,legXMaxBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,shelfBitmap,legXMaxBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
             
                 // items on self
@@ -163,7 +164,7 @@ export default class GenRoomDecorationStorageClass
                 boxZBound.setFromValues((bz-boxSize),(bz+boxSize));
 
                 rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-                boxMesh=MeshPrimitivesClass.createMeshRotatedCube(boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
+                boxMesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(boxMesh);
                 this.map.addMesh(boxMesh);
             }

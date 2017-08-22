@@ -137,7 +137,7 @@ export default class ParticleListClass
                 // calculate if this lights bounds
                 // are within the frustrum and eliminate if they arent
                 
-            if (!light.isInsideFrustrum()) continue;
+            if (!light.isInsideFrustrum(this.view)) continue;
 
                 // find the light place
                 

@@ -1,5 +1,6 @@
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
+import EntityClass from '../../code/entities/entity.js';
 
 //
 // monster entity class
@@ -7,9 +8,9 @@ import PointClass from '../../code/utility/point.js';
 
 export default class EntityMonsterClass extends EntityClass
 {
-    constructor(name,position,angle,maxHealth,model,ai)
+    constructor(view,map,entityList,sound,name,position,angle,maxHealth,model,ai)
     {
-        super(name,position,angle,maxHealth,model);
+        super(view,map,entityList,sound,name,position,angle,maxHealth,model);
         
             // entity setup
             
@@ -162,11 +163,11 @@ export default class EntityMonsterClass extends EntityClass
             // make it the player, and if our old
             // enemy got deleted, revert back to player
             
-        if (this.enemyId===-1) this.enemyId=entityList.getPlayer().id;
+        if (this.enemyId===-1) this.enemyId=this.entityList.getPlayer().id;
         
-        enemy=entityList.findEntityById(this.enemyId);
+        enemy=this.entityList.findEntityById(this.enemyId);
         if (enemy===null) {
-            enemy=entityList.getPlayer();
+            enemy=this.entityList.getPlayer();
             this.enemyId=enemy.id;
         }
         

@@ -1,11 +1,17 @@
+import EntityProjectileClass from '../../code/entities/entity_projectile.js';
+
 //
 // projectile class
 //
 
 export default class ProjectileClass
 {
-    constructor(model)
+    constructor(view,map,entityList,sound,model)
     {
+        this.view=view;
+        this.map=map;
+        this.entityList=entityList;
+        this.sound=sound;
         this.model=model;
         
         this.speed=0;
@@ -78,8 +84,8 @@ export default class ProjectileClass
     
     fire(parentEntityId,pos,ang)
     {
-        let entity=new EntityProjectileClass('projectile',parentEntityId,pos,ang,this);
-        entityList.addEntity(entity);
+        let entity=new EntityProjectileClass(this.view,this.map,this.entityList,this.sound,'projectile',parentEntityId,pos,ang,this);
+        this.entityList.addEntity(entity);
         
         sound.play(entity,this.fireSoundBuffer);
     }

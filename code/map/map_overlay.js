@@ -2,6 +2,7 @@ import Point2DIntClass from '../../code/utility/2D_int_point.js';
 import Line2DClass from '../../code/utility/2D_line.js';
 import RectClass from '../../code/utility/rect.js';
 import ColorClass from '../../code/utility/color.js';
+import EntityProjectileClass from '../../code/entities/entity_projectile.js';
 import MapOverlayShaderClass from '../../code/map/map_overlay_shader.js';
 
 //
@@ -422,7 +423,7 @@ export default class MapOverlayClass
         // draw the map overlay
         //
         
-    draw()
+    draw(entityList)
     {
         let n,x,y;
         let p1,p2,p3;

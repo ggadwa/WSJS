@@ -9,8 +9,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationCubicalClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         Object.seal(this);
@@ -45,14 +46,14 @@ export default class GenRoomDecorationCubicalClass
             if (!((skipWall===constants.ROOM_SIDE_LEFT) && (skipIdx===n))) {
                 dx=room.xBound.min+(rect.lft*constants.ROOM_BLOCK_WIDTH);
                 xBound=new BoundClass(dx,(dx+wid));
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+                this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
                 this.map.addOverlayDecorationWall(dx,dz,dx,(dz+constants.ROOM_BLOCK_WIDTH));
             }
             
             if (!((skipWall===constants.ROOM_SIDE_RIGHT) && (skipIdx===n))) {
                 dx=room.xBound.min+(rect.rgt*constants.ROOM_BLOCK_WIDTH);
                 xBound=new BoundClass((dx-wid),dx);
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+                this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
                 this.map.addOverlayDecorationWall(dx,dz,dx,(dz+constants.ROOM_BLOCK_WIDTH));
             }
         }
@@ -66,14 +67,14 @@ export default class GenRoomDecorationCubicalClass
             if (!((skipWall===constants.ROOM_SIDE_TOP) && (skipIdx===n))) {
                 dz=room.zBound.min+(rect.top*constants.ROOM_BLOCK_WIDTH);
                 zBound=new BoundClass(dz,(dz+wid));
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+                this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
                 this.map.addOverlayDecorationWall(dx,dz,(dx+constants.ROOM_BLOCK_WIDTH),dz);
             }
             
             if (!((skipWall===constants.ROOM_SIDE_BOTTOM) && (skipIdx===n))) {
                 dz=room.zBound.min+(rect.bot*constants.ROOM_BLOCK_WIDTH);
                 zBound=new BoundClass((dz-wid),dz);
-                this.map.addMesh(MeshPrimitivesClass.createMeshCube(bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+                this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,bitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
                 this.map.addOverlayDecorationWall(dx,dz,(dx+constants.ROOM_BLOCK_WIDTH),dz);
             }
         }

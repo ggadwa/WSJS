@@ -1,3 +1,4 @@
+import AIClass from '../../code/entities/ai.js';
 import genRandom from '../../generate/utility/random.js';
 
 //

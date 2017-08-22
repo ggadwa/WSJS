@@ -1,12 +1,14 @@
+import EntityClass from '../../code/entities/entity.js';
+
 //
 // entity projectile object
 //
 
 export default class EntityProjectileClass extends EntityClass
 {
-    constructor(name,parentEntityId,position,angle,projectile)
+    constructor(view,map,entityList,sound,name,parentEntityId,position,angle,projectile)
     {
-        super(name,position,angle,0,projectile.model);
+        super(view,map,entityList,sound,name,position,angle,0,projectile.model);
         
             // remember who shot this
             

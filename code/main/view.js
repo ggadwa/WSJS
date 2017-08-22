@@ -529,7 +529,7 @@ export default class ViewClass
         // draw view
         //
 
-    draw(map,sky)
+    draw(map,sky,entityList,particleList)
     {
         let n,nEntity,entity;
         let light,tintOn,tintAtt;
@@ -582,15 +582,15 @@ export default class ViewClass
             // all lights need a eye coordinate, so calc
             // that here
             
-        view.lights=[];
+        this.lights=[];
 
         map.addViewLightsFromMapLights();
         particleList.addViewLightsFromParticleLights();
         
             // fill in any missing lights with NULL
 
-        while (view.lights.length<view.MAX_LIGHT_COUNT) {
-            view.lights.push(null);
+        while (this.lights.length<this.MAX_LIGHT_COUNT) {
+            this.lights.push(null);
         }
         
             // and finally make the eye coordinate
@@ -610,9 +610,9 @@ export default class ViewClass
         
             // draw the sky
             
-        this.sky.drawStart();
-        this.sky.draw();
-        this.sky.drawEnd();
+        sky.drawStart();
+        sky.draw();
+        sky.drawEnd();
         
             // draw the map
        
@@ -705,7 +705,7 @@ export default class ViewClass
 
             // map overlay
             
-        if (this.drawOverlay) map.overlayDraw();
+        if (this.drawOverlay) map.overlayDraw(entityList);
         
             // text overlays
 

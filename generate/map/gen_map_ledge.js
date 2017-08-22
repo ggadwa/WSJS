@@ -10,8 +10,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomLedgeClass
 {
-    constructor(map)
+    constructor(view,map)
     {
+        this.view=view;
         this.map=map;
         
         Object.seal(this);
@@ -79,7 +80,7 @@ export default class GenRoomLedgeClass
 
             // finally create the mesh
 
-        this.map.addMesh(new MapMeshClass(bitmap,vertexList,indexes,constants.MESH_FLAG_LEDGE));
+        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_LEDGE));
     }
         
         //
