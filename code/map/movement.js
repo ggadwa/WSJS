@@ -32,7 +32,7 @@ export default class MovementClass
         this.moves.push(move);
     }
     
-    run(view,map,entityList)
+    run(view,map)
     {
         let mesh,isOpen,prevIdx;
         let f,move;
@@ -51,7 +51,7 @@ export default class MovementClass
         if (!this.looping) {
             
             if (!this.moving) {
-                isOpen=(mesh.center.distance(entityList.getPlayer().position)<this.approachDistance);
+                isOpen=(mesh.center.distance(map.getPlayerEntity().position)<this.approachDistance);
                 
                 if (isOpen) {
                     if (this.currentMoveIdx===1) return;
@@ -115,6 +115,6 @@ export default class MovementClass
         
             // and any effected entity
             
-        entityList.movementPush(this.meshIdx,this.movePnt);
+        map.movementPushEntities(this.meshIdx,this.movePnt);
     }
 }

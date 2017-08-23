@@ -8,9 +8,9 @@ import EntityClass from '../../code/entities/entity.js';
 
 export default class EntityMonsterClass extends EntityClass
 {
-    constructor(view,map,entityList,sound,name,position,angle,maxHealth,model,ai)
+    constructor(view,map,sound,name,position,angle,maxHealth,model,ai)
     {
-        super(view,map,entityList,sound,name,position,angle,maxHealth,model);
+        super(view,map,sound,name,position,angle,maxHealth,model);
         
             // entity setup
             
@@ -43,7 +43,7 @@ export default class EntityMonsterClass extends EntityClass
         
     die()
     {
-        sound.play(this,this.ai.dieSoundBuffer);
+        this.sound.play(this,this.ai.dieSoundBuffer);
         this.markAsDelete();
     }
     
@@ -54,7 +54,7 @@ export default class EntityMonsterClass extends EntityClass
             // if we weren't active, play the
             // active sound instead of the hurt
         
-        sound.play(this,(this.active?this.ai.wakeSoundBuffer:this.ai.hurtSoundBuffer));
+        this.sound.play(this,(this.active?this.ai.wakeSoundBuffer:this.ai.hurtSoundBuffer));
         
             // always wake up and chase the
             // entity that damaged you
@@ -75,7 +75,7 @@ export default class EntityMonsterClass extends EntityClass
         
             // wait time not up
             
-        if (view.timeStamp<this.lastShotTimeStamp) return;
+        if (this.view.timeStamp<this.lastShotTimeStamp) return;
         
             // check if we are within fire slop angle
             // or too far away
@@ -85,7 +85,7 @@ export default class EntityMonsterClass extends EntityClass
         
             // setup fire position
 
-        this.lastShotTimeStamp=view.timeStamp+this.ai.fireRechargeTick;
+        this.lastShotTimeStamp=this.view.timeStamp+this.ai.fireRechargeTick;
 
         this.fireAngle.setFromPoint(this.angle);
 
@@ -145,8 +145,8 @@ export default class EntityMonsterClass extends EntityClass
             // play sound and reset last fire
             // time so it doesn't fire immediately
             
-        sound.play(this,this.ai.wakeSoundBuffer);
-        this.lastShotTimeStamp=view.timeStamp;
+        this.sound.play(this,this.ai.wakeSoundBuffer);
+        this.lastShotTimeStamp=this.view.timeStamp;
         
         this.model.skeleton.resetAnimation();
     }
@@ -163,11 +163,11 @@ export default class EntityMonsterClass extends EntityClass
             // make it the player, and if our old
             // enemy got deleted, revert back to player
             
-        if (this.enemyId===-1) this.enemyId=this.entityList.getPlayer().id;
+        if (this.enemyId===-1) this.enemyId=this.map.getPlayerEntity().id;
         
-        enemy=this.entityList.findEntityById(this.enemyId);
+        enemy=this.map.findEntityById(this.enemyId);
         if (enemy===null) {
-            enemy=this.entityList.getPlayer();
+            enemy=this.map.getPlayerEntity();
             this.enemyId=enemy.id;
         }
         

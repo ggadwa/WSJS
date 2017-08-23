@@ -14,13 +14,13 @@ export default class MovementListClass
         this.movements.push(movement);
     }
     
-    run(view,map,entityList)
+    run(view,map)
     {
         let n;
         let nMovement=this.movements.length;
         
         for (n=0;n!==nMovement;n++) {
-            this.movements[n].run(view,map,entityList);
+            this.movements[n].run(view,map);
         }
     }
 }

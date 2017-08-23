@@ -9,10 +9,9 @@ import BoundClass from '../../code/utility/bound.js';
 
 export default class CollisionClass
 {
-    constructor(map,entityList)
+    constructor(map)
     {
         this.map=map;
-        this.entityList=entityList;
         
         this.BUMP_HIGH=1000;
 
@@ -158,7 +157,7 @@ export default class CollisionClass
         let high=entity.high;
         
         let nMesh=this.map.meshes.length;
-        let nEntity=this.entityList.countEntity();
+        let nEntity=this.map.countEntity();
         
             // only bump once
             
@@ -237,7 +236,7 @@ export default class CollisionClass
                 // check other entities
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.entityList.getEntity(n);
+                checkEntity=this.map.getEntity(n);
                 if (checkEntity.id===entity.id) continue;
                 
                 checkEntityPt=checkEntity.position;

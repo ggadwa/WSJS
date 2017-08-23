@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import ModelBoneClass from '../../code/model/model_bone.js';
 import ModelLimbClass from '../../code/model/model_limb.js';
@@ -9,11 +10,14 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class ModelSkeletonClass
 {
-    constructor()
+    constructor(view)
     {
-        this.bones=[];
-
+        this.view=view;
+        
+            // bones
+            
         this.baseBoneIdx=0;
+        this.bones=[];
 
             // lists of bones that are
             // used for animation and
@@ -48,7 +52,7 @@ export default class ModelSkeletonClass
         let n,bone;
         let nBone=this.bones.length;
         
-        let skeleton=new ModelSkeletonClass();
+        let skeleton=new ModelSkeletonClass(this.view);
         
         for (n=0;n!==nBone;n++) {
             bone=this.bones[n];
@@ -271,7 +275,7 @@ export default class ModelSkeletonClass
         
             // the current factor
             
-        let factor=1.0-((this.lastAnimationTick-view.timeStamp)/this.lastAnimationMillisec);
+        let factor=1.0-((this.lastAnimationTick-this.view.timeStamp)/this.lastAnimationMillisec);
 
             // tween the current angles
             
@@ -458,12 +462,12 @@ export default class ModelSkeletonClass
     {
             // time for a new pose?
             
-        if (view.timeStamp<this.lastAnimationTick) return;
+        if (this.view.timeStamp<this.lastAnimationTick) return;
         
             // next pose 3 seconds away (testing)
         
         this.lastAnimationMillisec=2000;
-        this.lastAnimationTick=view.timeStamp+this.lastAnimationMillisec;
+        this.lastAnimationTick=this.view.timeStamp+this.lastAnimationMillisec;
         
             // move current next pose to last pose
             
@@ -531,12 +535,12 @@ export default class ModelSkeletonClass
     {
             // time for a new pose?
             
-        if (view.timeStamp<this.lastAnimationTick) return;
+        if (this.view.timeStamp<this.lastAnimationTick) return;
         
             // next pose 4 seconds away
             
         this.lastAnimationMillisec=4000;
-        this.lastAnimationTick=view.timeStamp+this.lastAnimationMillisec;
+        this.lastAnimationTick=this.view.timeStamp+this.lastAnimationMillisec;
         
             // move current next pose to last pose
             

@@ -30,9 +30,9 @@ class ConfigClass
             //
 
         this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=0;
+        this.MONSTER_ENTITY_COUNT=10;
         
-        this.MONSTER_AI_ON=false;
+        this.MONSTER_AI_ON=true;
         this.MONSTER_BOSS=false;
         
             //

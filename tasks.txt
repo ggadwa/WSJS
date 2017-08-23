@@ -10,7 +10,15 @@ WebGL2
 
 
 
---> change around sound, so we have soundList, not sound.xxx
+
+1. make a particle utility to create particle types
+2. particle_list moves to map
+3. view.draw() stuff moves to map
+
+--> can we get rid of sound list?  just have sounds (like bitmaps)
+--> particle in map
+--> view.draw() needs to move a lot of stuff into a single map.draw() [sky, meshes, liquids, particles]
+--> is model list necessary?
 --> replace all MAP_TEXTURE_TYPE_ with generic bitmap types, in constants
 --> make genBitmap be a single call, like genModel/genSound
 

@@ -529,13 +529,13 @@ export default class ViewClass
         // draw view
         //
 
-    draw(map,sky,entityList,particleList)
+    draw(map,particleList)
     {
         let n,nEntity,entity;
         let light,tintOn,tintAtt;
         let weapon;
         let fpsStr,idx;
-        let player=entityList.getPlayer();
+        let player=map.getPlayerEntity();
          
             // everything overdraws except
             // clear the depth buffer
@@ -610,9 +610,7 @@ export default class ViewClass
         
             // draw the sky
             
-        sky.drawStart();
-        sky.draw();
-        sky.drawEnd();
+        map.drawSky();
         
             // draw the map
        
@@ -629,10 +627,10 @@ export default class ViewClass
         this.drawModelCount=0;
         this.drawModelTrigCount=0;
 
-        nEntity=entityList.countEntity();
+        nEntity=map.countEntity();
 
         for (n=1;n<nEntity;n++) {
-            entity=entityList.getEntity(n);
+            entity=map.getEntity(n);
 
             if (entity.inFrustum()) {
                 entity.drawStart();
@@ -705,7 +703,7 @@ export default class ViewClass
 
             // map overlay
             
-        if (this.drawOverlay) map.overlayDraw(entityList);
+        if (this.drawOverlay) map.overlayDraw();
         
             // text overlays
 

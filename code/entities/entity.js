@@ -9,11 +9,10 @@ import CollisionClass from '../../code/entities/collisions.js';
 
 export default class EntityClass
 {
-    constructor(view,map,entityList,sound,name,position,angle,maxHealth,model)
+    constructor(view,map,sound,name,position,angle,maxHealth,model)
     {
         this.view=view;
         this.map=map;
-        this.entityList=entityList;
         this.sound=sound;
         
         this.name=name;
@@ -79,7 +78,7 @@ export default class EntityClass
         
         this.pushMesh=null;
 
-        this.collision=new CollisionClass(map,entityList);
+        this.collision=new CollisionClass(map);
         
         // no seal, as this object is extended
     }
@@ -509,7 +508,7 @@ export default class EntityClass
     
     addDamage(hitEntityId,damage)
     {
-        this.damageTintStartTick=view.timeStamp;
+        this.damageTintStartTick=this.view.timeStamp;
         
         this.health-=damage;
         if (this.health<=0) this.die();
@@ -526,7 +525,7 @@ export default class EntityClass
         
         if (this.damageTintStartTick===-1) return(0.0);
         
-        tick=view.timeStamp-this.damageTintStartTick;
+        tick=this.view.timeStamp-this.damageTintStartTick;
         if (tick>=1000) {
             this.damageTintStartTick=-1;
             return(0.0);
@@ -612,7 +611,7 @@ export default class EntityClass
         this.yFrustumBound.setFromValues((this.position.y-this.high),this.position.y);
         this.zFrustumBound.setFromValues((this.position.z-this.radius),(this.position.z+this.radius));
 
-        return(view.boundBoxInFrustum(this.xFrustumBound,this.yFrustumBound,this.zFrustumBound));
+        return(this.view.boundBoxInFrustum(this.xFrustumBound,this.yFrustumBound,this.zFrustumBound));
     }
     
         //
@@ -635,7 +634,7 @@ export default class EntityClass
             // vertices or just move to current position
             // and angle
             
-        if ((this.model.skeleton!==null) && (!view.paused)) {
+        if ((this.model.skeleton!==null) && (!this.view.paused)) {
             this.model.skeleton.animate();
             this.model.mesh.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
         }

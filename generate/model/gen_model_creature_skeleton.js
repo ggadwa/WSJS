@@ -11,8 +11,9 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenModelCreatureSkeletonClass
 {
-    constructor(model,sizeFactor)
+    constructor(view,model,sizeFactor)
     {
+        this.view=view;
         this.model=model;
         this.sizeFactor=sizeFactor;
         
@@ -429,7 +430,7 @@ export default class GenModelCreatureSkeletonClass
         
             // build the skeleton
 
-        this.model.skeleton=new ModelSkeletonClass();
+        this.model.skeleton=new ModelSkeletonClass(this.view);
         
         bodyLimbIdx=this.buildBody();
         this.buildLimbs(bodyLimbIdx);

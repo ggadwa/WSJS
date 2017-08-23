@@ -6,11 +6,10 @@ import EntityProjectileClass from '../../code/entities/entity_projectile.js';
 
 export default class ProjectileClass
 {
-    constructor(view,map,entityList,sound,model)
+    constructor(view,map,sound,model)
     {
         this.view=view;
         this.map=map;
-        this.entityList=entityList;
         this.sound=sound;
         this.model=model;
         
@@ -84,10 +83,10 @@ export default class ProjectileClass
     
     fire(parentEntityId,pos,ang)
     {
-        let entity=new EntityProjectileClass(this.view,this.map,this.entityList,this.sound,'projectile',parentEntityId,pos,ang,this);
-        this.entityList.addEntity(entity);
+        let entity=new EntityProjectileClass(this.view,this.map,this.sound,'projectile',parentEntityId,pos,ang,this);
+        this.map.addEntity(entity);
         
-        sound.play(entity,this.fireSoundBuffer);
+        this.sound.play(entity,this.fireSoundBuffer);
     }
     
 }

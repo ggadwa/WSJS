@@ -31,7 +31,7 @@ export default class GenModelClass
         switch (modelType) {
         
             case this.TYPE_CREATURE:
-                genSkeleton=new GenModelCreatureSkeletonClass(model,sizeFactor);
+                genSkeleton=new GenModelCreatureSkeletonClass(this.view,model,sizeFactor);
                 genSkeleton.build();
                 genMesh=new GenModelCreatureMeshClass(this.view,model,modelBitmap);
                 genMesh.build(inDebug);

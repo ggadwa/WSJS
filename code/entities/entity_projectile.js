@@ -6,9 +6,9 @@ import EntityClass from '../../code/entities/entity.js';
 
 export default class EntityProjectileClass extends EntityClass
 {
-    constructor(view,map,entityList,sound,name,parentEntityId,position,angle,projectile)
+    constructor(view,map,sound,name,parentEntityId,position,angle,projectile)
     {
-        super(view,map,entityList,sound,name,position,angle,0,projectile.model);
+        super(view,map,sound,name,position,angle,0,projectile.model);
         
             // remember who shot this
             
@@ -25,7 +25,7 @@ export default class EntityProjectileClass extends EntityClass
             // local variables
             
         this.projectile=projectile;
-        this.startTimeStamp=view.timeStamp;
+        this.startTimeStamp=this.view.timeStamp;
         
         Object.seal(this);
     }
@@ -71,8 +71,8 @@ export default class EntityProjectileClass extends EntityClass
         
             // explosion and sound
             
-        particleList.addExplosionParticles(this.position);
-        sound.play(this,this.projectile.hitSoundBuffer);
+        this.map.addExplosionParticles(this.position);
+        this.sound.play(this,this.projectile.hitSoundBuffer);
         
             // handle any damage
         
@@ -87,7 +87,7 @@ export default class EntityProjectileClass extends EntityClass
     {
             // cancel any projectile that lasts over lifetime
             
-        if ((this.startTimeStamp+this.projectile.lifeTick)<view.timeStamp) {
+        if ((this.startTimeStamp+this.projectile.lifeTick)<this.view.timeStamp) {
             this.markAsDelete();
             return;
         }

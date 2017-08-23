@@ -423,7 +423,7 @@ export default class MapOverlayClass
         // draw the map overlay
         //
         
-    draw(entityList)
+    draw(map)
     {
         let n,x,y;
         let p1,p2,p3;
@@ -494,10 +494,10 @@ export default class MapOverlayClass
         p2=new Point2DIntClass(0,0);
         p3=new Point2DIntClass(0,0);
 
-        nEntity=entityList.countEntity();
+        nEntity=map.countEntity();
         
         for (n=0;n!==nEntity;n++) {
-            entity=entityList.getEntity(n);
+            entity=map.getEntity(n);
             if (entity instanceof EntityProjectileClass) continue;
             
             this.mapOverlayShader.drawColor(((n===0)?playerColor:monsterColor));       // index 0 is the player

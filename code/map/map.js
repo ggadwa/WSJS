@@ -14,6 +14,7 @@ import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import MapRoomClass from '../../code/map/map_room.js';
 import MovementListClass from '../../code/map/movement_list.js';
 import MapOverlayClass from '../../code/map/map_overlay.js';
+import SkyClass from '../../code/sky/sky.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -35,6 +36,9 @@ export default class MapClass
         this.lights=[];
         this.rooms=[];
         this.liquids=[];
+        
+        this.entityCurrentId=1;
+        this.entities=[];
 
         this.genBitmapWall=new GenBitmapWallClass(view);
         this.genBitmapFloor=new GenBitmapFloorClass(view);
@@ -46,10 +50,11 @@ export default class MapClass
         this.genBitmapBox=new GenBitmapBoxClass(view);
         this.genBitmapLiquid=new GenBitmapLiquidClass(view);
 
-        this.textureBitmaps=new Map();
-
         this.movementList=new MovementListClass();
         this.overlay=new MapOverlayClass(view,fileCache);
+        this.sky=new SkyClass(view,fileCache);
+        
+        this.textureBitmaps=new Map();
 
         this.lightXBound=new BoundClass(0,0);           // global not local so they won't get GCd
         this.lightYBound=new BoundClass(0,0);
@@ -64,9 +69,19 @@ export default class MapClass
 
     initialize()
     {
-        if (!this.overlay.initialize()) return(false);
+            // first entity is always the player
+            // so lock that off
+
+        this.entities=[];
+        this.entities.push(null);
+        
+            // any initialize any subsystems
+
         if (!this.mapMeshShader.initialize()) return(false);
-        return(this.mapLiquidShader.initialize());
+        if (!this.mapLiquidShader.initialize()) return(false);
+        if (!this.overlay.initialize()) return(false);
+        return(this.sky.initialize());
+
     }
 
     release()
@@ -74,6 +89,7 @@ export default class MapClass
         this.mapLiquidShader.release();
         this.mapMeshShader.release();
         this.overlay.release();
+        this.sky.release();
     }
     
         //
@@ -162,6 +178,7 @@ export default class MapClass
         this.lights=[];
         this.rooms=[];
         this.liquids=[];
+        this.entities=[];
     }
 
         //
@@ -424,9 +441,9 @@ export default class MapClass
         this.movementList.addMovement(movement);
     }
     
-    runMovements(entityList)
+    runMovements()
     {
-        this.movementList.run(this.view,this,entityList);
+        this.movementList.run(this.view,this);
     }
     
         //
@@ -438,9 +455,9 @@ export default class MapClass
         this.overlay.precalcDrawValues();
     }
         
-    overlayDraw(entityList)
+    overlayDraw()
     {
-        this.overlay.draw(entityList);
+        this.overlay.draw(map);
     }
     
     addOverlayRoom(room)
@@ -481,6 +498,103 @@ export default class MapClass
     addOverlayDoor(xBound,zBound)
     {
         this.overlay.addDoor(xBound,zBound);
+    }
+    
+        //
+        // sky draw
+        //
+        
+    drawSky()
+    {
+        this.sky.drawStart();
+        this.sky.draw();
+        this.sky.drawEnd();
+    }
+    
+        //
+        // entities
+        //
+        
+    setPlayerEntity(entity)
+    {
+        entity.id=0;
+        this.entities[0]=entity;
+    }
+
+    addEntity(entity)
+    {
+        entity.id=this.entityCurrentId++;
+        this.entities.push(entity);
+    }
+
+    countEntity()
+    {
+        return(this.entities.length);
+    }
+
+    getEntity(entityIdx)
+    {
+        return(this.entities[entityIdx]);
+    }
+    
+    getPlayerEntity()
+    {
+        return(this.entities[0]);
+    }
+    
+    findEntityById(id)
+    {
+        let n,entity;
+        let nEntity=this.entities.length;
+            
+        for (n=0;n!==nEntity;n++) {
+            entity=this.entities[n];
+            if (entity.id===id) return(entity);
+        }
+        
+        return(null);
+    }
+    
+    movementPushEntities(meshIdx,movePnt)
+    {
+        let n,entity;
+        let nEntity=this.entities.length;
+        
+            // check the entities, skipping
+            // any projectiles
+            
+        for (n=0;n!==nEntity;n++) {
+            entity=this.entities[n];
+            if (entity instanceof EntityProjectileClass) continue;
+            
+            entity.movementPush(meshIdx,movePnt);
+        }
+    }
+    
+    runEntities()
+    {
+        let n;
+        let nEntity=this.entities.length;
+        
+            // run the entities
+            
+        for (n=0;n!==nEntity;n++) {
+            this.entities[n].run(this);
+        }
+        
+            // now clean up any that got
+            // marked for deleting
+            
+        n=0;
+        
+        while (n<nEntity) {
+            if (this.entities[n].isMarkedForDeletion()) {
+                this.entities.splice(n,1);
+                nEntity--;
+                continue;
+            }
+            n++;
+        }
     }
 
         //

@@ -6,8 +6,6 @@ import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
 import ModelClass from '../../code/model/model.js';
 import ModelListClass from '../../code/model/model_list.js';
-import SkyClass from '../../code/sky/sky.js';
-import EntityListClass from '../../code/entities/entity_list.js';
 import ParticleListClass from '../../code/particle/particle_list.js';
 import DebugClass from '../../code/debug/debug.js';
 import InputClass from '../../code/main/input.js';
@@ -19,6 +17,7 @@ import GenProjectileClass from '../../generate/thing/gen_projectile.js';
 import GenSoundClass from '../../generate/sound/gen_sound.js';
 import GenAIClass from '../../generate/thing/gen_ai.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
+import EntityMonsterClass from '../../code/entities/entity_monster.js';
 import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
 import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
 import genRandom from '../../generate/utility/random.js';
@@ -37,8 +36,6 @@ class MainClass
         this.view=new ViewClass(this.fileCache);
         this.map=new MapClass(this.view,this.fileCache);
         this.modelList=new ModelListClass(this.view,this.fileCache);
-        this.sky=new SkyClass(this.view,this.fileCache);
-        this.entityList=new EntityListClass();
         this.particleList=new ParticleListClass(this.view,this.fileCache);
         this.debug=new DebugClass(this.view,this.fileCache);
         this.input=new InputClass(this.view);
@@ -80,8 +77,6 @@ class MainClass
         if (!this.sound.initialize()) return;
         if (!this.map.initialize()) return;
         if (!this.modelList.initialize()) return;
-        if (!this.sky.initialize()) return(false);
-        if (!this.entityList.initialize()) return;
         if (!this.particleList.initialize()) return(false);
         if (!this.debug.initialize()) return;
 
@@ -249,7 +244,7 @@ class MainClass
         let monsterAIs;
         
         let genSound=new GenSoundClass(this.sound.getAudioContext());
-        let genProjectile=new GenProjectileClass(this.view,this.map,this.entityList,this.sound,this.modelList,genSound);
+        let genProjectile=new GenProjectileClass(this.view,this.map,this.sound,this.modelList,genSound);
         let genWeapon=new GenWeaponClass(this.view,this.modelList,genSound);
         let genAI=new GenAIClass(genProjectile,genSound);
 
@@ -261,7 +256,7 @@ class MainClass
             return;
         }
 
-        playerEntity=new EntityPlayerClass(this.map,this.map,this.entityList,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
+        playerEntity=new EntityPlayerClass(this.map,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
         playerWeapon=genWeapon.generate();
@@ -269,7 +264,7 @@ class MainClass
         playerEntity.addWeapon(playerWeapon);
         playerEntity.setCurrentWeaponIndex(0);
 
-        this.entityList.setPlayer(playerEntity);
+        this.map.setPlayerEntity(playerEntity);
         
             // create AI type for each monster
         
@@ -289,7 +284,7 @@ class MainClass
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
             model=this.modelList.cloneModel('monster_'+monsterType);
-            this.entityList.addEntity(new EntityMonsterClass(this.view,this.map,this.entityList,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            this.map.addEntity(new EntityMonsterClass(this.view,this.map,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
         
             // boss monster
@@ -297,7 +292,7 @@ class MainClass
         if (config.MONSTER_BOSS) {
             pos=this.map.findRandomBossPosition();
             model=this.modelList.cloneModel('boss');
-            if (pos!==null) this.entityList.addEntity(new EntityMonsterClass(this.view,this.map,this.entityList,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
+            if (pos!==null) this.map.addEntity(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 
             // finished
@@ -322,11 +317,11 @@ class MainClass
         
             // set the listener to this entity
             
-        this.sound.setListenerToEntity(this.entityList.getPlayer());
+        this.sound.setListenerToEntity(this.map.getPlayerEntity());
 
             // start the input
 
-        this.input.initialize(this.entityList.getPlayer());
+        this.input.initialize(this.map.getPlayerEntity());
         
             // the cancel loop flag
             
@@ -361,9 +356,7 @@ function mainLoop(timeStamp)
     let fpsTime;
     let view=main.view;
     let map=main.map;
-    let entityList=main.entityList;
     let particleList=main.particleList;
-    let sky=main.sky;
     let sound=main.sound;
     
         // next frame
@@ -390,7 +383,7 @@ function mainLoop(timeStamp)
         view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
 
         if (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
-            map.runMovements(entityList);
+            map.runMovements();
 
             if (view.physicsTick<constants.BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
@@ -398,7 +391,7 @@ function mainLoop(timeStamp)
                     view.physicsTick-=constants.PHYSICS_MILLISECONDS;
                     view.lastPhysicTimeStamp+=constants.PHYSICS_MILLISECONDS;
 
-                    entityList.run();
+                    map.runEntities();
                 }
             }
             else {
@@ -422,7 +415,7 @@ function mainLoop(timeStamp)
     if (view.drawTick>constants.DRAW_MILLISECONDS) {
         view.lastDrawTimeStamp=view.timeStamp; 
 
-        view.draw(map,sky,entityList,particleList);
+        view.draw(map,particleList);
         
         view.fpsTotal+=view.drawTick;
         view.fpsCount++;
