@@ -140,11 +140,11 @@ export default class ParticleClass
         this.alphaEnd=alphaEnd;
     }
     
-    setTiming(timeStamp,lifeTime)
+    setLifeTime(lifeTime)
     {
-        this.startTimeStamp=timeStamp;
+        this.startTimeStamp=this.view.timeStamp;
         this.lifeTime=lifeTime;
-        this.endTimeStamp=timeStamp+lifeTime;
+        this.endTimeStamp=this.view.timeStamp+lifeTime;
     }
     
     setLightMaxItensity(lightMaxIntensity)

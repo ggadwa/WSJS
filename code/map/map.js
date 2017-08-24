@@ -12,9 +12,10 @@ import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
 import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import MapRoomClass from '../../code/map/map_room.js';
-import MovementListClass from '../../code/map/movement_list.js';
+import MapMovementListClass from '../../code/map/map_movement_list.js';
 import MapOverlayClass from '../../code/map/map_overlay.js';
 import SkyClass from '../../code/sky/sky.js';
+import MapParticleListClass from '../../code/map/map_particle_list.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -30,7 +31,7 @@ export default class MapClass
         this.fileCache=this.fileCache;
         
         this.mapMeshShader=new MapMeshShaderClass(view,fileCache);
-        this.mapLiquidShader=new MapLiquidShaderClass(view,fileCache);        // shared
+        this.mapLiquidShader=new MapLiquidShaderClass(view,fileCache);
 
         this.meshes=[];
         this.lights=[];
@@ -50,9 +51,10 @@ export default class MapClass
         this.genBitmapBox=new GenBitmapBoxClass(view);
         this.genBitmapLiquid=new GenBitmapLiquidClass(view);
 
-        this.movementList=new MovementListClass();
+        this.movementList=new MapMovementListClass();
         this.overlay=new MapOverlayClass(view,fileCache);
         this.sky=new SkyClass(view,fileCache);
+        this.particleList=new MapParticleListClass(view,fileCache);
         
         this.textureBitmaps=new Map();
 
@@ -80,7 +82,8 @@ export default class MapClass
         if (!this.mapMeshShader.initialize()) return(false);
         if (!this.mapLiquidShader.initialize()) return(false);
         if (!this.overlay.initialize()) return(false);
-        return(this.sky.initialize());
+        if (!this.sky.initialize()) return(false);
+        return(this.particleList.initialize());
 
     }
 
@@ -90,6 +93,7 @@ export default class MapClass
         this.mapMeshShader.release();
         this.overlay.release();
         this.sky.release();
+        this.particleList.release();
     }
     
         //
@@ -295,6 +299,8 @@ export default class MapClass
         //
         // find all the map lights in this view
         // and add them to the view light list
+        // 
+        // this also calls through to the particle lights
         //
 
     addViewLightsFromMapLights()
@@ -349,6 +355,10 @@ export default class MapClass
                 if (this.view.lights.length>this.view.MAX_LIGHT_COUNT) this.view.lights.pop();
             }
         }
+        
+            // and add in any from particles
+            
+        this.particleList.addViewLightsFromParticleLights();
     }
     
         //

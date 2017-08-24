@@ -6,7 +6,6 @@ import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
 import ModelClass from '../../code/model/model.js';
 import ModelListClass from '../../code/model/model_list.js';
-import ParticleListClass from '../../code/particle/particle_list.js';
 import DebugClass from '../../code/debug/debug.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
@@ -36,7 +35,6 @@ class MainClass
         this.view=new ViewClass(this.fileCache);
         this.map=new MapClass(this.view,this.fileCache);
         this.modelList=new ModelListClass(this.view,this.fileCache);
-        this.particleList=new ParticleListClass(this.view,this.fileCache);
         this.debug=new DebugClass(this.view,this.fileCache);
         this.input=new InputClass(this.view);
         this.sound=new SoundClass();
@@ -77,7 +75,6 @@ class MainClass
         if (!this.sound.initialize()) return;
         if (!this.map.initialize()) return;
         if (!this.modelList.initialize()) return;
-        if (!this.particleList.initialize()) return(false);
         if (!this.debug.initialize()) return;
 
             // next step
@@ -356,7 +353,6 @@ function mainLoop(timeStamp)
     let fpsTime;
     let view=main.view;
     let map=main.map;
-    let particleList=main.particleList;
     let sound=main.sound;
     
         // next frame
@@ -415,7 +411,7 @@ function mainLoop(timeStamp)
     if (view.drawTick>constants.DRAW_MILLISECONDS) {
         view.lastDrawTimeStamp=view.timeStamp; 
 
-        view.draw(map,particleList);
+        view.draw(map);
         
         view.fpsTotal+=view.drawTick;
         view.fpsCount++;

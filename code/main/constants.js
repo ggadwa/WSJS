@@ -133,3 +133,7 @@ export const LIMB_TYPE_WHIP=11;
 export const LIMB_AXIS_X=0;
 export const LIMB_AXIS_Y=1;
 export const LIMB_AXIS_Z=2;
+
+    // particles
+    
+export const PARTICLE_MAX_COUNT=50;

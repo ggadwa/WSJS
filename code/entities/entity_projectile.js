@@ -1,4 +1,5 @@
 import EntityClass from '../../code/entities/entity.js';
+import ParticleUtilityClass from '../../code/particle/particle_utility.js';
 
 //
 // entity projectile object
@@ -71,7 +72,7 @@ export default class EntityProjectileClass extends EntityClass
         
             // explosion and sound
             
-        this.map.addExplosionParticles(this.position);
+        ParticleUtilityClass.createExplosionParticles(this.map,this.position);
         this.sound.play(this,this.projectile.hitSoundBuffer);
         
             // handle any damage

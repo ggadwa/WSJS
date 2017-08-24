@@ -1,8 +1,8 @@
 //
-// movement list class
+// map movement list class
 //
 
-export default class MovementListClass
+export default class MapMovementListClass
 {
     constructor()
     {

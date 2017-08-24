@@ -529,7 +529,7 @@ export default class ViewClass
         // draw view
         //
 
-    draw(map,particleList)
+    draw(map)
     {
         let n,nEntity,entity;
         let light,tintOn,tintAtt;
@@ -585,7 +585,6 @@ export default class ViewClass
         this.lights=[];
 
         map.addViewLightsFromMapLights();
-        particleList.addViewLightsFromParticleLights();
         
             // fill in any missing lights with NULL
 
@@ -653,7 +652,7 @@ export default class ViewClass
         
             // particles
             
-        particleList.draw();
+        map.particleList.draw();
       
             // player weapon
          

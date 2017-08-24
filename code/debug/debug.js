@@ -1,6 +1,7 @@
 import PointClass from '../../code/utility/point.js';
 import ColorClass from '../../code/utility/color.js';
 import DebugShaderClass from '../../code/debug/debug_shader.js';
+import ParticleUtilityClass from '../../code/particle/particle_utility.js';
 
 //
 // debug class
@@ -409,7 +410,7 @@ export default class DebugClass
         
             // now the bones, use the particle engine
         
-        particle=particleList.addDebugParticles(position,nBone);
+        particle=ParticleUtilityClass.addDebugParticles(map,position,nBone);
         if (particle!==null) {            
             for (n=0;n!==nBone;n++) {
                 pnt=particle.getPoint(n);
