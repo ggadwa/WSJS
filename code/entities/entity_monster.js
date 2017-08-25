@@ -163,11 +163,11 @@ export default class EntityMonsterClass extends EntityClass
             // make it the player, and if our old
             // enemy got deleted, revert back to player
             
-        if (this.enemyId===-1) this.enemyId=this.map.getPlayerEntity().id;
+        if (this.enemyId===-1) this.enemyId=this.map.entityList.getPlayer().id;
         
-        enemy=this.map.findEntityById(this.enemyId);
+        enemy=this.map.entityList.findById(this.enemyId);
         if (enemy===null) {
-            enemy=this.map.getPlayerEntity();
+            enemy=this.map.entityList.getPlayer();
             this.enemyId=enemy.id;
         }
         

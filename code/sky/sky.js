@@ -1,5 +1,6 @@
+import * as constants from '../../code/main/constants.js';
 import SkyShaderClass from '../../code/sky/sky_shader.js';
-import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
+import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 
 //
 // sky class
@@ -32,7 +33,7 @@ export default class SkyClass
     initialize()
     {
         let gl=this.view.gl;
-        let genBitmapSky;
+        let genBitmap;
 
         if (!this.skyShader.initialize()) return(false);
         
@@ -48,8 +49,8 @@ export default class SkyClass
         
             // create bitmaps
         
-        genBitmapSky=new GenBitmapSkyClass(this.view);
-        this.bitmap=genBitmapSky.generateRandom(false);
+        genBitmap=new GenBitmapClass(this.view);
+        this.bitmap=genBitmap.generate(constants.BITMAP_TYPE_SKY,false);
         
         return(true);
     }
@@ -68,27 +69,9 @@ export default class SkyClass
     }
 
         //
-        // start/stop/draw interface
+        // draw
         //
 
-    drawStart()
-    {
-        let gl=this.view.gl;
-        
-        gl.disable(gl.DEPTH_TEST);
-
-        this.skyShader.drawStart();
-    }
-
-    drawEnd()
-    {
-        let gl=this.view.gl;
-        
-        this.skyShader.drawEnd();
-
-        gl.enable(gl.DEPTH_TEST);
-    }
-    
     drawPlane(gl,cameraPos,vx0,vy0,vz0,vx1,vy1,vz1,vx2,vy2,vz2,vx3,vy3,vz3,u,v,u2,v2)
     {
         this.vertexes[0]=cameraPos.x+vx0;
@@ -154,6 +137,12 @@ export default class SkyClass
         let cameraPos=this.view.camera.position;
         let skyRadius=25000;
         
+            // setup shader
+            
+        gl.disable(gl.DEPTH_TEST);
+
+        this.skyShader.drawStart();
+        
         this.bitmap.attachAsSky();
         
             // sides
@@ -175,6 +164,12 @@ export default class SkyClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+        
+            // end shader
+            
+        this.skyShader.drawEnd();
+
+        gl.enable(gl.DEPTH_TEST);
     }
     
 }

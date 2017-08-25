@@ -60,16 +60,6 @@ export default class WeaponClass
         // draw weapon
         //
 
-    drawStart()
-    {
-        this.model.drawStart();
-    }
-
-    drawEnd()
-    {
-        this.model.drawEnd();
-    }
-
     draw(entity)
     {
         let pos=entity.position;

@@ -2,20 +2,13 @@ import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
 import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
-import GenBitmapWallClass from '../../generate/bitmap/gen_bitmap_wall.js';
-import GenBitmapFloorClass from '../../generate/bitmap/gen_bitmap_floor.js';
-import GenBitmapCeilingClass from '../../generate/bitmap/gen_bitmap_ceiling.js';
-import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
-import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
-import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
-import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
-import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
-import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
+import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 import MapRoomClass from '../../code/map/map_room.js';
+import MapEntityListClass from '../../code/map/map_entity_list.js';
+import MapParticleListClass from '../../code/map/map_particle_list.js';
 import MapMovementListClass from '../../code/map/map_movement_list.js';
 import MapOverlayClass from '../../code/map/map_overlay.js';
 import SkyClass from '../../code/sky/sky.js';
-import MapParticleListClass from '../../code/map/map_particle_list.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -37,30 +30,15 @@ export default class MapClass
         this.lights=[];
         this.rooms=[];
         this.liquids=[];
-        
-        this.entityCurrentId=1;
-        this.entities=[];
 
-        this.genBitmapWall=new GenBitmapWallClass(view);
-        this.genBitmapFloor=new GenBitmapFloorClass(view);
-        this.genBitmapCeiling=new GenBitmapCeilingClass(view);
-        this.genBitmapDoor=new GenBitmapDoorClass(view);
-        this.genBitmapMetal=new GenBitmapMetalClass(view);
-        this.genBitmapMachine=new GenBitmapMachineClass(view);
-        this.genBitmapPanel=new GenBitmapPanelClass(view);
-        this.genBitmapBox=new GenBitmapBoxClass(view);
-        this.genBitmapLiquid=new GenBitmapLiquidClass(view);
-
+        this.entityList=new MapEntityListClass();
         this.movementList=new MapMovementListClass();
         this.overlay=new MapOverlayClass(view,fileCache);
         this.sky=new SkyClass(view,fileCache);
         this.particleList=new MapParticleListClass(view,fileCache);
         
+        this.genBitmap=new GenBitmapClass(view);
         this.textureBitmaps=new Map();
-
-        this.lightXBound=new BoundClass(0,0);           // global not local so they won't get GCd
-        this.lightYBound=new BoundClass(0,0);
-        this.lightZBound=new BoundClass(0,0);
 
         Object.seal(this);
     }
@@ -71,29 +49,22 @@ export default class MapClass
 
     initialize()
     {
-            // first entity is always the player
-            // so lock that off
-
-        this.entities=[];
-        this.entities.push(null);
-        
-            // any initialize any subsystems
-
         if (!this.mapMeshShader.initialize()) return(false);
         if (!this.mapLiquidShader.initialize()) return(false);
+        if (!this.entityList.initialize()) return(false);
+        if (!this.particleList.initialize()) return(false);
         if (!this.overlay.initialize()) return(false);
-        if (!this.sky.initialize()) return(false);
-        return(this.particleList.initialize());
-
+        return(this.sky.initialize());
     }
 
     release()
     {
         this.mapLiquidShader.release();
         this.mapMeshShader.release();
+        this.entityList.release();
+        this.particleList.release();
         this.overlay.release();
         this.sky.release();
-        this.particleList.release();
     }
     
         //
@@ -109,53 +80,13 @@ export default class MapClass
         this.textureBitmaps.clear();
     }
     
-    getTexture(textureType)
+    getTexture(bitmapType)
     {
-        let bitmap=this.textureBitmaps.get(textureType);
+        let bitmap=this.textureBitmaps.get(bitmapType);
         if (bitmap!==undefined) return(bitmap);
-            
-        switch (textureType) {
-            case constants.MAP_TEXTURE_TYPE_WALL:
-            case constants.MAP_TEXTURE_TYPE_PILLAR:
-                bitmap=this.genBitmapWall.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_FLOOR:
-            case constants.MAP_TEXTURE_TYPE_PLATFORM:
-                bitmap=this.genBitmapFloor.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_CEILING:
-                bitmap=this.genBitmapCeiling.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_METAL:
-                bitmap=this.genBitmapMetal.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_DOOR:
-            case constants.MAP_TEXTURE_TYPE_FRAME:
-                bitmap=this.genBitmapDoor.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_COMPUTER:
-                bitmap=this.genBitmapMachine.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_PANEL:
-                bitmap=this.genBitmapPanel.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_BOX:
-                bitmap=this.genBitmapBox.generateRandom(false);
-                break;
-
-            case constants.MAP_TEXTURE_TYPE_LIQUID:
-                bitmap=this.genBitmapLiquid.generateRandom(false);
-                break;
-        }
         
-        this.textureBitmaps.set(textureType,bitmap);
+        bitmap=this.genBitmap.generate(bitmapType,false);
+        this.textureBitmaps.set(bitmapType,bitmap);
         
         return(bitmap);
     }
@@ -182,7 +113,9 @@ export default class MapClass
         this.lights=[];
         this.rooms=[];
         this.liquids=[];
-        this.entities=[];
+        
+        this.entityList.clear();
+        this.particleList.clear();
     }
 
         //
@@ -300,10 +233,8 @@ export default class MapClass
         // find all the map lights in this view
         // and add them to the view light list
         // 
-        // this also calls through to the particle lights
-        //
 
-    addViewLightsFromMapLights()
+    addLightsToViewLights()
     {
         let n,k,nLight,idx;
         let x,y,z;
@@ -355,10 +286,6 @@ export default class MapClass
                 if (this.view.lights.length>this.view.MAX_LIGHT_COUNT) this.view.lights.pop();
             }
         }
-        
-            // and add in any from particles
-            
-        this.particleList.addViewLightsFromParticleLights();
     }
     
         //
@@ -467,7 +394,7 @@ export default class MapClass
         
     overlayDraw()
     {
-        this.overlay.draw(map);
+        this.overlay.draw(this);
     }
     
     addOverlayRoom(room)
@@ -511,103 +438,6 @@ export default class MapClass
     }
     
         //
-        // sky draw
-        //
-        
-    drawSky()
-    {
-        this.sky.drawStart();
-        this.sky.draw();
-        this.sky.drawEnd();
-    }
-    
-        //
-        // entities
-        //
-        
-    setPlayerEntity(entity)
-    {
-        entity.id=0;
-        this.entities[0]=entity;
-    }
-
-    addEntity(entity)
-    {
-        entity.id=this.entityCurrentId++;
-        this.entities.push(entity);
-    }
-
-    countEntity()
-    {
-        return(this.entities.length);
-    }
-
-    getEntity(entityIdx)
-    {
-        return(this.entities[entityIdx]);
-    }
-    
-    getPlayerEntity()
-    {
-        return(this.entities[0]);
-    }
-    
-    findEntityById(id)
-    {
-        let n,entity;
-        let nEntity=this.entities.length;
-            
-        for (n=0;n!==nEntity;n++) {
-            entity=this.entities[n];
-            if (entity.id===id) return(entity);
-        }
-        
-        return(null);
-    }
-    
-    movementPushEntities(meshIdx,movePnt)
-    {
-        let n,entity;
-        let nEntity=this.entities.length;
-        
-            // check the entities, skipping
-            // any projectiles
-            
-        for (n=0;n!==nEntity;n++) {
-            entity=this.entities[n];
-            if (entity instanceof EntityProjectileClass) continue;
-            
-            entity.movementPush(meshIdx,movePnt);
-        }
-    }
-    
-    runEntities()
-    {
-        let n;
-        let nEntity=this.entities.length;
-        
-            // run the entities
-            
-        for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(this);
-        }
-        
-            // now clean up any that got
-            // marked for deleting
-            
-        n=0;
-        
-        while (n<nEntity) {
-            if (this.entities[n].isMarkedForDeletion()) {
-                this.entities.splice(n,1);
-                nEntity--;
-                continue;
-            }
-            n++;
-        }
-    }
-
-        //
         // setup all the mesh buffers
         //
 
@@ -633,21 +463,13 @@ export default class MapClass
         // draw map meshes
         //
 
-    drawMeshStart()
-    {
-        this.mapMeshShader.drawStart();
-    }
-
-    drawMeshEnd()
-    {
-        this.mapMeshShader.drawEnd();
-    }
-
     drawMesh()
     {
         let n,mesh;
         let nMesh=this.meshes.length;
         let currentBitmap;
+        
+        this.mapMeshShader.drawStart();
 
             // setup map drawing
 
@@ -677,59 +499,28 @@ export default class MapClass
             mesh.draw();
         }
         
-            // debugging draw
-        
-        if (config.DEBUG_DRAW_MAP_MESH_LINES) {
-            for (n=0;n!==nMesh;n++) {
-                mesh=this.meshes[n];
-                if (this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshLines(mesh);
-            }
-        }
-        
-        if (config.DEBUG_DRAW_MAP_MESH_TANGENTS) {
-            for (n=0;n!==nMesh;n++) {
-                mesh=this.meshes[n];
-                if (this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshTangents(mesh);
-            }
-        }
-        
-        if (config.DEBUG_DRAW_MAP_MESH_NORMALS) {
-            for (n=0;n!==nMesh;n++) {
-                mesh=this.meshes[n];
-                if (this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) debug.drawMapMeshNormals(mesh);
-            }
-        }
-        
+        this.mapMeshShader.drawEnd();
     }
     
         //
         // draw map liquids
         //
 
-    drawLiquidStart()
-    {
-        let gl=this.view.gl;
-        
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-        this.mapLiquidShader.drawStart();
-    }
-
-    drawLiquidEnd()
-    {
-        let gl=this.view.gl;
-        
-        this.mapLiquidShader.drawEnd();
-        
-        gl.disable(gl.BLEND);
-    }
-
     drawLiquid()
     {
         let n,liquid;
         let nLiquid=this.liquids.length;
         let currentBitmap;
+        let gl=this.view.gl;
+        
+            // change the blend
+            
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        
+        gl.depthMask(false);
+
+        this.mapLiquidShader.drawStart();
 
             // setup liquid drawing
 
@@ -757,6 +548,13 @@ export default class MapClass
             liquid.bindBuffers(this.mapLiquidShader);
             liquid.draw();
         }
+        
+            // reset the blend
+            
+        this.mapLiquidShader.drawEnd();
+        
+        gl.disable(gl.BLEND);
+        gl.depthMask(true);
     }
     
 }

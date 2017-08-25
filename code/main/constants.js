@@ -59,46 +59,6 @@ export const MESH_FLAG_LIGHT=9;
 export const MESH_FLAG_DECORATION=10;
 export const MESH_FLAG_WINDOW=11;
 
-    // map textures
-    
-export const MAP_TEXTURE_TYPE_WALL=0;
-export const MAP_TEXTURE_TYPE_FLOOR=1;
-export const MAP_TEXTURE_TYPE_CEILING=2;
-export const MAP_TEXTURE_TYPE_PLATFORM=3;
-export const MAP_TEXTURE_TYPE_PILLAR=4;
-export const MAP_TEXTURE_TYPE_METAL=5;
-export const MAP_TEXTURE_TYPE_DOOR=6;
-export const MAP_TEXTURE_TYPE_FRAME=7;
-export const MAP_TEXTURE_TYPE_COMPUTER=8;
-export const MAP_TEXTURE_TYPE_PANEL=9;
-export const MAP_TEXTURE_TYPE_BOX=10;
-export const MAP_TEXTURE_TYPE_LIQUID=11;
-
-/*
- *         
-            // types
-            
-        this.TYPE_WALL=0;
-        this.TYPE_FLOOR=1;
-        this.TYPE_CEILING=2;
-        this.TYPE_DOOR=3;
-        this.TYPE_METAL=4;
-        this.TYPE_BOX=5;
-        this.TYPE_PANEL=6;
-        this.TYPE_LIQUID=7;
-        this.TYPE_MACHINE=8;
-        this.TYPE_PARTICLE=9;
-        this.TYPE_ITEM=10;
-        this.TYPE_SKIN=11;
-        this.TYPE_SKY=12;
-
-        this.TYPE_NAMES=    [
-                                'Gun Fire','Explosion','Monster Wake Up',
-                                'Monster Hurt','Monster Die'
-                            ];
-
- */
-
     // extra room features
     
 export const STAIR_STEP_COUNT=10;
@@ -137,3 +97,34 @@ export const LIMB_AXIS_Z=2;
     // particles
     
 export const PARTICLE_MAX_COUNT=50;
+export const PARTICLE_MAX_POINTS=200;
+
+
+    // bitmap types
+            
+export const BITMAP_TYPE_WALL=0;
+export const BITMAP_TYPE_FLOOR=1;
+export const BITMAP_TYPE_CEILING=2;
+export const BITMAP_TYPE_DOOR=3;
+export const BITMAP_TYPE_METAL=4;
+export const BITMAP_TYPE_BOX=5;
+export const BITMAP_TYPE_PANEL=6;
+export const BITMAP_TYPE_LIQUID=7;
+export const BITMAP_TYPE_MACHINE=8;
+export const BITMAP_TYPE_PLATFORM=9;
+export const BITMAP_TYPE_PIPE=10;
+export const BITMAP_TYPE_FRAME=11;
+export const BITMAP_TYPE_PILLAR=12;
+export const BITMAP_TYPE_PARTICLE=13;
+export const BITMAP_TYPE_ITEM=14;
+export const BITMAP_TYPE_SKIN=15;
+export const BITMAP_TYPE_SKY=16;
+
+export const BITMAP_TYPE_NAMES=
+                [
+                    'Wall','Floor','Ceiling','Door','Metal',
+                    'Box','Panel','Liquid','Machine',
+                    'Platform','Pipe','Frame','Pillar',
+                    'Particle','Item','Skin','Sky'
+                ];
+

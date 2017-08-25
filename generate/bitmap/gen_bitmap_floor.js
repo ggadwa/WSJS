@@ -1,32 +1,16 @@
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate floor bitmap class
 //
 
-export default class GenBitmapFloorClass extends GenBitmapClass
+export default class GenBitmapFloorClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
-        
-            // types
-            
-        this.TYPE_TILE=0;
-        this.TYPE_HEXAGONAL=1;
-        this.TYPE_METAL=2;
-        this.TYPE_CEMENT=3;
-        this.TYPE_MOSAIC=4;
-        this.TYPE_WOOD=5;
-
-        this.TYPE_NAMES=
-                [
-                    'Tile','Hexagonal','Metal','Cement',
-                    'Mosaic','Wood'
-                ];
-        
         Object.seal(this);
     }
         
@@ -572,7 +556,7 @@ export default class GenBitmapFloorClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(generateType,inDebug)
+    generate(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;
@@ -606,34 +590,34 @@ export default class GenBitmapFloorClass extends GenBitmapClass
 
             // create the bitmap
 
-        switch (generateType) {
+        switch (genRandom.randomIndex(6)) {
 
-            case this.TYPE_TILE:
+            case 0:
                 this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=10.0;
                 break;
 
-            case this.TYPE_HEXAGONAL:
+            case 1:
                 this.generateHexagonal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
                 break;
 
-            case this.TYPE_METAL:
+            case 2:
                 this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
                 
-            case this.TYPE_CEMENT:
+            case 3:
                 this.generateCement(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
                 break;
                 
-            case this.TYPE_MOSAIC:
+            case 4:
                 this.generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=10.0;
                 break;
 
-            case this.TYPE_WOOD:
+            case 5:
                 this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=2.0;
                 break;
@@ -649,11 +633,6 @@ export default class GenBitmapFloorClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
-    }
-    
-    generateRandom(inDebug)
-    {
-        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

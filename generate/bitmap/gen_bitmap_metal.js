@@ -1,26 +1,16 @@
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate metal bitmap class
 //
 
-export default class GenBitmapMetalClass extends GenBitmapClass
+export default class GenBitmapMetalClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
-        
-            // types
-            
-        this.TYPE_METAL=0;
-
-        this.TYPE_NAMES=
-                [
-                    'Metal'
-                ];
-        
         Object.seal(this);
     }
             
@@ -90,7 +80,7 @@ export default class GenBitmapMetalClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(generateType,inDebug)
+    generate(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;
@@ -124,9 +114,9 @@ export default class GenBitmapMetalClass extends GenBitmapClass
 
             // create the bitmap
 
-        switch (generateType) {
+        switch (genRandom.randomIndex(1)) {
 
-            case this.TYPE_METAL:
+            case 0:
                 this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
@@ -142,11 +132,6 @@ export default class GenBitmapMetalClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
-    }
-    
-    generateRandom(inDebug)
-    {
-        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

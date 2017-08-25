@@ -54,20 +54,6 @@ class ConfigClass
 
         this.PLAYER_CLIP_WALLS=false;
         this.PLAYER_FLY=false;
-
-            //
-            // draw debuging
-            //
-
-        this.DEBUG_DRAW_MAP_MESH_LINES=false;
-        this.DEBUG_DRAW_MAP_MESH_NORMALS=false;
-        this.DEBUG_DRAW_MAP_MESH_TANGENTS=false;
-
-        this.DEBUG_DRAW_MODEL_HITBOX=false;
-        this.DEBUG_DRAW_MODEL_SKELETON=false;
-        this.DEBUG_DRAW_MODEL_MESH_LINES=false;
-        this.DEBUG_DRAW_MODEL_MESH_NORMALS=false;
-        this.DEBUG_DRAW_MODEL_MESH_TANGENTS=false;
     }
 }
 

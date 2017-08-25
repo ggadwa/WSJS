@@ -18,7 +18,6 @@ export default class MapParticleListClass
         this.particleShader=new ParticleShaderClass(view,fileCache);
         
         this.particleBitmap=null;
-        this.particleBitmapSize=32;
 
         this.particles=[];
         
@@ -73,7 +72,7 @@ export default class MapParticleListClass
         // particle list
         //
 
-    getParticle(particleIdx)
+    get(particleIdx)
     {
         return(this.particles[particleIdx]);
     }
@@ -89,12 +88,21 @@ export default class MapParticleListClass
         return(null);
     }
     
+    clear()
+    {
+        let n;
+        
+        for (n=0;n!==constants.PARTICLE_MAX_COUNT;n++) {
+            this.particles[n].release();
+        }
+    }
+    
         //
         // find all the particle lights in this view
         // and add them to the view light list
         //
 
-    addViewLightsFromParticleLights()
+    addLightsToViewLights()
     {
         let n,k,idx;
         let x,y,z;
@@ -182,8 +190,10 @@ export default class MapParticleListClass
         this.particleShader.drawStart();
         
         gl.enable(gl.BLEND);
-        //gl.blendFunc(gl.SRC_ALPHA,gl.ONE);        // additive   
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE);        // additive   
+        //gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        
+        gl.depthMask(false);
         
             // setup, draw, and timeout any
             // particles
@@ -195,7 +205,10 @@ export default class MapParticleListClass
             }
         }
         
+            // reset gl back to normal
+            
         gl.disable(gl.BLEND);
+        gl.depthMask(true);
         
         this.particleShader.drawEnd();
     }

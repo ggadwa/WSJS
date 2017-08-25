@@ -90,7 +90,7 @@ export default class GenRoomLedgeClass
     createLedges(room)
     {
         let x,z;
-        let ledgeBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
+        let ledgeBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
         let wid,high;
         let xMax,zMax;
         let pts;

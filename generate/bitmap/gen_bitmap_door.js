@@ -1,27 +1,16 @@
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate door bitmap class
 //
 
-export default class GenBitmapDoorClass extends GenBitmapClass
+export default class GenBitmapDoorClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
-        
-            // types
-            
-        this.TYPE_METAL=0;
-        this.TYPE_WOOD=1;
-
-        this.TYPE_NAMES=
-                [
-                    'Metal','Wood'
-                ];
-        
         Object.seal(this);
     }
             
@@ -142,7 +131,7 @@ export default class GenBitmapDoorClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(generateType,inDebug)
+    generate(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;
@@ -176,14 +165,14 @@ export default class GenBitmapDoorClass extends GenBitmapClass
 
             // create the bitmap
 
-        switch (generateType) {
+        switch (genRandom.randomIndex(2)) {
 
-            case this.TYPE_METAL:
+            case 0:
                 this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
                 
-            case this.TYPE_WOOD:
+            case 1:
                 this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=2.0;
                 break;
@@ -199,11 +188,6 @@ export default class GenBitmapDoorClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
-    }
-    
-    generateRandom(inDebug)
-    {
-        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

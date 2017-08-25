@@ -30,7 +30,7 @@ export default class GenRoomDecorationComputerClass
         zBound=new BoundClass((room.zBound.min+(rect.top*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*constants.ROOM_BLOCK_WIDTH)));
         yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
 
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM),xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,this.map.getTexture(constants.BITMAP_TYPE_PLATFORM),xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
     }
         
         //
@@ -45,8 +45,8 @@ export default class GenRoomDecorationComputerClass
         
             // textures
             
-        computerBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_COMPUTER);
-        metalBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
+        computerBitmap=this.map.getTexture(constants.BITMAP_TYPE_MACHINE);
+        metalBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
        
             // computer
 
@@ -143,8 +143,8 @@ export default class GenRoomDecorationComputerClass
             
             // the machine location
         
-        computerBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PANEL);
-        baseBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
+        computerBitmap=this.map.getTexture(constants.BITMAP_TYPE_PANEL);
+        baseBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
         
             // panel directions and size
             
@@ -205,8 +205,8 @@ export default class GenRoomDecorationComputerClass
             
             // junction textures
 
-        baseBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
-        pipeBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
+        baseBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
+        pipeBitmap=this.map.getTexture(constants.BITMAP_TYPE_PIPE);
         
             // junction sizes
             

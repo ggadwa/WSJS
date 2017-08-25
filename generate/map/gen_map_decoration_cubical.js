@@ -88,7 +88,7 @@ export default class GenRoomDecorationCubicalClass
     create(room,rect)
     {
         let wid,yBound;
-        let bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME);
+        let bitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
         
             // get width
             

@@ -535,7 +535,7 @@ export default class ViewClass
         let light,tintOn,tintAtt;
         let weapon;
         let fpsStr,idx;
-        let player=map.getPlayerEntity();
+        let player=map.entityList.getPlayer();
          
             // everything overdraws except
             // clear the depth buffer
@@ -584,7 +584,8 @@ export default class ViewClass
             
         this.lights=[];
 
-        map.addViewLightsFromMapLights();
+        map.addLightsToViewLights();
+        map.particleList.addLightsToViewLights();
         
             // fill in any missing lights with NULL
 
@@ -607,51 +608,19 @@ export default class ViewClass
             
         this.glowFactor=Math.abs(Math.cos(this.timeStamp/500.0));
         
-            // draw the sky
+            // reset some stats
             
-        map.drawSky();
-        
-            // draw the map
-       
         this.drawMeshCount=0;
         this.drawMeshTrigCount=0;
-
-        map.drawMeshStart();
-        map.drawMesh();
-        map.drawMeshEnd();
-
-            // draw the entities
-            // always skip index 0 as that's the player
-            
         this.drawModelCount=0;
         this.drawModelTrigCount=0;
-
-        nEntity=map.countEntity();
-
-        for (n=1;n<nEntity;n++) {
-            entity=map.getEntity(n);
-
-            if (entity.inFrustum()) {
-                entity.drawStart();
-                entity.draw();
-                entity.drawEnd();
-
-                if (config.DEBUG_DRAW_MODEL_HITBOX) debug.drawModelHitBox(entity.model,entity.radius,entity.high,entity.angle,entity.position);
-                if (config.DEBUG_DRAW_MODEL_SKELETON) debug.drawModelSkeleton(entity.model,entity.angle,entity.position);
-                if (config.DEBUG_DRAW_MODEL_MESH_LINES) debug.drawModelMeshLines(entity.model);
-                if (config.DEBUG_DRAW_MODEL_MESH_NORMALS) debug.drawModelMeshNormals(entity.model);
-                if (config.DEBUG_DRAW_MODEL_MESH_TANGENTS) debug.drawModelMeshTangents(entity.model);
-            }
-        }
         
-            // liquids
+            // draw the map
             
-        map.drawLiquidStart();
+        map.sky.draw();
+        map.drawMesh();
+        map.entityList.draw();
         map.drawLiquid();
-        map.drawLiquidEnd();
-        
-            // particles
-            
         map.particleList.draw();
       
             // player weapon
@@ -659,9 +628,7 @@ export default class ViewClass
         weapon=player.getCurrentWeapon();
         if (weapon!==null) {
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-            weapon.drawStart();
             weapon.draw(player);
-            weapon.drawEnd();
         }
         
             // setup any tinting

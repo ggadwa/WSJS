@@ -1,5 +1,5 @@
 import ColorClass from '../../code/utility/color.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import TextShaderClass from '../../code/text/text_shader.js';
 
 //
@@ -74,7 +74,7 @@ export default class TextClass
             // background is black, text is white
             // so it can be colored
 
-        genBitmapUtility=new GenBitmapClass(this.view);
+        genBitmapUtility=new GenBitmapBaseClass(this.view);
         genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,new ColorClass(0.0,0.0,0.0));
 
             // draw the text

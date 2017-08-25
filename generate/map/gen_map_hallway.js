@@ -110,7 +110,7 @@ export default class GenRoomHallwayClass
     {
         let idx,meshIdx,xDoorBound;
         let vertexList,movement;
-        let doorBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_DOOR);
+        let doorBitmap=this.map.getTexture(constants.BITMAP_TYPE_DOOR);
         
         xDoorBound=new BoundClass((x-thickSize),(x+thickSize));
             
@@ -137,9 +137,9 @@ export default class GenRoomHallwayClass
     {
         let idx,meshCenterPoint,thickSize;
         let vertexList;
-        let zHallwayBound,zThickBound,xFrameBound;
+        let zHallwayBound,zThickBound,xFrameBound,frameBitmap;
         
-        let roomBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
+        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
         
             // need a center point to better
             // create normals
@@ -201,19 +201,21 @@ export default class GenRoomHallwayClass
         }
         
             // the frame
+            
+        frameBitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
         
         xFrameBound=new BoundClass(xBound.min,xBound.min);
-        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
         
         xFrameBound=new BoundClass(xBound.max,xBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
     }
     
     createHallwayDoorZ(xBound,yBound,z,thickSize)
     {
         let idx,meshIdx,zDoorBound;
         let vertexList,movement;
-        let doorBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_DOOR);
+        let doorBitmap=this.map.getTexture(constants.BITMAP_TYPE_DOOR);
         
         zDoorBound=new BoundClass((z-thickSize),(z+thickSize));
         
@@ -240,9 +242,9 @@ export default class GenRoomHallwayClass
     {
         let idx,meshCenterPoint,thickSize;
         let vertexList;
-        let xHallwayBound,xThickBound,zFrameBound;
+        let xHallwayBound,xThickBound,zFrameBound,frameBitmap;
         
-        let roomBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
+        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
         
             // need a center point to better
             // create normals
@@ -304,12 +306,14 @@ export default class GenRoomHallwayClass
         }
         
             // the frame
+            
+        frameBitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
         
         zFrameBound=new BoundClass(zBound.min,zBound.min);
-        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,true,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,true,false,true));
         
         zFrameBound=new BoundClass(zBound.max,zBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_FRAME),xBound,yBound,zFrameBound,false,false,true));
+        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,false,false,true));
     }
 }
 

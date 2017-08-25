@@ -1,26 +1,16 @@
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate panel bitmap class
 //
 
-export default class GenBitmapPanelClass extends GenBitmapClass
+export default class GenBitmapPanelClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
-        
-            // types
-            
-        this.TYPE_PANEL=0;
-
-        this.TYPE_NAMES=
-                [
-                    'Panel'
-                ];
-        
         Object.seal(this);
     }
     
@@ -85,7 +75,7 @@ export default class GenBitmapPanelClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(generateType,inDebug)
+    generate(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;
@@ -119,9 +109,9 @@ export default class GenBitmapPanelClass extends GenBitmapClass
 
             // create the bitmap
 
-        switch (generateType) {
+        switch (genRandom.randomIndex(1)) {
 
-            case this.TYPE_PANEL:
+            case 0:
                 this.generatePanel(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
                 shineFactor=1.0;
                 break;
@@ -137,11 +127,6 @@ export default class GenBitmapPanelClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
-    }
-    
-    generateRandom(inDebug)
-    {
-        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

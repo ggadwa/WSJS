@@ -6,7 +6,6 @@ import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
 import ModelClass from '../../code/model/model.js';
 import ModelListClass from '../../code/model/model_list.js';
-import DebugClass from '../../code/debug/debug.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
 import GenMapClass from '../../generate/map/gen_map.js';
@@ -17,8 +16,7 @@ import GenSoundClass from '../../generate/sound/gen_sound.js';
 import GenAIClass from '../../generate/thing/gen_ai.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityMonsterClass from '../../code/entities/entity_monster.js';
-import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
-import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
+import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -35,7 +33,6 @@ class MainClass
         this.view=new ViewClass(this.fileCache);
         this.map=new MapClass(this.view,this.fileCache);
         this.modelList=new ModelListClass(this.view,this.fileCache);
-        this.debug=new DebugClass(this.view,this.fileCache);
         this.input=new InputClass(this.view);
         this.sound=new SoundClass();
 
@@ -75,7 +72,6 @@ class MainClass
         if (!this.sound.initialize()) return;
         if (!this.map.initialize()) return;
         if (!this.modelList.initialize()) return;
-        if (!this.debug.initialize()) return;
 
             // next step
 
@@ -113,17 +109,17 @@ class MainClass
         this.view.loadingScreenAddString('Generating Player Model');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildPlayerModel.bind(this,new GenBitmapSkinClass(this.view)),1);
+        setTimeout(this.initBuildPlayerModel.bind(this,new GenBitmapClass(this.view)),1);
     }
     
-    initBuildPlayerModel(genBitmapSkin)
+    initBuildPlayerModel(genBitmap)
     {
         let model,modelBitmap;
         let genModel=new GenModelClass(this.view);
 
             // build the player model
         
-        modelBitmap=genBitmapSkin.generateRandom(false);
+        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_SKIN,false);
         
         model=new ModelClass('player');
         genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,1.0,false);
@@ -136,16 +132,16 @@ class MainClass
         this.view.loadingScreenAddString('Generating Monster Models');
         this.view.loadingScreenDraw(null);
         
-        setTimeout(this.initBuildMonsterModels.bind(this,0,genModel,genBitmapSkin),1);
+        setTimeout(this.initBuildMonsterModels.bind(this,0,genModel,genBitmap),1);
     }
 
-    initBuildMonsterModels(idx,genModel,genBitmapSkin)
+    initBuildMonsterModels(idx,genModel,genBitmap)
     {
         let model,modelBitmap;
 
             // build the model
         
-        modelBitmap=genBitmapSkin.generateRandom(false);
+        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_SKIN,false);
 
         model=new ModelClass(('monster_'+idx));
         genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,1.0,false);
@@ -157,7 +153,7 @@ class MainClass
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
             this.view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
-            setTimeout(this.initBuildMonsterModels.bind(this,idx,genModel,genBitmapSkin),1);
+            setTimeout(this.initBuildMonsterModels.bind(this,idx,genModel,genBitmap),1);
             return;
         }
 
@@ -168,24 +164,24 @@ class MainClass
             this.view.loadingScreenAddString('Generating Boss Model');
             this.view.loadingScreenDraw(null);
 
-            setTimeout(this.initBuildBossModel.bind(this,genModel,genBitmapSkin),1);
+            setTimeout(this.initBuildBossModel.bind(this,genModel,genBitmap),1);
         }
         else {
             this.view.loadingScreenUpdate();
             this.view.loadingScreenAddString('Generating Weapons');
             this.view.loadingScreenDraw(null);
 
-            setTimeout(this.initBuildWeapons.bind(this,genModel,null),1);
+            setTimeout(this.initBuildWeapons.bind(this,genModel,genBitmap),1);
         }
     }
     
-    initBuildBossModel(genModel,genBitmapSkin)
+    initBuildBossModel(genModel,genBitmap)
     {
         let model,modelBitmap;
 
             // build monster
         
-        modelBitmap=genBitmapSkin.generateRandom(false);
+        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_SKIN,false);
 
         model=new ModelClass('boss');
         genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,genRandom.randomFloat(2.5,3.0),false);
@@ -198,18 +194,14 @@ class MainClass
         this.view.loadingScreenAddString('Generating Weapons');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildWeapons.bind(this,genModel,null),1);
+        setTimeout(this.initBuildWeapons.bind(this,genModel,genBitmap),1);
     }
 
-    initBuildWeapons(genModel,genBitmapItem)
+    initBuildWeapons(genModel,genBitmap)
     {
         let model,modelBitmap;
-        
-            // supergumba -- right now this is bad, it'll leak and get closed more than once,
-            // deal with this when we have real weapon routines
-        
-        if (genBitmapItem===null) genBitmapItem=new GenBitmapItemClass(this.view);
-        modelBitmap=genBitmapItem.generate(0,false);
+
+        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_ITEM,false);
 
             // weapon
 
@@ -261,7 +253,7 @@ class MainClass
         playerEntity.addWeapon(playerWeapon);
         playerEntity.setCurrentWeaponIndex(0);
 
-        this.map.setPlayerEntity(playerEntity);
+        this.map.entityList.setPlayer(playerEntity);
         
             // create AI type for each monster
         
@@ -281,7 +273,7 @@ class MainClass
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
             model=this.modelList.cloneModel('monster_'+monsterType);
-            this.map.addEntity(new EntityMonsterClass(this.view,this.map,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
+            this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
         
             // boss monster
@@ -289,7 +281,7 @@ class MainClass
         if (config.MONSTER_BOSS) {
             pos=this.map.findRandomBossPosition();
             model=this.modelList.cloneModel('boss');
-            if (pos!==null) this.map.addEntity(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
+            if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 
             // finished
@@ -314,11 +306,11 @@ class MainClass
         
             // set the listener to this entity
             
-        this.sound.setListenerToEntity(this.map.getPlayerEntity());
+        this.sound.setListenerToEntity(this.map.entityList.getPlayer());
 
             // start the input
 
-        this.input.initialize(this.map.getPlayerEntity());
+        this.input.initialize(this.map.entityList.getPlayer());
         
             // the cancel loop flag
             
@@ -387,7 +379,7 @@ function mainLoop(timeStamp)
                     view.physicsTick-=constants.PHYSICS_MILLISECONDS;
                     view.lastPhysicTimeStamp+=constants.PHYSICS_MILLISECONDS;
 
-                    map.runEntities();
+                    map.entityList.run();
                 }
             }
             else {

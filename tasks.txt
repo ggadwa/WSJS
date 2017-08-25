@@ -12,17 +12,12 @@ WebGL2
 
 
 
-
-
---> entities in map
---> view.draw() needs to move a lot of stuff into a single map.draw() [sky, meshes, liquids, particles]
-
---> better particle composeting
-
+--> put liquids and such in their own list
+--> need particle blob (use for explosions)
+--> platform, pipe, frame, and pillar need their own texture creation
+--> sky is just terrible
 --> can we get rid of sound list?  just have sounds (like bitmaps)
 --> is model list necessary?
---> replace all MAP_TEXTURE_TYPE_ with generic bitmap types, in constants
---> make genBitmap be a single call, like genModel/genSound
 
 
 
@@ -33,7 +28,7 @@ ToDos
         [X] mapRoomConstants.ROOM_DECORATION_PILLARS:
         [X] mapRoomConstants.ROOM_DECORATION_STORAGE:
         [X] mapRoomConstants.ROOM_DECORATION_COMPUTER:
-              - computer panel has square around lights
+              - computer panel has square around lights (possible canary bug, check after chrome 61)
         [ ] mapRoomConstants.ROOM_DECORATION_PIPE:
         [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
               - raised chunk of floor with stairs
@@ -41,7 +36,6 @@ ToDos
         [ ] mapRoomConstants.ROOM_DECORATION_LAB:
               - glowing vat texture, glass cylinders
         [ ] pits (wires, pipes)
-    * remove decoration type from room class
     * types for low/high/water rooms
     * special edge ones (panels, conduits)
     * animated decorative items

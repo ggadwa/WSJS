@@ -25,7 +25,7 @@ export default class GenRoomLiftClass
     addLiftChunk(room,x,yLiftBound,z)
     {
         let len,meshIdx,movement,moveMSec,waitMSec;
-        let liftBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
+        let liftBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
         
         let xLiftBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
         let zLiftBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));

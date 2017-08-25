@@ -33,7 +33,7 @@ export default class GenRoomClosetClass
 
             // the walls
             
-        bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
+        bitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(24);
@@ -80,7 +80,7 @@ export default class GenRoomClosetClass
 
             // ceiling
             
-        bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_CEILING);
+        bitmap=this.map.getTexture(constants.BITMAP_TYPE_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);
@@ -106,7 +106,7 @@ export default class GenRoomClosetClass
 
             // floor
         
-        bitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_FLOOR);
+        bitmap=this.map.getTexture(constants.BITMAP_TYPE_FLOOR);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);

@@ -1,28 +1,16 @@
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate ceiling bitmap class
 //
 
-export default class GenBitmapCeilingClass extends GenBitmapClass
+export default class GenBitmapCeilingClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
-        
-            // types
-            
-        this.TYPE_TILE=0;
-        this.TYPE_METAL=1;
-        this.TYPE_CEMENT=2;
-
-        this.TYPE_NAMES=
-                [
-                    'Tile','Metal','Cement'
-                ];
-        
         Object.seal(this);
     }
         
@@ -227,7 +215,7 @@ export default class GenBitmapCeilingClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(generateType,inDebug)
+    generate(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;
@@ -261,19 +249,19 @@ export default class GenBitmapCeilingClass extends GenBitmapClass
 
             // create the bitmap
 
-        switch (generateType) {
+        switch (genRandom.randomIndex(3)) {
 
-            case this.TYPE_TILE:
+            case 0:
                 this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=10.0;
                 break;
 
-            case this.TYPE_METAL:
+            case 1:
                 this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
                 
-            case this.TYPE_CEMENT:
+            case 2:
                 this.generateCement(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
                 break;
@@ -289,11 +277,6 @@ export default class GenBitmapCeilingClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
-    }
-    
-    generateRandom(inDebug)
-    {
-        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

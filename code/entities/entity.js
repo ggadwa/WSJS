@@ -618,16 +618,6 @@ export default class EntityClass
         // draw entity
         //
         
-    drawStart()
-    {
-        this.model.drawStart();
-    }
-
-    drawEnd()
-    {
-        this.model.drawEnd();
-    }
-
     draw()
     {
             // either update skeleton and create

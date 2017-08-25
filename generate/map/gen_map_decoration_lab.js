@@ -30,8 +30,8 @@ export default class GenRoomDecorationLabClass
         let yMid,centerPnt,radius;
         let platformBitmap,metalBitmap;
 
-        platformBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
-        metalBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
+        platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
+        metalBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
         
             // the top and bottom base
 
@@ -73,8 +73,8 @@ export default class GenRoomDecorationLabClass
         let reduceSize;
         let platformBitmap,metalBitmap;
 
-        platformBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
-        metalBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
+        platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
+        metalBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
         
             // the top base
             

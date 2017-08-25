@@ -57,25 +57,19 @@ export default class ModelClass
         // draw model
         //
 
-    drawStart()
-    {
-        this.modelMeshShader.drawStart();
-    }
-
-    drawEnd()
-    {
-        this.modelMeshShader.drawEnd();
-    }
-
     draw()
     {
         let mesh=this.mesh;
 
+        this.modelMeshShader.drawStart();
+        
         mesh.bitmap.attachAsTexture(this.modelMeshShader);
         
         mesh.buildNonCulledTriangleIndexes();
         mesh.bindBuffers(this.modelMeshShader);
         mesh.draw();
+        
+        this.modelMeshShader.drawEnd();
     }
 
 }

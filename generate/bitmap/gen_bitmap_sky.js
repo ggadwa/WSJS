@@ -1,25 +1,17 @@
 import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate sky bitmap class
 //
 
-export default class GenBitmapSkyClass extends GenBitmapClass
+export default class GenBitmapSkyClass extends GenBitmapBaseClass
 {
     constructor(view)
     {    
         super(view);
-        
-        this.TYPE_CLOUDS=0;
-
-        this.TYPE_NAMES=
-                [
-                    'Clouds'
-                ];
-        
         Object.seal(this);
     }
         
@@ -169,7 +161,7 @@ export default class GenBitmapSkyClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(generateType,inDebug)
+    generate(inDebug)
     {
         let wid,high;
         let bitmapCanvas,bitmapCTX;
@@ -186,9 +178,9 @@ export default class GenBitmapSkyClass extends GenBitmapClass
 
             // create the bitmap
 
-        switch (generateType) {
+        switch (genRandom.randomIndex(1)) {
 
-            case this.TYPE_CLOUDS:
+            case 0:
                 this.generateSkyClouds(bitmapCTX,wid,high);
                 break;
                 
@@ -203,11 +195,6 @@ export default class GenBitmapSkyClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(this.view,bitmapCanvas,null,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
-    }
-    
-    generateRandom(inDebug)
-    {
-        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

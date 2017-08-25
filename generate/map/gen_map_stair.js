@@ -126,8 +126,8 @@ export default class GenRoomStairsClass
         let xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,zThickBound;
         let meshCenterPoint,thickSize,stairHigh,stepDrop;
         
-        let roomBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
-        let stairBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
+        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
+        let stairBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
         
             // need a center point to better
             // create normals
@@ -297,8 +297,8 @@ export default class GenRoomStairsClass
         let n,idx,stepAdd,yBoundFront,yBoundBack,nIdx;
         let vertexList,meshCenterPoint,thickSize,stairHigh,stepDrop;
         let xStepBound,yStepBound,yBoundTop,yBoundBottom,zStepBound,xThickBound;
-        let roomBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
-        let stairBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
+        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
+        let stairBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
         
             // need a center point to better
             // create normals

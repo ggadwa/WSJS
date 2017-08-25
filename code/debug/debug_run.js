@@ -3,19 +3,7 @@ import FileCacheClass from '../../code/main/filecache.js';
 import ViewClass from '../../code/main/view.js';
 import ModelClass from '../../code/model/model.js';
 import SoundClass from '../../code/sound/sound.js';
-import GenBitmapWallClass from '../../generate/bitmap/gen_bitmap_wall.js';
-import GenBitmapFloorClass from '../../generate/bitmap/gen_bitmap_floor.js';
-import GenBitmapCeilingClass from '../../generate/bitmap/gen_bitmap_ceiling.js';
-import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
-import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
-import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
-import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
-import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
-import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
-import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
-import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
-import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
-import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
+import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 import GenModelClass from '../../generate/model/gen_model.js';
 import GenSoundClass from '../../generate/sound/gen_sound.js';
 
@@ -25,12 +13,12 @@ import GenSoundClass from '../../generate/sound/gen_sound.js';
 
 class DebugItemClass
 {
-    constructor(name,typeIdx,objType,obj,isHeader)
+    constructor(name,typeIdx,objType,generatorObj,isHeader)
     {
         this.name=name;
         this.typeIdx=typeIdx;
         this.objType=objType;
-        this.obj=obj;
+        this.generatorObj=generatorObj;
         this.isHeader=isHeader;
     }
 }
@@ -69,19 +57,7 @@ export default class DebugRunClass
         this.fillListWithModelGenerator(new GenModelClass());
 
         this.list.push(new DebugItemClass('Bitmaps',-1,-1,null,true));
-        this.fillListWithBitmapGenerator('Wall',new GenBitmapWallClass(this.view));
-        this.fillListWithBitmapGenerator('Floor',new GenBitmapFloorClass(this.view));
-        this.fillListWithBitmapGenerator('Ceiling',new GenBitmapCeilingClass(this.view));
-        this.fillListWithBitmapGenerator('Door',new GenBitmapDoorClass(this.view));
-        this.fillListWithBitmapGenerator('Metal',new GenBitmapMetalClass(this.view));
-        this.fillListWithBitmapGenerator('Machine',new GenBitmapMachineClass(this.view));
-        this.fillListWithBitmapGenerator('Panel',new GenBitmapPanelClass(this.view));
-        this.fillListWithBitmapGenerator('Box',new GenBitmapBoxClass(this.view));
-        this.fillListWithBitmapGenerator('Liquid',new GenBitmapLiquidClass(this.view));
-        this.fillListWithBitmapGenerator('Skin',new GenBitmapSkinClass(this.view));
-        this.fillListWithBitmapGenerator('Item',new GenBitmapItemClass(this.view));
-        this.fillListWithBitmapGenerator('Sky',new GenBitmapSkyClass(this.view));
-        this.fillListWithBitmapGenerator('Particle',new GenBitmapParticleClass(this.view));
+        this.fillListWithBitmapGenerator();
         
         this.sound.initialize();
         this.list.push(new DebugItemClass('Sounds',-1,-1,null,true));
@@ -93,13 +69,23 @@ export default class DebugRunClass
         //
         // break up generator objects by their type names
         //
-        
-    fillListWithBitmapGenerator(name,obj)
+    
+    fillListWithModelGenerator(obj)
     {
         let n;
         
         for (n=0;n!==obj.TYPE_NAMES.length;n++) {
-            this.list.push(new DebugItemClass(name,n,this.DEBUG_ITEM_TYPE_BITMAP,obj,false));
+            this.list.push(new DebugItemClass(obj.TYPE_NAMES[n],n,this.DEBUG_ITEM_TYPE_MODEL,obj,false));
+        }
+    }
+        
+    fillListWithBitmapGenerator()
+    {
+        let n;
+        let generatorObj=new GenBitmapClass();
+        
+        for (n=0;n!==constants.BITMAP_TYPE_NAMES.length;n++) {
+            this.list.push(new DebugItemClass(constants.BITMAP_TYPE_NAMES[n],n,this.DEBUG_ITEM_TYPE_BITMAP,generatorObj,false));
         }
     }
     
@@ -108,16 +94,7 @@ export default class DebugRunClass
         let n;
         
         for (n=0;n!==obj.TYPE_NAMES.length;n++) {
-            this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_SOUND,obj,false));
-        }
-    }
-    
-    fillListWithModelGenerator(obj)
-    {
-        let n;
-        
-        for (n=0;n!==obj.TYPE_NAMES.length;n++) {
-            this.list.push(new DebugItemClass(null,n,this.DEBUG_ITEM_TYPE_MODEL,obj,false));
+            this.list.push(new DebugItemClass(obj.TYPE_NAMES[n],n,this.DEBUG_ITEM_TYPE_SOUND,obj,false));
         }
     }
         
@@ -133,7 +110,7 @@ export default class DebugRunClass
         
             // generate the bitmap
             
-        debugBitmap=item.obj.generate(item.typeIdx,true);
+        debugBitmap=item.generatorObj.generate(item.typeIdx,true);
         
             // draw the bitmap
             
@@ -163,7 +140,7 @@ export default class DebugRunClass
         let wid=this.soundCanvas.width;
         let high=this.soundCanvas.height;
         
-        this.currentSoundBuffer=item.obj.generate(item.typeIdx,true);
+        this.currentSoundBuffer=item.generatorObj.generate(item.typeIdx,true);
         data=this.currentSoundBuffer.buffer.getChannelData(0);
         dataLen=data.length;
         
@@ -550,23 +527,11 @@ export default class DebugRunClass
             
                 // regular items
             
-            switch (item.objType) {
-                case this.DEBUG_ITEM_TYPE_BITMAP:
-                    name=item.name+'>'+item.obj.TYPE_NAMES[item.typeIdx];
-                    break;
-                case this.DEBUG_ITEM_TYPE_SOUND:
-                    name=item.obj.TYPE_NAMES[item.typeIdx];
-                    break;
-                case this.DEBUG_ITEM_TYPE_MODEL:
-                    name=item.obj.TYPE_NAMES[item.typeIdx];
-                    break;
-            }
-            
             itemDiv=document.createElement('div');
             itemDiv.id='item_'+n;
             itemDiv.style.paddingLeft='4px';
             itemDiv.style.cursor='pointer';
-            itemDiv.appendChild(document.createTextNode(name));
+            itemDiv.appendChild(document.createTextNode(item.name));
             itemDiv.onclick=this.clickListItem.bind(this,n);
             
             parentDiv.appendChild(itemDiv);

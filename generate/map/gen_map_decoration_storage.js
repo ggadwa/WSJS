@@ -38,7 +38,7 @@ export default class GenRoomDecorationStorageClass
         let stackLevel,stackCount,mesh;
         let boxXBound,boxYBound,boxZBound;
         let boxPos,rotAngle;
-        let boxBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_BOX);
+        let boxBitmap=this.map.getTexture(constants.BITMAP_TYPE_BOX);
         
             // box size
             
@@ -84,8 +84,8 @@ export default class GenRoomDecorationStorageClass
         let tableXBound,tableYBound,tableZBound;
         let legXMinBound,legXMaxBound,legZMinBound,legZMaxBound,legYBound;
         let boxXBound,boxYBound,boxZBound;
-        let shelfBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL);
-        let boxBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_BOX);
+        let shelfBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
+        let boxBitmap=this.map.getTexture(constants.BITMAP_TYPE_BOX);
         
         x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
         z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);

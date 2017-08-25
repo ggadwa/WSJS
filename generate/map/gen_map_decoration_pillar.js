@@ -95,8 +95,8 @@ export default class GenRoomDecorationPillarClass
     {
             // texture
             
-        let pillarBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PILLAR);
-        let platformBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
+        let pillarBitmap=this.map.getTexture(constants.BITMAP_TYPE_PILLAR);
+        let platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
         
             // determine if this is a square rect
             // if so, one big pillar

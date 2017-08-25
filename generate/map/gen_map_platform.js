@@ -368,7 +368,7 @@ export default class GenRoomPlatformClass
     create(room)
     {
         let lastStairPos;
-        let platformBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_PLATFORM);
+        let platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
 
         lastStairPos=this.createRandomPlatforms(room,platformBitmap);
         this.createConnectRoomPlatform(room,platformBitmap,lastStairPos);

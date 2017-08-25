@@ -157,7 +157,7 @@ export default class CollisionClass
         let high=entity.high;
         
         let nMesh=this.map.meshes.length;
-        let nEntity=this.map.countEntity();
+        let nEntity=this.map.entityList.count();
         
             // only bump once
             
@@ -236,7 +236,7 @@ export default class CollisionClass
                 // check other entities
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.map.getEntity(n);
+                checkEntity=this.map.entityList.get(n);
                 if (checkEntity.id===entity.id) continue;
                 
                 checkEntityPt=checkEntity.position;

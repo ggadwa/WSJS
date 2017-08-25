@@ -84,7 +84,7 @@ export default class ProjectileClass
     fire(parentEntityId,pos,ang)
     {
         let entity=new EntityProjectileClass(this.view,this.map,this.sound,'projectile',parentEntityId,pos,ang,this);
-        this.map.addEntity(entity);
+        this.map.entityList.add(entity);
         
         this.sound.play(entity,this.fireSoundBuffer);
     }

@@ -235,7 +235,7 @@ export default class GenMapClass
         let yAdd,yBound,yWallBound,yFloorBound;
         let roomIdx,room;
         let storyCount,liquid;
-        let roomBitmap=this.map.getTexture(constants.MAP_TEXTURE_TYPE_WALL);
+        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
         
             // figure out room Y size from extension mode
             // all rooms need at least 2 stories
@@ -280,7 +280,7 @@ export default class GenMapClass
         
             // the floor
             
-        room.createMeshFloor(this.map.getTexture(constants.MAP_TEXTURE_TYPE_FLOOR));
+        room.createMeshFloor(this.map.getTexture(constants.BITMAP_TYPE_FLOOR));
 
             // walls
             // each wall is a tall piece and a short piece on top
@@ -303,7 +303,7 @@ export default class GenMapClass
         
             // the ceiling
         
-        room.createMeshCeiling(this.map.getTexture(constants.MAP_TEXTURE_TYPE_CEILING));
+        room.createMeshCeiling(this.map.getTexture(constants.BITMAP_TYPE_CEILING));
         
         return(roomIdx);
     }
@@ -346,7 +346,7 @@ export default class GenMapClass
             xFixtureBound=new BoundClass((fixturePos.x-400),(fixturePos.x+400));
             yFixtureBound=new BoundClass(fixturePos.y,(fixturePos.y+1000));
             zFixtureBound=new BoundClass((fixturePos.z-400),(fixturePos.z+400));
-            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
+            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.view,this.map.getTexture(constants.BITMAP_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -756,7 +756,7 @@ export default class GenMapClass
         
             // finally add the liquid
         
-        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.view,this.map.getTexture(constants.MAP_TEXTURE_TYPE_LIQUID),room));
+        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.view,this.map.getTexture(constants.BITMAP_TYPE_LIQUID),room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room

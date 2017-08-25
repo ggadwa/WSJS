@@ -1,24 +1,16 @@
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate particle bitmap class
 //
 
-export default class GenBitmapParticleClass extends GenBitmapClass
+export default class GenBitmapParticleClass extends GenBitmapBaseClass
 {
     constructor(view)
     {    
         super(view);
-        
-        this.TYPE_OVAL=0;
-
-        this.TYPE_NAMES=
-                [
-                    'Oval'
-                ];
-        
         Object.seal(this);
     }
         
@@ -26,7 +18,7 @@ export default class GenBitmapParticleClass extends GenBitmapClass
         // generate mainline
         //
 
-    generate(generateType,inDebug)
+    generate(inDebug)
     {
         let wid,high;
         let bitmapCanvas,bitmapCTX;
@@ -55,11 +47,6 @@ export default class GenBitmapParticleClass extends GenBitmapClass
             // bitmap object
 
         return(new BitmapClass(this.view,bitmapCanvas,null,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
-    }
-    
-    generateRandom(inDebug)
-    {
-        return(this.generate(genRandom.randomIndex(this.TYPE_NAMES.length),inDebug));
     }
 
 }

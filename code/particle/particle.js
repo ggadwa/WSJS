@@ -1,3 +1,4 @@
+import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import ColorClass from '../../code/utility/color.js';
 import LightClass from '../../code/light/light.js';
@@ -13,8 +14,6 @@ export default class ParticleClass
     {
         this.view=view;
         
-        this.PARTICLE_MAX_POINTS=200;
-
         this.radiusStart=0;
         this.radiusEnd=0;
 
@@ -32,8 +31,6 @@ export default class ParticleClass
         this.endTimeStamp=0;
         this.lifeTime=0;
 
-        this.noDepthTest=false;
-        
         this.light=new LightClass(new PointClass(0,0,0),new ColorClass(0.0,0.0,0.0),0.0,1.0);
         this.lightMaxIntensity=0.0;
 
@@ -49,9 +46,9 @@ export default class ParticleClass
 
         this.randomRot=new PointClass(0.0,0.0,0.0);
 
-        this.vertices=new Float32Array((this.PARTICLE_MAX_POINTS*4)*3);
-        this.uvs=new Float32Array((this.PARTICLE_MAX_POINTS*4)*2);
-        this.indexes=new Uint16Array((this.PARTICLE_MAX_POINTS*2)*3);
+        this.vertices=new Float32Array((constants.PARTICLE_MAX_POINTS*4)*3);
+        this.uvs=new Float32Array((constants.PARTICLE_MAX_POINTS*4)*2);
+        this.indexes=new Uint16Array((constants.PARTICLE_MAX_POINTS*2)*3);
         
         this.vertexPosBuffer=null;
         this.vertexUVBuffer=null;
@@ -69,7 +66,7 @@ export default class ParticleClass
         let n;
         let gl=this.view.gl;
         
-        for (n=0;n!==this.PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
+        for (n=0;n!==constants.PARTICLE_MAX_POINTS;n++) {     // supergumba -- move to constructor
             this.points.push(new PointClass(0,0,0));
         }
 
@@ -150,11 +147,6 @@ export default class ParticleClass
     setLightMaxItensity(lightMaxIntensity)
     {
         this.lightMaxIntensity=lightMaxIntensity;
-    }
-    
-    setNoDepthTest(noDepthTest)
-    {
-        this.noDepthTest=noDepthTest;
     }
     
     setCount(count)
@@ -347,11 +339,7 @@ export default class ParticleClass
 
             // draw the indexes
             
-        if (this.noDepthTest) gl.disable(gl.DEPTH_TEST);
-
         gl.drawElements(gl.TRIANGLES,(nTrig*3),gl.UNSIGNED_SHORT,0);
-        
-        if (this.noDepthTest) gl.enable(gl.DEPTH_TEST);
 
             // remove the buffers
 
