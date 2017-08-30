@@ -30,7 +30,7 @@ export default class GenRoomLiftClass
         let xLiftBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
         let zLiftBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
 
-        meshIdx=this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,constants.MESH_FLAG_LIFT));
+        meshIdx=this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,constants.MESH_FLAG_LIFT));
         
             // random wait
         

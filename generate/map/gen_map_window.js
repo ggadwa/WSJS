@@ -101,7 +101,7 @@ export default class GenRoomWindowClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // the window casing
             
@@ -109,16 +109,16 @@ export default class GenRoomWindowClass
         
         switch (connectSide) {
             case constants.ROOM_SIDE_LEFT:
-                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,frameBitmap,xBound,yBound,zBound,false,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,frameBitmap,xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_RIGHT:
-                this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,frameBitmap,xBound,yBound,zBound,true,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,frameBitmap,xBound,yBound,zBound,true,true,false));
                 break;
             case constants.ROOM_SIDE_TOP:
-                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zBound,false,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_BOTTOM:
-                this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zBound,true,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zBound,true,true,false));
                 break;
         }
     }
@@ -220,7 +220,7 @@ export default class GenRoomWindowClass
             
                 // build the blocks
             
-            if (this.map.boxBoundCollision(xWindowBound,null,zWindowBound,constants.MESH_FLAG_ROOM_WALL)!==-1) {
+            if (this.map.meshList.boxBoundCollision(xWindowBound,null,zWindowBound,constants.MESH_FLAG_ROOM_WALL)!==-1) {
                 failCount++;
                 continue;
             }

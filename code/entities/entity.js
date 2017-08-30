@@ -393,7 +393,7 @@ export default class EntityClass
         
             // get the collision line vector
         
-        collisionLine=this.map.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
+        collisionLine=this.map.meshList.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
         this.reflectLineVector.setFromSubPoint(collisionLine.p1,collisionLine.p2);
 	
             // now get the angle between them,

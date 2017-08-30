@@ -618,9 +618,9 @@ export default class ViewClass
             // draw the map
             
         map.sky.draw();
-        map.drawMesh();
+        map.meshList.draw();
         map.entityList.draw();
-        map.drawLiquid();
+        map.liquidList.draw();
         map.particleList.draw();
       
             // player weapon

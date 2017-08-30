@@ -1,9 +1,9 @@
 import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
-import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
-import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
 import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 import MapRoomClass from '../../code/map/map_room.js';
+import MapMeshListClass from '../../code/map/map_mesh_list.js';
+import MapLiquidListClass from '../../code/map/map_liquid_list.js';
 import MapEntityListClass from '../../code/map/map_entity_list.js';
 import MapParticleListClass from '../../code/map/map_particle_list.js';
 import MapMovementListClass from '../../code/map/map_movement_list.js';
@@ -23,14 +23,11 @@ export default class MapClass
         this.view=view;
         this.fileCache=this.fileCache;
         
-        this.mapMeshShader=new MapMeshShaderClass(view,fileCache);
-        this.mapLiquidShader=new MapLiquidShaderClass(view,fileCache);
-
-        this.meshes=[];
         this.lights=[];
         this.rooms=[];
-        this.liquids=[];
 
+        this.meshList=new MapMeshListClass(view,fileCache);
+        this.liquidList=new MapLiquidListClass(view,fileCache);
         this.entityList=new MapEntityListClass();
         this.movementList=new MapMovementListClass();
         this.overlay=new MapOverlayClass(view,fileCache);
@@ -49,8 +46,8 @@ export default class MapClass
 
     initialize()
     {
-        if (!this.mapMeshShader.initialize()) return(false);
-        if (!this.mapLiquidShader.initialize()) return(false);
+        if (!this.meshList.initialize()) return(false);
+        if (!this.liquidList.initialize()) return(false);
         if (!this.entityList.initialize()) return(false);
         if (!this.particleList.initialize()) return(false);
         if (!this.overlay.initialize()) return(false);
@@ -59,8 +56,8 @@ export default class MapClass
 
     release()
     {
-        this.mapLiquidShader.release();
-        this.mapMeshShader.release();
+        this.meshList.release();
+        this.liquidList.release();
         this.entityList.release();
         this.particleList.release();
         this.overlay.release();
@@ -97,23 +94,11 @@ export default class MapClass
 
     clear()
     {
-        let n;
-        let nMesh=this.meshes.length;
-        let nLiquid=this.liquids.length;
-
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].close();
-        }
-        
-        for (n=0;n!==nLiquid;n++) {
-            this.liquids[n].close();
-        }
-
-        this.meshes=[];
         this.lights=[];
         this.rooms=[];
-        this.liquids=[];
         
+        this.meshList.clear();
+        this.liquidList.clear();
         this.entityList.clear();
         this.particleList.clear();
     }
@@ -122,26 +107,9 @@ export default class MapClass
         // add items to map
         //
 
-    addMesh(mesh)
-    {
-        this.meshes.push(mesh);
-        return(this.meshes.length-1);
-    }
-    
-    getMesh(idx)
-    {
-        return(this.meshes[idx]);
-    }
-
     addLight(light)
     {
         this.lights.push(light);
-    }
-    
-    addLiquid(liquid)
-    {
-        this.liquids.push(liquid);
-        return(this.liquids.length-1);
     }
     
         //
@@ -152,60 +120,6 @@ export default class MapClass
     {
         this.rooms.push(new MapRoomClass(this.view,this,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid));
         return(this.rooms.length-1);
-    }
-
-        //
-        // check for map mesh collisions
-        //
-
-    boxBoundCollision(xBound,yBound,zBound,onlyFlag)
-    {
-        let n;
-        let nMesh=this.meshes.length;
-
-        for (n=0;n!==nMesh;n++) {
-            if (onlyFlag!==null) {
-                if (this.meshes[n].flag!==onlyFlag) continue;
-            }
-            if (this.meshes[n].boxBoundCollision(xBound,yBound,zBound)) return(n);
-        }
-
-        return(-1);
-    }
-
-    boxMeshCollision(checkMesh,onlyFlag)
-    {
-        let n;
-        let nMesh=this.meshes.length;
-
-        for (n=0;n!==nMesh;n++) {
-            if (onlyFlag!==null) {
-                if (this.meshes[n].flag!==onlyFlag) continue;
-            }
-            if (this.meshes[n].boxMeshCollision(checkMesh)) return(n);
-        }
-
-        return(-1);
-    }
-
-        //
-        // flag counts
-        //
-
-    countMeshByFlag(onlyFlag)
-    {
-        let n,count;
-        let nMesh=this.meshes.length;
-
-        if (onlyFlag===null) return(nMesh);
-
-        count=0;
-
-        for (n=0;n!==nMesh;n++) {
-            if (this.meshes[n].flag===onlyFlag) count++;
-        }
-
-        return(count);
     }
 
         //
@@ -285,24 +199,6 @@ export default class MapClass
                 this.view.lights.splice(idx,0,light);
                 if (this.view.lights.length>this.view.MAX_LIGHT_COUNT) this.view.lights.pop();
             }
-        }
-    }
-    
-        //
-        // run through the meshes and
-        // have them build their collision meshes
-        //
-        
-    buildCollisionGeometry()
-    {
-        let n;
-        let nMesh=this.meshes.length;
-
-            // setup all the gl
-            // buffers and indexes
-
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].buildCollisionGeometry();
         }
     }
 
@@ -443,118 +339,8 @@ export default class MapClass
 
     setupBuffers()
     {
-        let n;
-        let nMesh=this.meshes.length;
-        let nLiquid=this.liquids.length;
-
-            // setup all the mesh and
-            // liquid gl buffers
-
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].setupBuffers();
-        }
-        
-        for (n=0;n!==nLiquid;n++) {
-            this.liquids[n].setupBuffers();
-        }
-    }
-
-        //
-        // draw map meshes
-        //
-
-    drawMesh()
-    {
-        let n,mesh;
-        let nMesh=this.meshes.length;
-        let currentBitmap;
-        
-        this.mapMeshShader.drawStart();
-
-            // setup map drawing
-
-        currentBitmap=null;
-
-            // draw the meshes
-
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.meshes[n];
-
-                // skip if not in view frustum
-
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
-
-                // time to change bitmap
-
-            if (mesh.bitmap!==currentBitmap) {
-                currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.mapMeshShader);
-            }
-
-                // draw the mesh
-
-            mesh.updateBuffers();
-            mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers(this.mapMeshShader);
-            mesh.draw();
-        }
-        
-        this.mapMeshShader.drawEnd();
-    }
-    
-        //
-        // draw map liquids
-        //
-
-    drawLiquid()
-    {
-        let n,liquid;
-        let nLiquid=this.liquids.length;
-        let currentBitmap;
-        let gl=this.view.gl;
-        
-            // change the blend
-            
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-        
-        gl.depthMask(false);
-
-        this.mapLiquidShader.drawStart();
-
-            // setup liquid drawing
-
-        currentBitmap=null;
-
-            // draw the liquids
-
-        for (n=0;n!==nLiquid;n++) {
-            liquid=this.liquids[n];
-
-                // skip if not in view frustum
-
-            if (!this.view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
-
-                // time to change bitmap
-
-            if (liquid.bitmap!==currentBitmap) {
-                currentBitmap=liquid.bitmap;
-                liquid.bitmap.attachAsLiquid();
-            }
-
-                // draw the liquid
-
-            liquid.updateBuffers();
-            liquid.bindBuffers(this.mapLiquidShader);
-            liquid.draw();
-        }
-        
-            // reset the blend
-            
-        this.mapLiquidShader.drawEnd();
-        
-        gl.disable(gl.BLEND);
-        gl.depthMask(true);
+        this.meshList.setupBuffers();
+        this.liquidList.setupBuffers();
     }
     
 }

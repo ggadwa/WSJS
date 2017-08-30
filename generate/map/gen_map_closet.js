@@ -76,7 +76,7 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
@@ -102,7 +102,7 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
+        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
 
             // floor
         
@@ -128,7 +128,7 @@ export default class GenRoomClosetClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
+        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
     }
 
         // closet mainline
@@ -215,7 +215,7 @@ export default class GenRoomClosetClass
                 // build the blocks
             
             for (k=0;k!==closetLen;k++) {
-                if (this.map.boxBoundCollision(xClosetBound,null,zClosetBound,constants.MESH_FLAG_ROOM_WALL)!==-1) break;
+                if (this.map.meshList.boxBoundCollision(xClosetBound,null,zClosetBound,constants.MESH_FLAG_ROOM_WALL)!==-1) break;
 
                 this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
                 this.map.addOverlayCloset(xClosetBound,zClosetBound);

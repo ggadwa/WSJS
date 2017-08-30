@@ -45,12 +45,12 @@ export default class GenRoomDecorationLabClass
         yBound=new BoundClass(yMid,room.yBound.max);
         mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,platformBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
 
         yBound=new BoundClass((room.yBound.max-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)),(room.yBound.max-constants.ROOM_FLOOR_HEIGHT));
         mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,platformBitmap,centerPnt,yBound,radius,true,true,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
 
             // the tube
         
@@ -60,7 +60,7 @@ export default class GenRoomDecorationLabClass
 
         mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,metalBitmap,centerPnt,yBound,radius,false,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
     }
     
         //
@@ -85,7 +85,7 @@ export default class GenRoomDecorationLabClass
         zBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
 
         yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
         
             // the pump
         
@@ -96,7 +96,7 @@ export default class GenRoomDecorationLabClass
         zBound.max-=reduceSize;
 
         yBound=new BoundClass((room.yBound.max-Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.5)),(room.yBound.max-constants.ROOM_FLOOR_DEPTH));
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
     }
         
         //

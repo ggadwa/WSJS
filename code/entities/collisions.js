@@ -156,7 +156,7 @@ export default class CollisionClass
         let radius=entity.radius;
         let high=entity.high;
         
-        let nMesh=this.map.meshes.length;
+        let nMesh=this.map.meshList.meshes.length;
         let nEntity=this.map.entityList.count();
         
             // only bump once
@@ -196,7 +196,7 @@ export default class CollisionClass
                 // check against collision lines
 
             for (n=0;n!==nMesh;n++) {
-                mesh=this.map.meshes[n];
+                mesh=this.map.meshList.meshes[n];
                 
                     // skip any mesh we don't collide with
                     
@@ -325,10 +325,10 @@ export default class CollisionClass
         this.objYBound.setFromValues((entity.position.y-fallY),(entity.position.y+fallY));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
-        nMesh=this.map.meshes.length;
+        nMesh=this.map.meshList.meshes.length;
         
         for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshes[n];
+            mesh=this.map.meshList.meshes[n];
             
                 // skip walls or ceilings
                 
@@ -377,10 +377,10 @@ export default class CollisionClass
         
             // run through the meshes
         
-        nMesh=this.map.meshes.length;
+        nMesh=this.map.meshList.meshes.length;
         
         for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshes[n];
+            mesh=this.map.meshList.meshes[n];
             
                 // skip walls
                 

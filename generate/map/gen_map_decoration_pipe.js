@@ -146,7 +146,7 @@ export default class GenRoomDecorationPipeClass
         mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
     }
 
     addPipeCornerChunk(bitmap,pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
@@ -291,7 +291,7 @@ export default class GenRoomDecorationPipeClass
         mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
     }
     
         //
@@ -475,7 +475,7 @@ export default class GenRoomDecorationPipeClass
         platformBoundZ=new BoundClass((z-wid),(z+wid));
         
         platformBoundY=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
         
             // determine direction
         

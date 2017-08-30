@@ -57,7 +57,7 @@ export default class GenRoomPlatformClass
         if (story!==0) {
             yBound.min=yBound.max;
             yBound.max=room.yBound.max;
-            this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_STAIR));
+            this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_STAIR));
         }
         
             // block the stairs off from any decorations
@@ -97,7 +97,7 @@ export default class GenRoomPlatformClass
         let yPlatformBound=new BoundClass(y,(y+constants.ROOM_FLOOR_DEPTH));
         let zPlatformBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
         
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,constants.MESH_FLAG_PLATFORM));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,constants.MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             // a cleared spot is a spot that's open

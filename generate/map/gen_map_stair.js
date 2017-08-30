@@ -112,7 +112,7 @@ export default class GenRoomStairsClass
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
         mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,flags);        
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
     }
 
         //

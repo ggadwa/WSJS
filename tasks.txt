@@ -12,7 +12,9 @@ WebGL2
 
 
 
---> put liquids and such in their own list
+--> room list, light list
+--> overlay direct call through to object, movement also
+--> need to block off extra edge for up rooms (because of steps)
 --> need particle blob (use for explosions)
 --> platform, pipe, frame, and pillar need their own texture creation
 --> sky is just terrible

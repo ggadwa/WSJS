@@ -43,7 +43,7 @@ export default class MovementClass
         
             // the mesh
             
-        mesh=map.getMesh(this.meshIdx);
+        mesh=map.meshList.get(this.meshIdx);
         
             // if not looping, then do approach disance
             // if not already moving

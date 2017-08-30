@@ -80,150 +80,6 @@ export default class GenMapClass
         Object.seal(this);
     }
     
-        //
-        // remove shared triangles
-        //
-
-    removeSharedTrianglesChunk(meshFlag,compareMeshFlag,equalY,removeBoth)
-    {
-        let n,k,t1,t2,nMesh,hit;
-        let mesh,otherMesh;
-        let trigList,trigCache,otherTrigCache;
-        let targetMeshCount,targetMeshList;
-        let nTrig,aTrig,bTrig;
-        
-            // this function calculates if a triangle
-            // is wall like, and it's bounds, and caches it
-            
-        nMesh=this.map.meshes.length;
-            
-        for (n=0;n!==nMesh;n++) {
-            this.map.meshes[n].buildSharedTriangleCache();
-        }
-
-            // create a list of triangles
-            // to delete
-
-        trigList=[];
-
-            // run through all the meshes
-            // and remove any triangles occupying
-            // the same space
-
-            // since trigs can be rotated, we
-            // compare the bounds, equal bounds
-            // means overlapping
-
-            // skip any trigs that aren't straight walls
-            // so slanted walls don't get erased (only
-            // straight walls are connected)
-            
-        targetMeshCount=0;
-        targetMeshList=new Uint16Array(nMesh);
-
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshes[n];
-            if (mesh.flag!==meshFlag) continue;
-            
-                // build a list of meshes that
-                // are targets for trig eliminations from
-                // this mesh
-                
-                // if we are comparing two distinct types
-                // then we need to iterate over the whole
-                // list, otherwise just the back half as we've
-                // already hit that type in the outer loop
-                
-                // also, two different types means we are
-                // eliminating from inside, so do the touch differently
-            
-            targetMeshCount=0;
-            
-            if (meshFlag===compareMeshFlag) {
-                for (k=(n+1);k<nMesh;k++) {
-                    otherMesh=this.map.meshes[k];
-                    if (otherMesh.flag!==compareMeshFlag) continue;
-
-                    if (mesh.boxTouchOtherMeshOutside(otherMesh)) targetMeshList[targetMeshCount++]=k;
-                }
-            }
-            else {
-                for (k=0;k!==nMesh;k++) {
-                    otherMesh=this.map.meshes[k];
-                    if (otherMesh.flag!==compareMeshFlag) continue;
-
-                    if (mesh.boxTouchOtherMeshInside(otherMesh)) targetMeshList[targetMeshCount++]=k;
-                }
-            }
-            
-            if (targetMeshCount===0) continue;
-                
-                // now run through the triangles
-
-            for (t1=0;t1!==mesh.trigCount;t1++) {
-                
-                trigCache=mesh.getSharedTriangleCacheItem(t1);
-                if (!trigCache.isWall) continue;
-
-                hit=false;
-
-                for (k=0;k!==targetMeshCount;k++) {
-                    otherMesh=this.map.meshes[targetMeshList[k]];
-
-                    for (t2=0;t2!==otherMesh.trigCount;t2++) {
-                        
-                        otherTrigCache=otherMesh.getSharedTriangleCacheItem(t2);
-                        if (!otherTrigCache.isWall) continue;
-                        
-                        if ((trigCache.xBound.min!==otherTrigCache.xBound.min) || (trigCache.xBound.max!==otherTrigCache.xBound.max)) continue;
-                        if ((trigCache.zBound.min!==otherTrigCache.zBound.min) || (trigCache.zBound.max!==otherTrigCache.zBound.max)) continue;
-
-                        if (equalY) {
-                            if ((trigCache.yBound.min!==otherTrigCache.yBound.min) || (trigCache.yBound.max!==otherTrigCache.yBound.max)) continue;
-                        }
-                        else {
-                            if ((trigCache.yBound.min<otherTrigCache.yBound.min) || (trigCache.yBound.max>otherTrigCache.yBound.max)) continue;
-                        }
-                        
-                        trigList.push([n,t1]);
-                        if (removeBoth) trigList.push([targetMeshList[k],t2]);
-                        hit=true;
-                        break;
-                    }
-
-                    if (hit) break;
-                }
-            }
-        }
-        
-            // clear the caches
-            
-        for (n=0;n!==nMesh;n++) {
-            this.map.meshes[n].clearSharedTriangleCache();
-        }
-        
-            // finally delete the triangles
-
-        nTrig=trigList.length;
-        if (nTrig===0) return;
-
-        for (n=0;n!==nTrig;n++) {
-
-                // remove the trig
-
-            aTrig=trigList[n];
-            this.map.meshes[aTrig[0]].removeTriangle(aTrig[1]);
-
-                // shift other indexes
-
-            for (k=n;k<nTrig;k++) {
-                bTrig=trigList[k];
-                if (aTrig[0]===bTrig[0]) {
-                    if (aTrig[1]<bTrig[1]) bTrig[1]--;
-                }
-            }
-        }
-    }
 
         //
         // create rooms
@@ -267,7 +123,7 @@ export default class GenMapClass
             // and lower it for pool and add a story
         
         liquid=(config.ROOM_LIQUIDS)&&(level===constants.ROOM_LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
-        
+
             // top of room
             
         yBound.min=yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*storyCount);
@@ -294,7 +150,7 @@ export default class GenMapClass
             mesh2=room.createMeshWalls(roomBitmap,yFloorBound);
             mesh.combineMesh(mesh2);
             
-            this.map.addMesh(mesh);
+            this.map.meshList.add(mesh);
             if (n===0) this.map.addOverlayRoom(room);
             
             yWallBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
@@ -346,7 +202,7 @@ export default class GenMapClass
             xFixtureBound=new BoundClass((fixturePos.x-400),(fixturePos.x+400));
             yFixtureBound=new BoundClass(fixturePos.y,(fixturePos.y+1000));
             zFixtureBound=new BoundClass((fixturePos.z-400),(fixturePos.z+400));
-            this.map.addMesh(MeshPrimitivesClass.createMeshPryamid(this.view,this.map.getTexture(constants.BITMAP_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
+            this.map.meshList.add(MeshPrimitivesClass.createMeshPryamid(this.view,this.map.getTexture(constants.BITMAP_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -597,7 +453,7 @@ export default class GenMapClass
 
                 }
                 
-                if (this.map.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
+                if (this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
 
                 tryCount++;
                 if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
@@ -737,7 +593,7 @@ export default class GenMapClass
 
             }
 
-            if (this.map.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
+            if (this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
 
             tryCount++;
             if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
@@ -756,7 +612,7 @@ export default class GenMapClass
         
             // finally add the liquid
         
-        if (room.liquid) this.map.addLiquid(new MapLiquidClass(this.view,this.map.getTexture(constants.BITMAP_TYPE_LIQUID),room));
+        if (room.liquid) this.map.liquidList.add(new MapLiquidClass(this.view,this.map.getTexture(constants.BITMAP_TYPE_LIQUID),room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room
@@ -991,7 +847,7 @@ export default class GenMapClass
             // remove all the shared trigs between rooms and
             // remove them both
             
-        this.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_WALL,true,true);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_WALL,true,true);
         
             // finish with the callback
             
@@ -1005,8 +861,8 @@ export default class GenMapClass
             // now remove any platforms or ledges that are equal
             // in another platform or ledge wall
             
-        this.removeSharedTrianglesChunk(constants.MESH_FLAG_PLATFORM,constants.MESH_FLAG_PLATFORM,true,true);
-        this.removeSharedTrianglesChunk(constants.MESH_FLAG_LEDGE,constants.MESH_FLAG_LEDGE,true,true);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_PLATFORM,constants.MESH_FLAG_PLATFORM,true,true);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_LEDGE,constants.MESH_FLAG_LEDGE,true,true);
         
             // finish with the callback
             
@@ -1019,8 +875,8 @@ export default class GenMapClass
             // and finally remove any platform or ledge triangles that
             // are enclosed by an outer wall
             
-        this.removeSharedTrianglesChunk(constants.MESH_FLAG_PLATFORM,constants.MESH_FLAG_ROOM_WALL,false,false);
-        this.removeSharedTrianglesChunk(constants.MESH_FLAG_LEDGE,constants.MESH_FLAG_ROOM_WALL,false,false);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_PLATFORM,constants.MESH_FLAG_ROOM_WALL,false,false);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_LEDGE,constants.MESH_FLAG_ROOM_WALL,false,false);
         
             // finish with the callback
             

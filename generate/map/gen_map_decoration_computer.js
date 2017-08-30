@@ -30,7 +30,7 @@ export default class GenRoomDecorationComputerClass
         zBound=new BoundClass((room.zBound.min+(rect.top*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*constants.ROOM_BLOCK_WIDTH)));
         yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
 
-        this.map.addMesh(MeshPrimitivesClass.createMeshCube(this.view,this.map.getTexture(constants.BITMAP_TYPE_PLATFORM),xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.map.getTexture(constants.BITMAP_TYPE_PLATFORM),xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
     }
         
         //
@@ -69,14 +69,14 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound2,yBound,zBound,false,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,true,false,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 break;
                 
             case constants.ROOM_SIDE_TOP:
@@ -85,14 +85,14 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound,yBound,zBound2,true,true,false,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,true,true,true,false,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 
                 break;
                 
@@ -102,14 +102,14 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound2,yBound,zBound,true,false,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,false,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 break;
                 
             case constants.ROOM_SIDE_BOTTOM:
@@ -118,14 +118,14 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound,yBound,zBound2,true,true,true,false,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,true,true,false,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
                 MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 break;
 
         }
@@ -188,9 +188,9 @@ export default class GenRoomDecorationComputerClass
         
         mesh2=MeshPrimitivesClass.createMeshWedge(this.view,baseBitmap,xBound,yBound,zBound,ang,false,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
         mesh.combineMesh(mesh2);
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
         
-        this.map.addMesh(MeshPrimitivesClass.createMeshWedge(this.view,computerBitmap,xBound,yBound,zBound,ang,true,false,false,false,true,true,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshWedge(this.view,computerBitmap,xBound,yBound,zBound,ang,true,false,false,false,true,true,false,constants.MESH_FLAG_DECORATION));
     }
     
         //
@@ -227,7 +227,7 @@ export default class GenRoomDecorationComputerClass
                 zBound=new BoundClass((pnt.z+juncMargin),((pnt.z+constants.ROOM_BLOCK_WIDTH)-juncMargin));
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 break;
                 
             case constants.ROOM_SIDE_TOP:
@@ -235,7 +235,7 @@ export default class GenRoomDecorationComputerClass
                 zBound=new BoundClass(pnt.z,(pnt.z+juncWid));
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 break;
                 
             case constants.ROOM_SIDE_RIGHT:
@@ -243,7 +243,7 @@ export default class GenRoomDecorationComputerClass
                 zBound=new BoundClass((pnt.z+juncMargin),((pnt.z+constants.ROOM_BLOCK_WIDTH)-juncMargin));
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 break;
                 
             case constants.ROOM_SIDE_BOTTOM:
@@ -251,7 +251,7 @@ export default class GenRoomDecorationComputerClass
                 zBound=new BoundClass(((pnt.z+constants.ROOM_BLOCK_WIDTH)-juncWid),(pnt.z+constants.ROOM_BLOCK_WIDTH));
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                this.map.addMesh(mesh);
+                this.map.meshList.add(mesh);
                 break;
         }
         
@@ -264,11 +264,11 @@ export default class GenRoomDecorationComputerClass
         
         if (upperPipe) {
             pipeYBound=new BoundClass(room.yBound.min,yBound.min);
-            this.map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(this.view,pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,constants.MESH_FLAG_DECORATION));
+            this.map.meshList.add(MeshPrimitivesClass.createMeshCylinderSimple(this.view,pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,constants.MESH_FLAG_DECORATION));
         }
         if (lowerPipe) {
             pipeYBound=new BoundClass(yBound.max,pnt.y);
-            this.map.addMesh(MeshPrimitivesClass.createMeshCylinderSimple(this.view,pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,constants.MESH_FLAG_DECORATION));
+            this.map.meshList.add(MeshPrimitivesClass.createMeshCylinderSimple(this.view,pipeBitmap,centerPnt,pipeYBound,pipeRadius,false,false,constants.MESH_FLAG_DECORATION));
         }
     }
     

@@ -99,7 +99,7 @@ export default class GenRoomHallwayClass
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
         mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,flags);        
-        return(this.map.addMesh(mesh));
+        return(this.map.meshList.add(mesh));
     }
 
         //
@@ -205,10 +205,10 @@ export default class GenRoomHallwayClass
         frameBitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
         
         xFrameBound=new BoundClass(xBound.min,xBound.min);
-        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
         
         xFrameBound=new BoundClass(xBound.max,xBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
     }
     
     createHallwayDoorZ(xBound,yBound,z,thickSize)
@@ -310,10 +310,10 @@ export default class GenRoomHallwayClass
         frameBitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
         
         zFrameBound=new BoundClass(zBound.min,zBound.min);
-        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,true,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,true,false,true));
         
         zFrameBound=new BoundClass(zBound.max,zBound.max);
-        this.map.addMesh(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,false,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,false,false,true));
     }
 }
 

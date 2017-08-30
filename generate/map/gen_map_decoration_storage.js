@@ -63,7 +63,7 @@ export default class GenRoomDecorationStorageClass
             rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
             mesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
             MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-            this.map.addMesh(mesh);
+            this.map.meshList.add(mesh);
 
                 // go up one level
 
@@ -166,7 +166,7 @@ export default class GenRoomDecorationStorageClass
                 rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
                 boxMesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(boxMesh);
-                this.map.addMesh(boxMesh);
+                this.map.meshList.add(boxMesh);
             }
 
                 // go up one level
@@ -177,7 +177,7 @@ export default class GenRoomDecorationStorageClass
             legYBound.add(-this.shelfHigh);
         }
         
-        this.map.addMesh(mesh);
+        this.map.meshList.add(mesh);
     }
     
         //

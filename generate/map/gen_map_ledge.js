@@ -80,7 +80,7 @@ export default class GenRoomLedgeClass
 
             // finally create the mesh
 
-        this.map.addMesh(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_LEDGE));
+        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_LEDGE));
     }
         
         //

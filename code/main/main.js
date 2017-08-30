@@ -101,7 +101,7 @@ class MainClass
     {
             // build the collision geometry
 
-        this.map.buildCollisionGeometry();
+        this.map.meshList.buildCollisionGeometry();
 
             // next step
 
