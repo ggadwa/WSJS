@@ -104,7 +104,7 @@ export default class GenRoomPlatformClass
             
         room.clearBlockGrid(story,x,z);
 
-        this.map.addOverlayPlatform(xPlatformBound,zPlatformBound);
+        this.map.overlay.addPlatform(xPlatformBound,zPlatformBound);
     }
         
         //

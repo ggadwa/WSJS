@@ -239,7 +239,7 @@ class MainClass
 
             // make player entity
 
-        pos=this.map.findRandomPlayerPosition();
+        pos=this.map.roomList.findRandomPlayerPosition();
         if (pos===null) {
             alert('Couldn\'t find a place to spawn player!');
             return;
@@ -268,7 +268,7 @@ class MainClass
             // it's own model
 
         for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
-            pos=this.map.findRandomMonsterPosition();
+            pos=this.map.roomList.findRandomMonsterPosition();
             if (pos===null) continue;
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
@@ -279,7 +279,7 @@ class MainClass
             // boss monster
             
         if (config.MONSTER_BOSS) {
-            pos=this.map.findRandomBossPosition();
+            pos=this.map.roomList.findRandomBossPosition();
             model=this.modelList.cloneModel('boss');
             if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
@@ -371,7 +371,7 @@ function mainLoop(timeStamp)
         view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
 
         if (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
-            map.runMovements();
+            map.movementList.run(view,map);
 
             if (view.physicsTick<constants.BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 

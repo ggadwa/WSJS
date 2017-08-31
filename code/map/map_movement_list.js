@@ -9,10 +9,36 @@ export default class MapMovementListClass
         this.movements=[];
     }
     
-    addMovement(movement)
+        //
+        // initialize and release
+        //
+
+    initialize()
+    {
+        return(true);
+    }
+
+    release()
+    {
+    }
+    
+    add(movement)
     {
         this.movements.push(movement);
     }
+    
+        //
+        // clear lights
+        //
+
+    clear()
+    {
+        this.movements=[];
+    }
+
+        //
+        // run movements
+        //
     
     run(view,map)
     {

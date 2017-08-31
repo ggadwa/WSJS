@@ -122,7 +122,7 @@ export default class GenRoomHallwayClass
         this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zBound);
         meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
         
-        this.map.addOverlayDoor(xDoorBound,zBound);
+        this.map.overlay.addDoor(xDoorBound,zBound);
         
             // and the movement
         
@@ -130,7 +130,7 @@ export default class GenRoomHallwayClass
         movement.addMove(new MoveClass(1500,new PointClass(0,0,0)));
         movement.addMove(new MoveClass(1500,new PointClass(0,-(constants.ROOM_FLOOR_HEIGHT-constants.ROOM_FLOOR_DEPTH),0)));
         
-        this.map.addMovement(movement);
+        this.map.movementList.add(movement);
     }
     
     createHallwayX(xBound,yBound,zBound,doubleDoor)
@@ -227,7 +227,7 @@ export default class GenRoomHallwayClass
         this.createSingleCeilingZ(idx,vertexList,xBound,yBound.max,zDoorBound);
         meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
         
-        this.map.addOverlayDoor(xBound,zDoorBound);
+        this.map.overlay.addDoor(xBound,zDoorBound);
         
             // and the movement
         
@@ -235,7 +235,7 @@ export default class GenRoomHallwayClass
         movement.addMove(new MoveClass(1500,new PointClass(0,0,0)));
         movement.addMove(new MoveClass(1500,new PointClass(0,-(constants.ROOM_FLOOR_HEIGHT-constants.ROOM_FLOOR_DEPTH),0)));
         
-        this.map.addMovement(movement); 
+        this.map.movementList.add(movement); 
     }
 
     createHallwayZ(xBound,yBound,zBound,doubleDoor)

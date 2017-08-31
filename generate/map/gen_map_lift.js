@@ -48,13 +48,13 @@ export default class GenRoomLiftClass
         movement.addMove(new MoveClass(moveMSec,new PointClass(0,0,0)));
         movement.addMove(new MoveClass(waitMSec,new PointClass(0,0,0)));
         
-        this.map.addMovement(movement); 
+        this.map.movementList.add(movement); 
 
             // can't span on this
             
         room.setBlockGrid(0,x,z);
 
-        this.map.addOverlayLift(xLiftBound,zLiftBound);
+        this.map.overlay.addLift(xLiftBound,zLiftBound);
     }
     
         //

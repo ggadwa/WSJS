@@ -8,18 +8,16 @@ WebGL2
            (reason can't do for now, it forces mesh shader setup to be per VAO, and that means repeated lights, etc.)
     [ ] uniform buffers for lights & matrixes
 
+ESNext
+    [ ] make all internal list arrays as private, use count() and get()
 
 
 
-
---> room list, light list
---> overlay direct call through to object, movement also
---> need to block off extra edge for up rooms (because of steps)
+--> transparent meshes
+--> glass texture
 --> need particle blob (use for explosions)
 --> platform, pipe, frame, and pillar need their own texture creation
 --> sky is just terrible
---> can we get rid of sound list?  just have sounds (like bitmaps)
---> is model list necessary?
 
 
 
@@ -31,16 +29,18 @@ ToDos
         [X] mapRoomConstants.ROOM_DECORATION_STORAGE:
         [X] mapRoomConstants.ROOM_DECORATION_COMPUTER:
               - computer panel has square around lights (possible canary bug, check after chrome 61)
+              - computer sides are part of texture
         [ ] mapRoomConstants.ROOM_DECORATION_PIPE:
         [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
               - raised chunk of floor with stairs
-              - bunch of squares you can jump climb?
+              - cubical tops
         [ ] mapRoomConstants.ROOM_DECORATION_LAB:
-              - glowing vat texture, glass cylinders
+              - glowing vat texture (animated it up and down), glass cylinders
         [ ] pits (wires, pipes)
     * types for low/high/water rooms
     * special edge ones (panels, conduits)
     * animated decorative items
+    * particles on decorative items
 
 --> models cast light
 --> models get hunch as part of body skeleton, not variable

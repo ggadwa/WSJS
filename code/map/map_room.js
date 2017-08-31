@@ -59,6 +59,7 @@ export default class MapRoomClass
         this.edgeGrid=null;
         
         this.connectSideHasDoor=[false,false,false,false];      // track which connections had a door
+        this.connectSideHasStair=[false,false,false,false];     // track which connections had a (possible) stair
         this.legalWindowSide=[true,true,true,true];             // track where windows can be
         
         this.yOpenBound=new BoundClass(0,0);
@@ -234,6 +235,20 @@ export default class MapRoomClass
     isDoorOnConnectionSide(connectSide)
     {
         return(this.connectSideHasDoor[connectSide]);
+    }
+    
+        //
+        // mark stairs
+        //
+        
+    markStairOnConnectionSide(connectionSide)
+    {
+        this.connectSideHasStair[connectionSide]=true;
+    }
+    
+    isStairOnConnectionSide(connectionSide)
+    {
+        return(this.connectSideHasStair[connectionSide]);
     }
     
         //
@@ -436,10 +451,10 @@ export default class MapRoomClass
     isSideOpenToOtherRoom(connectSide)
     {
         let n,room;
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
 
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             
             switch (connectSide) {
                 case constants.ROOM_SIDE_LEFT:
@@ -478,8 +493,32 @@ export default class MapRoomClass
             // typed arrays initialize to 0
 
         let grid=new Uint16Array(xSize*zSize);
+        
+            // if it's possible for a side to have
+            // stairs, then stay further away from it
+            
+        if (this.connectSideHasStair[constants.ROOM_SIDE_LEFT]) {
+            for (z=0;z!=zSize;z++) {
+                grid[z*xSize]=1;
+            }
+        }
+        if (this.connectSideHasStair[constants.ROOM_SIDE_RIGHT]) {
+            for (z=0;z!=zSize;z++) {
+                grid[(z*xSize)+(xSize-1)]=1;
+            }
+        }
+        if (this.connectSideHasStair[constants.ROOM_SIDE_TOP]) {
+            for (x=0;x!=xSize;x++) {
+                grid[x]=1;
+            }
+        }
+        if (this.connectSideHasStair[constants.ROOM_SIDE_BOTTOM]) {
+            for (x=0;x!=xSize;x++) {
+                grid[((zSize-1)*xSize)+x]=1;
+            }
+        }
 
-            // start making the cubicals
+            // start making the random rects
 
         while (true) {
 

@@ -289,7 +289,7 @@ export default class GenRoomStairsClass
         
             // overlay
             
-        this.map.addOverlayStair(xBound,zBound);
+        this.map.overlay.addStair(xBound,zBound);
     }
 
     createStairsZ(xBound,yBound,zBound,toPlatform,includeBack,flip)
@@ -461,7 +461,7 @@ export default class GenRoomStairsClass
         
             // overlay
             
-        this.map.addOverlayStair(xBound,zBound);
+        this.map.overlay.addStair(xBound,zBound);
     }
     
     createStairsExtension(room)

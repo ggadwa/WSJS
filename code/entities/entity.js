@@ -575,7 +575,7 @@ export default class EntityClass
     setupCurrentRoom()
     {
         let n,room;
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
         
             // check if still in the current
             // room
@@ -585,7 +585,7 @@ export default class EntityClass
         }
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             if (room.posInRoom(this.position)) {
                 this.currentRoom=room;
                 return;

@@ -218,7 +218,7 @@ export default class GenRoomClosetClass
                 if (this.map.meshList.boxBoundCollision(xClosetBound,null,zClosetBound,constants.MESH_FLAG_ROOM_WALL)!==-1) break;
 
                 this.createClosetCube(xClosetBound,yClosetBound,zClosetBound);
-                this.map.addOverlayCloset(xClosetBound,zClosetBound);
+                this.map.overlay.addCloset(xClosetBound,zClosetBound);
                 
                 if (story===0) room.maskEdgeGridBlockToBounds(xClosetBound,zClosetBound);    // block off ledges for edge grid
                 

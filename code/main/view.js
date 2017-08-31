@@ -584,7 +584,7 @@ export default class ViewClass
             
         this.lights=[];
 
-        map.addLightsToViewLights();
+        map.lightList.addLightsToViewLights();
         map.particleList.addLightsToViewLights();
         
             // fill in any missing lights with NULL
@@ -669,7 +669,7 @@ export default class ViewClass
 
             // map overlay
             
-        if (this.drawOverlay) map.overlayDraw();
+        if (this.drawOverlay) map.overlay.draw(map);
         
             // text overlays
 

@@ -131,8 +131,17 @@ export default class GenMapClass
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=this.map.addRoom(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
-        room=this.map.rooms[roomIdx];
+        roomIdx=this.map.roomList.add(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
+        room=this.map.roomList.get(roomIdx);
+        
+            // if the room is higher, we need to mark that off
+            // so we don't build decorations to close to steps
+        
+        if (mainPathConnectedRoom!==null) {    
+            if (level===constants.ROOM_LEVEL_HIGHER) {
+                mainPathConnectedRoom.markStairOnConnectionSide(mainPathSide);
+            }
+        }
         
             // the floor
             
@@ -151,7 +160,7 @@ export default class GenMapClass
             mesh.combineMesh(mesh2);
             
             this.map.meshList.add(mesh);
-            if (n===0) this.map.addOverlayRoom(room);
+            if (n===0) this.map.overlay.addRoom(room);
             
             yWallBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
             yFloorBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
@@ -184,7 +193,7 @@ export default class GenMapClass
         
             // add to overlay
             
-        this.map.addOverlayConnection(xHallwayBound,zHallwayBound);
+        this.map.overlay.addConnection(xHallwayBound,zHallwayBound);
     }
         
         //
@@ -223,7 +232,7 @@ export default class GenMapClass
             // add light to map
 
         light=new LightClass(lightPos,new ColorClass(red,green,blue),intensity,exponent);
-        this.map.addLight(light);
+        this.map.lightList.add(light);
 
         return(light);
     }
@@ -231,7 +240,7 @@ export default class GenMapClass
     addRoomLight(roomIdx)
     {
         let lightY,fixturePos,lightPos,intensity;
-        let room=this.map.rooms[roomIdx];
+        let room=this.map.roomList.get(roomIdx);
         
             // locations
             
@@ -462,7 +471,7 @@ export default class GenMapClass
                 // path type for rooms on path is normal unless
                 // this is the final room
 
-            pathType=((this.map.rooms.length+1)>=config.ROOM_PATH_COUNT)?constants.ROOM_PATH_TYPE_GOAL:constants.ROOM_PATH_TYPE_NORMAL;
+            pathType=((this.map.roomList.count()+1)>=config.ROOM_PATH_COUNT)?constants.ROOM_PATH_TYPE_GOAL:constants.ROOM_PATH_TYPE_NORMAL;
         }
 
             // add in hallways and a light
@@ -478,7 +487,7 @@ export default class GenMapClass
         roomIdx=this.addRegularRoom(constants.ROOM_LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
         this.currentRoomCount++;
         
-        room=this.map.rooms[roomIdx];
+        room=this.map.roomList.get(roomIdx);
         
             // mark off any doors we made
             
@@ -512,7 +521,7 @@ export default class GenMapClass
         
             // at end of path?
             
-        if ((this.map.rooms.length>=config.ROOM_PATH_COUNT) || (config.SIMPLE_TEST_MAP)) return;
+        if ((this.map.roomList.count()>=config.ROOM_PATH_COUNT) || (config.SIMPLE_TEST_MAP)) return;
 
             // next room in path
             
@@ -604,7 +613,7 @@ export default class GenMapClass
         roomIdx=this.addRegularRoom(level,constants.ROOM_PATH_TYPE_NORMAL,xBlockSize,zBlockSize,xBound,zBound,false,connectSide,lastRoom,lastRoom.extensionDirection);
         this.currentRoomCount++;
         
-        room=this.map.rooms[roomIdx];
+        room=this.map.roomList.get(roomIdx);
         
             // mark where windows can be
         
@@ -632,10 +641,10 @@ export default class GenMapClass
     buildRoomExtensions()
     {
         let n,room;
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             
                 // only do extensions on normal rooms
                 
@@ -661,12 +670,12 @@ export default class GenMapClass
     buildRoomClosets()
     {
         let n,room,closet;
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
         
         closet=new GenRoomClosetClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             if (!room.liquid) closet.addCloset(room);
         }
     }
@@ -674,12 +683,12 @@ export default class GenMapClass
     buildRoomWindows()
     {
         let n,room,windows;
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
         
         windows=new GenRoomWindowClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             if (!room.liquid) windows.addWindow(this,room);
         }
     }
@@ -687,12 +696,12 @@ export default class GenMapClass
     buildRoomLedges()
     {
         let n,room,ledge;
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
         
         ledge=new GenRoomLedgeClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             ledge.createLedges(room);
         }
     }
@@ -700,13 +709,13 @@ export default class GenMapClass
     buildRoomPlatforms()
     {
         let n,room,platform,stair;
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
         
         platform=new GenRoomPlatformClass(this.view,this.map);
         stair=new GenRoomStairsClass(this.view,this.map);
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             if (room.mainPath) continue;
             
             switch (room.level) {
@@ -730,12 +739,12 @@ export default class GenMapClass
         let pipe=new GenRoomDecorationPipeClass(this.view,this.map);
         let cubicle=new GenRoomDecorationCubicalClass(this.view,this.map);
         let lab=new GenRoomDecorationLabClass(this.view,this.map);
-        let nRoom=this.map.rooms.length;
+        let nRoom=this.map.roomList.count();
         
         if (!config.ROOM_DECORATIONS) return;
         
         for (n=0;n!==nRoom;n++) {
-            room=this.map.rooms[n];
+            room=this.map.roomList.get(n);
             
                 // a random series of rectangles in the room
                 // to place decorations
@@ -888,7 +897,7 @@ export default class GenMapClass
     {
             // overlay precalc
             
-        this.map.precalcOverlayDrawValues();
+        this.map.overlay.precalcDrawValues();
         
             // finish with the callback
             
