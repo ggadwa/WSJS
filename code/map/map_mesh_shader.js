@@ -20,6 +20,7 @@ export default class MapMeshShaderClass extends ShaderClass
         this.modelMatrixUniform=null;
         this.normalMatrixUniform=null;
         
+        this.alphaUniform=null;
         this.shineFactorUniform=null;
         this.glowFactorUniform=null;
         this.ambientUniform=null;
@@ -56,6 +57,7 @@ export default class MapMeshShaderClass extends ShaderClass
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
 
+        this.alphaUniform=gl.getUniformLocation(this.program,'alpha');
         this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');
         this.glowFactorUniform=gl.getUniformLocation(this.program,'glowFactor');
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');

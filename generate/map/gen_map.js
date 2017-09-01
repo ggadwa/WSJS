@@ -758,7 +758,7 @@ export default class GenMapClass
             for (k=0;k!==nRect;k++) {
             
                 decorationType=genRandom.randomIndex(7);        // +1 for a skip version
-                //decorationType=constants.ROOM_DECORATION_PIPE; // supergumba -- testing
+                decorationType=constants.ROOM_DECORATION_LAB; // supergumba -- testing
             
                 switch (decorationType) {
                     case constants.ROOM_DECORATION_PILLARS:

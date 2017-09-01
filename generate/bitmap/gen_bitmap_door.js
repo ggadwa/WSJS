@@ -184,10 +184,10 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
         
         if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
         
-            // otherwise, create the wenGL
+            // otherwise, create the webGL
             // bitmap object
 
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 
 }

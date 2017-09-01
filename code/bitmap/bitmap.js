@@ -4,7 +4,7 @@
 
 export default class BitmapClass
 {
-    constructor(view,bitmapCanvas,normalMapCanvas,specularMapCanvas,glowMapCanvas,uvScale,shineFactor)
+    constructor(view,bitmapCanvas,normalMapCanvas,specularMapCanvas,glowMapCanvas,alpha,uvScale,shineFactor)
     {
         this.view=view;
         
@@ -13,6 +13,7 @@ export default class BitmapClass
         this.specularMap=null;
         this.glowMap=null;
 
+        this.alpha=alpha;
         this.uvScale=uvScale;
         this.shineFactor=shineFactor;
 
@@ -89,8 +90,9 @@ export default class BitmapClass
     {
         let gl=this.view.gl;
 
-            // shine factor in shader
+            // uniforms
 
+        gl.uniform1f(shader.alphaUniform,this.alpha);
         gl.uniform1f(shader.shineFactorUniform,this.shineFactor);
         gl.uniform1f(shader.glowFactorUniform,this.view.glowFactor);
 
@@ -109,10 +111,12 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
     
-    attachAsLiquid()
+    attachAsLiquid(shader)
     {
         let gl=this.view.gl;
 
+        gl.uniform1f(shader.alphaUniform,this.alpha);
+        
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }

@@ -43,10 +43,10 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
         
         if (inDebug) return({bitmap:bitmapCanvas,normal:null,specular:null,glow:null});
         
-            // otherwise, create the wenGL
+            // otherwise, create the webGL
             // bitmap object
 
-        return(new BitmapClass(this.view,bitmapCanvas,null,null,null,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+        return(new BitmapClass(this.view,bitmapCanvas,null,null,null,1.0,[(1.0/4000.0),(1.0/4000.0)],1.0));    
     }
 
 }

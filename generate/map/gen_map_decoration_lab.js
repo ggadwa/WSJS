@@ -2,6 +2,8 @@ import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
+import MoveClass from '../../code/map/move.js';
+import MovementClass from '../../code/map/movement.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -26,12 +28,14 @@ export default class GenRoomDecorationLabClass
         
     addTube(room,x,z)
     {
-        let yBound,mesh;
-        let yMid,centerPnt,radius;
-        let platformBitmap,metalBitmap;
+        let yBound,mesh,meshIdx;
+        let yCapTop,yCapBottom,yBaseTop,yBaseBottom,yLiqHigh,centerPnt,radius;
+        let moveY,movement,msec;
+        let platformBitmap,glassBitmap,gooBitmap;
 
         platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
-        metalBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
+        glassBitmap=this.map.getTexture(constants.BITMAP_TYPE_GLASS);
+        gooBitmap=this.map.getTexture(constants.BITMAP_TYPE_GOO);
         
             // the top and bottom base
 
@@ -41,26 +45,52 @@ export default class GenRoomDecorationLabClass
       
         radius=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.35);
         
-        yMid=(room.yBound.max-this.tubeBaseSize);
-        yBound=new BoundClass(yMid,room.yBound.max);
+        yCapTop=(room.yBound.max-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
+        yCapBottom=(room.yBound.max-constants.ROOM_FLOOR_HEIGHT);
+        
+        yBaseTop=(room.yBound.max-this.tubeBaseSize);
+        yBaseBottom=room.yBound.max;
+        
+        yBound=new BoundClass(yBaseTop,yBaseBottom);
         mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,platformBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         this.map.meshList.add(mesh);
 
-        yBound=new BoundClass((room.yBound.max-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)),(room.yBound.max-constants.ROOM_FLOOR_HEIGHT));
+        yBound=new BoundClass(yCapTop,yCapBottom);
         mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,platformBitmap,centerPnt,yBound,radius,true,true,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         this.map.meshList.add(mesh);
 
             // the tube
         
-        yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_HEIGHT),yMid);
-        
+        yBound=new BoundClass(yCapBottom,yBaseTop); 
         radius=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3);
 
-        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,metalBitmap,centerPnt,yBound,radius,false,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,glassBitmap,centerPnt,yBound,radius,false,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         this.map.meshList.add(mesh);
+        
+            // the liquid in the tube
+        
+        yLiqHigh=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,(yBound.getSize()-constants.ROOM_FLOOR_DEPTH));    
+        yBound=new BoundClass((yBaseTop-yLiqHigh),yBaseTop);
+        
+        radius=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.28);
+
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,gooBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
+        MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
+        meshIdx=this.map.meshList.add(mesh);
+        
+            // liquid movement
+        
+        moveY=Math.trunc(yLiqHigh*genRandom.randomFloat(0.1,0.7));
+        msec=genRandom.randomInt(500,2000);
+        
+        movement=new MovementClass(meshIdx,true,0);
+        movement.addMove(new MoveClass(msec,new PointClass(0,0,0)));
+        movement.addMove(new MoveClass(msec,new PointClass(0,moveY,0)));
+        
+        this.map.movementList.add(movement);
     }
     
         //

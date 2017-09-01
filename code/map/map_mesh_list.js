@@ -15,6 +15,12 @@ export default class MapMeshListClass
         this.meshShader=new MapMeshShaderClass(view,fileCache);
 
         this.meshes=[];
+        
+            // this is an optimization that we use to skip
+            // transparency drawing if the opaque draw didn't
+            // skip any
+            
+        this.hadTransparentInDraw=false;
 
         Object.seal(this);
     }
@@ -301,22 +307,27 @@ export default class MapMeshListClass
         // draw map meshes
         //
 
-    draw()
+    drawOpaque()
     {
         let n,mesh;
-        let nMesh=this.meshes.length;
         let currentBitmap;
+        let nMesh=this.meshes.length;
         
         this.meshShader.drawStart();
 
             // setup map drawing
 
         currentBitmap=null;
+        this.hadTransparentInDraw=false;
 
-            // draw the meshes
+            // draw the opaque meshes
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.meshes[n];
+            if (mesh.isTransparent()) {
+                this.hadTransparentInDraw=true;
+                continue;
+            }
 
                 // skip if not in view frustum
 
@@ -334,10 +345,68 @@ export default class MapMeshListClass
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
             mesh.bindBuffers(this.meshShader);
-            mesh.draw();
+            mesh.drawOpaque();
         }
         
         this.meshShader.drawEnd();
+    }
+    
+    drawTransparent()
+    {
+        let n,mesh;
+        let nMesh=this.meshes.length;
+        let currentBitmap;
+        let gl=this.view.gl;
+        
+            // if no transparency in the opaque draw,
+            // skip this whole method
+            
+        if (!this.hadTransparentInDraw) return;
+        
+            // change the blend
+            
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+        
+        gl.depthMask(false);
+        
+        this.meshShader.drawStart();
+
+            // setup map drawing
+
+        currentBitmap=null;
+
+            // draw the transparent meshes
+
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.meshes[n];
+            if (!mesh.isTransparent()) continue;
+
+                // skip if not in view frustum
+
+            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+
+                // time to change bitmap
+
+            if (mesh.bitmap!==currentBitmap) {
+                currentBitmap=mesh.bitmap;
+                mesh.bitmap.attachAsTexture(this.meshShader);
+            }
+
+                // draw the mesh
+
+            mesh.updateBuffers();
+            mesh.buildNonCulledTriangleIndexes();
+            mesh.bindBuffers(this.meshShader);
+            mesh.drawTransparent();
+        }
+        
+            // reset the blend
+            
+        this.meshShader.drawEnd();
+        
+        gl.disable(gl.BLEND);
+        gl.depthMask(true);
     }
     
 }

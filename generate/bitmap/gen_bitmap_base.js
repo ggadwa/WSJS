@@ -657,6 +657,38 @@ export default class GenBitmapBaseClass
     }
     
         //
+        // glow utility
+        //
+
+    createGlowMap(bitmapCTX,glowCTX,wid,high,clamp)
+    {
+        let n,idx,nPixel;
+
+        let bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapData=bitmapImgData.data;
+
+        let glowImgData=glowCTX.getImageData(0,0,wid,high);
+        let glowData=glowImgData.data;
+
+            // transfer over the bitmap and
+            // clamp it for the glow
+            
+        idx=0;
+        nPixel=wid*high;
+        
+        for (n=0;n!==nPixel;n++) {
+            glowData[idx]=Math.trunc(bitmapData[idx]*clamp);
+            glowData[idx+1]=Math.trunc(bitmapData[idx+1]*clamp);
+            glowData[idx+2]=Math.trunc(bitmapData[idx+2]*clamp);
+            glowData[idx+3]=0xFF;
+            
+            idx+=4;
+        } 
+
+        glowCTX.putImageData(glowImgData,0,0);
+    }
+    
+        //
         // channel swaps
         //
         

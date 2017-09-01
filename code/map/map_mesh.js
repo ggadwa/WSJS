@@ -494,6 +494,15 @@ export default class MapMeshClass
             
         this.requiresBufferUpdate=true;
     }
+    
+        //
+        // transparency flags
+        //
+        
+    isTransparent()
+    {
+        return(this.bitmap.alpha!==1.0);
+    }
 
         //
         // mesh binding
@@ -557,9 +566,15 @@ export default class MapMeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawUVs,gl.STATIC_DRAW);
 
-            // indexes are dynamic
+            // opaque meshes have dynamic indexes,
+            // transparent meshes always draw all trigs
             
         this.indexBuffer=gl.createBuffer();
+        
+        if (this.isTransparent()) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
+        }
     }
 
     bindBuffers(mapMeshShader)
@@ -578,10 +593,11 @@ export default class MapMeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.vertexAttribPointer(mapMeshShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
-            // need to always rebuild the array from the culled list
+            // opaque meshes have dynamic indexes,
+            // transparent meshes always draw all trigs
             
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
+        if (!this.isTransparent()) gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
     }
     
         //
@@ -677,13 +693,23 @@ export default class MapMeshClass
         // mesh drawing
         //
 
-    draw()
+    drawOpaque()
     {
         let gl=this.view.gl;
-
-        gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
         
+        gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
+            
         this.view.drawMeshCount++;
         this.view.drawMeshTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
+    }
+    
+    drawTransparent()
+    {
+        let gl=this.view.gl;
+        
+        gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
+
+        this.view.drawMeshCount++;
+        this.view.drawMeshTrigCount+=Math.trunc(this.indexCount/3);
     }
 }

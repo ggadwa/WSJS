@@ -2,13 +2,17 @@
 
 uniform lowp sampler2D baseTex;
 
+uniform lowp float alpha;
+
 in highp vec2 fragUV;
 
 out lowp vec4 outputPixel;
 
 void main(void)
 {
-    outputPixel.rgb=texture(baseTex,fragUV).rgb;
-    outputPixel.a=0.85;
+    lowp vec4 tex=texture(baseTex,fragUV);
+
+    outputPixel.rgb=tex.rgb;
+    outputPixel.a=tex.a*alpha;
 }
 

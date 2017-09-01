@@ -1,70 +1,65 @@
-import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
-// generate liquid bitmap class
+// generate glass bitmap class
 //
 
-export default class GenBitmapLiquidClass extends GenBitmapBaseClass
+export default class GenBitmapGlassClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
         Object.seal(this);
     }
-        
+            
         //
-        // liquid
+        // glass bitmaps
         //
     
-    generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateGlass(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,x,y,x2,y2,ovalWid,ovalHigh;
-        let color=this.getDefaultPrimaryColor();
+        let n,nLine,color;
+        let x,y,x2,y2,startWid,sizeWid;
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
-            // background
+            // default glass to white
             
-        this.drawRect(bitmapCTX,0,0,wid,high,this.darkenColor(color,0.9));
+        this.drawRect(bitmapCTX,0,0,wid,high,this.whiteColor);
         
-            // gradient ovals
+            // back noise and blur
             
-        for (n=0;n!==20;n++) {
-            ovalWid=genRandom.randomInt(50,100);
-            ovalHigh=genRandom.randomInt(50,100);
+        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.9,0.95,0.7);
+        this.blur(bitmapCTX,0,0,wid,high,10,false);
+        
+            // reflection lines
             
-            x=genRandom.randomInt(0,(wid-ovalWid));
-            y=genRandom.randomInt(0,(high-ovalHigh));
-            
-                // draw the oval and any wrapped ovals
-                
-            this.drawOval(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),color,null);
-            if ((x+ovalWid)>wid) {
-                x2=-((x+ovalWid)-wid);
-                this.drawOval(bitmapCTX,x2,y,(x2+ovalWid),(y+ovalHigh),color,null);
-            }
-            if ((y+ovalHigh)>high) {
-                y2=-((y+ovalHigh)-high);
-                this.drawOval(bitmapCTX,x,y2,(x+ovalWid),(y2+ovalHigh),color,null);
-            }
+        nLine=genRandom.randomInt(5,20);
+        
+        startWid=Math.trunc(wid*0.4);
+        sizeWid=Math.trunc(wid*0.6);
+        
+        for (n=0;n!==nLine;n++) {
+            color=this.getRandomGray(0.7,0.9);
+            x=genRandom.randomInt(0,startWid);
+            x2=genRandom.randomInt((x+1),(wid-x));
+            y=high-genRandom.randomInt(0,(high-(x2-x)));
+            y2=y-Math.trunc((x2-x)*0.5);
+            this.drawBumpLine(bitmapCTX,normalCTX,x,y,x2,y2,1,color);
         }
         
-        this.blur(bitmapCTX,0,0,wid,high,5,false);
-        
-            // noise and blurs
-        
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,5,false);
+            // front noise and blur
             
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,5,false);
-        
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
-    }
+        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.95,1.0,0.7);
+        this.blur(bitmapCTX,0,0,wid,high,5,false);        
+       
+            // finish with the specular
 
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
+    }
+            
         //
         // generate mainline
         //
@@ -106,8 +101,8 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
+                this.generateGlass(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=10.0;
                 break;
 
         }
@@ -120,7 +115,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        alpha=genRandom.randomFloat(0.5,0.4);
+        alpha=genRandom.randomFloat(0.3,0.5);
         return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,alpha,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 

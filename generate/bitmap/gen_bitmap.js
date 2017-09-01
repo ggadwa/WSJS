@@ -8,6 +8,8 @@ import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
 import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
+import GenBitmapGlassClass from '../../generate/bitmap/gen_bitmap_glass.js';
+import GenBitmapGooClass from '../../generate/bitmap/gen_bitmap_goo.js';
 import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
 import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
 import GenBitmapSkinClass from '../../generate/bitmap/gen_bitmap_skin.js';
@@ -36,6 +38,8 @@ export default class GenBitmapClass
         this.genBitmapPanel=new GenBitmapPanelClass(this.view);
         this.genBitmapLiquid=new GenBitmapLiquidClass(this.view);
         this.genBitmapMachine=new GenBitmapMachineClass(this.view);
+        this.genBitmapGlass=new GenBitmapGlassClass(this.view);
+        this.genBitmapGoo=new GenBitmapGooClass(this.view);
         this.genBitmapParticle=new GenBitmapParticleClass(this.view);
         this.genBitmapItem=new GenBitmapItemClass(this.view);
         this.genBitmapSkin=new GenBitmapSkinClass(this.view);
@@ -91,6 +95,12 @@ export default class GenBitmapClass
             case constants.BITMAP_TYPE_PILLAR:
                 return(this.genBitmapWall.generate(inDebug));
                 
+            case constants.BITMAP_TYPE_GLASS:
+                return(this.genBitmapGlass.generate(inDebug));
+                
+            case constants.BITMAP_TYPE_GOO:
+                return(this.genBitmapGoo.generate(inDebug));
+               
             case constants.BITMAP_TYPE_PARTICLE:
                 return(this.genBitmapParticle.generate(inDebug));
                 

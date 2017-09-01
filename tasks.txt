@@ -13,8 +13,8 @@ ESNext
 
 
 
---> transparent meshes
---> glass texture
+--> small goo holders in pumps
+
 --> need particle blob (use for explosions)
 --> platform, pipe, frame, and pillar need their own texture creation
 --> sky is just terrible
@@ -30,12 +30,11 @@ ToDos
         [X] mapRoomConstants.ROOM_DECORATION_COMPUTER:
               - computer panel has square around lights (possible canary bug, check after chrome 61)
               - computer sides are part of texture
-        [ ] mapRoomConstants.ROOM_DECORATION_PIPE:
+        [X] mapRoomConstants.ROOM_DECORATION_PIPE:
         [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
               - raised chunk of floor with stairs
               - cubical tops
-        [ ] mapRoomConstants.ROOM_DECORATION_LAB:
-              - glowing vat texture (animated it up and down), glass cylinders
+        [X] mapRoomConstants.ROOM_DECORATION_LAB:
         [ ] pits (wires, pipes)
     * types for low/high/water rooms
     * special edge ones (panels, conduits)

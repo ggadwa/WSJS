@@ -6,6 +6,7 @@ uniform lowp sampler2D specularTex;
 uniform lowp sampler2D glowTex;
 
 uniform lowp vec3 ambient;
+uniform lowp float alpha;
 uniform mediump float shineFactor;
 uniform mediump float glowFactor;
 
@@ -98,6 +99,6 @@ void main(void)
         // finally create the pixel
 
     outputPixel.rgb=((tex.rgb*pixelAmbient)+spec)+(texture(glowTex,fragUV).rgb*glowFactor);
-    outputPixel.a=tex.a;
+    outputPixel.a=tex.a*alpha;
 }
 

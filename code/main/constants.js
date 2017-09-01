@@ -115,16 +115,18 @@ export const BITMAP_TYPE_PLATFORM=9;
 export const BITMAP_TYPE_PIPE=10;
 export const BITMAP_TYPE_FRAME=11;
 export const BITMAP_TYPE_PILLAR=12;
-export const BITMAP_TYPE_PARTICLE=13;
-export const BITMAP_TYPE_ITEM=14;
-export const BITMAP_TYPE_SKIN=15;
-export const BITMAP_TYPE_SKY=16;
+export const BITMAP_TYPE_GLASS=13;
+export const BITMAP_TYPE_GOO=14;
+export const BITMAP_TYPE_PARTICLE=15;
+export const BITMAP_TYPE_ITEM=16;
+export const BITMAP_TYPE_SKIN=17;
+export const BITMAP_TYPE_SKY=18;
 
 export const BITMAP_TYPE_NAMES=
                 [
                     'Wall','Floor','Ceiling','Door','Metal',
                     'Box','Panel','Liquid','Machine',
-                    'Platform','Pipe','Frame','Pillar',
-                    'Particle','Item','Skin','Sky'
+                    'Platform','Pipe','Frame','Pillar','Glass',
+                    'Goo','Particle','Item','Skin','Sky'
                 ];
 

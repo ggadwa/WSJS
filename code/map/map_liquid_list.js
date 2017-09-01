@@ -115,7 +115,7 @@ export default class MapLiquidListClass
 
             if (liquid.bitmap!==currentBitmap) {
                 currentBitmap=liquid.bitmap;
-                liquid.bitmap.attachAsLiquid();
+                liquid.bitmap.attachAsLiquid(this.liquidShader);
             }
 
                 // draw the liquid
