@@ -17,6 +17,8 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.modelMatrixUniform=null;
         this.normalMatrixUniform=null;
         
+        this.alphaUniform=null;
+        
         Object.seal(this);
     }
     
@@ -43,6 +45,8 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
+        
+        this.alphaUniform=gl.getUniformLocation(this.program,'alpha');
 
             // these uniforms are always the same
 

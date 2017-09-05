@@ -745,6 +745,7 @@ export default class GenMapClass
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
+            if (room.liquid) continue;
             
                 // a random series of rectangles in the room
                 // to place decorations
@@ -758,7 +759,7 @@ export default class GenMapClass
             for (k=0;k!==nRect;k++) {
             
                 decorationType=genRandom.randomIndex(7);        // +1 for a skip version
-                decorationType=constants.ROOM_DECORATION_LAB; // supergumba -- testing
+                //decorationType=constants.ROOM_DECORATION_CUBICAL; // supergumba -- testing
             
                 switch (decorationType) {
                     case constants.ROOM_DECORATION_PILLARS:

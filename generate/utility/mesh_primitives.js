@@ -22,7 +22,7 @@ export default class MeshPrimitivesClass
 
     static createMeshRotatedCube(view,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,flags)
     {
-        let vertexList,count,idx,centerPt;
+        let vertexList,count,idx,centerPnt;
         let n,indexes;
         
             // get cube size
@@ -116,8 +116,8 @@ export default class MeshPrimitivesClass
             // rotate
             
         if (rotAngle!==null) {
-            centerPt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
-            MeshUtilityClass.rotateVertexes(vertexList,centerPt,rotAngle);
+            centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+            MeshUtilityClass.rotateVertexes(vertexList,centerPnt,rotAngle);
         }
         
             // calculate the normals, then use those to
@@ -208,9 +208,9 @@ export default class MeshPrimitivesClass
         // create wedge
         //
 
-    static createMeshWedge(view,bitmap,xBound,yBound,zBound,rotAngle,wholeUV,left,right,back,top,bottom,normalsIn,flags)
+    static createMeshRotateWedge(view,bitmap,xBound,yBound,zBound,rotAngle,left,right,back,top,bottom,normalsIn,flags)
     {
-        let n,v,idx,count,centerPnt,topIdx,botIdx;
+        let n,idx,count,centerPnt,topIdx,botIdx;
         let vertexList,indexes;
         
             // get wedge size
@@ -289,61 +289,6 @@ export default class MeshPrimitivesClass
         for (n=0;n!==count;n++) {
             indexes[n]=n;
         }
-        
-            // build whole UVs
-
-        if (wholeUV) {
-            if (topIdx!==-1) {
-                v=vertexList[topIdx++];
-                v.uv.x=0.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[topIdx++];
-                v.uv.x=1.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[topIdx++];
-                v.uv.x=1.0;
-                v.uv.y=1.0;
-                
-                v=vertexList[topIdx++];
-                v.uv.x=0.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[topIdx++];
-                v.uv.x=1.0;
-                v.uv.y=1.0;
-                
-                v=vertexList[topIdx++];
-                v.uv.x=0.0;
-                v.uv.y=1.0;
-            }  
-            if (botIdx!==-1) {
-                v=vertexList[botIdx++];
-                v.uv.x=0.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[botIdx++];
-                v.uv.x=1.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[botIdx++];
-                v.uv.x=1.0;
-                v.uv.y=1.0;
-                
-                v=vertexList[botIdx++];
-                v.uv.x=0.0;
-                v.uv.y=0.0;
-                
-                v=vertexList[botIdx++];
-                v.uv.x=1.0;
-                v.uv.y=1.0;
-                
-                v=vertexList[botIdx++];
-                v.uv.x=0.0;
-                v.uv.y=1.0;
-            }  
-        }
 
             // rotate
             
@@ -351,20 +296,110 @@ export default class MeshPrimitivesClass
             centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
             MeshUtilityClass.rotateVertexes(vertexList,centerPnt,rotAngle);
         }
-        
+
             // calculate the normals, then use those to
             // calcualte the uvs, and finally the UVs to
             // calculate the tangents
 
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,normalsIn);
-        if (!wholeUV) MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
             // finally create the mesh
 
         return(new MapMeshClass(view,bitmap,vertexList,indexes,flags));
     }
+    
+    static createMeshDirectionWedge(view,bitmap,xBound,yBound,zBound,dir,left,right,back,top,bottom,normalsIn,flags)
+    {
+        let angList=[90.0,0.0,270.0,180.0];         // angle for wedges based on constants.ROOM_SIDE_X
+        let ang=new PointClass(0.0,angList[dir],0.0);
+        
+        return(this.createMeshRotateWedge(view,bitmap,xBound,yBound,zBound,ang,left,right,back,top,bottom,normalsIn,flags));
+    }
+    
+    static meshWedgeSetWholeUV(mesh,quadIndex,left,right,back)
+    {
+        let v;
+        let idx=0;
+        let vertexList=mesh.vertexList;
+        
+            // figure out the proper vertex list
+            // from sides
+            
+        if (left) idx+=3;
+        if (right) idx+=3;
+        if (back) idx+=6;
+        idx+=(quadIndex*6);
+        
+            // set the UV
+        
+        v=vertexList[idx++];
+        v.uv.x=0.0;
+        v.uv.y=0.0;
 
+        v=vertexList[idx++];
+        v.uv.x=1.0;
+        v.uv.y=0.0;
+
+        v=vertexList[idx++];
+        v.uv.x=1.0;
+        v.uv.y=1.0;
+
+        v=vertexList[idx++];
+        v.uv.x=0.0;
+        v.uv.y=0.0;
+
+        v=vertexList[idx++];
+        v.uv.x=1.0;
+        v.uv.y=1.0;
+
+        v=vertexList[idx++];
+        v.uv.x=0.0;
+        v.uv.y=1.0;
+    }
+    
+    static meshWedgeScaleUV(mesh,quadIndex,left,right,back,xOffset,xScale,yOffset,yScale)
+    {
+        let v;
+        let idx=0;
+        let vertexList=mesh.vertexList;
+        
+            // figure out the proper vertex list
+            // from sides
+            
+        if (left) idx+=3;
+        if (right) idx+=3;
+        if (back) idx+=6;
+        idx+=(quadIndex*6);
+        
+            // set the UV
+        
+        v=vertexList[idx++];
+        v.uv.x+=xOffset;
+        v.uv.y+=yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x=(v.uv.x*xScale)+xOffset;
+        v.uv.y+=yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x=(v.uv.x*xScale)+xOffset;
+        v.uv.y=(v.uv.y*yScale)+yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x+=xOffset;
+        v.uv.y+=yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x=(v.uv.x*xScale)+xOffset;
+        v.uv.y=(v.uv.y*yScale)+yOffset;
+
+        v=vertexList[idx++];
+        v.uv.x+=xOffset;
+        v.uv.y=(v.uv.y*yScale)+yOffset;
+    }
+    
         //
         // create pryamid
         //

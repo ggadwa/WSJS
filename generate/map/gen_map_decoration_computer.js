@@ -73,9 +73,10 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,true,false,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.1,0.9,0.1,0.9);        // front facing poly
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
                 this.map.meshList.add(mesh);
                 break;
                 
@@ -89,9 +90,10 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,true,true,true,false,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.1,0.9,0.1,0.9);        // front facing poly
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
                 this.map.meshList.add(mesh);
                 
                 break;
@@ -106,9 +108,10 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,false,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.1,0.9,0.1,0.9);        // front facing poly
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
                 this.map.meshList.add(mesh);
                 break;
                 
@@ -122,9 +125,10 @@ export default class GenRoomDecorationComputerClass
                 
                 mesh=MeshPrimitivesClass.createMeshCube(this.view,computerBitmap,xBound,yBound,zBound,true,true,false,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.0,1.0);
-                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.0,0.1,0.0,1.0);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.0,0.1,0.1,0.9);
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,2,0.1,0.9,0.1,0.9);        // front facing poly
+                MeshPrimitivesClass.meshCubeScaleUV(mesh,3,0.1,0.9,0.0,0.1);
                 this.map.meshList.add(mesh);
                 break;
 
@@ -137,60 +141,41 @@ export default class GenRoomDecorationComputerClass
         
     addTerminal(room,pnt,dir)
     {
-        let panelMargin,ang,mesh,mesh2;
+        let panelMargin,mesh,mesh2;
         let xBound,yBound,zBound;
-        let computerBitmap,baseBitmap;
+        let panelBitmap,baseBitmap;
             
             // the machine location
         
-        computerBitmap=this.map.getTexture(constants.BITMAP_TYPE_PANEL);
+        panelBitmap=this.map.getTexture(constants.BITMAP_TYPE_PANEL);
         baseBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
         
-            // panel directions and size
+            // the panel bottom
             
         panelMargin=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH/5),Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
 
         xBound=new BoundClass((pnt.x+panelMargin),((pnt.x+constants.ROOM_BLOCK_WIDTH)-panelMargin));
         zBound=new BoundClass((pnt.z+panelMargin),((pnt.z+constants.ROOM_BLOCK_WIDTH)-panelMargin));
         yBound=new BoundClass(pnt.y,(pnt.y-Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.3)));
+        
+        mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+        MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
+        
+            // the panel wedge
 
-        switch (dir) {
-            
-            case constants.ROOM_SIDE_LEFT:
-                ang=new PointClass(0.0,90.0,0.0);
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                break;
-                
-            case constants.ROOM_SIDE_TOP:
-                ang=new PointClass(0.0,0.0,0.0);
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                break;
-                
-            case constants.ROOM_SIDE_RIGHT:
-                ang=new PointClass(0.0,270.0,0.0);
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                break;
-                
-            case constants.ROOM_SIDE_BOTTOM:
-                ang=new PointClass(0.0,180.0,0.0);
-                mesh=MeshPrimitivesClass.createMeshCube(this.view,baseBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-                break;
-        }
-
-            // create top of panel
-            
         yBound.max=yBound.min;
         yBound.min=yBound.max-constants.ROOM_FLOOR_DEPTH;
         
-        mesh2=MeshPrimitivesClass.createMeshWedge(this.view,baseBitmap,xBound,yBound,zBound,ang,false,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+        mesh2=MeshPrimitivesClass.createMeshDirectionWedge(this.view,baseBitmap,xBound,yBound,zBound,dir,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
         mesh.combineMesh(mesh2);
         this.map.meshList.add(mesh);
         
-        this.map.meshList.add(MeshPrimitivesClass.createMeshWedge(this.view,computerBitmap,xBound,yBound,zBound,ang,true,false,false,false,true,true,false,constants.MESH_FLAG_DECORATION));
+            // the panel top
+        
+        mesh=MeshPrimitivesClass.createMeshDirectionWedge(this.view,panelBitmap,xBound,yBound,zBound,dir,false,false,false,true,true,false,constants.MESH_FLAG_DECORATION);
+        MeshPrimitivesClass.meshWedgeSetWholeUV(mesh,0,false,false,false);
+        MeshPrimitivesClass.meshWedgeScaleUV(mesh,0,false,false,false,0.1,0.9,0.1,0.9);
+        this.map.meshList.add(mesh);
     }
     
         //

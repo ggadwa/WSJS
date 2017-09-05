@@ -21,14 +21,14 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
     
     generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,x,y,x2,y2,ovalWid,ovalHigh;
+        let n,x,y,x2,y2,ovalWid,ovalHigh,ovalColor;
         let color=this.getDefaultPrimaryColor();
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
             // background
             
-        this.drawRect(bitmapCTX,0,0,wid,high,this.darkenColor(color,0.9));
+        this.drawRect(bitmapCTX,0,0,wid,high,color);
         
             // gradient ovals
             
@@ -39,16 +39,18 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
             x=genRandom.randomInt(0,(wid-ovalWid));
             y=genRandom.randomInt(0,(high-ovalHigh));
             
+            ovalColor=this.darkenColor(color,genRandom.randomFloat(0.95,0.04));
+            
                 // draw the oval and any wrapped ovals
                 
-            this.drawOval(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),color,null);
+            this.drawOval(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),ovalColor,null);
             if ((x+ovalWid)>wid) {
                 x2=-((x+ovalWid)-wid);
-                this.drawOval(bitmapCTX,x2,y,(x2+ovalWid),(y+ovalHigh),color,null);
+                this.drawOval(bitmapCTX,x2,y,(x2+ovalWid),(y+ovalHigh),ovalColor,null);
             }
             if ((y+ovalHigh)>high) {
                 y2=-((y+ovalHigh)-high);
-                this.drawOval(bitmapCTX,x,y2,(x+ovalWid),(y2+ovalHigh),color,null);
+                this.drawOval(bitmapCTX,x,y2,(x+ovalWid),(y2+ovalHigh),ovalColor,null);
             }
         }
         
@@ -120,7 +122,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        alpha=genRandom.randomFloat(0.5,0.4);
+        alpha=genRandom.randomFloat(0.8,0.2);
         return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,alpha,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 

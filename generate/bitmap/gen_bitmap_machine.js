@@ -19,71 +19,44 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
         // components
         //
         
-    generateComputerComponentMonitor(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    generateComputerComponentWires(bitmapCTX,normalCTX,lft,top,rgt,bot)
     {
-        let x,y,mx,my,lx,ly,dx,dy,meterSize,meterHalfSize;
-        let horz,color,glowColor;
-        let monitorColor=new ColorClass(0.2,0.2,0.2);
+        let n,nLine;
+        let x,y;
+        let horz,lineColor;
         
-            // monitor background
+            // wires background
             
         lft+=5;
         rgt-=5;
         top+=5;
         bot-=5;
             
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,3,monitorColor,false);
-        
-        color=this.getRandomColor();
-        glowColor=this.darkenColor(color,0.5);
+        this.drawRect(bitmapCTX,lft,top,rgt,bot,this.blackColor);
         
             // determine if horz or vertical
             
         horz=((rgt-lft)>(bot-top));
         
-        lft+=3;
-        rgt-=3;
-        top+=3;
-        bot-=3;
-        
         if (horz) {
-            my=Math.trunc((top+bot)*0.5);
+            nLine=Math.trunc((bot-top)*0.7);
             
-            lx=lft;
-            ly=my;
-            
-            meterSize=bot-top;
-            meterHalfSize=Math.trunc(meterSize*0.5);
-            
-            for (x=lft;x<=rgt;x+=5) {
-                if (x>rgt) x=rgt;
-                dy=my+(genRandom.randomInt(0,meterSize)-meterHalfSize);
-
-                this.drawLine(bitmapCTX,normalCTX,lx,ly,x,dy,color,true);
-                this.drawLine(glowCTX,null,lx,ly,x,dy,glowColor,true);
-
-                lx=x;
-                ly=dy;
-            }   
+            for (n=0;n!==nLine;n++) {
+                y=(top+5)+genRandom.randomInt(0,((bot-top)-10));
+                
+                lineColor=this.getRandomColor();
+                this.drawRandomLine(bitmapCTX,normalCTX,lft,y,rgt,y,5,lineColor,false);
+            }
         }
         else {
-            mx=Math.trunc((lft+rgt)*0.5);
+            nLine=Math.trunc((rgt-lft)*0.7);
             
-            lx=mx;
-            ly=top;
-            meterSize=rgt-lft;
-            meterHalfSize=Math.trunc(meterSize*0.5);
-            
-            for (y=top;y<=bot;y+=5) {
-                if (y>bot) y=bot;
-                dx=mx+(genRandom.randomInt(0,meterSize)-meterHalfSize);
-
-                this.drawLine(bitmapCTX,normalCTX,lx,ly,dx,y,color,true);
-                this.drawLine(glowCTX,null,lx,ly,dx,y,glowColor,true);
-
-                lx=dx;
-                ly=y;
-            }   
+            for (n=0;n!==nLine;n++) {
+                x=(lft+5)+genRandom.randomInt(0,((rgt-lft)-10));
+                
+                lineColor=this.getRandomColor();
+                this.drawRandomLine(bitmapCTX,normalCTX,x,top,x,bot,5,lineColor,false);
+            }
         }
     }
     
@@ -102,7 +75,7 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
 
         this.drawRect(bitmapCTX,lft,top,rgt,bot,shutterColor);
 
-        nShutter=Math.trunc((bot-top)/30);
+        nShutter=Math.trunc((bot-top)/20);
 
         yAdd=(bot-top)/nShutter;
         y=top+Math.trunc(yAdd/2);
@@ -120,14 +93,12 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         let color;
         
-        wid=genRandom.randomInt(30,25);
+        wid=genRandom.randomInt(20,20);
         
-        xCount=Math.trunc((rgt-lft)/wid)-1;
-        yCount=Math.trunc((bot-top)/wid)-1;
+        xCount=Math.trunc((rgt-lft)/wid);
+        yCount=Math.trunc((bot-top)/wid);
         
         if ((xCount<=0) || (yCount<=0)) return;
-        if (xCount>10) xCount=10;
-        if (yCount>10) yCount=10;
         
         xOff=(lft+2)+Math.trunc(((rgt-lft)-(xCount*wid))/2);
         yOff=(top+2)+Math.trunc(((bot-top)-(yCount*wid))/2);
@@ -158,12 +129,10 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
         
         wid=genRandom.randomInt(30,25);
         
-        xCount=Math.trunc((rgt-lft)/wid)-1;
-        yCount=Math.trunc((bot-top)/wid)-1;
+        xCount=Math.trunc((rgt-lft)/wid);
+        yCount=Math.trunc((bot-top)/wid);
         
         if ((xCount<=0) || (yCount<=0)) return;
-        if (xCount>10) xCount=10;
-        if (yCount>10) yCount=10;
         
         xOff=(lft+2)+Math.trunc(((rgt-lft)-(xCount*wid))/2);
         yOff=(top+2)+Math.trunc(((bot-top)-(yCount*wid))/2);
@@ -177,11 +146,58 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
                     // the button
                 
                 color=this.getRandomColor();
-                this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+wid),2,this.getRandomColor(),false);
+                this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+wid),2,color,false);
                 
                     // the possible glow
                     
                 if (genRandom.randomPercentage(0.5)) this.drawRect(glowCTX,dx,dy,(dx+wid),(dy+wid),this.darkenColor(color,0.5));
+            }
+        }
+    }
+    
+    generateComputerComponentDrives(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    {
+        let x,y,xCount,yCount,dx,dy,bx,by,wid,high;
+        let color,ledColor;
+        let ledColors=[new ColorClass(0.0,1.0,0.0),new ColorClass(1.0,1.0,0.0),new ColorClass(1.0,0.0,0.0)];
+        
+            // the random color (always dark)
+            
+        color=this.getRandomGray(0.1,0.3);
+        
+            // the drive sizes
+            // pick randomly, but make sure they fill entire size
+        
+        high=genRandom.randomInt(20,10);
+        wid=high*2;
+        
+        xCount=Math.trunc((rgt-lft)/wid);
+        yCount=Math.trunc((bot-top)/high);
+        
+        if (xCount<=0) xCount=1;
+        if (yCount<=0) yCount=1;
+        
+        wid=Math.trunc(((rgt-lft)-10)/xCount);
+        high=Math.trunc(((bot-top)-10)/yCount);
+        
+        for (y=0;y!==yCount;y++) {
+            dy=(top+5)+(y*high);
+            
+            for (x=0;x!==xCount;x++) {
+                dx=(lft+5)+(x*wid);
+                
+                    // the drive
+                
+                this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+high),2,color,true);
+                
+                    // the glowing indicator
+                
+                ledColor=ledColors[genRandom.randomIndex(3)];
+                
+                bx=(dx+wid)-6;
+                by=(dy+high)-6;
+                this.drawRect(bitmapCTX,bx,by,(bx+3),(by+3),ledColor);
+                this.drawRect(glowCTX,bx,by,(bx+3),(by+3),this.darkenColor(ledColor,0.5));
             }
         }
     }
@@ -192,23 +208,28 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
         
     generateComputer(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
-        let mx,my,sz,lft,top,rgt,bot;
-        let componentType,hadBlank,hadMonitor,hadShutter;
+        let mx,my,sz,lft,top,rgt,bot,rndTry;
+        let componentType,hadBlank,hadWires,hadShutter,rndSuccess;
+        let offset=Math.trunc(wid*0.1);
         let metalColor=this.getDefaultPrimaryColor();
         let metalInsideColor=this.boostColor(metalColor,0.1);
        
-            // face plate
+            // this is a collection of plates that are
+            // used to wrap the object around cubes
             
-        this.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,8,metalColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,offset,0,wid,offset,8,metalColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,0,offset,offset,high,8,metalColor,true);
+        
+        this.draw3DRect(bitmapCTX,normalCTX,offset,offset,wid,high,8,metalColor,true);
         
             // inside components
             // these are stacks of vertical or horizontal chunks
             
-        mx=15;
-        my=15;
+        mx=offset+15;
+        my=offset+15;
         
         hadBlank=false;
-        hadMonitor=false;
+        hadWires=false;
         hadShutter=false;
         
         while (true) {
@@ -237,34 +258,56 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
                 my+=(sz+5);
             }
             
-                // draw the components
-                // we only allow one blank, monitor, or shutter
+                // box around components, can
+                // be randonly in or out
                 
-            this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,5,metalInsideColor,false);
+            this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,5,metalInsideColor,genRandom.randomPercentage(0.5));
             
-            componentType=genRandom.randomIndex(5);
-            if ((componentType===0) && (hadBlank)) componentType++;
-            if ((componentType===1) && (hadMonitor)) componentType++;
-            if ((componentType===2) && (hadShutter)) componentType++;
+                // draw the components
+                // we only allow one blank, wires, or shutter
             
-            switch (componentType) {
-                case 0:
-                    hadBlank=true;
-                    break;
-                case 1:
-                    hadMonitor=true;
-                    this.generateComputerComponentMonitor(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
-                    break;
-                case 2:
-                    hadShutter=true;
-                    this.generateComputerComponentShutter(bitmapCTX,normalCTX,lft,top,rgt,bot);
-                    break;
-                case 3:
-                    this.generateComputerComponentLights(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
-                    break;
-                case 4:
-                    this.generateComputerComponentButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
-                    break;
+            rndTry=0;
+            
+            while (rndTry<25) {
+                componentType=genRandom.randomIndex(6);
+                
+                rndSuccess=false;
+
+                switch (componentType) {
+                    case 0:
+                        if (hadBlank) break;
+                        hadBlank=true;
+                        rndSuccess=true;
+                        break;
+                    case 1:
+                        if (hadWires) break;
+                        hadWires=true;
+                        this.generateComputerComponentWires(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                        rndSuccess=true;
+                        break;
+                    case 2:
+                        if (hadShutter) break;
+                        hadShutter=true;
+                        this.generateComputerComponentShutter(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                        rndSuccess=true;
+                        break;
+                    case 3:
+                        this.generateComputerComponentLights(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
+                        rndSuccess=true;
+                        break;
+                    case 4:
+                        this.generateComputerComponentButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
+                        rndSuccess=true;
+                        break;
+                    case 5:
+                        this.generateComputerComponentDrives(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
+                        rndSuccess=true;
+                        break;
+                }
+                
+                if (rndSuccess) break;
+                
+                rndTry++;
             }
             
                 // are we finished?

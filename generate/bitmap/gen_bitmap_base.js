@@ -1392,7 +1392,7 @@ export default class GenBitmapBaseClass
                 ex=sx+xAdd;
                 ey=sy+yAdd;
 
-                r=10-genRandom.randomIndex(lineVariant);
+                r=lineVariant-genRandom.randomIndex(lineVariant*2);
 
                 if (horizontal) {
                     ey+=r;

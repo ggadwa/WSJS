@@ -446,8 +446,8 @@ export default class GenRoomDecorationPipeClass
         
     addPipeSet(room,x,z)
     {
-        let px,pz,sx,sz,pos,yBound,platformBoundX,platformBoundY,platformBoundZ;
-        let gridSize,radius,wid;
+        let px,pz,sx,sz,yBound,platformBoundX,platformBoundY,platformBoundZ;
+        let gridSize,radius;
         let platformBitmap,pipeBitmap;
         let pnt,dir,dirLen;
         
@@ -466,13 +466,11 @@ export default class GenRoomDecorationPipeClass
         
         yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBoundByCoordinate(x,z);
         
-        wid=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5);
-
         x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
         z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
         
-        platformBoundX=new BoundClass((x-wid),(x+wid));
-        platformBoundZ=new BoundClass((z-wid),(z+wid));
+        platformBoundX=new BoundClass(x,(x+constants.ROOM_BLOCK_WIDTH));
+        platformBoundZ=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
         
         platformBoundY=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
         this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
@@ -486,8 +484,8 @@ export default class GenRoomDecorationPipeClass
         
             // create the pipes
             
-        sx=(x-Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
-        sz=(z-Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5))+Math.trunc(gridSize*0.5);
+        sx=x+Math.trunc(gridSize*0.5);
+        sz=z+Math.trunc(gridSize*0.5);
         
         pnt=new PointClass(0,0,0);
 
@@ -522,7 +520,13 @@ export default class GenRoomDecorationPipeClass
         
         for (z=rect.top;z!==rect.bot;z++) {
             for (x=rect.lft;x!==rect.rgt;x++) {
-                this.addPipeSet(room,x,z);
+                
+                switch (genRandom.randomIndex(2)) {
+                    case 0:
+                        this.addPipeSet(room,x,z);
+                        break;
+                }
+                
             }
         }
     }

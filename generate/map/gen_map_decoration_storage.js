@@ -24,7 +24,7 @@ export default class GenRoomDecorationStorageClass
         this.zShelfMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
         
         this.boxMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
-        this.boxHigh=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3));
+        this.boxHigh=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3));
 
         Object.seal(this);
     }
@@ -193,11 +193,13 @@ export default class GenRoomDecorationStorageClass
         for (x=rect.lft;x!==rect.rgt;x++) {
             for (z=rect.top;z!==rect.bot;z++) {
                 
-                if (genRandom.randomPercentage(0.5)) {
-                    this.addBoxes(room,x,z);
-                }
-                else {
-                    this.addShelf(room,x,z);
+                switch (genRandom.randomIndex(3)) {
+                    case 0:
+                        this.addBoxes(room,x,z);
+                        break;
+                    case 1:
+                        this.addShelf(room,x,z);
+                        break;
                 }
             }
         }
