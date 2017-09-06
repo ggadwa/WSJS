@@ -92,7 +92,7 @@ export default class GenBitmapWallClass extends GenBitmapBaseClass
                     ex=genRandom.randomInBetween((lft+20),(rgt-20));
 
                     lineColor=this.darkenColor(drawBrickColor,0.9);
-                    this.drawRandomLine(bitmapCTX,normalCTX,sx,top,ex,bot,20,lineColor,false);
+                    this.drawRandomLine(bitmapCTX,normalCTX,sx,top,ex,bot,lft,top,rgt,bot,20,lineColor,false);
                 }
             }
             
@@ -123,7 +123,7 @@ export default class GenBitmapWallClass extends GenBitmapBaseClass
 
     generateStone(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,k,rect,edgeSize;
+        let n,k,rect,edgeSize,clipMargin;
         let drawStoneColor,drawEdgeColor,lineColor,darken,f;
         let x,y,x2,y2,lineCount,lineVarient,stoneWid,stoneHigh;
 
@@ -169,7 +169,9 @@ export default class GenBitmapWallClass extends GenBitmapBaseClass
                 
             stoneWid=(rect.rgt-rect.lft)-((edgeSize*2)+padding);
             stoneHigh=(rect.bot-rect.top)-((edgeSize*2)+padding);
-            lineCount=genRandom.randomInt(5,10);
+            lineCount=genRandom.randomInt(3,8);
+            
+            clipMargin=padding+edgeSize;
             
             for (k=0;k!==lineCount;k++) {
                 x=genRandom.randomInt((rect.lft+edgeSize),stoneWid);
@@ -183,7 +185,7 @@ export default class GenBitmapWallClass extends GenBitmapBaseClass
                 
                 darken=0.9+(genRandom.random()*0.1);
                 lineColor=this.darkenColor(drawStoneColor,darken);
-                this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVarient,lineColor,false);
+                this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,(rect.lft+clipMargin),(rect.top+clipMargin),(rect.rgt-clipMargin),(rect.bot-clipMargin),lineVarient,lineColor,false);
             }
             
                 // redo the fill, but just do the edges so we
@@ -499,7 +501,7 @@ export default class GenBitmapWallClass extends GenBitmapBaseClass
 
         let lineColorBase=this.getDefaultPrimaryColor();
         let plasterColor=this.dullColor(lineColorBase,0.8);
-        let lineCount=genRandom.randomInt(40,30);
+        let lineCount=genRandom.randomInt(50,50);
 
             // clear canvases
 
@@ -514,7 +516,7 @@ export default class GenBitmapWallClass extends GenBitmapBaseClass
             darken=0.85+(genRandom.random()*0.1);
             lineColor=this.darkenColor(lineColorBase,darken);
             
-            this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,30,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,0,0,wid,high,15,lineColor,false);
         }
         
         for (n=0;n!==lineCount;n++) {
@@ -523,7 +525,7 @@ export default class GenBitmapWallClass extends GenBitmapBaseClass
             boost=0.05+(genRandom.random()*0.1);
             lineColor=this.boostColor(lineColorBase,boost);
             
-            this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,30,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,0,0,wid,high,15,lineColor,false);
         }
         
             // plaster noise

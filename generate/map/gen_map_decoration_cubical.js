@@ -102,6 +102,8 @@ export default class GenRoomDecorationCubicalClass
         else {
             yBound=new BoundClass((room.yBound.max-((room.storyCount-1)*constants.ROOM_FLOOR_HEIGHT)),room.yBound.max);
         }
+        
+        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(rect.lft,rect.top);
             
         this.addCubicalWall(room,bitmap,rect,wid,yBound);
     }

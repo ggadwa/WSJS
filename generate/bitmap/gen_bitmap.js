@@ -6,6 +6,7 @@ import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
 import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
 import GenBitmapBoxClass from '../../generate/bitmap/gen_bitmap_box.js';
 import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
+import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
 import GenBitmapGlassClass from '../../generate/bitmap/gen_bitmap_glass.js';
@@ -36,6 +37,7 @@ export default class GenBitmapClass
         this.genBitmapMetal=new GenBitmapMetalClass(this.view);
         this.genBitmapBox=new GenBitmapBoxClass(this.view);
         this.genBitmapPanel=new GenBitmapPanelClass(this.view);
+        this.genBitmapPipe=new GenBitmapPipeClass(this.view);
         this.genBitmapLiquid=new GenBitmapLiquidClass(this.view);
         this.genBitmapMachine=new GenBitmapMachineClass(this.view);
         this.genBitmapGlass=new GenBitmapGlassClass(this.view);
@@ -87,7 +89,7 @@ export default class GenBitmapClass
                 return(this.genBitmapCeiling.generate(inDebug));
                 
             case constants.BITMAP_TYPE_PIPE:
-                return(this.genBitmapMetal.generate(inDebug));
+                return(this.genBitmapPipe.generate(inDebug));
                 
             case constants.BITMAP_TYPE_FRAME:
                 return(this.genBitmapWall.generate(inDebug));

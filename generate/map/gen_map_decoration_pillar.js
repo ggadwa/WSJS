@@ -30,6 +30,10 @@ export default class GenRoomDecorationPillarClass
     {
         let x,z,yBound,pos,radius;
         let platformXBound,platformYBound,platformZBound;
+        
+            // check the grid to avoid blocking stairs
+            
+        if (room.checkBlockGrid(0,rect.lft,rect.top)) return;
 
             // position
             

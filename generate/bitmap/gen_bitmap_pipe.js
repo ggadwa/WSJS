@@ -1,82 +1,83 @@
-import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
-// generate liquid bitmap class
+// generate pipe bitmap class
 //
 
-export default class GenBitmapLiquidClass extends GenBitmapBaseClass
+export default class GenBitmapPipeClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
         Object.seal(this);
     }
-        
+            
         //
-        // liquid
+        // pipe bitmaps
         //
-        
-    generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
+    
+    generatePipe(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,k,x,y,xAdd,yAdd,lineCount,ovalCount,ovalWid,ovalHigh,ovalColor;
-        let color=this.getDefaultPrimaryColor();
+        let n,x,y,darken,metalColor;
+        let streakCount,streakWid,streakColor;
+        let screwCount,screwSize,screenFlatInnerSize,screwColor;
+
+            // some random values
+
+        metalColor=this.getDefaultPrimaryColor();
+        this.drawRect(bitmapCTX,0,0,wid,high,metalColor);
         
+            // clear canvases
+
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
-            // background
-            
-        this.drawRect(bitmapCTX,0,0,wid,high,color);
+            // possible streaks
         
-            // water lines
+        if (genRandom.randomPercentage(0.5)) {
+            streakCount=genRandom.randomInt(15,10);
             
-        lineCount=genRandom.randomInt(5,5);
-        
-        for (n=0;n!==lineCount;n++) {
-            ovalColor=this.darkenColor(color,genRandom.randomFloat(0.93,0.05));
-            
-            x=genRandom.randomInt(0,wid);
-            y=genRandom.randomInt(0,high);
-            xAdd=25-genRandom.randomInt(25,25);
-            yAdd=25-genRandom.randomInt(25,25);
-            
-            ovalCount=genRandom.randomInt(5,10);
-            
-            for (k=0;k!==ovalCount;k++) {
-                ovalWid=genRandom.randomInt(50,100);
-                ovalHigh=genRandom.randomInt(50,100);
+            for (n=0;n!==streakCount;n++) {
+                streakWid=genRandom.randomInt(10,40);
+                x=genRandom.randomInBetween(streakWid,(wid-streakWid));
 
-                this.drawWrappedOval(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),wid,high,ovalColor,null);
-                
-                x+=xAdd;
-                if (x<0) x+=wid;
-                if (x>=wid) x-=wid;
-                
-                y+=yAdd;
-                if (y<0) y+=high;
-                if (y>=high) y-=high;
+                darken=0.5+(genRandom.random()*0.5);
+                streakColor=this.darkenColor(metalColor,darken);
+
+                this.drawStreakMetal(bitmapCTX,wid,high,x,0,high,streakWid,streakColor);
             }
         }
         
-        this.blur(bitmapCTX,0,0,wid,high,5,false);
+            // possible screws (in line)
+            
+        if (genRandom.randomPercentage(0.5)) {
+            screwSize=genRandom.randomInt(10,20);
+            screenFlatInnerSize=Math.trunc(screwSize*0.4);
+            screwColor=this.boostColor(metalColor,0.05);
         
-            // noise and blur
+            screwCount=Math.trunc(high/(screwSize*2));
+            
+            y=0;
+            
+            for (n=0;n!=screwCount;n++) {
+                this.draw3DOval(bitmapCTX,normalCTX,0,y,screwSize,(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+                y+=(screwSize*2);
+            }
+        }
         
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,10,false);
-        
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
-    }
+            // finish with the specular
 
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
+    }
+            
         //
         // generate mainline
         //
 
     generate(inDebug)
     {
-        let wid,high,alpha;
+        let wid,high;
         let shineFactor=1.0;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
@@ -111,8 +112,8 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
+                this.generatePipe(bitmapCTX,normalCTX,specularCTX,wid,high);
+                shineFactor=15.0;
                 break;
 
         }
@@ -125,8 +126,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        alpha=genRandom.randomFloat(0.8,0.2);
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,alpha,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 
 }

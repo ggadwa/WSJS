@@ -46,7 +46,7 @@ export default class GenBitmapFloorClass extends GenBitmapBaseClass
         }
 
         lineColor=this.darkenColor(tileColor,0.9);
-        this.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,20,lineColor,false);
+        this.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,lft,top,rgt,bot,20,lineColor,false);
     }
 
     generateTileInner(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,paddingSize,complex)

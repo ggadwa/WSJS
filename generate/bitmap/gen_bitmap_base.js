@@ -1197,8 +1197,162 @@ export default class GenBitmapBaseClass
         bitmapCTX.fill();
         if (borderRGBColor!==null) bitmapCTX.stroke();
     }
-
+    
+    drawWrappedOval(bitmapCTX,lft,top,rgt,bot,wid,high,fillRGBColor,borderRGBColor)
+    {
+        let         x,y;
+        
+        this.drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor);
+        if (lft<0) {
+            x=wid+lft;
+            this.drawOval(bitmapCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
+        }
+        if (rgt>wid) {
+            x=-(rgt-wid);
+            this.drawOval(bitmapCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
+        }
+        if (top<0) {
+            y=high+top;
+            this.drawOval(bitmapCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
+        }
+        if (bot>high) {
+            y=-(bot-high);
+            this.drawOval(bitmapCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
+        }
+    }
+    
     draw3DOval(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
+    {
+        let n,x,y,mx,my,halfWid,halfHigh;
+        let rad,fx,fy,col,idx;
+        let orgWid,orgHigh,wid,high,edgeCount;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+        
+            // start and end arc
+            
+        startArc=Math.trunc(startArc*1000);
+        endArc=Math.trunc(endArc*1000);
+        if (startArc>=endArc) return;
+        
+            // the drawing size
+            
+        orgWid=rgt-lft;
+        orgHigh=bot-top;
+        wid=orgWid-1;
+        high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
+        mx=Math.trunc(wid/2);
+        my=Math.trunc(high/2);
+
+        bitmapImgData=bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
+        bitmapData=bitmapImgData.data;
+
+        edgeCount=edgeSize;
+        
+            // fill the oval
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=wid*0.5;
+            halfHigh=high*0.5;
+            
+            if (edgeCount>0) {
+                col=edgeRGBColor;
+            }
+            else {
+                col=fillRGBColor;
+            }
+
+            for (n=startArc;n<endArc;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
+
+                fx=Math.sin(rad);
+                x=mx+Math.trunc(halfWid*fx);
+                if (x<0) x=0;
+
+                fy=Math.cos(rad);
+                y=my-Math.trunc(halfHigh*fy);
+                if (y<0) y=0;
+
+                    // the color pixel
+
+                idx=((y*orgWid)+x)*4;
+
+                bitmapData[idx]=Math.trunc(col.r*255.0);
+                bitmapData[idx+1]=Math.trunc(col.g*255.0);
+                bitmapData[idx+2]=Math.trunc(col.b*255.0);
+            }
+
+            if (edgeCount>0) edgeCount--;
+            if ((edgeCount===0) && (fillRGBColor===null)) break;
+
+            wid--;
+            high--;
+        }
+
+        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        
+            // chrome has a really onbxious bug where it'll get
+            // image data messed up and doing both of these at once
+            // tends to get the normal written to the bitmap, so,
+            // sigh, we do both these separately
+            
+        normalImgData=normalCTX.getImageData(lft,top,orgWid,orgHigh);
+        normalData=normalImgData.data;
+        
+        wid=orgWid-1;
+        high=orgHigh-1;
+        
+        edgeCount=edgeSize;
+        
+            // create the normals
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=wid*0.5;
+            halfHigh=high*0.5;
+
+            for (n=startArc;n<endArc;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
+
+                fx=Math.sin(rad);
+                x=mx+Math.trunc(halfWid*fx);
+                if (x<0) x=0;
+
+                fy=Math.cos(rad);
+                y=my-Math.trunc(halfHigh*fy);
+                if (y<0) y=0;
+
+                    // get a normal for the pixel change
+                    // if within the flat inner circle, just point the z out
+                    // otherwise calculate from radius
+
+                idx=((y*orgWid)+x)*4;
+
+                if ((wid<=flatInnerSize) || (high<=flatInnerSize)) {
+                    normalData[idx]=127;
+                    normalData[idx+1]=127;
+                    normalData[idx+2]=255;
+                }
+                else {
+                    normalData[idx]=(fx+1.0)*127.0;
+                    normalData[idx+1]=(fy+1.0)*127.0;
+                    normalData[idx+2]=(0.5+1.0)*127.0;        // just so we remember that we are focing the Z back to top
+                }
+            }
+            
+            if (edgeCount>0) edgeCount--;
+            if ((edgeCount===0) && (fillRGBColor===null)) break;
+
+            wid--;
+            high--;
+        }
+        
+        normalCTX.putImageData(normalImgData,lft,top);
+    }
+
+
+    draw3DOvalOld(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,col,idx;
@@ -1290,7 +1444,8 @@ export default class GenBitmapBaseClass
         bitmapCTX.putImageData(bitmapImgData,lft,top);
         normalCTX.putImageData(normalImgData,lft,top);
     }
-    
+
+   
     drawLine(bitmapCTX,normalCTX,x,y,x2,y2,color,lightLine)
     {
         let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
@@ -1370,7 +1525,7 @@ export default class GenBitmapBaseClass
         }
     }
     
-    drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,lineVariant,color,lightLine)
+    drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,clipLft,clipTop,clipRgt,clipBot,lineVariant,color,lightLine)
     {
         let n,sx,sy,ex,ey,r;
         let segCount=genRandom.randomInt(2,5);
@@ -1401,6 +1556,11 @@ export default class GenBitmapBaseClass
                     ex+=r;
                 }
             }
+            
+            if (ex<clipLft) ex=clipLft;
+            if (ex>clipRgt) ex=clipRgt;
+            if (ey<clipTop) ey=clipTop;
+            if (ey>clipBot) ey=clipBot;
             
             this.drawLine(bitmapCTX,normalCTX,sx,sy,ex,ey,color,lightLine);
             

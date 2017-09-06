@@ -454,7 +454,7 @@ export default class GenRoomDecorationPipeClass
             // bitmaps
 
         platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
-        pipeBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
+        pipeBitmap=this.map.getTexture(constants.BITMAP_TYPE_PIPE);
         
             // get # of pipes (on a grid so they can collide
             // properly) and their relative sizes

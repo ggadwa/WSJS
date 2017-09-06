@@ -12,8 +12,6 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
---> need better liquid -- lines of ovals in the same color
---> storage needs multiple boxes for stacks (like 4, 2, 1 etc)
 --> need particle blob (use for explosions)
 --> platform, pipe, frame, and pillar need their own texture creation
 --> sky is just terrible

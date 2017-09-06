@@ -83,7 +83,7 @@ export default class GenBitmapSkinClass extends GenBitmapBaseClass
         this.endClip(bitmapCTX);
     }
 
-    generateScale(bitmapCTX,normalCTX,glowCTX,specularCTX,wid,high)
+    generateScale(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let skinColor,scaleCount;
         let mx=Math.trunc(wid*0.5);
@@ -139,7 +139,7 @@ export default class GenBitmapSkinClass extends GenBitmapBaseClass
             darken=0.6+(genRandom.random()*0.25);
             lineColor=this.darkenColor(clothColor,darken);
             
-            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,30,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,lft,top,rgt,bot,30,lineColor,false);
         }
         
         lineCount=genRandom.randomInt(30,30);
@@ -152,7 +152,7 @@ export default class GenBitmapSkinClass extends GenBitmapBaseClass
             darken=0.6+(genRandom.random()*0.25);
             lineColor=this.darkenColor(clothColor,darken);
             
-            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y,30,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y,lft,top,rgt,bot,30,lineColor,false);
         }
         
             // blur it
@@ -221,12 +221,12 @@ export default class GenBitmapSkinClass extends GenBitmapBaseClass
                 // hair half from top
                 
             y=halfHigh+genRandom.randomInt(top,halfHigh);
-            this.drawRandomLine(bitmapCTX,normalCTX,x,(top-5),x,(y+5),10,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,(top-5),x,(y+5),lft,top,rgt,bot,10,lineColor,false);
             
                 // hair half from bottom
                 
             y=high-(halfHigh+genRandom.randomInt(top,halfHigh));
-            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(bot+5),10,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(bot+5),lft,top,rgt,bot,10,lineColor,false);
         }
     }
         
@@ -299,7 +299,7 @@ export default class GenBitmapSkinClass extends GenBitmapBaseClass
         glowCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
         glowCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
+        this.clearGlowRect(glowCTX,0,0,this.BITMAP_MODEL_TEXTURE_SIZE,this.BITMAP_MODEL_TEXTURE_SIZE);
 
         wid=bitmapCanvas.width;
         high=bitmapCanvas.height;

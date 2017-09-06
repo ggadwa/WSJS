@@ -192,7 +192,7 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
         glowCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
         glowCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
+        this.clearGlowRect(glowCTX,0,0,this.BITMAP_MODEL_TEXTURE_SIZE,this.BITMAP_MODEL_TEXTURE_SIZE);
 
         wid=bitmapCanvas.width;
         high=bitmapCanvas.height;

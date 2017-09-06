@@ -45,7 +45,7 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
                 y=(top+5)+genRandom.randomInt(0,((bot-top)-10));
                 
                 lineColor=this.getRandomColor();
-                this.drawRandomLine(bitmapCTX,normalCTX,lft,y,rgt,y,5,lineColor,false);
+                this.drawRandomLine(bitmapCTX,normalCTX,lft,y,rgt,y,lft,top,rgt,bot,5,lineColor,false);
             }
         }
         else {
@@ -55,7 +55,7 @@ export default class GenBitmapMachineClass extends GenBitmapBaseClass
                 x=(lft+5)+genRandom.randomInt(0,((rgt-lft)-10));
                 
                 lineColor=this.getRandomColor();
-                this.drawRandomLine(bitmapCTX,normalCTX,x,top,x,bot,5,lineColor,false);
+                this.drawRandomLine(bitmapCTX,normalCTX,x,top,x,bot,lft,top,rgt,bot,5,lineColor,false);
             }
         }
     }
