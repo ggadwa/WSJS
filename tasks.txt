@@ -12,34 +12,19 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
+
+--> make wood a separate bitmap type, use for boxes, remove from other places
+--> possibly split up every texture and have wallCollection/ceilingCollection/etc randomly pick one
+--> cubicals -> LiftBlocks
+--> need low/high/normal room lists
+--> make sky a 4x2 texture, make array for mountain heights, reverse on back half, draw random lines downwards
+
 --> need particle blob (use for explosions)
 --> platform, pipe, frame, and pillar need their own texture creation
---> sky is just terrible
 
-
-
-ToDos
-
-[DECORATIONS]
-    * random rects
-        [X] mapRoomConstants.ROOM_DECORATION_PILLARS:
-        [X] mapRoomConstants.ROOM_DECORATION_STORAGE:
-        [X] mapRoomConstants.ROOM_DECORATION_COMPUTER:
-        [X] mapRoomConstants.ROOM_DECORATION_PIPE:
-        [X] mapRoomConstants.ROOM_DECORATION_CUBICAL:
-              - raised chunk of floor with stairs
-              - cubical tops
-        [X] mapRoomConstants.ROOM_DECORATION_LAB:
-        [ ] pits (wires, pipes)
-    * types for low/high/water rooms
-    * special edge ones (panels, conduits)
-    * animated decorative items
-    * particles on decorative items
 
 --> models cast light
 --> models get hunch as part of body skeleton, not variable
-
-
 
 #### monsters still getting hit by own projectiles
 #### need meeles for monsters
