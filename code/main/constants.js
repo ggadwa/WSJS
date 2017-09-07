@@ -107,7 +107,7 @@ export const BITMAP_TYPE_FLOOR=1;
 export const BITMAP_TYPE_CEILING=2;
 export const BITMAP_TYPE_DOOR=3;
 export const BITMAP_TYPE_METAL=4;
-export const BITMAP_TYPE_BOX=5;
+export const BITMAP_TYPE_WOOD=5;
 export const BITMAP_TYPE_PANEL=6;
 export const BITMAP_TYPE_LIQUID=7;
 export const BITMAP_TYPE_MACHINE=8;
@@ -125,7 +125,7 @@ export const BITMAP_TYPE_SKY=18;
 export const BITMAP_TYPE_NAMES=
                 [
                     'Wall','Floor','Ceiling','Door','Metal',
-                    'Box','Panel','Liquid','Machine',
+                    'Wood','Panel','Liquid','Machine',
                     'Platform','Pipe','Frame','Pillar','Glass',
                     'Goo','Particle','Item','Skin','Sky'
                 ];

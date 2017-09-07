@@ -4,12 +4,14 @@ import PointClass from '../../code/utility/point.js';
 import FileCacheClass from '../../code/main/filecache.js';
 import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
-import ModelClass from '../../code/model/model.js';
 import ModelListClass from '../../code/model/model_list.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
 import GenMapClass from '../../generate/map/gen_map.js';
-import GenModelClass from '../../generate/model/gen_model.js';
+import GenModelHumanClass from '../../generate/model/gen_model_human.js';
+import GenModelMonsterClass from '../../generate/model/gen_model_monster.js';
+import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
+import GenModelProjectileClass from '../../generate/model/gen_model_projectile.js';
 import GenWeaponClass from '../../generate/thing/gen_weapon.js';
 import GenProjectileClass from '../../generate/thing/gen_projectile.js';
 import GenSoundClass from '../../generate/sound/gen_sound.js';
@@ -109,21 +111,17 @@ class MainClass
         this.view.loadingScreenAddString('Generating Player Model');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildPlayerModel.bind(this,new GenBitmapClass(this.view)),1);
+        setTimeout(this.initBuildPlayerModel.bind(this),1);
     }
     
-    initBuildPlayerModel(genBitmap)
+    initBuildPlayerModel()
     {
-        let model,modelBitmap;
-        let genModel=new GenModelClass(this.view);
+        let model;
+        let genModel=new GenModelHumanClass(this.view);
 
             // build the player model
         
-        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_SKIN,false);
-        
-        model=new ModelClass('player');
-        genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,1.0,false);
-
+        model=genModel.generate('player',1.0,false);
         this.modelList.addModel(model);
 
             // next step
@@ -132,20 +130,17 @@ class MainClass
         this.view.loadingScreenAddString('Generating Monster Models');
         this.view.loadingScreenDraw(null);
         
-        setTimeout(this.initBuildMonsterModels.bind(this,0,genModel,genBitmap),1);
+        setTimeout(this.initBuildMonsterModels.bind(this,0),1);
     }
 
-    initBuildMonsterModels(idx,genModel,genBitmap)
+    initBuildMonsterModels(idx)
     {
-        let model,modelBitmap;
+        let model;
+        let genModel=new GenModelMonsterClass(this.view);
 
             // build the model
         
-        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_SKIN,false);
-
-        model=new ModelClass(('monster_'+idx));
-        genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,1.0,false);
-
+        model=genModel.generate(('monster_'+idx),1.0,false);
         this.modelList.addModel(model);
 
             // if more models, then loop back around
@@ -153,7 +148,7 @@ class MainClass
         idx++;
         if (idx<config.MONSTER_TYPE_COUNT) {
             this.view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
-            setTimeout(this.initBuildMonsterModels.bind(this,idx,genModel,genBitmap),1);
+            setTimeout(this.initBuildMonsterModels.bind(this,idx),1);
             return;
         }
 
@@ -164,28 +159,25 @@ class MainClass
             this.view.loadingScreenAddString('Generating Boss Model');
             this.view.loadingScreenDraw(null);
 
-            setTimeout(this.initBuildBossModel.bind(this,genModel,genBitmap),1);
+            setTimeout(this.initBuildBossModel.bind(this),1);
         }
         else {
             this.view.loadingScreenUpdate();
             this.view.loadingScreenAddString('Generating Weapons');
             this.view.loadingScreenDraw(null);
 
-            setTimeout(this.initBuildWeapons.bind(this,genModel,genBitmap),1);
+            setTimeout(this.initBuildWeapons.bind(this),1);
         }
     }
     
-    initBuildBossModel(genModel,genBitmap)
+    initBuildBossModel()
     {
-        let model,modelBitmap;
+        let model;
+        let genModel=new GenModelMonsterClass(this.view);
 
             // build monster
         
-        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_SKIN,false);
-
-        model=new ModelClass('boss');
-        genModel.build(model,modelBitmap,genModel.TYPE_CREATURE,genRandom.randomFloat(2.5,3.0),false);
-
+        model=genModel.generate('boss',genRandom.randomFloat(2.5,3.0),false);
         this.modelList.addModel(model);
 
             // next step
@@ -194,27 +186,24 @@ class MainClass
         this.view.loadingScreenAddString('Generating Weapons');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildWeapons.bind(this,genModel,genBitmap),1);
+        setTimeout(this.initBuildWeapons.bind(this),1);
     }
 
-    initBuildWeapons(genModel,genBitmap)
+    initBuildWeapons()
     {
-        let model,modelBitmap;
-
-        modelBitmap=genBitmap.generate(constants.BITMAP_TYPE_ITEM,false);
+        let model;
+        let genModel;
 
             // weapon
 
-        model=new ModelClass('weapon_0');
-        genModel.build(model,modelBitmap,genModel.TYPE_WEAPON,1.0,false);
-
+        genModel=new GenModelWeaponClass(this.view);
+        model=genModel.generate('weapon_0',1.0,false);
         this.modelList.addModel(model);
 
             // projectile
 
-        model=new ModelClass('projectile_0');
-        genModel.build(model,modelBitmap,genModel.TYPE_PROJECTILE,1.0,false);
-
+        genModel=new GenModelProjectileClass(this.view);
+        model=genModel.generate('projectile_0',1.0,false);
         this.modelList.addModel(model);
 
             // next step

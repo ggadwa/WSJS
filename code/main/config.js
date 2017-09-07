@@ -6,7 +6,7 @@ class ConfigClass
 {
     constructor()
     {
-        this.SEED=Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
+        this.SEED=300; // Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
 
             //
             // map generation
@@ -29,10 +29,10 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=5;
-        this.MONSTER_ENTITY_COUNT=20;
+        this.MONSTER_TYPE_COUNT=1;
+        this.MONSTER_ENTITY_COUNT=5;
         
-        this.MONSTER_AI_ON=true;
+        this.MONSTER_AI_ON=false;
         this.MONSTER_BOSS=true;
         
             //

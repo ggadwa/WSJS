@@ -9,7 +9,7 @@ import genRandom from '../../generate/utility/random.js';
 // helper class for globe shrinking
 //
 
-class GenModelCreatureBoneClass
+class GenModelMonsterBoneClass
 {
     constructor()
     {
@@ -22,10 +22,10 @@ class GenModelCreatureBoneClass
 }
 
 //
-// gen creature mesh class
+// gen monster mesh class
 //
 
-export default class GenModelCreatureMeshClass
+export default class GenModelMonsterMeshClass
 {
     constructor(view,model,bitmap)
     {
@@ -642,7 +642,7 @@ export default class GenModelCreatureMeshClass
             boneIdx=skeletonBoneIndexes[n];
             bone=this.model.skeleton.bones[boneIdx];
             
-            listBone=new GenModelCreatureBoneClass();
+            listBone=new GenModelMonsterBoneClass();
             listBone.idx=boneIdx;
             listBone.position=bone.position.copy();
             listBone.gravityLockDistance=bone.gravityLockDistance;
@@ -682,7 +682,7 @@ export default class GenModelCreatureMeshClass
             for (k=1;k!==extraBoneCount;k++) {
                 f=k/extraBoneCount;
                 
-                listBone=new GenModelCreatureBoneClass();
+                listBone=new GenModelMonsterBoneClass();
                 listBone.idx=-1;
                 
                 listBone.position=new PointClass(0,0,0);

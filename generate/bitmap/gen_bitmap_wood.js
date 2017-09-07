@@ -1,4 +1,5 @@
 import genRandom from '../../generate/utility/random.js';
+import ColorClass from '../../code/utility/color.js';
 import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
@@ -13,68 +14,6 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         super(view);
         Object.seal(this);
     }
-            
-        //
-        // metal bitmaps
-        //
-    
-    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
-    {
-        let n,x,offset;
-        let streakWid,streakColor,darken;
-
-            // some random values
-
-        let metalColor=this.getDefaultPrimaryColor();
-
-        let edgeSize=genRandom.randomInt(4,8);
-        let innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
-        
-        let screwSize=genRandom.randomInt(10,20);
-        let screenFlatInnerSize=Math.trunc(screwSize*0.4);
-        
-        let streakCount=genRandom.randomInt(15,10);
-        let screwColor=this.boostColor(metalColor,0.05);
-        
-            // clear canvases
-
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
-        
-            // the plate
-            
-        this.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,edgeSize,metalColor,true);
-        
-            // possible streaks
-        
-        if (genRandom.randomPercentage(0.5)) {
-            for (n=0;n!==streakCount;n++) {
-                streakWid=genRandom.randomInt(10,40);
-                x=edgeSize+genRandom.randomInBetween(streakWid,((wid-streakWid)-(edgeSize*2)));
-
-                darken=0.5+(genRandom.random()*0.5);
-                streakColor=this.darkenColor(metalColor,darken);
-
-                this.drawStreakMetal(bitmapCTX,wid,high,x,edgeSize,(high-edgeSize),streakWid,streakColor);
-            }
-        }
-        
-            // possible screws
-            
-        if (genRandom.randomPercentage(0.5)) {
-            offset=edgeSize+4;
-            
-            this.draw3DOval(bitmapCTX,normalCTX,offset,offset,(offset+screwSize),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,offset,((high-offset)-screwSize),(offset+screwSize),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),offset,(wid-offset),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),((high-offset)-screwSize),(wid-offset),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            
-            innerEdgeSize+=screwSize;
-        }
-        
-            // finish with the specular
-
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
-    }
     
         //
         // wood bitmaps
@@ -82,17 +21,24 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
 
     generateWoodDrawBoard(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,woodColor)
     {
-        let woodFactor=0.8+(genRandom.random()*0.2);
-        let col=this.darkenColor(woodColor,woodFactor);
-
+        let col;
+        
+        col=this.darkenColor(woodColor,genRandom.random(0.9,0.1));
+        
         this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
-        this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+        if ((bot-top)>(rgt-lft)) {
+            this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+        }
+        else {
+            this.drawColorStripeHorizontal(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+        }
         this.addNoiseRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
     }
     
     generateWood(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,lft,rgt,top,bot;
+        let n,y,lft,rgt,top,bot;
+        let topBotBorder,lftRgtBorder;
         let boardSplit,boardHigh;
         
             // some random values
@@ -100,7 +46,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         let boardCount=genRandom.randomInt(4,8);
         let boardSize=Math.trunc(wid/boardCount);
         let edgeSize=genRandom.randomInt(3,3);
-        let woodColor=this.getDefaultPrimaryColor();
+        let woodColor=new ColorClass(genRandom.randomFloat(0.6,0.2),genRandom.randomFloat(0.3,0.2),0.0);
 
             // clear canvases
 
@@ -127,7 +73,17 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         top=0;
         bot=high;
         
-        if (genRandom.randomPercentage(0.5)) {
+        lftRgtBorder=genRandom.randomPercentage(0.5);
+        topBotBorder=genRandom.randomPercentage(0.5);
+        
+        if ((lftRgtBorder) || (topBotBorder)) {
+            if (genRandom.randomPercentage(0.5)) {
+                y=Math.trunc((high*0.5)-(boardSize*0.5));
+                this.generateWoodDrawBoard(bitmapCTX,normalCTX,0,y,wid,(y+boardSize),edgeSize,woodColor);
+            }
+        }
+        
+        if (lftRgtBorder) {
             top+=boardSize;
             bot-=boardSize;
             
@@ -135,7 +91,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
             this.generateWoodDrawBoard(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,edgeSize,woodColor);
         }
         
-        if (genRandom.randomPercentage(0.5)) {
+        if (topBotBorder) {
             this.generateWoodDrawBoard(bitmapCTX,normalCTX,0,top,boardSize,bot,edgeSize,woodColor);
             this.generateWoodDrawBoard(bitmapCTX,normalCTX,(wid-boardSize),top,wid,bot,edgeSize,woodColor);
         }
@@ -152,7 +108,6 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
     generate(inDebug)
     {
         let wid,high;
-        let shineFactor=1.0;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
             // setup the canvas
@@ -181,21 +136,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         wid=bitmapCanvas.width;
         high=bitmapCanvas.height;
 
-            // create the bitmap
-
-        switch (genRandom.randomIndex(2)) {
-
-            case 0:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=15.0;
-                break;
-                
-            case 1:
-                this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=2.0;
-                break;
-
-        }
+        this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high);
 
             // debug just displays the canvases, so send
             // them back
@@ -205,7 +146,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],2.0));    
     }
 
 }

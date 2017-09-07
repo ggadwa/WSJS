@@ -60,9 +60,9 @@ export default class GenMapClass
         this.ROOM_LONG_HALLWAY_PERCENTAGE=0.3;          // what percentage of the time the general room path will have a long hallway
         this.ROOM_LIQUID_PERCENTAGE=0.3;                // what % of time a lower room can have a liquid
         
-        this.ROOM_LIGHT_FACTOR=0.5;                     // lights are initially set to room radius, this factor is multipled in
-        this.ROOM_LIGHT_FACTOR_EXTRA=0.3;               // random addition to light factor above
-        this.ROOM_LIGHT_PER_STORY_BOOST=0.15;            // add in for each extra story
+        this.ROOM_LIGHT_FACTOR=0.45;                     // lights are initially set to room radius, this factor is multipled in
+        this.ROOM_LIGHT_FACTOR_EXTRA=0.25;               // random addition to light factor above
+        this.ROOM_LIGHT_PER_STORY_BOOST=0.12;            // add in for each extra story
 
         this.ROOM_LIGHT_EXPONENT_MINIMUM=1.0;           // minimum light exponent (0.0 is completely hard light with no fall off)
         this.ROOM_LIGHT_EXPONENT_EXTRA=0.5;             // exponent add

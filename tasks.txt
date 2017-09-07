@@ -12,9 +12,10 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
-
---> make wood a separate bitmap type, use for boxes, remove from other places
---> possibly split up every texture and have wallCollection/ceilingCollection/etc randomly pick one
+--> 3rd person view
+--> get rid of BITMAP_TYPE_*
+--> models get hunch as part of body skeleton, not variable
+--> sounds need to be same way
 --> cubicals -> LiftBlocks
 --> need low/high/normal room lists
 --> make sky a 4x2 texture, make array for mountain heights, reverse on back half, draw random lines downwards
@@ -22,20 +23,16 @@ ESNext
 --> need particle blob (use for explosions)
 --> platform, pipe, frame, and pillar need their own texture creation
 
-
 --> models cast light
---> models get hunch as part of body skeleton, not variable
+
 
 #### monsters still getting hit by own projectiles
 #### need meeles for monsters
 #### stairs need quads or blocks at top
 #### ai types (charge, sniper, etc)
-#### office decorations (outside like computers)
-#### lifts instead of platforms in lower levels
 #### windows have different bar types
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
-#### item texture is pretty ugly
 #### collisions against slanted walls are bad
 #### weapon models
 #### get rid of weapon fire hard-coding

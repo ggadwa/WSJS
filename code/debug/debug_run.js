@@ -1,10 +1,30 @@
 import * as constants from '../../code/main/constants.js';
 import FileCacheClass from '../../code/main/filecache.js';
 import ViewClass from '../../code/main/view.js';
-import ModelClass from '../../code/model/model.js';
 import SoundClass from '../../code/sound/sound.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
-import GenModelClass from '../../generate/model/gen_model.js';
+import GenBitmapWallClass from '../../generate/bitmap/gen_bitmap_wall.js';
+import GenBitmapFloorClass from '../../generate/bitmap/gen_bitmap_floor.js';
+import GenBitmapCeilingClass from '../../generate/bitmap/gen_bitmap_ceiling.js';
+import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
+import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
+import GenBitmapWoodClass from '../../generate/bitmap/gen_bitmap_wood.js';
+import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
+import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
+import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
+import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
+import GenBitmapGlassClass from '../../generate/bitmap/gen_bitmap_glass.js';
+import GenBitmapGooClass from '../../generate/bitmap/gen_bitmap_goo.js';
+import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
+import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
+import GenBitmapSkinFurClass from '../../generate/bitmap/gen_bitmap_skin_fur.js';
+import GenBitmapSkinLeatherClass from '../../generate/bitmap/gen_bitmap_skin_leather.js';
+import GenBitmapSkinScaleClass from '../../generate/bitmap/gen_bitmap_skin_scale.js';
+import GenBitmapSkinSuitClass from '../../generate/bitmap/gen_bitmap_skin_suit.js';
+import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
+import GenModelHumanClass from '../../generate/model/gen_model_human.js';
+import GenModelMonsterClass from '../../generate/model/gen_model_monster.js';
+import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
+import GenModelProjectileClass from '../../generate/model/gen_model_projectile.js';
 import GenSoundClass from '../../generate/sound/gen_sound.js';
 
 //
@@ -54,7 +74,7 @@ export default class DebugRunClass
         this.list=[];
         
         this.list.push(new DebugItemClass('Models',-1,-1,null,true));
-        this.fillListWithModelGenerator(new GenModelClass());
+        this.fillListWithModelGenerator();
 
         this.list.push(new DebugItemClass('Bitmaps',-1,-1,null,true));
         this.fillListWithBitmapGenerator();
@@ -70,23 +90,39 @@ export default class DebugRunClass
         // break up generator objects by their type names
         //
     
-    fillListWithModelGenerator(obj)
+    fillListWithModelGenerator()
     {
-        let n;
+        let idx=0;
         
-        for (n=0;n!==obj.TYPE_NAMES.length;n++) {
-            this.list.push(new DebugItemClass(obj.TYPE_NAMES[n],n,this.DEBUG_ITEM_TYPE_MODEL,obj,false));
-        }
+        this.list.push(new DebugItemClass('Human',idx++,this.DEBUG_ITEM_TYPE_MODEL,new GenModelHumanClass(this.view),false));
+        this.list.push(new DebugItemClass('Monster',idx++,this.DEBUG_ITEM_TYPE_MODEL,new GenModelMonsterClass(this.view),false));
+        this.list.push(new DebugItemClass('Weapon',idx++,this.DEBUG_ITEM_TYPE_MODEL,new GenModelWeaponClass(this.view),false));
+        this.list.push(new DebugItemClass('Projectile',idx++,this.DEBUG_ITEM_TYPE_MODEL,new GenModelProjectileClass(this.view),false));
     }
         
     fillListWithBitmapGenerator()
     {
-        let n;
-        let generatorObj=new GenBitmapClass();
+        let idx=0;
         
-        for (n=0;n!==constants.BITMAP_TYPE_NAMES.length;n++) {
-            this.list.push(new DebugItemClass(constants.BITMAP_TYPE_NAMES[n],n,this.DEBUG_ITEM_TYPE_BITMAP,generatorObj,false));
-        }
+        this.list.push(new DebugItemClass('Wall',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapWallClass(this.view),false));
+        this.list.push(new DebugItemClass('Floor',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapFloorClass(this.view),false));
+        this.list.push(new DebugItemClass('Ceiling',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapCeilingClass(this.view),false));
+        this.list.push(new DebugItemClass('Door',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapDoorClass(this.view),false));
+        this.list.push(new DebugItemClass('Metal',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMetalClass(this.view),false));
+        this.list.push(new DebugItemClass('Wood',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapWoodClass(this.view),false));
+        this.list.push(new DebugItemClass('Panel',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapPanelClass(this.view),false));
+        this.list.push(new DebugItemClass('Pipe',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapPipeClass(this.view),false));
+        this.list.push(new DebugItemClass('Liquid',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapLiquidClass(this.view),false));
+        this.list.push(new DebugItemClass('Machine',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMachineClass(this.view),false));
+        this.list.push(new DebugItemClass('Glass',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGlassClass(this.view),false));
+        this.list.push(new DebugItemClass('Goo',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGooClass(this.view),false));
+        this.list.push(new DebugItemClass('Particle',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapParticleClass(this.view),false));
+        this.list.push(new DebugItemClass('Item',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapItemClass(this.view),false));
+        this.list.push(new DebugItemClass('Skin Fur',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinFurClass(this.view),false));
+        this.list.push(new DebugItemClass('Skin Leather',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinLeatherClass(this.view),false));
+        this.list.push(new DebugItemClass('Skin Scale',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinScaleClass(this.view),false));
+        this.list.push(new DebugItemClass('Skin Suit',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinSuitClass(this.view),false));
+        this.list.push(new DebugItemClass('Sky',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkyClass(this.view),false));
     }
     
     fillListWithSoundGenerator(obj)
@@ -110,7 +146,7 @@ export default class DebugRunClass
         
             // generate the bitmap
             
-        debugBitmap=item.generatorObj.generate(item.typeIdx,true);
+        debugBitmap=item.generatorObj.generate(true);
         
             // draw the bitmap
             
@@ -381,17 +417,13 @@ export default class DebugRunClass
     drawModel(item)
     {
         let ctx;
-        let model,genModel,factor,xOffset,yOffset,thirdWid;
+        let model,factor,xOffset,yOffset,thirdWid;
         let wid=this.modelCanvas.width;
         let high=this.modelCanvas.height;
-
         
             // build the model
         
-        model=new ModelClass('test');
-        
-        genModel=new GenModelClass(this.view);
-        genModel.build(model,null,item.typeIdx,1.0,true);
+        model=item.generatorObj.generate('test',1.0,true);
         
             // draw axises
         

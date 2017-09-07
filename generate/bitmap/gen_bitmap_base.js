@@ -53,6 +53,13 @@ export default class GenBitmapBaseClass
         this.NORMAL_BOTTOM_LEFT_45=new PointClass(-0.30,-0.30,0.70);
         this.NORMAL_BOTTOM_RIGHT_45=new PointClass(0.30,-0.30,0.70);
         
+            // current clip rect
+            
+        this.clipLft=-1;
+        this.clipTop=-1;
+        this.clipRgt=-1;
+        this.clipBot=-1;
+        
             // some precalced colors
             
         this.blackColor=new ColorClass(0.0,0.0,0.0);
@@ -237,11 +244,21 @@ export default class GenBitmapBaseClass
         bitmapCTX.save();
         bitmapCTX.rect(lft,top,(rgt-lft),(bot-top));
         bitmapCTX.clip();
+        
+        this.clipLft=lft;
+        this.clipTop=top;
+        this.clipRgt=rgt;
+        this.clipBot=bot;
     }
     
     endClip(bitmapCTX)
     {
         bitmapCTX.restore();
+        
+        this.clipLft=-1;
+        this.clipTop=-1;
+        this.clipRgt=-1;
+        this.clipBot=-1;
     }
 
         //
@@ -1273,6 +1290,13 @@ export default class GenBitmapBaseClass
                 fy=Math.cos(rad);
                 y=my-Math.trunc(halfHigh*fy);
                 if (y<0) y=0;
+                
+                    // clipping
+                    
+                if (this.clipLft!==-1) {
+                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
+                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
+                }
 
                     // the color pixel
 
@@ -1322,6 +1346,13 @@ export default class GenBitmapBaseClass
                 fy=Math.cos(rad);
                 y=my-Math.trunc(halfHigh*fy);
                 if (y<0) y=0;
+                
+                    // clipping
+                    
+                if (this.clipLft!==-1) {
+                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
+                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
+                }
 
                     // get a normal for the pixel change
                     // if within the flat inner circle, just point the z out
@@ -2044,20 +2075,14 @@ export default class GenBitmapBaseClass
         let bitmapImgData,bitmapData;
         let normalImgData,normalData;
 
-            // get the image data
-
         if ((wid<1) || (high<1)) return;
 
+            // chrome has a bizarre bug that will mix up
+            // two image datas of the same size, so we do these
+            // separately
+            
         bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
-
-        normalImgData=normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
-
-            // write the stripe
 
         for (y=0;y!==high;y++) {
 
@@ -2073,6 +2098,27 @@ export default class GenBitmapBaseClass
                 bitmapData[idx+1]=greenByte;
                 bitmapData[idx+2]=blueByte;
 
+                idx+=4;
+            }
+        }
+
+        bitmapCTX.putImageData(bitmapImgData,lft,top);        
+
+            // the normal data
+            
+        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
+
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
+
+            // write the stripe
+
+        for (y=0;y!==high;y++) {
+
+            idx=(y*wid)*4;
+
+            for (x=0;x!==wid;x++) {
                 normalData[idx]=nx;
                 normalData[idx+1]=127.0;
                 normalData[idx+2]=nz;
@@ -2083,9 +2129,6 @@ export default class GenBitmapBaseClass
             nx=-nx;
         }
 
-            // write all the data back
-
-        bitmapCTX.putImageData(bitmapImgData,lft,top);        
         normalCTX.putImageData(normalImgData,lft,top);
     }
 
@@ -2099,18 +2142,14 @@ export default class GenBitmapBaseClass
         let bitmapImgData,bitmapData;
         let normalImgData,normalData;
 
-            // get the image data
-
         if ((wid<1) || (high<1)) return;
+        
+            // chrome has a bizarre bug that will mix up
+            // two image datas of the same size, so we do these
+            // separately
 
         bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
-
-        normalImgData=normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
 
             // write the stripe
 
@@ -2126,7 +2165,26 @@ export default class GenBitmapBaseClass
                 bitmapData[idx]=redByte;
                 bitmapData[idx+1]=greenByte;
                 bitmapData[idx+2]=blueByte;
+            }
+        }
 
+            // write all the data back
+
+        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        
+            // normal data
+            
+        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
+
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
+
+            // write the stripe
+
+        for (x=0;x!==wid;x++) {
+            for (y=0;y!==high;y++) {
+                idx=((y*wid)+x)*4;
                 normalData[idx]=nx;
                 normalData[idx+1]=127.0;
                 normalData[idx+2]=nz;
@@ -2135,9 +2193,6 @@ export default class GenBitmapBaseClass
             nx=-nx;
         }
 
-            // write all the data back
-
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
         normalCTX.putImageData(normalImgData,lft,top);
     }
 
@@ -2151,20 +2206,14 @@ export default class GenBitmapBaseClass
         let bitmapImgData,bitmapData;
         let normalImgData,normalData;
 
-            // get the image data
-
         if ((wid<1) || (high<1)) return;
+        
+            // chrome has a bizarre bug that will mix up
+            // two image datas of the same size, so we do these
+            // separately
 
         bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
-
-        normalImgData=normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
-
-            // write the stripe
 
         for (y=0;y!==high;y++) {
             for (x=0;x!==wid;x++) {
@@ -2177,6 +2226,25 @@ export default class GenBitmapBaseClass
                 bitmapData[idx]=Math.trunc(color.r*255.0);
                 bitmapData[idx+1]=Math.trunc(color.g*255.0);
                 bitmapData[idx+2]=Math.trunc(color.b*255.0);
+            }
+        }
+
+        bitmapCTX.putImageData(bitmapImgData,lft,top);        
+        
+            // normal data
+            
+        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
+
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
+
+            // write the stripe
+
+        for (y=0;y!==high;y++) {
+            for (x=0;x!==wid;x++) {
+                cIdx=(x+y)%100;
+                idx=((y*wid)+x)*4;
 
                 normalData[idx]=((cIdx&0x1)===0)?nx:-nx;
                 normalData[idx+1]=127.0;
@@ -2184,9 +2252,6 @@ export default class GenBitmapBaseClass
             }
         }
 
-            // write all the data back
-
-        bitmapCTX.putImageData(bitmapImgData,lft,top);        
         normalCTX.putImageData(normalImgData,lft,top);
     }
     
@@ -2204,5 +2269,13 @@ export default class GenBitmapBaseClass
         this.drawRect(bitmapCTX,lft,yMid,xMid,bot,new ColorClass(0,1,0));
         this.drawRect(bitmapCTX,xMid,yMid,rgt,bot,new ColorClass(0,0,1));
     }
+    
+        //
+        // generate mainline
+        //
 
+    generate(inDebug)
+    {
+    }
+    
 }
