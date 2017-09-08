@@ -31,7 +31,7 @@ export default class GenSkeletonHumanClass extends GenSkeletonBaseClass
 
         this.model.skeleton=new ModelSkeletonClass(this.view);
         
-        bodyLimbIdx=this.buildBody(3000,500,2000,500,1000,100,0.9);
+        bodyLimbIdx=this.buildBody(3000,500,2000,500,1000,100,0.9,false);
         
         boneIdx=this.model.skeleton.findBoneIndex('Torso_Top');
         this.buildLimbHead(0,boneIdx,300,300,600,700);

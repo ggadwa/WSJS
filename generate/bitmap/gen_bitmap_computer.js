@@ -4,10 +4,10 @@ import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
-// generate machine bitmap class
+// generate computer bitmap class
 //
 
-export default class GenBitmapMachineClass extends GenBitmapBaseClass
+export default class GenBitmapComputerClass extends GenBitmapBaseClass
 {
     constructor(view)
     {

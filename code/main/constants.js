@@ -36,14 +36,6 @@ export const ROOM_PATH_TYPE_NORMAL=0;
 export const ROOM_PATH_TYPE_START=1;
 export const ROOM_PATH_TYPE_GOAL=2;
 
-export const ROOM_DECORATION_NONE=-1;
-export const ROOM_DECORATION_PILLARS=0;
-export const ROOM_DECORATION_STORAGE=1;
-export const ROOM_DECORATION_COMPUTER=2;
-export const ROOM_DECORATION_PIPE=3;
-export const ROOM_DECORATION_CUBICAL=4;
-export const ROOM_DECORATION_LAB=5;
-
     // map mesh flag types
 
 export const MESH_FLAG_NONE=0;

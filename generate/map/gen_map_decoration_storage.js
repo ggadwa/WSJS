@@ -14,13 +14,18 @@ export default class GenRoomDecorationStorageClass
 {
     constructor(view,map)
     {
+        let genBitmap;
+        
         this.view=view;
         this.map=map;
         
-            // textures
+            // bitmaps
             
-        this.woodBitmap=null;
-        this.metalBitmap=null;
+        genBitmap=new GenBitmapWoodClass(this.view);
+        this.woodBitmap=genBitmap.generate(false);
+        
+        genBitmap=new GenBitmapMetalClass(this.view);
+        this.metalBitmap=genBitmap.generate(false);
         
             // give all these decorations the same general
             // width and height no matter where in the map
@@ -34,34 +39,6 @@ export default class GenRoomDecorationStorageClass
         this.boxHigh=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3));
 
         Object.seal(this);
-    }
-    
-        //
-        // bitmaps
-        //
-        
-    getWoodBitmap()
-    {
-        let genBitmapWood;
-        
-        if (this.woodBitmap==null) {
-            genBitmapWood=new GenBitmapWoodClass(this.view);
-            this.woodBitmap=genBitmapWood.generate(false);
-        }
-        
-        return(this.woodBitmap);
-    }
-    
-    getMetalBitmap()
-    {
-        let genBitmapMetal;
-        
-        if (this.metalBitmap==null) {
-            genBitmapMetal=new GenBitmapMetalClass(this.view);
-            this.metalBitmap=genBitmapMetal.generate(false);
-        }
-        
-        return(this.metalBitmap);
     }
     
         //
@@ -95,7 +72,7 @@ export default class GenRoomDecorationStorageClass
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
             
             rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-            mesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,this.getWoodBitmap(),boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
+            mesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,this.woodBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
             MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
             this.map.meshList.add(mesh);
 
@@ -160,7 +137,7 @@ export default class GenRoomDecorationStorageClass
 
                 // the table
 
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.getMetalBitmap(),tableXBound,tableYBound,tableZBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,tableXBound,tableYBound,tableZBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
             if (mesh===null) {
                 mesh=mesh2;
             }
@@ -170,16 +147,16 @@ export default class GenRoomDecorationStorageClass
             
                 // legs
 
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.getMetalBitmap(),legXMinBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMinBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.getMetalBitmap(),legXMinBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMinBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.getMetalBitmap(),legXMaxBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMaxBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
 
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.getMetalBitmap(),legXMaxBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
+            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMaxBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
             mesh.combineMesh(mesh2);
             
                 // items on self
@@ -196,7 +173,7 @@ export default class GenRoomDecorationStorageClass
                 boxZBound.setFromValues((bz-boxSize),(bz+boxSize));
 
                 rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-                boxMesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,this.getWoodBitmap(),boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
+                boxMesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,this.woodBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
                 MeshPrimitivesClass.meshCubeSetWholeUV(boxMesh);
                 this.map.meshList.add(boxMesh);
             }

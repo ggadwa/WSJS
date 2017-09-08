@@ -4,6 +4,7 @@ import BoundClass from '../../code/utility/bound.js';
 import MapMeshClass from '../../code/map/map_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
+import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -12,10 +13,16 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationPipeClass
 {
-    constructor(view,map)
+    constructor(view,map,platformBitmap)
     {
+        let genBitmap;
+        
         this.view=view;
         this.map=map;
+        this.platformBitmap=platformBitmap;
+        
+        genBitmap=new GenBitmapPipeClass(this.view);
+        this.pipeBitmap=genBitmap.generate(false);
         
         Object.seal(this);
     }
@@ -24,7 +31,7 @@ export default class GenRoomDecorationPipeClass
         // pieces of pipes
         //
 
-    addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng)
+    addPipeStraightChunk(pnt,len,radius,pipeAng)
     {
         let n,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let u1,u2,vfact;
@@ -143,13 +150,13 @@ export default class GenRoomDecorationPipeClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
+        mesh=new MapMeshClass(this.view,this.pipeBitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
         this.map.meshList.add(mesh);
     }
 
-    addPipeCornerChunk(bitmap,pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
+    addPipeCornerChunk(pnt,radius,xStart,zStart,xTurn,zTurn,yFlip)
     {
         let n,k,v,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2;
         let yAdd,xTurnAdd,zTurnAdd;
@@ -288,7 +295,7 @@ export default class GenRoomDecorationPipeClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
+        mesh=new MapMeshClass(this.view,this.pipeBitmap,vertexList,indexes,constants.MESH_FLAG_DECORATION);
         mesh.simpleCollisionGeometry=true;
         
         this.map.meshList.add(mesh);
@@ -298,7 +305,7 @@ export default class GenRoomDecorationPipeClass
         // pipe types
         //
     
-    addPipeSide(room,bitmap,dir,pnt,radius,dirLen,yBound)
+    addPipeSide(room,dir,pnt,radius,dirLen,yBound)
     {
         let len,pipeAng;
         
@@ -310,7 +317,7 @@ export default class GenRoomDecorationPipeClass
         len=genRandom.randomInt(1,(room.storyCount-1));
         len=(len*(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH))-((radius*2)+constants.ROOM_FLOOR_DEPTH);
         
-        this.addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng);
+        this.addPipeStraightChunk(pnt,len,radius,pipeAng);
         
         pnt.y-=len;
         
@@ -319,43 +326,43 @@ export default class GenRoomDecorationPipeClass
         switch (dir) {
             
             case constants.ROOM_SIDE_LEFT:  
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,0.0,-90.0,false);
 
                 pipeAng.setFromValues(0.0,0.0,90.0);
-                this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,dirLen,radius,pipeAng);
                 
                 pnt.x-=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,-90.0,0.0,90.0,false);
                 break;
                 
             case constants.ROOM_SIDE_RIGHT:
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,0.0,90.0,false);
 
                 pipeAng.setFromValues(0.0,0.0,-90.0);
-                this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,dirLen,radius,pipeAng);
                 
                 pnt.x+=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,90.0,0.0,-90.0,false);
                 break;
                 
             case constants.ROOM_SIDE_TOP:
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,90.0,0.0,false);
 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
-                this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,dirLen,radius,pipeAng);
                 
                 pnt.z-=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0,false);
+                this.addPipeCornerChunk(pnt,radius,90.0,0.0,-90.0,0.0,false);
                 break;
                 
             case constants.ROOM_SIDE_BOTTOM:
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,-90.0,0.0,false);
 
                 pipeAng.setFromValues(90.0,0.0,0.0);
-                this.addPipeStraightChunk(bitmap,pnt,dirLen,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,dirLen,radius,pipeAng);
                 
                 pnt.z+=dirLen;
-                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0,90.0,0.0,false);
+                this.addPipeCornerChunk(pnt,radius,-90.0,0.0,90.0,0.0,false);
                 break;
         }
         
@@ -365,19 +372,19 @@ export default class GenRoomDecorationPipeClass
         
         if (len>0) {
             pipeAng=new PointClass(0,0,180.0);     // force len to point up
-            this.addPipeStraightChunk(bitmap,pnt,len,radius,pipeAng);
+            this.addPipeStraightChunk(pnt,len,radius,pipeAng);
         }
     }
     
-    addPipeUp(room,bitmap,pnt,radius,yBound)
+    addPipeUp(room,pnt,radius,yBound)
     {
         let pipeAng;
         
         pipeAng=new PointClass(0,0,180.0);     // force len to point up
-        this.addPipeStraightChunk(bitmap,pnt,(pnt.y-yBound.min),radius,pipeAng);
+        this.addPipeStraightChunk(pnt,(pnt.y-yBound.min),radius,pipeAng);
     }
         
-    addPipeDown(room,bitmap,x,z,pnt,radius,yBound)
+    addPipeDown(room,x,z,pnt,radius,yBound)
     {
         let pipeAng=new PointClass(0,0,0);
         
@@ -386,25 +393,25 @@ export default class GenRoomDecorationPipeClass
                 // to left
                 
             if (z===0) {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,-90.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,0.0,-90.0,false);
                 
                 pipeAng.setFromValues(0.0,0.0,90.0);
-                this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,radius,radius,pipeAng);
                 
                 pnt.x-=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,90.0,0.0,-90.0,true);
+                this.addPipeCornerChunk(pnt,radius,0.0,90.0,0.0,-90.0,true);
             }
             
                 // to bottom
                 
             else {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,-90.0,0.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,-90.0,0.0,false);
                 
                 pipeAng.setFromValues(90.0,0.0,0.0);
-                this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,radius,radius,pipeAng);
                 
                 pnt.z+=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,90.0,0.0,-90.0,0.0,true);
+                this.addPipeCornerChunk(pnt,radius,90.0,0.0,-90.0,0.0,true);
             }
         }
         else {
@@ -412,32 +419,32 @@ export default class GenRoomDecorationPipeClass
                 // to top
                 
             if (z===0) {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,90.0,0.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,90.0,0.0,false);
                 
                 pipeAng.setFromValues(-90.0,0.0,0.0);
-                this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,radius,radius,pipeAng);
                 
                 pnt.z-=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,-90.0,0.0,90.0,0.0,true);
+                this.addPipeCornerChunk(pnt,radius,-90.0,0.0,90.0,0.0,true);
             }
             
                 // to right
                 
             else {
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,0.0,0.0,90.0,false);
+                this.addPipeCornerChunk(pnt,radius,0.0,0.0,0.0,90.0,false);
                 
                 pipeAng.setFromValues(0.0,0.0,-90.0);
-                this.addPipeStraightChunk(bitmap,pnt,radius,radius,pipeAng);
+                this.addPipeStraightChunk(pnt,radius,radius,pipeAng);
                 
                 pnt.x+=radius;
-                this.addPipeCornerChunk(bitmap,pnt,radius,0.0,-90.0,0.0,90.0,true);
+                this.addPipeCornerChunk(pnt,radius,0.0,-90.0,0.0,90.0,true);
             }
         }
         
             // finally down to ground
             
         pipeAng.setFromValues(0.0,0.0,0.0);
-        this.addPipeStraightChunk(bitmap,pnt,(yBound.max-pnt.y),radius,pipeAng);
+        this.addPipeStraightChunk(pnt,(yBound.max-pnt.y),radius,pipeAng);
     }
         
         //
@@ -448,13 +455,7 @@ export default class GenRoomDecorationPipeClass
     {
         let px,pz,sx,sz,yBound,platformBoundX,platformBoundY,platformBoundZ;
         let gridSize,radius;
-        let platformBitmap,pipeBitmap;
         let pnt,dir,dirLen;
-        
-            // bitmaps
-
-        platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
-        pipeBitmap=this.map.getTexture(constants.BITMAP_TYPE_PIPE);
         
             // get # of pipes (on a grid so they can collide
             // properly) and their relative sizes
@@ -473,7 +474,7 @@ export default class GenRoomDecorationPipeClass
         platformBoundZ=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
         
         platformBoundY=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,platformBoundX,platformBoundY,platformBoundZ,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
         
             // determine direction
         
@@ -497,13 +498,13 @@ export default class GenRoomDecorationPipeClass
                 
                 switch (genRandom.randomIndex(4)) {
                     case 0:
-                        this.addPipeSide(room,pipeBitmap,dir.direction,pnt,radius,dirLen,yBound);
+                        this.addPipeSide(room,dir.direction,pnt,radius,dirLen,yBound);
                         break;
                     case 1:
-                        this.addPipeUp(room,pipeBitmap,pnt,radius,yBound);
+                        this.addPipeUp(room,pnt,radius,yBound);
                         break;
                     case 2:
-                        this.addPipeDown(room,pipeBitmap,px,pz,pnt,radius,yBound);
+                        this.addPipeDown(room,px,pz,pnt,radius,yBound);
                         break;
                 }
             }

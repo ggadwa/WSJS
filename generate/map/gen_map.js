@@ -18,6 +18,13 @@ import GenRoomDecorationPipeClass from '../../generate/map/gen_map_decoration_pi
 import GenRoomDecorationCubicalClass from '../../generate/map/gen_map_decoration_cubical.js';
 import GenRoomDecorationLabClass from '../../generate/map/gen_map_decoration_lab.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
+import GenBitmapBrickClass from '../../generate/bitmap/gen_bitmap_brick.js';
+import GenBitmapStoneClass from '../../generate/bitmap/gen_bitmap_stone.js';
+import GenBitmapBlockClass from '../../generate/bitmap/gen_bitmap_block.js';
+import GenBitmapPlasterClass from '../../generate/bitmap/gen_bitmap_plaster.js';
+import GenBitmapScifiClass from '../../generate/bitmap/gen_bitmap_scifi.js';
+import GenBitmapTileClass from '../../generate/bitmap/gen_bitmap_tile.js';
+import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -42,6 +49,17 @@ export default class GenMapClass
         this.yBase=Math.trunc(this.view.OPENGL_FAR_Z/2);
         
         this.currentRoomCount=0;
+        
+            // preload data objects
+            
+        this.wallBitmap=null;
+        this.floorBitmap=null;
+        this.ceilingBitmap=null;
+        this.platformBitmap=null;
+        this.frameBitmap=null;
+        
+        this.genRoomHallway=null;
+        this.genRoomStairs=null;
         
             // constants
             
@@ -74,10 +92,83 @@ export default class GenMapClass
         
         this.HALLWAY_LIGHT_INTENSITY=constants.ROOM_FLOOR_HEIGHT*1.6;                 // intensity of hallway lights
         this.DOOR_LIGHT_INTENSITY=constants.ROOM_FLOOR_HEIGHT*1.3;                    // intensity of lights over doors
-        this.WINDOW_LIGHT_INTENSITY=constants.ROOM_FLOOR_HEIGHT*3.6;                  // intensity of window light
-        this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=constants.ROOM_FLOOR_HEIGHT*0.15;         // how much to cut main room light for each window
+        this.WINDOW_LIGHT_INTENSITY=constants.ROOM_FLOOR_HEIGHT*4.2;                  // intensity of window light
+        this.WINDOW_MAIN_LIGHT_INTENSITY_CUT=constants.ROOM_FLOOR_HEIGHT*0.05;         // how much to cut main room light for each window
 
         Object.seal(this);
+    }
+    
+        //
+        // preload some textures and objects
+        //
+        
+    preloadData()
+    {
+        let genBitmap;
+        
+            // bitmaps
+            
+        switch(genRandom.randomIndex(5)) {
+            case 0:
+                genBitmap=new GenBitmapBrickClass(this.view);
+                break;
+            case 1:
+                genBitmap=new GenBitmapStoneClass(this.view);
+                break;
+            case 2:
+                genBitmap=new GenBitmapBlockClass(this.view);
+                break;
+            case 3:
+                genBitmap=new GenBitmapPlasterClass(this.view);
+                break;
+            case 4:
+                genBitmap=new GenBitmapScifiClass(this.view);
+                break;
+        }
+        
+        this.wallBitmap=genBitmap.generate(false);
+        
+        this.floorBitmap=this.map.getTexture(constants.BITMAP_TYPE_FLOOR);
+        this.ceilingBitmap=this.map.getTexture(constants.BITMAP_TYPE_CEILING);
+        
+        switch(genRandom.randomIndex(5)) {
+            case 0:
+                genBitmap=new GenBitmapBrickClass(this.view);
+                break;
+            case 1:
+                genBitmap=new GenBitmapStoneClass(this.view);
+                break;
+            case 2:
+                genBitmap=new GenBitmapBlockClass(this.view);
+                break;
+            case 3:
+                genBitmap=new GenBitmapMetalClass(this.view);
+                break;
+            case 4:
+                genBitmap=new GenBitmapTileClass(this.view);
+                break;
+        }
+        
+        this.platformBitmap=genBitmap.generate(false);
+        
+        switch(genRandom.randomIndex(3)) {
+            case 0:
+                genBitmap=new GenBitmapBrickClass(this.view);
+                break;
+            case 1:
+                genBitmap=new GenBitmapMetalClass(this.view);
+                break;
+            case 2:
+                genBitmap=new GenBitmapPlasterClass(this.view);
+                break;
+        }
+        
+        this.frameBitmap=genBitmap.generate(false);
+        
+            // misc constructors
+            
+        this.genRoomHallway=new GenRoomHallwayClass(this.view,this.map,this.wallBitmap,this.ceilingBitmap,this.floorBitmap,this.frameBitmap);
+        this.genRoomStairs=new GenRoomStairsClass(this.view,this.map,this.wallBitmap);
     }
     
 
@@ -91,7 +182,6 @@ export default class GenMapClass
         let yAdd,yBound,yWallBound,yFloorBound;
         let roomIdx,room;
         let storyCount,liquid;
-        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
         
             // figure out room Y size from extension mode
             // all rooms need at least 2 stories
@@ -155,8 +245,8 @@ export default class GenMapClass
         yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
             
         for (n=0;n!==storyCount;n++) {
-            mesh=room.createMeshWalls(roomBitmap,yWallBound);
-            mesh2=room.createMeshWalls(roomBitmap,yFloorBound);
+            mesh=room.createMeshWalls(this.wallBitmap,yWallBound);
+            mesh2=room.createMeshWalls(this.wallBitmap,yFloorBound);
             mesh.combineMesh(mesh2);
             
             this.map.meshList.add(mesh);
@@ -179,16 +269,15 @@ export default class GenMapClass
         
     addHallwayRoom(connectSide,hallwayMode,xHallwayBound,zHallwayBound)
     {
-            // build the door
+            // build the hallway
             
-        let genRoomHallway=new GenRoomHallwayClass(this.view,this.map);
         let yHallwayBound=new BoundClass(this.yBase,(this.yBase-constants.ROOM_FLOOR_HEIGHT));        // don't count the upper header
 
         if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_RIGHT)) {
-            genRoomHallway.createHallwayX(xHallwayBound,yHallwayBound,zHallwayBound,(hallwayMode===this.HALLWAY_LONG));
+            this.genRoomHallway.createHallwayX(xHallwayBound,yHallwayBound,zHallwayBound,(hallwayMode===this.HALLWAY_LONG));
         }
         else {
-            genRoomHallway.createHallwayZ(xHallwayBound,yHallwayBound,zHallwayBound,(hallwayMode===this.HALLWAY_LONG));
+            this.genRoomHallway.createHallwayZ(xHallwayBound,yHallwayBound,zHallwayBound,(hallwayMode===this.HALLWAY_LONG));
         }
         
             // add to overlay
@@ -672,7 +761,7 @@ export default class GenMapClass
         let n,room,closet;
         let nRoom=this.map.roomList.count();
         
-        closet=new GenRoomClosetClass(this.view,this.map);
+        closet=new GenRoomClosetClass(this.view,this.map,this.wallBitmap,this.floorBitmap,this.ceilingBitmap);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -685,7 +774,7 @@ export default class GenMapClass
         let n,room,windows;
         let nRoom=this.map.roomList.count();
         
-        windows=new GenRoomWindowClass(this.view,this.map);
+        windows=new GenRoomWindowClass(this.view,this.map,this.wallBitmap,this.frameBitmap);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -698,7 +787,7 @@ export default class GenMapClass
         let n,room,ledge;
         let nRoom=this.map.roomList.count();
         
-        ledge=new GenRoomLedgeClass(this.view,this.map);
+        ledge=new GenRoomLedgeClass(this.view,this.map,this.platformBitmap);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -708,11 +797,10 @@ export default class GenMapClass
     
     buildRoomPlatforms()
     {
-        let n,room,platform,stair;
+        let n,room,platform;
         let nRoom=this.map.roomList.count();
         
-        platform=new GenRoomPlatformClass(this.view,this.map);
-        stair=new GenRoomStairsClass(this.view,this.map);
+        platform=new GenRoomPlatformClass(this.view,this.map,this.platformBitmap,this.genRoomStairs);
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -723,7 +811,7 @@ export default class GenMapClass
                     platform.create(room);
                     break;
                 case constants.ROOM_LEVEL_HIGHER:
-                    stair.createStairsExtension(room);
+                    this.genRoomStairs.createStairsExtension(room);
                     break;
             }
         }
@@ -733,15 +821,13 @@ export default class GenMapClass
     {
         let n,room,rects;
         let k,nRect,decorationType;
-        let pillar=new GenRoomDecorationPillarClass(this.view,this.map);
+        let pillar=new GenRoomDecorationPillarClass(this.view,this.map,this.platformBitmap);
         let storage=new GenRoomDecorationStorageClass(this.view,this.map);
-        let computer=new GenRoomDecorationComputerClass(this.view,this.map);
-        let pipe=new GenRoomDecorationPipeClass(this.view,this.map);
-        let cubicle=new GenRoomDecorationCubicalClass(this.view,this.map);
-        let lab=new GenRoomDecorationLabClass(this.view,this.map);
+        let computer=new GenRoomDecorationComputerClass(this.view,this.map,this.platformBitmap);
+        let pipe=new GenRoomDecorationPipeClass(this.view,this.map,this.platformBitmap);
+        let cubicle=new GenRoomDecorationCubicalClass(this.view,this.map,this.platformBitmap);
+        let lab=new GenRoomDecorationLabClass(this.view,this.map,this.platformBitmap);
         let nRoom=this.map.roomList.count();
-        
-        if (!config.ROOM_DECORATIONS) return;
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -757,32 +843,38 @@ export default class GenMapClass
             nRect=rects.length;
             
             for (k=0;k!==nRect;k++) {
+                
+                    // a number between 0 and 1 for how dense the decorations are
+                    
+                if (!genRandom.randomPercentage(config.DECORATION_DENSTIY)) continue;
             
-                decorationType=genRandom.randomIndex(7);        // +1 for a skip version
-                //decorationType=constants.ROOM_DECORATION_CUBICAL; // supergumba -- testing
+                    // pick a random dectoration
+                    
+                decorationType=genRandom.randomIndex(6);
+                //decorationType=constants.ROOM_DECORATION_LAB; // supergumba -- testing
             
                 switch (decorationType) {
-                    case constants.ROOM_DECORATION_PILLARS:
+                    case 0:
                         pillar.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case constants.ROOM_DECORATION_STORAGE:
+                    case 1:
                         storage.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case constants.ROOM_DECORATION_COMPUTER:
+                    case 2:
                         computer.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case constants.ROOM_DECORATION_PIPE:
+                    case 3:
                         pipe.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case constants.ROOM_DECORATION_CUBICAL:
+                    case 4:
                         cubicle.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
-                    case constants.ROOM_DECORATION_LAB:
+                    case 5:
                         lab.create(room,rects[k]);
                         room.blockGridForRect(rects[k]);
                         break;
@@ -798,6 +890,8 @@ export default class GenMapClass
 
     build()
     {
+        this.preloadData();
+        
         this.view.loadingScreenDraw(0.1);
         setTimeout(this.buildMapPath.bind(this),1);
     }

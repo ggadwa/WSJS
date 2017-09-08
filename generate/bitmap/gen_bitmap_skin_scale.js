@@ -98,7 +98,7 @@ export default class GenBitmapSkinScaleClass extends GenBitmapSkinBaseClass
             // scales and skin settings
             
         skinColor=this.getRandomColor();
-        scaleCount=genRandom.randomInt(3,5);
+        scaleCount=genRandom.randomInt(8,10);
          
             // clear canvases
         

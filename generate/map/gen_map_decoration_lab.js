@@ -4,6 +4,11 @@ import BoundClass from '../../code/utility/bound.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import MoveClass from '../../code/map/move.js';
 import MovementClass from '../../code/map/movement.js';
+import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
+import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
+import GenBitmapGlassClass from '../../generate/bitmap/gen_bitmap_glass.js';
+import GenBitmapGooClass from '../../generate/bitmap/gen_bitmap_goo.js';
+import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -12,10 +17,13 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationLabClass
 {
-    constructor(view,map)
+    constructor(view,map,platformBitmap)
     {
+        let genBitmap;
+        
         this.view=view;
         this.map=map;
+        this.platformBitmap=platformBitmap;
         
         this.tubeHigh=constants.ROOM_FLOOR_HEIGHT;
         this.tubeCapHigh=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.25));
@@ -23,6 +31,22 @@ export default class GenRoomDecorationLabClass
         this.smallTubeHigh=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,constants.ROOM_FLOOR_DEPTH);
         this.smallTubeCapHigh=Math.trunc(this.smallTubeHigh*genRandom.randomFloat(0.1,0.2));
 
+            // bitmaps
+            
+        genBitmap=new GenBitmapMetalClass(this.view);
+        this.metalBitmap=genBitmap.generate(false);
+        
+        genBitmap=new GenBitmapPanelClass(this.view);
+        this.panelBitmap=genBitmap.generate(false);
+        
+        genBitmap=new GenBitmapGlassClass(this.view);
+        this.glassBitmap=genBitmap.generate(false);
+        
+        genBitmap=new GenBitmapGooClass(this.view);
+        this.gooBitmap=genBitmap.generate(false);
+        
+        genBitmap=new GenBitmapPipeClass(this.view);
+        this.pipeBitmap=genBitmap.generate(false);
         
         Object.seal(this);
     }
@@ -36,11 +60,6 @@ export default class GenRoomDecorationLabClass
         let yBound,mesh,meshIdx;
         let yCapTop,yCapBottom,yBaseTop,yBaseBottom,yLiqHigh;
         let moveY,movement,msec;
-        let pipeBitmap,glassBitmap,gooBitmap;
-
-        pipeBitmap=this.map.getTexture(constants.BITMAP_TYPE_PIPE);
-        glassBitmap=this.map.getTexture(constants.BITMAP_TYPE_GLASS);
-        gooBitmap=this.map.getTexture(constants.BITMAP_TYPE_GOO);
         
             // the top and bottom base
         
@@ -52,14 +71,14 @@ export default class GenRoomDecorationLabClass
         
         if (yBaseTop!==yBaseBottom) {
             yBound=new BoundClass(yBaseTop,yBaseBottom);
-            mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,pipeBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
+            mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,this.pipeBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
             MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
             this.map.meshList.add(mesh);
         }
         
         if (yCapTop!==yCapBottom) {
             yBound=new BoundClass(yCapTop,yCapBottom);
-            mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,pipeBitmap,centerPnt,yBound,radius,true,true,constants.MESH_FLAG_DECORATION);
+            mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,this.pipeBitmap,centerPnt,yBound,radius,true,true,constants.MESH_FLAG_DECORATION);
             MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
             this.map.meshList.add(mesh);
         }
@@ -69,7 +88,7 @@ export default class GenRoomDecorationLabClass
         yBound=new BoundClass(yCapBottom,yBaseTop); 
         radius=Math.trunc(radius*0.9);
 
-        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,glassBitmap,centerPnt,yBound,radius,false,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,this.glassBitmap,centerPnt,yBound,radius,false,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         this.map.meshList.add(mesh);
         
@@ -80,7 +99,7 @@ export default class GenRoomDecorationLabClass
         
         radius=Math.trunc(radius*0.98);
 
-        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,gooBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCylinderSimple(this.view,this.gooBitmap,centerPnt,yBound,radius,true,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCylinderScaleU(mesh,5.0);
         meshIdx=this.map.meshList.add(mesh);
         
@@ -116,13 +135,10 @@ export default class GenRoomDecorationLabClass
     addMachineryItemPanel(xBound,zBound,y)
     {
         let mesh,yBound;
-        let panelBitmap;
-        
-        panelBitmap=this.map.getTexture(constants.BITMAP_TYPE_PANEL);
         
         yBound=new BoundClass((y-Math.trunc(constants.ROOM_FLOOR_DEPTH*0.5)),y);
         
-        mesh=MeshPrimitivesClass.createMeshCube(this.view,panelBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
+        mesh=MeshPrimitivesClass.createMeshCube(this.view,this.panelBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
         MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
         MeshPrimitivesClass.meshCubeScaleUV(mesh,0,0.1,0.9,0.0,0.1);
         MeshPrimitivesClass.meshCubeScaleUV(mesh,1,0.1,0.9,0.0,0.1);
@@ -163,11 +179,6 @@ export default class GenRoomDecorationLabClass
         let xBound,yBound,zBound;
         let sz,xBoundItem,zBoundItem;
         let reduceSize;
-        let platformBitmap,metalBitmap,pipeBitmap;
-
-        platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
-        metalBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
-        pipeBitmap=this.map.getTexture(constants.BITMAP_TYPE_PIPE);
         
             // the platform
             
@@ -178,7 +189,7 @@ export default class GenRoomDecorationLabClass
         zBound=new BoundClass(z,(z+constants.ROOM_BLOCK_WIDTH));
 
         yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
         
             // the box
         
@@ -189,7 +200,7 @@ export default class GenRoomDecorationLabClass
         zBound.max-=reduceSize;
 
         yBound=new BoundClass((room.yBound.max-Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.3)),(room.yBound.max-constants.ROOM_FLOOR_DEPTH));
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,xBound,yBound,zBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION));
         
             // box items
         

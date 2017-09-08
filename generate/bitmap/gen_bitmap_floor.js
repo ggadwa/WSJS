@@ -14,170 +14,6 @@ export default class GenBitmapFloorClass extends GenBitmapBaseClass
         Object.seal(this);
     }
         
-        //
-        // tile bitmaps
-        //
-        
-    generateTilePieceCrack(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeMargin,tileColor)
-    {
-        let sx,ex,sy,ey;
-        let lineColor,lineMargin;
-        let tileWid,tileHigh;
-        
-        if (!genRandom.randomPercentage(0.10)) return;
-
-        sx=lft+edgeMargin;
-        ex=rgt-edgeMargin;
-        sy=top+edgeMargin;
-        ey=bot-edgeMargin;
-        
-        tileWid=rgt-lft;
-        tileHigh=bot-top;
-
-        if (genRandom.randomPercentage(0.50)) {
-            lineMargin=Math.trunc(tileWid/5);
-            sx=genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
-            ex=genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
-        }
-        else {
-            lineMargin=Math.trunc(tileHigh/5);
-            sy=genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
-            ey=genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
-        }
-
-        lineColor=this.darkenColor(tileColor,0.9);
-        this.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,lft,top,rgt,bot,20,lineColor,false);
-    }
-
-    generateTileInner(bitmapCTX,normalCTX,lft,top,rgt,bot,tileColor,tileStyle,splitCount,edgeSize,paddingSize,complex)
-    {
-        let x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh;
-        let col,padding;
-
-            // tile style
-
-        tileStyle=genRandom.randomIndex(3);
-
-            // splits
-
-        tileWid=Math.trunc((rgt-lft)/splitCount);
-        tileHigh=Math.trunc((bot-top)/splitCount);
-
-        for (y=0;y!==splitCount;y++) {
-
-            dTop=top+(tileHigh*y);
-            dBot=(dTop+tileHigh)-paddingSize;
-            if (y===(splitCount-1)) dBot=bot;
-
-            dLft=lft;
-
-            for (x=0;x!==splitCount;x++) {
-                
-                dLft=lft+(tileWid*x);
-                dRgt=dLft+tileWid;
-                if (x===(splitCount-1)) dRgt=rgt;
-                
-                dRgt-=paddingSize;
-
-                    // sometimes a tile piece is a recursion to
-                    // another tile set
-
-                if ((complex) && (genRandom.randomPercentage(0.25))) {
-                    tileStyle=genRandom.randomIndex(3);
-                    this.generateTileInner(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,tileColor,tileStyle,2,edgeSize,paddingSize,false);
-                    continue;
-                }
-
-                    // make the tile
-
-                col=tileColor[0];
-
-                switch (tileStyle) {
-
-                    case 0:         // border style
-                        if ((x!==0) && (y!==0)) col=tileColor[1];
-                        break;
-
-                    case 1:         // checker board style
-                        col=tileColor[(x+y)&0x1];
-                        break;
-
-                    case 2:         // stripe style
-                        if ((x&0x1)!==0) col=tileColor[1];
-                        break;
-
-                }
-
-                this.draw3DRect(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col,true);
-
-                    // possible design
-                    // 0 = nothing
-
-                if (complex) {
-                    col=this.darkenColor(col,0.8);
-                    padding=edgeSize+2;
-                    
-                    switch (genRandom.randomIndex(3)) {
-                        case 1:
-                            this.drawOval(bitmapCTX,(dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),col,this.blackColor);
-                            break;
-                        case 2:
-                            this.drawDiamond(bitmapCTX,(dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),col,this.blackColor);
-                            break;
-                    }
-                }
-                
-                    // possible crack
-                    
-                this.generateTilePieceCrack(bitmapCTX,normalCTX,dLft,dTop,dRgt,dBot,edgeSize,col);
-            }
-        }
-    }
-
-    generateTile(bitmapCTX,normalCTX,specularCTX,wid,high)
-    {
-        let splitCount,tileStyle,groutColor;
-        let tileColor=[];
-        
-        let complex=genRandom.randomPercentage(0.5);
-        let small=false;
-        if (!complex) small=genRandom.randomPercentage(0.5);
-
-            // some random values
-
-        if (!small) {
-            splitCount=genRandom.randomInt(2,2);
-        }
-        else {
-            splitCount=genRandom.randomInt(6,4);
-        }
-        
-        tileStyle=genRandom.randomIndex(3);
-        tileColor[0]=this.getDefaultPrimaryColor();
-        tileColor[1]=this.darkenColor(tileColor[0],0.85);
-
-            // clear canvas
-
-        groutColor=this.dullColor(tileColor[0],0.7);
-        this.drawRect(bitmapCTX,0,0,wid,high,groutColor);
-        
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,5,false);
-        
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
-
-            // original splits
-
-        this.generateTileInner(bitmapCTX,normalCTX,0,0,wid,high,tileColor,tileStyle,splitCount,(small?2:5),(small?3:0),complex);
-
-            // tile noise
-
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,1.1,1.3,0.2);
-
-            // finish with the specular
-
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
-    }
     
         //
         // hexagonal
@@ -483,7 +319,7 @@ export default class GenBitmapFloorClass extends GenBitmapBaseClass
                 
                     // any cracks
                     
-                this.generateTilePieceCrack(bitmapCTX,normalCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
+                this.drawSmallCrack(bitmapCTX,normalCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
 
                 lft+=tileWid;
             }
@@ -496,61 +332,6 @@ export default class GenBitmapFloorClass extends GenBitmapBaseClass
         this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
     }
 
-        //
-        // wood bitmaps
-        //
-
-    generateWood(bitmapCTX,normalCTX,specularCTX,wid,high)
-    {
-        let n,k,lft,rgt,top,bot;
-        let boardSplit,boardHigh,woodFactor;
-        
-            // some random values
-
-        let boardCount=genRandom.randomInt(4,8);
-        let boardSize=Math.trunc(wid/boardCount);
-        let edgeSize=genRandom.randomInt(3,3);
-        let woodColor=this.getDefaultPrimaryColor();
-        let col;
-
-            // clear canvases
-
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
-
-            // regular wood planking
-
-        lft=0;
-
-        for (n=0;n!==boardCount;n++) {
-            rgt=lft+boardSize;
-            if (n===(boardCount-1)) rgt=wid;
-            
-            boardSplit=genRandom.randomInt(1,3);
-            boardHigh=Math.trunc(high/boardSplit);
-            
-            top=0;
-            
-            for (k=0;k!==boardSplit;k++) {
-                bot=top+boardHigh;
-                if (k===(boardSplit-1)) bot=high;
-                
-                woodFactor=0.8+(genRandom.random()*0.2);
-                col=this.darkenColor(woodColor,woodFactor);
-
-                this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
-                this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
-                this.addNoiseRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
-                
-                top=bot;
-            }
-            
-            lft=rgt;
-        }
-
-            // finish with the specular
-
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.4);
-    }
 
         //
         // generate mainline
@@ -590,37 +371,28 @@ export default class GenBitmapFloorClass extends GenBitmapBaseClass
 
             // create the bitmap
 
-        switch (genRandom.randomIndex(6)) {
+        switch (genRandom.randomIndex(4)) {
 
             case 0:
-                this.generateTile(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=10.0;
-                break;
-
-            case 1:
                 this.generateHexagonal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
                 break;
 
-            case 2:
+            case 1:
                 this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=15.0;
                 break;
                 
-            case 3:
+            case 2:
                 this.generateCement(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=5.0;
                 break;
                 
-            case 4:
+            case 3:
                 this.generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high);
                 shineFactor=10.0;
                 break;
 
-            case 5:
-                this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=2.0;
-                break;
 
         }
 

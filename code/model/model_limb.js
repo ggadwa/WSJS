@@ -16,8 +16,6 @@ export default class ModelLimbClass
         this.aroundSurfaceCount=aroundSurfaceCount;
         this.boneIndexes=boneIndexes;
         
-        this.hunchAngle=0.0;
-        
         Object.seal(this);
     }
     

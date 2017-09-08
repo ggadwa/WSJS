@@ -2256,6 +2256,41 @@ export default class GenBitmapBaseClass
     }
     
         //
+        // cracks
+        //
+        
+    drawSmallCrack(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeMargin,backColor)
+    {
+        let sx,ex,sy,ey;
+        let lineColor,lineMargin;
+        let tileWid,tileHigh;
+        
+        if (!genRandom.randomPercentage(0.10)) return;
+
+        sx=lft+edgeMargin;
+        ex=rgt-edgeMargin;
+        sy=top+edgeMargin;
+        ey=bot-edgeMargin;
+        
+        tileWid=rgt-lft;
+        tileHigh=bot-top;
+
+        if (genRandom.randomPercentage(0.50)) {
+            lineMargin=Math.trunc(tileWid/5);
+            sx=genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+            ex=genRandom.randomInBetween((lft+lineMargin),(rgt-lineMargin));
+        }
+        else {
+            lineMargin=Math.trunc(tileHigh/5);
+            sy=genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+            ey=genRandom.randomInBetween((top+lineMargin),(bot-lineMargin));
+        }
+
+        lineColor=this.darkenColor(backColor,0.9);
+        this.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,lft,top,rgt,bot,20,lineColor,false);
+    }
+    
+        //
         // testing
         //
     

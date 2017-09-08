@@ -339,15 +339,13 @@ export default class ModelSkeletonClass
         this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0.0,-(r*0.5),(z*0.9));
     }
     
-    poseSetBody(limb,startAng,extraAng,hunchAngle)
+    poseSetBody(limb,startAng,extraAng)
     {
         let n,x;
         let nBone=limb.boneIndexes.length;
 
         x=genRandom.randomInBetween(startAng,extraAng);
         if (this.lastAnimationFlip) x=-x;
-        
-        x-=hunchAngle;
         
             // always start past hip bone as we don't
             // want to rotate against the base bone
@@ -424,10 +422,10 @@ export default class ModelSkeletonClass
             
             switch (limb.limbType) {
                 case constants.LIMB_TYPE_BODY:
-                    this.poseSetBody(limb,5.0,5.0,limb.hunchAngle);
+                    this.poseSetBody(limb,5.0,5.0);
                     break;
                 case constants.LIMB_TYPE_HEAD:
-                    this.poseSetBody(limb,5.0,15.0,0.0);
+                    this.poseSetBody(limb,5.0,15.0);
                     break;
                 case constants.LIMB_TYPE_LEG:
                     this.poseSetLeg(limb,legOffset,true);
@@ -497,10 +495,10 @@ export default class ModelSkeletonClass
             
             switch (limb.limbType) {
                 case constants.LIMB_TYPE_BODY:
-                    this.poseSetBody(limb,3.0,3.0,limb.hunchAngle);
+                    this.poseSetBody(limb,3.0,3.0);
                     break;
                 case constants.LIMB_TYPE_HEAD:
-                    this.poseSetBody(limb,0.0,10.0,0.0);
+                    this.poseSetBody(limb,0.0,10.0);
                     break;
                 case constants.LIMB_TYPE_LEG:
                     this.poseSetLeg(limb,legOffset,false);

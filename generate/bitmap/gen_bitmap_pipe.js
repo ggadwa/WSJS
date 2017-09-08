@@ -20,8 +20,9 @@ export default class GenBitmapPipeClass extends GenBitmapBaseClass
     
     generatePipe(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,x,y,darken,metalColor;
+        let n,x,y,yAdd,darken,metalColor;
         let streakCount,streakWid,streakColor;
+        let lineCount,lineColor;
         let screwCount,screwSize,screenFlatInnerSize,screwColor;
 
             // some random values
@@ -49,19 +50,35 @@ export default class GenBitmapPipeClass extends GenBitmapBaseClass
             }
         }
         
+            // possible segments
+            
+        if (genRandom.randomPercentage(0.5)) {
+            lineCount=genRandom.randomInt(1,8);
+            
+            lineColor=this.darkenColor(metalColor,0.7);
+            
+            yAdd=(high/lineCount);
+            y=Math.trunc((high-(yAdd*lineCount))*0.5);
+            
+            for (n=0;n!==lineCount;n++) {
+                this.drawLine(bitmapCTX,normalCTX,0,y,wid,y,lineColor,false);
+                y+=yAdd;
+            }
+        }
+        
             // possible screws (in line)
             
         if (genRandom.randomPercentage(0.5)) {
-            screwSize=genRandom.randomInt(10,20);
+            screwSize=genRandom.randomInt(15,30);
             screenFlatInnerSize=Math.trunc(screwSize*0.4);
             screwColor=this.boostColor(metalColor,0.05);
         
             screwCount=Math.trunc(high/(screwSize*2));
             
-            y=0;
+            y=5;
             
-            for (n=0;n!=screwCount;n++) {
-                this.draw3DOval(bitmapCTX,normalCTX,0,y,screwSize,(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            for (n=0;n!==screwCount;n++) {
+                this.draw3DOval(bitmapCTX,normalCTX,5,y,(screwSize+5),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
                 y+=(screwSize*2);
             }
         }

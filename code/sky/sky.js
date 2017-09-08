@@ -1,6 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import SkyShaderClass from '../../code/sky/sky_shader.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
+import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
 
 //
 // sky class
@@ -49,8 +49,8 @@ export default class SkyClass
         
             // create bitmaps
         
-        genBitmap=new GenBitmapClass(this.view);
-        this.bitmap=genBitmap.generate(constants.BITMAP_TYPE_SKY,false);
+        genBitmap=new GenBitmapSkyClass(this.view);
+        this.bitmap=genBitmap.generate(false);
         
         return(true);
     }

@@ -112,7 +112,7 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
 
         this.model.skeleton=new ModelSkeletonClass(this.view);
         
-        bodyLimbIdx=this.buildBody(1500,2000,3000,2000,300,1000,1.0);
+        bodyLimbIdx=this.buildBody(1500,2000,3000,2000,300,1000,1.0,true);
         this.buildRandomLimbs(bodyLimbIdx);
         
             // setup the bones for animation

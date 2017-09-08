@@ -1,73 +1,67 @@
-import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
 import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
-// generate liquid bitmap class
+// generate plaster bitmap class
 //
 
-export default class GenBitmapLiquidClass extends GenBitmapBaseClass
+export default class GenBitmapPlasterClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
         Object.seal(this);
     }
-        
+    
         //
-        // liquid
+        // plaster bitmaps
         //
-        
-    generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
+
+    generatePlaster(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,k,x,y,xAdd,yAdd,lineCount,ovalCount,ovalWid,ovalHigh,ovalColor;
-        let color=new ColorClass(genRandom.randomFloat(0.1,0.2),genRandom.randomFloat(0.1,0.2),1.0);
-        
+        let n,x;
+        let lineColor,darken,boost;
+
+            // some random values
+
+        let lineColorBase=this.getDefaultPrimaryColor();
+        let plasterColor=this.dullColor(lineColorBase,0.8);
+        let lineCount=genRandom.randomInt(50,50);
+
+            // clear canvases
+
+        this.drawRect(bitmapCTX,0,0,wid,high,plasterColor);
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
-            // background
+            // lines
             
-        this.drawRect(bitmapCTX,0,0,wid,high,color);
-        
-            // water lines
-            
-        lineCount=genRandom.randomInt(5,5);
-        
         for (n=0;n!==lineCount;n++) {
-            ovalColor=this.darkenColor(color,genRandom.randomFloat(0.93,0.05));
-            
             x=genRandom.randomInt(0,wid);
-            y=genRandom.randomInt(0,high);
-            xAdd=25-genRandom.randomInt(25,25);
-            yAdd=25-genRandom.randomInt(25,25);
             
-            ovalCount=genRandom.randomInt(5,10);
+            darken=0.85+(genRandom.random()*0.1);
+            lineColor=this.darkenColor(lineColorBase,darken);
             
-            for (k=0;k!==ovalCount;k++) {
-                ovalWid=genRandom.randomInt(50,100);
-                ovalHigh=genRandom.randomInt(50,100);
-
-                this.drawWrappedOval(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),wid,high,ovalColor,null);
-                
-                x+=xAdd;
-                if (x<0) x+=wid;
-                if (x>=wid) x-=wid;
-                
-                y+=yAdd;
-                if (y<0) y+=high;
-                if (y>=high) y-=high;
-            }
+            this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,0,0,wid,high,15,lineColor,false);
         }
         
+        for (n=0;n!==lineCount;n++) {
+            x=genRandom.randomInt(0,wid);
+            
+            boost=0.05+(genRandom.random()*0.1);
+            lineColor=this.boostColor(lineColorBase,boost);
+            
+            this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,high,0,0,wid,high,15,lineColor,false);
+        }
+        
+            // plaster noise
+            
+        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.8);
         this.blur(bitmapCTX,0,0,wid,high,5,false);
-        
-            // noise and blur
-        
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,10,false);
-        
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
+
+            // finish with the specular
+
+        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.4);
     }
 
         //
@@ -76,8 +70,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
 
     generate(inDebug)
     {
-        let wid,high,alpha;
-        let shineFactor=1.0;
+        let wid,high;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
             // setup the canvas
@@ -108,14 +101,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
 
             // create the bitmap
 
-        switch (genRandom.randomIndex(1)) {
-
-            case 0:
-                this.generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
-                break;
-
-        }
+        this.generatePlaster(bitmapCTX,normalCTX,specularCTX,wid,high);
 
             // debug just displays the canvases, so send
             // them back
@@ -125,8 +111,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        alpha=genRandom.randomFloat(0.8,0.2);
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,alpha,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],5.0));    
     }
 
 }

@@ -13,10 +13,15 @@ import MovementClass from '../../code/map/movement.js';
 
 export default class GenRoomHallwayClass
 {
-    constructor(view,map)
+    constructor(view,map,wallBitmap,floorBitmap,ceilingBitmap,frameBitmap)
     {
         this.view=view;
         this.map=map;
+        
+        this.wallBitmap=wallBitmap;
+        this.floorBitmap=floorBitmap;
+        this.ceilingBitmap=ceilingBitmap;
+        this.frameBitmap=frameBitmap;
         
         Object.seal(this);
     }
@@ -137,9 +142,7 @@ export default class GenRoomHallwayClass
     {
         let idx,meshCenterPoint,thickSize;
         let vertexList;
-        let zHallwayBound,zThickBound,xFrameBound,frameBitmap;
-        
-        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
+        let zHallwayBound,zThickBound,xFrameBound;
         
             // need a center point to better
             // create normals
@@ -161,7 +164,7 @@ export default class GenRoomHallwayClass
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.min+thickSize));
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.max-thickSize));
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -174,7 +177,7 @@ export default class GenRoomHallwayClass
         zThickBound=new BoundClass((zBound.max-thickSize),zBound.max);
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
 
            // the ceiling and floor
 
@@ -183,12 +186,12 @@ export default class GenRoomHallwayClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingX(idx,vertexList,xBound,yBound.min,zHallwayBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
+        this.finishMesh(this.ceilingBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingX(idx,vertexList,xBound,yBound.max,zHallwayBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_FLOOR);
+        this.finishMesh(this.floorBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_FLOOR);
         
             // the door
             
@@ -202,13 +205,11 @@ export default class GenRoomHallwayClass
         
             // the frame
             
-        frameBitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
-        
         xFrameBound=new BoundClass(xBound.min,xBound.min);
-        this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,true,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.frameBitmap,xFrameBound,yBound,zBound,true,false,true));
         
         xFrameBound=new BoundClass(xBound.max,xBound.max);
-        this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.map.getTexture(constants.BITMAP_TYPE_FRAME),xFrameBound,yBound,zBound,false,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.frameBitmap,xFrameBound,yBound,zBound,false,false,true));
     }
     
     createHallwayDoorZ(xBound,yBound,z,thickSize)
@@ -242,9 +243,7 @@ export default class GenRoomHallwayClass
     {
         let idx,meshCenterPoint,thickSize;
         let vertexList;
-        let xHallwayBound,xThickBound,zFrameBound,frameBitmap;
-        
-        let roomBitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
+        let xHallwayBound,xThickBound,zFrameBound;
         
             // need a center point to better
             // create normals
@@ -266,7 +265,7 @@ export default class GenRoomHallwayClass
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
         idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBound,zBound);
         idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBound,zBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -279,7 +278,7 @@ export default class GenRoomHallwayClass
         xThickBound=new BoundClass((xBound.max-thickSize),xBound.max);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
 
            // the ceiling
            
@@ -288,12 +287,12 @@ export default class GenRoomHallwayClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingZ(idx,vertexList,xHallwayBound,yBound.min,zBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
+        this.finishMesh(this.ceilingBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingZ(idx,vertexList,xHallwayBound,yBound.max,zBound);
-        this.finishMesh(roomBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_FLOOR);
+        this.finishMesh(this.floorBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_FLOOR);
         
             // the door
         
@@ -307,13 +306,11 @@ export default class GenRoomHallwayClass
         
             // the frame
             
-        frameBitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
-        
         zFrameBound=new BoundClass(zBound.min,zBound.min);
-        this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,true,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,this.frameBitmap,xBound,yBound,zFrameBound,true,false,true));
         
         zFrameBound=new BoundClass(zBound.max,zBound.max);
-        this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zFrameBound,false,false,true));
+        this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,this.frameBitmap,xBound,yBound,zFrameBound,false,false,true));
     }
 }
 

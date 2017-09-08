@@ -12,13 +12,23 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
+
+
+
+
+--> remove wall/ceiling/floor type bitmaps, split into texture types
+--> get rid of BITMAP_TYPE_*, then delete gen_bitmap
+--> make sky a 4x2 texture, make array for mountain heights, reverse on back half, draw random lines downwards
+
+--> need junction (box with wires or circuits)
+
+--> commonize generate in bitmaps
+--> getting hit seems to leave on hit shading
 --> 3rd person view
---> get rid of BITMAP_TYPE_*
---> models get hunch as part of body skeleton, not variable
+--> flatten human mesh
 --> sounds need to be same way
 --> cubicals -> LiftBlocks
 --> need low/high/normal room lists
---> make sky a 4x2 texture, make array for mountain heights, reverse on back half, draw random lines downwards
 
 --> need particle blob (use for explosions)
 --> platform, pipe, frame, and pillar need their own texture creation

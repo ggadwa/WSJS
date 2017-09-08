@@ -1,7 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
-import GenRoomStairsClass from '../../generate/map/gen_map_stair.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -10,10 +9,12 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomPlatformClass
 {
-    constructor(view,map)
+    constructor(view,map,platformBitmap,genRoomStairs)
     {
         this.view=view;
         this.map=map;
+        this.platformBitmap=platformBitmap;
+        this.genRoomStairs=genRoomStairs;
         
         Object.seal(this);
     }
@@ -22,11 +23,10 @@ export default class GenRoomPlatformClass
         // add stair chunk
         //
         
-    addStairChunk(room,dir,x,z,story,platformBitmap)
+    addStairChunk(room,dir,x,z,story)
     {
         let rx,rz,xBound,yBound,zBound;
         let y=(room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*story));
-        let genRoomStairs=new GenRoomStairsClass(this.view,this.map);
 
         rx=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
         xBound=new BoundClass(rx,(rx+constants.ROOM_BLOCK_WIDTH));
@@ -38,16 +38,16 @@ export default class GenRoomPlatformClass
         
         switch (dir) {
             case constants.ROOM_SIDE_LEFT:
-                genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,false);
+                this.genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,false);
                 break;
             case constants.ROOM_SIDE_RIGHT:
-                genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,true);
+                this.genRoomStairs.createStairsX(xBound,yBound,zBound,true,true,true);
                 break;
             case constants.ROOM_SIDE_TOP:
-                genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,false);
+                this.genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,false);
                 break;
             case constants.ROOM_SIDE_BOTTOM:
-                genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,true);
+                this.genRoomStairs.createStairsZ(xBound,yBound,zBound,true,true,true);
                 break;
         }
         
@@ -57,7 +57,7 @@ export default class GenRoomPlatformClass
         if (story!==0) {
             yBound.min=yBound.max;
             yBound.max=room.yBound.max;
-            this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_STAIR));
+            this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,xBound,yBound,zBound,true,true,true,true,false,false,false,constants.MESH_FLAG_STAIR));
         }
         
             // block the stairs off from any decorations
@@ -89,7 +89,7 @@ export default class GenRoomPlatformClass
         // add platform chunk
         //
         
-    addPlatformChunk(room,x,z,story,platformBitmap)
+    addPlatformChunk(room,x,z,story)
     {
         let y=(room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*story));
         
@@ -97,7 +97,7 @@ export default class GenRoomPlatformClass
         let yPlatformBound=new BoundClass(y,(y+constants.ROOM_FLOOR_DEPTH));
         let zPlatformBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
         
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,constants.MESH_FLAG_PLATFORM));
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,xPlatformBound,yPlatformBound,zPlatformBound,true,true,true,true,true,true,false,constants.MESH_FLAG_PLATFORM));
 
             // can now spawn items unto upper grid
             // a cleared spot is a spot that's open
@@ -129,7 +129,7 @@ export default class GenRoomPlatformClass
         // platform from connecting room to random platforms
         //
         
-    createConnectRoomPlatform(room,platformBitmap,lastStairPos)
+    createConnectRoomPlatform(room,lastStairPos)
     {
         let x,z,x2,z2,min,max;
         let connectStory,dir,orgDir,dirStack,item;
@@ -175,7 +175,7 @@ export default class GenRoomPlatformClass
             // randomly move around until we hit a
             // previous block
         
-        this.addPlatformChunk(room,x,z,connectStory,platformBitmap);
+        this.addPlatformChunk(room,x,z,connectStory);
         
         dirStack=[];
         dirStack.push({x:x,z:z});
@@ -236,7 +236,7 @@ export default class GenRoomPlatformClass
             x=x2;
             z=z2;
             
-            this.addPlatformChunk(room,x,z,connectStory,platformBitmap);
+            this.addPlatformChunk(room,x,z,connectStory);
 
             dirStack.push({x:x,z:z});
         }
@@ -246,7 +246,7 @@ export default class GenRoomPlatformClass
         // create random platforms
         // 
     
-    createRandomPlatforms(room,platformBitmap)
+    createRandomPlatforms(room)
     {
         let n,k,x,z,x2,z2,stairX,stairZ,dir,orgDir,dirCount;
         let dirStack,item,connectStory;
@@ -273,7 +273,7 @@ export default class GenRoomPlatformClass
                 // stair to next level
                 // remember stairs so we don't cross it
                 
-            this.addStairChunk(room,dir,x,z,n,platformBitmap);
+            this.addStairChunk(room,dir,x,z,n);
             
             stairX=x;
             stairZ=z;
@@ -283,7 +283,7 @@ export default class GenRoomPlatformClass
             x=this.moveDirX(dir,x);
             z=this.moveDirZ(dir,z);
             
-            this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+            this.addPlatformChunk(room,x,z,(n+1));
             
                 // we keep a list of the platform
                 // chunks we've made so we can backup
@@ -335,7 +335,7 @@ export default class GenRoomPlatformClass
                 x=x2;
                 z=z2;
                 
-                this.addPlatformChunk(room,x,z,(n+1),platformBitmap);
+                this.addPlatformChunk(room,x,z,(n+1));
                 
                 dirStack.push({x:x,z:z});
             }
@@ -368,10 +368,9 @@ export default class GenRoomPlatformClass
     create(room)
     {
         let lastStairPos;
-        let platformBitmap=this.map.getTexture(constants.BITMAP_TYPE_PLATFORM);
 
-        lastStairPos=this.createRandomPlatforms(room,platformBitmap);
-        this.createConnectRoomPlatform(room,platformBitmap,lastStairPos);
+        lastStairPos=this.createRandomPlatforms(room);
+        this.createConnectRoomPlatform(room,lastStairPos);
     }
 }
 

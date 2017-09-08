@@ -11,10 +11,13 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomClosetClass
 {
-    constructor(view,map)
+    constructor(view,map,wallBitmap,floorBitmap,ceilingBitmap)
     {
         this.view=view;
         this.map=map;
+        this.wallBitmap=wallBitmap;
+        this.floorBitmap=floorBitmap;
+        this.ceilingBitmap=ceilingBitmap;
         
         Object.seal(this);
     }
@@ -25,7 +28,6 @@ export default class GenRoomClosetClass
     {
         let n,idx;
         let vertexList,indexes;
-        let bitmap;
         
             // center point for normal creation
             
@@ -33,8 +35,6 @@ export default class GenRoomClosetClass
 
             // the walls
             
-        bitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
-
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(24);
 
@@ -73,15 +73,13 @@ export default class GenRoomClosetClass
         }
         
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListUVs(this.wallBitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        this.map.meshList.add(new MapMeshClass(this.view,this.wallBitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // ceiling
             
-        bitmap=this.map.getTexture(constants.BITMAP_TYPE_CEILING);
-        
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);
 
@@ -99,14 +97,12 @@ export default class GenRoomClosetClass
         }
         
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListUVs(this.ceilingBitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
+        this.map.meshList.add(new MapMeshClass(this.view,this.ceilingBitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
 
             // floor
-        
-        bitmap=this.map.getTexture(constants.BITMAP_TYPE_FLOOR);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(6);
@@ -125,10 +121,10 @@ export default class GenRoomClosetClass
         }
         
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListUVs(this.floorBitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
+        this.map.meshList.add(new MapMeshClass(this.view,this.floorBitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
     }
 
         // closet mainline

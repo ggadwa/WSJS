@@ -23,7 +23,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
     {
         let col;
         
-        col=this.darkenColor(woodColor,genRandom.random(0.9,0.1));
+        col=this.darkenColor(woodColor,genRandom.randomFloat(0.8,0.2));
         
         this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
         if ((bot-top)>(rgt-lft)) {

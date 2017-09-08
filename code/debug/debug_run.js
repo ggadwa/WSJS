@@ -2,7 +2,12 @@ import * as constants from '../../code/main/constants.js';
 import FileCacheClass from '../../code/main/filecache.js';
 import ViewClass from '../../code/main/view.js';
 import SoundClass from '../../code/sound/sound.js';
-import GenBitmapWallClass from '../../generate/bitmap/gen_bitmap_wall.js';
+import GenBitmapBrickClass from '../../generate/bitmap/gen_bitmap_brick.js';
+import GenBitmapStoneClass from '../../generate/bitmap/gen_bitmap_stone.js';
+import GenBitmapBlockClass from '../../generate/bitmap/gen_bitmap_block.js';
+import GenBitmapPlasterClass from '../../generate/bitmap/gen_bitmap_plaster.js';
+import GenBitmapTileClass from '../../generate/bitmap/gen_bitmap_tile.js';
+import GenBitmapScifiClass from '../../generate/bitmap/gen_bitmap_scifi.js';
 import GenBitmapFloorClass from '../../generate/bitmap/gen_bitmap_floor.js';
 import GenBitmapCeilingClass from '../../generate/bitmap/gen_bitmap_ceiling.js';
 import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
@@ -11,7 +16,7 @@ import GenBitmapWoodClass from '../../generate/bitmap/gen_bitmap_wood.js';
 import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
 import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
-import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_machine.js';
+import GenBitmapComputerClass from '../../generate/bitmap/gen_bitmap_computer.js';
 import GenBitmapGlassClass from '../../generate/bitmap/gen_bitmap_glass.js';
 import GenBitmapGooClass from '../../generate/bitmap/gen_bitmap_goo.js';
 import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
@@ -104,7 +109,12 @@ export default class DebugRunClass
     {
         let idx=0;
         
-        this.list.push(new DebugItemClass('Wall',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapWallClass(this.view),false));
+        this.list.push(new DebugItemClass('Brick',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapBrickClass(this.view),false));
+        this.list.push(new DebugItemClass('Stone',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapStoneClass(this.view),false));
+        this.list.push(new DebugItemClass('Block',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapBlockClass(this.view),false));
+        this.list.push(new DebugItemClass('Plaster',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapPlasterClass(this.view),false));
+        this.list.push(new DebugItemClass('Tile',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapTileClass(this.view),false));
+        this.list.push(new DebugItemClass('Scifi',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapScifiClass(this.view),false));
         this.list.push(new DebugItemClass('Floor',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapFloorClass(this.view),false));
         this.list.push(new DebugItemClass('Ceiling',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapCeilingClass(this.view),false));
         this.list.push(new DebugItemClass('Door',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapDoorClass(this.view),false));
@@ -113,7 +123,7 @@ export default class DebugRunClass
         this.list.push(new DebugItemClass('Panel',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapPanelClass(this.view),false));
         this.list.push(new DebugItemClass('Pipe',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapPipeClass(this.view),false));
         this.list.push(new DebugItemClass('Liquid',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapLiquidClass(this.view),false));
-        this.list.push(new DebugItemClass('Machine',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMachineClass(this.view),false));
+        this.list.push(new DebugItemClass('Computer',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapComputerClass(this.view),false));
         this.list.push(new DebugItemClass('Glass',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGlassClass(this.view),false));
         this.list.push(new DebugItemClass('Goo',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGooClass(this.view),false));
         this.list.push(new DebugItemClass('Particle',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapParticleClass(this.view),false));

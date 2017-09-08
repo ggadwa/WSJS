@@ -9,10 +9,12 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomDecorationCubicalClass
 {
-    constructor(view,map)
+    constructor(view,map,platformBitmap)
     {
         this.view=view;
         this.map=map;
+        
+        this.platformBitmap=platformBitmap;
         
         Object.seal(this);
     }
@@ -88,7 +90,6 @@ export default class GenRoomDecorationCubicalClass
     create(room,rect)
     {
         let wid,yBound;
-        let bitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
         
             // get width
             
@@ -105,7 +106,7 @@ export default class GenRoomDecorationCubicalClass
         
         yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(rect.lft,rect.top);
             
-        this.addCubicalWall(room,bitmap,rect,wid,yBound);
+        this.addCubicalWall(room,this.platformBitmap,rect,wid,yBound);
     }
 
 }

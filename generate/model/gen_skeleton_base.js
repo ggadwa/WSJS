@@ -300,8 +300,9 @@ export default class GenSkeletonBaseClass
         // general body for human
         //
         
-    buildBody(minHipHigh,extraHipHigh,minBodyHigh,extraBodyHigh,minRadius,extraRadius,waistReduce)
+    buildBody(minHipHigh,extraHipHigh,minBodyHigh,extraBodyHigh,minRadius,extraRadius,waistReduce,hasHunch)
     {
+        let hipPnt,waistPnt,torsoPnt,topTorsoPnt,hunchAng;
         let bodyLimb,bodyLimbIdx;
         let bodyHigh,hipHigh,waistHigh,torsoHigh,torsoTopHigh;
         let baseBoneIdx,hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx;
@@ -317,16 +318,30 @@ export default class GenSkeletonBaseClass
         torsoHigh=waistHigh+Math.trunc(bodyHigh*0.33);
         torsoTopHigh=torsoHigh+Math.trunc(bodyHigh*0.33);
         
+            // random hunch
+        
+        hunchAng=-genRandom.randomFloat(0.0,70.0);
+        
             // the base bone
             
         baseBoneIdx=bones.push(new ModelBoneClass('Base',-1,new PointClass(0,0,0)))-1;
 
             // the spine
-            
-        hipBoneIdx=bones.push(new ModelBoneClass('Hip',baseBoneIdx,new PointClass(0,-hipHigh,0)))-1;
-        waistBoneIdx=bones.push(new ModelBoneClass('Waist',hipBoneIdx,new PointClass(0,-waistHigh,0)))-1;
-        torsoBoneIdx=bones.push(new ModelBoneClass('Torso',waistBoneIdx,new PointClass(0,-torsoHigh,0)))-1;
-        torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso_Top',torsoBoneIdx,new PointClass(0,-torsoTopHigh,0)))-1;
+        
+        hipPnt=new PointClass(0,-hipHigh,0);
+        hipBoneIdx=bones.push(new ModelBoneClass('Hip',baseBoneIdx,hipPnt))-1;
+        
+        waistPnt=new PointClass(0,-waistHigh,hipPnt.z);
+        if (hasHunch) waistPnt.rotateX(hipPnt,(hunchAng*genRandom.randomFloat(0.5,0.05)));
+        waistBoneIdx=bones.push(new ModelBoneClass('Waist',hipBoneIdx,waistPnt))-1;
+        
+        torsoPnt=new PointClass(0,-torsoHigh,waistPnt.z);
+        if (hasHunch) torsoPnt.rotateX(waistPnt,(hunchAng*genRandom.randomFloat(0.7,0.05)));
+        torsoBoneIdx=bones.push(new ModelBoneClass('Torso',waistBoneIdx,torsoPnt))-1;
+        
+        topTorsoPnt=new PointClass(0,-torsoTopHigh,torsoPnt.z);
+        if (hasHunch) topTorsoPnt.rotateX(torsoPnt,(hunchAng*genRandom.randomFloat(0.9,0.05)));
+        torsoTopBoneIdx=bones.push(new ModelBoneClass('Torso_Top',torsoBoneIdx,topTorsoPnt))-1;
         
         bones[hipBoneIdx].gravityLockDistance=Math.trunc(genRandom.randomInt(minRadius,extraRadius)*this.sizeFactor);
         bones[waistBoneIdx].gravityLockDistance=Math.trunc((genRandom.randomInt(minRadius,extraRadius)*waistReduce)*this.sizeFactor);
@@ -337,8 +352,6 @@ export default class GenSkeletonBaseClass
             
         bodyLimb=new ModelLimbClass(constants.LIMB_TYPE_BODY,0,constants.LIMB_AXIS_Y,12,12,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
         bodyLimbIdx=skeleton.limbs.push(bodyLimb)-1;
-        
-        bodyLimb.hunchAngle=genRandom.randomInt(0,20);
         
         return(bodyLimbIdx);
     }

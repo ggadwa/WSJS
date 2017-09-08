@@ -31,7 +31,7 @@ export default class MapParticleListClass
     initialize()
     {
         let n,particle;
-        let genBitmapParticle;
+        let genBitmap;
 
             // create the shader
             
@@ -49,8 +49,8 @@ export default class MapParticleListClass
         
             // construct a particle bitmap
             
-        genBitmapParticle=new GenBitmapParticleClass(this.view);  
-        this.particleBitmap=genBitmapParticle.generate(genBitmapParticle.TYPE_OVAL,false);
+        genBitmap=new GenBitmapParticleClass(this.view);  
+        this.particleBitmap=genBitmap.generate(false);
        
         return(true);
     }

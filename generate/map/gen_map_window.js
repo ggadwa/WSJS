@@ -12,10 +12,12 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomWindowClass
 {
-    constructor(view,map)
+    constructor(view,map,wallBitmap,frameBitmap)
     {
         this.view=view;
         this.map=map;
+        this.wallBitmap=wallBitmap;
+        this.frameBitmap=frameBitmap;
         
         Object.seal(this);
     }
@@ -26,7 +28,6 @@ export default class GenRoomWindowClass
     {
         let n,idx;
         let vertexList,indexes;
-        let bitmap,frameBitmap;
 
             // center point for normal creation
             
@@ -34,8 +35,6 @@ export default class GenRoomWindowClass
 
             // the inside walls
             
-        bitmap=this.map.getTexture(constants.BITMAP_TYPE_WALL);
-
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(30);
             
@@ -98,27 +97,25 @@ export default class GenRoomWindowClass
         }
         
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,centerPoint,true);
-        MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
+        MeshUtilityClass.buildVertexListUVs(this.wallBitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        this.map.meshList.add(new MapMeshClass(this.view,this.wallBitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // the window casing
             
-        frameBitmap=this.map.getTexture(constants.BITMAP_TYPE_FRAME);
-        
         switch (connectSide) {
             case constants.ROOM_SIDE_LEFT:
-                this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,frameBitmap,xBound,yBound,zBound,false,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.frameBitmap,xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_RIGHT:
-                this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,frameBitmap,xBound,yBound,zBound,true,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.frameBitmap,xBound,yBound,zBound,true,true,false));
                 break;
             case constants.ROOM_SIDE_TOP:
-                this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zBound,false,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,this.frameBitmap,xBound,yBound,zBound,false,true,false));
                 break;
             case constants.ROOM_SIDE_BOTTOM:
-                this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,frameBitmap,xBound,yBound,zBound,true,true,false));
+                this.map.meshList.add(MeshPrimitivesClass.createFrameZ(this.view,this.frameBitmap,xBound,yBound,zBound,true,true,false));
                 break;
         }
     }
