@@ -20,55 +20,50 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
     
     generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,x,offset;
-        let streakWid,streakColor,darken;
+        let lft,rgt,top,bot;
+        let indentCount,sz;
 
             // some random values
 
-        let metalColor=this.getDefaultPrimaryColor();
+        let metalColor=this.getRandomMetalColor();
 
         let edgeSize=genRandom.randomInt(4,8);
-        let innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;
+        let screwSize=genRandom.randomInt(15,20);
+        let screwInnerSize=Math.trunc(screwSize*0.4);
         
-        let screwSize=genRandom.randomInt(10,20);
-        let screenFlatInnerSize=Math.trunc(screwSize*0.4);
-        
-        let streakCount=genRandom.randomInt(15,10);
         let screwColor=this.boostColor(metalColor,0.05);
         
             // clear canvases
 
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         
-            // the plate
-            
-        this.draw3DRect(bitmapCTX,normalCTX,0,0,wid,high,edgeSize,metalColor,true);
+        lft=0;
+        top=0;
+        rgt=wid;
+        bot=high;
         
-            // possible streaks
+        indentCount=0;
         
-        if (genRandom.randomPercentage(0.5)) {
-            for (n=0;n!==streakCount;n++) {
-                streakWid=genRandom.randomInt(10,40);
-                x=edgeSize+genRandom.randomInBetween(streakWid,((wid-streakWid)-(edgeSize*2)));
+        while (indentCount<2) {
+        
+                // the plate, streaks, and screws
 
-                darken=0.5+(genRandom.random()*0.5);
-                streakColor=this.darkenColor(metalColor,darken);
-
-                this.drawStreakMetal(bitmapCTX,wid,high,x,edgeSize,(high-edgeSize),streakWid,streakColor);
-            }
-        }
-        
-            // possible screws
+            this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,metalColor,genRandom.randomPercentage(0.5));
+            this.generateMetalStreakShine(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),wid,high,metalColor);
+            this.generateMetalScrewsRandom(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),screwColor,screwSize,screwInnerSize);
             
-        if (genRandom.randomPercentage(0.5)) {
-            offset=edgeSize+4;
+                // go in more?
+                
+            if (genRandom.randomPercentage(0.7)) break;
             
-            this.draw3DOval(bitmapCTX,normalCTX,offset,offset,(offset+screwSize),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,offset,((high-offset)-screwSize),(offset+screwSize),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),offset,(wid-offset),(offset+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((wid-offset)-screwSize),((high-offset)-screwSize),(wid-offset),(high-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            sz=genRandom.randomInt(((screwSize*2)+10),((screwSize*2)+10));
             
-            innerEdgeSize+=screwSize;
+            lft+=sz;
+            rgt-=sz;
+            top+=sz;
+            bot-=sz;
+            
+            indentCount++;
         }
         
             // finish with the specular
@@ -83,7 +78,6 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
     generate(inDebug)
     {
         let wid,high;
-        let shineFactor=1.0;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
             // setup the canvas
@@ -114,14 +108,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
 
             // create the bitmap
 
-        switch (genRandom.randomIndex(1)) {
-
-            case 0:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=15.0;
-                break;
-
-        }
+        this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
 
             // debug just displays the canvases, so send
             // them back
@@ -131,7 +118,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],15.0));    
     }
 
 }

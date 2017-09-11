@@ -19,22 +19,6 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         // wood bitmaps
         //
 
-    generateWoodDrawBoard(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,woodColor)
-    {
-        let col;
-        
-        col=this.darkenColor(woodColor,genRandom.randomFloat(0.8,0.2));
-        
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
-        if ((bot-top)>(rgt-lft)) {
-            this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
-        }
-        else {
-            this.drawColorStripeHorizontal(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
-        }
-        this.addNoiseRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
-    }
-    
     generateWood(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         let n,y,lft,rgt,top,bot;
@@ -46,7 +30,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         let boardCount=genRandom.randomInt(4,8);
         let boardSize=Math.trunc(wid/boardCount);
         let edgeSize=genRandom.randomInt(3,3);
-        let woodColor=new ColorClass(genRandom.randomFloat(0.6,0.2),genRandom.randomFloat(0.3,0.2),0.0);
+        let woodColor=this.getRandomWoodColor();
 
             // clear canvases
 

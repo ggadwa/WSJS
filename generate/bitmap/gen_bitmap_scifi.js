@@ -151,7 +151,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
 
             // some random values
 
-        let metalColor=this.getDefaultPrimaryColor();
+        let metalColor=this.getRandomMetalColor();
         let darkMetalColor=this.darkenColor(metalColor,0.8);
         let shutterColor=this.getRandomColor();
 

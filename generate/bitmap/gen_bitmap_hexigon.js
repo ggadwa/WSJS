@@ -3,70 +3,60 @@ import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
-// generate pipe bitmap class
+// generate hexigon bitmap class
 //
 
-export default class GenBitmapPipeClass extends GenBitmapBaseClass
+export default class GenBitmapHexigonClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
         super(view);
         Object.seal(this);
     }
-            
-        //
-        // pipe bitmaps
-        //
     
-    generatePipe(bitmapCTX,normalCTX,specularCTX,wid,high)
+        //
+        // hexagonal
+        //
+        
+    generateHexagonal(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,y,yAdd,metalColor;
-        let lineCount,lineColor;
-        let screwSize,screwInnerSize,screwColor;
+        let color,edgeColor,edgeSize;
+        let xCount,yCount,xSize,ySize;
+        let x,y,lft,top;
 
-            // some random values
-
-        metalColor=this.getRandomColor();
-        this.drawRect(bitmapCTX,0,0,wid,high,metalColor);
-        
-            // clear canvases
-
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
-        
-            // possible streaks
-        
-        this.generateMetalStreakShine(bitmapCTX,0,0,wid,high,wid,high,metalColor);
-        
-            // possible segments
+            // colors
             
-        if (genRandom.randomPercentage(0.5)) {
-            lineCount=genRandom.randomInt(1,8);
+        color=this.getDefaultPrimaryColor();
+        edgeColor=this.darkenColor(color,0.8);
+        
+            // sizing
+        
+        edgeSize=genRandom.randomInt(2,3);
+        xCount=2+(2*genRandom.randomInt(0,2));
+        yCount=2+(2*genRandom.randomInt(0,5));
+        
+        xSize=Math.trunc(wid/xCount);
+        ySize=Math.trunc(high/yCount);
+        
+        top=-Math.trunc(ySize/2);
+        
+        for (y=0;y<=(yCount*2);y++) {
             
-            lineColor=this.darkenColor(metalColor,0.7);
+            lft=((y%2)===0)?0:xSize;
             
-            yAdd=(high/lineCount);
-            y=Math.trunc((high-(yAdd*lineCount))*0.5);
-            
-            for (n=0;n!==lineCount;n++) {
-                this.drawLine(bitmapCTX,normalCTX,0,y,wid,y,lineColor,false);
-                y+=yAdd;
+            for (x=0;x<=xCount;x+=2) {
+                this.draw3DHexagon(bitmapCTX,normalCTX,wid,high,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
+                lft+=(xSize*2);
             }
-        }
-        
-            // possible screws (in line)
             
-        if (genRandom.randomPercentage(0.5)) {
-            screwSize=genRandom.randomInt(15,30);
-            screwInnerSize=Math.trunc(screwSize*0.4);
-            screwColor=this.boostColor(metalColor,0.05);
-            this.generateMetalScrewsVertical(bitmapCTX,normalCTX,0,0,wid,high,screwColor,screwSize,screwInnerSize);
+            top+=(ySize/2);
         }
         
             // finish with the specular
 
         this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
     }
-            
+
         //
         // generate mainline
         //
@@ -104,7 +94,7 @@ export default class GenBitmapPipeClass extends GenBitmapBaseClass
 
             // create the bitmap
 
-        this.generatePipe(bitmapCTX,normalCTX,specularCTX,wid,high);
+        this.generateHexagonal(bitmapCTX,normalCTX,specularCTX,wid,high);
 
             // debug just displays the canvases, so send
             // them back
@@ -114,7 +104,7 @@ export default class GenBitmapPipeClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],15.0));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],8.0));    
     }
 
 }

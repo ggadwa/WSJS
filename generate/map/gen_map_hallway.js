@@ -13,7 +13,7 @@ import MovementClass from '../../code/map/movement.js';
 
 export default class GenRoomHallwayClass
 {
-    constructor(view,map,wallBitmap,floorBitmap,ceilingBitmap,frameBitmap)
+    constructor(view,map,wallBitmap,floorBitmap,ceilingBitmap,frameBitmap,doorBitmap)
     {
         this.view=view;
         this.map=map;
@@ -22,6 +22,7 @@ export default class GenRoomHallwayClass
         this.floorBitmap=floorBitmap;
         this.ceilingBitmap=ceilingBitmap;
         this.frameBitmap=frameBitmap;
+        this.doorBitmap=doorBitmap;
         
         Object.seal(this);
     }
@@ -115,7 +116,6 @@ export default class GenRoomHallwayClass
     {
         let idx,meshIdx,xDoorBound;
         let vertexList,movement;
-        let doorBitmap=this.map.getTexture(constants.BITMAP_TYPE_DOOR);
         
         xDoorBound=new BoundClass((x-thickSize),(x+thickSize));
             
@@ -125,7 +125,7 @@ export default class GenRoomHallwayClass
         idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zBound);
         idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zBound);
         this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zBound);
-        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
+        meshIdx=this.finishMesh(this.doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
         
         this.map.overlay.addDoor(xDoorBound,zBound);
         
@@ -216,7 +216,6 @@ export default class GenRoomHallwayClass
     {
         let idx,meshIdx,zDoorBound;
         let vertexList,movement;
-        let doorBitmap=this.map.getTexture(constants.BITMAP_TYPE_DOOR);
         
         zDoorBound=new BoundClass((z-thickSize),(z+thickSize));
         
@@ -226,7 +225,7 @@ export default class GenRoomHallwayClass
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z-thickSize));
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z+thickSize));
         this.createSingleCeilingZ(idx,vertexList,xBound,yBound.max,zDoorBound);
-        meshIdx=this.finishMesh(doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
+        meshIdx=this.finishMesh(this.doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
         
         this.map.overlay.addDoor(xBound,zDoorBound);
         

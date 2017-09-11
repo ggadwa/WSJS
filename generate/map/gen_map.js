@@ -25,6 +25,11 @@ import GenBitmapPlasterClass from '../../generate/bitmap/gen_bitmap_plaster.js';
 import GenBitmapScifiClass from '../../generate/bitmap/gen_bitmap_scifi.js';
 import GenBitmapTileClass from '../../generate/bitmap/gen_bitmap_tile.js';
 import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
+import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
+import GenBitmapCementClass from '../../generate/bitmap/gen_bitmap_cement.js';
+import GenBitmapGrateClass from '../../generate/bitmap/gen_bitmap_grate.js';
+import GenBitmapHexigonClass from '../../generate/bitmap/gen_bitmap_hexigon.js';
+import GenBitmapMosaicClass from '../../generate/bitmap/gen_bitmap_mosaic.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -106,7 +111,7 @@ export default class GenMapClass
     {
         let genBitmap;
         
-            // bitmaps
+            // wall bitmap
             
         switch(genRandom.randomIndex(5)) {
             case 0:
@@ -128,9 +133,34 @@ export default class GenMapClass
         
         this.wallBitmap=genBitmap.generate(false);
         
-        this.floorBitmap=this.map.getTexture(constants.BITMAP_TYPE_FLOOR);
+            // floor bitmap
+            
+        switch(genRandom.randomIndex(5)) {
+            case 0:
+                genBitmap=new GenBitmapTileClass(this.view);
+                break;
+            case 1:
+                genBitmap=new GenBitmapCementClass(this.view);
+                break;
+            case 2:
+                genBitmap=new GenBitmapGrateClass(this.view);
+                break;
+            case 3:
+                genBitmap=new GenBitmapHexigonClass(this.view);
+                break;
+            case 4:
+                genBitmap=new GenBitmapMosaicClass(this.view);
+                break;
+        }
+        
+        this.floorBitmap=genBitmap.generate(false);
+        
+            // ceiling bitmap
+            
         this.ceilingBitmap=this.map.getTexture(constants.BITMAP_TYPE_CEILING);
         
+            // platform bitmap
+            
         switch(genRandom.randomIndex(5)) {
             case 0:
                 genBitmap=new GenBitmapBrickClass(this.view);
@@ -151,6 +181,8 @@ export default class GenMapClass
         
         this.platformBitmap=genBitmap.generate(false);
         
+            // frame bitmap
+            
         switch(genRandom.randomIndex(3)) {
             case 0:
                 genBitmap=new GenBitmapBrickClass(this.view);
@@ -165,9 +197,14 @@ export default class GenMapClass
         
         this.frameBitmap=genBitmap.generate(false);
         
+            // door bitmap
+            
+        genBitmap=new GenBitmapDoorClass(this.view);
+        this.doorBitmap=genBitmap.generate(false);
+        
             // misc constructors
             
-        this.genRoomHallway=new GenRoomHallwayClass(this.view,this.map,this.wallBitmap,this.ceilingBitmap,this.floorBitmap,this.frameBitmap);
+        this.genRoomHallway=new GenRoomHallwayClass(this.view,this.map,this.wallBitmap,this.ceilingBitmap,this.floorBitmap,this.frameBitmap,this.doorBitmap);
         this.genRoomStairs=new GenRoomStairsClass(this.view,this.map,this.wallBitmap);
     }
     

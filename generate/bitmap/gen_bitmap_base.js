@@ -287,6 +287,24 @@ export default class GenBitmapBaseClass
         return(new ColorClass(col,col,col));
     }
     
+    getRandomWoodColor()
+    {
+        return(new ColorClass(genRandom.randomFloat(0.6,0.2),genRandom.randomFloat(0.3,0.2),0.0));
+    }
+    
+    getRandomMetalColor()
+    {
+        let f;
+        
+        if (genRandom.randomPercentage(0.5)) {      // blue-ish
+            f=genRandom.randomFloat(0.2,0.3);
+            return(new ColorClass(f,(f+0.4),1.0));
+        }
+        
+        f=genRandom.randomFloat(0.7,0.2);           // silver-ish
+        return(new ColorClass(f,f,(f+0.1)))
+    }
+    
     darkenColor(color,darkenFactor)
     {
         return(new ColorClass((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
@@ -1776,29 +1794,43 @@ export default class GenBitmapBaseClass
         let bitmapImgData,bitmapData;
         let normalImgData,normalData;
         let ringWid,ringWidSub,ringHigh,ringHighSub;
-
-            // get the image data
-            // note - particles always get the entire image
-            // because they might need to wrap around edges
-            
+        let listIdx,angList,sizeList;
+        
         if ((lft>=rgt) || (top>=bot)) return;
-
+        
         wid=rgt-lft;
         high=bot-top;
-
-        bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
-        bitmapData=bitmapImgData.data;
-
-        if (normalCTX!==null) {
-            normalImgData=normalCTX.getImageData(0,0,imgWid,imgHigh);
-            normalData=normalImgData.data;
+        
+            // again, horrible chrome bug forces us to
+            // run this as two separate writes because
+            // it like to mix up the bitmaps
+            
+        angList=new Float32Array(ringCount*pixelDensity);
+        sizeList=new Float32Array(ringCount*pixelDensity);
+        
+            // build the data
+        
+        listIdx=0;
+        
+        for (n=0;n!==ringCount;n++) {
+            for (k=0;k!==pixelDensity;k++) {
+                angList[listIdx]=(Math.PI*2.0)*genRandom.random();
+                sizeList[listIdx]=genRandom.random();
+                listIdx++;
+            }
         }
+        
             // get the center
             // remember this is a clip so
             // it always starts at 0,0
 
         mx=lft+Math.trunc(wid/2);
         my=top+Math.trunc(high/2);
+
+            // do the bitmap data first
+            
+        bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        bitmapData=bitmapImgData.data;
 
             // create the rings of
             // particles
@@ -1809,6 +1841,8 @@ export default class GenBitmapBaseClass
         ringHigh=high;
         ringHighSub=Math.trunc(high/(ringCount+1));
 
+        listIdx=0;
+        
         for (n=0;n!==ringCount;n++) {
 
                 // the density of each ring
@@ -1817,13 +1851,15 @@ export default class GenBitmapBaseClass
 
                     // get a random pixel
 
-                rad=(Math.PI*2.0)*genRandom.random();
+                rad=angList[listIdx];
                 fx=Math.sin(rad);
                 fy=Math.cos(rad);
 
-                fsz=genRandom.random();
+                fsz=sizeList[listIdx];
                 px=mx+Math.trunc((fsz*ringWid)*fx);
                 py=my-Math.trunc((fsz*ringHigh)*fy);
+                
+                listIdx++;
 
                     // this can wrap
 
@@ -1847,20 +1883,6 @@ export default class GenBitmapBaseClass
                 col=(bitmapData[idx+2]/255.0)*darkenFactor;
                 if (col>1.0) col=1.0;
                 bitmapData[idx+2]=Math.trunc(col*255.0);
-
-                    // get a normal for the pixel change
-
-                if (normalCTX!==null) {
-                    if (!flipNormals) {
-                        normalData[idx]=(fx+1.0)*127.0;
-                        normalData[idx+1]=(fy+1.0)*127.0;
-                    }
-                    else {
-                        normalData[idx]=(fy+1.0)*127.0;
-                        normalData[idx+1]=(fx+1.0)*127.0;
-                    }
-                    normalData[idx+2]=(0.5+1.0)*127.0;        // just so we remember that we are focing the Z back to top
-                }
             }
 
                 // next ring
@@ -1872,7 +1894,71 @@ export default class GenBitmapBaseClass
             // write all the data back
 
         bitmapCTX.putImageData(bitmapImgData,0,0);
-        if (normalCTX!==null) normalCTX.putImageData(normalImgData,0,0);
+        
+            // now the normal data
+            
+        if (normalCTX===null) return;
+            
+        normalImgData=normalCTX.getImageData(0,0,imgWid,imgHigh);
+        normalData=normalImgData.data;
+
+            // create the rings of
+            // particles
+
+        ringWid=wid;
+        ringHigh=high;
+
+        listIdx=0;
+        
+        for (n=0;n!==ringCount;n++) {
+
+                // the density of each ring
+
+            for (k=0;k!==pixelDensity;k++) {
+
+                    // get a random pixel
+
+                rad=angList[listIdx];
+                fx=Math.sin(rad);
+                fy=Math.cos(rad);
+
+                fsz=sizeList[listIdx];
+                px=mx+Math.trunc((fsz*ringWid)*fx);
+                py=my-Math.trunc((fsz*ringHigh)*fy);
+                
+                listIdx++;
+
+                    // this can wrap
+
+                if (px<0) px+=imgWid;
+                if (px>=imgWid) px-=imgWid;
+                if (py<0) py+=imgHigh;
+                if (py>=imgHigh) py-=imgHigh;
+
+                    // get a normal for the pixel change
+
+                idx=((py*imgWid)+px)*4;
+
+                if (!flipNormals) {
+                    normalData[idx]=(fx+1.0)*127.0;
+                    normalData[idx+1]=(fy+1.0)*127.0;
+                }
+                else {
+                    normalData[idx]=(fy+1.0)*127.0;
+                    normalData[idx+1]=(fx+1.0)*127.0;
+                }
+                normalData[idx+2]=(0.5+1.0)*127.0;        // just so we remember that we are focing the Z back to top
+            }
+
+                // next ring
+
+            ringWid-=ringWidSub;
+            ringHigh-=ringHighSub;
+        }
+
+            // write all the data back
+
+        normalCTX.putImageData(normalImgData,0,0);
     }
     
         //
@@ -1887,6 +1973,13 @@ export default class GenBitmapBaseClass
         
         if (top>=bot) return;
         if (streakWid<=0) return;
+        
+            // since we draw the streaks from both sides,
+            // we need to move the X into the middle and cut width in half
+            
+        streakWid=Math.trunc(streakWid*0.5);
+            
+        x+=streakWid;
         
             // get the image data
 
@@ -2253,6 +2346,157 @@ export default class GenBitmapBaseClass
         }
 
         normalCTX.putImageData(normalImgData,lft,top);
+    }
+    
+        //
+        // wood utilities
+        //
+        
+    generateWoodDrawBoard(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,woodColor)
+    {
+        let col;
+        
+        col=this.darkenColor(woodColor,genRandom.randomFloat(0.8,0.2));
+        
+        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
+        if ((bot-top)>(rgt-lft)) {
+            this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+        }
+        else {
+            this.drawColorStripeHorizontal(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+        }
+        this.addNoiseRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
+    }
+    
+        //
+        // metal utilities
+        //
+    
+    generateMetalStreakShine(bitmapCTX,lft,top,rgt,bot,wid,high,metalColor)
+    {
+        let x,streakWid,streakColor;
+        let lite=genRandom.randomPercentage(0.5); 
+        
+        x=lft;
+        
+        while (true) {
+            streakWid=genRandom.randomInt(20,50);
+            if ((x+streakWid)>rgt) streakWid=rgt-x;
+            
+                // small % are no streak
+                
+            if (genRandom.randomPercentage(0.9)) {
+                if (lite) {
+                    streakColor=this.lightenColor(metalColor,genRandom.randomFloat(0.05,0.1))
+                }
+                else {
+                    streakColor=this.darkenColor(metalColor,genRandom.randomFloat(0.5,0.5));
+                }
+                
+
+                this.drawStreakMetal(bitmapCTX,wid,high,x,top,bot,streakWid,streakColor);
+            }
+            
+            x+=(streakWid+genRandom.randomInt(15,30));
+            if (x>=rgt) break;
+        }
+        
+        this.blur(bitmapCTX,lft,top,rgt,bot,(lite?2:1),true);
+    }
+    
+    generateMetalScrewsRandom(bitmapCTX,normalCTX,lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
+    {
+        let         n,x,y,lx,rx,ty,by;
+        let         xCount,xOffset,yCount,yOffset;
+        
+        lx=lft+5;
+        rx=(rgt-5)-screwSize;
+        ty=top+5;
+        by=(bot-5)-screwSize;
+        
+        xCount=Math.trunc(((rgt-lft)/(screwSize+5)))-2;     // always avoid corners
+        xOffset=Math.trunc(((rgt-lft)-(xCount*(screwSize+5)))*0.5);
+        
+        yCount=Math.trunc(((bot-top)/(screwSize+5)))-2;
+        yOffset=Math.trunc(((bot-top)-(yCount*(screwSize+5)))*0.5);
+        
+            // corners
+
+        if (genRandom.randomPercentage(0.33)) {
+            this.draw3DOval(bitmapCTX,normalCTX,lx,ty,(lx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,rx,ty,(rx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,lx,by,(lx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(bitmapCTX,normalCTX,rx,by,(rx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            return;
+        }
+        
+            // left side
+            
+        if (genRandom.randomPercentage(0.33)) {
+            for (n=0;n!==yCount;n++) {
+                y=top+(yOffset+(n*(screwSize+5)));
+                this.draw3DOval(bitmapCTX,normalCTX,lx,y,(lx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            }
+        }
+        
+            // right side
+            
+        if (genRandom.randomPercentage(0.33)) {
+            for (n=0;n!==yCount;n++) {
+                y=top+(yOffset+(n*(screwSize+5)));
+                this.draw3DOval(bitmapCTX,normalCTX,rx,y,(rx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            }
+        }
+        
+            // top
+            
+        if (genRandom.randomPercentage(0.33)) {
+            for (n=0;n!==xCount;n++) {
+                x=lft+(xOffset+(n*(screwSize+5)));
+                this.draw3DOval(bitmapCTX,normalCTX,x,ty,(x+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            }
+        }
+        
+            // bottom
+            
+        if (genRandom.randomPercentage(0.33)) {
+            for (n=0;n!==xCount;n++) {
+                x=lft+(xOffset+(n*(screwSize+5)));
+                this.draw3DOval(bitmapCTX,normalCTX,x,by,(x+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            }
+        }
+    }
+    
+    generateMetalScrewsHorizontal(bitmapCTX,normalCTX,lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
+    {
+        let         n,x,y;
+        let         xCount,xOffset;
+        
+        y=Math.trunc(((top+bot)*0.5)-(screwSize*0.5));
+        
+        xCount=Math.trunc(((rgt-lft)/(screwSize+5)));
+        xOffset=Math.trunc(((rgt-lft)-(xCount*(screwSize+5)))*0.5);
+        
+        for (n=0;n!==xCount;n++) {
+            x=lft+(xOffset+(n*(screwSize+5)));
+            this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+        }
+    }
+    
+    generateMetalScrewsVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
+    {
+        let         n,x,y;
+        let         yCount,yOffset;
+        
+        x=Math.trunc(((lft+rgt)*0.5)-(screwSize*0.5));
+        
+        yCount=Math.trunc(((bot-top)/(screwSize+5)));
+        yOffset=Math.trunc(((bot-top)-(yCount*(screwSize+5)))*0.5);
+        
+        for (n=0;n!==yCount;n++) {
+            y=lft+(yOffset+(n*(screwSize+5)));
+            this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+        }
     }
     
         //
