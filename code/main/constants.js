@@ -90,35 +90,3 @@ export const LIMB_AXIS_Z=2;
     
 export const PARTICLE_MAX_COUNT=50;
 export const PARTICLE_MAX_POINTS=200;
-
-
-    // bitmap types
-            
-export const BITMAP_TYPE_WALL=0;
-export const BITMAP_TYPE_FLOOR=1;
-export const BITMAP_TYPE_CEILING=2;
-export const BITMAP_TYPE_DOOR=3;
-export const BITMAP_TYPE_METAL=4;
-export const BITMAP_TYPE_WOOD=5;
-export const BITMAP_TYPE_PANEL=6;
-export const BITMAP_TYPE_LIQUID=7;
-export const BITMAP_TYPE_MACHINE=8;
-export const BITMAP_TYPE_PLATFORM=9;
-export const BITMAP_TYPE_PIPE=10;
-export const BITMAP_TYPE_FRAME=11;
-export const BITMAP_TYPE_PILLAR=12;
-export const BITMAP_TYPE_GLASS=13;
-export const BITMAP_TYPE_GOO=14;
-export const BITMAP_TYPE_PARTICLE=15;
-export const BITMAP_TYPE_ITEM=16;
-export const BITMAP_TYPE_SKIN=17;
-export const BITMAP_TYPE_SKY=18;
-
-export const BITMAP_TYPE_NAMES=
-                [
-                    'Wall','Floor','Ceiling','Door','Metal',
-                    'Wood','Panel','Liquid','Machine',
-                    'Platform','Pipe','Frame','Pillar','Glass',
-                    'Goo','Particle','Item','Skin','Sky'
-                ];
-

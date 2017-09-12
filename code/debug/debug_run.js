@@ -12,7 +12,6 @@ import GenBitmapCementClass from '../../generate/bitmap/gen_bitmap_cement.js';
 import GenBitmapGrateClass from '../../generate/bitmap/gen_bitmap_grate.js';
 import GenBitmapHexigonClass from '../../generate/bitmap/gen_bitmap_hexigon.js';
 import GenBitmapMosaicClass from '../../generate/bitmap/gen_bitmap_mosaic.js';
-import GenBitmapCeilingClass from '../../generate/bitmap/gen_bitmap_ceiling.js';
 import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
 import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
 import GenBitmapWoodClass from '../../generate/bitmap/gen_bitmap_wood.js';
@@ -122,7 +121,6 @@ export default class DebugRunClass
         this.list.push(new DebugItemClass('Grate',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGrateClass(this.view),false));
         this.list.push(new DebugItemClass('Hexigon',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapHexigonClass(this.view),false));
         this.list.push(new DebugItemClass('Mosaic',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMosaicClass(this.view),false));
-        this.list.push(new DebugItemClass('Ceiling',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapCeilingClass(this.view),false));
         this.list.push(new DebugItemClass('Door',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapDoorClass(this.view),false));
         this.list.push(new DebugItemClass('Metal',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMetalClass(this.view),false));
         this.list.push(new DebugItemClass('Wood',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapWoodClass(this.view),false));

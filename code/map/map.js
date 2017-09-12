@@ -1,6 +1,5 @@
 import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 import MapRoomListClass from '../../code/map/map_room_list.js';
 import MapRoomClass from '../../code/map/map_room.js';
 import MapMeshListClass from '../../code/map/map_mesh_list.js';
@@ -35,9 +34,6 @@ export default class MapClass
         this.sky=new SkyClass(view,fileCache);
         this.particleList=new MapParticleListClass(view,fileCache);
         
-        this.genBitmap=new GenBitmapClass(view);
-        this.textureBitmaps=new Map();
-
         Object.seal(this);
     }
     
@@ -71,29 +67,6 @@ export default class MapClass
         this.sky.release();
     }
     
-        //
-        // textures
-        //
-    
-    releaseTextures()
-    {
-        for (let bitmap of this.textureBitmaps.values()) {
-            bitmap.close();
-        }
-        
-        this.textureBitmaps.clear();
-    }
-    
-    getTexture(bitmapType)
-    {
-        let bitmap=this.textureBitmaps.get(bitmapType);
-        if (bitmap!==undefined) return(bitmap);
-        
-        bitmap=this.genBitmap.generate(bitmapType,false);
-        this.textureBitmaps.set(bitmapType,bitmap);
-        
-        return(bitmap);
-    }
     
         //
         // clear map

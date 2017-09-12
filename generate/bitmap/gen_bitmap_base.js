@@ -18,7 +18,8 @@ export default class GenBitmapBaseClass
             
         this.BITMAP_MAP_TEXTURE_SIZE=512;
         this.BITMAP_MODEL_TEXTURE_SIZE=512;
-        this.BITMAP_SKY_TEXTURE_SIZE=512;
+        this.BITMAP_SKY_TEXTURE_WIDTH=2048;
+        this.BITMAP_SKY_TEXTURE_HEIGHT=1024;
         this.BITMAP_PARTICLE_TEXTURE_SIZE=64;
         
         this.BITMAP_STACKED_X_MIN_COUNT=1;

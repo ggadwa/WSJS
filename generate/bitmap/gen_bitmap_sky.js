@@ -21,11 +21,11 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
     
     generateClouds(bitmapCTX,lft,top,rgt,bot,cloudColor)
     {
-        let n,x,y,xsz,ysz;
+        let n,x,y,x2,xsz,ysz;
         let wid=rgt-lft;
         let high=bot-top;
         let quarterWid=Math.trunc(wid*0.25);
-        let quarterHigh=Math.trunc(high*0.25);
+        let quarterHigh=Math.trunc(high*0.175);
         
             // random clouds
             
@@ -33,39 +33,70 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
             xsz=genRandom.randomInt(quarterWid,quarterWid);
             ysz=genRandom.randomInt(quarterHigh,quarterHigh);
             
-            x=genRandom.randomInt(lft,(wid-xsz));
+            x=genRandom.randomInt(lft,wid)-Math.trunc(xsz*0.5);
             y=top-Math.trunc(ysz*0.5);
             
             this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            if (x<lft) {
+                x2=rgt+x;
+                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+            }
+            if ((x+xsz)>rgt) {
+                x2=lft-((x+xsz)-rgt);
+                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+            }
         }
-        
-            // side cloud to complete wrapping
-            
-        this.drawOval(bitmapCTX,(lft-20),(top-20),(lft+20),(top+20),cloudColor,null);
-        this.drawOval(bitmapCTX,(rgt-20),(top-20),(rgt+20),(top+20),cloudColor,null);
     }
     
-    generateMountainsBuildRange(top,bot,yPercStart,rangeCount,rangeSize)
+    generateMountainsBuildRange(top,bot,rangeCount,rangeSize)
     {
-        let n,yStart;
-        let high=bot-top;
-        let rangeY=[];
+        let n,y,halfCount;
+        let midY,midDir,midCount;
+        let rangeY;
         
-        yStart=high-Math.trunc(high*yPercStart);
+            // we only do half the range,
+            // and reverse for the other half so
+            // they match up
+            
+        halfCount=Math.trunc(rangeCount*0.5);
+                
+            // remember the mid point and we either
+            // favore going down or up if we pass it
+            
+        midY=Math.trunc((top+bot)*0.5);
+        midDir=0;
+        midCount=0;
 
-        for (n=0;n<(rangeCount-1);n++) {
-            rangeY.push(yStart+genRandom.randomInt(0,rangeSize));
-        }
+            // create the range
         
-        rangeY.push(yStart);
+        y=midY;
+        rangeY=new Int16Array(rangeCount);
+
+        for (n=0;n!=halfCount;n++) {
+            rangeY[n]=y;
+            rangeY[rangeCount-n]=y;
+            
+            if (midCount<=0) {
+                midCount=genRandom.randomIndex(50);
+                midDir=(y>midY)?-1:1;
+            }
+            
+            if (midDir<0) {
+                y+=(2-genRandom.randomIndex(rangeSize));
+            }
+            else {
+                y+=((rangeSize-2)-genRandom.randomIndex(rangeSize));
+            }
+            
+            midCount--;
+        }
     
         return(rangeY);
     }
     
-    generateMountainsDraw(bitmapCTX,lft,top,rgt,bot,rangeY,yOffset,lineDepth,col)
+    generateMountainsDraw(bitmapCTX,lft,top,rgt,bot,rangeY,col)
     {
-        let x,y,idx;
-        let xSize,prevX,nextX,prevY,nextY,slopeY,rangeIdx;
+        let x,y,idx,rangeIdx;
         let wid=rgt-lft;
         let high=bot-top;
         let bitmapImgData,bitmapData;
@@ -75,52 +106,19 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         
             // run through the ranges
             
-        xSize=Math.trunc(wid/(rangeY.length+1));
-        nextX=0;
-        
-        nextY=rangeY[0];
-        
         rangeIdx=0;
 
-        for (x=0;x!==wid;x++) {
-            
-                // time for new slope
+        for (x=lft;x!==rgt;x++) {
                 
-            if (x===nextX) {
-                prevX=nextX;
-                nextX=prevX+xSize;
-                
-                prevY=nextY;
-                
-                if (rangeY.length>rangeIdx) {
-                    nextY=rangeY[rangeIdx];
-                    rangeIdx++;
-                }
-                else {
-                    nextY=rangeY[0];
-                }
-            }
-            
-                // get the Y for the slope
-
-            slopeY=(prevY+Math.trunc((nextY-prevY)*((x-prevX)/xSize)))+yOffset;
-            
-                // draw the line
-                
-            for (y=slopeY;y<bot;y++) {
+            for (y=rangeY[rangeIdx];y<bot;y++) {
                 idx=((y*wid)+x)*4;
                 
-                if ((y-slopeY)<lineDepth) {
-                    bitmapData[idx]=0;
-                    bitmapData[idx+1]=0;
-                    bitmapData[idx+2]=0;
-                    continue;
-                }
-
                 bitmapData[idx]=Math.trunc(col.r*255.0);
                 bitmapData[idx+1]=Math.trunc(col.g*255.0);
                 bitmapData[idx+2]=Math.trunc(col.b*255.0);
             }
+            
+            rangeIdx++;
         }
         
         bitmapCTX.putImageData(bitmapImgData,lft,top);
@@ -128,33 +126,34 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
 
     generateSkyClouds(bitmapCTX,wid,high)
     {
+        let qx=Math.trunc(wid*0.25);
         let mx=Math.trunc(wid*0.5);
         let my=Math.trunc(high*0.5);
         let rangeY;
         
-        let cloudColor=this.getRandomColor();//new ColorClass(1,1,1);
-        let skyColor=this.getRandomColor();//new ColorClass(0.1,0.95,1.0)
-        let mountainColor=this.getRandomColor();//new ColorClass(0.65,0.35,0.0);
-        let groundColor=this.darkenColor(mountainColor,0.8);
-        
-        this.drawRect(bitmapCTX,0,0,wid,high,cloudColor);
+        let cloudColor=new ColorClass(1,1,1);
+        let skyColor=new ColorClass(0.1,0.95,1.0);
+        let mountainColor=new ColorClass(0.65,0.35,0.0);
+        let groundColor=new ColorClass(0.1,1.0,0.1);
         
             // side
             
-        this.drawVerticalGradient(bitmapCTX,0,my,wid,high,skyColor,this.darkenColor(skyColor,0.5));
-        this.generateClouds(bitmapCTX,0,my,wid,high,cloudColor);
+        this.drawVerticalGradient(bitmapCTX,0,0,wid,my,skyColor,this.darkenColor(skyColor,0.5));
+        this.generateClouds(bitmapCTX,0,0,wid,my,cloudColor);
         this.blur(bitmapCTX,0,my,wid,high,3,true);
         
-        rangeY=this.generateMountainsBuildRange(my,high,0.5,genRandom.randomInt(20,10),30);
-        this.generateMountainsDraw(bitmapCTX,0,my,wid,high,rangeY,0,3,mountainColor);
+        rangeY=this.generateMountainsBuildRange(0,Math.trunc(my*0.75),wid,8);
+        this.generateMountainsDraw(bitmapCTX,0,0,wid,my,rangeY,this.darkenColor(mountainColor,0.8));
         
-        rangeY=this.generateMountainsBuildRange(my,high,0.35,genRandom.randomInt(15,5),20);
-        this.generateMountainsDraw(bitmapCTX,0,my,wid,high,rangeY,0,3,groundColor);
+        rangeY=this.generateMountainsBuildRange(Math.trunc(my*0.25),my,wid,5);
+        this.generateMountainsDraw(bitmapCTX,0,0,wid,my,rangeY,mountainColor);
+        
+        this.drawVerticalGradient(bitmapCTX,0,Math.trunc(my*0.9),wid,my,this.darkenColor(groundColor,0.8),groundColor);
         
             // top and bottom
             
-        this.drawRect(bitmapCTX,0,0,mx,my,cloudColor);
-        this.drawRect(bitmapCTX,mx,0,wid,my,groundColor);
+        this.drawRect(bitmapCTX,0,my,qx,high,cloudColor);
+        this.drawRect(bitmapCTX,qx,my,mx,high,groundColor);
     }
 
         //
@@ -169,8 +168,8 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
             // setup the canvas
 
         bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_SKY_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_SKY_TEXTURE_SIZE;
+        bitmapCanvas.width=this.BITMAP_SKY_TEXTURE_WIDTH;
+        bitmapCanvas.height=this.BITMAP_SKY_TEXTURE_HEIGHT;
         bitmapCTX=bitmapCanvas.getContext('2d');
 
         wid=bitmapCanvas.width;
@@ -178,13 +177,7 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
 
             // create the bitmap
 
-        switch (genRandom.randomIndex(1)) {
-
-            case 0:
-                this.generateSkyClouds(bitmapCTX,wid,high);
-                break;
-                
-        }
+        this.generateSkyClouds(bitmapCTX,wid,high);
 
             // debug just displays the canvases, so send
             // them back

@@ -38,24 +38,6 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
         this.generateMetalStreakShine(bitmapCTX,edgeSize,edgeSize,(wid-edgeSize),(high-edgeSize),wid,high,metalColor);
     }
     
-    generateDoorRunner(bitmapCTX,normalCTX,top,bot,wid,high)
-    {
-            // some random values
-
-        let metalColor=this.getRandomMetalColor();
-
-        let edgeSize=genRandom.randomInt(4,8);
-        let screwSize=genRandom.randomInt(15,((bot-top)-20));
-        let screwInnerSize=Math.trunc(screwSize*0.4);
-        let screwColor=this.boostColor(metalColor,0.05);
-        
-            // the runner plate with screws
-            
-        this.draw3DRect(bitmapCTX,normalCTX,0,top,wid,bot,edgeSize,metalColor,true);
-        this.generateMetalStreakShine(bitmapCTX,edgeSize,(top+edgeSize),(wid-edgeSize),(bot-edgeSize),wid,high,metalColor);
-        this.generateMetalScrewsHorizontal(bitmapCTX,normalCTX,edgeSize,top,(wid-edgeSize),bot,screwColor,screwSize,screwInnerSize);
-    }
-    
     generateDoorWoodBackground(bitmapCTX,normalCTX,wid,high)
     {
         let n,lft,rgt;
@@ -89,9 +71,18 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
         }
     }
     
+    generateDoorRunner(bitmapCTX,normalCTX,top,bot,wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor)
+    {
+        this.draw3DRect(bitmapCTX,normalCTX,0,top,wid,bot,edgeSize,metalColor,true);
+        this.generateMetalStreakShine(bitmapCTX,edgeSize,(top+edgeSize),(wid-edgeSize),(bot-edgeSize),wid,high,metalColor);
+        this.generateMetalScrewsHorizontal(bitmapCTX,normalCTX,edgeSize,top,(wid-edgeSize),bot,screwColor,screwSize,screwInnerSize);
+    }
+    
     generateDoor(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
         let runHigh,runMid,hadRun;
+        let edgeSize,screwSize,screwInnerSize,screwColor;
+        let metalColor=this.getRandomMetalColor();
         
         if (genRandom.randomPercentage(0.5)) {
             this.generateDoorWoodBackground(bitmapCTX,normalCTX,wid,high);
@@ -106,17 +97,22 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
         runHigh=genRandom.randomInt(Math.trunc(high*0.1),Math.trunc(high*0.05));
         runMid=Math.trunc((high*0.5)-(runHigh*0.5));
         
+        edgeSize=genRandom.randomInt(4,8);
+        screwSize=genRandom.randomInt(15,(runHigh-20));
+        screwInnerSize=Math.trunc(screwSize*0.4);
+        screwColor=this.boostColor(metalColor,0.05);
+        
         if (genRandom.randomPercentage(0.5)) {
             hadRun=true;
-            this.generateDoorRunner(bitmapCTX,normalCTX,0,runHigh,wid,high);
+            this.generateDoorRunner(bitmapCTX,normalCTX,0,runHigh,wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
         }
         
         if (genRandom.randomPercentage(0.5)) {
             hadRun=true;
-            this.generateDoorRunner(bitmapCTX,normalCTX,runMid,(runMid+runHigh),wid,high);
+            this.generateDoorRunner(bitmapCTX,normalCTX,runMid,(runMid+runHigh),wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
         }
         
-        if ((genRandom.randomPercentage(0.5)) || (!hadRun)) this.generateDoorRunner(bitmapCTX,normalCTX,(high-runHigh),high,wid,high);
+        if ((genRandom.randomPercentage(0.5)) || (!hadRun)) this.generateDoorRunner(bitmapCTX,normalCTX,(high-runHigh),high,wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
         
             // finish with the specular
 

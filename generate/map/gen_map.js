@@ -30,6 +30,8 @@ import GenBitmapCementClass from '../../generate/bitmap/gen_bitmap_cement.js';
 import GenBitmapGrateClass from '../../generate/bitmap/gen_bitmap_grate.js';
 import GenBitmapHexigonClass from '../../generate/bitmap/gen_bitmap_hexigon.js';
 import GenBitmapMosaicClass from '../../generate/bitmap/gen_bitmap_mosaic.js';
+import GenBitmapWoodClass from '../../generate/bitmap/gen_bitmap_wood.js';
+import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -62,6 +64,9 @@ export default class GenMapClass
         this.ceilingBitmap=null;
         this.platformBitmap=null;
         this.frameBitmap=null;
+        this.lightBitmap=null;
+        this.doorBitmap=null;
+        this.liquidBitmap=null;
         
         this.genRoomHallway=null;
         this.genRoomStairs=null;
@@ -157,7 +162,22 @@ export default class GenMapClass
         
             // ceiling bitmap
             
-        this.ceilingBitmap=this.map.getTexture(constants.BITMAP_TYPE_CEILING);
+        switch(genRandom.randomIndex(4)) {
+            case 0:
+                genBitmap=new GenBitmapTileClass(this.view);
+                break;
+            case 1:
+                genBitmap=new GenBitmapCementClass(this.view);
+                break;
+            case 2:
+                genBitmap=new GenBitmapMetalClass(this.view);
+                break;
+            case 3:
+                genBitmap=new GenBitmapWoodClass(this.view);
+                break;
+        }
+            
+        this.ceilingBitmap=genBitmap.generate(false);
         
             // platform bitmap
             
@@ -197,17 +217,22 @@ export default class GenMapClass
         
         this.frameBitmap=genBitmap.generate(false);
         
-            // door bitmap
+            // other misc bitmaps
+            
+        genBitmap=new GenBitmapMetalClass(this.view);
+        this.lightBitmap=genBitmap.generate(false);
             
         genBitmap=new GenBitmapDoorClass(this.view);
         this.doorBitmap=genBitmap.generate(false);
         
+        genBitmap=new GenBitmapLiquidClass(this.view);
+        this.liquidBitmap=genBitmap.generate(false);
+        
             // misc constructors
             
         this.genRoomHallway=new GenRoomHallwayClass(this.view,this.map,this.wallBitmap,this.ceilingBitmap,this.floorBitmap,this.frameBitmap,this.doorBitmap);
-        this.genRoomStairs=new GenRoomStairsClass(this.view,this.map,this.wallBitmap);
+        this.genRoomStairs=new GenRoomStairsClass(this.view,this.map,this.wallBitmap,this.platformBitmap);
     }
-    
 
         //
         // create rooms
@@ -272,7 +297,7 @@ export default class GenMapClass
         
             // the floor
             
-        room.createMeshFloor(this.map.getTexture(constants.BITMAP_TYPE_FLOOR));
+        room.createMeshFloor(this.floorBitmap);
 
             // walls
             // each wall is a tall piece and a short piece on top
@@ -295,7 +320,7 @@ export default class GenMapClass
         
             // the ceiling
         
-        room.createMeshCeiling(this.map.getTexture(constants.BITMAP_TYPE_CEILING));
+        room.createMeshCeiling(this.ceilingBitmap);
         
         return(roomIdx);
     }
@@ -337,7 +362,7 @@ export default class GenMapClass
             xFixtureBound=new BoundClass((fixturePos.x-400),(fixturePos.x+400));
             yFixtureBound=new BoundClass(fixturePos.y,(fixturePos.y+1000));
             zFixtureBound=new BoundClass((fixturePos.z-400),(fixturePos.z+400));
-            this.map.meshList.add(MeshPrimitivesClass.createMeshPryamid(this.view,this.map.getTexture(constants.BITMAP_TYPE_METAL),xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
+            this.map.meshList.add(MeshPrimitivesClass.createMeshPryamid(this.view,this.lightBitmap,xFixtureBound,yFixtureBound,zFixtureBound,rotAngle,constants.MESH_FLAG_LIGHT));
         }
         
             // the color
@@ -747,7 +772,7 @@ export default class GenMapClass
         
             // finally add the liquid
         
-        if (room.liquid) this.map.liquidList.add(new MapLiquidClass(this.view,this.map.getTexture(constants.BITMAP_TYPE_LIQUID),room));
+        if (room.liquid) this.map.liquidList.add(new MapLiquidClass(this.view,this.liquidBitmap,room));
         
             // mask off edges that have collided with
             // the newest room or stairs leading to a room

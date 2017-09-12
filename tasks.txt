@@ -15,11 +15,10 @@ ESNext
 
 
 --> metal band on door needs to be same metal color
---> remove wall/ceiling/floor type bitmaps, split into texture types
---> get rid of BITMAP_TYPE_*, then delete gen_bitmap
 --> get rid of default primary color
 --> make sky a 4x2 texture, make array for mountain heights, reverse on back half, draw random lines downwards
 --> stuff in genMap that can go to constants
+--> GenRoomLiftClass eventually delete
 
 --> need junction (box with wires or circuits)
 

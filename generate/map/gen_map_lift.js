@@ -10,10 +10,11 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenRoomLiftClass
 {
-    constructor(view,map)
+    constructor(view,map,liftBitmap)
     {
         this.view=view;
         this.map=map;
+        this.liftBitmap=liftBitmap;
         
         Object.seal(this);
     }
@@ -25,12 +26,11 @@ export default class GenRoomLiftClass
     addLiftChunk(room,x,yLiftBound,z)
     {
         let len,meshIdx,movement,moveMSec,waitMSec;
-        let liftBitmap=this.map.getTexture(constants.BITMAP_TYPE_METAL);
         
         let xLiftBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
         let zLiftBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
 
-        meshIdx=this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,constants.MESH_FLAG_LIFT));
+        meshIdx=this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.liftBitmap,xLiftBound,yLiftBound,zLiftBound,true,true,true,true,true,false,false,constants.MESH_FLAG_LIFT));
         
             // random wait
         

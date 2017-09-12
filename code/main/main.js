@@ -18,7 +18,6 @@ import GenSoundClass from '../../generate/sound/gen_sound.js';
 import GenAIClass from '../../generate/thing/gen_ai.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityMonsterClass from '../../code/entities/entity_monster.js';
-import GenBitmapClass from '../../generate/bitmap/gen_bitmap.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
