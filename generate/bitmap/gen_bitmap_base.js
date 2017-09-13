@@ -92,11 +92,6 @@ export default class GenBitmapBaseClass
                     [0.8,0.5,0.5]      // dull red
                 ];
                 
-            // we have a default primary color for every instance
-            // so things created with this have the same color scheme
-            
-        this.defaultPrimaryColorIdx=genRandom.randomInt(0,this.primaryColorList.length);
-
         // can't seal as this is a parent class
     }
     
@@ -266,14 +261,6 @@ export default class GenBitmapBaseClass
         // color routines
         //
 
-    getDefaultPrimaryColor()
-    {
-        let col=this.primaryColorList[this.defaultPrimaryColorIdx];
-        let darken=0.1-(genRandom.random()*0.2);
-        
-        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
-    }
-    
     getRandomColor()
     {
         let col=this.primaryColorList[genRandom.randomIndex(this.primaryColorList.length)];

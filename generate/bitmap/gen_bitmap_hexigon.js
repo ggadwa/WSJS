@@ -26,7 +26,7 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
 
             // colors
             
-        color=this.getDefaultPrimaryColor();
+        color=this.getRandomColor();
         edgeColor=this.darkenColor(color,0.8);
         
             // sizing

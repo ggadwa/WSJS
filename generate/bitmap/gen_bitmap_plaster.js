@@ -25,7 +25,7 @@ export default class GenBitmapPlasterClass extends GenBitmapBaseClass
 
             // some random values
 
-        let lineColorBase=this.getDefaultPrimaryColor();
+        let lineColorBase=this.getRandomColor();
         let plasterColor=this.dullColor(lineColorBase,0.8);
         let lineCount=genRandom.randomInt(50,50);
 

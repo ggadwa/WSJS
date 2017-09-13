@@ -52,7 +52,7 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
     generateGoo(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let n,x,y,x2,y2,radius,startColor,endColor;
-        let color=this.getDefaultPrimaryColor();
+        let color=this.getRandomColor();
         
         this.clearNormalsRect(normalCTX,0,0,wid,high);
         

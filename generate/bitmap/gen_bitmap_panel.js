@@ -142,15 +142,15 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
     generatePanel(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let offset=Math.trunc(wid*0.1);
-        let metalColor=this.getDefaultPrimaryColor();
+        let panelColor=this.getRandomColor();
         
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.draw3DRect(bitmapCTX,normalCTX,offset,0,wid,offset,8,metalColor,true);
-        this.draw3DRect(bitmapCTX,normalCTX,0,offset,offset,high,8,metalColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,offset,0,wid,offset,8,panelColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,0,offset,offset,high,8,panelColor,true);
         
-        this.draw3DRect(bitmapCTX,normalCTX,offset,offset,wid,high,8,metalColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,offset,offset,wid,high,8,panelColor,true);
        
             // the buttons
 

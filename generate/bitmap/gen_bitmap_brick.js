@@ -28,7 +28,7 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
         let edgeSize=genRandom.randomInt(3,7);
         let paddingSize=genRandom.randomInt(2,10);
         
-        let brickColor=this.getDefaultPrimaryColor();
+        let brickColor=this.getRandomColor();
         let groutColor=this.dullColor(brickColor,0.7);
         let dirtColor=this.darkenColor(brickColor,0.5);
         

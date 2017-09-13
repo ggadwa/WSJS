@@ -74,7 +74,7 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
 
         for (n=0;n!=halfCount;n++) {
             rangeY[n]=y;
-            rangeY[rangeCount-n]=y;
+            rangeY[(rangeCount-1)-n]=y;
             
             if (midCount<=0) {
                 midCount=genRandom.randomIndex(50);
@@ -150,6 +150,17 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         
         this.drawVerticalGradient(bitmapCTX,0,Math.trunc(my*0.9),wid,my,this.darkenColor(groundColor,0.8),groundColor);
         
+        /* supergumba -- testing so we can see if the sky cube is properly positioned
+        bitmapCTX.fillStyle='#FF0000';
+        bitmapCTX.fillRect(480,10,30,30);
+        bitmapCTX.fillStyle='#00FF00';
+        bitmapCTX.fillRect(992,10,30,30);
+        bitmapCTX.fillStyle='#0000FF';
+        bitmapCTX.fillRect(1504,10,30,30);
+        bitmapCTX.fillStyle='#FF00FF';
+        bitmapCTX.fillRect(2016,10,30,30);
+        */
+       
             // top and bottom
             
         this.drawRect(bitmapCTX,0,my,qx,high,cloudColor);

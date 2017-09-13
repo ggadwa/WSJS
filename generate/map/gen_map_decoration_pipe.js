@@ -4,6 +4,7 @@ import BoundClass from '../../code/utility/bound.js';
 import MapMeshClass from '../../code/map/map_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
+import GenRoomDecorationBaseClass from '../../generate/map/gen_map_decoration_base.js';
 import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -11,15 +12,13 @@ import genRandom from '../../generate/utility/random.js';
 // generate room pipe decoration class
 //
 
-export default class GenRoomDecorationPipeClass
+export default class GenRoomDecorationPipeClass extends GenRoomDecorationBaseClass
 {
     constructor(view,map,platformBitmap)
     {
         let genBitmap;
         
-        this.view=view;
-        this.map=map;
-        this.platformBitmap=platformBitmap;
+        super(view,map,platformBitmap);
         
         genBitmap=new GenBitmapPipeClass(this.view);
         this.pipeBitmap=genBitmap.generate(false);

@@ -118,7 +118,7 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
 
             // some random values
 
-        let metalColor=this.getDefaultPrimaryColor();
+        let metalColor=this.getRandomMetalColor();
         let wireColor=this.getRandomColor();
         let streakCount=genRandom.randomInt(15,10);
         

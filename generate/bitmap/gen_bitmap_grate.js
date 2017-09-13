@@ -30,7 +30,7 @@ export default class GenBitmapGrateClass extends GenBitmapBaseClass
 
             // some random values
 
-        let metalColor=this.getDefaultPrimaryColor();
+        let metalColor=this.getRandomMetalColor();
 
         let edgeSize=genRandom.randomInt(4,8);
         let innerEdgeSize=genRandom.randomInt(4,10)+edgeSize;

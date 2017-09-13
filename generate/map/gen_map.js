@@ -15,7 +15,7 @@ import GenRoomDecorationPillarClass from '../../generate/map/gen_map_decoration_
 import GenRoomDecorationStorageClass from '../../generate/map/gen_map_decoration_storage.js';
 import GenRoomDecorationComputerClass from '../../generate/map/gen_map_decoration_computer.js';
 import GenRoomDecorationPipeClass from '../../generate/map/gen_map_decoration_pipe.js';
-import GenRoomDecorationCubicalClass from '../../generate/map/gen_map_decoration_cubical.js';
+import GenRoomDecorationBlockClass from '../../generate/map/gen_map_decoration_block.js';
 import GenRoomDecorationLabClass from '../../generate/map/gen_map_decoration_lab.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import GenBitmapBrickClass from '../../generate/bitmap/gen_bitmap_brick.js';
@@ -882,14 +882,18 @@ export default class GenMapClass
     buildRoomDecorations()
     {
         let n,room,rects;
-        let k,nRect,decorationType;
+        let k,nRect,decorationObj;
         let pillar=new GenRoomDecorationPillarClass(this.view,this.map,this.platformBitmap);
-        let storage=new GenRoomDecorationStorageClass(this.view,this.map);
+        let storage=new GenRoomDecorationStorageClass(this.view,this.map,this.platformBitmap);
         let computer=new GenRoomDecorationComputerClass(this.view,this.map,this.platformBitmap);
         let pipe=new GenRoomDecorationPipeClass(this.view,this.map,this.platformBitmap);
-        let cubicle=new GenRoomDecorationCubicalClass(this.view,this.map,this.platformBitmap);
+        let block=new GenRoomDecorationBlockClass(this.view,this.map,this.platformBitmap);
         let lab=new GenRoomDecorationLabClass(this.view,this.map,this.platformBitmap);
         let nRoom=this.map.roomList.count();
+        
+        let upperList=[pillar,storage,computer,lab];
+        let normalList=[pillar,storage,computer,pipe,block,lab];
+        let lowerList=[pillar,storage,computer,lab];
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -911,37 +915,23 @@ export default class GenMapClass
                 if (!genRandom.randomPercentage(config.DECORATION_DENSTIY)) continue;
             
                     // pick a random dectoration
-                    
-                decorationType=genRandom.randomIndex(6);
-                //decorationType=constants.ROOM_DECORATION_LAB; // supergumba -- testing
-            
-                switch (decorationType) {
-                    case 0:
-                        pillar.create(room,rects[k]);
-                        room.blockGridForRect(rects[k]);
-                        break;
-                    case 1:
-                        storage.create(room,rects[k]);
-                        room.blockGridForRect(rects[k]);
-                        break;
-                    case 2:
-                        computer.create(room,rects[k]);
-                        room.blockGridForRect(rects[k]);
-                        break;
-                    case 3:
-                        pipe.create(room,rects[k]);
-                        room.blockGridForRect(rects[k]);
-                        break;
-                    case 4:
-                        cubicle.create(room,rects[k]);
-                        room.blockGridForRect(rects[k]);
-                        break;
-                    case 5:
-                        lab.create(room,rects[k]);
-                        room.blockGridForRect(rects[k]);
-                        break;
-
+                
+                if (room.level===constants.ROOM_LEVEL_HIGHER) {
+                    decorationObj=upperList[genRandom.randomIndex(upperList.length)];
                 }
+                else {
+                    if (room.level===constants.ROOM_LEVEL_LOWER) {
+                        decorationObj=lowerList[genRandom.randomIndex(lowerList.length)];
+                    }
+                    else {
+                        decorationObj=normalList[genRandom.randomIndex(normalList.length)];
+                    }
+                }
+
+                //decorationObj=block; // supergumba -- testing
+            
+                decorationObj.create(room,rects[k]);
+                room.blockGridForRect(rects[k]);
             }
         }
     }

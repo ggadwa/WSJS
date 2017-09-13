@@ -2,20 +2,17 @@ import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
+import GenRoomDecorationBaseClass from '../../generate/map/gen_map_decoration_base.js';
 
 //
-// generate room cubical decoration class
+// generate room block decoration class
 //
 
-export default class GenRoomDecorationCubicalClass
+export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseClass
 {
     constructor(view,map,platformBitmap)
     {
-        this.view=view;
-        this.map=map;
-        
-        this.platformBitmap=platformBitmap;
-        
+        super(view,map,platformBitmap);
         Object.seal(this);
     }
         

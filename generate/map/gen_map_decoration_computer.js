@@ -2,6 +2,7 @@ import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import genRandom from '../../generate/utility/random.js';
+import GenRoomDecorationBaseClass from '../../generate/map/gen_map_decoration_base.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
 import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
@@ -12,15 +13,13 @@ import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
 // generate room computer decoration class
 //
 
-export default class GenRoomDecorationComputerClass
+export default class GenRoomDecorationComputerClass extends GenRoomDecorationBaseClass
 {
     constructor(view,map,platformBitmap)
     {
         let genBitmap;
         
-        this.view=view;
-        this.map=map;
-        this.platformBitmap=platformBitmap;
+        super(view,map,platformBitmap);
         
             // bitmaps
             

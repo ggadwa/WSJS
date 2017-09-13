@@ -30,11 +30,11 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=1;
-        this.MONSTER_ENTITY_COUNT=5;
+        this.MONSTER_TYPE_COUNT=4;
+        this.MONSTER_ENTITY_COUNT=10;
         
         this.MONSTER_AI_ON=false;
-        this.MONSTER_BOSS=true;
+        this.MONSTER_BOSS=false;
         
             //
             // sounds

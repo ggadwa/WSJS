@@ -26,7 +26,7 @@ export default class GenBitmapCementClass extends GenBitmapBaseClass
 
             // some random values
 
-        concreteColor=this.getDefaultPrimaryColor();
+        concreteColor=this.getRandomGray(0.4,0.7);
         lineColor=this.darkenColor(concreteColor,0.95);
         line2Color=this.boostColor(concreteColor,0.05);
 

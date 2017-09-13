@@ -2,6 +2,7 @@ import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
+import GenRoomDecorationBaseClass from '../../generate/map/gen_map_decoration_base.js';
 import MoveClass from '../../code/map/move.js';
 import MovementClass from '../../code/map/movement.js';
 import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
@@ -15,15 +16,13 @@ import genRandom from '../../generate/utility/random.js';
 // generate room lab decoration class
 //
 
-export default class GenRoomDecorationLabClass
+export default class GenRoomDecorationLabClass extends GenRoomDecorationBaseClass
 {
     constructor(view,map,platformBitmap)
     {
         let genBitmap;
         
-        this.view=view;
-        this.map=map;
-        this.platformBitmap=platformBitmap;
+        super(view,map,platformBitmap);
         
         this.tubeHigh=constants.ROOM_FLOOR_HEIGHT;
         this.tubeCapHigh=genRandom.randomInt(constants.ROOM_FLOOR_DEPTH,Math.trunc(constants.ROOM_FLOOR_HEIGHT*0.25));

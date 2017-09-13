@@ -211,16 +211,16 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         let mx,my,sz,lft,top,rgt,bot,rndTry;
         let componentType,hadBlank,hadWires,hadShutter,rndSuccess;
         let offset=Math.trunc(wid*0.1);
-        let metalColor=this.getDefaultPrimaryColor();
-        let metalInsideColor=this.boostColor(metalColor,0.1);
+        let panelColor=this.getRandomColor();
+        let panelInsideColor=this.boostColor(panelColor,0.1);
        
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.draw3DRect(bitmapCTX,normalCTX,offset,0,wid,offset,8,metalColor,true);
-        this.draw3DRect(bitmapCTX,normalCTX,0,offset,offset,high,8,metalColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,offset,0,wid,offset,8,panelColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,0,offset,offset,high,8,panelColor,true);
         
-        this.draw3DRect(bitmapCTX,normalCTX,offset,offset,wid,high,8,metalColor,true);
+        this.draw3DRect(bitmapCTX,normalCTX,offset,offset,wid,high,8,panelColor,true);
         
             // inside components
             // these are stacks of vertical or horizontal chunks
@@ -261,7 +261,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 // box around components, can
                 // be randonly in or out
                 
-            this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,5,metalInsideColor,genRandom.randomPercentage(0.5));
+            this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,5,panelInsideColor,genRandom.randomPercentage(0.5));
             
                 // draw the components
                 // we only allow one blank, wires, or shutter

@@ -531,7 +531,7 @@ export default class ViewClass
 
     draw(map)
     {
-        let n,nEntity,entity;
+        let n;
         let light,tintOn,tintAtt;
         let weapon;
         let fpsStr,idx;

@@ -233,7 +233,7 @@ class MainClass
             return;
         }
 
-        playerEntity=new EntityPlayerClass(this.map,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
+        playerEntity=new EntityPlayerClass(this.view,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
         playerWeapon=genWeapon.generate();

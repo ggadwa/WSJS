@@ -26,7 +26,7 @@ export default class GenBitmapStoneClass extends GenBitmapBaseClass
 
             // some random values
 
-        let stoneColor=this.getDefaultPrimaryColor();
+        let stoneColor=this.getRandomColor();
         let groutColor=this.dullColor(stoneColor,0.7);
         let edgeColor=this.darkenColor(stoneColor,0.8);
         

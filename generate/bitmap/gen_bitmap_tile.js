@@ -122,7 +122,7 @@ export default class GenBitmapTileClass extends GenBitmapBaseClass
         }
         
         tileStyle=genRandom.randomIndex(3);
-        tileColor[0]=this.getDefaultPrimaryColor();
+        tileColor[0]=this.getRandomColor();
         tileColor[1]=this.darkenColor(tileColor[0],0.85);
 
             // clear canvas

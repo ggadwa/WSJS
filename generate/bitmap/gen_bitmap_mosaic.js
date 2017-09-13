@@ -30,7 +30,7 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
         borderSize=genRandom.randomInt(2,5);
         edgeSize=genRandom.randomInt(1,2);
         
-        borderColor=this.getDefaultPrimaryColor();
+        borderColor=this.getRandomColor();
         mortarColor=this.dullColor(borderColor,0.7);
         
         mosaicColor=this.getRandomColor();

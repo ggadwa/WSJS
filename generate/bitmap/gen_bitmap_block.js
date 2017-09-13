@@ -24,7 +24,7 @@ export default class GenBitmapBlockClass extends GenBitmapBaseClass
         let top,bot,ySize,slopeHigh;
         let sx,ex,streakWid;
         
-        let concreteColor=this.getDefaultPrimaryColor();
+        let concreteColor=this.getRandomColor();
         let concreteColor2=this.darkenColor(concreteColor,0.8);
         let dirtColor=this.darkenColor(concreteColor,0.5);
         
