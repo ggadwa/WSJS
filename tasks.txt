@@ -13,10 +13,11 @@ ESNext
 
 
 
+--> make some parts of the block only floor depth in height so you can go under it
 --> monster legs need to be on certain spots depending on hunch
 
 --> stuff in genMap that can go to constants
---> GenRoomLiftClass eventually delete
+--> storage needs smaller & bigger box random
 
 --> need junction (box with wires or circuits)
 
@@ -24,11 +25,8 @@ ESNext
 --> 3rd person view
 --> flatten human mesh
 --> sounds need to be same way
---> cubicals -> LiftBlocks
 
 --> need particle blob (use for explosions)
---> platform, pipe, frame, and pillar need their own texture creation
-
 --> models cast light
 
 
@@ -36,7 +34,7 @@ ESNext
 #### need meeles for monsters
 #### stairs need quads or blocks at top
 #### ai types (charge, sniper, etc)
-#### windows have different bar types
+#### windows have different bar types/glass
 #### only put closets in areas that have platforms to them?
 #### platforms not knocking out main map mesh walls?
 #### collisions against slanted walls are bad
