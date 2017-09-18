@@ -70,11 +70,16 @@ export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseCl
         let xBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
         let yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_HEIGHT),room.yBound.max);
         let zBound=new BoundClass((room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+((z+1)*constants.ROOM_BLOCK_WIDTH)));
+        let yAdd,bottom;
         
             // some random height changes
+        
+        yAdd=constants.ROOM_FLOOR_DEPTH; 
+        bottom=false;
             
         if (genRandom.randomPercentage(0.1)) {
             yBound.min-=constants.ROOM_FLOOR_DEPTH;
+            yAdd=constants.ROOM_FLOOR_DEPTH*3;
         }
         else {
             if (genRandom.randomPercentage(0.1)) {
@@ -82,7 +87,14 @@ export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseCl
             }  
         }
         
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,constants.MESH_FLAG_PLATFORM));
+            // some are pass under
+            
+        if (genRandom.randomPercentage(0.2)) {
+            yBound.max=yBound.min+yAdd;
+            bottom=true;
+        }
+        
+        this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,xBound,yBound,zBound,true,true,true,true,true,bottom,false,constants.MESH_FLAG_PLATFORM));
     }
     
         //
@@ -94,11 +106,14 @@ export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseCl
         let xBound,zBound;
 
         let x,z;
-        let hadLift,isLift;
+        let noLift,hadLift,isLift;
 
             // create the block pieces
+            // in the times when there's only a 1x1
+            // block, there's no lift
             
-        hadLift=false;
+        noLift=(((rect.rgt-rect.lft)===1) && ((rect.bot-rect.top)===1));
+        hadLift=noLift;
             
         for (x=rect.lft;x!==rect.rgt;x++) {
             for (z=rect.top;z!==rect.bot;z++) {
@@ -116,7 +131,7 @@ export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseCl
                     // if we've reached the end without a lift,
                     // than make one
                     
-                if ((x===(rect.rgt-1)) && (z===(rect.bot-1)) && (!hadLift)) isLift=true;
+                if ((x===(rect.rgt-1)) && (z===(rect.bot-1)) && (!hadLift) && (!noLift)) isLift=true;
                 
                     // do any lifts
                     

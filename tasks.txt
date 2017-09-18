@@ -13,7 +13,6 @@ ESNext
 
 
 
---> make some parts of the block only floor depth in height so you can go under it
 --> monster legs need to be on certain spots depending on hunch
 
 --> stuff in genMap that can go to constants
