@@ -34,14 +34,24 @@ export default class GenMeshHumanClass extends GenMeshBaseClass
         let modelVertexList=null;
         let modelIndexes=null;
         
-            // random body scaling
-            
-        fullBodyScale=new PointClass(1.0,1.0,(1.0-genRandom.randomFloat(0.0,0.2)));
-        
             // wrap all the limbs
             
         for (n=0;n!==skeleton.limbs.length;n++) {
             limb=skeleton.limbs[n];
+            
+                // get limb scale
+                
+            switch(limb.limbType) {
+                case constants.LIMB_TYPE_BODY:
+                    fullBodyScale=new PointClass(1.0,0.5,(1.0-genRandom.randomFloat(0.3,0.2)));
+                    break;
+                case constants.LIMB_TYPE_HEAD:
+                    fullBodyScale=new PointClass(1.0,0.7,(1.0-genRandom.randomFloat(0.0,0.2)));
+                    break;
+                default:
+                    fullBodyScale=new PointClass(1.0,1.0,1.0);
+                    break;
+            }
             
                 // counts
                 

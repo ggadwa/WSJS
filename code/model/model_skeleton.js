@@ -444,12 +444,6 @@ export default class ModelSkeletonClass
                 case constants.LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);
                     break;
-                case constants.LIMB_TYPE_HEAD_SNOUT:
-                    this.poseSetHeadSnout(limb);
-                    break;
-                case constants.LIMB_TYPE_HEAD_JAW:
-                    this.poseSetHeadJaw(limb);
-                    break;
             }
         }
         
@@ -516,12 +510,6 @@ export default class ModelSkeletonClass
                     break;
                 case constants.LIMB_TYPE_WHIP:
                     this.poseSetWhip(limb);
-                    break;
-                case constants.LIMB_TYPE_HEAD_SNOUT:
-                    this.poseSetHeadSnout(limb);
-                    break;
-                case constants.LIMB_TYPE_HEAD_JAW:
-                    this.poseSetHeadJaw(limb);
                     break;
             }
         }

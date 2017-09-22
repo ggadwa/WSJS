@@ -22,11 +22,11 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
         // random limbs for monster
         //
     
-    buildRandomLimbs(bodyLimbIdx)
+    buildRandomLimbs(bodyLimbIdx,hunchAng)
     {
         let n,limbCount,limbType,limbRadius,limbAng,armLength,whipLength,angIdx;
         let neckLength,neckRadius,jawRadius,headRadius;
-        let boneIdx;
+        let boneIdx,fingerCount,toeCount;
         let skeleton=this.model.skeleton;
         let bodyLimb=skeleton.limbs[bodyLimbIdx];
         let legSweepList=[0,45,90,135,180,225,270,315];
@@ -50,6 +50,11 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
         jawRadius=genRandom.randomInt((neckRadius+200),500);
         headRadius=genRandom.randomInt((neckRadius+200),500);
         
+            // extra piece counts
+
+        fingerCount=genRandom.randomInt(0,5);
+        toeCount=genRandom.randomInt(0,5);
+        
             // the random limbs
         
         for (n=0;n!==limbCount;n++) {
@@ -63,9 +68,20 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
                 limbType=randomLimbType[genRandom.randomIndex(randomLimbType.length)];
             }
             
-                // get a bone
-            
-            boneIdx=bodyLimb.boneIndexes[genRandom.randomIndex(bodyLimb.boneIndexes.length)];
+                // get a bone, depending on hunch, legs can only go
+                // in certain places
+                
+            if (limbType!==constants.LIMB_TYPE_LEG) {
+                boneIdx=bodyLimb.boneIndexes[genRandom.randomIndex(bodyLimb.boneIndexes.length)];
+            }
+            else {
+                if (hunchAng>30.0) {
+                    boneIdx=bodyLimb.boneIndexes[genRandom.randomIndex(bodyLimb.boneIndexes.length)];
+                }
+                else {
+                    boneIdx=bodyLimb.boneIndexes[0];
+                }
+            }
             
                 // create the limb
                 
@@ -75,14 +91,14 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
                     angIdx=genRandom.randomIndex(armWhipSweepList.length);
                     limbAng=armWhipSweepList[angIdx];
                     armWhipSweepList.splice(angIdx,1);
-                    this.buildLimbArm(n,boneIdx,limbRadius,armLength,limbAng,true);
+                    this.buildLimbArm(n,boneIdx,limbRadius,armLength,limbAng,fingerCount);
                     break;
                     
                 case constants.LIMB_TYPE_LEG:
                     angIdx=genRandom.randomIndex(legSweepList.length);
                     limbAng=legSweepList[angIdx];
                     legSweepList.splice(angIdx,1);
-                    this.buildLimbLeg(n,boneIdx,limbRadius,limbAng,(90.0-genRandom.randomFloat(0.0,180.0)));
+                    this.buildLimbLeg(n,boneIdx,limbRadius,limbAng,(90.0-genRandom.randomFloat(0.0,180.0)),toeCount,true);
                     break;
                     
                 case constants.LIMB_TYPE_WHIP:
@@ -106,14 +122,24 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
 
     build()
     {
-        let bodyLimbIdx;
+        let bodyLimbIdx,hunchAng;
+        
+            // get a hunch angle which determines
+            // where the legs go
+            
+        if (genRandom.randomPercentage(0.3)) {        
+            hunchAng=genRandom.randomFloat(30.0,60.0);
+        }
+        else {
+            hunchAng=genRandom.randomFloat(0.0,30.0);
+        }
         
             // build the skeleton
 
         this.model.skeleton=new ModelSkeletonClass(this.view);
         
-        bodyLimbIdx=this.buildBody(1500,2000,3000,2000,300,1000,1.0,true);
-        this.buildRandomLimbs(bodyLimbIdx);
+        bodyLimbIdx=this.buildBody(1500,2000,3000,2000,300,1000,1.0,hunchAng);
+        this.buildRandomLimbs(bodyLimbIdx,hunchAng);
         
             // setup the bones for animation
             

@@ -554,8 +554,9 @@ export default class GenMeshBaseClass
     }
     
         //
-        // each bone has a gravity scale factor that
-        // squishes the shrunk globe in a direction
+        // scale all the vertexes along
+        // the line to the bone, use this to
+        // squish a model in a certain direction
         //
         
     scaleVertexToBones(vertexList,fullBodyScale)

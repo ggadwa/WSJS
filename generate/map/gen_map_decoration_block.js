@@ -65,7 +65,7 @@ export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseCl
         this.map.overlay.addLift(xLiftBound,zLiftBound);
     }
     
-    addBlockChunk(room,x,z)
+    addBlockChunk(room,x,z,noBridge)
     {
         let xBound=new BoundClass((room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+((x+1)*constants.ROOM_BLOCK_WIDTH)));
         let yBound=new BoundClass((room.yBound.max-constants.ROOM_FLOOR_HEIGHT),room.yBound.max);
@@ -89,7 +89,7 @@ export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseCl
         
             // some are pass under
             
-        if (genRandom.randomPercentage(0.2)) {
+        if ((genRandom.randomPercentage(0.2)) && (!noBridge)) {
             yBound.max=yBound.min+yAdd;
             bottom=true;
         }
@@ -140,7 +140,7 @@ export default class GenRoomDecorationBlockClass extends GenRoomDecorationBaseCl
                     hadLift=true;
                 }
                 else {
-                    this.addBlockChunk(room,x,z);
+                    this.addBlockChunk(room,x,z,noLift);
                 }
             
             }

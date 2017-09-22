@@ -13,7 +13,8 @@ ESNext
 
 
 
---> monster legs need to be on certain spots depending on hunch
+--> toes need work
+--> make item texture not so awful
 
 --> stuff in genMap that can go to constants
 --> storage needs smaller & bigger box random
@@ -22,10 +23,9 @@ ESNext
 
 --> commonize generate in bitmaps
 --> 3rd person view
---> flatten human mesh
+
 --> sounds need to be same way
 
---> need particle blob (use for explosions)
 --> models cast light
 
 
