@@ -18,100 +18,45 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
         // metal
         //
 
-    generateMetalWires(bitmapCTX,normalCTX,wid,high,grid,color)
+    generateMetalWire(bitmapCTX,normalCTX,y,lineWidth,wid,high,color)
     {
-        let n,k,x,y,split;
-        let lineCount=genRandom.randomInt(1,5);
-        
-        let lineWidth=Math.trunc(wid*0.05);
-        if (lineWidth<5) lineWidth=5;
-        
-        for (n=0;n!==lineCount;n++) {
-            
-            if (genRandom.randomPercentage(0.5)) {
-                x=genRandom.randomInt(lineWidth,(wid-(lineWidth*2)));
-                this.drawBumpLine(bitmapCTX,normalCTX,x,0,x,high,lineWidth,color);
-                
-                split=Math.trunc(wid/16);
-                x=Math.trunc(x/split);
-                for (k=0;k!==16;k++) {
-                    grid[(k*16)+x]=1;
-                }
-            }
-            else {
-                y=genRandom.randomInt(lineWidth,(high-(lineWidth*2)));
-                this.drawBumpLine(bitmapCTX,normalCTX,0,y,wid,y,lineWidth,color);
-                
-                split=Math.trunc(high/16);
-                y=Math.trunc(y/split);
-                for (k=0;k!==16;k++) {
-                    grid[(y*16)+k]=1;
-                }
-            }
-            
-        }
+        y+=Math.trunc(lineWidth*0.5);
+        this.drawBumpLine(bitmapCTX,normalCTX,0,y,wid,y,(lineWidth-4),color);
     }
     
-    generateMetalButtons(bitmapCTX,normalCTX,wid,high,grid)
+    generateMetalButtons(bitmapCTX,normalCTX,glowCTX,y,buttonSize,wid,high)
     {
-        let n,k,x,y,color;
-        let buttonWid=Math.trunc(wid/16);
-        let buttonHigh=Math.trunc(high/16);
-        let buttonCount=genRandom.randomInt(3,5);
+        let n,x,color;
+        let buttonCount=Math.trunc(wid/buttonSize)-1;
+        
+        x=Math.trunc((wid-(buttonSize*buttonCount))*0.5);
         
         for (n=0;n!==buttonCount;n++) {
-            
-            for (k=0;k!==10;k++) {
-                x=genRandom.randomInt(0,15);
-                y=genRandom.randomInt(0,15);
-                
-                if (grid[(y*16)+x]!==0) continue;
-                grid[(y*16)+x]=1;
-                
-                color=this.getRandomColor();
-                
-                x*=buttonWid;
-                y*=buttonHigh;
-                this.draw3DRect(bitmapCTX,normalCTX,x,y,(x+buttonWid),(y+buttonHigh),2,color,false);
-                break;
-            }
+            color=this.getRandomColor();
+            this.draw3DRect(bitmapCTX,normalCTX,x,y,(x+(buttonSize-4)),(y+(buttonSize-4)),2,color,false);
+            if (genRandom.randomPercentage(0.5)) this.drawRect(glowCTX,(x+2),(y+2),(x+(buttonSize-6)),(y+(buttonSize-6)),this.darkenColor(color,0.5));
+            x+=buttonSize;
         }
     }
     
-    generateMetalScrews(bitmapCTX,normalCTX,wid,high,grid,metalColor)
-    {
-        let n,k,x,y,color;
-        let screwWid=Math.trunc(wid/16);
-        let screwHigh=Math.trunc(high/16);
-        let screwCount=genRandom.randomInt(2,5);
-        
-        let screwColor=this.boostColor(metalColor,0.05);
-        let screwFlatInnerSize=Math.trunc(screwWid*0.4);
-        
-        for (n=0;n!==screwCount;n++) {
-            
-            for (k=0;k!==10;k++) {
-                x=genRandom.randomInt(0,15);
-                y=genRandom.randomInt(0,15);
-                
-                if (grid[(y*16)+x]!==0) continue;
-                grid[(y*16)+x]=1;
-                
-                color=this.getRandomColor();
-                
-                x*=screwWid;
-                y*=screwHigh;
-                this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwWid),(y+screwHigh),0.0,1.0,2,screwFlatInnerSize,screwColor,this.blackColor);
-                break;
-            }
-        }
-    }
-    
-    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateMetalScrews(bitmapCTX,normalCTX,y,screwSize,wid,high,screwColor)
     {
         let n,x;
-        let streakWid,streakColor,darken;
+        let screwFlatInnerSize=Math.trunc(screwSize*0.25);
+        let screwCount=Math.trunc(wid/screwSize)-1;
         
+        x=Math.trunc((wid-(screwSize*screwCount))*0.5);
+        
+        for (n=0;n!==screwCount;n++) {
+            this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+(screwSize-4)),(y+(screwSize-4)),0.0,1.0,2,screwFlatInnerSize,screwColor,this.blackColor);
+            x+=screwSize;
+        }
+    }
+    
+    generateMetal(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
+    {
+        let n,y,yAdd,lineCount;
+   
             // a grid to place items
             
         let grid=new Uint8Array(16*16);
@@ -120,35 +65,40 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
 
         let metalColor=this.getRandomMetalColor();
         let wireColor=this.getRandomColor();
-        let streakCount=genRandom.randomInt(15,10);
+        let screwColor=this.darkenColor(metalColor,0.8);
         
             // clear canvases
 
         this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearGlowRect(glowCTX,0,0,wid,high);
         
             // the plate
             
         this.drawRect(bitmapCTX,0,0,wid,high,metalColor);
+        this.generateMetalStreakShine(bitmapCTX,0,0,wid,high,wid,high,metalColor);
         
-            // possible streaks
+            // parts of item
         
-        if (genRandom.randomPercentage(0.5)) {
-            for (n=0;n!==streakCount;n++) {
-                streakWid=genRandom.randomInt(10,40);
-                x=genRandom.randomInBetween(streakWid,(wid-streakWid));
-
-                darken=0.5+(genRandom.random()*0.5);
-                streakColor=this.darkenColor(metalColor,darken);
-
-                this.drawStreakMetal(bitmapCTX,wid,high,x,0,high,streakWid,streakColor);
+        lineCount=genRandom.randomInt(5,8);
+        
+        y=0;
+        yAdd=Math.trunc(high/lineCount);
+        
+        for (n=0;n!==lineCount;n++) {
+            switch(genRandom.randomIndex(3)) {
+                case 0:
+                    this.generateMetalWire(bitmapCTX,normalCTX,y,yAdd,wid,high,grid,wireColor);
+                    break;
+                case 1:
+                    this.generateMetalButtons(bitmapCTX,normalCTX,glowCTX,y,yAdd,wid,high);
+                    break;
+                case 2:
+                    this.generateMetalScrews(bitmapCTX,normalCTX,y,yAdd,wid,high,grid,screwColor);
+                    break;
             }
-        }
-        
-            // wires and buttons
             
-        this.generateMetalWires(bitmapCTX,normalCTX,wid,high,grid,wireColor);
-        this.generateMetalButtons(bitmapCTX,normalCTX,wid,high,grid);
-        this.generateMetalScrews(bitmapCTX,normalCTX,wid,high,grid,metalColor);
+            y+=yAdd;
+        }
 
             // finish with the specular
 
@@ -162,7 +112,6 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
     generate(inDebug)
     {
         let wid,high;
-        let shineFactor=1.0;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
             // setup the canvas
@@ -183,24 +132,16 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
         specularCTX=specularCanvas.getContext('2d');
         
         glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
+        glowCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
+        glowCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
         glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
 
         wid=bitmapCanvas.width;
         high=bitmapCanvas.height;
 
             // create the bitmap
 
-        switch (genRandom.randomIndex(1)) {
-
-            case 0:
-                this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
-                break;
-                
-        }
+        this.generateMetal(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
 
             // debug just displays the canvases, so send
             // them back
@@ -210,7 +151,7 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
             // otherwise, create the webGL
             // bitmap object
 
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
+        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],8.0));    
     }
 
 }

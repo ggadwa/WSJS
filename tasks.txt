@@ -15,6 +15,8 @@ ESNext
 
 --> toes need work
 --> make item texture not so awful
+--> projectiles need to not hit generating entity for certain period
+--> projectile speed needs to be +% of entity speed
 
 --> stuff in genMap that can go to constants
 --> storage needs smaller & bigger box random
@@ -29,7 +31,6 @@ ESNext
 --> models cast light
 
 
-#### monsters still getting hit by own projectiles
 #### need meeles for monsters
 #### stairs need quads or blocks at top
 #### ai types (charge, sniper, etc)
