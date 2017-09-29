@@ -14,9 +14,9 @@ ESNext
 
 
 --> toes need work
---> make item texture not so awful
---> projectiles need to not hit generating entity for certain period
---> projectile speed needs to be +% of entity speed
+--> monster arms are backwards (can be pointing up)
+--> projectile speed needs to be > entity speed
+--> monster meeles
 
 --> stuff in genMap that can go to constants
 --> storage needs smaller & bigger box random

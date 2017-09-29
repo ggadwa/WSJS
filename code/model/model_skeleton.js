@@ -301,14 +301,14 @@ export default class ModelSkeletonClass
         // pose utilities
         //
         
-    poseSetLeg(limb,legOffset,walking)
+    poseSetLeg(limb,walking)
     {
         let r,flipLeg;
 
         r=0.0;
         if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
-        flipLeg=((legOffset&0x1)!==0x0);
+        flipLeg=limb.flipped;
         if (this.lastAnimationFlip) flipLeg=!flipLeg;
         
         if (flipLeg) {
@@ -411,7 +411,6 @@ export default class ModelSkeletonClass
     walkNextPose()
     {
         let n,limb;
-        let legOffset=0;
         let nLimb=this.limbs.length;
         
         let armLeftZAngle=45.0;
@@ -428,8 +427,7 @@ export default class ModelSkeletonClass
                     this.poseSetBody(limb,5.0,15.0);
                     break;
                 case constants.LIMB_TYPE_LEG:
-                    this.poseSetLeg(limb,legOffset,true);
-                    legOffset++;
+                    this.poseSetLeg(limb,true);
                     break;
                 case constants.LIMB_TYPE_ARM:
                     if (limb.side===constants.LIMB_SIDE_LEFT) {
@@ -478,7 +476,6 @@ export default class ModelSkeletonClass
     idleNextPose()
     {
         let n,limb;
-        let legOffset=0;
         let nLimb=this.limbs.length;
         
         let armLeftZAngle=45.0;
@@ -495,8 +492,7 @@ export default class ModelSkeletonClass
                     this.poseSetBody(limb,0.0,10.0);
                     break;
                 case constants.LIMB_TYPE_LEG:
-                    this.poseSetLeg(limb,legOffset,false);
-                    legOffset++;
+                    this.poseSetLeg(limb,false);
                     break;
                 case constants.LIMB_TYPE_ARM:
                     if (limb.side===constants.LIMB_SIDE_LEFT) {

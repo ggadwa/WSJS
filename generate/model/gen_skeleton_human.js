@@ -42,8 +42,8 @@ export default class GenSkeletonHumanClass extends GenSkeletonBaseClass
         this.buildLimbArm(2,boneIdx,300,armLength,270.0,0);
 
         boneIdx=this.model.skeleton.findBoneIndex('Hip');
-        this.buildLimbLeg(3,boneIdx,300,90.0,10.0,0,false);
-        this.buildLimbLeg(4,boneIdx,300,270.0,-10.0,0,false);
+        this.buildLimbLeg(3,boneIdx,300,90.0,10.0,0,false,false);
+        this.buildLimbLeg(4,boneIdx,300,270.0,-10.0,0,false,true);
         
             // setup the bones for animation
             

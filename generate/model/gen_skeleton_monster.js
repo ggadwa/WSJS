@@ -25,12 +25,16 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
     buildRandomLimbs(bodyLimbIdx,hunchAng)
     {
         let n,limbCount,limbType,limbRadius,limbAng,armLength,whipLength,angIdx;
-        let neckLength,neckRadius,jawRadius,headRadius;
+        let neckLength,neckRadius,jawRadius,headRadius,footRotAdd,maxLegPair;
         let boneIdx,fingerCount,toeCount;
         let skeleton=this.model.skeleton;
         let bodyLimb=skeleton.limbs[bodyLimbIdx];
-        let legSweepList=[0,45,90,135,180,225,270,315];
-        let armWhipSweepList=[0,30,60,90,120,150,180,210,240,270,300,330];
+        let legSweepList=[75,80,85,90,95,100,105];
+        let legBoneList=[0,1,2,3];
+        let armSweepList=[70,80,90,100,110,250,260,270,280,290];
+        let armBoneList=[1,2,3];
+        let whipSweepList=[320,330,340,350,0,10,20,30,40];
+        let whipBoneList=[0,1,2,3];
         
         let randomLimbType=[constants.LIMB_TYPE_ARM,constants.LIMB_TYPE_WHIP];
         
@@ -55,32 +59,21 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
         fingerCount=genRandom.randomInt(0,5);
         toeCount=genRandom.randomInt(0,5);
         
+            // max pairs of legs
+            
+        maxLegPair=(hunchAng>30.0)?2:1;
+        
             // the random limbs
         
         for (n=0;n!==limbCount;n++) {
             
                 // always need two legs
                 
-            if (n<2) {
+            if (n<maxLegPair) {
                 limbType=constants.LIMB_TYPE_LEG;
             }
             else {
                 limbType=randomLimbType[genRandom.randomIndex(randomLimbType.length)];
-            }
-            
-                // get a bone, depending on hunch, legs can only go
-                // in certain places
-                
-            if (limbType!==constants.LIMB_TYPE_LEG) {
-                boneIdx=bodyLimb.boneIndexes[genRandom.randomIndex(bodyLimb.boneIndexes.length)];
-            }
-            else {
-                if (hunchAng>30.0) {
-                    boneIdx=bodyLimb.boneIndexes[genRandom.randomIndex(bodyLimb.boneIndexes.length)];
-                }
-                else {
-                    boneIdx=bodyLimb.boneIndexes[0];
-                }
             }
             
                 // create the limb
@@ -88,23 +81,36 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
             switch (limbType) {
                 
                 case constants.LIMB_TYPE_ARM:
-                    angIdx=genRandom.randomIndex(armWhipSweepList.length);
-                    limbAng=armWhipSweepList[angIdx];
-                    armWhipSweepList.splice(angIdx,1);
+                    boneIdx=bodyLimb.boneIndexes[armBoneList[genRandom.randomIndex(armBoneList.length)]];
+                    
+                    angIdx=genRandom.randomIndex(armSweepList.length);
+                    limbAng=armSweepList[angIdx];
+                    armSweepList.splice(angIdx,1);
                     this.buildLimbArm(n,boneIdx,limbRadius,armLength,limbAng,fingerCount);
                     break;
                     
                 case constants.LIMB_TYPE_LEG:
+                    if (hunchAng>30.0) {
+                        boneIdx=bodyLimb.boneIndexes[legBoneList[genRandom.randomIndex(legBoneList.length)]];
+                    }
+                    else {
+                        boneIdx=bodyLimb.boneIndexes[0];
+                    }
+                    
                     angIdx=genRandom.randomIndex(legSweepList.length);
                     limbAng=legSweepList[angIdx];
                     legSweepList.splice(angIdx,1);
-                    this.buildLimbLeg(n,boneIdx,limbRadius,limbAng,(90.0-genRandom.randomFloat(0.0,180.0)),toeCount,true);
+                    footRotAdd=20.0-genRandom.randomFloat(0.0,40.0);
+                    this.buildLimbLeg(n,boneIdx,limbRadius,limbAng,(90.0+footRotAdd),toeCount,true,false);
+                    this.buildLimbLeg(n,boneIdx,limbRadius,(limbAng+180.0),(90.0+footRotAdd),toeCount,true,true);
                     break;
                     
                 case constants.LIMB_TYPE_WHIP:
-                    angIdx=genRandom.randomIndex(armWhipSweepList.length);
-                    limbAng=armWhipSweepList[angIdx];
-                    armWhipSweepList.splice(angIdx,1);
+                    boneIdx=bodyLimb.boneIndexes[whipBoneList[genRandom.randomIndex(whipBoneList.length)]];
+                    
+                    angIdx=genRandom.randomIndex(whipSweepList.length);
+                    limbAng=whipSweepList[angIdx];
+                    whipSweepList.splice(angIdx,1);
                     this.buildLimbWhip(n,boneIdx,limbRadius,whipLength,limbAng);
                     break;
             }
@@ -138,7 +144,7 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
 
         this.model.skeleton=new ModelSkeletonClass(this.view);
         
-        bodyLimbIdx=this.buildBody(1500,2000,3000,2000,300,1000,1.0,hunchAng);
+        bodyLimbIdx=this.buildBody(1500,1500,1500,1500,300,1000,1.0,hunchAng);
         this.buildRandomLimbs(bodyLimbIdx,hunchAng);
         
             // setup the bones for animation

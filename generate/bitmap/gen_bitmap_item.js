@@ -56,10 +56,6 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
     generateMetal(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
     {
         let n,y,yAdd,lineCount;
-   
-            // a grid to place items
-            
-        let grid=new Uint8Array(16*16);
 
             // some random values
 
@@ -85,15 +81,15 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
         yAdd=Math.trunc(high/lineCount);
         
         for (n=0;n!==lineCount;n++) {
-            switch(genRandom.randomIndex(3)) {
+            switch(genRandom.randomIndex(4)) {
                 case 0:
-                    this.generateMetalWire(bitmapCTX,normalCTX,y,yAdd,wid,high,grid,wireColor);
+                    this.generateMetalWire(bitmapCTX,normalCTX,y,yAdd,wid,high,wireColor);
                     break;
                 case 1:
                     this.generateMetalButtons(bitmapCTX,normalCTX,glowCTX,y,yAdd,wid,high);
                     break;
                 case 2:
-                    this.generateMetalScrews(bitmapCTX,normalCTX,y,yAdd,wid,high,grid,screwColor);
+                    this.generateMetalScrews(bitmapCTX,normalCTX,y,yAdd,wid,high,screwColor);
                     break;
             }
             

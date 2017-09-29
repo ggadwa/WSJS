@@ -16,8 +16,8 @@ export default class EntityClass
         this.sound=sound;
         
         this.name=name;
-        this.position=position;
-        this.angle=angle;
+        this.position=position.copy();      // it's possible we will get a global, so always copy
+        this.angle=angle.copy();
         this.maxHealth=maxHealth;
         this.model=model;
         

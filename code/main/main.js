@@ -54,14 +54,18 @@ class MainClass
 
     initGL()
     {
-            // init view ang webgl
+            // print out the key incase we have
+            // trouble so we don't lose it
+            
+        console.log('Seed:'+config.SEED);
+         
+           // init view ang webgl
         
         if (!this.view.initialize()) return;
 
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Initialized WebGL2');
         this.view.loadingScreenAddString('Initializing Internal Structures');
         this.view.loadingScreenDraw(null);
 

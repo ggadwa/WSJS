@@ -27,6 +27,7 @@ export default class EntityProjectileClass extends EntityClass
             
         this.projectile=projectile;
         this.startTimeStamp=this.view.timeStamp;
+        this.selfHitTimeStamp=this.view.timeStamp+2500;         // how long until projectiles can hit their parent, to stop projectiles from hitting parents when launched
         
         Object.seal(this);
     }
@@ -104,9 +105,12 @@ export default class EntityProjectileClass extends EntityClass
         if (this.isAnyCollision()) {
             
                 // skip any collisions with parentEntity
+                // if within the self hit timestamp
 
             if (this.touchEntity!==null) {
-                if (this.touchEntity.id===this.parentEntityId) return;
+                if (this.selfHitTimeStamp<this.view.timeStamp) {
+                    if (this.touchEntity.id===this.parentEntityId) return;
+                }
             }
             
                 // bouncing

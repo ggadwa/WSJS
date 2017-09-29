@@ -36,7 +36,7 @@ export default class GenMeshMonsterClass extends GenMeshBaseClass
         
             // random body scaling
             
-        fullBodyScale=new PointClass(1.0,1.0,(1.0-genRandom.randomFloat(0.0,0.2)));
+        fullBodyScale=new PointClass(1.0,(1.0-genRandom.randomFloat(0.0,0.3)),(1.0-genRandom.randomFloat(0.0,0.2)));
         
             // wrap all the limbs
             
