@@ -123,6 +123,11 @@ export default class ViewClass
             
         this.uiTintRect=new RectClass(0,0,0,0);
         this.uiTintColor=new ColorClass(1.0,0.0,0.0);
+        
+            // misc pre-allocates
+            
+        this.uiTextColor=new ColorClass(1.0,1.0,0.0);
+        this.uiWeaponTextColor=new ColorClass(0.3,1.0,0.2);
 
             // loading screen
 
@@ -684,11 +689,14 @@ export default class ViewClass
         }
         
         this.text.drawStart();
-        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,new ColorClass(1.0,1.0,0.0));
+        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
+        this.text.drawWithShadow(30,(this.high-5),25,22,player.getCurrentWeaponDisplayString(),this.text.TEXT_ALIGN_LEFT,this.uiWeaponTextColor);
+        
         if (this.paused) {
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',this.text.TEXT_ALIGN_CENTER,new ColorClass(1.0,1.0,0.0));
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',this.text.TEXT_ALIGN_CENTER,new ColorClass(1.0,1.0,0.0));
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',this.text.TEXT_ALIGN_CENTER,this.uiTextColor);
+            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',this.text.TEXT_ALIGN_CENTER,this.uiTextColor);
         }
+        
         this.text.drawEnd();
     }
     

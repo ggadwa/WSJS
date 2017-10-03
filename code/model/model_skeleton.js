@@ -330,9 +330,7 @@ export default class ModelSkeletonClass
         r=0.0;
         if (walking) r=genRandom.randomInBetween(20.0,40.0);
         
-        z=-armAngle;
-        if (limb.side===constants.LIMB_SIDE_LEFT) z=-z;
-        
+        z=limb.flipped?-armAngle:armAngle;
         if (this.lastAnimationFlip) r=-r;
         
         this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0.0,-r,z);

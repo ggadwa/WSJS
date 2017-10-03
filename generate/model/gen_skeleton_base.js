@@ -116,7 +116,7 @@ export default class GenSkeletonBaseClass
         // arm limb
         //
     
-    buildLimbArm(limbIdx,parentBoneIdx,radius,length,rotOffset,fingerCount)
+    buildLimbArm(limbIdx,parentBoneIdx,radius,length,rotOffset,fingerCount,flipped)
     {
         let armRadius,armLength,axis,pnt,vct,pushVct;
         let shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx,knuckleBoneIdx,fingerBoneIdx;
@@ -155,7 +155,7 @@ export default class GenSkeletonBaseClass
         bones[elbowBoneIdx].gravityLockDistance=armRadius;
         bones[wristBoneIdx].gravityLockDistance=armRadius;
         
-        armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,false,8,5,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
+        armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,flipped,8,5,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
         
             // limb
             
@@ -166,7 +166,7 @@ export default class GenSkeletonBaseClass
         
         bones[handBoneIdx].gravityLockDistance=handRadius;
         
-        handLimbIdx=this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HAND,limbIdx,axis,false,5,5,[handBoneIdx],-1,-1))-1;
+        handLimbIdx=this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HAND,limbIdx,axis,flipped,5,5,[handBoneIdx],-1,-1))-1;
 
             // finger limbs
             
@@ -196,7 +196,7 @@ export default class GenSkeletonBaseClass
             bones[knuckleBoneIdx].gravityLockDistance=fingerRadius;
             bones[fingerBoneIdx].gravityLockDistance=fingerRadius;
             
-            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,axis,false,4,4,[knuckleBoneIdx,fingerBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,axis,flipped,4,4,[knuckleBoneIdx,fingerBoneIdx]));
             
             fy+=fingerDistance;
         }

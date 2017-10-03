@@ -11,7 +11,9 @@ export default class WeaponClass
         this.view=view;
         this.model=model;
         
-        this.projectiles=[];
+        this.name='';
+        this.projectile=null;
+        this.altProjectile=null;
 
         this.lastFireTimeStamp=0;
 
@@ -20,16 +22,46 @@ export default class WeaponClass
         this.fireAngle=new PointClass(0,0,0);
         this.firePos=new PointClass(0,0,0);
         
+        this.displayStr='';         // todo -- probably temp, but pre-create so we don't realloc this a lot
+        
         Object.seal(this);
+    }
+    
+        //
+        // player display purposes
+        //
+        
+    setName(name)
+    {
+        this.name=name;
     }
     
         //
         // projectiles
         //
     
-    addProjectile(projectile)
+    setProjectile(projectile)
     {
-        this.projectiles.push(projectile);
+        this.projectile=projectile;
+    }
+    
+    setAltProjectile(altProjectile)
+    {
+        this.altProjectile=altProjectile;
+    }
+    
+        //
+        // weapon display strings
+        //
+        
+    getWeaponDisplayString()            // todo -- this is probably all temporary for now
+    {
+        this.displayStr=this.name;
+        
+        if (this.projectile!=null) this.displayStr+=(' | '+20);
+        if (this.altProjectile!=null) this.displayStr+=(' | '+40);
+        
+        return(this.displayStr);
     }
     
         //
@@ -53,7 +85,27 @@ export default class WeaponClass
         this.firePos.addPoint(entity.position);
         this.firePos.y-=2000;        // supergumba -- all this is hardcoded!
         
-        this.projectiles[0].fire(entity.id,this.firePos,this.fireAngle);
+        this.projectile.fire(entity.id,this.firePos,this.fireAngle);
+    }
+    
+    altFire(entity)
+    {
+            // time to fire again?
+            
+        if (this.view.timeStamp<this.lastFireTimeStamp) return;
+        
+        this.lastFireTimeStamp=this.view.timeStamp+1000;
+        
+            // create projectile
+            
+        this.fireAngle.setFromPoint(entity.angle);
+        
+        this.firePos.setFromValues(0,0,4000);      // supergumba -- all this is hardcoded!
+        this.firePos.rotate(this.fireAngle);
+        this.firePos.addPoint(entity.position);
+        this.firePos.y-=2000;        // supergumba -- all this is hardcoded!
+        
+        this.altProjectile.fire(entity.id,this.firePos,this.fireAngle);
     }
     
         //

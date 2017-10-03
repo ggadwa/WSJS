@@ -74,6 +74,7 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
             }
             else {
                 limbType=randomLimbType[genRandom.randomIndex(randomLimbType.length)];
+                limbType=constants.LIMB_TYPE_ARM;
             }
             
                 // create the limb
@@ -81,15 +82,19 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
             switch (limbType) {
                 
                 case constants.LIMB_TYPE_ARM:
+                    if (armSweepList.length===0) break;
+                    
                     boneIdx=bodyLimb.boneIndexes[armBoneList[genRandom.randomIndex(armBoneList.length)]];
                     
                     angIdx=genRandom.randomIndex(armSweepList.length);
                     limbAng=armSweepList[angIdx];
                     armSweepList.splice(angIdx,1);
-                    this.buildLimbArm(n,boneIdx,limbRadius,armLength,limbAng,fingerCount);
+                    this.buildLimbArm(n,boneIdx,limbRadius,armLength,limbAng,fingerCount,(limbAng>=250));
                     break;
                     
                 case constants.LIMB_TYPE_LEG:
+                    if (legSweepList.length===0) break;
+                    
                     if (hunchAng>30.0) {
                         boneIdx=bodyLimb.boneIndexes[legBoneList[genRandom.randomIndex(legBoneList.length)]];
                     }
@@ -106,6 +111,8 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
                     break;
                     
                 case constants.LIMB_TYPE_WHIP:
+                    if (whipSweepList.length===0) break;
+                    
                     boneIdx=bodyLimb.boneIndexes[whipBoneList[genRandom.randomIndex(whipBoneList.length)]];
                     
                     angIdx=genRandom.randomIndex(whipSweepList.length);

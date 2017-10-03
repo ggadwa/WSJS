@@ -33,8 +33,10 @@ export default class EntityPlayerClass extends EntityClass
         
         this.lastInLiquid=false;
 
+        this.weaponFiredTrigger=false;
+        this.weaponAltFiredTrigger=false;
+        
         this.weaponCurrentIndex=-1;
-        this.weaponFired=false;
         this.weapons=[];
         
         Object.seal(this);
@@ -91,9 +93,31 @@ export default class EntityPlayerClass extends EntityClass
         return(this.weapons[this.weaponCurrentIndex]);
     }
     
+    previousWeapon()
+    {
+        this.weaponCurrentIndex--;
+        if (this.weaponCurrentIndex<0) this.weaponCurrentIndex=this.weapons.length-1;
+    }
+    
+    nextWeapon()
+    {
+        this.weaponCurrentIndex++;
+        if (this.weaponCurrentIndex>=this.weapons.length) this.weaponCurrentIndex=0;
+    }
+    
     fireCurrentWeapon()
     {
-        this.weaponFired=true;
+        this.weaponFiredTrigger=true;
+    }
+    
+    fireCurrentWeaponAlt()
+    {
+        this.weaponAltFiredTrigger=true;
+    }
+    
+    getCurrentWeaponDisplayString()         // todo -- probably temporary
+    {
+        return(this.weapons[this.weaponCurrentIndex].getWeaponDisplayString());
     }
     
         //
@@ -116,11 +140,18 @@ export default class EntityPlayerClass extends EntityClass
         
             // fire any weapons that were triggered
             
-        if (this.weaponFired) {
-            this.weaponFired=false;
+        if (this.weaponFiredTrigger) {
+            this.weaponFiredTrigger=false;
             
             weapon=this.getCurrentWeapon();
             if (weapon!==null) weapon.fire(this);
+        }
+        
+        if (this.weaponAltFiredTrigger) {
+            this.weaponAltFiredTrigger=false;
+            
+            weapon=this.getCurrentWeapon();
+            if (weapon!==null) weapon.altFire(this);
         }
         
             // input turning and looking

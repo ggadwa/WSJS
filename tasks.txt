@@ -13,8 +13,16 @@ ESNext
 
 
 
++ projectiles have ammo & time to fire on them
++ weapons have two projectiles only, ammo on projectiles
++ name weapons
++ switch weapons
+
+
+
+--> bounce projectiles can bounce forever
+--> do AI types [stalk (melee), fire (get within firing distance), sniper (stay at firing distance), boss (stalk, melee, and fire)]
 --> toes need work
---> monster arms are backwards (can be pointing up)
 --> projectile speed needs to be > entity speed
 --> monster meeles
 

@@ -38,8 +38,8 @@ export default class GenSkeletonHumanClass extends GenSkeletonBaseClass
         
         armLength=Math.trunc(genRandom.randomInt(2200,500));
         
-        this.buildLimbArm(1,boneIdx,300,armLength,90.0,0);
-        this.buildLimbArm(2,boneIdx,300,armLength,270.0,0);
+        this.buildLimbArm(1,boneIdx,300,armLength,90.0,0,false);
+        this.buildLimbArm(2,boneIdx,300,armLength,270.0,0,true);
 
         boneIdx=this.model.skeleton.findBoneIndex('Hip');
         this.buildLimbLeg(3,boneIdx,300,90.0,10.0,0,false,false);

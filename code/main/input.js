@@ -1,3 +1,5 @@
+import * as constants from '../../code/main/constants.js';
+
 //
 // input class
 //
@@ -22,6 +24,8 @@ export default class InputClass
         this.mouseChangeY=0;
         
         this.mouseButtonFlags=new Uint8Array(8);
+        this.mouseWheelClick=0;
+        this.mouseWheelClickRefreshTick=view.timeStamp;
         
             // listeners
             // need to set them to a variables so remove
@@ -35,6 +39,7 @@ export default class InputClass
         
         this.mouseDownListener=this.mouseDown.bind(this);
         this.mouseUpListener=this.mouseUp.bind(this);
+        this.mouseWheelListener=this.mouseWheel.bind(this);
         this.mouseMovedListener=this.mouseMove.bind(this);
         
         Object.seal(this);
@@ -137,9 +142,24 @@ export default class InputClass
             
         if (this.keyFlags[32]) this.playerEntity.startJump();
         
-            // mouse 0 fire
+            // mouse 0/2 fire
             
         if (this.mouseButtonFlags[0]) this.playerEntity.fireCurrentWeapon();
+        if (this.mouseButtonFlags[2]) this.playerEntity.fireCurrentWeaponAlt();
+        
+            // mouse wheel
+        
+        if (this.mouseWheelClick!==0) {
+            if (this.mouseWheelClick>0) {
+                this.playerEntity.previousWeapon();
+            }
+            else {
+                this.playerEntity.nextWeapon();
+            }
+            
+            this.mouseWheelClick=0;
+            this.mouseWheelClickRefreshTick=this.view.timeStamp+constants.INPUT_WHEEL_REFRESH_TICK;
+        }
         
             // m flips map on/off
             
@@ -242,6 +262,9 @@ export default class InputClass
         for (n=0;n!==8;n++) {
             this.mouseButtonFlags[n]=0;
         }
+        
+        this.mouseWheelClick=0;
+        this.mouseWheelClickRefreshTick=this.view.timeStamp;
     }
     
         // mouse event callbacks
@@ -256,11 +279,13 @@ export default class InputClass
         if (elem===this.view.canvas) {
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
+            document.addEventListener('wheel',this.mouseWheelListener,false);
             document.addEventListener('mousemove',this.mouseMovedListener,false);
         }
         else {
             document.removeEventListener('mousedown',this.mouseDownListener,false);
             document.removeEventListener('mouseup',this.mouseUpListener,false);
+            document.removeEventListener('wheel',this.mouseWheelListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
             this.view.setPauseState(true,false);       // go into pause
             this.setPauseState(true);
@@ -280,6 +305,13 @@ export default class InputClass
     mouseUp(event)
     {
         this.mouseButtonFlags[event.button]=0;
+    }
+    
+    mouseWheel(event)
+    {
+        if (this.view.timeStamp<this.mouseWheelClickRefreshTick) return;
+        
+        this.mouseWheelClick=Math.sign(event.deltaY);
     }
     
     mouseMove(event)

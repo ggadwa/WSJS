@@ -13,6 +13,10 @@ export const PHYSICS_MILLISECONDS=16;
 export const DRAW_MILLISECONDS=16;
 export const BAIL_MILLISECONDS=5000;
 
+    // input timing
+    
+export const INPUT_WHEEL_REFRESH_TICK=500;
+
     // room settings
     
 export const ROOM_BLOCK_WIDTH=8000;                     // x/z dimension of a block (rooms are made up of a grid of blocks)

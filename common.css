@@ -1,0 +1,91 @@
+.header {
+    float:left;
+    width:100%;
+    height:42px;
+    background-color:#CCFFCC;
+    font-family:Arial;
+    font-size:24pt;
+    font-weight:bold;
+    white-space:nowrap;
+    padding:4px;
+    box-sizing:border-box;
+}
+
+.button {
+    float:right;
+    right:5px;
+    width:100px;
+    height:32px;
+    margin:1px;
+    background-color:#CCCCDD;
+    border:1px solid #555555;
+    font-family:Arial;
+    font-size:18pt;
+    text-align:center;
+    padding-top:2px;
+    cursor:pointer;
+    box-sizing:border-box;
+}
+
+.button:hover {
+    background-color:#AAAAFF;
+}
+
+.configContainer {
+    float:left;
+    width:100%;
+    background-color:#EEEEFF;
+    font-family:Arial;
+    font-size:12pt;
+    margin-bottom:4px;
+    box-sizing:border-box;
+}
+
+.configColumn {
+    float:left;
+    width:25%;
+    margin:4px;
+    font-family:Arial;
+    font-size:12pt;
+    box-sizing:border-box;
+}
+
+.controlWrapper {
+    width:100%;
+    height:25px;
+    padding-left:2px;
+    padding-right:2px;
+}
+
+.controlCheckbox {
+    float:left;
+}
+
+.labelCheckbox {
+    float:left;
+    padding-left:4px;
+}
+
+.controlText {
+    float:left;
+    width:calc(30% - 8px);   
+}
+
+.labelText {
+    float:left;
+    width:70%;
+    padding-right:4px;
+    text-align:right;
+}
+
+.instructContainer, .linkContainer {
+    float:left;
+    width:100%;
+    background-color:#EEEEFF;
+    font-family:Arial;
+    font-size:14pt;
+    white-space:nowrap;
+    padding:4px;
+    margin-bottom:4px;
+    box-sizing:border-box;
+}

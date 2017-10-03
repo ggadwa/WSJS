@@ -18,7 +18,7 @@ export default class GenProjectileClass
         Object.seal(this);
     }
 
-    generate(isPlayer)
+    generate(entityAI,isPlayer)
     {
         let projectile=new ProjectileClass(this.view,this.map,this.sound,this.modelList.getModel('projectile_0'));
         

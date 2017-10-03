@@ -240,9 +240,28 @@ class MainClass
         playerEntity=new EntityPlayerClass(this.view,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
+            // todo -- all this is hard coded
+            
         playerWeapon=genWeapon.generate();
-        playerWeapon.addProjectile(genProjectile.generate(true));
+        playerWeapon.setProjectile(genProjectile.generate(true));
+        playerWeapon.setName('Pistol');
         playerEntity.addWeapon(playerWeapon);
+        
+        playerWeapon=genWeapon.generate();
+        playerWeapon.setProjectile(genProjectile.generate(true));
+        playerWeapon.setName('Rocket Launcher');
+        playerEntity.addWeapon(playerWeapon);
+        
+        playerWeapon=genWeapon.generate();
+        playerWeapon.setProjectile(genProjectile.generate(true));
+        playerWeapon.setName('Grenade Launcher');
+        playerEntity.addWeapon(playerWeapon);
+        
+        playerWeapon=genWeapon.generate();
+        playerWeapon.setProjectile(genProjectile.generate(true));
+        playerWeapon.setName('Laser Gun');
+        playerEntity.addWeapon(playerWeapon);
+        
         playerEntity.setCurrentWeaponIndex(0);
 
         this.map.entityList.setPlayer(playerEntity);
