@@ -24,7 +24,7 @@ export default class ShaderClass
     {
         let gl=this.view.gl;
         
-            // get the shaders from divs
+            // get the shaders
 
         if (!this.loadVertexShader(name)) {
             this.release();

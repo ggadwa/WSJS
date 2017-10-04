@@ -4,10 +4,11 @@
 
 export default class ModelClass
 {
-    constructor(name)
+    constructor(view,name)
     {
+        this.view=view;
         this.name=name;
-        this.modelMeshShader=null;          // this gets set when model is attached to model list
+        
         this.mesh=null;
         this.skeleton=null;
         
@@ -30,9 +31,8 @@ export default class ModelClass
         
     clone()
     {
-        let model=new ModelClass(this.name);
+        let model=new ModelClass(this.view,this.name);
         
-        model.modelMeshShader=this.modelMeshShader;
         model.mesh=this.mesh.clone();
         model.skeleton=this.skeleton.clone();
 
@@ -61,15 +61,15 @@ export default class ModelClass
     {
         let mesh=this.mesh;
 
-        this.modelMeshShader.drawStart();
+        this.view.shaderList.modelMeshShader.drawStart();
         
-        mesh.bitmap.attachAsTexture(this.modelMeshShader);
+        mesh.bitmap.attachAsTexture(this.view.shaderList.modelMeshShader);
         
         mesh.buildNonCulledTriangleIndexes();
-        mesh.bindBuffers(this.modelMeshShader);
+        mesh.bindBuffers();
         mesh.draw();
         
-        this.modelMeshShader.drawEnd();
+        this.view.shaderList.modelMeshShader.drawEnd();
     }
 
 }

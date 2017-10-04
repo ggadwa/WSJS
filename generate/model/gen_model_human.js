@@ -25,7 +25,7 @@ export default class GenModelHumanClass extends GenModelBaseClass
         
             // new model
             
-        model=new ModelClass(name);
+        model=new ModelClass(this.view,name);
         
             // bitmap
 

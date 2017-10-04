@@ -1,5 +1,4 @@
 import * as constants from '../../code/main/constants.js';
-import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 
 //
 // map mesh list class
@@ -11,8 +10,6 @@ export default class MapMeshListClass
     {
         this.view=view;
         this.fileCache=this.fileCache;
-        
-        this.meshShader=new MapMeshShaderClass(view,fileCache);
 
         this.meshes=[];
         
@@ -31,12 +28,11 @@ export default class MapMeshListClass
 
     initialize()
     {
-        return(this.meshShader.initialize());
+        return(true);
     }
 
     release()
     {
-        this.meshShader.release();
     }
     
         //
@@ -313,7 +309,7 @@ export default class MapMeshListClass
         let currentBitmap;
         let nMesh=this.meshes.length;
         
-        this.meshShader.drawStart();
+        this.view.shaderList.mapMeshShader.drawStart();
 
             // setup map drawing
 
@@ -337,18 +333,18 @@ export default class MapMeshListClass
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.meshShader);
+                mesh.bitmap.attachAsTexture(this.view.shaderList.mapMeshShader);
             }
 
                 // draw the mesh
 
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers(this.meshShader);
+            mesh.bindBuffers();
             mesh.drawOpaque();
         }
         
-        this.meshShader.drawEnd();
+        this.view.shaderList.mapMeshShader.drawEnd();
     }
     
     drawTransparent()
@@ -370,7 +366,7 @@ export default class MapMeshListClass
         
         gl.depthMask(false);
         
-        this.meshShader.drawStart();
+        this.view.shaderList.mapMeshShader.drawStart();
 
             // setup map drawing
 
@@ -390,20 +386,20 @@ export default class MapMeshListClass
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.meshShader);
+                mesh.bitmap.attachAsTexture(this.view.shaderList.mapMeshShader);
             }
 
                 // draw the mesh
 
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers(this.meshShader);
+            mesh.bindBuffers();
             mesh.drawTransparent();
         }
         
             // reset the blend
             
-        this.meshShader.drawEnd();
+        this.view.shaderList.mapMeshShader.drawEnd();
         
         gl.disable(gl.BLEND);
         gl.depthMask(true);

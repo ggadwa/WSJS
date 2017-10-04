@@ -28,7 +28,7 @@ export default class GenModelMonsterClass extends GenModelBaseClass
         
             // new model
             
-        model=new ModelClass(name);
+        model=new ModelClass(this.view,name);
         
             // bitmap
 

@@ -1,5 +1,7 @@
 import AIClass from '../../code/entities/ai.js';
 import genRandom from '../../generate/utility/random.js';
+import GenProjectileClass from '../../generate/thing/gen_projectile.js';
+import GenSoundClass from '../../generate/sound/gen_sound.js';
 
 //
 // generate projectile class
@@ -7,7 +9,7 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenAIClass
 {
-    constructor(genProjectile,genSound)
+    constructor(view,map,sound,modelList)
     {
             // constants
             
@@ -36,19 +38,28 @@ export default class GenAIClass
         this.MONSTER_MIN_FAR_WAKE_DISTANCE=35000;
         this.MONSTER_RANDOM_EXTRA_FAR_WAKE_DISTANCE=20000;
 
-        this.genProjectile=genProjectile;
-        this.genSound=genSound;
+        this.view=view;
+        this.map=map;
+        this.sound=sound;
+        this.modelList=modelList;
         
         Object.seal(this);
     }
 
-    generate(boss)
+    generate(name,boss)
     {
+        let genSound,genProjectile;
         let speed,acceleration,deceleration,standTurnSpeed,walkTurnSpeed;
         let nearWakeDistance,farWakeDistance;
         let fireRechargeTick,fireSlopAngle,fixMaxDistance;
         let ai=new AIClass();
         
+             // sound generator
+            
+        genSound=new GenSoundClass(this.sound.getAudioContext());
+        
+            // create the AI
+       
         fireSlopAngle=genRandom.randomFloat(this.MONSTER_MIN_FIRE_SLOP_ANGLE,this.MONSTER_RANDOM_EXTRA_FIRE_SLOP_ANGLE);
         
         speed=genRandom.randomInt(this.MONSTER_MIN_SPEED,this.MONSTER_RANDOM_EXTRA_SPEED);
@@ -75,12 +86,13 @@ export default class GenAIClass
             ai.setWakeSleepDistance(farWakeDistance,farWakeDistance,(fireSlopAngle*2.0),-1);        // boss never sleep
         }
         
-        ai.setSoundBuffers(this.genSound.generate(this.genSound.TYPE_MONSTER_WAKE,false),this.genSound.generate(this.genSound.TYPE_MONSTER_HURT,false),this.genSound.generate(this.genSound.TYPE_MONSTER_DIE,false));
+        ai.setSoundBuffers(genSound.generate(genSound.TYPE_MONSTER_WAKE,false),genSound.generate(genSound.TYPE_MONSTER_HURT,false),genSound.generate(genSound.TYPE_MONSTER_DIE,false));
         
             // projectile
             
         if (genRandom.randomPercentage(this.MONSTER_FIRE_PERCENTAGE)) {
-            ai.setProjectile(this.genProjectile.generate(false));
+            genProjectile=new GenProjectileClass(this.view,this.map,this.sound,this.modelList);
+            ai.setProjectile(genProjectile.generate(name,false));
             
             fireRechargeTick=genRandom.randomInt(this.MONSTER_MIN_FIRE_RECHARGE_TICK,this.MONSTER_RANDOM_EXTRA_FIRE_RECHARGE_TICK);
             fixMaxDistance=genRandom.randomInt(this.MONSTER_MIN_FIRE_MAX_DISTANCE,this.MONSTER_RANDOM_EXTRA_FIRE_MAX_DISTANCE);

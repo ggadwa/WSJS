@@ -577,21 +577,21 @@ export default class MapMeshClass
         }
     }
 
-    bindBuffers(mapMeshShader)
+    bindBuffers()
     {
         let gl=this.view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.vertexAttribPointer(mapMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.mapMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.vertexAttribPointer(mapMeshShader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.mapMeshShader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.vertexAttribPointer(mapMeshShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.mapMeshShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
-        gl.vertexAttribPointer(mapMeshShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.mapMeshShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
             // opaque meshes have dynamic indexes,
             // transparent meshes always draw all trigs

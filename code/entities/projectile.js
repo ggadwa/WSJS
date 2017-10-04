@@ -32,6 +32,11 @@ export default class ProjectileClass
         this.reflect=false;
     }
     
+    close()
+    {
+        this.model.close();
+    }
+    
     setSpeed(speed)
     {
         this.speed=speed;

@@ -177,7 +177,7 @@ export default class MapLiquidClass
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
     }
     
-    bindBuffers(mapLiquidShader)
+    bindBuffers()
     {
         let gl=this.view.gl;
 
@@ -186,11 +186,11 @@ export default class MapLiquidClass
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
-        gl.vertexAttribPointer(mapLiquidShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.mapLiquidShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.DYNAMIC_DRAW);
-        gl.vertexAttribPointer(mapLiquidShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.mapLiquidShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
             // indexes are static
             

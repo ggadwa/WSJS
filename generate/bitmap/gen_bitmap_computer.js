@@ -40,6 +40,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         
         if (horz) {
             nLine=Math.trunc((bot-top)*0.7);
+            if (nLine<=0) return;
             
             for (n=0;n!==nLine;n++) {
                 y=(top+5)+genRandom.randomInt(0,((bot-top)-10));
@@ -50,6 +51,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         }
         else {
             nLine=Math.trunc((rgt-lft)*0.7);
+            if (nLine<=0) return;
             
             for (n=0;n!==nLine;n++) {
                 x=(lft+5)+genRandom.randomInt(0,((rgt-lft)-10));

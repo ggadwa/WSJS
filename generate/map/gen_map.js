@@ -905,7 +905,7 @@ export default class GenMapClass
             rects=room.createRandomRects(room);
             
                 // put items in the rects
-            
+                
             nRect=rects.length;
             
             for (k=0;k!==nRect;k++) {
@@ -927,7 +927,7 @@ export default class GenMapClass
                         decorationObj=normalList[genRandom.randomIndex(normalList.length)];
                     }
                 }
-
+                
                 //decorationObj=block; // supergumba -- testing
             
                 decorationObj.create(room,rects[k]);

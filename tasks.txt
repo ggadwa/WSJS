@@ -12,12 +12,25 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
++ get rid of filecache (move to shader)
++ make shaderList
++ get rid of modelList
++ move glOptions to constants
++ move shaderNames to constants
 
++ ai has model in it, split model animation bits from model so we can share?
+
++ main can get some imports removed (gen stuff)
+
++ weapons make projectiles
++ playerEntity makes weapons
++ ai makes projectiles
 + projectiles have ammo & time to fire on them
 + weapons have two projectiles only, ammo on projectiles
 + name weapons
 + switch weapons
 
++ can we get rid of modelList and just pass models (and check other lists, sounds, bitmaps, etc)
 
 
 --> bounce projectiles can bounce forever

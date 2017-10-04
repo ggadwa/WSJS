@@ -1,5 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import config from '../../code/main/config.js';
+import ShaderListClass from '../../code/shader/shader_list.js';
 import PointClass from '../../code/utility/point.js';
 import RectClass from '../../code/utility/rect.js';
 import PlaneClass from '../../code/utility/plane.js';
@@ -22,6 +23,7 @@ export default class ViewClass
 
         this.gl=null;
         this.canvas=null;
+        this.shaderList=null;
         
             // pause flag
             
@@ -179,7 +181,7 @@ export default class ViewClass
         // initialize and release
         //
     
-    initialize()
+    initialize(callback)
     {
         let glOptions={
             alpha:false,
@@ -196,7 +198,7 @@ export default class ViewClass
         this.gl=this.canvas.getContext("webgl2",glOptions);
         if (this.gl===null) {
             alert('WebGL2 not available, try a newer browser');
-            return(false);
+            return;
         }
         
             // some initial setups
@@ -212,6 +214,14 @@ export default class ViewClass
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
         
+            // load the shaders, this requires a callback
+            
+        this.shaderList=new ShaderListClass(this,this.fileCache);
+        this.shaderList.initialize(this.initialize2.bind(this,callback));
+    }
+    
+    initialize2(callback)
+    {
             // create needed objects
             
         this.text=new TextClass(this,this.fileCache);
@@ -220,8 +230,8 @@ export default class ViewClass
 
             // initialize other drawing objects
 
-        if (!this.text.initialize()) return(false);
-        if (!this.interface.initialize()) return(false);
+        if (!this.text.initialize()) return;
+        if (!this.interface.initialize()) return;
         
             // setup some interface positions
         
@@ -234,13 +244,16 @@ export default class ViewClass
         
         this.uiTintRect.setFromValues(0,0,this.wid,this.high);
 
-        return(true);
+            // finally return to initialization process
+            
+        callback();
     }
 
     release()
     {
         this.text.release();
         this.interface.release();
+        this.shaderList.release();
     }
     
         //

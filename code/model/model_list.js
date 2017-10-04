@@ -9,7 +9,6 @@ export default class ModelListClass
     constructor(view,fileCache)
     {
         this.models=[];
-        this.modelMeshShader=new ModelMeshShaderClass(view,fileCache);
         
         Object.seal(this);
     }
@@ -20,12 +19,11 @@ export default class ModelListClass
 
     initialize()
     {
-        return(this.modelMeshShader.initialize());
+        return(true);
     }
 
     release()
     {
-        this.modelMeshShader.release();
     }
 
         //
@@ -34,7 +32,6 @@ export default class ModelListClass
 
     addModel(model)
     {
-        model.modelMeshShader=this.modelMeshShader;
         this.models.push(model);
     }
 

@@ -1,4 +1,6 @@
 import ProjectileClass from '../../code/entities/projectile.js';
+import GenModelProjectileClass from '../../generate/model/gen_model_projectile.js';
+import GenSoundClass from '../../generate/sound/gen_sound.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
@@ -7,24 +9,38 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenProjectileClass
 {
-    constructor(view,map,sound,modelList,genSound)
+    constructor(view,map,sound,modelList)
     {
         this.view=view;
         this.map=map;
         this.sound=sound;
-        this.modelList=modelList;
-        this.genSound=genSound;
+        this.modelList=modelList;       // todo -- DELETE THIS temporary until shaders are global
         
         Object.seal(this);
     }
 
-    generate(entityAI,isPlayer)
+    generate(ownerName,isPlayer)
     {
-        let projectile=new ProjectileClass(this.view,this.map,this.sound,this.modelList.getModel('projectile_0'));
+        let projectile,genModel,model;
+        let genSound;
+        
+            // the model
+            
+        genModel=new GenModelProjectileClass(this.view);
+        model=genModel.generate(('projectile_'+ownerName),1.0,false);
+        this.modelList.addModel(model);
+        
+            // sound generator
+            
+        genSound=new GenSoundClass(this.sound.getAudioContext());
+            
+            // the projectile
+            
+        projectile=new ProjectileClass(this.view,this.map,this.sound,model);
         
         projectile.setLifeTick(10000);
-        projectile.setFireSoundBuffer(this.genSound.generate(this.genSound.TYPE_GUN_FIRE,false));
-        projectile.setHitSoundBuffer(this.genSound.generate(this.genSound.TYPE_EXPLOSION,false));
+        projectile.setFireSoundBuffer(genSound.generate(genSound.TYPE_GUN_FIRE,false));
+        projectile.setHitSoundBuffer(genSound.generate(genSound.TYPE_EXPLOSION,false));
         projectile.setDamage((isPlayer?25:15),0,0);
         
             // enemy settings

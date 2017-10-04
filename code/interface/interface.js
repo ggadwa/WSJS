@@ -10,8 +10,6 @@ export default class InterfaceClass
     {
         this.view=view;
         
-        this.interfaceShader=new InterfaceShaderClass(view,fileCache);
-
         this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
         this.vertexPosBuffer=null;
         
@@ -24,18 +22,13 @@ export default class InterfaceClass
 
     initialize()
     {
-        if (!this.interfaceShader.initialize()) return(false);
-        
         this.vertexPosBuffer=this.view.gl.createBuffer();
-        
         return(true);
     }
 
     release()
     {
         this.view.gl.deleteBuffer(this.vertexPosBuffer);
-        
-        this.interfaceShader.release();
     }
 
         //
@@ -51,14 +44,14 @@ export default class InterfaceClass
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-        this.interfaceShader.drawStart();
+        this.view.shaderList.interfaceShader.drawStart();
     }
 
     drawEnd()
     {
         let gl=this.view.gl;
 
-        this.interfaceShader.drawEnd();
+        this.view.shaderList.interfaceShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
@@ -81,15 +74,15 @@ export default class InterfaceClass
         
             // setup the color
             
-        gl.uniform4f(this.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
+        gl.uniform4f(this.view.shaderList.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
 
             // setup the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.rectVertices,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.interfaceShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.view.shaderList.interfaceShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.view.shaderList.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
             // draw the indexes
             
@@ -122,15 +115,15 @@ export default class InterfaceClass
         
             // setup the color
             
-        gl.uniform4f(this.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
+        gl.uniform4f(this.view.shaderList.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
 
             // setup the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.rectVertices,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.interfaceShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.view.shaderList.interfaceShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.view.shaderList.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
             // draw the indexes
             

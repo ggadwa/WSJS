@@ -6,12 +6,12 @@ import PointClass from '../../code/utility/point.js';
 
 export default class WeaponClass
 {
-    constructor(view,model)
+    constructor(view,model,name)
     {
         this.view=view;
         this.model=model;
+        this.name=name;
         
-        this.name='';
         this.projectile=null;
         this.altProjectile=null;
 

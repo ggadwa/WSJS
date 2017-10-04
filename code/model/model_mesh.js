@@ -369,21 +369,21 @@ export default class ModelMeshClass
         this.indexBuffer=gl.createBuffer();
     }
 
-    bindBuffers(modelMeshShader)
+    bindBuffers()
     {
         let gl=this.view.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.vertexAttribPointer(modelMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.modelMeshShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.vertexAttribPointer(modelMeshShader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.modelMeshShader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.vertexAttribPointer(modelMeshShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.modelMeshShader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
-        gl.vertexAttribPointer(modelMeshShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.modelMeshShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
             // need to always rebuild the array from the culled list
             

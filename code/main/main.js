@@ -49,10 +49,10 @@ class MainClass
     {
         this.view.createCanvas();
         
-        setTimeout(this.initGL.bind(this),1);
+        setTimeout(this.initView.bind(this),1);
     }
 
-    initGL()
+    initView()
     {
             // print out the key incase we have
             // trouble so we don't lose it
@@ -61,10 +61,11 @@ class MainClass
          
            // init view ang webgl
         
-        if (!this.view.initialize()) return;
-
-            // next step
-
+        this.view.initialize(this.initViewFinish.bind(this));
+    }
+    
+    initViewFinish()
+    {
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Initializing Internal Structures');
         this.view.loadingScreenDraw(null);
@@ -166,10 +167,10 @@ class MainClass
         }
         else {
             this.view.loadingScreenUpdate();
-            this.view.loadingScreenAddString('Generating Weapons');
+            this.view.loadingScreenAddString('Generating Dynamic Entities');
             this.view.loadingScreenDraw(null);
 
-            setTimeout(this.initBuildWeapons.bind(this),1);
+            setTimeout(this.initBuildEntities.bind(this),1);
         }
     }
     
@@ -186,48 +187,34 @@ class MainClass
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Weapons');
-        this.view.loadingScreenDraw(null);
-
-        setTimeout(this.initBuildWeapons.bind(this),1);
-    }
-
-    initBuildWeapons()
-    {
-        let model;
-        let genModel;
-
-            // weapon
-
-        genModel=new GenModelWeaponClass(this.view);
-        model=genModel.generate('weapon_0',1.0,false);
-        this.modelList.addModel(model);
-
-            // projectile
-
-        genModel=new GenModelProjectileClass(this.view);
-        model=genModel.generate('projectile_0',1.0,false);
-        this.modelList.addModel(model);
-
-            // next step
-
-        this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Generating Dynamic Entities');
         this.view.loadingScreenDraw(null);
 
         setTimeout(this.initBuildEntities.bind(this),1);
     }
 
+    intBuildEntitiesSingleWeapon(playerEntity,name)
+    {
+        let genWeapon,genProjectile;
+        let playerWeapon,playerProjectile;
+        
+        genWeapon=new GenWeaponClass(this.view,this.map,this.sound,this.modelList);
+        playerWeapon=genWeapon.generate(name);
+        
+        genProjectile=new GenProjectileClass(this.view,this.map,this.sound,this.modelList);
+        playerProjectile=genProjectile.generate(('player_'+name),true);
+        
+        playerWeapon.setProjectile(playerProjectile);
+        playerEntity.addWeapon(playerWeapon);
+    }
+
     initBuildEntities()
     {
         let n,monsterType;
-        let model,pos,playerEntity,playerWeapon;
+        let model,pos,playerEntity;
         let monsterAIs;
         
-        let genSound=new GenSoundClass(this.sound.getAudioContext());
-        let genProjectile=new GenProjectileClass(this.view,this.map,this.sound,this.modelList,genSound);
-        let genWeapon=new GenWeaponClass(this.view,this.modelList,genSound);
-        let genAI=new GenAIClass(genProjectile,genSound);
+        let genAI=new GenAIClass(this.view,this.map,this.sound,this.modelList);
 
             // make player entity
 
@@ -242,25 +229,10 @@ class MainClass
         
             // todo -- all this is hard coded
             
-        playerWeapon=genWeapon.generate();
-        playerWeapon.setProjectile(genProjectile.generate(true));
-        playerWeapon.setName('Pistol');
-        playerEntity.addWeapon(playerWeapon);
-        
-        playerWeapon=genWeapon.generate();
-        playerWeapon.setProjectile(genProjectile.generate(true));
-        playerWeapon.setName('Rocket Launcher');
-        playerEntity.addWeapon(playerWeapon);
-        
-        playerWeapon=genWeapon.generate();
-        playerWeapon.setProjectile(genProjectile.generate(true));
-        playerWeapon.setName('Grenade Launcher');
-        playerEntity.addWeapon(playerWeapon);
-        
-        playerWeapon=genWeapon.generate();
-        playerWeapon.setProjectile(genProjectile.generate(true));
-        playerWeapon.setName('Laser Gun');
-        playerEntity.addWeapon(playerWeapon);
+        this.intBuildEntitiesSingleWeapon(playerEntity,'Pistol');
+        this.intBuildEntitiesSingleWeapon(playerEntity,'Rocket Launcher');
+        this.intBuildEntitiesSingleWeapon(playerEntity,'Grenade Launcher');
+        this.intBuildEntitiesSingleWeapon(playerEntity,'Laser Gun');
         
         playerEntity.setCurrentWeaponIndex(0);
 

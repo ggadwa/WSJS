@@ -6,7 +6,7 @@ import GenRoomDecorationBaseClass from '../../generate/map/gen_map_decoration_ba
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
 import GenBitmapPanelClass from '../../generate/bitmap/gen_bitmap_panel.js';
-import GenBitmapMachineClass from '../../generate/bitmap/gen_bitmap_computer.js';
+import GenBitmapComputerClass from '../../generate/bitmap/gen_bitmap_computer.js';
 import GenBitmapPipeClass from '../../generate/bitmap/gen_bitmap_pipe.js';
 
 //
@@ -25,16 +25,16 @@ export default class GenRoomDecorationComputerClass extends GenRoomDecorationBas
             
         genBitmap=new GenBitmapMetalClass(this.view);
         this.metalBitmap=genBitmap.generate(false);
-        
+
         genBitmap=new GenBitmapPanelClass(this.view);
         this.panelBitmap=genBitmap.generate(false);
-        
-        genBitmap=new GenBitmapMachineClass(this.view);
+
+        genBitmap=new GenBitmapComputerClass(this.view);
         this.computerBitmap=genBitmap.generate(false);
-        
+
         genBitmap=new GenBitmapPipeClass(this.view);
         this.pipeBitmap=genBitmap.generate(false);
-        
+
         Object.seal(this);
     }
     

@@ -1,5 +1,4 @@
 import * as constants from '../../code/main/constants.js';
-import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
 
 //
 // map liquid list class
@@ -11,8 +10,6 @@ export default class MapLiquidListClass
     {
         this.view=view;
         this.fileCache=this.fileCache;
-        
-        this.liquidShader=new MapLiquidShaderClass(view,fileCache);
 
         this.liquids=[];
 
@@ -25,12 +22,11 @@ export default class MapLiquidListClass
 
     initialize()
     {
-        return(this.liquidShader.initialize());
+        return(true);
     }
 
     release()
     {
-        this.liquidShader.release();
     }
     
         //
@@ -96,7 +92,7 @@ export default class MapLiquidListClass
         
         gl.depthMask(false);
 
-        this.liquidShader.drawStart();
+        this.view.shaderList.mapLiquidShader.drawStart();
 
             // setup liquid drawing
 
@@ -115,19 +111,19 @@ export default class MapLiquidListClass
 
             if (liquid.bitmap!==currentBitmap) {
                 currentBitmap=liquid.bitmap;
-                liquid.bitmap.attachAsLiquid(this.liquidShader);
+                liquid.bitmap.attachAsLiquid(this.view.shaderList.mapLiquidShader);
             }
 
                 // draw the liquid
 
             liquid.updateBuffers();
-            liquid.bindBuffers(this.liquidShader);
+            liquid.bindBuffers();
             liquid.draw();
         }
         
             // reset the blend
             
-        this.liquidShader.drawEnd();
+        this.view.shaderList.mapLiquidShader.drawEnd();
         
         gl.disable(gl.BLEND);
         gl.depthMask(true);

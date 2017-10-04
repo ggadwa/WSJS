@@ -24,7 +24,7 @@ export default class GenModelWeaponClass extends GenModelBaseClass
         
             // new model
             
-        model=new ModelClass(name);
+        model=new ModelClass(this.view,name);
         
             // bitmap
 
