@@ -18,6 +18,8 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.normalMatrixUniform=null;
         
         this.alphaUniform=null;
+       
+        this.finalInitCallback=null;
         
         Object.seal(this);
     }
@@ -26,16 +28,20 @@ export default class MapLiquidShaderClass extends ShaderClass
         // initialize/release map liquid shader
         //
 
-    initialize()
+    initialize(callback)
     {
-            // get a new shader object
-            // and load/compile it
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
 
-        if (!super.initialize('map_liquid')) return(false);
+        super.initialize('map_liquid',this.initialize2.bind(this));
+    }
+    
+    initialize2()
+    {
+        let gl=this.view.gl;
 
             // setup uniforms
-
-        let gl=this.view.gl;
 
         gl.useProgram(this.program);
 
@@ -54,7 +60,7 @@ export default class MapLiquidShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

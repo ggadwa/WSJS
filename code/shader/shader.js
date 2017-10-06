@@ -20,7 +20,7 @@ export default class ShaderClass
         // initialize/release shader
         //
 
-    initialize(name)
+    initialize(name,callback)
     {
         let gl=this.view.gl;
         
@@ -28,12 +28,12 @@ export default class ShaderClass
 
         if (!this.loadVertexShader(name)) {
             this.release();
-            return(false);
+            return;
         }
 
         if (!this.loadFragmentShader(name)) {
             this.release();
-            return(false);
+            return;
         }
 
             // compile the program
@@ -46,10 +46,10 @@ export default class ShaderClass
         if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
             this.errorAlert(name,"program",gl.getProgramInfoLog(this.program));
             this.release();
-            return(false);
+            return;
         }
 
-        return(true);
+        callback();
     }
 
     release()

@@ -14,6 +14,8 @@ export default class InterfaceShaderClass extends ShaderClass
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
         
+        this.finalInitCallback=null;
+        
         Object.seal(this);
     }
     
@@ -21,14 +23,18 @@ export default class InterfaceShaderClass extends ShaderClass
         // initialize/release interface shader
         //
 
-    initialize()
+    initialize(callback)
+    {
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
+
+        super.initialize('interface',this.initialize2.bind(this));
+    }
+    
+    initialize2()
     {
         let gl=this.view.gl;
-        
-            // get a new shader object
-            // and load/compile it
-
-        if (!super.initialize('interface')) return(false);
 
             // setup uniforms
 
@@ -41,7 +47,7 @@ export default class InterfaceShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

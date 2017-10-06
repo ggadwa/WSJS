@@ -26,6 +26,8 @@ export default class ModelMeshShaderClass extends ShaderClass
 
         this.lights=[];
         
+        this.finalInitCallback=null;
+        
         Object.seal(this);
     }
     
@@ -33,15 +35,19 @@ export default class ModelMeshShaderClass extends ShaderClass
         // initialize/release model shader
         //
 
-    initialize()
+    initialize(callback)
+    {
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
+        
+        super.initialize('model_mesh',this.initialize2.bind(this));
+    }
+    
+    initialize2()
     {
         let n,name;
         let gl=this.view.gl;
-
-            // get a new shader object
-            // and load/compile it
-
-        if (!super.initialize('model_mesh')) return(false);
 
             // setup uniforms
 
@@ -77,7 +83,7 @@ export default class ModelMeshShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

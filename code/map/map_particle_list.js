@@ -1,5 +1,4 @@
 import * as constants from '../../code/main/constants.js';
-import ParticleShaderClass from '../../code/particle/particle_shader.js';
 import ParticleClass from '../../code/particle/particle.js';
 import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
 
@@ -15,8 +14,6 @@ export default class MapParticleListClass
         
             // variables
             
-        this.particleShader=new ParticleShaderClass(view,fileCache);
-        
         this.particleBitmap=null;
 
         this.particles=[];
@@ -33,10 +30,6 @@ export default class MapParticleListClass
         let n,particle;
         let genBitmap;
 
-            // create the shader
-            
-        if (!this.particleShader.initialize()) return(false);
-        
             // precreate all the particles so we don't have GC problems
             
         this.particles=[];
@@ -64,8 +57,6 @@ export default class MapParticleListClass
         }
         
         this.particleBitmap.close();
-        
-        this.particleShader.release();
     }
 
         //
@@ -187,7 +178,7 @@ export default class MapParticleListClass
         
             // start the shader
             
-        this.particleShader.drawStart();
+        this.view.shaderList.particleShader.drawStart();
         
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE);        // additive   
@@ -200,7 +191,7 @@ export default class MapParticleListClass
             
         for (n=0;n!==constants.PARTICLE_MAX_COUNT;n++) {
             if (!this.particles[n].isFree()) {
-                this.particles[n].draw(this.particleShader);
+                this.particles[n].draw(this.view.shaderList.particleShader);
                 this.particles[n].timeout();
             }
         }
@@ -210,7 +201,7 @@ export default class MapParticleListClass
         gl.disable(gl.BLEND);
         gl.depthMask(true);
         
-        this.particleShader.drawEnd();
+        this.view.shaderList.particleShader.drawEnd();
     }
 
 }

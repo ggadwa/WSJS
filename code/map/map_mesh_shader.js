@@ -27,6 +27,8 @@ export default class MapMeshShaderClass extends ShaderClass
 
         this.lights=[];
         
+        this.finalInitCallback=null;
+        
         Object.seal(this);
     }
     
@@ -34,15 +36,19 @@ export default class MapMeshShaderClass extends ShaderClass
         // initialize/release map shader
         //
 
-    initialize()
+    initialize(callback)
+    {
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
+
+        super.initialize('map_mesh',this.initialize2.bind(this));
+    }
+    
+    initialize2()
     {
         let n,name;
         let gl=this.view.gl;
-        
-            // get a new shader object
-            // and load/compile it
-
-        if (!super.initialize('map_mesh')) return(false);
 
             // setup uniforms
 
@@ -79,7 +85,7 @@ export default class MapMeshShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

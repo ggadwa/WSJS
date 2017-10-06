@@ -14,6 +14,8 @@ export default class MapOverlayShaderClass extends ShaderClass
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
         
+        this.finalInitCallback=null;
+        
         Object.seal(this);
     }
     
@@ -21,15 +23,19 @@ export default class MapOverlayShaderClass extends ShaderClass
     // initialize/release map overlay shader
     //
 
-    initialize()
+    initialize(callback)
+    {
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
+
+        super.initialize('map_overlay',this.initialize2.bind(this));
+    }
+    
+    initialize2()
     {
         let gl=this.view.gl;
         
-            // get a new shader object
-            // and load/compile it
-
-        if (!super.initialize('map_overlay')) return(false);
-
             // setup uniforms
 
         gl.useProgram(this.program);
@@ -41,7 +47,7 @@ export default class MapOverlayShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

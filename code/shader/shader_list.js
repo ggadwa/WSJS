@@ -1,6 +1,9 @@
 import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
+import MapOverlayShaderClass from '../../code/map/map_overlay_shader.js';
+import SkyShaderClass from '../../code/sky/sky_shader.js';
 import ModelMeshShaderClass from '../../code/model/model_mesh_shader.js';
+import ParticleShaderClass from '../../code/particle/particle_shader.js';
 import InterfaceShaderClass from '../../code/interface/interface_shader.js';
 import TextShaderClass from '../../code/text/text_shader.js';
 
@@ -24,55 +27,81 @@ export default class ShaderListClass
         this.interfaceShader=null;
         this.textShader=null;
         
-            // all the shaders we need to load
-            
-        this.shaderNames=[
-                'debug',
-                'interface',
-                'map_mesh',
-                'map_liquid',
-                'map_overlay',
-                'model_mesh',
-                'particle',
-                'text',
-                'sky',
-        ];
+        this.finalInitCallback=null;
         
         Object.seal(this);
     }
     
         //
         // load the shaders
+        // 
+        // this looks really messy because we have to do it all with callbacks,
+        // there isn't a asynch way to load the files
         //
-        
+    
     initialize(callback)
     {
+        this.finalInitCallback=callback;
+        
+        this.initializeMapMeshShader();
+    }
+    
+    initializeMapMeshShader()
+    {
         this.mapMeshShader=new MapMeshShaderClass(this.view,this.fileCache);
-        if (!this.mapMeshShader.initialize()) return;
-        
+        this.mapMeshShader.initialize(this.initializeMapLiquidShader.bind(this));
+    }
+    
+    initializeMapLiquidShader()
+    {
         this.mapLiquidShader=new MapLiquidShaderClass(this.view,this.fileCache);
-        if (!this.mapLiquidShader.initialize()) return;
-
-            
+        this.mapLiquidShader.initialize(this.initializeMapOverlayShader.bind(this));
+    }
+    
+    initializeMapOverlayShader()
+    {
+        this.mapOverlayShader=new MapOverlayShaderClass(this.view,this.fileCache);
+        this.mapOverlayShader.initialize(this.initializeSkyShader.bind(this));
+    }
+    
+    initializeSkyShader()
+    {
+        this.skyShader=new SkyShaderClass(this.view,this.fileCache);
+        this.skyShader.initialize(this.initializeModelMeshShader.bind(this));
+    }
+    
+    initializeModelMeshShader()
+    {            
         this.modelMeshShader=new ModelMeshShaderClass(this.view,this.fileCache);
-        if (!this.modelMeshShader.initialize()) return;
-            
-            
-            
+        this.modelMeshShader.initialize(this.initializeParticleShader.bind(this));
+    }
+    
+    initializeParticleShader()
+    {            
+        this.particleShader=new ParticleShaderClass(this.view,this.fileCache);
+        this.particleShader.initialize(this.initializeInterfaceShader.bind(this));
+    }
+    
+    initializeInterfaceShader()
+    {            
         this.interfaceShader=new InterfaceShaderClass(this.view,this.fileCache);
-        if (!this.interfaceShader.initialize()) return;
-        
+        this.interfaceShader.initialize(this.initializeTextShader.bind(this));
+    }
+    
+    initializeTextShader()
+    {        
         this.textShader=new TextShaderClass(this.view,this.fileCache);
-        if (!this.textShader.initialize()) return;
-        
-        callback();
+        this.textShader.initialize(this.finalInitCallback);
     }
     
     release()
     {
         this.mapMeshShader.release();
         this.mapLiquidShader.release();
+        this.mapOverlayShader.release();
+        this.skyShader.release();
         this.modelMeshShader.release();
+        this.particleShader.release();
         this.interfaceShader.release();
         this.textShader.release();
     }

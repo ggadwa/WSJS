@@ -15,6 +15,8 @@ export default class TextShaderClass extends ShaderClass
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
         
+        this.finalInitCallback=null;
+        
         Object.seal(this);
     }
     
@@ -22,14 +24,18 @@ export default class TextShaderClass extends ShaderClass
     // initialize/release text shader
     //
 
-    initialize()
+    initialize(callback)
+    {
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
+
+        super.initialize('text',this.initialize2.bind(this));
+    }
+    
+    initialize2()
     {
         let gl=this.view.gl;
-        
-            // get a new shader object
-            // and load/compile it
-
-        if (!super.initialize('text')) return(false);
 
             // setup uniforms
 
@@ -47,7 +53,7 @@ export default class TextShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

@@ -16,6 +16,8 @@ export default class ParticleShaderClass extends ShaderClass
         this.modelMatrixUniform=null;    
         this.colorAlphaUniform=null;
         
+        this.finalInitCallback=null;
+        
         Object.seal(this);
     }
     
@@ -23,14 +25,18 @@ export default class ParticleShaderClass extends ShaderClass
         // initialize/release particle shader
         //
 
-    initialize()
+    initialize(callback)
+    {
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
+
+       super.initialize('particle',this.initialize2.bind(this));
+    }
+    
+    initialize2()
     {
         let gl=this.view.gl;
-        
-            // get a new shader object
-            // and load/compile it
-
-        if (!super.initialize('particle')) return(false);
 
             // setup uniforms
 
@@ -50,7 +56,7 @@ export default class ParticleShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

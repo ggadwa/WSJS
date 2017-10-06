@@ -3,7 +3,6 @@ import Line2DClass from '../../code/utility/2D_line.js';
 import RectClass from '../../code/utility/rect.js';
 import ColorClass from '../../code/utility/color.js';
 import EntityProjectileClass from '../../code/entities/entity_projectile.js';
-import MapOverlayShaderClass from '../../code/map/map_overlay_shader.js';
 
 //
 // map overlay class
@@ -14,7 +13,6 @@ export default class MapOverlayClass
     constructor(view,fileCache)
     {
         this.view=view;
-        this.mapOverlayShader=new MapOverlayShaderClass(view,fileCache);
 
         this.roomQuadList=[];
         this.liquidQuadList=[];
@@ -52,8 +50,6 @@ export default class MapOverlayClass
     {
         let gl=this.view.gl;
         
-        if (!this.mapOverlayShader.initialize()) return(false);
-        
         this.roomQuadVertexPosBuffer=gl.createBuffer();
         this.liquidQuadVertexPosBuffer=gl.createBuffer();
         this.roomVertexPosBuffer=gl.createBuffer();
@@ -78,8 +74,6 @@ export default class MapOverlayClass
         gl.deleteBuffer(this.entityVertexPosBuffer);
         
         this.entityVertices=null;
-        
-        this.mapOverlayShader.release();
     }
         
         //
@@ -432,63 +426,63 @@ export default class MapOverlayClass
         let monsterColor=new ColorClass(1.0,0.5,0.5);
         let gl=this.view.gl;
 
-        this.mapOverlayShader.drawStart();
+        this.view.shaderList.mapOverlayShader.drawStart();
         gl.disable(gl.DEPTH_TEST);
         
             // room quads
         
         if (this.roomQuadList.length!==0) {
-            this.mapOverlayShader.drawColor(new ColorClass(0.0,0.0,0.0));
+            this.view.shaderList.mapOverlayShader.drawColor(new ColorClass(0.0,0.0,0.0));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.roomQuadVertexPosBuffer);
-            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.vertexAttribPointer(this.view.shaderList.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             gl.drawArrays(gl.TRIANGLES,0,(this.roomQuadList.length*6));
         }
         
             // liquid quads
         
         if (this.liquidQuadList.length!==0) {
-            this.mapOverlayShader.drawColor(new ColorClass(0.5,0.0,0.4));
+            this.view.shaderList.mapOverlayShader.drawColor(new ColorClass(0.5,0.0,0.4));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.liquidQuadVertexPosBuffer);
-            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.vertexAttribPointer(this.view.shaderList.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             gl.drawArrays(gl.TRIANGLES,0,(this.liquidQuadList.length*6));
         }
         
             // extra lines
   
         if (this.extraLineList.length!==0) {
-            this.mapOverlayShader.drawColor(new ColorClass(0.5,0.5,1.0));
+            this.view.shaderList.mapOverlayShader.drawColor(new ColorClass(0.5,0.5,1.0));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.extraVertexPosBuffer);
-            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.vertexAttribPointer(this.view.shaderList.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             gl.drawArrays(gl.LINES,0,(this.extraLineList.length*2));
         }
         
             // room lines
         
         if (this.roomLineList.length!==0) {
-            this.mapOverlayShader.drawColor(new ColorClass(0.0,0.0,1.0));
+            this.view.shaderList.mapOverlayShader.drawColor(new ColorClass(0.0,0.0,1.0));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.roomVertexPosBuffer);
-            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.vertexAttribPointer(this.view.shaderList.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             gl.drawArrays(gl.LINES,0,(this.roomLineList.length*2));
         }
         
             // door quads
         
         if (this.doorQuadList.length!==0) {
-            this.mapOverlayShader.drawColor(new ColorClass(1.0,0.2,0.2));
+            this.view.shaderList.mapOverlayShader.drawColor(new ColorClass(1.0,0.2,0.2));
 
             gl.bindBuffer(gl.ARRAY_BUFFER,this.doorQuadVertexPosBuffer);
-            gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+            gl.vertexAttribPointer(this.view.shaderList.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             gl.drawArrays(gl.TRIANGLES,0,(this.doorQuadList.length*6));
         }
         
             // entities
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.entityVertexPosBuffer);
-        gl.vertexAttribPointer(this.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.view.shaderList.mapOverlayShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
             
         p1=new Point2DIntClass(0,0);
         p2=new Point2DIntClass(0,0);
@@ -500,7 +494,7 @@ export default class MapOverlayClass
             entity=map.entityList.get(n);
             if (entity instanceof EntityProjectileClass) continue;
             
-            this.mapOverlayShader.drawColor(((n===0)?playerColor:monsterColor));       // index 0 is the player
+            this.view.shaderList.mapOverlayShader.drawColor(((n===0)?playerColor:monsterColor));       // index 0 is the player
             
             ang=360.0-entity.angle.y;
         
@@ -531,7 +525,7 @@ export default class MapOverlayClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
 
         gl.enable(gl.DEPTH_TEST);
-        this.mapOverlayShader.drawEnd();
+        this.view.shaderList.mapOverlayShader.drawEnd();
     }
     
 }

@@ -13,10 +13,9 @@ ESNext
 
 
 + get rid of filecache (move to shader)
-+ make shaderList
+[make shaderList]
 + get rid of modelList
 + move glOptions to constants
-+ move shaderNames to constants
 
 + ai has model in it, split model animation bits from model so we can share?
 
@@ -30,7 +29,6 @@ ESNext
 + name weapons
 + switch weapons
 
-+ can we get rid of modelList and just pass models (and check other lists, sounds, bitmaps, etc)
 
 
 --> bounce projectiles can bounce forever

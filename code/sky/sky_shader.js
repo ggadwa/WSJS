@@ -15,6 +15,8 @@ export default class SkyShaderClass extends ShaderClass
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;
         
+        this.finalInitCallback=null;
+        
         Object.seal(this);
     }
     
@@ -22,14 +24,18 @@ export default class SkyShaderClass extends ShaderClass
         // initialize/release sky shader
         //
 
-    initialize()
+    initialize(callback)
+    {
+        this.finalInitCallback=callback;
+        
+            // load and compile the shader, requires callback
+
+        super.initialize('sky',this.initialize2.bind(this));
+    }
+    
+    initialize2()
     {
         let gl=this.view.gl;
-        
-            // get a new shader object
-            // and load/compile it
-
-        if (!super.initialize('sky')) return(false);
 
             // setup uniforms
 
@@ -43,7 +49,7 @@ export default class SkyShaderClass extends ShaderClass
 
         gl.useProgram(null);
 
-        return(true);
+        this.finalInitCallback();
     }
 
     release()

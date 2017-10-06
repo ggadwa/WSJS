@@ -1,5 +1,4 @@
 import * as constants from '../../code/main/constants.js';
-import SkyShaderClass from '../../code/sky/sky_shader.js';
 import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
 
 //
@@ -11,7 +10,6 @@ export default class SkyClass
     constructor(view,fileCache)
     {
         this.view=view;
-        this.skyShader=new SkyShaderClass(view,fileCache);
 
         this.vertexes=null;
         this.uvs=null;
@@ -34,8 +32,6 @@ export default class SkyClass
     {
         let gl=this.view.gl;
         let genBitmap;
-
-        if (!this.skyShader.initialize()) return(false);
         
             // room enough for the 8 points of the cube
             
@@ -64,8 +60,6 @@ export default class SkyClass
         gl.deleteBuffer(this.indexBuffer);
         
         this.bitmap.close();
-        
-        this.skyShader.release();
     }
 
         //
@@ -114,14 +108,14 @@ export default class SkyClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertexes,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.skyShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.view.shaderList.skyShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.view.shaderList.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.skyShader.vertexUVAttribute);
-        gl.vertexAttribPointer(this.skyShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.view.shaderList.skyShader.vertexUVAttribute);
+        gl.vertexAttribPointer(this.view.shaderList.skyShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STREAM_DRAW);
@@ -141,7 +135,7 @@ export default class SkyClass
             
         gl.disable(gl.DEPTH_TEST);
 
-        this.skyShader.drawStart();
+        this.view.shaderList.skyShader.drawStart();
         
         this.bitmap.attachAsSky();
         
@@ -167,7 +161,7 @@ export default class SkyClass
         
             // end shader
             
-        this.skyShader.drawEnd();
+        this.view.shaderList.skyShader.drawEnd();
 
         gl.enable(gl.DEPTH_TEST);
     }
