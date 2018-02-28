@@ -6,7 +6,7 @@ import InterfaceShaderClass from '../../code/interface/interface_shader.js';
 
 export default class InterfaceClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
         

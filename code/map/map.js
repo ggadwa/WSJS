@@ -31,8 +31,8 @@ export default class MapClass
         this.entityList=new MapEntityListClass();
         this.movementList=new MapMovementListClass();
         this.overlay=new MapOverlayClass(view,fileCache);
-        this.sky=new SkyClass(view,fileCache);
-        this.particleList=new MapParticleListClass(view,fileCache);
+        this.sky=new SkyClass(view);
+        this.particleList=new MapParticleListClass(view);
         
         Object.seal(this);
     }

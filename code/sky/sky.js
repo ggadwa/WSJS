@@ -7,7 +7,7 @@ import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
 
 export default class SkyClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
 

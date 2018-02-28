@@ -8,7 +8,7 @@ import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js
 
 export default class MapParticleListClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
         

@@ -7,7 +7,7 @@ import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 
 export default class TextClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
         

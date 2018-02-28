@@ -48,49 +48,49 @@ export default class ShaderListClass
     
     initializeMapMeshShader()
     {
-        this.mapMeshShader=new MapMeshShaderClass(this.view,this.fileCache);
+        this.mapMeshShader=new MapMeshShaderClass(this.view);
         this.mapMeshShader.initialize(this.initializeMapLiquidShader.bind(this));
     }
     
     initializeMapLiquidShader()
     {
-        this.mapLiquidShader=new MapLiquidShaderClass(this.view,this.fileCache);
+        this.mapLiquidShader=new MapLiquidShaderClass(this.view);
         this.mapLiquidShader.initialize(this.initializeMapOverlayShader.bind(this));
     }
     
     initializeMapOverlayShader()
     {
-        this.mapOverlayShader=new MapOverlayShaderClass(this.view,this.fileCache);
+        this.mapOverlayShader=new MapOverlayShaderClass(this.view);
         this.mapOverlayShader.initialize(this.initializeSkyShader.bind(this));
     }
     
     initializeSkyShader()
     {
-        this.skyShader=new SkyShaderClass(this.view,this.fileCache);
+        this.skyShader=new SkyShaderClass(this.view);
         this.skyShader.initialize(this.initializeModelMeshShader.bind(this));
     }
     
     initializeModelMeshShader()
     {            
-        this.modelMeshShader=new ModelMeshShaderClass(this.view,this.fileCache);
+        this.modelMeshShader=new ModelMeshShaderClass(this.view);
         this.modelMeshShader.initialize(this.initializeParticleShader.bind(this));
     }
     
     initializeParticleShader()
     {            
-        this.particleShader=new ParticleShaderClass(this.view,this.fileCache);
+        this.particleShader=new ParticleShaderClass(this.view);
         this.particleShader.initialize(this.initializeInterfaceShader.bind(this));
     }
     
     initializeInterfaceShader()
     {            
-        this.interfaceShader=new InterfaceShaderClass(this.view,this.fileCache);
+        this.interfaceShader=new InterfaceShaderClass(this.view);
         this.interfaceShader.initialize(this.initializeTextShader.bind(this));
     }
     
     initializeTextShader()
     {        
-        this.textShader=new TextShaderClass(this.view,this.fileCache);
+        this.textShader=new TextShaderClass(this.view);
         this.textShader.initialize(this.finalInitCallback);
     }
     

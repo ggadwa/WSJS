@@ -7,9 +7,9 @@ import ShaderLightClass from '../../code/shader/shader_light.js';
 
 export default class MapMeshShaderClass extends ShaderClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
-        super(view,fileCache);
+        super(view);
         
         this.vertexPositionAttribute=null;
         this.vertexNormalAttribute=null;

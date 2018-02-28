@@ -224,8 +224,8 @@ export default class ViewClass
     {
             // create needed objects
             
-        this.text=new TextClass(this,this.fileCache);
-        this.interface=new InterfaceClass(this,this.fileCache);
+        this.text=new TextClass(this);
+        this.interface=new InterfaceClass(this);
         this.camera=new ViewCameraClass();
 
             // initialize other drawing objects

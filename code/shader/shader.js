@@ -4,10 +4,16 @@
 
 export default class ShaderClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
-        this.fileCache=fileCache;
+        
+        this.vertexShaderURL=null;
+        this.fragmentShaderURL=null;
+        this.callback=null;
+        
+        this.vertexShaderSource=null;
+        this.fragmentShaderSource=null;
         
         this.vertexShader=null;
         this.fragmentShader=null;
@@ -22,19 +28,108 @@ export default class ShaderClass
 
     initialize(name,callback)
     {
+        this.vertexShaderURL='shaders/'+name+'.vert';
+        this.fragmentShaderURL='shaders/'+name+'.frag';
+        this.callback=callback;
+        
+        this.loadVertexShader();
+    }
+    
+    loadVertexShader()
+    {
+        fetch(this.vertexShaderURL)
+            .then(
+                (resp)=>{
+                    if (resp.status!=200) return(Promise.reject(new Error('Missing file: '+this.vertexShaderURL)));
+                    return(resp.text());
+                }
+            )
+            .then((data)=>{
+                    this.vertexShaderSource=data;
+                    this.loadFragmentShader();
+                }
+            )
+            .catch((error)=>alert(error));
+    }
+    
+    loadFragmentShader()
+    {
+        fetch(this.fragmentShaderURL)
+            .then(
+                (resp)=>{
+                    if (resp.status!=200) return(Promise.reject(new Error('Missing file: '+this.fragmentShaderURL)));
+                    return(resp.text());
+                }
+            )
+            .then((data)=>{
+                    this.fragmentShaderSource=data;
+                    this.compileShader();
+                }
+            )
+            .catch((error)=>alert(error));
+    }
+    
+    compileShader()
+    {
         let gl=this.view.gl;
         
-            // get the shaders
+            // compile vertex shader
+            
+        this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(this.vertexShader,this.vertexShaderSource);
+        gl.compileShader(this.vertexShader);
 
-        if (!this.loadVertexShader(name)) {
+        if (!gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) {
+            this.errorAlert(this.vertexShaderURL,"vertex",gl.getShaderInfoLog(this.vertexShader));
             this.release();
             return;
         }
+        
+            // compile fragment shader
+            
+        this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(this.fragmentShader,this.fragmentShaderSource);
+        gl.compileShader(this.fragmentShader);
+
+        if (!gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) {
+            this.errorAlert(this.fragmentShaderURL,"fragment",gl.getShaderInfoLog(this.fragmentShader));
+            this.release();
+            return;
+        }
+        
+            // compile the program
+
+        this.program=gl.createProgram();
+        gl.attachShader(this.program,this.vertexShader);
+        gl.attachShader(this.program,this.fragmentShader);
+        gl.linkProgram(this.program);
+
+        if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
+            this.errorAlert(name,"program",gl.getProgramInfoLog(this.program));
+            this.release();
+            return;
+        }
+
+            // and the callback
+            
+        this.callback();
+    }
+    
+    
+    
+    
+/*
+    initialize2(name,callback)
+    {
+        let gl=this.view.gl;
 
         if (!this.loadFragmentShader(name)) {
             this.release();
             return;
         }
+    initialize(name,callback)
+    {
+        let gl=this.view.gl;
 
             // compile the program
 
@@ -51,7 +146,7 @@ export default class ShaderClass
 
         callback();
     }
-
+*/
     release()
     {
         let gl=this.view.gl;
@@ -76,43 +171,60 @@ export default class ShaderClass
     }
     
         //
+        // load files
+        //
+        /*
+    loadFile(fileName,callback)
+    {
+        let req,res;
+        
+            // ajax the file
+
+        req=new XMLHttpRequest();
+
+        req.open('GET',fileName,true);
+        req.overrideMimeType('text/plain');
+
+        req.onreadystatechange=function() {
+            if (req.readyState!==4) return;
+            res=req.responseText;
+            if (res!==null) {
+                if (res.length===0) res=null;
+            }
+            if (res===null) {
+                alert('Missing File: '+fileName);
+                return;
+            }
+
+            callback(fileName,res);
+        };
+
+        req.send(null);
+    }
+    
+        //
         // load shaders
         //
-    
-    loadVertexShader(name)
-    {
-        let source;
-        let gl=this.view.gl;
         
-        this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
-
-        source=this.fileCache.getFile('shaders/'+name+'.vert');
-        gl.shaderSource(this.vertexShader,source);
-        gl.compileShader(this.vertexShader);
-
-        if (gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) return(true);
-
-        this.errorAlert(name,"vertex",gl.getShaderInfoLog(this.vertexShader));
-        return(false);
-    }
-
-    loadFragmentShader(name)
+    loadFragmentShader3(name)
     {
-        let source;
+        this.loadFile(('shaders/'+name+'.frag'),this.loadFragmentShader2.bind(this));
+    }
+    
+    loadFragmentShader2(fileName,source)
+    {
         let gl=this.view.gl;
         
         this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
-
-        source=this.fileCache.getFile('shaders/'+name+'.frag');
         gl.shaderSource(this.fragmentShader,source);
         gl.compileShader(this.fragmentShader);
 
         if (gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) return(true);
 
-        this.errorAlert(name,"fragment",gl.getShaderInfoLog(this.fragmentShader));
+        this.errorAlert(fileName,"fragment",gl.getShaderInfoLog(this.fragmentShader));
         return(false);
     }
-   
+   */
         //
         // shader errors
         //
