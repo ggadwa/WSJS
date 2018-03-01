@@ -12,8 +12,6 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
-+ get rid of filecache (move to shader) *** FINISH ***
-[make shaderList]
 + get rid of modelList
 + move glOptions to constants
 

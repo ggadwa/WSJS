@@ -13,10 +13,9 @@ import TextShaderClass from '../../code/text/text_shader.js';
 
 export default class ShaderListClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
-        this.fileCache=fileCache;
         
         this.mapMeshShader=null;
         this.mapLiquidShader=null;

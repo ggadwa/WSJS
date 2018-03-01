@@ -1,5 +1,4 @@
 import * as constants from '../../code/main/constants.js';
-import FileCacheClass from '../../code/main/filecache.js';
 import ViewClass from '../../code/main/view.js';
 import SoundClass from '../../code/sound/sound.js';
 import GenBitmapBrickClass from '../../generate/bitmap/gen_bitmap_brick.js';
@@ -59,8 +58,7 @@ export default class DebugRunClass
 {
     constructor()
     {
-        this.fileCache=new FileCacheClass();
-        this.view=new ViewClass(this.fileCache);
+        this.view=new ViewClass();
         this.sound=new SoundClass();
 
         this.listDiv=null;

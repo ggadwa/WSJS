@@ -6,9 +6,9 @@ import ShaderClass from '../../code/shader/shader.js';
 
 export default class DebugShaderClass extends ShaderClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
-        super(view,fileCache);
+        super(view);
         
         this.vertexPositionAttribute=null;
         this.perspectiveMatrixUniform=null;

@@ -15,10 +15,8 @@ import InterfaceClass from '../../code/interface/interface.js';
 
 export default class ViewClass
 {
-    constructor(fileCache)
+    constructor()
     {
-        this.fileCache=fileCache;
-        
             // the opengl context
 
         this.gl=null;
@@ -216,7 +214,7 @@ export default class ViewClass
         
             // load the shaders, this requires a callback
             
-        this.shaderList=new ShaderListClass(this,this.fileCache);
+        this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize(this.initialize2.bind(this,callback));
     }
     

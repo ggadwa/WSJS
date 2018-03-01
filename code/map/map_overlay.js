@@ -10,7 +10,7 @@ import EntityProjectileClass from '../../code/entities/entity_projectile.js';
 
 export default class MapOverlayClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
 

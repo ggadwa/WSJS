@@ -6,10 +6,9 @@ import * as constants from '../../code/main/constants.js';
 
 export default class MapMeshListClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
-        this.fileCache=this.fileCache;
 
         this.meshes=[];
         

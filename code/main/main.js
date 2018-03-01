@@ -1,7 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
-import FileCacheClass from '../../code/main/filecache.js';
 import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
 import ModelListClass from '../../code/model/model_list.js';
@@ -30,10 +29,9 @@ class MainClass
     {
             // game globals
 
-        this.fileCache=new FileCacheClass();
-        this.view=new ViewClass(this.fileCache);
-        this.map=new MapClass(this.view,this.fileCache);
-        this.modelList=new ModelListClass(this.view,this.fileCache);
+        this.view=new ViewClass();
+        this.map=new MapClass(this.view);
+        this.modelList=new ModelListClass(this.view);
         this.input=new InputClass(this.view);
         this.sound=new SoundClass();
 
@@ -41,11 +39,6 @@ class MainClass
     }
 
     run()
-    {
-        this.fileCache.fillCache(this.initCanvas.bind(this));       // this contains all the shader code, needs to be loaded first
-    }
-    
-    initCanvas()
     {
         this.view.createCanvas();
         

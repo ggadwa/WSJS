@@ -19,18 +19,17 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class MapClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
         this.view=view;
-        this.fileCache=this.fileCache;
         
         this.roomList=new MapRoomListClass(view,this);
-        this.meshList=new MapMeshListClass(view,fileCache);
-        this.liquidList=new MapLiquidListClass(view,fileCache);
+        this.meshList=new MapMeshListClass(view);
+        this.liquidList=new MapLiquidListClass(view);
         this.lightList=new MapLightListClass(view);
         this.entityList=new MapEntityListClass();
         this.movementList=new MapMovementListClass();
-        this.overlay=new MapOverlayClass(view,fileCache);
+        this.overlay=new MapOverlayClass(view);
         this.sky=new SkyClass(view);
         this.particleList=new MapParticleListClass(view);
         

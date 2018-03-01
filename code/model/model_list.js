@@ -6,8 +6,10 @@ import ModelMeshShaderClass from '../../code/model/model_mesh_shader.js';
 
 export default class ModelListClass
 {
-    constructor(view,fileCache)
+    constructor(view)
     {
+        this.view=view;
+        
         this.models=[];
         
         Object.seal(this);
