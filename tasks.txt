@@ -12,12 +12,20 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
+
+- do model mesh first
+
++ separate draw part of model from setup part of model
++ ai has model in it, split model animation bits from model so we can share?
++ add the clone() methods in model
++ get rid of model cloning, and flag isClone
++ model.close() to release ... add initialize()
 + get rid of modelList
 + move glOptions to constants
 
 + boxes are terrible
 
-+ ai has model in it, split model animation bits from model so we can share?
+
 
 + main can get some imports removed (gen stuff)
 

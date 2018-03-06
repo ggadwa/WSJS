@@ -1,4 +1,5 @@
 import * as constants from '../../code/main/constants.js';
+import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityProjectileClass from '../../code/entities/entity_projectile.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../generate/utility/random.js';
@@ -11,7 +12,7 @@ export default class MapEntityListClass
 {
     constructor()
     {
-        this.entityCurrentId=1;
+        this.entityCurrentId=1;     // 0 is always the player
         this.entities=[];
 
         Object.seal(this);
@@ -44,17 +45,25 @@ export default class MapEntityListClass
     setPlayer(entity)
     {
         entity.id=0;
+        entity.initialize();
+        
         this.entities[0]=entity;
     }
 
     add(entity)
     {
         entity.id=this.entityCurrentId++;
+        entity.initialize();
+        
         this.entities.push(entity);
     }
     
     clear()
     {
+        for (entity of this.entities) {
+            entity.release();
+        }
+        
         this.entities=[];
     }
 
@@ -75,11 +84,9 @@ export default class MapEntityListClass
     
     findById(id)
     {
-        let n,entity;
-        let nEntity=this.entities.length;
-            
-        for (n=0;n!==nEntity;n++) {
-            entity=this.entities[n];
+        let entity;
+         
+        for (entity of this.entities) {
             if (entity.id===id) return(entity);
         }
         
@@ -92,14 +99,12 @@ export default class MapEntityListClass
         
     movementPush(meshIdx,movePnt)
     {
-        let n,entity;
-        let nEntity=this.entities.length;
+        let entity;
         
             // check the entities, skipping
             // any projectiles
             
-        for (n=0;n!==nEntity;n++) {
-            entity=this.entities[n];
+        for (entity of this.entities) {
             if (entity instanceof EntityProjectileClass) continue;
             
             entity.movementPush(meshIdx,movePnt);
@@ -112,22 +117,24 @@ export default class MapEntityListClass
         
     run()
     {
-        let n;
-        let nEntity=this.entities.length;
+        let n,nEntity;
+        let entity;
         
             // run the entities
             
-        for (n=0;n!==nEntity;n++) {
-            this.entities[n].run(this);
+        for (entity of this.entities) {
+            entity.run(this);
         }
         
             // now clean up any that got
             // marked for deleting
             
         n=0;
+        nEntity=this.entities.length;
         
         while (n<nEntity) {
             if (this.entities[n].isMarkedForDeletion()) {
+                entity.release();
                 this.entities.splice(n,1);
                 nEntity--;
                 continue;
@@ -142,13 +149,13 @@ export default class MapEntityListClass
         
     draw()
     {
-        let n,entity;
-        let nEntity=this.entities.length;
+        let entity;
 
             // skip index 0 as that's the player
             
-        for (n=1;n<nEntity;n++) {
-            entity=this.entities[n];
+        for (entity of this.entities) {
+            if (entity instanceof EntityPlayerClass) continue;
+
             if (entity.inFrustum()) entity.draw();
         }
     }

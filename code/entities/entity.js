@@ -2,6 +2,7 @@ import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import CollisionClass from '../../code/entities/collisions.js';
+import ModelDrawClass from '../../code/model_draw/model_draw.js';
 
 //
 // entity base class
@@ -20,6 +21,7 @@ export default class EntityClass
         this.angle=angle.copy();
         this.maxHealth=maxHealth;
         this.model=model;
+        this.modelDraw=new ModelDrawClass(view,model);
         
         this.radius=this.model.calculateRadius();
         this.high=this.model.calculateHeight();
@@ -84,7 +86,21 @@ export default class EntityClass
     }
     
         //
-        // setup
+        // initialize and release
+        //
+        
+    initialize()
+    {
+        this.modelDraw.initialize();
+    }
+    
+    release()
+    {
+        this.modelDraw.release();
+    }
+    
+        //
+        // misc
         //
         
     overrideRadiusHeight(radius,high)
