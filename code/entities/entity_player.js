@@ -43,6 +43,27 @@ export default class EntityPlayerClass extends EntityClass
     }
     
         //
+        // initialize and release
+        //
+        
+    initialize()
+    {
+        super.initialize();
+    }
+    
+    release()
+    {
+        let weapon;
+        
+        super.release();
+        
+        for (weapon in weapons)
+        {
+            weapon.release();
+        }
+    }
+    
+        //
         // looking and turning
         //
         
@@ -79,6 +100,7 @@ export default class EntityPlayerClass extends EntityClass
         
     addWeapon(weapon)
     {
+        weapon.initialize();
         this.weapons.push(weapon);
     }
     

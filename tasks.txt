@@ -13,24 +13,29 @@ ESNext
 
 
 
+
 - do model mesh first
+- fix the binding bug
 
 + separate draw part of model from setup part of model
 + ai has model in it, split model animation bits from model so we can share?
-+ add the clone() methods in model
-+ get rid of model cloning, and flag isClone
++ get rid of model cloning, and flag isClone (cloneModel(name))
 + model.close() to release ... add initialize()
 + get rid of modelList
-+ move glOptions to constants
 
++ weapons make projectiles
++ playerEntity makes weapons
+
+***** TRACK ALL initialize/release, and don't use close()
+
+
++ move glOptions to constants
 + boxes are terrible
 
 
 
 + main can get some imports removed (gen stuff)
 
-+ weapons make projectiles
-+ playerEntity makes weapons
 + ai makes projectiles
 + projectiles have ammo & time to fire on them
 + weapons have two projectiles only, ammo on projectiles

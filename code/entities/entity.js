@@ -642,15 +642,15 @@ export default class EntityClass
             
         if ((this.model.skeleton!==null) && (!this.view.paused)) {
             this.model.skeleton.animate();
-            this.model.mesh.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
+            this.modelDraw.drawMesh.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
         }
         else {
-            this.model.mesh.updateVertexesToAngleAndPosition(this.angle,this.position);
+            this.modelDraw.drawMesh.updateVertexesToAngleAndPosition(this.angle,this.position);
         }
         
             // draw the model
             
-        this.model.draw();
+        this.modelDraw.draw();
     }
     
     

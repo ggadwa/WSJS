@@ -2,18 +2,17 @@ import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import ModelMeshClass from '../../code/model/model_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
+import GenMeshBaseClass from '../../generate/model/gen_mesh_base.js';
 
 //
 // gen weapon mesh class
 //
 
-export default class GenModelWeaponMeshClass
+export default class GenModelWeaponMeshClass extends GenMeshBaseClass
 {
     constructor(view,model,bitmap)
     {
-        this.view=view;
-        this.model=model;
-        this.bitmap=bitmap;
+        super(view,model,bitmap);
 
             //
             // counts for vertex/uvs/indexes
@@ -105,7 +104,7 @@ export default class GenModelWeaponMeshClass
         // build weapon mesh
         //
 
-    build(inDebug)
+    build()
     {
         let vertexList=MeshUtilityClass.createModelVertexList(this.CYLINDER_VERTEX_COUNT);
         let indexes=new Uint16Array(this.CYLINDER_INDEX_COUNT);
@@ -118,7 +117,6 @@ export default class GenModelWeaponMeshClass
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.view,this.bitmap,vertexList,indexes,0);
-        if (!inDebug) this.model.mesh.setupBuffers();
     }
     
 }

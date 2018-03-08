@@ -9,7 +9,7 @@ import ModelDrawSkeletonClass from '../../code/model_draw/model_draw_skeleton.js
 // object itself
 //
 
-export default class ModelClass
+export default class ModelDrawClass
 {
     constructor(view,model)
     {
@@ -31,10 +31,29 @@ export default class ModelClass
         this.drawMesh.initialize();
     }
     
-    relase()
+    release()
     {
         this.drawMesh.release();
     }
+    
+        //
+        // draw model
+        //
 
+    draw()
+    {
+        let mesh=this.model.mesh;
+        let drawMesh=this.drawMesh;
+
+        this.view.shaderList.modelMeshShader.drawStart();
+        
+        mesh.bitmap.attachAsTexture(this.view.shaderList.modelMeshShader);
+        
+        drawMesh.buildNonCulledTriangleIndexes();
+        drawMesh.bindBuffers();
+        drawMesh.draw();
+        
+        this.view.shaderList.modelMeshShader.drawEnd();
+    }
 
 }

@@ -22,7 +22,7 @@ export default class GenMeshHumanClass extends GenMeshBaseClass
         // build mesh around skeleton
         //
 
-    build(inDebug)
+    build()
     {
         let n,limb,indexOffset;
         let fullBodyScale;
@@ -83,7 +83,6 @@ export default class GenMeshHumanClass extends GenMeshBaseClass
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.view,this.bitmap,modelVertexList,modelIndexes,0);
-        if (!inDebug) this.model.mesh.setupBuffers();
         this.model.mesh.precalcAnimationValues(this.model.skeleton);
     }
     

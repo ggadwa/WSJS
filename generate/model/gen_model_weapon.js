@@ -38,7 +38,7 @@ export default class GenModelWeaponClass extends GenModelBaseClass
             // skeleton and mesh
         
         genMesh=new GenMeshWeaponClass(this.view,model,modelBitmap);
-        genMesh.build(inDebug);
+        genMesh.build();
         
         return(model);
     }

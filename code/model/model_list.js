@@ -70,7 +70,7 @@ export default class ModelListClass
         if (model===null) return(null);
         
         cloneModel=model.clone();
-        cloneModel.mesh.setupBuffers();
+        //cloneModel.mesh.setupBuffers();
         
         this.models.push(cloneModel);
         

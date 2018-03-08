@@ -2,19 +2,17 @@ import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import ModelMeshClass from '../../code/model/model_mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
+import GenMeshBaseClass from '../../generate/model/gen_mesh_base.js';
 
 //
 // gen projectile mesh class
 //
 
-export default class GenModelProjectileMeshClass
+export default class GenModelProjectileMeshClass extends GenMeshBaseClass
 {
     constructor(view,model,bitmap)
     {
-        this.view=view;
-        this.model=model;
-        this.bitmap=bitmap;
-        
+        super(view,model,bitmap);
         Object.seal(this);
     }
     
@@ -125,7 +123,7 @@ export default class GenModelProjectileMeshClass
         // build projectile mesh
         //
 
-    build(inDebug)
+    build()
     {
         let vertexList=MeshUtilityClass.createModelVertexList(36);
         let indexes=new Uint16Array(36);
@@ -135,7 +133,6 @@ export default class GenModelProjectileMeshClass
             // add mesh to model
             
         this.model.mesh=new ModelMeshClass(this.view,this.bitmap,vertexList,indexes,0);
-        if (!inDebug) this.model.mesh.setupBuffers();
     }
     
 }

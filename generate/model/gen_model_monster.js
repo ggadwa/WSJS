@@ -57,7 +57,7 @@ export default class GenModelMonsterClass extends GenModelBaseClass
         genSkeleton.build();
         
         genMesh=new GenMeshMonsterClass(this.view,model,modelBitmap);
-        genMesh.build(inDebug);
+        genMesh.build();
         
         return(model);
     }

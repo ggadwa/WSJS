@@ -38,7 +38,7 @@ export default class GenModelProjectileClass extends GenModelBaseClass
             // skeleton and mesh
         
         genMesh=new GenMeshProjectileClass(this.view,model,modelBitmap);
-        genMesh.build(inDebug);
+        genMesh.build();
 
         return(model);
     }

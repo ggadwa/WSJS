@@ -42,7 +42,7 @@ export default class GenModelHumanClass extends GenModelBaseClass
         genSkeleton.build();
         
         genMesh=new GenMeshHumanClass(this.view,model,modelBitmap);
-        genMesh.build(inDebug);
+        genMesh.build();
         
         return(model);
     }

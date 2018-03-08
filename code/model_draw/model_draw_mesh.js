@@ -14,7 +14,6 @@ export default class ModelDrawMeshClass
     {
         this.view=view;
         this.model=model;
-        this.mesh=model.mesh;
         
             // non-culled vertex and index list
 
@@ -54,24 +53,25 @@ export default class ModelDrawMeshClass
     
     initialize()
     {
+        let mesh=this.model.mesh;
         let n,v,vIdx,uIdx,nIdx,tIdx;
         let gl=this.view.gl;
         
             // build the default buffer data
             // from the vertex list
         
-        this.drawVertices=new Float32Array(this.mesh.vertexCount*3);
-        this.drawNormals=new Float32Array(this.mesh.vertexCount*3);
-        this.drawTangents=new Float32Array(this.mesh.vertexCount*3);
-        this.drawUVs=new Float32Array(this.mesh.vertexCount*2);
+        this.drawVertices=new Float32Array(mesh.vertexCount*3);
+        this.drawNormals=new Float32Array(mesh.vertexCount*3);
+        this.drawTangents=new Float32Array(mesh.vertexCount*3);
+        this.drawUVs=new Float32Array(mesh.vertexCount*2);
         
         vIdx=0;
         uIdx=0;
         nIdx=0;
         tIdx=0;
         
-        for (n=0;n!==this.mesh.vertexCount;n++) {
-            v=this.mesh.vertexList[n];
+        for (n=0;n!==mesh.vertexCount;n++) {
+            v=mesh.vertexList[n];
             
             this.drawVertices[vIdx++]=v.position.x;
             this.drawVertices[vIdx++]=v.position.y;
@@ -133,6 +133,7 @@ export default class ModelDrawMeshClass
         
     updateVertexesToPoseAndPosition(skeleton,angle,position)
     {
+        let mesh=this.model.mesh;
         let n,v,vIdx,nIdx;
         let bone,parentBone;
         let gl=this.view.gl;
@@ -142,8 +143,8 @@ export default class ModelDrawMeshClass
         vIdx=0;
         nIdx=0;
         
-        for (n=0;n!==this.mesh.vertexCount;n++) {
-            v=this.mesh.vertexList[n];
+        for (n=0;n!==mesh.vertexCount;n++) {
+            v=mesh.vertexList[n];
             
                 // bone movement
                 
@@ -208,6 +209,7 @@ export default class ModelDrawMeshClass
         
     updateVertexesToAngleAndPosition(angle,position)
     {
+        let mesh=this.model.mesh;
         let n,v,vIdx,nIdx;
         let gl=this.view.gl;
         
@@ -216,8 +218,8 @@ export default class ModelDrawMeshClass
         vIdx=0;
         nIdx=0;
         
-        for (n=0;n!==this.mesh.vertexCount;n++) {
-            v=this.mesh.vertexList[n];
+        for (n=0;n!==mesh.vertexCount;n++) {
+            v=mesh.vertexList[n];
             
             this.rotVector.setFromPoint(v.position);
             this.rotVector.rotate(angle);
@@ -276,19 +278,20 @@ export default class ModelDrawMeshClass
         
     buildNonCulledTriangleIndexes()
     {
+        let mesh=this.model.mesh;
         let n,x,y,z,f,idx,vIdx;
        
             // we build a list of array the vertexes
             // that aren't culled, if it's the first
             // time we need to create the array
             
-        if (this.nonCulledVertexes===null) this.nonCulledVertexes=new Uint8Array(this.mesh.vertexCount);
+        if (this.nonCulledVertexes===null) this.nonCulledVertexes=new Uint8Array(mesh.vertexCount);
 
             // if it's the first time, we'll need
             // to create the index array
             
         this.nonCulledIndexCount=0;
-        if (this.nonCulledIndexes===null) this.nonCulledIndexes=new Uint16Array(this.mesh.indexCount);
+        if (this.nonCulledIndexes===null) this.nonCulledIndexes=new Uint16Array(mesh.indexCount);
         
             // check all the vertexes for culling, i.e.,
             // have normals facing away from the eye
@@ -300,7 +303,7 @@ export default class ModelDrawMeshClass
         
         vIdx=0;
         
-        for (n=0;n!==this.mesh.vertexCount;n++) {
+        for (n=0;n!==mesh.vertexCount;n++) {
             
             x=this.drawVertices[vIdx]-this.view.camera.position.x;      // cullPnt.setFromValues(this.drawVertices[vIdx],this.drawVertices[vIdx+1],this.drawVertices[vIdx+2]);
             y=this.drawVertices[vIdx+1]-this.view.camera.position.y;     // cullTrigToEyeVector.setFromSubPoint(this.cullPnt,this.view.camera.position);
@@ -323,11 +326,11 @@ export default class ModelDrawMeshClass
             
         idx=0;
         
-        for (n=0;n!==this.mesh.trigCount;n++) {
-            if ((this.nonCulledVertexes[this.indexes[idx]]) || (this.nonCulledVertexes[this.indexes[idx+1]]) || (this.nonCulledVertexes[this.indexes[idx+2]])) {
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx++];
+        for (n=0;n!==mesh.trigCount;n++) {
+            if ((this.nonCulledVertexes[mesh.indexes[idx]]) || (this.nonCulledVertexes[mesh.indexes[idx+1]]) || (this.nonCulledVertexes[mesh.indexes[idx+2]])) {
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=mesh.indexes[idx++];
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=mesh.indexes[idx++];
+                this.nonCulledIndexes[this.nonCulledIndexCount++]=mesh.indexes[idx++];
             }
             else {
                 idx=idx+3;      // supergumba -- chrome complains about idx+=3, so we do this for now
