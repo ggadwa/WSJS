@@ -57,7 +57,7 @@ export default class EntityPlayerClass extends EntityClass
         
         super.release();
         
-        for (weapon in weapons)
+        for (weapon of weapons)
         {
             weapon.release();
         }

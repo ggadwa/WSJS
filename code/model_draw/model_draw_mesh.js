@@ -10,10 +10,10 @@ import ModelMeshVertexClass from '../../code/model/model_mesh_vertex.js';
 
 export default class ModelDrawMeshClass
 {
-    constructor(view,model)
+    constructor(view,mesh)
     {
         this.view=view;
-        this.model=model;
+        this.mesh=mesh;
         
             // non-culled vertex and index list
 
@@ -53,7 +53,7 @@ export default class ModelDrawMeshClass
     
     initialize()
     {
-        let mesh=this.model.mesh;
+        let mesh=this.mesh;
         let n,v,vIdx,uIdx,nIdx,tIdx;
         let gl=this.view.gl;
         
@@ -115,7 +115,7 @@ export default class ModelDrawMeshClass
     release()
     {
         let gl=this.view.gl;
-
+        
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
 
@@ -131,11 +131,11 @@ export default class ModelDrawMeshClass
         // set vertices to pose and offset position
         //
         
-    updateVertexesToPoseAndPosition(skeleton,angle,position)
+    updateVertexesToPoseAndPosition(drawSkeleton,angle,position)
     {
-        let mesh=this.model.mesh;
+        let mesh=this.mesh;
         let n,v,vIdx,nIdx;
-        let bone,parentBone;
+        let drawBone,parentDrawBone;
         let gl=this.view.gl;
         
             // move all the vertexes
@@ -148,32 +148,32 @@ export default class ModelDrawMeshClass
             
                 // bone movement
                 
-            bone=skeleton.bones[v.boneIdx];
+            drawBone=drawSkeleton.drawBones[v.boneIdx];
                 
             this.rotVector.setFromPoint(v.vectorFromBone);
-            this.rotVector.rotate(bone.curPoseAngle);
+            this.rotVector.rotate(drawBone.curPoseAngle);
             
-            this.rotVector.x=bone.curPosePosition.x+this.rotVector.x;
-            this.rotVector.y=bone.curPosePosition.y+this.rotVector.y;
-            this.rotVector.z=bone.curPosePosition.z+this.rotVector.z;
+            this.rotVector.x=drawBone.curPosePosition.x+this.rotVector.x;
+            this.rotVector.y=drawBone.curPosePosition.y+this.rotVector.y;
+            this.rotVector.z=drawBone.curPosePosition.z+this.rotVector.z;
             
             this.rotNormal.setFromPoint(v.normal);
-            this.rotNormal.rotate(bone.curPoseAngle);
+            this.rotNormal.rotate(drawBone.curPoseAngle);
             
                 // average in any parent movement
                 
             if (v.parentBoneIdx!==-1) {
-                parentBone=skeleton.bones[v.parentBoneIdx];
+                parentDrawBone=drawSkeleton.drawBones[v.parentBoneIdx];
                 
                 this.parentRotVector.setFromPoint(v.vectorFromParentBone);
-                this.parentRotVector.rotate(parentBone.curPoseAngle);
+                this.parentRotVector.rotate(parentDrawBone.curPoseAngle);
 
-                this.parentRotVector.x=parentBone.curPosePosition.x+this.parentRotVector.x;
-                this.parentRotVector.y=parentBone.curPosePosition.y+this.parentRotVector.y;
-                this.parentRotVector.z=parentBone.curPosePosition.z+this.parentRotVector.z;
+                this.parentRotVector.x=parentDrawBone.curPosePosition.x+this.parentRotVector.x;
+                this.parentRotVector.y=parentDrawBone.curPosePosition.y+this.parentRotVector.y;
+                this.parentRotVector.z=parentDrawBone.curPosePosition.z+this.parentRotVector.z;
 
                 this.parentRotNormal.setFromPoint(v.normal);
-                this.parentRotNormal.rotate(parentBone.curPoseAngle);
+                this.parentRotNormal.rotate(parentDrawBone.curPoseAngle);
                 
                 this.rotVector.average(this.parentRotVector);
                 this.rotNormal.average(this.parentRotNormal);
@@ -209,7 +209,7 @@ export default class ModelDrawMeshClass
         
     updateVertexesToAngleAndPosition(angle,position)
     {
-        let mesh=this.model.mesh;
+        let mesh=this.mesh;
         let n,v,vIdx,nIdx;
         let gl=this.view.gl;
         
@@ -237,7 +237,7 @@ export default class ModelDrawMeshClass
         }
         
             // set the buffers
-            
+        
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
         
@@ -278,7 +278,7 @@ export default class ModelDrawMeshClass
         
     buildNonCulledTriangleIndexes()
     {
-        let mesh=this.model.mesh;
+        let mesh=this.mesh;
         let n,x,y,z,f,idx,vIdx;
        
             // we build a list of array the vertexes

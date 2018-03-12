@@ -35,7 +35,7 @@ export default class MapEntityListClass
 
     release()
     {
-        this.entities=[];
+        this.clear();
     }
 
         //
@@ -60,6 +60,8 @@ export default class MapEntityListClass
     
     clear()
     {
+        let entity;
+        
         for (entity of this.entities) {
             entity.release();
         }

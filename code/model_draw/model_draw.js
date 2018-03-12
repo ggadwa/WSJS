@@ -16,8 +16,10 @@ export default class ModelDrawClass
         this.view=view;
         this.model=model;
         
-        this.drawMesh=new ModelDrawMeshClass(view,model);
-        this.drawSkeleton=new ModelDrawSkeletonClass(view,model);
+        this.drawMesh=new ModelDrawMeshClass(view,model.mesh);
+        
+        this.drawSkeleton=null;
+        if (model.skeleton!==null) this.drawSkeleton=new ModelDrawSkeletonClass(view,model.skeleton);
         
         Object.seal(this);
     }

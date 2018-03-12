@@ -640,9 +640,9 @@ export default class EntityClass
             // vertices or just move to current position
             // and angle
             
-        if ((this.model.skeleton!==null) && (!this.view.paused)) {
-            this.model.skeleton.animate();
-            this.modelDraw.drawMesh.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
+        if (this.modelDraw.drawSkeleton!==null) {
+            if (!this.view.paused) this.modelDraw.drawSkeleton.animate();
+            this.modelDraw.drawMesh.updateVertexesToPoseAndPosition(this.modelDraw.drawSkeleton,this.angle,this.position);
         }
         else {
             this.modelDraw.drawMesh.updateVertexesToAngleAndPosition(this.angle,this.position);
