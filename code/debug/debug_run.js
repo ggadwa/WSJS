@@ -50,6 +50,20 @@ class DebugItemClass
 }
 
 //
+// model scaling
+//
+
+class DebugModelScaleClass
+{
+    constructor(xOffset,yOffset,factor)
+    {
+        this.xOffset=xOffset;
+        this.yOffset=yOffset;
+        this.factor=factor;
+    }
+}
+
+//
 // this is a specialized main that debug outputs some
 // generated items
 //
@@ -152,7 +166,7 @@ export default class DebugRunClass
         
     drawBitmap(item)
     {
-        let ctx,debugBitmap,fourWid;
+        let ctx,debugBitmap,boxSize;
         let wid=this.bitmapCanvas.width;
         let high=this.bitmapCanvas.height;
         
@@ -162,16 +176,16 @@ export default class DebugRunClass
         
             // draw the bitmap
             
+        boxSize=(wid<high)?Math.trunc(wid*0.5):Math.trunc(high*0.5);
+            
         ctx=this.bitmapCanvas.getContext('2d');
         ctx.fillStyle='#FFFFFF';
         ctx.fillRect(0,0,wid,high);
         
-        fourWid=Math.trunc(wid/4);
-        
-        ctx.drawImage(debugBitmap.bitmap,0,0,fourWid,high);
-        if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,fourWid,0,fourWid,high);
-        if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,(fourWid*2),0,fourWid,high);
-        if (debugBitmap.glow!==null) ctx.drawImage(debugBitmap.glow,(fourWid*3),0,fourWid,high);
+        ctx.drawImage(debugBitmap.bitmap,0,0,boxSize,boxSize);
+        if (debugBitmap.normal!==null) ctx.drawImage(debugBitmap.normal,boxSize,0,boxSize,boxSize);
+        if (debugBitmap.specular!==null) ctx.drawImage(debugBitmap.specular,0,boxSize,boxSize,boxSize);
+        if (debugBitmap.glow!==null) ctx.drawImage(debugBitmap.glow,boxSize,boxSize,boxSize,boxSize);
         
             // show the canvas
             
@@ -182,7 +196,7 @@ export default class DebugRunClass
     
     drawSound(item)
     {
-        let x,dataSkip,dataLen,y,idx,halfHigh;
+        let x,dataSkip,dataLen,y,idx,top,meterHigh,halfMeterHigh;
         let data;
         let ctx;
         let wid=this.soundCanvas.width;
@@ -196,15 +210,28 @@ export default class DebugRunClass
         ctx.fillStyle='#FFFFFF';
         ctx.fillRect(0,0,wid,high);
         
-            // the midline
-            
-        halfHigh=Math.trunc(high/2);
+            // the top/bottom and midline
+        
+        meterHigh=200;
+        halfMeterHigh=Math.trunc(meterHigh*0.5);
+        top=Math.trunc(high*0.5)-halfMeterHigh;    
+        
+        ctx.strokeStyle='#000000';
+        
+        ctx.beginPath();
+        ctx.moveTo(0,top);
+        ctx.lineTo(wid,top);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0,(top+meterHigh));
+        ctx.lineTo(wid,(top+meterHigh));
+        ctx.stroke();
             
         ctx.strokeStyle='#FF0000';
         
         ctx.beginPath();
-        ctx.moveTo(0,halfHigh);
-        ctx.lineTo(wid,halfHigh);
+        ctx.moveTo(0,(top+halfMeterHigh));
+        ctx.lineTo(wid,(top+halfMeterHigh));
         ctx.stroke();
 
             // the drawing skip
@@ -216,13 +243,13 @@ export default class DebugRunClass
         ctx.strokeStyle='#0000FF';
         ctx.beginPath();
 
-        y=halfHigh+Math.trunc(data[0]*halfHigh);
+        y=(top+halfMeterHigh)+Math.trunc(data[0]*halfMeterHigh);
         ctx.moveTo(0,y);
         
         idx=0;
 
         for (x=1;x!==wid;x++) {
-            y=halfHigh+Math.trunc(data[idx]*halfHigh);
+            y=(top+halfMeterHigh)+Math.trunc(data[idx]*halfMeterHigh);
             ctx.lineTo(x,y);
             
             idx+=dataSkip;
@@ -270,39 +297,11 @@ export default class DebugRunClass
         return(0);
     }
     
-    drawModelGetOffsetX(axisType,wid)
-    {
-        switch (axisType) {
-            case this.DEBUG_MODEL_XY:
-                return(Math.trunc(wid*0.5));
-            case this.DEBUG_MODEL_XZ:
-                return(Math.trunc(wid*0.5));
-            case this.DEBUG_MODEL_ZY:
-                return(Math.trunc(wid*0.5));
-        }
-        
-        return(0);
-    }
-    
-    drawModelGetOffsetY(axisType,high)
-    {
-        switch (axisType) {
-            case this.DEBUG_MODEL_XY:
-                return(high);
-            case this.DEBUG_MODEL_XZ:
-                return(Math.trunc(high*0.5));
-            case this.DEBUG_MODEL_ZY:
-                return(high);
-        }
-        
-        return(0);
-    }
-    
-    drawModelGetFactor(model,axisType,wid,high)
+    drawModelGetScale(model,axisType,boxSize)
     {
         let n,x,y,minX,minY,maxX,maxY,v;
         let mesh,bone,nBone;
-        let xFactor,yFactor;
+        let xFactor,yFactor,factor,xOffset,yOffset;
         
         minX=minY=1000000;
         maxX=maxY=-1000000;
@@ -337,10 +336,14 @@ export default class DebugRunClass
             }
         }
         
-        xFactor=wid/Math.abs(maxX-minX);
-        yFactor=high/Math.abs(maxY-minY);
+        xFactor=boxSize/Math.abs(maxX-minX);
+        yFactor=boxSize/Math.abs(maxY-minY);
+        factor=(xFactor<yFactor)?xFactor:yFactor;
         
-        return((xFactor<yFactor)?xFactor:yFactor);
+        xOffset=Math.trunc(Math.abs(minX));
+        yOffset=Math.trunc(Math.abs(minY));
+        
+        return(new DebugModelScaleClass(xOffset,yOffset,factor));
     }
     
     drawModelBackground(ctx,lft,top,wid,high,backgroundColor)
@@ -349,7 +352,7 @@ export default class DebugRunClass
         ctx.fillRect(lft,top,wid,high);
     }
     
-    drawModelMesh(ctx,mesh,axisType,factor,xOffset,yOffset,lft,top,wid,high)
+    drawModelMesh(ctx,mesh,axisType,scale,lft,top,wid,high)
     {
         let n,v,x,y,x1,y1,x2,y2,idx,trigCount;
         
@@ -363,16 +366,16 @@ export default class DebugRunClass
         for (n=0;n!==trigCount;n++) {
             
             v=mesh.vertexList[mesh.indexes[idx++]];
-            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,v.position)*factor));
-            y=top+(yOffset+(this.drawModelMeshGetY(axisType,v.position)*factor));
+            x=lft+((this.drawModelMeshGetX(axisType,v.position)+scale.xOffset)*scale.factor);
+            y=top+((this.drawModelMeshGetY(axisType,v.position)+scale.yOffset)*scale.factor);
             
             v=mesh.vertexList[mesh.indexes[idx++]];
-            x1=lft+(xOffset+(this.drawModelMeshGetX(axisType,v.position)*factor));
-            y1=top+(yOffset+(this.drawModelMeshGetY(axisType,v.position)*factor));
+            x1=lft+((this.drawModelMeshGetX(axisType,v.position)+scale.xOffset)*scale.factor);
+            y1=top+((this.drawModelMeshGetY(axisType,v.position)+scale.yOffset)*scale.factor);
             
             v=mesh.vertexList[mesh.indexes[idx++]];
-            x2=lft+(xOffset+(this.drawModelMeshGetX(axisType,v.position)*factor));
-            y2=top+(yOffset+(this.drawModelMeshGetY(axisType,v.position)*factor));
+            x2=lft+((this.drawModelMeshGetX(axisType,v.position)+scale.xOffset)*scale.factor);
+            y2=top+((this.drawModelMeshGetY(axisType,v.position)+scale.yOffset)*scale.factor);
 
             ctx.beginPath();
             ctx.moveTo(x,y);
@@ -383,7 +386,7 @@ export default class DebugRunClass
         }
     }
     
-    drawModelSkeleton(ctx,skeleton,axisType,factor,xOffset,yOffset,lft,top,wid,high)
+    drawModelSkeleton(ctx,skeleton,axisType,scale,lft,top,wid,high)
     {
         let n,nBone,bone,x,y,x1,y1;
         
@@ -398,12 +401,12 @@ export default class DebugRunClass
             if (skeleton.bones[n].parentBoneIdx===-1) continue;
 
             bone=skeleton.bones[n];
-            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,bone.position)*factor));
-            y=top+(yOffset+(this.drawModelMeshGetY(axisType,bone.position)*factor));
+            x=lft+((this.drawModelMeshGetX(axisType,bone.position)+scale.xOffset)*scale.factor);
+            y=top+((this.drawModelMeshGetY(axisType,bone.position)+scale.yOffset)*scale.factor);
             
             bone=skeleton.bones[skeleton.bones[n].parentBoneIdx];
-            x1=lft+(xOffset+(this.drawModelMeshGetX(axisType,bone.position)*factor));
-            y1=top+(yOffset+(this.drawModelMeshGetY(axisType,bone.position)*factor));
+            x1=lft+((this.drawModelMeshGetX(axisType,bone.position)+scale.xOffset)*scale.factor);
+            y1=top+((this.drawModelMeshGetY(axisType,bone.position)+scale.yOffset)*scale.factor);
 
             ctx.beginPath();
             ctx.moveTo(x,y);
@@ -419,8 +422,8 @@ export default class DebugRunClass
         
         for (n=0;n!==nBone;n++) {
             bone=skeleton.bones[n];
-            x=lft+(xOffset+(this.drawModelMeshGetX(axisType,bone.position)*factor));
-            y=top+(yOffset+(this.drawModelMeshGetY(axisType,bone.position)*factor));
+            x=lft+((this.drawModelMeshGetX(axisType,bone.position)+scale.xOffset)*scale.factor);
+            y=top+((this.drawModelMeshGetY(axisType,bone.position)+scale.yOffset)*scale.factor);
             
             ctx.fillRect((x-4),(y-4),8,8);
         }
@@ -429,7 +432,7 @@ export default class DebugRunClass
     drawModel(item)
     {
         let ctx;
-        let model,factor,xOffset,yOffset,thirdWid;
+        let model,scale,boxSize;
         let wid=this.modelCanvas.width;
         let high=this.modelCanvas.height;
         
@@ -439,30 +442,26 @@ export default class DebugRunClass
         
             // draw axises
         
-        thirdWid=Math.trunc(wid/3);
+        boxSize=(wid<high)?Math.trunc(wid*0.5):Math.trunc(high*0.5);
 
         ctx=this.modelCanvas.getContext('2d');
+        ctx.fillStyle='#FFFFFF';
+        ctx.fillRect(0,0,wid,high);
+                
+        this.drawModelBackground(ctx,0,0,boxSize,boxSize,'#CCCCCC');
+        scale=this.drawModelGetScale(model,this.DEBUG_MODEL_XY,boxSize);
+        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XY,scale,0,0,boxSize,boxSize);
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XY,scale,0,0,boxSize,boxSize);
         
-        this.drawModelBackground(ctx,0,0,thirdWid,high,'#CCCCCC');
-        factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_XY,thirdWid,high);
-        xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XY,thirdWid);
-        yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XY,high);
-        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
-        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XY,factor,xOffset,yOffset,0,0,thirdWid,high);
+        this.drawModelBackground(ctx,boxSize,0,boxSize,boxSize,'#EEEEEE');
+        scale=this.drawModelGetScale(model,this.DEBUG_MODEL_ZY,boxSize);
+        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_ZY,scale,boxSize,0,boxSize,boxSize);
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_ZY,scale,boxSize,0,boxSize,boxSize);
         
-        this.drawModelBackground(ctx,thirdWid,0,thirdWid,high,'#EEEEEE');
-        factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_ZY,thirdWid,high);
-        xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_ZY,thirdWid);
-        yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_ZY,high);
-        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
-        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_ZY,factor,xOffset,yOffset,thirdWid,0,thirdWid,high);
-        
-        this.drawModelBackground(ctx,(thirdWid*2),0,thirdWid,high,'#CCCCCC');
-        factor=this.drawModelGetFactor(model,this.DEBUG_MODEL_XZ,thirdWid,high);
-        xOffset=this.drawModelGetOffsetX(this.DEBUG_MODEL_XZ,thirdWid);
-        yOffset=this.drawModelGetOffsetY(this.DEBUG_MODEL_XZ,high);
-        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);
-        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XZ,factor,xOffset,yOffset,(thirdWid*2),0,thirdWid,high);
+        this.drawModelBackground(ctx,0,boxSize,boxSize,boxSize,'#EEEEEE');
+        scale=this.drawModelGetScale(model,this.DEBUG_MODEL_XZ,boxSize);
+        if (model.skeleton!==null) this.drawModelSkeleton(ctx,model.skeleton,this.DEBUG_MODEL_XZ,scale,0,boxSize,boxSize,boxSize);
+        this.drawModelMesh(ctx,model.mesh,this.DEBUG_MODEL_XZ,scale,0,boxSize,boxSize,boxSize);
         
             // show the canvas
             
@@ -519,7 +518,7 @@ export default class DebugRunClass
     
     createInterface()
     {
-        let n,item,name;
+        let n,item,canvasRect;
         let itemDiv,headerDiv,viewDiv,parentDiv;
         
             // the list
@@ -589,23 +588,27 @@ export default class DebugRunClass
         parentDiv.style.position="absolute";
         parentDiv.style.left='300px';
         parentDiv.style.top='0px';
-        parentDiv.style.overflowX='auto';
+        parentDiv.style.overflowX='hidden';
         parentDiv.style.overflowY='hidden';
         parentDiv.style.width='calc(100% - 300px)';
         parentDiv.style.height='100%';
             
         document.body.appendChild(parentDiv);
         
+            // width for canvases
+        
+        canvasRect=parentDiv.getBoundingClientRect();    
+        
             // the bitmap canvas
             
         this.bitmapCanvas=document.createElement('canvas');
         this.bitmapCanvas.style.position="absolute";
-        this.bitmapCanvas.style.left='5px';
-        this.bitmapCanvas.style.top='5px';
+        this.bitmapCanvas.style.left='0px';
+        this.bitmapCanvas.style.top='0px';
         this.bitmapCanvas.style.border='1px solid #000000';
         this.bitmapCanvas.style.display='none';
-        this.bitmapCanvas.width=512*4;
-        this.bitmapCanvas.height=512;
+        this.bitmapCanvas.width=canvasRect.width;
+        this.bitmapCanvas.height=canvasRect.height;
         
         parentDiv.appendChild(this.bitmapCanvas);
         
@@ -613,12 +616,12 @@ export default class DebugRunClass
             
         this.soundCanvas=document.createElement('canvas');
         this.soundCanvas.style.position="absolute";
-        this.soundCanvas.style.left='5px';
-        this.soundCanvas.style.top='5px';
+        this.soundCanvas.style.left='0px';
+        this.soundCanvas.style.top='0px';
         this.soundCanvas.style.border='1px solid #000000';
         this.soundCanvas.style.display='none';
-        this.soundCanvas.width=1024;
-        this.soundCanvas.height=256;
+        this.soundCanvas.width=canvasRect.width;
+        this.soundCanvas.height=canvasRect.height;
         this.soundCanvas.onclick=this.playSound.bind(this);
         
         parentDiv.appendChild(this.soundCanvas);
@@ -627,12 +630,12 @@ export default class DebugRunClass
             
         this.modelCanvas=document.createElement('canvas');
         this.modelCanvas.style.position="absolute";
-        this.modelCanvas.style.left='5px';
-        this.modelCanvas.style.top='5px';
+        this.modelCanvas.style.left='0px';
+        this.modelCanvas.style.top='0px';
         this.modelCanvas.style.border='1px solid #000000';
         this.modelCanvas.style.display='none';
-        this.modelCanvas.width=768*3;
-        this.modelCanvas.height=768;
+        this.modelCanvas.width=canvasRect.width;
+        this.modelCanvas.height=canvasRect.height;
         
         parentDiv.appendChild(this.modelCanvas);
     }
