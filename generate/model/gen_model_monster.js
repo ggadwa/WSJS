@@ -4,9 +4,7 @@ import ModelClass from '../../code/model/model.js';
 import GenModelBaseClass from '../../generate/model/gen_model_base.js';
 import GenSkeletonMonsterClass from '../../generate/model/gen_skeleton_monster.js';
 import GenMeshMonsterClass from '../../generate/model/gen_mesh_monster.js';
-import GenBitmapSkinFurClass from '../../generate/bitmap/gen_bitmap_skin_fur.js';
-import GenBitmapSkinLeatherClass from '../../generate/bitmap/gen_bitmap_skin_leather.js';
-import GenBitmapSkinScaleClass from '../../generate/bitmap/gen_bitmap_skin_scale.js';
+import GenBitmapMonsterClass from '../../generate/bitmap/gen_bitmap_monster.js';
 
 //
 // generate a model
@@ -35,19 +33,7 @@ export default class GenModelMonsterClass extends GenModelBaseClass
         modelBitmap=null;
         
         if (!inDebug) {
-            
-            switch(genRandom.randomIndex(3)) {
-                case 0:
-                    genBitmap=new GenBitmapSkinFurClass(this.view);
-                    break;
-                case 1:
-                    genBitmap=new GenBitmapSkinLeatherClass(this.view);
-                    break;
-                case 2:
-                    genBitmap=new GenBitmapSkinScaleClass(this.view);
-                    break;
-            }
-            
+            genBitmap=new GenBitmapMonsterClass(this.view);
             modelBitmap=genBitmap.generate(false);
         }
         

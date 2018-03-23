@@ -1,12 +1,12 @@
 import genRandom from '../../generate/utility/random.js';
-import GenBitmapSkinBaseClass from '../../generate/bitmap/gen_bitmap_skin_base.js';
+import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate skin bitmap class
 //
 
-export default class GenBitmapSkinSuitClass extends GenBitmapSkinBaseClass
+export default class GenBitmapPlayerClass extends GenBitmapBaseClass
 {
     constructor(view)
     {    

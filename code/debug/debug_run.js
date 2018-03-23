@@ -22,10 +22,8 @@ import GenBitmapGlassClass from '../../generate/bitmap/gen_bitmap_glass.js';
 import GenBitmapGooClass from '../../generate/bitmap/gen_bitmap_goo.js';
 import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
 import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
-import GenBitmapSkinFurClass from '../../generate/bitmap/gen_bitmap_skin_fur.js';
-import GenBitmapSkinLeatherClass from '../../generate/bitmap/gen_bitmap_skin_leather.js';
-import GenBitmapSkinScaleClass from '../../generate/bitmap/gen_bitmap_skin_scale.js';
-import GenBitmapSkinSuitClass from '../../generate/bitmap/gen_bitmap_skin_suit.js';
+import GenBitmapMonsterClass from '../../generate/bitmap/gen_bitmap_monster.js';
+import GenBitmapPlayerClass from '../../generate/bitmap/gen_bitmap_player.js';
 import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
 import GenModelHumanClass from '../../generate/model/gen_model_human.js';
 import GenModelMonsterClass from '../../generate/model/gen_model_monster.js';
@@ -144,10 +142,8 @@ export default class DebugRunClass
         this.list.push(new DebugItemClass('Goo',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGooClass(this.view),false));
         this.list.push(new DebugItemClass('Particle',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapParticleClass(this.view),false));
         this.list.push(new DebugItemClass('Item',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapItemClass(this.view),false));
-        this.list.push(new DebugItemClass('Skin Fur',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinFurClass(this.view),false));
-        this.list.push(new DebugItemClass('Skin Leather',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinLeatherClass(this.view),false));
-        this.list.push(new DebugItemClass('Skin Scale',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinScaleClass(this.view),false));
-        this.list.push(new DebugItemClass('Skin Suit',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkinSuitClass(this.view),false));
+        this.list.push(new DebugItemClass('Monster',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMonsterClass(this.view),false));
+        this.list.push(new DebugItemClass('Player',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapPlayerClass(this.view),false));
         this.list.push(new DebugItemClass('Sky',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapSkyClass(this.view),false));
     }
     

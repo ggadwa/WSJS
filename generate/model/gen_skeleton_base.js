@@ -22,11 +22,11 @@ export default class GenSkeletonBaseClass
         // leg limb
         //
         
-    buildLimbLeg(limbIdx,parentBoneIdx,radius,rotOffset,footRot,toeCount,hasLegRot,flipped)
+    buildLimbLeg(limbIdx,parentBoneIdx,radius,rotOffset,footLength,footRot,toeCount,flipped)
     {
         let pnt,vct,pushVct,legRadius;
         let hipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx,heelBoneIdx,knuckleBoneIdx,toeBoneIdx;
-        let n,footLength,toeRadius,toeDistance,fx;
+        let n,toeRadius,toeDistance,fx;
         let footVct,footPnt,knuckleVct,knucklePnt,toePnt;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
@@ -45,10 +45,6 @@ export default class GenSkeletonBaseClass
             // legs always face down
             
         vct=new PointClass(0.0,-parentBone.position.y,0.0);
-        if (hasLegRot) {
-            rotOffset=genRandom.randomInt(0,20)-10;
-            vct.rotateX(null,rotOffset);
-        }
         
             // leg bones
             // we might already have a hip, so don't rebuild if we do
@@ -68,8 +64,6 @@ export default class GenSkeletonBaseClass
             // the foot bones
             // feet are always parallel to ground, towards front
        
-        footLength=genRandom.randomInt(legRadius,(legRadius*2));
-        
         footVct=new PointClass(0.0,0.0,footLength);
         footVct.rotateY(null,footRot);
         
@@ -93,9 +87,9 @@ export default class GenSkeletonBaseClass
         knuckleVct=footVct.copy();
         knuckleVct.normalize();
         knuckleVct.scale(Math.trunc(footLength*0.4));
-        knucklePnt=new PointClass((footPnt.x+knuckleVct.x),(footPnt.y+knuckleVct.y),(footPnt.z+knuckleVct.z));
+        knucklePnt=new PointClass((footPnt.x+knuckleVct.x),0,(footPnt.z+knuckleVct.z));
         
-        toePnt=new PointClass((knucklePnt.x+knuckleVct.x),(knucklePnt.y+knuckleVct.y),(knucklePnt.z+knuckleVct.z));
+        toePnt=new PointClass((knucklePnt.x+knuckleVct.x),0,(knucklePnt.z+knuckleVct.z));
 
         fx=knucklePnt.x-Math.trunc(toeCount*0.5)*toeDistance;
 
@@ -206,9 +200,9 @@ export default class GenSkeletonBaseClass
         // whip limbs
         //
     
-    buildLimbWhip(limbIdx,parentBoneIdx,radius,length)
+    buildLimbWhip(limbIdx,parentBoneIdx,radius,length,rotOffset)
     {
-        let whipRadius,rotOffset,whipLength,axis,pnt,vct,pushVct;
+        let whipRadius,whipLength,axis,pnt,vct,pushVct;
         let whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
@@ -219,16 +213,6 @@ export default class GenSkeletonBaseClass
         whipRadius=radius*this.sizeFactor;
         whipLength=length*this.sizeFactor;
         
-        if (genRandom.randomPercentage(0.5)) {
-            axis=constants.LIMB_AXIS_Z;
-            rotOffset=genRandom.randomInt(0,30)-15;
-        }
-        else {
-            axis=constants.LIMB_AXIS_X;
-            rotOffset=genRandom.randomInt(90,30)-15;
-        }
-        if (genRandom.randomPercentage(0.5)) rotOffset+=180;
-        
         pushVct=new PointClass(0.0,0.0,(parentBone.gravityLockDistance-Math.trunc(whipRadius*0.5)));
         pushVct.rotateY(null,rotOffset);
         
@@ -236,6 +220,8 @@ export default class GenSkeletonBaseClass
         pnt.addPoint(pushVct);
         
             // whips face out
+            
+        axis=(((rotOffset>315)||(rotOffset<45))||((rotOffset>135)&&(rotOffset<225)))?constants.LIMB_AXIS_Z:constants.LIMB_AXIS_X;
             
         vct=new PointClass(0.0,0.0,whipLength);
         vct.rotateY(null,rotOffset);

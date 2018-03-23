@@ -12,7 +12,9 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
-
+- monster bitmaps
+   - spots
+   - other?
 
 - do model mesh first
 - fix the binding bug
