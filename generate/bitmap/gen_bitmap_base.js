@@ -293,6 +293,48 @@ export default class GenBitmapBaseClass
         return(new ColorClass(f,f,(f+0.1)))
     }
     
+    getRandomFurColor()
+    {
+        let f;
+        
+        switch (genRandom.randomIndex(5)) {
+            
+            case 0:         // blonde
+                f=genRandom.randomFloat(0.5,0.2);
+                return(new ColorClass(f,f,0.0));
+                
+            case 1:         // white
+                f=genRandom.randomFloat(0.7,0.1);
+                return(new ColorClass(f,f,f));
+                
+            case 2:         // black
+                f=genRandom.randomFloat(0.2,0.2);
+                return(new ColorClass(f,f,f));
+                
+            case 3:         // brown
+                f=genRandom.randomFloat(0.3,0.2);
+                return(new ColorClass((f+0.3),f,0.0));
+
+            case 4:         // red
+                f=genRandom.randomFloat(0.5,0.3);
+                return(new ColorClass(f,0.2,0.2));
+
+        }
+    }
+    
+    getRandomScaleColor()
+    {
+        let f;
+        
+        if (genRandom.randomPercentage(0.5)) {      // green-ish
+            f=genRandom.randomFloat(0.2,0.3);
+            return(new ColorClass(f,1.0,f));
+        }
+        
+        f=genRandom.randomFloat(0.7,0.2);           // purple-ish
+        return(new ColorClass(f,0.2,f))
+    }
+    
     darkenColor(color,darkenFactor)
     {
         return(new ColorClass((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
