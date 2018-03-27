@@ -182,7 +182,7 @@ export default class EntityMonsterClass extends EntityClass
             // inactive monsters currently just stand
             
         if (!this.active) {
-            this.model.skeleton.idlePose();
+            this.modelDraw.drawSkeleton.idlePose();
             
             this.setMovementForward(false);
             this.move(true,false,false);
@@ -194,7 +194,7 @@ export default class EntityMonsterClass extends EntityClass
             
                 // pose
             
-            this.model.skeleton.walkPose();
+            this.modelDraw.drawSkeleton.walkPose();
         
                 // turn towards and stalk player
 

@@ -54,12 +54,12 @@ export default class GenSkeletonBaseClass
         ankleBoneIdx=bones.push(new ModelBoneClass(('Ankle_'+limbIdx),kneeBoneIdx,new PointClass((pnt.x+(vct.x*0.8)),(pnt.y+(vct.y*0.8)),(pnt.z+(vct.z*0.8)))))-1;
         heelBoneIdx=bones.push(new ModelBoneClass(('Heel_'+limbIdx),ankleBoneIdx,new PointClass((pnt.x+(vct.x*0.95)),(pnt.y+(vct.y*0.95)),(pnt.z+(vct.z*0.95)))))-1;
         
-        bones[hipBoneIdx].gravityLockDistance=Math.trunc(legRadius*1.1);
+        bones[hipBoneIdx].gravityLockDistance=Math.trunc(legRadius*genRandom.randomFloat(1.0,0.3));
         bones[kneeBoneIdx].gravityLockDistance=legRadius;
         bones[ankleBoneIdx].gravityLockDistance=legRadius;
         bones[heelBoneIdx].gravityLockDistance=legRadius;
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_LEG,limbIdx,constants.LIMB_AXIS_Y,flipped,8,5,[hipBoneIdx,kneeBoneIdx,ankleBoneIdx,heelBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_LEG,limbIdx,constants.LIMB_AXIS_Y,flipped,8,5,false,[hipBoneIdx,kneeBoneIdx,ankleBoneIdx,heelBoneIdx]));
         
             // the foot bones
             // feet are always parallel to ground, towards front
@@ -73,7 +73,7 @@ export default class GenSkeletonBaseClass
 
         bones[footBoneIdx].gravityLockDistance=legRadius;
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FOOT,limbIdx,constants.LIMB_AXIS_Z,flipped,5,5,[heelBoneIdx,footBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FOOT,limbIdx,constants.LIMB_AXIS_Z,flipped,5,5,false,[heelBoneIdx,footBoneIdx]));
 
             // toe limbs
             
@@ -100,7 +100,7 @@ export default class GenSkeletonBaseClass
             bones[knuckleBoneIdx].gravityLockDistance=toeRadius;
             bones[toeBoneIdx].gravityLockDistance=toeRadius;
             
-            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,constants.LIMB_AXIS_Z,flipped,4,4,[knuckleBoneIdx,toeBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,constants.LIMB_AXIS_Z,flipped,4,4,false,[knuckleBoneIdx,toeBoneIdx]));
             
             fx+=toeDistance;
         }
@@ -145,22 +145,22 @@ export default class GenSkeletonBaseClass
         elbowBoneIdx=bones.push(new ModelBoneClass(('Elbow_'+limbIdx),shoulderBoneIdx,new PointClass((pnt.x+(vct.x*0.45)),(pnt.y+(vct.y*0.45)),(pnt.z+(vct.z*0.45)))))-1;
         wristBoneIdx=bones.push(new ModelBoneClass(('Wrist_'+limbIdx),elbowBoneIdx,new PointClass((pnt.x+(vct.x*0.9)),(pnt.y+(vct.y*0.9)),(pnt.z+(vct.z*0.9)))))-1;
         
-        bones[shoulderBoneIdx].gravityLockDistance=Math.trunc(armRadius*1.1);
+        bones[shoulderBoneIdx].gravityLockDistance=Math.trunc(armRadius*1.5);
         bones[elbowBoneIdx].gravityLockDistance=armRadius;
         bones[wristBoneIdx].gravityLockDistance=armRadius;
         
-        armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,flipped,8,5,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
+        armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,flipped,8,5,false,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
         
             // limb
             
-        handRadius=Math.trunc(armRadius*1.3);
+        handRadius=Math.trunc(armRadius*genRandom.randomFloat(1.0,0.3));
         handPnt=new PointClass((pnt.x+vct.x),(pnt.y+vct.y),(pnt.z+vct.z));
         
         handBoneIdx=bones.push(new ModelBoneClass(('Hand_'+limbIdx),wristBoneIdx,handPnt))-1;
         
         bones[handBoneIdx].gravityLockDistance=handRadius;
         
-        handLimbIdx=this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HAND,limbIdx,axis,flipped,5,5,[handBoneIdx],-1,-1))-1;
+        handLimbIdx=this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HAND,limbIdx,axis,flipped,5,5,false,[handBoneIdx]))-1;
 
             // finger limbs
             
@@ -190,7 +190,7 @@ export default class GenSkeletonBaseClass
             bones[knuckleBoneIdx].gravityLockDistance=fingerRadius;
             bones[fingerBoneIdx].gravityLockDistance=fingerRadius;
             
-            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,axis,flipped,4,4,[knuckleBoneIdx,fingerBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,axis,flipped,4,4,false,[knuckleBoneIdx,fingerBoneIdx]));
             
             fy+=fingerDistance;
         }
@@ -238,7 +238,7 @@ export default class GenSkeletonBaseClass
         bones[whip2BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.6);
         bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.3);
 
-        skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_WHIP,limbIdx,axis,false,8,5,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
+        skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_WHIP,limbIdx,axis,false,8,5,false,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
     }
     
         //
@@ -247,9 +247,9 @@ export default class GenSkeletonBaseClass
         
     buildLimbHead(limbIdx,parentBoneIdx,neckLength,neckRadius,jawRadius,headRadius)
     {
-        let pnt;
+        let pnt,vct;
         let neckStartBoneIdx,neckEndBoneIdx,jawBoneIdx,headBoneIdx;
-        let neckStartLength,neckEndLength,jawLength,headLength;
+        let neckStartLength,jawLength,headLength;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
         let parentBone=bones[parentBoneIdx];
@@ -259,35 +259,53 @@ export default class GenSkeletonBaseClass
         jawRadius*=this.sizeFactor;
         headRadius*=this.sizeFactor;
         
-            // size and position around body
-
-        pnt=parentBone.position.copy();
-        
-        neckStartLength=(parentBone.gravityLockDistance*0.25)*this.sizeFactor;
-        neckEndLength=neckLength+neckStartLength;
-        
             // create the neck
             
-        neckStartBoneIdx=bones.push(new ModelBoneClass(('Neck_Start_'+limbIdx),parentBoneIdx,new PointClass(pnt.x,(pnt.y-neckStartLength),pnt.z)))-1;
-        neckEndBoneIdx=bones.push(new ModelBoneClass(('Neck_End_'+limbIdx),neckStartBoneIdx,new PointClass(pnt.x,(pnt.y-neckEndLength),pnt.z)))-1;
+        neckStartLength=(parentBone.gravityLockDistance*0.25)*this.sizeFactor;
         
-        bones[neckStartBoneIdx].gravityLockDistance=neckRadius;
+        pnt=parentBone.position.copy();
+        vct=new PointClass(0,-neckStartLength,0);
+        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
+        pnt.addPoint(vct);
+            
+        neckStartBoneIdx=bones.push(new ModelBoneClass(('Neck_Start_'+limbIdx),parentBoneIdx,pnt))-1;
+        
+        pnt=pnt.copy();
+        vct=new PointClass(0,-neckLength,0);
+        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
+        pnt.addPoint(vct);
+        
+        neckEndBoneIdx=bones.push(new ModelBoneClass(('Neck_End_'+limbIdx),neckStartBoneIdx,pnt))-1;
+        
+        bones[neckStartBoneIdx].gravityLockDistance=neckRadius*genRandom.randomFloat(0.8,0.2);
         bones[neckEndBoneIdx].gravityLockDistance=neckRadius;
 
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_NECK,0,constants.LIMB_AXIS_Y,false,5,5,[neckStartBoneIdx,neckEndBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_NECK,0,constants.LIMB_AXIS_Y,false,5,5,false,[neckStartBoneIdx,neckEndBoneIdx]));
         
             // create the head
             
-        jawLength=neckEndLength+Math.trunc(jawRadius*0.5)+Math.trunc(neckRadius*0.5);
-        headLength=jawLength+Math.trunc(headRadius*0.5);
+        jawLength=Math.trunc(jawRadius*0.5)+Math.trunc(neckRadius*0.5);
         
-        jawBoneIdx=bones.push(new ModelBoneClass('Jaw',neckEndBoneIdx,new PointClass(pnt.x,(pnt.y-jawLength),pnt.z)))-1;
-        headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,new PointClass(pnt.x,(pnt.y-headLength),pnt.z)))-1;
+        pnt=pnt.copy();
+        vct=new PointClass(0,-jawLength,0);
+        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
+        pnt.addPoint(vct);
+        
+        jawBoneIdx=bones.push(new ModelBoneClass('Jaw',neckEndBoneIdx,pnt))-1;
+        
+        headLength=Math.trunc(headRadius*genRandom.randomFloat(0.4,0.4));
+        
+        pnt=pnt.copy();
+        vct=new PointClass(0,-headLength,0);
+        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
+        pnt.addPoint(vct);
+        
+        headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,pnt))-1;
         
         bones[jawBoneIdx].gravityLockDistance=jawRadius;
         bones[headBoneIdx].gravityLockDistance=headRadius;
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,[jawBoneIdx,headBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,false,[jawBoneIdx,headBoneIdx]));
     }
     
         //
@@ -340,7 +358,7 @@ export default class GenSkeletonBaseClass
 
             // the body limb
             
-        bodyLimb=new ModelLimbClass(constants.LIMB_TYPE_BODY,0,constants.LIMB_AXIS_Y,false,12,12,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
+        bodyLimb=new ModelLimbClass(constants.LIMB_TYPE_BODY,0,constants.LIMB_AXIS_Y,false,12,12,true,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
         bodyLimbIdx=skeleton.limbs.push(bodyLimb)-1;
         
         return(bodyLimbIdx);

@@ -12,7 +12,8 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
-- do model mesh first
+- head->neck needs random angle
+- legs/arms have random connection multiplies
 - fix the binding bug
 
 + separate draw part of model from setup part of model

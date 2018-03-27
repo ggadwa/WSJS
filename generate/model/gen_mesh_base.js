@@ -732,7 +732,6 @@ export default class GenMeshBaseClass
         
         switch (limbType) {
             case constants.LIMB_TYPE_BODY:
-            case constants.LIMB_TYPE_NECK:
                 MeshUtilityClass.transformUVs(vertexList,0.0,0.5,0.5,0.5);
                 break;
             case constants.LIMB_TYPE_HEAD:
