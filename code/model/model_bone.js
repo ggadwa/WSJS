@@ -22,7 +22,7 @@ export default class ModelBoneClass
         this.gravityLockDistance=500;
 
             // pose
-
+            
         this.curPoseAngle=new PointClass(0.0,0.0,0.0);
         this.curPosePosition=this.position.copy();
 

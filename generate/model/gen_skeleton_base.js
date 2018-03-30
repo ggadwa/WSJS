@@ -245,11 +245,13 @@ export default class GenSkeletonBaseClass
         // head
         //
         
-    buildLimbHead(limbIdx,parentBoneIdx,neckLength,neckRadius,jawRadius,headRadius)
+    buildLimbHead(limbIdx,parentBoneIdx,neckLength,neckRadius,jawRadius,headRadius,hasJaw)
     {
-        let pnt,vct;
-        let neckStartBoneIdx,neckEndBoneIdx,jawBoneIdx,headBoneIdx;
-        let neckStartLength,jawLength,headLength;
+        let pnt,jawPnt,neckPnt,vct;
+        let neckStartBoneIdx,neckEndBoneIdx;
+        let jawBoneIdx;
+        let headBottomBoneIdx,headTopBoneIdx;
+        let neckStartLength,jawLength,headOffset,headLength,headRot;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
         let parentBone=bones[parentBoneIdx];
@@ -268,44 +270,65 @@ export default class GenSkeletonBaseClass
         vct.rotateX(null,-genRandom.randomFloat(0,25.0));
         pnt.addPoint(vct);
             
-        neckStartBoneIdx=bones.push(new ModelBoneClass(('Neck_Start_'+limbIdx),parentBoneIdx,pnt))-1;
+        neckStartBoneIdx=bones.push(new ModelBoneClass(('Neck_Bottom_'+limbIdx),parentBoneIdx,pnt))-1;
         
-        pnt=pnt.copy();
+        neckPnt=pnt.copy();
         vct=new PointClass(0,-neckLength,0);
         vct.rotateX(null,-genRandom.randomFloat(0,25.0));
-        pnt.addPoint(vct);
+        neckPnt.addPoint(vct);
         
-        neckEndBoneIdx=bones.push(new ModelBoneClass(('Neck_End_'+limbIdx),neckStartBoneIdx,pnt))-1;
+        neckEndBoneIdx=bones.push(new ModelBoneClass(('Neck_Top_'+limbIdx),neckStartBoneIdx,neckPnt))-1;
         
         bones[neckStartBoneIdx].gravityLockDistance=neckRadius*genRandom.randomFloat(0.8,0.2);
         bones[neckEndBoneIdx].gravityLockDistance=neckRadius;
 
         this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_NECK,0,constants.LIMB_AXIS_Y,false,5,5,false,[neckStartBoneIdx,neckEndBoneIdx]));
         
-            // create the head
+            // default placements
             
-        jawLength=Math.trunc(jawRadius*0.5)+Math.trunc(neckRadius*0.5);
+        headOffset=10;
+        headRot=-genRandom.randomFloat(0,25.0);
         
-        pnt=pnt.copy();
-        vct=new PointClass(0,-jawLength,0);
-        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
-        pnt.addPoint(vct);
+            // create the jaw
+            
+        if (hasJaw) {
+            jawRadius=Math.trunc(headRadius*genRandom.randomFloat(0.1,0.1));
+            
+            jawPnt=neckPnt.copy();
+            vct=new PointClass(0,-headOffset,headRadius);
+            vct.rotateX(null,headRot);
+            jawPnt.addPoint(vct);
+
+            jawBoneIdx=bones.push(new ModelBoneClass(('Jaw_'+limbIdx),neckEndBoneIdx,jawPnt))-1;
+            
+            bones[jawBoneIdx].gravityLockDistance=jawRadius;
+            
+            this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_JAW,0,constants.LIMB_AXIS_Z,false,5,5,false,[neckEndBoneIdx,jawBoneIdx]));
+            
+            headOffset+=headRadius;
+        }
         
-        jawBoneIdx=bones.push(new ModelBoneClass('Jaw',neckEndBoneIdx,pnt))-1;
+            // create the head
         
         headLength=Math.trunc(headRadius*genRandom.randomFloat(0.4,0.4));
         
-        pnt=pnt.copy();
-        vct=new PointClass(0,-headLength,0);
-        vct.rotateX(null,-genRandom.randomFloat(0,25.0));
+        pnt=neckPnt.copy();
+        vct=new PointClass(0,-headLength,0);        // no rot here
         pnt.addPoint(vct);
         
-        headBoneIdx=bones.push(new ModelBoneClass('Head',jawBoneIdx,pnt))-1;
+        headBottomBoneIdx=bones.push(new ModelBoneClass(('Head_Bottom_'+limbIdx),neckEndBoneIdx,pnt))-1;
         
-        bones[jawBoneIdx].gravityLockDistance=jawRadius;
-        bones[headBoneIdx].gravityLockDistance=headRadius;
+        pnt=pnt.copy();
+        vct=new PointClass(0,-headLength,0);
+        vct.rotateX(null,headRot);
+        pnt.addPoint(vct);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,false,[jawBoneIdx,headBoneIdx]));
+        headTopBoneIdx=bones.push(new ModelBoneClass(('Head_Top_'+limbIdx),headBottomBoneIdx,pnt))-1;
+        
+        bones[headBottomBoneIdx].gravityLockDistance=headRadius;
+        bones[headTopBoneIdx].gravityLockDistance=headRadius;
+        
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,false,[headBottomBoneIdx,headTopBoneIdx]));
     }
     
         //
