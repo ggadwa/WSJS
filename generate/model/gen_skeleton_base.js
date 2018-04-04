@@ -26,7 +26,7 @@ export default class GenSkeletonBaseClass
     {
         let pnt,vct,pushVct,legRadius;
         let hipBoneIdx,kneeBoneIdx,ankleBoneIdx,footBoneIdx,heelBoneIdx,knuckleBoneIdx,toeBoneIdx;
-        let n,toeRadius,toeDistance,fx;
+        let n,toeRadius,toeDistance,fx,meshScale;
         let footVct,footPnt,knuckleVct,knucklePnt,toePnt;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
@@ -59,7 +59,9 @@ export default class GenSkeletonBaseClass
         bones[ankleBoneIdx].gravityLockDistance=legRadius;
         bones[heelBoneIdx].gravityLockDistance=legRadius;
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_LEG,limbIdx,constants.LIMB_AXIS_Y,flipped,8,5,false,[hipBoneIdx,kneeBoneIdx,ankleBoneIdx,heelBoneIdx]));
+        meshScale=genRandom.randomFloat(0.7,0.3);
+        
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_LEG,limbIdx,constants.LIMB_AXIS_Y,flipped,8,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,0.0,meshScale),[hipBoneIdx,kneeBoneIdx,ankleBoneIdx,heelBoneIdx]));
         
             // the foot bones
             // feet are always parallel to ground, towards front
@@ -69,11 +71,12 @@ export default class GenSkeletonBaseClass
         
         footPnt=bones[heelBoneIdx].position.copy();
         footPnt.addPoint(footVct);
+        footPnt.y=0.0;
         footBoneIdx=bones.push(new ModelBoneClass(('Foot_'+limbIdx),heelBoneIdx,footPnt))-1;
 
-        bones[footBoneIdx].gravityLockDistance=legRadius;
+        bones[footBoneIdx].gravityLockDistance=legRadius*genRandom.randomFloat(1.2,0.3);
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FOOT,limbIdx,constants.LIMB_AXIS_Z,flipped,5,5,false,[heelBoneIdx,footBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FOOT,limbIdx,constants.LIMB_AXIS_Z,flipped,5,5,false,new PointClass(1.0,0.7,1.0),new PointClass(1.0,0.0,1.0),[heelBoneIdx,footBoneIdx]));
 
             // toe limbs
             
@@ -100,7 +103,7 @@ export default class GenSkeletonBaseClass
             bones[knuckleBoneIdx].gravityLockDistance=toeRadius;
             bones[toeBoneIdx].gravityLockDistance=toeRadius;
             
-            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,constants.LIMB_AXIS_Z,flipped,4,4,false,[knuckleBoneIdx,toeBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,constants.LIMB_AXIS_Z,flipped,4,4,false,new PointClass(1.0,0.7,1.0),new PointClass(1.0,0.0,1.0),[knuckleBoneIdx,toeBoneIdx]));
             
             fx+=toeDistance;
         }
@@ -115,7 +118,7 @@ export default class GenSkeletonBaseClass
         let armRadius,armLength,axis,pnt,vct,pushVct;
         let shoulderBoneIdx,elbowBoneIdx,wristBoneIdx,handBoneIdx,knuckleBoneIdx,fingerBoneIdx;
         let handPnt,handRadius,armLimbIdx,handLimbIdx;
-        let n,fy,fingerRadius,fingerDistance;
+        let n,fy,fingerRadius,fingerDistance,meshScale;
         let knucklePnt,knuckleVct,fingerPnt,fingerVct;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
@@ -149,9 +152,11 @@ export default class GenSkeletonBaseClass
         bones[elbowBoneIdx].gravityLockDistance=armRadius;
         bones[wristBoneIdx].gravityLockDistance=armRadius;
         
-        armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,flipped,8,5,false,[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
+        meshScale=genRandom.randomFloat(0.7,0.3);
         
-            // limb
+        armLimbIdx=skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_ARM,limbIdx,axis,flipped,8,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[shoulderBoneIdx,elbowBoneIdx,wristBoneIdx]))-1;
+        
+            // hand limb
             
         handRadius=Math.trunc(armRadius*genRandom.randomFloat(1.0,0.3));
         handPnt=new PointClass((pnt.x+vct.x),(pnt.y+vct.y),(pnt.z+vct.z));
@@ -160,7 +165,7 @@ export default class GenSkeletonBaseClass
         
         bones[handBoneIdx].gravityLockDistance=handRadius;
         
-        handLimbIdx=this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HAND,limbIdx,axis,flipped,5,5,false,[handBoneIdx]))-1;
+        handLimbIdx=this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HAND,limbIdx,axis,flipped,5,5,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[handBoneIdx]))-1;
 
             // finger limbs
             
@@ -190,7 +195,7 @@ export default class GenSkeletonBaseClass
             bones[knuckleBoneIdx].gravityLockDistance=fingerRadius;
             bones[fingerBoneIdx].gravityLockDistance=fingerRadius;
             
-            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,axis,flipped,4,4,false,[knuckleBoneIdx,fingerBoneIdx]));
+            skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_FINGER,limbIdx,axis,flipped,4,4,false,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[knuckleBoneIdx,fingerBoneIdx]));
             
             fy+=fingerDistance;
         }
@@ -238,7 +243,7 @@ export default class GenSkeletonBaseClass
         bones[whip2BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.6);
         bones[whip3BoneIdx].gravityLockDistance=Math.trunc(whipRadius*0.3);
 
-        skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_WHIP,limbIdx,axis,false,8,5,false,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
+        skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_WHIP,limbIdx,axis,false,8,5,false,null,null,[whip0BoneIdx,whip1BoneIdx,whip2BoneIdx,whip3BoneIdx]));
     }
     
         //
@@ -251,7 +256,8 @@ export default class GenSkeletonBaseClass
         let neckStartBoneIdx,neckEndBoneIdx;
         let jawBoneIdx;
         let headBottomBoneIdx,headTopBoneIdx;
-        let neckStartLength,jawLength,headOffset,headLength,headRot;
+        let neckStartLength,headOffset,headLength,headRot;
+        let scaleMin,scaleMax;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
         let parentBone=bones[parentBoneIdx];
@@ -282,7 +288,7 @@ export default class GenSkeletonBaseClass
         bones[neckStartBoneIdx].gravityLockDistance=neckRadius*genRandom.randomFloat(0.8,0.2);
         bones[neckEndBoneIdx].gravityLockDistance=neckRadius;
 
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_NECK,0,constants.LIMB_AXIS_Y,false,5,5,false,[neckStartBoneIdx,neckEndBoneIdx]));
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_NECK,0,constants.LIMB_AXIS_Y,false,5,5,false,null,null,[neckStartBoneIdx,neckEndBoneIdx]));
         
             // default placements
             
@@ -303,9 +309,13 @@ export default class GenSkeletonBaseClass
             
             bones[jawBoneIdx].gravityLockDistance=jawRadius;
             
-            this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_JAW,0,constants.LIMB_AXIS_Z,false,5,5,false,[neckEndBoneIdx,jawBoneIdx]));
+            scaleMax=new PointClass(genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3));
+            scaleMin=scaleMax.copy();
+            scaleMin.y=0.1;
             
-            headOffset+=headRadius;
+            this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_JAW,0,constants.LIMB_AXIS_Z,false,5,5,false,scaleMin,scaleMax,[neckEndBoneIdx,jawBoneIdx]));
+            
+            headOffset+=jawRadius;
         }
         
             // create the head
@@ -313,7 +323,7 @@ export default class GenSkeletonBaseClass
         headLength=Math.trunc(headRadius*genRandom.randomFloat(0.4,0.4));
         
         pnt=neckPnt.copy();
-        vct=new PointClass(0,-headLength,0);        // no rot here
+        vct=new PointClass(0,-headOffset,0);        // no rot here
         pnt.addPoint(vct);
         
         headBottomBoneIdx=bones.push(new ModelBoneClass(('Head_Bottom_'+limbIdx),neckEndBoneIdx,pnt))-1;
@@ -328,7 +338,11 @@ export default class GenSkeletonBaseClass
         bones[headBottomBoneIdx].gravityLockDistance=headRadius;
         bones[headTopBoneIdx].gravityLockDistance=headRadius;
         
-        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,false,[headBottomBoneIdx,headTopBoneIdx]));
+        scaleMin=new PointClass(genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3),genRandom.randomFloat(0.7,0.3));
+        scaleMax=scaleMin.copy();
+        if (hasJaw) scaleMax.y=0.1;
+        
+        this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_HEAD,0,constants.LIMB_AXIS_Y,false,10,10,false,scaleMin,scaleMax,[headBottomBoneIdx,headTopBoneIdx]));
     }
     
         //
@@ -339,7 +353,7 @@ export default class GenSkeletonBaseClass
     {
         let hipPnt,waistPnt,torsoPnt,topTorsoPnt;
         let bodyLimb,bodyLimbIdx;
-        let bodyHigh,hipHigh,waistHigh,torsoHigh,torsoTopHigh;
+        let bodyHigh,hipHigh,waistHigh,torsoHigh,torsoTopHigh,meshScale;
         let baseBoneIdx,hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx;
         let skeleton=this.model.skeleton;
         let bones=skeleton.bones;
@@ -381,7 +395,9 @@ export default class GenSkeletonBaseClass
 
             // the body limb
             
-        bodyLimb=new ModelLimbClass(constants.LIMB_TYPE_BODY,0,constants.LIMB_AXIS_Y,false,12,12,true,[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
+        meshScale=genRandom.randomFloat(0.7,0.3);
+            
+        bodyLimb=new ModelLimbClass(constants.LIMB_TYPE_BODY,0,constants.LIMB_AXIS_Y,false,12,12,true,new PointClass(1.0,1.0,meshScale),new PointClass(1.0,1.0,meshScale),[hipBoneIdx,waistBoneIdx,torsoBoneIdx,torsoTopBoneIdx]);
         bodyLimbIdx=skeleton.limbs.push(bodyLimb)-1;
         
         return(bodyLimbIdx);

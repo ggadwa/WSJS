@@ -89,7 +89,6 @@ export default class PointClass
         this.z=Math.trunc(this.z+pt.z);
     }
     
-    
     subPoint(pt)
     {
         this.x-=pt.x;
@@ -377,6 +376,28 @@ export default class PointClass
         this.x=((this.x-pt.x)*scale.x)+pt.x;
         this.y=((this.y-pt.y)*scale.y)+pt.y;
         this.z=((this.z-pt.z)*scale.z)+pt.z;
+    }
+    
+    scaleFromMinMaxPoint(pt,scaleMin,scaleMax)
+    {
+        let x=this.x-pt.x;
+        let y=this.y-pt.y;
+        let z=this.z-pt.z;
+        
+        if (scaleMin!==null) {
+            if (x<0) x*=scaleMin.x;
+            if (y<0) y*=scaleMin.y;
+            if (z<0) z*=scaleMin.z;
+        }
+        if (scaleMax!==null) {
+            if (x>0) x*=scaleMax.x;
+            if (y>0) y*=scaleMax.y;
+            if (z>0) z*=scaleMax.z;
+        }
+        
+        this.x=x+pt.x;
+        this.y=y+pt.y;
+        this.z=z+pt.z;
     }
     
     matrixMultiply(mat)

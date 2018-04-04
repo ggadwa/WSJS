@@ -609,11 +609,15 @@ export default class ViewClass
             this.lights.push(null);
         }
         
-            // and finally make the eye coordinate
+            // and finally do any light running
+            // and make the eye coordinate
 
         for (n=0;n!==this.MAX_LIGHT_COUNT;n++) {
             light=this.lights[n];
-            if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
+            if (light!==null) {
+                light.run(this.timeStamp);
+                this.convertToEyeCoordinates(light.position,light.eyePosition);
+            }
         }
 
             // build the culling frustum

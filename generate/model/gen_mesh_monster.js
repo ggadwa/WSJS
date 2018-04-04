@@ -48,7 +48,7 @@ export default class GenMeshMonsterClass extends GenMeshBaseClass
             vertexList=MeshUtilityClass.createModelVertexList(((limb.aroundSurfaceCount+1)*(limb.acrossSurfaceCount-2))+2);    // (around+1)*(across-2) for quads, + 2 for top and bottom point (around+1 for extra vertexes to stop UV wrapping)
             indexes=new Uint16Array(((limb.aroundSurfaceCount*(limb.acrossSurfaceCount-3))*6)+((limb.aroundSurfaceCount*2)*3));   // (around*(across-3))*6 for quads, (around*2)*3 for top and bottom trigs
             
-            this.buildAroundBoneList(limb.limbType,limb.axis,limb.acrossSurfaceCount,limb.aroundSurfaceCount,fullBodyScale,limb.boneIndexes,vertexList,indexes);
+            this.buildAroundBoneLimb(limb,vertexList,indexes);
             if (limb.randomize) this.randomScaleVertexToBones(vertexList);
             
             limbVertexList.push(vertexList);

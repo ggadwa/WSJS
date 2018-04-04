@@ -11,9 +11,7 @@ WebGL2
 ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
-
-- head->neck needs random angle
-- legs/arms have random connection multiplies
+- fix jaw stuff
 - fix the binding bug
 
 + separate draw part of model from setup part of model

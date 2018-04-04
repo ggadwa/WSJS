@@ -1,6 +1,7 @@
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import ColorClass from '../../code/utility/color.js';
+import genRandom from '../../generate/utility/random.js';
 
 //
 // map light class
@@ -12,12 +13,27 @@ export default class LightClass
 {
     constructor(position,color,intensity,exponent)
     {
+            // constants
+            
+        this.LIGHT_TYPE_NORMAL=0;
+        this.LIGHT_TYPE_WAVE=1;
+        this.LIGHT_TYPE_FLICKER=2;
+        
+            // variables
+            
         this.position=position;                 // should be PointClass
         this.eyePosition=new PointClass(0,0,0);    // the eye position in the current render, set by the view
         this.color=color;                       // should be ColorClass
         this.intensity=intensity;
         this.invertIntensity=1.0/intensity;
         this.exponent=exponent;
+        
+        this.lightType=this.LIGHT_TYPE_NORMAL;
+        this.lightWaveFrequency=0;
+        this.lightFlickerOn=false;
+        this.lightFlickerNextTick=0;
+        
+        this.origIntensity=intensity;
 
         this.dist=0.0;           // used to sort lights
         
@@ -42,6 +58,8 @@ export default class LightClass
     {
         this.intensity=intensity;
         this.invertIntensity=1.0/intensity;
+        
+        this.origIntensity=this.intensity;
     }
     
     changeIntensity(intensityAdd)
@@ -50,12 +68,67 @@ export default class LightClass
         if (this.intensity<1) this.intensity=1;
         
         this.invertIntensity=1.0/this.intensity;
+        
+        this.origIntensity=this.intensity;
+    }
+    
+    setRandomLightType(timeStamp)
+    {
+        if (genRandom.randomPercentage(0.7)) {
+            this.lightType=this.LIGHT_TYPE_NORMAL;
+            return;
+        }
+        
+        this.lightType=genRandom.randomIndex(2)+1;
+        
+        switch (this.lightType) {
+            case this.LIGHT_TYPE_WAVE:
+                this.lightWaveFrequency=genRandom.randomInt(2000,2000);
+                break;
+            case this.LIGHT_TYPE_FLICKER:
+                this.lightFlickerOn=false;
+                this.lightFlickerNextTick=timeStamp;
+                break;
+        }
     }
     
     clear()
     {
         this.intensity=0.0;
         this.invertIntensity=0.0;
+    }
+    
+    run(timeStamp)
+    {
+        let f;
+        
+        switch (this.lightType) {
+            
+            case this.LIGHT_TYPE_WAVE:
+                f=(timeStamp%this.lightWaveFrequency)/this.lightWaveFrequency;
+                f=Math.sin((2.0*Math.PI)*f);
+                f=((f+1.0)*0.5);
+                f=(f*0.25)+0.75;
+                this.intensity=this.origIntensity*f;
+                this.invertIntensity=1.0/this.intensity;
+                break;
+                
+            case this.LIGHT_TYPE_FLICKER:
+                if (this.lightFlickerNextTick<=timeStamp) {
+                    this.lightFlickerOn=!this.lightFlickerOn;
+                    if (this.lightFlickerOn) {
+                        this.lightFlickerNextTick=timeStamp+genRandom.randomInt(500,2000);
+                    }
+                    else {
+                        this.lightFlickerNextTick=timeStamp+genRandom.randomInt(100,400);
+                    }
+                }
+                this.intensity=this.origIntensity;
+                if (!this.lightFlickerOn) this.intensity*=0.3;
+                this.invertIntensity=1.0/this.intensity;
+                break;
+        }
+        
     }
     
     distance(pt)

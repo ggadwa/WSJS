@@ -7,7 +7,7 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class ModelLimbClass
 {
-    constructor(limbType,index,axis,flipped,acrossSurfaceCount,aroundSurfaceCount,randomize,boneIndexes)
+    constructor(limbType,index,axis,flipped,acrossSurfaceCount,aroundSurfaceCount,randomize,scaleMin,scaleMax,boneIndexes)
     {
         this.limbType=limbType;
         this.index=index;
@@ -16,6 +16,8 @@ export default class ModelLimbClass
         this.acrossSurfaceCount=acrossSurfaceCount;
         this.aroundSurfaceCount=aroundSurfaceCount;
         this.randomize=randomize;
+        this.scaleMin=scaleMin;
+        this.scaleMax=scaleMax;
         this.boneIndexes=boneIndexes;
         
         Object.seal(this);

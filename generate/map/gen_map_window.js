@@ -227,7 +227,7 @@ export default class GenRoomWindowClass
                 // light from window
                 // cut the main light if there's extra lights
                 
-            genMap.addGeneralLight(lightPos,null,null,genMap.WINDOW_LIGHT_INTENSITY);
+            genMap.addGeneralLight(lightPos,null,null,genMap.WINDOW_LIGHT_INTENSITY,false);
             room.mainLight.changeIntensity(-genMap.WINDOW_MAIN_LIGHT_INTENSITY_CUT);
             
                 // if window at bottom, mask off

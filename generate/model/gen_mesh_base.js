@@ -559,7 +559,7 @@ export default class GenMeshBaseClass
         // squish a model in a certain direction
         //
         
-    scaleVertexToBones(vertexList,fullBodyScale)
+    scaleVertexToBones(vertexList,scaleMin,scaleMax)
     {
         let n,v;
         let nVertex=vertexList.length;
@@ -567,7 +567,7 @@ export default class GenMeshBaseClass
         
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
-            if (v.boneIdx!==-1) v.position.scaleFromPoint(bones[v.boneIdx].position,fullBodyScale);
+            if (v.boneIdx!==-1) v.position.scaleFromMinMaxPoint(bones[v.boneIdx].position,scaleMin,scaleMax);
         }
     }
     
@@ -621,10 +621,10 @@ export default class GenMeshBaseClass
     }
         
         //
-        // build around bone list
+        // build mesh around limb
         //
         
-    buildAroundBoneList(limbType,axis,acrossSurfaceCount,aroundSurfaceCount,fullBodyScale,skeletonBoneIndexes,vertexList,indexes)
+    buildAroundBoneLimb(limb,vertexList,indexes)
     {
         let n,k,f,boneIdx,bone,parentBone,listBone;
         let acrossRadius,aroundRadius;
@@ -635,10 +635,10 @@ export default class GenMeshBaseClass
             // create list of bones
             
         let boneList=[];
-        let boneCount=skeletonBoneIndexes.length;
+        let boneCount=limb.boneIndexes.length;
         
         for (n=0;n!==boneCount;n++) {
-            boneIdx=skeletonBoneIndexes[n];
+            boneIdx=limb.boneIndexes[n];
             bone=this.model.skeleton.bones[boneIdx];
             
             listBone=new GenMeshBaseBoneClass();
@@ -709,28 +709,28 @@ export default class GenMeshBaseClass
             
         maxGravity=this.findMaxGravityForBoneList(boneList);
         
-        switch (axis) {
+        switch (limb.axis) {
             case constants.LIMB_AXIS_X:
                 acrossRadius=(xBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(yBound.getSize()>zBound.getSize())?((yBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonX(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                this.buildGlobeAroundSkeletonX(limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
             case constants.LIMB_AXIS_Y:
                 acrossRadius=(yBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>zBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((zBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonY(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                this.buildGlobeAroundSkeletonY(limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
             case constants.LIMB_AXIS_Z:
                 acrossRadius=(zBound.getSize()*0.5)+maxGravity;
                 aroundRadius=(xBound.getSize()>yBound.getSize())?((xBound.getSize()*0.5)+maxGravity):((yBound.getSize()*0.5)+maxGravity);
-                this.buildGlobeAroundSkeletonZ(acrossSurfaceCount,aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
+                this.buildGlobeAroundSkeletonZ(limb.acrossSurfaceCount,limb.aroundSurfaceCount,centerPnt,acrossRadius,aroundRadius,vertexList,indexes);
                 break;
         }
         
             // reset the UVs to work within the
             // texture chunks
         
-        switch (limbType) {
+        switch (limb.limbType) {
             case constants.LIMB_TYPE_BODY:
                 MeshUtilityClass.transformUVs(vertexList,0.0,0.5,0.5,0.5);
                 break;
@@ -748,7 +748,7 @@ export default class GenMeshBaseClass
             
         this.shrinkWrapGlobe(vertexList,boneList,centerPnt);
         this.attachVertexToBones(vertexList,boneList,centerPnt);
-        this.scaleVertexToBones(vertexList,fullBodyScale);
+        this.scaleVertexToBones(vertexList,limb.scaleMin,limb.scaleMax);
     }
     
         //

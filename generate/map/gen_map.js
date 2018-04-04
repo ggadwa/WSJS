@@ -351,7 +351,7 @@ export default class GenMapClass
         // lights
         //
 
-    addGeneralLight(lightPos,fixturePos,rotAngle,intensity)
+    addGeneralLight(lightPos,fixturePos,rotAngle,intensity,allowNonStaticLight)
     {
         let light,red,green,blue,exponent;
         let xFixtureBound,yFixtureBound,zFixtureBound;
@@ -383,6 +383,7 @@ export default class GenMapClass
             // add light to map
 
         light=new LightClass(lightPos,new ColorClass(red,green,blue),intensity,exponent);
+        if ((allowNonStaticLight) && (config.NON_STATIC_LIGHTS)) light.setRandomLightType(this.view.timeStamp);
         this.map.lightList.add(light);
 
         return(light);
@@ -409,7 +410,7 @@ export default class GenMapClass
             // create the light
             // remember this because later windows can reduce light
             
-        room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity);
+        room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity,true);
     }
     
     addHallwayLight(connectSide,hallwayMode,hallwaySize,xBound,zBound)
@@ -422,7 +423,7 @@ export default class GenMapClass
         if (hallwayMode===this.HALLWAY_LONG) {
             fixturePos=new PointClass(xBound.getMidPoint(),(this.yBase-constants.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
             lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
-            this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY);
+            this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY,true);
         }
         
             // ends
@@ -446,11 +447,11 @@ export default class GenMapClass
         
         fixturePos=new PointClass((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
         lightPos=new PointClass((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
-        this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY);
+        this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true);
         
         fixturePos=new PointClass((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
         lightPos=new PointClass((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
-        this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY);
+        this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true);
     }
   
         //
