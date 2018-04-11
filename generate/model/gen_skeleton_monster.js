@@ -118,9 +118,9 @@ export default class GenSkeletonMonsterClass extends GenSkeletonBaseClass
     {
         let boneIdx;
         let neckLength=genRandom.randomInt(200,600);
-        let neckRadius=genRandom.randomInt(200,400);
-        let jawRadius=genRandom.randomInt(500,300);
         let headRadius=genRandom.randomInt(500,400);
+        let jawRadius=headRadius*genRandom.randomFloat(0.9,0.3);
+        let neckRadius=headRadius*genRandom.randomFloat(0.3,0.5);
         
         boneIdx=this.model.skeleton.findBoneIndex('Torso_Top');
         this.buildLimbHead(0,boneIdx,neckLength,neckRadius,jawRadius,headRadius,true);

@@ -34,7 +34,7 @@ export default class GenSkeletonHumanClass extends GenSkeletonBaseClass
         bodyLimbIdx=this.buildBody(3000,500,2000,500,1000,100,0.9,0.0);
         
         boneIdx=this.model.skeleton.findBoneIndex('Torso_Top');
-        this.buildLimbHead(0,boneIdx,300,300,600,700,false);
+        this.buildLimbHead(0,boneIdx,400,300,500,500,false);
         
         armLength=Math.trunc(genRandom.randomInt(2200,500));
         
