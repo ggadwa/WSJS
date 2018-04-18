@@ -27,11 +27,6 @@ export default class ModelMeshClass
         this.cacheRadius=-1;
         this.cacheHigh=-1;
 
-            // keep track if this is a clone or
-            // not because the bitmaps are shared
-            
-        this.isClone=false;
-        
         Object.seal(this);
     }
     
@@ -41,23 +36,7 @@ export default class ModelMeshClass
 
     close()
     {
-        if (!this.isClone) this.bitmap.close();
-    }
-    
-        //
-        // clone
-        //
-        
-    clone()
-    {
-            // nothing that is part of this mesh is every changed
-            // only the internal gl arrays so we can just re-use the
-            // data
-        
-        let mesh=new ModelMeshClass(this.view,this.bitmap,this.vertexList,this.indexes,this.flag);
-        mesh.isClone=true;
-        
-        return(mesh);
+        this.bitmap.close();
     }
     
         //

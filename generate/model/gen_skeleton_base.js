@@ -298,10 +298,10 @@ export default class GenSkeletonBaseClass
             // create the jaw
             
         if (hasJaw) {
-            jawRadius=Math.trunc(headRadius*genRandom.randomFloat(0.1,0.1));
+            jawRadius=Math.trunc(headRadius*genRandom.randomFloat(0.3,0.3));
             
             jawBackPnt=neckPnt.copy();
-            vct=new PointClass(0,-headOffset,-(headRadius-(jawRadius*0.5)));
+            vct=new PointClass(0,-headOffset,-((headRadius*0.6)-(jawRadius*0.5)));
             jawBackPnt.addPoint(vct);
             
             jawBackBoneIdx=bones.push(new ModelBoneClass(('Jaw_Back_'+limbIdx),neckEndBoneIdx,jawBackPnt))-1;
@@ -309,10 +309,10 @@ export default class GenSkeletonBaseClass
             bones[jawBackBoneIdx].gravityLockDistance=jawRadius;
 
             jawFrontPnt=neckPnt.copy();
-            vct=new PointClass(0,-headOffset,(headRadius-(jawRadius*0.5)));
+            vct=new PointClass(0,-headOffset,((headRadius*genRandom.randomFloat(0.5,0.3))-(jawRadius*0.5)));
             jawFrontPnt.addPoint(vct);
 
-            jawFrontBoneIdx=bones.push(new ModelBoneClass(('Jaw_Front_'+limbIdx),neckEndBoneIdx,jawFrontPnt))-1;
+            jawFrontBoneIdx=bones.push(new ModelBoneClass(('Jaw_Front_'+limbIdx),jawBackBoneIdx,jawFrontPnt))-1;
             
             bones[jawFrontBoneIdx].gravityLockDistance=jawRadius;
             
@@ -320,9 +320,7 @@ export default class GenSkeletonBaseClass
             scaleMin=scaleMax.copy();
             scaleMin.y=0.1;
             
-            this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_JAW,0,constants.LIMB_AXIS_Z,false,5,5,false,scaleMin,scaleMax,[jawBackBoneIdx,jawFrontBoneIdx]));
-            
-            headOffset+=jawRadius;
+            this.model.skeleton.limbs.push(new ModelLimbClass(constants.LIMB_TYPE_JAW,0,constants.LIMB_AXIS_Z,false,6,6,false,scaleMin,scaleMax,[jawBackBoneIdx,jawFrontBoneIdx]));
         }
         
             // create the head

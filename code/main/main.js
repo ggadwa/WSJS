@@ -248,7 +248,7 @@ class MainClass
             if (pos===null) continue;
             
             monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
-            model=this.modelList.cloneModel('monster_'+monsterType);
+            model=this.modelList.getModel('monster_'+monsterType);
             this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
         }
         
@@ -256,7 +256,7 @@ class MainClass
             
         if (config.MONSTER_BOSS) {
             pos=this.map.roomList.findRandomBossPosition();
-            model=this.modelList.cloneModel('boss');
+            model=this.modelList.getModel('boss');
             if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
         }
 

@@ -57,24 +57,5 @@ export default class ModelListClass
 
         return(null);
     }
-    
-        //
-        // clone models
-        //
-        
-    cloneModel(name)
-    {
-        let model,cloneModel;
-        
-        model=this.getModel(name);
-        if (model===null) return(null);
-        
-        cloneModel=model.clone();
-        //cloneModel.mesh.setupBuffers();
-        
-        this.models.push(cloneModel);
-        
-        return(cloneModel);
-    }
 
 }
