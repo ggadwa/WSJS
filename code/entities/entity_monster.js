@@ -8,9 +8,9 @@ import EntityClass from '../../code/entities/entity.js';
 
 export default class EntityMonsterClass extends EntityClass
 {
-    constructor(view,map,sound,name,position,angle,maxHealth,model,ai)
+    constructor(view,map,sound,name,position,angle,maxHealth,ai)
     {
-        super(view,map,sound,name,position,angle,maxHealth,model);
+        super(view,map,sound,name,position,angle,maxHealth,ai.getModel());
         
             // entity setup
             

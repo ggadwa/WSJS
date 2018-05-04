@@ -32,7 +32,7 @@ class ConfigClass
             //
 
         this.MONSTER_TYPE_COUNT=4;
-        this.MONSTER_ENTITY_COUNT=10;
+        this.MONSTER_PER_TYPE_COUNT=3;
         
         this.MONSTER_AI_ON=false;
         this.MONSTER_BOSS=false;

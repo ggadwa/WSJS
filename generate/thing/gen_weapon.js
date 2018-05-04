@@ -1,5 +1,6 @@
 import WeaponClass from '../../code/entities/weapon.js';
 import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
+import GenProjectileClass from '../../generate/thing/gen_projectile.js';
 
 //
 // generate weapon class
@@ -7,24 +8,26 @@ import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
 
 export default class GenWeaponClass
 {
-    constructor(view,map,sound,modelList)
+    constructor(view,map,sound)
     {
         this.view=view;
         this.map=map;
         this.sound=sound;
-        this.modelList=modelList;       // todo -- DELETE temporary until shaders are global
         
         Object.seal(this);
     }
     
     generate(name)
     {
-        let genModel,model;
+        let weapon;
+        let genModel=new GenModelWeaponClass(this.view);
+        let genProjectile=new GenProjectileClass(this.view,this.map,this.sound);
         
-        genModel=new GenModelWeaponClass(this.view);
-        model=genModel.generate('weapon_0',1.0,false);
-        this.modelList.addModel(model);
+            // the weapon and projectile
+            
+        weapon=new WeaponClass(this.view,genModel.generate(name,1.0,false),name);
+        weapon.setProjectile(genProjectile.generate(name,true));
         
-        return(new WeaponClass(this.view,model,name));
+        return(weapon);
     }
 }

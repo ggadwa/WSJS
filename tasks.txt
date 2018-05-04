@@ -11,16 +11,14 @@ WebGL2
 ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
+
+
++ map types: sparse/compact | indoor/outdoor
+
 + fix the binding bug
-+ ai has model in it, split model animation bits from model so we can share?
-+ get rid of modelList
-
-
 + close() -> release()
-
-
-+ weapons make projectiles
 + playerEntity makes weapons
++ do AI types [stalk (melee), fire (get within firing distance), sniper (stay at firing distance), boss (stalk, melee, and fire)]
 
 ***** TRACK ALL initialize/release, and don't use close()
 
@@ -32,17 +30,12 @@ ESNext
 
 + main can get some imports removed (gen stuff)
 
-+ ai makes projectiles
 + projectiles have ammo & time to fire on them
 + weapons have two projectiles only, ammo on projectiles
-+ name weapons
-+ switch weapons
 
 
 
 --> bounce projectiles can bounce forever
---> do AI types [stalk (melee), fire (get within firing distance), sniper (stay at firing distance), boss (stalk, melee, and fire)]
---> toes need work
 --> projectile speed needs to be > entity speed
 --> monster meeles
 

@@ -3,16 +3,13 @@ import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
-import ModelListClass from '../../code/model/model_list.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
 import GenMapClass from '../../generate/map/gen_map.js';
 import GenModelHumanClass from '../../generate/model/gen_model_human.js';
-import GenModelMonsterClass from '../../generate/model/gen_model_monster.js';
 import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
 import GenModelProjectileClass from '../../generate/model/gen_model_projectile.js';
 import GenWeaponClass from '../../generate/thing/gen_weapon.js';
-import GenProjectileClass from '../../generate/thing/gen_projectile.js';
 import GenSoundClass from '../../generate/sound/gen_sound.js';
 import GenAIClass from '../../generate/thing/gen_ai.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
@@ -31,7 +28,6 @@ class MainClass
 
         this.view=new ViewClass();
         this.map=new MapClass(this.view);
-        this.modelList=new ModelListClass(this.view);
         this.input=new InputClass(this.view);
         this.sound=new SoundClass();
 
@@ -70,7 +66,6 @@ class MainClass
     {
         if (!this.sound.initialize()) return;
         if (!this.map.initialize()) return;
-        if (!this.modelList.initialize()) return;
 
             // next step
 
@@ -105,168 +100,113 @@ class MainClass
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Player Model');
+        this.view.loadingScreenAddString('Generating Player');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildPlayerModel.bind(this),1);
+        setTimeout(this.initBuildPlayer.bind(this),1);
     }
     
-    initBuildPlayerModel()
+    initBuildPlayer()
     {
-        let model;
+        let model,pos,playerEntity;
         let genModel=new GenModelHumanClass(this.view);
+        let genWeapon=new GenWeaponClass(this.view,this.map,this.sound);
 
             // build the player model
         
         model=genModel.generate('player',1.0,false);
-        this.modelList.addModel(model);
-
-            // next step
-
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Monster Models');
-        this.view.loadingScreenDraw(null);
         
-        setTimeout(this.initBuildMonsterModels.bind(this,0),1);
-    }
-
-    initBuildMonsterModels(idx)
-    {
-        let model;
-        let genModel=new GenModelMonsterClass(this.view);
-
-            // build the model
+            // find place for player
         
-        model=genModel.generate(('monster_'+idx),1.0,false);
-        this.modelList.addModel(model);
-
-            // if more models, then loop back around
-
-        idx++;
-        if (idx<config.MONSTER_TYPE_COUNT) {
-            this.view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
-            setTimeout(this.initBuildMonsterModels.bind(this,idx),1);
-            return;
-        }
-
-            // next step
-
-        if (config.MONSTER_BOSS) {
-            this.view.loadingScreenUpdate();
-            this.view.loadingScreenAddString('Generating Boss Model');
-            this.view.loadingScreenDraw(null);
-
-            setTimeout(this.initBuildBossModel.bind(this),1);
-        }
-        else {
-            this.view.loadingScreenUpdate();
-            this.view.loadingScreenAddString('Generating Dynamic Entities');
-            this.view.loadingScreenDraw(null);
-
-            setTimeout(this.initBuildEntities.bind(this),1);
-        }
-    }
-    
-    initBuildBossModel()
-    {
-        let model;
-        let genModel=new GenModelMonsterClass(this.view);
-
-            // build monster
-        
-        model=genModel.generate('boss',genRandom.randomFloat(2.5,3.0),false);
-        this.modelList.addModel(model);
-
-            // next step
-
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Entities');
-        this.view.loadingScreenDraw(null);
-
-        setTimeout(this.initBuildEntities.bind(this),1);
-    }
-
-    intBuildEntitiesSingleWeapon(playerEntity,name)
-    {
-        let genWeapon,genProjectile;
-        let playerWeapon,playerProjectile;
-        
-        genWeapon=new GenWeaponClass(this.view,this.map,this.sound,this.modelList);
-        playerWeapon=genWeapon.generate(name);
-        
-        genProjectile=new GenProjectileClass(this.view,this.map,this.sound,this.modelList);
-        playerProjectile=genProjectile.generate(('player_'+name),true);
-        
-        playerWeapon.setProjectile(playerProjectile);
-        playerEntity.addWeapon(playerWeapon);
-    }
-
-    initBuildEntities()
-    {
-        let n,monsterType;
-        let model,pos,playerEntity;
-        let monsterAIs;
-        
-        let genAI=new GenAIClass(this.view,this.map,this.sound,this.modelList);
-
-            // make player entity
-
         pos=this.map.roomList.findRandomPlayerPosition();
         if (pos===null) {
             alert('Couldn\'t find a place to spawn player!');
             return;
         }
 
-        playerEntity=new EntityPlayerClass(this.view,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,this.modelList.getModel('player'));
+        playerEntity=new EntityPlayerClass(this.view,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,model);
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
             // todo -- all this is hard coded
             
-        this.intBuildEntitiesSingleWeapon(playerEntity,'Pistol');
-        this.intBuildEntitiesSingleWeapon(playerEntity,'Rocket Launcher');
-        this.intBuildEntitiesSingleWeapon(playerEntity,'Grenade Launcher');
-        this.intBuildEntitiesSingleWeapon(playerEntity,'Laser Gun');
+        playerEntity.addWeapon(genWeapon.generate('Pistol'));
+        playerEntity.addWeapon(genWeapon.generate('Rocket Launcher'));
+        playerEntity.addWeapon(genWeapon.generate('Grenade Launcher'));
+        playerEntity.addWeapon(genWeapon.generate('Laser Gun'));
         
         playerEntity.setCurrentWeaponIndex(0);
 
         this.map.entityList.setPlayer(playerEntity);
-        
-            // create AI type for each monster
-        
-        monsterAIs=[];
-        
-        for (n=0;n!==config.MONSTER_TYPE_COUNT;n++) {
-            monsterAIs.push(genAI.generate(false));
-        }
 
-            // make monster entities
-            // we clone their models in the list so each entity gets
-            // it's own model
-
-        for (n=0;n!==config.MONSTER_ENTITY_COUNT;n++) {
-            pos=this.map.roomList.findRandomMonsterPosition();
-            if (pos===null) continue;
-            
-            monsterType=n%config.MONSTER_TYPE_COUNT;            // same number of each type
-            model=this.modelList.getModel('monster_'+monsterType);
-            this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,model,monsterAIs[monsterType]));
-        }
-        
-            // boss monster
-            
-        if (config.MONSTER_BOSS) {
-            pos=this.map.roomList.findRandomBossPosition();
-            model=this.modelList.getModel('boss');
-            if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,model,genAI.generate(true)));
-        }
-
-            // finished
+            // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Running');
+        this.view.loadingScreenAddString('Generating Monsters');
+        this.view.loadingScreenDraw(null);
+        
+        setTimeout(this.initBuildMonsters.bind(this,0),1);
+    }
+
+    initBuildMonsters(idx)
+    {
+        let n,pos,ai;
+        let genAI=new GenAIClass(this.view,this.map,this.sound);
+
+            // create AI type for each monster
+            // AI create all weapons and models
+        
+        ai=genAI.generate(('monster_'+idx),genAI.AI_TYPE_STALKING_MONSTER);
+
+            // make monster entities
+
+        for (n=0;n!==config.MONSTER_PER_TYPE_COUNT;n++) {
+            pos=this.map.roomList.findRandomMonsterPosition();
+            if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,ai));
+        }
+
+            // if more monster types, then loop back around
+
+        idx++;
+        if (idx<config.MONSTER_TYPE_COUNT) {
+            this.view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
+            setTimeout(this.initBuildMonsters.bind(this,idx),1);
+            return;
+        }
+
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Generating Boss');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initFinish.bind(this),1);    
+        setTimeout(this.initBuildBoss.bind(this),1);
+    }
+    
+    initBuildBoss()
+    {
+        let pos,ai;
+        let genAI=new GenAIClass(this.view,this.map,this.sound);
+        
+        if (config.MONSTER_BOSS) {
+
+                // create AI type for each monster
+                // AI create all weapons and models
+
+            ai=genAI.generate('boss',genAI.AI_TYPE_BOSS);
+            
+                // place the boss at end of map
+                
+            pos=this.map.roomList.findRandomBossPosition();
+            if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,ai));
+        }
+        
+            // next step
+
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Finishing');
+        this.view.loadingScreenDraw(null);
+
+        setTimeout(this.initFinish.bind(this),1);
     }
 
     initFinish()

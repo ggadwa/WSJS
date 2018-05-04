@@ -1,5 +1,6 @@
 import AIClass from '../../code/entities/ai.js';
 import genRandom from '../../generate/utility/random.js';
+import GenModelMonsterClass from '../../generate/model/gen_model_monster.js';
 import GenProjectileClass from '../../generate/thing/gen_projectile.js';
 import GenSoundClass from '../../generate/sound/gen_sound.js';
 
@@ -9,7 +10,7 @@ import GenSoundClass from '../../generate/sound/gen_sound.js';
 
 export default class GenAIClass
 {
-    constructor(view,map,sound,modelList)
+    constructor(view,map,sound)
     {
             // constants
             
@@ -37,24 +38,38 @@ export default class GenAIClass
         
         this.MONSTER_MIN_FAR_WAKE_DISTANCE=35000;
         this.MONSTER_RANDOM_EXTRA_FAR_WAKE_DISTANCE=20000;
+        
+        this.AI_TYPE_STALKING_MONSTER=0;
+        this.AI_TYPE_BOSS=1;
 
         this.view=view;
         this.map=map;
         this.sound=sound;
-        this.modelList=modelList;
         
         Object.seal(this);
     }
 
-    generate(name,boss)
+    generate(name,aiType)
     {
         let genSound,genProjectile;
         let speed,acceleration,deceleration,standTurnSpeed,walkTurnSpeed;
         let nearWakeDistance,farWakeDistance;
         let fireRechargeTick,fireSlopAngle,fixMaxDistance;
+        let genModel=new GenModelMonsterClass(this.view);
         let ai=new AIClass();
         
-             // sound generator
+            // the model
+        
+        switch (aiType) {
+            case this.AI_TYPE_STALKING_MONSTER:
+                ai.setModel(genModel.generate(name,1.0,false));
+                break;
+            case this.AI_TYPE_BOSS:
+                ai.setModel(genModel.generate(name,genRandom.randomFloat(2.5,3.0),false));
+                break;
+        }
+        
+            // sound generator
             
         genSound=new GenSoundClass(this.sound.getAudioContext());
         
@@ -68,7 +83,7 @@ export default class GenAIClass
         standTurnSpeed=genRandom.randomFloat(this.MONSTER_MIN_STAND_TURN_SPEED,this.MONSTER_RANDOM_EXTRA_STAND_TURN_SPEED);
         walkTurnSpeed=genRandom.randomFloat(this.MONSTER_MIN_WALK_TURN_SPEED,this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED);
         
-        if (boss) {
+        if (aiType===this.AI_TYPE_BOSS) {
             speed*=0.7;
             walkTurnSpeed*=0.7;
             if (walkTurnSpeed<1.0) walkTurnSpeed=1.0;
@@ -79,7 +94,7 @@ export default class GenAIClass
         farWakeDistance=genRandom.randomInt(this.MONSTER_MIN_FAR_WAKE_DISTANCE,this.MONSTER_RANDOM_EXTRA_FAR_WAKE_DISTANCE);
         nearWakeDistance=Math.trunc(farWakeDistance*(genRandom.random()*0.7));
         
-        if (!boss) {
+        if (aiType===this.AI_TYPE_STALKING_MONSTER) {
             ai.setWakeSleepDistance(nearWakeDistance,farWakeDistance,(fireSlopAngle*2.0),(farWakeDistance*2));       // notice player with twice field of vision as firing
         }
         else {
@@ -91,7 +106,7 @@ export default class GenAIClass
             // projectile
             
         if (genRandom.randomPercentage(this.MONSTER_FIRE_PERCENTAGE)) {
-            genProjectile=new GenProjectileClass(this.view,this.map,this.sound,this.modelList);
+            genProjectile=new GenProjectileClass(this.view,this.map,this.sound);
             ai.setProjectile(genProjectile.generate(name,false));
             
             fireRechargeTick=genRandom.randomInt(this.MONSTER_MIN_FIRE_RECHARGE_TICK,this.MONSTER_RANDOM_EXTRA_FIRE_RECHARGE_TICK);

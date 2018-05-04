@@ -18,6 +18,7 @@ export default class AIClass
         this.farWakeHalfAngleFieldOfVision=0;
         this.sleepDistance=0;
         
+        this.model=null;
         this.projectile=null;
         
         this.fireRechargeTick=0;
@@ -48,6 +49,16 @@ export default class AIClass
         this.farWakeDistance=farWakeDistance;
         this.farWakeHalfAngleFieldOfVision=farWakeHalfAngleFieldOfVision;
         this.sleepDistance=sleepDistance;
+    }
+    
+    setModel(model)
+    {
+        this.model=model;
+    }
+    
+    getModel()
+    {
+        return(this.model);
     }
     
     setProjectile(projectile)

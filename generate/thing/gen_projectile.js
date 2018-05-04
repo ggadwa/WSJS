@@ -9,12 +9,11 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenProjectileClass
 {
-    constructor(view,map,sound,modelList)
+    constructor(view,map,sound)
     {
         this.view=view;
         this.map=map;
         this.sound=sound;
-        this.modelList=modelList;       // todo -- DELETE THIS temporary until shaders are global
         
         Object.seal(this);
     }
@@ -28,7 +27,6 @@ export default class GenProjectileClass
             
         genModel=new GenModelProjectileClass(this.view);
         model=genModel.generate(('projectile_'+ownerName),1.0,false);
-        this.modelList.addModel(model);
         
             // sound generator
             
