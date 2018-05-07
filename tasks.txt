@@ -13,9 +13,16 @@ ESNext
 
 
 
-+ map types: sparse/compact | indoor/outdoor
++ map style types: indoor/outdoor/space
 
-+ fix the binding bug
+OUTDOOR
+  - sparse = hallways only
+  - medium = hallways and extensions
+  - compact = extensions
+  - tunnels instead of hallways
+  - grass texture (use fur texture) / tunnel texture (dirt & rocks) / walls need to be restricted to stone or wood textures
+
++ fix the binding bug on projectiles
 + close() -> release()
 + playerEntity makes weapons
 + do AI types [stalk (melee), fire (get within firing distance), sniper (stay at firing distance), boss (stalk, melee, and fire)]

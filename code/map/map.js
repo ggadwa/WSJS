@@ -23,6 +23,17 @@ export default class MapClass
     {
         this.view=view;
         
+            // constants
+            
+        this.DESIGN_SPARSE=0;
+        this.DESIGN_MEDIUM=1;
+        this.DESIGN_COMPACT=2;
+        
+        this.STYLE_INDOOR=0;
+        this.STYLE_OUTDOOR=1;
+            
+            // variables
+        
         this.roomList=new MapRoomListClass(view,this);
         this.meshList=new MapMeshListClass(view);
         this.liquidList=new MapLiquidListClass(view);

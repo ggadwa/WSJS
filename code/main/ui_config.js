@@ -26,6 +26,7 @@ export default class UIConfigClass
                 // get the control
                 
             ctrl=document.getElementById('ctrl_'+propList[n]);
+            if (ctrl===null) continue;          // skips all the combo lists and other items that don't have controls
             
                 // set the config
                 
@@ -33,15 +34,19 @@ export default class UIConfigClass
                 config[propList[n]]=ctrl.checked;
             }
             else {
-                str=ctrl.value;
-                if (str.indexOf('.')===-1) {
-                    config[propList[n]]=parseInt(str);
+                if (ctrl.nodeName!=='SELECT') {
+                    str=ctrl.value;
+                    if (str.indexOf('.')===-1) {
+                        config[propList[n]]=parseInt(str);
+                    }
+                    else {
+                        config[propList[n]]=parseFloat(str);
+                    }
                 }
                 else {
-                    config[propList[n]]=parseFloat(str);
+                    config[propList[n]]=ctrl.selectedIndex;
                 }
             }
-            
         }
                 
             // remove all the HTML
@@ -75,7 +80,7 @@ export default class UIConfigClass
     
     run()
     {
-        let n,wrapperDiv,labelDiv,ctrl,btn;
+        let n,k,wrapperDiv,labelDiv,ctrl,comboArray,option,btn;
         let mainDiv,headerDiv,leftColDiv,rightColDiv;
         let instructHeaderDiv,instructDiv;
         let linkHeaderDiv,linkDiv;
@@ -141,10 +146,22 @@ export default class UIConfigClass
             leftColDiv.appendChild(wrapperDiv);
         }
         
+            // a couple special controls
+            
+        
+        
             // add in right controls (text)
         
         for (n=0;n!==nProp;n++) {
             if (typeof(config[propList[n]])==='boolean') continue;
+            
+                // skip any lists
+                
+            if (propList[n].endsWith('_LIST')) continue;
+            
+                // determine if combo
+                
+            comboArray=config[propList[n]+'_LIST'];
             
                 // the wrapper
                 
@@ -161,11 +178,26 @@ export default class UIConfigClass
             wrapperDiv.appendChild(labelDiv);
             
                 // the control
+            
+            if (comboArray===undefined) {    
+                ctrl=document.createElement('input');
+                ctrl.id='ctrl_'+propList[n];
+                ctrl.type='text';
+                ctrl.value=config[propList[n]];
+            }
+            else {
+                ctrl=document.createElement('select');
+                ctrl.id='ctrl_'+propList[n];
                 
-            ctrl=document.createElement('input');
-            ctrl.id='ctrl_'+propList[n];
-            ctrl.type='text';
-            ctrl.value=config[propList[n]];
+                for (k=0;k!=comboArray.length;k++) {
+                    option=document.createElement('option');
+                    option.text=comboArray[k];
+                    ctrl.add(option);
+                }
+                
+                ctrl.selectedIndex=config[propList[n]];
+            }
+            
             ctrl.className='controlText';
             
             wrapperDiv.appendChild(ctrl);

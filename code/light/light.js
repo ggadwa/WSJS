@@ -120,11 +120,11 @@ export default class LightClass
                         this.lightFlickerNextTick=timeStamp+genRandom.randomInt(500,2000);
                     }
                     else {
-                        this.lightFlickerNextTick=timeStamp+genRandom.randomInt(100,400);
+                        this.lightFlickerNextTick=timeStamp+genRandom.randomInt(100,200);
                     }
                 }
                 this.intensity=this.origIntensity;
-                if (!this.lightFlickerOn) this.intensity*=0.3;
+                if (!this.lightFlickerOn) this.intensity*=genRandom.randomFloat(0.75,0.15);
                 this.invertIntensity=1.0/this.intensity;
                 break;
         }

@@ -38,7 +38,7 @@ import genRandom from '../../generate/utility/random.js';
 // generate map class
 //
 
-export default class GenMapClass
+export default class GenMapSpaceClass
 {
     constructor(view,map,callbackFunc)
     {
@@ -54,8 +54,6 @@ export default class GenMapClass
             // of the map
             
         this.yBase=Math.trunc(this.view.OPENGL_FAR_Z/2);
-        
-        this.currentRoomCount=0;
         
             // preload data objects
             
@@ -637,8 +635,6 @@ export default class GenMapClass
             // the room
             
         roomIdx=this.addRegularRoom(constants.ROOM_LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
-        this.currentRoomCount++;
-        
         room=this.map.roomList.get(roomIdx);
         
             // mark off any doors we made
@@ -675,10 +671,17 @@ export default class GenMapClass
             
         if ((this.map.roomList.count()>=config.ROOM_PATH_COUNT) || (config.SIMPLE_TEST_MAP)) return;
 
+            // compact mode has no hallways
+        
+        if (config.MAP_DESIGN_TYPE===this.DESIGN_COMPACT) {
+            hallwayMode=this.HALLWAY_NONE;
+        }
+        else {
+            hallwayMode=(genRandom.randomPercentage(this.ROOM_LONG_HALLWAY_PERCENTAGE))?this.HALLWAY_LONG:this.HALLWAY_SHORT;
+        }
+        
             // next room in path
-            
-        hallwayMode=(genRandom.randomPercentage(this.ROOM_LONG_HALLWAY_PERCENTAGE))?this.HALLWAY_LONG:this.HALLWAY_SHORT;
-            
+        
         this.buildMapRoomPath(room,hallwayMode);
     }
     
@@ -763,8 +766,6 @@ export default class GenMapClass
             // the room
             
         roomIdx=this.addRegularRoom(level,constants.ROOM_PATH_TYPE_NORMAL,xBlockSize,zBlockSize,xBound,zBound,false,connectSide,lastRoom,lastRoom.extensionDirection);
-        this.currentRoomCount++;
-        
         room=this.map.roomList.get(roomIdx);
         
             // mark where windows can be
@@ -794,6 +795,10 @@ export default class GenMapClass
     {
         let n,room;
         let nRoom=this.map.roomList.count();
+        
+            // sparse mode has no extensions
+            
+        if (config.MAP_DESIGN_TYPE===this.DESIGN_SPARSE) return;
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -954,8 +959,6 @@ export default class GenMapClass
             // start the recursive
             // room adding
 
-        this.currentRoomCount=0;
-        
         this.buildMapRoomPath(null,this.HALLWAY_NONE);
         
         this.view.loadingScreenDraw(0.2);
@@ -973,8 +976,6 @@ export default class GenMapClass
             // start the recursive
             // room adding
 
-        this.currentRoomCount=0;
-        
         this.buildRoomExtensions();
         
         this.view.loadingScreenDraw(0.3);
