@@ -20,6 +20,8 @@ import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import GenBitmapComputerClass from '../../generate/bitmap/gen_bitmap_computer.js';
 import GenBitmapGlassClass from '../../generate/bitmap/gen_bitmap_glass.js';
 import GenBitmapGooClass from '../../generate/bitmap/gen_bitmap_goo.js';
+import GenBitmapGroundClass from '../../generate/bitmap/gen_bitmap_ground.js';
+import GenBitmapCaveClass from '../../generate/bitmap/gen_bitmap_cave.js';
 import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
 import GenBitmapItemClass from '../../generate/bitmap/gen_bitmap_item.js';
 import GenBitmapMonsterClass from '../../generate/bitmap/gen_bitmap_monster.js';
@@ -140,6 +142,8 @@ export default class DebugRunClass
         this.list.push(new DebugItemClass('Computer',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapComputerClass(this.view),false));
         this.list.push(new DebugItemClass('Glass',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGlassClass(this.view),false));
         this.list.push(new DebugItemClass('Goo',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGooClass(this.view),false));
+        this.list.push(new DebugItemClass('Ground',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapGroundClass(this.view),false));
+        this.list.push(new DebugItemClass('Cave',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapCaveClass(this.view),false));
         this.list.push(new DebugItemClass('Particle',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapParticleClass(this.view),false));
         this.list.push(new DebugItemClass('Item',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapItemClass(this.view),false));
         this.list.push(new DebugItemClass('Monster',idx++,this.DEBUG_ITEM_TYPE_BITMAP,new GenBitmapMonsterClass(this.view),false));

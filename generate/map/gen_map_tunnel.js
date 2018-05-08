@@ -11,16 +11,13 @@ import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 
 export default class GenRoomTunnelClass
 {
-    constructor(view,map,wallBitmap,floorBitmap,ceilingBitmap,frameBitmap,doorBitmap)
+    constructor(view,map,tunnelBitmap,floorBitmap)
     {
         this.view=view;
         this.map=map;
         
-        this.wallBitmap=wallBitmap;
+        this.tunnelBitmap=tunnelBitmap;
         this.floorBitmap=floorBitmap;
-        this.ceilingBitmap=ceilingBitmap;
-        this.frameBitmap=frameBitmap;
-        this.doorBitmap=doorBitmap;
         
         Object.seal(this);
     }
@@ -136,7 +133,7 @@ export default class GenRoomTunnelClass
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.min+thickSize));
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.max-thickSize));
-        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -149,7 +146,7 @@ export default class GenRoomTunnelClass
         zThickBound=new BoundClass((zBound.max-thickSize),zBound.max);
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound);
-        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
 
            // the ceiling and floor
 
@@ -158,7 +155,7 @@ export default class GenRoomTunnelClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingX(idx,vertexList,xBound,yBound.min,zTunnelBound);
-        this.finishMesh(this.ceilingBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
+        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
@@ -192,7 +189,7 @@ export default class GenRoomTunnelClass
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
         idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBound,zBound);
         idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBound,zBound);
-        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
 
             // external walls
 
@@ -205,7 +202,7 @@ export default class GenRoomTunnelClass
         xThickBound=new BoundClass((xBound.max-thickSize),xBound.max);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
-        this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
+        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
 
            // the ceiling
            
@@ -214,7 +211,7 @@ export default class GenRoomTunnelClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
         this.createSingleCeilingZ(idx,vertexList,xTunnelBound,yBound.min,zBound);
-        this.finishMesh(this.ceilingBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
+        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_CEILING);
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);

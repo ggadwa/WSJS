@@ -19,13 +19,13 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         // sky
         //
     
-    generateClouds(bitmapCTX,lft,top,rgt,bot,cloudColor)
+    generateClouds(bitmapCTX,lft,top,rgt,bot,allSides,cloudColor)
     {
-        let n,x,y,x2,xsz,ysz;
+        let n,x,y,x2,y2,xsz,ysz;
         let wid=rgt-lft;
         let high=bot-top;
         let quarterWid=Math.trunc(wid*0.25);
-        let quarterHigh=Math.trunc(high*0.175);
+        let quarterHigh=Math.trunc(high*0.25);
         
             // random clouds
             
@@ -36,6 +36,8 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
             x=genRandom.randomInt(lft,wid)-Math.trunc(xsz*0.5);
             y=top-Math.trunc(ysz*0.5);
             
+                // the top
+                
             this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
             if (x<lft) {
                 x2=rgt+x;
@@ -45,6 +47,52 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
                 x2=lft-((x+xsz)-rgt);
                 this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
             }
+            
+            if (!allSides) continue;
+                
+                // the bottom
+                
+            y=bot-Math.trunc(ysz*0.5);
+            
+            this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            if (x<lft) {
+                x2=rgt+x;
+                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+            }
+            if ((x+xsz)>rgt) {
+                x2=lft-((x+xsz)-rgt);
+                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+            }
+            
+                // the left
+                
+            x=lft-Math.trunc(xsz*0.5);
+            y=genRandom.randomInt(top,high)-Math.trunc(ysz*0.5);
+                
+            this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            if (y<bot) {
+                y2=bot+y;
+                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+            }
+            if ((y+ysz)>bot) {
+                y2=top-((y+ysz)-bot);
+                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+            }
+            
+                // the right
+                
+            x=rgt-Math.trunc(xsz*0.5);
+            
+            this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            if (y<bot) {
+                y2=bot+y;
+                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+            }
+            if ((y+ysz)>bot) {
+                y2=top-((y+ysz)-bot);
+                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+            }
+
         }
     }
     
@@ -136,10 +184,17 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         let mountainColor=new ColorClass(0.65,0.35,0.0);
         let groundColor=new ColorClass(0.1,1.0,0.1);
         
+            // top and bottom
+            
+        this.drawRect(bitmapCTX,0,my,qx,high,skyColor);
+        this.generateClouds(bitmapCTX,0,my,qx,high,true,cloudColor);
+        
+        this.drawRect(bitmapCTX,qx,my,mx,high,groundColor);
+        
             // side
             
         this.drawVerticalGradient(bitmapCTX,0,0,wid,my,skyColor,this.darkenColor(skyColor,0.5));
-        this.generateClouds(bitmapCTX,0,0,wid,my,cloudColor);
+        this.generateClouds(bitmapCTX,0,0,wid,my,false,cloudColor);
         this.blur(bitmapCTX,0,my,wid,high,3,true);
         
         rangeY=this.generateMountainsBuildRange(0,Math.trunc(my*0.75),wid,8);
@@ -161,10 +216,6 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         bitmapCTX.fillRect(2016,10,30,30);
         */
        
-            // top and bottom
-            
-        this.drawRect(bitmapCTX,0,my,qx,high,cloudColor);
-        this.drawRect(bitmapCTX,qx,my,mx,high,groundColor);
     }
 
         //

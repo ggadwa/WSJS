@@ -280,6 +280,16 @@ export default class GenBitmapBaseClass
         return(new ColorClass(genRandom.randomFloat(0.6,0.2),genRandom.randomFloat(0.3,0.2),0.0));
     }
     
+    getRandomGrassColor()
+    {
+        return(new ColorClass(genRandom.randomFloat(0.0,0.2),genRandom.randomFloat(0.8,0.2),genRandom.randomFloat(0.0,0.2)));
+    }
+    
+    getRandomDirtColor()
+    {
+        return(new ColorClass(genRandom.randomFloat(0.6,0.2),genRandom.randomFloat(0.3,0.2),0.0));
+    }
+    
     getRandomMetalColor()
     {
         let f;

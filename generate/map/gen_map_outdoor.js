@@ -20,17 +20,10 @@ import GenRoomDecorationLabClass from '../../generate/map/gen_map_decoration_lab
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import GenBitmapBrickClass from '../../generate/bitmap/gen_bitmap_brick.js';
 import GenBitmapStoneClass from '../../generate/bitmap/gen_bitmap_stone.js';
-import GenBitmapBlockClass from '../../generate/bitmap/gen_bitmap_block.js';
-import GenBitmapPlasterClass from '../../generate/bitmap/gen_bitmap_plaster.js';
-import GenBitmapScifiClass from '../../generate/bitmap/gen_bitmap_scifi.js';
-import GenBitmapTileClass from '../../generate/bitmap/gen_bitmap_tile.js';
-import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
-import GenBitmapDoorClass from '../../generate/bitmap/gen_bitmap_door.js';
 import GenBitmapCementClass from '../../generate/bitmap/gen_bitmap_cement.js';
-import GenBitmapGrateClass from '../../generate/bitmap/gen_bitmap_grate.js';
-import GenBitmapHexigonClass from '../../generate/bitmap/gen_bitmap_hexigon.js';
-import GenBitmapMosaicClass from '../../generate/bitmap/gen_bitmap_mosaic.js';
-import GenBitmapWoodClass from '../../generate/bitmap/gen_bitmap_wood.js';
+import GenBitmapGroundClass from '../../generate/bitmap/gen_bitmap_ground.js';
+import GenBitmapCaveClass from '../../generate/bitmap/gen_bitmap_cave.js';
+import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -59,15 +52,11 @@ export default class GenMapOutdoorClass
             
         this.wallBitmap=null;
         this.floorBitmap=null;
-        this.ceilingBitmap=null;
-        this.platformBitmap=null;
-        this.frameBitmap=null;
+        this.tunnelBitmap=null;
         this.lightBitmap=null;
-        this.doorBitmap=null;
         this.liquidBitmap=null;
         
         this.genRoomTunnel=null;
-        this.genRoomStairs=null;
         
             // constants
             
@@ -116,21 +105,12 @@ export default class GenMapOutdoorClass
         
             // wall bitmap
             
-        switch(genRandom.randomIndex(5)) {
+        switch(genRandom.randomIndex(2)) {
             case 0:
                 genBitmap=new GenBitmapBrickClass(this.view);
                 break;
             case 1:
                 genBitmap=new GenBitmapStoneClass(this.view);
-                break;
-            case 2:
-                genBitmap=new GenBitmapBlockClass(this.view);
-                break;
-            case 3:
-                genBitmap=new GenBitmapPlasterClass(this.view);
-                break;
-            case 4:
-                genBitmap=new GenBitmapScifiClass(this.view);
                 break;
         }
         
@@ -138,98 +118,26 @@ export default class GenMapOutdoorClass
         
             // floor bitmap
             
-        switch(genRandom.randomIndex(5)) {
-            case 0:
-                genBitmap=new GenBitmapTileClass(this.view);
-                break;
-            case 1:
-                genBitmap=new GenBitmapCementClass(this.view);
-                break;
-            case 2:
-                genBitmap=new GenBitmapGrateClass(this.view);
-                break;
-            case 3:
-                genBitmap=new GenBitmapHexigonClass(this.view);
-                break;
-            case 4:
-                genBitmap=new GenBitmapMosaicClass(this.view);
-                break;
-        }
         
+        genBitmap=new GenBitmapGroundClass(this.view);
         this.floorBitmap=genBitmap.generate(false);
         
-            // ceiling bitmap
+            // tunnel bitmap
             
-        switch(genRandom.randomIndex(4)) {
-            case 0:
-                genBitmap=new GenBitmapTileClass(this.view);
-                break;
-            case 1:
-                genBitmap=new GenBitmapCementClass(this.view);
-                break;
-            case 2:
-                genBitmap=new GenBitmapMetalClass(this.view);
-                break;
-            case 3:
-                genBitmap=new GenBitmapWoodClass(this.view);
-                break;
-        }
-            
-        this.ceilingBitmap=genBitmap.generate(false);
-        
-            // platform bitmap
-            
-        switch(genRandom.randomIndex(5)) {
-            case 0:
-                genBitmap=new GenBitmapBrickClass(this.view);
-                break;
-            case 1:
-                genBitmap=new GenBitmapStoneClass(this.view);
-                break;
-            case 2:
-                genBitmap=new GenBitmapBlockClass(this.view);
-                break;
-            case 3:
-                genBitmap=new GenBitmapMetalClass(this.view);
-                break;
-            case 4:
-                genBitmap=new GenBitmapTileClass(this.view);
-                break;
-        }
-        
-        this.platformBitmap=genBitmap.generate(false);
-        
-            // frame bitmap
-            
-        switch(genRandom.randomIndex(3)) {
-            case 0:
-                genBitmap=new GenBitmapBrickClass(this.view);
-                break;
-            case 1:
-                genBitmap=new GenBitmapMetalClass(this.view);
-                break;
-            case 2:
-                genBitmap=new GenBitmapPlasterClass(this.view);
-                break;
-        }
-        
-        this.frameBitmap=genBitmap.generate(false);
+        genBitmap=new GenBitmapCaveClass(this.view);
+        this.tunnelBitmap=genBitmap.generate(false);
         
             // other misc bitmaps
             
         genBitmap=new GenBitmapMetalClass(this.view);
         this.lightBitmap=genBitmap.generate(false);
-            
-        genBitmap=new GenBitmapDoorClass(this.view);
-        this.doorBitmap=genBitmap.generate(false);
         
         genBitmap=new GenBitmapLiquidClass(this.view);
         this.liquidBitmap=genBitmap.generate(false);
         
             // misc constructors
             
-        this.genRoomTunnel=new GenRoomTunnelClass(this.view,this.map,this.wallBitmap,this.ceilingBitmap,this.floorBitmap,this.frameBitmap,this.doorBitmap);
-        this.genRoomStairs=new GenRoomStairsClass(this.view,this.map,this.wallBitmap,this.platformBitmap);
+        this.genRoomTunnel=new GenRoomTunnelClass(this.view,this.map,this.tunnelBitmap,this.floorBitmap);
     }
 
         //
@@ -238,36 +146,10 @@ export default class GenMapOutdoorClass
 
     addRegularRoom(level,pathType,xBlockSize,zBlockSize,xBound,zBound,mainPath,mainPathSide,mainPathConnectedRoom,extensionDirection)
     {
-        let n,mesh,mesh2;
-        let yAdd,yBound,yWallBound,yFloorBound;
+        let mesh,mesh2;
+        let yBound,yWallBound,yFloorBound;
         let roomIdx,room;
-        let storyCount,liquid;
-        
-            // figure out room Y size from extension mode
-            // all rooms need at least 2 stories
-            
-        switch (level) {
-            case constants.ROOM_LEVEL_LOWER:
-                storyCount=genRandom.randomInt(2,4);
-                yAdd=(genRandom.randomInBetween(1,(storyCount-1)));
-                yBound=new BoundClass(0,this.yBase+((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*yAdd));
-                break;
-            case constants.ROOM_LEVEL_HIGHER:
-                storyCount=genRandom.randomInt(2,4);
-                yBound=new BoundClass(0,this.yBase-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
-                break;
-            default:
-                storyCount=genRandom.randomInt(2,3);
-                yBound=new BoundClass(0,this.yBase);
-                break;
-        }
-        
-            // if a goal room, and we have a boss, always
-            // make room taller
-            
-        if (pathType===constants.ROOM_PATH_TYPE_GOAL) {
-            if (storyCount<4) storyCount=4;
-        }
+        let liquid;
         
             // determine if this room has a liquid,
             // and lower it for pool and add a story
@@ -275,13 +157,13 @@ export default class GenMapOutdoorClass
         liquid=(config.ROOM_LIQUIDS)&&(level===constants.ROOM_LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
 
             // top of room
-            
-        yBound.min=yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*storyCount);
+        
+        yBound=new BoundClass((this.yBase-constants.ROOM_FLOOR_HEIGHT),this.yBase);
             
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=this.map.roomList.add(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
+        roomIdx=this.map.roomList.add(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,1,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
         room=this.map.roomList.get(roomIdx);
         
             // if the room is higher, we need to mark that off
@@ -304,17 +186,12 @@ export default class GenMapOutdoorClass
         yWallBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_HEIGHT),yBound.max);
         yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
             
-        for (n=0;n!==storyCount;n++) {
-            mesh=room.createMeshWalls(this.wallBitmap,yWallBound);
-            mesh2=room.createMeshWalls(this.wallBitmap,yFloorBound);
-            mesh.combineMesh(mesh2);
-            
-            this.map.meshList.add(mesh);
-            if (n===0) this.map.overlay.addRoom(room);
-            
-            yWallBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
-            yFloorBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
-        }
+        mesh=room.createMeshWalls(this.wallBitmap,yWallBound);
+        mesh2=room.createMeshWalls(this.wallBitmap,yFloorBound);
+        mesh.combineMesh(mesh2);
+
+        this.map.meshList.add(mesh);
+        this.map.overlay.addRoom(room);
         
         return(roomIdx);
     }

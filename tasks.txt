@@ -21,6 +21,7 @@ OUTDOOR
   - compact = extensions
   - tunnels instead of hallways
   - grass texture (use fur texture) / tunnel texture (dirt & rocks) / walls need to be restricted to stone or wood textures
+  - better dirt texture
 
 + fix the binding bug on projectiles
 + close() -> release()
