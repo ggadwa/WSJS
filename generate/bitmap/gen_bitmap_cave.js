@@ -20,9 +20,8 @@ export default class GenBitmapCaveClass extends GenBitmapBaseClass
 
     generateCave(bitmapCTX,normalCTX,specularCTX,wid,high)
     {
-        let n,k,rect,edgeSize,clipMargin;
-        let drawStoneColor,drawEdgeColor,lineColor,darken,f;
-        let x,y,x2,y2,lineCount,lineVarient,stoneWid,stoneHigh;
+        let n,rect,edgeSize;
+        let drawStoneColor,drawEdgeColor,f;
 
             // some random values
 
@@ -55,46 +54,13 @@ export default class GenBitmapCaveClass extends GenBitmapBaseClass
                 f=genRandom.random()+darkenFactor;
                 if (f>1.0) f=1.0;
             }
-
+            
             drawStoneColor=this.darkenColor(stoneColor,f);
             drawEdgeColor=this.darkenColor(edgeColor,f);
 
-            edgeSize=genRandom.randomInt(5,12);     // new edge size as stones aren't the same
+            edgeSize=genRandom.randomInt(3,5);     // new edge size as stones aren't the same
 
-            this.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
-            this.blur(bitmapCTX,(rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4,false);
-            
-                // cracked lines
-                
-            stoneWid=(rect.rgt-rect.lft)-((edgeSize*2)+padding);
-            stoneHigh=(rect.bot-rect.top)-((edgeSize*2)+padding);
-            lineCount=genRandom.randomInt(3,8);
-            
-            clipMargin=padding+edgeSize;
-            
-            for (k=0;k!==lineCount;k++) {
-                x=genRandom.randomInt((rect.lft+edgeSize),stoneWid);
-                y=genRandom.randomInt((rect.top+edgeSize),stoneHigh);
-                x2=genRandom.randomInt((rect.lft+edgeSize),stoneWid);
-                y2=genRandom.randomInt((rect.top+edgeSize),stoneHigh);
-                
-                lineVarient=20;
-                if (lineVarient>stoneWid) lineVarient=stoneWid;
-                if (lineVarient>stoneHigh) lineVarient=stoneHigh;
-                
-                darken=0.9+(genRandom.random()*0.1);
-                lineColor=this.darkenColor(drawStoneColor,darken);
-                this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,(rect.lft+clipMargin),(rect.top+clipMargin),(rect.rgt-clipMargin),(rect.bot-clipMargin),lineVarient,lineColor,false);
-            }
-            
-                // redo the fill, but just do the edges so we
-                // erase any lines that went over
-                
-            this.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,null,drawEdgeColor);
-            
-                 // any random noise
-                
-            this.addNoiseRect(bitmapCTX,rect.lft,rect.top,rect.rgt,rect.bot,0.8,1.0,0.4);
+            this.draw3DComplexOval(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
         }
 
             // finish with the specular

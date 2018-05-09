@@ -1440,98 +1440,123 @@ export default class GenBitmapBaseClass
         normalCTX.putImageData(normalImgData,lft,top);
     }
 
-
-    draw3DOvalOld(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
+    draw3DComplexOval(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
-        let n,x,y,mx,my,halfWid,halfHigh;
-        let rad,fx,fy,col,idx;
-        let orgWid,orgHigh,wid,high;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
+        let n,k,k2,add,rad,fx,fy;
+        let darkenFactor,darkColor,normal;
+
+        let wid=rgt-lft;
+        let high=bot-top;
+
+        let mx=Math.trunc((lft+rgt)/2);
+        let my=Math.trunc((top+bot)/2);
+        let halfWid=wid*0.5;
+        let halfHigh=high*0.5;
         
-            // start and end arc
-            
-        startArc=Math.trunc(startArc*1000);
-        endArc=Math.trunc(endArc*1000);
-        if (startArc>=endArc) return;
+        let totalPointCount=60;
+
+            // build the polygon
+
+        let x=new Uint16Array(totalPointCount);
+        let y=new Uint16Array(totalPointCount);
         
-            // the drawing size
-            
-        orgWid=rgt-lft;
-        orgHigh=bot-top;
-        wid=orgWid-1;
-        high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
-        mx=Math.trunc(wid/2);
-        my=Math.trunc(high/2);
+        for (n=0;n!==totalPointCount;n++) {
+            rad=(Math.PI*2.0)*(n/totalPointCount);
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
-        bitmapData=bitmapImgData.data;
+            fx=Math.sin(rad);
+            x[n]=mx+Math.trunc(halfWid*fx);
+            if (x[n]<0) x[n]=0;
 
-        normalImgData=normalCTX.getImageData(lft,top,orgWid,orgHigh);
-        normalData=normalImgData.data;
-
-        let edgeCount=edgeSize;
-        
-            // fill the oval
-
-        while ((wid>0) && (high>0)) {
-
-            halfWid=wid*0.5;
-            halfHigh=high*0.5;
-            
-            if (edgeCount>0) {
-                col=edgeRGBColor;
-            }
-            else {
-                col=fillRGBColor;
-            }
-
-            for (n=startArc;n<endArc;n++) {
-                rad=(Math.PI*2.0)*(n*0.001);
-
-                fx=Math.sin(rad);
-                x=mx+Math.trunc(halfWid*fx);
-                if (x<0) x=0;
-
-                fy=Math.cos(rad);
-                y=my-Math.trunc(halfHigh*fy);
-                if (y<0) y=0;
-
-                    // the color pixel
-
-                idx=((y*orgWid)+x)*4;
-
-                bitmapData[idx]=Math.trunc(col.r*255.0);
-                bitmapData[idx+1]=Math.trunc(col.g*255.0);
-                bitmapData[idx+2]=Math.trunc(col.b*255.0);
-
-                    // get a normal for the pixel change
-                    // if within the flat inner circle, just point the z out
-                    // otherwise calculate from radius
-
-                if ((wid<=flatInnerSize) || (high<=flatInnerSize)) {
-                    normalData[idx]=127;
-                    normalData[idx+1]=127;
-                    normalData[idx+2]=255;
-                }
-                else {
-                    normalData[idx]=(fx+1.0)*127.0;
-                    normalData[idx+1]=(fy+1.0)*127.0;
-                    normalData[idx+2]=(0.5+1.0)*127.0;        // just so we remember that we are focing the Z back to top
-                }
-            }
-
-            if (edgeCount>0) edgeCount--;
-            if ((edgeCount===0) && (fillRGBColor===null)) break;
-
-            wid--;
-            high--;
+            fy=Math.cos(rad);
+            y[n]=my-Math.trunc(halfHigh*fy);
+            if (y[n]<0) y[n]=0;
         }
 
-            // write all the data back
+            // randomize it
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
-        normalCTX.putImageData(normalImgData,lft,top);
+        for (n=0;n!==totalPointCount;n++) {
+            add=genRandom.randomIndex(5);
+            x[n]+=(x[n]<mx)?add:-add;
+            add=genRandom.randomIndex(5);
+            y[n]+=(y[n]<my)?add:-add;
+        }
+
+            // draw the edges
+
+        bitmapCTX.lineWidth=2;
+        normalCTX.lineWidth=2;
+
+        for (n=0;n!==edgeSize;n++) {
+
+                // the color outline
+
+            darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
+            darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
+            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+
+            bitmapCTX.beginPath();
+            bitmapCTX.moveTo(x[0],y[0]);
+
+            for (k=1;k!==totalPointCount;k++) {
+                bitmapCTX.lineTo(x[k],y[k]);
+            }
+
+            bitmapCTX.lineTo(x[0],y[0]);
+            bitmapCTX.stroke();
+
+                // the normals
+                
+            for (k=0;k!==totalPointCount;k++) {
+                rad=(Math.PI*2.0)*(k/totalPointCount);
+                normal=new PointClass(Math.sin(rad),Math.cos(rad),0.5);
+                normal.normalize();
+                normalCTX.strokeStyle=this.normalToRGBColor(normal);
+                
+                k2=k+1;
+                if (k2===totalPointCount) k2=0;
+
+                normalCTX.beginPath();
+                normalCTX.moveTo(x[k],y[k]);
+                normalCTX.lineTo(x[k2],y[k2]);
+                normalCTX.stroke();
+            }
+            
+                // reduce polygon
+
+            for (k=0;k!==totalPointCount;k++) {
+                x[k]+=(x[k]<mx)?1:-1;
+                y[k]+=(y[k]<my)?1:-1;
+            }
+        }
+
+        bitmapCTX.lineWidth=1;
+        normalCTX.lineWidth=1;
+        
+        if (fillRGBColor===null) return;
+
+            // and the fill
+
+        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+
+        bitmapCTX.beginPath();
+        bitmapCTX.moveTo(x[0],y[0]);
+
+        for (k=1;k!==totalPointCount;k++) {
+            bitmapCTX.lineTo(x[k],y[k]);
+        }
+
+        bitmapCTX.fill();
+        
+        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+
+        normalCTX.beginPath();
+        normalCTX.moveTo(x[0],y[0]);
+
+        for (k=1;k!==totalPointCount;k++) {
+            normalCTX.lineTo(x[k],y[k]);
+        }
+
+        normalCTX.fill();
     }
 
    
