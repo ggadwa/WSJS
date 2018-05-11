@@ -20,7 +20,6 @@ import GenRoomDecorationLabClass from '../../generate/map/gen_map_decoration_lab
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import GenBitmapBrickClass from '../../generate/bitmap/gen_bitmap_brick.js';
 import GenBitmapStoneClass from '../../generate/bitmap/gen_bitmap_stone.js';
-import GenBitmapCementClass from '../../generate/bitmap/gen_bitmap_cement.js';
 import GenBitmapGroundClass from '../../generate/bitmap/gen_bitmap_ground.js';
 import GenBitmapCaveClass from '../../generate/bitmap/gen_bitmap_cave.js';
 import GenBitmapMetalClass from '../../generate/bitmap/gen_bitmap_metal.js';
@@ -924,6 +923,8 @@ export default class GenMapOutdoorClass
     
     buildMapFinish()
     {
+        this.map.meshList.randomizeVertexes(constants.MESH_FLAG_ROOM_WALL,1000,1000);
+        
             // overlay precalc
             
         this.map.overlay.precalcDrawValues();

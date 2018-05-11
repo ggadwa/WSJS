@@ -1,4 +1,6 @@
 import * as constants from '../../code/main/constants.js';
+import PointClass from '../../code/utility/point.js';
+import genRandom from '../../generate/utility/random.js';
 
 //
 // map mesh list class
@@ -282,6 +284,54 @@ export default class MapMeshListClass
                 }
             }
         }
+    }
+    
+        //
+        // special utility routine to randomize vertexes
+        // in a map
+        //
+        
+    randomizeVertexes(meshFlag,xMove,zMove)
+    {
+        let n,k,n2,k2,x,z,nMesh;
+        let nVertex,nVertex2,vertexList,vertexList2;
+        let pos=new PointClass(0,0,0);
+        
+            // this function calculates if a triangle
+            // is wall like, and it's bounds, and caches it
+            
+        nMesh=this.meshes.length;
+            
+        for (n=0;n!==nMesh;n++) {
+            if (this.meshes[n].flag!==meshFlag) continue;
+            
+            vertexList=this.meshes[n].vertexList;
+            nVertex=vertexList.length;
+            
+            for (k=0;k!==nVertex;k++) {
+ 
+                    // get a movement and a position to move
+                    // from
+                
+                pos.setFromPoint(vertexList[k].position);
+                x=genRandom.randomInt(0,xMove);
+                z=genRandom.randomInt(0,zMove);
+                
+                    // now move every vertex like this
+                    
+                for (n2=0;n2!==nMesh;n2++) {
+                    vertexList2=this.meshes[n2].vertexList;
+                    nVertex2=vertexList2.length;
+            
+                    for (k2=0;k2!==nVertex2;k2++) {
+                        if (vertexList2[k2].position.equals(pos)) {
+                            vertexList2[k2].position.addValues(x,0,z);
+                        }
+                    }
+                }
+                    
+            }
+       }
     }
    
         //
