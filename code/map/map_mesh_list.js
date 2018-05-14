@@ -291,11 +291,13 @@ export default class MapMeshListClass
         // in a map
         //
         
-    randomizeVertexes(meshFlag,xMove,zMove)
+    randomizeVertexes(meshFlag,skipMeshFlag,y,moveMin,moveExtra)
     {
-        let n,k,n2,k2,x,z,nMesh;
+        let n,k,n2,k2,nMesh,center,skip;
         let nVertex,nVertex2,vertexList,vertexList2;
         let pos=new PointClass(0,0,0);
+        let randomPos=new PointClass(0,0,0);
+        let vct=new PointClass(0,0,0);
         
             // this function calculates if a triangle
             // is wall like, and it's bounds, and caches it
@@ -305,17 +307,49 @@ export default class MapMeshListClass
         for (n=0;n!==nMesh;n++) {
             if (this.meshes[n].flag!==meshFlag) continue;
             
+            center=this.meshes[n].center;
+            
             vertexList=this.meshes[n].vertexList;
             nVertex=vertexList.length;
             
             for (k=0;k!==nVertex;k++) {
+                
+                    // only do for certain Y
+                    
+                if (vertexList[k].position.y!==y) continue;
+                
+                    // original position
+                    
+                pos.setFromPoint(vertexList[k].position);
+                
+                    // skip this vertex if it connects
+                    // with any pologon of the skip type
+                    
+                skip=false;
+                
+                for (n2=0;n2!==nMesh;n2++) {
+                    if (this.meshes[n2].flag!==skipMeshFlag) continue;
+                        
+                    vertexList2=this.meshes[n2].vertexList;
+                    nVertex2=vertexList2.length;
+            
+                    for (k2=0;k2!==nVertex2;k2++) {
+                        if ((vertexList2[k2].position.x===pos.x) && (vertexList2[k2].position.z===pos.z)) {
+                            skip=true;
+                            break;
+                        }
+                        if (skip) break;
+                    }
+                }
+                
+                if (skip) continue;
  
                     // get a movement and a position to move
                     // from
                 
-                pos.setFromPoint(vertexList[k].position);
-                x=genRandom.randomInt(0,xMove);
-                z=genRandom.randomInt(0,zMove);
+                vct.setFromSubPoint(pos,center);
+                vct.scale(genRandom.randomFloat(moveMin,moveExtra));
+                randomPos.setFromAddPoint(center,vct);
                 
                     // now move every vertex like this
                     
@@ -324,8 +358,9 @@ export default class MapMeshListClass
                     nVertex2=vertexList2.length;
             
                     for (k2=0;k2!==nVertex2;k2++) {
-                        if (vertexList2[k2].position.equals(pos)) {
-                            vertexList2[k2].position.addValues(x,0,z);
+                        if ((vertexList2[k2].position.x===pos.x) && (vertexList2[k2].position.z===pos.z)) {
+                            vertexList2[k2].position.x=randomPos.x;
+                            vertexList2[k2].position.z=randomPos.z;
                         }
                     }
                 }

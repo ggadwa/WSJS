@@ -12,7 +12,7 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
---> randomize needs to be from center (x/z changes, always out by normal)
+--> why aren't tunnel/wall knock outs working?
 
 + map style types: indoor/outdoor/space
 
