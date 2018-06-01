@@ -883,7 +883,7 @@ export default class GenMapOutdoorClass
             // remove them both
             
         this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_WALL,true,true);
-        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_TUNNEL,constants.MESH_FLAG_ROOM_WALL,true,true);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_TUNNEL,true,true);
         
             // finish with the callback
             
@@ -924,7 +924,7 @@ export default class GenMapOutdoorClass
     
     buildMapFinish()
     {
-        //this.map.meshList.randomizeVertexes(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_TUNNEL,this.yBase,0.9,0.2);
+        this.map.meshList.randomizeVertexes(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_TUNNEL,this.yBase,0.9,0.1);
         
             // overlay precalc
             

@@ -109,19 +109,14 @@ export default class GenRoomTunnelClass
 
     createTunnelX(xBound,yBound,zBound)
     {
-        let idx,meshCenterPoint,thickSize;
+        let idx,meshCenterPoint;
         let vertexList;
-        let zTunnelBound,zThickBound;
+        let zTunnelBound;
         
             // need a center point to better
             // create normals
             
         meshCenterPoint=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
-        
-            // doors need to be pushed in on
-            // the edges so they have a wall thickness
-            
-        thickSize=0; // Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
         
             // the door room
             // internal walls
@@ -131,26 +126,13 @@ export default class GenRoomTunnelClass
 
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
-        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.min+thickSize));
-        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.max-thickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.min);
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
         this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_TUNNEL);
 
-            // external walls
-/*
-        idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList(16);
-
-        zThickBound=new BoundClass(zBound.min,(zBound.min+thickSize));
-        idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
-        idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound); 
-        zThickBound=new BoundClass((zBound.max-thickSize),zBound.max);
-        idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
-        idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound);
-        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
-*/
            // the ceiling and floor
 
-        zTunnelBound=new BoundClass((zBound.min+thickSize),(zBound.max-thickSize));
+        zTunnelBound=new BoundClass(zBound.min,zBound.max);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
@@ -165,20 +147,15 @@ export default class GenRoomTunnelClass
     
     createTunnelZ(xBound,yBound,zBound)
     {
-        let idx,meshCenterPoint,thickSize;
+        let idx,meshCenterPoint;
         let vertexList;
-        let xTunnelBound,xThickBound;
+        let xTunnelBound;
         
             // need a center point to better
             // create normals
             
         meshCenterPoint=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
-            // doors need to be pushed in on
-            // the edges so they have a wall thickness
-            
-        thickSize=0; // Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
-         
             // the door room
             // internal walls
      
@@ -187,26 +164,13 @@ export default class GenRoomTunnelClass
 
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
-        idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBound,zBound);
-        idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
         this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_TUNNEL);
 
-            // external walls
-/*
-        idx=0;
-        vertexList=MeshUtilityClass.createMapVertexList(16);
-
-        xThickBound=new BoundClass(xBound.min,(xBound.min+thickSize));
-        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
-        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
-        xThickBound=new BoundClass((xBound.max-thickSize),xBound.max);
-        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
-        idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
-        this.finishMesh(this.tunnelBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
-*/
            // the ceiling
            
-        xTunnelBound=new BoundClass((xBound.min+thickSize),(xBound.max-thickSize));
+        xTunnelBound=new BoundClass(xBound.min,xBound.max);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);

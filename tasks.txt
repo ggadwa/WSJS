@@ -12,9 +12,9 @@ ESNext
     [ ] make all internal list arrays as private, use count() and get()
 
 
---> why aren't tunnel/wall knock outs working?
 
 + map style types: indoor/outdoor/space
++ do rocks in a different way, place randomly, but collide and move them out of the way of other rocks
 
 OUTDOOR
   - sparse = hallways only

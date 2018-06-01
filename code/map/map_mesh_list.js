@@ -1,6 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import genRandom from '../../generate/utility/random.js';
+import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 
 //
 // map mesh list class
@@ -194,9 +195,6 @@ export default class MapMeshListClass
                 // then we need to iterate over the whole
                 // list, otherwise just the back half as we've
                 // already hit that type in the outer loop
-                
-                // also, two different types means we are
-                // eliminating from inside, so do the touch differently
             
             targetMeshCount=0;
             
@@ -205,7 +203,7 @@ export default class MapMeshListClass
                     otherMesh=this.meshes[k];
                     if (otherMesh.flag!==compareMeshFlag) continue;
 
-                    if (mesh.boxTouchOtherMeshOutside(otherMesh)) targetMeshList[targetMeshCount++]=k;
+                    if ((mesh.boxTouchOtherMeshOutside(otherMesh)) || (mesh.boxTouchOtherMeshInside(otherMesh))) targetMeshList[targetMeshCount++]=k;
                 }
             }
             else {
@@ -213,7 +211,7 @@ export default class MapMeshListClass
                     otherMesh=this.meshes[k];
                     if (otherMesh.flag!==compareMeshFlag) continue;
 
-                    if (mesh.boxTouchOtherMeshInside(otherMesh)) targetMeshList[targetMeshCount++]=k;
+                    if ((mesh.boxTouchOtherMeshOutside(otherMesh)) || (mesh.boxTouchOtherMeshInside(otherMesh))) targetMeshList[targetMeshCount++]=k;
                 }
             }
             
@@ -277,7 +275,7 @@ export default class MapMeshListClass
 
                 // shift other indexes
 
-            for (k=n;k<nTrig;k++) {
+            for (k=(n+1);k<nTrig;k++) {
                 bTrig=trigList[k];
                 if (aTrig[0]===bTrig[0]) {
                     if (aTrig[1]<bTrig[1]) bTrig[1]--;
@@ -299,8 +297,9 @@ export default class MapMeshListClass
         let randomPos=new PointClass(0,0,0);
         let vct=new PointClass(0,0,0);
         
-            // this function calculates if a triangle
-            // is wall like, and it's bounds, and caches it
+            // run through any mesh of the type
+            // and randomly move vertexes IN unless
+            // they touch the skip mesh type
             
         nMesh=this.meshes.length;
             
@@ -323,11 +322,12 @@ export default class MapMeshListClass
                 pos.setFromPoint(vertexList[k].position);
                 
                     // skip this vertex if it connects
-                    // with any pologon of the skip type
+                    // with any pologons of the skip type
                     
                 skip=false;
                 
                 for (n2=0;n2!==nMesh;n2++) {
+                    if (n===n2) continue;
                     if (this.meshes[n2].flag!==skipMeshFlag) continue;
                         
                     vertexList2=this.meshes[n2].vertexList;
@@ -338,8 +338,9 @@ export default class MapMeshListClass
                             skip=true;
                             break;
                         }
-                        if (skip) break;
                     }
+                    
+                    if (skip) break;
                 }
                 
                 if (skip) continue;
@@ -354,6 +355,8 @@ export default class MapMeshListClass
                     // now move every vertex like this
                     
                 for (n2=0;n2!==nMesh;n2++) {
+                    if (this.meshes[n2].flag!==meshFlag) continue;
+                    
                     vertexList2=this.meshes[n2].vertexList;
                     nVertex2=vertexList2.length;
             
@@ -364,7 +367,11 @@ export default class MapMeshListClass
                         }
                     }
                 }
-                    
+                
+                    // finally recalculate the normals
+                
+                MeshUtilityClass.buildVertexListNormals(vertexList,this.meshes[n].indexes,center,true);
+                MeshUtilityClass.buildVertexListTangents(vertexList,this.meshes[n].indexes);             
             }
        }
     }
