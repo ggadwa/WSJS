@@ -15,7 +15,7 @@ class ConfigClass
         this.MAP_DESIGN_TYPE=1;
         this.MAP_DESIGN_TYPE_LIST=['Sparse','Medium','Compact'];
         
-        this.MAP_STYLE_TYPE=1;
+        this.MAP_STYLE_TYPE=0;
         this.MAP_STYLE_TYPE_LIST=['Indoor','Outdoor','Space'];
             
         this.ROOM_PATH_COUNT=6;                     // how many rooms in the map path
@@ -37,11 +37,11 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=0;
-        this.MONSTER_PER_TYPE_COUNT=0;
+        this.MONSTER_TYPE_COUNT=3;
+        this.MONSTER_PER_TYPE_COUNT=5;
         
-        this.MONSTER_AI_ON=false;
-        this.MONSTER_BOSS=false;
+        this.MONSTER_AI_ON=true;
+        this.MONSTER_BOSS=true;
         
             //
             // sounds
