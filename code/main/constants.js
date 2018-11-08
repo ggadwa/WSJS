@@ -2,6 +2,16 @@
 // Constants
 // 
 
+export const GL_OPTIONS={
+            alpha:false,
+            depth:true,
+            stencil:false,
+            antialias:false,
+            premultipliedAlpha:false,
+            preserveDrawingBuffer:true,
+            failIfMajorPerformanceCaveat:false
+        }; 
+
     // misc math
     
 export const DEGREE_TO_RAD=Math.PI/180.0;

@@ -30,15 +30,14 @@ class ConfigClass
             // lighting
             //
 
-        this.MAP_LIGHT_AMBIENT=0.7;                 // all over ambient light [r,g,b]
+        this.MAP_LIGHT_AMBIENT=0.1;                 // all over ambient light [r,g,b]
         this.NON_STATIC_LIGHTS=true;                // allows lights that flicker or strobe
 
             //
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=3;
-        this.MONSTER_PER_TYPE_COUNT=5;
+        this.MONSTER_TYPE_COUNT=10;
         
         this.MONSTER_AI_ON=true;
         this.MONSTER_BOSS=true;

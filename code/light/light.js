@@ -17,7 +17,6 @@ export default class LightClass
             
         this.LIGHT_TYPE_NORMAL=0;
         this.LIGHT_TYPE_WAVE=1;
-        this.LIGHT_TYPE_FLICKER=2;
         
             // variables
             
@@ -30,8 +29,6 @@ export default class LightClass
         
         this.lightType=this.LIGHT_TYPE_NORMAL;
         this.lightWaveFrequency=0;
-        this.lightFlickerOn=false;
-        this.lightFlickerNextTick=0;
         
         this.origIntensity=intensity;
 
@@ -79,15 +76,11 @@ export default class LightClass
             return;
         }
         
-        this.lightType=genRandom.randomIndex(2)+1;
+        this.lightType=genRandom.randomIndex(2);
         
         switch (this.lightType) {
             case this.LIGHT_TYPE_WAVE:
                 this.lightWaveFrequency=genRandom.randomInt(2000,2000);
-                break;
-            case this.LIGHT_TYPE_FLICKER:
-                this.lightFlickerOn=false;
-                this.lightFlickerNextTick=timeStamp;
                 break;
         }
     }
@@ -113,20 +106,6 @@ export default class LightClass
                 this.invertIntensity=1.0/this.intensity;
                 break;
                 
-            case this.LIGHT_TYPE_FLICKER:
-                if (this.lightFlickerNextTick<=timeStamp) {
-                    this.lightFlickerOn=!this.lightFlickerOn;
-                    if (this.lightFlickerOn) {
-                        this.lightFlickerNextTick=timeStamp+genRandom.randomInt(500,2000);
-                    }
-                    else {
-                        this.lightFlickerNextTick=timeStamp+genRandom.randomInt(100,200);
-                    }
-                }
-                this.intensity=this.origIntensity;
-                if (!this.lightFlickerOn) this.intensity*=genRandom.randomFloat(0.75,0.15);
-                this.invertIntensity=1.0/this.intensity;
-                break;
         }
         
     }

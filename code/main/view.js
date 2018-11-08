@@ -181,19 +181,9 @@ export default class ViewClass
     
     initialize(callback)
     {
-        let glOptions={
-            alpha:false,
-            depth:true,
-            stencil:false,
-            antialias:false,
-            premultipliedAlpha:false,
-            preserveDrawingBuffer:true,
-            failIfMajorPerformanceCaveat:false
-        };
-        
             // get the gl context
 
-        this.gl=this.canvas.getContext("webgl2",glOptions);
+        this.gl=this.canvas.getContext("webgl2",constants.GL_OPTIONS);
         if (this.gl===null) {
             alert('WebGL2 not available, try a newer browser');
             return;

@@ -400,32 +400,25 @@ export default class GenSoundClass
     
     generate(generateType,inDebug)
     {
-        let sound=null;
-        
         switch (generateType) {
             
             case this.TYPE_GUN_FIRE:
-                sound=this.generateGunFire();
-                break;
+                return(this.generateGunFire());
                 
             case this.TYPE_EXPLOSION:
-                sound=this.generateExplosion();
-                break;
+                return(this.generateExplosion());
                 
             case this.TYPE_MONSTER_WAKE:
-                sound=this.generateMonster(1.5,100.0,600.0,50.0,200.0);
-                break;
+                return(this.generateMonster(1.5,100.0,600.0,50.0,200.0));
                 
             case this.TYPE_MONSTER_HURT:
-                sound=this.generateMonster(0.5,300.0,700.0,100.0,300.0);
-                break;
+                return(this.generateMonster(0.5,300.0,700.0,100.0,300.0));
                 
             case this.TYPE_MONSTER_DIE:
-                sound=this.generateMonster(0.75,80.0,180.0,50.0,100.0);
-                break;
+                return(this.generateMonster(0.75,80.0,180.0,50.0,100.0));
         }
         
-        return(sound);
+        return(null);
     }
 }
 

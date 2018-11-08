@@ -13,7 +13,7 @@ import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
 import GenModelProjectileClass from '../../generate/model/gen_model_projectile.js';
 import GenWeaponClass from '../../generate/thing/gen_weapon.js';
 import GenSoundClass from '../../generate/sound/gen_sound.js';
-import GenAIClass from '../../generate/thing/gen_ai.js';
+import GenMonsterClass from '../../generate/thing/gen_monster.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityMonsterClass from '../../code/entities/entity_monster.js';
 import genRandom from '../../generate/utility/random.js';
@@ -164,21 +164,33 @@ class MainClass
 
     initBuildMonsters(idx)
     {
-        let n,pos,ai;
-        let genAI=new GenAIClass(this.view,this.map,this.sound);
+        let pos,isBoss;
+        let genMonster=new GenMonsterClass(this.view,this.map,this.sound);
 
-            // create AI type for each monster
-            // AI create all weapons and models
+            // is boss?
+
+        isBoss=(((idx+1)===config.MONSTER_TYPE_COUNT) && (config.MONSTER_BOSS));
         
-        ai=genAI.generate(('monster_'+idx),genAI.AI_TYPE_STALKING_MONSTER);
-
-            // make monster entities
-
-        for (n=0;n!==config.MONSTER_PER_TYPE_COUNT;n++) {
-            pos=this.map.roomList.findRandomMonsterPosition();
-            if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,('monster_'+n),pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),100,ai));
+            // make monster entity
+        
+        if (isBoss) {
+            pos=this.map.roomList.findRandomBossPosition();
         }
-
+        else {
+            pos=this.map.roomList.findRandomMonsterPosition();
+        }
+        
+        if (pos!==null) {
+            if (isBoss) {
+                genMonster.generate('boss',true,pos);
+                this.map.entityList.add(genMonster.generate('boss',true,pos));    
+            }
+            else {
+                genMonster.generate(('monster_'+idx),false,pos);
+                this.map.entityList.add(genMonster.generate(('monster_'+idx),false,pos));
+            }
+        }
+        
             // if more monster types, then loop back around
 
         idx++;
@@ -191,39 +203,12 @@ class MainClass
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Boss');
-        this.view.loadingScreenDraw(null);
-
-        setTimeout(this.initBuildBoss.bind(this),1);
-    }
-    
-    initBuildBoss()
-    {
-        let pos,ai;
-        let genAI=new GenAIClass(this.view,this.map,this.sound);
-        
-        if (config.MONSTER_BOSS) {
-
-                // create AI type for each monster
-                // AI create all weapons and models
-
-            ai=genAI.generate('boss',genAI.AI_TYPE_BOSS);
-            
-                // place the boss at end of map
-                
-            pos=this.map.roomList.findRandomBossPosition();
-            if (pos!==null) this.map.entityList.add(new EntityMonsterClass(this.view,this.map,this.sound,'boss',pos,new PointClass(0.0,(genRandom.random()*360.0),0.0),500,ai));
-        }
-        
-            // next step
-
-        this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Finishing');
         this.view.loadingScreenDraw(null);
 
         setTimeout(this.initFinish.bind(this),1);
     }
-
+    
     initFinish()
     {
             // finish by setting up all the mesh

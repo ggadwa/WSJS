@@ -8,19 +8,22 @@ import EntityClass from '../../code/entities/entity.js';
 
 export default class EntityMonsterClass extends EntityClass
 {
-    constructor(view,map,sound,name,position,angle,maxHealth,ai)
+    constructor(view,map,sound,name,position,angle,maxHealth,model)
     {
-        super(view,map,sound,name,position,angle,maxHealth,ai.getModel());
+        super(view,map,sound,name,position,angle,maxHealth,model);
         
-            // entity setup
-            
-        this.movementForwardMaxSpeed=ai.speed;
-        this.movementForwardAcceleration=ai.acceleration;
-        this.movementForwardDeceleration=ai.deceleration;
+        this.standTurnSpeed=0;
+        this.walkTurnSpeed=0;
         
-            // local variables
-
-        this.ai=ai;
+        this.nearWakeDistance=0;
+        this.farWakeDistance=0;
+        this.farWakeHalfAngleFieldOfVision=0;
+        this.sleepDistance=0;
+        
+        this.fireRechargeTick=0;
+        this.fireSlopAngle=0;
+        this.fireMaxDistance=0;
+        this.lastFireTimeStamp=0;
         
         this.active=false;
         this.lastShotTimeStamp=0;
@@ -28,6 +31,12 @@ export default class EntityMonsterClass extends EntityClass
         this.enemyId=-1;
         this.currentDistanceToEnemy=0;
         this.lastAngleDifToEnemy=360;
+        
+        this.projectile=null;
+        
+        this.wakeSoundBuffer=null;
+        this.hurtSoundBuffer=null;
+        this.dieSoundBuffer=null;
         
             // global to stop GC
             
@@ -43,7 +52,7 @@ export default class EntityMonsterClass extends EntityClass
         
     die()
     {
-        this.sound.play(this,this.ai.dieSoundBuffer);
+        this.sound.play(this,this.dieSoundBuffer);
         this.markAsDelete();
     }
     
@@ -54,7 +63,7 @@ export default class EntityMonsterClass extends EntityClass
             // if we weren't active, play the
             // active sound instead of the hurt
         
-        this.sound.play(this,(this.active?this.ai.wakeSoundBuffer:this.ai.hurtSoundBuffer));
+        this.sound.play(this,(this.active?this.wakeSoundBuffer:this.hurtSoundBuffer));
         
             // always wake up and chase the
             // entity that damaged you
@@ -71,7 +80,7 @@ export default class EntityMonsterClass extends EntityClass
     {
             // can't fire if no projectile
             
-        if (this.ai.projectile===null) return;
+        if (this.projectile===null) return;
         
             // wait time not up
             
@@ -80,12 +89,12 @@ export default class EntityMonsterClass extends EntityClass
             // check if we are within fire slop angle
             // or too far away
             
-        if (this.lastAngleDifToEnemy>this.ai.fireSlopAngle) return;
-        if (this.currentDistanceToEnemy>this.ai.fireMaxDistance) return;
+        if (this.lastAngleDifToEnemy>this.fireSlopAngle) return;
+        if (this.currentDistanceToEnemy>this.fireMaxDistance) return;
         
             // setup fire position
 
-        this.lastShotTimeStamp=this.view.timeStamp+this.ai.fireRechargeTick;
+        this.lastShotTimeStamp=this.view.timeStamp+this.fireRechargeTick;
 
         this.fireAngle.setFromPoint(this.angle);
 
@@ -98,7 +107,7 @@ export default class EntityMonsterClass extends EntityClass
         
             // fire
 
-        this.ai.projectile.fire(this.id,this.firePosition,this.fireAngle);
+        this.projectile.fire(this.id,this.firePosition,this.fireAngle);
     }
     
         //
@@ -114,9 +123,9 @@ export default class EntityMonsterClass extends EntityClass
             // if active, see if time to sleep
             
         if (this.active) {
-            if (this.ai.sleepDistance===-1) return;         // some monsters never sleep
+            if (this.sleepDistance===-1) return;         // some monsters never sleep
             
-            if (this.currentDistanceToEnemy>this.ai.sleepDistance) {
+            if (this.currentDistanceToEnemy>this.sleepDistance) {
                 this.active=false;
                 this.model.skeleton.resetAnimation();
                 return;
@@ -128,16 +137,16 @@ export default class EntityMonsterClass extends EntityClass
             // get distance, near wake distance always
             // wakes, far only if seen
             
-        if (this.currentDistanceToEnemy>this.ai.farWakeDistance) return;
+        if (this.currentDistanceToEnemy>this.farWakeDistance) return;
         
             // if within near, wake up
             // otherwise, wake up if looking at you
             
-        if (this.currentDistanceToEnemy<this.ai.nearWakeDistance) {
+        if (this.currentDistanceToEnemy<this.nearWakeDistance) {
             this.active=true;
         }
         else {
-            this.active=(this.getAngleDifferenceTowardsPosition(enemy.position)<this.ai.farWakeHalfAngleFieldOfVision);
+            this.active=(this.getAngleDifferenceTowardsPosition(enemy.position)<this.farWakeHalfAngleFieldOfVision);
         }
         
         if (!this.active) return;
@@ -145,7 +154,7 @@ export default class EntityMonsterClass extends EntityClass
             // play sound and reset last fire
             // time so it doesn't fire immediately
             
-        this.sound.play(this,this.ai.wakeSoundBuffer);
+        this.sound.play(this,this.wakeSoundBuffer);
         this.lastShotTimeStamp=this.view.timeStamp;
         
         this.model.skeleton.resetAnimation();
@@ -200,7 +209,7 @@ export default class EntityMonsterClass extends EntityClass
 
             this.setMovementForward(true);
             this.move(true,true,false,false);
-            if (this.isStandingOnFloor()) this.lastAngleDifToEnemy=this.turnTowardsPosition(enemy.position,this.ai.walkTurnSpeed);
+            if (this.isStandingOnFloor()) this.lastAngleDifToEnemy=this.turnTowardsPosition(enemy.position,this.walkTurnSpeed);
         }
         
             // firing projectiles

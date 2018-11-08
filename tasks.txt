@@ -8,10 +8,20 @@ WebGL2
            (reason can't do for now, it forces mesh shader setup to be per VAO, and that means repeated lights, etc.)
     [ ] uniform buffers for lights & matrixes
 
-ESNext
-    [ ] make all internal list arrays as private, use count() and get()
 
+this.movement.z in entity is bad
 
+--> DO AWAY with AI, make entity_monster_stalk, entity_monster_boss, entity_monster_fire
+    + get rid of ai and gen_ai classes
++ stairs can be next to doors (keep away from edges)
++ decorations can be in stairs
++ stacked boxes are awful
++ only static lights from windows
++ whats with the resetAnimation errors
+
+----> Get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW
+
++ constants need to be with objects
 
 + map style types: indoor/outdoor/space
 + do rocks in a different way, place randomly, but collide and move them out of the way of other rocks
@@ -32,13 +42,7 @@ OUTDOOR
 ***** TRACK ALL initialize/release, and don't use close()
 
 
-+ move glOptions to constants
-+ boxes are terrible
-
-
-
 + main can get some imports removed (gen stuff)
-
 + projectiles have ammo & time to fire on them
 + weapons have two projectiles only, ammo on projectiles
 
