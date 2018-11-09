@@ -34,7 +34,7 @@ class MapRoomFaceClass
 
 export default class MapRoomClass
 {
-    constructor(view,map,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid)
+    constructor(view,map,pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid,outdoor)
     {
         this.view=view;
         this.map=map;
@@ -52,6 +52,7 @@ export default class MapRoomClass
         this.mainPathConnectedRoom=mainPathConnectedRoom;
         this.level=level;
         this.liquid=liquid;
+        this.outdoor=outdoor;
         
         this.mainLight=null;                    // used to track main light for room
         

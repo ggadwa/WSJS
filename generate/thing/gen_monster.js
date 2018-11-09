@@ -84,7 +84,7 @@ export default class GenMonsterClass
         
         fastFactor=genRandom.randomFloat(this.MONSTER_FAST_FACTOR,this.MONSTER_RANDOM_EXTRA_FAST_FACTOR);
         slowFactor=genRandom.randomFloat(this.MONSTER_SLOW_FACTOR,this.MONSTER_RANDOM_EXTRA_SLOW_FACTOR);
-
+        
             // if the monster can fire, it either walks
             // slowly or not at all
                 
@@ -98,21 +98,14 @@ export default class GenMonsterClass
                 standTurnSpeed*=fastFactor;
                 walkTurnSpeed=0;
             }
-            else {
-                speed*=fastFactor;
-                acceleration*=fastFactor;
-                deceleration*=fastFactor;
-                standTurnSpeed*=fastFactor;
-                walkTurnSpeed*=fastFactor;
-            }
         }
         else {
             canFire=false;
-            speed=genRandom.randomInt(this.MONSTER_MIN_SPEED_FAST,this.MONSTER_RANDOM_EXTRA_SPEED_FAST);
-            acceleration=genRandom.randomFloat(this.MONSTER_MIN_ACCELERATION_FAST,this.MONSTER_RANDOM_EXTRA_ACCELERATION_FAST);
-            deceleration=genRandom.randomFloat(this.MONSTER_MIN_DECLERATION_FAST,this.MONSTER_RANDOM_EXTRA_DECELERATION_FAST);
-            standTurnSpeed=genRandom.randomFloat(this.MONSTER_MIN_STAND_TURN_SPEED_FAST,this.MONSTER_RANDOM_EXTRA_STAND_TURN_SPEED_FAST);
-            walkTurnSpeed=genRandom.randomFloat(this.MONSTER_MIN_WALK_TURN_SPEED_FAST,this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED_FAST);
+            speed*=fastFactor;
+            acceleration*=fastFactor;
+            deceleration*=fastFactor;
+            standTurnSpeed*=fastFactor;
+            walkTurnSpeed*=fastFactor;
         }
         
             // bosses are bigger so have extra slow down

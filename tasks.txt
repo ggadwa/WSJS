@@ -9,70 +9,49 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-this.movement.z in entity is bad
++ stairs can be next to doors (keep away from edges) [DO NEXT we have seed that makes this problem]
 
---> DO AWAY with AI, make entity_monster_stalk, entity_monster_boss, entity_monster_fire
-    + get rid of ai and gen_ai classes
-+ stairs can be next to doors (keep away from edges)
+---> randomizeVertexes needs to take array of rooms
++ integrate outdoor stuff into regular map as a room
++ need tree + rock decorations for outdoors
 + decorations can be in stairs
-+ stacked boxes are awful
 + only static lights from windows
-+ whats with the resetAnimation errors
++ whats with the resetAnimation errors (on monster wake)
++ monster meele, fire and meele sounds
 
 ----> Get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW
 
+    setMovementForward(on)
+    setMovementBackward(on)
+    setMovementSideLeft(on)
+    setMovementSideRight(on)
+    setSpeed(speed)
+    setLifeTick(lifeTick)
+    setFireSoundBuffer(fireSoundBuffer)
+    setHitSoundBuffer(hitSoundBuffer)
+    setDamage(damage,splashRadius,splashDamage)
+    setNoGravity(noGravity)
+    setLob(lob)
+    setBounce(bounce,bounceFactor)
+    setReflect(reflect)
+    setName(name)
+    setProjectile(projectile)
+    setAltProjectile(altProjectile)
+
+
 + constants need to be with objects
-
-+ map style types: indoor/outdoor/space
-+ do rocks in a different way, place randomly, but collide and move them out of the way of other rocks
-
-OUTDOOR
-  - sparse = hallways only
-  - medium = hallways and extensions
-  - compact = extensions
-  - tunnels instead of hallways
-  - grass texture (use fur texture) / tunnel texture (dirt & rocks) / walls need to be restricted to stone or wood textures
-  - better dirt texture
 
 + fix the binding bug on projectiles
 + close() -> release()
 + playerEntity makes weapons
-+ do AI types [stalk (melee), fire (get within firing distance), sniper (stay at firing distance), boss (stalk, melee, and fire)]
+
 
 ***** TRACK ALL initialize/release, and don't use close()
 
 
-+ main can get some imports removed (gen stuff)
 + projectiles have ammo & time to fire on them
 + weapons have two projectiles only, ammo on projectiles
-
-
-
 --> bounce projectiles can bounce forever
 --> projectile speed needs to be > entity speed
---> monster meeles
-
 --> stuff in genMap that can go to constants
---> storage needs smaller & bigger box random
-
---> need junction (box with wires or circuits)
-
---> commonize generate in bitmaps
 --> 3rd person view
-
---> sounds need to be same way
-
---> models cast light
-
-
-#### need meeles for monsters
-#### stairs need quads or blocks at top
-#### ai types (charge, sniper, etc)
-#### windows have different bar types/glass
-#### only put closets in areas that have platforms to them?
-#### platforms not knocking out main map mesh walls?
-#### collisions against slanted walls are bad
-#### weapon models
-#### get rid of weapon fire hard-coding
-#### liquid tint colors are hard-coded
-#### draw closest map meshes first

@@ -5,9 +5,7 @@ import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
-import GenMapIndoorClass from '../../generate/map/gen_map_indoor.js';
-import GenMapOutdoorClass from '../../generate/map/gen_map_outdoor.js';
-import GenMapSpaceClass from '../../generate/map/gen_map_space.js';
+import GenMapClass from '../../generate/map/gen_map.js';
 import GenModelHumanClass from '../../generate/model/gen_model_human.js';
 import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
 import GenModelProjectileClass from '../../generate/model/gen_model_projectile.js';
@@ -80,20 +78,7 @@ class MainClass
 
     initBuildMap()
     {
-        let genMap;
-        
-        switch (config.MAP_STYLE_TYPE) {
-            case this.map.STYLE_INDOOR:
-                genMap=new GenMapIndoorClass(this.view,this.map,this.initBuildMapFinish.bind(this));
-                break;
-            case this.map.STYLE_OUTDOOR:
-                genMap=new GenMapOutdoorClass(this.view,this.map,this.initBuildMapFinish.bind(this));
-                break;
-            case this.map.STYLE_SPACE:
-                genMap=new GenMapSpaceClass(this.view,this.map,this.initBuildMapFinish.bind(this));
-                break;
-        }
-
+        let genMap=new GenMapClass(this.view,this.map,this.initBuildMapFinish.bind(this));
         genMap.build();
     }
 

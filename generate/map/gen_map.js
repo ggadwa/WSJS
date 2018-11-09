@@ -32,13 +32,14 @@ import GenBitmapHexigonClass from '../../generate/bitmap/gen_bitmap_hexigon.js';
 import GenBitmapMosaicClass from '../../generate/bitmap/gen_bitmap_mosaic.js';
 import GenBitmapWoodClass from '../../generate/bitmap/gen_bitmap_wood.js';
 import GenBitmapLiquidClass from '../../generate/bitmap/gen_bitmap_liquid.js';
+import GenBitmapGroundClass from '../../generate/bitmap/gen_bitmap_ground.js';
 import genRandom from '../../generate/utility/random.js';
 
 //
 // generate map class
 //
 
-export default class GenMapSpaceClass
+export default class GenMapClass
 {
     constructor(view,map,callbackFunc)
     {
@@ -65,9 +66,13 @@ export default class GenMapSpaceClass
         this.lightBitmap=null;
         this.doorBitmap=null;
         this.liquidBitmap=null;
+        this.fenceBitmap=null;
+        this.groundBitmap=null;
         
         this.genRoomHallway=null;
         this.genRoomStairs=null;
+        
+        this.outdoorRooms=[];
         
             // constants
             
@@ -85,6 +90,7 @@ export default class GenMapSpaceClass
         
         this.ROOM_LONG_HALLWAY_PERCENTAGE=0.3;          // what percentage of the time the general room path will have a long hallway
         this.ROOM_LIQUID_PERCENTAGE=0.3;                // what % of time a lower room can have a liquid
+        this.ROOM_OUTDOOR_PERCENTAGE=0.1;               // what % of time a outdoor room is created
         
         this.ROOM_LIGHT_FACTOR=0.45;                     // lights are initially set to room radius, this factor is multipled in
         this.ROOM_LIGHT_FACTOR_EXTRA=0.25;               // random addition to light factor above
@@ -215,6 +221,24 @@ export default class GenMapSpaceClass
         
         this.frameBitmap=genBitmap.generate(false);
         
+            // fence bitmap
+            
+        switch(genRandom.randomIndex(2)) {
+            case 0:
+                genBitmap=new GenBitmapBrickClass(this.view);
+                break;
+            case 1:
+                genBitmap=new GenBitmapStoneClass(this.view);
+                break;
+        }
+        
+        this.fenceBitmap=genBitmap.generate(false);
+        
+            // ground bitmap
+        
+        genBitmap=new GenBitmapGroundClass(this.view);
+        this.groundBitmap=genBitmap.generate(false);
+        
             // other misc bitmaps
             
         genBitmap=new GenBitmapMetalClass(this.view);
@@ -241,7 +265,19 @@ export default class GenMapSpaceClass
         let n,mesh,mesh2;
         let yAdd,yBound,yWallBound,yFloorBound;
         let roomIdx,room;
-        let storyCount,liquid;
+        let storyCount,liquid,outdoor,forceOutdoor;
+        
+            // if the connecting room exists and is outdoors
+            // reset the level
+            
+        forceOutdoor=false;
+        
+        if (mainPathConnectedRoom!==null) {
+            if (mainPathConnectedRoom.outdoor) {
+                level=constants.ROOM_LEVEL_NORMAL;
+                forceOutdoor=true;
+            }
+        }
         
             // figure out room Y size from extension mode
             // all rooms need at least 2 stories
@@ -273,6 +309,10 @@ export default class GenMapSpaceClass
             // and lower it for pool and add a story
         
         liquid=(config.ROOM_LIQUIDS)&&(level===constants.ROOM_LEVEL_LOWER)&&(genRandom.randomPercentage(this.ROOM_LIQUID_PERCENTAGE))&&(!config.SIMPLE_TEST_MAP);
+        
+            // determine if outdoor
+          
+        outdoor=((genRandom.randomPercentage(this.ROOM_OUTDOOR_PERCENTAGE))&&(this.outdoorRooms.length===0)&&(!config.SIMPLE_TEST_MAP))||(forceOutdoor);
 
             // top of room
             
@@ -281,8 +321,10 @@ export default class GenMapSpaceClass
             // add this room to the tracking room list so
             // we can use it later to add entities and decorations and such
 
-        roomIdx=this.map.roomList.add(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid);
+        roomIdx=this.map.roomList.add(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid,outdoor);
         room=this.map.roomList.get(roomIdx);
+        
+        if (outdoor) this.outdoorRooms.push(roomIdx);
         
             // if the room is higher, we need to mark that off
             // so we don't build decorations to close to steps
@@ -293,32 +335,49 @@ export default class GenMapSpaceClass
             }
         }
         
-            // the floor
+            // indoor rooms
             
-        room.createMeshFloor(this.floorBitmap);
+        if (!outdoor) {
+            room.createMeshFloor(this.floorBitmap);
 
-            // walls
-            // each wall is a tall piece and a short piece on top
-            // the short piece is for headers on doors and places for platforms
-            
-        yWallBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_HEIGHT),yBound.max);
-        yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
-            
-        for (n=0;n!==storyCount;n++) {
-            mesh=room.createMeshWalls(this.wallBitmap,yWallBound);
-            mesh2=room.createMeshWalls(this.wallBitmap,yFloorBound);
-            mesh.combineMesh(mesh2);
-            
-            this.map.meshList.add(mesh);
-            if (n===0) this.map.overlay.addRoom(room);
-            
-            yWallBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
-            yFloorBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
+                // walls
+                // each wall is a tall piece and a short piece on top
+                // the short piece is for headers on doors and places for platforms
+
+            yWallBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_HEIGHT),yBound.max);
+            yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
+
+            for (n=0;n!==storyCount;n++) {
+                mesh=room.createMeshWalls(this.wallBitmap,yWallBound);
+                mesh2=room.createMeshWalls(this.wallBitmap,yFloorBound);
+                mesh.combineMesh(mesh2);
+
+                this.map.meshList.add(mesh);
+                if (n===0) this.map.overlay.addRoom(room);
+
+                yWallBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
+                yFloorBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
+            }
+
+            room.createMeshCeiling(this.ceilingBitmap);
         }
-        
-            // the ceiling
-        
-        room.createMeshCeiling(this.ceilingBitmap);
+        else {
+            room.createMeshFloor(this.groundBitmap);
+
+                // walls
+                // each wall is a tall piece and a short piece on top
+                // the short piece is for headers on doors and places for platforms
+
+            yWallBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_HEIGHT),yBound.max);
+            yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
+
+            mesh=room.createMeshWalls(this.fenceBitmap,yWallBound);
+            mesh2=room.createMeshWalls(this.fenceBitmap,yFloorBound);
+            mesh.combineMesh(mesh2);
+
+            this.map.meshList.add(mesh);
+            this.map.overlay.addRoom(room);
+        }
         
         return(roomIdx);
     }
@@ -673,7 +732,7 @@ export default class GenMapSpaceClass
 
             // compact mode has no hallways
         
-        if (config.MAP_DESIGN_TYPE===this.DESIGN_COMPACT) {
+        if (config.MAP_DESIGN_TYPE===this.map.DESIGN_COMPACT) {
             hallwayMode=this.HALLWAY_NONE;
         }
         else {
@@ -798,7 +857,7 @@ export default class GenMapSpaceClass
         
             // sparse mode has no extensions
             
-        if (config.MAP_DESIGN_TYPE===this.DESIGN_SPARSE) return;
+        if (config.MAP_DESIGN_TYPE===this.map.DESIGN_SPARSE) return;
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
@@ -833,7 +892,7 @@ export default class GenMapSpaceClass
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
-            if (!room.liquid) closet.addCloset(room);
+            if ((!room.liquid) && (!room.outdoor)) closet.addCloset(room);
         }
     }
     
@@ -846,7 +905,7 @@ export default class GenMapSpaceClass
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
-            if (!room.liquid) windows.addWindow(this,room);
+            if ((!room.liquid) && (!room.outdoor)) windows.addWindow(this,room);
         }
     }
     
@@ -859,7 +918,7 @@ export default class GenMapSpaceClass
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
-            ledge.createLedges(room);
+            if (!room.outdoor) ledge.createLedges(room);
         }
     }
     
@@ -872,7 +931,7 @@ export default class GenMapSpaceClass
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
-            if (room.mainPath) continue;
+            if ((room.mainPath) || (room.outdoor)) continue;
             
             switch (room.level) {
                 case constants.ROOM_LEVEL_LOWER:
@@ -903,7 +962,7 @@ export default class GenMapSpaceClass
         
         for (n=0;n!==nRoom;n++) {
             room=this.map.roomList.get(n);
-            if (room.liquid) continue;
+            if ((room.liquid) || (room.outdoor)) continue;
             
                 // a random series of rectangles in the room
                 // to place decorations
@@ -934,7 +993,7 @@ export default class GenMapSpaceClass
                     }
                 }
                 
-                //decorationObj=block; // supergumba -- testing
+                //decorationObj=storage; // supergumba -- testing
             
                 decorationObj.create(room,rects[k]);
                 room.blockGridForRect(rects[k]);
@@ -1044,6 +1103,9 @@ export default class GenMapSpaceClass
     
     buildMapFinish()
     {
+        //this.outdoorRooms
+        //this.map.meshList.randomizeVertexes(constants.MESH_FLAG_ROOM_WALL,-1,this.yBase,0.9,0.1);
+        
             // overlay precalc
             
         this.map.overlay.precalcDrawValues();

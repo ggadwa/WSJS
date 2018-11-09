@@ -6,7 +6,7 @@ class ConfigClass
 {
     constructor()
     {
-        this.SEED=Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
+        this.SEED=32; // Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
 
             //
             // map generation
@@ -15,9 +15,6 @@ class ConfigClass
         this.MAP_DESIGN_TYPE=1;
         this.MAP_DESIGN_TYPE_LIST=['Sparse','Medium','Compact'];
         
-        this.MAP_STYLE_TYPE=0;
-        this.MAP_STYLE_TYPE_LIST=['Indoor','Outdoor','Space'];
-            
         this.ROOM_PATH_COUNT=6;                     // how many rooms in the map path
 
         this.ROOM_LIQUIDS=true;                     // turns on or off liquids
@@ -37,7 +34,7 @@ class ConfigClass
             // monsters
             //
 
-        this.MONSTER_TYPE_COUNT=10;
+        this.MONSTER_TYPE_COUNT=3;
         
         this.MONSTER_AI_ON=true;
         this.MONSTER_BOSS=true;

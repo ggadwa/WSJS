@@ -35,8 +35,7 @@ export default class GenRoomDecorationStorageClass extends GenRoomDecorationBase
         this.xShelfMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
         this.zShelfMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
         
-        this.boxMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
-        this.boxHigh=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3));
+        this.boxSize=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2));
 
         Object.seal(this);
     }
@@ -48,17 +47,19 @@ export default class GenRoomDecorationStorageClass extends GenRoomDecorationBase
     addBoxes(room,x,z)
     {
         let stackLevel,stackCount,mesh;
-        let boxXBound,boxYBound,boxZBound;
+        let boxHalfSize,boxXBound,boxYBound,boxZBound;
         let boxPos,rotAngle;
         
             // box size
             
-        x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
-        z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
+        x=(room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH))+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5);
+        z=(room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH))+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5);
+        
+        boxHalfSize=Math.trunc(this.boxSize*0.5);
             
-        boxXBound=new BoundClass((x+this.boxMargin),((x+constants.ROOM_BLOCK_WIDTH)-this.boxMargin));
-        boxYBound=new BoundClass((room.yBound.max-this.boxHigh),room.yBound.max);
-        boxZBound=new BoundClass((z+this.boxMargin),((z+constants.ROOM_BLOCK_WIDTH)-this.boxMargin));
+        boxXBound=new BoundClass((x-boxHalfSize),(x+boxHalfSize));
+        boxYBound=new BoundClass((room.yBound.max-this.boxSize),room.yBound.max);
+        boxZBound=new BoundClass((z-boxHalfSize),(z+boxHalfSize));
         
         boxPos=new PointClass(0,0,0);
         rotAngle=new PointClass(0.0,0.0,0.0);
@@ -70,7 +71,6 @@ export default class GenRoomDecorationStorageClass extends GenRoomDecorationBase
             // the stacked shelves
             
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
-            
             rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
             mesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,this.woodBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
             MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
@@ -78,7 +78,7 @@ export default class GenRoomDecorationStorageClass extends GenRoomDecorationBase
 
                 // go up one level
 
-            boxYBound.add(-this.boxHigh);
+            boxYBound.add(-this.boxSize);
             if (boxYBound.min<room.yBound.min) break;
         }
     }
