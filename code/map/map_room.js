@@ -482,7 +482,7 @@ export default class MapRoomClass
         
     createRandomRects()
     {
-        let x,z,x2,z2,hit;
+        let n,x,z,x2,z2,hit,rect,delSkip;
         let wid,high,startWid,startHigh;
         let xBlockStart,xBlockEnd,zBlockStart,zBlockEnd;
         let xSize=this.xBlockSize-2;
@@ -591,6 +591,31 @@ export default class MapRoomClass
                 }
             }
         }
+        
+            // remove any rects that have a section
+            // blocked off
+  
+        n=0;
+        
+        while (n<rects.length) {
+            rect=rects[n];
+            
+            delSkip=false;
+            
+            for (x=rect.lft;x!==rect.rgt;x++) {
+                for (z=rect.top;z!==rect.bot;z++) {
+                    if (this.checkBlockGrid(0,x,z)) {
+                        rects=rects.slice(n,(n+1));
+                        delSkip=true;
+                        break;
+                    }
+                }
+                
+                if (delSkip) break;
+            }
+            
+            if (!delSkip) n++;
+        }
 
         return(rects);
     }
@@ -610,7 +635,7 @@ export default class MapRoomClass
         // create polygon walls and floors
         //
         
-    createMeshWalls(bitmap,yWallBound)
+    createMeshWalls(bitmap,yWallBound,meshFlag)
     {
         let n,nSegment,x,z,x2,z2;
         let vertexList,indexes,vIdx,iIdx;
@@ -735,7 +760,7 @@ export default class MapRoomClass
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,true);
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
     }
     
         //
@@ -794,7 +819,7 @@ export default class MapRoomClass
         // create polygon floors or ceilings
         //
         
-    createMeshFloor(bitmap)
+    createMeshFloor(bitmap,meshFlag)
     {
         let x,z,vx,vz,vx2,vz2;
         let v,nSegment;
@@ -863,7 +888,7 @@ export default class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_FLOOR));
+        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
     }
     
     createMeshCeiling(bitmap)

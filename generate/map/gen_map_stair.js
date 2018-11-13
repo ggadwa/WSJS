@@ -492,19 +492,27 @@ export default class GenRoomStairsClass
             min=0;
             if (room.zBound.min>room.mainPathConnectedRoom.zBound.min) min=Math.trunc((room.zBound.min-room.mainPathConnectedRoom.zBound.min)/constants.ROOM_BLOCK_WIDTH);
             
-            max=room.zBlockSize;
-            if (room.zBound.max<room.mainPathConnectedRoom.zBound.max) max=Math.trunc((room.zBound.max-room.mainPathConnectedRoom.zBound.min)/constants.ROOM_BLOCK_WIDTH);
+            max=room.mainPathConnectedRoom.zBlockSize;
+            if (room.zBound.max<room.mainPathConnectedRoom.zBound.max) max=room.mainPathConnectedRoom.zBlockSize-Math.trunc((room.mainPathConnectedRoom.zBound.min-room.zBound.max)/constants.ROOM_BLOCK_WIDTH);
             
-            z=genRandom.randomInBetween(min,(max-1));
+            min++;
+            max-=2;
+            if (min>max) return;
+            
+            z=genRandom.randomInBetween(min,max);
         }
         else {
             min=0;
             if (room.xBound.min>room.mainPathConnectedRoom.xBound.min) min=Math.trunc((room.xBound.min-room.mainPathConnectedRoom.xBound.min)/constants.ROOM_BLOCK_WIDTH);
             
-            max=room.xBlockSize;
-            if (room.xBound.max<room.mainPathConnectedRoom.xBound.max) max=Math.trunc((room.xBound.max-room.mainPathConnectedRoom.xBound.min)/constants.ROOM_BLOCK_WIDTH);
+            max=room.mainPathConnectedRoom.xBlockSize;
+            if (room.xBound.max<room.mainPathConnectedRoom.xBound.max) max=room.mainPathConnectedRoom.xBlockSize-Math.trunc((room.mainPathConnectedRoom.xBound.min-room.xBound.max)/constants.ROOM_BLOCK_WIDTH);
             
-            x=genRandom.randomInBetween(min,(max-1));
+            min++;
+            max-=2;
+            if (min>max) return;
+            
+            x=genRandom.randomInBetween(min,max);
         }
         
             // create stairs

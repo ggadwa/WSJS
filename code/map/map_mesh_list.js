@@ -289,7 +289,7 @@ export default class MapMeshListClass
         // in a map
         //
         
-    randomizeVertexes(meshFlag,skipMeshFlag,y,moveMin,moveExtra)
+    randomizeXZVertexes(meshFlag,skipMeshFlag,y,movePercentMin,movePercentExtra)
     {
         let n,k,n2,k2,nMesh,center,skip;
         let nVertex,nVertex2,vertexList,vertexList2;
@@ -349,7 +349,7 @@ export default class MapMeshListClass
                     // from
                 
                 vct.setFromSubPoint(pos,center);
-                vct.scale(genRandom.randomFloat(moveMin,moveExtra));
+                vct.scale(genRandom.randomFloat(movePercentMin,movePercentExtra));
                 randomPos.setFromAddPoint(center,vct);
                 
                     // now move every vertex like this
@@ -372,6 +372,79 @@ export default class MapMeshListClass
                 
                 MeshUtilityClass.buildVertexListNormals(vertexList,this.meshes[n].indexes,center,true);
                 MeshUtilityClass.buildVertexListTangents(vertexList,this.meshes[n].indexes);             
+            }
+       }
+    }
+    
+    randomizeYVertexes(meshFlag,skipMeshFlag,y,moveMin,moveExtra)
+    {
+        let n,k,n2,k2,nMesh,yAdd,skip;
+        let nVertex,nVertex2,vertexList,vertexList2;
+        let pos=new PointClass(0,0,0);
+        
+            // run through any mesh of the type
+            // and randomly move vertexes UP unless
+            // they touch the skip mesh type
+            
+        nMesh=this.meshes.length;
+            
+        for (n=0;n!==nMesh;n++) {
+            if (this.meshes[n].flag!==meshFlag) continue;
+            
+            vertexList=this.meshes[n].vertexList;
+            nVertex=vertexList.length;
+            
+            for (k=0;k!==nVertex;k++) {
+                
+                    // only do for certain Y
+                    
+                if (vertexList[k].position.y!==y) continue;
+                
+                    // original position
+                    
+                pos.setFromPoint(vertexList[k].position);
+                
+                    // skip this vertex if it connects
+                    // with any pologons of the skip type
+                    
+                skip=false;
+                
+                for (n2=0;n2!==nMesh;n2++) {
+                    if (n===n2) continue;
+                    if (this.meshes[n2].flag!==skipMeshFlag) continue;
+                        
+                    vertexList2=this.meshes[n2].vertexList;
+                    nVertex2=vertexList2.length;
+            
+                    for (k2=0;k2!==nVertex2;k2++) {
+                        if ((vertexList2[k2].position.x===pos.x) && (vertexList2[k2].position.z===pos.z)) {
+                            skip=true;
+                            break;
+                        }
+                    }
+                    
+                    if (skip) break;
+                }
+                
+                if (skip) continue;
+ 
+                    // get a movement and a position to move
+                    // from
+                    
+                yAdd=-(genRandom.randomInt(moveMin,moveExtra));
+                
+                    // now move every vertex like this
+                    
+                for (n2=0;n2!==nMesh;n2++) {
+                    if (this.meshes[n2].flag!==meshFlag) continue;
+                    
+                    vertexList2=this.meshes[n2].vertexList;
+                    nVertex2=vertexList2.length;
+            
+                    for (k2=0;k2!==nVertex2;k2++) {
+                        if ((vertexList2[k2].position.x===pos.x) && (vertexList2[k2].position.z===pos.z)) vertexList2[k2].position.y+=yAdd;
+                    }
+                }
             }
        }
     }

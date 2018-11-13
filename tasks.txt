@@ -9,12 +9,16 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-+ stairs can be next to doors (keep away from edges) [DO NEXT we have seed that makes this problem]
 
----> randomizeVertexes needs to take array of rooms
-+ integrate outdoor stuff into regular map as a room
+= seed 57 crashes!
+- get rid of rooms.length===1 to always make outdoors
+- extensions are running over each other
+- outside rooms need special light (high ambient, no light)
+
+- y randomize is bad (not skipping floor segments)
 + need tree + rock decorations for outdoors
-+ decorations can be in stairs
+- fix grass
+
 + only static lights from windows
 + whats with the resetAnimation errors (on monster wake)
 + monster meele, fire and meele sounds

@@ -64,7 +64,8 @@ export const MESH_FLAG_LIFT=8;
 export const MESH_FLAG_LIGHT=9;
 export const MESH_FLAG_DECORATION=10;
 export const MESH_FLAG_WINDOW=11;
-export const MESH_FLAG_ROOM_TUNNEL=12;
+export const MESH_FLAG_ROOM_FENCE=12;
+export const MESH_FLAG_ROOM_GROUND=13;
 
     // extra room features
     

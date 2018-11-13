@@ -72,7 +72,7 @@ export default class GenMapClass
         this.genRoomHallway=null;
         this.genRoomStairs=null;
         
-        this.outdoorRooms=[];
+        this.hasOutdoorRoom=false;
         
             // constants
             
@@ -312,7 +312,7 @@ export default class GenMapClass
         
             // determine if outdoor
           
-        outdoor=((genRandom.randomPercentage(this.ROOM_OUTDOOR_PERCENTAGE))&&(this.outdoorRooms.length===0)&&(!config.SIMPLE_TEST_MAP))||(forceOutdoor);
+        outdoor=(this.map.roomList.rooms.length===1)||(forceOutdoor); //((genRandom.randomPercentage(this.ROOM_OUTDOOR_PERCENTAGE))&&(!this.hasOutdoorRoom)&&(!config.SIMPLE_TEST_MAP))||(forceOutdoor);
 
             // top of room
             
@@ -324,7 +324,7 @@ export default class GenMapClass
         roomIdx=this.map.roomList.add(pathType,xBlockSize,zBlockSize,xBound,yBound,zBound,storyCount,extensionDirection,mainPath,mainPathSide,mainPathConnectedRoom,level,liquid,outdoor);
         room=this.map.roomList.get(roomIdx);
         
-        if (outdoor) this.outdoorRooms.push(roomIdx);
+        this.hasOutdoorRoom|=outdoor;
         
             // if the room is higher, we need to mark that off
             // so we don't build decorations to close to steps
@@ -338,7 +338,7 @@ export default class GenMapClass
             // indoor rooms
             
         if (!outdoor) {
-            room.createMeshFloor(this.floorBitmap);
+            room.createMeshFloor(this.floorBitmap,constants.MESH_FLAG_ROOM_FLOOR);
 
                 // walls
                 // each wall is a tall piece and a short piece on top
@@ -348,8 +348,8 @@ export default class GenMapClass
             yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
 
             for (n=0;n!==storyCount;n++) {
-                mesh=room.createMeshWalls(this.wallBitmap,yWallBound);
-                mesh2=room.createMeshWalls(this.wallBitmap,yFloorBound);
+                mesh=room.createMeshWalls(this.wallBitmap,yWallBound,constants.MESH_FLAG_ROOM_WALL);
+                mesh2=room.createMeshWalls(this.wallBitmap,yFloorBound,constants.MESH_FLAG_ROOM_WALL);
                 mesh.combineMesh(mesh2);
 
                 this.map.meshList.add(mesh);
@@ -362,7 +362,7 @@ export default class GenMapClass
             room.createMeshCeiling(this.ceilingBitmap);
         }
         else {
-            room.createMeshFloor(this.groundBitmap);
+            room.createMeshFloor(this.groundBitmap,constants.MESH_FLAG_ROOM_GROUND);
 
                 // walls
                 // each wall is a tall piece and a short piece on top
@@ -371,8 +371,8 @@ export default class GenMapClass
             yWallBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_HEIGHT),yBound.max);
             yFloorBound=new BoundClass((yWallBound.min-constants.ROOM_FLOOR_DEPTH),yWallBound.min);
 
-            mesh=room.createMeshWalls(this.fenceBitmap,yWallBound);
-            mesh2=room.createMeshWalls(this.fenceBitmap,yFloorBound);
+            mesh=room.createMeshWalls(this.fenceBitmap,yWallBound,constants.MESH_FLAG_ROOM_FENCE);
+            mesh2=room.createMeshWalls(this.fenceBitmap,yFloorBound,constants.MESH_FLAG_ROOM_FENCE);
             mesh.combineMesh(mesh2);
 
             this.map.meshList.add(mesh);
@@ -470,7 +470,7 @@ export default class GenMapClass
         room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity,true);
     }
     
-    addHallwayLight(connectSide,hallwayMode,hallwaySize,xBound,zBound)
+    addHallwayLight(lastRoom,room,connectSide,hallwayMode,hallwaySize,xBound,zBound)
     {
         let xAdd,zAdd,xAdd2,zAdd2,y,fixturePos,lightPos;
         let rot1,rot2;
@@ -502,13 +502,17 @@ export default class GenMapClass
             rot2=new PointClass(90,180,0);
         }
         
-        fixturePos=new PointClass((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
-        lightPos=new PointClass((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
-        this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true);
+        if (!lastRoom.outdoor) {
+            fixturePos=new PointClass((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
+            lightPos=new PointClass((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
+            this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true);
+        }
         
-        fixturePos=new PointClass((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
-        lightPos=new PointClass((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
-        this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true);
+        if (!room.outdoor) {
+            fixturePos=new PointClass((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
+            lightPos=new PointClass((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
+            this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true);
+        }
     }
   
         //
@@ -683,22 +687,20 @@ export default class GenMapClass
             pathType=((this.map.roomList.count()+1)>=config.ROOM_PATH_COUNT)?constants.ROOM_PATH_TYPE_GOAL:constants.ROOM_PATH_TYPE_NORMAL;
         }
 
-            // add in hallways and a light
-            // if the hallway is long
-            
-        if (hallwayMode!==this.HALLWAY_NONE) {
-            this.addHallwayRoom(connectSide,hallwayMode,xHallwayBound,zHallwayBound);
-            this.addHallwayLight(connectSide,hallwayMode,doorAdd,xHallwayBound,zHallwayBound);
-        }
-
             // the room
             
         roomIdx=this.addRegularRoom(constants.ROOM_LEVEL_NORMAL,pathType,xBlockSize,zBlockSize,xBound,zBound,true,-1,null,extensionDirection);
         room=this.map.roomList.get(roomIdx);
         
-            // mark off any doors we made
+            // add in hallways and a light
+            // if the hallway is long
             
         if (hallwayMode!==this.HALLWAY_NONE) {
+            this.addHallwayRoom(connectSide,hallwayMode,xHallwayBound,zHallwayBound);
+            this.addHallwayLight(lastRoom,room,connectSide,hallwayMode,doorAdd,xHallwayBound,zHallwayBound);
+        
+                // mark off any doors we made
+            
             lastRoom.markDoorOnConnectionSide(connectSide,false);
             room.markDoorOnConnectionSide(connectSide,true);
         }
@@ -724,7 +726,7 @@ export default class GenMapClass
         
             // add the room light
 
-        this.addRoomLight(roomIdx);
+        if (!room.outdoor) this.addRoomLight(roomIdx);
         
             // at end of path?
             
@@ -847,7 +849,7 @@ export default class GenMapClass
         
             // add the room light
 
-        this.addRoomLight(roomIdx);
+        if (!room.outdoor) this.addRoomLight(roomIdx);
     }
 
     buildRoomExtensions()
@@ -1065,6 +1067,8 @@ export default class GenMapClass
             // remove them both
             
         this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_WALL,true,true);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_FENCE,constants.MESH_FLAG_ROOM_FENCE,true,true);
+        this.map.meshList.removeSharedTrianglesChunk(constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_ROOM_FENCE,true,true);
         
             // finish with the callback
             
@@ -1103,8 +1107,10 @@ export default class GenMapClass
     
     buildMapFinish()
     {
-        //this.outdoorRooms
-        //this.map.meshList.randomizeVertexes(constants.MESH_FLAG_ROOM_WALL,-1,this.yBase,0.9,0.1);
+            // randomize outside rooms
+            
+        this.map.meshList.randomizeXZVertexes(constants.MESH_FLAG_ROOM_FENCE,constants.MESH_FLAG_ROOM_WALL,this.yBase,0.9,0.1);
+        //this.map.meshList.randomizeYVertexes(constants.MESH_FLAG_ROOM_GROUND,constants.MESH_FLAG_ROOM_FLOOR,this.yBase,0,Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1));
         
             // overlay precalc
             
