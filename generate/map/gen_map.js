@@ -266,7 +266,7 @@ export default class GenMapClass
         let yAdd,yBound,yWallBound,yFloorBound;
         let roomIdx,room;
         let storyCount,liquid,outdoor,forceOutdoor;
-        
+                
             // if the connecting room exists and is outdoors
             // reset the level
             
@@ -338,7 +338,8 @@ export default class GenMapClass
             // indoor rooms
             
         if (!outdoor) {
-            room.createMeshFloor(this.floorBitmap,constants.MESH_FLAG_ROOM_FLOOR);
+            mesh=room.createMeshFloor(this.floorBitmap,constants.MESH_FLAG_ROOM_FLOOR);
+            this.map.meshList.add(mesh);
 
                 // walls
                 // each wall is a tall piece and a short piece on top
@@ -359,10 +360,12 @@ export default class GenMapClass
                 yFloorBound.add(-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH));
             }
 
-            room.createMeshCeiling(this.ceilingBitmap);
+            mesh=room.createMeshCeiling(this.ceilingBitmap);
+            this.map.meshList.add(mesh);
         }
         else {
-            room.createMeshFloor(this.groundBitmap,constants.MESH_FLAG_ROOM_GROUND);
+            mesh=room.createMeshFloor(this.groundBitmap,constants.MESH_FLAG_ROOM_GROUND);
+            this.map.meshList.add(mesh);
 
                 // walls
                 // each wall is a tall piece and a short piece on top
@@ -374,7 +377,7 @@ export default class GenMapClass
             mesh=room.createMeshWalls(this.fenceBitmap,yWallBound,constants.MESH_FLAG_ROOM_FENCE);
             mesh2=room.createMeshWalls(this.fenceBitmap,yFloorBound,constants.MESH_FLAG_ROOM_FENCE);
             mesh.combineMesh(mesh2);
-
+            
             this.map.meshList.add(mesh);
             this.map.overlay.addRoom(room);
         }
@@ -408,7 +411,7 @@ export default class GenMapClass
         // lights
         //
 
-    addGeneralLight(lightPos,fixturePos,rotAngle,intensity,allowNonStaticLight)
+    addGeneralLight(lightPos,fixturePos,rotAngle,intensity,allowNonStaticLight,sunLight)
     {
         let light,red,green,blue,exponent;
         let xFixtureBound,yFixtureBound,zFixtureBound;
@@ -434,13 +437,16 @@ export default class GenMapClass
         }
         
             // the exponent
-            
-        exponent=this.ROOM_LIGHT_EXPONENT_MINIMUM+(genRandom.random()*this.ROOM_LIGHT_EXPONENT_EXTRA);
+            // if sunlight (for outdoors) than exponent
+            // is 0.0 so it's hard light with no drop off
+        
+        exponent=0.0;
+        if (!sunLight) exponent=this.ROOM_LIGHT_EXPONENT_MINIMUM+(genRandom.random()*this.ROOM_LIGHT_EXPONENT_EXTRA);
 
             // add light to map
 
         light=new LightClass(lightPos,new ColorClass(red,green,blue),intensity,exponent);
-        if ((allowNonStaticLight) && (config.NON_STATIC_LIGHTS)) light.setRandomLightType(this.view.timeStamp);
+        if (allowNonStaticLight) light.setRandomLightType(this.view.timeStamp);
         this.map.lightList.add(light);
 
         return(light);
@@ -451,23 +457,23 @@ export default class GenMapClass
         let lightY,fixturePos,lightPos,intensity;
         let room=this.map.roomList.get(roomIdx);
         
-            // locations
-            
+            // location
+
         lightY=room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*room.storyCount);
-        
+
         fixturePos=new PointClass(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
         lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
-        
+
             // intensity
-        
+
         intensity=Math.max(room.xBound.getSize(),room.yBound.getSize(),room.zBound.getSize());
         if (room.storyCount>=2) intensity+=(intensity*((room.storyCount-1)*this.ROOM_LIGHT_PER_STORY_BOOST));
         if (!config.SIMPLE_TEST_MAP) intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
-        
+
             // create the light
-            // remember this because later windows can reduce light
-            
-        room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity,true);
+            // remember this because later windows can reduce indoor light
+
+        room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity,true,false);
     }
     
     addHallwayLight(lastRoom,room,connectSide,hallwayMode,hallwaySize,xBound,zBound)
@@ -480,7 +486,7 @@ export default class GenMapClass
         if (hallwayMode===this.HALLWAY_LONG) {
             fixturePos=new PointClass(xBound.getMidPoint(),(this.yBase-constants.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
             lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
-            this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY,true);
+            this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY,true,false);
         }
         
             // ends
@@ -505,13 +511,13 @@ export default class GenMapClass
         if (!lastRoom.outdoor) {
             fixturePos=new PointClass((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
             lightPos=new PointClass((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
-            this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true);
+            this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true,false);
         }
         
         if (!room.outdoor) {
             fixturePos=new PointClass((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
             lightPos=new PointClass((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
-            this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true);
+            this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true,false);
         }
     }
   
@@ -675,7 +681,7 @@ export default class GenMapClass
 
                 }
                 
-                if (this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
+                if ((this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) && (this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_FENCE)===-1)) break;
 
                 tryCount++;
                 if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
@@ -818,8 +824,8 @@ export default class GenMapClass
 
             }
 
-            if (this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) break;
-
+            if ((this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_WALL)===-1) && (this.map.meshList.boxBoundCollision(xBound,null,zBound,constants.MESH_FLAG_ROOM_FENCE)===-1)) break;
+            
             tryCount++;
             if (tryCount>this.ROOM_MAX_CONNECT_TRY) return;
         }
@@ -1045,7 +1051,7 @@ export default class GenMapClass
     
     buildMapRoomPieces()
     {
-            // build room closets
+            // build room pieces
             
         this.buildRoomClosets();
         this.buildRoomWindows();

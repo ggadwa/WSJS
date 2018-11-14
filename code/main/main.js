@@ -200,10 +200,6 @@ class MainClass
             // buffers and indexes
 
         this.map.setupBuffers();
-
-            // ambient
-
-        this.view.ambient.setFromValues(config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT);
         
             // set the listener to this entity
             

@@ -25,10 +25,10 @@ export default class GenMonsterClass
         this.MONSTER_MIN_WALK_TURN_SPEED=0.8;
         this.MONSTER_RANDOM_EXTRA_WALK_TURN_SPEED=2.0;
         
-        this.MONSTER_FAST_FACTOR=1.5;
-        this.MONSTER_RANDOM_EXTRA_FAST_FACTOR=2.0;
+        this.MONSTER_FAST_FACTOR=1.2;
+        this.MONSTER_RANDOM_EXTRA_FAST_FACTOR=0.5;
         
-        this.MONSTER_SLOW_FACTOR=0.5;
+        this.MONSTER_SLOW_FACTOR=0.4;
         this.MONSTER_RANDOM_EXTRA_SLOW_FACTOR=0.2;
         
         this.MONSTER_MIN_FIRE_RECHARGE_TICK=4000;

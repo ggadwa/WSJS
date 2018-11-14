@@ -61,8 +61,6 @@ export default class ViewClass
 
             // view lighting
 
-        this.ambient=new ColorClass(0.0,0.0,0.0);
-
         this.MAX_LIGHT_COUNT=24;
         this.lights=[];
         

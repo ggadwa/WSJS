@@ -605,7 +605,7 @@ export default class MapRoomClass
             for (x=rect.lft;x!==rect.rgt;x++) {
                 for (z=rect.top;z!==rect.bot;z++) {
                     if (this.checkBlockGrid(0,x,z)) {
-                        rects=rects.slice(n,(n+1));
+                        rects.splice(n,1);
                         delSkip=true;
                         break;
                     }
@@ -641,7 +641,7 @@ export default class MapRoomClass
         let vertexList,indexes,vIdx,iIdx;
 
             // build the vertices.  Each triangle gets it's
-            // own vertices so normals and light map UVs work
+            // own vertices so normals work
 
         nSegment=(this.xBlockSize*2)+(this.zBlockSize*2);
 
@@ -888,7 +888,7 @@ export default class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
+        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
     }
     
     createMeshCeiling(bitmap)
@@ -961,7 +961,7 @@ export default class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        this.map.meshList.add(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
+        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
     }
     
         //

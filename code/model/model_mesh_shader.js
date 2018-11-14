@@ -1,3 +1,4 @@
+import config from '../../code/main/config.js';
 import ShaderClass from '../../code/shader/shader.js';
 import ShaderLightClass from '../../code/shader/shader_light.js';
 
@@ -90,7 +91,7 @@ export default class ModelMeshShaderClass extends ShaderClass
     {
         super.release();
     }
-
+    
         //
         // start/stop model shader drawing
         //
@@ -111,11 +112,13 @@ export default class ModelMeshShaderClass extends ShaderClass
         gl.uniformMatrix4fv(this.modelMatrixUniform,false,this.view.modelMatrix);
         gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.view.normalMatrix);
 
+            // ambient
+            
+        gl.uniform3f(this.ambientUniform,config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT);
+        
             // lighting
             // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)
             // and the second vec4 is r,g,b,exponent (color and exponent)
-
-        gl.uniform3f(this.ambientUniform,this.view.ambient.r,this.view.ambient.g,this.view.ambient.b);
 
         for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
 

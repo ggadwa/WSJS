@@ -1,4 +1,5 @@
 import * as constants from '../../code/main/constants.js';
+import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import genRandom from '../../generate/utility/random.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
@@ -479,7 +480,7 @@ export default class MapMeshListClass
 
         currentBitmap=null;
         this.hadTransparentInDraw=false;
-
+        
             // draw the opaque meshes
 
         for (n=0;n!==nMesh;n++) {
@@ -499,7 +500,7 @@ export default class MapMeshListClass
                 currentBitmap=mesh.bitmap;
                 mesh.bitmap.attachAsTexture(this.view.shaderList.mapMeshShader);
             }
-
+            
                 // draw the mesh
 
             mesh.updateBuffers();
