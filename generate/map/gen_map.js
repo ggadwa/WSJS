@@ -411,7 +411,7 @@ export default class GenMapClass
         // lights
         //
 
-    addGeneralLight(lightPos,fixturePos,rotAngle,intensity,allowNonStaticLight,sunLight)
+    addGeneralLight(lightPos,fixturePos,rotAngle,intensity,allowNonStaticLight,outdoor)
     {
         let light,red,green,blue,exponent;
         let xFixtureBound,yFixtureBound,zFixtureBound;
@@ -441,12 +441,12 @@ export default class GenMapClass
             // is 0.0 so it's hard light with no drop off
         
         exponent=0.0;
-        if (!sunLight) exponent=this.ROOM_LIGHT_EXPONENT_MINIMUM+(genRandom.random()*this.ROOM_LIGHT_EXPONENT_EXTRA);
+        if (!outdoor) exponent=this.ROOM_LIGHT_EXPONENT_MINIMUM+(genRandom.random()*this.ROOM_LIGHT_EXPONENT_EXTRA);
 
             // add light to map
 
         light=new LightClass(lightPos,new ColorClass(red,green,blue),intensity,exponent);
-        if (allowNonStaticLight) light.setRandomLightType(this.view.timeStamp);
+        if ((allowNonStaticLight) && (!outdoor)) light.setRandomLightType(this.view.timeStamp);
         this.map.lightList.add(light);
 
         return(light);
@@ -457,23 +457,45 @@ export default class GenMapClass
         let lightY,fixturePos,lightPos,intensity;
         let room=this.map.roomList.get(roomIdx);
         
-            // location
+            // outdoor and indoor rooms have different
+            // light types
+            
+        if (!room.outdoor) {
 
-        lightY=room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*room.storyCount);
+                // location
 
-        fixturePos=new PointClass(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
-        lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
+            lightY=room.yBound.max-((constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH)*room.storyCount);
 
-            // intensity
+            fixturePos=new PointClass(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
+            lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
 
-        intensity=Math.max(room.xBound.getSize(),room.yBound.getSize(),room.zBound.getSize());
-        if (room.storyCount>=2) intensity+=(intensity*((room.storyCount-1)*this.ROOM_LIGHT_PER_STORY_BOOST));
-        if (!config.SIMPLE_TEST_MAP) intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
+                // intensity
 
-            // create the light
-            // remember this because later windows can reduce indoor light
+            intensity=Math.max(room.xBound.getSize(),room.yBound.getSize(),room.zBound.getSize());
+            if (room.storyCount>=2) intensity+=(intensity*((room.storyCount-1)*this.ROOM_LIGHT_PER_STORY_BOOST));
+            if (!config.SIMPLE_TEST_MAP) intensity=Math.trunc((intensity*this.ROOM_LIGHT_FACTOR)+(intensity*(genRandom.random()*this.ROOM_LIGHT_FACTOR_EXTRA)));
 
-        room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity,true,false);
+                // create the light
+                // remember this because later windows can reduce indoor light
+
+            room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity,true,false);
+        }
+        else {
+
+                // location
+
+            lightY=room.yBound.max-(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH);
+            lightPos=new PointClass(room.xBound.getMidPoint(),lightY,room.zBound.getMidPoint());
+
+                // intensity
+
+            intensity=Math.trunc((room.xBound.getSize()+room.zBound.getSize())*0.25)+(constants.ROOM_FLOOR_HEIGHT+constants.ROOM_FLOOR_DEPTH);
+
+                // create the light
+                // remember this because later windows can reduce indoor light
+
+            room.mainLight=this.addGeneralLight(lightPos,null,null,intensity,true,true);
+        }
     }
     
     addHallwayLight(lastRoom,room,connectSide,hallwayMode,hallwaySize,xBound,zBound)
@@ -732,7 +754,7 @@ export default class GenMapClass
         
             // add the room light
 
-        if (!room.outdoor) this.addRoomLight(roomIdx);
+        this.addRoomLight(roomIdx);
         
             // at end of path?
             
@@ -855,7 +877,7 @@ export default class GenMapClass
         
             // add the room light
 
-        if (!room.outdoor) this.addRoomLight(roomIdx);
+        this.addRoomLight(roomIdx);
     }
 
     buildRoomExtensions()

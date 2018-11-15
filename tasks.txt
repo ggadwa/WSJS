@@ -9,7 +9,7 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-- go back to lights in rooms, need special light flag for add in intensity*color or something for sun
+- outdoor lights need special operations
 
 - get rid of rooms.length===1 to always make outdoors
 
