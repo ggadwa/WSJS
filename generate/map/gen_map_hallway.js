@@ -112,18 +112,19 @@ export default class GenRoomHallwayClass
         // create doors
         //
 
-    createDoorXSingle(x,yBound,zBound,thickSize)
+    createDoorXSingle(x,yBound,zBound)
     {
         let idx,meshIdx,xDoorBound;
         let vertexList,movement;
+        let doorThickSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
         
-        xDoorBound=new BoundClass((x-thickSize),(x+thickSize));
+        xDoorBound=new BoundClass((x-doorThickSize),(x+doorThickSize));
             
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(12);
         
-        idx=this.createSingleWallX(idx,vertexList,(x-thickSize),yBound,zBound);
-        idx=this.createSingleWallX(idx,vertexList,(x+thickSize),yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,(x-doorThickSize),yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,(x+doorThickSize),yBound,zBound);
         this.createSingleCeilingX(idx,vertexList,xDoorBound,yBound.max,zBound);
         meshIdx=this.finishMesh(this.doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
         
@@ -140,7 +141,7 @@ export default class GenRoomHallwayClass
     
     createHallwayX(xBound,yBound,zBound,doubleDoor)
     {
-        let idx,meshCenterPoint,thickSize;
+        let idx,meshCenterPoint,doorOffset;
         let vertexList;
         let zHallwayBound,zThickBound,xFrameBound;
         
@@ -148,11 +149,6 @@ export default class GenRoomHallwayClass
             // create normals
             
         meshCenterPoint=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
-        
-            // doors need to be pushed in on
-            // the edges so they have a wall thickness
-            
-        thickSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
         
             // the door room
             // internal walls
@@ -162,8 +158,8 @@ export default class GenRoomHallwayClass
 
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
-        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.min+thickSize));
-        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(zBound.max-thickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.min);
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
         this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
 
             // external walls
@@ -171,17 +167,17 @@ export default class GenRoomHallwayClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(16);
 
-        zThickBound=new BoundClass(zBound.min,(zBound.min+thickSize));
+        zThickBound=new BoundClass(zBound.min,zBound.min);
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound); 
-        zThickBound=new BoundClass((zBound.max-thickSize),zBound.max);
+        zThickBound=new BoundClass(zBound.max,zBound.max);
         idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zThickBound);
         idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zThickBound);
         this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
 
            // the ceiling and floor
 
-        zHallwayBound=new BoundClass((zBound.min+thickSize),(zBound.max-thickSize));
+        zHallwayBound=new BoundClass(zBound.min,zBound.max);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
@@ -196,11 +192,12 @@ export default class GenRoomHallwayClass
             // the door
             
         if (doubleDoor) {
-            this.createDoorXSingle((xBound.min+(thickSize*2)),yBound,zBound,thickSize);
-            this.createDoorXSingle((xBound.max-(thickSize*2)),yBound,zBound,thickSize);
+            doorOffset=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
+            this.createDoorXSingle((xBound.min+doorOffset),yBound,zBound);
+            this.createDoorXSingle((xBound.max-doorOffset),yBound,zBound);
         }
         else {
-            this.createDoorXSingle(xBound.getMidPoint(),yBound,zBound,thickSize);
+            this.createDoorXSingle(xBound.getMidPoint(),yBound,zBound);
         }
         
             // the frame
@@ -212,18 +209,19 @@ export default class GenRoomHallwayClass
         this.map.meshList.add(MeshPrimitivesClass.createFrameX(this.view,this.frameBitmap,xFrameBound,yBound,zBound,false,false,true));
     }
     
-    createHallwayDoorZ(xBound,yBound,z,thickSize)
+    createDoorZSingle(xBound,yBound,z)
     {
         let idx,meshIdx,zDoorBound;
         let vertexList,movement;
+        let doorThickSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
         
-        zDoorBound=new BoundClass((z-thickSize),(z+thickSize));
+        zDoorBound=new BoundClass((z-doorThickSize),(z+doorThickSize));
         
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(12);
         
-        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z-thickSize));
-        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z+thickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z-doorThickSize));
+        idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,(z+doorThickSize));
         this.createSingleCeilingZ(idx,vertexList,xBound,yBound.max,zDoorBound);
         meshIdx=this.finishMesh(this.doorBitmap,vertexList,true,null,false,constants.MESH_FLAG_DOOR);
         
@@ -240,7 +238,7 @@ export default class GenRoomHallwayClass
 
     createHallwayZ(xBound,yBound,zBound,doubleDoor)
     {
-        let idx,meshCenterPoint,thickSize;
+        let idx,meshCenterPoint,doorOffset;
         let vertexList;
         let xHallwayBound,xThickBound,zFrameBound;
         
@@ -249,11 +247,6 @@ export default class GenRoomHallwayClass
             
         meshCenterPoint=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
         
-            // doors need to be pushed in on
-            // the edges so they have a wall thickness
-            
-        thickSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
-         
             // the door room
             // internal walls
             
@@ -262,8 +255,8 @@ export default class GenRoomHallwayClass
 
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xBound,yBound,zBound.max);
-        idx=this.createSingleWallX(idx,vertexList,(xBound.min+thickSize),yBound,zBound);
-        idx=this.createSingleWallX(idx,vertexList,(xBound.max-thickSize),yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,xBound.min,yBound,zBound);
+        idx=this.createSingleWallX(idx,vertexList,xBound.max,yBound,zBound);
         this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,true,constants.MESH_FLAG_ROOM_WALL);
 
             // external walls
@@ -271,17 +264,17 @@ export default class GenRoomHallwayClass
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(16);
 
-        xThickBound=new BoundClass(xBound.min,(xBound.min+thickSize));
+        xThickBound=new BoundClass(xBound.min,xBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
-        xThickBound=new BoundClass((xBound.max-thickSize),xBound.max);
+        xThickBound=new BoundClass(xBound.max,xBound.max);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.min);
         idx=this.createSingleWallZ(idx,vertexList,xThickBound,yBound,zBound.max);
         this.finishMesh(this.wallBitmap,vertexList,true,meshCenterPoint,false,constants.MESH_FLAG_ROOM_WALL);
 
            // the ceiling
            
-        xHallwayBound=new BoundClass((xBound.min+thickSize),(xBound.max-thickSize));
+        xHallwayBound=new BoundClass(xBound.min,xBound.max);
 
         idx=0;
         vertexList=MeshUtilityClass.createMapVertexList(4);
@@ -296,11 +289,12 @@ export default class GenRoomHallwayClass
             // the door
         
         if (doubleDoor) {
-            this.createHallwayDoorZ(xBound,yBound,(zBound.min+(thickSize*2)),thickSize);
-            this.createHallwayDoorZ(xBound,yBound,(zBound.max-(thickSize*2)),thickSize);
+            doorOffset=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
+            this.createDoorZSingle(xBound,yBound,(zBound.min+doorOffset));
+            this.createDoorZSingle(xBound,yBound,(zBound.max-doorOffset));
         }
         else {
-            this.createHallwayDoorZ(xBound,yBound,zBound.getMidPoint(),thickSize);
+            this.createDoorZSingle(xBound,yBound,zBound.getMidPoint());
         }
         
             // the frame

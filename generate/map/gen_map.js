@@ -501,7 +501,7 @@ export default class GenMapClass
     addHallwayLight(lastRoom,room,connectSide,hallwayMode,hallwaySize,xBound,zBound)
     {
         let xAdd,zAdd,xAdd2,zAdd2,y,fixturePos,lightPos;
-        let rot1,rot2;
+        let rot1,rot2,startOK,endOK;
         
             // middle of hallway
             
@@ -529,14 +529,27 @@ export default class GenMapClass
             rot1=new PointClass(90,0,0);
             rot2=new PointClass(90,180,0);
         }
+            
+            // outside doesn't have end lights
+            
+        if ((connectSide===constants.ROOM_SIDE_LEFT) || (connectSide===constants.ROOM_SIDE_TOP)) {
+            startOK=!lastRoom.outdoor;
+            endOK=!room.outdoor;
+        }
+        else {
+            startOK=!room.outdoor;
+            endOK=!lastRoom.outdoor;
+        }
         
-        if (!lastRoom.outdoor) {
+            // the lights
+            
+        if (startOK) {
             fixturePos=new PointClass((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
             lightPos=new PointClass((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
             this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true,false);
         }
         
-        if (!room.outdoor) {
+        if (endOK) {
             fixturePos=new PointClass((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
             lightPos=new PointClass((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
             this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true,false);
@@ -1137,8 +1150,8 @@ export default class GenMapClass
     {
             // randomize outside rooms
             
-        this.map.meshList.randomizeXZVertexes(constants.MESH_FLAG_ROOM_FENCE,constants.MESH_FLAG_ROOM_WALL,this.yBase,0.9,0.1);
-        //this.map.meshList.randomizeYVertexes(constants.MESH_FLAG_ROOM_GROUND,constants.MESH_FLAG_ROOM_FLOOR,this.yBase,0,Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1));
+        this.map.meshList.randomizeXZVertexes(constants.MESH_FLAG_ROOM_FENCE,[constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_DECORATION],this.yBase,0.9,0.1);
+        this.map.meshList.randomizeYVertexes(constants.MESH_FLAG_ROOM_GROUND,[constants.MESH_FLAG_ROOM_FLOOR,constants.MESH_FLAG_DECORATION],this.yBase,0,Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2));
         
             // overlay precalc
             

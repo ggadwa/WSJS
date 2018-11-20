@@ -290,7 +290,7 @@ export default class MapMeshListClass
         // in a map
         //
         
-    randomizeXZVertexes(meshFlag,skipMeshFlag,y,movePercentMin,movePercentExtra)
+    randomizeXZVertexes(meshFlag,skipMeshFlagList,y,movePercentMin,movePercentExtra)
     {
         let n,k,n2,k2,nMesh,center,skip;
         let nVertex,nVertex2,vertexList,vertexList2;
@@ -323,13 +323,13 @@ export default class MapMeshListClass
                 pos.setFromPoint(vertexList[k].position);
                 
                     // skip this vertex if it connects
-                    // with any pologons of the skip type
+                    // with any polygons of the skip type
                     
                 skip=false;
                 
                 for (n2=0;n2!==nMesh;n2++) {
                     if (n===n2) continue;
-                    if (this.meshes[n2].flag!==skipMeshFlag) continue;
+                    if (skipMeshFlagList.indexOf(this.meshes[n2].flag)==-1) continue;
                         
                     vertexList2=this.meshes[n2].vertexList;
                     nVertex2=vertexList2.length;
@@ -377,7 +377,7 @@ export default class MapMeshListClass
        }
     }
     
-    randomizeYVertexes(meshFlag,skipMeshFlag,y,moveMin,moveExtra)
+    randomizeYVertexes(meshFlag,skipMeshFlagList,y,moveMin,moveExtra)
     {
         let n,k,n2,k2,nMesh,yAdd,skip;
         let nVertex,nVertex2,vertexList,vertexList2;
@@ -406,13 +406,13 @@ export default class MapMeshListClass
                 pos.setFromPoint(vertexList[k].position);
                 
                     // skip this vertex if it connects
-                    // with any pologons of the skip type
+                    // with any polygons of the skip type
                     
                 skip=false;
                 
                 for (n2=0;n2!==nMesh;n2++) {
                     if (n===n2) continue;
-                    if (this.meshes[n2].flag!==skipMeshFlag) continue;
+                    if (skipMeshFlagList.indexOf(this.meshes[n2].flag)==-1) continue;
                         
                     vertexList2=this.meshes[n2].vertexList;
                     nVertex2=vertexList2.length;
@@ -443,7 +443,7 @@ export default class MapMeshListClass
                     nVertex2=vertexList2.length;
             
                     for (k2=0;k2!==nVertex2;k2++) {
-                        if ((vertexList2[k2].position.x===pos.x) && (vertexList2[k2].position.z===pos.z)) vertexList2[k2].position.y+=yAdd;
+                        if ((vertexList2[k2].position.x===pos.x) && (vertexList2[k2].position.y===y) && (vertexList2[k2].position.z===pos.z)) vertexList2[k2].position.y+=yAdd;
                     }
                 }
             }

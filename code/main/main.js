@@ -140,11 +140,20 @@ class MainClass
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Monsters');
-        this.view.loadingScreenDraw(null);
+        if (config.MONSTER_COUNT!==0) {
+            this.view.loadingScreenUpdate();
+            this.view.loadingScreenAddString('Generating Monsters');
+            this.view.loadingScreenDraw(null);
         
-        setTimeout(this.initBuildMonsters.bind(this,0),1);
+            setTimeout(this.initBuildMonsters.bind(this,0),1);
+        }
+        else {
+            this.view.loadingScreenUpdate();
+            this.view.loadingScreenAddString('Finishing');
+            this.view.loadingScreenDraw(null);
+
+            setTimeout(this.initFinish.bind(this),1);   
+        }
     }
 
     initBuildMonsters(idx)
@@ -179,8 +188,8 @@ class MainClass
             // if more monster types, then loop back around
 
         idx++;
-        if (idx<config.MONSTER_TYPE_COUNT) {
-            this.view.loadingScreenDraw((idx+1)/(config.MONSTER_TYPE_COUNT+1));
+        if (idx<config.MONSTER_COUNT) {
+            this.view.loadingScreenDraw((idx+1)/(config.MONSTER_COUNT+1));
             setTimeout(this.initBuildMonsters.bind(this,idx),1);
             return;
         }

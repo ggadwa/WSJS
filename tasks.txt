@@ -11,9 +11,13 @@ WebGL2
 
 - outdoor lights need special operations
 
+- walking on ground falls through
+- collisionFloorRect doubles on squares instead of triangles, might need to be triangles
 - get rid of rooms.length===1 to always make outdoors
 
-- y randomize is bad (not skipping floor segments)
+- grass is bad
+
+
 + need tree + rock decorations for outdoors
 
 + only static lights from windows
