@@ -3,7 +3,7 @@ import Point2DClass from '../../code/utility/2D_point.js';
 import LineClass from '../../code/utility/line.js';
 import BoundClass from '../../code/utility/bound.js';
 import MapMeshVertexClass from '../../code/map/map_mesh_vertex.js';
-import CollisionRectClass from '../../code/utility/collision_rect.js';
+import CollisionTrigClass from '../../code/utility/collision_trig.js';
 
 //
 // special class used to pre-calc some
@@ -78,8 +78,8 @@ export default class MapMeshClass
         this.simpleCollisionGeometry=false;
         
         this.collisionLines=[];
-        this.collisionFloorRects=[];
-        this.collisionCeilingRects=[];
+        this.collisionFloorTrigs=[];
+        this.collisionCeilingTrigs=[];
         
             // marks if the vertices have changed
             // and a buffer update is required
@@ -347,44 +347,7 @@ export default class MapMeshClass
 
         this.collisionLines.push(line);
     }
-    
-    buildCollisionGeometryRect(v0,v1,v2,rectList)
-    {
-        let n,nRect,cRect;
-        let lft,top,rgt,bot;
         
-            // get 2D box
-            
-        lft=rgt=v0.position.x;
-        top=bot=v0.position.z;
-        
-        if (v1.position.x<lft) lft=v1.position.x;
-        if (v2.position.x<lft) lft=v2.position.x;
-        if (v1.position.x>rgt) rgt=v1.position.x;
-        if (v2.position.x>rgt) rgt=v2.position.x;
-        
-        if (v1.position.z<top) top=v1.position.z;
-        if (v2.position.z<top) top=v2.position.z;
-        if (v1.position.z>bot) bot=v1.position.z;
-        if (v2.position.z>bot) bot=v2.position.z;
-        
-            // build the rect
-        
-        cRect=new CollisionRectClass(lft,top,rgt,bot,v0.position.y);
-        
-            // is rect already in list?
-            // usually, two triangles make
-            // a single rectangle
-
-        nRect=rectList.length;
-
-        for (n=0;n!==nRect;n++) {
-            if (rectList[n].equals(cRect)) return;
-        }
-
-        rectList.push(cRect);
-    }
-    
     buildCollisionGeometry()
     {
         let n,ny;
@@ -401,8 +364,10 @@ export default class MapMeshClass
             this.collisionLines.push(new LineClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max)));
             this.collisionLines.push(new LineClass(new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max)));
             
-            this.collisionFloorRects.push(new CollisionRectClass(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.min));
-            this.collisionCeilingRects.push(new CollisionRectClass(this.xBound.min,this.zBound.min,this.xBound.max,this.zBound.max,this.yBound.max));
+            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max)));
+            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max)));
+            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max)));
+            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max)));
             return;
         }
 
@@ -426,14 +391,14 @@ export default class MapMeshClass
                 // detect if triangle is a floor
                 
             if (ny<=-0.7) {
-                this.buildCollisionGeometryRect(v0,v1,v2,this.collisionFloorRects);
+                this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(v0.position.x,v0.position.y,v0.position.z),new PointClass(v1.position.x,v1.position.y,v1.position.z),new PointClass(v2.position.x,v2.position.y,v2.position.z)));
             }
             
                 // detect if triangle is a ceiling
                 
             else {
                 if (ny>=0.7) {
-                    this.buildCollisionGeometryRect(v0,v1,v2,this.collisionCeilingRects);
+                    this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(v0.position.x,v0.position.y,v0.position.z),new PointClass(v1.position.x,v1.position.y,v1.position.z),new PointClass(v2.position.x,v2.position.y,v2.position.z)));
                 }
 
                     // detect if triangle is wall like
@@ -470,16 +435,16 @@ export default class MapMeshClass
             this.collisionLines[n].addPoint(movePnt);
         }
         
-        nCollide=this.collisionFloorRects.length;
+        nCollide=this.collisionFloorTrigs.length;
         
         for (n=0;n!==nCollide;n++) {
-            this.collisionFloorRects[n].addPoint(movePnt);
+            this.collisionFloorTrigs[n].addPoint(movePnt);
         }
         
-        nCollide=this.collisionCeilingRects.length;
+        nCollide=this.collisionCeilingTrigs.length;
         
         for (n=0;n!==nCollide;n++) {
-            this.collisionCeilingRects[n].addPoint(movePnt);
+            this.collisionCeilingTrigs[n].addPoint(movePnt);
         }
             
             // and finally the bounds

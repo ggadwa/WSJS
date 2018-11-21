@@ -9,22 +9,21 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-- outdoor lights need special operations
+- outdoor lights need special operations (a square lighting rig?)
 
-- walking on ground falls through
-- collisionFloorRect doubles on squares instead of triangles, might need to be triangles
+- start using ray tracer for walking on floor/ceiling segments
+- getting stuck on ceilings when jumping (try hallways)
 - get rid of rooms.length===1 to always make outdoors
-
 - grass is bad
+- need outside walls for outdoor areas
 
+- need tree + rock decorations for outdoors
 
-+ need tree + rock decorations for outdoors
+- only static lights from windows
+- whats with the resetAnimation errors (on monster wake)
+- monster meele, fire and meele sounds
 
-+ only static lights from windows
-+ whats with the resetAnimation errors (on monster wake)
-+ monster meele, fire and meele sounds
-
-----> Get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW
+- get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW
 
     setMovementForward(on)
     setMovementBackward(on)
@@ -43,20 +42,13 @@ WebGL2
     setProjectile(projectile)
     setAltProjectile(altProjectile)
 
-
-+ constants need to be with objects
-
-+ fix the binding bug on projectiles
-+ close() -> release()
-+ playerEntity makes weapons
-
-
-***** TRACK ALL initialize/release, and don't use close()
-
-
-+ projectiles have ammo & time to fire on them
-+ weapons have two projectiles only, ammo on projectiles
---> bounce projectiles can bounce forever
---> projectile speed needs to be > entity speed
---> stuff in genMap that can go to constants
---> 3rd person view
+- constants need to be with objects (when statics are there)
+- fix the binding bug on projectiles
+- playerEntity makes weapons
+- track all initialize/release, and don't use close()
+- projectiles have ammo & time to fire on them
+- weapons have two projectiles only, ammo on projectiles
+- bounce projectiles can bounce forever
+- projectile speed needs to be > entity speed
+- stuff in genMap that can go to constants
+- 3rd person view

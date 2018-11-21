@@ -316,8 +316,8 @@ export default class CollisionClass
     
     fallObjectInMap(entity,fallY)
     {
-        let n,k,nMesh,nCollisionRect;
-        let mesh,collisionRect;
+        let n,k,nMesh,nCollisionTrig;
+        let mesh,collisionTrig;
 
             // the rough collide boxes
             
@@ -339,17 +339,17 @@ export default class CollisionClass
 
             if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
 
-                // check the collide rects
+                // check the collide triangles
                 // if we are within the fall, then
                 // return the ground
 
-            nCollisionRect=mesh.collisionFloorRects.length;
+            nCollisionTrig=mesh.collisionFloorTrigs.length;
 
-            for (k=0;k!==nCollisionRect;k++) {
-                collisionRect=mesh.collisionFloorRects[k];
-                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionFloorTrigs[k];
+                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
                     entity.standOnMeshIdx=n;
-                    return(collisionRect.y-entity.position.y);
+                    return(collisionTrig.v0.y-entity.position.y);
                 }
             }
         }
@@ -366,9 +366,9 @@ export default class CollisionClass
         
     riseObjectInMap(entity,riseY)
     {
-        let n,k,nMesh,nCollisionRect;
-        let mesh,collisionRect;
-
+        let n,k,nMesh,nCollisionTrig;
+        let mesh,collisionTrig;
+        
             // the rough collide boxes
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
@@ -394,13 +394,13 @@ export default class CollisionClass
                 // if we are within the rise, then
                 // bound to the ceiling
 
-            nCollisionRect=mesh.collisionCeilingRects.length;
+            nCollisionTrig=mesh.collisionCeilingTrigs.length;
 
-            for (k=0;k!==nCollisionRect;k++) {
-                collisionRect=mesh.collisionCeilingRects[k];
-                if (collisionRect.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionCeilingTrigs[k];
+                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
                     entity.collideCeilingMeshIdx=n;
-                    return(collisionRect.y-(entity.position.y-entity.high));
+                    return(collisionTrig.v0.y-(entity.position.y-entity.high));
                 }
             }
         }
