@@ -1151,7 +1151,7 @@ export default class GenMapClass
             // randomize outside rooms
             
         this.map.meshList.randomizeXZVertexes(constants.MESH_FLAG_ROOM_FENCE,[constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_DECORATION],this.yBase,0.9,0.1);
-        this.map.meshList.randomizeYVertexes(constants.MESH_FLAG_ROOM_GROUND,[constants.MESH_FLAG_ROOM_FLOOR,constants.MESH_FLAG_DECORATION],this.yBase,0,Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2));
+        this.map.meshList.randomizeYVertexes(constants.MESH_FLAG_ROOM_GROUND,[constants.MESH_FLAG_ROOM_FLOOR,constants.MESH_FLAG_DECORATION],this.yBase,0,constants.BUMP_HEIGHT);
         
             // overlay precalc
             

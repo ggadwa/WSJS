@@ -82,7 +82,7 @@ export default class CollisionTrigClass
     rayTrace(pnt,rayVct)
     {
 	let det,invDet,t,u,v;
-	
+        
             // calculate the cross product and
             // then the inner product to get the
             // determinate

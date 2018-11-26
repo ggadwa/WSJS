@@ -9,9 +9,12 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
+- start using ray tracer for walking on floor/ceiling segments
+  - need to do grid of rays
+
 - outdoor lights need special operations (a square lighting rig?)
 
-- start using ray tracer for walking on floor/ceiling segments
+
 - getting stuck on ceilings when jumping (try hallways)
 - get rid of rooms.length===1 to always make outdoors
 - grass is bad

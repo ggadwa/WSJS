@@ -13,8 +13,6 @@ export default class CollisionClass
     {
         this.map=map;
         
-        this.BUMP_HIGH=1000;
-
         this.spokePt=new PointClass(0,0,0);        // these are global to avoid it being local and GCd
         this.spokeHitPt=new PointClass(0,0,0);
         this.spokeLine=new LineClass(null,null);
@@ -26,7 +24,15 @@ export default class CollisionClass
         this.testPt=new PointClass(0,0,0);
         this.moveIntersectPt=new PointClass(0,0,0);
         this.radiusPt=new PointClass(0,0,0);
-
+        
+        this.rayTopLeftPoint=new PointClass(0,0,0);
+        this.rayTopRightPoint=new PointClass(0,0,0);
+        this.rayBottomLeftPoint=new PointClass(0,0,0);
+        this.rayBottomRightPoint=new PointClass(0,0,0);
+        this.rayMidPoint=new PointClass(0,0,0);
+        
+        this.rayVector=new PointClass(0,0,0);
+        
         this.objXBound=new BoundClass(0,0);
         this.objYBound=new BoundClass(0,0);
         this.objZBound=new BoundClass(0,0);
@@ -228,7 +234,7 @@ export default class CollisionClass
                         currentHitPt=this.moveIntersectPt;
                         currentDist=dist;
                         bumpY=-1;
-                        if ((this.testPt.y-yBound.min)<this.BUMP_HIGH) bumpY=yBound.min;
+                        if ((this.testPt.y-yBound.min)<=constants.BUMP_HEIGHT) bumpY=yBound.min;
                     }
                 }
             }
@@ -267,7 +273,7 @@ export default class CollisionClass
                     currentDist=dist;
                     
                     bumpY=-1;
-                    if ((this.testPt.y-entityTopY)<this.BUMP_HIGH) bumpY=entityTopY;
+                    if ((this.testPt.y-entityTopY)<=constants.BUMP_HEIGHT) bumpY=entityTopY;
                 }
             }
 
@@ -316,14 +322,50 @@ export default class CollisionClass
     
     fallObjectInMap(entity,fallY)
     {
-        let n,k,nMesh,nCollisionTrig;
-        let mesh,collisionTrig;
+        let n,k,y,nMesh,nCollisionTrig;
+        let mesh,collisionTrig,rayHitPnt;
 
             // the rough collide boxes
+            // we use the bump height to be the tallest
+            // triangle we can climb
             
+        y=entity.position.y-constants.BUMP_HEIGHT;
+        
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues((entity.position.y-fallY),(entity.position.y+fallY));
+        this.objYBound.setFromValues(y,(entity.position.y+fallY));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
+        
+            // the five (4 corner, 1 middle) ray point and vector
+            
+        this.rayTopLeftPoint.x=this.objXBound.min;
+        this.rayTopLeftPoint.y=y;
+        this.rayTopLeftPoint.z=this.objZBound.min;
+        
+        this.rayTopRightPoint.x=this.objXBound.max;
+        this.rayTopRightPoint.y=y;
+        this.rayTopRightPoint.z=this.objZBound.min;
+        
+        this.rayBottomLeftPoint.x=this.objXBound.min;
+        this.rayBottomLeftPoint.y=y;
+        this.rayBottomLeftPoint.z=this.objZBound.max;
+        
+        this.rayBottomRightPoint.x=this.objXBound.max;
+        this.rayBottomRightPoint.y=y;
+        this.rayBottomRightPoint.z=this.objZBound.max;
+        
+        this.rayMidPoint.x=entity.position.x;
+        this.rayMidPoint.y=y;
+        this.rayMidPoint.z=entity.position.z;
+        
+        this.rayVector.x=0;
+        this.rayVector.y=fallY*2;
+        this.rayVector.z=0;
+        
+            // start with no hits
+            
+        entity.standOnMeshIdx=-1;
+        
+            // run through colliding trigs
         
         nMesh=this.map.meshList.meshes.length;
         
@@ -348,15 +390,56 @@ export default class CollisionClass
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionFloorTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    entity.standOnMeshIdx=n;
-                    return(collisionTrig.v0.y-entity.position.y);
+                    
+                    y=entity.position.y+fallY;
+                    
+                    rayHitPnt=collisionTrig.rayTrace(this.rayTopLeftPoint,this.rayVector);
+                    if (rayHitPnt!==null) {
+                        if (rayHitPnt.y<=y) {
+                            entity.standOnMeshIdx=n;
+                            y=rayHitPnt.y;
+                        }
+                    }
+                    
+                    rayHitPnt=collisionTrig.rayTrace(this.rayTopRightPoint,this.rayVector);
+                    if (rayHitPnt!==null) {
+                        if (rayHitPnt.y<=y) {
+                            entity.standOnMeshIdx=n;
+                            y=rayHitPnt.y;
+                        }
+                    }
+                    
+                    rayHitPnt=collisionTrig.rayTrace(this.rayBottomLeftPoint,this.rayVector);
+                    if (rayHitPnt!==null) {
+                        if (rayHitPnt.y<=y) {
+                            entity.standOnMeshIdx=n;
+                            y=rayHitPnt.y;
+                        }
+                    }
+                    
+                    rayHitPnt=collisionTrig.rayTrace(this.rayBottomRightPoint,this.rayVector);
+                    if (rayHitPnt!==null) {
+                        if (rayHitPnt.y<=y) {
+                            entity.standOnMeshIdx=n;
+                            y=rayHitPnt.y;
+                        }
+                    }
+                    
+                    rayHitPnt=collisionTrig.rayTrace(this.rayMidPoint,this.rayVector);
+                    if (rayHitPnt!==null) {
+                        if (rayHitPnt.y<=y) {
+                            entity.standOnMeshIdx=n;
+                            y=rayHitPnt.y;
+                        }
+                    }
+                        
+                    if (entity.standOnMeshIdx!==-1) return(y-entity.position.y);
                 }
             }
         }
         
             // else return the fall
         
-        entity.standOnMeshIdx=-1;
         return(fallY);
     }
     
