@@ -9,20 +9,14 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-- start using ray tracer for walking on floor/ceiling segments
-  - need to do grid of rays
-
-- outdoor lights need special operations (a square lighting rig?)
-
+- bump is broken (need to do rays differently, always need middle, 4 corners, maybe use spokes?)
+- ceiling needs same ray hits
 
 - getting stuck on ceilings when jumping (try hallways)
 - get rid of rooms.length===1 to always make outdoors
 - grass is bad
 - need outside walls for outdoor areas
-
 - need tree + rock decorations for outdoors
-
-- only static lights from windows
 - whats with the resetAnimation errors (on monster wake)
 - monster meele, fire and meele sounds
 

@@ -258,7 +258,9 @@ export default class EntityClass
         if (yAdd>=0) {
             this.collideCeilingMeshIdx=-1;                         // no ceiling collisions if going down
 
-            fallY=this.collision.fallObjectInMap(this,yAdd);
+            fallY=this.collision.fallObjectInMap(this);
+            if (fallY>yAdd) fallY=yAdd;                             // can only drop as far as current fall
+            
             this.position.addValuesTrunc(0,fallY,0);
         
             if (fallY<=0) this.gravity=this.gravityMinValue;

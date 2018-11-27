@@ -25,11 +25,8 @@ export default class CollisionClass
         this.moveIntersectPt=new PointClass(0,0,0);
         this.radiusPt=new PointClass(0,0,0);
         
-        this.rayTopLeftPoint=new PointClass(0,0,0);
-        this.rayTopRightPoint=new PointClass(0,0,0);
-        this.rayBottomLeftPoint=new PointClass(0,0,0);
-        this.rayBottomRightPoint=new PointClass(0,0,0);
-        this.rayMidPoint=new PointClass(0,0,0);
+        this.rayPoints=[];
+        this.createRayPoints();
         
         this.rayVector=new PointClass(0,0,0);
         
@@ -50,6 +47,15 @@ export default class CollisionClass
             this.spokeCalcSin[n]=Math.sin(rad);
             this.spokeCalcCos[n]=Math.cos(rad);
             rad+=radAdd;
+        }
+    }
+    
+    createRayPoints()
+    {
+        let n;
+        
+        for (n=0;n!=16;n++) {
+            this.rayPoints.push(new PointClass(0,0,0));
         }
     }
     
@@ -320,50 +326,60 @@ export default class CollisionClass
     // floor collisions
     //
     
-    fallObjectInMap(entity,fallY)
+    buildYCollisionRayPointsAndVector(entity)
     {
-        let n,k,y,nMesh,nCollisionTrig;
+        let x,z,px,py,pz,radiusAdd;
+        let idx;
+        
+            // ray points start above and the
+            // vector heads down
+
+        py=entity.position.y-constants.FLOOR_RISE_HEIGHT;
+        
+            // the 16 points
+            
+        idx=0;
+        radiusAdd=(entity.radius*2)/4.0;
+        
+        for (z=0;z!==4;z++) {
+            pz=Math.trunc((entity.position.z-entity.radius)+(radiusAdd*z));
+            
+            for (x=0;x!==4;x++) {
+                px=Math.trunc((entity.position.x-entity.radius)+(radiusAdd*x));
+                this.rayPoints[idx++].setFromValues(px,py,pz);
+            }
+        }
+
+            // and the vector, facing down
+            
+        this.rayVector.x=0;
+        this.rayVector.y=constants.FLOOR_RISE_HEIGHT*2;
+        this.rayVector.z=0;
+    }
+    
+    fallObjectInMap(entity)
+    {
+        let n,k,i,y,nMesh,nCollisionTrig;
         let mesh,collisionTrig,rayHitPnt;
 
             // the rough collide boxes
             // we use the bump height to be the tallest
             // triangle we can climb
             
-        y=entity.position.y-constants.BUMP_HEIGHT;
+        y=entity.position.y-constants.FLOOR_RISE_HEIGHT;
         
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues(y,(entity.position.y+fallY));
+        this.objYBound.setFromValues(y,(entity.position.y+constants.FLOOR_RISE_HEIGHT));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
-            // the five (4 corner, 1 middle) ray point and vector
+            // build the 16 ray trace points and ray vector
             
-        this.rayTopLeftPoint.x=this.objXBound.min;
-        this.rayTopLeftPoint.y=y;
-        this.rayTopLeftPoint.z=this.objZBound.min;
-        
-        this.rayTopRightPoint.x=this.objXBound.max;
-        this.rayTopRightPoint.y=y;
-        this.rayTopRightPoint.z=this.objZBound.min;
-        
-        this.rayBottomLeftPoint.x=this.objXBound.min;
-        this.rayBottomLeftPoint.y=y;
-        this.rayBottomLeftPoint.z=this.objZBound.max;
-        
-        this.rayBottomRightPoint.x=this.objXBound.max;
-        this.rayBottomRightPoint.y=y;
-        this.rayBottomRightPoint.z=this.objZBound.max;
-        
-        this.rayMidPoint.x=entity.position.x;
-        this.rayMidPoint.y=y;
-        this.rayMidPoint.z=entity.position.z;
-        
-        this.rayVector.x=0;
-        this.rayVector.y=fallY*2;
-        this.rayVector.z=0;
+        this.buildYCollisionRayPointsAndVector(entity);
         
             // start with no hits
-            
+       
         entity.standOnMeshIdx=-1;
+        y=entity.position.y+constants.FLOOR_RISE_HEIGHT;
         
             // run through colliding trigs
         
@@ -384,63 +400,34 @@ export default class CollisionClass
                 // check the collide triangles
                 // if we are within the fall, then
                 // return the ground
+                
+                // first check by a rough, then run all
+                // the rays to find the highest hit
 
             nCollisionTrig=mesh.collisionFloorTrigs.length;
 
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionFloorTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    
-                    y=entity.position.y+fallY;
-                    
-                    rayHitPnt=collisionTrig.rayTrace(this.rayTopLeftPoint,this.rayVector);
-                    if (rayHitPnt!==null) {
-                        if (rayHitPnt.y<=y) {
-                            entity.standOnMeshIdx=n;
-                            y=rayHitPnt.y;
+                    for (i=0;i!==16;i++) {
+                        rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
+                        if (rayHitPnt!==null) {
+                            if (rayHitPnt.y<=y) {
+                                entity.standOnMeshIdx=n;
+                                y=rayHitPnt.y;
+                            }
                         }
                     }
-                    
-                    rayHitPnt=collisionTrig.rayTrace(this.rayTopRightPoint,this.rayVector);
-                    if (rayHitPnt!==null) {
-                        if (rayHitPnt.y<=y) {
-                            entity.standOnMeshIdx=n;
-                            y=rayHitPnt.y;
-                        }
-                    }
-                    
-                    rayHitPnt=collisionTrig.rayTrace(this.rayBottomLeftPoint,this.rayVector);
-                    if (rayHitPnt!==null) {
-                        if (rayHitPnt.y<=y) {
-                            entity.standOnMeshIdx=n;
-                            y=rayHitPnt.y;
-                        }
-                    }
-                    
-                    rayHitPnt=collisionTrig.rayTrace(this.rayBottomRightPoint,this.rayVector);
-                    if (rayHitPnt!==null) {
-                        if (rayHitPnt.y<=y) {
-                            entity.standOnMeshIdx=n;
-                            y=rayHitPnt.y;
-                        }
-                    }
-                    
-                    rayHitPnt=collisionTrig.rayTrace(this.rayMidPoint,this.rayVector);
-                    if (rayHitPnt!==null) {
-                        if (rayHitPnt.y<=y) {
-                            entity.standOnMeshIdx=n;
-                            y=rayHitPnt.y;
-                        }
-                    }
-                        
-                    if (entity.standOnMeshIdx!==-1) return(y-entity.position.y);
                 }
             }
         }
+            
+        if (entity.standOnMeshIdx!==-1) return(y-entity.position.y);
         
-            // else return the fall
+            // if no collisions, return the
+            // farthest part of the ray
         
-        return(fallY);
+        return(constants.FLOOR_RISE_HEIGHT);
     }
     
         //

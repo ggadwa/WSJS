@@ -33,7 +33,8 @@ export const ROOM_BLOCK_WIDTH=8000;                     // x/z dimension of a bl
 export const ROOM_FLOOR_HEIGHT=8000;                    // how tall each floor of a room is
 export const ROOM_FLOOR_DEPTH=700;                      // the depth of the area between floors
 
-export const BUMP_HEIGHT=1000;                          // heights we can bump up (also highest we can move up a slanted floor)
+export const BUMP_HEIGHT=1000;                          // heights we can bump up
+export const FLOOR_RISE_HEIGHT=2000;                    // heights we can move up or down on a slanted triangle
             
 export const ROOM_SIDE_LEFT=0;
 export const ROOM_SIDE_TOP=1;

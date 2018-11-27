@@ -13,11 +13,12 @@ uniform mediump float glowFactor;
 struct lightType {
     highp vec4 positionIntensity;
     mediump vec4 colorExponent;
+    highp vec2 boxXBound,boxZBound;
 };
 
 uniform lightType lights[24];
 
-in highp vec3 eyeVector,eyePosition;
+in highp vec3 mapPosition,eyeVector,eyePosition;
 in highp vec2 fragUV;
 in mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
@@ -26,7 +27,7 @@ out lowp vec4 outputPixel;
 void main(void)
 {
     lowp float att;
-    highp float dist;
+    highp float intensity,dist;
     highp vec3 lightVector,lightVertexVector;
 
         // the default light color is the ambient
@@ -55,16 +56,55 @@ void main(void)
 
     for (int n=0;n!=24;n++) {
 
+            // if intensity = 0.0, then light is off
+
+        intensity=lights[n].positionIntensity.w;
+        if (intensity==0.0) continue;
+
             // get vector for light
 
         lightVector=lights[n].positionIntensity.xyz-eyePosition;
 
+            // if intensity = -1.0, then light is a boundary box light
+
+        if (intensity==-1.0) {
+
+                // for now, only check x/z as outdoor lights are ambients
+                // x = min, y = max
+
+            if ((mapPosition.x<lights[n].boxXBound.x) || (mapPosition.x>lights[n].boxXBound.y)) continue;
+            if ((mapPosition.z<lights[n].boxZBound.x) || (mapPosition.z>lights[n].boxZBound.y)) continue;
+
+                // add in the light (no attenuation)
+
+            lightCol+=lights[n].colorExponent.rgb;
+
+                // per-light bump calc (in tangent space)
+
+            lightVertexVector.x=dot(lightVector,tangentSpaceTangent);
+            lightVertexVector.y=dot(lightVector,tangentSpaceBinormal);
+            lightVertexVector.z=dot(lightVector,tangentSpaceNormal);
+
+            bumpLightVertexVector=normalize(lightVertexVector);
+            bump+=dot(bumpLightVertexVector,bumpMap);
+
+                // per-light spec count
+
+            specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
+            specFactor=max(dot(bumpMap,specHalfVector),0.0);
+            spec+=(specMap*pow(specFactor,shineFactor));
+
+            continue;
+        }
+
+            // otherwise it's a normal radial light
+
         dist=length(lightVector);
-        if (dist<lights[n].positionIntensity.w) {
+        if (dist<intensity) {
 
                 // the lighting attenuation
 
-            att=1.0-(dist/lights[n].positionIntensity.w);
+            att=1.0-(dist/intensity);
             att+=pow(att,lights[n].colorExponent.w);
             lightCol+=(lights[n].colorExponent.rgb*att);
 

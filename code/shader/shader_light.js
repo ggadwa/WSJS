@@ -8,6 +8,8 @@ export default class ShaderLightClass
     {
         this.positionIntensityUniform=null;
         this.colorExponentUniform=null;
+        this.boxXBoundUniform=null;
+        this.boxZBoundUniform=null;
         
         Object.seal(this);
     }

@@ -115,38 +115,6 @@ export default class ShaderClass
         this.callback();
     }
     
-    
-    
-    
-/*
-    initialize2(name,callback)
-    {
-        let gl=this.view.gl;
-
-        if (!this.loadFragmentShader(name)) {
-            this.release();
-            return;
-        }
-    initialize(name,callback)
-    {
-        let gl=this.view.gl;
-
-            // compile the program
-
-        this.program=gl.createProgram();
-        gl.attachShader(this.program,this.vertexShader);
-        gl.attachShader(this.program,this.fragmentShader);
-        gl.linkProgram(this.program);
-
-        if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
-            this.errorAlert(name,"program",gl.getProgramInfoLog(this.program));
-            this.release();
-            return;
-        }
-
-        callback();
-    }
-*/
     release()
     {
         let gl=this.view.gl;
@@ -169,62 +137,7 @@ export default class ShaderClass
         this.fragmentShader=null;
         this.program=null;
     }
-    
-        //
-        // load files
-        //
-        /*
-    loadFile(fileName,callback)
-    {
-        let req,res;
-        
-            // ajax the file
 
-        req=new XMLHttpRequest();
-
-        req.open('GET',fileName,true);
-        req.overrideMimeType('text/plain');
-
-        req.onreadystatechange=function() {
-            if (req.readyState!==4) return;
-            res=req.responseText;
-            if (res!==null) {
-                if (res.length===0) res=null;
-            }
-            if (res===null) {
-                alert('Missing File: '+fileName);
-                return;
-            }
-
-            callback(fileName,res);
-        };
-
-        req.send(null);
-    }
-    
-        //
-        // load shaders
-        //
-        
-    loadFragmentShader3(name)
-    {
-        this.loadFile(('shaders/'+name+'.frag'),this.loadFragmentShader2.bind(this));
-    }
-    
-    loadFragmentShader2(fileName,source)
-    {
-        let gl=this.view.gl;
-        
-        this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(this.fragmentShader,source);
-        gl.compileShader(this.fragmentShader);
-
-        if (gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) return(true);
-
-        this.errorAlert(fileName,"fragment",gl.getShaderInfoLog(this.fragmentShader));
-        return(false);
-    }
-   */
         //
         // shader errors
         //

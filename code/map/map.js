@@ -28,9 +28,6 @@ export default class MapClass
         this.DESIGN_SPARSE=0;
         this.DESIGN_MEDIUM=1;
         this.DESIGN_COMPACT=2;
-        
-        this.STYLE_INDOOR=0;
-        this.STYLE_OUTDOOR=1;
             
             // variables
         

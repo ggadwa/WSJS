@@ -26,10 +26,22 @@ export default class BoundClass
         }
     }
     
+    setFromBound(bound)
+    {
+        this.min=bound.min;
+        this.max=bound.max;
+    }
+    
     add(addValue)
     {
         this.min+=addValue;
         this.max+=addValue;
+    }
+    
+    grow(growValue)
+    {
+        this.min-=growValue;
+        this.max+=growValue;
     }
                 
     getMidPoint()

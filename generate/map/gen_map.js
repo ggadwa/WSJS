@@ -411,10 +411,16 @@ export default class GenMapClass
         // lights
         //
 
-    addGeneralLight(lightPos,fixturePos,rotAngle,intensity,allowNonStaticLight,outdoor)
+    addGeneralLight(room,lightPos,fixturePos,rotAngle,intensity,allowNonStaticLight)
     {
-        let light,red,green,blue,exponent;
+        let light,red,green,blue,exponent,outdoor;
         let xFixtureBound,yFixtureBound,zFixtureBound;
+        
+            // outdoor lights are cast to a box boundary
+            // instead of radial
+            
+        outdoor=false;
+        if (room!==null) outdoor=room.outdoor;
 
             // light fixture
 
@@ -439,15 +445,27 @@ export default class GenMapClass
             // the exponent
             // if sunlight (for outdoors) than exponent
             // is 0.0 so it's hard light with no drop off
+            // this is ignored in boundary rooms
         
-        exponent=0.0;
-        if (!outdoor) exponent=this.ROOM_LIGHT_EXPONENT_MINIMUM+(genRandom.random()*this.ROOM_LIGHT_EXPONENT_EXTRA);
+        exponent=this.ROOM_LIGHT_EXPONENT_MINIMUM+(genRandom.random()*this.ROOM_LIGHT_EXPONENT_EXTRA);
 
             // add light to map
 
         light=new LightClass(lightPos,new ColorClass(red,green,blue),intensity,exponent);
-        if ((allowNonStaticLight) && (!outdoor)) light.setRandomLightType(this.view.timeStamp);
+        if (allowNonStaticLight) light.setRandomLightType(this.view.timeStamp);
         this.map.lightList.add(light);
+        
+            // outdoor lights are bound to their room
+            // grow them a bit to catch some light seeping into other areas
+            
+        if (outdoor) {
+            light.isBoxBound=true;
+            light.boxXBound.setFromBound(room.xBound);
+            light.boxZBound.setFromBound(room.zBound);
+            
+            light.boxXBound.grow(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1));
+            light.boxZBound.grow(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1));
+        }
 
         return(light);
     }
@@ -478,7 +496,7 @@ export default class GenMapClass
                 // create the light
                 // remember this because later windows can reduce indoor light
 
-            room.mainLight=this.addGeneralLight(lightPos,fixturePos,null,intensity,true,false);
+            room.mainLight=this.addGeneralLight(room,lightPos,fixturePos,null,intensity,true);
         }
         else {
 
@@ -494,7 +512,7 @@ export default class GenMapClass
                 // create the light
                 // remember this because later windows can reduce indoor light
 
-            room.mainLight=this.addGeneralLight(lightPos,null,null,intensity,true,true);
+            room.mainLight=this.addGeneralLight(room,lightPos,null,null,intensity,true);
         }
     }
     
@@ -508,7 +526,7 @@ export default class GenMapClass
         if (hallwayMode===this.HALLWAY_LONG) {
             fixturePos=new PointClass(xBound.getMidPoint(),(this.yBase-constants.ROOM_FLOOR_HEIGHT),zBound.getMidPoint());
             lightPos=new PointClass(fixturePos.x,(fixturePos.y+1100),fixturePos.z);
-            this.addGeneralLight(lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY,true,false);
+            this.addGeneralLight(null,lightPos,fixturePos,null,this.HALLWAY_LIGHT_INTENSITY,true);
         }
         
             // ends
@@ -546,13 +564,13 @@ export default class GenMapClass
         if (startOK) {
             fixturePos=new PointClass((xBound.getMidPoint()+xAdd),y,(zBound.getMidPoint()+zAdd));
             lightPos=new PointClass((fixturePos.x+xAdd2),fixturePos.y,(fixturePos.z+zAdd2));
-            this.addGeneralLight(lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true,false);
+            this.addGeneralLight(null,lightPos,fixturePos,rot1,this.DOOR_LIGHT_INTENSITY,true);
         }
         
         if (endOK) {
             fixturePos=new PointClass((xBound.getMidPoint()-xAdd),y,(zBound.getMidPoint()-zAdd));
             lightPos=new PointClass((fixturePos.x-xAdd2),fixturePos.y,(fixturePos.z-zAdd2));
-            this.addGeneralLight(lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true,false);
+            this.addGeneralLight(null,lightPos,fixturePos,rot2,this.DOOR_LIGHT_INTENSITY,true);
         }
     }
   
@@ -1151,7 +1169,7 @@ export default class GenMapClass
             // randomize outside rooms
             
         this.map.meshList.randomizeXZVertexes(constants.MESH_FLAG_ROOM_FENCE,[constants.MESH_FLAG_ROOM_WALL,constants.MESH_FLAG_DECORATION],this.yBase,0.9,0.1);
-        this.map.meshList.randomizeYVertexes(constants.MESH_FLAG_ROOM_GROUND,[constants.MESH_FLAG_ROOM_FLOOR,constants.MESH_FLAG_DECORATION],this.yBase,0,constants.BUMP_HEIGHT);
+        this.map.meshList.randomizeYVertexes(constants.MESH_FLAG_ROOM_GROUND,[constants.MESH_FLAG_ROOM_FLOOR,constants.MESH_FLAG_DECORATION],this.yBase,0,constants.FLOOR_RISE_HEIGHT);
         
             // overlay precalc
             
