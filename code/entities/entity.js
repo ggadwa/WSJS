@@ -270,6 +270,10 @@ export default class EntityClass
             
             riseY=this.collision.riseObjectInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);
+            
+            if (riseY>yAdd) {                                       // if we can't get as high as we want, then clear any movement
+                this.movement.y=0;
+            }
         }
     }
     

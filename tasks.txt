@@ -9,10 +9,7 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-- bump is broken (need to do rays differently, always need middle, 4 corners, maybe use spokes?)
-- ceiling needs same ray hits
 
-- getting stuck on ceilings when jumping (try hallways)
 - get rid of rooms.length===1 to always make outdoors
 - grass is bad
 - need outside walls for outdoor areas

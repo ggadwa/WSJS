@@ -54,7 +54,7 @@ export default class CollisionClass
     {
         let n;
         
-        for (n=0;n!=16;n++) {
+        for (n=0;n!=25;n++) {
             this.rayPoints.push(new PointClass(0,0,0));
         }
     }
@@ -326,35 +326,23 @@ export default class CollisionClass
     // floor collisions
     //
     
-    buildYCollisionRayPointsAndVector(entity)
+    buildYCollisionRayPoints(entity,y)
     {
-        let x,z,px,py,pz,radiusAdd;
-        let idx;
+        let n,radius,x,z;
         
-            // ray points start above and the
-            // vector heads down
-
-        py=entity.position.y-constants.FLOOR_RISE_HEIGHT;
+            // use spokes (around the radius) plus
+            // an extra for the middle
         
-            // the 16 points
-            
-        idx=0;
-        radiusAdd=(entity.radius*2)/4.0;
+        radius=entity.radius;
         
-        for (z=0;z!==4;z++) {
-            pz=Math.trunc((entity.position.z-entity.radius)+(radiusAdd*z));
-            
-            for (x=0;x!==4;x++) {
-                px=Math.trunc((entity.position.x-entity.radius)+(radiusAdd*x));
-                this.rayPoints[idx++].setFromValues(px,py,pz);
-            }
+        x=entity.position.x;
+        z=entity.position.z;
+        
+        for (n=0;n!==24;n++) {
+            this.rayPoints[n].setFromValues((x+(radius*this.spokeCalcSin[n])),y,(z+(radius*this.spokeCalcCos[n])));
         }
-
-            // and the vector, facing down
-            
-        this.rayVector.x=0;
-        this.rayVector.y=constants.FLOOR_RISE_HEIGHT*2;
-        this.rayVector.z=0;
+        
+        this.rayPoints[24].setFromValues(x,y,z);
     }
     
     fallObjectInMap(entity)
@@ -363,19 +351,21 @@ export default class CollisionClass
         let mesh,collisionTrig,rayHitPnt;
 
             // the rough collide boxes
-            // we use the bump height to be the tallest
-            // triangle we can climb
+            // floor_rise_height is the farthest
+            // we can move up and down a floor segment
             
-        y=entity.position.y-constants.FLOOR_RISE_HEIGHT;
-        
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues(y,(entity.position.y+constants.FLOOR_RISE_HEIGHT));
+        this.objYBound.setFromValues((entity.position.y-constants.FLOOR_RISE_HEIGHT),(entity.position.y+constants.FLOOR_RISE_HEIGHT));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
-            // build the 16 ray trace points and ray vector
+            // build the ray trace points and ray vector
             
-        this.buildYCollisionRayPointsAndVector(entity);
+        this.buildYCollisionRayPoints(entity,(entity.position.y-constants.FLOOR_RISE_HEIGHT));
         
+        this.rayVector.x=0;
+        this.rayVector.y=constants.FLOOR_RISE_HEIGHT*2;
+        this.rayVector.z=0;
+       
             // start with no hits
        
         entity.standOnMeshIdx=-1;
@@ -409,7 +399,7 @@ export default class CollisionClass
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionFloorTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    for (i=0;i!==16;i++) {
+                    for (i=0;i!==25;i++) {
                         rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
                         if (rayHitPnt!==null) {
                             if (rayHitPnt.y<=y) {
@@ -436,14 +426,30 @@ export default class CollisionClass
         
     riseObjectInMap(entity,riseY)
     {
-        let n,k,nMesh,nCollisionTrig;
-        let mesh,collisionTrig;
+        let n,k,i,y,nMesh,nCollisionTrig;
+        let mesh,collisionTrig,rayHitPnt;
         
             // the rough collide boxes
+            // we check from the top of the object past the rise
+            // (to catch things moving into us or pushing past ceiling)
+            // to the furtherest we are trying to rise
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues(((entity.position.y-entity.high)+riseY),((entity.position.y-entity.high)-riseY));      // riseY is NEGATIVE
+        this.objYBound.setFromValues(((entity.position.y-entity.high)+riseY),((entity.position.y-entity.high)-riseY));      // riseY is negative
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
+        
+            // build the ray trace points and ray vector
+            
+        this.buildYCollisionRayPoints(entity,((entity.position.y-entity.high)-riseY));
+            
+        this.rayVector.x=0;
+        this.rayVector.y=riseY*2;     // riseY is negative
+        this.rayVector.z=0;
+        
+            // start with no hits
+       
+        entity.collideCeilingMeshIdx=-1;
+        y=(entity.position.y-entity.high)+riseY;
         
             // run through the meshes
         
@@ -460,24 +466,36 @@ export default class CollisionClass
 
             if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
 
-                // check the collide rects
+                // check the collide triangles
                 // if we are within the rise, then
                 // bound to the ceiling
+                
+                // first check by a rough, then run all
+                // the rays to find the lowest hit
 
             nCollisionTrig=mesh.collisionCeilingTrigs.length;
 
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionCeilingTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    entity.collideCeilingMeshIdx=n;
-                    return(collisionTrig.v0.y-(entity.position.y-entity.high));
+                    for (i=0;i!==25;i++) {
+                        rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
+                        if (rayHitPnt!==null) {
+                            if (rayHitPnt.y>=y) {
+                                console.log(rayHitPnt.y+'='+y);
+                                entity.collideCeilingMeshIdx=n;
+                                y=rayHitPnt.y;
+                            }
+                        }
+                    }
                 }
             }
         }
         
-            // no hits
+        if (entity.collideCeilingMeshIdx!==-1) return(y-(entity.position.y-entity.high));
         
-        entity.collideCeilingMeshIdx=-1;
+            // if no collisions, return the riseY
+        
         return(riseY);
     }
     
