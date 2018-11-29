@@ -9,7 +9,7 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-
+- might need a non-alias line drawing
 - get rid of rooms.length===1 to always make outdoors
 - grass is bad
 - need outside walls for outdoor areas

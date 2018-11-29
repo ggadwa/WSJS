@@ -21,7 +21,7 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
     generateGrass(bitmapCTX,normalCTX,wid,high)
     {
         let n,x,y;
-        let darken,boost,lineColor;
+        let darken,lineColor;
         let halfHigh=Math.trunc(high*0.5);
         let grassColor=this.getRandomGrassColor();
         
@@ -31,26 +31,20 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
             
         for (x=0;x!==wid;x++) {
             
-                // hair color
+                // grass color
                 
-            //if ((n%2)===0) {
-                darken=0.5+(genRandom.random()*0.3);
-                lineColor=this.darkenColor(grassColor,darken);
-            //}
-            //else {
-            //    boost=0.1+(genRandom.random()*0.3);
-            //    lineColor=this.boostColor(grassColor,boost);
-            //}
+            darken=0.5+(genRandom.random()*0.3);
+            lineColor=this.darkenColor(grassColor,darken);
             
                 // hair half from top
                 
             y=halfHigh+genRandom.randomInt(0,halfHigh);
-            this.drawRandomLine(bitmapCTX,normalCTX,x,-5,x,(y+5),0,0,wid,high,10,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,0,x,(y+5),0,0,wid,high,10,lineColor,false);
             
                 // hair half from bottom
                 
             y=high-(halfHigh+genRandom.randomInt(0,halfHigh));
-            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(high+5),0,0,wid,high,10,lineColor,false);
+            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,high,0,0,wid,high,10,lineColor,false);
         }
     }
     
