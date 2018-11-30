@@ -10,7 +10,7 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
 {
     constructor(view)
     {    
-        super(view);
+        super(view,true,true,false);
         Object.seal(this);
     }
         
@@ -20,14 +20,14 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
         
     generateGrass(bitmapCTX,normalCTX,wid,high)
     {
-        let n,x,y;
+        let x,y;
         let darken,lineColor;
         let halfHigh=Math.trunc(high*0.5);
         let grassColor=this.getRandomGrassColor();
         
         this.drawRect(bitmapCTX,0,0,wid,high,grassColor);
 
-            // hair
+            // grass
             
         for (x=0;x!==wid;x++) {
             
@@ -52,7 +52,7 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high,mx,my;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;

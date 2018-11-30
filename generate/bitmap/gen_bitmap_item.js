@@ -10,7 +10,7 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
 {
     constructor(view)
     {    
-        super(view);
+        super(view,true,true,true);
         Object.seal(this);
     }
     
@@ -34,7 +34,7 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
         for (n=0;n!==buttonCount;n++) {
             color=this.getRandomColor();
             this.draw3DRect(bitmapCTX,normalCTX,x,y,(x+(buttonSize-4)),(y+(buttonSize-4)),2,color,false);
-            if (genRandom.randomPercentage(0.5)) this.drawRect(glowCTX,(x+2),(y+2),(x+(buttonSize-6)),(y+(buttonSize-6)),this.darkenColor(color,0.5));
+            if (genRandom.randomPercentage(0.5)) this.drawGlowRect(glowCTX,(x+2),(y+2),(x+(buttonSize-6)),(y+(buttonSize-6)),color);
             x+=buttonSize;
         }
     }
@@ -105,7 +105,7 @@ export default class GenBitmapItemClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;

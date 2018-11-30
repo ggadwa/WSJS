@@ -11,7 +11,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
-        super(view);
+        super(view,true,true,false);
         Object.seal(this);
     }
         
@@ -74,7 +74,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high,alpha;
         let shineFactor=1.0;

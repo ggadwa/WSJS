@@ -9,6 +9,10 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
+- put bitmapCTX/normalCTX/etc as part of bitmap base
+- do returns as part of base (don't pass debug)
+- remove all bitmapCTX in signatures
+
 - might need a non-alias line drawing
 - get rid of rooms.length===1 to always make outdoors
 - grass is bad

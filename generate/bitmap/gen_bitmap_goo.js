@@ -11,7 +11,7 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
-        super(view);
+        super(view,true,true,true);
         Object.seal(this);
     }
         
@@ -103,7 +103,7 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;

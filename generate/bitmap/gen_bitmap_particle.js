@@ -11,7 +11,7 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
 {
     constructor(view)
     {    
-        super(view);
+        super(view,false,false,false);
         Object.seal(this);
     }
     
@@ -47,7 +47,7 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high;
         let bitmapCanvas,bitmapCTX;

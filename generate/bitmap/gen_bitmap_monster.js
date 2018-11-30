@@ -10,7 +10,7 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
 {
     constructor(view)
     {    
-        super(view);
+        super(view,true,true,true);
         Object.seal(this);
     }
         
@@ -260,7 +260,7 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high,mx,my;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;

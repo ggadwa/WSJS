@@ -10,9 +10,12 @@ import genRandom from '../../generate/utility/random.js';
 
 export default class GenBitmapBaseClass
 {
-    constructor(view)
+    constructor(view,hasNormal,hasSpecular,hasGlow)
     {
         this.view=view;
+        this.hasNormal=hasNormal;
+        this.hasSpecular=hasSpecular;
+        this.hasGlow=hasGlow;
         
             // constants
             
@@ -53,6 +56,17 @@ export default class GenBitmapBaseClass
         this.NORMAL_TOP_RIGHT_45=new PointClass(0.30,0.30,0.70);
         this.NORMAL_BOTTOM_LEFT_45=new PointClass(-0.30,-0.30,0.70);
         this.NORMAL_BOTTOM_RIGHT_45=new PointClass(0.30,-0.30,0.70);
+        
+            // the bitmap, normal, specular, and glow
+            
+        this.bitmapCanvas=null;
+        this.bitmapCTX=null;
+        this.normalCanvas=null;
+        this.normalCTX=null;
+        this.specularCanvas=null;
+        this.specularCTX=null;
+        this.glowCanvas=null;
+        this.glowCTX=null;
         
             // current clip rect
             
@@ -790,12 +804,20 @@ export default class GenBitmapBaseClass
         // rectangles, ovals, lines
         //
 
-    drawRect(ctx,lft,top,rgt,bot,color)
+    drawRect(bitmapCTX,lft,top,rgt,bot,color)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
-        ctx.fillStyle=this.colorToRGBColor(color);
-        ctx.fillRect(lft,top,(rgt-lft),(bot-top));
+        bitmapCTX.fillStyle=this.colorToRGBColor(color);
+        bitmapCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+    }
+    
+    drawGlowRect(glowCTX,lft,top,rgt,bot,color)
+    {
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        glowCTX.fillStyle=this.colorToRGBColor(this.darkenColor(color,0.5));
+        glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
 
     draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,color,faceOut)
@@ -1557,6 +1579,58 @@ export default class GenBitmapBaseClass
         }
 
         normalCTX.fill();
+    }
+    
+    drawLine2(ctx,imgWid,imgHigh,x,y,x2,y2,color)
+    {
+        let n,xLen,yLen,dif,dx,dy,slope,idx;
+        let bitmapImgData,bitmapData;
+        let r=Math.trunc(color.r*255.0);
+        let g=Math.trunc(color.g*255.0);
+        let b=Math.trunc(color.b*255.0);
+        
+            // get the image data
+
+        bitmapImgData=ctx.getImageData(0,0,imgWid,imgHigh);
+        bitmapData=bitmapImgData.data;
+        
+            // the line
+            
+        xLen=Math.abs(x2-x);
+        yLen=Math.abs(y2-y);
+            
+        if (xLen>yLen) {
+            slope=yLen/xLen;
+            dif=x2-x;
+            
+            for (n=0;n!==xLen;n++) {
+                dx=x+Math.trunc((dif*n)/xLen);
+                dy=y+Math.trunc(slope*n);
+                
+                idx=((dy*imgWid)+dx)*4;
+                bitmapData[idx]=r;
+                bitmapData[idx+1]=g;
+                bitmapData[idx+2]=b;
+            }
+        }
+        else {
+            slope=xLen/yLen;
+            dif=y2-y;
+            
+            for (n=0;n!==yLen;n++) {
+                dx=x+Math.trunc(slope*n);
+                dy=y+Math.trunc((dif*n)/yLen);
+                
+                idx=((dy*imgWid)+dx)*4;
+                bitmapData[idx]=r;
+                bitmapData[idx+1]=g;
+                bitmapData[idx+2]=b;
+            }
+        }
+        
+            // write all the data back
+
+        ctx.putImageData(bitmapImgData,0,0);
     }
 
    
@@ -2636,9 +2710,40 @@ export default class GenBitmapBaseClass
         //
         // generate mainline
         //
+        
+    generateInternal()
+    {
+    }
 
     generate(inDebug)
     {
+        return(this.generateInternal(inDebug));
+        
+        // move bitmap setup here
+        // move returns here
+        // get rid of passing around bitmap etc
+        
+        /*
+        this.bitmapCanvas=document.createElement('canvas');
+        this.bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
+        this.bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
+        this.bitmapCTX=bitmapCanvas.getContext('2d');
+
+        this.normalCanvas=document.createElement('canvas');
+        this.normalCanvas.width=hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.normalCanvas.height=hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.normalCTX=normalCanvas.getContext('2d');
+
+        this.specularCanvas=document.createElement('canvas');
+        this.specularCanvas.width=hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.specularCanvas.height=hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.specularCTX=specularCanvas.getContext('2d');
+        
+        this.glowCanvas=document.createElement('canvas');
+        this.glowCanvas.width=hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.glowCanvas.height=hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.glowCTX=glowCanvas.getContext('2d');
+*/
     }
     
 }

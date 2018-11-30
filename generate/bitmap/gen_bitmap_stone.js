@@ -10,7 +10,7 @@ export default class GenBitmapStoneClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
-        super(view);
+        super(view,true,true,false);
         Object.seal(this);
     }
     
@@ -104,7 +104,7 @@ export default class GenBitmapStoneClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high;
         let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;

@@ -11,7 +11,7 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
-        super(view);
+        super(view,true,true,true);
         Object.seal(this);
     }
     
@@ -134,7 +134,7 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
                 
                     // the possible glow
                     
-                if (genRandom.randomPercentage(0.5)) this.drawRect(glowCTX,(dx+1),(dy+1),(dx+(wid-1)),(dy+(wid-1)),this.darkenColor(color,0.5));
+                if (genRandom.randomPercentage(0.5)) this.drawGlowRect(glowCTX,(dx+1),(dy+1),(dx+(wid-1)),(dy+(wid-1)),color);
             }
         }
     }
@@ -165,7 +165,7 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;

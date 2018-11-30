@@ -11,7 +11,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
 {
     constructor(view)
     {
-        super(view);
+        super(view,true,true,true);
         Object.seal(this);
     }
     
@@ -152,7 +152,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 
                     // the possible glow
                     
-                if (genRandom.randomPercentage(0.5)) this.drawRect(glowCTX,dx,dy,(dx+wid),(dy+wid),this.darkenColor(color,0.5));
+                if (genRandom.randomPercentage(0.5)) this.drawGlowRect(glowCTX,dx,dy,(dx+wid),(dy+wid),color);
             }
         }
     }
@@ -199,7 +199,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 bx=(dx+wid)-6;
                 by=(dy+high)-6;
                 this.drawRect(bitmapCTX,bx,by,(bx+3),(by+3),ledColor);
-                this.drawRect(glowCTX,bx,by,(bx+3),(by+3),this.darkenColor(ledColor,0.5));
+                this.drawGlowRect(glowCTX,bx,by,(bx+3),(by+3),ledColor);
             }
         }
     }
@@ -326,7 +326,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generate(inDebug)
+    generateInternal(inDebug)
     {
         let wid,high;
         let shineFactor=1.0;
