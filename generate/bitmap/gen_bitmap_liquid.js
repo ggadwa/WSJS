@@ -19,16 +19,16 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
         // liquid
         //
         
-    generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateLiquid(wid,high)
     {
         let n,k,x,y,xAdd,yAdd,lineCount,ovalCount,ovalWid,ovalHigh,ovalColor;
         let color=new ColorClass(genRandom.randomFloat(0.1,0.2),genRandom.randomFloat(0.1,0.2),1.0);
         
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearNormalsRect(0,0,wid,high);
         
             // background
             
-        this.drawRect(bitmapCTX,0,0,wid,high,color);
+        this.drawRect(0,0,wid,high,color);
         
             // water lines
             
@@ -48,7 +48,7 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
                 ovalWid=genRandom.randomInt(50,100);
                 ovalHigh=genRandom.randomInt(50,100);
 
-                this.drawWrappedOval(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),wid,high,ovalColor,null);
+                this.drawWrappedOval(x,y,(x+ovalWid),(y+ovalHigh),wid,high,ovalColor,null);
                 
                 x+=xAdd;
                 if (x<0) x+=wid;
@@ -60,73 +60,40 @@ export default class GenBitmapLiquidClass extends GenBitmapBaseClass
             }
         }
         
-        this.blur(bitmapCTX,0,0,wid,high,5,false);
+        this.blur(0,0,wid,high,5,false);
         
             // noise and blur
         
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.8,0.9,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,10,false);
+        this.addNoiseRect(0,0,wid,high,0.8,0.9,0.9);
+        this.blur(0,0,wid,high,10,false);
         
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
+        this.createSpecularMap(wid,high,0.5);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
-        let wid,high,alpha;
-        let shineFactor=1.0;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
+        let wid,high;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
+            
+        this.shineFactor=1.0;
+        this.alpha=genRandom.randomFloat(0.8,0.2);
 
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateLiquid(bitmapCTX,normalCTX,specularCTX,wid,high);
-                shineFactor=8.0;
+                this.generateLiquid(wid,high);
+                this.shineFactor=8.0;
                 break;
 
         }
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        alpha=genRandom.randomFloat(0.8,0.2);
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,alpha,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 
 }

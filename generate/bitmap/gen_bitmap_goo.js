@@ -19,7 +19,7 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
         // liquid
         //
     
-    drawOvalGradient(bitmapCTX,lft,top,rgt,bot,startColor,endColor)
+    drawOvalGradient(lft,top,rgt,bot,startColor,endColor)
     {
         let col=new ColorClass(startColor.r,startColor.g,startColor.b);
         let count,rAdd,gAdd,bAdd;
@@ -37,7 +37,7 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
             // ovals
             
         while (true) {
-            this.drawOval(bitmapCTX,lft,top,rgt,bot,col,null);
+            this.drawOval(lft,top,rgt,bot,col,null);
             lft++;
             rgt--;
             if (lft>=rgt) break;
@@ -49,12 +49,12 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
         }
     }
 
-    generateGoo(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
+    generateGoo(wid,high)
     {
         let n,x,y,x2,y2,radius,startColor,endColor;
         let color=this.getRandomColor();
         
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearNormalsRect(0,0,wid,high);
         
             // gradient colors
             
@@ -63,7 +63,7 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
         
             // main color
             
-        this.drawRect(bitmapCTX,0,0,wid,high,startColor);
+        this.drawRect(0,0,wid,high,startColor);
         
             // gradient ovals
             
@@ -75,85 +75,53 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
             
                 // the oval itself and any wrap around clips
 
-            this.drawOvalGradient(bitmapCTX,x,y,(x+radius),(y+radius),startColor,endColor);
+            this.drawOvalGradient(x,y,(x+radius),(y+radius),startColor,endColor);
             if ((x+radius)>wid) {
                 x2=-((x+radius)-wid);
-                this.drawOvalGradient(bitmapCTX,x2,y,(x2+radius),(y+radius),startColor,endColor);
+                this.drawOvalGradient(x2,y,(x2+radius),(y+radius),startColor,endColor);
             }
             if ((y+radius)>high) {
                 y2=-((y+radius)-high);
-                this.drawOvalGradient(bitmapCTX,x,y2,(x+radius),(y2+radius),startColor,endColor);
+                this.drawOvalGradient(x,y2,(x+radius),(y2+radius),startColor,endColor);
             }
         }
         
             // noise and blurs
             
-        this.blur(bitmapCTX,0,0,wid,high,15,false);
+        this.blur(0,0,wid,high,15,false);
         
             // create the glow from a clamped bitmap
             
-        this.createGlowMap(bitmapCTX,glowCTX,wid,high,0.5);
+        this.createGlowMap(wid,high,0.5);
 
             // create specular
             
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
+        this.createSpecularMap(wid,high,0.5);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let shineFactor=1.0;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        glowCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        glowCTX=glowCanvas.getContext('2d');
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
+            
+        this.shineFactor=1.0;
 
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateGoo(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
-                shineFactor=8.0;
+                this.generateGoo(wid,high);
+                this.shineFactor=8.0;
                 break;
 
         }
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 
 }

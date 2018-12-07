@@ -18,7 +18,7 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
         // hexagonal
         //
         
-    generateHexagonal(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateHexagonal(wid,high)
     {
         let color,edgeColor,edgeSize;
         let xCount,yCount,xSize,ySize;
@@ -45,7 +45,7 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
             lft=((y%2)===0)?0:xSize;
             
             for (x=0;x<=xCount;x+=2) {
-                this.draw3DHexagon(bitmapCTX,normalCTX,wid,high,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
+                this.draw3DHexagon(wid,high,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
                 lft+=(xSize*2);
             }
             
@@ -54,57 +54,23 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
+        this.createSpecularMap(wid,high,0.6);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
 
-        this.generateHexagonal(bitmapCTX,normalCTX,specularCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],8.0));    
+        this.generateHexagonal(wid,high);
     }
 
 }

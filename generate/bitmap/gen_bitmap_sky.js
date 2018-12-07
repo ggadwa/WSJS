@@ -19,7 +19,7 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         // sky
         //
     
-    generateClouds(bitmapCTX,lft,top,rgt,bot,allSides,cloudColor)
+    generateClouds(lft,top,rgt,bot,allSides,cloudColor)
     {
         let n,x,y,x2,y2,xsz,ysz;
         let wid=rgt-lft;
@@ -38,14 +38,14 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
             
                 // the top
                 
-            this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
             if (x<lft) {
                 x2=rgt+x;
-                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+                this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
             }
             if ((x+xsz)>rgt) {
                 x2=lft-((x+xsz)-rgt);
-                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+                this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
             }
             
             if (!allSides) continue;
@@ -54,14 +54,14 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
                 
             y=bot-Math.trunc(ysz*0.5);
             
-            this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
             if (x<lft) {
                 x2=rgt+x;
-                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+                this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
             }
             if ((x+xsz)>rgt) {
                 x2=lft-((x+xsz)-rgt);
-                this.drawOval(bitmapCTX,x2,y,(x2+xsz),(y+ysz),cloudColor,null);
+                this.drawOval(x2,y,(x2+xsz),(y+ysz),cloudColor,null);
             }
             
                 // the left
@@ -69,28 +69,28 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
             x=lft-Math.trunc(xsz*0.5);
             y=genRandom.randomInt(top,high)-Math.trunc(ysz*0.5);
                 
-            this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
             if (y<bot) {
                 y2=bot+y;
-                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+                this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
             }
             if ((y+ysz)>bot) {
                 y2=top-((y+ysz)-bot);
-                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+                this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
             }
             
                 // the right
                 
             x=rgt-Math.trunc(xsz*0.5);
             
-            this.drawOval(bitmapCTX,x,y,(x+xsz),(y+ysz),cloudColor,null);
+            this.drawOval(x,y,(x+xsz),(y+ysz),cloudColor,null);
             if (y<bot) {
                 y2=bot+y;
-                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+                this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
             }
             if ((y+ysz)>bot) {
                 y2=top-((y+ysz)-bot);
-                this.drawOval(bitmapCTX,x,y2,(x+xsz),(y2+ysz),cloudColor,null);
+                this.drawOval(x,y2,(x+xsz),(y2+ysz),cloudColor,null);
             }
 
         }
@@ -142,14 +142,14 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         return(rangeY);
     }
     
-    generateMountainsDraw(bitmapCTX,lft,top,rgt,bot,rangeY,col)
+    generateMountainsDraw(lft,top,rgt,bot,rangeY,col)
     {
         let x,y,idx,rangeIdx;
         let wid=rgt-lft;
         let high=bot-top;
         let bitmapImgData,bitmapData;
         
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
         
             // run through the ranges
@@ -169,10 +169,10 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
             rangeIdx++;
         }
         
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
 
-    generateSkyClouds(bitmapCTX,wid,high)
+    generateSkyClouds(wid,high)
     {
         let qx=Math.trunc(wid*0.25);
         let mx=Math.trunc(wid*0.5);
@@ -186,34 +186,34 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         
             // top and bottom
             
-        this.drawRect(bitmapCTX,0,my,qx,high,skyColor);
-        this.generateClouds(bitmapCTX,0,my,qx,high,true,cloudColor);
+        this.drawRect(0,my,qx,high,skyColor);
+        this.generateClouds(0,my,qx,high,true,cloudColor);
         
-        this.drawRect(bitmapCTX,qx,my,mx,high,groundColor);
+        this.drawRect(qx,my,mx,high,groundColor);
         
             // side
             
-        this.drawVerticalGradient(bitmapCTX,0,0,wid,my,skyColor,this.darkenColor(skyColor,0.5));
-        this.generateClouds(bitmapCTX,0,0,wid,my,false,cloudColor);
-        this.blur(bitmapCTX,0,my,wid,high,3,true);
+        this.drawVerticalGradient(0,0,wid,my,skyColor,this.darkenColor(skyColor,0.5));
+        this.generateClouds(0,0,wid,my,false,cloudColor);
+        this.blur(0,my,wid,high,3,true);
         
         rangeY=this.generateMountainsBuildRange(0,Math.trunc(my*0.75),wid,8);
-        this.generateMountainsDraw(bitmapCTX,0,0,wid,my,rangeY,this.darkenColor(mountainColor,0.8));
+        this.generateMountainsDraw(0,0,wid,my,rangeY,this.darkenColor(mountainColor,0.8));
         
         rangeY=this.generateMountainsBuildRange(Math.trunc(my*0.25),my,wid,5);
-        this.generateMountainsDraw(bitmapCTX,0,0,wid,my,rangeY,mountainColor);
+        this.generateMountainsDraw(0,0,wid,my,rangeY,mountainColor);
         
-        this.drawVerticalGradient(bitmapCTX,0,Math.trunc(my*0.9),wid,my,this.darkenColor(groundColor,0.8),groundColor);
+        this.drawVerticalGradient(0,Math.trunc(my*0.9),wid,my,this.darkenColor(groundColor,0.8),groundColor);
         
         /* supergumba -- testing so we can see if the sky cube is properly positioned
-        bitmapCTX.fillStyle='#FF0000';
-        bitmapCTX.fillRect(480,10,30,30);
-        bitmapCTX.fillStyle='#00FF00';
-        bitmapCTX.fillRect(992,10,30,30);
-        bitmapCTX.fillStyle='#0000FF';
-        bitmapCTX.fillRect(1504,10,30,30);
-        bitmapCTX.fillStyle='#FF00FF';
-        bitmapCTX.fillRect(2016,10,30,30);
+        this.bitmapCTX.fillStyle='#FF0000';
+        this.bitmapCTX.fillRect(480,10,30,30);
+        this.bitmapCTX.fillStyle='#00FF00';
+        this.bitmapCTX.fillRect(992,10,30,30);
+        this.bitmapCTX.fillStyle='#0000FF';
+        this.bitmapCTX.fillRect(1504,10,30,30);
+        this.bitmapCTX.fillStyle='#FF00FF';
+        this.bitmapCTX.fillRect(2016,10,30,30);
         */
        
     }
@@ -222,34 +222,16 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_SKY_TEXTURE_WIDTH;
-        bitmapCanvas.height=this.BITMAP_SKY_TEXTURE_HEIGHT;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
 
-        this.generateSkyClouds(bitmapCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:null,specular:null,glow:null});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,null,null,null,1.0,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+        this.generateSkyClouds(wid,high);
     }
 
 }

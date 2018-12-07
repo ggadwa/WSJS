@@ -456,15 +456,11 @@ export default class GenMapClass
         this.map.lightList.add(light);
         
             // outdoor lights are bound to their room
-            // grow them a bit to catch some light seeping into other areas
             
         if (outdoor) {
             light.isBoxBound=true;
             light.boxXBound.setFromBound(room.xBound);
             light.boxZBound.setFromBound(room.zBound);
-            
-            light.boxXBound.grow(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1));
-            light.boxZBound.grow(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1));
         }
 
         return(light);

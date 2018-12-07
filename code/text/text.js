@@ -53,7 +53,7 @@ export default class TextClass
     initialize()
     {
         let x,y,yAdd,cIdx,charStr,ch;
-        let canvas,ctx,genBitmapUtility;
+        let canvas,ctx;
         let gl=this.view.gl;
 
             // setup the canvas
@@ -65,9 +65,9 @@ export default class TextClass
         
             // background is black, text is white
             // so it can be colored
-
-        genBitmapUtility=new GenBitmapBaseClass(this.view);
-        genBitmapUtility.drawRect(ctx,0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT,new ColorClass(0.0,0.0,0.0));
+            
+        ctx.fillStyle='#000000';
+        ctx.fillRect(0,0,this.TEXT_TEXTURE_WIDTH,this.TEXT_TEXTURE_HEIGHT);
 
             // draw the text
 

@@ -18,7 +18,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         // scifi bitmaps
         //
     
-    generateSciFiPiecePlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor)
+    generateSciFiPiecePlate(high,wid,lft,top,rgt,bot,edgeSize,metalColor)
     {
         let n,x,streakWid;
         let streakColor,darken;
@@ -30,7 +30,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         
             // the plate
             
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,metalColor,true);
+        this.draw3DRect(lft,top,rgt,bot,edgeSize,metalColor,true);
         
             // streaks
             
@@ -41,11 +41,11 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
             darken=0.5+(genRandom.random()*0.5);
             streakColor=this.darkenColor(metalColor,darken);
 
-            this.drawStreakMetal(bitmapCTX,wid,high,(lft+x),(top+edgeSize),((top+plateHigh)-edgeSize),streakWid,streakColor);
+            this.drawStreakMetal(wid,high,(lft+x),(top+edgeSize),((top+plateHigh)-edgeSize),streakWid,streakColor);
         }
     }
     
-    generateSciFiPieceScrews(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor)
+    generateSciFiPieceScrews(wid,high,lft,top,rgt,bot,edgeSize,metalColor)
     {
         let n,x,y,xAdd,yAdd,offset,screwCount;
         let lineWid,lineHigh;
@@ -57,7 +57,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         
             // the plate
             
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,metalColor,true);
+        this.draw3DRect(lft,top,rgt,bot,edgeSize,metalColor,true);
         
             // in a line
             
@@ -75,7 +75,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
                 x=lft+Math.trunc((xAdd*0.5)-(screwSize*0.5));
                 
                 for (n=0;n!==screwCount;n++) {
-                    this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+                    this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
                     x+=xAdd;
                 }
             }
@@ -86,7 +86,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
                 y=top+Math.trunc((yAdd*0.5)-(screwSize*0.5));
                 
                 for (n=0;n!==screwCount;n++) {
-                    this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+                    this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
                     y+=yAdd;
                 }
             }
@@ -97,14 +97,14 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         else {
             offset=edgeSize+4;
 
-            this.draw3DOval(bitmapCTX,normalCTX,(lft+offset),(top+offset),((lft+offset)+screwSize),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,(lft+offset),((bot-offset)-screwSize),((lft+offset)+screwSize),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((rgt-offset)-screwSize),(top+offset),(rgt-offset),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,((rgt-offset)-screwSize),((bot-offset)-screwSize),(rgt-offset),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval((lft+offset),(top+offset),((lft+offset)+screwSize),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval((lft+offset),((bot-offset)-screwSize),((lft+offset)+screwSize),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(((rgt-offset)-screwSize),(top+offset),(rgt-offset),((top+offset)+screwSize),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(((rgt-offset)-screwSize),((bot-offset)-screwSize),(rgt-offset),(bot-offset),0.0,1.0,2,screenFlatInnerSize,screwColor,this.blackColor);
         }
     }
     
-    generateSciFiPieceShutter(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,edgeSize,metalColor,shutterColor)
+    generateSciFiPieceShutter(wid,high,lft,top,rgt,bot,edgeSize,metalColor,shutterColor)
     {
         let n,nShutter,shutterSize;
         let y,yAdd;
@@ -116,14 +116,14 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         
             // outer and inner plate
             
-        this.generateSciFiPiecePlate(bitmapCTX,normalCTX,high,wid,lft,top,rgt,bot,edgeSize,metalColor,0,0,0);
+        this.generateSciFiPiecePlate(high,wid,lft,top,rgt,bot,edgeSize,metalColor,0,0,0);
         
         lft+=frameXSize;
         top+=frameYSize;
         rgt-=frameXSize;
         bot-=frameYSize;
         
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,shutterColor,true);
+        this.draw3DRect(lft,top,rgt,bot,edgeSize,shutterColor,true);
         
         lft+=edgeSize;
         top+=edgeSize;
@@ -140,12 +140,12 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         shutterSize=genRandom.randomInt(10,Math.trunc(yAdd*0.25));
         
         for (n=0;n!==nShutter;n++) {
-            this.drawSlope(bitmapCTX,normalCTX,lft,y,rgt,(y+shutterSize),shutterEdgeColor,false);
+            this.drawSlope(lft,y,rgt,(y+shutterSize),shutterEdgeColor,false);
             y+=yAdd;
         }
     }
     
-    generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateSciFi(wid,high)
     {
         let mx,my,sz,lft,rgt,top,bot,col,forceWid,forceHigh;
 
@@ -159,7 +159,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         
             // clear canvases
 
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearNormalsRect(0,0,wid,high);
         
             // we don't want pieces to small,
             // so here's a wid/high that if we cross,
@@ -207,13 +207,13 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
             
             switch (genRandom.randomIndex(3)) {
                 case 0:
-                    this.generateSciFiPiecePlate(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col);
+                    this.generateSciFiPiecePlate(wid,high,lft,top,rgt,bot,metalEdgeSize,col);
                     break;
                 case 1:
-                    this.generateSciFiPieceScrews(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col);
+                    this.generateSciFiPieceScrews(wid,high,lft,top,rgt,bot,metalEdgeSize,col);
                     break;
                 case 2:
-                    this.generateSciFiPieceShutter(bitmapCTX,normalCTX,specularCTX,wid,high,lft,top,rgt,bot,metalEdgeSize,col,shutterColor);
+                    this.generateSciFiPieceShutter(wid,high,lft,top,rgt,bot,metalEdgeSize,col,shutterColor);
                     break;
             }
             
@@ -224,57 +224,23 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
+        this.createSpecularMap(wid,high,0.6);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
 
-        this.generateSciFi(bitmapCTX,normalCTX,specularCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],15.0));    
+        this.generateSciFi(wid,high);
     }
 
 }

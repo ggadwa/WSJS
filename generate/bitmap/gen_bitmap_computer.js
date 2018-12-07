@@ -19,7 +19,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         // components
         //
         
-    generateComputerComponentWires(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateComputerComponentWires(lft,top,rgt,bot)
     {
         let n,nLine;
         let x,y;
@@ -32,7 +32,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         top+=5;
         bot-=5;
             
-        this.drawRect(bitmapCTX,lft,top,rgt,bot,this.blackColor);
+        this.drawRect(lft,top,rgt,bot,this.blackColor);
         
             // determine if horz or vertical
             
@@ -46,7 +46,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 y=(top+5)+genRandom.randomInt(0,((bot-top)-10));
                 
                 lineColor=this.getRandomColor();
-                this.drawRandomLine(bitmapCTX,normalCTX,lft,y,rgt,y,lft,top,rgt,bot,5,lineColor,false);
+                this.drawRandomLine(lft,y,rgt,y,lft,top,rgt,bot,5,lineColor,false);
             }
         }
         else {
@@ -57,12 +57,12 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 x=(lft+5)+genRandom.randomInt(0,((rgt-lft)-10));
                 
                 lineColor=this.getRandomColor();
-                this.drawRandomLine(bitmapCTX,normalCTX,x,top,x,bot,lft,top,rgt,bot,5,lineColor,false);
+                this.drawRandomLine(x,top,x,bot,lft,top,rgt,bot,5,lineColor,false);
             }
         }
     }
     
-    generateComputerComponentShutter(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateComputerComponentShutter(lft,top,rgt,bot)
     {
         let y;
         let n,nShutter,shutterSize,yAdd,shutterColor,shutterEdgeColor;
@@ -75,7 +75,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         shutterColor=this.getRandomColor();
         shutterEdgeColor=this.darkenColor(shutterColor,0.9);
 
-        this.drawRect(bitmapCTX,lft,top,rgt,bot,shutterColor);
+        this.drawRect(lft,top,rgt,bot,shutterColor);
 
         nShutter=Math.trunc((bot-top)/20);
 
@@ -85,12 +85,12 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         shutterSize=genRandom.randomInt(5,Math.trunc(yAdd*0.2));
 
         for (n=0;n!==nShutter;n++) {
-            this.drawSlope(bitmapCTX,normalCTX,lft,y,rgt,(y+shutterSize),shutterEdgeColor,false);
+            this.drawSlope(lft,y,rgt,(y+shutterSize),shutterEdgeColor,false);
             y+=yAdd;
         }
     }
     
-    generateComputerComponentLights(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    generateComputerComponentLights(lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         let color;
@@ -115,16 +115,16 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                     
                 color=this.getRandomColor();
                 if (genRandom.randomPercentage(0.5)) color=this.darkenColor(color,0.7);
-                this.draw3DOval(bitmapCTX,normalCTX,dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,this.blackColor);
+                this.draw3DOval(dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,this.blackColor);
                 
                     // the possible glow
                     
-                if (genRandom.randomPercentage(0.5)) this.drawOval(glowCTX,(dx+2),(dy+2),(dx+(wid-6)),(dy+(wid-6)),this.darkenColor(color,0.7),null);
+                if (genRandom.randomPercentage(0.5)) this.drawGlowOval((dx+2),(dy+2),(dx+(wid-6)),(dy+(wid-6)),this.darkenColor(color,0.7),null);
             }
         }
     }
     
-    generateComputerComponentButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    generateComputerComponentButtons(lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         let color;
@@ -148,16 +148,16 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                     // the button
                 
                 color=this.getRandomColor();
-                this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+wid),2,color,false);
+                this.draw3DRect(dx,dy,(dx+wid),(dy+wid),2,color,false);
                 
                     // the possible glow
                     
-                if (genRandom.randomPercentage(0.5)) this.drawGlowRect(glowCTX,dx,dy,(dx+wid),(dy+wid),color);
+                if (genRandom.randomPercentage(0.5)) this.drawGlowRect(dx,dy,(dx+wid),(dy+wid),color);
             }
         }
     }
     
-    generateComputerComponentDrives(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    generateComputerComponentDrives(lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,dx,dy,bx,by,wid,high;
         let color,ledColor;
@@ -190,7 +190,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 
                     // the drive
                 
-                this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+high),2,color,true);
+                this.draw3DRect(dx,dy,(dx+wid),(dy+high),2,color,true);
                 
                     // the glowing indicator
                 
@@ -198,8 +198,8 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 
                 bx=(dx+wid)-6;
                 by=(dy+high)-6;
-                this.drawRect(bitmapCTX,bx,by,(bx+3),(by+3),ledColor);
-                this.drawGlowRect(glowCTX,bx,by,(bx+3),(by+3),ledColor);
+                this.drawRect(bx,by,(bx+3),(by+3),ledColor);
+                this.drawGlowRect(bx,by,(bx+3),(by+3),ledColor);
             }
         }
     }
@@ -208,7 +208,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         // computer
         //
         
-    generateComputer(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
+    generateComputer(wid,high)
     {
         let mx,my,sz,lft,top,rgt,bot,rndTry;
         let componentType,hadBlank,hadWires,hadShutter,rndSuccess;
@@ -219,10 +219,10 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.draw3DRect(bitmapCTX,normalCTX,offset,0,wid,offset,8,panelColor,true);
-        this.draw3DRect(bitmapCTX,normalCTX,0,offset,offset,high,8,panelColor,true);
+        this.draw3DRect(offset,0,wid,offset,8,panelColor,true);
+        this.draw3DRect(0,offset,offset,high,8,panelColor,true);
         
-        this.draw3DRect(bitmapCTX,normalCTX,offset,offset,wid,high,8,panelColor,true);
+        this.draw3DRect(offset,offset,wid,high,8,panelColor,true);
         
             // inside components
             // these are stacks of vertical or horizontal chunks
@@ -263,7 +263,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 // box around components, can
                 // be randonly in or out
                 
-            this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,5,panelInsideColor,genRandom.randomPercentage(0.5));
+            this.draw3DRect(lft,top,rgt,bot,5,panelInsideColor,genRandom.randomPercentage(0.5));
             
                 // draw the components
                 // we only allow one blank, wires, or shutter
@@ -284,25 +284,25 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                     case 1:
                         if (hadWires) break;
                         hadWires=true;
-                        this.generateComputerComponentWires(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                        this.generateComputerComponentWires(lft,top,rgt,bot);
                         rndSuccess=true;
                         break;
                     case 2:
                         if (hadShutter) break;
                         hadShutter=true;
-                        this.generateComputerComponentShutter(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                        this.generateComputerComponentShutter(lft,top,rgt,bot);
                         rndSuccess=true;
                         break;
                     case 3:
-                        this.generateComputerComponentLights(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
+                        this.generateComputerComponentLights(lft,top,rgt,bot);
                         rndSuccess=true;
                         break;
                     case 4:
-                        this.generateComputerComponentButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
+                        this.generateComputerComponentButtons(lft,top,rgt,bot);
                         rndSuccess=true;
                         break;
                     case 5:
-                        this.generateComputerComponentDrives(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
+                        this.generateComputerComponentDrives(lft,top,rgt,bot);
                         rndSuccess=true;
                         break;
                 }
@@ -319,65 +319,32 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.4);
+        this.createSpecularMap(wid,high,0.4);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let shineFactor=1.0;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        glowCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,this.BITMAP_MAP_TEXTURE_SIZE,this.BITMAP_MAP_TEXTURE_SIZE);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
+            
+        this.shineFactor=1.0;
 
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateComputer(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
-                shineFactor=1.5;
+                this.generateComputer(wid,high);
+                this.shineFactor=1.5;
                 break;
 
         }
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 
 }

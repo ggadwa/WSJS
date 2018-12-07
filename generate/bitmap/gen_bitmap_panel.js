@@ -19,7 +19,7 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
         // panel
         //
         
-    generatePanelMonitor(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    generatePanelMonitor(lft,top,rgt,bot)
     {
         let n,nChar,str,y;
         let fontSize;
@@ -30,7 +30,7 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
         top+=5;
         bot-=5;
         
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,3,this.blackColor,false);
+        this.draw3DRect(lft,top,rgt,bot,3,this.blackColor,false);
         
             // the text
             
@@ -47,22 +47,22 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
             
         y=Math.trunc((top+bot)*0.5);
             
-        bitmapCTX.font=fontSize+'px Courier';
-        bitmapCTX.textAlign='left';
-        bitmapCTX.textBaseline='middle';
-        bitmapCTX.fillStyle='#00FF00';
+        this.bitmapCTX.font=fontSize+'px Courier';
+        this.bitmapCTX.textAlign='left';
+        this.bitmapCTX.textBaseline='middle';
+        this.bitmapCTX.fillStyle='#00FF00';
         
-        bitmapCTX.fillText(str,(lft+5),y);
+        this.bitmapCTX.fillText(str,(lft+5),y);
         
-        glowCTX.font=fontSize+'px Courier';
-        glowCTX.textAlign='left';
-        glowCTX.textBaseline='middle';
-        glowCTX.fillStyle='#007F00';
+        this.glowCTX.font=fontSize+'px Courier';
+        this.glowCTX.textAlign='left';
+        this.glowCTX.textBaseline='middle';
+        this.glowCTX.fillStyle='#007F00';
         
-        glowCTX.fillText(str,(lft+5),y);
+        this.glowCTX.fillText(str,(lft+5),y);
     }
     
-    generatePanelButtons(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    generatePanelButtons(lft,top,rgt,bot)
     {
         let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
         let skip,xSkip,ySkip,lastSkip,hadMonitor;
@@ -118,7 +118,7 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
             
             if ((genRandom.randomPercentage(0.25)) && (!hadMonitor)) {
                 hadMonitor=true;
-                this.generatePanelMonitor(bitmapCTX,normalCTX,glowCTX,xOff,dy,(xOff+(xCount*wid)),(dy+wid));
+                this.generatePanelMonitor(xOff,dy,(xOff+(xCount*wid)),(dy+wid));
                 continue;
             }
             
@@ -130,16 +130,16 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
                     // the button
                     
                 color=this.getRandomColor();
-                this.draw3DRect(bitmapCTX,normalCTX,dx,dy,(dx+wid),(dy+wid),2,color,false);
+                this.draw3DRect(dx,dy,(dx+wid),(dy+wid),2,color,false);
                 
                     // the possible glow
                     
-                if (genRandom.randomPercentage(0.5)) this.drawGlowRect(glowCTX,(dx+1),(dy+1),(dx+(wid-1)),(dy+(wid-1)),color);
+                if (genRandom.randomPercentage(0.5)) this.drawGlowRect((dx+1),(dy+1),(dx+(wid-1)),(dy+(wid-1)),color);
             }
         }
     }
     
-    generatePanel(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high)
+    generatePanel(wid,high)
     {
         let offset=Math.trunc(wid*0.1);
         let panelColor=this.getRandomColor();
@@ -147,76 +147,43 @@ export default class GenBitmapPanelClass extends GenBitmapBaseClass
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.draw3DRect(bitmapCTX,normalCTX,offset,0,wid,offset,8,panelColor,true);
-        this.draw3DRect(bitmapCTX,normalCTX,0,offset,offset,high,8,panelColor,true);
+        this.draw3DRect(offset,0,wid,offset,8,panelColor,true);
+        this.draw3DRect(0,offset,offset,high,8,panelColor,true);
         
-        this.draw3DRect(bitmapCTX,normalCTX,offset,offset,wid,high,8,panelColor,true);
+        this.draw3DRect(offset,offset,wid,high,8,panelColor,true);
        
             // the buttons
 
-        this.generatePanelButtons(bitmapCTX,normalCTX,glowCTX,(offset+5),(offset+5),(wid-5),(high-5));
+        this.generatePanelButtons((offset+5),(offset+5),(wid-5),(high-5));
         
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.4);
+        this.createSpecularMap(wid,high,0.4);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let shineFactor=1.0;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        glowCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,this.BITMAP_MODEL_TEXTURE_SIZE,this.BITMAP_MODEL_TEXTURE_SIZE);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
+            
+        this.shineFactor=1.0;
 
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generatePanel(bitmapCTX,normalCTX,specularCTX,glowCTX,wid,high);
-                shineFactor=1.0;
+                this.generatePanel(wid,high);
+                this.shineFactor=1.0;
                 break;
 
         }
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],shineFactor));    
     }
 
 }

@@ -18,7 +18,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
         // metal bitmaps
         //
     
-    generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateMetal(wid,high)
     {
         let lft,rgt,top,bot;
         let indentCount,sz;
@@ -35,7 +35,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
         
             // clear canvases
 
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearNormalsRect(0,0,wid,high);
         
         lft=0;
         top=0;
@@ -48,9 +48,9 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
         
                 // the plate, streaks, and screws
 
-            this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,metalColor,genRandom.randomPercentage(0.5));
-            this.generateMetalStreakShine(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),wid,high,metalColor);
-            this.generateMetalScrewsRandom(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),screwColor,screwSize,screwInnerSize);
+            this.draw3DRect(lft,top,rgt,bot,edgeSize,metalColor,genRandom.randomPercentage(0.5));
+            this.generateMetalStreakShine((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),wid,high,metalColor);
+            this.generateMetalScrewsRandom((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),screwColor,screwSize,screwInnerSize);
             
                 // go in more?
                 
@@ -68,57 +68,23 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.6);
+        this.createSpecularMap(wid,high,0.6);
     }
             
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
 
-        this.generateMetal(bitmapCTX,normalCTX,specularCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],15.0));    
+        this.generateMetal(wid,high);
     }
 
 }

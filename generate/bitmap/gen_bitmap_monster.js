@@ -18,7 +18,7 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         // fur
         //
         
-    generateFurChunk(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateFurChunk(lft,top,rgt,bot)
     {
         let n,x,y;
         let darken,boost,lineColor;
@@ -27,7 +27,7 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         let halfHigh=Math.trunc(high*0.5);
         let furColor=this.getRandomFurColor();
         
-        this.drawRect(bitmapCTX,lft,top,rgt,bot,furColor);
+        this.drawRect(lft,top,rgt,bot,furColor);
 
             // hair
             
@@ -47,12 +47,12 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
                 // hair half from top
                 
             y=halfHigh+genRandom.randomInt(top,halfHigh);
-            this.drawRandomLine(bitmapCTX,normalCTX,x,(top-5),x,(y+5),lft,top,rgt,bot,10,lineColor,false);
+            this.drawRandomLine(x,(top-5),x,(y+5),lft,top,rgt,bot,10,lineColor,false);
             
                 // hair half from bottom
                 
             y=high-(halfHigh+genRandom.randomInt(top,halfHigh));
-            this.drawRandomLine(bitmapCTX,normalCTX,x,(y-5),x,(bot+5),lft,top,rgt,bot,10,lineColor,false);
+            this.drawRandomLine(x,(y-5),x,(bot+5),lft,top,rgt,bot,10,lineColor,false);
         }
     }
     
@@ -60,7 +60,7 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         // cloth
         //
         
-    generateClothChunk(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateClothChunk(lft,top,rgt,bot)
     {
         let n,x,x2,y,y2,lineCount;
         let darken,lineColor;
@@ -68,8 +68,8 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         let high=bot-top;
         let clothColor=this.getRandomColor();
          
-        this.drawRect(bitmapCTX,lft,top,rgt,bot,clothColor);
-        this.addNoiseRect(bitmapCTX,lft,top,rgt,bot,0.8,0.9,0.5);        
+        this.drawRect(lft,top,rgt,bot,clothColor);
+        this.addNoiseRect(lft,top,rgt,bot,0.8,0.9,0.5);        
  
             // lines
             
@@ -83,7 +83,7 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
             darken=0.6+(genRandom.random()*0.25);
             lineColor=this.darkenColor(clothColor,darken);
             
-            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x,y2,lft,top,rgt,bot,30,lineColor,false);
+            this.drawRandomLine(x,y,x,y2,lft,top,rgt,bot,30,lineColor,false);
         }
         
         lineCount=genRandom.randomInt(30,30);
@@ -96,19 +96,19 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
             darken=0.6+(genRandom.random()*0.25);
             lineColor=this.darkenColor(clothColor,darken);
             
-            this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y,lft,top,rgt,bot,30,lineColor,false);
+            this.drawRandomLine(x,y,x2,y,lft,top,rgt,bot,30,lineColor,false);
         }
         
             // blur it
             
-        this.blur(bitmapCTX,lft,top,rgt,bot,25,false);
+        this.blur(lft,top,rgt,bot,25,false);
     }
     
         //
         // scales
         //
         
-    generateScaleChunk(bitmapCTX,normalCTX,lft,top,rgt,bot)
+    generateScaleChunk(lft,top,rgt,bot)
     {
         let x,y,dx,dy,sx,sy,sx2,sy2;
         let xCount,col;
@@ -122,13 +122,13 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         let sWid=wid/scaleCount;
         let sHigh=high/scaleCount;
         
-        this.startClip(bitmapCTX,lft,top,rgt,bot);
+        this.startClip(lft,top,rgt,bot);
          
             // background
 
-        this.drawRect(bitmapCTX,lft,top,rgt,bot,scaleColor);
-        this.addNoiseRect(bitmapCTX,lft,top,rgt,bot,0.5,0.7,0.6);
-        this.blur(bitmapCTX,lft,top,rgt,bot,5,false);
+        this.drawRect(lft,top,rgt,bot,scaleColor);
+        this.addNoiseRect(lft,top,rgt,bot,0.5,0.7,0.6);
+        this.blur(lft,top,rgt,bot,5,false);
         
             // scales (need extra row for overlap)
 
@@ -169,8 +169,8 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
                     // we draw the scale as a solid, flat oval and
                     // then redraw the border with normals
                     
-                this.draw3DOval(bitmapCTX,normalCTX,sx,sy,sx2,sy2,0.25,0.75,3,0,null,borderColor);
-                this.drawOval(bitmapCTX,sx,sy,sx2,sy2,0.0,1.0,3,0,col,null);
+                this.draw3DOval(sx,sy,sx2,sy2,0.25,0.75,3,0,null,borderColor);
+                this.drawOval(sx,sy,sx2,sy2,0.0,1.0,3,0,col,null);
                 
                 dx+=sWid;
             }
@@ -178,26 +178,26 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
             dy-=sHigh;
         }
         
-        this.endClip(bitmapCTX);
+        this.endClip();
     }
     
         //
         // metal
         //
         
-    generateMetalChunk(bitmapCTX,normalCTX,lft,top,rgt,bot,wid,high)
+    generateMetalChunk(lft,top,rgt,bot,wid,high)
     {
         let metalColor=this.getRandomMetalColor();
         
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,0,metalColor,genRandom.randomPercentage(0.5));
-        this.generateMetalStreakShine(bitmapCTX,lft,top,rgt,bot,wid,high,metalColor);
+        this.draw3DRect(lft,top,rgt,bot,0,metalColor,genRandom.randomPercentage(0.5));
+        this.generateMetalStreakShine(lft,top,rgt,bot,wid,high,metalColor);
     }
     
         //
         // spots
         //
         
-    generateSpots(bitmapCTX,normalCTX,lft,top,rgt,bot,wid,high)
+    generateSpots(lft,top,rgt,bot,wid,high)
     {
         let innerWid=rgt-lft;
         let innerHigh=bot-top;
@@ -208,116 +208,82 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         
             // the fur
             
-        this.generateFurChunk(bitmapCTX,normalCTX,lft,top,rgt,bot);
+        this.generateFurChunk(lft,top,rgt,bot);
         
             // the fur spots
         
-        bitmapCTX.globalAlpha=genRandom.randomFloat(0.1,0.3);
+        this.bitmapCTX.globalAlpha=genRandom.randomFloat(0.1,0.3);
  
         for (n=0;n!==spotCount;n++) {
             spotSize=genRandom.randomInt(spotMin,spotAdd);
             x=genRandom.randomInt(0,(innerWid-spotSize))+lft;
             y=genRandom.randomInt(0,(innerHigh-spotSize))+top;
-            this.drawOval(bitmapCTX,x,y,(x+spotSize),(y+spotSize),this.blackColor,null);
+            this.drawOval(x,y,(x+spotSize),(y+spotSize),this.blackColor,null);
         }
         
-        bitmapCTX.globalAlpha=1.0;
+        this.bitmapCTX.globalAlpha=1.0;
     }
     
         //
         // random chunk
         //
     
-    generateRandomChunk(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot,wid,high,isFace)
+    generateRandomChunk(lft,top,rgt,bot,wid,high,isFace)
     {
         switch (genRandom.randomIndex(5)) {
             
             case 0:
-                this.generateFurChunk(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                this.generateFurChunk(lft,top,rgt,bot);
                 break;
             
             case 1:
-                this.generateClothChunk(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                this.generateClothChunk(lft,top,rgt,bot);
                 break;
                 
             case 2:
-                this.generateScaleChunk(bitmapCTX,normalCTX,lft,top,rgt,bot);
+                this.generateScaleChunk(lft,top,rgt,bot);
                 break;
                 
             case 3:
-                this.generateMetalChunk(bitmapCTX,normalCTX,lft,top,rgt,bot,wid,high);
+                this.generateMetalChunk(lft,top,rgt,bot,wid,high);
                 break;
                 
             case 4:
-                this.generateSpots(bitmapCTX,normalCTX,lft,top,rgt,bot,wid,high);
+                this.generateSpots(lft,top,rgt,bot,wid,high);
                 break;
         }
         
-        if (isFace) this.generateFaceChunk(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot);
+        if (isFace) this.generateFaceChunk(lft,top,rgt,bot);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high,mx,my;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=this.BITMAP_MODEL_TEXTURE_SIZE;
-        glowCanvas.height=this.BITMAP_MODEL_TEXTURE_SIZE;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,this.BITMAP_MODEL_TEXTURE_SIZE,this.BITMAP_MODEL_TEXTURE_SIZE);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
         
         mx=Math.trunc(wid*0.5);
         my=Math.trunc(high*0.5);
          
             // clear canvases
 
-        this.drawRect(bitmapCTX,0,0,wid,high,this.whiteColor);
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.drawRect(0,0,wid,high,this.whiteColor);
+        this.clearNormalsRect(0,0,wid,high);
 
             // chunks
             
-        this.generateRandomChunk(bitmapCTX,normalCTX,glowCTX,0,0,mx,my,wid,high,false);
-        this.generateRandomChunk(bitmapCTX,normalCTX,glowCTX,mx,0,wid,my,wid,high,true);
-        this.generateRandomChunk(bitmapCTX,normalCTX,glowCTX,0,my,mx,high,wid,high,false);
+        this.generateRandomChunk(0,0,mx,my,wid,high,false);
+        this.generateRandomChunk(mx,0,wid,my,wid,high,true);
+        this.generateRandomChunk(0,my,mx,high,wid,high,false);
 
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.4);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],0.5));    
+        this.createSpecularMap(wid,high,0.4);
     }
 
 }

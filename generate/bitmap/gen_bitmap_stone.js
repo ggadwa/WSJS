@@ -18,7 +18,7 @@ export default class GenBitmapStoneClass extends GenBitmapBaseClass
         // stone bitmaps
         //
 
-    generateStone(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateStone(wid,high)
     {
         let n,k,rect,edgeSize,clipMargin;
         let drawStoneColor,drawEdgeColor,lineColor,darken,f;
@@ -37,11 +37,11 @@ export default class GenBitmapStoneClass extends GenBitmapBaseClass
 
             // clear canvases
 
-        this.drawRect(bitmapCTX,0,0,wid,high,groutColor);
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
-        this.blur(bitmapCTX,0,0,wid,high,5,false);
+        this.drawRect(0,0,wid,high,groutColor);
+        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.9);
+        this.blur(0,0,wid,high,5,false);
 
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearNormalsRect(0,0,wid,high);
 
             // draw the stones
 
@@ -59,8 +59,8 @@ export default class GenBitmapStoneClass extends GenBitmapBaseClass
 
             edgeSize=genRandom.randomInt(5,12);     // new edge size as stones aren't the same
 
-            this.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
-            this.blur(bitmapCTX,(rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4,false);
+            this.draw3DComplexRect(rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
+            this.blur((rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4,false);
             
                 // cracked lines
                 
@@ -82,72 +82,38 @@ export default class GenBitmapStoneClass extends GenBitmapBaseClass
                 
                 darken=0.9+(genRandom.random()*0.1);
                 lineColor=this.darkenColor(drawStoneColor,darken);
-                this.drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,(rect.lft+clipMargin),(rect.top+clipMargin),(rect.rgt-clipMargin),(rect.bot-clipMargin),lineVarient,lineColor,false);
+                this.drawRandomLine(x,y,x2,y2,(rect.lft+clipMargin),(rect.top+clipMargin),(rect.rgt-clipMargin),(rect.bot-clipMargin),lineVarient,lineColor,false);
             }
             
                 // redo the fill, but just do the edges so we
                 // erase any lines that went over
                 
-            this.draw3DComplexRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,null,drawEdgeColor);
+            this.draw3DComplexRect(rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,null,drawEdgeColor);
             
                  // any random noise
                 
-            this.addNoiseRect(bitmapCTX,rect.lft,rect.top,rect.rgt,rect.bot,0.8,1.0,0.4);
+            this.addNoiseRect(rect.lft,rect.top,rect.rgt,rect.bot,0.8,1.0,0.4);
         }
 
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
+        this.createSpecularMap(wid,high,0.5);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
 
-        this.generateStone(bitmapCTX,normalCTX,specularCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],10.0));    
+        this.generateStone(wid,high);
     }
 
 }

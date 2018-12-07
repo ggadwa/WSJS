@@ -18,7 +18,7 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
         // mosaic bitmaps
         //
 
-    generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateMosaic(wid,high)
     {
         let x,y,lft,rgt,top,bot,tileWid,tileHigh;
         let splitCount,borderSize,edgeSize;
@@ -43,10 +43,10 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
 
             // clear canvases to mortar
 
-        this.drawRect(bitmapCTX,0,0,wid,high,mortarColor);
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
+        this.drawRect(0,0,wid,high,mortarColor);
+        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.9);
 
-        this.clearNormalsRect(normalCTX,0,0,wid,high);        
+        this.clearNormalsRect(0,0,wid,high);        
 
             // draw the tiles
         
@@ -71,16 +71,16 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
 
                 rgt=(lft+tileWid)-borderSize;
 
-                this.draw3DRect(bitmapCTX,normalCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col,true);
+                this.draw3DRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col,true);
                 
                     // noise and blur
                 
-                this.addNoiseRect(bitmapCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),1.1,1.3,0.5);
-                this.blur(bitmapCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),3,false);
+                this.addNoiseRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),1.1,1.3,0.5);
+                this.blur(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),3,false);
                 
                     // any cracks
                     
-                this.drawSmallCrack(bitmapCTX,normalCTX,Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
+                this.drawSmallCrack(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
 
                 lft+=tileWid;
             }
@@ -90,57 +90,23 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.5);
+        this.createSpecularMap(wid,high,0.5);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
 
-        this.generateMosaic(bitmapCTX,normalCTX,specularCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],10.0));    
+        this.generateMosaic(wid,high);
     }
 
 }

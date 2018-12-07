@@ -3,6 +3,7 @@ import PointClass from '../../code/utility/point.js';
 import RectClass from '../../code/utility/rect.js';
 import ColorClass from '../../code/utility/color.js';
 import genRandom from '../../generate/utility/random.js';
+import BitmapClass from '../../code/bitmap/bitmap.js';
 
 //
 // generate bitmap class
@@ -16,6 +17,12 @@ export default class GenBitmapBaseClass
         this.hasNormal=hasNormal;
         this.hasSpecular=hasSpecular;
         this.hasGlow=hasGlow;
+        
+            // defaults
+            
+        this.alpha=1.0;
+        this.uvScale=[(1.0/4000.0),(1.0/4000.0)];
+        this.shineFactor=5.0;
         
             // constants
             
@@ -249,11 +256,11 @@ export default class GenBitmapBaseClass
         // clipping
         //
         
-    startClip(bitmapCTX,lft,top,rgt,bot)
+    startClip(lft,top,rgt,bot)
     {
-        bitmapCTX.save();
-        bitmapCTX.rect(lft,top,(rgt-lft),(bot-top));
-        bitmapCTX.clip();
+        this.bitmapCTX.save();
+        this.bitmapCTX.rect(lft,top,(rgt-lft),(bot-top));
+        this.bitmapCTX.clip();
         
         this.clipLft=lft;
         this.clipTop=top;
@@ -261,9 +268,9 @@ export default class GenBitmapBaseClass
         this.clipBot=bot;
     }
     
-    endClip(bitmapCTX)
+    endClip()
     {
-        bitmapCTX.restore();
+        this.bitmapCTX.restore();
         
         this.clipLft=-1;
         this.clipTop=-1;
@@ -473,27 +480,27 @@ export default class GenBitmapBaseClass
         // normal and glow clearing
         //
 
-    clearNormalsRect(normalCTX,lft,top,rgt,bot)
+    clearNormalsRect(lft,top,rgt,bot)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
-        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
-        normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        this.normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        this.normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
     
-    clearGlowRect(glowCTX,lft,top,rgt,bot)
+    clearGlowRect(lft,top,rgt,bot)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
-        glowCTX.fillStyle='#000000';
-        glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        this.glowCTX.fillStyle='#000000';
+        this.glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
 
         //
         // noise routines
         //
 
-    addNoiseRect(bitmapCTX,lft,top,rgt,bot,minDarken,maxDarken,percentage)
+    addNoiseRect(lft,top,rgt,bot,minDarken,maxDarken,percentage)
     {    
         let n,nPixel,idx;
         let col,fct;
@@ -506,7 +513,7 @@ export default class GenBitmapBaseClass
         
         if ((lft>=rgt) || (top>=bot)) return;
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
 
             // get the image data to add noise to
@@ -542,10 +549,10 @@ export default class GenBitmapBaseClass
             idx+=4;
         }
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
     
-    addNormalNoiseRect(normalCTX,lft,top,rgt,bot,percentage)
+    addNormalNoiseRect(lft,top,rgt,bot,percentage)
     {    
         let n,nPixel,idx;
         let wid=rgt-lft;
@@ -558,7 +565,7 @@ export default class GenBitmapBaseClass
 
         if ((lft>=rgt) || (top>=bot)) return;
 
-        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
         normalData=normalImgData.data;
         
             // get the image data to add noise to
@@ -584,14 +591,14 @@ export default class GenBitmapBaseClass
             idx+=4;
         }
 
-        normalCTX.putImageData(normalImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
     }
     
         //
         // blur routines
         //
         
-    blur(bitmapCTX,lft,top,rgt,bot,blurCount,clamp)
+    blur(lft,top,rgt,bot,blurCount,clamp)
     {
         let n,idx;
         let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
@@ -602,7 +609,7 @@ export default class GenBitmapBaseClass
         
         if ((wid<=0) || (high<=0)) return;
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
         
         blurData=new Uint8ClampedArray(bitmapData.length);
@@ -682,22 +689,22 @@ export default class GenBitmapBaseClass
             }
         } 
         
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
 
         //
         // specular routines
         //
 
-    createSpecularMap(bitmapCTX,specularCTX,wid,high,clamp)
+    createSpecularMap(wid,high,clamp)
     {
         let n,idx,nPixel;
         let f,fMin,fMax,fDif;
 
-        let bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapImgData=this.bitmapCTX.getImageData(0,0,wid,high);
         let bitmapData=bitmapImgData.data;
 
-        let specularImgData=specularCTX.getImageData(0,0,wid,high);
+        let specularImgData=this.specularCTX.getImageData(0,0,wid,high);
         let specularData=specularImgData.data;
 
         idx=0;
@@ -742,21 +749,21 @@ export default class GenBitmapBaseClass
             specularData[idx++]=0xFF;
         } 
 
-        specularCTX.putImageData(specularImgData,0,0);
+        this.specularCTX.putImageData(specularImgData,0,0);
     }
     
         //
         // glow utility
         //
 
-    createGlowMap(bitmapCTX,glowCTX,wid,high,clamp)
+    createGlowMap(wid,high,clamp)
     {
         let n,idx,nPixel;
 
-        let bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapImgData=this.bitmapCTX.getImageData(0,0,wid,high);
         let bitmapData=bitmapImgData.data;
 
-        let glowImgData=glowCTX.getImageData(0,0,wid,high);
+        let glowImgData=this.glowCTX.getImageData(0,0,wid,high);
         let glowData=glowImgData.data;
 
             // transfer over the bitmap and
@@ -774,18 +781,18 @@ export default class GenBitmapBaseClass
             idx+=4;
         } 
 
-        glowCTX.putImageData(glowImgData,0,0);
+        this.glowCTX.putImageData(glowImgData,0,0);
     }
     
         //
         // channel swaps
         //
         
-    swapRedToAlpha(bitmapCTX,wid,high)
+    swapRedToAlpha(wid,high)
     {
         let n,nPixel,idx;
         
-        let bitmapImgData=bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapImgData=this.bitmapCTX.getImageData(0,0,wid,high);
         let bitmapData=bitmapImgData.data;
         
         idx=0;
@@ -796,7 +803,7 @@ export default class GenBitmapBaseClass
             idx+=4;
         }
         
-        bitmapCTX.putImageData(bitmapImgData,0,0);
+        this.bitmapCTX.putImageData(bitmapImgData,0,0);
     }
 
 
@@ -804,23 +811,23 @@ export default class GenBitmapBaseClass
         // rectangles, ovals, lines
         //
 
-    drawRect(bitmapCTX,lft,top,rgt,bot,color)
+    drawRect(lft,top,rgt,bot,color)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
-        bitmapCTX.fillStyle=this.colorToRGBColor(color);
-        bitmapCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        this.bitmapCTX.fillStyle=this.colorToRGBColor(color);
+        this.bitmapCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
     
-    drawGlowRect(glowCTX,lft,top,rgt,bot,color)
+    drawGlowRect(lft,top,rgt,bot,color)
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
-        glowCTX.fillStyle=this.colorToRGBColor(this.darkenColor(color,0.5));
-        glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        this.glowCTX.fillStyle=this.colorToRGBColor(this.darkenColor(color,0.5));
+        this.glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
 
-    draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,color,faceOut)
+    draw3DRect(lft,top,rgt,bot,edgeSize,color,faceOut)
     {
         let n,lx,rx,ty,by;
         let colFactor,edgeColor,fillColor;
@@ -841,55 +848,55 @@ export default class GenBitmapBaseClass
             }
             
             edgeColor=this.darkenColor(color,colFactor);
-            bitmapCTX.strokeStyle=this.colorToRGBColor(edgeColor);
+            this.bitmapCTX.strokeStyle=this.colorToRGBColor(edgeColor);
 
                 // the color
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lx,ty);
-            bitmapCTX.lineTo(lx,by);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lx,ty);
+            this.bitmapCTX.lineTo(lx,by);
+            this.bitmapCTX.stroke();
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(rx,ty);
-            bitmapCTX.lineTo(rx,by);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(rx,ty);
+            this.bitmapCTX.lineTo(rx,by);
+            this.bitmapCTX.stroke();
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lx,ty);
-            bitmapCTX.lineTo(rx,ty);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lx,ty);
+            this.bitmapCTX.lineTo(rx,ty);
+            this.bitmapCTX.stroke();
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lx,by);
-            bitmapCTX.lineTo(rx,by);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lx,by);
+            this.bitmapCTX.lineTo(rx,by);
+            this.bitmapCTX.stroke();
 
                 // the normal
 
-            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_LEFT_45:this.NORMAL_RIGHT_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(lx,ty);
-            normalCTX.lineTo(lx,by);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_LEFT_45:this.NORMAL_RIGHT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,ty);
+            this.normalCTX.lineTo(lx,by);
+            this.normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_RIGHT_45:this.NORMAL_LEFT_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(rx,ty);
-            normalCTX.lineTo(rx,by);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_RIGHT_45:this.NORMAL_LEFT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(rx,ty);
+            this.normalCTX.lineTo(rx,by);
+            this.normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(lx,ty);
-            normalCTX.lineTo(rx,ty);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,ty);
+            this.normalCTX.lineTo(rx,ty);
+            this.normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_BOTTOM_45:this.NORMAL_TOP_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(lx,by);
-            normalCTX.lineTo(rx,by);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_BOTTOM_45:this.NORMAL_TOP_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,by);
+            this.normalCTX.lineTo(rx,by);
+            this.normalCTX.stroke();
 
                 // next edge
 
@@ -906,12 +913,12 @@ export default class GenBitmapBaseClass
 
             // draw the inner fill
 
-        this.drawRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillColor);
+        this.drawRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillColor);
 
-        this.clearNormalsRect(normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
+        this.clearNormalsRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
     }
 
-    draw3DComplexRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    draw3DComplexRect(lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
         let n,k,k2,add;
         let darkenFactor,darkColor;
@@ -995,8 +1002,8 @@ export default class GenBitmapBaseClass
 
             // draw the edges
 
-        bitmapCTX.lineWidth=2;
-        normalCTX.lineWidth=2;
+        this.bitmapCTX.lineWidth=2;
+        this.normalCTX.lineWidth=2;
 
         for (n=0;n!==edgeSize;n++) {
 
@@ -1004,64 +1011,64 @@ export default class GenBitmapBaseClass
 
             darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
             darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
-            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+            this.bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x[0],y[0]);
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(x[0],y[0]);
 
             for (k=1;k!==totalPointCount;k++) {
-                bitmapCTX.lineTo(x[k],y[k]);
+                this.bitmapCTX.lineTo(x[k],y[k]);
             }
 
-            bitmapCTX.lineTo(x[0],y[0]);
-            bitmapCTX.stroke();
+            this.bitmapCTX.lineTo(x[0],y[0]);
+            this.bitmapCTX.stroke();
 
                 // the normals
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
-            normalCTX.beginPath();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
+            this.normalCTX.beginPath();
 
             for (k=0;k!==sidePointCount;k++) {
-                normalCTX.moveTo(x[k],y[k]);
+                this.normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
-                normalCTX.lineTo(x[k2],y[k2]);
+                this.normalCTX.lineTo(x[k2],y[k2]);
             }
 
-            normalCTX.stroke();
+            this.normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_45);
-            normalCTX.beginPath();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_RIGHT_45);
+            this.normalCTX.beginPath();
 
             for (k=sidePointCount;k!==(sidePointCount*2);k++) {
-                normalCTX.moveTo(x[k],y[k]);
+                this.normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
-                normalCTX.lineTo(x[k2],y[k2]);
+                this.normalCTX.lineTo(x[k2],y[k2]);
             }
 
-            normalCTX.stroke();
+            this.normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
-            normalCTX.beginPath();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
+            this.normalCTX.beginPath();
 
             for (k=(sidePointCount*2);k!==(sidePointCount*3);k++) {
-                normalCTX.moveTo(x[k],y[k]);
+                this.normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
-                normalCTX.lineTo(x[k2],y[k2]);
+                this.normalCTX.lineTo(x[k2],y[k2]);
             }
 
-            normalCTX.stroke();
+            this.normalCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_45);
-            normalCTX.beginPath();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_LEFT_45);
+            this.normalCTX.beginPath();
 
             for (k=(sidePointCount*3);k!==(sidePointCount*4);k++) {
-                normalCTX.moveTo(x[k],y[k]);
+                this.normalCTX.moveTo(x[k],y[k]);
                 k2=k+1;
                 if (k2===totalPointCount) k2=0;
-                normalCTX.lineTo(x[k2],y[k2]);
+                this.normalCTX.lineTo(x[k2],y[k2]);
             }
 
-            normalCTX.stroke();
+            this.normalCTX.stroke();
 
                 // reduce polygon
 
@@ -1071,37 +1078,37 @@ export default class GenBitmapBaseClass
             }
         }
 
-        bitmapCTX.lineWidth=1;
-        normalCTX.lineWidth=1;
+        this.bitmapCTX.lineWidth=1;
+        this.normalCTX.lineWidth=1;
         
         if (fillRGBColor===null) return;
 
             // and the fill
 
-        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        this.bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
 
-        bitmapCTX.beginPath();
-        bitmapCTX.moveTo(x[0],y[0]);
+        this.bitmapCTX.beginPath();
+        this.bitmapCTX.moveTo(x[0],y[0]);
 
         for (k=1;k!==totalPointCount;k++) {
-            bitmapCTX.lineTo(x[k],y[k]);
+            this.bitmapCTX.lineTo(x[k],y[k]);
         }
 
-        bitmapCTX.fill();
+        this.bitmapCTX.fill();
         
-        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        this.normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
 
-        normalCTX.beginPath();
-        normalCTX.moveTo(x[0],y[0]);
+        this.normalCTX.beginPath();
+        this.normalCTX.moveTo(x[0],y[0]);
 
         for (k=1;k!==totalPointCount;k++) {
-            normalCTX.lineTo(x[k],y[k]);
+            this.normalCTX.lineTo(x[k],y[k]);
         }
 
-        normalCTX.fill();
+        this.normalCTX.fill();
     }
     
-    draw3DHexagon(bitmapCTX,normalCTX,wid,high,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    draw3DHexagon(wid,high,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
         let n,lx,rx,my,xAdd;
         let darkenFactor,darkColor;
@@ -1117,8 +1124,8 @@ export default class GenBitmapBaseClass
         
             // draw the edges
             
-        bitmapCTX.lineWidth=2;
-        normalCTX.lineWidth=2;
+        this.bitmapCTX.lineWidth=2;
+        this.normalCTX.lineWidth=2;
 
         for (n=0;n!==edgeSize;n++) {
 
@@ -1126,77 +1133,77 @@ export default class GenBitmapBaseClass
 
             darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
             darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
-            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+            this.bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
             
                 // top-left to top to top-right
             
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lx,my);
-            bitmapCTX.lineTo(lft,top);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lx,my);
+            this.bitmapCTX.lineTo(lft,top);
+            this.bitmapCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_LEFT_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(lx,my);
-            normalCTX.lineTo(lft,top);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_LEFT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,my);
+            this.normalCTX.lineTo(lft,top);
+            this.normalCTX.stroke();
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lft,top);
-            bitmapCTX.lineTo(rgt,top);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lft,top);
+            this.bitmapCTX.lineTo(rgt,top);
+            this.bitmapCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(lft,top);
-            normalCTX.lineTo(rgt,top);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lft,top);
+            this.normalCTX.lineTo(rgt,top);
+            this.normalCTX.stroke();
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(rgt,top);
-            bitmapCTX.lineTo(rx,my);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(rgt,top);
+            this.bitmapCTX.lineTo(rx,my);
+            this.bitmapCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_RIGHT_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(rgt,top);
-            normalCTX.lineTo(rx,my);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_RIGHT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(rgt,top);
+            this.normalCTX.lineTo(rx,my);
+            this.normalCTX.stroke();
             
                 // bottom-right to bottom to bottom-left
             
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(rx,my);
-            bitmapCTX.lineTo(rgt,bot);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(rx,my);
+            this.bitmapCTX.lineTo(rgt,bot);
+            this.bitmapCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_RIGHT_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(rx,my);
-            normalCTX.lineTo(rgt,bot);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_RIGHT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(rx,my);
+            this.normalCTX.lineTo(rgt,bot);
+            this.normalCTX.stroke();
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(rgt,bot);
-            bitmapCTX.lineTo(lft,bot);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(rgt,bot);
+            this.bitmapCTX.lineTo(lft,bot);
+            this.bitmapCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(rgt,bot);
-            normalCTX.lineTo(lft,bot);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(rgt,bot);
+            this.normalCTX.lineTo(lft,bot);
+            this.normalCTX.stroke();
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lft,bot);
-            bitmapCTX.lineTo(lx,my);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lft,bot);
+            this.bitmapCTX.lineTo(lx,my);
+            this.bitmapCTX.stroke();
 
-            normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_LEFT_45);
-            normalCTX.beginPath();
-            normalCTX.moveTo(lft,bot);
-            normalCTX.lineTo(lx,my);
-            normalCTX.stroke();
+            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_LEFT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lft,bot);
+            this.normalCTX.lineTo(lx,my);
+            this.normalCTX.stroke();
             
                 // reduce it
                 
@@ -1208,8 +1215,8 @@ export default class GenBitmapBaseClass
             bot--;
         }
         
-        bitmapCTX.lineWidth=1;
-        normalCTX.lineWidth=1;
+        this.bitmapCTX.lineWidth=1;
+        this.normalCTX.lineWidth=1;
         
         if (fillRGBColor===null) return;
 
@@ -1217,66 +1224,66 @@ export default class GenBitmapBaseClass
             // which we have to break up because canvases
             // get confused with offscreen coordinates
 
-        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
-        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        this.bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        this.normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
 
             // the box
             
-        bitmapCTX.fillRect(lft,top,(rgt-lft),(bot-top));
-        normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        this.bitmapCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        this.normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
         
             // left triangle
 
         if (lft>=0) {
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lx,my);
-            bitmapCTX.lineTo(lft,top);
-            bitmapCTX.lineTo(lft,bot);
-            bitmapCTX.fill();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lx,my);
+            this.bitmapCTX.lineTo(lft,top);
+            this.bitmapCTX.lineTo(lft,bot);
+            this.bitmapCTX.fill();
            
-            normalCTX.beginPath();
-            normalCTX.moveTo(lx,my);
-            normalCTX.lineTo(lft,top);
-            normalCTX.lineTo(lft,bot);
-            normalCTX.fill();
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,my);
+            this.normalCTX.lineTo(lft,top);
+            this.normalCTX.lineTo(lft,bot);
+            this.normalCTX.fill();
         }
 
         if (rgt<wid) {
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(rx,my);
-            bitmapCTX.lineTo(rgt,top);
-            bitmapCTX.lineTo(rgt,bot);
-            bitmapCTX.fill();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(rx,my);
+            this.bitmapCTX.lineTo(rgt,top);
+            this.bitmapCTX.lineTo(rgt,bot);
+            this.bitmapCTX.fill();
            
-            normalCTX.beginPath();
-            normalCTX.moveTo(rx,my);
-            normalCTX.lineTo(rgt,top);
-            normalCTX.lineTo(rgt,bot);
-            normalCTX.fill();
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(rx,my);
+            this.normalCTX.lineTo(rgt,top);
+            this.normalCTX.lineTo(rgt,bot);
+            this.normalCTX.fill();
         }
     }
     
-    drawDiamond(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
+    drawDiamond(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
         let mx,my;
 
         mx=Math.trunc((lft+rgt)/2);
         my=Math.trunc((top+bot)/2);
 
-        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
-        if (borderRGBColor!==null) bitmapCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
+        this.bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        if (borderRGBColor!==null) this.bitmapCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
 
-        bitmapCTX.beginPath();
-        bitmapCTX.moveTo(mx,top);
-        bitmapCTX.lineTo(rgt,my);
-        bitmapCTX.lineTo(mx,bot);
-        bitmapCTX.lineTo(lft,my);
-        bitmapCTX.lineTo(mx,top);
-        bitmapCTX.fill();
-        if (borderRGBColor!==null) bitmapCTX.stroke();
+        this.bitmapCTX.beginPath();
+        this.bitmapCTX.moveTo(mx,top);
+        this.bitmapCTX.lineTo(rgt,my);
+        this.bitmapCTX.lineTo(mx,bot);
+        this.bitmapCTX.lineTo(lft,my);
+        this.bitmapCTX.lineTo(mx,top);
+        this.bitmapCTX.fill();
+        if (borderRGBColor!==null) this.bitmapCTX.stroke();
     }
     
-    drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor)
+    drawOval(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
         let mx,my,xRadius,yRadius;
 
@@ -1286,39 +1293,58 @@ export default class GenBitmapBaseClass
         xRadius=Math.trunc((rgt-lft)*0.5);
         yRadius=Math.trunc((bot-top)*0.5);
 
-        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
-        if (borderRGBColor!==null) bitmapCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
+        this.bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        if (borderRGBColor!==null) this.bitmapCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
         
-        bitmapCTX.beginPath();
-        bitmapCTX.ellipse(mx,my,xRadius,yRadius,0.0,0.0,(Math.PI*2));
-        bitmapCTX.fill();
-        if (borderRGBColor!==null) bitmapCTX.stroke();
+        this.bitmapCTX.beginPath();
+        this.bitmapCTX.ellipse(mx,my,xRadius,yRadius,0.0,0.0,(Math.PI*2));
+        this.bitmapCTX.fill();
+        if (borderRGBColor!==null) this.bitmapCTX.stroke();
     }
     
-    drawWrappedOval(bitmapCTX,lft,top,rgt,bot,wid,high,fillRGBColor,borderRGBColor)
+    drawGlowOval(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
+    {
+        let mx,my,xRadius,yRadius;
+
+        mx=Math.trunc((lft+rgt)/2);
+        my=Math.trunc((top+bot)/2);
+        
+        xRadius=Math.trunc((rgt-lft)*0.5);
+        yRadius=Math.trunc((bot-top)*0.5);
+
+        this.glowCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        if (borderRGBColor!==null) this.glowCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
+        
+        this.glowCTX.beginPath();
+        this.glowCTX.ellipse(mx,my,xRadius,yRadius,0.0,0.0,(Math.PI*2));
+        this.glowCTX.fill();
+        if (borderRGBColor!==null) this.glowCTX.stroke();
+    }
+    
+    drawWrappedOval(lft,top,rgt,bot,wid,high,fillRGBColor,borderRGBColor)
     {
         let         x,y;
         
-        this.drawOval(bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor);
+        this.drawOval(this.bitmapCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor);
         if (lft<0) {
             x=wid+lft;
-            this.drawOval(bitmapCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
+            this.drawOval(this.bitmapCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
         }
         if (rgt>wid) {
             x=-(rgt-wid);
-            this.drawOval(bitmapCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
+            this.drawOval(this.bitmapCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
         }
         if (top<0) {
             y=high+top;
-            this.drawOval(bitmapCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
+            this.drawOval(this.bitmapCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
         }
         if (bot>high) {
             y=-(bot-high);
-            this.drawOval(bitmapCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
+            this.drawOval(this.bitmapCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
         }
     }
     
-    draw3DOval(bitmapCTX,normalCTX,lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
+    draw3DOval(lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,col,idx;
@@ -1341,7 +1367,7 @@ export default class GenBitmapBaseClass
         mx=Math.trunc(wid/2);
         my=Math.trunc(high/2);
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,orgWid,orgHigh);
         bitmapData=bitmapImgData.data;
 
         edgeCount=edgeSize;
@@ -1394,14 +1420,14 @@ export default class GenBitmapBaseClass
             high--;
         }
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);
         
             // chrome has a really onbxious bug where it'll get
             // image data messed up and doing both of these at once
             // tends to get the normal written to the bitmap, so,
             // sigh, we do both these separately
             
-        normalImgData=normalCTX.getImageData(lft,top,orgWid,orgHigh);
+        normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
         normalData=normalImgData.data;
         
         wid=orgWid-1;
@@ -1459,10 +1485,10 @@ export default class GenBitmapBaseClass
             high--;
         }
         
-        normalCTX.putImageData(normalImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
     }
 
-    draw3DComplexOval(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
+    draw3DComplexOval(lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
         let n,k,k2,add,rad,fx,fy;
         let darkenFactor,darkColor,normal;
@@ -1505,8 +1531,8 @@ export default class GenBitmapBaseClass
 
             // draw the edges
 
-        bitmapCTX.lineWidth=2;
-        normalCTX.lineWidth=2;
+        this.bitmapCTX.lineWidth=2;
+        this.normalCTX.lineWidth=2;
 
         for (n=0;n!==edgeSize;n++) {
 
@@ -1514,17 +1540,17 @@ export default class GenBitmapBaseClass
 
             darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
             darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
-            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+            this.bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
 
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x[0],y[0]);
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(x[0],y[0]);
 
             for (k=1;k!==totalPointCount;k++) {
-                bitmapCTX.lineTo(x[k],y[k]);
+                this.bitmapCTX.lineTo(x[k],y[k]);
             }
 
-            bitmapCTX.lineTo(x[0],y[0]);
-            bitmapCTX.stroke();
+            this.bitmapCTX.lineTo(x[0],y[0]);
+            this.bitmapCTX.stroke();
 
                 // the normals
                 
@@ -1532,15 +1558,15 @@ export default class GenBitmapBaseClass
                 rad=(Math.PI*2.0)*(k/totalPointCount);
                 normal=new PointClass(Math.sin(rad),Math.cos(rad),0.5);
                 normal.normalize();
-                normalCTX.strokeStyle=this.normalToRGBColor(normal);
+                this.normalCTX.strokeStyle=this.normalToRGBColor(normal);
                 
                 k2=k+1;
                 if (k2===totalPointCount) k2=0;
 
-                normalCTX.beginPath();
-                normalCTX.moveTo(x[k],y[k]);
-                normalCTX.lineTo(x[k2],y[k2]);
-                normalCTX.stroke();
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x[k],y[k]);
+                this.normalCTX.lineTo(x[k2],y[k2]);
+                this.normalCTX.stroke();
             }
             
                 // reduce polygon
@@ -1551,34 +1577,34 @@ export default class GenBitmapBaseClass
             }
         }
 
-        bitmapCTX.lineWidth=1;
-        normalCTX.lineWidth=1;
+        this.bitmapCTX.lineWidth=1;
+        this.normalCTX.lineWidth=1;
         
         if (fillRGBColor===null) return;
 
             // and the fill
 
-        bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        this.bitmapCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
 
-        bitmapCTX.beginPath();
-        bitmapCTX.moveTo(x[0],y[0]);
+        this.bitmapCTX.beginPath();
+        this.bitmapCTX.moveTo(x[0],y[0]);
 
         for (k=1;k!==totalPointCount;k++) {
-            bitmapCTX.lineTo(x[k],y[k]);
+            this.bitmapCTX.lineTo(x[k],y[k]);
         }
 
-        bitmapCTX.fill();
+        this.bitmapCTX.fill();
         
-        normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        this.normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
 
-        normalCTX.beginPath();
-        normalCTX.moveTo(x[0],y[0]);
+        this.normalCTX.beginPath();
+        this.normalCTX.moveTo(x[0],y[0]);
 
         for (k=1;k!==totalPointCount;k++) {
-            normalCTX.lineTo(x[k],y[k]);
+            this.normalCTX.lineTo(x[k],y[k]);
         }
 
-        normalCTX.fill();
+        this.normalCTX.fill();
     }
     
     drawLine2(ctx,imgWid,imgHigh,x,y,x2,y2,color)
@@ -1634,86 +1660,86 @@ export default class GenBitmapBaseClass
     }
 
    
-    drawLine(bitmapCTX,normalCTX,x,y,x2,y2,color,lightLine)
+    drawLine(x,y,x2,y2,color,lightLine)
     {
         let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
             // line itself
             
-        bitmapCTX.strokeStyle=this.colorToRGBColor(color);
+        this.bitmapCTX.strokeStyle=this.colorToRGBColor(color);
 
-        bitmapCTX.beginPath();
-        bitmapCTX.moveTo(x,y);
-        bitmapCTX.lineTo(x2,y2);
-        bitmapCTX.stroke();
+        this.bitmapCTX.beginPath();
+        this.bitmapCTX.moveTo(x,y);
+        this.bitmapCTX.lineTo(x2,y2);
+        this.bitmapCTX.stroke();
         
             // smoothing
   
-        bitmapCTX.strokeStyle=this.colorToRGBAColor(color,0.5);
+        this.bitmapCTX.strokeStyle=this.colorToRGBAColor(color,0.5);
 
         if (horizontal) {
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x,(y-1));
-            bitmapCTX.lineTo(x2,(y2-1));
-            bitmapCTX.stroke();
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(x,(y+1));
-            bitmapCTX.lineTo(x2,(y2+1));
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(x,(y-1));
+            this.bitmapCTX.lineTo(x2,(y2-1));
+            this.bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(x,(y+1));
+            this.bitmapCTX.lineTo(x2,(y2+1));
+            this.bitmapCTX.stroke();
         }
         else {
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo((x-1),y);
-            bitmapCTX.lineTo((x2-1),y2);
-            bitmapCTX.stroke();
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo((x+1),y);
-            bitmapCTX.lineTo((x2+1),y2);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo((x-1),y);
+            this.bitmapCTX.lineTo((x2-1),y2);
+            this.bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo((x+1),y);
+            this.bitmapCTX.lineTo((x2+1),y2);
+            this.bitmapCTX.stroke();
         }
 
             // the normal change
             // flip as lines are inside
 
-        if (normalCTX!==null) {
+        if (this.normalCTX!==null) {
             if (horizontal) {
-                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,(y-1));
-                normalCTX.lineTo(x2,(y2-1));
-                normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,(y+1));
-                normalCTX.lineTo(x2,(y2+1));
-                normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,(y-1));
+                this.normalCTX.lineTo(x2,(y2-1));
+                this.normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,(y+1));
+                this.normalCTX.lineTo(x2,(y2+1));
+                this.normalCTX.stroke();
             }
             else {
-                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo((x-1),y);
-                normalCTX.lineTo((x2-1),y2);
-                normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
-                normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo((x+1),y);
-                normalCTX.lineTo((x2+1),y2);
-                normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo((x-1),y);
+                this.normalCTX.lineTo((x2-1),y2);
+                this.normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo((x+1),y);
+                this.normalCTX.lineTo((x2+1),y2);
+                this.normalCTX.stroke();
             }
         }
     }
     
-    drawRandomLine(bitmapCTX,normalCTX,x,y,x2,y2,clipLft,clipTop,clipRgt,clipBot,lineVariant,color,lightLine)
+    drawRandomLine(x,y,x2,y2,clipLft,clipTop,clipRgt,clipBot,lineVariant,color,lightLine)
     {
         let n,sx,sy,ex,ey,r;
         let segCount=genRandom.randomInt(2,5);
@@ -1750,14 +1776,14 @@ export default class GenBitmapBaseClass
             if (ey<clipTop) ey=clipTop;
             if (ey>clipBot) ey=clipBot;
             
-            this.drawLine(bitmapCTX,normalCTX,sx,sy,ex,ey,color,lightLine);
+            this.drawLine(sx,sy,ex,ey,color,lightLine);
             
             sx=ex;
             sy=ey;
         }
     }
     
-    drawBumpLine(bitmapCTX,normalCTX,x,y,x2,y2,wid,color)
+    drawBumpLine(x,y,x2,y2,wid,color)
     {
         let n;
         let halfWid=Math.trunc(wid*0.5);
@@ -1779,35 +1805,35 @@ export default class GenBitmapBaseClass
         
             // the fade up
             
-        bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+        this.bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
             
         for (n=0;n!==chunkOne;n++) {
             if (horizontal) {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,y);
-                bitmapCTX.lineTo(x2,y2);
-                bitmapCTX.stroke();
+                this.bitmapCTX.beginPath();
+                this.bitmapCTX.moveTo(x,y);
+                this.bitmapCTX.lineTo(x2,y2);
+                this.bitmapCTX.stroke();
                 
-                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
                 
                 y++;
                 y2++;
             }
             else {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,y);
-                bitmapCTX.lineTo(x2,y2);
-                bitmapCTX.stroke();
+                this.bitmapCTX.beginPath();
+                this.bitmapCTX.moveTo(x,y);
+                this.bitmapCTX.lineTo(x2,y2);
+                this.bitmapCTX.stroke();
 
-                normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor((n===0)?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
                 
                 x++;
                 x2++;
@@ -1816,34 +1842,34 @@ export default class GenBitmapBaseClass
         
             // the level chunk
             
-        bitmapCTX.strokeStyle=this.colorToRGBColor(color);
-        normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+        this.bitmapCTX.strokeStyle=this.colorToRGBColor(color);
+        this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
         
         for (n=chunkOne;n!==chunkTwo;n++) {
             if (horizontal) {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,y);
-                bitmapCTX.lineTo(x2,y2);
-                bitmapCTX.stroke();
+                this.bitmapCTX.beginPath();
+                this.bitmapCTX.moveTo(x,y);
+                this.bitmapCTX.lineTo(x2,y2);
+                this.bitmapCTX.stroke();
                 
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
                 
                 y++;
                 y2++;
             }
             else {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,y);
-                bitmapCTX.lineTo(x2,y2);
-                bitmapCTX.stroke();
+                this.bitmapCTX.beginPath();
+                this.bitmapCTX.moveTo(x,y);
+                this.bitmapCTX.lineTo(x2,y2);
+                this.bitmapCTX.stroke();
 
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
                 
                 x++;
                 x2++;
@@ -1852,35 +1878,35 @@ export default class GenBitmapBaseClass
             
             // the fade down
             
-        bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+        this.bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
             
         for (n=chunkTwo;n!==wid;n++) {
             if (horizontal) {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,y);
-                bitmapCTX.lineTo(x2,y2);
-                bitmapCTX.stroke();
+                this.bitmapCTX.beginPath();
+                this.bitmapCTX.moveTo(x,y);
+                this.bitmapCTX.lineTo(x2,y2);
+                this.bitmapCTX.stroke();
                 
-                normalCTX.strokeStyle=this.normalToRGBColor((n===(wid-1))?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor((n===(wid-1))?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
                 
                 y++;
                 y2++;
             }
             else {
-                bitmapCTX.beginPath();
-                bitmapCTX.moveTo(x,y);
-                bitmapCTX.lineTo(x2,y2);
-                bitmapCTX.stroke();
+                this.bitmapCTX.beginPath();
+                this.bitmapCTX.moveTo(x,y);
+                this.bitmapCTX.lineTo(x2,y2);
+                this.bitmapCTX.stroke();
 
-                normalCTX.strokeStyle=this.normalToRGBColor((n===(wid-1))?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
-                normalCTX.beginPath();
-                normalCTX.moveTo(x,y);
-                normalCTX.lineTo(x2,y2);
-                normalCTX.stroke();
+                this.normalCTX.strokeStyle=this.normalToRGBColor((n===(wid-1))?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
+                this.normalCTX.beginPath();
+                this.normalCTX.moveTo(x,y);
+                this.normalCTX.lineTo(x2,y2);
+                this.normalCTX.stroke();
                 
                 x++;
                 x2++;
@@ -1892,13 +1918,13 @@ export default class GenBitmapBaseClass
         // slopes
         //
         
-    drawSlope(bitmapCTX,normalCTX,lft,top,rgt,bot,color,up)
+    drawSlope(lft,top,rgt,bot,color,up)
     {
         let y;
         let darkenFactor,darkColor;
         let high=bot-top;
         
-        normalCTX.strokeStyle=this.normalToRGBColor(up?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
+        this.normalCTX.strokeStyle=this.normalToRGBColor(up?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
         
         for (y=top;y!==bot;y++) {
             
@@ -1906,17 +1932,17 @@ export default class GenBitmapBaseClass
             if (up) darkenFactor=0.2-darkenFactor;
             darkenFactor+=0.8;
             darkColor=this.darkenColor(color,darkenFactor);
-            bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
+            this.bitmapCTX.strokeStyle=this.colorToRGBColor(darkColor);
             
-            bitmapCTX.beginPath();
-            bitmapCTX.moveTo(lft,y);
-            bitmapCTX.lineTo(rgt,y);
-            bitmapCTX.stroke();
+            this.bitmapCTX.beginPath();
+            this.bitmapCTX.moveTo(lft,y);
+            this.bitmapCTX.lineTo(rgt,y);
+            this.bitmapCTX.stroke();
             
-            normalCTX.beginPath();
-            normalCTX.moveTo(lft,y);
-            normalCTX.lineTo(rgt,y);
-            normalCTX.stroke();
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lft,y);
+            this.normalCTX.lineTo(rgt,y);
+            this.normalCTX.stroke();
         }
     }
     
@@ -1924,7 +1950,7 @@ export default class GenBitmapBaseClass
         // particles
         //
 
-    drawParticle(bitmapCTX,normalCTX,imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
+    drawParticle(imgWid,imgHigh,lft,top,rgt,bot,ringCount,darkenFactor,pixelDensity,flipNormals)
     {
         let n,k,px,py,mx,my,idx;
         let rad,fx,fy,fsz;
@@ -1968,7 +1994,7 @@ export default class GenBitmapBaseClass
 
             // do the bitmap data first
             
-        bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        bitmapImgData=this.bitmapCTX.getImageData(0,0,imgWid,imgHigh);
         bitmapData=bitmapImgData.data;
 
             // create the rings of
@@ -2032,13 +2058,11 @@ export default class GenBitmapBaseClass
 
             // write all the data back
 
-        bitmapCTX.putImageData(bitmapImgData,0,0);
+        this.bitmapCTX.putImageData(bitmapImgData,0,0);
         
             // now the normal data
             
-        if (normalCTX===null) return;
-            
-        normalImgData=normalCTX.getImageData(0,0,imgWid,imgHigh);
+        normalImgData=this.normalCTX.getImageData(0,0,imgWid,imgHigh);
         normalData=normalImgData.data;
 
             // create the rings of
@@ -2097,14 +2121,14 @@ export default class GenBitmapBaseClass
 
             // write all the data back
 
-        normalCTX.putImageData(normalImgData,0,0);
+        this.normalCTX.putImageData(normalImgData,0,0);
     }
     
         //
         // streaks
         //
 
-    drawStreakMetal(bitmapCTX,imgWid,imgHigh,x,top,bot,streakWid,baseColor)
+    drawStreakMetal(imgWid,imgHigh,x,top,bot,streakWid,baseColor)
     {
         let n,lx,rx,y,idx;
         let bitmapImgData,bitmapData;
@@ -2122,7 +2146,7 @@ export default class GenBitmapBaseClass
         
             // get the image data
 
-        bitmapImgData=bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        bitmapImgData=this.bitmapCTX.getImageData(0,0,imgWid,imgHigh);
         bitmapData=bitmapImgData.data;
         
             // start with 100 density and reduce
@@ -2165,10 +2189,10 @@ export default class GenBitmapBaseClass
         
             // write all the data back
 
-        bitmapCTX.putImageData(bitmapImgData,0,0);
+        this.bitmapCTX.putImageData(bitmapImgData,0,0);
     }
     
-    drawStreakDirtSingle(bitmapCTX,lft,top,rgt,bot,reduceStreak,density,dirtColorAvg)
+    drawStreakDirtSingle(lft,top,rgt,bot,reduceStreak,density,dirtColorAvg)
     {
         let lx,rx,xAdd,x,y,idx;
         let factor,lineDensity,dirtWidReduce;
@@ -2180,7 +2204,7 @@ export default class GenBitmapBaseClass
         
             // get the image data
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
         
             // random dirt reductions
@@ -2217,10 +2241,10 @@ export default class GenBitmapBaseClass
         
             // write all the data back
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
     
-    drawStreakDirt(bitmapCTX,lft,top,rgt,bot,additionalStreakCount,reduceStreak,density,color)
+    drawStreakDirt(lft,top,rgt,bot,additionalStreakCount,reduceStreak,density,color)
     {
         let n,sx,ex,ey;
         let dirtColorAvg;
@@ -2231,7 +2255,7 @@ export default class GenBitmapBaseClass
         
             // original streak
             
-        this.drawStreakDirtSingle(bitmapCTX,lft,top,rgt,bot,reduceStreak,density,dirtColorAvg);
+        this.drawStreakDirtSingle(lft,top,rgt,bot,reduceStreak,density,dirtColorAvg);
         
             // additional streaks
             
@@ -2242,7 +2266,7 @@ export default class GenBitmapBaseClass
             
             ey=bot-genRandom.randomInt(0,Math.trunc((bot-top)*0.25));
             
-            this.drawStreakDirtSingle(bitmapCTX,sx,top,ex,ey,reduceStreak,density,dirtColorAvg);
+            this.drawStreakDirtSingle(sx,top,ex,ey,reduceStreak,density,dirtColorAvg);
             
             lft=sx;     // always make sure the newest streaks are smaller and within the first one
             rgt=ex;
@@ -2253,7 +2277,7 @@ export default class GenBitmapBaseClass
         // gradients
         //
         
-    drawVerticalGradient(bitmapCTX,lft,top,rgt,bot,topColor,botColor)
+    drawVerticalGradient(lft,top,rgt,bot,topColor,botColor)
     {
         let x,y,idx;
         let rDif,gDif,bDif,factor,redByte,greenByte,blueByte;
@@ -2265,7 +2289,7 @@ export default class GenBitmapBaseClass
 
         if ((wid<1) || (high<1)) return;
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
         
         rDif=botColor.r-topColor.r;
@@ -2294,10 +2318,10 @@ export default class GenBitmapBaseClass
 
             // write all the data back
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
 
-    drawColorStripeHorizontal(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
+    drawColorStripeHorizontal(lft,top,rgt,bot,factor,baseColor)
     {
         let x,y,nx,nz,idx;
         let color,redByte,greenByte,blueByte;
@@ -2313,7 +2337,7 @@ export default class GenBitmapBaseClass
             // two image datas of the same size, so we do these
             // separately
             
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
 
         for (y=0;y!==high;y++) {
@@ -2334,11 +2358,11 @@ export default class GenBitmapBaseClass
             }
         }
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);        
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);        
 
             // the normal data
             
-        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
         normalData=normalImgData.data;
 
         nx=Math.trunc((0.10+1.0)*127.0);
@@ -2361,10 +2385,10 @@ export default class GenBitmapBaseClass
             nx=-nx;
         }
 
-        normalCTX.putImageData(normalImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
     }
 
-    drawColorStripeVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
+    drawColorStripeVertical(lft,top,rgt,bot,factor,baseColor)
     {
         let x,y,nx,nz,idx;
         let color,redByte,greenByte,blueByte;
@@ -2380,7 +2404,7 @@ export default class GenBitmapBaseClass
             // two image datas of the same size, so we do these
             // separately
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
 
             // write the stripe
@@ -2402,11 +2426,11 @@ export default class GenBitmapBaseClass
 
             // write all the data back
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);
         
             // normal data
             
-        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
         normalData=normalImgData.data;
 
         nx=Math.trunc((0.10+1.0)*127.0);
@@ -2425,10 +2449,10 @@ export default class GenBitmapBaseClass
             nx=-nx;
         }
 
-        normalCTX.putImageData(normalImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
     }
 
-    drawColorStripeSlant(bitmapCTX,normalCTX,lft,top,rgt,bot,factor,baseColor)
+    drawColorStripeSlant(lft,top,rgt,bot,factor,baseColor)
     {
         let x,y,nx,nz,idx,cIdx;
         let color;
@@ -2444,7 +2468,7 @@ export default class GenBitmapBaseClass
             // two image datas of the same size, so we do these
             // separately
 
-        bitmapImgData=bitmapCTX.getImageData(lft,top,wid,high);
+        bitmapImgData=this.bitmapCTX.getImageData(lft,top,wid,high);
         bitmapData=bitmapImgData.data;
 
         for (y=0;y!==high;y++) {
@@ -2461,11 +2485,11 @@ export default class GenBitmapBaseClass
             }
         }
 
-        bitmapCTX.putImageData(bitmapImgData,lft,top);        
+        this.bitmapCTX.putImageData(bitmapImgData,lft,top);        
         
             // normal data
             
-        normalImgData=normalCTX.getImageData(lft,top,wid,high);
+        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
         normalData=normalImgData.data;
 
         nx=Math.trunc((0.10+1.0)*127.0);
@@ -2484,34 +2508,34 @@ export default class GenBitmapBaseClass
             }
         }
 
-        normalCTX.putImageData(normalImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
     }
     
         //
         // wood utilities
         //
         
-    generateWoodDrawBoard(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,woodColor)
+    generateWoodDrawBoard(lft,top,rgt,bot,edgeSize,woodColor)
     {
         let col;
         
         col=this.darkenColor(woodColor,genRandom.randomFloat(0.8,0.2));
         
-        this.draw3DRect(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeSize,col,true);
+        this.draw3DRect(lft,top,rgt,bot,edgeSize,col,true);
         if ((bot-top)>(rgt-lft)) {
-            this.drawColorStripeVertical(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+            this.drawColorStripeVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
         }
         else {
-            this.drawColorStripeHorizontal(bitmapCTX,normalCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
+            this.drawColorStripeHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
         }
-        this.addNoiseRect(bitmapCTX,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
+        this.addNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
     }
     
         //
         // metal utilities
         //
     
-    generateMetalStreakShine(bitmapCTX,lft,top,rgt,bot,wid,high,metalColor)
+    generateMetalStreakShine(lft,top,rgt,bot,wid,high,metalColor)
     {
         let x,streakWid,streakColor;
         let lite=genRandom.randomPercentage(0.5); 
@@ -2533,17 +2557,17 @@ export default class GenBitmapBaseClass
                 }
                 
 
-                this.drawStreakMetal(bitmapCTX,wid,high,x,top,bot,streakWid,streakColor);
+                this.drawStreakMetal(wid,high,x,top,bot,streakWid,streakColor);
             }
             
             x+=(streakWid+genRandom.randomInt(15,30));
             if (x>=rgt) break;
         }
         
-        this.blur(bitmapCTX,lft,top,rgt,bot,(lite?2:1),true);
+        this.blur(lft,top,rgt,bot,(lite?2:1),true);
     }
     
-    generateMetalScrewsRandom(bitmapCTX,normalCTX,lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
+    generateMetalScrewsRandom(lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
     {
         let         n,x,y,lx,rx,ty,by;
         let         xCount,xOffset,yCount,yOffset;
@@ -2562,10 +2586,10 @@ export default class GenBitmapBaseClass
             // corners
 
         if (genRandom.randomPercentage(0.33)) {
-            this.draw3DOval(bitmapCTX,normalCTX,lx,ty,(lx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,rx,ty,(rx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,lx,by,(lx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(bitmapCTX,normalCTX,rx,by,(rx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(lx,ty,(lx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(rx,ty,(rx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(lx,by,(lx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(rx,by,(rx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
             return;
         }
         
@@ -2574,7 +2598,7 @@ export default class GenBitmapBaseClass
         if (genRandom.randomPercentage(0.33)) {
             for (n=0;n!==yCount;n++) {
                 y=top+(yOffset+(n*(screwSize+5)));
-                this.draw3DOval(bitmapCTX,normalCTX,lx,y,(lx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+                this.draw3DOval(lx,y,(lx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
             }
         }
         
@@ -2583,7 +2607,7 @@ export default class GenBitmapBaseClass
         if (genRandom.randomPercentage(0.33)) {
             for (n=0;n!==yCount;n++) {
                 y=top+(yOffset+(n*(screwSize+5)));
-                this.draw3DOval(bitmapCTX,normalCTX,rx,y,(rx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+                this.draw3DOval(rx,y,(rx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
             }
         }
         
@@ -2592,7 +2616,7 @@ export default class GenBitmapBaseClass
         if (genRandom.randomPercentage(0.33)) {
             for (n=0;n!==xCount;n++) {
                 x=lft+(xOffset+(n*(screwSize+5)));
-                this.draw3DOval(bitmapCTX,normalCTX,x,ty,(x+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+                this.draw3DOval(x,ty,(x+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
             }
         }
         
@@ -2601,12 +2625,12 @@ export default class GenBitmapBaseClass
         if (genRandom.randomPercentage(0.33)) {
             for (n=0;n!==xCount;n++) {
                 x=lft+(xOffset+(n*(screwSize+5)));
-                this.draw3DOval(bitmapCTX,normalCTX,x,by,(x+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+                this.draw3DOval(x,by,(x+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
             }
         }
     }
     
-    generateMetalScrewsHorizontal(bitmapCTX,normalCTX,lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
+    generateMetalScrewsHorizontal(lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
     {
         let         n,x,y;
         let         xCount,xOffset;
@@ -2618,11 +2642,11 @@ export default class GenBitmapBaseClass
         
         for (n=0;n!==xCount;n++) {
             x=lft+(xOffset+(n*(screwSize+5)));
-            this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
         }
     }
     
-    generateMetalScrewsVertical(bitmapCTX,normalCTX,lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
+    generateMetalScrewsVertical(lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
     {
         let         n,x,y;
         let         yCount,yOffset;
@@ -2634,7 +2658,7 @@ export default class GenBitmapBaseClass
         
         for (n=0;n!==yCount;n++) {
             y=lft+(yOffset+(n*(screwSize+5)));
-            this.draw3DOval(bitmapCTX,normalCTX,x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
         }
     }
     
@@ -2642,7 +2666,7 @@ export default class GenBitmapBaseClass
         // cracks
         //
         
-    drawSmallCrack(bitmapCTX,normalCTX,lft,top,rgt,bot,edgeMargin,backColor)
+    drawSmallCrack(lft,top,rgt,bot,edgeMargin,backColor)
     {
         let sx,ex,sy,ey;
         let lineColor,lineMargin;
@@ -2670,41 +2694,65 @@ export default class GenBitmapBaseClass
         }
 
         lineColor=this.darkenColor(backColor,0.9);
-        this.drawRandomLine(bitmapCTX,normalCTX,sx,sy,ex,ey,lft,top,rgt,bot,20,lineColor,false);
+        this.drawRandomLine(sx,sy,ex,ey,lft,top,rgt,bot,20,lineColor,false);
     }
     
         //
         // face chunks
         //
         
-    generateFaceChunkEye(bitmapCTX,normalCTX,glowCTX,x,top,bot,eyeColor)
+    generateFaceChunkEye(x,top,bot,eyeColor)
     {
-        this.draw3DOval(bitmapCTX,normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
-        this.drawOval(bitmapCTX,(x+10),(top+81),(x+20),(top+89),eyeColor,null);
-        this.drawOval(glowCTX,(x+10),(top+81),(x+20),(top+89),this.darkenColor(eyeColor,0.5),null);
+        this.draw3DOval(this.normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
+        this.drawOval((x+10),(top+81),(x+20),(top+89),eyeColor,null);
+        this.drawGlowOval((x+10),(top+81),(x+20),(top+89),this.darkenColor(eyeColor,0.5),null);
     }
     
-    generateFaceChunk(bitmapCTX,normalCTX,glowCTX,lft,top,rgt,bot)
+    generateFaceChunk(lft,top,rgt,bot)
     {
         let eyeColor=this.getRandomColor();
         
-        this.generateFaceChunkEye(bitmapCTX,normalCTX,glowCTX,480,top,bot,eyeColor);
-        this.generateFaceChunkEye(bitmapCTX,normalCTX,glowCTX,430,top,bot,eyeColor);
+        this.generateFaceChunkEye(480,top,bot,eyeColor);
+        this.generateFaceChunkEye(430,top,bot,eyeColor);
     }
     
         //
         // testing
         //
     
-    drawUVTest(bitmapCTX,lft,top,rgt,bot)
+    drawUVTest(lft,top,rgt,bot)
     {
         let xMid=Math.trunc((lft+rgt)/2);
         let yMid=Math.trunc((top+bot)/2);
         
-        this.drawRect(bitmapCTX,lft,top,xMid,yMid,new ColorClass(1,1,0));
-        this.drawRect(bitmapCTX,xMid,top,rgt,yMid,new ColorClass(1,0,0));
-        this.drawRect(bitmapCTX,lft,yMid,xMid,bot,new ColorClass(0,1,0));
-        this.drawRect(bitmapCTX,xMid,yMid,rgt,bot,new ColorClass(0,0,1));
+        this.drawRect(lft,top,xMid,yMid,new ColorClass(1,1,0));
+        this.drawRect(xMid,top,rgt,yMid,new ColorClass(1,0,0));
+        this.drawRect(lft,yMid,xMid,bot,new ColorClass(0,1,0));
+        this.drawRect(xMid,yMid,rgt,bot,new ColorClass(0,0,1));
+    }
+    
+        //
+        // clear canvases
+        //
+        
+    clearCanvases(canvas,ctx,r,g,b,a)
+    {
+        let n,len;
+        let imgData,data;
+        
+        len=(canvas.width*4)*canvas.height;
+        
+        imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        data=imgData.data;
+        
+        for (n=0;n!==len;n+=4) {
+            data[n]=r;
+            data[n+1]=g;
+            data[n+2]=b;
+            data[n+3]=a;
+        }
+        
+        ctx.putImageData(imgData,0,0);
     }
     
         //
@@ -2714,36 +2762,49 @@ export default class GenBitmapBaseClass
     generateInternal()
     {
     }
-
+    
     generate(inDebug)
     {
-        return(this.generateInternal(inDebug));
-        
-        // move bitmap setup here
-        // move returns here
-        // get rid of passing around bitmap etc
-        
-        /*
+            // setup all the bitmap parts
+            
         this.bitmapCanvas=document.createElement('canvas');
         this.bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
         this.bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        this.bitmapCTX=bitmapCanvas.getContext('2d');
-
+        this.bitmapCTX=this.bitmapCanvas.getContext('2d');
+        
         this.normalCanvas=document.createElement('canvas');
-        this.normalCanvas.width=hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.normalCanvas.height=hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.normalCTX=normalCanvas.getContext('2d');
+        this.normalCanvas.width=this.hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.normalCanvas.height=this.hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.normalCTX=this.normalCanvas.getContext('2d');
 
         this.specularCanvas=document.createElement('canvas');
-        this.specularCanvas.width=hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.specularCanvas.height=hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.specularCTX=specularCanvas.getContext('2d');
+        this.specularCanvas.width=this.hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.specularCanvas.height=this.hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.specularCTX=this.specularCanvas.getContext('2d');
         
         this.glowCanvas=document.createElement('canvas');
-        this.glowCanvas.width=hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.glowCanvas.height=hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.glowCTX=glowCanvas.getContext('2d');
-*/
+        this.glowCanvas.width=this.hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.glowCanvas.height=this.hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.glowCTX=this.glowCanvas.getContext('2d');
+        
+        this.clearCanvases(this.bitmapCanvas,this.bitmapCTX,255,255,255,255);
+        this.clearCanvases(this.normalCanvas,this.normalCTX,0,0,255,255);
+        this.clearCanvases(this.specularCanvas,this.specularCTX,0,0,0,255);
+        this.clearCanvases(this.glowCanvas,this.glowCTX,0,0,0,255);
+
+            // run the internal generator
+
+        this.generateInternal();
+
+            // debug just displays the canvases, so send
+            // them back
+        
+        if (inDebug) return({bitmap:this.bitmapCanvas,normal:this.normalCanvas,specular:this.specularCanvas,glow:this.glowCanvas});
+        
+            // otherwise, create the bitmap object
+
+        return(new BitmapClass(this.view,this.bitmapCanvas,this.normalCanvas,this.specularCanvas,this.glowCanvas,this.alpha,this.uvScale,this.shineFactor));    
+
     }
     
 }

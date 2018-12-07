@@ -15,14 +15,14 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
         Object.seal(this);
     }
     
-    generateBlob(bitmapCTX,wid,high)
+    generateBlob(wid,high)
     {
         let n,f,col;
         let x,y,halfWid,halfHigh,ovalWid,ovalHigh;
 
             // background
             
-        this.drawRect(bitmapCTX,0,0,wid,high,this.blackColor);
+        this.drawRect(0,0,wid,high,this.blackColor);
 
             // different blends of gray
             
@@ -39,7 +39,7 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
             x=genRandom.randomInt(0,(wid-ovalWid));
             y=genRandom.randomInt(0,(high-ovalHigh));
             
-            this.drawOval(bitmapCTX,x,y,(x+ovalWid),(y+ovalHigh),col,null);
+            this.drawOval(x,y,(x+ovalWid),(y+ovalHigh),col,null);
         }
     }
         
@@ -47,32 +47,14 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX;
 
-            // setup the canvas
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_PARTICLE_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_PARTICLE_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
-
-        this.generateBlob(bitmapCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:null,specular:null,glow:null});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,null,null,null,1.0,[(1.0/4000.0),(1.0/4000.0)],1.0));    
+        this.generateBlob(wid,high);
     }
 
 }

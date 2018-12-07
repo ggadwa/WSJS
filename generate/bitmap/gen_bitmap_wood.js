@@ -19,7 +19,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         // wood bitmaps
         //
 
-    generateWood(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateWood(wid,high)
     {
         let n,y,lft,rgt,top,bot;
         let topBotBorder,lftRgtBorder;
@@ -34,7 +34,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
 
             // clear canvases
 
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearNormalsRect(0,0,wid,high);
 
             // regular wood planking
 
@@ -47,7 +47,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
             boardSplit=genRandom.randomInt(1,3);
             boardHigh=Math.trunc(high/boardSplit);
             
-            this.generateWoodDrawBoard(bitmapCTX,normalCTX,lft,0,rgt,high,edgeSize,woodColor);
+            this.generateWoodDrawBoard(lft,0,rgt,high,edgeSize,woodColor);
             
             lft=rgt;
         }
@@ -63,7 +63,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         if ((lftRgtBorder) || (topBotBorder)) {
             if (genRandom.randomPercentage(0.5)) {
                 y=Math.trunc((high*0.5)-(boardSize*0.5));
-                this.generateWoodDrawBoard(bitmapCTX,normalCTX,0,y,wid,(y+boardSize),edgeSize,woodColor);
+                this.generateWoodDrawBoard(0,y,wid,(y+boardSize),edgeSize,woodColor);
             }
         }
         
@@ -71,66 +71,32 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
             top+=boardSize;
             bot-=boardSize;
             
-            this.generateWoodDrawBoard(bitmapCTX,normalCTX,0,0,wid,boardSize,edgeSize,woodColor);
-            this.generateWoodDrawBoard(bitmapCTX,normalCTX,0,(high-boardSize),wid,high,edgeSize,woodColor);
+            this.generateWoodDrawBoard(0,0,wid,boardSize,edgeSize,woodColor);
+            this.generateWoodDrawBoard(0,(high-boardSize),wid,high,edgeSize,woodColor);
         }
         
         if (topBotBorder) {
-            this.generateWoodDrawBoard(bitmapCTX,normalCTX,0,top,boardSize,bot,edgeSize,woodColor);
-            this.generateWoodDrawBoard(bitmapCTX,normalCTX,(wid-boardSize),top,wid,bot,edgeSize,woodColor);
+            this.generateWoodDrawBoard(0,top,boardSize,bot,edgeSize,woodColor);
+            this.generateWoodDrawBoard((wid-boardSize),top,wid,bot,edgeSize,woodColor);
         }
 
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.2);
+        this.createSpecularMap(wid,high,0.2);
     }
             
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
-
-        this.generateWood(bitmapCTX,normalCTX,specularCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],2.0));    
+        this.generateWood(wid,high);
     }
 
 }

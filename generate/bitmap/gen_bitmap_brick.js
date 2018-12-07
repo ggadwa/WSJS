@@ -18,7 +18,7 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
         // brick bitmaps
         //
 
-    generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high)
+    generateBrick(wid,high)
     {
         let n,rect,segments;
         let drawBrickColor,f;
@@ -41,10 +41,10 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
 
             // clear canvases
 
-        this.drawRect(bitmapCTX,0,0,wid,high,groutColor);
-        this.addNoiseRect(bitmapCTX,0,0,wid,high,0.6,0.8,0.9);
+        this.drawRect(0,0,wid,high,groutColor);
+        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.9);
 
-        this.clearNormalsRect(normalCTX,0,0,wid,high);
+        this.clearNormalsRect(0,0,wid,high);
 
             // draw the bricks
 
@@ -60,8 +60,8 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
 
             drawBrickColor=this.darkenColor(brickColor,f);
 
-            this.draw3DRect(bitmapCTX,normalCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,true);
-            this.addNoiseRect(bitmapCTX,rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,0.6);
+            this.draw3DRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,true);
+            this.addNoiseRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,0.6);
             
                 // calc the brick size around the edges
                 
@@ -92,7 +92,7 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
                     ex=genRandom.randomInBetween((lft+20),(rgt-20));
 
                     lineColor=this.darkenColor(drawBrickColor,0.9);
-                    this.drawRandomLine(bitmapCTX,normalCTX,sx,top,ex,bot,lft,top,rgt,bot,20,lineColor,false);
+                    this.drawRandomLine(sx,top,ex,bot,lft,top,rgt,bot,20,lineColor,false);
                 }
             }
             
@@ -103,68 +103,34 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
                 if (streakWid>5) {
                     sx=genRandom.randomInt(lft,((rgt-lft)-streakWid));
                     ex=sx+streakWid;
-                    this.drawStreakDirt(bitmapCTX,sx,top,ex,bot,5,2,0.6,dirtColor);
+                    this.drawStreakDirt(sx,top,ex,bot,5,2,0.6,dirtColor);
                 }
             }
             
                 // and blur it
                 
-            this.blur(bitmapCTX,lft,top,rgt,bot,4,false);
+            this.blur(lft,top,rgt,bot,4,false);
         }
 
             // finish with the specular
 
-        this.createSpecularMap(bitmapCTX,specularCTX,wid,high,0.4);
+        this.createSpecularMap(wid,high,0.4);
     }
 
         //
         // generate mainline
         //
 
-    generateInternal(inDebug)
+    generateInternal()
     {
         let wid,high;
-        let bitmapCanvas,bitmapCTX,normalCanvas,normalCTX,specularCanvas,specularCTX,glowCanvas,glowCTX;
 
-            // setup the canvas
-
-        bitmapCanvas=document.createElement('canvas');
-        bitmapCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        bitmapCTX=bitmapCanvas.getContext('2d');
-
-        normalCanvas=document.createElement('canvas');
-        normalCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        normalCTX=normalCanvas.getContext('2d');
-
-        specularCanvas=document.createElement('canvas');
-        specularCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
-        specularCTX=specularCanvas.getContext('2d');
-        
-        glowCanvas=document.createElement('canvas');
-        glowCanvas.width=2;
-        glowCanvas.height=2;
-        glowCTX=glowCanvas.getContext('2d');
-        this.clearGlowRect(glowCTX,0,0,2,2);
-
-        wid=bitmapCanvas.width;
-        high=bitmapCanvas.height;
+        wid=this.bitmapCanvas.width;
+        high=this.bitmapCanvas.height;
 
             // create the bitmap
 
-        this.generateBrick(bitmapCTX,normalCTX,specularCTX,wid,high);
-
-            // debug just displays the canvases, so send
-            // them back
-        
-        if (inDebug) return({bitmap:bitmapCanvas,normal:normalCanvas,specular:specularCanvas,glow:glowCanvas});
-        
-            // otherwise, create the webGL
-            // bitmap object
-
-        return(new BitmapClass(this.view,bitmapCanvas,normalCanvas,specularCanvas,glowCanvas,1.0,[(1.0/4000.0),(1.0/4000.0)],5.0));    
+        this.generateBrick(wid,high);
     }
 
 }
