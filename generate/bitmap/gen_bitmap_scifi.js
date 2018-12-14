@@ -18,7 +18,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         // scifi bitmaps
         //
     
-    generateSciFiPiecePlate(high,wid,lft,top,rgt,bot,edgeSize,metalColor)
+    generateSciFiPiecePlate(lft,top,rgt,bot,edgeSize,metalColor)
     {
         let n,x,streakWid;
         let streakColor,darken;
@@ -41,11 +41,11 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
             darken=0.5+(genRandom.random()*0.5);
             streakColor=this.darkenColor(metalColor,darken);
 
-            this.drawStreakMetal(wid,high,(lft+x),(top+edgeSize),((top+plateHigh)-edgeSize),streakWid,streakColor);
+            this.drawStreakMetal((lft+x),(top+edgeSize),((top+plateHigh)-edgeSize),streakWid,streakColor);
         }
     }
     
-    generateSciFiPieceScrews(wid,high,lft,top,rgt,bot,edgeSize,metalColor)
+    generateSciFiPieceScrews(lft,top,rgt,bot,edgeSize,metalColor)
     {
         let n,x,y,xAdd,yAdd,offset,screwCount;
         let lineWid,lineHigh;
@@ -104,7 +104,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         }
     }
     
-    generateSciFiPieceShutter(wid,high,lft,top,rgt,bot,edgeSize,metalColor,shutterColor)
+    generateSciFiPieceShutter(lft,top,rgt,bot,edgeSize,metalColor,shutterColor)
     {
         let n,nShutter,shutterSize;
         let y,yAdd;
@@ -116,7 +116,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         
             // outer and inner plate
             
-        this.generateSciFiPiecePlate(high,wid,lft,top,rgt,bot,edgeSize,metalColor,0,0,0);
+        this.generateSciFiPiecePlate(lft,top,rgt,bot,edgeSize,metalColor,0,0,0);
         
         lft+=frameXSize;
         top+=frameYSize;
@@ -145,7 +145,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
         }
     }
     
-    generateSciFi(wid,high)
+    generateSciFi()
     {
         let mx,my,sz,lft,rgt,top,bot,col,forceWid,forceHigh;
 
@@ -157,16 +157,12 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
 
         let metalEdgeSize=genRandom.randomInt(4,4);
         
-            // clear canvases
-
-        this.clearNormalsRect(0,0,wid,high);
-        
             // we don't want pieces to small,
             // so here's a wid/high that if we cross,
             // move to full width/height
             
-        forceWid=Math.trunc(wid*0.8);
-        forceHigh=Math.trunc(high*0.8);
+        forceWid=Math.trunc(this.bitmapCanvas.width*0.8);
+        forceHigh=Math.trunc(this.bitmapCanvas.height*0.8);
         
             // draw the chunks of the metal
         
@@ -183,8 +179,8 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
                 
             if (genRandom.randomPercentage(0.5)) {
                 rgt=lft+sz;
-                if (rgt>forceWid) rgt=wid;
-                bot=high;
+                if (rgt>forceWid) rgt=this.bitmapCanvas.width;
+                bot=this.bitmapCanvas.height;
                 
                 mx=rgt;
             }
@@ -193,8 +189,8 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
                 
             else {
                 bot=top+sz;
-                if (bot>forceHigh) bot=high;
-                rgt=wid;
+                if (bot>forceHigh) bot=this.bitmapCanvas.height;
+                rgt=this.bitmapCanvas.width;
                 
                 my=bot;
             }
@@ -207,24 +203,24 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
             
             switch (genRandom.randomIndex(3)) {
                 case 0:
-                    this.generateSciFiPiecePlate(wid,high,lft,top,rgt,bot,metalEdgeSize,col);
+                    this.generateSciFiPiecePlate(lft,top,rgt,bot,metalEdgeSize,col);
                     break;
                 case 1:
-                    this.generateSciFiPieceScrews(wid,high,lft,top,rgt,bot,metalEdgeSize,col);
+                    this.generateSciFiPieceScrews(lft,top,rgt,bot,metalEdgeSize,col);
                     break;
                 case 2:
-                    this.generateSciFiPieceShutter(wid,high,lft,top,rgt,bot,metalEdgeSize,col,shutterColor);
+                    this.generateSciFiPieceShutter(lft,top,rgt,bot,metalEdgeSize,col,shutterColor);
                     break;
             }
             
                 // are we finished?
                 
-            if ((mx>=wid) || (my>=high)) break;
+            if ((mx>=this.bitmapCanvas.width) || (my>=this.bitmapCanvas.height)) break;
         }
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.6);
+        this.createSpecularMap(0.6);
     }
 
         //
@@ -233,14 +229,7 @@ export default class GenBitmapScifiClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateSciFi(wid,high);
+        this.generateSciFi();
     }
 
 }

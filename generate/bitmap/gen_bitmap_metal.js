@@ -18,7 +18,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
         // metal bitmaps
         //
     
-    generateMetal(wid,high)
+    generateMetal()
     {
         let lft,rgt,top,bot;
         let indentCount,sz;
@@ -33,14 +33,10 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
         
         let screwColor=this.boostColor(metalColor,0.05);
         
-            // clear canvases
-
-        this.clearNormalsRect(0,0,wid,high);
-        
         lft=0;
         top=0;
-        rgt=wid;
-        bot=high;
+        rgt=this.bitmapCanvas.width;
+        bot=this.bitmapCanvas.height;
         
         indentCount=0;
         
@@ -49,7 +45,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
                 // the plate, streaks, and screws
 
             this.draw3DRect(lft,top,rgt,bot,edgeSize,metalColor,genRandom.randomPercentage(0.5));
-            this.generateMetalStreakShine((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),wid,high,metalColor);
+            this.generateMetalStreakShine((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),metalColor);
             this.generateMetalScrewsRandom((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),screwColor,screwSize,screwInnerSize);
             
                 // go in more?
@@ -68,7 +64,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.6);
+        this.createSpecularMap(0.6);
     }
             
         //
@@ -77,14 +73,7 @@ export default class GenBitmapMetalClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateMetal(wid,high);
+        this.generateMetal();
     }
 
 }

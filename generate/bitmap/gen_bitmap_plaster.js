@@ -18,7 +18,7 @@ export default class GenBitmapPlasterClass extends GenBitmapBaseClass
         // plaster bitmaps
         //
 
-    generatePlaster(wid,high)
+    generatePlaster()
     {
         let n,x;
         let lineColor,darken,boost;
@@ -31,37 +31,36 @@ export default class GenBitmapPlasterClass extends GenBitmapBaseClass
 
             // clear canvases
 
-        this.drawRect(0,0,wid,high,plasterColor);
-        this.clearNormalsRect(0,0,wid,high);
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,plasterColor);
         
             // lines
             
         for (n=0;n!==lineCount;n++) {
-            x=genRandom.randomInt(0,wid);
+            x=genRandom.randomInt(0,this.bitmapCanvas.width);
             
             darken=0.85+(genRandom.random()*0.1);
             lineColor=this.darkenColor(lineColorBase,darken);
             
-            this.drawRandomLine(x,0,x,high,0,0,wid,high,15,lineColor,false);
+            this.drawRandomLine(x,0,x,this.bitmapCanvas.height,0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,15,lineColor,false);
         }
         
         for (n=0;n!==lineCount;n++) {
-            x=genRandom.randomInt(0,wid);
+            x=genRandom.randomInt(0,this.bitmapCanvas.width);
             
             boost=0.05+(genRandom.random()*0.1);
             lineColor=this.boostColor(lineColorBase,boost);
             
-            this.drawRandomLine(x,0,x,high,0,0,wid,high,15,lineColor,false);
+            this.drawRandomLine(x,0,x,this.bitmapCanvas.height,0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,15,lineColor,false);
         }
         
             // plaster noise
             
-        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.8);
-        this.blur(0,0,wid,high,5,false);
+        this.addNoiseRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,0.6,0.8,0.8);
+        this.blur(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,5,false);
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.4);
+        this.createSpecularMap(0.4);
     }
 
         //
@@ -70,14 +69,7 @@ export default class GenBitmapPlasterClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generatePlaster(wid,high);
+        this.generatePlaster();
     }
 
 }

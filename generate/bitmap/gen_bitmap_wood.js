@@ -19,7 +19,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
         // wood bitmaps
         //
 
-    generateWood(wid,high)
+    generateWood()
     {
         let n,y,lft,rgt,top,bot;
         let topBotBorder,lftRgtBorder;
@@ -28,13 +28,9 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
             // some random values
 
         let boardCount=genRandom.randomInt(4,8);
-        let boardSize=Math.trunc(wid/boardCount);
+        let boardSize=Math.trunc(this.bitmapCanvas.width/boardCount);
         let edgeSize=genRandom.randomInt(3,3);
         let woodColor=this.getRandomWoodColor();
-
-            // clear canvases
-
-        this.clearNormalsRect(0,0,wid,high);
 
             // regular wood planking
 
@@ -42,12 +38,12 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
 
         for (n=0;n!==boardCount;n++) {
             rgt=lft+boardSize;
-            if (n===(boardCount-1)) rgt=wid;
+            if (n===(boardCount-1)) rgt=this.bitmapCanvas.width;
             
             boardSplit=genRandom.randomInt(1,3);
-            boardHigh=Math.trunc(high/boardSplit);
+            boardHigh=Math.trunc(this.bitmapCanvas.height/boardSplit);
             
-            this.generateWoodDrawBoard(lft,0,rgt,high,edgeSize,woodColor);
+            this.generateWoodDrawBoard(lft,0,rgt,this.bitmapCanvas.height,edgeSize,woodColor);
             
             lft=rgt;
         }
@@ -55,15 +51,15 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
             // border
         
         top=0;
-        bot=high;
+        bot=this.bitmapCanvas.height;
         
         lftRgtBorder=genRandom.randomPercentage(0.5);
         topBotBorder=genRandom.randomPercentage(0.5);
         
         if ((lftRgtBorder) || (topBotBorder)) {
             if (genRandom.randomPercentage(0.5)) {
-                y=Math.trunc((high*0.5)-(boardSize*0.5));
-                this.generateWoodDrawBoard(0,y,wid,(y+boardSize),edgeSize,woodColor);
+                y=Math.trunc((this.bitmapCanvas.height*0.5)-(boardSize*0.5));
+                this.generateWoodDrawBoard(0,y,this.bitmapCanvas.width,(y+boardSize),edgeSize,woodColor);
             }
         }
         
@@ -71,18 +67,18 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
             top+=boardSize;
             bot-=boardSize;
             
-            this.generateWoodDrawBoard(0,0,wid,boardSize,edgeSize,woodColor);
-            this.generateWoodDrawBoard(0,(high-boardSize),wid,high,edgeSize,woodColor);
+            this.generateWoodDrawBoard(0,0,this.bitmapCanvas.width,boardSize,edgeSize,woodColor);
+            this.generateWoodDrawBoard(0,(this.bitmapCanvas.height-boardSize),this.bitmapCanvas.width,this.bitmapCanvas.height,edgeSize,woodColor);
         }
         
         if (topBotBorder) {
             this.generateWoodDrawBoard(0,top,boardSize,bot,edgeSize,woodColor);
-            this.generateWoodDrawBoard((wid-boardSize),top,wid,bot,edgeSize,woodColor);
+            this.generateWoodDrawBoard((this.bitmapCanvas.width-boardSize),top,this.bitmapCanvas.width,bot,edgeSize,woodColor);
         }
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.2);
+        this.createSpecularMap(0.2);
     }
             
         //
@@ -91,12 +87,7 @@ export default class GenBitmapBoxClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-        this.generateWood(wid,high);
+        this.generateWood();
     }
 
 }

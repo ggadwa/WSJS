@@ -103,7 +103,7 @@ export default class GenBitmapTileClass extends GenBitmapBaseClass
         }
     }
 
-    generateTile(wid,high)
+    generateTile()
     {
         let splitCount,tileStyle,groutColor;
         let tileColor=[];
@@ -128,24 +128,22 @@ export default class GenBitmapTileClass extends GenBitmapBaseClass
             // clear canvas
 
         groutColor=this.dullColor(tileColor[0],0.7);
-        this.drawRect(0,0,wid,high,groutColor);
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,groutColor);
         
-        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.9);
-        this.blur(0,0,wid,high,5,false);
-        
-        this.clearNormalsRect(0,0,wid,high);
+        this.addNoiseRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,0.6,0.8,0.9);
+        this.blur(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,5,false);
 
             // original splits
 
-        this.generateTileInner(0,0,wid,high,tileColor,tileStyle,splitCount,(small?2:5),(small?3:0),complex);
+        this.generateTileInner(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,tileColor,tileStyle,splitCount,(small?2:5),(small?3:0),complex);
 
             // tile noise
 
-        this.addNoiseRect(0,0,wid,high,1.1,1.3,0.2);
+        this.addNoiseRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,1.1,1.3,0.2);
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.5);
+        this.createSpecularMap(0.5);
     }
     
         //
@@ -154,14 +152,7 @@ export default class GenBitmapTileClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateTile(wid,high);
+        this.generateTile();
     }
 
 }

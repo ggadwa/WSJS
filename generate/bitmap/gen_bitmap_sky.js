@@ -172,11 +172,11 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         this.bitmapCTX.putImageData(bitmapImgData,lft,top);
     }
 
-    generateSkyClouds(wid,high)
+    generateSkyClouds()
     {
-        let qx=Math.trunc(wid*0.25);
-        let mx=Math.trunc(wid*0.5);
-        let my=Math.trunc(high*0.5);
+        let qx=Math.trunc(this.bitmapCanvas.width*0.25);
+        let mx=Math.trunc(this.bitmapCanvas.width*0.5);
+        let my=Math.trunc(this.bitmapCanvas.height*0.5);
         let rangeY;
         
         let cloudColor=new ColorClass(1,1,1);
@@ -186,24 +186,24 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
         
             // top and bottom
             
-        this.drawRect(0,my,qx,high,skyColor);
-        this.generateClouds(0,my,qx,high,true,cloudColor);
+        this.drawRect(0,my,qx,this.bitmapCanvas.height,skyColor);
+        this.generateClouds(0,my,qx,this.bitmapCanvas.height,true,cloudColor);
         
-        this.drawRect(qx,my,mx,high,groundColor);
+        this.drawRect(qx,my,mx,this.bitmapCanvas.height,groundColor);
         
             // side
             
-        this.drawVerticalGradient(0,0,wid,my,skyColor,this.darkenColor(skyColor,0.5));
-        this.generateClouds(0,0,wid,my,false,cloudColor);
-        this.blur(0,my,wid,high,3,true);
+        this.drawVerticalGradient(0,0,this.bitmapCanvas.width,my,skyColor,this.darkenColor(skyColor,0.5));
+        this.generateClouds(0,0,this.bitmapCanvas.width,my,false,cloudColor);
+        this.blur(0,my,this.bitmapCanvas.width,this.bitmapCanvas.height,3,true);
         
-        rangeY=this.generateMountainsBuildRange(0,Math.trunc(my*0.75),wid,8);
-        this.generateMountainsDraw(0,0,wid,my,rangeY,this.darkenColor(mountainColor,0.8));
+        rangeY=this.generateMountainsBuildRange(0,Math.trunc(my*0.75),this.bitmapCanvas.width,8);
+        this.generateMountainsDraw(0,0,this.bitmapCanvas.width,my,rangeY,this.darkenColor(mountainColor,0.8));
         
-        rangeY=this.generateMountainsBuildRange(Math.trunc(my*0.25),my,wid,5);
-        this.generateMountainsDraw(0,0,wid,my,rangeY,mountainColor);
+        rangeY=this.generateMountainsBuildRange(Math.trunc(my*0.25),my,this.bitmapCanvas.width,5);
+        this.generateMountainsDraw(0,0,this.bitmapCanvas.width,my,rangeY,mountainColor);
         
-        this.drawVerticalGradient(0,Math.trunc(my*0.9),wid,my,this.darkenColor(groundColor,0.8),groundColor);
+        this.drawVerticalGradient(0,Math.trunc(my*0.9),this.bitmapCanvas.width,my,this.darkenColor(groundColor,0.8),groundColor);
         
         /* supergumba -- testing so we can see if the sky cube is properly positioned
         this.bitmapCTX.fillStyle='#FF0000';
@@ -224,14 +224,7 @@ export default class GenBitmapSkyClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateSkyClouds(wid,high);
+        this.generateSkyClouds();
     }
 
 }

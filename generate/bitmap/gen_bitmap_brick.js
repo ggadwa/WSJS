@@ -18,7 +18,7 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
         // brick bitmaps
         //
 
-    generateBrick(wid,high)
+    generateBrick()
     {
         let n,rect,segments;
         let drawBrickColor,f;
@@ -33,18 +33,16 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
         let dirtColor=this.darkenColor(brickColor,0.5);
         
         if (genRandom.randomPercentage(0.5)) {
-            segments=this.createStackedSegments(wid,high);
+            segments=this.createStackedSegments();
         }
         else {
-            segments=this.createRandomSegments(wid,high);
+            segments=this.createRandomSegments();
         }
 
             // clear canvases
 
-        this.drawRect(0,0,wid,high,groutColor);
-        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.9);
-
-        this.clearNormalsRect(0,0,wid,high);
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,groutColor);
+        this.addNoiseRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,0.6,0.8,0.9);
 
             // draw the bricks
 
@@ -54,7 +52,7 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
                 // the brick
                 
             f=1.0;
-            if (!((rect.lft<0) || (rect.rgt>wid))) {        // don't darken bricks that fall off edges
+            if (!((rect.lft<0) || (rect.rgt>this.bitmapCanvas.width))) {        // don't darken bricks that fall off edges
                 f=0.6+(genRandom.random()*0.4);
             }
 
@@ -74,8 +72,8 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
             }
             
             rgt=rect.rgt;
-            if (rgt>=wid) {
-                rgt=wid-1;
+            if (rgt>=this.bitmapCanvas.width) {
+                rgt=this.bitmapCanvas.width-1;
             }
             else {
                 rgt-=(paddingSize+edgeSize);
@@ -114,7 +112,7 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.4);
+        this.createSpecularMap(0.4);
     }
 
         //
@@ -123,14 +121,7 @@ export default class GenBitmapBrickClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateBrick(wid,high);
+        this.generateBrick();
     }
 
 }

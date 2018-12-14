@@ -120,7 +120,7 @@ export default class GenBitmapBaseClass
         // segmenting routines
         //
 
-    createStackedSegments(cvsWid,cvsHigh)
+    createStackedSegments()
     {
         let x,y;
         let lft,top;
@@ -128,11 +128,11 @@ export default class GenBitmapBaseClass
         let segments=[];
 
         let xCount=this.BITMAP_STACKED_X_MIN_COUNT+Math.trunc(genRandom.random()*this.BITMAP_STACKED_X_EXTRA_COUNT);
-        let wid=Math.trunc(cvsWid/xCount);
+        let wid=Math.trunc(this.bitmapCanvas.width/xCount);
         let halfWid=Math.trunc(wid/2);
 
         let yCount=this.BITMAP_STACKED_Y_MIN_COUNT+Math.trunc(genRandom.random()*this.BITMAP_STACKED_Y_EXTRA_COUNT);
-        let high=Math.trunc(cvsHigh/yCount);
+        let high=Math.trunc(this.bitmapCanvas.height/yCount);
 
         top=0;
         halfBrick=false;
@@ -155,7 +155,7 @@ export default class GenBitmapBaseClass
         return(segments);
     }
 
-    createRandomSegments(cvsWid,cvsHigh)
+    createRandomSegments()
     {
         let x,y,x2,y2,hit;
         let wid,high,startWid,startHigh;
@@ -235,10 +235,10 @@ export default class GenBitmapBaseClass
                 // create the segment and block off
                 // the grid
 
-            lft=Math.trunc(x*(cvsWid/this.BITMAP_GRID_DIVISION));
-            top=Math.trunc(y*(cvsHigh/this.BITMAP_GRID_DIVISION));
-            rgt=Math.trunc((x+wid)*(cvsWid/this.BITMAP_GRID_DIVISION));
-            bot=Math.trunc((y+high)*(cvsHigh/this.BITMAP_GRID_DIVISION));
+            lft=Math.trunc(x*(this.bitmapCanvas.width/this.BITMAP_GRID_DIVISION));
+            top=Math.trunc(y*(this.bitmapCanvas.height/this.BITMAP_GRID_DIVISION));
+            rgt=Math.trunc((x+wid)*(this.bitmapCanvas.width/this.BITMAP_GRID_DIVISION));
+            bot=Math.trunc((y+high)*(this.bitmapCanvas.height/this.BITMAP_GRID_DIVISION));
 
             segments.push(new RectClass(lft,top,rgt,bot));
 
@@ -696,19 +696,19 @@ export default class GenBitmapBaseClass
         // specular routines
         //
 
-    createSpecularMap(wid,high,clamp)
+    createSpecularMap(clamp)
     {
         let n,idx,nPixel;
         let f,fMin,fMax,fDif;
 
-        let bitmapImgData=this.bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapImgData=this.bitmapCTX.getImageData(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height);
         let bitmapData=bitmapImgData.data;
 
-        let specularImgData=this.specularCTX.getImageData(0,0,wid,high);
+        let specularImgData=this.specularCTX.getImageData(0,0,this.specularCanvas.width,this.specularCanvas.height);
         let specularData=specularImgData.data;
 
         idx=0;
-        nPixel=wid*high;
+        nPixel=this.bitmapCanvas.width*this.bitmapCanvas.height;
         
             // get the min-max across the entire
             // bitmap
@@ -756,21 +756,21 @@ export default class GenBitmapBaseClass
         // glow utility
         //
 
-    createGlowMap(wid,high,clamp)
+    createGlowMap(clamp)
     {
         let n,idx,nPixel;
 
-        let bitmapImgData=this.bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapImgData=this.bitmapCTX.getImageData(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height);
         let bitmapData=bitmapImgData.data;
 
-        let glowImgData=this.glowCTX.getImageData(0,0,wid,high);
+        let glowImgData=this.glowCTX.getImageData(0,0,this.glowCanvas.width,this.glowCanvas.height);
         let glowData=glowImgData.data;
 
             // transfer over the bitmap and
             // clamp it for the glow
             
         idx=0;
-        nPixel=wid*high;
+        nPixel=this.bitmapCanvas.width*this.bitmapCanvas.height;
         
         for (n=0;n!==nPixel;n++) {
             glowData[idx]=Math.trunc(bitmapData[idx]*clamp);
@@ -792,7 +792,7 @@ export default class GenBitmapBaseClass
     {
         let n,nPixel,idx;
         
-        let bitmapImgData=this.bitmapCTX.getImageData(0,0,wid,high);
+        let bitmapImgData=this.bitmapCTX.getImageData(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height);
         let bitmapData=bitmapImgData.data;
         
         idx=0;
@@ -1607,18 +1607,20 @@ export default class GenBitmapBaseClass
         this.normalCTX.fill();
     }
     
-    drawLine2(ctx,imgWid,imgHigh,x,y,x2,y2,color)
+    drawLine2(ctx,x,y,x2,y2,color)
     {
-        let n,xLen,yLen,dif,dx,dy,slope,idx;
-        let bitmapImgData,bitmapData;
+        let xLen,yLen,sp,ep,dx,dy,slope,idx;
+        let bitmapImgData,bitmapData,bitmapWid;
         let r=Math.trunc(color.r*255.0);
         let g=Math.trunc(color.g*255.0);
         let b=Math.trunc(color.b*255.0);
         
             // get the image data
 
-        bitmapImgData=ctx.getImageData(0,0,imgWid,imgHigh);
+        bitmapImgData=ctx.getImageData(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height);
         bitmapData=bitmapImgData.data;
+        
+        bitmapWid=this.bitmapCanvas.width;
         
             // the line
             
@@ -1627,30 +1629,48 @@ export default class GenBitmapBaseClass
             
         if (xLen>yLen) {
             slope=yLen/xLen;
-            dif=x2-x;
             
-            for (n=0;n!==xLen;n++) {
-                dx=x+Math.trunc((dif*n)/xLen);
-                dy=y+Math.trunc(slope*n);
-                
-                idx=((dy*imgWid)+dx)*4;
+            if (x<x2) {
+                sp=x;
+                ep=x2;
+            }
+            else {
+                sp=x2;
+                ep=x;
+            }
+            
+            dy=y;
+            
+            for (dx=sp;dx!==ep;dx++) {
+                idx=((Math.trunc(dy)*bitmapWid)+dx)*4;
                 bitmapData[idx]=r;
                 bitmapData[idx+1]=g;
                 bitmapData[idx+2]=b;
+                
+                dy+=slope;
             }
         }
         else {
             slope=xLen/yLen;
-            dif=y2-y;
             
-            for (n=0;n!==yLen;n++) {
-                dx=x+Math.trunc(slope*n);
-                dy=y+Math.trunc((dif*n)/yLen);
-                
-                idx=((dy*imgWid)+dx)*4;
+            if (y<y2) {
+                sp=y;
+                ep=y2;
+            }
+            else {
+                sp=y2;
+                ep=y;
+            }
+            
+            dx=x;
+            
+            for (dy=sp;dy!==ep;dy++) {
+                idx=((dy*bitmapWid)+Math.trunc(dx))*4;
                 bitmapData[idx]=r;
                 bitmapData[idx+1]=g;
                 bitmapData[idx+2]=b;
+                
+                dx+=slope;
             }
         }
         
@@ -1777,6 +1797,7 @@ export default class GenBitmapBaseClass
             if (ey>clipBot) ey=clipBot;
             
             this.drawLine(sx,sy,ex,ey,color,lightLine);
+            //this.drawLine2(this.bitmapCTX,sx,sy,ex,ey,color);
             
             sx=ex;
             sy=ey;
@@ -1994,7 +2015,7 @@ export default class GenBitmapBaseClass
 
             // do the bitmap data first
             
-        bitmapImgData=this.bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        bitmapImgData=this.bitmapCTX.getImageData(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height);
         bitmapData=bitmapImgData.data;
 
             // create the rings of
@@ -2062,7 +2083,7 @@ export default class GenBitmapBaseClass
         
             // now the normal data
             
-        normalImgData=this.normalCTX.getImageData(0,0,imgWid,imgHigh);
+        normalImgData=this.normalCTX.getImageData(0,0,this.normalCanvas.width,this.normalCanvas.height);
         normalData=normalImgData.data;
 
             // create the rings of
@@ -2128,7 +2149,7 @@ export default class GenBitmapBaseClass
         // streaks
         //
 
-    drawStreakMetal(imgWid,imgHigh,x,top,bot,streakWid,baseColor)
+    drawStreakMetal(x,top,bot,streakWid,baseColor)
     {
         let n,lx,rx,y,idx;
         let bitmapImgData,bitmapData;
@@ -2146,7 +2167,7 @@ export default class GenBitmapBaseClass
         
             // get the image data
 
-        bitmapImgData=this.bitmapCTX.getImageData(0,0,imgWid,imgHigh);
+        bitmapImgData=this.bitmapCTX.getImageData(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height);
         bitmapData=bitmapImgData.data;
         
             // start with 100 density and reduce
@@ -2165,8 +2186,8 @@ export default class GenBitmapBaseClass
             for (y=top;y!==bot;y++) {
                 
                 if (genRandom.randomInt(0,100)<density) {
-                    if ((lx>=0) && (lx<imgWid)) {
-                        idx=((y*imgWid)+lx)*4;
+                    if ((lx>=0) && (lx<this.bitmapCanvas.width)) {
+                        idx=((y*this.bitmapCanvas.width)+lx)*4;
                         bitmapData[idx]=Math.trunc(baseColor.r*255.0);
                         bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
                         bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
@@ -2174,8 +2195,8 @@ export default class GenBitmapBaseClass
                 }
                 
                 if (genRandom.randomInt(0,100)<density) {
-                    if ((rx>=0) && (rx<imgWid)) {
-                        idx=((y*imgWid)+rx)*4;
+                    if ((rx>=0) && (rx<this.bitmapCanvas.width)) {
+                        idx=((y*this.bitmapCanvas.width)+rx)*4;
                         bitmapData[idx]=Math.trunc(baseColor.r*255.0);
                         bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
                         bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
@@ -2535,7 +2556,7 @@ export default class GenBitmapBaseClass
         // metal utilities
         //
     
-    generateMetalStreakShine(lft,top,rgt,bot,wid,high,metalColor)
+    generateMetalStreakShine(lft,top,rgt,bot,metalColor)
     {
         let x,streakWid,streakColor;
         let lite=genRandom.randomPercentage(0.5); 
@@ -2557,7 +2578,7 @@ export default class GenBitmapBaseClass
                 }
                 
 
-                this.drawStreakMetal(wid,high,x,top,bot,streakWid,streakColor);
+                this.drawStreakMetal(x,top,bot,streakWid,streakColor);
             }
             
             x+=(streakWid+genRandom.randomInt(15,30));
@@ -2632,7 +2653,7 @@ export default class GenBitmapBaseClass
     
     generateMetalScrewsHorizontal(lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
     {
-        let         n,x,y;
+        let         n,x,y,boltStyle;
         let         xCount,xOffset;
         
         y=Math.trunc(((top+bot)*0.5)-(screwSize*0.5));
@@ -2640,15 +2661,23 @@ export default class GenBitmapBaseClass
         xCount=Math.trunc(((rgt-lft)/(screwSize+5)));
         xOffset=Math.trunc(((rgt-lft)-(xCount*(screwSize+5)))*0.5);
         
+        boltStyle=genRandom.randomIndex(4);
+        
         for (n=0;n!==xCount;n++) {
             x=lft+(xOffset+(n*(screwSize+5)));
-            this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            
+            if ((boltStyle==0)||((boltStyle==2)&&((n%4)===0))||((boltStyle==3)&&((n%4)!==0))) {
+                this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            }
+            else {
+                this.draw3DRect(x,y,(x+screwSize),(y+screwSize),screwInnerSize,screwColor,true);
+            }
         }
     }
     
     generateMetalScrewsVertical(lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
     {
-        let         n,x,y;
+        let         n,x,y,boltStyle;
         let         yCount,yOffset;
         
         x=Math.trunc(((lft+rgt)*0.5)-(screwSize*0.5));
@@ -2656,9 +2685,17 @@ export default class GenBitmapBaseClass
         yCount=Math.trunc(((bot-top)/(screwSize+5)));
         yOffset=Math.trunc(((bot-top)-(yCount*(screwSize+5)))*0.5);
         
+        boltStyle=genRandom.randomIndex(4);
+        
         for (n=0;n!==yCount;n++) {
             y=lft+(yOffset+(n*(screwSize+5)));
-            this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            
+            if ((boltStyle==0)||((boltStyle==2)&&((n%4)===0))||((boltStyle==3)&&((n%4)!==0))) {
+                this.draw3DOval(x,y,(x+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
+            }
+            else {
+                this.draw3DRect(x,y,(x+screwSize),(y+screwSize),screwInnerSize,screwColor,true);
+            }
         }
     }
     

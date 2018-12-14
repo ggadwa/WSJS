@@ -18,18 +18,18 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
         // fur
         //
         
-    generateGrass(wid,high)
+    generateGrass()
     {
         let x,y;
         let darken,lineColor;
-        let halfHigh=Math.trunc(high*0.5);
+        let halfHigh=Math.trunc(this.bitmapCanvas.height*0.5);
         let grassColor=this.getRandomGrassColor();
         
-        this.drawRect(0,0,wid,high,grassColor);
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,grassColor);
 
             // grass
             
-        for (x=0;x!==wid;x++) {
+        for (x=0;x!==this.bitmapCanvas.width;x++) {
             
                 // grass color
                 
@@ -39,12 +39,12 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
                 // hair half from top
                 
             y=halfHigh+genRandom.randomInt(0,halfHigh);
-            this.drawRandomLine(x,0,x,(y+5),0,0,wid,high,10,lineColor,false);
+            this.drawRandomLine(x,0,x,(y+5),0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,10,lineColor,false);
             
                 // hair half from bottom
                 
-            y=high-(halfHigh+genRandom.randomInt(0,halfHigh));
-            this.drawRandomLine(x,(y-5),x,high,0,0,wid,high,10,lineColor,false);
+            y=this.bitmapCanvas.height-(halfHigh+genRandom.randomInt(0,halfHigh));
+            this.drawRandomLine(x,(y-5),x,this.bitmapCanvas.height,0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,10,lineColor,false);
         }
     }
     
@@ -54,32 +54,19 @@ export default class GenBitmapGroundClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high,mx,my;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-        
-        mx=Math.trunc(wid*0.5);
-        my=Math.trunc(high*0.5);
-         
-            // clear canvases
-
-        this.drawRect(0,0,wid,high,this.whiteColor);
-        this.clearNormalsRect(0,0,wid,high);
-
             // create the bitmap
 
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateGrass(wid,high);
+                this.generateGrass();
                 break;
 
         }
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.4);
+        this.createSpecularMap(0.4);
     }
 
 }

@@ -18,26 +18,21 @@ export default class GenBitmapPlayerClass extends GenBitmapBaseClass
         // suit
         //
                 
-    generateSuit(wid,high)
+    generateSuit()
     {
-        let mx=Math.trunc(wid*0.5);
-        let my=Math.trunc(high*0.5);
-         
-            // clear canvases
-
-        this.drawRect(0,0,wid,high,this.whiteColor);       
-        this.clearNormalsRect(0,0,wid,high);
+        let mx=Math.trunc(this.bitmapCanvas.width*0.5);
+        let my=Math.trunc(this.bitmapCanvas.height*0.5);
 
             // fur
             
         this.drawUVTest(0,0,mx,my);
-        this.drawUVTest(mx,0,wid,my);
-        this.generateFaceChunk(mx,0,wid,my);
-        this.drawUVTest(0,my,mx,high);
+        this.drawUVTest(mx,0,this.bitmapCanvas.width,my);
+        this.generateFaceChunk(mx,0,this.bitmapCanvas.width,my);
+        this.drawUVTest(0,my,mx,this.bitmapCanvas.height);
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.3);
+        this.createSpecularMap(0.3);
     }
 
         //
@@ -46,12 +41,7 @@ export default class GenBitmapPlayerClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-        
-        this.generateSuit(wid,high);
+        this.generateSuit();
     }
 
 }

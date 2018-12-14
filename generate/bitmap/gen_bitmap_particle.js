@@ -15,19 +15,19 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
         Object.seal(this);
     }
     
-    generateBlob(wid,high)
+    generateBlob()
     {
         let n,f,col;
         let x,y,halfWid,halfHigh,ovalWid,ovalHigh;
 
             // background
             
-        this.drawRect(0,0,wid,high,this.blackColor);
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,this.blackColor);
 
             // different blends of gray
             
-        halfWid=Math.trunc(wid*0.5);
-        halfHigh=Math.trunc(high*0.5);
+        halfWid=Math.trunc(this.bitmapCanvas.width*0.5);
+        halfHigh=Math.trunc(this.bitmapCanvas.height*0.5);
             
         for (n=0;n!==20;n++) {
             f=genRandom.randomFloat(0.9,0.1);
@@ -36,8 +36,8 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
             ovalWid=genRandom.randomInt(halfWid,halfWid);
             ovalHigh=genRandom.randomInt(halfHigh,halfHigh);
             
-            x=genRandom.randomInt(0,(wid-ovalWid));
-            y=genRandom.randomInt(0,(high-ovalHigh));
+            x=genRandom.randomInt(0,(this.bitmapCanvas.width-ovalWid));
+            y=genRandom.randomInt(0,(this.bitmapCanvas.height-ovalHigh));
             
             this.drawOval(x,y,(x+ovalWid),(y+ovalHigh),col,null);
         }
@@ -49,12 +49,7 @@ export default class GenBitmapParticleClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-        this.generateBlob(wid,high);
+        this.generateBlob();
     }
 
 }

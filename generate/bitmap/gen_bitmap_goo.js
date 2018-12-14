@@ -49,12 +49,10 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
         }
     }
 
-    generateGoo(wid,high)
+    generateGoo()
     {
         let n,x,y,x2,y2,radius,startColor,endColor;
         let color=this.getRandomColor();
-        
-        this.clearNormalsRect(0,0,wid,high);
         
             // gradient colors
             
@@ -63,40 +61,40 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
         
             // main color
             
-        this.drawRect(0,0,wid,high,startColor);
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,startColor);
         
             // gradient ovals
             
         for (n=0;n!==80;n++) {
             radius=genRandom.randomInt(50,200);
             
-            x=genRandom.randomInt(0,wid);
-            y=genRandom.randomInt(0,high);
+            x=genRandom.randomInt(0,this.bitmapCanvas.width);
+            y=genRandom.randomInt(0,this.bitmapCanvas.height);
             
                 // the oval itself and any wrap around clips
 
             this.drawOvalGradient(x,y,(x+radius),(y+radius),startColor,endColor);
-            if ((x+radius)>wid) {
-                x2=-((x+radius)-wid);
+            if ((x+radius)>this.bitmapCanvas.width) {
+                x2=-((x+radius)-this.bitmapCanvas.width);
                 this.drawOvalGradient(x2,y,(x2+radius),(y+radius),startColor,endColor);
             }
-            if ((y+radius)>high) {
-                y2=-((y+radius)-high);
+            if ((y+radius)>this.bitmapCanvas.height) {
+                y2=-((y+radius)-this.bitmapCanvas.height);
                 this.drawOvalGradient(x,y2,(x+radius),(y2+radius),startColor,endColor);
             }
         }
         
             // noise and blurs
             
-        this.blur(0,0,wid,high,15,false);
+        this.blur(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,15,false);
         
             // create the glow from a clamped bitmap
             
-        this.createGlowMap(wid,high,0.5);
+        this.createGlowMap(0.5);
 
             // create specular
             
-        this.createSpecularMap(wid,high,0.5);
+        this.createSpecularMap(0.5);
     }
 
         //
@@ -105,19 +103,12 @@ export default class GenBitmapGooClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-            
         this.shineFactor=1.0;
 
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateGoo(wid,high);
+                this.generateGoo();
                 this.shineFactor=8.0;
                 break;
 

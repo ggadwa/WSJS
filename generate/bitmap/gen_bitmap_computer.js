@@ -208,21 +208,21 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         // computer
         //
         
-    generateComputer(wid,high)
+    generateComputer()
     {
         let mx,my,sz,lft,top,rgt,bot,rndTry;
         let componentType,hadBlank,hadWires,hadShutter,rndSuccess;
-        let offset=Math.trunc(wid*0.1);
+        let offset=Math.trunc(this.bitmapCanvas.width*0.1);
         let panelColor=this.getRandomColor();
         let panelInsideColor=this.boostColor(panelColor,0.1);
        
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.draw3DRect(offset,0,wid,offset,8,panelColor,true);
-        this.draw3DRect(0,offset,offset,high,8,panelColor,true);
+        this.draw3DRect(offset,0,this.bitmapCanvas.width,offset,8,panelColor,true);
+        this.draw3DRect(0,offset,offset,this.bitmapCanvas.height,8,panelColor,true);
         
-        this.draw3DRect(offset,offset,wid,high,8,panelColor,true);
+        this.draw3DRect(offset,offset,this.bitmapCanvas.width,this.bitmapCanvas.height,8,panelColor,true);
         
             // inside components
             // these are stacks of vertical or horizontal chunks
@@ -244,8 +244,8 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 
             if (genRandom.randomPercentage(0.5)) {
                 rgt=lft+sz;
-                if (rgt>(wid-15)) rgt=wid-15;
-                bot=high-15;
+                if (rgt>(this.bitmapCanvas.width-15)) rgt=this.bitmapCanvas.width-15;
+                bot=this.bitmapCanvas.height-15;
                 
                 mx+=(sz+5);
             }
@@ -254,8 +254,8 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
                 
             else {
                 bot=top+sz;
-                if (bot>(high-15)) bot=high-15;
-                rgt=wid-15;
+                if (bot>(this.bitmapCanvas.height-15)) bot=this.bitmapCanvas.height-15;
+                rgt=this.bitmapCanvas.width-15;
                 
                 my+=(sz+5);
             }
@@ -314,12 +314,12 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
             
                 // are we finished?
                 
-            if ((mx>=(wid-15)) || (my>=(high-15))) break;
+            if ((mx>=(this.bitmapCanvas.width-15)) || (my>=(this.bitmapCanvas.height-15))) break;
         }
         
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.4);
+        this.createSpecularMap(0.4);
     }
 
         //
@@ -328,11 +328,6 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
             // create the bitmap
             
         this.shineFactor=1.0;
@@ -340,7 +335,7 @@ export default class GenBitmapComputerClass extends GenBitmapBaseClass
         switch (genRandom.randomIndex(1)) {
 
             case 0:
-                this.generateComputer(wid,high);
+                this.generateComputer();
                 this.shineFactor=1.5;
                 break;
 

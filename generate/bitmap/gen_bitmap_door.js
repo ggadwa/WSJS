@@ -25,17 +25,13 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
         let metalColor=this.getRandomMetalColor();
         let edgeSize=genRandom.randomInt(4,8);
         
-            // clear canvases
-
-        this.clearNormalsRect(0,0,wid,high);
-        
             // the plate
             
         this.draw3DRect(0,0,wid,high,edgeSize,metalColor,true);
 
             // possible streaks
             
-        this.generateMetalStreakShine(edgeSize,edgeSize,(wid-edgeSize),(high-edgeSize),wid,high,metalColor);
+        this.generateMetalStreakShine(edgeSize,edgeSize,(wid-edgeSize),(high-edgeSize),metalColor);
     }
     
     generateDoorWoodBackground(wid,high)
@@ -49,10 +45,6 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
         let boardSize=Math.trunc(wid/boardCount);
         let edgeSize=genRandom.randomInt(3,3);
         let woodColor=this.getRandomWoodColor();
-
-            // clear canvases
-
-        this.clearNormalsRect(0,0,wid,high);
 
             // regular wood planking
 
@@ -74,28 +66,28 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
     generateDoorRunner(top,bot,wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor)
     {
         this.draw3DRect(0,top,wid,bot,edgeSize,metalColor,true);
-        this.generateMetalStreakShine(edgeSize,(top+edgeSize),(wid-edgeSize),(bot-edgeSize),wid,high,metalColor);
-        this.generateMetalScrewsHorizontal(edgeSize,top,(wid-edgeSize),bot,screwColor,screwSize,screwInnerSize);
+        this.generateMetalStreakShine(edgeSize,(top+edgeSize),(wid-edgeSize),(bot-edgeSize),metalColor);
+        if (genRandom.randomPercentage(0.75)) this.generateMetalScrewsHorizontal(edgeSize,top,(wid-edgeSize),bot,screwColor,screwSize,screwInnerSize);
     }
     
-    generateDoor(wid,high)
+    generateDoor()
     {
         let runHigh,runMid,hadRun;
         let edgeSize,screwSize,screwInnerSize,screwColor;
         let metalColor=this.getRandomMetalColor();
         
         if (genRandom.randomPercentage(0.5)) {
-            this.generateDoorWoodBackground(wid,high);
+            this.generateDoorWoodBackground(this.bitmapCanvas.width,this.bitmapCanvas.height);
         }
         else {
-            this.generateDoorMetalBackground(wid,high);
+            this.generateDoorMetalBackground(this.bitmapCanvas.width,this.bitmapCanvas.height);
         }
         
             // top and bottom runners
         
         hadRun=false;
-        runHigh=genRandom.randomInt(Math.trunc(high*0.1),Math.trunc(high*0.05));
-        runMid=Math.trunc((high*0.5)-(runHigh*0.5));
+        runHigh=genRandom.randomInt(Math.trunc(this.bitmapCanvas.height*0.1),Math.trunc(this.bitmapCanvas.height*0.05));
+        runMid=Math.trunc((this.bitmapCanvas.height*0.5)-(runHigh*0.5));
         
         edgeSize=genRandom.randomInt(4,8);
         screwSize=genRandom.randomInt(15,(runHigh-20));
@@ -104,19 +96,19 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
         
         if (genRandom.randomPercentage(0.5)) {
             hadRun=true;
-            this.generateDoorRunner(0,runHigh,wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
+            this.generateDoorRunner(0,runHigh,this.bitmapCanvas.width,this.bitmapCanvas.height,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
         }
         
         if (genRandom.randomPercentage(0.5)) {
             hadRun=true;
-            this.generateDoorRunner(runMid,(runMid+runHigh),wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
+            this.generateDoorRunner(runMid,(runMid+runHigh),this.bitmapCanvas.width,this.bitmapCanvas.height,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
         }
         
-        if ((genRandom.randomPercentage(0.5)) || (!hadRun)) this.generateDoorRunner((high-runHigh),high,wid,high,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
+        if ((genRandom.randomPercentage(0.5)) || (!hadRun)) this.generateDoorRunner((this.bitmapCanvas.height-runHigh),this.bitmapCanvas.height,this.bitmapCanvas.width,this.bitmapCanvas.height,metalColor,edgeSize,screwSize,screwInnerSize,screwColor);
         
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.6);
+        this.createSpecularMap(0.6);
     }
             
         //
@@ -125,14 +117,7 @@ export default class GenBitmapDoorClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateDoor(wid,high);
+        this.generateDoor();
     }
 
 }

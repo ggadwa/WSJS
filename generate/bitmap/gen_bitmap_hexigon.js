@@ -18,7 +18,7 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
         // hexagonal
         //
         
-    generateHexagonal(wid,high)
+    generateHexagonal()
     {
         let color,edgeColor,edgeSize;
         let xCount,yCount,xSize,ySize;
@@ -35,8 +35,8 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
         xCount=2+(2*genRandom.randomInt(0,2));
         yCount=2+(2*genRandom.randomInt(0,5));
         
-        xSize=Math.trunc(wid/xCount);
-        ySize=Math.trunc(high/yCount);
+        xSize=Math.trunc(this.bitmapCanvas.width/xCount);
+        ySize=Math.trunc(this.bitmapCanvas.height/yCount);
         
         top=-Math.trunc(ySize/2);
         
@@ -45,7 +45,7 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
             lft=((y%2)===0)?0:xSize;
             
             for (x=0;x<=xCount;x+=2) {
-                this.draw3DHexagon(wid,high,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
+                this.draw3DHexagon(this.bitmapCanvas.width,this.bitmapCanvas.height,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
                 lft+=(xSize*2);
             }
             
@@ -54,7 +54,7 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
         
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.6);
+        this.createSpecularMap(0.6);
     }
 
         //
@@ -63,14 +63,7 @@ export default class GenBitmapHexigonClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateHexagonal(wid,high);
+        this.generateHexagonal();
     }
 
 }

@@ -18,7 +18,7 @@ export default class GenBitmapGrateClass extends GenBitmapBaseClass
         // metal bitmaps
         //
     
-    generateGrate(wid,high)
+    generateGrate()
     {
         let x,y;
         let dx,dy,sx,sy,ex,ey;
@@ -39,22 +39,18 @@ export default class GenBitmapGrateClass extends GenBitmapBaseClass
         let screwInnerSize=Math.trunc(screwSize*0.4);
         let screwColor=this.boostColor(metalColor,0.05);
         
-            // clear canvases
-
-        this.clearNormalsRect(0,0,wid,high);
-        
             // the plates and streaks
             
-        this.draw3DRect(0,0,wid,high,edgeSize,metalColor,genRandom.randomPercentage(0.5));
-        this.generateMetalStreakShine(edgeSize,edgeSize,(wid-edgeSize),(high-edgeSize),wid,high,metalColor);
+        this.draw3DRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,edgeSize,metalColor,genRandom.randomPercentage(0.5));
+        this.generateMetalStreakShine(edgeSize,edgeSize,(this.bitmapCanvas.width-edgeSize),(this.bitmapCanvas.height-edgeSize),metalColor);
             
             // grate corrugation
  
         metalCorrColor=this.darkenColor(metalColor,0.6);
 
         corrCount=genRandom.randomInt(8,15);
-        corrWid=Math.trunc((wid-(innerEdgeSize*2))/corrCount);
-        corrHigh=Math.trunc((high-(innerEdgeSize*2))/corrCount);
+        corrWid=Math.trunc((this.bitmapCanvas.width-(innerEdgeSize*2))/corrCount);
+        corrHigh=Math.trunc((this.bitmapCanvas.height-(innerEdgeSize*2))/corrCount);
 
         lineWid=corrWid-4;
         lineHigh=corrHigh-4;
@@ -69,11 +65,11 @@ export default class GenBitmapGrateClass extends GenBitmapBaseClass
 
             // corrugations
 
-        dy=Math.trunc((high-(corrHigh*corrCount))*0.5);
+        dy=Math.trunc((this.bitmapCanvas.height-(corrHigh*corrCount))*0.5);
 
         for (y=0;y!==corrCount;y++) {
 
-            dx=Math.trunc((wid-(corrWid*corrCount))*0.5);
+            dx=Math.trunc((this.bitmapCanvas.width-(corrWid*corrCount))*0.5);
 
             for (x=0;x!==corrCount;x++) {
 
@@ -95,11 +91,11 @@ export default class GenBitmapGrateClass extends GenBitmapBaseClass
         
             // possible screws
             
-        this.generateMetalScrewsRandom(edgeSize,edgeSize,(wid-edgeSize),(high-edgeSize),screwColor,screwSize,screwInnerSize);
+        this.generateMetalScrewsRandom(edgeSize,edgeSize,(this.bitmapCanvas.width-edgeSize),(this.bitmapCanvas.height-edgeSize),screwColor,screwSize,screwInnerSize);
         
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.6);
+        this.createSpecularMap(0.6);
     }
 
         //
@@ -108,14 +104,7 @@ export default class GenBitmapGrateClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateGrate(wid,high);
+        this.generateGrate();
     }
 
 }

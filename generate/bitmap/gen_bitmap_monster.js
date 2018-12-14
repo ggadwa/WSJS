@@ -185,19 +185,19 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         // metal
         //
         
-    generateMetalChunk(lft,top,rgt,bot,wid,high)
+    generateMetalChunk(lft,top,rgt,bot)
     {
         let metalColor=this.getRandomMetalColor();
         
         this.draw3DRect(lft,top,rgt,bot,0,metalColor,genRandom.randomPercentage(0.5));
-        this.generateMetalStreakShine(lft,top,rgt,bot,wid,high,metalColor);
+        this.generateMetalStreakShine(lft,top,rgt,bot,metalColor);
     }
     
         //
         // spots
         //
         
-    generateSpots(lft,top,rgt,bot,wid,high)
+    generateSpots(lft,top,rgt,bot)
     {
         let innerWid=rgt-lft;
         let innerHigh=bot-top;
@@ -228,7 +228,7 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
         // random chunk
         //
     
-    generateRandomChunk(lft,top,rgt,bot,wid,high,isFace)
+    generateRandomChunk(lft,top,rgt,bot,isFace)
     {
         switch (genRandom.randomIndex(5)) {
             
@@ -245,11 +245,11 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
                 break;
                 
             case 3:
-                this.generateMetalChunk(lft,top,rgt,bot,wid,high);
+                this.generateMetalChunk(lft,top,rgt,bot);
                 break;
                 
             case 4:
-                this.generateSpots(lft,top,rgt,bot,wid,high);
+                this.generateSpots(lft,top,rgt,bot);
                 break;
         }
         
@@ -262,28 +262,20 @@ export default class GenBitmapMonsterClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high,mx,my;
+        let mx,my;
 
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-        
-        mx=Math.trunc(wid*0.5);
-        my=Math.trunc(high*0.5);
-         
-            // clear canvases
-
-        this.drawRect(0,0,wid,high,this.whiteColor);
-        this.clearNormalsRect(0,0,wid,high);
+        mx=Math.trunc(this.bitmapCanvas.width*0.5);
+        my=Math.trunc(this.bitmapCanvas.height*0.5);
 
             // chunks
             
-        this.generateRandomChunk(0,0,mx,my,wid,high,false);
-        this.generateRandomChunk(mx,0,wid,my,wid,high,true);
-        this.generateRandomChunk(0,my,mx,high,wid,high,false);
+        this.generateRandomChunk(0,0,mx,my,false);
+        this.generateRandomChunk(mx,0,this.bitmapCanvas.width,my,true);
+        this.generateRandomChunk(0,my,mx,this.bitmapCanvas.height,false);
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.4);
+        this.createSpecularMap(0.4);
     }
 
 }

@@ -18,7 +18,7 @@ export default class GenBitmapCaveClass extends GenBitmapBaseClass
         // cave bitmaps
         //
 
-    generateCave(wid,high)
+    generateCave()
     {
         let n,rect,edgeSize;
         let drawStoneColor,drawEdgeColor,f;
@@ -31,16 +31,14 @@ export default class GenBitmapCaveClass extends GenBitmapBaseClass
         
         let padding=genRandom.randomInt(0,5);
         
-        let segments=this.createRandomSegments(wid,high);
+        let segments=this.createRandomSegments();
         let darkenFactor=0.5;
 
             // clear canvases
 
-        this.drawRect(0,0,wid,high,dirtColor);
-        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.9);
-        this.blur(0,0,wid,high,5,false);
-
-        this.clearNormalsRect(0,0,wid,high);
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,dirtColor);
+        this.addNoiseRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,0.6,0.8,0.9);
+        this.blur(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,5,false);
 
             // draw the stones
 
@@ -50,7 +48,7 @@ export default class GenBitmapCaveClass extends GenBitmapBaseClass
             rect=segments[n];
 
             f=1.0;
-            if ((rect.lft>=0) && (rect.top>=0) && (rect.rgt<=wid) && (rect.bot<=high)) {        // don't darken stones that fall off edges
+            if ((rect.lft>=0) && (rect.top>=0) && (rect.rgt<=this.bitmapCanvas.width) && (rect.bot<=this.bitmapCanvas.height)) {        // don't darken stones that fall off edges
                 f=genRandom.random()+darkenFactor;
                 if (f>1.0) f=1.0;
             }
@@ -65,7 +63,7 @@ export default class GenBitmapCaveClass extends GenBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.7);
+        this.createSpecularMap(0.7);
     }
 
         //
@@ -74,14 +72,7 @@ export default class GenBitmapCaveClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateCave(wid,high);
+        this.generateCave();
     }
 
 }

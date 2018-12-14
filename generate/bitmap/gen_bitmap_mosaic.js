@@ -18,7 +18,7 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
         // mosaic bitmaps
         //
 
-    generateMosaic(wid,high)
+    generateMosaic()
     {
         let x,y,lft,rgt,top,bot,tileWid,tileHigh;
         let splitCount,borderSize,edgeSize;
@@ -38,15 +38,13 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
         
             // tile sizes
             
-        tileWid=wid/splitCount;
-        tileHigh=high/splitCount;
+        tileWid=this.bitmapCanvas.width/splitCount;
+        tileHigh=this.bitmapCanvas.height/splitCount;
 
             // clear canvases to mortar
 
-        this.drawRect(0,0,wid,high,mortarColor);
-        this.addNoiseRect(0,0,wid,high,0.6,0.8,0.9);
-
-        this.clearNormalsRect(0,0,wid,high);        
+        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,mortarColor);
+        this.addNoiseRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,0.6,0.8,0.9);
 
             // draw the tiles
         
@@ -90,7 +88,7 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(wid,high,0.5);
+        this.createSpecularMap(0.5);
     }
 
         //
@@ -99,14 +97,7 @@ export default class GenBitmapMosaicClass extends GenBitmapBaseClass
 
     generateInternal()
     {
-        let wid,high;
-
-        wid=this.bitmapCanvas.width;
-        high=this.bitmapCanvas.height;
-
-            // create the bitmap
-
-        this.generateMosaic(wid,high);
+        this.generateMosaic();
     }
 
 }
