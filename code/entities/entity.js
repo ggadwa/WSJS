@@ -2,7 +2,6 @@ import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import CollisionClass from '../../code/entities/collisions.js';
-import ModelDrawClass from '../../code/model_draw/model_draw.js';
 
 //
 // entity base class
@@ -21,7 +20,6 @@ export default class EntityClass
         this.angle=angle.copy();
         this.maxHealth=maxHealth;
         this.model=model;
-        this.modelDraw=new ModelDrawClass(view,model);
         
         this.radius=this.model.calculateRadius();
         this.high=this.model.calculateHeight();
@@ -91,12 +89,12 @@ export default class EntityClass
         
     initialize()
     {
-        this.modelDraw.initialize();
+        this.model.initialize();
     }
     
     release()
     {
-        this.modelDraw.release();
+        this.model.release();
     }
     
         //
@@ -646,17 +644,17 @@ export default class EntityClass
             // vertices or just move to current position
             // and angle
             
-        if (this.modelDraw.drawSkeleton!==null) {
-            if (!this.view.paused) this.modelDraw.drawSkeleton.animate();
-            this.modelDraw.drawMesh.updateVertexesToPoseAndPosition(this.modelDraw.drawSkeleton,this.angle,this.position);
+        if (this.model.skeleton!==null) {
+            if (!this.view.paused) this.model.skeleton.animate();
+            this.model.drawMesh.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
         }
         else {
-            this.modelDraw.drawMesh.updateVertexesToAngleAndPosition(this.angle,this.position);
+            this.model.drawMesh.updateVertexesToAngleAndPosition(this.angle,this.position);
         }
         
             // draw the model
             
-        this.modelDraw.draw();
+        this.model.draw();
     }
     
     

@@ -16,27 +16,19 @@ export default class ModelClass
     }
     
         //
-        // close model
-        //
-
-    close()
-    {
-        this.mesh.close();
-        this.skeleton.close();
-    }
+        // initialize and release
+        // 
     
-        //
-        // clone this model
-        //
-        
-    clone()
+    initialize()
     {
-        let model=new ModelClass(this.view,this.name);
-        
-        model.mesh=this.mesh.clone();
-        model.skeleton=this.skeleton.clone();
+        this.mesh.initialize();
+        this.skeleton.initialize();
+    }
 
-        return(model);
+    release()
+    {
+        this.mesh.release();
+        this.skeleton.release();
     }
     
         //
@@ -52,5 +44,23 @@ export default class ModelClass
     {
         return(this.mesh.calculateHeight());
     }
+    
+        //
+        // draw model
+        //
 
+    draw()
+    {
+        let mesh=this.model.mesh;
+
+        this.view.shaderList.modelMeshShader.drawStart();
+        
+        mesh.bitmap.attachAsTexture(this.view.shaderList.modelMeshShader);
+        
+        mesh.buildNonCulledTriangleIndexes();
+        mesh.bindBuffers(this.view.shaderList.modelMeshShader);
+        mesh.draw();
+        
+        this.view.shaderList.modelMeshShader.drawEnd();
+    }
 }

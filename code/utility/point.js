@@ -470,6 +470,20 @@ export default class PointClass
         return(fang);
     }
     
+    minFromPoint(pt)
+    {
+        if (this.x>pt.x) this.x=pt.x;
+        if (this.y>pt.y) this.y=pt.y;
+        if (this.z>pt.z) this.z=pt.z;
+    }
+    
+    maxFromPoint(pt)
+    {
+        if (this.x<pt.x) this.x=pt.x;
+        if (this.y<pt.y) this.y=pt.y;
+        if (this.z<pt.z) this.z=pt.z;
+    }
+    
     copy()
     {
         return(new PointClass(this.x,this.y,this.z));

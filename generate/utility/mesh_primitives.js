@@ -1,7 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshClass from '../../code/mesh/mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -130,7 +130,7 @@ export default class MeshPrimitivesClass
 
             // finally create the mesh
 
-        return(new MapMeshClass(view,bitmap,vertexList,indexes,flags));
+        return(new MeshClass(view,bitmap,vertexList,indexes,flags));
     }
     
     static createMeshCube(view,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,flags)
@@ -307,7 +307,7 @@ export default class MeshPrimitivesClass
 
             // finally create the mesh
 
-        return(new MapMeshClass(view,bitmap,vertexList,indexes,flags));
+        return(new MeshClass(view,bitmap,vertexList,indexes,flags));
     }
     
     static createMeshDirectionWedge(view,bitmap,xBound,yBound,zBound,dir,left,right,back,top,bottom,normalsIn,flags)
@@ -453,7 +453,7 @@ export default class MeshPrimitivesClass
 
             // finally create the mesh
 
-        return(new MapMeshClass(view,bitmap,vertexList,indexes,flags));
+        return(new MeshClass(view,bitmap,vertexList,indexes,flags));
     }
     
         //
@@ -673,7 +673,7 @@ export default class MeshPrimitivesClass
             // finally create the mesh
             // all cylinders are simple box collisions
 
-        mesh=new MapMeshClass(view,bitmap,vertexList,indexes,flags);
+        mesh=new MeshClass(view,bitmap,vertexList,indexes,flags);
         mesh.simpleCollisionGeometry=true;
         
         return(mesh);

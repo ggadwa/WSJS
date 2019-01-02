@@ -1,5 +1,4 @@
 import PointClass from '../../code/utility/point.js';
-import ModelDrawClass from '../../code/model_draw/model_draw.js';
 
 //
 // weapon class
@@ -11,7 +10,6 @@ export default class WeaponClass
     {
         this.view=view;
         this.model=model;
-        this.modelDraw=new ModelDrawClass(view,model);
         this.name=name;
         
         this.projectile=null;
@@ -35,12 +33,12 @@ export default class WeaponClass
         
     initialize()
     {
-        this.modelDraw.initialize();
+        this.model.initialize();
     }
     
     release()
     {
-        this.modelDraw.release();
+        this.model.release();
     }
     
         //
@@ -150,11 +148,11 @@ export default class WeaponClass
             // move vertexes to reflect
             // angle and offset of weapon
             
-        this.modelDraw.drawMesh.updateVertexesToAngleAndPosition(this.handAngle,this.handOffset);
+        this.model.drawMesh.updateVertexesToAngleAndPosition(this.handAngle,this.handOffset);
         
             // draw the model
             
-        this.modelDraw.draw();
+        this.model.draw();
     }
 
 }

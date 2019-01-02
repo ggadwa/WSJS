@@ -505,7 +505,7 @@ export default class MapMeshListClass
 
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers();
+            mesh.bindBuffers(this.view.shaderList.mapMeshShader);
             mesh.drawOpaque();
         }
         
@@ -558,7 +558,7 @@ export default class MapMeshListClass
 
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers();
+            mesh.bindBuffers(this.view.shaderList.mapMeshShader);
             mesh.drawTransparent();
         }
         

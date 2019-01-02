@@ -634,12 +634,13 @@ export default class ViewClass
       
             // player weapon
          
+         /*
         weapon=player.getCurrentWeapon();
         if (weapon!==null) {
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
             weapon.draw(player);
         }
-        
+        */
             // setup any tinting
         
         tintOn=false;
@@ -693,7 +694,7 @@ export default class ViewClass
         
         this.text.drawStart();
         this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
-        this.text.drawWithShadow(30,(this.high-5),25,22,player.getCurrentWeaponDisplayString(),this.text.TEXT_ALIGN_LEFT,this.uiWeaponTextColor);
+        //this.text.drawWithShadow(30,(this.high-5),25,22,player.getCurrentWeaponDisplayString(),this.text.TEXT_ALIGN_LEFT,this.uiWeaponTextColor);
         
         if (this.paused) {
             this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',this.text.TEXT_ALIGN_CENTER,this.uiTextColor);

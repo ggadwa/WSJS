@@ -312,7 +312,7 @@ export default class GenMapClass
         
             // determine if outdoor
           
-        outdoor=(this.map.roomList.rooms.length===1)||(forceOutdoor); //((genRandom.randomPercentage(this.ROOM_OUTDOOR_PERCENTAGE))&&(!this.hasOutdoorRoom)&&(!config.SIMPLE_TEST_MAP))||(forceOutdoor);
+        outdoor=((genRandom.randomPercentage(this.ROOM_OUTDOOR_PERCENTAGE))&&(!this.hasOutdoorRoom)&&(!config.SIMPLE_TEST_MAP))||(forceOutdoor);
 
             // top of room
             

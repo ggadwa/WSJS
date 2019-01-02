@@ -1,7 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshClass from '../../code/mesh/mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import genRandom from '../../generate/utility/random.js';
@@ -100,7 +100,7 @@ export default class GenRoomWindowClass
         MeshUtilityClass.buildVertexListUVs(this.wallBitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
         
-        this.map.meshList.add(new MapMeshClass(this.view,this.wallBitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
+        this.map.meshList.add(new MeshClass(this.view,this.wallBitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_WALL));
 
             // the window casing
             

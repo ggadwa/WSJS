@@ -1,7 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshClass from '../../code/mesh/mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -113,7 +113,7 @@ export default class GenRoomStairsClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
-        mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,flags);        
+        mesh=new MeshClass(this.view,bitmap,vertexList,indexes,flags);        
         this.map.meshList.add(mesh);
     }
 

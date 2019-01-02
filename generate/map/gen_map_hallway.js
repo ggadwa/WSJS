@@ -1,7 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
-import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshClass from '../../code/mesh/mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import MeshPrimitivesClass from '../../generate/utility/mesh_primitives.js';
 import MoveClass from '../../code/map/move.js';
@@ -104,7 +104,7 @@ export default class GenRoomHallwayClass
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
 
-        mesh=new MapMeshClass(this.view,bitmap,vertexList,indexes,flags);        
+        mesh=new MeshClass(this.view,bitmap,vertexList,indexes,flags);        
         return(this.map.meshList.add(mesh));
     }
 

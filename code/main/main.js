@@ -15,6 +15,7 @@ import GenMonsterClass from '../../generate/thing/gen_monster.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityMonsterClass from '../../code/entities/entity_monster.js';
 import genRandom from '../../generate/utility/random.js';
+import ImportObjClass from '../../code/import/import_obj.js';
 
 //
 // main class
@@ -33,7 +34,7 @@ class MainClass
 
         Object.seal(this);
     }
-
+    
     run()
     {
         this.view.createCanvas();
@@ -129,10 +130,10 @@ class MainClass
         
             // todo -- all this is hard coded
             
-        playerEntity.addWeapon(genWeapon.generate('Pistol'));
-        playerEntity.addWeapon(genWeapon.generate('Rocket Launcher'));
-        playerEntity.addWeapon(genWeapon.generate('Grenade Launcher'));
-        playerEntity.addWeapon(genWeapon.generate('Laser Gun'));
+        //playerEntity.addWeapon(genWeapon.generate('Pistol'));
+        //playerEntity.addWeapon(genWeapon.generate('Rocket Launcher'));
+        //playerEntity.addWeapon(genWeapon.generate('Grenade Launcher'));
+        //playerEntity.addWeapon(genWeapon.generate('Laser Gun'));
         
         playerEntity.setCurrentWeaponIndex(0);
 
@@ -205,6 +206,17 @@ class MainClass
     
     initFinish()
     {
+            // supergumba -- our import
+
+        let importObj=new ImportObjClass(this.view,this.map,'./data/objs/cube_trigs_2.obj',1000.0);
+        importObj.import(this.initFinish2.bind(this));
+        this.map.entityList.getPlayer().position.setFromValues(0,0,0);
+        
+    }
+    
+    initFinish2()
+    {
+        
             // finish by setting up all the mesh
             // buffers and indexes
 

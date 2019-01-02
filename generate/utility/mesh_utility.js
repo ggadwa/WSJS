@@ -1,6 +1,5 @@
 import PointClass from '../../code/utility/point.js';
-import MapMeshVertexClass from '../../code/map/map_mesh_vertex.js';
-import ModelMeshVertexClass from '../../code/model/model_mesh_vertex.js';
+import MeshVertexClass from '../../code/mesh/mesh_vertex.js';
 
 //
 // mesh utility class (static)
@@ -23,7 +22,7 @@ export default class MeshUtilityClass
         let vertexList=[];
         
         for (n=0;n!==nVertex;n++) {
-            vertexList.push(new MapMeshVertexClass());
+            vertexList.push(new MeshVertexClass());
         }
         
         return(vertexList);
@@ -35,7 +34,7 @@ export default class MeshUtilityClass
         let vertexList=[];
         
         for (n=0;n!==nVertex;n++) {
-            vertexList.push(new ModelMeshVertexClass());
+            vertexList.push(new MeshVertexClass());
         }
         
         return(vertexList);

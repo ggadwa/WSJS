@@ -5,7 +5,7 @@ import Line2DClass from '../../code/utility/2D_line.js';
 import BoundClass from '../../code/utility/bound.js';
 import RectClass from '../../code/utility/rect.js';
 import GridClass from '../../code/utility/grid.js';
-import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshClass from '../../code/mesh/mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -760,7 +760,7 @@ export default class MapRoomClass
         MeshUtilityClass.buildVertexListNormals(vertexList,indexes,null,true);
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
+        return(new MeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
     }
     
         //
@@ -888,7 +888,7 @@ export default class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
+        return(new MeshClass(this.view,bitmap,vertexList,indexes,meshFlag));
     }
     
     createMeshCeiling(bitmap)
@@ -961,7 +961,7 @@ export default class MapRoomClass
 
         MeshUtilityClass.buildVertexListUVs(bitmap,vertexList);
         MeshUtilityClass.buildVertexListTangents(vertexList,indexes);
-        return(new MapMeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
+        return(new MeshClass(this.view,bitmap,vertexList,indexes,constants.MESH_FLAG_ROOM_CEILING));
     }
     
         //

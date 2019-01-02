@@ -482,7 +482,6 @@ export default class CollisionClass
                         rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
                         if (rayHitPnt!==null) {
                             if (rayHitPnt.y>=y) {
-                                console.log(rayHitPnt.y+'='+y);
                                 entity.collideCeilingMeshIdx=n;
                                 y=rayHitPnt.y;
                             }

@@ -131,6 +131,8 @@ export default class SkyClass
         let cameraPos=this.view.camera.position;
         let skyRadius=25000;
         
+        return;     // supergumba -- testing
+        
             // setup shader
             
         gl.disable(gl.DEPTH_TEST);

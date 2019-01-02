@@ -1,6 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
-import MapMeshClass from '../../code/map/map_mesh.js';
+import MeshClass from '../../code/mesh/mesh.js';
 import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 import genRandom from '../../generate/utility/random.js';
 
@@ -81,7 +81,7 @@ export default class GenRoomLedgeClass
 
             // finally create the mesh
 
-        this.map.meshList.add(new MapMeshClass(this.view,this.platformBitmap,vertexList,indexes,constants.MESH_FLAG_LEDGE));
+        this.map.meshList.add(new MeshClass(this.view,this.platformBitmap,vertexList,indexes,constants.MESH_FLAG_LEDGE));
     }
         
         //
