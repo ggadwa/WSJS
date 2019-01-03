@@ -12,19 +12,21 @@ WebGL2
 
 ******************************
 
-0. combine model_draw and model_mesh
+* combine model_draw and model_mesh
 1. make all the mesh map/model generic
     -> models need to hold own bitmap
 2. move to bitmap2
 3. then add obj stuff
+3a. sort the imported meshes by material
+4. need json to run it
 
 5. get rid of generator stuff
 6. get rid of combineMesh in mesh.js
 7. delete MapMeshSharedTrigCacheClass in mesh.js
 8. get rid of limbs in model stuff
-9. get glows textures _g
+9. make glows textures _g
 
-
+10. map needs to keep a list of bitmaps to release
 
 
 

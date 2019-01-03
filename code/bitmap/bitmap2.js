@@ -1,9 +1,10 @@
 export default class Bitmap2Class
 {
-    constructor(view,name)
+    constructor(view,name,colorOnly)
     {
         this.view=view;
         this.name=name;
+        this.colorOnly=colorOnly;
         
         this.colorImage=new Image();
         this.normalImage=new Image();
@@ -41,6 +42,11 @@ export default class Bitmap2Class
     {
         let path='./data/textures/'+this.name+'_n.png';
         
+        if (this.colorOnly) {
+            this.initializeCreateGLTextures(callback);
+            return;
+        }
+        
         this.normalImage.onload=this.initializeLoadSpecular.bind(this,callback);
         this.normalImage.onerror=this.loadTextureError.bind(this,path);
         this.normalImage.src=path;
@@ -77,6 +83,11 @@ export default class Bitmap2Class
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D,null);
+        
+        if (this.colorOnly) {
+            callback();
+            return;
+        }
 
             // setup the normal map
 

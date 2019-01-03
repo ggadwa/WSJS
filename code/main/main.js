@@ -16,6 +16,7 @@ import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityMonsterClass from '../../code/entities/entity_monster.js';
 import genRandom from '../../generate/utility/random.js';
 import ImportObjClass from '../../code/import/import_obj.js';
+import GameClass from '../../data/scripts/game.js';
 
 //
 // main class
@@ -31,6 +32,8 @@ class MainClass
         this.map=new MapClass(this.view);
         this.input=new InputClass(this.view);
         this.sound=new SoundClass();
+        
+        this.game=new GameClass(this.view,this.map);
 
         Object.seal(this);
     }
@@ -74,13 +77,12 @@ class MainClass
         this.view.loadingScreenAddString('Generating Dynamic Map');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildMap.bind(this),1);
+        setTimeout(this.initLoadMap.bind(this),1);
     }
 
-    initBuildMap()
+    initLoadMap()
     {
-        let genMap=new GenMapClass(this.view,this.map,this.initBuildMapFinish.bind(this));
-        genMap.build();
+        this.game.loadStartMap(this.initBuildMapFinish.bind(this));
     }
 
     initBuildMapFinish()
@@ -96,7 +98,7 @@ class MainClass
     {
             // build the collision geometry
 
-        this.map.meshList.buildCollisionGeometry();
+        //this.map.meshList.buildCollisionGeometry();
 
             // next step
 
@@ -119,12 +121,14 @@ class MainClass
         
             // find place for player
         
+        pos=new PointClass(0,0,0);
+        /*
         pos=this.map.roomList.findRandomPlayerPosition();
         if (pos===null) {
             alert('Couldn\'t find a place to spawn player!');
             return;
         }
-
+*/
         playerEntity=new EntityPlayerClass(this.view,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,model);
         playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
         
@@ -159,6 +163,7 @@ class MainClass
 
     initBuildMonsters(idx)
     {
+        /*
         let pos,isBoss;
         let genMonster=new GenMonsterClass(this.view,this.map,this.sound);
 
@@ -200,21 +205,12 @@ class MainClass
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Finishing');
         this.view.loadingScreenDraw(null);
+*/
 
         setTimeout(this.initFinish.bind(this),1);
     }
     
     initFinish()
-    {
-            // supergumba -- our import
-
-        let importObj=new ImportObjClass(this.view,this.map,'./data/objs/cube_trigs_2.obj',1000.0);
-        importObj.import(this.initFinish2.bind(this));
-        this.map.entityList.getPlayer().position.setFromValues(0,0,0);
-        
-    }
-    
-    initFinish2()
     {
         
             // finish by setting up all the mesh

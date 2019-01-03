@@ -7,10 +7,9 @@ import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 
 export default class ImportObjClass
 {
-    constructor(view,map,url,scale)
+    constructor(view,url,scale)
     {
         this.view=view;
-        this.map=map;
         this.url=url;
         this.scale=scale;
         
@@ -21,6 +20,8 @@ export default class ImportObjClass
         this.uvList=[];
         this.normalList=[];
         this.textureMap=new Map();
+        
+        this.meshes=[];
         
         this.callback=null;
     }
@@ -36,8 +37,8 @@ export default class ImportObjClass
             
         this.callback=callback;
         
-            // start with the fetch
-            
+            // fetch the file
+                        
         fetch(this.url)
             .then(
                 (resp)=>{
@@ -126,35 +127,23 @@ export default class ImportObjClass
 
             // add the polys
         
-        //console.log('=== point start');
-        
         for (n=0;n!==npt;n++) {
             v=new MeshVertexClass();
             v.position.setFromPoint(this.vertexList[vIdx[n]]);
             v.uv.setFromPoint(this.uvList[uvIdx[n]]);
             v.normal.setFromPoint(this.normalList[normalIdx[n]]);
             meshVertices.push(v);
-            
-            //console.log('v='+v.position.x+','+v.position.y+','+v.position.z);
-            //console.log('vt='+v.uv.x+','+v.uv.y);
-            //console.log('vn='+v.normal.x+','+v.normal.y+','+v.normal.z);
         }
-        
-        //console.log('=== index start ('+npt+')');
         
         for (n=0;n<(npt-2);n++) {
             meshIndexes.push(startTrigIdx);
             meshIndexes.push(startTrigIdx+(n+1));
             meshIndexes.push(startTrigIdx+(n+2));
-            
-            //console.log(startTrigIdx+','+(startTrigIdx+(n+1))+','+(startTrigIdx+(n+2)));
         }
     }
     
     addMesh(bitmapName,meshVertices,meshIndexes)
     {
-        console.log('adding mesh with vertex count='+meshVertices.length);
-        
         let bitmap=this.textureMap.get(bitmapName);
         if (bitmap===undefined) {
             console.log('missing material: '+bitmapName);
@@ -162,11 +151,7 @@ export default class ImportObjClass
         }
 
         MeshUtilityClass.buildVertexListTangents(meshVertices,meshIndexes);
-        this.map.meshList.add(new MeshClass(this.view,bitmap,meshVertices,meshIndexes,0));
-            
-            console.log('mesh idx='+(this.map.meshList.meshes.length-1));
-            console.log('index count='+this.map.meshList.meshes[this.map.meshList.meshes.length-1].indexCount);
-            console.log('trig count='+this.map.meshList.meshes[this.map.meshList.meshes.length-1].trigCount);
+        this.meshes.push(new MeshClass(this.view,bitmap,meshVertices,meshIndexes,0));
     }
     
         //
@@ -196,7 +181,7 @@ export default class ImportObjClass
             
             switch(tokens[0]) {
                 case 'usemtl':                        
-                    if (!this.textureMap.has(tokens[1])) this.textureMap.set(tokens[1],new Bitmap2Class(this.view,tokens[1]));
+                    if (!this.textureMap.has(tokens[1])) this.textureMap.set(tokens[1],new Bitmap2Class(this.view,tokens[1],false));
                     break;
             }
         }
@@ -223,9 +208,9 @@ export default class ImportObjClass
             
             switch(tokens[0]) {
                 case 'v':
-                    x=Math.trunc(parseFloat(tokens[1])*this.scale);
-                    y=Math.trunc(parseFloat(tokens[2])*this.scale);
-                    z=Math.trunc(parseFloat(tokens[3])*this.scale);
+                    x=Math.trunc(parseFloat(tokens[1])*this.scale.x);
+                    y=Math.trunc(parseFloat(tokens[2])*this.scale.y);
+                    z=Math.trunc(parseFloat(tokens[3])*this.scale.z);
                     pnt=new PointClass(x,y,z);
                     
                     min.minFromPoint(pnt);
@@ -240,10 +225,6 @@ export default class ImportObjClass
                     break;
             }
         }
-        
-        console.log('main vertex list count='+this.vertexList.length);
-        console.log('main uv list count='+this.uvList.length);
-        console.log('main normal list count='+this.normalList.length);
         
             // now create all the meshes
             
@@ -261,6 +242,9 @@ export default class ImportObjClass
             
             switch(tokens[0]) {
                 case 'g':
+                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
+                    meshVertices=[];
+                    meshIndexes=[];
                     break;
                 case 'v':
                     posVertexIdx++;
@@ -275,8 +259,7 @@ export default class ImportObjClass
                     this.addTrigsForFace(tokens,posVertexIdx,posUVIdx,posNormalIdx,meshVertices,meshIndexes);
                     break;
                 case 'usemtl':
-                    if (lastMaterialName!==null) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
-                    
+                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
                     lastMaterialName=tokens[1];
                     meshVertices=[];
                     meshIndexes=[];
@@ -286,7 +269,7 @@ export default class ImportObjClass
         
             // and finally any current usemtl
             
-        if (lastMaterialName!==null) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
+        if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
         
             // finally callback to finish the import
             

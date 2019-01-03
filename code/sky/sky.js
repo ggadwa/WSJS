@@ -1,5 +1,5 @@
 import * as constants from '../../code/main/constants.js';
-import GenBitmapSkyClass from '../../generate/bitmap/gen_bitmap_sky.js';
+import Bitmap2Class from '../bitmap/bitmap2.js';
 
 //
 // sky class
@@ -19,7 +19,14 @@ export default class SkyClass
         this.uvPosBuffer=null;
         this.indexBuffer=null;
         
-        this.bitmap=null;
+        this.bitmaps=[null,null,null,null,null,null];
+        
+        this.BITMAP_EAST_IDX=0;
+        this.BITMAP_WEST_IDX=1;
+        this.BITMAP_NORTH_IDX=2;
+        this.BITMAP_SOUTH_IDX=3;
+        this.BITMAP_TOP_IDX=4;
+        this.BITMAP_BOTTOM_IDX=5;
         
         Object.seal(this);
     }
@@ -31,7 +38,6 @@ export default class SkyClass
     initialize()
     {
         let gl=this.view.gl;
-        let genBitmap;
         
             // room enough for the 8 points of the cube
             
@@ -43,25 +49,44 @@ export default class SkyClass
         this.uvPosBuffer=gl.createBuffer();
         this.indexBuffer=gl.createBuffer();
         
-            // create bitmaps
-        
-        genBitmap=new GenBitmapSkyClass(this.view);
-        this.bitmap=genBitmap.generate(false);
-        
         return(true);
     }
 
     release()
     {
+        let n;
         let gl=this.view.gl;
 
         gl.deleteBuffer(this.vertexPosBuffer);
         gl.deleteBuffer(this.uvPosBuffer);
         gl.deleteBuffer(this.indexBuffer);
         
-        this.bitmap.close();
+        for (n=0;n!==6;n++) {
+            if (this.bitmaps[n]!==null) this.bitmaps[n].release();
+        }
     }
-
+    
+        //
+        // load bitmaps
+        //
+        
+    loadBitmapsProcess(idx,skyBoxBitmapNames,callback)
+    {
+        let bitmap;
+        
+        if (idx===6) callback();
+        
+        bitmap=new Bitmap2Class(this.view,skyBoxBitmapNames[idx],true);
+        this.bitmaps[idx]=bitmap;
+        
+        bitmap.initialize(this.loadBitmapsProcess.bind(this,(idx+1),skyBoxBitmapNames,callback));
+    }
+     
+    loadBitmaps(skyBoxBitmapNames,callback)
+    {
+        this.loadBitmapsProcess(0,skyBoxBitmapNames,callback);
+    }
+    
         //
         // draw
         //
@@ -131,8 +156,6 @@ export default class SkyClass
         let cameraPos=this.view.camera.position;
         let skyRadius=25000;
         
-        return;     // supergumba -- testing
-        
             // setup shader
             
         gl.disable(gl.DEPTH_TEST);
@@ -141,22 +164,35 @@ export default class SkyClass
 
         this.view.shaderList.skyShader.drawStart();
         
-        this.bitmap.attachAsSky();
+            // east
         
-            // sides
+        this.bitmaps[this.BITMAP_EAST_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.0,0.0,1.0,1.0);
         
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.2499,0.01,0.0,0.4999);
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.25,0.01,0.4999,0.4999);
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.50,0.01,0.7499,0.4999);
-        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.9999,0.01,0.75,0.4999);
+            // west
+        
+        this.bitmaps[this.BITMAP_WEST_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,1.0,0.0,0.0,1.0);
+        
+            // north
+        
+        this.bitmaps[this.BITMAP_NORTH_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.0,0.0,1.0,1.0);
+
+            // south
+        
+        this.bitmaps[this.BITMAP_SOUTH_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.0,0.0,1.0,1.0);
         
             // top
         
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,0.01,0.51,0.2499,0.9999);
+        this.bitmaps[this.BITMAP_TOP_IDX].attachAsSky();
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,1.0,0.0,0.0,1.0);
         
             // bottom
         
-        this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.25,0.51,0.4999,0.9999);
+        this.bitmaps[this.BITMAP_BOTTOM_IDX].attachAsSky();
+        this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,1.0,0.0,0.0,1.0);
         
             // remove the buffers
 
