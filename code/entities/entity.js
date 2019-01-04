@@ -52,8 +52,6 @@ export default class EntityClass
         this.movement=new PointClass(0,0,0);
         this.gravity=this.gravityMinValue;
         
-        this.currentRoom=null;
-
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
         this.touchEntity=null;
@@ -345,7 +343,6 @@ export default class EntityClass
             
         if (clipping) {
             this.position.addPoint(this.movePt);
-            this.setupCurrentRoom();
             return;
         }
 
@@ -353,10 +350,6 @@ export default class EntityClass
         
         this.moveY(noGravity);
         this.moveXZ(bump,slide,clipping);
-        
-            // reset which room entity is in
-            
-        this.setupCurrentRoom();
     }
     
     moveDirect(x,y,z)
@@ -561,10 +554,12 @@ export default class EntityClass
         
     isInLiquid()
     {
+        /*
         if (this.currentRoom===null) return(false);
         if (!this.currentRoom.liquid) return(false);
         
         return((this.position.y-this.eyeOffset)>=this.currentRoom.getLiquidY());
+        */
     }
     
     isStandingOnFloor()
@@ -585,32 +580,6 @@ export default class EntityClass
         if (this.standOnMeshIdx!==-1) return(true);
         
         return(false);
-    }
-    
-    getCurrentRoom()
-    {
-        return(this.currentRoom);
-    }
-    
-    setupCurrentRoom()
-    {
-        let n,room;
-        let nRoom=this.map.roomList.count();
-        
-            // check if still in the current
-            // room
-            
-        if (this.currentRoom!==null) {
-            if (this.currentRoom.posInRoom(this.position)) return;
-        }
-        
-        for (n=0;n!==nRoom;n++) {
-            room=this.map.roomList.get(n);
-            if (room.posInRoom(this.position)) {
-                this.currentRoom=room;
-                return;
-            }
-        }
     }
     
         //

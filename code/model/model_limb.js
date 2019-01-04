@@ -1,5 +1,5 @@
 import PointClass from '../../code/utility/point.js';
-import genRandom from '../../generate/utility/random.js';
+import genRandom from '../../code/utility/random.js';
 
 //
 // limb class

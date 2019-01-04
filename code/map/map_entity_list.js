@@ -2,7 +2,7 @@ import * as constants from '../../code/main/constants.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityProjectileClass from '../../code/entities/entity_projectile.js';
 import config from '../../code/main/config.js';
-import genRandom from '../../generate/utility/random.js';
+import genRandom from '../../code/utility/random.js';
 
 //
 // map class

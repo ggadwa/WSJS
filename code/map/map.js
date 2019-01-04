@@ -1,7 +1,5 @@
 import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
-import MapRoomListClass from '../../code/map/map_room_list.js';
-import MapRoomClass from '../../code/map/map_room.js';
 import MapMeshListClass from '../../code/map/map_mesh_list.js';
 import MapLiquidListClass from '../../code/map/map_liquid_list.js';
 import MapLightListClass from '../../code/map/map_light_list.js';
@@ -11,7 +9,7 @@ import MapMovementListClass from '../../code/map/map_movement_list.js';
 import MapOverlayClass from '../../code/map/map_overlay.js';
 import SkyClass from '../../code/sky/sky.js';
 import config from '../../code/main/config.js';
-import genRandom from '../../generate/utility/random.js';
+import genRandom from '../../code/utility/random.js';
 
 //
 // map class
@@ -31,7 +29,6 @@ export default class MapClass
             
             // variables
         
-        this.roomList=new MapRoomListClass(view,this);
         this.meshList=new MapMeshListClass(view);
         this.liquidList=new MapLiquidListClass(view);
         this.lightList=new MapLightListClass(view);
@@ -50,7 +47,6 @@ export default class MapClass
 
     initialize()
     {
-        if (!this.roomList.initialize()) return(false);
         if (!this.meshList.initialize()) return(false);
         if (!this.liquidList.initialize()) return(false);
         if (!this.lightList.initialize()) return(false);
@@ -63,7 +59,6 @@ export default class MapClass
 
     release()
     {
-        this.roomList.release();
         this.meshList.release();
         this.liquidList.release();
         this.lightList.release();
@@ -81,7 +76,6 @@ export default class MapClass
 
     clear()
     {
-        this.roomList.clear();
         this.meshList.clear();
         this.liquidList.clear();
         this.lightList.clear();

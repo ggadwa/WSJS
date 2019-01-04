@@ -2,7 +2,7 @@ import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import ColorClass from '../../code/utility/color.js';
 import LightClass from '../../code/light/light.js';
-import genRandom from '../../generate/utility/random.js';
+import genRandom from '../../code/utility/random.js';
 
 //
 // particle class

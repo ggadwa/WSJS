@@ -1,5 +1,4 @@
 import ColorClass from '../../code/utility/color.js';
-import GenBitmapBaseClass from '../../generate/bitmap/gen_bitmap_base.js';
 
 //
 // text class

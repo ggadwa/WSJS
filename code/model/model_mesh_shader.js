@@ -116,7 +116,7 @@ export default class ModelMeshShaderClass extends ShaderClass
 
             // ambient
             
-        gl.uniform3f(this.ambientUniform,config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT,config.MAP_LIGHT_AMBIENT);
+        gl.uniform3f(this.ambientUniform,this.view.ambient.r,this.view.ambient.g,this.view.ambient.b);
         
             // lighting
             // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)

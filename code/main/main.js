@@ -5,18 +5,12 @@ import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
-import GenMapClass from '../../generate/map/gen_map.js';
-import GenModelHumanClass from '../../generate/model/gen_model_human.js';
-import GenModelWeaponClass from '../../generate/model/gen_model_weapon.js';
-import GenModelProjectileClass from '../../generate/model/gen_model_projectile.js';
-import GenWeaponClass from '../../generate/thing/gen_weapon.js';
-import GenSoundClass from '../../generate/sound/gen_sound.js';
-import GenMonsterClass from '../../generate/thing/gen_monster.js';
 import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityMonsterClass from '../../code/entities/entity_monster.js';
-import genRandom from '../../generate/utility/random.js';
+import genRandom from '../../code/utility/random.js';
 import ImportObjClass from '../../code/import/import_obj.js';
 import GameClass from '../../data/scripts/game.js';
+import ModelClass from '../../code/model/model.js';
 
 //
 // main class
@@ -74,7 +68,7 @@ class MainClass
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Dynamic Map');
+        this.view.loadingScreenAddString('Importing Map');
         this.view.loadingScreenDraw(null);
 
         setTimeout(this.initLoadMap.bind(this),1);
@@ -82,7 +76,8 @@ class MainClass
 
     initLoadMap()
     {
-        this.game.loadStartMap(this.initBuildMapFinish.bind(this));
+        let projectMap=this.game.getStartMap();
+        projectMap.load(this.initBuildMapFinish.bind(this));
     }
 
     initBuildMapFinish()
@@ -112,16 +107,16 @@ class MainClass
     initBuildPlayer()
     {
         let model,pos,playerEntity;
-        let genModel=new GenModelHumanClass(this.view);
-        let genWeapon=new GenWeaponClass(this.view,this.map,this.sound);
+        //let genModel=new GenModelHumanClass(this.view);
+        //let genWeapon=new GenWeaponClass(this.view,this.map,this.sound);
 
             // build the player model
         
-        model=genModel.generate('player',1.0,false);
+        model=new ModelClass(this.view,name);
         
             // find place for player
         
-        pos=new PointClass(0,0,0);
+        pos=new PointClass(0,-30000,0);
         /*
         pos=this.map.roomList.findRandomPlayerPosition();
         if (pos===null) {

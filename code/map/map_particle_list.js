@@ -1,6 +1,5 @@
 import * as constants from '../../code/main/constants.js';
 import ParticleClass from '../../code/particle/particle.js';
-import GenBitmapParticleClass from '../../generate/bitmap/gen_bitmap_particle.js';
 
 //
 // map particle list class
@@ -42,8 +41,8 @@ export default class MapParticleListClass
         
             // construct a particle bitmap
             
-        genBitmap=new GenBitmapParticleClass(this.view);  
-        this.particleBitmap=genBitmap.generate(false);
+        //genBitmap=new GenBitmapParticleClass(this.view);  // supergumba -- needs rebuild
+        //this.particleBitmap=genBitmap.generate(false);
        
         return(true);
     }

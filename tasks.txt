@@ -10,23 +10,37 @@ WebGL2
 
 
 
+hit=blue_crystal_04
+hit=tower_roof05
 ******************************
 
 * combine model_draw and model_mesh
+0. missing texture undefined.png
 1. make all the mesh map/model generic
     -> models need to hold own bitmap
 2. move to bitmap2
 3. then add obj stuff
 3a. sort the imported meshes by material
-4. need json to run it
+* need scripts to run it
+* need map class
+* turn sky on and off (null for bitmaps)
+* pass light list
+* pass movement list
+4e. pass liquid list
+4f. pass glow list (per texture)
 
 5. get rid of generator stuff
 6. get rid of combineMesh in mesh.js
-7. delete MapMeshSharedTrigCacheClass in mesh.js
+7. delete MapMeshSharedTrigCacheClass in mesh.js (and search for sharedtri)
+7a. get rid of randomize stuff in meshlist
 8. get rid of limbs in model stuff
-9. make glows textures _g
 
 10. map needs to keep a list of bitmaps to release
+11. need to rename materials in OBJs
+
+* game/dual_castles need to extend another class
+12. remove outdoor light type and shader stuff
+13. get rid of config stuff
 
 
 

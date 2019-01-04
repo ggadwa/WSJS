@@ -10,24 +10,27 @@ import BoundClass from '../../code/utility/bound.js';
 
 export default class MapLiquidClass
 {
-    constructor(view,bitmap,room)
+    constructor(view,bitmap,waveSize,waveFrequency,waveHeight,xBound,y,zBound)
     {
         this.view=view;
         this.bitmap=bitmap;
+        this.waveSize=waveSize;
+        this.waveFrequency=waveFrequency;
+        this.waveHeight=waveHeight;
         
-            // pick up some variables from the room
+            // setup size
             
-        this.xBlockSize=room.xBlockSize;
-        this.zBlockSize=room.zBlockSize;
-        
-        this.xBound=room.xBound;
-        this.zBound=room.zBound;
+        this.xBound=xBound.copy();
+        this.y=y;
+        this.zBound=zBound.copy();
+            
+        this.xBlockSize=xBound.getSize()/waveSize;
+        this.zBlockSize=zBound.getSize()/waveSize;
         
             // liquids are flat plans, so we
             // need a single Y, and then create a yBound
             // so the frustum calcs can use it
             
-        this.y=room.getLiquidY();
         this.yBound=new BoundClass(this.y,this.y);
         
             // null buffers
@@ -41,11 +44,6 @@ export default class MapLiquidClass
         
         this.indexCount=0;
         
-            // constants
-            
-        this.LIQUID_WAVE_FREQUENCY=4000;           // frequency in milliseconds of waves
-        this.LIQUID_WAVE_HEIGHT=400;               // pixel height of waves
-
         Object.seal(this);
     }
     
@@ -78,9 +76,9 @@ export default class MapLiquidClass
         
             // get the y offsets for waves
         
-        let freq=((this.view.timeStamp%this.LIQUID_WAVE_FREQUENCY)/this.LIQUID_WAVE_FREQUENCY)*(Math.PI*2);
+        let freq=((this.view.timeStamp%this.waveFrequency)/this.waveFrequency)*(Math.PI*2);
         let cs=Math.cos(freq);
-        let offY=Math.trunc(cs*this.LIQUID_WAVE_HEIGHT);
+        let offY=Math.trunc(cs*this.waveHeight);
         
             // create mesh
             

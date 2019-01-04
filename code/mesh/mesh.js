@@ -6,32 +6,15 @@ import MeshVertexClass from '../../code/mesh/mesh_vertex.js';
 import CollisionTrigClass from '../../code/utility/collision_trig.js';
 
 //
-// special class used to pre-calc some
-// shared triangle elimination calculations
-//
-
-class MapMeshSharedTrigCacheClass
-{
-    constructor()
-    {
-        this.isWall=false;
-        this.xBound=null;
-        this.yBound=null;
-        this.zBound=null;
-        
-        Object.seal(this);
-    }
-}
-
-//
 // map mesh class
 //
 
 export default class MeshClass
 {
-    constructor(view,bitmap,vertexList,indexes,flag)
+    constructor(view,name,bitmap,vertexList,indexes,flag)
     {
         this.view=view;
+        this.name=name;
         this.bitmap=bitmap;
         this.vertexList=vertexList;
         this.indexes=indexes;
@@ -67,11 +50,6 @@ export default class MeshClass
         this.vertexTangentBuffer=null;
         this.vertexUVBuffer=null;
         this.indexBuffer=null;
-
-            // cache for eliminating triangles
-            // that share the same space
-
-        this.trigSharedTrigCache=null;
 
             // collision lists
 
@@ -117,45 +95,6 @@ export default class MeshClass
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     }
     
-        //
-        // combine two meshes
-        //
-
-    combineMesh(mesh)
-    {
-        let n;
-        let iAdd,indexes2;
-        
-            // add the vertexes
-
-        for (n=0;n!==mesh.vertexCount;n++) {
-            this.vertexList.push(mesh.vertexList[n]);
-        }
-
-            // indexes need to be moved
-
-        indexes2=new Uint16Array(this.indexes.length+mesh.indexes.length);
-        indexes2.set(this.indexes,0);
-
-        iAdd=this.indexes.length;
-
-        for (n=0;n!==mesh.indexes.length;n++) {
-            indexes2[n+iAdd]=mesh.indexes[n]+iAdd;
-        }
-
-        this.indexes=indexes2;
-
-            // reset counts
-
-        this.vertexCount=this.vertexList.length;
-        this.indexCount=this.indexes.length;
-        this.trigCount=Math.trunc(this.indexCount/3);
-
-            // setup bounds
-
-        this.setupBounds();
-    }
-
         //
         // mesh box collision
         //
@@ -207,91 +146,6 @@ export default class MeshClass
             return(!((this.xBound.min>checkMesh.xBound.max) || (this.xBound.max<checkMesh.xBound.min)));
         }
         return(false);
-    }
-
-        //
-        // triangles
-        //
-
-    buildSharedTriangleCache()
-    {
-        let n,v0,v1,v2;
-        let cacheItem;
-        
-        this.trigSharedTrigCache=[];
-        
-        for (n=0;n!==this.trigCount;n++) {
-            
-            cacheItem=new MapMeshSharedTrigCacheClass();
-            
-            v0=this.vertexList[this.indexes[(n*3)]];
-            v1=this.vertexList[this.indexes[(n*3)+1]];
-            v2=this.vertexList[this.indexes[(n*3)+2]];
-
-                // if all the Xs of Zs are equal,
-                // consider it a straight wall
-
-            cacheItem.isWall=((v0.position.x===v1.position.x) && (v0.position.x===v2.position.x)) || ((v0.position.z===v1.position.z) && (v0.position.z===v2.position.z));
-            
-                // the bounds
-            
-            cacheItem.xBound=new BoundClass(v0.position.x,v0.position.x);
-            cacheItem.xBound.adjust(v1.position.x);
-            cacheItem.xBound.adjust(v2.position.x);
-            
-            cacheItem.yBound=new BoundClass(v0.position.y,v0.position.y);
-            cacheItem.yBound.adjust(v1.position.y);
-            cacheItem.yBound.adjust(v2.position.y);
-            
-            cacheItem.zBound=new BoundClass(v0.position.z,v0.position.z);
-            cacheItem.zBound.adjust(v1.position.z);
-            cacheItem.zBound.adjust(v2.position.z);
-            
-                // store in cache
-                
-            this.trigSharedTrigCache.push(cacheItem);
-        }
-    }
-    
-    getSharedTriangleCacheItem(trigIdx)
-    {
-        return(this.trigSharedTrigCache[trigIdx]);
-    }
-    
-    clearSharedTriangleCache()
-    {
-        this.trigSharedTrigCache=null;
-    }
-
-    removeTriangle(trigIdx)
-    {
-        let n,idx,cutIdx;
-        let newIndexes;
-        
-        if (this.indexCount===0) return;
-        if ((trigIdx<0) || (trigIdx>=this.trigCount)) return;
-
-            // rebuild the array
-
-        newIndexes=new Uint16Array(this.indexCount-3);
-
-        idx=0;
-        cutIdx=trigIdx*3;
-
-        for (n=0;n<cutIdx;n++) {
-            newIndexes[idx++]=this.indexes[n];
-        }
-
-        for (n=(cutIdx+3);n<this.indexCount;n++) {
-            newIndexes[idx++]=this.indexes[n];
-        }
-
-        this.indexes=newIndexes;
-
-            // fix a couple counts
-
-        this.indexCount-=3;
-        this.trigCount--;
     }
 
         //

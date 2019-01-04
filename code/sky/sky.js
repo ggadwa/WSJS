@@ -10,6 +10,8 @@ export default class SkyClass
     constructor(view)
     {
         this.view=view;
+        
+        this.on=false;
 
         this.vertexes=null;
         this.uvs=null;
@@ -21,12 +23,12 @@ export default class SkyClass
         
         this.bitmaps=[null,null,null,null,null,null];
         
-        this.BITMAP_EAST_IDX=0;
-        this.BITMAP_WEST_IDX=1;
-        this.BITMAP_NORTH_IDX=2;
-        this.BITMAP_SOUTH_IDX=3;
-        this.BITMAP_TOP_IDX=4;
-        this.BITMAP_BOTTOM_IDX=5;
+        this.BITMAP_NEG_X_IDX=0;
+        this.BITMAP_POS_X_IDX=1;
+        this.BITMAP_NEG_Y_IDX=2;
+        this.BITMAP_POS_Y_IDX=3;
+        this.BITMAP_NEG_Z_IDX=4;
+        this.BITMAP_POS_Z_IDX=5;
         
         Object.seal(this);
     }
@@ -70,21 +72,21 @@ export default class SkyClass
         // load bitmaps
         //
         
-    loadBitmapsProcess(idx,skyBoxBitmapNames,callback)
+    loadBitmapsProcess(idx,skyBoxSettings,callback)
     {
         let bitmap;
         
         if (idx===6) callback();
         
-        bitmap=new Bitmap2Class(this.view,skyBoxBitmapNames[idx],true);
+        bitmap=new Bitmap2Class(this.view,skyBoxSettings.bitmaps[idx],true);
         this.bitmaps[idx]=bitmap;
         
-        bitmap.initialize(this.loadBitmapsProcess.bind(this,(idx+1),skyBoxBitmapNames,callback));
+        bitmap.initialize(this.loadBitmapsProcess.bind(this,(idx+1),skyBoxSettings,callback));
     }
      
-    loadBitmaps(skyBoxBitmapNames,callback)
+    loadBitmaps(skyBoxSettings,callback)
     {
-        this.loadBitmapsProcess(0,skyBoxBitmapNames,callback);
+        this.loadBitmapsProcess(0,skyBoxSettings,callback);
     }
     
         //
@@ -156,6 +158,8 @@ export default class SkyClass
         let cameraPos=this.view.camera.position;
         let skyRadius=25000;
         
+        if (!this.on) return;
+        
             // setup shader
             
         gl.disable(gl.DEPTH_TEST);
@@ -164,35 +168,35 @@ export default class SkyClass
 
         this.view.shaderList.skyShader.drawStart();
         
-            // east
+            // negative X plane
         
-        this.bitmaps[this.BITMAP_EAST_IDX].attachAsSky();    
-        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.0,0.0,1.0,1.0);
+        this.bitmaps[this.BITMAP_NEG_X_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.999,0.001,0.001,0.999);
         
-            // west
+            // positive X plane
         
-        this.bitmaps[this.BITMAP_WEST_IDX].attachAsSky();    
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,1.0,0.0,0.0,1.0);
+        this.bitmaps[this.BITMAP_POS_X_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.001,0.001,0.999,0.999);
+         
+            // negative Y plane
         
-            // north
+        this.bitmaps[this.BITMAP_NEG_Y_IDX].attachAsSky();
+        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,0.999,0.999,0.001,0.001);
         
-        this.bitmaps[this.BITMAP_NORTH_IDX].attachAsSky();    
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.0,0.0,1.0,1.0);
+            // positive Y plane
+        
+        this.bitmaps[this.BITMAP_POS_Y_IDX].attachAsSky();
+        this.drawPlane(gl,cameraPos,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,0.999,0.999,0.001,0.001);
+       
+            // negative Z plane
+        
+        this.bitmaps[this.BITMAP_NEG_Z_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.001,0.001,0.999,0.999);
 
-            // south
+            // positive Z plane
         
-        this.bitmaps[this.BITMAP_SOUTH_IDX].attachAsSky();    
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.0,0.0,1.0,1.0);
-        
-            // top
-        
-        this.bitmaps[this.BITMAP_TOP_IDX].attachAsSky();
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,1.0,0.0,0.0,1.0);
-        
-            // bottom
-        
-        this.bitmaps[this.BITMAP_BOTTOM_IDX].attachAsSky();
-        this.drawPlane(gl,cameraPos,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,1.0,0.0,0.0,1.0);
+        this.bitmaps[this.BITMAP_POS_Z_IDX].attachAsSky();    
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.999,0.001,0.001,0.999);
         
             // remove the buffers
 

@@ -61,6 +61,8 @@ export default class ViewClass
 
             // view lighting
 
+        this.ambient={"r":1.0,"g":1.0,"b":1.0};
+        
         this.MAX_LIGHT_COUNT=24;
         this.lights=[];
         
@@ -653,7 +655,7 @@ export default class ViewClass
         }
         if (player.isInLiquid()) {
             tintOn=true;
-            player.getCurrentRoom().addTintFromLiquidColor(this.uiTintColor);
+        //    player.getCurrentRoom().addTintFromLiquidColor(this.uiTintColor);
         }
         
             // interface drawing

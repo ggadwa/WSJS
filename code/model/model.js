@@ -21,14 +21,14 @@ export default class ModelClass
     
     initialize()
     {
-        this.mesh.initialize();
-        this.skeleton.initialize();
+    //    this.mesh.initialize();
+    //    this.skeleton.initialize();
     }
 
     release()
     {
-        this.mesh.release();
-        this.skeleton.release();
+    //    this.mesh.release();
+    //    this.skeleton.release();
     }
     
         //
@@ -37,12 +37,14 @@ export default class ModelClass
         
     calculateRadius()
     {
-        return(this.mesh.calculateRadius(this.skeleton));
+        return(1000);
+        //return(this.mesh.calculateRadius(this.skeleton));
     }
     
     calculateHeight()
     {
-        return(this.mesh.calculateHeight());
+        return(1000);
+        //return(this.mesh.calculateHeight());
     }
     
         //
@@ -51,6 +53,8 @@ export default class ModelClass
 
     draw()
     {
+        return;
+        
         let mesh=this.model.mesh;
 
         this.view.shaderList.modelMeshShader.drawStart();

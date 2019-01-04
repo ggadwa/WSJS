@@ -3,15 +3,16 @@ import Point2DClass from '../utility/2D_point.js';
 import Bitmap2Class from '../bitmap/bitmap2.js';
 import MeshVertexClass from '../../code/mesh/mesh_vertex.js';
 import MeshClass from '../../code/mesh/mesh.js';
-import MeshUtilityClass from '../../generate/utility/mesh_utility.js';
 
 export default class ImportObjClass
 {
-    constructor(view,url,scale)
+    constructor(view,url,scale,flipY)
     {
         this.view=view;
         this.url=url;
         this.scale=scale;
+        
+        this.flipFactor=flipY?-1.0:1.0;
         
         this.data=null;
         this.lines=null;
@@ -142,7 +143,77 @@ export default class ImportObjClass
         }
     }
     
-    addMesh(bitmapName,meshVertices,meshIndexes)
+    buildVertexListTangents(vertexList,indexes)
+    {
+        let n,nTrig,trigIdx;
+        let v0,v1,v2;
+        let u10,u20,v10,v20;
+
+            // generate tangents by the trigs
+            // sometimes we will end up overwriting
+            // but it depends on the mesh to have
+            // constant shared vertices against
+            // triangle tangents
+
+            // note this recreates a bit of what
+            // goes on to create the normal, because
+            // we need that first to make the UVs
+
+        let p10=new PointClass(0.0,0.0,0.0);
+        let p20=new PointClass(0.0,0.0,0.0);
+        let vLeft=new PointClass(0.0,0.0,0.0);
+        let vRight=new PointClass(0.0,0.0,0.0);
+        let vNum=new PointClass(0.0,0.0,0.0);
+        let denom;
+        let tangent=new PointClass(0.0,0.0,0.0);
+
+        nTrig=Math.trunc(indexes.length/3);
+
+        for (n=0;n!==nTrig;n++) {
+
+                // get the vertex indexes and
+                // the vertexes for the trig
+
+            trigIdx=n*3;
+
+            v0=vertexList[indexes[trigIdx]];
+            v1=vertexList[indexes[trigIdx+1]];
+            v2=vertexList[indexes[trigIdx+2]];
+
+                // create vectors
+
+            p10.setFromSubPoint(v1.position,v0.position);
+            p20.setFromSubPoint(v2.position,v0.position);
+
+                // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
+
+            u10=v1.uv.x-v0.uv.x;        // x component
+            u20=v2.uv.x-v0.uv.x;
+            v10=v1.uv.y-v0.uv.y;        // y component
+            v20=v2.uv.y-v0.uv.y;
+
+                // calculate the tangent
+                // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
+
+            vLeft.setFromScale(p10,v20);
+            vRight.setFromScale(p20,v10);
+            vNum.setFromSubPoint(vLeft,vRight);
+
+            denom=(u10*v20)-(v10*u20);
+            if (denom!==0.0) denom=1.0/denom;
+            tangent.setFromScale(vNum,denom);
+            tangent.normalize();
+
+                // and set the mesh normal
+                // to all vertexes in this trig
+
+            v0.tangent.setFromPoint(tangent);
+            v1.tangent.setFromPoint(tangent);
+            v2.tangent.setFromPoint(tangent);
+        }
+    }
+    
+    addMesh(groupName,bitmapName,meshVertices,meshIndexes)
     {
         let bitmap=this.textureMap.get(bitmapName);
         if (bitmap===undefined) {
@@ -150,8 +221,8 @@ export default class ImportObjClass
             return;
         }
 
-        MeshUtilityClass.buildVertexListTangents(meshVertices,meshIndexes);
-        this.meshes.push(new MeshClass(this.view,bitmap,meshVertices,meshIndexes,0));
+        this.buildVertexListTangents(meshVertices,meshIndexes);
+        this.meshes.push(new MeshClass(this.view,groupName,bitmap,meshVertices,meshIndexes,0));
     }
     
         //
@@ -180,7 +251,7 @@ export default class ImportObjClass
             tokens=this.lines[n].split(' ');
             
             switch(tokens[0]) {
-                case 'usemtl':                        
+                case 'usemtl':
                     if (!this.textureMap.has(tokens[1])) this.textureMap.set(tokens[1],new Bitmap2Class(this.view,tokens[1],false));
                     break;
             }
@@ -194,12 +265,10 @@ export default class ImportObjClass
     decodeMeshes()
     {
         let n,tokens;
-        let x,y,z,pnt;
-        let lastMaterialName;
+        let x,y,z;
+        let lastGroupName,lastMaterialName;
         let posVertexIdx,posUVIdx,posNormalIdx;
         let meshVertices,meshIndexes;
-        let min=new PointClass(0,0,0);
-        let max=new PointClass(0,0,0);
         
             // get the vertexes, UVs, and normals
             
@@ -208,20 +277,21 @@ export default class ImportObjClass
             
             switch(tokens[0]) {
                 case 'v':
-                    x=Math.trunc(parseFloat(tokens[1])*this.scale.x);
-                    y=Math.trunc(parseFloat(tokens[2])*this.scale.y);
-                    z=Math.trunc(parseFloat(tokens[3])*this.scale.z);
-                    pnt=new PointClass(x,y,z);
-                    
-                    min.minFromPoint(pnt);
-                    max.maxFromPoint(pnt);
-                    this.vertexList.push(pnt);
+                    x=Math.trunc(parseFloat(tokens[1])*this.scale);
+                    y=Math.trunc((parseFloat(tokens[2])*this.scale)*this.flipFactor);
+                    z=Math.trunc(parseFloat(tokens[3])*this.scale);
+                    this.vertexList.push(new PointClass(x,y,z));
                     break;
                 case 'vt':
-                    this.uvList.push(new Point2DClass(parseFloat(tokens[1]),parseFloat(tokens[2])));
+                    x=parseFloat(tokens[1]);
+                    y=parseFloat(tokens[2])*this.flipFactor;
+                    this.uvList.push(new Point2DClass(x,y));
                     break;
                 case 'vn':
-                    this.normalList.push(new PointClass(parseFloat(tokens[1]),parseFloat(tokens[2]),parseFloat(tokens[3])));
+                    x=parseFloat(tokens[1]);
+                    y=parseFloat(tokens[2])*this.flipFactor;
+                    z=parseFloat(tokens[3]);
+                    this.normalList.push(new PointClass(x,y,z));
                     break;
             }
         }
@@ -236,13 +306,15 @@ export default class ImportObjClass
         posNormalIdx=0;
         
         lastMaterialName=null;
+        lastGroupName=null;
             
         for (n=0;n!==this.lines.length;n++) {
             tokens=this.lines[n].split(' ');
             
             switch(tokens[0]) {
                 case 'g':
-                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
+                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,lastMaterialName,meshVertices,meshIndexes);
+                    lastGroupName=tokens[1];
                     meshVertices=[];
                     meshIndexes=[];
                     break;
@@ -259,7 +331,7 @@ export default class ImportObjClass
                     this.addTrigsForFace(tokens,posVertexIdx,posUVIdx,posNormalIdx,meshVertices,meshIndexes);
                     break;
                 case 'usemtl':
-                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
+                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,lastMaterialName,meshVertices,meshIndexes);
                     lastMaterialName=tokens[1];
                     meshVertices=[];
                     meshIndexes=[];
@@ -269,7 +341,7 @@ export default class ImportObjClass
         
             // and finally any current usemtl
             
-        if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastMaterialName,meshVertices,meshIndexes);
+        if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,lastMaterialName,meshVertices,meshIndexes);
         
             // finally callback to finish the import
             

@@ -1,4 +1,5 @@
 import config from '../../code/main/config.js';
+import BoundClass from '../../code/utility/bound.js';
 import EntityClass from '../../code/entities/entity.js';
 
 //
@@ -13,7 +14,7 @@ export default class EntityPlayerClass extends EntityClass
         
             // entity setup
             
-        this.movementForwardMaxSpeed=175;
+        this.movementForwardMaxSpeed=300; // 175;
         this.movementForwardAcceleration=10;
         this.movementForwardDeceleration=20;
         this.movementSideMaxSpeed=125;
@@ -165,8 +166,12 @@ export default class EntityPlayerClass extends EntityClass
         if (this.weaponFiredTrigger) {
             this.weaponFiredTrigger=false;
             
-            weapon=this.getCurrentWeapon();
-            if (weapon!==null) weapon.fire(this);
+            let idx=this.map.meshList.boxBoundCollision(new BoundClass(this.position.x-100,this.position.x+100),new BoundClass(this.position.y-100,this.position.y+100),new BoundClass(this.position.z-100,this.position.z+100),null);
+            console.log('pos='+this.position.x+','+this.position.y+','+this.position.z);
+            if (idx!==-1) console.log('hit='+this.map.meshList.meshes[idx].name);
+            
+            //weapon=this.getCurrentWeapon();
+            //if (weapon!==null) weapon.fire(this);
         }
         
         if (this.weaponAltFiredTrigger) {
