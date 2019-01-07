@@ -1,5 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import config from '../../code/main/config.js';
+import BitmapListClass from '../../code/bitmap/bitmap_list.js';
 import ShaderListClass from '../../code/shader/shader_list.js';
 import PointClass from '../../code/utility/point.js';
 import RectClass from '../../code/utility/rect.js';
@@ -21,6 +22,7 @@ export default class ViewClass
 
         this.gl=null;
         this.canvas=null;
+        this.bitmapList=null;
         this.shaderList=null;
         
             // pause flag
@@ -55,18 +57,12 @@ export default class ViewClass
         this.billboardXMatrix=new Float32Array(16);
         this.billboardYMatrix=new Float32Array(16);
 
-            // overlay drawing
-
-        this.drawOverlay=config.SHOW_OVERLAY_MAP;
-
             // view lighting
 
         this.ambient={"r":1.0,"g":1.0,"b":1.0};
         
         this.MAX_LIGHT_COUNT=24;
         this.lights=[];
-        
-        this.glowFactor=0.0;
 
             // frustum planes
 
@@ -202,6 +198,12 @@ export default class ViewClass
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
         
+            // initialize the bitmap list, this
+            // is used to keep track of bitmaps
+            
+        this.bitmapList=new BitmapListClass(this);
+        this.bitmapList.initialize();
+        
             // load the shaders, this requires a callback
             
         this.shaderList=new ShaderListClass(this);
@@ -242,6 +244,7 @@ export default class ViewClass
         this.text.release();
         this.interface.release();
         this.shaderList.release();
+        this.bitmapList.release();
     }
     
         //
@@ -288,15 +291,6 @@ export default class ViewClass
         this.fpsTotal=0;
         this.fpsCount=0;
         this.fpsStartTimeStamp=timeStamp;
-    }
-    
-        //
-        // interface controls
-        //
-        
-    mapOverlayStateFlip()
-    {
-        this.drawOverlay=!this.drawOverlay;
     }
     
         //
@@ -538,7 +532,7 @@ export default class ViewClass
     draw(map)
     {
         let n;
-        let light,tintOn,tintAtt;
+        let light,tintOn,tintAtt,liquidIdx,liquid;
         let weapon;
         let fpsStr,idx;
         let player=map.entityList.getPlayer();
@@ -614,10 +608,6 @@ export default class ViewClass
 
         this.buildCullingFrustum();
         
-            // the glow
-            
-        this.glowFactor=Math.abs(Math.cos(this.timeStamp/500.0));
-        
             // reset some stats
             
         this.drawMeshCount=0;
@@ -653,9 +643,11 @@ export default class ViewClass
             tintOn=true;
             this.uiTintColor.addFromValues(tintAtt,0.0,0.0);
         }
-        if (player.isInLiquid()) {
+        liquidIdx=player.getInLiquidIndex();
+        if (liquidIdx!==-1) {
             tintOn=true;
-        //    player.getCurrentRoom().addTintFromLiquidColor(this.uiTintColor);
+            liquid=map.liquidList.liquids[liquidIdx];
+            this.uiTintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
         }
         
             // interface drawing
@@ -672,17 +664,13 @@ export default class ViewClass
             // health
         
         this.uiHealthRect.top=this.uiHealthRect.bot-Math.trunc(this.uiHealthHigh*player.getPercentageHealth());
-        this.interface.drawRect(this.uiHealthRect,this.uiHealthColor,this.uiHealthAlpha);
-        this.interface.drawFrameRect(this.uiHealthFrameRect,this.uiHealthFrameColor,1.0);
+        //this.interface.drawRect(this.uiHealthRect,this.uiHealthColor,this.uiHealthAlpha);
+        //this.interface.drawFrameRect(this.uiHealthFrameRect,this.uiHealthFrameColor,1.0);
         
             // finish interface drawing
             
         this.interface.drawEnd();
 
-            // map overlay
-            
-        if (this.drawOverlay) map.overlay.draw(map);
-        
             // text overlays
 
         fpsStr=this.fps.toString();

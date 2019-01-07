@@ -1,4 +1,5 @@
 import PointClass from '../../code/utility/point.js';
+import BoundClass from '../../code/utility/bound.js';
 import ColorClass from '../../code/utility/color.js';
 import LightClass from '../../code/light/light.js';
 import MapLiquidClass from '../../code/map/map_liquid.js';
@@ -14,20 +15,17 @@ export default class ImportMapClass
         this.map=map;
     }
     
-    load(name,scale,flipY,skyBoxSettings,lightSettings,liquidSettings,movementSettings,callback)
+    load(name,scale,flipY,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback)
     {
         let importObj;
         
         importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY);
-        importObj.import(this.finishLoad.bind(this,importObj,skyBoxSettings,lightSettings,liquidSettings,movementSettings,callback));        
+        importObj.import(this.addMeshes.bind(this,importObj,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback));        
     }
     
-    finishLoad(importObj,skyBoxSettings,lightSettings,liquidSettings,movementSettings,callback)
+    addMeshes(importObj,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback)
     {
-        let n,k,idx;
-        let light,lightDef;
-        let liquid,liquidDef;
-        let movement,move,movementDef,moveDef;
+        let n;
         
             // add the meshes to the map
             
@@ -35,7 +33,36 @@ export default class ImportMapClass
             this.map.meshList.add(importObj.meshes[n]);
         }
         
-            // create the lights
+            // add in any liquid or sky textures so
+            // they get loaded
+            
+        if (liquidSettings!==null) {
+            for (n=0;n!==liquidSettings.liquids.length;n++) {
+                this.view.bitmapList.add(liquidSettings.liquids[n].bitmap,true);
+            }
+        }
+        
+        if (skyBoxSettings!==null) {
+            this.view.bitmapList.add(skyBoxSettings.bitmapNegX,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapPosX,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapNegY,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapPosY,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapNegZ,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapPosZ,true);
+        }
+        
+        this.view.bitmapList.loadAllBitmaps(this.finishLoad.bind(this,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback));
+    }
+    
+    finishLoad(skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback)
+    {
+        let n,k,idx;
+        let light,lightDef;
+        let liquid,liquidDef,liquidBitmap;
+        let movement,movementDef,moveDef;
+        let glowDef,bitmap;
+        
+            // the lights
             
         this.view.ambient=lightSettings.ambient;
         
@@ -58,17 +85,17 @@ export default class ImportMapClass
             // the liquids
             
         if (liquidSettings!==null) {
-            /*
             for (n=0;n!==liquidSettings.liquids.length;n++) {
                 liquidDef=liquidSettings.liquids[n];
-                
-                liquid=new MapLiquidClass(this.view,bitmap,liquidDef.waveSize,liquidDef.waveFrequency,liquidDef.waveHeight,new BoundClass(liquidDef.xBound.min,liquidDef.xBound.max),liquidDef.y,new BoundClass(liquidDef.zBound.min,liquidDef.zBound.max))
+
+                liquidBitmap=this.view.bitmapList.get(liquidDef.bitmap);
+                liquidBitmap.alpha=liquidDef.alpha;
+                liquid=new MapLiquidClass(this.view,liquidBitmap,liquidDef.waveSize,liquidDef.waveFrequency,liquidDef.waveHeight,liquidDef.uShift,liquidDef.vShift,new ColorClass(liquidDef.tint.r,liquidDef.tint.g,liquidDef.tint.b),new BoundClass(liquidDef.xBound.min,liquidDef.xBound.max),new BoundClass(liquidDef.yBound.min,liquidDef.yBound.max),new BoundClass(liquidDef.zBound.min,liquidDef.zBound.max))
                 this.map.liquidList.add(liquid);
             }
-            */
         }
        
-            // create the movements
+            // the movements
             
         if (movementSettings!==null) {
 
@@ -85,7 +112,6 @@ export default class ImportMapClass
 
                 for (k=0;k!==movementDef.moves.length;k++) {
                     moveDef=movementDef.moves[k];
-
                     movement.addMove(new MoveClass(moveDef.tick,new PointClass(moveDef.move.x,moveDef.move.y,moveDef.move.z)));
                 }
 
@@ -93,15 +119,35 @@ export default class ImportMapClass
             }
         }
         
-            // load the sky
+            // the sky
             
         if (skyBoxSettings===null) {
             this.map.sky.on=false;
-            callback();
         }
         else {
             this.map.sky.on=true;
-            this.map.sky.loadBitmaps(skyBoxSettings,callback);
+            this.map.sky.skyBoxSettings=skyBoxSettings;
         }
+        
+            // alter any bitmaps for glow settings
+            
+        if (glowSettings!==null) {
+            for (n=0;n!==glowSettings.glows.length;n++) {
+                glowDef=glowSettings.glows[n];
+                
+                bitmap=this.view.bitmapList.get(glowDef.bitmap);
+                if (bitmap===undefined) {
+                    console.log('Missing bitmap to set glow to: '+glowDef.bitmap);
+                    return;
+                }
+                
+                bitmap.glowFrequency=glowDef.frequency;
+                bitmap.glowMax=glowDef.max;
+            }
+        }
+        
+            // and return control to map script
+            
+        callback();
     }
 }

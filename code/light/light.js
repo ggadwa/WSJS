@@ -34,10 +34,6 @@ export default class LightClass
 
         this.dist=0.0;           // used to sort lights
         
-        this.isBoxBound=false;                      // special outdoor lights that are bound to boxes instead of radial
-        this.boxXBound=new BoundClass(0,0);
-        this.boxZBound=new BoundClass(0,0);
-        
         this.frustumXBound=new BoundClass(0,0);        // set here to avoid gc
         this.frustumYBound=new BoundClass(0,0);
         this.frustumZBound=new BoundClass(0,0);

@@ -549,17 +549,12 @@ export default class EntityClass
     }
     
         //
-        // room information
+        // position information
         //
         
-    isInLiquid()
+    getInLiquidIndex()
     {
-        /*
-        if (this.currentRoom===null) return(false);
-        if (!this.currentRoom.liquid) return(false);
-        
-        return((this.position.y-this.eyeOffset)>=this.currentRoom.getLiquidY());
-        */
+        return(this.map.liquidList.getLiquidForPoint(this.position));
     }
     
     isStandingOnFloor()

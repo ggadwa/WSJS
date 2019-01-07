@@ -6,7 +6,6 @@ import MapLightListClass from '../../code/map/map_light_list.js';
 import MapEntityListClass from '../../code/map/map_entity_list.js';
 import MapParticleListClass from '../../code/map/map_particle_list.js';
 import MapMovementListClass from '../../code/map/map_movement_list.js';
-import MapOverlayClass from '../../code/map/map_overlay.js';
 import SkyClass from '../../code/sky/sky.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../code/utility/random.js';
@@ -34,7 +33,6 @@ export default class MapClass
         this.lightList=new MapLightListClass(view);
         this.entityList=new MapEntityListClass();
         this.movementList=new MapMovementListClass();
-        this.overlay=new MapOverlayClass(view);
         this.sky=new SkyClass(view);
         this.particleList=new MapParticleListClass(view);
         
@@ -53,7 +51,6 @@ export default class MapClass
         if (!this.entityList.initialize()) return(false);
         if (!this.movementList.initialize()) return(false);
         if (!this.particleList.initialize()) return(false);
-        if (!this.overlay.initialize()) return(false);
         return(this.sky.initialize());
     }
 
@@ -65,7 +62,6 @@ export default class MapClass
         this.entityList.release();
         this.movementList.release();
         this.particleList.release();
-        this.overlay.release();
         this.sky.release();
     }
     

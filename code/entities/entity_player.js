@@ -92,7 +92,7 @@ export default class EntityPlayerClass extends EntityClass
     {
             // can't jump if falling or in liquid
             
-        if ((this.isStandingOnFloor()) && (!this.isInLiquid())) this.movementJump(this.jumpHeight);
+        if ((this.isStandingOnFloor()) && (this.getInLiquidIndex()!==-1)) this.movementJump(this.jumpHeight);
     }
     
         //
@@ -193,7 +193,7 @@ export default class EntityPlayerClass extends EntityClass
             // precise ticks so we count hits within a certain
             // time frame
         
-        if (this.isInLiquid()) {
+        if (this.getInLiquidIndex()!==-1) {
             this.lastInLiquid=true;
         }
         else {

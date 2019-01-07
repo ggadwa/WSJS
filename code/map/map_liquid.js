@@ -4,34 +4,30 @@ import BoundClass from '../../code/utility/bound.js';
 //
 // map liquid class
 // 
-// represents a single liquid volume, liquid volumes have infinite
-// Y past the single top Y
+// represents a single liquid volume
 //
 
 export default class MapLiquidClass
 {
-    constructor(view,bitmap,waveSize,waveFrequency,waveHeight,xBound,y,zBound)
+    constructor(view,bitmap,waveSize,waveFrequency,waveHeight,uShift,vShift,tint,xBound,yBound,zBound)
     {
         this.view=view;
         this.bitmap=bitmap;
         this.waveSize=waveSize;
         this.waveFrequency=waveFrequency;
         this.waveHeight=waveHeight;
+        this.uShift=uShift;
+        this.vShift=vShift;
+        this.tint=tint;
         
             // setup size
             
         this.xBound=xBound.copy();
-        this.y=y;
+        this.yBound=yBound.copy();
         this.zBound=zBound.copy();
             
-        this.xBlockSize=xBound.getSize()/waveSize;
-        this.zBlockSize=zBound.getSize()/waveSize;
-        
-            // liquids are flat plans, so we
-            // need a single Y, and then create a yBound
-            // so the frustum calcs can use it
-            
-        this.yBound=new BoundClass(this.y,this.y);
+        this.xBlockSize=Math.trunc(xBound.getSize()/waveSize);
+        this.zBlockSize=Math.trunc(zBound.getSize()/waveSize);
         
             // null buffers
 
@@ -86,20 +82,22 @@ export default class MapLiquidClass
         uvIdx=0;
         
         vz=this.zBound.min;
-        gz=0.0;
+        gz=(this.view.timeStamp*this.vShift);
+        gz=gz-Math.trunc(gz);
         
         offRow=Math.trunc(vz/constants.ROOM_BLOCK_WIDTH);
         
         for (z=0;z!==(this.zBlockSize+1);z++) {
             
             vx=this.xBound.min;
-            gx=0.0;
+            gx=(this.view.timeStamp*this.uShift);
+            gx=gx-Math.trunc(gx);
             
             offCol=Math.trunc(vx/constants.ROOM_BLOCK_WIDTH);
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
-                this.vertices[vIdx++]=(((offRow+offCol)%2)===0)?(this.y-offY):(this.y+offY);
+                this.vertices[vIdx++]=(((offRow+offCol)%2)===0)?(this.yBound.min-offY):(this.yBound.min+offY);
                 this.vertices[vIdx++]=vz;
                 
                 this.uvs[uvIdx++]=gx;

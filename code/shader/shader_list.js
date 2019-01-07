@@ -1,6 +1,5 @@
 import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
-import MapOverlayShaderClass from '../../code/map/map_overlay_shader.js';
 import SkyShaderClass from '../../code/sky/sky_shader.js';
 import ModelMeshShaderClass from '../../code/model/model_mesh_shader.js';
 import ParticleShaderClass from '../../code/particle/particle_shader.js';
@@ -19,7 +18,6 @@ export default class ShaderListClass
         
         this.mapMeshShader=null;
         this.mapLiquidShader=null;
-        this.mapOverlayShader=null;
         this.skyShader=null;
         this.modelMeshShader=null;
         this.particleShader=null;
@@ -54,13 +52,7 @@ export default class ShaderListClass
     initializeMapLiquidShader()
     {
         this.mapLiquidShader=new MapLiquidShaderClass(this.view);
-        this.mapLiquidShader.initialize(this.initializeMapOverlayShader.bind(this));
-    }
-    
-    initializeMapOverlayShader()
-    {
-        this.mapOverlayShader=new MapOverlayShaderClass(this.view);
-        this.mapOverlayShader.initialize(this.initializeSkyShader.bind(this));
+        this.mapLiquidShader.initialize(this.initializeSkyShader.bind(this));
     }
     
     initializeSkyShader()
@@ -97,7 +89,6 @@ export default class ShaderListClass
     {
         this.mapMeshShader.release();
         this.mapLiquidShader.release();
-        this.mapOverlayShader.release();
         this.skyShader.release();
         this.modelMeshShader.release();
         this.particleShader.release();

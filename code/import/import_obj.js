@@ -1,6 +1,5 @@
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
-import Bitmap2Class from '../bitmap/bitmap2.js';
 import MeshVertexClass from '../../code/mesh/mesh_vertex.js';
 import MeshClass from '../../code/mesh/mesh.js';
 
@@ -20,7 +19,6 @@ export default class ImportObjClass
         this.vertexList=[];
         this.uvList=[];
         this.normalList=[];
-        this.textureMap=new Map();
         
         this.meshes=[];
         
@@ -55,32 +53,7 @@ export default class ImportObjClass
             //.catch((error)=>alert(error));
             .catch((error)=>console.log(error));
     }
-    
-        //
-        // loads all the textures in the obj
-        //
         
-    loadTexturesProcess(keyIter,callback)
-    {
-        let rtn,bitmap;
-        
-            // get next key
-            
-        rtn=keyIter.next();
-        if (rtn.done) {
-            callback();
-            return;
-        }
-        
-        bitmap=this.textureMap.get(rtn.value);
-        bitmap.initialize(this.loadTexturesProcess.bind(this,keyIter,callback));
-    }
-    
-    loadTextures(callback)
-    {
-        this.loadTexturesProcess(this.textureMap.keys(),callback);
-    }
-    
         //
         // utilities
         //
@@ -215,7 +188,7 @@ export default class ImportObjClass
     
     addMesh(groupName,bitmapName,meshVertices,meshIndexes)
     {
-        let bitmap=this.textureMap.get(bitmapName);
+        let bitmap=this.view.bitmapList.get(bitmapName);
         if (bitmap===undefined) {
             console.log('missing material: '+bitmapName);
             return;
@@ -252,14 +225,16 @@ export default class ImportObjClass
             
             switch(tokens[0]) {
                 case 'usemtl':
-                    if (!this.textureMap.has(tokens[1])) this.textureMap.set(tokens[1],new Bitmap2Class(this.view,tokens[1],false));
+                    this.view.bitmapList.add(tokens[1],false);
                     break;
             }
         }
         
-            // load the textures by fetch
+            // force all the textures to load
+            // and when finished, continue on with
+            // decoding the meshes
             
-        this.loadTextures(this.decodeMeshes.bind(this));
+        this.view.bitmapList.loadAllBitmaps(this.decodeMeshes.bind(this));
     }
     
     decodeMeshes()

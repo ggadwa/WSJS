@@ -223,7 +223,6 @@ export default class UIConfigClass
         this.createInstructionLine(instructDiv,'Left Mouse Button - Fire');
         this.createInstructionLine(instructDiv,'Right Mouse Button - Alt Fire');
         this.createInstructionLine(instructDiv,'Mouse Wheel - Change Weapon');
-        this.createInstructionLine(instructDiv,'M - Map');
 
         document.body.appendChild(instructDiv);
         

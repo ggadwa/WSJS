@@ -161,13 +161,6 @@ export default class InputClass
             this.mouseWheelClickRefreshTick=this.view.timeStamp+constants.INPUT_WHEEL_REFRESH_TICK;
         }
         
-            // m flips map on/off
-            
-        if (this.keyFlags[77]) {
-            this.keyFlags[77]=0;        // force it up
-            this.view.mapOverlayStateFlip();
-        }
-
             // mouse turning
             
         if (this.mouseChangeX!==0) {

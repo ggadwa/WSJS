@@ -75,8 +75,6 @@ export default class MapMeshShaderClass extends ShaderClass
             name='lights['+n+']';
             this.lights[n].positionIntensityUniform=gl.getUniformLocation(this.program,name+'.positionIntensity');
             this.lights[n].colorExponentUniform=gl.getUniformLocation(this.program,name+'.colorExponent');
-            this.lights[n].boxXBoundUniform=gl.getUniformLocation(this.program,name+'.boxXBound');
-            this.lights[n].boxZBoundUniform=gl.getUniformLocation(this.program,name+'.boxZBound');
         }
 
             // these uniforms are always the same
@@ -123,8 +121,6 @@ export default class MapMeshShaderClass extends ShaderClass
             // and the second vec4 is r,g,b,exponent (color and exponent)
             
             // if intensity = 0 light is off
-            // if intensity = -1 light is a box light (for outdoor)
-            // otherwise regular radial light
         
         for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
 
@@ -136,16 +132,6 @@ export default class MapMeshShaderClass extends ShaderClass
             if (viewLight===null) {
                 gl.uniform4f(light.positionIntensityUniform,0.0,0.0,0.0,0.0);    // x,y,z,intensity
                 gl.uniform4f(light.colorExponentUniform,1.0,1.0,1.0,1.0);       // r,g,b,exponent
-                continue;
-            }
-            
-                // special box boundary lights
-                
-            if (viewLight.isBoxBound) {
-                gl.uniform4f(light.positionIntensityUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,-1.0);
-                gl.uniform4f(light.colorExponentUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,0.0);
-                gl.uniform2f(light.boxXBoundUniform,viewLight.boxXBound.min,viewLight.boxXBound.max);
-                gl.uniform2f(light.boxZBoundUniform,viewLight.boxZBound.min,viewLight.boxZBound.max);
                 continue;
             }
 

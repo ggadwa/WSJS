@@ -58,6 +58,27 @@ export default class MapLiquidListClass
     {
         return(this.liquids[idx]);
     }
+    
+        //
+        // determine which point a liquid is in
+        //
+        
+    getLiquidForPoint(pnt)
+    {
+        let n,liquid;
+        
+        for (n=0;n!==this.liquids.length;n++) {
+            liquid=this.liquids[n];
+            
+            if ((pnt.x<liquid.xBound.min) || (pnt.x>liquid.xBound.max)) continue;
+            if ((pnt.y<liquid.yBound.min) || (pnt.y>liquid.yBound.max)) continue;
+            if ((pnt.z<liquid.zBound.min) || (pnt.z>liquid.zBound.max)) continue;
+            
+            return(n);
+        }
+        
+        return(-1);
+    }
         
         //
         // setup liquid buffers
