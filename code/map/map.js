@@ -1,6 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import BoundClass from '../../code/utility/bound.js';
-import MapMeshListClass from '../../code/map/map_mesh_list.js';
+import MeshListClass from '../../code/mesh/mesh_list.js';
 import MapLiquidListClass from '../../code/map/map_liquid_list.js';
 import MapLightListClass from '../../code/map/map_light_list.js';
 import MapEntityListClass from '../../code/map/map_entity_list.js';
@@ -28,7 +28,7 @@ export default class MapClass
             
             // variables
         
-        this.meshList=new MapMeshListClass(view);
+        this.meshList=new MeshListClass(view);
         this.liquidList=new MapLiquidListClass(view);
         this.lightList=new MapLightListClass(view);
         this.entityList=new MapEntityListClass();
@@ -45,7 +45,7 @@ export default class MapClass
 
     initialize()
     {
-        if (!this.meshList.initialize()) return(false);
+        if (!this.meshList.initialize(this.view.shaderList.mapMeshShader)) return(false);
         if (!this.liquidList.initialize()) return(false);
         if (!this.lightList.initialize()) return(false);
         if (!this.entityList.initialize()) return(false);

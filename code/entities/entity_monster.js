@@ -8,9 +8,9 @@ import EntityClass from '../../code/entities/entity.js';
 
 export default class EntityMonsterClass extends EntityClass
 {
-    constructor(view,map,sound,name,position,angle,maxHealth,model)
+    constructor(view,map,name,radius,height)
     {
-        super(view,map,sound,name,position,angle,maxHealth,model);
+        super(view,map,name,radius,height);
         
         this.standTurnSpeed=0;
         this.walkTurnSpeed=0;
@@ -168,6 +168,8 @@ export default class EntityMonsterClass extends EntityClass
     {
         let enemy;
         
+        return;     // for now do nothing until we have all the OBJ loaders functioning
+        
             // if we don't have an enemy yet,
             // make it the player, and if our old
             // enemy got deleted, revert back to player
@@ -191,7 +193,7 @@ export default class EntityMonsterClass extends EntityClass
             // inactive monsters currently just stand
             
         if (!this.active) {
-            this.modelDraw.skeleton.idlePose();
+            //this.modelDraw.skeleton.idlePose();       // deal with animations later
             
             this.setMovementForward(false);
             this.move(true,false,false);
@@ -203,7 +205,7 @@ export default class EntityMonsterClass extends EntityClass
             
                 // pose
             
-            this.modelDraw.skeleton.walkPose();
+            //this.modelDraw.skeleton.walkPose();       // deal with animation later
         
                 // turn towards and stalk player
 

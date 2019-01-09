@@ -85,7 +85,7 @@ export default class MapLiquidClass
         gz=(this.view.timeStamp*this.vShift);
         gz=gz-Math.trunc(gz);
         
-        offRow=Math.trunc(vz/constants.ROOM_BLOCK_WIDTH);
+        offRow=Math.trunc(vz/this.waveSize);
         
         for (z=0;z!==(this.zBlockSize+1);z++) {
             
@@ -93,7 +93,7 @@ export default class MapLiquidClass
             gx=(this.view.timeStamp*this.uShift);
             gx=gx-Math.trunc(gx);
             
-            offCol=Math.trunc(vx/constants.ROOM_BLOCK_WIDTH);
+            offCol=Math.trunc(vx/this.waveSize);
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
@@ -103,13 +103,13 @@ export default class MapLiquidClass
                 this.uvs[uvIdx++]=gx;
                 this.uvs[uvIdx++]=gz;
                 
-                vx+=constants.ROOM_BLOCK_WIDTH;
+                vx+=this.waveSize;
                 gx+=1.0;
                 
                 offCol++;
             }
             
-            vz+=constants.ROOM_BLOCK_WIDTH;
+            vz+=this.waveSize;
             gz+=1.0;
             
             offRow++;

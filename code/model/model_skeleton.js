@@ -1,7 +1,6 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import ModelBoneClass from '../../code/model/model_bone.js';
-import ModelLimbClass from '../../code/model/model_limb.js';
 import genRandom from '../../code/utility/random.js';
 
 //
@@ -19,12 +18,6 @@ export default class ModelSkeletonClass
         this.baseBoneIdx=0;
         this.bones=[];
 
-            // lists of bones that are
-            // used for animation and
-            // mesh building
-
-        this.limbs=[];
-        
             // animations
 
         this.lastAnimationTick=0;
@@ -45,32 +38,6 @@ export default class ModelSkeletonClass
     release()
     {
         this.bones=[];
-    }
-    
-        //
-        // clone
-        //
-        
-    clone()
-    {
-        let bone;
-        
-        let skeleton=new ModelSkeletonClass(this.view);
-        
-        for (bone of this.bones) {
-            skeleton.bones.push(new ModelBoneClass(bone.name,bone.parentBoneIdx,bone.position));
-        }
-        
-            // these list can just be copied,
-            // they are read only
-        
-        skeleton.limbs=this.limbs;
-        
-            // recalc the bone animation values
-            
-        skeleton.precalcAnimationValues();
-        
-        return(skeleton);
     }
     
         //
@@ -103,21 +70,6 @@ export default class ModelSkeletonClass
         
         if ((bone1===null) || (bone2===null)) return(null);
         return(new PointClass(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
-    }
-    
-    getBoneLimbType(boneIdx)
-    {
-        let n,limb;
-        let nLimb=this.limbs.length;
-        
-        if (boneIdx===-1) return(-1);
-        
-        for (n=0;n!==nLimb;n++) {
-            limb=this.limbs[n];
-            if (limb.boneIndexes.indexOf(boneIdx)!==-1) return(limb.limbType);
-        }
-        
-        return(-1);
     }
     
         //
@@ -291,236 +243,4 @@ export default class ModelSkeletonClass
         this.lastAnimationMillisec=1;
         this.lastAnimationFlip=false;
     }
-    
-        //
-        // pose utilities
-        //
-        
-    poseSetLeg(limb,walking)
-    {
-        let r,flipLeg;
-
-        r=0.0;
-        if (walking) r=genRandom.randomInBetween(20.0,40.0);
-        
-        flipLeg=limb.flipped;
-        if (this.lastAnimationFlip) flipLeg=!flipLeg;
-        
-        if (flipLeg) {
-            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(r,0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues((r*0.7),0.0,0.0);
-            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(-(r*0.8),0.0,0.0);
-        }
-        else {
-            this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(-r,0.0,0.0);
-            this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(-(r*2.0),0.0,0.0);
-            this.bones[limb.boneIndexes[2]].nextPoseAngle.setFromValues(0.0,0.0,0.0);
-        }
-    }
-    
-    poseSetArm(limb,armAngle,walking)
-    {
-        let r,z;
-        
-        r=0.0;
-        if (walking) r=genRandom.randomInBetween(20.0,40.0);
-        
-        z=limb.flipped?-armAngle:armAngle;
-        if (this.lastAnimationFlip) r=-r;
-        
-        this.bones[limb.boneIndexes[0]].nextPoseAngle.setFromValues(0.0,-r,z);
-        this.bones[limb.boneIndexes[1]].nextPoseAngle.setFromValues(0.0,-(r*0.5),(z*0.9));
-    }
-    
-    poseSetBody(limb,startAng,extraAng)
-    {
-        let n,x;
-        let nBone=limb.boneIndexes.length;
-
-        x=genRandom.randomInBetween(startAng,extraAng);
-        if (this.lastAnimationFlip) x=-x;
-        
-            // always start past hip bone as we don't
-            // want to rotate against the base bone
-            
-        for (n=1;n!==nBone;n++) {
-            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);
-            x*=0.75;
-        }
-    }
-    
-    poseSetWhip(limb)
-    {
-        let n,x,z;
-        let nBone=limb.boneIndexes.length;
-
-        if (this.lastAnimationFlip) {
-            x=genRandom.randomInBetween(5,10);
-            z=genRandom.randomInBetween(5,10);
-        }
-        else {
-            x=-genRandom.randomInBetween(15,45);
-            z=-genRandom.randomInBetween(15,45);
-        }
-            
-        for (n=0;n!==nBone;n++) {
-            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,z);
-            x*=1.1;
-            z*=1.1;
-        }
-    }
-    
-    poseSetHeadSnout(limb)
-    {
-        let n,y;
-        let nBone=limb.boneIndexes.length;
-
-        y=genRandom.randomInBetween(5,10);
-        if (this.lastAnimationFlip) y=-y;
-            
-        for (n=0;n!==nBone;n++) {
-            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(0.0,y,0.0);
-            y*=1.1;
-        }
-    }
-    
-    poseSetHeadJaw(limb)
-    {
-        let n,x;
-        let nBone=limb.boneIndexes.length;
-
-        x=-genRandom.randomInBetween(25,40);
-        if (this.lastAnimationFlip) x=-10;
-            
-        for (n=0;n!==nBone;n++) {
-            this.bones[limb.boneIndexes[n]].nextPoseAngle.setFromValues(x,0.0,0.0);
-        }
-    }
-   
-        //
-        // walk poses
-        //
-        
-    walkNextPose()
-    {
-        let limb;
-        
-        let armLeftZAngle=45.0;
-        let armRightZAngle=45.0;
-        
-        for (limb of this.skeleton.limbs) {
-            
-            switch (limb.limbType) {
-                case constants.LIMB_TYPE_BODY:
-                    this.poseSetBody(limb,5.0,5.0);
-                    break;
-                case constants.LIMB_TYPE_HEAD:
-                    this.poseSetBody(limb,5.0,15.0);
-                    break;
-                case constants.LIMB_TYPE_LEG:
-                    this.poseSetLeg(limb,true);
-                    break;
-                case constants.LIMB_TYPE_ARM:
-                    if (limb.side===constants.LIMB_SIDE_LEFT) {
-                        this.poseSetArm(limb,armLeftZAngle,true);
-                        armLeftZAngle+=5.0;
-                    }
-                    else {
-                        this.poseSetArm(limb,armRightZAngle,true);
-                        armRightZAngle+=5.0;
-                    }
-                    break;
-                case constants.LIMB_TYPE_WHIP:
-                    this.poseSetWhip(limb);
-                    break;
-            }
-        }
-        
-        this.lastAnimationFlip=!this.lastAnimationFlip;
-    }
-    
-    walkPose()
-    {
-            // time for a new pose?
-            
-        if (this.view.timeStamp<this.lastAnimationTick) return;
-        
-            // next pose 3 seconds away (testing)
-        
-        this.lastAnimationMillisec=2000;
-        this.lastAnimationTick=this.view.timeStamp+this.lastAnimationMillisec;
-        
-            // move current next pose to last pose
-            
-        this.moveNextPoseToPrevPose();
-        
-            // construct new pose
-
-        this.clearNextPose();
-        this.walkNextPose();
-    }
-    
-        //
-        // idle poses
-        //
-        
-    idleNextPose()
-    {
-        let limb;
-        
-        let armLeftZAngle=45.0;
-        let armRightZAngle=45.0;
-        
-        for (limb of this.skeleton.limbs) {
-            
-            switch (limb.limbType) {
-                case constants.LIMB_TYPE_BODY:
-                    this.poseSetBody(limb,3.0,3.0);
-                    break;
-                case constants.LIMB_TYPE_HEAD:
-                    this.poseSetBody(limb,0.0,10.0);
-                    break;
-                case constants.LIMB_TYPE_LEG:
-                    this.poseSetLeg(limb,false);
-                    break;
-                case constants.LIMB_TYPE_ARM:
-                    if (limb.side===constants.LIMB_SIDE_LEFT) {
-                        this.poseSetArm(limb,armLeftZAngle,false);
-                        armLeftZAngle+=5.0;
-                    }
-                    else {
-                        this.poseSetArm(limb,armRightZAngle,false);
-                        armRightZAngle+=5.0;
-                    }
-                    break;
-                case constants.LIMB_TYPE_WHIP:
-                    this.poseSetWhip(limb);
-                    break;
-            }
-        }
-        
-        this.lastAnimationFlip=!this.lastAnimationFlip;
-    }
-        
-    idlePose()
-    {
-            // time for a new pose?
-            
-        if (this.view.timeStamp<this.lastAnimationTick) return;
-        
-            // next pose 4 seconds away
-            
-        this.lastAnimationMillisec=4000;
-        this.lastAnimationTick=this.view.timeStamp+this.lastAnimationMillisec;
-        
-            // move current next pose to last pose
-            
-        this.moveNextPoseToPrevPose();
-        
-            // construct new pose
-
-        this.clearNextPose();
-        this.idleNextPose();
-    }
-
 }

@@ -129,17 +129,21 @@ export default class SkyClass
         skyRadius=Math.trunc(this.skyBoxSettings.size*0.5);
         
             // setup shader
-            
-        gl.disable(gl.DEPTH_TEST);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
 
         this.view.shaderList.skyShader.drawStart();
         
             // negative X plane
+            // after this first texture is set we do some
+            // misc tex parameters (they would fail without a
+            // texture set)
         
         bitmap=this.view.bitmapList.get(this.skyBoxSettings.bitmapNegX);
         bitmap.attachAsSky();
+        
+        gl.disable(gl.DEPTH_TEST);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+
         this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.999,0.001,0.001,0.999);
         
             // positive X plane

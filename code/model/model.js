@@ -1,16 +1,18 @@
+import MeshListClass from '../../code/mesh/mesh_list.js';
+import ModelSkeletonClass from '../../code/model/model_skeleton.js';
+
 //
 // model object
 //
 
 export default class ModelClass
 {
-    constructor(view,name)
+    constructor(view)
     {
         this.view=view;
-        this.name=name;
         
-        this.mesh=null;
-        this.skeleton=null;
+        this.meshList=new MeshListClass(view);
+        this.skeleton=new ModelSkeletonClass(view);
         
         Object.seal(this);
     }
@@ -21,30 +23,25 @@ export default class ModelClass
     
     initialize()
     {
-    //    this.mesh.initialize();
-    //    this.skeleton.initialize();
+        if (!this.meshList.initialize(this.view.shaderList.modelMeshShader)) return(false);
+        this.skeleton.initialize();
+        
+        return(true);
     }
 
     release()
     {
-    //    this.mesh.release();
-    //    this.skeleton.release();
+        this.meshList.release();
+        this.skeleton.release();
     }
     
         //
-        // information
+        // setup buffers
         //
         
-    calculateRadius()
+    setupBuffers()
     {
-        return(1000);
-        //return(this.mesh.calculateRadius(this.skeleton));
-    }
-    
-    calculateHeight()
-    {
-        return(1000);
-        //return(this.mesh.calculateHeight());
+        this.meshList.setupBuffers();
     }
     
         //
@@ -53,18 +50,6 @@ export default class ModelClass
 
     draw()
     {
-        return;
-        
-        let mesh=this.model.mesh;
-
-        this.view.shaderList.modelMeshShader.drawStart();
-        
-        mesh.bitmap.attachAsTexture(this.view.shaderList.modelMeshShader);
-        
-        mesh.buildNonCulledTriangleIndexes();
-        mesh.bindBuffers(this.view.shaderList.modelMeshShader);
-        mesh.draw();
-        
-        this.view.shaderList.modelMeshShader.drawEnd();
+        this.meshList.drawOpaque();
     }
 }

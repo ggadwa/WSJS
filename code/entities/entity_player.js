@@ -8,9 +8,9 @@ import EntityClass from '../../code/entities/entity.js';
 
 export default class EntityPlayerClass extends EntityClass
 {
-    constructor(view,map,sound,name,position,angle,maxHealth,model)
+    constructor(view,map,name,radius,height,position,angle)
     {
-        super(view,map,sound,name,position,angle,maxHealth,model);
+        super(view,map,name,radius,height,position,angle);
         
             // entity setup
             

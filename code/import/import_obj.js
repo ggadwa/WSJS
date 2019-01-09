@@ -21,38 +21,30 @@ export default class ImportObjClass
         this.normalList=[];
         
         this.meshes=[];
+    }
+    
+        //
+        // async OBJ loader
+        //
         
-        this.callback=null;
+    async loadOBJ()
+    {
+        let resp;
+        
+        try {
+            resp=await fetch(this.url);
+            if (!resp.ok) return(Promise.reject('Unable to load '+this.url+'; '+resp.statusText));
+            return(await resp.text());
+        }
+        catch (e) {
+            return(Promise.reject('Unable to load '+this.url+'; '+e.message));
+        }
     }
     
         //
         // start the import by loading the obj file
         // and passing it on to the decoder
         //
-        
-    import(callback)
-    {
-            // save callback for later
-            
-        this.callback=callback;
-        
-            // fetch the file
-                        
-        fetch(this.url)
-            .then(
-                (resp)=>{
-                    if (resp.status!=200) return(Promise.reject(new Error('Missing file: '+this.url)));
-                    return(resp.text());
-                }
-            )
-            .then((data)=>{
-                    this.data=data;
-                    this.decode();
-                }
-            )
-            //.catch((error)=>alert(error));
-            .catch((error)=>console.log(error));
-    }
         
         //
         // utilities
@@ -199,12 +191,35 @@ export default class ImportObjClass
     }
     
         //
-        // main decoder
+        // main importer
         //
         
-    decode()
+    async import(meshList)
     {
         let n,splitChar,tokens;
+        let x,y,z,normal;
+        let lastGroupName,lastMaterialName;
+        let posVertexIdx,posUVIdx,posNormalIdx;
+        let meshVertices,meshIndexes;
+        
+            // load the file
+            
+        await this.loadOBJ()
+            .then
+                (
+                        // resolved
+                
+                    value=>{
+                        this.data=value;
+                    },
+                    
+                        // rejected
+                        
+                    value=>{
+                        console.log(value);
+                        return;
+                    }
+                );
         
             // get the lines and trim
             // any extraneous control characters
@@ -231,19 +246,8 @@ export default class ImportObjClass
         }
         
             // force all the textures to load
-            // and when finished, continue on with
-            // decoding the meshes
             
-        this.view.bitmapList.loadAllBitmaps(this.decodeMeshes.bind(this));
-    }
-    
-    decodeMeshes()
-    {
-        let n,tokens;
-        let x,y,z;
-        let lastGroupName,lastMaterialName;
-        let posVertexIdx,posUVIdx,posNormalIdx;
-        let meshVertices,meshIndexes;
+        if (!(await this.view.bitmapList.loadAllBitmaps())) return(false);
         
             // get the vertexes, UVs, and normals
             
@@ -266,7 +270,9 @@ export default class ImportObjClass
                     x=parseFloat(tokens[1]);
                     y=parseFloat(tokens[2])*this.flipFactor;
                     z=parseFloat(tokens[3]);
-                    this.normalList.push(new PointClass(x,y,z));
+                    normal=new PointClass(x,y,z);
+                    normal.normalize();
+                    this.normalList.push(normal);
                     break;
             }
         }
@@ -318,9 +324,13 @@ export default class ImportObjClass
             
         if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,lastMaterialName,meshVertices,meshIndexes);
         
-            // finally callback to finish the import
+            // and sort meshes into mesh list
             
-        this.callback();
+        for (n=0;n!==this.meshes.length;n++) {
+            meshList.add(this.meshes[n]);
+        }
+        
+        return(true);
     }
     
 }

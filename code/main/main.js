@@ -5,12 +5,11 @@ import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
 import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
-import EntityPlayerClass from '../../code/entities/entity_player.js';
-import EntityMonsterClass from '../../code/entities/entity_monster.js';
 import genRandom from '../../code/utility/random.js';
-import ImportObjClass from '../../code/import/import_obj.js';
 import GameClass from '../../data/scripts/game.js';
-import ModelClass from '../../code/model/model.js';
+import PlayerClass from '../../data/scripts/player.js';
+import CyborgClass from '../../data/scripts/cyborg.js';
+import BarrelClass from '../../data/scripts/barrel.js';
 
 //
 // main class
@@ -28,6 +27,7 @@ class MainClass
         this.sound=new SoundClass();
         
         this.game=new GameClass(this.view,this.map);
+        this.projectMap=this.game.getStartMap();
 
         Object.seal(this);
     }
@@ -74,10 +74,12 @@ class MainClass
         setTimeout(this.initLoadMap.bind(this),1);
     }
 
-    initLoadMap()
+    async initLoadMap()
     {
-        let projectMap=this.game.getStartMap();
-        projectMap.load(this.initBuildMapFinish.bind(this));
+        this.projectMap.initialize();
+        if (!(await this.projectMap.loadMap())) return;
+        
+        setTimeout(this.initBuildMapFinish.bind(this),1);
     }
 
     initBuildMapFinish()
@@ -101,113 +103,43 @@ class MainClass
         this.view.loadingScreenAddString('Generating Player');
         this.view.loadingScreenDraw(null);
 
-        setTimeout(this.initBuildPlayer.bind(this),1);
+        setTimeout(this.initBuildEntities.bind(this),1);
     }
-    
-    initBuildPlayer()
-    {
-        let model,pos,playerEntity;
-        //let genModel=new GenModelHumanClass(this.view);
-        //let genWeapon=new GenWeaponClass(this.view,this.map,this.sound);
 
-            // build the player model
+    async initBuildEntities()
+    {
+        let entity;
         
-        model=new ModelClass(this.view,name);
-        
-            // find place for player
-        
-        pos=new PointClass(0,-30000,0);
-        /*
-        pos=this.map.roomList.findRandomPlayerPosition();
-        if (pos===null) {
-            alert('Couldn\'t find a place to spawn player!');
-            return;
-        }
-*/
-        playerEntity=new EntityPlayerClass(this.view,this.map,this.sound,'player',pos,new PointClass(0.0,0.0,0.0),200,model);
-        playerEntity.overrideRadiusHeight(2000,5000);       // lock player into a certain radius/height for viewport clipping
-        
-            // todo -- all this is hard coded
+            // the player entity
             
-        //playerEntity.addWeapon(genWeapon.generate('Pistol'));
-        //playerEntity.addWeapon(genWeapon.generate('Rocket Launcher'));
-        //playerEntity.addWeapon(genWeapon.generate('Grenade Launcher'));
-        //playerEntity.addWeapon(genWeapon.generate('Laser Gun'));
+        entity=new PlayerClass(this.view,this.map,'player',2000,5000);
+        entity.initialize();
+        if (!(await entity.loadModel())) return;
+        this.projectMap.setupPlayer(entity);
+        entity.setCurrentWeaponIndex(0);
+        this.map.entityList.setPlayer(entity);
         
-        playerEntity.setCurrentWeaponIndex(0);
-
-        this.map.entityList.setPlayer(playerEntity);
-
-            // next step
-
-        if (config.MONSTER_COUNT!==0) {
-            this.view.loadingScreenUpdate();
-            this.view.loadingScreenAddString('Generating Monsters');
-            this.view.loadingScreenDraw(null);
+            // test entity 1
+           
+        entity=new CyborgClass(this.view,this.map,'monster',2000,5000);
+        entity.initialize();
+        if (!(await entity.loadModel())) return;
+        entity.position.setFromValues(0,-17200,19000)
+        this.map.entityList.add(entity);
         
-            setTimeout(this.initBuildMonsters.bind(this,0),1);
-        }
-        else {
-            this.view.loadingScreenUpdate();
-            this.view.loadingScreenAddString('Finishing');
-            this.view.loadingScreenDraw(null);
-
-            setTimeout(this.initFinish.bind(this),1);   
-        }
-    }
-
-    initBuildMonsters(idx)
-    {
-        /*
-        let pos,isBoss;
-        let genMonster=new GenMonsterClass(this.view,this.map,this.sound);
-
-            // is boss?
-
-        isBoss=(((idx+1)===config.MONSTER_TYPE_COUNT) && (config.MONSTER_BOSS));
+            // test entity 2
+            
+        entity=new BarrelClass(this.view,this.map,'barrel',1000,2000);
+        entity.initialize();
+        if (!(await entity.loadModel())) return;
+        entity.position.setFromValues(8000,-17200,19000)
+        this.map.entityList.add(entity);
         
-            // make monster entity
-        
-        if (isBoss) {
-            pos=this.map.roomList.findRandomBossPosition();
-        }
-        else {
-            pos=this.map.roomList.findRandomMonsterPosition();
-        }
-        
-        if (pos!==null) {
-            if (isBoss) {
-                genMonster.generate('boss',true,pos);
-                this.map.entityList.add(genMonster.generate('boss',true,pos));    
-            }
-            else {
-                genMonster.generate(('monster_'+idx),false,pos);
-                this.map.entityList.add(genMonster.generate(('monster_'+idx),false,pos));
-            }
-        }
-        
-            // if more monster types, then loop back around
-
-        idx++;
-        if (idx<config.MONSTER_COUNT) {
-            this.view.loadingScreenDraw((idx+1)/(config.MONSTER_COUNT+1));
-            setTimeout(this.initBuildMonsters.bind(this,idx),1);
-            return;
-        }
-
-            // next step
-
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Finishing');
-        this.view.loadingScreenDraw(null);
-*/
-
-        setTimeout(this.initFinish.bind(this),1);
+        this.initFinish();
     }
     
     initFinish()
     {
-        
             // finish by setting up all the mesh
             // buffers and indexes
 

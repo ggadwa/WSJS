@@ -1,5 +1,4 @@
 import * as constants from '../../code/main/constants.js';
-import EntityPlayerClass from '../../code/entities/entity_player.js';
 import EntityProjectileClass from '../../code/entities/entity_projectile.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../code/utility/random.js';
@@ -45,16 +44,12 @@ export default class MapEntityListClass
     setPlayer(entity)
     {
         entity.id=0;
-        entity.initialize();
-        
         this.entities[0]=entity;
     }
 
     add(entity)
     {
         entity.id=this.entityCurrentId++;
-        entity.initialize();
-        
         this.entities.push(entity);
     }
     
@@ -151,14 +146,13 @@ export default class MapEntityListClass
         
     draw()
     {
-        let entity;
+        let n;
+        let nEntity=this.entities.length;
 
             // skip index 0 as that's the player
             
-        for (entity of this.entities) {
-            if (entity instanceof EntityPlayerClass) continue;
-
-            if (entity.inFrustum()) entity.draw();
+        for (n=1;n<nEntity;n++) {
+            this.entities[n].draw();
         }
     }
 }

@@ -3,14 +3,15 @@ import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 
 //
-// map mesh list class
+// mesh list class
 //
 
-export default class MapMeshListClass
+export default class MeshListClass
 {
     constructor(view)
     {
         this.view=view;
+        this.shader=null;           // this will be attached later when initialized
 
         this.meshes=[];
         
@@ -27,8 +28,10 @@ export default class MapMeshListClass
         // initialize and release
         //
 
-    initialize()
+    initialize(shader)
     {
+        this.shader=shader;
+        
         return(true);
     }
 
@@ -80,7 +83,7 @@ export default class MapMeshListClass
     }
 
         //
-        // check for map mesh collisions
+        // check for mesh list collisions
         //
 
     boxBoundCollision(xBound,yBound,zBound,onlyFlag)
@@ -114,26 +117,6 @@ export default class MapMeshListClass
     }
 
         //
-        // flag counts
-        //
-
-    countMeshByFlag(onlyFlag)
-    {
-        let n,count;
-        let nMesh=this.meshes.length;
-
-        if (onlyFlag===null) return(nMesh);
-
-        count=0;
-
-        for (n=0;n!==nMesh;n++) {
-            if (this.meshes[n].flag===onlyFlag) count++;
-        }
-
-        return(count);
-    }
-    
-        //
         // run through the meshes and
         // have them build their collision meshes
         //
@@ -148,6 +131,30 @@ export default class MapMeshListClass
 
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].buildCollisionGeometry();
+        }
+    }
+    
+        //
+        // animations
+        //
+        
+    updateVertexesToPoseAndPosition(skeleton,angle,position)
+    {
+        let n;
+        let nMesh=this.meshes.length;
+
+        for (n=0;n!==nMesh;n++) {
+            this.meshes[n].updateVertexesToPoseAndPosition(skeleton,angle,position);
+        }
+    }
+    
+    updateVertexesToAngleAndPosition(angle,position)
+    {
+        let n;
+        let nMesh=this.meshes.length;
+
+        for (n=0;n!==nMesh;n++) {
+            this.meshes[n].updateVertexesToAngleAndPosition(angle,position);
         }
     }
            
@@ -166,7 +173,7 @@ export default class MapMeshListClass
     }
 
         //
-        // draw map meshes
+        // draw meshes
         //
 
     drawOpaque()
@@ -175,7 +182,7 @@ export default class MapMeshListClass
         let currentBitmap;
         let nMesh=this.meshes.length;
         
-        this.view.shaderList.mapMeshShader.drawStart();
+        this.shader.drawStart();
 
             // setup map drawing
 
@@ -199,18 +206,18 @@ export default class MapMeshListClass
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.view.shaderList.mapMeshShader);
+                mesh.bitmap.attachAsTexture(this.shader);
             }
             
                 // draw the mesh
 
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers(this.view.shaderList.mapMeshShader);
+            mesh.bindBuffers(this.shader);
             mesh.drawOpaque();
         }
         
-        this.view.shaderList.mapMeshShader.drawEnd();
+        this.shader.drawEnd();
     }
     
     drawTransparent()
@@ -232,7 +239,7 @@ export default class MapMeshListClass
         
         gl.depthMask(false);
         
-        this.view.shaderList.mapMeshShader.drawStart();
+        this.shader.drawStart();
 
             // setup map drawing
 
@@ -252,20 +259,20 @@ export default class MapMeshListClass
 
             if (mesh.bitmap!==currentBitmap) {
                 currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.view.shaderList.mapMeshShader);
+                mesh.bitmap.attachAsTexture(this.shader);
             }
 
                 // draw the mesh
 
             mesh.updateBuffers();
             mesh.buildNonCulledTriangleIndexes();
-            mesh.bindBuffers(this.view.shaderList.mapMeshShader);
+            mesh.bindBuffers(this.shader);
             mesh.drawTransparent();
         }
         
             // reset the blend
             
-        this.view.shaderList.mapMeshShader.drawEnd();
+        this.shader.drawEnd();
         
         gl.disable(gl.BLEND);
         gl.depthMask(true);

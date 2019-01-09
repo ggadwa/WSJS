@@ -7,10 +7,31 @@ export default class ProjectMapClass
     }
     
         //
-        // override to load and setup the map
+        // initialize and release
         //
         
-    load(callback)
+    initialize()
+    {
+    }
+    
+    release()
+    {
+    }
+    
+        //
+        // override this to load in map
+        //
+        
+    async loadMap()
+    {
+    }
+    
+        //
+        // override these to deal with where entities are
+        // place in the map
+        //
+        
+    setupPlayer(player)
     {
     }
 }

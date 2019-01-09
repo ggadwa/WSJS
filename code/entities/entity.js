@@ -1,6 +1,8 @@
 import * as constants from '../../code/main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import ModelClass from '../../code/model/model.js';
+import ImportModelClass from '../../code/import/import_model.js';
 import CollisionClass from '../../code/entities/collisions.js';
 
 //
@@ -9,20 +11,17 @@ import CollisionClass from '../../code/entities/collisions.js';
 
 export default class EntityClass
 {
-    constructor(view,map,sound,name,position,angle,maxHealth,model)
+    constructor(view,map,name,radius,height)
     {
         this.view=view;
         this.map=map;
-        this.sound=sound;
         
         this.name=name;
-        this.position=position.copy();      // it's possible we will get a global, so always copy
-        this.angle=angle.copy();
-        this.maxHealth=maxHealth;
-        this.model=model;
-        
-        this.radius=this.model.calculateRadius();
-        this.high=this.model.calculateHeight();
+        this.radius=radius;
+        this.high=height;
+        this.position=new PointClass(0,0,0);
+        this.angle=new PointClass(0,0,0);
+        this.model=null;
         
         this.positionBackup=new PointClass(0,0,0);
         
@@ -30,8 +29,8 @@ export default class EntityClass
 
         this.id=-1;
         
-        this.maxHealth=maxHealth;
-        this.health=maxHealth;
+        this.maxHealth=100;
+        this.health=100;
         
         this.gravityMinValue=10;
         this.gravityMaxValue=280;
@@ -87,22 +86,20 @@ export default class EntityClass
         
     initialize()
     {
-        this.model.initialize();
+        this.model=null;
     }
     
     release()
     {
-        this.model.release();
+        if (this.model!==null) this.model.release();
     }
     
         //
-        // misc
+        // loading model
         //
         
-    overrideRadiusHeight(radius,high)
+    async loadModel()
     {
-        this.radius=radius;
-        this.high=high;
     }
     
         //
@@ -586,35 +583,27 @@ export default class EntityClass
     }
     
         //
-        // frustum checks
-        //
-        
-    inFrustum()
-    {
-        this.xFrustumBound.setFromValues((this.position.x-this.radius),(this.position.x+this.radius));
-        this.yFrustumBound.setFromValues((this.position.y-this.high),this.position.y);
-        this.zFrustumBound.setFromValues((this.position.z-this.radius),(this.position.z+this.radius));
-
-        return(this.view.boundBoxInFrustum(this.xFrustumBound,this.yFrustumBound,this.zFrustumBound));
-    }
-    
-        //
         // draw entity
         //
         
     draw()
     {
+        if (this.model===null) return;
+        
             // either update skeleton and create
             // vertices or just move to current position
             // and angle
             
         if (this.model.skeleton!==null) {
-            if (!this.view.paused) this.model.skeleton.animate();
-            this.model.drawMesh.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
+            //if (!this.view.paused) this.model.skeleton.animate();
+            //this.model.meshList.updateVertexesToPoseAndPosition(this.model.skeleton,this.angle,this.position);
         }
         else {
-            this.model.drawMesh.updateVertexesToAngleAndPosition(this.angle,this.position);
+            //this.model.meshList.updateVertexesToAngleAndPosition(this.angle,this.position);
         }
+        
+        let angle=new PointClass(0,Math.trunc((this.view.timeStamp*0.01)%360),0);
+        this.model.meshList.updateVertexesToAngleAndPosition(angle,this.position);     // temporary just to get model in place
         
             // draw the model
             

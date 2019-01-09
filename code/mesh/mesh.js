@@ -68,10 +68,12 @@ export default class MeshClass
         
         this.setupBounds();
         
-            // cache the radius and height calcs
-            
-        this.cacheRadius=-1;
-        this.cacheHigh=-1;
+            // global variables to stop GCd
+
+        this.rotVector=new PointClass(0.0,0.0,0.0);
+        this.rotNormal=new PointClass(0.0,0.0,0.0);
+        this.parentRotVector=new PointClass(0.0,0.0,0.0);
+        this.parentRotNormal=new PointClass(0.0,0.0,0.0);
         
         Object.seal(this);
     }
@@ -175,69 +177,6 @@ export default class MeshClass
         this.center.x/=this.vertexCount;
         this.center.y/=this.vertexCount;
         this.center.z/=this.vertexCount;
-    }
-    
-        //
-        // information
-        //
-        
-    calculateRadius(skeleton)
-    {
-        let n,v,limbType;
-        let xBound,zBound;
-        
-        if (this.cacheRadius===-1) {
-            xBound=new BoundClass(0,0);
-            zBound=new BoundClass(0,0);
-            
-                // no skeleton, do all vertexes
-                
-            if (skeleton===null) {
-                for (n=0;n!==this.vertexCount;n++) {
-                    v=this.vertexList[n];
-                    xBound.adjust(v.position.x);
-                    zBound.adjust(v.position.z);
-                }
-            }
-
-                // has a skeleton, eliminate some
-                // limbs that bulk up the collision radius
-                
-            else {
-                for (n=0;n!==this.vertexCount;n++) {
-                    v=this.vertexList[n];
-                    limbType=skeleton.getBoneLimbType(v.boneIdx);
-
-                    if ((limbType===constants.LIMB_TYPE_BODY) || (limbType===constants.LIMB_TYPE_HEAD) || (limbType===constants.LIMB_TYPE_LEG)) {
-                        xBound.adjust(v.position.x);
-                        zBound.adjust(v.position.z);
-                    }
-                }
-            }
-            
-            this.cacheRadius=Math.trunc((xBound.getSize()+zBound.getSize())*0.25);       // average, then /2 for half (radius)
-        }
-        
-        return(this.cacheRadius);
-    }
-    
-    calculateHeight()
-    {
-        let n,v;
-        let high;
-        
-        if (this.cacheHigh===-1) {
-            high=0;
-
-            for (n=0;n!==this.vertexCount;n++) {
-                v=this.vertexList[n];
-                if (v.position.y<high) high=v.position.y;
-            }
-
-            this.cacheHigh=-high;
-        }
-        
-        return(this.cacheHigh);
     }
     
         //
@@ -512,7 +451,7 @@ export default class MeshClass
     
         //
         // update buffers
-        // this happens when a mesh is moved, and flagged to get
+        // this happens when a mao mesh is moved, and flagged to get
         // updated.  We only do this when the mesh is drawn so we don't
         // update uncessarly
         //
@@ -545,13 +484,186 @@ export default class MeshClass
     }
     
         //
+        // set vertices to pose and offset position
+        //
+        
+    updateVertexesToPoseAndPosition(skeleton,angle,position)
+    {
+        let n,v,x,y,z,vIdx,nIdx;
+        let bone,parentBone;
+        let gl=this.view.gl;
+        
+            // we recalc the bounds while
+            // we move model around
+        
+        v=this.vertexList[0];
+        
+        this.center.setFromValues(0,0,0);
+        this.xBound.setFromValues(v.position.x,v.position.x);
+        this.yBound.setFromValues(v.position.y,v.position.y);
+        this.zBound.setFromValues(v.position.z,v.position.z);
+        
+            // move all the vertexes
+            
+        vIdx=0;
+        nIdx=0;
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            
+                // bone movement
+                
+            bone=skeleton.bones[v.boneIdx];
+                
+            this.rotVector.setFromPoint(v.vectorFromBone);
+            this.rotVector.rotate(bone.curPoseAngle);
+            
+            this.rotVector.x=bone.curPosePosition.x+this.rotVector.x;
+            this.rotVector.y=bone.curPosePosition.y+this.rotVector.y;
+            this.rotVector.z=bone.curPosePosition.z+this.rotVector.z;
+            
+            this.rotNormal.setFromPoint(v.normal);
+            this.rotNormal.rotate(bone.curPoseAngle);
+            
+                // average in any parent movement
+                
+            if (v.parentBoneIdx!==-1) {
+                parentBone=skeleton.bones[v.parentBoneIdx];
+                
+                this.parentRotVector.setFromPoint(v.vectorFromParentBone);
+                this.parentRotVector.rotate(parentBone.curPoseAngle);
+
+                this.parentRotVector.x=parentBone.curPosePosition.x+this.parentRotVector.x;
+                this.parentRotVector.y=parentBone.curPosePosition.y+this.parentRotVector.y;
+                this.parentRotVector.z=parentBone.curPosePosition.z+this.parentRotVector.z;
+
+                this.parentRotNormal.setFromPoint(v.normal);
+                this.parentRotNormal.rotate(parentBone.curPoseAngle);
+                
+                this.rotVector.average(this.parentRotVector);
+                this.rotNormal.average(this.parentRotNormal);
+            }    
+            
+                // whole model movement
+   
+            this.rotVector.rotate(angle);
+            
+            x=this.rotVector.x+position.x;
+            y=this.rotVector.y+position.y;
+            z=this.rotVector.z+position.z;
+            
+            this.drawVertices[vIdx++]=x;
+            this.drawVertices[vIdx++]=y;
+            this.drawVertices[vIdx++]=z;
+            
+            this.rotNormal.rotate(angle);
+            
+            this.drawNormals[nIdx++]=this.rotNormal.x;
+            this.drawNormals[nIdx++]=this.rotNormal.y;
+            this.drawNormals[nIdx++]=this.rotNormal.z;
+             
+                // adjust bounding
+                
+            this.center.addValues(x,y,z);
+            this.xBound.adjust(x);
+            this.yBound.adjust(y);
+            this.zBound.adjust(z);
+        }
+        
+            // set the buffers
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.DYNAMIC_DRAW);
+        
+            // finish with the center
+            
+        this.center.x/=this.vertexCount;
+        this.center.y/=this.vertexCount;
+        this.center.z/=this.vertexCount;
+    }
+    
+        //
+        // set vertices to ang and offset position
+        //
+        
+    updateVertexesToAngleAndPosition(angle,position)
+    {
+        let n,v,x,y,z,vIdx,nIdx;
+        let gl=this.view.gl;
+        
+            // we recalc the bounds while
+            // we move model around
+            
+        v=this.vertexList[0];
+        
+        this.center.setFromValues(0,0,0);
+        this.xBound.setFromValues(v.position.x,v.position.x);
+        this.yBound.setFromValues(v.position.y,v.position.y);
+        this.zBound.setFromValues(v.position.z,v.position.z);
+        
+            // move all the vertexes
+            
+        vIdx=0;
+        nIdx=0;
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            
+                // animate vertexes
+                
+            this.rotVector.setFromPoint(v.position);
+            this.rotVector.rotate(angle);
+            
+            x=this.rotVector.x+position.x;
+            y=this.rotVector.y+position.y;
+            z=this.rotVector.z+position.z;
+            
+            this.drawVertices[vIdx++]=x;
+            this.drawVertices[vIdx++]=y;
+            this.drawVertices[vIdx++]=z;
+            
+            this.rotNormal.setFromPoint(v.normal);
+            this.rotNormal.rotate(angle);
+            
+            this.drawNormals[nIdx++]=this.rotNormal.x;
+            this.drawNormals[nIdx++]=this.rotNormal.y;
+            this.drawNormals[nIdx++]=this.rotNormal.z;
+            
+                // adjust bounding
+                
+            this.center.addValues(x,y,z);
+            this.xBound.adjust(x);
+            this.yBound.adjust(y);
+            this.zBound.adjust(z);
+        }
+        
+            // set the buffers
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.DYNAMIC_DRAW);
+        
+            // finish with the center
+            
+        this.center.x/=this.vertexCount;
+        this.center.y/=this.vertexCount;
+        this.center.z/=this.vertexCount;
+    }
+    
+        //
         // build an index list of triangles that aren't
         // culled
         //
         
     buildNonCulledTriangleIndexes()
     {
-        let n,v,x,y,z,f,idx;
+        let n,v,x,y,z,nx,ny,nz;
+        let f,idx,drawIdx;
 
             // if it's the first time, we'll need
             // to create the index array
@@ -573,12 +685,14 @@ export default class MeshClass
         for (n=0;n!==this.trigCount;n++) {
             
                 // vector from trig to eye point
-                
-            v=this.vertexList[this.indexes[idx]];
             
-            x=v.position.x-this.view.camera.position.x;      // cullTrigToEyeVector.setFromSubPoint(v.position,this.view.camera.position)
-            y=v.position.y-this.view.camera.position.y;
-            z=v.position.z-this.view.camera.position.z;
+            drawIdx=this.indexes[idx]*3;
+            x=this.drawVertices[drawIdx]-this.view.camera.position.x;     // cullTrigToEyeVector.setFromSubPoint(draw.position,this.view.camera.position)
+            nx=this.drawNormals[drawIdx++];
+            y=this.drawVertices[drawIdx]-this.view.camera.position.y;
+            ny=this.drawNormals[drawIdx++];
+            z=this.drawVertices[drawIdx]-this.view.camera.position.z;
+            nz=this.drawNormals[drawIdx++];
             
             f=Math.sqrt((x*x)+(y*y)+(z*z));   // cullTrigToEyeVector.normalize();
             if (f!==0.0) f=1.0/f;
@@ -589,13 +703,13 @@ export default class MeshClass
             
                 // dot product
                 
-            if (((x*v.normal.x)+(y*v.normal.y)+(z*v.normal.z))<=this.view.VIEW_NORMAL_CULL_LIMIT) {      // this.cullTrigToEyeVector.dot(v.normal)
+            if (((x*nx)+(y*ny)+(z*nz))<=this.view.VIEW_NORMAL_CULL_LIMIT) {      // this.cullTrigToEyeVector.dot(draw.normal)
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+1];
                 this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+2];
             }    
         
-            idx=idx+3;      // supergumba -- chrome complains about idx+=3, so we do this for now
+            idx+=3;
         }
     }
     

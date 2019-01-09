@@ -60,35 +60,10 @@ export default class BitmapListClass
         // loading
         //
         
-        
-    loadTexturesProcess(keyIter,callback)
-    {
-        let rtn,bitmap;
-        
-            // get next key
-            
-        rtn=keyIter.next();
-        if (rtn.done) {
-            callback();
-            return;
-        }
-        
-        bitmap=this.bitmaps.get(rtn.value);
-        if (bitmap.loaded) {
-            loadTexturesProcess(keyIter,callback);
-            return;
-        }
-        
-        bitmap.initialize(this.loadTexturesProcess.bind(this,keyIter,callback));
-    }
-    
-    loadAllBitmaps(callback)
+    async loadAllBitmaps()
     {
         let keyIter,rtn,bitmap;
         
-            // start all the unloaded bitmaps
-            // loading
-            
         keyIter=this.bitmaps.keys();
         
         while (true) {
@@ -96,40 +71,13 @@ export default class BitmapListClass
             if (rtn.done) break;
             
             bitmap=this.bitmaps.get(rtn.value);
-            if (bitmap.loadState===bitmap.LOAD_STATE_UNLOADED) bitmap.load();
-        }
-        
-            // now wait for a completion
-            
-        setTimeout(this.loadAllBitmapsWaitForCompletition.bind(this,callback),this.BITMAP_LOAD_WAIT_TIMEOUT); 
-    }
-    
-    loadAllBitmapsWaitForCompletition(callback)
-    {
-        let keyIter,rtn,bitmap;
-        
-            // is everybody loaded?  If so time
-            // to continue on with callback
-            // if any errors, halt the code
-            
-        keyIter=this.bitmaps.keys();
-        
-        while (true) {
-            rtn=keyIter.next();
-            if (rtn.done) break;
-            
-            bitmap=this.bitmaps.get(rtn.value);
-            if (bitmap.loadState===bitmap.LOAD_STATE_UNLOADED) {
-                setTimeout(this.loadAllBitmapsWaitForCompletition.bind(this,callback),this.BITMAP_LOAD_WAIT_TIMEOUT); 
-                return;
+            if (!bitmap.loaded) {
+                let rtn=await bitmap.load();
+                if (!rtn) return(false);
             }
-            
-            if (bitmap.loadState===bitmap.LOAD_STATE_ERROR) return;
         }
-        
-            // continue on with whatever called this
-            
-        callback();
+
+        return(true);
     }
     
 }

@@ -9,20 +9,14 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
+0. shaders have callbacks, eliminate
 
-
+2e. get back to updateVertexesToPoseAndPosition
 3. sort the imported meshes by material
-
-4. need starting position, for dungon: -7230,-78,-56786
-
-
-1. make all the mesh map/model generic
-    -> models need multiple meshes
-6. get rid of limbs in model stuff
-7. need to rename materials in OBJs
-9. get rid of config stuff
-10. model import
 11. water texture is awful
+12. MESH_FLAG_ / collisions
+14. dungeon lights and doors and liquids
+15. high->height
 
 
 - get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW

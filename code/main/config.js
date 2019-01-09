@@ -9,15 +9,6 @@ class ConfigClass
         this.SEED=Date.now();                       // random seed for generation; guarenteed to make exact same game with same seed
 
             //
-            // monsters
-            //
-
-        this.MONSTER_COUNT=0;
-        
-        this.MONSTER_AI_ON=true;
-        this.MONSTER_BOSS=false;
-        
-            //
             // sounds
             //
             

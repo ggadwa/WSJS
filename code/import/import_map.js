@@ -15,23 +15,17 @@ export default class ImportMapClass
         this.map=map;
     }
     
-    load(name,scale,flipY,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback)
+    async load(name,scale,flipY,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings)
     {
+        let n,k,idx;
+        let light,lightDef;
+        let liquid,liquidDef,liquidBitmap;
+        let movement,movementDef,moveDef;
+        let glowDef,bitmap;
         let importObj;
         
         importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY);
-        importObj.import(this.addMeshes.bind(this,importObj,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback));        
-    }
-    
-    addMeshes(importObj,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback)
-    {
-        let n;
-        
-            // add the meshes to the map
-            
-        for (n=0;n!==importObj.meshes.length;n++) {
-            this.map.meshList.add(importObj.meshes[n]);
-        }
+        if (!(await importObj.import(this.map.meshList))) return(false);
         
             // add in any liquid or sky textures so
             // they get loaded
@@ -51,16 +45,7 @@ export default class ImportMapClass
             this.view.bitmapList.add(skyBoxSettings.bitmapPosZ,true);
         }
         
-        this.view.bitmapList.loadAllBitmaps(this.finishLoad.bind(this,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback));
-    }
-    
-    finishLoad(skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings,callback)
-    {
-        let n,k,idx;
-        let light,lightDef;
-        let liquid,liquidDef,liquidBitmap;
-        let movement,movementDef,moveDef;
-        let glowDef,bitmap;
+        if (!(await this.view.bitmapList.loadAllBitmaps())) return(false);
         
             // the lights
             
@@ -146,8 +131,6 @@ export default class ImportMapClass
             }
         }
         
-            // and return control to map script
-            
-        callback();
+        return(true);
     }
 }
