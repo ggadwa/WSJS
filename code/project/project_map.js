@@ -27,11 +27,10 @@ export default class ProjectMapClass
     }
     
         //
-        // override these to deal with where entities are
-        // place in the map
+        // override this to add entities to map
         //
         
-    setupPlayer(player)
+    async loadEntities()
     {
     }
 }

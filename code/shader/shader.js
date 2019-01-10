@@ -10,10 +10,6 @@ export default class ShaderClass
         
         this.vertexShaderURL=null;
         this.fragmentShaderURL=null;
-        this.callback=null;
-        
-        this.vertexShaderSource=null;
-        this.fragmentShaderSource=null;
         
         this.vertexShader=null;
         this.fragmentShader=null;
@@ -26,93 +22,8 @@ export default class ShaderClass
         // initialize/release shader
         //
 
-    initialize(name,callback)
+    initialize()
     {
-        this.vertexShaderURL='shaders/'+name+'.vert';
-        this.fragmentShaderURL='shaders/'+name+'.frag';
-        this.callback=callback;
-        
-        this.loadVertexShader();
-    }
-    
-    loadVertexShader()
-    {
-        fetch(this.vertexShaderURL)
-            .then(
-                (resp)=>{
-                    if (resp.status!=200) return(Promise.reject(new Error('Missing file: '+this.vertexShaderURL)));
-                    return(resp.text());
-                }
-            )
-            .then((data)=>{
-                    this.vertexShaderSource=data;
-                    this.loadFragmentShader();
-                }
-            )
-            .catch((error)=>alert(error));
-    }
-    
-    loadFragmentShader()
-    {
-        fetch(this.fragmentShaderURL)
-            .then(
-                (resp)=>{
-                    if (resp.status!=200) return(Promise.reject(new Error('Missing file: '+this.fragmentShaderURL)));
-                    return(resp.text());
-                }
-            )
-            .then((data)=>{
-                    this.fragmentShaderSource=data;
-                    this.compileShader();
-                }
-            )
-            .catch((error)=>alert(error));
-    }
-    
-    compileShader()
-    {
-        let gl=this.view.gl;
-        
-            // compile vertex shader
-            
-        this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
-        gl.shaderSource(this.vertexShader,this.vertexShaderSource);
-        gl.compileShader(this.vertexShader);
-
-        if (!gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) {
-            this.errorAlert(this.vertexShaderURL,"vertex",gl.getShaderInfoLog(this.vertexShader));
-            this.release();
-            return;
-        }
-        
-            // compile fragment shader
-            
-        this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(this.fragmentShader,this.fragmentShaderSource);
-        gl.compileShader(this.fragmentShader);
-
-        if (!gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) {
-            this.errorAlert(this.fragmentShaderURL,"fragment",gl.getShaderInfoLog(this.fragmentShader));
-            this.release();
-            return;
-        }
-        
-            // compile the program
-
-        this.program=gl.createProgram();
-        gl.attachShader(this.program,this.vertexShader);
-        gl.attachShader(this.program,this.fragmentShader);
-        gl.linkProgram(this.program);
-
-        if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
-            this.errorAlert(name,"program",gl.getProgramInfoLog(this.program));
-            this.release();
-            return;
-        }
-
-            // and the callback
-            
-        this.callback();
     }
     
     release()
@@ -137,18 +48,131 @@ export default class ShaderClass
         this.fragmentShader=null;
         this.program=null;
     }
+    
+        //
+        // load shader
+        //
+        
+    async loadShader(url)
+    {
+        let resp;
+        
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
+            return(await resp.text());
+        }
+        catch (e) {
+            return(Promise.reject('Unable to load '+url+'; '+e.message));
+        }
+    }
+     
+    async load()
+    {
+        let vertexShaderSource,fragmentShaderSource;
+        let gl=this.view.gl;
+        
+            // load vertex shader
+        
+        vertexShaderSource=null;
+        
+        await this.loadShader(this.vertexShaderURL)
+            .then
+                (
+                        // resolved
+                
+                    value=>{
+                        vertexShaderSource=value;
+                    },
+                    
+                        // rejected
+                        
+                    value=>{
+                        console.log(value);
+                    }
+                );
+        
+        if (vertexShaderSource===null) return(false);
+        
+            // load fragment shader
+        
+        fragmentShaderSource=null;
+        
+        await this.loadShader(this.fragmentShaderURL)
+            .then
+                (
+                        // resolved
+                
+                    value=>{
+                        fragmentShaderSource=value;
+                    },
+                    
+                        // rejected
+                        
+                    value=>{
+                        console.log(value);
+                    }
+                );
+        
+        if (fragmentShaderSource===null) return(false);
+        
+            // compile vertex shader
+            
+        this.vertexShader=gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(this.vertexShader,vertexShaderSource);
+        gl.compileShader(this.vertexShader);
+
+        if (!gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) {
+            this.writeError(this.vertexShaderURL,"vertex",gl.getShaderInfoLog(this.vertexShader));
+            this.release();
+            return(false);
+        }
+        
+            // compile fragment shader
+            
+        this.fragmentShader=gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(this.fragmentShader,fragmentShaderSource);
+        gl.compileShader(this.fragmentShader);
+
+        if (!gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) {
+            this.writeError(this.fragmentShaderURL,"fragment",gl.getShaderInfoLog(this.fragmentShader));
+            this.release();
+            return(false);
+        }
+        
+            // compile the program
+
+        this.program=gl.createProgram();
+        gl.attachShader(this.program,this.vertexShader);
+        gl.attachShader(this.program,this.fragmentShader);
+        gl.linkProgram(this.program);
+
+        if (!gl.getProgramParameter(this.program,gl.LINK_STATUS)) {
+            this.writeError(name,"program",gl.getProgramInfoLog(this.program));
+            this.release();
+            return(false);
+        }
+        
+            // do the variables and final setup
+            
+        this.loadFinish();
+        
+        return(true);
+    }
+    
+    loadFinish()
+    {
+    }
 
         //
         // shader errors
         //
 
-    errorAlert(name,nameType,errStr)
+    writeError(name,nameType,errStr)
     {
-        let str='Shader Error: '+name+'('+nameType+')\n';
-        str+='-----------------------------------------\n';
-        str+=errStr;
-
-        alert(str);
+        console.log('Shader Error: '+name+'('+nameType+')');
+        console.log('-----------------------------------------');
+        console.log(errStr);
     }
 
 }

@@ -7,9 +7,9 @@ import MoveClass from '../../code/map/move.js';
 
 export default class MovementClass
 {
-    constructor(meshIdx,looping,approachDistance)
+    constructor(meshIdxList,looping,approachDistance)
     {
-        this.meshIdx=meshIdx;
+        this.meshIdxList=meshIdxList;
         this.looping=looping;
         this.approachDistance=approachDistance;
         
@@ -18,6 +18,7 @@ export default class MovementClass
         
         this.moving=looping;            // looping movements are always moving
         
+        this.originalCenterPnt=null;
         this.movePnt=new PointClass(0,0,0);
         this.nextOffsetPnt=new PointClass(0,0,0);
         this.lastOffsetPnt=new PointClass(0,0,0);
@@ -34,6 +35,7 @@ export default class MovementClass
     
     run(view,map)
     {
+        let n,nMesh;
         let mesh,isOpen,prevIdx;
         let f,move;
         
@@ -41,9 +43,27 @@ export default class MovementClass
             
         if (this.moves.length===0) return;
         
-            // the mesh
+            // the mesh count
             
-        mesh=map.meshList.get(this.meshIdx);
+        nMesh=this.meshIdxList.length;
+        
+            // the first time we run, we grab the
+            // current center point for all meshes
+            // because a big movement can change the distance
+            
+        if (this.originalCenterPnt===null) {
+            
+            this.originalCenterPnt=new PointClass(0,0,0);
+            
+            for (n=0;n!==nMesh;n++) {
+                mesh=map.meshList.get(this.meshIdxList[n]);
+                this.originalCenterPnt.addPoint(mesh.center);
+            }
+            
+            this.originalCenterPnt.x=Math.trunc(this.originalCenterPnt.x/nMesh);
+            this.originalCenterPnt.y=Math.trunc(this.originalCenterPnt.y/nMesh);
+            this.originalCenterPnt.z=Math.trunc(this.originalCenterPnt.z/nMesh);
+        }
         
             // if not looping, then do approach disance
             // if not already moving
@@ -51,7 +71,7 @@ export default class MovementClass
         if (!this.looping) {
             
             if (!this.moving) {
-                isOpen=(mesh.center.distance(map.entityList.getPlayer().position)<this.approachDistance);
+                isOpen=(this.originalCenterPnt.distance(map.entityList.getPlayer().position)<this.approachDistance);
                 
                 if (isOpen) {
                     if (this.currentMoveIdx===1) return;
@@ -109,12 +129,12 @@ export default class MovementClass
         this.movePnt.setFromSubPoint(this.nextOffsetPnt,this.lastOffsetPnt);
         this.lastOffsetPnt.setFromPoint(this.nextOffsetPnt);
         
-            // do the move
+            // do the moves
         
-        mesh.move(this.movePnt);
-        
-            // and any effected entity
-            
-        map.entityList.movementPush(this.meshIdx,this.movePnt);
+        for (n=0;n!==nMesh;n++) {
+            mesh=map.meshList.get(this.meshIdxList[n]);
+            mesh.move(this.movePnt);
+            map.entityList.movementPush(this.meshIdxList[n],this.movePnt);
+        }
     }
 }

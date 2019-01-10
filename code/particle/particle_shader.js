@@ -10,31 +10,23 @@ export default class ParticleShaderClass extends ShaderClass
     {
         super(view);
         
+        this.vertexShaderURL='shaders/particle.vert';
+        this.fragmentShaderURL='shaders/particle.frag';
+        
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;    
         this.colorAlphaUniform=null;
         
-        this.finalInitCallback=null;
-        
         Object.seal(this);
     }
     
         //
-        // initialize/release particle shader
+        // load finish
         //
 
-    initialize(callback)
-    {
-        this.finalInitCallback=callback;
-        
-            // load and compile the shader, requires callback
-
-       super.initialize('particle',this.initialize2.bind(this));
-    }
-    
-    initialize2()
+    loadFinish()
     {
         let gl=this.view.gl;
 
@@ -55,13 +47,6 @@ export default class ParticleShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
         gl.useProgram(null);
-
-        this.finalInitCallback();
-    }
-
-    release()
-    {
-        super.release();
     }
 
         //

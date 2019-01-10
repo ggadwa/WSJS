@@ -10,30 +10,22 @@ export default class SkyShaderClass extends ShaderClass
     {
         super(view);
         
+        this.vertexShaderURL='shaders/sky.vert';
+        this.fragmentShaderURL='shaders/sky.frag';
+        
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
         this.perspectiveMatrixUniform=null;
         this.modelMatrixUniform=null;
         
-        this.finalInitCallback=null;
-        
         Object.seal(this);
     }
     
         //
-        // initialize/release sky shader
+        // load finish
         //
 
-    initialize(callback)
-    {
-        this.finalInitCallback=callback;
-        
-            // load and compile the shader, requires callback
-
-        super.initialize('sky',this.initialize2.bind(this));
-    }
-    
-    initialize2()
+    loadFinish()
     {
         let gl=this.view.gl;
 
@@ -48,13 +40,6 @@ export default class SkyShaderClass extends ShaderClass
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
 
         gl.useProgram(null);
-
-        this.finalInitCallback();
-    }
-
-    release()
-    {
-        super.release();
     }
 
         //

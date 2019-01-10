@@ -10,29 +10,21 @@ export default class InterfaceShaderClass extends ShaderClass
     {
         super(view);
         
+        this.vertexShaderURL='shaders/interface.vert';
+        this.fragmentShaderURL='shaders/interface.frag';
+        
         this.vertexPositionAttribute=null;
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
-        
-        this.finalInitCallback=null;
         
         Object.seal(this);
     }
     
         //
-        // initialize/release interface shader
+        // load finish
         //
 
-    initialize(callback)
-    {
-        this.finalInitCallback=callback;
-        
-            // load and compile the shader, requires callback
-
-        super.initialize('interface',this.initialize2.bind(this));
-    }
-    
-    initialize2()
+    loadFinish()
     {
         let gl=this.view.gl;
 
@@ -46,13 +38,6 @@ export default class InterfaceShaderClass extends ShaderClass
         this.colorUniform=gl.getUniformLocation(this.program,'color');
 
         gl.useProgram(null);
-
-        this.finalInitCallback();
-    }
-
-    release()
-    {
-        super.release();
     }
 
         //

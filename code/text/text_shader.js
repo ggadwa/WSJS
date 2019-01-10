@@ -10,30 +10,22 @@ export default class TextShaderClass extends ShaderClass
     {
         super(view);
         
+        this.vertexShaderURL='shaders/text.vert';
+        this.fragmentShaderURL='shaders/text.frag';
+        
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
         
-        this.finalInitCallback=null;
-        
         Object.seal(this);
     }
     
-    //
-    // initialize/release text shader
-    //
+        //
+        // load finish
+        //
 
-    initialize(callback)
-    {
-        this.finalInitCallback=callback;
-        
-            // load and compile the shader, requires callback
-
-        super.initialize('text',this.initialize2.bind(this));
-    }
-    
-    initialize2()
+    loadFinish()
     {
         let gl=this.view.gl;
 
@@ -52,13 +44,6 @@ export default class TextShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
         gl.useProgram(null);
-
-        this.finalInitCallback();
-    }
-
-    release()
-    {
-        super.release();
     }
 
     //

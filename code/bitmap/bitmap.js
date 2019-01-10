@@ -60,6 +60,43 @@ export default class BitmapClass
     }
     
         //
+        // glow map utilities
+        //
+        
+    createEmptyGlowMapImage()
+    {
+        let n,idx;
+        let canvas,ctx,imgData,data;
+        
+            // create an all black image
+            // for bitmaps without glow maps
+            
+        canvas=document.createElement('canvas');
+        canvas.width=8;
+        canvas.height=8;
+        ctx=canvas.getContext('2d');
+
+	imgData=ctx.getImageData(0,0,8,8);
+        data=imgData.data;
+        
+        idx=0;
+        
+        for (n=0;n!=64;n++) {
+            data[idx++]=0;
+            data[idx++]=0;
+            data[idx++]=0;
+            data[idx++]=255;
+        }
+		
+	ctx.putImageData(imgData,0,0);
+		
+            // convert to image
+            
+        this.glowImage=new Image();
+        this.glowImage.src=canvas.toDataURL("image/png");
+    }
+    
+        //
         // load texture
         //
         
@@ -171,6 +208,8 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,null);
         
             // glow bitmap
+            // these do not have to exist, if missing,
+            // will use fake glowmap
             
         await this.loadImagePromise('./data/textures/'+this.name+'_g.png')
             .then
@@ -183,12 +222,10 @@ export default class BitmapClass
                     
                         // rejected
                         
-                    value=>{
-                        console.log('Unable to load '+value);
+                    ()=>{
+                        this.createEmptyGlowMapImage();
                     }
                 );
-        
-        if (this.glowImage===null) return(false);
         
         this.glowMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.glowMap);

@@ -20,7 +20,7 @@ export default class ImportMapClass
         let n,k,idx;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
-        let movement,movementDef,moveDef;
+        let movement,idxList,movementDef,moveDef;
         let glowDef,bitmap;
         let importObj;
         
@@ -87,13 +87,18 @@ export default class ImportMapClass
             for (n=0;n!==movementSettings.movements.length;n++) {
                 movementDef=movementSettings.movements[n];
 
-                idx=this.map.meshList.find(movementDef.mesh);
-                if (idx===-1) {
-                    console.log('Unknown mesh to attach movement to: '+movementDef.mesh);
-                    continue;
+                idxList=[];
+                
+                for (k=0;k!==movementDef.meshes.length;k++) {
+                    idx=this.map.meshList.find(movementDef.meshes[k]);
+                    if (idx===-1) {
+                        console.log('Unknown mesh to attach movement to: '+movementDef.meshes[k]);
+                        continue;
+                    }
+                    idxList.push(idx);
                 }
 
-                movement=new MovementClass(idx,movementDef.looping,movementDef.approachDistance);
+                movement=new MovementClass(idxList,movementDef.looping,movementDef.approachDistance);
 
                 for (k=0;k!==movementDef.moves.length;k++) {
                     moveDef=movementDef.moves[k];

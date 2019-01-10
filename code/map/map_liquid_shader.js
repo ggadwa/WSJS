@@ -10,6 +10,9 @@ export default class MapLiquidShaderClass extends ShaderClass
     {
         super(view);
         
+        this.vertexShaderURL='shaders/map_liquid.vert';
+        this.fragmentShaderURL='shaders/map_liquid.frag';
+        
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
 
@@ -18,26 +21,15 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.normalMatrixUniform=null;
         
         this.alphaUniform=null;
-       
-        this.finalInitCallback=null;
         
         Object.seal(this);
     }
     
         //
-        // initialize/release map liquid shader
+        // load finish
         //
 
-    initialize(callback)
-    {
-        this.finalInitCallback=callback;
-        
-            // load and compile the shader, requires callback
-
-        super.initialize('map_liquid',this.initialize2.bind(this));
-    }
-    
-    initialize2()
+    loadFinish()
     {
         let gl=this.view.gl;
 
@@ -59,13 +51,6 @@ export default class MapLiquidShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
         gl.useProgram(null);
-
-        this.finalInitCallback();
-    }
-
-    release()
-    {
-        super.release();
     }
 
         //

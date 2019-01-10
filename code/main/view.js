@@ -175,7 +175,7 @@ export default class ViewClass
         // initialize and release
         //
     
-    initialize(callback)
+    initialize()
     {
             // get the gl context
 
@@ -204,14 +204,11 @@ export default class ViewClass
         this.bitmapList=new BitmapListClass(this);
         this.bitmapList.initialize();
         
-            // load the shaders, this requires a callback
+            // shaders
             
         this.shaderList=new ShaderListClass(this);
-        this.shaderList.initialize(this.initialize2.bind(this,callback));
-    }
-    
-    initialize2(callback)
-    {
+        this.shaderList.initialize();
+        
             // create needed objects
             
         this.text=new TextClass(this);
@@ -233,10 +230,6 @@ export default class ViewClass
         this.uiHealthFrameRect.setFromValues(5,((this.high-5)-this.uiHealthHigh),25,(this.high-5));
         
         this.uiTintRect.setFromValues(0,0,this.wid,this.high);
-
-            // finally return to initialization process
-            
-        callback();
     }
 
     release()
@@ -245,6 +238,15 @@ export default class ViewClass
         this.interface.release();
         this.shaderList.release();
         this.bitmapList.release();
+    }
+    
+        //
+        // load the shaders
+        //
+        
+    async loadShaders(callback)
+    {
+        return(await this.shaderList.loadShaders(callback));
     }
     
         //

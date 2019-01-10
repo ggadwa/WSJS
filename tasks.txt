@@ -9,14 +9,47 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-0. shaders have callbacks, eliminate
+LAMP06 -> fire
 
-2e. get back to updateVertexesToPoseAndPosition
-3. sort the imported meshes by material
+
+2. will need rotational movement for doors (need offset from center)
+
+4. get back to updateVertexesToPoseAndPosition
+
 11. water texture is awful
 12. MESH_FLAG_ / collisions
-14. dungeon lights and doors and liquids
+14. dungeon lights and doors
+14a. dungeon flames by particles
 15. high->height
+16. shaders need to be dynamic and part of project
+
+fire particle setup
+
+<Particle name="Fire 1">
+<Settings count="10" time="1000" ambient="1" additive="true" chain="Fire 1 Reverse" />
+<Image file="particle_blob" count="4" time="100" loop="true" />
+<Trail count="0" step="0" reduce="1" />
+<Gravity start="-1.5" add="0" />
+<Size start="450" end="420" />
+<X offset="60" move="1" rot="0" rot_accel="0" />
+<Y offset="60" move="1" rot="0" rot_accel="0" />
+<Z offset="60" move="1" rot="0" rot_accel="0" />
+<Color start="FF0000" end="FF0000" />
+<Alpha start="0.8" end="0.8" />
+</Particle>
+<Particle name="Fire 2">
+<Settings count="10" time="1000" ambient="1" additive="true" chain="Fire 2 Reverse" />
+<Image file="particle_blob" count="4" time="100" loop="true" />
+<Trail count="0" step="0" reduce="1" />
+<Gravity start="-1.5" add="0" />
+<Size start="250" end="220" />
+<X offset="30" move="1" rot="0" rot_accel="0" />
+<Y offset="30" move="1" rot="0" rot_accel="0" />
+<Z offset="30" move="1" rot="0" rot_accel="0" />
+<Color start="FF7F00" end="FF7F00" />
+<Alpha start="0.4" end="0.4" />
+</Particle>
+
 
 
 - get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW

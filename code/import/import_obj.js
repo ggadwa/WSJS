@@ -178,16 +178,20 @@ export default class ImportObjClass
         }
     }
     
-    addMesh(groupName,bitmapName,meshVertices,meshIndexes)
+    addMesh(groupName,groupNameOffset,bitmapName,meshVertices,meshIndexes)
     {
+        let name;
         let bitmap=this.view.bitmapList.get(bitmapName);
         if (bitmap===undefined) {
             console.log('missing material: '+bitmapName);
             return;
         }
+        
+        name=groupName;
+        if (groupNameOffset!=0) name+=('_'+groupNameOffset);
 
         this.buildVertexListTangents(meshVertices,meshIndexes);
-        this.meshes.push(new MeshClass(this.view,groupName,bitmap,meshVertices,meshIndexes,0));
+        this.meshes.push(new MeshClass(this.view,name,bitmap,meshVertices,meshIndexes,0));
     }
     
         //
@@ -196,11 +200,12 @@ export default class ImportObjClass
         
     async import(meshList)
     {
-        let n,splitChar,tokens;
+        let n,k,splitChar,tokens;
         let x,y,z,normal;
-        let lastGroupName,lastMaterialName;
+        let lastGroupName,groupNameOffset,lastMaterialName;
         let posVertexIdx,posUVIdx,posNormalIdx;
         let meshVertices,meshIndexes;
+        let curBitmapName;
         
             // load the file
             
@@ -288,14 +293,16 @@ export default class ImportObjClass
         
         lastMaterialName=null;
         lastGroupName=null;
+        groupNameOffset=0;
             
         for (n=0;n!==this.lines.length;n++) {
             tokens=this.lines[n].split(' ');
             
             switch(tokens[0]) {
                 case 'g':
-                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,lastMaterialName,meshVertices,meshIndexes);
+                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
                     lastGroupName=tokens[1];
+                    groupNameOffset=0;
                     meshVertices=[];
                     meshIndexes=[];
                     break;
@@ -312,7 +319,10 @@ export default class ImportObjClass
                     this.addTrigsForFace(tokens,posVertexIdx,posUVIdx,posNormalIdx,meshVertices,meshIndexes);
                     break;
                 case 'usemtl':
-                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,lastMaterialName,meshVertices,meshIndexes);
+                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) {
+                        this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
+                        groupNameOffset++;      // new materials break meshes, so if we are under the same group name it needs a new _X value
+                    }
                     lastMaterialName=tokens[1];
                     meshVertices=[];
                     meshIndexes=[];
@@ -322,12 +332,23 @@ export default class ImportObjClass
         
             // and finally any current usemtl
             
-        if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,lastMaterialName,meshVertices,meshIndexes);
+        if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
         
-            // and sort meshes into mesh list
+            // and sort meshes by bitmaps into mesh list
             
         for (n=0;n!==this.meshes.length;n++) {
-            meshList.add(this.meshes[n]);
+            if (this.meshes[n]===null) continue;
+            
+            curBitmapName=this.meshes[n].bitmap.name;
+            
+            for (k=n;k<this.meshes.length;k++) {
+                if (this.meshes[k]===null) continue;
+                
+                if (this.meshes[k].bitmap.name===curBitmapName) {
+                    meshList.add(this.meshes[k]);
+                    this.meshes[k]=null;
+                }
+            }
         }
         
         return(true);

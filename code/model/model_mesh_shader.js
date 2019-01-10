@@ -12,6 +12,9 @@ export default class ModelMeshShaderClass extends ShaderClass
     {
         super(view);
         
+        this.vertexShaderURL='shaders/model_mesh.vert';
+        this.fragmentShaderURL='shaders/model_mesh.frag';
+        
         this.vertexPositionAttribute=null;
         this.vertexNormalAttribute=null;
         this.vertexTangentAttribute=null;    
@@ -27,25 +30,14 @@ export default class ModelMeshShaderClass extends ShaderClass
 
         this.lights=[];
         
-        this.finalInitCallback=null;
-        
         Object.seal(this);
     }
     
         //
-        // initialize/release model shader
+        // load finish
         //
 
-    initialize(callback)
-    {
-        this.finalInitCallback=callback;
-        
-            // load and compile the shader, requires callback
-        
-        super.initialize('model_mesh',this.initialize2.bind(this));
-    }
-    
-    initialize2()
+    loadFinish()
     {
         let n,name;
         let gl=this.view.gl;
@@ -83,13 +75,6 @@ export default class ModelMeshShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'glowTex'),3);
 
         gl.useProgram(null);
-
-        this.finalInitCallback();
-    }
-
-    release()
-    {
-        super.release();
     }
     
         //

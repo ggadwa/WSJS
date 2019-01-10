@@ -36,64 +36,63 @@ export default class ShaderListClass
         // there isn't a asynch way to load the files
         //
     
-    initialize(callback)
+    initialize()
     {
-        this.finalInitCallback=callback;
-        
-        this.initializeMapMeshShader();
+        this.mapMeshShader=null;
+        this.mapLiquidShader=null;
+        this.skyShader=null;
+        this.modelMeshShader=null;
+        this.particleShader=null;
+        this.interfaceShader=null;
+        this.textShader=null;
     }
     
-    initializeMapMeshShader()
-    {
-        this.mapMeshShader=new MapMeshShaderClass(this.view);
-        this.mapMeshShader.initialize(this.initializeMapLiquidShader.bind(this));
-    }
-    
-    initializeMapLiquidShader()
-    {
-        this.mapLiquidShader=new MapLiquidShaderClass(this.view);
-        this.mapLiquidShader.initialize(this.initializeSkyShader.bind(this));
-    }
-    
-    initializeSkyShader()
-    {
-        this.skyShader=new SkyShaderClass(this.view);
-        this.skyShader.initialize(this.initializeModelMeshShader.bind(this));
-    }
-    
-    initializeModelMeshShader()
-    {            
-        this.modelMeshShader=new ModelMeshShaderClass(this.view);
-        this.modelMeshShader.initialize(this.initializeParticleShader.bind(this));
-    }
-    
-    initializeParticleShader()
-    {            
-        this.particleShader=new ParticleShaderClass(this.view);
-        this.particleShader.initialize(this.initializeInterfaceShader.bind(this));
-    }
-    
-    initializeInterfaceShader()
-    {            
-        this.interfaceShader=new InterfaceShaderClass(this.view);
-        this.interfaceShader.initialize(this.initializeTextShader.bind(this));
-    }
-    
-    initializeTextShader()
-    {        
-        this.textShader=new TextShaderClass(this.view);
-        this.textShader.initialize(this.finalInitCallback);
-    }
     
     release()
     {
-        this.mapMeshShader.release();
-        this.mapLiquidShader.release();
-        this.skyShader.release();
-        this.modelMeshShader.release();
-        this.particleShader.release();
-        this.interfaceShader.release();
-        this.textShader.release();
+        if (this.mapMeshShader!==null) this.mapMeshShader.release();
+        if (this.mapLiquidShader!==null) this.mapLiquidShader.release();
+        if (this.skyShader!==null) this.skyShader.release();
+        if (this.modelMeshShader!==null) this.modelMeshShader.release();
+        if (this.particleShader!==null) this.particleShader.release();
+        if (this.interfaceShader!==null) this.interfaceShader.release();
+        if (this.textShader!==null) this.textShader.release();
     }
+    
+        //
+        // load shaders
+        //
+        
+    async loadShaders()
+    {
+        this.mapMeshShader=new MapMeshShaderClass(this.view);
+        this.mapMeshShader.initialize();
+        if (!(await this.mapMeshShader.load())) return(false);
+
+        this.mapLiquidShader=new MapLiquidShaderClass(this.view);
+        this.mapLiquidShader.initialize();
+        if (!(await this.mapLiquidShader.load())) return(false);
+
+        this.skyShader=new SkyShaderClass(this.view);
+        this.skyShader.initialize();
+        if (!(await this.skyShader.load())) return(false);
+    
+        this.modelMeshShader=new ModelMeshShaderClass(this.view);
+        this.modelMeshShader.initialize();
+        if (!(await this.modelMeshShader.load())) return(false);
+           
+        this.particleShader=new ParticleShaderClass(this.view);
+        this.particleShader.initialize();
+        if (!(await this.particleShader.load())) return(false);
+            
+        this.interfaceShader=new InterfaceShaderClass(this.view);
+        this.interfaceShader.initialize();
+        if (!(await this.interfaceShader.load())) return(false);
+      
+        this.textShader=new TextShaderClass(this.view);
+        this.textShader.initialize();
+        return(await this.textShader.load());
+    }
+
 
 }

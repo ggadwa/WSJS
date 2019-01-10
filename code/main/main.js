@@ -7,9 +7,6 @@ import InputClass from '../../code/main/input.js';
 import SoundClass from '../../code/sound/sound.js';
 import genRandom from '../../code/utility/random.js';
 import GameClass from '../../data/scripts/game.js';
-import PlayerClass from '../../data/scripts/player.js';
-import CyborgClass from '../../data/scripts/cyborg.js';
-import BarrelClass from '../../data/scripts/barrel.js';
 
 //
 // main class
@@ -39,23 +36,21 @@ class MainClass
         setTimeout(this.initView.bind(this),1);
     }
 
-    initView()
+    async initView()
     {
             // print out the key incase we have
             // trouble so we don't lose it
             
         console.log('Seed:'+config.SEED);
          
-           // init view ang webgl
+           // init view
         
-        this.view.initialize(this.initViewFinish.bind(this));
-    }
-    
-    initViewFinish()
-    {
+        this.view.initialize();
+        if (!(await this.view.loadShaders())) return;
+
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Initializing Internal Structures');
-        this.view.loadingScreenDraw(null);
+        this.view.loadingScreenDraw(0.25);
 
         setTimeout(this.initInternal.bind(this),1);
     }
@@ -69,7 +64,7 @@ class MainClass
 
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Importing Map');
-        this.view.loadingScreenDraw(null);
+        this.view.loadingScreenDraw(0.5);
 
         setTimeout(this.initLoadMap.bind(this),1);
     }
@@ -86,7 +81,7 @@ class MainClass
     {
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Building Collision Geometry');
-        this.view.loadingScreenDraw(null);
+        this.view.loadingScreenDraw(0.75);
 
         setTimeout(this.initBuildCollisionGeometry.bind(this),1);
     }
@@ -101,39 +96,14 @@ class MainClass
 
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Generating Player');
-        this.view.loadingScreenDraw(null);
+        this.view.loadingScreenDraw(0.8);
 
         setTimeout(this.initBuildEntities.bind(this),1);
     }
 
     async initBuildEntities()
     {
-        let entity;
-        
-            // the player entity
-            
-        entity=new PlayerClass(this.view,this.map,'player',2000,5000);
-        entity.initialize();
-        if (!(await entity.loadModel())) return;
-        this.projectMap.setupPlayer(entity);
-        entity.setCurrentWeaponIndex(0);
-        this.map.entityList.setPlayer(entity);
-        
-            // test entity 1
-           
-        entity=new CyborgClass(this.view,this.map,'monster',2000,5000);
-        entity.initialize();
-        if (!(await entity.loadModel())) return;
-        entity.position.setFromValues(0,-17200,19000)
-        this.map.entityList.add(entity);
-        
-            // test entity 2
-            
-        entity=new BarrelClass(this.view,this.map,'barrel',1000,2000);
-        entity.initialize();
-        if (!(await entity.loadModel())) return;
-        entity.position.setFromValues(8000,-17200,19000)
-        this.map.entityList.add(entity);
+        if (!(await this.projectMap.loadEntities())) return;
         
         this.initFinish();
     }
