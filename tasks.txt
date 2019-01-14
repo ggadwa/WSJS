@@ -9,19 +9,23 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-LAMP06 -> fire
-
+1. effect engine
+    1a. effect drawing
+    1b. effect lighting
+    1c. particle shader -> effect shader
 
 2. will need rotational movement for doors (need offset from center)
 
 4. get back to updateVertexesToPoseAndPosition
 
-11. water texture is awful
+5. entity -> project_entity
+6. remove all particle stuff
+
 12. MESH_FLAG_ / collisions
-14. dungeon lights and doors
-14a. dungeon flames by particles
+
 15. high->height
 16. shaders need to be dynamic and part of project
+17. red_crystall fix double L in dungeon obj
 
 fire particle setup
 

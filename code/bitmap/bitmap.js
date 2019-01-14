@@ -60,8 +60,39 @@ export default class BitmapClass
     }
     
         //
-        // glow map utilities
+        // bitmap utilities
         //
+        
+    checkImageForAlpha(img)
+    {
+        let n,nPixel,idx,hasAlpha;
+        let canvas,ctx,imgData,data;
+        
+            // draw the image onto a canvas
+            // and then check for alpha
+            
+        canvas=document.createElement('canvas');
+        canvas.width=img.width;
+        canvas.height=img.height;
+        ctx=canvas.getContext('2d');
+        
+        ctx.drawImage(img,0,0);
+
+	imgData=ctx.getImageData(0,0,img.width,img.height);
+        data=imgData.data;
+        
+        nPixel=img.width*img.height;
+        idx=0;
+        
+        hasAlpha=false;
+        
+        for (n=0;n!=nPixel;n++) {
+            idx+=3;
+            if (data[idx++]!==255) return(true);
+        }
+        
+        return(false);
+    }
         
     createEmptyGlowMapImage()
     {
@@ -116,6 +147,7 @@ export default class BitmapClass
     
     async load()
     {
+        let hasAlpha;
         let gl=this.view.gl;
         
             // color bitmap
@@ -137,10 +169,14 @@ export default class BitmapClass
                 );
         
         if (this.colorImage===null) return(false);
+        
+            // detect if there is any alpha
+            
+        hasAlpha=this.checkImageForAlpha(this.colorImage);
 
         this.texture=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
-        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.colorImage);
+        gl.texImage2D(gl.TEXTURE_2D,0,(hasAlpha?gl.RGBA:gl.RGB),(hasAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);

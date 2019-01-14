@@ -63,12 +63,12 @@ class MainClass
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Importing Map');
-        this.view.loadingScreenDraw(0.5);
+        this.view.loadingScreenAddString('Game Setup');
+        this.view.loadingScreenDraw(0.3);
 
         setTimeout(this.initLoadMap.bind(this),1);
     }
-
+    
     async initLoadMap()
     {
         this.projectMap.initialize();

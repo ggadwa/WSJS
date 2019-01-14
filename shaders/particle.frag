@@ -9,7 +9,9 @@ out lowp vec4 outputPixel;
 
 void main(void)
 {
-    lowp float r=texture(baseTex,fragUV).r;   // red component is used as a mask
-    outputPixel=colorAlpha*r;
+    lowp vec4 tex=texture(baseTex,fragUV);
+
+    outputPixel.rgb=colorAlpha.rgb*tex.r;   // red component is used as a mask
+    outputPixel.a=tex.a*colorAlpha.a;
 }
 

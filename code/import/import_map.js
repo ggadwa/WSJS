@@ -15,9 +15,10 @@ export default class ImportMapClass
         this.map=map;
     }
     
-    async load(name,scale,flipY,skyBoxSettings,lightSettings,glowSettings,liquidSettings,movementSettings)
+    async load(name,scale,flipY,skyBoxSettings,lightSettings,glowSettings,effectSettings,liquidSettings,movementSettings)
     {
         let n,k,idx;
+        let effect,effectDef,effectPos;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
         let movement,idxList,movementDef,moveDef;
@@ -27,7 +28,27 @@ export default class ImportMapClass
         importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY);
         if (!(await importObj.import(this.map.meshList))) return(false);
         
-            // add in any liquid or sky textures so
+            // run through the effects so bitmaps get into list
+            
+        if (effectSettings!==null) {
+            for (n=0;n!==effectSettings.effects.length;n++) {
+                effectDef=effectSettings.effects[n];
+                
+                idx=this.map.meshList.find(effectDef.mesh);
+                if (idx===-1) {
+                    console.log('Unknown mesh to attach light to: '+lightDef.mesh);
+                    continue;
+                }
+                
+                effectPos=new PointClass(effectDef.offset.x,effectDef.offset.y,effectDef.offset.z);
+                effectPos.addPoint(this.map.meshList.meshes[idx].center);
+                
+                effect=new effectDef.class(this.view,this.map,effectPos);
+                this.map.effectList.add(effectDef.name,effect);
+            }
+        }
+        
+            // add in any liquid,and sky bitmaps
             // they get loaded
             
         if (liquidSettings!==null) {

@@ -587,7 +587,7 @@ export default class ViewClass
         this.lights=[];
 
         map.lightList.addLightsToViewLights();
-        map.particleList.addLightsToViewLights();
+        map.effectList.addLightsToViewLights();
         
             // fill in any missing lights with NULL
 
@@ -624,7 +624,7 @@ export default class ViewClass
         map.entityList.draw();
         map.meshList.drawTransparent();
         map.liquidList.draw();
-        map.particleList.draw();
+        map.effectList.draw();
       
             // player weapon
          
