@@ -7,9 +7,10 @@ import MoveClass from '../../code/map/move.js';
 
 export default class MovementClass
 {
-    constructor(meshIdxList,looping,approachDistance)
+    constructor(meshIdxList,rotateOffset,looping,approachDistance)
     {
         this.meshIdxList=meshIdxList;
+        this.rotateOffset=rotateOffset;
         this.looping=looping;
         this.approachDistance=approachDistance;
         
@@ -19,9 +20,14 @@ export default class MovementClass
         this.moving=looping;            // looping movements are always moving
         
         this.originalCenterPnt=null;
+        
         this.movePnt=new PointClass(0,0,0);
-        this.nextOffsetPnt=new PointClass(0,0,0);
-        this.lastOffsetPnt=new PointClass(0,0,0);
+        this.nextMovePnt=new PointClass(0,0,0);
+        this.lastMovePnt=new PointClass(0,0,0);
+        
+        this.rotateAng=new PointClass(0,0,0);
+        this.nextRotateAng=new PointClass(0,0,0);
+        this.lastRotateAng=new PointClass(0,0,0);
         
         this.moves=[];
         
@@ -121,19 +127,25 @@ export default class MovementClass
         prevIdx--;
         if (prevIdx<0) prevIdx=this.moves.length-1;
         
-        this.nextOffsetPnt.tween(this.moves[prevIdx].movePnt,move.movePnt,f);
-        this.nextOffsetPnt.trunc();         // stops these calculations from messing with the collisions because of float slop
+        this.nextMovePnt.tween(this.moves[prevIdx].movePnt,move.movePnt,f);
+        this.nextMovePnt.trunc();         // stops these calculations from messing with the collisions because of float slop
         
-            // move is change from last move
+        this.nextRotateAng.tween(this.moves[prevIdx].rotateAngle,move.rotateAngle,f);
+        
+            // moves and rotates are changes from last move
             
-        this.movePnt.setFromSubPoint(this.nextOffsetPnt,this.lastOffsetPnt);
-        this.lastOffsetPnt.setFromPoint(this.nextOffsetPnt);
+        this.movePnt.setFromSubPoint(this.nextMovePnt,this.lastMovePnt);
+        this.lastMovePnt.setFromPoint(this.nextMovePnt);
+        
+        this.rotateAng.setFromSubPoint(this.nextRotateAng,this.lastRotateAng);
+        this.lastRotateAng.setFromPoint(this.nextRotateAng);
         
             // do the moves
         
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshList.get(this.meshIdxList[n]);
-            mesh.move(this.movePnt);
+            if (!this.movePnt.isZero()) mesh.move(this.movePnt);
+            if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.rotateOffset);
             map.entityList.movementPush(this.meshIdxList[n],this.movePnt);
         }
     }

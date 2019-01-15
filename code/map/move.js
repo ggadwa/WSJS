@@ -4,10 +4,11 @@
 
 export default class MoveClass
 {
-    constructor(lifeTick,movePnt)
+    constructor(lifeTick,movePnt,rotateAngle)
     {
         this.lifeTick=lifeTick;
         this.movePnt=movePnt;
+        this.rotateAngle=rotateAngle;
     }
     
 }

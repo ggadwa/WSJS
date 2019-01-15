@@ -62,7 +62,8 @@ export default class MeshClass
             // marks if the vertices have changed
             // and a buffer update is required
             
-        this.requiresBufferUpdate=false;
+        this.requiresVertexBufferUpdate=false;
+        this.requiresNormalBufferUpdate=false;
         
             // setup the bounds
         
@@ -74,6 +75,8 @@ export default class MeshClass
         this.rotNormal=new PointClass(0.0,0.0,0.0);
         this.parentRotVector=new PointClass(0.0,0.0,0.0);
         this.parentRotNormal=new PointClass(0.0,0.0,0.0);
+        
+        this.rotCenterPnt=new PointClass(0.0,0.0,0.0);
         
         Object.seal(this);
     }
@@ -297,7 +300,7 @@ export default class MeshClass
     }
     
         //
-        // move mesh
+        // move or rotate mesh
         //
         
     move(movePnt)
@@ -341,7 +344,52 @@ export default class MeshClass
             // and mark as requiring a
             // gl buffer update when drawing
             
-        this.requiresBufferUpdate=true;
+        this.requiresVertexBufferUpdate=true;
+    }
+    
+    rotate(rotateAngle,offsetPnt)
+    {
+        let n,v;
+        
+            // have to rebuild the bounds during rotate
+            // note: for now we don't move the center
+            // as it'll mess up the rotation
+            
+        v=this.vertexList[0];
+        
+        this.xBound.setFromValues(v.position.x,v.position.x);
+        this.yBound.setFromValues(v.position.y,v.position.y);
+        this.zBound.setFromValues(v.position.z,v.position.z);
+        
+            // rotate the vertexes
+            
+        this.rotCenterPnt.setFromAddPoint(this.center,offsetPnt);
+        
+        for (n=0;n!==this.vertexCount;n++) {
+            v=this.vertexList[n];
+            
+                // the point
+                
+            this.rotVector.setFromSubPoint(v.position,this.rotCenterPnt);
+            this.rotVector.rotate(rotateAngle);
+            v.position.setFromAddPoint(this.rotCenterPnt,this.rotVector);
+            
+                // the normal
+                
+            v.normal.rotate(rotateAngle);
+            
+                // rebuild the bounds while here
+                
+            this.xBound.adjust(v.position.x);
+            this.yBound.adjust(v.position.y);
+            this.zBound.adjust(v.position.z);
+        }
+        
+            // and mark as requiring a
+            // gl buffer update when drawing
+            
+        this.requiresVertexBufferUpdate=true;
+        this.requiresNormalBufferUpdate=true;
     }
     
         //
@@ -451,7 +499,7 @@ export default class MeshClass
     
         //
         // update buffers
-        // this happens when a mao mesh is moved, and flagged to get
+        // this happens when a map mesh is moved, and flagged to get
         // updated.  We only do this when the mesh is drawn so we don't
         // update uncessarly
         //
@@ -461,26 +509,49 @@ export default class MeshClass
         let n,v,vIdx;
         let gl=this.view.gl;
         
-        if (!this.requiresBufferUpdate) return;
-        
-            // update buffer
-        
-        vIdx=0;
-        
-        for (n=0;n!==this.vertexCount;n++) {
-            v=this.vertexList[n];
+            // vertex buffer updates
             
-            this.drawVertices[vIdx++]=v.position.x;
-            this.drawVertices[vIdx++]=v.position.y;
-            this.drawVertices[vIdx++]=v.position.z;
+        if (this.requiresVertexBufferUpdate) {
+        
+            vIdx=0;
+
+            for (n=0;n!==this.vertexCount;n++) {
+                v=this.vertexList[n];
+
+                this.drawVertices[vIdx++]=v.position.x;
+                this.drawVertices[vIdx++]=v.position.y;
+                this.drawVertices[vIdx++]=v.position.z;
+            }
+
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+
+                // mark as updated
+
+            this.requiresVertexBufferUpdate=false;
         }
+        
+             // normal buffer updates
+            
+        if (this.requiresNormalBufferUpdate) {
+        
+            vIdx=0;
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+            for (n=0;n!==this.vertexCount;n++) {
+                v=this.vertexList[n];
 
-            // mark as updated
+                this.drawNormals[vIdx++]=v.normal.x;
+                this.drawNormals[vIdx++]=v.normal.y;
+                this.drawNormals[vIdx++]=v.normal.z;
+            }
 
-        this.requiresBufferUpdate=false;
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+
+                // mark as updated
+
+            this.requiresNormalBufferUpdate=false;
+        }
     }
     
         //

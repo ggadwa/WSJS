@@ -21,7 +21,7 @@ export default class ImportMapClass
         let effect,effectDef,effectPos;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
-        let movement,idxList,movementDef,moveDef;
+        let movement,idxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset;
         let glowDef,bitmap;
         let importObj;
         
@@ -118,12 +118,22 @@ export default class ImportMapClass
                     }
                     idxList.push(idx);
                 }
+                    
+                rotateOffset=new PointClass(0,0,0);
+                if (movementDef.rotateOffset!==undefined) rotateOffset.setFromValues(movementDef.rotateOffset.x,movementDef.rotateOffset.y,movementDef.rotateOffset.z);
 
-                movement=new MovementClass(idxList,movementDef.looping,movementDef.approachDistance);
+                movement=new MovementClass(idxList,rotateOffset,movementDef.looping,movementDef.approachDistance);
 
                 for (k=0;k!==movementDef.moves.length;k++) {
                     moveDef=movementDef.moves[k];
-                    movement.addMove(new MoveClass(moveDef.tick,new PointClass(moveDef.move.x,moveDef.move.y,moveDef.move.z)));
+                    
+                    movePoint=new PointClass(0,0,0);
+                    if (moveDef.move!==undefined) movePoint.setFromValues(moveDef.move.x,moveDef.move.y,moveDef.move.z);
+                    
+                    moveRotate=new PointClass(0,0,0);
+                    if (moveDef.rotate!==undefined) moveRotate.setFromValues(moveDef.rotate.x,moveDef.rotate.y,moveDef.rotate.z);
+                    
+                    movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate));
                 }
 
                 this.map.movementList.add(movement);

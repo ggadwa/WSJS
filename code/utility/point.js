@@ -484,6 +484,11 @@ export default class PointClass
         if (this.z<pt.z) this.z=pt.z;
     }
     
+    isZero()
+    {
+        return((this.x===0) && (this.y===0) && (this.z===0));
+    }
+    
     copy()
     {
         return(new PointClass(this.x,this.y,this.z));

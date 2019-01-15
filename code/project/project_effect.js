@@ -1,3 +1,5 @@
+import PointClass from '../../code/utility/point.js';
+
 export default class ProjectEffectClass
 {
     constructor(view,map,position)
@@ -5,6 +7,8 @@ export default class ProjectEffectClass
         this.view=view;
         this.map=map;
         this.position=position;
+        
+        this.tempPoint=new PointClass(0,0,0);
     }
     
     initialize()
@@ -26,13 +30,99 @@ export default class ProjectEffectClass
         return(this.view.bitmapList.get(name));
     }
     
+    addBillboardQuadToGLList(centerPnt,u,v,uSize,vSize,halfWid,halfHigh,vIdx,vertices,uvIdx,uvs,iIdx,indexes,elementIdx)
+    {
+            // top left
+            
+        this.tempPoint.x=-halfWid;
+        this.tempPoint.y=-halfHigh;
+        this.tempPoint.z=0.0;
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
+        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
+        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+
+        uvs[uvIdx++]=u;
+        uvs[uvIdx++]=v;
+
+            // top right
+            
+        this.tempPoint.x=halfWid;
+        this.tempPoint.y=-halfHigh;
+        this.tempPoint.z=0.0;
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
+        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
+        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+
+        uvs[uvIdx++]=u+uSize;
+        uvs[uvIdx++]=v;
+
+            // bottom right
+            
+        this.tempPoint.x=halfWid;
+        this.tempPoint.y=halfHigh;
+        this.tempPoint.z=0.0;
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
+        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
+        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+
+        uvs[uvIdx++]=u+uSize;
+        uvs[uvIdx++]=v+vSize;
+
+            // bottom left
+            
+        this.tempPoint.x=-halfWid;
+        this.tempPoint.y=halfHigh;
+        this.tempPoint.z=0.0;
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
+        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
+        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+
+        uvs[uvIdx++]=u;
+        uvs[uvIdx++]=v+vSize;
+
+            // build the triangles
+
+        indexes[iIdx++]=elementIdx;     // triangle 1
+        indexes[iIdx++]=elementIdx+1;
+        indexes[iIdx++]=elementIdx+2;
+
+        indexes[iIdx++]=elementIdx;     // triangle 2
+        indexes[iIdx++]=elementIdx+2;
+        indexes[iIdx++]=elementIdx+3;
+    }
+    
         //
-        // override this if the effect needs to add
-        // a light to the current frame
+        // override this if the effect projects and
+        // light.  Return a lightclass (type to precalc if you
+        // can.)  Default retuns NULL, which means no light
         //
         
-    addFrameLight()
+    getLight()
     {
+        return(null);
+    }
+    
+        //
+        // override this to return TRUE if effect is in
+        // view, the default is TRUE, you should always
+        // override this to improve performance
+        //
+        
+    isInView()
+    {
+        return(true);
     }
     
         //
@@ -40,7 +130,7 @@ export default class ProjectEffectClass
         // the frame
         //
         
-    frameDraw()
+    draw()
     {
     }
 }
