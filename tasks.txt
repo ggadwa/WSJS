@@ -12,12 +12,11 @@ WebGL2
 1. make a particle effect, then remove old particle effect
    1b. particle shader -> effect shader
 
-3. lighting fails when too many lights
-
 4. get back to updateVertexesToPoseAndPosition
 5. entity -> project_entity
 6. remove all particle stuff
 12. MESH_FLAG_ / collisions
+    12a. remove all old collision stuff
 15. high->height
 16. shaders need to be dynamic and part of project
 

@@ -56,7 +56,7 @@ export default class MapEffectListClass
     addLightsToViewLights()
     {
         let effect,light;
-        let n,x,y,z,dist,idx;
+        let n,x,y,z,idx;
         
         for (effect of this.effects.values()) {
             light=effect.getLight();
@@ -72,7 +72,7 @@ export default class MapEffectListClass
             x=this.view.camera.position.x-light.position.x;
             y=this.view.camera.position.y-light.position.y;
             z=this.view.camera.position.z-light.position.z;
-            dist=Math.sqrt((x*x)+(y*y)+(z*z));
+            light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
                 
             idx=-1;
 

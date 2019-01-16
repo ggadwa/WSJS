@@ -2,11 +2,12 @@ import PointClass from '../../code/utility/point.js';
 
 export default class ProjectEffectClass
 {
-    constructor(view,map,position)
+    constructor(view,map,position,data)
     {
         this.view=view;
         this.map=map;
         this.position=position;
+        this.data=data;
         
         this.tempPoint=new PointClass(0,0,0);
     }
