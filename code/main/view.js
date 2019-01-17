@@ -1,6 +1,7 @@
 import * as constants from '../../code/main/constants.js';
 import config from '../../code/main/config.js';
 import BitmapListClass from '../../code/bitmap/bitmap_list.js';
+import SoundListClass from '../../code/sound/sound_list.js';
 import ShaderListClass from '../../code/shader/shader_list.js';
 import PointClass from '../../code/utility/point.js';
 import RectClass from '../../code/utility/rect.js';
@@ -23,6 +24,7 @@ export default class ViewClass
         this.gl=null;
         this.canvas=null;
         this.bitmapList=null;
+        this.soundList=null;
         this.shaderList=null;
         
             // pause flag
@@ -198,13 +200,17 @@ export default class ViewClass
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
         
-            // initialize the bitmap list, this
-            // is used to keep track of bitmaps
+            // bitmap list
             
         this.bitmapList=new BitmapListClass(this);
         this.bitmapList.initialize();
         
-            // shaders
+            // sound list
+            
+        this.soundList=new SoundListClass(this);
+        this.soundList.initialize();
+        
+            // shader list
             
         this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize();
@@ -237,6 +243,7 @@ export default class ViewClass
         this.text.release();
         this.interface.release();
         this.shaderList.release();
+        this.soundList.release();
         this.bitmapList.release();
     }
     

@@ -95,10 +95,10 @@ export default class EntityClass
     }
     
         //
-        // loading model
+        // loading resources
         //
         
-    async loadModel()
+    async loadResources()
     {
     }
     

@@ -63,8 +63,8 @@ class MainClass
             // next step
 
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Game Setup');
-        this.view.loadingScreenDraw(0.3);
+        this.view.loadingScreenAddString('Loading Map');
+        this.view.loadingScreenDraw(0.1);
 
         setTimeout(this.initLoadMap.bind(this),1);
     }
@@ -74,38 +74,55 @@ class MainClass
         this.projectMap.initialize();
         if (!(await this.projectMap.loadMap())) return;
         
-        setTimeout(this.initBuildMapFinish.bind(this),1);
-    }
-
-    initBuildMapFinish()
-    {
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Building Collision Geometry');
-        this.view.loadingScreenDraw(0.75);
-
-        setTimeout(this.initBuildCollisionGeometry.bind(this),1);
+        this.view.loadingScreenAddString('Building Collision Geomtry');
+        this.view.loadingScreenDraw(0.2);
+        
+        setTimeout(this.initCollisionGeomtry.bind(this),1);
     }
-
-    initBuildCollisionGeometry()
+    
+    initCollisionGeomtry()
     {
-            // build the collision geometry
-
-        //this.map.meshList.buildCollisionGeometry();
-
-            // next step
-
+        this.map.meshList.buildCollisionGeometry();
+        
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Generating Player');
-        this.view.loadingScreenDraw(0.8);
-
-        setTimeout(this.initBuildEntities.bind(this),1);
+        this.view.loadingScreenAddString('Loading Entities');
+        this.view.loadingScreenDraw(0.3);
+        
+        setTimeout(this.initLoadEntities.bind(this),1);
     }
 
-    async initBuildEntities()
+    async initLoadEntities()
     {
         if (!(await this.projectMap.loadEntities())) return;
         
-        this.initFinish();
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Loading Images');
+        this.view.loadingScreenDraw(0.4);
+        
+        setTimeout(this.initLoadImages.bind(this),1);
+    }
+    
+    async initLoadImages()
+    {
+        if (!(await this.view.bitmapList.loadAllBitmaps())) return;
+        
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Loading Sounds');
+        this.view.loadingScreenDraw(0.9);
+
+        setTimeout(this.initLoadSounds.bind(this),1);
+    }
+    
+    async initLoadSounds()
+    {
+        if (!(await this.view.soundList.loadAllSounds())) return;
+        
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Preparing to Run');
+        this.view.loadingScreenDraw(0.9);
+
+        setTimeout(this.initFinish.bind(this),1);
     }
     
     initFinish()
@@ -117,7 +134,7 @@ class MainClass
         
             // set the listener to this entity
             
-        this.sound.setListenerToEntity(this.map.entityList.getPlayer());
+        this.view.soundList.setListenerToEntity(this.map.entityList.getPlayer());
 
             // start the input
 
@@ -200,7 +217,7 @@ function mainLoop(timeStamp)
                 // update the listener and all current
                 // playing sound positions
                 
-            sound.update();
+            view.soundList.updateListener();
         }
     }
     

@@ -126,9 +126,6 @@ export default class MeshListClass
         let n;
         let nMesh=this.meshes.length;
 
-            // setup all the gl
-            // buffers and indexes
-
         for (n=0;n!==nMesh;n++) {
             this.meshes[n].buildCollisionGeometry();
         }

@@ -1,5 +1,4 @@
 import PointClass from '../../code/utility/point.js';
-import SoundPlayListClass from '../../code/sound/sound_play_list.js';
 
 //
 // sound class
@@ -7,15 +6,15 @@ import SoundPlayListClass from '../../code/sound/sound_play_list.js';
 
 export default class SoundClass
 {
-    constructor()
+    constructor(view,ctx,name,maxDistance)
     {
-        this.ctx=null;
-        this.listener=null;
-
-        this.soundPlayList=null;
+        this.view=view;
+        this.ctx=ctx;
+        this.name=name;
+        this.maxDistance=maxDistance;
         
-        this.currentListenerEntity=null;
-        this.listenerForwardVector=new PointClass(0.0,0.0,1.0);            // local to global to avoid GC
+        this.buffer=null;
+        this.loaded=false;
         
         Object.seal(this);
     }
@@ -26,91 +25,82 @@ export default class SoundClass
         
     initialize()
     {
-            // initialize the audio context
-            
-        let initAudioContext=window.AudioContext||window.webkitAudioContext;
-        this.ctx=new initAudioContext();
-        
-        if (this.ctx===null) {
-            alert('Could not initialize audio context');
-            return(false);
-        }
-        
-            // and the sound play list
-        
-        this.soundPlayList=new SoundPlayListClass();
-        if (!this.soundPlayList.initialize()) return(false);
-        
-            // get a reference to the listener
-            
-        this.listener=this.ctx.listener;
+        this.buffer=null;
+        this.loaded=false;
         
         return(true);
     }
     
     release()
     {
-       this.soundPlayList.release();
+        this.buffer=null;
+        this.loaded=false;
     }
     
         //
-        // utilities
+        // load wav file
         //
         
-    getAudioContext()
+    async loadWAV()
     {
-        return(this.ctx);
-    }
-    
-        //
-        // setup listener
-        //
+        let resp;
+        let url='./data/sounds/'+this.name+'.wav';
         
-    setListenerToEntity(entity)
-    {
-        this.currentListenerEntity=entity;
-    }
-    
-        //
-        // play a sound
-        //
-        
-    play(entity,buffer)
-    {
-        this.soundPlayList.startSoundPlay(this.ctx,this.currentListenerEntity,entity,buffer);
-    }
-        
-        //
-        // update sounds
-        //
-    
-    update()
-    {
-        if (this.listener===null) return;
-        
-            // update listener
-            
-        this.listenerForwardVector.setFromValues(0.0,0.0,-1.0);
-        this.listenerForwardVector.rotateY(null,this.currentListenerEntity.angle.y);
-        
-        if (this.listener.positionX) {
-            this.listener.positionX.value=this.currentListenerEntity.position.x;
-            this.listener.positionY.value=this.currentListenerEntity.position.y;
-            this.listener.positionZ.value=this.currentListenerEntity.position.z;
-            this.listener.forwardX.value=this.listenerForwardVector.x;
-            this.listener.forwardY.value=this.listenerForwardVector.y;
-            this.listener.forwardZ.value=this.listenerForwardVector.z;
-            this.listener.upX.value=0.0;
-            this.listener.upY.value=1.0;
-            this.listener.upZ.value=0.0;
+        try {
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
+            return(await resp.arrayBuffer());
         }
-        else {      // supergumba -- remove all this when firefox stops being stupid
-            this.listener.setPosition(this.currentListenerEntity.position.x,this.currentListenerEntity.position.y,this.currentListenerEntity.position.z);
-            this.listener.setOrientation(this.listenerForwardVector.x,this.listenerForwardVector.y,this.listenerForwardVector.z,0.0,1.0,0.0);
+        catch (e) {
+            return(Promise.reject('Unable to load '+url+'; '+e.message));
         }
-        
-            // update all playing sounds
-            
-        this.soundPlayList.updateSoundPlays(this.currentListenerEntity);
     }
+    
+    async load()
+    {
+        let data=null;
+        
+            // load the wav file
+            
+        await this.loadWAV()
+            .then
+                (
+                        // resolved
+                
+                    value=>{
+                        data=value;
+                    },
+                    
+                        // rejected
+                        
+                    err=>{
+                        console.log(err);
+                    }
+                );
+
+        if (data==null) return(false);
+        
+           // decode the wav file to get an audio buffer
+           
+        this.buffer=null;
+        
+        await this.ctx.decodeAudioData(data)
+            .then
+                (
+                        // resolved
+                
+                    decodedData=>{
+                        this.buffer=decodedData;
+                    },
+                            
+                        // rejected
+                        
+                    ()=>{
+                        console.log('Unable to decode wav file '+this.name);
+                    }
+                );
+        
+        return(this.buffer!==null);
+    }
+    
 }

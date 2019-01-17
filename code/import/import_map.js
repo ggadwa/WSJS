@@ -25,7 +25,7 @@ export default class ImportMapClass
         let glowDef,bitmap;
         let importObj;
         
-        importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY);
+        importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY,false);
         if (!(await importObj.import(this.map.meshList))) return(false);
         
             // run through the effects so bitmaps get into list
@@ -47,26 +47,6 @@ export default class ImportMapClass
                 this.map.effectList.add(effectDef.name,effect);
             }
         }
-        
-            // add in any liquid,and sky bitmaps
-            // they get loaded
-            
-        if (liquidSettings!==null) {
-            for (n=0;n!==liquidSettings.liquids.length;n++) {
-                this.view.bitmapList.add(liquidSettings.liquids[n].bitmap,true);
-            }
-        }
-        
-        if (skyBoxSettings!==null) {
-            this.view.bitmapList.add(skyBoxSettings.bitmapNegX,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapPosX,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapNegY,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapPosY,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapNegZ,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapPosZ,true);
-        }
-        
-        if (!(await this.view.bitmapList.loadAllBitmaps())) return(false);
         
             // the lights
             
@@ -93,6 +73,8 @@ export default class ImportMapClass
         if (liquidSettings!==null) {
             for (n=0;n!==liquidSettings.liquids.length;n++) {
                 liquidDef=liquidSettings.liquids[n];
+                
+                this.view.bitmapList.add(liquidDef.bitmap,true);
 
                 liquidBitmap=this.view.bitmapList.get(liquidDef.bitmap);
                 liquidBitmap.alpha=liquidDef.alpha;
@@ -148,6 +130,13 @@ export default class ImportMapClass
         else {
             this.map.sky.on=true;
             this.map.sky.skyBoxSettings=skyBoxSettings;
+            
+            this.view.bitmapList.add(skyBoxSettings.bitmapNegX,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapPosX,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapNegY,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapPosY,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapNegZ,true);
+            this.view.bitmapList.add(skyBoxSettings.bitmapPosZ,true);
         }
         
             // alter any bitmaps for glow settings

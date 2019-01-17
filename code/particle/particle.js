@@ -45,6 +45,8 @@ export default class ParticleClass
         this.bottomRight=new PointClass(0,0,0);
 
         this.randomRot=new PointClass(0.0,0.0,0.0);
+        
+        this.PARTICLE_MAX_POINTS=200;
 
         this.vertices=new Float32Array((constants.PARTICLE_MAX_POINTS*4)*3);
         this.uvs=new Float32Array((constants.PARTICLE_MAX_POINTS*4)*2);

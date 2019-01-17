@@ -26,7 +26,7 @@ export default class SoundPlayClass
         // play a sound buffer at this entity
         //
         
-    play(ctx,entityListener,entity,soundBuffer)
+    play(ctx,entityListener,entity,sound)
     {
         let dist;
         
@@ -34,13 +34,13 @@ export default class SoundPlayClass
         
         if (entity!==null) {
             dist=entity.position.distance(entityListener.position);
-            if (dist>soundBuffer.maxDistance) return(false);
+            if (dist>sound.maxDistance) return(false);
         }
         
             // set the audio nodes
         
         this.sourceNode=ctx.createBufferSource();
-        this.sourceNode.buffer=soundBuffer.buffer;
+        this.sourceNode.buffer=sound.buffer;
         this.sourceNode.onended=this.ended.bind(this);
         
             // if no entity, than just add
@@ -58,8 +58,8 @@ export default class SoundPlayClass
             
             this.pannerNode.panningModel='HRTF';
             this.pannerNode.distanceModel='inverse';
-            this.pannerNode.refDistance=soundBuffer.maxDistance*0.25;
-            this.pannerNode.maxDistance=soundBuffer.maxDistance;
+            this.pannerNode.refDistance=sound.maxDistance*0.25;
+            this.pannerNode.maxDistance=sound.maxDistance;
             this.pannerNode.rolloffFactor=1;
             this.pannerNode.coneInnerAngle=360;
             this.pannerNode.coneOuterAngle=0;
@@ -104,7 +104,7 @@ export default class SoundPlayClass
         // handle any entity updates to this sound
         //
         
-    update(listenerEntity)
+    update()
     {
         if (this.entity!==null) {
             this.pannerNode.positionX.value=this.entity.position.x;

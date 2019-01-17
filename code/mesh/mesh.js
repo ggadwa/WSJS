@@ -53,8 +53,6 @@ export default class MeshClass
 
             // collision lists
 
-        this.simpleCollisionGeometry=false;
-        
         this.collisionLines=[];
         this.collisionFloorTrigs=[];
         this.collisionCeilingTrigs=[];
@@ -241,23 +239,6 @@ export default class MeshClass
         let tIdx;
         let v0,v1,v2;
         
-            // some meshes have simple collision
-            // geometery -- these are assumed to be
-            // hitting against the bound box
-            
-        if (this.simpleCollisionGeometry) {
-            this.collisionLines.push(new LineClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.min)));
-            this.collisionLines.push(new LineClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max)));
-            this.collisionLines.push(new LineClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max)));
-            this.collisionLines.push(new LineClass(new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max)));
-            
-            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max)));
-            this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max)));
-            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.min,this.yBound.min,this.zBound.min),new PointClass(this.xBound.max,this.yBound.min,this.zBound.min),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max)));
-            this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.min),new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max)));
-            return;
-        }
-
             // run through the triangles
             // and find any that make a wall to
             // create collision lines and floors

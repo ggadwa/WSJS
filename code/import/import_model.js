@@ -15,7 +15,7 @@ export default class ImportModelClass
     {
         let importObj;
         
-        importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY);
+        importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY,true);
         return(await importObj.import(this.model.meshList));
     }
 

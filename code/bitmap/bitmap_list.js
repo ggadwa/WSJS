@@ -10,8 +10,6 @@ export default class BitmapListClass
     {
         this.view=view;
         
-        this.BITMAP_LOAD_WAIT_TIMEOUT=100;
-
         this.bitmaps=new Map();
 
         Object.seal(this);

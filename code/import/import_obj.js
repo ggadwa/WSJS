@@ -5,11 +5,12 @@ import MeshClass from '../../code/mesh/mesh.js';
 
 export default class ImportObjClass
 {
-    constructor(view,url,scale,flipY)
+    constructor(view,url,scale,flipY,forceBottomYToZero)
     {
         this.view=view;
         this.url=url;
         this.scale=scale;
+        this.forceBottomYToZero=forceBottomYToZero;
         
         this.flipFactor=flipY?-1.0:1.0;
         
@@ -200,8 +201,8 @@ export default class ImportObjClass
         
     async import(meshList)
     {
-        let n,k,splitChar,tokens;
-        let x,y,z,normal;
+        let n,k,splitChar,tokens,mesh;
+        let x,y,z,normal,by;
         let lastGroupName,groupNameOffset,lastMaterialName;
         let posVertexIdx,posUVIdx,posNormalIdx;
         let meshVertices,meshIndexes;
@@ -249,10 +250,6 @@ export default class ImportObjClass
                     break;
             }
         }
-        
-            // force all the textures to load
-            
-        if (!(await this.view.bitmapList.loadAllBitmaps())) return(false);
         
             // get the vertexes, UVs, and normals
             
@@ -333,6 +330,30 @@ export default class ImportObjClass
             // and finally any current usemtl
             
         if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
+        
+            // force the bottom Y to 0
+            // this is used for game play models
+            
+        if (this.forceBottomYToZero) {
+            
+            for (n=0;n!==this.meshes.length;n++) {
+                mesh=this.meshes[n];
+                
+                    // get the bottom Y
+                
+                by=0;
+                
+                for (k=0;k!==mesh.vertexList.length;k++) {
+                    if (mesh.vertexList[k].position.y>by) by=mesh.vertexList[k].position.y;
+                }
+                
+                    // now transform the vertexes
+            
+                for (k=0;k!==mesh.vertexList.length;k++) {
+                    mesh.vertexList[k].position.y-=by;
+                }
+            }
+        }
         
             // and sort meshes by bitmaps into mesh list
             
