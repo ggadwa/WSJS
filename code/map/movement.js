@@ -89,15 +89,15 @@ export default class MovementClass
                 }
                 
                 this.moving=true;
-                this.nextMoveNextTick=view.timeStamp+this.moves[this.currentMoveIdx].lifeTick;
+                this.nextMoveNextTick=view.timestamp+this.moves[this.currentMoveIdx].lifeTick;
             }
             else {
                 
                     // check if we've finished, and make sure
                     // the movement lands on the final spot
             
-                if (this.nextMoveNextTick<view.timeStamp) {
-                    this.nextMoveNextTick=view.timeStamp;
+                if (this.nextMoveNextTick<view.timestamp) {
+                    this.nextMoveNextTick=view.timestamp;
                     this.moving=false;
                 }
             }
@@ -109,11 +109,11 @@ export default class MovementClass
         
                 // next view
 
-            if (this.nextMoveNextTick<view.timeStamp) {
+            if (this.nextMoveNextTick<view.timestamp) {
                 this.currentMoveIdx++;
                 if (this.currentMoveIdx>=this.moves.length) this.currentMoveIdx=0;
 
-                this.nextMoveNextTick=view.timeStamp+this.moves[this.currentMoveIdx].lifeTick;
+                this.nextMoveNextTick=view.timestamp+this.moves[this.currentMoveIdx].lifeTick;
             }
         }
         
@@ -121,7 +121,7 @@ export default class MovementClass
             // is between the previous and the next point
             
         move=this.moves[this.currentMoveIdx];
-        f=1.0-((this.nextMoveNextTick-view.timeStamp)/move.lifeTick);
+        f=1.0-((this.nextMoveNextTick-view.timestamp)/move.lifeTick);
         
         prevIdx=this.currentMoveIdx;
         prevIdx--;

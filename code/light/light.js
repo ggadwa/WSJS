@@ -69,7 +69,7 @@ export default class LightClass
         this.origIntensity=this.intensity;
     }
     
-    setRandomLightType(timeStamp)
+    setRandomLightType(timestamp)
     {
         if (genRandom.randomPercentage(0.7)) {
             this.lightType=this.LIGHT_TYPE_NORMAL;
@@ -91,14 +91,14 @@ export default class LightClass
         this.invertIntensity=0.0;
     }
     
-    run(timeStamp)
+    run(timestamp)
     {
         let f;
         
         switch (this.lightType) {
             
             case this.LIGHT_TYPE_WAVE:
-                f=(timeStamp%this.lightWaveFrequency)/this.lightWaveFrequency;
+                f=(timestamp%this.lightWaveFrequency)/this.lightWaveFrequency;
                 f=Math.sin((2.0*Math.PI)*f);
                 f=((f+1.0)*0.5);
                 f=(f*0.25)+0.75;

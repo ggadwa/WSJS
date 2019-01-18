@@ -108,6 +108,9 @@ export default class SoundListClass
     async loadAllSounds()
     {
         let keyIter,rtn,sound;
+        let success,promises=[];
+        
+            // gather all the promises
         
         keyIter=this.sounds.keys();
         
@@ -116,13 +119,22 @@ export default class SoundListClass
             if (rtn.done) break;
             
             sound=this.sounds.get(rtn.value);
-            if (!sound.loaded) {
-                let rtn=await sound.load();
-                if (!rtn) return(false);
-            }
+            if (!sound.loaded) promises.push(sound.load());
         }
 
-        return(true);
+            // and await them all
+            
+        success=true;
+        
+        await Promise.all(promises)
+            .then
+                (
+                    (values)=>{
+                        success=!values.includes(false);
+                    },
+                );
+
+        return(success);
     }
     
         //
@@ -178,7 +190,7 @@ export default class SoundListClass
         
             // find sound
             
-        sound=this.sounds.gte(name);
+        sound=this.sounds.get(name);
         if (sound===null) return;
         
             // find a free sound play
@@ -194,7 +206,7 @@ export default class SoundListClass
         
             // set it to entity
             
-        soundPlay.play(this.ctx,this.entityListener,entity,sound);
+        soundPlay.play(this.ctx,this.currentListenerEntity,entity,sound);
     }
     
     

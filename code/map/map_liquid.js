@@ -72,7 +72,7 @@ export default class MapLiquidClass
         
             // get the y offsets for waves
         
-        let freq=((this.view.timeStamp%this.waveFrequency)/this.waveFrequency)*(Math.PI*2);
+        let freq=((this.view.timestamp%this.waveFrequency)/this.waveFrequency)*(Math.PI*2);
         let cs=Math.cos(freq);
         let offY=Math.trunc(cs*this.waveHeight);
         
@@ -82,7 +82,7 @@ export default class MapLiquidClass
         uvIdx=0;
         
         vz=this.zBound.min;
-        gz=(this.view.timeStamp*this.vShift);
+        gz=(this.view.timestamp*this.vShift);
         gz=gz-Math.trunc(gz);
         
         offRow=Math.trunc(vz/this.waveSize);
@@ -90,7 +90,7 @@ export default class MapLiquidClass
         for (z=0;z!==(this.zBlockSize+1);z++) {
             
             vx=this.xBound.min;
-            gx=(this.view.timeStamp*this.uShift);
+            gx=(this.view.timestamp*this.uShift);
             gx=gx-Math.trunc(gx);
             
             offCol=Math.trunc(vx/this.waveSize);

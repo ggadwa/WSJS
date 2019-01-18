@@ -27,8 +27,8 @@ export default class ParticleClass
         
         this.bitmap=null;
 
-        this.startTimeStamp=0;
-        this.endTimeStamp=0;
+        this.startTimestamp=0;
+        this.endTimestamp=0;
         this.lifeTime=0;
 
         this.light=new LightClass(new PointClass(0,0,0),new ColorClass(0.0,0.0,0.0),0.0,1.0);
@@ -99,7 +99,7 @@ export default class ParticleClass
     
     timeout()
     {
-        if (this.view.timeStamp>this.endTimeStamp) this.count=0;
+        if (this.view.timestamp>this.endTimestamp) this.count=0;
     }
     
         //
@@ -141,9 +141,9 @@ export default class ParticleClass
     
     setLifeTime(lifeTime)
     {
-        this.startTimeStamp=this.view.timeStamp;
+        this.startTimestamp=this.view.timestamp;
         this.lifeTime=lifeTime;
-        this.endTimeStamp=this.view.timeStamp+lifeTime;
+        this.endTimestamp=this.view.timestamp+lifeTime;
     }
     
     setLightMaxItensity(lightMaxIntensity)
@@ -198,7 +198,7 @@ export default class ParticleClass
     {
         let tick,halfTick;
         
-        tick=this.view.timeStamp-this.startTimeStamp;
+        tick=this.view.timestamp-this.startTimestamp;
         
         if ((this.lightMaxIntensity===0) || (tick>this.lifeTime)) {
             this.light.setIntensity(0);
@@ -228,7 +228,7 @@ export default class ParticleClass
             // get the radius and color
         
         timeFactor=0.0;
-        if (this.lifeTime!==0) timeFactor=(this.view.timeStamp-this.startTimeStamp)/this.lifeTime;
+        if (this.lifeTime!==0) timeFactor=(this.view.timestamp-this.startTimestamp)/this.lifeTime;
         
         radius=this.radiusStart+(this.radiusEnd-this.radiusStart)*timeFactor;
         moveFactor=this.movement*timeFactor;

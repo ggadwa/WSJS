@@ -223,7 +223,7 @@ export default class ModelSkeletonClass
         
             // the current factor
             
-        let factor=1.0-((this.lastAnimationTick-this.view.timeStamp)/this.lastAnimationMillisec);
+        let factor=1.0-((this.lastAnimationTick-this.view.timestamp)/this.lastAnimationMillisec);
 
             // tween the current angles
             

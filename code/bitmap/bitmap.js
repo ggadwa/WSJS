@@ -291,7 +291,7 @@ export default class BitmapClass
         gl.uniform1f(shader.shineFactorUniform,this.shineFactor);
         
         if (this.glowFrequency!==0) {
-            glowFactor=Math.abs(Math.cos(this.view.timeStamp/this.glowFrequency)*this.glowMax);
+            glowFactor=Math.abs(Math.cos(this.view.timestamp/this.glowFrequency)*this.glowMax);
             gl.uniform1f(shader.glowFactorUniform,glowFactor);
         }
         else {

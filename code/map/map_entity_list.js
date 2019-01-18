@@ -79,12 +79,25 @@ export default class MapEntityListClass
         return(this.entities[0]);
     }
     
-    findById(id)
+    find(name)
     {
         let entity;
          
         for (entity of this.entities) {
-            if (entity.id===id) return(entity);
+            if (entity.name===name) return(entity);
+        }
+        
+        return(null);
+    }
+    
+    findHold(parentEntity,name)
+    {
+        let entity;
+         
+        for (entity of this.entities) {
+            if (entity.heldBy===parentEntity) {
+                if (entity.name===name) return(entity);
+            }
         }
         
         return(null);

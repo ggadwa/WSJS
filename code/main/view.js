@@ -85,23 +85,23 @@ export default class ViewClass
 
             // main loop
 
-        this.timeStamp=0;
+        this.timestamp=0;
         this.physicsTick=0;
         this.drawTick=0;
 
         this.loopCancel=false;
         
-        this.lastPhysicTimeStamp=0;
-        this.lastPhysicTimeStampPauseOffset=0;
-        this.lastDrawTimeStamp=0;
-        this.lastDrawTimeStampPauseOffset=0;
+        this.lastPhysicTimestamp=0;
+        this.lastPhysicTimestampPauseOffset=0;
+        this.lastDrawTimestamp=0;
+        this.lastDrawTimestampPauseOffset=0;
 
             // stats
 
         this.fps=0.0;
         this.fpsTotal=0;
         this.fpsCount=0;
-        this.fpsStartTimeStamp=0;
+        this.fpsStartTimestamp=0;
 
         this.drawMeshCount=0;
         this.drawMeshTrigCount=0;
@@ -262,7 +262,7 @@ export default class ViewClass
     
     setPauseState(pause,initState)
     {
-        let timeStamp;
+        let timestamp;
         
             // set the state
 
@@ -270,36 +270,36 @@ export default class ViewClass
         
             // current timestamp
             
-        timeStamp=Math.trunc(window.performance.now());
+        timestamp=Math.trunc(window.performance.now());
         
             // if going into pause, we need
             // to remember the time stamp offsets
             // so they can be restored
         
         if (initState) {
-            this.lastPhysicTimeStampPauseOffset=0;
-            this.lastDrawTimeStampPauseOffset=0;
+            this.lastPhysicTimestampPauseOffset=0;
+            this.lastDrawTimestampPauseOffset=0;
         }
         else {
             if (pause) {
-                this.lastPhysicTimeStampPauseOffset=timeStamp-this.lastPhysicTimeStamp;
-                this.lastDrawTimeStampPauseOffset=timeStamp-this.lastDrawTimeStamp;
+                this.lastPhysicTimestampPauseOffset=timestamp-this.lastPhysicTimestamp;
+                this.lastDrawTimestampPauseOffset=timestamp-this.lastDrawTimestamp;
             }
         }
         
             // reset the timing to this timestamp
             
-        this.timeStamp=timeStamp;
+        this.timestamp=timestamp;
 
-        this.lastPhysicTimeStamp=timeStamp+this.lastPhysicTimeStampPauseOffset;
-        this.lastDrawTimeStamp=timeStamp+this.lastDrawTimeStampPauseOffset;
+        this.lastPhysicTimestamp=timestamp+this.lastPhysicTimestampPauseOffset;
+        this.lastDrawTimestamp=timestamp+this.lastDrawTimestampPauseOffset;
 
             // start the fps over again
             
         this.fps=0.0;
         this.fpsTotal=0;
         this.fpsCount=0;
-        this.fpsStartTimeStamp=timeStamp;
+        this.fpsStartTimestamp=timestamp;
     }
     
         //
@@ -608,7 +608,7 @@ export default class ViewClass
         for (n=0;n!==this.MAX_LIGHT_COUNT;n++) {
             light=this.lights[n];
             if (light!==null) {
-                light.run(this.timeStamp);
+                light.run(this.timestamp);
                 this.convertToEyeCoordinates(light.position,light.eyePosition);
             }
         }

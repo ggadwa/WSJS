@@ -1,11 +1,11 @@
-import EntityClass from '../../code/entities/entity.js';
+import ProjectEntityClass from '../../code/project/project_entity.js';
 import ParticleUtilityClass from '../../code/particle/particle_utility.js';
 
 //
 // entity projectile object
 //
 
-export default class EntityProjectileClass extends EntityClass
+export default class EntityProjectileClass extends ProjectEntityClass
 {
     constructor(view,map,sound,name,parentEntityId,position,angle,projectile)
     {
@@ -26,8 +26,8 @@ export default class EntityProjectileClass extends EntityClass
             // local variables
             
         this.projectile=projectile;
-        this.startTimeStamp=this.view.timeStamp;
-        this.selfHitTimeStamp=this.view.timeStamp+2500;         // how long until projectiles can hit their parent, to stop projectiles from hitting parents when launched
+        this.startTimestamp=this.view.timestamp;
+        this.selfHitTimestamp=this.view.timestamp+2500;         // how long until projectiles can hit their parent, to stop projectiles from hitting parents when launched
         
         Object.seal(this);
     }
@@ -89,7 +89,7 @@ export default class EntityProjectileClass extends EntityClass
     {
             // cancel any projectile that lasts over lifetime
             
-        if ((this.startTimeStamp+this.projectile.lifeTick)<this.view.timeStamp) {
+        if ((this.startTimestamp+this.projectile.lifeTick)<this.view.timestamp) {
             this.markAsDelete();
             return;
         }
@@ -108,7 +108,7 @@ export default class EntityProjectileClass extends EntityClass
                 // if within the self hit timestamp
 
             if (this.touchEntity!==null) {
-                if (this.selfHitTimeStamp<this.view.timeStamp) {
+                if (this.selfHitTimestamp<this.view.timestamp) {
                     if (this.touchEntity.id===this.parentEntityId) return;
                 }
             }

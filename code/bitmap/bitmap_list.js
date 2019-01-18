@@ -60,8 +60,11 @@ export default class BitmapListClass
         
     async loadAllBitmaps()
     {
-        let keyIter,rtn,bitmap;
+        let n,keyIter,rtn,bitmap;
+        let success,promises=[];
         
+            // gather all the promises
+            
         keyIter=this.bitmaps.keys();
         
         while (true) {
@@ -69,13 +72,22 @@ export default class BitmapListClass
             if (rtn.done) break;
             
             bitmap=this.bitmaps.get(rtn.value);
-            if (!bitmap.loaded) {
-                let rtn=await bitmap.load();
-                if (!rtn) return(false);
-            }
+            if (!bitmap.loaded) promises.push(bitmap.load());
         }
+        
+            // and await them all
+            
+        success=true;
+        
+        await Promise.all(promises)
+            .then
+                (
+                    (values)=>{
+                        success=!values.includes(false);
+                    },
+                );
 
-        return(true);
+        return(success);
     }
     
 }

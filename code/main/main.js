@@ -168,7 +168,7 @@ let main=new MainClass();
 // main loop
 //
 
-function mainLoop(timeStamp)
+function mainLoop(timestamp)
 {
     let fpsTime;
     let view=main.view;
@@ -182,7 +182,7 @@ function mainLoop(timeStamp)
     
         // get integer msec timestamp
     
-    view.timeStamp=Math.trunc(timeStamp);
+    view.timestamp=Math.trunc(timestamp);
     
         // run the input
         
@@ -196,7 +196,7 @@ function mainLoop(timeStamp)
         // physics remains constants
     
     if (!view.paused) {
-        view.physicsTick=view.timeStamp-view.lastPhysicTimeStamp;
+        view.physicsTick=view.timestamp-view.lastPhysicTimestamp;
 
         if (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
             map.movementList.run(view,map);
@@ -205,13 +205,13 @@ function mainLoop(timeStamp)
 
                 while (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
                     view.physicsTick-=constants.PHYSICS_MILLISECONDS;
-                    view.lastPhysicTimeStamp+=constants.PHYSICS_MILLISECONDS;
+                    view.lastPhysicTimestamp+=constants.PHYSICS_MILLISECONDS;
 
                     map.entityList.run();
                 }
             }
             else {
-                view.lastPhysicTimeStamp=view.timeStamp;
+                view.lastPhysicTimestamp=view.timestamp;
             }
 
                 // update the listener and all current
@@ -226,10 +226,10 @@ function mainLoop(timeStamp)
         // this timing is loose, as it's only there to
         // draw frames
         
-    view.drawTick=view.timeStamp-view.lastDrawTimeStamp;
+    view.drawTick=view.timestamp-view.lastDrawTimestamp;
     
     if (view.drawTick>constants.DRAW_MILLISECONDS) {
-        view.lastDrawTimeStamp=view.timeStamp; 
+        view.lastDrawTimestamp=view.timestamp; 
 
         view.draw(map);
         
@@ -240,10 +240,10 @@ function mainLoop(timeStamp)
         // the fps
     
     if (!view.paused) {
-        fpsTime=view.timeStamp-view.fpsStartTimeStamp;
+        fpsTime=view.timestamp-view.fpsStartTimestamp;
         if (fpsTime>=1000) {
             view.fps=(view.fpsCount*1000.0)/view.fpsTotal;
-            view.fpsStartTimeStamp=view.timeStamp;
+            view.fpsStartTimestamp=view.timestamp;
 
             view.fpsTotal=0;
             view.fpsCount=0;

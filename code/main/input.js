@@ -25,7 +25,7 @@ export default class InputClass
         
         this.mouseButtonFlags=new Uint8Array(8);
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=view.timeStamp;
+        this.mouseWheelClickRefreshTick=view.timestamp;
         
             // listeners
             // need to set them to a variables so remove
@@ -158,7 +158,7 @@ export default class InputClass
             }
             
             this.mouseWheelClick=0;
-            this.mouseWheelClickRefreshTick=this.view.timeStamp+constants.INPUT_WHEEL_REFRESH_TICK;
+            this.mouseWheelClickRefreshTick=this.view.timestamp+constants.INPUT_WHEEL_REFRESH_TICK;
         }
         
             // mouse turning
@@ -257,7 +257,7 @@ export default class InputClass
         }
         
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=this.view.timeStamp;
+        this.mouseWheelClickRefreshTick=this.view.timestamp;
     }
     
         // mouse event callbacks
@@ -302,7 +302,7 @@ export default class InputClass
     
     mouseWheel(event)
     {
-        if (this.view.timeStamp<this.mouseWheelClickRefreshTick) return;
+        if (this.view.timestamp<this.mouseWheelClickRefreshTick) return;
         
         this.mouseWheelClick=Math.sign(event.deltaY);
     }

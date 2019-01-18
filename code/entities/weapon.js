@@ -15,7 +15,7 @@ export default class WeaponClass
         this.projectile=null;
         this.altProjectile=null;
 
-        this.lastFireTimeStamp=0;
+        this.lastFireTimestamp=0;
 
         this.handOffset=new PointClass(0,0,0);     // global to stop GCd
         this.handAngle=new PointClass(0,0,0);
@@ -86,9 +86,9 @@ export default class WeaponClass
     {
             // time to fire again?
             
-        if (this.view.timeStamp<this.lastFireTimeStamp) return;
+        if (this.view.timestamp<this.lastFireTimestamp) return;
         
-        this.lastFireTimeStamp=this.view.timeStamp+1000;
+        this.lastFireTimestamp=this.view.timestamp+1000;
         
             // create projectile
             
@@ -106,9 +106,9 @@ export default class WeaponClass
     {
             // time to fire again?
             
-        if (this.view.timeStamp<this.lastFireTimeStamp) return;
+        if (this.view.timestamp<this.lastFireTimestamp) return;
         
-        this.lastFireTimeStamp=this.view.timeStamp+1000;
+        this.lastFireTimestamp=this.view.timestamp+1000;
         
             // create projectile
             
@@ -133,7 +133,7 @@ export default class WeaponClass
         
             // get new position
             
-        this.handOffset.setFromValues(0,0,2500);      // supergumba -- all this is hardcoded!
+        this.handOffset.setFromValues(0,0,80000);      // supergumba -- all this is hardcoded!
         this.handOffset.rotate(angle);
         this.handOffset.addPoint(pos);
         
@@ -143,7 +143,8 @@ export default class WeaponClass
             
         this.handAngle.setFromPoint(angle);
         this.handAngle.x=(-this.handAngle.x)-15.0;
-        this.handAngle.y+=180.0;
+        //this.handAngle.y+=180.0;
+        this.handAngle.y+=20;
        
             // move vertexes to reflect
             // angle and offset of weapon

@@ -1,7 +1,3 @@
-When interface created
-    [ ] close gl
-    [ ] all the object release()
-
 WebGL2
     [ ] vertex array objects (liquids, models, map)
            https://webgl2fundamentals.org/webgl/lessons/webgl1-to-webgl2.html
@@ -9,206 +5,20 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-
-2. need to work on sounds
-  2a. entity load sounds/models combine, too confusing
-1. updateSoundPlays rebuild all this
-
-0. work on collisions
-   0a. make sure to combine any lines/floors that we can
-
+0. do a weapon/projectile -> then delete old stuff
 1. make a particle effect, then remove old particle effect
    1b. particle shader -> effect shader
 
+2. work on collisions
+   0a. make sure to combine any lines/floors that we can
 
 4. get back to updateVertexesToPoseAndPosition
-5. entity -> project_entity
-6. remove all particle stuff
-15. high->height
-16. shaders need to be dynamic and part of project
+4. weapons and projectiles are own entity class
+4a. delete all weapon stuff from player
 
-
-
-
-        //
-        // utilities
-        //
-        
-    getAudioContext()
-    {
-        return(this.ctx);
-    }
-    
-    
-        //
-        // play a sound
-        //
-        
-    play(entity,buffer)
-    {
-        this.soundPlayList.startSoundPlay(this.ctx,this.currentListenerEntity,entity,buffer);
-    }
-        
-        //
-        // update sounds
-        //
-
-
-
-export default class SoundListClass
-{
-    constructor(game)
-    {
-        this.game=game;
-        
-        this.MAIN_VOLUME=0.3;
-        this.DISTANCE_ATTUATION=0.0002;
-        
-        this.buffers=new Map();
-        
-        Object.seal(this);
-    }
-    
-    initialize(callback)
-    {
-        this.create();
-        this.load(callback);
-    }
-    
-    /**
-     * Override this to fill the list of sounds this game will need.
-     * Format will be wav and inside a sounds folder of the resource base path.
-     */
-    create()
-    {
-    }
-    
-    add(name)
-    {
-        this.buffers.set(name,null);
-    }
-    
-    /**
-     * Plays a sound at full volume.
-     */
-    play(name)
-    {
-        let ctx=this.game.audioContext;
-        let source,gain;
-        let buffer=this.buffers.get(name);
-        
-            // just a warning if no music
-            
-        if ((buffer===undefined) || (buffer===null)) {
-            console.log('Unknown sound: '+name);
-            return;
-        }
-
-            // play sound
-            
-        source=ctx.createBufferSource();
-        source.buffer=buffer;
-        
-        gain=ctx.createGain();
-        gain.gain.value=this.MAIN_VOLUME;
-
-        source.connect(gain);
-        gain.connect(ctx.destination);
-        source.start(0);
-    }
-    
-    /**
-     * Plays a sound where the volumn is attuned to
-     * the distance from the camera sprite.
-     */
-    playAtSprite(name,sprite,cameraSprite)
-    {
-        let ctx=this.game.audioContext;
-        let source,gain,vol;
-        let x=sprite.x-cameraSprite.x;
-        let y=sprite.y-cameraSprite.y;
-        
-            // attenuate, and if <= 0, don't play sound
-            
-        vol=this.MAIN_VOLUME-(Math.sqrt((x*x)+(y*y))*this.DISTANCE_ATTUATION);
-        if (vol<=0.0) return;
-        
-            // play sound
-            
-        source=ctx.createBufferSource();
-        gain=ctx.createGain();
-        
-        source.buffer=this.buffers.get(name);
-        gain.gain.value=vol;
-
-        source.connect(gain);
-        gain.connect(ctx.destination);
-        source.start(0);
-    }
-    
-    loadProcessLoaded(req,name,keyIter,count,callback)
-    {
-        let buffers=this.buffers;
-        let thisRef=this;
-        
-            // error
-            
-        if (req.status!==200) {
-            console.log('Missing sound wav: '+name);        // this will abort the game loading process
-            this.loadProcess(keyIter,(count+1),callback);
-            return;
-        }
-        
-            // need to decode the sound
-            
-        buffers=this.buffers;
-        
-        this.game.audioContext.decodeAudioData(req.response,
-                            function(buffer) {
-                                buffers.set(name,buffer);
-                                thisRef.loadProcess(keyIter,(count+1),callback);
-                            },
-                            function(err) {
-                                console.log('Unable to process music: '+name+': '+err);
-                                thisRef.loadProcess(keyIter,(count+1),callback);
-                            }
-                        );
-    }
-    
-    loadProcess(keyIter,count,callback)
-    {
-        let req,rtn,name,path;
-        
-            // get next key
-            
-        rtn=keyIter.next();
-        if (rtn.done) {
-            callback();
-            return;
-        }
-        
-        this.game.drawProgress('Loading Sounds',count,(this.buffers.size-1));
-
-        name=rtn.value;
-        path=this.game.resourceBasePath+'sounds/'+name+'.wav';
-        
-        req=new XMLHttpRequest();
-        req.open('GET',path,true);
-        req.responseType='arraybuffer';
-        req.onload=this.loadProcessLoaded.bind(this,req,name,keyIter,count,callback);
-        req.send();
-    }
-    
-    load(callback)
-    {
-        this.loadProcess(this.buffers.keys(),0,callback);
-    }
-    
-    
-}
-
-
-
+5. high->height
+6. shaders need to be dynamic and part of project
+7. eventually delete all stuff in entities folder
 
 - get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW
 
