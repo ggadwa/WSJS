@@ -92,9 +92,20 @@ class MainClass
         setTimeout(this.initLoadEntities.bind(this),1);
     }
 
-    async initLoadEntities()
+    initLoadEntities()
     {
-        if (!(await this.projectMap.loadEntities())) return;
+        if (!this.projectMap.loadEntities()) return;
+        
+        this.view.loadingScreenUpdate();
+        this.view.loadingScreenAddString('Loading Models');
+        this.view.loadingScreenDraw(0.4);
+        
+        setTimeout(this.initLoadEntityModels.bind(this),1);
+    }
+    
+    async initLoadEntityModels()
+    {
+        if (!(await this.map.entityList.loadAllModels())) return;
         
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Loading Images');

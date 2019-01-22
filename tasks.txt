@@ -5,7 +5,10 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-0. do a weapon/projectile -> then delete old stuff
+
+
+0. need to check if models are drawing all meshes
+1. need to get rid of a lot of project_entity stuff, it's very player specific
 1. make a particle effect, then remove old particle effect
    1b. particle shader -> effect shader
 
@@ -13,7 +16,6 @@ WebGL2
    0a. make sure to combine any lines/floors that we can
 
 4. get back to updateVertexesToPoseAndPosition
-4. weapons and projectiles are own entity class
 4a. delete all weapon stuff from player
 
 5. high->height
@@ -21,6 +23,7 @@ WebGL2
 7. eventually delete all stuff in entities folder
 
 - get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW
+  (a lot of this has already been deleted, here for future reference)
 
     setMovementForward(on)
     setMovementBackward(on)

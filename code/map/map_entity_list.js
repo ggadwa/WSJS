@@ -1,5 +1,4 @@
 import * as constants from '../../code/main/constants.js';
-import EntityProjectileClass from '../../code/entities/entity_projectile.js';
 import config from '../../code/main/config.js';
 import genRandom from '../../code/utility/random.js';
 
@@ -104,6 +103,23 @@ export default class MapEntityListClass
     }
     
         //
+        // load all models
+        //
+        
+    async loadAllModels()
+    {
+        let n;
+        let nEntity=this.entities.length;
+
+        for (n=0;n<nEntity;n++) {
+            if (!(await this.entities[n].loadModel())) return(false);
+        }
+        
+        return(true);
+    }
+
+    
+        //
         // movements against entities
         //
         
@@ -115,8 +131,6 @@ export default class MapEntityListClass
             // any projectiles
             
         for (entity of this.entities) {
-            if (entity instanceof EntityProjectileClass) continue;
-            
             entity.movementPush(meshIdx,movePnt);
         }
     }

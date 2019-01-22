@@ -30,7 +30,7 @@ export default class ProjectMapClass
         // override this to add entities to map
         //
         
-    async loadEntities()
+    loadEntities()
     {
     }
 }

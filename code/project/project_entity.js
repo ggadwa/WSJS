@@ -25,6 +25,9 @@ export default class ProjectEntityClass
         this.heldBy=null;
         
         this.model=null;
+        this.modelName=null;
+        this.modelSize=1;
+        this.modelFlipY=true;
         
         this.positionBackup=new PointClass(0,0,0);
         
@@ -98,11 +101,33 @@ export default class ProjectEntityClass
     }
     
         //
-        // loading resources
+        // models
         //
-        
-    async loadResources()
+     
+    setModel(modelName,modelSize,modelFlipY)
     {
+        this.modelName=modelName;
+        this.modelSize=modelSize;
+        this.modelFlipY=modelFlipY;
+    }
+    
+    async loadModel()
+    {
+        let importModel;
+        
+        if (this.modelName==null) return(true);
+        
+            // the model
+            
+        this.model=new ModelClass(this.view);
+        this.model.initialize();
+        
+        importModel=new ImportModelClass(this.view,this.model);
+        if (!(await importModel.load(this.modelName,this.modelSize,this.modelFlipY))) return(false);
+
+        this.model.setupBuffers();
+        
+        return(true);
     }
     
         //
@@ -135,6 +160,7 @@ export default class ProjectEntityClass
     sendMessage(data)
     {
     }
+    
     
         //
         // start and stop movements
@@ -597,6 +623,11 @@ export default class ProjectEntityClass
         //
         // sounds
         //
+        
+    addSound(name,distance)
+    {
+        this.view.soundList.add(name,distance);
+    }
         
     playSound(name)
     {

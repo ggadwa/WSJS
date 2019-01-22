@@ -65,7 +65,6 @@ export default class MapClass
         this.sky.release();
     }
     
-    
         //
         // clear map
         //
@@ -88,6 +87,35 @@ export default class MapClass
     {
         this.meshList.setupBuffers();
         this.liquidList.setupBuffers();
+    }
+    
+        //
+        // project utilities
+        //
+        
+    addEntity(entityClass,name,position,radius,height,isPlayer,heldByEntity)
+    {    
+        let entity;
+                
+        entity=new entityClass(this.view,this,name,radius,height);
+        if (isPlayer) {
+            this.entityList.setPlayer(entity);
+        }
+        else {
+            this.entityList.add(entity);
+        }
+        
+        entity.initialize();
+        if (position===null) {
+            entity.position.setFromValues(0,0,0);
+        }
+        else {
+            entity.position.setFromPoint(position);
+        }
+        
+        if (heldByEntity!==null) heldByEntity.hold(entity);
+        
+        return(entity);
     }
     
 }
