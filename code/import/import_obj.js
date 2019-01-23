@@ -210,6 +210,8 @@ export default class ImportObjClass
         
             // load the file
             
+        this.data=null;
+            
         await this.loadOBJ()
             .then
                 (
@@ -223,9 +225,10 @@ export default class ImportObjClass
                         
                     value=>{
                         console.log(value);
-                        return;
                     }
                 );
+        
+        if (this.data===null) return(false);
         
             // get the lines and trim
             // any extraneous control characters

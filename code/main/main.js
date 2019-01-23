@@ -195,10 +195,6 @@ function mainLoop(timestamp)
     
     view.timestamp=Math.trunc(timestamp);
     
-        // run the input
-        
-    if (!view.paused) main.input.run();
-    
         // map movement, entities, and
         // other physics, we only do this if we've
         // moved unto another physics tick

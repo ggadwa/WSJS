@@ -6,8 +6,7 @@ WebGL2
 
 
 
-
-0. need to check if models are drawing all meshes
+0. get rid of run() from input, move that to entity_player
 1. need to get rid of a lot of project_entity stuff, it's very player specific
 1. make a particle effect, then remove old particle effect
    1b. particle shader -> effect shader
