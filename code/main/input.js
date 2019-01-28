@@ -196,6 +196,20 @@ export default class InputClass
         this.mouseWheelClickRefreshTick=this.view.timestamp;
     }
     
+    mouseWheelRead()
+    {
+        let     click;
+        
+        if (this.mouseWheelClick===0) return(0);
+
+        click=this.mouseWheelClick;
+        
+        this.mouseWheelClick=0;
+        this.mouseWheelClickRefreshTick=this.view.timestamp+constants.INPUT_WHEEL_REFRESH_TICK;
+        
+        return(click);
+    }
+    
         // mouse event callbacks
     
     pointerLockChange(event)

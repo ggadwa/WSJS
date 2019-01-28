@@ -3,8 +3,6 @@ import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import ViewClass from '../../code/main/view.js';
 import MapClass from '../../code/map/map.js';
-import InputClass from '../../code/main/input.js';
-import SoundClass from '../../code/sound/sound.js';
 import genRandom from '../../code/utility/random.js';
 import GameClass from '../../data/scripts/game.js';
 
@@ -20,8 +18,6 @@ class MainClass
 
         this.view=new ViewClass();
         this.map=new MapClass(this.view);
-        this.input=new InputClass(this.view);
-        this.sound=new SoundClass();
         
         this.game=new GameClass(this.view,this.map);
         this.projectMap=this.game.getStartMap();
@@ -57,7 +53,6 @@ class MainClass
 
     initInternal()
     {
-        if (!this.sound.initialize()) return;
         if (!this.map.initialize()) return;
 
             // next step
@@ -149,7 +144,7 @@ class MainClass
 
             // start the input
 
-        this.input.initialize(this.map.entityList.getPlayer());
+        this.view.input.initialize(this.map.entityList.getPlayer());
         
             // the cancel loop flag
             
@@ -158,7 +153,7 @@ class MainClass
             // start the main loop in paused mode
 
         this.view.setPauseState(true,true);
-        this.input.setPauseState(true);
+        this.view.input.setPauseState(true);
         
             // and now start the loop
             
@@ -184,7 +179,6 @@ function mainLoop(timestamp)
     let fpsTime;
     let view=main.view;
     let map=main.map;
-    let sound=main.sound;
     
         // next frame
         

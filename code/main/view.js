@@ -7,6 +7,7 @@ import PointClass from '../../code/utility/point.js';
 import RectClass from '../../code/utility/rect.js';
 import PlaneClass from '../../code/utility/plane.js';
 import ColorClass from '../../code/utility/color.js';
+import InputClass from '../../code/main/input.js';
 import ViewCameraClass from '../../code/main/view_camera.js';
 import TextClass from '../../code/text/text.js';
 import InterfaceClass from '../../code/interface/interface.js';
@@ -26,6 +27,10 @@ export default class ViewClass
         this.bitmapList=null;
         this.soundList=null;
         this.shaderList=null;
+        
+            // input
+            
+        this.input=new InputClass(this);
         
             // pause flag
             
