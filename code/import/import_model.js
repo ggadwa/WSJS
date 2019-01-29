@@ -11,11 +11,11 @@ export default class ImportModelClass
         this.model=model;
     }
     
-    async load(name,scale,flipY)
+    async load(importSettings)
     {
         let importObj;
         
-        importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY,true);
+        importObj=new ImportObjClass(this.view,importSettings);
         return(await importObj.import(this.model.meshList));
     }
 

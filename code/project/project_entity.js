@@ -25,9 +25,7 @@ export default class ProjectEntityClass
         this.heldBy=null;
         
         this.model=null;
-        this.modelName=null;
-        this.modelSize=1;
-        this.modelFlipY=true;
+        this.modelImportSettings=null;
         
         this.positionBackup=new PointClass(0,0,0);
         
@@ -104,18 +102,16 @@ export default class ProjectEntityClass
         // models
         //
      
-    setModel(modelName,modelSize,modelFlipY)
+    setModel(modelImportSettings)
     {
-        this.modelName=modelName;
-        this.modelSize=modelSize;
-        this.modelFlipY=modelFlipY;
+        this.modelImportSettings=modelImportSettings;        
     }
     
     async loadModel()
     {
         let importModel;
         
-        if (this.modelName==null) return(true);
+        if (this.modelImportSettings==null) return(true);
         
             // the model
             
@@ -123,7 +119,7 @@ export default class ProjectEntityClass
         this.model.initialize();
         
         importModel=new ImportModelClass(this.view,this.model);
-        if (!(await importModel.load(this.modelName,this.modelSize,this.modelFlipY))) return(false);
+        if (!(await importModel.load(this.modelImportSettings))) return(false);
 
         this.model.setupBuffers();
         

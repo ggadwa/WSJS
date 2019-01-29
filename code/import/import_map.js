@@ -15,7 +15,7 @@ export default class ImportMapClass
         this.map=map;
     }
     
-    async load(name,scale,flipY,skyBoxSettings,lightSettings,glowSettings,effectSettings,liquidSettings,movementSettings)
+    async load(importSettings,skyBoxSettings,lightSettings,glowSettings,effectSettings,liquidSettings,movementSettings)
     {
         let n,k,idx;
         let effect,effectDef,effectPos;
@@ -25,7 +25,7 @@ export default class ImportMapClass
         let glowDef,bitmap;
         let importObj;
         
-        importObj=new ImportObjClass(this.view,('./data/objs/'+name+'.obj'),scale,flipY,false);
+        importObj=new ImportObjClass(this.view,importSettings);
         if (!(await importObj.import(this.map.meshList))) return(false);
         
             // run through the effects so bitmaps get into list

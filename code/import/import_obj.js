@@ -5,14 +5,10 @@ import MeshClass from '../../code/mesh/mesh.js';
 
 export default class ImportObjClass
 {
-    constructor(view,url,scale,flipY,forceBottomYToZero)
+    constructor(view,importSettings)
     {
         this.view=view;
-        this.url=url;
-        this.scale=scale;
-        this.forceBottomYToZero=forceBottomYToZero;
-        
-        this.flipFactor=flipY?-1.0:1.0;
+        this.importSettings=importSettings;
         
         this.data=null;
         this.lines=null;
@@ -31,14 +27,15 @@ export default class ImportObjClass
     async loadOBJ()
     {
         let resp;
+        let url='./data/objs/'+this.importSettings.name+'.obj';
         
         try {
-            resp=await fetch(this.url);
-            if (!resp.ok) return(Promise.reject('Unable to load '+this.url+'; '+resp.statusText));
+            resp=await fetch(url);
+            if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
             return(await resp.text());
         }
         catch (e) {
-            return(Promise.reject('Unable to load '+this.url+'; '+e.message));
+            return(Promise.reject('Unable to load '+url+'; '+e.message));
         }
     }
     
@@ -196,6 +193,97 @@ export default class ImportObjClass
     }
     
         //
+        // rotations
+        //
+        
+    rotate()
+    {
+        let n,nVertex;
+        let centerPnt=new PointClass(0,0,0);
+        let rotAng=new PointClass(0,0,180);
+        
+            // can't do anything if only one
+            // or no vertexes
+            
+        nVertex=this.vertexList.length;
+        if (nVertex<=1) return;
+       
+            // find the center
+
+        centerPnt.setFromPoint(this.vertexList[0]);
+            
+        for (n=1;n!==nVertex;n++) {
+            centerPnt.addPoint(this.vertexList[n]);
+        }
+        
+        centerPnt.x=Math.trunc(centerPnt.x/nVertex);
+        centerPnt.y=Math.trunc(centerPnt.y/nVertex);
+        centerPnt.z=Math.trunc(centerPnt.z/nVertex);
+        
+            // now rotate
+            
+        for (n=0;n!==nVertex;n++) {
+            this.vertexList[n].rotateAroundPoint(centerPnt,rotAng);
+        }
+        
+        for (n=0;n!=this.normalList.length;n++) {
+            this.normalList[n].rotate(rotAng);
+        }
+    }
+    
+    zeroTop()
+    {
+        let n,nVertex,by;
+        
+            // can't do anything if only one
+            // or no vertexes
+            
+        nVertex=this.vertexList.length;
+        if (nVertex<=1) return;
+       
+            // find bottom Y
+            
+        by=0;
+            
+        for (n=0;n!==nVertex;n++) {
+            if (this.vertexList[n].y<by) by=this.vertexList[n].y;
+        }
+        
+        by=Math.trunc(Math.abs(by));
+        
+            // floor it
+            
+        for (n=0;n!==nVertex;n++) {
+            this.vertexList[n].y+=by;
+        }    
+    }
+    
+    zeroBottom()
+    {
+        let n,nVertex,by;
+        
+            // can't do anything if only one
+            // or no vertexes
+            
+        nVertex=this.vertexList.length;
+        if (nVertex<=1) return;
+       
+            // find bottom Y
+            
+        by=0;
+            
+        for (n=0;n!==nVertex;n++) {
+            if (this.vertexList[n].y>by) by=this.vertexList[n].y;
+        }
+        
+            // floor it
+            
+        for (n=0;n!==nVertex;n++) {
+            this.vertexList[n].y-=by;
+        }    
+    }
+    
+        //
         // main importer
         //
         
@@ -261,19 +349,19 @@ export default class ImportObjClass
             
             switch(tokens[0]) {
                 case 'v':
-                    x=Math.trunc(parseFloat(tokens[1])*this.scale);
-                    y=Math.trunc((parseFloat(tokens[2])*this.scale)*this.flipFactor);
-                    z=Math.trunc(parseFloat(tokens[3])*this.scale);
+                    x=Math.trunc(parseFloat(tokens[1])*this.importSettings.scale);
+                    y=Math.trunc(parseFloat(tokens[2])*this.importSettings.scale);
+                    z=Math.trunc(parseFloat(tokens[3])*this.importSettings.scale);
                     this.vertexList.push(new PointClass(x,y,z));
                     break;
                 case 'vt':
-                    x=parseFloat(tokens[1]);
-                    y=parseFloat(tokens[2])*this.flipFactor;
+                    x=parseFloat(tokens[1])*this.importSettings.uScale;
+                    y=parseFloat(tokens[2])*this.importSettings.vScale;
                     this.uvList.push(new Point2DClass(x,y));
                     break;
                 case 'vn':
                     x=parseFloat(tokens[1]);
-                    y=parseFloat(tokens[2])*this.flipFactor;
+                    y=parseFloat(tokens[2]);
                     z=parseFloat(tokens[3]);
                     normal=new PointClass(x,y,z);
                     normal.normalize();
@@ -281,6 +369,16 @@ export default class ImportObjClass
                     break;
             }
         }
+        
+        this.rotate();
+        
+            // maps should have zero top (for convience)
+            // models should have zero bottom so they
+            // draw at the bottom of the xyz position
+            // but it's not required
+            
+        if (this.importSettings.zeroTop) this.zeroTop();
+        if (this.importSettings.zeroBottom) this.zeroBottom();
         
             // now create all the meshes
             
@@ -333,30 +431,6 @@ export default class ImportObjClass
             // and finally any current usemtl
             
         if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
-        
-            // force the bottom Y to 0
-            // this is used for game play models
-            
-        if (this.forceBottomYToZero) {
-            
-            for (n=0;n!==this.meshes.length;n++) {
-                mesh=this.meshes[n];
-                
-                    // get the bottom Y
-                
-                by=0;
-                
-                for (k=0;k!==mesh.vertexList.length;k++) {
-                    if (mesh.vertexList[k].position.y>by) by=mesh.vertexList[k].position.y;
-                }
-                
-                    // now transform the vertexes
-            
-                for (k=0;k!==mesh.vertexList.length;k++) {
-                    mesh.vertexList[k].position.y-=by;
-                }
-            }
-        }
         
             // and sort meshes by bitmaps into mesh list
             
