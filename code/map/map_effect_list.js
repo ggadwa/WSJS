@@ -59,6 +59,8 @@ export default class MapEffectListClass
         let n,x,y,z,idx;
         
         for (effect of this.effects.values()) {
+            if (!effect.show) continue;
+            
             light=effect.getLight();
             if (light===null) continue;
             
@@ -104,6 +106,9 @@ export default class MapEffectListClass
         let effect;
         
         for (effect of this.effects.values()) {
+            if (!effect.show) continue;
+            
+            effect.drawSetup();
             if (effect.isInView()) effect.draw();
         }
     }

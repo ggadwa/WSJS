@@ -19,8 +19,8 @@ class MainClass
         this.view=new ViewClass();
         this.map=new MapClass(this.view);
         
-        this.game=new GameClass(this.view,this.map);
-        this.projectMap=this.game.getStartMap();
+        this.game=null;
+        this.projectMap=null;
 
         Object.seal(this);
     }
@@ -38,6 +38,11 @@ class MainClass
             // trouble so we don't lose it
             
         console.log('Seed:'+config.SEED);
+        
+            // the project objects
+            
+        this.game=new GameClass(this.view,this.map);
+        this.projectMap=this.game.getStartMap();
          
            // init view
         

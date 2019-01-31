@@ -9,11 +9,15 @@ export default class ProjectEffectClass
         this.position=position;
         this.data=data;
         
+        this.show=true;
+        
         this.tempPoint=new PointClass(0,0,0);
     }
     
     initialize()
     {
+        this.show=true;
+        
         return(true);
     }
     
@@ -113,6 +117,16 @@ export default class ProjectEffectClass
     getLight()
     {
         return(null);
+    }
+    
+        //
+        // override this for any draw setup, after this isInView
+        // is called to check to see if effect is in view, and then
+        // it's draw with a call to draw()
+        // 
+        
+    drawSetup()
+    {
     }
     
         //

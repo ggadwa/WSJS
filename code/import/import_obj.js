@@ -10,6 +10,16 @@ export default class ImportObjClass
         this.view=view;
         this.importSettings=importSettings;
         
+            // fix any missing import settings
+            
+        if (this.importSettings.name===undefined) throw('importSettings.name is required');
+        if (this.importSettings.scale===undefined) this.importSettings.scale=1;
+        if (this.importSettings.uScale===undefined) this.importSettings.uScale=1;
+        if (this.importSettings.vScale===undefined) this.importSettings.vScale=1;
+        if (this.importSettings.rotate===undefined) this.importSettings.rotate={"x":0,"y":0,"z":0};
+        if (this.importSettings.zeroTop===undefined) this.importSettings.zeroTop=false;
+        if (this.importSettings.zeroBottom===undefined) this.importSettings.zeroBottom=false;
+        
         this.data=null;
         this.lines=null;
         
@@ -200,7 +210,7 @@ export default class ImportObjClass
     {
         let n,nVertex;
         let centerPnt=new PointClass(0,0,0);
-        let rotAng=new PointClass(0,0,180);
+        let rotAng=this.importSettings.rotate;
         
             // can't do anything if only one
             // or no vertexes

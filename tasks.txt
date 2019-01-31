@@ -5,9 +5,8 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
--> deflip the Y and treat down as negative?
--> IMPORT needs rotate angle
 
+0. map.addEntity -> needs to be entityList.add(...) etc, rework that code
 1. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions
 1. make a particle effect, then remove old particle effect
