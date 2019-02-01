@@ -2,7 +2,7 @@ import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
 import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
 import SkyShaderClass from '../../code/sky/sky_shader.js';
 import ModelMeshShaderClass from '../../code/model/model_mesh_shader.js';
-import ParticleShaderClass from '../../code/particle/particle_shader.js';
+import EffectShaderClass from '../../code/map/effect_shader.js';
 import InterfaceShaderClass from '../../code/interface/interface_shader.js';
 import TextShaderClass from '../../code/text/text_shader.js';
 
@@ -20,7 +20,7 @@ export default class ShaderListClass
         this.mapLiquidShader=null;
         this.skyShader=null;
         this.modelMeshShader=null;
-        this.particleShader=null;
+        this.effectShader=null;
         this.interfaceShader=null;
         this.textShader=null;
         
@@ -42,7 +42,7 @@ export default class ShaderListClass
         this.mapLiquidShader=null;
         this.skyShader=null;
         this.modelMeshShader=null;
-        this.particleShader=null;
+        this.effectShader=null;
         this.interfaceShader=null;
         this.textShader=null;
     }
@@ -54,7 +54,7 @@ export default class ShaderListClass
         if (this.mapLiquidShader!==null) this.mapLiquidShader.release();
         if (this.skyShader!==null) this.skyShader.release();
         if (this.modelMeshShader!==null) this.modelMeshShader.release();
-        if (this.particleShader!==null) this.particleShader.release();
+        if (this.effectShader!==null) this.effectShader.release();
         if (this.interfaceShader!==null) this.interfaceShader.release();
         if (this.textShader!==null) this.textShader.release();
     }
@@ -81,9 +81,9 @@ export default class ShaderListClass
         this.modelMeshShader.initialize();
         if (!(await this.modelMeshShader.load())) return(false);
            
-        this.particleShader=new ParticleShaderClass(this.view);
-        this.particleShader.initialize();
-        if (!(await this.particleShader.load())) return(false);
+        this.effectShader=new EffectShaderClass(this.view);
+        this.effectShader.initialize();
+        if (!(await this.effectShader.load())) return(false);
             
         this.interfaceShader=new InterfaceShaderClass(this.view);
         this.interfaceShader.initialize();

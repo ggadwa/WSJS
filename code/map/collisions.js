@@ -166,7 +166,7 @@ export default class CollisionClass
         
         let origPt=entity.position;
         let radius=entity.radius;
-        let high=entity.high;
+        let high=entity.height;
         
         let nMesh=this.map.meshList.meshes.length;
         let nEntity=this.map.entityList.count();
@@ -255,7 +255,7 @@ export default class CollisionClass
                 
                     // skip if not in the Y of the line
 
-                entityTopY=checkEntityPt.y-checkEntity.high;
+                entityTopY=checkEntityPt.y-checkEntity.height;
                 if (((this.testPt.y-high)>checkEntityPt.y) || (this.testPt.y<=entityTopY)) continue;
                 
                     // check the circle
@@ -430,12 +430,12 @@ export default class CollisionClass
             // to the furtherest we are trying to rise
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues(((entity.position.y-entity.high)+riseY),((entity.position.y-entity.high)-riseY));      // riseY is negative
+        this.objYBound.setFromValues(((entity.position.y-entity.height)+riseY),((entity.position.y-entity.height)-riseY));      // riseY is negative
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
             // build the ray trace points and ray vector
             
-        this.buildYCollisionRayPoints(entity,((entity.position.y-entity.high)-riseY));
+        this.buildYCollisionRayPoints(entity,((entity.position.y-entity.height)-riseY));
             
         this.rayVector.x=0;
         this.rayVector.y=riseY*2;     // riseY is negative
@@ -444,7 +444,7 @@ export default class CollisionClass
             // start with no hits
        
         entity.collideCeilingMeshIdx=-1;
-        y=(entity.position.y-entity.high)+riseY;
+        y=(entity.position.y-entity.height)+riseY;
         
             // run through the meshes
         
@@ -482,7 +482,7 @@ export default class CollisionClass
             }
         }
         
-        if (entity.collideCeilingMeshIdx!==-1) return(y-(entity.position.y-entity.high));
+        if (entity.collideCeilingMeshIdx!==-1) return(y-(entity.position.y-entity.height));
         
             // if no collisions, return the riseY
         

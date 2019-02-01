@@ -5,26 +5,17 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-
-0. map.addEntity -> needs to be entityList.add(...) etc, rework that code
-1. need to get rid of a lot of project_entity stuff, it's very player specific
+1. make JSON stuff in file parallel to map objs?
+2. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions
-1. make a particle effect, then remove old particle effect
-   1b. particle shader -> effect shader
-
-2. work on collisions
+3. work on collisions
    0a. make sure to combine any lines/floors that we can
-
 4. get back to updateVertexesToPoseAndPosition
 4a. delete all weapon stuff from player
-
-5. high->height
-6. shaders need to be dynamic and part of project
-7. eventually delete all stuff in entities folder
-
-8. view -> WSJS?
-10. map into view
-11. combine input / view pause states
+5. shaders need to be dynamic and part of project
+6. view -> WSJS?
+7. map into view
+8. combine input / view pause states
 
 
 - get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW

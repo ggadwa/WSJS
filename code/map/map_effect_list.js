@@ -10,7 +10,7 @@ export default class MapEffectListClass
     constructor(view)
     {
         this.view=view;
-        this.effects=new Map();
+        this.effects=[];
         
         Object.seal(this);
     }
@@ -21,32 +21,27 @@ export default class MapEffectListClass
 
     initialize()
     {
-        this.effects.clear();
+        this.effects=[];
         return(true);
     }
 
     release()
     {
-        this.effects.forEach(
-                function(key,value) {
-                    value.release();
-                }
-        );
+        let effect;
+        
+        for (effect of this.effects) {
+            effect.release();
+        }
     }
 
         //
         // effect list
         //
 
-    add(name,effect)
+    add(effect)
     {
-        this.effects.set(name,effect);
+        this.effects.push(effect);
         effect.initialize();
-    }
-    
-    get(name)
-    {
-        return(this.effects.get(name));
     }
     
         //
@@ -58,7 +53,7 @@ export default class MapEffectListClass
         let effect,light;
         let n,x,y,z,idx;
         
-        for (effect of this.effects.values()) {
+        for (effect of this.effects) {
             if (!effect.show) continue;
             
             light=effect.getLight();
@@ -105,7 +100,7 @@ export default class MapEffectListClass
     {
         let effect;
         
-        for (effect of this.effects.values()) {
+        for (effect of this.effects) {
             if (!effect.show) continue;
             
             effect.drawSetup();

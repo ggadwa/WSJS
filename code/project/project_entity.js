@@ -11,23 +11,28 @@ import CollisionClass from '../../code/map/collisions.js';
 
 export default class ProjectEntityClass
 {
-    constructor(view,map,name,radius,height)
+    constructor(view,map,name,position,angle)
     {
         this.view=view;
         this.map=map;
         
         this.name=name;
-        this.radius=radius;
-        this.high=height;
+        this.radius=1;
+        this.height=1;
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
+        
         this.show=true;
         this.heldBy=null;
         
         this.model=null;
         this.modelImportSettings=null;
         
+        if (position!==null) this.position.setFromPoint(position);
+        if (angle!==null) this.angle.setFromPoint(angle);
+        
         this.positionBackup=new PointClass(0,0,0);
+        this.positionBackup.setFromPoint(this.position);
         
         this.eyeOffset=3000;
 

@@ -44,7 +44,7 @@ export default class ImportMapClass
                 effectPos.addPoint(this.map.meshList.meshes[idx].center);
                 
                 effect=new effectDef.class(this.view,this.map,effectPos,effectDef.data);
-                this.map.effectList.add(effectDef.name,effect);
+                this.map.effectList.add(effect);
             }
         }
         

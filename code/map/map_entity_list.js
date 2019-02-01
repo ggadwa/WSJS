@@ -44,12 +44,16 @@ export default class MapEntityListClass
     {
         entity.id=0;
         this.entities[0]=entity;
+        
+        entity.initialize();
     }
 
     add(entity)
     {
         entity.id=this.entityCurrentId++;
         this.entities.push(entity);
+        
+        entity.initialize();
     }
     
     clear()

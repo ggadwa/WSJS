@@ -11,7 +11,7 @@ void main(void)
 {
     lowp vec4 tex=texture(baseTex,fragUV);
 
-    outputPixel.rgb=colorAlpha.rgb*tex.r;   // red component is used as a mask
+    outputPixel.rgb=colorAlpha.rgb*tex.rgb;
     outputPixel.a=tex.a*colorAlpha.a;
 }
 
