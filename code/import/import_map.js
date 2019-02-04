@@ -6,6 +6,7 @@ import MapLiquidClass from '../../code/map/map_liquid.js';
 import MoveClass from '../../code/map/move.js';
 import MovementClass from '../../code/map/movement.js';
 import ImportObjClass from '../../code/import/import_obj.js';
+import ImportJSONClass from '../../code/import/import_json.js';
 
 export default class ImportMapClass
 {
@@ -15,24 +16,33 @@ export default class ImportMapClass
         this.map=map;
     }
     
-    async load(importSettings,skyBoxSettings,lightSettings,glowSettings,effectSettings,liquidSettings,movementSettings)
+    async load(importSettings)
     {
         let n,k,idx;
-        let effect,effectDef,effectPos;
+        let effect,effectDef,effectPos,effectClass;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
         let movement,idxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset;
         let glowDef,bitmap;
-        let importObj;
+        let importObj,importJSON,mapSettings;
         
+            // import the map itself
+            
         importObj=new ImportObjClass(this.view,importSettings);
         if (!(await importObj.import(this.map.meshList))) return(false);
         
+            // import the json
+            
+        importJSON=new ImportJSONClass(this.view,importSettings);
+        mapSettings=(await importJSON.import());
+        
             // run through the effects so bitmaps get into list
             
-        if (effectSettings!==null) {
-            for (n=0;n!==effectSettings.effects.length;n++) {
-                effectDef=effectSettings.effects[n];
+        if (mapSettings.effects!==null) {
+            if (importSettings.effectClassLookup===undefined) throw('Map JSON that has effects requires an effectClassLookup property in importSettings to convert names to classes');
+            
+            for (n=0;n!==mapSettings.effects.length;n++) {
+                effectDef=mapSettings.effects[n];
                 
                 idx=this.map.meshList.find(effectDef.mesh);
                 if (idx===-1) {
@@ -40,22 +50,32 @@ export default class ImportMapClass
                     continue;
                 }
                 
+                effectClass=null;
+                for (k=0;k!==importSettings.effectClassLookup.length;k++) {
+                    if (effectDef.effect===importSettings.effectClassLookup[k][0]) {
+                        effectClass=importSettings.effectClassLookup[k][1];
+                        break;
+                    }
+                }
+                
+                if (effectClass===null) throw('Could not find a class in effectClassLookup for effect named: '+effectDef.effect);
+                
                 effectPos=new PointClass(effectDef.offset.x,effectDef.offset.y,effectDef.offset.z);
                 effectPos.addPoint(this.map.meshList.meshes[idx].center);
                 
-                effect=new effectDef.class(this.view,this.map,effectPos,effectDef.data);
+                effect=new effectClass(this.view,this.map,effectPos,effectDef.data);
                 this.map.effectList.add(effect);
             }
         }
         
             // the lights
             
-        this.view.ambient=lightSettings.ambient;
+        this.view.ambient=mapSettings.ambient;
         
-        if (lightSettings.lights!==null) {
+        if (mapSettings.lights!==null) {
             
-            for (n=0;n!==lightSettings.lights.length;n++) {
-                lightDef=lightSettings.lights[n];
+            for (n=0;n!==mapSettings.lights.length;n++) {
+                lightDef=mapSettings.lights[n];
 
                 idx=this.map.meshList.find(lightDef.mesh);
                 if (idx===-1) {
@@ -70,9 +90,9 @@ export default class ImportMapClass
         
             // the liquids
             
-        if (liquidSettings!==null) {
-            for (n=0;n!==liquidSettings.liquids.length;n++) {
-                liquidDef=liquidSettings.liquids[n];
+        if (mapSettings.liquids!==null) {
+            for (n=0;n!==mapSettings.liquids.length;n++) {
+                liquidDef=mapSettings.liquids[n];
                 
                 this.view.bitmapList.add(liquidDef.bitmap,true);
 
@@ -85,10 +105,10 @@ export default class ImportMapClass
        
             // the movements
             
-        if (movementSettings!==null) {
+        if (mapSettings.movements!==null) {
 
-            for (n=0;n!==movementSettings.movements.length;n++) {
-                movementDef=movementSettings.movements[n];
+            for (n=0;n!==mapSettings.movements.length;n++) {
+                movementDef=mapSettings.movements[n];
 
                 idxList=[];
                 
@@ -124,26 +144,26 @@ export default class ImportMapClass
         
             // the sky
             
-        if (skyBoxSettings===null) {
+        if (mapSettings.skyBox===null) {
             this.map.sky.on=false;
         }
         else {
             this.map.sky.on=true;
-            this.map.sky.skyBoxSettings=skyBoxSettings;
+            this.map.sky.skyBoxSettings=mapSettings.skyBox;
             
-            this.view.bitmapList.add(skyBoxSettings.bitmapNegX,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapPosX,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapNegY,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapPosY,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapNegZ,true);
-            this.view.bitmapList.add(skyBoxSettings.bitmapPosZ,true);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegX,true);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosX,true);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegY,true);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosY,true);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegZ,true);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosZ,true);
         }
         
             // alter any bitmaps for glow settings
             
-        if (glowSettings!==null) {
-            for (n=0;n!==glowSettings.glows.length;n++) {
-                glowDef=glowSettings.glows[n];
+        if (mapSettings.glows!==null) {
+            for (n=0;n!==mapSettings.glows.length;n++) {
+                glowDef=mapSettings.glows[n];
                 
                 bitmap=this.view.bitmapList.get(glowDef.bitmap);
                 if (bitmap===undefined) {

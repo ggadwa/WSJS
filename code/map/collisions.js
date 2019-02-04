@@ -151,6 +151,135 @@ export default class CollisionClass
         
         return(true);
     }
+    
+        //
+        // simple collision
+        //
+        
+    simpleCollision(entity)
+    {
+        let n,k;
+        let mesh,checkEntity,checkEntityPt;
+        let collisionLine,nCollisionLine;        
+        let currentHitPt;        
+        let dist,currentDist;
+        
+        let origPt=entity.position;
+        let radius=entity.radius;
+        let high=entity.height;
+        
+        let nMesh=this.map.meshList.meshes.length;
+        let nEntity=this.map.entityList.count();
+        
+            // only bump once
+            
+        let entityTopY;
+        let yBound;
+        
+            // the rough collide boxes
+            
+        this.objXBound.setFromValues((entity.position.x-radius),(entity.position.x+radius));
+        this.objYBound.setFromValues((entity.position.y-high),entity.position.y);
+        this.objZBound.setFromValues((entity.position.z-radius),(entity.position.z+radius));
+        
+            // no collisions yet
+            
+        entity.collideWallMeshIdx=-1;
+        entity.collideWallLineIdx=-1;
+        
+        currentHitPt=null;
+        currentDist=-1;
+
+            // run through the meshes and
+            // check against collision lines
+
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.map.meshList.meshes[n];
+
+                // skip any mesh we don't collide with
+
+            if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                // check the collide lines
+
+            nCollisionLine=mesh.collisionLines.length;
+
+            for (k=0;k!==nCollisionLine;k++) {
+                collisionLine=mesh.collisionLines[k];
+
+                    // skip if not in the Y of the line
+
+                yBound=collisionLine.getYBound();
+                if (entity.position.y<=yBound.min) continue;
+                if ((entity.position.y-high)>yBound.max) continue;
+
+                    // check against line
+
+                if (!this.circleLineXZIntersection(collisionLine,entity.position,radius,this.moveIntersectPt)) continue;
+
+                    // find closest hit point
+
+                dist=entity.position.noSquareDistance(this.moveIntersectPt);
+                if ((dist<currentDist) || (currentDist===-1)) {
+                    entity.collideWallMeshIdx=n;
+                    entity.collideWallLineIdx=k;
+                    currentHitPt=this.moveIntersectPt;
+                    currentDist=dist;
+                }
+            }
+        }
+
+            // check other entities
+
+        for (n=0;n!==nEntity;n++) {
+            checkEntity=this.map.entityList.get(n);
+            if (checkEntity.id===entity.id) continue;
+
+            checkEntityPt=checkEntity.position;
+
+                // skip if not in the Y of the line
+
+            entityTopY=checkEntityPt.y-checkEntity.height;
+            if (((entity.position.y-high)>checkEntityPt.y) || (entity.position.y<=entityTopY)) continue;
+
+                // check the circle
+
+            if (!this.circleCircleIntersection(entity.position,radius,checkEntityPt,checkEntity.radius,this.moveIntersectPt)) continue;
+
+                // find closest hit point
+
+            dist=entity.position.noSquareDistance(this.moveIntersectPt);
+            if ((dist<currentDist) || (currentDist===-1)) {
+                entity.collideWallMeshIdx=-1;
+
+                    // set the touch
+
+                entity.touchEntity=checkEntity;
+                checkEntity.touchEntity=entity;
+
+                    // the hit point
+
+                currentHitPt=this.moveIntersectPt;
+                currentDist=dist;
+            }
+        }
+
+            // if no hits, return null
+            
+        if (currentHitPt===null) return(null);
+        
+            // we need to move the hit point so it's
+            // always outside the radius of moving point
+        
+        this.radiusPt.setFromValues((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
+        
+        this.radiusPt.normalize();
+        this.radiusPt.scale(radius);
+        
+        this.radiusPt.addPoint(currentHitPt);
+        
+        return(this.radiusPt);
+    }
 
         //
         // colliding objects

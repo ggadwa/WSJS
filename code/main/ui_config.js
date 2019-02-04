@@ -119,49 +119,7 @@ export default class UIConfigClass
             // add in left controls (booleans)
         
         for (n=0;n!==nProp;n++) {
-            if (!(typeof(config[propList[n]])==='boolean')) continue;
-            
-                // the wrapper
-                
-            wrapperDiv=document.createElement('div');
-            wrapperDiv.className='controlWrapper';
-            
-                // the control
-                
-            ctrl=document.createElement('input');
-            ctrl.id='ctrl_'+propList[n];
-            ctrl.type='checkbox';
-            ctrl.checked=config[propList[n]];
-            ctrl.className='controlCheckbox';
-            wrapperDiv.appendChild(ctrl);
-             
-                // the label
-                
-            labelDiv=document.createElement('label');
-            labelDiv.className='labelCheckbox';
-            labelDiv.htmlFor='ctrl_'+propList[n];
-            labelDiv.appendChild(document.createTextNode(propList[n]));
-            wrapperDiv.appendChild(labelDiv);
-            
-            leftColDiv.appendChild(wrapperDiv);
-        }
-        
-            // a couple special controls
-            
-        
-        
-            // add in right controls (text)
-        
-        for (n=0;n!==nProp;n++) {
-            if (typeof(config[propList[n]])==='boolean') continue;
-            
-                // skip any lists
-                
             if (propList[n].endsWith('_LIST')) continue;
-            
-                // determine if combo
-                
-            comboArray=config[propList[n]+'_LIST'];
             
                 // the wrapper
                 
@@ -177,32 +135,49 @@ export default class UIConfigClass
             
             wrapperDiv.appendChild(labelDiv);
             
-                // the control
-            
-            if (comboArray===undefined) {    
+                // booleans
+                
+            if (typeof(config[propList[n]])==='boolean') {
                 ctrl=document.createElement('input');
                 ctrl.id='ctrl_'+propList[n];
-                ctrl.type='text';
-                ctrl.value=config[propList[n]];
+                ctrl.type='checkbox';
+                ctrl.checked=config[propList[n]];
+                ctrl.className='controlCheckbox';
+                wrapperDiv.appendChild(ctrl);
             }
             else {
-                ctrl=document.createElement('select');
-                ctrl.id='ctrl_'+propList[n];
                 
-                for (k=0;k!=comboArray.length;k++) {
-                    option=document.createElement('option');
-                    option.text=comboArray[k];
-                    ctrl.add(option);
+                    // if there's a combo array, it's a combo
+
+                comboArray=config[propList[n]+'_LIST'];
+            
+                    // the control
+
+                if (comboArray===undefined) {    
+                    ctrl=document.createElement('input');
+                    ctrl.id='ctrl_'+propList[n];
+                    ctrl.type='text';
+                    ctrl.value=config[propList[n]];
                 }
-                
-                ctrl.selectedIndex=config[propList[n]];
+                else {
+                    ctrl=document.createElement('select');
+                    ctrl.id='ctrl_'+propList[n];
+
+                    for (k=0;k!=comboArray.length;k++) {
+                        option=document.createElement('option');
+                        option.text=comboArray[k];
+                        ctrl.add(option);
+                    }
+
+                    ctrl.selectedIndex=config[propList[n]];
+                }
+
+                ctrl.className='controlText';
+
+                wrapperDiv.appendChild(ctrl);
             }
             
-            ctrl.className='controlText';
-            
-            wrapperDiv.appendChild(ctrl);
-            
-            rightColDiv.appendChild(wrapperDiv);
+            leftColDiv.appendChild(wrapperDiv);
         }
         
         document.body.appendChild(mainDiv);
