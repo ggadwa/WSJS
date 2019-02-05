@@ -39,8 +39,6 @@ export default class ImportMapClass
             // run through the effects so bitmaps get into list
             
         if (mapSettings.effects!==null) {
-            if (importSettings.effectClassLookup===undefined) throw('Map JSON that has effects requires an effectClassLookup property in importSettings to convert names to classes');
-            
             for (n=0;n!==mapSettings.effects.length;n++) {
                 effectDef=mapSettings.effects[n];
                 
@@ -50,14 +48,7 @@ export default class ImportMapClass
                     continue;
                 }
                 
-                effectClass=null;
-                for (k=0;k!==importSettings.effectClassLookup.length;k++) {
-                    if (effectDef.effect===importSettings.effectClassLookup[k][0]) {
-                        effectClass=importSettings.effectClassLookup[k][1];
-                        break;
-                    }
-                }
-                
+                effectClass=importSettings.lookupEffectClass(effectDef.effect);
                 if (effectClass===null) throw('Could not find a class in effectClassLookup for effect named: '+effectDef.effect);
                 
                 effectPos=new PointClass(effectDef.offset.x,effectDef.offset.y,effectDef.offset.z);

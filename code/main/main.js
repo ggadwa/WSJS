@@ -6,6 +6,9 @@ import MapClass from '../../code/map/map.js';
 import genRandom from '../../code/utility/random.js';
 import GameClass from '../../data/scripts/game.js';
 
+import ImportSettingsClass from '../../code/import/import_settings.js';
+import ImportFBXClass from '../../code/import/import_fbx.js';
+
 //
 // main class
 //
@@ -34,6 +37,22 @@ class MainClass
 
     async initView()
     {
+        /*
+        let importSettings=new ImportSettingsClass('example');
+        
+        importSettings.scale=500;
+        importSettings.vScale=-1.0;
+        importSettings.rotate.z=180;
+        importSettings.yZero=importSettings.Y_ZERO_TOP;
+        
+        let importFBXClass=new ImportFBXClass(this.view,importSettings);
+        importFBXClass.import(null);
+        
+        return;
+        */
+
+
+
             // print out the key incase we have
             // trouble so we don't lose it
             

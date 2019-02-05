@@ -10,16 +10,6 @@ export default class ImportObjClass
         this.view=view;
         this.importSettings=importSettings;
         
-            // fix any missing import settings
-            
-        if (this.importSettings.name===undefined) throw('importSettings.name is required');
-        if (this.importSettings.scale===undefined) this.importSettings.scale=1;
-        if (this.importSettings.uScale===undefined) this.importSettings.uScale=1;
-        if (this.importSettings.vScale===undefined) this.importSettings.vScale=1;
-        if (this.importSettings.rotate===undefined) this.importSettings.rotate={"x":0,"y":0,"z":0};
-        if (this.importSettings.zeroTop===undefined) this.importSettings.zeroTop=false;
-        if (this.importSettings.zeroBottom===undefined) this.importSettings.zeroBottom=false;
-        
         this.data=null;
         this.lines=null;
         
@@ -49,11 +39,6 @@ export default class ImportObjClass
         }
     }
     
-        //
-        // start the import by loading the obj file
-        // and passing it on to the decoder
-        //
-        
         //
         // utilities
         //
@@ -387,8 +372,14 @@ export default class ImportObjClass
             // draw at the bottom of the xyz position
             // but it's not required
             
-        if (this.importSettings.zeroTop) this.zeroTop();
-        if (this.importSettings.zeroBottom) this.zeroBottom();
+        switch (this.importSettings.yZero) {
+            case this.importSettings.Y_ZERO_TOP:
+                this.zeroTop();
+                break;
+            case this.importSettings.Y_ZERO_BOTTOM:
+                this.zeroBottom();
+                break;
+        }
         
             // now create all the meshes
             
