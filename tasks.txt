@@ -5,7 +5,7 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-1.5: collision for rocket
+0. need flag to load OBJ or FBX
 1.6 merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions

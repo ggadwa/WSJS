@@ -37,7 +37,7 @@ class MainClass
 
     async initView()
     {
-
+/*
         let importSettings=new ImportSettingsClass('example');
         
         importSettings.scale=500;
@@ -49,7 +49,7 @@ class MainClass
         importFBXClass.import(null);
         
         return;
-
+*/
 
 
 

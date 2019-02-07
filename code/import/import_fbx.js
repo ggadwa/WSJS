@@ -65,7 +65,7 @@ export default class ImportFBXClass
         try {
             resp=await fetch(url);
             if (!resp.ok) return(Promise.reject('Unable to load '+url+'; '+resp.statusText));
-            return(await resp.text());
+            return(await resp.arrayBuffer());
         }
         catch (e) {
             return(Promise.reject('Unable to load '+url+'; '+e.message));
@@ -198,6 +198,19 @@ export default class ImportFBXClass
         return(tokens);
     }
     
+    tokenizeValueAsInt(value)
+    {
+        let n;
+        let tokens=value.split(',');
+        let intTokens=[];
+        
+        for (n=0;n!==tokens.length;n++) {
+            intTokens.push(parseInt(tokens[n]));
+        }
+        
+        return(intTokens);
+    }
+    
         //
         // convert indexes into trigs
         //
@@ -208,7 +221,9 @@ export default class ImportFBXClass
         let startTrigIdx;
         
         console.log('uvlookup='+uvLookupType);
+        console.log('uvIndexes='+uvIndexes);
         console.log('normallookup='+normalLookupType);
+        console.log('normalIndexes='+normalIndexes);
         
             // is there at least 3 points?
 	
@@ -222,14 +237,22 @@ export default class ImportFBXClass
         startTrigIdx=vertexList.length;
 
             // add the polys
-            
-            // supergumba -- need to deal with direct/etc
         
         for (n=0;n!==npt;n++) {
             v=new MeshVertexClass();
             v.position.setFromPoint(this.vertexList[trigIndexes[n]]);
-            v.uv.setFromPoint(this.uvList[trigIndexes[n]]);
-            v.normal.setFromPoint(this.normalList[trigIndexes[n]]);
+            if (uvLookupType===this.LOOKUP_DIRECT) {
+                v.uv.setFromPoint(this.uvList[trigIndexes[n]]);
+            }
+            else {
+                v.uv.setFromPoint(this.uvList[uvIndexes[n]]);
+            }
+            if (normalLookupType===this.LOOKUP_DIRECT) {
+                v.normal.setFromPoint(this.normalList[trigIndexes[n]]);
+            }
+            else {
+                v.normal.setFromPoint(this.normalList[normalIndexes[n]]);
+            }
             vertexList.push(v);
         }
         
@@ -337,13 +360,13 @@ export default class ImportFBXClass
         
     decodeModel(modelNode)
     {
-        let n,name;
+        let n,name,bitmap;
         let x,y,z,normal;
         let uvNode,normalNode;
         let value,tokens;
         let idx,trigIndexes;
         let uvLookupType,normalLookupType,uvIndexes,normalIndexes;
-        let mesh,vertexList,indexes;
+        let vertexList,indexes;
         
             // find the name
             
@@ -362,7 +385,7 @@ export default class ImportFBXClass
         value=modelNode.getProperty('Vertices');
         if (value===undefined) {
             console.log('FBX file missing Vertices node in model '+this.importSettings.name);
-            return(false);
+            return(null);
         }
         
         tokens=value.split(',');
@@ -380,15 +403,19 @@ export default class ImportFBXClass
         uvNode=this.findNodeByName(modelNode,'LayerElementUV');
         if (uvNode===null) {
             console.log('FBX file missing LayerElementUV node in model '+this.importSettings.name);
-            return(false);
+            return(null);
         }
         
+        uvIndexes=null;
         uvLookupType=(this.tokenizeValue(uvNode.getProperty('ReferenceInformationType'))[0]==='Direct')?this.LOOKUP_DIRECT:this.LOOKUP_INDEX;
+        if (uvLookupType===this.LOOKUP_INDEX) {
+            uvIndexes=this.tokenizeValueAsInt(uvNode.getProperty('UVIndex'));
+        }
         
         value=uvNode.getProperty('UV');
         if (value===undefined) {
             console.log('FBX file missing LayerElementUV->UV node in model '+this.importSettings.name);
-            return(false);
+            return(null);
         }
         
         tokens=value.split(',');
@@ -405,15 +432,19 @@ export default class ImportFBXClass
         normalNode=this.findNodeByName(modelNode,'LayerElementNormal');
         if (normalNode===null) {
             console.log('FBX file missing LayerElementNormal node in model '+this.importSettings.name);
-            return(false);
+            return(null);
         }
         
+        normalIndexes=null;
         normalLookupType=(this.tokenizeValue(normalNode.getProperty('ReferenceInformationType'))[0]==='Direct')?this.LOOKUP_DIRECT:this.LOOKUP_INDEX;
+        if (normalLookupType===this.LOOKUP_INDEX) {
+            normalIndexes=this.tokenizeValueAsInt(normalNode.getProperty('NormalsIndex'));
+        }
         
         value=normalNode.getProperty('Normals');
         if (value===undefined) {
             console.log('FBX file missing LayerElementNormal->Normals node in model '+this.importSettings.name);
-            return(false);
+            return(null);
         }
            
         tokens=value.split(',');
@@ -437,7 +468,7 @@ export default class ImportFBXClass
         value=modelNode.getProperty('PolygonVertexIndex');
         if (value===undefined) {
             console.log('FBX file missing PolygonVertexIndex node in model '+this.importSettings.name);
-            return(false);
+            return(null);
         }
         
             // the temp list that gets turned into a mesh
@@ -461,36 +492,13 @@ export default class ImportFBXClass
                 this.addTrigsForIndexes(trigIndexes,vertexList,indexes,uvLookupType,uvIndexes,normalLookupType,normalIndexes);
             }
         }
-        
-        
                 
-            // start a mesh
-            
-        //mesh=new MeshClass(this.view,name,bitmap,vertexList,indexes,0);
-
-
-
-        /*    
-            // and sort meshes by bitmaps into mesh list
-            
-        for (n=0;n!==this.meshes.length;n++) {
-            if (this.meshes[n]===null) continue;
-            
-            curBitmapName=this.meshes[n].bitmap.name;
-            
-            for (k=n;k<this.meshes.length;k++) {
-                if (this.meshes[k]===null) continue;
-                
-                if (this.meshes[k].bitmap.name===curBitmapName) {
-                    meshList.add(this.meshes[k]);
-                    this.meshes[k]=null;
-                }
-            }
-        }
-            */
             // decode successful
             
-        return(true);
+        bitmap=null; // this.view.bitmapList.get(bitmapName);
+        console.log('DONE vertexList='+vertexList.length);
+        console.log('DONE indexes='+indexes.length);
+        return(new MeshClass(this.view,name,bitmap,vertexList,indexes,0));
     }
     
         //
@@ -499,7 +507,9 @@ export default class ImportFBXClass
         
     async import(meshList)
     {
-        let n,rootNode,objectsNode,node;
+        let n,k,rootNode,objectsNode,node;
+        let curBitmapName;
+        let mesh,meshes;
         let data=null;
         
             // load the file
@@ -522,12 +532,53 @@ export default class ImportFBXClass
         
         if (data===null) return(false);
         
+            // make sure it's a proper file
+            
+            
+            
+            
+        
+            // convert to a tree
+            
+        let byteOffset;
+        let nextNodeOffset,name,propertyCount,propertyListSize,nameLen;
+        let view=new DataView(data);
+        let textDecoder=new TextDecoder('utf-8');
+        
+            // make sure it's a proper file
+            
+        name=textDecoder.decode(new Uint8Array(data.slice(0,18)));
+        if (name!=='Kaydara FBX Binary') {
+            console.log('Not a proper binary FBX file: '+this.importSettings.name);
+            return(false);
+        }
+        
+            // run through each node
+            
+        byteOffset=27;      // skip the headers
+        
+        while (true) {
+            
+                // get node information
+
+            nextNodeOffset=view.getUInt32(byteOffset);
+            propertyCount=view.getUInt32(byteOffset+4);
+            propertyListSize=view.getUInt32(byteOffset+8);
+            nameLen=view.getUInt8(byteOffset+12);
+            
+            name=textDecoder.decode(new Uint8Array(data.slice((byteOffset+13),(byteOffset+(nameLen+13)))));
+            
+            console.log(name);
+            
+            byteOffset=nextNodeOffset;
+            if (byteOffset>=data.length) break;
+        }
+        
+        return(false);
+        
             // scan the nodes into a tree
             
         rootNode=this.convertTextToNodeTree(data);
-        
-        
-        this.test(rootNode,0);
         
             // find the objects node
             
@@ -539,13 +590,39 @@ export default class ImportFBXClass
         
             // now decode each model
             
+        meshes=[];
+        
         for (n=0;n!==objectsNode.children.length;n++) {
             node=objectsNode.children[n];
             if (node.name==='Model') {
-                if (!this.decodeModel(node)) return(false);
+                
+                    // look for meshes
+                    
+                console.log('MODEL='+this.tokenizeValue(node.value)[1]);
+                
+                //mesh=this.decodeModel(node);
+                //if (mesh===null) return(false);
+                
+                //meshes.push(mesh);
             }
         }
-        
+
+            // and sort meshes by bitmaps into mesh list
+            
+        for (n=0;n!==this.meshes.length;n++) {
+            if (this.meshes[n]===null) continue;
+            
+            curBitmapName=this.meshes[n].bitmap.name;
+            
+            for (k=n;k<this.meshes.length;k++) {
+                if (this.meshes[k]===null) continue;
+                
+                if (this.meshes[k].bitmap.name===curBitmapName) {
+                    meshList.add(this.meshes[k]);
+                    this.meshes[k]=null;
+                }
+            }
+        }
         
         return(true);
     }
