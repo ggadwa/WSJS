@@ -37,8 +37,8 @@ class MainClass
 
     async initView()
     {
-/*
-        let importSettings=new ImportSettingsClass('example');
+
+        let importSettings=new ImportSettingsClass('guard_binary');
         
         importSettings.scale=500;
         importSettings.vScale=-1.0;
@@ -49,7 +49,7 @@ class MainClass
         importFBXClass.import(null);
         
         return;
-*/
+
 
 
 

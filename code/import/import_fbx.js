@@ -5,28 +5,22 @@ import MeshClass from '../../code/mesh/mesh.js';
 
 class FBXNodeClass
 {
-    constructor(name,value)
+    constructor(name)
     {
         this.name=name;
-        this.value=value;
         
-        this.properties=new Map();
+        this.properties=[];
         this.children=[];
     }
     
-    addProperty(name,value)
+    addProperty(value)
     {
-        this.properties.set(name,value);
+        this.properties.push(value);
     }
     
-    getProperty(name)
+    addChild(name)
     {
-        return(this.properties.get(name));
-    }
-    
-    addChild(name,value)
-    {
-        let child=new FBXNodeClass(name,value);
+        let child=new FBXNodeClass(name);
         this.children.push(child);
         
         return(child);
@@ -43,6 +37,8 @@ export default class ImportFBXClass
         this.LOOKUP_DIRECT=0;
         this.LOOKUP_INDEX=1;
         
+        this.READ_NODE_LIST=['Objects','Model','Geometry','Vertices','PolygonVertexIndex','LayerElementUV','UV','UVIndex','LayerElementNormal','Normals','NormalsIndex','MappingInformationType','ReferenceInformationType'];        
+       
         this.data=null;
         this.lines=null;
         
@@ -70,80 +66,6 @@ export default class ImportFBXClass
         catch (e) {
             return(Promise.reject('Unable to load '+url+'; '+e.message));
         }
-    }
-    
-        //
-        // covert FBX to nodes
-        //
-        
-    convertTextToNodeTree(data)
-    {
-        let idx,nextIdx,line;
-        let colonIdx,name,value;
-        let nodeStack,parentNode;
-        
-            // scan the nodes into a tree
-            
-        idx=0;
-        
-        nodeStack=[];
-        nodeStack.push(new FBXNodeClass(null,null));    // the root node
-        
-        while (idx!==-1) {
-            
-                // get next line
-                
-            nextIdx=data.indexOf('\n',idx);
-            if (nextIdx===-1) {
-                line=data.substring(idx).trim();
-                idx=-1;
-            }
-            else {
-                line=data.substring(idx,nextIdx).trim();
-                idx=nextIdx+1;
-            }
-            
-                // skip comments ; and blank lines
-                
-            if (line==='') continue;
-            if (line.charAt(0)===';') continue;
-            
-                // end of brace
-                
-            if (line==='}') {
-                nodeStack.pop();
-                continue;
-            }
-            
-                // get name and value
-                
-            colonIdx=line.indexOf(':');
-            if (colonIdx===-1) continue;
-            
-            name=line.substring(0,colonIdx).trim();
-            value=line.substring(colonIdx+1).trim();
-            
-                // get parent node
-                
-            parentNode=nodeStack[nodeStack.length-1];
-            
-                // going into brace means
-                // a subnode
-                
-            if (value.charAt(value.length-1)==='{') {
-                nodeStack.push(parentNode.addChild(name,value.substring(0,(value.length-1)).trim()));
-            }
-            
-                // otherwise a property
-                
-            else {
-                parentNode.addProperty(name,value);
-            }
-        }
-        
-            // return root node
-            
-        return(nodeStack[0]);
     }
     
         //
@@ -368,17 +290,14 @@ export default class ImportFBXClass
         let uvLookupType,normalLookupType,uvIndexes,normalIndexes;
         let vertexList,indexes;
         
-            // find the name
-            
-        name='';
-        tokens=this.tokenizeValue(modelNode.value);
+            // find the name (has a null separator in it, then ?Model
         
-        for (n=0;n!==tokens.length;n++) {
-            if (tokens[n].startsWith('Model::')) {
-                name=tokens[n].substring(7);
-                break;
-            }
-        }
+        name=modelNode.properties[0];
+        idx=modelNode.properties[0].indexOf(String.fromCharCode(0));
+        if (idx!==-1) name=name.substring(0,idx);
+        
+        console.log('mesh='+name);
+        return(null);
         
             // get the vertices
             
@@ -502,12 +421,166 @@ export default class ImportFBXClass
     }
     
         //
+        // decode binary tree nodes
+        //
+        
+    decodeProperty(data,view,textDecoder,byteOffset,node)
+    {
+        let propType;
+        let arrayLen,arrayEncode,arrayCompressLen,len;
+        let str,idx;
+        
+        propType=String.fromCharCode(view.getUint8(byteOffset)).charAt(0);
+        console.log(node.name+'='+propType);
+        
+            // get the item
+            
+        switch (propType) {
+            case 'Y':
+                return(2+1);
+            case 'C':
+                return(1+1);
+            case 'I':
+                return(4+1);
+            case 'F':
+                node.addProperty(view.getFloat32((byteOffset+1),true));
+                return(4+1);
+            case 'D':
+                return(8+1);
+            case 'L':
+                return(8+1);
+            case 'f':
+                arrayLen=view.getUint32((byteOffset+1),true);
+                arrayEncode=view.getUint32((byteOffset+5),true);
+                arrayCompressLen=view.getUint32((byteOffset+9),true);
+                return((arrayEncode===0)?((arrayLen*4)+13):(arrayCompressLen+13));
+            case 'd':
+                arrayLen=view.getUint32((byteOffset+1),true);
+                arrayEncode=view.getUint32((byteOffset+5),true);
+                arrayCompressLen=view.getUint32((byteOffset+9),true);
+                console.log('compressed='+arrayEncode);
+                return((arrayEncode===0)?((arrayLen*8)+13):(arrayCompressLen+13));
+            case 'l':
+                arrayLen=view.getUint32((byteOffset+1),true);
+                arrayEncode=view.getUint32((byteOffset+5),true);
+                arrayCompressLen=view.getUint32((byteOffset+9),true);
+                return((arrayEncode===0)?((arrayLen*8)+13):(arrayCompressLen+13));
+            case 'i':
+                arrayLen=view.getUint32((byteOffset+1),true);
+                arrayEncode=view.getUint32((byteOffset+5),true);
+                arrayCompressLen=view.getUint32((byteOffset+9),true);
+                console.log('compressed='+arrayEncode);
+                return((arrayEncode===0)?((arrayLen*4)+13):(arrayCompressLen+13));
+            case 'b':
+                arrayLen=view.getUint32((byteOffset+1),true);
+                arrayEncode=view.getUint32((byteOffset+5),true);
+                arrayCompressLen=view.getUint32((byteOffset+9),true);
+                return((arrayEncode===0)?(arrayLen+13):(arrayCompressLen+13));
+            case 'S':
+                len=view.getUint32((byteOffset+1),true);
+                str=textDecoder.decode(new Uint8Array(data.slice((byteOffset+5),((byteOffset+5)+len))));
+                idx=str.indexOf(0);
+                if (idx!==-1) str=str.substring(0,idx);     // strings can be null terminated
+                node.addProperty(str);
+                return(len+5);
+            case 'R':
+                len=view.getUint32((byteOffset+1),true);
+                // ignore these, aren't used in decoding
+                return(len+5);
+        }
+
+        return(0);
+    }
+        
+    decodeBinaryTree(data,view,textDecoder,is64bit,byteOffset,parentNode)
+    {
+        let n,ok;
+        let nodeHeaderLen;
+        let nextNodeOffset,propertyOffset,propertyCount,propertyListSize,nameLen;
+        let node,name;
+        
+        while (true) {
+            
+                // get node information
+
+            if (!is64bit) {
+                nextNodeOffset=view.getUint32(byteOffset,true);
+                propertyCount=view.getUint32((byteOffset+4),true);
+                propertyListSize=view.getUint32((byteOffset+8),true);
+                nameLen=view.getUint8(byteOffset+12);
+                nodeHeaderLen=13;
+            }
+            else {
+                nextNodeOffset=view.getUint32(byteOffset,true)+(view.getUint32((byteOffset+4),true)*(2**32));
+                propertyCount=view.getUint32((byteOffset+8),true)+(view.getUint32((byteOffset+12),true)*(2**32));
+                propertyListSize=view.getUint32((byteOffset+16),true)+(view.getUint32((byteOffset+20),true)*(2**32));
+                nameLen=view.getUint8(byteOffset+24);
+                nodeHeaderLen=25;
+                
+            }
+            
+                // at the blank end node?
+                
+            if (nextNodeOffset===0) break;
+
+                // get the name
+                
+            byteOffset+=nodeHeaderLen;
+            name=textDecoder.decode(new Uint8Array(data.slice(byteOffset,(byteOffset+nameLen))));
+            byteOffset+=nameLen;
+            
+                // we are only looking for specific nodes,
+                // so knock out things we don't care about
+                
+            ok=false;
+            
+            for (n=0;n!==this.READ_NODE_LIST.length;n++) {
+                if (name===this.READ_NODE_LIST[n]) {
+                    ok=true;
+                }
+            }
+                
+            if (!ok) {
+                byteOffset=nextNodeOffset;
+                continue;
+            }
+                
+                // create the node
+            
+            node=parentNode.addChild(name);
+            
+                // read the properties
+            
+            propertyOffset=byteOffset;
+            
+            for (n=0;n!==propertyCount;n++) {
+                propertyOffset+=this.decodeProperty(data,view,textDecoder,propertyOffset,node);
+            }
+            
+            byteOffset+=propertyListSize;
+            
+                // check for nested nodes
+                // there is always a null node at the end so ignore that
+            
+            if (byteOffset<nextNodeOffset) {
+                this.decodeBinaryTree(data,view,textDecoder,is64bit,byteOffset,node);
+            }
+            
+                // move on to next child
+                
+            byteOffset=nextNodeOffset;
+        }
+
+    }
+    
+        //
         // main importer
         //
         
     async import(meshList)
     {
         let n,k,rootNode,objectsNode,node;
+        let name,is64bit,view,textDecoder;
         let curBitmapName;
         let mesh,meshes;
         let data=null;
@@ -532,18 +605,10 @@ export default class ImportFBXClass
         
         if (data===null) return(false);
         
-            // make sure it's a proper file
-            
-            
-            
-            
-        
             // convert to a tree
             
-        let byteOffset;
-        let nextNodeOffset,name,propertyCount,propertyListSize,nameLen;
-        let view=new DataView(data);
-        let textDecoder=new TextDecoder('utf-8');
+        view=new DataView(data);
+        textDecoder=new TextDecoder('utf-8');
         
             // make sure it's a proper file
             
@@ -553,32 +618,15 @@ export default class ImportFBXClass
             return(false);
         }
         
-            // run through each node
+            // get the version
             
-        byteOffset=27;      // skip the headers
+        is64bit=view.getUint32(23,true)>=7500;
         
-        while (true) {
-            
-                // get node information
-
-            nextNodeOffset=view.getUInt32(byteOffset);
-            propertyCount=view.getUInt32(byteOffset+4);
-            propertyListSize=view.getUInt32(byteOffset+8);
-            nameLen=view.getUInt8(byteOffset+12);
-            
-            name=textDecoder.decode(new Uint8Array(data.slice((byteOffset+13),(byteOffset+(nameLen+13)))));
-            
-            console.log(name);
-            
-            byteOffset=nextNodeOffset;
-            if (byteOffset>=data.length) break;
-        }
+            // decode the tree
+            // start at byte 27 to skip headers
         
-        return(false);
-        
-            // scan the nodes into a tree
-            
-        rootNode=this.convertTextToNodeTree(data);
+        rootNode=new FBXNodeClass(null);
+        this.decodeBinaryTree(data,view,textDecoder,is64bit,27,rootNode);
         
             // find the objects node
             
@@ -588,22 +636,26 @@ export default class ImportFBXClass
             return(false);
         }
         
+        this.test(rootNode,0);
+        console.log('done');
+        return(true);
+        
             // now decode each model
             
         meshes=[];
         
         for (n=0;n!==objectsNode.children.length;n++) {
             node=objectsNode.children[n];
-            if (node.name==='Model') {
+            if (node.name!=='Model') continue;
                 
-                    // look for meshes
-                    
-                console.log('MODEL='+this.tokenizeValue(node.value)[1]);
-                
-                //mesh=this.decodeModel(node);
-                //if (mesh===null) return(false);
-                
-                //meshes.push(mesh);
+                // decode for type
+
+            switch(node.properties[1]) {
+                case 'Mesh':
+                    mesh=this.decodeModel(node);
+                    if (mesh===null) return(false);
+                    meshes.push(mesh);
+                    break;
             }
         }
 
@@ -631,25 +683,24 @@ export default class ImportFBXClass
     {
         let n,k;
         let str;
-        
-        for (var [key, value] of node.properties) {
+        /*
+        for (n=0;n!=node.properties.length;n++) {
             str='';
             for (k=0;k!==spaceCount;k++) { str+='.'; }
             str+='PROP:';
-            str+=key;
-            str+='=';
-            str+=value;
+            str+=node.properties[n];
             console.log(str);
         }
-        
+        */
         for (n=0;n!=node.children.length;n++) {
             str='';
             for (k=0;k!==spaceCount;k++) { str+='.'; }
             str+=node.children[n].name;
-            str+='=';
-            str+=node.children[n].value;
+            str+=" [";
+            str+=node.children[n].properties.length;
+            str+="]";
             console.log(str);
-            this.test(node.children[n],(spaceCount+2));
+            this.test(node.children[n],(spaceCount+1));
         }
     }
 }
