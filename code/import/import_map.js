@@ -5,7 +5,9 @@ import LightClass from '../../code/light/light.js';
 import MapLiquidClass from '../../code/map/map_liquid.js';
 import MoveClass from '../../code/map/move.js';
 import MovementClass from '../../code/map/movement.js';
+import ImportSettingsClass from '../../code/import/import_settings.js';
 import ImportObjClass from '../../code/import/import_obj.js';
+import ImportFbxClass from '../../code/import/import_fbx.js';
 import ImportJSONClass from '../../code/import/import_json.js';
 
 export default class ImportMapClass
@@ -24,12 +26,17 @@ export default class ImportMapClass
         let liquid,liquidDef,liquidBitmap;
         let movement,idxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset;
         let glowDef,bitmap;
-        let importObj,importJSON,mapSettings;
+        let importMesh,importJSON,mapSettings;
         
             // import the map itself
-            
-        importObj=new ImportObjClass(this.view,importSettings);
-        if (!(await importObj.import(this.map.meshList))) return(false);
+          
+        if (importSettings.format===ImportSettingsClass.FORMAT_OBJ) {
+            importMesh=new ImportObjClass(this.view,importSettings); 
+        }
+        else {
+            importMesh=new ImportFbxClass(this.view,importSettings); 
+        }
+        if (!(await importMesh.import(this.map.meshList))) return(false);
         
             // import the json
             

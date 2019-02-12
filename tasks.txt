@@ -5,7 +5,9 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-0. need flag to load OBJ or FBX
+0. should OBJ import share like vertexes?
+--> FBX import needs to move UVs and normals by polygon index, not vertex
+
 1.6 merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions

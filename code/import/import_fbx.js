@@ -27,7 +27,7 @@ class FBXNodeClass
     }
 }
 
-export default class ImportFBXClass
+export default class ImportFbxClass
 {
     constructor(view,importSettings)
     {
@@ -78,59 +78,12 @@ export default class ImportFBXClass
     }
     
         //
-        // convert indexes into trigs
-        //
-        
-    addTrigsForIndexes(trigIndexes,vertices,indexes,vertexList,uvList,uvIndexes,normalList,normalsIndexes)
-    {
-        let n,npt,v;
-        let startTrigIdx;
-        
-            // is there at least 3 points?
-	
-        npt=trigIndexes.length;
-        
-	if (npt<3) return;
-        
-            // polys are tesselated into
-            // triangles around 0 vertex
-            
-        startTrigIdx=vertexList.length;
-
-            // add the polys
-        
-        for (n=0;n!==npt;n++) {
-            v=new MeshVertexClass();
-            v.position.setFromPoint(vertexList[trigIndexes[n]]);
-            if (uvIndexes===null) {
-                v.uv.setFromPoint(uvList[trigIndexes[n]]);
-            }
-            else {
-                v.uv.setFromPoint(uvList[uvIndexes[n]]);
-            }
-            if (normalsIndexes===null) {
-                v.normal.setFromPoint(normalList[trigIndexes[n]]);
-            }
-            else {
-                v.normal.setFromPoint(normalList[normalsIndexes[n]]);
-            }
-            vertices.push(v);
-        }
-        
-        for (n=0;n<(npt-2);n++) {
-            indexes.push(startTrigIdx);
-            indexes.push(startTrigIdx+(n+1));
-            indexes.push(startTrigIdx+(n+2));
-        }
-    }
-    
-        //
         // rotations and Y zeroing
         //
         
-    rotate(vertexList,normalList)
+    rotate(vertexList)
     {
-        let n,nVertex;
+        let n,v,nVertex;
         let centerPnt=new PointClass(0,0,0);
         let rotAng=this.importSettings.rotate;
         
@@ -142,10 +95,10 @@ export default class ImportFBXClass
        
             // find the center
 
-        centerPnt.setFromPoint(vertexList[0]);
+        centerPnt.setFromPoint(vertexList[0].position);
             
         for (n=1;n!==nVertex;n++) {
-            centerPnt.addPoint(vertexList[n]);
+            centerPnt.addPoint(vertexList[n].position);
         }
         
         centerPnt.x=Math.trunc(centerPnt.x/nVertex);
@@ -155,22 +108,20 @@ export default class ImportFBXClass
             // now rotate
             
         for (n=0;n!==nVertex;n++) {
-            vertexList[n].rotateAroundPoint(centerPnt,rotAng);
-        }
-        
-        for (n=0;n!=normalList.length;n++) {
-            normalList[n].rotate(rotAng);
+            v=vertexList[n];
+            v.position.rotateAroundPoint(centerPnt,rotAng);
+            v.normal.rotate(rotAng);
         }
     }
     
-    zeroTop()
+    zeroTop(vertexList)
     {
         let n,nVertex,by;
         
             // can't do anything if only one
             // or no vertexes
             
-        nVertex=this.vertexList.length;
+        nVertex=vertexList.length;
         if (nVertex<=1) return;
        
             // find bottom Y
@@ -178,7 +129,7 @@ export default class ImportFBXClass
         by=0;
             
         for (n=0;n!==nVertex;n++) {
-            if (this.vertexList[n].y<by) by=this.vertexList[n].y;
+            if (vertexList[n].position.y<by) by=vertexList[n].position.y;
         }
         
         by=Math.trunc(Math.abs(by));
@@ -186,18 +137,18 @@ export default class ImportFBXClass
             // floor it
             
         for (n=0;n!==nVertex;n++) {
-            this.vertexList[n].y+=by;
+            vertexList[n].position.y+=by;
         }    
     }
     
-    zeroBottom()
+    zeroBottom(vertexList)
     {
         let n,nVertex,by;
         
             // can't do anything if only one
             // or no vertexes
             
-        nVertex=this.vertexList.length;
+        nVertex=vertexList.length;
         if (nVertex<=1) return;
        
             // find bottom Y
@@ -205,14 +156,84 @@ export default class ImportFBXClass
         by=0;
             
         for (n=0;n!==nVertex;n++) {
-            if (this.vertexList[n].y>by) by=this.vertexList[n].y;
+            if (vertexList[n].position.y>by) by=vertexList[n].position.y;
         }
         
             // floor it
             
         for (n=0;n!==nVertex;n++) {
-            this.vertexList[n].y-=by;
+            vertexList[n].position.y-=by;
         }    
+    }
+    
+    buildVertexListTangents(vertexList,indexes)
+    {
+        let n,nTrig,trigIdx;
+        let v0,v1,v2;
+        let u10,u20,v10,v20;
+
+            // generate tangents by the trigs
+            // sometimes we will end up overwriting
+            // but it depends on the mesh to have
+            // constant shared vertices against
+            // triangle tangents
+
+            // note this recreates a bit of what
+            // goes on to create the normal, because
+            // we need that first to make the UVs
+
+        let p10=new PointClass(0.0,0.0,0.0);
+        let p20=new PointClass(0.0,0.0,0.0);
+        let vLeft=new PointClass(0.0,0.0,0.0);
+        let vRight=new PointClass(0.0,0.0,0.0);
+        let vNum=new PointClass(0.0,0.0,0.0);
+        let denom;
+        let tangent=new PointClass(0.0,0.0,0.0);
+
+        nTrig=Math.trunc(indexes.length/3);
+
+        for (n=0;n!==nTrig;n++) {
+
+                // get the vertex indexes and
+                // the vertexes for the trig
+
+            trigIdx=n*3;
+
+            v0=vertexList[indexes[trigIdx]];
+            v1=vertexList[indexes[trigIdx+1]];
+            v2=vertexList[indexes[trigIdx+2]];
+
+                // create vectors
+
+            p10.setFromSubPoint(v1.position,v0.position);
+            p20.setFromSubPoint(v2.position,v0.position);
+
+                // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
+
+            u10=v1.uv.x-v0.uv.x;        // x component
+            u20=v2.uv.x-v0.uv.x;
+            v10=v1.uv.y-v0.uv.y;        // y component
+            v20=v2.uv.y-v0.uv.y;
+
+                // calculate the tangent
+                // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
+
+            vLeft.setFromScale(p10,v20);
+            vRight.setFromScale(p20,v10);
+            vNum.setFromSubPoint(vLeft,vRight);
+
+            denom=(u10*v20)-(v10*u20);
+            if (denom!==0.0) denom=1.0/denom;
+            tangent.setFromScale(vNum,denom);
+            tangent.normalize();
+
+                // and set the mesh normal
+                // to all vertexes in this trig
+
+            v0.tangent.setFromPoint(tangent);
+            v1.tangent.setFromPoint(tangent);
+            v2.tangent.setFromPoint(tangent);
+        }
     }
     
         //
@@ -221,15 +242,17 @@ export default class ImportFBXClass
         
     decodeGeometry(geoNode)
     {
-        let n,name,array,bitmap;
-        let idx,x,y,z,normal;
-        let trigIndexes,polygonIndexNode,polygonIndexes,vertices,indexes;
+        let n,k,v,nVertex,npt,name,array,bitmap;
+        let idx,x,y,z;
+        let trigIndexes,polygonIndexNode,polygonIndexes,indexes;
         let verticesNode,refTypeNode;
         let uvLayerNode,uvNode,uvIndexNode,uvIndexes;
         let normalLayerNode,normalsNode,normalsIndexNode,normalsIndexes;
+        let normalCount,normal=new PointClass(0,0,0);
         let vertexList=[];
-        let uvList=[];
-        let normalList=[];
+        
+        let startTrigIdx,startVertexIdx;
+        let vertexArray,uvArray,normalsArray;
         
             // find the name (has a null separator in it, then ?Model
         
@@ -237,6 +260,166 @@ export default class ImportFBXClass
         idx=geoNode.properties[1].indexOf(String.fromCharCode(0));
         if (idx!==-1) name=name.substring(0,idx);
         
+        
+        
+        
+
+            
+            // get the indexes
+            
+        polygonIndexNode=this.findNodeByName(geoNode,'PolygonVertexIndex');
+        if (polygonIndexNode===null) {
+            console.log('No polygon indexes found in FBX model: '+this.importSettings.name);
+            return(null);
+        }
+        
+        polygonIndexes=polygonIndexNode.properties[0];
+        
+            // get the vertexes
+            
+        verticesNode=this.findNodeByName(geoNode,'Vertices');
+        if (verticesNode===null) {
+            console.log('No vertices found in FBX model: '+this.importSettings.name);
+            return(null);
+        }
+        
+        vertexArray=verticesNode.properties[0];
+        
+            // load the UVs
+            // we are assuming ByPolygonVertex mapping
+            
+        uvLayerNode=this.findNodeByName(geoNode,'LayerElementUV');
+        if (uvLayerNode===null) {
+            console.log('No UV Layer found in FBX model: '+this.importSettings.name);
+            return(null);
+        }
+        
+        uvIndexes=null;
+        
+        refTypeNode=this.findNodeByName(uvLayerNode,'ReferenceInformationType');
+        if (refTypeNode.properties[0]!=='Direct') {
+            uvIndexNode=this.findNodeByName(uvLayerNode,'UVIndex');
+            uvIndexes=uvIndexNode.properties[0];
+        }
+        
+        uvNode=this.findNodeByName(uvLayerNode,'UV');
+        uvArray=uvNode.properties[0];
+        
+            // load the normals
+            // we are assuming ByPolygonVertex mapping
+            
+        normalLayerNode=this.findNodeByName(geoNode,'LayerElementNormal');
+        if (normalLayerNode===null) {
+            console.log('No Normals Layer found in FBX model: '+this.importSettings.name);
+            return(null);
+        }
+        
+        normalsIndexes=null;
+        
+        refTypeNode=this.findNodeByName(normalLayerNode,'ReferenceInformationType');
+        if (refTypeNode.properties[0]!=='Direct') {
+            normalsIndexNode=this.findNodeByName(normalLayerNode,'UVIndex');
+            normalsIndexes=normalsIndexNode.properties[0];
+        }
+        
+        normalsNode=this.findNodeByName(normalLayerNode,'Normals');
+        normalsArray=normalsNode.properties[0];
+        
+            // run through the indexes and build
+            // a vertex for each one, this is necessary so
+            // we preserve good normals
+            
+        indexes=[];
+        vertexList=[];
+        
+        startTrigIdx=0;
+        trigIndexes=[];
+        
+        for (n=0;n!=polygonIndexes.length;n++) {
+            
+                // a negative number indicates the end of a polygon
+
+            idx=polygonIndexes[n];
+            if (idx>=0) {
+                trigIndexes.push(idx);
+                continue;
+            }
+
+            trigIndexes.push((-idx)-1);     // was XOR, need to make positive and -1
+            
+                // build the vertexes
+            
+            npt=trigIndexes.length;
+            
+            startVertexIdx=vertexList.length;
+            
+            for (k=0;k!=npt;k++) {
+                
+                    // the position
+                
+                idx=trigIndexes[k]*3;
+                x=vertexArray[idx]*this.importSettings.scale;
+                y=vertexArray[idx+1]*this.importSettings.scale;
+                z=vertexArray[idx+2]*this.importSettings.scale;
+            
+                v=new MeshVertexClass();
+                v.position.setFromValues(x,y,z);
+                vertexList.push(v);
+                
+                    // the uv
+                    
+                if (uvIndexes===null) {
+                    idx=(startTrigIdx+k)*2;
+                }
+                else {
+                    idx=uvIndexes[startTrigIdx+k]*2;
+                }
+            
+                x=uvArray[idx]*this.importSettings.uScale;
+                y=uvArray[idx+1]*this.importSettings.vScale;
+                v.uv.setFromValues(x,y);
+                
+                    // the normal
+                    
+                if (normalsIndexes===null) {
+                    idx=(startTrigIdx+k)*3;
+                }
+                else {
+                    idx=normalsIndexes[startTrigIdx+k]*3;
+                }
+                
+                x=normalsArray[idx]*this.importSettings.scale;
+                y=normalsArray[idx+1]*this.importSettings.scale;
+                z=normalsArray[idx+2]*this.importSettings.scale;
+                    
+                v.normal.setFromValues(x,y,z);
+                v.normal.normalize();
+            }
+                
+                // now build the indexes
+                
+            for (k=0;k<(npt-2);k++) {
+                indexes.push(startVertexIdx);
+                indexes.push(startVertexIdx+(k+1));
+                indexes.push(startVertexIdx+(k+2));
+            }
+            
+                // move on to next polygon
+                
+            startTrigIdx=n+1;
+            trigIndexes=[];
+        }
+        
+        console.log('v count='+vertexList.length);
+
+        
+        
+        
+        
+        
+        
+
+/*        
             // load vertices
             
         verticesNode=this.findNodeByName(geoNode,'Vertices');
@@ -247,15 +430,33 @@ export default class ImportFBXClass
         
         idx=0;
         array=verticesNode.properties[0];
+        
+        nVertex=Math.trunc(array.length/3);
 
-        for (n=0;n!==array.length;n++) {
+        for (n=0;n!==nVertex;n++) {
             x=array[idx++]*this.importSettings.scale;
             y=array[idx++]*this.importSettings.scale;
             z=array[idx++]*this.importSettings.scale;
-            vertexList.push(new PointClass(x,y,z));
+            
+            v=new MeshVertexClass();
+            v.position.setFromValues(x,y,z);
+            vertexList.push(v);
         }
         
+        console.log('v count='+nVertex);
+        
+            // get the indexes
+            
+        polygonIndexNode=this.findNodeByName(geoNode,'PolygonVertexIndex');
+        if (polygonIndexNode===null) {
+            console.log('No polygon indexes found in FBX model: '+this.importSettings.name);
+            return(null);
+        }
+            
+        polygonIndexes=polygonIndexNode.properties[0];
+        
             // load the UVs
+            // we are assuming ByPolygonVertex mapping
             
         uvLayerNode=this.findNodeByName(geoNode,'LayerElementUV');
         if (uvLayerNode===null) {
@@ -273,16 +474,34 @@ export default class ImportFBXClass
         
         uvNode=this.findNodeByName(uvLayerNode,'UV');
         
-        idx=0;
         array=uvNode.properties[0];
-
-        for (n=0;n!==array.length;n++) {
-            x=array[idx++]*this.importSettings.uScale;
-            y=array[idx++]*this.importSettings.vScale;
-            uvList.push(new Point2DClass(x,y,z));
+        
+        for (n=0;n!==nVertex;n++) {
+                
+            idx=0;
+            
+            for (k=0;k!=polygonIndexes.length;k++) {
+                idx=polygonIndexes[k];
+                if (idx<0) idx=((-idx)-1);
+                if (idx!==n) continue;
+                
+                if (uvIndexes===null) {
+                    idx=k*2;
+                }
+                else {
+                    idx=uvIndexes[k]*2;
+                }
+                
+                break;
+            }
+            
+            x=array[idx]*this.importSettings.uScale;
+            y=array[idx+1]*this.importSettings.vScale;
+            vertexList[n].uv.setFromValues(x,y);
         }
         
             // load the normals
+            // we are assuming ByPolygonVertex mapping
             
         normalLayerNode=this.findNodeByName(geoNode,'LayerElementNormal');
         if (normalLayerNode===null) {
@@ -300,63 +519,105 @@ export default class ImportFBXClass
         
         normalsNode=this.findNodeByName(normalLayerNode,'Normals');
         
-        idx=0;
         array=normalsNode.properties[0];
 
-        for (n=0;n!==array.length;n++) {
-            x=array[idx++]*this.importSettings.scale;
-            y=array[idx++]*this.importSettings.scale;
-            z=array[idx++]*this.importSettings.scale;
-            normal=new PointClass(x,y,z);
+        for (n=0;n!==nVertex;n++) {
+            
+            normal.setFromValues(0,0,0);
+            normalCount=0;
+            
+                // check polygon indexes, if the
+                // index is for this vertex, than add
+                // in the normal
+                
+            for (k=0;k!=polygonIndexes.length;k++) {
+                idx=polygonIndexes[k];
+                if (idx<0) idx=((-idx)-1);
+                if (idx!==n) continue;
+                
+                    // add in the normal
+                    
+                if (normalsIndexes===null) {
+                    idx=k*3;
+                }
+                else {
+                    idx=normalsIndexes[k]*3;
+                }
+                
+                x=array[idx]*this.importSettings.scale;
+                y=array[idx+1]*this.importSettings.scale;
+                z=array[idx+2]*this.importSettings.scale;
+                    
+                normal.addValues(x,y,z);
+                normalCount++;
+            }
+            
+                // finally finish with normalized average
+                
+            if (normalCount!==0) normal.scale(1/normalCount);
             normal.normalize();
-            normalList.push(normal);
+            
+            vertexList[n].normal.setFromPoint(normal);
         }
-       
+*/
             // any user rotations
             
-        this.rotate(vertexList,normalList);
+        this.rotate(vertexList);
         
-            // get the polygons
+            // maps should have zero top (for convience)
+            // models should have zero bottom so they
+            // draw at the bottom of the xyz position
+            // but it's not required
             
-        polygonIndexNode=this.findNodeByName(geoNode,'PolygonVertexIndex');
-        if (polygonIndexNode===null) {
-            console.log('No polygon indexes found in FBX model: '+this.importSettings.name);
-            return(null);
+        switch (this.importSettings.yZero) {
+            case this.importSettings.Y_ZERO_TOP:
+                this.zeroTop(vertexList);
+                break;
+            case this.importSettings.Y_ZERO_BOTTOM:
+                this.zeroBottom(vertexList);
+                break;
         }
-            
-        polygonIndexes=polygonIndexNode.properties[0];
-        
-            // the temp list that gets turned into a mesh
-            
-        vertices=[];
-        indexes=[];
-        
-            // take apart the polygons and turn them into trigs
 
+            // take apart the polygons and turn them into trigs
+            // a negative number indicates the end of a polygon
+/*
+        indexes=[];
         trigIndexes=[];
         
         for (n=0;n!=polygonIndexes.length;n++) {
             idx=polygonIndexes[n];
             if (idx>=0) {
                 trigIndexes.push(idx);
+                continue;
             }
-            else {
-                trigIndexes.push((-idx)-1);     // was XOR, need to make positive and -1
-                this.addTrigsForIndexes(trigIndexes,vertices,indexes,vertexList,uvList,uvIndexes,normalList,normalsIndexes);
+
+            trigIndexes.push((-idx)-1);     // was XOR, need to make positive and -1
+            
+            npt=trigIndexes.length;
+                
+            for (k=0;k<(npt-2);k++) {
+                indexes.push(trigIndexes[0]);
+                indexes.push(trigIndexes[k+1]);
+                indexes.push(trigIndexes[k+2]);
             }
+            
+            trigIndexes=[];
         }
+*/
+            // recreate the tangents
+            
+        this.buildVertexListTangents(vertexList,indexes);
                 
             // decode successful
-            
+        
+        this.view.bitmapList.add(this.importSettings.name,false);    
         bitmap=this.view.bitmapList.get(this.importSettings.name);
         if (bitmap===undefined) {
             console.log('missing material: '+this.importSettings.name);
             return(null);
         }
 
-        console.log('DONE vertexList='+vertices.length);
-        console.log('DONE indexes='+indexes.length);
-        return(new MeshClass(this.view,name,bitmap,vertices,indexes,0));
+        return(new MeshClass(this.view,name,bitmap,vertexList,indexes,0));
     }
     
         //
@@ -596,10 +857,9 @@ export default class ImportFBXClass
         
     async import(meshList)
     {
-        let n,k,rootNode,objectsNode,geometryNode,node;
+        let rootNode,objectsNode,geometryNode;
         let name,is64bit,view,textDecoder;
-        let curBitmapName;
-        let mesh,meshes;
+        let mesh;
         let data=null;
         
             // load the file
@@ -645,10 +905,6 @@ export default class ImportFBXClass
         rootNode=new FBXNodeClass(null);
         if (!this.decodeBinaryTree(data,view,textDecoder,is64bit,27,rootNode)) return(false);
         
-        this.test(rootNode,0);
-        
-        return(false);
-        
             // find the objects>geometry node
             
         objectsNode=this.findNodeByName(rootNode,'Objects');
@@ -664,49 +920,12 @@ export default class ImportFBXClass
         }
         
             // decode the mesh
+            // for now, seems there's only one mesh in FBX
             
         mesh=this.decodeGeometry(geometryNode);
         if (mesh===null) return(false);
         
-        meshes.push(mesh);
-        
-            // now decode each model
-        
-        /*    
-        meshes=[];
-        
-        for (n=0;n!==objectsNode.children.length;n++) {
-            node=objectsNode.children[n];
-            if (node.name!=='Model') continue;
-                
-                // decode for type
-                // second property is mesh for geometry
-
-            switch(node.properties[2]) {
-                case 'Mesh':
-                    mesh=this.decodeModel(node);
-                    if (mesh===null) return(false);
-                    meshes.push(mesh);
-                    break;
-            }
-        }
-*/
-            // and sort meshes by bitmaps into mesh list
-            
-        for (n=0;n!==this.meshes.length;n++) {
-            if (this.meshes[n]===null) continue;
-            
-            curBitmapName=this.meshes[n].bitmap.name;
-            
-            for (k=n;k<this.meshes.length;k++) {
-                if (this.meshes[k]===null) continue;
-                
-                if (this.meshes[k].bitmap.name===curBitmapName) {
-                    meshList.add(this.meshes[k]);
-                    this.meshes[k]=null;
-                }
-            }
-        }
+        meshList.add(mesh);
         
         return(true);
     }

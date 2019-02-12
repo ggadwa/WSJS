@@ -37,27 +37,6 @@ class MainClass
 
     async initView()
     {
-
-        let importSettings=new ImportSettingsClass('guard_binary');
-        
-        importSettings.scale=500;
-        importSettings.vScale=-1.0;
-        importSettings.rotate.z=180;
-        importSettings.yZero=importSettings.Y_ZERO_TOP;
-        
-        let importFBXClass=new ImportFBXClass(this.view,importSettings);
-        importFBXClass.import(null);
-        
-        return;
-
-
-
-
-            // print out the key incase we have
-            // trouble so we don't lose it
-            
-        console.log('Seed:'+config.SEED);
-        
             // the project objects
             
         this.game=new GameClass(this.view,this.map);
