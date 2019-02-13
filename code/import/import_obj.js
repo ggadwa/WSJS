@@ -182,6 +182,8 @@ export default class ImportObjClass
         
         name=groupName;
         if (groupNameOffset!=0) name+=('_'+groupNameOffset);
+        
+        meshIndexes=new Uint32Array(meshIndexes);           // force to typed array
 
         this.buildVertexListTangents(meshVertices,meshIndexes);
         this.meshes.push(new MeshClass(this.view,name,bitmap,meshVertices,meshIndexes,0));

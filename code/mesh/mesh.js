@@ -24,6 +24,10 @@ export default class MeshClass
         this.indexCount=this.indexes.length;
         this.trigCount=Math.trunc(this.indexCount/3);
         
+            // need 16 or 32 bit indexes?
+            
+        this.need32BitIndexes=(this.vertexCount>0xFFFF);
+        
             // center and bounds
             
         this.center=new PointClass(0,0,0);
@@ -426,7 +430,7 @@ export default class MeshClass
 
             // create all the buffers
             // expects buffers to already be Float32Array
-            // or Uint16Array
+            // or Uint32Array
 
         this.vertexPosBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
@@ -721,7 +725,14 @@ export default class MeshClass
             // to create the index array
             
         this.nonCulledIndexCount=0;
-        if (this.nonCulledIndexes===null) this.nonCulledIndexes=new Uint16Array(this.indexCount);
+        if (this.nonCulledIndexes===null) {
+            if (this.need32BitIndexes) {
+                this.nonCulledIndexes=new Uint32Array(this.indexCount);
+            }
+            else {
+                this.nonCulledIndexes=new Uint16Array(this.indexCount);
+            }
+        } 
         
             // build it out of triangles
             // that aren't normal culled, i.e.,
@@ -773,7 +784,7 @@ export default class MeshClass
     {
         let gl=this.view.gl;
         
-        gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,gl.UNSIGNED_SHORT,0);
+        gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
             
         this.view.drawMeshCount++;
         this.view.drawMeshTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
@@ -783,7 +794,7 @@ export default class MeshClass
     {
         let gl=this.view.gl;
         
-        gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
+        gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
 
         this.view.drawMeshCount++;
         this.view.drawMeshTrigCount+=Math.trunc(this.indexCount/3);

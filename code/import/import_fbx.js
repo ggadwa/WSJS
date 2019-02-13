@@ -34,7 +34,7 @@ export default class ImportFbxClass
         this.view=view;
         this.importSettings=importSettings;
         
-        this.READ_NODE_LIST=['Objects','Model','Geometry','Vertices','PolygonVertexIndex','LayerElementUV','UV','UVIndex','LayerElementNormal','Normals','NormalsIndex','MappingInformationType','ReferenceInformationType'];        
+        this.READ_NODE_LIST=['Objects','Model','Geometry','Vertices','PolygonVertexIndex','LayerElementUV','UV','UVIndex','LayerElementNormal','Normals','NormalsIndex','MappingInformationType','ReferenceInformationType','Deformer','Takes','Take'];        
        
         this.data=null;
         this.lines=null;
@@ -75,6 +75,14 @@ export default class ImportFbxClass
         }
         
         return(null);
+    }
+    
+    trimNodeNameToNullCharacter(name)
+    {
+        let idx=name.indexOf(String.fromCharCode(0));
+        if (idx!==-1) name=name.substring(0,idx);
+        
+        return(name);
     }
     
         //
@@ -240,30 +248,36 @@ export default class ImportFbxClass
         // decode geometry nodes
         //
         
-    decodeGeometry(geoNode)
+    decodeGeometry(rootNode)
     {
-        let n,k,v,nVertex,npt,name,array,bitmap;
+        let n,k,v,npt,name,bitmap;
         let idx,x,y,z;
+        let objectsNode,geoNode;
         let trigIndexes,polygonIndexNode,polygonIndexes,indexes;
         let verticesNode,refTypeNode;
         let uvLayerNode,uvNode,uvIndexNode,uvIndexes;
         let normalLayerNode,normalsNode,normalsIndexNode,normalsIndexes;
-        let normalCount,normal=new PointClass(0,0,0);
-        let vertexList=[];
-        
         let startTrigIdx,startVertexIdx;
-        let vertexArray,uvArray,normalsArray;
+        let vertexList,vertexArray,uvArray,normalsArray;
+                
+            // find the objects>geometry node
+            
+        objectsNode=this.findNodeByName(rootNode,'Objects');
+        if (objectsNode===null) {
+            console.log('No objects node in FBX file '+this.importSettings.name);
+            return(null);
+        }
         
-            // find the name (has a null separator in it, then ?Model
+        geoNode=this.findNodeByName(objectsNode,'Geometry');
+        if (geoNode===null) {
+            console.log('No geometry node in FBX file '+this.importSettings.name);
+            return(null);
+        }
         
-        name=geoNode.properties[1];
-        idx=geoNode.properties[1].indexOf(String.fromCharCode(0));
-        if (idx!==-1) name=name.substring(0,idx);
+            // find the name
+            // (has a null separator in it, then [SOH]Model)
         
-        
-        
-        
-
+        name=this.trimNodeNameToNullCharacter(geoNode.properties[1]);
             
             // get the indexes
             
@@ -410,156 +424,8 @@ export default class ImportFbxClass
             trigIndexes=[];
         }
         
-        console.log('v count='+vertexList.length);
+        indexes=new Uint32Array(indexes);           // force to typed array
 
-        
-        
-        
-        
-        
-        
-
-/*        
-            // load vertices
-            
-        verticesNode=this.findNodeByName(geoNode,'Vertices');
-        if (verticesNode===null) {
-            console.log('No vertices found in FBX model: '+this.importSettings.name);
-            return(null);
-        }
-        
-        idx=0;
-        array=verticesNode.properties[0];
-        
-        nVertex=Math.trunc(array.length/3);
-
-        for (n=0;n!==nVertex;n++) {
-            x=array[idx++]*this.importSettings.scale;
-            y=array[idx++]*this.importSettings.scale;
-            z=array[idx++]*this.importSettings.scale;
-            
-            v=new MeshVertexClass();
-            v.position.setFromValues(x,y,z);
-            vertexList.push(v);
-        }
-        
-        console.log('v count='+nVertex);
-        
-            // get the indexes
-            
-        polygonIndexNode=this.findNodeByName(geoNode,'PolygonVertexIndex');
-        if (polygonIndexNode===null) {
-            console.log('No polygon indexes found in FBX model: '+this.importSettings.name);
-            return(null);
-        }
-            
-        polygonIndexes=polygonIndexNode.properties[0];
-        
-            // load the UVs
-            // we are assuming ByPolygonVertex mapping
-            
-        uvLayerNode=this.findNodeByName(geoNode,'LayerElementUV');
-        if (uvLayerNode===null) {
-            console.log('No UV Layer found in FBX model: '+this.importSettings.name);
-            return(null);
-        }
-        
-        uvIndexes=null;
-        
-        refTypeNode=this.findNodeByName(uvLayerNode,'ReferenceInformationType');
-        if (refTypeNode.properties[0]!=='Direct') {
-            uvIndexNode=this.findNodeByName(uvLayerNode,'UVIndex');
-            uvIndexes=uvIndexNode.properties[0];
-        }
-        
-        uvNode=this.findNodeByName(uvLayerNode,'UV');
-        
-        array=uvNode.properties[0];
-        
-        for (n=0;n!==nVertex;n++) {
-                
-            idx=0;
-            
-            for (k=0;k!=polygonIndexes.length;k++) {
-                idx=polygonIndexes[k];
-                if (idx<0) idx=((-idx)-1);
-                if (idx!==n) continue;
-                
-                if (uvIndexes===null) {
-                    idx=k*2;
-                }
-                else {
-                    idx=uvIndexes[k]*2;
-                }
-                
-                break;
-            }
-            
-            x=array[idx]*this.importSettings.uScale;
-            y=array[idx+1]*this.importSettings.vScale;
-            vertexList[n].uv.setFromValues(x,y);
-        }
-        
-            // load the normals
-            // we are assuming ByPolygonVertex mapping
-            
-        normalLayerNode=this.findNodeByName(geoNode,'LayerElementNormal');
-        if (normalLayerNode===null) {
-            console.log('No Normals Layer found in FBX model: '+this.importSettings.name);
-            return(null);
-        }
-        
-        normalsIndexes=null;
-        
-        refTypeNode=this.findNodeByName(normalLayerNode,'ReferenceInformationType');
-        if (refTypeNode.properties[0]!=='Direct') {
-            normalsIndexNode=this.findNodeByName(normalLayerNode,'UVIndex');
-            normalsIndexes=normalsIndexNode.properties[0];
-        }
-        
-        normalsNode=this.findNodeByName(normalLayerNode,'Normals');
-        
-        array=normalsNode.properties[0];
-
-        for (n=0;n!==nVertex;n++) {
-            
-            normal.setFromValues(0,0,0);
-            normalCount=0;
-            
-                // check polygon indexes, if the
-                // index is for this vertex, than add
-                // in the normal
-                
-            for (k=0;k!=polygonIndexes.length;k++) {
-                idx=polygonIndexes[k];
-                if (idx<0) idx=((-idx)-1);
-                if (idx!==n) continue;
-                
-                    // add in the normal
-                    
-                if (normalsIndexes===null) {
-                    idx=k*3;
-                }
-                else {
-                    idx=normalsIndexes[k]*3;
-                }
-                
-                x=array[idx]*this.importSettings.scale;
-                y=array[idx+1]*this.importSettings.scale;
-                z=array[idx+2]*this.importSettings.scale;
-                    
-                normal.addValues(x,y,z);
-                normalCount++;
-            }
-            
-                // finally finish with normalized average
-                
-            if (normalCount!==0) normal.scale(1/normalCount);
-            normal.normalize();
-            
-            vertexList[n].normal.setFromPoint(normal);
-        }
-*/
             // any user rotations
             
         this.rotate(vertexList);
@@ -578,32 +444,6 @@ export default class ImportFbxClass
                 break;
         }
 
-            // take apart the polygons and turn them into trigs
-            // a negative number indicates the end of a polygon
-/*
-        indexes=[];
-        trigIndexes=[];
-        
-        for (n=0;n!=polygonIndexes.length;n++) {
-            idx=polygonIndexes[n];
-            if (idx>=0) {
-                trigIndexes.push(idx);
-                continue;
-            }
-
-            trigIndexes.push((-idx)-1);     // was XOR, need to make positive and -1
-            
-            npt=trigIndexes.length;
-                
-            for (k=0;k<(npt-2);k++) {
-                indexes.push(trigIndexes[0]);
-                indexes.push(trigIndexes[k+1]);
-                indexes.push(trigIndexes[k+2]);
-            }
-            
-            trigIndexes=[];
-        }
-*/
             // recreate the tangents
             
         this.buildVertexListTangents(vertexList,indexes);
@@ -618,6 +458,59 @@ export default class ImportFbxClass
         }
 
         return(new MeshClass(this.view,name,bitmap,vertexList,indexes,0));
+    }
+    
+        //
+        // decode limbs and animations
+        //
+        
+    decodeLimbs(rootNode)
+    {
+        let n;
+        let objectsNode,node;
+        
+             // find the objects node
+            
+        objectsNode=this.findNodeByName(rootNode,'Objects');
+        if (objectsNode===null) {
+            console.log('No objects node in FBX file '+this.importSettings.name);
+            return(null);
+        }
+        
+            // get all the models
+            
+        for (n=0;n!==objectsNode.children.length;n++) {
+            node=objectsNode.children[n];
+            if (node.name==='Model') console.log('Model='+this.trimNodeNameToNullCharacter(node.properties[1]));
+        }
+        
+            // get all the deformers
+            
+        for (n=0;n!==objectsNode.children.length;n++) {
+            node=objectsNode.children[n];
+            if (node.name==='Deformer') console.log('Deformer='+this.trimNodeNameToNullCharacter(node.properties[1]));
+        }
+    }
+    
+    decodeAnimations(rootNode)
+    {
+        let n;
+        let takesNode,node;
+        
+            // takes aren't required
+            
+        takesNode=this.findNodeByName(rootNode,'Takes');
+        if (takesNode===null) return(null);
+        
+            // get all the takes
+            
+        for (n=0;n!==takesNode.children.length;n++) {
+            node=takesNode.children[n];
+            
+            if (node.name==='Take') console.log('Take='+node.properties[0]);
+        }
+        
+        
     }
     
         //
@@ -905,44 +798,27 @@ export default class ImportFbxClass
         rootNode=new FBXNodeClass(null);
         if (!this.decodeBinaryTree(data,view,textDecoder,is64bit,27,rootNode)) return(false);
         
-            // find the objects>geometry node
-            
-        objectsNode=this.findNodeByName(rootNode,'Objects');
-        if (objectsNode===null) {
-            console.log('No objects node in FBX file '+this.importSettings.name);
-            return(false);
-        }
-        
-        geometryNode=this.findNodeByName(objectsNode,'Geometry');
-        if (geometryNode===null) {
-            console.log('No geometry node in FBX file '+this.importSettings.name);
-            return(false);
-        }
-        
             // decode the mesh
             // for now, seems there's only one mesh in FBX
             
-        mesh=this.decodeGeometry(geometryNode);
+        mesh=this.decodeGeometry(rootNode);
         if (mesh===null) return(false);
         
         meshList.add(mesh);
         
+            // decode the limbs and animations
+            
+        this.decodeLimbs(rootNode);
+        this.decodeAnimations(rootNode);
+        
         return(true);
     }
 
-    test(node,spaceCount)
+    debugNodePrintOut(node,spaceCount)
     {
         let n,k;
         let str;
-        /*
-        for (n=0;n!=node.properties.length;n++) {
-            str='';
-            for (k=0;k!==spaceCount;k++) { str+='.'; }
-            str+='PROP:';
-            str+=node.properties[n];
-            console.log(str);
-        }
-        */
+
         for (n=0;n!=node.children.length;n++) {
             str='';
             for (k=0;k!==spaceCount;k++) { str+='.'; }
