@@ -1,5 +1,5 @@
-import * as constants from '../../code/main/constants.js';
-import ProjectEffectClass from '../../code/project/project_effect.js';
+import * as constants from '../main/constants.js';
+import ProjectEffectClass from '../project/project_effect.js';
 
 //
 // map particle list class

@@ -1,5 +1,5 @@
-import PointClass from '../../code/utility/point.js';
-import Point2DClass from '../../code/utility/2D_point.js';
+import PointClass from '../utility/point.js';
+import Point2DClass from '../utility/2D_point.js';
 
 //
 // mesh vertex

@@ -1,4 +1,4 @@
-import BitmapClass from '../../code/bitmap/bitmap.js';
+import BitmapClass from '../bitmap/bitmap.js';
 
 //
 // view bitmap list class

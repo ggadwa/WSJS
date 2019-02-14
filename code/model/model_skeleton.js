@@ -1,7 +1,7 @@
-import * as constants from '../../code/main/constants.js';
-import PointClass from '../../code/utility/point.js';
-import ModelBoneClass from '../../code/model/model_bone.js';
-import genRandom from '../../code/utility/random.js';
+import * as constants from '../main/constants.js';
+import PointClass from '../utility/point.js';
+import ModelBoneClass from '../model/model_bone.js';
+import genRandom from '../utility/random.js';
 
 //
 // model skeleton class

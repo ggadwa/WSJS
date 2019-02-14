@@ -14,9 +14,10 @@
 <!-- the script -->
 
 <script type="module">
+    import GameClass from './data/scripts/game.js';
     import UIConfigClass from './code/main/ui_config.js';
 
-    let uiConfig=new UIConfigClass();
+    let uiConfig=new UIConfigClass(GameClass);
     uiConfig.run();
 </script>
 <script nomodule>

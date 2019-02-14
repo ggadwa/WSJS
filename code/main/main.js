@@ -1,13 +1,9 @@
-import * as constants from '../../code/main/constants.js';
-import config from '../../code/main/config.js';
-import PointClass from '../../code/utility/point.js';
-import ViewClass from '../../code/main/view.js';
-import MapClass from '../../code/map/map.js';
-import genRandom from '../../code/utility/random.js';
-import GameClass from '../../data/scripts/game.js';
-
-import ImportSettingsClass from '../../code/import/import_settings.js';
-import ImportFBXClass from '../../code/import/import_fbx.js';
+import * as constants from '../main/constants.js';
+import config from '../main/config.js';
+import PointClass from '../utility/point.js';
+import ViewClass from '../main/view.js';
+import MapClass from '../map/map.js';
+import genRandom from '../utility/random.js';
 
 //
 // main class
@@ -28,18 +24,18 @@ class MainClass
         Object.seal(this);
     }
     
-    run()
+    run(gameClass)
     {
         this.view.createCanvas();
         
-        setTimeout(this.initView.bind(this),1);
+        setTimeout(this.initView.bind(this,gameClass),1);
     }
 
-    async initView()
+    async initView(gameClass)
     {
             // the project objects
             
-        this.game=new GameClass(this.view,this.map);
+        this.game=new gameClass(this.view,this.map);
         this.projectMap=this.game.getStartMap();
          
            // init view

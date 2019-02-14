@@ -1,6 +1,6 @@
-import config from '../../code/main/config.js';
-import ShaderClass from '../../code/shader/shader.js';
-import ShaderLightClass from '../../code/shader/shader_light.js';
+import config from '../main/config.js';
+import ShaderClass from '../shader/shader.js';
+import ShaderLightClass from '../shader/shader_light.js';
 
 //
 // model shader class

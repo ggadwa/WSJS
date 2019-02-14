@@ -1,7 +1,7 @@
-import * as constants from '../../code/main/constants.js';
-import PointClass from '../../code/utility/point.js';
-import LineClass from '../../code/utility/line.js';
-import BoundClass from '../../code/utility/bound.js';
+import * as constants from '../main/constants.js';
+import PointClass from '../utility/point.js';
+import LineClass from '../utility/line.js';
+import BoundClass from '../utility/bound.js';
 
 //
 // collision class

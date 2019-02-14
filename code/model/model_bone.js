@@ -1,4 +1,4 @@
-import PointClass from '../../code/utility/point.js';
+import PointClass from '../utility/point.js';
 
 //
 // model bone class
@@ -17,10 +17,6 @@ export default class ModelBoneClass
         this.vectorFromParent=new PointClass(0.0,0,0,0,0);
         this.childBoneIndexes=[];
 
-            // mesh creation
-
-        this.gravityLockDistance=500;
-
             // animation position
             
         this.curPoseAngle=new PointClass(0.0,0.0,0.0);
@@ -28,6 +24,11 @@ export default class ModelBoneClass
 
         this.prevPoseAngle=new PointClass(0.0,0.0,0.0);
         this.nextPoseAngle=new PointClass(0.0,0.0,0.0);
+        
+            // importing data
+            
+        this.fbxImportIndexes=null;
+        this.fbxImportWeights=null;
 
         Object.seal(this);
     }

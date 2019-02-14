@@ -1,9 +1,9 @@
-import * as constants from '../../code/main/constants.js';
-import PointClass from '../../code/utility/point.js';
-import BoundClass from '../../code/utility/bound.js';
-import ModelClass from '../../code/model/model.js';
-import ImportModelClass from '../../code/import/import_model.js';
-import CollisionClass from '../../code/map/collisions.js';
+import * as constants from '../main/constants.js';
+import PointClass from '../utility/point.js';
+import BoundClass from '../utility/bound.js';
+import ModelClass from '../model/model.js';
+import ImportModelClass from '../import/import_model.js';
+import CollisionClass from '../map/collisions.js';
 
 //
 // project entity base class

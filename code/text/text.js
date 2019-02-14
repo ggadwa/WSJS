@@ -1,4 +1,4 @@
-import ColorClass from '../../code/utility/color.js';
+import ColorClass from '../utility/color.js';
 
 //
 // text class

@@ -1,16 +1,16 @@
-import * as constants from '../../code/main/constants.js';
-import config from '../../code/main/config.js';
-import BitmapListClass from '../../code/bitmap/bitmap_list.js';
-import SoundListClass from '../../code/sound/sound_list.js';
-import ShaderListClass from '../../code/shader/shader_list.js';
-import PointClass from '../../code/utility/point.js';
-import RectClass from '../../code/utility/rect.js';
-import PlaneClass from '../../code/utility/plane.js';
-import ColorClass from '../../code/utility/color.js';
-import InputClass from '../../code/main/input.js';
-import ViewCameraClass from '../../code/main/view_camera.js';
-import TextClass from '../../code/text/text.js';
-import InterfaceClass from '../../code/interface/interface.js';
+import * as constants from '../main/constants.js';
+import config from '../main/config.js';
+import BitmapListClass from '../bitmap/bitmap_list.js';
+import SoundListClass from '../sound/sound_list.js';
+import ShaderListClass from '../shader/shader_list.js';
+import PointClass from '../utility/point.js';
+import RectClass from '../utility/rect.js';
+import PlaneClass from '../utility/plane.js';
+import ColorClass from '../utility/color.js';
+import InputClass from '../main/input.js';
+import ViewCameraClass from '../main/view_camera.js';
+import TextClass from '../text/text.js';
+import InterfaceClass from '../interface/interface.js';
 
 //
 // view class

@@ -1,14 +1,14 @@
-import PointClass from '../../code/utility/point.js';
-import BoundClass from '../../code/utility/bound.js';
-import ColorClass from '../../code/utility/color.js';
-import LightClass from '../../code/light/light.js';
-import MapLiquidClass from '../../code/map/map_liquid.js';
-import MoveClass from '../../code/map/move.js';
-import MovementClass from '../../code/map/movement.js';
-import ImportSettingsClass from '../../code/import/import_settings.js';
-import ImportObjClass from '../../code/import/import_obj.js';
-import ImportFbxClass from '../../code/import/import_fbx.js';
-import ImportJSONClass from '../../code/import/import_json.js';
+import PointClass from '../utility/point.js';
+import BoundClass from '../utility/bound.js';
+import ColorClass from '../utility/color.js';
+import LightClass from '../light/light.js';
+import MapLiquidClass from '../map/map_liquid.js';
+import MoveClass from '../map/move.js';
+import MovementClass from '../map/movement.js';
+import ImportSettingsClass from '../import/import_settings.js';
+import ImportObjClass from '../import/import_obj.js';
+import ImportFbxClass from '../import/import_fbx.js';
+import ImportJSONClass from '../import/import_json.js';
 
 export default class ImportMapClass
 {
@@ -36,7 +36,7 @@ export default class ImportMapClass
         else {
             importMesh=new ImportFbxClass(this.view,importSettings); 
         }
-        if (!(await importMesh.import(this.map.meshList))) return(false);
+        if (!(await importMesh.import(this.map.meshList,null))) return(false);
         
             // import the json
             

@@ -1,44 +1,29 @@
+import ImportBaseClass from '../import/import_base.js';
+import FBXNodeClass from '../import/fbx_node.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
-import MeshVertexClass from '../../code/mesh/mesh_vertex.js';
-import MeshClass from '../../code/mesh/mesh.js';
+import MeshVertexClass from '../mesh/mesh_vertex.js';
+import MeshClass from '../mesh/mesh.js';
+import ModelBoneClass from '../model/model_bone.js';
 
-class FBXNodeClass
-{
-    constructor(name)
-    {
-        this.name=name;
-        
-        this.properties=[];
-        this.children=[];
-    }
-    
-    addProperty(value)
-    {
-        this.properties.push(value);
-    }
-    
-    addChild(name)
-    {
-        let child=new FBXNodeClass(name);
-        this.children.push(child);
-        
-        return(child);
-    }
-}
-
-export default class ImportFbxClass
+export default class ImportFbxClass extends ImportBaseClass
 {
     constructor(view,importSettings)
     {
-        this.view=view;
-        this.importSettings=importSettings;
+        super(view,importSettings);
         
-        this.READ_NODE_LIST=['Objects','Model','Geometry','Vertices','PolygonVertexIndex','LayerElementUV','UV','UVIndex','LayerElementNormal','Normals','NormalsIndex','MappingInformationType','ReferenceInformationType','Deformer','Takes','Take'];        
-       
         this.data=null;
         this.lines=null;
         
+        this.READ_NODE_LIST=[
+                                'Objects','Model','Geometry',
+                                'Vertices','PolygonVertexIndex',
+                                'LayerElementUV','UV','UVIndex','LayerElementNormal','Normals','NormalsIndex',
+                                'MappingInformationType','ReferenceInformationType',
+                                'Deformer','Indexes','Weights',
+                                'Takes','Take'
+                            ];        
+
         this.meshes=[];
     }
     
@@ -248,7 +233,7 @@ export default class ImportFbxClass
         // decode geometry nodes
         //
         
-    decodeGeometry(rootNode)
+    decodeGeometry(rootNode,skeleton)
     {
         let n,k,v,npt,name,bitmap;
         let idx,x,y,z;
@@ -461,35 +446,90 @@ export default class ImportFbxClass
     }
     
         //
-        // decode limbs and animations
+        // decode bones and animations
         //
         
-    decodeLimbs(rootNode)
+    decodeBones(rootNode,skeleton)
     {
-        let n;
-        let objectsNode,node;
+        let n,k,name;
+        let objectsNode,connectionsNode;
+        let indexesNode,weightsNode,node,bone;
         
-             // find the objects node
-            
+             // find the objects and connections node
+        
         objectsNode=this.findNodeByName(rootNode,'Objects');
         if (objectsNode===null) {
             console.log('No objects node in FBX file '+this.importSettings.name);
             return(null);
         }
+            
+        connectionsNode=this.findNodeByName(rootNode,'Connections');
+        if (connectionsNode===null) {
+            console.log('No connections node in FBX file '+this.importSettings.name);
+            return(null);
+        }
         
-            // get all the models
+            // get all the models for bones
             
         for (n=0;n!==objectsNode.children.length;n++) {
             node=objectsNode.children[n];
-            if (node.name==='Model') console.log('Model='+this.trimNodeNameToNullCharacter(node.properties[1]));
+            if (node.name!=='Model') continue;
+            if (node.properties[2]!=='LimbNode') continue;
+            
+                // get name
+                
+            name=this.trimNodeNameToNullCharacter(node.properties[1]);
+            
+                // find connection
+                
+            //console.log(name+'='+node.properties[1]);
+            
+            bone=new ModelBoneClass(name,-1,new PointClass(0,0,0));
+            skeleton.bones.push(bone);
         }
+        
+        console.log('connect prop count='+connectionsNode.properties.length);
+        
+        for (n=0;n!==connectionsNode.children.length;n++) {
+            node=connectionsNode.children[n];
+            //console.log('CONNECTION: '+node.name+'--->'+node.properties[0]+'--->'+node.properties[3]+'='+node.properties[4]);
+        }
+            
+            
+        
         
             // get all the deformers
-            
+            /*
         for (n=0;n!==objectsNode.children.length;n++) {
             node=objectsNode.children[n];
-            if (node.name==='Deformer') console.log('Deformer='+this.trimNodeNameToNullCharacter(node.properties[1]));
+            if (node.name!=='Deformer') continue;
+            
+                // find bone for deformer
+                
+            name=this.trimNodeNameToNullCharacter(node.properties[1]);
+
+            bone=null;
+
+            for (k=0;k!==bones.length;k++) {
+                if (bones[k].name===name) {
+                    bone=bones[k];
+                    break;
+                }
+            }
+                
+            if (bone===null) continue;
+            
+                // get the indexes and weights
+                
+            indexesNode=this.findNodeByName(node,'Indexes');
+            weightsNode=this.findNodeByName(node,'Weights');
+            
+            if ((indexesNode!==null) && (weightsNode!==null)) {
+                bone.fbxImportIndexes=indexesNode.properties[0];
+                bone.fbxImportWeights=weightsNode.properties[0];
+            }
         }
+        */
     }
     
     decodeAnimations(rootNode)
@@ -698,7 +738,7 @@ export default class ImportFbxClass
             
                 // we are only looking for specific nodes,
                 // so knock out things we don't care about
- 
+
             ok=false;
             
             for (n=0;n!==this.READ_NODE_LIST.length;n++) {
@@ -748,9 +788,9 @@ export default class ImportFbxClass
         // main importer
         //
         
-    async import(meshList)
+    async import(meshList,skeleton)
     {
-        let rootNode,objectsNode,geometryNode;
+        let rootNode;
         let name,is64bit,view,textDecoder;
         let mesh;
         let data=null;
@@ -798,18 +838,19 @@ export default class ImportFbxClass
         rootNode=new FBXNodeClass(null);
         if (!this.decodeBinaryTree(data,view,textDecoder,is64bit,27,rootNode)) return(false);
         
+            // get the bones ahead of time so
+            // we can attach when building the
+            // vertexes
+            
+        if (skeleton!==null) this.decodeBones(rootNode,skeleton);
+        
             // decode the mesh
             // for now, seems there's only one mesh in FBX
             
-        mesh=this.decodeGeometry(rootNode);
+        mesh=this.decodeGeometry(rootNode,skeleton);
         if (mesh===null) return(false);
         
         meshList.add(mesh);
-        
-            // decode the limbs and animations
-            
-        this.decodeLimbs(rootNode);
-        this.decodeAnimations(rootNode);
         
         return(true);
     }
@@ -840,9 +881,18 @@ export default class ImportFbxClass
                     }
                 }
                 str+="]";
+                
+                str+="[";
+                for (k=0;k!==node.children[n].properties.length;k++) {
+                    if (typeof(node.children[n].properties[k])==='string') {
+                        str+=node.children[n].properties[k];
+                        str+=',';
+                    }
+                }
+                str+="]";
             }
             console.log(str);
-            this.test(node.children[n],(spaceCount+1));
+            this.debugNodePrintOut(node.children[n],(spaceCount+1));
         }
     }
 }

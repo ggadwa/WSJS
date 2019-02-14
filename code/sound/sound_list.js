@@ -1,6 +1,6 @@
-import PointClass from '../../code/utility/point.js';
-import SoundClass from '../../code/sound/sound.js';
-import SoundPlayClass from '../../code/sound/sound_play.js';
+import PointClass from '../utility/point.js';
+import SoundClass from '../sound/sound.js';
+import SoundPlayClass from '../sound/sound_play.js';
 
 //
 // view sound list class

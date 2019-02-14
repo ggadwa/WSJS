@@ -1,9 +1,9 @@
-import PointClass from '../../code/utility/point.js';
-import BoundClass from '../../code/utility/bound.js';
-import ColorClass from '../../code/utility/color.js';
-import ImportSettingsClass from '../../code/import/import_settings.js';
-import ImportObjClass from '../../code/import/import_obj.js';
-import ImportFbxClass from '../../code/import/import_fbx.js';
+import PointClass from '../utility/point.js';
+import BoundClass from '../utility/bound.js';
+import ColorClass from '../utility/color.js';
+import ImportSettingsClass from '../import/import_settings.js';
+import ImportObjClass from '../import/import_obj.js';
+import ImportFbxClass from '../import/import_fbx.js';
 
 export default class ImportModelClass
 {
@@ -23,7 +23,7 @@ export default class ImportModelClass
         else {
             importMesh=new ImportFbxClass(this.view,importSettings);
         }
-        return(await importMesh.import(this.model.meshList));
+        return(await importMesh.import(this.model.meshList,this.model.skeleton));
     }
 
 }

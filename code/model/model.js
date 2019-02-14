@@ -1,5 +1,5 @@
-import MeshListClass from '../../code/mesh/mesh_list.js';
-import ModelSkeletonClass from '../../code/model/model_skeleton.js';
+import MeshListClass from '../mesh/mesh_list.js';
+import ModelSkeletonClass from '../model/model_skeleton.js';
 
 //
 // model object

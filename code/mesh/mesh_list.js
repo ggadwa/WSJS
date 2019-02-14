@@ -1,6 +1,6 @@
-import * as constants from '../../code/main/constants.js';
-import config from '../../code/main/config.js';
-import PointClass from '../../code/utility/point.js';
+import * as constants from '../main/constants.js';
+import config from '../main/config.js';
+import PointClass from '../utility/point.js';
 
 //
 // mesh list class

@@ -1,5 +1,5 @@
-import config from '../../code/main/config.js';
-import main from '../../code/main/main.js';
+import config from '../main/config.js';
+import main from '../main/main.js';
 
 //
 // startup UI configuring class
@@ -8,8 +8,9 @@ import main from '../../code/main/main.js';
 
 export default class UIConfigClass
 {
-    constructor()
+    constructor(gameClass)
     {
+        this.gameClass=gameClass;
     }
         
     startGame()
@@ -55,7 +56,7 @@ export default class UIConfigClass
         
             // start game
             
-        main.run();
+        main.run(this.gameClass);
     }
     
     createInstructionLine(div,str)

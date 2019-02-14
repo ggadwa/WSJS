@@ -1,4 +1,4 @@
-import config from '../../code/main/config.js';
+import config from '../main/config.js';
 
 //
 // gen random object

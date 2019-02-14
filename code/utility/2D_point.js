@@ -1,4 +1,4 @@
-import * as constants from '../../code/main/constants.js';
+import * as constants from '../main/constants.js';
 
 export default class Point2DClass
 {

@@ -1,14 +1,14 @@
+import ImportBaseClass from '../import/import_base.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
-import MeshVertexClass from '../../code/mesh/mesh_vertex.js';
-import MeshClass from '../../code/mesh/mesh.js';
+import MeshVertexClass from '../mesh/mesh_vertex.js';
+import MeshClass from '../mesh/mesh.js';
 
-export default class ImportObjClass
+export default class ImportObjClass extends ImportBaseClass
 {
     constructor(view,importSettings)
     {
-        this.view=view;
-        this.importSettings=importSettings;
+        super(view,importSettings);
         
         this.data=null;
         this.lines=null;

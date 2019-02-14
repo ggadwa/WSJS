@@ -1,14 +1,14 @@
-import * as constants from '../../code/main/constants.js';
-import BoundClass from '../../code/utility/bound.js';
-import MeshListClass from '../../code/mesh/mesh_list.js';
-import MapLiquidListClass from '../../code/map/map_liquid_list.js';
-import MapLightListClass from '../../code/map/map_light_list.js';
-import MapEntityListClass from '../../code/map/map_entity_list.js';
-import MapEffectListClass from '../../code/map/map_effect_list.js';
-import MapMovementListClass from '../../code/map/map_movement_list.js';
-import SkyClass from '../../code/sky/sky.js';
-import config from '../../code/main/config.js';
-import genRandom from '../../code/utility/random.js';
+import * as constants from '../main/constants.js';
+import BoundClass from '../utility/bound.js';
+import MeshListClass from '../mesh/mesh_list.js';
+import MapLiquidListClass from '../map/map_liquid_list.js';
+import MapLightListClass from '../map/map_light_list.js';
+import MapEntityListClass from '../map/map_entity_list.js';
+import MapEffectListClass from '../map/map_effect_list.js';
+import MapMovementListClass from '../map/map_movement_list.js';
+import SkyClass from '../sky/sky.js';
+import config from '../main/config.js';
+import genRandom from '../utility/random.js';
 
 //
 // map class

@@ -5,6 +5,19 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
+--> bone connections
+
+Connections:  {
+	Connect: "OO", "Model::Spine1", "Model::Root"
+	Connect: "OO", "Model::Spine2", "Model::Spine1"
+	Connect: "OO", "Model::Neck", "Model::Spine2"
+	Connect: "OO", "Model::Head", "Model::Neck"
+
+
+
+-> build a bone list, which indexes + weights
+-> fix vertexes as they are created and built around indexes
+
 1.6 merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions
@@ -16,6 +29,7 @@ WebGL2
 6. view -> WSJS?
 7. map into view
 8. combine input / view pause states
+9. get rid of constants, use statics
 
 
 - get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW

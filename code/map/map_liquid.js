@@ -1,5 +1,5 @@
-import * as constants from '../../code/main/constants.js';
-import BoundClass from '../../code/utility/bound.js';
+import * as constants from '../main/constants.js';
+import BoundClass from '../utility/bound.js';
 
 //
 // map liquid class

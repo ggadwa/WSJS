@@ -1,5 +1,5 @@
-import PointClass from '../../code/utility/point.js';
-import MoveClass from '../../code/map/move.js';
+import PointClass from '../utility/point.js';
+import MoveClass from '../map/move.js';
 
 //
 // movement class

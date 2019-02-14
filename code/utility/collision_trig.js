@@ -1,5 +1,5 @@
-import PointClass from '../../code/utility/point.js';
-import BoundClass from '../../code/utility/bound.js';
+import PointClass from '../utility/point.js';
+import BoundClass from '../utility/bound.js';
 
 export default class CollisionTrigClass
 {

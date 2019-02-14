@@ -1,6 +1,6 @@
-import * as constants from '../../code/main/constants.js';
-import config from '../../code/main/config.js';
-import genRandom from '../../code/utility/random.js';
+import * as constants from '../main/constants.js';
+import config from '../main/config.js';
+import genRandom from '../utility/random.js';
 
 //
 // map class

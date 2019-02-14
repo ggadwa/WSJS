@@ -1,10 +1,10 @@
-import MapMeshShaderClass from '../../code/map/map_mesh_shader.js';
-import MapLiquidShaderClass from '../../code/map/map_liquid_shader.js';
-import SkyShaderClass from '../../code/sky/sky_shader.js';
-import ModelMeshShaderClass from '../../code/model/model_mesh_shader.js';
-import EffectShaderClass from '../../code/map/effect_shader.js';
-import InterfaceShaderClass from '../../code/interface/interface_shader.js';
-import TextShaderClass from '../../code/text/text_shader.js';
+import MapMeshShaderClass from '../map/map_mesh_shader.js';
+import MapLiquidShaderClass from '../map/map_liquid_shader.js';
+import SkyShaderClass from '../sky/sky_shader.js';
+import ModelMeshShaderClass from '../model/model_mesh_shader.js';
+import EffectShaderClass from '../map/effect_shader.js';
+import InterfaceShaderClass from '../interface/interface_shader.js';
+import TextShaderClass from '../text/text_shader.js';
 
 //
 // class to handle loading global shaders

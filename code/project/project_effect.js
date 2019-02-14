@@ -1,4 +1,4 @@
-import PointClass from '../../code/utility/point.js';
+import PointClass from '../utility/point.js';
 
 export default class ProjectEffectClass
 {

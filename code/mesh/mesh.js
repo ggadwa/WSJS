@@ -1,9 +1,9 @@
-import PointClass from '../../code/utility/point.js';
-import Point2DClass from '../../code/utility/2D_point.js';
-import LineClass from '../../code/utility/line.js';
-import BoundClass from '../../code/utility/bound.js';
-import MeshVertexClass from '../../code/mesh/mesh_vertex.js';
-import CollisionTrigClass from '../../code/utility/collision_trig.js';
+import PointClass from '../utility/point.js';
+import Point2DClass from '../utility/2D_point.js';
+import LineClass from '../utility/line.js';
+import BoundClass from '../utility/bound.js';
+import MeshVertexClass from '../mesh/mesh_vertex.js';
+import CollisionTrigClass from '../utility/collision_trig.js';
 
 //
 // map mesh class

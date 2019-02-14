@@ -1,4 +1,4 @@
-import ShaderClass from '../../code/shader/shader.js';
+import ShaderClass from '../shader/shader.js';
 
 //
 // interface shader class
