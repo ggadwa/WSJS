@@ -15,7 +15,7 @@ export default class ModelSkeletonClass
         
             // bones
             
-        this.baseBoneIdx=0;
+        this.rootBoneIdx=-1;
         this.bones=[];
 
             // animations
@@ -63,56 +63,6 @@ export default class ModelSkeletonClass
         return(this.bones[idx]);
     }
     
-    getDistanceBetweenBones(name1,name2)
-    {
-        let bone1=this.findBone(name1);
-        let bone2=this.findBone(name2);
-        
-        if ((bone1===null) || (bone2===null)) return(null);
-        return(new PointClass(Math.abs(bone1.position.x-bone2.position.x),Math.abs(bone1.position.y-bone2.position.y),Math.abs(bone1.position.z-bone2.position.z)));
-    }
-    
-        //
-        // bounds and center
-        //
-        
-    getBounds(xBound,yBound,zBound)
-    {
-        let n,pos;
-        let nBone=this.bones.length;
-        
-        xBound.min=xBound.max=0;
-        yBound.min=yBound.max=0;
-        zBound.min=zBound.max=0;
-        
-        for (n=0;n!==nBone;n++) {
-            pos=this.bones[n].position;
-            xBound.adjust(pos.x);
-            yBound.adjust(pos.y);
-            zBound.adjust(pos.z);
-        }
-    }
-    
-    getCenter()
-    {
-        let n;
-        let nBone=this.bones.length;
-        
-        let pt=new PointClass(0,0,0);
-        
-        for (n=0;n!==nBone;n++) {
-            pt.addPoint(this.bones[n].position);
-        }
-        
-        if (nBone===0) return(pt);
-        
-        pt.x=Math.trunc(pt.x/nBone);
-        pt.y=Math.trunc(pt.y/nBone);
-        pt.z=Math.trunc(pt.z/nBone);
-        
-        return(pt);
-    }
-    
         //
         // this runs a number of pre-calcs to setup
         // the skeleton for animation
@@ -120,25 +70,22 @@ export default class ModelSkeletonClass
         
     precalcAnimationValues()
     {
-        let n,k,bone,parentBone;
+        let n,k,bone;
         let nBone=this.bones.length;
         
-            // get the base bone
+            // run through the bones, find the
+            // root bone (no parent, expect just one) and
+            // setup the children
             
-        this.baseBoneIdx=this.findBoneIndex('Base');
-        if (this.baseBoneIdx===-1) this.baseBoneIdx=0;
-        
-            // build the vectors and children
-            // lists
+        this.rootBoneIdx=-1;
         
         for (n=0;n!==nBone;n++) {
             bone=this.bones[n];
             
-                // vector to parent
+                // root?
                 
-            if (bone.parentBoneIdx!==-1) {
-                parentBone=this.bones[bone.parentBoneIdx];
-                bone.vectorFromParent.setFromSubPoint(bone.position,parentBone.position);
+            if (this.rootBoneIdx===-1) {
+                if (bone.parentBoneIdx===-1) this.rootBoneIdx=n;
             }
             
                 // children
@@ -202,7 +149,7 @@ export default class ModelSkeletonClass
             bone.curPosePosition.setFromAddPoint(parentBone.curPosePosition,rotVector);
         }
         else {
-            bone.curPosePosition.setFromPoint(bone.position);
+            //bone.curPosePosition.setFromPoint(bone.position);
         }
         
             // need to pass this bone's rotation on
@@ -234,7 +181,7 @@ export default class ModelSkeletonClass
             // now move all the bones, starting at
             // the base
             
-        this.rotatePoseBoneRecursive(this.skeleton.baseBoneIdx,new PointClass(0.0,0.0,0.0));
+        //this.rotatePoseBoneRecursive(this.skeleton.baseBoneIdx,new PointClass(0.0,0.0,0.0));
     }
     
     resetAnimation()
@@ -242,5 +189,197 @@ export default class ModelSkeletonClass
         this.lastAnimationTick=0;
         this.lastAnimationMillisec=1;
         this.lastAnimationFlip=false;
+    }
+    
+    runAnimationRecursive(boneIdx,ang,pnt)
+    {
+        let bone,childBoneIdx;
+        let nextAng;
+        
+            // add in current position
+         
+        bone=this.bones[boneIdx];
+        
+        bone.curPosePosition.setFromPoint(bone.vectorFromParent);
+        bone.curPosePosition.rotate(ang);
+        bone.curPosePosition.addPoint(pnt);
+        
+            // next angle, we have to do this
+            // so adding in new angles doesn't kill global
+            
+        nextAng=ang.copy();
+        nextAng.addPoint(bone.curPoseAngle);
+        
+            // now push it off to other bones
+            
+        for (childBoneIdx of bone.childBoneIndexes) {
+            this.runAnimationRecursive(childBoneIdx,nextAng,bone.curPosePosition);
+        }
+    }
+    
+    runAnimation(ang,pnt)
+    {
+            // test animation
+            
+        let bone=this.findBone('mixamorig:LeftArm');
+        bone.curPoseAngle.y+=0.5;
+        
+            // start at the root bone and build up
+            // the tree
+            
+        if (this.rootBoneIdx!==-1) this.runAnimationRecursive(this.rootBoneIdx,ang,pnt);
+    }
+    
+        //
+        // debug stuff -- note this is not optimized and slow!
+        //
+        
+    draw()
+    {
+        let n,nBone,bone,parentBone;
+        let vertices,indexes,vIdx,iIdx,elementIdx;
+        let lineCount,lineElementOffset,lineVertexStartIdx;
+        let vertexPosBuffer,indexBuffer;
+        let boneSize=50;
+        let gl=this.view.gl;
+        let shader=this.view.shaderList.modelSkeletonShader;
+        let tempPoint=new PointClass(0,0,0);
+        
+            // any skeleton?
+        
+        nBone=this.bones.length;    
+        if (nBone===0) return;
+        
+            // skeleton bones
+            
+        vertices=new Float32Array(((3*4)*nBone)+((3*2)*nBone));
+        indexes=new Uint16Array((nBone*6)+(nBone*2));           // count for bone billboard quads and bone lines
+        
+        vIdx=0;
+        iIdx=0;
+        
+        for (n=0;n!==nBone;n++) {
+            bone=this.bones[n];
+            
+            tempPoint.x=-boneSize;
+            tempPoint.y=-boneSize;
+            tempPoint.z=0.0;
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+            vertices[vIdx++]=tempPoint.x+bone.curPosePosition.x;
+            vertices[vIdx++]=tempPoint.y+bone.curPosePosition.y;
+            vertices[vIdx++]=tempPoint.z+bone.curPosePosition.z;
+
+            tempPoint.x=boneSize;
+            tempPoint.y=-boneSize;
+            tempPoint.z=0.0;
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+            vertices[vIdx++]=tempPoint.x+bone.curPosePosition.x;
+            vertices[vIdx++]=tempPoint.y+bone.curPosePosition.y;
+            vertices[vIdx++]=tempPoint.z+bone.curPosePosition.z;
+
+            tempPoint.x=boneSize;
+            tempPoint.y=boneSize;
+            tempPoint.z=0.0;
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+            vertices[vIdx++]=tempPoint.x+bone.curPosePosition.x;
+            vertices[vIdx++]=tempPoint.y+bone.curPosePosition.y;
+            vertices[vIdx++]=tempPoint.z+bone.curPosePosition.z;
+
+            tempPoint.x=-boneSize;
+            tempPoint.y=boneSize;
+            tempPoint.z=0.0;
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+
+            vertices[vIdx++]=tempPoint.x+bone.curPosePosition.x;
+            vertices[vIdx++]=tempPoint.y+bone.curPosePosition.y;
+            vertices[vIdx++]=tempPoint.z+bone.curPosePosition.z;
+
+            elementIdx=n*4;
+            
+            indexes[iIdx++]=elementIdx;     // triangle 1
+            indexes[iIdx++]=elementIdx+1;
+            indexes[iIdx++]=elementIdx+2;
+
+            indexes[iIdx++]=elementIdx;     // triangle 2
+            indexes[iIdx++]=elementIdx+2;
+            indexes[iIdx++]=elementIdx+3;
+        }
+        
+        lineCount=0;
+        lineElementOffset=iIdx;
+        lineVertexStartIdx=Math.trunc(vIdx/3);
+        
+        for (n=0;n!==nBone;n++) {
+            bone=this.bones[n];
+            if (bone.parentBoneIdx===-1) continue;
+            
+            parentBone=this.bones[bone.parentBoneIdx];
+            
+            vertices[vIdx++]=bone.curPosePosition.x;
+            vertices[vIdx++]=bone.curPosePosition.y;
+            vertices[vIdx++]=bone.curPosePosition.z;
+            
+            vertices[vIdx++]=parentBone.curPosePosition.x;
+            vertices[vIdx++]=parentBone.curPosePosition.y;
+            vertices[vIdx++]=parentBone.curPosePosition.z;
+            
+            indexes[iIdx++]=lineVertexStartIdx++;
+            indexes[iIdx++]=lineVertexStartIdx++;
+            
+            lineCount++;
+        }
+       
+            // build the buffers
+            
+        vertexPosBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.DYNAMIC_DRAW);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+
+        indexBuffer=gl.createBuffer();
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
+        
+            // always draw it, no matter what
+            
+        gl.disable(gl.DEPTH_TEST);
+
+            // draw the skeleton
+            
+        shader.drawStart(0,1,0);
+        
+            // the lines
+            
+        gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
+        gl.drawElements(gl.LINES,(lineCount*2),gl.UNSIGNED_SHORT,(lineElementOffset*2));
+        
+            // the bones
+            
+        gl.uniform3f(shader.colorUniform,1.0,0.0,1.0);
+        gl.drawElements(gl.TRIANGLES,(nBone*6),gl.UNSIGNED_SHORT,0);
+        
+            // the bones
+        
+        shader.drawEnd();
+        
+            // re-enable depth
+            
+        gl.enable(gl.DEPTH_TEST);
+        
+            // tear down the buffers
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
+
+        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(indexBuffer);
     }
 }

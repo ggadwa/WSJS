@@ -20,8 +20,9 @@ export default class ImportFbxClass extends ImportBaseClass
                                 'Vertices','PolygonVertexIndex',
                                 'LayerElementUV','UV','UVIndex','LayerElementNormal','Normals','NormalsIndex',
                                 'MappingInformationType','ReferenceInformationType',
+                                'Properties70','P',
                                 'Deformer','Indexes','Weights',
-                                'Takes','Take'
+                                'Connections','C'
                             ];        
 
         this.meshes=[];
@@ -52,10 +53,9 @@ export default class ImportFbxClass extends ImportBaseClass
         
     findNodeByName(startNode,name)
     {
-        let n,node;
+        let node;
         
-        for (n=0;n!==startNode.children.length;n++) {
-            node=startNode.children[n];
+        for (node of startNode.children) {
             if (node.name===name) return(node);
         }
         
@@ -70,11 +70,24 @@ export default class ImportFbxClass extends ImportBaseClass
         return(name);
     }
     
+    findNodeByFirstPropertyString(searchNode,name)
+    {
+        let node;
+        
+        for (node of searchNode.children) {
+            if (node.properties.length!==0) {
+                if (node.properties[0]===name) return(node);
+            }
+        }
+        
+        return(null);
+    }
+    
         //
         // rotations and Y zeroing
         //
         
-    rotate(vertexList)
+    rotate(vertexList,skeleton)
     {
         let n,v,nVertex;
         let centerPnt=new PointClass(0,0,0);
@@ -98,12 +111,18 @@ export default class ImportFbxClass extends ImportBaseClass
         centerPnt.y=Math.trunc(centerPnt.y/nVertex);
         centerPnt.z=Math.trunc(centerPnt.z/nVertex);
         
-            // now rotate
+            // now rotate vertexes
             
         for (n=0;n!==nVertex;n++) {
             v=vertexList[n];
             v.position.rotateAroundPoint(centerPnt,rotAng);
             v.normal.rotate(rotAng);
+        }
+        
+            // and any bones
+            
+        for (n=0;n!==skeleton.bones.length;n++) {
+            skeleton.bones[n].vectorFromParent.rotate(rotAng);        // these are vectors, just need to rotate
         }
     }
     
@@ -127,11 +146,11 @@ export default class ImportFbxClass extends ImportBaseClass
         
         by=Math.trunc(Math.abs(by));
         
-            // floor it
+            // floor vertexes and bones
             
         for (n=0;n!==nVertex;n++) {
             vertexList[n].position.y+=by;
-        }    
+        }
     }
     
     zeroBottom(vertexList)
@@ -156,7 +175,7 @@ export default class ImportFbxClass extends ImportBaseClass
             
         for (n=0;n!==nVertex;n++) {
             vertexList[n].position.y-=by;
-        }    
+        }
     }
     
     buildVertexListTangents(vertexList,indexes)
@@ -235,8 +254,8 @@ export default class ImportFbxClass extends ImportBaseClass
         
     decodeGeometry(rootNode,skeleton)
     {
-        let n,k,v,npt,name,bitmap;
-        let idx,x,y,z;
+        let n,k,t,i,v,npt,name,bitmap;
+        let idx,vIdx,x,y,z,bone;
         let objectsNode,geoNode;
         let trigIndexes,polygonIndexNode,polygonIndexes,indexes;
         let verticesNode,refTypeNode;
@@ -355,7 +374,7 @@ export default class ImportFbxClass extends ImportBaseClass
             for (k=0;k!=npt;k++) {
                 
                     // the position
-                
+                    
                 idx=trigIndexes[k]*3;
                 x=vertexArray[idx]*this.importSettings.scale;
                 y=vertexArray[idx+1]*this.importSettings.scale;
@@ -387,12 +406,28 @@ export default class ImportFbxClass extends ImportBaseClass
                     idx=normalsIndexes[startTrigIdx+k]*3;
                 }
                 
-                x=normalsArray[idx]*this.importSettings.scale;
-                y=normalsArray[idx+1]*this.importSettings.scale;
-                z=normalsArray[idx+2]*this.importSettings.scale;
+                x=normalsArray[idx];
+                y=normalsArray[idx+1];
+                z=normalsArray[idx+2];
                     
                 v.normal.setFromValues(x,y,z);
                 v.normal.normalize();
+                   
+                   // find any bones that need to connect
+                   
+                vIdx=trigIndexes[k];
+                
+                for (t=0;t!==skeleton.bones.length;t++) {
+                    bone=skeleton.bones[t];
+                    if (bone.fbxImportIndexes===null) continue;
+                    
+                    for (i=0;i!==bone.fbxImportIndexes.length;i++) {
+                        if (bone.fbxImportIndexes[i]===vIdx) {
+                            v.addBoneConnection(t,bone.fbxImportWeights[i]);
+                            break;
+                        }
+                    }
+                }
             }
                 
                 // now build the indexes
@@ -413,7 +448,7 @@ export default class ImportFbxClass extends ImportBaseClass
 
             // any user rotations
             
-        this.rotate(vertexList);
+        this.rotate(vertexList,skeleton);
         
             // maps should have zero top (for convience)
             // models should have zero bottom so they
@@ -451,8 +486,8 @@ export default class ImportFbxClass extends ImportBaseClass
         
     decodeBones(rootNode,skeleton)
     {
-        let n,k,name;
-        let objectsNode,connectionsNode;
+        let n,k,t,x,y,z,uid,parentUID,name;
+        let objectsNode,property70Node,connectionsNode,propNode;
         let indexesNode,weightsNode,node,bone;
         
              // find the objects and connections node
@@ -476,47 +511,59 @@ export default class ImportFbxClass extends ImportBaseClass
             if (node.name!=='Model') continue;
             if (node.properties[2]!=='LimbNode') continue;
             
-                // get name
-                
+                // get uid and name
+             
+            uid=node.properties[0];
             name=this.trimNodeNameToNullCharacter(node.properties[1]);
             
-                // find connection
+                // find local transform
                 
-            //console.log(name+'='+node.properties[1]);
+            property70Node=this.findNodeByName(node,'Properties70');
+            propNode=this.findNodeByFirstPropertyString(property70Node,'Lcl Translation');
             
-            bone=new ModelBoneClass(name,-1,new PointClass(0,0,0));
+            x=propNode.properties[4]*this.importSettings.scale;
+            y=propNode.properties[5]*this.importSettings.scale;
+            z=propNode.properties[6]*this.importSettings.scale;
+            
+                // create bone
+                
+            bone=new ModelBoneClass(name,new PointClass(x,y,z));
+            bone.fbxImportUID=uid;
+            
             skeleton.bones.push(bone);
         }
         
-        console.log('connect prop count='+connectionsNode.properties.length);
-        
-        for (n=0;n!==connectionsNode.children.length;n++) {
-            node=connectionsNode.children[n];
-            //console.log('CONNECTION: '+node.name+'--->'+node.properties[0]+'--->'+node.properties[3]+'='+node.properties[4]);
-        }
+        for (n=0;n!==skeleton.bones.length;n++) {
+            bone=skeleton.bones[n];
             
-            
-        
+            for (k=0;k!==connectionsNode.children.length;k++) {
+                node=connectionsNode.children[k];
+                if (node.properties[1]===bone.fbxImportUID) {
+                    
+                    parentUID=node.properties[2];
+                    for (t=0;t!==skeleton.bones.length;t++) {
+                        if (skeleton.bones[t].fbxImportUID===parentUID) {
+                            bone.parentBoneIdx=t;
+                        }
+                    }
+                }
+            }
+        } 
         
             // get all the deformers
-            /*
+            // we store these and use them later add
+            // to the vertexes
+
         for (n=0;n!==objectsNode.children.length;n++) {
             node=objectsNode.children[n];
             if (node.name!=='Deformer') continue;
             
                 // find bone for deformer
-                
+
             name=this.trimNodeNameToNullCharacter(node.properties[1]);
-
-            bone=null;
-
-            for (k=0;k!==bones.length;k++) {
-                if (bones[k].name===name) {
-                    bone=bones[k];
-                    break;
-                }
-            }
-                
+            if (name.startsWith("Cluster ")) name=name.substring(8);
+            
+            bone=skeleton.findBone(name);
             if (bone===null) continue;
             
                 // get the indexes and weights
@@ -529,11 +576,11 @@ export default class ImportFbxClass extends ImportBaseClass
                 bone.fbxImportWeights=weightsNode.properties[0];
             }
         }
-        */
     }
     
     decodeAnimations(rootNode)
     {
+        /*
         let n;
         let takesNode,node;
         
@@ -549,7 +596,7 @@ export default class ImportFbxClass extends ImportBaseClass
             
             if (node.name==='Take') console.log('Take='+node.properties[0]);
         }
-        
+        */
         
     }
     
@@ -838,6 +885,8 @@ export default class ImportFbxClass extends ImportBaseClass
         rootNode=new FBXNodeClass(null);
         if (!this.decodeBinaryTree(data,view,textDecoder,is64bit,27,rootNode)) return(false);
         
+        //this.debugNodePrintOut(rootNode,0);
+        
             // get the bones ahead of time so
             // we can attach when building the
             // vertexes
@@ -852,46 +901,57 @@ export default class ImportFbxClass extends ImportBaseClass
         
         meshList.add(mesh);
         
+            // precalc some values
+            
+        skeleton.precalcAnimationValues();
+        
         return(true);
     }
 
     debugNodePrintOut(node,spaceCount)
     {
         let n,k;
-        let str;
+        let str,prop;
 
         for (n=0;n!=node.children.length;n++) {
             str='';
             for (k=0;k!==spaceCount;k++) { str+='.'; }
+            
             str+=node.children[n].name;
-            str+=" [";
-            str+=node.children[n].properties.length;
-            str+="]";
+
             if (node.children[n].properties.length!==0) {
-                str+=" [";
-                if (node.children[n].properties[0] instanceof Float64Array) {
-                    str+='Float64Array->'+node.children[n].properties[0].length;
-                }
-                else {
-                    if (node.children[n].properties[0] instanceof Int32Array) {
-                        str+='Int32Array->'+node.children[n].properties[0].length;
-                    }
-                    else {
-                        str+=typeof(node.children[n].properties[0]);
-                    }
-                }
-                str+="]";
-                
-                str+="[";
+                str+=' [';
+
                 for (k=0;k!==node.children[n].properties.length;k++) {
-                    if (typeof(node.children[n].properties[k])==='string') {
-                        str+=node.children[n].properties[k];
-                        str+=',';
+                    if (k!==0) str+=',';
+                    
+                    prop=node.children[n].properties[k];
+                    
+                    switch (typeof(prop)) {
+                        case 'string':
+                        case 'number':
+                        case 'boolean':
+                            str+=node.children[n].properties[k];
+                            break;
+                        default:
+                            if (prop instanceof Float64Array) {
+                                str+='Float64Array->'+prop.length;
+                                break;
+                            }
+                            if (prop instanceof Int32Array) {
+                                str+='Int32Array->'+prop.length;
+                                break;
+                            }
+                            str+='?';
+                            break;
                     }
                 }
-                str+="]";
+                
+                str+=']';
             }
+            
             console.log(str);
+            
             this.debugNodePrintOut(node.children[n],(spaceCount+1));
         }
     }

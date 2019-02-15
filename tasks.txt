@@ -5,18 +5,12 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
---> bone connections
-
-Connections:  {
-	Connect: "OO", "Model::Spine1", "Model::Root"
-	Connect: "OO", "Model::Spine2", "Model::Spine1"
-	Connect: "OO", "Model::Neck", "Model::Spine2"
-	Connect: "OO", "Model::Head", "Model::Neck"
-
-
-
+- need to constrain to certain versions, like 7 and up?
+- determine bone connections outside of loop, build parallel list and apply when making vertexList
 -> build a bone list, which indexes + weights
 -> fix vertexes as they are created and built around indexes
+     -> then precalc the offsets
+     -> animate
 
 1.6 merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific

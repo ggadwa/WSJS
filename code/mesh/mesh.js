@@ -718,7 +718,7 @@ export default class MeshClass
         
     buildNonCulledTriangleIndexes()
     {
-        let n,v,x,y,z,nx,ny,nz;
+        let n,x,y,z,nx,ny,nz;
         let f,idx,drawIdx;
 
             // if it's the first time, we'll need

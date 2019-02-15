@@ -1,3 +1,4 @@
+import config from '../main/config.js';
 import MeshListClass from '../mesh/mesh_list.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
 
@@ -51,5 +52,7 @@ export default class ModelClass
     draw()
     {
         this.meshList.drawOpaque();
+        
+        if (config.DRAW_SKELETONS) this.skeleton.draw();
     }
 }

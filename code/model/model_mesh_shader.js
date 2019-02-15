@@ -3,7 +3,7 @@ import ShaderClass from '../shader/shader.js';
 import ShaderLightClass from '../shader/shader_light.js';
 
 //
-// model shader class
+// model mesh shader class
 //
 
 export default class ModelMeshShaderClass extends ShaderClass
