@@ -1,6 +1,5 @@
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
-import MeshVertexBoneConnectClass from '../mesh/mesh_vertex_bone_connect.js';
 
 //
 // mesh vertex
@@ -18,10 +17,5 @@ export default class MeshVertexClass
         this.boneConnects=[];
         
         Object.seal(this);
-    }
-    
-    addBoneConnection(boneIndex,weight)
-    {
-        this.boneConnects.push(new MeshVertexBoneConnectClass(boneIndex,weight));
     }
 }

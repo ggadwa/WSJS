@@ -1,13 +1,16 @@
+import PointClass from '../utility/point.js';
+
 //
 // mesh vertex bone connection
 //
 
 export default class MeshVertexBoneConnectClass
 {
-    constructor(boneIndex,weight)
+    constructor(boneIdx,weight)
     {
-        this.boneIndex=boneIndex;
+        this.boneIdx=boneIdx;
         this.weight=weight;
+        this.vectorFromBone=new PointClass(0,0,0);
         
         Object.seal(this);
     }

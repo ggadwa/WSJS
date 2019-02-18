@@ -99,6 +99,35 @@ export default class ModelSkeletonClass
     }
     
         //
+        // build neutral pose
+        // this is used mostly for mesh vertexes to create
+        // vectors to bones
+        //
+
+    buildNeutralPoseRecursive(boneIdx,pnt)
+    {
+        let bone,childBoneIdx;
+        
+            // add in current position
+         
+        bone=this.bones[boneIdx];
+        
+        bone.curPosePosition.setFromPoint(bone.vectorFromParent);
+        bone.curPosePosition.addPoint(pnt);
+        
+            // now push it off to other bones
+            
+        for (childBoneIdx of bone.childBoneIndexes) {
+            this.buildNeutralPoseRecursive(childBoneIdx,bone.curPosePosition);
+        }
+    }
+    
+    buildNeutralPose()
+    {
+        if (this.rootBoneIdx!==-1) this.buildNeutralPoseRecursive(this.rootBoneIdx,new PointClass(0,0,0));
+    }
+    
+        //
         // functions to handle clear, moving
         // and tweening the prev, next, and current
         // pose

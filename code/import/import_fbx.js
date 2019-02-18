@@ -3,6 +3,7 @@ import FBXNodeClass from '../import/fbx_node.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
 import MeshVertexClass from '../mesh/mesh_vertex.js';
+import MeshVertexBoneConnectClass from '../mesh/mesh_vertex_bone_connect.js';
 import MeshClass from '../mesh/mesh.js';
 import ModelBoneClass from '../model/model_bone.js';
 
@@ -254,8 +255,8 @@ export default class ImportFbxClass extends ImportBaseClass
         
     decodeGeometry(rootNode,skeleton)
     {
-        let n,k,t,i,v,npt,name,bitmap;
-        let idx,vIdx,x,y,z,bone;
+        let n,k,v,npt,name,bitmap;
+        let idx,x,y,z,bone;
         let objectsNode,geoNode;
         let trigIndexes,polygonIndexNode,polygonIndexes,indexes;
         let verticesNode,refTypeNode;
@@ -263,6 +264,7 @@ export default class ImportFbxClass extends ImportBaseClass
         let normalLayerNode,normalsNode,normalsIndexNode,normalsIndexes;
         let startTrigIdx,startVertexIdx;
         let vertexList,vertexArray,uvArray,normalsArray;
+        let vertexConnectionList;
                 
             // find the objects>geometry node
             
@@ -343,6 +345,25 @@ export default class ImportFbxClass extends ImportBaseClass
         normalsNode=this.findNodeByName(normalLayerNode,'Normals');
         normalsArray=normalsNode.properties[0];
         
+            // since we have to flatten the vertex list
+            // (normals and uvs can be different) we figure
+            // out all the bone connections first
+            
+        vertexConnectionList=new Array(vertexArray.length);
+        
+        for (n=0;n!==vertexArray.length;n++) {
+            vertexConnectionList[n]=new Array();
+        }
+                
+        for (n=0;n!==skeleton.bones.length;n++) {
+            bone=skeleton.bones[n];
+            if (bone.fbxImportIndexes===null) continue;
+
+            for (k=0;k!==bone.fbxImportIndexes.length;k++) {
+                vertexConnectionList[bone.fbxImportIndexes[k]].push(new MeshVertexBoneConnectClass(n,bone.fbxImportWeights[k]));
+            }
+        }
+        
             // run through the indexes and build
             // a vertex for each one, this is necessary so
             // we preserve good normals
@@ -412,22 +433,10 @@ export default class ImportFbxClass extends ImportBaseClass
                     
                 v.normal.setFromValues(x,y,z);
                 v.normal.normalize();
-                   
-                   // find any bones that need to connect
-                   
-                vIdx=trigIndexes[k];
                 
-                for (t=0;t!==skeleton.bones.length;t++) {
-                    bone=skeleton.bones[t];
-                    if (bone.fbxImportIndexes===null) continue;
+                    // and any bone attachments
                     
-                    for (i=0;i!==bone.fbxImportIndexes.length;i++) {
-                        if (bone.fbxImportIndexes[i]===vIdx) {
-                            v.addBoneConnection(t,bone.fbxImportWeights[i]);
-                            break;
-                        }
-                    }
-                }
+                v.boneConnects=vertexConnectionList[trigIndexes[k]];
             }
                 
                 // now build the indexes
@@ -495,13 +504,13 @@ export default class ImportFbxClass extends ImportBaseClass
         objectsNode=this.findNodeByName(rootNode,'Objects');
         if (objectsNode===null) {
             console.log('No objects node in FBX file '+this.importSettings.name);
-            return(null);
+            return(false);
         }
             
         connectionsNode=this.findNodeByName(rootNode,'Connections');
         if (connectionsNode===null) {
             console.log('No connections node in FBX file '+this.importSettings.name);
-            return(null);
+            return(false);
         }
         
             // get all the models for bones
@@ -576,6 +585,8 @@ export default class ImportFbxClass extends ImportBaseClass
                 bone.fbxImportWeights=weightsNode.properties[0];
             }
         }
+        
+        return(true);
     }
     
     decodeAnimations(rootNode)
@@ -838,7 +849,7 @@ export default class ImportFbxClass extends ImportBaseClass
     async import(meshList,skeleton)
     {
         let rootNode;
-        let name,is64bit,view,textDecoder;
+        let name,version,is64bit,view,textDecoder;
         let mesh;
         let data=null;
         
@@ -876,8 +887,14 @@ export default class ImportFbxClass extends ImportBaseClass
         }
         
             // get the version
-            
-        is64bit=view.getUint32(23,true)>=7500;
+        
+        version=view.getUint32(23,true);
+        if (version<7400) {
+            console.log('FBX binary needs to be at least version 7.4: '+this.importSettings.name);
+            return(false);
+        }
+        
+        is64bit=version>=7500;
         
             // decode the tree
             // start at byte 27 to skip headers
@@ -891,7 +908,11 @@ export default class ImportFbxClass extends ImportBaseClass
             // we can attach when building the
             // vertexes
             
-        if (skeleton!==null) this.decodeBones(rootNode,skeleton);
+        if (skeleton!==null) { 
+            if (!this.decodeBones(rootNode,skeleton)) return(false);
+            skeleton.precalcAnimationValues();
+            skeleton.buildNeutralPose();
+        }
         
             // decode the mesh
             // for now, seems there's only one mesh in FBX
@@ -899,11 +920,9 @@ export default class ImportFbxClass extends ImportBaseClass
         mesh=this.decodeGeometry(rootNode,skeleton);
         if (mesh===null) return(false);
         
-        meshList.add(mesh);
+        if (skeleton!==null) mesh.precalcAnimationValues(skeleton);
         
-            // precalc some values
-            
-        skeleton.precalcAnimationValues();
+        meshList.add(mesh);
         
         return(true);
     }

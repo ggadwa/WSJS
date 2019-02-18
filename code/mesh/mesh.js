@@ -186,23 +186,22 @@ export default class MeshClass
     
         //
         // precalcs the vector from the bone animations
+        // it relies on the skeleton having the pose setup
+        // as the neutral pose
         //
         
     precalcAnimationValues(skeleton)
     {
-        let n,v,bone,parentBone;
+        let n,k,v,bone,connect;
 
         for (n=0;n!==this.vertexCount;n++) {
             v=this.vertexList[n];
             
-            bone=skeleton.bones[v.boneIdx];
-            v.vectorFromBone.setFromSubPoint(v.position,bone.position);
-            
-            if (bone.parentBoneIdx!==-1) {
-                parentBone=skeleton.bones[bone.parentBoneIdx];
-                
-                v.parentBoneIdx=bone.parentBoneIdx;
-                v.vectorFromParentBone.setFromSubPoint(v.position,parentBone.position);
+            for (k=0;k!==v.boneConnects.length;k++) {
+                connect=v.boneConnects[k];
+
+                bone=skeleton.bones[connect.boneIdx];
+                connect.vectorFromBone.setFromSubPoint(v.position,bone.curPosePosition);
             }
         }
     }
