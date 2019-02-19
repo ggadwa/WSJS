@@ -6,15 +6,15 @@ import PointClass from '../utility/point.js';
 
 export default class ModelBoneClass
 {
-    constructor(name,vectorFromParent)
+    constructor(name,parentBoneIdx,vectorFromParent)
     {
         this.name=name;
+        this.parentBoneIdx=parentBoneIdx;
         this.vectorFromParent=vectorFromParent;
-        this.parentBoneIdx=-1;
 
-            // parenting
+            // children
 
-        this.childBoneIndexes=[];
+        this.childBoneIdxs=[];
 
             // animation position
             
@@ -23,12 +23,6 @@ export default class ModelBoneClass
 
         this.prevPoseAngle=new PointClass(0.0,0.0,0.0);
         this.nextPoseAngle=new PointClass(0.0,0.0,0.0);
-        
-            // importing data
-            
-        this.fbxImportUID=0;
-        this.fbxImportIndexes=null;
-        this.fbxImportWeights=null;
 
         Object.seal(this);
     }

@@ -8,6 +8,8 @@ export default class ImportJSONClass
             // fix any missing import settings
             
         if (this.importSettings.name===undefined) throw('importSettings.name is required');
+        
+        Object.seal(this);
     }
     
         //

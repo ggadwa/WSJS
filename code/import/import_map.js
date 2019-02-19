@@ -16,6 +16,8 @@ export default class ImportMapClass
     {
         this.view=view;
         this.map=map;
+        
+        Object.seal(this);
     }
     
     async load(importSettings)

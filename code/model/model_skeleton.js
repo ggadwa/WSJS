@@ -64,41 +64,6 @@ export default class ModelSkeletonClass
     }
     
         //
-        // this runs a number of pre-calcs to setup
-        // the skeleton for animation
-        //
-        
-    precalcAnimationValues()
-    {
-        let n,k,bone;
-        let nBone=this.bones.length;
-        
-            // run through the bones, find the
-            // root bone (no parent, expect just one) and
-            // setup the children
-            
-        this.rootBoneIdx=-1;
-        
-        for (n=0;n!==nBone;n++) {
-            bone=this.bones[n];
-            
-                // root?
-                
-            if (this.rootBoneIdx===-1) {
-                if (bone.parentBoneIdx===-1) this.rootBoneIdx=n;
-            }
-            
-                // children
-                
-            for (k=0;k!==nBone;k++) {
-                if (n!==k) {
-                    if (this.bones[k].parentBoneIdx===n) bone.childBoneIndexes.push(k);
-                }
-            }
-        }
-    }
-    
-        //
         // build neutral pose
         // this is used mostly for mesh vertexes to create
         // vectors to bones
@@ -117,7 +82,7 @@ export default class ModelSkeletonClass
         
             // now push it off to other bones
             
-        for (childBoneIdx of bone.childBoneIndexes) {
+        for (childBoneIdx of bone.childBoneIdxs) {
             this.buildNeutralPoseRecursive(childBoneIdx,bone.curPosePosition);
         }
     }
@@ -188,7 +153,7 @@ export default class ModelSkeletonClass
         
             // now move all children
         
-        for (idx of bone.childBoneIndexes) {
+        for (idx of bone.childBoneIdxs) {
             this.rotatePoseBoneRecursive(idx,bone.curPoseAngle);
         }
     }
@@ -241,7 +206,7 @@ export default class ModelSkeletonClass
         
             // now push it off to other bones
             
-        for (childBoneIdx of bone.childBoneIndexes) {
+        for (childBoneIdx of bone.childBoneIdxs) {
             this.runAnimationRecursive(childBoneIdx,nextAng,bone.curPosePosition);
         }
     }
@@ -250,8 +215,8 @@ export default class ModelSkeletonClass
     {
             // test animation
             
-        let bone=this.findBone('mixamorig:LeftArm');
-        bone.curPoseAngle.y+=0.5;
+        let bone=this.findBone('T-Rex_Tail1_02');
+        if (bone!==null) bone.curPoseAngle.y+=0.5;
         
             // start at the root bone and build up
             // the tree

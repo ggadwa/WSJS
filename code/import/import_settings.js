@@ -3,7 +3,7 @@ import PointClass from '../utility/point.js';
 export default class ImportSettingsClass
 {
     static FORMAT_OBJ=0;
-    static FORMAT_FBX=1;
+    static FORMAT_GLTF=1;
     
     constructor(name)
     {
@@ -22,6 +22,8 @@ export default class ImportSettingsClass
         this.yZero=this.Y_ZERO_NONE;
         
         this.effectClassLookup=new Map();
+        
+        Object.seal(this);
     }
     
     addEffectClassLookup(name,effectClass)

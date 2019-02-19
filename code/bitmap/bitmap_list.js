@@ -60,7 +60,7 @@ export default class BitmapListClass
         
     async loadAllBitmaps()
     {
-        let n,keyIter,rtn,bitmap;
+        let keyIter,rtn,bitmap;
         let success,promises=[];
         
             // gather all the promises

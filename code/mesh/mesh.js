@@ -19,7 +19,7 @@ export default class MeshClass
         this.vertexList=vertexList;
         this.indexes=indexes;
         this.flag=flag;
-
+        
         this.vertexCount=this.vertexList.length;
         this.indexCount=this.indexes.length;
         this.trigCount=Math.trunc(this.indexCount/3);

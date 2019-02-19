@@ -18,6 +18,8 @@ export default class ImportObjClass extends ImportBaseClass
         this.normalList=[];
         
         this.meshes=[];
+        
+        Object.seal(this);
     }
     
         //
@@ -286,8 +288,8 @@ export default class ImportObjClass extends ImportBaseClass
         
     async import(meshList)
     {
-        let n,k,splitChar,tokens,mesh;
-        let x,y,z,normal,by;
+        let n,k,splitChar,tokens;
+        let x,y,z,normal;
         let lastGroupName,groupNameOffset,lastMaterialName;
         let posVertexIdx,posUVIdx,posNormalIdx;
         let meshVertices,meshIndexes;

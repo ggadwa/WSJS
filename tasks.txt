@@ -5,12 +5,17 @@ WebGL2
     [ ] uniform buffers for lights & matrixes
 
 
-- need to constrain to certain versions, like 7 and up?
-- determine bone connections outside of loop, build parallel list and apply when making vertexList
--> build a bone list, which indexes + weights
--> fix vertexes as they are created and built around indexes
-     -> then precalc the offsets
-     -> animate
+
+0. skeleton is missing some kind of rotate
+0. get rid of all fbx stuff and zip stuff
+1. gltf needs rotate/zero stuff
+
+2. get rid of broken double windows in OBJ
+3. translate OBJs to GLTF?
+
+4. meshclass flags -- delete?
+5. vertices -> vertexes (use same spelling)
+6. indicies -> indexes
 
 1.6 merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
