@@ -1,5 +1,7 @@
 import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
+import QuaternionClass from '../utility/quaternion.js';
+import MatrixClass from '../utility/matrix.js';
 import ModelBoneClass from '../model/model_bone.js';
 import genRandom from '../utility/random.js';
 
@@ -23,6 +25,11 @@ export default class ModelSkeletonClass
         this.lastAnimationTick=0;
         this.lastAnimationMillisec=1;
         this.lastAnimationFlip=false;          // supergumba -- temporary for random animations
+        
+            // globals to stop GC
+            
+        this.boneMat=new MatrixClass();
+        this.boneMat2=new MatrixClass();
         
         Object.seal(this);
     }
@@ -61,35 +68,6 @@ export default class ModelSkeletonClass
         let idx=this.findBoneIndex(name);
         if (idx===-1) return(null);
         return(this.bones[idx]);
-    }
-    
-        //
-        // build neutral pose
-        // this is used mostly for mesh vertexes to create
-        // vectors to bones
-        //
-
-    buildNeutralPoseRecursive(boneIdx,pnt)
-    {
-        let bone,childBoneIdx;
-        
-            // add in current position
-         
-        bone=this.bones[boneIdx];
-        
-        bone.curPosePosition.setFromPoint(bone.vectorFromParent);
-        bone.curPosePosition.addPoint(pnt);
-        
-            // now push it off to other bones
-            
-        for (childBoneIdx of bone.childBoneIdxs) {
-            this.buildNeutralPoseRecursive(childBoneIdx,bone.curPosePosition);
-        }
-    }
-    
-    buildNeutralPose()
-    {
-        if (this.rootBoneIdx!==-1) this.buildNeutralPoseRecursive(this.rootBoneIdx,new PointClass(0,0,0));
     }
     
         //
@@ -137,7 +115,7 @@ export default class ModelSkeletonClass
         if (bone.parentBoneIdx!==-1) {
             parentBone=this.bones[bone.parentBoneIdx];
             
-            rotVector=new PointClass(bone.vectorFromParent.x,bone.vectorFromParent.y,bone.vectorFromParent.z);
+            rotVector=new PointClass(bone.translate.x,bone.translate.y,bone.translate.z);
             rotVector.rotate(ang);
             
             bone.curPosePosition.setFromAddPoint(parentBone.curPosePosition,rotVector);
@@ -190,13 +168,60 @@ export default class ModelSkeletonClass
         let bone,childBoneIdx;
         let nextAng;
         
-            // add in current position
-         
         bone=this.bones[boneIdx];
         
-        bone.curPosePosition.setFromPoint(bone.vectorFromParent);
-        bone.curPosePosition.rotate(ang);
-        bone.curPosePosition.addPoint(pnt);
+        console.log('1=>'+pnt.x);
+        
+        /*
+         *             mat=new MatrixClass();
+            mat2=new MatrixClass();
+            
+            translationProp=node.translation;
+            if (translationProp!==undefined) {
+                mat2.setTranslationMatrix((translationProp[0]*this.importSettings.scale),(translationProp[1]*this.importSettings.scale),(translationProp[2]*this.importSettings.scale));
+                mat.multiply(mat2);
+            }
+            
+            rotationProp=node.rotation;
+            if (rotationProp!==undefined) {
+                mat2.setRotationFromQuaternion(rotationProp[0],rotationProp[1],rotationProp[2],rotationProp[3]);
+                mat.multiply(mat2);
+            }
+            
+            scaleProp=node.scale;
+            if (scaleProp!==undefined) {
+                mat2.setScaleMatrix(scaleProp[0],scaleProp[1],scaleProp[2]);
+                mat.multiply(mat2);
+            }
+            
+                // now the game scale
+                
+            vectorFromParent=new PointClass(0,0,0);
+            vectorFromParent.matrixMultiply(mat);
+
+         */
+        
+            // create the matrix
+            
+        this.boneMat.setTranslationMatrix(bone.translation.x,bone.translation.y,bone.translation.z);
+        
+            // add in current position
+         
+        console.log('2=>'+pnt.x);
+        
+        bone.curPosePosition.setFromPoint(0,0,0);
+        bone.curPosePosition.matrixMultiply(this.boneMat);
+        
+        
+        bone.curPosePosition.setFromPoint(bone.translation.x,bone.translation.y,bone.translation.z);
+                
+        
+
+        
+        //bone.curPosePosition.rotate(ang);
+        //bone.curPosePosition.addPoint(pnt);
+        
+        console.log('3=>'+pnt.x);
         
             // next angle, we have to do this
             // so adding in new angles doesn't kill global
@@ -207,6 +232,7 @@ export default class ModelSkeletonClass
             // now push it off to other bones
             
         for (childBoneIdx of bone.childBoneIdxs) {
+            console.log('before recurse=>'+bone.curPosePosition);
             this.runAnimationRecursive(childBoneIdx,nextAng,bone.curPosePosition);
         }
     }
@@ -215,8 +241,8 @@ export default class ModelSkeletonClass
     {
             // test animation
             
-        let bone=this.findBone('T-Rex_Tail1_02');
-        if (bone!==null) bone.curPoseAngle.y+=0.5;
+        //let bone=this.findBone('T-Rex_Tail1_02');
+        //if (bone!==null) bone.curPoseAngle.y+=0.5;
         
             // start at the root bone and build up
             // the tree

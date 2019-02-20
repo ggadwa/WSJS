@@ -1,6 +1,8 @@
 import ImportBaseClass from '../import/import_base.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
+import QuaternionClass from '../utility/quaternion.js';
+import MatrixClass from '../utility/matrix.js';
 import MeshVertexClass from '../mesh/mesh_vertex.js';
 import MeshVertexBoneConnectClass from '../mesh/mesh_vertex_bone_connect.js';
 import MeshClass from '../mesh/mesh.js';
@@ -76,10 +78,10 @@ export default class ImportGLTFClass extends ImportBaseClass
         // buffer utilities
         //
         
-    decodeBuffer(accessorIdx,vecSize)
+    decodeBuffer(accessorIdx,arrayVecSize)
     {
         let n,k,arrayIdx,byteIdx;
-        let dataView,array,itemCount,componentType;
+        let dataView,array,count,vecType,componentType,internalVecSize;
         let accessorNode,bufferViewNode;
         let byteOffset,byteLength,byteStride;
         
@@ -87,8 +89,20 @@ export default class ImportGLTFClass extends ImportBaseClass
             
         accessorNode=this.jsonData.accessors[accessorIdx];
         byteOffset=(accessorNode.byteOffset===undefined)?0:accessorNode.byteOffset;
+        vecType=accessorNode.type;
         componentType=accessorNode.componentType;
-
+        count=accessorNode.count;
+        
+            // if there's a bigger size than we need
+            // (this happens for tangents) then we need to
+            // figure this out in case the strides are missing
+            // and only pass back the data we need
+            
+        internalVecSize=arrayVecSize;
+        if (vecType==='VEC2') internalVecSize=2;
+        if (vecType==='VEC3') internalVecSize=3;
+        if (vecType==='VEC4') internalVecSize=4;
+        
             // now to the buffer view
             
         bufferViewNode=this.jsonData.bufferViews[accessorNode.bufferView];
@@ -105,16 +119,14 @@ export default class ImportGLTFClass extends ImportBaseClass
         switch (componentType) {
             
             case this.view.gl.FLOAT:
-                byteStride=(bufferViewNode.byteStride===undefined)?4:bufferViewNode.byteStride;
-                itemCount=Math.trunc(byteLength/byteStride);
-                
-                array=new Float32Array(itemCount*vecSize);
+                byteStride=(bufferViewNode.byteStride===undefined)?(4*internalVecSize):bufferViewNode.byteStride;
+                array=new Float32Array(count*arrayVecSize);
 
                 byteIdx=0;
                 arrayIdx=0;
 
-                for (n=0;n!==itemCount;n++) {
-                    for (k=0;k!==vecSize;k++) {
+                for (n=0;n!==count;n++) {
+                    for (k=0;k!==arrayVecSize;k++) {
                         array[arrayIdx]=dataView.getFloat32((byteIdx+(k*4)),true);
                         arrayIdx++;
                     }
@@ -124,16 +136,14 @@ export default class ImportGLTFClass extends ImportBaseClass
                 return(array);
             
             case this.view.gl.UNSIGNED_INT:
-                byteStride=(bufferViewNode.byteStride===undefined)?4:bufferViewNode.byteStride;
-                itemCount=Math.trunc(byteLength/byteStride);
-                
-                array=new Uint32Array(itemCount*vecSize);
+                byteStride=(bufferViewNode.byteStride===undefined)?(4*internalVecSize):bufferViewNode.byteStride;
+                array=new Uint32Array(count*arrayVecSize);
 
                 byteIdx=0;
                 arrayIdx=0;
 
-                for (n=0;n!==itemCount;n++) {
-                    for (k=0;k!==vecSize;k++) {
+                for (n=0;n!==count;n++) {
+                    for (k=0;k!==arrayVecSize;k++) {
                         array[arrayIdx]=dataView.getUint32((byteIdx+(k*4)),true);
                         arrayIdx++;
                     }
@@ -143,16 +153,14 @@ export default class ImportGLTFClass extends ImportBaseClass
                 return(array);
             
             case this.view.gl.INT:
-                byteStride=(bufferViewNode.byteStride===undefined)?4:bufferViewNode.byteStride;
-                itemCount=Math.trunc(byteLength/byteStride);
-                
-                array=new Int32Array(itemCount*vecSize);
+                byteStride=(bufferViewNode.byteStride===undefined)?(4*internalVecSize):bufferViewNode.byteStride;
+                array=new Int32Array(count*arrayVecSize);
 
                 byteIdx=0;
                 arrayIdx=0;
 
-                for (n=0;n!==itemCount;n++) {
-                    for (k=0;k!==vecSize;k++) {
+                for (n=0;n!==count;n++) {
+                    for (k=0;k!==arrayVecSize;k++) {
                         array[arrayIdx]=dataView.getInt32((byteIdx+(k*4)),true);
                         arrayIdx++;
                     }
@@ -162,16 +170,14 @@ export default class ImportGLTFClass extends ImportBaseClass
                 return(array);
             
             case this.view.gl.UNSIGNED_SHORT:
-                byteStride=(bufferViewNode.byteStride===undefined)?2:bufferViewNode.byteStride;
-                itemCount=Math.trunc(byteLength/byteStride);
-                
-                array=new Uint16Array(itemCount*vecSize);
+                byteStride=(bufferViewNode.byteStride===undefined)?(2*internalVecSize):bufferViewNode.byteStride;
+                array=new Uint16Array(count*arrayVecSize);
 
                 byteIdx=0;
                 arrayIdx=0;
 
-                for (n=0;n!==itemCount;n++) {
-                    for (k=0;k!==vecSize;k++) {
+                for (n=0;n!==count;n++) {
+                    for (k=0;k!==arrayVecSize;k++) {
                         array[arrayIdx]=dataView.getUint16((byteIdx+(k*2)),true);
                         arrayIdx++;
                     }
@@ -181,16 +187,14 @@ export default class ImportGLTFClass extends ImportBaseClass
                 return(array);
                 
             case this.view.gl.UNSIGNED_SHORT:
-                byteStride=(bufferViewNode.byteStride===undefined)?2:bufferViewNode.byteStride;
-                itemCount=Math.trunc(byteLength/byteStride);
-                
-                array=new Int16Array(itemCount*vecSize);
+                byteStride=(bufferViewNode.byteStride===undefined)?(2*internalVecSize):bufferViewNode.byteStride;
+                array=new Int16Array(count*arrayVecSize);
 
                 byteIdx=0;
                 arrayIdx=0;
 
-                for (n=0;n!==itemCount;n++) {
-                    for (k=0;k!==vecSize;k++) {
+                for (n=0;n!==count;n++) {
+                    for (k=0;k!==arrayVecSize;k++) {
                         array[arrayIdx]=dataView.getInt16((byteIdx+(k*2)),true);
                         arrayIdx++;
                     }
@@ -256,7 +260,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             // and any bones
             
         for (n=0;n!==skeleton.bones.length;n++) {
-            skeleton.bones[n].vectorFromParent.rotate(rotAng);        // these are vectors, just need to rotate
+            skeleton.bones[n].translation.rotate(rotAng);        // these are vectors, just need to rotate
         }
     }
     
@@ -329,24 +333,31 @@ export default class ImportGLTFClass extends ImportBaseClass
     decodeBoneRecurse(skeleton,parentBoneIdx,nodeIdx)
     {
         let n,node,bone,boneIdx;
-        let translation,vectorFromParent;
+        let translationProp,rotationProp,scaleProp;
+        let translation,rotation,scale;
         
         node=this.jsonData.nodes[nodeIdx];
         
             // get the position
             
-        translation=node.translation;
-        
-        if ((parentBoneIdx===-1) || (translation===undefined)) {
-            vectorFromParent=new PointClass(0,0,0);
-        }
-        else {
-            vectorFromParent=new PointClass((translation[0]*this.importSettings.scale),(translation[1]*this.importSettings.scale),(translation[2]*this.importSettings.scale));
+        translation=new PointClass(0,0,0);
+        rotation=new QuaternionClass();
+        scale=new PointClass(1,1,1);
+            
+        if (parentBoneIdx!==-1) {
+            translationProp=node.translation;
+            if (translationProp!==undefined) translation.setFromValues((translationProp[0]*this.importSettings.scale),(translationProp[1]*this.importSettings.scale),(translationProp[2]*this.importSettings.scale));
+            
+            rotationProp=node.rotation;
+            if (rotationProp!==undefined) rotation.setFromValues(rotationProp[0],rotationProp[1],rotationProp[2],rotationProp[3]);
+            
+            scaleProp=node.scale;
+            if (scaleProp!==undefined) scale.setFromValues(scaleProp[0],scaleProp[1],scaleProp[2]);
         }
         
             // setup the bone and parent
         
-        bone=new ModelBoneClass(node.name,parentBoneIdx,vectorFromParent);
+        bone=new ModelBoneClass(node.name,parentBoneIdx,translation,rotation,scale);
         
         boneIdx=skeleton.bones.length;
         skeleton.bones.push(bone);
@@ -382,7 +393,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     decodeMesh(meshList,skeleton)
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
-        let indices,vertices,normals,tangents,uvs,v,vertexList;
+        let indices,vertices,normals,tangents,uvs,v,vertexList,needColorTexture;
         let vIdx,nIdx,tIdx,uvIdx;
         let mesh,curBitmapName;
         let meshes=[];
@@ -396,12 +407,12 @@ export default class ImportGLTFClass extends ImportBaseClass
             
                 // run through the primitives
                 // we need to knock out anything that's
-                // not a uv mapped triangle stream
+                // triangle stream
                 
             for (k=0;k!==meshNode.primitives.length;k++) {
                 primitiveNode=meshNode.primitives[k];
                 if (primitiveNode.mode!==4) continue;       // not a triangle stream
-                if (primitiveNode.attributes.TEXCOORD_0===undefined) continue;      // no uv mapping
+                needColorTexture=(primitiveNode.attributes.TEXCOORD_0===undefined);      // no uv mapping
                 
                     // create the mesh
                   
@@ -409,7 +420,13 @@ export default class ImportGLTFClass extends ImportBaseClass
                 vertices=this.decodeBuffer(primitiveNode.attributes.POSITION,3);
                 normals=this.decodeBuffer(primitiveNode.attributes.NORMAL,3);
                 tangents=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
-                uvs=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
+                
+                if (!needColorTexture) {
+                    uvs=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
+                }
+                else {
+                    uvs=new Float32Array(Math.trunc(vertices.length/3)*2);
+                }
                 
                 vIdx=0;
                 nIdx=0;
@@ -427,6 +444,8 @@ export default class ImportGLTFClass extends ImportBaseClass
                     v.uv.setFromValues((uvs[uvIdx++]*this.importSettings.uScale),(uvs[uvIdx++]*this.importSettings.vScale));
                     vertexList.push(v);
                 }
+                
+                    // supergumba -- need to fix non-uv mapped textures
                 
                     // finally make the mesh
                     

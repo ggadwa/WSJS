@@ -402,9 +402,9 @@ export default class PointClass
     
     matrixMultiply(mat)
     {
-        let mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8])+mat[12];
-        let my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9])+mat[13];
-        let mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10])+mat[14];
+        let mx=(this.x*mat.data[0])+(this.y*mat.data[4])+(this.z*mat.data[8])+mat.data[12];
+        let my=(this.x*mat.data[1])+(this.y*mat.data[5])+(this.z*mat.data[9])+mat.data[13];
+        let mz=(this.x*mat.data[2])+(this.y*mat.data[6])+(this.z*mat.data[10])+mat.data[14];
         
         this.x=mx;
         this.y=my;
@@ -413,9 +413,9 @@ export default class PointClass
     
     matrixMultiplyIgnoreTransform(mat)
     {
-        let mx=(this.x*mat[0])+(this.y*mat[4])+(this.z*mat[8]);
-        let my=(this.x*mat[1])+(this.y*mat[5])+(this.z*mat[9]);
-        let mz=(this.x*mat[2])+(this.y*mat[6])+(this.z*mat[10]);
+        let mx=(this.x*mat.data[0])+(this.y*mat.data[4])+(this.z*mat.data[8]);
+        let my=(this.x*mat.data[1])+(this.y*mat.data[5])+(this.z*mat.data[9]);
+        let mz=(this.x*mat.data[2])+(this.y*mat.data[6])+(this.z*mat.data[10]);
         
         this.x=mx;
         this.y=my;

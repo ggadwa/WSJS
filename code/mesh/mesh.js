@@ -548,6 +548,8 @@ export default class MeshClass
         let bone,parentBone;
         let gl=this.view.gl;
         
+        return; // supergumba -- all needs to be redone with matrixes
+        
             // we recalc the bounds while
             // we move model around
         

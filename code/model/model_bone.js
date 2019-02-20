@@ -6,11 +6,13 @@ import PointClass from '../utility/point.js';
 
 export default class ModelBoneClass
 {
-    constructor(name,parentBoneIdx,vectorFromParent)
+    constructor(name,parentBoneIdx,translation,rotation,scale)
     {
         this.name=name;
         this.parentBoneIdx=parentBoneIdx;
-        this.vectorFromParent=vectorFromParent;
+        this.translation=translation;   // a point
+        this.rotation=rotation;         // a quaternion
+        this.scale=scale;               // a point
 
             // children
 

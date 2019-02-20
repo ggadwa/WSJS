@@ -7,8 +7,11 @@ WebGL2
 
 
 0. skeleton is missing some kind of rotate
+
+1. need to import non-UV trigs as flat textures
+    1a. create textures
+2. figure out textures
 0. get rid of all fbx stuff and zip stuff
-1. gltf needs rotate/zero stuff
 
 2. get rid of broken double windows in OBJ
 3. translate OBJs to GLTF?
@@ -16,6 +19,8 @@ WebGL2
 4. meshclass flags -- delete?
 5. vertices -> vertexes (use same spelling)
 6. indicies -> indexes
+
+
 
 1.6 merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific

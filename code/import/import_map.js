@@ -7,7 +7,7 @@ import MoveClass from '../map/move.js';
 import MovementClass from '../map/movement.js';
 import ImportSettingsClass from '../import/import_settings.js';
 import ImportObjClass from '../import/import_obj.js';
-import ImportFbxClass from '../import/import_fbx.js';
+import ImportGLTFClass from '../import/import_gltf.js';
 import ImportJSONClass from '../import/import_json.js';
 
 export default class ImportMapClass
@@ -36,7 +36,7 @@ export default class ImportMapClass
             importMesh=new ImportObjClass(this.view,importSettings); 
         }
         else {
-            importMesh=new ImportFbxClass(this.view,importSettings); 
+            importMesh=new ImportGLTFClass(this.view,importSettings); 
         }
         if (!(await importMesh.import(this.map.meshList,null))) return(false);
         

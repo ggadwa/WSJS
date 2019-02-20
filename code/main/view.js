@@ -7,6 +7,7 @@ import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
+import MatrixClass from '../utility/matrix.js';
 import InputClass from '../main/input.js';
 import ViewCameraClass from '../main/view_camera.js';
 import TextClass from '../text/text.js';
@@ -61,8 +62,8 @@ export default class ViewClass
 
             // billboarding matrixes
 
-        this.billboardXMatrix=new Float32Array(16);
-        this.billboardYMatrix=new Float32Array(16);
+        this.billboardXMatrix=new MatrixClass();
+        this.billboardYMatrix=new MatrixClass();
 
             // view lighting
 
@@ -494,52 +495,6 @@ export default class ViewClass
     }
     
         //
-        // billboarding matrixes
-        //
-        
-    buildBillboardXMatrix(ang)
-    {
-        let rad;
-        
-            // identity
-            // we can assume non-touched cells will always be 0
-            
-        this.billboardXMatrix[0]=1.0;
-        this.billboardXMatrix[5]=1.0;
-        this.billboardXMatrix[10]=1.0;
-        this.billboardXMatrix[15]=1.0;
-
-            // rotation
-            
-        rad=ang*constants.DEGREE_TO_RAD;
-        
-        this.billboardXMatrix[5]=this.billboardXMatrix[10]=Math.cos(rad);
-        this.billboardXMatrix[6]=Math.sin(rad);
-        this.billboardXMatrix[9]=-this.billboardXMatrix[6];
-    }
-    
-    buildBillboardYMatrix(ang)
-    {
-        let rad;
-        
-            // identity
-            // we can assume non-touched cells will always be 0
-            
-        this.billboardYMatrix[0]=1.0;
-        this.billboardYMatrix[5]=1.0;
-        this.billboardYMatrix[10]=1.0;
-        this.billboardYMatrix[15]=1.0;
-
-            // rotation
-            
-        rad=ang*constants.DEGREE_TO_RAD;
-        
-        this.billboardYMatrix[0]=this.billboardYMatrix[10]=Math.cos(rad);
-        this.billboardYMatrix[8]=Math.sin(rad);
-        this.billboardYMatrix[2]=-this.billboardYMatrix[8];
-    }
-    
-        //
         // draw view
         //
 
@@ -589,8 +544,8 @@ export default class ViewClass
             // build the billboarding matrixes
             // mostly used for particles
             
-        this.buildBillboardXMatrix(this.camera.angle.x);
-        this.buildBillboardYMatrix(this.camera.angle.y);
+        this.billboardXMatrix.setRotationFromXAngle(this.camera.angle.x);
+        this.billboardYMatrix.setRotationFromYAngle(this.camera.angle.y);
         
             // convert view lights to shader lights
             // all lights need a eye coordinate, so calc
