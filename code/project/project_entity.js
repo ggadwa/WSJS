@@ -269,12 +269,12 @@ export default class ProjectEntityClass
         else {
             
                 // if there is upwards movement (usually a jump or push)
-                // then reduce it by the current gravity
+                // then reduce it by the current gravity acceleration
   
-            if (this.movement.y<0) {
-                this.movement.y+=this.gravityAcceleration;
-                if (this.movement.y>=0) {
-                    this.gravity=this.movement.y;
+            if (this.movement.y>0) {
+                this.movement.y-=this.gravityAcceleration;
+                if (this.movement.y<=0) {
+                    this.gravity=-this.movement.y;
                     this.movement.y=0;
                 }
                 else {
@@ -289,23 +289,28 @@ export default class ProjectEntityClass
                 this.gravity+=this.gravityAcceleration;
                 if (this.gravity>this.gravityMaxValue) this.gravity=this.gravityMaxValue;
             
-                yAdd+=this.gravity;
+                yAdd-=this.gravity;
             }
         }
         
-            // now move up or down
+            // moving down
             
-        if (yAdd>=0) {
+        if (yAdd<=0) {
             this.collideCeilingMeshIdx=-1;                         // no ceiling collisions if going down
 
             fallY=this.collision.fallObjectInMap(this);
-            if (fallY>yAdd) fallY=yAdd;                             // can only drop as far as current fall
+            console.log('yAdd='+yAdd+', fallY='+fallY);
+            if (fallY>yAdd) fallY=yAdd;                            // can only drop as far as current fall
             
             this.position.addValuesTrunc(0,fallY,0);
         
-            if (fallY<=0) this.gravity=this.gravityMinValue;
+            if (fallY>=0) this.gravity=this.gravityMinValue;
         }
+        
+            // moving up
+            
         else {
+            /*
             this.standOnMeshIdx=-1;                                 // no standing if going up
             
             riseY=this.collision.riseObjectInMap(this,yAdd);
@@ -314,6 +319,7 @@ export default class ProjectEntityClass
             if (riseY>yAdd) {                                       // if we can't get as high as we want, then clear any movement
                 this.movement.y=0;
             }
+            */
         }
     }
     
@@ -352,24 +358,24 @@ export default class ProjectEntityClass
         }
 
         if (this.movementSideLeftOn) {
-            this.movement.x-=this.movementSideAcceleration;
-            if (this.movement.x<-this.movementSideMaxSpeed) this.movement.x=-this.movementSideMaxSpeed;
-        }
-        else {
-            if (!this.movementSideRightOn) {
-                this.movement.x+=this.movementSideAcceleration;
-                if (this.movement.x>0) this.movement.x=0;
-            }
-        }
-
-        if (this.movementSideRightOn) {
             this.movement.x+=this.movementSideAcceleration;
             if (this.movement.x>this.movementSideMaxSpeed) this.movement.x=this.movementSideMaxSpeed;
         }
         else {
-            if (!this.movementSideLeftOn) {
+            if (!this.movementSideRightOn) {
                 this.movement.x-=this.movementSideAcceleration;
                 if (this.movement.x<0) this.movement.x=0;
+            }
+        }
+
+        if (this.movementSideRightOn) {
+            this.movement.x-=this.movementSideAcceleration;
+            if (this.movement.x<this.movementSideMaxSpeed) this.movement.x=-this.movementSideMaxSpeed;
+        }
+        else {
+            if (!this.movementSideLeftOn) {
+                this.movement.x=this.movementSideAcceleration;
+                if (this.movement.x>0) this.movement.x=0;
             }
         }
         
@@ -542,17 +548,6 @@ export default class ProjectEntityClass
 	}
         
         return((addway<subway)?addway:subway);
-    }
-    
-        //
-        // look (x angle)
-        //
-
-    look(addAngle)
-    {
-        this.angle.x+=addAngle;
-        if (this.angle.x<-80.0) this.angle.x=-80.0;
-        if (this.angle.x>=80.0) this.angle.x=80.0;
     }
     
         //

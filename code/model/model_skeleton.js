@@ -30,6 +30,7 @@ export default class ModelSkeletonClass
             
         this.boneMat=new MatrixClass();
         this.boneMat2=new MatrixClass();
+        this.mainRotQuat=new QuaternionClass();
         
         Object.seal(this);
     }
@@ -163,77 +164,31 @@ export default class ModelSkeletonClass
         this.lastAnimationFlip=false;
     }
     
-    runAnimationRecursive(boneIdx,ang,pnt)
+    runAnimationRecursive(boneIdx,pnt,rotQuat)
     {
         let bone,childBoneIdx;
-        let nextAng;
         
         bone=this.bones[boneIdx];
         
-        console.log('1=>'+pnt.x);
+            // get bone position
+            
+        bone.curPosePosition.setFromPoint(bone.translation);
+        this.boneMat.setRotationFromQuaternion(rotQuat);        // rotation of parent bone
+        this.boneMat2.setScaleFromPoint(bone.scale);
+        this.boneMat.multiply(this.boneMat2);
         
-        /*
-         *             mat=new MatrixClass();
-            mat2=new MatrixClass();
-            
-            translationProp=node.translation;
-            if (translationProp!==undefined) {
-                mat2.setTranslationMatrix((translationProp[0]*this.importSettings.scale),(translationProp[1]*this.importSettings.scale),(translationProp[2]*this.importSettings.scale));
-                mat.multiply(mat2);
-            }
-            
-            rotationProp=node.rotation;
-            if (rotationProp!==undefined) {
-                mat2.setRotationFromQuaternion(rotationProp[0],rotationProp[1],rotationProp[2],rotationProp[3]);
-                mat.multiply(mat2);
-            }
-            
-            scaleProp=node.scale;
-            if (scaleProp!==undefined) {
-                mat2.setScaleMatrix(scaleProp[0],scaleProp[1],scaleProp[2]);
-                mat.multiply(mat2);
-            }
-            
-                // now the game scale
-                
-            vectorFromParent=new PointClass(0,0,0);
-            vectorFromParent.matrixMultiply(mat);
-
-         */
-        
-            // create the matrix
-            
-        this.boneMat.setTranslationMatrix(bone.translation.x,bone.translation.y,bone.translation.z);
-        
-            // add in current position
-         
-        console.log('2=>'+pnt.x);
-        
-        bone.curPosePosition.setFromPoint(0,0,0);
         bone.curPosePosition.matrixMultiply(this.boneMat);
+        bone.curPosePosition.addPoint(pnt);
         
+            // create the next cumulative quaternion for
+            // children bones
         
-        bone.curPosePosition.setFromPoint(bone.translation.x,bone.translation.y,bone.translation.z);
-                
+        bone.curPoseChildBoneQuat.setFromMultiply(rotQuat,bone.rotation);
         
-
-        
-        //bone.curPosePosition.rotate(ang);
-        //bone.curPosePosition.addPoint(pnt);
-        
-        console.log('3=>'+pnt.x);
-        
-            // next angle, we have to do this
-            // so adding in new angles doesn't kill global
-            
-        nextAng=ang.copy();
-        nextAng.addPoint(bone.curPoseAngle);
-        
-            // now push it off to other bones
+            // move children bones
             
         for (childBoneIdx of bone.childBoneIdxs) {
-            console.log('before recurse=>'+bone.curPosePosition);
-            this.runAnimationRecursive(childBoneIdx,nextAng,bone.curPosePosition);
+            this.runAnimationRecursive(childBoneIdx,bone.curPosePosition,bone.curPoseChildBoneQuat);
         }
     }
     
@@ -244,10 +199,13 @@ export default class ModelSkeletonClass
         //let bone=this.findBone('T-Rex_Tail1_02');
         //if (bone!==null) bone.curPoseAngle.y+=0.5;
         
+        
+        this.mainRotQuat.setFromVectorAndAngle(0,-1,0,ang.y);
+        
             // start at the root bone and build up
             // the tree
             
-        if (this.rootBoneIdx!==-1) this.runAnimationRecursive(this.rootBoneIdx,ang,pnt);
+        if (this.rootBoneIdx!==-1) this.runAnimationRecursive(this.rootBoneIdx,pnt,this.mainRotQuat);
     }
     
         //

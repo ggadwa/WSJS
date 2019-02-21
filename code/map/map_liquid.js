@@ -97,7 +97,7 @@ export default class MapLiquidClass
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
-                this.vertices[vIdx++]=(((offRow+offCol)%2)===0)?(this.yBound.min-offY):(this.yBound.min+offY);
+                this.vertices[vIdx++]=(((offRow+offCol)%2)===0)?(this.yBound.max-offY):(this.yBound.max+offY);
                 this.vertices[vIdx++]=vz;
                 
                 this.uvs[uvIdx++]=gx;

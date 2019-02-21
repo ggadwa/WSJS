@@ -37,6 +37,24 @@ export default class MatrixClass
         this.data[15]=1.0;
     }
     
+    setTranslationFromPoint(pnt)
+    {
+        this.setIdentity();
+
+        this.data[12]=pnt.x;	
+	this.data[13]=pnt.y;
+	this.data[14]=pnt.z;
+    }
+    
+    setScaleFromPoint(pnt)
+    {
+        this.setIdentity();
+        
+	this.data[0]=pnt.x;
+	this.data[5]=pnt.y;
+	this.data[10]=pnt.z;
+    }
+    
     setRotationFromXAngle(xAng)
     {
         let rad=xAng*constants.DEGREE_TO_RAD;
@@ -70,77 +88,69 @@ export default class MatrixClass
         this.data[4]=-this.data[1];
     }
     
-    setRotationFromQuaternion(x,y,z,w)
+    setRotationFromQuaternion(quant)
     {
-        let xy=x*y;
-        let zw=z*w;
-        let xz=x*z;
-        let yw=y*w;
-        let yz=y*z;
-        let xw=x*w;
-        let sx=x*x;
-        let sy=y*y;
-        let sz=z*z;
-        let sw=w*w;
+        let xx=quant.x*quant.x;
+        let xy=quant.x*quant.y;
+        let xz=quant.x*quant.z;
+        let xw=quant.x*quant.w;
+        let yy=quant.y*quant.y;
+        let yz=quant.y*quant.z;
+        let yw=quant.y*quant.w;
+        let zz=quant.z*quant.z;
+        let zw=quant.z*quant.w;
         
         this.setIdentity();
         
-        this.data[0]=sx+sy-sz-sw;
-        this.data[1]=(yz+xw)*2.0;
-        this.data[2]=(yw-xz)*2.0;
-        
-        this.data[4]=(yz-xw)*2.0;
-        this.data[5]=sx-sy+sz-sw;
-        this.data[6]=(zw+xy)*2.0;
-        
-        this.data[8]=(yw+xz)*2.0;
-        this.data[9]=(zw-xy)*2.0;
-        this.data[10]=sx-sy-sz+sw;
-    }
-    
-    setScaleMatrix(x,y,z)
-    {
-        this.setIdentity();
-        
-	this.data[0]=x;
-	this.data[5]=y;
-	this.data[10]=z;
-    }
-    
-    setTranslationMatrix(x,y,z)
-    {
-        this.setIdentity();
-
-        this.data[12]=x;	
-	this.data[13]=y;
-	this.data[14]=z;
+        this.data[0]=1.0-(2.0*(yy+zz));
+        this.data[4]=2.0*(xy-zw);
+        this.data[8]=2.0*(xz+yw);
+        this.data[1]=2.0*(xy+zw);
+        this.data[5]=1.0-(2.0*(xx+zz));
+        this.data[9]=2.0*(yz-xw);
+        this.data[2]=2.0*(xz-yw);
+        this.data[6]=2.0*(yz+xw);
+        this.data[10]=1.0-(2.0*(xx+yy));
     }
 
     multiply(mat)
     {
-	let productMat=new MatrixClass();
+        let d0=(this.data[0]*mat.data[0])+(this.data[4]*mat.data[1])+(this.data[8]*mat.data[2])+(this.data[12]*mat.data[3]);
+        let d4=(this.data[0]*mat.data[4])+(this.data[4]*mat.data[5])+(this.data[8]*mat.data[6])+(this.data[12]*mat.data[7]);
+        let d8=(this.data[0]*mat.data[8])+(this.data[4]*mat.data[9])+(this.data[8]*mat.data[10])+(this.data[12]*mat.data[11]);
+        let d12=(this.data[0]*mat.data[12])+(this.data[4]*mat.data[13])+(this.data[8]*mat.data[14])+(this.data[12]*mat.data[15]);
         
-        productMat.data[0]=(this.data[0]*mat.data[0])+(this.data[4]*mat.data[1])+(this.data[8]*mat.data[2])+(this.data[12]*mat.data[3]);
-        productMat.data[4]=(this.data[0]*mat.data[4])+(this.data[4]*mat.data[5])+(this.data[8]*mat.data[6])+(this.data[12]*mat.data[7]);
-        productMat.data[8]=(this.data[0]*mat.data[8])+(this.data[4]*mat.data[9])+(this.data[8]*mat.data[10])+(this.data[12]*mat.data[11]);
-        productMat.data[12]=(this.data[0]*mat.data[12])+(this.data[4]*mat.data[13])+(this.data[8]*mat.data[14])+(this.data[12]*mat.data[15]);
+        let d1=(this.data[1]*mat.data[0])+(this.data[5]*mat.data[1])+(this.data[9]*mat.data[2])+(this.data[13]*mat.data[3]);
+        let d5=(this.data[1]*mat.data[4])+(this.data[5]*mat.data[5])+(this.data[9]*mat.data[6])+(this.data[13]*mat.data[7]);
+        let d9=(this.data[1]*mat.data[8])+(this.data[5]*mat.data[9])+(this.data[9]*mat.data[10])+(this.data[13]*mat.data[11]);
+        let d13=(this.data[1]*mat.data[12])+(this.data[5]*mat.data[13])+(this.data[9]*mat.data[14])+(this.data[13]*mat.data[15]);
         
-        productMat.data[1]=(this.data[1]*mat.data[0])+(this.data[5]*mat.data[1])+(this.data[9]*mat.data[2])+(this.data[13]*mat.data[3]);
-        productMat.data[5]=(this.data[1]*mat.data[4])+(this.data[5]*mat.data[5])+(this.data[9]*mat.data[6])+(this.data[13]*mat.data[7]);
-        productMat.data[9]=(this.data[1]*mat.data[8])+(this.data[5]*mat.data[9])+(this.data[9]*mat.data[10])+(this.data[13]*mat.data[11]);
-        productMat.data[13]=(this.data[1]*mat.data[12])+(this.data[5]*mat.data[13])+(this.data[9]*mat.data[14])+(this.data[13]*mat.data[15]);
-        
-        productMat.data[2]=(this.data[2]*mat.data[0])+(this.data[6]*mat.data[1])+(this.data[10]*mat.data[2])+(this.data[14]*mat.data[3]);
-        productMat.data[6]=(this.data[2]*mat.data[4])+(this.data[6]*mat.data[5])+(this.data[10]*mat.data[6])+(this.data[14]*mat.data[7]);
-        productMat.data[10]=(this.data[2]*mat.data[8])+(this.data[6]*mat.data[9])+(this.data[10]*mat.data[10])+(this.data[14]*mat.data[11]);
-        productMat.data[14]=(this.data[2]*mat.data[12])+(this.data[6]*mat.data[13])+(this.data[10]*mat.data[14])+(this.data[14]*mat.data[15]);
+        let d2=(this.data[2]*mat.data[0])+(this.data[6]*mat.data[1])+(this.data[10]*mat.data[2])+(this.data[14]*mat.data[3]);
+        let d6=(this.data[2]*mat.data[4])+(this.data[6]*mat.data[5])+(this.data[10]*mat.data[6])+(this.data[14]*mat.data[7]);
+        let d10=(this.data[2]*mat.data[8])+(this.data[6]*mat.data[9])+(this.data[10]*mat.data[10])+(this.data[14]*mat.data[11]);
+        let d14=(this.data[2]*mat.data[12])+(this.data[6]*mat.data[13])+(this.data[10]*mat.data[14])+(this.data[14]*mat.data[15]);
 
-        productMat.data[3]=(this.data[3]*mat.data[0])+(this.data[7]*mat.data[1])+(this.data[11]*mat.data[2])+(this.data[15]*mat.data[3]);
-        productMat.data[7]=(this.data[3]*mat.data[4])+(this.data[7]*mat.data[5])+(this.data[11]*mat.data[6])+(this.data[15]*mat.data[7]);
-        productMat.data[11]=(this.data[3]*mat.data[8])+(this.data[7]*mat.data[9])+(this.data[11]*mat.data[10])+(this.data[15]*mat.data[11]);
-        productMat.data[15]=(this.data[3]*mat.data[12])+(this.data[7]*mat.data[13])+(this.data[11]*mat.data[14])+(this.data[15]*mat.data[15]);
+        let d3=(this.data[3]*mat.data[0])+(this.data[7]*mat.data[1])+(this.data[11]*mat.data[2])+(this.data[15]*mat.data[3]);
+        let d7=(this.data[3]*mat.data[4])+(this.data[7]*mat.data[5])+(this.data[11]*mat.data[6])+(this.data[15]*mat.data[7]);
+        let d11=(this.data[3]*mat.data[8])+(this.data[7]*mat.data[9])+(this.data[11]*mat.data[10])+(this.data[15]*mat.data[11]);
+        let d15=(this.data[3]*mat.data[12])+(this.data[7]*mat.data[13])+(this.data[11]*mat.data[14])+(this.data[15]*mat.data[15]);
         
-        this.data=productMat.data;
+        this.data[0]=d0;
+        this.data[1]=d1;
+        this.data[2]=d2;
+        this.data[3]=d3;
+        this.data[4]=d4;
+        this.data[5]=d5;
+        this.data[6]=d6;
+        this.data[7]=d7;
+        this.data[8]=d8;
+        this.data[9]=d9;
+        this.data[10]=d10;
+        this.data[11]=d11;
+        this.data[12]=d12;
+        this.data[13]=d13;
+        this.data[14]=d14;
+        this.data[15]=d15;
     }
     
     consoleDebug()

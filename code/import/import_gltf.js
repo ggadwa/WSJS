@@ -208,69 +208,14 @@ export default class ImportGLTFClass extends ImportBaseClass
     }
     
         //
-        // rotations and Y zeroing
+        // flooring
         //
-        
-    rotate(meshes,skeleton)
-    {
-        let n,k,v,mesh,pos,nVertex;
-        let centerPnt;
-        let minPnt=new PointClass(0,0,0);
-        let maxPnt=new PointClass(0,0,0);
-        let rotAng=this.importSettings.rotate;
-        
-            // run through all meshes
-            // and get the center point
-        
-        minPnt.setFromPoint(meshes[0].vertexList[0].position);
-        maxPnt.setFromPoint(meshes[0].vertexList[0].position);
-            
-        for (n=0;n!==meshes.length;n++) {
-            mesh=meshes[n];
-            
-            nVertex=mesh.vertexList.length;
-
-            for (k=0;k!==nVertex;k++) {
-                pos=mesh.vertexList[k].position;
-                if (pos.x<minPnt.x) minPnt.x=pos.x;
-                if (pos.y<minPnt.y) minPnt.y=pos.y;
-                if (pos.z<minPnt.z) minPnt.z=pos.z;
-                if (pos.x>maxPnt.x) maxPnt.x=pos.x;
-                if (pos.y>maxPnt.y) maxPnt.y=pos.y;
-                if (pos.z>maxPnt.z) maxPnt.z=pos.z;
-            }
-        }
-        
-        centerPnt=new PointClass(Math.trunc((minPnt.x+maxPnt.x)*0.5),Math.trunc((minPnt.y+maxPnt.y)*0.5),Math.trunc((minPnt.z+maxPnt.z)*0.5));
-        
-            // now rotate vertexes
-            
-        for (n=0;n!==meshes.length;n++) {
-            mesh=meshes[n];
-            
-            nVertex=mesh.vertexList.length;
-            
-            for (k=0;k!==nVertex;k++) {
-                v=mesh.vertexList[k];
-                v.position.rotateAroundPoint(centerPnt,rotAng);
-                v.normal.rotate(rotAng);
-            }
-        }
-        
-            // and any bones
-            
-        for (n=0;n!==skeleton.bones.length;n++) {
-            skeleton.bones[n].translation.rotate(rotAng);        // these are vectors, just need to rotate
-        }
-    }
     
-    zeroTop(meshes)
+    floorY(meshes,skeleton)
     {
-        let n,k,mesh,nVertex,by;
+        let n,k,mesh,nVertex,fy;
         
-            // find bottom Y
-            
-        by=0;
+        fy=meshes[0].vertexList[0].position.y;
         
         for (n=0;n!==meshes.length;n++) {
             mesh=meshes[n];
@@ -278,38 +223,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             nVertex=mesh.vertexList.length;
             
             for (k=0;k!==nVertex;k++) {
-                if (mesh.vertexList[k].position.y<by) by=mesh.vertexList[k].position.y;
-            }
-        }
-        
-        by=Math.trunc(Math.abs(by));
-        
-            // floor vertexes
-            
-        for (n=0;n!==meshes.length;n++) {
-            mesh=meshes[n];
-        
-            nVertex=mesh.vertexList.length;
-            
-            for (k=0;k!==nVertex;k++) {
-                mesh.vertexList[k].position.y+=by;
-            }
-        }
-    }
-    
-    zeroBottom(meshes)
-    {
-        let n,k,mesh,nVertex,by;
-        
-        by=0;
-        
-        for (n=0;n!==meshes.length;n++) {
-            mesh=meshes[n];
-        
-            nVertex=mesh.vertexList.length;
-            
-            for (k=0;k!==nVertex;k++) {
-                if (mesh.vertexList[k].position.y>by) by=mesh.vertexList[k].position.y;
+                if (mesh.vertexList[k].position.y<fy) fy=mesh.vertexList[k].position.y;
             }
         }
         
@@ -321,8 +235,14 @@ export default class ImportGLTFClass extends ImportBaseClass
             nVertex=mesh.vertexList.length;
             
             for (k=0;k!==nVertex;k++) {
-                mesh.vertexList[k].position.y-=by;
+                mesh.vertexList[k].position.y-=fy;
             }
+        }
+        
+            // and floor the root bone
+            
+        if (skeleton.rootBoneIdx!==-1) {
+            skeleton.bones[skeleton.rootBoneIdx].translation.y-=fy;
         }
     }
     
@@ -387,6 +307,37 @@ export default class ImportGLTFClass extends ImportBaseClass
     }
     
         //
+        // decode materials
+        //
+    
+    findMaterialForMesh(meshNode,primitiveNode)
+    {
+        let materialNode=this.jsonData.materials[primitiveNode.material];
+        
+        if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness!==undefined) {
+            if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture) {
+                console.log(meshNode.name+' has diffuse texture');
+            }
+            else {
+                console.log(meshNode.name+' has diffuse color='+materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor);
+            }
+        }
+        else {
+            if (materialNode.pbrMetallicRoughness!==undefined) {
+                console.log(meshNode.name+' has metallic='+materialNode.pbrMetallicRoughness.baseColorTexture);
+            }
+        }
+        
+        console.log(materialNode.normalTexture);
+        return(null);
+        
+            // could not find any texture
+            
+        console.log('Could not find texture for mesh '+meshNode.name+' in '+this.importSettings.name);
+        return(null);
+    }
+    
+        //
         // decode meshes
         //
         
@@ -445,7 +396,9 @@ export default class ImportGLTFClass extends ImportBaseClass
                     vertexList.push(v);
                 }
                 
-                    // supergumba -- need to fix non-uv mapped textures
+                    // create bitmap
+                    
+                this.findMaterialForMesh(meshNode,primitiveNode);
                 
                     // finally make the mesh
                     
@@ -454,23 +407,10 @@ export default class ImportGLTFClass extends ImportBaseClass
             }
         }
 
-            // any user rotations
-
-        this.rotate(meshes,skeleton);
-
-            // maps should have zero top (for convience)
             // models should have zero bottom so they
             // draw at the bottom of the xyz position
-            // but it's not required
 
-        switch (this.importSettings.yZero) {
-            case this.importSettings.Y_ZERO_TOP:
-                this.zeroTop(meshes);
-                break;
-            case this.importSettings.Y_ZERO_BOTTOM:
-                this.zeroBottom(meshes);
-                break;
-        }
+        if (this.importSettings.floorY) this.floorY(meshes,skeleton);
         
             // and sort meshes by bitmaps into mesh list
             

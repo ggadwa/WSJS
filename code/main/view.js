@@ -48,7 +48,7 @@ export default class ViewClass
         this.wid=0;
         this.high=0;
         this.aspect=0.0;
-        this.lookAtUpVector=new PointClass(0.0,1.0,0.0);
+        this.lookAtUpVector=new PointClass(0.0,-1.0,0.0);
 
         this.eyePos=new PointClass(0.0,0.0,0.0);
 

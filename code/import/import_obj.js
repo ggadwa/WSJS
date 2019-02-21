@@ -192,47 +192,12 @@ export default class ImportObjClass extends ImportBaseClass
     }
     
         //
-        // rotations
+        // flooring
         //
         
-    rotate()
+    floorY()
     {
-        let n,nVertex;
-        let centerPnt=new PointClass(0,0,0);
-        let rotAng=this.importSettings.rotate;
-        
-            // can't do anything if only one
-            // or no vertexes
-            
-        nVertex=this.vertexList.length;
-        if (nVertex<=1) return;
-       
-            // find the center
-
-        centerPnt.setFromPoint(this.vertexList[0]);
-            
-        for (n=1;n!==nVertex;n++) {
-            centerPnt.addPoint(this.vertexList[n]);
-        }
-        
-        centerPnt.x=Math.trunc(centerPnt.x/nVertex);
-        centerPnt.y=Math.trunc(centerPnt.y/nVertex);
-        centerPnt.z=Math.trunc(centerPnt.z/nVertex);
-        
-            // now rotate
-            
-        for (n=0;n!==nVertex;n++) {
-            this.vertexList[n].rotateAroundPoint(centerPnt,rotAng);
-        }
-        
-        for (n=0;n!=this.normalList.length;n++) {
-            this.normalList[n].rotate(rotAng);
-        }
-    }
-    
-    zeroTop()
-    {
-        let n,nVertex,by;
+        let n,nVertex,fy;
         
             // can't do anything if only one
             // or no vertexes
@@ -242,44 +207,17 @@ export default class ImportObjClass extends ImportBaseClass
        
             // find bottom Y
             
-        by=0;
+        fy=this.vertexList[0].y;
             
         for (n=0;n!==nVertex;n++) {
-            if (this.vertexList[n].y<by) by=this.vertexList[n].y;
-        }
-        
-        by=Math.trunc(Math.abs(by));
-        
-            // floor it
-            
-        for (n=0;n!==nVertex;n++) {
-            this.vertexList[n].y+=by;
-        }    
-    }
-    
-    zeroBottom()
-    {
-        let n,nVertex,by;
-        
-            // can't do anything if only one
-            // or no vertexes
-            
-        nVertex=this.vertexList.length;
-        if (nVertex<=1) return;
-       
-            // find bottom Y
-            
-        by=0;
-            
-        for (n=0;n!==nVertex;n++) {
-            if (this.vertexList[n].y>by) by=this.vertexList[n].y;
+            if (this.vertexList[n].y<fy) fy=this.vertexList[n].y;
         }
         
             // floor it
             
         for (n=0;n!==nVertex;n++) {
-            this.vertexList[n].y-=by;
-        }    
+            this.vertexList[n].y-=fy;
+        }
     }
     
         //
@@ -369,21 +307,10 @@ export default class ImportObjClass extends ImportBaseClass
             }
         }
         
-        this.rotate();
-        
-            // maps should have zero top (for convience)
             // models should have zero bottom so they
             // draw at the bottom of the xyz position
-            // but it's not required
-            
-        switch (this.importSettings.yZero) {
-            case this.importSettings.Y_ZERO_TOP:
-                this.zeroTop();
-                break;
-            case this.importSettings.Y_ZERO_BOTTOM:
-                this.zeroBottom();
-                break;
-        }
+
+        if (this.importSettings.floorY) this.floorY();
         
             // now create all the meshes
             

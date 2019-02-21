@@ -1,4 +1,5 @@
 import PointClass from '../utility/point.js';
+import QuaternionClass from '../utility/quaternion.js';
 
 //
 // model bone class
@@ -18,10 +19,10 @@ export default class ModelBoneClass
 
         this.childBoneIdxs=[];
 
-            // animation position
-            
-        this.curPoseAngle=new PointClass(0.0,0.0,0.0);
+            // pose position
+
         this.curPosePosition=new PointClass(0.0,0.0,0.0);
+        this.curPoseChildBoneQuat=new QuaternionClass();
 
         this.prevPoseAngle=new PointClass(0.0,0.0,0.0);
         this.nextPoseAngle=new PointClass(0.0,0.0,0.0);

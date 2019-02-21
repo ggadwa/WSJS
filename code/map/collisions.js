@@ -489,16 +489,16 @@ export default class CollisionClass
         
             // build the ray trace points and ray vector
             
-        this.buildYCollisionRayPoints(entity,(entity.position.y-constants.FLOOR_RISE_HEIGHT));
+        this.buildYCollisionRayPoints(entity,(entity.position.y+constants.FLOOR_RISE_HEIGHT));
         
         this.rayVector.x=0;
-        this.rayVector.y=constants.FLOOR_RISE_HEIGHT*2;
+        this.rayVector.y=-(constants.FLOOR_RISE_HEIGHT*2);
         this.rayVector.z=0;
        
             // start with no hits
        
         entity.standOnMeshIdx=-1;
-        y=entity.position.y+constants.FLOOR_RISE_HEIGHT;
+        y=entity.position.y-constants.FLOOR_RISE_HEIGHT;
         
             // run through colliding trigs
         
@@ -526,7 +526,7 @@ export default class CollisionClass
                     for (i=0;i!==25;i++) {
                         rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
                         if (rayHitPnt!==null) {
-                            if (rayHitPnt.y<=y) {
+                            if (rayHitPnt.y>=y) {
                                 entity.standOnMeshIdx=n;
                                 y=rayHitPnt.y;
                             }
@@ -536,7 +536,7 @@ export default class CollisionClass
             }
         }
             
-        if (entity.standOnMeshIdx!==-1) return(y-entity.position.y);
+        if (entity.standOnMeshIdx!==-1) return(y+entity.position.y);
         
             // if no collisions, return the
             // farthest part of the ray
