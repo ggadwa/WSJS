@@ -1,10 +1,18 @@
+import ColorClass from '../utility/color.js';
+
 export default class BitmapClass
 {
-    constructor(view,name,colorOnly)
+    constructor(view,colorURL,normalURL,specularURL,specularFactor,glowURL,solidColor)
     {
         this.view=view;
-        this.name=name;
-        this.colorOnly=colorOnly;
+        this.colorURL=colorURL;
+        this.normalURL=normalURL;
+        this.specularURL=specularURL;
+        this.specularFactor=specularFactor;
+        this.glowURL=glowURL;
+        this.solidColor=solidColor;
+        
+        if (this.specularFactor===null) this.specularFactor=new ColorClass(1,1,1);      // default specular, in case it's missing
         
         this.LOAD_STATE_UNLOADED=0;
         this.LOAD_STATE_LOADED=1;
@@ -21,7 +29,6 @@ export default class BitmapClass
         this.glowMap=null;
 
         this.alpha=1.0;
-        this.shineFactor=5.0;
         this.glowFrequency=0;
         this.glowMax=1.0;
         
@@ -93,11 +100,11 @@ export default class BitmapClass
         
         return(false);
     }
-        
-    createEmptyGlowMapImage()
+    
+    createDefaultImageForMissingImage(r,g,b)
     {
         let n,idx;
-        let canvas,ctx,imgData,data;
+        let canvas,ctx,imgData,data,image;
         
             // create an all black image
             // for bitmaps without glow maps
@@ -113,18 +120,27 @@ export default class BitmapClass
         idx=0;
         
         for (n=0;n!=64;n++) {
-            data[idx++]=0;
-            data[idx++]=0;
-            data[idx++]=0;
+            data[idx++]=r;
+            data[idx++]=g;
+            data[idx++]=b;
             data[idx++]=255;
         }
 		
 	ctx.putImageData(imgData,0,0);
 		
             // convert to image
+            // we have to wait for a promise here
+            // as these don't always load async
             
-        this.glowImage=new Image();
-        this.glowImage.src=canvas.toDataURL("image/png");
+        return(
+            new Promise((resolve,reject) =>
+                {
+                    let img=new Image();
+                    img.onload=()=>resolve(img);
+                    img.src=canvas.toDataURL("image/png");      // reject will never happen here as far as I can tell
+                }
+            )
+       );
     }
     
         //
@@ -150,25 +166,37 @@ export default class BitmapClass
         let hasAlpha;
         let gl=this.view.gl;
         
-            // color bitmap
+            // special check for solid colors
             
-        await this.loadImagePromise('./data/textures/'+this.name+'.png')
-            .then
-                (
-                        // resolved
-                
-                    value=>{
-                        this.colorImage=value;
-                    },
-                    
-                        // rejected
-                        
-                    value=>{
-                        console.log('Unable to load '+value);
-                    }
-                );
+        if (this.solidColor!==null) {
+            this.colorImage=await this.createDefaultImageForMissingImage(this.solidColor.r,this.solidColor.g,this.solidColor.b);
+        }
         
-        if (this.colorImage===null) return(false);
+            // color bitmap
+            // this is the only required image, all others
+            // are created if missing
+        
+        else {    
+            this.colorImage=null;
+
+            await this.loadImagePromise('./data/'+this.colorURL)
+                .then
+                    (
+                            // resolved
+
+                        value=>{
+                            this.colorImage=value;
+                        },
+
+                            // rejected
+
+                        value=>{
+                            console.log('Unable to load '+value);
+                        }
+                    );
+
+            if (this.colorImage===null) return(false);
+        }
         
             // detect if there is any alpha
             
@@ -182,31 +210,30 @@ export default class BitmapClass
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D,null);
         
-        if (this.colorOnly) {
-            this.loaded=true;
-            return(true);
+            // normal bitmap
+        
+        this.normalImage=null;
+        
+        if (this.normalURL!==null) {
+            await this.loadImagePromise('./data/'+this.normalURL)
+                .then
+                    (
+                            // resolved
+
+                        value=>{
+                                this.normalImage=value;
+                        },
+
+                            // rejected
+
+                        value=>{}
+                    );
+        }
+        
+        if (this.normalImage===null) {
+            this.normalImage=await this.createDefaultImageForMissingImage(0,0,255);
         }
 
-            // normal bitmap
-            
-        await this.loadImagePromise('./data/textures/'+this.name+'_n.png')
-            .then
-                (
-                        // resolved
-                
-                    value=>{
-                        this.normalImage=value;
-                    },
-                    
-                        // rejected
-                        
-                    value=>{
-                        console.log('Unable to load '+value);
-                    }
-                );
-        
-        if (this.normalImage===null) return(false);
-        
         this.normalMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.normalImage);
@@ -214,26 +241,30 @@ export default class BitmapClass
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D,null);
-        
+
             // specular bitmap
             
-        await this.loadImagePromise('./data/textures/'+this.name+'_s.png')
-            .then
-                (
-                        // resolved
-                
-                    value=>{
-                        this.specularImage=value;
-                    },
-                    
-                        // rejected
-                        
-                    value=>{
-                        console.log('Unable to load '+value);
-                    }
-                );
+        this.specularImage=null;
         
-        if (this.specularImage===null) return(false);
+        if (this.specularURL!==null) {
+            await this.loadImagePromise('./data/'+this.specularURL)
+                .then
+                    (
+                            // resolved
+
+                        value=>{
+                                this.specularImage=value;
+                        },
+
+                            // rejected
+
+                        value=>{}
+                    );
+        }
+        
+        if (this.specularImage===null) {
+            this.specularImage=await this.createDefaultImageForMissingImage(0,0,0);
+        }
         
         this.specularMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
@@ -246,22 +277,28 @@ export default class BitmapClass
             // glow bitmap
             // these do not have to exist, if missing,
             // will use fake glowmap
-            
-        await this.loadImagePromise('./data/textures/'+this.name+'_g.png')
-            .then
-                (
-                        // resolved
-                
-                    value=>{
-                        this.glowImage=value;
-                    },
-                    
-                        // rejected
-                        
-                    ()=>{
-                        this.createEmptyGlowMapImage();
-                    }
-                );
+        
+        this.glowImage=null;
+        
+        if (this.glowURL!==null) {
+            await this.loadImagePromise('./data/'+this.glowURL)
+                .then
+                    (
+                            // resolved
+
+                        value=>{
+                                this.glowImage=value;
+                        },
+
+                            // rejected
+
+                        ()=>{}
+                    );
+        }
+        
+        if (this.glowImage===null) {
+            this.glowImage=await this.createDefaultImageForMissingImage(0,0,0);
+        }
         
         this.glowMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.glowMap);
@@ -288,7 +325,7 @@ export default class BitmapClass
             // uniforms
 
         gl.uniform1f(shader.alphaUniform,this.alpha);
-        gl.uniform1f(shader.shineFactorUniform,this.shineFactor);
+        gl.uniform3f(shader.specularFactorUniform,this.specularFactor.r,this.specularFactor.g,this.specularFactor.b);
         
         if (this.glowFrequency!==0) {
             glowFactor=Math.abs(Math.cos(this.view.timestamp/this.glowFrequency)*this.glowMax);

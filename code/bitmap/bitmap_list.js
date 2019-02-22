@@ -1,3 +1,4 @@
+import ColorClass from '../utility/color.js';
 import BitmapClass from '../bitmap/bitmap.js';
 
 //
@@ -32,26 +33,42 @@ export default class BitmapListClass
         // add and get a bitmap
         //
         
-    add(name,colorOnly)
+    add(colorURL,normalURL,specularURL,specularFactor,glowURL)
     {
         let bitmap;
             
             // already in list?
             
-        if (this.bitmaps.has(name)) return;
+        if (this.bitmaps.has(colorURL)) return;
         
             // add new one to list, will be loaded
             // by another call that force loads unloaded
             // bitmaps
                     
-        bitmap=new BitmapClass(this.view,name,colorOnly);
+        bitmap=new BitmapClass(this.view,colorURL,normalURL,specularURL,specularFactor,glowURL,null);
+        bitmap.initialize();
+        this.bitmaps.set(colorURL,bitmap);
+        
+        return(bitmap);
+    }
+    
+    addSolidColor(name,r,g,b)
+    {
+        let bitmap;
+        
+            // specialized bitmap for the color models that have
+            // parts without textures
+        
+        bitmap=new BitmapClass(this.view,null,null,null,null,null,new ColorClass(r,g,b));
         bitmap.initialize();
         this.bitmaps.set(name,bitmap);
+        
+        return(bitmap);
     }
 
-    get(name)
+    get(colorURL)
     {
-        return(this.bitmaps.get(name));
+        return(this.bitmaps.get(colorURL));
     }
     
         //

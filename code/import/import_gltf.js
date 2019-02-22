@@ -1,6 +1,7 @@
 import ImportBaseClass from '../import/import_base.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
+import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import MatrixClass from '../utility/matrix.js';
 import MeshVertexClass from '../mesh/mesh_vertex.js';
@@ -108,6 +109,11 @@ export default class ImportGLTFClass extends ImportBaseClass
         bufferViewNode=this.jsonData.bufferViews[accessorNode.bufferView];
         if (bufferViewNode.byteOffset!==undefined) byteOffset+=bufferViewNode.byteOffset;
         byteLength=bufferViewNode.byteLength;
+        
+            // I have seen gltf files where the byteoffset + bytelength
+            // is greater than total bytes, fix this
+            
+        if ((byteOffset+byteLength)>this.binData.byteLength) byteLength=this.binData.byteLength-byteOffset;
         
             // and finally the buffer
             // we assume one bin file here so we just read from that
@@ -247,6 +253,80 @@ export default class ImportGLTFClass extends ImportBaseClass
     }
     
         //
+        // rebuild missing tangents
+        //
+
+    buildVertexListTangents(vertexList,indexes)
+    {
+        let n,nTrig,trigIdx;
+        let v0,v1,v2;
+        let u10,u20,v10,v20;
+
+            // generate tangents by the trigs
+            // sometimes we will end up overwriting
+            // but it depends on the mesh to have
+            // constant shared vertices against
+            // triangle tangents
+
+            // note this recreates a bit of what
+            // goes on to create the normal, because
+            // we need that first to make the UVs
+
+        let p10=new PointClass(0.0,0.0,0.0);
+        let p20=new PointClass(0.0,0.0,0.0);
+        let vLeft=new PointClass(0.0,0.0,0.0);
+        let vRight=new PointClass(0.0,0.0,0.0);
+        let vNum=new PointClass(0.0,0.0,0.0);
+        let denom;
+        let tangent=new PointClass(0.0,0.0,0.0);
+
+        nTrig=Math.trunc(indexes.length/3);
+
+        for (n=0;n!==nTrig;n++) {
+
+                // get the vertex indexes and
+                // the vertexes for the trig
+
+            trigIdx=n*3;
+
+            v0=vertexList[indexes[trigIdx]];
+            v1=vertexList[indexes[trigIdx+1]];
+            v2=vertexList[indexes[trigIdx+2]];
+
+                // create vectors
+
+            p10.setFromSubPoint(v1.position,v0.position);
+            p20.setFromSubPoint(v2.position,v0.position);
+
+                // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
+
+            u10=v1.uv.x-v0.uv.x;        // x component
+            u20=v2.uv.x-v0.uv.x;
+            v10=v1.uv.y-v0.uv.y;        // y component
+            v20=v2.uv.y-v0.uv.y;
+
+                // calculate the tangent
+                // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
+
+            vLeft.setFromScale(p10,v20);
+            vRight.setFromScale(p20,v10);
+            vNum.setFromSubPoint(vLeft,vRight);
+
+            denom=(u10*v20)-(v10*u20);
+            if (denom!==0.0) denom=1.0/denom;
+            tangent.setFromScale(vNum,denom);
+            tangent.normalize();
+
+                // and set the mesh normal
+                // to all vertexes in this trig
+
+            v0.tangent.setFromPoint(tangent);
+            v1.tangent.setFromPoint(tangent);
+            v2.tangent.setFromPoint(tangent);
+        }
+    }
+    
+        //
         // decode bones
         //
     
@@ -312,29 +392,87 @@ export default class ImportGLTFClass extends ImportBaseClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
+        let diffuseTexture,diffuseFactor,baseColorFactor,glossTexture,specularFactorProp;
+        let colorURL=null;
+        let normalURL=null;
+        let specularURL=null;
+        let specularFactor=null;
+        let prefixURL='models/'+this.importSettings.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
         
-        if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness!==undefined) {
-            if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture) {
-                console.log(meshNode.name+' has diffuse texture');
-            }
-            else {
-                console.log(meshNode.name+' has diffuse color='+materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor);
-            }
-        }
-        else {
-            if (materialNode.pbrMetallicRoughness!==undefined) {
-                console.log(meshNode.name+' has metallic='+materialNode.pbrMetallicRoughness.baseColorTexture);
-            }
-        }
-        
-        console.log(materialNode.normalTexture);
-        return(null);
-        
-            // could not find any texture
+            // first find any normal texture
             
-        console.log('Could not find texture for mesh '+meshNode.name+' in '+this.importSettings.name);
-        return(null);
+        if (materialNode.normalTexture!==undefined) {
+            normalURL=prefixURL+this.jsonData.images[materialNode.normalTexture.index].uri;
+        }
+        
+            // default specular
+            
+        specularFactor=new ColorClass(1.0,1.0,1.0);
+        
+            // now any color texture
+            // check specularGlossiness first
+        
+        if (materialNode.extensions!==undefined) {    
+            if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness!==undefined) {
+
+                    // find the glossy base color
+
+                diffuseTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture;
+                if (diffuseTexture!==undefined) {
+                    colorURL=prefixURL+this.jsonData.images[diffuseTexture.index].uri;
+                }
+                else {
+                    diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
+                    if (diffuseFactor!==undefined) {
+                        return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),diffuseFactor[0],diffuseFactor[1],diffuseFactor[2]));
+                    }
+                }
+
+                    // get the specular
+
+                glossTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture;
+                if (glossTexture!==undefined) {
+                    specularURL=prefixURL+this.jsonData.images[glossTexture.index].uri;
+
+                    specularFactorProp=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularFactor;
+                    if (specularFactorProp!==undefined) specularFactor=new ColorClass(specularFactorProp[0],specularFactorProp[1],specularFactorProp[2]);
+                }
+            }
+        }
+        
+            // check metallicRoughness next
+            
+        if (colorURL===null) {
+            
+                // check for base color
+                
+            if (materialNode.pbrMetallicRoughness!==undefined) {
+                if (materialNode.pbrMetallicRoughness.baseColorTexture!==undefined) {
+                    colorURL=prefixURL+this.jsonData.images[materialNode.pbrMetallicRoughness.baseColorTexture.index].uri;
+                }
+                
+                    // else check for solid color
+                    
+                else {
+                    baseColorFactor=materialNode.pbrMetallicRoughness.baseColorFactor;
+                    if (baseColorFactor!==undefined) {
+                        return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),baseColorFactor[0],baseColorFactor[1],baseColorFactor[2]));
+                    }
+                }
+            }
+        }
+        
+            // no color texture is an error
+
+        if (colorURL===null) {
+            console.log('Could not find texture for mesh '+meshNode.name+' in '+this.importSettings.name);
+            return(null);
+        }
+        
+            // add the texture and return the bitmap
+
+        return(this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,null));
     }
     
         //
@@ -343,10 +481,10 @@ export default class ImportGLTFClass extends ImportBaseClass
         
     decodeMesh(meshList,skeleton)
     {
-        let n,k,t,meshesNode,meshNode,primitiveNode;
-        let indices,vertices,normals,tangents,uvs,v,vertexList,needColorTexture;
+        let n,k,t,meshesNode,meshNode,primitiveNode,skip;
+        let indices,vertices,normals,tangents,uvs,v,vertexList;
         let vIdx,nIdx,tIdx,uvIdx;
-        let mesh,curBitmapName;
+        let mesh,bitmap,curBitmapName;
         let meshes=[];
         
             // run through the meshes
@@ -356,6 +494,21 @@ export default class ImportGLTFClass extends ImportBaseClass
         for (n=0;n!==meshesNode.length;n++) {
             meshNode=meshesNode[n];
             
+                // we can skip meshes that the user doesn't
+                // want because sometimes meshs can have planes
+                // and stuff
+            
+            skip=false;
+            
+            for (k=0;k!==this.importSettings.skipMeshes.length;k++) {
+                if (meshNode.name===this.importSettings.skipMeshes[k]) {
+                    skip=true;
+                    break;
+                }
+            }
+            
+            if (skip) continue;
+            
                 // run through the primitives
                 // we need to knock out anything that's
                 // triangle stream
@@ -363,16 +516,18 @@ export default class ImportGLTFClass extends ImportBaseClass
             for (k=0;k!==meshNode.primitives.length;k++) {
                 primitiveNode=meshNode.primitives[k];
                 if (primitiveNode.mode!==4) continue;       // not a triangle stream
-                needColorTexture=(primitiveNode.attributes.TEXCOORD_0===undefined);      // no uv mapping
                 
                     // create the mesh
                   
                 indices=this.decodeBuffer(primitiveNode.indices,1);
                 vertices=this.decodeBuffer(primitiveNode.attributes.POSITION,3);
                 normals=this.decodeBuffer(primitiveNode.attributes.NORMAL,3);
-                tangents=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
                 
-                if (!needColorTexture) {
+                tangents=null;      // tangents aren't always there, we recreate them if missing
+                if (primitiveNode.attributes.TANGENT!==undefined) tangents=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
+                
+                                    // solid colors usually don't have UVs but we treat everything as a texture so we create a 0,0 list
+                if (primitiveNode.attributes.TEXCOORD_0!==undefined) {
                     uvs=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
                 }
                 else {
@@ -390,19 +545,26 @@ export default class ImportGLTFClass extends ImportBaseClass
                     v.position.setFromValues((vertices[vIdx++]*this.importSettings.scale),(vertices[vIdx++]*this.importSettings.scale),(vertices[vIdx++]*this.importSettings.scale));
                     v.normal.setFromValues(normals[nIdx++],normals[nIdx++],normals[nIdx++]);
                     v.normal.normalize();
-                    v.tangent.setFromValues(tangents[tIdx++],tangents[tIdx++],tangents[tIdx++]);
-                    v.tangent.normalize();
-                    v.uv.setFromValues((uvs[uvIdx++]*this.importSettings.uScale),(uvs[uvIdx++]*this.importSettings.vScale));
+                    if (tangents!=null) {
+                        v.tangent.setFromValues(tangents[tIdx++],tangents[tIdx++],tangents[tIdx++]);
+                        v.tangent.normalize();
+                    }
+                    v.uv.setFromValues(uvs[uvIdx++],uvs[uvIdx++]);
                     vertexList.push(v);
                 }
                 
+                    // do we need to recreate tangents?
+                    
+                if (tangents===null) this.buildVertexListTangents(vertexList,indices);
+                
                     // create bitmap
                     
-                this.findMaterialForMesh(meshNode,primitiveNode);
+                bitmap=this.findMaterialForMesh(meshNode,primitiveNode);
+                if (bitmap===null) return(false);
                 
                     // finally make the mesh
                     
-                mesh=new MeshClass(this.view,meshNode.name,this.view.bitmapList.get('roof_metal'),vertexList,indices,0);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexList,indices,0);
                 meshes.push(mesh);
             }
         }
@@ -428,6 +590,8 @@ export default class ImportGLTFClass extends ImportBaseClass
                 }
             }
         }
+        
+        return(true);
     }
     
         //
@@ -455,7 +619,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             // process the file
             
         this.decodeBones(skeleton);
-        this.decodeMesh(meshList,skeleton);
+        if (!this.decodeMesh(meshList,skeleton)) return(false);
         
         return(true);
     }

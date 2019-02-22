@@ -14,8 +14,8 @@ export default class ImportSettingsClass
         this.scale=1;
         this.uScale=1;
         this.vScale=1;
-        this.rotate=new PointClass(0,0,0);
         this.floorY=false;
+        this.skipMeshes=[];
         
         this.effectClassLookup=new Map();
         

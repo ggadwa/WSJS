@@ -94,7 +94,7 @@ export default class ImportMapClass
             for (n=0;n!==mapSettings.liquids.length;n++) {
                 liquidDef=mapSettings.liquids[n];
                 
-                this.view.bitmapList.add(liquidDef.bitmap,true);
+                this.view.bitmapList.add(liquidDef.bitmap,null,null,null,null);
 
                 liquidBitmap=this.view.bitmapList.get(liquidDef.bitmap);
                 liquidBitmap.alpha=liquidDef.alpha;
@@ -151,15 +151,18 @@ export default class ImportMapClass
             this.map.sky.on=true;
             this.map.sky.skyBoxSettings=mapSettings.skyBox;
             
-            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegX,true);
-            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosX,true);
-            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegY,true);
-            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosY,true);
-            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegZ,true);
-            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosZ,true);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegX,null,null,null,null);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosX,null,null,null,null);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegY,null,null,null,null);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosY,null,null,null,null);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapNegZ,null,null,null,null);
+            this.view.bitmapList.add(mapSettings.skyBox.bitmapPosZ,null,null,null,null);
         }
         
             // alter any bitmaps for glow settings
+            // normally nothing loads glows, we reset that here
+            // supergumba -- this is all a bit sticky we need to deal
+            // with this in some other way in the future
             
         if (mapSettings.glows!==null) {
             for (n=0;n!==mapSettings.glows.length;n++) {
@@ -170,6 +173,10 @@ export default class ImportMapClass
                     console.log('Missing bitmap to set glow to: '+glowDef.bitmap);
                     return;
                 }
+                
+                bitmap.glowURL=bitmap.colorURL;
+                idx=bitmap.glowURL.lastIndexOf('.');    // get rid of extension so we can add _g
+                bitmap.glowURL=bitmap.glowURL.substring(0,idx)+'_g'+bitmap.glowURL.substring(idx);
                 
                 bitmap.glowFrequency=glowDef.frequency;
                 bitmap.glowMax=glowDef.max;

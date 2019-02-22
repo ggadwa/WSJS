@@ -110,9 +110,6 @@ export default class ViewClass
         this.fpsStartTimestamp=0;
 
         this.drawMeshCount=0;
-        this.drawMeshTrigCount=0;
-        this.drawModelCount=0;
-        this.drawModelTrigCount=0;
         
             // health
         
@@ -580,9 +577,6 @@ export default class ViewClass
             // reset some stats
             
         this.drawMeshCount=0;
-        this.drawMeshTrigCount=0;
-        this.drawModelCount=0;
-        this.drawModelTrigCount=0;
         
             // draw the map
             
@@ -653,6 +647,7 @@ export default class ViewClass
         
         this.text.drawStart();
         this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
+        this.text.drawWithShadow((this.wid-5),46,20,18,(''+this.drawMeshCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
         //this.text.drawWithShadow(30,(this.high-5),25,22,player.getCurrentWeaponDisplayString(),this.text.TEXT_ALIGN_LEFT,this.uiWeaponTextColor);
         
         if (this.paused) {

@@ -25,14 +25,14 @@ export default class ProjectEffectClass
     {
     }
     
-    addBitmap(name)
+    addBitmap(colorURL,normalURL,specularURL,specularFactor,glowURL)
     {
-        this.view.bitmapList.add(name,true);
+        this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,glowURL);
     }
     
-    getBitmap(name)
+    getBitmap(colorURL)
     {
-        return(this.view.bitmapList.get(name));
+        return(this.view.bitmapList.get(colorURL));
     }
     
     addBillboardQuadToGLList(centerPnt,u,v,uSize,vSize,halfWid,halfHigh,vIdx,vertices,uvIdx,uvs,iIdx,indexes,elementIdx)

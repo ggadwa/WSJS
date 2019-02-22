@@ -204,7 +204,6 @@ export default class MapLiquidClass
         gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
         
         this.view.drawMeshCount++;
-        this.view.drawMeshTrigCount+=Math.trunc(this.indexCount/3);
     }
     
 }

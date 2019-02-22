@@ -52,7 +52,6 @@ export default class ModelClass
     draw()
     {
         this.meshList.drawOpaque();
-        
         if (config.DRAW_SKELETONS) this.skeleton.draw();
     }
 }

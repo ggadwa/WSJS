@@ -24,7 +24,7 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.modelMatrixUniform=null;
         this.normalMatrixUniform=null;
 
-        this.shineFactorUniform=null;
+        this.specularFactorUniform=null;
         this.glowFactorUniform=null;
         this.ambientUniform=null;
 
@@ -55,7 +55,7 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
 
-        this.shineFactorUniform=gl.getUniformLocation(this.program,'shineFactor');
+        this.specularFactorUniform=gl.getUniformLocation(this.program,'specularFactor');
         this.glowFactorUniform=gl.getUniformLocation(this.program,'glowFactor');
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
 

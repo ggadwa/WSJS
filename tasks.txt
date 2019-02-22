@@ -6,12 +6,17 @@ WebGL2
 
 
 
-0. need to be able to NOT have normal or specular textures or glow textures
-1. textures need to be loaded by url from root (so can be found in model texture directories)
+
+0. models aren't being properly culled
+
+1. missing globe on moon walk
+   1a. missing skeleton on moon walk
+
+2. get rid of u/v scale in import settings
 
 3. all collision and box routines have to be fixed
 4. all frustum stuff has to be fixed
-5. why is uv swapped?
+5. why is uv swapped? (only on objs it seems)
 6. underwater collision bad
 
 1. need to import non-UV trigs as flat textures

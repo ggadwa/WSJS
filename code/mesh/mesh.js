@@ -788,7 +788,6 @@ export default class MeshClass
         gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
             
         this.view.drawMeshCount++;
-        this.view.drawMeshTrigCount+=Math.trunc(this.nonCulledIndexCount/3);
     }
     
     drawTransparent()
@@ -798,6 +797,5 @@ export default class MeshClass
         gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
 
         this.view.drawMeshCount++;
-        this.view.drawMeshTrigCount+=Math.trunc(this.indexCount/3);
     }
 }

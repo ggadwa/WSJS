@@ -7,7 +7,7 @@ uniform lowp sampler2D glowTex;
 
 uniform lowp vec3 ambient;
 uniform lowp float alpha;
-uniform mediump float shineFactor;
+uniform mediump vec3 specularFactor;
 uniform mediump float glowFactor;
 
 struct lightType {
@@ -86,14 +86,16 @@ void main(void)
 
             specHalfVector=normalize(normalize(eyeVector)+bumpLightVertexVector);
             specFactor=max(dot(bumpMap,specHalfVector),0.0);
-            spec+=((specMap*pow(specFactor,shineFactor))*att);
+            spec.r+=((specMap.r*pow(specFactor,specularFactor.r))*att);
+            spec.g+=((specMap.g*pow(specFactor,specularFactor.g))*att);
+            spec.b+=((specMap.b*pow(specFactor,specularFactor.b))*att);
         }
     }
 
         // finish the spec by making sure
         // it's dimmed in dark areas
 
-    spec=min(spec,1.0)*((lightCol.r+lightCol.g+lightCol.b)*0.33);
+    spec=min(spec,1.0)*vec3(lightCol.r,lightCol.g,lightCol.b);
 
         // add bump into the ambient and make
         // sure it's never less than 10% of the

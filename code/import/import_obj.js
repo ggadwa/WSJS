@@ -1,6 +1,7 @@
 import ImportBaseClass from '../import/import_base.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
+import ColorClass from '../utility/color.js';
 import MeshVertexClass from '../mesh/mesh_vertex.js';
 import MeshClass from '../mesh/mesh.js';
 
@@ -176,9 +177,9 @@ export default class ImportObjClass extends ImportBaseClass
     addMesh(groupName,groupNameOffset,bitmapName,meshVertices,meshIndexes)
     {
         let name;
-        let bitmap=this.view.bitmapList.get(bitmapName);
+        let bitmap=this.view.bitmapList.get('textures/'+bitmapName+'.png');
         if (bitmap===undefined) {
-            console.log('missing material: '+bitmapName);
+            console.log('missing material: textures/'+bitmapName+'.png');
             return;
         }
         
@@ -274,7 +275,7 @@ export default class ImportObjClass extends ImportBaseClass
             
             switch(tokens[0]) {
                 case 'usemtl':
-                    this.view.bitmapList.add(tokens[1],false);
+                    this.view.bitmapList.add(('textures/'+tokens[1]+'.png'),('textures/'+tokens[1]+'_n.png'),('textures/'+tokens[1]+'_s.png'),new ColorClass(5,5,5),null);
                     break;
             }
         }
