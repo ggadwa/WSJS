@@ -46,6 +46,15 @@ export default class Matrix4Class
         }
     }
     
+    fromArrayOffset(array,offset)
+    {
+        let n;
+        
+        for (n=0;n!==16;n++) {
+            this.data[n]=array[n+offset];
+        }
+    }
+    
     setTranslationFromPoint(pnt)
     {
         this.setIdentity();
@@ -162,6 +171,155 @@ export default class Matrix4Class
         this.data[15]=d15;
     }
     
+    setFromMultiply(mat1,mat2)
+    {
+        this.data[0]=(mat1.data[0]*mat2.data[0])+(mat1.data[4]*mat2.data[1])+(mat1.data[8]*mat2.data[2])+(mat1.data[12]*mat2.data[3]);
+        this.data[4]=(mat1.data[0]*mat2.data[4])+(mat1.data[4]*mat2.data[5])+(mat1.data[8]*mat2.data[6])+(mat1.data[12]*mat2.data[7]);
+        this.data[8]=(mat1.data[0]*mat2.data[8])+(mat1.data[4]*mat2.data[9])+(mat1.data[8]*mat2.data[10])+(mat1.data[12]*mat2.data[11]);
+        this.data[12]=(mat1.data[0]*mat2.data[12])+(mat1.data[4]*mat2.data[13])+(mat1.data[8]*mat2.data[14])+(mat1.data[12]*mat2.data[15]);
+        
+        this.data[1]=(mat1.data[1]*mat2.data[0])+(mat1.data[5]*mat2.data[1])+(mat1.data[9]*mat2.data[2])+(mat1.data[13]*mat2.data[3]);
+        this.data[5]=(mat1.data[1]*mat2.data[4])+(mat1.data[5]*mat2.data[5])+(mat1.data[9]*mat2.data[6])+(mat1.data[13]*mat2.data[7]);
+        this.data[9]=(mat1.data[1]*mat2.data[8])+(mat1.data[5]*mat2.data[9])+(mat1.data[9]*mat2.data[10])+(mat1.data[13]*mat2.data[11]);
+        this.data[13]=(mat1.data[1]*mat2.data[12])+(mat1.data[5]*mat2.data[13])+(mat1.data[9]*mat2.data[14])+(mat1.data[13]*mat2.data[15]);
+        
+        this.data[2]=(mat1.data[2]*mat2.data[0])+(mat1.data[6]*mat2.data[1])+(mat1.data[10]*mat2.data[2])+(mat1.data[14]*mat2.data[3]);
+        this.data[6]=(mat1.data[2]*mat2.data[4])+(mat1.data[6]*mat2.data[5])+(mat1.data[10]*mat2.data[6])+(mat1.data[14]*mat2.data[7]);
+        this.data[10]=(mat1.data[2]*mat2.data[8])+(mat1.data[6]*mat2.data[9])+(mat1.data[10]*mat2.data[10])+(mat1.data[14]*mat2.data[11]);
+        this.data[14]=(mat1.data[2]*mat2.data[12])+(mat1.data[6]*mat2.data[13])+(mat1.data[10]*mat2.data[14])+(mat1.data[14]*mat2.data[15]);
+
+        this.data[3]=(mat1.data[3]*mat2.data[0])+(mat1.data[7]*mat2.data[1])+(mat1.data[11]*mat2.data[2])+(mat1.data[15]*mat2.data[3]);
+        this.data[7]=(mat1.data[3]*mat2.data[4])+(mat1.data[7]*mat2.data[5])+(mat1.data[11]*mat2.data[6])+(mat1.data[15]*mat2.data[7]);
+        this.data[11]=(mat1.data[3]*mat2.data[8])+(mat1.data[7]*mat2.data[9])+(mat1.data[11]*mat2.data[10])+(mat1.data[15]*mat2.data[11]);
+        this.data[15]=(mat1.data[3]*mat2.data[12])+(mat1.data[7]*mat2.data[13])+(mat1.data[11]*mat2.data[14])+(mat1.data[15]*mat2.data[15]);
+    }
+    
+    setFromInvertMatrix(m)
+    {
+        let n,det;
+
+    this.data[0] = (m[5]  * m[10] * m[15]) - 
+             (m[5]  * m[11] * m[14]) - 
+             (m[9]  * m[6]  * m[15]) + 
+             (m[9]  * m[7]  * m[14]) +
+             (m[13] * m[6]  * m[11]) - 
+             (m[13] * m[7]  * m[10]);
+
+    this.data[4] = (-m[4]  * m[10] * m[15]) + 
+              (m[4]  * m[11] * m[14]) + 
+              (m[8]  * m[6]  * m[15]) - 
+              (m[8]  * m[7]  * m[14]) - 
+              (m[12] * m[6]  * m[11]) + 
+              (m[12] * m[7]  * m[10]);
+
+    this.data[8] = (m[4]  * m[9] * m[15]) - 
+             (m[4]  * m[11] * m[13]) - 
+             (m[8]  * m[5] * m[15]) + 
+             (m[8]  * m[7] * m[13]) + 
+             (m[12] * m[5] * m[11]) - 
+             (m[12] * m[7] * m[9]);
+
+    this.data[12] = (-m[4]  * m[9] * m[14]) + 
+               (m[4]  * m[10] * m[13]) +
+               (m[8]  * m[5] * m[14]) - 
+               (m[8]  * m[6] * m[13]) - 
+               (m[12] * m[5] * m[10]) + 
+               (m[12] * m[6] * m[9]);
+
+    this.data[1] = (-m[1]  * m[10] * m[15]) + 
+              (m[1]  * m[11] * m[14]) + 
+              (m[9]  * m[2] * m[15]) - 
+              (m[9]  * m[3] * m[14]) - 
+              (m[13] * m[2] * m[11]) + 
+              (m[13] * m[3] * m[10]);
+
+    this.data[5] = (m[0]  * m[10] * m[15]) - 
+             (m[0]  * m[11] * m[14]) - 
+             (m[8]  * m[2] * m[15]) + 
+             (m[8]  * m[3] * m[14]) + 
+             (m[12] * m[2] * m[11]) - 
+             (m[12] * m[3] * m[10]);
+
+    this.data[9] = (-m[0]  * m[9] * m[15]) + 
+              (m[0]  * m[11] * m[13]) + 
+              (m[8]  * m[1] * m[15]) - 
+              (m[8]  * m[3] * m[13]) - 
+              (m[12] * m[1] * m[11]) + 
+              (m[12] * m[3] * m[9]);
+
+    this.data[13] = (m[0]  * m[9] * m[14]) - 
+              (m[0]  * m[10] * m[13]) - 
+              (m[8]  * m[1] * m[14]) + 
+              (m[8]  * m[2] * m[13]) + 
+              (m[12] * m[1] * m[10]) - 
+              (m[12] * m[2] * m[9]);
+
+    this.data[2] = (m[1]  * m[6] * m[15]) - 
+             (m[1]  * m[7] * m[14]) - 
+             (m[5]  * m[2] * m[15]) + 
+             (m[5]  * m[3] * m[14]) + 
+             (m[13] * m[2] * m[7]) - 
+             (m[13] * m[3] * m[6]);
+
+    this.data[6] = (-m[0]  * m[6] * m[15]) + 
+              (m[0]  * m[7] * m[14]) + 
+              (m[4]  * m[2] * m[15]) - 
+              (m[4]  * m[3] * m[14]) - 
+              (m[12] * m[2] * m[7]) + 
+              (m[12] * m[3] * m[6]);
+
+    this.data[10] = (m[0]  * m[5] * m[15]) - 
+              (m[0]  * m[7] * m[13]) - 
+              (m[4]  * m[1] * m[15]) + 
+              (m[4]  * m[3] * m[13]) + 
+              (m[12] * m[1] * m[7]) - 
+              (m[12] * m[3] * m[5]);
+
+    this.data[14] = (-m[0]  * m[5] * m[14]) + 
+               (m[0]  * m[6] * m[13]) + 
+               (m[4]  * m[1] * m[14]) - 
+               (m[4]  * m[2] * m[13]) - 
+               (m[12] * m[1] * m[6]) + 
+               (m[12] * m[2] * m[5]);
+
+    this.data[3] = (-m[1] * m[6] * m[11]) + 
+              (m[1] * m[7] * m[10]) + 
+              (m[5] * m[2] * m[11]) - 
+              (m[5] * m[3] * m[10]) - 
+              (m[9] * m[2] * m[7]) + 
+              (m[9] * m[3] * m[6]);
+
+    this.data[7] = (m[0] * m[6] * m[11]) - 
+             (m[0] * m[7] * m[10]) - 
+             (m[4] * m[2] * m[11]) + 
+             (m[4] * m[3] * m[10]) + 
+             (m[8] * m[2] * m[7]) - 
+             (m[8] * m[3] * m[6]);
+
+    this.data[11] = (-m[0] * m[5] * m[11]) + 
+               (m[0] * m[7] * m[9]) + 
+               (m[4] * m[1] * m[11]) - 
+               (m[4] * m[3] * m[9]) - 
+               (m[8] * m[1] * m[7]) + 
+               (m[8] * m[3] * m[5]);
+
+    this.data[15] = (m[0] * m[5] * m[10]) - 
+              (m[0] * m[6] * m[9]) - 
+              (m[4] * m[1] * m[10]) + 
+              (m[4] * m[2] * m[9]) + 
+              (m[8] * m[1] * m[6]) - 
+              (m[8] * m[2] * m[5]);
+
+        det=(m[0] * this.data[0]) + (m[1] * this.data[4]) + (m[2] * this.data[8]) + (m[3] * this.data[12]);
+        if (det==0) return;
+
+        det=1.0/det;
+
+        for (n=0;n!==16;n++) {
+            this.data[n]*=det;
+        }
+    }
+        
     setPerspectiveMatrix(viewFOV,viewAspect,glNearZ,glFarZ)
     {
         let fov=1.0/Math.tan(viewFOV*0.5);

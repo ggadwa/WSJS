@@ -19,6 +19,8 @@ export default class MapMeshShaderClass extends ShaderClass
         this.vertexNormalAttribute=null;
         this.vertexTangentAttribute=null;    
         this.vertexUVAttribute=null;
+        this.vertexJointAttribute=null;         // unused in map mesh shader
+        this.vertexWeightAttribute=null;        // unused in map mesh shader
 
         this.perspectiveMatrixUniform=null;
         this.viewMatrixUniform=null;

@@ -151,7 +151,7 @@ export default class MeshListClass
         // draw meshes
         //
 
-    drawOpaque(modelMatrix)
+    drawOpaque(modelMatrix,jointMatrixArray)
     {
         let n,mesh;
         let currentBitmap;
@@ -167,6 +167,14 @@ export default class MeshListClass
         else {
             this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
             this.frustumTranslationPoint.translationFromMatrix(modelMatrix);
+        }
+        
+            // set any joint matrixes
+            
+        if (jointMatrixArray!==null) {
+            for (n=0;n!==jointMatrixArray.length;n++) {
+                this.view.gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
+            }
         }
 
             // setup map drawing
@@ -204,7 +212,7 @@ export default class MeshListClass
         this.shader.drawEnd();
     }
     
-    drawTransparent(modelMatrix)
+    drawTransparent(modelMatrix,jointMatrixArray)
     {
         let n,mesh;
         let nMesh=this.meshes.length;
@@ -233,6 +241,14 @@ export default class MeshListClass
         else {
             this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
             this.frustumTranslationPoint.translationFromMatrix(modelMatrix);
+        }
+        
+            // set any joint matrixes
+            
+        if (jointMatrixArray!==null) {
+            for (n=0;n!==jointMatrixArray.length;n++) {
+                this.view.gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
+            }
         }
 
             // setup map drawing

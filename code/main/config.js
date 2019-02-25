@@ -34,7 +34,7 @@ class ConfigClass
 
         this.PLAYER_CLIP_WALLS=true;
         this.PLAYER_FLY=true;
-        this.DRAW_SKELETONS=false;
+        this.DRAW_SKELETONS=true;
     }
 }
 

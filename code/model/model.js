@@ -65,7 +65,7 @@ export default class ModelClass
 
             // draw the meshlist
             
-        this.meshList.drawOpaque(this.modelMatrix);
+        this.meshList.drawOpaque(this.modelMatrix,this.skeleton.getPoseJointMatrixArray());
         if (config.DRAW_SKELETONS) this.skeleton.draw(this.modelMatrix);
     }
 }

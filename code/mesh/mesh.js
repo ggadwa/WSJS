@@ -19,17 +19,20 @@ export default class MeshClass
         this.normalArray=normalArray;       // expected Float32Array
         this.tangentArray=tangentArray;     // expected Float32Array
         this.uvArray=uvArray;               // expected Float32Array
-        this.jointArray=jointArray;         // expected Uint16/32Array or null
-        this.weightArray=weightArray;       // expected Float32Array or null
+        this.jointArray=jointArray;         // expected Uint16/32Array or null (when not used)
+        this.weightArray=weightArray;       // expected Float32Array or null (when not used)
         this.indexArray=indexArray;         // expected Uint16/32Array
         
         this.vertexCount=this.vertexArray.length;
         this.indexCount=this.indexArray.length;
         this.trigCount=Math.trunc(this.indexCount/3);
         
-            // need 16 or 32 bit indexes?
+            // check for 16/32 integers
             
         this.need32BitIndexes=(indexArray.constructor.name==='Uint32Array');
+        
+        this.need32BitJointIndexes=false;
+        if (this.jointArray!==null) this.need32BitJointIndexes=(this.jointArray.constructor.name==='Uint32Array');
         
             // center and bounds
             
@@ -38,19 +41,14 @@ export default class MeshClass
         this.yBound=new BoundClass(0,0);
         this.zBound=new BoundClass(0,0);
 
-            // drawing arrays
-
-        this.drawVertices=null;
-        this.drawNormals=null;
-        this.drawTangents=null;
-        this.drawUVs=null;
-
-            // null buffers
+            // gl buffers
 
         this.vertexBuffer=null;
         this.normalBuffer=null;
         this.tangentBuffer=null;
         this.uvBuffer=null;
+        this.jointBuffer=null;
+        this.weightBuffer=null;
         this.indexBuffer=null;
 
             // collision lists
@@ -415,7 +413,17 @@ export default class MeshClass
         this.uvBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STATIC_DRAW);
-
+        
+        if (this.jointArray!==null) {
+            this.jointBuffer=gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.jointBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.jointArray,gl.STATIC_DRAW);
+            
+            this.weightBuffer=gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.weightBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.weightArray,gl.STATIC_DRAW);
+        }
+            
         this.indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.STATIC_DRAW);
@@ -436,6 +444,14 @@ export default class MeshClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        
+        if (this.jointArray!==null) {
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.jointBuffer);
+            gl.vertexAttribPointer(shader.vertexJointAttribute,4,(this.need32BitJointIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),false,0,0);
+            
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.weightBuffer);
+            gl.vertexAttribPointer(shader.vertexWeightAttribute,4,gl.FLOAT,false,0,0);
+        }
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
     }

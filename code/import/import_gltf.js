@@ -5,7 +5,9 @@ import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import MeshClass from '../mesh/mesh.js';
-import ModelBoneClass from '../model/model_bone.js';
+import ModelNodeClass from '../model/model_node.js';
+import ModelJointClass from '../model/model_joint.js';
+import ModelSkeletonClass from '../model/model_skeleton.js';
 
 export default class ImportGLTFClass extends ImportBaseClass
 {
@@ -101,6 +103,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         if (vecType==='VEC2') internalVecSize=2;
         if (vecType==='VEC3') internalVecSize=3;
         if (vecType==='VEC4') internalVecSize=4;
+        if (vecType==='MAT4') internalVecSize=16;
         
             // now to the buffer view
             
@@ -239,10 +242,10 @@ export default class ImportGLTFClass extends ImportBaseClass
             }
         }
         
-            // and floor the root bone
+            // and floor the root node
             
-        if (skeleton.rootBoneIdx!==-1) {
-            skeleton.bones[skeleton.rootBoneIdx].translation.y-=fy;
+        if (skeleton.rootNodeIdx!==-1) {
+            skeleton.nodes[skeleton.rootNodeIdx].translation.y-=fy;
         }
     }
     
@@ -340,18 +343,18 @@ export default class ImportGLTFClass extends ImportBaseClass
     }
     
         //
-        // decode bones
+        // decode skeleton
         //
     
-    decodeBoneRecurse(skeleton,parentBoneIdx,nodeIdx)
+    decodeNode(nodeIdx)
     {
-        let n,node,bone,boneIdx;
+        let node;
         let translationProp,rotationProp,scaleProp;
         let mat,translation,rotation,scale;
         
         node=this.jsonData.nodes[nodeIdx];
         
-            // find this bones TRS
+            // find this nodes TRS
             
         translation=new PointClass(0,0,0);
         rotation=new QuaternionClass();
@@ -383,64 +386,80 @@ export default class ImportGLTFClass extends ImportBaseClass
             if (scaleProp!==undefined) scale.setFromValues(scaleProp[0],scaleProp[1],scaleProp[2]);
         }
         
-            // setup the bone and parent
+            // setup the node
         
-        bone=new ModelBoneClass(node.name,parentBoneIdx,translation,rotation,scale);
-        
-        boneIdx=skeleton.bones.length;
-        skeleton.bones.push(bone);
-        
-            // run through all the children
-            
-        if (node.children===undefined) return(boneIdx);
-        
-        for (n=0;n!==node.children.length;n++) {
-            bone.childBoneIdxs.push(this.decodeBoneRecurse(skeleton,boneIdx,node.children[n]));
-        }
-        
-        return(boneIdx);
+        return(new ModelNodeClass(node.name,((node.children!==undefined)?node.children:[]),translation,rotation,scale));
     }
     
-    decodeBonesFindParentNodeForChildIndex(nodeIdx)
+    findNodeIndexInChildIndexes(skeleton,nodeIdx)
     {
         let n,k,node;
-        
-        for (n=0;n!==this.jsonData.nodes.length;n++) {
+
+        for (n=0;n!==skeleton.nodes.length;n++) {
             if (n===nodeIdx) continue;
+            node=skeleton.nodes[n];
             
-            node=this.jsonData.nodes[n];
-            if (node.children===undefined) continue;
-            
-            for (k=0;k!==node.children.length;k++) {
-                if (node.children[k]===nodeIdx) return(n);
+            for (k=0;k!==node.childNodeIdxs.length;k++) {
+                if (node.childNodeIdxs[k]===nodeIdx) return(n);
             }
         }
         
         return(-1);
     }
     
-    decodeBones(skeleton)
+    decodeSkeleton(skeleton)
     {
-        let n,nodeIdx,parentNodeIdx;
+        let n,nodes,skin,joints;
+        let mat,inverseBindMatrixFloatArray;
         
-            // build the bone tree
-            // for now we assume a single skin
-            // and we find the root of the first
-            // joint in that skin, the skeleton
-            // index is unreliable and might go away
+            // we have to load every node
+            // because even though they aren't part of
+            // the skeleton they have important TRS data
+         
+        nodes=this.jsonData.nodes;
+        
+        for (n=0;n!==nodes.length;n++) {
+            skeleton.nodes.push(this.decodeNode(n));
+        }
+        
+            // assuming a single skin, we
+            // get the joint indexes for this skeleton
+            // because of shader limits, we need to 
+            // error out if too many joints
+        
+        skin=this.jsonData.skins[0];
+        joints=skin.joints;
+        
+        if (joints.length>ModelSkeletonClass.MAX_SKELETON_JOINT) {
+            console.log('too many joints in skeleton ('+joints.length+' out of '+SkeletonClass.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
+            return(false);
+        }
+        
+        inverseBindMatrixFloatArray=this.decodeBuffer(skin.inverseBindMatrices,16);
+        
+        for (n=0;n!==joints.length;n++) {
+            mat=new Matrix4Class();
+            mat.fromArrayOffset(inverseBindMatrixFloatArray,(n*16));
+            skeleton.joints.push(new ModelJointClass(joints[n],mat));
+        }
+        
+            // now find the parents
             
-        nodeIdx=this.jsonData.skins[0].joints[0];
+        for (n=0;n!==skeleton.nodes.length;n++) {
+            skeleton.nodes[n].parentNodeIdx=this.findNodeIndexInChildIndexes(skeleton,n);
+        }
+        
+            // find the root node by taking the first joint
+            // node and finding it's ultimate parent
+            
+        skeleton.rootNodeIdx=skeleton.joints[0].nodeIdx;
         
         while (true) {
-            parentNodeIdx=this.decodeBonesFindParentNodeForChildIndex(nodeIdx);
-            if (parentNodeIdx===-1) break;
-            
-            nodeIdx=parentNodeIdx;
+            if (skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx===-1) break;
+            skeleton.rootNodeIdx=skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx;
         }
-
-            // now bring in the rest of the skeleton
-        
-        skeleton.rootBoneIdx=this.decodeBoneRecurse(skeleton,-1,nodeIdx);
+            
+        return(true);
     }
     
         //
@@ -698,7 +717,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         
             // process the file
             
-        this.decodeBones(skeleton);
+        if (!this.decodeSkeleton(skeleton)) return(false);
         if (!this.decodeMesh(meshList,skeleton)) return(false);
         
         return(true);

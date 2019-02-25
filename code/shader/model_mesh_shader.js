@@ -1,6 +1,7 @@
 import config from '../main/config.js';
 import ShaderClass from '../shader/shader.js';
 import ShaderLightClass from '../shader/shader_light.js';
+import ModelSkeletonClass from '../model/model_skeleton.js';
 
 //
 // model mesh shader class
@@ -19,11 +20,15 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.vertexNormalAttribute=null;
         this.vertexTangentAttribute=null;    
         this.vertexUVAttribute=null;
+        this.vertexJointAttribute=null;
+        this.vertexWeightAttribute=null;
 
         this.perspectiveMatrixUniform=null;
         this.viewMatrixUniform=null;
         this.modelMatrixUniform=null;
         this.normalMatrixUniform=null;
+        
+        this.jointMatrixUniformArray=[];
 
         this.specularFactorUniform=null;
         this.glowFactorUniform=null;
@@ -51,11 +56,18 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.vertexNormalAttribute=gl.getAttribLocation(this.program,'vertexNormal');
         this.vertexTangentAttribute=gl.getAttribLocation(this.program,'vertexTangent');
         this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
-
+        this.vertexJointAttribute=gl.getAttribLocation(this.program,'vertexJoint');
+        this.vertexWeightAttribute=gl.getAttribLocation(this.program,'vertexWeight');
+        
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
+        
+        for (n=0;n!==ModelSkeletonClass.MAX_SKELETON_JOINT;n++) {
+            name='jointMatrix['+n+']';
+            this.jointMatrixUniformArray.push(gl.getUniformLocation(this.program,name));
+        }
 
         this.specularFactorUniform=gl.getUniformLocation(this.program,'specularFactor');
         this.glowFactorUniform=gl.getUniformLocation(this.program,'glowFactor');
@@ -132,6 +144,8 @@ export default class ModelMeshShaderClass extends ShaderClass
         gl.enableVertexAttribArray(this.vertexNormalAttribute);
         gl.enableVertexAttribArray(this.vertexTangentAttribute);
         gl.enableVertexAttribArray(this.vertexUVAttribute);
+        gl.enableVertexAttribArray(this.vertexJointAttribute);
+        gl.enableVertexAttribArray(this.vertexWeightAttribute);
     }
 
     drawEnd()
@@ -144,6 +158,8 @@ export default class ModelMeshShaderClass extends ShaderClass
         gl.disableVertexAttribArray(this.vertexNormalAttribute);
         gl.disableVertexAttribArray(this.vertexTangentAttribute);
         gl.disableVertexAttribArray(this.vertexUVAttribute);
+        gl.disableVertexAttribArray(this.vertexJointAttribute);
+        gl.disableVertexAttribArray(this.vertexWeightAttribute);
 
             // no longer using shader
 

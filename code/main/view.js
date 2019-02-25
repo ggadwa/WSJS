@@ -405,9 +405,9 @@ export default class ViewClass
             // draw the map
             
         map.sky.draw();
-        map.meshList.drawOpaque(null);
+        map.meshList.drawOpaque(null,null);
         map.entityList.draw();
-        map.meshList.drawTransparent(null);
+        map.meshList.drawTransparent(null,null);
         map.liquidList.draw();
         map.effectList.draw();
       

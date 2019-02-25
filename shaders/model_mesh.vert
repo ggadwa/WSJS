@@ -4,11 +4,15 @@ in highp vec3 vertexPosition;
 in highp vec3 vertexNormal;
 in highp vec3 vertexTangent;
 in highp vec2 vertexUV;
+in highp vec4 vertexJoint;
+in highp vec4 vertexWeight;
 
 uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 viewMatrix;
 uniform highp mat4 modelMatrix;
 uniform highp mat3 normalMatrix;
+
+uniform highp mat4 jointMatrix[128];
 
 out highp vec3 mapPosition,eyeVector,eyePosition;
 out highp vec2 fragUV;
@@ -16,7 +20,17 @@ out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 void main(void)
 {
-    gl_Position=perspectiveMatrix*viewMatrix*modelMatrix*vec4(vertexPosition,1.0);
+        // calculate the animation
+
+    mat4 skinMatrix=
+        (vertexWeight.x*jointMatrix[int(vertexJoint.x)]) +
+        (vertexWeight.y*jointMatrix[int(vertexJoint.y)]) +
+        (vertexWeight.z*jointMatrix[int(vertexJoint.z)]) +
+        (vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
+
+        // set the positions
+
+    gl_Position=perspectiveMatrix*viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
 
     mapPosition=vertexPosition;
     eyePosition=vec3(viewMatrix*vec4(vertexPosition,1.0));
