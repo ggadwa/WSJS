@@ -52,7 +52,7 @@ export default class InterfaceShaderClass extends ShaderClass
 
             // setup the uniforms
 
-        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,this.view.orthoMatrix);
+        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,this.view.orthoMatrix.data);
 
             // enable the vertex attributes
 

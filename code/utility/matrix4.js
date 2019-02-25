@@ -1,6 +1,6 @@
 import * as constants from '../main/constants.js';
 
-export default class MatrixClass
+export default class Matrix4Class
 {
     constructor()
     {
@@ -35,6 +35,15 @@ export default class MatrixClass
         this.data[13]=0.0;
         this.data[14]=0.0;
         this.data[15]=1.0;
+    }
+    
+    fromArray(array)
+    {
+        let n;
+        
+        for (n=0;n!==16;n++) {
+            this.data[n]=array[n];
+        }
     }
     
     setTranslationFromPoint(pnt)
@@ -153,50 +162,112 @@ export default class MatrixClass
         this.data[15]=d15;
     }
     
-    consoleDebug()
+    setPerspectiveMatrix(viewFOV,viewAspect,glNearZ,glFarZ)
     {
-        console.log(this.data[0]+','+this.data[4]+','+this.data[8]+','+this.data[12]);
-        console.log(this.data[1]+','+this.data[5]+','+this.data[9]+','+this.data[13]);
-        console.log(this.data[2]+','+this.data[6]+','+this.data[10]+','+this.data[14]);
-        console.log(this.data[3]+','+this.data[7]+','+this.data[11]+','+this.data[15]);
+        let fov=1.0/Math.tan(viewFOV*0.5);
+        let dist=1.0/(glNearZ-glFarZ);
+        
+            // create the perspective matrix
+            
+        this.data[0]=fov/viewAspect;
+        this.data[1]=0.0;
+        this.data[2]=0.0;
+        this.data[3]=0.0;
+        this.data[4]=0.0;
+        this.data[5]=fov;
+        this.data[6]=0.0;
+        this.data[7]=0.0;
+        this.data[8]=0.0;
+        this.data[9]=0.0;
+        this.data[10]=(glFarZ+glNearZ)*dist;
+        this.data[11]=-1.0;
+        this.data[12]=0.0;
+        this.data[13]=0.0;
+        this.data[14]=((glFarZ*glNearZ)*2.0)*dist;
+        this.data[15]=0.0;
+        
+            // now translate it for the near_z
+                     
+        this.data[12]+=(this.data[8]*glNearZ);
+        this.data[13]+=(this.data[9]*glNearZ);
+        this.data[14]+=(this.data[10]*glNearZ);
+        this.data[15]+=(this.data[11]*glNearZ);
     }
     
+    setLookAtMatrix(eyePnt,centerPnt,lookAtUpVector)
+    {
+        let x0,x1,x2,y0,y1,y2,z0,z1,z2;
+        let f;
+
+        z0=eyePnt.x-centerPnt.x;
+        z1=eyePnt.y-centerPnt.y;
+        z2=eyePnt.z-centerPnt.z;
+
+        f=Math.sqrt((z0*z0)+(z1*z1)+(z2*z2));
+        f=1.0/f;
+        z0*=f;
+        z1*=f;
+        z2*=f;
+
+        x0=(lookAtUpVector.y*z2)-(lookAtUpVector.z*z1);
+        x1=(lookAtUpVector.z*z0)-(lookAtUpVector.x*z2);
+        x2=(lookAtUpVector.x*z1)-(lookAtUpVector.y*z0);
+        
+        f=Math.sqrt((x0*x0)+(x1*x1)+(x2*x2));
+        if (f!==0.0) f=1.0/f;
+        x0*=f;
+        x1*=f;
+        x2*=f;
+
+        y0=(z1*x2)-(z2*x1);
+        y1=(z2*x0)-(z0*x2);
+        y2=(z0*x1)-(z1*x0);
+
+        f=Math.sqrt((y0*y0)+(y1*y1)+(y2*y2));
+        if (f!==0.0) f=1.0/f;
+        y0*=f;
+        y1*=f;
+        y2*=f;
+
+        this.data[0]=x0;
+        this.data[1]=y0;
+        this.data[2]=z0;
+        this.data[3]=0.0;
+        this.data[4]=x1;
+        this.data[5]=y1;
+        this.data[6]=z1;
+        this.data[7]=0.0;
+        this.data[8]=x2;
+        this.data[9]=y2;
+        this.data[10]=z2;
+        this.data[11]=0.0;
+        this.data[12]=-((x0*eyePnt.x)+(x1*eyePnt.y)+(x2*eyePnt.z));
+        this.data[13]=-((y0*eyePnt.x)+(y1*eyePnt.y)+(y2*eyePnt.z));
+        this.data[14]=-((z0*eyePnt.x)+(z1*eyePnt.y)+(z2*eyePnt.z));
+        this.data[15]=1.0;
+    }
     
+    setOrthoMatrix(screenWidth,screenHeight,glNearZ,glFarZ)
+    {
+        let horz=1.0/screenWidth;
+        let vert=1.0/screenHeight;
+        let dist=1.0/(glNearZ-glFarZ);
 
-/*
-
-void matrix_average(matrix_type *mat,int nmatrix,matrix_type *mats)
-{
-	int				n,i;
-	float			*f,*f2,f_count;
-
-		// all zeros
-
-	memset(mat,0x0,sizeof(matrix_type));
-
-		// add up all the matrixes
-
-	for (n=0;n!=nmatrix;n++) {
-		f=(float*)mat->data;
-		f2=(float*)mats[n].data;
-
-		for (i=0;i!=16;i++) {
-			*f=(*f)+(*f2++);
-			f++;
-		}
-	}
-
-		// average the matrixes
-
-	f_count=(float)nmatrix;
-	f=(float*)mat->data;
-
-	for (i=0;i!=16;i++) {
-		*f=(*f)/f_count;
-		f++;
-	}
-}
-
-
- */
+        this.data[0]=horz*2.0;
+        this.data[1]=0.0;
+        this.data[2]=0.0;
+        this.data[3]=0.0;
+        this.data[4]=0.0;
+        this.data[5]=vert*-2.0;
+        this.data[6]=0.0;
+        this.data[7]=0.0;
+        this.data[8]=0.0;
+        this.data[9]=0.0;
+        this.data[10]=dist*2.0;
+        this.data[11]=0.0;
+        this.data[12]=-1.0; // wid*-horz;      // these will always equal these numbers,
+        this.data[13]=1.0; // high*vert;     // but leave in the code for readability
+        this.data[14]=(glFarZ+glNearZ)*dist;
+        this.data[15]=1.0;
+    }
 }

@@ -212,7 +212,7 @@ export default class UIConfigClass
         linkDiv=document.createElement('div');
         linkDiv.className='linkContainer';
         
-        this.createLink(linkDiv,'https://twitter.com/ggadwa','@ggadwa (my twitter)');
+        this.createLink(linkDiv,'https://twitter.com/ggadwa','@ggadwa');
         this.createLink(linkDiv,'https://github.com/ggadwa/WSJS','GitHub Source Code');
             
         document.body.appendChild(linkDiv);

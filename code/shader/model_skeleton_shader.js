@@ -17,6 +17,7 @@ export default class ModelSkeletonShaderClass extends ShaderClass
         this.vertexPositionAttribute=null;
 
         this.perspectiveMatrixUniform=null;
+        this.viewMatrixUniform=null;
         this.modelMatrixUniform=null;
         
         this.colorUniform=null;
@@ -39,6 +40,7 @@ export default class ModelSkeletonShaderClass extends ShaderClass
         this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
 
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
+        this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
 
         this.colorUniform=gl.getUniformLocation(this.program,'color');
@@ -47,21 +49,21 @@ export default class ModelSkeletonShaderClass extends ShaderClass
     }
     
         //
-        // start/stop model shader drawing
+        // start/stop skeleton shader drawing
         //
 
     drawStart()
     {
         let gl=this.view.gl;
 
-            // using the model shader
+            // using the skeleton shader
 
         gl.useProgram(this.program);
 
             // matrix
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix);
-        gl.uniformMatrix4fv(this.modelMatrixUniform,false,this.view.modelMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
 
             // enable the vertex attributes
 

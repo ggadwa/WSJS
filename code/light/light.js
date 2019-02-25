@@ -146,7 +146,7 @@ export default class LightClass
         this.frustumYBound.setFromValues((this.position.y-this.intensity),(this.position.y+this.intensity));
         this.frustumZBound.setFromValues((this.position.z-this.intensity),(this.position.z+this.intensity));
         
-        return(view.boundBoxInFrustum(this.frustumXBound,this.frustumYBound,this.frustumZBound));
+        return(view.boundBoxInFrustum(this.frustumXBound,this.frustumYBound,this.frustumZBound,null));
     }
 }
 

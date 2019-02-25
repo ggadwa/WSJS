@@ -1,7 +1,7 @@
 import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import QuaternionClass from '../utility/quaternion.js';
-import MatrixClass from '../utility/matrix.js';
+import Matrix4Class from '../utility/matrix4.js';
 import ModelBoneClass from '../model/model_bone.js';
 import genRandom from '../utility/random.js';
 
@@ -19,7 +19,7 @@ export default class ModelSkeletonClass
             
         this.rootBoneIdx=-1;
         this.bones=[];
-
+        
             // animations
 
         this.lastAnimationTick=0;
@@ -28,9 +28,12 @@ export default class ModelSkeletonClass
         
             // globals to stop GC
             
-        this.boneMat=new MatrixClass();
-        this.boneMat2=new MatrixClass();
-        this.mainRotQuat=new QuaternionClass();
+        this.boneMat=new Matrix4Class();
+        this.boneMat2=new Matrix4Class();
+        
+        this.rootPosition=new PointClass(0,0,0);
+        this.rootRotation=new QuaternionClass();
+        this.rootScale=new PointClass(1,1,1);
         
         Object.seal(this);
     }
@@ -164,7 +167,7 @@ export default class ModelSkeletonClass
         this.lastAnimationFlip=false;
     }
     
-    runAnimationRecursive(boneIdx,pnt,rotQuat)
+    runAnimationRecursive(boneIdx,pnt,rotQuat,scale)
     {
         let bone,childBoneIdx;
         
@@ -174,45 +177,39 @@ export default class ModelSkeletonClass
             
         bone.curPosePosition.setFromPoint(bone.translation);
         this.boneMat.setRotationFromQuaternion(rotQuat);        // rotation of parent bone
-        this.boneMat2.setScaleFromPoint(bone.scale);
+        this.boneMat2.setScaleFromPoint(scale);
         this.boneMat.multiply(this.boneMat2);
         
         bone.curPosePosition.matrixMultiply(this.boneMat);
         bone.curPosePosition.addPoint(pnt);
         
-            // create the next cumulative quaternion for
-            // children bones
+            // create the next cumulative quaternion and
+            // scale for children bones children bones
         
         bone.curPoseChildBoneQuat.setFromMultiply(rotQuat,bone.rotation);
+        bone.curPoseChildBoneScale.setFromMultiply(scale,bone.scale);
         
             // move children bones
             
         for (childBoneIdx of bone.childBoneIdxs) {
-            this.runAnimationRecursive(childBoneIdx,bone.curPosePosition,bone.curPoseChildBoneQuat);
+            this.runAnimationRecursive(childBoneIdx,bone.curPosePosition,bone.curPoseChildBoneQuat,bone.curPoseChildBoneScale);
         }
     }
     
-    runAnimation(ang,pnt)
+    runAnimation()
     {
-            // test animation
-            
-        //let bone=this.findBone('T-Rex_Tail1_02');
-        //if (bone!==null) bone.curPoseAngle.y+=0.5;
-        
-        
-        this.mainRotQuat.setFromVectorAndAngle(0,-1,0,ang.y);
-        
-            // start at the root bone and build up
-            // the tree
-            
-        if (this.rootBoneIdx!==-1) this.runAnimationRecursive(this.rootBoneIdx,pnt,this.mainRotQuat);
+        this.rootPosition.setFromValues(0,0,0);
+        this.rootRotation.setIdentity();
+        this.rootScale.setFromValues(1,1,1);
+
+        if (this.rootBoneIdx!==-1) this.runAnimationRecursive(this.rootBoneIdx,this.rootPosition,this.rootRotation,this.rootScale);
     }
     
         //
         // debug stuff -- note this is not optimized and slow!
         //
         
-    draw()
+    draw(modelMatrix)
     {
         let n,nBone,bone,parentBone;
         let vertices,indexes,vIdx,iIdx,elementIdx;
@@ -333,6 +330,8 @@ export default class ModelSkeletonClass
             // draw the skeleton
             
         shader.drawStart(0,1,0);
+            
+        gl.uniformMatrix4fv(shader.modelMatrixUniform,false,modelMatrix.data);
         
             // the lines
             

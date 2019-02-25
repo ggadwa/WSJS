@@ -1,23 +1,22 @@
 import ShaderClass from '../shader/shader.js';
 
 //
-// effect shader class
+// sky shader class
 //
 
-export default class EffectShaderClass extends ShaderClass
+export default class SkyShaderClass extends ShaderClass
 {
     constructor(view)
     {
         super(view);
         
-        this.vertexShaderURL='shaders/effect.vert';
-        this.fragmentShaderURL='shaders/effect.frag';
+        this.vertexShaderURL='shaders/sky.vert';
+        this.fragmentShaderURL='shaders/sky.frag';
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
         this.perspectiveMatrixUniform=null;
-        this.modelMatrixUniform=null;    
-        this.colorAlphaUniform=null;
+        this.viewMatrixUniform=null;
         
         Object.seal(this);
     }
@@ -38,33 +37,25 @@ export default class EffectShaderClass extends ShaderClass
         this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
-        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
-        
-        this.colorAlphaUniform=gl.getUniformLocation(this.program,'colorAlpha');
-        
-            // texture uniforms never change
-            
-        gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
+        this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
 
         gl.useProgram(null);
     }
 
         //
-        // start/stop effect drawing
+        // start/stop interface shader drawing
         //
 
     drawStart()
     {
         let gl=this.view.gl;
         
-            // using the map shader
-
         gl.useProgram(this.program);
 
-            // matrix
+            // setup the uniforms
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix);
-        gl.uniformMatrix4fv(this.modelMatrixUniform,false,this.view.modelMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
 
             // enable the vertex attributes
 
@@ -81,9 +72,9 @@ export default class EffectShaderClass extends ShaderClass
         gl.disableVertexAttribArray(this.vertexPositionAttribute);
         gl.disableVertexAttribArray(this.vertexUVAttribute);
 
-            // no longer using shader
+            // no longer using program
 
         gl.useProgram(null);
     }
-}
 
+}

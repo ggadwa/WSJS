@@ -4,13 +4,9 @@ WebGL2
            (reason can't do for now, it forces mesh shader setup to be per VAO, and that means repeated lights, etc.)
     [ ] uniform buffers for lights & matrixes
 
+[Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
-
-0. models aren't being properly culled
-
-1. missing globe on moon walk
-   1a. missing skeleton on moon walk
 
 2. get rid of u/v scale in import settings
 
@@ -18,10 +14,6 @@ WebGL2
 4. all frustum stuff has to be fixed
 5. why is uv swapped? (only on objs it seems)
 6. underwater collision bad
-
-1. need to import non-UV trigs as flat textures
-    1a. create textures
-2. figure out textures
 
 2. get rid of broken double windows in OBJ
 3. translate OBJs to GLTF?

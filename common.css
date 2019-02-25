@@ -68,12 +68,12 @@
 
 .controlText {
     float:left;
-    width:calc(30% - 8px);   
+    width:30%;   
 }
 
 .labelText {
     float:left;
-    width:70%;
+    width:65%;
     padding-right:4px;
     text-align:right;
 }

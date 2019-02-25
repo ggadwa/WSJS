@@ -640,6 +640,8 @@ export default class ProjectEntityClass
     
         //
         // override this to change how the model is setup for drawing
+        // will need to setup model position and angles here or nothing
+        // will draw
         //
         
     drawSetup()

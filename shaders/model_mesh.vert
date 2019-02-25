@@ -6,6 +6,7 @@ in highp vec3 vertexTangent;
 in highp vec2 vertexUV;
 
 uniform highp mat4 perspectiveMatrix;
+uniform highp mat4 viewMatrix;
 uniform highp mat4 modelMatrix;
 uniform highp mat3 normalMatrix;
 
@@ -15,17 +16,19 @@ out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 void main(void)
 {
-    gl_Position=perspectiveMatrix*modelMatrix*vec4(vertexPosition,1.0);
+    gl_Position=perspectiveMatrix*viewMatrix*modelMatrix*vec4(vertexPosition,1.0);
 
     mapPosition=vertexPosition;
-    eyePosition=vec3(modelMatrix*vec4(vertexPosition,1.0));
+    eyePosition=vec3(viewMatrix*vec4(vertexPosition,1.0));
 
         // get the tangent space
+        // need to rotate the normals with the model matrix
         // this gets passed to the fragment so we can calculate lights
 
-    tangentSpaceTangent=normalize(normalMatrix*vertexTangent);
-    tangentSpaceBinormal=normalize(normalMatrix*cross(vertexNormal,vertexTangent));
-    tangentSpaceNormal=normalize(normalMatrix*vertexNormal);
+    highp mat3 rotNormalMatrix=mat3(modelMatrix)*normalMatrix;
+    tangentSpaceTangent=normalize(rotNormalMatrix*vertexTangent);
+    tangentSpaceBinormal=normalize(rotNormalMatrix*cross(vertexNormal,vertexTangent));
+    tangentSpaceNormal=normalize(rotNormalMatrix*vertexNormal);
 
         // translate the eye vector
 

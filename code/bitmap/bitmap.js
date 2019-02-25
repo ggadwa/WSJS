@@ -169,7 +169,7 @@ export default class BitmapClass
             // special check for solid colors
             
         if (this.solidColor!==null) {
-            this.colorImage=await this.createDefaultImageForMissingImage(this.solidColor.r,this.solidColor.g,this.solidColor.b);
+            this.colorImage=await this.createDefaultImageForMissingImage((this.solidColor.r*255),(this.solidColor.g*255),(this.solidColor.b*255));
         }
         
             // color bitmap

@@ -7,10 +7,11 @@ import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
-import MatrixClass from '../utility/matrix.js';
+import Matrix4Class from '../utility/matrix4.js';
+import Matrix3Class from '../utility/matrix3.js';
 import InputClass from '../main/input.js';
 import ViewCameraClass from '../main/view_camera.js';
-import TextClass from '../text/text.js';
+import TextClass from '../interface/text.js';
 import InterfaceClass from '../interface/interface.js';
 
 //
@@ -43,8 +44,6 @@ export default class ViewClass
         this.OPENGL_NEAR_Z=500;
         this.OPENGL_FAR_Z=300000;
 
-        this.VIEW_NORMAL_CULL_LIMIT=0.3;
-
         this.wid=0;
         this.high=0;
         this.aspect=0.0;
@@ -54,16 +53,15 @@ export default class ViewClass
 
             // the gl matrixes
 
-        this.perspectiveMatrix=new Float32Array(16);
-        this.modelMatrix=new Float32Array(16);
-        this.normalMatrixTemp=new Float32Array(16);         // global to eliminate GCd
-        this.normalMatrix=new Float32Array(9);
-        this.orthoMatrix=new Float32Array(16);
+        this.perspectiveMatrix=new Matrix4Class();
+        this.viewMatrix=new Matrix4Class();
+        this.normalMatrix=new Matrix3Class();
+        this.orthoMatrix=new Matrix4Class();
 
             // billboarding matrixes
 
-        this.billboardXMatrix=new MatrixClass();
-        this.billboardYMatrix=new MatrixClass();
+        this.billboardXMatrix=new Matrix4Class();
+        this.billboardYMatrix=new Matrix4Class();
 
             // view lighting
 
@@ -311,184 +309,9 @@ export default class ViewClass
     
     convertToEyeCoordinates(pt,eyePt)
     {
-        eyePt.x=(pt.x*this.modelMatrix[0])+(pt.y*this.modelMatrix[4])+(pt.z*this.modelMatrix[8])+this.modelMatrix[12];
-        eyePt.y=(pt.x*this.modelMatrix[1])+(pt.y*this.modelMatrix[5])+(pt.z*this.modelMatrix[9])+this.modelMatrix[13];
-        eyePt.z=(pt.x*this.modelMatrix[2])+(pt.y*this.modelMatrix[6])+(pt.z*this.modelMatrix[10])+this.modelMatrix[14];
-    }
-    
-        //
-        // build perspective and ortho matrix
-        //
-
-    buildPerspectiveMatrix()
-    {
-        let fov=1.0/Math.tan(this.OPENGL_FOV*0.5);
-        let dist=1.0/(this.OPENGL_NEAR_Z-this.OPENGL_FAR_Z);
-        
-            // create the perspective matrix
-            
-        this.perspectiveMatrix[0]=fov/this.aspect;
-        this.perspectiveMatrix[1]=0.0;
-        this.perspectiveMatrix[2]=0.0;
-        this.perspectiveMatrix[3]=0.0;
-        this.perspectiveMatrix[4]=0.0;
-        this.perspectiveMatrix[5]=fov;
-        this.perspectiveMatrix[6]=0.0;
-        this.perspectiveMatrix[7]=0.0;
-        this.perspectiveMatrix[8]=0.0;
-        this.perspectiveMatrix[9]=0.0;
-        this.perspectiveMatrix[10]=(this.OPENGL_FAR_Z+this.OPENGL_NEAR_Z)*dist;
-        this.perspectiveMatrix[11]=-1.0;
-        this.perspectiveMatrix[12]=0.0;
-        this.perspectiveMatrix[13]=0.0;
-        this.perspectiveMatrix[14]=((this.OPENGL_FAR_Z*this.OPENGL_NEAR_Z)*2.0)*dist;
-        this.perspectiveMatrix[15]=0.0;
-        
-            // now translate it for the near_z
-                     
-        this.perspectiveMatrix[12]+=(this.perspectiveMatrix[8]*this.OPENGL_NEAR_Z);
-        this.perspectiveMatrix[13]+=(this.perspectiveMatrix[9]*this.OPENGL_NEAR_Z);
-        this.perspectiveMatrix[14]+=(this.perspectiveMatrix[10]*this.OPENGL_NEAR_Z);
-        this.perspectiveMatrix[15]+=(this.perspectiveMatrix[11]*this.OPENGL_NEAR_Z);
-    }
-    
-    buildOrthoMatrix(nearZ,farZ)
-    {
-        let horz=1.0/this.wid;
-        let vert=1.0/this.high;
-        let dist=1.0/(nearZ-farZ);
-
-        this.orthoMatrix[0]=horz*2.0;
-        this.orthoMatrix[1]=0.0;
-        this.orthoMatrix[2]=0.0;
-        this.orthoMatrix[3]=0.0;
-        this.orthoMatrix[4]=0.0;
-        this.orthoMatrix[5]=vert*-2.0;
-        this.orthoMatrix[6]=0.0;
-        this.orthoMatrix[7]=0.0;
-        this.orthoMatrix[8]=0.0;
-        this.orthoMatrix[9]=0.0;
-        this.orthoMatrix[10]=dist*2.0;
-        this.orthoMatrix[11]=0.0;
-        this.orthoMatrix[12]=-1.0; // this.wid*-horz;      // these will always equal these numbers,
-        this.orthoMatrix[13]=1.0; // this.high*vert;     // but leave in the code for readability
-        this.orthoMatrix[14]=(farZ+nearZ)*dist;
-        this.orthoMatrix[15]=1.0;
-    }
-    
-        //
-        // build look at matrix
-        //
-     
-    buildLookAtMatrix(centerPos)
-    {
-        let x0,x1,x2,y0,y1,y2,z0,z1,z2;
-        let f;
-
-        z0=this.eyePos.x-centerPos.x;
-        z1=this.eyePos.y-centerPos.y;
-        z2=this.eyePos.z-centerPos.z;
-
-        f=Math.sqrt((z0*z0)+(z1*z1)+(z2*z2));
-        f=1.0/f;
-        z0*=f;
-        z1*=f;
-        z2*=f;
-
-        x0=(this.lookAtUpVector.y*z2)-(this.lookAtUpVector.z*z1);
-        x1=(this.lookAtUpVector.z*z0)-(this.lookAtUpVector.x*z2);
-        x2=(this.lookAtUpVector.x*z1)-(this.lookAtUpVector.y*z0);
-        
-        f=Math.sqrt((x0*x0)+(x1*x1)+(x2*x2));
-        if (f!==0.0) f=1.0/f;
-        x0*=f;
-        x1*=f;
-        x2*=f;
-
-        y0=(z1*x2)-(z2*x1);
-        y1=(z2*x0)-(z0*x2);
-        y2=(z0*x1)-(z1*x0);
-
-        f=Math.sqrt((y0*y0)+(y1*y1)+(y2*y2));
-        if (f!==0.0) f=1.0/f;
-        y0*=f;
-        y1*=f;
-        y2*=f;
-
-        this.modelMatrix[0]=x0;
-        this.modelMatrix[1]=y0;
-        this.modelMatrix[2]=z0;
-        this.modelMatrix[3]=0.0;
-        this.modelMatrix[4]=x1;
-        this.modelMatrix[5]=y1;
-        this.modelMatrix[6]=z1;
-        this.modelMatrix[7]=0.0;
-        this.modelMatrix[8]=x2;
-        this.modelMatrix[9]=y2;
-        this.modelMatrix[10]=z2;
-        this.modelMatrix[11]=0.0;
-        this.modelMatrix[12]=-((x0*this.eyePos.x)+(x1*this.eyePos.y)+(x2*this.eyePos.z));
-        this.modelMatrix[13]=-((y0*this.eyePos.x)+(y1*this.eyePos.y)+(y2*this.eyePos.z));
-        this.modelMatrix[14]=-((z0*this.eyePos.x)+(z1*this.eyePos.y)+(z2*this.eyePos.z));
-        this.modelMatrix[15]=1.0;
-    }
-    
-        //
-        // create the normal matrix
-        //
-        
-    buildNormalMatrix()
-    {
-            // the normal is the invert-transpose of the
-            // model matrix put into a 3x3 matrix
-        
-            // create the inversion
-            
-        let m00=(this.modelMatrix[0]*this.modelMatrix[5])-(this.modelMatrix[1]*this.modelMatrix[4]);
-        let m01=(this.modelMatrix[0]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[4]);
-        let m02=(this.modelMatrix[0]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[4]);
-        let m03=(this.modelMatrix[1]*this.modelMatrix[6])-(this.modelMatrix[2]*this.modelMatrix[5]);
-        let m04=(this.modelMatrix[1]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[5]);
-        let m05=(this.modelMatrix[2]*this.modelMatrix[7])-(this.modelMatrix[3]*this.modelMatrix[6]);
-        let m06=(this.modelMatrix[8]*this.modelMatrix[13])-(this.modelMatrix[9]*this.modelMatrix[12]);
-        let m07=(this.modelMatrix[8]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[12]);
-        let m08=(this.modelMatrix[8]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[12]);
-        let m09=(this.modelMatrix[9]*this.modelMatrix[14])-(this.modelMatrix[10]*this.modelMatrix[13]);
-        let m10=(this.modelMatrix[9]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[13]);
-        let m11=(this.modelMatrix[10]*this.modelMatrix[15])-(this.modelMatrix[11]*this.modelMatrix[14]);
-
-        let det=(m00*m11)-(m01*m10)+(m02*m09)+(m03*m08)-(m04*m07)+(m05*m06);
-        if (det!==0.0) det=1.0/det;
-
-        this.normalMatrixTemp[0]=((this.modelMatrix[5]*m11)-(this.modelMatrix[6]*m10)+(this.modelMatrix[7]*m09))*det;
-        this.normalMatrixTemp[1]=((this.modelMatrix[2]*m10)-(this.modelMatrix[1]*m11)-(this.modelMatrix[3]*m09))*det;
-        this.normalMatrixTemp[2]=((this.modelMatrix[13]*m05)-(this.modelMatrix[14]*m04)+(this.modelMatrix[15]*m03))*det;
-        this.normalMatrixTemp[3]=((this.modelMatrix[10]*m04)-(this.modelMatrix[9]*m05)-(this.modelMatrix[11]*m03))*det;
-        this.normalMatrixTemp[4]=((this.modelMatrix[6]*m08)-(this.modelMatrix[4]*m11)-(this.modelMatrix[7]*m07))*det;
-        this.normalMatrixTemp[5]=((this.modelMatrix[0]*m11)-(this.modelMatrix[2]*m08)+(this.modelMatrix[3]*m07))*det;
-        this.normalMatrixTemp[6]=((this.modelMatrix[14]*m02)-(this.modelMatrix[12]*m05)-(this.modelMatrix[15]*m01))*det;
-        this.normalMatrixTemp[7]=((this.modelMatrix[8]*m05)-(this.modelMatrix[10]*m02)+(this.modelMatrix[11]*m01))*det;
-        this.normalMatrixTemp[8]=((this.modelMatrix[4]*m10)-(this.modelMatrix[5]*m08)+(this.modelMatrix[7]*m06))*det;
-        this.normalMatrixTemp[9]=((this.modelMatrix[1]*m08)-(this.modelMatrix[0]*m10)-(this.modelMatrix[3]*m06))*det;
-        this.normalMatrixTemp[10]=((this.modelMatrix[12]*m04)-(this.modelMatrix[13]*m02)+(this.modelMatrix[15]*m00))*det;
-        this.normalMatrixTemp[11]=((this.modelMatrix[9]*m02)-(this.modelMatrix[8]*m04)-(this.modelMatrix[11]*m00))*det;
-        this.normalMatrixTemp[12]=((this.modelMatrix[5]*m07)-(this.modelMatrix[4]*m09)-(this.modelMatrix[6]*m06))*det;
-        this.normalMatrixTemp[13]=((this.modelMatrix[0]*m09)-(this.modelMatrix[1]*m07)+(this.modelMatrix[2]*m06))*det;
-        this.normalMatrixTemp[14]=((this.modelMatrix[13]*m01)-(this.modelMatrix[12]*m03)-(this.modelMatrix[14]*m00))*det;
-        this.normalMatrixTemp[15]=((this.modelMatrix[8]*m03)-(this.modelMatrix[9]*m01)+(this.modelMatrix[10]*m00))*det;
-        
-            // put int 3x3 matrix
-            // we transpose this at the same time
-            
-        this.normalMatrix[0]=this.normalMatrixTemp[0];          // non-transposed these would be 0,1,2,4,5,6,8,9,10
-        this.normalMatrix[1]=this.normalMatrixTemp[4];
-        this.normalMatrix[2]=this.normalMatrixTemp[8];
-        this.normalMatrix[3]=this.normalMatrixTemp[1];
-        this.normalMatrix[4]=this.normalMatrixTemp[5];
-        this.normalMatrix[5]=this.normalMatrixTemp[9];
-        this.normalMatrix[6]=this.normalMatrixTemp[2];
-        this.normalMatrix[7]=this.normalMatrixTemp[6];
-        this.normalMatrix[8]=this.normalMatrixTemp[10];
+        eyePt.x=(pt.x*this.viewMatrix.data[0])+(pt.y*this.viewMatrix.data[4])+(pt.z*this.viewMatrix.data[8])+this.viewMatrix.data[12];
+        eyePt.y=(pt.x*this.viewMatrix.data[1])+(pt.y*this.viewMatrix.data[5])+(pt.z*this.viewMatrix.data[9])+this.viewMatrix.data[13];
+        eyePt.z=(pt.x*this.viewMatrix.data[2])+(pt.y*this.viewMatrix.data[6])+(pt.z*this.viewMatrix.data[10])+this.viewMatrix.data[14];
     }
     
         //
@@ -516,7 +339,7 @@ export default class ViewClass
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
 
-        this.buildPerspectiveMatrix();
+        this.perspectiveMatrix.setPerspectiveMatrix(this.OPENGL_FOV,this.aspect,this.OPENGL_NEAR_Z,this.OPENGL_FAR_Z);
 
             // get the eye point and rotate it
             // around the view position
@@ -527,16 +350,17 @@ export default class ViewClass
 
             // setup the look at
 
-        this.buildLookAtMatrix(this.camera.position);
+        this.viewMatrix.setLookAtMatrix(this.eyePos,this.camera.position,this.lookAtUpVector);
 
             // create the 3x3 normal matrix
-            // the normal is the invert-transpose of the model matrix
+            // the normal is the invert-transpose of the view matrix
+            // put into a 3x3 matrix
             
-        this.buildNormalMatrix();
+        this.normalMatrix.setInvertTransposeFromMat4(this.viewMatrix);
 
             // the 2D ortho matrix
 
-        this.buildOrthoMatrix(-1.0,1.0);
+        this.orthoMatrix.setOrthoMatrix(this.wid,this.high,-1.0,1.0);
         
             // build the billboarding matrixes
             // mostly used for particles
@@ -581,9 +405,9 @@ export default class ViewClass
             // draw the map
             
         map.sky.draw();
-        map.meshList.drawOpaque();
+        map.meshList.drawOpaque(null);
         map.entityList.draw();
-        map.meshList.drawTransparent();
+        map.meshList.drawTransparent(null);
         map.liquidList.draw();
         map.effectList.draw();
       
@@ -694,7 +518,7 @@ export default class ViewClass
         
             // the 2D ortho matrix
 
-        this.buildOrthoMatrix(-1.0,1.0);
+        this.orthoMatrix.setOrthoMatrix(this.wid,this.high,-1.0,1.0);
         
             // clear to black
             
@@ -739,25 +563,25 @@ export default class ViewClass
             // to build the frustum
             // ABCD planes equations
 
-        this.clipPlane[0]=(this.modelMatrix[0]*this.perspectiveMatrix[0])+(this.modelMatrix[1]*this.perspectiveMatrix[4])+(this.modelMatrix[2]*this.perspectiveMatrix[8])+(this.modelMatrix[3]*this.perspectiveMatrix[12]);
-        this.clipPlane[1]=(this.modelMatrix[0]*this.perspectiveMatrix[1])+(this.modelMatrix[1]*this.perspectiveMatrix[5])+(this.modelMatrix[2]*this.perspectiveMatrix[9])+(this.modelMatrix[3]*this.perspectiveMatrix[13]);
-        this.clipPlane[2]=(this.modelMatrix[0]*this.perspectiveMatrix[2])+(this.modelMatrix[1]*this.perspectiveMatrix[6])+(this.modelMatrix[2]*this.perspectiveMatrix[10])+(this.modelMatrix[3]*this.perspectiveMatrix[14]);
-        this.clipPlane[3]=(this.modelMatrix[0]*this.perspectiveMatrix[3])+(this.modelMatrix[1]*this.perspectiveMatrix[7])+(this.modelMatrix[2]*this.perspectiveMatrix[11])+(this.modelMatrix[3]*this.perspectiveMatrix[15]);
+        this.clipPlane[0]=(this.viewMatrix.data[0]*this.perspectiveMatrix.data[0])+(this.viewMatrix.data[1]*this.perspectiveMatrix.data[4])+(this.viewMatrix.data[2]*this.perspectiveMatrix.data[8])+(this.viewMatrix.data[3]*this.perspectiveMatrix.data[12]);
+        this.clipPlane[1]=(this.viewMatrix.data[0]*this.perspectiveMatrix.data[1])+(this.viewMatrix.data[1]*this.perspectiveMatrix.data[5])+(this.viewMatrix.data[2]*this.perspectiveMatrix.data[9])+(this.viewMatrix.data[3]*this.perspectiveMatrix.data[13]);
+        this.clipPlane[2]=(this.viewMatrix.data[0]*this.perspectiveMatrix.data[2])+(this.viewMatrix.data[1]*this.perspectiveMatrix.data[6])+(this.viewMatrix.data[2]*this.perspectiveMatrix.data[10])+(this.viewMatrix.data[3]*this.perspectiveMatrix.data[14]);
+        this.clipPlane[3]=(this.viewMatrix.data[0]*this.perspectiveMatrix.data[3])+(this.viewMatrix.data[1]*this.perspectiveMatrix.data[7])+(this.viewMatrix.data[2]*this.perspectiveMatrix.data[11])+(this.viewMatrix.data[3]*this.perspectiveMatrix.data[15]);
 
-        this.clipPlane[4]=(this.modelMatrix[4]*this.perspectiveMatrix[0])+(this.modelMatrix[5]*this.perspectiveMatrix[4])+(this.modelMatrix[6]*this.perspectiveMatrix[8])+(this.modelMatrix[7]*this.perspectiveMatrix[12]);
-        this.clipPlane[5]=(this.modelMatrix[4]*this.perspectiveMatrix[1])+(this.modelMatrix[5]*this.perspectiveMatrix[5])+(this.modelMatrix[6]*this.perspectiveMatrix[9])+(this.modelMatrix[7]*this.perspectiveMatrix[13]);
-        this.clipPlane[6]=(this.modelMatrix[4]*this.perspectiveMatrix[2])+(this.modelMatrix[5]*this.perspectiveMatrix[6])+(this.modelMatrix[6]*this.perspectiveMatrix[10])+(this.modelMatrix[7]*this.perspectiveMatrix[14]);
-        this.clipPlane[7]=(this.modelMatrix[4]*this.perspectiveMatrix[3])+(this.modelMatrix[5]*this.perspectiveMatrix[7])+(this.modelMatrix[6]*this.perspectiveMatrix[11])+(this.modelMatrix[7]*this.perspectiveMatrix[15]);
+        this.clipPlane[4]=(this.viewMatrix.data[4]*this.perspectiveMatrix.data[0])+(this.viewMatrix.data[5]*this.perspectiveMatrix.data[4])+(this.viewMatrix.data[6]*this.perspectiveMatrix.data[8])+(this.viewMatrix.data[7]*this.perspectiveMatrix.data[12]);
+        this.clipPlane[5]=(this.viewMatrix.data[4]*this.perspectiveMatrix.data[1])+(this.viewMatrix.data[5]*this.perspectiveMatrix.data[5])+(this.viewMatrix.data[6]*this.perspectiveMatrix.data[9])+(this.viewMatrix.data[7]*this.perspectiveMatrix.data[13]);
+        this.clipPlane[6]=(this.viewMatrix.data[4]*this.perspectiveMatrix.data[2])+(this.viewMatrix.data[5]*this.perspectiveMatrix.data[6])+(this.viewMatrix.data[6]*this.perspectiveMatrix.data[10])+(this.viewMatrix.data[7]*this.perspectiveMatrix.data[14]);
+        this.clipPlane[7]=(this.viewMatrix.data[4]*this.perspectiveMatrix.data[3])+(this.viewMatrix.data[5]*this.perspectiveMatrix.data[7])+(this.viewMatrix.data[6]*this.perspectiveMatrix.data[11])+(this.viewMatrix.data[7]*this.perspectiveMatrix.data[15]);
 
-        this.clipPlane[8]=(this.modelMatrix[8]*this.perspectiveMatrix[0])+(this.modelMatrix[9]*this.perspectiveMatrix[4])+(this.modelMatrix[10]*this.perspectiveMatrix[8])+(this.modelMatrix[11]*this.perspectiveMatrix[12]);
-        this.clipPlane[9]=(this.modelMatrix[8]*this.perspectiveMatrix[1])+(this.modelMatrix[9]*this.perspectiveMatrix[5])+(this.modelMatrix[10]*this.perspectiveMatrix[9])+(this.modelMatrix[11]*this.perspectiveMatrix[13]);
-        this.clipPlane[10]=(this.modelMatrix[8]*this.perspectiveMatrix[2])+(this.modelMatrix[9]*this.perspectiveMatrix[6])+(this.modelMatrix[10]*this.perspectiveMatrix[10])+(this.modelMatrix[11]*this.perspectiveMatrix[14]);
-        this.clipPlane[11]=(this.modelMatrix[8]*this.perspectiveMatrix[3])+(this.modelMatrix[9]*this.perspectiveMatrix[7])+(this.modelMatrix[10]*this.perspectiveMatrix[11])+(this.modelMatrix[11]*this.perspectiveMatrix[15]);
+        this.clipPlane[8]=(this.viewMatrix.data[8]*this.perspectiveMatrix.data[0])+(this.viewMatrix.data[9]*this.perspectiveMatrix.data[4])+(this.viewMatrix.data[10]*this.perspectiveMatrix.data[8])+(this.viewMatrix.data[11]*this.perspectiveMatrix.data[12]);
+        this.clipPlane[9]=(this.viewMatrix.data[8]*this.perspectiveMatrix.data[1])+(this.viewMatrix.data[9]*this.perspectiveMatrix.data[5])+(this.viewMatrix.data[10]*this.perspectiveMatrix.data[9])+(this.viewMatrix.data[11]*this.perspectiveMatrix.data[13]);
+        this.clipPlane[10]=(this.viewMatrix.data[8]*this.perspectiveMatrix.data[2])+(this.viewMatrix.data[9]*this.perspectiveMatrix.data[6])+(this.viewMatrix.data[10]*this.perspectiveMatrix.data[10])+(this.viewMatrix.data[11]*this.perspectiveMatrix.data[14]);
+        this.clipPlane[11]=(this.viewMatrix.data[8]*this.perspectiveMatrix.data[3])+(this.viewMatrix.data[9]*this.perspectiveMatrix.data[7])+(this.viewMatrix.data[10]*this.perspectiveMatrix.data[11])+(this.viewMatrix.data[11]*this.perspectiveMatrix.data[15]);
 
-        this.clipPlane[12]=(this.modelMatrix[12]*this.perspectiveMatrix[0])+(this.modelMatrix[13]*this.perspectiveMatrix[4])+(this.modelMatrix[14]*this.perspectiveMatrix[8])+(this.modelMatrix[15]*this.perspectiveMatrix[12]);
-        this.clipPlane[13]=(this.modelMatrix[12]*this.perspectiveMatrix[1])+(this.modelMatrix[13]*this.perspectiveMatrix[5])+(this.modelMatrix[14]*this.perspectiveMatrix[9])+(this.modelMatrix[15]*this.perspectiveMatrix[13]);
-        this.clipPlane[14]=(this.modelMatrix[12]*this.perspectiveMatrix[2])+(this.modelMatrix[13]*this.perspectiveMatrix[6])+(this.modelMatrix[14]*this.perspectiveMatrix[10])+(this.modelMatrix[15]*this.perspectiveMatrix[14]);
-        this.clipPlane[15]=(this.modelMatrix[12]*this.perspectiveMatrix[3])+(this.modelMatrix[13]*this.perspectiveMatrix[7])+(this.modelMatrix[14]*this.perspectiveMatrix[11])+(this.modelMatrix[15]*this.perspectiveMatrix[15]);
+        this.clipPlane[12]=(this.viewMatrix.data[12]*this.perspectiveMatrix.data[0])+(this.viewMatrix.data[13]*this.perspectiveMatrix.data[4])+(this.viewMatrix.data[14]*this.perspectiveMatrix.data[8])+(this.viewMatrix.data[15]*this.perspectiveMatrix.data[12]);
+        this.clipPlane[13]=(this.viewMatrix.data[12]*this.perspectiveMatrix.data[1])+(this.viewMatrix.data[13]*this.perspectiveMatrix.data[5])+(this.viewMatrix.data[14]*this.perspectiveMatrix.data[9])+(this.viewMatrix.data[15]*this.perspectiveMatrix.data[13]);
+        this.clipPlane[14]=(this.viewMatrix.data[12]*this.perspectiveMatrix.data[2])+(this.viewMatrix.data[13]*this.perspectiveMatrix.data[6])+(this.viewMatrix.data[14]*this.perspectiveMatrix.data[10])+(this.viewMatrix.data[15]*this.perspectiveMatrix.data[14]);
+        this.clipPlane[15]=(this.viewMatrix.data[12]*this.perspectiveMatrix.data[3])+(this.viewMatrix.data[13]*this.perspectiveMatrix.data[7])+(this.viewMatrix.data[14]*this.perspectiveMatrix.data[11])+(this.viewMatrix.data[15]*this.perspectiveMatrix.data[15]);
 
                 // left plane
 
@@ -808,17 +632,17 @@ export default class ViewClass
         this.frustumFarPlane.normalize();
     }
 
-    boundBoxInFrustum(xBound,yBound,zBound)
+    boundBoxInFrustum(xBound,yBound,zBound,translationPnt)
     {
             // check if outside the plane, if it is,
             // then it's considered outside the bounds
 
-        if (!this.frustumLeftPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
-        if (!this.frustumRightPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
-        if (!this.frustumTopPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
-        if (!this.frustumBottomPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
-        if (!this.frustumNearPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
-        if (!this.frustumFarPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumLeftPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
+        if (!this.frustumRightPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
+        if (!this.frustumTopPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
+        if (!this.frustumBottomPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
+        if (!this.frustumNearPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
+        if (!this.frustumFarPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
 
             // otherwise considered within the frustum planes
 

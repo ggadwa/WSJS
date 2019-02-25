@@ -15,6 +15,8 @@ export default class MeshListClass
 
         this.meshes=[];
         
+        this.frustumTranslationPoint=new PointClass(0,0,0);
+        
             // this is an optimization that we use to skip
             // transparency drawing if the opaque draw didn't
             // skip any
@@ -132,30 +134,6 @@ export default class MeshListClass
     }
     
         //
-        // animations
-        //
-        
-    updateVertexesToPoseAndPosition(skeleton,angle,position)
-    {
-        let n;
-        let nMesh=this.meshes.length;
-
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].updateVertexesToPoseAndPosition(skeleton,angle,position);
-        }
-    }
-    
-    updateVertexesToAngleAndPosition(angle,position)
-    {
-        let n;
-        let nMesh=this.meshes.length;
-
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].updateVertexesToAngleAndPosition(angle,position);
-        }
-    }
-           
-        //
         // setup all the mesh buffers
         //
 
@@ -173,13 +151,23 @@ export default class MeshListClass
         // draw meshes
         //
 
-    drawOpaque()
+    drawOpaque(modelMatrix)
     {
         let n,mesh;
         let currentBitmap;
         let nMesh=this.meshes.length;
         
         this.shader.drawStart();
+        
+            // set any model matrix
+            
+        if (modelMatrix===null) {
+            this.frustumTranslationPoint.setFromValues(0,0,0);
+        }
+        else {
+            this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
+            this.frustumTranslationPoint.translationFromMatrix(modelMatrix);
+        }
 
             // setup map drawing
 
@@ -197,7 +185,7 @@ export default class MeshListClass
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound,this.frustumTranslationPoint)) continue;
 
                 // time to change bitmap
 
@@ -209,7 +197,6 @@ export default class MeshListClass
                 // draw the mesh
 
             mesh.updateBuffers();
-            mesh.buildNonCulledTriangleIndexes();
             mesh.bindBuffers(this.shader);
             mesh.drawOpaque();
         }
@@ -217,7 +204,7 @@ export default class MeshListClass
         this.shader.drawEnd();
     }
     
-    drawTransparent()
+    drawTransparent(modelMatrix)
     {
         let n,mesh;
         let nMesh=this.meshes.length;
@@ -237,6 +224,16 @@ export default class MeshListClass
         gl.depthMask(false);
         
         this.shader.drawStart();
+        
+            // set any model matrix
+            
+        if (modelMatrix===null) {
+            this.frustumTranslationPoint.setFromValues(0,0,0);
+        }
+        else {
+            this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
+            this.frustumTranslationPoint.translationFromMatrix(modelMatrix);
+        }
 
             // setup map drawing
 
@@ -250,7 +247,7 @@ export default class MeshListClass
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound,this.frustumTranslationPoint)) continue;
 
                 // time to change bitmap
 
@@ -262,7 +259,6 @@ export default class MeshListClass
                 // draw the mesh
 
             mesh.updateBuffers();
-            mesh.buildNonCulledTriangleIndexes();
             mesh.bindBuffers(this.shader);
             mesh.drawTransparent();
         }

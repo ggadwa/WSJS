@@ -3,7 +3,7 @@ import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
 import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
-import MatrixClass from '../utility/matrix.js';
+import Matrix4Class from '../utility/matrix4.js';
 import MeshVertexClass from '../mesh/mesh_vertex.js';
 import MeshVertexBoneConnectClass from '../mesh/mesh_vertex_bone_connect.js';
 import MeshClass from '../mesh/mesh.js';
@@ -334,17 +334,32 @@ export default class ImportGLTFClass extends ImportBaseClass
     {
         let n,node,bone,boneIdx;
         let translationProp,rotationProp,scaleProp;
-        let translation,rotation,scale;
+        let mat,translation,rotation,scale;
         
         node=this.jsonData.nodes[nodeIdx];
         
-            // get the position
+            // find this bones TRS
             
         translation=new PointClass(0,0,0);
         rotation=new QuaternionClass();
         scale=new PointClass(1,1,1);
+        
+            // check for matrixes first
             
-        if (parentBoneIdx!==-1) {
+        if (node.matrix!==undefined) {
+            mat=new Matrix4Class();
+            mat.fromArray(node.matrix);
+
+                // decompose to TRS
+
+            translation.setFromValues((mat.data[12]*this.importSettings.scale),(mat.data[13]*this.importSettings.scale),(mat.data[14]*this.importSettings.scale));
+            rotation.fromMatrix(mat);
+            scale.scaleFromMatrix(mat);
+        }
+        
+            // else get TRS
+            
+        else {
             translationProp=node.translation;
             if (translationProp!==undefined) translation.setFromValues((translationProp[0]*this.importSettings.scale),(translationProp[1]*this.importSettings.scale),(translationProp[2]*this.importSettings.scale));
             
@@ -373,16 +388,45 @@ export default class ImportGLTFClass extends ImportBaseClass
         return(boneIdx);
     }
     
+    decodeBonesFindParentNodeForChildIndex(nodeIdx)
+    {
+        let n,k,node;
+        
+        for (n=0;n!==this.jsonData.nodes.length;n++) {
+            if (n===nodeIdx) continue;
+            
+            node=this.jsonData.nodes[n];
+            if (node.children===undefined) continue;
+            
+            for (k=0;k!==node.children.length;k++) {
+                if (node.children[k]===nodeIdx) return(n);
+            }
+        }
+        
+        return(-1);
+    }
+    
     decodeBones(skeleton)
     {
-        let nodeIdx;
+        let n,nodeIdx,parentNodeIdx;
         
             // build the bone tree
-            // for now we are assuming single skin
-            // at this point for use skin 0 to get
-            // root bone
+            // for now we assume a single skin
+            // and we find the root of the first
+            // joint in that skin, the skeleton
+            // index is unreliable and might go away
             
-        nodeIdx=this.jsonData.skins[0].skeleton;
+        nodeIdx=this.jsonData.skins[0].joints[0];
+        
+        while (true) {
+            parentNodeIdx=this.decodeBonesFindParentNodeForChildIndex(nodeIdx);
+            if (parentNodeIdx===-1) break;
+            
+            nodeIdx=parentNodeIdx;
+        }
+
+            // now bring in the rest of the skeleton
+        
         skeleton.rootBoneIdx=this.decodeBoneRecurse(skeleton,-1,nodeIdx);
     }
     
@@ -392,7 +436,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
-        let diffuseTexture,diffuseFactor,baseColorFactor,glossTexture,specularFactorProp;
+        let diffuseTexture,diffuseFactor,baseColorFactor,glossTexture,specularFactorProp,glossFactor;
         let colorURL=null;
         let normalURL=null;
         let specularURL=null;
@@ -425,7 +469,8 @@ export default class ImportGLTFClass extends ImportBaseClass
                 else {
                     diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
                     if (diffuseFactor!==undefined) {
-                        return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),diffuseFactor[0],diffuseFactor[1],diffuseFactor[2]));
+                        glossFactor=(materialNode.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor*2.0);     // this is relatively random and really here to deal with missing textures
+                        return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),(diffuseFactor[0]+glossFactor),(diffuseFactor[1]+glossFactor),(diffuseFactor[2]+glossFactor)));
                     }
                 }
 
@@ -534,6 +579,11 @@ export default class ImportGLTFClass extends ImportBaseClass
                     uvs=new Float32Array(Math.trunc(vertices.length/3)*2);
                 }
                 
+                if (skeleton!==null) {
+                    this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4); // unsigned short 4
+                    this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);    // float 4
+                }
+                
                 vIdx=0;
                 nIdx=0;
                 tIdx=0;
@@ -553,6 +603,12 @@ export default class ImportGLTFClass extends ImportBaseClass
                     vertexList.push(v);
                 }
                 
+                vIdx=0;
+                
+                for (t=0;t!=(indices.length*3);t++) {
+                    vertices[vIdx++]*=this.importSettings.scale;
+                }
+                
                     // do we need to recreate tangents?
                     
                 if (tangents===null) this.buildVertexListTangents(vertexList,indices);
@@ -564,7 +620,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                 
                     // finally make the mesh
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexList,indices,0);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexList,null,indices);
                 meshes.push(mesh);
             }
         }

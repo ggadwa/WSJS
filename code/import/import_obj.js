@@ -189,7 +189,7 @@ export default class ImportObjClass extends ImportBaseClass
         meshIndexes=new Uint32Array(meshIndexes);           // force to typed array
 
         this.buildVertexListTangents(meshVertices,meshIndexes);
-        this.meshes.push(new MeshClass(this.view,name,bitmap,meshVertices,meshIndexes,0));
+        this.meshes.push(new MeshClass(this.view,name,bitmap,meshVertices,null,meshIndexes));
     }
     
         //

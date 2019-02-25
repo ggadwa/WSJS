@@ -6,7 +6,7 @@ import MapLightListClass from '../map/map_light_list.js';
 import MapEntityListClass from '../map/map_entity_list.js';
 import MapEffectListClass from '../map/map_effect_list.js';
 import MapMovementListClass from '../map/map_movement_list.js';
-import SkyClass from '../sky/sky.js';
+import SkyClass from '../map/sky.js';
 import config from '../main/config.js';
 import genRandom from '../utility/random.js';
 

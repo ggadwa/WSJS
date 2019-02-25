@@ -1,26 +1,23 @@
 import ShaderClass from '../shader/shader.js';
 
 //
-// map shader object
+// effect shader class
 //
 
-export default class MapLiquidShaderClass extends ShaderClass
+export default class EffectShaderClass extends ShaderClass
 {
     constructor(view)
     {
         super(view);
         
-        this.vertexShaderURL='shaders/map_liquid.vert';
-        this.fragmentShaderURL='shaders/map_liquid.frag';
+        this.vertexShaderURL='shaders/effect.vert';
+        this.fragmentShaderURL='shaders/effect.frag';
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;
-
         this.perspectiveMatrixUniform=null;
-        this.modelMatrixUniform=null;
-        this.normalMatrixUniform=null;
-        
-        this.alphaUniform=null;
+        this.viewMatrixUniform=null;    
+        this.colorAlphaUniform=null;
         
         Object.seal(this);
     }
@@ -39,37 +36,35 @@ export default class MapLiquidShaderClass extends ShaderClass
 
         this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
         this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
-        
+
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
-        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
-        this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
+        this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         
-        this.alphaUniform=gl.getUniformLocation(this.program,'alpha');
-
-            // these uniforms are always the same
-
+        this.colorAlphaUniform=gl.getUniformLocation(this.program,'colorAlpha');
+        
+            // texture uniforms never change
+            
         gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
         gl.useProgram(null);
     }
 
         //
-        // start/stop liquid shader drawing
+        // start/stop effect drawing
         //
 
     drawStart()
     {
-            // using the map shader
-
         let gl=this.view.gl;
+        
+            // using the map shader
 
         gl.useProgram(this.program);
 
             // matrix
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix);
-        gl.uniformMatrix4fv(this.modelMatrixUniform,false,this.view.modelMatrix);
-        gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.view.normalMatrix);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
 
             // enable the vertex attributes
 
@@ -80,7 +75,7 @@ export default class MapLiquidShaderClass extends ShaderClass
     drawEnd()
     {
         let gl=this.view.gl;
-
+        
             // disable vertex attributes
 
         gl.disableVertexAttribArray(this.vertexPositionAttribute);
@@ -90,5 +85,5 @@ export default class MapLiquidShaderClass extends ShaderClass
 
         gl.useProgram(null);
     }
-
 }
+

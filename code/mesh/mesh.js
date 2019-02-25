@@ -11,22 +11,23 @@ import CollisionTrigClass from '../utility/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,vertexList,indexes,flag)
+    constructor(view,name,bitmap,vertexList,vertexArray,indexes)
     {
         this.view=view;
         this.name=name;
         this.bitmap=bitmap;
         this.vertexList=vertexList;
         this.indexes=indexes;
-        this.flag=flag;
         
-        this.vertexCount=this.vertexList.length;
+        this.vertexArray=vertexArray;
+        
+        this.vertexCount=(vertexArray===null)?this.vertexList.length:this.vertexArray.length;
         this.indexCount=this.indexes.length;
         this.trigCount=Math.trunc(this.indexCount/3);
         
             // need 16 or 32 bit indexes?
             
-        this.need32BitIndexes=(this.vertexCount>0xFFFF);
+        this.need32BitIndexes=(indexes.constructor.name==='Uint32Array');
         
             // center and bounds
             
@@ -34,11 +35,6 @@ export default class MeshClass
         this.xBound=new BoundClass(0,0);
         this.yBound=new BoundClass(0,0);
         this.zBound=new BoundClass(0,0);
-
-            // non-culled index list
-
-        this.nonCulledIndexCount=0;
-        this.nonCulledIndexes=null;
 
             // drawing arrays
 
@@ -74,10 +70,6 @@ export default class MeshClass
             // global variables to stop GCd
 
         this.rotVector=new PointClass(0.0,0.0,0.0);
-        this.rotNormal=new PointClass(0.0,0.0,0.0);
-        this.parentRotVector=new PointClass(0.0,0.0,0.0);
-        this.parentRotNormal=new PointClass(0.0,0.0,0.0);
-        
         this.rotCenterPnt=new PointClass(0.0,0.0,0.0);
         
         Object.seal(this);
@@ -184,28 +176,6 @@ export default class MeshClass
         this.center.z/=this.vertexCount;
     }
     
-        //
-        // precalcs the vector from the bone animations
-        // it relies on the skeleton having the pose setup
-        // as the neutral pose
-        //
-        
-    precalcAnimationValues(skeleton)
-    {
-        let n,k,v,bone,connect;
-
-        for (n=0;n!==this.vertexCount;n++) {
-            v=this.vertexList[n];
-            
-            for (k=0;k!==v.boneConnects.length;k++) {
-                connect=v.boneConnects[k];
-
-                bone=skeleton.bones[connect.boneIdx];
-                connect.vectorFromBone.setFromSubPoint(v.position,bone.curPosePosition);
-            }
-        }
-    }
-
         //
         // collision geometry
         //
@@ -447,15 +417,9 @@ export default class MeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.drawUVs,gl.STATIC_DRAW);
 
-            // opaque meshes have dynamic indexes,
-            // transparent meshes always draw all trigs
-            
         this.indexBuffer=gl.createBuffer();
-        
-        if (this.isTransparent()) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
-        }
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
     }
 
     bindBuffers(shader)
@@ -474,11 +438,7 @@ export default class MeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
-            // opaque meshes have dynamic indexes,
-            // transparent meshes always draw all trigs
-            
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        if (!this.isTransparent()) gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.nonCulledIndexes,gl.DYNAMIC_DRAW);
     }
     
         //
@@ -537,246 +497,7 @@ export default class MeshClass
             this.requiresNormalBufferUpdate=false;
         }
     }
-    
-        //
-        // set vertices to pose and offset position
-        //
-        
-    updateVertexesToPoseAndPosition(skeleton,angle,position)
-    {
-        let n,v,x,y,z,vIdx,nIdx;
-        let bone,parentBone;
-        let gl=this.view.gl;
-        
-        return; // supergumba -- all needs to be redone with matrixes
-        
-            // we recalc the bounds while
-            // we move model around
-        
-        v=this.vertexList[0];
-        
-        this.center.setFromValues(0,0,0);
-        this.xBound.setFromValues(v.position.x,v.position.x);
-        this.yBound.setFromValues(v.position.y,v.position.y);
-        this.zBound.setFromValues(v.position.z,v.position.z);
-        
-            // move all the vertexes
             
-        vIdx=0;
-        nIdx=0;
-        
-        for (n=0;n!==this.vertexCount;n++) {
-            v=this.vertexList[n];
-            
-                // bone movement
-                
-            bone=skeleton.bones[v.boneIdx];
-                
-            this.rotVector.setFromPoint(v.vectorFromBone);
-            this.rotVector.rotate(bone.curPoseAngle);
-            
-            this.rotVector.x=bone.curPosePosition.x+this.rotVector.x;
-            this.rotVector.y=bone.curPosePosition.y+this.rotVector.y;
-            this.rotVector.z=bone.curPosePosition.z+this.rotVector.z;
-            
-            this.rotNormal.setFromPoint(v.normal);
-            this.rotNormal.rotate(bone.curPoseAngle);
-            
-                // average in any parent movement
-                
-            if (v.parentBoneIdx!==-1) {
-                parentBone=skeleton.bones[v.parentBoneIdx];
-                
-                this.parentRotVector.setFromPoint(v.vectorFromParentBone);
-                this.parentRotVector.rotate(parentBone.curPoseAngle);
-
-                this.parentRotVector.x=parentBone.curPosePosition.x+this.parentRotVector.x;
-                this.parentRotVector.y=parentBone.curPosePosition.y+this.parentRotVector.y;
-                this.parentRotVector.z=parentBone.curPosePosition.z+this.parentRotVector.z;
-
-                this.parentRotNormal.setFromPoint(v.normal);
-                this.parentRotNormal.rotate(parentBone.curPoseAngle);
-                
-                this.rotVector.average(this.parentRotVector);
-                this.rotNormal.average(this.parentRotNormal);
-            }    
-            
-                // whole model movement
-   
-            this.rotVector.rotate(angle);
-            
-            x=this.rotVector.x+position.x;
-            y=this.rotVector.y+position.y;
-            z=this.rotVector.z+position.z;
-            
-            this.drawVertices[vIdx++]=x;
-            this.drawVertices[vIdx++]=y;
-            this.drawVertices[vIdx++]=z;
-            
-            this.rotNormal.rotate(angle);
-            
-            this.drawNormals[nIdx++]=this.rotNormal.x;
-            this.drawNormals[nIdx++]=this.rotNormal.y;
-            this.drawNormals[nIdx++]=this.rotNormal.z;
-             
-                // adjust bounding
-                
-            this.center.addValues(x,y,z);
-            this.xBound.adjust(x);
-            this.yBound.adjust(y);
-            this.zBound.adjust(z);
-        }
-        
-            // set the buffers
-            
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.DYNAMIC_DRAW);
-        
-            // finish with the center
-            
-        this.center.x/=this.vertexCount;
-        this.center.y/=this.vertexCount;
-        this.center.z/=this.vertexCount;
-    }
-    
-        //
-        // set vertices to ang and offset position
-        //
-        
-    updateVertexesToAngleAndPosition(angle,position)
-    {
-        let n,v,x,y,z,vIdx,nIdx;
-        let gl=this.view.gl;
-        
-            // we recalc the bounds while
-            // we move model around
-            
-        v=this.vertexList[0];
-        
-        this.center.setFromValues(0,0,0);
-        this.xBound.setFromValues(v.position.x,v.position.x);
-        this.yBound.setFromValues(v.position.y,v.position.y);
-        this.zBound.setFromValues(v.position.z,v.position.z);
-        
-            // move all the vertexes
-            
-        vIdx=0;
-        nIdx=0;
-        
-        for (n=0;n!==this.vertexCount;n++) {
-            v=this.vertexList[n];
-            
-                // animate vertexes
-                
-            this.rotVector.setFromPoint(v.position);
-            this.rotVector.rotate(angle);
-            
-            x=this.rotVector.x+position.x;
-            y=this.rotVector.y+position.y;
-            z=this.rotVector.z+position.z;
-            
-            this.drawVertices[vIdx++]=x;
-            this.drawVertices[vIdx++]=y;
-            this.drawVertices[vIdx++]=z;
-            
-            this.rotNormal.setFromPoint(v.normal);
-            this.rotNormal.rotate(angle);
-            
-            this.drawNormals[nIdx++]=this.rotNormal.x;
-            this.drawNormals[nIdx++]=this.rotNormal.y;
-            this.drawNormals[nIdx++]=this.rotNormal.z;
-            
-                // adjust bounding
-                
-            this.center.addValues(x,y,z);
-            this.xBound.adjust(x);
-            this.yBound.adjust(y);
-            this.zBound.adjust(z);
-        }
-        
-            // set the buffers
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.DYNAMIC_DRAW);
-        
-            // finish with the center
-            
-        this.center.x/=this.vertexCount;
-        this.center.y/=this.vertexCount;
-        this.center.z/=this.vertexCount;
-    }
-    
-        //
-        // build an index list of triangles that aren't
-        // culled
-        //
-        
-    buildNonCulledTriangleIndexes()
-    {
-        let n,x,y,z,nx,ny,nz;
-        let f,idx,drawIdx;
-
-            // if it's the first time, we'll need
-            // to create the index array
-            
-        this.nonCulledIndexCount=0;
-        if (this.nonCulledIndexes===null) {
-            if (this.need32BitIndexes) {
-                this.nonCulledIndexes=new Uint32Array(this.indexCount);
-            }
-            else {
-                this.nonCulledIndexes=new Uint16Array(this.indexCount);
-            }
-        } 
-        
-            // build it out of triangles
-            // that aren't normal culled, i.e.,
-            // have normals facing away from the eye
-            // which is the dot product between the normal
-            // and the vector from trig to eye point
-            
-            // all this is unwrapped (instead of using classes)
-            // for speed reasons
-        
-        idx=0;
-        
-        for (n=0;n!==this.trigCount;n++) {
-            
-                // vector from trig to eye point
-            
-            drawIdx=this.indexes[idx]*3;
-            x=this.drawVertices[drawIdx]-this.view.camera.position.x;     // cullTrigToEyeVector.setFromSubPoint(draw.position,this.view.camera.position)
-            nx=this.drawNormals[drawIdx++];
-            y=this.drawVertices[drawIdx]-this.view.camera.position.y;
-            ny=this.drawNormals[drawIdx++];
-            z=this.drawVertices[drawIdx]-this.view.camera.position.z;
-            nz=this.drawNormals[drawIdx++];
-            
-            f=Math.sqrt((x*x)+(y*y)+(z*z));   // cullTrigToEyeVector.normalize();
-            if (f!==0.0) f=1.0/f;
-        
-            x=x*f;
-            y=y*f;
-            z=z*f;
-            
-                // dot product
-                
-            if (((x*nx)+(y*ny)+(z*nz))<=this.view.VIEW_NORMAL_CULL_LIMIT) {      // this.cullTrigToEyeVector.dot(draw.normal)
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx];
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+1];
-                this.nonCulledIndexes[this.nonCulledIndexCount++]=this.indexes[idx+2];
-            }    
-        
-            idx+=3;
-        }
-    }
-    
         //
         // mesh drawing
         //
@@ -785,7 +506,7 @@ export default class MeshClass
     {
         let gl=this.view.gl;
         
-        gl.drawElements(gl.TRIANGLES,this.nonCulledIndexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
+        gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
             
         this.view.drawMeshCount++;
     }

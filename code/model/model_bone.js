@@ -23,6 +23,7 @@ export default class ModelBoneClass
 
         this.curPosePosition=new PointClass(0.0,0.0,0.0);
         this.curPoseChildBoneQuat=new QuaternionClass();
+        this.curPoseChildBoneScale=new PointClass(1.0,1.0,1.0);
 
         this.prevPoseAngle=new PointClass(0.0,0.0,0.0);
         this.nextPoseAngle=new PointClass(0.0,0.0,0.0);

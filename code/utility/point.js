@@ -96,6 +96,27 @@ export default class PointClass
         this.z-=pt.z;
     }
     
+    multiply(pt)
+    {
+        this.x*=pt.x;
+        this.y*=pt.y;
+        this.z*=pt.z;
+    }
+    
+    setFromMultiply(pt1,pt2)
+    {
+        this.x=pt1.x*pt2.x;
+        this.y=pt1.y*pt2.y;
+        this.z=pt1.z*pt2.z;
+    }
+    
+    multiplyValues(x,y,z)
+    {
+        this.x*=x;
+        this.y*=y;
+        this.z*=z;
+    }
+    
     tween(pt1,pt2,factor)
     {
         this.x=pt1.x+(pt2.x-pt1.x)*factor;
@@ -300,6 +321,13 @@ export default class PointClass
             this.z+=centerPt.z;
         }
     }
+    
+    translationFromMatrix(mat)
+    {
+        this.x=mat.data[12];
+        this.y=mat.data[13];
+        this.z=mat.data[14];
+    }
                 
     noSquareDistance(pt)
     {
@@ -398,6 +426,13 @@ export default class PointClass
         this.x=x+pt.x;
         this.y=y+pt.y;
         this.z=z+pt.z;
+    }
+    
+    scaleFromMatrix(mat)
+    {
+        this.x=Math.sqrt((mat.data[0]*mat.data[0])+(mat.data[1]*mat.data[1])+(mat.data[2]*mat.data[2]));
+        this.y=Math.sqrt((mat.data[4]*mat.data[4])+(mat.data[5]*mat.data[5])+(mat.data[6]*mat.data[6]));
+        this.z=Math.sqrt((mat.data[8]*mat.data[8])+(mat.data[9]*mat.data[9])+(mat.data[10]*mat.data[10]));
     }
     
     matrixMultiply(mat)
