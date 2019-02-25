@@ -31,8 +31,8 @@ export default class MapLiquidClass
         
             // null buffers
 
-        this.vertexPosBuffer=null;
-        this.vertexUVBuffer=null;
+        this.vertexBuffer=null;
+        this.uvBuffer=null;
         this.indexBuffer=null;
         
         this.vertices=null;
@@ -54,8 +54,8 @@ export default class MapLiquidClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
 
-        if (this.vertexPosBuffer!==null) gl.deleteBuffer(this.vertexPosBuffer);
-        if (this.vertexUVBuffer!==null) gl.deleteBuffer(this.vertexUVBuffer);
+        if (this.vertexBuffer!==null) gl.deleteBuffer(this.vertexBuffer);
+        if (this.uvBuffer!==null) gl.deleteBuffer(this.uvBuffer);
         
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     }
@@ -124,8 +124,8 @@ export default class MapLiquidClass
         
             // create the buffers
             
-        this.vertexPosBuffer=gl.createBuffer();
-        this.vertexUVBuffer=gl.createBuffer();
+        this.vertexBuffer=gl.createBuffer();
+        this.uvBuffer=gl.createBuffer();
         this.indexBuffer=gl.createBuffer();
         
             // get liquid vertex size
@@ -180,11 +180,11 @@ export default class MapLiquidClass
             // water vertices and UVs are always moving
             // so always update these buffers
             
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
         gl.vertexAttribPointer(this.view.shaderList.mapLiquidShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.DYNAMIC_DRAW);
         gl.vertexAttribPointer(this.view.shaderList.mapLiquidShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 

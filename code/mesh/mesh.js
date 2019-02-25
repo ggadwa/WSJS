@@ -2,7 +2,6 @@ import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
 import LineClass from '../utility/line.js';
 import BoundClass from '../utility/bound.js';
-import MeshVertexClass from '../mesh/mesh_vertex.js';
 import CollisionTrigClass from '../utility/collision_trig.js';
 
 //
@@ -11,23 +10,26 @@ import CollisionTrigClass from '../utility/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,vertexList,vertexArray,indexes)
+    constructor(view,name,bitmap,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
         this.view=view;
         this.name=name;
         this.bitmap=bitmap;
-        this.vertexList=vertexList;
-        this.indexes=indexes;
+        this.vertexArray=vertexArray;       // expected Float32Array
+        this.normalArray=normalArray;       // expected Float32Array
+        this.tangentArray=tangentArray;     // expected Float32Array
+        this.uvArray=uvArray;               // expected Float32Array
+        this.jointArray=jointArray;         // expected Uint16/32Array or null
+        this.weightArray=weightArray;       // expected Float32Array or null
+        this.indexArray=indexArray;         // expected Uint16/32Array
         
-        this.vertexArray=vertexArray;
-        
-        this.vertexCount=(vertexArray===null)?this.vertexList.length:this.vertexArray.length;
-        this.indexCount=this.indexes.length;
+        this.vertexCount=this.vertexArray.length;
+        this.indexCount=this.indexArray.length;
         this.trigCount=Math.trunc(this.indexCount/3);
         
             // need 16 or 32 bit indexes?
             
-        this.need32BitIndexes=(indexes.constructor.name==='Uint32Array');
+        this.need32BitIndexes=(indexArray.constructor.name==='Uint32Array');
         
             // center and bounds
             
@@ -45,10 +47,10 @@ export default class MeshClass
 
             // null buffers
 
-        this.vertexPosBuffer=null;
-        this.vertexNormalBuffer=null;
-        this.vertexTangentBuffer=null;
-        this.vertexUVBuffer=null;
+        this.vertexBuffer=null;
+        this.normalBuffer=null;
+        this.tangentBuffer=null;
+        this.uvBuffer=null;
         this.indexBuffer=null;
 
             // collision lists
@@ -69,8 +71,10 @@ export default class MeshClass
         
             // global variables to stop GCd
 
+        this.rotPoint=new PointClass(0,0,0);
         this.rotVector=new PointClass(0.0,0.0,0.0);
         this.rotCenterPnt=new PointClass(0.0,0.0,0.0);
+        this.rotNormal=new PointClass(0,0,0);
         
         Object.seal(this);
     }
@@ -86,10 +90,10 @@ export default class MeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
 
-        if (this.vertexPosBuffer!==null) gl.deleteBuffer(this.vertexPosBuffer);
-        if (this.vertexNormalBuffer!==null) gl.deleteBuffer(this.vertexNormalBuffer);
-        if (this.vertexTangentBuffer!==null) gl.deleteBuffer(this.vertexTangentBuffer);
-        if (this.vertexUVBuffer!==null) gl.deleteBuffer(this.vertexUVBuffer);
+        if (this.vertexBuffer!==null) gl.deleteBuffer(this.vertexBuffer);
+        if (this.normalBuffer!==null) gl.deleteBuffer(this.normalBuffer);
+        if (this.tangentBuffer!==null) gl.deleteBuffer(this.tangentBuffer);
+        if (this.uvBuffer!==null) gl.deleteBuffer(this.uvBuffer);
 
         if (this.indexBuffer!==null) gl.deleteBuffer(this.indexBuffer);
     }
@@ -153,44 +157,50 @@ export default class MeshClass
 
     setupBounds()
     {
-        let n;
-        let v=this.vertexList[0];
+        let n,count;
+        let x=this.vertexArray[0];
+        let y=this.vertexArray[1];
+        let z=this.vertexArray[2];
         
-        this.center.setFromValues(v.position.x,v.position.y,v.position.z);
-        this.xBound.setFromValues(v.position.x,v.position.x);
-        this.yBound.setFromValues(v.position.y,v.position.y);
-        this.zBound.setFromValues(v.position.z,v.position.z);
+        this.center.setFromValues(x,y,z);
+        this.xBound.setFromValues(x,x);
+        this.yBound.setFromValues(y,y);
+        this.zBound.setFromValues(z,z);
 
-        for (n=1;n<this.vertexCount;n++) {
-            v=this.vertexList[n];
+        for (n=3;n<this.vertexCount;n+=3) {
+            x=this.vertexArray[n];
+            y=this.vertexArray[n+1];
+            z=this.vertexArray[n+2];
             
-            this.center.addPoint(v.position);
+            this.center.addValues(x,y,z);
 
-            this.xBound.adjust(v.position.x);
-            this.yBound.adjust(v.position.y);
-            this.zBound.adjust(v.position.z);
+            this.xBound.adjust(x);
+            this.yBound.adjust(y);
+            this.zBound.adjust(z);
         }
 
-        this.center.x/=this.vertexCount;
-        this.center.y/=this.vertexCount;
-        this.center.z/=this.vertexCount;
+        count=Math.trunc(this.vertexCount/3);
+        
+        this.center.x/=count;
+        this.center.y/=count;
+        this.center.z/=count;
     }
     
         //
         // collision geometry
         //
 
-    buildCollisionGeometryLine(v0,v1,v2)
+    buildCollisionGeometryLine(x0,y0,z0,x1,y1,z1,x2,y2,z2)
     {
         let n,nLine,line;
         
             // create the line
 
-        if (v0.y===v1.y) {
-            line=new LineClass(v0.position.copy(),v2.position.copy());
+        if (y0===y1) {
+            line=new LineClass(new PointClass(x0,y0,z0),new PointClass(x2,y2,z2));
         }
         else {
-            line=new LineClass(v0.position.copy(),v1.position.copy());
+            line=new LineClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1));
         }
 
             // is line already in list?
@@ -209,8 +219,8 @@ export default class MeshClass
     buildCollisionGeometry()
     {
         let n,ny;
-        let tIdx;
-        let v0,v1,v2;
+        let tIdx,vIdx,nIdx;
+        let x0,y0,z0,x1,y1,z1,x2,y2,z2;
         
             // run through the triangles
             // and find any that make a wall to
@@ -223,30 +233,42 @@ export default class MeshClass
             
                 // get trig vertices
 
-            v0=this.vertexList[this.indexes[tIdx++]];
-            v1=this.vertexList[this.indexes[tIdx++]];
-            v2=this.vertexList[this.indexes[tIdx++]];
+            vIdx=this.indexArray[tIdx]*3;
+            x0=this.vertexArray[vIdx];
+            y0=this.vertexArray[vIdx+1];
+            z0=this.vertexArray[vIdx+2];
             
-            ny=v0.normal.y;
+            vIdx=this.indexArray[tIdx+1]*3;
+            x1=this.vertexArray[vIdx];
+            y1=this.vertexArray[vIdx+1];
+            z1=this.vertexArray[vIdx+2];
+            
+            vIdx=this.indexArray[tIdx+2]*3;
+            x2=this.vertexArray[vIdx];
+            y2=this.vertexArray[vIdx+1];
+            z2=this.vertexArray[vIdx+2];
+            
+            nIdx=this.indexArray[tIdx*3];
+            ny=this.normalArray[nIdx+1];
             
                 // detect if triangle is a floor
                 
-            if (ny<=-0.7) {
-                this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(v0.position.x,v0.position.y,v0.position.z),new PointClass(v1.position.x,v1.position.y,v1.position.z),new PointClass(v2.position.x,v2.position.y,v2.position.z)));
+            if (ny>=0.7) {
+                this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
             }
             
                 // detect if triangle is a ceiling
                 
             else {
-                if (ny>=0.7) {
-                    this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(v0.position.x,v0.position.y,v0.position.z),new PointClass(v1.position.x,v1.position.y,v1.position.z),new PointClass(v2.position.x,v2.position.y,v2.position.z)));
+                if (ny<=-0.7) {
+                    this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
                 }
 
                     // detect if triangle is wall like
 
                 else {
                     if (Math.abs(ny)<=0.3) {
-                        this.buildCollisionGeometryLine(v0,v1,v2);
+                        this.buildCollisionGeometryLine(x0,y0,z0,x1,y1,z1,x2,y2,z2);
                     }
                 }
             }
@@ -264,8 +286,10 @@ export default class MeshClass
         
             // move the vertexes
             
-        for (n=0;n!==this.vertexCount;n++) {
-            this.vertexList[n].position.addPoint(movePnt);
+        for (n=0;n<this.vertexCount;n+=3) {
+            this.vertexArray[n]+=movePnt.x;
+            this.vertexArray[n+1]+=movePnt.y;
+            this.vertexArray[n+2]+=movePnt.z;
         }
         
             // update the collision boxes
@@ -303,40 +327,51 @@ export default class MeshClass
     
     rotate(rotateAngle,offsetPnt)
     {
-        let n,v;
+        let n,x,y,z;
         
             // have to rebuild the bounds during rotate
             // note: for now we don't move the center
             // as it'll mess up the rotation
             
-        v=this.vertexList[0];
+        x=this.vertexArray[0];
+        y=this.vertexArray[1];
+        z=this.vertexArray[2];
         
-        this.xBound.setFromValues(v.position.x,v.position.x);
-        this.yBound.setFromValues(v.position.y,v.position.y);
-        this.zBound.setFromValues(v.position.z,v.position.z);
+        this.xBound.setFromValues(x,x);
+        this.yBound.setFromValues(y,y);
+        this.zBound.setFromValues(z,z);
         
             // rotate the vertexes
             
         this.rotCenterPnt.setFromAddPoint(this.center,offsetPnt);
         
-        for (n=0;n!==this.vertexCount;n++) {
-            v=this.vertexList[n];
+        for (n=0;n<this.vertexCount;n+=3) {
+            this.rotPoint.setFromValues(this.vertexArray[n],this.vertexArray[n+1],this.vertexArray[n+2]);
             
                 // the point
                 
-            this.rotVector.setFromSubPoint(v.position,this.rotCenterPnt);
+            this.rotVector.setFromSubPoint(this.rotPoint,this.rotCenterPnt);
             this.rotVector.rotate(rotateAngle);
-            v.position.setFromAddPoint(this.rotCenterPnt,this.rotVector);
+            this.rotPoint.setFromAddPoint(this.rotCenterPnt,this.rotVector);
+            
+            this.vertexArray[n]=this.rotPoint.x;
+            this.vertexArray[n+1]=this.rotPoint.y;
+            this.vertexArray[n+2]=this.rotPoint.z;
             
                 // the normal
-                
-            v.normal.rotate(rotateAngle);
+             
+            this.rotNormal.setFromValues(this.normalArray[n],this.normalArray[n+1],this.normalArray[n+2]);
+            this.rotNormal.rotate(rotateAngle);
+            
+            this.normalArray[n]=this.rotNormal.x;
+            this.normalArray[n+1]=this.rotNormal.y;
+            this.normalArray[n+2]=this.rotNormal.z;
             
                 // rebuild the bounds while here
                 
-            this.xBound.adjust(v.position.x);
-            this.yBound.adjust(v.position.y);
-            this.zBound.adjust(v.position.z);
+            this.xBound.adjust(this.rotPoint.x);
+            this.yBound.adjust(this.rotPoint.y);
+            this.zBound.adjust(this.rotPoint.z);
         }
         
             // and mark as requiring a
@@ -361,81 +396,45 @@ export default class MeshClass
 
     setupBuffers()
     {
-        let n,v;
-        let vIdx,uIdx,nIdx,tIdx;
         let gl=this.view.gl;
         
-            // build the default data
-            // from the vertex list
-        
-        this.drawVertices=new Float32Array(this.vertexCount*3);
-        this.drawNormals=new Float32Array(this.vertexCount*3);
-        this.drawTangents=new Float32Array(this.vertexCount*3);
-        this.drawUVs=new Float32Array(this.vertexCount*2);
-        
-        vIdx=0;
-        uIdx=0;
-        nIdx=0;
-        tIdx=0;
-        
-        for (n=0;n!==this.vertexCount;n++) {
-            v=this.vertexList[n];
-            
-            this.drawVertices[vIdx++]=v.position.x;
-            this.drawVertices[vIdx++]=v.position.y;
-            this.drawVertices[vIdx++]=v.position.z;
-            
-            this.drawNormals[nIdx++]=v.normal.x;
-            this.drawNormals[nIdx++]=v.normal.y;
-            this.drawNormals[nIdx++]=v.normal.z;
-            
-            this.drawTangents[tIdx++]=v.tangent.x;
-            this.drawTangents[tIdx++]=v.tangent.y;
-            this.drawTangents[tIdx++]=v.tangent.z;
-            
-            this.drawUVs[uIdx++]=v.uv.x;
-            this.drawUVs[uIdx++]=v.uv.y;
-        }
-
             // create all the buffers
-            // expects buffers to already be Float32Array
-            // or Uint32Array
 
-        this.vertexPosBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.STATIC_DRAW);
+        this.vertexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.STATIC_DRAW);
 
-        this.vertexNormalBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.STATIC_DRAW);
+        this.normalBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.normalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.normalArray,gl.STATIC_DRAW);
 
-        this.vertexTangentBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawTangents,gl.STATIC_DRAW);
+        this.tangentBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.tangentBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.tangentArray,gl.STATIC_DRAW);
 
-        this.vertexUVBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.drawUVs,gl.STATIC_DRAW);
+        this.uvBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STATIC_DRAW);
 
         this.indexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.STATIC_DRAW);
     }
 
     bindBuffers(shader)
     {
         let gl=this.view.gl;
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.normalBuffer);
         gl.vertexAttribPointer(shader.vertexNormalAttribute,3,gl.FLOAT,false,0,0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexTangentBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.tangentBuffer);
         gl.vertexAttribPointer(shader.vertexTangentAttribute,3,gl.FLOAT,false,0,0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexUVBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
@@ -450,25 +449,13 @@ export default class MeshClass
         
     updateBuffers()
     {
-        let n,v,vIdx;
         let gl=this.view.gl;
         
             // vertex buffer updates
             
         if (this.requiresVertexBufferUpdate) {
-        
-            vIdx=0;
-
-            for (n=0;n!==this.vertexCount;n++) {
-                v=this.vertexList[n];
-
-                this.drawVertices[vIdx++]=v.position.x;
-                this.drawVertices[vIdx++]=v.position.y;
-                this.drawVertices[vIdx++]=v.position.z;
-            }
-
-            gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER,this.drawVertices,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
 
                 // mark as updated
 
@@ -478,19 +465,8 @@ export default class MeshClass
              // normal buffer updates
             
         if (this.requiresNormalBufferUpdate) {
-        
-            vIdx=0;
-
-            for (n=0;n!==this.vertexCount;n++) {
-                v=this.vertexList[n];
-
-                this.drawNormals[vIdx++]=v.normal.x;
-                this.drawNormals[vIdx++]=v.normal.y;
-                this.drawNormals[vIdx++]=v.normal.z;
-            }
-
-            gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexNormalBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER,this.drawNormals,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+            gl.bindBuffer(gl.ARRAY_BUFFER,this.normalBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER,this.normalArray,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
 
                 // mark as updated
 

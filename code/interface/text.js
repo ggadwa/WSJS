@@ -34,12 +34,12 @@ export default class TextClass
 
             // drawing objects
 
-        this.vertices=null;
-        this.uvs=null;
-        this.indexes=null;
+        this.vertexArray=null;
+        this.uvArray=null;
+        this.indexArray=null;
 
-        this.vertexPosBuffer=null;
-        this.uvPosBuffer=null;
+        this.vertexBuffer=null;
+        this.uvBuffer=null;
         this.indexBuffer=null;
         
         Object.seal(this);
@@ -106,14 +106,14 @@ export default class TextClass
             // character drawing, we do this because
             // doing this inline would be expensive
             
-        this.vertices=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
-        this.uvs=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
-        this.indexes=new Uint16Array((this.TEXT_MAX_STRING_LEN*2)*3);
+        this.vertexArray=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
+        this.uvArray=new Float32Array((this.TEXT_MAX_STRING_LEN*4)*2);
+        this.indexArray=new Uint16Array((this.TEXT_MAX_STRING_LEN*2)*3);
         
             // and finally the vbos
             
-        this.vertexPosBuffer=gl.createBuffer();
-        this.uvPosBuffer=gl.createBuffer();
+        this.vertexBuffer=gl.createBuffer();
+        this.uvBuffer=gl.createBuffer();
         this.indexBuffer=gl.createBuffer();
 
         return(true);
@@ -125,12 +125,12 @@ export default class TextClass
         
             // remove vbos
             
-        this.vertices=null;
-        this.uvs=null;
-        this.indexes=null;
+        this.vertexArray=null;
+        this.uvArray=null;
+        this.indexArray=null;
 
-        gl.deleteBuffer(this.vertexPosBuffer);
-        gl.deleteBuffer(this.uvPosBuffer);
+        gl.deleteBuffer(this.vertexBuffer);
+        gl.deleteBuffer(this.uvBuffer);
         gl.deleteBuffer(this.indexBuffer);
 
             // shut down the texture
@@ -221,7 +221,7 @@ export default class TextClass
         ty=y-charHigh;
         by=y;
 
-            // build the vertices
+            // build the vertexes
 
         nTrig=len*2;            // 2 triangles for every character
 
@@ -236,35 +236,35 @@ export default class TextClass
         for (n=0;n!==len;n++) {
             x2=x+charWid;
 
-            this.vertices[vIdx++]=x;
-            this.vertices[vIdx++]=ty;
-            this.vertices[vIdx++]=x2;
-            this.vertices[vIdx++]=ty;
-            this.vertices[vIdx++]=x2;
-            this.vertices[vIdx++]=by;
-            this.vertices[vIdx++]=x;
-            this.vertices[vIdx++]=by;
+            this.vertexArray[vIdx++]=x;
+            this.vertexArray[vIdx++]=ty;
+            this.vertexArray[vIdx++]=x2;
+            this.vertexArray[vIdx++]=ty;
+            this.vertexArray[vIdx++]=x2;
+            this.vertexArray[vIdx++]=by;
+            this.vertexArray[vIdx++]=x;
+            this.vertexArray[vIdx++]=by;
 
             cIdx=str.charCodeAt(n)-32;
             gx=((cIdx%this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_WIDTH)/this.TEXT_TEXTURE_WIDTH;
             gy=(Math.trunc(cIdx/this.TEXT_CHAR_PER_ROW)*this.TEXT_CHAR_HEIGHT)/this.TEXT_TEXTURE_HEIGHT;
 
-            this.uvs[uvIdx++]=gx;
-            this.uvs[uvIdx++]=gy;
-            this.uvs[uvIdx++]=(gx+gxAdd);
-            this.uvs[uvIdx++]=gy;
-            this.uvs[uvIdx++]=(gx+gxAdd);
-            this.uvs[uvIdx++]=(gy+gyAdd);
-            this.uvs[uvIdx++]=gx;
-            this.uvs[uvIdx++]=(gy+gyAdd);
+            this.uvArray[uvIdx++]=gx;
+            this.uvArray[uvIdx++]=gy;
+            this.uvArray[uvIdx++]=(gx+gxAdd);
+            this.uvArray[uvIdx++]=gy;
+            this.uvArray[uvIdx++]=(gx+gxAdd);
+            this.uvArray[uvIdx++]=(gy+gyAdd);
+            this.uvArray[uvIdx++]=gx;
+            this.uvArray[uvIdx++]=(gy+gyAdd);
 
-            this.indexes[iIdx++]=elementIdx;     // triangle 1
-            this.indexes[iIdx++]=elementIdx+1;
-            this.indexes[iIdx++]=elementIdx+2;
+            this.indexArray[iIdx++]=elementIdx;     // triangle 1
+            this.indexArray[iIdx++]=elementIdx+1;
+            this.indexArray[iIdx++]=elementIdx+2;
 
-            this.indexes[iIdx++]=elementIdx;     // triangle 2
-            this.indexes[iIdx++]=elementIdx+2;
-            this.indexes[iIdx++]=elementIdx+3;
+            this.indexArray[iIdx++]=elementIdx;     // triangle 2
+            this.indexArray[iIdx++]=elementIdx+2;
+            this.indexArray[iIdx++]=elementIdx+3;
 
             elementIdx+=4;
             
@@ -280,20 +280,20 @@ export default class TextClass
 
             // setup the buffers
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.STREAM_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.view.shaderList.textShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.view.shaderList.textShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.STREAM_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.view.shaderList.textShader.vertexUVAttribute);
         gl.vertexAttribPointer(this.view.shaderList.textShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STREAM_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.STREAM_DRAW);
 
             // draw the indexes
 

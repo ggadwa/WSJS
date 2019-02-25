@@ -10,8 +10,8 @@ export default class InterfaceClass
     {
         this.view=view;
         
-        this.rectVertices=new Float32Array(12);         // local to global to avoid GCd
-        this.vertexPosBuffer=null;
+        this.rectVertexArray=new Float32Array(12);         // local to global to avoid GCd
+        this.vertexBuffer=null;
         
         Object.seal(this);
     }
@@ -22,13 +22,13 @@ export default class InterfaceClass
 
     initialize()
     {
-        this.vertexPosBuffer=this.view.gl.createBuffer();
+        this.vertexBuffer=this.view.gl.createBuffer();
         return(true);
     }
 
     release()
     {
-        this.view.gl.deleteBuffer(this.vertexPosBuffer);
+        this.view.gl.deleteBuffer(this.vertexBuffer);
     }
 
         //
@@ -61,16 +61,16 @@ export default class InterfaceClass
     {
         let gl=this.view.gl;
         
-            // vertices
+            // vertexes
             
-        this.rectVertices[0]=rect.lft;
-        this.rectVertices[1]=rect.top;
-        this.rectVertices[2]=rect.rgt;
-        this.rectVertices[3]=rect.top;
-        this.rectVertices[4]=rect.rgt;
-        this.rectVertices[5]=rect.bot;
-        this.rectVertices[6]=rect.lft;
-        this.rectVertices[7]=rect.bot;
+        this.rectVertexArray[0]=rect.lft;
+        this.rectVertexArray[1]=rect.top;
+        this.rectVertexArray[2]=rect.rgt;
+        this.rectVertexArray[3]=rect.top;
+        this.rectVertexArray[4]=rect.rgt;
+        this.rectVertexArray[5]=rect.bot;
+        this.rectVertexArray[6]=rect.lft;
+        this.rectVertexArray[7]=rect.bot;
         
             // setup the color
             
@@ -78,8 +78,8 @@ export default class InterfaceClass
 
             // setup the buffers
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertices,gl.STREAM_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertexArray,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.view.shaderList.interfaceShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.view.shaderList.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
@@ -97,21 +97,21 @@ export default class InterfaceClass
     {
         let gl=this.view.gl;
         
-            // vertices
+            // vertexes
             
-        this.rectVertices[0]=rect.lft;
-        this.rectVertices[1]=rect.top;
-        this.rectVertices[2]=rect.rgt;
-        this.rectVertices[3]=rect.top;
-        this.rectVertices[4]=rect.lft;
-        this.rectVertices[5]=rect.bot;
+        this.rectVertexArray[0]=rect.lft;
+        this.rectVertexArray[1]=rect.top;
+        this.rectVertexArray[2]=rect.rgt;
+        this.rectVertexArray[3]=rect.top;
+        this.rectVertexArray[4]=rect.lft;
+        this.rectVertexArray[5]=rect.bot;
         
-        this.rectVertices[6]=rect.rgt;
-        this.rectVertices[7]=rect.top;
-        this.rectVertices[8]=rect.rgt;
-        this.rectVertices[9]=rect.bot;
-        this.rectVertices[10]=rect.lft;
-        this.rectVertices[11]=rect.bot;
+        this.rectVertexArray[6]=rect.rgt;
+        this.rectVertexArray[7]=rect.top;
+        this.rectVertexArray[8]=rect.rgt;
+        this.rectVertexArray[9]=rect.bot;
+        this.rectVertexArray[10]=rect.lft;
+        this.rectVertexArray[11]=rect.bot;
         
             // setup the color
             
@@ -119,8 +119,8 @@ export default class InterfaceClass
 
             // setup the buffers
 
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertices,gl.STREAM_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertexArray,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.view.shaderList.interfaceShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.view.shaderList.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);

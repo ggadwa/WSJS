@@ -4,8 +4,6 @@ import Point2DClass from '../utility/2D_point.js';
 import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
-import MeshVertexClass from '../mesh/mesh_vertex.js';
-import MeshVertexBoneConnectClass from '../mesh/mesh_vertex_bone_connect.js';
 import MeshClass from '../mesh/mesh.js';
 import ModelBoneClass from '../model/model_bone.js';
 
@@ -219,17 +217,15 @@ export default class ImportGLTFClass extends ImportBaseClass
     
     floorY(meshes,skeleton)
     {
-        let n,k,mesh,nVertex,fy;
+        let n,k,mesh,fy;
         
-        fy=meshes[0].vertexList[0].position.y;
+        fy=meshes[0].vertexArray[1];        // first Y on first mesh
         
         for (n=0;n!==meshes.length;n++) {
             mesh=meshes[n];
         
-            nVertex=mesh.vertexList.length;
-            
-            for (k=0;k!==nVertex;k++) {
-                if (mesh.vertexList[k].position.y<fy) fy=mesh.vertexList[k].position.y;
+            for (k=0;k<mesh.vertexArray.length;k+=3) {
+                if (mesh.vertexArray[k+1]<fy) fy=mesh.vertexArray[k+1];
             }
         }
         
@@ -238,10 +234,8 @@ export default class ImportGLTFClass extends ImportBaseClass
         for (n=0;n!==meshes.length;n++) {
             mesh=meshes[n];
         
-            nVertex=mesh.vertexList.length;
-            
-            for (k=0;k!==nVertex;k++) {
-                mesh.vertexList[k].position.y-=fy;
+            for (k=0;k<mesh.vertexArray.length;k+=3) {
+                mesh.vertexArray[k+1]-=fy;
             }
         }
         
@@ -256,22 +250,27 @@ export default class ImportGLTFClass extends ImportBaseClass
         // rebuild missing tangents
         //
 
-    buildVertexListTangents(vertexList,indexes)
+    buildTangents(vertexArray,uvArray,indexArray)
     {
-        let n,nTrig,trigIdx;
-        let v0,v1,v2;
+        let n,nTrig,trigIdx,vIdx,uvIdx;
         let u10,u20,v10,v20;
 
             // generate tangents by the trigs
             // sometimes we will end up overwriting
             // but it depends on the mesh to have
-            // constant shared vertices against
+            // constant shared vertexes against
             // triangle tangents
 
             // note this recreates a bit of what
             // goes on to create the normal, because
             // we need that first to make the UVs
 
+        let v0=new PointClass(0,0,0);
+        let v1=new PointClass(0,0,0);
+        let v2=new PointClass(0,0,0);
+        let uv0=new Point2DClass(0,0,0);
+        let uv1=new Point2DClass(0,0,0);
+        let uv2=new Point2DClass(0,0,0);
         let p10=new PointClass(0.0,0.0,0.0);
         let p20=new PointClass(0.0,0.0,0.0);
         let vLeft=new PointClass(0.0,0.0,0.0);
@@ -279,8 +278,10 @@ export default class ImportGLTFClass extends ImportBaseClass
         let vNum=new PointClass(0.0,0.0,0.0);
         let denom;
         let tangent=new PointClass(0.0,0.0,0.0);
+        
+        let tangentArray=[];
 
-        nTrig=Math.trunc(indexes.length/3);
+        nTrig=Math.trunc(indexArray.length/3);
 
         for (n=0;n!==nTrig;n++) {
 
@@ -289,21 +290,31 @@ export default class ImportGLTFClass extends ImportBaseClass
 
             trigIdx=n*3;
 
-            v0=vertexList[indexes[trigIdx]];
-            v1=vertexList[indexes[trigIdx+1]];
-            v2=vertexList[indexes[trigIdx+2]];
+            vIdx=indexArray[trigIdx]*3;
+            v0.setFromValues(vertexArray[vIdx],vertexArray[vIdx+1],vertexArray[vIdx+2]);
+            vIdx=indexArray[trigIdx+1]*3;
+            v1.setFromValues(vertexArray[vIdx],vertexArray[vIdx+1],vertexArray[vIdx+2]);
+            vIdx=indexArray[trigIdx+2]*3;
+            v2.setFromValues(vertexArray[vIdx],vertexArray[vIdx+1],vertexArray[vIdx+2]);
+            
+            uvIdx=indexArray[trigIdx]*2;
+            uv0.setFromValues(uvArray[uvIdx],uvArray[uvIdx+1]);
+            uvIdx=indexArray[trigIdx+1]*2;
+            uv1.setFromValues(uvArray[uvIdx],uvArray[uvIdx+1]);
+            uvIdx=indexArray[trigIdx+2]*2;
+            uv2.setFromValues(uvArray[uvIdx],uvArray[uvIdx+1]);
 
                 // create vectors
 
-            p10.setFromSubPoint(v1.position,v0.position);
-            p20.setFromSubPoint(v2.position,v0.position);
+            p10.setFromSubPoint(v1,v0);
+            p20.setFromSubPoint(v2,v0);
 
                 // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
 
-            u10=v1.uv.x-v0.uv.x;        // x component
-            u20=v2.uv.x-v0.uv.x;
-            v10=v1.uv.y-v0.uv.y;        // y component
-            v20=v2.uv.y-v0.uv.y;
+            u10=uv1.x-uv0.x;        // x component
+            u20=uv2.x-uv0.x;
+            v10=uv1.y-uv0.y;        // y component
+            v20=uv2.y-uv0.y;
 
                 // calculate the tangent
                 // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
@@ -317,13 +328,15 @@ export default class ImportGLTFClass extends ImportBaseClass
             tangent.setFromScale(vNum,denom);
             tangent.normalize();
 
-                // and set the mesh normal
+                // and set the mesh tangent
                 // to all vertexes in this trig
 
-            v0.tangent.setFromPoint(tangent);
-            v1.tangent.setFromPoint(tangent);
-            v2.tangent.setFromPoint(tangent);
+            tangentArray.push(tangent.x,tangent.y,tangent.z);
+            tangentArray.push(tangent.x,tangent.y,tangent.z);
+            tangentArray.push(tangent.x,tangent.y,tangent.z);
         }
+        
+        return(tangentArray);
     }
     
         //
@@ -527,9 +540,12 @@ export default class ImportGLTFClass extends ImportBaseClass
     decodeMesh(meshList,skeleton)
     {
         let n,k,t,meshesNode,meshNode,primitiveNode,skip;
-        let indices,vertices,normals,tangents,uvs,v,vertexList;
-        let vIdx,nIdx,tIdx,uvIdx;
+        let vertexArray,normalArray,tangentArray,uvArray,indexArray;
+        let jointArray,weightArray;
+        let vIdx,nIdx,tIdx;
         let mesh,bitmap,curBitmapName;
+        let normal=new PointClass(0,0,0);
+        let tangent=new PointClass(0,0,0);
         let meshes=[];
         
             // run through the meshes
@@ -562,56 +578,62 @@ export default class ImportGLTFClass extends ImportBaseClass
                 primitiveNode=meshNode.primitives[k];
                 if (primitiveNode.mode!==4) continue;       // not a triangle stream
                 
-                    // create the mesh
+                    // get all the arrays
                   
-                indices=this.decodeBuffer(primitiveNode.indices,1);
-                vertices=this.decodeBuffer(primitiveNode.attributes.POSITION,3);
-                normals=this.decodeBuffer(primitiveNode.attributes.NORMAL,3);
+                indexArray=this.decodeBuffer(primitiveNode.indices,1);
+                vertexArray=this.decodeBuffer(primitiveNode.attributes.POSITION,3);
+                normalArray=this.decodeBuffer(primitiveNode.attributes.NORMAL,3);
                 
-                tangents=null;      // tangents aren't always there, we recreate them if missing
-                if (primitiveNode.attributes.TANGENT!==undefined) tangents=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
+                tangentArray=null;  // tangents aren't always there, we recreate them if missing
+                if (primitiveNode.attributes.TANGENT!==undefined) tangentArray=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
                 
                                     // solid colors usually don't have UVs but we treat everything as a texture so we create a 0,0 list
                 if (primitiveNode.attributes.TEXCOORD_0!==undefined) {
-                    uvs=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
+                    uvArray=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
                 }
                 else {
-                    uvs=new Float32Array(Math.trunc(vertices.length/3)*2);
+                    uvArray=new Float32Array(Math.trunc(vertexArray.length/3)*2);
                 }
                 
                 if (skeleton!==null) {
-                    this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4); // unsigned short 4
-                    this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);    // float 4
+                    jointArray=this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4);
+                    weightArray=this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);
+                }
+                else {
+                    jointArray=null;
+                    weightArray=null;
                 }
                 
+                    // scale the vertexes and normalize
+                    // any normals or tangents
+                    
                 vIdx=0;
                 nIdx=0;
                 tIdx=0;
-                uvIdx=0;
-                vertexList=[];
                 
-                for (t=0;t!=indices.length;t++) {
-                    v=new MeshVertexClass();
-                    v.position.setFromValues((vertices[vIdx++]*this.importSettings.scale),(vertices[vIdx++]*this.importSettings.scale),(vertices[vIdx++]*this.importSettings.scale));
-                    v.normal.setFromValues(normals[nIdx++],normals[nIdx++],normals[nIdx++]);
-                    v.normal.normalize();
-                    if (tangents!=null) {
-                        v.tangent.setFromValues(tangents[tIdx++],tangents[tIdx++],tangents[tIdx++]);
-                        v.tangent.normalize();
+                for (t=0;t<vertexArray.length;t+=3) {
+                    vertexArray[vIdx++]*=this.importSettings.scale;
+                    vertexArray[vIdx++]*=this.importSettings.scale;
+                    vertexArray[vIdx++]*=this.importSettings.scale;
+                    
+                    normal.setFromValues(normalArray[nIdx],normalArray[nIdx+1],normalArray[nIdx+2]);
+                    normal.normalize();
+                    normalArray[nIdx++]=normal.x;
+                    normalArray[nIdx++]=normal.y;
+                    normalArray[nIdx++]=normal.z;
+                    
+                    if (tangentArray!==null) {
+                        tangent.setFromValues(tangentArray[nIdx],tangentArray[nIdx+1],tangentArray[nIdx+2]);
+                        tangent.normalize();
+                        tangentArray[nIdx++]=tangent.x;
+                        tangentArray[nIdx++]=tangent.y;
+                        tangentArray[nIdx++]=tangent.z;
                     }
-                    v.uv.setFromValues(uvs[uvIdx++],uvs[uvIdx++]);
-                    vertexList.push(v);
-                }
-                
-                vIdx=0;
-                
-                for (t=0;t!=(indices.length*3);t++) {
-                    vertices[vIdx++]*=this.importSettings.scale;
                 }
                 
                     // do we need to recreate tangents?
                     
-                if (tangents===null) this.buildVertexListTangents(vertexList,indices);
+                if (tangentArray===null) this.buildTangents(vertexArray,uvArray,indexArray);
                 
                     // create bitmap
                     
@@ -619,8 +641,10 @@ export default class ImportGLTFClass extends ImportBaseClass
                 if (bitmap===null) return(false);
                 
                     // finally make the mesh
+                    // all the array types should be their proper
+                    // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexList,null,indices);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }

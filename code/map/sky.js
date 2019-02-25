@@ -17,8 +17,8 @@ export default class SkyClass
         this.uvs=null;
         this.indexes=null;
         
-        this.vertexPosBuffer=null;
-        this.uvPosBuffer=null;
+        this.vertexBuffer=null;
+        this.uvBuffer=null;
         this.indexBuffer=null;
         
         Object.seal(this);
@@ -38,8 +38,8 @@ export default class SkyClass
         this.uvs=new Float32Array(16);
         this.indexes=new Uint16Array(6*4);      //enough for 4 sides, the longest draw pattern we do
         
-        this.vertexPosBuffer=gl.createBuffer();
-        this.uvPosBuffer=gl.createBuffer();
+        this.vertexBuffer=gl.createBuffer();
+        this.uvBuffer=gl.createBuffer();
         this.indexBuffer=gl.createBuffer();
         
         return(true);
@@ -49,8 +49,8 @@ export default class SkyClass
     {
         let gl=this.view.gl;
 
-        gl.deleteBuffer(this.vertexPosBuffer);
-        gl.deleteBuffer(this.uvPosBuffer);
+        gl.deleteBuffer(this.vertexBuffer);
+        gl.deleteBuffer(this.uvBuffer);
         gl.deleteBuffer(this.indexBuffer);
     }
     
@@ -97,13 +97,13 @@ export default class SkyClass
         
             // attach buffers
             
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertexes,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.view.shaderList.skyShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.view.shaderList.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvPosBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.STREAM_DRAW);
 
         gl.enableVertexAttribArray(this.view.shaderList.skyShader.vertexUVAttribute);

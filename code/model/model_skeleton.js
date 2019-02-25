@@ -214,7 +214,7 @@ export default class ModelSkeletonClass
         let n,nBone,bone,parentBone;
         let vertices,indexes,vIdx,iIdx,elementIdx;
         let lineCount,lineElementOffset,lineVertexStartIdx;
-        let vertexPosBuffer,indexBuffer;
+        let vertexBuffer,indexBuffer;
         let boneSize=50;
         let gl=this.view.gl;
         let shader=this.view.shaderList.modelSkeletonShader;
@@ -313,8 +313,8 @@ export default class ModelSkeletonClass
        
             // build the buffers
             
-        vertexPosBuffer=gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER,vertexPosBuffer);
+        vertexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.DYNAMIC_DRAW);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
 
@@ -356,7 +356,7 @@ export default class ModelSkeletonClass
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
 
-        gl.deleteBuffer(vertexPosBuffer);
+        gl.deleteBuffer(vertexBuffer);
         gl.deleteBuffer(indexBuffer);
     }
 }

@@ -2,7 +2,6 @@ import ImportBaseClass from '../import/import_base.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
 import ColorClass from '../utility/color.js';
-import MeshVertexClass from '../mesh/mesh_vertex.js';
 import MeshClass from '../mesh/mesh.js';
 
 export default class ImportObjClass extends ImportBaseClass
@@ -54,7 +53,7 @@ export default class ImportObjClass extends ImportBaseClass
         return(curListPosition+idx);
     }
     
-    addTrigsForFace(tokens,posVertexIdx,posUVIdx,posNormalIdx,meshVertices,meshIndexes)
+    addTrigsForFace(tokens,posVertexIdx,posUVIdx,posNormalIdx,vertexArray,normalArray,uvArray,indexArray)
     {
         let n,npt,v,vIdx,uvIdx,normalIdx;
         let vTokens,startTrigIdx;
@@ -85,41 +84,44 @@ export default class ImportObjClass extends ImportBaseClass
             // polys are tesselated into
             // triangles around 0 vertex
             
-        startTrigIdx=meshVertices.length;
+        startTrigIdx=Math.trunc(vertexArray.length/3);
 
             // add the polys
         
         for (n=0;n!==npt;n++) {
-            v=new MeshVertexClass();
-            v.position.setFromPoint(this.vertexList[vIdx[n]]);
-            v.uv.setFromPoint(this.uvList[uvIdx[n]]);
-            v.normal.setFromPoint(this.normalList[normalIdx[n]]);
-            meshVertices.push(v);
+            vertexArray.push(this.vertexList[vIdx[n]].x,this.vertexList[vIdx[n]].y,this.vertexList[vIdx[n]].z);
+            normalArray.push(this.normalList[normalIdx[n]].x,this.normalList[normalIdx[n]].y,this.normalList[normalIdx[n]].z);
+            uvArray.push(this.uvList[uvIdx[n]].x,this.uvList[uvIdx[n]].y);
         }
         
         for (n=0;n<(npt-2);n++) {
-            meshIndexes.push(startTrigIdx);
-            meshIndexes.push(startTrigIdx+(n+1));
-            meshIndexes.push(startTrigIdx+(n+2));
+            indexArray.push(startTrigIdx);
+            indexArray.push(startTrigIdx+(n+1));
+            indexArray.push(startTrigIdx+(n+2));
         }
     }
     
-    buildVertexListTangents(vertexList,indexes)
+    buildTangents(vertexArray,uvArray,indexArray)
     {
-        let n,nTrig,trigIdx;
-        let v0,v1,v2;
+        let n,nTrig,trigIdx,vIdx,uvIdx;
         let u10,u20,v10,v20;
 
             // generate tangents by the trigs
             // sometimes we will end up overwriting
             // but it depends on the mesh to have
-            // constant shared vertices against
+            // constant shared vertexes against
             // triangle tangents
 
             // note this recreates a bit of what
             // goes on to create the normal, because
             // we need that first to make the UVs
 
+        let v0=new PointClass(0,0,0);
+        let v1=new PointClass(0,0,0);
+        let v2=new PointClass(0,0,0);
+        let uv0=new Point2DClass(0,0,0);
+        let uv1=new Point2DClass(0,0,0);
+        let uv2=new Point2DClass(0,0,0);
         let p10=new PointClass(0.0,0.0,0.0);
         let p20=new PointClass(0.0,0.0,0.0);
         let vLeft=new PointClass(0.0,0.0,0.0);
@@ -127,8 +129,10 @@ export default class ImportObjClass extends ImportBaseClass
         let vNum=new PointClass(0.0,0.0,0.0);
         let denom;
         let tangent=new PointClass(0.0,0.0,0.0);
+        
+        let tangentArray=[];
 
-        nTrig=Math.trunc(indexes.length/3);
+        nTrig=Math.trunc(indexArray.length/3);
 
         for (n=0;n!==nTrig;n++) {
 
@@ -137,21 +141,31 @@ export default class ImportObjClass extends ImportBaseClass
 
             trigIdx=n*3;
 
-            v0=vertexList[indexes[trigIdx]];
-            v1=vertexList[indexes[trigIdx+1]];
-            v2=vertexList[indexes[trigIdx+2]];
+            vIdx=indexArray[trigIdx]*3;
+            v0.setFromValues(vertexArray[vIdx],vertexArray[vIdx+1],vertexArray[vIdx+2]);
+            vIdx=indexArray[trigIdx+1]*3;
+            v1.setFromValues(vertexArray[vIdx],vertexArray[vIdx+1],vertexArray[vIdx+2]);
+            vIdx=indexArray[trigIdx+2]*3;
+            v2.setFromValues(vertexArray[vIdx],vertexArray[vIdx+1],vertexArray[vIdx+2]);
+            
+            uvIdx=indexArray[trigIdx]*2;
+            uv0.setFromValues(uvArray[uvIdx],uvArray[uvIdx+1]);
+            uvIdx=indexArray[trigIdx+1]*2;
+            uv1.setFromValues(uvArray[uvIdx],uvArray[uvIdx+1]);
+            uvIdx=indexArray[trigIdx+2]*2;
+            uv2.setFromValues(uvArray[uvIdx],uvArray[uvIdx+1]);
 
                 // create vectors
 
-            p10.setFromSubPoint(v1.position,v0.position);
-            p20.setFromSubPoint(v2.position,v0.position);
+            p10.setFromSubPoint(v1,v0);
+            p20.setFromSubPoint(v2,v0);
 
                 // get the UV scalars (u1-u0), (u2-u0), (v1-v0), (v2-v0)
 
-            u10=v1.uv.x-v0.uv.x;        // x component
-            u20=v2.uv.x-v0.uv.x;
-            v10=v1.uv.y-v0.uv.y;        // y component
-            v20=v2.uv.y-v0.uv.y;
+            u10=uv1.x-uv0.x;        // x component
+            u20=uv2.x-uv0.x;
+            v10=uv1.y-uv0.y;        // y component
+            v20=uv2.y-uv0.y;
 
                 // calculate the tangent
                 // (v20xp10)-(v10xp20) / (u10*v20)-(v10*u20)
@@ -165,18 +179,20 @@ export default class ImportObjClass extends ImportBaseClass
             tangent.setFromScale(vNum,denom);
             tangent.normalize();
 
-                // and set the mesh normal
+                // and set the mesh tangent
                 // to all vertexes in this trig
 
-            v0.tangent.setFromPoint(tangent);
-            v1.tangent.setFromPoint(tangent);
-            v2.tangent.setFromPoint(tangent);
+            tangentArray.push(tangent.x,tangent.y,tangent.z);
+            tangentArray.push(tangent.x,tangent.y,tangent.z);
+            tangentArray.push(tangent.x,tangent.y,tangent.z);
         }
+        
+        return(tangentArray);
     }
     
-    addMesh(groupName,groupNameOffset,bitmapName,meshVertices,meshIndexes)
+    addMesh(groupName,groupNameOffset,bitmapName,vertexArray,normalArray,uvArray,indexArray)
     {
-        let name;
+        let name,tangentArray;
         let bitmap=this.view.bitmapList.get('textures/'+bitmapName+'.png');
         if (bitmap===undefined) {
             console.log('missing material: textures/'+bitmapName+'.png');
@@ -186,10 +202,8 @@ export default class ImportObjClass extends ImportBaseClass
         name=groupName;
         if (groupNameOffset!=0) name+=('_'+groupNameOffset);
         
-        meshIndexes=new Uint32Array(meshIndexes);           // force to typed array
-
-        this.buildVertexListTangents(meshVertices,meshIndexes);
-        this.meshes.push(new MeshClass(this.view,name,bitmap,meshVertices,null,meshIndexes));
+        tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
+        this.meshes.push(new MeshClass(this.view,name,bitmap,new Float32Array(vertexArray),new Float32Array(normalArray),new Float32Array(tangentArray),new Float32Array(uvArray),null,null,new Uint32Array(indexArray)));
     }
     
         //
@@ -231,7 +245,7 @@ export default class ImportObjClass extends ImportBaseClass
         let x,y,z,normal;
         let lastGroupName,groupNameOffset,lastMaterialName;
         let posVertexIdx,posUVIdx,posNormalIdx;
-        let meshVertices,meshIndexes;
+        let vertexArray,normalArray,uvArray,indexArray;
         let curBitmapName;
         
             // load the file
@@ -315,8 +329,10 @@ export default class ImportObjClass extends ImportBaseClass
         
             // now create all the meshes
             
-        meshVertices=[];
-        meshIndexes=[];
+        vertexArray=[];
+        normalArray=[];
+        uvArray=[];
+        indexArray=[];
         
         posVertexIdx=0;
         posUVIdx=0;
@@ -331,11 +347,13 @@ export default class ImportObjClass extends ImportBaseClass
             
             switch(tokens[0]) {
                 case 'g':
-                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
+                    if ((lastMaterialName!==null) && (vertexArray.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,vertexArray,normalArray,uvArray,indexArray);
                     lastGroupName=tokens[1];
                     groupNameOffset=0;
-                    meshVertices=[];
-                    meshIndexes=[];
+                    vertexArray=[];
+                    normalArray=[];
+                    uvArray=[];
+                    indexArray=[];
                     break;
                 case 'v':
                     posVertexIdx++;
@@ -347,23 +365,25 @@ export default class ImportObjClass extends ImportBaseClass
                     posNormalIdx++;
                     break;
                 case 'f':
-                    this.addTrigsForFace(tokens,posVertexIdx,posUVIdx,posNormalIdx,meshVertices,meshIndexes);
+                    this.addTrigsForFace(tokens,posVertexIdx,posUVIdx,posNormalIdx,vertexArray,normalArray,uvArray,indexArray);
                     break;
                 case 'usemtl':
-                    if ((lastMaterialName!==null) && (meshVertices.length!==0)) {
-                        this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
+                    if ((lastMaterialName!==null) && (vertexArray.length!==0)) {
+                        this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,vertexArray,normalArray,uvArray,indexArray);
                         groupNameOffset++;      // new materials break meshes, so if we are under the same group name it needs a new _X value
                     }
                     lastMaterialName=tokens[1];
-                    meshVertices=[];
-                    meshIndexes=[];
+                    vertexArray=[];
+                    normalArray=[];
+                    uvArray=[];
+                    indexArray=[];
                     break;
             }
         }
         
             // and finally any current usemtl
             
-        if ((lastMaterialName!==null) && (meshVertices.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,meshVertices,meshIndexes);
+        if ((lastMaterialName!==null) && (vertexArray.length!==0)) this.addMesh(lastGroupName,groupNameOffset,lastMaterialName,vertexArray,normalArray,uvArray,indexArray);
         
             // and sort meshes by bitmaps into mesh list
             

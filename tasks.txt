@@ -7,7 +7,6 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
-
 2. get rid of u/v scale in import settings
 
 3. all collision and box routines have to be fixed
@@ -18,43 +17,18 @@ WebGL2
 2. get rid of broken double windows in OBJ
 3. translate OBJs to GLTF?
 
-4. meshclass flags -- delete?
-5. vertices -> vertexes (use same spelling)
-6. indicies -> indexes
 
 
-
-1.6 merge collision into entity
+0. move angles to quaternions
+1. merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions
 3. work on collisions
    0a. make sure to combine any lines/floors that we can
-4. get back to updateVertexesToPoseAndPosition
-4a. delete all weapon stuff from player
+4. delete all weapon stuff from player
 5. shaders need to be dynamic and part of project
 6. view -> WSJS?
 7. map into view
 8. combine input / view pause states
 9. get rid of constants, use statics
-
-
-- get rid of settings/getters and do direct, setters and getters are SLLLOOOWWWW
-  (a lot of this has already been deleted, here for future reference)
-
-    setMovementForward(on)
-    setMovementBackward(on)
-    setMovementSideLeft(on)
-    setMovementSideRight(on)
-    setSpeed(speed)
-    setLifeTick(lifeTick)
-    setFireSoundBuffer(fireSoundBuffer)
-    setHitSoundBuffer(hitSoundBuffer)
-    setDamage(damage,splashRadius,splashDamage)
-    setNoGravity(noGravity)
-    setLob(lob)
-    setBounce(bounce,bounceFactor)
-    setReflect(reflect)
-    setName(name)
-    setProjectile(projectile)
-    setAltProjectile(altProjectile)
 
