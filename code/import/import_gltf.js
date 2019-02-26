@@ -7,6 +7,8 @@ import Matrix4Class from '../utility/matrix4.js';
 import MeshClass from '../mesh/mesh.js';
 import ModelNodeClass from '../model/model_node.js';
 import ModelJointClass from '../model/model_joint.js';
+import ModelAnimationClass from '../model/model_animation.js';
+import ModelAnimationChannelClass from '../model/model_animation_channel.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
 
 export default class ImportGLTFClass extends ImportBaseClass
@@ -215,41 +217,6 @@ export default class ImportGLTFClass extends ImportBaseClass
     }
     
         //
-        // flooring
-        //
-    
-    floorY(meshes,skeleton)
-    {
-        let n,k,mesh,fy;
-        
-        fy=meshes[0].vertexArray[1];        // first Y on first mesh
-        
-        for (n=0;n!==meshes.length;n++) {
-            mesh=meshes[n];
-        
-            for (k=0;k<mesh.vertexArray.length;k+=3) {
-                if (mesh.vertexArray[k+1]<fy) fy=mesh.vertexArray[k+1];
-            }
-        }
-        
-            // floor vertexes
-            
-        for (n=0;n!==meshes.length;n++) {
-            mesh=meshes[n];
-        
-            for (k=0;k<mesh.vertexArray.length;k+=3) {
-                mesh.vertexArray[k+1]-=fy;
-            }
-        }
-        
-            // and floor the root node
-            
-        if (skeleton.rootNodeIdx!==-1) {
-            skeleton.nodes[skeleton.rootNodeIdx].translation.y-=fy;
-        }
-    }
-    
-        //
         // rebuild missing tangents
         //
 
@@ -368,7 +335,7 @@ export default class ImportGLTFClass extends ImportBaseClass
 
                 // decompose to TRS
 
-            translation.setFromValues((mat.data[12]*this.importSettings.scale),(mat.data[13]*this.importSettings.scale),(mat.data[14]*this.importSettings.scale));
+            translation.setFromValues(mat.data[12],mat.data[13],mat.data[14]);
             rotation.fromMatrix(mat);
             scale.scaleFromMatrix(mat);
         }
@@ -377,7 +344,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             
         else {
             translationProp=node.translation;
-            if (translationProp!==undefined) translation.setFromValues((translationProp[0]*this.importSettings.scale),(translationProp[1]*this.importSettings.scale),(translationProp[2]*this.importSettings.scale));
+            if (translationProp!==undefined) translation.setFromValues(translationProp[0],translationProp[1],translationProp[2]);
             
             rotationProp=node.rotation;
             if (rotationProp!==undefined) rotation.setFromValues(rotationProp[0],rotationProp[1],rotationProp[2],rotationProp[3]);
@@ -558,7 +525,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         
     decodeMesh(meshList,skeleton)
     {
-        let n,k,t,meshesNode,meshNode,primitiveNode,skip;
+        let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
         let jointArray,weightArray;
         let vIdx,nIdx,tIdx;
@@ -573,21 +540,6 @@ export default class ImportGLTFClass extends ImportBaseClass
         
         for (n=0;n!==meshesNode.length;n++) {
             meshNode=meshesNode[n];
-            
-                // we can skip meshes that the user doesn't
-                // want because sometimes meshs can have planes
-                // and stuff
-            
-            skip=false;
-            
-            for (k=0;k!==this.importSettings.skipMeshes.length;k++) {
-                if (meshNode.name===this.importSettings.skipMeshes[k]) {
-                    skip=true;
-                    break;
-                }
-            }
-            
-            if (skip) continue;
             
                 // run through the primitives
                 // we need to knock out anything that's
@@ -623,18 +575,12 @@ export default class ImportGLTFClass extends ImportBaseClass
                     weightArray=null;
                 }
                 
-                    // scale the vertexes and normalize
-                    // any normals or tangents
-                    
-                vIdx=0;
+                    // normalize any normals or tangents
+
                 nIdx=0;
                 tIdx=0;
                 
                 for (t=0;t<vertexArray.length;t+=3) {
-                    vertexArray[vIdx++]*=this.importSettings.scale;
-                    vertexArray[vIdx++]*=this.importSettings.scale;
-                    vertexArray[vIdx++]*=this.importSettings.scale;
-                    
                     normal.setFromValues(normalArray[nIdx],normalArray[nIdx+1],normalArray[nIdx+2]);
                     normal.normalize();
                     normalArray[nIdx++]=normal.x;
@@ -663,16 +609,11 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // all the array types should be their proper
                     // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,this.importSettings.scale,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }
 
-            // models should have zero bottom so they
-            // draw at the bottom of the xyz position
-
-        if (this.importSettings.floorY) this.floorY(meshes,skeleton);
-        
             // and sort meshes by bitmaps into mesh list
             
         for (n=0;n!==meshes.length;n++) {
@@ -689,6 +630,33 @@ export default class ImportGLTFClass extends ImportBaseClass
                 }
             }
         }
+        
+        return(true);
+    }
+    
+        //
+        // decode animations
+        //
+        
+    decodeAnimations(skeleton)
+    {
+        let n,animations,animateNode;
+        let animation;
+        
+        animations=this.jsonData.animations;
+        if (animations===undefined) return;
+        
+        for (n=0;n!==animations.length;n++) {
+            animateNode=animations[n];
+            
+                // new animation
+                
+            animation=new ModelAnimationClass(animateNode.name);
+            skeleton.animations.push(animation);
+            
+            
+        }
+        
         
         return(true);
     }
@@ -717,8 +685,13 @@ export default class ImportGLTFClass extends ImportBaseClass
         
             // process the file
             
-        if (!this.decodeSkeleton(skeleton)) return(false);
+        if (skeleton!==null) {
+            if (!this.decodeSkeleton(skeleton)) return(false);
+        }
         if (!this.decodeMesh(meshList,skeleton)) return(false);
+        if (skeleton!==null) {
+            if (!this.decodeAnimations(skeleton)) return(false);
+        }
         
         return(true);
     }

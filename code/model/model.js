@@ -19,9 +19,12 @@ export default class ModelClass
         
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
+        this.scale=new PointClass(1,1,1);
+        
         this.modelMatrix=new Matrix4Class();
         
         this.rotMatrix=new Matrix4Class();  // supergumba -- all temporary use quanternion
+        this.scaleMatrix=new Matrix4Class();
         
         Object.seal(this);
     }
@@ -62,10 +65,19 @@ export default class ModelClass
         this.modelMatrix.setTranslationFromPoint(this.position);
         this.rotMatrix.setRotationFromYAngle(this.angle.y);
         this.modelMatrix.multiply(this.rotMatrix);
+        this.scaleMatrix.setScaleFromPoint(this.scale);
+        this.modelMatrix.multiply(this.scaleMatrix);
 
             // draw the meshlist
             
         this.meshList.drawOpaque(this.modelMatrix,this.skeleton.getPoseJointMatrixArray());
-        if (config.DRAW_SKELETONS) this.skeleton.draw(this.modelMatrix);
+        
+        if (config.DRAW_SKELETONS) {
+            this.modelMatrix.setTranslationFromPoint(this.position);
+            this.rotMatrix.setRotationFromYAngle(this.angle.y);
+            this.modelMatrix.multiply(this.rotMatrix);
+
+            this.skeleton.draw(this.modelMatrix,this.scale);
+        }
     }
 }

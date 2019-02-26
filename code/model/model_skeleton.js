@@ -30,6 +30,10 @@ export default class ModelSkeletonClass
             
         this.joints=[];
         
+            // animations
+            
+        this.animations=[];
+        
             // globals to stop GC
             
         this.nodeMat=new Matrix4Class();
@@ -69,7 +73,6 @@ export default class ModelSkeletonClass
         //
         // animation
         //
-    
     
     
     runAnimationRecursive(node,parentNode)
@@ -123,15 +126,10 @@ export default class ModelSkeletonClass
             joint=this.joints[n];
             node=this.nodes[joint.nodeIdx];
             
+                // specs say this starts with inverse of global
+                // changes to root node, but there are none
                 
-            //joint.jointMatrix.fromArray(joint.inverseBindMatrix.data);
-            //joint.jointMatrix.multiply(node.curPoseMatrix);
-            
-            
-            joint.jointMatrix.fromArray(node.curPoseMatrix.data);
-            joint.jointMatrix.multiply(joint.inverseBindMatrix);
-            
-            joint.jointMatrix.setIdentity();
+            joint.jointMatrix.setFromMultiply(node.curPoseMatrix,joint.inverseBindMatrix);
             
             matrixArray.push(joint.jointMatrix);
         }
@@ -143,7 +141,7 @@ export default class ModelSkeletonClass
         // debug stuff -- note this is not optimized and slow!
         //
         
-    draw(modelMatrix)
+    draw(modelMatrix,scale)
     {
         let n,nNode,node,parentNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;
@@ -176,9 +174,9 @@ export default class ModelSkeletonClass
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-            vertices[vIdx++]=tempPoint.x+node.curPosePosition.x;
-            vertices[vIdx++]=tempPoint.y+node.curPosePosition.y;
-            vertices[vIdx++]=tempPoint.z+node.curPosePosition.z;
+            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
+            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
+            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
 
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
@@ -186,9 +184,9 @@ export default class ModelSkeletonClass
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-            vertices[vIdx++]=tempPoint.x+node.curPosePosition.x;
-            vertices[vIdx++]=tempPoint.y+node.curPosePosition.y;
-            vertices[vIdx++]=tempPoint.z+node.curPosePosition.z;
+            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
+            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
+            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
 
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
@@ -196,9 +194,9 @@ export default class ModelSkeletonClass
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-            vertices[vIdx++]=tempPoint.x+node.curPosePosition.x;
-            vertices[vIdx++]=tempPoint.y+node.curPosePosition.y;
-            vertices[vIdx++]=tempPoint.z+node.curPosePosition.z;
+            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
+            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
+            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
 
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
@@ -206,9 +204,9 @@ export default class ModelSkeletonClass
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
             tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-            vertices[vIdx++]=tempPoint.x+node.curPosePosition.x;
-            vertices[vIdx++]=tempPoint.y+node.curPosePosition.y;
-            vertices[vIdx++]=tempPoint.z+node.curPosePosition.z;
+            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
+            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
+            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
 
             elementIdx=n*4;
             
@@ -231,13 +229,13 @@ export default class ModelSkeletonClass
             
             parentNode=this.nodes[node.parentNodeIdx];
             
-            vertices[vIdx++]=node.curPosePosition.x;
-            vertices[vIdx++]=node.curPosePosition.y;
-            vertices[vIdx++]=node.curPosePosition.z;
+            vertices[vIdx++]=node.curPosePosition.x*scale.x;
+            vertices[vIdx++]=node.curPosePosition.y*scale.y;
+            vertices[vIdx++]=node.curPosePosition.z*scale.z;
             
-            vertices[vIdx++]=parentNode.curPosePosition.x;
-            vertices[vIdx++]=parentNode.curPosePosition.y;
-            vertices[vIdx++]=parentNode.curPosePosition.z;
+            vertices[vIdx++]=parentNode.curPosePosition.x*scale.x;
+            vertices[vIdx++]=parentNode.curPosePosition.y*scale.y;
+            vertices[vIdx++]=parentNode.curPosePosition.z*scale.z;
             
             indexes[iIdx++]=lineVertexStartIdx++;
             indexes[iIdx++]=lineVertexStartIdx++;

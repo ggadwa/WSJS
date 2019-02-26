@@ -203,7 +203,7 @@ export default class ImportObjClass extends ImportBaseClass
         if (groupNameOffset!=0) name+=('_'+groupNameOffset);
         
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
-        this.meshes.push(new MeshClass(this.view,name,bitmap,new Float32Array(vertexArray),new Float32Array(normalArray),new Float32Array(tangentArray),new Float32Array(uvArray),null,null,new Uint32Array(indexArray)));
+        this.meshes.push(new MeshClass(this.view,name,bitmap,1.0,new Float32Array(vertexArray),new Float32Array(normalArray),new Float32Array(tangentArray),new Float32Array(uvArray),null,null,new Uint32Array(indexArray)));
     }
     
         //
@@ -307,8 +307,8 @@ export default class ImportObjClass extends ImportBaseClass
                     this.vertexList.push(new PointClass(x,y,z));
                     break;
                 case 'vt':
-                    x=parseFloat(tokens[1])*this.importSettings.uScale;
-                    y=parseFloat(tokens[2])*this.importSettings.vScale;
+                    x=parseFloat(tokens[1]);
+                    y=-parseFloat(tokens[2]);
                     this.uvList.push(new Point2DClass(x,y));
                     break;
                 case 'vn':

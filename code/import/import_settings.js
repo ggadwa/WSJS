@@ -8,14 +8,8 @@ export default class ImportSettingsClass
     constructor(name)
     {
         this.name=name;
-        
         this.format=this.FORMAT_OBJ;
-        
         this.scale=1;
-        this.uScale=1;
-        this.vScale=1;
-        this.floorY=false;
-        this.skipMeshes=[];
         
         this.effectClassLookup=new Map();
         

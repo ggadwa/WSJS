@@ -9,15 +9,13 @@ uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 viewMatrix;
 uniform highp mat3 normalMatrix;
 
-out highp vec3 mapPosition,eyeVector,eyePosition;
+out highp vec3 eyeVector,eyePosition;
 out highp vec2 fragUV;
 out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 void main(void)
 {
     gl_Position=perspectiveMatrix*viewMatrix*vec4(vertexPosition,1.0);
-
-    mapPosition=vertexPosition;
     eyePosition=vec3(viewMatrix*vec4(vertexPosition,1.0));
 
         // get the tangent space

@@ -7,19 +7,10 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
-0. need to remove all scaling and all flooring, this messes everything up, do scaling in shader and building bounds
-
-2. get rid of u/v scale in import settings
+0. animations
 
 3. all collision and box routines have to be fixed
-4. all frustum stuff has to be fixed
-5. why is uv swapped? (only on objs it seems)
 6. underwater collision bad
-
-2. get rid of broken double windows in OBJ
-3. translate OBJs to GLTF?
-
-
 
 0. move angles to quaternions
 1. merge collision into entity

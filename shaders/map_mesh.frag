@@ -17,7 +17,7 @@ struct lightType {
 
 uniform lightType lights[24];
 
-in highp vec3 mapPosition,eyeVector,eyePosition;
+in highp vec3 eyeVector,eyePosition;
 in highp vec2 fragUV;
 in mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 

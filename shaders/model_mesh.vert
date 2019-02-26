@@ -14,7 +14,7 @@ uniform highp mat3 normalMatrix;
 
 uniform highp mat4 jointMatrix[128];
 
-out highp vec3 mapPosition,eyeVector,eyePosition;
+out highp vec3 eyeVector,eyePosition;
 out highp vec2 fragUV;
 out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
@@ -22,18 +22,13 @@ void main(void)
 {
         // calculate the animation
 
-    mat4 skinMatrix=
-        (vertexWeight.x*jointMatrix[int(vertexJoint.x)]) +
-        (vertexWeight.y*jointMatrix[int(vertexJoint.y)]) +
-        (vertexWeight.z*jointMatrix[int(vertexJoint.z)]) +
-        (vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
+    mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
 
         // set the positions
 
-    gl_Position=perspectiveMatrix*viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
-
-    mapPosition=vertexPosition;
-    eyePosition=vec3(viewMatrix*vec4(vertexPosition,1.0));
+    highp vec4 pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
+    gl_Position=perspectiveMatrix*pos;
+    eyePosition=vec3(pos);
 
         // get the tangent space
         // need to rotate the normals with the model matrix

@@ -78,10 +78,6 @@ export default class ProjectEntityClass
         this.reflectMovementVector=new PointClass(0,0,0);
         this.reflectLineVector=new PointClass(0,0,0);
 
-        this.xFrustumBound=new BoundClass(0,0);
-        this.yFrustumBound=new BoundClass(0,0);
-        this.zFrustumBound=new BoundClass(0,0);
-        
         this.pushMesh=null;
 
         this.collision=new CollisionClass(map);
@@ -126,6 +122,7 @@ export default class ProjectEntityClass
         importModel=new ImportModelClass(this.view,this.model);
         if (!(await importModel.load(this.modelImportSettings))) return(false);
 
+        this.model.scale.setFromValues(this.modelImportSettings.scale,this.modelImportSettings.scale,this.modelImportSettings.scale);
         this.model.setupBuffers();
         
         return(true);

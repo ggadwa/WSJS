@@ -194,123 +194,28 @@ export default class Matrix4Class
         this.data[15]=(mat1.data[3]*mat2.data[12])+(mat1.data[7]*mat2.data[13])+(mat1.data[11]*mat2.data[14])+(mat1.data[15]*mat2.data[15]);
     }
     
-    setFromInvertMatrix(m)
+    setFromInvertMatrix(mat)
     {
         let n,det;
 
-    this.data[0] = (m[5]  * m[10] * m[15]) - 
-             (m[5]  * m[11] * m[14]) - 
-             (m[9]  * m[6]  * m[15]) + 
-             (m[9]  * m[7]  * m[14]) +
-             (m[13] * m[6]  * m[11]) - 
-             (m[13] * m[7]  * m[10]);
+        this.data[0]=(mat.data[5]*mat.data[10]*mat.data[15])-(mat.data[5]*mat.data[11]*mat.data[14])-(mat.data[9]*mat.data[6]*mat.data[15])+(mat.data[9]*mat.data[7]*mat.data[14])+(mat.data[13]*mat.data[6]*mat.data[11])-(mat.data[13]*mat.data[7]*mat.data[10]);
+        this.data[4]=(-mat.data[4]*mat.data[10]*mat.data[15])+(mat.data[4]*mat.data[11]*mat.data[14])+(mat.data[8]*mat.data[6]*mat.data[15])-(mat.data[8]*mat.data[7]*mat.data[14])-(mat.data[12]*mat.data[6]*mat.data[11])+(mat.data[12]*mat.data[7]*mat.data[10]);
+        this.data[8]=(mat.data[4]*mat.data[9]*mat.data[15])-(mat.data[4]*mat.data[11]*mat.data[13])-(mat.data[8]*mat.data[5]*mat.data[15])+(mat.data[8]*mat.data[7]*mat.data[13])+(mat.data[12]*mat.data[5]*mat.data[11])-(mat.data[12]*mat.data[7]*mat.data[9]);
+        this.data[12]=(-mat.data[4]*mat.data[9]*mat.data[14])+(mat.data[4]*mat.data[10]*mat.data[13])+(mat.data[8]*mat.data[5]*mat.data[14])-(mat.data[8]*mat.data[6]*mat.data[13])-(mat.data[12]*mat.data[5]*mat.data[10])+(mat.data[12]*mat.data[6]*mat.data[9]);
+        this.data[1]=(-mat.data[1]*mat.data[10]*mat.data[15])+(mat.data[1]*mat.data[11]*mat.data[14])+(mat.data[9]*mat.data[2]*mat.data[15])-(mat.data[9]*mat.data[3]*mat.data[14])-(mat.data[13]*mat.data[2]*mat.data[11])+(mat.data[13]*mat.data[3]*mat.data[10]);
+        this.data[5]=(mat.data[0]*mat.data[10]*mat.data[15])-(mat.data[0]*mat.data[11]*mat.data[14])-(mat.data[8]*mat.data[2]*mat.data[15])+(mat.data[8]*mat.data[3]*mat.data[14])+(mat.data[12]*mat.data[2]*mat.data[11])-(mat.data[12]*mat.data[3]*mat.data[10]);
+        this.data[9]=(-mat.data[0]*mat.data[9]*mat.data[15])+(mat.data[0]*mat.data[11]*mat.data[13])+(mat.data[8]*mat.data[1]*mat.data[15])-(mat.data[8]*mat.data[3]*mat.data[13])-(mat.data[12]*mat.data[1]*mat.data[11])+(mat.data[12]*mat.data[3]*mat.data[9]);
+        this.data[13]=(mat.data[0]*mat.data[9]*mat.data[14])-(mat.data[0]*mat.data[10]*mat.data[13])-(mat.data[8]*mat.data[1]*mat.data[14])+(mat.data[8]*mat.data[2]*mat.data[13])+(mat.data[12]*mat.data[1]*mat.data[10])-(mat.data[12]*mat.data[2]*mat.data[9]);
+        this.data[2]=(mat.data[1]*mat.data[6]*mat.data[15])-(mat.data[1]*mat.data[7]*mat.data[14])-(mat.data[5]*mat.data[2]*mat.data[15])+(mat.data[5]*mat.data[3]*mat.data[14])+(mat.data[13]*mat.data[2]*mat.data[7])-(mat.data[13]*mat.data[3]*mat.data[6]);
+        this.data[6]=(-mat.data[0]*mat.data[6]*mat.data[15])+(mat.data[0]*mat.data[7]*mat.data[14])+(mat.data[4]*mat.data[2]*mat.data[15])-(mat.data[4]*mat.data[3]*mat.data[14])-(mat.data[12]*mat.data[2]*mat.data[7])+(mat.data[12]*mat.data[3]*mat.data[6]);
+        this.data[10]=(mat.data[0]*mat.data[5]*mat.data[15])-(mat.data[0]*mat.data[7]*mat.data[13])-(mat.data[4]*mat.data[1]*mat.data[15])+(mat.data[4]*mat.data[3]*mat.data[13])+(mat.data[12]*mat.data[1]*mat.data[7])-(mat.data[12]*mat.data[3]*mat.data[5]);
+        this.data[14]=(-mat.data[0]*mat.data[5]*mat.data[14])+(mat.data[0]*mat.data[6]*mat.data[13])+(mat.data[4]*mat.data[1]*mat.data[14])-(mat.data[4]*mat.data[2]*mat.data[13])-(mat.data[12]*mat.data[1]*mat.data[6])+(mat.data[12]*mat.data[2]*mat.data[5]);
+        this.data[3]=(-mat.data[1]*mat.data[6]*mat.data[11])+(mat.data[1]*mat.data[7]*mat.data[10])+(mat.data[5]*mat.data[2]*mat.data[11])-(mat.data[5]*mat.data[3]*mat.data[10])-(mat.data[9]*mat.data[2]*mat.data[7])+(mat.data[9]*mat.data[3]*mat.data[6]);
+        this.data[7]=(mat.data[0]*mat.data[6]*mat.data[11])-(mat.data[0]*mat.data[7]*mat.data[10])-(mat.data[4]*mat.data[2]*mat.data[11])+(mat.data[4]*mat.data[3]*mat.data[10])+(mat.data[8]*mat.data[2]*mat.data[7])-(mat.data[8]*mat.data[3]*mat.data[6]);
+        this.data[11]=(-mat.data[0]*mat.data[5]*mat.data[11])+(mat.data[0]*mat.data[7]*mat.data[9])+(mat.data[4]*mat.data[1]*mat.data[11])-(mat.data[4]*mat.data[3]*mat.data[9])-(mat.data[8]*mat.data[1]*mat.data[7])+(mat.data[8]*mat.data[3]*mat.data[5]);
+        this.data[15]=(mat.data[0]*mat.data[5]*mat.data[10])-(mat.data[0]*mat.data[6]*mat.data[9])-(mat.data[4]*mat.data[1]*mat.data[10])+(mat.data[4]*mat.data[2]*mat.data[9])+(mat.data[8]*mat.data[1]*mat.data[6])-(mat.data[8]*mat.data[2]*mat.data[5]);
 
-    this.data[4] = (-m[4]  * m[10] * m[15]) + 
-              (m[4]  * m[11] * m[14]) + 
-              (m[8]  * m[6]  * m[15]) - 
-              (m[8]  * m[7]  * m[14]) - 
-              (m[12] * m[6]  * m[11]) + 
-              (m[12] * m[7]  * m[10]);
-
-    this.data[8] = (m[4]  * m[9] * m[15]) - 
-             (m[4]  * m[11] * m[13]) - 
-             (m[8]  * m[5] * m[15]) + 
-             (m[8]  * m[7] * m[13]) + 
-             (m[12] * m[5] * m[11]) - 
-             (m[12] * m[7] * m[9]);
-
-    this.data[12] = (-m[4]  * m[9] * m[14]) + 
-               (m[4]  * m[10] * m[13]) +
-               (m[8]  * m[5] * m[14]) - 
-               (m[8]  * m[6] * m[13]) - 
-               (m[12] * m[5] * m[10]) + 
-               (m[12] * m[6] * m[9]);
-
-    this.data[1] = (-m[1]  * m[10] * m[15]) + 
-              (m[1]  * m[11] * m[14]) + 
-              (m[9]  * m[2] * m[15]) - 
-              (m[9]  * m[3] * m[14]) - 
-              (m[13] * m[2] * m[11]) + 
-              (m[13] * m[3] * m[10]);
-
-    this.data[5] = (m[0]  * m[10] * m[15]) - 
-             (m[0]  * m[11] * m[14]) - 
-             (m[8]  * m[2] * m[15]) + 
-             (m[8]  * m[3] * m[14]) + 
-             (m[12] * m[2] * m[11]) - 
-             (m[12] * m[3] * m[10]);
-
-    this.data[9] = (-m[0]  * m[9] * m[15]) + 
-              (m[0]  * m[11] * m[13]) + 
-              (m[8]  * m[1] * m[15]) - 
-              (m[8]  * m[3] * m[13]) - 
-              (m[12] * m[1] * m[11]) + 
-              (m[12] * m[3] * m[9]);
-
-    this.data[13] = (m[0]  * m[9] * m[14]) - 
-              (m[0]  * m[10] * m[13]) - 
-              (m[8]  * m[1] * m[14]) + 
-              (m[8]  * m[2] * m[13]) + 
-              (m[12] * m[1] * m[10]) - 
-              (m[12] * m[2] * m[9]);
-
-    this.data[2] = (m[1]  * m[6] * m[15]) - 
-             (m[1]  * m[7] * m[14]) - 
-             (m[5]  * m[2] * m[15]) + 
-             (m[5]  * m[3] * m[14]) + 
-             (m[13] * m[2] * m[7]) - 
-             (m[13] * m[3] * m[6]);
-
-    this.data[6] = (-m[0]  * m[6] * m[15]) + 
-              (m[0]  * m[7] * m[14]) + 
-              (m[4]  * m[2] * m[15]) - 
-              (m[4]  * m[3] * m[14]) - 
-              (m[12] * m[2] * m[7]) + 
-              (m[12] * m[3] * m[6]);
-
-    this.data[10] = (m[0]  * m[5] * m[15]) - 
-              (m[0]  * m[7] * m[13]) - 
-              (m[4]  * m[1] * m[15]) + 
-              (m[4]  * m[3] * m[13]) + 
-              (m[12] * m[1] * m[7]) - 
-              (m[12] * m[3] * m[5]);
-
-    this.data[14] = (-m[0]  * m[5] * m[14]) + 
-               (m[0]  * m[6] * m[13]) + 
-               (m[4]  * m[1] * m[14]) - 
-               (m[4]  * m[2] * m[13]) - 
-               (m[12] * m[1] * m[6]) + 
-               (m[12] * m[2] * m[5]);
-
-    this.data[3] = (-m[1] * m[6] * m[11]) + 
-              (m[1] * m[7] * m[10]) + 
-              (m[5] * m[2] * m[11]) - 
-              (m[5] * m[3] * m[10]) - 
-              (m[9] * m[2] * m[7]) + 
-              (m[9] * m[3] * m[6]);
-
-    this.data[7] = (m[0] * m[6] * m[11]) - 
-             (m[0] * m[7] * m[10]) - 
-             (m[4] * m[2] * m[11]) + 
-             (m[4] * m[3] * m[10]) + 
-             (m[8] * m[2] * m[7]) - 
-             (m[8] * m[3] * m[6]);
-
-    this.data[11] = (-m[0] * m[5] * m[11]) + 
-               (m[0] * m[7] * m[9]) + 
-               (m[4] * m[1] * m[11]) - 
-               (m[4] * m[3] * m[9]) - 
-               (m[8] * m[1] * m[7]) + 
-               (m[8] * m[3] * m[5]);
-
-    this.data[15] = (m[0] * m[5] * m[10]) - 
-              (m[0] * m[6] * m[9]) - 
-              (m[4] * m[1] * m[10]) + 
-              (m[4] * m[2] * m[9]) + 
-              (m[8] * m[1] * m[6]) - 
-              (m[8] * m[2] * m[5]);
-
-        det=(m[0] * this.data[0]) + (m[1] * this.data[4]) + (m[2] * this.data[8]) + (m[3] * this.data[12]);
+        det=(mat.data[0]*this.data[0])+(mat.data[1]*this.data[4])+(mat.data[2]*this.data[8])+(mat.data[3]*this.data[12]);
         if (det==0) return;
 
         det=1.0/det;
