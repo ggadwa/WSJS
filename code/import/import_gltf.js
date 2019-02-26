@@ -9,6 +9,7 @@ import ModelNodeClass from '../model/model_node.js';
 import ModelJointClass from '../model/model_joint.js';
 import ModelAnimationClass from '../model/model_animation.js';
 import ModelAnimationChannelClass from '../model/model_animation_channel.js';
+import ModelAnimationChannelPoseClass from '../model/model_animation_channel_pose.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
 
 export default class ImportGLTFClass extends ImportBaseClass
@@ -528,7 +529,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
         let jointArray,weightArray;
-        let vIdx,nIdx,tIdx;
+        let nIdx,tIdx;
         let mesh,bitmap,curBitmapName;
         let normal=new PointClass(0,0,0);
         let tangent=new PointClass(0,0,0);
@@ -609,7 +610,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // all the array types should be their proper
                     // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,this.importSettings.scale,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }
@@ -640,8 +641,10 @@ export default class ImportGLTFClass extends ImportBaseClass
         
     decodeAnimations(skeleton)
     {
-        let n,animations,animateNode;
-        let animation;
+        let n,k,t,isVec4;
+        let animations,channels,animateNode,channelNode,samplerNode;
+        let animation,channel,pose;
+        let timeArray,vectorArray,vector,vIdx;
         
         animations=this.jsonData.animations;
         if (animations===undefined) return;
@@ -654,9 +657,61 @@ export default class ImportGLTFClass extends ImportBaseClass
             animation=new ModelAnimationClass(animateNode.name);
             skeleton.animations.push(animation);
             
+                // channels
+                
+            channels=animateNode.channels;
             
+            for (k=0;k!==channels.length;k++) {
+                channelNode=channels[k];
+                
+                    // currently only handling translation, rotation,
+                    // and scale
+                    
+                channel=null;
+                
+                switch (channelNode.target.path) {
+                    case 'translation':
+                        channel=new ModelAnimationChannelClass(channelNode.target.node,ModelAnimationChannelClass.TRS_TYPE_TRANSLATION);
+                        break;
+                    case 'rotation':
+                        channel=new ModelAnimationChannelClass(channelNode.target.node,ModelAnimationChannelClass.TRS_TYPE_ROTATION);
+                        break;
+                    case 'rotation':
+                        channel=new ModelAnimationChannelClass(channelNode.target.node,ModelAnimationChannelClass.TRS_TYPE_SCALE);
+                        break;
+                }
+                
+                if (channel===null) continue;
+                
+                    // read in the samplier
+                    
+                samplerNode=animateNode.samplers[channelNode.sampler];
+                    
+                isVec4=(channel.trsType===ModelAnimationChannelClass.TRS_TYPE_ROTATION);
+                timeArray=this.decodeBuffer(samplerNode.input,1);
+                vectorArray=this.decodeBuffer(samplerNode.output,(isVec4?4:3));
+                
+                for (t=0;t!==timeArray.length;t++) {
+                    if (isVec4) {
+                        vIdx=t*4;
+                        pose=new ModelAnimationChannelPoseClass(Math.trunc(timeArray[t]*1000),vectorArray.slice(vIdx,(vIdx+4)));
+                    }
+                    else {
+                        vIdx=t*3;
+                        pose=new ModelAnimationChannelPoseClass(Math.trunc(timeArray[t]*1000),vectorArray.slice(vIdx,(vIdx+3)));
+                    }
+                    channel.poses.push(pose);
+                }
+                
+                    // add to animation
+                    
+                animation.channels.push(channel);
+            }
+            
+                // finally calculate length of animation
+                
+            animation.calcAnimationLength();
         }
-        
         
         return(true);
     }

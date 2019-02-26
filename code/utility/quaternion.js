@@ -41,6 +41,17 @@ export default class QuaternionClass
         this.w=Math.cos(rd*0.5);
     }
     
+    normalize()
+    {
+        let f=Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z)+(this.w*this.w));
+        if (f!==0.0) f=1.0/f;
+        
+        this.x*=f;
+        this.y*=f;
+        this.z*=f;
+        this.w*=f;
+    }
+    
     setFromMultiply(q1,q2)
     {
         this.x=(q1.x*q2.w)+(q1.y*q2.z)-(q1.z*q2.y)+(q1.w*q2.x);

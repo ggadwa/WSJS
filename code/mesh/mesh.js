@@ -10,12 +10,11 @@ import CollisionTrigClass from '../utility/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,scale,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
+    constructor(view,name,bitmap,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
         this.view=view;
         this.name=name;
         this.bitmap=bitmap;
-        this.scale=scale;                   // overall scale of mesh, used for models whose scale differs from internal scale
         this.vertexArray=vertexArray;       // expected Float32Array
         this.normalArray=normalArray;       // expected Float32Array
         this.tangentArray=tangentArray;     // expected Float32Array
@@ -41,6 +40,10 @@ export default class MeshClass
         this.xBound=new BoundClass(0,0);
         this.yBound=new BoundClass(0,0);
         this.zBound=new BoundClass(0,0);
+        
+        this.originalXBound=new BoundClass(0,0);
+        this.originalYBound=new BoundClass(0,0);
+        this.originalZBound=new BoundClass(0,0);
 
             // gl buffers
 
@@ -70,6 +73,8 @@ export default class MeshClass
         
             // global variables to stop GCd
 
+        this.boundMinPoint=new PointClass(0,0,0);
+        this.boundMaxPoint=new PointClass(0,0,0);
         this.rotPoint=new PointClass(0,0,0);
         this.rotVector=new PointClass(0.0,0.0,0.0);
         this.rotCenterPnt=new PointClass(0.0,0.0,0.0);
@@ -156,33 +161,62 @@ export default class MeshClass
 
     setupBounds()
     {
-        let n,count;
-        let x=this.vertexArray[0]*this.scale;
-        let y=this.vertexArray[1]*this.scale;
-        let z=this.vertexArray[2]*this.scale;
+        let n;
+        let x=this.vertexArray[0];
+        let y=this.vertexArray[1];
+        let z=this.vertexArray[2];
         
-        this.center.setFromValues(x,y,z);
+            // get bounds
+            
         this.xBound.setFromValues(x,x);
         this.yBound.setFromValues(y,y);
         this.zBound.setFromValues(z,z);
 
         for (n=3;n<this.vertexCount;n+=3) {
-            x=this.vertexArray[n]*this.scale;
-            y=this.vertexArray[n+1]*this.scale;
-            z=this.vertexArray[n+2]*this.scale;
+            x=this.vertexArray[n];
+            y=this.vertexArray[n+1];
+            z=this.vertexArray[n+2];
             
-            this.center.addValues(x,y,z);
-
             this.xBound.adjust(x);
             this.yBound.adjust(y);
             this.zBound.adjust(z);
         }
 
-        count=Math.trunc(this.vertexCount/3);
+            // get center
+            
+        this.center.x=this.xBound.getMidPoint();
+        this.center.y=this.yBound.getMidPoint();
+        this.center.z=this.zBound.getMidPoint();
         
-        this.center.x/=count;
-        this.center.y/=count;
-        this.center.z/=count;
+            // save original version to use
+            // for modelmatrix recalculations
+            
+        this.originalXBound.setFromBound(this.xBound);
+        this.originalYBound.setFromBound(this.yBound);
+        this.originalZBound.setFromBound(this.zBound);
+    }
+    
+        //
+        // rebuild bound boxes to modelmatrix
+        // this is mostly used by models to fix bounding
+        // boxes for frustum culling
+        //
+
+    recalcBoundsFromModelMatrix(modelMatrix)
+    {
+        this.boundMinPoint.setFromValues(this.originalXBound.min,this.originalYBound.min,this.originalZBound.min);
+        this.boundMinPoint.matrixMultiply(modelMatrix);
+        
+        this.boundMaxPoint.setFromValues(this.originalXBound.max,this.originalYBound.max,this.originalZBound.max);
+        this.boundMaxPoint.matrixMultiply(modelMatrix);
+        
+        this.xBound.setFromValues(this.boundMinPoint.x,this.boundMaxPoint.x);
+        this.yBound.setFromValues(this.boundMinPoint.y,this.boundMaxPoint.y);
+        this.zBound.setFromValues(this.boundMinPoint.z,this.boundMaxPoint.z);
+        
+        this.center.x=this.xBound.getMidPoint();
+        this.center.y=this.yBound.getMidPoint();
+        this.center.z=this.zBound.getMidPoint();
     }
     
         //

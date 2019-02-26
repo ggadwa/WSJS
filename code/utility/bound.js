@@ -46,7 +46,7 @@ export default class BoundClass
                 
     getMidPoint()
     {
-        return((this.max+this.min)/2);
+        return((this.max+this.min)*0.5);
     }
                 
     getSize()

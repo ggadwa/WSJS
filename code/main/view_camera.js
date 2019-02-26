@@ -21,7 +21,7 @@ export default class ViewCameraClass
     setToEntity(entity,eyeHigh)
     {
         this.position.setFromPoint(entity.position);
-        this.position.y-=eyeHigh;
+        this.position.y+=eyeHigh;
         this.angle.setFromPoint(entity.angle);
     }
     

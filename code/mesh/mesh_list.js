@@ -15,8 +15,6 @@ export default class MeshListClass
 
         this.meshes=[];
         
-        this.frustumTranslationPoint=new PointClass(0,0,0);
-        
             // this is an optimization that we use to skip
             // transparency drawing if the opaque draw didn't
             // skip any
@@ -146,7 +144,22 @@ export default class MeshListClass
             this.meshes[n].setupBuffers();
         }
     }
+    
+        //
+        // rebuild bound boxes to modelmatrix
+        // this is mostly used by models to fix bounding
+        // boxes for frustum culling
+        //
 
+    recalcBoundsFromModelMatrix(modelMatrix)
+    {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            mesh.recalcBoundsFromModelMatrix(modelMatrix);
+        }
+    }
+    
         //
         // draw meshes
         //
@@ -161,13 +174,7 @@ export default class MeshListClass
         
             // set any model matrix
             
-        if (modelMatrix===null) {
-            this.frustumTranslationPoint.setFromValues(0,0,0);
-        }
-        else {
-            this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
-            this.frustumTranslationPoint.translationFromMatrix(modelMatrix);
-        }
+        if (modelMatrix!==null) this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
         
             // set any joint matrixes
             
@@ -193,7 +200,7 @@ export default class MeshListClass
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound,this.frustumTranslationPoint)) continue;
+            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
 
                 // time to change bitmap
 
@@ -263,7 +270,7 @@ export default class MeshListClass
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound,this.frustumTranslationPoint)) continue;
+            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
 
                 // time to change bitmap
 

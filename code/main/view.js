@@ -632,17 +632,17 @@ export default class ViewClass
         this.frustumFarPlane.normalize();
     }
 
-    boundBoxInFrustum(xBound,yBound,zBound,translationPnt)
+    boundBoxInFrustum(xBound,yBound,zBound)
     {
             // check if outside the plane, if it is,
             // then it's considered outside the bounds
 
-        if (!this.frustumLeftPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
-        if (!this.frustumRightPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
-        if (!this.frustumTopPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
-        if (!this.frustumBottomPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
-        if (!this.frustumNearPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
-        if (!this.frustumFarPlane.boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)) return(false);
+        if (!this.frustumLeftPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumRightPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumTopPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumBottomPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumNearPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
+        if (!this.frustumFarPlane.boundBoxOutsidePlane(xBound,yBound,zBound)) return(false);
 
             // otherwise considered within the frustum planes
 

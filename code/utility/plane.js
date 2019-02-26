@@ -20,29 +20,15 @@ export default class PlaneClass
         this.d/=f;
     }
     
-    boundBoxOutsidePlane(xBound,yBound,zBound,translationPnt)
+    boundBoxOutsidePlane(xBound,yBound,zBound)
     {
-        let xMin,yMin,zMin;
-        let xMax,yMax,zMax;
+        let xMin=xBound.min;
+        let yMin=yBound.min;
+        let zMin=zBound.min;
 
-        if (translationPnt===null) {
-            xMin=xBound.min;
-            yMin=yBound.min;
-            zMin=zBound.min;
-
-            xMax=xBound.max;
-            yMax=yBound.max;
-            zMax=zBound.max;
-        }
-        else {
-            xMin=xBound.min+translationPnt.x;
-            yMin=yBound.min+translationPnt.y;
-            zMin=zBound.min+translationPnt.z;
-
-            xMax=xBound.max+translationPnt.x;
-            yMax=yBound.max+translationPnt.y;
-            zMax=zBound.max+translationPnt.z;
-        }
+        let xMax=xBound.max;
+        let yMax=yBound.max;
+        let zMax=zBound.max;
         
         if (((this.a*xMin)+(this.b*yMin)+(this.c*zMin)+this.d)>0.0) return(true);
 		if (((this.a*xMax)+(this.b*yMin)+(this.c*zMin)+this.d)>0.0) return(true);

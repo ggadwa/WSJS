@@ -67,6 +67,11 @@ export default class ModelClass
         this.modelMatrix.multiply(this.rotMatrix);
         this.scaleMatrix.setScaleFromPoint(this.scale);
         this.modelMatrix.multiply(this.scaleMatrix);
+        
+            // need to rebuild all the bounds to this
+            // model matrix so frustum calcs work
+        
+        this.meshList.recalcBoundsFromModelMatrix(this.modelMatrix);    
 
             // draw the meshlist
             

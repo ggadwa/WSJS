@@ -4,6 +4,7 @@ import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import ModelNodeClass from '../model/model_node.js';
 import ModelJointClass from '../model/model_joint.js';
+import ModelAnimationChannelClass from '../model/model_animation_channel.js';
 import genRandom from '../utility/random.js';
 
 //
@@ -33,6 +34,10 @@ export default class ModelSkeletonClass
             // animations
             
         this.animations=[];
+        
+        this.currentAnimationIdx=-1;
+        this.currentAnimationStartTimestamp=0;
+        this.currentAnimationData=new Float32Array(4);
         
             // globals to stop GC
             
@@ -74,17 +79,16 @@ export default class ModelSkeletonClass
         // animation
         //
     
-    
-    runAnimationRecursive(node,parentNode)
+    runAnimationNode(node,parentNode)
     {
         let childNodeIdx;
         
-            // get node position (T*R*S)
+            // get node pose position (T*R*S)
          
-        node.curPoseMatrix.setTranslationFromPoint(node.translation);
-        this.nodeMat.setRotationFromQuaternion(node.rotation);
+        node.curPoseMatrix.setTranslationFromPoint(node.poseTranslation);
+        this.nodeMat.setRotationFromQuaternion(node.poseRotation);
         node.curPoseMatrix.multiply(this.nodeMat);
-        this.nodeMat.setScaleFromPoint(node.scale);
+        this.nodeMat.setScaleFromPoint(node.poseScale);
         node.curPoseMatrix.multiply(this.nodeMat);
 
             // multiply in the parent
@@ -104,13 +108,74 @@ export default class ModelSkeletonClass
             // move children nodes
             
         for (childNodeIdx of node.childNodeIdxs) {
-            this.runAnimationRecursive(this.nodes[childNodeIdx],node);
+            this.runAnimationNode(this.nodes[childNodeIdx],node);
+        }
+    }
+    
+    setupNodesToPose()
+    {
+        let n,tick;
+        let animation,channels,channel,node;
+        
+        animation=this.animations[this.currentAnimationIdx];
+        channels=animation.channels;
+        
+            // the global animation tick
+            
+        tick=Math.trunc((this.view.timestamp-this.currentAnimationStartTimestamp)%animation.tickLength);
+        
+            // each channel changes one node over time
+            
+        for (n=0;n!==channels.length;n++) {
+            channel=channels[n];
+            node=this.nodes[channel.nodeIdx];
+            
+                // calculate the pose
+                
+            channel.getPoseDataForTick(tick,this.currentAnimationData);
+            
+                // change the node
+            
+            switch (channel.trsType) {
+                case ModelAnimationChannelClass.TRS_TYPE_TRANSLATION:
+                    node.poseTranslation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    break;
+                case ModelAnimationChannelClass.TRS_TYPE_ROTATION:
+                    node.poseRotation.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2],this.currentAnimationData[3]);
+                    break;
+                case ModelAnimationChannelClass.TRS_TYPE_SCALE:
+                    node.poseScale.setFromValues(this.currentAnimationData[0],this.currentAnimationData[1],this.currentAnimationData[2]);
+                    break;
+            }
         }
     }
     
     runAnimation()
     {
-        if (this.rootNodeIdx!==-1) this.runAnimationRecursive(this.nodes[this.rootNodeIdx],null);
+        if (this.rootNodeIdx===-1) return;
+        
+        if (this.currentAnimationIdx!==-1) this.setupNodesToPose();
+        this.runAnimationNode(this.nodes[this.rootNodeIdx],null);
+    }
+    
+    startAnimation(name)
+    {
+        let n;
+        
+        for (n=0;n!==this.animations.length;n++) {
+            if (this.animations[n].name===name) {
+                this.currentAnimationIdx=n;
+                this.currentAnimationStartTimestamp=this.view.timestamp;
+                return(true);
+            }
+        }
+        
+        return(false);
+    }
+    
+    isAnimationRunning()
+    {
+        return(this.currentAnimationIdx!==-1);
     }
     
         //

@@ -125,7 +125,7 @@ export default class MapLiquidListClass
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound,null)) continue;
+            if (!this.view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
 
                 // time to change bitmap
 

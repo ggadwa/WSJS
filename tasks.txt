@@ -7,7 +7,7 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
-0. animations
+1. check billboard effect shaders
 
 3. all collision and box routines have to be fixed
 6. underwater collision bad
