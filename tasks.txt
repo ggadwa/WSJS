@@ -7,12 +7,17 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
+bumps
+jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
+model angle by quaternions
+
+0. eventualy get rid of importsettings
+
 1. check billboard effect shaders
 
 3. all collision and box routines have to be fixed
 6. underwater collision bad
 
-0. move angles to quaternions
 1. merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions

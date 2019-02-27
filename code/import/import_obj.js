@@ -301,9 +301,9 @@ export default class ImportObjClass extends ImportBaseClass
             
             switch(tokens[0]) {
                 case 'v':
-                    x=Math.trunc(parseFloat(tokens[1])*this.importSettings.scale);
-                    y=Math.trunc(parseFloat(tokens[2])*this.importSettings.scale);
-                    z=Math.trunc(parseFloat(tokens[3])*this.importSettings.scale);
+                    x=parseFloat(tokens[1]);
+                    y=parseFloat(tokens[2]);
+                    z=parseFloat(tokens[3]);
                     this.vertexList.push(new PointClass(x,y,z));
                     break;
                 case 'vt':

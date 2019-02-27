@@ -39,7 +39,7 @@ export default class BitmapListClass
             
             // already in list?
             
-        if (this.bitmaps.has(colorURL)) return;
+        if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
         
             // add new one to list, will be loaded
             // by another call that force loads unloaded

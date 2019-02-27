@@ -132,6 +132,21 @@ export default class MeshListClass
     }
     
         //
+        // resize -- only used for maps because
+        // resizing breaks all animation matrixes
+        //
+        
+    resize(scale)
+    {
+        let n;
+        let nMesh=this.meshes.length;
+
+        for (n=0;n!==nMesh;n++) {
+            this.meshes[n].resize(scale);
+        }
+    }
+    
+        //
         // setup all the mesh buffers
         //
 

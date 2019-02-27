@@ -22,7 +22,7 @@ export default class ImportMapClass
     
     async load(importSettings)
     {
-        let n,k,idx;
+        let n,k,scale,idx;
         let effect,effectDef,effectPos,effectClass;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
@@ -44,6 +44,11 @@ export default class ImportMapClass
             
         importJSON=new ImportJSONClass(this.view,importSettings);
         mapSettings=(await importJSON.import());
+        
+            // scale everything
+            
+        scale=mapSettings.scale;
+        if (scale!==undefined) this.map.meshList.resize(scale);
         
             // run through the effects so bitmaps get into list
             

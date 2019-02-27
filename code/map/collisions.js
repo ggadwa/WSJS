@@ -179,7 +179,7 @@ export default class CollisionClass
             // the rough collide boxes
             
         this.objXBound.setFromValues((entity.position.x-radius),(entity.position.x+radius));
-        this.objYBound.setFromValues((entity.position.y-high),entity.position.y);
+        this.objYBound.setFromValues(entity.position.y,(entity.position.y+high));
         this.objZBound.setFromValues((entity.position.z-radius),(entity.position.z+radius));
         
             // no collisions yet
@@ -210,8 +210,8 @@ export default class CollisionClass
                     // skip if not in the Y of the line
 
                 yBound=collisionLine.getYBound();
-                if (entity.position.y<=yBound.min) continue;
-                if ((entity.position.y-high)>yBound.max) continue;
+                if (entity.position.y>=yBound.max) continue;
+                if ((entity.position.y+high)<yBound.min) continue;
 
                     // check against line
 
@@ -237,10 +237,10 @@ export default class CollisionClass
 
             checkEntityPt=checkEntity.position;
 
-                // skip if not in the Y of the line
+                // skip if not in the Y of the object
 
-            entityTopY=checkEntityPt.y-checkEntity.height;
-            if (((entity.position.y-high)>checkEntityPt.y) || (entity.position.y<=entityTopY)) continue;
+            entityTopY=checkEntityPt.y+checkEntity.height;
+            if (((entity.position.y+high)<checkEntityPt.y) || (entity.position.y>=entityTopY)) continue;
 
                 // check the circle
 
@@ -314,7 +314,7 @@ export default class CollisionClass
             // the rough collide boxes
             
         this.objXBound.setFromValues((this.testPt.x-radius),(this.testPt.x+radius));
-        this.objYBound.setFromValues((this.testPt.y-high),this.testPt.y);
+        this.objYBound.setFromValues(this.testPt.y,(this.testPt.y+high));
         this.objZBound.setFromValues((this.testPt.z-radius),(this.testPt.z+radius));
         
             // no collisions yet
@@ -353,8 +353,8 @@ export default class CollisionClass
                         // skip if not in the Y of the line
             
                     yBound=collisionLine.getYBound();
-                    if (this.testPt.y<=yBound.min) continue;
-                    if ((this.testPt.y-high)>yBound.max) continue;
+                    if (this.testPt.y>=yBound.max) continue;
+                    if ((this.testPt.y+high)<yBound.min) continue;
                     
                         // check against line
 
@@ -368,8 +368,9 @@ export default class CollisionClass
                         entity.collideWallLineIdx=k;
                         currentHitPt=this.moveIntersectPt;
                         currentDist=dist;
+                        
                         bumpY=-1;
-                        if ((this.testPt.y-yBound.min)<=constants.BUMP_HEIGHT) bumpY=yBound.min;
+                        if ((yBound.max-this.testPt.y)<=constants.BUMP_HEIGHT) bumpY=yBound.max;
                     }
                 }
             }
@@ -384,8 +385,8 @@ export default class CollisionClass
                 
                     // skip if not in the Y of the line
 
-                entityTopY=checkEntityPt.y-checkEntity.height;
-                if (((this.testPt.y-high)>checkEntityPt.y) || (this.testPt.y<=entityTopY)) continue;
+                entityTopY=checkEntityPt.y+checkEntity.height;
+                if (((this.testPt.y+high)<checkEntityPt.y) || (this.testPt.y>=entityTopY)) continue;
                 
                     // check the circle
                     
@@ -408,7 +409,7 @@ export default class CollisionClass
                     currentDist=dist;
                     
                     bumpY=-1;
-                    if ((this.testPt.y-entityTopY)<=constants.BUMP_HEIGHT) bumpY=entityTopY;
+                    if ((entityTopY-this.testPt.y)<=constants.BUMP_HEIGHT) bumpY=entityTopY;
                 }
             }
 
@@ -487,7 +488,11 @@ export default class CollisionClass
         this.objYBound.setFromValues((entity.position.y-constants.FLOOR_RISE_HEIGHT),(entity.position.y+constants.FLOOR_RISE_HEIGHT));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
-            // build the ray trace points and ray vector
+            // build the ray trace points
+            // from the bottom of the entity cylinder
+            // plus the floor rise height (so we can move up)
+            // and the vector moving down the Y (which is negative
+            // as the Y is up)
             
         this.buildYCollisionRayPoints(entity,(entity.position.y+constants.FLOOR_RISE_HEIGHT));
         
@@ -535,13 +540,15 @@ export default class CollisionClass
                 }
             }
         }
-            
-        if (entity.standOnMeshIdx!==-1) return(y+entity.position.y);
+         
+            // get how far we've fallen (negative, y is up)
+
+        if (entity.standOnMeshIdx!==-1) return(y-entity.position.y);
         
             // if no collisions, return the
             // farthest part of the ray
         
-        return(constants.FLOOR_RISE_HEIGHT);
+        return(-constants.FLOOR_RISE_HEIGHT);
     }
     
         //
@@ -559,21 +566,24 @@ export default class CollisionClass
             // to the furtherest we are trying to rise
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues(((entity.position.y-entity.height)+riseY),((entity.position.y-entity.height)-riseY));      // riseY is negative
+        this.objYBound.setFromValues((entity.position.y+entity.height),((entity.position.y+entity.height)+riseY));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
-            // build the ray trace points and ray vector
+            // build the ray trace points
+            // from the top of the entity cylinder
+            // and the vector moving up the Y (which is positive
+            // as the Y is up)
             
-        this.buildYCollisionRayPoints(entity,((entity.position.y-entity.height)-riseY));
+        this.buildYCollisionRayPoints(entity,(entity.position.y+entity.height));
             
         this.rayVector.x=0;
-        this.rayVector.y=riseY*2;     // riseY is negative
+        this.rayVector.y=riseY;
         this.rayVector.z=0;
         
             // start with no hits
        
         entity.collideCeilingMeshIdx=-1;
-        y=(entity.position.y-entity.height)+riseY;
+        y=(entity.position.y+entity.height)+riseY;
         
             // run through the meshes
         
@@ -601,7 +611,7 @@ export default class CollisionClass
                     for (i=0;i!==25;i++) {
                         rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
                         if (rayHitPnt!==null) {
-                            if (rayHitPnt.y>=y) {
+                            if (rayHitPnt.y<=y) {
                                 entity.collideCeilingMeshIdx=n;
                                 y=rayHitPnt.y;
                             }
@@ -611,7 +621,7 @@ export default class CollisionClass
             }
         }
         
-        if (entity.collideCeilingMeshIdx!==-1) return(y-(entity.position.y-entity.height));
+        if (entity.collideCeilingMeshIdx!==-1) return(y-(entity.position.y+entity.height));
         
             // if no collisions, return the riseY
         

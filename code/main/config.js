@@ -32,8 +32,8 @@ class ConfigClass
             // play testing
             //
 
-        this.PLAYER_CLIP_WALLS=true;
-        this.PLAYER_FLY=true;
+        this.PLAYER_CLIP_WALLS=false;
+        this.PLAYER_FLY=false;
         this.DRAW_SKELETONS=false;
     }
 }

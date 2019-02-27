@@ -197,6 +197,22 @@ export default class MeshClass
     }
     
         //
+        // resize -- only used for maps because
+        // resizing breaks all animation matrixes
+        //
+    
+    resize(scale)
+    {
+        let n;
+        
+        for (n=0;n!=this.vertexCount;n++) {
+            this.vertexArray[n]*=scale;
+        }
+        
+        this.setupBounds();
+    }
+    
+        //
         // rebuild bound boxes to modelmatrix
         // this is mostly used by models to fix bounding
         // boxes for frustum culling
@@ -252,7 +268,7 @@ export default class MeshClass
     buildCollisionGeometry()
     {
         let n,ny;
-        let tIdx,vIdx,nIdx;
+        let tIdx,vIdx;
         let x0,y0,z0,x1,y1,z1,x2,y2,z2;
         
             // run through the triangles
@@ -260,16 +276,18 @@ export default class MeshClass
             // create collision lines and floors
             // to create collision boxes
             
-        tIdx=0;
-            
         for (n=0;n!==this.trigCount;n++) {
             
                 // get trig vertices
+                
+            tIdx=n*3;
 
             vIdx=this.indexArray[tIdx]*3;
             x0=this.vertexArray[vIdx];
             y0=this.vertexArray[vIdx+1];
             z0=this.vertexArray[vIdx+2];
+            
+            ny=this.normalArray[vIdx+1];      // arrays are parallel, we need normal to check slope
             
             vIdx=this.indexArray[tIdx+1]*3;
             x1=this.vertexArray[vIdx];
@@ -280,9 +298,6 @@ export default class MeshClass
             x2=this.vertexArray[vIdx];
             y2=this.vertexArray[vIdx+1];
             z2=this.vertexArray[vIdx+2];
-            
-            nIdx=this.indexArray[tIdx*3];
-            ny=this.normalArray[nIdx+1];
             
                 // detect if triangle is a floor
                 

@@ -296,27 +296,22 @@ export default class ProjectEntityClass
             this.collideCeilingMeshIdx=-1;                         // no ceiling collisions if going down
 
             fallY=this.collision.fallObjectInMap(this);
-            console.log('yAdd='+yAdd+', fallY='+fallY);
-            if (fallY>yAdd) fallY=yAdd;                            // can only drop as far as current fall
+            if (fallY<yAdd) fallY=yAdd;                            // can only drop as far as current fall
             
             this.position.addValuesTrunc(0,fallY,0);
         
-            if (fallY>=0) this.gravity=this.gravityMinValue;
+            if (fallY>=0) this.gravity=this.gravityMinValue;        // if we are rising or stopped by a floor, restart gravity
         }
         
             // moving up
             
         else {
-            /*
             this.standOnMeshIdx=-1;                                 // no standing if going up
             
             riseY=this.collision.riseObjectInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);
             
-            if (riseY>yAdd) {                                       // if we can't get as high as we want, then clear any movement
-                this.movement.y=0;
-            }
-            */
+            if (riseY<yAdd) this.movement.y=0;                      // if we can't get as high as we want, then clear any movement
         }
     }
     
@@ -435,7 +430,7 @@ export default class ProjectEntityClass
     movementJump(jumpValue)
     {
         this.gravity=this.gravityMinValue;
-        this.movement.y=-jumpValue;
+        this.movement.y=jumpValue;
     }
     
     movementReflect()

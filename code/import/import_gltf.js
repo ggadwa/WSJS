@@ -380,6 +380,15 @@ export default class ImportGLTFClass extends ImportBaseClass
         let n,nodes,skin,joints;
         let mat,inverseBindMatrixFloatArray;
         
+            // if there's a skeleton to decode,
+            // then rigging is required and
+            // it's an error otherwise
+        
+        if (this.jsonData.skins===undefined) {
+            console.log('rigging is required for model '+this.importSettings.name);
+            return(false);
+        }
+        
             // we have to load every node
             // because even though they aren't part of
             // the skeleton they have important TRS data
@@ -457,9 +466,9 @@ export default class ImportGLTFClass extends ImportBaseClass
             // now any color texture
             // check specularGlossiness first
         
-        if (materialNode.extensions!==undefined) {    
+        if (materialNode.extensions!==undefined) {
             if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness!==undefined) {
-
+                
                     // find the glossy base color
 
                 diffuseTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture;
@@ -743,7 +752,9 @@ export default class ImportGLTFClass extends ImportBaseClass
         if (skeleton!==null) {
             if (!this.decodeSkeleton(skeleton)) return(false);
         }
+        
         if (!this.decodeMesh(meshList,skeleton)) return(false);
+        
         if (skeleton!==null) {
             if (!this.decodeAnimations(skeleton)) return(false);
         }

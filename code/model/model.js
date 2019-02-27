@@ -63,7 +63,11 @@ export default class ModelClass
     draw()
     {
         this.modelMatrix.setTranslationFromPoint(this.position);
+        this.rotMatrix.setRotationFromZAngle(this.angle.z);
+        this.modelMatrix.multiply(this.rotMatrix);
         this.rotMatrix.setRotationFromYAngle(this.angle.y);
+        this.modelMatrix.multiply(this.rotMatrix);
+        this.rotMatrix.setRotationFromXAngle(this.angle.x);
         this.modelMatrix.multiply(this.rotMatrix);
         this.scaleMatrix.setScaleFromPoint(this.scale);
         this.modelMatrix.multiply(this.scaleMatrix);
