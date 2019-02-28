@@ -380,14 +380,9 @@ export default class ImportGLTFClass extends ImportBaseClass
         let n,nodes,skin,joints;
         let mat,inverseBindMatrixFloatArray;
         
-            // if there's a skeleton to decode,
-            // then rigging is required and
-            // it's an error otherwise
+            // if there's no skin, then no rigging
         
-        if (this.jsonData.skins===undefined) {
-            console.log('rigging is required for model '+this.importSettings.name);
-            return(false);
-        }
+        if (this.jsonData.skins===undefined) return(true);
         
             // we have to load every node
             // because even though they aren't part of
@@ -544,6 +539,10 @@ export default class ImportGLTFClass extends ImportBaseClass
         let tangent=new PointClass(0,0,0);
         let meshes=[];
         
+            // if there's no skin, then ignore any rigging
+            
+        if (this.jsonData.skins===undefined) skeleton=null;
+        
             // run through the meshes
             
         meshesNode=this.jsonData.meshes;
@@ -653,7 +652,13 @@ export default class ImportGLTFClass extends ImportBaseClass
         let n,k,t,isVec4;
         let animations,channels,animateNode,channelNode,samplerNode;
         let animation,channel,pose;
-        let timeArray,vectorArray,vector,vIdx;
+        let timeArray,vectorArray,vIdx;
+        
+            // if no skin, then no animation
+            
+        if (this.jsonData.skins===undefined) return(true);    
+            
+            // decode the animations
         
         animations=this.jsonData.animations;
         if (animations===undefined) return;

@@ -20,7 +20,8 @@ export default class ModelAnimationChannelClass
     
     getPoseDataForTick(tick,outData)
     {
-        let n,f,fi,x,y,z,w;
+        let n,f;
+        // let fi,x,y,z,w;
         let tickLen,tickOffset;
         let endPoseIdx;
         let startPose,endPose;

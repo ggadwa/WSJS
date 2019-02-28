@@ -3,6 +3,7 @@ import PointClass from '../../code/utility/point.js';
 import Matrix4Class from '../utility/matrix4.js';
 import MeshListClass from '../mesh/mesh_list.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
+import ImportModelClass from '../import/import_model.js';
 
 //
 // model object
@@ -10,9 +11,12 @@ import ModelSkeletonClass from '../model/model_skeleton.js';
 
 export default class ModelClass
 {
-    constructor(view)
+    constructor(view,importSettings)
     {
         this.view=view;
+        this.importSettings=importSettings;
+        
+        this.loaded=false;
         
         this.meshList=new MeshListClass(view);
         this.skeleton=new ModelSkeletonClass(view);
@@ -38,6 +42,8 @@ export default class ModelClass
         if (!this.meshList.initialize(this.view.shaderList.modelMeshShader)) return(false);
         this.skeleton.initialize();
         
+        this.loaded=false;
+        
         return(true);
     }
 
@@ -45,6 +51,33 @@ export default class ModelClass
     {
         this.meshList.release();
         this.skeleton.release();
+    }
+    
+        //
+        // async model loading
+        //
+        
+    async load()
+    {
+        let importModel;
+        
+            // no import settings, nothing to load
+            
+        if (this.importSettings==null) return(true);
+        
+        console.log('loading='+this.importSettings.name);
+        
+            // the model
+            
+        importModel=new ImportModelClass(this.view,this);
+        if (!(await importModel.load(this.importSettings))) return(false);
+
+        this.scale.setFromValues(this.importSettings.scale,this.importSettings.scale,this.importSettings.scale);
+        this.setupBuffers();
+        
+        this.loaded=true;
+        
+        return(true);
     }
     
         //
@@ -75,8 +108,8 @@ export default class ModelClass
             // need to rebuild all the bounds to this
             // model matrix so frustum calcs work
         
-        this.meshList.recalcBoundsFromModelMatrix(this.modelMatrix);    
-
+        this.meshList.recalcBoundsFromModelMatrix(this.modelMatrix);
+        
             // draw the meshlist
             
         this.meshList.drawOpaque(this.modelMatrix,this.skeleton.getPoseJointMatrixArray());

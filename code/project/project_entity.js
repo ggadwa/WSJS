@@ -2,7 +2,6 @@ import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import ModelClass from '../model/model.js';
-import ImportModelClass from '../import/import_model.js';
 import CollisionClass from '../map/collisions.js';
 
 //
@@ -26,7 +25,6 @@ export default class ProjectEntityClass
         this.heldBy=null;
         
         this.model=null;
-        this.modelImportSettings=null;
         
         if (position!==null) this.position.setFromPoint(position);
         if (angle!==null) this.angle.setFromPoint(angle);
@@ -103,29 +101,14 @@ export default class ProjectEntityClass
         // models
         //
      
-    setModel(modelImportSettings)
+    setModel(importSettings)
     {
-        this.modelImportSettings=modelImportSettings;        
-    }
-    
-    async loadModel()
-    {
-        let importModel;
+        if (this.model!==null) {
+            console.log('already set model once');
+            return;
+        }
         
-        if (this.modelImportSettings==null) return(true);
-        
-            // the model
-            
-        this.model=new ModelClass(this.view);
-        this.model.initialize();
-        
-        importModel=new ImportModelClass(this.view,this.model);
-        if (!(await importModel.load(this.modelImportSettings))) return(false);
-
-        this.model.scale.setFromValues(this.modelImportSettings.scale,this.modelImportSettings.scale,this.modelImportSettings.scale);
-        this.model.setupBuffers();
-        
-        return(true);
+        this.model=this.view.modelList.add(importSettings.name,importSettings);      
     }
     
         //

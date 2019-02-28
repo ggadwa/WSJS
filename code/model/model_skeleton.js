@@ -28,7 +28,7 @@ export default class ModelSkeletonClass
         
             // joints
             // all nodes needed for animation
-            
+
         this.joints=[];
         
             // animations
@@ -36,7 +36,8 @@ export default class ModelSkeletonClass
         this.animations=[];
         
         this.currentAnimationIdx=-1;
-        this.currentAnimationStartTimestamp=0;
+        this.currentAnimationStartTick=-1;
+        this.currentAnimationEndTick=-1;
         this.currentAnimationData=new Float32Array(4);
         
             // globals to stop GC
@@ -122,7 +123,7 @@ export default class ModelSkeletonClass
         
             // the global animation tick
             
-        tick=Math.trunc((this.view.timestamp-this.currentAnimationStartTimestamp)%animation.tickLength);
+        tick=animation.loopStartTick+Math.trunc((this.view.timestamp-animation.startTimestamp)%(animation.loopEndTick-animation.loopStartTick));
         
             // each channel changes one node over time
             
@@ -152,25 +153,51 @@ export default class ModelSkeletonClass
     
     runAnimation()
     {
-        if (this.rootNodeIdx===-1) return;
+        if (this.rootNodeIdx===-1) return;      // this model has no rigging
         
         if (this.currentAnimationIdx!==-1) this.setupNodesToPose();
         this.runAnimationNode(this.nodes[this.rootNodeIdx],null);
     }
     
-    startAnimation(name)
+    findAnimationIndex(name)
     {
         let n;
         
         for (n=0;n!==this.animations.length;n++) {
-            if (this.animations[n].name===name) {
-                this.currentAnimationIdx=n;
-                this.currentAnimationStartTimestamp=this.view.timestamp;
-                return(true);
-            }
+            if (this.animations[n].name===name) return(n);
         }
         
-        return(false);
+        return(-1);
+    }
+    
+    startAnimationChunk(name,loopStartTick,loopEndTick)
+    {
+        let animation;
+        
+        this.currentAnimationIdx=this.findAnimationIndex(name);
+        if (this.currentAnimationIdx===-1) return(false);
+        
+        animation=this.animations[this.currentAnimationIdx];
+        animation.startTimestamp=this.view.timestamp;
+        animation.loopStartTick=loopStartTick;
+        animation.loopEndTick=loopEndTick;
+        
+        return(true);
+    }
+    
+    startAnimation(name)
+    {
+        let animation;
+        
+        this.currentAnimationIdx=this.findAnimationIndex(name);
+        if (this.currentAnimationIdx===-1) return(false);
+        
+        animation=this.animations[this.currentAnimationIdx];
+        animation.startTimestamp=this.view.timestamp;
+        animation.loopStartTick=0;
+        animation.loopEndTick=animation.tickLength;
+        
+        return(true);
     }
     
     isAnimationRunning()
@@ -187,6 +214,22 @@ export default class ModelSkeletonClass
         let n,node,joint;
         let matrixArray=[];
         
+            // if there is no rigging, everything is
+            // the identity matrix
+            
+        if (this.rootNodeIdx===-1) {
+            
+            for (n=0;n!==this.joints.length;n++) {
+                this.joints[n].setIdentity();
+                matrixArray.push(joint.jointMatrix);
+            }
+            
+            return(matrixArray);
+        }
+        
+            // otherwise calculate the joint matrixes
+            // based on the animation pose matrix
+            
         for (n=0;n!==this.joints.length;n++) {
             joint=this.joints[n];
             node=this.nodes[joint.nodeIdx];

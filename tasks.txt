@@ -11,6 +11,7 @@ bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
 model angle by quaternions
 
+
 0. eventualy get rid of importsettings
 
 1. check billboard effect shaders

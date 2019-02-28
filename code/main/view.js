@@ -3,6 +3,7 @@ import config from '../main/config.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
 import ShaderListClass from '../shader/shader_list.js';
+import ModelListClass from '../model/model_list.js';
 import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
@@ -26,9 +27,13 @@ export default class ViewClass
 
         this.gl=null;
         this.canvas=null;
+        
+            // the cached objects
+            
         this.bitmapList=null;
         this.soundList=null;
         this.shaderList=null;
+        this.modelList=null;
         
             // input
             
@@ -201,20 +206,21 @@ export default class ViewClass
         this.high=this.canvas.height;
         this.aspect=this.canvas.width/this.canvas.height;
         
-            // bitmap list
+            // bitmap, sound, shader, and model list
+            // a lot of these are deffered load or
+            // versions that cache objects
             
         this.bitmapList=new BitmapListClass(this);
         this.bitmapList.initialize();
         
-            // sound list
-            
         this.soundList=new SoundListClass(this);
         this.soundList.initialize();
         
-            // shader list
-            
         this.shaderList=new ShaderListClass(this);
         this.shaderList.initialize();
+            
+        this.modelList=new ModelListClass(this);
+        this.modelList.initialize();
         
             // create needed objects
             
@@ -243,6 +249,7 @@ export default class ViewClass
     {
         this.text.release();
         this.interface.release();
+        this.modelList.release();
         this.shaderList.release();
         this.soundList.release();
         this.bitmapList.release();

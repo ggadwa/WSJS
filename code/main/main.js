@@ -99,7 +99,7 @@ class MainClass
     
     async initLoadEntityModels()
     {
-        if (!(await this.map.entityList.loadAllModels())) return;
+        if (!(await this.view.modelList.loadAllModels())) return;
         
         this.view.loadingScreenUpdate();
         this.view.loadingScreenAddString('Loading Images');

@@ -11,6 +11,10 @@ export default class ModelAnimationClass
         this.channels=[];
         
         this.tickLength=0;
+        
+        this.startTimestamp=0;
+        this.loopStartTick=-1;
+        this.loopEndTick=-1;
 
         Object.seal(this);
     }
