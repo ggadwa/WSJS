@@ -112,7 +112,9 @@ export default class ModelClass
             
         this.meshList.drawOpaque(this.modelMatrix,this.skeleton.getPoseJointMatrixArray());
         
-        if (config.DRAW_SKELETONS) {
+            // debug skeleton drawing
+            
+        if (config.DRAW_MODEL_SKELETONS) {
             this.modelMatrix.setTranslationFromPoint(this.position);
             this.rotMatrix.setRotationFromYAngle(this.angle.y);
             this.modelMatrix.multiply(this.rotMatrix);

@@ -13,7 +13,7 @@ class ConfigClass
             //
             
         this.START_MAP=0;
-        this.START_MAP_LIST=['Dual Castles','Dungeon'];
+        this.START_MAP_LIST=['Post War City','Dual Castles','Dungeon'];
 
             //
             // sounds
@@ -32,9 +32,9 @@ class ConfigClass
             // play testing
             //
 
-        this.PLAYER_CLIP_WALLS=false;
-        this.PLAYER_FLY=false;
-        this.DRAW_SKELETONS=false;
+        this.PLAYER_CLIP_WALLS=true;
+        this.PLAYER_FLY=true;
+        this.DRAW_MODEL_SKELETONS=false;
     }
 }
 

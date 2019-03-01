@@ -82,6 +82,17 @@ export default class MeshListClass
         return(-1);
     }
 
+    delete(name)
+    {
+        let mesh;
+        let idx=this.find(name);
+        if (idx===-1) return;
+        
+        mesh=this.meshes[idx];
+        mesh.close();
+        this.meshes.splice(idx,1);
+    }
+    
         //
         // check for mesh list collisions
         //
@@ -132,17 +143,19 @@ export default class MeshListClass
     }
     
         //
-        // resize -- only used for maps because
-        // resizing breaks all animation matrixes
+        // used for maps because they
+        // aren't rigged which means there's no animation
+        // to get the vertexes in the right place, so we
+        // need to apply the node matrixes
         //
         
-    resize(scale)
+    recalcVertexesFromImportMatrixes(scale)
     {
         let n;
         let nMesh=this.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
-            this.meshes[n].resize(scale);
+            this.meshes[n].recalcVertexesFromImportMatrixes(scale);
         }
     }
     

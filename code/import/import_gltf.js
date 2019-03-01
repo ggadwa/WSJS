@@ -311,6 +311,130 @@ export default class ImportGLTFClass extends ImportBaseClass
     }
     
         //
+        // node utilities
+        //
+        
+    findNodeIndexInSkeletonChildIndexes(skeleton,nodeIdx)
+    {
+        let n,k,node;
+
+        for (n=0;n!==skeleton.nodes.length;n++) {
+            if (n===nodeIdx) continue;
+            node=skeleton.nodes[n];
+            
+            for (k=0;k!==node.childNodeIdxs.length;k++) {
+                if (node.childNodeIdxs[k]===nodeIdx) return(n);
+            }
+        }
+        
+        return(-1);
+    }
+    
+    findNodeIndexInDataForMeshIndex(meshIdx)
+    {
+        let n,nodes;
+
+        nodes=this.jsonData.nodes;
+        
+        for (n=0;n!==nodes.length;n++) {
+            if ((nodes[n].mesh!==undefined) && (nodes[n].mesh===meshIdx)) return(n);
+        }
+        
+        return(-1);
+    }
+    
+    findParentNodeIndexInDataForNodeIdx(nodeIdx)
+    {
+        let n,k,node,nodes;
+        
+        nodes=this.jsonData.nodes;
+
+        for (n=0;n!==nodes.length;n++) {
+            if (n===nodeIdx) continue;
+            
+            node=nodes[n];
+            if (node.children===undefined) continue;
+            
+            for (k=0;k!==node.children.length;k++) {
+                if (node.children[k]===nodeIdx) return(n);
+            }
+        }
+        
+        return(-1);
+    }
+        
+    getCumulativeNodeMatrixForMesh(meshIdx)
+    {
+        let n,node,nodeIdx,nodeParentIdx;
+        let translationProp,rotationProp,scaleProp;
+        let mat,mat2,mat3,translation,rotation,scale;
+        let nodeStack=[];
+        
+            // if no node, then it's the identity
+            
+        nodeIdx=this.findNodeIndexInDataForMeshIndex(meshIdx);
+        if (nodeIdx===-1) return(new Matrix4Class());
+        
+            // if not, make a stack of parent nodes
+        
+        while (true) {
+            nodeStack.push(nodeIdx);
+            
+            nodeParentIdx=this.findParentNodeIndexInDataForNodeIdx(nodeIdx);
+            if (nodeParentIdx===-1) break;
+            
+            nodeIdx=nodeParentIdx;
+        }
+        
+            // now reverse build the matrixes
+            
+        translation=new PointClass(0,0,0);
+        rotation=new QuaternionClass();
+        scale=new PointClass(1,1,1);
+        mat=new Matrix4Class();
+        mat2=new Matrix4Class();
+        mat3=new Matrix4Class();
+        
+        for (n=(nodeStack.length-1);n>=0;n--) {
+            node=this.jsonData.nodes[nodeStack[n]];
+            
+                // get matrix or TRS to matrix
+                
+            if (node.matrix!==undefined) {
+                mat2.fromArray(node.matrix);
+            }
+            else {
+                mat2.setIdentity();
+                
+                translationProp=node.translation;
+                if (translationProp!==undefined) {
+                    translation.setFromValues(translationProp[0],translationProp[1],translationProp[2]);
+                    mat3.setTranslationFromPoint(translation);
+                    mat2.multiply(mat3);
+                }
+                
+                rotationProp=node.rotation;
+                if (rotationProp!==undefined) {
+                    rotation.setFromValues(rotationProp[0],rotationProp[1],rotationProp[2],rotationProp[3]);
+                    mat3.setRotationFromQuaternion(rotation);
+                    mat2.multiply(mat3);
+                }
+                
+                scaleProp=node.scale;
+                if (scaleProp!==undefined) {
+                    scale.setFromValues(scaleProp[0],scaleProp[1],scaleProp[2]);
+                    mat3.setScaleFromPoint(scale);
+                    mat2.multiply(mat3);
+                }
+            }
+            
+            mat.multiply(mat2);
+        }
+        
+        return(mat);
+    }
+    
+        //
         // decode skeleton
         //
     
@@ -359,22 +483,6 @@ export default class ImportGLTFClass extends ImportBaseClass
         return(new ModelNodeClass(node.name,((node.children!==undefined)?node.children:[]),translation,rotation,scale));
     }
     
-    findNodeIndexInChildIndexes(skeleton,nodeIdx)
-    {
-        let n,k,node;
-
-        for (n=0;n!==skeleton.nodes.length;n++) {
-            if (n===nodeIdx) continue;
-            node=skeleton.nodes[n];
-            
-            for (k=0;k!==node.childNodeIdxs.length;k++) {
-                if (node.childNodeIdxs[k]===nodeIdx) return(n);
-            }
-        }
-        
-        return(-1);
-    }
-    
     decodeSkeleton(skeleton)
     {
         let n,nodes,skin,joints;
@@ -418,7 +526,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             // now find the parents
             
         for (n=0;n!==skeleton.nodes.length;n++) {
-            skeleton.nodes[n].parentNodeIdx=this.findNodeIndexInChildIndexes(skeleton,n);
+            skeleton.nodes[n].parentNodeIdx=this.findNodeIndexInSkeletonChildIndexes(skeleton,n);
         }
         
             // find the root node by taking the first joint
@@ -537,6 +645,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         let mesh,bitmap,curBitmapName;
         let normal=new PointClass(0,0,0);
         let tangent=new PointClass(0,0,0);
+        let cumulativeNodeMatrix;
         let meshes=[];
         
             // if there's no skin, then ignore any rigging
@@ -549,6 +658,14 @@ export default class ImportGLTFClass extends ImportBaseClass
         
         for (n=0;n!==meshesNode.length;n++) {
             meshNode=meshesNode[n];
+            
+                // always store a matrix for each mesh
+                // from the nodes, this is mostly used by
+                // maps to precalculate the vertexes as there
+                // is no rigging so they need to be moved
+                // into their real coordinates
+                
+            cumulativeNodeMatrix=this.getCumulativeNodeMatrixForMesh(n);
             
                 // run through the primitives
                 // we need to knock out anything that's
@@ -618,7 +735,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // all the array types should be their proper
                     // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }

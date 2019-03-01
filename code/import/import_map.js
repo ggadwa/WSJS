@@ -45,14 +45,19 @@ export default class ImportMapClass
         importJSON=new ImportJSONClass(this.view,importSettings);
         mapSettings=(await importJSON.import());
         
-            // scale everything
+            // maps don't have rigging, so we need to recalculate
+            // all the node matrixes and TRS and then scale to
+            // the size we want (animations cover that for rigged
+            // models)
             
         scale=mapSettings.scale;
-        if (scale!==undefined) this.map.meshList.resize(scale);
+        if (scale===undefined) scale=1;
+        
+        this.map.meshList.recalcVertexesFromImportMatrixes(scale);
         
             // run through the effects so bitmaps get into list
             
-        if (mapSettings.effects!==null) {
+        if (mapSettings.effects!==undefined) {
             for (n=0;n!==mapSettings.effects.length;n++) {
                 effectDef=mapSettings.effects[n];
                 
@@ -77,7 +82,7 @@ export default class ImportMapClass
             
         this.view.ambient=mapSettings.ambient;
         
-        if (mapSettings.lights!==null) {
+        if (mapSettings.lights!==undefined) {
             
             for (n=0;n!==mapSettings.lights.length;n++) {
                 lightDef=mapSettings.lights[n];
@@ -95,7 +100,7 @@ export default class ImportMapClass
         
             // the liquids
             
-        if (mapSettings.liquids!==null) {
+        if (mapSettings.liquids!==undefined) {
             for (n=0;n!==mapSettings.liquids.length;n++) {
                 liquidDef=mapSettings.liquids[n];
                 
@@ -110,7 +115,7 @@ export default class ImportMapClass
        
             // the movements
             
-        if (mapSettings.movements!==null) {
+        if (mapSettings.movements!==undefined) {
 
             for (n=0;n!==mapSettings.movements.length;n++) {
                 movementDef=mapSettings.movements[n];
@@ -149,7 +154,7 @@ export default class ImportMapClass
         
             // the sky
             
-        if (mapSettings.skyBox===null) {
+        if (mapSettings.skyBox===undefined) {
             this.map.sky.on=false;
         }
         else {
@@ -169,7 +174,7 @@ export default class ImportMapClass
             // supergumba -- this is all a bit sticky we need to deal
             // with this in some other way in the future
             
-        if (mapSettings.glows!==null) {
+        if (mapSettings.glows!==undefined) {
             for (n=0;n!==mapSettings.glows.length;n++) {
                 glowDef=mapSettings.glows[n];
                 

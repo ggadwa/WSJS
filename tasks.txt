@@ -7,9 +7,9 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
+0a. need to fix transparencies
+0b. need way to say certain meshes don't collide
 
-0. importer ALWAYS load nodes
-1. load meshes BY nodes and alter the vertexes on through
 
 bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
@@ -17,6 +17,7 @@ model angle by quaternions
 
 
 0. eventualy get rid of importsettings
+
 
 1. check billboard effect shaders
 

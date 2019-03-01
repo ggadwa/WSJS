@@ -10,11 +10,12 @@ import CollisionTrigClass from '../utility/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
+    constructor(view,name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
         this.view=view;
         this.name=name;
         this.bitmap=bitmap;
+        this.cumulativeNodeMatrix=cumulativeNodeMatrix;     // a matrix, all the glTF matrixes premultiplied up to this mesh
         this.vertexArray=vertexArray;       // expected Float32Array
         this.normalArray=normalArray;       // expected Float32Array
         this.tangentArray=tangentArray;     // expected Float32Array
@@ -197,16 +198,32 @@ export default class MeshClass
     }
     
         //
-        // resize -- only used for maps because
-        // resizing breaks all animation matrixes
+        // used for maps because they
+        // aren't rigged which means there's no animation
+        // to get the vertexes in the right place, so we
+        // need to apply the node matrixes
         //
     
-    resize(scale)
+    recalcVertexesFromImportMatrixes(scale)
     {
         let n;
+        let v=new PointClass(0,0,0);
         
-        for (n=0;n!=this.vertexCount;n++) {
-            this.vertexArray[n]*=scale;
+        for (n=0;n<this.vertexCount;n+=3) {
+            v.setFromValues(this.vertexArray[n],this.vertexArray[n+1],this.vertexArray[n+2]);
+            v.matrixMultiply(this.cumulativeNodeMatrix);
+            
+            this.vertexArray[n]=v.x*scale;
+            this.vertexArray[n+1]=v.y*scale;
+            this.vertexArray[n+2]=v.z*scale;
+            
+            v.setFromValues(this.normalArray[n],this.normalArray[n+1],this.normalArray[n+2]);
+            v.matrixMultiplyIgnoreTransform(this.cumulativeNodeMatrix);
+            v.normalize();
+            
+            this.normalArray[n]=v.x;
+            this.normalArray[n+1]=v.y;
+            this.normalArray[n+2]=v.z;
         }
         
         this.setupBounds();

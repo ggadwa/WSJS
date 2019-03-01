@@ -1,6 +1,7 @@
 import ImportBaseClass from '../import/import_base.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
+import Matrix4Class from '../utility/matrix4.js';
 import ColorClass from '../utility/color.js';
 import MeshClass from '../mesh/mesh.js';
 
@@ -203,7 +204,7 @@ export default class ImportObjClass extends ImportBaseClass
         if (groupNameOffset!=0) name+=('_'+groupNameOffset);
         
         tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
-        this.meshes.push(new MeshClass(this.view,name,bitmap,new Float32Array(vertexArray),new Float32Array(normalArray),new Float32Array(tangentArray),new Float32Array(uvArray),null,null,new Uint32Array(indexArray)));
+        this.meshes.push(new MeshClass(this.view,name,bitmap,new Matrix4Class(),new Float32Array(vertexArray),new Float32Array(normalArray),new Float32Array(tangentArray),new Float32Array(uvArray),null,null,new Uint32Array(indexArray)));
     }
     
         //
