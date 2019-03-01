@@ -65,8 +65,6 @@ export default class ModelClass
             
         if (this.importSettings==null) return(true);
         
-        console.log('loading='+this.importSettings.name);
-        
             // the model
             
         importModel=new ImportModelClass(this.view,this);

@@ -69,7 +69,7 @@ class MainClass
         if (!(await this.projectMap.loadMap())) return;
         
         this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Building Collision Geomtry');
+        this.view.loadingScreenAddString('Building Collision Geometry');
         this.view.loadingScreenDraw(0.2);
         
         setTimeout(this.initCollisionGeomtry.bind(this),1);

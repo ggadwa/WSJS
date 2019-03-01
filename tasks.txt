@@ -7,6 +7,10 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
+
+0. importer ALWAYS load nodes
+1. load meshes BY nodes and alter the vertexes on through
+
 bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
 model angle by quaternions
