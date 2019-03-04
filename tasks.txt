@@ -7,32 +7,38 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
-0a. need to fix transparencies
-0b. need way to say certain meshes don't collide
+Dungeon to do
+ 1. start all gates down
+ 2. start all doors closed
+ 3. first crypt has crystal & lamp running into each other
+ 4. lower area in room a bit so I can add deadly slime
+
+0. when maps final, redo it so we have glossy stuff instead of wacky material bit
+1. fix dungeon movements when new map
+2. transparencies need to be sorted
+3. need to sort waves too or at least form in direction away from camera
+4. waves need wave direction (x/z/none) - get from u/v change
+5. addBillboardQuadToGLList is crap, maybe keep an offset and always add up
+     - add a rotation factor to it, rotate glow bitmap in flame (and smoke?)
+6. add no collision by bitmap ("noCollideBitmaps")
+      - cobwebs in dungeon map
+      - bushes & branches in castle map
+
 
 
 bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
 model angle by quaternions
 
-
-0. eventualy get rid of importsettings
-
-
 1. check billboard effect shaders
-
 3. all collision and box routines have to be fixed
 6. underwater collision bad
-
 1. merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
     - just position/angle and collisions
-3. work on collisions
-   0a. make sure to combine any lines/floors that we can
 4. delete all weapon stuff from player
 5. shaders need to be dynamic and part of project
 6. view -> WSJS?
 7. map into view
 8. combine input / view pause states
 9. get rid of constants, use statics
-

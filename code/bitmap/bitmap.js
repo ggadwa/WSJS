@@ -29,6 +29,8 @@ export default class BitmapClass
         this.glowMap=null;
 
         this.alpha=1.0;
+        this.hasColorImageAlpha=false;
+        
         this.glowFrequency=0;
         this.glowMax=1.0;
         
@@ -72,7 +74,7 @@ export default class BitmapClass
         
     checkImageForAlpha(img)
     {
-        let n,nPixel,idx,hasAlpha;
+        let n,nPixel,idx;
         let canvas,ctx,imgData,data;
         
             // draw the image onto a canvas
@@ -90,8 +92,6 @@ export default class BitmapClass
         
         nPixel=img.width*img.height;
         idx=0;
-        
-        hasAlpha=false;
         
         for (n=0;n!=nPixel;n++) {
             idx+=3;
@@ -163,7 +163,6 @@ export default class BitmapClass
     
     async load()
     {
-        let hasAlpha;
         let gl=this.view.gl;
         
             // special check for solid colors
@@ -200,11 +199,11 @@ export default class BitmapClass
         
             // detect if there is any alpha
             
-        hasAlpha=this.checkImageForAlpha(this.colorImage);
+        this.hasColorImageAlpha=this.checkImageForAlpha(this.colorImage);
 
         this.texture=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
-        gl.texImage2D(gl.TEXTURE_2D,0,(hasAlpha?gl.RGBA:gl.RGB),(hasAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
+        gl.texImage2D(gl.TEXTURE_2D,0,(this.hasColorImageAlpha?gl.RGBA:gl.RGB),(this.hasColorImageAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);

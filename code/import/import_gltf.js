@@ -250,7 +250,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         let denom;
         let tangent=new PointClass(0.0,0.0,0.0);
         
-        let tangentArray=[];
+        let tangentArray=new Float32Array(vertexArray.length);
 
         nTrig=Math.trunc(indexArray.length/3);
 
@@ -302,9 +302,18 @@ export default class ImportGLTFClass extends ImportBaseClass
                 // and set the mesh tangent
                 // to all vertexes in this trig
 
-            tangentArray.push(tangent.x,tangent.y,tangent.z);
-            tangentArray.push(tangent.x,tangent.y,tangent.z);
-            tangentArray.push(tangent.x,tangent.y,tangent.z);
+            vIdx=indexArray[trigIdx]*3;
+            tangentArray[vIdx]=tangent.x;
+            tangentArray[vIdx+1]=tangent.y;
+            tangentArray[vIdx+2]=tangent.z;
+            vIdx=indexArray[trigIdx+1]*3;
+            tangentArray[vIdx]=tangent.x;
+            tangentArray[vIdx+1]=tangent.y;
+            tangentArray[vIdx+2]=tangent.z;
+            vIdx=indexArray[trigIdx+2]*3;
+            tangentArray[vIdx]=tangent.x;
+            tangentArray[vIdx+1]=tangent.y;
+            tangentArray[vIdx+2]=tangent.z;
         }
         
         return(tangentArray);
@@ -558,7 +567,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         
             // first find any normal texture
             
-        if (materialNode.normalTexture!==undefined) {
+        if ((materialNode.normalTexture!==undefined) && (!this.importSettings.getMaterialDirectlyFromName)) {
             normalURL=prefixURL+this.jsonData.images[materialNode.normalTexture.index].uri;
         }
         
@@ -566,34 +575,46 @@ export default class ImportGLTFClass extends ImportBaseClass
             
         specularFactor=new ColorClass(1.0,1.0,1.0);
         
+            // special override for fbx->gltf conversions
+            // that have wacky textures
+            
+        if (this.importSettings.getMaterialDirectlyFromName) {
+            colorURL=prefixURL+'textures/'+materialNode.name+'_color.png';
+            normalURL=prefixURL+'textures/'+materialNode.name+'_normals.png';
+            specularURL=prefixURL+'textures/'+materialNode.name+'_specular.png';
+            specularFactor=new ColorClass(5.0,5.0,5.0);
+        }
+        
             // now any color texture
             // check specularGlossiness first
         
-        if (materialNode.extensions!==undefined) {
-            if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness!==undefined) {
-                
-                    // find the glossy base color
+        if (colorURL===null) {
+            if (materialNode.extensions!==undefined) {
+                if (materialNode.extensions.KHR_materials_pbrSpecularGlossiness!==undefined) {
 
-                diffuseTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture;
-                if (diffuseTexture!==undefined) {
-                    colorURL=prefixURL+this.jsonData.images[diffuseTexture.index].uri;
-                }
-                else {
-                    diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
-                    if (diffuseFactor!==undefined) {
-                        glossFactor=(materialNode.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor*2.0);     // this is relatively random and really here to deal with missing textures
-                        return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),(diffuseFactor[0]+glossFactor),(diffuseFactor[1]+glossFactor),(diffuseFactor[2]+glossFactor)));
+                        // find the glossy base color
+
+                    diffuseTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture;
+                    if (diffuseTexture!==undefined) {
+                        colorURL=prefixURL+this.jsonData.images[diffuseTexture.index].uri;
                     }
-                }
+                    else {
+                        diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
+                        if (diffuseFactor!==undefined) {
+                            glossFactor=(materialNode.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor*2.0);     // this is relatively random and really here to deal with missing textures
+                            return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),(diffuseFactor[0]+glossFactor),(diffuseFactor[1]+glossFactor),(diffuseFactor[2]+glossFactor)));
+                        }
+                    }
 
-                    // get the specular
+                        // get the specular
 
-                glossTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture;
-                if (glossTexture!==undefined) {
-                    specularURL=prefixURL+this.jsonData.images[glossTexture.index].uri;
+                    glossTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture;
+                    if (glossTexture!==undefined) {
+                        specularURL=prefixURL+this.jsonData.images[glossTexture.index].uri;
 
-                    specularFactorProp=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularFactor;
-                    if (specularFactorProp!==undefined) specularFactor=new ColorClass(specularFactorProp[0],specularFactorProp[1],specularFactorProp[2]);
+                        specularFactorProp=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularFactor;
+                        if (specularFactorProp!==undefined) specularFactor=new ColorClass(specularFactorProp[0],specularFactorProp[1],specularFactorProp[2]);
+                    }
                 }
             }
         }
@@ -724,7 +745,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                 
                     // do we need to recreate tangents?
                     
-                if (tangentArray===null) this.buildTangents(vertexArray,uvArray,indexArray);
+                if (tangentArray===null) tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
                 
                     // create bitmap
                     

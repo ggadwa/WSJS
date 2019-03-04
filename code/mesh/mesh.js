@@ -452,7 +452,7 @@ export default class MeshClass
         
     isTransparent()
     {
-        return(this.bitmap.alpha!==1.0);
+        return((this.bitmap.alpha!==1.0)||(this.bitmap.hasColorImageAlpha));
     }
 
         //

@@ -9,13 +9,14 @@ import BoundClass from '../utility/bound.js';
 
 export default class MapLiquidClass
 {
-    constructor(view,bitmap,waveSize,waveFrequency,waveHeight,uShift,vShift,tint,xBound,yBound,zBound)
+    constructor(view,bitmap,waveSize,waveFrequency,waveHeight,waveUVStamp,uShift,vShift,tint,xBound,yBound,zBound)
     {
         this.view=view;
         this.bitmap=bitmap;
         this.waveSize=waveSize;
         this.waveFrequency=waveFrequency;
         this.waveHeight=waveHeight;
+        this.waveUVStamp=waveUVStamp;
         this.uShift=uShift;
         this.vShift=vShift;
         this.tint=tint;
@@ -104,13 +105,13 @@ export default class MapLiquidClass
                 this.uvs[uvIdx++]=gz;
                 
                 vx+=this.waveSize;
-                gx+=1.0;
+                gx+=this.waveUVStamp;
                 
                 offCol++;
             }
             
             vz+=this.waveSize;
-            gz+=1.0;
+            gz+=this.waveUVStamp;
             
             offRow++;
         }

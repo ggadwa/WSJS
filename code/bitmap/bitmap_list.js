@@ -71,6 +71,28 @@ export default class BitmapListClass
         return(this.bitmaps.get(colorURL));
     }
     
+    getSimpleName(name)
+    {
+        let checkName,idx,key,value;
+        
+        for ([key, value] of this.bitmaps) {
+            checkName=key;
+            
+                // reduce down to name, skipping
+                // any URL or extensions, this is a specific
+                // instance used to hook things up to materials
+                
+            idx=checkName.lastIndexOf('/');
+            if (idx!==-1) checkName=checkName.substring(idx+1);
+            idx=checkName.lastIndexOf('.');
+            if (idx!==-1) checkName=checkName.substring(0,idx);
+            
+            if (checkName===name) return(value);
+        }
+        
+        return(null);
+    }
+    
         //
         // loading
         //

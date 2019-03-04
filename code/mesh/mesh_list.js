@@ -270,14 +270,8 @@ export default class MeshListClass
         
             // set any model matrix
             
-        if (modelMatrix===null) {
-            this.frustumTranslationPoint.setFromValues(0,0,0);
-        }
-        else {
-            this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
-            this.frustumTranslationPoint.translationFromMatrix(modelMatrix);
-        }
-        
+        if (modelMatrix!==null) this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
+         
             // set any joint matrixes
             
         if (jointMatrixArray!==null) {
