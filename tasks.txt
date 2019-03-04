@@ -13,6 +13,8 @@ Dungeon to do
  3. first crypt has crystal & lamp running into each other
  4. lower area in room a bit so I can add deadly slime
 
+0. can go through most of walls in dual castles (bottom pillars)
+   -> circleLineXZIntersection seems to be missing walls, need better Y?
 0. when maps final, redo it so we have glossy stuff instead of wacky material bit
 1. fix dungeon movements when new map
 2. transparencies need to be sorted
@@ -20,9 +22,6 @@ Dungeon to do
 4. waves need wave direction (x/z/none) - get from u/v change
 5. addBillboardQuadToGLList is crap, maybe keep an offset and always add up
      - add a rotation factor to it, rotate glow bitmap in flame (and smoke?)
-6. add no collision by bitmap ("noCollideBitmaps")
-      - cobwebs in dungeon map
-      - bushes & branches in castle map
 
 
 

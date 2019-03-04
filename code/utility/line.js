@@ -34,7 +34,7 @@ export default class LineClass
     
     getXBound()
     {
-        this.xBound.setFromValues(this.p1.x,this.p2.x);     // these can be dangerous but CG is worse
+        this.xBound.setFromValues(this.p1.x,this.p2.x);
         return(this.xBound);
     }
     

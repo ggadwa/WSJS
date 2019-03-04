@@ -94,18 +94,29 @@ export default class MeshListClass
     }
     
         //
+        // set no collisions for bitmaps
+        //
+        
+    setNoCollisionsForBitmap(bitmap)
+    {
+        let n;
+        let nMesh=this.meshes.length;
+        
+        for (n=0;n!==nMesh;n++) {
+            if (this.meshes[n].bitmap.colorURL===bitmap.colorURL) this.meshes[n].noCollisions=true;
+        }
+    }
+    
+        //
         // check for mesh list collisions
         //
 
-    boxBoundCollision(xBound,yBound,zBound,onlyFlag)
+    boxBoundCollision(xBound,yBound,zBound)
     {
         let n;
         let nMesh=this.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
-            if (onlyFlag!==null) {
-                if (this.meshes[n].flag!==onlyFlag) continue;
-            }
             if (this.meshes[n].boxBoundCollision(xBound,yBound,zBound)) return(n);
         }
 

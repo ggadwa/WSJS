@@ -195,6 +195,7 @@ export default class CollisionClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshList.meshes[n];
+            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 
@@ -338,6 +339,7 @@ export default class CollisionClass
 
             for (n=0;n!==nMesh;n++) {
                 mesh=this.map.meshList.meshes[n];
+                if (mesh.noCollisions) continue;
                 
                     // skip any mesh we don't collide with
                     
@@ -511,6 +513,7 @@ export default class CollisionClass
         
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshList.meshes[n];
+            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 
@@ -591,6 +594,7 @@ export default class CollisionClass
         
         for (n=0;n!==nMesh;n++) {
             mesh=this.map.meshList.meshes[n];
+            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 

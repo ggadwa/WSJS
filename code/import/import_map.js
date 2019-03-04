@@ -172,6 +172,23 @@ export default class ImportMapClass
             }
         }
         
+            // and turn off any collisions for certain
+            // bitmaps, mostly for things like bushes
+            // and webs, etc
+            
+        if (importSettings.noCollideBitmaps!==undefined) {
+            for (n=0;n!==importSettings.noCollideBitmaps.length;n++) {
+                
+                bitmap=this.view.bitmapList.getSimpleName(importSettings.noCollideBitmaps[n]);                
+                if (bitmap===null) {
+                    console.log('Missing bitmap to set no collisions to: '+importSettings.noCollideBitmaps[n]);
+                    return(false);
+                }
+                
+                this.map.meshList.setNoCollisionsForBitmap(bitmap);
+            }
+        }
+        
         return(true);
     }
 }

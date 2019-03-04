@@ -58,6 +58,8 @@ export default class MeshClass
 
             // collision lists
 
+        this.noCollisions=false;
+        
         this.collisionLines=[];
         this.collisionFloorTrigs=[];
         this.collisionCeilingTrigs=[];
@@ -287,6 +289,12 @@ export default class MeshClass
         let n,ny;
         let tIdx,vIdx;
         let x0,y0,z0,x1,y1,z1,x2,y2,z2;
+        
+            // some meshes can be tagged as no
+            // collision, specifically things like
+            // webs or bushes, etc
+            
+        if (this.noCollisions) return;
         
             // run through the triangles
             // and find any that make a wall to
