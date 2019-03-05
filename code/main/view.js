@@ -412,10 +412,17 @@ export default class ViewClass
             // draw the map
             
         map.sky.draw();
-        map.meshList.drawOpaque(null,null);
+        if (!config.DRAW_COLLISION_PLANES) {
+            map.meshList.drawOpaque(null,null);
+        }
+        else {
+            map.meshList.debugDrawCollisionSurfaces();
+        }
         map.entityList.draw();
-        map.meshList.drawTransparent(null,null);
-        map.liquidList.draw();
+        if (!config.DRAW_COLLISION_PLANES) {
+            map.meshList.drawTransparent(null,null);
+            map.liquidList.draw();
+        }
         map.effectList.draw();
       
             // player weapon

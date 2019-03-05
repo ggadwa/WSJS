@@ -2,7 +2,7 @@ import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import ModelClass from '../model/model.js';
-import CollisionClass from '../map/collisions.js';
+import CollisionClass from '../collision/collisions.js';
 
 //
 // project entity base class

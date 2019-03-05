@@ -246,10 +246,11 @@ export default class ModelSkeletonClass
     }
     
         //
-        // debug stuff -- note this is not optimized and slow!
+        // draw the skeleton for debug purposes
+        // note this is not optimal and slow!
         //
         
-    draw(modelMatrix,scale)
+    debugDraw(modelMatrix,scale)
     {
         let n,nNode,node,parentNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;
@@ -257,7 +258,7 @@ export default class ModelSkeletonClass
         let vertexBuffer,indexBuffer;
         let nodeSize=50;
         let gl=this.view.gl;
-        let shader=this.view.shaderList.modelSkeletonShader;
+        let shader=this.view.shaderList.debugShader;
         let tempPoint=new PointClass(0,0,0);
         
             // any skeleton?

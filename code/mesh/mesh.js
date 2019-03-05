@@ -2,7 +2,8 @@ import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
 import LineClass from '../utility/line.js';
 import BoundClass from '../utility/bound.js';
-import CollisionTrigClass from '../utility/collision_trig.js';
+import CollisionLineClass from '../collision/collision_line.js';
+import CollisionTrigClass from '../collision/collision_trig.js';
 
 //
 // map mesh class
@@ -260,17 +261,61 @@ export default class MeshClass
 
     buildCollisionGeometryLine(x0,y0,z0,x1,y1,z1,x2,y2,z2)
     {
-        let n,nLine,line;
+        let n,nLine,collisionLine;
+        let x,z,dist01,dist02,dist12;
+        let yBound;
+        
+            // truncate these so we get as many
+            // collisions as possble stamped together
+            
+        x0=Math.trunc(x0);
+        y0=Math.trunc(y0);
+        z0=Math.trunc(z0);
+        x1=Math.trunc(x1);
+        y1=Math.trunc(y1);
+        z1=Math.trunc(z1);
+        x2=Math.trunc(x2);
+        y2=Math.trunc(y2);
+        z2=Math.trunc(z2);
+        
+            // the y is the total height of all Ys
+            // special check for skipping super
+            // small Y lines
+            
+        yBound=new BoundClass(y0,y1);
+        yBound.adjust(y2);
+            
+        if (yBound.getSize()<20) return;
+        
+            // the longest line of the triangle
+            // is it's line
+            
+        x=x0-x1;
+        z=z0-z1;
+        dist01=Math.sqrt((x*x)+(z*z));
+        
+        x=x0-x2;
+        z=z0-z2;
+        dist02=Math.sqrt((x*x)+(z*z));
+        
+        x=x1-x2;
+        z=z1-z2;
+        dist12=Math.sqrt((x*x)+(z*z));
         
             // create the line
-
-        if (y0===y1) {
-            line=new LineClass(new PointClass(x0,y0,z0),new PointClass(x2,y2,z2));
+           
+        if ((dist01>dist02) && (dist01>dist12)) {
+            collisionLine=new CollisionLineClass(x0,z0,x1,z1,yBound);
         }
         else {
-            line=new LineClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1));
+            if (dist02>dist12) {
+                collisionLine=new CollisionLineClass(x0,z0,x2,z2,yBound);
+            }
+            else {
+                collisionLine=new CollisionLineClass(x1,z1,x2,z2,yBound);
+            }
         }
-
+        
             // is line already in list?
             // usually, two triangles make
             // a single line
@@ -278,10 +323,10 @@ export default class MeshClass
         nLine=this.collisionLines.length;
 
         for (n=0;n!==nLine;n++) {
-            if (this.collisionLines[n].equals(line)) return;
+            if (this.collisionLines[n].equals(collisionLine)) return;
         }
 
-        this.collisionLines.push(line);
+        this.collisionLines.push(collisionLine);
     }
         
     buildCollisionGeometry()

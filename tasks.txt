@@ -13,15 +13,16 @@ Dungeon to do
  3. first crypt has crystal & lamp running into each other
  4. lower area in room a bit so I can add deadly slime
 
+++++ ADD CRYSTAL_BLUE/RED to noCollision lists
+
 0. transparency sorting
      - when drawing opaque, build into linked list (meshIdx/trigIdx) by view matrix Z in meshList
      - then draw that as transparent
-0. can go through most of walls in dual castles (bottom pillars)
-   -> circleLineXZIntersection seems to be missing walls, need better Y?
 0. when maps final, redo it so we have glossy stuff instead of wacky material bit
 1. fix dungeon movements when new map
 
 2a. liquids uv needs to be global so they line up
+2b. under liquid is broken
 3. need to sort waves too or at least form in direction away from camera
 4. waves need wave direction (x/z/none) - get from u/v change
 5. addBillboardQuadToGLList is crap, maybe keep an offset and always add up
@@ -34,11 +35,7 @@ jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
 model angle by quaternions
 
 1. check billboard effect shaders
-3. all collision and box routines have to be fixed
-6. underwater collision bad
-1. merge collision into entity
 2. need to get rid of a lot of project_entity stuff, it's very player specific
-    - just position/angle and collisions
 4. delete all weapon stuff from player
 5. shaders need to be dynamic and part of project
 6. view -> WSJS?

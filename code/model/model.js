@@ -119,7 +119,7 @@ export default class ModelClass
             this.rotMatrix.setRotationFromYAngle(this.angle.y);
             this.modelMatrix.multiply(this.rotMatrix);
 
-            this.skeleton.draw(this.modelMatrix,this.scale);
+            this.skeleton.debugDraw(this.modelMatrix,this.scale);
         }
     }
 }

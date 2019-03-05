@@ -32,6 +32,16 @@ export default class LineClass
         return((this.p1.equals(line.p2)) && (this.p2.equals(line.p1)));
     }
     
+    boxBoundCollision(xBound,yBound,zBound)
+    {
+        if ((this.p1.x<xBound.min) && (this.p2.x<xBound.min)) return(false);
+        if ((this.p1.x>xBound.max) && (this.p2.x>xBound.max)) return(false);
+        if ((this.p1.y<yBound.min) && (this.p2.y<yBound.min)) return(false);
+        if ((this.p1.y>yBound.max) && (this.p2.y>yBound.max)) return(false);
+        if ((this.p1.z<zBound.min) && (this.p2.z<zBound.min)) return(false);
+        return(!((this.p1.z>zBound.max) && (this.p2.z>zBound.max)));
+    }
+    
     getXBound()
     {
         this.xBound.setFromValues(this.p1.x,this.p2.x);

@@ -63,18 +63,18 @@ export default class CollisionClass
         // collision routines
         //
     
-    lineLineXZIntersection(line1,line2,lineIntersectPt)
+    collisionLineToLineXZIntersection(collisionLine,line,py,lineIntersectPt)
     {
         let denom,r,s,ax,az;
         
-        let fx0=line1.p1.x;
-        let fz0=line1.p1.z;
-        let fx1=line1.p2.x;
-        let fz1=line1.p2.z;
-        let fx2=line2.p1.x;
-        let fz2=line2.p1.z;
-        let fx3=line2.p2.x;
-        let fz3=line2.p2.z;
+        let fx0=collisionLine.x0;
+        let fz0=collisionLine.z0;
+        let fx1=collisionLine.x1;
+        let fz1=collisionLine.z1;
+        let fx2=line.p1.x;
+        let fz2=line.p1.z;
+        let fx3=line.p2.x;
+        let fz3=line.p2.z;
 
         let bx=fx1-fx0;
         let dx=fx3-fx2;
@@ -96,11 +96,11 @@ export default class CollisionClass
 
         if ((r===0.0) && (s===0.0)) return(false);
 
-        lineIntersectPt.setFromValues((fx0+(r*bx)),line1.p1.y,(fz0+(r*bz)));
+        lineIntersectPt.setFromValues((fx0+(r*bx)),py,(fz0+(r*bz)));
         return(true);
     }
 
-    circleLineXZIntersection(line,circlePt,radius,lineIntersectPt)
+    circleLineXZIntersection(collisionLine,circlePt,radius,lineIntersectPt)
     {
             // cast rays from the center of the circle
             // like spokes to check for collisions
@@ -117,7 +117,7 @@ export default class CollisionClass
             this.spokePt.x=circlePt.x+(radius*this.spokeCalcSin[n]);
             this.spokePt.z=circlePt.z-(radius*this.spokeCalcCos[n]);   // everything is passed by pointer so this will change the spoke line
 
-            if (this.lineLineXZIntersection(line,this.spokeLine,this.spokeHitPt)) {
+            if (this.collisionLineToLineXZIntersection(collisionLine,this.spokeLine,circlePt.y,this.spokeHitPt)) {
                 dist=circlePt.noSquareDistance(this.spokeHitPt);
                 if ((dist<currentDist) || (currentDist===-1)) {
                     lineIntersectPt.setFromPoint(this.spokeHitPt);
@@ -174,7 +174,6 @@ export default class CollisionClass
             // only bump once
             
         let entityTopY;
-        let yBound;
         
             // the rough collide boxes
             
@@ -210,12 +209,11 @@ export default class CollisionClass
 
                     // skip if not in the Y of the line
 
-                yBound=collisionLine.getYBound();
-                if (entity.position.y>=yBound.max) continue;
-                if ((entity.position.y+high)<yBound.min) continue;
+                if (entity.position.y>=collisionLine.yBound.max) continue;
+                if ((entity.position.y+high)<collisionLine.yBound.min) continue;
 
                     // check against line
-
+                    
                 if (!this.circleLineXZIntersection(collisionLine,entity.position,radius,this.moveIntersectPt)) continue;
 
                     // find closest hit point
@@ -305,7 +303,6 @@ export default class CollisionClass
             
         let bumpOnce=false;
         let bumpY,entityTopY;
-        let yBound;
         
             // the moved point
             
@@ -354,12 +351,11 @@ export default class CollisionClass
                     
                         // skip if not in the Y of the line
             
-                    yBound=collisionLine.getYBound();
-                    if (this.testPt.y>=yBound.max) continue;
-                    if ((this.testPt.y+high)<yBound.min) continue;
+                    if (this.testPt.y>=collisionLine.yBound.max) continue;
+                    if ((this.testPt.y+high)<collisionLine.yBound.min) continue;
                     
                         // check against line
-
+                    
                     if (!this.circleLineXZIntersection(collisionLine,this.testPt,radius,this.moveIntersectPt)) continue;
                     
                         // find closest hit point
@@ -372,7 +368,7 @@ export default class CollisionClass
                         currentDist=dist;
                         
                         bumpY=-1;
-                        if ((yBound.max-this.testPt.y)<=constants.BUMP_HEIGHT) bumpY=yBound.max;
+                        if ((collisionLine.yBound.max-this.testPt.y)<=constants.BUMP_HEIGHT) bumpY=collisionLine.yBound.max;
                     }
                 }
             }

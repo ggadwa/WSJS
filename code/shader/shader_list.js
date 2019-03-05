@@ -2,7 +2,7 @@ import MapMeshShaderClass from '../shader/map_mesh_shader.js';
 import MapLiquidShaderClass from '../shader/map_liquid_shader.js';
 import SkyShaderClass from '../shader/sky_shader.js';
 import ModelMeshShaderClass from '../shader/model_mesh_shader.js';
-import ModelSkeletonShaderClass from '../shader/model_skeleton_shader.js';
+import DebugShaderClass from '../shader/debug_shader.js';
 import EffectShaderClass from '../shader/effect_shader.js';
 import InterfaceShaderClass from '../shader/interface_shader.js';
 import TextShaderClass from '../shader/text_shader.js';
@@ -21,7 +21,7 @@ export default class ShaderListClass
         this.mapLiquidShader=null;
         this.skyShader=null;
         this.modelMeshShader=null;
-        this.modelSkeletonShader=null;
+        this.debugShader=null;
         this.effectShader=null;
         this.interfaceShader=null;
         this.textShader=null;
@@ -44,7 +44,7 @@ export default class ShaderListClass
         this.mapLiquidShader=null;
         this.skyShader=null;
         this.modelMeshShader=null;
-        this.modelSkeletonShader=null;
+        this.debugShader=null;
         this.effectShader=null;
         this.interfaceShader=null;
         this.textShader=null;
@@ -57,7 +57,7 @@ export default class ShaderListClass
         if (this.mapLiquidShader!==null) this.mapLiquidShader.release();
         if (this.skyShader!==null) this.skyShader.release();
         if (this.modelMeshShader!==null) this.modelMeshShader.release();
-        if (this.modelSkeletonShader!==null) this.modelSkeletonShader.release();
+        if (this.debugShader!==null) this.debugShader.release();
         if (this.effectShader!==null) this.effectShader.release();
         if (this.interfaceShader!==null) this.interfaceShader.release();
         if (this.textShader!==null) this.textShader.release();
@@ -85,9 +85,9 @@ export default class ShaderListClass
         this.modelMeshShader.initialize();
         if (!(await this.modelMeshShader.load())) return(false);
         
-        this.modelSkeletonShader=new ModelSkeletonShaderClass(this.view);
-        this.modelSkeletonShader.initialize();
-        if (!(await this.modelSkeletonShader.load())) return(false);
+        this.debugShader=new DebugShaderClass(this.view);
+        this.debugShader.initialize();
+        if (!(await this.debugShader.load())) return(false);
            
         this.effectShader=new EffectShaderClass(this.view);
         this.effectShader.initialize();

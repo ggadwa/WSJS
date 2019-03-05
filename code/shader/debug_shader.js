@@ -2,10 +2,10 @@ import config from '../main/config.js';
 import ShaderClass from '../shader/shader.js';
 
 //
-// model skeleton shader class
+// debug shader class
 //
 
-export default class ModelSkeletonShaderClass extends ShaderClass
+export default class DebugShaderClass extends ShaderClass
 {
     constructor(view)
     {
