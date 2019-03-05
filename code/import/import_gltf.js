@@ -662,7 +662,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
         let jointArray,weightArray;
-        let nIdx,tIdx;
+        let nIdx,forceTangentRebuild;
         let mesh,bitmap,curBitmapName;
         let normal=new PointClass(0,0,0);
         let tangent=new PointClass(0,0,0);
@@ -672,6 +672,12 @@ export default class ImportGLTFClass extends ImportBaseClass
             // if there's no skin, then ignore any rigging
             
         if (this.jsonData.skins===undefined) skeleton=null;
+        
+            // special flag to force tangents to
+            // get rebuild if tangents in file are wrong
+            
+        forceTangentRebuild=false;
+        if (this.importSettings.forceTangentRebuild!==undefined) forceTangentRebuild=this.importSettings.forceTangentRebuild;
         
             // run through the meshes
             
@@ -703,7 +709,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                 normalArray=this.decodeBuffer(primitiveNode.attributes.NORMAL,3);
                 
                 tangentArray=null;  // tangents aren't always there, we recreate them if missing
-                if (primitiveNode.attributes.TANGENT!==undefined) tangentArray=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
+                if ((primitiveNode.attributes.TANGENT!==undefined) && (!forceTangentRebuild)) tangentArray=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
                 
                                     // solid colors usually don't have UVs but we treat everything as a texture so we create a 0,0 list
                 if (primitiveNode.attributes.TEXCOORD_0!==undefined) {
@@ -722,10 +728,9 @@ export default class ImportGLTFClass extends ImportBaseClass
                     weightArray=null;
                 }
                 
-                    // normalize any normals or tangents
+                    // normalize any normals
 
                 nIdx=0;
-                tIdx=0;
                 
                 for (t=0;t<vertexArray.length;t+=3) {
                     normal.setFromValues(normalArray[nIdx],normalArray[nIdx+1],normalArray[nIdx+2]);
@@ -733,8 +738,17 @@ export default class ImportGLTFClass extends ImportBaseClass
                     normalArray[nIdx++]=normal.x;
                     normalArray[nIdx++]=normal.y;
                     normalArray[nIdx++]=normal.z;
+                }
+                
+                    // recreate or normalize the tangents
                     
-                    if (tangentArray!==null) {
+                if (tangentArray===null) {
+                    tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
+                }
+                else {
+                    nIdx=0;
+                    
+                    for (t=0;t<vertexArray.length;t+=3) {
                         tangent.setFromValues(tangentArray[nIdx],tangentArray[nIdx+1],tangentArray[nIdx+2]);
                         tangent.normalize();
                         tangentArray[nIdx++]=tangent.x;
@@ -742,10 +756,6 @@ export default class ImportGLTFClass extends ImportBaseClass
                         tangentArray[nIdx++]=tangent.z;
                     }
                 }
-                
-                    // do we need to recreate tangents?
-                    
-                if (tangentArray===null) tangentArray=this.buildTangents(vertexArray,uvArray,indexArray);
                 
                     // create bitmap
                     

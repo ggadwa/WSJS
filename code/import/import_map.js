@@ -50,7 +50,7 @@ export default class ImportMapClass
                 
                 idx=this.map.meshList.find(effectDef.mesh);
                 if (idx===-1) {
-                    console.log('Unknown mesh to attach light to: '+lightDef.mesh);
+                    console.log('Unknown mesh to attach effect to: '+effectDef.mesh);
                     continue;
                 }
                 

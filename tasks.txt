@@ -13,17 +13,21 @@ Dungeon to do
  3. first crypt has crystal & lamp running into each other
  4. lower area in room a bit so I can add deadly slime
 
+0. transparency sorting
+     - when drawing opaque, build into linked list (meshIdx/trigIdx) by view matrix Z in meshList
+     - then draw that as transparent
 0. can go through most of walls in dual castles (bottom pillars)
    -> circleLineXZIntersection seems to be missing walls, need better Y?
 0. when maps final, redo it so we have glossy stuff instead of wacky material bit
 1. fix dungeon movements when new map
-2. transparencies need to be sorted
+
+2a. liquids uv needs to be global so they line up
 3. need to sort waves too or at least form in direction away from camera
 4. waves need wave direction (x/z/none) - get from u/v change
 5. addBillboardQuadToGLList is crap, maybe keep an offset and always add up
      - add a rotation factor to it, rotate glow bitmap in flame (and smoke?)
 
-
+6. be able to start animation paused (at certain second of animation)
 
 bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
