@@ -6,9 +6,8 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
-1. player can have NULL model
-5. addBillboardQuadToGLList is crap, maybe keep an offset and always add up
-     - add a rotation factor to it, rotate glow bitmap in flame (and smoke?)
+
+0. get a better grass
 
 0. transparency sorting
      - when drawing opaque, build into linked list (meshIdx/trigIdx) by view matrix Z in meshList
@@ -16,19 +15,13 @@ WebGL2
 0. when maps final, redo it so we have glossy stuff instead of wacky material bit
 1. fix dungeon movements when new map
 
-2a. liquids uv needs to be global so they line up
-2b. under liquid is broken
 3. need to sort waves too or at least form in direction away from camera
-4. waves need wave direction (x/z/none) - get from u/v change
-
 6. be able to start animation paused (at certain second of animation)
 
-elevators in castle fail
 bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
 model angle by quaternions
 
-1. check billboard effect shaders
 2. need to get rid of a lot of project_entity stuff, it's very player specific
 4. delete all weapon stuff from player
 5. shaders need to be dynamic and part of project

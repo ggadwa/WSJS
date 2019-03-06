@@ -9,12 +9,12 @@ import BoundClass from '../utility/bound.js';
 
 export default class MapLiquidClass
 {
-    constructor(view,bitmap,waveSize,waveFrequency,waveHeight,waveUVStamp,uShift,vShift,tint,xBound,yBound,zBound)
+    constructor(view,bitmap,waveSize,wavePeriod,waveHeight,waveUVStamp,uShift,vShift,tint,xBound,yBound,zBound)
     {
         this.view=view;
         this.bitmap=bitmap;
         this.waveSize=waveSize;
-        this.waveFrequency=waveFrequency;
+        this.wavePeriod=wavePeriod;
         this.waveHeight=waveHeight;
         this.waveUVStamp=waveUVStamp;
         this.uShift=uShift;
@@ -67,15 +67,13 @@ export default class MapLiquidClass
 
     updateBuffers()
     {
-        let x,z,vx,vz,gx,gz;
+        let x,z,vx,vz,gx,gz,gxStart;
         let vIdx,uvIdx;
-        let offRow,offCol;
+        let offRow,offCol,offColStart;
         
             // get the y offsets for waves
         
-        let freq=((this.view.timestamp%this.waveFrequency)/this.waveFrequency)*(Math.PI*2);
-        let cs=Math.cos(freq);
-        let offY=Math.trunc(cs*this.waveHeight);
+        let offY=this.view.getPeriodicCos(this.wavePeriod,this.waveHeight);
         
             // create mesh
             
@@ -83,22 +81,29 @@ export default class MapLiquidClass
         uvIdx=0;
         
         vz=this.zBound.min;
-        gz=(this.view.timestamp*this.vShift);
+        gz=((Math.abs(vz)/this.waveSize)*this.waveUVStamp)+(this.view.timestamp*this.vShift);
         gz=gz-Math.trunc(gz);
+        offRow=Math.trunc(vz/this.waveSize)&0x1;
         
-        offRow=Math.trunc(vz/this.waveSize);
+        gxStart=((Math.abs(this.xBound.min)/this.waveSize)*this.waveUVStamp)+(this.view.timestamp*this.uShift);
+        gxStart=gxStart-Math.trunc(gxStart);
+        offColStart=Math.trunc(this.xBound.min/this.waveSize)&0x1;
         
         for (z=0;z!==(this.zBlockSize+1);z++) {
             
             vx=this.xBound.min;
-            gx=(this.view.timestamp*this.uShift);
-            gx=gx-Math.trunc(gx);
             
-            offCol=Math.trunc(vx/this.waveSize);
+            gx=gxStart;
+            offCol=offColStart;
             
             for (x=0;x!==(this.xBlockSize+1);x++) {
                 this.vertices[vIdx++]=vx;
-                this.vertices[vIdx++]=(((offRow+offCol)%2)===0)?(this.yBound.max-offY):(this.yBound.max+offY);
+                if (this.uShift>this.vShift) {
+                    this.vertices[vIdx++]=((offCol&0x1)===0)?(this.yBound.max-offY):(this.yBound.max+offY);
+                }
+                else {
+                    this.vertices[vIdx++]=((offRow&0x1)===0)?(this.yBound.max-offY):(this.yBound.max+offY);
+                }
                 this.vertices[vIdx++]=vz;
                 
                 this.uvs[uvIdx++]=gx;

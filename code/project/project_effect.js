@@ -11,6 +11,14 @@ export default class ProjectEffectClass
         
         this.show=true;
         
+        this.billboardQuadVertexes=null;
+        this.billboardQuadUVs=null;
+        this.billboardQuadIndexes=null;
+        
+        this.billboardQuadVertexIdx=0;
+        this.billboardQuadUVIdx=0;
+        this.billboardQuadIndexIdx=0;
+        
         this.tempPoint=new PointClass(0,0,0);
     }
     
@@ -35,77 +43,99 @@ export default class ProjectEffectClass
         return(this.view.bitmapList.get(colorURL));
     }
     
-    addBillboardQuadToGLList(centerPnt,u,v,uSize,vSize,halfWid,halfHigh,vIdx,vertices,uvIdx,uvs,iIdx,indexes,elementIdx)
+        //
+        // utilities to build billboarded quads
+        // mostly used for effects
+        //
+        
+    startBillboardQuads(vertexes,uvs,indexes)
     {
+        this.billboardQuadVertexes=vertexes;
+        this.billboardQuadUVs=uvs;
+        this.billboardQuadIndexes=indexes;
+        
+        this.billboardQuadVertexIdx=0;
+        this.billboardQuadUVIdx=0;
+        this.billboardQuadIndexIdx=0;
+    }
+    
+    addBillboardQuad(centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot)
+    {
+        let elementIdx=Math.trunc(this.billboardQuadVertexIdx/3);
+        
             // top left
             
         this.tempPoint.x=-halfWid;
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
+        if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
-        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
-        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.z+centerPnt.z;
 
-        uvs[uvIdx++]=u;
-        uvs[uvIdx++]=v;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=u;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=v;
 
             // top right
             
         this.tempPoint.x=halfWid;
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
+        if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
-        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
-        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.z+centerPnt.z;
 
-        uvs[uvIdx++]=u+uSize;
-        uvs[uvIdx++]=v;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=u+uSize;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=v;
 
             // bottom right
             
         this.tempPoint.x=halfWid;
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
+        if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
-        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
-        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.z+centerPnt.z;
 
-        uvs[uvIdx++]=u+uSize;
-        uvs[uvIdx++]=v+vSize;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=u+uSize;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=v+vSize;
 
             // bottom left
             
         this.tempPoint.x=-halfWid;
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
+        if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
         this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
 
-        vertices[vIdx++]=this.tempPoint.x+centerPnt.x;
-        vertices[vIdx++]=this.tempPoint.y+centerPnt.y;
-        vertices[vIdx++]=this.tempPoint.z+centerPnt.z;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
+        this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.z+centerPnt.z;
 
-        uvs[uvIdx++]=u;
-        uvs[uvIdx++]=v+vSize;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=u;
+        this.billboardQuadUVs[this.billboardQuadUVIdx++]=v+vSize;
 
             // build the triangles
 
-        indexes[iIdx++]=elementIdx;     // triangle 1
-        indexes[iIdx++]=elementIdx+1;
-        indexes[iIdx++]=elementIdx+2;
+        this.billboardQuadIndexes[this.billboardQuadIndexIdx++]=elementIdx;     // triangle 1
+        this.billboardQuadIndexes[this.billboardQuadIndexIdx++]=elementIdx+1;
+        this.billboardQuadIndexes[this.billboardQuadIndexIdx++]=elementIdx+2;
 
-        indexes[iIdx++]=elementIdx;     // triangle 2
-        indexes[iIdx++]=elementIdx+2;
-        indexes[iIdx++]=elementIdx+3;
+        this.billboardQuadIndexes[this.billboardQuadIndexIdx++]=elementIdx;     // triangle 2
+        this.billboardQuadIndexes[this.billboardQuadIndexIdx++]=elementIdx+2;
+        this.billboardQuadIndexes[this.billboardQuadIndexIdx++]=elementIdx+3;
     }
     
         //

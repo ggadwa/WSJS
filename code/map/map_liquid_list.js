@@ -1,4 +1,5 @@
 import * as constants from '../main/constants.js';
+import PointClass from '../utility/point.js';
 
 //
 // map liquid list class
@@ -11,6 +12,8 @@ export default class MapLiquidListClass
         this.view=view;
 
         this.liquids=[];
+        
+        this.tempEyePoint=new PointClass(0,0,0);
 
         Object.seal(this);
     }
@@ -78,6 +81,12 @@ export default class MapLiquidListClass
         }
         
         return(-1);
+    }
+    
+    getLiquidForEyePoint(pnt,eyeOffset)
+    {
+        this.tempEyePoint.setFromValues(pnt.x,(pnt.y+eyeOffset),pnt.z);
+        return(this.getLiquidForPoint(this.tempEyePoint));
     }
         
         //

@@ -393,8 +393,8 @@ export default class ProjectEntityClass
         if (movePnt.y<0) {
             if (this.standOnMeshIdx===meshIdx) {
                 this.pushMesh=this.map.meshList.get(meshIdx);
-                if (this.position.y>=this.pushMesh.yBound.min) {
-                    this.position.y=Math.trunc(this.pushMesh.yBound.min)-1;
+                if (this.position.y<=this.pushMesh.yBound.min) {
+                    this.position.y=Math.trunc(this.pushMesh.yBound.min)+1;
                 }
             }
         }
@@ -569,6 +569,11 @@ export default class ProjectEntityClass
     getInLiquidIndex()
     {
         return(this.map.liquidList.getLiquidForPoint(this.position));
+    }
+    
+    getUnderLiquidIndex()
+    {
+        return(this.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset));
     }
     
     isStandingOnFloor()

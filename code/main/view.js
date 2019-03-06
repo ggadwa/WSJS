@@ -265,6 +265,27 @@ export default class ViewClass
     }
     
         //
+        // timing utilities
+        //
+        
+    getPeriodicCos(millisecondPeriod,amplitude)
+    {
+        let freq=((this.timestamp%millisecondPeriod)/millisecondPeriod)*(Math.PI*2);
+        return(Math.trunc(Math.cos(freq)*amplitude));
+    }
+    
+    getPeriodicSin(millisecondPeriod,amplitude)
+    {
+        let freq=((this.timestamp%millisecondPeriod)/millisecondPeriod)*(Math.PI*2);
+        return(Math.trunc(Math.sin(freq)*amplitude));
+    }
+    
+    getPeriodicLinear(millisecondPeriod,amplitude)
+    {
+        return(((this.timestamp%millisecondPeriod)/millisecondPeriod)*amplitude);
+    }
+    
+        //
         // pause state
         //
     
@@ -444,7 +465,7 @@ export default class ViewClass
             tintOn=true;
             this.uiTintColor.addFromValues(tintAtt,0.0,0.0);
         }
-        liquidIdx=player.getInLiquidIndex();
+        liquidIdx=player.getUnderLiquidIndex();
         if (liquidIdx!==-1) {
             tintOn=true;
             liquid=map.liquidList.liquids[liquidIdx];

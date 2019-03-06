@@ -1,4 +1,5 @@
 import ShaderClass from '../shader/shader.js';
+import ShaderLightClass from '../shader/shader_light.js';
 
 //
 // map shader object
@@ -20,7 +21,10 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.viewMatrixUniform=null;
         this.normalMatrixUniform=null;
         
+        this.ambientUniform=null;
         this.alphaUniform=null;
+        
+        this.lights=[];
         
         Object.seal(this);
     }
@@ -31,6 +35,7 @@ export default class MapLiquidShaderClass extends ShaderClass
 
     loadFinish()
     {
+        let n,name;
         let gl=this.view.gl;
 
             // setup uniforms
@@ -44,7 +49,16 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
         
+        this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
         this.alphaUniform=gl.getUniformLocation(this.program,'alpha');
+        
+        for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
+            this.lights.push(new ShaderLightClass());
+
+            name='lights['+n+']';
+            this.lights[n].positionIntensityUniform=gl.getUniformLocation(this.program,name+'.positionIntensity');
+            this.lights[n].colorExponentUniform=gl.getUniformLocation(this.program,name+'.colorExponent');
+        }
 
             // these uniforms are always the same
 
@@ -59,8 +73,7 @@ export default class MapLiquidShaderClass extends ShaderClass
 
     drawStart()
     {
-            // using the map shader
-
+        let n,light,viewLight;
         let gl=this.view.gl;
 
         gl.useProgram(this.program);
@@ -70,6 +83,35 @@ export default class MapLiquidShaderClass extends ShaderClass
         gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
         gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
         gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.view.normalMatrix.data);
+        
+            // ambient
+            
+        gl.uniform3f(this.ambientUniform,this.view.ambient.r,this.view.ambient.g,this.view.ambient.b);
+
+            // lighting
+            // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)
+            // and the second vec4 is r,g,b,exponent (color and exponent)
+            
+            // if intensity = 0 light is off
+        
+        for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
+
+            light=this.lights[n];
+            viewLight=this.view.lights[n];
+
+                // no light sets intensity to 0
+
+            if (viewLight===null) {
+                gl.uniform4f(light.positionIntensityUniform,0.0,0.0,0.0,0.0);    // x,y,z,intensity
+                gl.uniform4f(light.colorExponentUniform,1.0,1.0,1.0,1.0);       // r,g,b,exponent
+                continue;
+            }
+
+                // otherwise setup the radial light
+
+            gl.uniform4f(light.positionIntensityUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,viewLight.intensity);
+            gl.uniform4f(light.colorExponentUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,viewLight.exponent);
+        }
 
             // enable the vertex attributes
 
