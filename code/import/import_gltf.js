@@ -612,8 +612,11 @@ export default class ImportGLTFClass extends ImportBaseClass
                     if (glossTexture!==undefined) {
                         specularURL=prefixURL+this.jsonData.images[glossTexture.index].uri;
 
-                        specularFactorProp=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularFactor;
-                        if (specularFactorProp!==undefined) specularFactor=new ColorClass(specularFactorProp[0],specularFactorProp[1],specularFactorProp[2]);
+                        specularFactorProp=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor;        // our specular factor comes from the gloss factor
+                        if (specularFactorProp!==undefined) {
+                            specularFactorProp*=10;     // a factor of 0.5 = 5, which is regular specular
+                            specularFactor=new ColorClass(specularFactorProp,specularFactorProp,specularFactorProp);
+                        }
                     }
                 }
             }

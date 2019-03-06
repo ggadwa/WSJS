@@ -371,23 +371,21 @@ export default class MeshClass
             
                 // detect if triangle is a floor
                 
-            if (ny>=0.7) {
+            if (ny>=0.4) {
                 this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
             }
             
                 // detect if triangle is a ceiling
                 
             else {
-                if (ny<=-0.7) {
+                if (ny<=-0.4) {
                     this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
                 }
 
-                    // detect if triangle is wall like
+                    // else consider it a wall
 
                 else {
-                    if (Math.abs(ny)<=0.3) {
-                        this.buildCollisionGeometryLine(x0,y0,z0,x1,y1,z1,x2,y2,z2);
-                    }
+                    this.buildCollisionGeometryLine(x0,y0,z0,x1,y1,z1,x2,y2,z2);
                 }
             }
         }
