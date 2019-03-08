@@ -28,6 +28,7 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.modelMatrixUniform=null;
         this.normalMatrixUniform=null;
         
+        this.hasSkinUniform=null;
         this.jointMatrixUniformArray=[];
 
         this.specularFactorUniform=null;
@@ -63,6 +64,8 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
+        
+        this.hasSkinUniform=gl.getUniformLocation(this.program,'hasSkin');
         
         for (n=0;n!==ModelSkeletonClass.MAX_SKELETON_JOINT;n++) {
             name='jointMatrix['+n+']';

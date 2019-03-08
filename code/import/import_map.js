@@ -40,7 +40,7 @@ export default class ImportMapClass
         scale=importSettings.scale;
         if (scale===undefined) scale=1;
         
-        this.map.meshList.recalcVertexesFromImportMatrixes(scale);
+        this.map.meshList.scaleMeshes(scale);
         
             // run through the effects so bitmaps get into list
             
@@ -145,12 +145,12 @@ export default class ImportMapClass
             this.map.sky.on=true;
             this.map.sky.skyBoxSettings=importSettings.skyBox;
             
-            this.view.bitmapList.add(importSettings.skyBox.bitmapNegX,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapPosX,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapNegY,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapPosY,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapNegZ,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapPosZ,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapNegX,null,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapPosX,null,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapNegY,null,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapPosY,null,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapNegZ,null,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapPosZ,null,null,null,null,null);
         }
         
             // alter any bitmaps for glow settings

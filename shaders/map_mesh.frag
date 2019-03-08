@@ -107,5 +107,7 @@ void main(void)
 
     outputPixel.rgb=((tex.rgb*pixelAmbient)+spec)+(texture(glowTex,fragUV).rgb*glowFactor);
     outputPixel.a=tex.a*alpha;
+
+    if (tex.a==0.0) discard;
 }
 

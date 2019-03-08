@@ -201,32 +201,18 @@ export default class MeshClass
     }
     
         //
-        // used for maps because they
-        // aren't rigged which means there's no animation
-        // to get the vertexes in the right place, so we
-        // need to apply the node matrixes
+        // only use on maps as they aren't rigged
+        // animations have inverseBindMatrixes which have
+        // transposes in them so you can only scale them
+        // in model matrixes
         //
     
-    recalcVertexesFromImportMatrixes(scale)
+    scale(scale)
     {
         let n;
-        let v=new PointClass(0,0,0);
         
-        for (n=0;n<this.vertexCount;n+=3) {
-            v.setFromValues(this.vertexArray[n],this.vertexArray[n+1],this.vertexArray[n+2]);
-            v.matrixMultiply(this.cumulativeNodeMatrix);
-            
-            this.vertexArray[n]=v.x*scale;
-            this.vertexArray[n+1]=v.y*scale;
-            this.vertexArray[n+2]=v.z*scale;
-            
-            v.setFromValues(this.normalArray[n],this.normalArray[n+1],this.normalArray[n+2]);
-            v.matrixMultiplyIgnoreTransform(this.cumulativeNodeMatrix);
-            v.normalize();
-            
-            this.normalArray[n]=v.x;
-            this.normalArray[n+1]=v.y;
-            this.normalArray[n+2]=v.z;
+        for (n=0;n!=this.vertexCount;n++) {
+            this.vertexArray[n]*=scale;
         }
         
         this.setupBounds();
@@ -564,11 +550,16 @@ export default class MeshClass
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
         if (this.jointArray!==null) {
+            if (shader.hasSkinUniform!==null) this.view.gl.uniform1i(shader.hasSkinUniform,1);
+
             gl.bindBuffer(gl.ARRAY_BUFFER,this.jointBuffer);
             gl.vertexAttribPointer(shader.vertexJointAttribute,4,(this.need32BitJointIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),false,0,0);
             
             gl.bindBuffer(gl.ARRAY_BUFFER,this.weightBuffer);
             gl.vertexAttribPointer(shader.vertexWeightAttribute,4,gl.FLOAT,false,0,0);
+        }
+        else {
+            if (shader.hasSkinUniform!==null) this.view.gl.uniform1i(shader.hasSkinUniform,0);
         }
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);

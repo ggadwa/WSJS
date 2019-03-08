@@ -2,7 +2,7 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
-    constructor(view,colorURL,normalURL,specularURL,specularFactor,glowURL,solidColor)
+    constructor(view,colorURL,normalURL,specularURL,specularFactor,glowURL,scale,solidColor)
     {
         this.view=view;
         this.colorURL=colorURL;
@@ -10,13 +10,10 @@ export default class BitmapClass
         this.specularURL=specularURL;
         this.specularFactor=specularFactor;
         this.glowURL=glowURL;
+        this.scale=scale;
         this.solidColor=solidColor;
         
         if (this.specularFactor===null) this.specularFactor=new ColorClass(1,1,1);      // default specular, in case it's missing
-        
-        this.LOAD_STATE_UNLOADED=0;
-        this.LOAD_STATE_LOADED=1;
-        this.LOAD_STATE_ERROR=2;
         
         this.colorImage=null;
         this.normalImage=null;
@@ -33,6 +30,9 @@ export default class BitmapClass
         
         this.glowFrequency=0;
         this.glowMax=1.0;
+        
+        this.simpleName=null;
+        this.buildSimpleName();
         
         this.loaded=false;
     }
@@ -66,6 +66,28 @@ export default class BitmapClass
         this.glowImage=null;
         
         this.loaded=false;
+    }
+    
+        //
+        // a name used by some json to pick out meshes
+        // by textures
+        //
+        
+    buildSimpleName()
+    {
+        let idx;
+        
+                // reduce down to name, skipping
+                // any URL or extensions, this is a specific
+                // instance used to hook things up to materials
+        
+        this.simpleName=this.colorURL;
+        if (this.simpleName===null) return;
+        
+        idx=this.simpleName.lastIndexOf('/');
+        if (idx!==-1) this.simpleName=this.simpleName.substring(idx+1);
+        idx=this.simpleName.lastIndexOf('.');
+        if (idx!==-1) this.simpleName=this.simpleName.substring(0,idx);
     }
     
         //

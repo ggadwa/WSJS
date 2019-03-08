@@ -35,7 +35,7 @@ export default class ProjectEffectClass
     
     addBitmap(colorURL,normalURL,specularURL,specularFactor,glowURL)
     {
-        this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,glowURL);
+        this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,glowURL,null);
     }
     
     getBitmap(colorURL)

@@ -562,6 +562,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         let normalURL=null;
         let specularURL=null;
         let specularFactor=null;
+        let scale=null;
         let prefixURL='models/'+this.importSettings.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
         
@@ -597,6 +598,16 @@ export default class ImportGLTFClass extends ImportBaseClass
                     diffuseTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture;
                     if (diffuseTexture!==undefined) {
                         colorURL=prefixURL+this.jsonData.images[diffuseTexture.index].uri;
+                        
+                            // check for any scale
+                            
+                        if (diffuseTexture.extensions!==undefined) {
+                            if (diffuseTexture.extensions.KHR_texture_transform!==undefined) {
+                                if (diffuseTexture.extensions.KHR_texture_transform.scale!==undefined) {
+                                    scale=diffuseTexture.extensions.KHR_texture_transform.scale;
+                                }
+                            }
+                        }
                     }
                     else {
                         diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
@@ -653,7 +664,7 @@ export default class ImportGLTFClass extends ImportBaseClass
         
             // add the texture and return the bitmap
 
-        return(this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,null));
+        return(this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,null,scale));
     }
     
         //
@@ -664,9 +675,10 @@ export default class ImportGLTFClass extends ImportBaseClass
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
-        let jointArray,weightArray;
+        let jointArray,weightArray,fakeArrayLen;
         let nIdx,forceTangentRebuild;
         let mesh,bitmap,curBitmapName;
+        let v=new PointClass(0,0,0);
         let normal=new PointClass(0,0,0);
         let tangent=new PointClass(0,0,0);
         let cumulativeNodeMatrix;
@@ -722,25 +734,46 @@ export default class ImportGLTFClass extends ImportBaseClass
                     uvArray=new Float32Array(Math.trunc(vertexArray.length/3)*2);
                 }
                 
+                jointArray=null;
+                weightArray=null;
+                
                 if (skeleton!==null) {
-                    jointArray=this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4);
-                    weightArray=this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);
+                    if (primitiveNode.attributes.JOINTS_0!==undefined) {
+                        jointArray=this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4);
+                        weightArray=this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);
+                    }
                 }
-                else {
-                    jointArray=null;
-                    weightArray=null;
+                
+                    // if we don't have a joint array or skeleton,
+                    // then there's no bone connection so we need to multiply
+                    // in the cumulative matrixes
+                
+                if (jointArray===null) {    
+                    for (t=0;t<vertexArray.length;t+=3) {
+                        v.setFromValues(vertexArray[t],vertexArray[t+1],vertexArray[t+2]);
+                        v.matrixMultiply(cumulativeNodeMatrix);
+
+                        vertexArray[t]=v.x;
+                        vertexArray[t+1]=v.y;
+                        vertexArray[t+2]=v.z;
+
+                        normal.setFromValues(normalArray[t],normalArray[t+1],normalArray[t+2]);
+                        normal.matrixMultiplyIgnoreTransform(cumulativeNodeMatrix);        // will get normalized below
+
+                        normalArray[t]=normal.x;
+                        normalArray[t+1]=normal.y;
+                        normalArray[t+2]=normal.z;
+                    }
                 }
                 
                     // normalize any normals
 
-                nIdx=0;
-                
                 for (t=0;t<vertexArray.length;t+=3) {
-                    normal.setFromValues(normalArray[nIdx],normalArray[nIdx+1],normalArray[nIdx+2]);
+                    normal.setFromValues(normalArray[t],normalArray[t+1],normalArray[t+2]);
                     normal.normalize();
-                    normalArray[nIdx++]=normal.x;
-                    normalArray[nIdx++]=normal.y;
-                    normalArray[nIdx++]=normal.z;
+                    normalArray[t]=normal.x;
+                    normalArray[t+1]=normal.y;
+                    normalArray[t+2]=normal.z;
                 }
                 
                     // recreate or normalize the tangents
@@ -764,6 +797,21 @@ export default class ImportGLTFClass extends ImportBaseClass
                     
                 bitmap=this.findMaterialForMesh(meshNode,primitiveNode);
                 if (bitmap===null) return(false);
+                
+                    // is it in the skip list?
+                    
+                if (this.importSettings.meshSkipBitmaps!==undefined) {
+                    if (this.importSettings.meshSkipBitmaps.indexOf(bitmap.simpleName)!==-1) continue;
+                }
+                
+                    // any texture transforms
+                    
+                if (bitmap.scale!==null) {
+                    for (t=0;t<uvArray.length;t+=2) {
+                        uvArray[t]=uvArray[t]*bitmap.scale[0];
+                        uvArray[t+1]=uvArray[t+1]*bitmap.scale[1];
+                    }
+                }
                 
                     // finally make the mesh
                     // all the array types should be their proper

@@ -159,19 +159,19 @@ export default class MeshListClass
     }
     
         //
-        // used for maps because they
-        // aren't rigged which means there's no animation
-        // to get the vertexes in the right place, so we
-        // need to apply the node matrixes
+        // only use on maps as they aren't rigged
+        // animations have inverseBindMatrixes which have
+        // transposes in them so you can only scale them
+        // in model matrixes
         //
         
-    recalcVertexesFromImportMatrixes(scale)
+    scaleMeshes(scale)
     {
         let n;
         let nMesh=this.meshes.length;
 
         for (n=0;n!==nMesh;n++) {
-            this.meshes[n].recalcVertexesFromImportMatrixes(scale);
+            this.meshes[n].scale(scale);
         }
     }
     
@@ -244,7 +244,7 @@ export default class MeshListClass
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            //if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
 
                 // time to change bitmap
 

@@ -185,6 +185,22 @@ export default class ModelSkeletonClass
         return(true);
     }
     
+    startAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
+    {
+        let animation;
+        let fps=1000/framesPerSecond;
+        
+        this.currentAnimationIdx=this.findAnimationIndex(name);
+        if (this.currentAnimationIdx===-1) return(false);
+        
+        animation=this.animations[this.currentAnimationIdx];
+        animation.startTimestamp=this.view.timestamp;
+        animation.loopStartTick=Math.trunc(loopStartFrame*fps);
+        animation.loopEndTick=Math.trunc(loopEndFrame*fps);
+        
+        return(true);
+    }
+    
     startAnimation(name)
     {
         let animation;

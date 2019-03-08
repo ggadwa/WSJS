@@ -33,7 +33,7 @@ export default class BitmapListClass
         // add and get a bitmap
         //
         
-    add(colorURL,normalURL,specularURL,specularFactor,glowURL)
+    add(colorURL,normalURL,specularURL,specularFactor,glowURL,scale)
     {
         let bitmap;
             
@@ -45,7 +45,7 @@ export default class BitmapListClass
             // by another call that force loads unloaded
             // bitmaps
                     
-        bitmap=new BitmapClass(this.view,colorURL,normalURL,specularURL,specularFactor,glowURL,null);
+        bitmap=new BitmapClass(this.view,colorURL,normalURL,specularURL,specularFactor,glowURL,scale,null);
         bitmap.initialize();
         this.bitmaps.set(colorURL,bitmap);
         
@@ -59,7 +59,7 @@ export default class BitmapListClass
             // specialized bitmap for the color models that have
             // parts without textures
         
-        bitmap=new BitmapClass(this.view,null,null,null,null,null,new ColorClass(r,g,b));
+        bitmap=new BitmapClass(this.view,null,null,null,null,null,null,new ColorClass(r,g,b));
         bitmap.initialize();
         this.bitmaps.set(name,bitmap);
         
@@ -73,21 +73,10 @@ export default class BitmapListClass
     
     getSimpleName(name)
     {
-        let checkName,idx,key,value;
+        let key,value;
         
-        for ([key, value] of this.bitmaps) {
-            checkName=key;
-            
-                // reduce down to name, skipping
-                // any URL or extensions, this is a specific
-                // instance used to hook things up to materials
-                
-            idx=checkName.lastIndexOf('/');
-            if (idx!==-1) checkName=checkName.substring(idx+1);
-            idx=checkName.lastIndexOf('.');
-            if (idx!==-1) checkName=checkName.substring(0,idx);
-            
-            if (checkName===name) return(value);
+        for ([key,value] of this.bitmaps) {
+            if (value.simpleName===name) return(value);
         }
         
         return(null);

@@ -32,7 +32,7 @@ export default class ProjectEntityClass
         this.positionBackup=new PointClass(0,0,0);
         this.positionBackup.setFromPoint(this.position);
         
-        this.eyeOffset=3000;
+        this.eyeOffset=0;
 
         this.id=-1;
         

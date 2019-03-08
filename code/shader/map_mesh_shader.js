@@ -30,6 +30,8 @@ export default class MapMeshShaderClass extends ShaderClass
         this.specularFactorUniform=null;
         this.glowFactorUniform=null; 
         this.ambientUniform=null;
+        
+        this.hasSkinUniform=null;               // we keep this hear as mesh drawing is generic between map and model and we need to know if this exists
 
         this.lights=[];
         

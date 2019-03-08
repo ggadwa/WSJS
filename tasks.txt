@@ -7,15 +7,18 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
 
-0. get a better grass
+++ get rid of transparency pass, only support masks
+++ liquids need to draw away from z
+++ get rid of alpha in map_mesh.frag
 
-0. transparency sorting
-     - when drawing opaque, build into linked list (meshIdx/trigIdx) by view matrix Z in meshList
-     - then draw that as transparent
-0. when maps final, redo it so we have glossy stuff instead of wacky material bit
+--> getPoseJointMatrixArray don't need to build identity arrays, it's skipped
+--> mesh_list turn back on frustum culling
+
+a. if no joint in mesh import than multiply up with cumulative
+b. need a no joint flag for model drawing
+
 1. fix dungeon movements when new map
 
-3. need to sort waves too or at least form in direction away from camera
 6. be able to start animation paused (at certain second of animation)
 
 bumps

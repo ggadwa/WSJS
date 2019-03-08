@@ -12,6 +12,7 @@ uniform highp mat4 viewMatrix;
 uniform highp mat4 modelMatrix;
 uniform highp mat3 normalMatrix;
 
+uniform lowp int hasSkin;
 uniform highp mat4 jointMatrix[128];
 
 out highp vec3 eyeVector,eyePosition;
@@ -20,13 +21,19 @@ out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 
 void main(void)
 {
-        // calculate the animation
+        // calculate the possible animation
+        // and vertex position
 
-    mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
+    highp vec4 pos;
 
-        // set the positions
+    if (hasSkin!=0) {
+        mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
+        pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
+    }
+    else {
+        pos=viewMatrix*modelMatrix*vec4(vertexPosition,1.0);
+    }
 
-    highp vec4 pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
     gl_Position=perspectiveMatrix*pos;
     eyePosition=vec3(pos);
 
