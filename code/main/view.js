@@ -113,6 +113,7 @@ export default class ViewClass
         this.fpsStartTimestamp=0;
 
         this.drawMeshCount=0;
+        this.drawTrigCount=0;
         
             // health
         
@@ -429,21 +430,19 @@ export default class ViewClass
             // reset some stats
             
         this.drawMeshCount=0;
+        this.drawTrigCount=0;
         
             // draw the map
             
         map.sky.draw();
         if (!config.DRAW_COLLISION_PLANES) {
-            map.meshList.drawOpaque(null,null);
+            map.meshList.draw(null,null,false);
         }
         else {
             map.meshList.debugDrawCollisionSurfaces();
         }
         map.entityList.draw();
-        if (!config.DRAW_COLLISION_PLANES) {
-            map.meshList.drawTransparent(null,null);
-            map.liquidList.draw();
-        }
+        if (!config.DRAW_COLLISION_PLANES) map.liquidList.draw();
         map.effectList.draw();
       
             // player weapon
@@ -506,7 +505,7 @@ export default class ViewClass
         
         this.text.drawStart();
         this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
-        this.text.drawWithShadow((this.wid-5),46,20,18,(''+this.drawMeshCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
+        this.text.drawWithShadow((this.wid-5),46,20,18,(this.drawMeshCount+'/'+this.drawTrigCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
         //this.text.drawWithShadow(30,(this.high-5),25,22,player.getCurrentWeaponDisplayString(),this.text.TEXT_ALIGN_LEFT,this.uiWeaponTextColor);
         
         if (this.paused) {

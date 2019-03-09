@@ -22,7 +22,6 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.normalMatrixUniform=null;
         
         this.ambientUniform=null;
-        this.alphaUniform=null;
         
         this.lights=[];
         
@@ -50,7 +49,6 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
         
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
-        this.alphaUniform=gl.getUniformLocation(this.program,'alpha');
         
         for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());

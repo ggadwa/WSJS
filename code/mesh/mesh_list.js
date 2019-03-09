@@ -16,12 +16,6 @@ export default class MeshListClass
 
         this.meshes=[];
         
-            // this is an optimization that we use to skip
-            // transparency drawing if the opaque draw didn't
-            // skip any
-            
-        this.hadTransparentInDraw=false;
-        
             // an identity matrix for some debug drawing
             
         this.identityModelMatrix=new Matrix4Class();
@@ -208,7 +202,7 @@ export default class MeshListClass
         // draw meshes
         //
 
-    drawOpaque(modelMatrix,jointMatrixArray)
+    draw(modelMatrix,jointMatrixArray,noFrustumCull)
     {
         let n,mesh;
         let currentBitmap;
@@ -231,21 +225,19 @@ export default class MeshListClass
             // setup map drawing
 
         currentBitmap=null;
-        this.hadTransparentInDraw=false;
         
-            // draw the opaque meshes
+            // draw the meshes
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.meshes[n];
-            if (mesh.isTransparent()) {
-                this.hadTransparentInDraw=true;
-                continue;
-            }
 
                 // skip if not in view frustum
+                // some special models, like in hand weapons, don't cull
 
-            //if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
-
+            if (!noFrustumCull) {
+                if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            }
+            
                 // time to change bitmap
 
             if (mesh.bitmap!==currentBitmap) {
@@ -257,79 +249,10 @@ export default class MeshListClass
 
             mesh.updateBuffers();
             mesh.bindBuffers(this.shader);
-            mesh.drawOpaque();
+            mesh.draw();
         }
         
         this.shader.drawEnd();
-    }
-    
-    drawTransparent(modelMatrix,jointMatrixArray)
-    {
-        let n,mesh;
-        let nMesh=this.meshes.length;
-        let currentBitmap;
-        let gl=this.view.gl;
-        
-            // if no transparency in the opaque draw,
-            // skip this whole method
-            
-        if (!this.hadTransparentInDraw) return;
-        
-            // change the blend
-            
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-        
-        gl.depthMask(false);
-        
-        this.shader.drawStart();
-        
-            // set any model matrix
-            
-        if (modelMatrix!==null) this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
-         
-            // set any joint matrixes
-            
-        if (jointMatrixArray!==null) {
-            for (n=0;n!==jointMatrixArray.length;n++) {
-                this.view.gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
-            }
-        }
-
-            // setup map drawing
-
-        currentBitmap=null;
-
-            // draw the transparent meshes
-
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.meshes[n];
-            if (!mesh.isTransparent()) continue;
-
-                // skip if not in view frustum
-
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
-
-                // time to change bitmap
-
-            if (mesh.bitmap!==currentBitmap) {
-                currentBitmap=mesh.bitmap;
-                mesh.bitmap.attachAsTexture(this.shader);
-            }
-
-                // draw the mesh
-
-            mesh.updateBuffers();
-            mesh.bindBuffers(this.shader);
-            mesh.drawTransparent();
-        }
-        
-            // reset the blend
-            
-        this.shader.drawEnd();
-        
-        gl.disable(gl.BLEND);
-        gl.depthMask(true);
     }
     
         //

@@ -4,6 +4,7 @@ uniform lowp sampler2D baseTex;
 uniform lowp sampler2D normalTex;
 uniform lowp sampler2D specularTex;
 uniform lowp sampler2D glowTex;
+uniform lowp sampler2D maskTex;
 
 uniform lowp vec3 ambient;
 uniform mediump vec3 specularFactor;
@@ -105,6 +106,12 @@ void main(void)
         // finally create the pixel
 
     outputPixel.rgb=((tex.rgb*pixelAmbient)+spec)+(texture(glowTex,fragUV.xy).rgb*glowFactor);
-    outputPixel.a=tex.a;
+    outputPixel.a=1.0;
+
+        // any masking pixel discards
+        // have to do this at very end because some drivers
+        // get weird about this (or so I've read)
+
+    if (texture(maskTex,fragUV).a==0.0) discard;
 }
 

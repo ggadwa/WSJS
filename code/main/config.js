@@ -36,6 +36,7 @@ class ConfigClass
         this.PLAYER_FLY=false;
         this.DRAW_MODEL_SKELETONS=false;
         this.DRAW_COLLISION_PLANES=false;
+        this.DRAW_PATHS=false;
     }
 }
 

@@ -675,7 +675,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
-        let jointArray,weightArray,fakeArrayLen;
+        let rigged,jointArray,weightArray,fakeArrayLen;
         let nIdx,forceTangentRebuild;
         let mesh,bitmap,curBitmapName;
         let v=new PointClass(0,0,0);
@@ -734,11 +734,17 @@ export default class ImportGLTFClass extends ImportBaseClass
                     uvArray=new Float32Array(Math.trunc(vertexArray.length/3)*2);
                 }
                 
+                    // get the joints, for maps these won't exist at all
+                    // but for models we need to ready for this existing or
+                    // not, and change how the shader works depending
+                    
+                rigged=false;
                 jointArray=null;
                 weightArray=null;
                 
                 if (skeleton!==null) {
                     if (primitiveNode.attributes.JOINTS_0!==undefined) {
+                        rigged=true;
                         jointArray=this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4);
                         weightArray=this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);
                     }
@@ -748,7 +754,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // then there's no bone connection so we need to multiply
                     // in the cumulative matrixes
                 
-                if (jointArray===null) {    
+                if (!rigged) {    
                     for (t=0;t<vertexArray.length;t+=3) {
                         v.setFromValues(vertexArray[t],vertexArray[t+1],vertexArray[t+2]);
                         v.matrixMultiply(cumulativeNodeMatrix);
@@ -763,6 +769,18 @@ export default class ImportGLTFClass extends ImportBaseClass
                         normalArray[t]=normal.x;
                         normalArray[t+1]=normal.y;
                         normalArray[t+2]=normal.z;
+                    }
+                }
+                
+                    // if we have a skeleton, it's a model,
+                    // and so we require joints so we don't
+                    // have to enable/disable attribute on the fly
+                    
+                if (skeleton!==null) {
+                    if (!rigged) {
+                        fakeArrayLen=Math.trunc(vertexArray.length/3)*4;
+                        jointArray=new Float32Array(fakeArrayLen);
+                        weightArray=new Float32Array(fakeArrayLen);
                     }
                 }
                 
@@ -817,7 +835,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // all the array types should be their proper
                     // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,rigged,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }

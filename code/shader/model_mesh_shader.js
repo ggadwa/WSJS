@@ -90,6 +90,7 @@ export default class ModelMeshShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
         gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
         gl.uniform1i(gl.getUniformLocation(this.program,'glowTex'),3);
+        gl.uniform1i(gl.getUniformLocation(this.program,'maskTex'),4);
 
         gl.useProgram(null);
     }

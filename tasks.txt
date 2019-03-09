@@ -6,10 +6,7 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up]
 
-
-++ get rid of transparency pass, only support masks
-++ liquids need to draw away from z
-++ get rid of alpha in map_mesh.frag
+fix web
 
 --> getPoseJointMatrixArray don't need to build identity arrays, it's skipped
 --> mesh_list turn back on frustum culling
@@ -18,7 +15,7 @@ a. if no joint in mesh import than multiply up with cumulative
 b. need a no joint flag for model drawing
 
 1. fix dungeon movements when new map
-
+2. liquids need to draw away from z
 6. be able to start animation paused (at certain second of animation)
 
 bumps

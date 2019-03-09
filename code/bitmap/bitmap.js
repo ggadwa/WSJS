@@ -24,8 +24,8 @@ export default class BitmapClass
         this.normalMap=null;
         this.specularMap=null;
         this.glowMap=null;
+        this.mask=null;
 
-        this.alpha=1.0;
         this.hasColorImageAlpha=false;
         
         this.glowFrequency=0;
@@ -35,6 +35,8 @@ export default class BitmapClass
         this.buildSimpleName();
         
         this.loaded=false;
+        
+        Object.seal(this);
     }
 
         //
@@ -47,6 +49,7 @@ export default class BitmapClass
         this.normalMap=null;
         this.specularMap=null;
         this.glowMap=null;
+        this.mask=null;
 
         this.loaded=false;
     }
@@ -59,11 +62,13 @@ export default class BitmapClass
         if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
         if (this.specularMap!==null) gl.deleteTexture(this.specularMap);
         if (this.glowMap!==null) gl.deleteTexture(this.glowMap);
+        if (this.mask!==null) gl.deleteTexture(this.mask);
         
         this.colorImage=null;
         this.normalImage=null;
         this.specularImage=null;
         this.glowImage=null;
+        this.mask=null;
         
         this.loaded=false;
     }
@@ -126,7 +131,7 @@ export default class BitmapClass
     createDefaultImageForMissingImage(r,g,b)
     {
         let n,idx;
-        let canvas,ctx,imgData,data,image;
+        let canvas,ctx,imgData,data;
         
             // create an all black image
             // for bitmaps without glow maps
@@ -185,6 +190,7 @@ export default class BitmapClass
     
     async load()
     {
+        let maskImage;
         let gl=this.view.gl;
         
             // special check for solid colors
@@ -231,6 +237,25 @@ export default class BitmapClass
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D,null);
         
+            // if there is an alpha, build the mask
+            // into a different texture so we can use
+            // nearest, otherwise it's all black with a 1 alpha
+            // so no masking
+            
+        if (this.hasColorImageAlpha) {
+            maskImage=this.colorImage;
+        }
+        else {
+            maskImage=await this.createDefaultImageForMissingImage(0,0,0);      // alpha will be 1
+        }
+            
+        this.mask=gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D,this.mask);
+        gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,maskImage);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
+        gl.bindTexture(gl.TEXTURE_2D,null);
+        
             // normal bitmap
         
         this.normalImage=null;
@@ -252,7 +277,7 @@ export default class BitmapClass
         }
         
         if (this.normalImage===null) {
-            this.normalImage=await this.createDefaultImageForMissingImage(0,0,255);
+            this.normalImage=await this.createDefaultImageForMissingImage(255,255,255); // setting it to this makes the bump calculations flat on both sides (0,0,255) is normal flat bump
         }
 
         this.normalMap=gl.createTexture();
@@ -345,7 +370,6 @@ export default class BitmapClass
 
             // uniforms
 
-        gl.uniform1f(shader.alphaUniform,this.alpha);
         gl.uniform3f(shader.specularFactorUniform,this.specularFactor.r,this.specularFactor.g,this.specularFactor.b);
         
         if (this.glowFrequency!==0) {
@@ -357,6 +381,9 @@ export default class BitmapClass
         }
         
             // the textures
+            
+        gl.activeTexture(gl.TEXTURE4);
+        gl.bindTexture(gl.TEXTURE_2D,this.mask);
             
         gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D,this.glowMap);
@@ -375,8 +402,6 @@ export default class BitmapClass
     {
         let gl=this.view.gl;
 
-        gl.uniform1f(shader.alphaUniform,this.alpha);
-        
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }

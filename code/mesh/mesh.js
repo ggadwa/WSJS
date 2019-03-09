@@ -11,11 +11,12 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
+    constructor(view,name,bitmap,rigged,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
         this.view=view;
         this.name=name;
         this.bitmap=bitmap;
+        this.rigged=rigged;
         this.cumulativeNodeMatrix=cumulativeNodeMatrix;     // a matrix, all the glTF matrixes premultiplied up to this mesh
         this.vertexArray=vertexArray;       // expected Float32Array
         this.normalArray=normalArray;       // expected Float32Array
@@ -77,8 +78,6 @@ export default class MeshClass
         
             // global variables to stop GCd
 
-        this.boundMinPoint=new PointClass(0,0,0);
-        this.boundMaxPoint=new PointClass(0,0,0);
         this.rotPoint=new PointClass(0,0,0);
         this.rotVector=new PointClass(0.0,0.0,0.0);
         this.rotCenterPnt=new PointClass(0.0,0.0,0.0);
@@ -221,21 +220,72 @@ export default class MeshClass
         //
         // rebuild bound boxes to modelmatrix
         // this is mostly used by models to fix bounding
-        // boxes for frustum culling
+        // boxes for frustum culling, need to deal this
+        // on all 8 rectangle corners
         //
 
     recalcBoundsFromModelMatrix(modelMatrix)
     {
-        this.boundMinPoint.setFromValues(this.originalXBound.min,this.originalYBound.min,this.originalZBound.min);
-        this.boundMinPoint.matrixMultiply(modelMatrix);
+            // 8 corners of enclosing space
+            
+        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.min,this.originalZBound.min);
+        this.rotPoint.matrixMultiply(modelMatrix);
         
-        this.boundMaxPoint.setFromValues(this.originalXBound.max,this.originalYBound.max,this.originalZBound.max);
-        this.boundMaxPoint.matrixMultiply(modelMatrix);
+        this.xBound.setFromValues(this.rotPoint.x,this.rotPoint.x);
+        this.yBound.setFromValues(this.rotPoint.y,this.rotPoint.y);
+        this.zBound.setFromValues(this.rotPoint.z,this.rotPoint.z);
         
-        this.xBound.setFromValues(this.boundMinPoint.x,this.boundMaxPoint.x);
-        this.yBound.setFromValues(this.boundMinPoint.y,this.boundMaxPoint.y);
-        this.zBound.setFromValues(this.boundMinPoint.z,this.boundMaxPoint.z);
+        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.min,this.originalZBound.max);
+        this.rotPoint.matrixMultiply(modelMatrix);
+
+        this.xBound.adjust(this.rotPoint.x);
+        this.yBound.adjust(this.rotPoint.y);
+        this.zBound.adjust(this.rotPoint.z);
+            
+        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.min,this.originalZBound.min);
+        this.rotPoint.matrixMultiply(modelMatrix);
+
+        this.xBound.adjust(this.rotPoint.x);
+        this.yBound.adjust(this.rotPoint.y);
+        this.zBound.adjust(this.rotPoint.z);
+
+        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.min,this.originalZBound.max);
+        this.rotPoint.matrixMultiply(modelMatrix);
+
+        this.xBound.adjust(this.rotPoint.x);
+        this.yBound.adjust(this.rotPoint.y);
+        this.zBound.adjust(this.rotPoint.z);
+            
+        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.max,this.originalZBound.min);
+        this.rotPoint.matrixMultiply(modelMatrix);
         
+        this.xBound.adjust(this.rotPoint.x);
+        this.yBound.adjust(this.rotPoint.y);
+        this.zBound.adjust(this.rotPoint.z);
+        
+        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.max,this.originalZBound.max);
+        this.rotPoint.matrixMultiply(modelMatrix);
+
+        this.xBound.adjust(this.rotPoint.x);
+        this.yBound.adjust(this.rotPoint.y);
+        this.zBound.adjust(this.rotPoint.z);
+            
+        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.max,this.originalZBound.min);
+        this.rotPoint.matrixMultiply(modelMatrix);
+
+        this.xBound.adjust(this.rotPoint.x);
+        this.yBound.adjust(this.rotPoint.y);
+        this.zBound.adjust(this.rotPoint.z);
+
+        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.max,this.originalZBound.max);
+        this.rotPoint.matrixMultiply(modelMatrix);
+
+        this.xBound.adjust(this.rotPoint.x);
+        this.yBound.adjust(this.rotPoint.y);
+        this.zBound.adjust(this.rotPoint.z);
+
+            // and the center
+            
         this.center.x=this.xBound.getMidPoint();
         this.center.y=this.yBound.getMidPoint();
         this.center.z=this.zBound.getMidPoint();
@@ -484,15 +534,6 @@ export default class MeshClass
     }
     
         //
-        // transparency flags
-        //
-        
-    isTransparent()
-    {
-        return((this.bitmap.alpha!==1.0)||(this.bitmap.hasColorImageAlpha));
-    }
-
-        //
         // mesh binding
         //
 
@@ -549,18 +590,17 @@ export default class MeshClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
+            // any rigging if available
+            
         if (this.jointArray!==null) {
-            if (shader.hasSkinUniform!==null) this.view.gl.uniform1i(shader.hasSkinUniform,1);
-
             gl.bindBuffer(gl.ARRAY_BUFFER,this.jointBuffer);
             gl.vertexAttribPointer(shader.vertexJointAttribute,4,(this.need32BitJointIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),false,0,0);
             
             gl.bindBuffer(gl.ARRAY_BUFFER,this.weightBuffer);
             gl.vertexAttribPointer(shader.vertexWeightAttribute,4,gl.FLOAT,false,0,0);
         }
-        else {
-            if (shader.hasSkinUniform!==null) this.view.gl.uniform1i(shader.hasSkinUniform,0);
-        }
+
+        if (shader.hasSkinUniform!==null) this.view.gl.uniform1i(shader.hasSkinUniform,(this.rigged?1:0));
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
     }
@@ -603,21 +643,13 @@ export default class MeshClass
         // mesh drawing
         //
 
-    drawOpaque()
+    draw()
     {
         let gl=this.view.gl;
         
         gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
             
         this.view.drawMeshCount++;
-    }
-    
-    drawTransparent()
-    {
-        let gl=this.view.gl;
-        
-        gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
-
-        this.view.drawMeshCount++;
+        this.view.drawTrigCount+=Math.trunc(this.indexCount/3);
     }
 }

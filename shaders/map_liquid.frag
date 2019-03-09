@@ -3,7 +3,6 @@
 uniform lowp sampler2D baseTex;
 
 uniform lowp vec3 ambient;
-uniform lowp float alpha;
 
 struct lightType {
     highp vec4 positionIntensity;
@@ -53,6 +52,6 @@ void main(void)
     }
 
     outputPixel.rgb=tex.rgb*lightCol;
-    outputPixel.a=tex.a*alpha;
+    outputPixel.a=tex.a;
 }
 

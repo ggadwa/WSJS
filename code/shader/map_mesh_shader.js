@@ -26,7 +26,6 @@ export default class MapMeshShaderClass extends ShaderClass
         this.viewMatrixUniform=null;
         this.normalMatrixUniform=null;
         
-        this.alphaUniform=null;
         this.specularFactorUniform=null;
         this.glowFactorUniform=null; 
         this.ambientUniform=null;
@@ -60,7 +59,6 @@ export default class MapMeshShaderClass extends ShaderClass
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
 
-        this.alphaUniform=gl.getUniformLocation(this.program,'alpha');
         this.specularFactorUniform=gl.getUniformLocation(this.program,'specularFactor');
         this.glowFactorUniform=gl.getUniformLocation(this.program,'glowFactor');
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
@@ -79,6 +77,7 @@ export default class MapMeshShaderClass extends ShaderClass
         gl.uniform1i(gl.getUniformLocation(this.program,'normalTex'),1);
         gl.uniform1i(gl.getUniformLocation(this.program,'specularTex'),2);
         gl.uniform1i(gl.getUniformLocation(this.program,'glowTex'),3);
+        gl.uniform1i(gl.getUniformLocation(this.program,'maskTex'),4);
 
         gl.useProgram(null);
     }

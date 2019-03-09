@@ -25,6 +25,8 @@ export default class ModelClass
         this.angle=new PointClass(0,0,0);
         this.scale=new PointClass(1,1,1);
         
+        this.noFrustumCull=false;
+        
         this.modelMatrix=new Matrix4Class();
         
         this.rotMatrix=new Matrix4Class();  // supergumba -- all temporary use quanternion
@@ -110,7 +112,7 @@ export default class ModelClass
         
             // draw the meshlist
             
-        this.meshList.drawOpaque(this.modelMatrix,this.skeleton.getPoseJointMatrixArray());
+        this.meshList.draw(this.modelMatrix,this.skeleton.getPoseJointMatrixArray(),this.noFrustumCull);
         
             // debug skeleton drawing
             
