@@ -11,12 +11,11 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,rigged,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
+    constructor(view,name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
         this.view=view;
         this.name=name;
         this.bitmap=bitmap;
-        this.rigged=rigged;
         this.cumulativeNodeMatrix=cumulativeNodeMatrix;     // a matrix, all the glTF matrixes premultiplied up to this mesh
         this.vertexArray=vertexArray;       // expected Float32Array
         this.normalArray=normalArray;       // expected Float32Array
@@ -599,8 +598,6 @@ export default class MeshClass
             gl.bindBuffer(gl.ARRAY_BUFFER,this.weightBuffer);
             gl.vertexAttribPointer(shader.vertexWeightAttribute,4,gl.FLOAT,false,0,0);
         }
-
-        if (shader.hasSkinUniform!==null) this.view.gl.uniform1i(shader.hasSkinUniform,(this.rigged?1:0));
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
     }

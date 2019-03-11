@@ -557,7 +557,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
-        let diffuseTexture,diffuseFactor,baseColorFactor,glossTexture,specularFactorProp,glossFactor;
+        let n,bitmap,diffuseTexture,glossTexture,specularFactorProp,glowDef;
         let colorURL=null;
         let normalURL=null;
         let specularURL=null;
@@ -568,24 +568,14 @@ export default class ImportGLTFClass extends ImportBaseClass
         
             // first find any normal texture
             
-        if ((materialNode.normalTexture!==undefined) && (!this.importSettings.getMaterialDirectlyFromName)) {
+        if (materialNode.normalTexture!==undefined) {
             normalURL=prefixURL+this.jsonData.images[materialNode.normalTexture.index].uri;
         }
         
             // default specular
             
-        specularFactor=new ColorClass(1.0,1.0,1.0);
-        
-            // special override for fbx->gltf conversions
-            // that have wacky textures
-            
-        if (this.importSettings.getMaterialDirectlyFromName) {
-            colorURL=prefixURL+'textures/'+materialNode.name+'_color.png';
-            normalURL=prefixURL+'textures/'+materialNode.name+'_normals.png';
-            specularURL=prefixURL+'textures/'+materialNode.name+'_specular.png';
-            specularFactor=new ColorClass(5.0,5.0,5.0);
-        }
-        
+        specularFactor=new ColorClass(5.0,5.0,5.0);
+                
             // now any color texture
             // check specularGlossiness first
         
@@ -607,13 +597,6 @@ export default class ImportGLTFClass extends ImportBaseClass
                                     scale=diffuseTexture.extensions.KHR_texture_transform.scale;
                                 }
                             }
-                        }
-                    }
-                    else {
-                        diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
-                        if (diffuseFactor!==undefined) {
-                            glossFactor=(materialNode.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor*2.0);     // this is relatively random and really here to deal with missing textures
-                            return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),(diffuseFactor[0]+glossFactor),(diffuseFactor[1]+glossFactor),(diffuseFactor[2]+glossFactor)));
                         }
                     }
 
@@ -643,15 +626,6 @@ export default class ImportGLTFClass extends ImportBaseClass
                 if (materialNode.pbrMetallicRoughness.baseColorTexture!==undefined) {
                     colorURL=prefixURL+this.jsonData.images[materialNode.pbrMetallicRoughness.baseColorTexture.index].uri;
                 }
-                
-                    // else check for solid color
-                    
-                else {
-                    baseColorFactor=materialNode.pbrMetallicRoughness.baseColorFactor;
-                    if (baseColorFactor!==undefined) {
-                        return(this.view.bitmapList.addSolidColor((prefixURL+materialNode.name),baseColorFactor[0],baseColorFactor[1],baseColorFactor[2]));
-                    }
-                }
             }
         }
         
@@ -662,9 +636,30 @@ export default class ImportGLTFClass extends ImportBaseClass
             return(null);
         }
         
-            // add the texture and return the bitmap
+            // create the bitmap and
+            // add to list to be loaded later
+            
+        bitmap=this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
+        
+            // any glow subsitutions?
+        
+        if (this.importSettings.glows!==undefined) {
+            for (n=0;n!==this.importSettings.glows.length;n++) {
+                glowDef=this.importSettings.glows[n];
+                
+                if (bitmap.simpleName===glowDef.bitmap) {
+                    bitmap.glowURL=glowDef.url;
+                    bitmap.glowFrequency=glowDef.frequency;
+                    bitmap.glowMin=glowDef.min;
+                    bitmap.glowMax=glowDef.max;
+                    break;
+                }
+            }
+        }
+        
+            // return the bitmap
 
-        return(this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,null,scale));
+        return(bitmap);
     }
     
         //
@@ -675,7 +670,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
-        let rigged,jointArray,weightArray,fakeArrayLen;
+        let jointArray,weightArray,fakeArrayLen;
         let nIdx,forceTangentRebuild;
         let mesh,bitmap,curBitmapName;
         let v=new PointClass(0,0,0);
@@ -683,10 +678,6 @@ export default class ImportGLTFClass extends ImportBaseClass
         let tangent=new PointClass(0,0,0);
         let cumulativeNodeMatrix;
         let meshes=[];
-        
-            // if there's no skin, then ignore any rigging
-            
-        if (this.jsonData.skins===undefined) skeleton=null;
         
             // special flag to force tangents to
             // get rebuild if tangents in file are wrong
@@ -726,35 +717,50 @@ export default class ImportGLTFClass extends ImportBaseClass
                 tangentArray=null;  // tangents aren't always there, we recreate them if missing
                 if ((primitiveNode.attributes.TANGENT!==undefined) && (!forceTangentRebuild)) tangentArray=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
                 
-                                    // solid colors usually don't have UVs but we treat everything as a texture so we create a 0,0 list
-                if (primitiveNode.attributes.TEXCOORD_0!==undefined) {
-                    uvArray=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
-                }
-                else {
-                    uvArray=new Float32Array(Math.trunc(vertexArray.length/3)*2);
+                if (primitiveNode.attributes.TEXCOORD_0===undefined) {
+                    console.log('uv are required in '+this.importSettings.name);
+                    return(false);
                 }
                 
-                    // get the joints, for maps these won't exist at all
-                    // but for models we need to ready for this existing or
-                    // not, and change how the shader works depending
+                uvArray=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
+                
+                    // get the joints, if no skeleton it means we
+                    // are loading a map, so skip these.  If there's a skeleton
+                    // but no skin, then it's a mesh without animation so
+                    // no rigging is OK.  Otherwise it's a warning and an elimination
+                    // of the mesh
                     
-                rigged=false;
                 jointArray=null;
                 weightArray=null;
                 
                 if (skeleton!==null) {
-                    if (primitiveNode.attributes.JOINTS_0!==undefined) {
-                        rigged=true;
+                    
+                        // its a model but no skin, so make a fake joint array
+                        
+                    if (this.jsonData.skins===undefined) {
+                        fakeArrayLen=Math.trunc(vertexArray.length/3)*4;
+                        jointArray=new Float32Array(fakeArrayLen);
+                        weightArray=new Float32Array(fakeArrayLen);
+                        
+                        for (t=0;t<fakeArrayLen;t+=4) {
+                            weightArray[t]=1.0;                 // everything is hooked up to root node, 100%, identity should leave where it is
+                        }
+                    }
+                    else {
+                        if (primitiveNode.attributes.JOINTS_0===undefined) {
+                            console.log('warning: mesh '+meshNode.name+' is in a skinned model '+this.importSettings.name+' but has no bone attachments, being ignored');
+                            continue;
+                        }
+                        
                         jointArray=this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4);
                         weightArray=this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);
                     }
                 }
                 
-                    // if we don't have a joint array or skeleton,
-                    // then there's no bone connection so we need to multiply
-                    // in the cumulative matrixes
+                    // maps don't have skeletons so we need to add up
+                    // the cumulative matrixes since to animation
                 
-                if (!rigged) {    
+                if (skeleton===null) {    
                     for (t=0;t<vertexArray.length;t+=3) {
                         v.setFromValues(vertexArray[t],vertexArray[t+1],vertexArray[t+2]);
                         v.matrixMultiply(cumulativeNodeMatrix);
@@ -769,18 +775,6 @@ export default class ImportGLTFClass extends ImportBaseClass
                         normalArray[t]=normal.x;
                         normalArray[t+1]=normal.y;
                         normalArray[t+2]=normal.z;
-                    }
-                }
-                
-                    // if we have a skeleton, it's a model,
-                    // and so we require joints so we don't
-                    // have to enable/disable attribute on the fly
-                    
-                if (skeleton!==null) {
-                    if (!rigged) {
-                        fakeArrayLen=Math.trunc(vertexArray.length/3)*4;
-                        jointArray=new Float32Array(fakeArrayLen);
-                        weightArray=new Float32Array(fakeArrayLen);
                     }
                 }
                 
@@ -835,7 +829,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // all the array types should be their proper
                     // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,rigged,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }

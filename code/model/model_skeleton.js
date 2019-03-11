@@ -252,7 +252,7 @@ export default class ModelSkeletonClass
             
                 // specs say this starts with inverse of global
                 // changes to root node, but there are none
-                
+
             joint.jointMatrix.setFromMultiply(node.curPoseMatrix,joint.inverseBindMatrix);
             
             matrixArray.push(joint.jointMatrix);

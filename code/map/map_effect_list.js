@@ -103,8 +103,7 @@ export default class MapEffectListClass
         for (effect of this.effects) {
             if (!effect.show) continue;
             
-            effect.drawSetup();
-            if (effect.isInView()) effect.draw();
+            if (effect.drawSetup()) effect.draw();
         }
     }
 

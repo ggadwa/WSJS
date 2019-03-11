@@ -2,13 +2,13 @@ import PointClass from '../utility/point.js';
 
 export default class ProjectEffectClass
 {
-    constructor(view,map,position,data)
+    constructor(view,map,data)
     {
         this.view=view;
         this.map=map;
-        this.position=position;
         this.data=data;
         
+        this.position=new PointClass(0,0,0);
         this.show=true;
         
         this.billboardQuadVertexes=null;
@@ -33,9 +33,9 @@ export default class ProjectEffectClass
     {
     }
     
-    addBitmap(colorURL,normalURL,specularURL,specularFactor,glowURL)
+    addBitmap(colorURL,normalURL,specularURL,specularFactor,scale)
     {
-        this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,glowURL,null);
+        this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
     }
     
     getBitmap(colorURL)
@@ -150,22 +150,12 @@ export default class ProjectEffectClass
     }
     
         //
-        // override this for any draw setup, after this isInView
-        // is called to check to see if effect is in view, and then
-        // it's draw with a call to draw()
+        // override this for any draw setup, and return TRUE
+        // if the effect is within the view, you should always
+        // override this to improve performance
         // 
         
     drawSetup()
-    {
-    }
-    
-        //
-        // override this to return TRUE if effect is in
-        // view, the default is TRUE, you should always
-        // override this to improve performance
-        //
-        
-    isInView()
     {
         return(true);
     }

@@ -12,7 +12,7 @@ class ConfigClass
             // temp map testing
             //
             
-        this.START_MAP=0;
+        this.START_MAP=1;
         this.START_MAP_LIST=['Dual Castles','Dungeon'];
 
             //

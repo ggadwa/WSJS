@@ -20,11 +20,11 @@ export default class ImportMapClass
     async load(importSettings)
     {
         let n,k,scale,idx;
-        let effect,effectDef,effectPos;
+        let effect,effectDef;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
         let movement,idxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset;
-        let glowDef,bitmap;
+        let bitmap;
         let importMesh;
         
             // import the map itself
@@ -48,16 +48,7 @@ export default class ImportMapClass
             for (n=0;n!==importSettings.effects.length;n++) {
                 effectDef=importSettings.effects[n];
                 
-                idx=this.map.meshList.find(effectDef.mesh);
-                if (idx===-1) {
-                    console.log('Unknown mesh to attach effect to: '+effectDef.mesh);
-                    continue;
-                }
-                
-                effectPos=new PointClass(effectDef.offset.x,effectDef.offset.y,effectDef.offset.z);
-                effectPos.addPoint(this.map.meshList.meshes[idx].center);
-                
-                effect=new effectDef.effect(this.view,this.map,effectPos,effectDef.data);
+                effect=new effectDef.effect(this.view,this.map,effectDef.data);
                 this.map.effectList.add(effect);
             }
         }
@@ -144,33 +135,14 @@ export default class ImportMapClass
             this.map.sky.on=true;
             this.map.sky.skyBoxSettings=importSettings.skyBox;
             
-            this.view.bitmapList.add(importSettings.skyBox.bitmapNegX,null,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapPosX,null,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapNegY,null,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapPosY,null,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapNegZ,null,null,null,null,null);
-            this.view.bitmapList.add(importSettings.skyBox.bitmapPosZ,null,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapNegX,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapPosX,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapNegY,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapPosY,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapNegZ,null,null,null,null);
+            this.view.bitmapList.add(importSettings.skyBox.bitmapPosZ,null,null,null,null);
         }
-        
-            // alter any bitmaps for glow settings
-            // normally nothing loads glows, we reset that here
-            
-        if (importSettings.glows!==undefined) {
-            for (n=0;n!==importSettings.glows.length;n++) {
-                glowDef=importSettings.glows[n];
-                
-                bitmap=this.view.bitmapList.getSimpleName(glowDef.bitmap);
-                if (bitmap===null) {
-                    console.log('Missing bitmap to set glow to: '+glowDef.bitmap);
-                    return;
-                }
-                
-                bitmap.glowURL=glowDef.url;
-                bitmap.glowFrequency=glowDef.frequency;
-                bitmap.glowMax=glowDef.max;
-            }
-        }
-        
+
             // and turn off any collisions for certain
             // bitmaps, mostly for things like bushes
             // and webs, etc

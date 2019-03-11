@@ -60,7 +60,6 @@ export default class ViewClass
 
         this.perspectiveMatrix=new Matrix4Class();
         this.viewMatrix=new Matrix4Class();
-        this.normalMatrix=new Matrix3Class();
         this.orthoMatrix=new Matrix4Class();
 
             // billboarding matrixes
@@ -380,12 +379,6 @@ export default class ViewClass
             // setup the look at
 
         this.viewMatrix.setLookAtMatrix(this.eyePos,this.camera.position,this.lookAtUpVector);
-
-            // create the 3x3 normal matrix
-            // the normal is the invert-transpose of the view matrix
-            // put into a 3x3 matrix
-            
-        this.normalMatrix.setInvertTransposeFromMat4(this.viewMatrix);
 
             // the 2D ortho matrix
 

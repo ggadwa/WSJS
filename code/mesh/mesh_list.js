@@ -1,6 +1,7 @@
 import * as constants from '../main/constants.js';
 import config from '../main/config.js';
 import PointClass from '../utility/point.js';
+import Matrix3Class from '../utility/matrix3.js';
 import Matrix4Class from '../utility/matrix4.js';
 
 //
@@ -16,8 +17,10 @@ export default class MeshListClass
 
         this.meshes=[];
         
-            // an identity matrix for some debug drawing
+            // some pre-allocated matrixes
             
+        this.normalMatrix=new Matrix3Class();
+        this.modelViewMatrix=new Matrix4Class();
         this.identityModelMatrix=new Matrix4Class();
 
         Object.seal(this);
@@ -220,6 +223,16 @@ export default class MeshListClass
             for (n=0;n!==jointMatrixArray.length;n++) {
                 this.view.gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
             }
+        }
+        
+            // need to create the normal matrix, which
+            // is used to tranform normals into eye space
+            // for lighting, only maps use this since it needs
+            // to be view*model*skin in the models
+            
+        if (modelMatrix===null) {    
+            this.normalMatrix.setInvertTransposeFromMat4(this.view.viewMatrix);
+            this.view.gl.uniformMatrix3fv(this.shader.normalMatrixUniform,false,this.normalMatrix.data);
         }
 
             // setup map drawing

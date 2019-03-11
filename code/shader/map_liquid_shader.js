@@ -1,5 +1,6 @@
 import ShaderClass from '../shader/shader.js';
 import ShaderLightClass from '../shader/shader_light.js';
+import Matrix3Class from '../utility/matrix3.js';
 
 //
 // map shader object
@@ -24,6 +25,10 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.ambientUniform=null;
         
         this.lights=[];
+        
+            // some pre-allocated matrixes
+            
+        this.normalMatrix=new Matrix3Class();        
         
         Object.seal(this);
     }
@@ -80,7 +85,13 @@ export default class MapLiquidShaderClass extends ShaderClass
 
         gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
         gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
-        gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.view.normalMatrix.data);
+        
+            // there's no model matrix for liquids
+            // so this is just the transpose inverse of
+            // the view matrix
+            
+        this.normalMatrix.setInvertTransposeFromMat4(this.view.viewMatrix);
+        gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.normalMatrix.data);
         
             // ambient
             

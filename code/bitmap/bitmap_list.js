@@ -33,7 +33,7 @@ export default class BitmapListClass
         // add and get a bitmap
         //
         
-    add(colorURL,normalURL,specularURL,specularFactor,glowURL,scale)
+    add(colorURL,normalURL,specularURL,specularFactor,scale)
     {
         let bitmap;
             
@@ -45,27 +45,13 @@ export default class BitmapListClass
             // by another call that force loads unloaded
             // bitmaps
                     
-        bitmap=new BitmapClass(this.view,colorURL,normalURL,specularURL,specularFactor,glowURL,scale,null);
+        bitmap=new BitmapClass(this.view,colorURL,normalURL,specularURL,specularFactor,scale);
         bitmap.initialize();
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);
     }
     
-    addSolidColor(name,r,g,b)
-    {
-        let bitmap;
-        
-            // specialized bitmap for the color models that have
-            // parts without textures
-        
-        bitmap=new BitmapClass(this.view,null,null,null,null,null,null,new ColorClass(r,g,b));
-        bitmap.initialize();
-        this.bitmaps.set(name,bitmap);
-        
-        return(bitmap);
-    }
-
     get(colorURL)
     {
         return(this.bitmaps.get(colorURL));

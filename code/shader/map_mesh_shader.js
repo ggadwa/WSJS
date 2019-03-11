@@ -29,8 +29,6 @@ export default class MapMeshShaderClass extends ShaderClass
         this.specularFactorUniform=null;
         this.glowFactorUniform=null; 
         this.ambientUniform=null;
-        
-        this.hasSkinUniform=null;               // we keep this hear as mesh drawing is generic between map and model and we need to know if this exists
 
         this.lights=[];
         
@@ -95,10 +93,11 @@ export default class MapMeshShaderClass extends ShaderClass
         gl.useProgram(this.program);
 
             // matrix
+            // normal is set on a per mesh level as some have
+            // model matrixes which need to be calculated in
 
         gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
         gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
-        gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.view.normalMatrix.data);
         
             // ambient
             

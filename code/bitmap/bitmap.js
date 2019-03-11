@@ -2,16 +2,15 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
-    constructor(view,colorURL,normalURL,specularURL,specularFactor,glowURL,scale,solidColor)
+    constructor(view,colorURL,normalURL,specularURL,specularFactor,scale)
     {
         this.view=view;
         this.colorURL=colorURL;
         this.normalURL=normalURL;
         this.specularURL=specularURL;
         this.specularFactor=specularFactor;
-        this.glowURL=glowURL;
+        this.glowURL=null;
         this.scale=scale;
-        this.solidColor=solidColor;
         
         if (this.specularFactor===null) this.specularFactor=new ColorClass(1,1,1);      // default specular, in case it's missing
         
@@ -29,6 +28,7 @@ export default class BitmapClass
         this.hasColorImageAlpha=false;
         
         this.glowFrequency=0;
+        this.glowMin=0.0;
         this.glowMax=1.0;
         
         this.simpleName=null;
@@ -193,37 +193,29 @@ export default class BitmapClass
         let maskImage;
         let gl=this.view.gl;
         
-            // special check for solid colors
-            
-        if (this.solidColor!==null) {
-            this.colorImage=await this.createDefaultImageForMissingImage((this.solidColor.r*255),(this.solidColor.g*255),(this.solidColor.b*255));
-        }
-        
             // color bitmap
             // this is the only required image, all others
             // are created if missing
         
-        else {    
-            this.colorImage=null;
+        this.colorImage=null;
 
-            await this.loadImagePromise('./data/'+this.colorURL)
-                .then
-                    (
-                            // resolved
+        await this.loadImagePromise('./data/'+this.colorURL)
+            .then
+                (
+                        // resolved
 
-                        value=>{
-                            this.colorImage=value;
-                        },
+                    value=>{
+                        this.colorImage=value;
+                    },
 
-                            // rejected
+                        // rejected
 
-                        value=>{
-                            console.log('Unable to load '+value);
-                        }
-                    );
+                    value=>{
+                        console.log('Unable to load '+value);
+                    }
+                );
 
-            if (this.colorImage===null) return(false);
-        }
+        if (this.colorImage===null) return(false);
         
             // detect if there is any alpha
             
@@ -373,7 +365,7 @@ export default class BitmapClass
         gl.uniform3f(shader.specularFactorUniform,this.specularFactor.r,this.specularFactor.g,this.specularFactor.b);
         
         if (this.glowFrequency!==0) {
-            glowFactor=Math.abs(Math.cos(this.view.timestamp/this.glowFrequency)*this.glowMax);
+            glowFactor=this.glowMin+Math.abs(Math.cos(this.view.timestamp/this.glowFrequency)*(this.glowMax-this.glowMin));
             gl.uniform1f(shader.glowFactorUniform,glowFactor);
         }
         else {
