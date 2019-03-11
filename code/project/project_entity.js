@@ -142,7 +142,6 @@ export default class ProjectEntityClass
     {
     }
     
-    
         //
         // start and stop movements
         //
@@ -611,7 +610,18 @@ export default class ProjectEntityClass
     }
     
         //
+        // ready entity
+        // this is the first call before it starts running,
+        // after everything has been prepared and loaded
+        //
+    
+    ready()
+    {
+    }
+    
+        //
         // run entity
+        // called during physics loops as entity is run
         //
         
     run()
@@ -637,8 +647,10 @@ export default class ProjectEntityClass
         if (this.model===null) return;
         if (!this.show) return;
         
-            // call the setup
+            // run the animation
+            // and then call the setup
             
+        this.model.skeleton.runAnimation();
         this.drawSetup();
         
             // draw the model

@@ -23,7 +23,7 @@ export default class ModelSkeletonClass
             // we need all nodes, as certain non-joint modes
             // also effect the children joints
             
-        this.rootNodeIdx=-1;
+        this.rootNodeIdx=0;
         this.nodes=[];
         
             // joints
@@ -36,9 +36,14 @@ export default class ModelSkeletonClass
         this.animations=[];
         
         this.currentAnimationIdx=-1;
-        this.currentAnimationStartTick=-1;
-        this.currentAnimationEndTick=-1;
+        this.currentAnimationStartTick=0;
+        this.currentAnimationEndTick=0;
         this.currentAnimationData=new Float32Array(4);
+        
+        this.queuedAnimationIdx=-1;
+        this.queuedAnimationStartTimeStamp=0;
+        this.queuedAnimationLoopStartTick=0;
+        this.queuedAnimationLoopEndTick=0;
         
             // globals to stop GC
             
@@ -153,9 +158,30 @@ export default class ModelSkeletonClass
     
     runAnimation()
     {
-        if (this.rootNodeIdx===-1) return;      // this model has no rigging
+        let animation;
         
-        if (this.currentAnimationIdx!==-1) this.setupNodesToPose();
+            // if we are running an animation, then
+            // setup nodes to pose and check to see
+            // if queue is being popped
+            
+        if (this.currentAnimationIdx!==-1) {
+
+            if (this.queuedAnimationIdx!==-1) {
+                if (this.view.timestamp>=this.queuedAnimationStartTimeStamp) {
+                    this.currentAnimationIdx=this.queuedAnimationIdx;
+                    animation=this.animations[this.currentAnimationIdx];
+                    animation.startTimestamp=this.queuedAnimationStartTimeStamp;
+                    animation.loopStartTick=this.queuedAnimationLoopStartTick;
+                    animation.loopEndTick=this.queuedAnimationLoopEndTick;
+                }
+            }
+            
+            this.setupNodesToPose();
+        }
+        
+            // now cumulative all the nodes for
+            // their matrixes
+            
         this.runAnimationNode(this.nodes[this.rootNodeIdx],null);
     }
     
@@ -201,6 +227,34 @@ export default class ModelSkeletonClass
         return(true);
     }
     
+    queueAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
+    {
+        let animation,len;
+        let fps=1000/framesPerSecond;
+        
+            // if no animation, queue becomes a start
+            
+        if (this.currentAnatimationIdx===-1) return(this.startAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame));
+        
+            // find when this animation ends
+            
+        animation=this.animations[this.currentAnimationIdx];
+        
+        len=animation.loopEndTick-animation.loopStartTick;
+        len-=Math.trunc((this.view.timestamp-animation.startTimestamp)%len);
+        
+            // queue up
+            
+        this.queuedAnimationIdx=this.findAnimationIndex(name);
+        if (this.queuedAnimationIdx===-1) return(false);
+        
+        this.queuedAnimationStartTimeStamp=this.view.timestamp+len;
+        this.queuedAnimationLoopStartTick=Math.trunc(loopStartFrame*fps);
+        this.queuedAnimationLoopEndTick=Math.trunc(loopEndFrame*fps);
+        
+        return(true);
+    }
+    
     startAnimation(name)
     {
         let animation;
@@ -229,19 +283,6 @@ export default class ModelSkeletonClass
     {
         let n,node,joint;
         let matrixArray=[];
-        
-            // if there is no rigging, everything is
-            // the identity matrix
-            
-        if (this.rootNodeIdx===-1) {
-            
-            for (n=0;n!==this.joints.length;n++) {
-                this.joints[n].setIdentity();
-                matrixArray.push(joint.jointMatrix);
-            }
-            
-            return(matrixArray);
-        }
         
             // otherwise calculate the joint matrixes
             // based on the animation pose matrix

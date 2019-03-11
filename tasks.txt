@@ -4,13 +4,12 @@ WebGL2
            (reason can't do for now, it forces mesh shader setup to be per VAO, and that means repeated lights, etc.)
     [ ] uniform buffers for lights & matrixes
 
-[Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped and either 100% rigged or no skinning at all]
+[Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
+
+need isEntityInRange('player') then check for E key on 
 
 sort effects, will need a sort z call into the effect
 entites need data
-
-if indexes never change in effects, don't rebuild (fire and smoke) - also use periodic calls
-
 
 2. liquids need to draw away from z
 6. be able to start animation paused (at certain second of animation)

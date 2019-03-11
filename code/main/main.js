@@ -145,6 +145,10 @@ class MainClass
 
         this.view.input.initialize(this.map.entityList.getPlayer());
         
+            // ready all the entities
+            
+        this.map.entityList.ready();
+        
             // the cancel loop flag
             
         this.view.loopCancel=false;

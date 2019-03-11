@@ -27,6 +27,8 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.viewMatrixUniform=null;
         this.modelMatrixUniform=null;       //normal matrix is calculated in vert shader because of skin (view*model*skin)
         
+        this.noSkinUniform=null;
+        this.noSkinAttachedNodeMatrixUniform=null;
         this.jointMatrixUniformArray=[];
 
         this.specularFactorUniform=null;
@@ -61,6 +63,9 @@ export default class ModelMeshShaderClass extends ShaderClass
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
+        
+        this.noSkinUniform=gl.getUniformLocation(this.program,'noSkin');
+        this.noSkinAttachedNodeMatrixUniform=gl.getUniformLocation(this.program,'noSkinAttachedNodeMatrix');
         
         for (n=0;n!==ModelSkeletonClass.MAX_SKELETON_JOINT;n++) {
             name='jointMatrix['+n+']';
@@ -105,8 +110,9 @@ export default class ModelMeshShaderClass extends ShaderClass
         gl.useProgram(this.program);
 
             // matrix
-            // normal is set on a per mesh level as some have
-            // model matrixes which need to be calculated in
+            // model matrixes are calculated at a per model and sometimes mesh
+            // level, the normal matrix is calculated in the shader
+            // because skinning needs to be multiplied in
 
         gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
         gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);

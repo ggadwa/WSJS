@@ -497,10 +497,6 @@ export default class ImportGLTFClass extends ImportBaseClass
         let n,nodes,skin,joints;
         let mat,inverseBindMatrixFloatArray;
         
-            // if there's no skin, then no rigging
-        
-        if (this.jsonData.skins===undefined) return(true);
-        
             // we have to load every node
             // because even though they aren't part of
             // the skeleton they have important TRS data
@@ -511,43 +507,51 @@ export default class ImportGLTFClass extends ImportBaseClass
             skeleton.nodes.push(this.decodeNode(n));
         }
         
-            // assuming a single skin, we
+            // if there is a skin, then
             // get the joint indexes for this skeleton
             // because of shader limits, we need to 
             // error out if too many joints
         
-        skin=this.jsonData.skins[0];
-        joints=skin.joints;
-        
-        if (joints.length>ModelSkeletonClass.MAX_SKELETON_JOINT) {
-            console.log('too many joints in skeleton ('+joints.length+' out of '+SkeletonClass.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
-            return(false);
+        if (this.jsonData.skins!==undefined) {
+            skin=this.jsonData.skins[0];
+            joints=skin.joints;
+
+            if (joints.length>ModelSkeletonClass.MAX_SKELETON_JOINT) {
+                console.log('too many joints in skeleton ('+joints.length+' out of '+SkeletonClass.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
+                return(false);
+            }
+
+            inverseBindMatrixFloatArray=this.decodeBuffer(skin.inverseBindMatrices,16);
+
+            for (n=0;n!==joints.length;n++) {
+                mat=new Matrix4Class();
+                mat.fromArrayOffset(inverseBindMatrixFloatArray,(n*16));
+                skeleton.joints.push(new ModelJointClass(joints[n],mat));
+            }
         }
         
-        inverseBindMatrixFloatArray=this.decodeBuffer(skin.inverseBindMatrices,16);
-        
-        for (n=0;n!==joints.length;n++) {
-            mat=new Matrix4Class();
-            mat.fromArrayOffset(inverseBindMatrixFloatArray,(n*16));
-            skeleton.joints.push(new ModelJointClass(joints[n],mat));
-        }
-        
-            // now find the parents
+            // now find the parents for all the nodes
             
         for (n=0;n!==skeleton.nodes.length;n++) {
             skeleton.nodes[n].parentNodeIdx=this.findNodeIndexInSkeletonChildIndexes(skeleton,n);
         }
         
             // find the root node by taking the first joint
-            // node and finding it's ultimate parent
-            
-        skeleton.rootNodeIdx=skeleton.joints[0].nodeIdx;
+            // node and finding it's ultimate parent, if no joints,
+            // then make the root the first node
         
-        while (true) {
-            if (skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx===-1) break;
-            skeleton.rootNodeIdx=skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx;
+        if (this.jsonData.skins===undefined) {
+            skeleton.rootNodeIdx=0;
         }
-            
+        else {
+            skeleton.rootNodeIdx=skeleton.joints[0].nodeIdx;
+
+            while (true) {
+                if (skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx===-1) break;
+                skeleton.rootNodeIdx=skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx;
+            }
+        }
+        
         return(true);
     }
     
@@ -670,7 +674,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
-        let jointArray,weightArray,fakeArrayLen;
+        let jointArray,weightArray,fakeArrayLen,noSkinAttachedNodeIdx;
         let nIdx,forceTangentRebuild;
         let mesh,bitmap,curBitmapName;
         let v=new PointClass(0,0,0);
@@ -708,6 +712,17 @@ export default class ImportGLTFClass extends ImportBaseClass
                 primitiveNode=meshNode.primitives[k];
                 if (primitiveNode.mode!==4) continue;       // not a triangle stream
                 
+                    // create or get bitmap
+                    
+                bitmap=this.findMaterialForMesh(meshNode,primitiveNode);
+                if (bitmap===null) return(false);
+                
+                    // is it in the skip list?
+                    
+                if (this.importSettings.meshSkipBitmaps!==undefined) {
+                    if (this.importSettings.meshSkipBitmaps.indexOf(bitmap.simpleName)!==-1) continue;
+                }
+                
                     // get all the arrays
                   
                 indexArray=this.decodeBuffer(primitiveNode.indices,1);
@@ -724,34 +739,26 @@ export default class ImportGLTFClass extends ImportBaseClass
                 
                 uvArray=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
                 
-                    // get the joints, if no skeleton it means we
-                    // are loading a map, so skip these.  If there's a skeleton
-                    // but no skin, then it's a mesh without animation so
-                    // no rigging is OK.  Otherwise it's a warning and an elimination
-                    // of the mesh
+                    // if we don't have a skeleton (loading a map) then
+                    // don't get any joints.  If we have a skeleton, but no
+                    // joints, then it's something attached directly to
+                    // a node (no skinning) otherwise it's a regular skinned mesh
                     
                 jointArray=null;
                 weightArray=null;
+                noSkinAttachedNodeIdx=-1;
                 
                 if (skeleton!==null) {
                     
-                        // its a model but no skin, so make a fake joint array
+                    if (primitiveNode.attributes.JOINTS_0===undefined) {
+                        noSkinAttachedNodeIdx=this.findNodeIndexInDataForMeshIndex(n);
+                        if (noSkinAttachedNodeIdx===-1) noSkinAttachedNodeIdx=0;        // if no attachment, then just use root node
                         
-                    if (this.jsonData.skins===undefined) {
-                        fakeArrayLen=Math.trunc(vertexArray.length/3)*4;
+                        fakeArrayLen=Math.trunc(vertexArray.length/3)*4;    // some drivers can get goofy if you don't bind something
                         jointArray=new Float32Array(fakeArrayLen);
-                        weightArray=new Float32Array(fakeArrayLen);
-                        
-                        for (t=0;t<fakeArrayLen;t+=4) {
-                            weightArray[t]=1.0;                 // everything is hooked up to root node, 100%, identity should leave where it is
-                        }
+                        weightArray=new Float32Array(fakeArrayLen);        
                     }
                     else {
-                        if (primitiveNode.attributes.JOINTS_0===undefined) {
-                            console.log('warning: mesh '+meshNode.name+' is in a skinned model '+this.importSettings.name+' but has no bone attachments, being ignored');
-                            continue;
-                        }
-                        
                         jointArray=this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4);
                         weightArray=this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);
                     }
@@ -805,17 +812,6 @@ export default class ImportGLTFClass extends ImportBaseClass
                     }
                 }
                 
-                    // create bitmap
-                    
-                bitmap=this.findMaterialForMesh(meshNode,primitiveNode);
-                if (bitmap===null) return(false);
-                
-                    // is it in the skip list?
-                    
-                if (this.importSettings.meshSkipBitmaps!==undefined) {
-                    if (this.importSettings.meshSkipBitmaps.indexOf(bitmap.simpleName)!==-1) continue;
-                }
-                
                     // any texture transforms
                     
                 if (bitmap.scale!==null) {
@@ -829,7 +825,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // all the array types should be their proper
                     // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
+                mesh=new MeshClass(this.view,meshNode.name,bitmap,noSkinAttachedNodeIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }
@@ -864,15 +860,11 @@ export default class ImportGLTFClass extends ImportBaseClass
         let animations,channels,animateNode,channelNode,samplerNode;
         let animation,channel,pose;
         let timeArray,vectorArray,vIdx;
-        
-            // if no skin, then no animation
-            
-        if (this.jsonData.skins===undefined) return(true);    
             
             // decode the animations
         
         animations=this.jsonData.animations;
-        if (animations===undefined) return;
+        if (animations===undefined) return(true);
         
         for (n=0;n!==animations.length;n++) {
             animateNode=animations[n];

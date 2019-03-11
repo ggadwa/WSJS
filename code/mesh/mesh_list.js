@@ -205,37 +205,40 @@ export default class MeshListClass
         // draw meshes
         //
 
-    draw(modelMatrix,jointMatrixArray,noFrustumCull)
+    draw(modelMatrix,skeleton,noFrustumCull)
     {
         let n,mesh;
+        let jointMatrixArray;
         let currentBitmap;
         let nMesh=this.meshes.length;
         
         this.shader.drawStart();
         
-            // set any model matrix
+            // if there is a model matrix, then
+            // it's a model so set both the model matrix
+            // and the joint matrixes
             
-        if (modelMatrix!==null) this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
-        
-            // set any joint matrixes
-            
-        if (jointMatrixArray!==null) {
+        if (modelMatrix!==null) {
+            this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
+
+            jointMatrixArray=skeleton.getPoseJointMatrixArray();
             for (n=0;n!==jointMatrixArray.length;n++) {
                 this.view.gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
             }
         }
         
+            // otherwise it's a map mesh, so we
             // need to create the normal matrix, which
             // is used to tranform normals into eye space
             // for lighting, only maps use this since it needs
             // to be view*model*skin in the models
             
-        if (modelMatrix===null) {    
+        else {    
             this.normalMatrix.setInvertTransposeFromMat4(this.view.viewMatrix);
             this.view.gl.uniformMatrix3fv(this.shader.normalMatrixUniform,false,this.normalMatrix.data);
         }
 
-            // setup map drawing
+            // keep track of bitmap changes
 
         currentBitmap=null;
         
@@ -249,6 +252,26 @@ export default class MeshListClass
 
             if (!noFrustumCull) {
                 if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            }
+            
+                // if we are in a model (we have a model
+                // matrix) we have to deal with meshes that are
+                // skinned and not skinned through some variables
+                
+            if (modelMatrix!==null) {
+                
+                    // skinned
+                    
+                if (mesh.noSkinAttachedNodeIdx===-1) {
+                    this.view.gl.uniform1i(this.shader.noSkinUniform,0);
+                }
+                
+                    // not skinned
+                    
+                else {
+                    this.view.gl.uniform1i(this.shader.noSkinUniform,1);
+                    this.view.gl.uniformMatrix4fv(this.shader.noSkinAttachedNodeMatrixUniform,false,skeleton.nodes[mesh.noSkinAttachedNodeIdx].curPoseMatrix.data);
+                }
             }
             
                 // time to change bitmap

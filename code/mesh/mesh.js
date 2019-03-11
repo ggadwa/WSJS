@@ -11,12 +11,12 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,cumulativeNodeMatrix,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
+    constructor(view,name,bitmap,noSkinAttachedNodeIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
         this.view=view;
         this.name=name;
         this.bitmap=bitmap;
-        this.cumulativeNodeMatrix=cumulativeNodeMatrix;     // a matrix, all the glTF matrixes premultiplied up to this mesh
+        this.noSkinAttachedNodeIdx=noSkinAttachedNodeIdx;       // which node a non-skinned mesh is attached to
         this.vertexArray=vertexArray;       // expected Float32Array
         this.normalArray=normalArray;       // expected Float32Array
         this.tangentArray=tangentArray;     // expected Float32Array

@@ -123,6 +123,21 @@ export default class MapEntityListClass
     }
     
         //
+        // ready entities
+        //
+        
+    ready()
+    {
+        let entity;
+        
+            // run the entities
+            
+        for (entity of this.entities) {
+            entity.ready(this);
+        }
+    }
+    
+        //
         // run entities
         //
         
@@ -134,7 +149,7 @@ export default class MapEntityListClass
             // run the entities
             
         for (entity of this.entities) {
-            entity.run(this);
+            entity.run();
         }
         
             // now clean up any that got
@@ -160,13 +175,10 @@ export default class MapEntityListClass
         
     draw()
     {
-        let n;
-        let nEntity=this.entities.length;
+        let entity;
 
-            // skip index 0 as that's the player
-            
-        for (n=1;n<nEntity;n++) {
-            this.entities[n].draw();
+        for (entity of this.entities) {
+            entity.draw();
         }
     }
 }

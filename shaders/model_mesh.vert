@@ -11,6 +11,8 @@ uniform highp mat4 perspectiveMatrix;
 uniform highp mat4 viewMatrix;
 uniform highp mat4 modelMatrix;
 
+uniform bool noSkin;
+uniform highp mat4 noSkinAttachedNodeMatrix;
 uniform highp mat4 jointMatrix[128];
 
 out highp vec3 eyeVector,eyePosition;
@@ -20,15 +22,26 @@ out mediump vec3 tangentSpaceTangent,tangentSpaceBinormal,tangentSpaceNormal;
 void main(void)
 {
         // calculate the skin animation
-        // and vertex position
+        // and vertex position, if skinning, calc
+        // the skin matrix otherwise just attach to node
+        // by its matrix
 
         // note we build the normalMatrix here,
         // this is costly but has to be done because of the
         // skin matrix
 
-    highp mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
-    highp vec4 pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
-    highp mat3 normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(skinMatrix)));
+    highp vec4 pos;
+    highp mat3 normalMatrix;
+
+    if (!noSkin) {
+        highp mat4 skinMatrix=(vertexWeight.x*jointMatrix[int(vertexJoint.x)])+(vertexWeight.y*jointMatrix[int(vertexJoint.y)])+(vertexWeight.z*jointMatrix[int(vertexJoint.z)])+(vertexWeight.w*jointMatrix[int(vertexJoint.w)]);
+        pos=viewMatrix*modelMatrix*skinMatrix*vec4(vertexPosition,1.0);
+        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(skinMatrix)));
+    }
+    else {
+        pos=viewMatrix*modelMatrix*noSkinAttachedNodeMatrix*vec4(vertexPosition,1.0);
+        normalMatrix=transpose(inverse(mat3(viewMatrix)*mat3(modelMatrix)*mat3(noSkinAttachedNodeMatrix)));
+    }
 
     gl_Position=perspectiveMatrix*pos;
     eyePosition=vec3(pos);

@@ -112,7 +112,7 @@ export default class ModelClass
         
             // draw the meshlist
             
-        this.meshList.draw(this.modelMatrix,this.skeleton.getPoseJointMatrixArray(),this.noFrustumCull);
+        this.meshList.draw(this.modelMatrix,this.skeleton,this.noFrustumCull);
         
             // debug skeleton drawing
             
