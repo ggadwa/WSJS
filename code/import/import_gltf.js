@@ -1,4 +1,3 @@
-import ImportBaseClass from '../import/import_base.js';
 import PointClass from '../utility/point.js';
 import Point2DClass from '../utility/2D_point.js';
 import ColorClass from '../utility/color.js';
@@ -6,17 +5,19 @@ import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import MeshClass from '../mesh/mesh.js';
 import ModelNodeClass from '../model/model_node.js';
+import ModelSkinClass from '../model/model_skin.js';
 import ModelJointClass from '../model/model_joint.js';
 import ModelAnimationClass from '../model/model_animation.js';
 import ModelAnimationChannelClass from '../model/model_animation_channel.js';
 import ModelAnimationChannelPoseClass from '../model/model_animation_channel_pose.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
 
-export default class ImportGLTFClass extends ImportBaseClass
+export default class ImportGLTFClass
 {
-    constructor(view,importSettings)
+    constructor(core,importSettings)
     {
-        super(view,importSettings);
+        this.core=core;
+        this.importSettings=importSettings;
         
         this.jsonData=null;
         this.binData=null;
@@ -128,7 +129,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             
         switch (componentType) {
             
-            case this.view.gl.FLOAT:
+            case this.core.gl.FLOAT:
                 byteStride=(bufferViewNode.byteStride===undefined)?(4*internalVecSize):bufferViewNode.byteStride;
                 array=new Float32Array(count*arrayVecSize);
 
@@ -145,7 +146,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             
                 return(array);
             
-            case this.view.gl.UNSIGNED_INT:
+            case this.core.gl.UNSIGNED_INT:
                 byteStride=(bufferViewNode.byteStride===undefined)?(4*internalVecSize):bufferViewNode.byteStride;
                 array=new Uint32Array(count*arrayVecSize);
 
@@ -162,7 +163,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             
                 return(array);
             
-            case this.view.gl.INT:
+            case this.core.gl.INT:
                 byteStride=(bufferViewNode.byteStride===undefined)?(4*internalVecSize):bufferViewNode.byteStride;
                 array=new Int32Array(count*arrayVecSize);
 
@@ -179,7 +180,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             
                 return(array);
             
-            case this.view.gl.UNSIGNED_SHORT:
+            case this.core.gl.UNSIGNED_SHORT:
                 byteStride=(bufferViewNode.byteStride===undefined)?(2*internalVecSize):bufferViewNode.byteStride;
                 array=new Uint16Array(count*arrayVecSize);
 
@@ -196,7 +197,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             
                 return(array);
                 
-            case this.view.gl.UNSIGNED_SHORT:
+            case this.core.gl.UNSIGNED_SHORT:
                 byteStride=(bufferViewNode.byteStride===undefined)?(2*internalVecSize):bufferViewNode.byteStride;
                 array=new Int16Array(count*arrayVecSize);
 
@@ -352,6 +353,19 @@ export default class ImportGLTFClass extends ImportBaseClass
         return(-1);
     }
     
+    findSkinIndexInDataForMeshIndex(meshIdx)
+    {
+        let node,nodeIdx;
+        
+        nodeIdx=this.findNodeIndexInDataForMeshIndex(meshIdx);
+        if (nodeIdx===-1) return(-1);
+        
+        node=this.jsonData.nodes[nodeIdx];
+        if (node.skin===undefined) return(-1);
+        
+        return(node.skin);
+    }
+    
     findParentNodeIndexInDataForNodeIdx(nodeIdx)
     {
         let n,k,node,nodes;
@@ -494,7 +508,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     
     decodeSkeleton(skeleton)
     {
-        let n,nodes,skin,joints;
+        let n,k,nodes,skin,skeletonSkin,joints;
         let mat,inverseBindMatrixFloatArray;
         
             // we have to load every node
@@ -507,48 +521,38 @@ export default class ImportGLTFClass extends ImportBaseClass
             skeleton.nodes.push(this.decodeNode(n));
         }
         
+            // and reverse lookup all the node parents
+            
+        for (n=0;n!==skeleton.nodes.length;n++) {
+            skeleton.nodes[n].parentNodeIdx=this.findNodeIndexInSkeletonChildIndexes(skeleton,n);
+        }
+        
             // if there is a skin, then
             // get the joint indexes for this skeleton
             // because of shader limits, we need to 
             // error out if too many joints
         
         if (this.jsonData.skins!==undefined) {
-            skin=this.jsonData.skins[0];
-            joints=skin.joints;
-
-            if (joints.length>ModelSkeletonClass.MAX_SKELETON_JOINT) {
-                console.log('too many joints in skeleton ('+joints.length+' out of '+SkeletonClass.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
-                return(false);
-            }
-
-            inverseBindMatrixFloatArray=this.decodeBuffer(skin.inverseBindMatrices,16);
-
-            for (n=0;n!==joints.length;n++) {
-                mat=new Matrix4Class();
-                mat.fromArrayOffset(inverseBindMatrixFloatArray,(n*16));
-                skeleton.joints.push(new ModelJointClass(joints[n],mat));
-            }
-        }
-        
-            // now find the parents for all the nodes
             
-        for (n=0;n!==skeleton.nodes.length;n++) {
-            skeleton.nodes[n].parentNodeIdx=this.findNodeIndexInSkeletonChildIndexes(skeleton,n);
-        }
-        
-            // find the root node by taking the first joint
-            // node and finding it's ultimate parent, if no joints,
-            // then make the root the first node
-        
-        if (this.jsonData.skins===undefined) {
-            skeleton.rootNodeIdx=0;
-        }
-        else {
-            skeleton.rootNodeIdx=skeleton.joints[0].nodeIdx;
+            for (n=0;n!==this.jsonData.skins.length;n++) {
+                skin=this.jsonData.skins[n];
+                joints=skin.joints;
 
-            while (true) {
-                if (skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx===-1) break;
-                skeleton.rootNodeIdx=skeleton.nodes[skeleton.rootNodeIdx].parentNodeIdx;
+                if (joints.length>ModelSkinClass.MAX_SKELETON_JOINT) {
+                    console.log('too many joints in skeleton ('+joints.length+' out of '+ModelSkinClass.MAX_SKELETON_JOINT+' in model '+this.importSettings.name);
+                    return(false);
+                }
+
+                skeletonSkin=new ModelSkinClass(skeleton);
+                skeleton.skins.push(skeletonSkin);
+
+                inverseBindMatrixFloatArray=this.decodeBuffer(skin.inverseBindMatrices,16);
+
+                for (k=0;k!==joints.length;k++) {
+                    mat=new Matrix4Class();
+                    mat.fromArrayOffset(inverseBindMatrixFloatArray,(k*16));
+                    skeletonSkin.joints.push(new ModelJointClass(joints[k],mat));
+                }
             }
         }
         
@@ -643,7 +647,7 @@ export default class ImportGLTFClass extends ImportBaseClass
             // create the bitmap and
             // add to list to be loaded later
             
-        bitmap=this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
+        bitmap=this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
         
             // any glow subsitutions?
         
@@ -674,7 +678,7 @@ export default class ImportGLTFClass extends ImportBaseClass
     {
         let n,k,t,meshesNode,meshNode,primitiveNode;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
-        let jointArray,weightArray,fakeArrayLen,noSkinAttachedNodeIdx;
+        let jointArray,weightArray,fakeArrayLen,noSkinAttachedNodeIdx,skinIdx;
         let nIdx,forceTangentRebuild;
         let mesh,bitmap,curBitmapName;
         let v=new PointClass(0,0,0);
@@ -744,8 +748,11 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // joints, then it's something attached directly to
                     // a node (no skinning) otherwise it's a regular skinned mesh
                     
+                    // we also find which skin this is attached to
+                    
                 jointArray=null;
                 weightArray=null;
+                skinIdx=-1;
                 noSkinAttachedNodeIdx=-1;
                 
                 if (skeleton!==null) {
@@ -761,6 +768,9 @@ export default class ImportGLTFClass extends ImportBaseClass
                     else {
                         jointArray=this.decodeBuffer(primitiveNode.attributes.JOINTS_0,4);
                         weightArray=this.decodeBuffer(primitiveNode.attributes.WEIGHTS_0,4);
+                        
+                        skinIdx=this.findSkinIndexInDataForMeshIndex(n);
+                        if (skinIdx===-1) skinIdx=0;                        // if no attachment, then it defaults to first skin
                     }
                 }
                 
@@ -825,7 +835,7 @@ export default class ImportGLTFClass extends ImportBaseClass
                     // all the array types should be their proper
                     // type at this point (like Float32Array, etc)
                     
-                mesh=new MeshClass(this.view,meshNode.name,bitmap,noSkinAttachedNodeIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
+                mesh=new MeshClass(this.core,meshNode.name,bitmap,noSkinAttachedNodeIdx,skinIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray);
                 meshes.push(mesh);
             }
         }

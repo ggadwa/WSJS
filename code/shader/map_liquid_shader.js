@@ -1,3 +1,4 @@
+import CoreClass from '../main/core.js';
 import ShaderClass from '../shader/shader.js';
 import ShaderLightClass from '../shader/shader_light.js';
 import Matrix3Class from '../utility/matrix3.js';
@@ -8,9 +9,9 @@ import Matrix3Class from '../utility/matrix3.js';
 
 export default class MapLiquidShaderClass extends ShaderClass
 {
-    constructor(view)
+    constructor(core)
     {
-        super(view);
+        super(core);
         
         this.vertexShaderURL='shaders/map_liquid.vert';
         this.fragmentShaderURL='shaders/map_liquid.frag';
@@ -40,7 +41,7 @@ export default class MapLiquidShaderClass extends ShaderClass
     loadFinish()
     {
         let n,name;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // setup uniforms
 
@@ -55,7 +56,7 @@ export default class MapLiquidShaderClass extends ShaderClass
         
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
         
-        for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
 
             name='lights['+n+']';
@@ -77,25 +78,25 @@ export default class MapLiquidShaderClass extends ShaderClass
     drawStart()
     {
         let n,light,viewLight;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.useProgram(this.program);
 
             // matrix
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
-        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.core.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.core.viewMatrix.data);
         
             // there's no model matrix for liquids
             // so this is just the transpose inverse of
             // the view matrix
             
-        this.normalMatrix.setInvertTransposeFromMat4(this.view.viewMatrix);
+        this.normalMatrix.setInvertTransposeFromMat4(this.core.viewMatrix);
         gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.normalMatrix.data);
         
             // ambient
             
-        gl.uniform3f(this.ambientUniform,this.view.ambient.r,this.view.ambient.g,this.view.ambient.b);
+        gl.uniform3f(this.ambientUniform,this.core.ambient.r,this.core.ambient.g,this.core.ambient.b);
 
             // lighting
             // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)
@@ -103,10 +104,10 @@ export default class MapLiquidShaderClass extends ShaderClass
             
             // if intensity = 0 light is off
         
-        for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
 
             light=this.lights[n];
-            viewLight=this.view.lights[n];
+            viewLight=this.core.lights[n];
 
                 // no light sets intensity to 0
 
@@ -130,7 +131,7 @@ export default class MapLiquidShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // disable vertex attributes
 

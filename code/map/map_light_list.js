@@ -1,4 +1,5 @@
 import * as constants from '../main/constants.js';
+import CoreClass from '../main/core.js';
 
 //
 // map light list class
@@ -6,9 +7,9 @@ import * as constants from '../main/constants.js';
 
 export default class MapLightListClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
         this.lights=[];
 
@@ -86,13 +87,13 @@ export default class MapLightListClass
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
 
-            x=this.view.camera.position.x-light.position.x;
-            y=this.view.camera.position.y-light.position.y;
-            z=this.view.camera.position.z-light.position.z;
+            x=this.core.camera.position.x-light.position.x;
+            y=this.core.camera.position.y-light.position.y;
+            z=this.core.camera.position.z-light.position.z;
             light.dist=Math.sqrt((x*x)+(y*y)+(z*z));
         }
         
-            // find the view.MAX_LIGHT_COUNT closest lights
+            // find the CoreClass.MAX_LIGHT_COUNT closest lights
             // and put them into the view list
 
         for (n=0;n!==nLight;n++) {
@@ -101,14 +102,14 @@ export default class MapLightListClass
                 // calculate if this lights bounds
                 // are within the frustrum and eliminate if they arent
                 
-            if (!light.isInsideFrustrum(this.view)) continue;
+            if (!light.isInsideFrustrum(this.core)) continue;
 
                 // find the light place
                 
             idx=-1;
 
-            for (k=0;k!==this.view.lights.length;k++) {
-                if (this.view.lights[k].dist>light.dist) {
+            for (k=0;k!==this.core.lights.length;k++) {
+                if (this.core.lights[k].dist>light.dist) {
                     idx=k;
                     break;
                 }
@@ -117,11 +118,11 @@ export default class MapLightListClass
                 // add the light
                 
             if (idx===-1) {
-                if (this.view.lights.length<this.view.MAX_LIGHT_COUNT) this.view.lights.push(light);
+                if (this.core.lights.length<CoreClass.MAX_LIGHT_COUNT) this.core.lights.push(light);
             }
             else {
-                this.view.lights.splice(idx,0,light);
-                if (this.view.lights.length>this.view.MAX_LIGHT_COUNT) this.view.lights.pop();
+                this.core.lights.splice(idx,0,light);
+                if (this.core.lights.length>CoreClass.MAX_LIGHT_COUNT) this.core.lights.pop();
             }
         }
     }

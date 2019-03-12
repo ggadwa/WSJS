@@ -7,9 +7,9 @@ import PointClass from '../utility/point.js';
 
 export default class MapLiquidListClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
 
         this.liquids=[];
         
@@ -112,7 +112,7 @@ export default class MapLiquidListClass
         let n,liquid;
         let nLiquid=this.liquids.length;
         let currentBitmap;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // change the blend
             
@@ -121,7 +121,7 @@ export default class MapLiquidListClass
         
         gl.depthMask(false);
 
-        this.view.shaderList.mapLiquidShader.drawStart();
+        this.core.shaderList.mapLiquidShader.drawStart();
 
             // setup liquid drawing
 
@@ -134,13 +134,13 @@ export default class MapLiquidListClass
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
+            if (!this.core.boundBoxInFrustum(liquid.xBound,liquid.yBound,liquid.zBound)) continue;
 
                 // time to change bitmap
 
             if (liquid.bitmap!==currentBitmap) {
                 currentBitmap=liquid.bitmap;
-                liquid.bitmap.attachAsLiquid(this.view.shaderList.mapLiquidShader);
+                liquid.bitmap.attachAsLiquid(this.core.shaderList.mapLiquidShader);
             }
 
                 // draw the liquid
@@ -152,7 +152,7 @@ export default class MapLiquidListClass
         
             // reset the blend
             
-        this.view.shaderList.mapLiquidShader.drawEnd();
+        this.core.shaderList.mapLiquidShader.drawEnd();
         
         gl.disable(gl.BLEND);
         gl.depthMask(true);

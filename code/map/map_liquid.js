@@ -9,9 +9,9 @@ import BoundClass from '../utility/bound.js';
 
 export default class MapLiquidClass
 {
-    constructor(view,bitmap,waveSize,wavePeriod,waveHeight,waveUVStamp,uShift,vShift,tint,xBound,yBound,zBound)
+    constructor(core,bitmap,waveSize,wavePeriod,waveHeight,waveUVStamp,uShift,vShift,tint,xBound,yBound,zBound)
     {
-        this.view=view;
+        this.core=core;
         this.bitmap=bitmap;
         this.waveSize=waveSize;
         this.wavePeriod=wavePeriod;
@@ -50,7 +50,7 @@ export default class MapLiquidClass
         
     close()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -73,7 +73,7 @@ export default class MapLiquidClass
         
             // get the y offsets for waves
         
-        let offY=this.view.getPeriodicCos(this.wavePeriod,this.waveHeight);
+        let offY=this.core.getPeriodicCos(this.wavePeriod,this.waveHeight);
         
             // create mesh
             
@@ -81,11 +81,11 @@ export default class MapLiquidClass
         uvIdx=0;
         
         vz=this.zBound.min;
-        gz=((Math.abs(vz)/this.waveSize)*this.waveUVStamp)+(this.view.timestamp*this.vShift);
+        gz=((Math.abs(vz)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.vShift);
         gz=gz-Math.trunc(gz);
         offRow=Math.trunc(vz/this.waveSize)&0x1;
         
-        gxStart=((Math.abs(this.xBound.min)/this.waveSize)*this.waveUVStamp)+(this.view.timestamp*this.uShift);
+        gxStart=((Math.abs(this.xBound.min)/this.waveSize)*this.waveUVStamp)+(this.core.timestamp*this.uShift);
         gxStart=gxStart-Math.trunc(gxStart);
         offColStart=Math.trunc(this.xBound.min/this.waveSize)&0x1;
         
@@ -126,7 +126,7 @@ export default class MapLiquidClass
     {
         let x,z,iIdx,vIdx,vTopIdx,vBotIdx;
         let nVertex,nSegment,indexes;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // create the buffers
             
@@ -181,18 +181,18 @@ export default class MapLiquidClass
     
     bindBuffers()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // water vertices and UVs are always moving
             // so always update these buffers
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
-        gl.vertexAttribPointer(this.view.shaderList.mapLiquidShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.core.shaderList.mapLiquidShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.DYNAMIC_DRAW);
-        gl.vertexAttribPointer(this.view.shaderList.mapLiquidShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.vertexAttribPointer(this.core.shaderList.mapLiquidShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
             // indexes are static
             
@@ -205,12 +205,12 @@ export default class MapLiquidClass
 
     draw()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.drawElements(gl.TRIANGLES,this.indexCount,gl.UNSIGNED_SHORT,0);
         
-        this.view.drawMeshCount++;
-        this.view.drawTrigCount+=Math.trunc(this.indexCount/3);
+        this.core.drawMeshCount++;
+        this.core.drawTrigCount+=Math.trunc(this.indexCount/3);
     }
     
 }

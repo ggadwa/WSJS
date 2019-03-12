@@ -11,15 +11,15 @@ import ImportModelClass from '../import/import_model.js';
 
 export default class ModelClass
 {
-    constructor(view,importSettings)
+    constructor(core,importSettings)
     {
-        this.view=view;
+        this.core=core;
         this.importSettings=importSettings;
         
         this.loaded=false;
         
-        this.meshList=new MeshListClass(view);
-        this.skeleton=new ModelSkeletonClass(view);
+        this.meshList=new MeshListClass(core);
+        this.skeleton=new ModelSkeletonClass(core);
         
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
@@ -41,7 +41,7 @@ export default class ModelClass
     
     initialize()
     {
-        if (!this.meshList.initialize(this.view.shaderList.modelMeshShader)) return(false);
+        if (!this.meshList.initialize(this.core.shaderList.modelMeshShader)) return(false);
         this.skeleton.initialize();
         
         this.loaded=false;
@@ -69,7 +69,7 @@ export default class ModelClass
         
             // the model
             
-        importModel=new ImportModelClass(this.view,this);
+        importModel=new ImportModelClass(this.core,this);
         if (!(await importModel.load(this.importSettings))) return(false);
 
         this.scale.setFromValues(this.importSettings.scale,this.importSettings.scale,this.importSettings.scale);

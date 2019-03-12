@@ -6,6 +6,7 @@ import MapLightListClass from '../map/map_light_list.js';
 import MapEntityListClass from '../map/map_entity_list.js';
 import MapEffectListClass from '../map/map_effect_list.js';
 import MapMovementListClass from '../map/map_movement_list.js';
+import MapPathClass from '../map/map_path.js';
 import SkyClass from '../map/sky.js';
 import config from '../main/config.js';
 import genRandom from '../utility/random.js';
@@ -16,25 +17,20 @@ import genRandom from '../utility/random.js';
 
 export default class MapClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
-        
-            // constants
-            
-        this.DESIGN_SPARSE=0;
-        this.DESIGN_MEDIUM=1;
-        this.DESIGN_COMPACT=2;
+        this.core=core;
             
             // variables
         
-        this.meshList=new MeshListClass(view);
-        this.liquidList=new MapLiquidListClass(view);
-        this.lightList=new MapLightListClass(view);
+        this.meshList=new MeshListClass(core);
+        this.liquidList=new MapLiquidListClass(core);
+        this.lightList=new MapLightListClass(core);
         this.entityList=new MapEntityListClass();
         this.movementList=new MapMovementListClass();
-        this.sky=new SkyClass(view);
-        this.effectList=new MapEffectListClass(view);
+        this.sky=new SkyClass(core);
+        this.effectList=new MapEffectListClass(core);
+        this.path=new MapPathClass(core);
         
         Object.seal(this);
     }
@@ -45,7 +41,7 @@ export default class MapClass
 
     initialize()
     {
-        if (!this.meshList.initialize(this.view.shaderList.mapMeshShader)) return(false);
+        if (!this.meshList.initialize(this.core.shaderList.mapMeshShader)) return(false);
         if (!this.liquidList.initialize()) return(false);
         if (!this.lightList.initialize()) return(false);
         if (!this.entityList.initialize()) return(false);

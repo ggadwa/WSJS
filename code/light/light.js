@@ -140,13 +140,13 @@ export default class LightClass
         zBound.setFromValues((this.position.z-this.intensity),(this.position.z+this.intensity));
     }
     
-    isInsideFrustrum(view)
+    isInsideFrustrum(core)
     {
         this.frustumXBound.setFromValues((this.position.x-this.intensity),(this.position.x+this.intensity));
         this.frustumYBound.setFromValues((this.position.y-this.intensity),(this.position.y+this.intensity));
         this.frustumZBound.setFromValues((this.position.z-this.intensity),(this.position.z+this.intensity));
         
-        return(view.boundBoxInFrustum(this.frustumXBound,this.frustumYBound,this.frustumZBound));
+        return(core.boundBoxInFrustum(this.frustumXBound,this.frustumYBound,this.frustumZBound));
     }
 }
 

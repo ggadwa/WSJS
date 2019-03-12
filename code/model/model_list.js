@@ -1,14 +1,14 @@
 import ModelClass from '../model/model.js';
 
 //
-// view model list class
+// core model list class
 //
 
 export default class ModelListClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
         this.models=new Map();
 
@@ -44,7 +44,7 @@ export default class ModelListClass
             // by another call that force loads unloaded
             // models
                     
-        model=new ModelClass(this.view,importSettings);
+        model=new ModelClass(this.core,importSettings);
         model.initialize();
         this.models.set(name,model);
         

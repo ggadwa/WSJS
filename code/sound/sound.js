@@ -6,9 +6,9 @@ import PointClass from '../utility/point.js';
 
 export default class SoundClass
 {
-    constructor(view,ctx,name,maxDistance)
+    constructor(core,ctx,name,maxDistance)
     {
-        this.view=view;
+        this.core=core;
         this.ctx=ctx;
         this.name=name;
         this.maxDistance=maxDistance;

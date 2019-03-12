@@ -3,14 +3,14 @@ import SoundClass from '../sound/sound.js';
 import SoundPlayClass from '../sound/sound_play.js';
 
 //
-// view sound list class
+// core sound list class
 //
 
 export default class SoundListClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
         this.sounds=new Map();
         
@@ -91,7 +91,7 @@ export default class SoundListClass
             // by another call that force loads unloaded
             // sounds
                     
-        sound=new SoundClass(this.view,this.ctx,name,maxDistance);
+        sound=new SoundClass(this.core,this.ctx,name,maxDistance);
         sound.initialize();
         this.sounds.set(name,sound);
     }

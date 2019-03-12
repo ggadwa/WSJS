@@ -5,9 +5,9 @@ import ImportGLTFClass from '../import/import_gltf.js';
 
 export default class ImportModelClass
 {
-    constructor(view,model)
+    constructor(core,model)
     {
-        this.view=view;
+        this.core=core;
         this.model=model;
         
         Object.seal(this);
@@ -17,7 +17,7 @@ export default class ImportModelClass
     {
         let importMesh;
         
-        importMesh=new ImportGLTFClass(this.view,importSettings);
+        importMesh=new ImportGLTFClass(this.core,importSettings);
         return(await importMesh.import(this.model.meshList,this.model.skeleton));
     }
 

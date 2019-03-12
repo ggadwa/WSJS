@@ -2,8 +2,6 @@ import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
-import ModelNodeClass from '../model/model_node.js';
-import ModelJointClass from '../model/model_joint.js';
 import ModelAnimationChannelClass from '../model/model_animation_channel.js';
 import genRandom from '../utility/random.js';
 
@@ -15,21 +13,21 @@ export default class ModelSkeletonClass
 {
     static MAX_SKELETON_JOINT=128;
     
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
             // nodes
             // we need all nodes, as certain non-joint modes
             // also effect the children joints
             
-        this.rootNodeIdx=0;
         this.nodes=[];
         
-            // joints
-            // all nodes needed for animation
+            // skins
+            // these are a collections of node indexes
+            // used to create skin matrixes
 
-        this.joints=[];
+        this.skins=[];
         
             // animations
             
@@ -128,7 +126,7 @@ export default class ModelSkeletonClass
         
             // the global animation tick
             
-        tick=animation.loopStartTick+Math.trunc((this.view.timestamp-animation.startTimestamp)%(animation.loopEndTick-animation.loopStartTick));
+        tick=animation.loopStartTick+Math.trunc((this.core.timestamp-animation.startTimestamp)%(animation.loopEndTick-animation.loopStartTick));
         
             // each channel changes one node over time
             
@@ -167,7 +165,7 @@ export default class ModelSkeletonClass
         if (this.currentAnimationIdx!==-1) {
 
             if (this.queuedAnimationIdx!==-1) {
-                if (this.view.timestamp>=this.queuedAnimationStartTimeStamp) {
+                if (this.core.timestamp>=this.queuedAnimationStartTimeStamp) {
                     this.currentAnimationIdx=this.queuedAnimationIdx;
                     animation=this.animations[this.currentAnimationIdx];
                     animation.startTimestamp=this.queuedAnimationStartTimeStamp;
@@ -182,7 +180,7 @@ export default class ModelSkeletonClass
             // now cumulative all the nodes for
             // their matrixes
             
-        this.runAnimationNode(this.nodes[this.rootNodeIdx],null);
+        this.runAnimationNode(this.nodes[0],null);
     }
     
     findAnimationIndex(name)
@@ -204,7 +202,7 @@ export default class ModelSkeletonClass
         if (this.currentAnimationIdx===-1) return(false);
         
         animation=this.animations[this.currentAnimationIdx];
-        animation.startTimestamp=this.view.timestamp;
+        animation.startTimestamp=this.core.timestamp;
         animation.loopStartTick=loopStartTick;
         animation.loopEndTick=loopEndTick;
         
@@ -220,7 +218,7 @@ export default class ModelSkeletonClass
         if (this.currentAnimationIdx===-1) return(false);
         
         animation=this.animations[this.currentAnimationIdx];
-        animation.startTimestamp=this.view.timestamp;
+        animation.startTimestamp=this.core.timestamp;
         animation.loopStartTick=Math.trunc(loopStartFrame*fps);
         animation.loopEndTick=Math.trunc(loopEndFrame*fps);
         
@@ -241,14 +239,14 @@ export default class ModelSkeletonClass
         animation=this.animations[this.currentAnimationIdx];
         
         len=animation.loopEndTick-animation.loopStartTick;
-        len-=Math.trunc((this.view.timestamp-animation.startTimestamp)%len);
+        len-=Math.trunc((this.core.timestamp-animation.startTimestamp)%len);
         
             // queue up
             
         this.queuedAnimationIdx=this.findAnimationIndex(name);
         if (this.queuedAnimationIdx===-1) return(false);
         
-        this.queuedAnimationStartTimeStamp=this.view.timestamp+len;
+        this.queuedAnimationStartTimeStamp=this.core.timestamp+len;
         this.queuedAnimationLoopStartTick=Math.trunc(loopStartFrame*fps);
         this.queuedAnimationLoopEndTick=Math.trunc(loopEndFrame*fps);
         
@@ -263,7 +261,7 @@ export default class ModelSkeletonClass
         if (this.currentAnimationIdx===-1) return(false);
         
         animation=this.animations[this.currentAnimationIdx];
-        animation.startTimestamp=this.view.timestamp;
+        animation.startTimestamp=this.core.timestamp;
         animation.loopStartTick=0;
         animation.loopEndTick=animation.tickLength;
         
@@ -273,33 +271,6 @@ export default class ModelSkeletonClass
     isAnimationRunning()
     {
         return(this.currentAnimationIdx!==-1);
-    }
-    
-        //
-        // get the skeleton joint matrixes
-        //
-        
-    getPoseJointMatrixArray()
-    {
-        let n,node,joint;
-        let matrixArray=[];
-        
-            // otherwise calculate the joint matrixes
-            // based on the animation pose matrix
-            
-        for (n=0;n!==this.joints.length;n++) {
-            joint=this.joints[n];
-            node=this.nodes[joint.nodeIdx];
-            
-                // specs say this starts with inverse of global
-                // changes to root node, but there are none
-
-            joint.jointMatrix.setFromMultiply(node.curPoseMatrix,joint.inverseBindMatrix);
-            
-            matrixArray.push(joint.jointMatrix);
-        }
-        
-        return(matrixArray);
     }
     
         //
@@ -314,8 +285,8 @@ export default class ModelSkeletonClass
         let lineCount,lineElementOffset,lineVertexStartIdx;
         let vertexBuffer,indexBuffer;
         let nodeSize=50;
-        let gl=this.view.gl;
-        let shader=this.view.shaderList.debugShader;
+        let gl=this.core.gl;
+        let shader=this.core.shaderList.debugShader;
         let tempPoint=new PointClass(0,0,0);
         
             // any skeleton?
@@ -337,8 +308,8 @@ export default class ModelSkeletonClass
             tempPoint.x=-nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -347,8 +318,8 @@ export default class ModelSkeletonClass
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -357,8 +328,8 @@ export default class ModelSkeletonClass
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -367,8 +338,8 @@ export default class ModelSkeletonClass
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);

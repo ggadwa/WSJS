@@ -4,9 +4,9 @@
 
 export default class ShaderClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
         this.vertexShaderURL=null;
         this.fragmentShaderURL=null;
@@ -28,7 +28,7 @@ export default class ShaderClass
     
     release()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
         if (this.program===null) return;
 
@@ -70,7 +70,7 @@ export default class ShaderClass
     async load()
     {
         let vertexShaderSource,fragmentShaderSource;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // load vertex shader
         

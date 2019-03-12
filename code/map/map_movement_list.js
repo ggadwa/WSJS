@@ -40,13 +40,13 @@ export default class MapMovementListClass
         // run movements
         //
     
-    run(view,map)
+    run(core,map)
     {
         let n;
         let nMovement=this.movements.length;
         
         for (n=0;n!==nMovement;n++) {
-            this.movements[n].run(view,map);
+            this.movements[n].run(core,map);
         }
     }
 }

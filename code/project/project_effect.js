@@ -2,10 +2,9 @@ import PointClass from '../utility/point.js';
 
 export default class ProjectEffectClass
 {
-    constructor(view,map,data)
+    constructor(core,data)
     {
-        this.view=view;
-        this.map=map;
+        this.core=core;
         this.data=data;
         
         this.position=new PointClass(0,0,0);
@@ -35,12 +34,12 @@ export default class ProjectEffectClass
     
     addBitmap(colorURL,normalURL,specularURL,specularFactor,scale)
     {
-        this.view.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
+        this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
     }
     
     getBitmap(colorURL)
     {
-        return(this.view.bitmapList.get(colorURL));
+        return(this.core.bitmapList.get(colorURL));
     }
     
         //
@@ -69,8 +68,8 @@ export default class ProjectEffectClass
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -85,8 +84,8 @@ export default class ProjectEffectClass
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -101,8 +100,8 @@ export default class ProjectEffectClass
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -117,8 +116,8 @@ export default class ProjectEffectClass
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.view.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;

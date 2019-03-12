@@ -1,9 +1,8 @@
 export default class ProjectMapClass
 {
-    constructor(view,map)
+    constructor(core)
     {
-        this.view=view;
-        this.map=map;
+        this.core=core;
     }
     
         //

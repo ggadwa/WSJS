@@ -9,9 +9,9 @@ import BoundClass from '../utility/bound.js';
 
 export default class CollisionClass
 {
-    constructor(map)
+    constructor(core)
     {
-        this.map=map;
+        this.core=core;
         
         this.spokePt=new PointClass(0,0,0);        // these are global to avoid it being local and GCd
         this.spokeHitPt=new PointClass(0,0,0);
@@ -168,8 +168,8 @@ export default class CollisionClass
         let radius=entity.radius;
         let high=entity.height;
         
-        let nMesh=this.map.meshList.meshes.length;
-        let nEntity=this.map.entityList.count();
+        let nMesh=this.core.map.meshList.meshes.length;
+        let nEntity=this.core.map.entityList.count();
         
             // only bump once
             
@@ -193,7 +193,7 @@ export default class CollisionClass
             // check against collision lines
 
         for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshList.meshes[n];
+            mesh=this.core.map.meshList.meshes[n];
             if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
@@ -231,7 +231,7 @@ export default class CollisionClass
             // check other entities
 
         for (n=0;n!==nEntity;n++) {
-            checkEntity=this.map.entityList.get(n);
+            checkEntity=this.core.map.entityList.get(n);
             if (checkEntity.id===entity.id) continue;
 
             checkEntityPt=checkEntity.position;
@@ -296,8 +296,8 @@ export default class CollisionClass
         let radius=entity.radius;
         let high=entity.height;
         
-        let nMesh=this.map.meshList.meshes.length;
-        let nEntity=this.map.entityList.count();
+        let nMesh=this.core.map.meshList.meshes.length;
+        let nEntity=this.core.map.entityList.count();
         
             // only bump once
             
@@ -335,7 +335,7 @@ export default class CollisionClass
                 // check against collision lines
 
             for (n=0;n!==nMesh;n++) {
-                mesh=this.map.meshList.meshes[n];
+                mesh=this.core.map.meshList.meshes[n];
                 if (mesh.noCollisions) continue;
                 
                     // skip any mesh we don't collide with
@@ -376,7 +376,7 @@ export default class CollisionClass
                 // check other entities
 
             for (n=0;n!==nEntity;n++) {
-                checkEntity=this.map.entityList.get(n);
+                checkEntity=this.core.map.entityList.get(n);
                 if (checkEntity.id===entity.id) continue;
                 
                 checkEntityPt=checkEntity.position;
@@ -505,10 +505,10 @@ export default class CollisionClass
         
             // run through colliding trigs
         
-        nMesh=this.map.meshList.meshes.length;
+        nMesh=this.core.map.meshList.meshes.length;
         
         for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshList.meshes[n];
+            mesh=this.core.map.meshList.meshes[n];
             if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
@@ -586,10 +586,10 @@ export default class CollisionClass
         
             // run through the meshes
         
-        nMesh=this.map.meshList.meshes.length;
+        nMesh=this.core.map.meshList.meshes.length;
         
         for (n=0;n!==nMesh;n++) {
-            mesh=this.map.meshList.meshes[n];
+            mesh=this.core.map.meshList.meshes[n];
             if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with

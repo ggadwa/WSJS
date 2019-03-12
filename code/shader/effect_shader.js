@@ -6,9 +6,9 @@ import ShaderClass from '../shader/shader.js';
 
 export default class EffectShaderClass extends ShaderClass
 {
-    constructor(view)
+    constructor(core)
     {
-        super(view);
+        super(core);
         
         this.vertexShaderURL='shaders/effect.vert';
         this.fragmentShaderURL='shaders/effect.frag';
@@ -28,7 +28,7 @@ export default class EffectShaderClass extends ShaderClass
 
     loadFinish()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // setup uniforms
 
@@ -55,7 +55,7 @@ export default class EffectShaderClass extends ShaderClass
 
     drawStart()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // using the map shader
 
@@ -63,8 +63,8 @@ export default class EffectShaderClass extends ShaderClass
 
             // matrix
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
-        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.core.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.core.viewMatrix.data);
 
             // enable the vertex attributes
 
@@ -74,7 +74,7 @@ export default class EffectShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // disable vertex attributes
 

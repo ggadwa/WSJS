@@ -13,9 +13,9 @@ import TextShaderClass from '../shader/text_shader.js';
 
 export default class ShaderListClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
         this.mapMeshShader=null;
         this.mapLiquidShader=null;
@@ -69,35 +69,35 @@ export default class ShaderListClass
         
     async loadShaders()
     {
-        this.mapMeshShader=new MapMeshShaderClass(this.view);
+        this.mapMeshShader=new MapMeshShaderClass(this.core);
         this.mapMeshShader.initialize();
         if (!(await this.mapMeshShader.load())) return(false);
 
-        this.mapLiquidShader=new MapLiquidShaderClass(this.view);
+        this.mapLiquidShader=new MapLiquidShaderClass(this.core);
         this.mapLiquidShader.initialize();
         if (!(await this.mapLiquidShader.load())) return(false);
 
-        this.skyShader=new SkyShaderClass(this.view);
+        this.skyShader=new SkyShaderClass(this.core);
         this.skyShader.initialize();
         if (!(await this.skyShader.load())) return(false);
     
-        this.modelMeshShader=new ModelMeshShaderClass(this.view);
+        this.modelMeshShader=new ModelMeshShaderClass(this.core);
         this.modelMeshShader.initialize();
         if (!(await this.modelMeshShader.load())) return(false);
         
-        this.debugShader=new DebugShaderClass(this.view);
+        this.debugShader=new DebugShaderClass(this.core);
         this.debugShader.initialize();
         if (!(await this.debugShader.load())) return(false);
            
-        this.effectShader=new EffectShaderClass(this.view);
+        this.effectShader=new EffectShaderClass(this.core);
         this.effectShader.initialize();
         if (!(await this.effectShader.load())) return(false);
             
-        this.interfaceShader=new InterfaceShaderClass(this.view);
+        this.interfaceShader=new InterfaceShaderClass(this.core);
         this.interfaceShader.initialize();
         if (!(await this.interfaceShader.load())) return(false);
       
-        this.textShader=new TextShaderClass(this.view);
+        this.textShader=new TextShaderClass(this.core);
         this.textShader.initialize();
         return(await this.textShader.load());
     }

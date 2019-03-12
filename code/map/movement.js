@@ -39,7 +39,7 @@ export default class MovementClass
         this.moves.push(move);
     }
     
-    run(view,map)
+    run(core,map)
     {
         let n,nMesh;
         let mesh,isOpen,prevIdx;
@@ -89,15 +89,15 @@ export default class MovementClass
                 }
                 
                 this.moving=true;
-                this.nextMoveNextTick=view.timestamp+this.moves[this.currentMoveIdx].lifeTick;
+                this.nextMoveNextTick=core.timestamp+this.moves[this.currentMoveIdx].lifeTick;
             }
             else {
                 
                     // check if we've finished, and make sure
                     // the movement lands on the final spot
             
-                if (this.nextMoveNextTick<view.timestamp) {
-                    this.nextMoveNextTick=view.timestamp;
+                if (this.nextMoveNextTick<core.timestamp) {
+                    this.nextMoveNextTick=core.timestamp;
                     this.moving=false;
                 }
             }
@@ -107,13 +107,13 @@ export default class MovementClass
             
         else {
         
-                // next view
+                // next move
 
-            if (this.nextMoveNextTick<view.timestamp) {
+            if (this.nextMoveNextTick<core.timestamp) {
                 this.currentMoveIdx++;
                 if (this.currentMoveIdx>=this.moves.length) this.currentMoveIdx=0;
 
-                this.nextMoveNextTick=view.timestamp+this.moves[this.currentMoveIdx].lifeTick;
+                this.nextMoveNextTick=core.timestamp+this.moves[this.currentMoveIdx].lifeTick;
             }
         }
         
@@ -121,7 +121,7 @@ export default class MovementClass
             // is between the previous and the next point
             
         move=this.moves[this.currentMoveIdx];
-        f=1.0-((this.nextMoveNextTick-view.timestamp)/move.lifeTick);
+        f=1.0-((this.nextMoveNextTick-core.timestamp)/move.lifeTick);
         
         prevIdx=this.currentMoveIdx;
         prevIdx--;

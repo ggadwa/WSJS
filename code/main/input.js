@@ -6,9 +6,9 @@ import * as constants from '../main/constants.js';
 
 export default class InputClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
 
             // the single player entity
             
@@ -25,7 +25,7 @@ export default class InputClass
         
         this.mouseButtonFlags=new Uint8Array(8);
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=view.timestamp;
+        this.mouseWheelClickRefreshTick=core.timestamp;
         
             // listeners
             // need to set them to a variables so remove
@@ -75,7 +75,7 @@ export default class InputClass
         
     clickResume()
     {
-        this.view.setPauseState(false,false);
+        this.core.setPauseState(false,false);
         this.setPauseState(false);
     }
         
@@ -94,13 +94,13 @@ export default class InputClass
                 // and make sure a click
                 // unpaused
                 
-            this.view.canvas.onclick=this.clickResume.bind(this);
+            this.core.canvas.onclick=this.clickResume.bind(this);
         }
         else {
             
                 // clear the unpause click
                 
-            this.view.canvas.onclick=null;
+            this.core.canvas.onclick=null;
             
                 // attach events
                 
@@ -159,10 +159,10 @@ export default class InputClass
         
             // request the pointer lock
             
-        if (this.view.canvas.requestPointerLock) {
+        if (this.core.canvas.requestPointerLock) {
             document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
             document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-            this.view.canvas.requestPointerLock();
+            this.core.canvas.requestPointerLock();
         }
         else {
             console.log('Pointer lock not supported, no mouse control');
@@ -193,7 +193,7 @@ export default class InputClass
         }
         
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=this.view.timestamp;
+        this.mouseWheelClickRefreshTick=this.core.timestamp;
     }
     
     mouseWheelRead()
@@ -205,7 +205,7 @@ export default class InputClass
         click=this.mouseWheelClick;
         
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=this.view.timestamp+constants.INPUT_WHEEL_REFRESH_TICK;
+        this.mouseWheelClickRefreshTick=this.core.timestamp+constants.INPUT_WHEEL_REFRESH_TICK;
         
         return(click);
     }
@@ -219,7 +219,7 @@ export default class InputClass
         if (document.mozPointerLockElement) elem=document.mozPointerLockElement;
         if (document.webkitPointerLockElement) elem=document.webkitPointerLockElement;
         
-        if (elem===this.view.canvas) {
+        if (elem===this.core.canvas) {
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('wheel',this.mouseWheelListener,false);
@@ -230,7 +230,7 @@ export default class InputClass
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('wheel',this.mouseWheelListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            this.view.setPauseState(true,false);       // go into pause
+            this.core.setPauseState(true,false);       // go into pause
             this.setPauseState(true);
         }
     }
@@ -252,7 +252,7 @@ export default class InputClass
     
     mouseWheel(event)
     {
-        if (this.view.timestamp<this.mouseWheelClickRefreshTick) return;
+        if (this.core.timestamp<this.mouseWheelClickRefreshTick) return;
         
         this.mouseWheelClick=Math.sign(event.deltaY);
     }

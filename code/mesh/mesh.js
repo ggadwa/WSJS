@@ -11,12 +11,13 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class MeshClass
 {
-    constructor(view,name,bitmap,noSkinAttachedNodeIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
+    constructor(core,name,bitmap,noSkinAttachedNodeIdx,skinIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
-        this.view=view;
+        this.core=core;
         this.name=name;
         this.bitmap=bitmap;
         this.noSkinAttachedNodeIdx=noSkinAttachedNodeIdx;       // which node a non-skinned mesh is attached to
+        this.skinIdx=skinIdx;                                   // if attached to a skin, then which skin is it
         this.vertexArray=vertexArray;       // expected Float32Array
         this.normalArray=normalArray;       // expected Float32Array
         this.tangentArray=tangentArray;     // expected Float32Array
@@ -46,6 +47,10 @@ export default class MeshClass
         this.originalXBound=new BoundClass(0,0);
         this.originalYBound=new BoundClass(0,0);
         this.originalZBound=new BoundClass(0,0);
+        
+            // flags
+            
+        this.show=true;
 
             // gl buffers
 
@@ -91,7 +96,7 @@ export default class MeshClass
 
     close()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
@@ -538,7 +543,7 @@ export default class MeshClass
 
     setupBuffers()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // create all the buffers
 
@@ -575,7 +580,7 @@ export default class MeshClass
 
     bindBuffers(shader)
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
@@ -611,7 +616,7 @@ export default class MeshClass
         
     updateBuffers()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // vertex buffer updates
             
@@ -642,11 +647,11 @@ export default class MeshClass
 
     draw()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
         gl.drawElements(gl.TRIANGLES,this.indexCount,(this.need32BitIndexes?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT),0);
             
-        this.view.drawMeshCount++;
-        this.view.drawTrigCount+=Math.trunc(this.indexCount/3);
+        this.core.drawMeshCount++;
+        this.core.drawTrigCount+=Math.trunc(this.indexCount/3);
     }
 }

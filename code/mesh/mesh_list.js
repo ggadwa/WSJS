@@ -10,9 +10,9 @@ import Matrix4Class from '../utility/matrix4.js';
 
 export default class MeshListClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         this.shader=null;           // this will be attached later when initialized
 
         this.meshes=[];
@@ -47,11 +47,10 @@ export default class MeshListClass
 
     clear()
     {
-        let n;
-        let nMesh=this.meshes.length;
+        let mesh;
 
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].close();
+        for (mesh of this.meshes) {
+            mesh.close();
         }
         
         this.meshes=[];
@@ -83,6 +82,18 @@ export default class MeshListClass
 
         return(-1);
     }
+    
+    show(name,show)
+    {
+        let mesh;
+
+        for (mesh of this.meshes) {
+            if (mesh.name===name) {
+                mesh.show=show;
+                return;
+            }
+        }
+    }
 
     delete(name)
     {
@@ -101,11 +112,10 @@ export default class MeshListClass
         
     setNoCollisionsForBitmap(bitmap)
     {
-        let n;
-        let nMesh=this.meshes.length;
+        let mesh;
         
-        for (n=0;n!==nMesh;n++) {
-            if (this.meshes[n].bitmap.colorURL===bitmap.colorURL) this.meshes[n].noCollisions=true;
+        for (mesh of this.meshes) {
+            if (mesh.bitmap.colorURL===bitmap.colorURL) mesh.noCollisions=true;
         }
     }
     
@@ -147,11 +157,10 @@ export default class MeshListClass
         
     buildCollisionGeometry()
     {
-        let n;
-        let nMesh=this.meshes.length;
+        let mesh;
 
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].buildCollisionGeometry();
+        for (mesh of this.meshes) {
+            mesh.buildCollisionGeometry();
         }
     }
     
@@ -164,11 +173,10 @@ export default class MeshListClass
         
     scaleMeshes(scale)
     {
-        let n;
-        let nMesh=this.meshes.length;
+        let mesh;
 
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].scale(scale);
+        for (mesh of this.meshes) {
+            mesh.scale(scale);
         }
     }
     
@@ -178,11 +186,10 @@ export default class MeshListClass
 
     setupBuffers()
     {
-        let n;
-        let nMesh=this.meshes.length;
+        let mesh;
 
-        for (n=0;n!==nMesh;n++) {
-            this.meshes[n].setupBuffers();
+        for (mesh of this.meshes) {
+            mesh.setupBuffers();
         }
     }
     
@@ -209,68 +216,74 @@ export default class MeshListClass
     {
         let n,mesh;
         let jointMatrixArray;
-        let currentBitmap;
-        let nMesh=this.meshes.length;
+        let currentBitmap,currentSkinIdx;
+        let gl=this.core.gl;
         
         this.shader.drawStart();
         
             // if there is a model matrix, then
-            // it's a model so set both the model matrix
-            // and the joint matrixes
+            // it's a model set the model matrix
             
         if (modelMatrix!==null) {
-            this.view.gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
-
-            jointMatrixArray=skeleton.getPoseJointMatrixArray();
-            for (n=0;n!==jointMatrixArray.length;n++) {
-                this.view.gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
-            }
+            gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
         }
         
             // otherwise it's a map mesh, so we
             // need to create the normal matrix, which
             // is used to tranform normals into eye space
-            // for lighting, only maps use this since it needs
-            // to be view*model*skin in the models
+            // for lighting, models do this in the shader because
+            // models need view*model*skin for the normal matrix
             
         else {    
-            this.normalMatrix.setInvertTransposeFromMat4(this.view.viewMatrix);
-            this.view.gl.uniformMatrix3fv(this.shader.normalMatrixUniform,false,this.normalMatrix.data);
+            this.normalMatrix.setInvertTransposeFromMat4(this.core.viewMatrix);
+            gl.uniformMatrix3fv(this.shader.normalMatrixUniform,false,this.normalMatrix.data);
         }
 
-            // keep track of bitmap changes
+            // keep track of skin and bitmap
+            // changes to reduce state changes
 
+        currentSkinIdx=-1;
         currentBitmap=null;
         
             // draw the meshes
 
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.meshes[n];
+        for (mesh of this.meshes) {
+            if (!mesh.show) continue;
 
                 // skip if not in view frustum
                 // some special models, like in hand weapons, don't cull
 
             if (!noFrustumCull) {
-                if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+                if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             }
             
                 // if we are in a model (we have a model
                 // matrix) we have to deal with meshes that are
                 // skinned and not skinned through some variables
+                // and setting or changing the joint skinning matrix
                 
             if (modelMatrix!==null) {
                 
                     // skinned
                     
                 if (mesh.noSkinAttachedNodeIdx===-1) {
-                    this.view.gl.uniform1i(this.shader.noSkinUniform,0);
+                    gl.uniform1i(this.shader.noSkinUniform,0);
+                    
+                    if (currentSkinIdx!==mesh.skinIdx) {
+                        currentSkinIdx=mesh.skinIdx;
+                        
+                        jointMatrixArray=skeleton.skins[currentSkinIdx].getPoseJointMatrixArray();
+                        for (n=0;n!==jointMatrixArray.length;n++) {
+                            gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
+                        }
+                    }
                 }
                 
                     // not skinned
                     
                 else {
-                    this.view.gl.uniform1i(this.shader.noSkinUniform,1);
-                    this.view.gl.uniformMatrix4fv(this.shader.noSkinAttachedNodeMatrixUniform,false,skeleton.nodes[mesh.noSkinAttachedNodeIdx].curPoseMatrix.data);
+                    gl.uniform1i(this.shader.noSkinUniform,1);
+                    gl.uniformMatrix4fv(this.shader.noSkinAttachedNodeMatrixUniform,false,skeleton.nodes[mesh.noSkinAttachedNodeIdx].curPoseMatrix.data);
                 }
             }
             
@@ -298,18 +311,17 @@ export default class MeshListClass
         
     debugDrawCollisionSurfaces()
     {
-        let n,k,mesh,line,floor,ceiling;
+        let k,mesh,line,floor,ceiling;
         let vertexes,indexes,vertexBuffer,indexBuffer;
-        let gl=this.view.gl;
-        let nMesh=this.meshes.length;
-        let shader=this.view.shaderList.debugShader;
+        let gl=this.core.gl;
+        let shader=this.core.shaderList.debugShader;
         
         shader.drawStart();
         
             // the debug shader has a model matrix, so
             // we set that to the identity
             
-        this.view.gl.uniformMatrix4fv(shader.modelMatrixUniform,false,this.identityModelMatrix.data);
+        this.core.gl.uniformMatrix4fv(shader.modelMatrixUniform,false,this.identityModelMatrix.data);
         
             // arrays for any drawing
             
@@ -332,13 +344,13 @@ export default class MeshListClass
 
             // draw the collision parts
 
-        for (n=0;n!==nMesh;n++) {
-            mesh=this.meshes[n];
+        for (mesh of this.meshes) {
+            if (!mesh.show) continue;
             if (mesh.noCollisions) continue;
 
                 // skip if not in view frustum
 
-            if (!this.view.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
+            if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
                 // draw the lines in green
 

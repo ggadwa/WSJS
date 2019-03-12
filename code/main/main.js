@@ -1,7 +1,7 @@
 import * as constants from '../main/constants.js';
 import config from '../main/config.js';
 import PointClass from '../utility/point.js';
-import ViewClass from '../main/view.js';
+import CoreClass from '../main/core.js';
 import MapClass from '../map/map.js';
 import genRandom from '../utility/random.js';
 
@@ -15,8 +15,9 @@ class MainClass
     {
             // game globals
 
-        this.view=new ViewClass();
-        this.map=new MapClass(this.view);
+        this.core=new CoreClass();
+        this.map=new MapClass(this.core);
+        this.core.map=this.map;
         
         this.game=null;
         this.projectMap=null;
@@ -26,26 +27,26 @@ class MainClass
     
     run(gameClass)
     {
-        this.view.createCanvas();
+        this.core.createCanvas();
         
-        setTimeout(this.initView.bind(this,gameClass),1);
+        setTimeout(this.initCore.bind(this,gameClass),1);
     }
 
-    async initView(gameClass)
+    async initCore(gameClass)
     {
             // the project objects
             
-        this.game=new gameClass(this.view,this.map);
+        this.game=new gameClass(this.core);
         this.projectMap=this.game.getStartMap();
          
-           // init view
+           // init core
         
-        this.view.initialize();
-        if (!(await this.view.loadShaders())) return;
+        this.core.initialize();
+        if (!(await this.core.loadShaders())) return;
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Initializing Internal Structures');
-        this.view.loadingScreenDraw(0.25);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Initializing Internal Structures');
+        this.core.loadingScreenDraw(0.25);
 
         setTimeout(this.initInternal.bind(this),1);
     }
@@ -56,9 +57,9 @@ class MainClass
 
             // next step
 
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Loading Map');
-        this.view.loadingScreenDraw(0.1);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Loading Map');
+        this.core.loadingScreenDraw(0.1);
 
         setTimeout(this.initLoadMap.bind(this),1);
     }
@@ -68,9 +69,9 @@ class MainClass
         this.projectMap.initialize();
         if (!(await this.projectMap.loadMap())) return;
         
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Building Collision Geometry');
-        this.view.loadingScreenDraw(0.2);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Building Collision Geometry');
+        this.core.loadingScreenDraw(0.2);
         
         setTimeout(this.initCollisionGeomtry.bind(this),1);
     }
@@ -79,9 +80,9 @@ class MainClass
     {
         this.map.meshList.buildCollisionGeometry();
         
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Loading Entities');
-        this.view.loadingScreenDraw(0.3);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Loading Entities');
+        this.core.loadingScreenDraw(0.3);
         
         setTimeout(this.initLoadEntities.bind(this),1);
     }
@@ -90,42 +91,42 @@ class MainClass
     {
         if (!this.projectMap.loadEntities()) return;
         
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Loading Models');
-        this.view.loadingScreenDraw(0.4);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Loading Models');
+        this.core.loadingScreenDraw(0.4);
         
         setTimeout(this.initLoadEntityModels.bind(this),1);
     }
     
     async initLoadEntityModels()
     {
-        if (!(await this.view.modelList.loadAllModels())) return;
+        if (!(await this.core.modelList.loadAllModels())) return;
         
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Loading Images');
-        this.view.loadingScreenDraw(0.4);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Loading Images');
+        this.core.loadingScreenDraw(0.4);
         
         setTimeout(this.initLoadImages.bind(this),1);
     }
     
     async initLoadImages()
     {
-        if (!(await this.view.bitmapList.loadAllBitmaps())) return;
+        if (!(await this.core.bitmapList.loadAllBitmaps())) return;
         
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Loading Sounds');
-        this.view.loadingScreenDraw(0.9);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Loading Sounds');
+        this.core.loadingScreenDraw(0.9);
 
         setTimeout(this.initLoadSounds.bind(this),1);
     }
     
     async initLoadSounds()
     {
-        if (!(await this.view.soundList.loadAllSounds())) return;
+        if (!(await this.core.soundList.loadAllSounds())) return;
         
-        this.view.loadingScreenUpdate();
-        this.view.loadingScreenAddString('Preparing to Run');
-        this.view.loadingScreenDraw(0.9);
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Preparing to Run');
+        this.core.loadingScreenDraw(0.9);
 
         setTimeout(this.initFinish.bind(this),1);
     }
@@ -139,11 +140,11 @@ class MainClass
         
             // set the listener to this entity
             
-        this.view.soundList.setListenerToEntity(this.map.entityList.getPlayer());
+        this.core.soundList.setListenerToEntity(this.map.entityList.getPlayer());
 
             // start the input
 
-        this.view.input.initialize(this.map.entityList.getPlayer());
+        this.core.input.initialize(this.map.entityList.getPlayer());
         
             // ready all the entities
             
@@ -151,12 +152,12 @@ class MainClass
         
             // the cancel loop flag
             
-        this.view.loopCancel=false;
+        this.core.loopCancel=false;
         
             // start the main loop in paused mode
 
-        this.view.setPauseState(true,true);
-        this.view.input.setPauseState(true);
+        this.core.setPauseState(true,true);
+        this.core.input.setPauseState(true);
         
             // and now start the loop
             
@@ -180,17 +181,17 @@ let main=new MainClass();
 function mainLoop(timestamp)
 {
     let fpsTime;
-    let view=main.view;
+    let core=main.core;
     let map=main.map;
     
         // next frame
         
-    if (view.loopCancel) return;
+    if (core.loopCancel) return;
     window.requestAnimationFrame(mainLoop);
     
         // get integer msec timestamp
     
-    view.timestamp=Math.trunc(timestamp);
+    core.timestamp=Math.trunc(timestamp);
     
         // map movement, entities, and
         // other physics, we only do this if we've
@@ -199,29 +200,29 @@ function mainLoop(timestamp)
         // this timing needs to be precise so
         // physics remains constants
     
-    if (!view.paused) {
-        view.physicsTick=view.timestamp-view.lastPhysicTimestamp;
+    if (!core.paused) {
+        core.physicsTick=core.timestamp-core.lastPhysicTimestamp;
 
-        if (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
-            map.movementList.run(view,map);
+        if (core.physicsTick>constants.PHYSICS_MILLISECONDS) {
+            map.movementList.run(core,map);
 
-            if (view.physicsTick<constants.BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+            if (core.physicsTick<constants.BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
-                while (view.physicsTick>constants.PHYSICS_MILLISECONDS) {
-                    view.physicsTick-=constants.PHYSICS_MILLISECONDS;
-                    view.lastPhysicTimestamp+=constants.PHYSICS_MILLISECONDS;
+                while (core.physicsTick>constants.PHYSICS_MILLISECONDS) {
+                    core.physicsTick-=constants.PHYSICS_MILLISECONDS;
+                    core.lastPhysicTimestamp+=constants.PHYSICS_MILLISECONDS;
 
                     map.entityList.run();
                 }
             }
             else {
-                view.lastPhysicTimestamp=view.timestamp;
+                core.lastPhysicTimestamp=core.timestamp;
             }
 
                 // update the listener and all current
                 // playing sound positions
                 
-            view.soundList.updateListener();
+            core.soundList.updateListener();
         }
     }
     
@@ -230,27 +231,27 @@ function mainLoop(timestamp)
         // this timing is loose, as it's only there to
         // draw frames
         
-    view.drawTick=view.timestamp-view.lastDrawTimestamp;
+    core.drawTick=core.timestamp-core.lastDrawTimestamp;
     
-    if (view.drawTick>constants.DRAW_MILLISECONDS) {
-        view.lastDrawTimestamp=view.timestamp; 
+    if (core.drawTick>constants.DRAW_MILLISECONDS) {
+        core.lastDrawTimestamp=core.timestamp; 
 
-        view.draw(map);
+        core.draw(map);
         
-        view.fpsTotal+=view.drawTick;
-        view.fpsCount++;
+        core.fpsTotal+=core.drawTick;
+        core.fpsCount++;
     }
     
         // the fps
     
-    if (!view.paused) {
-        fpsTime=view.timestamp-view.fpsStartTimestamp;
+    if (!core.paused) {
+        fpsTime=core.timestamp-core.fpsStartTimestamp;
         if (fpsTime>=1000) {
-            view.fps=(view.fpsCount*1000.0)/view.fpsTotal;
-            view.fpsStartTimestamp=view.timestamp;
+            core.fps=(core.fpsCount*1000.0)/core.fpsTotal;
+            core.fpsStartTimestamp=core.timestamp;
 
-            view.fpsTotal=0;
-            view.fpsCount=0;
+            core.fpsTotal=0;
+            core.fpsCount=0;
         }
     }
 }

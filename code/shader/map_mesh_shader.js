@@ -1,4 +1,5 @@
 import config from '../main/config.js';
+import CoreClass from '../main/core.js';
 import ShaderClass from '../shader/shader.js';
 import ShaderLightClass from '../shader/shader_light.js';
 
@@ -8,9 +9,9 @@ import ShaderLightClass from '../shader/shader_light.js';
 
 export default class MapMeshShaderClass extends ShaderClass
 {
-    constructor(view)
+    constructor(core)
     {
-        super(view);
+        super(core);
         
         this.vertexShaderURL='shaders/map_mesh.vert';
         this.fragmentShaderURL='shaders/map_mesh.frag';
@@ -42,7 +43,7 @@ export default class MapMeshShaderClass extends ShaderClass
     loadFinish()
     {
         let n,name;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // setup uniforms
 
@@ -61,7 +62,7 @@ export default class MapMeshShaderClass extends ShaderClass
         this.glowFactorUniform=gl.getUniformLocation(this.program,'glowFactor');
         this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
         
-        for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
 
             name='lights['+n+']';
@@ -88,7 +89,7 @@ export default class MapMeshShaderClass extends ShaderClass
     {
         let n;
         let light,viewLight;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.useProgram(this.program);
 
@@ -96,12 +97,12 @@ export default class MapMeshShaderClass extends ShaderClass
             // normal is set on a per mesh level as some have
             // model matrixes which need to be calculated in
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
-        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.core.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.core.viewMatrix.data);
         
             // ambient
             
-        gl.uniform3f(this.ambientUniform,this.view.ambient.r,this.view.ambient.g,this.view.ambient.b);
+        gl.uniform3f(this.ambientUniform,this.core.ambient.r,this.core.ambient.g,this.core.ambient.b);
 
             // lighting
             // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)
@@ -109,10 +110,10 @@ export default class MapMeshShaderClass extends ShaderClass
             
             // if intensity = 0 light is off
         
-        for (n=0;n!==this.view.MAX_LIGHT_COUNT;n++) {
+        for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
 
             light=this.lights[n];
-            viewLight=this.view.lights[n];
+            viewLight=this.core.lights[n];
 
                 // no light sets intensity to 0
 
@@ -138,7 +139,7 @@ export default class MapMeshShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // disable vertex attributes
 

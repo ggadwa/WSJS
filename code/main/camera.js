@@ -1,10 +1,10 @@
 import PointClass from '../utility/point.js';
 
 //
-// view camera class
+// camera class
 //
 
-export default class ViewCameraClass
+export default class CameraClass
 {
     constructor()
     {

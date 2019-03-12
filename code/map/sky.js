@@ -6,9 +6,9 @@ import * as constants from '../main/constants.js';
 
 export default class SkyClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
         this.on=false;
         this.skyBoxSettings=null;
@@ -30,7 +30,7 @@ export default class SkyClass
 
     initialize()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // room enough for the 8 points of the cube
             
@@ -47,7 +47,7 @@ export default class SkyClass
 
     release()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.deleteBuffer(this.vertexBuffer);
         gl.deleteBuffer(this.uvBuffer);
@@ -100,14 +100,14 @@ export default class SkyClass
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertexes,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.view.shaderList.skyShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.view.shaderList.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.core.shaderList.skyShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.core.shaderList.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.view.shaderList.skyShader.vertexUVAttribute);
-        gl.vertexAttribPointer(this.view.shaderList.skyShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.core.shaderList.skyShader.vertexUVAttribute);
+        gl.vertexAttribPointer(this.core.shaderList.skyShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STREAM_DRAW);
@@ -119,25 +119,25 @@ export default class SkyClass
         
     draw()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         let bitmap;
         let cameraPos,skyRadius;
         
         if (!this.on) return;
         
-        cameraPos=this.view.camera.position;
+        cameraPos=this.core.camera.position;
         skyRadius=Math.trunc(this.skyBoxSettings.size*0.5);
         
             // setup shader
 
-        this.view.shaderList.skyShader.drawStart();
+        this.core.shaderList.skyShader.drawStart();
         
             // negative X plane
             // after this first texture is set we do some
             // misc tex parameters (they would fail without a
             // texture set)
         
-        bitmap=this.view.bitmapList.get(this.skyBoxSettings.bitmapNegX);
+        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapNegX);
         bitmap.attachAsSky();
         
         gl.disable(gl.DEPTH_TEST);
@@ -148,31 +148,31 @@ export default class SkyClass
         
             // positive X plane
         
-        bitmap=this.view.bitmapList.get(this.skyBoxSettings.bitmapPosX);
+        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapPosX);
         bitmap.attachAsSky();
         this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.001,0.999,0.999,0.001);
          
             // negative Y plane
         
-        bitmap=this.view.bitmapList.get(this.skyBoxSettings.bitmapNegY);
+        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapNegY);
         bitmap.attachAsSky();
         this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,0.999,0.999,0.001,0.001);
         
             // positive Y plane
         
-        bitmap=this.view.bitmapList.get(this.skyBoxSettings.bitmapPosY);
+        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapPosY);
         bitmap.attachAsSky();
         this.drawPlane(gl,cameraPos,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,0.999,0.999,0.001,0.001);
        
             // negative Z plane
         
-        bitmap=this.view.bitmapList.get(this.skyBoxSettings.bitmapNegZ);
+        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapNegZ);
         bitmap.attachAsSky();
         this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.001,0.999,0.999,0.001);
 
             // positive Z plane
         
-        bitmap=this.view.bitmapList.get(this.skyBoxSettings.bitmapPosZ);
+        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapPosZ);
         bitmap.attachAsSky();
         this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.999,0.999,0.001,0.001);
         
@@ -183,7 +183,7 @@ export default class SkyClass
         
             // end shader
             
-        this.view.shaderList.skyShader.drawEnd();
+        this.core.shaderList.skyShader.drawEnd();
 
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);

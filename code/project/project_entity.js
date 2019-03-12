@@ -10,10 +10,9 @@ import CollisionClass from '../collision/collisions.js';
 
 export default class ProjectEntityClass
 {
-    constructor(view,map,name,position,angle)
+    constructor(core,name,position,angle)
     {
-        this.view=view;
-        this.map=map;
+        this.core=core;
         
         this.name=name;
         this.radius=1;
@@ -78,7 +77,7 @@ export default class ProjectEntityClass
 
         this.pushMesh=null;
 
-        this.collision=new CollisionClass(map);
+        this.collision=new CollisionClass(core);
         
         // no seal, as this object is extended
     }
@@ -108,7 +107,7 @@ export default class ProjectEntityClass
             return;
         }
         
-        this.model=this.view.modelList.add(importSettings.name,importSettings);      
+        this.model=this.core.modelList.add(importSettings.name,importSettings);      
     }
     
         //
@@ -391,7 +390,7 @@ export default class ProjectEntityClass
             
         if (movePnt.y<0) {
             if (this.standOnMeshIdx===meshIdx) {
-                this.pushMesh=this.map.meshList.get(meshIdx);
+                this.pushMesh=this.core.map.meshList.get(meshIdx);
                 if (this.position.y<=this.pushMesh.yBound.min) {
                     this.position.y=Math.trunc(this.pushMesh.yBound.min)+1;
                 }
@@ -430,7 +429,7 @@ export default class ProjectEntityClass
         
             // get the collision line vector
         
-        collisionLine=this.map.meshList.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
+        collisionLine=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
         this.reflectLineVector.setFromSubPoint(collisionLine.p1,collisionLine.p2);
 	
             // now get the angle between them,
@@ -534,7 +533,7 @@ export default class ProjectEntityClass
     
     addDamage(hitEntityId,damage)
     {
-        this.damageTintStartTick=this.view.timestamp;
+        this.damageTintStartTick=this.core.timestamp;
         
         this.health-=damage;
         if (this.health<=0) this.die();
@@ -551,7 +550,7 @@ export default class ProjectEntityClass
         
         if (this.damageTintStartTick===-1) return(0.0);
         
-        tick=this.view.timestamp-this.damageTintStartTick;
+        tick=this.core.timestamp-this.damageTintStartTick;
         if (tick>=1000) {
             this.damageTintStartTick=-1;
             return(0.0);
@@ -567,12 +566,12 @@ export default class ProjectEntityClass
         
     getInLiquidIndex()
     {
-        return(this.map.liquidList.getLiquidForPoint(this.position));
+        return(this.core.map.liquidList.getLiquidForPoint(this.position));
     }
     
     getUnderLiquidIndex()
     {
-        return(this.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset));
+        return(this.core.map.liquidList.getLiquidForEyePoint(this.position,this.eyeOffset));
     }
     
     isStandingOnFloor()
@@ -601,12 +600,12 @@ export default class ProjectEntityClass
         
     addSound(name,distance)
     {
-        this.view.soundList.add(name,distance);
+        this.core.soundList.add(name,distance);
     }
         
     playSound(name)
     {
-        this.view.soundList.play(this,name);
+        this.core.soundList.play(this,name);
     }
     
         //

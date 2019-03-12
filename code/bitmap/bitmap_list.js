@@ -2,14 +2,14 @@ import ColorClass from '../utility/color.js';
 import BitmapClass from '../bitmap/bitmap.js';
 
 //
-// view bitmap list class
+// core bitmap list class
 //
 
 export default class BitmapListClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
         this.bitmaps=new Map();
 
@@ -45,7 +45,7 @@ export default class BitmapListClass
             // by another call that force loads unloaded
             // bitmaps
                     
-        bitmap=new BitmapClass(this.view,colorURL,normalURL,specularURL,specularFactor,scale);
+        bitmap=new BitmapClass(this.core,colorURL,normalURL,specularURL,specularFactor,scale);
         bitmap.initialize();
         this.bitmaps.set(colorURL,bitmap);
         

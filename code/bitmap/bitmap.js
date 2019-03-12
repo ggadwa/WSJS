@@ -2,9 +2,9 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
-    constructor(view,colorURL,normalURL,specularURL,specularFactor,scale)
+    constructor(core,colorURL,normalURL,specularURL,specularFactor,scale)
     {
-        this.view=view;
+        this.core=core;
         this.colorURL=colorURL;
         this.normalURL=normalURL;
         this.specularURL=specularURL;
@@ -56,7 +56,7 @@ export default class BitmapClass
     
     release()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         if (this.texture!==null) gl.deleteTexture(this.texture);
         if (this.normalMap!==null) gl.deleteTexture(this.normalMap);
@@ -191,7 +191,7 @@ export default class BitmapClass
     async load()
     {
         let maskImage;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // color bitmap
             // this is the only required image, all others
@@ -358,14 +358,14 @@ export default class BitmapClass
     attachAsTexture(shader)
     {
         let glowFactor;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // uniforms
 
         gl.uniform3f(shader.specularFactorUniform,this.specularFactor.r,this.specularFactor.g,this.specularFactor.b);
         
         if (this.glowFrequency!==0) {
-            glowFactor=this.glowMin+Math.abs(Math.cos(this.view.timestamp/this.glowFrequency)*(this.glowMax-this.glowMin));
+            glowFactor=this.glowMin+Math.abs(Math.cos(this.core.timestamp/this.glowFrequency)*(this.glowMax-this.glowMin));
             gl.uniform1f(shader.glowFactorUniform,glowFactor);
         }
         else {
@@ -392,7 +392,7 @@ export default class BitmapClass
     
     attachAsLiquid(shader)
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -400,7 +400,7 @@ export default class BitmapClass
     
     attachAsParticle()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
@@ -408,7 +408,7 @@ export default class BitmapClass
     
     attachAsSky()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.texture);

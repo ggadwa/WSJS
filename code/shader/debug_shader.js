@@ -7,9 +7,9 @@ import ShaderClass from '../shader/shader.js';
 
 export default class DebugShaderClass extends ShaderClass
 {
-    constructor(view)
+    constructor(core)
     {
-        super(view);
+        super(core);
         
         this.vertexShaderURL='shaders/model_skeleton.vert';
         this.fragmentShaderURL='shaders/model_skeleton.frag';
@@ -31,7 +31,7 @@ export default class DebugShaderClass extends ShaderClass
 
     loadFinish()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // setup uniforms
 
@@ -54,7 +54,7 @@ export default class DebugShaderClass extends ShaderClass
 
     drawStart()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // using the skeleton shader
 
@@ -62,8 +62,8 @@ export default class DebugShaderClass extends ShaderClass
 
             // matrix
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
-        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.core.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.core.viewMatrix.data);
 
             // enable the vertex attributes
 
@@ -72,7 +72,7 @@ export default class DebugShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // disable vertex attributes
 

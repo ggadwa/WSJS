@@ -6,9 +6,9 @@ import ColorClass from '../utility/color.js';
 
 export default class TextClass
 {
-    constructor(view)
+    constructor(core)
     {
-        this.view=view;
+        this.core=core;
         
             // constants
             
@@ -53,7 +53,7 @@ export default class TextClass
     {
         let x,y,yAdd,cIdx,charStr,ch;
         let canvas,ctx;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // setup the canvas
 
@@ -121,7 +121,7 @@ export default class TextClass
 
     release()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // remove vbos
             
@@ -167,21 +167,21 @@ export default class TextClass
 
     drawStart()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
         gl.disable(gl.DEPTH_TEST);
         
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-        this.view.shaderList.textShader.drawStart();
+        this.core.shaderList.textShader.drawStart();
     }
 
     drawEnd()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
-        this.view.shaderList.textShader.drawEnd();
+        this.core.shaderList.textShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
@@ -192,7 +192,7 @@ export default class TextClass
         let n,x2,ty,by,vIdx,uvIdx,iIdx,elementIdx;
         let cIdx,gx,gy,gxAdd,gyAdd;
         let len,drawWid,nTrig;
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // get the length and clip if
             // past our pre-set buffer size
@@ -276,21 +276,21 @@ export default class TextClass
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D,this.fontTexture);
 
-        gl.uniform3f(this.view.shaderList.textShader.colorUniform,color.r,color.g,color.b);
+        gl.uniform3f(this.core.shaderList.textShader.colorUniform,color.r,color.g,color.b);
 
             // setup the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.view.shaderList.textShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.view.shaderList.textShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.core.shaderList.textShader.vertexPositionAttribute);
+        gl.vertexAttribPointer(this.core.shaderList.textShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STREAM_DRAW);
 
-        gl.enableVertexAttribArray(this.view.shaderList.textShader.vertexUVAttribute);
-        gl.vertexAttribPointer(this.view.shaderList.textShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(this.core.shaderList.textShader.vertexUVAttribute);
+        gl.vertexAttribPointer(this.core.shaderList.textShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.STREAM_DRAW);

@@ -6,9 +6,9 @@ import ShaderClass from '../shader/shader.js';
 
 export default class SkyShaderClass extends ShaderClass
 {
-    constructor(view)
+    constructor(core)
     {
-        super(view);
+        super(core);
         
         this.vertexShaderURL='shaders/sky.vert';
         this.fragmentShaderURL='shaders/sky.frag';
@@ -27,7 +27,7 @@ export default class SkyShaderClass extends ShaderClass
 
     loadFinish()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
 
             // setup uniforms
 
@@ -48,14 +48,14 @@ export default class SkyShaderClass extends ShaderClass
 
     drawStart()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
         gl.useProgram(this.program);
 
             // setup the uniforms
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.view.perspectiveMatrix.data);
-        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.view.viewMatrix.data);
+        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.core.perspectiveMatrix.data);
+        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.core.viewMatrix.data);
 
             // enable the vertex attributes
 
@@ -65,7 +65,7 @@ export default class SkyShaderClass extends ShaderClass
 
     drawEnd()
     {
-        let gl=this.view.gl;
+        let gl=this.core.gl;
         
             // disable vertex attributes
 

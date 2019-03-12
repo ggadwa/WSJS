@@ -6,13 +6,20 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
+- map as part of core
+- need much better frustum culling for models
+- better animation for dragon queen
+
+
+work on held gun position
 need isEntityInRange('player') then check for E key on 
 
 sort effects, will need a sort z call into the effect
 entites need data
 
+work on paths
+
 2. liquids need to draw away from z
-6. be able to start animation paused (at certain second of animation)
 
 bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
@@ -21,9 +28,23 @@ model angle by quaternions
 2. need to get rid of a lot of project_entity stuff, it's very player specific
 4. delete all weapon stuff from player
 5. shaders need to be dynamic and part of project
-6. view -> WSJS?
-7. map into view
 8. combine input / view pause states
 9. get rid of constants, use statics
+
+project_entity to remove
+    setMovementForward(on)
+    setMovementBackward(on)
+    setMovementSideLeft(on)
+    setMovementSideRight(on)
+    movementBounce(bounceFactor)
+    movementJump(jumpValue)
+    movementReflect()
+    turn(addAngle)
+    turnTowards(toY,speed)
+    turnTowardsPosition(pos,speed)
+    getAngleDifferenceTowardsPosition(pos)
+    getPercentageHealth()
+    getDamageTintAttenuation()
+
 
 
