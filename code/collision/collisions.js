@@ -233,6 +233,7 @@ export default class CollisionClass
         for (n=0;n!==nEntity;n++) {
             checkEntity=this.core.map.entityList.get(n);
             if (checkEntity.id===entity.id) continue;
+            if (checkEntity.heldBy===entity) continue;
 
             checkEntityPt=checkEntity.position;
 
@@ -372,12 +373,13 @@ export default class CollisionClass
                     }
                 }
             }
-            
+          
                 // check other entities
 
             for (n=0;n!==nEntity;n++) {
                 checkEntity=this.core.map.entityList.get(n);
                 if (checkEntity.id===entity.id) continue;
+                if (checkEntity.heldBy===entity) continue;
                 
                 checkEntityPt=checkEntity.position;
                 
