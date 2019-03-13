@@ -2,7 +2,6 @@ import * as constants from '../main/constants.js';
 import config from '../main/config.js';
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
-import MapClass from '../map/map.js';
 import genRandom from '../utility/random.js';
 
 //
@@ -13,14 +12,10 @@ class MainClass
 {
     constructor()
     {
-            // game globals
+            // core is the global root
+            // object for all game objects
 
         this.core=new CoreClass();
-        this.map=new MapClass(this.core);
-        this.core.map=this.map;
-        
-        this.game=null;
-        this.projectMap=null;
 
         Object.seal(this);
     }
@@ -29,18 +24,16 @@ class MainClass
     {
         this.core.createCanvas();
         
-        setTimeout(this.initCore.bind(this,gameClass),1);
-    }
-
-    async initCore(gameClass)
-    {
             // the project objects
             
-        this.game=new gameClass(this.core);
-        this.projectMap=this.game.getStartMap();
-         
-           // init core
+        this.core.projectGame=new gameClass(this.core);
+        this.core.projectMap=this.core.projectGame.getStartProjectMap();
         
+        setTimeout(this.initCore.bind(this),1);
+    }
+
+    async initCore()
+    {
         this.core.initialize();
         if (!(await this.core.loadShaders())) return;
 
@@ -53,7 +46,7 @@ class MainClass
 
     initInternal()
     {
-        if (!this.map.initialize()) return;
+        if (!this.core.map.initialize()) return;
 
             // next step
 
@@ -66,8 +59,8 @@ class MainClass
     
     async initLoadMap()
     {
-        this.projectMap.initialize();
-        if (!(await this.projectMap.loadMap())) return;
+        this.core.projectMap.initialize();
+        if (!(await this.core.projectMap.loadMap())) return;
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Building Collision Geometry');
@@ -78,7 +71,7 @@ class MainClass
     
     initCollisionGeomtry()
     {
-        this.map.meshList.buildCollisionGeometry();
+        this.core.map.meshList.buildCollisionGeometry();
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Entities');
@@ -89,7 +82,7 @@ class MainClass
 
     initLoadEntities()
     {
-        if (!this.projectMap.loadEntities()) return;
+        if (!this.core.projectMap.loadEntities()) return;
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Models');
@@ -136,19 +129,19 @@ class MainClass
             // finish by setting up all the mesh
             // buffers and indexes
 
-        this.map.setupBuffers();
+        this.core.map.setupBuffers();
         
             // set the listener to this entity
             
-        this.core.soundList.setListenerToEntity(this.map.entityList.getPlayer());
+        this.core.soundList.setListenerToEntity(this.core.map.entityList.getPlayer());
 
             // start the input
 
-        this.core.input.initialize(this.map.entityList.getPlayer());
+        this.core.input.initialize(this.core.map.entityList.getPlayer());
         
             // ready all the entities
             
-        this.map.entityList.ready();
+        this.core.map.entityList.ready();
         
             // the cancel loop flag
             
@@ -182,7 +175,7 @@ function mainLoop(timestamp)
 {
     let fpsTime;
     let core=main.core;
-    let map=main.map;
+    let map=core.map;
     
         // next frame
         
@@ -236,7 +229,7 @@ function mainLoop(timestamp)
     if (core.drawTick>constants.DRAW_MILLISECONDS) {
         core.lastDrawTimestamp=core.timestamp; 
 
-        core.draw(map);
+        core.draw();
         
         core.fpsTotal+=core.drawTick;
         core.fpsCount++;

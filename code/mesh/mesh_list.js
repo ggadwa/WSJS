@@ -219,20 +219,31 @@ export default class MeshListClass
         let currentBitmap,currentSkinIdx;
         let gl=this.core.gl;
         
+            // models cull as a single unit
+            
+        if (modelMatrix!==null) {
+            
+        }
+        
+            // start the shader
+        
         this.shader.drawStart();
         
             // if there is a model matrix, then
-            // it's a model set the model matrix
+            // it's a model and we use the model
+            // matrix to position it, models don't
+            // have pre-set normal matrixes because
+            // they need the skin (view*model*skin) so
+            // they are calculated in the shader
             
         if (modelMatrix!==null) {
             gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
         }
         
-            // otherwise it's a map mesh, so we
+            // otherwise it's a map mesh, which is pre-positioned
+            // so we don't need a model matrix, but we
             // need to create the normal matrix, which
             // is used to tranform normals into eye space
-            // for lighting, models do this in the shader because
-            // models need view*model*skin for the normal matrix
             
         else {    
             this.normalMatrix.setInvertTransposeFromMat4(this.core.viewMatrix);
@@ -250,13 +261,6 @@ export default class MeshListClass
         for (mesh of this.meshes) {
             if (!mesh.show) continue;
 
-                // skip if not in view frustum
-                // some special models, like in hand weapons, don't cull
-
-            if (!noFrustumCull) {
-                if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
-            }
-            
                 // if we are in a model (we have a model
                 // matrix) we have to deal with meshes that are
                 // skinned and not skinned through some variables
@@ -285,6 +289,14 @@ export default class MeshListClass
                     gl.uniform1i(this.shader.noSkinUniform,1);
                     gl.uniformMatrix4fv(this.shader.noSkinAttachedNodeMatrixUniform,false,skeleton.nodes[mesh.noSkinAttachedNodeIdx].curPoseMatrix.data);
                 }
+            }
+            
+                // models cull as a single unit, but map meshes
+                // which are precalculated cull against the view frustum
+                // on a per mesh basis
+            
+            else {
+                if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             }
             
                 // time to change bitmap

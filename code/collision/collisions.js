@@ -165,7 +165,7 @@ export default class CollisionClass
         let dist,currentDist;
         
         let origPt=entity.position;
-        let radius=entity.radius;
+        let radius=entity.xRadius;
         let high=entity.height;
         
         let nMesh=this.core.map.meshList.meshes.length;
@@ -244,7 +244,7 @@ export default class CollisionClass
 
                 // check the circle
 
-            if (!this.circleCircleIntersection(entity.position,radius,checkEntityPt,checkEntity.radius,this.moveIntersectPt)) continue;
+            if (!this.circleCircleIntersection(entity.position,radius,checkEntityPt,checkEntity.xRadius,this.moveIntersectPt)) continue;
 
                 // find closest hit point
 
@@ -294,7 +294,7 @@ export default class CollisionClass
         let dist,currentDist;
         
         let origPt=entity.position;
-        let radius=entity.radius;
+        let radius=entity.xRadius;
         let high=entity.height;
         
         let nMesh=this.core.map.meshList.meshes.length;
@@ -390,7 +390,7 @@ export default class CollisionClass
                 
                     // check the circle
                     
-                if (!this.circleCircleIntersection(this.testPt,radius,checkEntityPt,checkEntity.radius,this.moveIntersectPt)) continue;
+                if (!this.circleCircleIntersection(this.testPt,radius,checkEntityPt,checkEntity.xRadius,this.moveIntersectPt)) continue;
                 
                     // find closest hit point
 
@@ -463,7 +463,7 @@ export default class CollisionClass
             // use spokes (around the radius) plus
             // an extra for the middle
         
-        radius=entity.radius;
+        radius=entity.xRadius;
         
         x=entity.position.x;
         z=entity.position.z;
@@ -484,9 +484,9 @@ export default class CollisionClass
             // floor_rise_height is the farthest
             // we can move up and down a floor segment
             
-        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
+        this.objXBound.setFromValues((entity.position.x-entity.xRadius),(entity.position.x+entity.xRadius));
         this.objYBound.setFromValues((entity.position.y-constants.FLOOR_RISE_HEIGHT),(entity.position.y+constants.FLOOR_RISE_HEIGHT));
-        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
+        this.objZBound.setFromValues((entity.position.z-entity.zRadius),(entity.position.z+entity.zRadius));
         
             // build the ray trace points
             // from the bottom of the entity cylinder
@@ -566,9 +566,9 @@ export default class CollisionClass
             // (to catch things moving into us or pushing past ceiling)
             // to the furtherest we are trying to rise
             
-        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
+        this.objXBound.setFromValues((entity.position.x-entity.xRadius),(entity.position.x+entity.zRadius));
         this.objYBound.setFromValues((entity.position.y+entity.height),((entity.position.y+entity.height)+riseY));
-        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
+        this.objZBound.setFromValues((entity.position.z-entity.zRadius),(entity.position.z+entity.zRadius));
         
             // build the ray trace points
             // from the top of the entity cylinder

@@ -6,11 +6,11 @@ export default class ProjectGameClass
     }
         
         //
-        // override this to get initial startup map for game
+        // override this to get initial startup project map for game
         // this returns a ProjectMapClass
         //
         
-    getStartMap()
+    getStartProjectMap()
     {
     }
 }

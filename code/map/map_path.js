@@ -13,11 +13,11 @@ export default class MapPathClass
     
     /*
         //
-        // draw the skeleton for debug purposes
+        // draw the path for debug purposes
         // note this is not optimal and slow!
         //
         
-    debugDraw(modelMatrix,scale)
+    debugDrawPath(modelMatrix,scale)
     {
         let n,nNode,node,parentNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;

@@ -15,7 +15,8 @@ export default class ProjectEntityClass
         this.core=core;
         
         this.name=name;
-        this.radius=1;
+        this.xRadius=1;
+        this.zRadius=1;
         this.height=1;
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
@@ -654,6 +655,6 @@ export default class ProjectEntityClass
         
             // draw the model
             
-        this.model.draw();
+        this.model.draw(this);
     }
 }

@@ -12,7 +12,7 @@ class ConfigClass
             // temp map testing
             //
             
-        this.START_MAP=1;
+        this.START_MAP=0;
         this.START_MAP_LIST=['Dual Castles','Dungeon'];
 
             //
@@ -32,8 +32,9 @@ class ConfigClass
             // play testing
             //
 
-        this.PLAYER_CLIP_WALLS=false;
-        this.PLAYER_FLY=false;
+        this.PLAYER_CLIP_WALLS=true;
+        this.PLAYER_FLY=true;
+        this.DRAW_ENTITY_BOUNDS=true;
         this.DRAW_MODEL_SKELETONS=false;
         this.DRAW_COLLISION_PLANES=false;
         this.DRAW_PATHS=false;

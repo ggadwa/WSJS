@@ -1,5 +1,6 @@
 import * as constants from '../main/constants.js';
 import config from '../main/config.js';
+import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
 import ShaderListClass from '../shader/shader_list.js';
@@ -41,7 +42,12 @@ export default class CoreClass
         
             // the current map
             
-        this.map=null;
+        this.map=new MapClass(this);
+        
+            // the project game and map
+            
+        this.projectGame=null;
+        this.projectMap=null;
         
             // input
             
@@ -353,13 +359,13 @@ export default class CoreClass
         // draw view
         //
 
-    draw(map)
+    draw()
     {
         let n;
         let light,tintOn,tintAtt,liquidIdx,liquid;
         let weapon;
         let fpsStr,idx;
-        let player=map.entityList.getPlayer();
+        let player=this.map.entityList.getPlayer();
          
             // everything overdraws except
             // clear the depth buffer
@@ -403,8 +409,8 @@ export default class CoreClass
             
         this.lights=[];
 
-        map.lightList.addLightsToViewLights();
-        map.effectList.addLightsToViewLights();
+        this.map.lightList.addLightsToViewLights();
+        this.map.effectList.addLightsToViewLights();
         
             // fill in any missing lights with NULL
 
@@ -434,16 +440,16 @@ export default class CoreClass
         
             // draw the map
             
-        map.sky.draw();
+        this.map.sky.draw();
         if (!config.DRAW_COLLISION_PLANES) {
-            map.meshList.draw(null,null,false);
+            this.map.meshList.draw(null,null,false);
         }
         else {
-            map.meshList.debugDrawCollisionSurfaces();
+            this.map.meshList.debugDrawCollisionSurfaces();
         }
-        map.entityList.draw();
-        if (!config.DRAW_COLLISION_PLANES) map.liquidList.draw();
-        map.effectList.draw();
+        this.map.entityList.draw();
+        if (!config.DRAW_COLLISION_PLANES) this.map.liquidList.draw();
+        this.map.effectList.draw();
       
             // player weapon
          
@@ -467,7 +473,7 @@ export default class CoreClass
         liquidIdx=player.getUnderLiquidIndex();
         if (liquidIdx!==-1) {
             tintOn=true;
-            liquid=map.liquidList.liquids[liquidIdx];
+            liquid=this.map.liquidList.liquids[liquidIdx];
             this.uiTintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
         }
         

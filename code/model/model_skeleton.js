@@ -278,7 +278,7 @@ export default class ModelSkeletonClass
         // note this is not optimal and slow!
         //
         
-    debugDraw(modelMatrix,scale)
+    debugDrawSkeleton(modelMatrix,scale)
     {
         let n,nNode,node,parentNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;
@@ -390,7 +390,7 @@ export default class ModelSkeletonClass
         indexBuffer=gl.createBuffer();
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.DYNAMIC_DRAW);
         
             // always draw it, no matter what
             
