@@ -82,18 +82,6 @@ export default class MeshListClass
 
         return(-1);
     }
-    
-    show(name,show)
-    {
-        let mesh;
-
-        for (mesh of this.meshes) {
-            if (mesh.name===name) {
-                mesh.show=show;
-                return;
-            }
-        }
-    }
 
     delete(name)
     {
@@ -194,50 +182,29 @@ export default class MeshListClass
     }
     
         //
-        // rebuild bound boxes to modelmatrix
-        // this is mostly used by models to fix bounding
-        // boxes for frustum culling
-        //
-
-    recalcBoundsFromModelMatrix(modelMatrix)
-    {
-        let mesh;
-        
-        for (mesh of this.meshes) {
-            mesh.recalcBoundsFromModelMatrix(modelMatrix);
-        }
-    }
-    
-        //
         // draw meshes
         //
 
-    draw(modelMatrix,skeleton,noFrustumCull)
+    draw(modelEntityAlter)
     {
-        let n,mesh;
+        let n,k,mesh;
         let jointMatrixArray;
         let currentBitmap,currentSkinIdx;
         let gl=this.core.gl;
-        
-            // models cull as a single unit
-            
-        if (modelMatrix!==null) {
-            
-        }
+        let nMesh=this.meshes.length;
         
             // start the shader
         
         this.shader.drawStart();
         
-            // if there is a model matrix, then
-            // it's a model and we use the model
+            // if a model then we use the model
             // matrix to position it, models don't
             // have pre-set normal matrixes because
             // they need the skin (view*model*skin) so
             // they are calculated in the shader
             
-        if (modelMatrix!==null) {
-            gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelMatrix.data);
+        if (modelEntityAlter!==null) {
+            gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelEntityAlter.modelMatrix.data);
         }
         
             // otherwise it's a map mesh, which is pre-positioned
@@ -258,15 +225,19 @@ export default class MeshListClass
         
             // draw the meshes
 
-        for (mesh of this.meshes) {
-            if (!mesh.show) continue;
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.meshes[n];
 
                 // if we are in a model (we have a model
                 // matrix) we have to deal with meshes that are
                 // skinned and not skinned through some variables
                 // and setting or changing the joint skinning matrix
                 
-            if (modelMatrix!==null) {
+            if (modelEntityAlter!==null) {
+                
+                    // any hidden model meshes
+                    
+                if (modelEntityAlter.meshHideList[n]===1) continue;
                 
                     // skinned
                     
@@ -276,9 +247,9 @@ export default class MeshListClass
                     if (currentSkinIdx!==mesh.skinIdx) {
                         currentSkinIdx=mesh.skinIdx;
                         
-                        jointMatrixArray=skeleton.skins[currentSkinIdx].getPoseJointMatrixArray();
-                        for (n=0;n!==jointMatrixArray.length;n++) {
-                            gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[n],false,jointMatrixArray[n].data);
+                        jointMatrixArray=modelEntityAlter.getPoseJointMatrixArray(currentSkinIdx);
+                        for (k=0;k!==jointMatrixArray.length;k++) {
+                            gl.uniformMatrix4fv(this.shader.jointMatrixUniformArray[k],false,jointMatrixArray[k].data);
                         }
                     }
                 }
@@ -287,7 +258,7 @@ export default class MeshListClass
                     
                 else {
                     gl.uniform1i(this.shader.noSkinUniform,1);
-                    gl.uniformMatrix4fv(this.shader.noSkinAttachedNodeMatrixUniform,false,skeleton.nodes[mesh.noSkinAttachedNodeIdx].curPoseMatrix.data);
+                    gl.uniformMatrix4fv(this.shader.noSkinAttachedNodeMatrixUniform,false,modelEntityAlter.getNodeCurrentPoseMatrix(mesh.noSkinAttachedNodeIdx).data);
                 }
             }
             
@@ -357,7 +328,6 @@ export default class MeshListClass
             // draw the collision parts
 
         for (mesh of this.meshes) {
-            if (!mesh.show) continue;
             if (mesh.noCollisions) continue;
 
                 // skip if not in view frustum

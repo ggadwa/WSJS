@@ -30,6 +30,14 @@ export default class QuaternionClass
         this.w=w;
     }
     
+    setFromQuaternion(quat)
+    {
+        this.x=quat.x;
+        this.y=quat.y;
+        this.z=quat.z;
+        this.w=quat.w;
+    }
+    
     setFromVectorAndAngle(x,y,z,ang)
     {
         let rd=ang*constants.DEGREE_TO_RAD;
@@ -96,5 +104,16 @@ export default class QuaternionClass
         this.x=(mat.data[6]-mat.data[9])/w4;
         this.y=(mat.data[8]-mat.data[2])/w4;
         this.z=(mat.data[1]-mat.data[4])/w4;
+    }
+    
+    copy()
+    {
+        let quat=new QuaternionClass();
+        quat.x=this.x;
+        quat.y=this.y;
+        quat.z=this.z;
+        quat.w=this.w;
+        
+        return(quat);
     }
 }

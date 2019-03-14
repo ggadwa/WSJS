@@ -543,7 +543,7 @@ export default class ImportGLTFClass
                     return(false);
                 }
 
-                skeletonSkin=new ModelSkinClass(skeleton);
+                skeletonSkin=new ModelSkinClass();
                 skeleton.skins.push(skeletonSkin);
 
                 inverseBindMatrixFloatArray=this.decodeBuffer(skin.inverseBindMatrices,16);

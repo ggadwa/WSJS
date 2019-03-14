@@ -95,6 +95,8 @@ class MainClass
     {
         if (!(await this.core.modelList.loadAllModels())) return;
         
+        this.core.map.entityList.setupModelEntityAlters();
+        
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Images');
         this.core.loadingScreenDraw(0.4);

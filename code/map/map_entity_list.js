@@ -35,6 +35,21 @@ export default class MapEntityListClass
     {
         this.clear();
     }
+    
+        //
+        // sets up the model entity alter which each
+        // entity has to track the animations/nodes/etc
+        // for their shared models
+        //
+        
+    setupModelEntityAlters()
+    {
+        let entity;
+        
+        for (entity of this.entities) {
+            if (entity.modelEntityAlter!==null) entity.modelEntityAlter.finishSetup();
+        }
+    }
 
         //
         // list items
@@ -173,11 +188,17 @@ export default class MapEntityListClass
         // draw entities
         //
         
-    draw()
+    draw(heldBy)
     {
         let entity;
 
         for (entity of this.entities) {
+            if (heldBy!==null) {
+                if (entity.heldBy!==heldBy) continue;
+            }
+            else {
+                if (entity.heldBy!==null) continue;
+            }
             entity.draw();
         }
     }

@@ -11,8 +11,6 @@ export default class ModelJointClass
         this.nodeIdx=nodeIdx;
         this.inverseBindMatrix=inverseBindMatrix;
         
-        this.jointMatrix=new Matrix4Class();
-        
         this.translateMatrix=new Matrix4Class();        // pre loaded to avoid GC
         this.rotMatrix=new Matrix4Class();
         this.scaleMatrix=new Matrix4Class();

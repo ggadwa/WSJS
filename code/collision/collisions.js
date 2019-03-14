@@ -100,7 +100,7 @@ export default class CollisionClass
         return(true);
     }
 
-    circleLineXZIntersection(collisionLine,circlePt,radius,lineIntersectPt)
+    ellipseLineXZIntersection(collisionLine,circlePt,xRadius,zRadius,lineIntersectPt)
     {
             // cast rays from the center of the circle
             // like spokes to check for collisions
@@ -114,8 +114,8 @@ export default class CollisionClass
         this.spokeLine.setFromValues(circlePt,this.spokePt);
 
         for (n=0;n!==24;n++) {
-            this.spokePt.x=circlePt.x+(radius*this.spokeCalcSin[n]);
-            this.spokePt.z=circlePt.z-(radius*this.spokeCalcCos[n]);   // everything is passed by pointer so this will change the spoke line
+            this.spokePt.x=circlePt.x+(xRadius*this.spokeCalcCos[n]);
+            this.spokePt.z=circlePt.z-(zRadius*this.spokeCalcSin[n]);   // everything is passed by pointer so this will change the spoke line
 
             if (this.collisionLineToLineXZIntersection(collisionLine,this.spokeLine,circlePt.y,this.spokeHitPt)) {
                 dist=circlePt.noSquareDistance(this.spokeHitPt);
@@ -165,7 +165,9 @@ export default class CollisionClass
         let dist,currentDist;
         
         let origPt=entity.position;
-        let radius=entity.xRadius;
+        let xRadius=entity.xRadius;
+        let zRadius=entity.zRadius;
+        let maxRadius=Math.max(xRadius,zRadius);
         let high=entity.height;
         
         let nMesh=this.core.map.meshList.meshes.length;
@@ -177,9 +179,9 @@ export default class CollisionClass
         
             // the rough collide boxes
             
-        this.objXBound.setFromValues((entity.position.x-radius),(entity.position.x+radius));
+        this.objXBound.setFromValues((entity.position.x-maxRadius),(entity.position.x+maxRadius));
         this.objYBound.setFromValues(entity.position.y,(entity.position.y+high));
-        this.objZBound.setFromValues((entity.position.z-radius),(entity.position.z+radius));
+        this.objZBound.setFromValues((entity.position.z-maxRadius),(entity.position.z+maxRadius));
         
             // no collisions yet
             
@@ -214,7 +216,7 @@ export default class CollisionClass
 
                     // check against line
                     
-                if (!this.circleLineXZIntersection(collisionLine,entity.position,radius,this.moveIntersectPt)) continue;
+                if (!this.ellipseLineXZIntersection(collisionLine,entity.position,xRadius,zRadius,this.moveIntersectPt)) continue;
 
                     // find closest hit point
 
@@ -244,7 +246,7 @@ export default class CollisionClass
 
                 // check the circle
 
-            if (!this.circleCircleIntersection(entity.position,radius,checkEntityPt,checkEntity.xRadius,this.moveIntersectPt)) continue;
+            if (!this.circleCircleIntersection(entity.position,maxRadius,checkEntityPt,Math.max(checkEntity.xRadius,checkEntity.zRadius),this.moveIntersectPt)) continue;
 
                 // find closest hit point
 
@@ -269,12 +271,12 @@ export default class CollisionClass
         if (currentHitPt===null) return(null);
         
             // we need to move the hit point so it's
-            // always outside the radius of moving point
+            // always outside the max radius of the ellipse
         
         this.radiusPt.setFromValues((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
         
         this.radiusPt.normalize();
-        this.radiusPt.scale(radius);
+        this.radiusPt.scale(maxRadius);
         
         this.radiusPt.addPoint(currentHitPt);
         
@@ -294,7 +296,9 @@ export default class CollisionClass
         let dist,currentDist;
         
         let origPt=entity.position;
-        let radius=entity.xRadius;
+        let xRadius=entity.xRadius;
+        let zRadius=entity.zRadius;
+        let maxRadius=Math.max(xRadius,zRadius);
         let high=entity.height;
         
         let nMesh=this.core.map.meshList.meshes.length;
@@ -312,9 +316,9 @@ export default class CollisionClass
         
             // the rough collide boxes
             
-        this.objXBound.setFromValues((this.testPt.x-radius),(this.testPt.x+radius));
+        this.objXBound.setFromValues((this.testPt.x-maxRadius),(this.testPt.x+maxRadius));
         this.objYBound.setFromValues(this.testPt.y,(this.testPt.y+high));
-        this.objZBound.setFromValues((this.testPt.z-radius),(this.testPt.z+radius));
+        this.objZBound.setFromValues((this.testPt.z-maxRadius),(this.testPt.z+maxRadius));
         
             // no collisions yet
             
@@ -357,7 +361,7 @@ export default class CollisionClass
                     
                         // check against line
                     
-                    if (!this.circleLineXZIntersection(collisionLine,this.testPt,radius,this.moveIntersectPt)) continue;
+                    if (!this.ellipseLineXZIntersection(collisionLine,this.testPt,xRadius,zRadius,this.moveIntersectPt)) continue;
                     
                         // find closest hit point
 
@@ -390,7 +394,7 @@ export default class CollisionClass
                 
                     // check the circle
                     
-                if (!this.circleCircleIntersection(this.testPt,radius,checkEntityPt,checkEntity.xRadius,this.moveIntersectPt)) continue;
+                if (!this.circleCircleIntersection(this.testPt,maxRadius,checkEntityPt,Math.max(checkEntity.xRadius,checkEntity.zRadius),this.moveIntersectPt)) continue;
                 
                     // find closest hit point
 
@@ -436,13 +440,11 @@ export default class CollisionClass
         }
         
             // we need to move the hit point so it's
-            // always outside the radius of moving point
+            // always outside the max radius of the ellipse
         
         this.radiusPt.setFromValues((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
-        
         this.radiusPt.normalize();
-        this.radiusPt.scale(radius);
-        
+        this.radiusPt.scale(maxRadius);
         this.radiusPt.addPoint(currentHitPt);
         
             // and the new move is the original

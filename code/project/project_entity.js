@@ -2,6 +2,7 @@ import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import ModelClass from '../model/model.js';
+import ModelEntityAlterClass from '../model/model_entity_alter.js';
 import CollisionClass from '../collision/collisions.js';
 
 //
@@ -25,6 +26,7 @@ export default class ProjectEntityClass
         this.heldBy=null;
         
         this.model=null;
+        this.modelEntityAlter=null;
         
         if (position!==null) this.position.setFromPoint(position);
         if (angle!==null) this.angle.setFromPoint(angle);
@@ -108,7 +110,39 @@ export default class ProjectEntityClass
             return;
         }
         
-        this.model=this.core.modelList.add(importSettings.name,importSettings);      
+        this.model=this.core.modelList.add(importSettings.name,importSettings);
+        this.modelEntityAlter=new ModelEntityAlterClass(this.core,this);
+    }
+    
+    showModelMesh(name,show)
+    {
+        return(this.modelEntityAlter.show(name,show));
+    }
+    
+    setModelNoFrustumCull(noFrustumCull)
+    {
+        this.modelEntityAlter.noFrustumCull=noFrustumCull;
+    }
+    
+    setModelDrawPosition(position,angle)
+    {
+        this.modelEntityAlter.position.setFromPoint(position);
+        this.modelEntityAlter.angle.setFromPoint(angle);
+    }
+    
+    startModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
+    {
+        return(this.modelEntityAlter.startAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame));
+    }
+    
+    queueModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
+    {
+        return(this.modelEntityAlter.queueAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame));
+    }
+    
+    isModelAnimationRunning()
+    {
+        return(this.modelEntityAlter.isAnimationRunning());
     }
     
         //
@@ -629,13 +663,16 @@ export default class ProjectEntityClass
     }
     
         //
-        // override this to change how the model is setup for drawing
-        // will need to setup model position and angles here or nothing
-        // will draw
+        // override this if you want to change how a model is setup
+        // or positioned in the scene.  the default is just to
+        // position the model the same as the entity's position and
+        // angle.  use setModelDrawPosition(position,angle) to change
+        // inside this method
         //
         
     drawSetup()
     {
+        this.setModelDrawPosition(this.position,this.angle);
     }
     
         //
@@ -650,7 +687,7 @@ export default class ProjectEntityClass
             // run the animation
             // and then call the setup
             
-        this.model.skeleton.runAnimation();
+        this.modelEntityAlter.runAnimation();
         this.drawSetup();
         
             // draw the model

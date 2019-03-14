@@ -32,9 +32,9 @@ class ConfigClass
             // play testing
             //
 
-        this.PLAYER_CLIP_WALLS=true;
-        this.PLAYER_FLY=true;
-        this.DRAW_ENTITY_BOUNDS=true;
+        this.PLAYER_CLIP_WALLS=false;
+        this.PLAYER_FLY=false;
+        this.DRAW_ENTITY_BOUNDS=false;
         this.DRAW_MODEL_SKELETONS=false;
         this.DRAW_COLLISION_PLANES=false;
         this.DRAW_PATHS=false;

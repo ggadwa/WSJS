@@ -126,6 +126,7 @@ export default class CoreClass
 
         this.drawMeshCount=0;
         this.drawTrigCount=0;
+        this.drawModelCount=0;
         
             // health
         
@@ -363,7 +364,6 @@ export default class CoreClass
     {
         let n;
         let light,tintOn,tintAtt,liquidIdx,liquid;
-        let weapon;
         let fpsStr,idx;
         let player=this.map.entityList.getPlayer();
          
@@ -437,29 +437,36 @@ export default class CoreClass
             
         this.drawMeshCount=0;
         this.drawTrigCount=0;
+        this.drawModelCount=0;
         
-            // draw the map
+            // draw the sky and map
             
         this.map.sky.draw();
         if (!config.DRAW_COLLISION_PLANES) {
-            this.map.meshList.draw(null,null,false);
+            this.map.meshList.draw(null);
         }
         else {
             this.map.meshList.debugDrawCollisionSurfaces();
         }
-        this.map.entityList.draw();
+        
+            // draw any non help entities
+            
+        this.map.entityList.draw(null);
+        
+            // any liquids
+            
         if (!config.DRAW_COLLISION_PLANES) this.map.liquidList.draw();
+        
+            // any effects
+            
         this.map.effectList.draw();
-      
-            // player weapon
-         
-         /*
-        weapon=player.getCurrentWeapon();
-        if (weapon!==null) {
-            this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-            weapon.draw(player);
-        }
-        */
+        
+            // and finally held entities,
+            // clearing the z buffer first
+            
+        this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+        this.map.entityList.draw(player);
+
             // setup any tinting
         
         tintOn=false;
@@ -511,7 +518,9 @@ export default class CoreClass
         
         this.text.drawStart();
         this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
-        this.text.drawWithShadow((this.wid-5),46,20,18,(this.drawMeshCount+'/'+this.drawTrigCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
+        this.text.drawWithShadow((this.wid-5),46,20,18,('mesh:'+this.drawMeshCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
+        this.text.drawWithShadow((this.wid-5),69,20,18,('trig:'+this.drawTrigCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
+        this.text.drawWithShadow((this.wid-5),92,20,18,('model:'+this.drawModelCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
         //this.text.drawWithShadow(30,(this.high-5),25,22,player.getCurrentWeaponDisplayString(),this.text.TEXT_ALIGN_LEFT,this.uiWeaponTextColor);
         
         if (this.paused) {

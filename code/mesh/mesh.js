@@ -47,10 +47,6 @@ export default class MeshClass
         this.originalXBound=new BoundClass(0,0);
         this.originalYBound=new BoundClass(0,0);
         this.originalZBound=new BoundClass(0,0);
-        
-            // flags
-            
-        this.show=true;
 
             // gl buffers
 
@@ -219,80 +215,6 @@ export default class MeshClass
         }
         
         this.setupBounds();
-    }
-    
-        //
-        // rebuild bound boxes to modelmatrix
-        // this is mostly used by models to fix bounding
-        // boxes for frustum culling, need to deal this
-        // on all 8 rectangle corners
-        //
-
-    recalcBoundsFromModelMatrix(modelMatrix)
-    {
-            // 8 corners of enclosing space
-            
-        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.min,this.originalZBound.min);
-        this.rotPoint.matrixMultiply(modelMatrix);
-        
-        this.xBound.setFromValues(this.rotPoint.x,this.rotPoint.x);
-        this.yBound.setFromValues(this.rotPoint.y,this.rotPoint.y);
-        this.zBound.setFromValues(this.rotPoint.z,this.rotPoint.z);
-        
-        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.min,this.originalZBound.max);
-        this.rotPoint.matrixMultiply(modelMatrix);
-
-        this.xBound.adjust(this.rotPoint.x);
-        this.yBound.adjust(this.rotPoint.y);
-        this.zBound.adjust(this.rotPoint.z);
-            
-        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.min,this.originalZBound.min);
-        this.rotPoint.matrixMultiply(modelMatrix);
-
-        this.xBound.adjust(this.rotPoint.x);
-        this.yBound.adjust(this.rotPoint.y);
-        this.zBound.adjust(this.rotPoint.z);
-
-        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.min,this.originalZBound.max);
-        this.rotPoint.matrixMultiply(modelMatrix);
-
-        this.xBound.adjust(this.rotPoint.x);
-        this.yBound.adjust(this.rotPoint.y);
-        this.zBound.adjust(this.rotPoint.z);
-            
-        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.max,this.originalZBound.min);
-        this.rotPoint.matrixMultiply(modelMatrix);
-        
-        this.xBound.adjust(this.rotPoint.x);
-        this.yBound.adjust(this.rotPoint.y);
-        this.zBound.adjust(this.rotPoint.z);
-        
-        this.rotPoint.setFromValues(this.originalXBound.min,this.originalYBound.max,this.originalZBound.max);
-        this.rotPoint.matrixMultiply(modelMatrix);
-
-        this.xBound.adjust(this.rotPoint.x);
-        this.yBound.adjust(this.rotPoint.y);
-        this.zBound.adjust(this.rotPoint.z);
-            
-        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.max,this.originalZBound.min);
-        this.rotPoint.matrixMultiply(modelMatrix);
-
-        this.xBound.adjust(this.rotPoint.x);
-        this.yBound.adjust(this.rotPoint.y);
-        this.zBound.adjust(this.rotPoint.z);
-
-        this.rotPoint.setFromValues(this.originalXBound.max,this.originalYBound.max,this.originalZBound.max);
-        this.rotPoint.matrixMultiply(modelMatrix);
-
-        this.xBound.adjust(this.rotPoint.x);
-        this.yBound.adjust(this.rotPoint.y);
-        this.zBound.adjust(this.rotPoint.z);
-
-            // and the center
-            
-        this.center.x=this.xBound.getMidPoint();
-        this.center.y=this.yBound.getMidPoint();
-        this.center.z=this.zBound.getMidPoint();
     }
     
         //
