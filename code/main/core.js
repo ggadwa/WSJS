@@ -9,6 +9,7 @@ import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
+import QuaternionClass from '../../code/utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import Matrix3Class from '../utility/matrix3.js';
 import InputClass from '../main/input.js';
@@ -75,11 +76,10 @@ export default class CoreClass
         this.perspectiveMatrix=new Matrix4Class();
         this.viewMatrix=new Matrix4Class();
         this.orthoMatrix=new Matrix4Class();
-
-            // billboarding matrixes
-
-        this.billboardXMatrix=new Matrix4Class();
-        this.billboardYMatrix=new Matrix4Class();
+        
+        this.eyeRotMatrix=new Matrix4Class();
+        this.eyeRotMatrix2=new Matrix4Class();
+        this.billboardMatrix=new Matrix4Class();
 
             // view lighting
 
@@ -382,12 +382,16 @@ export default class CoreClass
 
         this.perspectiveMatrix.setPerspectiveMatrix(this.OPENGL_FOV,this.aspect,this.OPENGL_NEAR_Z,this.OPENGL_FAR_Z);
 
-            // get the eye point and rotate it
-            // around the view position
+            // the eye point is -this.OPENGL_NEAR_Z behind
+            // the player
 
-        this.eyePos.setFromValues(this.camera.position.x,this.camera.position.y,(this.camera.position.z-this.OPENGL_NEAR_Z));
-        this.eyePos.rotateX(this.camera.position,this.camera.angle.x);
-        this.eyePos.rotateY(this.camera.position,this.camera.angle.y);
+        this.eyePos.setFromValues(0,0,-this.OPENGL_NEAR_Z);
+        this.eyeRotMatrix.setTranslationFromPoint(this.camera.position);
+        this.eyeRotMatrix2.setRotationFromYAngle(this.camera.angle.y);
+        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
+        this.eyeRotMatrix2.setRotationFromXAngle(this.camera.angle.x);
+        this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
+        this.eyePos.matrixMultiply(this.eyeRotMatrix);
 
             // setup the look at
 
@@ -400,8 +404,9 @@ export default class CoreClass
             // build the billboarding matrixes
             // mostly used for particles
             
-        this.billboardXMatrix.setRotationFromXAngle(this.camera.angle.x);
-        this.billboardYMatrix.setRotationFromYAngle(this.camera.angle.y);
+        this.billboardMatrix.setRotationFromYAngle(this.camera.angle.y);
+        this.eyeRotMatrix.setRotationFromXAngle(this.camera.angle.x);
+        this.billboardMatrix.multiply(this.eyeRotMatrix);
         
             // convert view lights to shader lights
             // all lights need a eye coordinate, so calc

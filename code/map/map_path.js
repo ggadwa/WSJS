@@ -47,8 +47,7 @@ export default class MapPathClass
             tempPoint.x=-nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -57,8 +56,7 @@ export default class MapPathClass
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -67,8 +65,7 @@ export default class MapPathClass
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -77,8 +74,7 @@ export default class MapPathClass
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);

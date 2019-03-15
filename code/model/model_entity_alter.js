@@ -21,8 +21,8 @@ export default class ModelEntityAlterClass
         this.core=core;
         this.entity=entity;
         
-        this.position=new PointClass(0,0,0);;
-        this.angle=new PointClass(0,0,0);
+        this.position=new PointClass(0,0,0);
+        this.quaternion=new QuaternionClass(0,0,0,1);
         
         this.noFrustumCull=false;
         this.meshHideList=new Uint8Array(ModelEntityAlterClass.MAX_MESH_COUNT);
@@ -105,11 +105,7 @@ export default class ModelEntityAlterClass
     {
         this.modelMatrix.setTranslationFromPoint(this.position);
         
-        this.rotMatrix.setRotationFromZAngle(this.angle.z);         // supergumba -- use quaternions in future
-        this.modelMatrix.multiply(this.rotMatrix);
-        this.rotMatrix.setRotationFromYAngle(this.angle.y);
-        this.modelMatrix.multiply(this.rotMatrix);
-        this.rotMatrix.setRotationFromXAngle(this.angle.x);
+        this.rotMatrix.setRotationFromQuaternion(this.quaternion);
         this.modelMatrix.multiply(this.rotMatrix);
         
         if (includeScale) {
@@ -128,66 +124,62 @@ export default class ModelEntityAlterClass
             
         this.cullModelMatrix.setTranslationFromPoint(this.position);
         
-        this.rotMatrix.setRotationFromZAngle(this.angle.z);         // supergumba -- use quaternions in future
-        this.cullModelMatrix.multiply(this.rotMatrix);
-        this.rotMatrix.setRotationFromYAngle(this.angle.y);
-        this.cullModelMatrix.multiply(this.rotMatrix);
-        this.rotMatrix.setRotationFromXAngle(this.angle.x);
+        this.rotMatrix.setRotationFromQuaternion(this.quaternion);
         this.cullModelMatrix.multiply(this.rotMatrix);
         
             // find the bounds by creating 8 corners
-            // that enclose the ellipse/cylinder of the entity
+            // that enclose the cylinder of the entity
             
-        this.rotPoint.setFromValues(-this.entity.xRadius,0,-this.entity.zRadius);
+        this.rotPoint.setFromValues(-this.entity.radius,0,-this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
         
         this.xBound.setFromValues(this.rotPoint.x,this.rotPoint.x);
         this.yBound.setFromValues(this.rotPoint.y,this.rotPoint.y);
         this.zBound.setFromValues(this.rotPoint.z,this.rotPoint.z);
         
-        this.rotPoint.setFromValues(-this.entity.xRadius,0,this.entity.zRadius);
+        this.rotPoint.setFromValues(-this.entity.radius,0,this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
 
         this.xBound.adjust(this.rotPoint.x);
         this.yBound.adjust(this.rotPoint.y);
         this.zBound.adjust(this.rotPoint.z);
             
-        this.rotPoint.setFromValues(this.entity.xRadius,0,-this.entity.zRadius);
+        this.rotPoint.setFromValues(this.entity.radius,0,-this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
 
         this.xBound.adjust(this.rotPoint.x);
         this.yBound.adjust(this.rotPoint.y);
         this.zBound.adjust(this.rotPoint.z);
 
-        this.rotPoint.setFromValues(this.entity.xRadius,0,this.entity.zRadius);
+        this.rotPoint.setFromValues(this.entity.radius,0,this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
 
         this.xBound.adjust(this.rotPoint.x);
         this.yBound.adjust(this.rotPoint.y);
         this.zBound.adjust(this.rotPoint.z);
             
-        this.rotPoint.setFromValues(-this.entity.xRadius,this.entity.height,-this.entity.zRadius);
+        this.rotPoint.setFromValues(-this.entity.radius,this.entity.height,-this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
         
         this.xBound.adjust(this.rotPoint.x);
         this.yBound.adjust(this.rotPoint.y);
         this.zBound.adjust(this.rotPoint.z);
         
-        this.rotPoint.setFromValues(-this.entity.xRadius,this.entity.height,this.entity.zRadius);
+        this.rotPoint.setFromValues(-this.entity.radius,this.entity.height,this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
 
         this.xBound.adjust(this.rotPoint.x);
         this.yBound.adjust(this.rotPoint.y);
         this.zBound.adjust(this.rotPoint.z);
             
-        this.rotPoint.setFromValues(this.entity.xRadius,this.entity.height,-this.entity.zRadius);
+        this.rotPoint.setFromValues(this.entity.radius,this.entity.height,-this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
 
         this.xBound.adjust(this.rotPoint.x);
         this.yBound.adjust(this.rotPoint.y);
         this.zBound.adjust(this.rotPoint.z);
 
-        this.rotPoint.setFromValues(this.entity.xRadius,this.entity.height,this.entity.zRadius);
+        this.rotPoint.setFromValues(this.entity.radius,this.entity.height,this.entity.radius);
         this.rotPoint.matrixMultiply(this.cullModelMatrix);
 
         this.xBound.adjust(this.rotPoint.x);
@@ -413,8 +405,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=-nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -423,8 +414,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -433,8 +423,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -443,8 +432,7 @@ export default class ModelEntityAlterClass
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+            tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
             vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
@@ -556,14 +544,14 @@ export default class ModelEntityAlterClass
         vIdx=0;
         iIdx=0;
         
-            // top and bottom ellipse
+            // top and bottom circle
             
         for (n=0;n!==36;n++) {
             rad=constants.DEGREE_TO_RAD*(n*10)
 
-            vertices[vIdx++]=entity.xRadius*Math.cos(rad);
+            vertices[vIdx++]=entity.radius*Math.sin(rad);
             vertices[vIdx++]=entity.height;
-            vertices[vIdx++]=entity.zRadius*Math.sin(rad);
+            vertices[vIdx++]=entity.radius*(-Math.cos(rad));
             
             indexes[iIdx++]=n;
             indexes[iIdx++]=(n===35)?0:(n+1);
@@ -572,9 +560,9 @@ export default class ModelEntityAlterClass
         for (n=0;n!==36;n++) {
             rad=constants.DEGREE_TO_RAD*(n*10)
 
-            vertices[vIdx++]=entity.xRadius*Math.cos(rad);
+            vertices[vIdx++]=entity.radius*Math.sin(rad);
             vertices[vIdx++]=0;
-            vertices[vIdx++]=entity.zRadius*Math.sin(rad);
+            vertices[vIdx++]=entity.radius*(-Math.cos(rad));
             
             indexes[iIdx++]=n+36;
             indexes[iIdx++]=(n===35)?36:(n+37);
@@ -585,12 +573,12 @@ export default class ModelEntityAlterClass
         for (n=0;n!==4;n++) {
             rad=constants.DEGREE_TO_RAD*(n*90);
 
-            vertices[vIdx++]=(entity.xRadius*Math.cos(rad));
+            vertices[vIdx++]=(entity.radius*Math.sin(rad));
             vertices[vIdx++]=entity.height;
-            vertices[vIdx++]=(entity.zRadius*Math.sin(rad));
-            vertices[vIdx++]=(entity.xRadius*Math.cos(rad));
+            vertices[vIdx++]=(entity.radius*(-Math.cos(rad)));
+            vertices[vIdx++]=(entity.radius*Math.sin(rad));
             vertices[vIdx++]=0;
-            vertices[vIdx++]=(entity.zRadius*Math.sin(rad));
+            vertices[vIdx++]=(entity.radius*-(Math.cos(rad)));
 
             indexes[iIdx++]=72+(n*2);
             indexes[iIdx++]=73+(n*2);

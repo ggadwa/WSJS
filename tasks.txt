@@ -6,32 +6,20 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
+quaternion update
+  - project_entity
+  - camera
+  - core.draw
+
+get rid of .rotate/.rotateX/etc from point
+get rid of setRotationFromZAngle from matrix
+get rid of core.eyeRotMatrix2 after quaternions
+
 - make dual castles a little bigger to stop head getting caught
-- need ellipse -> ellipse colliding
-- get rid of simple collision (maybe)
 - work on held gun position
-- held weapons need to always draw last and clear the Z
-- setModelDrawPosition to quaternions
-- all of modelEntityAlter to quaternions
+
 
 - animations seem to jump at times, maybe loop is bad
-
-
-
-0-90
-
-double t = Math.Atan( dHalfwidthEllipse * Math.Tan( dAngle * Math.Pi/180.0 ) 
-                                                    / dHalfheightEllipse);
-
-90-180
-
-double t = Math.Atan( dHalfwidthEllipse * Math.Tan( dAngle * Math.Pi/180.0 ) 
-                                                    / dHalfheightEllipse) + Math.Pi;
-
-etc
-
-
-
 
 need isEntityInRange('player') then check for E key on 
 

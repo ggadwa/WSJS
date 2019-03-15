@@ -2,14 +2,12 @@ import * as constants from '../main/constants.js';
 
 export default class QuaternionClass
 {
-    constructor()
+    constructor(x,y,z,w)
     {
-            // start with identity quaternion
-            
-        this.x=0;
-        this.y=0;
-        this.z=0;
-        this.w=1;
+        this.x=x;
+        this.y=y;
+        this.z=z;
+        this.w=w;
         
         Object.seal(this);
     }
@@ -108,12 +106,6 @@ export default class QuaternionClass
     
     copy()
     {
-        let quat=new QuaternionClass();
-        quat.x=this.x;
-        quat.y=this.y;
-        quat.z=this.z;
-        quat.w=this.w;
-        
-        return(quat);
+        return(new QuaternionClass(this.x,this.y,this.z,this.w));
     }
 }

@@ -100,7 +100,7 @@ export default class CollisionClass
         return(true);
     }
 
-    ellipseLineXZIntersection(collisionLine,circlePt,xRadius,zRadius,lineIntersectPt)
+    circleLineXZIntersection(collisionLine,circlePt,radius,lineIntersectPt)
     {
             // cast rays from the center of the circle
             // like spokes to check for collisions
@@ -114,8 +114,8 @@ export default class CollisionClass
         this.spokeLine.setFromValues(circlePt,this.spokePt);
 
         for (n=0;n!==24;n++) {
-            this.spokePt.x=circlePt.x+(xRadius*this.spokeCalcCos[n]);
-            this.spokePt.z=circlePt.z-(zRadius*this.spokeCalcSin[n]);   // everything is passed by pointer so this will change the spoke line
+            this.spokePt.x=circlePt.x+(radius*this.spokeCalcSin[n]);
+            this.spokePt.z=circlePt.z-(radius*this.spokeCalcCos[n]);   // everything is passed by pointer so this will change the spoke line
 
             if (this.collisionLineToLineXZIntersection(collisionLine,this.spokeLine,circlePt.y,this.spokeHitPt)) {
                 dist=circlePt.noSquareDistance(this.spokeHitPt);
@@ -165,9 +165,7 @@ export default class CollisionClass
         let dist,currentDist;
         
         let origPt=entity.position;
-        let xRadius=entity.xRadius;
-        let zRadius=entity.zRadius;
-        let maxRadius=Math.max(xRadius,zRadius);
+        let radius=entity.radius;
         let high=entity.height;
         
         let nMesh=this.core.map.meshList.meshes.length;
@@ -179,9 +177,9 @@ export default class CollisionClass
         
             // the rough collide boxes
             
-        this.objXBound.setFromValues((entity.position.x-maxRadius),(entity.position.x+maxRadius));
+        this.objXBound.setFromValues((entity.position.x-radius),(entity.position.x+radius));
         this.objYBound.setFromValues(entity.position.y,(entity.position.y+high));
-        this.objZBound.setFromValues((entity.position.z-maxRadius),(entity.position.z+maxRadius));
+        this.objZBound.setFromValues((entity.position.z-radius),(entity.position.z+radius));
         
             // no collisions yet
             
@@ -216,7 +214,7 @@ export default class CollisionClass
 
                     // check against line
                     
-                if (!this.ellipseLineXZIntersection(collisionLine,entity.position,xRadius,zRadius,this.moveIntersectPt)) continue;
+                if (!this.circleLineXZIntersection(collisionLine,entity.position,radius,this.moveIntersectPt)) continue;
 
                     // find closest hit point
 
@@ -246,7 +244,7 @@ export default class CollisionClass
 
                 // check the circle
 
-            if (!this.circleCircleIntersection(entity.position,maxRadius,checkEntityPt,Math.max(checkEntity.xRadius,checkEntity.zRadius),this.moveIntersectPt)) continue;
+            if (!this.circleCircleIntersection(entity.position,radius,checkEntityPt,checkEntity.radius,this.moveIntersectPt)) continue;
 
                 // find closest hit point
 
@@ -274,10 +272,8 @@ export default class CollisionClass
             // always outside the max radius of the ellipse
         
         this.radiusPt.setFromValues((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
-        
         this.radiusPt.normalize();
-        this.radiusPt.scale(maxRadius);
-        
+        this.radiusPt.scale(radius);
         this.radiusPt.addPoint(currentHitPt);
         
         return(this.radiusPt);
@@ -296,9 +292,7 @@ export default class CollisionClass
         let dist,currentDist;
         
         let origPt=entity.position;
-        let xRadius=entity.xRadius;
-        let zRadius=entity.zRadius;
-        let maxRadius=Math.max(xRadius,zRadius);
+        let radius=entity.radius;
         let high=entity.height;
         
         let nMesh=this.core.map.meshList.meshes.length;
@@ -316,9 +310,9 @@ export default class CollisionClass
         
             // the rough collide boxes
             
-        this.objXBound.setFromValues((this.testPt.x-maxRadius),(this.testPt.x+maxRadius));
+        this.objXBound.setFromValues((this.testPt.x-radius),(this.testPt.x+radius));
         this.objYBound.setFromValues(this.testPt.y,(this.testPt.y+high));
-        this.objZBound.setFromValues((this.testPt.z-maxRadius),(this.testPt.z+maxRadius));
+        this.objZBound.setFromValues((this.testPt.z-radius),(this.testPt.z+radius));
         
             // no collisions yet
             
@@ -361,7 +355,7 @@ export default class CollisionClass
                     
                         // check against line
                     
-                    if (!this.ellipseLineXZIntersection(collisionLine,this.testPt,xRadius,zRadius,this.moveIntersectPt)) continue;
+                    if (!this.circleLineXZIntersection(collisionLine,this.testPt,radius,this.moveIntersectPt)) continue;
                     
                         // find closest hit point
 
@@ -394,7 +388,7 @@ export default class CollisionClass
                 
                     // check the circle
                     
-                if (!this.circleCircleIntersection(this.testPt,maxRadius,checkEntityPt,Math.max(checkEntity.xRadius,checkEntity.zRadius),this.moveIntersectPt)) continue;
+                if (!this.circleCircleIntersection(this.testPt,radius,checkEntityPt,checkEntity.radius,this.moveIntersectPt)) continue;
                 
                     // find closest hit point
 
@@ -444,7 +438,7 @@ export default class CollisionClass
         
         this.radiusPt.setFromValues((origPt.x-currentHitPt.x),0,(origPt.z-currentHitPt.z));
         this.radiusPt.normalize();
-        this.radiusPt.scale(maxRadius);
+        this.radiusPt.scale(radius);
         this.radiusPt.addPoint(currentHitPt);
         
             // and the new move is the original
@@ -465,13 +459,13 @@ export default class CollisionClass
             // use spokes (around the radius) plus
             // an extra for the middle
         
-        radius=entity.xRadius;
+        radius=entity.radius;
         
         x=entity.position.x;
         z=entity.position.z;
         
         for (n=0;n!==24;n++) {
-            this.rayPoints[n].setFromValues((x+(radius*this.spokeCalcSin[n])),y,(z+(radius*this.spokeCalcCos[n])));
+            this.rayPoints[n].setFromValues((x+(radius*this.spokeCalcSin[n])),y,(z-(radius*this.spokeCalcCos[n])));
         }
         
         this.rayPoints[24].setFromValues(x,y,z);
@@ -486,9 +480,9 @@ export default class CollisionClass
             // floor_rise_height is the farthest
             // we can move up and down a floor segment
             
-        this.objXBound.setFromValues((entity.position.x-entity.xRadius),(entity.position.x+entity.xRadius));
+        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
         this.objYBound.setFromValues((entity.position.y-constants.FLOOR_RISE_HEIGHT),(entity.position.y+constants.FLOOR_RISE_HEIGHT));
-        this.objZBound.setFromValues((entity.position.z-entity.zRadius),(entity.position.z+entity.zRadius));
+        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
             // build the ray trace points
             // from the bottom of the entity cylinder
@@ -568,9 +562,9 @@ export default class CollisionClass
             // (to catch things moving into us or pushing past ceiling)
             // to the furtherest we are trying to rise
             
-        this.objXBound.setFromValues((entity.position.x-entity.xRadius),(entity.position.x+entity.zRadius));
+        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
         this.objYBound.setFromValues((entity.position.y+entity.height),((entity.position.y+entity.height)+riseY));
-        this.objZBound.setFromValues((entity.position.z-entity.zRadius),(entity.position.z+entity.zRadius));
+        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
             // build the ray trace points
             // from the top of the entity cylinder

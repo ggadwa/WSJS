@@ -412,7 +412,7 @@ export default class ImportGLTFClass
             // now reverse build the matrixes
             
         translation=new PointClass(0,0,0);
-        rotation=new QuaternionClass();
+        rotation=new QuaternionClass(0,0,0,1);
         scale=new PointClass(1,1,1);
         mat=new Matrix4Class();
         mat2=new Matrix4Class();
@@ -472,7 +472,7 @@ export default class ImportGLTFClass
             // find this nodes TRS
             
         translation=new PointClass(0,0,0);
-        rotation=new QuaternionClass();
+        rotation=new QuaternionClass(0,0,0,1);
         scale=new PointClass(1,1,1);
         
             // check for matrixes first

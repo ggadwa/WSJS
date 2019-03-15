@@ -68,8 +68,7 @@ export default class ProjectEffectClass
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -84,8 +83,7 @@ export default class ProjectEffectClass
         this.tempPoint.y=-halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -100,8 +98,7 @@ export default class ProjectEffectClass
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;
@@ -116,8 +113,7 @@ export default class ProjectEffectClass
         this.tempPoint.y=halfHigh;
         this.tempPoint.z=0.0;
         if (rot!==0.0) this.tempPoint.rotateZ(null,rot);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardXMatrix);
-        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardYMatrix);
+        this.tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.x+centerPnt.x;
         this.billboardQuadVertexes[this.billboardQuadVertexIdx++]=this.tempPoint.y+centerPnt.y;

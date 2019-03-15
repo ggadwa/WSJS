@@ -1,6 +1,7 @@
 import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
+import QuaternionClass from '../utility/quaternion.js';
 import ModelClass from '../model/model.js';
 import ModelEntityAlterClass from '../model/model_entity_alter.js';
 import CollisionClass from '../collision/collisions.js';
@@ -16,8 +17,7 @@ export default class ProjectEntityClass
         this.core=core;
         
         this.name=name;
-        this.xRadius=1;
-        this.zRadius=1;
+        this.radius=1;
         this.height=1;
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
@@ -127,7 +127,7 @@ export default class ProjectEntityClass
     setModelDrawPosition(position,angle)
     {
         this.modelEntityAlter.position.setFromPoint(position);
-        this.modelEntityAlter.angle.setFromPoint(angle);
+        this.modelEntityAlter.quaternion.setFromVectorAndAngle(0,1,0,angle.y);
     }
     
     startModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
@@ -666,7 +666,7 @@ export default class ProjectEntityClass
         // override this if you want to change how a model is setup
         // or positioned in the scene.  the default is just to
         // position the model the same as the entity's position and
-        // angle.  use setModelDrawPosition(position,angle) to change
+        // angle.  use setModelDrawPosition([PointClass],[QuaternionClass]) to change
         // inside this method
         //
         
