@@ -19,8 +19,8 @@ export default class ProjectEntityClass
         this.name=name;
         this.radius=1;
         this.height=1;
-        this.position=new PointClass(0,0,0);
-        this.angle=new PointClass(0,0,0);
+        this.position=position.copy();
+        this.angle=angle.copy();
         
         this.show=true;
         this.heldBy=null;
@@ -28,11 +28,7 @@ export default class ProjectEntityClass
         this.model=null;
         this.modelEntityAlter=null;
         
-        if (position!==null) this.position.setFromPoint(position);
-        if (angle!==null) this.angle.setFromPoint(angle);
-        
-        this.positionBackup=new PointClass(0,0,0);
-        this.positionBackup.setFromPoint(this.position);
+        this.positionBackup=this.position.copy();
         
         this.eyeOffset=0;
 
@@ -127,7 +123,7 @@ export default class ProjectEntityClass
     setModelDrawPosition(position,angle)
     {
         this.modelEntityAlter.position.setFromPoint(position);
-        this.modelEntityAlter.quaternion.setFromVectorAndAngle(0,1,0,angle.y);
+        this.modelEntityAlter.angle.setFromPoint(angle);
     }
     
     startModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
@@ -175,7 +171,7 @@ export default class ProjectEntityClass
     sendMessage(data)
     {
     }
-    
+        
         //
         // start and stop movements
         //

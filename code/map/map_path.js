@@ -1,3 +1,6 @@
+import PointClass from '../utility/point.js';
+import Matrix4Class from '../utility/matrix4.js';
+
 //
 // map path class
 //
@@ -11,32 +14,40 @@ export default class MapPathClass
         this.nodes=[];
     }
     
-    /*
         //
         // draw the path for debug purposes
         // note this is not optimal and slow!
         //
         
-    debugDrawPath(modelMatrix,scale)
+    debugDrawPath()
     {
-        let n,nNode,node,parentNode;
+        let n,k,nNode,nLine,node,linkNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;
         let lineCount,lineElementOffset,lineVertexStartIdx;
         let vertexBuffer,indexBuffer;
-        let nodeSize=50;
+        let nodeSize=250;
         let gl=this.core.gl;
         let shader=this.core.shaderList.debugShader;
         let tempPoint=new PointClass(0,0,0);
+        let identityModelMatrix=new Matrix4Class();
         
-            // any skeleton?
+            // any nodes?
         
-        nNode=this.nodes.length;    
+        nNode=this.nodes.length;
         if (nNode===0) return;
         
-            // skeleton nodes
+            // get total line count
             
-        vertices=new Float32Array(((3*4)*nNode)+((3*2)*nNode));
-        indexes=new Uint16Array((nNode*6)+(nNode*2));           // count for node billboard quads and node lines
+        nLine=0;
+        
+        for (n=0;n!==nNode;n++) {
+            nLine+=this.nodes[n].links.length;
+        }
+        
+            // path nodes
+            
+        vertices=new Float32Array(((3*4)*nNode)+((3*2)*nLine));
+        indexes=new Uint16Array((nNode*6)+(nLine*2));
         
         vIdx=0;
         iIdx=0;
@@ -49,36 +60,36 @@ export default class MapPathClass
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+node.position.x;
+            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=tempPoint.z+node.position.z;
 
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+node.position.x;
+            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=tempPoint.z+node.position.z;
 
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+node.position.x;
+            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=tempPoint.z+node.position.z;
 
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+node.position.x;
+            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=tempPoint.z+node.position.z;
 
             elementIdx=n*4;
             
@@ -91,28 +102,26 @@ export default class MapPathClass
             indexes[iIdx++]=elementIdx+3;
         }
         
-        lineCount=0;
         lineElementOffset=iIdx;
         lineVertexStartIdx=Math.trunc(vIdx/3);
         
         for (n=0;n!==nNode;n++) {
             node=this.nodes[n];
-            if (node.parentNodeIdx===-1) continue;
+
+            for (k=0;k!==node.links.length;k++) {
+                linkNode=this.nodes[node.links[k]];
             
-            parentNode=this.nodes[node.parentNodeIdx];
-            
-            vertices[vIdx++]=node.curPosePosition.x*scale.x;
-            vertices[vIdx++]=node.curPosePosition.y*scale.y;
-            vertices[vIdx++]=node.curPosePosition.z*scale.z;
-            
-            vertices[vIdx++]=parentNode.curPosePosition.x*scale.x;
-            vertices[vIdx++]=parentNode.curPosePosition.y*scale.y;
-            vertices[vIdx++]=parentNode.curPosePosition.z*scale.z;
-            
-            indexes[iIdx++]=lineVertexStartIdx++;
-            indexes[iIdx++]=lineVertexStartIdx++;
-            
-            lineCount++;
+                vertices[vIdx++]=node.position.x;
+                vertices[vIdx++]=node.position.y;
+                vertices[vIdx++]=node.position.z;
+
+                vertices[vIdx++]=linkNode.position.x;
+                vertices[vIdx++]=linkNode.position.y;
+                vertices[vIdx++]=linkNode.position.z;
+
+                indexes[iIdx++]=lineVertexStartIdx++;
+                indexes[iIdx++]=lineVertexStartIdx++;
+            }
         }
        
             // build the buffers
@@ -125,29 +134,28 @@ export default class MapPathClass
         indexBuffer=gl.createBuffer();
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.DYNAMIC_DRAW);
         
             // always draw it, no matter what
             
         gl.disable(gl.DEPTH_TEST);
 
-            // draw the skeleton
+        shader.drawStart();
+        
+            // the debug shader has a model matrix, so
+            // we set that to the identity
             
-        shader.drawStart(0,1,0);
-            
-        gl.uniformMatrix4fv(shader.modelMatrixUniform,false,modelMatrix.data);
+        this.core.gl.uniformMatrix4fv(shader.modelMatrixUniform,false,identityModelMatrix.data);
         
             // the lines
             
-        gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
+        gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
         gl.drawElements(gl.LINES,(lineCount*2),gl.UNSIGNED_SHORT,(lineElementOffset*2));
         
             // the nodes
             
-        gl.uniform3f(shader.colorUniform,1.0,0.0,1.0);
+        gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
         gl.drawElements(gl.TRIANGLES,(nNode*6),gl.UNSIGNED_SHORT,0);
-        
-            // the nodes
         
         shader.drawEnd();
         
@@ -163,5 +171,5 @@ export default class MapPathClass
         gl.deleteBuffer(vertexBuffer);
         gl.deleteBuffer(indexBuffer);
     }
-    */
+
 }

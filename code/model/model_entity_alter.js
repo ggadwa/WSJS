@@ -22,7 +22,7 @@ export default class ModelEntityAlterClass
         this.entity=entity;
         
         this.position=new PointClass(0,0,0);
-        this.quaternion=new QuaternionClass(0,0,0,1);
+        this.angle=new PointClass(0,0,0);
         
         this.noFrustumCull=false;
         this.meshHideList=new Uint8Array(ModelEntityAlterClass.MAX_MESH_COUNT);
@@ -105,7 +105,11 @@ export default class ModelEntityAlterClass
     {
         this.modelMatrix.setTranslationFromPoint(this.position);
         
-        this.rotMatrix.setRotationFromQuaternion(this.quaternion);
+        this.rotMatrix.setRotationFromYAngle(this.angle.z);
+        this.modelMatrix.multiply(this.rotMatrix);
+        this.rotMatrix.setRotationFromYAngle(this.angle.y);
+        this.modelMatrix.multiply(this.rotMatrix);
+        this.rotMatrix.setRotationFromXAngle(this.angle.x);
         this.modelMatrix.multiply(this.rotMatrix);
         
         if (includeScale) {
@@ -124,7 +128,11 @@ export default class ModelEntityAlterClass
             
         this.cullModelMatrix.setTranslationFromPoint(this.position);
         
-        this.rotMatrix.setRotationFromQuaternion(this.quaternion);
+        this.rotMatrix.setRotationFromYAngle(this.angle.z);
+        this.cullModelMatrix.multiply(this.rotMatrix);
+        this.rotMatrix.setRotationFromYAngle(this.angle.y);
+        this.cullModelMatrix.multiply(this.rotMatrix);
+        this.rotMatrix.setRotationFromXAngle(this.angle.x);
         this.cullModelMatrix.multiply(this.rotMatrix);
         
             // find the bounds by creating 8 corners
@@ -491,7 +499,7 @@ export default class ModelEntityAlterClass
 
             // draw the skeleton
             
-        shader.drawStart(0,1,0);
+        shader.drawStart();
             
         gl.uniformMatrix4fv(shader.modelMatrixUniform,false,this.modelMatrix.data);
         
@@ -602,7 +610,7 @@ export default class ModelEntityAlterClass
 
             // draw the lines
             
-        shader.drawStart(0,1,0);
+        shader.drawStart();
             
         gl.uniformMatrix4fv(shader.modelMatrixUniform,false,this.modelMatrix.data);
         

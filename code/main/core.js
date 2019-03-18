@@ -454,7 +454,11 @@ export default class CoreClass
             this.map.meshList.debugDrawCollisionSurfaces();
         }
         
-            // draw any non help entities
+            // path debugging
+            
+        if (config.DRAW_PATHS) this.map.path.debugDrawPath();
+        
+            // draw any non held entities
             
         this.map.entityList.draw(null);
         
