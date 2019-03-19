@@ -524,6 +524,81 @@ export default class PointClass
         return((this.x===0) && (this.y===0) && (this.z===0));
     }
     
+    moveXWithAcceleration(movePos,moveNeg,acceleration,deceleration,maxValue)
+    {
+        if (movePos) {
+            this.x+=acceleration;
+            if (this.x>maxValue) this.x=maxValue;
+        }
+        else {
+            if (!moveNeg) {
+                this.x-=deceleration;
+                if (this.x<0) this.x=0;
+            }
+        }
+        
+        if (moveNeg) {
+            this.x-=acceleration;
+            if (this.x<-maxValue) this.x=-maxValue;
+        }
+        else {
+            if (!movePos) {
+                this.x+=deceleration;
+                if (this.x>0) this.x=0;
+            }
+        }
+    }
+    
+    moveYWithAcceleration(movePos,moveNeg,acceleration,deceleration,maxValue)
+    {
+        if (movePos) {
+            this.y+=acceleration;
+            if (this.y>maxValue) this.y=maxValue;
+        }
+        else {
+            if (!moveNeg) {
+                this.y-=deceleration;
+                if (this.y<0) this.y=0;
+            }
+        }
+        
+        if (moveNeg) {
+            this.y-=acceleration;
+            if (this.y<-maxValue) this.y=-maxValue;
+        }
+        else {
+            if (!movePos) {
+                this.y+=deceleration;
+                if (this.y>0) this.y=0;
+            }
+        }
+    }
+    
+    moveZWithAcceleration(movePos,moveNeg,acceleration,deceleration,maxValue)
+    {
+        if (movePos) {
+            this.z+=acceleration;
+            if (this.z>maxValue) this.z=maxValue;
+        }
+        else {
+            if (!moveNeg) {
+                this.z-=deceleration;
+                if (this.z<0) this.z=0;
+            }
+        }
+        
+        if (moveNeg) {
+            this.z-=acceleration;
+            if (this.z<-maxValue) this.z=-maxValue;
+        }
+        else {
+            if (!movePos) {
+                this.z+=deceleration;
+                if (this.z>0) this.z=0;
+            }
+        }
+    }
+    
     copy()
     {
         return(new PointClass(this.x,this.y,this.z));

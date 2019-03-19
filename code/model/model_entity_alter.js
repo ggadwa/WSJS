@@ -393,6 +393,7 @@ export default class ModelEntityAlterClass
         let shader=this.core.shaderList.debugShader;
         let scale=this.entity.model.scale;
         let tempPoint=new PointClass(0,0,0);
+        let posePoint=new PointClass(0,0,0);
         
             // any skeleton?
         
@@ -410,41 +411,50 @@ export default class ModelEntityAlterClass
         for (n=0;n!==nNode;n++) {
             node=this.nodes[n];
             
+                // get pose point in world coordinates
+                
+            posePoint.x=node.curPosePosition.x*scale.x;
+            posePoint.y=node.curPosePosition.y*scale.y;
+            posePoint.z=node.curPosePosition.z*scale.z;
+            posePoint.matrixMultiply(this.modelMatrix);
+            
+                // now the billboarded quad points
+            
             tempPoint.x=-nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+posePoint.x;
+            vertices[vIdx++]=tempPoint.y+posePoint.y;
+            vertices[vIdx++]=tempPoint.z+posePoint.z;
 
             tempPoint.x=nodeSize;
             tempPoint.y=-nodeSize;
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+posePoint.x;
+            vertices[vIdx++]=tempPoint.y+posePoint.y;
+            vertices[vIdx++]=tempPoint.z+posePoint.z;
 
             tempPoint.x=nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+posePoint.x;
+            vertices[vIdx++]=tempPoint.y+posePoint.y;
+            vertices[vIdx++]=tempPoint.z+posePoint.z;
 
             tempPoint.x=-nodeSize;
             tempPoint.y=nodeSize;
             tempPoint.z=0.0;
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
-            vertices[vIdx++]=tempPoint.x+(node.curPosePosition.x*scale.x);
-            vertices[vIdx++]=tempPoint.y+(node.curPosePosition.y*scale.y);
-            vertices[vIdx++]=tempPoint.z+(node.curPosePosition.z*scale.z);
+            vertices[vIdx++]=tempPoint.x+posePoint.x;
+            vertices[vIdx++]=tempPoint.y+posePoint.y;
+            vertices[vIdx++]=tempPoint.z+posePoint.z;
 
             elementIdx=n*4;
             
@@ -465,15 +475,25 @@ export default class ModelEntityAlterClass
             node=this.nodes[n];
             if (node.parentNodeIdx===-1) continue;
             
+            posePoint.x=node.curPosePosition.x*scale.x;
+            posePoint.y=node.curPosePosition.y*scale.y;
+            posePoint.z=node.curPosePosition.z*scale.z;
+            posePoint.matrixMultiply(this.modelMatrix);
+            
+            vertices[vIdx++]=posePoint.x;
+            vertices[vIdx++]=posePoint.y;
+            vertices[vIdx++]=posePoint.z;
+            
             parentNode=this.nodes[node.parentNodeIdx];
             
-            vertices[vIdx++]=node.curPosePosition.x*scale.x;
-            vertices[vIdx++]=node.curPosePosition.y*scale.y;
-            vertices[vIdx++]=node.curPosePosition.z*scale.z;
+            posePoint.x=parentNode.curPosePosition.x*scale.x;
+            posePoint.y=parentNode.curPosePosition.y*scale.y;
+            posePoint.z=parentNode.curPosePosition.z*scale.z;
+            posePoint.matrixMultiply(this.modelMatrix);
             
-            vertices[vIdx++]=parentNode.curPosePosition.x*scale.x;
-            vertices[vIdx++]=parentNode.curPosePosition.y*scale.y;
-            vertices[vIdx++]=parentNode.curPosePosition.z*scale.z;
+            vertices[vIdx++]=posePoint.x;
+            vertices[vIdx++]=posePoint.y;
+            vertices[vIdx++]=posePoint.z;
             
             indexes[iIdx++]=lineVertexStartIdx++;
             indexes[iIdx++]=lineVertexStartIdx++;
@@ -500,8 +520,6 @@ export default class ModelEntityAlterClass
             // draw the skeleton
             
         shader.drawStart();
-            
-        gl.uniformMatrix4fv(shader.modelMatrixUniform,false,this.modelMatrix.data);
         
             // the lines
             
@@ -557,9 +575,9 @@ export default class ModelEntityAlterClass
         for (n=0;n!==36;n++) {
             rad=constants.DEGREE_TO_RAD*(n*10)
 
-            vertices[vIdx++]=entity.radius*Math.sin(rad);
-            vertices[vIdx++]=entity.height;
-            vertices[vIdx++]=entity.radius*(-Math.cos(rad));
+            vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
+            vertices[vIdx++]=this.position.y+entity.height;
+            vertices[vIdx++]=this.position.z+(entity.radius*(-Math.cos(rad)));
             
             indexes[iIdx++]=n;
             indexes[iIdx++]=(n===35)?0:(n+1);
@@ -568,9 +586,9 @@ export default class ModelEntityAlterClass
         for (n=0;n!==36;n++) {
             rad=constants.DEGREE_TO_RAD*(n*10)
 
-            vertices[vIdx++]=entity.radius*Math.sin(rad);
-            vertices[vIdx++]=0;
-            vertices[vIdx++]=entity.radius*(-Math.cos(rad));
+            vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
+            vertices[vIdx++]=this.position.y;
+            vertices[vIdx++]=this.position.z+(entity.radius*(-Math.cos(rad)));
             
             indexes[iIdx++]=n+36;
             indexes[iIdx++]=(n===35)?36:(n+37);
@@ -581,12 +599,13 @@ export default class ModelEntityAlterClass
         for (n=0;n!==4;n++) {
             rad=constants.DEGREE_TO_RAD*(n*90);
 
-            vertices[vIdx++]=(entity.radius*Math.sin(rad));
-            vertices[vIdx++]=entity.height;
-            vertices[vIdx++]=(entity.radius*(-Math.cos(rad)));
-            vertices[vIdx++]=(entity.radius*Math.sin(rad));
-            vertices[vIdx++]=0;
-            vertices[vIdx++]=(entity.radius*-(Math.cos(rad)));
+            vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
+            vertices[vIdx++]=this.position.y+entity.height;
+            vertices[vIdx++]=this.position.z+(entity.radius*(-Math.cos(rad)));
+            
+            vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
+            vertices[vIdx++]=this.position.y;
+            vertices[vIdx++]=this.position.z+(entity.radius*-(Math.cos(rad)));
 
             indexes[iIdx++]=72+(n*2);
             indexes[iIdx++]=73+(n*2);
@@ -611,8 +630,6 @@ export default class ModelEntityAlterClass
             // draw the lines
             
         shader.drawStart();
-            
-        gl.uniformMatrix4fv(shader.modelMatrixUniform,false,this.modelMatrix.data);
         
             // the lines
             

@@ -32,7 +32,7 @@ class ConfigClass
             // play testing
             //
 
-        this.PLAYER_CLIP_WALLS=false;
+        this.PLAYER_NO_CLIP=false;
         this.PLAYER_FLY=false;
         this.DRAW_ENTITY_BOUNDS=false;
         this.DRAW_MODEL_SKELETONS=false;

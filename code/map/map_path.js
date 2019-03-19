@@ -23,13 +23,12 @@ export default class MapPathClass
     {
         let n,k,nNode,nLine,node,linkNode;
         let vertices,indexes,vIdx,iIdx,elementIdx;
-        let lineCount,lineElementOffset,lineVertexStartIdx;
+        let lineElementOffset,lineVertexStartIdx;
         let vertexBuffer,indexBuffer;
         let nodeSize=250;
         let gl=this.core.gl;
         let shader=this.core.shaderList.debugShader;
         let tempPoint=new PointClass(0,0,0);
-        let identityModelMatrix=new Matrix4Class();
         
             // any nodes?
         
@@ -142,15 +141,10 @@ export default class MapPathClass
 
         shader.drawStart();
         
-            // the debug shader has a model matrix, so
-            // we set that to the identity
-            
-        this.core.gl.uniformMatrix4fv(shader.modelMatrixUniform,false,identityModelMatrix.data);
-        
             // the lines
             
         gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
-        gl.drawElements(gl.LINES,(lineCount*2),gl.UNSIGNED_SHORT,(lineElementOffset*2));
+        gl.drawElements(gl.LINES,(nLine*2),gl.UNSIGNED_SHORT,(lineElementOffset*2));
         
             // the nodes
             

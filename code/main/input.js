@@ -159,26 +159,18 @@ export default class InputClass
         
             // request the pointer lock
             
-        if (this.core.canvas.requestPointerLock) {
-            document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
-            document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-            this.core.canvas.requestPointerLock();
-        }
-        else {
-            console.log('Pointer lock not supported, no mouse control');
-            return;
-        }
+        document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
+        document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
+        this.core.canvas.requestPointerLock();
     }
     
     mouseEnd()
     {
             // stop pointer lock
             
-        if (document.exitPointerLock) {
-            document.exitPointerLock();
-            document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
-            document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
-        }
+        document.exitPointerLock();
+        document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
+        document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
     }
     
     mouseButtonClear()
@@ -214,12 +206,7 @@ export default class InputClass
     
     pointerLockChange(event)
     {
-        let elem=null;
-        if (document.pointerLockElement) elem=document.pointerLockElement;
-        if (document.mozPointerLockElement) elem=document.mozPointerLockElement;
-        if (document.webkitPointerLockElement) elem=document.webkitPointerLockElement;
-        
-        if (elem===this.core.canvas) {
+        if (document.pointerLockElement===this.core.canvas) {
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
             document.addEventListener('wheel',this.mouseWheelListener,false);

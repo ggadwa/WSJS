@@ -21,7 +21,6 @@ export default class MeshListClass
             
         this.normalMatrix=new Matrix3Class();
         this.modelViewMatrix=new Matrix4Class();
-        this.identityModelMatrix=new Matrix4Class();
 
         Object.seal(this);
     }
@@ -300,11 +299,6 @@ export default class MeshListClass
         let shader=this.core.shaderList.debugShader;
         
         shader.drawStart();
-        
-            // the debug shader has a model matrix, so
-            // we set that to the identity
-            
-        this.core.gl.uniformMatrix4fv(shader.modelMatrixUniform,false,this.identityModelMatrix.data);
         
             // arrays for any drawing
             

@@ -6,9 +6,11 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
+- make a path creator
 - possible new hand model
 - crosshair
 
+- why is mouse wheel broken?
 - animations seem to jump at times, maybe loop is bad
 
 need isEntityInRange('player') then check for E key on 
@@ -17,6 +19,12 @@ sort effects, will need a sort z call into the effect
 entites need data
 
 work on paths
+
+project_entity clean up
+        this.gravityMinValue=10;
+        this.gravityMaxValue=280;
+        this.gravityAcceleration=10;
+
 
 2. liquids need to draw away from z
 
@@ -30,10 +38,6 @@ model angle by quaternions
 9. get rid of constants, use statics
 
 project_entity to remove
-    setMovementForward(on)
-    setMovementBackward(on)
-    setMovementSideLeft(on)
-    setMovementSideRight(on)
     movementBounce(bounceFactor)
     movementJump(jumpValue)
     movementReflect()

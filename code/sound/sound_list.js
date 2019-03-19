@@ -154,7 +154,7 @@ export default class SoundListClass
         
             // update listener
             
-        this.listenerForwardVector.setFromValues(0.0,0.0,-1.0);
+        this.listenerForwardVector.setFromValues(0,0,-1);
         this.listenerForwardVector.rotateY(null,this.currentListenerEntity.angle.y);
         
         this.listener.positionX.value=this.currentListenerEntity.position.x;

@@ -11,14 +11,13 @@ export default class DebugShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/model_skeleton.vert';
-        this.fragmentShaderURL='shaders/model_skeleton.frag';
+        this.vertexShaderURL='shaders/debug.vert';
+        this.fragmentShaderURL='shaders/debug.frag';
         
         this.vertexPositionAttribute=null;
 
         this.perspectiveMatrixUniform=null;
         this.viewMatrixUniform=null;
-        this.modelMatrixUniform=null;
         
         this.colorUniform=null;
         
@@ -41,7 +40,6 @@ export default class DebugShaderClass extends ShaderClass
 
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
-        this.modelMatrixUniform=gl.getUniformLocation(this.program,'modelMatrix');
 
         this.colorUniform=gl.getUniformLocation(this.program,'color');
 

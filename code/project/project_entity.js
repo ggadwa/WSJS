@@ -41,19 +41,6 @@ export default class ProjectEntityClass
         this.gravityMaxValue=280;
         this.gravityAcceleration=10;
         
-        this.movementForwardMaxSpeed=0;
-        this.movementForwardAcceleration=0;
-        this.movementForwardDeceleration=0;
-        this.movementSideMaxSpeed=0;
-        this.movementSideAcceleration=0;
-        this.movementSideDeceleration=0;
-
-        this.movementForwardOn=false;
-        this.movementBackwardOn=false;
-        this.movementSideLeftOn=false;
-        this.movementSideRightOn=false;
-        
-        this.movement=new PointClass(0,0,0);
         this.gravity=this.gravityMinValue;
         
         this.markedForDeletion=false;              // used to delete this outside the run loop
@@ -67,7 +54,6 @@ export default class ProjectEntityClass
         
         this.damageTintStartTick=-1;
 
-        this.movePt=new PointClass(0,0,0);     // this are global to stop them being local and GC'd
         this.checkMovePt=new PointClass(0,0,0);
         this.collideMovePt=new PointClass(0,0,0);
         this.collideSlideMovePt=new PointClass(0,0,0);
@@ -171,54 +157,46 @@ export default class ProjectEntityClass
     sendMessage(data)
     {
     }
-        
-        //
-        // start and stop movements
-        //
-        
-    setMovementForward(on)
-    {
-        this.movementForwardOn=on;
-    }
-    
-    setMovementBackward(on)
-    {
-        this.movementBackwardOn=on;
-    }
-    
-    setMovementSideLeft(on)
-    {
-        this.movementSideLeftOn=on;
-    }
-    
-    setMovementSideRight(on)
-    {
-        this.movementSideRightOn=on;
-    }
     
         //
-        // utility to backup and restore position
+        // path utilities
         //
         
-    backupPosition()
+    findNearestPathNode(maxDistance)
     {
-        this.positionBackup.setFromPoint(this.position);
-    }
-    
-    restorePosition()
-    {
-        this.position.setFromPoint(this.positionBackup);
+        let n,d,dist;
+        let nodeIdx;
+        let path=this.core.map.path;
+        let nNode=path.nodes.length;
+        
+        nodeIdx=-1;
+        dist=maxDistance;
+        
+        for (n=0;n!==nNode;n++) {
+            d=path.nodes[n].position.distance(this.position);
+            if (d<dist) {
+                dist=d;
+                nodeIdx=n;
+            }
+        }
+
+        return(nodeIdx);
     }
     
         //
-        // move entity
+        // move utilities
         //
     
-    moveXZ(bump,slide,clipping)
+    moveInMapXZ(movePnt,bump,slide)
     {
+            // clear collisions
+            
+        this.touchEntity=null;
+        this.collideWallMeshIdx=-1;
+        
             // if no movement, then skip
         
-        if ((this.movePt.x===0) && (this.movePt.z===0)) return;
+        if ((movePnt.x===0) && (movePnt.z===0)) return;
         
             // run the collision which
             // will return a new move direction
@@ -226,7 +204,7 @@ export default class ProjectEntityClass
             // there's been a bump, move it, otherwise,
             // try sliding
         
-        this.checkMovePt.setFromValues(this.movePt.x,0.0,this.movePt.z);
+        this.checkMovePt.setFromValues(movePnt.x,0,movePnt.z);
         
         this.collision.moveObjectInMap(this,this.checkMovePt,bump,this.collideMovePt);
         if ((this.collideMovePt.equals(this.checkMovePt)) || (this.collideMovePt.y!==0)) {
@@ -237,7 +215,7 @@ export default class ProjectEntityClass
             // try to slide
         
         if (slide) {
-            this.checkMovePt.setFromValues(this.movePt.x,0.0,0.0);
+            this.checkMovePt.setFromValues(movePnt.x,0.0,0.0);
 
             this.collision.moveObjectInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
             if (this.collideSlideMovePt.equals(this.checkMovePt)) {
@@ -245,7 +223,7 @@ export default class ProjectEntityClass
                 return;
             }
 
-            this.checkMovePt.setFromValues(0.0,0.0,this.movePt.z);
+            this.checkMovePt.setFromValues(0.0,0.0,movePnt.z);
 
             this.collision.moveObjectInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
             if (this.collideSlideMovePt.equals(this.checkMovePt)) {
@@ -260,15 +238,18 @@ export default class ProjectEntityClass
         this.position.addPointTrunc(this.collideMovePt);
     }
     
-    moveY(noGravity)
+    moveInMapY(movePnt,noGravity)
     {
         let yAdd,fallY,riseY;
         
-            // y movement is the rotated x/z movement
-            // (for swimming and flying) plus the natural
-            // y movement
-
-        yAdd=this.movePt.y+this.movement.y;
+            // clear collisions
+            
+        this.collideCeilingMeshIdx=-1;
+        this.standOnMeshIdx=-1;
+        
+            // get the initial y movement
+            
+        yAdd=movePnt.y;
          
             // add in gravity
             
@@ -280,11 +261,11 @@ export default class ProjectEntityClass
                 // if there is upwards movement (usually a jump or push)
                 // then reduce it by the current gravity acceleration
   
-            if (this.movement.y>0) {
-                this.movement.y-=this.gravityAcceleration;
-                if (this.movement.y<=0) {
-                    this.gravity=-this.movement.y;
-                    this.movement.y=0;
+            if (movePnt.y>0) {
+                movePnt.y-=this.gravityAcceleration;
+                if (movePnt.y<=0) {
+                    this.gravity=-movePnt.y;
+                    movePnt.y=0;
                 }
                 else {
                     this.gravity=this.gravityMinValue;
@@ -312,7 +293,10 @@ export default class ProjectEntityClass
             
             this.position.addValuesTrunc(0,fallY,0);
         
-            if (fallY>=0) this.gravity=this.gravityMinValue;        // if we are rising or stopped by a floor, restart gravity
+            if (fallY>=0) {
+                this.gravity=this.gravityMinValue;                  // if we are rising or stopped by a floor, restart gravity
+                return(true);
+            }
         }
         
             // moving up
@@ -323,92 +307,13 @@ export default class ProjectEntityClass
             riseY=this.collision.riseObjectInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);
             
-            if (riseY<yAdd) this.movement.y=0;                      // if we can't get as high as we want, then clear any movement
-        }
-    }
-    
-    move(bump,slide,noGravity,clipping)
-    {
-            // clear collision flags
-            
-        this.touchEntity=null;
-        this.collideWallMeshIdx=-1;
-        this.collideCeilingMeshIdx=-1;
-        this.standOnMeshIdx=-1;
-
-            // calculate the movement, add in
-            // acceleration and deceleration
-        
-        if (this.movementForwardOn) {
-            this.movement.z+=this.movementForwardAcceleration;
-            if (this.movement.z>this.movementForwardMaxSpeed) this.movement.z=this.movementForwardMaxSpeed;
-        }
-        else {
-            if (!this.movementBackwardOn) {
-                this.movement.z-=this.movementForwardDeceleration;
-                if (this.movement.z<0) this.movement.z=0;
+            if (riseY<yAdd) {
+                this.movePnt.y=0;                      // if we can't get as high as we want, then clear any movement
+                return(true);
             }
         }
         
-        if (this.movementBackwardOn) {
-            this.movement.z-=this.movementForwardAcceleration;
-            if (this.movement.z<-this.movementForwardMaxSpeed) this.movement.z=-this.movementForwardMaxSpeed;
-        }
-        else {
-            if (!this.movementForwardOn) {
-                this.movement.z+=this.movementForwardDeceleration;
-                if (this.movement.z>0) this.movement.z=0;
-            }
-        }
-
-        if (this.movementSideLeftOn) {
-            this.movement.x+=this.movementSideAcceleration;
-            if (this.movement.x>this.movementSideMaxSpeed) this.movement.x=this.movementSideMaxSpeed;
-        }
-        else {
-            if (!this.movementSideRightOn) {
-                this.movement.x-=this.movementSideAcceleration;
-                if (this.movement.x<0) this.movement.x=0;
-            }
-        }
-
-        if (this.movementSideRightOn) {
-            this.movement.x-=this.movementSideAcceleration;
-            if (this.movement.x<this.movementSideMaxSpeed) this.movement.x=-this.movementSideMaxSpeed;
-        }
-        else {
-            if (!this.movementSideLeftOn) {
-                this.movement.x=this.movementSideAcceleration;
-                if (this.movement.x>0) this.movement.x=0;
-            }
-        }
-        
-            // turn the facing angle(s), trunc it to avoid
-            // floats which mess up the math.  if there is no gravity,
-            // then add in the X rotation so we can fly up and down
-            // during the moveY section
-            
-        this.movePt.setFromValues(this.movement.x,0,this.movement.z);
-        if (noGravity) this.movePt.rotateX(null,this.angle.x);
-        this.movePt.rotateY(null,this.angle.y);
-        this.movePt.trunc();
-        
-            // if no clipping, just move
-            
-        if (clipping) {
-            this.position.addPoint(this.movePt);
-            return;
-        }
-
-            // move around the map
-        
-        this.moveY(noGravity);
-        this.moveXZ(bump,slide,clipping);
-    }
-    
-    moveDirect(x,y,z)
-    {
-        this.position.addValuesTrunc(x,y,z);
+        return(false);
     }
     
         //
@@ -437,12 +342,6 @@ export default class ProjectEntityClass
         this.gravity=this.gravityMinValue;
         
         return(Math.abs(this.movement.y)>this.gravityAcceleration);
-    }
-    
-    movementJump(jumpValue)
-    {
-        this.gravity=this.gravityMinValue;
-        this.movement.y=jumpValue;
     }
     
     movementReflect()
