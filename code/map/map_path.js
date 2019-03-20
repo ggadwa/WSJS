@@ -15,6 +15,21 @@ export default class MapPathClass
     }
     
         //
+        // called after loading to build path hints,
+        // which are which link to follow from any node
+        // for the shortest path to another node
+        //
+        
+    buildPathHints()
+    {
+        let node;
+        
+        for (node of this.nodes) {
+            node.buildPathHints(this.nodes);
+        }
+    }
+    
+        //
         // draw the path for debug purposes
         // note this is not optimal and slow!
         //

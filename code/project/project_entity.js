@@ -174,13 +174,64 @@ export default class ProjectEntityClass
         
         for (n=0;n!==nNode;n++) {
             d=path.nodes[n].position.distance(this.position);
-            if (d<dist) {
+            if ((d<dist) || (dist===-1)) {
                 dist=d;
                 nodeIdx=n;
             }
         }
 
         return(nodeIdx);
+    }
+    
+    hitPathNode(nodeIdx,slopDistance)
+    {
+        return(this.core.map.path.nodes[nodeIdx].position.distance(this.position)<slopDistance);
+    }
+    
+    nextNodeInPath(fromNodeIdx,toNodeIdx)
+    {
+        return(this.core.map.path.nodes[fromNodeIdx].pathHints[toNodeIdx]);
+    }
+    
+    turnTowardsNode(nodeIdx,turnSpeed)
+    {
+        let toY,subway,addway;
+        let node=this.core.map.path.nodes[nodeIdx];
+        
+            // already there?
+            
+        toY=this.position.angleYTo(node.position);
+        if (this.angle.y===toY) return;
+        
+            // which way is faster?
+	
+	if (this.angle.y>toY) {
+            addway=360.0-(this.angle.y-toY);
+            subway=this.angle.y-toY;
+	}
+	else {
+            addway=toY-this.angle.y;
+            subway=360.0-(toY-this.angle.y);
+	}
+        
+            // if we are within speed, then
+            // it's equal
+            
+        if ((subway<turnSpeed) || (addway<turnSpeed)) {
+            this.angle.y=toY;
+            return(0);
+        }
+		
+            // now turn and always
+            // return the difference
+	
+	if (subway<addway) {
+            this.turn(-turnSpeed);
+            return(subway);
+	}
+
+        this.turn(turnSpeed);
+        return(addway);
     }
     
         //

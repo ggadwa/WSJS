@@ -150,9 +150,11 @@ export default class ImportMapClass
             for (n=0;n!==importSettings.paths.length;n++) {
                 pathDef=importSettings.paths[n];
                 
-                pathNode=new MapPathNodeClass(pathDef.name,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links);
+                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.data);
                 this.core.map.path.nodes.push(pathNode);
             }
+            
+            this.core.map.path.buildPathHints();
         }
 
             // and turn off any collisions for certain
