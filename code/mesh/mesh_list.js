@@ -202,8 +202,13 @@ export default class MeshListClass
             // they need the skin (view*model*skin) so
             // they are calculated in the shader
             
+            // also some models (like hand weapons)
+            // draw in the camera space, so we have to replace
+            // the view here
+            
         if (modelEntityAlter!==null) {
             gl.uniformMatrix4fv(this.shader.modelMatrixUniform,false,modelEntityAlter.modelMatrix.data);
+            if (modelEntityAlter.inCameraSpace) gl.uniformMatrix4fv(this.shader.viewMatrixUniform,false,this.core.cameraSpaceViewMatrix.data);
         }
         
             // otherwise it's a map mesh, which is pre-positioned

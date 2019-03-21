@@ -77,6 +77,10 @@ export default class CoreClass
         this.viewMatrix=new Matrix4Class();
         this.orthoMatrix=new Matrix4Class();
         
+        this.cameraSpaceEyePos=new PointClass(0,0,0);
+        this.cameraSpacePos=new PointClass(0,0,0);
+        this.cameraSpaceViewMatrix=new Matrix4Class();
+
         this.eyeRotMatrix=new Matrix4Class();
         this.eyeRotMatrix2=new Matrix4Class();
         this.billboardMatrix=new Matrix4Class();
@@ -396,6 +400,13 @@ export default class CoreClass
             // setup the look at
 
         this.viewMatrix.setLookAtMatrix(this.eyePos,this.camera.position,this.lookAtUpVector);
+        
+            // camera space view matrix
+            // (for things like weapons)
+            
+        this.cameraSpaceEyePos=new PointClass(0,0,-this.OPENGL_NEAR_Z);
+        this.cameraSpacePos=new PointClass(0,0,0);
+        this.cameraSpaceViewMatrix.setLookAtMatrix(this.cameraSpaceEyePos,this.cameraSpacePos,this.lookAtUpVector);
 
             // the 2D ortho matrix
 

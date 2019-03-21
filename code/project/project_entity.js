@@ -101,15 +101,11 @@ export default class ProjectEntityClass
         return(this.modelEntityAlter.show(name,show));
     }
     
-    setModelNoFrustumCull(noFrustumCull)
-    {
-        this.modelEntityAlter.noFrustumCull=noFrustumCull;
-    }
-    
-    setModelDrawPosition(position,angle)
+    setModelDrawPosition(position,angle,inCameraSpace)
     {
         this.modelEntityAlter.position.setFromPoint(position);
         this.modelEntityAlter.angle.setFromPoint(angle);
+        this.modelEntityAlter.inCameraSpace=(inCameraSpace===undefined)?false:inCameraSpace;
     }
     
     startModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
@@ -612,13 +608,13 @@ export default class ProjectEntityClass
         // override this if you want to change how a model is setup
         // or positioned in the scene.  the default is just to
         // position the model the same as the entity's position and
-        // angle.  use setModelDrawPosition([PointClass],[QuaternionClass]) to change
+        // angle.  use setModelDrawPosition([PointClass],[QuaternionClass],inCameraSpace) to change
         // inside this method
         //
         
     drawSetup()
     {
-        this.setModelDrawPosition(this.position,this.angle);
+        this.setModelDrawPosition(this.position,this.angle,false);
     }
     
         //

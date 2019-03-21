@@ -10,8 +10,7 @@ export default class MapPathNodeClass
         this.position=position;
         this.links=links;
         this.data=(data===undefined)?null:data;
-        
-        this.recurseFlag=false;
+
         this.pathHints=null;
     }
     
@@ -21,23 +20,15 @@ export default class MapPathNodeClass
         // shortest path to that node from this one
         //
      
-    countPathToNode(nodes,fromNodeIdx,toNodeIdx,pathCount)
+    countPathToNode(nodes,nodeHits,fromNodeIdx,toNodeIdx,pathCount)
     {
-        let n,node;
-        let linkNodeIdx,linkPathCount,count;
-        
-            // if we already hit this
-            // then return -1
+        let n,node,nextNodeHits;
+        let linkPathCount,count;
             
         node=nodes[fromNodeIdx];
         
-        if (node.recurseFlag) return(-1);
-        
-        node.recurseFlag=true;
-        
             // follow the links
           
-        linkNodeIdx=-1;
         linkPathCount=-1;
         
         for (n=0;n!==node.links.length;n++) {
@@ -46,11 +37,22 @@ export default class MapPathNodeClass
                 // the node count to this node
                 
             if (node.links[n]===toNodeIdx) return(pathCount);
-
+            
+                // if we already hit this
+                // node then cancel the path
+                // note this might miss quicker paths but still
+                // guarentees a quick path to node under most
+                // circumstances
+            
+            if (nodeHits[node.links[n]]!==0) continue;
+            
                 // recurse further and return the link
                 // with the shortest node count
                 
-            count=this.countPathToNode(nodes,node.links[n],toNodeIdx,(pathCount+1));
+            nextNodeHits=new Uint8Array(nodeHits);
+            nextNodeHits[node.links[n]]=1;
+                
+            count=this.countPathToNode(nodes,nextNodeHits,node.links[n],toNodeIdx,(pathCount+1));
             if (count===-1) continue;
             
             if ((linkPathCount===-1) || (count<linkPathCount)) linkPathCount=count;
@@ -61,8 +63,8 @@ export default class MapPathNodeClass
     
     buildPathHints(nodes)
     {
-        let n,k,t;
-        let count,linkPathCount;
+        let n,k;
+        let count,linkPathCount,nodeHits;
         let nNode=nodes.length;
         
         this.pathHints=new Uint16Array(nNode);
@@ -76,21 +78,20 @@ export default class MapPathNodeClass
                 continue;
             }
             
+                // else find which link has the
+                // shortest path
+                
             linkPathCount=-1;
             
             for (k=0;k!==this.links.length;k++) {
                 
-                    // for each path navigate,
-                    // make sure we don't circle back
-                    // on ourselves
+                    // keep track of what we've hit recursively
+                    // so we can cancel out paths that wrap around
                     
-                for (t=0;t!==nNode;t++) {
-                    nodes[t].recurseFlag=false;
-                }
+                nodeHits=new Uint8Array(nNode);
+                nodeHits[this.nodeIdx]=1;
                 
-                    // now find shortest link
-                    
-                count=this.countPathToNode(nodes,this.links[k],n,0);
+                count=this.countPathToNode(nodes,nodeHits,this.links[k],n,0);
                 if ((linkPathCount===-1) || (count<linkPathCount)) {
                     linkPathCount=count;
                     this.pathHints[n]=this.links[k];

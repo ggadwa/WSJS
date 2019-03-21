@@ -24,7 +24,7 @@ export default class ModelEntityAlterClass
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
         
-        this.noFrustumCull=false;
+        this.inCameraSpace=false;
         this.meshHideList=new Uint8Array(ModelEntityAlterClass.MAX_MESH_COUNT);
         
         this.modelMatrix=new Matrix4Class();
@@ -120,9 +120,10 @@ export default class ModelEntityAlterClass
 
     boundBoxInFrustum()
     {
-            // some things never cull, like hand weapons
+            // can't cull anything in camera space
+            // (like held weapons)
         
-        if (this.noFrustumCull) return(true);
+        if (this.inCameraSpace) return(true);
         
             // culling matrix can't have scale in it
             

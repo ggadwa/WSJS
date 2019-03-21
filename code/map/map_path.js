@@ -15,6 +15,25 @@ export default class MapPathClass
     }
     
         //
+        // fixes any path links that aren't
+        // linked back from linking node
+        //
+        
+    fixBrokenLinks()
+    {
+        let n,k,node,linkNode;
+        
+        for (n=0;n!==this.nodes.length;n++) {
+            node=this.nodes[n];
+            
+            for (k=0;k!==node.links.length;k++) {
+                linkNode=this.nodes[node.links[k]];
+                if (!linkNode.links.includes(n)) linkNode.links.push(n);
+            }
+        }
+    }
+    
+        //
         // called after loading to build path hints,
         // which are which link to follow from any node
         // for the shortest path to another node
@@ -23,6 +42,13 @@ export default class MapPathClass
     buildPathHints()
     {
         let node;
+        
+            // before we start, fix any links that
+            // that aren't followed back
+            
+        this.fixBrokenLinks();
+        
+            // now recurse for path hints
         
         for (node of this.nodes) {
             node.buildPathHints(this.nodes);
@@ -41,6 +67,7 @@ export default class MapPathClass
         let lineElementOffset,lineVertexStartIdx;
         let vertexBuffer,indexBuffer;
         let nodeSize=250;
+        let drawSlop=50;
         let gl=this.core.gl;
         let shader=this.core.shaderList.debugShader;
         let tempPoint=new PointClass(0,0,0);
@@ -75,7 +102,7 @@ export default class MapPathClass
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
-            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
             vertices[vIdx++]=tempPoint.z+node.position.z;
 
             tempPoint.x=nodeSize;
@@ -84,7 +111,7 @@ export default class MapPathClass
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
-            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
             vertices[vIdx++]=tempPoint.z+node.position.z;
 
             tempPoint.x=nodeSize;
@@ -93,7 +120,7 @@ export default class MapPathClass
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
-            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
             vertices[vIdx++]=tempPoint.z+node.position.z;
 
             tempPoint.x=-nodeSize;
@@ -102,7 +129,7 @@ export default class MapPathClass
             tempPoint.matrixMultiplyIgnoreTransform(this.core.billboardMatrix);
 
             vertices[vIdx++]=tempPoint.x+node.position.x;
-            vertices[vIdx++]=tempPoint.y+node.position.y;
+            vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
             vertices[vIdx++]=tempPoint.z+node.position.z;
 
             elementIdx=n*4;
@@ -126,11 +153,11 @@ export default class MapPathClass
                 linkNode=this.nodes[node.links[k]];
             
                 vertices[vIdx++]=node.position.x;
-                vertices[vIdx++]=node.position.y;
+                vertices[vIdx++]=node.position.y+drawSlop;
                 vertices[vIdx++]=node.position.z;
 
                 vertices[vIdx++]=linkNode.position.x;
-                vertices[vIdx++]=linkNode.position.y;
+                vertices[vIdx++]=linkNode.position.y+drawSlop;
                 vertices[vIdx++]=linkNode.position.z;
 
                 indexes[iIdx++]=lineVertexStartIdx++;
@@ -152,8 +179,6 @@ export default class MapPathClass
         
             // always draw it, no matter what
             
-        gl.disable(gl.DEPTH_TEST);
-
         shader.drawStart();
         
             // the lines
@@ -170,8 +195,6 @@ export default class MapPathClass
         
             // re-enable depth
             
-        gl.enable(gl.DEPTH_TEST);
-        
             // tear down the buffers
             
         gl.bindBuffer(gl.ARRAY_BUFFER,null);
