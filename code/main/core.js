@@ -14,7 +14,6 @@ import Matrix4Class from '../utility/matrix4.js';
 import Matrix3Class from '../utility/matrix3.js';
 import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
-import TextClass from '../interface/text.js';
 import InterfaceClass from '../interface/interface.js';
 
 //
@@ -132,33 +131,15 @@ export default class CoreClass
         this.drawTrigCount=0;
         this.drawModelCount=0;
         
-            // health
-        
-        this.uiHealthHigh=0;
-        this.uiHealthRect=new RectClass(0,0,0,0);
-        this.uiHealthColor=new ColorClass(1.0,0.0,0.0);
-        this.uiHealthFrameRect=new RectClass(0,0,0,0);
-        this.uiHealthFrameColor=new ColorClass(1.0,1.0,1.0);
-        this.uiHealthAlpha=0.7;
-        
             // tinting
             
         this.uiTintRect=new RectClass(0,0,0,0);
         this.uiTintColor=new ColorClass(1.0,0.0,0.0);
-        
-            // misc pre-allocates
-            
-        this.uiTextColor=new ColorClass(1.0,1.0,0.0);
-        this.uiWeaponTextColor=new ColorClass(0.3,1.0,0.2);
 
             // loading screen
 
         this.loadingStrings=[];
         this.loadingLastAddMsec=0;
-        this.loadingBarRect=new RectClass(0,0,0,0);
-        this.loadingBarColor=new ColorClass(0.3,0.1,1.0);
-        this.loadingBarFrameRect=new RectClass(0,0,0,0);
-        this.loadingBarFrameColor=new ColorClass(1.0,1.0,1.0);
         
         Object.seal(this);
     }
@@ -242,30 +223,20 @@ export default class CoreClass
         
             // create needed objects
             
-        this.text=new TextClass(this);
         this.interface=new InterfaceClass(this);
         this.camera=new CameraClass();
 
-            // initialize other drawing objects
+            // interface object
 
-        if (!this.text.initialize()) return;
         if (!this.interface.initialize()) return;
         
             // setup some interface positions
-        
-        this.loadingBarRect.setFromValues(5,(this.high-25),5,(this.high-5));
-        this.loadingBarFrameRect.setFromValues(5,(this.high-25),(this.wid-5),(this.high-5));
-        
-        this.uiHealthHigh=Math.trunc(this.high*0.5)-10;
-        this.uiHealthRect.setFromValues(5,(this.high-this.uiHealthHigh),25,(this.high-5));
-        this.uiHealthFrameRect.setFromValues(5,((this.high-5)-this.uiHealthHigh),25,(this.high-5));
         
         this.uiTintRect.setFromValues(0,0,this.wid,this.high);
     }
 
     release()
     {
-        this.text.release();
         this.interface.release();
         this.modelList.release();
         this.shaderList.release();
@@ -504,51 +475,17 @@ export default class CoreClass
             this.uiTintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
         }
         
-            // interface drawing
-            
-        this.interface.drawStart();
-        
             // any tints
             
         if (tintOn) {
             this.uiTintColor.fixOverflow();
-            this.interface.drawRect(this.uiTintRect,this.uiTintColor,0.5);
+            //this.interface.drawRect(this.uiTintRect,this.uiTintColor,0.5);
         }
         
-            // health
-        
-        this.uiHealthRect.top=this.uiHealthRect.bot-Math.trunc(this.uiHealthHigh*player.getPercentageHealth());
-        //this.interface.drawRect(this.uiHealthRect,this.uiHealthColor,this.uiHealthAlpha);
-        //this.interface.drawFrameRect(this.uiHealthFrameRect,this.uiHealthFrameColor,1.0);
-        
-            // finish interface drawing
+            // interface
             
-        this.interface.drawEnd();
-
-            // text overlays
-
-        fpsStr=this.fps.toString();
-        idx=fpsStr.indexOf('.');
-        if (idx===-1) {
-            fpsStr+='.0';
-        }
-        else {
-            fpsStr=fpsStr.substring(0,(idx+3));
-        }
-        
-        this.text.drawStart();
-        this.text.drawWithShadow((this.wid-5),23,20,18,fpsStr,this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
-        this.text.drawWithShadow((this.wid-5),46,20,18,('mesh:'+this.drawMeshCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
-        this.text.drawWithShadow((this.wid-5),69,20,18,('trig:'+this.drawTrigCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
-        this.text.drawWithShadow((this.wid-5),92,20,18,('model:'+this.drawModelCount),this.text.TEXT_ALIGN_RIGHT,this.uiTextColor);
-        //this.text.drawWithShadow(30,(this.high-5),25,22,player.getCurrentWeaponDisplayString(),this.text.TEXT_ALIGN_LEFT,this.uiWeaponTextColor);
-        
-        if (this.paused) {
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)-20),48,45,'Paused',this.text.TEXT_ALIGN_CENTER,this.uiTextColor);
-            this.text.drawWithShadow(Math.trunc(this.wid*0.5),(Math.trunc(this.high*0.5)+20),36,32,'click to start - esc to pause',this.text.TEXT_ALIGN_CENTER,this.uiTextColor);
-        }
-        
-        this.text.drawEnd();
+        this.interface.draw();
+        if (this.paused) this.interface.drawPauseMessage();
     }
     
         //
@@ -580,11 +517,8 @@ export default class CoreClass
         console.log(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
     }
     
-    loadingScreenDraw(progress)
+    loadingScreenDraw()
     {
-        let n,nLine;
-        let y,col;
-        
             // the 2D ortho matrix
 
         this.orthoMatrix.setOrthoMatrix(this.wid,this.high,-1.0,1.0);
@@ -594,32 +528,9 @@ export default class CoreClass
         this.gl.clearColor(0.0,0.0,0.0,1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT,this.gl.DEPTH_BUFFER_BIT);
         
-            // lines
+            // debug console
             
-        nLine=this.loadingStrings.length;
-
-        this.text.drawStart();
-        
-        y=(this.high-30)-((nLine-1)*22);
-        col=new ColorClass(1.0,1.0,1.0);
-        
-        for (n=0;n!==nLine;n++) {
-            if (n===(nLine-1)) col=new ColorClass(1.0,0.3,0.3);
-            this.text.draw(5,y,20,18,this.loadingStrings[n],this.text.TEXT_ALIGN_LEFT,col);
-            y+=22;
-        }
-        
-        this.text.drawEnd();
-
-            // progress
-        
-        this.interface.drawStart();
-        if (progress!==null) {
-            this.loadingBarRect.rgt=5+Math.trunc((this.wid-10)*progress);
-            this.interface.drawRect(this.loadingBarRect,this.loadingBarColor,1.0);
-        }
-        this.interface.drawFrameRect(this.loadingBarFrameRect,this.loadingBarFrameColor,1.0);
-        this.interface.drawEnd();
+        this.interface.drawDebugConsole(this.loadingStrings);
     }
     
         //

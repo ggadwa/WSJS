@@ -189,6 +189,19 @@ export default class ProjectEntityClass
         return(this.core.map.path.nodes[fromNodeIdx].pathHints[toNodeIdx]);
     }
     
+    moveToRandomNode()
+    {
+        let nodes=this.core.map.path.nodes;
+        let idx=Math.trunc(nodes.length*Math.random());
+        
+        this.position.setFromPoint(nodes[idx].position);
+    }
+    
+    getRandomNodeIndex()
+    {
+        return(Math.trunc(this.core.map.path.nodes.length*Math.random()));
+    }
+    
     turnTowardsNode(nodeIdx,turnSpeed)
     {
         let toY,subway,addway;

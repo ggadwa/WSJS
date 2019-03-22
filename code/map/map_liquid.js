@@ -146,6 +146,17 @@ export default class MapLiquidClass
             
         this.updateBuffers();
         
+            // so we can use subdata later, data the
+            // buffers here
+            
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.DYNAMIC_DRAW);
+        
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        
             // the indexes always stay the same
             
         nSegment=this.xBlockSize*this.zBlockSize;
@@ -187,11 +198,11 @@ export default class MapLiquidClass
             // so always update these buffers
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertices,gl.DYNAMIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertices);
         gl.vertexAttribPointer(this.core.shaderList.mapLiquidShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.DYNAMIC_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.uvs);
         gl.vertexAttribPointer(this.core.shaderList.mapLiquidShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
             // indexes are static

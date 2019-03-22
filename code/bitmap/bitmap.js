@@ -398,6 +398,14 @@ export default class BitmapClass
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
     }
     
+    attachAsInterface()
+    {
+        let gl=this.core.gl;
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D,this.texture);
+    }
+    
     attachAsParticle()
     {
         let gl=this.core.gl;

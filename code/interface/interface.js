@@ -1,4 +1,7 @@
+import ColorClass from '../../code/utility/color.js';
 import InterfaceShaderClass from '../shader/interface_shader.js';
+import InterfaceElementClass from '../interface/interface_element.js';
+import InterfaceTextClass from '../interface/interface_text.js';
 
 //
 // interface class
@@ -10,8 +13,10 @@ export default class InterfaceClass
     {
         this.core=core;
         
-        this.rectVertexArray=new Float32Array(12);         // local to global to avoid GCd
-        this.vertexBuffer=null;
+        this.elements=new Map();
+        this.texts=new Map();
+            
+        this.uiTextColor=new ColorClass(1,1,0);
         
         Object.seal(this);
     }
@@ -22,21 +27,65 @@ export default class InterfaceClass
 
     initialize()
     {
-        this.vertexBuffer=this.core.gl.createBuffer();
+            // clear all current elements and texts
+            
+        this.elements.clear();
+        this.texts.clear();
+        
+            // create the static font texture
+            
+        InterfaceTextClass.createStaticFontTexture(this.core.gl);
+
         return(true);
     }
 
     release()
     {
-        this.core.gl.deleteBuffer(this.vertexBuffer);
+        let element,text;
+        
+            // release all elements and texts
+            
+        for (element of this.elements) {
+            element.release();
+        }
+        
+        for (text of this.texts) {
+            text.release();
+        }
+        
+            // and the static font texture
+            
+        InterfaceTextClass.deleteStaticFontTexture(this.core.gl);
+    }
+    
+        //
+        // add interface chunks
+        //
+        
+    addElement(id,bitmap,uvOffset,uvSize,rect,color,alpha)
+    {
+        let element=new InterfaceElementClass(this.core,bitmap,uvOffset,uvSize,rect,color,alpha);
+        
+        element.initialize();
+        this.elements.set(id,element);
+    }
+    
+    addText(id,str,x,y,fontSize,align,color,alpha)
+    {
+        let text=new InterfaceTextClass(this.core,str,x,y,fontSize,align,color,alpha);
+        
+        text.initialize();
+        this.texts.set(id,text);
+    }
+    
+    updateText(id,str)
+    {
+        this.texts.get(id).str=str;
     }
 
-        //
-        // start/stop/draw interface
-        //
-
-    drawStart()
+    draw()
     {
+        let key,element,text;
         let gl=this.core.gl;
         
         gl.disable(gl.DEPTH_TEST);
@@ -44,94 +93,93 @@ export default class InterfaceClass
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
+            // run through the elements
+            
         this.core.shaderList.interfaceShader.drawStart();
-    }
-
-    drawEnd()
-    {
-        let gl=this.core.gl;
-
+        
+        for ([key,element] of this.elements) {
+            element.draw();
+        }
+        
         this.core.shaderList.interfaceShader.drawEnd();
+        
+        this.core.shaderList.textShader.drawStart();
+        
+        for ([key,text] of this.texts) {
+            text.draw();
+        }
+        
+        this.core.shaderList.textShader.drawEnd();
 
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }
     
-    drawFrameRect(rect,color,alpha)
+        //
+        // special core drawing
+        // note: none of these are optimized, this is
+        // debug stuff only, it'll be slow
+        //
+        
+    drawDebugConsole(consoleStrings)
     {
+        let n,y,col,text;
+        let nLine=consoleStrings.length;
         let gl=this.core.gl;
         
-            // vertexes
-            
-        this.rectVertexArray[0]=rect.lft;
-        this.rectVertexArray[1]=rect.top;
-        this.rectVertexArray[2]=rect.rgt;
-        this.rectVertexArray[3]=rect.top;
-        this.rectVertexArray[4]=rect.rgt;
-        this.rectVertexArray[5]=rect.bot;
-        this.rectVertexArray[6]=rect.lft;
-        this.rectVertexArray[7]=rect.bot;
+        gl.disable(gl.DEPTH_TEST);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+        this.core.shaderList.textShader.drawStart();
         
-            // setup the color
-            
-        gl.uniform4f(this.core.shaderList.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
-
-            // setup the buffers
-
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertexArray,gl.STREAM_DRAW);
-
-        gl.enableVertexAttribArray(this.core.shaderList.interfaceShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.core.shaderList.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        y=(this.core.high-5)-((nLine-1)*22);
+        col=new ColorClass(1.0,1.0,1.0);
         
-            // draw the indexes
+        for (n=0;n!==nLine;n++) {
+            if (n===(nLine-1)) col=new ColorClass(1,0.3,0.3);
+            text=new InterfaceTextClass(this.core,consoleStrings[n],5,y,20,InterfaceTextClass.TEXT_ALIGN_LEFT,col,1);
+            text.initialize();
+            text.draw();
+            text.release();
             
-        gl.drawArrays(gl.LINE_LOOP,0,4);
+            y+=22;
+        }
+        
+        this.core.shaderList.textShader.drawEnd();
 
-            // remove the buffers
-
-        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
     }
-    
-    drawRect(rect,color,alpha)
+        
+    drawPauseMessage()
     {
+        let text;
+        let x=Math.trunc(this.core.wid*0.5);
+        let y=Math.trunc(this.core.high*0.5);
         let gl=this.core.gl;
         
-            // vertexes
-            
-        this.rectVertexArray[0]=rect.lft;
-        this.rectVertexArray[1]=rect.top;
-        this.rectVertexArray[2]=rect.rgt;
-        this.rectVertexArray[3]=rect.top;
-        this.rectVertexArray[4]=rect.lft;
-        this.rectVertexArray[5]=rect.bot;
+        gl.disable(gl.DEPTH_TEST);
+
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+        this.core.shaderList.textShader.drawStart();
         
-        this.rectVertexArray[6]=rect.rgt;
-        this.rectVertexArray[7]=rect.top;
-        this.rectVertexArray[8]=rect.rgt;
-        this.rectVertexArray[9]=rect.bot;
-        this.rectVertexArray[10]=rect.lft;
-        this.rectVertexArray[11]=rect.bot;
+        text=new InterfaceTextClass(this.core,'Paused',x,(y-20),48,InterfaceTextClass.TEXT_ALIGN_CENTER,this.uiTextColor,1);
+        text.initialize();
+        text.draw();
+        text.release();
         
-            // setup the color
-            
-        gl.uniform4f(this.core.shaderList.interfaceShader.colorUniform,color.r,color.g,color.b,alpha);
-
-            // setup the buffers
-
-        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.rectVertexArray,gl.STREAM_DRAW);
-
-        gl.enableVertexAttribArray(this.core.shaderList.interfaceShader.vertexPositionAttribute);
-        gl.vertexAttribPointer(this.core.shaderList.interfaceShader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        text=new InterfaceTextClass(this.core,'click to start - esc to pause',x,(y+20),36,InterfaceTextClass.TEXT_ALIGN_CENTER,this.uiTextColor,1);
+        text.initialize();
+        text.draw();
+        text.release();
         
-            // draw the indexes
-            
-        gl.drawArrays(gl.TRIANGLES,0,6);
+        this.core.shaderList.textShader.drawEnd();
 
-            // remove the buffers
-
-        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        gl.disable(gl.BLEND);
+        gl.enable(gl.DEPTH_TEST);
     }
-    
 }

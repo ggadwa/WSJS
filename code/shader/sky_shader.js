@@ -38,6 +38,10 @@ export default class SkyShaderClass extends ShaderClass
 
         this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
+        
+            // texture uniforms never change
+            
+        gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
         gl.useProgram(null);
     }

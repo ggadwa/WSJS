@@ -8,7 +8,7 @@ import ModelClass from '../../code/model/model.js';
 import ImportModelClass from '../../code/import/import_model.js';
 import MapPathNodeClass from '../../code/map/map_path_node.js';
 
-export default class ProjectEntityEditorClass extends ProjectEntityClass
+export default class ProjectEntityDeveloperClass extends ProjectEntityClass
 {
     constructor(core,name,position,angle)
     {

@@ -544,7 +544,7 @@ export default class MeshClass
             
         if (this.requiresVertexBufferUpdate) {
             gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+            gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
 
                 // mark as updated
 
@@ -555,7 +555,7 @@ export default class MeshClass
             
         if (this.requiresNormalBufferUpdate) {
             gl.bindBuffer(gl.ARRAY_BUFFER,this.normalBuffer);
-            gl.bufferData(gl.ARRAY_BUFFER,this.normalArray,gl.DYNAMIC_DRAW);       // supergumba -- seems right, will require testing
+            gl.bufferSubData(gl.ARRAY_BUFFER,0,this.normalArray);
 
                 // mark as updated
 

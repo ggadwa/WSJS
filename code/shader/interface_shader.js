@@ -14,6 +14,7 @@ export default class InterfaceShaderClass extends ShaderClass
         this.fragmentShaderURL='shaders/interface.frag';
         
         this.vertexPositionAttribute=null;
+        this.vertexUVAttribute=null;
         this.orthoMatrixUniform=null;
         this.colorUniform=null;
         
@@ -33,9 +34,14 @@ export default class InterfaceShaderClass extends ShaderClass
         gl.useProgram(this.program);
 
         this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
+        this.vertexUVAttribute=gl.getAttribLocation(this.program,'vertexUV');
 
         this.orthoMatrixUniform=gl.getUniformLocation(this.program,'orthoMatrix');    
         this.colorUniform=gl.getUniformLocation(this.program,'color');
+        
+            // texture uniforms never change
+            
+        gl.uniform1i(gl.getUniformLocation(this.program,'baseTex'),0);
 
         gl.useProgram(null);
     }
@@ -57,6 +63,7 @@ export default class InterfaceShaderClass extends ShaderClass
             // enable the vertex attributes
 
         gl.enableVertexAttribArray(this.vertexPositionAttribute);
+        gl.enableVertexAttribArray(this.vertexUVAttribute);
     }
 
     drawEnd()
@@ -66,6 +73,7 @@ export default class InterfaceShaderClass extends ShaderClass
             // disable vertex attributes
 
         gl.disableVertexAttribArray(this.vertexPositionAttribute);
+        gl.disableVertexAttribArray(this.vertexUVAttribute);
 
             // no longer using program
 

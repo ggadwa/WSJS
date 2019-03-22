@@ -38,9 +38,30 @@ export default class SkyClass
         this.uvs=new Float32Array(16);
         this.indexes=new Uint16Array(6*4);      //enough for 4 sides, the longest draw pattern we do
         
+            // prebuild these so we can use subdata later
+            
         this.vertexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.vertexes,gl.DYNAMIC_DRAW);
+
         this.uvBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+            
+            // index buffer is always the same
+            
+        this.indexes[0]=0;
+        this.indexes[1]=1;
+        this.indexes[2]=3;
+        this.indexes[3]=1;
+        this.indexes[4]=2;
+        this.indexes[5]=3;
+            
         this.indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         
         return(true);
     }
@@ -88,29 +109,21 @@ export default class SkyClass
         this.uvs[6]=u;
         this.uvs[7]=v2;
         
-        this.indexes[0]=0;
-        this.indexes[1]=1;
-        this.indexes[2]=3;
-        this.indexes[3]=1;
-        this.indexes[4]=2;
-        this.indexes[5]=3;
-        
             // attach buffers
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertexes,gl.STREAM_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexes);
 
         gl.enableVertexAttribArray(this.core.shaderList.skyShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.core.shaderList.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.uvs,gl.STREAM_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.uvs);
 
         gl.enableVertexAttribArray(this.core.shaderList.skyShader.vertexUVAttribute);
         gl.vertexAttribPointer(this.core.shaderList.skyShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexes,gl.STREAM_DRAW);
 
             // draw the plane
             

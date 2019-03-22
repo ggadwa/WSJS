@@ -39,7 +39,7 @@ class MainClass
 
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Initializing Internal Structures');
-        this.core.loadingScreenDraw(0.25);
+        this.core.loadingScreenDraw();
 
         setTimeout(this.initInternal.bind(this),1);
     }
@@ -47,12 +47,13 @@ class MainClass
     initInternal()
     {
         if (!this.core.map.initialize()) return;
+        this.core.projectGame.initialize();
 
             // next step
 
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Map');
-        this.core.loadingScreenDraw(0.1);
+        this.core.loadingScreenDraw();
 
         setTimeout(this.initLoadMap.bind(this),1);
     }
@@ -64,7 +65,7 @@ class MainClass
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Building Collision Geometry');
-        this.core.loadingScreenDraw(0.2);
+        this.core.loadingScreenDraw();
         
         setTimeout(this.initCollisionGeomtry.bind(this),1);
     }
@@ -75,7 +76,7 @@ class MainClass
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Entities');
-        this.core.loadingScreenDraw(0.3);
+        this.core.loadingScreenDraw();
         
         setTimeout(this.initLoadEntities.bind(this),1);
     }
@@ -86,7 +87,7 @@ class MainClass
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Models');
-        this.core.loadingScreenDraw(0.4);
+        this.core.loadingScreenDraw();
         
         setTimeout(this.initLoadEntityModels.bind(this),1);
     }
@@ -99,7 +100,7 @@ class MainClass
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Images');
-        this.core.loadingScreenDraw(0.4);
+        this.core.loadingScreenDraw();
         
         setTimeout(this.initLoadImages.bind(this),1);
     }
@@ -110,7 +111,7 @@ class MainClass
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Sounds');
-        this.core.loadingScreenDraw(0.9);
+        this.core.loadingScreenDraw();
 
         setTimeout(this.initLoadSounds.bind(this),1);
     }
@@ -121,7 +122,7 @@ class MainClass
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Preparing to Run');
-        this.core.loadingScreenDraw(0.9);
+        this.core.loadingScreenDraw();
 
         setTimeout(this.initFinish.bind(this),1);
     }
@@ -207,6 +208,7 @@ function mainLoop(timestamp)
                     core.physicsTick-=constants.PHYSICS_MILLISECONDS;
                     core.lastPhysicTimestamp+=constants.PHYSICS_MILLISECONDS;
 
+                    core.projectGame.run();
                     map.entityList.run();
                 }
             }
