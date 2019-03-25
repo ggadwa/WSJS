@@ -6,10 +6,12 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
+- look up down hit scan
+- hit scan needs to do floor and ceilings trigs
 
+- work on wall trig collisions
 - bots need to determine if on moving platforms
 - new way to do tinting
-- buffersubdata in text
 
 - bouncing grenade
 - why is mouse wheel broken? (sometimes!  pause state?)

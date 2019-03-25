@@ -298,7 +298,7 @@ export default class MeshListClass
         
     debugDrawCollisionSurfaces()
     {
-        let k,mesh,line,floor,ceiling;
+        let k,mesh,wall,floor,ceiling;
         let vertexes,indexes,vertexBuffer,indexBuffer;
         let gl=this.core.gl;
         let shader=this.core.shaderList.debugShader;
@@ -307,8 +307,8 @@ export default class MeshListClass
         
             // arrays for any drawing
             
-        vertexes=new Float32Array(3*4);
-        indexes=new Uint16Array(6);         // always quad, with two triangles
+        vertexes=new Float32Array(3*3);
+        indexes=new Uint16Array(3);         // always quad, with two triangles
         
         vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
@@ -318,8 +318,6 @@ export default class MeshListClass
         
         indexes[0]=indexes[3]=0;
         indexes[1]=1;
-        indexes[2]=indexes[4]=2;
-        indexes[5]=3;
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
@@ -337,19 +335,21 @@ export default class MeshListClass
 
             gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
             
-            for (k=0;k!==mesh.collisionLines.length;k++) {
-                line=mesh.collisionLines[k];
+            for (k=0;k!==mesh.collisionWallTrigs.length;k++) {
+                wall=mesh.collisionWallTrigs[k];
                 
-                vertexes[0]=vertexes[9]=line.x0;
-                vertexes[3]=vertexes[6]=line.x1;
-                vertexes[1]=vertexes[4]=line.yBound.max;
-                vertexes[7]=vertexes[10]=line.yBound.min;
-                vertexes[2]=vertexes[11]=line.z0;
-                vertexes[5]=vertexes[8]=line.z1;
+                vertexes[0]=wall.v0.x;
+                vertexes[1]=wall.v0.y;
+                vertexes[2]=wall.v0.z;
+                vertexes[3]=wall.v1.x;
+                vertexes[4]=wall.v1.y;
+                vertexes[5]=wall.v1.z;
+                vertexes[6]=wall.v2.x;
+                vertexes[7]=wall.v2.y;
+                vertexes[8]=wall.v2.z;
                 
                 gl.bufferData(gl.ARRAY_BUFFER,vertexes,gl.DYNAMIC_DRAW);
-
-                gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,0);
+                gl.drawArrays(gl.TRIANGLES,0,3);
             }
             
                 // draw the floors in blue
@@ -370,8 +370,7 @@ export default class MeshListClass
                 vertexes[8]=floor.v2.z;
                 
                 gl.bufferData(gl.ARRAY_BUFFER,vertexes,gl.DYNAMIC_DRAW);
-
-                gl.drawElements(gl.TRIANGLES,3,gl.UNSIGNED_SHORT,0);
+                gl.drawArrays(gl.TRIANGLES,0,3);
             }
             
                 // draw the ceilings in red
@@ -392,8 +391,7 @@ export default class MeshListClass
                 vertexes[8]=ceiling.v2.z;
                 
                 gl.bufferData(gl.ARRAY_BUFFER,vertexes,gl.DYNAMIC_DRAW);
-
-                gl.drawElements(gl.TRIANGLES,3,gl.UNSIGNED_SHORT,0);
+                gl.drawArrays(gl.TRIANGLES,0,3);
             }
         }
         

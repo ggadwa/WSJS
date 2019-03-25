@@ -26,7 +26,6 @@ export default class CollisionTrigClass
         this.perpVector=new PointClass(0,0,0);
         this.lineToTrigPointVector=new PointClass(0,0,0);
         this.lineToTrigPerpVector=new PointClass(0,0,0);
-        this.hitPoint=new PointClass(0,0,0);
         
             // precalc some items
             
@@ -79,7 +78,7 @@ export default class CollisionTrigClass
         return(!(this.zBound.max<=zLapBound.min));
     }
     
-    rayTrace(pnt,rayVct)
+    rayTrace(pnt,rayVct,hitPnt)
     {
 	let det,invDet,t,u,v;
         
@@ -95,7 +94,7 @@ export default class CollisionTrigClass
 	
 		// is line on the same plane as triangle?
 		
-	if ((det>-0.00001) && (det<0.00001)) return(null);
+	if ((det>-0.00001) && (det<0.00001)) return(false);
 
 		// get the inverse determinate
 
@@ -111,7 +110,7 @@ export default class CollisionTrigClass
 	this.lineToTrigPointVector.z=pnt.z-this.v0.z;
 
 	u=invDet*((this.lineToTrigPointVector.x*this.perpVector.x)+(this.lineToTrigPointVector.y*this.perpVector.y)+(this.lineToTrigPointVector.z*this.perpVector.z));
-	if ((u<0.0) || (u>1.0)) return(null);
+	if ((u<0.0) || (u>1.0)) return(false);
 	
 		// calculate triangle V and test
 		// using the cross product of lineToTrigPointVector
@@ -122,24 +121,22 @@ export default class CollisionTrigClass
 	this.lineToTrigPerpVector.z=(this.lineToTrigPointVector.x*this.vct1.y)-(this.vct1.x*this.lineToTrigPointVector.y);
 	
 	v=invDet*((rayVct.x*this.lineToTrigPerpVector.x)+(rayVct.y*this.lineToTrigPerpVector.y)+(rayVct.z*this.lineToTrigPerpVector.z));
-	if ((v<0.0) || ((u+v)>1.0)) return(null);
+	if ((v<0.0) || ((u+v)>1.0)) return(false);
 	
 		// get line T for point(t) =  start_point + (vector*t)
 		// use the inner product of vct2 and lineToTrigPerpVector
 		// -t are on the negative vector behind the point, so ignore
 
 	t=invDet*((this.vct2.x*this.lineToTrigPerpVector.x)+(this.vct2.y*this.lineToTrigPerpVector.y)+(this.vct2.z*this.lineToTrigPerpVector.z));
-	if (t<0.0) return(null);
+	if (t<0.0) return(false);
 	
-		// get point on line of intersection
+            // get point on line of intersection
 		
-	this.hitPoint.x=pnt.x+(rayVct.x*t);
-	this.hitPoint.y=pnt.y+(rayVct.y*t);
-	this.hitPoint.z=pnt.z+(rayVct.z*t);
-	
-		// return hit point
+	hitPnt.x=pnt.x+(rayVct.x*t);
+	hitPnt.y=pnt.y+(rayVct.y*t);
+	hitPnt.z=pnt.z+(rayVct.z*t);
 		
-	return(this.hitPoint);
+	return(true);
     }
 
 }

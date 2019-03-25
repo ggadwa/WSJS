@@ -368,7 +368,7 @@ export default class ProjectEntityClass
             this.position.addValuesTrunc(0,riseY,0);
             
             if (riseY<yAdd) {
-                this.movePnt.y=0;                      // if we can't get as high as we want, then clear any movement
+                movePnt.y=0;                      // if we can't get as high as we want, then clear any movement
                 return(true);
             }
         }
@@ -511,6 +511,15 @@ export default class ProjectEntityClass
 	}
         
         return((addway<subway)?addway:subway);
+    }
+    
+        //
+        // ray trace utilities
+        //
+        
+    rayCollision(pnt,vector,hitPnt)
+    {
+        return(this.collision.rayCollision(pnt,vector,hitPnt));
     }
     
         //

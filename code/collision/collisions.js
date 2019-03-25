@@ -13,10 +13,7 @@ export default class CollisionClass
     {
         this.core=core;
         
-        this.spokePt=new PointClass(0,0,0);        // these are global to avoid it being local and GCd
-        this.spokeHitPt=new PointClass(0,0,0);
-        this.spokeLine=new LineClass(null,null);
-        
+        this.spokeCenterPt=new PointClass(0,0,0);
         this.spokeCalcSin=new Float32Array(24);    // circular collision pre-calcs
         this.spokeCalcCos=new Float32Array(24);
         this.preCalcSpokes();
@@ -25,6 +22,7 @@ export default class CollisionClass
         this.moveIntersectPt=new PointClass(0,0,0);
         this.radiusPt=new PointClass(0,0,0);
         
+        this.rayHitPnt=new PointClass(0,0,0);
         this.rayPoints=[];
         this.createRayPoints();
         
@@ -63,67 +61,45 @@ export default class CollisionClass
         // collision routines
         //
     
-    collisionLineToLineXZIntersection(collisionLine,line,py,lineIntersectPt)
-    {
-        let denom,r,s,ax,az;
-        
-        let fx0=collisionLine.x0;
-        let fz0=collisionLine.z0;
-        let fx1=collisionLine.x1;
-        let fz1=collisionLine.z1;
-        let fx2=line.p1.x;
-        let fz2=line.p1.z;
-        let fx3=line.p2.x;
-        let fz3=line.p2.z;
-
-        let bx=fx1-fx0;
-        let dx=fx3-fx2;
-
-        let bz=fz1-fz0;
-        let dz=fz3-fz2;
-
-        denom=(bx*dz)-(bz*dx);
-        if (denom===0.0) return(false);
-        
-        ax=fx0-fx2;
-        az=fz0-fz2;
-
-        r=((az*dx)-(ax*dz))/denom;
-        if ((r<0.0) || (r>1.0)) return(false);
-
-        s=((az*bx)-(ax*bz))/denom;
-        if ((s<0.0) || (s>1.0)) return(false);
-
-        if ((r===0.0) && (s===0.0)) return(false);
-
-        lineIntersectPt.setFromValues((fx0+(r*bx)),py,(fz0+(r*bz)));
-        return(true);
-    }
-
-    circleLineXZIntersection(collisionLine,circlePt,radius,lineIntersectPt)
+    circleTrigXZIntersection(collisionTrig,circlePt,radius,high,lineIntersectPt)
     {
             // cast rays from the center of the circle
             // like spokes to check for collisions
-            // we do it instead of just checking the
-            // perpendicular so you can't wade into corners
             
-        let n,dist;
+        let n,k,y,yAdd,segmentCount,dist;
         let currentDist=-1;
         
-        this.spokePt.setFromValues(circlePt.x,circlePt.y,circlePt.z);
-        this.spokeLine.setFromValues(circlePt,this.spokePt);
+            // always directly out of the center, so
+            // y is always 0
+            
+        this.rayVector.y=0;
+        
+            // we need to do the height in parts so we
+            // hit things of all heights
+            
+        segmentCount=Math.trunc(high/1000);
+        yAdd=Math.trunc(high/segmentCount);
 
-        for (n=0;n!==24;n++) {
-            this.spokePt.x=circlePt.x+(radius*this.spokeCalcSin[n]);
-            this.spokePt.z=circlePt.z-(radius*this.spokeCalcCos[n]);   // everything is passed by pointer so this will change the spoke line
+            // now the spokes across the y
+            
+        this.spokeCenterPt.setFromValues(circlePt.x,(circlePt.y+100),circlePt.z);           // don't do directly on bottom
+            
+        for (n=0;n!==segmentCount;n++) {
+ 
+            for (k=0;k!==24;k++) {
+                this.rayVector.x=this.spokeCenterPt.x+(radius*this.spokeCalcSin[k]);
+                this.rayVector.z=this.spokeCenterPt.z-(radius*this.spokeCalcCos[k]);
 
-            if (this.collisionLineToLineXZIntersection(collisionLine,this.spokeLine,circlePt.y,this.spokeHitPt)) {
-                dist=circlePt.noSquareDistance(this.spokeHitPt);
-                if ((dist<currentDist) || (currentDist===-1)) {
-                    lineIntersectPt.setFromPoint(this.spokeHitPt);
-                    currentDist=dist;
+                if (collisionTrig.rayTrace(this.spokeCenterPt,this.rayVector,this.rayHitPnt)) {
+                    dist=this.spokeCenterPt.noSquareDistance(this.rayHitPnt);
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        lineIntersectPt.setFromPoint(this.rayHitPnt);
+                        currentDist=dist;
+                    }
                 }
             }
+            
+            this.spokeCenterPt.y+=yAdd;
         }
         
         return(currentDist!==-1);
@@ -160,7 +136,7 @@ export default class CollisionClass
     {
         let n,k;
         let mesh,checkEntity,checkEntityPt;
-        let collisionLine,nCollisionLine;        
+        let collisionTrig,nCollisionTrig;        
         let currentHitPt;        
         let dist,currentDist;
         
@@ -202,19 +178,15 @@ export default class CollisionClass
 
                 // check the collide lines
 
-            nCollisionLine=mesh.collisionLines.length;
+            nCollisionTrig=mesh.collisionWallTrigs.length;
 
-            for (k=0;k!==nCollisionLine;k++) {
-                collisionLine=mesh.collisionLines[k];
-
-                    // skip if not in the Y of the line
-
-                if (entity.position.y>=collisionLine.yBound.max) continue;
-                if ((entity.position.y+high)<collisionLine.yBound.min) continue;
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionWallTrigs[k];
+                if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
 
                     // check against line
                     
-                if (!this.circleLineXZIntersection(collisionLine,entity.position,radius,this.moveIntersectPt)) continue;
+                if (!this.circleTrigXZIntersection(collisionTrig,entity.position,radius,high,this.moveIntersectPt)) continue;
 
                     // find closest hit point
 
@@ -287,7 +259,7 @@ export default class CollisionClass
     {
         let n,k;
         let mesh,checkEntity,checkEntityPt;
-        let collisionLine,nCollisionLine;        
+        let collisionTrig,nCollisionTrig;        
         let currentHitPt;        
         let dist,currentDist;
         
@@ -343,19 +315,15 @@ export default class CollisionClass
                 
                     // check the collide lines
                     
-                nCollisionLine=mesh.collisionLines.length;
+                nCollisionTrig=mesh.collisionWallTrigs.length;
 
-                for (k=0;k!==nCollisionLine;k++) {
-                    collisionLine=mesh.collisionLines[k];
-                    
-                        // skip if not in the Y of the line
-            
-                    if (this.testPt.y>=collisionLine.yBound.max) continue;
-                    if ((this.testPt.y+high)<collisionLine.yBound.min) continue;
+                for (k=0;k!==nCollisionTrig;k++) {
+                    collisionTrig=mesh.collisionWallTrigs[k];
+                    if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
                     
                         // check against line
                     
-                    if (!this.circleLineXZIntersection(collisionLine,this.testPt,radius,this.moveIntersectPt)) continue;
+                    if (!this.circleTrigXZIntersection(collisionTrig,this.testPt,radius,high,this.moveIntersectPt)) continue;
                     
                         // find closest hit point
 
@@ -367,7 +335,7 @@ export default class CollisionClass
                         currentDist=dist;
                         
                         bumpY=-1;
-                        if ((collisionLine.yBound.max-this.testPt.y)<=constants.BUMP_HEIGHT) bumpY=collisionLine.yBound.max;
+                        if ((collisionTrig.yBound.max-this.testPt.y)<=constants.BUMP_HEIGHT) bumpY=collisionTrig.yBound.max;
                     }
                 }
             }
@@ -448,9 +416,9 @@ export default class CollisionClass
         collideMovePt.setFromValues((this.radiusPt.x-origPt.x),(this.testPt.y-origPt.y),(this.radiusPt.z-origPt.z));
     }
     
-    //
-    // floor collisions
-    //
+        //
+        // floor collisions
+        //
     
     buildYCollisionRayPoints(entity,y)
     {
@@ -474,7 +442,7 @@ export default class CollisionClass
     fallObjectInMap(entity)
     {
         let n,k,i,y,nMesh,nCollisionTrig;
-        let mesh,collisionTrig,rayHitPnt;
+        let mesh,collisionTrig;
 
             // the rough collide boxes
             // floor_rise_height is the farthest
@@ -526,11 +494,10 @@ export default class CollisionClass
                 collisionTrig=mesh.collisionFloorTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
                     for (i=0;i!==25;i++) {
-                        rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
-                        if (rayHitPnt!==null) {
-                            if (rayHitPnt.y>=y) {
+                        if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
+                            if (this.rayHitPnt.y>=y) {
                                 entity.standOnMeshIdx=n;
-                                y=rayHitPnt.y;
+                                y=this.rayHitPnt.y;
                             }
                         }
                     }
@@ -555,7 +522,7 @@ export default class CollisionClass
     riseObjectInMap(entity,riseY)
     {
         let n,k,i,y,nMesh,nCollisionTrig;
-        let mesh,collisionTrig,rayHitPnt;
+        let mesh,collisionTrig;
         
             // the rough collide boxes
             // we check from the top of the object past the rise
@@ -607,11 +574,10 @@ export default class CollisionClass
                 collisionTrig=mesh.collisionCeilingTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
                     for (i=0;i!==25;i++) {
-                        rayHitPnt=collisionTrig.rayTrace(this.rayPoints[i],this.rayVector);
-                        if (rayHitPnt!==null) {
-                            if (rayHitPnt.y<=y) {
+                        if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
+                            if (this.rayHitPnt.y<=y) {
                                 entity.collideCeilingMeshIdx=n;
-                                y=rayHitPnt.y;
+                                y=this.rayHitPnt.y;
                             }
                         }
                     }
@@ -624,6 +590,100 @@ export default class CollisionClass
             // if no collisions, return the riseY
         
         return(riseY);
+    }
+    
+        //
+        // ray collision
+        //
+        
+    rayCollision(pnt,vector,hitPnt)
+    {
+        let n,k;
+        let mesh,checkEntity,checkEntityPt;
+        let collisionTrig,nCollisionTrig;              
+        let dist,currentDist;
+        
+        let nMesh=this.core.map.meshList.meshes.length;
+        let nEntity=this.core.map.entityList.count();
+        
+            // the rough collide boxes
+            
+        this.objXBound.setFromValues(pnt.x,(pnt.x+vector.x));
+        this.objYBound.setFromValues(pnt.y,(pnt.y+vector.y));
+        this.objZBound.setFromValues(pnt.z,(pnt.z+vector.z));
+        
+            // no collisions yet
+
+        currentDist=-1;
+
+            // run through the meshes and
+            // check against all trigs
+
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.core.map.meshList.meshes[n];
+            if (mesh.noCollisions) continue;
+
+                // skip any mesh we don't collide with
+
+            if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                // check the wall trigs
+
+            nCollisionTrig=mesh.collisionWallTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionWallTrigs[k];
+                if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                if (collisionTrig.rayTrace(pnt,vector,this.rayHitPnt)) {
+                    dist=pnt.noSquareDistance(this.rayHitPnt);
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        hitPnt.setFromPoint(this.rayHitPnt);
+                        currentDist=dist;
+                    }
+                }
+            }
+        }
+/*
+            // check other entities
+
+        for (n=0;n!==nEntity;n++) {
+            checkEntity=this.core.map.entityList.get(n);
+            if (checkEntity.id===entity.id) continue;
+            if (checkEntity.heldBy===entity) continue;
+
+            checkEntityPt=checkEntity.position;
+
+                // skip if not in the Y of the object
+
+            entityTopY=checkEntityPt.y+checkEntity.height;
+            if (((entity.position.y+high)<checkEntityPt.y) || (entity.position.y>=entityTopY)) continue;
+
+                // check the circle
+
+            if (!this.circleCircleIntersection(entity.position,radius,checkEntityPt,checkEntity.radius,this.moveIntersectPt)) continue;
+
+                // find closest hit point
+
+            dist=entity.position.noSquareDistance(this.moveIntersectPt);
+            if ((dist<currentDist) || (currentDist===-1)) {
+                entity.collideWallMeshIdx=-1;
+
+                    // set the touch
+
+                entity.touchEntity=checkEntity;
+                checkEntity.touchEntity=entity;
+
+                    // the hit point
+
+                currentHitPt=this.moveIntersectPt;
+                currentDist=dist;
+            }
+        }
+*/
+            // any hits
+            
+        return(currentDist!==-1);
     }
     
 }

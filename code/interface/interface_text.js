@@ -53,10 +53,22 @@ export default class InterfaceTextClass
         this.vertexArray=new Float32Array((InterfaceTextClass.TEXT_MAX_STRING_LEN*4)*2);
         this.uvArray=new Float32Array((InterfaceTextClass.TEXT_MAX_STRING_LEN*4)*2);
         this.indexArray=new Uint16Array((InterfaceTextClass.TEXT_MAX_STRING_LEN*2)*3);
+        
+            // setup buffer data here so we can subdata later
             
         this.vertexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.DYNAMIC_DRAW);
+        
         this.uvBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        
         this.indexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
     }
     
     release()
@@ -257,19 +269,19 @@ export default class InterfaceTextClass
             // setup the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.vertexArray,gl.STREAM_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
 
         gl.enableVertexAttribArray(shader.vertexPositionAttribute);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER,this.uvArray,gl.STREAM_DRAW);
+        gl.bufferSubData(gl.ARRAY_BUFFER,0,this.uvArray);
 
         gl.enableVertexAttribArray(shader.vertexUVAttribute);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.indexArray,gl.STREAM_DRAW);
+        gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER,0,this.indexArray);
 
             // draw the indexes
 
