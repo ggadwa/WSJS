@@ -6,14 +6,17 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
-- look up down hit scan
-- hit scan needs to do floor and ceilings trigs
 
-- work on wall trig collisions
+- billboard quads draw from effect --> need setup, and use subdata
+
+- bouncing grenade
+
+- work on entity wall trig collisions
 - bots need to determine if on moving platforms
 - new way to do tinting
 
-- bouncing grenade
+- Pt to Pnt
+
 - why is mouse wheel broken? (sometimes!  pause state?)
 
 need isEntityInRange('player') then check for E key on 

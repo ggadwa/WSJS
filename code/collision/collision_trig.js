@@ -59,6 +59,15 @@ export default class CollisionTrigClass
 	this.vct2.z=this.v2.z-this.v0.z;
     }
     
+    resetFromValues(x0,y0,z0,x1,y1,z1,x2,y2,z2)
+    {
+        this.v0.setFromValues(x0,y0,z0);
+        this.v1.setFromValues(x1,y1,z1);
+        this.v2.setFromValues(x2,y2,z2);
+        
+        this.precalc();
+    }
+    
     addPoint(pnt)
     {
         this.v0.addPoint(pnt);

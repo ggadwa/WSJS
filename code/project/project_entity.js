@@ -46,6 +46,7 @@ export default class ProjectEntityClass
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
         this.touchEntity=null;
+        this.hitEntity=null;
         
         this.collideWallMeshIdx=-1;
         this.collideWallLineIdx=-1;
@@ -266,7 +267,7 @@ export default class ProjectEntityClass
         
         this.checkMovePt.setFromValues(movePnt.x,0,movePnt.z);
         
-        this.collision.moveObjectInMap(this,this.checkMovePt,bump,this.collideMovePt);
+        this.collision.moveEntityInMap(this,this.checkMovePt,bump,this.collideMovePt);
         if ((this.collideMovePt.equals(this.checkMovePt)) || (this.collideMovePt.y!==0)) {
             this.position.addPointTrunc(this.collideMovePt);
             return;
@@ -277,7 +278,7 @@ export default class ProjectEntityClass
         if (slide) {
             this.checkMovePt.setFromValues(movePnt.x,0.0,0.0);
 
-            this.collision.moveObjectInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
+            this.collision.moveEntityInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
             if (this.collideSlideMovePt.equals(this.checkMovePt)) {
                 this.position.addPointTrunc(this.collideSlideMovePt);
                 return;
@@ -285,7 +286,7 @@ export default class ProjectEntityClass
 
             this.checkMovePt.setFromValues(0.0,0.0,movePnt.z);
 
-            this.collision.moveObjectInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
+            this.collision.moveEntityInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
             if (this.collideSlideMovePt.equals(this.checkMovePt)) {
                 this.position.addPointTrunc(this.collideSlideMovePt);
                 return;
@@ -348,7 +349,7 @@ export default class ProjectEntityClass
         if (yAdd<=0) {
             this.collideCeilingMeshIdx=-1;                         // no ceiling collisions if going down
 
-            fallY=this.collision.fallObjectInMap(this);
+            fallY=this.collision.fallEntityInMap(this);
             if (fallY<yAdd) fallY=yAdd;                            // can only drop as far as current fall
             
             this.position.addValuesTrunc(0,fallY,0);
@@ -364,7 +365,7 @@ export default class ProjectEntityClass
         else {
             this.standOnMeshIdx=-1;                                 // no standing if going up
             
-            riseY=this.collision.riseObjectInMap(this,yAdd);
+            riseY=this.collision.riseEntityInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);
             
             if (riseY<yAdd) {
@@ -519,7 +520,7 @@ export default class ProjectEntityClass
         
     rayCollision(pnt,vector,hitPnt)
     {
-        return(this.collision.rayCollision(pnt,vector,hitPnt));
+        return(this.collision.rayCollision(pnt,vector,hitPnt,this));
     }
     
         //

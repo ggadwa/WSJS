@@ -134,6 +134,17 @@ export default class ProjectEffectClass
     }
     
         //
+        // override this to react when something is restarting
+        // this effect, i.e., starting it over in another location
+        //
+        
+    restart(position,show)
+    {
+        this.position.setFromPoint(position);
+        this.show=show;
+    }
+    
+        //
         // override this if the effect projects and
         // light.  Return a lightclass (type to precalc if you
         // can.)  Default retuns NULL, which means no light
