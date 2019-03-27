@@ -49,7 +49,7 @@ export default class ProjectEntityClass
         this.hitEntity=null;
         
         this.collideWallMeshIdx=-1;
-        this.collideWallLineIdx=-1;
+        this.collideWallTrigIdx=-1;
         this.collideCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
         
@@ -356,7 +356,7 @@ export default class ProjectEntityClass
         
             if (fallY>=0) {
                 this.gravity=this.gravityMinValue;                  // if we are rising or stopped by a floor, restart gravity
-                return(true);
+                return(movePnt.y);
             }
         }
         
@@ -368,13 +368,10 @@ export default class ProjectEntityClass
             riseY=this.collision.riseEntityInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);
             
-            if (riseY<yAdd) {
-                movePnt.y=0;                      // if we can't get as high as we want, then clear any movement
-                return(true);
-            }
+            if (riseY<yAdd) return(0);                      // if we can't get as high as we want, then clear any movement
         }
         
-        return(false);
+        return(movePnt.y);
     }
     
         //
@@ -395,33 +392,35 @@ export default class ProjectEntityClass
         }
     }
     
-        // change movement
+        //
+        // movement utilities
+        //
         
-    movementBounce(bounceFactor)
+    movementBounce(movement,bounceFactor)
     {
-        this.movement.y=-Math.trunc((this.movement.y+this.gravity)*bounceFactor);
+        movement.y=-Math.trunc((movement.y+this.gravity)*bounceFactor);
         this.gravity=this.gravityMinValue;
         
-        return(Math.abs(this.movement.y)>this.gravityAcceleration);
+        return(Math.abs(movement.y)>this.gravityAcceleration);
     }
     
-    movementReflect()
+    movementReflect(movement,angY)
     {
         let f,ang;
-        let collisionLine;
+        let collisionTrig;
         
             // get the movement vector from the hit
             // point, which is the inverse
 
-        this.reflectMovementVector.setFromValues(this.movement.x,0,this.movement.z);
-        this.reflectMovementVector.rotateY(null,this.angle.y);
-        this.reflectMovementVector.trunc();
+        this.reflectMovementVector.setFromValues(movement.x,0,movement.z);
         this.reflectMovementVector.scale(-1.0);
         
             // get the collision line vector
         
-        collisionLine=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionLines[this.collideWallLineIdx];
-        this.reflectLineVector.setFromSubPoint(collisionLine.p1,collisionLine.p2);
+        collisionTrig=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionWallTrigs[this.collideWallTrigIdx];
+        collisionTrig.getReflectionVector(this.reflectLineVector);
+        
+        this.reflectLineVector.y=0;       // remove this, we are only doing in 2D
 	
             // now get the angle between them,
             // checking both directions of wall
@@ -433,11 +432,14 @@ export default class ProjectEntityClass
         ang=Math.acos(f)*constants.RAD_TO_DEGREE;
 
             // calculate the reflection angle
-		
-	ang=this.angle.y-(180.0-(ang*2.0));
-	if (ang===this.angle.y) ang=this.angle.y+180.0;          // special check for straight hits
+            
+        ang=angY+(ang*2.0);
+        if (ang<0.0) ang=360.0+ang;
+        if (ang>360.0) ang=ang-360.0;
 
-	this.angle.y=ang;
+        if (ang===angY) ang=angY+180.0;          // special check for straight hits
+        
+        return(ang);
     }
     
         //

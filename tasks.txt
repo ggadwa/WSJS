@@ -7,9 +7,9 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
 
-- billboard quads draw from effect --> need setup, and use subdata
 
 - bouncing grenade
+- reflections are bad
 
 - work on entity wall trig collisions
 - bots need to determine if on moving platforms

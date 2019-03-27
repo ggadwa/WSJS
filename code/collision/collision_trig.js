@@ -87,6 +87,16 @@ export default class CollisionTrigClass
         return(!(this.zBound.max<=zLapBound.min));
     }
     
+    getReflectionVector(vector)
+    {
+        if (this.v0.distance(this.v1)>this.v0.distance(this.v2)) {
+            vector.setFromSubPoint(this.v0,this.v1);
+        }
+        else {
+            vector.setFromSubPoint(this.v0,this.v2);
+        }
+    }
+    
     rayTrace(pnt,rayVct,hitPnt)
     {
 	let det,invDet,t,u,v;
