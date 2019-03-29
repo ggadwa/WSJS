@@ -7,9 +7,7 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
 
-
-- bouncing grenade
-- reflections are bad
+- explosion particle
 
 - work on entity wall trig collisions
 - bots need to determine if on moving platforms

@@ -38,7 +38,7 @@ export default class ProjectEntityClass
         this.health=100;
         
         this.gravityMinValue=10;
-        this.gravityMaxValue=280;
+        this.gravityMaxValue=300;
         this.gravityAcceleration=10;
         
         this.gravity=this.gravityMinValue;
@@ -396,48 +396,53 @@ export default class ProjectEntityClass
         // movement utilities
         //
         
-    movementBounce(movement,bounceFactor)
+    floorHitBounceY(y,bounceFactor)
     {
-        movement.y=-Math.trunc((movement.y+this.gravity)*bounceFactor);
+        y=-Math.trunc((y+this.gravity)*bounceFactor);
         this.gravity=this.gravityMinValue;
         
-        return(Math.abs(movement.y)>this.gravityAcceleration);
+        if (Math.abs(y)<this.gravityAcceleration) y=0;          // always break if we are less than acceleration
+        
+        return(y);
     }
     
-    movementReflect(movement,angY)
+    wallHitAngleReflect()
     {
         let f,ang;
         let collisionTrig;
         
-            // get the movement vector from the hit
-            // point, which is the inverse
+            // get the opposite of the movement
+            // vector and the collision wall vector
+            // we do the opposite so we start facing
+            // back down the movement vector
 
-        this.reflectMovementVector.setFromValues(movement.x,0,movement.z);
-        this.reflectMovementVector.scale(-1.0);
-        
-            // get the collision line vector
+        this.reflectMovementVector.setFromValues(0,0,-1);
+        this.reflectMovementVector.rotateY(null,this.angle.y);
         
         collisionTrig=this.core.map.meshList.meshes[this.collideWallMeshIdx].collisionWallTrigs[this.collideWallTrigIdx];
         collisionTrig.getReflectionVector(this.reflectLineVector);
         
-        this.reflectLineVector.y=0;       // remove this, we are only doing in 2D
+        this.reflectLineVector.y=0;       // remove y, we are only doing in 2D
 	
-            // now get the angle between them,
-            // checking both directions of wall
+            // now get the angle between the vectors
             
         this.reflectMovementVector.normalize();
         this.reflectLineVector.normalize();
             
         f=this.reflectLineVector.dot(this.reflectMovementVector);
         ang=Math.acos(f)*constants.RAD_TO_DEGREE;
-
+        
             // calculate the reflection angle
             
-        ang=angY+(ang*2.0);
+        if (this.angle.y>=180.0) {
+            ang=(this.angle.y+180.0)+(180.0-(ang*2.0));
+        }
+        else {
+            ang=(this.angle.y+180.0)-(ang*2.0);
+        }
+
         if (ang<0.0) ang=360.0+ang;
         if (ang>360.0) ang=ang-360.0;
-
-        if (ang===angY) ang=angY+180.0;          // special check for straight hits
         
         return(ang);
     }

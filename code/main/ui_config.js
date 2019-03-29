@@ -197,8 +197,8 @@ export default class UIConfigClass
         this.createInstructionLine(instructDiv,'AWSD - Movement');
         this.createInstructionLine(instructDiv,'Space - Jump');
         this.createInstructionLine(instructDiv,'Left Mouse Button - Fire');
-        this.createInstructionLine(instructDiv,'Right Mouse Button - Alt Fire');
-        this.createInstructionLine(instructDiv,'Mouse Wheel - Change Weapon');
+        this.createInstructionLine(instructDiv,'Right Mouse Button - Grenade');
+        this.createInstructionLine(instructDiv,'Mouse Wheel / Number keys  - Change Weapon');
 
         document.body.appendChild(instructDiv);
         
