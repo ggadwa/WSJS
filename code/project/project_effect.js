@@ -1,4 +1,6 @@
 import PointClass from '../utility/point.js';
+import ColorClass from '../../code/utility/color.js';
+import LightClass from '../../code/light/light.js';
 
 class ProjectEffectChunkClass
 {
@@ -42,12 +44,13 @@ export default class ProjectEffectClass
         this.chunks=[];
 
         this.tempPoint=new PointClass(0,0,0);
+        this.motionPoint=new PointClass(0,0,0);
+        
+        this.light=new LightClass(this.position,new ColorClass(1.0,1.0,1.0),0,1.0);
     }
     
     initialize()
     {
-        this.show=true;
-        
         return(true);
     }
     
@@ -62,6 +65,40 @@ export default class ProjectEffectClass
     addBitmap(colorURL,normalURL,specularURL,specularFactor,scale)
     {
         return(this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale));
+    }
+    
+        //
+        // light utilities
+        //
+        
+    setLightColor(color,exponent)
+    {
+        this.light.color.setFromColor(color);
+        this.light.exponent=exponent;
+    }
+    
+    setLightIntensity(intensity)
+    {
+        this.light.setIntensity(intensity);
+    }
+    
+        //
+        // random move utilities
+        //
+        
+    createRandomMotionArray(count,x,y,z)
+    {
+        let n;
+        let dx=x*2;
+        let dy=y*2;
+        let dz=z*2;
+        let motions=[];
+        
+        for (n=0;n!==count;n++) {
+            motions.push(new PointClass(((dx*Math.random())-x),((dy*Math.random())-y),((dz*Math.random())-z)));
+        }
+        
+        return(motions);
     }
     
         //
@@ -193,6 +230,19 @@ export default class ProjectEffectClass
         this.indexes[this.indexIdx++]=elementIdx+3;
     }
     
+    drawAddBillboardQuadFromMotion(bitmap,motions,factor,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,sourceFactor,destFactor,color,alpha)
+    {
+        let motion;
+        
+        for (motion of motions) {
+            this.motionPoint.setFromPoint(centerPnt);
+            this.motionPoint.x+=(motion.x*factor);
+            this.motionPoint.y+=(motion.y*factor);
+            this.motionPoint.z+=(motion.z*factor);
+            this.drawAddBillboardQuad(bitmap,this.motionPoint,u,v,uSize,vSize,halfWid,halfHigh,rot,sourceFactor,destFactor,color,alpha);
+        }
+    }
+    
     drawAddTriangle(bitmap,pnt0,u0,v0,pnt1,u1,v1,pnt2,u2,v2,sourceFactor,destFactor,color,alpha)
     {
         let elementIdx=Math.trunc(this.vertexIdx/3);
@@ -242,7 +292,7 @@ export default class ProjectEffectClass
         
         gl.enable(gl.BLEND);
         gl.depthMask(false);
-            
+        
             // setup the buffers
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexPosBuffer);
@@ -277,7 +327,7 @@ export default class ProjectEffectClass
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,null);
         
             // reset gl back to normal
-            
+        
         gl.disable(gl.BLEND);
         gl.depthMask(true);
         
@@ -293,17 +343,6 @@ export default class ProjectEffectClass
     {
         this.position.setFromPoint(position);
         this.show=show;
-    }
-    
-        //
-        // override this if the effect projects and
-        // light.  Return a lightclass (type to precalc if you
-        // can.)  Default retuns NULL, which means no light
-        //
-        
-    getLight()
-    {
-        return(null);
     }
     
         //

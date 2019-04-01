@@ -15,6 +15,13 @@ export default class ColorClass
         this.g=g;
         this.b=b;
     }
+    
+    setFromColor(col)
+    {
+        this.r=col.r;
+        this.g=col.g;
+        this.b=col.b;
+    }
                 
     add(col)
     {

@@ -7,8 +7,9 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
 
-- explosion particle
+- sub folders for scripts?
 
+- need to eliminate floor segments that have an x or z that is too small
 - work on entity wall trig collisions
 - bots need to determine if on moving platforms
 - new way to do tinting
@@ -21,12 +22,6 @@ need isEntityInRange('player') then check for E key on
 
 sort effects, will need a sort z call into the effect
 entites need data
-
-
-project_entity clean up
-        this.gravityMinValue=10;
-        this.gravityMaxValue=280;
-        this.gravityAcceleration=10;
 
 
 2. liquids need to draw away from z

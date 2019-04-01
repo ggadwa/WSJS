@@ -405,15 +405,11 @@ export default class CoreClass
             this.lights.push(null);
         }
         
-            // and finally do any light running
-            // and make the eye coordinate
+            // and create light eye cordinates
 
         for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
             light=this.lights[n];
-            if (light!==null) {
-                light.run(this.timestamp);
-                this.convertToEyeCoordinates(light.position,light.eyePosition);
-            }
+            if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
         }
 
             // build the culling frustum

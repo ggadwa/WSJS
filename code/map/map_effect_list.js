@@ -57,8 +57,13 @@ export default class MapEffectListClass
         for (effect of this.effects) {
             if (!effect.show) continue;
             
-            light=effect.getLight();
-            if (light===null) continue;
+            light=effect.light;
+            if (light.intensity===0) continue;
+            
+                // always reset light to
+                // effect position
+                
+            light.position.setFromPoint(effect.position);
             
                 // skip any lights outside of frustrum
                 
