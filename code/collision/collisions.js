@@ -21,7 +21,6 @@ export default class CollisionClass
 
         this.testPnt=new PointClass(0,0,0);
         this.intersectPnt=new PointClass(0,0,0);
-        this.radiusPt=new PointClass(0,0,0);
         
         this.rayHitPnt=new PointClass(0,0,0);
         this.rayIntersectPnt=new PointClass(0,0,0);
@@ -65,7 +64,7 @@ export default class CollisionClass
         // collision utilities
         //
     
-    circleTrigXZIntersection(collisionTrig,circlePt,radius,high,lineIntersectPt)
+    circleTrigXZIntersection(collisionTrig,circlePnt,radius,high,lineIntersectPnt)
     {
             // cast rays from the center of the circle
             // like spokes to check for collisions
@@ -86,7 +85,7 @@ export default class CollisionClass
 
             // now the spokes across the y
             
-        this.spokeCenterPt.setFromValues(circlePt.x,circlePt.y,circlePt.z);           // don't do directly on bottom
+        this.spokeCenterPt.setFromValues(circlePnt.x,circlePnt.y,circlePnt.z);           // don't do directly on bottom
             
         for (n=0;n!==segmentCount;n++) {
  
@@ -97,7 +96,7 @@ export default class CollisionClass
                 if (collisionTrig.rayTrace(this.spokeCenterPt,this.rayVector,this.rayHitPnt)) {
                     dist=this.spokeCenterPt.noSquareDistance(this.rayHitPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
-                        lineIntersectPt.setFromPoint(this.rayHitPnt);
+                        lineIntersectPnt.setFromPoint(this.rayHitPnt);
                         currentDist=dist;
                     }
                 }
@@ -109,7 +108,7 @@ export default class CollisionClass
         return(currentDist!==-1);
     }
     
-    circleCircleIntersection(circlePt1,radius1,circlePt2,radius2,circleIntersectPt)
+    circleCircleIntersection(circlePnt1,radius1,circlePnt2,radius2,circleIntersectPnt)
     {
         let dist;
         let totalRadius=radius1+radius2;
@@ -118,16 +117,16 @@ export default class CollisionClass
             // (x,z only, scrub out the Y)
             // if less than r1+r2 then it's a hit
             
-        dist=circlePt1.distanceScrubY(circlePt2);
+        dist=circlePnt1.distanceScrubY(circlePnt2);
         if (dist>totalRadius) return(false);
         
             // hit point needs to be on the
             // radius of circle2
             
-        circleIntersectPt.setFromValues((circlePt1.x-circlePt2.x),0,(circlePt1.z-circlePt2.z));
-        circleIntersectPt.normalize();
-        circleIntersectPt.scale(radius2);
-        circleIntersectPt.addPoint(circlePt2);
+        circleIntersectPnt.setFromValues((circlePnt1.x-circlePnt2.x),0,(circlePnt1.z-circlePnt2.z));
+        circleIntersectPnt.normalize();
+        circleIntersectPnt.scale(radius2);
+        circleIntersectPnt.addPoint(circlePnt2);
         
         return(true);
     }
@@ -182,14 +181,10 @@ export default class CollisionClass
     moveEntityInMap(entity,movePnt,bump,collideMovePnt)
     {
         let n,k;
-        let mesh,checkEntity,checkEntityPt;
+        let mesh,checkEntity;
         let collisionTrig,nCollisionTrig;        
-        let currentHitPt;        
+        let currentHitPnt;        
         let dist,currentDist;
-        
-        let origPnt=entity.position;
-        let radius=entity.radius;
-        let high=entity.height;
         
         let nMesh=this.core.map.meshList.meshes.length;
         let nEntity=this.core.map.entityList.count();
@@ -201,13 +196,13 @@ export default class CollisionClass
         
             // the moved point
             
-        this.testPnt.setFromValues((origPnt.x+movePnt.x),origPnt.y,(origPnt.z+movePnt.z));
+        this.testPnt.setFromValues((entity.position.x+movePnt.x),entity.position.y,(entity.position.z+movePnt.z));
         
             // the rough collide boxes
             
-        this.objXBound.setFromValues((this.testPnt.x-radius),(this.testPnt.x+radius));
-        this.objYBound.setFromValues(this.testPnt.y,(this.testPnt.y+high));
-        this.objZBound.setFromValues((this.testPnt.z-radius),(this.testPnt.z+radius));
+        this.objXBound.setFromValues((this.testPnt.x-entity.radius),(this.testPnt.x+entity.radius));
+        this.objYBound.setFromValues(this.testPnt.y,(this.testPnt.y+entity.height));
+        this.objZBound.setFromValues((this.testPnt.z-entity.radius),(this.testPnt.z+entity.radius));
         
             // no collisions yet
             
@@ -217,14 +212,14 @@ export default class CollisionClass
             // we need to possible run through
             // this multiple times to deal with
             // bumps
-            
+          
         while (true) {
             
-            currentHitPt=null;
+            currentHitPnt=null;
             currentDist=-1;
             
             bumpY=-1;
-        
+            
                 // run through the meshes and
                 // check against collision lines
 
@@ -246,7 +241,7 @@ export default class CollisionClass
                     
                         // check against wall trig
                     
-                    if (!this.circleTrigXZIntersection(collisionTrig,this.testPnt,radius,high,this.intersectPnt)) continue;
+                    if (!this.circleTrigXZIntersection(collisionTrig,this.testPnt,entity.radius,entity.height,this.intersectPnt)) continue;
                     
                         // find closest hit point
 
@@ -254,7 +249,7 @@ export default class CollisionClass
                     if ((dist<currentDist) || (currentDist===-1)) {
                         entity.collideWallMeshIdx=n;
                         entity.collideWallTrigIdx=k;
-                        currentHitPt=this.intersectPnt;
+                        currentHitPnt=this.intersectPnt;
                         currentDist=dist;
                         
                         bumpY=-1;
@@ -262,7 +257,7 @@ export default class CollisionClass
                     }
                 }
             }
-          
+            
                 // check other entities
 
             for (n=0;n!==nEntity;n++) {
@@ -270,16 +265,14 @@ export default class CollisionClass
                 if (checkEntity.id===entity.id) continue;
                 if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
                 
-                checkEntityPt=checkEntity.position;
-                
                     // skip if not in the Y of the line
 
-                entityTopY=checkEntityPt.y+checkEntity.height;
-                if (((this.testPnt.y+high)<checkEntityPt.y) || (this.testPnt.y>=entityTopY)) continue;
+                entityTopY=checkEntity.position.y+checkEntity.height;
+                if (((this.testPnt.y+entity.height)<checkEntity.position.y) || (this.testPnt.y>=entityTopY)) continue;
                 
                     // check the circle
                     
-                if (!this.circleCircleIntersection(this.testPnt,radius,checkEntityPt,checkEntity.radius,this.intersectPnt)) continue;
+                if (!this.circleCircleIntersection(this.testPnt,entity.radius,checkEntity.position,checkEntity.radius,this.intersectPnt)) continue;
                 
                     // find closest hit point
 
@@ -294,7 +287,7 @@ export default class CollisionClass
                     
                         // the hit point
                         
-                    currentHitPt=this.intersectPnt;
+                    currentHitPnt=this.intersectPnt;
                     currentDist=dist;
                     
                     bumpY=-1;
@@ -306,14 +299,13 @@ export default class CollisionClass
                 // original move plus any bump
                 // we might have had
                 
-            if (currentHitPt===null) {
-                collideMovePnt.setFromValues(movePnt.x,(this.testPnt.y-origPnt.y),movePnt.z);
+            if (currentHitPnt===null) {
+                collideMovePnt.setFromValues(movePnt.x,(this.testPnt.y-entity.position.y),movePnt.z);
                 return;
             }
             
-                // if no bump, not a bumpable
-                // hit, or we've already bumped,
-                // just return hit
+                // if no bump or not a bumpable
+                // hit or already bumped, just return hit
                 
             if ((!bump) || (bumpY===-1) || (bumpOnce)) break;
                 
@@ -327,16 +319,19 @@ export default class CollisionClass
             // we need to move the hit point so it's
             // always outside the max radius of the ellipse
         
-        this.radiusPt.setFromValues((origPnt.x-currentHitPt.x),0,(origPnt.z-currentHitPt.z));
-        this.radiusPt.normalize();
-        this.radiusPt.scale(radius);
-        this.radiusPt.addPoint(currentHitPt);
+        currentHitPnt.x=currentHitPnt.x-entity.position.x;
+        currentHitPnt.y=0;
+        currentHitPnt.z=currentHitPnt.z-entity.position.z;
+        
+        currentHitPnt.normalize();
+        currentHitPnt.scale(entity.radius);
+        currentHitPnt.addPoint(entity.position);
         
             // and the new move is the original
             // point to this current hit point
             // always restore the bump move
         
-        collideMovePnt.setFromValues((this.radiusPt.x-origPnt.x),(this.testPnt.y-origPnt.y),(this.radiusPt.z-origPnt.z));
+        collideMovePnt.setFromValues((currentHitPnt.x-entity.position.x),(this.testPnt.y-entity.position.y),(currentHitPnt.z-entity.position.z));
     }
     
         //

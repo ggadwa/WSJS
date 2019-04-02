@@ -2,8 +2,6 @@ import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
 import ProjectEntityClass from '../../code/project/project_entity.js';
-import EntityWeaponBerettaClass from '../../data/scripts/entity_weapon_beretta.js';
-import EntityWeaponM16RifleClass from '../../data/scripts/entity_weapon_m16_rifle.js';
 import ModelClass from '../../code/model/model.js';
 import ImportModelClass from '../../code/import/import_model.js';
 import MapPathNodeClass from '../../code/map/map_path_node.js';

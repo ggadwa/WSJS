@@ -6,10 +6,10 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
-
-- sub folders for scripts?
-
+- need bigger radius
 - need to eliminate floor segments that have an x or z that is too small
+- no bumps if wall segment doesn't have associated floor segment (draw in different color)
+- have certain x & z < do get box segments
 - work on entity wall trig collisions
 - bots need to determine if on moving platforms
 - new way to do tinting
