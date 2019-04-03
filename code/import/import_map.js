@@ -158,8 +158,8 @@ export default class ImportMapClass
         }
 
             // and turn off any collisions for certain
-            // bitmaps, mostly for things like bushes
-            // and webs, etc
+            // bitmaps (like bushes and webs) and certain mesh names
+            // or set to simple bound box collisions
             
         if (importSettings.noCollideBitmaps!==undefined) {
             for (n=0;n!==importSettings.noCollideBitmaps.length;n++) {
@@ -171,6 +171,31 @@ export default class ImportMapClass
                 }
                 
                 this.core.map.meshList.setNoCollisionsForBitmap(bitmap);
+            }
+        }
+        
+        if (importSettings.noCollideMeshes!==undefined) {
+            for (n=0;n!==importSettings.noCollideMeshes.length;n++) {
+                this.core.map.meshList.setNoCollisionsForBitmap(importSettings.noCollideMeshes[n]);
+            }
+        }
+        
+        if (importSettings.simpleCollideBitmaps!==undefined) {
+            for (n=0;n!==importSettings.simpleCollideBitmaps.length;n++) {
+                
+                bitmap=this.core.bitmapList.getSimpleName(importSettings.simpleCollideBitmaps[n]);                
+                if (bitmap===null) {
+                    console.log('Missing bitmap to set no collisions to: '+importSettings.simpleCollideBitmaps[n]);
+                    return(false);
+                }
+                
+                this.core.map.meshList.setSimpleCollisionsForBitmap(bitmap);
+            }
+        }
+            
+        if (importSettings.simpleCollideMeshes!==undefined) {
+            for (n=0;n!==importSettings.simpleCollideMeshes.length;n++) {
+                this.core.map.meshList.setSimpleCollisionsForMeshes(importSettings.simpleCollideMeshes[n]);
             }
         }
         

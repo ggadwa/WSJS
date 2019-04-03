@@ -3,6 +3,8 @@ import BoundClass from '../utility/bound.js';
 
 export default class CollisionTrigClass
 {
+    static FLOOR_MIN_XZ_ELIMINATION_SIZE=500;       // if the min x/z of a segment is less than this, then it's elimated as a floor/ceiling segment
+    
     constructor(v0,v1,v2)
     {
         this.v0=v0;

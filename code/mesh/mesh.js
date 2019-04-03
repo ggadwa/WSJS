@@ -60,6 +60,7 @@ export default class MeshClass
             // collision lists
 
         this.noCollisions=false;
+        this.simpleCollisions=false;
         
         this.collisionWallTrigs=[];
         this.collisionFloorTrigs=[];
@@ -224,13 +225,16 @@ export default class MeshClass
     {
         let n,ny;
         let tIdx,vIdx;
+        let xSize,zSize;
         let x0,y0,z0,x1,y1,z1,x2,y2,z2;
         
             // some meshes can be tagged as no
             // collision, specifically things like
             // webs or bushes, etc
+            // other messages can be simple collisions,
+            // which means they collide on their bounds
             
-        if (this.noCollisions) return;
+        if ((this.noCollisions) || (this.simpleCollisions)) return;
         
             // run through the triangles
             // and find any that make a wall to
@@ -260,9 +264,17 @@ export default class MeshClass
             y2=this.vertexArray[vIdx+1];
             z2=this.vertexArray[vIdx+2];
             
+                // get the x/z area for some floor
+                // or ceiling eliminations, if too small
+                // it can't be stood on and is decorative
+                
+            xSize=Math.max(Math.abs(x0-x1),Math.abs(x0-x2),Math.abs(x1-x2));
+            zSize=Math.max(Math.abs(z0-z1),Math.abs(z0-z2),Math.abs(z1-z2));
+            
                 // detect if triangle is a floor
                 
             if (ny>=0.4) {
+                if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                 this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
             }
             
@@ -270,6 +282,7 @@ export default class MeshClass
                 
             else {
                 if (ny<=-0.4) {
+                    if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                     this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
                 }
 

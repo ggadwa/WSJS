@@ -440,13 +440,13 @@ export default class CoreClass
             
         this.map.entityList.draw(null);
         
-            // any liquids
+            // liquids
             
         if (!config.DRAW_COLLISION_PLANES) this.map.liquidList.draw();
         
-            // any effects
+            // effects
             
-        this.map.effectList.draw();
+        if (!config.DRAW_COLLISION_PLANES) this.map.effectList.draw();
         
             // and finally held entities,
             // clearing the z buffer first

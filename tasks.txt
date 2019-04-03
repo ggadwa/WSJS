@@ -6,10 +6,15 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
-- need bigger radius
-- need to eliminate floor segments that have an x or z that is too small
-- no bumps if wall segment doesn't have associated floor segment (draw in different color)
-- have certain x & z < do get box segments
+
+
+--> do all these for no/simple collisions dungeon
+- finish simple collision boxes
+- do simple collisions in collision
+
+- need bigger player radius or why can we look into walls?  Is radius bump failing?
+- no bumps if wall segment doesn't have associated floor segment (draw in different color) [maybe]
+
 - work on entity wall trig collisions
 - bots need to determine if on moving platforms
 - new way to do tinting
@@ -23,14 +28,11 @@ need isEntityInRange('player') then check for E key on
 sort effects, will need a sort z call into the effect
 entites need data
 
-
-2. liquids need to draw away from z
+liquids need to draw away from z
 
 bumps
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
-model angle by quaternions
 
-2. need to get rid of a lot of project_entity stuff, it's very player specific
 5. shaders need to be dynamic and part of project
 8. combine input / view pause states
 9. get rid of constants, use statics
@@ -45,6 +47,4 @@ project_entity to remove
     getAngleDifferenceTowardsPosition(pos)
     getPercentageHealth()
     getDamageTintAttenuation()
-
-
 

@@ -94,7 +94,7 @@ export default class MeshListClass
     }
     
         //
-        // set no collisions for bitmaps
+        // set no/simple collisions for bitmaps
         //
         
     setNoCollisionsForBitmap(bitmap)
@@ -103,6 +103,33 @@ export default class MeshListClass
         
         for (mesh of this.meshes) {
             if (mesh.bitmap.colorURL===bitmap.colorURL) mesh.noCollisions=true;
+        }
+    }
+    
+    setNoCollisionsForMeshes(name)
+    {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            if (mesh.name.startsWith(name)) mesh.noCollisions=true;
+        }
+    }
+    
+    setSimpleCollisionsForBitmap(bitmap)
+    {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            if (mesh.bitmap.colorURL===bitmap.colorURL) mesh.simpleCollisions=true;
+        }
+    }
+    
+    setSimpleCollisionsForMeshes(name)
+    {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            if (mesh.name.startsWith(name)) mesh.simpleCollisions=true;
         }
     }
     
@@ -299,7 +326,7 @@ export default class MeshListClass
     debugDrawCollisionSurfaces()
     {
         let k,mesh,wall,floor,ceiling;
-        let vertexes,indexes,vertexBuffer,indexBuffer;
+        let vertexes,vertexBuffer,indexBuffer;
         let gl=this.core.gl;
         let shader=this.core.shaderList.debugShader;
         
@@ -307,20 +334,12 @@ export default class MeshListClass
         
             // arrays for any drawing
             
-        vertexes=new Float32Array(3*3);
-        indexes=new Uint16Array(3);         // always quad, with two triangles
+        vertexes=new Float32Array(36);     // we need at least 12 triangles for simple collision cubes
         
         vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,vertexes,gl.DYNAMIC_DRAW);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
-
-        indexBuffer=gl.createBuffer();
-        
-        indexes[0]=indexes[3]=0;
-        indexes[1]=1;
-        
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,indexes,gl.STATIC_DRAW);
 
             // draw the collision parts
 
@@ -331,7 +350,99 @@ export default class MeshListClass
 
             if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
-                // draw the lines in green
+                // draw simple collisions in yellow
+                
+            if (mesh.simpleCollisions) {
+                vertexes[0]=mesh.xBound.min;        // top
+                vertexes[1]=mesh.yBound.max;
+                vertexes[2]=mesh.zBound.min;
+                vertexes[3]=mesh.xBound.max;
+                vertexes[4]=mesh.yBound.max;
+                vertexes[5]=mesh.zBound.min;
+                vertexes[6]=mesh.xBound.max;
+                vertexes[7]=mesh.yBound.max;
+                vertexes[8]=mesh.zBound.max;
+                vertexes[9]=mesh.xBound.min;
+                vertexes[10]=mesh.yBound.max;
+                vertexes[11]=mesh.zBound.min;
+                vertexes[12]=mesh.xBound.max;
+                vertexes[13]=mesh.yBound.max;
+                vertexes[14]=mesh.zBound.max;
+                vertexes[15]=mesh.xBound.min;
+                vertexes[16]=mesh.yBound.max;
+                vertexes[17]=mesh.zBound.max;
+
+                vertexes[18]=mesh.xBound.min;        // bottom
+                vertexes[19]=mesh.yBound.min;
+                vertexes[20]=mesh.zBound.min;
+                vertexes[21]=mesh.xBound.max;
+                vertexes[22]=mesh.yBound.min;
+                vertexes[23]=mesh.zBound.min;
+                vertexes[24]=mesh.xBound.max;
+                vertexes[25]=mesh.yBound.min;
+                vertexes[26]=mesh.zBound.max;
+                vertexes[27]=mesh.xBound.min;
+                vertexes[28]=mesh.yBound.min;
+                vertexes[29]=mesh.zBound.min;
+                vertexes[30]=mesh.xBound.max;
+                vertexes[31]=mesh.yBound.min;
+                vertexes[32]=mesh.zBound.max;
+                vertexes[33]=mesh.xBound.min;
+                vertexes[34]=mesh.yBound.min;
+                vertexes[35]=mesh.zBound.max;
+
+                gl.uniform3f(shader.colorUniform,0.8,0.8,0.0);
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
+                gl.drawArrays(gl.TRIANGLES,0,12);
+                
+                vertexes[0]=mesh.xBound.min;        // left
+                vertexes[1]=mesh.yBound.max;
+                vertexes[2]=mesh.zBound.max;
+                vertexes[3]=mesh.xBound.min;
+                vertexes[4]=mesh.yBound.max;
+                vertexes[5]=mesh.zBound.min;
+                vertexes[6]=mesh.xBound.min;
+                vertexes[7]=mesh.yBound.min;
+                vertexes[8]=mesh.zBound.min;
+                vertexes[9]=mesh.xBound.min;
+                vertexes[10]=mesh.yBound.max;
+                vertexes[11]=mesh.zBound.max;
+                vertexes[12]=mesh.xBound.min;
+                vertexes[13]=mesh.yBound.min;
+                vertexes[14]=mesh.zBound.min;
+                vertexes[15]=mesh.xBound.min;
+                vertexes[16]=mesh.yBound.min;
+                vertexes[17]=mesh.zBound.max;
+
+                vertexes[18]=mesh.xBound.max;        // right
+                vertexes[19]=mesh.yBound.max;
+                vertexes[20]=mesh.zBound.max;
+                vertexes[21]=mesh.xBound.max;
+                vertexes[22]=mesh.yBound.max;
+                vertexes[23]=mesh.zBound.min;
+                vertexes[24]=mesh.xBound.max;
+                vertexes[25]=mesh.yBound.min;
+                vertexes[26]=mesh.zBound.min;
+                vertexes[27]=mesh.xBound.max;
+                vertexes[28]=mesh.yBound.max;
+                vertexes[29]=mesh.zBound.max;
+                vertexes[30]=mesh.xBound.max;
+                vertexes[31]=mesh.yBound.min;
+                vertexes[32]=mesh.zBound.min;
+                vertexes[33]=mesh.xBound.max;
+                vertexes[34]=mesh.yBound.min;
+                vertexes[35]=mesh.zBound.max;
+
+                gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
+                gl.drawArrays(gl.TRIANGLES,0,12);
+                
+                
+                
+                continue;
+            }
+            
+                // draw the walls in green
 
             gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
             
@@ -348,7 +459,7 @@ export default class MeshListClass
                 vertexes[7]=wall.v2.y;
                 vertexes[8]=wall.v2.z;
                 
-                gl.bufferData(gl.ARRAY_BUFFER,vertexes,gl.DYNAMIC_DRAW);
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
                 gl.drawArrays(gl.TRIANGLES,0,3);
             }
             
@@ -369,7 +480,7 @@ export default class MeshListClass
                 vertexes[7]=floor.v2.y;
                 vertexes[8]=floor.v2.z;
                 
-                gl.bufferData(gl.ARRAY_BUFFER,vertexes,gl.DYNAMIC_DRAW);
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
                 gl.drawArrays(gl.TRIANGLES,0,3);
             }
             
@@ -390,7 +501,7 @@ export default class MeshListClass
                 vertexes[7]=ceiling.v2.y;
                 vertexes[8]=ceiling.v2.z;
                 
-                gl.bufferData(gl.ARRAY_BUFFER,vertexes,gl.DYNAMIC_DRAW);
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
                 gl.drawArrays(gl.TRIANGLES,0,3);
             }
         }
