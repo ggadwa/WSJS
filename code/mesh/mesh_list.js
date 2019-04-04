@@ -334,7 +334,7 @@ export default class MeshListClass
         
             // arrays for any drawing
             
-        vertexes=new Float32Array(36);     // we need at least 12 triangles for simple collision cubes
+        vertexes=new Float32Array(9);     // we need at least 12 triangles for simple collision cubes
         
         vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
@@ -350,101 +350,15 @@ export default class MeshListClass
 
             if (!this.core.boundBoxInFrustum(mesh.xBound,mesh.yBound,mesh.zBound)) continue;
             
-                // draw simple collisions in yellow
-                
-            if (mesh.simpleCollisions) {
-                vertexes[0]=mesh.xBound.min;        // top
-                vertexes[1]=mesh.yBound.max;
-                vertexes[2]=mesh.zBound.min;
-                vertexes[3]=mesh.xBound.max;
-                vertexes[4]=mesh.yBound.max;
-                vertexes[5]=mesh.zBound.min;
-                vertexes[6]=mesh.xBound.max;
-                vertexes[7]=mesh.yBound.max;
-                vertexes[8]=mesh.zBound.max;
-                vertexes[9]=mesh.xBound.min;
-                vertexes[10]=mesh.yBound.max;
-                vertexes[11]=mesh.zBound.min;
-                vertexes[12]=mesh.xBound.max;
-                vertexes[13]=mesh.yBound.max;
-                vertexes[14]=mesh.zBound.max;
-                vertexes[15]=mesh.xBound.min;
-                vertexes[16]=mesh.yBound.max;
-                vertexes[17]=mesh.zBound.max;
-
-                vertexes[18]=mesh.xBound.min;        // bottom
-                vertexes[19]=mesh.yBound.min;
-                vertexes[20]=mesh.zBound.min;
-                vertexes[21]=mesh.xBound.max;
-                vertexes[22]=mesh.yBound.min;
-                vertexes[23]=mesh.zBound.min;
-                vertexes[24]=mesh.xBound.max;
-                vertexes[25]=mesh.yBound.min;
-                vertexes[26]=mesh.zBound.max;
-                vertexes[27]=mesh.xBound.min;
-                vertexes[28]=mesh.yBound.min;
-                vertexes[29]=mesh.zBound.min;
-                vertexes[30]=mesh.xBound.max;
-                vertexes[31]=mesh.yBound.min;
-                vertexes[32]=mesh.zBound.max;
-                vertexes[33]=mesh.xBound.min;
-                vertexes[34]=mesh.yBound.min;
-                vertexes[35]=mesh.zBound.max;
-
-                gl.uniform3f(shader.colorUniform,0.8,0.8,0.0);
-                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
-                gl.drawArrays(gl.TRIANGLES,0,12);
-                
-                vertexes[0]=mesh.xBound.min;        // left
-                vertexes[1]=mesh.yBound.max;
-                vertexes[2]=mesh.zBound.max;
-                vertexes[3]=mesh.xBound.min;
-                vertexes[4]=mesh.yBound.max;
-                vertexes[5]=mesh.zBound.min;
-                vertexes[6]=mesh.xBound.min;
-                vertexes[7]=mesh.yBound.min;
-                vertexes[8]=mesh.zBound.min;
-                vertexes[9]=mesh.xBound.min;
-                vertexes[10]=mesh.yBound.max;
-                vertexes[11]=mesh.zBound.max;
-                vertexes[12]=mesh.xBound.min;
-                vertexes[13]=mesh.yBound.min;
-                vertexes[14]=mesh.zBound.min;
-                vertexes[15]=mesh.xBound.min;
-                vertexes[16]=mesh.yBound.min;
-                vertexes[17]=mesh.zBound.max;
-
-                vertexes[18]=mesh.xBound.max;        // right
-                vertexes[19]=mesh.yBound.max;
-                vertexes[20]=mesh.zBound.max;
-                vertexes[21]=mesh.xBound.max;
-                vertexes[22]=mesh.yBound.max;
-                vertexes[23]=mesh.zBound.min;
-                vertexes[24]=mesh.xBound.max;
-                vertexes[25]=mesh.yBound.min;
-                vertexes[26]=mesh.zBound.min;
-                vertexes[27]=mesh.xBound.max;
-                vertexes[28]=mesh.yBound.max;
-                vertexes[29]=mesh.zBound.max;
-                vertexes[30]=mesh.xBound.max;
-                vertexes[31]=mesh.yBound.min;
-                vertexes[32]=mesh.zBound.min;
-                vertexes[33]=mesh.xBound.max;
-                vertexes[34]=mesh.yBound.min;
-                vertexes[35]=mesh.zBound.max;
-
-                gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
-                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
-                gl.drawArrays(gl.TRIANGLES,0,12);
-                
-                
-                
-                continue;
-            }
-            
                 // draw the walls in green
+                // or yellow if simple
 
-            gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
+            if (mesh.simpleCollisions) {
+                gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
+            }
+            else {
+                gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
+            }
             
             for (k=0;k!==mesh.collisionWallTrigs.length;k++) {
                 wall=mesh.collisionWallTrigs[k];
@@ -464,8 +378,14 @@ export default class MeshListClass
             }
             
                 // draw the floors in blue
+                // or puple is simple
 
-            gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
+            if (mesh.simpleCollisions) {
+                gl.uniform3f(shader.colorUniform,1.0,0.0,1.0);
+            }
+            else {
+                gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
+            }
             
             for (k=0;k!==mesh.collisionFloorTrigs.length;k++) {
                 floor=mesh.collisionFloorTrigs[k];
@@ -485,8 +405,14 @@ export default class MeshListClass
             }
             
                 // draw the ceilings in red
+                // or orange if simple
 
-            gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
+            if (mesh.simpleCollisions) {
+                gl.uniform3f(shader.colorUniform,1.0,0.4,0.0);
+            }
+            else {
+                gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
+            }
             
             for (k=0;k!==mesh.collisionCeilingTrigs.length;k++) {
                 ceiling=mesh.collisionCeilingTrigs[k];

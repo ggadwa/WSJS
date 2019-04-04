@@ -425,7 +425,7 @@ export default class CoreClass
             // draw the sky and map
             
         this.map.sky.draw();
-        if (!config.DRAW_COLLISION_PLANES) {
+        if (!config.DRAW_COLLISION_GEOMETRY) {
             this.map.meshList.draw(null);
         }
         else {
@@ -442,11 +442,11 @@ export default class CoreClass
         
             // liquids
             
-        if (!config.DRAW_COLLISION_PLANES) this.map.liquidList.draw();
+        if (!config.DRAW_COLLISION_GEOMETRY) this.map.liquidList.draw();
         
             // effects
             
-        if (!config.DRAW_COLLISION_PLANES) this.map.effectList.draw();
+        if (!config.DRAW_COLLISION_GEOMETRY) this.map.effectList.draw();
         
             // and finally held entities,
             // clearing the z buffer first

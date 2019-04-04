@@ -28,16 +28,11 @@ export default class Point2DClass
         this.y+=yAdd;
     }
     
-    noSquareDistance(pt)
+    distance(pt)
     {
         let px=this.x-pt.x;
         let py=this.y-pt.y;
-        return((px*px)+(py*py));
-    }
-                
-    distance(pt)
-    {
-        return(Math.sqrt(this.noSquareDistance(pt)));
+        return(Math.sqrt((px*px)+(py*py)));
     }
     
     equals(pt)

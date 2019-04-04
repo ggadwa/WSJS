@@ -329,30 +329,20 @@ export default class PointClass
         this.z=mat.data[14];
     }
                 
-    noSquareDistance(pt)
+    distance(pt)
     {
         let px=this.x-pt.x;
         let py=this.y-pt.y;
         let pz=this.z-pt.z;
-        return((px*px)+(py*py)+(pz*pz));
-    }
-                
-    noSquareDistanceByTriplet(kx,ky,kz)
-    {
-        let px=this.x-kx;
-        let py=this.y-ky;
-        let pz=this.z-kz;
-        return((px*px)+(py*py)+(pz*pz));
-    }
-    
-    distance(pt)
-    {
-        return(Math.sqrt(this.noSquareDistance(pt)));
+        return(Math.sqrt((px*px)+(py*py)+(pz*pz)));
     }
                 
     distanceByTriplet(kx,ky,kz)
     {
-        return(Math.sqrt(this.noSquareDistanceByTriplet(kx,ky,kz)));
+        let px=this.x-kx;
+        let py=this.y-ky;
+        let pz=this.z-kz;
+        return(Math.sqrt((px*px)+(py*py)+(pz*pz)));
     }
     
     distanceScrubY(pt)

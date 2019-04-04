@@ -8,10 +8,6 @@ WebGL2
 
 
 
---> do all these for no/simple collisions dungeon
-- finish simple collision boxes
-- do simple collisions in collision
-
 - need bigger player radius or why can we look into walls?  Is radius bump failing?
 - no bumps if wall segment doesn't have associated floor segment (draw in different color) [maybe]
 

@@ -68,7 +68,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
     pathEditor()
     {
         let nodeIdx;
-        let name,links;
+        let links;
         let input=this.core.input;
         
             // i key picks a new parent from closest node

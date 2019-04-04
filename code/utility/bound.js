@@ -60,6 +60,16 @@ export default class BoundClass
         if (value>this.max) this.max=value;
     }
     
+    enlargeForSign(value)
+    {
+        if (value<0) {
+            this.min+=value;
+        }
+        else {
+            this.max+=value;
+        }
+    }
+    
     copy()
     {
         return(new BoundClass(this.min,this.max));

@@ -29,6 +29,8 @@ export default class CollisionTrigClass
         this.lineToTrigPointVector=new PointClass(0,0,0);
         this.lineToTrigPerpVector=new PointClass(0,0,0);
         
+        this.rotVector=new PointClass(0,0,0);       // for mesh movement rotations
+        
             // precalc some items
             
         this.precalc();
@@ -70,11 +72,28 @@ export default class CollisionTrigClass
         this.precalc();
     }
     
-    addPoint(pnt)
+    move(pnt)
     {
         this.v0.addPoint(pnt);
         this.v1.addPoint(pnt);
         this.v2.addPoint(pnt);
+        
+        this.precalc();
+    }
+    
+    rotate(rotateAngle,centerPnt)
+    {
+        this.rotVector.setFromSubPoint(this.v0,centerPnt);
+        this.rotVector.rotate(rotateAngle);
+        this.v0.setFromAddPoint(centerPnt,this.rotVector);
+        
+        this.rotVector.setFromSubPoint(this.v1,centerPnt);
+        this.rotVector.rotate(rotateAngle);
+        this.v1.setFromAddPoint(centerPnt,this.rotVector);
+
+        this.rotVector.setFromSubPoint(this.v2,centerPnt);
+        this.rotVector.rotate(rotateAngle);
+        this.v2.setFromAddPoint(centerPnt,this.rotVector);
         
         this.precalc();
     }
