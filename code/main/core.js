@@ -324,11 +324,11 @@ export default class CoreClass
         // convert coordinate to eye coordinates
         //
     
-    convertToEyeCoordinates(pt,eyePt)
+    convertToEyeCoordinates(pnt,eyePnt)
     {
-        eyePt.x=(pt.x*this.viewMatrix.data[0])+(pt.y*this.viewMatrix.data[4])+(pt.z*this.viewMatrix.data[8])+this.viewMatrix.data[12];
-        eyePt.y=(pt.x*this.viewMatrix.data[1])+(pt.y*this.viewMatrix.data[5])+(pt.z*this.viewMatrix.data[9])+this.viewMatrix.data[13];
-        eyePt.z=(pt.x*this.viewMatrix.data[2])+(pt.y*this.viewMatrix.data[6])+(pt.z*this.viewMatrix.data[10])+this.viewMatrix.data[14];
+        eyePnt.x=(pnt.x*this.viewMatrix.data[0])+(pnt.y*this.viewMatrix.data[4])+(pnt.z*this.viewMatrix.data[8])+this.viewMatrix.data[12];
+        eyePnt.y=(pnt.x*this.viewMatrix.data[1])+(pnt.y*this.viewMatrix.data[5])+(pnt.z*this.viewMatrix.data[9])+this.viewMatrix.data[13];
+        eyePnt.z=(pnt.x*this.viewMatrix.data[2])+(pnt.y*this.viewMatrix.data[6])+(pnt.z*this.viewMatrix.data[10])+this.viewMatrix.data[14];
     }
     
         //
@@ -339,7 +339,6 @@ export default class CoreClass
     {
         let n;
         let light,tintOn,tintAtt,liquidIdx,liquid;
-        let fpsStr,idx;
         let player=this.map.entityList.getPlayer();
          
             // everything overdraws except

@@ -10,19 +10,19 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class CollisionClass
 {
+    static COLLISION_FLOOR_MARGIN=10;             // sometimes wall segments can extend a couple pixels off of floors, so this slop fixes getting stuck on edges
+    
     constructor(core)
     {
         this.core=core;
         
-        this.spokeCenterPt=new PointClass(0,0,0);
+        this.spokeCenterPnt=new PointClass(0,0,0);
         this.spokeCalcSin=new Float32Array(24);    // circular collision pre-calcs
         this.spokeCalcCos=new Float32Array(24);
         this.createSpokeSinCos();
 
         this.entityTestPnt=new PointClass(0,0,0);
         this.entityTestIntersectPnt=new PointClass(0,0,0);
-        this.entityClosestIntersectPnt=new PointClass(0,0,0);
-        this.entityRadiusPushPnt=new PointClass(0,0,0);
         
         this.rayHitPnt=new PointClass(0,0,0);
         this.rayIntersectPnt=new PointClass(0,0,0);
@@ -86,17 +86,20 @@ export default class CollisionClass
         yAdd=Math.trunc(high/segmentCount);
 
             // now the spokes across the y
+            // we start up COLLISION_FLOOR_MARGIN because
+            // sometimes walls can be a couple pixels above floors
+            // and we'd get stuck on edges
             
-        this.spokeCenterPt.setFromValues(circlePnt.x,circlePnt.y,circlePnt.z);
+        this.spokeCenterPnt.setFromValues(circlePnt.x,(circlePnt.y+CollisionClass.COLLISION_FLOOR_MARGIN),circlePnt.z);
             
         for (n=0;n!==segmentCount;n++) {
  
             for (k=0;k!==24;k++) {
-                this.rayVector.x=this.spokeCenterPt.x+(radius*this.spokeCalcSin[k]);
-                this.rayVector.z=this.spokeCenterPt.z-(radius*this.spokeCalcCos[k]);
+                this.rayVector.x=this.spokeCenterPnt.x+(radius*this.spokeCalcSin[k]);
+                this.rayVector.z=this.spokeCenterPnt.z-(radius*this.spokeCalcCos[k]);
 
-                if (collisionTrig.rayTrace(this.spokeCenterPt,this.rayVector,this.rayHitPnt)) {
-                    dist=this.spokeCenterPt.distance(this.rayHitPnt);
+                if (collisionTrig.rayTrace(this.spokeCenterPnt,this.rayVector,this.rayHitPnt)) {
+                    dist=this.spokeCenterPnt.distance(this.rayHitPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
                         lineIntersectPnt.setFromPoint(this.rayHitPnt);
                         currentDist=dist;
@@ -104,7 +107,7 @@ export default class CollisionClass
                 }
             }
             
-            this.spokeCenterPt.y+=yAdd;
+            this.spokeCenterPnt.y+=yAdd;
         }
         
         return(currentDist!==-1);
@@ -180,7 +183,7 @@ export default class CollisionClass
         // entity collisions
         //
 
-    moveEntityInMap(entity,movePnt,bump,collideMovePnt)
+    moveEntityInMap(entity,movePnt,bump)
     {
         let n,k;
         let mesh,checkEntity;
@@ -245,10 +248,12 @@ export default class CollisionClass
 
                     dist=this.entityTestPnt.distance(this.entityTestIntersectPnt);
                     if ((dist<currentDist) || (currentDist===-1)) {
+                        currentDist=dist;
+                        
+                            // set the wall collision
+                            
                         entity.collideWallMeshIdx=n;
                         entity.collideWallTrigIdx=k;
-                        this.entityClosestIntersectPnt.setFromPoint(this.entityTestIntersectPnt);
-                        currentDist=dist;
                         
                         bumpY=-1;
                         if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=constants.BUMP_HEIGHT) bumpY=collisionTrig.yBound.max;
@@ -276,30 +281,25 @@ export default class CollisionClass
 
                 dist=this.entityTestPnt.distance(this.entityTestIntersectPnt);
                 if ((dist<currentDist) || (currentDist===-1)) {
-                    entity.collideWallMeshIdx=-1;
+                    currentDist=dist;
                     
                         // set the touch
                         
+                    entity.collideWallMeshIdx=-1;
                     entity.touchEntity=checkEntity;
                     checkEntity.touchEntity=entity;
-                    
-                        // the hit point
-                        
-                    this.entityClosestIntersectPnt.setFromPoint(this.entityTestIntersectPnt);
-                    currentDist=dist;
                     
                     bumpY=-1;
                     if ((entityTopY-this.entityTestPnt.y)<=constants.BUMP_HEIGHT) bumpY=entityTopY;
                 }
             }
 
-                // if no hits, just return
-                // original move plus any bump
-                // we might have had
+                // if no hits, add in any bump
+                // and return false
                 
             if (currentDist===-1) {
-                collideMovePnt.setFromValues(movePnt.x,(this.entityTestPnt.y-entity.position.y),movePnt.z);
-                return;
+                movePnt.y=this.entityTestPnt.y-entity.position.y;
+                return(false);
             }
             
                 // if no bump or not a bumpable
@@ -314,21 +314,10 @@ export default class CollisionClass
             this.entityTestPnt.y=bumpY;
         }
         
-            // reverse the hit point and move it one
-            // radius away so we are always outside the radius
-
-        this.entityRadiusPushPnt.setFromPoint(movePnt);
-        this.entityRadiusPushPnt.y=0;
-        this.entityRadiusPushPnt.normalize();
-        this.entityRadiusPushPnt.scale(-entity.radius);
-        
-        this.entityClosestIntersectPnt.addPoint(this.entityRadiusPushPnt);
-
-            // and the new move is the original
-            // point to this current hit point
-            // always restore the bump move
-        
-        collideMovePnt.setFromValues((this.entityClosestIntersectPnt.x-entity.position.x),(this.entityTestPnt.y-entity.position.y),(this.entityClosestIntersectPnt.z-entity.position.z));
+            // it's a hit, ignore any bumps and
+            // stop movement
+            
+        return(true);
     }
     
         //

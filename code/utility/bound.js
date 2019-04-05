@@ -70,6 +70,12 @@ export default class BoundClass
         }
     }
     
+    trunc()
+    {
+        this.min=Math.trunc(this.min);
+        this.max=Math.trunc(this.max);
+    }
+    
     copy()
     {
         return(new BoundClass(this.min,this.max));

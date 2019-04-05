@@ -11,6 +11,10 @@ export default class CollisionTrigClass
         this.v1=v1;
         this.v2=v2;
         
+        this.v0.trunc();
+        this.v1.trunc();
+        this.v2.trunc();
+        
             // bounds
             
         this.xBound=null;

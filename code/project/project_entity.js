@@ -55,9 +55,7 @@ export default class ProjectEntityClass
         
         this.damageTintStartTick=-1;
 
-        this.checkMovePt=new PointClass(0,0,0);
-        this.collideMovePt=new PointClass(0,0,0);
-        this.collideSlideMovePt=new PointClass(0,0,0);
+        this.checkMovePnt=new PointClass(0,0,0);
         this.reflectMovementVector=new PointClass(0,0,0);
         this.reflectLineVector=new PointClass(0,0,0);
 
@@ -259,44 +257,34 @@ export default class ProjectEntityClass
         
         if ((movePnt.x===0) && (movePnt.z===0)) return;
         
-            // run the collision which
-            // will return a new move direction
-            // if it's the same as the original or
-            // there's been a bump, move it, otherwise,
-            // try sliding
+            // run the collision which returns
+            // false if no hit (and adds a possible bump
+            // value to movePnt)
         
-        this.checkMovePt.setFromValues(movePnt.x,0,movePnt.z);
+        this.checkMovePnt.setFromValues(movePnt.x,0,movePnt.z);
         
-        this.collision.moveEntityInMap(this,this.checkMovePt,bump,this.collideMovePt);
-        if ((this.collideMovePt.equals(this.checkMovePt)) || (this.collideMovePt.y!==0)) {
-            this.position.addPointTrunc(this.collideMovePt);
+        if (!this.collision.moveEntityInMap(this,this.checkMovePnt,bump)) {
+            this.position.addPointTrunc(this.checkMovePnt);
             return;
         }
         
             // try to slide
-        
+      
         if (slide) {
-            this.checkMovePt.setFromValues(movePnt.x,0.0,0.0);
+            this.checkMovePnt.setFromValues(movePnt.x,0.0,0.0);
 
-            this.collision.moveEntityInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
-            if (this.collideSlideMovePt.equals(this.checkMovePt)) {
-                this.position.addPointTrunc(this.collideSlideMovePt);
+            if (!this.collision.moveEntityInMap(this,this.checkMovePnt,false)) {
+                this.position.addPointTrunc(this.checkMovePnt);
                 return;
             }
 
-            this.checkMovePt.setFromValues(0.0,0.0,movePnt.z);
+            this.checkMovePnt.setFromValues(0.0,0.0,movePnt.z);
 
-            this.collision.moveEntityInMap(this,this.checkMovePt,false,this.collideSlideMovePt);
-            if (this.collideSlideMovePt.equals(this.checkMovePt)) {
-                this.position.addPointTrunc(this.collideSlideMovePt);
+            if (!this.collision.moveEntityInMap(this,this.checkMovePnt,false)) {
+                this.position.addPointTrunc(this.checkMovePnt);
                 return;
             }
         }
-        
-            // if nothing works, just use the
-            // the original collide point
-            
-        this.position.addPointTrunc(this.collideMovePt);
     }
     
     moveInMapY(movePnt,noGravity)
@@ -528,6 +516,22 @@ export default class ProjectEntityClass
     rayCollision(pnt,vector,hitPnt)
     {
         return(this.collision.rayCollision(pnt,vector,hitPnt,this));
+    }
+    
+        //
+        // entity utilities
+        //
+        
+    isEntityInRange(name,dist)
+    {
+        let entity=this.core.map.entityList.find(name);
+        
+        if (entity===null) {
+            console.log('Unable to find entity '+name);
+            return(false);
+        }
+        
+        return(entity.position.distance(this.position)<dist);
     }
     
         //

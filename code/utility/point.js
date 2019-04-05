@@ -18,11 +18,11 @@ export default class PointClass
         this.z=zSet;
     }
     
-    setFromPoint(pt)
+    setFromPoint(pnt)
     {
-        this.x=pt.x;
-        this.y=pt.y;
-        this.z=pt.z;
+        this.x=pnt.x;
+        this.y=pnt.y;
+        this.z=pnt.z;
     }
     
     setFromAddPoint(pt1,pt2)
@@ -47,11 +47,11 @@ export default class PointClass
         this.cross(pt2);
     }
     
-    setFromScale(pt,f)
+    setFromScale(pnt,f)
     {
-        this.x=pt.x*f;
-        this.y=pt.y*f;
-        this.z=pt.z*f;
+        this.x=pnt.x*f;
+        this.y=pnt.y*f;
+        this.z=pnt.z*f;
     }
     
     trunc()
@@ -75,39 +75,39 @@ export default class PointClass
         this.z=Math.trunc(this.z+zAdd);
     }
    
-    addPoint(pt)
+    addPoint(pnt)
     {
-        this.x+=pt.x;
-        this.y+=pt.y;
-        this.z+=pt.z;
+        this.x+=pnt.x;
+        this.y+=pnt.y;
+        this.z+=pnt.z;
     }
     
-    addPointTrunc(pt)
+    addPointTrunc(pnt)
     {
-        this.x=Math.trunc(this.x+pt.x);
-        this.y=Math.trunc(this.y+pt.y);
-        this.z=Math.trunc(this.z+pt.z);
+        this.x=Math.trunc(this.x+pnt.x);
+        this.y=Math.trunc(this.y+pnt.y);
+        this.z=Math.trunc(this.z+pnt.z);
     }
     
-    subPoint(pt)
+    subPoint(pnt)
     {
-        this.x-=pt.x;
-        this.y-=pt.y;
-        this.z-=pt.z;
+        this.x-=pnt.x;
+        this.y-=pnt.y;
+        this.z-=pnt.z;
     }
     
-    multiply(pt)
+    multiply(pnt)
     {
-        this.x*=pt.x;
-        this.y*=pt.y;
-        this.z*=pt.z;
+        this.x*=pnt.x;
+        this.y*=pnt.y;
+        this.z*=pnt.z;
     }
     
-    setFromMultiply(pt1,pt2)
+    setFromMultiply(pnt1,pnt2)
     {
-        this.x=pt1.x*pt2.x;
-        this.y=pt1.y*pt2.y;
-        this.z=pt1.z*pt2.z;
+        this.x=pnt1.x*pnt2.x;
+        this.y=pnt1.y*pnt2.y;
+        this.z=pnt1.z*pnt2.z;
     }
     
     multiplyValues(x,y,z)
@@ -117,37 +117,37 @@ export default class PointClass
         this.z*=z;
     }
     
-    tween(pt1,pt2,factor)
+    tween(pnt1,pnt2,factor)
     {
-        this.x=pt1.x+(pt2.x-pt1.x)*factor;
-        this.y=pt1.y+(pt2.y-pt1.y)*factor;
-        this.z=pt1.z+(pt2.z-pt1.z)*factor;
+        this.x=pnt1.x+(pnt2.x-pnt1.x)*factor;
+        this.y=pnt1.y+(pnt2.y-pnt1.y)*factor;
+        this.z=pnt1.z+(pnt2.z-pnt1.z)*factor;
     }
     
-    average(pt)
+    average(pnt)
     {
-        this.x=(this.x+pt.x)*0.5;
-        this.y=(this.y+pt.y)*0.5;
-        this.z=(this.z+pt.z)*0.5;
+        this.x=(this.x+pnt.x)*0.5;
+        this.y=(this.y+pnt.y)*0.5;
+        this.z=(this.z+pnt.z)*0.5;
     }
     
-    equals(pt)
+    equals(pnt)
     {
-        return((this.x===pt.x)&&(this.y===pt.y)&&(this.z===pt.z));
+        return((this.x===pnt.x)&&(this.y===pnt.y)&&(this.z===pnt.z));
     }
     
-    truncEquals(pt)
+    truncEquals(pnt)
     {
-        return((Math.trunc(this.x)===Math.trunc(pt.x))&&(Math.trunc(this.y)===Math.trunc(pt.y))&&(Math.trunc(this.z)===Math.trunc(pt.z)));
+        return((Math.trunc(this.x)===Math.trunc(pnt.x))&&(Math.trunc(this.y)===Math.trunc(pnt.y))&&(Math.trunc(this.z)===Math.trunc(pnt.z)));
     }
     
-    rotateX(centerPt,rotX)
+    rotateX(centerPnt,rotX)
     {
         let rd,sn,cs,y,z;
         
-        if (centerPt!==null) {
-            this.y-=centerPt.y;
-            this.z-=centerPt.z;
+        if (centerPnt!==null) {
+            this.y-=centerPnt.y;
+            this.z-=centerPnt.z;
         }
         
         rd=rotX*constants.DEGREE_TO_RAD;
@@ -157,22 +157,22 @@ export default class PointClass
         y=(this.y*cs)-(this.z*sn);
         z=(this.y*sn)+(this.z*cs);
 
-        if (centerPt!==null) {
-            y+=centerPt.y;
-            z+=centerPt.z;
+        if (centerPnt!==null) {
+            y+=centerPnt.y;
+            z+=centerPnt.z;
         }
         
         this.y=y;
         this.z=z;
     }
     
-    rotateY(centerPt,rotY)
+    rotateY(centerPnt,rotY)
     {
         let rd,sn,cs,x,z;
         
-        if (centerPt!==null) {
-            this.x-=centerPt.x;
-            this.z-=centerPt.z;
+        if (centerPnt!==null) {
+            this.x-=centerPnt.x;
+            this.z-=centerPnt.z;
         }
         
         rd=rotY*constants.DEGREE_TO_RAD;
@@ -182,22 +182,22 @@ export default class PointClass
         x=(this.z*sn)+(this.x*cs);
         z=(this.z*cs)-(this.x*sn);
 
-        if (centerPt!==null) {
-            x+=centerPt.x;
-            z+=centerPt.z;
+        if (centerPnt!==null) {
+            x+=centerPnt.x;
+            z+=centerPnt.z;
         }
         
         this.x=x;
         this.z=z;
     }
     
-    rotateZ(centerPt,rotZ)
+    rotateZ(centerPnt,rotZ)
     {
         let rd,sn,cs,x,y;
         
-        if (centerPt!==null) {
-            this.x-=centerPt.x;
-            this.y-=centerPt.y;
+        if (centerPnt!==null) {
+            this.x-=centerPnt.x;
+            this.y-=centerPnt.y;
         }
         
         rd=rotZ*constants.DEGREE_TO_RAD;
@@ -207,9 +207,9 @@ export default class PointClass
         x=(this.x*cs)-(this.y*sn);
         y=(this.x*sn)+(this.y*cs);
         
-        if (centerPt!==null) {
-            x+=centerPt.x;
-            y+=centerPt.y;
+        if (centerPnt!==null) {
+            x+=centerPnt.x;
+            y+=centerPnt.y;
         }
         
         this.x=x;
@@ -263,14 +263,14 @@ export default class PointClass
         }
     }
       
-    rotateAroundPoint(centerPt,ang)
+    rotateAroundPoint(centerPnt,ang)
     {
         let rd,sn,cs,x,y,z;
         
-        if (centerPt!==null) {
-            this.x-=centerPt.x;
-            this.y-=centerPt.y;
-            this.z-=centerPt.z;
+        if (centerPnt!==null) {
+            this.x-=centerPnt.x;
+            this.y-=centerPnt.y;
+            this.z-=centerPnt.z;
         }
         
             // rotate X
@@ -315,10 +315,10 @@ export default class PointClass
             this.y=y;
         }
         
-        if (centerPt!==null) {
-            this.x+=centerPt.x;
-            this.y+=centerPt.y;
-            this.z+=centerPt.z;
+        if (centerPnt!==null) {
+            this.x+=centerPnt.x;
+            this.y+=centerPnt.y;
+            this.z+=centerPnt.z;
         }
     }
     
@@ -329,11 +329,11 @@ export default class PointClass
         this.z=mat.data[14];
     }
                 
-    distance(pt)
+    distance(pnt)
     {
-        let px=this.x-pt.x;
-        let py=this.y-pt.y;
-        let pz=this.z-pt.z;
+        let px=this.x-pnt.x;
+        let py=this.y-pnt.y;
+        let pz=this.z-pnt.z;
         return(Math.sqrt((px*px)+(py*py)+(pz*pz)));
     }
                 
@@ -345,10 +345,10 @@ export default class PointClass
         return(Math.sqrt((px*px)+(py*py)+(pz*pz)));
     }
     
-    distanceScrubY(pt)
+    distanceScrubY(pnt)
     {
-        let px=this.x-pt.x;
-        let pz=this.z-pt.z;
+        let px=this.x-pnt.x;
+        let pz=this.z-pnt.z;
         return(Math.sqrt((px*px)+(pz*pz)));
     }
     
@@ -367,16 +367,16 @@ export default class PointClass
         this.z*=f;
     }
     
-    dot(pt)
+    dot(pnt)
     {
-        return((this.x*pt.x)+(this.y*pt.y)+(this.z*pt.z));
+        return((this.x*pnt.x)+(this.y*pnt.y)+(this.z*pnt.z));
     }
 
-    cross(pt)
+    cross(pnt)
     {
-        let x=(this.y*pt.z)-(this.z*pt.y);
-        let y=(this.z*pt.x)-(this.x*pt.z);
-        let z=(this.x*pt.y)-(this.y*pt.x);
+        let x=(this.y*pnt.z)-(this.z*pnt.y);
+        let y=(this.z*pnt.x)-(this.x*pnt.z);
+        let z=(this.x*pnt.y)-(this.y*pnt.x);
         this.x=x;
         this.y=y;
         this.z=z;
@@ -389,18 +389,18 @@ export default class PointClass
         this.z*=f;
     }
     
-    scaleFromPoint(pt,scale)
+    scaleFromPoint(pnt,scale)
     {
-        this.x=((this.x-pt.x)*scale.x)+pt.x;
-        this.y=((this.y-pt.y)*scale.y)+pt.y;
-        this.z=((this.z-pt.z)*scale.z)+pt.z;
+        this.x=((this.x-pnt.x)*scale.x)+pnt.x;
+        this.y=((this.y-pnt.y)*scale.y)+pnt.y;
+        this.z=((this.z-pnt.z)*scale.z)+pnt.z;
     }
     
-    scaleFromMinMaxPoint(pt,scaleMin,scaleMax)
+    scaleFromMinMaxPoint(pnt,scaleMin,scaleMax)
     {
-        let x=this.x-pt.x;
-        let y=this.y-pt.y;
-        let z=this.z-pt.z;
+        let x=this.x-pnt.x;
+        let y=this.y-pnt.y;
+        let z=this.z-pnt.z;
         
         if (scaleMin!==null) {
             if (x<0) x*=scaleMin.x;
@@ -413,9 +413,9 @@ export default class PointClass
             if (z>0) z*=scaleMax.z;
         }
         
-        this.x=x+pt.x;
-        this.y=y+pt.y;
-        this.z=z+pt.z;
+        this.x=x+pnt.x;
+        this.y=y+pnt.y;
+        this.z=z+pnt.z;
     }
     
     scaleFromMatrix(mat)
@@ -447,18 +447,18 @@ export default class PointClass
         this.z=mz;
     }
     
-    angleYTo(pt)
+    angleYTo(pnt)
     {
             // z is pointing up, atan2 gives us the angle to the x vector,
             // so we need the Z up vector (positive) and the vector to pt
             // then subtract them for correct angle
         
-        let fang=(Math.atan2(0,100)-Math.atan2((pt.x-this.x),(pt.z-this.z)))*constants.RAD_TO_DEGREE;
+        let fang=(Math.atan2(0,100)-Math.atan2((pnt.x-this.x),(pnt.z-this.z)))*constants.RAD_TO_DEGREE;
         
             // now we need to switch it up for which side the x is on
             // (if greater, the #s are 0 to -180, if positive, 180 to 0)
             
-        if (this.x>pt.x) {
+        if (this.x>pnt.x) {
             fang=-fang;
         }
         else {
@@ -471,18 +471,18 @@ export default class PointClass
         return(fang);
     }
     
-    angleXTo(pt)
+    angleXTo(pnt)
     {
             // z is pointing up, atan2 gives us the angle to the y vector,
             // so we need the Z up vector (positive) and the vector to pt
             // then subtract them for correct angle
         
-        let fang=(Math.atan2(0,100)-Math.atan2((pt.y-this.y),(pt.z-this.z)))*constants.RAD_TO_DEGREE;
+        let fang=(Math.atan2(0,100)-Math.atan2((pnt.y-this.y),(pnt.z-this.z)))*constants.RAD_TO_DEGREE;
         
             // now we need to switch it up for which side the y is on
             // (if greater, the #s are 0 to -180, if positive, 180 to 0)
             
-        if (this.y>pt.y) {
+        if (this.y>pnt.y) {
             fang=-fang;
         }
         else {
@@ -495,18 +495,18 @@ export default class PointClass
         return(fang);
     }
     
-    minFromPoint(pt)
+    minFromPoint(pnt)
     {
-        if (this.x>pt.x) this.x=pt.x;
-        if (this.y>pt.y) this.y=pt.y;
-        if (this.z>pt.z) this.z=pt.z;
+        if (this.x>pnt.x) this.x=pnt.x;
+        if (this.y>pnt.y) this.y=pnt.y;
+        if (this.z>pnt.z) this.z=pnt.z;
     }
     
-    maxFromPoint(pt)
+    maxFromPoint(pnt)
     {
-        if (this.x<pt.x) this.x=pt.x;
-        if (this.y<pt.y) this.y=pt.y;
-        if (this.z<pt.z) this.z=pt.z;
+        if (this.x<pnt.x) this.x=pnt.x;
+        if (this.y<pnt.y) this.y=pnt.y;
+        if (this.z<pnt.z) this.z=pnt.z;
     }
     
     isZero()

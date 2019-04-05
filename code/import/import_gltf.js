@@ -1,5 +1,4 @@
 import PointClass from '../utility/point.js';
-import Point2DClass from '../utility/2D_point.js';
 import ColorClass from '../utility/color.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
@@ -240,9 +239,9 @@ export default class ImportGLTFClass
         let v0=new PointClass(0,0,0);
         let v1=new PointClass(0,0,0);
         let v2=new PointClass(0,0,0);
-        let uv0=new Point2DClass(0,0,0);
-        let uv1=new Point2DClass(0,0,0);
-        let uv2=new Point2DClass(0,0,0);
+        let uv0=new PointClass(0,0,0);
+        let uv1=new PointClass(0,0,0);
+        let uv2=new PointClass(0,0,0);
         let p10=new PointClass(0.0,0.0,0.0);
         let p20=new PointClass(0.0,0.0,0.0);
         let vLeft=new PointClass(0.0,0.0,0.0);

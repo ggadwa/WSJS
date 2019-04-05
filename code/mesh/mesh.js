@@ -1,5 +1,4 @@
 import PointClass from '../utility/point.js';
-import Point2DClass from '../utility/2D_point.js';
 import LineClass from '../utility/line.js';
 import BoundClass from '../utility/bound.js';
 import CollisionTrigClass from '../collision/collision_trig.js';
@@ -289,10 +288,22 @@ export default class MeshClass
             y1=this.vertexArray[vIdx+1];
             z1=this.vertexArray[vIdx+2];
             
+            ny+=this.normalArray[vIdx+1];
+            
             vIdx=this.indexArray[tIdx+2]*3;
             x2=this.vertexArray[vIdx];
             y2=this.vertexArray[vIdx+1];
             z2=this.vertexArray[vIdx+2];
+            
+            ny+=this.normalArray[vIdx+1];
+            
+                // average out the normal, this kind
+                // of stuff takes a dot product but since
+                // we are comparing it to (0,-1,0) etc the
+                // product will only be the Y coordinate to
+                // find the slope
+                
+            ny=ny/3;
             
                 // get the x/z area for some floor
                 // or ceiling eliminations, if too small
@@ -303,7 +314,7 @@ export default class MeshClass
             
                 // detect if triangle is a floor
                 
-            if (ny>=0.4) {
+            if (ny>=0.7) {
                 if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                 this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
             }
@@ -311,7 +322,7 @@ export default class MeshClass
                 // detect if triangle is a ceiling
                 
             else {
-                if (ny<=-0.4) {
+                if (ny<=-0.7) {
                     if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                     this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
                 }
