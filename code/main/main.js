@@ -1,8 +1,6 @@
 import * as constants from '../main/constants.js';
-import config from '../main/config.js';
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
-import genRandom from '../utility/random.js';
 
 //
 // main class
@@ -20,13 +18,17 @@ class MainClass
         Object.seal(this);
     }
     
-    run(gameClass)
+    run(gameClass,data)
     {
+            // remove any old html and start
+            // the canvas
+            
+        document.body.innerHTML='';
         this.core.createCanvas();
         
             // the project objects
             
-        this.core.projectGame=new gameClass(this.core);
+        this.core.projectGame=new gameClass(this.core,data);
         this.core.projectMap=this.core.projectGame.getStartProjectMap();
         
         setTimeout(this.initCore.bind(this),1);

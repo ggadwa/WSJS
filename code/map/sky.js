@@ -113,14 +113,10 @@ export default class SkyClass
             
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexes);
-
-        gl.enableVertexAttribArray(this.core.shaderList.skyShader.vertexPositionAttribute);
         gl.vertexAttribPointer(this.core.shaderList.skyShader.vertexPositionAttribute,3,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.uvs);
-
-        gl.enableVertexAttribArray(this.core.shaderList.skyShader.vertexUVAttribute);
         gl.vertexAttribPointer(this.core.shaderList.skyShader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);

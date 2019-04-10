@@ -1,5 +1,4 @@
 import * as constants from '../main/constants.js';
-import config from '../main/config.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
@@ -23,6 +22,11 @@ import InterfaceClass from '../interface/interface.js';
 export default class CoreClass
 {
     static MAX_LIGHT_COUNT=24;
+    
+    static DRAW_ENTITY_BOUNDS=false;
+    static DRAW_MODEL_SKELETONS=false;
+    static DRAW_COLLISION_GEOMETRY=false;
+    static DRAW_PATHS=false;
    
     constructor()
     {
@@ -130,11 +134,6 @@ export default class CoreClass
         this.drawMeshCount=0;
         this.drawTrigCount=0;
         this.drawModelCount=0;
-        
-            // tinting
-            
-        this.uiTintRect=new RectClass(0,0,0,0);
-        this.uiTintColor=new ColorClass(1.0,0.0,0.0);
 
             // loading screen
 
@@ -229,10 +228,6 @@ export default class CoreClass
             // interface object
 
         if (!this.interface.initialize()) return;
-        
-            // setup some interface positions
-        
-        this.uiTintRect.setFromValues(0,0,this.wid,this.high);
     }
 
     release()
@@ -338,7 +333,7 @@ export default class CoreClass
     draw()
     {
         let n;
-        let light,tintOn,tintAtt,liquidIdx,liquid;
+        let light;
         let player=this.map.entityList.getPlayer();
          
             // everything overdraws except
@@ -424,7 +419,7 @@ export default class CoreClass
             // draw the sky and map
             
         this.map.sky.draw();
-        if (!config.DRAW_COLLISION_GEOMETRY) {
+        if (!CoreClass.DRAW_COLLISION_GEOMETRY) {
             this.map.meshList.draw(null);
         }
         else {
@@ -433,7 +428,7 @@ export default class CoreClass
         
             // path debugging
             
-        if (config.DRAW_PATHS) this.map.path.debugDrawPath();
+        if (CoreClass.DRAW_PATHS) this.map.path.debugDrawPath();
         
             // draw any non held entities
             
@@ -441,11 +436,11 @@ export default class CoreClass
         
             // liquids
             
-        if (!config.DRAW_COLLISION_GEOMETRY) this.map.liquidList.draw();
+        if (!CoreClass.DRAW_COLLISION_GEOMETRY) this.map.liquidList.draw();
         
             // effects
             
-        if (!config.DRAW_COLLISION_GEOMETRY) this.map.effectList.draw();
+        if (!CoreClass.DRAW_COLLISION_GEOMETRY) this.map.effectList.draw();
         
             // and finally held entities,
             // clearing the z buffer first
@@ -453,30 +448,6 @@ export default class CoreClass
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
         this.map.entityList.draw(player);
 
-            // setup any tinting
-        
-        tintOn=false;
-        this.uiTintColor.setFromValues(0.0,0.0,0.0);
-        
-        tintAtt=player.getDamageTintAttenuation();
-        if (tintAtt!==0.0) {
-            tintOn=true;
-            this.uiTintColor.addFromValues(tintAtt,0.0,0.0);
-        }
-        liquidIdx=player.getUnderLiquidIndex();
-        if (liquidIdx!==-1) {
-            tintOn=true;
-            liquid=this.map.liquidList.liquids[liquidIdx];
-            this.uiTintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
-        }
-        
-            // any tints
-            
-        if (tintOn) {
-            this.uiTintColor.fixOverflow();
-            //this.interface.drawRect(this.uiTintRect,this.uiTintColor,0.5);
-        }
-        
             // interface
             
         this.interface.draw();

@@ -1,6 +1,4 @@
 import * as constants from '../main/constants.js';
-import config from '../main/config.js';
-import genRandom from '../utility/random.js';
 
 //
 // map class

@@ -1,22 +1,19 @@
 import ShaderClass from '../shader/shader.js';
 
 //
-// debug shader class
+// tint shader class
 //
 
-export default class DebugShaderClass extends ShaderClass
+export default class TintShaderClass extends ShaderClass
 {
     constructor(core)
     {
         super(core);
         
-        this.shaderName='debug';
+        this.shaderName='tint';
         
         this.vertexPositionAttribute=null;
-
-        this.perspectiveMatrixUniform=null;
-        this.viewMatrixUniform=null;
-        
+        this.orthoMatrixUniform=null;
         this.colorUniform=null;
         
         Object.seal(this);
@@ -36,30 +33,25 @@ export default class DebugShaderClass extends ShaderClass
 
         this.vertexPositionAttribute=gl.getAttribLocation(this.program,'vertexPosition');
 
-        this.perspectiveMatrixUniform=gl.getUniformLocation(this.program,'perspectiveMatrix');
-        this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
-
+        this.orthoMatrixUniform=gl.getUniformLocation(this.program,'orthoMatrix');    
         this.colorUniform=gl.getUniformLocation(this.program,'color');
 
         gl.useProgram(null);
     }
-    
+
         //
-        // start/stop skeleton shader drawing
+        // start/stop interface shader drawing
         //
 
     drawStart()
     {
         let gl=this.core.gl;
-
-            // using the skeleton shader
-
+        
         gl.useProgram(this.program);
 
-            // matrix
+            // setup the uniforms
 
-        gl.uniformMatrix4fv(this.perspectiveMatrixUniform,false,this.core.perspectiveMatrix.data);
-        gl.uniformMatrix4fv(this.viewMatrixUniform,false,this.core.viewMatrix.data);
+        gl.uniformMatrix4fv(this.orthoMatrixUniform,false,this.core.orthoMatrix.data);
 
             // enable the vertex attributes
 
@@ -69,12 +61,12 @@ export default class DebugShaderClass extends ShaderClass
     drawEnd()
     {
         let gl=this.core.gl;
-
+        
             // disable vertex attributes
 
         gl.disableVertexAttribArray(this.vertexPositionAttribute);
 
-            // no longer using shader
+            // no longer using program
 
         gl.useProgram(null);
     }

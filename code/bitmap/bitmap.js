@@ -199,7 +199,7 @@ export default class BitmapClass
         
         this.colorImage=null;
 
-        await this.loadImagePromise('./data/'+this.colorURL)
+        await this.loadImagePromise('../'+this.colorURL)
             .then
                 (
                         // resolved
@@ -253,7 +253,7 @@ export default class BitmapClass
         this.normalImage=null;
         
         if (this.normalURL!==null) {
-            await this.loadImagePromise('./data/'+this.normalURL)
+            await this.loadImagePromise('../'+this.normalURL)
                 .then
                     (
                             // resolved
@@ -285,7 +285,7 @@ export default class BitmapClass
         this.specularImage=null;
         
         if (this.specularURL!==null) {
-            await this.loadImagePromise('./data/'+this.specularURL)
+            await this.loadImagePromise('../'+this.specularURL)
                 .then
                     (
                             // resolved
@@ -319,7 +319,7 @@ export default class BitmapClass
         this.glowImage=null;
         
         if (this.glowURL!==null) {
-            await this.loadImagePromise('./data/'+this.glowURL)
+            await this.loadImagePromise('../'+this.glowURL)
                 .then
                     (
                             // resolved

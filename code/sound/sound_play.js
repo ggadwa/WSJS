@@ -1,13 +1,13 @@
-import config from '../main/config.js';
-
 //
 // sound play class
 //
 
 export default class SoundPlayClass
 {
-    constructor()
+    constructor(soundList)
     {
+        this.soundList=soundList;
+        
         this.free=true;
         this.entity=null;
         
@@ -48,7 +48,7 @@ export default class SoundPlayClass
             
         if (entity===null) {
             this.gainNode=ctx.createGain();
-            this.gainNode.gain.value=config.VOLUME;
+            this.gainNode.gain.value=soundList.soundVolume;
         
             this.sourceNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);
@@ -75,7 +75,7 @@ export default class SoundPlayClass
             this.sourceNode.connect(this.pannerNode);
             
             this.gainNode=ctx.createGain();
-            this.gainNode.gain.value=config.VOLUME;
+            this.gainNode.gain.value=soundList.soundVolume;
 
             this.pannerNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);

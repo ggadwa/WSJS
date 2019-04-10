@@ -115,14 +115,10 @@ export default class InterfaceElementClass
 
         gl.bindBuffer(gl.ARRAY_BUFFER,this.vertexBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.vertexArray);
-
-        gl.enableVertexAttribArray(shader.vertexPositionAttribute);
         gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ARRAY_BUFFER,this.uvBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,0,this.uvArray);
-
-        gl.enableVertexAttribArray(shader.vertexUVAttribute);
         gl.vertexAttribPointer(shader.vertexUVAttribute,2,gl.FLOAT,false,0,0);
         
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indexBuffer);

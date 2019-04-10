@@ -13,8 +13,7 @@ export default class MapLiquidShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/map_liquid.vert';
-        this.fragmentShaderURL='shaders/map_liquid.frag';
+        this.shaderName='map_liquid';
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;

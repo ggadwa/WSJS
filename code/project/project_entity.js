@@ -154,6 +154,25 @@ export default class ProjectEntityClass
     }
     
         //
+        // periodics
+        //
+        
+    getPeriodicCos(millisecondPeriod,amplitude)
+    {
+        return(this.core.getPeriodicCos(millisecondPeriod,amplitude));
+    }
+    
+    getPeriodicSin(millisecondPeriod,amplitude)
+    {
+        return(this.core.getPeriodicSin(millisecondPeriod,amplitude));
+    }
+    
+    getPeriodicLinear(millisecondPeriod,amplitude)
+    {
+        return(this.core.getPeriodicLinear(millisecondPeriod,amplitude));
+    }
+    
+        //
         // path utilities
         //
         

@@ -10,8 +10,7 @@ export default class SkyShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/sky.vert';
-        this.fragmentShaderURL='shaders/sky.frag';
+        this.shaderName='sky';
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;

@@ -1,8 +1,9 @@
 export default class ProjectGameClass
 {
-    constructor(core)
+    constructor(core,data)
     {
         this.core=core;
+        this.data=data;
     }
     
     initialize()
@@ -53,6 +54,15 @@ export default class ProjectGameClass
     getInterfaceHeight()
     {
         return(this.core.high);
+    }
+    
+        //
+        // some configuration APIs
+        //
+        
+    setSoundVolume(volume)
+    {
+        this.core.soundList.soundVolume=volume;
     }
         
         //

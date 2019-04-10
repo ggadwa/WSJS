@@ -4,9 +4,9 @@ import InterfaceTextClass from '../../code/interface/interface_text.js';
 
 export default class ProjectGameDeveloprClass extends ProjectGameClass
 {
-    constructor(core)
+    constructor(core,data)
     {
-        super(core);
+        super(core,data);
     }
     
     initialize()

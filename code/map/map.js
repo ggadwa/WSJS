@@ -8,8 +8,6 @@ import MapEffectListClass from '../map/map_effect_list.js';
 import MapMovementListClass from '../map/map_movement_list.js';
 import MapPathClass from '../map/map_path.js';
 import SkyClass from '../map/sky.js';
-import config from '../main/config.js';
-import genRandom from '../utility/random.js';
 
 //
 // map class

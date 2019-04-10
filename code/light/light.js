@@ -1,7 +1,6 @@
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import ColorClass from '../utility/color.js';
-import genRandom from '../utility/random.js';
 
 //
 // map light class

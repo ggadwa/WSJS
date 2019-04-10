@@ -31,7 +31,7 @@ export default class ImportGLTFClass
     async loadGLTFJson()
     {
         let resp;
-        let url='./data/models/'+this.importSettings.name+'/scene.gltf';
+        let url='../models/'+this.importSettings.name+'/scene.gltf';
         
         try {
             resp=await fetch(url);
@@ -46,7 +46,7 @@ export default class ImportGLTFClass
     async loadGLTFBin()
     {
         let resp;
-        let url='./data/models/'+this.importSettings.name+'/scene.bin';
+        let url='../models/'+this.importSettings.name+'/scene.bin';
         
         try {
             resp=await fetch(url);
@@ -721,6 +721,10 @@ export default class ImportGLTFClass
                 if (bitmap===null) return(false);
                 
                     // is it in the skip list?
+                    
+                if (this.importSettings.meshSkipMeshes!==undefined) {
+                    if (this.importSettings.meshSkipMeshes.indexOf(meshNode.name)!==-1) continue;
+                }
                     
                 if (this.importSettings.meshSkipBitmaps!==undefined) {
                     if (this.importSettings.meshSkipBitmaps.indexOf(bitmap.simpleName)!==-1) continue;

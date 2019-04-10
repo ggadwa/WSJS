@@ -1,4 +1,3 @@
-import config from '../main/config.js';
 import CoreClass from '../main/core.js';
 import ShaderClass from '../shader/shader.js';
 import ShaderLightClass from '../shader/shader_light.js';
@@ -14,8 +13,7 @@ export default class ModelMeshShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/model_mesh.vert';
-        this.fragmentShaderURL='shaders/model_mesh.frag';
+        this.shaderName='model_mesh';
         
         this.vertexPositionAttribute=null;
         this.vertexNormalAttribute=null;

@@ -578,7 +578,7 @@ export default class ModelEntityAlterClass
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y+entity.height;
-            vertices[vIdx++]=this.position.z+(entity.radius*(-Math.cos(rad)));
+            vertices[vIdx++]=this.position.z-(entity.radius*Math.cos(rad));
             
             indexes[iIdx++]=n;
             indexes[iIdx++]=(n===35)?0:(n+1);
@@ -589,7 +589,7 @@ export default class ModelEntityAlterClass
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y;
-            vertices[vIdx++]=this.position.z+(entity.radius*(-Math.cos(rad)));
+            vertices[vIdx++]=this.position.z-(entity.radius*Math.cos(rad));
             
             indexes[iIdx++]=n+36;
             indexes[iIdx++]=(n===35)?36:(n+37);
@@ -602,11 +602,11 @@ export default class ModelEntityAlterClass
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y+entity.height;
-            vertices[vIdx++]=this.position.z+(entity.radius*(-Math.cos(rad)));
+            vertices[vIdx++]=this.position.z-(entity.radius*Math.cos(rad));
             
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y;
-            vertices[vIdx++]=this.position.z+(entity.radius*-(Math.cos(rad)));
+            vertices[vIdx++]=this.position.z-(entity.radius*Math.cos(rad));
 
             indexes[iIdx++]=72+(n*2);
             indexes[iIdx++]=73+(n*2);

@@ -4,12 +4,13 @@
 
 export default class ShaderClass
 {
+    static SHADER_BASE_PATH='../../shaders/';
+    
     constructor(core)
     {
         this.core=core;
         
-        this.vertexShaderURL=null;
-        this.fragmentShaderURL=null;
+        this.shaderName=null;
         
         this.vertexShader=null;
         this.fragmentShader=null;
@@ -76,7 +77,7 @@ export default class ShaderClass
         
         vertexShaderSource=null;
         
-        await this.loadShader(this.vertexShaderURL)
+        await this.loadShader(ShaderClass.SHADER_BASE_PATH+this.shaderName+'.vert')
             .then
                 (
                         // resolved
@@ -98,7 +99,7 @@ export default class ShaderClass
         
         fragmentShaderSource=null;
         
-        await this.loadShader(this.fragmentShaderURL)
+        await this.loadShader(ShaderClass.SHADER_BASE_PATH+this.shaderName+'.frag')
             .then
                 (
                         // resolved
@@ -123,7 +124,7 @@ export default class ShaderClass
         gl.compileShader(this.vertexShader);
 
         if (!gl.getShaderParameter(this.vertexShader,gl.COMPILE_STATUS)) {
-            this.writeError(this.vertexShaderURL,"vertex",gl.getShaderInfoLog(this.vertexShader));
+            this.writeError(this.shaderName,"vertex",gl.getShaderInfoLog(this.vertexShader));
             this.release();
             return(false);
         }
@@ -135,7 +136,7 @@ export default class ShaderClass
         gl.compileShader(this.fragmentShader);
 
         if (!gl.getShaderParameter(this.fragmentShader,gl.COMPILE_STATUS)) {
-            this.writeError(this.fragmentShaderURL,"fragment",gl.getShaderInfoLog(this.fragmentShader));
+            this.writeError(this.shaderName,"fragment",gl.getShaderInfoLog(this.fragmentShader));
             this.release();
             return(false);
         }

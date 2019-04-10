@@ -1,7 +1,7 @@
 import * as constants from '../main/constants.js';
-import config from '../main/config.js';
 import PointClass from '../../code/utility/point.js';
 import Matrix4Class from '../utility/matrix4.js';
+import CoreClass from '../../code/main/core.js';
 import MeshListClass from '../mesh/mesh_list.js';
 import ModelSkeletonClass from '../model/model_skeleton.js';
 import ImportModelClass from '../import/import_model.js';
@@ -102,11 +102,11 @@ export default class ModelClass
         
             // debug skeleton and/or bounds drawing
             
-        if ((config.DRAW_MODEL_SKELETONS) || (config.DRAW_ENTITY_BOUNDS)) {
+        if ((CoreClass.DRAW_MODEL_SKELETONS) || (CoreClass.DRAW_ENTITY_BOUNDS)) {
             modelEntityAlter.setupModelMatrix(false);
 
-            if (config.DRAW_MODEL_SKELETONS) modelEntityAlter.debugDrawSkeleton();
-            if (config.DRAW_ENTITY_BOUNDS) modelEntityAlter.debugDrawBounds();
+            if (CoreClass.DRAW_MODEL_SKELETONS) modelEntityAlter.debugDrawSkeleton();
+            if (CoreClass.DRAW_ENTITY_BOUNDS) modelEntityAlter.debugDrawBounds();
         }
         
             // add up model draws for stats

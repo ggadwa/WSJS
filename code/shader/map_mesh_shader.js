@@ -1,4 +1,3 @@
-import config from '../main/config.js';
 import CoreClass from '../main/core.js';
 import ShaderClass from '../shader/shader.js';
 import ShaderLightClass from '../shader/shader_light.js';
@@ -13,8 +12,7 @@ export default class MapMeshShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/map_mesh.vert';
-        this.fragmentShaderURL='shaders/map_mesh.frag';
+        this.shaderName='map_mesh';
         
         this.vertexPositionAttribute=null;
         this.vertexNormalAttribute=null;

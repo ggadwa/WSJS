@@ -11,14 +11,15 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 export default class CollisionClass
 {
     static COLLISION_FLOOR_MARGIN=10;             // sometimes wall segments can extend a couple pixels off of floors, so this slop fixes getting stuck on edges
+    static COLLISION_SPOKE_COUNT=24;
     
     constructor(core)
     {
         this.core=core;
         
         this.spokeCenterPnt=new PointClass(0,0,0);
-        this.spokeCalcSin=new Float32Array(24);    // circular collision pre-calcs
-        this.spokeCalcCos=new Float32Array(24);
+        this.spokeCalcSin=new Float32Array(CollisionClass.COLLISION_SPOKE_COUNT);    // circular collision pre-calcs
+        this.spokeCalcCos=new Float32Array(CollisionClass.COLLISION_SPOKE_COUNT);
         this.createSpokeSinCos();
 
         this.entityTestPnt=new PointClass(0,0,0);
@@ -44,9 +45,9 @@ export default class CollisionClass
     {
         let n;
         let rad=0.0;
-        let radAdd=(Math.PI*2.0)/24.0;
+        let radAdd=(Math.PI*2.0)/CollisionClass.COLLISION_SPOKE_COUNT;
         
-        for (n=0;n!==24;n++) {
+        for (n=0;n!==CollisionClass.COLLISION_SPOKE_COUNT;n++) {
             this.spokeCalcSin[n]=Math.sin(rad);
             this.spokeCalcCos[n]=Math.cos(rad);
             rad+=radAdd;
@@ -57,7 +58,7 @@ export default class CollisionClass
     {
         let n;
         
-        for (n=0;n!=25;n++) {
+        for (n=0;n!=(CollisionClass.COLLISION_SPOKE_COUNT+1);n++) {
             this.rayPoints.push(new PointClass(0,0,0));
         }
     }
@@ -94,9 +95,9 @@ export default class CollisionClass
             
         for (n=0;n!==segmentCount;n++) {
  
-            for (k=0;k!==24;k++) {
-                this.rayVector.x=this.spokeCenterPnt.x+(radius*this.spokeCalcSin[k]);
-                this.rayVector.z=this.spokeCenterPnt.z-(radius*this.spokeCalcCos[k]);
+            for (k=0;k!==CollisionClass.COLLISION_SPOKE_COUNT;k++) {
+                this.rayVector.x=radius*this.spokeCalcSin[k];
+                this.rayVector.z=-(radius*this.spokeCalcCos[k]);
 
                 if (collisionTrig.rayTrace(this.spokeCenterPnt,this.rayVector,this.rayHitPnt)) {
                     dist=this.spokeCenterPnt.distance(this.rayHitPnt);
@@ -147,11 +148,11 @@ export default class CollisionClass
             // create a series of quads and ray trace
             // against their triangles
             
-        for (n=0;n!==24;n++) {
+        for (n=0;n!==CollisionClass.COLLISION_SPOKE_COUNT;n++) {
             x1=circlePnt.x+(radius*this.spokeCalcSin[n]);
             z1=circlePnt.z-(radius*this.spokeCalcCos[n]);
             
-            k=(n===23)?0:(n+1);
+            k=(n===(CollisionClass.COLLISION_SPOKE_COUNT-1))?0:(n+1);
             x2=circlePnt.x+(radius*this.spokeCalcSin[k]);
             z2=circlePnt.z-(radius*this.spokeCalcCos[k]);
             
@@ -305,7 +306,7 @@ export default class CollisionClass
                 // if no bump or not a bumpable
                 // hit or already bumped, just return hit
                 
-            if ((!bump) || (bumpY===-1) || (bumpOnce)) break;
+            if ((!bump) || (bumpY===-1) || (bumpOnce)) return(true);
                 
                 // do the bump, but only
                 // once
@@ -336,11 +337,11 @@ export default class CollisionClass
         x=entity.position.x;
         z=entity.position.z;
         
-        for (n=0;n!==24;n++) {
+        for (n=0;n!==CollisionClass.COLLISION_SPOKE_COUNT;n++) {
             this.rayPoints[n].setFromValues((x+(radius*this.spokeCalcSin[n])),y,(z-(radius*this.spokeCalcCos[n])));
         }
         
-        this.rayPoints[24].setFromValues(x,y,z);
+        this.rayPoints[CollisionClass.COLLISION_SPOKE_COUNT].setFromValues(x,y,z);
     }
     
     fallEntityInMap(entity)
@@ -397,7 +398,7 @@ export default class CollisionClass
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionFloorTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    for (i=0;i!==25;i++) {
+                    for (i=0;i!==(CollisionClass.COLLISION_SPOKE_COUNT+1);i++) {
                         if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
                             if (this.rayHitPnt.y>=y) {
                                 entity.standOnMeshIdx=n;
@@ -477,7 +478,7 @@ export default class CollisionClass
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionCeilingTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    for (i=0;i!==25;i++) {
+                    for (i=0;i!==(CollisionClass.COLLISION_SPOKE_COUNT+1);i++) {
                         if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
                             if (this.rayHitPnt.y<=y) {
                                 entity.collideCeilingMeshIdx=n;

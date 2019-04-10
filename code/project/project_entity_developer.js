@@ -1,6 +1,6 @@
-import config from '../../code/main/config.js';
 import PointClass from '../../code/utility/point.js';
 import BoundClass from '../../code/utility/bound.js';
+import CoreClass from '../main/core.js';
 import ProjectEntityClass from '../../code/project/project_entity.js';
 import ModelClass from '../../code/model/model.js';
 import ImportModelClass from '../../code/import/import_model.js';
@@ -187,6 +187,6 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         
             // path editing
             
-        if (config.DRAW_PATHS) this.pathEditor();
+        if (CoreClass.DRAW_PATHS) this.pathEditor();
     }
 }

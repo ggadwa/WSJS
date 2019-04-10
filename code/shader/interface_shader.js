@@ -10,8 +10,7 @@ export default class InterfaceShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/interface.vert';
-        this.fragmentShaderURL='shaders/interface.frag';
+        this.shaderName='interface';
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;

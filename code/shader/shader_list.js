@@ -5,6 +5,7 @@ import ModelMeshShaderClass from '../shader/model_mesh_shader.js';
 import DebugShaderClass from '../shader/debug_shader.js';
 import EffectShaderClass from '../shader/effect_shader.js';
 import InterfaceShaderClass from '../shader/interface_shader.js';
+import TintShaderClass from '../shader/tint_shader.js';
 import TextShaderClass from '../shader/text_shader.js';
 
 //
@@ -24,6 +25,7 @@ export default class ShaderListClass
         this.debugShader=null;
         this.effectShader=null;
         this.interfaceShader=null;
+        this.tintShader=null;
         this.textShader=null;
         
         this.finalInitCallback=null;
@@ -47,6 +49,7 @@ export default class ShaderListClass
         this.debugShader=null;
         this.effectShader=null;
         this.interfaceShader=null;
+        this.tintShader=null;
         this.textShader=null;
     }
     
@@ -60,6 +63,7 @@ export default class ShaderListClass
         if (this.debugShader!==null) this.debugShader.release();
         if (this.effectShader!==null) this.effectShader.release();
         if (this.interfaceShader!==null) this.interfaceShader.release();
+        if (this.tintShader!==null) this.tintShader.release();
         if (this.textShader!==null) this.textShader.release();
     }
     
@@ -96,6 +100,10 @@ export default class ShaderListClass
         this.interfaceShader=new InterfaceShaderClass(this.core);
         this.interfaceShader.initialize();
         if (!(await this.interfaceShader.load())) return(false);
+        
+        this.tintShader=new TintShaderClass(this.core);
+        this.tintShader.initialize();
+        if (!(await this.tintShader.load())) return(false);
       
         this.textShader=new TextShaderClass(this.core);
         this.textShader.initialize();

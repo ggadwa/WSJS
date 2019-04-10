@@ -10,8 +10,7 @@ export default class TextShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/text.vert';
-        this.fragmentShaderURL='shaders/text.frag';
+        this.shaderName='text';
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;

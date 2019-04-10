@@ -8,6 +8,8 @@ import SoundPlayClass from '../sound/sound_play.js';
 
 export default class SoundListClass
 {
+    static MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
+    
     constructor(core)
     {
         this.core=core;
@@ -22,9 +24,12 @@ export default class SoundListClass
         this.currentListenerEntity=null;
         this.listenerForwardVector=new PointClass(0.0,0.0,1.0);            // local to global to avoid GC
         
-            // playing sounds
+            // volumes
             
-        this.MAX_CONCURRENT_SOUNDS=8;                   // maximum number of concurrent sounds you can have playing
+        this.soundVolume=0.3;
+        this.musicVolume=0.3;
+        
+            // playing sounds
 
         this.soundPlays=null;
 
@@ -53,8 +58,8 @@ export default class SoundListClass
         
         this.soundPlays=[];
         
-        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
-            this.soundPlays.push(new SoundPlayClass());
+        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
+            this.soundPlays.push(new SoundPlayClass(this));
         }
        
             // get a reference to the listener
@@ -68,7 +73,7 @@ export default class SoundListClass
     {
         let n;
         
-        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
             this.soundPlays[n].close();
         }
         
@@ -169,7 +174,7 @@ export default class SoundListClass
         
             // update all playing sounds
             
-        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
             if (!this.soundPlays[n].free) this.soundPlays[n].update(this.currentListenerEntity);
         }
     }
@@ -189,7 +194,7 @@ export default class SoundListClass
         
             // find a free sound play
             
-        for (n=0;n!==this.MAX_CONCURRENT_SOUNDS;n++) {
+        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
             if (this.soundPlays[n].free) {
                 soundPlay=this.soundPlays[n];
                 break;

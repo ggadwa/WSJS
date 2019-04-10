@@ -10,8 +10,7 @@ export default class EffectShaderClass extends ShaderClass
     {
         super(core);
         
-        this.vertexShaderURL='shaders/effect.vert';
-        this.fragmentShaderURL='shaders/effect.frag';
+        this.shaderName='effect';
         
         this.vertexPositionAttribute=null;
         this.vertexUVAttribute=null;

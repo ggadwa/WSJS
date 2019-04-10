@@ -1,5 +1,4 @@
 import ColorClass from '../../code/utility/color.js';
-import InterfaceShaderClass from '../shader/interface_shader.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 
@@ -18,6 +17,10 @@ export default class InterfaceClass
             
         this.uiTextColor=new ColorClass(1,1,0);
         
+        this.tintVertexArray=new Float32Array(2*6);     // 2D, only 2 vertex coordinates
+        this.tintVertexBuffer=null;
+        this.tintColor=new ColorClass(0,0,0);
+        
         Object.seal(this);
     }
     
@@ -27,6 +30,8 @@ export default class InterfaceClass
 
     initialize()
     {
+        let gl=this.core.gl;
+        
             // clear all current elements and texts
             
         this.elements.clear();
@@ -35,6 +40,28 @@ export default class InterfaceClass
             // create the static font texture
             
         InterfaceTextClass.createStaticFontTexture(this.core.gl);
+        
+            // tint vertexes
+            // (two triangles)
+            
+        this.tintVertexArray[0]=0;
+        this.tintVertexArray[1]=0;
+        this.tintVertexArray[2]=this.core.wid;
+        this.tintVertexArray[3]=0;
+        this.tintVertexArray[4]=this.core.wid;
+        this.tintVertexArray[5]=this.core.high;
+        
+        this.tintVertexArray[6]=0;
+        this.tintVertexArray[7]=0;
+        this.tintVertexArray[8]=this.core.wid;
+        this.tintVertexArray[9]=this.core.high;
+        this.tintVertexArray[10]=0;
+        this.tintVertexArray[11]=this.core.high;
+            
+        this.tintVertexBuffer=gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.tintVertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER,this.tintVertexArray,gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
 
         return(true);
     }
@@ -42,6 +69,10 @@ export default class InterfaceClass
     release()
     {
         let element,text;
+        
+            // release tint
+            
+        this.core.gl.deleteBuffer(this.tintVertexBuffer);
         
             // release all elements and texts
             
@@ -82,6 +113,62 @@ export default class InterfaceClass
     {
         this.texts.get(id).str=str;
     }
+    
+        //
+        // drawing
+        //
+        
+    drawTint()
+    {
+        let tintOn,tintAtt,liquidIdx,liquid;
+        let player=this.core.map.entityList.getPlayer();
+        let shader=this.core.shaderList.tintShader;
+        let gl=this.core.gl;
+        
+            // setup tint
+            
+        tintOn=false;
+        this.tintColor.setFromValues(0.0,0.0,0.0);
+        
+        tintAtt=player.getDamageTintAttenuation();
+        if (tintAtt!==0.0) {
+            tintOn=true;
+            this.tintColor.addFromValues(tintAtt,0.0,0.0);
+        }
+        
+        liquidIdx=player.getUnderLiquidIndex();
+        if (liquidIdx!==-1) {
+            tintOn=true;
+            liquid=this.core.map.liquidList.liquids[liquidIdx];
+            this.tintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
+        }
+        
+        if (!tintOn) return;
+        
+            // draw tint
+            
+        gl.blendFunc(gl.ONE,gl.ONE);
+        
+        shader.drawStart();
+        
+        this.tintColor.fixOverflow();
+        gl.uniform4f(shader.colorUniform,this.tintColor.r,this.tintColor.g,this.tintColor.b,1.0);
+        
+            // setup the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,this.tintVertexBuffer);
+        gl.vertexAttribPointer(shader.vertexPositionAttribute,2,gl.FLOAT,false,0,0);
+        
+            // draw the quad
+            
+        gl.drawArrays(gl.TRIANGLES,0,6);
+
+            // remove the buffers
+
+        gl.bindBuffer(gl.ARRAY_BUFFER,null);
+        
+        shader.drawEnd();
+    }
 
     draw()
     {
@@ -89,11 +176,15 @@ export default class InterfaceClass
         let gl=this.core.gl;
         
         gl.disable(gl.DEPTH_TEST);
-
         gl.enable(gl.BLEND);
+        
+            // tinting
+        
+        this.drawTint();
+            
+            // elements
+            
         gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-            // run through the elements
             
         this.core.shaderList.interfaceShader.drawStart();
         
@@ -103,6 +194,8 @@ export default class InterfaceClass
         
         this.core.shaderList.interfaceShader.drawEnd();
         
+            // text
+            
         this.core.shaderList.textShader.drawStart();
         
         for ([key,text] of this.texts) {

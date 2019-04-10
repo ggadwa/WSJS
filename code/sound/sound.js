@@ -44,7 +44,7 @@ export default class SoundClass
     async loadWAV()
     {
         let resp;
-        let url='./data/sounds/'+this.name+'.wav';
+        let url='../sounds/'+this.name+'.wav';
         
         try {
             resp=await fetch(url);
