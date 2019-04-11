@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
@@ -12,6 +11,8 @@ import CollisionClass from '../collision/collisions.js';
 
 export default class ProjectEntityClass
 {
+    static RAD_TO_DEGREE=180.0/Math.PI;
+    
     constructor(core,name,position,angle)
     {
         this.core=core;
@@ -437,7 +438,7 @@ export default class ProjectEntityClass
         this.reflectLineVector.normalize();
             
         f=this.reflectLineVector.dot(this.reflectMovementVector);
-        ang=Math.acos(f)*constants.RAD_TO_DEGREE;
+        ang=Math.acos(f)*ProjectEntityClass.RAD_TO_DEGREE;
         
             // calculate the reflection angle
             

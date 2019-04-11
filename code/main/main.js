@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import CoreClass from '../main/core.js';
 
@@ -176,6 +175,10 @@ let main=new MainClass();
 // main loop
 //
 
+const PHYSICS_MILLISECONDS=16;
+const DRAW_MILLISECONDS=16;
+const BAIL_MILLISECONDS=5000;
+
 function mainLoop(timestamp)
 {
     let fpsTime;
@@ -201,14 +204,14 @@ function mainLoop(timestamp)
     if (!core.paused) {
         core.physicsTick=core.timestamp-core.lastPhysicTimestamp;
 
-        if (core.physicsTick>constants.PHYSICS_MILLISECONDS) {
+        if (core.physicsTick>PHYSICS_MILLISECONDS) {
             map.movementList.run(core,map);
 
-            if (core.physicsTick<constants.BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+            if (core.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
-                while (core.physicsTick>constants.PHYSICS_MILLISECONDS) {
-                    core.physicsTick-=constants.PHYSICS_MILLISECONDS;
-                    core.lastPhysicTimestamp+=constants.PHYSICS_MILLISECONDS;
+                while (core.physicsTick>PHYSICS_MILLISECONDS) {
+                    core.physicsTick-=PHYSICS_MILLISECONDS;
+                    core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
                     core.projectGame.run();
                     map.entityList.run();
@@ -232,7 +235,7 @@ function mainLoop(timestamp)
         
     core.drawTick=core.timestamp-core.lastDrawTimestamp;
     
-    if (core.drawTick>constants.DRAW_MILLISECONDS) {
+    if (core.drawTick>DRAW_MILLISECONDS) {
         core.lastDrawTimestamp=core.timestamp; 
 
         core.draw();

@@ -1,5 +1,3 @@
-import * as constants from '../main/constants.js';
-
 //
 // sky class
 //

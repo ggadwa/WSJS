@@ -1,11 +1,11 @@
-import * as constants from '../main/constants.js';
-
 //
 // input class
 //
 
 export default class InputClass
 {
+    static INPUT_WHEEL_REFRESH_TICK=500;
+    
     constructor(core)
     {
         this.core=core;
@@ -197,7 +197,7 @@ export default class InputClass
         click=this.mouseWheelClick;
         
         this.mouseWheelClick=0;
-        this.mouseWheelClickRefreshTick=this.core.timestamp+constants.INPUT_WHEEL_REFRESH_TICK;
+        this.mouseWheelClickRefreshTick=this.core.timestamp+InputClass.INPUT_WHEEL_REFRESH_TICK;
         
         return(click);
     }

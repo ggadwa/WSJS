@@ -1,7 +1,8 @@
-import * as constants from '../main/constants.js';
-
 export default class PointClass
 {
+    static DEGREE_TO_RAD=Math.PI/180.0;
+    static RAD_TO_DEGREE=180.0/Math.PI;
+
     constructor(x,y,z)
     {
         this.x=x;
@@ -150,7 +151,7 @@ export default class PointClass
             this.z-=centerPnt.z;
         }
         
-        rd=rotX*constants.DEGREE_TO_RAD;
+        rd=rotX*PointClass.DEGREE_TO_RAD;
         sn=Math.sin(rd);
         cs=Math.cos(rd);
         
@@ -175,7 +176,7 @@ export default class PointClass
             this.z-=centerPnt.z;
         }
         
-        rd=rotY*constants.DEGREE_TO_RAD;
+        rd=rotY*PointClass.DEGREE_TO_RAD;
         sn=Math.sin(rd);
         cs=Math.cos(rd);
         
@@ -200,7 +201,7 @@ export default class PointClass
             this.y-=centerPnt.y;
         }
         
-        rd=rotZ*constants.DEGREE_TO_RAD;
+        rd=rotZ*PointClass.DEGREE_TO_RAD;
         sn=Math.sin(rd);
         cs=Math.cos(rd);
         
@@ -223,7 +224,7 @@ export default class PointClass
             // rotate X
         
         if (ang.x!==0.0) {
-            rd=ang.x*constants.DEGREE_TO_RAD;
+            rd=ang.x*PointClass.DEGREE_TO_RAD;
             sn=Math.sin(rd);
             cs=Math.cos(rd);
 
@@ -237,7 +238,7 @@ export default class PointClass
             // rotate Y
         
         if (ang.y!==0.0) {
-            rd=ang.y*constants.DEGREE_TO_RAD;
+            rd=ang.y*PointClass.DEGREE_TO_RAD;
             sn=Math.sin(rd);
             cs=Math.cos(rd);
 
@@ -251,7 +252,7 @@ export default class PointClass
             // rotate Z
         
         if (ang.z!==0.0) {
-            rd=ang.z*constants.DEGREE_TO_RAD;
+            rd=ang.z*PointClass.DEGREE_TO_RAD;
             sn=Math.sin(rd);
             cs=Math.cos(rd);
 
@@ -276,7 +277,7 @@ export default class PointClass
             // rotate X
         
         if (ang.x!==0.0) {
-            rd=ang.x*constants.DEGREE_TO_RAD;
+            rd=ang.x*PointClass.DEGREE_TO_RAD;
             sn=Math.sin(rd);
             cs=Math.cos(rd);
 
@@ -290,7 +291,7 @@ export default class PointClass
             // rotate Y
         
         if (ang.y!==0.0) {
-            rd=ang.y*constants.DEGREE_TO_RAD;
+            rd=ang.y*PointClass.DEGREE_TO_RAD;
             sn=Math.sin(rd);
             cs=Math.cos(rd);
 
@@ -304,7 +305,7 @@ export default class PointClass
             // rotate Z
         
         if (ang.z!==0.0) {
-            rd=ang.z*constants.DEGREE_TO_RAD;
+            rd=ang.z*PointClass.DEGREE_TO_RAD;
             sn=Math.sin(rd);
             cs=Math.cos(rd);
 
@@ -453,7 +454,7 @@ export default class PointClass
             // so we need the Z up vector (positive) and the vector to pt
             // then subtract them for correct angle
         
-        let fang=(Math.atan2(0,100)-Math.atan2((pnt.x-this.x),(pnt.z-this.z)))*constants.RAD_TO_DEGREE;
+        let fang=(Math.atan2(0,100)-Math.atan2((pnt.x-this.x),(pnt.z-this.z)))*PointClass.RAD_TO_DEGREE;
         
             // now we need to switch it up for which side the x is on
             // (if greater, the #s are 0 to -180, if positive, 180 to 0)
@@ -477,7 +478,7 @@ export default class PointClass
             // so we need the Z up vector (positive) and the vector to pt
             // then subtract them for correct angle
         
-        let fang=(Math.atan2(0,100)-Math.atan2((pnt.y-this.y),(pnt.z-this.z)))*constants.RAD_TO_DEGREE;
+        let fang=(Math.atan2(0,100)-Math.atan2((pnt.y-this.y),(pnt.z-this.z)))*PointClass.RAD_TO_DEGREE;
         
             // now we need to switch it up for which side the y is on
             // (if greater, the #s are 0 to -180, if positive, 180 to 0)

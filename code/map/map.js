@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import BoundClass from '../utility/bound.js';
 import MeshListClass from '../mesh/mesh_list.js';
 import MapLiquidListClass from '../map/map_liquid_list.js';

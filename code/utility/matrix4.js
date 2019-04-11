@@ -1,7 +1,7 @@
-import * as constants from '../main/constants.js';
-
 export default class Matrix4Class
 {
+    static DEGREE_TO_RAD=Math.PI/180.0;
+
     constructor()
     {
         this.data=new Float32Array(16);
@@ -75,7 +75,7 @@ export default class Matrix4Class
     
     setRotationFromXAngle(xAng)
     {
-        let rad=xAng*constants.DEGREE_TO_RAD;
+        let rad=xAng*Matrix4Class.DEGREE_TO_RAD;
         
         this.setIdentity();
         
@@ -86,7 +86,7 @@ export default class Matrix4Class
     
     setRotationFromYAngle(yAng)
     {
-        let rad=yAng*constants.DEGREE_TO_RAD;
+        let rad=yAng*Matrix4Class.DEGREE_TO_RAD;
         
         this.setIdentity();
         
@@ -97,7 +97,7 @@ export default class Matrix4Class
     
     setRotationFromZAngle(zAng)
     {
-        let rad=zAng*constants.DEGREE_TO_RAD;
+        let rad=zAng*Matrix4Class.DEGREE_TO_RAD;
         
         this.setIdentity();
         

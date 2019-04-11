@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import PointClass from '../../code/utility/point.js';
 import Matrix4Class from '../utility/matrix4.js';
 import CoreClass from '../../code/main/core.js';

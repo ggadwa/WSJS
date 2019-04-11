@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 
 //

@@ -7,12 +7,16 @@ import MoveClass from '../map/move.js';
 
 export default class MovementClass
 {
-    constructor(meshIdxList,rotateOffset,looping,approachDistance)
+    constructor(meshIdxList,reverseMeshIdxList,rotateOffset,approachOffet,looping,approachDistance)
     {
         this.meshIdxList=meshIdxList;
+        this.reverseMeshIdxList=reverseMeshIdxList;
         this.rotateOffset=rotateOffset;
+        this.approachOffet=approachOffet;
         this.looping=looping;
         this.approachDistance=approachDistance;
+        
+        this.reverseRotateOffet=new PointClass(-this.rotateOffset.x,-this.rotateOffset.x,-this.rotateOffset.z);
         
         this.currentMoveIdx=0;
         this.nextMoveNextTick=0;
@@ -69,12 +73,14 @@ export default class MovementClass
             this.originalCenterPnt.x=Math.trunc(this.originalCenterPnt.x/nMesh);
             this.originalCenterPnt.y=Math.trunc(this.originalCenterPnt.y/nMesh);
             this.originalCenterPnt.z=Math.trunc(this.originalCenterPnt.z/nMesh);
+            
+            this.originalCenterPnt.addPoint(this.approachOffet);        // a special offset so the approach center can be moved
         }
         
-            // if not looping, then do approach disance
-            // if not already moving
+            // if not looping, and we have an approach distance,
+            // then do approach distance if not already moving
             
-        if (!this.looping) {
+        if ((!this.looping) && (this.approachDistance!==-1)) {
             
             if (!this.moving) {
                 isOpen=(this.originalCenterPnt.distance(map.entityList.getPlayer().position)<this.approachDistance);
@@ -147,6 +153,22 @@ export default class MovementClass
             if (!this.movePnt.isZero()) mesh.move(this.movePnt);
             if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.rotateOffset);
             map.entityList.movementPush(this.meshIdxList[n],this.movePnt);
+        }
+        
+            // do reverse moves
+            
+        if (this.reverseMeshIdxList!==null) {
+            nMesh=this.reverseMeshIdxList.length;
+            
+            this.movePnt.scale(-1);
+            this.rotateAng.scale(-1);
+        
+            for (n=0;n!==nMesh;n++) {
+                mesh=map.meshList.get(this.reverseMeshIdxList[n]);
+                if (!this.movePnt.isZero()) mesh.move(this.movePnt);
+                if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.reverseRotateOffet);
+                map.entityList.movementPush(this.reverseMeshIdxList[n],this.movePnt);
+            }
         }
     }
 }

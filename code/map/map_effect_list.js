@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import CoreClass from '../main/core.js';
 import ProjectEffectClass from '../project/project_effect.js';
 

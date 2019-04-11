@@ -23,7 +23,7 @@ export default class ImportMapClass
         let effect,effectDef;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
-        let movement,idxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset;
+        let movement,meshIdxList,reverseMeshIdxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset,approachOffset;
         let pathNode,pathDef;
         let bitmap;
         let importMesh;
@@ -95,7 +95,7 @@ export default class ImportMapClass
             for (n=0;n!==importSettings.movements.length;n++) {
                 movementDef=importSettings.movements[n];
 
-                idxList=[];
+                meshIdxList=[];
                 
                 for (k=0;k!==movementDef.meshes.length;k++) {
                     idx=this.core.map.meshList.find(movementDef.meshes[k]);
@@ -103,13 +103,31 @@ export default class ImportMapClass
                         console.log('Unknown mesh to attach movement to: '+movementDef.meshes[k]);
                         continue;
                     }
-                    idxList.push(idx);
+                    meshIdxList.push(idx);
+                }
+                
+                reverseMeshIdxList=null;
+                
+                if (movementDef.reverseMeshes!==undefined) {
+                    reverseMeshIdxList=[];
+
+                    for (k=0;k!==movementDef.reverseMeshes.length;k++) {
+                        idx=this.core.map.meshList.find(movementDef.reverseMeshes[k]);
+                        if (idx===-1) {
+                            console.log('Unknown mesh to attach reverse movement to: '+movementDef.reverseMeshes[k]);
+                            continue;
+                        }
+                        reverseMeshIdxList.push(idx);
+                    }
                 }
                     
                 rotateOffset=new PointClass(0,0,0);
                 if (movementDef.rotateOffset!==undefined) rotateOffset.setFromValues(movementDef.rotateOffset.x,movementDef.rotateOffset.y,movementDef.rotateOffset.z);
+                
+                approachOffset=new PointClass(0,0,0);
+                if (movementDef.approachOffset!==undefined) approachOffset.setFromValues(movementDef.approachOffset.x,movementDef.approachOffset.y,movementDef.approachOffset.z);
 
-                movement=new MovementClass(idxList,rotateOffset,movementDef.looping,movementDef.approachDistance);
+                movement=new MovementClass(meshIdxList,reverseMeshIdxList,rotateOffset,approachOffset,movementDef.looping,movementDef.approachDistance);
 
                 for (k=0;k!==movementDef.moves.length;k++) {
                     moveDef=movementDef.moves[k];

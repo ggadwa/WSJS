@@ -6,8 +6,7 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
-
-- increase size of dungeon
+- what's with weird push backs in liquids? (like in dungeon)
 
 - bots need to stop turning if blocked by moving mesh
   - if one moving mesh, only get off when at top or bottom nearest to next node
@@ -22,7 +21,6 @@ liquids need to draw away from z
 jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
 
 8. combine input / view pause states
-9. constants use statics?
 
 project_entity to remove
     turn(addAngle)

@@ -308,6 +308,8 @@ export default class MeshClass
                 // get the x/z area for some floor
                 // or ceiling eliminations, if too small
                 // it can't be stood on and is decorative
+                // sometimes we get walls that are just slivers,
+                // also eliminate them
                 
             xSize=Math.max(Math.abs(x0-x1),Math.abs(x0-x2),Math.abs(x1-x2));
             zSize=Math.max(Math.abs(z0-z1),Math.abs(z0-z2),Math.abs(z1-z2));
@@ -330,6 +332,7 @@ export default class MeshClass
                     // else consider it a wall
 
                 else {
+
                     this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
                 }
             }

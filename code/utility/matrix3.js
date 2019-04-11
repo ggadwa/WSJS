@@ -1,5 +1,3 @@
-import * as constants from '../main/constants.js';
-
 export default class Matrix4Class
 {
     constructor()

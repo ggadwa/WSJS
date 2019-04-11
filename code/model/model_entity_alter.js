@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
@@ -15,6 +14,8 @@ import ModelAnimationChannelClass from '../model/model_animation_channel.js';
 export default class ModelEntityAlterClass
 {
     static MAX_MESH_COUNT=64;           // max number of meshes we can keep show/hides for
+    
+    static DEGREE_TO_RAD=Math.PI/180.0;
     
     constructor(core,entity)
     {
@@ -574,7 +575,7 @@ export default class ModelEntityAlterClass
             // top and bottom circle
             
         for (n=0;n!==36;n++) {
-            rad=constants.DEGREE_TO_RAD*(n*10)
+            rad=ModelEntityAlterClass.DEGREE_TO_RAD*(n*10)
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y+entity.height;
@@ -585,7 +586,7 @@ export default class ModelEntityAlterClass
         }
         
         for (n=0;n!==36;n++) {
-            rad=constants.DEGREE_TO_RAD*(n*10)
+            rad=ModelEntityAlterClass.DEGREE_TO_RAD*(n*10)
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y;
@@ -598,7 +599,7 @@ export default class ModelEntityAlterClass
             // a couple lines
         
         for (n=0;n!==4;n++) {
-            rad=constants.DEGREE_TO_RAD*(n*90);
+            rad=ModelEntityAlterClass.DEGREE_TO_RAD*(n*90);
 
             vertices[vIdx++]=this.position.x+(entity.radius*Math.sin(rad));
             vertices[vIdx++]=this.position.y+entity.height;

@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import MapClass from '../map/map.js';
 import BitmapListClass from '../bitmap/bitmap_list.js';
 import SoundListClass from '../sound/sound_list.js';
@@ -27,6 +26,16 @@ export default class CoreClass
     static DRAW_MODEL_SKELETONS=false;
     static DRAW_COLLISION_GEOMETRY=false;
     static DRAW_PATHS=false;
+    
+    static GL_OPTIONS={
+            alpha:false,
+            depth:true,
+            stencil:false,
+            antialias:false,
+            premultipliedAlpha:false,
+            preserveDrawingBuffer:true,
+            failIfMajorPerformanceCaveat:false
+        }; 
    
     constructor()
     {
@@ -185,7 +194,7 @@ export default class CoreClass
     {
             // get the gl context
 
-        this.gl=this.canvas.getContext("webgl2",constants.GL_OPTIONS);
+        this.gl=this.canvas.getContext("webgl2",CoreClass.GL_OPTIONS);
         if (this.gl===null) {
             alert('WebGL2 not available, try a newer browser');
             return;

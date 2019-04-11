@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import PointClass from '../utility/point.js';
 import LineClass from '../utility/line.js';
 import BoundClass from '../utility/bound.js';
@@ -10,6 +9,8 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class CollisionClass
 {
+    static BUMP_HEIGHT=1000;                      // heights we can bump up
+    static FLOOR_RISE_HEIGHT=2000;                // heights we can move up or down on a slanted triangle
     static COLLISION_FLOOR_MARGIN=10;             // sometimes wall segments can extend a couple pixels off of floors, so this slop fixes getting stuck on edges
     static COLLISION_SPOKE_COUNT=24;
     
@@ -101,6 +102,8 @@ export default class CollisionClass
 
                 if (collisionTrig.rayTrace(this.spokeCenterPnt,this.rayVector,this.rayHitPnt)) {
                     dist=this.spokeCenterPnt.distance(this.rayHitPnt);
+                    if (dist>radius) continue;
+                    
                     if ((dist<currentDist) || (currentDist===-1)) {
                         lineIntersectPnt.setFromPoint(this.rayHitPnt);
                         currentDist=dist;
@@ -140,10 +143,11 @@ export default class CollisionClass
     rayCylinderIntersection(rayPnt,rayVector,circlePnt,radius,high,intersectPnt)
     {
         let n,k,x1,z1,x2,z2;
-        let dist,currentDist;
+        let dist,currentDist,rayDist;
         let ty=circlePnt.y+high;
         
         currentDist=-1;
+        rayDist=rayVector.length();
         
             // create a series of quads and ray trace
             // against their triangles
@@ -159,6 +163,8 @@ export default class CollisionClass
             this.tempCollisionTrig.resetFromValues(x1,circlePnt.y,z1,x1,ty,z1,x2,ty,z2);
             if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,this.rayHitPnt)) {
                 dist=rayPnt.distance(this.rayHitPnt);
+                if (dist>rayDist) continue;
+                
                 if ((dist<currentDist) || (currentDist===-1)) {
                     intersectPnt.setFromPoint(this.rayHitPnt);
                     currentDist=dist;
@@ -170,6 +176,8 @@ export default class CollisionClass
             this.tempCollisionTrig.resetFromValues(x1,circlePnt.y,z1,x2,ty,z2,x2,circlePnt.y,z2);
             if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,this.rayHitPnt)) {
                 dist=rayPnt.distance(this.rayHitPnt);
+                if (dist>rayDist) continue;
+                
                 if ((dist<currentDist) || (currentDist===-1)) {
                     intersectPnt.setFromPoint(this.rayHitPnt);
                     currentDist=dist;
@@ -257,7 +265,7 @@ export default class CollisionClass
                         entity.collideWallTrigIdx=k;
                         
                         bumpY=-1;
-                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=constants.BUMP_HEIGHT) bumpY=collisionTrig.yBound.max;
+                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=CollisionClass.BUMP_HEIGHT) bumpY=collisionTrig.yBound.max;
                     }
                 }
             }
@@ -291,7 +299,7 @@ export default class CollisionClass
                     checkEntity.touchEntity=entity;
                     
                     bumpY=-1;
-                    if ((entityTopY-this.entityTestPnt.y)<=constants.BUMP_HEIGHT) bumpY=entityTopY;
+                    if ((entityTopY-this.entityTestPnt.y)<=CollisionClass.BUMP_HEIGHT) bumpY=entityTopY;
                 }
             }
 
@@ -354,7 +362,7 @@ export default class CollisionClass
             // we can move up and down a floor segment
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues((entity.position.y-constants.FLOOR_RISE_HEIGHT),(entity.position.y+constants.FLOOR_RISE_HEIGHT));
+        this.objYBound.setFromValues((entity.position.y-CollisionClass.FLOOR_RISE_HEIGHT),(entity.position.y+CollisionClass.FLOOR_RISE_HEIGHT));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
             // build the ray trace points
@@ -363,16 +371,16 @@ export default class CollisionClass
             // and the vector moving down the Y (which is negative
             // as the Y is up)
             
-        this.buildYCollisionRayPoints(entity,(entity.position.y+constants.FLOOR_RISE_HEIGHT));
+        this.buildYCollisionRayPoints(entity,(entity.position.y+CollisionClass.FLOOR_RISE_HEIGHT));
         
         this.rayVector.x=0;
-        this.rayVector.y=-(constants.FLOOR_RISE_HEIGHT*2);
+        this.rayVector.y=-(CollisionClass.FLOOR_RISE_HEIGHT*2);
         this.rayVector.z=0;
        
             // start with no hits
        
         entity.standOnMeshIdx=-1;
-        y=entity.position.y-constants.FLOOR_RISE_HEIGHT;
+        y=entity.position.y-CollisionClass.FLOOR_RISE_HEIGHT;
         
             // run through colliding trigs
         
@@ -417,7 +425,7 @@ export default class CollisionClass
             // if no collisions, return the
             // farthest part of the ray
         
-        return(-constants.FLOOR_RISE_HEIGHT);
+        return(-CollisionClass.FLOOR_RISE_HEIGHT);
     }
     
         //

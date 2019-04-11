@@ -1,7 +1,7 @@
-import * as constants from '../main/constants.js';
-
 export default class QuaternionClass
 {
+    static DEGREE_TO_RAD=Math.PI/180.0;
+    
     constructor(x,y,z,w)
     {
         this.x=x;
@@ -14,7 +14,7 @@ export default class QuaternionClass
     
     static createFromVectorAndAngle(x,y,z,ang)
     {
-        let rd=(ang*constants.DEGREE_TO_RAD)*0.5;
+        let rd=(ang*QuaternionClass.DEGREE_TO_RAD)*0.5;
         let sn=Math.sin(rd);
         
         return(new QuaternionClass((sn*x),(sn*y),(sn*z),Math.cos(rd)));
@@ -46,7 +46,7 @@ export default class QuaternionClass
     
     setFromVectorAndAngle(x,y,z,ang)
     {
-        let rd=ang*constants.DEGREE_TO_RAD;
+        let rd=ang*QuaternionClass.DEGREE_TO_RAD;
         let sn=Math.sin(rd*0.5);
         
         this.x=sn*x;

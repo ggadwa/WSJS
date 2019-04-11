@@ -1,4 +1,3 @@
-import * as constants from '../main/constants.js';
 import BoundClass from '../utility/bound.js';
 
 //
