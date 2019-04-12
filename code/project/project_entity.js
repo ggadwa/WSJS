@@ -646,6 +646,11 @@ export default class ProjectEntityClass
         this.core.soundList.play(this,name);
     }
     
+    playSoundAtEntity(entity,name)
+    {
+        this.core.soundList.play(entity,name);
+    }
+    
         //
         // ready entity
         // this is the first call before it starts running,
