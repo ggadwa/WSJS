@@ -83,6 +83,25 @@ export default class ProjectEffectClass
     }
     
         //
+        // sounds
+        //
+        
+    addSound(name,distance)
+    {
+        this.core.soundList.add(name,distance);
+    }
+        
+    playSound(name)
+    {
+        this.core.soundList.play(this,name);
+    }
+    
+    playSoundAtEntity(entity,name)
+    {
+        this.core.soundList.play(entity,name);
+    }
+    
+        //
         // random move utilities
         //
         
