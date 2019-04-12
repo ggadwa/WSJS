@@ -1,5 +1,6 @@
 import PointClass from '../utility/point.js';
 import MoveClass from '../map/move.js';
+import MeshClass from '../mesh/mesh.js';
 
 //
 // movement class
@@ -147,11 +148,22 @@ export default class MovementClass
         this.lastRotateAng.setFromPoint(this.nextRotateAng);
         
             // do the moves
+            
+            // we set a moving flag here because bots need to
+            // detect if they are on moving platforms and pause
         
         for (n=0;n!==nMesh;n++) {
             mesh=map.meshList.get(this.meshIdxList[n]);
-            if (!this.movePnt.isZero()) mesh.move(this.movePnt);
-            if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.rotateOffset);
+            mesh.moveMode=MeshClass.MOVE_PAUSED;
+            
+            if (!this.movePnt.isZero()) {
+                mesh.move(this.movePnt);
+                mesh.moveMode=MeshClass.MOVE_RUNNING;
+            }
+            if (!this.rotateAng.isZero()) {
+                mesh.rotate(this.rotateAng,this.rotateOffset);
+                mesh.moveMode=MeshClass.MOVE_RUNNING;
+            }
             map.entityList.movementPush(this.meshIdxList[n],this.movePnt);
         }
         
@@ -165,8 +177,16 @@ export default class MovementClass
         
             for (n=0;n!==nMesh;n++) {
                 mesh=map.meshList.get(this.reverseMeshIdxList[n]);
-                if (!this.movePnt.isZero()) mesh.move(this.movePnt);
-                if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.reverseRotateOffet);
+                mesh.moveMode=MeshClass.MOVE_PAUSED;
+                
+                if (!this.movePnt.isZero()) {
+                    mesh.move(this.movePnt);
+                    mesh.moveMode=MeshClass.MOVE_RUNNING;
+                }
+                if (!this.rotateAng.isZero()) {
+                    mesh.rotate(this.rotateAng,this.reverseRotateOffet);
+                    mesh.moveMode=MeshClass.MOVE_RUNNING;
+                }
                 map.entityList.movementPush(this.reverseMeshIdxList[n],this.movePnt);
             }
         }

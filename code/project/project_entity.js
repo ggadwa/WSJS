@@ -1,6 +1,7 @@
 import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
+import MeshClass from '../mesh/mesh.js';
 import ModelClass from '../model/model.js';
 import ModelEntityAlterClass from '../model/model_entity_alter.js';
 import CollisionClass from '../collision/collisions.js';
@@ -613,6 +614,12 @@ export default class ProjectEntityClass
     isHitCeiling()
     {
         return(this.collideCeilingMeshIdx!==-1);
+    }
+    
+    getStandingOnFloorMoveMode()
+    {
+        if (this.standOnMeshIdx===-1) return(MeshClass.MOVE_NONE);
+        return(this.core.map.meshList.meshes[this.standOnMeshIdx].moveMode);
     }
     
     isAnyCollision()
