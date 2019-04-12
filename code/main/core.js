@@ -22,11 +22,6 @@ export default class CoreClass
 {
     static MAX_LIGHT_COUNT=24;
     
-    static DRAW_ENTITY_BOUNDS=false;
-    static DRAW_MODEL_SKELETONS=false;
-    static DRAW_COLLISION_GEOMETRY=false;
-    static DRAW_PATHS=false;
-    
     static GL_OPTIONS={
             alpha:false,
             depth:true,
@@ -148,6 +143,13 @@ export default class CoreClass
 
         this.loadingStrings=[];
         this.loadingLastAddMsec=0;
+        
+            // debug
+            
+        this.debugEntityBounds=false;
+        this.debugPaths=false;
+        this.debugSkeletons=false;
+        this.debugCollisionSurfaces=false;
         
         Object.seal(this);
     }
@@ -428,7 +430,7 @@ export default class CoreClass
             // draw the sky and map
             
         this.map.sky.draw();
-        if (!CoreClass.DRAW_COLLISION_GEOMETRY) {
+        if (!this.debugCollisionSurfaces) {
             this.map.meshList.draw(null);
         }
         else {
@@ -437,7 +439,7 @@ export default class CoreClass
         
             // path debugging
             
-        if (CoreClass.DRAW_PATHS) this.map.path.debugDrawPath();
+        if (this.debugPaths) this.map.path.debugDrawPath();
         
             // draw any non held entities
             
@@ -445,11 +447,11 @@ export default class CoreClass
         
             // liquids
             
-        if (!CoreClass.DRAW_COLLISION_GEOMETRY) this.map.liquidList.draw();
+        if (!this.debugCollisionSurfaces) this.map.liquidList.draw();
         
             // effects
             
-        if (!CoreClass.DRAW_COLLISION_GEOMETRY) this.map.effectList.draw();
+        if (!this.debugCollisionSurfaces) this.map.effectList.draw();
         
             // and finally held entities,
             // clearing the z buffer first

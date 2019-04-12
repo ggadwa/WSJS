@@ -12,6 +12,7 @@ export default class MapPathNodeClass
         this.data=(data===undefined)?null:data;
 
         this.pathHints=null;
+        this.pathHintCounts=null;
     }
     
         //
@@ -26,6 +27,10 @@ export default class MapPathNodeClass
         let linkPathCount,count;
             
         node=nodes[fromNodeIdx];
+        
+            // has this node already gotten a count?
+            
+        if (node.pathHintCounts!==null) return(pathCount+node.pathHintCounts[toNodeIdx]);
         
             // follow the links
           
@@ -68,6 +73,7 @@ export default class MapPathNodeClass
         let nNode=nodes.length;
         
         this.pathHints=new Uint16Array(nNode);
+        this.pathHintCounts=new Uint16Array(nNode);
         
         for (n=0;n!==nNode;n++) {
             
@@ -75,6 +81,7 @@ export default class MapPathNodeClass
                 
             if (n===this.nodeIdx) {
                 this.pathHints[n]=n;
+                this.pathHintCounts[n]=0;
                 continue;
             }
             
@@ -95,6 +102,7 @@ export default class MapPathNodeClass
                 if ((linkPathCount===-1) || (count<linkPathCount)) {
                     linkPathCount=count;
                     this.pathHints[n]=this.links[k];
+                    this.pathHintCounts[n]=count;
                 }
             }
         }

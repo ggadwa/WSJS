@@ -6,10 +6,10 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
+- need a better way to build path hints
 - what's with weird push backs in liquids? (like in dungeon)
 
-- bots need to stop turning if blocked by moving mesh
-  - if one moving mesh, only get off when at top or bottom nearest to next node
+
 
 - why is mouse wheel broken? (sometimes!  pause state?)
 

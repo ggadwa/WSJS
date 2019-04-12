@@ -12,6 +12,12 @@ export default class MapPathClass
         this.core=core;
         
         this.nodes=[];
+        
+            // some path editor values
+            
+        this.editorParentNodeIdx=-1;
+        this.editorSplitStartNodeIdx=-1;
+        this.editorSplitEndNodeIdx=-1;
     }
     
         //
@@ -90,9 +96,11 @@ export default class MapPathClass
         vertices=new Float32Array(((3*4)*nNode)+((3*2)*nLine));
         indexes=new Uint16Array((nNode*6)+(nLine*2));
         
+            // nodes
+        
         vIdx=0;
         iIdx=0;
-        
+            
         for (n=0;n!==nNode;n++) {
             node=this.nodes[n];
             
@@ -143,6 +151,8 @@ export default class MapPathClass
             indexes[iIdx++]=elementIdx+3;
         }
         
+            // lines
+            
         lineElementOffset=iIdx;
         lineVertexStartIdx=Math.trunc(vIdx/3);
         
@@ -164,7 +174,7 @@ export default class MapPathClass
                 indexes[iIdx++]=lineVertexStartIdx++;
             }
         }
-       
+        
             // build the buffers
             
         vertexBuffer=gl.createBuffer();
@@ -190,6 +200,27 @@ export default class MapPathClass
             
         gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
         gl.drawElements(gl.TRIANGLES,(nNode*6),gl.UNSIGNED_SHORT,0);
+        
+            // the selected nodes
+            
+        gl.depthFunc(gl.LEQUAL);
+            
+        if (this.editorParentNodeIdx!==-1) {
+            gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
+            gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((this.editorParentNodeIdx*6)*2));
+        }
+        
+        if (this.editorSplitStartNodeIdx!==-1) {
+            gl.uniform3f(shader.colorUniform,0.0,1.0,1.0);
+            gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((this.editorSplitStartNodeIdx*6)*2));
+        }
+        
+        if (this.editorSplitEndNodeIdx!==-1) {
+            gl.uniform3f(shader.colorUniform,0.0,1.0,1.0);
+            gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((this.editorSplitEndNodeIdx*6)*2));
+        }
+        
+        gl.depthFunc(gl.LESS);
         
         shader.drawEnd();
         

@@ -65,6 +65,13 @@ export default class ProjectEntityClass
 
         this.collision=new CollisionClass(core);
         
+            // these developer debug flags
+            // live here so people can switch between
+            // developer and regular entities
+            
+        this.debugPlayerNoClip=false;
+        this.debugPlayerFly=false;
+        
         // no seal, as this object is extended
     }
     
@@ -261,6 +268,11 @@ export default class ProjectEntityClass
 
         this.turn(turnSpeed);
         return(addway);
+    }
+    
+    getVectorToNode(nodeIdx,pnt)
+    {
+        pnt.setFromSubPoint(this.core.map.path.nodes[nodeIdx].position,this.position);
     }
     
         //

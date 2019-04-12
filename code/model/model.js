@@ -100,12 +100,13 @@ export default class ModelClass
         this.meshList.draw(modelEntityAlter);
         
             // debug skeleton and/or bounds drawing
+            // note this can't draw held stuff
             
-        if ((CoreClass.DRAW_MODEL_SKELETONS) || (CoreClass.DRAW_ENTITY_BOUNDS)) {
+        if (((this.core.debugSkeletons) || (this.core.debugEntityBounds)) && (entity.heldBy===null)) {
             modelEntityAlter.setupModelMatrix(false);
 
-            if (CoreClass.DRAW_MODEL_SKELETONS) modelEntityAlter.debugDrawSkeleton();
-            if (CoreClass.DRAW_ENTITY_BOUNDS) modelEntityAlter.debugDrawBounds();
+            if (this.core.debugSkeletons) modelEntityAlter.debugDrawSkeleton();
+            if (this.core.debugEntityBounds) modelEntityAlter.debugDrawBounds();
         }
         
             // add up model draws for stats
