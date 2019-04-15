@@ -4,12 +4,12 @@
 
 export default class MapPathNodeClass
 {
-    constructor(nodeIdx,position,links,data)
+    constructor(nodeIdx,position,links,key)
     {
         this.nodeIdx=nodeIdx;
         this.position=position;
         this.links=links;
-        this.data=(data===undefined)?null:data;
+        this.key=(key===undefined)?null:key;
 
         this.pathHints=null;
         this.pathHintCounts=null;
@@ -77,6 +77,15 @@ export default class MapPathNodeClass
         
         for (n=0;n!==nNode;n++) {
             
+                // we only trace to nodes that
+                // have keys
+                
+            if (nodes[n].key===null) {
+                this.pathHints[n]=-1;
+                this.pathHintCounts[n]=0;
+                continue;
+            }
+            
                 // path to itself
                 
             if (n===this.nodeIdx) {
@@ -91,6 +100,14 @@ export default class MapPathNodeClass
             linkPathCount=-1;
             
             for (k=0;k!==this.links.length;k++) {
+                
+                    // quick hit from this link
+                    
+                if (this.links[k]===n) {
+                    this.pathHints[n]=this.links[k];
+                    this.pathHintCounts[n]=1;
+                    break;
+                }
                 
                     // keep track of what we've hit recursively
                     // so we can cancel out paths that wrap around

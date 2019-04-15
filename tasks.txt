@@ -6,15 +6,18 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
-- need a better way to build path hints
+- add entities in map json
+
+- paths have no indexes, ONLY paths with keys can be found, tracked to ['spawn','weapon']
+    - node path will need to gather a hash of keys
+
+- bots slow down if turns > 45
 - what's with weird push backs in liquids? (like in dungeon)
 
-
-
 - why is mouse wheel broken? (sometimes!  pause state?)
+- mouse wheel on os x mice is wacky
 
 sort effects, will need a sort z call into the effect
-entites need data
 
 liquids need to draw away from z
 

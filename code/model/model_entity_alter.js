@@ -24,6 +24,7 @@ export default class ModelEntityAlterClass
         
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
+        this.scale=new PointClass(0,0,0);
         
         this.inCameraSpace=false;
         this.meshHideList=new Uint8Array(ModelEntityAlterClass.MAX_MESH_COUNT);
@@ -114,7 +115,7 @@ export default class ModelEntityAlterClass
         this.modelMatrix.multiply(this.rotMatrix);
         
         if (includeScale) {
-            this.scaleMatrix.setScaleFromPoint(this.entity.model.scale);
+            this.scaleMatrix.setScaleFromPoint(this.scale);
             this.modelMatrix.multiply(this.scaleMatrix);
         }
     }

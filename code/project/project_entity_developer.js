@@ -8,9 +8,9 @@ import MapPathNodeClass from '../../code/map/map_path_node.js';
 
 export default class ProjectEntityDeveloperClass extends ProjectEntityClass
 {
-    constructor(core,name,position,angle)
+    constructor(core,name,position,angle,data)
     {
-        super(core,name,position,angle);
+        super(core,name,position,angle,data);
     }
     
         //
@@ -58,7 +58,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         if (key==='nodeIdx') return(undefined);
         if (key==='pathHints') return(undefined);
         if (key==='pathHintCounts') return(undefined);
-        if ((key==='data') && (value===null)) return(undefined);
+        if ((key==='key') && (value===null)) return(undefined);
         return(value);
     }
     
@@ -158,6 +158,19 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             
             console.log('Added node '+nodeIdx);
             return;
+        }
+        
+            // u key adds a key to node
+            
+        if (input.keyFlags[85]) {
+            input.keyFlags[85]=false;
+            
+            if (path.editorParentNodeIdx!==-1) {
+                path.nodes[path.editorParentNodeIdx].key='KEY_'+path.editorParentNodeIdx;
+                
+                console.log('Added temp key '+path.editorParentNodeIdx);
+                return;
+            }
         }
         
             // [ key deletes selected node

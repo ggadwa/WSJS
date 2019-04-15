@@ -14,15 +14,17 @@ export default class ProjectEntityClass
 {
     static RAD_TO_DEGREE=180.0/Math.PI;
     
-    constructor(core,name,position,angle)
+    constructor(core,name,position,angle,data)
     {
         this.core=core;
         
         this.name=name;
         this.radius=1;
         this.height=1;
+        this.scale=new PointClass(1,1,1);
         this.position=position.copy();
         this.angle=angle.copy();
+        this.data=data;
         
         this.show=true;
         this.heldBy=null;
@@ -109,10 +111,11 @@ export default class ProjectEntityClass
         return(this.modelEntityAlter.show(name,show));
     }
     
-    setModelDrawPosition(position,angle,inCameraSpace)
+    setModelDrawPosition(position,angle,scale,inCameraSpace)
     {
         this.modelEntityAlter.position.setFromPoint(position);
         this.modelEntityAlter.angle.setFromPoint(angle);
+        this.modelEntityAlter.scale.setFromPoint(scale);
         this.modelEntityAlter.inCameraSpace=(inCameraSpace===undefined)?false:inCameraSpace;
     }
     
@@ -686,13 +689,13 @@ export default class ProjectEntityClass
         // override this if you want to change how a model is setup
         // or positioned in the scene.  the default is just to
         // position the model the same as the entity's position and
-        // angle.  use setModelDrawPosition([PointClass],[QuaternionClass],inCameraSpace) to change
+        // angle.  use setModelDrawPosition([PointClass],[PointClass],[PointClass],inCameraSpace) to change
         // inside this method
         //
         
     drawSetup()
     {
-        this.setModelDrawPosition(this.position,this.angle,false);
+        this.setModelDrawPosition(this.position,this.angle,this.scale,false);
     }
     
         //
