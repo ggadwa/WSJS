@@ -7,9 +7,7 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
 - add entities in map json
-
-- paths have no indexes, ONLY paths with keys can be found, tracked to ['spawn','weapon']
-    - node path will need to gather a hash of keys
+- bot collisions don't seem to back up more than one node
 
 - bots slow down if turns > 45
 - what's with weird push backs in liquids? (like in dungeon)

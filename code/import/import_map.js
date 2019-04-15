@@ -168,7 +168,7 @@ export default class ImportMapClass
             for (n=0;n!==importSettings.paths.length;n++) {
                 pathDef=importSettings.paths[n];
                 
-                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.data);
+                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key);
                 this.core.map.path.nodes.push(pathNode);
             }
             

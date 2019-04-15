@@ -227,9 +227,10 @@ export default class ProjectEntityClass
         this.position.setFromPoint(nodes[idx].position);
     }
     
-    getRandomNodeIndex()
+    getRandomKeyNodeIndex()
     {
-        return(Math.trunc(this.core.map.path.nodes.length*Math.random()));
+        let keyNodes=this.core.map.path.keyNodes;
+        return(keyNodes[Math.trunc(keyNodes.length*Math.random())]);
     }
     
     turnTowardsNode(nodeIdx,turnSpeed)

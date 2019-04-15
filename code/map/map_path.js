@@ -12,6 +12,7 @@ export default class MapPathClass
         this.core=core;
         
         this.nodes=[];
+        this.keyNodes=[];
         
             // some path editor values
             
@@ -47,7 +48,7 @@ export default class MapPathClass
         
     buildPathHints()
     {
-        let node;
+        let n,node;
         
             // before we start, fix any links that
             // that aren't followed back
@@ -55,8 +56,14 @@ export default class MapPathClass
         this.fixBrokenLinks();
         
             // now recurse for path hints
+            // and build a list of key nodes
         
-        for (node of this.nodes) {
+        this.keyNodes=[];
+        
+        for (n=0;n!==this.nodes.length;n++) {
+            node=this.nodes[n];
+            if (node.key!==null) this.keyNodes.push(n);
+            
             node.buildPathHints(this.nodes);
         }
     }
@@ -139,7 +146,7 @@ export default class MapPathClass
             vertices[vIdx++]=tempPoint.x+node.position.x;
             vertices[vIdx++]=(tempPoint.y+node.position.y)+drawSlop;
             vertices[vIdx++]=tempPoint.z+node.position.z;
-
+            
             elementIdx=n*4;
             
             indexes[iIdx++]=elementIdx;     // triangle 1
@@ -200,10 +207,17 @@ export default class MapPathClass
             
         gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
         gl.drawElements(gl.TRIANGLES,(nNode*6),gl.UNSIGNED_SHORT,0);
-        
-            // the selected nodes
             
         gl.depthFunc(gl.LEQUAL);
+        
+            // overdraw for key nodes
+            
+        gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
+        
+        for (n=0;n!==nNode;n++) {
+            if (this.nodes[n].key!==null) gl.drawElements(gl.TRIANGLES,6,gl.UNSIGNED_SHORT,((n*6)*2));
+        }
+            // and overdraw for selected nodes
             
         if (this.editorParentNodeIdx!==-1) {
             gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);

@@ -160,15 +160,18 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             return;
         }
         
-            // u key adds a key to node
+            // u key adds a key to nearest node
             
         if (input.keyFlags[85]) {
             input.keyFlags[85]=false;
             
-            if (path.editorParentNodeIdx!==-1) {
-                path.nodes[path.editorParentNodeIdx].key='KEY_'+path.editorParentNodeIdx;
+            nodeIdx=this.findNearestPathNode(5000);
+            if (nodeIdx!==-1) {
+                path.nodes[nodeIdx].key='KEY_'+nodeIdx;
                 
-                console.log('Added temp key '+path.editorParentNodeIdx);
+                console.log('Added temp key '+nodeIdx);
+                
+                path.editorParentNodeIdx=nodeIdx;
                 return;
             }
         }
