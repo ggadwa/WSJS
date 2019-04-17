@@ -394,7 +394,7 @@ export default class ModelEntityAlterClass
         let nodeSize=50;
         let gl=this.core.gl;
         let shader=this.core.shaderList.debugShader;
-        let scale=this.entity.model.scale;
+        let scale=this.scale;
         let tempPoint=new PointClass(0,0,0);
         let posePoint=new PointClass(0,0,0);
         

@@ -7,7 +7,7 @@ WebGL2
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
 - add entities in map json
-- bot collisions don't seem to back up more than one node
+- instead of backing up, make bots slide left or right depending on angle
 
 - bots slow down if turns > 45
 - what's with weird push backs in liquids? (like in dungeon)
