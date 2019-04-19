@@ -24,6 +24,7 @@ export default class ImportMapClass
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
         let movement,meshIdxList,reverseMeshIdxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset,approachOffset;
+        let entityDef,entityPosition,entityAngle,entityData;
         let pathNode,pathDef;
         let bitmap;
         let importMesh;
@@ -138,7 +139,7 @@ export default class ImportMapClass
                     moveRotate=new PointClass(0,0,0);
                     if (moveDef.rotate!==undefined) moveRotate.setFromValues(moveDef.rotate.x,moveDef.rotate.y,moveDef.rotate.z);
                     
-                    movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate));
+                    movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate,moveDef.trigger));
                 }
 
                 this.core.map.movementList.add(movement);
@@ -173,6 +174,38 @@ export default class ImportMapClass
             }
             
             this.core.map.path.buildPathHints();
+        }
+        
+            // entities
+            
+        if (importSettings.entities===undefined) {
+            console.log('no entities in JSON, at least one entity, the player (entity 0), is required');
+            return(false);
+        }
+        
+        for (n=0;n!==importSettings.entities.length;n++) {
+            entityDef=importSettings.entities[n];
+            
+            if (entityDef.position!==undefined) {
+                entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
+            }
+            else {
+                entityPosition=new PointClass(0,0,0);
+            }
+            if (entityDef.angle!==undefined) {
+                entityAngle=new PointClass(entityDef.angle.x,entityDef.angle.y,entityDef.angle.z);
+            }
+            else {
+                entityAngle=new PointClass(0,0,0);
+            }
+            entityData=(entityDef.data===undefined)?null:entityDef.data;
+
+            if (n===0) {
+                this.core.map.entityList.setPlayer(new entityDef.entity(this.core,entityDef.name,entityPosition,entityAngle,entityData));
+            }
+            else {
+                this.core.map.entityList.add(new entityDef.entity(this.core,entityDef.name,entityPosition,entityAngle,entityData));
+            }
         }
 
             // and turn off any collisions for certain

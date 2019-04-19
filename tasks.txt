@@ -6,22 +6,22 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
-- add entities in map json
+- do triggers
+  * movements fire triggers
+  * 
+
+- need spawn only nodes
+- platform waiting seems broken will need actual code here (move wait - on all three nodes)
 - instead of backing up, make bots slide left or right depending on angle
 
-- bots slow down if turns > 45
-- what's with weird push backs in liquids? (like in dungeon)
+- ammo and stuff needs to reappear
 
 - why is mouse wheel broken? (sometimes!  pause state?)
 - mouse wheel on os x mice is wacky
-
-sort effects, will need a sort z call into the effect
-
-liquids need to draw away from z
-
-jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
-
-8. combine input / view pause states
+- sort effects, will need a sort z call into the effect
+- liquids need to draw away from z
+- jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
+- combine input / view pause states
 
 project_entity to remove
     turn(addAngle)

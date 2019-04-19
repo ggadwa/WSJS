@@ -127,6 +127,10 @@ export default class CoreClass
         this.lastPhysicTimestampPauseOffset=0;
         this.lastDrawTimestamp=0;
         this.lastDrawTimestampPauseOffset=0;
+        
+            // triggers
+            
+        this.triggers=new Map();
 
             // stats
 
@@ -278,6 +282,33 @@ export default class CoreClass
     getPeriodicLinear(millisecondPeriod,amplitude)
     {
         return(((this.timestamp%millisecondPeriod)/millisecondPeriod)*amplitude);
+    }
+    
+        //
+        // triggers
+        //
+        
+    clearTriggers()
+    {
+        let key,value;
+        
+            // we never delete triggers, just set
+            // them to false so we don't have GC
+            
+        for ([key,value] of this.triggers) {
+            this.triggers.set(key,false);
+        }
+    }
+    
+    setTrigger(triggerName)
+    {
+        this.triggers.set(triggerName,true);
+    }
+    
+    isTriggerSet(triggerName)
+    {
+        let value=this.triggers.get(triggerName);
+        return((value===null)?false:value);
     }
     
         //

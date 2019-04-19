@@ -35,6 +35,7 @@ export default class ProjectEntityClass
         this.positionBackup=this.position.copy();
         
         this.eyeOffset=0;
+        this.bumpHeight=0;
 
         this.id=-1;
         

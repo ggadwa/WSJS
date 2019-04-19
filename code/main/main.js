@@ -79,17 +79,6 @@ class MainClass
         this.core.loadingScreenAddString('Loading Entities');
         this.core.loadingScreenDraw();
         
-        setTimeout(this.initLoadEntities.bind(this),1);
-    }
-
-    initLoadEntities()
-    {
-        if (!this.core.projectMap.loadEntities()) return;
-        
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Loading Models');
-        this.core.loadingScreenDraw();
-        
         setTimeout(this.initLoadEntityModels.bind(this),1);
     }
     
@@ -205,7 +194,6 @@ function mainLoop(timestamp)
         core.physicsTick=core.timestamp-core.lastPhysicTimestamp;
 
         if (core.physicsTick>PHYSICS_MILLISECONDS) {
-            map.movementList.run(core,map);
 
             if (core.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
@@ -213,6 +201,8 @@ function mainLoop(timestamp)
                     core.physicsTick-=PHYSICS_MILLISECONDS;
                     core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
+                    core.clearTriggers();
+                    map.movementList.run(core,map);
                     core.projectGame.run();
                     map.entityList.run();
                 }

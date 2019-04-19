@@ -9,7 +9,7 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class CollisionClass
 {
-    static BUMP_HEIGHT=1000;                      // heights we can bump up
+    static MAX_BUMP_COUNT=2;
     static FLOOR_RISE_HEIGHT=2000;                // heights we can move up or down on a slanted triangle
     static COLLISION_FLOOR_MARGIN=10;             // sometimes wall segments can extend a couple pixels off of floors, so this slop fixes getting stuck on edges
     static COLLISION_SPOKE_COUNT=24;
@@ -204,7 +204,7 @@ export default class CollisionClass
         
             // only bump once
             
-        let bumpOnce=false;
+        let bumpCount=0;
         let bumpY,entityTopY;
         
             // the moved point
@@ -265,7 +265,7 @@ export default class CollisionClass
                         entity.collideWallTrigIdx=k;
                         
                         bumpY=-1;
-                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=CollisionClass.BUMP_HEIGHT) bumpY=collisionTrig.yBound.max;
+                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=entity.bumpHeight) bumpY=collisionTrig.yBound.max;
                     }
                 }
             }
@@ -299,7 +299,7 @@ export default class CollisionClass
                     checkEntity.touchEntity=entity;
                     
                     bumpY=-1;
-                    if ((entityTopY-this.entityTestPnt.y)<=CollisionClass.BUMP_HEIGHT) bumpY=entityTopY;
+                    if ((entityTopY-this.entityTestPnt.y)<=entity.bumpHeight) bumpY=entityTopY;
                 }
             }
 
@@ -314,12 +314,13 @@ export default class CollisionClass
                 // if no bump or not a bumpable
                 // hit or already bumped, just return hit
                 
-            if ((!bump) || (bumpY===-1) || (bumpOnce)) return(true);
+            if ((!bump) || (bumpY===-1) || (bumpCount>=CollisionClass.MAX_BUMP_COUNT)) return(true);
                 
-                // do the bump, but only
-                // once
+                // can try the bump a couple times
+                // as we might be moving fast enough to
+                // hit more than one bump
                 
-            bumpOnce=true;
+            bumpCount++;
             this.entityTestPnt.y=bumpY;
         }
         

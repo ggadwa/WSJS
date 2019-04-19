@@ -124,6 +124,10 @@ export default class MovementClass
             }
         }
         
+            // any triggers
+            
+        if (this.moves[this.currentMoveIdx].triggerName!==null) core.setTrigger(this.moves[this.currentMoveIdx].triggerName);
+        
             // the next offset we need to move to
             // is between the previous and the next point
             

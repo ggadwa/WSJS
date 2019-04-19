@@ -24,12 +24,4 @@ export default class ProjectMapClass
     async loadMap()
     {
     }
-    
-        //
-        // override this to add entities to map
-        //
-        
-    loadEntities()
-    {
-    }
 }

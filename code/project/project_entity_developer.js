@@ -65,7 +65,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
     pathEditor()
     {
         let n,k,nodeIdx;
-        let node,links;
+        let node,links,str;
         let path=this.core.map.path;
         let input=this.core.input;
         
@@ -226,7 +226,19 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         if (input.keyFlags[220]) {
             input.keyFlags[220]=false;
             
-            console.log(JSON.stringify(path.nodes,this.pathJSONReplacer.bind(this)));
+            str='                "paths":\n';
+            str+='                    [\n';
+            
+            for (n=0;n!==path.nodes.length;n++) {
+                str+='                        ';
+                str+=JSON.stringify(path.nodes[n],this.pathJSONReplacer.bind(this));
+                if (n!==(path.nodes.length-1)) str+=',';
+                str+='\n';
+            }
+            
+            str+='                    ]\n';
+            
+            console.info(str);
         }
     }
     
