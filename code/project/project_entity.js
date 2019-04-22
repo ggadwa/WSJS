@@ -39,9 +39,6 @@ export default class ProjectEntityClass
 
         this.id=-1;
         
-        this.maxHealth=100;
-        this.health=100;
-        
         this.gravityMinValue=10;
         this.gravityMaxValue=300;
         this.gravityAcceleration=10;
@@ -159,14 +156,6 @@ export default class ProjectEntityClass
     }
     
         //
-        // messages
-        //
-        
-    sendMessage(data)
-    {
-    }
-    
-        //
         // periodics
         //
         
@@ -224,6 +213,29 @@ export default class ProjectEntityClass
     nextNodeInPath(fromNodeIdx,toNodeIdx)
     {
         return(this.core.map.path.nodes[fromNodeIdx].pathHints[toNodeIdx]);
+    }
+    
+    nextNodeTowardsEntity(fromNodeIdx,entity)
+    {
+        let n,linkNode,nextNodeIdx;
+        let dist,currentDist;
+        let nodes=this.core.map.path.nodes;
+        let node=nodes[fromNodeIdx];
+        
+        nextNodeIdx=-1;
+        currentDist=0;
+        
+        for (n=0;n!==node.links.length;n++) {
+            linkNode=nodes[node.links[n]];
+            
+            dist=linkNode.position.distance(entity.position);
+            if ((n===0) || (dist<currentDist)) {
+                currentDist=dist;
+                nextNodeIdx=node.links[n];
+            }
+        }
+        
+        return(nextNodeIdx);
     }
     
     moveToNode(nodeIdx)
@@ -615,43 +627,6 @@ export default class ProjectEntityClass
     }
     
         //
-        // health, damage, death
-        //
-    
-    die()
-    {
-    }
-    
-    addDamage(hitEntityId,damage)
-    {
-        this.damageTintStartTick=this.core.timestamp;
-        
-        this.health-=damage;
-        if (this.health<=0) this.die();
-    }
-    
-    getPercentageHealth()
-    {
-        return(this.health/this.maxHealth);
-    }
-    
-    getDamageTintAttenuation()
-    {
-        let tick;
-        
-        if (this.damageTintStartTick===-1) return(0.0);
-        
-        tick=this.core.timestamp-this.damageTintStartTick;
-        if (tick>=1000) {
-            this.damageTintStartTick=-1;
-            return(0.0);
-        }
-        
-        if (tick<500) return((tick/500.0)*0.6);
-        return((1.0-((tick-500)/500.0))*0.6);
-    }
-    
-        //
         // position information
         //
         
@@ -689,6 +664,15 @@ export default class ProjectEntityClass
         if (this.standOnMeshIdx!==-1) return(true);
         
         return(false);
+    }
+    
+        //
+        // entity utilities
+        //
+        
+    getEntityList()
+    {
+        return(this.core.map.entityList);
     }
     
         //

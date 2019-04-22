@@ -6,21 +6,18 @@ WebGL2
 
 [Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
 
-- recheck mouse wheel on windows
-
-- make it work in safari
-- work on touch controls
-    - left side, move and turn
-    - right side, look and shoot, swipe left/right weapon change, swipe up for grenade
-
-- make fire part of explosion shrink back (fast)
+- chrome 74 has public/private fields, handle those when released
 
 - bots hitscan for player
+  - if player in site, after every node hit go directly to next linked node that is closer to player
+  * bot chase thing that damaged it
 
-- need spawn only nodes
+- tinting part of player, need a tint function to call from core (look for getDamageTintAttenuation)
+- need spawn nodes
+- bot die/respawn
+
 
 - ammo and stuff needs to reappear
-
 - swimming is broken
 
 
@@ -34,5 +31,10 @@ project_entity to remove
     turnTowards(toY,speed)
     turnTowardsPosition(pos,speed)
     getAngleDifferenceTowardsPosition(pos)
-    getPercentageHealth()
-    getDamageTintAttenuation()
+
+### LONG TERM ###
+
+- work on safari (need to wait for public/private class fields)
+- work on touch controls (left side, move and turn) (right side, look and shoot, swipe left/right weapon change, swipe up for grenade)
+- networking
+- persistant server storage (H2?)

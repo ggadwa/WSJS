@@ -129,7 +129,7 @@ export default class InterfaceClass
             
         tintOn=false;
         this.tintColor.setFromValues(0.0,0.0,0.0);
-        
+        /*
         tintAtt=player.getDamageTintAttenuation();
         if (tintAtt!==0.0) {
             tintOn=true;
@@ -142,7 +142,7 @@ export default class InterfaceClass
             liquid=this.core.map.liquidList.liquids[liquidIdx];
             this.tintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
         }
-        
+        */
         if (!tintOn) return;
         
             // draw tint

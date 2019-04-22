@@ -522,7 +522,7 @@ export default class CoreClass
         
         this.loadingStrings[idx]+=(' ['+msec+'ms]');
         
-        console.log(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
+        console.info(this.loadingStrings[idx]);      // supergumba -- temporary for optimization testing
     }
     
     loadingScreenDraw()
