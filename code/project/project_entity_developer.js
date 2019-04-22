@@ -27,13 +27,13 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
 
             // position and angle
             
-        console.log('pos='+Math.trunc(this.position.x)+','+Math.trunc(this.position.y)+','+Math.trunc(this.position.z));
-        console.log('ang='+Math.trunc(this.angle.x)+','+Math.trunc(this.angle.y)+','+Math.trunc(this.angle.z));
+        console.info('pos='+Math.trunc(this.position.x)+','+Math.trunc(this.position.y)+','+Math.trunc(this.position.z));
+        console.info('ang='+Math.trunc(this.angle.x)+','+Math.trunc(this.angle.y)+','+Math.trunc(this.angle.z));
 
             // nodes
             
         nodeIdx=this.findNearestPathNode(5000);
-        if (nodeIdx!==-1) console.log('node='+this.core.map.path.nodes[nodeIdx].nodeIdx);
+        if (nodeIdx!==-1) console.info('node='+this.core.map.path.nodes[nodeIdx].nodeIdx);
             
             // meshes
             
@@ -46,7 +46,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             }
         }
         
-        if (str!=='') console.log('mesh='+str);
+        if (str!=='') console.info('mesh='+str);
     }
     
         //
@@ -58,7 +58,9 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         if (key==='nodeIdx') return(undefined);
         if (key==='pathHints') return(undefined);
         if (key==='pathHintCounts') return(undefined);
+        if ((key==='altPosition') && (value===null)) return(undefined);
         if ((key==='key') && (value===null)) return(undefined);
+        if ((key==='data') && (value===null)) return(undefined);
         return(value);
     }
     
@@ -79,7 +81,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             
             path.editorParentNodeIdx=nodeIdx;
             
-            console.log('Reset to parent node '+nodeIdx);
+            console.info('Reset to parent node '+nodeIdx);
             return;
         }
         
@@ -94,13 +96,13 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             
             if (path.editorSplitStartNodeIdx===-1) {
                 path.editorSplitStartNodeIdx=nodeIdx;
-                console.log('starting split at '+nodeIdx+' > now select second node');
+                console.info('starting split at '+nodeIdx+' > now select second node');
                 return;
             }
             
             if (path.editorSplitEndNodeIdx===-1) {
                 path.editorSplitEndNodeIdx=nodeIdx;
-                console.log('second node selected '+nodeIdx+' > now add split node');
+                console.info('second node selected '+nodeIdx+' > now add split node');
                 return;
             }
             
@@ -136,7 +138,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
                     
                     path.editorParentNodeIdx=nodeIdx;
                     
-                    console.log('Connected node '+nodeIdx);
+                    console.info('Connected node '+nodeIdx);
                 }
                 
                 return;
@@ -156,7 +158,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             
             path.editorParentNodeIdx=nodeIdx;
             
-            console.log('Added node '+nodeIdx);
+            console.info('Added node '+nodeIdx);
             return;
         }
         
@@ -167,11 +169,16 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             
             nodeIdx=this.findNearestPathNode(5000);
             if (nodeIdx!==-1) {
+                path.editorParentNodeIdx=nodeIdx;
+                
+                if (path.nodes[nodeIdx].key!==null) {
+                    console.info('Node already has a key='+path.nodes[nodeIdx].key);
+                    return;
+                }
+                
                 path.nodes[nodeIdx].key='KEY_'+nodeIdx;
                 
-                console.log('Added temp key '+nodeIdx);
-                
-                path.editorParentNodeIdx=nodeIdx;
+                console.info('Added temp key '+nodeIdx);
                 return;
             }
         }
@@ -204,7 +211,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
                     
                 path.nodes.splice(path.editorParentNodeIdx,1);
                 
-                console.log('Deleted node '+path.editorParentNodeIdx);
+                console.info('Deleted node '+path.editorParentNodeIdx);
                 
                 path.editorParentNodeIdx=-1;
             }
@@ -217,7 +224,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             
             if (path.editorParentNodeIdx!==-1) {
                 path.nodes[path.editorParentNodeIdx].position.setFromPoint(this.position);
-                console.log('Moved node '+path.editorParentNodeIdx);
+                console.info('Moved node '+path.editorParentNodeIdx);
             }
         }
         
@@ -263,37 +270,46 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
         if (input.keyFlags[45]) {
             input.keyFlags[45]=false;
             this.debugPlayerNoClip=!this.debugPlayerNoClip;
-            console.log('player no clip='+this.debugPlayerNoClip);
+            console.info('player no clip='+this.debugPlayerNoClip);
         }
         
         if (input.keyFlags[36]) {
             input.keyFlags[36]=false;
             this.debugPlayerFly=!this.debugPlayerFly;
-            console.log('player fly='+this.debugPlayerFly);
+            console.info('player fly='+this.debugPlayerFly);
         }
         
         if (input.keyFlags[33]) {
             input.keyFlags[33]=false;
             this.core.debugEntityBounds=!this.core.debugEntityBounds;
-            console.log('draw entity bounds='+this.core.debugEntityBounds);
+            console.info('draw entity bounds='+this.core.debugEntityBounds);
         }
         
         if (input.keyFlags[46]) {
             input.keyFlags[46]=false;
             this.core.debugPaths=!this.core.debugPaths;
-            console.log('path editor='+this.core.debugPaths);
+            console.info('path editor='+this.core.debugPaths);
+            if (this.core.debugPaths) {
+                console.info('u add key to nearest node');
+                console.info('i select nearest node');
+                console.info('o start path splitting');
+                console.info('p adds new node to path');
+                console.info('[ deleted selected node');
+                console.info('] moves selected node to player');
+                console.info('\ output new path JSON');
+            }
         }
         
         if (input.keyFlags[35]) {
             input.keyFlags[35]=false;
             this.core.debugSkeletons=!this.core.debugSkeletons;
-            console.log('draw entity skeletons='+this.core.debugSkeletons);
+            console.info('draw entity skeletons='+this.core.debugSkeletons);
         }
         
         if (input.keyFlags[34]) {
             input.keyFlags[34]=false;
             this.core.debugCollisionSurfaces=!this.core.debugCollisionSurfaces;
-            console.log('draw collision surfaces='+this.core.debugCollisionSurfaces);
+            console.info('draw collision surfaces='+this.core.debugCollisionSurfaces);
         }
         
         

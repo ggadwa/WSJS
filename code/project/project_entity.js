@@ -212,12 +212,23 @@ export default class ProjectEntityClass
     
     hitPathNode(nodeIdx,slopDistance)
     {
-        return(this.core.map.path.nodes[nodeIdx].position.distance(this.position)<slopDistance);
+        let node=this.core.map.path.nodes[nodeIdx];
+        
+        if (node.altPosition!==null) {
+            if (node.altPosition.distance(this.position)<slopDistance) return(true);
+        }
+        
+        return(node.position.distance(this.position)<slopDistance);
     }
     
     nextNodeInPath(fromNodeIdx,toNodeIdx)
     {
         return(this.core.map.path.nodes[fromNodeIdx].pathHints[toNodeIdx]);
+    }
+    
+    moveToNode(nodeIdx)
+    {
+        this.position.setFromPoint(this.core.map.path.nodes[nodeIdx].position);
     }
     
     moveToRandomNode()
@@ -232,6 +243,23 @@ export default class ProjectEntityClass
     {
         let keyNodes=this.core.map.path.keyNodes;
         return(keyNodes[Math.trunc(keyNodes.length*Math.random())]);
+    }
+    
+    findKeyNodeIndex(key)
+    {
+        let n;
+        let keyNodes=this.core.map.path.keyNodes;
+        
+        for (n=0;n!==keyNodes.length;n++) {
+            if (this.core.map.path.nodes[keyNodes[n]].key===key) return(keyNodes[n]);
+        }
+        
+        return(-1);
+    }
+    
+    getNodeData(nodeIdx)
+    {
+        return(this.core.map.path.nodes[nodeIdx].data);
     }
     
     turnTowardsNode(nodeIdx,turnSpeed)
@@ -278,6 +306,20 @@ export default class ProjectEntityClass
     getVectorToNode(nodeIdx,pnt)
     {
         pnt.setFromSubPoint(this.core.map.path.nodes[nodeIdx].position,this.position);
+    }
+    
+        //
+        // trigger utilities
+        //
+        
+    setTrigger(triggerName)
+    {
+        this.core.setTrigger(triggerName);
+    }
+    
+    checkTrigger(triggerName)
+    {
+        return(this.core.checkTrigger(triggerName));
     }
     
         //

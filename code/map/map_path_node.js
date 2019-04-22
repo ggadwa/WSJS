@@ -4,12 +4,14 @@
 
 export default class MapPathNodeClass
 {
-    constructor(nodeIdx,position,links,key)
+    constructor(nodeIdx,position,altPosition,links,key,data)
     {
         this.nodeIdx=nodeIdx;
         this.position=position;
+        this.altPosition=(altPosition===undefined)?null:altPosition;
         this.links=links;
         this.key=(key===undefined)?null:key;
+        this.data=(data===undefined)?null:data;
 
         this.pathHints=null;
         this.pathHintCounts=null;
@@ -115,7 +117,9 @@ export default class MapPathNodeClass
                 nodeHits=new Uint8Array(nNode);
                 nodeHits[this.nodeIdx]=1;
                 
-                count=this.countPathToNode(nodes,nodeHits,this.links[k],n,0);
+                count=this.countPathToNode(nodes,nodeHits,this.links[k],n,1);
+                if (count===-1) continue;
+                
                 if ((linkPathCount===-1) || (count<linkPathCount)) {
                     linkPathCount=count;
                     this.pathHints[n]=this.links[k];

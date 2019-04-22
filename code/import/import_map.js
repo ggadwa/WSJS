@@ -25,7 +25,7 @@ export default class ImportMapClass
         let liquid,liquidDef,liquidBitmap;
         let movement,meshIdxList,reverseMeshIdxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset,approachOffset;
         let entityDef,entityPosition,entityAngle,entityData;
-        let pathNode,pathDef;
+        let pathNode,pathDef,altPosition;
         let bitmap;
         let importMesh;
         
@@ -169,7 +169,10 @@ export default class ImportMapClass
             for (n=0;n!==importSettings.paths.length;n++) {
                 pathDef=importSettings.paths[n];
                 
-                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),pathDef.links,pathDef.key);
+                altPosition=null;
+                if (pathDef.altPosition!==undefined) altPosition=new PointClass(pathDef.altPosition.x,pathDef.altPosition.y,pathDef.altPosition.z);
+                
+                pathNode=new MapPathNodeClass(this.core.map.path.nodes.length,new PointClass(pathDef.position.x,pathDef.position.y,pathDef.position.z),altPosition,pathDef.links,pathDef.key,pathDef.data);
                 this.core.map.path.nodes.push(pathNode);
             }
             

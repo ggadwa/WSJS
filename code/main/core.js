@@ -305,7 +305,7 @@ export default class CoreClass
         this.triggers.set(triggerName,true);
     }
     
-    isTriggerSet(triggerName)
+    checkTrigger(triggerName)
     {
         let value=this.triggers.get(triggerName);
         return((value===null)?false:value);
