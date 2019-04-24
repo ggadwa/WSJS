@@ -496,6 +496,43 @@ export default class PointClass
         return(fang);
     }
     
+    turnYTowards(toY,speed)
+    {
+        let subway,addway;
+        
+        if (this.y===toY) return(0);
+        
+            // which way is faster?
+	
+	if (this.y>toY) {
+            addway=360.0-(this.y-toY);
+            subway=this.y-toY;
+	}
+	else {
+            addway=toY-this.y;
+            subway=360.0-(toY-this.y);
+	}
+        
+            // if we are within speed, then
+            // it's equal
+            
+        if ((subway<speed) || (addway<speed)) {
+            this.y=toY;
+            return(0);
+        }
+		
+            // now turn and always
+            // return the difference
+	
+	if (subway<addway) {
+            this.y-=speed;
+            return(subway);
+	}
+
+        this.y+=speed;
+        return(addway);
+    }
+    
     minFromPoint(pnt)
     {
         if (this.x>pnt.x) this.x=pnt.x;

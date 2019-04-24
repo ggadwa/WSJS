@@ -11,10 +11,35 @@ WebGL2
 - bots hitscan for player
   - if player in site, after every node hit go directly to next linked node that is closer to player
   * bot chase thing that damaged it
+  * bot look at player
+  * bot fire
 
 - tinting part of player, need a tint function to call from core (look for getDamageTintAttenuation)
+
+        tintAtt=player.getDamageTintAttenuation();
+        if (tintAtt!==0.0) {
+            tintOn=true;
+            this.tintColor.addFromValues(tintAtt,0.0,0.0);
+        }
+        
+        liquidIdx=player.getUnderLiquidIndex();
+        if (liquidIdx!==-1) {
+            tintOn=true;
+            liquid=this.core.map.liquidList.liquids[liquidIdx];
+            this.tintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
+        }
+
+
 - need spawn nodes
 - bot die/respawn
+
+- websockets
+        this.socket=new WebSocket('ws://blech');
+        this.socket.addEventListener('open',this.open.bind(this));
+        this.socket.addEventListener('close',this.close.bind(this));
+        this.socket.addEventListener('message',this.message.bind(this));
+        this.socket.addEventListener('error',this.error.bind(this));
+
 
 
 - ammo and stuff needs to reappear
@@ -37,4 +62,4 @@ project_entity to remove
 - work on safari (need to wait for public/private class fields)
 - work on touch controls (left side, move and turn) (right side, look and shoot, swipe left/right weapon change, swipe up for grenade)
 - networking
-- persistant server storage (H2?)
+- persistent server storage
