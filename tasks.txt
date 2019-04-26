@@ -1,14 +1,9 @@
-WebGL2
-    [ ] vertex array objects (liquids, models, map)
-           https://webgl2fundamentals.org/webgl/lessons/webgl1-to-webgl2.html
-           (reason can't do for now, it forces mesh shader setup to be per VAO, and that means repeated lights, etc.)
-    [ ] uniform buffers for lights & matrixes
-
-[Models need to have front look DOWN the positive Z, and have positive Y up, uv mapped]
-
 - chrome 74 has public/private fields, handle those when released
 
-- bots hitscan for player
+- weapon pickups (need to start without m16)
+- grenade throw noise
+
+- bots hitscan for targetting player
   - bot fire/pickup different weapons/ammo
 
 - tinting part of player, need a tint function to call from core (look for getDamageTintAttenuation)
@@ -40,22 +35,11 @@ WebGL2
         this.socket.addEventListener('message',this.message.bind(this));
         this.socket.addEventListener('error',this.error.bind(this));
 
-
-
-- ammo and stuff needs to reappear
 - swimming is broken
-
-
 - sort effects, will need a sort z call into the effect
 - liquids need to draw away from z
 - jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
 - combine input / view pause states
-
-project_entity to remove
-    turn(addAngle)
-    turnTowards(toY,speed)
-    turnTowardsPosition(pos,speed)
-    getAngleDifferenceTowardsPosition(pos)
 
 ### LONG TERM ###
 

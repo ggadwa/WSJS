@@ -48,6 +48,7 @@ export default class ProjectEntityClass
         
         this.markedForDeletion=false;              // used to delete this outside the run loop
 
+        this.passThrough=false;
         this.touchEntity=null;
         this.hitEntity=null;
         
@@ -148,24 +149,14 @@ export default class ProjectEntityClass
     }
     
         //
-        // holding
-        //
-    
-    addEntity(entity,hold)
-    {
-        this.core.map.entityList.add(entity);
-        if (hold) entity.heldBy=this;
-    }
-    
-    hold(entity)
-    {
-        entity.heldBy=this;
-    }
-    
-        //
-        // periodics
+        // ticks and periodics
         //
         
+    getTimestamp()
+    {
+        return(this.core.timestamp);
+    }
+    
     getPeriodicCos(millisecondPeriod,amplitude)
     {
         return(this.core.getPeriodicCos(millisecondPeriod,amplitude));
@@ -180,6 +171,79 @@ export default class ProjectEntityClass
     {
         return(this.core.getPeriodicLinear(millisecondPeriod,amplitude));
     }
+    
+        //
+        // entity utilities
+        //
+        
+    getEntityList()
+    {
+        return(this.core.map.entityList);
+    }
+    
+    addEntity(entity,show,hold)
+    {
+        entity.show=show;
+        this.core.map.entityList.add(entity);
+        if (hold) entity.heldBy=this;
+    }
+    
+    holdEntity(entity)
+    {
+        entity.heldBy=this;
+    }
+        
+    isEntityInRange(name,dist)
+    {
+        let entity=this.core.map.entityList.find(name);
+        
+        if (entity===null) {
+            console.log('Unable to find entity '+name);
+            return(false);
+        }
+        
+        return(entity.position.distance(this.position)<dist);
+    }
+    
+        //
+        // interface utilities
+        //
+        
+    addInterfaceElement(id,bitmapName,uvOffset,uvSize,rect,color,alpha)
+    {
+        let bitmap=this.core.bitmapList.getSimpleName(bitmapName);
+        if (bitmap===null) {
+            console.log('Missing bitmap to add to interface: '+bitmapName);
+            return;
+        }
+                    
+        this.core.interface.addElement(id,bitmap,uvOffset,uvSize,rect,color,alpha);
+    }
+    
+    pulseInterfaceElement(id,tick,expand)
+    {
+        this.core.interface.pulseElement(id,tick,expand);
+    }
+    
+    addInterfaceText(id,text,x,y,fontSize,align,color,alpha)
+    {
+        this.core.interface.addText(id,text,x,y,fontSize,align,color,alpha);
+    }
+    
+    updateInterfaceText(id,str)
+    {
+        this.core.interface.updateText(id,str);
+    }
+    
+    getInterfaceWidth()
+    {
+        return(this.core.wid);
+    }
+    
+    getInterfaceHeight()
+    {
+        return(this.core.high);
+    }        
     
         //
         // path utilities
@@ -314,11 +378,13 @@ export default class ProjectEntityClass
             // return the difference
 	
 	if (subway<addway) {
-            this.turn(-turnSpeed);
+            this.angle.y-=turnSpeed;
+            if (this.angle.y<0) this.angle.y=360+this.angle.y;
             return(subway);
 	}
 
-        this.turn(turnSpeed);
+        this.angle.y+=turnSpeed;
+        if (this.angle.y>=360) this.angle.y=this.angle.y-360;
         return(addway);
     }
     
@@ -535,102 +601,12 @@ export default class ProjectEntityClass
     }
     
         //
-        // turn (y angle)
-        //
-
-    turn(addAngle)
-    {
-        this.angle.y+=addAngle;
-        if (this.angle.y<0.0) this.angle.y+=360.0;
-        if (this.angle.y>=360.00) this.angle.y-=360.0;
-    }
-    
-    turnTowards(toY,speed)
-    {
-        let subway,addway;
-        
-        if (this.angle.y===toY) return(0);
-        
-            // which way is faster?
-	
-	if (this.angle.y>toY) {
-            addway=360.0-(this.angle.y-toY);
-            subway=this.angle.y-toY;
-	}
-	else {
-            addway=toY-this.angle.y;
-            subway=360.0-(toY-this.angle.y);
-	}
-        
-            // if we are within speed, then
-            // it's equal
-            
-        if ((subway<speed) || (addway<speed)) {
-            this.angle.y=toY;
-            return(0);
-        }
-		
-            // now turn and always
-            // return the difference
-	
-	if (subway<addway) {
-            this.turn(-speed);
-            return(subway);
-	}
-
-        this.turn(speed);
-        return(addway);
-    }
-    
-    turnTowardsPosition(pos,speed)
-    {
-        return(this.turnTowards(this.position.angleYTo(pos),speed));
-    }
-    
-    getAngleDifferenceTowardsPosition(pos)
-    {
-        let subway,addway;
-        let toY=this.position.angleYTo(pos);
-        
-        if (this.angle.y===toY) return(0);
-        
-            // which way is faster?
-	
-	if (this.angle.y>toY) {
-            addway=360.0-(this.angle.y-toY);
-            subway=this.angle.y-toY;
-	}
-	else {
-            addway=toY-this.angle.y;
-            subway=360.0-(toY-this.angle.y);
-	}
-        
-        return((addway<subway)?addway:subway);
-    }
-    
-        //
         // ray trace utilities
         //
         
     rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter)
     {
         return(this.collision.rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter,this));
-    }
-    
-        //
-        // entity utilities
-        //
-        
-    isEntityInRange(name,dist)
-    {
-        let entity=this.core.map.entityList.find(name);
-        
-        if (entity===null) {
-            console.log('Unable to find entity '+name);
-            return(false);
-        }
-        
-        return(entity.position.distance(this.position)<dist);
     }
     
         //
@@ -671,15 +647,6 @@ export default class ProjectEntityClass
         if (this.standOnMeshIdx!==-1) return(true);
         
         return(false);
-    }
-    
-        //
-        // entity utilities
-        //
-        
-    getEntityList()
-    {
-        return(this.core.map.entityList);
     }
     
         //

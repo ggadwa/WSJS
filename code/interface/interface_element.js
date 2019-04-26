@@ -11,6 +11,10 @@ export default class InterfaceElementClass
         this.color=color;
         this.alpha=alpha;
         
+        this.pulseStartTick=0;
+        this.pulseTick=-1;
+        this.pulseExpand=0;
+        
         this.vertexArray=new Float32Array(2*4);     // 2D, only 2 vertex coordinates
         this.uvArray=new Float32Array(2*4);
         this.indexArray=new Uint16Array(6);
@@ -64,21 +68,52 @@ export default class InterfaceElementClass
         gl.deleteBuffer(this.indexBuffer);
     }
     
+    pulse(tick,expand)
+    {
+        this.pulseStartTick=this.core.timestamp;
+        this.pulseTick=tick;
+        this.pulseExpand=expand;
+    }
+    
     draw()
     {
+        let tick,lx,rx,ty,by,factor;
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
         
-            // vertexes
+            // handle any pulses
             
-        this.vertexArray[0]=this.rect.lft;
-        this.vertexArray[1]=this.rect.top;
-        this.vertexArray[2]=this.rect.rgt;
-        this.vertexArray[3]=this.rect.top;
-        this.vertexArray[4]=this.rect.rgt;
-        this.vertexArray[5]=this.rect.bot;
-        this.vertexArray[6]=this.rect.lft;
-        this.vertexArray[7]=this.rect.bot;
+        if (this.pulseTick!==-1) {
+            tick=this.core.timestamp-this.pulseStartTick;
+            factor=Math.trunc(Math.sin((tick/this.pulseTick)*Math.PI)*this.pulseExpand);
+            
+            if (tick>this.pulseTick) {
+                this.pulseTick=-1;
+                factor=0;
+            }
+            
+            lx=this.rect.lft-factor;
+            rx=this.rect.rgt+factor;
+            ty=this.rect.top-factor;
+            by=this.rect.bot+factor;
+        }
+        else {
+            lx=this.rect.lft;
+            rx=this.rect.rgt;
+            ty=this.rect.top;
+            by=this.rect.bot;
+        }
+        
+            // vertexes
+
+        this.vertexArray[0]=lx;
+        this.vertexArray[1]=ty;
+        this.vertexArray[2]=rx;
+        this.vertexArray[3]=ty;
+        this.vertexArray[4]=rx;
+        this.vertexArray[5]=by;
+        this.vertexArray[6]=lx;
+        this.vertexArray[7]=by;
         
         if (this.uvOffset===null) {
             this.uvArray[0]=0;

@@ -36,6 +36,11 @@ export default class ProjectGameClass
         this.core.interface.addElement(id,bitmap,uvOffset,uvSize,rect,color,alpha);
     }
     
+    pulseInterfaceElement(id,tick,expand)
+    {
+        this.core.interface.pulseElement(id,tick,expand);
+    }
+    
     addInterfaceText(id,text,x,y,fontSize,align,color,alpha)
     {
         this.core.interface.addText(id,text,x,y,fontSize,align,color,alpha);

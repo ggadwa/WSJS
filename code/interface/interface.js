@@ -101,6 +101,11 @@ export default class InterfaceClass
         this.elements.set(id,element);
     }
     
+    pulseElement(id,tick,expand)
+    {
+        this.elements.get(id).pulse(tick,expand);
+    }
+    
     addText(id,str,x,y,fontSize,align,color,alpha)
     {
         let text=new InterfaceTextClass(this.core,str,x,y,fontSize,align,color,alpha);
@@ -111,7 +116,7 @@ export default class InterfaceClass
     
     updateText(id,str)
     {
-        this.texts.get(id).str=str;
+        this.texts.get(id).str=''+str;      // make sure it's a string
     }
     
         //

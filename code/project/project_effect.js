@@ -121,9 +121,14 @@ export default class ProjectEffectClass
     }
     
         //
-        // periodics
+        // times and periodics
         //
         
+    getTimestamp()
+    {
+        return(this.core.timestamp);
+    }
+    
     getPeriodicCos(millisecondPeriod,amplitude)
     {
         return(this.core.getPeriodicCos(millisecondPeriod,amplitude));

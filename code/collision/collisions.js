@@ -311,6 +311,17 @@ export default class CollisionClass
                 return(false);
             }
             
+                // if it's a touched entity, but the
+                // entity is passthrough, keep the entity touch
+                // but return no hit
+                
+            if (entity.touchEntity!==null) {
+                if (entity.touchEntity.passThrough) {
+                    movePnt.y=this.entityTestPnt.y-entity.position.y;
+                    return(false);
+                }
+            }
+            
                 // if no bump or not a bumpable
                 // hit or already bumped, just return hit
                 
