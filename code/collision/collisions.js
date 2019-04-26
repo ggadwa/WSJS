@@ -511,7 +511,7 @@ export default class CollisionClass
         // mostly for hit scans
         //
         
-    rayCollision(pnt,vector,hitPnt,sourceEntity)
+    rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter,sourceEntity)
     {
         let n,k;
         let mesh,entity;
@@ -600,9 +600,21 @@ export default class CollisionClass
 
         for (n=0;n!==nEntity;n++) {
             entity=this.core.map.entityList.get(n);
-            if (entity.id===sourceEntity.id) continue;
+            if (entity===sourceEntity) continue;
+            if (entity===sourceEntity.heldBy) continue;         // skip source entity and anything holding source entity
             if ((!entity.show) || (entity.heldBy!==null)) continue;
             
+                // filtering
+            
+            if (hitFilter!==null) {
+                if (hitFilter.indexOf(entity.filter)===-1) continue;
+            }    
+            if (skipFilter!==null) {
+                if (skipFilter.indexOf(entity.filter)!==-1) continue;
+            }
+            
+                // run the collision
+                
             if (this.rayCylinderIntersection(pnt,vector,entity.position,entity.radius,entity.height,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
                 if ((dist<currentDist) || (currentDist===-1)) {

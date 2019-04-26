@@ -324,15 +324,26 @@ export default class MeshListClass
     debugDrawCollisionSurfaces()
     {
         let k,mesh,wall,floor,ceiling;
+        let idx,vertexCount;
         let vertexes,vertexBuffer,indexBuffer;
         let gl=this.core.gl;
         let shader=this.core.shaderList.debugShader;
         
         shader.drawStart();
         
+            // get max number of items to draw
+            
+        vertexCount=0;
+        
+        for (mesh of this.meshes) {
+            if (mesh.noCollisions) continue;
+            
+            vertexCount+=(Math.max(mesh.collisionWallTrigs.length,mesh.collisionFloorTrigs.length,mesh.collisionCeilingTrigs.length)*9);
+        }
+        
             // arrays for any drawing
             
-        vertexes=new Float32Array(9);     // we need at least 12 triangles for simple collision cubes
+        vertexes=new Float32Array(vertexCount);
         
         vertexBuffer=gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER,vertexBuffer);
@@ -351,82 +362,94 @@ export default class MeshListClass
                 // draw the walls in green
                 // or yellow if simple
 
-            if (mesh.simpleCollisions) {
-                gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
-            }
-            else {
-                gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
-            }
+            idx=0;
             
             for (k=0;k!==mesh.collisionWallTrigs.length;k++) {
                 wall=mesh.collisionWallTrigs[k];
                 
-                vertexes[0]=wall.v0.x;
-                vertexes[1]=wall.v0.y;
-                vertexes[2]=wall.v0.z;
-                vertexes[3]=wall.v1.x;
-                vertexes[4]=wall.v1.y;
-                vertexes[5]=wall.v1.z;
-                vertexes[6]=wall.v2.x;
-                vertexes[7]=wall.v2.y;
-                vertexes[8]=wall.v2.z;
-                
-                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
-                gl.drawArrays(gl.TRIANGLES,0,3);
+                vertexes[idx++]=wall.v0.x;
+                vertexes[idx++]=wall.v0.y;
+                vertexes[idx++]=wall.v0.z;
+                vertexes[idx++]=wall.v1.x;
+                vertexes[idx++]=wall.v1.y;
+                vertexes[idx++]=wall.v1.z;
+                vertexes[idx++]=wall.v2.x;
+                vertexes[idx++]=wall.v2.y;
+                vertexes[idx++]=wall.v2.z;
+            }
+            
+            if (idx!==0) {
+                if (mesh.simpleCollisions) {
+                    gl.uniform3f(shader.colorUniform,1.0,1.0,0.0);
+                }
+                else {
+                    gl.uniform3f(shader.colorUniform,0.0,1.0,0.0);
+                }
+
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
+                gl.drawArrays(gl.TRIANGLES,0,idx);
             }
             
                 // draw the floors in blue
                 // or puple is simple
 
-            if (mesh.simpleCollisions) {
-                gl.uniform3f(shader.colorUniform,1.0,0.0,1.0);
-            }
-            else {
-                gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
-            }
+            idx=0;
             
             for (k=0;k!==mesh.collisionFloorTrigs.length;k++) {
                 floor=mesh.collisionFloorTrigs[k];
                 
-                vertexes[0]=floor.v0.x;
-                vertexes[1]=floor.v0.y;
-                vertexes[2]=floor.v0.z;
-                vertexes[3]=floor.v1.x;
-                vertexes[4]=floor.v1.y;
-                vertexes[5]=floor.v1.z;
-                vertexes[6]=floor.v2.x;
-                vertexes[7]=floor.v2.y;
-                vertexes[8]=floor.v2.z;
+                vertexes[idx++]=floor.v0.x;
+                vertexes[idx++]=floor.v0.y;
+                vertexes[idx++]=floor.v0.z;
+                vertexes[idx++]=floor.v1.x;
+                vertexes[idx++]=floor.v1.y;
+                vertexes[idx++]=floor.v1.z;
+                vertexes[idx++]=floor.v2.x;
+                vertexes[idx++]=floor.v2.y;
+                vertexes[idx++]=floor.v2.z;
+            }
                 
-                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
-                gl.drawArrays(gl.TRIANGLES,0,3);
+            if (idx!==0) {
+                if (mesh.simpleCollisions) {
+                    gl.uniform3f(shader.colorUniform,1.0,0.0,1.0);
+                }
+                else {
+                    gl.uniform3f(shader.colorUniform,0.0,0.0,1.0);
+                }
+                
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
+                gl.drawArrays(gl.TRIANGLES,0,idx);
             }
             
                 // draw the ceilings in red
                 // or orange if simple
 
-            if (mesh.simpleCollisions) {
-                gl.uniform3f(shader.colorUniform,1.0,0.4,0.0);
-            }
-            else {
-                gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
-            }
+            idx=0;
             
             for (k=0;k!==mesh.collisionCeilingTrigs.length;k++) {
                 ceiling=mesh.collisionCeilingTrigs[k];
                 
-                vertexes[0]=ceiling.v0.x;
-                vertexes[1]=ceiling.v0.y;
-                vertexes[2]=ceiling.v0.z;
-                vertexes[3]=ceiling.v1.x;
-                vertexes[4]=ceiling.v1.y;
-                vertexes[5]=ceiling.v1.z;
-                vertexes[6]=ceiling.v2.x;
-                vertexes[7]=ceiling.v2.y;
-                vertexes[8]=ceiling.v2.z;
+                vertexes[idx++]=ceiling.v0.x;
+                vertexes[idx++]=ceiling.v0.y;
+                vertexes[idx++]=ceiling.v0.z;
+                vertexes[idx++]=ceiling.v1.x;
+                vertexes[idx++]=ceiling.v1.y;
+                vertexes[idx++]=ceiling.v1.z;
+                vertexes[idx++]=ceiling.v2.x;
+                vertexes[idx++]=ceiling.v2.y;
+                vertexes[idx++]=ceiling.v2.z;
+            }
                 
-                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes);
-                gl.drawArrays(gl.TRIANGLES,0,3);
+            if (idx!==0) {
+                if (mesh.simpleCollisions) {
+                    gl.uniform3f(shader.colorUniform,1.0,0.4,0.0);
+                }
+                else {
+                    gl.uniform3f(shader.colorUniform,1.0,0.0,0.0);
+                }
+                
+                gl.bufferSubData(gl.ARRAY_BUFFER,0,vertexes,0,idx);
+                gl.drawArrays(gl.TRIANGLES,0,idx);
             }
         }
         

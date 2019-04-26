@@ -28,6 +28,7 @@ export default class ProjectEntityClass
         
         this.show=true;
         this.heldBy=null;
+        this.filter=null;
         
         this.model=null;
         this.modelEntityAlter=null;
@@ -149,7 +150,13 @@ export default class ProjectEntityClass
         //
         // holding
         //
-        
+    
+    addEntity(entity,hold)
+    {
+        this.core.map.entityList.add(entity);
+        if (hold) entity.heldBy=this;
+    }
+    
     hold(entity)
     {
         entity.heldBy=this;
@@ -605,9 +612,9 @@ export default class ProjectEntityClass
         // ray trace utilities
         //
         
-    rayCollision(pnt,vector,hitPnt)
+    rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter)
     {
-        return(this.collision.rayCollision(pnt,vector,hitPnt,this));
+        return(this.collision.rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter,this));
     }
     
         //
@@ -719,11 +726,13 @@ export default class ProjectEntityClass
         // position the model the same as the entity's position and
         // angle.  use setModelDrawPosition([PointClass],[PointClass],[PointClass],inCameraSpace) to change
         // inside this method
+        // return TRUE to draw the model, FALSE to not draw
         //
         
     drawSetup()
     {
         this.setModelDrawPosition(this.position,this.angle,this.scale,false);
+        return(true);
     }
     
         //
@@ -735,11 +744,11 @@ export default class ProjectEntityClass
         if (this.model===null) return;
         if (!this.show) return;
         
-            // run the animation
-            // and then call the setup
+            // call the draw setup and
+            // then if returns true, run the animation
             
+        if (!this.drawSetup()) return;        
         this.modelEntityAlter.runAnimation();
-        this.drawSetup();
         
             // draw the model
             

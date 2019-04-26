@@ -265,26 +265,24 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             return;
         }
         
-            // debug keys
+            // - for no clip
             
-        if (input.keyFlags[45]) {
-            input.keyFlags[45]=false;
+        if (input.keyFlags[189]) {
+            input.keyFlags[189]=false;
             this.debugPlayerNoClip=!this.debugPlayerNoClip;
             console.info('player no clip='+this.debugPlayerNoClip);
         }
         
-        if (input.keyFlags[36]) {
-            input.keyFlags[36]=false;
+            // = for fly
+        
+        if (input.keyFlags[187]) {
+            input.keyFlags[187]=false;
             this.debugPlayerFly=!this.debugPlayerFly;
             console.info('player fly='+this.debugPlayerFly);
         }
         
-        if (input.keyFlags[33]) {
-            input.keyFlags[33]=false;
-            this.core.debugEntityBounds=!this.core.debugEntityBounds;
-            console.info('draw entity bounds='+this.core.debugEntityBounds);
-        }
-        
+            // delete turns on path editor
+            
         if (input.keyFlags[46]) {
             input.keyFlags[46]=false;
             this.core.debugPaths=!this.core.debugPaths;
@@ -300,18 +298,29 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             }
         }
         
+            // end turns on entity bounds
+            
         if (input.keyFlags[35]) {
             input.keyFlags[35]=false;
+            this.core.debugEntityBounds=!this.core.debugEntityBounds;
+            console.info('draw entity bounds='+this.core.debugEntityBounds);
+        }
+        
+            // page down turns on entity skeletons
+        
+        if (input.keyFlags[34]) {
+            input.keyFlags[34]=false;
             this.core.debugSkeletons=!this.core.debugSkeletons;
             console.info('draw entity skeletons='+this.core.debugSkeletons);
         }
         
-        if (input.keyFlags[34]) {
-            input.keyFlags[34]=false;
+            // page up turns on collision surfaces
+            
+        if (input.keyFlags[33]) {
+            input.keyFlags[33]=false;
             this.core.debugCollisionSurfaces=!this.core.debugCollisionSurfaces;
             console.info('draw collision surfaces='+this.core.debugCollisionSurfaces);
         }
-        
         
             // path editing
             
