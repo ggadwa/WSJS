@@ -1,8 +1,10 @@
 - chrome 74 has public/private fields, handle those when released
 
-- bots hitscan for targetting player
-- bots throw grenades
+- bots need X angle targeting
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)
+- need monster AI
+
+- need screen shake for explosions
 
 - any this.core. stuff needs to be removed from scripts
 

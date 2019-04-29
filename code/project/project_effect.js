@@ -4,14 +4,13 @@ import LightClass from '../../code/light/light.js';
 
 class ProjectEffectChunkClass
 {
-    constructor(bitmap,glDrawType,indexOffset,indexCount,sourceFactor,destFactor,color,alpha)
+    constructor(bitmap,glDrawType,indexOffset,indexCount,drawMode,color,alpha)
     {
         this.bitmap=bitmap;
         this.glDrawType=glDrawType;
         this.indexOffset=indexOffset;
         this.indexCount=indexCount;
-        this.sourceFactor=sourceFactor;
-        this.destFactor=destFactor;
+        this.drawMode=drawMode;
         this.color=color;
         this.alpha=alpha;
         
@@ -21,6 +20,10 @@ class ProjectEffectChunkClass
 
 export default class ProjectEffectClass
 {
+    static DRAW_MODE_OPAQUE=0;
+    static DRAW_MODE_TRANSPARENT=1;
+    static DRAW_MODE_ADDITIVE=2;
+    
     constructor(core,data)
     {
         this.core=core;
@@ -194,13 +197,13 @@ export default class ProjectEffectClass
         this.chunks.length=0;
     }
    
-    drawAddBillboardQuad(bitmap,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,sourceFactor,destFactor,color,alpha)
+    drawAddBillboardQuad(bitmap,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
     {
         let elementIdx=Math.trunc(this.vertexIdx/3);
         
             // add in this chunk for drawing
             
-        this.chunks.push(new ProjectEffectChunkClass(bitmap,this.core.gl.TRIANGLES,this.indexIdx,6,sourceFactor,destFactor,color,alpha));
+        this.chunks.push(new ProjectEffectChunkClass(bitmap,this.core.gl.TRIANGLES,this.indexIdx,6,drawMode,color,alpha));
         
             // top left
             
@@ -273,7 +276,7 @@ export default class ProjectEffectClass
         this.indexes[this.indexIdx++]=elementIdx+3;
     }
     
-    drawAddBillboardQuadFromMotion(bitmap,motions,factor,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,sourceFactor,destFactor,color,alpha)
+    drawAddBillboardQuadFromMotion(bitmap,motions,factor,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
     {
         let motion;
         
@@ -282,17 +285,17 @@ export default class ProjectEffectClass
             this.motionPoint.x+=(motion.x*factor);
             this.motionPoint.y+=(motion.y*factor);
             this.motionPoint.z+=(motion.z*factor);
-            this.drawAddBillboardQuad(bitmap,this.motionPoint,u,v,uSize,vSize,halfWid,halfHigh,rot,sourceFactor,destFactor,color,alpha);
+            this.drawAddBillboardQuad(bitmap,this.motionPoint,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha);
         }
     }
     
-    drawAddTriangle(bitmap,pnt0,u0,v0,pnt1,u1,v1,pnt2,u2,v2,sourceFactor,destFactor,color,alpha)
+    drawAddTriangle(bitmap,pnt0,u0,v0,pnt1,u1,v1,pnt2,u2,v2,drawMode,color,alpha)
     {
         let elementIdx=Math.trunc(this.vertexIdx/3);
         
             // add in this chunk for drawing
             
-        this.chunks.push(new ProjectEffectChunkClass(bitmap,this.core.gl.TRIANGLES,this.indexIdx,3,sourceFactor,destFactor,color,alpha));
+        this.chunks.push(new ProjectEffectChunkClass(bitmap,this.core.gl.TRIANGLES,this.indexIdx,3,drawMode,color,alpha));
         
             // build the triangle
             
@@ -324,8 +327,8 @@ export default class ProjectEffectClass
     
     drawEnd()
     {
-        let chunk;
-        let currentBitmap=null;
+        let chunk,currentDrawMode;
+        let currentBitmap;
         let gl=this.core.gl;
         let shader=this.core.shaderList.effectShader;
         
@@ -351,15 +354,39 @@ export default class ProjectEffectClass
         
             // run through the chunks
             
+        currentDrawMode=-1;
+        currentBitmap=null;
+            
         for (chunk of this.chunks) {
             
-            gl.blendFunc(chunk.sourceFactor,chunk.destFactor);
-        
+                // the draw mode
+            
+            if (chunk.drawMode!==currentDrawMode) {
+                currentDrawMode=chunk.drawMode;
+    
+                switch (currentDrawMode)
+                {
+                    case ProjectEffectClass.DRAW_MODE_TRANSPARENT:
+                        gl.blendFunc(this.core.gl.SRC_ALPHA,this.core.gl.ONE_MINUS_SRC_ALPHA);
+                        break;
+                    case ProjectEffectClass.DRAW_MODE_ADDITIVE:
+                        gl.blendFunc(this.core.gl.SRC_ALPHA,this.core.gl.ONE);
+                        break;
+                    default:
+                        gl.blendFunc(this.core.gl.ONE,this.core.gl.ZERO);
+                        break;
+                }
+            }
+            
+                // bitmap switch
+
             if (chunk.bitmap!==currentBitmap) {
                 currentBitmap=chunk.bitmap;
                 chunk.bitmap.attachAsParticle();
             }
             
+                // draw the chunk
+                
             gl.uniform4f(shader.colorAlphaUniform,chunk.color.r,chunk.color.g,chunk.color.b,chunk.alpha);
             gl.drawElements(chunk.glDrawType,chunk.indexCount,gl.UNSIGNED_SHORT,(chunk.indexOffset*2));
         }

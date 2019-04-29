@@ -135,7 +135,7 @@ export default class InterfaceClass
         
             // draw tint
             
-        gl.blendFunc(gl.ONE,gl.ONE);
+        gl.blendFunc(gl.ONE,gl.SRC_COLOR);
         
         shader.drawStart();
         

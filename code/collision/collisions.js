@@ -565,6 +565,7 @@ export default class CollisionClass
             // no collisions yet
 
         currentDist=-1;
+        sourceEntity.hitEntity=null;
 
             // run through the meshes and
             // check against all trigs
@@ -631,8 +632,6 @@ export default class CollisionClass
 
             // check entities
             
-        sourceEntity.hitEntity=null;
-
         for (n=0;n!==nEntity;n++) {
             entity=this.core.map.entityList.get(n);
             if (entity===sourceEntity) continue;
