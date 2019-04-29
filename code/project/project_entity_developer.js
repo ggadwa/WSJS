@@ -107,7 +107,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             }
             
             nodeIdx=path.nodes.length;
-            path.nodes.push(new MapPathNodeClass(nodeIdx,this.position.copy(),[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx]));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,this.position.copy(),null,[path.editorSplitStartNodeIdx,path.editorSplitEndNodeIdx],null,null));
             
             links=path.nodes[path.editorSplitStartNodeIdx].links;
             links[links.indexOf(path.editorSplitEndNodeIdx)]=nodeIdx;
@@ -154,7 +154,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
                 path.nodes[path.editorParentNodeIdx].links.push(nodeIdx);
             }
             
-            path.nodes.push(new MapPathNodeClass(nodeIdx,this.position.copy(),links));
+            path.nodes.push(new MapPathNodeClass(nodeIdx,this.position.copy(),null,links,null,null));
             
             path.editorParentNodeIdx=nodeIdx;
             

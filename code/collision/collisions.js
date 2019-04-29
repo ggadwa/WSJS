@@ -274,7 +274,7 @@ export default class CollisionClass
 
             for (n=0;n!==nEntity;n++) {
                 checkEntity=this.core.map.entityList.get(n);
-                if (checkEntity.id===entity.id) continue;
+                if (checkEntity===entity) continue;
                 if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
                 
                     // skip if not in the Y of the line
@@ -339,6 +339,30 @@ export default class CollisionClass
             // stop movement
             
         return(true);
+    }
+    
+    checkEntityCollision(entity)
+    {
+        let n,entityTopY;
+        let checkEntity;
+        let nEntity=this.core.map.entityList.entities.length;
+
+        for (n=0;n!==nEntity;n++) {
+            checkEntity=this.core.map.entityList.get(n);
+            if (checkEntity===entity) continue;
+            if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
+
+                // skip if not in the Y of the line
+
+            entityTopY=checkEntity.position.y+checkEntity.height;
+            if (((this.entityTestPnt.y+entity.height)<checkEntity.position.y) || (this.entityTestPnt.y>=entityTopY)) continue;
+
+                // check the circle
+
+            if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) return(checkEntity);
+        }
+        
+        return(null);
     }
     
         //

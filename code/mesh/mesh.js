@@ -9,10 +9,6 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 
 export default class MeshClass
 {
-    static MOVE_NONE=0;
-    static MOVE_RUNNING=1;
-    static MOVE_PAUSED=2;
-    
     constructor(core,name,bitmap,noSkinAttachedNodeIdx,skinIdx,vertexArray,normalArray,tangentArray,uvArray,jointArray,weightArray,indexArray)
     {
         this.core=core;
@@ -68,10 +64,6 @@ export default class MeshClass
         this.collisionWallTrigs=[];
         this.collisionFloorTrigs=[];
         this.collisionCeilingTrigs=[];
-        
-            // moving flag
-            
-        this.moveMode=MeshClass.MOVE_NONE;
         
             // marks if the vertices have changed
             // and a buffer update is required

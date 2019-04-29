@@ -179,10 +179,11 @@ export default class SoundListClass
         }
     }
         //
-        // start playing a sound attached to an entity
+        // start playing a sound attached to an entity or mesh
+        // (or if no attachment, a global sound)
         //
         
-    play(entity,name)
+    play(entity,mesh,name)
     {
         let n,sound;
         let soundPlay=null;
@@ -205,8 +206,7 @@ export default class SoundListClass
         
             // set it to entity
             
-        soundPlay.play(this.ctx,this.currentListenerEntity,entity,sound);
+        soundPlay.play(this.ctx,this.currentListenerEntity,entity,mesh,sound);
     }
-    
     
 }

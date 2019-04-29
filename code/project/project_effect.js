@@ -93,12 +93,12 @@ export default class ProjectEffectClass
         
     playSound(name)
     {
-        this.core.soundList.play(this,name);
+        this.core.soundList.play(this,null,name);
     }
     
     playSoundAtEntity(entity,name)
     {
-        this.core.soundList.play(entity,name);
+        this.core.soundList.play(entity,null,name);
     }
     
         //

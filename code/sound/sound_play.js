@@ -10,6 +10,7 @@ export default class SoundPlayClass
         
         this.free=true;
         this.entity=null;
+        this.mesh=null;
         
         this.sourceNode=null;
         this.gainNode=null;
@@ -26,14 +27,19 @@ export default class SoundPlayClass
         // play a sound buffer at this entity
         //
         
-    play(ctx,entityListener,entity,sound)
+    play(ctx,entityListener,entity,mesh,sound)
     {
         let dist;
         
-            // skip if over max distance from entity
+            // skip if over max distance from entity/mesh
         
         if (entity!==null) {
             dist=entity.position.distance(entityListener.position);
+            if (dist>sound.maxDistance) return(false);
+        }
+        
+        if (mesh!==null) {
+            dist=mesh.center.distance(entityListener.position);
             if (dist>sound.maxDistance) return(false);
         }
         
@@ -43,10 +49,10 @@ export default class SoundPlayClass
         this.sourceNode.buffer=sound.buffer;
         this.sourceNode.onended=this.ended.bind(this);
         
-            // if no entity, than just add
+            // if no entity/mesh, than just add
             // a gain node, otherwise a panner
             
-        if (entity===null) {
+        if ((entity===null) && (mesh===null)) {
             this.gainNode=ctx.createGain();
             this.gainNode.gain.value=this.soundList.soundVolume;
         
@@ -65,9 +71,17 @@ export default class SoundPlayClass
             this.pannerNode.coneOuterAngle=0;
             this.pannerNode.coneOuterGain=0;
             
-            this.pannerNode.positionX.value=entity.position.x;
-            this.pannerNode.positionY.value=entity.position.y;
-            this.pannerNode.positionZ.value=entity.position.z;
+            if (entity!==null) {
+                this.pannerNode.positionX.value=entity.position.x;
+                this.pannerNode.positionY.value=entity.position.y;
+                this.pannerNode.positionZ.value=entity.position.z;
+            }
+            else {
+                this.pannerNode.positionX.value=mesh.center.x;
+                this.pannerNode.positionY.value=mesh.center.y;
+                this.pannerNode.positionZ.value=mesh.center.z;
+            }
+            
             this.pannerNode.orientationX.value=1;
             this.pannerNode.orientationY.value=0;
             this.pannerNode.orientationZ.value=0;
@@ -84,6 +98,8 @@ export default class SoundPlayClass
             // set to entity and mark as used
         
         this.entity=entity;
+        this.mesh=mesh;
+        
         this.free=false;
         
             // finally play the sound
@@ -94,7 +110,8 @@ export default class SoundPlayClass
     ended()
     {
         this.free=true;
-        this.entity=null;           // otherwise entities cleared from entity list will be cleaned up late
+        this.entity=null;           // otherwise entities/meshes cleared from entity list will be cleaned up late
+        this.mesh=null;
         this.sourceNode=null;
         this.gainNode=null;
         this.pannerNode=null;
@@ -110,6 +127,12 @@ export default class SoundPlayClass
             this.pannerNode.positionX.value=this.entity.position.x;
             this.pannerNode.positionY.value=this.entity.position.y;
             this.pannerNode.positionZ.value=this.entity.position.z;
+            return;
+        }
+        if (this.mesh!==null) {
+            this.pannerNode.positionX.value=this.mesh.center.x;
+            this.pannerNode.positionY.value=this.mesh.center.y;
+            this.pannerNode.positionZ.value=this.mesh.center.z;
         }
     }
 

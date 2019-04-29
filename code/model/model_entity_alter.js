@@ -55,6 +55,8 @@ export default class ModelEntityAlterClass
         this.currentAnimationLoopEndTick=0;
         this.currentAnimationData=new Float32Array(4);
         
+        this.queuedAnimationStop=false;
+        
         this.queuedAnimationIdx=-1;
         this.queuedAnimationStartTimestamp=0;
         this.queuedAnimationLoopStartTick=0;
@@ -279,6 +281,10 @@ export default class ModelEntityAlterClass
             
         tick=this.currentAnimationLoopStartTick+Math.trunc((this.core.timestamp-this.currentAnimationStartTimestamp)%(this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick));
         
+        if (this.queuedAnimationStop) {
+            if ((this.core.timestamp-this.currentAnimationStartTimestamp)>=(this.currentAnimationLoopEndTick-this.currentAnimationLoopStartTick)) tick=this.currentAnimationLoopEndTick;
+        }
+        
             // each channel changes one node over time
             
         for (n=0;n!==channels.length;n++) {
@@ -312,7 +318,6 @@ export default class ModelEntityAlterClass
             // if queue is being popped
             
         if (this.currentAnimationIdx!==-1) {
-
             if (this.queuedAnimationIdx!==-1) {
                 if (this.core.timestamp>=this.queuedAnimationStartTimestamp) {
                     this.currentAnimationIdx=this.queuedAnimationIdx;
@@ -346,7 +351,15 @@ export default class ModelEntityAlterClass
         this.currentAnimationLoopStartTick=Math.trunc(loopStartFrame*fps);
         this.currentAnimationLoopEndTick=Math.trunc(loopEndFrame*fps);
         
+        this.queuedAnimationIdx=-1;          // a start erased any queued animations
+        this.queuedAnimationStop=false;
+        
         return(true);
+    }
+    
+    queueAnimationStop()
+    {
+        this.queuedAnimationStop=true;
     }
     
     queueAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)

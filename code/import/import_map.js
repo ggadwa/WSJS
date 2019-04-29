@@ -23,7 +23,8 @@ export default class ImportMapClass
         let effect,effectDef;
         let light,lightDef;
         let liquid,liquidDef,liquidBitmap;
-        let movement,meshIdxList,reverseMeshIdxList,movementDef,moveDef,movePoint,moveRotate,rotateOffset,approachOffset;
+        let movement,meshIdxList,reverseMeshIdxList,movementDef;
+        let moveDef,movePoint,moveRotate,rotateOffset,centerOffset;
         let entityDef,entityPosition,entityAngle,entityData;
         let pathNode,pathDef,altPosition;
         let bitmap;
@@ -125,10 +126,10 @@ export default class ImportMapClass
                 rotateOffset=new PointClass(0,0,0);
                 if (movementDef.rotateOffset!==undefined) rotateOffset.setFromValues(movementDef.rotateOffset.x,movementDef.rotateOffset.y,movementDef.rotateOffset.z);
                 
-                approachOffset=new PointClass(0,0,0);
-                if (movementDef.approachOffset!==undefined) approachOffset.setFromValues(movementDef.approachOffset.x,movementDef.approachOffset.y,movementDef.approachOffset.z);
+                centerOffset=new PointClass(0,0,0);
+                if (movementDef.centerOffset!==undefined) centerOffset.setFromValues(movementDef.centerOffset.x,movementDef.centerOffset.y,movementDef.centerOffset.z);
 
-                movement=new MovementClass(meshIdxList,reverseMeshIdxList,rotateOffset,approachOffset,movementDef.looping,movementDef.approachDistance);
+                movement=new MovementClass(this.core,meshIdxList,reverseMeshIdxList,rotateOffset,centerOffset);
 
                 for (k=0;k!==movementDef.moves.length;k++) {
                     moveDef=movementDef.moves[k];
@@ -139,7 +140,9 @@ export default class ImportMapClass
                     moveRotate=new PointClass(0,0,0);
                     if (moveDef.rotate!==undefined) moveRotate.setFromValues(moveDef.rotate.x,moveDef.rotate.y,moveDef.rotate.z);
                     
-                    movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate,moveDef.trigger));
+                    if (moveDef.sound!==undefined) this.core.soundList.add(moveDef.sound,moveDef.soundMaxDistance)
+                    
+                    movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate,MoveClass.lookupPauseType(moveDef.pauseType),((moveDef.pauseData===undefined)?null:moveDef.pauseData),((moveDef.sound===undefined)?null:moveDef.sound),((moveDef.trigger===undefined)?null:moveDef.trigger)));
                 }
 
                 this.core.map.movementList.add(movement);

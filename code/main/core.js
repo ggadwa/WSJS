@@ -288,21 +288,13 @@ export default class CoreClass
         // triggers
         //
         
-    clearTriggers()
-    {
-        let key,value;
-        
-            // we never delete triggers, just set
-            // them to false so we don't have GC
-            
-        for ([key,value] of this.triggers) {
-            this.triggers.set(key,false);
-        }
-    }
-    
     setTrigger(triggerName)
     {
         this.triggers.set(triggerName,true);
+    }
+    
+    clearTrigger(triggerName) {
+        this.triggers.set(triggerName,false);
     }
     
     checkTrigger(triggerName)

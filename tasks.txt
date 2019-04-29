@@ -1,32 +1,12 @@
 - chrome 74 has public/private fields, handle those when released
 
-- weapon pickups (need to start without m16)
-- grenade throw noise
-
 - bots hitscan for targetting player
-  - bot fire/pickup different weapons/ammo
-
-- tinting part of player, need a tint function to call from core (look for getDamageTintAttenuation)
-
-        tintAtt=player.getDamageTintAttenuation();
-        if (tintAtt!==0.0) {
-            tintOn=true;
-            this.tintColor.addFromValues(tintAtt,0.0,0.0);
-        }
-        
-        liquidIdx=player.getUnderLiquidIndex();
-        if (liquidIdx!==-1) {
-            tintOn=true;
-            liquid=this.core.map.liquidList.liquids[liquidIdx];
-            this.tintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
-        }
+- bots throw grenades
+- bots need to get unstuck (put node by platforms, go to nearest node if stuck)
 
 - any this.core. stuff needs to be removed from scripts
 
 - add network persistence test
-
-- need spawn nodes
-- bot die/respawn
 
 - websockets
         this.socket=new WebSocket('ws://blech');

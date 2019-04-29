@@ -125,30 +125,13 @@ export default class InterfaceClass
         
     drawTint()
     {
-        let tintOn,tintAtt,liquidIdx,liquid;
         let player=this.core.map.entityList.getPlayer();
         let shader=this.core.shaderList.tintShader;
         let gl=this.core.gl;
         
             // setup tint
             
-        tintOn=false;
-        this.tintColor.setFromValues(0.0,0.0,0.0);
-        /*
-        tintAtt=player.getDamageTintAttenuation();
-        if (tintAtt!==0.0) {
-            tintOn=true;
-            this.tintColor.addFromValues(tintAtt,0.0,0.0);
-        }
-        
-        liquidIdx=player.getUnderLiquidIndex();
-        if (liquidIdx!==-1) {
-            tintOn=true;
-            liquid=this.core.map.liquidList.liquids[liquidIdx];
-            this.tintColor.addFromValues(liquid.tint.r,liquid.tint.g,liquid.tint.b);
-        }
-        */
-        if (!tintOn) return;
+        if (!player.getScreenTint(this.tintColor)) return;
         
             // draw tint
             

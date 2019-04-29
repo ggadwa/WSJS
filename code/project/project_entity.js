@@ -124,6 +124,11 @@ export default class ProjectEntityClass
         return(this.modelEntityAlter.startAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame));
     }
     
+    queueAnimationStop()
+    {
+        this.modelEntityAlter.queueAnimationStop();
+    }
+    
     queueModelAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame)
     {
         return(this.modelEntityAlter.queueAnimationChunkInFrames(name,framesPerSecond,loopStartFrame,loopEndFrame));
@@ -205,6 +210,11 @@ export default class ProjectEntityClass
         return(entity.position.distance(this.position)<dist);
     }
     
+    turnYTowardsEntity(entity,turnSpeed)
+    {
+        return(this.angle.turnYTowards(this.position.angleYTo(entity.position),turnSpeed));
+    }
+    
         //
         // interface utilities
         //
@@ -243,7 +253,18 @@ export default class ProjectEntityClass
     getInterfaceHeight()
     {
         return(this.core.high);
-    }        
+    }
+    
+    /**
+     * Override this to setup a tinting color for the screen.
+     * Return false if not tint.
+     * 
+     * @argument {ColorClass} tintColor 
+     */
+    getScreenTint(tintColor)
+    {
+        return(false);
+    }
     
         //
         // path utilities
@@ -314,12 +335,19 @@ export default class ProjectEntityClass
         this.position.setFromPoint(this.core.map.path.nodes[nodeIdx].position);
     }
     
-    moveToRandomNode()
+    moveToRandomNode(failCount)
     {
         let nodes=this.core.map.path.nodes;
-        let idx=Math.trunc(nodes.length*Math.random());
+        let idx;
         
-        this.position.setFromPoint(nodes[idx].position);
+        while (failCount>0) {
+            idx=Math.trunc(nodes.length*Math.random());
+            this.position.setFromPoint(nodes[idx].position);
+            
+            if (this.collision.checkEntityCollision(this)===null) return;
+            
+            failCount--;
+        }
     }
     
     getRandomKeyNodeIndex()
@@ -345,47 +373,9 @@ export default class ProjectEntityClass
         return(this.core.map.path.nodes[nodeIdx].data);
     }
     
-    turnTowardsNode(nodeIdx,turnSpeed)
+    turnYTowardsNode(nodeIdx,turnSpeed)
     {
-        let toY,subway,addway;
-        let node=this.core.map.path.nodes[nodeIdx];
-        
-            // already there?
-            
-        toY=this.position.angleYTo(node.position);
-        if (this.angle.y===toY) return;
-        
-            // which way is faster?
-	
-	if (this.angle.y>toY) {
-            addway=360.0-(this.angle.y-toY);
-            subway=this.angle.y-toY;
-	}
-	else {
-            addway=toY-this.angle.y;
-            subway=360.0-(toY-this.angle.y);
-	}
-        
-            // if we are within speed, then
-            // it's equal
-            
-        if ((subway<turnSpeed) || (addway<turnSpeed)) {
-            this.angle.y=toY;
-            return(0);
-        }
-		
-            // now turn and always
-            // return the difference
-	
-	if (subway<addway) {
-            this.angle.y-=turnSpeed;
-            if (this.angle.y<0) this.angle.y=360+this.angle.y;
-            return(subway);
-	}
-
-        this.angle.y+=turnSpeed;
-        if (this.angle.y>=360) this.angle.y=this.angle.y-360;
-        return(addway);
+        return(this.angle.turnYTowards(this.position.angleYTo(this.core.map.path.nodes[nodeIdx].position),turnSpeed));
     }
     
     getVectorToNode(nodeIdx,pnt)
@@ -633,12 +623,6 @@ export default class ProjectEntityClass
         return(this.collideCeilingMeshIdx!==-1);
     }
     
-    getStandingOnFloorMoveMode()
-    {
-        if (this.standOnMeshIdx===-1) return(MeshClass.MOVE_NONE);
-        return(this.core.map.meshList.meshes[this.standOnMeshIdx].moveMode);
-    }
-    
     isAnyCollision()
     {
         if (this.touchEntity!==null) return(true);
@@ -660,12 +644,12 @@ export default class ProjectEntityClass
         
     playSound(name)
     {
-        this.core.soundList.play(this,name);
+        this.core.soundList.play(this,null,name);
     }
     
     playSoundAtEntity(entity,name)
     {
-        this.core.soundList.play(entity,name);
+        this.core.soundList.play(entity,null,name);
     }
     
         //

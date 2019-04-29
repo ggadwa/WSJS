@@ -8,21 +8,19 @@ import MeshClass from '../mesh/mesh.js';
 
 export default class MovementClass
 {
-    constructor(meshIdxList,reverseMeshIdxList,rotateOffset,approachOffet,looping,approachDistance)
+    constructor(core,meshIdxList,reverseMeshIdxList,rotateOffset,centerOffset)
     {
+        this.core=core;
         this.meshIdxList=meshIdxList;
         this.reverseMeshIdxList=reverseMeshIdxList;
         this.rotateOffset=rotateOffset;
-        this.approachOffet=approachOffet;
-        this.looping=looping;
-        this.approachDistance=approachDistance;
+        this.centerOffset=centerOffset;
         
         this.reverseRotateOffet=new PointClass(-this.rotateOffset.x,-this.rotateOffset.x,-this.rotateOffset.z);
         
         this.currentMoveIdx=0;
         this.nextMoveNextTick=0;
-        
-        this.moving=looping;            // looping movements are always moving
+        this.stopped=false;
         
         this.originalCenterPnt=null;
         
@@ -35,8 +33,6 @@ export default class MovementClass
         this.lastRotateAng=new PointClass(0,0,0);
         
         this.moves=[];
-        
-        this.y=0;
     }
     
     addMove(move)
@@ -44,14 +40,16 @@ export default class MovementClass
         this.moves.push(move);
     }
     
-    run(core,map)
+    run()
     {
         let n,nMesh;
-        let mesh,isOpen,prevIdx;
+        let mesh,paused,nextIdx,prevIdx;
         let f,move;
         
-            // skip if no moves
+            // skip if no moves or we
+            // are permanently stopped
             
+        if (this.stopped) return;
         if (this.moves.length===0) return;
         
             // the mesh count
@@ -67,7 +65,7 @@ export default class MovementClass
             this.originalCenterPnt=new PointClass(0,0,0);
             
             for (n=0;n!==nMesh;n++) {
-                mesh=map.meshList.get(this.meshIdxList[n]);
+                mesh=this.core.map.meshList.get(this.meshIdxList[n]);
                 this.originalCenterPnt.addPoint(mesh.center);
             }
             
@@ -75,64 +73,68 @@ export default class MovementClass
             this.originalCenterPnt.y=Math.trunc(this.originalCenterPnt.y/nMesh);
             this.originalCenterPnt.z=Math.trunc(this.originalCenterPnt.z/nMesh);
             
-            this.originalCenterPnt.addPoint(this.approachOffet);        // a special offset so the approach center can be moved
+            this.originalCenterPnt.addPoint(this.centerOffset);        // a special offset so the approach center can be moved
         }
         
-            // if not looping, and we have an approach distance,
-            // then do approach distance if not already moving
+            // are we moving to another movement?
             
-        if ((!this.looping) && (this.approachDistance!==-1)) {
+        if (this.nextMoveNextTick<this.core.timestamp) {
             
-            if (!this.moving) {
-                isOpen=(this.originalCenterPnt.distance(map.entityList.getPlayer().position)<this.approachDistance);
-                
-                if (isOpen) {
-                    if (this.currentMoveIdx===1) return;
-                    this.currentMoveIdx=1;
-                }
-                else {
-                    if (this.currentMoveIdx===0) return;
-                    this.currentMoveIdx=0;
-                }
-                
-                this.moving=true;
-                this.nextMoveNextTick=core.timestamp+this.moves[this.currentMoveIdx].lifeTick;
+            nextIdx=this.currentMoveIdx+1;
+            if (nextIdx>=this.moves.length) nextIdx=0;
+            
+                // should we pause?
+            
+            paused=false;
+            move=this.moves[nextIdx];
+            
+            switch (move.pauseType) {
+                case MoveClass.PAUSE_TRIGGER:
+                    paused=!this.core.checkTrigger(move.pauseData);
+                    break;
+                case MoveClass.PAUSE_APPROACH:
+                    paused=(this.originalCenterPnt.distance(this.core.map.entityList.getPlayer().position)>move.pauseData);
+                    break;
+                case MoveClass.PAUSE_LEAVE:
+                    paused=(this.originalCenterPnt.distance(this.core.map.entityList.getPlayer().position)<move.pauseData);
+                    break;
+                case MoveClass.PAUSE_STOP:
+                    paused=true;
+                    this.stopped=true;      // do one last move to line up with end, and then this movement permanently stops
+                    break;
+            }
+            
+                // if paused, make sure we are at end of
+                // current move, otherwise switch
+            
+            if (paused) {
+                this.nextMoveNextTick=this.core.timestamp;
             }
             else {
+                this.currentMoveIdx=nextIdx;
+                this.nextMoveNextTick=this.core.timestamp+this.moves[this.currentMoveIdx].lifeTick;
                 
-                    // check if we've finished, and make sure
-                    // the movement lands on the final spot
-            
-                if (this.nextMoveNextTick<core.timestamp) {
-                    this.nextMoveNextTick=core.timestamp;
-                    this.moving=false;
-                }
+                    // set any trigger or sound
+                    
+                if (move.triggerName!==null) this.core.setTrigger(move.triggerName);
+                if (move.soundName!==null) this.core.soundList.play(null,this.core.map.meshList.get(this.meshIdxList[0]),move.soundName)
             }
         }
         
-            // looping movements
+            // if we aren't moving to another movement
+            // then always clear any trigger
             
         else {
-        
-                // next move
-
-            if (this.nextMoveNextTick<core.timestamp) {
-                this.currentMoveIdx++;
-                if (this.currentMoveIdx>=this.moves.length) this.currentMoveIdx=0;
-
-                this.nextMoveNextTick=core.timestamp+this.moves[this.currentMoveIdx].lifeTick;
-            }
+            move=this.moves[this.currentMoveIdx];
+            if (move.triggerName!==null) this.core.clearTrigger(move.triggerName);
         }
-        
-            // any triggers
             
-        if (this.moves[this.currentMoveIdx].triggerName!==null) core.setTrigger(this.moves[this.currentMoveIdx].triggerName);
-        
             // the next offset we need to move to
             // is between the previous and the next point
             
         move=this.moves[this.currentMoveIdx];
-        f=1.0-((this.nextMoveNextTick-core.timestamp)/move.lifeTick);
+        
+        f=1.0-((this.nextMoveNextTick-this.core.timestamp)/move.lifeTick);
         
         prevIdx=this.currentMoveIdx;
         prevIdx--;
@@ -157,18 +159,12 @@ export default class MovementClass
             // detect if they are on moving platforms and pause
         
         for (n=0;n!==nMesh;n++) {
-            mesh=map.meshList.get(this.meshIdxList[n]);
-            mesh.moveMode=MeshClass.MOVE_PAUSED;
+            mesh=this.core.map.meshList.get(this.meshIdxList[n]);
             
-            if (!this.movePnt.isZero()) {
-                mesh.move(this.movePnt);
-                mesh.moveMode=MeshClass.MOVE_RUNNING;
-            }
-            if (!this.rotateAng.isZero()) {
-                mesh.rotate(this.rotateAng,this.rotateOffset);
-                mesh.moveMode=MeshClass.MOVE_RUNNING;
-            }
-            map.entityList.movementPush(this.meshIdxList[n],this.movePnt);
+            if (!this.movePnt.isZero()) mesh.move(this.movePnt);
+            if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.rotateOffset);
+
+            this.core.map.entityList.movementPush(this.meshIdxList[n],this.movePnt);
         }
         
             // do reverse moves
@@ -180,18 +176,12 @@ export default class MovementClass
             this.rotateAng.scale(-1);
         
             for (n=0;n!==nMesh;n++) {
-                mesh=map.meshList.get(this.reverseMeshIdxList[n]);
-                mesh.moveMode=MeshClass.MOVE_PAUSED;
+                mesh=this.core.map.meshList.get(this.reverseMeshIdxList[n]);
                 
-                if (!this.movePnt.isZero()) {
-                    mesh.move(this.movePnt);
-                    mesh.moveMode=MeshClass.MOVE_RUNNING;
-                }
-                if (!this.rotateAng.isZero()) {
-                    mesh.rotate(this.rotateAng,this.reverseRotateOffet);
-                    mesh.moveMode=MeshClass.MOVE_RUNNING;
-                }
-                map.entityList.movementPush(this.reverseMeshIdxList[n],this.movePnt);
+                if (!this.movePnt.isZero()) mesh.move(this.movePnt);
+                if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.reverseRotateOffet);
+
+                this.core.map.entityList.movementPush(this.reverseMeshIdxList[n],this.movePnt);
             }
         }
     }

@@ -201,8 +201,7 @@ function mainLoop(timestamp)
                     core.physicsTick-=PHYSICS_MILLISECONDS;
                     core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
-                    core.clearTriggers();
-                    map.movementList.run(core,map);
+                    map.movementList.run();
                     core.projectGame.run();
                     map.entityList.run();
                 }
