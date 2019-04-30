@@ -80,6 +80,11 @@ export default class ProjectEffectClass
         this.light.exponent=exponent;
     }
     
+    setLightPosition(position)
+    {
+        this.light.position.setFromPoint(position);
+    }
+    
     setLightIntensity(intensity)
     {
         this.light.setIntensity(intensity);
@@ -412,6 +417,7 @@ export default class ProjectEffectClass
     restart(position,show)
     {
         this.position.setFromPoint(position);
+        this.light.position.setFromPoint(position);
         this.show=show;
     }
     
