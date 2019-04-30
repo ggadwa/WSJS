@@ -1,3 +1,5 @@
+import ImportMapClass from '../../code/import/import_map.js';
+
 export default class ProjectMapClass
 {
     constructor(core)
@@ -18,10 +20,22 @@ export default class ProjectMapClass
     }
     
         //
-        // override this to load in map
+        // override this give the import settings
+        // for this map
         //
         
+    getImportSettings()
+    {
+        return(null);
+    }
+    
+        //
+        // main map loader
+        //
+    
     async loadMap()
     {
+        let importMap=new ImportMapClass(this.core);
+        return(await importMap.load(this.getImportSettings()));
     }
 }

@@ -11,6 +11,15 @@ export default class ProjectGameClass
     }
     
         //
+        // create maps
+        //
+        
+    createMap(mapClass)
+    {
+        return(new mapClass(this.core));
+    }
+    
+        //
         // call this to add a bitmap
         //
         

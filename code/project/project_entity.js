@@ -46,8 +46,6 @@ export default class ProjectEntityClass
         
         this.gravity=this.gravityMinValue;
         
-        this.markedForDeletion=false;              // used to delete this outside the run loop
-
         this.passThrough=false;
         this.touchEntity=null;
         this.hitEntity=null;
@@ -56,6 +54,7 @@ export default class ProjectEntityClass
         this.collideWallTrigIdx=-1;
         this.collideCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
+        this.standOnEntity=null;
         
         this.damageTintStartTick=-1;
 
@@ -89,6 +88,57 @@ export default class ProjectEntityClass
     release()
     {
         if (this.model!==null) this.model.release();
+    }
+    
+        //
+        // meshes and liquids
+        //
+        
+    getMeshList()
+    {
+        return(this.core.map.meshList);
+    }
+    
+    getLiquidList()
+    {
+        return(this.core.map.liquidList);
+    }
+    
+        //
+        // input
+        //
+        
+    isKeyDown(keyCode)
+    {
+        return(this.core.input.keyFlags[keyCode]);
+    }
+    
+    isMouseButtonDown(buttonIdx)
+    {
+        return(this.core.input.mouseButtonFlags[buttonIdx]);
+    }
+    
+    getMouseWheelClick()
+    {
+        return(this.core.input.mouseWheelRead());
+    }
+    
+    getMouseMoveX()
+    {
+        let x;
+        
+        x=this.core.input.mouseChangeX;
+        this.core.input.mouseChangeX=0;
+        return(x);
+    }
+    
+    getMouseMoveY()
+    {
+        let y;
+        
+        y=this.core.input.mouseChangeY;
+        this.core.input.mouseChangeY=0;
+        return(y);
     }
     
         //
@@ -140,20 +190,6 @@ export default class ProjectEntityClass
     }
     
         //
-        // deleting
-        //
-        
-    markAsDelete()
-    {
-        this.markedForDeletion=true;
-    }
-    
-    isMarkedForDeletion()
-    {
-        return(this.markedForDeletion);
-    }
-    
-        //
         // ticks and periodics
         //
         
@@ -186,11 +222,21 @@ export default class ProjectEntityClass
         return(this.core.map.entityList);
     }
     
-    addEntity(entity,show,hold)
+    getPlayerEntity()
     {
+        return(this.core.map.entityList.getPlayer());
+    }
+    
+    addEntity(entityClass,name,position,angle,data,show,hold)
+    {
+        let entity;
+        
+        entity=new entityClass(this.core,name,position,angle,data);
         entity.show=show;
         this.core.map.entityList.add(entity);
         if (hold) entity.heldBy=this;
+        
+        return(entity);
     }
     
     holdEntity(entity)
@@ -213,6 +259,26 @@ export default class ProjectEntityClass
     turnYTowardsEntity(entity,turnSpeed)
     {
         return(this.angle.turnYTowards(this.position.angleYTo(entity.position),turnSpeed));
+    }
+    
+        //
+        // effect utilities
+        //
+        
+    getEffectList()
+    {
+        return(this.core.map.effectList);
+    }
+    
+    addEffect(effectClass,data,show)
+    {
+        let effect;
+                
+        effect=new effectClass(this.core,data);
+        effect.show=show;
+        this.core.map.effectList.add(effect);
+        
+        return(effect);
     }
     
         //

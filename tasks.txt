@@ -1,23 +1,13 @@
 - chrome 74 has public/private fields, handle those when released
 
-- add standing on objects
 - need screen shake for explosions (periodic sin)
 - bots need X angle targeting
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)
 - need monster AI
+   - damage/die
+   - activate/stalk
 
-
-
-- any this.core. stuff needs to be removed from scripts
-
-- add network persistence test
-
-- websockets
-        this.socket=new WebSocket('ws://blech');
-        this.socket.addEventListener('open',this.open.bind(this));
-        this.socket.addEventListener('close',this.close.bind(this));
-        this.socket.addEventListener('message',this.message.bind(this));
-        this.socket.addEventListener('error',this.error.bind(this));
+- networking
 
 - swimming is broken
 - sort effects, will need a sort z call into the effect
@@ -29,5 +19,3 @@
 
 - work on safari (need to wait for public/private class fields)
 - work on touch controls (left side, move and turn) (right side, look and shoot, swipe left/right weapon change, swipe up for grenade)
-- networking
-- persistent server storage

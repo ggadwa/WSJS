@@ -154,29 +154,12 @@ export default class MapEntityListClass
         
     run()
     {
-        let n,nEntity;
         let entity;
         
             // run the entities
             
         for (entity of this.entities) {
             entity.run();
-        }
-        
-            // now clean up any that got
-            // marked for deleting
-            
-        n=0;
-        nEntity=this.entities.length;
-        
-        while (n<nEntity) {
-            if (this.entities[n].isMarkedForDeletion()) {
-                entity.release();
-                this.entities.splice(n,1);
-                nEntity--;
-                continue;
-            }
-            n++;
         }
     }
     

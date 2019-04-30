@@ -62,6 +62,20 @@ export default class ProjectEffectClass
     }
     
         //
+        // meshes and liquids
+        //
+        
+    getMeshList()
+    {
+        return(this.core.map.meshList);
+    }
+    
+    getLiquidList()
+    {
+        return(this.core.map.liquidList);
+    }
+    
+        //
         // bitmap utilities
         //
     
@@ -150,6 +164,15 @@ export default class ProjectEffectClass
     getPeriodicLinear(millisecondPeriod,amplitude)
     {
         return(this.core.getPeriodicLinear(millisecondPeriod,amplitude));
+    }
+    
+        //
+        // frustum checks
+        //
+    
+    boundBoxInFrustum(xBound,yBound,zBound)
+    {
+        return(this.core.boundBoxInFrustum(xBound,yBound,zBound));
     }
     
         //

@@ -392,6 +392,7 @@ export default class CollisionClass
     {
         let n,k,i,y,nMesh,nCollisionTrig;
         let mesh,collisionTrig;
+        let nEntity,checkEntity,entityTopY;
 
             // the rough collide boxes
             // floor_rise_height is the farthest
@@ -416,6 +417,8 @@ export default class CollisionClass
             // start with no hits
        
         entity.standOnMeshIdx=-1;
+        entity.standOnEntity=null;
+        
         y=entity.position.y-CollisionClass.FLOOR_RISE_HEIGHT;
         
             // run through colliding trigs
@@ -453,10 +456,35 @@ export default class CollisionClass
                 }
             }
         }
+        
+            // run through colliding entities
+            
+        nEntity=this.core.map.entityList.entities.length;
+        
+        for (n=0;n!==nEntity;n++) {
+            checkEntity=this.core.map.entityList.get(n);
+            if (checkEntity===entity) continue;
+            if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
+            
+                // skip if not in the Y of the line
+
+            entityTopY=checkEntity.position.y+checkEntity.height;
+            if ((entity.y<(entityTopY-CollisionClass.FLOOR_RISE_HEIGHT)) || (entity.y>=entityTopY)) continue;
+
+                // check the circle
+
+            if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
+                if (entityTopY>=y) {
+                    entity.standOnMeshIdx=-1;
+                    entity.standOnEntity=checkEntity;
+                    y=entityTopY;
+                }
+            }
+        }
          
             // get how far we've fallen (negative, y is up)
 
-        if (entity.standOnMeshIdx!==-1) return(y-entity.position.y);
+        if ((entity.standOnMeshIdx!==-1) || (entity.standOnEntity!==null)) return(y-entity.position.y);
         
             // if no collisions, return the
             // farthest part of the ray
