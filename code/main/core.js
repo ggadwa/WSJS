@@ -77,6 +77,10 @@ export default class CoreClass
         this.lookAtUpVector=new PointClass(0.0,-1.0,0.0);
 
         this.eyePos=new PointClass(0.0,0.0,0.0);
+        
+        this.cameraShakeStartTick=-1;
+        this.cameraShakeTick=0;
+        this.cameraShakeShift=0;
 
             // the gl matrixes
 
@@ -350,6 +354,39 @@ export default class CoreClass
     }
     
         //
+        // camera shaking
+        //
+        
+    startCameraShake(shakeTick,shakeShift)
+    {
+        this.cameraShakeStartTick=this.timestamp;
+        this.cameraShakeTick=shakeTick;
+        this.cameraShakeShift=shakeShift;
+    }
+    
+    runCameraShake()
+    {
+        let tick,shakeSize;
+        
+        if (this.cameraShakeStartTick===-1) return;
+        
+            // time to end shake?
+            
+        tick=this.timestamp-this.cameraShakeStartTick;
+        if (tick>this.cameraShakeTick) {
+            this.cameraShakeStartTick=-1;
+            return;
+        }
+        
+            // shake camera
+         
+        shakeSize=this.cameraShakeShift*(1.0-(tick/this.cameraShakeTick));
+        this.eyePos.x+=Math.trunc(Math.random()*shakeSize);
+        this.eyePos.y+=Math.trunc(Math.random()*shakeSize);
+        this.eyePos.z+=Math.trunc(Math.random()*shakeSize);
+    }
+    
+        //
         // convert coordinate to eye coordinates
         //
     
@@ -395,6 +432,8 @@ export default class CoreClass
         this.eyeRotMatrix2.setRotationFromXAngle(this.camera.angle.x);
         this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
         this.eyePos.matrixMultiply(this.eyeRotMatrix);
+        
+        this.runCameraShake();
 
             // setup the look at
 

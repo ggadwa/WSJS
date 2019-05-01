@@ -55,6 +55,7 @@ export default class ProjectEntityClass
         this.collideCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
         this.standOnEntity=null;
+        this.hitHeadOnEntity=null;
         
         this.damageTintStartTick=-1;
 
@@ -321,6 +322,15 @@ export default class ProjectEntityClass
         return(this.core.high);
     }
     
+        //
+        // misc APIs
+        //
+        
+    startCameraShake(shakeTick,shakeShift)
+    {
+        this.core.startCameraShake(shakeTick,shakeShift);
+    }
+    
     /**
      * Override this to setup a tinting color for the screen.
      * Return false if not tint.
@@ -557,10 +567,9 @@ export default class ProjectEntityClass
             
         if (yAdd<=0) {
             this.collideCeilingMeshIdx=-1;                         // no ceiling collisions if going down
+            this.hitHeadOnEntity=null;
 
-            fallY=this.collision.fallEntityInMap(this);
-            if (fallY<yAdd) fallY=yAdd;                            // can only drop as far as current fall
-            
+            fallY=this.collision.fallEntityInMap(this,yAdd);
             this.position.addValuesTrunc(0,fallY,0);
         
             if (fallY>=0) {
@@ -573,6 +582,7 @@ export default class ProjectEntityClass
             
         else {
             this.standOnMeshIdx=-1;                                 // no standing if going up
+            this.standOnEntity=null;
             
             riseY=this.collision.riseEntityInMap(this,yAdd);
             this.position.addValuesTrunc(0,riseY,0);

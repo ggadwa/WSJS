@@ -1,21 +1,18 @@
 - chrome 74 has public/private fields, handle those when released
 
-- need screen shake for explosions (periodic sin)
 - bots need X angle targeting
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)
 - need monster AI
-   - damage/die
    - activate/stalk
 
 - networking
+- combine input / view pause states
 
 - swimming is broken
 - sort effects, will need a sort z call into the effect
 - liquids need to draw away from z
-- jumping (make gravityReset() + addMovement(x,y,z) delete other methods)
-- combine input / view pause states
 
-### LONG TERM ###
+### SAFARI ###
 
-- work on safari (need to wait for public/private class fields)
+- wait for public/private class fields to land in safari
 - work on touch controls (left side, move and turn) (right side, look and shoot, swipe left/right weapon change, swipe up for grenade)

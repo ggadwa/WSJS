@@ -388,30 +388,31 @@ export default class CollisionClass
         this.rayPoints[CollisionClass.COLLISION_SPOKE_COUNT].setFromValues(x,y,z);
     }
     
-    fallEntityInMap(entity)
+    fallEntityInMap(entity,fallY)
     {
         let n,k,i,y,nMesh,nCollisionTrig;
         let mesh,collisionTrig;
-        let nEntity,checkEntity,entityTopY;
+        let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
 
             // the rough collide boxes
             // floor_rise_height is the farthest
             // we can move up and down a floor segment
+            // and fallY is negative (moving down)
             
         this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues((entity.position.y-CollisionClass.FLOOR_RISE_HEIGHT),(entity.position.y+CollisionClass.FLOOR_RISE_HEIGHT));
+        this.objYBound.setFromValues((entity.position.y+fallY),(entity.position.y+CollisionClass.FLOOR_RISE_HEIGHT));
         this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
             // build the ray trace points
             // from the bottom of the entity cylinder
-            // plus the floor rise height (so we can move up)
-            // and the vector moving down the Y (which is negative
-            // as the Y is up)
+            // plus the floor rise height (so we can move up on
+            // slanted floors) to the floor rise height + fallY
+            // (which is negative as the Y is up)
             
         this.buildYCollisionRayPoints(entity,(entity.position.y+CollisionClass.FLOOR_RISE_HEIGHT));
         
         this.rayVector.x=0;
-        this.rayVector.y=-(CollisionClass.FLOOR_RISE_HEIGHT*2);
+        this.rayVector.y=(-CollisionClass.FLOOR_RISE_HEIGHT)+fallY;
         this.rayVector.z=0;
        
             // start with no hits
@@ -419,7 +420,7 @@ export default class CollisionClass
         entity.standOnMeshIdx=-1;
         entity.standOnEntity=null;
         
-        y=entity.position.y-CollisionClass.FLOOR_RISE_HEIGHT;
+        y=entity.position.y+fallY;
         
             // run through colliding trigs
         
@@ -461,23 +462,28 @@ export default class CollisionClass
             
         nEntity=this.core.map.entityList.entities.length;
         
+        entityTop=(entity.position.y+entity.height)+fallY;
+        entityBot=entity.position.y+fallY;
+        
         for (n=0;n!==nEntity;n++) {
             checkEntity=this.core.map.entityList.get(n);
             if (checkEntity===entity) continue;
-            if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
+            if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
             
-                // skip if not in the Y of the line
+                // we can only hit the top of something if
+                // our bottom is within the check entity and our top
+                // is above it
 
-            entityTopY=checkEntity.position.y+checkEntity.height;
-            if ((entity.y<(entityTopY-CollisionClass.FLOOR_RISE_HEIGHT)) || (entity.y>=entityTopY)) continue;
+            checkEntityTop=checkEntity.position.y+checkEntity.height;
+            if ((entityTop<=checkEntityTop) || (entityBot>=checkEntityTop) || (entityBot<=checkEntity.position.y)) continue;
 
                 // check the circle
 
             if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
-                if (entityTopY>=y) {
+                if (checkEntityTop>=y) {
                     entity.standOnMeshIdx=-1;
                     entity.standOnEntity=checkEntity;
-                    y=entityTopY;
+                    y=checkEntityTop;
                 }
             }
         }
@@ -487,9 +493,9 @@ export default class CollisionClass
         if ((entity.standOnMeshIdx!==-1) || (entity.standOnEntity!==null)) return(y-entity.position.y);
         
             // if no collisions, return the
-            // farthest part of the ray
+            // current fall
         
-        return(-CollisionClass.FLOOR_RISE_HEIGHT);
+        return(fallY);
     }
     
         //
@@ -500,6 +506,7 @@ export default class CollisionClass
     {
         let n,k,i,y,nMesh,nCollisionTrig;
         let mesh,collisionTrig;
+        let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
         
             // the rough collide boxes
             // we check from the top of the entity past the rise
@@ -524,6 +531,8 @@ export default class CollisionClass
             // start with no hits
        
         entity.collideCeilingMeshIdx=-1;
+        entity.hitHeadOnEntity=false;
+        
         y=(entity.position.y+entity.height)+riseY;
         
             // run through the meshes
@@ -561,8 +570,39 @@ export default class CollisionClass
                 }
             }
         }
+            // run through colliding entities
+            
+        nEntity=this.core.map.entityList.entities.length;
         
-        if (entity.collideCeilingMeshIdx!==-1) return(y-(entity.position.y+entity.height));
+        entityTop=(entity.position.y+entity.height)+riseY;
+        entityBot=entity.position.y+riseY;
+        
+        for (n=0;n!==nEntity;n++) {
+            checkEntity=this.core.map.entityList.get(n);
+            if (checkEntity===entity) continue;
+            if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
+            
+                // we can only hit the bottom of something if
+                // our top is within the check entity and our bottom
+                // is below it
+
+            checkEntityTop=checkEntity.position.y+checkEntity.height;
+            if ((entityBot>=checkEntity.position.y) || (entityTop>=checkEntityTop) || (entityTop<=checkEntity.position.y)) continue;
+
+                // check the circle
+
+            if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
+                if (checkEntity.position.y<=y) {
+                    entity.collideCeilingMeshIdx=-1;
+                    entity.hitHeadOnEntity=checkEntity;
+                    y=checkEntity.position.y;
+                }
+            }
+        }
+        
+            // get how far we've risen (positive, y is up)
+            
+        if ((entity.collideCeilingMeshIdx!==-1) || (entity.hitHeadOnEntity!==null)) return(y-(entity.position.y+entity.height));
         
             // if no collisions, return the riseY
         
@@ -664,7 +704,7 @@ export default class CollisionClass
             entity=this.core.map.entityList.get(n);
             if (entity===sourceEntity) continue;
             if (entity===sourceEntity.heldBy) continue;         // skip source entity and anything holding source entity
-            if ((!entity.show) || (entity.heldBy!==null)) continue;
+            if ((!entity.show) || (entity.passThrough) || (entity.heldBy!==null)) continue;
             
                 // filtering
             
