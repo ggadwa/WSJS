@@ -1,9 +1,11 @@
 - chrome 74 has public/private fields, handle those when released
 
+- sliding is awful (check spiders)
 - bots need X angle targeting
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)
-- need monster AI
-   - activate/stalk
+
+- circleTrigIntersection is bad, big slow down
+- monsters need to pause when past pause distance
 
 - networking
 - combine input / view pause states
