@@ -112,6 +112,23 @@ export default class CollisionTrigClass
         return(!(this.zBound.max<=zLapBound.min));
     }
     
+    rayOverlapBounds(pnt,ray)
+    {
+        let k;
+        
+        k=pnt.x+ray.x;
+        if ((pnt.x<this.xBound.min) && (k<this.xBound.min)) return(false);
+        if ((pnt.x>this.xBound.max) && (k>this.xBound.max)) return(false);
+        
+        k=pnt.y+ray.y;
+        if ((pnt.y<this.yBound.min) && (k<this.yBound.min)) return(false);
+        if ((pnt.y>this.yBound.max) && (k>this.yBound.max)) return(false);
+
+        k=pnt.z+ray.z;
+        if ((pnt.z<this.zBound.min) && (k<this.zBound.min)) return(false);
+        return(!((pnt.z>this.zBound.max) && (k>this.zBound.max)));
+    }
+    
     getReflectionVector(vector)
     {
         if (this.v0.distance(this.v1)>this.v0.distance(this.v2)) {

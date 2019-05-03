@@ -92,7 +92,7 @@ export default class MeshListClass
     }
     
         //
-        // set no/simple collisions for bitmaps
+        // set collision/bump types for meshes
         //
         
     setNoCollisionsForBitmap(bitmap)
@@ -128,6 +128,15 @@ export default class MeshListClass
         
         for (mesh of this.meshes) {
             if (mesh.name.startsWith(name)) mesh.simpleCollisions=true;
+        }
+    }
+        
+    setNoBumpForMeshes(name)
+    {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            if (mesh.name.startsWith(name)) mesh.bump=false;
         }
     }
     

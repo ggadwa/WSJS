@@ -479,6 +479,8 @@ export default class ProjectEntityClass
     
     moveInMapXZ(movePnt,bump,slide)
     {
+        let slideSpeed;
+        
             // clear collisions
             
         this.touchEntity=null;
@@ -502,14 +504,16 @@ export default class ProjectEntityClass
             // try to slide
       
         if (slide) {
-            this.checkMovePnt.setFromValues(movePnt.x,0.0,0.0);
+            slideSpeed=Math.trunc(Math.sqrt((movePnt.x*movePnt.x)+(movePnt.z*movePnt.z)));
+            
+            this.checkMovePnt.setFromValues((Math.sign(movePnt.x)*slideSpeed),0.0,0.0);
 
             if (!this.collision.moveEntityInMap(this,this.checkMovePnt,false)) {
                 this.position.addPointTrunc(this.checkMovePnt);
                 return;
             }
 
-            this.checkMovePnt.setFromValues(0.0,0.0,movePnt.z);
+            this.checkMovePnt.setFromValues(0.0,0.0,(Math.sign(movePnt.z)*slideSpeed));
 
             if (!this.collision.moveEntityInMap(this,this.checkMovePnt,false)) {
                 this.position.addPointTrunc(this.checkMovePnt);

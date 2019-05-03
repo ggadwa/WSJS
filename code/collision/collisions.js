@@ -10,9 +10,10 @@ import CollisionTrigClass from '../collision/collision_trig.js';
 export default class CollisionClass
 {
     static MAX_BUMP_COUNT=2;
-    static FLOOR_RISE_HEIGHT=2000;                // heights we can move up or down on a slanted triangle
-    static COLLISION_FLOOR_MARGIN=10;             // sometimes wall segments can extend a couple pixels off of floors, so this slop fixes getting stuck on edges
-    static COLLISION_SPOKE_COUNT=24;
+    static FLOOR_RISE_HEIGHT=2000;                  // heights we can move up or down on a slanted triangle
+    static COLLISION_SPOKE_COUNT=24;                // how many ray spokes we check collisions across x/z
+    static COLLISION_HEIGHT_SEGMENT_COUNT=4;        // how many segements we check collisions across the height
+    static COLLISION_HEIGHT_MARGIN=10;              // sometimes wall segments can extend a couple pixels off of floors or ceilings, so this slop fixes getting stuck on edges
     
     constructor(core)
     {
@@ -73,7 +74,7 @@ export default class CollisionClass
             // cast rays from the center of the circle
             // like spokes to check for collisions
             
-        let n,k,yAdd,segmentCount,dist;
+        let n,k,yAdd,dist;
         let currentDist=-1;
         
             // always directly out of the center, so
@@ -83,22 +84,23 @@ export default class CollisionClass
         
             // we need to do the height in parts so we
             // hit things collisions up and down the cylinder
-            
-        segmentCount=(high<500)?1:Math.trunc(high/500);
-        yAdd=Math.trunc(high/segmentCount);
+
+        yAdd=Math.trunc((high-(CollisionClass.COLLISION_HEIGHT_MARGIN*2))/CollisionClass.COLLISION_HEIGHT_SEGMENT_COUNT);
 
             // now the spokes across the y
-            // we start up COLLISION_FLOOR_MARGIN because
+            // we start up COLLISION_HEIGHT_MARGIN because
             // sometimes walls can be a couple pixels above floors
             // and we'd get stuck on edges
             
-        this.spokeCenterPnt.setFromValues(circlePnt.x,(circlePnt.y+CollisionClass.COLLISION_FLOOR_MARGIN),circlePnt.z);
+        this.spokeCenterPnt.setFromValues(circlePnt.x,(circlePnt.y+CollisionClass.COLLISION_HEIGHT_MARGIN),circlePnt.z);
             
-        for (n=0;n!==segmentCount;n++) {
+        for (n=0;n!==CollisionClass.COLLISION_HEIGHT_SEGMENT_COUNT;n++) {
  
             for (k=0;k!==CollisionClass.COLLISION_SPOKE_COUNT;k++) {
                 this.rayVector.x=radius*this.spokeCalcSin[k];
                 this.rayVector.z=-(radius*this.spokeCalcCos[k]);
+                
+                if (!collisionTrig.rayOverlapBounds(this.spokeCenterPnt,this.rayVector)) continue;
 
                 if (collisionTrig.rayTrace(this.spokeCenterPnt,this.rayVector,this.rayHitPnt)) {
                     dist=this.spokeCenterPnt.distance(this.rayHitPnt);
@@ -161,26 +163,32 @@ export default class CollisionClass
             z2=circlePnt.z-(radius*this.spokeCalcCos[k]);
             
             this.tempCollisionTrig.resetFromValues(x1,circlePnt.y,z1,x1,ty,z1,x2,ty,z2);
-            if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,this.rayHitPnt)) {
-                dist=rayPnt.distance(this.rayHitPnt);
-                if (dist>rayDist) continue;
-                
-                if ((dist<currentDist) || (currentDist===-1)) {
-                    intersectPnt.setFromPoint(this.rayHitPnt);
-                    currentDist=dist;
+            
+            if (this.tempCollisionTrig.rayOverlapBounds(rayPnt,rayVector)) {
+                if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,this.rayHitPnt)) {
+                    dist=rayPnt.distance(this.rayHitPnt);
+                    if (dist>rayDist) continue;
+
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        intersectPnt.setFromPoint(this.rayHitPnt);
+                        currentDist=dist;
+                    }
+
+                    continue;           // if it hits one triangle, we are done with the quad
                 }
-                
-                continue;           // if it hits one triangle, we are done with the quad
             }
             
             this.tempCollisionTrig.resetFromValues(x1,circlePnt.y,z1,x2,ty,z2,x2,circlePnt.y,z2);
-            if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,this.rayHitPnt)) {
-                dist=rayPnt.distance(this.rayHitPnt);
-                if (dist>rayDist) continue;
-                
-                if ((dist<currentDist) || (currentDist===-1)) {
-                    intersectPnt.setFromPoint(this.rayHitPnt);
-                    currentDist=dist;
+            
+            if (this.tempCollisionTrig.rayOverlapBounds(rayPnt,rayVector)) {
+                if (this.tempCollisionTrig.rayTrace(rayPnt,rayVector,this.rayHitPnt)) {
+                    dist=rayPnt.distance(this.rayHitPnt);
+                    if (dist>rayDist) continue;
+
+                    if ((dist<currentDist) || (currentDist===-1)) {
+                        intersectPnt.setFromPoint(this.rayHitPnt);
+                        currentDist=dist;
+                    }
                 }
             }
         }
@@ -202,7 +210,7 @@ export default class CollisionClass
         let nMesh=this.core.map.meshList.meshes.length;
         let nEntity=this.core.map.entityList.count();
         
-            // only bump once
+            // keep a bump count
             
         let bumpCount=0;
         let bumpY,entityTopY;
@@ -265,7 +273,9 @@ export default class CollisionClass
                         entity.collideWallTrigIdx=k;
                         
                         bumpY=-1;
-                        if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=entity.bumpHeight) bumpY=collisionTrig.yBound.max;
+                        if (mesh.bump) {
+                            if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=entity.bumpHeight) bumpY=collisionTrig.yBound.max;
+                        }
                     }
                 }
             }

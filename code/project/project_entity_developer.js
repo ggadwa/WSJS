@@ -46,7 +46,9 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             }
         }
         
-        if (str!=='') console.info('mesh='+str);
+        if (str!=='') console.info('hit mesh='+str);
+        
+        if (this.standOnMeshIdx!==-1) console.info('stand mesh='+this.core.map.meshList.meshes[this.standOnMeshIdx].name);
     }
     
         //
