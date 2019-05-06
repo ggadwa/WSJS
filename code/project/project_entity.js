@@ -246,15 +246,8 @@ export default class ProjectEntityClass
         entity.heldBy=this;
     }
         
-    isEntityInRange(name,dist)
+    isEntityInRange(entity,dist)
     {
-        let entity=this.core.map.entityList.find(name);
-        
-        if (entity===null) {
-            console.log('Unable to find entity '+name);
-            return(false);
-        }
-        
         return(entity.position.distance(this.position)<dist);
     }
     
@@ -306,6 +299,16 @@ export default class ProjectEntityClass
     addInterfaceText(id,text,x,y,fontSize,align,color,alpha)
     {
         this.core.interface.addText(id,text,x,y,fontSize,align,color,alpha);
+    }
+    
+    removeInterfaceText(id)
+    {
+        this.core.interface.removeText(id);
+    }
+    
+    showInterfaceText(id,show)
+    {
+        this.core.interface.showText(id,show);
     }
     
     updateInterfaceText(id,str)

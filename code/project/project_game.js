@@ -55,6 +55,16 @@ export default class ProjectGameClass
         this.core.interface.addText(id,text,x,y,fontSize,align,color,alpha);
     }
     
+    removeInterfaceText(id)
+    {
+        this.core.interface.removeText(id);
+    }
+    
+    showInterfaceText(id,show)
+    {
+        this.core.interface.showText(id,show);
+    }
+    
     updateInterfaceText(id,str)
     {
         this.core.interface.updateText(id,str);

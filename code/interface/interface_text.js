@@ -30,6 +30,8 @@ export default class InterfaceTextClass
         this.align=align;
         this.color=color;
         this.alpha=alpha;
+        
+        this.show=true;
                 
             // character drawing arrays
             
@@ -291,6 +293,8 @@ export default class InterfaceTextClass
     
     draw()
     {
+        if (!this.show) return;
+        
         this.drawSingle(1,1,this.fontShadowColor);
         this.drawSingle(0,0,null);
     }

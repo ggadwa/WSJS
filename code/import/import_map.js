@@ -64,6 +64,16 @@ export default class ImportMapClass
             
             for (n=0;n!==importSettings.lights.length;n++) {
                 lightDef=importSettings.lights[n];
+                
+                    // positioned
+                    
+                if (lightDef.position!==undefined) {
+                    light=new LightClass(new PointClass(lightDef.position.x,lightDef.position.y,lightDef.position.z),new ColorClass(lightDef.color.r,lightDef.color.g,lightDef.color.b),lightDef.intensity,lightDef.exponent);
+                    this.core.map.lightList.add(light);
+                    continue;
+                }
+                
+                    // positioned from a mesh
 
                 idx=this.core.map.meshList.find(lightDef.mesh);
                 if (idx===-1) {

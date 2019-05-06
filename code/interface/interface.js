@@ -108,10 +108,26 @@ export default class InterfaceClass
     
     addText(id,str,x,y,fontSize,align,color,alpha)
     {
-        let text=new InterfaceTextClass(this.core,str,x,y,fontSize,align,color,alpha);
+        let text=new InterfaceTextClass(this.core,(''+str),x,y,fontSize,align,color,alpha);
         
         text.initialize();
         this.texts.set(id,text);
+    }
+    
+    removeText(id)
+    {
+        let text;
+                
+        text=this.texts.get(id);
+        if (text!==undefined) {
+            text.release();
+            this.texts.delete(id);
+        }
+    }
+    
+    showText(id,show)
+    {
+        this.texts.get(id).show=show;
     }
     
     updateText(id,str)
