@@ -1,11 +1,13 @@
 - chrome 74 has public/private fields, handle those when released
 
-- bots need X angle targeting
+- player needs to keep falling like bots
+- scores in multiplayer
+- armor
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)
-
+- rotating items need to push entities
+- need (and remember) interface for mouse acceleration, etc
 - networking
 - combine input / view pause states
-
 - swimming is broken
 - sort effects, will need a sort z call into the effect
 - liquids need to draw away from z

@@ -73,6 +73,7 @@ export default class ProjectEntityClass
             
         this.debugPlayerNoClip=false;
         this.debugPlayerFly=false;
+        this.debugNoDamage=false;
         
         // no seal, as this object is extended
     }
@@ -595,6 +596,14 @@ export default class ProjectEntityClass
         }
         
         return(movePnt.y);
+    }
+    
+    simpleMoveEntityInMap(movePnt)
+    {
+        if (this.collision.simpleMoveEntityInMap(this,movePnt)) return(true);
+        
+        this.position.addPointTrunc(movePnt);
+        return(false);
     }
     
         //

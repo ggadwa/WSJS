@@ -741,5 +741,90 @@ export default class CollisionClass
             
         return(currentDist!==-1);
     }
+
+    
+        //
+        // simple collisions
+        // useful for things like simple projectiles
+        //
+    
+    simpleMoveEntityInMap(entity,movePnt)
+    {
+        let n,k;
+        let mesh,checkEntity,entityTopY;
+        let collisionTrig,nCollisionTrig;
+        
+        let nMesh=this.core.map.meshList.meshes.length;
+        let nEntity=this.core.map.entityList.count();
+        
+        entity.touchEntity=null;
+        
+            // the moved point
+            
+        this.entityTestPnt.setFromValues((entity.position.x+movePnt.x),(entity.position.y+movePnt.y),(entity.position.z+movePnt.z));
+        
+            // the rough collide boxes
+            
+        this.objXBound.setFromValues((this.entityTestPnt.x-entity.radius),(this.entityTestPnt.x+entity.radius));
+        this.objYBound.setFromValues(this.entityTestPnt.y,(this.entityTestPnt.y+entity.height));
+        this.objZBound.setFromValues((this.entityTestPnt.z-entity.radius),(this.entityTestPnt.z+entity.radius));
+            
+            // run through the meshes and
+            // rough check trig collision boxes
+
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.core.map.meshList.meshes[n];
+            if (mesh.noCollisions) continue;
+
+                // skip any mesh we don't collide with
+
+            if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                // check the collision trigs
+
+            nCollisionTrig=mesh.collisionWallTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionWallTrigs[k];
+                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) return(true);
+            }
+            
+            nCollisionTrig=mesh.collisionFloorTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionFloorTrigs[k];
+                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) return(true);
+            }
+            
+            nCollisionTrig=mesh.collisionCeilingTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionCeilingTrigs[k];
+                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) return(true);
+            }
+        }
+            
+            // check other entities
+
+        for (n=0;n!==nEntity;n++) {
+            checkEntity=this.core.map.entityList.get(n);
+            if (checkEntity===entity) continue;
+            if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
+
+                // skip if not in the Y of the line
+
+            entityTopY=checkEntity.position.y+checkEntity.height;
+            if (((this.entityTestPnt.y+entity.height)<checkEntity.position.y) || (this.entityTestPnt.y>=entityTopY)) continue;
+
+                // check the circle
+
+            if (this.circleCircleIntersection(this.entityTestPnt,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
+                entity.touchEntity=checkEntity;
+                return(true);
+            }
+        }
+            
+        return(false);
+    }
     
 }

@@ -496,6 +496,19 @@ export default class PointClass
         return(fang);
     }
     
+    getLookAngleTo(pnt)
+    {
+            // do this in 2D space as it doesn't matter what
+            // the rotation is or getting numbers outside
+            // of 180, just the look angle
+             
+        let dx=pnt.x-this.x;
+        let dz=pnt.z-this.z;
+        let x=Math.sqrt((dx*dx)+(dz*dz));
+        
+        return((Math.atan2(0,x)-Math.atan2((pnt.y-this.y),x))*PointClass.RAD_TO_DEGREE);
+    }
+    
     turnYTowards(toY,speed)
     {
         let subway,addway;

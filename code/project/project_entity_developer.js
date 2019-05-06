@@ -324,6 +324,14 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
             console.info('draw collision surfaces='+this.core.debugCollisionSurfaces);
         }
         
+            // home turns off damage
+            
+        if (input.keyFlags[36]) {
+            input.keyFlags[36]=false;
+            this.debugNoDamage=!this.debugNoDamage;
+            console.info('no damage='+this.debugNoDamage);
+        }
+        
             // path editing
             
         if (this.core.debugPaths) this.pathEditor();
