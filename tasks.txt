@@ -1,7 +1,7 @@
 
 
 - player hurt noise
-- armor model
+- stop getting popped up by other models running over you
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)
 - rotating items need to push entities
 - setup part of html (with name, server url, sliders)
