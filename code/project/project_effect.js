@@ -32,6 +32,8 @@ export default class ProjectEffectClass
         this.position=new PointClass(0,0,0);
         this.show=true;
         
+        this.setupOK=true;      // a flag to tell when drawSetup() returns FALSE as drawSetup and draw are done separately
+        
         this.vertexes=null;
         this.uvs=null;
         this.indexes=null;

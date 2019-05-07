@@ -60,6 +60,7 @@ export default class CoreClass
             // input
             
         this.input=new InputClass(this);
+        this.input.initialize();
         
             // pause flag
             
@@ -122,15 +123,14 @@ export default class CoreClass
             // main loop
 
         this.timestamp=0;
-        this.physicsTick=0;
-        this.drawTick=0;
+        this.lastTimestamp=Math.trunc(window.performance.now());
 
         this.loopCancel=false;
         
+        this.physicsTick=0;
         this.lastPhysicTimestamp=0;
-        this.lastPhysicTimestampPauseOffset=0;
+        this.drawTick=0;
         this.lastDrawTimestamp=0;
-        this.lastDrawTimestampPauseOffset=0;
         
             // triggers
             
@@ -311,46 +311,78 @@ export default class CoreClass
         // pause state
         //
     
+    // supergumba -- move this
+    
+    openSettings()
+    {
+        let div=document.createElement('div');
+        div.id='settingPane';
+        div.style.position='absolute';
+        div.style.left='calc(50% - 400px)';
+        div.style.top='calc(50% - 250px)';
+        div.style.width='800px';
+        div.style.height='500px';
+        div.style.backgroundColor='#EEEEEE';
+        div.style.border='1px solid #0000AA';
+        div.style.opacity='0.8';
+        
+        document.body.appendChild(div);
+    }
+    
+    closeSettings()
+    {
+        document.body.removeChild(document.getElementById('settingPane'));
+    }
+    
     setPauseState(pause,initState)
     {
-        let timestamp;
-        
             // set the state
 
         this.paused=pause;
         
-            // current timestamp
-            
-        timestamp=Math.trunc(window.performance.now());
+            // if unpausing, reset the last timestamp
+         
+        if (!pause) this.lastTimestamp=Math.trunc(window.performance.now());
         
-            // if going into pause, we need
-            // to remember the time stamp offsets
-            // so they can be restored
+            // if we are leaving pause, turn
+            // off pause window
+            
+        if (!pause) this.closeSettings();
+        
+            // if this is the init state, then we
+            // start the stamps at 0
         
         if (initState) {
-            this.lastPhysicTimestampPauseOffset=0;
-            this.lastDrawTimestampPauseOffset=0;
+            this.lastPhysicTimestamp=0;
+            this.lastDrawTimestamp=0;
         }
-        else {
-            if (pause) {
-                this.lastPhysicTimestampPauseOffset=timestamp-this.lastPhysicTimestamp;
-                this.lastDrawTimestampPauseOffset=timestamp-this.lastDrawTimestamp;
-            }
-        }
-        
-            // reset the timing to this timestamp
-            
-        this.timestamp=timestamp;
-
-        this.lastPhysicTimestamp=timestamp+this.lastPhysicTimestampPauseOffset;
-        this.lastDrawTimestamp=timestamp+this.lastDrawTimestampPauseOffset;
 
             // start the fps over again
             
         this.fps=0.0;
         this.fpsTotal=0;
         this.fpsCount=0;
-        this.fpsStartTimestamp=timestamp;
+        this.fpsStartTimestamp=-1;
+        
+            // always draw once if we
+            // are going into a pause
+            
+        if (pause) this.draw();
+        
+            // turn on/off the input
+        
+        if (pause) {    
+            this.input.stopInput();
+            this.canvas.onclick=this.setPauseState.bind(this,false,false);    // the click to restart
+        }
+        else {
+            this.canvas.onclick=null;
+            this.input.startInput();
+        }
+        
+            // if going into pause, open the settings
+            
+        if (pause) this.openSettings();
     }
     
         //
@@ -456,6 +488,15 @@ export default class CoreClass
         this.billboardMatrix.setRotationFromYAngle(this.camera.angle.y);
         this.eyeRotMatrix.setRotationFromXAngle(this.camera.angle.x);
         this.billboardMatrix.multiply(this.eyeRotMatrix);
+
+            // build the culling frustum
+
+        this.buildCullingFrustum();
+        
+            // run the effect draw setups first
+            // so lighting positions are set
+            
+        this.map.effectList.drawSetup();
         
             // convert view lights to shader lights
             // all lights need a eye coordinate, so calc
@@ -478,10 +519,6 @@ export default class CoreClass
             light=this.lights[n];
             if (light!==null) this.convertToEyeCoordinates(light.position,light.eyePosition);
         }
-
-            // build the culling frustum
-
-        this.buildCullingFrustum();
         
             // reset some stats
             

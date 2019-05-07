@@ -1,12 +1,13 @@
 
+- mouse wheel seems broken (windows?  Chrome?  Was working)
 
+- pause needs a setup screen (get rid of pause message)
 - player hurt noise
 - stop getting popped up by other models running over you
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)
 - rotating items need to push entities
-- setup part of html (with name, server url, sliders)
 - networking
-- combine input / view pause states
+
 - swimming is broken
 - sort effects, will need a sort z call into the effect
 - liquids need to draw away from z

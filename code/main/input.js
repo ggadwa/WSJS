@@ -10,10 +10,6 @@ export default class InputClass
     {
         this.core=core;
 
-            // the single player entity
-            
-        this.playerEntity=null;
-
             // input flags
 
         this.eventsAttached=false;
@@ -49,14 +45,8 @@ export default class InputClass
         // initialize/release input
         //
 
-    initialize(playerEntity)
+    initialize()
     {
-            // set to player entity
-            
-        this.playerEntity=playerEntity;
-
-            // clear any flags
-
         this.keyClear();
         this.mouseButtonClear();
     }
@@ -70,43 +60,26 @@ export default class InputClass
     }
     
         //
-        // pause state
+        // endable/disable input
         //
         
-    clickResume()
+    startInput()
     {
-        this.core.setPauseState(false,false);
-        this.setPauseState(false);
+        this.core.canvas.onclick=null;
+
+            // attach events
+
+        this.keyStart();
+        this.mouseStart();
+        this.eventsAttached=true;
     }
         
-    setPauseState(pause)
+    stopInput()
     {
-        if (pause) {
-            
-                // unattach any events
-                
-            if (this.eventsAttached) {
-                this.keyEnd();
-                this.mouseEnd();
-                this.eventsAttached=false;
-            }
-            
-                // and make sure a click
-                // unpaused
-                
-            this.core.canvas.onclick=this.clickResume.bind(this);
-        }
-        else {
-            
-                // clear the unpause click
-                
-            this.core.canvas.onclick=null;
-            
-                // attach events
-                
-            this.keyStart();
-            this.mouseStart();
-            this.eventsAttached=true;
+        if (this.eventsAttached) {
+            this.keyEnd();
+            this.mouseEnd();
+            this.eventsAttached=false;
         }
     }
     
@@ -217,8 +190,8 @@ export default class InputClass
             document.removeEventListener('mouseup',this.mouseUpListener,false);
             document.removeEventListener('wheel',this.mouseWheelListener,false);
             document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            this.core.setPauseState(true,false);       // go into pause
-            this.setPauseState(true);
+            
+            this.core.setPauseState(true,false);            // a pointer lock release auto pauses the game
         }
     }
     

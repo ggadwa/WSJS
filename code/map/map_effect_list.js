@@ -46,6 +46,8 @@ export default class MapEffectListClass
     
         //
         // lights from effects
+        // we need to run all the drawsetups before this
+        // so intensity/positioning are all set
         //
         
     addLightsToViewLights()
@@ -96,6 +98,22 @@ export default class MapEffectListClass
             }
         }
     }
+    
+        //
+        // run all the draw setups, we do this
+        // so lights and position can get setup
+        // before we run the lights
+        //
+        
+    drawSetup()
+    {
+        let effect;
+        
+        for (effect of this.effects) {
+            if (!effect.show) continue;
+            effect.setupOK=effect.drawSetup();
+        }
+    }
         
         //
         // draw all effects
@@ -106,9 +124,7 @@ export default class MapEffectListClass
         let effect;
         
         for (effect of this.effects) {
-            if (!effect.show) continue;
-            
-            if (effect.drawSetup()) effect.draw();
+            if ((effect.show) && (effect.setupOK)) effect.draw();
         }
     }
 

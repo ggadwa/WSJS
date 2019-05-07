@@ -143,7 +143,6 @@ class MainClass
             // start the main loop in paused mode
 
         this.core.setPauseState(true,true);
-        this.core.input.setPauseState(true);
         
             // and now start the loop
             
@@ -170,7 +169,7 @@ const BAIL_MILLISECONDS=5000;
 
 function mainLoop(timestamp)
 {
-    let fpsTime;
+    let fpsTime,tick;
     let core=main.core;
     let map=core.map;
     
@@ -179,9 +178,18 @@ function mainLoop(timestamp)
     if (core.loopCancel) return;
     window.requestAnimationFrame(mainLoop);
     
-        // get integer msec timestamp
+        // if paused, nothing to do
+        
+    if (core.paused) return;
     
-    core.timestamp=Math.trunc(timestamp);
+        // recalculate the timestamp by adding
+        // offset from last time we calculated it
+        // this seems odd but it's so we can pause
+        // without jumps in the timestamp
+        
+    tick=Math.trunc(window.performance.now());
+    core.timestamp+=(tick-core.lastTimestamp);
+    core.lastTimestamp=tick;
     
         // map movement, entities, and
         // other physics, we only do this if we've
@@ -190,31 +198,29 @@ function mainLoop(timestamp)
         // this timing needs to be precise so
         // physics remains constants
     
-    if (!core.paused) {
-        core.physicsTick=core.timestamp-core.lastPhysicTimestamp;
+    core.physicsTick=core.timestamp-core.lastPhysicTimestamp;
 
-        if (core.physicsTick>PHYSICS_MILLISECONDS) {
+    if (core.physicsTick>PHYSICS_MILLISECONDS) {
 
-            if (core.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
+        if (core.physicsTick<BAIL_MILLISECONDS) {       // this is a temporary bail measure in case something held the browser up for a long time
 
-                while (core.physicsTick>PHYSICS_MILLISECONDS) {
-                    core.physicsTick-=PHYSICS_MILLISECONDS;
-                    core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
+            while (core.physicsTick>PHYSICS_MILLISECONDS) {
+                core.physicsTick-=PHYSICS_MILLISECONDS;
+                core.lastPhysicTimestamp+=PHYSICS_MILLISECONDS;
 
-                    map.movementList.run();
-                    core.projectGame.run();
-                    map.entityList.run();
-                }
+                map.movementList.run();
+                core.projectGame.run();
+                map.entityList.run();
             }
-            else {
-                core.lastPhysicTimestamp=core.timestamp;
-            }
-
-                // update the listener and all current
-                // playing sound positions
-                
-            core.soundList.updateListener();
         }
+        else {
+            core.lastPhysicTimestamp=core.timestamp;
+        }
+
+            // update the listener and all current
+            // playing sound positions
+
+        core.soundList.updateListener();
     }
     
         // drawing
@@ -234,16 +240,16 @@ function mainLoop(timestamp)
     }
     
         // the fps
+        
+    if (core.fpsStartTimestamp===-1) core.fpsStartTimestamp=core.timestamp; // a reset from paused state
     
-    if (!core.paused) {
-        fpsTime=core.timestamp-core.fpsStartTimestamp;
-        if (fpsTime>=1000) {
-            core.fps=(core.fpsCount*1000.0)/core.fpsTotal;
-            core.fpsStartTimestamp=core.timestamp;
+    fpsTime=core.timestamp-core.fpsStartTimestamp;
+    if (fpsTime>=1000) {
+        core.fps=(core.fpsCount*1000.0)/core.fpsTotal;
+        core.fpsStartTimestamp=core.timestamp;
 
-            core.fpsTotal=0;
-            core.fpsCount=0;
-        }
+        core.fpsTotal=0;
+        core.fpsCount=0;
     }
 }
 
