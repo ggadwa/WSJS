@@ -54,7 +54,7 @@ export default class SoundPlayClass
             
         if ((entity===null) && (mesh===null)) {
             this.gainNode=ctx.createGain();
-            this.gainNode.gain.value=this.soundList.soundVolume;
+            this.gainNode.gain.value=this.soundList.core.settings.setup.soundVolume;
         
             this.sourceNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);
@@ -89,7 +89,7 @@ export default class SoundPlayClass
             this.sourceNode.connect(this.pannerNode);
             
             this.gainNode=ctx.createGain();
-            this.gainNode.gain.value=this.soundList.soundVolume;
+            this.gainNode.gain.value=this.soundList.core.settings.setup.soundVolume;
 
             this.pannerNode.connect(this.gainNode);
             this.gainNode.connect(ctx.destination);

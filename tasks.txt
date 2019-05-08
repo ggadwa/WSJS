@@ -1,7 +1,5 @@
 
-- mouse wheel seems broken (windows?  Chrome?  Was working)
-
-- pause needs a setup screen (get rid of pause message)
+- rigid bodies
 - player hurt noise
 - stop getting popped up by other models running over you
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)

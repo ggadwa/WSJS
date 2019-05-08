@@ -24,11 +24,6 @@ export default class SoundListClass
         this.currentListenerEntity=null;
         this.listenerForwardVector=new PointClass(0.0,0.0,1.0);            // local to global to avoid GC
         
-            // volumes
-            
-        this.soundVolume=0.3;
-        this.musicVolume=0.3;
-        
             // playing sounds
 
         this.soundPlays=null;

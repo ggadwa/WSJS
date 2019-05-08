@@ -249,34 +249,4 @@ export default class InterfaceClass
         gl.disable(gl.BLEND);
         gl.enable(gl.DEPTH_TEST);
     }
-        
-    drawPauseMessage()
-    {
-        let text;
-        let x=Math.trunc(this.core.wid*0.5);
-        let y=Math.trunc(this.core.high*0.5);
-        let gl=this.core.gl;
-        
-        gl.disable(gl.DEPTH_TEST);
-
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-        this.core.shaderList.textShader.drawStart();
-        
-        text=new InterfaceTextClass(this.core,'Paused',x,(y-20),48,InterfaceTextClass.TEXT_ALIGN_CENTER,this.uiTextColor,1);
-        text.initialize();
-        text.draw();
-        text.release();
-        
-        text=new InterfaceTextClass(this.core,'click to start - esc to pause',x,(y+20),36,InterfaceTextClass.TEXT_ALIGN_CENTER,this.uiTextColor,1);
-        text.initialize();
-        text.draw();
-        text.release();
-        
-        this.core.shaderList.textShader.drawEnd();
-
-        gl.disable(gl.BLEND);
-        gl.enable(gl.DEPTH_TEST);
-    }
 }

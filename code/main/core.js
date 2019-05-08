@@ -13,6 +13,7 @@ import Matrix3Class from '../utility/matrix3.js';
 import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
 import InterfaceClass from '../interface/interface.js';
+import SettingsClass from '../main/settings.js';
 
 //
 // core class
@@ -119,6 +120,8 @@ export default class CoreClass
         this.text=null;
         this.interface=null;
         this.camera=null;
+        this.setup=null;
+        this.settings=null;
 
             // main loop
 
@@ -239,14 +242,14 @@ export default class CoreClass
         this.modelList=new ModelListClass(this);
         this.modelList.initialize();
         
-            // create needed objects
+            // create misc objects
             
         this.interface=new InterfaceClass(this);
-        this.camera=new CameraClass();
-
-            // interface object
-
         if (!this.interface.initialize()) return;
+        
+        this.camera=new CameraClass();
+        
+        this.settings=new SettingsClass(this);
     }
 
     release()
@@ -311,29 +314,6 @@ export default class CoreClass
         // pause state
         //
     
-    // supergumba -- move this
-    
-    openSettings()
-    {
-        let div=document.createElement('div');
-        div.id='settingPane';
-        div.style.position='absolute';
-        div.style.left='calc(50% - 400px)';
-        div.style.top='calc(50% - 250px)';
-        div.style.width='800px';
-        div.style.height='500px';
-        div.style.backgroundColor='#EEEEEE';
-        div.style.border='1px solid #0000AA';
-        div.style.opacity='0.8';
-        
-        document.body.appendChild(div);
-    }
-    
-    closeSettings()
-    {
-        document.body.removeChild(document.getElementById('settingPane'));
-    }
-    
     setPauseState(pause,initState)
     {
             // set the state
@@ -347,7 +327,7 @@ export default class CoreClass
             // if we are leaving pause, turn
             // off pause window
             
-        if (!pause) this.closeSettings();
+        if (!pause) this.settings.close();
         
             // if this is the init state, then we
             // start the stamps at 0
@@ -382,7 +362,7 @@ export default class CoreClass
         
             // if going into pause, open the settings
             
-        if (pause) this.openSettings();
+        if (pause) this.settings.open();
     }
     
         //
@@ -561,7 +541,6 @@ export default class CoreClass
             // interface
             
         this.interface.draw();
-        if (this.paused) this.interface.drawPauseMessage();
     }
     
         //

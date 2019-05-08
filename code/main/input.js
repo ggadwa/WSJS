@@ -182,7 +182,7 @@ export default class InputClass
         if (document.pointerLockElement===this.core.canvas) {
             document.addEventListener('mousedown',this.mouseDownListener,false);
             document.addEventListener('mouseup',this.mouseUpListener,false);
-            document.addEventListener('wheel',this.mouseWheelListener,{passive:false});     // stop it from scrolling the page
+            document.addEventListener('wheel',this.mouseWheelListener,false);
             document.addEventListener('mousemove',this.mouseMovedListener,false);
         }
         else {
@@ -214,11 +214,9 @@ export default class InputClass
     {
         let deltaY=event.deltaY;
         
-        event.preventDefault();
-        event.stopPropagation();
-        
-            // for OS X, don't register if we aren't at least
+            // don't register if we aren't at least
             // at 4 clicks because of the smooth scrolling
+            // this is mostly a catch for OS X
             
         if (Math.abs(deltaY)<4) return;
         

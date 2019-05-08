@@ -93,6 +93,15 @@ export default class ProjectEntityClass
     }
     
         //
+        // general setup
+        //
+        
+    getSetup()
+    {
+        return(this.core.settings.setup);
+    }
+    
+        //
         // meshes and liquids
         //
         
