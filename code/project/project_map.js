@@ -20,6 +20,20 @@ export default class ProjectMapClass
     }
     
         //
+        // general info
+        //
+        
+    getSetup()
+    {
+        return(this.core.setup);
+    }
+    
+    getCamera()
+    {
+        return(this.core.camera);
+    }
+    
+        //
         // override this give the import settings
         // for this map
         //

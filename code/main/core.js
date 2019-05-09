@@ -13,7 +13,8 @@ import Matrix3Class from '../utility/matrix3.js';
 import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
 import InterfaceClass from '../interface/interface.js';
-import SettingsClass from '../main/settings.js';
+import SetupClass from '../main/setup.js';
+import SettingsDialogClass from '../main/settings_dialog.js';
 
 //
 // core class
@@ -32,6 +33,8 @@ export default class CoreClass
             preserveDrawingBuffer:true,
             failIfMajorPerformanceCaveat:false
         }; 
+        
+    gameName='unknown';
    
     constructor()
     {
@@ -68,10 +71,6 @@ export default class CoreClass
         this.paused=true;
         
             // the core setup
-
-        this.OPENGL_FOV=55.0;
-        this.OPENGL_NEAR_Z=500;
-        this.OPENGL_FAR_Z=300000;
 
         this.wid=0;
         this.high=0;
@@ -247,9 +246,10 @@ export default class CoreClass
         this.interface=new InterfaceClass(this);
         if (!this.interface.initialize()) return;
         
-        this.camera=new CameraClass();
+        this.camera=new CameraClass(this);
         
-        this.settings=new SettingsClass(this);
+        this.setup=SetupClass.load(this);
+        this.settings=new SettingsDialogClass(this);
     }
 
     release()
@@ -424,20 +424,20 @@ export default class CoreClass
             
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
         
-            // setup the view camera to be
-            // equal to player object
+            // setup the view camera based on
+            // the camera settings and the camera entity
             
-        this.camera.setToEntity(player,player.eyeOffset);
+        this.camera.setup(player);
 
             // create the perspective matrix
             // note this function has a translate in it for NEAR_Z
 
-        this.perspectiveMatrix.setPerspectiveMatrix(this.OPENGL_FOV,this.aspect,this.OPENGL_NEAR_Z,this.OPENGL_FAR_Z);
+        this.perspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,this.aspect,this.camera.glNearZ,this.camera.glFarZ);
 
-            // the eye point is -this.OPENGL_NEAR_Z behind
+            // the eye point is -this.camera.glNearZ behind
             // the player
 
-        this.eyePos.setFromValues(0,0,-this.OPENGL_NEAR_Z);
+        this.eyePos.setFromValues(0,0,-this.camera.glNearZ);
         this.eyeRotMatrix.setTranslationFromPoint(this.camera.position);
         this.eyeRotMatrix2.setRotationFromYAngle(this.camera.angle.y);
         this.eyeRotMatrix.multiply(this.eyeRotMatrix2);
@@ -454,7 +454,7 @@ export default class CoreClass
             // camera space view matrix
             // (for things like weapons)
             
-        this.cameraSpaceEyePos=new PointClass(0,0,-this.OPENGL_NEAR_Z);
+        this.cameraSpaceEyePos=new PointClass(0,0,-this.camera.glNearZ);
         this.cameraSpacePos=new PointClass(0,0,0);
         this.cameraSpaceViewMatrix.setLookAtMatrix(this.cameraSpaceEyePos,this.cameraSpacePos,this.lookAtUpVector);
 

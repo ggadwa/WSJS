@@ -11,6 +11,31 @@ export default class ProjectGameClass
     }
     
         //
+        // override this to set the name of this game
+        // this is needed so local storage saves can have
+        // different names
+        //
+        
+    getName()
+    {
+        return('unknown');
+    }
+    
+        //
+        // general info
+        //
+        
+    getSetup()
+    {
+        return(this.core.setup);
+    }
+    
+    getCamera()
+    {
+        return(this.core.camera);
+    }
+    
+        //
         // create maps
         //
         

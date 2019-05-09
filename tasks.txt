@@ -1,5 +1,5 @@
 
-- rigid bodies
+
 - player hurt noise
 - stop getting popped up by other models running over you
 - bots need to get unstuck (put node by platforms, go to nearest node if stuck)

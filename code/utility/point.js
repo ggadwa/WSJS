@@ -40,6 +40,13 @@ export default class PointClass
         this.z=pt1.z-pt2.z;
     }
     
+    setFromInvertPoint(pnt)
+    {
+        this.x=-pnt.x;
+        this.y=-pnt.y;
+        this.z=-pnt.z;
+    }
+    
     setFromCross(pt1,pt2)
     {
         this.x=pt1.x;

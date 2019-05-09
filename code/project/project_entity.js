@@ -93,12 +93,17 @@ export default class ProjectEntityClass
     }
     
         //
-        // general setup
+        // general info
         //
         
     getSetup()
     {
-        return(this.core.settings.setup);
+        return(this.core.setup);
+    }
+    
+    getCamera()
+    {
+        return(this.core.camera);
     }
     
         //
@@ -692,12 +697,17 @@ export default class ProjectEntityClass
     }
     
         //
-        // ray trace utilities
+        // collision utilities
         //
         
     rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter)
     {
-        return(this.collision.rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter,this));
+        return(this.collision.rayCollision(this,pnt,vector,hitPnt,hitFilter,skipFilter));
+    }
+    
+    getRigidBodyAngle(pointOffset,maxDrop,maxAngle)
+    {
+        return(this.collision.getRigidBodyAngle(this,pointOffset,maxDrop,maxAngle));
     }
     
         //

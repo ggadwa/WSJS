@@ -34,6 +34,10 @@ export default class CollisionClass
         
         this.rayVector=new PointClass(0,0,0);
         
+        this.rigidPnt=new PointClass(0,0,0);
+        this.rigidVector=new PointClass(0,0,0);
+        this.rigidHitPnt=new PointClass(0,0,0);
+        
         this.tempCollisionTrig=new CollisionTrigClass(new PointClass(0,0,0),new PointClass(0,0,0),new PointClass(0,0,0));
         
         this.objXBound=new BoundClass(0,0);
@@ -624,10 +628,10 @@ export default class CollisionClass
         // mostly for hit scans
         //
         
-    rayCollision(pnt,vector,hitPnt,hitFilter,skipFilter,sourceEntity)
+    rayCollision(entity,pnt,vector,hitPnt,hitFilter,skipFilter)
     {
         let n,k;
-        let mesh,entity;
+        let mesh,checkEntity;
         let collisionTrig,nCollisionTrig;              
         let dist,currentDist;
         
@@ -643,7 +647,7 @@ export default class CollisionClass
             // no collisions yet
 
         currentDist=-1;
-        sourceEntity.hitEntity=null;
+        entity.hitEntity=null;
 
             // run through the meshes and
             // check against all trigs
@@ -711,26 +715,26 @@ export default class CollisionClass
             // check entities
             
         for (n=0;n!==nEntity;n++) {
-            entity=this.core.map.entityList.get(n);
-            if (entity===sourceEntity) continue;
-            if (entity===sourceEntity.heldBy) continue;         // skip source entity and anything holding source entity
-            if ((!entity.show) || (entity.passThrough) || (entity.heldBy!==null)) continue;
+            checkEntity=this.core.map.entityList.get(n);
+            if (checkEntity===entity) continue;
+            if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
+            if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
             
                 // filtering
             
             if (hitFilter!==null) {
-                if (hitFilter.indexOf(entity.filter)===-1) continue;
+                if (hitFilter.indexOf(checkEntity.filter)===-1) continue;
             }    
             if (skipFilter!==null) {
-                if (skipFilter.indexOf(entity.filter)!==-1) continue;
+                if (skipFilter.indexOf(checkEntity.filter)!==-1) continue;
             }
             
                 // run the collision
                 
-            if (this.rayCylinderIntersection(pnt,vector,entity.position,entity.radius,entity.height,this.rayIntersectPnt)) {
+            if (this.rayCylinderIntersection(pnt,vector,checkEntity.position,checkEntity.radius,checkEntity.height,this.rayIntersectPnt)) {
                 dist=pnt.distance(this.rayIntersectPnt);
                 if ((dist<currentDist) || (currentDist===-1)) {
-                    sourceEntity.hitEntity=entity;
+                    entity.hitEntity=checkEntity;
                     hitPnt.setFromPoint(this.rayIntersectPnt);
                     currentDist=dist;
                 }
@@ -741,7 +745,85 @@ export default class CollisionClass
             
         return(currentDist!==-1);
     }
+    
+        //
+        // rigid body calculations
+        //
+        
+    getRigidBodyAngle(entity,pointOffset,maxDrop,maxAngle)
+    {
+        let n,k,x,y,nMesh,nCollisionTrig;
+        let ang;
+        let mesh,collisionTrig;
+        
+            // the rigid point is maxDrop above and
+            // maxDrop below so we can catch going up
+            // or down
+            
+        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
+        this.objYBound.setFromValues((entity.position.y-maxDrop),(entity.position.y+maxDrop));
+        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
+        
+            // build the single point for the rigid body
+            
+        this.rigidPnt.setFromAddPoint(entity.position,pointOffset);
+        this.rigidPnt.y+=maxDrop;
+        
+        this.rayVector.x=0;
+        this.rayVector.y=-(maxDrop*2);
+        this.rayVector.z=0;
+       
+            // start with no hits
+       
+        y=entity.position.y-maxDrop;
+        
+            // run through colliding trigs
+            // no entity checking as entities are always flat
+        
+        nMesh=this.core.map.meshList.meshes.length;
+        
+        for (n=0;n!==nMesh;n++) {
+            mesh=this.core.map.meshList.meshes[n];
+            if (mesh.noCollisions) continue;
 
+                // skip any mesh we don't collide with
+
+            if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
+
+                // check the collide triangles
+                // if we are within the fall, then
+                // return the ground
+                
+                // first check by a rough, then run all
+                // the rays to find the highest hit
+
+            nCollisionTrig=mesh.collisionFloorTrigs.length;
+
+            for (k=0;k!==nCollisionTrig;k++) {
+                collisionTrig=mesh.collisionFloorTrigs[k];
+                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
+                    if (collisionTrig.rayTrace(this.rigidPnt,this.rayVector,this.rayHitPnt)) {
+                        if (this.rayHitPnt.y>=y) y=this.rayHitPnt.y;
+                    }
+                }
+            }
+        }
+        
+            // if we hit nothing, return max angle
+            
+        if (y<=(entity.position.y-maxDrop)) return(maxAngle);
+        
+            // otherwise find direction of hit and calc
+            
+        y=y-entity.position.y;
+        x=Math.sqrt((pointOffset.x*pointOffset.x)+(pointOffset.z*pointOffset.z));
+        
+        ang=(Math.atan2(0,x)-Math.atan2(y,x))*PointClass.RAD_TO_DEGREE;
+
+        if (Math.abs(ang>maxAngle)) return(Math.sign(ang)*maxAngle);
+        
+        return(ang);
+    }
     
         //
         // simple collisions
