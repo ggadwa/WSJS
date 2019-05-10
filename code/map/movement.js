@@ -43,7 +43,7 @@ export default class MovementClass
     run()
     {
         let n,nMesh;
-        let mesh,paused,nextIdx,prevIdx;
+        let mesh,paused,nextIdx,prevIdx,needPush;
         let f,move;
         
             // skip if no moves or we
@@ -161,10 +161,19 @@ export default class MovementClass
         for (n=0;n!==nMesh;n++) {
             mesh=this.core.map.meshList.get(this.meshIdxList[n]);
             
-            if (!this.movePnt.isZero()) mesh.move(this.movePnt);
-            if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.rotateOffset);
-
-            this.core.map.entityList.movementPush(this.meshIdxList[n],this.movePnt);
+            needPush=false;
+            
+            if (!this.movePnt.isZero()) {
+                needPush=true;
+                mesh.move(this.movePnt);
+            }
+            
+            if (!this.rotateAng.isZero()) {
+                needPush=true;
+                mesh.rotate(this.rotateAng,this.rotateOffset);
+            }
+            
+            if (needPush) this.core.map.entityList.movementPush(this.meshIdxList[n],this.movePnt,this.rotateAng);
         }
         
             // do reverse moves
@@ -178,10 +187,19 @@ export default class MovementClass
             for (n=0;n!==nMesh;n++) {
                 mesh=this.core.map.meshList.get(this.reverseMeshIdxList[n]);
                 
-                if (!this.movePnt.isZero()) mesh.move(this.movePnt);
-                if (!this.rotateAng.isZero()) mesh.rotate(this.rotateAng,this.reverseRotateOffet);
-
-                this.core.map.entityList.movementPush(this.reverseMeshIdxList[n],this.movePnt);
+                needPush=false;
+                
+                if (!this.movePnt.isZero()) {
+                    needPush=true;
+                    mesh.move(this.movePnt);
+                }
+                
+                if (!this.rotateAng.isZero()) {
+                    needPush=true;
+                    mesh.rotate(this.rotateAng,this.reverseRotateOffet);
+                }
+                
+                if (needPush) this.core.map.entityList.movementPush(this.reverseMeshIdxList[n],this.movePnt,this.rotateAng);
             }
         }
     }

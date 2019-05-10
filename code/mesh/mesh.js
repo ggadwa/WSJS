@@ -125,7 +125,7 @@ export default class MeshClass
         }
         return(true);
     }
-
+    
     boxMeshCollision(checkMesh)
     {
         if (this.xBound.min>=checkMesh.xBound.max) return(false);

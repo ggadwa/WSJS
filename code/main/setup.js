@@ -1,8 +1,8 @@
 export default class SetupClass
 {
     name='Player';
-    serverURL='ws://127.0.0.1';
-    savedServerURLList=['ws://127.0.0.1','ws://10.0.0.1','ws://10.0.0.2'];
+    serverURL='127.0.0.1';
+    savedServerURLList=['127.0.0.1','10.0.0.1','10.0.0.2'];
 
     mouseXSensitivity=0.3;
     mouseXAcceleration=0.4;

@@ -473,35 +473,38 @@ export default class CollisionClass
         }
         
             // run through colliding entities
+            // unless we are currently in passthrough
             
-        nEntity=this.core.map.entityList.entities.length;
-        
-        entityTop=(entity.position.y+entity.height)+fallY;
-        entityBot=entity.position.y+fallY;
-        
-        for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.get(n);
-            if (checkEntity===entity) continue;
-            if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
-            
-                // we can only hit the top of something if
-                // our bottom is within the check entity and our top
-                // is above it
+        if (!entity.passThrough) {
+            nEntity=this.core.map.entityList.entities.length;
 
-            checkEntityTop=checkEntity.position.y+checkEntity.height;
-            if ((entityTop<=checkEntityTop) || (entityBot>=checkEntityTop) || (entityBot<=checkEntity.position.y)) continue;
+            entityTop=(entity.position.y+entity.height)+fallY;
+            entityBot=entity.position.y+fallY;
 
-                // check the circle
+            for (n=0;n!==nEntity;n++) {
+                checkEntity=this.core.map.entityList.get(n);
+                if (checkEntity===entity) continue;
+                if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
-            if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
-                if (checkEntityTop>=y) {
-                    entity.standOnMeshIdx=-1;
-                    entity.standOnEntity=checkEntity;
-                    y=checkEntityTop;
+                    // we can only hit the top of something if
+                    // our bottom is within the check entity and our top
+                    // is above it
+
+                checkEntityTop=checkEntity.position.y+checkEntity.height;
+                if ((entityTop<=checkEntityTop) || (entityBot>=checkEntityTop) || (entityBot<=checkEntity.position.y)) continue;
+
+                    // check the circle
+
+                if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
+                    if (checkEntityTop>=y) {
+                        entity.standOnMeshIdx=-1;
+                        entity.standOnEntity=checkEntity;
+                        y=checkEntityTop;
+                    }
                 }
             }
         }
-         
+        
             // get how far we've fallen (negative, y is up)
 
         if ((entity.standOnMeshIdx!==-1) || (entity.standOnEntity!==null)) return(y-entity.position.y);
@@ -585,31 +588,34 @@ export default class CollisionClass
             }
         }
             // run through colliding entities
+            // unless we are currently in passthrough
             
-        nEntity=this.core.map.entityList.entities.length;
+        if (!entity.passThrough) {
+            nEntity=this.core.map.entityList.entities.length;
         
-        entityTop=(entity.position.y+entity.height)+riseY;
-        entityBot=entity.position.y+riseY;
-        
-        for (n=0;n!==nEntity;n++) {
-            checkEntity=this.core.map.entityList.get(n);
-            if (checkEntity===entity) continue;
-            if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
-            
-                // we can only hit the bottom of something if
-                // our top is within the check entity and our bottom
-                // is below it
+            entityTop=(entity.position.y+entity.height)+riseY;
+            entityBot=entity.position.y+riseY;
 
-            checkEntityTop=checkEntity.position.y+checkEntity.height;
-            if ((entityBot>=checkEntity.position.y) || (entityTop>=checkEntityTop) || (entityTop<=checkEntity.position.y)) continue;
+            for (n=0;n!==nEntity;n++) {
+                checkEntity=this.core.map.entityList.get(n);
+                if (checkEntity===entity) continue;
+                if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
-                // check the circle
+                    // we can only hit the bottom of something if
+                    // our top is within the check entity and our bottom
+                    // is below it
 
-            if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
-                if (checkEntity.position.y<=y) {
-                    entity.collideCeilingMeshIdx=-1;
-                    entity.hitHeadOnEntity=checkEntity;
-                    y=checkEntity.position.y;
+                checkEntityTop=checkEntity.position.y+checkEntity.height;
+                if ((entityBot>=checkEntity.position.y) || (entityTop>=checkEntityTop) || (entityTop<=checkEntity.position.y)) continue;
+
+                    // check the circle
+
+                if (this.circleCircleIntersection(entity.position,entity.radius,checkEntity.position,checkEntity.radius,this.entityTestIntersectPnt)) {
+                    if (checkEntity.position.y<=y) {
+                        entity.collideCeilingMeshIdx=-1;
+                        entity.hitHeadOnEntity=checkEntity;
+                        y=checkEntity.position.y;
+                    }
                 }
             }
         }
@@ -756,17 +762,20 @@ export default class CollisionClass
         let ang;
         let mesh,collisionTrig;
         
+            // build the single point for the rigid body
+            
+        this.rigidPnt.setFromAddPoint(entity.position,pointOffset);
+        
+            // our bound is just the vertical line
+            
+        this.objXBound.setFromValues(this.rigidPnt.x,this.rigidPnt.x);
+        this.objYBound.setFromValues((this.rigidPnt.y-maxDrop),(this.rigidPnt.y+maxDrop));
+        this.objZBound.setFromValues(this.rigidPnt.z,this.rigidPnt.z);
+        
             // the rigid point is maxDrop above and
             // maxDrop below so we can catch going up
             // or down
             
-        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
-        this.objYBound.setFromValues((entity.position.y-maxDrop),(entity.position.y+maxDrop));
-        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
-        
-            // build the single point for the rigid body
-            
-        this.rigidPnt.setFromAddPoint(entity.position,pointOffset);
         this.rigidPnt.y+=maxDrop;
         
         this.rayVector.x=0;
@@ -775,7 +784,7 @@ export default class CollisionClass
        
             // start with no hits
        
-        y=entity.position.y-maxDrop;
+        y=this.rigidPnt.y+this.rayVector.y;
         
             // run through colliding trigs
             // no entity checking as entities are always flat

@@ -121,7 +121,7 @@ export default class MapEntityListClass
         // movements against entities
         //
         
-    movementPush(meshIdx,movePnt)
+    movementPush(meshIdx,movePnt,rotateAng)
     {
         let entity;
         
@@ -129,7 +129,7 @@ export default class MapEntityListClass
             // any projectiles
             
         for (entity of this.entities) {
-            entity.movementPush(meshIdx,movePnt);
+            entity.movementPush(meshIdx,movePnt,rotateAng);
         }
     }
     

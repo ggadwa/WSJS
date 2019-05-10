@@ -63,8 +63,6 @@ export default class ProjectEntityClass
         this.reflectMovementVector=new PointClass(0,0,0);
         this.reflectLineVector=new PointClass(0,0,0);
 
-        this.pushMesh=null;
-
         this.collision=new CollisionClass(core);
         
             // these developer debug flags
@@ -627,16 +625,56 @@ export default class ProjectEntityClass
         // mesh pushing
         //
         
-    movementPush(meshIdx,movePnt)
+    movementPush(meshIdx,movePnt,rotateAng)
     {
-            // lifts
+        let x,z,lft,rgt,top,bot;
+        let mesh;
+        
+        mesh=this.core.map.meshList.get(meshIdx);
+        
+            // lifting
             
         if (movePnt.y<0) {
             if (this.standOnMeshIdx===meshIdx) {
-                this.pushMesh=this.core.map.meshList.get(meshIdx);
-                if (this.position.y<=this.pushMesh.yBound.min) {
-                    this.position.y=Math.trunc(this.pushMesh.yBound.min)+1;
+                if (this.position.y<=mesh.yBound.min) {
+                    this.position.y=Math.trunc(mesh.yBound.min)+1;
                 }
+            }
+        }
+        
+            // shoving out of way
+
+        if ((movePnt.x===0) && (movePnt.z===0) && (rotateAng.y===0)) return;
+        
+            // are we within the bounds
+            
+        lft=this.position.x-this.radius;
+        rgt=this.position.x+this.radius;
+        top=this.position.z-this.radius;
+        bot=this.position.z+this.radius;
+        
+        if ((lft>=mesh.xBound.max) || (rgt<=mesh.xBound.min)) return;
+        if ((top>=mesh.zBound.max) || (bot<=mesh.zBound.min)) return;
+       
+            // shove them to rough bounds of object
+            // if a part is within the bounds, then push
+            // out the smallest way
+            
+        if (((lft>mesh.xBound.min) && (lft<mesh.xBound.max)) || ((rgt>mesh.xBound.min) && (rgt<mesh.xBound.max))) {
+            if (Math.abs(this.position.x-(mesh.xBound.max+this.radius))<Math.abs(this.position.x-(mesh.xBound.min-this.radius))) {
+                this.position.x=mesh.xBound.max+this.radius;
+            }
+            else {
+                this.position.x=mesh.xBound.min-this.radius;
+            }
+        }
+            
+        if (((top>mesh.zBound.min) && (top<mesh.zBound.max)) || ((bot>mesh.zBound.min) && (bot<mesh.zBound.max))) {
+            if (Math.abs(this.position.z-(mesh.zBound.max+this.radius))<Math.abs(this.position.z-(mesh.zBound.min-this.radius))) {
+                this.position.z=mesh.zBound.max+this.radius;
+            }
+            else {
+                this.position.z=mesh.zBound.min-this.radius;
             }
         }
     }

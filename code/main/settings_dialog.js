@@ -7,10 +7,11 @@ export default class SettingsDialogClass
     static DIALOG_BACKGROUND='#EEEEEE';
     static DIALOG_BACKGROUND_DIM='#777777';
     static DIALOG_OPACITY=0.9;
-    static DIALOG_OUTLINE_COLOR='#2200CC';
+    static DIALOG_OUTLINE_COLOR='#000033';
     static TAB_WIDTH=150;
     static TAB_HEIGHT=30;
-    static DIALOG_BUTTON_COLOR='#FF00CC';
+    static DIALOG_BUTTON_COLOR='#7777AA';
+    static DIALOG_BUTTON_COLOR_HIGHLIGHT='#8888FF';
     
     core=null;
     
@@ -99,8 +100,7 @@ export default class SettingsDialogClass
     {
         let buttonDiv=document.createElement('div');
         
-            // the tab
-            
+        buttonDiv.id='go';    
         buttonDiv.style.boxSizing='border-box';
         buttonDiv.style.position='absolute';
         buttonDiv.style.left=(SettingsDialogClass.DIALOG_WIDTH-SettingsDialogClass.TAB_WIDTH)+'px';
@@ -119,6 +119,8 @@ export default class SettingsDialogClass
         buttonDiv.style.userSelect='none';
         
         buttonDiv.onclick=this.core.setPauseState.bind(this.core,false,false);
+        buttonDiv.onmouseover=new Function('this.style.backgroundColor=\''+SettingsDialogClass.DIALOG_BUTTON_COLOR_HIGHLIGHT+'\'');
+        buttonDiv.onmouseout=new Function('this.style.backgroundColor=\''+SettingsDialogClass.DIALOG_BUTTON_COLOR+'\'');
         
         buttonDiv.appendChild(document.createTextNode('Go'));
         
@@ -294,7 +296,8 @@ export default class SettingsDialogClass
             
         this.core.setup.name=document.getElementById('name').value;
         this.core.setup.serverURL=document.getElementById('serverURL').value;
-
+        if (this.core.setup.savedServerURLList.indexOf(this.core.setup.serverURL)===-1) this.core.setup.savedServerURLList.splice(0,0,this.core.setup.serverURL);
+        
         this.core.setup.mouseXSensitivity=document.getElementById('mouseXSensitivity').value/100.0;
         this.core.setup.mouseXAcceleration=document.getElementById('mouseXAcceleration').value/100.0;
         this.core.setup.mouseXInvert=document.getElementById('mouseXInvert').checked;
