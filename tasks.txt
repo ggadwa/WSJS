@@ -1,5 +1,4 @@
 
-- work on rigid body
 - player hurt noise
 - networking
 

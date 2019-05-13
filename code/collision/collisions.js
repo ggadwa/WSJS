@@ -820,7 +820,7 @@ export default class CollisionClass
         
             // if we hit nothing, return max angle
             
-        if (y<=(entity.position.y-maxDrop)) return(maxAngle);
+        if (y===(this.rigidPnt.y+this.rayVector.y)) return(maxAngle);
         
             // otherwise find direction of hit and calc
             
@@ -828,8 +828,6 @@ export default class CollisionClass
         x=Math.sqrt((pointOffset.x*pointOffset.x)+(pointOffset.z*pointOffset.z));
         
         ang=(Math.atan2(0,x)-Math.atan2(y,x))*PointClass.RAD_TO_DEGREE;
-
-        if (Math.abs(ang>maxAngle)) return(Math.sign(ang)*maxAngle);
         
         return(ang);
     }

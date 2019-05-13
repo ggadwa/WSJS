@@ -627,7 +627,7 @@ export default class ProjectEntityClass
         
     movementPush(meshIdx,movePnt,rotateAng)
     {
-        let x,z,lft,rgt,top,bot;
+        let lft,rgt,top,bot;
         let mesh;
         
         mesh=this.core.map.meshList.get(meshIdx);
