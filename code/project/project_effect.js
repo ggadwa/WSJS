@@ -81,9 +81,9 @@ export default class ProjectEffectClass
         // bitmap utilities
         //
     
-    addBitmap(colorURL,normalURL,specularURL,specularFactor,scale)
+    addBitmap(colorURL,normalURL,specularURL,specularFactor,scale,roughness)
     {
-        return(this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale));
+        return(this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale,roughness));
     }
     
         //

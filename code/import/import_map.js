@@ -92,7 +92,7 @@ export default class ImportMapClass
             for (n=0;n!==importSettings.liquids.length;n++) {
                 liquidDef=importSettings.liquids[n];
                 
-                this.core.bitmapList.add(liquidDef.bitmap,null,null,null,null);
+                this.core.bitmapList.add(liquidDef.bitmap,null,null,null,null,0);
 
                 liquidBitmap=this.core.bitmapList.get(liquidDef.bitmap);
                 liquid=new MapLiquidClass(this.core,liquidBitmap,liquidDef.waveSize,liquidDef.wavePeriod,liquidDef.waveHeight,liquidDef.waveUVStamp,liquidDef.uShift,liquidDef.vShift,new ColorClass(liquidDef.tint.r,liquidDef.tint.g,liquidDef.tint.b),new BoundClass(liquidDef.xBound.min,liquidDef.xBound.max),new BoundClass(liquidDef.yBound.min,liquidDef.yBound.max),new BoundClass(liquidDef.zBound.min,liquidDef.zBound.max))
@@ -168,12 +168,12 @@ export default class ImportMapClass
             this.core.map.sky.on=true;
             this.core.map.sky.skyBoxSettings=importSettings.skyBox;
             
-            this.core.bitmapList.add(importSettings.skyBox.bitmapNegX,null,null,null,null);
-            this.core.bitmapList.add(importSettings.skyBox.bitmapPosX,null,null,null,null);
-            this.core.bitmapList.add(importSettings.skyBox.bitmapNegY,null,null,null,null);
-            this.core.bitmapList.add(importSettings.skyBox.bitmapPosY,null,null,null,null);
-            this.core.bitmapList.add(importSettings.skyBox.bitmapNegZ,null,null,null,null);
-            this.core.bitmapList.add(importSettings.skyBox.bitmapPosZ,null,null,null,null);
+            this.core.bitmapList.add(importSettings.skyBox.bitmapNegX,null,null,null,null,0);
+            this.core.bitmapList.add(importSettings.skyBox.bitmapPosX,null,null,null,null,0);
+            this.core.bitmapList.add(importSettings.skyBox.bitmapNegY,null,null,null,null,0);
+            this.core.bitmapList.add(importSettings.skyBox.bitmapPosY,null,null,null,null,0);
+            this.core.bitmapList.add(importSettings.skyBox.bitmapNegZ,null,null,null,null,0);
+            this.core.bitmapList.add(importSettings.skyBox.bitmapPosZ,null,null,null,null,0);
         }
         
             // paths
@@ -268,6 +268,19 @@ export default class ImportMapClass
         if (importSettings.meshNoBumpMeshes!==undefined) {
             for (n=0;n!==importSettings.meshNoBumpMeshes.length;n++) {
                 this.core.map.meshList.setNoBumpForMeshes(importSettings.meshNoBumpMeshes[n]);
+            }
+        }
+        
+        if (importSettings.decalBitmaps!==undefined) {
+            for (n=0;n!==importSettings.decalBitmaps.length;n++) {
+                
+                bitmap=this.core.bitmapList.getSimpleName(importSettings.decalBitmaps[n]);                
+                if (bitmap===null) {
+                    console.log('Missing bitmap to set as decal to: '+importSettings.decalBitmaps[n]);
+                    return(false);
+                }
+                
+                this.core.map.meshList.setDecalsForBitmap(bitmap);
             }
         }
         

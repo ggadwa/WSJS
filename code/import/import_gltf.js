@@ -566,10 +566,12 @@ export default class ImportGLTFClass
     {
         let n,bitmap,diffuseTexture,glossTexture,specularFactorProp,glowDef;
         let colorURL=null;
+        let colorBase=null;
         let normalURL=null;
         let specularURL=null;
         let specularFactor=null;
         let scale=null;
+        let roughness=0;
         let prefixURL='models/'+this.importSettings.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
         
@@ -633,21 +635,30 @@ export default class ImportGLTFClass
                 if (materialNode.pbrMetallicRoughness.baseColorTexture!==undefined) {
                     colorURL=prefixURL+this.jsonData.images[materialNode.pbrMetallicRoughness.baseColorTexture.index].uri;
                 }
+                else {
+                    if (materialNode.pbrMetallicRoughness.baseColorFactor!==undefined) {
+                        colorBase=new ColorClass(materialNode.pbrMetallicRoughness.baseColorFactor[0],materialNode.pbrMetallicRoughness.baseColorFactor[1],materialNode.pbrMetallicRoughness.baseColorFactor[2]);
+                    }
+                }
+                if (materialNode.pbrMetallicRoughness.roughnessFactor!==undefined) roughness=materialNode.pbrMetallicRoughness.roughnessFactor;
             }
-        }
-        
-            // no color texture is an error
-
-        if (colorURL===null) {
-            console.log('Could not find texture for mesh '+meshNode.name+' in '+this.importSettings.name);
-            return(null);
         }
         
             // create the bitmap and
             // add to list to be loaded later
             
-        bitmap=this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
-        
+        if (colorURL!==null) {
+            bitmap=this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale,roughness);
+        }
+        else {
+            if (colorBase!==null) {
+                bitmap=this.core.bitmapList.addColor(colorBase,normalURL,specularURL,specularFactor,scale,roughness);
+            }
+            else {
+                console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.importSettings.name);
+                return(null);
+            }
+        }
             // any glow subsitutions?
         
         if (this.importSettings.glows!==undefined) {
@@ -709,11 +720,18 @@ export default class ImportGLTFClass
             
                 // run through the primitives
                 // we need to knock out anything that's
-                // triangle stream
+                // not a triangle stream
                 
             for (k=0;k!==meshNode.primitives.length;k++) {
                 primitiveNode=meshNode.primitives[k];
-                if (primitiveNode.mode!==4) continue;       // not a triangle stream
+                
+                    // is it a triangle stream?  Some exporters
+                    // seem to leave this off, so I assume the default
+                    // is triangle stream
+                    
+                if (primitiveNode.mode!==undefined) {
+                    if (primitiveNode.mode!==4) continue;
+                }
                 
                     // create or get bitmap
                     

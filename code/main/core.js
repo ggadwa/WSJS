@@ -86,6 +86,7 @@ export default class CoreClass
             // the gl matrixes
 
         this.perspectiveMatrix=new Matrix4Class();
+        this.decalPerspectiveMatrix=new Matrix4Class();
         this.viewMatrix=new Matrix4Class();
         this.orthoMatrix=new Matrix4Class();
         
@@ -433,6 +434,7 @@ export default class CoreClass
             // note this function has a translate in it for NEAR_Z
 
         this.perspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,this.aspect,this.camera.glNearZ,this.camera.glFarZ);
+        this.decalPerspectiveMatrix.setPerspectiveMatrix(this.camera.glFOV,this.aspect,(this.camera.glNearZ+this.camera.decalZ),this.camera.glFarZ);
 
             // the eye point is -this.camera.glNearZ behind
             // the player
@@ -510,7 +512,8 @@ export default class CoreClass
             
         this.map.sky.draw();
         if (!this.debugCollisionSurfaces) {
-            this.map.meshList.draw(null);
+            this.map.meshList.draw(null,false);
+            this.map.meshList.draw(null,true);
         }
         else {
             this.map.meshList.debugDrawCollisionSurfaces();

@@ -2,15 +2,17 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
-    constructor(core,colorURL,normalURL,specularURL,specularFactor,scale)
+    constructor(core,colorURL,colorBase,normalURL,specularURL,specularFactor,scale,roughness)
     {
         this.core=core;
         this.colorURL=colorURL;
+        this.colorBase=colorBase;
         this.normalURL=normalURL;
         this.specularURL=specularURL;
         this.specularFactor=specularFactor;
         this.glowURL=null;
         this.scale=scale;
+        this.roughness=roughness;
         
         if (this.specularFactor===null) this.specularFactor=new ColorClass(1,1,1);      // default specular, in case it's missing
         
@@ -128,13 +130,13 @@ export default class BitmapClass
         return(false);
     }
     
-    createDefaultImageForMissingImage(r,g,b)
+    createSolidColorImage(r,g,b)
     {
         let n,idx;
         let canvas,ctx,imgData,data;
         
-            // create an all black image
-            // for bitmaps without glow maps
+            // create a solid image
+            // of a single color
             
         canvas=document.createElement('canvas');
         canvas.width=8;
@@ -150,6 +152,58 @@ export default class BitmapClass
             data[idx++]=r;
             data[idx++]=g;
             data[idx++]=b;
+            data[idx++]=255;
+        }
+		
+	ctx.putImageData(imgData,0,0);
+		
+            // convert to image
+            // we have to wait for a promise here
+            // as these don't always load async
+            
+        return(
+            new Promise((resolve,reject) =>
+                {
+                    let img=new Image();
+                    img.onload=()=>resolve(img);
+                    img.src=canvas.toDataURL("image/png");      // reject will never happen here as far as I can tell
+                }
+            )
+       );
+    }
+    
+    createRoughNormalImage(wid,high,roughness)
+    {
+        let n,pixelCount,idx;
+        let f,r,g,roughFactor;
+        let canvas,ctx,imgData,data;
+        
+            // creating a "rough" normal map
+            // from normal roughness
+            
+        canvas=document.createElement('canvas');
+        canvas.width=wid;
+        canvas.height=high;
+        ctx=canvas.getContext('2d');
+
+	imgData=ctx.getImageData(0,0,wid,high);
+        data=imgData.data;
+        
+        idx=0;
+        pixelCount=wid*high;
+        
+        roughFactor=roughness*128;
+        
+        for (n=0;n!=pixelCount;n++) {
+            r=Math.random()*roughFactor;
+            g=Math.random()*roughFactor;
+            
+            f=Math.sqrt((r*r)+(g*g)+65025);
+            if (f!==0.0) f=1.0/f;
+            
+            data[idx++]=Math.trunc(r*f);
+            data[idx++]=Math.trunc(g*f);
+            data[idx++]=Math.trunc(255*f);
             data[idx++]=255;
         }
 		
@@ -195,26 +249,32 @@ export default class BitmapClass
         
             // color bitmap
             // this is the only required image, all others
-            // are created if missing
+            // are created if missing.  This can be built from
+            // loading or a file or a base color
         
         this.colorImage=null;
+        
+        if (this.colorBase===null) {
+            await this.loadImagePromise('../'+this.colorURL)
+                .then
+                    (
+                            // resolved
 
-        await this.loadImagePromise('../'+this.colorURL)
-            .then
-                (
-                        // resolved
+                        value=>{
+                            this.colorImage=value;
+                        },
 
-                    value=>{
-                        this.colorImage=value;
-                    },
+                            // rejected
 
-                        // rejected
-
-                    value=>{
-                        console.log('Unable to load '+value);
-                    }
-                );
-
+                        value=>{
+                            console.log('Unable to load '+value);
+                        }
+                    );
+        }
+        else {
+            this.colorImage=await this.createSolidColorImage(Math.trunc(this.colorBase.r*255),Math.trunc(this.colorBase.g*255),Math.trunc(this.colorBase.b*255));
+        }
+        
         if (this.colorImage===null) return(false);
         
             // detect if there is any alpha
@@ -238,7 +298,7 @@ export default class BitmapClass
             maskImage=this.colorImage;
         }
         else {
-            maskImage=await this.createDefaultImageForMissingImage(0,0,0);      // alpha will be 1
+            maskImage=await this.createSolidColorImage(0,0,0);      // alpha will be 1
         }
             
         this.mask=gl.createTexture();
@@ -269,7 +329,12 @@ export default class BitmapClass
         }
         
         if (this.normalImage===null) {
-            this.normalImage=await this.createDefaultImageForMissingImage(255,255,255); // setting it to this makes the bump calculations flat on both sides (0,0,255) is normal flat bump
+            if (this.roughness!==0) {
+                this.normalImage=await this.createRoughNormalImage(this.colorImage.width,this.colorImage.height,this.roughness);
+            }
+            else {
+                this.normalImage=await this.createSolidColorImage(0,0,255);
+            }
         }
 
         this.normalMap=gl.createTexture();
@@ -301,7 +366,7 @@ export default class BitmapClass
         }
         
         if (this.specularImage===null) {
-            this.specularImage=await this.createDefaultImageForMissingImage(0,0,0);
+            this.specularImage=await this.createSolidColorImage(0,0,0);
         }
         
         this.specularMap=gl.createTexture();
@@ -335,7 +400,7 @@ export default class BitmapClass
         }
         
         if (this.glowImage===null) {
-            this.glowImage=await this.createDefaultImageForMissingImage(0,0,0);
+            this.glowImage=await this.createSolidColorImage(0,0,0);
         }
         
         this.glowMap=gl.createTexture();

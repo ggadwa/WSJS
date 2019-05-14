@@ -333,4 +333,24 @@ export default class Matrix4Class
         this.data[14]=(glFarZ+glNearZ)*dist;
         this.data[15]=1.0;
     }
+    
+    setFromMatrixMoveZ(mat,zAdd)
+    {
+        this.data[0]=mat.data[0];
+        this.data[1]=mat.data[1];
+        this.data[2]=mat.data[2];
+        this.data[3]=mat.data[3];
+        this.data[4]=mat.data[4];
+        this.data[5]=mat.data[5];
+        this.data[6]=mat.data[6];
+        this.data[7]=mat.data[7];
+        this.data[8]=mat.data[8];
+        this.data[9]=mat.data[9];
+        this.data[10]=mat.data[10];
+        this.data[11]=mat.data[11];
+        this.data[12]=mat.data[12];
+        this.data[13]=mat.data[13];
+        this.data[14]=mat.data[14]+zAdd;
+        this.data[15]=mat.data[15];
+    }
 }

@@ -55,6 +55,10 @@ export default class MeshClass
         this.jointBuffer=null;
         this.weightBuffer=null;
         this.indexBuffer=null;
+        
+            // decals
+            
+        this.decal=false;
 
             // collision lists
 

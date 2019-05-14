@@ -33,7 +33,7 @@ export default class BitmapListClass
         // add and get a bitmap
         //
         
-    add(colorURL,normalURL,specularURL,specularFactor,scale)
+    add(colorURL,normalURL,specularURL,specularFactor,scale,roughness)
     {
         let bitmap;
             
@@ -45,7 +45,32 @@ export default class BitmapListClass
             // by another call that force loads unloaded
             // bitmaps
                     
-        bitmap=new BitmapClass(this.core,colorURL,normalURL,specularURL,specularFactor,scale);
+        bitmap=new BitmapClass(this.core,colorURL,null,normalURL,specularURL,specularFactor,scale,roughness);
+        bitmap.initialize();
+        this.bitmaps.set(colorURL,bitmap);
+        
+        return(bitmap);
+    }
+    
+    addColor(colorBase,normalURL,specularURL,specularFactor,scale,roughness)
+    {
+        let bitmap;
+        let hex,colorURL;
+                
+            // make up a name from the color
+        
+        hex=(Math.trunc(colorBase.r*255)<<16)+(Math.trunc(colorBase.g*255)<<8)+Math.trunc(colorBase.b*255);
+        colorURL='_'+hex.toString(16);
+            
+            // already in list?
+            
+        if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
+        
+            // add new one to list, will be loaded
+            // by another call that force loads unloaded
+            // bitmaps
+                    
+        bitmap=new BitmapClass(this.core,colorURL,colorBase,normalURL,specularURL,specularFactor,scale,roughness);
         bitmap.initialize();
         this.bitmaps.set(colorURL,bitmap);
         

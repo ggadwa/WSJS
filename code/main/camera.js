@@ -16,6 +16,8 @@ export default class CameraClass
     glNearZ=500;
     glFarZ=500000;
     
+    decalZ=100;            // how far to push the Z for decal meshes
+    
     position=null;
     angle=null;
     

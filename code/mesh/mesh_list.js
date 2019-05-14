@@ -140,6 +140,15 @@ export default class MeshListClass
         }
     }
     
+    setDecalsForBitmap(bitmap)
+    {
+        let mesh;
+        
+        for (mesh of this.meshes) {
+            if (mesh.bitmap.colorURL===bitmap.colorURL) mesh.decal=true;
+        }
+    }
+    
         //
         // check for mesh list collisions
         //
@@ -218,7 +227,7 @@ export default class MeshListClass
         // draw meshes
         //
 
-    draw(modelEntityAlter)
+    draw(modelEntityAlter,decal)
     {
         let n,k,mesh;
         let jointMatrixArray;
@@ -228,7 +237,7 @@ export default class MeshListClass
         
             // start the shader
         
-        this.shader.drawStart();
+        this.shader.drawStart(decal);
         
             // if a model then we use the model
             // matrix to position it, models don't
@@ -265,6 +274,12 @@ export default class MeshListClass
 
         for (n=0;n!==nMesh;n++) {
             mesh=this.meshes[n];
+            
+                // the decal flag, we use this to draw
+                // meshes that are decal and need to be pushed
+                // a bit closer to the camera
+                
+            if (mesh.decal!==decal) continue;
 
                 // if we are in a model (we have a model
                 // matrix) we have to deal with meshes that are
