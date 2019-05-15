@@ -93,7 +93,6 @@ export default class ProjectEffectClass
     setLightColor(color,exponent)
     {
         this.light.color.setFromColor(color);
-        this.light.exponent=exponent;
     }
     
     setLightPosition(position)
@@ -104,6 +103,11 @@ export default class ProjectEffectClass
     setLightIntensity(intensity)
     {
         this.light.setIntensity(intensity);
+    }
+    
+    setLightExponent(exponent)
+    {
+        this.light.exponent=exponent;
     }
     
         //

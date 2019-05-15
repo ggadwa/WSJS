@@ -6,9 +6,10 @@ uniform lowp sampler2D specularTex;
 uniform lowp sampler2D glowTex;
 uniform lowp sampler2D maskTex;
 
-uniform lowp vec3 ambient;
 uniform mediump vec3 specularFactor;
 uniform mediump float glowFactor;
+
+uniform lowp vec3 lightMin,lightMax;
 
 struct lightType {
     highp vec4 positionIntensity;
@@ -29,29 +30,25 @@ void main(void)
     highp float intensity,dist;
     highp vec3 lightVector,lightVertexVector;
 
-        // the default light color is the ambient
-
-    lowp vec3 lightCol=ambient;
-
         // the texture fragment
 
     lowp vec4 tex=texture(baseTex,fragUV);
 
-        // the starting bump map
-        // since it will be created by going through the
-        // lights, we need a default value
+        // the bump map
 
     highp vec3 bumpLightVertexVector;
     lowp vec3 bumpMap=normalize((texture(normalTex,fragUV.xy).rgb*2.0)-1.0);
-    lowp float bump=dot(vec3(0.33,0.33,0.33),bumpMap);
+    lowp float bump=0.0;
 
-        // the starting spec map
+        // the spec map
 
     lowp vec3 spec=vec3(0.0,0.0,0.0),specHalfVector;
     lowp vec3 specMap=texture(specularTex,fragUV.xy).rgb;
     lowp float specFactor;
 
         // lights
+
+    lowp vec3 lightCol=vec3(0,0,0);
 
     for (int n=0;n!=24;n++) {
 
@@ -92,20 +89,18 @@ void main(void)
         }
     }
 
+        // calculate the final lighting
+
+    lightCol=clamp((lightCol*bump),lightMin,lightMax);
+
         // finish the spec by making sure
         // it's dimmed in dark areas
 
-    spec=min(spec,1.0)*vec3(lightCol.r,lightCol.g,lightCol.b);
-
-        // add bump into the ambient and make
-        // sure it's never less than 10% of the
-        // ambient
-
-    lowp vec3 pixelAmbient=max((lightCol*bump),(ambient*0.9));
+    spec=min(spec,1.0)*lightCol;
 
         // finally create the pixel
 
-    outputPixel.rgb=((tex.rgb*pixelAmbient)+spec)+(texture(glowTex,fragUV.xy).rgb*glowFactor);
+    outputPixel.rgb=((tex.rgb*lightCol)+spec)+(texture(glowTex,fragUV.xy).rgb*glowFactor);
     outputPixel.a=1.0;
 
         // any masking pixel discards

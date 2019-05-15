@@ -22,7 +22,8 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.viewMatrixUniform=null;
         this.normalMatrixUniform=null;
         
-        this.ambientUniform=null;
+        this.lightMinUniform=null;
+        this.lightMaxUniform=null;
         
         this.lights=[];
         
@@ -53,7 +54,8 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.viewMatrixUniform=gl.getUniformLocation(this.program,'viewMatrix');
         this.normalMatrixUniform=gl.getUniformLocation(this.program,'normalMatrix');
         
-        this.ambientUniform=gl.getUniformLocation(this.program,'ambient');
+        this.lightMinUniform=gl.getUniformLocation(this.program,'lightMin');
+        this.lightMaxUniform=gl.getUniformLocation(this.program,'lightMax');
         
         for (n=0;n!==CoreClass.MAX_LIGHT_COUNT;n++) {
             this.lights.push(new ShaderLightClass());
@@ -93,10 +95,6 @@ export default class MapLiquidShaderClass extends ShaderClass
         this.normalMatrix.setInvertTransposeFromMat4(this.core.viewMatrix);
         gl.uniformMatrix3fv(this.normalMatrixUniform,false,this.normalMatrix.data);
         
-            // ambient
-            
-        gl.uniform3f(this.ambientUniform,this.core.ambient.r,this.core.ambient.g,this.core.ambient.b);
-
             // lighting
             // these are packed, where the first vec4 is x,y,z,intensity (position and intensity)
             // and the second vec4 is r,g,b,exponent (color and exponent)
@@ -121,6 +119,9 @@ export default class MapLiquidShaderClass extends ShaderClass
             gl.uniform4f(light.positionIntensityUniform,viewLight.eyePosition.x,viewLight.eyePosition.y,viewLight.eyePosition.z,viewLight.intensity);
             gl.uniform4f(light.colorExponentUniform,viewLight.color.r,viewLight.color.g,viewLight.color.b,viewLight.exponent);
         }
+        
+        gl.uniform3f(this.lightMinUniform,this.core.map.lightList.lightMin.r,this.core.map.lightList.lightMin.g,this.core.map.lightList.lightMin.b);
+        gl.uniform3f(this.lightMaxUniform,this.core.map.lightList.lightMax.r,this.core.map.lightList.lightMax.g,this.core.map.lightList.lightMax.b);
 
             // enable the vertex attributes
 

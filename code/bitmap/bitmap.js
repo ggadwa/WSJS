@@ -2,6 +2,10 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
+    static DEFAULT_ROUGHNESS_MAX_VALUE=31;
+    static DEFAULT_CONTRAST=150;
+    static DEFAULT_CONTRAST_CLAMP=0.4;
+    
     constructor(core,colorURL,colorBase,normalURL,specularURL,specularFactor,scale,roughness)
     {
         this.core=core;
@@ -172,38 +176,92 @@ export default class BitmapClass
        );
     }
     
-    createRoughNormalImage(wid,high,roughness)
+    createRoughNormalImage(roughness)
     {
         let n,pixelCount,idx;
-        let f,r,g,roughFactor;
+        let r,g,b,roughFactor;
         let canvas,ctx,imgData,data;
         
             // creating a "rough" normal map
             // from normal roughness
             
         canvas=document.createElement('canvas');
-        canvas.width=wid;
-        canvas.height=high;
+        canvas.width=this.colorImage.width;
+        canvas.height=this.colorImage.height;
         ctx=canvas.getContext('2d');
 
-	imgData=ctx.getImageData(0,0,wid,high);
+	imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
         data=imgData.data;
         
         idx=0;
-        pixelCount=wid*high;
+        pixelCount=canvas.width*canvas.height;
         
-        roughFactor=roughness*128;
+        roughFactor=roughness*BitmapClass.DEFAULT_ROUGHNESS_MAX_VALUE;
         
         for (n=0;n!=pixelCount;n++) {
-            r=Math.random()*roughFactor;
-            g=Math.random()*roughFactor;
+            r=Math.trunc(Math.random()*roughFactor);
+            g=Math.trunc(Math.random()*roughFactor);
+            b=512-(r+g);
+            if (b>255) b=255;
             
-            f=Math.sqrt((r*r)+(g*g)+65025);
-            if (f!==0.0) f=1.0/f;
+            data[idx++]=r;
+            data[idx++]=g;
+            data[idx++]=b;
+            data[idx++]=255;
+        }
+		
+	ctx.putImageData(imgData,0,0);
+		
+            // convert to image
+            // we have to wait for a promise here
+            // as these don't always load async
             
-            data[idx++]=Math.trunc(r*f);
-            data[idx++]=Math.trunc(g*f);
-            data[idx++]=Math.trunc(255*f);
+        return(
+            new Promise((resolve,reject) =>
+                {
+                    let img=new Image();
+                    img.onload=()=>resolve(img);
+                    img.src=canvas.toDataURL("image/png");      // reject will never happen here as far as I can tell
+                }
+            )
+       );
+    }
+    
+    createContrastSpecularImage(contrast)
+    {
+        let n,pixelCount,idx;
+        let f,contrastFactor;
+        let canvas,ctx,imgData,data;
+        
+            // creating a specular map
+            // from a contrast value
+            
+        canvas=document.createElement('canvas');
+        canvas.width=this.colorImage.width;
+        canvas.height=this.colorImage.height;
+        ctx=canvas.getContext('2d');
+        
+            // add the original image
+            
+        ctx.drawImage(this.colorImage,0,0);
+        
+	imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        data=imgData.data;
+
+            // gray scale contrast
+            
+        idx=0;
+        pixelCount=canvas.width*canvas.height;
+        
+        contrastFactor=(259*(contrast+255))/(255*(259-contrast));
+        
+        for (n=0;n!=pixelCount;n++) {
+            f=(data[idx]+data[idx+1]+data[idx+2])*0.33;
+            f=Math.trunc(((contrastFactor*(f-128))+128)*BitmapClass.DEFAULT_CONTRAST_CLAMP);
+            
+            data[idx++]=f;
+            data[idx++]=f;
+            data[idx++]=f;
             data[idx++]=255;
         }
 		
@@ -327,13 +385,13 @@ export default class BitmapClass
                         value=>{}
                     );
         }
-        
+
         if (this.normalImage===null) {
             if (this.roughness!==0) {
-                this.normalImage=await this.createRoughNormalImage(this.colorImage.width,this.colorImage.height,this.roughness);
+                this.normalImage=await this.createRoughNormalImage(this.roughness);
             }
             else {
-                this.normalImage=await this.createSolidColorImage(0,0,255);
+                this.normalImage=await this.createSolidColorImage(127,127,255);
             }
         }
 
@@ -366,7 +424,7 @@ export default class BitmapClass
         }
         
         if (this.specularImage===null) {
-            this.specularImage=await this.createSolidColorImage(0,0,0);
+            this.specularImage=await this.createContrastSpecularImage(BitmapClass.DEFAULT_CONTRAST);
         }
         
         this.specularMap=gl.createTexture();

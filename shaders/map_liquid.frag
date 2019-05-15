@@ -2,7 +2,7 @@
 
 uniform lowp sampler2D baseTex;
 
-uniform lowp vec3 ambient;
+uniform lowp vec3 lightMin,lightMax;
 
 struct lightType {
     highp vec4 positionIntensity;
@@ -21,15 +21,13 @@ void main(void)
     lowp float att;
     highp float intensity,dist;
 
-        // the default light color is the ambient
-
-    lowp vec3 lightCol=ambient;
-
         // the liquid texture
 
     lowp vec4 tex=texture(baseTex,fragUV);
 
         // lights
+
+    lowp vec3 lightCol=vec3(0,0,0);
 
     for (int n=0;n!=24;n++) {
 
@@ -50,6 +48,12 @@ void main(void)
             lightCol+=(lights[n].colorExponent.rgb*att);
         }
     }
+
+        // calculate the final lighting
+
+    lightCol=clamp(lightCol,lightMin,lightMax);
+
+        // and the final pixel
 
     outputPixel.rgb=tex.rgb*lightCol;
     outputPixel.a=tex.a;

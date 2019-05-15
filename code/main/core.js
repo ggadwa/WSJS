@@ -100,8 +100,6 @@ export default class CoreClass
 
             // view lighting
 
-        this.ambient={"r":1.0,"g":1.0,"b":1.0};
-        
         this.lights=[];
 
             // frustum planes

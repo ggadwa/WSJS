@@ -1,4 +1,12 @@
 
+- better normal generation
+- redo sky boxes in the
+
+     top
+left front right back (this doesn't matter so much)
+     bottom
+
+
 
 - player hurt noise
 - networking

@@ -58,8 +58,9 @@ export default class ImportMapClass
         
             // the lights
             
-        this.core.ambient=importSettings.ambient;
-        
+        if (importSettings.lightMin!==undefined) this.core.map.lightList.lightMin.setFromValues(importSettings.lightMin.r,importSettings.lightMin.g,importSettings.lightMin.b);
+        if (importSettings.lightMax!==undefined) this.core.map.lightList.lightMax.setFromValues(importSettings.lightMax.r,importSettings.lightMax.g,importSettings.lightMax.b);
+            
         if (importSettings.lights!==undefined) {
             
             for (n=0;n!==importSettings.lights.length;n++) {

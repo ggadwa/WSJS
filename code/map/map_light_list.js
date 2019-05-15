@@ -1,3 +1,4 @@
+import ColorClass from '../utility/color.js';
 import CoreClass from '../main/core.js';
 
 //
@@ -9,6 +10,9 @@ export default class MapLightListClass
     constructor(core)
     {
         this.core=core;
+        
+        this.lightMin=new ColorClass(0,0,0);
+        this.lightMax=new ColorClass(1.5,1.5,1.5);
         
         this.lights=[];
 
