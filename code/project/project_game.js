@@ -50,7 +50,7 @@ export default class ProjectGameClass
         
     addBitmap(url)
     {
-        this.core.bitmapList.add(url,null,null,null,null,0);
+        this.core.bitmapList.addSimple(url);
     }
     
         //

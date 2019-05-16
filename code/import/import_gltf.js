@@ -571,7 +571,6 @@ export default class ImportGLTFClass
         let specularURL=null;
         let specularFactor=null;
         let scale=null;
-        let roughness=0;
         let prefixURL='models/'+this.importSettings.name+'/';
         let materialNode=this.jsonData.materials[primitiveNode.material];
         
@@ -640,7 +639,6 @@ export default class ImportGLTFClass
                         colorBase=new ColorClass(materialNode.pbrMetallicRoughness.baseColorFactor[0],materialNode.pbrMetallicRoughness.baseColorFactor[1],materialNode.pbrMetallicRoughness.baseColorFactor[2]);
                     }
                 }
-                if (materialNode.pbrMetallicRoughness.roughnessFactor!==undefined) roughness=materialNode.pbrMetallicRoughness.roughnessFactor;
             }
         }
         
@@ -648,11 +646,11 @@ export default class ImportGLTFClass
             // add to list to be loaded later
             
         if (colorURL!==null) {
-            bitmap=this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale,roughness);
+            bitmap=this.core.bitmapList.add(colorURL,normalURL,specularURL,specularFactor,scale);
         }
         else {
             if (colorBase!==null) {
-                bitmap=this.core.bitmapList.addColor(colorBase,normalURL,specularURL,specularFactor,scale,roughness);
+                bitmap=this.core.bitmapList.addColor(colorBase,normalURL,specularURL,specularFactor,scale);
             }
             else {
                 console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.importSettings.name);

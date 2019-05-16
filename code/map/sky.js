@@ -9,7 +9,8 @@ export default class SkyClass
         this.core=core;
         
         this.on=false;
-        this.skyBoxSettings=null;
+        this.size=0;
+        this.bitmapName=null;
 
         this.vertexes=null;
         this.uvs=null;
@@ -133,55 +134,30 @@ export default class SkyClass
         if (!this.on) return;
         
         cameraPos=this.core.camera.position;
-        skyRadius=Math.trunc(this.skyBoxSettings.size*0.5);
+        skyRadius=Math.trunc(this.size*0.5);
         
             // setup shader
 
         this.core.shaderList.skyShader.drawStart();
         
-            // negative X plane
-            // after this first texture is set we do some
-            // misc tex parameters (they would fail without a
-            // texture set)
-        
-        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapNegX);
+            // the sky texture
+            
+        bitmap=this.core.bitmapList.get(this.bitmapName);
         bitmap.attachAsSky();
         
         gl.disable(gl.DEPTH_TEST);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+        
+            // the planes
+            // -x, +x, -y, +y, -z, +z
 
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.999,0.999,0.001,0.001);
-        
-            // positive X plane
-        
-        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapPosX);
-        bitmap.attachAsSky();
-        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.001,0.999,0.999,0.001);
-         
-            // negative Y plane
-        
-        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapNegY);
-        bitmap.attachAsSky();
-        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,0.999,0.999,0.001,0.001);
-        
-            // positive Y plane
-        
-        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapPosY);
-        bitmap.attachAsSky();
-        this.drawPlane(gl,cameraPos,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,0.999,0.999,0.001,0.001);
-       
-            // negative Z plane
-        
-        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapNegZ);
-        bitmap.attachAsSky();
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.001,0.999,0.999,0.001);
-
-            // positive Z plane
-        
-        bitmap=this.core.bitmapList.get(this.skyBoxSettings.bitmapPosZ);
-        bitmap.attachAsSky();
-        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.999,0.999,0.001,0.001);
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,0.5,0.664,0.75,0.335);
+        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,0.25,0.664,0,0.335);
+        this.drawPlane(gl,cameraPos,skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,0.252,0.999,0.498,0.664);
+        this.drawPlane(gl,cameraPos,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,0.252,0,0.498,0.333);
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,-skyRadius,skyRadius,-skyRadius,0.498,0.664,0.252,0.335);
+        this.drawPlane(gl,cameraPos,-skyRadius,-skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,skyRadius,skyRadius,-skyRadius,skyRadius,skyRadius,0.752,0.664,0.999,0.335);
         
             // remove the buffers
 

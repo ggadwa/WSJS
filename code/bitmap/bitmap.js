@@ -2,11 +2,12 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
-    static DEFAULT_ROUGHNESS_MAX_VALUE=31;
-    static DEFAULT_CONTRAST=150;
-    static DEFAULT_CONTRAST_CLAMP=0.4;
+    static NORMAL_MAX_SHIFT=31;
+    static NORMAL_NO_SHIFT_CLAMP=0.7;
+    static SPECULAR_CONTRAST=150;
+    static SPECULAR_CONTRAST_CLAMP=0.4;
     
-    constructor(core,colorURL,colorBase,normalURL,specularURL,specularFactor,scale,roughness)
+    constructor(core,colorURL,colorBase,normalURL,specularURL,specularFactor,scale,simple)
     {
         this.core=core;
         this.colorURL=colorURL;
@@ -16,7 +17,7 @@ export default class BitmapClass
         this.specularFactor=specularFactor;
         this.glowURL=null;
         this.scale=scale;
-        this.roughness=roughness;
+        this.simple=simple;
         
         if (this.specularFactor===null) this.specularFactor=new ColorClass(1,1,1);      // default specular, in case it's missing
         
@@ -176,37 +177,56 @@ export default class BitmapClass
        );
     }
     
-    createRoughNormalImage(roughness)
+    createNormalFromColorImage()
     {
         let n,pixelCount,idx;
-        let r,g,b,roughFactor;
+        let f,rg;
         let canvas,ctx,imgData,data;
         
-            // creating a "rough" normal map
-            // from normal roughness
+            // creating a specular map
+            // from a contrast value
             
         canvas=document.createElement('canvas');
         canvas.width=this.colorImage.width;
         canvas.height=this.colorImage.height;
         ctx=canvas.getContext('2d');
-
+        
+            // add the original image
+            
+        ctx.drawImage(this.colorImage,0,0);
+        
 	imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
         data=imgData.data;
-        
+
+            // get a gray scale for the pixel,
+            // the darker it is, the more the normal
+            // points away
+            
         idx=0;
         pixelCount=canvas.width*canvas.height;
         
-        roughFactor=roughness*BitmapClass.DEFAULT_ROUGHNESS_MAX_VALUE;
-        
         for (n=0;n!=pixelCount;n++) {
-            r=Math.trunc(Math.random()*roughFactor);
-            g=Math.trunc(Math.random()*roughFactor);
-            b=512-(r+g);
-            if (b>255) b=255;
+            f=((data[idx]+data[idx+1]+data[idx+2])*0.33)/255;
             
-            data[idx++]=r;
-            data[idx++]=g;
-            data[idx++]=b;
+                // if below a certain darkness, then no
+                // normal
+                
+            if (f>BitmapClass.NORMAL_NO_SHIFT_CLAMP) {
+                data[idx++]=127;
+                data[idx++]=127;
+                data[idx++]=255;
+                data[idx++]=255;
+                
+                continue;
+            }
+            
+                // otherwise clamp it
+                
+            rg=127-Math.trunc((f*BitmapClass.NORMAL_MAX_SHIFT)/BitmapClass.NORMAL_NO_SHIFT_CLAMP);
+            
+            data[idx++]=rg;
+            data[idx++]=rg;
+            data[idx++]=255;
             data[idx++]=255;
         }
 		
@@ -227,7 +247,7 @@ export default class BitmapClass
        );
     }
     
-    createContrastSpecularImage(contrast)
+    createSpecularFromColorImage()
     {
         let n,pixelCount,idx;
         let f,contrastFactor;
@@ -253,11 +273,11 @@ export default class BitmapClass
         idx=0;
         pixelCount=canvas.width*canvas.height;
         
-        contrastFactor=(259*(contrast+255))/(255*(259-contrast));
+        contrastFactor=(259*(BitmapClass.SPECULAR_CONTRAST+255))/(255*(259-BitmapClass.SPECULAR_CONTRAST));
         
         for (n=0;n!=pixelCount;n++) {
             f=(data[idx]+data[idx+1]+data[idx+2])*0.33;
-            f=Math.trunc(((contrastFactor*(f-128))+128)*BitmapClass.DEFAULT_CONTRAST_CLAMP);
+            f=Math.trunc(((contrastFactor*(f-128))+128)*BitmapClass.SPECULAR_CLAMP);
             
             data[idx++]=f;
             data[idx++]=f;
@@ -347,6 +367,14 @@ export default class BitmapClass
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D,null);
         
+            // simple elements are only bitmaps,
+            // no normals, etc.
+            
+        if (this.simple) {
+            this.loaded=true;
+            return;
+        }
+        
             // if there is an alpha, build the mask
             // into a different texture so we can use
             // nearest, otherwise it's all black with a 1 alpha
@@ -386,14 +414,7 @@ export default class BitmapClass
                     );
         }
 
-        if (this.normalImage===null) {
-            if (this.roughness!==0) {
-                this.normalImage=await this.createRoughNormalImage(this.roughness);
-            }
-            else {
-                this.normalImage=await this.createSolidColorImage(127,127,255);
-            }
-        }
+        if (this.normalImage===null) this.normalImage=await this.createNormalFromColorImage();
 
         this.normalMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
@@ -424,7 +445,7 @@ export default class BitmapClass
         }
         
         if (this.specularImage===null) {
-            this.specularImage=await this.createContrastSpecularImage(BitmapClass.DEFAULT_CONTRAST);
+            this.specularImage=await this.createSpecularFromColorImage();
         }
         
         this.specularMap=gl.createTexture();
