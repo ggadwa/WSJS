@@ -11,6 +11,9 @@ import ImportModelClass from '../import/import_model.js';
 
 export default class ModelClass
 {
+    static MODEL_ROTATION_ORDER_XYZ=0;
+    static MODEL_ROTATION_ORDER_XZY=1;
+    
     constructor(core,importSettings)
     {
         this.core=core;

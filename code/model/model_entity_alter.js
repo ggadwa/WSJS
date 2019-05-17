@@ -2,6 +2,7 @@ import PointClass from '../utility/point.js';
 import BoundClass from '../utility/bound.js';
 import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
+import ModelClass from '../model/model.js';
 import ModelEntityAlterNodeClass from '../model/model_entity_alter_node.js';
 import ModelEntityAlterSkinClass from '../model/model_entity_alter_skin.js';
 import ModelAnimationChannelClass from '../model/model_animation_channel.js';
@@ -25,6 +26,8 @@ export default class ModelEntityAlterClass
         this.position=new PointClass(0,0,0);
         this.angle=new PointClass(0,0,0);
         this.scale=new PointClass(0,0,0);
+        
+        this.rotationOrder=ModelClass.MODEL_ROTATION_ORDER_XYZ;
         
         this.inCameraSpace=false;
         this.meshHideList=new Uint8Array(ModelEntityAlterClass.MAX_MESH_COUNT);
@@ -109,12 +112,24 @@ export default class ModelEntityAlterClass
     {
         this.modelMatrix.setTranslationFromPoint(this.position);
         
-        this.rotMatrix.setRotationFromYAngle(this.angle.z);
-        this.modelMatrix.multiply(this.rotMatrix);
-        this.rotMatrix.setRotationFromYAngle(this.angle.y);
-        this.modelMatrix.multiply(this.rotMatrix);
-        this.rotMatrix.setRotationFromXAngle(this.angle.x);
-        this.modelMatrix.multiply(this.rotMatrix);
+        switch (this.rotationOrder) {
+            case ModelClass.MODEL_ROTATION_ORDER_XYZ:
+                this.rotMatrix.setRotationFromZAngle(this.angle.z);
+                this.modelMatrix.multiply(this.rotMatrix);
+                this.rotMatrix.setRotationFromYAngle(this.angle.y);
+                this.modelMatrix.multiply(this.rotMatrix);
+                this.rotMatrix.setRotationFromXAngle(this.angle.x);
+                this.modelMatrix.multiply(this.rotMatrix);
+                break;
+            case ModelClass.MODEL_ROTATION_ORDER_XZY:
+                this.rotMatrix.setRotationFromYAngle(this.angle.y);
+                this.modelMatrix.multiply(this.rotMatrix);
+                this.rotMatrix.setRotationFromZAngle(this.angle.z);
+                this.modelMatrix.multiply(this.rotMatrix);
+                this.rotMatrix.setRotationFromXAngle(this.angle.x);
+                this.modelMatrix.multiply(this.rotMatrix);
+                break;
+        }
         
         if (includeScale) {
             this.scaleMatrix.setScaleFromPoint(this.scale);

@@ -577,22 +577,26 @@ export default class PointClass
         if (movePos) {
             this.x+=acceleration;
             if (this.x>maxValue) this.x=maxValue;
+            return;
         }
         else {
             if (!moveNeg) {
                 this.x-=deceleration;
                 if (this.x<0) this.x=0;
+                return;
             }
         }
         
         if (moveNeg) {
             this.x-=acceleration;
             if (this.x<-maxValue) this.x=-maxValue;
+            return;
         }
         else {
             if (!movePos) {
                 this.x+=deceleration;
                 if (this.x>0) this.x=0;
+                return;
             }
         }
     }
@@ -602,22 +606,26 @@ export default class PointClass
         if (movePos) {
             this.y+=acceleration;
             if (this.y>maxValue) this.y=maxValue;
+            return;
         }
         else {
             if (!moveNeg) {
                 this.y-=deceleration;
                 if (this.y<0) this.y=0;
+                return;
             }
         }
         
         if (moveNeg) {
             this.y-=acceleration;
             if (this.y<-maxValue) this.y=-maxValue;
+            return;
         }
         else {
             if (!movePos) {
                 this.y+=deceleration;
                 if (this.y>0) this.y=0;
+                return;
             }
         }
     }
@@ -627,22 +635,26 @@ export default class PointClass
         if (movePos) {
             this.z+=acceleration;
             if (this.z>maxValue) this.z=maxValue;
+            return;
         }
         else {
             if (!moveNeg) {
                 this.z-=deceleration;
                 if (this.z<0) this.z=0;
+                return;
             }
         }
         
         if (moveNeg) {
             this.z-=acceleration;
             if (this.z<-maxValue) this.z=-maxValue;
+            return;
         }
         else {
             if (!movePos) {
                 this.z+=deceleration;
                 if (this.z>0) this.z=0;
+                return;
             }
         }
     }

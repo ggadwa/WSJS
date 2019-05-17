@@ -175,6 +175,11 @@ export default class ProjectEntityClass
         return(this.modelEntityAlter.show(name,show));
     }
     
+    setModelRotationOrder(rotationOrder)
+    {
+        this.modelEntityAlter.rotationOrder=rotationOrder;
+    }
+    
     setModelDrawPosition(position,angle,scale,inCameraSpace)
     {
         this.modelEntityAlter.position.setFromPoint(position);
