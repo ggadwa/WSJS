@@ -516,6 +516,43 @@ export default class PointClass
         return((Math.atan2(0,x)-Math.atan2((pnt.y-this.y),x))*PointClass.RAD_TO_DEGREE);
     }
     
+    turnXTowards(toX,speed)
+    {
+        let subway,addway;
+        
+        if (this.x===toX) return(0);
+        
+            // which way is faster?
+	
+	if (this.x>toX) {
+            addway=360.0-(this.x-toX);
+            subway=this.x-toX;
+	}
+	else {
+            addway=toX-this.x;
+            subway=360.0-(toX-this.x);
+	}
+        
+            // if we are within speed, then
+            // it's equal
+            
+        if ((subway<speed) || (addway<speed)) {
+            this.x=toX;
+            return(0);
+        }
+		
+            // now turn and always
+            // return the difference
+	
+	if (subway<addway) {
+            this.x-=speed;
+            return(subway);
+	}
+
+        this.x+=speed;
+        return(addway);
+    }
+    
     turnYTowards(toY,speed)
     {
         let subway,addway;
@@ -553,6 +590,43 @@ export default class PointClass
         return(addway);
     }
     
+    turnZTowards(toZ,speed)
+    {
+        let subway,addway;
+        
+        if (this.z===toZ) return(0);
+        
+            // which way is faster?
+	
+	if (this.z>toZ) {
+            addway=360.0-(this.z-toZ);
+            subway=this.z-toZ;
+	}
+	else {
+            addway=toZ-this.z;
+            subway=360.0-(toZ-this.z);
+	}
+        
+            // if we are within speed, then
+            // it's equal
+            
+        if ((subway<speed) || (addway<speed)) {
+            this.z=toZ;
+            return(0);
+        }
+		
+            // now turn and always
+            // return the difference
+	
+	if (subway<addway) {
+            this.z-=speed;
+            return(subway);
+	}
+
+        this.z+=speed;
+        return(addway);
+    }
+    
     minFromPoint(pnt)
     {
         if (this.x>pnt.x) this.x=pnt.x;
@@ -572,87 +646,87 @@ export default class PointClass
         return((this.x===0) && (this.y===0) && (this.z===0));
     }
     
-    moveXWithAcceleration(movePos,moveNeg,acceleration,deceleration,maxValue)
+    moveXWithAcceleration(movePos,moveNeg,posAcceleration,posDeceleration,posMaxValue,negAcceleration,negDeceleration,negMaxValue)
     {
         if (movePos) {
-            this.x+=acceleration;
-            if (this.x>maxValue) this.x=maxValue;
+            this.x+=posAcceleration;
+            if (this.x>posMaxValue) this.x=posMaxValue;
             return;
         }
         else {
             if (!moveNeg) {
-                this.x-=deceleration;
+                this.x-=posDeceleration;
                 if (this.x<0) this.x=0;
                 return;
             }
         }
         
         if (moveNeg) {
-            this.x-=acceleration;
-            if (this.x<-maxValue) this.x=-maxValue;
+            this.x-=negAcceleration;
+            if (this.x<-negMaxValue) this.x=-negMaxValue;
             return;
         }
         else {
             if (!movePos) {
-                this.x+=deceleration;
+                this.x+=negDeceleration;
                 if (this.x>0) this.x=0;
                 return;
             }
         }
     }
     
-    moveYWithAcceleration(movePos,moveNeg,acceleration,deceleration,maxValue)
+    moveYWithAcceleration(movePos,moveNeg,posAcceleration,posDeceleration,posMaxValue,negAcceleration,negDeceleration,negMaxValue)
     {
         if (movePos) {
-            this.y+=acceleration;
-            if (this.y>maxValue) this.y=maxValue;
+            this.y+=posAcceleration;
+            if (this.y>posMaxValue) this.y=posMaxValue;
             return;
         }
         else {
             if (!moveNeg) {
-                this.y-=deceleration;
+                this.y-=posDeceleration;
                 if (this.y<0) this.y=0;
                 return;
             }
         }
         
         if (moveNeg) {
-            this.y-=acceleration;
-            if (this.y<-maxValue) this.y=-maxValue;
+            this.y-=negAcceleration;
+            if (this.y<-negMaxValue) this.y=-negMaxValue;
             return;
         }
         else {
             if (!movePos) {
-                this.y+=deceleration;
+                this.y+=negDeceleration;
                 if (this.y>0) this.y=0;
                 return;
             }
         }
     }
     
-    moveZWithAcceleration(movePos,moveNeg,acceleration,deceleration,maxValue)
+    moveZWithAcceleration(movePos,moveNeg,posAcceleration,posDeceleration,posMaxValue,negAcceleration,negDeceleration,negMaxValue)
     {
         if (movePos) {
-            this.z+=acceleration;
-            if (this.z>maxValue) this.z=maxValue;
+            this.z+=posAcceleration;
+            if (this.z>posMaxValue) this.z=posMaxValue;
             return;
         }
         else {
             if (!moveNeg) {
-                this.z-=deceleration;
+                this.z-=posDeceleration;
                 if (this.z<0) this.z=0;
                 return;
             }
         }
         
         if (moveNeg) {
-            this.z-=acceleration;
-            if (this.z<-maxValue) this.z=-maxValue;
+            this.z-=negAcceleration;
+            if (this.z<-negMaxValue) this.z=-negMaxValue;
             return;
         }
         else {
             if (!movePos) {
-                this.z+=deceleration;
+                this.z+=negDeceleration;
                 if (this.z>0) this.z=0;
                 return;
             }

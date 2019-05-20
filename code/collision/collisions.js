@@ -798,7 +798,7 @@ export default class CollisionClass
                 // skip any mesh we don't collide with
 
             if (!mesh.boxBoundCollision(this.objXBound,this.objYBound,this.objZBound)) continue;
-
+            
                 // check the collide triangles
                 // if we are within the fall, then
                 // return the ground
@@ -823,7 +823,7 @@ export default class CollisionClass
         if (y===(this.rigidPnt.y+this.rayVector.y)) return(maxAngle);
         
             // otherwise find direction of hit and calc
-  
+            
         y=y-entity.position.y;
         x=Math.sqrt((pointOffset.x*pointOffset.x)+(pointOffset.z*pointOffset.z));
         

@@ -70,6 +70,11 @@ export default class ProjectGameClass
         this.core.interface.addElement(id,bitmap,uvOffset,uvSize,rect,color,alpha);
     }
     
+    showInterfaceElement(id,show)
+    {
+        this.core.interface.showElement(id,show);
+    }
+    
     pulseInterfaceElement(id,tick,expand)
     {
         this.core.interface.pulseElement(id,tick,expand);

@@ -11,6 +11,8 @@ export default class InterfaceElementClass
         this.color=color;
         this.alpha=alpha;
         
+        this.show=true;
+        
         this.pulseStartTick=0;
         this.pulseTick=-1;
         this.pulseExpand=0;
@@ -80,6 +82,10 @@ export default class InterfaceElementClass
         let tick,lx,rx,ty,by,factor;
         let shader=this.core.shaderList.interfaceShader;
         let gl=this.core.gl;
+        
+            // skip if not shown
+            
+        if (!this.show) return;
         
             // handle any pulses
             

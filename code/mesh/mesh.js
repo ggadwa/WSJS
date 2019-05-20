@@ -2,6 +2,7 @@ import PointClass from '../utility/point.js';
 import LineClass from '../utility/line.js';
 import BoundClass from '../utility/bound.js';
 import CollisionTrigClass from '../collision/collision_trig.js';
+import MapClass from '../map/map.js';
 
 //
 // map mesh class
@@ -225,7 +226,7 @@ export default class MeshClass
         // collision geometry
         //
         
-    buildCollisionGeometry()
+    buildCollisionGeometry(maxFloorCeilingDetectionFactor)
     {
         let n,ny;
         let tIdx,vIdx;
@@ -321,7 +322,7 @@ export default class MeshClass
             
                 // detect if triangle is a floor
                 
-            if (ny>=0.7) {
+            if (ny>=maxFloorCeilingDetectionFactor) {
                 if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                 this.collisionFloorTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
             }
@@ -329,7 +330,7 @@ export default class MeshClass
                 // detect if triangle is a ceiling
                 
             else {
-                if (ny<=-0.7) {
+                if (ny<=-maxFloorCeilingDetectionFactor) {
                     if (Math.min(xSize,zSize)<CollisionTrigClass.FLOOR_MIN_XZ_ELIMINATION_SIZE) continue;
                     this.collisionCeilingTrigs.push(new CollisionTrigClass(new PointClass(x0,y0,z0),new PointClass(x1,y1,z1),new PointClass(x2,y2,z2)));
                 }

@@ -15,6 +15,11 @@ export default class MeshListClass
 
         this.meshes=[];
         
+            // a factor (the max of the Y in the normal vector)
+            // before triangle is considered a floor or ceilings
+            
+        this.maxFloorCeilingDetectionFactor=0.7;
+        
             // some pre-allocated matrixes
             
         this.normalMatrix=new Matrix3Class();
@@ -190,7 +195,7 @@ export default class MeshListClass
         let mesh;
 
         for (mesh of this.meshes) {
-            mesh.buildCollisionGeometry();
+            mesh.buildCollisionGeometry(this.maxFloorCeilingDetectionFactor);
         }
     }
     

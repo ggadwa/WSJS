@@ -101,6 +101,11 @@ export default class InterfaceClass
         this.elements.set(id,element);
     }
     
+    showElement(id,show)
+    {
+        this.elements.get(id).show=show;
+    }
+    
     pulseElement(id,tick,expand)
     {
         this.elements.get(id).pulse(tick,expand);

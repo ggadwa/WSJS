@@ -219,6 +219,12 @@ export default class ImportMapClass
                 this.core.map.entityList.add(new entityDef.entity(this.core,entityDef.name,entityPosition,entityAngle,entityData));
             }
         }
+        
+            // some physics settings
+            
+        if (importSettings.maxFloorCeilingDetectionFactor!==undefined) {
+            this.core.map.meshList.maxFloorCeilingDetectionFactor=1.0-importSettings.maxFloorCeilingDetectionFactor;     // 0 = walls facing straight up only, to 1 which is pretty much anything
+        }
 
             // and finally a number of mesh specific settings,
             // based either on bitmap associated or a prefix to a mesh name
