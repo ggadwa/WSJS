@@ -564,7 +564,7 @@ export default class ImportGLTFClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
-        let n,bitmap,diffuseTexture,glossTexture,specularFactorProp,glowDef;
+        let n,bitmap,diffuseTexture,diffuseFactor,glossTexture,specularFactorProp,glowDef;
         let colorURL=null;
         let colorBase=null;
         let normalURL=null;
@@ -605,6 +605,12 @@ export default class ImportGLTFClass
                                     scale=diffuseTexture.extensions.KHR_texture_transform.scale;
                                 }
                             }
+                        }
+                    }
+                    else {
+                        diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
+                        if (diffuseFactor!==undefined) {
+                            colorBase=new ColorClass(diffuseFactor[0],diffuseFactor[1],diffuseFactor[2]);
                         }
                     }
 
@@ -755,12 +761,16 @@ export default class ImportGLTFClass
                 tangentArray=null;  // tangents aren't always there, we recreate them if missing
                 if ((primitiveNode.attributes.TANGENT!==undefined) && (!forceTangentRebuild)) tangentArray=this.decodeBuffer(primitiveNode.attributes.TANGENT,3);
                 
-                if (primitiveNode.attributes.TEXCOORD_0===undefined) {
-                    console.log('uv are required in '+this.importSettings.name);
-                    return(false);
+                    // get the UV, sometimes solid colors have
+                    // no UV so just make a 0 uv array
+                    
+                if (primitiveNode.attributes.TEXCOORD_0!==undefined) {
+                    uvArray=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
                 }
-                
-                uvArray=this.decodeBuffer(primitiveNode.attributes.TEXCOORD_0,2);
+                else {
+                    fakeArrayLen=Math.trunc(vertexArray.length/3)*2;
+                    uvArray=new Float32Array(fakeArrayLen);
+                }
                 
                     // if we don't have a skeleton (loading a map) then
                     // don't get any joints.  If we have a skeleton, but no

@@ -51,7 +51,9 @@ export default class ProjectEntityClass
         this.hitEntity=null;
         
         this.collideWallMeshIdx=-1;
-        this.collideWallTrigIdx=-1;
+        this.collideWallTrigIdx=-1;         
+        this.slideWallMeshIdx=-1;
+        this.slideWallTrigIdx=-1;
         this.collideCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
         this.standOnEntity=null;
@@ -506,6 +508,7 @@ export default class ProjectEntityClass
             
         this.touchEntity=null;
         this.collideWallMeshIdx=-1;
+        this.slideWallMeshIdx=-1;
         
             // if no movement, then skip
         
@@ -525,6 +528,9 @@ export default class ProjectEntityClass
             // try to slide
       
         if (slide) {
+            this.slideWallMeshIdx=this.collideWallMeshIdx;
+            this.slideWallTrigIdx=this.collideWallTrigIdx;
+            
             slideSpeed=Math.trunc(Math.sqrt((movePnt.x*movePnt.x)+(movePnt.z*movePnt.z)));
             
             this.checkMovePnt.setFromValues((Math.sign(movePnt.x)*slideSpeed),0.0,0.0);
@@ -540,6 +546,8 @@ export default class ProjectEntityClass
                 this.position.addPointTrunc(this.checkMovePnt);
                 return;
             }
+            
+            this.slideWallMeshIdx=-1;       // was a collision after all
         }
     }
     

@@ -275,10 +275,16 @@ export default class CollisionClass
                             
                         entity.collideWallMeshIdx=n;
                         entity.collideWallTrigIdx=k;
-                        
+                       
+                            // if this is a bump target, it's not a wall
+                            // collision but a bump
+                            
                         bumpY=-1;
                         if (mesh.bump) {
-                            if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=entity.bumpHeight) bumpY=collisionTrig.yBound.max;
+                            if ((collisionTrig.yBound.max-this.entityTestPnt.y)<=entity.bumpHeight) {
+                                bumpY=collisionTrig.yBound.max;
+                                entity.collideWallMeshIdx=-1;
+                            }
                         }
                     }
                 }
