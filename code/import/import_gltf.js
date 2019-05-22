@@ -610,7 +610,7 @@ export default class ImportGLTFClass
                     else {
                         diffuseFactor=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseFactor;
                         if (diffuseFactor!==undefined) {
-                            colorBase=new ColorClass(diffuseFactor[0],diffuseFactor[1],diffuseFactor[2]);
+                            colorBase=new ColorClass((diffuseFactor[0]*5),(diffuseFactor[1]*5),(diffuseFactor[2]*5));   // add some normal spec in there, we normally want textures so this is a stop-gap
                         }
                     }
 

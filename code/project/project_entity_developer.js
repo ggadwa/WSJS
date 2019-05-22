@@ -259,6 +259,12 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
     {
         let input=this.core.input;
         
+            // skip if this isn't the player, as we might
+            // be overriding a bunch of other classes and get this
+            // in a non-player class
+            
+        if (this.core.map.entityList.entities[0]!==this) return;
+        
             // backspace prints out position info
             
         if (input.keyFlags[8]) {
@@ -296,7 +302,7 @@ export default class ProjectEntityDeveloperClass extends ProjectEntityClass
                 console.info('p adds new node to path');
                 console.info('[ deleted selected node');
                 console.info('] moves selected node to player');
-                console.info('\ output new path JSON');
+                console.info('\\ output new path JSON');
             }
         }
         

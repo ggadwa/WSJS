@@ -467,8 +467,15 @@ export default class ProjectEntityClass
         return(-1);
     }
     
+    getNodeKey(nodeIdx)
+    {
+        if (this.core.map.path.nodes[nodeIdx].key===undefined) return(null);
+        return(this.core.map.path.nodes[nodeIdx].key);
+    }
+    
     getNodeData(nodeIdx)
     {
+        if (this.core.map.path.nodes[nodeIdx].data===undefined) return(null);
         return(this.core.map.path.nodes[nodeIdx].data);
     }
     
