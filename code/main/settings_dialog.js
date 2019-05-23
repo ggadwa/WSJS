@@ -27,9 +27,11 @@ export default class SettingsDialogClass
     switchTab(name)
     {
         document.getElementById('tab_Profile').style.backgroundColor=(name==='Profile')?SettingsDialogClass.DIALOG_BACKGROUND:SettingsDialogClass.DIALOG_BACKGROUND_DIM;
+        document.getElementById('tab_Multiplayer').style.backgroundColor=(name==='Multiplayer')?SettingsDialogClass.DIALOG_BACKGROUND:SettingsDialogClass.DIALOG_BACKGROUND_DIM;
         document.getElementById('tab_Movement').style.backgroundColor=(name==='Movement')?SettingsDialogClass.DIALOG_BACKGROUND:SettingsDialogClass.DIALOG_BACKGROUND_DIM;
         document.getElementById('tab_Sound').style.backgroundColor=(name==='Sound')?SettingsDialogClass.DIALOG_BACKGROUND:SettingsDialogClass.DIALOG_BACKGROUND_DIM;
         document.getElementById('view_Profile').style.display=(name==='Profile')?'':'none';
+        document.getElementById('view_Multiplayer').style.display=(name==='Multiplayer')?'':'none';
         document.getElementById('view_Movement').style.display=(name==='Movement')?'':'none';
         document.getElementById('view_Sound').style.display=(name==='Sound')?'':'none';
     }
@@ -133,7 +135,7 @@ export default class SettingsDialogClass
         
     addInput(parentDiv,id,name,ctrlType,list,value,onChange)
     {
-        let n,selIdx;
+        let n;
         let rowDiv=document.createElement('div');
         let leftDiv=document.createElement('div');
         let rightDiv=document.createElement('div');
@@ -174,6 +176,7 @@ export default class SettingsDialogClass
                     input.style.fontFamily='Arial';
                     input.style.fontSize='12pt';
                     input.style.fontWeight='normal';
+                    input.style.width='200px';
                     break;
                 case 'range':
                     input.value=value;
@@ -195,14 +198,13 @@ export default class SettingsDialogClass
             input.style.fontFamily='Arial';
             input.style.fontSize='12pt';
             input.style.fontWeight='normal';
-            
-            selIdx=-1;
+            input.style.width='200px';
+
             for (n=0;n!==list.length;n++) {
                 input.add(new Option(list[n],list[n]));
-                if (list[n]===value) selIdx=n;
             }
             
-            input.selectedIndex=selIdx;
+            input.selectedIndex=value;
             
             if (onChange!==null) input.onchange=onChange;
         }
@@ -220,8 +222,14 @@ export default class SettingsDialogClass
     addProfileControls(viewDiv)
     {
         this.addInput(viewDiv,'name','Name:','text',null,this.core.setup.name,null);
+    }
+    
+    addMultiplayerControls(viewDiv)
+    {
         this.addInput(viewDiv,'serverURL','Server URL:','text',null,this.core.setup.serverURL,null);
-        this.addInput(viewDiv,'savedServerURLLIst','Saved Server URLs:','select',this.core.setup.savedServerURLList,'',this.savedServerListPick.bind(this));
+        this.addInput(viewDiv,'savedServerURLLIst','Saved Server URLs:','select',this.core.setup.savedServerURLList,-1,this.savedServerListPick.bind(this));
+        this.addInput(viewDiv,'botCount','Bot Count:','select',['0','1','2','3','4','5','6','7','8','9'],this.core.setup.botCount,null);
+        this.addInput(viewDiv,'botSkill','Bot Skill:','select',['Easy','Moderate','Normal','Skilled','Hard'],this.core.setup.botSkill,null);
     }
     
     addMovementControls(viewDiv)
@@ -275,11 +283,15 @@ export default class SettingsDialogClass
         view=this.addView(div,'Profile',true);
         this.addProfileControls(view);
         
-        this.addTab(div,SettingsDialogClass.TAB_WIDTH,'Movement',false);
+        this.addTab(div,SettingsDialogClass.TAB_WIDTH,'Multiplayer',false);
+        view=this.addView(div,'Multiplayer',false);
+        this.addMultiplayerControls(view,false);
+        
+        this.addTab(div,(SettingsDialogClass.TAB_WIDTH*2),'Movement',false);
         view=this.addView(div,'Movement',false);
         this.addMovementControls(view,false);
         
-        this.addTab(div,(SettingsDialogClass.TAB_WIDTH*2),'Sound',false);
+        this.addTab(div,(SettingsDialogClass.TAB_WIDTH*3),'Sound',false);
         view=this.addView(div,'Sound',false);
         this.addSoundControls(view,false);
 
@@ -295,8 +307,11 @@ export default class SettingsDialogClass
             // change the setup and save
             
         this.core.setup.name=document.getElementById('name').value;
+        
         this.core.setup.serverURL=document.getElementById('serverURL').value;
         if (this.core.setup.savedServerURLList.indexOf(this.core.setup.serverURL)===-1) this.core.setup.savedServerURLList.splice(0,0,this.core.setup.serverURL);
+        this.core.setup.botCount=document.getElementById('botCount').selectedIndex;
+        this.core.setup.botSkill=document.getElementById('botSkill').selectedIndex;
         
         this.core.setup.mouseXSensitivity=document.getElementById('mouseXSensitivity').value/100.0;
         this.core.setup.mouseXAcceleration=document.getElementById('mouseXAcceleration').value/100.0;

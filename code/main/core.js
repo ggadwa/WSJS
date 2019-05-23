@@ -34,7 +34,7 @@ export default class CoreClass
             failIfMajorPerformanceCaveat:false
         }; 
         
-    gameName='unknown';
+    isNetworkClient=false;
    
     constructor()
     {

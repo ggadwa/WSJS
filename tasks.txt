@@ -1,6 +1,10 @@
 
 - player hurt noise
 - networking
+- number of bots setup and bot skill
+   - implement count & skill (count has to show/hide bots everytime leave setup)
+       - same with player name
+- X killed Y messages
 
 - swimming is broken
 - sort effects, will need a sort z call into the effect

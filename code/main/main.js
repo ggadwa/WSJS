@@ -17,8 +17,12 @@ class MainClass
         Object.seal(this);
     }
     
-    run(gameClass,data)
+    run(gameClass,isNetworkClient,data)
     {
+            // setup networking
+            
+        this.core.isNetworkClient=isNetworkClient;
+        
             // remove any old html and start
             // the canvas
             
@@ -111,13 +115,13 @@ class MainClass
         if (!(await this.core.soundList.loadAllSounds())) return;
         
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Preparing to Run');
+        this.core.loadingScreenAddString('Final Setup');
         this.core.loadingScreenDraw();
 
-        setTimeout(this.initFinish.bind(this),1);
+        setTimeout(this.initFinalSetup.bind(this),1);
     }
     
-    initFinish()
+    initFinalSetup()
     {
             // finish by setting up all the mesh
             // buffers and indexes
@@ -144,8 +148,23 @@ class MainClass
 
         this.core.setPauseState(true,true);
         
-            // and now start the loop
-            
+            // if networking, then goto connect
+            // otherwise just start
+        
+        setTimeout((this.core.isNetworkClient?this.connectToServer.bind(this):this.kickStartLoop.bind(this)),1);
+    }
+    
+    connectToServer()
+    {
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Connecting to Server');
+        this.core.loadingScreenDraw();
+        
+        setTimeout(this.kickStartLoop.bind(this),1);
+    }
+        
+    kickStartLoop()
+    {
         window.requestAnimationFrame(mainLoop);
     }
 }
