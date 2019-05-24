@@ -17,11 +17,11 @@ class MainClass
         Object.seal(this);
     }
     
-    run(gameClass,isNetworkClient,data)
+    run(gameClass,isMultiplayer,data)
     {
             // setup networking
             
-        this.core.isNetworkClient=isNetworkClient;
+        this.core.isMultiplayer=isMultiplayer;
         
             // remove any old html and start
             // the canvas
@@ -56,11 +56,60 @@ class MainClass
 
             // next step
 
+        if (!this.core.isMultiplayer) {
+            this.core.loadingScreenUpdate();
+            this.core.loadingScreenAddString('Loading Map');
+            this.core.loadingScreenDraw();
+
+            setTimeout(this.initLoadMap.bind(this),1);
+        }
+        else {
+            this.core.loadingScreenUpdate();
+            this.core.loadingScreenAddString('Waiting for Setup');
+            this.core.loadingScreenDraw();
+            
+            setTimeout(this.runMultiplayerDialog.bind(this),1);
+        }
+    }
+    
+    runMultiplayerDialog()
+    {
+        this.core.connectDialog.open(this.runMultiplayerDialogContinueLoad.bind(this));     // return here, exit of this dialog will continue on to runMultiplayerDialogContinueLoad()
+    }
+        
+    runMultiplayerDialogContinueLoad()
+    {
+        this.core.connectDialog.close();
+        
+            // local games don't connect
+            
+        if (this.core.setup.localGame) {
+            this.runMultiplayerConnectedOK();
+            return;
+        }
+        
+            // connect to server
+            
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Connecting to Server');
+        this.core.loadingScreenDraw();
+        
+        this.core.network.connect(this.runMultiplayerConnectedOK.bind(this),this.runMultiplayerConnectedError.bind(this));     // return here, callback from connection or error
+    }
+    
+    runMultiplayerConnectedOK()
+    {
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Loading Map');
         this.core.loadingScreenDraw();
-
+        
         setTimeout(this.initLoadMap.bind(this),1);
+    }
+    
+    runMultiplayerConnectedError()
+    {
+        alert(this.core.network.lastErrorMessage);
+        this.runMultiplayerDialog();
     }
     
     async initLoadMap()
@@ -148,23 +197,8 @@ class MainClass
 
         this.core.setPauseState(true,true);
         
-            // if networking, then goto connect
-            // otherwise just start
+            // start the main loop
         
-        setTimeout((this.core.isNetworkClient?this.connectToServer.bind(this):this.kickStartLoop.bind(this)),1);
-    }
-    
-    connectToServer()
-    {
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Connecting to Server');
-        this.core.loadingScreenDraw();
-        
-        setTimeout(this.kickStartLoop.bind(this),1);
-    }
-        
-    kickStartLoop()
-    {
         window.requestAnimationFrame(mainLoop);
     }
 }

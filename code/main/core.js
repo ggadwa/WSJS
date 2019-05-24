@@ -13,8 +13,10 @@ import Matrix3Class from '../utility/matrix3.js';
 import InputClass from '../main/input.js';
 import CameraClass from '../main/camera.js';
 import InterfaceClass from '../interface/interface.js';
+import NetworkClass from '../main/network.js';
 import SetupClass from '../main/setup.js';
-import SettingsDialogClass from '../main/settings_dialog.js';
+import DialogSettingsClass from '../main/dialog_settings.js';
+import DialogConnectClass from '../main/dialog_connect.js';
 
 //
 // core class
@@ -34,7 +36,13 @@ export default class CoreClass
             failIfMajorPerformanceCaveat:false
         }; 
         
-    isNetworkClient=false;
+    isMultiplayer=false;
+    
+    setup=null;
+    settingsDialog=null;
+    connectDialog=null;
+    
+    network=null;
    
     constructor()
     {
@@ -65,6 +73,10 @@ export default class CoreClass
             
         this.input=new InputClass(this);
         this.input.initialize();
+        
+            // networking
+            
+        this.network=new NetworkClass(this);
         
             // pause flag
             
@@ -118,8 +130,6 @@ export default class CoreClass
         this.text=null;
         this.interface=null;
         this.camera=null;
-        this.setup=null;
-        this.settings=null;
 
             // main loop
 
@@ -248,7 +258,8 @@ export default class CoreClass
         this.camera=new CameraClass(this);
         
         this.setup=SetupClass.load(this);
-        this.settings=new SettingsDialogClass(this);
+        this.settingsDialog=new DialogSettingsClass(this);
+        this.connectDialog=new DialogConnectClass(this);
     }
 
     release()
@@ -326,7 +337,7 @@ export default class CoreClass
             // if we are leaving pause, turn
             // off pause window
             
-        if (!pause) this.settings.close();
+        if (!pause) this.settingsDialog.close();
         
             // if this is the init state, then we
             // start the stamps at 0
@@ -361,7 +372,7 @@ export default class CoreClass
         
             // if going into pause, open the settings
             
-        if (pause) this.settings.open();
+        if (pause) this.settingsDialog.open();
     }
     
         //

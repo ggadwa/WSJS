@@ -132,12 +132,27 @@ export default class InterfaceClass
     
     showText(id,show)
     {
-        this.texts.get(id).show=show;
+        let text=this.texts.get(id);
+        
+        text.show=show;
+        text.hideTick=-1;
     }
     
     updateText(id,str)
     {
-        this.texts.get(id).str=''+str;      // make sure it's a string
+        let text=this.texts.get(id);
+        
+        text.str=''+str;      // make sure it's a string
+        text.hideTick=-1;
+    }
+    
+    updateTemporaryText(id,str,tick)
+    {
+        let text=this.texts.get(id);
+        
+        text.str=''+str;      // make sure it's a string
+        text.show=true;
+        text.hideTick=this.core.timestamp+tick;
     }
     
         //

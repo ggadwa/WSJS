@@ -35,6 +35,11 @@ export default class ProjectGameClass
         return(this.core.camera);
     }
     
+    isMultiplayer()
+    {
+        return(this.core.isMultiplayer);
+    }
+    
         //
         // create maps
         //
@@ -98,6 +103,11 @@ export default class ProjectGameClass
     updateInterfaceText(id,str)
     {
         this.core.interface.updateText(id,str);
+    }
+    
+    updateInterfaceTemporaryText(id,str,tick)
+    {
+        this.core.interface.updateTemporaryText(id,str,tick);
     }
     
     getInterfaceWidth()

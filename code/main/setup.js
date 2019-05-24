@@ -8,6 +8,8 @@ export default class SetupClass
     
     name='Player';
     
+    localGame=true;
+    
     serverURL='127.0.0.1';
     savedServerURLList=['127.0.0.1'];
     

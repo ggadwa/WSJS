@@ -32,6 +32,7 @@ export default class InterfaceTextClass
         this.alpha=alpha;
         
         this.show=true;
+        this.hideTick=-1;
                 
             // character drawing arrays
             
@@ -294,6 +295,16 @@ export default class InterfaceTextClass
     draw()
     {
         if (!this.show) return;
+        
+            // check for temporary time out
+         
+        if (this.hideTick!==-1) {
+            if (this.hideTick<this.core.timestamp) {
+                this.hideTick=-1;
+                this.show=false;
+                return;
+            }
+        }
         
         this.drawSingle(1,1,this.fontShadowColor);
         this.drawSingle(0,0,null);

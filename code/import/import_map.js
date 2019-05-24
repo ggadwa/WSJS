@@ -198,6 +198,13 @@ export default class ImportMapClass
         for (n=0;n!==importSettings.entities.length;n++) {
             entityDef=importSettings.entities[n];
             
+                // special check for botCountIndex attribute,
+                // if it's there, we can knock out for bot count
+                
+            if (entityDef.botCountIndex!==undefined) {
+                if (entityDef.botCountIndex>=this.core.setup.botCount) continue;
+            }
+            
             if (entityDef.position!==undefined) {
                 entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
             }

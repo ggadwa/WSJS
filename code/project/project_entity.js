@@ -106,6 +106,11 @@ export default class ProjectEntityClass
         return(this.core.camera);
     }
     
+    isMultiplayer()
+    {
+        return(this.core.isMultiplayer);
+    }
+    
         //
         // meshes and liquids
         //
@@ -333,6 +338,11 @@ export default class ProjectEntityClass
     updateInterfaceText(id,str)
     {
         this.core.interface.updateText(id,str);
+    }
+    
+    updateInterfaceTemporaryText(id,str,tick)
+    {
+        this.core.interface.updateTemporaryText(id,str,tick);
     }
     
     getInterfaceWidth()
