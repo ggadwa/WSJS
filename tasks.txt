@@ -1,6 +1,9 @@
 
 - networking
 
+
+- message queue actually a hash of updated remote positions?
+
 - player hurt noise
 - implement bot skill
 

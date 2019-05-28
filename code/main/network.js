@@ -6,11 +6,7 @@ export default class NetworkClass
 {
     static PORT=52419;
     
-    static STATUS_OK=0;
-    static STATUS_INTERNAL_ERROR=1;
-    static STATUS_UNAUTHORIZED=2;
-    
-    static STATUS_STRINGS=['OK','Internal Error','Unauthorized'];
+    static MESSAGE_TYPE_ENTITY_UPDATE=0;
     
     core=null;
     socket=null;
@@ -79,38 +75,28 @@ export default class NetworkClass
     async message(event)
     {
         let dataView=new DataView(await (new Response(event.data).arrayBuffer()));
-        let status=dataView.getInt8(0);
-        
-            // stop on bad statuses
-            
-        if (status!==NetworkClass.STATUS_OK) {
-            this.lastErrorMessage='Network error: '+NetworkClass.STATUS_STRINGS[status];
-            this.disconnect();
-            
-                // if we hit a bad status while
-                // waiting to connect, call the startup error
-                
-            if (this.inConnectWait) {
-                this.inConnectWait=false;
-                this.connectErrorCallback();
-            }
-            return;
-        }
         
             // if we are waiting for a connect ok,
-            // get the id and we are now connected
+            // the id should be returned.  If a negative
+            // number, we failed to logon
             
         if (this.inConnectWait) {
             this.inConnectWait=false;
             
-            this.id=dataView.getInt16(1);
-            this.connectOKCallback();
+            this.id=dataView.getInt16(0);
+            
+            if (this.id<0) {
+                this.connectErrorCallback();
+            }
+            else {
+                this.connectOKCallback();
+            }
             return;
         }
         
             // otherwise it's a queued message
 
-        this.queue.push();
+        this.queue.push(dataView);
     }
     
     error(event)
@@ -141,8 +127,27 @@ export default class NetworkClass
         return(this.queue.pop());
     }
     
-    sendMessage(msg)
+    sendEntityUpdate(entity)
     {
+        let buffer=new ArrayBuffer(53);
+        let dataView=new DataView(buffer);
         
+        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE);
+        dataView.setInt32(2,entity.position.x);
+        dataView.setInt32(6,entity.position.y);
+        dataView.setInt32(10,entity.position.z);
+        dataView.setFloat32(14,entity.angle.x);
+        dataView.setFloat32(18,entity.angle.y);
+        dataView.setFloat32(22,entity.angle.z);
+        dataView.setFloat32(26,entity.scale.x);
+        dataView.setFloat32(30,entity.scale.y);
+        dataView.setFloat32(34,entity.scale.z);
+        dataView.setInt16(38,entity.modelEntityAlter.currentAnimationIdx);
+        dataView.setInt32(40,entity.modelEntityAlter.currentAnimationStartTimestamp);
+        dataView.setInt32(44,entity.modelEntityAlter.currentAnimationLoopStartTick);
+        dataView.setInt32(48,entity.modelEntityAlter.currentAnimationLoopEndTick);
+        dataView.setInt8(52,(entity.modelEntityAlter.queuedAnimationStop?0:1));
+        
+        this.socket.send(buffer);
     }
 }

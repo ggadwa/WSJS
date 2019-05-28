@@ -276,6 +276,11 @@ function mainLoop(timestamp)
         core.soundList.updateListener();
     }
     
+        // if multiplayer, update the server
+        // with player information
+        
+    if (core.isMultiplayer) core.network.sendEntityUpdate(map.entityList.getPlayer());
+    
         // drawing
         
         // this timing is loose, as it's only there to
