@@ -279,7 +279,7 @@ function mainLoop(timestamp)
         // if multiplayer, update the server
         // with player information
         
-    if (core.isMultiplayer) core.network.sendEntityUpdate(map.entityList.getPlayer());
+    if ((core.isMultiplayer) && (!core.setup.localGame)) core.network.sendEntityUpdate(map.entityList.getPlayer());
     
         // drawing
         

@@ -25,7 +25,7 @@ export default class ImportMapClass
         let liquid,liquidDef,liquidBitmap;
         let movement,meshIdxList,reverseMeshIdxList,movementDef;
         let moveDef,movePoint,moveRotate,rotateOffset,centerOffset;
-        let entityDef,entityPosition,entityAngle,entityData;
+        let entity,entityDef,entityPosition,entityAngle,entityData,entityName,botCount;
         let pathNode,pathDef,altPosition;
         let bitmap;
         let importMesh;
@@ -195,15 +195,12 @@ export default class ImportMapClass
             return(false);
         }
         
+        botCount=0;
+        
         for (n=0;n!==importSettings.entities.length;n++) {
             entityDef=importSettings.entities[n];
             
-                // special check for botCountIndex attribute,
-                // if it's there, we can knock out for bot count
-                
-            if (entityDef.botCountIndex!==undefined) {
-                if (entityDef.botCountIndex>=this.core.setup.botCount) continue;
-            }
+            entityName=(entityDef.name===undefined)?'':entityDef.name;
             
             if (entityDef.position!==undefined) {
                 entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
@@ -217,13 +214,30 @@ export default class ImportMapClass
             else {
                 entityAngle=new PointClass(0,0,0);
             }
+            
             entityData=(entityDef.data===undefined)?null:entityDef.data;
+            
+                // first entity is always assumed to be the player, anything
+                // else is a map entity
 
             if (n===0) {
-                this.core.map.entityList.setPlayer(new entityDef.entity(this.core,entityDef.name,entityPosition,entityAngle,entityData));
+                this.core.map.entityList.setPlayer(new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData));
             }
             else {
-                this.core.map.entityList.add(new entityDef.entity(this.core,entityDef.name,entityPosition,entityAngle,entityData));
+                entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
+                this.core.map.entityList.add(entity);
+                
+                    // deactivate if a remote or a bot over bot count
+                    
+                if (entityDef.remote!==undefined) {
+                    entity.remote=true;
+                    entity.active=false;
+                }
+                
+                if (entityDef.bot!==undefined) {
+                    entity.active=(botCount<this.core.setup.botCount);
+                    botCount++;
+                }
             }
         }
         

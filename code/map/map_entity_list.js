@@ -98,7 +98,7 @@ export default class MapEntityListClass
         let entity;
          
         for (entity of this.entities) {
-            if (entity.name===name) return(entity);
+            if ((entity.active) && (entity.name===name)) return(entity);
         }
         
         return(null);
@@ -109,7 +109,7 @@ export default class MapEntityListClass
         let entity;
          
         for (entity of this.entities) {
-            if (entity.heldBy===parentEntity) {
+            if ((entity.active) && (entity.heldBy===parentEntity)) {
                 if (entity.name===name) return(entity);
             }
         }
@@ -129,7 +129,7 @@ export default class MapEntityListClass
             // any projectiles
             
         for (entity of this.entities) {
-            entity.movementPush(meshIdx,movePnt,rotateAng);
+            if (entity.active) entity.movementPush(meshIdx,movePnt,rotateAng);
         }
     }
     
@@ -144,7 +144,7 @@ export default class MapEntityListClass
             // run the entities
             
         for (entity of this.entities) {
-            entity.ready(this);
+            if (entity.active) entity.ready(this);
         }
     }
     
@@ -159,7 +159,7 @@ export default class MapEntityListClass
             // run the entities
             
         for (entity of this.entities) {
-            entity.run();
+            if (entity.active) entity.run();
         }
     }
     
@@ -172,6 +172,8 @@ export default class MapEntityListClass
         let entity;
 
         for (entity of this.entities) {
+            if (!entity.active) continue;
+            
             if (heldBy!==null) {
                 if (entity.heldBy!==heldBy) continue;
             }

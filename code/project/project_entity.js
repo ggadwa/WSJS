@@ -26,6 +26,8 @@ export default class ProjectEntityClass
         this.angle=angle.copy();
         this.data=data;
         
+        this.active=true;
+        this.remote=false;
         this.show=true;
         this.heldBy=null;
         this.filter=null;
