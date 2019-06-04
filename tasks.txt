@@ -1,13 +1,13 @@
+- beach ball physics
 
 - networking
    - enter
    - leave
    - remotes and updates
 
-- add in cinemas
-
-- player hurt noise
 - implement bot skill
+- player hurt noise
+- add in cinemas
 
 - swimming is broken
 - sort effects, will need a sort z call into the effect
@@ -18,16 +18,3 @@
 
 - wait for public/private class fields to land in safari
 - work on touch controls (left side, move and turn) (right side, look and shoot, swipe left/right weapon change, swipe up for grenade)
-
-{
-    "actors":
-        [
-            {"name","guy","model":"player","position":{"x":-3000,"y":0,"z":0},"angle":{"x":0,"y":0,"z":0}},
-            {"name":"vampire","model":"vampire","position":{"x":3000,"y":0,"z":0},"angle":{"x":0,"y":0,"z":0}}
-        ],
-    "actions":
-        [
-            {"tick":0,"msec":3000,"actor":"guy","action":"move","position":{"x":0,"y":0,"z":0},"angle":{"x":0,"y":0,"z":0}},
-            {"tick":3000,"msec":1000,"actor":"guy","action":"move","position":{"x":0,"y":0,"z":0},"angle":{"x":0,"y":90,"z":0}}
-        ]
-}
