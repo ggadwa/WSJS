@@ -35,8 +35,6 @@ export default class ProjectEntityClass
         this.model=null;
         this.modelEntityAlter=null;
         
-        this.positionBackup=this.position.copy();
-        
         this.eyeOffset=0;
         this.bumpHeight=0;
 
@@ -51,6 +49,7 @@ export default class ProjectEntityClass
         this.passThrough=false;
         this.touchEntity=null;
         this.hitEntity=null;
+        this.hitPoint=new PointClass(0,0,0);
         
         this.collideWallMeshIdx=-1;
         this.collideWallTrigIdx=-1;         
@@ -58,6 +57,7 @@ export default class ProjectEntityClass
         this.slideWallTrigIdx=-1;
         this.collideCeilingMeshIdx=-1;
         this.standOnMeshIdx=-1;
+        this.standOnTrigIdx=-1;
         this.standOnEntity=null;
         this.hitHeadOnEntity=null;
         
@@ -282,6 +282,21 @@ export default class ProjectEntityClass
         return(this.angle.turnYTowards(this.position.angleYTo(entity.position),turnSpeed));
     }
     
+    damageEntityForRadius(hitEntity,centerPosition,maxDistance,maxDamage)
+    {
+        let entity,dist,damage;
+
+        for (entity of this.core.map.entityList.entities) {
+            if ((!entity.active) || (!entity.show)) continue;
+            
+            dist=centerPosition.distance(entity.position);
+            if (dist>maxDistance) continue;
+            
+            damage=Math.trunc((1.0-(dist/maxDistance))*maxDamage);
+            entity.damage(hitEntity,damage,centerPosition);
+        }
+    }
+    
         //
         // effect utilities
         //
@@ -361,9 +376,17 @@ export default class ProjectEntityClass
         // misc APIs
         //
         
-    startCameraShake(shakeTick,shakeShift)
+    shakeCamera(shakePosition,shakeDistance,shakeTick,shakeMaxShift)
     {
-        this.core.startCameraShake(shakeTick,shakeShift);
+        let entity,dist;
+
+            // shake only registers if close enough
+            // to camera object
+            
+        entity=this.getPlayerEntity();
+        
+        dist=this.position.distance(entity.position);
+        if (dist<shakeDistance) this.core.startCameraShake(shakeTick,Math.trunc((shakeMaxShift*dist)/shakeDistance));
     }
     
     /**
@@ -849,6 +872,14 @@ export default class ProjectEntityClass
         //
         
     run()
+    {
+    }
+    
+        //
+        // override this when taking damage
+        //
+        
+    damage(fromEntity,damage,hitPoint)
     {
     }
     

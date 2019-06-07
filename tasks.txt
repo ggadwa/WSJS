@@ -1,4 +1,10 @@
 - beach ball physics
+   - rolling
+   - gain speed rolling
+   - bouncing
+   - shoot to reset (explode)
+   - not getting stuck in circle
+   - falling
 
 - networking
    - enter

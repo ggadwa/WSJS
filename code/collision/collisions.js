@@ -470,6 +470,7 @@ export default class CollisionClass
                         if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
                             if (this.rayHitPnt.y>=y) {
                                 entity.standOnMeshIdx=n;
+                                entity.standOnTrigIdx=k;
                                 y=this.rayHitPnt.y;
                             }
                         }
