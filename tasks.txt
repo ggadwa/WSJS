@@ -1,10 +1,14 @@
 - beach ball physics
+   * need to get rid of centering on ball
    - rolling
    - gain speed rolling
-   - bouncing
+   * bouncing
    - shoot to reset (explode)
    - not getting stuck in circle
-   - falling
+   * falling
+   - bounce sound?
+
+--> transfer these changes to grenade
 
 - networking
    - enter

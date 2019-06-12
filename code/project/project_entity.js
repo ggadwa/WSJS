@@ -738,12 +738,12 @@ export default class ProjectEntityClass
         // movement utilities
         //
         
-    floorHitBounceY(y,bounceFactor)
+    floorHitBounceY(y,bounceFactor,bounceCut)
     {
-        y=-Math.trunc((y+this.gravity)*bounceFactor);
+        y=-Math.trunc((y-this.gravity)*bounceFactor);
         this.gravity=this.gravityMinValue;
         
-        if (Math.abs(y)<this.gravityAcceleration) y=0;          // always break if we are less than acceleration
+        if (Math.abs(y)<bounceCut) y=0;
         
         return(y);
     }
