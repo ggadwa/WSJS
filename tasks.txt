@@ -1,3 +1,8 @@
+
+--> make motion part of core
+--> make pushable part of core
+
+
 - beach ball physics
    * need to get rid of centering on ball
    - rolling
@@ -7,6 +12,8 @@
    - not getting stuck in circle
    * falling
    - bounce sound?
+   - floating
+   - water pushing
 
 --> transfer these changes to grenade
 
