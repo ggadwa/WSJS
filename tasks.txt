@@ -1,21 +1,8 @@
 
---> make motion part of core
---> make pushable part of core
-
-
 - beach ball physics
-   * need to get rid of centering on ball
-   - rolling
-   - gain speed rolling
-   * bouncing
-   - shoot to reset (explode)
-   - not getting stuck in circle
-   * falling
    - bounce sound?
    - floating
    - water pushing
-
---> transfer these changes to grenade
 
 - networking
    - enter
@@ -24,7 +11,6 @@
 
 - implement bot skill
 - player hurt noise
-- add in cinemas
 
 - swimming is broken
 - sort effects, will need a sort z call into the effect

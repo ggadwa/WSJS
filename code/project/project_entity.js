@@ -677,10 +677,13 @@ export default class ProjectEntityClass
     }
     
         //
-        // mesh pushing
+        // pushing
+        // you can override entityPush to do special things when
+        // touched by another entity, currently, returning FALSE means
+        // it can't be pushed
         //
         
-    movementPush(meshIdx,movePnt,rotateAng)
+    meshPush(meshIdx,movePnt,rotateAng)
     {
         let lft,rgt,top,bot;
         let mesh;
@@ -732,6 +735,11 @@ export default class ProjectEntityClass
                 this.position.z=mesh.zBound.min-this.radius;
             }
         }
+    }
+    
+    entityPush(entity,movePnt)
+    {
+        return(false);
     }
     
         //

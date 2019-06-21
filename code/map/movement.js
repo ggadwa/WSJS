@@ -173,7 +173,7 @@ export default class MovementClass
                 mesh.rotate(this.rotateAng,this.rotateOffset);
             }
             
-            if (needPush) this.core.map.entityList.movementPush(this.meshIdxList[n],this.movePnt,this.rotateAng);
+            if (needPush) this.core.map.entityList.meshPush(this.meshIdxList[n],this.movePnt,this.rotateAng);
         }
         
             // do reverse moves
@@ -199,7 +199,7 @@ export default class MovementClass
                     mesh.rotate(this.rotateAng,this.reverseRotateOffet);
                 }
                 
-                if (needPush) this.core.map.entityList.movementPush(this.reverseMeshIdxList[n],this.movePnt,this.rotateAng);
+                if (needPush) this.core.map.entityList.meshPush(this.reverseMeshIdxList[n],this.movePnt,this.rotateAng);
             }
         }
     }

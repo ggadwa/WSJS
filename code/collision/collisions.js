@@ -214,10 +214,13 @@ export default class CollisionClass
         let nMesh=this.core.map.meshList.meshes.length;
         let nEntity=this.core.map.entityList.count();
         
-            // keep a bump count
+            // keep a bump and push count
             
         let bumpCount=0;
         let bumpY,entityTopY;
+        
+        let pushCount=0;
+        let pushedEntity=false;
         
             // the moved point
             
@@ -236,7 +239,7 @@ export default class CollisionClass
         
             // we need to possible run through
             // this multiple times to deal with
-            // bumps
+            // bumps or pushes
           
         while (true) {
             currentDist=-1;
@@ -292,6 +295,8 @@ export default class CollisionClass
             
                 // check other entities
 
+            pushedEntity=false;
+            
             for (n=0;n!==nEntity;n++) {
                 checkEntity=this.core.map.entityList.get(n);
                 if (checkEntity===entity) continue;
@@ -318,8 +323,16 @@ export default class CollisionClass
                     entity.touchEntity=checkEntity;
                     checkEntity.touchEntity=entity;
                     
+                        // can we bump?
+                    
                     bumpY=-1;
                     if ((entityTopY-this.entityTestPnt.y)<=entity.bumpHeight) bumpY=entityTopY;
+                    
+                        // can we push?
+                        
+                    if ((bumpY==-1) && (!checkEntity.passThrough)) {
+                        pushedEntity=checkEntity.entityPush(entity,movePnt); 
+                    }
                 }
             }
 
@@ -342,8 +355,19 @@ export default class CollisionClass
                 }
             }
             
+                // if we pushed an object, then we can go back
+                // and try to move again (after the push got moved),
+                // if we already tried once, then just return the hit
+                
+            if (pushedEntity) {
+                if (pushCount!==0) return(true);
+                
+                pushCount++;
+                continue;
+            }
+            
                 // if no bump or not a bumpable
-                // hit or already bumped, just return hit
+                // hit or already bumped then just return hit
                 
             if ((!bump) || (bumpY===-1) || (bumpCount>=CollisionClass.MAX_BUMP_COUNT)) return(true);
                 

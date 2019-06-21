@@ -118,18 +118,15 @@ export default class MapEntityListClass
     }
     
         //
-        // movements against entities
+        // pushing
         //
         
-    movementPush(meshIdx,movePnt,rotateAng)
+    meshPush(meshIdx,movePnt,rotateAng)
     {
         let entity;
         
-            // check the entities, skipping
-            // any projectiles
-            
         for (entity of this.entities) {
-            if (entity.active) entity.movementPush(meshIdx,movePnt,rotateAng);
+            if (entity.active) entity.meshPush(meshIdx,movePnt,rotateAng);
         }
     }
     

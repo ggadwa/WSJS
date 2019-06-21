@@ -32,6 +32,7 @@ export default class CoreClass
             stencil:false,
             antialias:false,
             premultipliedAlpha:false,
+            desynchronized:true,
             preserveDrawingBuffer:true,
             failIfMajorPerformanceCaveat:false
         }; 
