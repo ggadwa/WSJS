@@ -217,6 +217,21 @@ export default class ProjectEntityClass
         return(this.modelEntityAlter.isAnimationRunning());
     }
     
+    setModelBoneTranslationPoint(name,translation)
+    {
+        this.modelEntityAlter.setBoneTranslationPoint(name,translation);
+    }
+    
+    setModelBoneRotationQuaternion(name,rotation)
+    {
+        this.modelEntityAlter.setBoneRotationQuaternion(name,rotation);
+    }
+    
+    setModelBoneScalePoint(name,scale)
+    {
+        this.modelEntityAlter.setBoneScale(name,scale);
+    }
+    
         //
         // ticks and periodics
         //

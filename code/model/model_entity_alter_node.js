@@ -14,9 +14,9 @@ export default class ModelEntityAlterNodeClass
         this.name=name;
         this.parentNodeIdx=parentNodeIdx;
         this.childNodeIdxs=childNodeIdxs;
-        this.translation=translation.copy();   // a point, no animation translation
-        this.rotation=rotation.copy();         // a quaternion, no animation rotation
-        this.scale=scale.copy();               // a point, no animation scale
+        this.translation=translation.copy();   // a point, static translation
+        this.rotation=rotation.copy();         // a quaternion, static rotation
+        this.scale=scale.copy();               // a point, static scale
 
             // the pose versions
             

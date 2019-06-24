@@ -347,7 +347,7 @@ export default class ModelEntityAlterClass
         
             // now cumulative all the nodes for
             // their matrixes
-            
+ 
         this.runAnimationNode(this.nodes[0],null);
     }
     
@@ -406,6 +406,47 @@ export default class ModelEntityAlterClass
     isAnimationRunning()
     {
         return(this.currentAnimationIdx!==-1);
+    }
+    
+        //
+        // hard set bone changes, these can only be used when
+        // an animation is not running
+        //
+        
+    setBoneTranslationPoint(name,translation)
+    {
+        let node;
+        
+        for (node of this.nodes) {
+            if (node.name===name) {
+                node.poseTranslation.setFromPoint(translation);
+                return;
+            }
+        }
+    }
+    
+    setBoneRotationQuaternion(name,rotation)
+    {
+        let node;
+        
+        for (node of this.nodes) {
+            if (node.name===name) {
+                node.poseRotation.setFromQuaternion(rotation);
+                return;
+            }
+        }
+    }
+    
+    setBoneScalePoint(name,scale)
+    {
+        let node;
+        
+        for (node of this.nodes) {
+            if (node.name===name) {
+                node.poseScale.setFromPoint(scale);
+                return;
+            }
+        }
     }
         
         //
