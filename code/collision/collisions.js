@@ -34,7 +34,11 @@ export default class CollisionClass
         
         this.rayVector=new PointClass(0,0,0);
         
-        this.rigidPnt=new PointClass(0,0,0);
+        this.rigidPnt=[];
+        this.rigidPnt.push(new PointClass(0,0,0));
+        this.rigidPnt.push(new PointClass(0,0,0));
+        this.rigidPnt.push(new PointClass(0,0,0));
+        this.rigidPnt.push(new PointClass(0,0,0));      // 4 rigid points
         this.rigidVector=new PointClass(0,0,0);
         this.rigidHitPnt=new PointClass(0,0,0);
         
@@ -787,35 +791,52 @@ export default class CollisionClass
         // rigid body calculations
         //
         
-    getRigidBodyAngle(entity,pointOffset,maxDrop,maxAngle)
+    getRigidBodyAngle(entity,rigidAngle,maxDrop,maxAngle)
     {
-        let n,k,x,y,nMesh,nCollisionTrig;
-        let ang;
+        let n,k,t,nMesh,nCollisionTrig;
         let mesh,collisionTrig;
+        let yHit=[0,0,0,0];
         
-            // build the single point for the rigid body
+            // build the four rigid body points
             
-        this.rigidPnt.setFromAddPoint(entity.position,pointOffset);
+        this.rigidPnt[0].setFromValues(0,0,entity.radius);      // top
+        this.rigidPnt[0].rotateY(null,entity.angle.y);
+        this.rigidPnt[0].addPoint(entity.position);
         
-            // our bound is just the vertical line
+        this.rigidPnt[1].setFromValues(0,0,-entity.radius);     // and bottom changes X
+        this.rigidPnt[1].rotateY(null,entity.angle.y);
+        this.rigidPnt[1].addPoint(entity.position);
+        
+        this.rigidPnt[2].setFromValues(entity.radius,0,0);      // left
+        this.rigidPnt[2].rotateY(null,entity.angle.y);
+        this.rigidPnt[2].addPoint(entity.position);
+        
+        this.rigidPnt[3].setFromValues(-entity.radius,0,0);      // and right changes Z
+        this.rigidPnt[3].rotateY(null,entity.angle.y);
+        this.rigidPnt[3].addPoint(entity.position);
+        
+            // our bound is around the X/Z
+            // plus any rigid drop
             
-        this.objXBound.setFromValues(this.rigidPnt.x,this.rigidPnt.x);
-        this.objYBound.setFromValues((this.rigidPnt.y-maxDrop),(this.rigidPnt.y+maxDrop));
-        this.objZBound.setFromValues(this.rigidPnt.z,this.rigidPnt.z);
+        this.objXBound.setFromValues((entity.position.x-entity.radius),(entity.position.x+entity.radius));
+        this.objYBound.setFromValues((entity.position.y-maxDrop),(entity.position.y+maxDrop));
+        this.objZBound.setFromValues((entity.position.z-entity.radius),(entity.position.z+entity.radius));
         
-            // the rigid point is maxDrop above and
-            // maxDrop below so we can catch going up
-            // or down
+            // ray vector is always straight down
             
-        this.rigidPnt.y+=maxDrop;
-        
         this.rayVector.x=0;
         this.rayVector.y=-(maxDrop*2);
         this.rayVector.z=0;
-       
-            // start with no hits
-       
-        y=this.rigidPnt.y+this.rayVector.y;
+        
+            // the rigid point is maxDrop above and
+            // maxDrop below so we can catch going up
+            // or down, and we start with no hits which
+            // is past the max drop
+            
+        for (n=0;n!==4;n++) {
+            this.rigidPnt[n].y+=maxDrop;
+            yHit[n]=this.rigidPnt[n].y+this.rayVector.y;
+        }
         
             // run through colliding trigs
             // no entity checking as entities are always flat
@@ -842,25 +863,55 @@ export default class CollisionClass
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionFloorTrigs[k];
                 if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    if (collisionTrig.rayTrace(this.rigidPnt,this.rayVector,this.rayHitPnt)) {
-                        if (this.rayHitPnt.y>=y) y=this.rayHitPnt.y;
+                    
+                    for (t=0;t!==4;t++) {
+                        if (collisionTrig.rayTrace(this.rigidPnt[t],this.rayVector,this.rayHitPnt)) {
+                            if (this.rayHitPnt.y>=yHit[t]) yHit[t]=Math.trunc(this.rayHitPnt.y);
+                        }
                     }
                 }
             }
         }
         
-            // if we hit nothing, return max angle
+            // calculate the X angle
+            // if the same (both on flat land or in air) then angle is 0
+            // otherwise it's the angle between the two rigid points
             
-        if (y===(this.rigidPnt.y+this.rayVector.y)) return(maxAngle);
+        if (yHit[0]===yHit[1]) {
+            rigidAngle.x=0;
+        }
+        else {
+            if ((this.rigidPnt[0].y+this.rayVector.y)===yHit[0]) {
+                rigidAngle.x=maxAngle;
+            }
+            else {
+                if ((this.rigidPnt[1].y+this.rayVector.y)===yHit[1]) {
+                    rigidAngle.x=-maxAngle;
+                }
+                else {
+                    rigidAngle.x=-((Math.atan2((yHit[0]-this.rigidPnt[0].y),entity.radius)-Math.atan2((yHit[1]-this.rigidPnt[1].y),entity.radius))*PointClass.RAD_TO_DEGREE)*0.5;
+                }
+            }
+        }
         
-            // otherwise find direction of hit and calc
+            // calculate the Z angle
             
-        y=y-entity.position.y;
-        x=Math.sqrt((pointOffset.x*pointOffset.x)+(pointOffset.z*pointOffset.z));
-        
-        ang=(Math.atan2(0,x)-Math.atan2(y,x))*PointClass.RAD_TO_DEGREE;
-        
-        return(ang);
+        if (yHit[2]===yHit[3]) {
+            rigidAngle.z=0;
+        }
+        else {
+            if ((this.rigidPnt[2].y+this.rayVector.y)===yHit[2]) {
+                rigidAngle.z=-maxAngle;
+            }
+            else {
+                if ((this.rigidPnt[3].y+this.rayVector.y)===yHit[3]) {
+                    rigidAngle.z=maxAngle;
+                }
+                else {
+                    rigidAngle.z=((Math.atan2((yHit[2]-this.rigidPnt[2].y),entity.radius)-Math.atan2((yHit[3]-this.rigidPnt[3].y),entity.radius))*PointClass.RAD_TO_DEGREE)*0.5;
+                }
+            }
+        }
     }
     
         //

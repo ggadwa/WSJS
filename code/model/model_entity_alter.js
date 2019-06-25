@@ -345,6 +345,10 @@ export default class ModelEntityAlterClass
             this.setupNodesToPose();
         }
         
+            // callback for any custom bone setup
+            
+        this.entity.animatedBoneSetup();
+        
             // now cumulative all the nodes for
             // their matrixes
  

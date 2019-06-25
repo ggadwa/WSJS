@@ -821,9 +821,9 @@ export default class ProjectEntityClass
         return(this.collision.rayCollision(this,pnt,vector,hitPnt,hitFilter,skipFilter));
     }
     
-    getRigidBodyAngle(pointOffset,maxDrop,maxAngle)
+    getRigidBodyAngle(rigidAngle,maxDrop,maxAngle)
     {
-        return(this.collision.getRigidBodyAngle(this,pointOffset,maxDrop,maxAngle));
+        return(this.collision.getRigidBodyAngle(this,rigidAngle,maxDrop,maxAngle));
     }
     
         //
@@ -903,6 +903,16 @@ export default class ProjectEntityClass
         //
         
     damage(fromEntity,damage,hitPoint)
+    {
+    }
+    
+        //
+        // override this if you want to make some alterations to bones after
+        // the animation has been calculated.  Use the setModelBoneXXX methods
+        // to alter bones
+        //
+        
+    animatedBoneSetup()
     {
     }
     
