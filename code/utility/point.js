@@ -365,6 +365,11 @@ export default class PointClass
         return(Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z)));
     }
     
+    lengthXZ()
+    {
+        return(Math.sqrt((this.x*this.x)+(this.z*this.z)));
+    }
+    
     normalize()
     {
         let f=Math.sqrt((this.x*this.x)+(this.y*this.y)+(this.z*this.z));
@@ -588,6 +593,28 @@ export default class PointClass
 
         this.y+=speed;
         return(addway);
+    }
+    
+    getTurnYTowards(toY)
+    {
+        let subway,addway;
+        
+        if (this.y===toY) return(0);
+        
+            // which way is faster?
+	
+	if (this.y>toY) {
+            addway=360.0-(this.y-toY);
+            subway=this.y-toY;
+	}
+	else {
+            addway=toY-this.y;
+            subway=360.0-(toY-this.y);
+	}
+        
+            // quickest turn
+	
+	return((subway<addway)?-subway:addway);
     }
     
     turnZTowards(toZ,speed)

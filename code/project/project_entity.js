@@ -529,9 +529,19 @@ export default class ProjectEntityClass
         return(this.core.map.path.nodes[nodeIdx].data);
     }
     
+    getNodePosition(nodeIdx)
+    {
+        return(this.core.map.path.nodes[nodeIdx].position);
+    }
+    
     turnYTowardsNode(nodeIdx,turnSpeed)
     {
         return(this.angle.turnYTowards(this.position.angleYTo(this.core.map.path.nodes[nodeIdx].position),turnSpeed));
+    }
+    
+    getTurnYTowardsNode(nodeIdx)
+    {
+        return(this.angle.getTurnYTowards(this.position.angleYTo(this.core.map.path.nodes[nodeIdx].position)));
     }
     
     getVectorToNode(nodeIdx,pnt)
