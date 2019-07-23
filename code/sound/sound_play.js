@@ -27,7 +27,7 @@ export default class SoundPlayClass
         // play a sound buffer at this entity
         //
         
-    play(ctx,entityListener,entity,mesh,sound)
+    play(ctx,entityListener,entity,mesh,sound,rate,loop)
     {
         let dist;
         
@@ -47,6 +47,8 @@ export default class SoundPlayClass
         
         this.sourceNode=ctx.createBufferSource();
         this.sourceNode.buffer=sound.buffer;
+        this.sourceNode.playbackRate.value=rate;
+        this.sourceNode.loop=loop;
         this.sourceNode.onended=this.ended.bind(this);
         
             // if no entity/mesh, than just add
@@ -115,6 +117,24 @@ export default class SoundPlayClass
         this.sourceNode=null;
         this.gainNode=null;
         this.pannerNode=null;
+    }
+    
+        //
+        // stop a playing sound
+        //
+        
+    stop()
+    {
+        this.sourceNode.stop();
+    }
+    
+        //
+        // change the rate
+        //
+        
+    changeRate(rate)
+    {
+        this.sourceNode.playbackRate.value=rate;
     }
     
         //

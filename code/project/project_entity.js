@@ -884,14 +884,29 @@ export default class ProjectEntityClass
         this.core.soundList.add(name,distance);
     }
         
-    playSound(name)
+    playSound(name,rate,loop)
     {
-        this.core.soundList.play(this,null,name);
+        return(this.core.soundList.play(this,null,name,rate,loop));
     }
     
-    playSoundAtEntity(entity,name)
+    playSoundAtEntity(entity,name,rate,loop)
     {
-        this.core.soundList.play(entity,null,name);
+        return(this.core.soundList.play(entity,null,name,rate,loop));
+    }
+    
+    playGlobal(name,rate,loop)
+    {
+        return(this.core.soundList.play(null,null,name,rate,loop));
+    }
+    
+    stopSound(playIdx)
+    {
+        this.core.soundList.stop(playIdx);
+    }
+    
+    changeSoundRate(playIdx,rate)
+    {
+        this.core.soundList.changeRate(playIdx,rate);
     }
     
         //

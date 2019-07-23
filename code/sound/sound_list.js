@@ -76,6 +76,20 @@ export default class SoundListClass
     }
     
         //
+        // suspend and resume all sound context
+        //
+        
+    suspend()
+    {
+        this.ctx.suspend();
+    }
+    
+    resume()
+    {
+        this.ctx.resume();
+    }
+    
+        //
         // add and get a sound
         //
         
@@ -178,9 +192,9 @@ export default class SoundListClass
         // (or if no attachment, a global sound)
         //
         
-    play(entity,mesh,name)
+    play(entity,mesh,name,rate,loop)
     {
-        let n,sound;
+        let n,idx,sound;
         let soundPlay=null;
         
             // find sound
@@ -192,6 +206,7 @@ export default class SoundListClass
             
         for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
             if (this.soundPlays[n].free) {
+                idx=n;
                 soundPlay=this.soundPlays[n];
                 break;
             }
@@ -201,7 +216,23 @@ export default class SoundListClass
         
             // set it to entity
             
-        soundPlay.play(this.ctx,this.currentListenerEntity,entity,mesh,sound);
+        soundPlay.play(this.ctx,this.currentListenerEntity,entity,mesh,sound,rate,loop);
+        
+        return(idx);
+    }
+    
+    stop(playIdx)
+    {
+        let soundPlay=this.soundPlays[playIdx];
+        
+        if (!soundPlay.free) soundPlay.stop();
+    }
+    
+    changeRate(playIdx,rate)
+    {
+        let soundPlay=this.soundPlays[playIdx];
+        
+        if (!soundPlay.free) soundPlay.changeRate(rate);
     }
     
 }

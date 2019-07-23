@@ -371,6 +371,15 @@ export default class CoreClass
             this.input.startInput();
         }
         
+            // suspend/resume the sound
+            
+        if (pause) {
+            this.soundList.suspend();
+        }
+        else {
+            this.soundList.resume();
+        }
+        
             // if going into pause, open the settings
             
         if (pause) this.settingsDialog.open();
