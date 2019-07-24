@@ -151,7 +151,7 @@ export default class ImportMapClass
                     moveRotate=new PointClass(0,0,0);
                     if (moveDef.rotate!==undefined) moveRotate.setFromValues(moveDef.rotate.x,moveDef.rotate.y,moveDef.rotate.z);
                     
-                    if (moveDef.sound!==undefined) this.core.soundList.add(moveDef.sound,moveDef.soundMaxDistance)
+                    if (moveDef.sound!==undefined) this.core.soundList.add(moveDef.sound,moveDef.soundMaxDistance,0,0)
                     
                     movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate,MoveClass.lookupPauseType(moveDef.pauseType),((moveDef.pauseData===undefined)?null:moveDef.pauseData),((moveDef.sound===undefined)?null:moveDef.sound),((moveDef.trigger===undefined)?null:moveDef.trigger)));
                 }

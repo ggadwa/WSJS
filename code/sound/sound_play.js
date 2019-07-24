@@ -48,6 +48,8 @@ export default class SoundPlayClass
         this.sourceNode=ctx.createBufferSource();
         this.sourceNode.buffer=sound.buffer;
         this.sourceNode.playbackRate.value=rate;
+        this.sourceNode.loopStart=sound.loopStart;
+        this.sourceNode.loopEnd=sound.loopEnd;
         this.sourceNode.loop=loop;
         this.sourceNode.onended=this.ended.bind(this);
         

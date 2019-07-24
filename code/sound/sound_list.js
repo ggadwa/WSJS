@@ -93,7 +93,7 @@ export default class SoundListClass
         // add and get a sound
         //
         
-    add(name,maxDistance)
+    add(name,maxDistance,loopStart,loopEnd)
     {
         let sound;
             
@@ -105,7 +105,7 @@ export default class SoundListClass
             // by another call that force loads unloaded
             // sounds
                     
-        sound=new SoundClass(this.core,this.ctx,name,maxDistance);
+        sound=new SoundClass(this.core,this.ctx,name,maxDistance,loopStart,loopEnd);
         sound.initialize();
         this.sounds.set(name,sound);
     }

@@ -879,9 +879,9 @@ export default class ProjectEntityClass
         // sounds
         //
         
-    addSound(name,distance)
+    addSound(name,distance,loopStart,loopEnd)
     {
-        this.core.soundList.add(name,distance);
+        this.core.soundList.add(name,distance,loopStart,loopEnd);
     }
         
     playSound(name,rate,loop)
