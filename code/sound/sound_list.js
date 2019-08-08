@@ -200,7 +200,10 @@ export default class SoundListClass
             // find sound
             
         sound=this.sounds.get(name);
-        if (sound===null) return;
+        if (sound===undefined) {
+            console.log('warning: unknown sound: '+name);
+            return;
+        }
         
             // find a free sound play
             
