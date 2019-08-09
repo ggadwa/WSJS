@@ -569,6 +569,15 @@ export default class ProjectEntityClass
     }
     
         //
+        // cube utilities
+        //
+        
+    findCubeContainingEntity()
+    {
+        return(this.core.map.cubeList.findCubeContainingEntity(this));
+    }
+    
+        //
         // move utilities
         //
     

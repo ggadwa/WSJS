@@ -5,6 +5,7 @@ import MapLightListClass from '../map/map_light_list.js';
 import MapEntityListClass from '../map/map_entity_list.js';
 import MapEffectListClass from '../map/map_effect_list.js';
 import MapMovementListClass from '../map/map_movement_list.js';
+import MapCubeListClass from '../map/map_cube_list.js';
 import MapPathClass from '../map/map_path.js';
 import SkyClass from '../map/sky.js';
 
@@ -14,6 +15,16 @@ import SkyClass from '../map/sky.js';
 
 export default class MapClass
 {
+    meshList=null;
+    liquidList=null;
+    lightList=null;
+    entityList=null;
+    movementList=null;
+    effectList=null;
+    cubeList=null;
+    path=null;
+    sky=null;
+    
     constructor(core)
     {
         this.core=core;
@@ -25,9 +36,10 @@ export default class MapClass
         this.lightList=new MapLightListClass(core);
         this.entityList=new MapEntityListClass();
         this.movementList=new MapMovementListClass();
-        this.sky=new SkyClass(core);
         this.effectList=new MapEffectListClass(core);
+        this.cubeList=new MapCubeListClass(core);
         this.path=new MapPathClass(core);
+        this.sky=new SkyClass(core);
         
         Object.seal(this);
     }
@@ -44,6 +56,7 @@ export default class MapClass
         if (!this.entityList.initialize()) return(false);
         if (!this.movementList.initialize()) return(false);
         if (!this.effectList.initialize()) return(false);
+        if (!this.cubeList.initialize()) return(false);
         return(this.sky.initialize());
     }
 
@@ -55,6 +68,7 @@ export default class MapClass
         this.entityList.release();
         this.movementList.release();
         this.effectList.release();
+        this.cubeList.release();
         this.sky.release();
     }
     
@@ -70,6 +84,7 @@ export default class MapClass
         this.entityList.clear();
         this.movementList.clear();
         this.effectList.clear();
+        this.cubeList.clear();
     }
 
         //
@@ -81,6 +96,5 @@ export default class MapClass
         this.meshList.setupBuffers();
         this.liquidList.setupBuffers();
     }
-    
     
 }

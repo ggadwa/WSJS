@@ -5,6 +5,7 @@ import LightClass from '../light/light.js';
 import MapLiquidClass from '../map/map_liquid.js';
 import MoveClass from '../map/move.js';
 import MovementClass from '../map/movement.js';
+import MapCubeClass from '../map/map_cube.js';
 import MapPathNodeClass from '../map/map_path_node.js';
 import ImportGLTFClass from '../import/import_gltf.js';
 
@@ -27,6 +28,7 @@ export default class ImportMapClass
         let moveDef,movePoint,moveRotate,rotateOffset,centerOffset;
         let entity,entityDef,entityPosition,entityAngle,entityData,entityName,botCount;
         let pathNode,pathDef,altPosition;
+        let cube,cubeDef;
         let bitmap;
         let importMesh;
         
@@ -186,6 +188,17 @@ export default class ImportMapClass
             }
             
             this.core.map.path.buildPathHints();
+        }
+        
+            // cubes
+            
+        if (importSettings.cubes!==undefined) {
+            for (n=0;n!==importSettings.cubes.length;n++) {
+                cubeDef=importSettings.cubes[n];
+                
+                cube=new MapCubeClass(new BoundClass(cubeDef.xBound.min,cubeDef.xBound.max),new BoundClass(cubeDef.yBound.min,cubeDef.yBound.max),new BoundClass(cubeDef.zBound.min,cubeDef.zBound.max),cubeDef.key,cubeDef.data);
+                this.core.map.cubeList.add(cube);
+            }
         }
         
             // entities
