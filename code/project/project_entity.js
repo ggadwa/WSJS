@@ -424,18 +424,58 @@ export default class ProjectEntityClass
         // path utilities
         //
         
+    getPathNodeList()
+    {
+        return(this.core.map.path.nodes);
+    }
+    
     findNearestPathNode(maxDistance)
     {
         let n,d,dist;
         let nodeIdx;
-        let path=this.core.map.path;
-        let nNode=path.nodes.length;
+        let nodes=this.core.map.path.nodes;
+        let nNode=nodes.length;
         
         nodeIdx=-1;
         dist=maxDistance;
         
         for (n=0;n!==nNode;n++) {
-            d=path.nodes[n].position.distance(this.position);
+            d=nodes[n].position.distance(this.position);
+            if ((d<dist) || (dist===-1)) {
+                dist=d;
+                nodeIdx=n;
+            }
+        }
+
+        return(nodeIdx);
+    }
+    
+    findNearestPathNodeWithinYAngleSweep(maxDistance,yMin,yMax)
+    {
+        let n,y,d,dist;
+        let nodeIdx,pos;
+        let nodes=this.core.map.path.nodes;
+        let nNode=nodes.length;
+        
+        nodeIdx=-1;
+        dist=maxDistance;
+        
+        for (n=0;n!==nNode;n++) {
+            pos=nodes[n].position;
+            
+                // within the sweep
+                
+            y=this.position.angleYTo(pos);
+            if (yMin<yMax) {
+                if ((y<yMin) || (y>yMax)) continue;
+            }
+            else {
+                if ((y<yMax) && (y>yMin)) continue;
+            }
+            
+                // next check is the distance
+                
+            d=pos.distance(this.position);
             if ((d<dist) || (dist===-1)) {
                 dist=d;
                 nodeIdx=n;
@@ -552,6 +592,12 @@ export default class ProjectEntityClass
     getVectorToNode(nodeIdx,pnt)
     {
         pnt.setFromSubPoint(this.core.map.path.nodes[nodeIdx].position,this.position);
+    }
+    
+    getYAngleBetweenNodes(fromNodeIdx,toNodeIdx)
+    {
+        let nodes=this.core.map.path.nodes;
+        return(nodes[fromNodeIdx].position.angleYTo(nodes[toNodeIdx].position));
     }
     
         //

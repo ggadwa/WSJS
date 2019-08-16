@@ -13,7 +13,8 @@ export default class MeshListClass
         this.core=core;
         this.shader=null;           // this will be attached later when initialized
 
-        this.meshes=[];
+        this.meshes=[];                     // the meshes themselves
+        this.collisionMeshIndexList=[];     // a list of meshes that you can collide with (optimization)
         
             // a factor (the max of the Y in the normal vector)
             // before triangle is considered a floor or ceilings
@@ -192,10 +193,14 @@ export default class MeshListClass
         
     buildCollisionGeometry()
     {
-        let mesh;
+        let n,mesh;
+        let nMesh=this.meshes.length;
+        
+        this.collisionMeshIndexList=[];
 
-        for (mesh of this.meshes) {
-            mesh.buildCollisionGeometry(this.maxFloorCeilingDetectionFactor);
+        for (n=0;n!=nMesh;n++) {
+            mesh=this.meshes[n];
+            if (mesh.buildCollisionGeometry(this.maxFloorCeilingDetectionFactor)) this.collisionMeshIndexList.push(n);
         }
     }
     

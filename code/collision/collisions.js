@@ -215,7 +215,6 @@ export default class CollisionClass
         let collisionTrig,nCollisionTrig;             
         let dist,currentDist;
         
-        let nMesh=this.core.map.meshList.meshes.length;
         let nEntity=this.core.map.entityList.count();
         
             // keep a bump and push count
@@ -252,9 +251,8 @@ export default class CollisionClass
                 // run through the meshes and
                 // check against collision lines
 
-            for (n=0;n!==nMesh;n++) {
+            for (n of this.core.map.meshList.collisionMeshIndexList) {
                 mesh=this.core.map.meshList.meshes[n];
-                if (mesh.noCollisions) continue;
                 
                     // skip any mesh we don't collide with
                     
@@ -438,7 +436,7 @@ export default class CollisionClass
     
     fallEntityInMap(entity,fallY)
     {
-        let n,k,i,y,nMesh,nCollisionTrig;
+        let n,k,i,y,nCollisionTrig;
         let mesh,collisionTrig;
         let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
 
@@ -472,11 +470,8 @@ export default class CollisionClass
         
             // run through colliding trigs
         
-        nMesh=this.core.map.meshList.meshes.length;
-        
-        for (n=0;n!==nMesh;n++) {
+        for (n of this.core.map.meshList.collisionMeshIndexList) {
             mesh=this.core.map.meshList.meshes[n];
-            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 
@@ -493,14 +488,14 @@ export default class CollisionClass
 
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionFloorTrigs[k];
-                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    for (i=0;i!==(CollisionClass.COLLISION_SPOKE_COUNT+1);i++) {
-                        if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
-                            if (this.rayHitPnt.y>=y) {
-                                entity.standOnMeshIdx=n;
-                                entity.standOnTrigIdx=k;
-                                y=this.rayHitPnt.y;
-                            }
+                if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
+                
+                for (i=0;i!==(CollisionClass.COLLISION_SPOKE_COUNT+1);i++) {
+                    if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
+                        if (this.rayHitPnt.y>=y) {
+                            entity.standOnMeshIdx=n;
+                            entity.standOnTrigIdx=k;
+                            y=this.rayHitPnt.y;
                         }
                     }
                 }
@@ -556,7 +551,7 @@ export default class CollisionClass
         
     riseEntityInMap(entity,riseY)
     {
-        let n,k,i,y,nMesh,nCollisionTrig;
+        let n,k,i,y,nCollisionTrig;
         let mesh,collisionTrig;
         let nEntity,checkEntity,entityTop,entityBot,checkEntityTop;
         
@@ -589,11 +584,8 @@ export default class CollisionClass
         
             // run through the meshes
         
-        nMesh=this.core.map.meshList.meshes.length;
-        
-        for (n=0;n!==nMesh;n++) {
+        for (n of this.core.map.meshList.collisionMeshIndexList) {
             mesh=this.core.map.meshList.meshes[n];
-            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 
@@ -610,13 +602,13 @@ export default class CollisionClass
 
             for (k=0;k!==nCollisionTrig;k++) {
                 collisionTrig=mesh.collisionCeilingTrigs[k];
-                if (collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) {
-                    for (i=0;i!==(CollisionClass.COLLISION_SPOKE_COUNT+1);i++) {
-                        if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
-                            if (this.rayHitPnt.y<=y) {
-                                entity.collideCeilingMeshIdx=n;
-                                y=this.rayHitPnt.y;
-                            }
+                if (!collisionTrig.overlapBounds(this.objXBound,this.objYBound,this.objZBound)) continue;
+                
+                for (i=0;i!==(CollisionClass.COLLISION_SPOKE_COUNT+1);i++) {
+                    if (collisionTrig.rayTrace(this.rayPoints[i],this.rayVector,this.rayHitPnt)) {
+                        if (this.rayHitPnt.y<=y) {
+                            entity.collideCeilingMeshIdx=n;
+                            y=this.rayHitPnt.y;
                         }
                     }
                 }
@@ -676,7 +668,6 @@ export default class CollisionClass
         let collisionTrig,nCollisionTrig;              
         let dist,currentDist;
         
-        let nMesh=this.core.map.meshList.meshes.length;
         let nEntity=this.core.map.entityList.count();
         
             // the rough collide boxes
@@ -693,9 +684,8 @@ export default class CollisionClass
             // run through the meshes and
             // check against all trigs
 
-        for (n=0;n!==nMesh;n++) {
+        for (n of this.core.map.meshList.collisionMeshIndexList) {
             mesh=this.core.map.meshList.meshes[n];
-            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 
@@ -793,7 +783,7 @@ export default class CollisionClass
         
     getRigidBodyAngle(entity,rigidAngle,maxDrop,maxAngle)
     {
-        let n,k,t,nMesh,nCollisionTrig;
+        let n,k,t,nCollisionTrig;
         let mesh,collisionTrig;
         let yHit=[0,0,0,0];
         
@@ -841,11 +831,8 @@ export default class CollisionClass
             // run through colliding trigs
             // no entity checking as entities are always flat
         
-        nMesh=this.core.map.meshList.meshes.length;
-        
-        for (n=0;n!==nMesh;n++) {
+        for (n of this.core.map.meshList.collisionMeshIndexList) {
             mesh=this.core.map.meshList.meshes[n];
-            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 
@@ -925,7 +912,6 @@ export default class CollisionClass
         let mesh,checkEntity,entityTopY;
         let collisionTrig,nCollisionTrig;
         
-        let nMesh=this.core.map.meshList.meshes.length;
         let nEntity=this.core.map.entityList.count();
         
         entity.touchEntity=null;
@@ -943,9 +929,8 @@ export default class CollisionClass
             // run through the meshes and
             // rough check trig collision boxes
 
-        for (n=0;n!==nMesh;n++) {
+        for (n of this.core.map.meshList.collisionMeshIndexList) {
             mesh=this.core.map.meshList.meshes[n];
-            if (mesh.noCollisions) continue;
 
                 // skip any mesh we don't collide with
 

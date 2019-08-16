@@ -237,7 +237,7 @@ export default class MeshClass
             // collision, specifically things like
             // webs or bushes, etc
             
-        if (this.noCollisions) return;
+        if (this.noCollisions) return(false);
         
              // other messages can be simple collisions,
             // which means they collide on their bounds
@@ -268,7 +268,7 @@ export default class MeshClass
             this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max)));
             this.collisionWallTrigs.push(new CollisionTrigClass(new PointClass(this.xBound.max,this.yBound.max,this.zBound.max),new PointClass(this.xBound.min,this.yBound.min,this.zBound.max),new PointClass(this.xBound.max,this.yBound.min,this.zBound.max)));
 
-            return;
+            return(true);
         }
        
             // run through the triangles
@@ -343,6 +343,8 @@ export default class MeshClass
                 }
             }
         }
+        
+        return(true);
     }
     
         //
