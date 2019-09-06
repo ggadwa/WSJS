@@ -196,7 +196,7 @@ export default class ImportGLTFClass
             
                 return(array);
                 
-            case this.core.gl.UNSIGNED_SHORT:
+            case this.core.gl.SHORT:
                 byteStride=(bufferViewNode.byteStride===undefined)?(2*internalVecSize):bufferViewNode.byteStride;
                 array=new Int16Array(count*arrayVecSize);
 

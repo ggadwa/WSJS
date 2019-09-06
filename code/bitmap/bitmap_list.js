@@ -36,11 +36,11 @@ export default class BitmapListClass
     add(colorURL,normalURL,specularURL,specularFactor,scale)
     {
         let bitmap;
-            
+        
             // already in list?
             
         if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
-        
+            
             // add new one to list, will be loaded
             // by another call that force loads unloaded
             // bitmaps
