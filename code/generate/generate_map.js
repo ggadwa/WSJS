@@ -3,6 +3,8 @@ import ColorClass from '../utility/color.js';
 import MapClass from '../../code/map/map.js';
 import MeshClass from '../../code/mesh/mesh.js';
 import LightClass from '../light/light.js';
+import GeneratePieceClass from '../generate/generate_piece.js';
+import GenerateUtilityClass from '../generate/generate_utility.js';
 
 export default class GenerateMapClass
 {
@@ -12,6 +14,52 @@ export default class GenerateMapClass
     {
         this.core=core;
     }
+    
+        //
+        // mesh building utilities
+        //
+        
+    buildFlatFloorCeiling(vIdx,vertexArray,nIdx,normalArray,iIdx,indexArray,trigIdx,y,normalY,gridSize,offX,offZ)
+    {
+        vertexArray[vIdx++]=offX;
+        vertexArray[vIdx++]=y;
+        vertexArray[vIdx++]=offZ;
+
+        normalArray[nIdx++]=0;
+        normalArray[nIdx++]=normalY;
+        normalArray[nIdx++]=0;
+
+        vertexArray[vIdx++]=offX+gridSize;
+        vertexArray[vIdx++]=y;
+        vertexArray[vIdx++]=offZ;
+
+        normalArray[nIdx++]=0;
+        normalArray[nIdx++]=normalY;
+        normalArray[nIdx++]=0;
+
+        vertexArray[vIdx++]=offX+gridSize;
+        vertexArray[vIdx++]=y;
+        vertexArray[vIdx++]=offZ+gridSize;
+
+        normalArray[nIdx++]=0;
+        normalArray[nIdx++]=normalY;
+        normalArray[nIdx++]=0;
+
+        vertexArray[vIdx++]=offX;
+        vertexArray[vIdx++]=y;
+        vertexArray[vIdx++]=offZ+gridSize;
+
+        normalArray[nIdx++]=0;
+        normalArray[nIdx++]=normalY;
+        normalArray[nIdx++]=0;
+
+        indexArray[iIdx++]=trigIdx;
+        indexArray[iIdx++]=trigIdx+1;
+        indexArray[iIdx++]=trigIdx+2;
+        indexArray[iIdx++]=trigIdx;
+        indexArray[iIdx++]=trigIdx+2;
+        indexArray[iIdx++]=trigIdx+3;
+    }
 
         //
         // build a map
@@ -19,146 +67,133 @@ export default class GenerateMapClass
         
     build(importSettings)
     {
-        let map=this.core.map;
+        let n,k,k2,offX,offZ;
         let mesh,bitmap;
         let vertexArray,normalArray,tangentArray,uvArray,indexArray;
-        let vIdx,nIdx,uvIdx,iIdx;
+        let nLine,vIdx,nIdx,uvIdx,iIdx,trigIdx;
         let light;
-        let gridSize;
-        let n,entity,entityDef,entityName,entityPosition,entityAngle,entityData;
+        let roomCount,gridSize,piece
+        let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
+        let map=this.core.map;
+        
+        roomCount=10;
         
             // grid size
             
-        gridSize=GenerateMapClass.GRID_SIZE*importSettings.scale;
+        gridSize=60000; // GenerateMapClass.GRID_SIZE*importSettings.scale;
+        offX=0;
+        offZ=0;
         
             // todo -- hard coded test, in importSettings
             
-        bitmap=this.core.bitmapList.addColor('models/dungeon/textures/rough_brick_color.png','models/dungeon/textures/rough_brick_normals.png','models/dungeon/textures/rough_brick_specular.png',new ColorClass(5,5,5),null);
+        bitmap=this.core.bitmapList.add('models/dungeon/textures/floor_color.png','models/dungeon/textures/floor_normals.png','models/dungeon/textures/floor_specular.png',new ColorClass(5,5,5),null);
 
-            // rooms
+            // pieces
             
-        vertexArray=new Float32Array(3*(4*6));
-        normalArray=new Float32Array(3*(4*6));
-        tangentArray=new Float32Array(3*(4*6));
-        uvArray=new Float32Array(2*(4*6));
-        indexArray=new Uint16Array(6*2);
-        
-        vIdx=0;
-        nIdx=0;
-        uvIdx=0;
-        iIdx=0;
-        
-            // top
+        for (n=0;n!=roomCount;n++) {
+            piece=GeneratePieceClass.getRandomPiece();
             
-        vertexArray[vIdx++]=-gridSize;
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=-gridSize;
-        
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=-1;
-        normalArray[nIdx++]=0;
-        
-        uvArray[uvIdx++]=0;
-        uvArray[uvIdx++]=0;
-        
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=-gridSize;
-        
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=-1;
-        normalArray[nIdx++]=0;
-        
-        uvArray[uvIdx++]=1;
-        uvArray[uvIdx++]=0;
-
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=gridSize;
-        
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=-1;
-        normalArray[nIdx++]=0;
-        
-        uvArray[uvIdx++]=1;
-        uvArray[uvIdx++]=1;
-
-        vertexArray[vIdx++]=-gridSize;
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=gridSize;
-        
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=-1;
-        normalArray[nIdx++]=0;
-        
-        uvArray[uvIdx++]=0;
-        uvArray[uvIdx++]=1;
-        
-        indexArray[iIdx++]=0;
-        indexArray[iIdx++]=1;
-        indexArray[iIdx++]=2;
-        indexArray[iIdx++]=0;
-        indexArray[iIdx++]=2;
-        indexArray[iIdx++]=3;
-
-            // bottom
+                // space for vertexes (none shared so normals
+                // can be different) on every wall and floor/ceiling
+                
+            nLine=piece.vertexes.length;
             
-        vertexArray[vIdx++]=-gridSize;
-        vertexArray[vIdx++]=0;
-        vertexArray[vIdx++]=-gridSize;
-        
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=1;
-        normalArray[nIdx++]=0;
-        
-        uvArray[uvIdx++]=0;
-        uvArray[uvIdx++]=0;
-        
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=0;
-        vertexArray[vIdx++]=-gridSize;
-        
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=1;
-        normalArray[nIdx++]=0;
-        
-        uvArray[uvIdx++]=1;
-        uvArray[uvIdx++]=0;
+            vertexArray=new Float32Array((nLine+2)*(4*6));
+            normalArray=new Float32Array((nLine+2)*(4*6));
+            tangentArray=new Float32Array((nLine+2)*(4*6));
+            uvArray=new Float32Array((nLine+2)*(4*6));
+            indexArray=new Uint16Array((nLine+2)*6);
 
-        vertexArray[vIdx++]=gridSize;
-        vertexArray[vIdx++]=0;
-        vertexArray[vIdx++]=gridSize;
-        
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=1;
-        normalArray[nIdx++]=0;
-        
-        uvArray[uvIdx++]=1;
-        uvArray[uvIdx++]=1;
+            vIdx=0;
+            nIdx=0;
+            uvIdx=0;
+            iIdx=0;
+            trigIdx=0;
+            
+                // create the walls
+            
+            for (k=0;k!=nLine;k++) {
+                k2=k+1;
+                if (k2===nLine) k2=0;
 
-        vertexArray[vIdx++]=-gridSize;
-        vertexArray[vIdx++]=0;
-        vertexArray[vIdx++]=gridSize;
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k][0]*0.1)*gridSize)+offX;
+                vertexArray[vIdx++]=gridSize;
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k][1]*0.1)*gridSize)+offZ;
+
+                normalArray[nIdx++]=piece.normals[k][0];
+                normalArray[nIdx++]=0;
+                normalArray[nIdx++]=piece.normals[k][1];
+
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k2][0]*0.1)*gridSize)+offX;
+                vertexArray[vIdx++]=gridSize;
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k2][1]*0.1)*gridSize)+offZ;
+
+                normalArray[nIdx++]=piece.normals[k][0];
+                normalArray[nIdx++]=0;
+                normalArray[nIdx++]=piece.normals[k][1];
+
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k2][0]*0.1)*gridSize)+offX;
+                vertexArray[vIdx++]=0;
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k2][1]*0.1)*gridSize)+offZ;
+
+                normalArray[nIdx++]=piece.normals[k][0];
+                normalArray[nIdx++]=0;
+                normalArray[nIdx++]=piece.normals[k][1];
+
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k][0]*0.1)*gridSize)+offX;
+                vertexArray[vIdx++]=0;
+                vertexArray[vIdx++]=Math.trunc((piece.vertexes[k][1]*0.1)*gridSize)+offZ;
+
+                normalArray[nIdx++]=piece.normals[k][0];
+                normalArray[nIdx++]=0;
+                normalArray[nIdx++]=piece.normals[k][1];
+
+                indexArray[iIdx++]=trigIdx;
+                indexArray[iIdx++]=trigIdx+1;
+                indexArray[iIdx++]=trigIdx+2;
+                indexArray[iIdx++]=trigIdx;
+                indexArray[iIdx++]=trigIdx+2;
+                indexArray[iIdx++]=trigIdx+3;
+                
+                trigIdx+=4;
+            }
+            
+                // floor
+            
+            this.buildFlatFloorCeiling(vIdx,vertexArray,nIdx,normalArray,iIdx,indexArray,trigIdx,0,1,gridSize,offX,offZ);
+            vIdx+=12;
+            nIdx+=12;
+            iIdx+=6;
+            trigIdx+=4;
+                
+            this.buildFlatFloorCeiling(vIdx,vertexArray,nIdx,normalArray,iIdx,indexArray,trigIdx,gridSize,-1,gridSize,offX,offZ);
+            vIdx+=12;
+            nIdx+=12;
+            iIdx+=6;
+            trigIdx+=4;
         
-        normalArray[nIdx++]=0;
-        normalArray[nIdx++]=1;
-        normalArray[nIdx++]=0;
+                // auto generate the uvs and tangents
+                
+            GenerateUtilityClass.buildUVs(vertexArray,normalArray,uvArray,0.00005);
+            GenerateUtilityClass.buildTangents(vertexArray,uvArray,tangentArray,indexArray);
         
-        uvArray[uvIdx++]=0;
-        uvArray[uvIdx++]=1;
+                // add this mesh and a single light
+                
+            mesh=new MeshClass(this.core,'test',bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray);
+            map.meshList.add(mesh);
+            
+            light=new LightClass(new PointClass((offX+(Math.trunc(gridSize*0.5))),Math.trunc(gridSize*0.75),(offZ+(Math.trunc(gridSize*0.5)))),new ColorClass(1,1,1),(gridSize*2),1.0);
+            map.lightList.add(light);
+            
+                // move onto next room
+                
+            offZ+=60000;
+            //offX+=6000;
+        }
         
-        indexArray[iIdx++]=4;
-        indexArray[iIdx++]=5;
-        indexArray[iIdx++]=6;
-        indexArray[iIdx++]=4;
-        indexArray[iIdx++]=6;
-        indexArray[iIdx++]=7;
-        
-        mesh=new MeshClass(this.core,'test',bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray);
-        map.meshList.add(mesh);
-        
-        light=new LightClass(new PointClass(0,Math.trunc(gridSize*0.75),0),new ColorClass(1,1,1),gridSize,1.0);
-        map.lightList.add(light);
+            // delete any shared triangles
+            
+        GenerateUtilityClass.deleteSharedTriangles(map.meshList);
         
             // entities
             

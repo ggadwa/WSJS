@@ -111,6 +111,18 @@ export default class MeshClass
     }
     
         //
+        // replace indexes, normally used by auto generator
+        //
+        
+    replaceIndexArray(indexArray)
+    {
+        this.indexArray=indexArray;
+        
+        this.indexCount=this.indexArray.length;
+        this.trigCount=Math.trunc(this.indexCount/3);
+    }
+    
+        //
         // mesh box collision
         //
 
