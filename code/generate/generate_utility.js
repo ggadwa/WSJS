@@ -11,16 +11,19 @@ export default class GenerateUtilityClass
         // build UVs for vertex lists
         //
             
-    static buildUVs(vertexArray,normalArray,uvArray,uvScale)
+    static buildUVs(vertexArray,normalArray,uvScale)
     {
         let n,k,nVertex,offset;
         let x,y,ang,mapUp;
         let minIntX,minIntY;
+        let uvArray;
         
         let v=new PointClass(0.0,0.0,0.0);
         let normal=new PointClass(0.0,0.0,0.0);
 
         nVertex=Math.trunc(vertexArray.length/3);
+        
+        uvArray=new Float32Array(nVertex*2);
 
             // determine floor/wall like by
             // the dot product of the normal
@@ -91,16 +94,19 @@ export default class GenerateUtilityClass
             uvArray[offset]-=minIntX;
             uvArray[offset+1]-=minIntY;
         }
+        
+        return(uvArray);
     }
     
         //
         // build tangents
         //
 
-    static buildTangents(vertexArray,uvArray,tangentArray,indexArray)
+    static buildTangents(vertexArray,uvArray,indexArray)
     {
         let n,nTrig,trigIdx,offset;
         let u10,u20,v10,v20;
+        let tangentArray;
 
             // generate tangents by the trigs
             // sometimes we will end up overwriting
@@ -127,6 +133,8 @@ export default class GenerateUtilityClass
         let tangent=new PointClass(0.0,0.0,0.0);
 
         nTrig=Math.trunc(indexArray.length/3);
+        
+        tangentArray=new Float32Array(vertexArray.length);
 
         for (n=0;n!==nTrig;n++) {
 
@@ -204,100 +212,7 @@ export default class GenerateUtilityClass
             tangentArray[offset+1]=tangent.y;
             tangentArray[offset+2]=tangent.z;
         }
-    }
-    
-        //
-        // deleted shared triangles
-        //
         
-    static deleteTriangleFromIndexes(indexArray,iIdx)
-    {
-        let n,idx;
-        let nIndex=indexArray.length;
-        let clippedIndexes=new Uint16Array(nIndex-3);
-        
-        idx=0;
-        
-        for (n=0;n!==iIdx;n++) {
-            clippedIndexes[idx++]=indexArray[n];
-        }
-        
-        for (n=(iIdx+3);n<nIndex;n++) {
-            clippedIndexes[idx++]=indexArray[n];
-        }
-        
-        return(clippedIndexes);
-    }
-    
-    static deleteSharedTriangles(meshList)
-    {
-        let n,k,nMesh;
-        let mesh,mesh2;
-        let iIdx,iIdx2,nIndex,nIndex2;
-        let x0,y0,z0,x1,y1,z1,x2,y2,z2,hit;
-        
-        nMesh=meshList.meshes.length;
-        
-        for (n=0;n!==nMesh;n++) {
-            mesh=meshList.meshes[n];
-            
-            for (k=(n+1);k<nMesh;k++) {
-                mesh2=meshList.meshes[k];
-                
-                    // run through all the trigs, pulling
-                    // out batches of indexes that are shared
-                    
-                nIndex=mesh.indexArray.length;
-                nIndex2=mesh2.indexArray.length;
-                
-                iIdx=0;
-                
-                while (iIdx<nIndex) {
-                    
-                    x0=mesh.vertexArray[(mesh.indexArray[iIdx]*3)];
-                    y0=mesh.vertexArray[(mesh.indexArray[iIdx]*3)+1];
-                    z0=mesh.vertexArray[(mesh.indexArray[iIdx]*3)+2];
-                    
-                    x1=mesh.vertexArray[(mesh.indexArray[iIdx+1]*3)];
-                    y1=mesh.vertexArray[(mesh.indexArray[iIdx+1]*3)+1];
-                    z1=mesh.vertexArray[(mesh.indexArray[iIdx+1]*3)+2];
-                    
-                    x2=mesh.vertexArray[(mesh.indexArray[iIdx+2]*3)];
-                    y2=mesh.vertexArray[(mesh.indexArray[iIdx+2]*3)+1];
-                    z2=mesh.vertexArray[(mesh.indexArray[iIdx+2]*3)+2];
-                    
-                    iIdx+=3;
-                    continue;
-                    
-                    iIdx2=0;
-                    hit=false;
-                    
-                    while (iIdx2<nIndex2) {
-                        
-                        if ((x0===mesh2.vertexArray[(mesh2.indexArray[iIdx2]*3)]) && (x1===mesh2.vertexArray[(mesh2.indexArray[iIdx2+1]*3)]) && (x2===mesh2.vertexArray[(mesh2.indexArray[iIdx2+2]*3)]) &&
-                            (y0===mesh2.vertexArray[(mesh2.indexArray[iIdx2]*3)+1]) && (y1===mesh2.vertexArray[(mesh2.indexArray[iIdx2+1]*3)+1]) && (y2===mesh2.vertexArray[(mesh2.indexArray[iIdx2+2]*3)+1]) &&
-                            (z0===mesh2.vertexArray[(mesh2.indexArray[iIdx2]*3)+2]) && (z1===mesh2.vertexArray[(mesh2.indexArray[iIdx2+1]*3)+2]) && (z2===mesh2.vertexArray[(mesh2.indexArray[iIdx2+2]*3)+2])) {
-
-                                // delete them
-                                
-                            mesh.replaceIndexArray(this.deleteTriangleFromIndexes(mesh.indexArray,iIdx));
-                            mesh2.replaceIndexArray(this.deleteTriangleFromIndexes(mesh2.indexArray,iIdx2));
-                            
-                            hit=true;
-                            
-                            break;
-                        }
-                        
-                        iIdx2+=3;
-                    }
-                    
-                    if (hit) break;
-                    
-                    iIdx+=3;
-                }
-                
-            }
-            
-        }
+        return(tangentArray);
     }
 }

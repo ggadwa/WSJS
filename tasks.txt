@@ -1,6 +1,5 @@
 - generator
-   - look over what I really need in generate_utility (buildNormals probably delete?)
-   - build from pieces
+   - put back in normal builder
 
 - beach ball physics
    - bounce sound?
