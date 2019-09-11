@@ -9,7 +9,13 @@ import GenerateUtilityClass from '../generate/generate_utility.js';
 
 export default class GenerateMapClass
 {
-    GRID_SIZE=100;
+    static GRID_SIZE=100;
+    static UV_FACTOR=0.00005;
+    
+    static MOVE_NEG_Z=0;
+    static MOVE_POS_Z=1;
+    static MOVE_NEG_X=2;
+    static MOVE_POS_X=3;
     
     constructor(core)
     {
@@ -20,19 +26,12 @@ export default class GenerateMapClass
         // mesh building utilities
         //
         
-    buildFlatFloorCeiling(vertexArray,normalArray,indexArray,trigIdx,y,normalY,gridSize,offset)
+    buildFlatFloorCeiling(vertexArray,indexArray,trigIdx,y,normalY,gridSize,offset)
     {
         vertexArray.push(offset.x,y,offset.z);
-        normalArray.push(0,normalY,0);
-
         vertexArray.push((offset.x+gridSize),y,offset.z);
-        normalArray.push(0,normalY,0);
-
         vertexArray.push((offset.x+gridSize),y,(offset.z+gridSize));
-        normalArray.push(0,normalY,0);
-
         vertexArray.push(offset.x,y,(offset.z+gridSize));
-        normalArray.push(0,normalY,0);
 
         indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
     }
@@ -94,6 +93,74 @@ export default class GenerateMapClass
             
         }
     }
+    
+    getNextRoomPosition(rooms,gridSize,roomOffset)
+    {
+        let n,moveDir,origMoveDir,offset;
+        let room,badSpot;
+        let tryCount=0;
+
+        while (tryCount!==10) {
+            
+            moveDir=Math.trunc(Math.random()*4);
+            origMoveDir=moveDir;
+            
+            while (true) {
+                offset=roomOffset.copy();
+
+                switch (moveDir) {
+                    case GenerateMapClass.MOVE_NEG_Z:
+                        offset.z-=gridSize;
+                        break;
+                    case GenerateMapClass.MOVE_POS_Z:
+                        offset.z+=gridSize;
+                        break;
+                    case GenerateMapClass.MOVE_NEG_X:
+                        offset.x-=gridSize;
+                        break;
+                    case GenerateMapClass.MOVE_POS_X:
+                        offset.x+=gridSize;
+                        break;
+                }
+                
+                    // are we in a bad spot?
+                    
+                badSpot=false;
+                
+                for (n=0;n!==rooms.length;n++) {
+                    room=rooms[n];
+                    
+                    if (room.offset.x>=(offset.x+gridSize)) continue;
+                    if ((room.offset.x+gridSize)<=offset.x) continue;
+                    if (room.offset.z>=(offset.z+gridSize)) continue;
+                    if ((room.offset.z+gridSize)<=offset.z) continue;
+                    
+                    badSpot=true;
+                    break;
+                }
+                
+                if (!badSpot) {
+                    roomOffset.setFromPoint(offset);
+                    return(true);
+                }
+                
+                    // try the next rotational edge of room
+                    
+                                
+                moveDir++;
+                if (moveDir>3) moveDir=0;
+
+                if (moveDir===origMoveDir) {
+                    tryCount++;
+                    break;
+                }
+            }
+
+        }
+            
+        return(false);
+    }
+    
 
         //
         // build a map
@@ -128,28 +195,8 @@ export default class GenerateMapClass
         genPiece=new GeneratePieceClass();
         
         for (n=0;n!=roomCount;n++) {
-            
-                // create the room
-                
             rooms.push(new GenerateRoomClass(genPiece.getRandomPiece(),roomOffset));
-            
-                // find a random place to continue
-                
-            switch (Math.trunc(Math.random()*4)) {
-                case 0:
-                    roomOffset.addValues(0,0,60000);
-                    break;
-                case 1:
-                    roomOffset.addValues(0,0,-60000);
-                    break;
-                case 2:
-                    roomOffset.addValues(60000,0,0);
-                    break;
-                case 3:
-                    roomOffset.addValues(-60000,0,0);
-                    break;
-            }
-            
+            if (!this.getNextRoomPosition(rooms,gridSize,roomOffset)) break;
         }
         
             // eliminate all combined walls
@@ -160,7 +207,7 @@ export default class GenerateMapClass
         
         for (n=0;n!=roomCount;n++) {
             room=rooms[n];
-            piece=rooms[n].piece;
+            piece=room.piece;
             
                 // we start these as non-typed arrays because
                 // we aren't sure of the size as walls could get
@@ -169,7 +216,6 @@ export default class GenerateMapClass
             nVertex=piece.vertexes.length;
             
             vertexArray=[];
-            normalArray=[];
             indexArray=[];
 
             trigIdx=0;
@@ -183,16 +229,9 @@ export default class GenerateMapClass
                 if (room.isLineHidden(k)) continue;
                 
                 vertexArray.push((Math.trunc((piece.vertexes[k][0]*0.1)*gridSize)+room.offset.x),roomHigh,(Math.trunc((piece.vertexes[k][1]*0.1)*gridSize)+room.offset.z));
-                normalArray.push(piece.normals[k][0],0,piece.normals[k][1]);
-
                 vertexArray.push((Math.trunc((piece.vertexes[k2][0]*0.1)*gridSize)+room.offset.x),roomHigh,(Math.trunc((piece.vertexes[k2][1]*0.1)*gridSize)+room.offset.z));
-                normalArray.push(piece.normals[k][0],0,piece.normals[k][1]);
-
                 vertexArray.push((Math.trunc((piece.vertexes[k2][0]*0.1)*gridSize)+room.offset.x),0,(Math.trunc((piece.vertexes[k2][1]*0.1)*gridSize)+room.offset.z));
-                normalArray.push(piece.normals[k][0],0,piece.normals[k][1]);
-
                 vertexArray.push((Math.trunc((piece.vertexes[k][0]*0.1)*gridSize)+room.offset.x),0,(Math.trunc((piece.vertexes[k][1]*0.1)*gridSize)+room.offset.z));
-                normalArray.push(piece.normals[k][0],0,piece.normals[k][1]);
 
                 indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
                 
@@ -201,21 +240,21 @@ export default class GenerateMapClass
             
                 // floor
             
-            this.buildFlatFloorCeiling(vertexArray,normalArray,indexArray,trigIdx,0,1,gridSize,room.offset);
+            this.buildFlatFloorCeiling(vertexArray,indexArray,trigIdx,0,1,gridSize,room.offset);
             trigIdx+=4;
                 
-            this.buildFlatFloorCeiling(vertexArray,normalArray,indexArray,trigIdx,roomHigh,-1,gridSize,room.offset);
+            this.buildFlatFloorCeiling(vertexArray,indexArray,trigIdx,roomHigh,-1,gridSize,room.offset);
             trigIdx+=4;
             
                 // turn the arrays into typed arrays
             
             vertexArray=new Float32Array(vertexArray);
-            normalArray=new Float32Array(normalArray);
             indexArray=new Uint16Array(indexArray);
         
                 // auto generate the uvs and tangents
                 
-            uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,0.00005);
+            normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,null,true);
+            uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMapClass.UV_FACTOR);
             tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
                 // add this mesh and a single light

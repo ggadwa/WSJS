@@ -1,5 +1,5 @@
 - generator
-   - put back in normal builder
+   - have a "move up"
 
 - beach ball physics
    - bounce sound?

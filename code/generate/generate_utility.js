@@ -99,6 +99,125 @@ export default class GenerateUtilityClass
     }
     
         //
+        // build normals
+        //
+        
+    static buildNormals(vertexArray,indexArray,meshCenterPoint,normalsIn)
+    {
+        let n,flip,nTrig,nVertex,trigIdx,offset;
+        let v0,v1,v2,normalArray;
+        let meshCenter,trigCenter,faceVct;
+        let p10,p20,normal;
+
+        normalArray=new Float32Array(vertexArray.length);
+
+            // determine the center of the vertices
+            // this will be used later to determine if
+            // normals should be flipped (for models
+            // normals always face out)
+        
+        if (meshCenterPoint!==null) {
+            meshCenter=meshCenterPoint;
+        }
+        else {
+            nVertex=Math.trunc(vertexArray.length/3);
+            meshCenter=new PointClass(0.0,0.0,0.0);
+            
+            for (n=0;n!==nVertex;n++) {
+                trigIdx=n*3;
+                meshCenter.addValues(vertexArray[trigIdx],vertexArray[trigIdx+1],vertexArray[trigIdx+2]);
+            }
+
+            meshCenter.x/=nVertex;
+            meshCenter.y/=nVertex;
+            meshCenter.z/=nVertex;
+        }
+        
+        trigCenter=new PointClass(0.0,0.0,0.0);
+        faceVct=new PointClass(0.0,0.0,0.0);
+
+            // generate normals by the trigs
+            // sometimes we will end up overwriting
+            // but it depends on the mesh to have
+            // constant shared vertices against
+            // triangle normals
+
+        v0=new PointClass(0.0,0.0,0.0);
+        v1=new PointClass(0.0,0.0,0.0);
+        v2=new PointClass(0.0,0.0,0.0);
+        p10=new PointClass(0.0,0.0,0.0);
+        p20=new PointClass(0.0,0.0,0.0);
+        normal=new PointClass(0.0,0.0,0.0);
+
+        nTrig=Math.trunc(indexArray.length/3);
+
+        for (n=0;n!==nTrig;n++) {
+
+                // get the vertex indexes and
+                // the vertexes for the trig
+
+            trigIdx=n*3;
+            
+            offset=indexArray[trigIdx]*3;
+            v0.x=vertexArray[offset];
+            v0.y=vertexArray[offset+1];
+            v0.z=vertexArray[offset+2];
+            
+            offset=indexArray[trigIdx+1]*3;
+            v1.x=vertexArray[offset];
+            v1.y=vertexArray[offset+1];
+            v1.z=vertexArray[offset+2];
+
+            offset=indexArray[trigIdx+2]*3;
+            v2.x=vertexArray[offset];
+            v2.y=vertexArray[offset+1];
+            v2.z=vertexArray[offset+2];
+
+                // create vectors and calculate the normal
+                // by the cross product
+
+            p10.setFromSubPoint(v1,v0);
+            p20.setFromSubPoint(v2,v0);
+            normal.setFromCross(p10,p20);
+            normal.normalize();
+
+                // determine if we need to flip
+                // we can use the dot product to tell
+                // us if the normal is pointing
+                // more towards the center or more
+                // away from it
+
+            trigCenter.setFromValues(((v0.x+v1.x+v2.x)/3),((v0.y+v1.y+v2.y)/3),((v0.z+v1.z+v2.z)/3));
+            faceVct.setFromSubPoint(trigCenter,meshCenter);
+
+            flip=(normal.dot(faceVct)>0.0);
+            if (!normalsIn) flip=!flip;
+
+            if (flip) normal.scale(-1.0);
+
+                // and set the mesh normal
+                // to all vertexes in this trig
+
+            offset=indexArray[trigIdx]*3;
+            normalArray[offset]=normal.x;
+            normalArray[offset+1]=normal.y;
+            normalArray[offset+2]=normal.z;
+
+            offset=indexArray[trigIdx+1]*3;
+            normalArray[offset]=normal.x;
+            normalArray[offset+1]=normal.y;
+            normalArray[offset+2]=normal.z;
+            
+            offset=indexArray[trigIdx+2]*3;
+            normalArray[offset]=normal.x;
+            normalArray[offset+1]=normal.y;
+            normalArray[offset+2]=normal.z;
+        }
+        
+        return(normalArray);
+    }
+    
+        //
         // build tangents
         //
 
