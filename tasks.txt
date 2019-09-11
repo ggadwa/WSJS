@@ -1,5 +1,5 @@
 - generator
-   - have a "move up"
+   - have a "move up" level
 
 - beach ball physics
    - bounce sound?

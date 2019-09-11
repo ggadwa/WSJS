@@ -102,37 +102,15 @@ export default class GenerateUtilityClass
         // build normals
         //
         
-    static buildNormals(vertexArray,indexArray,meshCenterPoint,normalsIn)
+    static buildNormals(vertexArray,indexArray,meshCenter,normalsIn)
     {
-        let n,flip,nTrig,nVertex,trigIdx,offset;
+        let n,flip,nTrig,trigIdx,offset;
         let v0,v1,v2,normalArray;
-        let meshCenter,trigCenter,faceVct;
+        let trigCenter,faceVct;
         let p10,p20,normal;
 
         normalArray=new Float32Array(vertexArray.length);
 
-            // determine the center of the vertices
-            // this will be used later to determine if
-            // normals should be flipped (for models
-            // normals always face out)
-        
-        if (meshCenterPoint!==null) {
-            meshCenter=meshCenterPoint;
-        }
-        else {
-            nVertex=Math.trunc(vertexArray.length/3);
-            meshCenter=new PointClass(0.0,0.0,0.0);
-            
-            for (n=0;n!==nVertex;n++) {
-                trigIdx=n*3;
-                meshCenter.addValues(vertexArray[trigIdx],vertexArray[trigIdx+1],vertexArray[trigIdx+2]);
-            }
-
-            meshCenter.x/=nVertex;
-            meshCenter.y/=nVertex;
-            meshCenter.z/=nVertex;
-        }
-        
         trigCenter=new PointClass(0.0,0.0,0.0);
         faceVct=new PointClass(0.0,0.0,0.0);
 

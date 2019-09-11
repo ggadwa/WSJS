@@ -1,21 +1,24 @@
+import PointClass from '../utility/point.js';
+
 export default class GenerateRoomClass
 {
-    constructor(piece,offset)
+    constructor(piece)
     {
         this.piece=piece;
-        this.offset=offset.copy();
+        this.offset=new PointClass(0,0,0);
+        this.storyCount=(this.piece.multistory)?(1+Math.trunc(Math.random()*3)):1;
         
-        this.vertexHideArray=new Uint8Array(this.piece.vertexes)
+        this.vertexHideArray=new Uint8Array(this.piece.vertexes.length*3); // 3 possible stories
     }
     
-    hideVertex(vIdx)
+    hideVertex(story,vIdx)
     {
-        this.vertexHideArray[vIdx]=1;
+        this.vertexHideArray[(story*this.piece.vertexes.length)+vIdx]=1;
     }
     
-    isLineHidden(vIdx)
+    isWallHidden(story,vIdx)
     {
-        return(this.vertexHideArray[vIdx]===1);
+        return(this.vertexHideArray[(story*this.piece.vertexes.length)+vIdx]===1);
     }
         
 }
