@@ -1,3 +1,5 @@
+import GenerateUtilityClass from '../generate/generate_utility.js';
+
 export default class GeneratePieceClass
 {
     pieces=
@@ -93,7 +95,19 @@ export default class GeneratePieceClass
                             [6,10],[5,10],[4,10],[4,9],[4,8],[4,7],[4,6],[4,5],[4,4],
                             [3,4],[2,4],[1,4],[0,4],[0,3],[0,2],[0,1]
                         ]
-                }
+                },
+                {
+                    "name":"hallway",
+                    "starter":false,
+                    "multistory":false,
+                    "vertexes":
+                        [
+                            [3,0],[4,0],[5,0],[6,0],[7,0],
+                            [7,1],[7,2],[7,3],[7,4],[7,5],[7,6],[7,7],[7,8],[7,9],[7,10],
+                            [7,10],[6,10],[5,10],[4,10],[3,10],
+                            [3,9],[3,8],[3,7],[3,6],[3,5],[3,4],[3,3],[3,2],[3,1]
+                        ]
+                },
 
             ];
     
@@ -143,7 +157,7 @@ export default class GeneratePieceClass
         //return(this.pieces[0]);
         
         while (true) {
-            piece=this.pieces[Math.trunc(Math.random()*this.pieces.length)];
+            piece=this.pieces[Math.trunc(GenerateUtilityClass.random()*this.pieces.length)];
             if (!isStarter) return(piece);
             
             if (piece.starter) return(piece);

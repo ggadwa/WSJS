@@ -2,9 +2,33 @@ import PointClass from '../utility/point.js';
 
 export default class GenerateUtilityClass
 {
+    static mwcW=0;
+    static mwcZ=0;
+    
     constructor()
     {
         Object.seal(this);
+    }
+    
+        //
+        // random numbers
+        //
+        
+    static setRandomSeed(seed)
+    {
+        GenerateUtilityClass.mwcW=(seed<<16)&0xFFFF;
+        GenerateUtilityClass.mwcZ=seed&0xFFFF;
+    }
+
+    static random()
+    {
+        let r;
+
+        GenerateUtilityClass.mwcZ=(36969*(GenerateUtilityClass.mwcZ&0xFFFF)+(GenerateUtilityClass.mwcZ>>16))&0xFFFFFFFF;
+        GenerateUtilityClass.mwcW=(18000*(GenerateUtilityClass.mwcW&0xFFFF)+(GenerateUtilityClass.mwcW>>16))&0xFFFFFFFF;
+        r=((GenerateUtilityClass.mwcZ<<16)+GenerateUtilityClass.mwcW)&0xFFFFFFFF;
+
+        return((r/=0xFFFFFFFF)+0.5);
     }
     
         //
