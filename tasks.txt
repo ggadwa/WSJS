@@ -1,7 +1,4 @@
 - generator
-   - have a "move up" level
-   - do stairs
-   - figure out where stunted maps are failing
 
 - beach ball physics
    - bounce sound?

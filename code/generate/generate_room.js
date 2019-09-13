@@ -3,9 +3,11 @@ import GenerateUtilityClass from '../generate/generate_utility.js';
 
 export default class GenerateRoomClass
 {
-    constructor(piece)
+    constructor(piece,sideRoom)
     {
         this.piece=piece;
+        this.sideRoom=sideRoom;
+        
         this.offset=new PointClass(0,0,0);
         this.storyCount=(this.piece.multistory)?(1+Math.trunc(GenerateUtilityClass.random()*3)):1;
         

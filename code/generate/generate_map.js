@@ -5,13 +5,11 @@ import MeshClass from '../../code/mesh/mesh.js';
 import LightClass from '../light/light.js';
 import GeneratePieceClass from '../generate/generate_piece.js';
 import GenerateRoomClass from '../generate/generate_room.js';
+import GenerateMeshClass from '../generate/generate_mesh.js';
 import GenerateUtilityClass from '../generate/generate_utility.js';
 
 export default class GenerateMapClass
 {
-    static UV_FACTOR=0.00005;
-    static STAIR_STEP_COUNT=10;
-    
     constructor(core)
     {
         this.core=core;
@@ -92,7 +90,7 @@ export default class GenerateMapClass
         }
     }
     
-    hasTwoSharedWalls(room,room2,roomSize)
+    hasTwoSharedWalls(room,room2,roomSize,sideRoom)
     {
         let vIdx,vIdx2,nextIdx,nextIdx2,nVertex,nVertex2;
         let ax,az,ax2,az2,bx,bz,bx2,bz2;
@@ -101,8 +99,10 @@ export default class GenerateMapClass
             // we note where these connections are
             // in case we need stairs
             
-        room.stairVertexIdx=-1;
-        room.stairVertexIdx2=-1;
+        if (!sideRoom) {
+            room.stairVertexIdx=-1;
+            room.stairVertexIdx2=-1;
+        }
         
             // check to see if two rooms share at
             // least two walls (so they can connect properly)
@@ -137,15 +137,19 @@ export default class GenerateMapClass
 
                     // as long as we have a count, keep
                     // adding on so we get entire size of hole
+                    // if it's a normal room, remember where the steps
+                    // so go
                     
                 if (((ax===bx) && (az===bz) && (ax2===bx2) && (az2===bz2)) || ((ax2===bx) && (az2===bz) && (ax===bx2) && (az===bz2))) {
                     count++;
-                    if (room.stairVertexIdx===-1) {
-                        room.stairVertexIdx=vIdx;
-                    }
-                    else {
-                        room.stairVertexIdx2=vIdx+1;
-                        if (room.stairVertexIdx2===nVertex) room.stairVertexIdx2=0;
+                    if (!sideRoom) {
+                        if (room.stairVertexIdx===-1) {
+                            room.stairVertexIdx=vIdx;
+                        }
+                        else {
+                            room.stairVertexIdx2=vIdx+1;
+                            if (room.stairVertexIdx2===nVertex) room.stairVertexIdx2=0;
+                        }
                     }
                 }
 
@@ -172,7 +176,7 @@ export default class GenerateMapClass
         // room positioning
         //
         
-    setNextRoomPosition(rooms,previousRoom,nextRoom,roomSize,pathXDeviation)
+    setNextRoomPosition(rooms,previousRoom,nextRoom,roomSize,pathXDeviation,pathTurnFactor,sideRoom)
     {
         let n,xAdd,zAdd,randAdd,origRandAdd,randShift,xShift,zShift;
         let room,badSpot;
@@ -190,7 +194,7 @@ export default class GenerateMapClass
             
                 // forward or turn
                 
-            if (GenerateUtilityClass.random()>0.5) {
+            if ((GenerateUtilityClass.random()<pathTurnFactor) || (sideRoom)) {
                 xAdd=(pathXDeviation*roomSize);
                 zAdd=0;
                 
@@ -209,7 +213,7 @@ export default class GenerateMapClass
                 // on same x/z coords, we need to have at least
                 // two walls in common
                 
-            randAdd=Math.trunc(GenerateUtilityClass.random()*9);
+            randAdd=Math.trunc(GenerateUtilityClass.random()*18)-9;        // we can connect across the entire edge, which is 9 grid units off of each side
             origRandAdd=randAdd;
             
             while (true) {
@@ -219,15 +223,12 @@ export default class GenerateMapClass
                 nextRoom.offset.y=previousRoom.offset.y;
                 nextRoom.offset.z=(previousRoom.offset.z+zAdd)+(randShift*zShift);
 
-                if (this.hasTwoSharedWalls(previousRoom,nextRoom,roomSize)) break;
+                if (this.hasTwoSharedWalls(previousRoom,nextRoom,roomSize,sideRoom)) break;
                 
                 randAdd++;
-                if (randAdd===10) randAdd=0;
+                if (randAdd===10) randAdd=-9;
 
-                if (randAdd===origRandAdd) {
-                    console.log('Failed on shifting');
-                    return(false);
-                }
+                if (randAdd===origRandAdd) return(false);
             }
                 
                 // are we colliding with any previous rooms?
@@ -251,168 +252,7 @@ export default class GenerateMapClass
             tryCount++;
         }
             
-        console.log('Failed on finding spot');
         return(false);
-    }
-    
-        //
-        // room pieces
-        //
-        
-    buildRoomFloorCeiling(room,centerPnt,name,bitmap,y,roomSize)
-    {
-        let vertexArray=[];
-        let normalArray;
-        let uvArray;
-        let tangentArray;
-        let indexArray=[];
-        
-        vertexArray.push(room.offset.x,y,room.offset.z);
-        vertexArray.push((room.offset.x+roomSize),y,room.offset.z);
-        vertexArray.push((room.offset.x+roomSize),y,(room.offset.z+roomSize));
-        vertexArray.push(room.offset.x,y,(room.offset.z+roomSize));
-
-        indexArray.push(0,1,2,0,2,3);
-        
-        normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMapClass.UV_FACTOR);
-        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
-        
-        this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
-    }
-    
-    buildRoomWalls(room,centerPnt,name,bitmap,roomSize,roomHigh)
-    {
-        let n,k,k2,y;
-        let nVertex,trigIdx;
-        let vertexArray,indexArray,uvArray,normalArray,tangentArray;
-        let piece=room.piece;
-        
-        nVertex=piece.vertexes.length;
-            
-        vertexArray=[];
-        indexArray=[];
-
-        trigIdx=0;
-        y=room.offset.y;
-
-        for (n=0;n!==room.storyCount;n++) {
-
-            for (k=0;k!=nVertex;k++) {
-                k2=k+1;
-                if (k2===nVertex) k2=0;
-
-                if (room.isWallHidden(n,k)) continue;
-
-                vertexArray.push((Math.trunc((piece.vertexes[k][0]*0.1)*roomSize)+room.offset.x),(y+roomHigh),(Math.trunc((piece.vertexes[k][1]*0.1)*roomSize)+room.offset.z));
-                vertexArray.push((Math.trunc((piece.vertexes[k2][0]*0.1)*roomSize)+room.offset.x),(y+roomHigh),(Math.trunc((piece.vertexes[k2][1]*0.1)*roomSize)+room.offset.z));
-                vertexArray.push((Math.trunc((piece.vertexes[k2][0]*0.1)*roomSize)+room.offset.x),y,(Math.trunc((piece.vertexes[k2][1]*0.1)*roomSize)+room.offset.z));
-                vertexArray.push((Math.trunc((piece.vertexes[k][0]*0.1)*roomSize)+room.offset.x),y,(Math.trunc((piece.vertexes[k][1]*0.1)*roomSize)+room.offset.z));
-
-                indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
-
-                trigIdx+=4;
-            }
-
-            y+=roomHigh;
-        }
-
-        vertexArray=new Float32Array(vertexArray);
-        indexArray=new Uint16Array(indexArray);
-        normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMapClass.UV_FACTOR);
-        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
-        
-        this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray));
-    }
-    
-    buildRoomStairs(room,name,bitmap,roomSize,roomHigh)
-    {
-        let n,x,z,x2,z2,y,trigIdx,zDir;
-        let sx,sx2,sz,sz2;
-        let centerPnt;
-        let vertexArray=[];
-        let normalArray;
-        let uvArray;
-        let tangentArray;
-        let indexArray=[];
-        let stepSize=Math.trunc(roomSize*0.02);
-        let stepHigh=Math.trunc(roomHigh/GenerateMapClass.STAIR_STEP_COUNT);
-        let stairSize=stepSize*GenerateMapClass.STAIR_STEP_COUNT;
-        let pieceVertex=room.piece.vertexes[room.stairVertexIdx];
-        let pieceVertex2=room.piece.vertexes[room.stairVertexIdx2];
-        
-            // depending on what vertex the connection was
-            // is the direction of the stairs
-        
-        zDir=false;
-        
-        if ((pieceVertex[0]===0) && (pieceVertex[1]!==0)) {     // to the -X
-            x=room.offset.x+stairSize;
-            x2=room.offset.x;
-            z=room.offset.z+(pieceVertex[1]*Math.trunc(roomSize*0.1));
-            z2=room.offset.z+(pieceVertex2[1]*Math.trunc(roomSize*0.1));
-        }
-        else {
-            if ((pieceVertex[0]===10) && (pieceVertex[1]!==10)) {       // to the +X
-                x2=room.offset.x+roomSize;
-                x=x2-stairSize;
-                z=room.offset.z+(pieceVertex[1]*Math.trunc(roomSize*0.1));
-                z2=room.offset.z+(pieceVertex2[1]*Math.trunc(roomSize*0.1));
-            }
-            else {          // to the +Z
-                zDir=true;
-                x=room.offset.x+(pieceVertex[0]*Math.trunc(roomSize*0.1));
-                x2=room.offset.x+(pieceVertex2[0]*Math.trunc(roomSize*0.1));
-                z2=room.offset.z+roomSize;
-                z=z2-stairSize;
-            }
-        }
-
-            // the stairs
-        
-        trigIdx=0;
-        y=room.offset.y+stepHigh;
-        
-        for (n=0;n!==GenerateMapClass.STAIR_STEP_COUNT;n++) { 
-            
-            if (zDir) {
-                sx=x;
-                sx2=x2;
-                sz=z+(n*stepSize);
-                sz2=sz+stepSize;
-            }
-            else {
-                if (x<x2) {
-                    sx=x+(n*stepSize);
-                    sx2=sx+stepSize;
-                }
-                else {
-                    sx=x-(n*stepSize);
-                    sx2=sx-stepSize;
-                }
-                sz=z;
-                sz2=z2;
-            }
-            
-            vertexArray.push(sx,y,sz);
-            vertexArray.push(sx2,y,sz);
-            vertexArray.push(sx2,y,sz2);
-            vertexArray.push(sx,y,sz2);
-
-            indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
-            trigIdx+=4;
-            
-            y+=stepHigh;
-        }
-        
-        centerPnt=new PointClass(Math.trunc((x+x2)*0.5),(room.offset.y+Math.trunc(roomHigh*0.5)),Math.trunc((z+z2)*0.5));
-        
-        normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMapClass.UV_FACTOR);
-        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
-        
-        this.core.map.meshList.add(new MeshClass(this.core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
 
         //
@@ -458,14 +298,14 @@ export default class GenerateMapClass
         
             // start room
             
-        room=new GenerateRoomClass(genPiece.getRandomPiece(true));
+        room=new GenerateRoomClass(genPiece.getRandomPiece(true),false);
         rooms.push(room);
         
             // path rooms
         
         for (n=1;n<roomCount;n++) {
-            nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(false));
-            if (!this.setNextRoomPosition(rooms,room,nextRoom,roomSize,pathXDeviation)) break;
+            nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(false),false);
+            if (!this.setNextRoomPosition(rooms,room,nextRoom,roomSize,pathXDeviation,importSettings.autoGenerate.pathTurnFactor,false)) break;
             
                 // do we have a stair?
                 
@@ -478,6 +318,23 @@ export default class GenerateMapClass
             room=nextRoom;
         }
         
+            // side rooms, always rooms off of
+            // other rooms but to the opposite side of path
+            // these are allowed to fail and are skipped if no space
+            
+            console.info('path count='+rooms.length);
+
+        for (n=0;n!=roomCount;n++) {
+            room=rooms[n];
+            if (GenerateUtilityClass.random()<importSettings.autoGenerate.sideRoomFactor) {
+                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(true),true);
+                if (this.setNextRoomPosition(rooms,room,nextRoom,roomSize,-pathXDeviation,importSettings.autoGenerate.pathTurnFactor,true)) {
+                    nextRoom.offset.y=room.offset.y;
+                    rooms.push(nextRoom);
+                }
+            }
+        }
+
             // eliminate all combined walls
             
         this.removeSharedWalls(rooms,roomSize,roomHigh);
@@ -495,14 +352,16 @@ export default class GenerateMapClass
                 
                 // meshes
                 
-            this.buildRoomWalls(room,centerPnt,('wall_'+n),wallBitmap,roomSize,roomHigh);
-            this.buildRoomFloorCeiling(room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,roomSize);
-            this.buildRoomFloorCeiling(room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,roomSize);
+            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),wallBitmap,roomSize,roomHigh);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,roomSize);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,roomSize);
             
                 // possible stairs
                 
             if (n<(roomCount-1)) {
-                if (rooms[n+1].offset.y>room.offset.y) this.buildRoomStairs(room,('stair_'+n),floorBitmap,roomSize,roomHigh);
+                if ((!room.sideRoom) && (!rooms[n+1].sideRoom)) {
+                    if (rooms[n+1].offset.y>room.offset.y) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),wallBitmap,floorBitmap,roomSize,roomHigh);
+                }
             }
             
                 // room light
