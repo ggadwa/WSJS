@@ -1,10 +1,9 @@
-import PointClass from '../utility/point.js';
-import MeshClass from '../../code/mesh/mesh.js';
-import GenerateUtilityClass from '../generate/generate_utility.js';
+import PointClass from '../../utility/point.js';
+import MeshClass from '../../mesh/mesh.js';
+import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateMeshClass
 {
-    static UV_FACTOR=0.00005;
     static STAIR_STEP_COUNT=10;
 
     constructor()
@@ -21,7 +20,7 @@ export default class GenerateMeshClass
         return(trigIdx+4);
     }
     
-    static addBox(core,name,bitmap,negX,posX,negY,posY,negZ,posZ,isNegX,isPosX,isNegY,isPosY,isNegZ,isPosZ)
+    static addBox(core,name,bitmap,negX,posX,negY,posY,negZ,posZ,isNegX,isPosX,isNegY,isPosY,isNegZ,isPosZ,roomHigh)
     {
         let vertexArray=[];
         let indexArray=[];
@@ -55,7 +54,7 @@ export default class GenerateMeshClass
         }
             
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMeshClass.UV_FACTOR);
+        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/roomHigh));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
         core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
@@ -65,7 +64,7 @@ export default class GenerateMeshClass
         // room pieces
         //
         
-    static buildRoomFloorCeiling(core,room,centerPnt,name,bitmap,y,roomSize)
+    static buildRoomFloorCeiling(core,room,centerPnt,name,bitmap,y,roomSize,roomHigh)
     {
         let vertexArray=[];
         let normalArray;
@@ -81,7 +80,7 @@ export default class GenerateMeshClass
         this.addQuadToIndexes(indexArray,0);
         
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMeshClass.UV_FACTOR);
+        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/roomHigh));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
         core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
@@ -124,7 +123,7 @@ export default class GenerateMeshClass
         vertexArray=new Float32Array(vertexArray);
         indexArray=new Uint16Array(indexArray);
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,true);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMeshClass.UV_FACTOR);
+        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/roomHigh));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
         core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,vertexArray,normalArray,tangentArray,uvArray,null,null,indexArray));
@@ -234,7 +233,7 @@ export default class GenerateMeshClass
             // create the mesh
             
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,GenerateMeshClass.UV_FACTOR);
+        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/roomHigh));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
         core.map.meshList.add(new MeshClass(core,name,floorBitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
@@ -243,17 +242,17 @@ export default class GenerateMeshClass
             
         if (zDir) {
             sx=(x<x2)?x:x2;
-            if ((sx>room.offset.x) && (sx<(room.offset.x+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,(sx-stepSize),sx,room.offset.y,(room.offset.y+roomHigh),z,z2,true,true,false,true,true,false);
+            if ((sx>room.offset.x) && (sx<(room.offset.x+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,(sx-stepSize),sx,room.offset.y,(room.offset.y+roomHigh),z,z2,true,true,false,true,true,false,roomHigh);
             
             sx=(x<x2)?x2:x;
-            if ((sx>room.offset.x) && (sx<(room.offset.x+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,sx,(sx+stepSize),room.offset.y,(room.offset.y+roomHigh),z,z2,true,true,false,true,true,false);
+            if ((sx>room.offset.x) && (sx<(room.offset.x+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,sx,(sx+stepSize),room.offset.y,(room.offset.y+roomHigh),z,z2,true,true,false,true,true,false,roomHigh);
         }
         else {
             sz=(z<z2)?z:z2;
-            if ((sz>room.offset.z) && (sz<(room.offset.z+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,x,x2,room.offset.y,(room.offset.y+roomHigh),(sz-stepSize),sz,true,false,false,true,true,true);
+            if ((sz>room.offset.z) && (sz<(room.offset.z+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,x,x2,room.offset.y,(room.offset.y+roomHigh),(sz-stepSize),sz,true,false,false,true,true,true,roomHigh);
             
             sz=(z<z2)?z2:z;
-            if ((sz>room.offset.z) && (sz<(room.offset.z+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,x,x2,room.offset.y,(room.offset.y+roomHigh),sz,(sz+stepSize),true,false,false,true,true,true);
+            if ((sz>room.offset.z) && (sz<(room.offset.z+roomSize))) this.addBox(core,(name+'_side1'),wallBitmap,x,x2,room.offset.y,(room.offset.y+roomHigh),sz,(sz+stepSize),true,false,false,true,true,true,roomHigh);
         }
     }
 }

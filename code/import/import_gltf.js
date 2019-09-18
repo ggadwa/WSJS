@@ -656,7 +656,7 @@ export default class ImportGLTFClass
         }
         else {
             if (colorBase!==null) {
-                bitmap=this.core.bitmapList.addColor(colorBase,normalURL,specularURL,specularFactor,scale);
+                bitmap=this.core.bitmapList.addColor(colorBase);        // this is meant as a fallback, games should use real PBR materials
             }
             else {
                 console.log('Could not find texture for mesh '+meshNode.name+' in material '+materialNode.name+' in '+this.importSettings.name);

@@ -1,4 +1,4 @@
-import GenerateUtilityClass from '../generate/generate_utility.js';
+import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GeneratePieceClass
 {
@@ -190,7 +190,7 @@ export default class GeneratePieceClass
         let piece;
         
         while (true) {
-            piece=this.pieces[Math.trunc(GenerateUtilityClass.random()*this.pieces.length)];
+            piece=this.pieces[GenerateUtilityClass.randomIndex(this.pieces.length)];
             if (!isStarter) return(piece);
             
             if (piece.starter) return(piece);

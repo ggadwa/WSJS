@@ -1,4 +1,4 @@
-import ColorClass from '../../code/utility/color.js';
+import ColorClass from '../utility/color.js';
 import InterfaceElementClass from '../interface/interface_element.js';
 import InterfaceTextClass from '../interface/interface_text.js';
 

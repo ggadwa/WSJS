@@ -10,7 +10,7 @@ export default class SkyClass
         
         this.on=false;
         this.size=0;
-        this.bitmapName=null;
+        this.bitmap=null;
 
         this.vertexes=null;
         this.uvs=null;
@@ -128,7 +128,6 @@ export default class SkyClass
     draw()
     {
         let gl=this.core.gl;
-        let bitmap;
         let cameraPos,skyRadius;
         
         if (!this.on) return;
@@ -142,8 +141,7 @@ export default class SkyClass
         
             // the sky texture
             
-        bitmap=this.core.bitmapList.get(this.bitmapName);
-        bitmap.attachAsSky();
+        this.bitmap.attachAsSky();
         
         gl.disable(gl.DEPTH_TEST);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);

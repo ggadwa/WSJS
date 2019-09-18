@@ -1,6 +1,6 @@
-import ColorClass from '../../code/utility/color.js';
+import ColorClass from '../utility/color.js';
 import ProjectGameClass from '../project/project_game.js';
-import InterfaceTextClass from '../../code/interface/interface_text.js';
+import InterfaceTextClass from '../interface/interface_text.js';
 
 export default class ProjectGameDeveloprClass extends ProjectGameClass
 {

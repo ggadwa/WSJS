@@ -12,6 +12,7 @@ export default class BitmapListClass
         this.core=core;
         
         this.bitmaps=new Map();
+        this.generatedUniqueId=0;
 
         Object.seal(this);
     }
@@ -41,18 +42,17 @@ export default class BitmapListClass
             
         if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
             
-            // add new one to list, will be loaded
-            // by another call that force loads unloaded
-            // bitmaps
+            // add bitmap to list, these will be loaded
+            // in a later call
                     
-        bitmap=new BitmapClass(this.core,colorURL,null,normalURL,specularURL,specularFactor,scale,false);
-        bitmap.initialize();
+        bitmap=new BitmapClass(this.core);
+        bitmap.initializeNormalURL(colorURL,normalURL,specularURL,specularFactor,scale);
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);
     }
     
-    addColor(colorBase,normalURL,specularURL,specularFactor,scale)
+    addColor(colorBase)
     {
         let bitmap;
         let hex,colorURL;
@@ -60,18 +60,17 @@ export default class BitmapListClass
             // make up a name from the color
         
         hex=(Math.trunc(colorBase.r*255)<<16)+(Math.trunc(colorBase.g*255)<<8)+Math.trunc(colorBase.b*255);
-        colorURL='_'+hex.toString(16);
+        colorURL='_rgb_'+hex.toString(16);
             
             // already in list?
             
         if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
         
-            // add new one to list, will be loaded
-            // by another call that force loads unloaded
-            // bitmaps
+            // add bitmap to list, these will be loaded
+            // in a later call
                     
-        bitmap=new BitmapClass(this.core,colorURL,colorBase,normalURL,specularURL,specularFactor,scale,false);
-        bitmap.initialize();
+        bitmap=new BitmapClass(this.core);
+        bitmap.initializeColor(colorURL,colorBase);
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);
@@ -85,21 +84,43 @@ export default class BitmapListClass
             
         if (this.bitmaps.has(colorURL)) return(this.bitmaps.get(colorURL));
         
-            // add new one to list, will be loaded
-            // by another call that force loads unloaded
-            // bitmaps
+            // add bitmap to list, these will be loaded
+            // in a later call
                     
-        bitmap=new BitmapClass(this.core,colorURL,null,null,null,null,null,true);
-        bitmap.initialize();
+        bitmap=new BitmapClass(this.core);
+        bitmap.initializeSimpleURL(colorURL);
         this.bitmaps.set(colorURL,bitmap);
         
         return(bitmap);
     }
     
-    get(colorURL)
+    addGenerated(colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax)
     {
-        return(this.bitmaps.get(colorURL));
+        let bitmap;
+        let colorURL;
+                
+            // generated bitmaps are always generated once
+            // so they are guarenteed to be unique, we just need
+            // fake colorURL for them
+        
+        colorURL='_generated_'+this.generatedUniqueId;
+        this.generatedUniqueId++;
+        
+            // add bitmap to list, these will be loaded
+            // in a later call
+                    
+        bitmap=new BitmapClass(this.core);
+        bitmap.initializeGenerated(colorURL,colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax);
+        this.bitmaps.set(colorURL,bitmap);
+        
+        return(bitmap);
     }
+    
+        //
+        // we can search out bitmaps by a "simple" name which removes
+        // any extra URL gunk -- this is basically used for interface elements
+        // or mass setting of meshes based on attached bitmaps
+        //
     
     getSimpleName(name)
     {

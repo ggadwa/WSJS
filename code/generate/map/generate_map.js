@@ -1,12 +1,13 @@
-import PointClass from '../utility/point.js';
-import ColorClass from '../utility/color.js';
-import MapClass from '../../code/map/map.js';
-import MeshClass from '../../code/mesh/mesh.js';
-import LightClass from '../light/light.js';
-import GeneratePieceClass from '../generate/generate_piece.js';
-import GenerateRoomClass from '../generate/generate_room.js';
-import GenerateMeshClass from '../generate/generate_mesh.js';
-import GenerateUtilityClass from '../generate/generate_utility.js';
+import PointClass from '../../utility/point.js';
+import ColorClass from '../../utility/color.js';
+import MapClass from '../../map/map.js';
+import MeshClass from '../../mesh/mesh.js';
+import LightClass from '../../light/light.js';
+import GeneratePieceClass from './generate_piece.js';
+import GenerateRoomClass from './generate_room.js';
+import GenerateMeshClass from './generate_mesh.js';
+import GenerateUtilityClass from '../utility/generate_utility.js';
+import GenerateBitmapRun from '../bitmap/generate_bitmap_run.js';
 
 export default class GenerateMapClass
 {
@@ -194,7 +195,7 @@ export default class GenerateMapClass
             
                 // forward or turn
                 
-            if ((GenerateUtilityClass.random()<pathTurnFactor) || (sideRoom)) {
+            if ((GenerateUtilityClass.randomPercentage(pathTurnFactor)) || (sideRoom)) {
                 xAdd=(pathXDeviation*roomSize);
                 zAdd=0;
                 
@@ -213,7 +214,7 @@ export default class GenerateMapClass
                 // on same x/z coords, we need to have at least
                 // two walls in common
                 
-            randAdd=Math.trunc(GenerateUtilityClass.random()*18)-9;        // we can connect across the entire edge, which is 9 grid units off of each side
+            randAdd=GenerateUtilityClass.randomInt(-9,18);        // we can connect across the entire edge, which is 9 grid units off of each side
             origRandAdd=randAdd;
             
             while (true) {
@@ -281,8 +282,10 @@ export default class GenerateMapClass
         roomHigh=importSettings.autoGenerate.roomHeight;
         
             // bitmaps
+            
+        wallBitmap=GenerateBitmapRun.generateWall(this.core);
           
-        wallBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.wallBitmap);
+        //wallBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.wallBitmap);
         floorBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.floorBitmap);
         ceilingBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.ceilingBitmap);
 
@@ -310,7 +313,7 @@ export default class GenerateMapClass
                 // do we have a stair?
                 
             if (room.storyCount>1) {
-                if (GenerateUtilityClass.random()>importSettings.autoGenerate.stairFactor) nextRoom.offset.y+=roomHigh;
+                if (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.stairFactor)) nextRoom.offset.y+=roomHigh;
             }
             
             rooms.push(nextRoom);
@@ -326,7 +329,7 @@ export default class GenerateMapClass
 
         for (n=0;n!=roomCount;n++) {
             room=rooms[n];
-            if (GenerateUtilityClass.random()<importSettings.autoGenerate.sideRoomFactor) {
+            if (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.sideRoomFactor)) {
                 nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(true),true);
                 if (this.setNextRoomPosition(rooms,room,nextRoom,roomSize,-pathXDeviation,importSettings.autoGenerate.pathTurnFactor,true)) {
                     nextRoom.offset.y=room.offset.y;
@@ -353,8 +356,8 @@ export default class GenerateMapClass
                 // meshes
                 
             GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),wallBitmap,roomSize,roomHigh);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,roomSize);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,roomSize);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,roomSize,roomHigh);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,roomSize,roomHigh);
             
                 // possible stairs
                 
@@ -413,8 +416,7 @@ export default class GenerateMapClass
         else {
             this.core.map.sky.on=true;
             this.core.map.sky.size=importSettings.skyBox.size;
-            this.core.map.sky.bitmapName=importSettings.skyBox.bitmap;
-            this.core.bitmapList.addSimple(importSettings.skyBox.bitmap);
+            this.core.map.sky.bitmap=this.core.bitmapList.addSimple(importSettings.skyBox.bitmap);
         }
         
         return(true);

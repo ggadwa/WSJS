@@ -1,5 +1,5 @@
-import ColorClass from '../../code/utility/color.js';
-import InterfaceClass from '../../code/interface/interface.js';
+import ColorClass from '../utility/color.js';
+import InterfaceClass from '../interface/interface.js';
 
 export default class InterfaceTextClass
 {

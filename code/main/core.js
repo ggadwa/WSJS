@@ -7,7 +7,7 @@ import PointClass from '../utility/point.js';
 import RectClass from '../utility/rect.js';
 import PlaneClass from '../utility/plane.js';
 import ColorClass from '../utility/color.js';
-import QuaternionClass from '../../code/utility/quaternion.js';
+import QuaternionClass from '../utility/quaternion.js';
 import Matrix4Class from '../utility/matrix4.js';
 import Matrix3Class from '../utility/matrix3.js';
 import InputClass from '../main/input.js';

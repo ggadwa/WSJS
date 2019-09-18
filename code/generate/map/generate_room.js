@@ -1,5 +1,5 @@
-import PointClass from '../utility/point.js';
-import GenerateUtilityClass from '../generate/generate_utility.js';
+import PointClass from '../../utility/point.js';
+import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateRoomClass
 {
@@ -9,7 +9,7 @@ export default class GenerateRoomClass
         this.sideRoom=sideRoom;
         
         this.offset=new PointClass(0,0,0);
-        this.storyCount=(this.piece.multistory)?(1+Math.trunc(GenerateUtilityClass.random()*3)):1;
+        this.storyCount=(this.piece.multistory)?(Math.trunc(GenerateUtilityClass.randomInt(1,3))):1;
         
         this.stairVertexIdx=0;
         this.stairVertexIdx2=0;

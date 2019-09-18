@@ -1,10 +1,10 @@
-import PointClass from '../../code/utility/point.js';
-import BoundClass from '../../code/utility/bound.js';
+import PointClass from '../utility/point.js';
+import BoundClass from '../utility/bound.js';
 import CoreClass from '../main/core.js';
-import ProjectEntityClass from '../../code/project/project_entity.js';
-import ModelClass from '../../code/model/model.js';
-import ImportModelClass from '../../code/import/import_model.js';
-import MapPathNodeClass from '../../code/map/map_path_node.js';
+import ProjectEntityClass from '../project/project_entity.js';
+import ModelClass from '../model/model.js';
+import ImportModelClass from '../import/import_model.js';
+import MapPathNodeClass from '../map/map_path_node.js';
 
 export default class ProjectEntityDeveloperClass extends ProjectEntityClass
 {

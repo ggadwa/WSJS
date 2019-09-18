@@ -1,4 +1,9 @@
-- generator
+stone
+  - needs more random Y (stone takes up 2 rows)
+  - edges are light interior colors
+  - need routine to make rough normals
+
+- need textures to stamp better
 
 - beach ball physics
    - bounce sound?

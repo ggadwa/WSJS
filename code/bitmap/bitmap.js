@@ -2,24 +2,31 @@ import ColorClass from '../utility/color.js';
 
 export default class BitmapClass
 {
+    static BITMAP_NORMAL_URL=0;         // bitmaps are a bunch of files by URL
+    static BITMAP_SIMPLE_URL=1;         // bitmap is a single file of just a color map
+    static BITMAP_COLOR=2;              // bitmap is just an RGB color
+    static BITMAP_GENERATED=3;          // bitmap is generated
+    
     static NORMAL_MAX_SHIFT=31;
     static NORMAL_NO_SHIFT_CLAMP=0.7;
     static SPECULAR_CONTRAST=150;
     static SPECULAR_CONTRAST_CLAMP=0.4;
     
-    constructor(core,colorURL,colorBase,normalURL,specularURL,specularFactor,scale,simple)
+    static DEFAULT_SPECULAR=5;
+    
+    constructor(core)
     {
         this.core=core;
-        this.colorURL=colorURL;
-        this.colorBase=colorBase;
-        this.normalURL=normalURL;
-        this.specularURL=specularURL;
-        this.specularFactor=specularFactor;
-        this.glowURL=null;
-        this.scale=scale;
-        this.simple=simple;
         
-        if (this.specularFactor===null) this.specularFactor=new ColorClass(1,1,1);      // default specular, in case it's missing
+        this.bitmapType=BitmapClass.BITMAP_NORMAL_URL;
+        
+        this.colorURL=null;
+        this.colorBase=null;
+        this.normalURL=null;
+        this.specularURL=null;
+        this.specularFactor=null;
+        this.glowURL=null;
+        this.scale=null;
         
         this.colorImage=null;
         this.normalImage=null;
@@ -39,8 +46,6 @@ export default class BitmapClass
         this.glowMax=1.0;
         
         this.simpleName=null;
-        this.buildSimpleName();
-        
         this.loaded=false;
         
         Object.seal(this);
@@ -49,16 +54,67 @@ export default class BitmapClass
         //
         // initialize and release bitmap
         //
-    
-    initialize()
-    {
-        this.texture=null;
-        this.normalMap=null;
-        this.specularMap=null;
-        this.glowMap=null;
-        this.mask=null;
 
-        this.loaded=false;
+    initializeNormalURL(colorURL,normalURL,specularURL,specularFactor,scale)
+    {
+        this.bitmapType=BitmapClass.BITMAP_NORMAL_URL;
+        
+        this.colorURL=colorURL;
+        this.colorBase=null;
+        this.normalURL=normalURL;
+        this.specularURL=specularURL;
+        this.specularFactor=(specularFactor!==null)?specularFactor:new ColorClass(BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR);
+        this.scale=scale;
+        
+        this.buildSimpleName();
+    }
+    
+    initializeSimpleURL(colorURL)
+    {
+        this.bitmapType=BitmapClass.BITMAP_SIMPLE_URL;
+        
+        this.colorURL=colorURL;
+        this.colorBase=null;
+        this.normalURL=null;
+        this.specularURL=null;
+        this.specularFactor=null;
+        this.scale=null;
+        
+        this.buildSimpleName();
+    }
+    
+    initializeColor(colorURL,colorBase)
+    {
+        this.bitmapType=BitmapClass.BITMAP_COLOR;
+        
+        this.colorURL=colorURL;
+        this.colorBase=colorBase;
+        this.normalURL=null;
+        this.specularURL=null;
+        this.specularFactor=new ColorClass(BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR,BitmapClass.DEFAULT_SPECULAR);
+        this.scale=null;
+        
+        this.buildSimpleName();
+    }
+    
+    initializeGenerated(colorURL,colorImage,normalImage,specularImage,specularFactor,glowImage,glowFrequency,glowMin,glowMax)
+    {
+        this.bitmapType=BitmapClass.BITMAP_GENERATED;
+        
+        this.colorURL=colorURL;
+        this.colorBase=null;
+        this.normalURL=null;
+        this.specularURL=null;
+        this.scale=null;
+        
+        this.colorURL=colorURL;
+        this.colorImage=colorImage;
+        this.normalImage=normalImage;
+        this.specularImage=specularImage;
+        this.specularFactor=specularFactor;
+        this.glowImage=glowImage;
+        
+        this.buildSimpleName();
     }
     
     release()
@@ -161,20 +217,8 @@ export default class BitmapClass
         }
 		
 	ctx.putImageData(imgData,0,0);
-		
-            // convert to image
-            // we have to wait for a promise here
-            // as these don't always load async
-            
-        return(
-            new Promise((resolve,reject) =>
-                {
-                    let img=new Image();
-                    img.onload=()=>resolve(img);
-                    img.src=canvas.toDataURL("image/png");      // reject will never happen here as far as I can tell
-                }
-            )
-       );
+        
+        return(canvas);
     }
     
     createNormalFromColorImage()
@@ -231,20 +275,8 @@ export default class BitmapClass
         }
 		
 	ctx.putImageData(imgData,0,0);
-		
-            // convert to image
-            // we have to wait for a promise here
-            // as these don't always load async
-            
-        return(
-            new Promise((resolve,reject) =>
-                {
-                    let img=new Image();
-                    img.onload=()=>resolve(img);
-                    img.src=canvas.toDataURL("image/png");      // reject will never happen here as far as I can tell
-                }
-            )
-       );
+        
+        return(canvas);
     }
     
     createSpecularFromColorImage()
@@ -286,20 +318,8 @@ export default class BitmapClass
         }
 		
 	ctx.putImageData(imgData,0,0);
-		
-            // convert to image
-            // we have to wait for a promise here
-            // as these don't always load async
-            
-        return(
-            new Promise((resolve,reject) =>
-                {
-                    let img=new Image();
-                    img.onload=()=>resolve(img);
-                    img.src=canvas.toDataURL("image/png");      // reject will never happen here as far as I can tell
-                }
-            )
-       );
+        
+        return(canvas);
     }
     
         //
@@ -330,27 +350,32 @@ export default class BitmapClass
             // are created if missing.  This can be built from
             // loading or a file or a base color
         
-        this.colorImage=null;
-        
-        if (this.colorBase===null) {
-            await this.loadImagePromise('../'+this.colorURL)
-                .then
-                    (
-                            // resolved
+        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+            
+            if (this.bitmapType===BitmapClass.BITMAP_COLOR) {
+                this.colorImage=this.createSolidColorImage(Math.trunc(this.colorBase.r*255),Math.trunc(this.colorBase.g*255),Math.trunc(this.colorBase.b*255));
+            }
+            else {
+                this.colorImage=null;
 
-                        value=>{
-                            this.colorImage=value;
-                        },
+                if (this.colorBase===null) {
+                    await this.loadImagePromise('../'+this.colorURL)
+                        .then
+                            (
+                                    // resolved
 
-                            // rejected
+                                value=>{
+                                    this.colorImage=value;
+                                },
 
-                        value=>{
-                            console.log('Unable to load '+value);
-                        }
-                    );
-        }
-        else {
-            this.colorImage=await this.createSolidColorImage(Math.trunc(this.colorBase.r*255),Math.trunc(this.colorBase.g*255),Math.trunc(this.colorBase.b*255));
+                                    // rejected
+
+                                value=>{
+                                    console.log('Unable to load '+value);
+                                }
+                            );
+                }
+            }
         }
         
         if (this.colorImage===null) return(false);
@@ -367,12 +392,12 @@ export default class BitmapClass
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D,null);
         
-            // simple elements are only bitmaps,
-            // no normals, etc.
+            // simple or color bitmaps exit here
+            // as they have no other elements like normals, etc
             
-        if (this.simple) {
+        if (this.bitmapType===BitmapClass.BITMAP_SIMPLE_URL) {
             this.loaded=true;
-            return;
+            return(true);
         }
         
             // if there is an alpha, build the mask
@@ -384,7 +409,7 @@ export default class BitmapClass
             maskImage=this.colorImage;
         }
         else {
-            maskImage=await this.createSolidColorImage(0,0,0);      // alpha will be 1
+            maskImage=this.createSolidColorImage(0,0,0);      // alpha will be 1
         }
             
         this.mask=gl.createTexture();
@@ -396,26 +421,28 @@ export default class BitmapClass
         
             // normal bitmap
         
-        this.normalImage=null;
+        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+            this.normalImage=null;
+
+            if (this.normalURL!==null) {
+                await this.loadImagePromise('../'+this.normalURL)
+                    .then
+                        (
+                                // resolved
+
+                            value=>{
+                                    this.normalImage=value;
+                            },
+
+                                // rejected
+
+                            value=>{}
+                        );
+            }
+        }    
         
-        if (this.normalURL!==null) {
-            await this.loadImagePromise('../'+this.normalURL)
-                .then
-                    (
-                            // resolved
-
-                        value=>{
-                                this.normalImage=value;
-                        },
-
-                            // rejected
-
-                        value=>{}
-                    );
-        }
-
-        if (this.normalImage===null) this.normalImage=await this.createNormalFromColorImage();
-
+        if (this.normalImage===null) this.normalImage=this.createNormalFromColorImage();
+        
         this.normalMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.normalMap);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,this.normalImage);
@@ -426,27 +453,27 @@ export default class BitmapClass
 
             // specular bitmap
             
-        this.specularImage=null;
-        
-        if (this.specularURL!==null) {
-            await this.loadImagePromise('../'+this.specularURL)
-                .then
-                    (
-                            // resolved
+        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+            this.specularImage=null;
 
-                        value=>{
-                                this.specularImage=value;
-                        },
+            if (this.specularURL!==null) {
+                await this.loadImagePromise('../'+this.specularURL)
+                    .then
+                        (
+                                // resolved
 
-                            // rejected
+                            value=>{
+                                    this.specularImage=value;
+                            },
 
-                        value=>{}
-                    );
+                                // rejected
+
+                            value=>{}
+                        );
+            }
         }
         
-        if (this.specularImage===null) {
-            this.specularImage=await this.createSpecularFromColorImage();
-        }
+        if (this.specularImage===null) this.specularImage=this.createSpecularFromColorImage();
         
         this.specularMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.specularMap);
@@ -460,27 +487,28 @@ export default class BitmapClass
             // these do not have to exist, if missing,
             // will use fake glowmap
         
-        this.glowImage=null;
         
-        if (this.glowURL!==null) {
-            await this.loadImagePromise('../'+this.glowURL)
-                .then
-                    (
-                            // resolved
+        if (this.bitmapType!==BitmapClass.BITMAP_GENERATED) {
+            this.glowImage=null;
 
-                        value=>{
-                                this.glowImage=value;
-                        },
+            if (this.glowURL!==null) {
+                await this.loadImagePromise('../'+this.glowURL)
+                    .then
+                        (
+                                // resolved
 
-                            // rejected
+                            value=>{
+                                    this.glowImage=value;
+                            },
 
-                        ()=>{}
-                    );
+                                // rejected
+
+                            ()=>{}
+                        );
+            }
         }
         
-        if (this.glowImage===null) {
-            this.glowImage=await this.createSolidColorImage(0,0,0);
-        }
+        if (this.glowImage===null) this.glowImage=this.createSolidColorImage(0,0,0);
         
         this.glowMap=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.glowMap);

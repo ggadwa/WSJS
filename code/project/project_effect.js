@@ -1,6 +1,6 @@
 import PointClass from '../utility/point.js';
-import ColorClass from '../../code/utility/color.js';
-import LightClass from '../../code/light/light.js';
+import ColorClass from '../utility/color.js';
+import LightClass from '../light/light.js';
 
 class ProjectEffectChunkClass
 {

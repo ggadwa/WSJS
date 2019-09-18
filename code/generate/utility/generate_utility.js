@@ -1,4 +1,4 @@
-import PointClass from '../utility/point.js';
+import PointClass from '../../utility/point.js';
 
 export default class GenerateUtilityClass
 {
@@ -29,6 +29,36 @@ export default class GenerateUtilityClass
         r=((GenerateUtilityClass.mwcZ<<16)+GenerateUtilityClass.mwcW)&0xFFFFFFFF;
 
         return((r/=0xFFFFFFFF)+0.5);
+    }
+    
+    static randomInt(startInt,extraInt)
+    {
+        return(startInt+Math.trunc(GenerateUtilityClass.random()*extraInt));
+    }
+    
+    static randomFloat(startFloat,extraFloat)
+    {
+        return(startFloat+(GenerateUtilityClass.random()*extraFloat));
+    }
+    
+    static randomIndex(maxIndex)
+    {
+            // always returns 0...(maxIndex-1)
+            
+        let idx=Math.trunc(GenerateUtilityClass.random()*maxIndex);
+        if (idx===maxIndex) idx=0;
+        
+        return(idx);
+    }
+    
+    static randomPercentage(percentage)
+    {
+        return(GenerateUtilityClass.random()<percentage);
+    }
+    
+    static randomInBetween(startInt,endInt)
+    {
+        return(GenerateUtilityClass.randomInt(startInt,(endInt-startInt)));
     }
     
         //
