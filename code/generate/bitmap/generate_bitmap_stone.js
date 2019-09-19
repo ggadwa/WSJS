@@ -1,3 +1,4 @@
+import ColorClass from '../../utility/color.js';
 import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
@@ -18,20 +19,71 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         // stone bitmaps
         //
 
+    drawSingleStone(lft,top,rgt,bot,stoneColor)
+    {
+        let n,nChunk;
+        let lft2,top2,wid2,high2,xRoundFactor,yRoundFactor;
+        let chunkWidStart,chunkWidAdd,chunkHighStart,chunkHighAdd;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let edgeSize;
+        let edgeSizeAdd=((wid>high?high:wid)*0.5)-5;
+        
+            // the stone itself
+            
+        edgeSize=GenerateUtilityClass.randomInt(5,edgeSizeAdd);     // new edge size as stones aren't the same
+        xRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
+        yRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
+        
+        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,false,0.7,0.8,0.2);
+        
+            // random chunks on stone
+
+        nChunk=GenerateUtilityClass.randomInt(5,10);
+        
+        chunkWidStart=Math.trunc(wid*0.25);
+        chunkWidAdd=Math.trunc(wid*0.5);
+        chunkHighStart=Math.trunc(high*0.25);
+        chunkHighAdd=Math.trunc(high*0.5);
+        
+        for (n=0;n!==nChunk;n++) {
+            wid2=GenerateUtilityClass.randomInt(chunkWidStart,chunkWidAdd);
+            high2=GenerateUtilityClass.randomInt(chunkHighStart,chunkHighAdd);
+            
+            lft2=GenerateUtilityClass.randomInt(lft,((rgt-lft)-wid2));
+            top2=GenerateUtilityClass.randomInt(top,((bot-top)-high2));
+            
+            edgeSize=GenerateUtilityClass.randomInt(5,(((wid2>high2)?high2:wid2)-5));
+            xRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
+            yRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
+        
+            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,true,0.7,0.8,0.2);
+        }
+    }
+    
     generateStone()
     {
         let n,k,rect,edgeSize,clipMargin;
         let drawStoneColor,drawEdgeColor,lineColor,darken,f;
         let x,y,x2,y2,lineCount,lineVarient,stoneWid,stoneHigh;
+        let paddingRight,paddingBottom;
+        
+        
+        let stoneColor=new ColorClass(GenerateUtilityClass.randomFloat(0.6,0.3),0.6,GenerateUtilityClass.randomFloat(0.6,0.2));
+        
+        
+        //this.drawOval(50,50,150,150,0,1,40,stoneColor,true);
+        
+        
+        //this.createSpecularMap(0.5);
+        //return;
 
             // some random values
 
-        let stoneColor=this.getRandomColor();
+        //let stoneColor=this.getRandomColor();
         let groutColor=this.dullColor(stoneColor,0.7);
         let edgeColor=this.darkenColor(stoneColor,0.8);
         
-        let padding=GenerateUtilityClass.randomInt(3,10);
-
         let segments=this.createRandomSegments();
         let darkenFactor=0.5;
 
@@ -53,11 +105,15 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             }
 
             drawStoneColor=this.darkenColor(stoneColor,f);
-            drawEdgeColor=this.darkenColor(edgeColor,f);
+            
+            paddingRight=GenerateUtilityClass.randomInt(0,4);
+            paddingBottom=GenerateUtilityClass.randomInt(0,4);
 
-            edgeSize=GenerateUtilityClass.randomInt(5,12);     // new edge size as stones aren't the same
+            this.drawSingleStone(rect.lft,rect.top,(rect.rgt-paddingRight),(rect.bot-paddingBottom),drawStoneColor);
 
-            this.draw3DComplexRect(rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
+            
+
+            //this.draw3DComplexRect(rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
             //this.blur((rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4,false);
             
                 // cracked lines

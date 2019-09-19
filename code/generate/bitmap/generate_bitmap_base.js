@@ -38,12 +38,12 @@ export default class GenerateBitmapBaseClass
         this.BITMAP_STACKED_Y_EXTRA_COUNT=4;
 
         this.BITMAP_GRID_DIVISION=100;
-        this.BITMAP_GRID_MIN_BLOCK_WIDTH=30;
-        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=10;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=20;
-        this.BITMAP_GRID_MIN_BLOCK_HEIGHT=10;
-        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=10;
+        this.BITMAP_GRID_MIN_BLOCK_WIDTH=10;
+        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=15;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=12;
+        this.BITMAP_GRID_MIN_BLOCK_HEIGHT=5;
+        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=10;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=7;
 
             // some precalced normals
 
@@ -115,6 +115,220 @@ export default class GenerateBitmapBaseClass
                 
         // can't seal as this is a parent class
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,mixNormals,noisePercentage,noiseMinDarken,noiseDarkenDif)
+    {
+        let n,x,y,mx,my,halfWid,halfHigh;
+        let rad,fx,fy,darkFactor,idx;
+        let normal,nFactor;
+        let orgWid,orgHigh,wid,high,edgeCount;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData,origNormalData;
+        let col=new ColorClass(0,0,0);
+        
+            // start and end arc
+            
+        startArc=Math.trunc(startArc*1000);
+        endArc=Math.trunc(endArc*1000);
+        if (startArc>=endArc) return;
+        
+            // the drawing size
+            
+        orgWid=rgt-lft;
+        orgHigh=bot-top;
+        wid=orgWid-1;
+        high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
+        mx=Math.trunc(wid*0.5);
+        my=Math.trunc(high*0.5);
+
+        bitmapImgData=this.colorCTX.getImageData(lft,top,orgWid,orgHigh);
+        bitmapData=bitmapImgData.data;
+
+        edgeCount=edgeSize;
+        
+            // fill the oval
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=wid*0.5;
+            halfHigh=high*0.5;
+            
+            for (n=startArc;n<endArc;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
+
+                fx=Math.sin(rad);
+                fx+=(fx*xRoundFactor);
+                if (fx>1.0) fx=1.0;
+                if (fx<-1.0) fx=-1.0;
+                
+                x=mx+Math.trunc(halfWid*fx);
+                if ((x<0) || (x>=orgWid)) continue;
+
+                fy=Math.cos(rad);
+                fy+=(fy*yRoundFactor);
+                if (fy>1.0) fy=1.0;
+                if (fy<-1.0) fy=-1.0;
+                
+                y=my-Math.trunc(halfHigh*fy);
+                if ((y<0) || (y>=orgHigh)) continue;
+                
+                    // clipping
+                    
+                if (this.clipLft!==-1) {
+                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
+                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
+                }
+                
+                    // any noise
+                
+                col.setFromColor(color);
+                
+                if (GenerateUtilityClass.randomPercentage(noisePercentage)) {
+                    darkFactor=GenerateUtilityClass.randomFloat(noiseMinDarken,noiseDarkenDif);
+                    col.r*=darkFactor;
+                    col.g*=darkFactor;
+                    col.b*=darkFactor;
+                }
+
+                    // the color pixel
+
+                idx=((y*orgWid)+x)*4;
+
+                bitmapData[idx]=Math.trunc(col.r*255.0);
+                bitmapData[idx+1]=Math.trunc(col.g*255.0);
+                bitmapData[idx+2]=Math.trunc(col.b*255.0);
+                bitmapData[idx+3]=255;
+            }
+
+            if (edgeCount>0) edgeCount--;
+
+            wid--;
+            high--;
+        }
+
+        this.colorCTX.putImageData(bitmapImgData,lft,top);
+        
+            // chrome seems to be buggy here if we have to
+            // image datas at once, so we do it separately
+            
+        normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
+        normalData=normalImgData.data;
+        
+        if (mixNormals) origNormalData=new Uint8Array(normalData);
+        
+        wid=orgWid-1;
+        high=orgHigh-1;
+        
+        edgeCount=edgeSize;
+        
+        normal=new PointClass(0,0,0);
+        
+            // create the normals
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=wid*0.5;
+            halfHigh=high*0.5;
+            
+            for (n=startArc;n<endArc;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
+
+                fx=Math.sin(rad);
+                fx+=(fx*xRoundFactor);
+                if (fx>1.0) fx=1.0;
+                if (fx<-1.0) fx=-1.0;
+
+                x=mx+Math.trunc(halfWid*fx);
+                if ((x<0) || (x>=orgWid)) continue;
+                
+                fy=Math.cos(rad);
+                fy+=(fy*yRoundFactor);
+                if (fy>1.0) fy=1.0;
+                if (fy<-1.0) fy=-1.0;
+
+                y=my-Math.trunc(halfHigh*fy);
+                if ((y<0) || (y>=orgHigh)) continue;
+                
+                    // clipping
+                    
+                if (this.clipLft!==-1) {
+                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
+                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
+                }
+
+                    // get a normal for the pixel change
+                    // if we are outside the edge, gradually fade it
+                    // to the default pointing out normal
+
+                idx=((y*orgWid)+x)*4;
+                
+                normal.x=0;
+                normal.y=0;
+                normal.z=1.0;
+                
+                if (edgeCount>0) {
+                    nFactor=edgeCount/edgeSize;
+                    normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
+                    normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
+                    normal.z=(0.5*nFactor)+(normal.z*(1.0-nFactor));
+                }
+
+                normal.normalize();
+                
+                if (mixNormals) {
+                    normal.x=(((origNormalData[idx]/127.0)-1.0)+normal.x)*0.5;
+                    normal.y=(((origNormalData[idx+1]/127.0)-1.0)+normal.y)*0.5;
+                    normal.z=(((origNormalData[idx+2]/127.0)-1.0)+normal.z)*0.5;
+                    normal.normalize();
+                }
+                
+                normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
+                normalData[idx+1]=(normal.y+1.0)*127.0;
+                normalData[idx+2]=(normal.z+1.0)*127.0;
+            }
+            
+            if (edgeCount>0) edgeCount--;
+
+            wid--;
+            high--;
+        }
+        
+        this.normalCTX.putImageData(normalImgData,lft,top);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
         //
         // segmenting routines
@@ -196,10 +410,10 @@ export default class GenerateBitmapBaseClass
 
                 // random size
 
-            startWid=this.BITMAP_GRID_MIN_BLOCK_WIDTH+Math.trunc(GenerateUtilityClass.random()*this.BITMAP_GRID_EXTRA_BLOCK_WIDTH);
+            startWid=GenerateUtilityClass.randomInt(this.BITMAP_GRID_MIN_BLOCK_WIDTH,this.BITMAP_GRID_EXTRA_BLOCK_WIDTH);
             if ((x+startWid)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
 
-            startHigh=this.BITMAP_GRID_MIN_BLOCK_HEIGHT+Math.trunc(GenerateUtilityClass.random()*this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
+            startHigh=GenerateUtilityClass.randomInt(this.BITMAP_GRID_MIN_BLOCK_HEIGHT,this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
             if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
                 // make sure we aren't leaving a little sliver
@@ -1288,7 +1502,7 @@ export default class GenerateBitmapBaseClass
         if (borderRGBColor!==null) this.colorCTX.stroke();
     }
     
-    drawOval(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
+    drawOval2(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
         let mx,my,xRadius,yRadius;
 
@@ -2783,6 +2997,38 @@ export default class GenerateBitmapBaseClass
     }
     
         //
+        // for testing
+        //
+        
+    test()
+    {
+        GenerateUtilityClass.setRandomSeed(Date.now());
+        
+            // setup all the bitmap parts
+            
+        this.colorCanvas=document.getElementById('color');
+        this.colorCTX=this.colorCanvas.getContext('2d');
+        
+        this.normalCanvas=document.getElementById('normal');
+        this.normalCTX=this.normalCanvas.getContext('2d');
+
+        this.specularCanvas=document.getElementById('specular');
+        this.specularCTX=this.specularCanvas.getContext('2d');
+        
+        this.glowCanvas=document.getElementById('glow');
+        this.glowCTX=this.glowCanvas.getContext('2d');
+        
+        this.clearCanvases(this.colorCanvas,this.colorCTX,255,255,255,255);
+        this.clearCanvases(this.normalCanvas,this.normalCTX,0,0,255,255);
+        this.clearCanvases(this.specularCanvas,this.specularCTX,0,0,0,255);
+        this.clearCanvases(this.glowCanvas,this.glowCTX,0,0,0,255);
+
+            // run the internal generator
+
+        this.generateInternal();
+    }
+    
+        //
         // generate mainline
         //
         
@@ -2832,8 +3078,7 @@ export default class GenerateBitmapBaseClass
         
             // add the bitmap object
             
-        return(this.core.bitmapList.addGenerated(this.normalCanvas,null,this.specularCanvas,this.specularFactor,this.glowCanvas,this.glowFrequency,this.glowMin,this.glowMax));
-    //    return(this.core.bitmapList.addGenerated(this.colorCanvas,this.normalCanvas,this.specularCanvas,this.specularFactor,this.glowCanvas,this.glowFrequency,this.glowMin,this.glowMax));
+        return(this.core.bitmapList.addGenerated(this.colorCanvas,this.normalCanvas,this.specularCanvas,this.specularFactor,this.glowCanvas,this.glowFrequency,this.glowMin,this.glowMax));
     }
     
 }
