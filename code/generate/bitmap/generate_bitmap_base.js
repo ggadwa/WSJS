@@ -40,10 +40,10 @@ export default class GenerateBitmapBaseClass
         this.BITMAP_GRID_DIVISION=100;
         this.BITMAP_GRID_MIN_BLOCK_WIDTH=10;
         this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=15;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=12;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=5;
         this.BITMAP_GRID_MIN_BLOCK_HEIGHT=5;
-        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=10;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=7;
+        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=5;
 
             // some precalced normals
 
@@ -126,7 +126,7 @@ export default class GenerateBitmapBaseClass
     
     
     
-    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,mixNormals,noisePercentage,noiseMinDarken,noiseDarkenDif)
+    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,mixNormals,noisePercentage,noiseMinDarken,noiseDarkenDif)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,darkFactor,idx;
@@ -280,7 +280,7 @@ export default class GenerateBitmapBaseClass
                     nFactor=edgeCount/edgeSize;
                     normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
                     normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
-                    normal.z=(0.5*nFactor)+(normal.z*(1.0-nFactor));
+                    normal.z=(normalZFactor*nFactor)+(normal.z*(1.0-nFactor));
                 }
 
                 normal.normalize();
@@ -416,11 +416,10 @@ export default class GenerateBitmapBaseClass
             startHigh=GenerateUtilityClass.randomInt(this.BITMAP_GRID_MIN_BLOCK_HEIGHT,this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
             if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
-                // make sure we aren't leaving a little sliver
-                // at the end
+                // make sure we aren't going over the edge
 
-            if (((x+startWid)+this.BITMAP_GRID_MIN_BLOCK_WIDTH)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
-            if (((y+startHigh)+this.BITMAP_GRID_MIN_BLOCK_HEIGHT)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
+            if ((x+startWid)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
+            if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
                 // determine what can fit
 

@@ -23,23 +23,25 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
     {
         let n,nChunk;
         let lft2,top2,wid2,high2,xRoundFactor,yRoundFactor;
-        let chunkWidStart,chunkWidAdd,chunkHighStart,chunkHighAdd;
+        let chunkWidStart,chunkWidAdd,chunkHighStart,chunkHighAdd,arcStart,arcEnd;
         let wid=rgt-lft;
         let high=bot-top;
         let edgeSize;
-        let edgeSizeAdd=((wid>high?high:wid)*0.5)-5;
+        let edgeSizeAdd=((wid>high?high:wid)*0.7)-5;
         
             // the stone itself
             
-        edgeSize=GenerateUtilityClass.randomInt(5,edgeSizeAdd);     // new edge size as stones aren't the same
-        xRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
-        yRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
+        edgeSize=GenerateUtilityClass.randomInt(Math.trunc(wid*0.7),Math.trunc(wid*0.2));     // new edge size as stones aren't the same
+        xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
+        yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         
-        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,false,0.7,0.8,0.2);
+        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,false,0.7,0.8,0.2);
         
             // random chunks on stone
+            // we make sure that the first 4 random
+            // one always go in a corner to smooth out oval
 
-        nChunk=GenerateUtilityClass.randomInt(5,10);
+        nChunk=GenerateUtilityClass.randomInt(5,5);
         
         chunkWidStart=Math.trunc(wid*0.25);
         chunkWidAdd=Math.trunc(wid*0.5);
@@ -50,14 +52,44 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             wid2=GenerateUtilityClass.randomInt(chunkWidStart,chunkWidAdd);
             high2=GenerateUtilityClass.randomInt(chunkHighStart,chunkHighAdd);
             
-            lft2=GenerateUtilityClass.randomInt(lft,((rgt-lft)-wid2));
-            top2=GenerateUtilityClass.randomInt(top,((bot-top)-high2));
+            switch (n) {
+                case 0:
+                    lft2=GenerateUtilityClass.randomInt(lft,5);
+                    top2=GenerateUtilityClass.randomInt(top,5);
+                    arcStart=0.65;
+                    arcEnd=1.1;
+                    break;
+                case 1:
+                    lft2=GenerateUtilityClass.randomInt((rgt-wid2),-5);
+                    top2=GenerateUtilityClass.randomInt(top,10);
+                    arcStart=-0.1;
+                    arcEnd=0.35;
+                    break;
+                case 2:
+                    lft2=GenerateUtilityClass.randomInt((rgt-wid2),-5);
+                    top2=GenerateUtilityClass.randomInt((bot-high2),-5);
+                    arcStart=0.15;
+                    arcEnd=0.6;
+                    break;
+                case 3:
+                    lft2=GenerateUtilityClass.randomInt(lft,5);
+                    top2=GenerateUtilityClass.randomInt((bot-high2),-5);
+                    arcStart=0.4;
+                    arcEnd=0.85;
+                    break;
+                default:
+                    lft2=GenerateUtilityClass.randomInt(lft,((rgt-lft)-wid2));
+                    top2=GenerateUtilityClass.randomInt(top,((bot-top)-high2));
+                    arcStart=0;
+                    arcEnd=1;
+                    break;
+            }
             
             edgeSize=GenerateUtilityClass.randomInt(5,(((wid2>high2)?high2:wid2)-5));
-            xRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
-            yRoundFactor=GenerateUtilityClass.randomFloat(0.01,0.05);
+            xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
+            yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         
-            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,true,0.7,0.8,0.2);
+            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),(n>3),0.7,0.8,0.2);
         }
     }
     
@@ -69,7 +101,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         let paddingRight,paddingBottom;
         
         
-        let stoneColor=new ColorClass(GenerateUtilityClass.randomFloat(0.6,0.3),0.6,GenerateUtilityClass.randomFloat(0.6,0.2));
+        let stoneColor=new ColorClass(GenerateUtilityClass.randomFloat(0.7,0.25),0.7,GenerateUtilityClass.randomFloat(0.7,0.1));
         
         
         //this.drawOval(50,50,150,150,0,1,40,stoneColor,true);
@@ -82,7 +114,6 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
         //let stoneColor=this.getRandomColor();
         let groutColor=this.dullColor(stoneColor,0.7);
-        let edgeColor=this.darkenColor(stoneColor,0.8);
         
         let segments=this.createRandomSegments();
         let darkenFactor=0.5;
@@ -92,7 +123,9 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
         this.addNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,0.8,0.9);
         this.blur(0,0,this.colorCanvas.width,this.colorCanvas.height,5,false);
-
+        
+        this.addNormalNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.5);
+        
             // draw the stones
 
         for (n=0;n!==segments.length;n++) {
@@ -151,7 +184,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
             // finish with the specular
 
-        this.createSpecularMap(0.5);
+        this.createSpecularMap(0.2);
     }
 
         //
