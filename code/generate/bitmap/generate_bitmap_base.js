@@ -40,10 +40,10 @@ export default class GenerateBitmapBaseClass
         this.BITMAP_GRID_DIVISION=100;
         this.BITMAP_GRID_MIN_BLOCK_WIDTH=10;
         this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=15;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=5;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=8;
         this.BITMAP_GRID_MIN_BLOCK_HEIGHT=5;
         this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=5;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=8;
 
             // some precalced normals
 
@@ -74,6 +74,8 @@ export default class GenerateBitmapBaseClass
         this.specularCTX=null;
         this.glowCanvas=null;
         this.glowCTX=null;
+        
+        this.mask=null;
         
             // current clip rect
             
@@ -115,220 +117,6 @@ export default class GenerateBitmapBaseClass
                 
         // can't seal as this is a parent class
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,mixNormals,noisePercentage,noiseMinDarken,noiseDarkenDif)
-    {
-        let n,x,y,mx,my,halfWid,halfHigh;
-        let rad,fx,fy,darkFactor,idx;
-        let normal,nFactor;
-        let orgWid,orgHigh,wid,high,edgeCount;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData,origNormalData;
-        let col=new ColorClass(0,0,0);
-        
-            // start and end arc
-            
-        startArc=Math.trunc(startArc*1000);
-        endArc=Math.trunc(endArc*1000);
-        if (startArc>=endArc) return;
-        
-            // the drawing size
-            
-        orgWid=rgt-lft;
-        orgHigh=bot-top;
-        wid=orgWid-1;
-        high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
-        mx=Math.trunc(wid*0.5);
-        my=Math.trunc(high*0.5);
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,orgWid,orgHigh);
-        bitmapData=bitmapImgData.data;
-
-        edgeCount=edgeSize;
-        
-            // fill the oval
-
-        while ((wid>0) && (high>0)) {
-
-            halfWid=wid*0.5;
-            halfHigh=high*0.5;
-            
-            for (n=startArc;n<endArc;n++) {
-                rad=(Math.PI*2.0)*(n*0.001);
-
-                fx=Math.sin(rad);
-                fx+=(fx*xRoundFactor);
-                if (fx>1.0) fx=1.0;
-                if (fx<-1.0) fx=-1.0;
-                
-                x=mx+Math.trunc(halfWid*fx);
-                if ((x<0) || (x>=orgWid)) continue;
-
-                fy=Math.cos(rad);
-                fy+=(fy*yRoundFactor);
-                if (fy>1.0) fy=1.0;
-                if (fy<-1.0) fy=-1.0;
-                
-                y=my-Math.trunc(halfHigh*fy);
-                if ((y<0) || (y>=orgHigh)) continue;
-                
-                    // clipping
-                    
-                if (this.clipLft!==-1) {
-                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
-                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
-                }
-                
-                    // any noise
-                
-                col.setFromColor(color);
-                
-                if (GenerateUtilityClass.randomPercentage(noisePercentage)) {
-                    darkFactor=GenerateUtilityClass.randomFloat(noiseMinDarken,noiseDarkenDif);
-                    col.r*=darkFactor;
-                    col.g*=darkFactor;
-                    col.b*=darkFactor;
-                }
-
-                    // the color pixel
-
-                idx=((y*orgWid)+x)*4;
-
-                bitmapData[idx]=Math.trunc(col.r*255.0);
-                bitmapData[idx+1]=Math.trunc(col.g*255.0);
-                bitmapData[idx+2]=Math.trunc(col.b*255.0);
-                bitmapData[idx+3]=255;
-            }
-
-            if (edgeCount>0) edgeCount--;
-
-            wid--;
-            high--;
-        }
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-        
-            // chrome seems to be buggy here if we have to
-            // image datas at once, so we do it separately
-            
-        normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
-        normalData=normalImgData.data;
-        
-        if (mixNormals) origNormalData=new Uint8Array(normalData);
-        
-        wid=orgWid-1;
-        high=orgHigh-1;
-        
-        edgeCount=edgeSize;
-        
-        normal=new PointClass(0,0,0);
-        
-            // create the normals
-
-        while ((wid>0) && (high>0)) {
-
-            halfWid=wid*0.5;
-            halfHigh=high*0.5;
-            
-            for (n=startArc;n<endArc;n++) {
-                rad=(Math.PI*2.0)*(n*0.001);
-
-                fx=Math.sin(rad);
-                fx+=(fx*xRoundFactor);
-                if (fx>1.0) fx=1.0;
-                if (fx<-1.0) fx=-1.0;
-
-                x=mx+Math.trunc(halfWid*fx);
-                if ((x<0) || (x>=orgWid)) continue;
-                
-                fy=Math.cos(rad);
-                fy+=(fy*yRoundFactor);
-                if (fy>1.0) fy=1.0;
-                if (fy<-1.0) fy=-1.0;
-
-                y=my-Math.trunc(halfHigh*fy);
-                if ((y<0) || (y>=orgHigh)) continue;
-                
-                    // clipping
-                    
-                if (this.clipLft!==-1) {
-                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
-                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
-                }
-
-                    // get a normal for the pixel change
-                    // if we are outside the edge, gradually fade it
-                    // to the default pointing out normal
-
-                idx=((y*orgWid)+x)*4;
-                
-                normal.x=0;
-                normal.y=0;
-                normal.z=1.0;
-                
-                if (edgeCount>0) {
-                    nFactor=edgeCount/edgeSize;
-                    normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
-                    normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
-                    normal.z=(normalZFactor*nFactor)+(normal.z*(1.0-nFactor));
-                }
-
-                normal.normalize();
-                
-                if (mixNormals) {
-                    normal.x=(((origNormalData[idx]/127.0)-1.0)+normal.x)*0.5;
-                    normal.y=(((origNormalData[idx+1]/127.0)-1.0)+normal.y)*0.5;
-                    normal.z=(((origNormalData[idx+2]/127.0)-1.0)+normal.z)*0.5;
-                    normal.normalize();
-                }
-                
-                normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
-                normalData[idx+1]=(normal.y+1.0)*127.0;
-                normalData[idx+2]=(normal.z+1.0)*127.0;
-            }
-            
-            if (edgeCount>0) edgeCount--;
-
-            wid--;
-            high--;
-        }
-        
-        this.normalCTX.putImageData(normalImgData,lft,top);
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
         //
         // segmenting routines
@@ -418,8 +206,8 @@ export default class GenerateBitmapBaseClass
 
                 // make sure we aren't going over the edge
 
-            if ((x+startWid)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
-            if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
+            if ((x+startWid+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
+            if ((y+startHigh+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
                 // determine what can fit
 
@@ -464,6 +252,633 @@ export default class GenerateBitmapBaseClass
 
         return(segments);
     }
+
+        //
+        // masking
+        //
+    
+    clearMask()
+    {
+        this.mask.fill(0);
+    }
+    
+    setMask(x,y)
+    {
+        this.mask[(y*this.colorCanvas.width)+x]=1;
+    }
+    
+    setStagedMask(x,y)
+    {
+        this.mask[(y*this.colorCanvas.width)+x]=2;      // this allows us to write into the mask but not change it until we swap the staging
+    }
+    
+    copyStagedMask()
+    {
+        let n;
+        
+        for (n=0;n!==this.mask.length;n++) {
+            if (this.mask[n]===2) this.mask[n]=1;
+        }
+    }
+    
+    checkMask(x,y)
+    {
+        return(this.mask[(y*this.colorCanvas.width)+x]===1);
+    }
+    
+        //
+        // blurs, noise, and surfaces
+        //
+
+    blur(ctx,lft,top,rgt,bot,blurCount,clamp)
+    {
+        let n,idx;
+        let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
+        let r,g,b;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData,blurData;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+        bitmapImgData=ctx.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
+        
+        blurData=new Uint8ClampedArray(bitmapData.length);
+        
+            // blur pixels to count
+
+        for (n=0;n!==blurCount;n++) {
+            
+            for (y=0;y!==high;y++) {
+
+                cys=y-1;
+                cye=y+2;
+
+                for (x=0;x!==wid;x++) {
+
+                        // get blur from 8 surrounding pixels
+
+                    r=g=b=0;
+
+                    cxs=x-1;
+                    cxe=x+2;
+
+                    for (cy=cys;cy!==cye;cy++) {
+                        
+                        dy=cy;
+                        if (!clamp) {
+                            if (dy<0) dy=high+dy;
+                            if (dy>=high) dy=dy-high;
+                        }
+                        else {
+                            if (dy<0) dy=0;
+                            if (dy>=high) dy=high-1;
+                        }
+                        
+                        for (cx=cxs;cx!==cxe;cx++) {
+                            if ((cy===y) && (cx===x)) continue;       // ignore self
+                            
+                            dx=cx;
+                            if (!clamp) {
+                                if (dx<0) dx=wid+dx;
+                                if (dx>=wid) dx=dx-wid;
+                            }
+                            else {
+                                if (dx<0) dx=0;
+                                if (dx>=wid) dx=wid-1;
+                            }
+                            
+                                // add up blur from the
+                                // original pixels
+
+                            idx=((dy*wid)+dx)*4;
+
+                            r+=bitmapData[idx];
+                            g+=bitmapData[idx+1];
+                            b+=bitmapData[idx+2];
+                        }
+                    }
+                    
+                    idx=((y*wid)+x)*4;
+
+                    blurData[idx]=Math.trunc(r*0.125);
+                    blurData[idx+1]=Math.trunc(g*0.125);
+                    blurData[idx+2]=Math.trunc(b*0.125);
+                }
+            }
+
+                // transfer over the changed pixels
+
+            for (y=0;y!==high;y++) {
+                idx=(y*wid)*4;
+                for (x=0;x!==wid;x++) {       
+                    bitmapData[idx]=blurData[idx];
+                    bitmapData[idx+1]=blurData[idx+1];
+                    bitmapData[idx+2]=blurData[idx+2];
+                    idx+=4;
+                }
+            }
+        } 
+        
+        ctx.putImageData(bitmapImgData,lft,top);
+    }
+    
+    drawNoiseRect(lft,top,rgt,bot,minDarken,maxDarken,percentage)
+    {    
+        let n,nPixel,idx;
+        let col,fct;
+        let wid=rgt-lft;
+        let high=bot-top;    
+        let darkenDif=maxDarken-minDarken;
+        let bitmapImgData,bitmapData;
+
+            // get the image data to add noise to
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
+
+            // get the image data to add noise to
+
+        idx=0;
+        nPixel=wid*high;
+
+        for (n=0;n!==nPixel;n++) {
+
+            if (GenerateUtilityClass.randomPercentage(percentage)) {
+
+                    // the bitmap noise
+
+                fct=minDarken+(darkenDif*GenerateUtilityClass.random());
+
+                    // darken the pixel
+
+                col=(bitmapData[idx]/255.0)*fct;
+                if (col>1.0) col=1.0;
+                bitmapData[idx]=Math.trunc(col*255.0);
+
+                col=(bitmapData[idx+1]/255.0)*fct;
+                if (col>1.0) col=1.0;
+                bitmapData[idx+1]=Math.trunc(col*255.0);
+
+                col=(bitmapData[idx+2]/255.0)*fct;
+                if (col>1.0) col=1.0;
+                bitmapData[idx+2]=Math.trunc(col*255.0);
+            }
+
+                // next pixel
+
+            idx+=4;
+        }
+
+        this.colorCTX.putImageData(bitmapImgData,lft,top);
+    }
+
+    drawBumpySurface(lft,top,rgt,bot,color,colFactor,bumpCount,blurCount)
+    {
+        let i,n,k,mx,my,px,py,wid,high,idx;
+        let col,rad,fx,fy,fsz;
+        let ringCount,pixelDensity;
+        let darken,colMultFactor;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+        let ringWid,ringWidSub,ringHigh,ringHighSub;
+        let listIdx,angList,sizeList;
+        let orgWid=rgt-lft;
+        let orgHigh=bot-top;
+        let normal=new PointClass(0,0,0);
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+            // start with background color
+            
+        this.drawRect(lft,top,rgt,bot,color);
+        
+            // build data for single bump
+            
+        ringCount=Math.trunc(orgWid*0.05);
+        pixelDensity=Math.trunc(orgWid*0.1);
+            
+        angList=new Float32Array(ringCount*pixelDensity);
+        sizeList=new Float32Array(ringCount*pixelDensity);
+        
+        listIdx=0;
+        
+        for (n=0;n!==ringCount;n++) {
+            for (k=0;k!==pixelDensity;k++) {
+                angList[listIdx]=(Math.PI*2.0)*GenerateUtilityClass.random();
+                sizeList[listIdx]=GenerateUtilityClass.random();
+                listIdx++;
+            }
+        }
+
+            // create random bumps
+
+        bitmapImgData=this.colorCTX.getImageData(lft,top,orgWid,orgHigh);
+        bitmapData=bitmapImgData.data;
+
+        normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
+        normalData=normalImgData.data;
+        
+        for (i=0;i!==bumpCount;i++) {
+            
+            wid=GenerateUtilityClass.randomInt(Math.trunc(orgWid*0.07),Math.trunc(orgWid*0.07));
+            high=GenerateUtilityClass.randomInt(Math.trunc(orgHigh*0.07),Math.trunc(orgHigh*0.07));
+            
+            mx=GenerateUtilityClass.randomInt(0,orgWid);
+            my=GenerateUtilityClass.randomInt(0,orgHigh);       // these can (and should) wrap around
+
+                // create the rings of particles
+
+            ringWid=wid;
+            ringWidSub=Math.trunc(wid/(ringCount+1));
+
+            ringHigh=high;
+            ringHighSub=Math.trunc(high/(ringCount+1));
+            
+            darken=GenerateUtilityClass.randomPercentage(0.5);
+            colMultFactor=(darken?colFactor:(colFactor*0.9));
+
+            listIdx=0;
+
+            for (n=0;n!==ringCount;n++) {
+
+                    // the density of each ring
+
+                for (k=0;k!==pixelDensity;k++) {
+
+                        // get a random pixel
+
+                    rad=angList[listIdx];
+                    fx=Math.sin(rad);
+                    fy=Math.cos(rad);
+
+                    fsz=sizeList[listIdx];
+                    px=mx+Math.trunc((fsz*ringWid)*fx);
+                    py=my-Math.trunc((fsz*ringHigh)*fy);
+
+                    listIdx++;
+
+                        // this can wrap
+
+                    if (px<0) px+=orgWid;
+                    if (px>=orgWid) px-=orgWid;
+                    if (py<0) py+=orgHigh;
+                    if (py>=orgHigh) py-=orgHigh;
+                    
+                    idx=((py*orgWid)+px)*4;
+
+                        // darken or lighten the pixels
+                        
+                    col=(bitmapData[idx]/255.0)*colMultFactor;
+                    if (col>1.0) col=1.0;
+                    bitmapData[idx]=Math.trunc(col*255.0);
+
+                    col=(bitmapData[idx+1]/255.0)*colMultFactor;
+                    if (col>1.0) col=1.0;
+                    bitmapData[idx+1]=Math.trunc(col*255.0);
+
+                    col=(bitmapData[idx+2]/255.0)*colMultFactor;
+                    if (col>1.0) col=1.0;
+                    bitmapData[idx+2]=Math.trunc(col*255.0);
+
+                        // the normals
+
+                    if (darken) {
+                        normal.x=fx;
+                        normal.y=fy;
+                    }
+                    else {
+                        normal.x=fy;
+                        normal.y=fx;
+                    }
+                    
+                    normal.z=0.5;
+                    normal.normalize();
+                    
+                    normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
+                    normalData[idx+1]=(normal.y+1.0)*127.0;
+                    normalData[idx+2]=(normal.z+1.0)*127.0;
+                }
+
+                    // next ring
+
+                ringWid-=ringWidSub;
+                ringHigh-=ringHighSub;
+            }
+        }
+        
+            // write all the data back
+
+        this.colorCTX.putImageData(bitmapImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
+        
+            // now blur the color
+
+        this.blur(this.colorCTX,lft,top,rgt,bot,blurCount,false);
+        this.blur(this.normalCTX,lft,top,rgt,bot,2,false);
+    }
+    
+        //
+        // colors
+        //
+        
+    getRandomColor()
+    {
+        let col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
+        let darken=0.1-(GenerateUtilityClass.random()*0.2);
+        
+        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+    }
+    
+    getRandomColorDull(dullFactor)
+    {
+        let color=this.getRandomColor();
+        
+            // find the midpoint
+            
+        let midPoint=(color.r+color.g+color.b)/3.0;
+        
+            // move towards it
+            
+        color.r=color.r+(midPoint-color.r)*dullFactor;
+        color.g=color.g+(midPoint-color.g)*dullFactor;
+        color.b=color.b+(midPoint-color.b)*dullFactor;
+
+        return(color);
+    }
+    
+    getRandomDirtColor()
+    {
+        return(new ColorClass(GenerateUtilityClass.randomFloat(0.6,0.2),GenerateUtilityClass.randomFloat(0.3,0.2),0.0));
+    }
+
+        //
+        // shape drawing
+        //
+
+    draw3DRect(lft,top,rgt,bot,edgeSize,color,faceOut)
+    {
+        let n,lx,rx,ty,by;
+        let colFactor,edgeColor,fillColor;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+
+            // draw the edges
+
+        lx=lft;
+        rx=rgt;
+        ty=top;
+        by=bot;
+
+        for (n=0;n<=edgeSize;n++) {
+            if (faceOut) {
+                colFactor=((n/edgeSize)*0.3)+0.7;
+            }
+            else {
+                colFactor=(0.3-((n/edgeSize)*0.3))+0.7;
+            }
+            
+            edgeColor=this.darkenColor(color,colFactor);
+            this.colorCTX.strokeStyle=this.colorToRGBColor(edgeColor);
+
+                // the color
+
+            this.colorCTX.beginPath();
+            this.colorCTX.moveTo(lx,ty);
+            this.colorCTX.lineTo(lx,by);
+            this.colorCTX.stroke();
+
+            this.colorCTX.beginPath();
+            this.colorCTX.moveTo(rx,ty);
+            this.colorCTX.lineTo(rx,by);
+            this.colorCTX.stroke();
+
+            this.colorCTX.beginPath();
+            this.colorCTX.moveTo(lx,ty);
+            this.colorCTX.lineTo(rx,ty);
+            this.colorCTX.stroke();
+
+            this.colorCTX.beginPath();
+            this.colorCTX.moveTo(lx,by);
+            this.colorCTX.lineTo(rx,by);
+            this.colorCTX.stroke();
+
+                // the normal
+
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_LEFT_45:this.NORMAL_RIGHT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,ty);
+            this.normalCTX.lineTo(lx,by);
+            this.normalCTX.stroke();
+
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_RIGHT_45:this.NORMAL_LEFT_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(rx,ty);
+            this.normalCTX.lineTo(rx,by);
+            this.normalCTX.stroke();
+
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,ty);
+            this.normalCTX.lineTo(rx,ty);
+            this.normalCTX.stroke();
+
+            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_BOTTOM_45:this.NORMAL_TOP_45);
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,by);
+            this.normalCTX.lineTo(rx,by);
+            this.normalCTX.stroke();
+
+                // next edge
+
+            lx++;
+            rx--;
+            ty++;
+            by--;
+        }
+        
+            // if this is facing in, then we use darker color
+        
+        fillColor=color;
+        if (!faceOut) fillColor=this.darkenColor(color,0.7);
+
+            // draw the inner fill
+
+        this.drawRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillColor);
+
+        this.clearNormalsRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
+    }
+        
+    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,addToMask,noisePercentage,noiseMinDarken,noiseDarkenDif)
+    {
+        let n,x,y,mx,my,halfWid,halfHigh;
+        let rad,fx,fy,darkFactor,idx;
+        let nFactor;
+        let orgWid,orgHigh,wid,high,edgeCount;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData,origNormalData;
+        let col=new ColorClass(0,0,0);
+        let normal=new PointClass(0,0,0);
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+            // start and end arc
+            
+        startArc=Math.trunc(startArc*1000);
+        endArc=Math.trunc(endArc*1000);
+        if (startArc>=endArc) return;
+        
+        
+                    // the drawing size
+            
+        orgWid=rgt-lft;
+        orgHigh=bot-top;
+        wid=orgWid-1;
+        high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
+        mx=Math.trunc(wid*0.5);
+        my=Math.trunc(high*0.5);
+
+        bitmapImgData=this.colorCTX.getImageData(lft,top,orgWid,orgHigh);
+        bitmapData=bitmapImgData.data;
+        
+        normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
+        normalData=normalImgData.data;
+        origNormalData=new Uint8Array(normalData);
+
+        edgeCount=edgeSize;
+        
+            // fill the oval
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=wid*0.5;
+            halfHigh=high*0.5;
+            
+            for (n=startArc;n<endArc;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
+
+                fx=Math.sin(rad);
+                fx+=(fx*xRoundFactor);
+                if (fx>1.0) fx=1.0;
+                if (fx<-1.0) fx=-1.0;
+                
+                x=mx+Math.trunc(halfWid*fx);
+                if ((x<0) || (x>=orgWid)) continue;
+
+                fy=Math.cos(rad);
+                fy+=(fy*yRoundFactor);
+                if (fy>1.0) fy=1.0;
+                if (fy<-1.0) fy=-1.0;
+                
+                y=my-Math.trunc(halfHigh*fy);
+                if ((y<0) || (y>=orgHigh)) continue;
+                
+                    // clipping
+                    
+                if (this.clipLft!==-1) {
+                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
+                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
+                }
+                
+                    // any noise
+                
+                col.setFromColor(color);
+                
+                if (GenerateUtilityClass.randomPercentage(noisePercentage)) {
+                    darkFactor=GenerateUtilityClass.randomFloat(noiseMinDarken,noiseDarkenDif);
+                    col.r*=darkFactor;
+                    col.g*=darkFactor;
+                    col.b*=darkFactor;
+                }
+
+                    // the color pixel
+
+                idx=((y*orgWid)+x)*4;
+
+                bitmapData[idx]=Math.trunc(col.r*255.0);
+                bitmapData[idx+1]=Math.trunc(col.g*255.0);
+                bitmapData[idx+2]=Math.trunc(col.b*255.0);
+                bitmapData[idx+3]=255;
+                
+                    // get a normal for the pixel change
+                    // if we are outside the edge, gradually fade it
+                    // to the default pointing out normal
+
+                normal.x=0;
+                normal.y=0;
+                normal.z=1.0;
+                
+                if (edgeCount>0) {
+                    nFactor=edgeCount/edgeSize;
+                    normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
+                    normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
+                    normal.z=(normalZFactor*nFactor)+(normal.z*(1.0-nFactor));
+                }
+
+                normal.normalize();
+                
+                    // if this is within the draw mask, then
+                    // mix the normals
+                
+                if (this.checkMask((x+lft),(y+top))) {
+                    normal.x=(((origNormalData[idx]/127.0)-1.0)+normal.x)*0.5;
+                    normal.y=(((origNormalData[idx+1]/127.0)-1.0)+normal.y)*0.5;
+                    normal.z=(((origNormalData[idx+2]/127.0)-1.0)+normal.z)*0.5;
+                    normal.normalize();
+                }
+                
+                normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
+                normalData[idx+1]=(normal.y+1.0)*127.0;
+                normalData[idx+2]=(normal.z+1.0)*127.0;
+                
+                    // and the mask
+                    
+                if (addToMask) this.setStagedMask((x+lft),(y+top));
+            }
+
+            if (edgeCount>0) edgeCount--;
+
+            wid--;
+            high--;
+        }
+
+        this.colorCTX.putImageData(bitmapImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
+        
+            // we stage the mask so we don't start
+            // merging normals, so we need to make that the
+            // real mask now
+            
+        if (addToMask) this.copyStagedMask();
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
         //
         // clipping
@@ -495,13 +910,6 @@ export default class GenerateBitmapBaseClass
         // color routines
         //
 
-    getRandomColor()
-    {
-        let col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
-        let darken=0.1-(GenerateUtilityClass.random()*0.2);
-        
-        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
-    }
     
     getRandomGray(min,max)
     {
@@ -519,10 +927,6 @@ export default class GenerateBitmapBaseClass
         return(new ColorClass(GenerateUtilityClass.randomFloat(0.0,0.2),GenerateUtilityClass.randomFloat(0.8,0.2),GenerateUtilityClass.randomFloat(0.0,0.2)));
     }
     
-    getRandomDirtColor()
-    {
-        return(new ColorClass(GenerateUtilityClass.randomFloat(0.6,0.2),GenerateUtilityClass.randomFloat(0.3,0.2),0.0));
-    }
     
     getRandomMetalColor()
     {
@@ -713,57 +1117,6 @@ export default class GenerateBitmapBaseClass
         // noise routines
         //
 
-    addNoiseRect(lft,top,rgt,bot,minDarken,maxDarken,percentage)
-    {    
-        let n,nPixel,idx;
-        let col,fct;
-        let wid=rgt-lft;
-        let high=bot-top;    
-        let darkenDif=maxDarken-minDarken;
-        let bitmapImgData,bitmapData;
-
-            // get the image data to add noise to
-        
-        if ((lft>=rgt) || (top>=bot)) return;
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-
-            // get the image data to add noise to
-
-        idx=0;
-        nPixel=wid*high;
-
-        for (n=0;n!==nPixel;n++) {
-
-            if (GenerateUtilityClass.randomPercentage(percentage)) {
-
-                    // the bitmap noise
-
-                fct=minDarken+(darkenDif*GenerateUtilityClass.random());
-
-                    // darken the pixel
-
-                col=(bitmapData[idx]/255.0)*fct;
-                if (col>1.0) col=1.0;
-                bitmapData[idx]=Math.trunc(col*255.0);
-
-                col=(bitmapData[idx+1]/255.0)*fct;
-                if (col>1.0) col=1.0;
-                bitmapData[idx+1]=Math.trunc(col*255.0);
-
-                col=(bitmapData[idx+2]/255.0)*fct;
-                if (col>1.0) col=1.0;
-                bitmapData[idx+2]=Math.trunc(col*255.0);
-            }
-
-                // next pixel
-
-            idx+=4;
-        }
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-    }
     
     addNormalNoiseRect(lft,top,rgt,bot,percentage)
     {    
@@ -811,99 +1164,6 @@ export default class GenerateBitmapBaseClass
         // blur routines
         //
         
-    blur(lft,top,rgt,bot,blurCount,clamp)
-    {
-        let n,idx;
-        let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
-        let r,g,b;
-        let wid=rgt-lft;
-        let high=bot-top;
-        let bitmapImgData,bitmapData,blurData;
-        
-        if ((wid<=0) || (high<=0)) return;
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-        
-        blurData=new Uint8ClampedArray(bitmapData.length);
-        
-            // blur pixels to count
-
-        for (n=0;n!==blurCount;n++) {
-            
-            for (y=0;y!==high;y++) {
-
-                cys=y-1;
-                cye=y+2;
-
-                for (x=0;x!==wid;x++) {
-
-                        // get blur from 8 surrounding pixels
-
-                    r=g=b=0;
-
-                    cxs=x-1;
-                    cxe=x+2;
-
-                    for (cy=cys;cy!==cye;cy++) {
-                        
-                        dy=cy;
-                        if (!clamp) {
-                            if (dy<0) dy=high+dy;
-                            if (dy>=high) dy=dy-high;
-                        }
-                        else {
-                            if (dy<0) dy=0;
-                            if (dy>=high) dy=high-1;
-                        }
-                        
-                        for (cx=cxs;cx!==cxe;cx++) {
-                            if ((cy===y) && (cx===x)) continue;       // ignore self
-                            
-                            dx=cx;
-                            if (!clamp) {
-                                if (dx<0) dx=wid+dx;
-                                if (dx>=wid) dx=dx-wid;
-                            }
-                            else {
-                                if (dx<0) dx=0;
-                                if (dx>=wid) dx=wid-1;
-                            }
-                            
-                                // add up blur from the
-                                // original pixels
-
-                            idx=((dy*wid)+dx)*4;
-
-                            r+=bitmapData[idx];
-                            g+=bitmapData[idx+1];
-                            b+=bitmapData[idx+2];
-                        }
-                    }
-                    
-                    idx=((y*wid)+x)*4;
-
-                    blurData[idx]=Math.trunc(r*0.125);
-                    blurData[idx+1]=Math.trunc(g*0.125);
-                    blurData[idx+2]=Math.trunc(b*0.125);
-                }
-            }
-
-                // transfer over the changed pixels
-
-            for (y=0;y!==high;y++) {
-                idx=(y*wid)*4;
-                for (x=0;x!==wid;x++) {       
-                    bitmapData[idx]=blurData[idx];
-                    bitmapData[idx+1]=blurData[idx+1];
-                    bitmapData[idx+2]=blurData[idx+2];
-                    idx+=4;
-                }
-            }
-        } 
-        
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-    }
 
         //
         // specular routines
@@ -1040,96 +1300,6 @@ export default class GenerateBitmapBaseClass
         this.glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
 
-    draw3DRect(lft,top,rgt,bot,edgeSize,color,faceOut)
-    {
-        let n,lx,rx,ty,by;
-        let colFactor,edgeColor,fillColor;
-
-            // draw the edges
-
-        lx=lft;
-        rx=rgt;
-        ty=top;
-        by=bot;
-
-        for (n=0;n<=edgeSize;n++) {
-            if (faceOut) {
-                colFactor=((n/edgeSize)*0.3)+0.7;
-            }
-            else {
-                colFactor=(0.3-((n/edgeSize)*0.3))+0.7;
-            }
-            
-            edgeColor=this.darkenColor(color,colFactor);
-            this.colorCTX.strokeStyle=this.colorToRGBColor(edgeColor);
-
-                // the color
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,ty);
-            this.colorCTX.lineTo(lx,by);
-            this.colorCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(rx,ty);
-            this.colorCTX.lineTo(rx,by);
-            this.colorCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,ty);
-            this.colorCTX.lineTo(rx,ty);
-            this.colorCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,by);
-            this.colorCTX.lineTo(rx,by);
-            this.colorCTX.stroke();
-
-                // the normal
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_LEFT_45:this.NORMAL_RIGHT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,ty);
-            this.normalCTX.lineTo(lx,by);
-            this.normalCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_RIGHT_45:this.NORMAL_LEFT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(rx,ty);
-            this.normalCTX.lineTo(rx,by);
-            this.normalCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,ty);
-            this.normalCTX.lineTo(rx,ty);
-            this.normalCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_BOTTOM_45:this.NORMAL_TOP_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,by);
-            this.normalCTX.lineTo(rx,by);
-            this.normalCTX.stroke();
-
-                // next edge
-
-            lx++;
-            rx--;
-            ty++;
-            by--;
-        }
-        
-            // if this is facing in, then we use darker color
-        
-        fillColor=color;
-        if (!faceOut) fillColor=this.darkenColor(color,0.7);
-
-            // draw the inner fill
-
-        this.drawRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillColor);
-
-        this.clearNormalsRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
-    }
 
     draw3DComplexRect(lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
     {
@@ -3021,6 +3191,8 @@ export default class GenerateBitmapBaseClass
         this.clearCanvases(this.normalCanvas,this.normalCTX,0,0,255,255);
         this.clearCanvases(this.specularCanvas,this.specularCTX,0,0,0,255);
         this.clearCanvases(this.glowCanvas,this.glowCTX,0,0,0,255);
+        
+        this.mask=new Uint8Array(this.colorCanvas.width*this.colorCanvas.height);
 
             // run the internal generator
 
@@ -3070,6 +3242,8 @@ export default class GenerateBitmapBaseClass
         this.clearCanvases(this.normalCanvas,this.normalCTX,0,0,255,255);
         this.clearCanvases(this.specularCanvas,this.specularCTX,0,0,0,255);
         this.clearCanvases(this.glowCanvas,this.glowCTX,0,0,0,255);
+        
+        this.mask=new Uint8Array(this.colorCanvas.width*this.colorCanvas.height);
 
             // run the internal generator
 

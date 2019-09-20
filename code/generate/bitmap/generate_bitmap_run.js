@@ -11,22 +11,19 @@ export default class GenerateBitmapRun
     {
     }
     
-    static generateWall(core)
+    static generateWall(core,temp)
     {
         let genBitmap;
         
-        genBitmap=new GenerateBitmapStoneClass(core,false,false,false);
-        
-        /*
-        switch(GenerateUtilityClass.randomIndex(2)) {
+        switch (temp) {
             case 0:
-                genBitmap=new GenerateBitmapBrickClass(core);
+                genBitmap=new GenerateBitmapStoneClass(core,false,false,false);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapStoneClass(core);
+                genBitmap=new GenerateBitmapBrickClass(core,false,false,false);
                 break;
         }
-        */
+
         return(genBitmap.generate());
     }
 }

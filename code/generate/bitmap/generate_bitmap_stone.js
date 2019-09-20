@@ -27,7 +27,11 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         let wid=rgt-lft;
         let high=bot-top;
         let edgeSize;
-        let edgeSizeAdd=((wid>high?high:wid)*0.7)-5;
+        
+            // we use the mask so we can mix normals when
+            // two ovals collide
+            
+        this.clearMask();
         
             // the stone itself
             
@@ -35,7 +39,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         
-        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,false,0.7,0.8,0.2);
+        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,true,0.7,0.8,0.2);
         
             // random chunks on stone
             // we make sure that the first 4 random
@@ -43,9 +47,9 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
         nChunk=GenerateUtilityClass.randomInt(5,5);
         
-        chunkWidStart=Math.trunc(wid*0.25);
+        chunkWidStart=Math.trunc(wid*0.3);
         chunkWidAdd=Math.trunc(wid*0.5);
-        chunkHighStart=Math.trunc(high*0.25);
+        chunkHighStart=Math.trunc(high*0.3);
         chunkHighAdd=Math.trunc(high*0.5);
         
         for (n=0;n!==nChunk;n++) {
@@ -85,46 +89,29 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
                     break;
             }
             
-            edgeSize=GenerateUtilityClass.randomInt(5,(((wid2>high2)?high2:wid2)-5));
+            edgeSize=GenerateUtilityClass.randomInt(Math.trunc(wid2*0.6),Math.trunc(wid2*0.3));
             xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
             yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         
-            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),(n>3),0.7,0.8,0.2);
+            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),(n<4),0.7,0.8,0.2);
         }
     }
     
     generateStone()
     {
-        let n,k,rect,edgeSize,clipMargin;
-        let drawStoneColor,drawEdgeColor,lineColor,darken,f;
-        let x,y,x2,y2,lineCount,lineVarient,stoneWid,stoneHigh;
+        let n,rect;
+        let drawStoneColor,f,bumpCount;
         let paddingRight,paddingBottom;
         
-        
-        let stoneColor=new ColorClass(GenerateUtilityClass.randomFloat(0.7,0.25),0.7,GenerateUtilityClass.randomFloat(0.7,0.1));
-        
-        
-        //this.drawOval(50,50,150,150,0,1,40,stoneColor,true);
-        
-        
-        //this.createSpecularMap(0.5);
-        //return;
-
-            // some random values
-
-        //let stoneColor=this.getRandomColor();
-        let groutColor=this.dullColor(stoneColor,0.7);
+        let stoneColor=this.getRandomColor();
+        let groutColor=this.getRandomColorDull(0.3);
         
         let segments=this.createRandomSegments();
-        let darkenFactor=0.5;
 
-            // clear canvases
+            // the grout is just a rough bumpy surface
 
-        this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
-        this.addNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,0.8,0.9);
-        this.blur(0,0,this.colorCanvas.width,this.colorCanvas.height,5,false);
-        
-        this.addNormalNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.5);
+        bumpCount=GenerateUtilityClass.randomInt(300,100);
+        this.drawBumpySurface(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor,0.8,bumpCount,3);
         
             // draw the stones
 
@@ -133,7 +120,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
             f=1.0;
             if ((rect.lft>=0) && (rect.top>=0) && (rect.rgt<=this.colorCanvas.width) && (rect.bot<=this.colorCanvas.height)) {        // don't darken stones that fall off edges
-                f=GenerateUtilityClass.random()+darkenFactor;
+                f=GenerateUtilityClass.random()+0.5;
                 if (f>1.0) f=1.0;
             }
 
@@ -143,48 +130,11 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             paddingBottom=GenerateUtilityClass.randomInt(0,4);
 
             this.drawSingleStone(rect.lft,rect.top,(rect.rgt-paddingRight),(rect.bot-paddingBottom),drawStoneColor);
-
-            
-
-            //this.draw3DComplexRect(rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,drawStoneColor,drawEdgeColor);
-            //this.blur((rect.lft+edgeSize),(rect.top+edgeSize),(rect.rgt-(padding+edgeSize)),(rect.bot-(padding+edgeSize)),4,false);
-            
-                // cracked lines
-            /*    
-            stoneWid=(rect.rgt-rect.lft)-((edgeSize*2)+padding);
-            stoneHigh=(rect.bot-rect.top)-((edgeSize*2)+padding);
-            lineCount=GenerateUtilityClass.randomInt(3,8);
-            
-            clipMargin=padding+edgeSize;
-            
-            for (k=0;k!==lineCount;k++) {
-                x=GenerateUtilityClass.randomInt((rect.lft+edgeSize),stoneWid);
-                y=GenerateUtilityClass.randomInt((rect.top+edgeSize),stoneHigh);
-                x2=GenerateUtilityClass.randomInt((rect.lft+edgeSize),stoneWid);
-                y2=GenerateUtilityClass.randomInt((rect.top+edgeSize),stoneHigh);
-                
-                lineVarient=20;
-                if (lineVarient>stoneWid) lineVarient=stoneWid;
-                if (lineVarient>stoneHigh) lineVarient=stoneHigh;
-                
-                darken=0.9+(GenerateUtilityClass.random()*0.1);
-                lineColor=this.darkenColor(drawStoneColor,darken);
-                this.drawRandomLine(x,y,x2,y2,(rect.lft+clipMargin),(rect.top+clipMargin),(rect.rgt-clipMargin),(rect.bot-clipMargin),lineVarient,lineColor,false);
-            }
-            */
-                // redo the fill, but just do the edges so we
-                // erase any lines that went over
-                
-            //this.draw3DComplexRect(rect.lft,rect.top,(rect.rgt-padding),(rect.bot-padding),edgeSize,null,drawEdgeColor);
-            
-                 // any random noise
-                
-            //this.addNoiseRect(rect.lft,rect.top,rect.rgt,rect.bot,0.8,1.0,0.4);
         }
 
             // finish with the specular
 
-        this.createSpecularMap(0.2);
+        this.createSpecularMap(0.3);
     }
 
         //

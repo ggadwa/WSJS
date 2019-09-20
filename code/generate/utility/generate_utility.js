@@ -125,7 +125,7 @@ export default class GenerateUtilityClass
             
             offset=n*2;
             uvArray[offset]=x*uvScale;
-            uvArray[offset+1]=y*uvScale;
+            uvArray[offset+1]=1.0-(y*uvScale);
         }
         
             // reduce all the UVs to

@@ -263,7 +263,7 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n;
-        let wallBitmap,floorBitmap,ceilingBitmap;
+        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap;
         let roomTopY;
         let room,nextRoom,light,genPiece,centerPnt,intensity;
         let roomCount,roomHigh,roomSize,piece,pathXDeviation;
@@ -283,9 +283,8 @@ export default class GenerateMapClass
         
             // bitmaps
             
-        wallBitmap=GenerateBitmapRun.generateWall(this.core);
-          
-        //wallBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.wallBitmap);
+        roomWallBitmap=GenerateBitmapRun.generateWall(this.core,0);
+        hallWallBitmap=GenerateBitmapRun.generateWall(this.core,1);
         floorBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.floorBitmap);
         ceilingBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.ceilingBitmap);
 
@@ -355,7 +354,7 @@ export default class GenerateMapClass
                 
                 // meshes
                 
-            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),wallBitmap,roomSize,roomHigh);
+            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),(piece.multistory?roomWallBitmap:hallWallBitmap),roomSize,roomHigh);
             GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,roomSize,roomHigh);
             GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,roomSize,roomHigh);
             
@@ -363,7 +362,7 @@ export default class GenerateMapClass
                 
             if (n<(roomCount-1)) {
                 if ((!room.sideRoom) && (!rooms[n+1].sideRoom)) {
-                    if (rooms[n+1].offset.y>room.offset.y) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),wallBitmap,floorBitmap,roomSize,roomHigh);
+                    if (rooms[n+1].offset.y>room.offset.y) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),hallWallBitmap,floorBitmap,roomSize,roomHigh);
                 }
             }
             

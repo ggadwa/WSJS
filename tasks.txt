@@ -1,5 +1,6 @@
 stone
-  - griding is really bad
+  - can we do normal and image at same time?
+  - bumpy surface
 
 
 - need textures to stamp better
