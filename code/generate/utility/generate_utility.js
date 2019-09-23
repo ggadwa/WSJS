@@ -61,6 +61,11 @@ export default class GenerateUtilityClass
         return(GenerateUtilityClass.randomInt(startInt,(endInt-startInt)));
     }
     
+    static randomSign()
+    {
+        return((GenerateUtilityClass.random()<0.5)?-1:1);
+    }
+    
         //
         // build UVs for vertex lists
         //

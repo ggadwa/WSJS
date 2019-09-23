@@ -26,7 +26,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         let chunkWidStart,chunkWidAdd,chunkHighStart,chunkHighAdd,arcStart,arcEnd;
         let wid=rgt-lft;
         let high=bot-top;
-        let edgeSize;
+        let edgeSize,flipNormals;
         
             // we use the mask so we can mix normals when
             // two ovals collide
@@ -39,13 +39,13 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         
-        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,true,0.7,0.8,0.2);
+        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,false,true,0.7,0.8,0.2);
         
             // random chunks on stone
             // we make sure that the first 4 random
             // one always go in a corner to smooth out oval
 
-        nChunk=GenerateUtilityClass.randomInt(5,5);
+        nChunk=GenerateUtilityClass.randomInt(3,4);
         
         chunkWidStart=Math.trunc(wid*0.3);
         chunkWidAdd=Math.trunc(wid*0.5);
@@ -59,25 +59,25 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             switch (n) {
                 case 0:
                     lft2=GenerateUtilityClass.randomInt(lft,5);
-                    top2=GenerateUtilityClass.randomInt(top,5);
+                    top2=GenerateUtilityClass.randomInt((top+(bot-top)*0.05),5);
                     arcStart=0.65;
                     arcEnd=1.1;
                     break;
                 case 1:
                     lft2=GenerateUtilityClass.randomInt((rgt-wid2),-5);
-                    top2=GenerateUtilityClass.randomInt(top,10);
+                    top2=GenerateUtilityClass.randomInt((top+(bot-top)*0.05),10);
                     arcStart=-0.1;
                     arcEnd=0.35;
                     break;
                 case 2:
                     lft2=GenerateUtilityClass.randomInt((rgt-wid2),-5);
-                    top2=GenerateUtilityClass.randomInt((bot-high2),-5);
+                    top2=GenerateUtilityClass.randomInt((bot-(high2+((bot-top)*0.05))),-5);
                     arcStart=0.15;
                     arcEnd=0.6;
                     break;
                 case 3:
                     lft2=GenerateUtilityClass.randomInt(lft,5);
-                    top2=GenerateUtilityClass.randomInt((bot-high2),-5);
+                    top2=GenerateUtilityClass.randomInt((bot-(high2+((bot-top)*0.05))),-5);
                     arcStart=0.4;
                     arcEnd=0.85;
                     break;
@@ -92,8 +92,11 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             edgeSize=GenerateUtilityClass.randomInt(Math.trunc(wid2*0.6),Math.trunc(wid2*0.3));
             xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
             yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
+            
+            flipNormals=false;
+            if (n>3) flipNormals=GenerateUtilityClass.randomPercentage(0.1);
         
-            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),(n<4),0.7,0.8,0.2);
+            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),flipNormals,(n<4),0.7,0.8,0.2);
         }
     }
     

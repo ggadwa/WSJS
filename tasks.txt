@@ -1,6 +1,6 @@
-stone
-  - can we do normal and image at same time?
-  - bumpy surface
+- room meshes need extra one floor length mesh on top of every story
+- room has moires
+
 
 
 - need textures to stamp better

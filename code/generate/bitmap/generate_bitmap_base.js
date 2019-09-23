@@ -32,17 +32,17 @@ export default class GenerateBitmapBaseClass
         this.BITMAP_SKY_TEXTURE_HEIGHT=1024;
         this.BITMAP_PARTICLE_TEXTURE_SIZE=64;
         
-        this.BITMAP_STACKED_X_MIN_COUNT=1;
+        this.BITMAP_STACKED_X_MIN_COUNT=4;
         this.BITMAP_STACKED_X_EXTRA_COUNT=4;
-        this.BITMAP_STACKED_Y_MIN_COUNT=3;
-        this.BITMAP_STACKED_Y_EXTRA_COUNT=4;
+        this.BITMAP_STACKED_Y_MIN_COUNT=4;
+        this.BITMAP_STACKED_Y_EXTRA_COUNT=5;
+        this.BITMAP_STACKED_ODD_LINE_PERCENTAGE=0.1;
 
         this.BITMAP_GRID_DIVISION=100;
         this.BITMAP_GRID_MIN_BLOCK_WIDTH=10;
-        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=15;
+        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=30;
         this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=8;
-        this.BITMAP_GRID_MIN_BLOCK_HEIGHT=5;
-        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=15;
+        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=5;
         this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=8;
 
             // some precalced normals
@@ -141,15 +141,35 @@ export default class GenerateBitmapBaseClass
 
         for (y=0;y!==yCount;y++) {
 
-            lft=halfBrick?-halfWid:0;
-
-            for (x=0;x!==xCount;x++) {
-                segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
-                lft+=wid;
+                // special lines (full line or double bricks)
+                
+            if (GenerateUtilityClass.randomPercentage(this.BITMAP_STACKED_ODD_LINE_PERCENTAGE)) {
+                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                    segments.push(new RectClass(0,top,this.colorCanvas.width,(top+high)));
+                }
+                else {
+                    lft=0;
+                    
+                    for (x=0;x!==(xCount*2);x++) {
+                        segments.push(new RectClass(lft,top,(lft+halfWid),(top+high)));
+                        lft+=halfWid;
+                    }
+                }
             }
+            
+                // regular lines
+                
+            else {
+                lft=halfBrick?-halfWid:0;
 
-            if (halfWid) segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
-
+                for (x=0;x!==xCount;x++) {
+                    segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
+                    lft+=wid;
+                }
+            
+                if (halfBrick) segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
+            }
+            
             top+=high;
             halfBrick=!halfBrick;
         }
@@ -197,11 +217,12 @@ export default class GenerateBitmapBaseClass
             if (!hit) break;
 
                 // random size
+                // height starts at half width, plus random extra
 
             startWid=GenerateUtilityClass.randomInt(this.BITMAP_GRID_MIN_BLOCK_WIDTH,this.BITMAP_GRID_EXTRA_BLOCK_WIDTH);
             if ((x+startWid)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
 
-            startHigh=GenerateUtilityClass.randomInt(this.BITMAP_GRID_MIN_BLOCK_HEIGHT,this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
+            startHigh=Math.trunc(startWid*0.5)+GenerateUtilityClass.randomInt(0,this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
             if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
                 // make sure we aren't going over the edge
@@ -619,10 +640,10 @@ export default class GenerateBitmapBaseClass
         // shape drawing
         //
 
-    draw3DRect(lft,top,rgt,bot,edgeSize,color,faceOut)
+    draw3DRect(lft,top,rgt,bot,edgeSize,edgeDarken,color,faceOut)
     {
         let n,lx,rx,ty,by;
-        let colFactor,edgeColor,fillColor;
+        let edgeColor;
         
         if ((lft>=rgt) || (top>=bot)) return;
 
@@ -632,16 +653,10 @@ export default class GenerateBitmapBaseClass
         rx=rgt;
         ty=top;
         by=bot;
+        
+        edgeColor=this.darkenColor(color,edgeDarken);
 
         for (n=0;n<=edgeSize;n++) {
-            if (faceOut) {
-                colFactor=((n/edgeSize)*0.3)+0.7;
-            }
-            else {
-                colFactor=(0.3-((n/edgeSize)*0.3))+0.7;
-            }
-            
-            edgeColor=this.darkenColor(color,colFactor);
             this.colorCTX.strokeStyle=this.colorToRGBColor(edgeColor);
 
                 // the color
@@ -700,19 +715,14 @@ export default class GenerateBitmapBaseClass
             by--;
         }
         
-            // if this is facing in, then we use darker color
-        
-        fillColor=color;
-        if (!faceOut) fillColor=this.darkenColor(color,0.7);
-
             // draw the inner fill
 
-        this.drawRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),fillColor);
+        this.drawRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color);
 
         this.clearNormalsRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
     }
         
-    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,addToMask,noisePercentage,noiseMinDarken,noiseDarkenDif)
+    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,flipNormals,addToMask,noisePercentage,noiseMinDarken,noiseDarkenDif)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,darkFactor,idx;
@@ -816,6 +826,10 @@ export default class GenerateBitmapBaseClass
                     normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
                     normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
                     normal.z=(normalZFactor*nFactor)+(normal.z*(1.0-nFactor));
+                    if (flipNormals) {
+                        normal.x=-normal.x;
+                        normal.y=-normal.y;
+                    }
                 }
 
                 normal.normalize();
@@ -855,7 +869,221 @@ export default class GenerateBitmapBaseClass
         if (addToMask) this.copyStagedMask();
     }
     
+        //
+        // streaks
+        //
+
+    drawStreakMetal(x,top,bot,streakWid,baseColor)
+    {
+        let n,lx,rx,y,idx;
+        let bitmapImgData,bitmapData;
+        let density,densityReduce;
+        
+        if (top>=bot) return;
+        if (streakWid<=0) return;
+        
+            // since we draw the streaks from both sides,
+            // we need to move the X into the middle and cut width in half
+            
+        streakWid=Math.trunc(streakWid*0.5);
+            
+        x+=streakWid;
+        
+            // get the image data
+
+        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        bitmapData=bitmapImgData.data;
+        
+            // start with 100 density and reduce
+            // as we go across the width
+            
+        density=100;
+        densityReduce=Math.trunc(90/streakWid);
+        
+            // write the streaks
+            
+        for (n=0;n!==streakWid;n++) {
+            
+            lx=x-n;
+            rx=x+n;
+            
+            for (y=top;y!==bot;y++) {
+                
+                if (GenerateUtilityClass.randomInt(0,100)<density) {
+                    if ((lx>=0) && (lx<this.colorCanvas.width)) {
+                        idx=((y*this.colorCanvas.width)+lx)*4;
+                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
+                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
+                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                    }
+                }
+                
+                if (GenerateUtilityClass.randomInt(0,100)<density) {
+                    if ((rx>=0) && (rx<this.colorCanvas.width)) {
+                        idx=((y*this.colorCanvas.width)+rx)*4;
+                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
+                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
+                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                    }
+                }
+            
+            }
+            
+            density-=densityReduce;
+        }
+        
+            // write all the data back
+
+        this.colorCTX.putImageData(bitmapImgData,0,0);
+    }
     
+    drawStreakDirtSingle(lft,top,rgt,bot,botClip,density,color)
+    {
+        let lx,rx,xAdd,x,y,idx;
+        let r,g,b;
+        let factor;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let mx=Math.trunc(wid*0.5);
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+        let normal=new PointClass(0,0,0);
+        
+        if ((wid<=0) || (high<=0)) return;
+        
+            // get the image data
+
+        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
+        
+        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
+        
+            // draw the dirt
+            
+        for (y=0;y!==high;y++) {
+            if ((y+top)>=botClip) break;
+            
+            factor=1.0-(y/high);
+            
+                // the dirt works down to a point
+                
+            xAdd=Math.trunc((wid*factor)*0.5);
+            lx=mx-xAdd;
+            rx=mx+xAdd;
+            if (lx>=rx) break;
+            
+            for (x=lx;x!==rx;x++) {
+                
+                    // the color
+                    
+                if (GenerateUtilityClass.randomPercentage(density)) {
+                    factor=GenerateUtilityClass.randomFloat(0.25,0.75);
+
+                    idx=((y*wid)+x)*4;
+                    r=bitmapData[idx]/255.0;
+                    g=bitmapData[idx+1]/255.0;
+                    b=bitmapData[idx+2]/255.0;
+                    bitmapData[idx]=(((1.0-factor)*r)+(color.r*factor))*255.0;
+                    bitmapData[idx+1]=(((1.0-factor)*g)+(color.g*factor))*255.0;
+                    bitmapData[idx+2]=(((1.0-factor)*b)+(color.b*factor))*255.0;
+                }
+                
+                    // the normal
+                    // we average it in with the current normal
+                    // so streaks follow the surface
+                
+                normal.x=Math.cos((Math.PI*(x-lx))/(rx-lx))*0.25;            // don't do extreme normals here
+                normal.y=0.0;
+                normal.z=0.5;
+                
+                normal.x=(((normalData[idx]/127.0)-1.0)+normal.x)*0.5;
+                normal.y=(((normalData[idx+1]/127.0)-1.0)+normal.y)*0.5;
+                normal.z=(((normalData[idx+2]/127.0)-1.0)+normal.z)*0.5;
+                normal.normalize();
+                
+                normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
+                normalData[idx+1]=(normal.y+1.0)*127.0;
+                normalData[idx+2]=(normal.z+1.0)*127.0;
+            }
+        }
+        
+            // write all the data back
+
+        this.colorCTX.putImageData(bitmapImgData,lft,top);
+        this.normalCTX.putImageData(normalImgData,lft,top);
+    }
+    
+    drawStreakDirt(lft,top,rgt,bot,botClip,additionalStreakCount,density,color)
+    {
+        let n,sx,ex,ey;
+        
+            // original streak
+            
+        this.drawStreakDirtSingle(lft,top,rgt,bot,botClip,density,color);
+        
+            // additional streaks
+            
+        for (n=0;n!==additionalStreakCount;n++) {
+            sx=GenerateUtilityClass.randomInBetween(lft,rgt);
+            ex=GenerateUtilityClass.randomInBetween(sx,rgt);
+            if (sx>=ex) continue;
+            
+            ey=bot-GenerateUtilityClass.randomInt(0,Math.trunc((bot-top)*0.25));
+            
+            this.drawStreakDirtSingle(sx,top,ex,ey,botClip,density,color);
+        }
+    }
+
+        //
+        // line drawings
+        //
+        
+    drawVerticalCrack(x,y,y2,clipLft,clipRgt,lineDir,lineVariant,color,lightLine,canSplit)
+    {
+        let n,sx,sy,ex,ey;
+        let segCount=GenerateUtilityClass.randomInt(2,5);
+        let yAdd=Math.trunc((y2-y)/segCount);
+        
+        sx=x;
+        sy=y;
+        
+        for (n=0;n!==segCount;n++) {
+            
+            if ((n+1)===segCount) {
+                ey=y2;
+            }
+            else {
+                ex=sx+(GenerateUtilityClass.randomIndex(lineVariant)*lineDir);
+                ey=sy+yAdd;
+            }
+            
+            if (ex<clipLft) ex=clipLft;
+            if (ex>clipRgt) ex=clipRgt;
+            
+            this.drawLine(sx,sy,ex,ey,color,lightLine);
+            
+            if ((ex===clipLft) || (ex===clipRgt)) break;
+            
+            if ((canSplit) && (GenerateUtilityClass.randomPercentage(0.5))) {
+                if (lineDir>0) {
+                    this.drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,lightLine,false);
+                }
+                else {
+                    this.drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,lightLine,false);
+                }
+                
+                canSplit=false;
+            }
+            
+            sx=ex;
+            sy=ey;
+        }
+    }
+
+    
+    
+        
     
     
     
@@ -2533,154 +2761,6 @@ export default class GenerateBitmapBaseClass
         this.normalCTX.putImageData(normalImgData,0,0);
     }
     
-        //
-        // streaks
-        //
-
-    drawStreakMetal(x,top,bot,streakWid,baseColor)
-    {
-        let n,lx,rx,y,idx;
-        let bitmapImgData,bitmapData;
-        let density,densityReduce;
-        
-        if (top>=bot) return;
-        if (streakWid<=0) return;
-        
-            // since we draw the streaks from both sides,
-            // we need to move the X into the middle and cut width in half
-            
-        streakWid=Math.trunc(streakWid*0.5);
-            
-        x+=streakWid;
-        
-            // get the image data
-
-        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        bitmapData=bitmapImgData.data;
-        
-            // start with 100 density and reduce
-            // as we go across the width
-            
-        density=100;
-        densityReduce=Math.trunc(90/streakWid);
-        
-            // write the streaks
-            
-        for (n=0;n!==streakWid;n++) {
-            
-            lx=x-n;
-            rx=x+n;
-            
-            for (y=top;y!==bot;y++) {
-                
-                if (GenerateUtilityClass.randomInt(0,100)<density) {
-                    if ((lx>=0) && (lx<this.colorCanvas.width)) {
-                        idx=((y*this.colorCanvas.width)+lx)*4;
-                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
-                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
-                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
-                    }
-                }
-                
-                if (GenerateUtilityClass.randomInt(0,100)<density) {
-                    if ((rx>=0) && (rx<this.colorCanvas.width)) {
-                        idx=((y*this.colorCanvas.width)+rx)*4;
-                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
-                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
-                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
-                    }
-                }
-            
-            }
-            
-            density-=densityReduce;
-        }
-        
-            // write all the data back
-
-        this.colorCTX.putImageData(bitmapImgData,0,0);
-    }
-    
-    drawStreakDirtSingle(lft,top,rgt,bot,reduceStreak,density,dirtColorAvg)
-    {
-        let lx,rx,xAdd,x,y,idx;
-        let factor,lineDensity,dirtWidReduce;
-        let wid=rgt-lft;
-        let high=bot-top;
-        let bitmapImgData,bitmapData;
-        
-        if ((wid<=0) || (high<=0)) return;
-        
-            // get the image data
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-        
-            // random dirt reductions
-        
-        dirtWidReduce=0;
-        if (reduceStreak) dirtWidReduce=(GenerateUtilityClass.random()*0.1)*wid;
-        
-            // draw the dirt
-            
-        for (y=0;y!==high;y++) {
-            
-            factor=1.0-(y/high);
-            
-                // the dirt works down to a point
-                
-            xAdd=Math.trunc((wid-(factor*dirtWidReduce))*0.48);
-            lx=xAdd;
-            rx=wid-xAdd;
-            if (lx>=rx) break;
-            
-            lineDensity=density*factor;
-            if (lineDensity<=0.2) lineDensity=0.2;
-            
-            for (x=lx;x!==rx;x++) {
-                
-                if (GenerateUtilityClass.randomPercentage(lineDensity)) {
-                    idx=((y*wid)+x)*4;
-                    bitmapData[idx]=Math.trunc((bitmapData[idx]+dirtColorAvg[0])*0.5);
-                    bitmapData[idx+1]=Math.trunc((bitmapData[idx]+dirtColorAvg[1])*0.5);
-                    bitmapData[idx+2]=Math.trunc((bitmapData[idx]+dirtColorAvg[2])*0.5);
-                }
-            }
-        }
-        
-            // write all the data back
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-    }
-    
-    drawStreakDirt(lft,top,rgt,bot,additionalStreakCount,reduceStreak,density,color)
-    {
-        let n,sx,ex,ey;
-        let dirtColorAvg;
-        
-            // get dirt color as ints
-            
-        dirtColorAvg=[Math.trunc(color.r*255.0),Math.trunc(color.g*255.0),Math.trunc(color.b*255.0)];
-        
-            // original streak
-            
-        this.drawStreakDirtSingle(lft,top,rgt,bot,reduceStreak,density,dirtColorAvg);
-        
-            // additional streaks
-            
-        for (n=0;n!==additionalStreakCount;n++) {
-            sx=GenerateUtilityClass.randomInBetween(lft,rgt);
-            ex=GenerateUtilityClass.randomInBetween(sx,rgt);
-            if (sx>=ex) continue;
-            
-            ey=bot-GenerateUtilityClass.randomInt(0,Math.trunc((bot-top)*0.25));
-            
-            this.drawStreakDirtSingle(sx,top,ex,ey,reduceStreak,density,dirtColorAvg);
-            
-            lft=sx;     // always make sure the newest streaks are smaller and within the first one
-            rgt=ex;
-        }
-    }
     
         //
         // gradients
@@ -2918,26 +2998,6 @@ export default class GenerateBitmapBaseClass
         }
 
         this.normalCTX.putImageData(normalImgData,lft,top);
-    }
-    
-        //
-        // wood utilities
-        //
-        
-    generateWoodDrawBoard(lft,top,rgt,bot,edgeSize,woodColor)
-    {
-        let col;
-        
-        col=this.darkenColor(woodColor,GenerateUtilityClass.randomFloat(0.8,0.2));
-        
-        this.draw3DRect(lft,top,rgt,bot,edgeSize,col,true);
-        if ((bot-top)>(rgt-lft)) {
-            this.drawColorStripeVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
-        }
-        else {
-            this.drawColorStripeHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
-        }
-        this.addNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
     }
     
         //

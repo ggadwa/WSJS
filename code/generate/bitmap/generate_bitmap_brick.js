@@ -22,7 +22,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
     generateBrick()
     {
         let n,rect,segments;
-        let drawBrickColor,f;
+        let drawBrickColor,streakColor,f;
         let lft,rgt,top,bot;
         let sx,ex,ey,streakWid,lineColor;
         
@@ -31,7 +31,6 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         
         let brickColor=this.getRandomColor();
         let groutColor=this.getRandomColorDull(0.3);
-        let dirtColor=this.darkenColor(brickColor,0.5);
         
         segments=this.createStackedSegments();
         
@@ -39,6 +38,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
         this.drawNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,0.8,0.9);
+        this.blur(this.colorCTX,0,0,this.colorCanvas.width,this.colorCanvas.height,3,true);
         
             // draw the bricks
 
@@ -54,41 +54,54 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             
             drawBrickColor=this.darkenColor(brickColor,f);
 
-            this.draw3DRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,drawBrickColor,true);
-            this.drawNoiseRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,0.6);
+            this.draw3DRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
+            this.drawNoiseRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
             
-                // any stains
-            
-            if (GenerateUtilityClass.randomPercentage(0.5)) {
-                streakWid=GenerateUtilityClass.randomInBetween(Math.trunc((rgt-lft)*0.6),Math.trunc((rgt-lft)*0.8));
-                if (streakWid>5) {
+                // any streaks/stains/cracks
+                // only on full blocks
+                
+            lft=rect.lft+edgeSize;
+            rgt=rect.rgt-(edgeSize+paddingSize);
+            top=rect.top+edgeSize;
+            bot=rect.bot-(edgeSize+paddingSize);
+                
+            if ((rect.lft>=0) && (rect.rgt<this.colorCanvas.width)) {
+                
+                    // streaks
+                    
+                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                    streakWid=GenerateUtilityClass.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
+                    if (streakWid<10) streakWid=10;
+
                     sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
                     ex=sx+streakWid;
-                    ey=GenerateUtilityClass.randomInt(Math.trunc(top+((bot-top)*0.5)),Math.trunc((bot-top)*0.5));
-                    this.drawStreakDirt(sx,top,ex,ey,5,2,0.8,dirtColor);
-                }
-            }
-            
-                // blur
-                
-            lft=(rect.lft<0)?0:(rect.lft+edgeSize);
-            rgt=(rect.rgt>=this.colorCanvas.width)?(rect.rgt-(this.colorCanvas.width-1)):(rect.rgt-(paddingSize+edgeSize));
-            top=rect.top+edgeSize;
-            bot=rect.bot-(paddingSize+edgeSize);
-            
-            this.blur(this.colorCTX,lft,top,rgt,bot,4,false);
-            
-                // add cracks (after any blurs)
-            
-            if ((rgt-lft)>(bot-top)) {
-                if (GenerateUtilityClass.randomPercentage(0.1)) {
-                    sx=GenerateUtilityClass.randomInBetween((lft+20),(rgt-20));
-                    ex=GenerateUtilityClass.randomInBetween((lft+20),(rgt-20));
+                    ey=GenerateUtilityClass.randomInBetween(bot,Math.trunc(bot*1.5));
 
-                    lineColor=this.darkenColor(drawBrickColor,0.9);
-                    this.drawRandomLine(sx,top,ex,bot,lft,top,rgt,bot,20,lineColor,true);
+                    streakColor=this.darkenColor(drawBrickColor,0.6);
+                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.5,streakColor);
+                }
+                
+                    // any cracks
+
+                if (GenerateUtilityClass.randomPercentage(0.1)) {
+                    if ((rgt-lft)>45) {
+                        sx=GenerateUtilityClass.randomInBetween((lft+15),(rgt-15));
+                        ex=sx+(GenerateUtilityClass.randomInt(5,25)-15);
+
+                        lineColor=this.darkenColor(drawBrickColor,0.7);
+                        this.drawVerticalCrack(sx,top,bot,lft,rgt,GenerateUtilityClass.randomSign(),10,lineColor,false,true);
+                    }
                 }
             }
+            
+                // blur everything
+                
+            lft=(rect.lft<0)?0:rect.lft;
+            rgt=(rect.rgt>=this.colorCanvas.width)?(this.colorCanvas.width-1):(rect.rgt-paddingSize);
+            top=rect.top;
+            bot=rect.bot-paddingSize;
+                
+            this.blur(this.colorCTX,lft,top,rgt,bot,GenerateUtilityClass.randomInt(1,2),true);
         }
         
             // finish with the specular
