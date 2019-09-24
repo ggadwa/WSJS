@@ -26,6 +26,12 @@ export default class GenerateBitmapRun
             case 2:
                 genBitmap=new GenerateBitmapWoodClass(core,false,false,false);
                 break;
+            case 3:
+                genBitmap=new GenerateBitmapBlockClass(core,false,false,false);
+                break;
+            case 4:
+                genBitmap=new GenerateBitmapMetalClass(core,false,false,false);
+                break;
         }
 
         return(genBitmap.generate());

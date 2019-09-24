@@ -286,7 +286,7 @@ export default class GenerateMapClass
         roomWallBitmap=GenerateBitmapRun.generateWall(this.core,0);
         hallWallBitmap=GenerateBitmapRun.generateWall(this.core,1);
         floorBitmap=GenerateBitmapRun.generateWall(this.core,2);
-        ceilingBitmap=this.createBitmapFromSettings(importSettings.autoGenerate.ceilingBitmap);
+        ceilingBitmap=GenerateBitmapRun.generateWall(this.core,4);
 
             // we always proceed in a path, so get
             // the deviation for the path

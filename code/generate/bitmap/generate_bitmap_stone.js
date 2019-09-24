@@ -102,37 +102,35 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
     
     generateStone()
     {
-        let n,rect;
+        let n,seg;
         let drawStoneColor,f,bumpCount;
         let paddingRight,paddingBottom;
         
         let stoneColor=this.getRandomColor();
+        let altStoneColor=this.getRandomColor();
         let groutColor=this.getRandomColorDull(0.3);
         
         let segments=this.createRandomSegments();
 
             // the grout is just a rough bumpy surface
 
-        bumpCount=GenerateUtilityClass.randomInt(300,100);
-        this.drawBumpySurface(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor,0.8,bumpCount,3);
+        bumpCount=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.6),Math.trunc(this.colorCanvas.width*0.2));
+        this.drawBumpySurface(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor,0.8,0.7,bumpCount,3);
         
             // draw the stones
 
         for (n=0;n!==segments.length;n++) {
-            rect=segments[n];
+            seg=segments[n];
 
-            f=1.0;
-            if ((rect.lft>=0) && (rect.top>=0) && (rect.rgt<=this.colorCanvas.width) && (rect.bot<=this.colorCanvas.height)) {        // don't darken stones that fall off edges
-                f=GenerateUtilityClass.random()+0.5;
-                if (f>1.0) f=1.0;
-            }
+            f=GenerateUtilityClass.random()+0.5;
+            if (f>1.0) f=1.0;
 
-            drawStoneColor=this.darkenColor(stoneColor,f);
+            drawStoneColor=this.darkenColor((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),f);
             
-            paddingRight=GenerateUtilityClass.randomInt(0,4);
-            paddingBottom=GenerateUtilityClass.randomInt(0,4);
+            paddingRight=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorCanvas.width*0.02));
+            paddingBottom=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorCanvas.width*0.02));
 
-            this.drawSingleStone(rect.lft,rect.top,(rect.rgt-paddingRight),(rect.bot-paddingBottom),drawStoneColor);
+            this.drawSingleStone(seg.lft,seg.top,(seg.rgt-paddingRight),(seg.bot-paddingBottom),drawStoneColor);
         }
 
             // finish with the specular

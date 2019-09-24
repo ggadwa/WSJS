@@ -5,6 +5,24 @@ import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
+// utility class for segment creation
+//
+
+class GeneratedSegmentClass
+{
+    constructor(lft,top,rgt,bot,isHalf,isSmall,isLarge)
+    {
+        this.lft=lft;
+        this.top=top;
+        this.rgt=rgt;
+        this.bot=bot;
+        this.isHalf=isHalf;
+        this.isSmall=isSmall;
+        this.isLarge=isLarge;
+    }
+}
+
+//
 // generate bitmap base class
 //
 
@@ -36,7 +54,7 @@ export default class GenerateBitmapBaseClass
         this.BITMAP_STACKED_X_EXTRA_COUNT=4;
         this.BITMAP_STACKED_Y_MIN_COUNT=4;
         this.BITMAP_STACKED_Y_EXTRA_COUNT=5;
-        this.BITMAP_STACKED_ODD_LINE_PERCENTAGE=0.1;
+        this.BITMAP_STACKED_ODD_LINE_PERCENTAGE=0.2;
 
         this.BITMAP_GRID_DIVISION=100;
         this.BITMAP_GRID_MIN_BLOCK_WIDTH=10;
@@ -145,13 +163,13 @@ export default class GenerateBitmapBaseClass
                 
             if (GenerateUtilityClass.randomPercentage(this.BITMAP_STACKED_ODD_LINE_PERCENTAGE)) {
                 if (GenerateUtilityClass.randomPercentage(0.5)) {
-                    segments.push(new RectClass(0,top,this.colorCanvas.width,(top+high)));
+                    segments.push(new GeneratedSegmentClass(0,top,(this.colorCanvas.width-1),(top+high),false,false,true));
                 }
                 else {
                     lft=0;
                     
                     for (x=0;x!==(xCount*2);x++) {
-                        segments.push(new RectClass(lft,top,(lft+halfWid),(top+high)));
+                        segments.push(new GeneratedSegmentClass(lft,top,(lft+halfWid),(top+high),false,true,false));
                         lft+=halfWid;
                     }
                 }
@@ -163,11 +181,11 @@ export default class GenerateBitmapBaseClass
                 lft=halfBrick?-halfWid:0;
 
                 for (x=0;x!==xCount;x++) {
-                    segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
+                    segments.push(new GeneratedSegmentClass(lft,top,(lft+wid),(top+high),(lft<0),false,false));
                     lft+=wid;
                 }
             
-                if (halfBrick) segments.push(new RectClass(lft,top,(lft+wid),(top+high)));
+                if (halfBrick) segments.push(new GeneratedSegmentClass(lft,top,(lft+wid),(top+high),true,false,false));
             }
             
             top+=high;
@@ -262,7 +280,7 @@ export default class GenerateBitmapBaseClass
             rgt=Math.trunc((x+wid)*(this.colorCanvas.width/this.BITMAP_GRID_DIVISION));
             bot=Math.trunc((y+high)*(this.colorCanvas.height/this.BITMAP_GRID_DIVISION));
 
-            segments.push(new RectClass(lft,top,rgt,bot));
+            segments.push(new GeneratedSegmentClass(lft,top,rgt,bot,false,false,false));
 
             for (y2=0;y2!==high;y2++) {
                 for (x2=0;x2!==wid;x2++) {
@@ -457,13 +475,13 @@ export default class GenerateBitmapBaseClass
         this.colorCTX.putImageData(bitmapImgData,lft,top);
     }
 
-    drawBumpySurface(lft,top,rgt,bot,color,colFactor,bumpCount,blurCount)
+    drawBumpySurface(lft,top,rgt,bot,color,colFactor,normalZFactor,bumpCount,blurCount)
     {
         let i,n,k,mx,my,px,py,wid,high,idx;
         let col,rad,fx,fy,fsz;
         let ringCount,pixelDensity;
         let darken,colMultFactor;
-        let bitmapImgData,bitmapData;
+        let bitmapImgData,bitmapData,origBitmapData;
         let normalImgData,normalData;
         let ringWid,ringWidSub,ringHigh,ringHighSub;
         let listIdx,angList,sizeList;
@@ -499,6 +517,7 @@ export default class GenerateBitmapBaseClass
 
         bitmapImgData=this.colorCTX.getImageData(lft,top,orgWid,orgHigh);
         bitmapData=bitmapImgData.data;
+        origBitmapData=new Uint8Array(bitmapData);
 
         normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
         normalData=normalImgData.data;
@@ -553,15 +572,15 @@ export default class GenerateBitmapBaseClass
 
                         // darken or lighten the pixels
                         
-                    col=(bitmapData[idx]/255.0)*colMultFactor;
+                    col=(origBitmapData[idx]/255.0)*colMultFactor;
                     if (col>1.0) col=1.0;
                     bitmapData[idx]=Math.trunc(col*255.0);
 
-                    col=(bitmapData[idx+1]/255.0)*colMultFactor;
+                    col=(origBitmapData[idx+1]/255.0)*colMultFactor;
                     if (col>1.0) col=1.0;
                     bitmapData[idx+1]=Math.trunc(col*255.0);
 
-                    col=(bitmapData[idx+2]/255.0)*colMultFactor;
+                    col=(origBitmapData[idx+2]/255.0)*colMultFactor;
                     if (col>1.0) col=1.0;
                     bitmapData[idx+2]=Math.trunc(col*255.0);
 
@@ -576,7 +595,7 @@ export default class GenerateBitmapBaseClass
                         normal.y=fx;
                     }
                     
-                    normal.z=0.5;
+                    normal.z=normalZFactor;
                     normal.normalize();
                     
                     normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
@@ -629,11 +648,6 @@ export default class GenerateBitmapBaseClass
         color.b=color.b+(midPoint-color.b)*dullFactor;
 
         return(color);
-    }
-    
-    getRandomDirtColor()
-    {
-        return(new ColorClass(GenerateUtilityClass.randomFloat(0.6,0.2),GenerateUtilityClass.randomFloat(0.3,0.2),0.0));
     }
 
         //
@@ -870,24 +884,24 @@ export default class GenerateBitmapBaseClass
     }
     
         //
-        // streaks
+        // metals
         //
-
-    drawStreakMetal(x,top,bot,streakWid,baseColor)
+        
+    drawMetalShineLine(x,top,bot,shineWid,baseColor)
     {
         let n,lx,rx,y,idx;
         let bitmapImgData,bitmapData;
         let density,densityReduce;
         
         if (top>=bot) return;
-        if (streakWid<=0) return;
+        if (shineWid<=0) return;
         
-            // since we draw the streaks from both sides,
+            // since we draw the shines from both sides,
             // we need to move the X into the middle and cut width in half
             
-        streakWid=Math.trunc(streakWid*0.5);
+        shineWid=Math.trunc(shineWid*0.5);
             
-        x+=streakWid;
+        x+=shineWid;
         
             // get the image data
 
@@ -898,11 +912,11 @@ export default class GenerateBitmapBaseClass
             // as we go across the width
             
         density=100;
-        densityReduce=Math.trunc(90/streakWid);
+        densityReduce=Math.trunc(90/shineWid);
         
             // write the streaks
             
-        for (n=0;n!==streakWid;n++) {
+        for (n=0;n!==shineWid;n++) {
             
             lx=x-n;
             rx=x+n;
@@ -937,6 +951,43 @@ export default class GenerateBitmapBaseClass
         this.colorCTX.putImageData(bitmapImgData,0,0);
     }
     
+    drawMetalShine(lft,top,rgt,bot,metalColor)
+    {
+        let x,shineWid,shineColor;
+        let wid=rgt-lft;
+        let lite=GenerateUtilityClass.randomPercentage(0.5); 
+        
+        x=lft;
+        
+        while (true) {
+            shineWid=GenerateUtilityClass.randomInt(Math.trunc(wid*0.035),Math.trunc(wid*0.1));
+            if ((x+shineWid)>rgt) shineWid=rgt-x;
+            
+                // small % are no streak
+                
+            if (GenerateUtilityClass.randomPercentage(0.9)) {
+                if (lite) {
+                    shineColor=this.lightenColor(metalColor,GenerateUtilityClass.randomFloat(0.05,0.1))
+                }
+                else {
+                    shineColor=this.darkenColor(metalColor,GenerateUtilityClass.randomFloat(0.5,0.5));
+                }
+                
+
+                this.drawMetalShineLine(x,top,bot,shineWid,shineColor);
+            }
+            
+            x+=(shineWid+GenerateUtilityClass.randomInt(Math.trunc(wid*0.03),Math.trunc(wid*0.05)));
+            if (x>=rgt) break;
+        }
+        
+        this.blur(this.colorCTX,lft,top,rgt,bot,(lite?2:1),true);
+    }
+    
+        //
+        // streaks
+        //
+        
     drawStreakDirtSingle(lft,top,rgt,bot,botClip,density,color)
     {
         let lx,rx,xAdd,x,y,idx;
@@ -1017,6 +1068,7 @@ export default class GenerateBitmapBaseClass
     drawStreakDirt(lft,top,rgt,bot,botClip,additionalStreakCount,density,color)
     {
         let n,sx,ex,ey;
+        let minWid;
         
             // original streak
             
@@ -1024,15 +1076,152 @@ export default class GenerateBitmapBaseClass
         
             // additional streaks
             
+        minWid=Math.trunc((rgt-lft)*0.1);
+        
         for (n=0;n!==additionalStreakCount;n++) {
-            sx=GenerateUtilityClass.randomInBetween(lft,rgt);
-            ex=GenerateUtilityClass.randomInBetween(sx,rgt);
+            sx=GenerateUtilityClass.randomInBetween(lft,(rgt-minWid));
+            ex=GenerateUtilityClass.randomInBetween((sx+minWid),rgt);
             if (sx>=ex) continue;
             
             ey=bot-GenerateUtilityClass.randomInt(0,Math.trunc((bot-top)*0.25));
             
             this.drawStreakDirtSingle(sx,top,ex,ey,botClip,density,color);
         }
+    }
+    
+        //
+        // color stripes and gradients
+        //
+        
+    drawColorStripeHorizontal(lft,top,rgt,bot,factor,baseColor)
+    {
+        let x,y,nx,nz,idx;
+        let color,redByte,greenByte,blueByte;
+        let colors=this.createRandomColorStripeArray(factor,baseColor);
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+
+        if ((wid<1) || (high<1)) return;
+
+            // chrome has a bizarre bug that will mix up
+            // two image datas of the same size, so we do these
+            // separately
+            
+        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
+
+        for (y=0;y!==high;y++) {
+
+            color=colors[y%100];
+            redByte=Math.trunc(color.r*255.0);
+            greenByte=Math.trunc(color.g*255.0);
+            blueByte=Math.trunc(color.b*255.0);
+
+            idx=(y*wid)*4;
+
+            for (x=0;x!==wid;x++) {
+                bitmapData[idx]=redByte;
+                bitmapData[idx+1]=greenByte;
+                bitmapData[idx+2]=blueByte;
+
+                idx+=4;
+            }
+        }
+
+        this.colorCTX.putImageData(bitmapImgData,lft,top);        
+
+            // the normal data
+            
+        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
+
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
+
+            // write the stripe
+
+        for (y=0;y!==high;y++) {
+
+            idx=(y*wid)*4;
+
+            for (x=0;x!==wid;x++) {
+                normalData[idx]=nx;
+                normalData[idx+1]=127.0;
+                normalData[idx+2]=nz;
+
+                idx+=4;
+            }
+
+            nx=-nx;
+        }
+
+        this.normalCTX.putImageData(normalImgData,lft,top);
+    }
+
+    drawColorStripeVertical(lft,top,rgt,bot,factor,baseColor)
+    {
+        let x,y,nx,nz,idx;
+        let color,redByte,greenByte,blueByte;
+        let colors=this.createRandomColorStripeArray(factor,baseColor);
+        let wid=rgt-lft;
+        let high=bot-top;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+
+        if ((wid<1) || (high<1)) return;
+        
+            // chrome has a bizarre bug that will mix up
+            // two image datas of the same size, so we do these
+            // separately
+
+        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
+        bitmapData=bitmapImgData.data;
+
+            // write the stripe
+
+        for (x=0;x!==wid;x++) {
+
+            color=colors[x%100];
+            redByte=Math.trunc(color.r*255.0);
+            greenByte=Math.trunc(color.g*255.0);
+            blueByte=Math.trunc(color.b*255.0);
+
+            for (y=0;y!==high;y++) {
+                idx=((y*wid)+x)*4;
+                bitmapData[idx]=redByte;
+                bitmapData[idx+1]=greenByte;
+                bitmapData[idx+2]=blueByte;
+            }
+        }
+
+            // write all the data back
+
+        this.colorCTX.putImageData(bitmapImgData,lft,top);
+        
+            // normal data
+            
+        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
+        normalData=normalImgData.data;
+
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
+
+            // write the stripe
+
+        for (x=0;x!==wid;x++) {
+            for (y=0;y!==high;y++) {
+                idx=((y*wid)+x)*4;
+                normalData[idx]=nx;
+                normalData[idx+1]=127.0;
+                normalData[idx+2]=nz;
+            }
+
+            nx=-nx;
+        }
+
+        this.normalCTX.putImageData(normalImgData,lft,top);
     }
 
         //
@@ -1093,7 +1282,20 @@ export default class GenerateBitmapBaseClass
     
     
     
+
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        
     
     
     
@@ -2810,136 +3012,6 @@ export default class GenerateBitmapBaseClass
         this.colorCTX.putImageData(bitmapImgData,lft,top);
     }
 
-    drawColorStripeHorizontal(lft,top,rgt,bot,factor,baseColor)
-    {
-        let x,y,nx,nz,idx;
-        let color,redByte,greenByte,blueByte;
-        let colors=this.createRandomColorStripeArray(factor,baseColor);
-        let wid=rgt-lft;
-        let high=bot-top;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
-
-        if ((wid<1) || (high<1)) return;
-
-            // chrome has a bizarre bug that will mix up
-            // two image datas of the same size, so we do these
-            // separately
-            
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-
-        for (y=0;y!==high;y++) {
-
-            color=colors[y%100];
-            redByte=Math.trunc(color.r*255.0);
-            greenByte=Math.trunc(color.g*255.0);
-            blueByte=Math.trunc(color.b*255.0);
-
-            idx=(y*wid)*4;
-
-            for (x=0;x!==wid;x++) {
-                bitmapData[idx]=redByte;
-                bitmapData[idx+1]=greenByte;
-                bitmapData[idx+2]=blueByte;
-
-                idx+=4;
-            }
-        }
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);        
-
-            // the normal data
-            
-        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
-
-            // write the stripe
-
-        for (y=0;y!==high;y++) {
-
-            idx=(y*wid)*4;
-
-            for (x=0;x!==wid;x++) {
-                normalData[idx]=nx;
-                normalData[idx+1]=127.0;
-                normalData[idx+2]=nz;
-
-                idx+=4;
-            }
-
-            nx=-nx;
-        }
-
-        this.normalCTX.putImageData(normalImgData,lft,top);
-    }
-
-    drawColorStripeVertical(lft,top,rgt,bot,factor,baseColor)
-    {
-        let x,y,nx,nz,idx;
-        let color,redByte,greenByte,blueByte;
-        let colors=this.createRandomColorStripeArray(factor,baseColor);
-        let wid=rgt-lft;
-        let high=bot-top;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
-
-        if ((wid<1) || (high<1)) return;
-        
-            // chrome has a bizarre bug that will mix up
-            // two image datas of the same size, so we do these
-            // separately
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-
-            // write the stripe
-
-        for (x=0;x!==wid;x++) {
-
-            color=colors[x%100];
-            redByte=Math.trunc(color.r*255.0);
-            greenByte=Math.trunc(color.g*255.0);
-            blueByte=Math.trunc(color.b*255.0);
-
-            for (y=0;y!==high;y++) {
-                idx=((y*wid)+x)*4;
-                bitmapData[idx]=redByte;
-                bitmapData[idx+1]=greenByte;
-                bitmapData[idx+2]=blueByte;
-            }
-        }
-
-            // write all the data back
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-        
-            // normal data
-            
-        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
-
-            // write the stripe
-
-        for (x=0;x!==wid;x++) {
-            for (y=0;y!==high;y++) {
-                idx=((y*wid)+x)*4;
-                normalData[idx]=nx;
-                normalData[idx+1]=127.0;
-                normalData[idx+2]=nz;
-            }
-
-            nx=-nx;
-        }
-
-        this.normalCTX.putImageData(normalImgData,lft,top);
-    }
 
     drawColorStripeSlant(lft,top,rgt,bot,factor,baseColor)
     {
@@ -3004,37 +3076,6 @@ export default class GenerateBitmapBaseClass
         // metal utilities
         //
     
-    generateMetalStreakShine(lft,top,rgt,bot,metalColor)
-    {
-        let x,streakWid,streakColor;
-        let lite=GenerateUtilityClass.randomPercentage(0.5); 
-        
-        x=lft;
-        
-        while (true) {
-            streakWid=GenerateUtilityClass.randomInt(20,50);
-            if ((x+streakWid)>rgt) streakWid=rgt-x;
-            
-                // small % are no streak
-                
-            if (GenerateUtilityClass.randomPercentage(0.9)) {
-                if (lite) {
-                    streakColor=this.lightenColor(metalColor,GenerateUtilityClass.randomFloat(0.05,0.1))
-                }
-                else {
-                    streakColor=this.darkenColor(metalColor,GenerateUtilityClass.randomFloat(0.5,0.5));
-                }
-                
-
-                this.drawStreakMetal(x,top,bot,streakWid,streakColor);
-            }
-            
-            x+=(streakWid+GenerateUtilityClass.randomInt(15,30));
-            if (x>=rgt) break;
-        }
-        
-        this.blur(lft,top,rgt,bot,(lite?2:1),true);
-    }
     
     generateMetalScrewsRandom(lft,top,rgt,bot,screwColor,screwSize,screwInnerSize)
     {

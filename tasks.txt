@@ -1,5 +1,11 @@
+- all bitmap hard coded need to be percentage, might need to try 1024x1024 textures?
 - room meshes need extra one floor length mesh on top of every story
-- room has moires
+- wood has moires
+- need to make statics for all generate_bitmap_base statics
+- delete all the old gen textures/etc
+
+- metal corrugation, better screws
+
 
 
 

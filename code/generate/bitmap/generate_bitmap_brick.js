@@ -21,15 +21,16 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 
     generateBrick()
     {
-        let n,rect,segments;
+        let n,seg,segments;
         let drawBrickColor,streakColor,f;
         let lft,rgt,top,bot;
         let sx,ex,ey,streakWid,lineColor;
         
-        let edgeSize=GenerateUtilityClass.randomInt(3,7);
-        let paddingSize=GenerateUtilityClass.randomInt(2,8);
+        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.01));
+        let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.01));
         
         let brickColor=this.getRandomColor();
+        let altBrickColor=this.getRandomColor();
         let groutColor=this.getRandomColorDull(0.3);
         
         segments=this.createStackedSegments();
@@ -43,29 +44,35 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             // draw the bricks
 
         for (n=0;n!==segments.length;n++) {
-            rect=segments[n];
+            seg=segments[n];
             
                 // the brick
                 
             f=1.0;
-            if (!((rect.lft<0) || (rect.rgt>this.colorCanvas.width))) {        // don't darken bricks that fall off edges
+            if (!((seg.lft<0) || (seg.rgt>this.colorCanvas.width))) {        // don't darken bricks that fall off edges
                 f=0.6+(GenerateUtilityClass.random()*0.4);
             }
             
-            drawBrickColor=this.darkenColor(brickColor,f);
-
-            this.draw3DRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
-            this.drawNoiseRect(rect.lft,rect.top,(rect.rgt-paddingSize),(rect.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
+            if (seg.isLarge) {
+                drawBrickColor=this.darkenColor(altBrickColor,f);
+                this.draw3DRect(-edgeSize,seg.top,(this.colorCanvas.width+edgeSize),(seg.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
+                this.drawNoiseRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
+            }
+            else {
+                drawBrickColor=this.darkenColor((seg.isSmall?altBrickColor:brickColor),f);
+                this.draw3DRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
+                this.drawNoiseRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
+            }
             
                 // any streaks/stains/cracks
-                // only on full blocks
+                // do not do on odd bricks
                 
-            lft=rect.lft+edgeSize;
-            rgt=rect.rgt-(edgeSize+paddingSize);
-            top=rect.top+edgeSize;
-            bot=rect.bot-(edgeSize+paddingSize);
+            lft=seg.lft+edgeSize;
+            rgt=seg.rgt-(edgeSize+paddingSize);
+            top=seg.top+edgeSize;
+            bot=seg.bot-(edgeSize+paddingSize);
                 
-            if ((rect.lft>=0) && (rect.rgt<this.colorCanvas.width)) {
+            if ((!seg.isHalf) && (!seg.isSmall) && (!seg.isLarge)) {
                 
                     // streaks
                     
@@ -96,10 +103,10 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             
                 // blur everything
                 
-            lft=(rect.lft<0)?0:rect.lft;
-            rgt=(rect.rgt>=this.colorCanvas.width)?(this.colorCanvas.width-1):(rect.rgt-paddingSize);
-            top=rect.top;
-            bot=rect.bot-paddingSize;
+            lft=(seg.lft<0)?0:seg.lft;
+            rgt=(seg.rgt>=this.colorCanvas.width)?(this.colorCanvas.width-1):(seg.rgt-paddingSize);
+            top=seg.top;
+            bot=seg.bot-paddingSize;
                 
             this.blur(this.colorCTX,lft,top,rgt,bot,GenerateUtilityClass.randomInt(1,2),true);
         }

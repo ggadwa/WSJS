@@ -20,18 +20,19 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
 
     generateBlock()
     {
-        let n,nBlock,flip;
+        let n,k,nBlock,col,flip;
         let top,bot,ySize,slopeHigh;
-        let sx,ex,streakWid;
+        let sx,ex,ey,streakCount,streakWid,streakColor;
         
         let concreteColor=this.getRandomColor();
-        let concreteColor2=this.darkenColor(concreteColor,0.8);
-        let dirtColor=this.darkenColor(concreteColor,0.5);
+        let concreteColor2=this.boostColor(concreteColor,0.1);
         
-            // block sizes
+            // block counts (always even)
             
-        nBlock=2+(GenerateUtilityClass.randomInt(0,2)*2);
-        ySize=this.colorCanvas.height/nBlock;
+        nBlock=2+(GenerateUtilityClass.randomInt(0,3)*2);
+        ySize=Math.trunc(this.colorCanvas.height/nBlock);
+        
+        slopeHigh=GenerateUtilityClass.randomInt(Math.trunc(ySize/10),Math.trunc(ySize/10));
         
             // the blocks
         
@@ -40,42 +41,41 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
         for (n=0;n!==nBlock;n++) {
             
             flip=((n%2)!==0);
-            bot=top+Math.trunc(ySize);
+            bot=(n===(nBlock-1))?this.colorCanvas.height:(top+ySize);
                
                // concrete background
                
-            this.drawRect(0,top,this.colorCanvas.width,bot,(flip?concreteColor:concreteColor2));
+            col=flip?concreteColor:concreteColor2;
+            this.drawBumpySurface(0,top,this.colorCanvas.width,bot,col,0.9,0.7,Math.trunc(this.colorCanvas.width*0.1),1);
             
                 // slopes
-            
-            slopeHigh=0;
+
             if (flip) {
-                slopeHigh=GenerateUtilityClass.randomInt(10,Math.trunc(ySize/6));
-                this.drawSlope(0,top,this.colorCanvas.width,(top+slopeHigh),concreteColor,true);
-                this.drawSlope(0,(bot-slopeHigh),this.colorCanvas.width,bot,concreteColor,false);
+                this.drawSlope(0,top,this.colorCanvas.width,(top+slopeHigh),col,true);
+                this.drawSlope(0,(bot-slopeHigh),this.colorCanvas.width,bot,col,false);
             }
             
-                // and random conrete noise
+                // noise and streaks
 
-            this.addNoiseRect(0,top,this.colorCanvas.width,bot,0.6,0.8,0.8);
-            this.blur(0,top,this.colorCanvas.width,bot,3,false);
-
-            this.addNoiseRect(0,top,this.colorCanvas.width,bot,0.8,0.9,0.7);
-            this.blur(0,top,this.colorCanvas.width,bot,3,false);
-
-                // final noise has the streak in it
-                
-            this.addNoiseRect(0,top,this.colorCanvas.width,bot,1.0,1.2,0.6);
+            this.drawNoiseRect(0,top,this.colorCanvas.width,bot,0.6,0.8,0.8);
             
-            streakWid=GenerateUtilityClass.randomInBetween(Math.trunc(this.colorCanvas.width/2),(this.colorCanvas.width-20));
-            sx=GenerateUtilityClass.randomInt(0,(this.colorCanvas.width-streakWid));
-            ex=sx+streakWid;
+            streakCount=GenerateUtilityClass.randomInt(0,5);
+            streakColor=this.darkenColor(col,0.6);
+            
+            for (k=0;k!==streakCount;k++) {
 
-            this.drawStreakDirt(sx,top,ex,(top+slopeHigh),0,4,0.8,dirtColor);    
-            this.drawStreakDirt(sx,(top+slopeHigh),ex,(bot-slopeHigh),5,8,0.8,dirtColor);
+                streakWid=GenerateUtilityClass.randomInBetween(Math.trunc(this.colorCanvas.width*0.2),Math.trunc(this.colorCanvas.width*0.3));
+                if (streakWid<10) streakWid=10;
 
-            this.blur(0,top,this.colorCanvas.width,bot,3,false);
-           
+                sx=GenerateUtilityClass.randomInt(0,(this.colorCanvas.width-streakWid));
+                ex=sx+streakWid;
+                ey=GenerateUtilityClass.randomInBetween(bot,Math.trunc((bot-top)*1.5));
+                
+                this.drawStreakDirt(sx,top,ex,ey,bot,5,0.5,streakColor);
+            }
+            
+            this.blur(this.colorCTX,0,top,this.colorCanvas.width,bot,2,false);
+
             top=bot;
         }
         
