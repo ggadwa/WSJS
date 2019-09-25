@@ -324,8 +324,6 @@ export default class GenerateMapClass
             // other rooms but to the opposite side of path
             // these are allowed to fail and are skipped if no space
             
-            console.info('path count='+rooms.length);
-
         for (n=0;n!=roomCount;n++) {
             room=rooms[n];
             if (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.sideRoomFactor)) {

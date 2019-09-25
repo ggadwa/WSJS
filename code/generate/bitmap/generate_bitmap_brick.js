@@ -36,10 +36,15 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         segments=this.createStackedSegments();
         
             // clear canvases
+            
+        //this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,brickColor);
+        //this.drawPerlinNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,16,16,0.7,0.3,true);
+        //this.createSpecularMap(0.4);
+        //return;
 
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
         this.drawNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,0.8,0.9);
-        this.blur(this.colorCTX,0,0,this.colorCanvas.width,this.colorCanvas.height,3,true);
+        this.blur(this.colorCTX,0,0,this.colorCanvas.width,this.colorCanvas.height,3,false);
         
             // draw the bricks
 
@@ -56,12 +61,16 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             if (seg.isLarge) {
                 drawBrickColor=this.darkenColor(altBrickColor,f);
                 this.draw3DRect(-edgeSize,seg.top,(this.colorCanvas.width+edgeSize),(seg.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
-                this.drawNoiseRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
+                
+                
+                //this.drawNoiseRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
+                this.drawPerlinNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)),16,16,0.7,0.3,true);
             }
             else {
                 drawBrickColor=this.darkenColor((seg.isSmall?altBrickColor:brickColor),f);
                 this.draw3DRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
-                this.drawNoiseRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
+                //this.drawNoiseRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
+                this.drawPerlinNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)),16,16,0.7,0.3,true);
             }
             
                 // any streaks/stains/cracks
@@ -108,7 +117,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             top=seg.top;
             bot=seg.bot-paddingSize;
                 
-            this.blur(this.colorCTX,lft,top,rgt,bot,GenerateUtilityClass.randomInt(1,2),true);
+            //this.blur(this.colorCTX,lft,top,rgt,bot,GenerateUtilityClass.randomInt(1,2),true);
         }
         
             // finish with the specular

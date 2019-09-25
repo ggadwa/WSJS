@@ -66,6 +66,11 @@ export default class GenerateUtilityClass
         return((GenerateUtilityClass.random()<0.5)?-1:1);
     }
     
+    static randomNegativeOneToOne()
+    {
+        return((this.random()*2.0)-1.0);
+    }
+    
         //
         // build UVs for vertex lists
         //

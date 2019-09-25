@@ -326,7 +326,7 @@ export default class GenerateBitmapBaseClass
     }
     
         //
-        // blurs, noise, and surfaces
+        // blurs
         //
 
     blur(ctx,lft,top,rgt,bot,blurCount,clamp)
@@ -422,6 +422,184 @@ export default class GenerateBitmapBaseClass
         
         ctx.putImageData(bitmapImgData,lft,top);
     }
+    
+        //
+        // noise
+        //
+    
+    createPerlinNoiseVectors(gridXSize,gridYSize)
+    {
+        let x,y,rowVectors,normal;
+        let vectors=[];
+        
+        for (y=0;y!==(gridYSize-1);y++) {
+            
+            rowVectors=[];
+            
+            for (x=0;x!==(gridXSize-1);x++) {
+                normal=new PointClass(GenerateUtilityClass.randomNegativeOneToOne(),GenerateUtilityClass.randomNegativeOneToOne(),0);
+                normal.normalize2D();
+                rowVectors.push(normal);
+            }
+            
+            rowVectors.push(rowVectors[0]);     // wrap around
+            
+            vectors.push(rowVectors);
+        }
+        
+        vectors.push(vectors[0]);           // wrap around
+        
+        return(vectors);
+    }
+    
+    getDotGridVector(vectors,gridX,gridY,gridWid,gridHigh,x,y)
+    {
+        let dx=(x-(gridX*gridWid))/gridWid;
+        let dy=(y-(gridY*gridHigh))/gridHigh;
+        
+        return((dx*vectors[gridY][gridX].x)+(dy*vectors[gridY][gridX].y));
+    }
+    
+    lerp(a,b,w)
+    {
+        let f=(Math.pow(w,2)*3)-(Math.pow(w,3)*2);
+        return(((1.0-f)*a)+(f*b));
+    }
+    
+    drawPerlinNoiseRect(lft,top,rgt,bot,gridXSize,gridYSize,colorClamp,normalZFactor,blurClamp)
+    {
+        let x,y,d00,d10,d11,d01,ix0,ix1,sx,sy,colFactor;
+        let gridWid,gridHigh,gridX0,gridX1,gridY0,gridY1,vectors;
+        let n0,n1,idx,k;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+        let gridDist;
+        let normal=new PointClass(0,0,0);
+        
+        if (lft<0) lft=0;
+        if (rgt>this.colorCanvas.width) rgt=this.colorCanvas.width;
+        if (top<0) top=0;
+        if (bot>this.colorCanvas.height) bot=this.colorCanvas.height;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+            // the grid size and vectors
+            
+        gridWid=Math.trunc(this.colorCanvas.width/gridXSize)+1;
+        gridHigh=Math.trunc(this.colorCanvas.height/gridYSize)+1;
+        vectors=this.createPerlinNoiseVectors(gridXSize,gridYSize);
+        
+        gridDist=Math.sqrt((gridWid*gridWid)+(gridHigh*gridHigh));
+
+        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        bitmapData=bitmapImgData.data;
+        
+        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        normalData=normalImgData.data;
+       
+        gridY0=0;
+        
+        for (y=top;y!==bot;y++) {
+            
+            gridY0=Math.trunc(y/gridHigh);
+            if (gridY0>=(gridYSize-1)) gridY0=gridYSize-2;
+            gridY1=gridY0+1;
+            
+            for (x=lft;x!==rgt;x++) {
+                idx=((y*this.colorCanvas.width)+x)*4;
+                
+                gridX0=Math.trunc(x/gridWid);
+                if (gridX0>=(gridXSize-1)) gridX0=gridXSize-2;
+                gridX1=gridX0+1;
+                
+                    // interpolate the grid normals and take
+                    // the dot product to get a -1->1 elevation
+                    
+                sx=(x-(gridX0*gridWid))/gridWid;
+                sy=(y-(gridY0*gridHigh))/gridHigh;
+                
+                n0=this.getDotGridVector(vectors,gridX0,gridY0,gridWid,gridHigh,x,y);
+                n1=this.getDotGridVector(vectors,gridX1,gridY0,gridWid,gridHigh,x,y);
+                ix0=this.lerp(n0,n1,sx);
+                
+                n0=this.getDotGridVector(vectors,gridX0,gridY1,gridWid,gridHigh,x,y);
+                n1=this.getDotGridVector(vectors,gridX1,gridY1,gridWid,gridHigh,x,y);
+                ix1=this.lerp(n0,n1,sx);
+                
+                    // turn this into a color factor for the base color
+                
+                colFactor=(this.lerp(ix0,ix1,sy)+1.0)*0.5;      // get it in 0..1
+                colFactor=colorClamp+(colFactor*(1.0-colorClamp));
+                if (colFactor>1.0) colFactor=1.0;
+                
+                bitmapData[idx]=bitmapData[idx]*colFactor;
+                bitmapData[idx+1]=bitmapData[idx+1]*colFactor;
+                bitmapData[idx+2]=bitmapData[idx+2]*colFactor;
+                
+                    // find a normal weighed between the grid points
+                    // we have to normalize later otherwise you get
+                    // squares lines
+                
+                sx=x-(gridX0*gridWid);
+                sy=y-(gridY0*gridHigh);
+                d00=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
+                
+                sx=(gridX1*gridWid)-x;
+                sy=y-(gridY0*gridHigh);
+                d01=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
+                
+                sx=(gridX1*gridWid)-x;
+                sy=(gridY1*gridHigh)-y;
+                d11=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
+                
+                sx=x-(gridX0*gridWid);
+                sy=(gridY1*gridHigh)-y;
+                d10=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
+                
+                k=Math.sqrt((d00*d00)+(d01*d01)+(d11*d11)+(d10*d10));
+                if (k!==0) {
+                    d00=d00/k;
+                    d01=d01/k;
+                    d11=d11/k;
+                    d10=d10/k;
+                }
+                
+                normal.x=(vectors[gridY0][gridX0].x*d00)+(vectors[gridY0][gridX1].x*d01)+(vectors[gridY1][gridX1].x*d11)+(vectors[gridY1][gridX0].x*d10);
+                normal.y=(vectors[gridY0][gridX0].y*d00)+(vectors[gridY0][gridX1].y*d01)+(vectors[gridY1][gridX1].y*d11)+(vectors[gridY1][gridX0].y*d10);
+                normal.normalize2D();
+                
+                normal.z=normalZFactor;
+                normal.normalize();
+                
+                    // and set it
+ 
+                normalData[idx]=(normal.x+1.0)*127.0;
+                normalData[idx+1]=(normal.y+1.0)*127.0;
+                normalData[idx+2]=(normal.z+1.0)*127.0;
+            }
+        }
+        
+        this.colorCTX.putImageData(bitmapImgData,0,0);
+        this.normalCTX.putImageData(normalImgData,0,0);
+        
+            // blur the color to stop edging problems
+            
+        this.blur(this.colorCTX,lft,top,rgt,bot,5,blurClamp);
+        
+            // need to blur the normals to eliminate the
+            // boxing that takes place when we figure out
+            // the normals
+            
+        this.blur(this.normalCTX,lft,top,rgt,bot,25,blurClamp);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     
     drawNoiseRect(lft,top,rgt,bot,minDarken,maxDarken,percentage)
     {    

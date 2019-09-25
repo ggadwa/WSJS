@@ -380,6 +380,15 @@ export default class PointClass
         this.z*=f;
     }
     
+    normalize2D()
+    {
+        let f=Math.sqrt((this.x*this.x)+(this.y*this.y));
+        if (f!==0.0) f=1.0/f;
+        
+        this.x*=f;
+        this.y*=f;
+    }
+    
     dot(pnt)
     {
         return((this.x*pnt.x)+(this.y*pnt.y)+(this.z*pnt.z));

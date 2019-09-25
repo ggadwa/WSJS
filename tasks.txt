@@ -3,10 +3,12 @@
 - wood has moires
 - need to make statics for all generate_bitmap_base statics
 - delete all the old gen textures/etc
-
 - metal corrugation, better screws
+- delete bumpy room thing
+- room uvs need to be better
 
 
+- perlin generator needs to build in the background so wrap arounds work, and then copy over
 
 
 - need textures to stamp better
