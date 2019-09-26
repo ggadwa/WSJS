@@ -22,29 +22,32 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
     generateBrick()
     {
         let n,seg,segments;
-        let drawBrickColor,streakColor,f;
+        let drawBrickColor,drawFrameColor,streakColor,f;
         let lft,rgt,top,bot;
         let sx,ex,ey,streakWid,lineColor;
         
-        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.01));
-        let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.01));
+        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
+        let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
         
         let brickColor=this.getRandomColor();
         let altBrickColor=this.getRandomColor();
         let groutColor=this.getRandomColorDull(0.3);
         
+            // create segments and noise data
+        
         segments=this.createStackedSegments();
+        this.createPerlinNoiseData(32,32,0.7);
         
             // clear canvases
             
         //this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,brickColor);
-        //this.drawPerlinNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,16,16,0.7,0.3,true);
+        //this.drawPerlinNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.3);
         //this.createSpecularMap(0.4);
         //return;
 
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
-        this.drawNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,0.8,0.9);
-        this.blur(this.colorCTX,0,0,this.colorCanvas.width,this.colorCanvas.height,3,false);
+        //this.drawNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,0.8,0.9);
+        //this.blur(this.colorCTX,0,0,this.colorCanvas.width,this.colorCanvas.height,3,false);
         
             // draw the bricks
 
@@ -60,22 +63,25 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             
             if (seg.isLarge) {
                 drawBrickColor=this.darkenColor(altBrickColor,f);
-                this.draw3DRect(-edgeSize,seg.top,(this.colorCanvas.width+edgeSize),(seg.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
-                
+                drawFrameColor=this.darkenColor(drawBrickColor,0.9);
+                this.drawRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),drawBrickColor);
+                this.draw3DFrameRect(-edgeSize,seg.top,(this.colorCanvas.width+edgeSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
                 
                 //this.drawNoiseRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
-                this.drawPerlinNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)),16,16,0.7,0.3,true);
+                this.drawPerlinNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)),0.3);
             }
             else {
                 drawBrickColor=this.darkenColor((seg.isSmall?altBrickColor:brickColor),f);
-                this.draw3DRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),edgeSize,0.9,drawBrickColor,true);
+                drawFrameColor=this.darkenColor(drawBrickColor,0.9);
+                this.drawRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),drawBrickColor);
+                this.draw3DFrameRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
                 //this.drawNoiseRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
-                this.drawPerlinNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)),16,16,0.7,0.3,true);
+                this.drawPerlinNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)),0.3);
             }
             
                 // any streaks/stains/cracks
                 // do not do on odd bricks
-                
+                /*
             lft=seg.lft+edgeSize;
             rgt=seg.rgt-(edgeSize+paddingSize);
             top=seg.top+edgeSize;
@@ -118,6 +124,8 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             bot=seg.bot-paddingSize;
                 
             //this.blur(this.colorCTX,lft,top,rgt,bot,GenerateUtilityClass.randomInt(1,2),true);
+                 * *
+                 */
         }
         
             // finish with the specular

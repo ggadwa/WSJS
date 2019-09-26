@@ -93,7 +93,12 @@ export default class GenerateBitmapBaseClass
         this.glowCanvas=null;
         this.glowCTX=null;
         
+            // masking and noise
+            
         this.mask=null;
+        
+        this.perlinNoiseColorFactor=null;
+        this.perlinNoiseNormals=null;
         
             // current clip rect
             
@@ -422,15 +427,135 @@ export default class GenerateBitmapBaseClass
         
         ctx.putImageData(bitmapImgData,lft,top);
     }
+    blur2(bitmapData,lft,top,rgt,bot,blurCount,clamp)
+    {
+        let n,idx;
+        let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
+        let r,g,b;
+        let wid=rgt-lft;
+        let high=bot-top;
+        let blurData;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+        blurData=new Uint8ClampedArray(bitmapData.length);
+        
+            // blur pixels to count
+
+        for (n=0;n!==blurCount;n++) {
+            
+            for (y=0;y!==high;y++) {
+
+                cys=y-1;
+                cye=y+2;
+
+                for (x=0;x!==wid;x++) {
+
+                        // get blur from 8 surrounding pixels
+
+                    r=g=b=0;
+
+                    cxs=x-1;
+                    cxe=x+2;
+
+                    for (cy=cys;cy!==cye;cy++) {
+                        
+                        dy=cy;
+                        if (!clamp) {
+                            if (dy<0) dy=high+dy;
+                            if (dy>=high) dy=dy-high;
+                        }
+                        else {
+                            if (dy<0) dy=0;
+                            if (dy>=high) dy=high-1;
+                        }
+                        
+                        for (cx=cxs;cx!==cxe;cx++) {
+                            if ((cy===y) && (cx===x)) continue;       // ignore self
+                            
+                            dx=cx;
+                            if (!clamp) {
+                                if (dx<0) dx=wid+dx;
+                                if (dx>=wid) dx=dx-wid;
+                            }
+                            else {
+                                if (dx<0) dx=0;
+                                if (dx>=wid) dx=wid-1;
+                            }
+                            
+                                // add up blur from the
+                                // original pixels
+
+                            idx=((dy*wid)+dx)*4;
+
+                            r+=bitmapData[idx];
+                            g+=bitmapData[idx+1];
+                            b+=bitmapData[idx+2];
+                        }
+                    }
+                    
+                    idx=((y*wid)+x)*4;
+
+                    blurData[idx]=Math.trunc(r*0.125);
+                    blurData[idx+1]=Math.trunc(g*0.125);
+                    blurData[idx+2]=Math.trunc(b*0.125);
+                }
+            }
+
+                // transfer over the changed pixels
+
+            for (y=0;y!==high;y++) {
+                idx=(y*wid)*4;
+                for (x=0;x!==wid;x++) {       
+                    bitmapData[idx]=blurData[idx];
+                    bitmapData[idx+1]=blurData[idx+1];
+                    bitmapData[idx+2]=blurData[idx+2];
+                    idx+=4;
+                }
+            }
+        } 
+    }
     
         //
         // noise
         //
     
-    createPerlinNoiseVectors(gridXSize,gridYSize)
+    getDotGridVector(vectors,gridX,gridY,gridWid,gridHigh,x,y)
     {
-        let x,y,rowVectors,normal;
-        let vectors=[];
+        let dx=(x-(gridX*gridWid))/gridWid;
+        let dy=(y-(gridY*gridHigh))/gridHigh;
+        
+        return((dx*vectors[gridY][gridX].x)+(dy*vectors[gridY][gridX].y));
+    }
+    
+    lerp(a,b,w)
+    {
+        let f=(Math.pow(w,2)*3)-(Math.pow(w,3)*2);
+        return(((1.0-f)*a)+(f*b));
+    }
+    
+    createPerlinNoiseData(gridXSize,gridYSize,normalZFactor)
+    {
+        let x,y,d00,d10,d11,d01,ix0,ix1,sx,sy;
+        let gridWid,gridHigh,gridX0,gridX1,gridY0,gridY1;
+        let vectors,rowVectors,normal;
+        let n0,n1,idx,k;
+        let gridDist;
+        
+            // noise data arrays
+            
+        this.perlinNoiseColorFactor=new Float32Array(this.colorCanvas.width*this.colorCanvas.height);
+        this.perlinNoiseNormals=new Uint8ClampedArray((this.colorCanvas.width*this.colorCanvas.height)*4);
+        
+            // the grid
+            
+        gridWid=Math.trunc(this.colorCanvas.width/gridXSize)+1;
+        gridHigh=Math.trunc(this.colorCanvas.height/gridYSize)+1;
+        gridDist=Math.sqrt((gridWid*gridWid)+(gridHigh*gridHigh));
+        
+            // generate the random grid vectors
+            
+        vectors=[];
         
         for (y=0;y!==(gridYSize-1);y++) {
             
@@ -448,64 +573,19 @@ export default class GenerateBitmapBaseClass
         }
         
         vectors.push(vectors[0]);           // wrap around
-        
-        return(vectors);
-    }
-    
-    getDotGridVector(vectors,gridX,gridY,gridWid,gridHigh,x,y)
-    {
-        let dx=(x-(gridX*gridWid))/gridWid;
-        let dy=(y-(gridY*gridHigh))/gridHigh;
-        
-        return((dx*vectors[gridY][gridX].x)+(dy*vectors[gridY][gridX].y));
-    }
-    
-    lerp(a,b,w)
-    {
-        let f=(Math.pow(w,2)*3)-(Math.pow(w,3)*2);
-        return(((1.0-f)*a)+(f*b));
-    }
-    
-    drawPerlinNoiseRect(lft,top,rgt,bot,gridXSize,gridYSize,colorClamp,normalZFactor,blurClamp)
-    {
-        let x,y,d00,d10,d11,d01,ix0,ix1,sx,sy,colFactor;
-        let gridWid,gridHigh,gridX0,gridX1,gridY0,gridY1,vectors;
-        let n0,n1,idx,k;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
-        let gridDist;
-        let normal=new PointClass(0,0,0);
-        
-        if (lft<0) lft=0;
-        if (rgt>this.colorCanvas.width) rgt=this.colorCanvas.width;
-        if (top<0) top=0;
-        if (bot>this.colorCanvas.height) bot=this.colorCanvas.height;
-        
-        if ((lft>=rgt) || (top>=bot)) return;
-        
-            // the grid size and vectors
-            
-        gridWid=Math.trunc(this.colorCanvas.width/gridXSize)+1;
-        gridHigh=Math.trunc(this.colorCanvas.height/gridYSize)+1;
-        vectors=this.createPerlinNoiseVectors(gridXSize,gridYSize);
-        
-        gridDist=Math.sqrt((gridWid*gridWid)+(gridHigh*gridHigh));
 
-        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        bitmapData=bitmapImgData.data;
-        
-        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        normalData=normalImgData.data;
-       
+            // create the noise arrays
+            
         gridY0=0;
+        normal=new PointClass(0,0,0);
         
-        for (y=top;y!==bot;y++) {
+        for (y=0;y!==this.colorCanvas.height;y++) {
             
             gridY0=Math.trunc(y/gridHigh);
             if (gridY0>=(gridYSize-1)) gridY0=gridYSize-2;
             gridY1=gridY0+1;
             
-            for (x=lft;x!==rgt;x++) {
+            for (x=0;x!==this.colorCanvas.width;x++) {
                 idx=((y*this.colorCanvas.width)+x)*4;
                 
                 gridX0=Math.trunc(x/gridWid);
@@ -528,14 +608,8 @@ export default class GenerateBitmapBaseClass
                 
                     // turn this into a color factor for the base color
                 
-                colFactor=(this.lerp(ix0,ix1,sy)+1.0)*0.5;      // get it in 0..1
-                colFactor=colorClamp+(colFactor*(1.0-colorClamp));
-                if (colFactor>1.0) colFactor=1.0;
-                
-                bitmapData[idx]=bitmapData[idx]*colFactor;
-                bitmapData[idx+1]=bitmapData[idx+1]*colFactor;
-                bitmapData[idx+2]=bitmapData[idx+2]*colFactor;
-                
+                this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]=(this.lerp(ix0,ix1,sy)+1.0)*0.5;      // get it in 0..1
+                    
                     // find a normal weighed between the grid points
                     // we have to normalize later otherwise you get
                     // squares lines
@@ -573,25 +647,66 @@ export default class GenerateBitmapBaseClass
                 
                     // and set it
  
-                normalData[idx]=(normal.x+1.0)*127.0;
-                normalData[idx+1]=(normal.y+1.0)*127.0;
-                normalData[idx+2]=(normal.z+1.0)*127.0;
+                this.perlinNoiseNormals[idx]=(normal.x+1.0)*127.0;
+                this.perlinNoiseNormals[idx+1]=(normal.y+1.0)*127.0;
+                this.perlinNoiseNormals[idx+2]=(normal.z+1.0)*127.0;
             }
         }
-        
-        this.colorCTX.putImageData(bitmapImgData,0,0);
-        this.normalCTX.putImageData(normalImgData,0,0);
-        
-            // blur the color to stop edging problems
-            
-        this.blur(this.colorCTX,lft,top,rgt,bot,5,blurClamp);
         
             // need to blur the normals to eliminate the
             // boxing that takes place when we figure out
             // the normals
             
-        this.blur(this.normalCTX,lft,top,rgt,bot,25,blurClamp);
+        this.blur2(this.perlinNoiseNormals,0,0,this.colorCanvas.width,this.colorCanvas.height,25,false);
     }
+    
+    drawPerlinNoiseRect(lft,top,rgt,bot,colorBoost)
+    {
+        let x,y,idx,colFactor;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+
+        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        bitmapData=bitmapImgData.data;
+        
+        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        normalData=normalImgData.data;
+       
+        for (y=top;y!==bot;y++) {
+            for (x=lft;x!==rgt;x++) {
+                
+                    // the perlin color factor (a single float)
+                    
+                idx=(y*this.colorCanvas.width)+x;
+                colFactor=this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]+colorBoost;
+                
+                idx*=4;
+                
+                    // now merge with bitmap color
+                    
+                bitmapData[idx]=bitmapData[idx]*colFactor;
+                bitmapData[idx+1]=bitmapData[idx+1]*colFactor;
+                bitmapData[idx+2]=bitmapData[idx+2]*colFactor;
+                
+                    // and set the normals
+                    
+                normalData[idx]=this.perlinNoiseNormals[idx];
+                normalData[idx+1]=this.perlinNoiseNormals[idx+1];
+                normalData[idx+2]=this.perlinNoiseNormals[idx+2];
+            }
+        }
+            
+        this.colorCTX.putImageData(bitmapImgData,0,0);
+        this.normalCTX.putImageData(normalImgData,0,0);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -653,6 +768,7 @@ export default class GenerateBitmapBaseClass
         this.colorCTX.putImageData(bitmapImgData,lft,top);
     }
 
+// supergumba -- delete
     drawBumpySurface(lft,top,rgt,bot,color,colFactor,normalZFactor,bumpCount,blurCount)
     {
         let i,n,k,mx,my,px,py,wid,high,idx;
@@ -832,86 +948,123 @@ export default class GenerateBitmapBaseClass
         // shape drawing
         //
 
-    draw3DRect(lft,top,rgt,bot,edgeSize,edgeDarken,color,faceOut)
+    drawRect(lft,top,rgt,bot,color)
     {
-        let n,lx,rx,ty,by;
-        let edgeColor;
+        let n,x,y,idx;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
         
         if ((lft>=rgt) || (top>=bot)) return;
+        
+        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        bitmapData=bitmapImgData.data;
+        
+        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        normalData=normalImgData.data;
 
             // draw the edges
 
-        lx=lft;
-        rx=rgt;
-        ty=top;
-        by=bot;
-        
-        edgeColor=this.darkenColor(color,edgeDarken);
+        for (y=top;y<=bot;y++) {
+            if ((y<0) || (y>=this.colorCanvas.height)) continue;
+            
+            for (x=lft;x<=rgt;x++) {
+                if ((x<0) || (x>=this.colorCanvas.width)) continue;
+                
+                idx=((y*this.colorCanvas.width)+x)*4;
+                
+                bitmapData[idx]=color.r*255.0;
+                bitmapData[idx+1]=color.g*255.0;
+                bitmapData[idx+2]=color.b*255.0;
 
-        for (n=0;n<=edgeSize;n++) {
-            this.colorCTX.strokeStyle=this.colorToRGBColor(edgeColor);
-
-                // the color
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,ty);
-            this.colorCTX.lineTo(lx,by);
-            this.colorCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(rx,ty);
-            this.colorCTX.lineTo(rx,by);
-            this.colorCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,ty);
-            this.colorCTX.lineTo(rx,ty);
-            this.colorCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,by);
-            this.colorCTX.lineTo(rx,by);
-            this.colorCTX.stroke();
-
-                // the normal
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_LEFT_45:this.NORMAL_RIGHT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,ty);
-            this.normalCTX.lineTo(lx,by);
-            this.normalCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_RIGHT_45:this.NORMAL_LEFT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(rx,ty);
-            this.normalCTX.lineTo(rx,by);
-            this.normalCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,ty);
-            this.normalCTX.lineTo(rx,ty);
-            this.normalCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(faceOut?this.NORMAL_BOTTOM_45:this.NORMAL_TOP_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,by);
-            this.normalCTX.lineTo(rx,by);
-            this.normalCTX.stroke();
-
-                // next edge
-
-            lx++;
-            rx--;
-            ty++;
-            by--;
+                normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
+                normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
+                normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+            }
         }
         
-            // draw the inner fill
+        this.colorCTX.putImageData(bitmapImgData,0,0);
+        this.normalCTX.putImageData(normalImgData,0,0);
+    }
+    
+    draw3DFrameRect(lft,top,rgt,bot,size,color,faceOut)
+    {
+        let n,x,y,idx;
+        let bitmapImgData,bitmapData;
+        let normalImgData,normalData;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        bitmapData=bitmapImgData.data;
+        
+        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        normalData=normalImgData.data;
 
-        this.drawRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color);
+            // draw the edges
 
-        this.clearNormalsRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize));
+        for (n=0;n<=size;n++) {
+            
+            for (x=lft;x<=rgt;x++) {
+                if ((x<0) || (x>=this.colorCanvas.width)) continue;
+                
+                if ((top>=0) && (top<this.colorCanvas.height)) {
+                    idx=((top*this.colorCanvas.width)+x)*4;
+                    bitmapData[idx]=color.r*255.0;
+                    bitmapData[idx+1]=color.g*255.0;
+                    bitmapData[idx+2]=color.b*255.0;
+
+                    normalData[idx]=((faceOut?this.NORMAL_TOP_45.x:this.NORMAL_BOTTOM_45.x)+1.0)*127.0;
+                    normalData[idx+1]=((faceOut?this.NORMAL_TOP_45.y:this.NORMAL_BOTTOM_45.y)+1.0)*127.0;
+                    normalData[idx+2]=((faceOut?this.NORMAL_TOP_45.z:this.NORMAL_BOTTOM_45.z)+1.0)*127.0;
+                }
+                
+                if ((bot>=0) && (bot<this.colorCanvas.height)) {
+                    idx=((bot*this.colorCanvas.width)+x)*4;
+                    bitmapData[idx]=color.r*255.0;
+                    bitmapData[idx+1]=color.g*255.0;
+                    bitmapData[idx+2]=color.b*255.0;
+
+                    normalData[idx]=((faceOut?this.NORMAL_BOTTOM_45.x:this.NORMAL_TOP_45.x)+1.0)*127.0;
+                    normalData[idx+1]=((faceOut?this.NORMAL_BOTTOM_45.y:this.NORMAL_TOP_45.y)+1.0)*127.0;
+                    normalData[idx+2]=((faceOut?this.NORMAL_BOTTOM_45.z:this.NORMAL_TOP_45.z)+1.0)*127.0;
+                }
+            }
+            
+            for (y=top;y<=bot;y++) {
+                if ((y<0) || (y>=this.colorCanvas.height)) continue;
+                
+                if ((lft>=0) && (lft<this.colorCanvas.width)) {
+                    idx=((y*this.colorCanvas.width)+lft)*4;
+                    bitmapData[idx]=color.r*255.0;
+                    bitmapData[idx+1]=color.g*255.0;
+                    bitmapData[idx+2]=color.b*255.0;
+
+                    normalData[idx]=((faceOut?this.NORMAL_LEFT_45.x:this.NORMAL_RIGHT_45.x)+1.0)*127.0;
+                    normalData[idx+1]=((faceOut?this.NORMAL_LEFT_45.y:this.NORMAL_RIGHT_45.y)+1.0)*127.0;
+                    normalData[idx+2]=((faceOut?this.NORMAL_LEFT_45.z:this.NORMAL_RIGHT_45.z)+1.0)*127.0;
+                }
+                
+                if ((rgt>=0) && (rgt<this.colorCanvas.width)) {
+                    idx=((y*this.colorCanvas.width)+rgt)*4;
+                    bitmapData[idx]=color.r*255.0;
+                    bitmapData[idx+1]=color.g*255.0;
+                    bitmapData[idx+2]=color.b*255.0;
+
+                    normalData[idx]=((faceOut?this.NORMAL_RIGHT_45.x:this.NORMAL_LEFT_45.x)+1.0)*127.0;
+                    normalData[idx+1]=((faceOut?this.NORMAL_RIGHT_45.y:this.NORMAL_LEFT_45.y)+1.0)*127.0;
+                    normalData[idx+2]=((faceOut?this.NORMAL_RIGHT_45.z:this.NORMAL_LEFT_45.z)+1.0)*127.0;
+                }
+            }
+                // next edge
+
+            lft++;
+            rgt--;
+            top++;
+            bot--;
+        }
+        
+        this.colorCTX.putImageData(bitmapImgData,0,0);
+        this.normalCTX.putImageData(normalImgData,0,0);
     }
         
     drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,flipNormals,addToMask,noisePercentage,noiseMinDarken,noiseDarkenDif)
