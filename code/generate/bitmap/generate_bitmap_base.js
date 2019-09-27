@@ -86,12 +86,19 @@ export default class GenerateBitmapBaseClass
             
         this.colorCanvas=null;
         this.colorCTX=null;
+        this.colorImgData=null;
+        
         this.normalCanvas=null;
         this.normalCTX=null;
+        this.normalImgData=null;
+        
         this.specularCanvas=null;
         this.specularCTX=null;
+        this.specularImgData=null;
+        
         this.glowCanvas=null;
         this.glowCTX=null;
+        this.glowImgData=null;
         
             // masking and noise
             
@@ -173,9 +180,10 @@ export default class GenerateBitmapBaseClass
                 else {
                     lft=0;
                     
-                    for (x=0;x!==(xCount*2);x++) {
+                    for (x=0;x!==xCount;x++) {
                         segments.push(new GeneratedSegmentClass(lft,top,(lft+halfWid),(top+high),false,true,false));
-                        lft+=halfWid;
+                        segments.push(new GeneratedSegmentClass((lft+halfWid),top,((x===(xCount-1))?(this.colorCanvas.width-1):(lft+wid)),(top+high),false,true,false));
+                        lft+=wid;
                     }
                 }
             }
@@ -183,14 +191,22 @@ export default class GenerateBitmapBaseClass
                 // regular lines
                 
             else {
-                lft=halfBrick?-halfWid:0;
+                if (halfBrick) {
+                    lft=-halfWid;
 
-                for (x=0;x!==xCount;x++) {
-                    segments.push(new GeneratedSegmentClass(lft,top,(lft+wid),(top+high),(lft<0),false,false));
-                    lft+=wid;
+                    for (x=0;x!==(xCount+1);x++) {
+                        segments.push(new GeneratedSegmentClass(lft,top,(lft+wid),(top+high),((x===0)||(x===xCount)),false,false));
+                        lft+=wid;
+                    }
                 }
-            
-                if (halfBrick) segments.push(new GeneratedSegmentClass(lft,top,(lft+wid),(top+high),true,false,false));
+                else {
+                   lft=0;
+
+                    for (x=0;x!==xCount;x++) {
+                        segments.push(new GeneratedSegmentClass(lft,top,((x===(xCount-1))?(this.colorCanvas.width-1):(lft+wid)),(top+high),(lft<0),false,false));
+                        lft+=wid;
+                    }
+                }
             }
             
             top+=high;
@@ -296,6 +312,35 @@ export default class GenerateBitmapBaseClass
 
         return(segments);
     }
+    
+        //
+        // colors
+        //
+        
+    getRandomColor()
+    {
+        let col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
+        let darken=0.1-(GenerateUtilityClass.random()*0.2);
+        
+        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+    }
+    
+    getRandomColorDull(dullFactor)
+    {
+        let color=this.getRandomColor();
+        
+            // find the midpoint
+            
+        let midPoint=(color.r+color.g+color.b)/3.0;
+        
+            // move towards it
+            
+        color.r=color.r+(midPoint-color.r)*dullFactor;
+        color.g=color.g+(midPoint-color.g)*dullFactor;
+        color.b=color.b+(midPoint-color.b)*dullFactor;
+
+        return(color);
+    }
 
         //
         // masking
@@ -331,103 +376,10 @@ export default class GenerateBitmapBaseClass
     }
     
         //
-        // blurs
+        // blur
         //
 
-    blur(ctx,lft,top,rgt,bot,blurCount,clamp)
-    {
-        let n,idx;
-        let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
-        let r,g,b;
-        let wid=rgt-lft;
-        let high=bot-top;
-        let bitmapImgData,bitmapData,blurData;
-        
-        if ((lft>=rgt) || (top>=bot)) return;
-        
-        bitmapImgData=ctx.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-        
-        blurData=new Uint8ClampedArray(bitmapData.length);
-        
-            // blur pixels to count
-
-        for (n=0;n!==blurCount;n++) {
-            
-            for (y=0;y!==high;y++) {
-
-                cys=y-1;
-                cye=y+2;
-
-                for (x=0;x!==wid;x++) {
-
-                        // get blur from 8 surrounding pixels
-
-                    r=g=b=0;
-
-                    cxs=x-1;
-                    cxe=x+2;
-
-                    for (cy=cys;cy!==cye;cy++) {
-                        
-                        dy=cy;
-                        if (!clamp) {
-                            if (dy<0) dy=high+dy;
-                            if (dy>=high) dy=dy-high;
-                        }
-                        else {
-                            if (dy<0) dy=0;
-                            if (dy>=high) dy=high-1;
-                        }
-                        
-                        for (cx=cxs;cx!==cxe;cx++) {
-                            if ((cy===y) && (cx===x)) continue;       // ignore self
-                            
-                            dx=cx;
-                            if (!clamp) {
-                                if (dx<0) dx=wid+dx;
-                                if (dx>=wid) dx=dx-wid;
-                            }
-                            else {
-                                if (dx<0) dx=0;
-                                if (dx>=wid) dx=wid-1;
-                            }
-                            
-                                // add up blur from the
-                                // original pixels
-
-                            idx=((dy*wid)+dx)*4;
-
-                            r+=bitmapData[idx];
-                            g+=bitmapData[idx+1];
-                            b+=bitmapData[idx+2];
-                        }
-                    }
-                    
-                    idx=((y*wid)+x)*4;
-
-                    blurData[idx]=Math.trunc(r*0.125);
-                    blurData[idx+1]=Math.trunc(g*0.125);
-                    blurData[idx+2]=Math.trunc(b*0.125);
-                }
-            }
-
-                // transfer over the changed pixels
-
-            for (y=0;y!==high;y++) {
-                idx=(y*wid)*4;
-                for (x=0;x!==wid;x++) {       
-                    bitmapData[idx]=blurData[idx];
-                    bitmapData[idx+1]=blurData[idx+1];
-                    bitmapData[idx+2]=blurData[idx+2];
-                    idx+=4;
-                }
-            }
-        } 
-        
-        ctx.putImageData(bitmapImgData,lft,top);
-    }
-    blur2(bitmapData,lft,top,rgt,bot,blurCount,clamp)
+    blur(data,lft,top,rgt,bot,blurCount,clamp)
     {
         let n,idx;
         let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
@@ -438,7 +390,7 @@ export default class GenerateBitmapBaseClass
         
         if ((lft>=rgt) || (top>=bot)) return;
         
-        blurData=new Uint8ClampedArray(bitmapData.length);
+        blurData=new Uint8ClampedArray(data.length);
         
             // blur pixels to count
 
@@ -488,9 +440,9 @@ export default class GenerateBitmapBaseClass
 
                             idx=((dy*wid)+dx)*4;
 
-                            r+=bitmapData[idx];
-                            g+=bitmapData[idx+1];
-                            b+=bitmapData[idx+2];
+                            r+=data[idx];
+                            g+=data[idx+1];
+                            b+=data[idx+2];
                         }
                     }
                     
@@ -507,9 +459,9 @@ export default class GenerateBitmapBaseClass
             for (y=0;y!==high;y++) {
                 idx=(y*wid)*4;
                 for (x=0;x!==wid;x++) {       
-                    bitmapData[idx]=blurData[idx];
-                    bitmapData[idx+1]=blurData[idx+1];
-                    bitmapData[idx+2]=blurData[idx+2];
+                    data[idx]=blurData[idx];
+                    data[idx+1]=blurData[idx+1];
+                    data[idx+2]=blurData[idx+2];
                     idx+=4;
                 }
             }
@@ -657,20 +609,15 @@ export default class GenerateBitmapBaseClass
             // boxing that takes place when we figure out
             // the normals
             
-        this.blur2(this.perlinNoiseNormals,0,0,this.colorCanvas.width,this.colorCanvas.height,25,false);
+        this.blur(this.perlinNoiseNormals,0,0,this.colorCanvas.width,this.colorCanvas.height,25,false);
     }
     
-    drawPerlinNoiseRect(lft,top,rgt,bot,colorBoost)
+    drawPerlinNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax)
     {
         let x,y,idx,colFactor;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
-
-        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        bitmapData=bitmapImgData.data;
-        
-        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        normalData=normalImgData.data;
+        let colorFactorAdd=colorFactorMax-colorFactorMin;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
        
         for (y=top;y!==bot;y++) {
             for (x=lft;x!==rgt;x++) {
@@ -678,15 +625,15 @@ export default class GenerateBitmapBaseClass
                     // the perlin color factor (a single float)
                     
                 idx=(y*this.colorCanvas.width)+x;
-                colFactor=this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]+colorBoost;
+                colFactor=colorFactorMin+(colorFactorAdd*this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]);
                 
                 idx*=4;
                 
                     // now merge with bitmap color
                     
-                bitmapData[idx]=bitmapData[idx]*colFactor;
-                bitmapData[idx+1]=bitmapData[idx+1]*colFactor;
-                bitmapData[idx+2]=bitmapData[idx+2]*colFactor;
+                colorData[idx]=colorData[idx]*colFactor;
+                colorData[idx+1]=colorData[idx+1]*colFactor;
+                colorData[idx+2]=colorData[idx+2]*colFactor;
                 
                     // and set the normals
                     
@@ -695,253 +642,30 @@ export default class GenerateBitmapBaseClass
                 normalData[idx+2]=this.perlinNoiseNormals[idx+2];
             }
         }
-            
-        this.colorCTX.putImageData(bitmapImgData,0,0);
-        this.normalCTX.putImageData(normalImgData,0,0);
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    drawNoiseRect(lft,top,rgt,bot,minDarken,maxDarken,percentage)
-    {    
-        let n,nPixel,idx;
-        let col,fct;
-        let wid=rgt-lft;
-        let high=bot-top;    
-        let darkenDif=maxDarken-minDarken;
-        let bitmapImgData,bitmapData;
-
-            // get the image data to add noise to
-        
-        if ((lft>=rgt) || (top>=bot)) return;
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-
-            // get the image data to add noise to
-
-        idx=0;
-        nPixel=wid*high;
-
-        for (n=0;n!==nPixel;n++) {
-
-            if (GenerateUtilityClass.randomPercentage(percentage)) {
-
-                    // the bitmap noise
-
-                fct=minDarken+(darkenDif*GenerateUtilityClass.random());
-
-                    // darken the pixel
-
-                col=(bitmapData[idx]/255.0)*fct;
-                if (col>1.0) col=1.0;
-                bitmapData[idx]=Math.trunc(col*255.0);
-
-                col=(bitmapData[idx+1]/255.0)*fct;
-                if (col>1.0) col=1.0;
-                bitmapData[idx+1]=Math.trunc(col*255.0);
-
-                col=(bitmapData[idx+2]/255.0)*fct;
-                if (col>1.0) col=1.0;
-                bitmapData[idx+2]=Math.trunc(col*255.0);
-            }
-
-                // next pixel
-
-            idx+=4;
-        }
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-    }
-
-// supergumba -- delete
-    drawBumpySurface(lft,top,rgt,bot,color,colFactor,normalZFactor,bumpCount,blurCount)
+    drawStaticNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax,blurCount,blurClamp)
     {
-        let i,n,k,mx,my,px,py,wid,high,idx;
-        let col,rad,fx,fy,fsz;
-        let ringCount,pixelDensity;
-        let darken,colMultFactor;
-        let bitmapImgData,bitmapData,origBitmapData;
-        let normalImgData,normalData;
-        let ringWid,ringWidSub,ringHigh,ringHighSub;
-        let listIdx,angList,sizeList;
-        let orgWid=rgt-lft;
-        let orgHigh=bot-top;
-        let normal=new PointClass(0,0,0);
-        
-        if ((lft>=rgt) || (top>=bot)) return;
-        
-            // start with background color
-            
-        this.drawRect(lft,top,rgt,bot,color);
-        
-            // build data for single bump
-            
-        ringCount=Math.trunc(orgWid*0.05);
-        pixelDensity=Math.trunc(orgWid*0.1);
-            
-        angList=new Float32Array(ringCount*pixelDensity);
-        sizeList=new Float32Array(ringCount*pixelDensity);
-        
-        listIdx=0;
-        
-        for (n=0;n!==ringCount;n++) {
-            for (k=0;k!==pixelDensity;k++) {
-                angList[listIdx]=(Math.PI*2.0)*GenerateUtilityClass.random();
-                sizeList[listIdx]=GenerateUtilityClass.random();
-                listIdx++;
-            }
-        }
+        let x,y,idx,colFactor;
+        let colorFactorAdd=colorFactorMax-colorFactorMin;
+        let colorData=this.colorImgData.data;
 
-            // create random bumps
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,orgWid,orgHigh);
-        bitmapData=bitmapImgData.data;
-        origBitmapData=new Uint8Array(bitmapData);
-
-        normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
-        normalData=normalImgData.data;
-        
-        for (i=0;i!==bumpCount;i++) {
-            
-            wid=GenerateUtilityClass.randomInt(Math.trunc(orgWid*0.07),Math.trunc(orgWid*0.07));
-            high=GenerateUtilityClass.randomInt(Math.trunc(orgHigh*0.07),Math.trunc(orgHigh*0.07));
-            
-            mx=GenerateUtilityClass.randomInt(0,orgWid);
-            my=GenerateUtilityClass.randomInt(0,orgHigh);       // these can (and should) wrap around
-
-                // create the rings of particles
-
-            ringWid=wid;
-            ringWidSub=Math.trunc(wid/(ringCount+1));
-
-            ringHigh=high;
-            ringHighSub=Math.trunc(high/(ringCount+1));
-            
-            darken=GenerateUtilityClass.randomPercentage(0.5);
-            colMultFactor=(darken?colFactor:(colFactor*0.9));
-
-            listIdx=0;
-
-            for (n=0;n!==ringCount;n++) {
-
-                    // the density of each ring
-
-                for (k=0;k!==pixelDensity;k++) {
-
-                        // get a random pixel
-
-                    rad=angList[listIdx];
-                    fx=Math.sin(rad);
-                    fy=Math.cos(rad);
-
-                    fsz=sizeList[listIdx];
-                    px=mx+Math.trunc((fsz*ringWid)*fx);
-                    py=my-Math.trunc((fsz*ringHigh)*fy);
-
-                    listIdx++;
-
-                        // this can wrap
-
-                    if (px<0) px+=orgWid;
-                    if (px>=orgWid) px-=orgWid;
-                    if (py<0) py+=orgHigh;
-                    if (py>=orgHigh) py-=orgHigh;
+        for (y=top;y!==bot;y++) {
+            for (x=lft;x!==rgt;x++) {
+                
+                    // the static random color factor
                     
-                    idx=((py*orgWid)+px)*4;
+                colFactor=colorFactorMin+(colorFactorAdd*GenerateUtilityClass.random());
 
-                        // darken or lighten the pixels
-                        
-                    col=(origBitmapData[idx]/255.0)*colMultFactor;
-                    if (col>1.0) col=1.0;
-                    bitmapData[idx]=Math.trunc(col*255.0);
-
-                    col=(origBitmapData[idx+1]/255.0)*colMultFactor;
-                    if (col>1.0) col=1.0;
-                    bitmapData[idx+1]=Math.trunc(col*255.0);
-
-                    col=(origBitmapData[idx+2]/255.0)*colMultFactor;
-                    if (col>1.0) col=1.0;
-                    bitmapData[idx+2]=Math.trunc(col*255.0);
-
-                        // the normals
-
-                    if (darken) {
-                        normal.x=fx;
-                        normal.y=fy;
-                    }
-                    else {
-                        normal.x=fy;
-                        normal.y=fx;
-                    }
-                    
-                    normal.z=normalZFactor;
-                    normal.normalize();
-                    
-                    normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
-                    normalData[idx+1]=(normal.y+1.0)*127.0;
-                    normalData[idx+2]=(normal.z+1.0)*127.0;
-                }
-
-                    // next ring
-
-                ringWid-=ringWidSub;
-                ringHigh-=ringHighSub;
-            }
+                idx=((y*this.colorCanvas.width)+x)*4;
+                
+                colorData[idx]=colorData[idx]*colFactor;
+                colorData[idx+1]=colorData[idx+1]*colFactor;
+                colorData[idx+2]=colorData[idx+2]*colFactor;
+             }
         }
         
-            // write all the data back
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-        this.normalCTX.putImageData(normalImgData,lft,top);
-        
-            // now blur the color
-
-        this.blur(this.colorCTX,lft,top,rgt,bot,blurCount,false);
-        this.blur(this.normalCTX,lft,top,rgt,bot,2,false);
-    }
-    
-        //
-        // colors
-        //
-        
-    getRandomColor()
-    {
-        let col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
-        let darken=0.1-(GenerateUtilityClass.random()*0.2);
-        
-        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
-    }
-    
-    getRandomColorDull(dullFactor)
-    {
-        let color=this.getRandomColor();
-        
-            // find the midpoint
-            
-        let midPoint=(color.r+color.g+color.b)/3.0;
-        
-            // move towards it
-            
-        color.r=color.r+(midPoint-color.r)*dullFactor;
-        color.g=color.g+(midPoint-color.g)*dullFactor;
-        color.b=color.b+(midPoint-color.b)*dullFactor;
-
-        return(color);
+        this.blur(colorData,0,0,this.colorImgData.width,this.colorImgData.height,blurCount,blurClamp);
     }
 
         //
@@ -950,56 +674,41 @@ export default class GenerateBitmapBaseClass
 
     drawRect(lft,top,rgt,bot,color)
     {
-        let n,x,y,idx;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
+        let x,y,idx;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
         
         if ((lft>=rgt) || (top>=bot)) return;
-        
-        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        bitmapData=bitmapImgData.data;
-        
-        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        normalData=normalImgData.data;
 
             // draw the edges
 
         for (y=top;y<=bot;y++) {
-            if ((y<0) || (y>=this.colorCanvas.height)) continue;
+            if ((y<0) || (y>=this.colorImgData.height)) continue;
             
             for (x=lft;x<=rgt;x++) {
-                if ((x<0) || (x>=this.colorCanvas.width)) continue;
+                if ((x<0) || (x>=this.colorImgData.width)) continue;
                 
-                idx=((y*this.colorCanvas.width)+x)*4;
+                idx=((y*this.colorImgData.width)+x)*4;
                 
-                bitmapData[idx]=color.r*255.0;
-                bitmapData[idx+1]=color.g*255.0;
-                bitmapData[idx+2]=color.b*255.0;
+                colorData[idx]=color.r*255.0;
+                colorData[idx+1]=color.g*255.0;
+                colorData[idx+2]=color.b*255.0;
 
                 normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
                 normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
                 normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
             }
         }
-        
-        this.colorCTX.putImageData(bitmapImgData,0,0);
-        this.normalCTX.putImageData(normalImgData,0,0);
     }
     
     draw3DFrameRect(lft,top,rgt,bot,size,color,faceOut)
     {
         let n,x,y,idx;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
-        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        bitmapData=bitmapImgData.data;
-        
-        normalImgData=this.normalCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        normalData=normalImgData.data;
-
             // draw the edges
 
         for (n=0;n<=size;n++) {
@@ -1009,9 +718,9 @@ export default class GenerateBitmapBaseClass
                 
                 if ((top>=0) && (top<this.colorCanvas.height)) {
                     idx=((top*this.colorCanvas.width)+x)*4;
-                    bitmapData[idx]=color.r*255.0;
-                    bitmapData[idx+1]=color.g*255.0;
-                    bitmapData[idx+2]=color.b*255.0;
+                    colorData[idx]=color.r*255.0;
+                    colorData[idx+1]=color.g*255.0;
+                    colorData[idx+2]=color.b*255.0;
 
                     normalData[idx]=((faceOut?this.NORMAL_TOP_45.x:this.NORMAL_BOTTOM_45.x)+1.0)*127.0;
                     normalData[idx+1]=((faceOut?this.NORMAL_TOP_45.y:this.NORMAL_BOTTOM_45.y)+1.0)*127.0;
@@ -1020,9 +729,9 @@ export default class GenerateBitmapBaseClass
                 
                 if ((bot>=0) && (bot<this.colorCanvas.height)) {
                     idx=((bot*this.colorCanvas.width)+x)*4;
-                    bitmapData[idx]=color.r*255.0;
-                    bitmapData[idx+1]=color.g*255.0;
-                    bitmapData[idx+2]=color.b*255.0;
+                    colorData[idx]=color.r*255.0;
+                    colorData[idx+1]=color.g*255.0;
+                    colorData[idx+2]=color.b*255.0;
 
                     normalData[idx]=((faceOut?this.NORMAL_BOTTOM_45.x:this.NORMAL_TOP_45.x)+1.0)*127.0;
                     normalData[idx+1]=((faceOut?this.NORMAL_BOTTOM_45.y:this.NORMAL_TOP_45.y)+1.0)*127.0;
@@ -1035,9 +744,9 @@ export default class GenerateBitmapBaseClass
                 
                 if ((lft>=0) && (lft<this.colorCanvas.width)) {
                     idx=((y*this.colorCanvas.width)+lft)*4;
-                    bitmapData[idx]=color.r*255.0;
-                    bitmapData[idx+1]=color.g*255.0;
-                    bitmapData[idx+2]=color.b*255.0;
+                    colorData[idx]=color.r*255.0;
+                    colorData[idx+1]=color.g*255.0;
+                    colorData[idx+2]=color.b*255.0;
 
                     normalData[idx]=((faceOut?this.NORMAL_LEFT_45.x:this.NORMAL_RIGHT_45.x)+1.0)*127.0;
                     normalData[idx+1]=((faceOut?this.NORMAL_LEFT_45.y:this.NORMAL_RIGHT_45.y)+1.0)*127.0;
@@ -1046,9 +755,9 @@ export default class GenerateBitmapBaseClass
                 
                 if ((rgt>=0) && (rgt<this.colorCanvas.width)) {
                     idx=((y*this.colorCanvas.width)+rgt)*4;
-                    bitmapData[idx]=color.r*255.0;
-                    bitmapData[idx+1]=color.g*255.0;
-                    bitmapData[idx+2]=color.b*255.0;
+                    colorData[idx]=color.r*255.0;
+                    colorData[idx+1]=color.g*255.0;
+                    colorData[idx+2]=color.b*255.0;
 
                     normalData[idx]=((faceOut?this.NORMAL_RIGHT_45.x:this.NORMAL_LEFT_45.x)+1.0)*127.0;
                     normalData[idx+1]=((faceOut?this.NORMAL_RIGHT_45.y:this.NORMAL_LEFT_45.y)+1.0)*127.0;
@@ -1062,9 +771,6 @@ export default class GenerateBitmapBaseClass
             top++;
             bot--;
         }
-        
-        this.colorCTX.putImageData(bitmapImgData,0,0);
-        this.normalCTX.putImageData(normalImgData,0,0);
     }
         
     drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,flipNormals,addToMask,noisePercentage,noiseMinDarken,noiseDarkenDif)
@@ -1072,11 +778,12 @@ export default class GenerateBitmapBaseClass
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,darkFactor,idx;
         let nFactor;
-        let orgWid,orgHigh,wid,high,edgeCount;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData,origNormalData;
+        let wid,high,edgeCount;
+        let origNormalData;
         let col=new ColorClass(0,0,0);
         let normal=new PointClass(0,0,0);
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
@@ -1086,21 +793,13 @@ export default class GenerateBitmapBaseClass
         endArc=Math.trunc(endArc*1000);
         if (startArc>=endArc) return;
         
-        
-                    // the drawing size
+            // the drawing size
             
-        orgWid=rgt-lft;
-        orgHigh=bot-top;
-        wid=orgWid-1;
-        high=orgHigh-1;         // avoids clipping on bottom from being on wid,high
-        mx=Math.trunc(wid*0.5);
-        my=Math.trunc(high*0.5);
+        wid=(rgt-lft)-1;
+        high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
+        mx=lft+Math.trunc(wid*0.5);
+        my=top+Math.trunc(high*0.5);
 
-        bitmapImgData=this.colorCTX.getImageData(lft,top,orgWid,orgHigh);
-        bitmapData=bitmapImgData.data;
-        
-        normalImgData=this.normalCTX.getImageData(lft,top,orgWid,orgHigh);
-        normalData=normalImgData.data;
         origNormalData=new Uint8Array(normalData);
 
         edgeCount=edgeSize;
@@ -1121,7 +820,7 @@ export default class GenerateBitmapBaseClass
                 if (fx<-1.0) fx=-1.0;
                 
                 x=mx+Math.trunc(halfWid*fx);
-                if ((x<0) || (x>=orgWid)) continue;
+                if ((x<0) || (x>=this.colorImgData.width)) continue;
 
                 fy=Math.cos(rad);
                 fy+=(fy*yRoundFactor);
@@ -1129,13 +828,13 @@ export default class GenerateBitmapBaseClass
                 if (fy<-1.0) fy=-1.0;
                 
                 y=my-Math.trunc(halfHigh*fy);
-                if ((y<0) || (y>=orgHigh)) continue;
+                if ((y<0) || (y>=this.colorImgData.height)) continue;
                 
                     // clipping
                     
                 if (this.clipLft!==-1) {
-                    if (((x+lft)<this.clipLft) || ((x+lft)>=this.clipRgt)) continue;
-                    if (((y+top)<this.clipTop) || ((y+top)>=this.clipBot)) continue;
+                    if ((x<this.clipLft) || (x>=this.clipRgt)) continue;
+                    if ((y<this.clipTop) || (y>=this.clipBot)) continue;
                 }
                 
                     // any noise
@@ -1151,12 +850,12 @@ export default class GenerateBitmapBaseClass
 
                     // the color pixel
 
-                idx=((y*orgWid)+x)*4;
+                idx=((y*this.colorImgData.width)+x)*4;
 
-                bitmapData[idx]=Math.trunc(col.r*255.0);
-                bitmapData[idx+1]=Math.trunc(col.g*255.0);
-                bitmapData[idx+2]=Math.trunc(col.b*255.0);
-                bitmapData[idx+3]=255;
+                colorData[idx]=Math.trunc(col.r*255.0);
+                colorData[idx+1]=Math.trunc(col.g*255.0);
+                colorData[idx+2]=Math.trunc(col.b*255.0);
+                colorData[idx+3]=255;
                 
                     // get a normal for the pixel change
                     // if we are outside the edge, gradually fade it
@@ -1203,9 +902,6 @@ export default class GenerateBitmapBaseClass
             wid--;
             high--;
         }
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-        this.normalCTX.putImageData(normalImgData,lft,top);
         
             // we stage the mask so we don't start
             // merging normals, so we need to make that the
@@ -1319,34 +1015,24 @@ export default class GenerateBitmapBaseClass
         // streaks
         //
         
-    drawStreakDirtSingle(lft,top,rgt,bot,botClip,density,color)
+    drawStreakDirtSingle(lft,top,rgt,bot,botClip,minMix,addMix,color)
     {
-        let lx,rx,xAdd,x,y,idx;
+        let lx,rx,xAdd,x,y,by,idx;
         let r,g,b;
         let factor;
         let wid=rgt-lft;
         let high=bot-top;
-        let mx=Math.trunc(wid*0.5);
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
-        let normal=new PointClass(0,0,0);
+        let mx=Math.trunc((lft+rgt)*0.5);
+        let colorData=this.colorImgData.data;
         
         if ((wid<=0) || (high<=0)) return;
         
-            // get the image data
-
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-        
-        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-        
             // draw the dirt
             
-        for (y=0;y!==high;y++) {
-            if ((y+top)>=botClip) break;
+        by=(botClip<bot)?botClip:bot;
             
-            factor=1.0-(y/high);
+        for (y=top;y!==by;y++) {
+            factor=1.0-((y-top)/high);
             
                 // the dirt works down to a point
                 
@@ -1356,54 +1042,28 @@ export default class GenerateBitmapBaseClass
             if (lx>=rx) break;
             
             for (x=lx;x!==rx;x++) {
-                
-                    // the color
-                    
-                if (GenerateUtilityClass.randomPercentage(density)) {
-                    factor=GenerateUtilityClass.randomFloat(0.25,0.75);
+                factor=GenerateUtilityClass.randomFloat(minMix,addMix);
 
-                    idx=((y*wid)+x)*4;
-                    r=bitmapData[idx]/255.0;
-                    g=bitmapData[idx+1]/255.0;
-                    b=bitmapData[idx+2]/255.0;
-                    bitmapData[idx]=(((1.0-factor)*r)+(color.r*factor))*255.0;
-                    bitmapData[idx+1]=(((1.0-factor)*g)+(color.g*factor))*255.0;
-                    bitmapData[idx+2]=(((1.0-factor)*b)+(color.b*factor))*255.0;
-                }
-                
-                    // the normal
-                    // we average it in with the current normal
-                    // so streaks follow the surface
-                
-                normal.x=Math.cos((Math.PI*(x-lx))/(rx-lx))*0.25;            // don't do extreme normals here
-                normal.y=0.0;
-                normal.z=0.5;
-                
-                normal.x=(((normalData[idx]/127.0)-1.0)+normal.x)*0.5;
-                normal.y=(((normalData[idx+1]/127.0)-1.0)+normal.y)*0.5;
-                normal.z=(((normalData[idx+2]/127.0)-1.0)+normal.z)*0.5;
-                normal.normalize();
-                
-                normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
-                normalData[idx+1]=(normal.y+1.0)*127.0;
-                normalData[idx+2]=(normal.z+1.0)*127.0;
+                idx=((y*this.colorImgData.width)+x)*4;
+                r=colorData[idx]/255.0;
+                g=colorData[idx+1]/255.0;
+                b=colorData[idx+2]/255.0;
+                colorData[idx]=(((1.0-factor)*r)+(color.r*factor))*255.0;
+                colorData[idx+1]=(((1.0-factor)*g)+(color.g*factor))*255.0;
+                colorData[idx+2]=(((1.0-factor)*b)+(color.b*factor))*255.0;
             }
         }
-        
-            // write all the data back
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-        this.normalCTX.putImageData(normalImgData,lft,top);
     }
     
-    drawStreakDirt(lft,top,rgt,bot,botClip,additionalStreakCount,density,color)
+    drawStreakDirt(lft,top,rgt,bot,botClip,additionalStreakCount,minMix,maxMix,color)
     {
         let n,sx,ex,ey;
         let minWid;
+        let addMix=maxMix-minMix;
         
             // original streak
             
-        this.drawStreakDirtSingle(lft,top,rgt,bot,botClip,density,color);
+        this.drawStreakDirtSingle(lft,top,rgt,bot,botClip,minMix,addMix,color);
         
             // additional streaks
             
@@ -1416,7 +1076,7 @@ export default class GenerateBitmapBaseClass
             
             ey=bot-GenerateUtilityClass.randomInt(0,Math.trunc((bot-top)*0.25));
             
-            this.drawStreakDirtSingle(sx,top,ex,ey,botClip,density,color);
+            this.drawStreakDirtSingle(sx,top,ex,ey,botClip,minMix,addMix,color);
         }
     }
     
@@ -1581,7 +1241,7 @@ export default class GenerateBitmapBaseClass
             if (ex<clipLft) ex=clipLft;
             if (ex>clipRgt) ex=clipRgt;
             
-            this.drawLine(sx,sy,ex,ey,color,lightLine);
+            this.drawLine2(sx,sy,ex,ey,color,lightLine);
             
             if ((ex===clipLft) || (ex===clipRgt)) break;
             
@@ -1926,65 +1586,6 @@ export default class GenerateBitmapBaseClass
         //
         
 
-        //
-        // specular routines
-        //
-
-    createSpecularMap(clamp)
-    {
-        let n,idx,nPixel;
-        let f,fMin,fMax,fDif;
-
-        let bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        let bitmapData=bitmapImgData.data;
-
-        let specularImgData=this.specularCTX.getImageData(0,0,this.specularCanvas.width,this.specularCanvas.height);
-        let specularData=specularImgData.data;
-
-        idx=0;
-        nPixel=this.colorCanvas.width*this.colorCanvas.height;
-        
-            // get the min-max across the entire
-            // bitmap
-            
-        fMin=1.0;
-        fMax=0.0;
-
-        for (n=0;n!==nPixel;n++) {
-            f=(bitmapData[idx]+bitmapData[idx+1]+bitmapData[idx+2])/(255.0*3.0);
-            if (f<fMin) fMin=f;
-            if (f>fMax) fMax=f;
-
-            idx+=4;
-        }
-        
-            // more than likely never going to happen, but
-            // just in case reset if min-max are bad
-            
-        if (fMin>fMax) {
-            fMin=0.0;
-            fMax=1.0;
-        }
-        
-            // use the the min/max to reclamp
-            // to 0...1 then * clamp
-        
-        idx=0;
-        fDif=fMax-fMin;
-        
-        for (n=0;n!==nPixel;n++) {
-            f=(bitmapData[idx]+bitmapData[idx+1]+bitmapData[idx+2])/(255.0*3.0);
-            f=((f-fMin)/fDif)*clamp;
-            f*=255.0;
-                    
-            specularData[idx++]=f;
-            specularData[idx++]=f;
-            specularData[idx++]=f;
-            specularData[idx++]=0xFF;
-        } 
-
-        this.specularCTX.putImageData(specularImgData,0,0);
-    }
     
         //
         // glow utility
@@ -2045,13 +1646,6 @@ export default class GenerateBitmapBaseClass
         // rectangles, ovals, lines
         //
 
-    drawRect(lft,top,rgt,bot,color)
-    {
-        if ((lft>=rgt) || (top>=bot)) return;
-
-        this.colorCTX.fillStyle=this.colorToRGBColor(color);
-        this.colorCTX.fillRect(lft,top,(rgt-lft),(bot-top));
-    }
     
     drawGlowRect(lft,top,rgt,bot,color)
     {
@@ -3572,20 +3166,92 @@ export default class GenerateBitmapBaseClass
         this.generateFaceChunkEye(480,top,bot,eyeColor);
         this.generateFaceChunkEye(430,top,bot,eyeColor);
     }
+
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+        //
+        // specular routines
+        //
+
+    createSpecularMap(clamp)
+    {
+        let n,idx,nPixel;
+        let f,fMin,fMax,fDif;
+        let colorData=this.colorImgData.data;
+        let specularData=this.specularImgData.data;
+
+        idx=0;
+        nPixel=this.colorImgData.width*this.colorImgData.height;
+        
+            // get the min-max across the entire
+            // bitmap
+            
+        fMin=1.0;
+        fMax=0.0;
+
+        for (n=0;n!==nPixel;n++) {
+            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])/(255.0*3.0);
+            if (f<fMin) fMin=f;
+            if (f>fMax) fMax=f;
+
+            idx+=4;
+        }
+        
+            // more than likely never going to happen, but
+            // just in case reset if min-max are bad
+            
+        if (fMin>fMax) {
+            fMin=0.0;
+            fMax=1.0;
+        }
+        
+            // use the the min/max to reclamp
+            // to 0...1 then * clamp
+        
+        idx=0;
+        fDif=fMax-fMin;
+        
+        for (n=0;n!==nPixel;n++) {
+            f=(colorData[idx]+colorData[idx+1]+colorData[idx+2])/(255.0*3.0);
+            f=((f-fMin)/fDif)*clamp;
+            f*=255.0;
+                    
+            specularData[idx++]=f;
+            specularData[idx++]=f;
+            specularData[idx++]=f;
+            specularData[idx++]=0xFF;
+        } 
+    }
+        
         //
         // clear canvases
         //
         
-    clearCanvases(canvas,ctx,r,g,b,a)
+    clearImageData(imgData,r,g,b,a)
     {
         let n,len;
-        let imgData,data;
+        let data=imgData.data;
         
-        len=(canvas.width*4)*canvas.height;
-        
-        imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
-        data=imgData.data;
+        len=(imgData.height*imgData.width)*4;
         
         for (n=0;n!==len;n+=4) {
             data[n]=r;
@@ -3593,8 +3259,6 @@ export default class GenerateBitmapBaseClass
             data[n+2]=b;
             data[n+3]=a;
         }
-        
-        ctx.putImageData(imgData,0,0);
     }
     
         //
@@ -3609,26 +3273,36 @@ export default class GenerateBitmapBaseClass
             
         this.colorCanvas=document.getElementById('color');
         this.colorCTX=this.colorCanvas.getContext('2d');
+        this.colorImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        this.clearImageData(this.colorImgData,255,255,255,255);
         
         this.normalCanvas=document.getElementById('normal');
         this.normalCTX=this.normalCanvas.getContext('2d');
+        this.normalImgData=this.normalCTX.getImageData(0,0,this.normalCanvas.width,this.normalCanvas.height);
+        this.clearImageData(this.normalImgData,0,0,255,255);
 
         this.specularCanvas=document.getElementById('specular');
         this.specularCTX=this.specularCanvas.getContext('2d');
+        this.specularImgData=this.specularCTX.getImageData(0,0,this.specularCanvas.width,this.specularCanvas.height);
+        this.clearImageData(this.specularImgData,0,0,0,255);
         
         this.glowCanvas=document.getElementById('glow');
         this.glowCTX=this.glowCanvas.getContext('2d');
-        
-        this.clearCanvases(this.colorCanvas,this.colorCTX,255,255,255,255);
-        this.clearCanvases(this.normalCanvas,this.normalCTX,0,0,255,255);
-        this.clearCanvases(this.specularCanvas,this.specularCTX,0,0,0,255);
-        this.clearCanvases(this.glowCanvas,this.glowCTX,0,0,0,255);
+        this.glowImgData=this.glowCTX.getImageData(0,0,this.glowCanvas.width,this.glowCanvas.height);
+        this.clearImageData(this.glowImgData,0,0,0,255);
         
         this.mask=new Uint8Array(this.colorCanvas.width*this.colorCanvas.height);
 
             // run the internal generator
 
         this.generateInternal();
+        
+            // write out the bitmaps
+            
+        this.colorCTX.putImageData(this.colorImgData,0,0);
+        this.normalCTX.putImageData(this.normalImgData,0,0);
+        this.specularCTX.putImageData(this.specularImgData,0,0);
+        this.glowCTX.putImageData(this.glowImgData,0,0);
     }
     
         //
@@ -3649,26 +3323,35 @@ export default class GenerateBitmapBaseClass
     generate()
     {
             // setup all the bitmap parts
+            // and get the image bytes for drawing
             
         this.colorCanvas=document.createElement('canvas');
         this.colorCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
         this.colorCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
         this.colorCTX=this.colorCanvas.getContext('2d');
+        this.colorImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
+        this.clearImageData(this.colorImgData,255,255,255,255);
         
         this.normalCanvas=document.createElement('canvas');
         this.normalCanvas.width=this.hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
         this.normalCanvas.height=this.hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
         this.normalCTX=this.normalCanvas.getContext('2d');
+        this.normalImgData=this.normalCTX.getImageData(0,0,this.normalCanvas.width,this.normalCanvas.height);
+        this.clearImageData(this.normalImgData,0,0,255,255);
 
         this.specularCanvas=document.createElement('canvas');
         this.specularCanvas.width=this.hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
         this.specularCanvas.height=this.hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
         this.specularCTX=this.specularCanvas.getContext('2d');
+        this.specularImgData=this.specularCTX.getImageData(0,0,this.specularCanvas.width,this.specularCanvas.height);
+        this.clearImageData(this.specularImgData,0,0,0,255);
         
         this.glowCanvas=document.createElement('canvas');
         this.glowCanvas.width=this.hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
         this.glowCanvas.height=this.hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
         this.glowCTX=this.glowCanvas.getContext('2d');
+        this.glowImgData=this.glowCTX.getImageData(0,0,this.glowCanvas.width,this.glowCanvas.height);
+        this.clearImageData(this.glowImgData,0,0,0,255);
         
         this.clearCanvases(this.colorCanvas,this.colorCTX,255,255,255,255);
         this.clearCanvases(this.normalCanvas,this.normalCTX,0,0,255,255);
@@ -3680,6 +3363,13 @@ export default class GenerateBitmapBaseClass
             // run the internal generator
 
         this.generateInternal();
+        
+            // write out the bitmaps
+            
+        this.colorCTX.putImageData(this.colorImgData,0,0);
+        this.normalCTX.putImageData(this.normalImgData,0,0);
+        this.specularCTX.putImageData(this.specularImgData,0,0);
+        this.glowCTX.putImageData(this.glowImgData,0,0);
         
             // add the bitmap object
             

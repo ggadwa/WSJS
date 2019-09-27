@@ -8,7 +8,7 @@
 - room uvs need to be better
 
 
-- perlin generator needs to build in the background so wrap arounds work, and then copy over
+- deal with blur/blur2
 
 
 - need textures to stamp better

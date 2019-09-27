@@ -45,8 +45,9 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
                
                // concrete background
                
+               
             col=flip?concreteColor:concreteColor2;
-            this.drawBumpySurface(0,top,this.colorCanvas.width,bot,col,0.9,0.7,Math.trunc(this.colorCanvas.width*0.1),1);
+           // this.drawBumpySurface(0,top,this.colorCanvas.width,bot,col,0.9,0.7,Math.trunc(this.colorCanvas.width*0.1),1);
             
                 // slopes
 
@@ -71,7 +72,7 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
                 ex=sx+streakWid;
                 ey=GenerateUtilityClass.randomInBetween(bot,Math.trunc((bot-top)*1.5));
                 
-                this.drawStreakDirt(sx,top,ex,ey,bot,5,0.5,streakColor);
+                this.drawStreakDirt(sx,top,ex,ey,bot,5,0.1,0.5,streakColor);
             }
             
             this.blur(this.colorCTX,0,top,this.colorCanvas.width,bot,2,false);

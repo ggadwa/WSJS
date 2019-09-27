@@ -19,7 +19,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         // brick bitmaps
         //
 
-    generateBrick()
+    generateInternal()
     {
         let n,seg,segments;
         let drawBrickColor,drawFrameColor,streakColor,f;
@@ -38,16 +38,10 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         segments=this.createStackedSegments();
         this.createPerlinNoiseData(32,32,0.7);
         
-            // clear canvases
+            // grout is a static noise color
             
-        //this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,brickColor);
-        //this.drawPerlinNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.3);
-        //this.createSpecularMap(0.4);
-        //return;
-
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
-        //this.drawNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,0.8,0.9);
-        //this.blur(this.colorCTX,0,0,this.colorCanvas.width,this.colorCanvas.height,3,false);
+        this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
         
             // draw the bricks
 
@@ -66,45 +60,43 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                 drawFrameColor=this.darkenColor(drawBrickColor,0.9);
                 this.drawRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),drawBrickColor);
                 this.draw3DFrameRect(-edgeSize,seg.top,(this.colorCanvas.width+edgeSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
-                
-                //this.drawNoiseRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
-                this.drawPerlinNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)),0.3);
+                this.drawPerlinNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)),0.8,1.3);
             }
             else {
                 drawBrickColor=this.darkenColor((seg.isSmall?altBrickColor:brickColor),f);
                 drawFrameColor=this.darkenColor(drawBrickColor,0.9);
                 this.drawRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),drawBrickColor);
                 this.draw3DFrameRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
-                //this.drawNoiseRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),0.8,1.0,GenerateUtilityClass.randomFloat(0.6,0.2));
-                this.drawPerlinNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)),0.3);
+                this.drawPerlinNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)),0.8,1.3);
             }
             
                 // any streaks/stains/cracks
                 // do not do on odd bricks
-                /*
+
             lft=seg.lft+edgeSize;
             rgt=seg.rgt-(edgeSize+paddingSize);
             top=seg.top+edgeSize;
             bot=seg.bot-(edgeSize+paddingSize);
                 
-            if ((!seg.isHalf) && (!seg.isSmall) && (!seg.isLarge)) {
+            if ((!seg.isHalf) && (!seg.isSmall)) {
                 
                     // streaks
                     
                 if (GenerateUtilityClass.randomPercentage(0.2)) {
                     streakWid=GenerateUtilityClass.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
                     if (streakWid<10) streakWid=10;
+                    if (streakWid>(this.colorCanvasWidth*0.1)) streakWid=this.colorCanvasWidth*0.1;
 
                     sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
                     ex=sx+streakWid;
-                    ey=GenerateUtilityClass.randomInBetween(bot,Math.trunc(bot*1.5));
+                    ey=GenerateUtilityClass.randomInBetween(bot,Math.trunc(bot*2.0));
 
                     streakColor=this.darkenColor(drawBrickColor,0.6);
-                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.5,streakColor);
+                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.1,0.5,streakColor);
                 }
                 
                     // any cracks
-
+/*
                 if (GenerateUtilityClass.randomPercentage(0.1)) {
                     if ((rgt-lft)>45) {
                         sx=GenerateUtilityClass.randomInBetween((lft+15),(rgt-15));
@@ -114,6 +106,8 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                         this.drawVerticalCrack(sx,top,bot,lft,rgt,GenerateUtilityClass.randomSign(),10,lineColor,false,true);
                     }
                 }
+
+ */
             }
             
                 // blur everything
@@ -122,24 +116,11 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             rgt=(seg.rgt>=this.colorCanvas.width)?(this.colorCanvas.width-1):(seg.rgt-paddingSize);
             top=seg.top;
             bot=seg.bot-paddingSize;
-                
-            //this.blur(this.colorCTX,lft,top,rgt,bot,GenerateUtilityClass.randomInt(1,2),true);
-                 * *
-                 */
         }
         
             // finish with the specular
 
         this.createSpecularMap(0.4);
-    }
-
-        //
-        // generate mainline
-        //
-
-    generateInternal()
-    {
-        this.generateBrick();
     }
 
 }

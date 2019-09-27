@@ -100,22 +100,25 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         }
     }
     
-    generateStone()
+    generateInternal()
     {
         let n,seg;
-        let drawStoneColor,f,bumpCount;
+        let drawStoneColor,f;
         let paddingRight,paddingBottom;
         
         let stoneColor=this.getRandomColor();
         let altStoneColor=this.getRandomColor();
         let groutColor=this.getRandomColorDull(0.3);
         
+            // create segments and noise data
+            
         let segments=this.createRandomSegments();
+        this.createPerlinNoiseData(16,16,0.5);
 
-            // the grout is just a rough bumpy surface
-
-        bumpCount=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.6),Math.trunc(this.colorCanvas.width*0.2));
-        this.drawBumpySurface(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor,0.8,0.7,bumpCount,3);
+            // the perlin noise grout
+            
+        this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,groutColor);
+        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.8,1.3);
         
             // draw the stones
 
@@ -127,8 +130,8 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
             drawStoneColor=this.darkenColor((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),f);
             
-            paddingRight=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorCanvas.width*0.02));
-            paddingBottom=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorCanvas.width*0.02));
+            paddingRight=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.02));
+            paddingBottom=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.02));
 
             this.drawSingleStone(seg.lft,seg.top,(seg.rgt-paddingRight),(seg.bot-paddingBottom),drawStoneColor);
         }
@@ -137,14 +140,4 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
         this.createSpecularMap(0.3);
     }
-
-        //
-        // generate mainline
-        //
-
-    generateInternal()
-    {
-        this.generateStone();
-    }
-
 }
