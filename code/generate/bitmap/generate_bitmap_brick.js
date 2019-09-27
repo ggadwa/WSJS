@@ -80,23 +80,8 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                 
             if ((!seg.isHalf) && (!seg.isSmall)) {
                 
-                    // streaks
-                    
-                if (GenerateUtilityClass.randomPercentage(0.2)) {
-                    streakWid=GenerateUtilityClass.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
-                    if (streakWid<10) streakWid=10;
-                    if (streakWid>(this.colorCanvasWidth*0.1)) streakWid=this.colorCanvasWidth*0.1;
-
-                    sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
-                    ex=sx+streakWid;
-                    ey=GenerateUtilityClass.randomInBetween(bot,Math.trunc(bot*2.0));
-
-                    streakColor=this.darkenColor(drawBrickColor,0.6);
-                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.1,0.5,streakColor);
-                }
-                
                     // any cracks
-/*
+
                 if (GenerateUtilityClass.randomPercentage(0.1)) {
                     if ((rgt-lft)>45) {
                         sx=GenerateUtilityClass.randomInBetween((lft+15),(rgt-15));
@@ -106,8 +91,21 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                         this.drawVerticalCrack(sx,top,bot,lft,rgt,GenerateUtilityClass.randomSign(),10,lineColor,false,true);
                     }
                 }
+                
+                    // streaks
+                    
+                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                    streakWid=GenerateUtilityClass.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
+                    if (streakWid<10) streakWid=10;
+                    if (streakWid>(this.colorCanvasWidth*0.1)) streakWid=this.colorCanvasWidth*0.1;
 
- */
+                    sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
+                    ex=sx+streakWid;
+                    ey=GenerateUtilityClass.randomInBetween(Math.trunc(bot*1.2),Math.trunc(bot*2.0));
+
+                    streakColor=this.darkenColor(drawBrickColor,0.6);
+                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.25,0.5,streakColor);
+                }
             }
             
                 // blur everything

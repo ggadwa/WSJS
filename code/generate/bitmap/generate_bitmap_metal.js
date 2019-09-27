@@ -21,14 +21,17 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
     generateMetalPanel(lft,top,rgt,bot,metalColor,edgeSize,screwSize)
     {
         let lft2,rgt2,top2,bot2,sz;
+        let frameColor;
 
         let screwInnerSize=Math.trunc(screwSize*0.4);
         let screwColor=this.boostColor(metalColor,0.05);
         
             // the plate
-                
-        this.draw3DRect(lft,top,rgt,bot,edgeSize,0.9,metalColor,true);
-        this.drawMetalShine((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),metalColor);
+            
+        frameColor=this.darkenColor(metalColor,0.9);
+        this.drawRect(lft,top,rgt,bot,metalColor);
+        this.drawMetalShine(lft,top,rgt,bot,metalColor);
+        this.draw3DFrameRect(lft,top,rgt,bot,edgeSize,frameColor,true);
         
             // variations
             
@@ -42,7 +45,8 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 rgt2=rgt-sz;
                 top2=top+sz;
                 bot2=bot-sz;
-                this.draw3DRect(lft2,top2,rgt2,bot2,edgeSize,0.8,metalColor,false);
+                frameColor=this.darkenColor(metalColor,0.8);
+                this.draw3DFrameRect(lft2,top2,rgt2,bot2,edgeSize,frameColor,false);
                 this.drawMetalShine((lft2+edgeSize),(top2+edgeSize),(rgt2-edgeSize),(bot2-edgeSize),metalColor);
                 break;
         }

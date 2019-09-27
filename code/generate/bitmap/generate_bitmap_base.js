@@ -384,8 +384,6 @@ export default class GenerateBitmapBaseClass
         let n,idx;
         let x,y,cx,cy,cxs,cxe,cys,cye,dx,dy;
         let r,g,b;
-        let wid=rgt-lft;
-        let high=bot-top;
         let blurData;
         
         if ((lft>=rgt) || (top>=bot)) return;
@@ -396,12 +394,12 @@ export default class GenerateBitmapBaseClass
 
         for (n=0;n!==blurCount;n++) {
             
-            for (y=0;y!==high;y++) {
+            for (y=top;y!==bot;y++) {
 
                 cys=y-1;
                 cye=y+2;
 
-                for (x=0;x!==wid;x++) {
+                for (x=lft;x!==rgt;x++) {
 
                         // get blur from 8 surrounding pixels
 
@@ -414,12 +412,12 @@ export default class GenerateBitmapBaseClass
                         
                         dy=cy;
                         if (!clamp) {
-                            if (dy<0) dy=high+dy;
-                            if (dy>=high) dy=dy-high;
+                            if (dy<top) dy=bot+(top-dy);
+                            if (dy>=bot) dy=top+(dy-bot);
                         }
                         else {
-                            if (dy<0) dy=0;
-                            if (dy>=high) dy=high-1;
+                            if (dy<top) dy=top;
+                            if (dy>=bot) dy=bot-1;
                         }
                         
                         for (cx=cxs;cx!==cxe;cx++) {
@@ -427,18 +425,18 @@ export default class GenerateBitmapBaseClass
                             
                             dx=cx;
                             if (!clamp) {
-                                if (dx<0) dx=wid+dx;
-                                if (dx>=wid) dx=dx-wid;
+                                if (dx<lft) dx=rgt+(lft-dx);
+                                if (dx>=rgt) dx=lft+(dx-rgt);
                             }
                             else {
-                                if (dx<0) dx=0;
-                                if (dx>=wid) dx=wid-1;
+                                if (dx<lft) dx=lft;
+                                if (dx>=rgt) dx=rgt-1;
                             }
                             
                                 // add up blur from the
                                 // original pixels
 
-                            idx=((dy*wid)+dx)*4;
+                            idx=((dy*this.colorImgData.width)+dx)*4;
 
                             r+=data[idx];
                             g+=data[idx+1];
@@ -446,19 +444,19 @@ export default class GenerateBitmapBaseClass
                         }
                     }
                     
-                    idx=((y*wid)+x)*4;
+                    idx=((y*this.colorImgData.width)+x)*4;
 
-                    blurData[idx]=Math.trunc(r*0.125);
-                    blurData[idx+1]=Math.trunc(g*0.125);
-                    blurData[idx+2]=Math.trunc(b*0.125);
+                    blurData[idx]=r*0.125;
+                    blurData[idx+1]=g*0.125;
+                    blurData[idx+2]=b*0.125;
                 }
             }
 
                 // transfer over the changed pixels
 
-            for (y=0;y!==high;y++) {
-                idx=(y*wid)*4;
-                for (x=0;x!==wid;x++) {       
+            for (y=top;y!==bot;y++) {
+                idx=((y*this.colorImgData.width)+lft)*4;
+                for (x=lft;x!==rgt;x++) {       
                     data[idx]=blurData[idx];
                     data[idx+1]=blurData[idx+1];
                     data[idx+2]=blurData[idx+2];
@@ -830,13 +828,6 @@ export default class GenerateBitmapBaseClass
                 y=my-Math.trunc(halfHigh*fy);
                 if ((y<0) || (y>=this.colorImgData.height)) continue;
                 
-                    // clipping
-                    
-                if (this.clipLft!==-1) {
-                    if ((x<this.clipLft) || (x>=this.clipRgt)) continue;
-                    if ((y<this.clipTop) || (y>=this.clipBot)) continue;
-                }
-                
                     // any noise
                 
                 col.setFromColor(color);
@@ -881,7 +872,7 @@ export default class GenerateBitmapBaseClass
                     // if this is within the draw mask, then
                     // mix the normals
                 
-                if (this.checkMask((x+lft),(y+top))) {
+                if (this.checkMask(x,y)) {
                     normal.x=(((origNormalData[idx]/127.0)-1.0)+normal.x)*0.5;
                     normal.y=(((origNormalData[idx+1]/127.0)-1.0)+normal.y)*0.5;
                     normal.z=(((origNormalData[idx+2]/127.0)-1.0)+normal.z)*0.5;
@@ -894,7 +885,7 @@ export default class GenerateBitmapBaseClass
                 
                     // and the mask
                     
-                if (addToMask) this.setStagedMask((x+lft),(y+top));
+                if (addToMask) this.setStagedMask(x,y);
             }
 
             if (edgeCount>0) edgeCount--;
@@ -917,7 +908,7 @@ export default class GenerateBitmapBaseClass
     drawMetalShineLine(x,top,bot,shineWid,baseColor)
     {
         let n,lx,rx,y,idx;
-        let bitmapImgData,bitmapData;
+        let colorData=this.colorImgData.data;
         let density,densityReduce;
         
         if (top>=bot) return;
@@ -929,11 +920,6 @@ export default class GenerateBitmapBaseClass
         shineWid=Math.trunc(shineWid*0.5);
             
         x+=shineWid;
-        
-            // get the image data
-
-        bitmapImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        bitmapData=bitmapImgData.data;
         
             // start with 100 density and reduce
             // as we go across the width
@@ -953,18 +939,18 @@ export default class GenerateBitmapBaseClass
                 if (GenerateUtilityClass.randomInt(0,100)<density) {
                     if ((lx>=0) && (lx<this.colorCanvas.width)) {
                         idx=((y*this.colorCanvas.width)+lx)*4;
-                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
-                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
-                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                        colorData[idx]=Math.trunc(baseColor.r*255.0);
+                        colorData[idx+1]=Math.trunc(baseColor.g*255.0);
+                        colorData[idx+2]=Math.trunc(baseColor.b*255.0);
                     }
                 }
                 
                 if (GenerateUtilityClass.randomInt(0,100)<density) {
                     if ((rx>=0) && (rx<this.colorCanvas.width)) {
                         idx=((y*this.colorCanvas.width)+rx)*4;
-                        bitmapData[idx]=Math.trunc(baseColor.r*255.0);
-                        bitmapData[idx+1]=Math.trunc(baseColor.g*255.0);
-                        bitmapData[idx+2]=Math.trunc(baseColor.b*255.0);
+                        colorData[idx]=Math.trunc(baseColor.r*255.0);
+                        colorData[idx+1]=Math.trunc(baseColor.g*255.0);
+                        colorData[idx+2]=Math.trunc(baseColor.b*255.0);
                     }
                 }
             
@@ -972,10 +958,6 @@ export default class GenerateBitmapBaseClass
             
             density-=densityReduce;
         }
-        
-            // write all the data back
-
-        this.colorCTX.putImageData(bitmapImgData,0,0);
     }
     
     drawMetalShine(lft,top,rgt,bot,metalColor)
@@ -987,7 +969,7 @@ export default class GenerateBitmapBaseClass
         x=lft;
         
         while (true) {
-            shineWid=GenerateUtilityClass.randomInt(Math.trunc(wid*0.035),Math.trunc(wid*0.1));
+            shineWid=GenerateUtilityClass.randomInt(Math.trunc(wid*0.035),Math.trunc(wid*0.15));
             if ((x+shineWid)>rgt) shineWid=rgt-x;
             
                 // small % are no streak
@@ -997,7 +979,7 @@ export default class GenerateBitmapBaseClass
                     shineColor=this.lightenColor(metalColor,GenerateUtilityClass.randomFloat(0.05,0.1))
                 }
                 else {
-                    shineColor=this.darkenColor(metalColor,GenerateUtilityClass.randomFloat(0.5,0.5));
+                    shineColor=this.darkenColor(metalColor,GenerateUtilityClass.randomFloat(0.7,0.3));
                 }
                 
 
@@ -1008,7 +990,7 @@ export default class GenerateBitmapBaseClass
             if (x>=rgt) break;
         }
         
-        this.blur(this.colorCTX,lft,top,rgt,bot,(lite?2:1),true);
+        this.blur(this.colorImgData.data,lft,top,rgt,bot,(lite?3:4),true);
     }
     
         //
@@ -1032,7 +1014,7 @@ export default class GenerateBitmapBaseClass
         by=(botClip<bot)?botClip:bot;
             
         for (y=top;y!==by;y++) {
-            factor=1.0-((y-top)/high);
+            factor=(bot-y)/high;
             
                 // the dirt works down to a point
                 
@@ -1219,6 +1201,136 @@ export default class GenerateBitmapBaseClass
         // line drawings
         //
         
+    drawLine(x,y,x2,y2,color,antiAlias,includeNormals)
+    {
+        let xLen,yLen,sp,ep,dx,dy,slope,idx,idx2;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
+        let r=Math.trunc(color.r*255.0);
+        let g=Math.trunc(color.g*255.0);
+        let b=Math.trunc(color.b*255.0);
+        
+            // the line
+            
+        xLen=Math.abs(x2-x);
+        yLen=Math.abs(y2-y);
+        
+        if ((xLen===0) && (yLen===0)) return;
+            
+        if (xLen>yLen) {
+            slope=yLen/xLen;
+            
+            if (x<x2) {
+                sp=x;
+                ep=x2;
+                dy=y;
+                slope*=Math.sign(y2-y);
+            }
+            else {
+                sp=x2;
+                ep=x;
+                dy=y2;
+                slope*=Math.sign(y-y2);
+            }
+            
+            for (dx=sp;dx!==ep;dx++) {
+                idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
+                colorData[idx]=r;
+                colorData[idx+1]=g;
+                colorData[idx+2]=b;
+                
+                if (includeNormals) {
+                    normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
+                    normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
+                    normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                }
+                
+                if ((dy>0) && (antiAlias)) {
+                    idx2=idx-(this.colorImgData.width*4);
+                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    
+                    if (includeNormals) {
+                        normalData[idx]=(this.NORMAL_TOP_45.x+1.0)*127.0;
+                        normalData[idx+1]=(this.NORMAL_TOP_45.y+1.0)*127.0;
+                        normalData[idx+2]=(this.NORMAL_TOP_45.z+1.0)*127.0;
+                    }
+                }
+                if ((dy<(this.colorImgData-1)) && (antiAlias)) {
+                    idx2=idx+(this.colorImgData.width*4);
+                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    
+                    if (includeNormals) {
+                        normalData[idx]=(this.NORMAL_BOTTOM_45.x+1.0)*127.0;
+                        normalData[idx+1]=(this.NORMAL_BOTTOM_45.y+1.0)*127.0;
+                        normalData[idx+2]=(this.NORMAL_BOTTOM_45.z+1.0)*127.0;
+                    }
+                }
+                
+                dy+=slope;
+            }
+        }
+        else {
+            slope=xLen/yLen;
+            
+            if (y<y2) {
+                sp=y;
+                ep=y2;
+                dx=x;
+                slope*=Math.sign(x2-x);
+            }
+            else {
+                sp=y2;
+                ep=y;
+                dx=x2;
+                slope*=Math.sign(x-x2);
+            }
+            
+            for (dy=sp;dy!==ep;dy++) {
+                idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
+                colorData[idx]=r;
+                colorData[idx+1]=g;
+                colorData[idx+2]=b;
+                
+                if (includeNormals) {
+                    normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
+                    normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
+                    normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                }
+                
+                if ((dx>0) && (antiAlias)) {
+                    idx2=idx-4;
+                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    
+                    if (includeNormals) {
+                        normalData[idx]=(this.NORMAL_LEFT_45.x+1.0)*127.0;
+                        normalData[idx+1]=(this.NORMAL_LEFT_45.y+1.0)*127.0;
+                        normalData[idx+2]=(this.NORMAL_LEFT_45.z+1.0)*127.0;
+                    }
+                }
+                if ((dx<(this.colorImgData.width-1)) && (antiAlias)) {
+                    idx2=idx+4;
+                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    
+                    if (includeNormals) {
+                        normalData[idx]=(this.NORMAL_RIGHT_45.x+1.0)*127.0;
+                        normalData[idx+1]=(this.NORMAL_RIGHT_45.y+1.0)*127.0;
+                        normalData[idx+2]=(this.NORMAL_RIGHT_45.z+1.0)*127.0;
+                    }
+                }
+                
+                dx+=slope;
+            }
+        }
+    }
+        
     drawVerticalCrack(x,y,y2,clipLft,clipRgt,lineDir,lineVariant,color,lightLine,canSplit)
     {
         let n,sx,sy,ex,ey;
@@ -1241,7 +1353,9 @@ export default class GenerateBitmapBaseClass
             if (ex<clipLft) ex=clipLft;
             if (ex>clipRgt) ex=clipRgt;
             
-            this.drawLine2(sx,sy,ex,ey,color,lightLine);
+            if (sy===ey) return;
+            
+            this.drawLine(sx,sy,ex,ey,color,lightLine,true,true);
             
             if ((ex===clipLft) || (ex===clipRgt)) break;
             
@@ -2350,157 +2464,8 @@ export default class GenerateBitmapBaseClass
         this.normalCTX.fill();
     }
     
-    drawLine2(ctx,x,y,x2,y2,color)
-    {
-        let xLen,yLen,sp,ep,dx,dy,slope,idx;
-        let bitmapImgData,bitmapData,bitmapWid;
-        let r=Math.trunc(color.r*255.0);
-        let g=Math.trunc(color.g*255.0);
-        let b=Math.trunc(color.b*255.0);
-        
-            // get the image data
-
-        bitmapImgData=ctx.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
-        bitmapData=bitmapImgData.data;
-        
-        bitmapWid=this.colorCanvas.width;
-        
-            // the line
-            
-        xLen=Math.abs(x2-x);
-        yLen=Math.abs(y2-y);
-            
-        if (xLen>yLen) {
-            slope=yLen/xLen;
-            
-            if (x<x2) {
-                sp=x;
-                ep=x2;
-            }
-            else {
-                sp=x2;
-                ep=x;
-            }
-            
-            dy=y;
-            
-            for (dx=sp;dx!==ep;dx++) {
-                idx=((Math.trunc(dy)*bitmapWid)+dx)*4;
-                bitmapData[idx]=r;
-                bitmapData[idx+1]=g;
-                bitmapData[idx+2]=b;
-                
-                dy+=slope;
-            }
-        }
-        else {
-            slope=xLen/yLen;
-            
-            if (y<y2) {
-                sp=y;
-                ep=y2;
-            }
-            else {
-                sp=y2;
-                ep=y;
-            }
-            
-            dx=x;
-            
-            for (dy=sp;dy!==ep;dy++) {
-                idx=((dy*bitmapWid)+Math.trunc(dx))*4;
-                bitmapData[idx]=r;
-                bitmapData[idx+1]=g;
-                bitmapData[idx+2]=b;
-                
-                dx+=slope;
-            }
-        }
-        
-            // write all the data back
-
-        ctx.putImageData(bitmapImgData,0,0);
-    }
 
    
-    drawLine(x,y,x2,y2,color,lightLine)
-    {
-        let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
-        
-            // line itself
-            
-        this.colorCTX.strokeStyle=this.colorToRGBColor(color);
-
-        this.colorCTX.beginPath();
-        this.colorCTX.moveTo(x,y);
-        this.colorCTX.lineTo(x2,y2);
-        this.colorCTX.stroke();
-        
-            // smoothing
-  
-        this.colorCTX.strokeStyle=this.colorToRGBAColor(color,0.5);
-
-        if (horizontal) {
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(x,(y-1));
-            this.colorCTX.lineTo(x2,(y2-1));
-            this.colorCTX.stroke();
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(x,(y+1));
-            this.colorCTX.lineTo(x2,(y2+1));
-            this.colorCTX.stroke();
-        }
-        else {
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo((x-1),y);
-            this.colorCTX.lineTo((x2-1),y2);
-            this.colorCTX.stroke();
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo((x+1),y);
-            this.colorCTX.lineTo((x2+1),y2);
-            this.colorCTX.stroke();
-        }
-
-            // the normal change
-            // flip as lines are inside
-
-        if (this.normalCTX!==null) {
-            if (horizontal) {
-                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_TOP_10:this.NORMAL_TOP_45);
-                this.normalCTX.beginPath();
-                this.normalCTX.moveTo(x,(y-1));
-                this.normalCTX.lineTo(x2,(y2-1));
-                this.normalCTX.stroke();
-                this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
-                this.normalCTX.beginPath();
-                this.normalCTX.moveTo(x,y);
-                this.normalCTX.lineTo(x2,y2);
-                this.normalCTX.stroke();
-                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_BOTTOM_10:this.NORMAL_BOTTOM_45);
-                this.normalCTX.beginPath();
-                this.normalCTX.moveTo(x,(y+1));
-                this.normalCTX.lineTo(x2,(y2+1));
-                this.normalCTX.stroke();
-            }
-            else {
-                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_LEFT_10:this.NORMAL_LEFT_45);
-                this.normalCTX.beginPath();
-                this.normalCTX.moveTo((x-1),y);
-                this.normalCTX.lineTo((x2-1),y2);
-                this.normalCTX.stroke();
-                this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
-                this.normalCTX.beginPath();
-                this.normalCTX.moveTo(x,y);
-                this.normalCTX.lineTo(x2,y2);
-                this.normalCTX.stroke();
-                this.normalCTX.strokeStyle=this.normalToRGBColor(lightLine?this.NORMAL_RIGHT_10:this.NORMAL_RIGHT_45);
-                this.normalCTX.beginPath();
-                this.normalCTX.moveTo((x+1),y);
-                this.normalCTX.lineTo((x2+1),y2);
-                this.normalCTX.stroke();
-            }
-        }
-    }
     
     drawRandomLine(x,y,x2,y2,clipLft,clipTop,clipRgt,clipBot,lineVariant,color,lightLine)
     {

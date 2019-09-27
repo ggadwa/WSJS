@@ -23,7 +23,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
     {
         let n,nChunk;
         let lft2,top2,wid2,high2,xRoundFactor,yRoundFactor;
-        let chunkWidStart,chunkWidAdd,chunkHighStart,chunkHighAdd,arcStart,arcEnd;
+        let chunkWidStart,chunkWidAdd,chunkHighStart,chunkHighAdd,chunkOffset,arcStart,arcEnd;
         let wid=rgt-lft;
         let high=bot-top;
         let edgeSize,flipNormals;
@@ -49,8 +49,9 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
         chunkWidStart=Math.trunc(wid*0.3);
         chunkWidAdd=Math.trunc(wid*0.5);
-        chunkHighStart=Math.trunc(high*0.3);
+        chunkHighStart=Math.trunc(high*0.35);
         chunkHighAdd=Math.trunc(high*0.5);
+        chunkOffset=Math.trunc(high*0.02);
         
         for (n=0;n!==nChunk;n++) {
             wid2=GenerateUtilityClass.randomInt(chunkWidStart,chunkWidAdd);
@@ -58,26 +59,25 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             
             switch (n) {
                 case 0:
-                    lft2=GenerateUtilityClass.randomInt(lft,5);
-                    top2=GenerateUtilityClass.randomInt((top+(bot-top)*0.05),5);
+                    lft2=GenerateUtilityClass.randomInt(lft,chunkOffset);
+                    top2=GenerateUtilityClass.randomInt(top,chunkOffset);
                     arcStart=0.65;
                     arcEnd=1.1;
                     break;
                 case 1:
-                    lft2=GenerateUtilityClass.randomInt((rgt-wid2),-5);
-                    top2=GenerateUtilityClass.randomInt((top+(bot-top)*0.05),10);
+                    lft2=GenerateUtilityClass.randomInt((rgt-wid2),-chunkOffset);
+                    top2=GenerateUtilityClass.randomInt(top,chunkOffset);
                     arcStart=-0.1;
                     arcEnd=0.35;
-                    break;
                 case 2:
-                    lft2=GenerateUtilityClass.randomInt((rgt-wid2),-5);
-                    top2=GenerateUtilityClass.randomInt((bot-(high2+((bot-top)*0.05))),-5);
+                    lft2=GenerateUtilityClass.randomInt((rgt-wid2),-chunkOffset);
+                    top2=GenerateUtilityClass.randomInt((bot-high2),-chunkOffset);
                     arcStart=0.15;
                     arcEnd=0.6;
                     break;
                 case 3:
-                    lft2=GenerateUtilityClass.randomInt(lft,5);
-                    top2=GenerateUtilityClass.randomInt((bot-(high2+((bot-top)*0.05))),-5);
+                    lft2=GenerateUtilityClass.randomInt(lft,chunkOffset);
+                    top2=GenerateUtilityClass.randomInt((bot-high2),-chunkOffset);
                     arcStart=0.4;
                     arcEnd=0.85;
                     break;
