@@ -59,6 +59,7 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
                 // noise and streaks
 
             this.drawNoiseRect(0,top,this.colorCanvas.width,bot,0.6,0.8,0.8);
+            //this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
             
             streakCount=GenerateUtilityClass.randomInt(0,5);
             streakColor=this.darkenColor(col,0.6);

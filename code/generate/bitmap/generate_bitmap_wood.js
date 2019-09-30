@@ -22,8 +22,10 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
     generateWoodDrawBoard(lft,top,rgt,bot,edgeSize,woodColor)
     {
         let col=this.darkenColor(woodColor,GenerateUtilityClass.randomFloat(0.8,0.2));
+        let frameColor=this.darkenColor(woodColor,0.9);
         
-        this.draw3DRect(lft,top,rgt,bot,edgeSize,0.9,col,true);
+        this.drawRect(lft,top,rgt,bot,col);
+        this.draw3DFrameRect(lft,top,rgt,bot,edgeSize,frameColor,true);
         
         if ((bot-top)>(rgt-lft)) {
             this.drawColorStripeVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
@@ -32,10 +34,10 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
             this.drawColorStripeHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
         }
         
-        this.drawNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,0.95,0.8);
+        this.drawStaticNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,1.1,2,true);
     }
 
-    generateWood()
+    generateInternal()
     {
         let n,y,ty,by,lft,rgt;
         
@@ -86,15 +88,6 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
             // finish with the specular
 
         this.createSpecularMap(0.2);
-    }
-            
-        //
-        // generate mainline
-        //
-
-    generateInternal()
-    {
-        this.generateWood();
     }
 
 }

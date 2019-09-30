@@ -1,14 +1,13 @@
-- all bitmap hard coded need to be percentage, might need to try 1024x1024 textures?
 - room meshes need extra one floor length mesh on top of every story
 - wood has moires
 - need to make statics for all generate_bitmap_base statics
-- delete all the old gen textures/etc
-- metal corrugation, better screws
-- delete bumpy room thing
+- metal vents
 - room uvs need to be better
 
 
-- deal with blur/blur2
+- get rid of normal line data
+- draw ovals from randomized line segments, fade into center
+- drawPerlinNoiseRect goes away, along with all normal data
 
 
 - need textures to stamp better

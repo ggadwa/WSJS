@@ -39,7 +39,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         
-        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,false,true,0.7,0.8,0.2);
+        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,false,true,0.8,0.4);
         
             // random chunks on stone
             // we make sure that the first 4 random
@@ -96,7 +96,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             flipNormals=false;
             if (n>3) flipNormals=GenerateUtilityClass.randomPercentage(0.1);
         
-            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),flipNormals,(n<4),0.7,0.8,0.2);
+            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),flipNormals,(n<4),0.8,0.4);
         }
     }
     

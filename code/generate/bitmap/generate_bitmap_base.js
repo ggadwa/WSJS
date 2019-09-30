@@ -106,6 +106,7 @@ export default class GenerateBitmapBaseClass
         
         this.perlinNoiseColorFactor=null;
         this.perlinNoiseNormals=null;
+        this.noiseNormals=null;
         
             // current clip rect
             
@@ -492,26 +493,32 @@ export default class GenerateBitmapBaseClass
         let n0,n1,idx,k;
         let gridDist;
         
+            // the grid
+            // it must be evenly divisible
+            
+        if (((this.colorImgData.width%gridXSize)!==0) || ((this.colorImgData.height%gridYSize)!==0)) {
+            console.log('perlin noise grid must be divisible by texture size');
+            return;
+        }
+            
+        gridWid=Math.trunc(this.colorImgData.width/gridXSize);
+        gridHigh=Math.trunc(this.colorImgData.height/gridYSize);
+        gridDist=Math.sqrt((gridWid*gridWid)+(gridHigh*gridHigh));
+        
             // noise data arrays
             
-        this.perlinNoiseColorFactor=new Float32Array(this.colorCanvas.width*this.colorCanvas.height);
-        this.perlinNoiseNormals=new Uint8ClampedArray((this.colorCanvas.width*this.colorCanvas.height)*4);
-        
-            // the grid
-            
-        gridWid=Math.trunc(this.colorCanvas.width/gridXSize)+1;
-        gridHigh=Math.trunc(this.colorCanvas.height/gridYSize)+1;
-        gridDist=Math.sqrt((gridWid*gridWid)+(gridHigh*gridHigh));
+        this.perlinNoiseColorFactor=new Float32Array(this.colorImgData.width*this.colorImgData.height);
+        this.perlinNoiseNormals=new Uint8ClampedArray((this.colorImgData.width*this.colorImgData.height)*4);
         
             // generate the random grid vectors
             
         vectors=[];
         
-        for (y=0;y!==(gridYSize-1);y++) {
+        for (y=0;y!==gridYSize;y++) {
             
             rowVectors=[];
             
-            for (x=0;x!==(gridXSize-1);x++) {
+            for (x=0;x!==gridXSize;x++) {
                 normal=new PointClass(GenerateUtilityClass.randomNegativeOneToOne(),GenerateUtilityClass.randomNegativeOneToOne(),0);
                 normal.normalize2D();
                 rowVectors.push(normal);
@@ -523,6 +530,8 @@ export default class GenerateBitmapBaseClass
         }
         
         vectors.push(vectors[0]);           // wrap around
+        
+        vectors[gridYSize][gridXSize].setFromPoint(vectors[0][0]);      // final wrap around from top-left to top-right
 
             // create the noise arrays
             
@@ -532,14 +541,12 @@ export default class GenerateBitmapBaseClass
         for (y=0;y!==this.colorCanvas.height;y++) {
             
             gridY0=Math.trunc(y/gridHigh);
-            if (gridY0>=(gridYSize-1)) gridY0=gridYSize-2;
             gridY1=gridY0+1;
             
             for (x=0;x!==this.colorCanvas.width;x++) {
                 idx=((y*this.colorCanvas.width)+x)*4;
                 
                 gridX0=Math.trunc(x/gridWid);
-                if (gridX0>=(gridXSize-1)) gridX0=gridXSize-2;
                 gridX1=gridX0+1;
                 
                     // interpolate the grid normals and take
@@ -663,7 +670,164 @@ export default class GenerateBitmapBaseClass
              }
         }
         
-        this.blur(colorData,0,0,this.colorImgData.width,this.colorImgData.height,blurCount,blurClamp);
+        this.blur(colorData,lft,top,rgt,bot,blurCount,blurClamp);
+    }
+    
+    createNormalNoiseDataSinglePolygon(lft,top,rgt,bot,sidePointCount,lineSize)
+    {
+        /*
+        let n,k,k2,x,y,mx,my,add,sz;
+        let totalPointCount;
+        let normal;
+        let wid=rgt-lft;
+        let high=bot-top;
+        
+        if ((rgt<=lft) || (bot<=top)) return;
+        
+            // build the polygon
+
+        mx=Math.trunc((lft+rgt)*0.5);
+        my=Math.trunc((top+bot)*0.5);
+            
+        totalPointCount=sidePointCount*4;
+
+        x=new Uint16Array(totalPointCount);
+        y=new Uint16Array(totalPointCount);
+        
+        for (n=0;n!==sidePointCount;n++) {
+            add=Math.trunc((wid/sidePointCount)*n);
+            x[n]=lft+add;
+            y[n]=top;
+            x[n+(sidePointCount*2)]=rgt-add;
+            y[n+(sidePointCount*2)]=bot;
+        }
+
+        for (n=0;n!==sidePointCount;n++) {
+            add=Math.trunc((high/sidePointCount)*n);
+            x[n+sidePointCount]=rgt;
+            y[n+sidePointCount]=top+add;
+            x[n+(sidePointCount*3)]=lft;
+            y[n+(sidePointCount*3)]=bot-add;
+        }
+        
+            // round the corners
+        
+        sz=(wid*0.1);
+        if (sz<5) sz=5;
+        
+        add=GenerateUtilityClass.randomInt(sz,sz);
+        x[0]+=add;
+        y[0]+=add;
+        add*=0.5;
+        x[1]+=add;
+        y[1]+=add;
+        x[(sidePointCount*4)-1]+=add;
+        y[(sidePointCount*4)-1]+=add;
+        
+        add=GenerateUtilityClass.randomInt(sz,sz);
+        x[sidePointCount]-=add;
+        y[sidePointCount]+=add;
+        add*=0.5;
+        x[sidePointCount-1]-=add;
+        y[sidePointCount-1]+=add;
+        x[sidePointCount+1]-=add;
+        y[sidePointCount+1]+=add;
+
+        add=GenerateUtilityClass.randomInt(sz,sz);
+        x[sidePointCount*2]-=add;
+        y[sidePointCount*2]-=add;
+        add*=0.5;
+        x[(sidePointCount*2)-1]-=add;
+        y[(sidePointCount*2)-1]-=add;
+        x[(sidePointCount*2)+1]-=add;
+        y[(sidePointCount*2)+1]-=add;
+
+        add=GenerateUtilityClass.randomInt(sz,sz);
+        x[sidePointCount*3]+=add;
+        y[sidePointCount*3]-=add;
+        add*=0.5;
+        x[(sidePointCount*3)-1]+=add;
+        y[(sidePointCount*3)-1]-=add;
+        x[(sidePointCount*3)+1]+=add;
+        y[(sidePointCount*3)+1]-=add;
+
+            // randomize it
+
+        for (n=0;n!==totalPointCount;n++) {
+            add=GenerateUtilityClass.randomIndex(sz,sz);
+            x[n]+=(x[n]<mx)?add:-add;
+            add=GenerateUtilityClass.randomIndex(sz,sz);
+            y[n]+=(y[n]<my)?add:-add;
+        }
+
+            // draw the edges
+            
+        normal=new PointClass(0,0,0);
+
+        for (n=0;n!==lineSize;n++) {
+            
+            normal.setFromPoint(this.NORMAL_TOP_45); 
+            normal.y=((normal.y*(lineSize-n))/lineSize);
+            normal.normalize();
+
+            for (k=0;k!==sidePointCount;k++) {
+                k2=k+1;
+                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
+            }
+            
+            normal.setFromPoint(this.NORMAL_RIGHT_45); 
+            normal.x=((normal.x*(lineSize-n))/lineSize);
+            normal.normalize();
+
+            for (k=sidePointCount;k!==(sidePointCount*2);k++) {
+                k2=k+1;
+                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
+            }
+            
+            normal.setFromPoint(this.NORMAL_BOTTOM_45); 
+            normal.y=((normal.y*(lineSize-n))/lineSize);
+            normal.normalize();
+
+
+            for (k=(sidePointCount*2);k!==(sidePointCount*3);k++) {
+                k2=k+1;
+                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
+            }
+            
+            normal.setFromPoint(this.NORMAL_LEFT_45); 
+            normal.x=((normal.x*(lineSize-n))/lineSize);
+            normal.normalize();
+
+            for (k=(sidePointCount*3);k!==(sidePointCount*4);k++) {
+                k2=k+1;
+                if (k2===totalPointCount) k2=0;
+                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
+            }
+
+                // reduce polygon
+
+            for (k=0;k!==totalPointCount;k++) {
+                x[k]+=(x[k]<mx)?1:-1;
+                y[k]+=(y[k]<my)?1:-1;
+            }
+        }
+
+         */
+    }
+    
+    createNormalNoiseData()
+    {
+        let n,x,y,wid,high;
+        let nCount=1;
+        
+        for (n=0;n!==nCount;n++) {
+            wid=GenerateUtilityClass.randomInt(50,250);
+            high=GenerateUtilityClass.randomInt(50,250);
+            x=GenerateUtilityClass.randomInt(0,(this.colorImgData.width-wid));
+            y=GenerateUtilityClass.randomInt(0,(this.colorImgData.height-high));
+            
+            this.createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),10,15);
+        }
     }
 
         //
@@ -771,7 +935,7 @@ export default class GenerateBitmapBaseClass
         }
     }
         
-    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,flipNormals,addToMask,noisePercentage,noiseMinDarken,noiseDarkenDif)
+    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,flipNormals,addToMask,noiseMinDarken,noiseDarkenDif)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,darkFactor,idx;
@@ -831,13 +995,11 @@ export default class GenerateBitmapBaseClass
                     // any noise
                 
                 col.setFromColor(color);
-                
-                if (GenerateUtilityClass.randomPercentage(noisePercentage)) {
-                    darkFactor=GenerateUtilityClass.randomFloat(noiseMinDarken,noiseDarkenDif);
-                    col.r*=darkFactor;
-                    col.g*=darkFactor;
-                    col.b*=darkFactor;
-                }
+
+                darkFactor=GenerateUtilityClass.randomFloat(noiseMinDarken,noiseDarkenDif);
+                col.r*=darkFactor;
+                col.g*=darkFactor;
+                col.b*=darkFactor;
 
                     // the color pixel
 
@@ -1066,60 +1228,74 @@ export default class GenerateBitmapBaseClass
         // color stripes and gradients
         //
         
+    createRandomColorStripeArray(factor,baseColor)
+    {
+        let n,f,count;
+        let r,g,b,color;
+        let colors=[];
+
+            // make stripes of varying sizes and colors
+
+        count=0;
+
+        for (n=0;n!==100;n++) {
+            count--;
+
+            if (count<=0) {
+                count=1+Math.trunc(GenerateUtilityClass.random()*3);
+
+                f=1.0+((1.0-(GenerateUtilityClass.random()*2.0))*factor);
+
+                r=baseColor.r*f;
+                if (r<0.0) r=0.0;
+                if (r>1.0) r=1.0;
+
+                g=baseColor.g*f;
+                if (g<0.0) g=0.0;
+                if (g>1.0) g=1.0;
+
+                b=baseColor.b*f;
+                if (b<0.0) b=0.0;
+                if (b>1.0) b=1.0;
+                
+                color=new ColorClass(r,g,b);
+            }
+
+            colors.push(color);
+        }    
+
+        return(colors);
+    }
+        
     drawColorStripeHorizontal(lft,top,rgt,bot,factor,baseColor)
     {
         let x,y,nx,nz,idx;
         let color,redByte,greenByte,blueByte;
         let colors=this.createRandomColorStripeArray(factor,baseColor);
-        let wid=rgt-lft;
-        let high=bot-top;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
 
-        if ((wid<1) || (high<1)) return;
+        if ((rgt<=lft) || (bot<=top)) return;
+        
+            // write the stripes
+        
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
 
-            // chrome has a bizarre bug that will mix up
-            // two image datas of the same size, so we do these
-            // separately
-            
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-
-        for (y=0;y!==high;y++) {
+        for (y=top;y!==bot;y++) {
 
             color=colors[y%100];
             redByte=Math.trunc(color.r*255.0);
             greenByte=Math.trunc(color.g*255.0);
             blueByte=Math.trunc(color.b*255.0);
 
-            idx=(y*wid)*4;
+            idx=(y*this.colorImgData.width)*4;
 
-            for (x=0;x!==wid;x++) {
-                bitmapData[idx]=redByte;
-                bitmapData[idx+1]=greenByte;
-                bitmapData[idx+2]=blueByte;
+            for (x=lft;x!==rgt;x++) {
+                colorData[idx]=redByte;
+                colorData[idx+1]=greenByte;
+                colorData[idx+2]=blueByte;
 
-                idx+=4;
-            }
-        }
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);        
-
-            // the normal data
-            
-        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
-
-            // write the stripe
-
-        for (y=0;y!==high;y++) {
-
-            idx=(y*wid)*4;
-
-            for (x=0;x!==wid;x++) {
                 normalData[idx]=nx;
                 normalData[idx+1]=127.0;
                 normalData[idx+2]=nz;
@@ -1129,8 +1305,6 @@ export default class GenerateBitmapBaseClass
 
             nx=-nx;
         }
-
-        this.normalCTX.putImageData(normalImgData,lft,top);
     }
 
     drawColorStripeVertical(lft,top,rgt,bot,factor,baseColor)
@@ -1138,54 +1312,29 @@ export default class GenerateBitmapBaseClass
         let x,y,nx,nz,idx;
         let color,redByte,greenByte,blueByte;
         let colors=this.createRandomColorStripeArray(factor,baseColor);
-        let wid=rgt-lft;
-        let high=bot-top;
-        let bitmapImgData,bitmapData;
-        let normalImgData,normalData;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
 
-        if ((wid<1) || (high<1)) return;
+        if ((rgt<=lft) || (bot<=top)) return;
         
-            // chrome has a bizarre bug that will mix up
-            // two image datas of the same size, so we do these
-            // separately
+            // write the stripes
+            
+        nx=Math.trunc((0.10+1.0)*127.0);
+        nz=Math.trunc((0.90+1.0)*127.0);
 
-        bitmapImgData=this.colorCTX.getImageData(lft,top,wid,high);
-        bitmapData=bitmapImgData.data;
-
-            // write the stripe
-
-        for (x=0;x!==wid;x++) {
+        for (x=lft;x!==rgt;x++) {
 
             color=colors[x%100];
             redByte=Math.trunc(color.r*255.0);
             greenByte=Math.trunc(color.g*255.0);
             blueByte=Math.trunc(color.b*255.0);
 
-            for (y=0;y!==high;y++) {
-                idx=((y*wid)+x)*4;
-                bitmapData[idx]=redByte;
-                bitmapData[idx+1]=greenByte;
-                bitmapData[idx+2]=blueByte;
-            }
-        }
+            for (y=top;y!==bot;y++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                colorData[idx]=redByte;
+                colorData[idx+1]=greenByte;
+                colorData[idx+2]=blueByte;
 
-            // write all the data back
-
-        this.colorCTX.putImageData(bitmapImgData,lft,top);
-        
-            // normal data
-            
-        normalImgData=this.normalCTX.getImageData(lft,top,wid,high);
-        normalData=normalImgData.data;
-
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
-
-            // write the stripe
-
-        for (x=0;x!==wid;x++) {
-            for (y=0;y!==high;y++) {
-                idx=((y*wid)+x)*4;
                 normalData[idx]=nx;
                 normalData[idx+1]=127.0;
                 normalData[idx+2]=nz;
@@ -1193,19 +1342,16 @@ export default class GenerateBitmapBaseClass
 
             nx=-nx;
         }
-
-        this.normalCTX.putImageData(normalImgData,lft,top);
     }
 
         //
         // line drawings
         //
         
-    drawLine(x,y,x2,y2,color,antiAlias,includeNormals)
+    drawLineColor(x,y,x2,y2,color,antiAlias)
     {
         let xLen,yLen,sp,ep,dx,dy,slope,idx,idx2;
         let colorData=this.colorImgData.data;
-        let normalData=this.normalImgData.data;
         let r=Math.trunc(color.r*255.0);
         let g=Math.trunc(color.g*255.0);
         let b=Math.trunc(color.b*255.0);
@@ -1239,35 +1385,17 @@ export default class GenerateBitmapBaseClass
                 colorData[idx+1]=g;
                 colorData[idx+2]=b;
                 
-                if (includeNormals) {
-                    normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
-                    normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
-                    normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
-                }
-                
                 if ((dy>0) && (antiAlias)) {
                     idx2=idx-(this.colorImgData.width*4);
                     colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
                     colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
                     colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                    
-                    if (includeNormals) {
-                        normalData[idx]=(this.NORMAL_TOP_45.x+1.0)*127.0;
-                        normalData[idx+1]=(this.NORMAL_TOP_45.y+1.0)*127.0;
-                        normalData[idx+2]=(this.NORMAL_TOP_45.z+1.0)*127.0;
-                    }
                 }
                 if ((dy<(this.colorImgData-1)) && (antiAlias)) {
                     idx2=idx+(this.colorImgData.width*4);
                     colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
                     colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
                     colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                    
-                    if (includeNormals) {
-                        normalData[idx]=(this.NORMAL_BOTTOM_45.x+1.0)*127.0;
-                        normalData[idx+1]=(this.NORMAL_BOTTOM_45.y+1.0)*127.0;
-                        normalData[idx+2]=(this.NORMAL_BOTTOM_45.z+1.0)*127.0;
-                    }
                 }
                 
                 dy+=slope;
@@ -1295,43 +1423,92 @@ export default class GenerateBitmapBaseClass
                 colorData[idx+1]=g;
                 colorData[idx+2]=b;
                 
-                if (includeNormals) {
-                    normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
-                    normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
-                    normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
-                }
-                
                 if ((dx>0) && (antiAlias)) {
                     idx2=idx-4;
                     colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
                     colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
                     colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                    
-                    if (includeNormals) {
-                        normalData[idx]=(this.NORMAL_LEFT_45.x+1.0)*127.0;
-                        normalData[idx+1]=(this.NORMAL_LEFT_45.y+1.0)*127.0;
-                        normalData[idx+2]=(this.NORMAL_LEFT_45.z+1.0)*127.0;
-                    }
                 }
                 if ((dx<(this.colorImgData.width-1)) && (antiAlias)) {
                     idx2=idx+4;
                     colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
                     colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
                     colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                    
-                    if (includeNormals) {
-                        normalData[idx]=(this.NORMAL_RIGHT_45.x+1.0)*127.0;
-                        normalData[idx+1]=(this.NORMAL_RIGHT_45.y+1.0)*127.0;
-                        normalData[idx+2]=(this.NORMAL_RIGHT_45.z+1.0)*127.0;
-                    }
                 }
                 
                 dx+=slope;
             }
         }
     }
+    
+    drawLineNormal(x,y,x2,y2,normal)
+    {
+        let xLen,yLen,sp,ep,dx,dy,slope,idx;
+        let normalData=this.normalImgData.data;
+        let r=Math.trunc((normal.x+1.0)*127.0);
+        let g=Math.trunc((normal.y+1.0)*127.0);
+        let b=Math.trunc((normal.z+1.0)*127.0);
         
-    drawVerticalCrack(x,y,y2,clipLft,clipRgt,lineDir,lineVariant,color,lightLine,canSplit)
+            // the line
+            
+        xLen=Math.abs(x2-x);
+        yLen=Math.abs(y2-y);
+        
+        if ((xLen===0) && (yLen===0)) return;
+            
+        if (xLen>yLen) {
+            slope=yLen/xLen;
+            
+            if (x<x2) {
+                sp=x;
+                ep=x2;
+                dy=y;
+                slope*=Math.sign(y2-y);
+            }
+            else {
+                sp=x2;
+                ep=x;
+                dy=y2;
+                slope*=Math.sign(y-y2);
+            }
+            
+            for (dx=sp;dx!==ep;dx++) {
+                idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
+                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                
+                dy+=slope;
+            }
+        }
+        else {
+            slope=xLen/yLen;
+            
+            if (y<y2) {
+                sp=y;
+                ep=y2;
+                dx=x;
+                slope*=Math.sign(x2-x);
+            }
+            else {
+                sp=y2;
+                ep=y;
+                dx=x2;
+                slope*=Math.sign(x-x2);
+            }
+            
+            for (dy=sp;dy!==ep;dy++) {
+                idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
+                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                
+                dx+=slope;
+            }
+        }
+    }
+            
+    drawVerticalCrack(x,y,y2,clipLft,clipRgt,lineDir,lineVariant,color,canSplit)
     {
         let n,sx,sy,ex,ey;
         let segCount=GenerateUtilityClass.randomInt(2,5);
@@ -1355,16 +1532,19 @@ export default class GenerateBitmapBaseClass
             
             if (sy===ey) return;
             
-            this.drawLine(sx,sy,ex,ey,color,lightLine,true,true);
+            this.drawLineColor(sx,sy,ex,ey,color,true);
+            this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
+            this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_LEFT_45);
+            this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_RIGHT_45);
             
             if ((ex===clipLft) || (ex===clipRgt)) break;
             
             if ((canSplit) && (GenerateUtilityClass.randomPercentage(0.5))) {
                 if (lineDir>0) {
-                    this.drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,lightLine,false);
+                    this.drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,false);
                 }
                 else {
-                    this.drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,lightLine,false);
+                    this.drawVerticalCrack(ex,ey,y2,clipLft,clipRgt,-lineDir,lineVariant,color,false);
                 }
                 
                 canSplit=false;
@@ -1589,44 +1769,6 @@ export default class GenerateBitmapBaseClass
         return(colorStr);
     }
 
-    createRandomColorStripeArray(factor,baseColor)
-    {
-        let n,f,count;
-        let r,g,b,color;
-        let colors=[];
-
-            // make stripes of varying sizes and colors
-
-        count=0;
-
-        for (n=0;n!==100;n++) {
-            count--;
-
-            if (count<=0) {
-                count=1+Math.trunc(GenerateUtilityClass.random()*3);
-
-                f=1.0+((1.0-(GenerateUtilityClass.random()*2.0))*factor);
-
-                r=baseColor.r*f;
-                if (r<0.0) r=0.0;
-                if (r>1.0) r=1.0;
-
-                g=baseColor.g*f;
-                if (g<0.0) g=0.0;
-                if (g>1.0) g=1.0;
-
-                b=baseColor.b*f;
-                if (b<0.0) b=0.0;
-                if (b>1.0) b=1.0;
-                
-                color=new ColorClass(r,g,b);
-            }
-
-            colors.push(color);
-        }    
-
-        return(colors);
-    }
     
         //
         // normal and glow clearing
@@ -2505,7 +2647,6 @@ export default class GenerateBitmapBaseClass
             if (ey>clipBot) ey=clipBot;
             
             this.drawLine(sx,sy,ex,ey,color,lightLine);
-            //this.drawLine2(this.colorCTX,sx,sy,ex,ey,color);
             
             sx=ex;
             sy=ey;
@@ -3317,11 +3458,6 @@ export default class GenerateBitmapBaseClass
         this.glowCTX=this.glowCanvas.getContext('2d');
         this.glowImgData=this.glowCTX.getImageData(0,0,this.glowCanvas.width,this.glowCanvas.height);
         this.clearImageData(this.glowImgData,0,0,0,255);
-        
-        this.clearCanvases(this.colorCanvas,this.colorCTX,255,255,255,255);
-        this.clearCanvases(this.normalCanvas,this.normalCTX,0,0,255,255);
-        this.clearCanvases(this.specularCanvas,this.specularCTX,0,0,0,255);
-        this.clearCanvases(this.glowCanvas,this.glowCTX,0,0,0,255);
         
         this.mask=new Uint8Array(this.colorCanvas.width*this.colorCanvas.height);
 

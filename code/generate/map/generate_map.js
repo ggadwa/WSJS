@@ -367,7 +367,7 @@ export default class GenerateMapClass
                 // room light
             
             intensity=Math.trunc(roomSize*0.7)+((roomHigh*0.6)*(room.storyCount-1));
-            light=new LightClass(new PointClass((room.offset.x+(Math.trunc(roomSize*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(roomSize*0.5)))),new ColorClass(1,1,1),intensity,0.3);
+            light=new LightClass(new PointClass((room.offset.x+(Math.trunc(roomSize*0.5))),Math.trunc(roomTopY*0.8),(room.offset.z+(Math.trunc(roomSize*0.5)))),new ColorClass(1,1,1),intensity,0.3);
             map.lightList.add(light);
         }
         

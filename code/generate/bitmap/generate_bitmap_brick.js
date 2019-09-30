@@ -43,6 +43,9 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
         this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
         
+        this.createNormalNoiseData();
+        return;
+        
             // draw the bricks
 
         for (n=0;n!==segments.length;n++) {
@@ -88,7 +91,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                         ex=sx+(GenerateUtilityClass.randomInt(5,25)-15);
 
                         lineColor=this.darkenColor(drawBrickColor,0.7);
-                        this.drawVerticalCrack(sx,top,bot,lft,rgt,GenerateUtilityClass.randomSign(),10,lineColor,false,true);
+                        this.drawVerticalCrack(sx,top,bot,lft,rgt,GenerateUtilityClass.randomSign(),10,lineColor,true);
                     }
                 }
                 

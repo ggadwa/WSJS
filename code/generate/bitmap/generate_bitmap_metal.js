@@ -8,6 +8,13 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
 {
+    static CORRUGATION_LINES=
+            [
+                [[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,1.0],[1.0,0.0]]],  // diamonds
+                [[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]]],  // waves
+                [[[0.5,0.0],[0.5,1.0]],[[0.0,0.5],[1.0,0.5]],[[0.0,0.5],[1.0,0.5]],[[0.5,0.0],[0.5,1.0]]]   // pluses
+            ];
+    
     constructor(core)
     {
         super(core,true,true,false);
@@ -15,27 +22,94 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
     }
             
         //
-        // metal bitmaps
+        // metal pieces
         //
     
+    generateMetalCorrugation(lft,top,rgt,bot,metalColor)
+    {
+        let x,y,dx,dy,sx,sy,ex,ey,idx,line;
+        let corrCount,corrWid,corrHigh;
+        let lineStyle,lineWid,lineHigh;
+        let metalCorrColor;
+        let wid=rgt-lft;
+        let high=bot-top;
+        
+        if ((wid<=0) || (high<=0)) return;
+        
+        metalCorrColor=this.darkenColor(metalColor,0.6);
+
+        corrCount=GenerateUtilityClass.randomInt(Math.trunc(wid*0.015),Math.trunc(wid*0.025));
+        corrWid=Math.trunc(wid/corrCount);
+        corrHigh=Math.trunc(high/corrCount);
+
+        lineWid=corrWid-4;
+        lineHigh=corrHigh-4;
+
+        lineStyle=GenerateUtilityClass.randomIndex(GenerateBitmapMetalClass.CORRUGATION_LINES.length);
+
+            // corrugations
+
+        dy=top+Math.trunc((high-(corrHigh*corrCount))*0.5);
+
+        for (y=0;y!==corrCount;y++) {
+
+            dx=lft+Math.trunc((wid-(corrWid*corrCount))*0.5);
+
+            for (x=0;x!==corrCount;x++) {
+
+                idx=((y&0x1)*2)+(x&0x1);
+                line=GenerateBitmapMetalClass.CORRUGATION_LINES[lineStyle][idx];
+
+                sx=dx+(line[0][0]*lineWid);
+                sy=dy+(line[0][1]*lineHigh);
+                ex=dx+(line[1][0]*lineWid);
+                ey=dy+(line[1][1]*lineHigh);
+
+                this.drawLine(sx,sy,ex,ey,metalCorrColor,true,true);
+
+                dx+=corrWid;
+            }
+
+            dy+=corrHigh;
+        }
+    }
+
+    generateMetalScrews(lft,top,rgt,bot,screwColor,screwSize)
+    {
+        let edgeSize=Math.trunc(screwSize*0.5);
+        
+            // corners
+            
+        if (GenerateUtilityClass.randomPercentage(0.33)) {
+            this.drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
+            this.drawOval((rgt-screwSize),top,rgt,(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
+            this.drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
+            this.drawOval(lft,(bot-screwSize),(lft+screwSize),bot,0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
+        }
+        
+            // middles
+
+    }
+
     generateMetalPanel(lft,top,rgt,bot,metalColor,edgeSize,screwSize)
     {
         let lft2,rgt2,top2,bot2,sz;
         let frameColor;
-
-        let screwInnerSize=Math.trunc(screwSize*0.4);
         let screwColor=this.boostColor(metalColor,0.05);
         
             // the plate
             
-        frameColor=this.darkenColor(metalColor,0.9);
+        this.createPerlinNoiseData(8,8,0.8);
         this.drawRect(lft,top,rgt,bot,metalColor);
+        this.drawPerlinNoiseRect(lft,top,rgt,bot,0.5,1.3);
+
+        frameColor=this.darkenColor(metalColor,0.9);
         this.drawMetalShine(lft,top,rgt,bot,metalColor);
         this.draw3DFrameRect(lft,top,rgt,bot,edgeSize,frameColor,true);
         
             // variations
             
-        switch (GenerateUtilityClass.randomIndex(2)) {
+        switch (GenerateUtilityClass.randomIndex(3)) {
             
                 // internal box
                 
@@ -48,78 +122,28 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 frameColor=this.darkenColor(metalColor,0.8);
                 this.draw3DFrameRect(lft2,top2,rgt2,bot2,edgeSize,frameColor,false);
                 this.drawMetalShine((lft2+edgeSize),(top2+edgeSize),(rgt2-edgeSize),(bot2-edgeSize),metalColor);
+                
+                sz=edgeSize+Math.trunc(edgeSize*0.2);
+                this.generateMetalScrews((lft+sz),(top+sz),(rgt-sz),(bot-sz),screwColor,screwSize);
+                break;
+                
+                // corrugation
+                
+            case 1:
+                sz=Math.trunc(edgeSize*2.5);
+                this.generateMetalCorrugation((lft+sz),(top+sz),(rgt-sz),(bot-sz),metalColor);
+                break;
+                
+                // empty
+                
+            case 2:
+                sz=edgeSize+Math.trunc(edgeSize*0.2);
+                this.generateMetalScrews((lft+sz),(top+sz),(rgt-sz),(bot-sz),screwColor,screwSize);
                 break;
         }
-        
-            // screws
-        
-        /*
-        this.generateMetalScrewsRandom((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),screwColor,screwSize,screwInnerSize);
-            
-        let         n,x,y,lx,rx,ty,by;
-        let         xCount,xOffset,yCount,yOffset;
-        
-        lx=lft+5;
-        rx=(rgt-5)-screwSize;
-        ty=top+5;
-        by=(bot-5)-screwSize;
-        
-        xCount=Math.trunc(((rgt-lft)/(screwSize+5)))-2;     // always avoid corners
-        xOffset=Math.trunc(((rgt-lft)-(xCount*(screwSize+5)))*0.5);
-        
-        yCount=Math.trunc(((bot-top)/(screwSize+5)))-2;
-        yOffset=Math.trunc(((bot-top)-(yCount*(screwSize+5)))*0.5);
-        
-            // corners
-
-        if (GenerateUtilityClass.randomPercentage(0.33)) {
-            this.draw3DOval(lx,ty,(lx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(rx,ty,(rx+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(lx,by,(lx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            this.draw3DOval(rx,by,(rx+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            return;
-        }
-        
-            // left side
-            
-        if (GenerateUtilityClass.randomPercentage(0.33)) {
-            for (n=0;n!==yCount;n++) {
-                y=top+(yOffset+(n*(screwSize+5)));
-                this.draw3DOval(lx,y,(lx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            }
-        }
-        
-            // right side
-            
-        if (GenerateUtilityClass.randomPercentage(0.33)) {
-            for (n=0;n!==yCount;n++) {
-                y=top+(yOffset+(n*(screwSize+5)));
-                this.draw3DOval(rx,y,(rx+screwSize),(y+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            }
-        }
-        
-            // top
-            
-        if (GenerateUtilityClass.randomPercentage(0.33)) {
-            for (n=0;n!==xCount;n++) {
-                x=lft+(xOffset+(n*(screwSize+5)));
-                this.draw3DOval(x,ty,(x+screwSize),(ty+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            }
-        }
-        
-            // bottom
-            
-        if (GenerateUtilityClass.randomPercentage(0.33)) {
-            for (n=0;n!==xCount;n++) {
-                x=lft+(xOffset+(n*(screwSize+5)));
-                this.draw3DOval(x,by,(x+screwSize),(by+screwSize),0.0,1.0,2,screwInnerSize,screwColor,this.blackColor);
-            }
-        }
-
-*/
     }
     
-    generateMetal()
+    generateInternal()
     {
         let mx,my;
         
@@ -151,15 +175,6 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
             // finish with the specular
 
         this.createSpecularMap(0.6);
-    }
-            
-        //
-        // generate mainline
-        //
-
-    generateInternal()
-    {
-        this.generateMetal();
     }
 
 }
