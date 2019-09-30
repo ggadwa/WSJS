@@ -673,161 +673,179 @@ export default class GenerateBitmapBaseClass
         this.blur(colorData,lft,top,rgt,bot,blurCount,blurClamp);
     }
     
+    createNormalNoiseDataSinglePolygonLine(x,y,x2,y2,normal)
+    {
+        let xLen,yLen,sp,ep,dx,dy,wx,wy,slope,idx;
+        let normalData=this.normalImgData.data;
+        let r=Math.trunc((normal.x+1.0)*127.0);
+        let g=Math.trunc((normal.y+1.0)*127.0);
+        let b=Math.trunc((normal.z+1.0)*127.0);
+        
+            // the line
+            
+        xLen=Math.abs(x2-x);
+        yLen=Math.abs(y2-y);
+        
+        if ((xLen===0) && (yLen===0)) return;
+            
+        if (xLen>yLen) {
+            slope=yLen/xLen;
+            
+            if (x<x2) {
+                sp=x;
+                ep=x2;
+                dy=y;
+                slope*=Math.sign(y2-y);
+            }
+            else {
+                sp=x2;
+                ep=x;
+                dy=y2;
+                slope*=Math.sign(y-y2);
+            }
+            
+            for (dx=sp;dx!==ep;dx++) {
+                wx=dx;
+                if (wx<0) wx=this.colorImgData.width+wx;
+                if (wx>=this.colorImgData.width) wx-=this.colorImgData.width;        // wrap around
+
+                wy=dy;
+                if (wy<0) wy=this.colorImgData.height+wy;
+                if (wy>=this.colorImgData.height) wy-=this.colorImgData.height;        // wrap around
+
+                idx=((Math.trunc(wy)*this.colorImgData.width)+wx)*4;
+                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                
+                dy+=slope;
+            }
+        }
+        else {
+            slope=xLen/yLen;
+            
+            if (y<y2) {
+                sp=y;
+                ep=y2;
+                dx=x;
+                slope*=Math.sign(x2-x);
+            }
+            else {
+                sp=y2;
+                ep=y;
+                dx=x2;
+                slope*=Math.sign(x-x2);
+            }
+            
+            for (dy=sp;dy!==ep;dy++) {
+                wx=dx;
+                if (wx<0) wx=this.colorImgData.width+wx;
+                if (wx>=this.colorImgData.width) wx-=this.colorImgData.width;        // wrap around
+
+                wy=dy;
+                if (wy<0) wy=this.colorImgData.height+wy;
+                if (wy>=this.colorImgData.height) wy-=this.colorImgData.height;        // wrap around
+
+                idx=((wy*this.colorImgData.width)+Math.trunc(wx))*4;
+                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                
+                dx+=slope;
+            }
+        }
+    }
+    
     createNormalNoiseDataSinglePolygon(lft,top,rgt,bot,sidePointCount,lineSize)
     {
-        /*
-        let n,k,k2,x,y,mx,my,add,sz;
-        let totalPointCount;
-        let normal;
-        let wid=rgt-lft;
-        let high=bot-top;
+        let n,k,x,y,sx,sy,lx,ly,fx,fy,rad,idx;
+        let normal,nFactor;
+        let mx=Math.trunc((lft+rgt)*0.5);
+        let my=Math.trunc((top+bot)*0.5);
+        let halfWid=Math.trunc((rgt-lft)*0.5);
+        let halfHigh=Math.trunc((bot-top)*0.5);
+        let startArc=0;
+        let endArc=360;
+        let normalZFactor=0.5;
+        let flipNormals=false;
+        let rx=new Int32Array(36);
+        let ry=new Int32Array(36);
+        
+        lineSize=5;
         
         if ((rgt<=lft) || (bot<=top)) return;
         
-            // build the polygon
-
-        mx=Math.trunc((lft+rgt)*0.5);
-        my=Math.trunc((top+bot)*0.5);
+            // create randomized points
+            // for oval
             
-        totalPointCount=sidePointCount*4;
-
-        x=new Uint16Array(totalPointCount);
-        y=new Uint16Array(totalPointCount);
-        
-        for (n=0;n!==sidePointCount;n++) {
-            add=Math.trunc((wid/sidePointCount)*n);
-            x[n]=lft+add;
-            y[n]=top;
-            x[n+(sidePointCount*2)]=rgt-add;
-            y[n+(sidePointCount*2)]=bot;
+        for (n=0;n!=36;n++) {
+            rx[n]=GenerateUtilityClass.randomInt(0,20)-10;
+            ry[n]=GenerateUtilityClass.randomInt(0,20)-10;
         }
 
-        for (n=0;n!==sidePointCount;n++) {
-            add=Math.trunc((high/sidePointCount)*n);
-            x[n+sidePointCount]=rgt;
-            y[n+sidePointCount]=top+add;
-            x[n+(sidePointCount*3)]=lft;
-            y[n+(sidePointCount*3)]=bot-add;
-        }
-        
-            // round the corners
-        
-        sz=(wid*0.1);
-        if (sz<5) sz=5;
-        
-        add=GenerateUtilityClass.randomInt(sz,sz);
-        x[0]+=add;
-        y[0]+=add;
-        add*=0.5;
-        x[1]+=add;
-        y[1]+=add;
-        x[(sidePointCount*4)-1]+=add;
-        y[(sidePointCount*4)-1]+=add;
-        
-        add=GenerateUtilityClass.randomInt(sz,sz);
-        x[sidePointCount]-=add;
-        y[sidePointCount]+=add;
-        add*=0.5;
-        x[sidePointCount-1]-=add;
-        y[sidePointCount-1]+=add;
-        x[sidePointCount+1]-=add;
-        y[sidePointCount+1]+=add;
-
-        add=GenerateUtilityClass.randomInt(sz,sz);
-        x[sidePointCount*2]-=add;
-        y[sidePointCount*2]-=add;
-        add*=0.5;
-        x[(sidePointCount*2)-1]-=add;
-        y[(sidePointCount*2)-1]-=add;
-        x[(sidePointCount*2)+1]-=add;
-        y[(sidePointCount*2)+1]-=add;
-
-        add=GenerateUtilityClass.randomInt(sz,sz);
-        x[sidePointCount*3]+=add;
-        y[sidePointCount*3]-=add;
-        add*=0.5;
-        x[(sidePointCount*3)-1]+=add;
-        y[(sidePointCount*3)-1]-=add;
-        x[(sidePointCount*3)+1]+=add;
-        y[(sidePointCount*3)+1]-=add;
-
-            // randomize it
-
-        for (n=0;n!==totalPointCount;n++) {
-            add=GenerateUtilityClass.randomIndex(sz,sz);
-            x[n]+=(x[n]<mx)?add:-add;
-            add=GenerateUtilityClass.randomIndex(sz,sz);
-            y[n]+=(y[n]<my)?add:-add;
-        }
-
-            // draw the edges
+            // build the polygon/oval
             
         normal=new PointClass(0,0,0);
+        
+        for (n=0;n!=lineSize;n++) {
+        
+            for (k=0;k!=36;k++) {
+                rad=(Math.PI*2.0)*(k/36);
 
-        for (n=0;n!==lineSize;n++) {
+                fx=Math.sin(rad);
+                x=(mx+Math.trunc(halfWid*fx))+rx[k];
+
+                fy=Math.cos(rad);
+                y=(my-Math.trunc(halfHigh*fy))+ry[k];
+                
+                nFactor=1.0-(n/lineSize);
+                normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
+                normal.y=(fy*nFactor)+(normal.y*(1.0-nFactor));
+                normal.z=(normalZFactor*nFactor)+(normal.z*(1.0-nFactor));
+                if (flipNormals) {
+                    normal.x=-normal.x;
+                    normal.y=-normal.y;
+                }
+
+                normal.normalize();
+
+                if (k!==0) {
+                    this.createNormalNoiseDataSinglePolygonLine(lx,ly,x,y,normal);
+                }
+                else {
+                    sx=x;
+                    sy=y;
+                }
+
+                lx=x;
+                ly=y;
+            }
+
+            this.createNormalNoiseDataSinglePolygonLine(lx,ly,sx,sy,normal);
             
-            normal.setFromPoint(this.NORMAL_TOP_45); 
-            normal.y=((normal.y*(lineSize-n))/lineSize);
-            normal.normalize();
+            halfWid--;
+            if (halfWid===0) break;
 
-            for (k=0;k!==sidePointCount;k++) {
-                k2=k+1;
-                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
-            }
-            
-            normal.setFromPoint(this.NORMAL_RIGHT_45); 
-            normal.x=((normal.x*(lineSize-n))/lineSize);
-            normal.normalize();
-
-            for (k=sidePointCount;k!==(sidePointCount*2);k++) {
-                k2=k+1;
-                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
-            }
-            
-            normal.setFromPoint(this.NORMAL_BOTTOM_45); 
-            normal.y=((normal.y*(lineSize-n))/lineSize);
-            normal.normalize();
-
-
-            for (k=(sidePointCount*2);k!==(sidePointCount*3);k++) {
-                k2=k+1;
-                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
-            }
-            
-            normal.setFromPoint(this.NORMAL_LEFT_45); 
-            normal.x=((normal.x*(lineSize-n))/lineSize);
-            normal.normalize();
-
-            for (k=(sidePointCount*3);k!==(sidePointCount*4);k++) {
-                k2=k+1;
-                if (k2===totalPointCount) k2=0;
-                this.drawLineNormalData(this.normalImgData.data,x[k],y[k],x[k2],y[k2],normal);
-            }
-
-                // reduce polygon
-
-            for (k=0;k!==totalPointCount;k++) {
-                x[k]+=(x[k]<mx)?1:-1;
-                y[k]+=(y[k]<my)?1:-1;
-            }
+            halfHigh--;
+            if (halfHigh===0) break;
         }
-
-         */
     }
     
     createNormalNoiseData()
     {
         let n,x,y,wid,high;
-        let nCount=1;
+        let nCount=100;
         
         for (n=0;n!==nCount;n++) {
-            wid=GenerateUtilityClass.randomInt(50,250);
-            high=GenerateUtilityClass.randomInt(50,250);
-            x=GenerateUtilityClass.randomInt(0,(this.colorImgData.width-wid));
-            y=GenerateUtilityClass.randomInt(0,(this.colorImgData.height-high));
+            x=GenerateUtilityClass.randomInt(0,(this.colorImgData.width-1));
+            y=GenerateUtilityClass.randomInt(0,(this.colorImgData.height-1));
+            wid=GenerateUtilityClass.randomInt(20,20);
+            high=GenerateUtilityClass.randomInt(20,20);
             
             this.createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),10,15);
         }
+        
+        this.blur(this.normalImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,5,false);
     }
 
         //
@@ -1380,22 +1398,24 @@ export default class GenerateBitmapBaseClass
             }
             
             for (dx=sp;dx!==ep;dx++) {
-                idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
-                colorData[idx]=r;
-                colorData[idx+1]=g;
-                colorData[idx+2]=b;
+                if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
+                    idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
+                    colorData[idx]=r;
+                    colorData[idx+1]=g;
+                    colorData[idx+2]=b;
                 
-                if ((dy>0) && (antiAlias)) {
-                    idx2=idx-(this.colorImgData.width*4);
-                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                }
-                if ((dy<(this.colorImgData-1)) && (antiAlias)) {
-                    idx2=idx+(this.colorImgData.width*4);
-                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    if ((dy>0) && (antiAlias)) {
+                        idx2=idx-(this.colorImgData.width*4);
+                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    }
+                    if ((dy<(this.colorImgData-1)) && (antiAlias)) {
+                        idx2=idx+(this.colorImgData.width*4);
+                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    }
                 }
                 
                 dy+=slope;
@@ -1418,22 +1438,24 @@ export default class GenerateBitmapBaseClass
             }
             
             for (dy=sp;dy!==ep;dy++) {
-                idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
-                colorData[idx]=r;
-                colorData[idx+1]=g;
-                colorData[idx+2]=b;
+                if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
+                    idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
+                    colorData[idx]=r;
+                    colorData[idx+1]=g;
+                    colorData[idx+2]=b;
                 
-                if ((dx>0) && (antiAlias)) {
-                    idx2=idx-4;
-                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                }
-                if ((dx<(this.colorImgData.width-1)) && (antiAlias)) {
-                    idx2=idx+4;
-                    colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                    colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                    colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    if ((dx>0) && (antiAlias)) {
+                        idx2=idx-4;
+                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    }
+                    if ((dx<(this.colorImgData.width-1)) && (antiAlias)) {
+                        idx2=idx+4;
+                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
+                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
+                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    }
                 }
                 
                 dx+=slope;
@@ -1473,10 +1495,12 @@ export default class GenerateBitmapBaseClass
             }
             
             for (dx=sp;dx!==ep;dx++) {
-                idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
-                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
-                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
-                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
+                    idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
+                    normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                    normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                    normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                }
                 
                 dy+=slope;
             }
@@ -1498,10 +1522,12 @@ export default class GenerateBitmapBaseClass
             }
             
             for (dy=sp;dy!==ep;dy++) {
-                idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
-                normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
-                normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
-                normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
+                    idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
+                    normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                    normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                    normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                }
                 
                 dx+=slope;
             }
