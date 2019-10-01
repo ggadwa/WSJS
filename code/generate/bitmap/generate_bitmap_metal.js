@@ -65,7 +65,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 ex=dx+(line[1][0]*lineWid);
                 ey=dy+(line[1][1]*lineHigh);
 
-                this.drawLine(sx,sy,ex,ey,metalCorrColor,true,true);
+                this.drawLineColor(sx,sy,ex,ey,metalCorrColor,true,true);
 
                 dx+=corrWid;
             }

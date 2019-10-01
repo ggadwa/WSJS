@@ -110,15 +110,17 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         let altStoneColor=this.getRandomColor();
         let groutColor=this.getRandomColorDull(0.3);
         
-            // create segments and noise data
+            // create segments
             
         let segments=this.createRandomSegments();
-        this.createPerlinNoiseData(16,16,0.5);
 
-            // the perlin noise grout
+            // the noise grout
             
         this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,groutColor);
-        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.8,1.3);
+        this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
+        
+        this.createNormalNoiseData(1.7,0.3);
+        this.drawNormalNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height);
         
             // draw the stones
 

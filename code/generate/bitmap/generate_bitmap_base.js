@@ -642,9 +642,9 @@ export default class GenerateBitmapBaseClass
                 
                     // and set the normals
                     
-                normalData[idx]=this.perlinNoiseNormals[idx];
-                normalData[idx+1]=this.perlinNoiseNormals[idx+1];
-                normalData[idx+2]=this.perlinNoiseNormals[idx+2];
+                //normalData[idx]=this.perlinNoiseNormals[idx];
+                //normalData[idx+1]=this.perlinNoiseNormals[idx+1];
+                //normalData[idx+2]=this.perlinNoiseNormals[idx+2];
             }
         }
     }
@@ -676,7 +676,7 @@ export default class GenerateBitmapBaseClass
     createNormalNoiseDataSinglePolygonLine(x,y,x2,y2,normal)
     {
         let xLen,yLen,sp,ep,dx,dy,wx,wy,slope,idx;
-        let normalData=this.normalImgData.data;
+        let normalData=this.noiseNormals;
         let r=Math.trunc((normal.x+1.0)*127.0);
         let g=Math.trunc((normal.y+1.0)*127.0);
         let b=Math.trunc((normal.z+1.0)*127.0);
@@ -756,7 +756,7 @@ export default class GenerateBitmapBaseClass
         }
     }
     
-    createNormalNoiseDataSinglePolygon(lft,top,rgt,bot,sidePointCount,lineSize)
+    createNormalNoiseDataSinglePolygon(lft,top,rgt,bot,normalZFactor,flipNormals)
     {
         let n,k,x,y,sx,sy,lx,ly,fx,fy,rad,idx;
         let normal,nFactor;
@@ -764,16 +764,17 @@ export default class GenerateBitmapBaseClass
         let my=Math.trunc((top+bot)*0.5);
         let halfWid=Math.trunc((rgt-lft)*0.5);
         let halfHigh=Math.trunc((bot-top)*0.5);
-        let startArc=0;
-        let endArc=360;
-        let normalZFactor=0.5;
-        let flipNormals=false;
+        let startArc,endArc,lineSize;
         let rx=new Int32Array(36);
         let ry=new Int32Array(36);
         
-        lineSize=5;
-        
         if ((rgt<=lft) || (bot<=top)) return;
+        
+            // random settings
+            
+        lineSize=GenerateUtilityClass.randomInt(2,3);
+        startArc=GenerateUtilityClass.randomInt(0,36);
+        endArc=GenerateUtilityClass.randomInt(startArc,36);
         
             // create randomized points
             // for oval
@@ -788,15 +789,16 @@ export default class GenerateBitmapBaseClass
         normal=new PointClass(0,0,0);
         
         for (n=0;n!=lineSize;n++) {
-        
-            for (k=0;k!=36;k++) {
-                rad=(Math.PI*2.0)*(k/36);
+            
+            for (k=startArc;k<endArc;k++) {
+                idx=k%36;
+                rad=(Math.PI*2.0)*(idx/36);
 
                 fx=Math.sin(rad);
-                x=(mx+Math.trunc(halfWid*fx))+rx[k];
+                x=(mx+Math.trunc(halfWid*fx))+rx[idx];
 
                 fy=Math.cos(rad);
-                y=(my-Math.trunc(halfHigh*fy))+ry[k];
+                y=(my-Math.trunc(halfHigh*fy))+ry[idx];
                 
                 nFactor=1.0-(n/lineSize);
                 normal.x=(fx*nFactor)+(normal.x*(1.0-nFactor));
@@ -809,7 +811,7 @@ export default class GenerateBitmapBaseClass
 
                 normal.normalize();
 
-                if (k!==0) {
+                if (k!==startArc) {
                     this.createNormalNoiseDataSinglePolygonLine(lx,ly,x,y,normal);
                 }
                 else {
@@ -820,8 +822,6 @@ export default class GenerateBitmapBaseClass
                 lx=x;
                 ly=y;
             }
-
-            this.createNormalNoiseDataSinglePolygonLine(lx,ly,sx,sy,normal);
             
             halfWid--;
             if (halfWid===0) break;
@@ -831,21 +831,58 @@ export default class GenerateBitmapBaseClass
         }
     }
     
-    createNormalNoiseData()
+    createNormalNoiseData(density,normalZFactor)
     {
-        let n,x,y,wid,high;
-        let nCount=100;
+        let n,x,y,wid,high,pixelSize,idx;
+        let nCount;
+        
+            // initialize the noise data
+            
+        pixelSize=this.colorImgData.height*this.colorImgData.width;
+        this.noiseNormals=new Uint8ClampedArray(pixelSize*4);
+        
+        idx=0;
+        
+        for (n=0;n!==pixelSize;n++) {
+            this.noiseNormals[idx]=127;
+            this.noiseNormals[idx+1]=127;
+            this.noiseNormals[idx+2]=255;
+            idx+=4;
+        }
+        
+            // create the random normal chunks
+            
+        nCount=Math.trunc((this.colorImgData.width*0.5)*density);
         
         for (n=0;n!==nCount;n++) {
             x=GenerateUtilityClass.randomInt(0,(this.colorImgData.width-1));
             y=GenerateUtilityClass.randomInt(0,(this.colorImgData.height-1));
-            wid=GenerateUtilityClass.randomInt(20,20);
-            high=GenerateUtilityClass.randomInt(20,20);
+            wid=GenerateUtilityClass.randomInt(20,40);
+            high=GenerateUtilityClass.randomInt(20,40);
             
-            this.createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),10,15);
+            this.createNormalNoiseDataSinglePolygon(x,y,(x+wid),(y+high),normalZFactor,GenerateUtilityClass.randomPercentage(0.5));
         }
         
-        this.blur(this.normalImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,5,false);
+            // blur to fix any missing pixels and make the
+            // height change not as drastic
+            
+        this.blur(this.noiseNormals,0,0,this.colorImgData.width,this.colorImgData.height,5,false);
+    }
+    
+    drawNormalNoiseRect(lft,top,rgt,bot)
+    {
+        let x,y,idx;
+        let normalData=this.normalImgData.data;
+
+        for (y=top;y!==bot;y++) {
+            for (x=lft;x!==rgt;x++) {
+                idx=((y*this.colorCanvas.width)+x)*4;
+                
+                normalData[idx]=this.noiseNormals[idx];
+                normalData[idx+1]=this.noiseNormals[idx+1];
+                normalData[idx+2]=this.noiseNormals[idx+2];
+             }
+        }
     }
 
         //
@@ -1560,8 +1597,8 @@ export default class GenerateBitmapBaseClass
             
             this.drawLineColor(sx,sy,ex,ey,color,true);
             this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
-            this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_LEFT_45);
-            this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_RIGHT_45);
+            this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_RIGHT_45);
+            this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_LEFT_45);
             
             if ((ex===clipLft) || (ex===clipRgt)) break;
             

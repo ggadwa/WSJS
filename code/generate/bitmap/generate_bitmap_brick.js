@@ -37,14 +37,12 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         
         segments=this.createStackedSegments();
         this.createPerlinNoiseData(32,32,0.7);
+        this.createNormalNoiseData(1.5,0.5);
         
             // grout is a static noise color
             
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
         this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
-        
-        this.createNormalNoiseData();
-        return;
         
             // draw the bricks
 
@@ -64,6 +62,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                 this.drawRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),drawBrickColor);
                 this.draw3DFrameRect(-edgeSize,seg.top,(this.colorCanvas.width+edgeSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
                 this.drawPerlinNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)),0.8,1.3);
+                this.drawNormalNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)));
             }
             else {
                 drawBrickColor=this.darkenColor((seg.isSmall?altBrickColor:brickColor),f);
@@ -71,6 +70,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                 this.drawRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),drawBrickColor);
                 this.draw3DFrameRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
                 this.drawPerlinNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)),0.8,1.3);
+                this.drawNormalNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)));
             }
             
                 // any streaks/stains/cracks
@@ -107,7 +107,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                     ey=GenerateUtilityClass.randomInBetween(Math.trunc(bot*1.2),Math.trunc(bot*2.0));
 
                     streakColor=this.darkenColor(drawBrickColor,0.6);
-                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.25,0.5,streakColor);
+                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.25,0.35,streakColor);
                 }
             }
             
