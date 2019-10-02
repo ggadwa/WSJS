@@ -5,9 +5,7 @@
 - room uvs need to be better
 
 
-- get rid of normal line data
-- draw ovals from randomized line segments, fade into center
-- drawPerlinNoiseRect goes away, along with all normal data
+- streaks need to always be top to bottom
 
 
 - need textures to stamp better

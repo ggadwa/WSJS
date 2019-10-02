@@ -105,7 +105,6 @@ export default class GenerateBitmapBaseClass
         this.mask=null;
         
         this.perlinNoiseColorFactor=null;
-        this.perlinNoiseNormals=null;
         this.noiseNormals=null;
         
             // current clip rect
@@ -342,6 +341,12 @@ export default class GenerateBitmapBaseClass
 
         return(color);
     }
+    
+    getRandomGray(min,max)
+    {
+        let col=min+(GenerateUtilityClass.random()*(max-min));
+        return(new ColorClass(col,col,col));
+    }
 
         //
         // masking
@@ -485,9 +490,9 @@ export default class GenerateBitmapBaseClass
         return(((1.0-f)*a)+(f*b));
     }
     
-    createPerlinNoiseData(gridXSize,gridYSize,normalZFactor)
+    createPerlinNoiseData(gridXSize,gridYSize)
     {
-        let x,y,d00,d10,d11,d01,ix0,ix1,sx,sy;
+        let x,y,ix0,ix1,sx,sy;
         let gridWid,gridHigh,gridX0,gridX1,gridY0,gridY1;
         let vectors,rowVectors,normal;
         let n0,n1,idx,k;
@@ -508,7 +513,6 @@ export default class GenerateBitmapBaseClass
             // noise data arrays
             
         this.perlinNoiseColorFactor=new Float32Array(this.colorImgData.width*this.colorImgData.height);
-        this.perlinNoiseNormals=new Uint8ClampedArray((this.colorImgData.width*this.colorImgData.height)*4);
         
             // generate the random grid vectors
             
@@ -566,55 +570,8 @@ export default class GenerateBitmapBaseClass
                     // turn this into a color factor for the base color
                 
                 this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]=(this.lerp(ix0,ix1,sy)+1.0)*0.5;      // get it in 0..1
-                    
-                    // find a normal weighed between the grid points
-                    // we have to normalize later otherwise you get
-                    // squares lines
-                
-                sx=x-(gridX0*gridWid);
-                sy=y-(gridY0*gridHigh);
-                d00=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
-                
-                sx=(gridX1*gridWid)-x;
-                sy=y-(gridY0*gridHigh);
-                d01=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
-                
-                sx=(gridX1*gridWid)-x;
-                sy=(gridY1*gridHigh)-y;
-                d11=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
-                
-                sx=x-(gridX0*gridWid);
-                sy=(gridY1*gridHigh)-y;
-                d10=1.0-(Math.sqrt((sx*sx)+(sy*sy))/gridDist);
-                
-                k=Math.sqrt((d00*d00)+(d01*d01)+(d11*d11)+(d10*d10));
-                if (k!==0) {
-                    d00=d00/k;
-                    d01=d01/k;
-                    d11=d11/k;
-                    d10=d10/k;
-                }
-                
-                normal.x=(vectors[gridY0][gridX0].x*d00)+(vectors[gridY0][gridX1].x*d01)+(vectors[gridY1][gridX1].x*d11)+(vectors[gridY1][gridX0].x*d10);
-                normal.y=(vectors[gridY0][gridX0].y*d00)+(vectors[gridY0][gridX1].y*d01)+(vectors[gridY1][gridX1].y*d11)+(vectors[gridY1][gridX0].y*d10);
-                normal.normalize2D();
-                
-                normal.z=normalZFactor;
-                normal.normalize();
-                
-                    // and set it
- 
-                this.perlinNoiseNormals[idx]=(normal.x+1.0)*127.0;
-                this.perlinNoiseNormals[idx+1]=(normal.y+1.0)*127.0;
-                this.perlinNoiseNormals[idx+2]=(normal.z+1.0)*127.0;
             }
         }
-        
-            // need to blur the normals to eliminate the
-            // boxing that takes place when we figure out
-            // the normals
-            
-        this.blur(this.perlinNoiseNormals,0,0,this.colorCanvas.width,this.colorCanvas.height,25,false);
     }
     
     drawPerlinNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax)
@@ -622,7 +579,6 @@ export default class GenerateBitmapBaseClass
         let x,y,idx,colFactor;
         let colorFactorAdd=colorFactorMax-colorFactorMin;
         let colorData=this.colorImgData.data;
-        let normalData=this.normalImgData.data;
        
         for (y=top;y!==bot;y++) {
             for (x=lft;x!==rgt;x++) {
@@ -639,17 +595,11 @@ export default class GenerateBitmapBaseClass
                 colorData[idx]=colorData[idx]*colFactor;
                 colorData[idx+1]=colorData[idx+1]*colFactor;
                 colorData[idx+2]=colorData[idx+2]*colFactor;
-                
-                    // and set the normals
-                    
-                //normalData[idx]=this.perlinNoiseNormals[idx];
-                //normalData[idx+1]=this.perlinNoiseNormals[idx+1];
-                //normalData[idx+2]=this.perlinNoiseNormals[idx+2];
             }
         }
     }
     
-    drawStaticNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax,blurCount,blurClamp)
+    drawStaticNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax)
     {
         let x,y,idx,colFactor;
         let colorFactorAdd=colorFactorMax-colorFactorMin;
@@ -669,8 +619,6 @@ export default class GenerateBitmapBaseClass
                 colorData[idx+2]=colorData[idx+2]*colFactor;
              }
         }
-        
-        this.blur(colorData,lft,top,rgt,bot,blurCount,blurClamp);
     }
     
     createNormalNoiseDataSinglePolygonLine(x,y,x2,y2,normal)
@@ -1144,7 +1092,7 @@ export default class GenerateBitmapBaseClass
         density=100;
         densityReduce=Math.trunc(90/shineWid);
         
-            // write the streaks
+            // write the shine lines
             
         for (n=0;n!==shineWid;n++) {
             
@@ -1189,7 +1137,7 @@ export default class GenerateBitmapBaseClass
             shineWid=GenerateUtilityClass.randomInt(Math.trunc(wid*0.035),Math.trunc(wid*0.15));
             if ((x+shineWid)>rgt) shineWid=rgt-x;
             
-                // small % are no streak
+                // small % are no lines
                 
             if (GenerateUtilityClass.randomPercentage(0.9)) {
                 if (lite) {
@@ -1214,30 +1162,31 @@ export default class GenerateBitmapBaseClass
         // streaks
         //
         
-    drawStreakDirtSingle(lft,top,rgt,bot,botClip,minMix,addMix,color)
+    drawStreakDirtSingle(lft,top,rgt,bot,minMix,addMix,color,minXReduce)
     {
-        let lx,rx,xAdd,x,y,by,idx;
+        let x,y,flx,frx,lx,rx,xAdd,idx;
         let r,g,b;
         let factor;
         let wid=rgt-lft;
         let high=bot-top;
-        let mx=Math.trunc((lft+rgt)*0.5);
         let colorData=this.colorImgData.data;
         
         if ((wid<=0) || (high<=0)) return;
         
+            // random shrink
+            
+        xAdd=GenerateUtilityClass.random()*minXReduce;
+        
             // draw the dirt
             
-        by=(botClip<bot)?botClip:bot;
+        flx=lft;
+        frx=rgt;
             
-        for (y=top;y!==by;y++) {
+        for (y=top;y!==bot;y++) {
             factor=(bot-y)/high;
             
-                // the dirt works down to a point
-                
-            xAdd=Math.trunc((wid*factor)*0.5);
-            lx=mx-xAdd;
-            rx=mx+xAdd;
+            lx=Math.trunc(flx);
+            rx=Math.trunc(frx);
             if (lx>=rx) break;
             
             for (x=lx;x!==rx;x++) {
@@ -1251,18 +1200,21 @@ export default class GenerateBitmapBaseClass
                 colorData[idx+1]=(((1.0-factor)*g)+(color.g*factor))*255.0;
                 colorData[idx+2]=(((1.0-factor)*b)+(color.b*factor))*255.0;
             }
+            
+            flx+=xAdd;
+            frx-=xAdd;
         }
     }
     
-    drawStreakDirt(lft,top,rgt,bot,botClip,additionalStreakCount,minMix,maxMix,color)
+    drawStreakDirt(lft,top,rgt,bot,additionalStreakCount,minMix,maxMix,color)
     {
-        let n,sx,ex,ey;
+        let n,sx,ex;
         let minWid;
         let addMix=maxMix-minMix;
         
             // original streak
             
-        this.drawStreakDirtSingle(lft,top,rgt,bot,botClip,minMix,addMix,color);
+        this.drawStreakDirtSingle(lft,top,rgt,bot,minMix,addMix,color,0.25);
         
             // additional streaks
             
@@ -1273,9 +1225,7 @@ export default class GenerateBitmapBaseClass
             ex=GenerateUtilityClass.randomInBetween((sx+minWid),rgt);
             if (sx>=ex) continue;
             
-            ey=bot-GenerateUtilityClass.randomInt(0,Math.trunc((bot-top)*0.25));
-            
-            this.drawStreakDirtSingle(sx,top,ex,ey,botClip,minMix,addMix,color);
+            this.drawStreakDirtSingle(sx,top,ex,bot,minMix,addMix,color,0.1);
         }
     }
     
@@ -1618,7 +1568,94 @@ export default class GenerateBitmapBaseClass
         }
     }
 
+        //
+        // slopes
+        //
+        
+    drawSlope(lft,top,rgt,bot,color,up)
+    {
+        let x,y,idx;
+        let rb,gb,bb,xb,yb,zb;
+        let darkenFactor,darkColor;
+        let high=bot-top;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+        if (up) {
+            xb=(this.NORMAL_TOP_45.x+1.0)*127.0;
+            yb=(this.NORMAL_TOP_45.y+1.0)*127.0;
+            zb=(this.NORMAL_TOP_45.z+1.0)*127.0;
+        }
+        else {
+            xb=(this.NORMAL_BOTTOM_45.x+1.0)*127.0;
+            yb=(this.NORMAL_BOTTOM_45.y+1.0)*127.0;
+            zb=(this.NORMAL_BOTTOM_45.z+1.0)*127.0;
+        }
+        
+        for (y=top;y!==bot;y++) {
+            
+            darkenFactor=(((y-top)+1)/high)*0.2;
+            if (up) darkenFactor=0.2-darkenFactor;
+            darkenFactor+=0.8;
+            darkColor=this.darkenColor(color,darkenFactor);
+            
+            rb=darkColor.r*255.0;
+            gb=darkColor.g*255.0;
+            bb=darkColor.b*255.0;
+            
+            for (x=lft;x!==rgt;x++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                
+                colorData[idx]=rb;
+                colorData[idx+1]=gb;
+                colorData[idx+2]=bb;
+                
+                normalData[idx]=xb;
+                normalData[idx+1]=yb;
+                normalData[idx+2]=zb;
+            }
+        }
+    }
     
+    drawDiamond(lft,top,rgt,bot,color)
+    {
+        let x,y,lx,rx,f,idx;
+        let mx,my,halfWid;
+        let colorData=this.colorImgData.data;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        mx=Math.trunc((lft+rgt)*0.5);
+        my=Math.trunc((top+bot)*0.5);
+        halfWid=Math.trunc((rgt-lft)*0.5);
+        
+        for (y=top;y!==bot;y++) {
+            
+            if (y<my) {
+                f=1.0-((my-y)/(my-top));
+                lx=mx-Math.trunc(halfWid*f);
+                rx=mx+Math.trunc(halfWid*f);
+            }
+            else {
+                f=1.0-((y-my)/(my-top));
+                lx=mx-Math.trunc(halfWid*f);
+                rx=mx+Math.trunc(halfWid*f);
+            }
+            
+            if (lx>=rx) continue;
+            
+            for (x=lx;x!==rx;x++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                
+                colorData[idx]=color.r*255.0;
+                colorData[idx+1]=color.g*255.0;
+                colorData[idx+2]=color.b*255.0;
+            }
+            
+        }
+    }
     
         
     
@@ -1688,12 +1725,6 @@ export default class GenerateBitmapBaseClass
         // color routines
         //
 
-    
-    getRandomGray(min,max)
-    {
-        let col=min+(GenerateUtilityClass.random()*(max-min));
-        return(new ColorClass(col,col,col));
-    }
     
     getRandomWoodColor()
     {
@@ -2325,26 +2356,6 @@ export default class GenerateBitmapBaseClass
         }
     }
     
-    drawDiamond(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
-    {
-        let mx,my;
-
-        mx=Math.trunc((lft+rgt)/2);
-        my=Math.trunc((top+bot)/2);
-
-        this.colorCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
-        if (borderRGBColor!==null) this.colorCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
-
-        this.colorCTX.beginPath();
-        this.colorCTX.moveTo(mx,top);
-        this.colorCTX.lineTo(rgt,my);
-        this.colorCTX.lineTo(mx,bot);
-        this.colorCTX.lineTo(lft,my);
-        this.colorCTX.lineTo(mx,top);
-        this.colorCTX.fill();
-        if (borderRGBColor!==null) this.colorCTX.stroke();
-    }
-    
     drawOval2(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
         let mx,my,xRadius,yRadius;
@@ -2847,37 +2858,6 @@ export default class GenerateBitmapBaseClass
         }
     }
     
-        //
-        // slopes
-        //
-        
-    drawSlope(lft,top,rgt,bot,color,up)
-    {
-        let y;
-        let darkenFactor,darkColor;
-        let high=bot-top;
-        
-        this.normalCTX.strokeStyle=this.normalToRGBColor(up?this.NORMAL_TOP_45:this.NORMAL_BOTTOM_45);
-        
-        for (y=top;y!==bot;y++) {
-            
-            darkenFactor=(((y-top)+1)/high)*0.2;
-            if (up) darkenFactor=0.2-darkenFactor;
-            darkenFactor+=0.8;
-            darkColor=this.darkenColor(color,darkenFactor);
-            this.colorCTX.strokeStyle=this.colorToRGBColor(darkColor);
-            
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lft,y);
-            this.colorCTX.lineTo(rgt,y);
-            this.colorCTX.stroke();
-            
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lft,y);
-            this.normalCTX.lineTo(rgt,y);
-            this.normalCTX.stroke();
-        }
-    }
     
         //
         // particles

@@ -263,7 +263,7 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n;
-        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap;
+        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap;
         let roomTopY;
         let room,nextRoom,light,genPiece,centerPnt,intensity;
         let roomCount,roomHigh,roomSize,piece,pathXDeviation;
@@ -285,8 +285,9 @@ export default class GenerateMapClass
             
         roomWallBitmap=GenerateBitmapRun.generateWall(this.core,0);
         hallWallBitmap=GenerateBitmapRun.generateWall(this.core,1);
-        floorBitmap=GenerateBitmapRun.generateWall(this.core,2);
+        floorBitmap=GenerateBitmapRun.generateWall(this.core,5);
         ceilingBitmap=GenerateBitmapRun.generateWall(this.core,4);
+        stepBitmap=GenerateBitmapRun.generateWall(this.core,3);
 
             // we always proceed in a path, so get
             // the deviation for the path
@@ -360,14 +361,14 @@ export default class GenerateMapClass
                 
             if (n<(roomCount-1)) {
                 if ((!room.sideRoom) && (!rooms[n+1].sideRoom)) {
-                    if (rooms[n+1].offset.y>room.offset.y) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),hallWallBitmap,floorBitmap,roomSize,roomHigh);
+                    if (rooms[n+1].offset.y>room.offset.y) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),stepBitmap,stepBitmap,roomSize,roomHigh);
                 }
             }
             
                 // room light
             
-            intensity=Math.trunc(roomSize*0.7)+((roomHigh*0.6)*(room.storyCount-1));
-            light=new LightClass(new PointClass((room.offset.x+(Math.trunc(roomSize*0.5))),Math.trunc(roomTopY*0.8),(room.offset.z+(Math.trunc(roomSize*0.5)))),new ColorClass(1,1,1),intensity,0.3);
+            intensity=Math.trunc(roomSize*0.7)+((roomHigh*0.2)*(room.storyCount-1));
+            light=new LightClass(new PointClass((room.offset.x+(Math.trunc(roomSize*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(roomSize*0.5)))),new ColorClass(1,1,1),intensity,0.5);
             map.lightList.add(light);
         }
         

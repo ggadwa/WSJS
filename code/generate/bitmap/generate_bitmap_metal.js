@@ -99,7 +99,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // the plate
             
-        this.createPerlinNoiseData(8,8,0.8);
+        this.createPerlinNoiseData(8,8);
         this.drawRect(lft,top,rgt,bot,metalColor);
         this.drawPerlinNoiseRect(lft,top,rgt,bot,0.5,1.3);
 

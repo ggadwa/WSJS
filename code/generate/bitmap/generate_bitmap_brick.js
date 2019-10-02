@@ -24,25 +24,26 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         let n,seg,segments;
         let drawBrickColor,drawFrameColor,streakColor,f;
         let lft,rgt,top,bot;
-        let sx,ex,ey,streakWid,lineColor;
+        let sx,ex,streakWid,lineColor;
         
         let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
         let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
         
         let brickColor=this.getRandomColor();
         let altBrickColor=this.getRandomColor();
-        let groutColor=this.getRandomColorDull(0.3);
+        let groutColor=this.getRandomGray(0.8,0,2);
         
             // create segments and noise data
         
         segments=this.createStackedSegments();
-        this.createPerlinNoiseData(32,32,0.7);
+        this.createPerlinNoiseData(32,32);
         this.createNormalNoiseData(1.5,0.5);
         
             // grout is a static noise color
             
         this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,groutColor);
-        this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
+        this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,1.0,1.4);
+        this.blur(this.colorImgData.data,0,0,this.colorCanvas.width,this.colorCanvas.height,1,false);
         
             // draw the bricks
 
@@ -104,10 +105,9 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 
                     sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
                     ex=sx+streakWid;
-                    ey=GenerateUtilityClass.randomInBetween(Math.trunc(bot*1.2),Math.trunc(bot*2.0));
 
                     streakColor=this.darkenColor(drawBrickColor,0.6);
-                    this.drawStreakDirt(sx,top,ex,ey,bot,5,0.25,0.35,streakColor);
+                    this.drawStreakDirt(sx,top,ex,bot,5,0.25,0.35,streakColor);
                 }
             }
             

@@ -26,7 +26,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         let chunkWidStart,chunkWidAdd,chunkHighStart,chunkHighAdd,chunkOffset,arcStart,arcEnd;
         let wid=rgt-lft;
         let high=bot-top;
-        let edgeSize,flipNormals;
+        let edgeSize,flipNormals,normalZFactor;
         
             // we use the mask so we can mix normals when
             // two ovals collide
@@ -35,7 +35,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
             // the stone itself
             
-        edgeSize=GenerateUtilityClass.randomInt(Math.trunc(wid*0.7),Math.trunc(wid*0.2));     // new edge size as stones aren't the same
+        edgeSize=GenerateUtilityClass.randomInt(Math.trunc(wid*0.8),Math.trunc(wid*0.15));     // new edge size as stones aren't the same
         xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         
@@ -92,11 +92,13 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             edgeSize=GenerateUtilityClass.randomInt(Math.trunc(wid2*0.6),Math.trunc(wid2*0.3));
             xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
             yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
+            normalZFactor=(GenerateUtilityClass.random()*0.3)+0.2;      // rocks have different normal heights
+            if (n>3) normalZFactor+=0.2;            // ovals ontop of outside one don't extend as far out
             
             flipNormals=false;
             if (n>3) flipNormals=GenerateUtilityClass.randomPercentage(0.1);
         
-            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,((n>3)?0.7:0.5),flipNormals,(n<4),0.8,0.4);
+            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,normalZFactor,flipNormals,(n<4),0.8,0.4);
         }
     }
     
@@ -108,7 +110,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
         let stoneColor=this.getRandomColor();
         let altStoneColor=this.getRandomColor();
-        let groutColor=this.getRandomColorDull(0.3);
+        let groutColor=this.getRandomGray(0.7,0.2);
         
             // create segments
             
@@ -117,7 +119,9 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             // the noise grout
             
         this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,groutColor);
-        this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
+        this.createPerlinNoiseData(8,8);
+        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.6,1.0);
+        this.drawStaticNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.9,1.1);
         
         this.createNormalNoiseData(1.7,0.3);
         this.drawNormalNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height);
@@ -137,7 +141,13 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
             this.drawSingleStone(seg.lft,seg.top,(seg.rgt-paddingRight),(seg.bot-paddingBottom),drawStoneColor);
         }
-
+        
+            // blur the colors and blur the normals so
+            // bricks don't stick out
+            
+        this.blur(this.colorImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,2,false);
+        this.blur(this.normalImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,2,false);
+        
             // finish with the specular
 
         this.createSpecularMap(0.3);

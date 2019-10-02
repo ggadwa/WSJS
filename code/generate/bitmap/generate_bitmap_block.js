@@ -18,14 +18,18 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
         // block bitmaps
         //
 
-    generateBlock()
+    generateInternal()
     {
         let n,k,nBlock,col,flip;
         let top,bot,ySize,slopeHigh;
-        let sx,ex,ey,streakCount,streakWid,streakColor;
+        let sx,ex,ty,by,streakCount,streakWid,streakColor;
         
         let concreteColor=this.getRandomColor();
         let concreteColor2=this.boostColor(concreteColor,0.1);
+        
+            // cement like noise
+            
+        this.createNormalNoiseData(2.2,0.4);    
         
             // block counts (always even)
             
@@ -45,9 +49,10 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
                
                // concrete background
                
-               
             col=flip?concreteColor:concreteColor2;
-           // this.drawBumpySurface(0,top,this.colorCanvas.width,bot,col,0.9,0.7,Math.trunc(this.colorCanvas.width*0.1),1);
+            this.drawRect(0,top,this.colorCanvas.width,bot,col);
+            
+            this.drawNormalNoiseRect(0,top,this.colorCanvas.width,bot);
             
                 // slopes
 
@@ -58,25 +63,25 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
             
                 // noise and streaks
 
-            this.drawNoiseRect(0,top,this.colorCanvas.width,bot,0.6,0.8,0.8);
-            //this.drawStaticNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.6,1.1,2,false);
+            this.drawStaticNoiseRect(0,top,this.colorCanvas.width,bot,0.8,1.2);
             
             streakCount=GenerateUtilityClass.randomInt(0,5);
             streakColor=this.darkenColor(col,0.6);
             
+            ty=flip?(top+slopeHigh):top;
+            by=flip?(bot-slopeHigh):bot;
+            
             for (k=0;k!==streakCount;k++) {
-
                 streakWid=GenerateUtilityClass.randomInBetween(Math.trunc(this.colorCanvas.width*0.2),Math.trunc(this.colorCanvas.width*0.3));
                 if (streakWid<10) streakWid=10;
 
                 sx=GenerateUtilityClass.randomInt(0,(this.colorCanvas.width-streakWid));
                 ex=sx+streakWid;
-                ey=GenerateUtilityClass.randomInBetween(bot,Math.trunc((bot-top)*1.5));
                 
-                this.drawStreakDirt(sx,top,ex,ey,bot,5,0.1,0.5,streakColor);
+                this.drawStreakDirt(sx,ty,ex,by,5,0.1,0.5,streakColor);
             }
             
-            this.blur(this.colorCTX,0,top,this.colorCanvas.width,bot,2,false);
+            this.blur(this.colorImgData.data,0,top,this.colorCanvas.width,bot,2,false);
 
             top=bot;
         }
@@ -84,15 +89,6 @@ export default class GenerateBitmapBlockClass extends GenerateBitmapBaseClass
             // finish with the specular
 
         this.createSpecularMap(0.5);
-    }
-
-        //
-        // generate mainline
-        //
-
-    generateInternal()
-    {
-        this.generateBlock();
     }
 
 }

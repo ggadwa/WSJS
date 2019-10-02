@@ -4,6 +4,7 @@ import GenerateBitmapBrickClass from './generate_bitmap_brick.js';
 import GenerateBitmapStoneClass from './generate_bitmap_stone.js';
 import GenerateBitmapMetalClass from './generate_bitmap_metal.js';
 import GenerateBitmapWoodClass from './generate_bitmap_wood.js';
+import GenerateBitmapTileClass from './generate_bitmap_tile.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapRun
@@ -18,10 +19,10 @@ export default class GenerateBitmapRun
         
         switch (temp) {
             case 0:
-                genBitmap=new GenerateBitmapStoneClass(core,false,false,false);
+                genBitmap=new GenerateBitmapBrickClass(core,false,false,false);
                 break;
             case 1:
-                genBitmap=new GenerateBitmapBrickClass(core,false,false,false);
+                genBitmap=new GenerateBitmapStoneClass(core,false,false,false);
                 break;
             case 2:
                 genBitmap=new GenerateBitmapWoodClass(core,false,false,false);
@@ -31,6 +32,9 @@ export default class GenerateBitmapRun
                 break;
             case 4:
                 genBitmap=new GenerateBitmapMetalClass(core,false,false,false);
+                break;
+            case 5:
+                genBitmap=new GenerateBitmapTileClass(core,false,false,false);
                 break;
         }
 
