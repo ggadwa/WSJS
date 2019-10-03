@@ -98,7 +98,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             flipNormals=false;
             if (n>3) flipNormals=GenerateUtilityClass.randomPercentage(0.1);
         
-            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,edgeSize,stoneColor,normalZFactor,flipNormals,(n<4),0.8,0.4);
+            this.drawOval(lft2,top2,(lft2+wid2),(top2+high2),arcStart,arcEnd,xRoundFactor,yRoundFactor,((n<4)?wid2:edgeSize),stoneColor,normalZFactor,flipNormals,(n<4),0.8,0.4);
         }
     }
     
@@ -106,7 +106,6 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
     {
         let n,seg;
         let drawStoneColor,f;
-        let paddingRight,paddingBottom;
         
         let stoneColor=this.getRandomColor();
         let altStoneColor=this.getRandomColor();
@@ -135,11 +134,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             if (f>1.0) f=1.0;
 
             drawStoneColor=this.darkenColor((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),f);
-            
-            paddingRight=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.02));
-            paddingBottom=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.02));
-
-            this.drawSingleStone(seg.lft,seg.top,(seg.rgt-paddingRight),(seg.bot-paddingBottom),drawStoneColor);
+            this.drawSingleStone(seg.lft,seg.top,seg.rgt,seg.bot,drawStoneColor);
         }
         
             // blur the colors and blur the normals so

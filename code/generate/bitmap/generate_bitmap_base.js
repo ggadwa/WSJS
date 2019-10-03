@@ -45,10 +45,6 @@ export default class GenerateBitmapBaseClass
             // constants
             
         this.BITMAP_MAP_TEXTURE_SIZE=512;
-        this.BITMAP_MODEL_TEXTURE_SIZE=512;
-        this.BITMAP_SKY_TEXTURE_WIDTH=2048;
-        this.BITMAP_SKY_TEXTURE_HEIGHT=1024;
-        this.BITMAP_PARTICLE_TEXTURE_SIZE=64;
         
         this.BITMAP_STACKED_X_MIN_COUNT=4;
         this.BITMAP_STACKED_X_EXTRA_COUNT=4;
@@ -60,7 +56,6 @@ export default class GenerateBitmapBaseClass
         this.BITMAP_GRID_MIN_BLOCK_WIDTH=10;
         this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=30;
         this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=8;
-        this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT=5;
         this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=8;
 
             // some precalced normals
@@ -256,27 +251,30 @@ export default class GenerateBitmapBaseClass
             if (!hit) break;
 
                 // random size
-                // height starts at half width, plus random extra
+                // we start with the width, determining what can fit
 
             startWid=GenerateUtilityClass.randomInt(this.BITMAP_GRID_MIN_BLOCK_WIDTH,this.BITMAP_GRID_EXTRA_BLOCK_WIDTH);
             if ((x+startWid)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
-
-            startHigh=Math.trunc(startWid*0.5)+GenerateUtilityClass.randomInt(0,this.BITMAP_GRID_EXTRA_BLOCK_HEIGHT);
-            if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
-
-                // make sure we aren't going over the edge
-
             if ((x+startWid+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
-            if ((y+startHigh+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
-
-                // determine what can fit
-
+            
             wid=1;
 
             while (wid<startWid) {
                 if (grid[(y*this.BITMAP_GRID_DIVISION)+(x+wid)]!==0) break;
                 wid++;
             }
+
+                // next we move to the height, which is either
+                // a square or a rectangle, and see what can fit
+            
+            if (GenerateUtilityClass.randomPercentage(0.5)) {
+                startHigh=wid;
+            }
+            else {
+                startHigh=Math.trunc(wid*(0.5+(GenerateUtilityClass.random()*0.2)));
+            }
+            if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
+            if ((y+startHigh+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
             high=1;
 
@@ -1066,6 +1064,44 @@ export default class GenerateBitmapBaseClass
         if (addToMask) this.copyStagedMask();
     }
     
+    drawDiamond(lft,top,rgt,bot,color)
+    {
+        let x,y,lx,rx,f,idx;
+        let mx,my,halfWid;
+        let colorData=this.colorImgData.data;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        mx=Math.trunc((lft+rgt)*0.5);
+        my=Math.trunc((top+bot)*0.5);
+        halfWid=Math.trunc((rgt-lft)*0.5);
+        
+        for (y=top;y!==bot;y++) {
+            
+            if (y<my) {
+                f=1.0-((my-y)/(my-top));
+                lx=mx-Math.trunc(halfWid*f);
+                rx=mx+Math.trunc(halfWid*f);
+            }
+            else {
+                f=1.0-((y-my)/(my-top));
+                lx=mx-Math.trunc(halfWid*f);
+                rx=mx+Math.trunc(halfWid*f);
+            }
+            
+            if (lx>=rx) continue;
+            
+            for (x=lx;x!==rx;x++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                
+                colorData[idx]=color.r*255.0;
+                colorData[idx+1]=color.g*255.0;
+                colorData[idx+2]=color.b*255.0;
+            }
+            
+        }
+    }
+    
         //
         // metals
         //
@@ -1230,7 +1266,7 @@ export default class GenerateBitmapBaseClass
     }
     
         //
-        // color stripes and gradients
+        // color stripes, gradients, waves
         //
         
     createRandomColorStripeArray(factor,baseColor)
@@ -1346,6 +1382,54 @@ export default class GenerateBitmapBaseClass
             }
 
             nx=-nx;
+        }
+    }
+    
+    drawNormalWaveVertical(lft,top,rgt,bot,waveCount)
+    {
+        let x,y,idx;
+        let waveIdx,wavePos,waveAdd;
+        let xb,yb,zb;
+        let normalData=this.normalImgData.data;
+
+        if ((rgt<=lft) || (bot<=top)) return;
+        
+        waveAdd=Math.trunc((bot-top)/waveCount);
+        waveIdx=0;
+        wavePos=0;
+        
+        for (y=top;y!==bot;y++) {
+            
+            switch(waveIdx) {
+                case 0:
+                    xb=(this.NORMAL_BOTTOM_45.x+1.0)*127.0;
+                    yb=(this.NORMAL_BOTTOM_45.y+1.0)*127.0;
+                    zb=(this.NORMAL_BOTTOM_45.z+1.0)*127.0;
+                    break;
+                case 1:
+                    xb=(this.NORMAL_CLEAR.x+1.0)*127.0;
+                    yb=(this.NORMAL_CLEAR.y+1.0)*127.0;
+                    zb=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                    break;
+                case 2:
+                    xb=(this.NORMAL_TOP_45.x+1.0)*127.0;
+                    yb=(this.NORMAL_TOP_45.y+1.0)*127.0;
+                    zb=(this.NORMAL_TOP_45.z+1.0)*127.0;
+                    break;
+            }
+            
+            for (x=lft;x!==rgt;x++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                normalData[idx]=xb;
+                normalData[idx+1]=yb;
+                normalData[idx+2]=zb;
+            }
+            
+            wavePos++;
+            if (wavePos>=waveAdd) {
+                wavePos=0;
+                waveIdx=(waveIdx+1)%3;
+            }
         }
     }
 
@@ -1565,95 +1649,6 @@ export default class GenerateBitmapBaseClass
             
             sx=ex;
             sy=ey;
-        }
-    }
-
-        //
-        // slopes
-        //
-        
-    drawSlope(lft,top,rgt,bot,color,up)
-    {
-        let x,y,idx;
-        let rb,gb,bb,xb,yb,zb;
-        let darkenFactor,darkColor;
-        let high=bot-top;
-        let colorData=this.colorImgData.data;
-        let normalData=this.normalImgData.data;
-        
-        if ((lft>=rgt) || (top>=bot)) return;
-        
-        if (up) {
-            xb=(this.NORMAL_TOP_45.x+1.0)*127.0;
-            yb=(this.NORMAL_TOP_45.y+1.0)*127.0;
-            zb=(this.NORMAL_TOP_45.z+1.0)*127.0;
-        }
-        else {
-            xb=(this.NORMAL_BOTTOM_45.x+1.0)*127.0;
-            yb=(this.NORMAL_BOTTOM_45.y+1.0)*127.0;
-            zb=(this.NORMAL_BOTTOM_45.z+1.0)*127.0;
-        }
-        
-        for (y=top;y!==bot;y++) {
-            
-            darkenFactor=(((y-top)+1)/high)*0.2;
-            if (up) darkenFactor=0.2-darkenFactor;
-            darkenFactor+=0.8;
-            darkColor=this.darkenColor(color,darkenFactor);
-            
-            rb=darkColor.r*255.0;
-            gb=darkColor.g*255.0;
-            bb=darkColor.b*255.0;
-            
-            for (x=lft;x!==rgt;x++) {
-                idx=((y*this.colorImgData.width)+x)*4;
-                
-                colorData[idx]=rb;
-                colorData[idx+1]=gb;
-                colorData[idx+2]=bb;
-                
-                normalData[idx]=xb;
-                normalData[idx+1]=yb;
-                normalData[idx+2]=zb;
-            }
-        }
-    }
-    
-    drawDiamond(lft,top,rgt,bot,color)
-    {
-        let x,y,lx,rx,f,idx;
-        let mx,my,halfWid;
-        let colorData=this.colorImgData.data;
-        
-        if ((lft>=rgt) || (top>=bot)) return;
-
-        mx=Math.trunc((lft+rgt)*0.5);
-        my=Math.trunc((top+bot)*0.5);
-        halfWid=Math.trunc((rgt-lft)*0.5);
-        
-        for (y=top;y!==bot;y++) {
-            
-            if (y<my) {
-                f=1.0-((my-y)/(my-top));
-                lx=mx-Math.trunc(halfWid*f);
-                rx=mx+Math.trunc(halfWid*f);
-            }
-            else {
-                f=1.0-((y-my)/(my-top));
-                lx=mx-Math.trunc(halfWid*f);
-                rx=mx+Math.trunc(halfWid*f);
-            }
-            
-            if (lx>=rx) continue;
-            
-            for (x=lx;x!==rx;x++) {
-                idx=((y*this.colorImgData.width)+x)*4;
-                
-                colorData[idx]=color.r*255.0;
-                colorData[idx+1]=color.g*255.0;
-                colorData[idx+2]=color.b*255.0;
-            }
-            
         }
     }
     

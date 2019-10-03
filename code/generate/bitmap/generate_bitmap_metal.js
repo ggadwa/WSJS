@@ -38,7 +38,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
         metalCorrColor=this.darkenColor(metalColor,0.6);
 
-        corrCount=GenerateUtilityClass.randomInt(Math.trunc(wid*0.015),Math.trunc(wid*0.025));
+        corrCount=GenerateUtilityClass.randomInt(Math.trunc(wid*0.025),Math.trunc(wid*0.03));
         corrWid=Math.trunc(wid/corrCount);
         corrHigh=Math.trunc(high/corrCount);
 
@@ -66,7 +66,17 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 ey=dy+(line[1][1]*lineHigh);
 
                 this.drawLineColor(sx,sy,ex,ey,metalCorrColor,true,true);
-
+                this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
+                
+                if (Math.abs(ex-sx)>Math.abs(ey-sy)) {
+                    this.drawLineNormal(sx,(sy+1),ex,(ey+1),this.NORMAL_BOTTOM_45);
+                    this.drawLineNormal(sx,(sy-1),ex,(ey-1),this.NORMAL_TOP_45);
+                }
+                else {
+                    this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_RIGHT_45);
+                    this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_LEFT_45);
+                }
+                
                 dx+=corrWid;
             }
 
@@ -76,19 +86,28 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
 
     generateMetalScrews(lft,top,rgt,bot,screwColor,screwSize)
     {
+        let mx,my;
         let edgeSize=Math.trunc(screwSize*0.5);
         
             // corners
             
         if (GenerateUtilityClass.randomPercentage(0.33)) {
-            this.drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
-            this.drawOval((rgt-screwSize),top,rgt,(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
-            this.drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
-            this.drawOval(lft,(bot-screwSize),(lft+screwSize),bot,0,1,0,0,edgeSize,screwColor,0.5,true,false,1,0);
+            this.drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval((rgt-screwSize),top,rgt,(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval(lft,(bot-screwSize),(lft+screwSize),bot,0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
         }
         
             // middles
-
+            
+        if (GenerateUtilityClass.randomPercentage(0.33)) {
+            mx=Math.trunc((lft+rgt)*0.5)-Math.trunc(screwSize*0.5);
+            my=Math.trunc((top+bot)*0.5)-Math.trunc(screwSize*0.5);
+            this.drawOval(mx,top,(mx+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval((rgt-screwSize),my,rgt,(my+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval(mx,(bot-screwSize),(mx+screwSize),bot,0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval(lft,my,(lft+screwSize),(my+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+        }
     }
 
     generateMetalPanel(lft,top,rgt,bot,metalColor,edgeSize,screwSize)
@@ -109,7 +128,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // variations
             
-        switch (GenerateUtilityClass.randomIndex(3)) {
+        switch (GenerateUtilityClass.randomIndex(4)) {
             
                 // internal box
                 
@@ -123,7 +142,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 this.draw3DFrameRect(lft2,top2,rgt2,bot2,edgeSize,frameColor,false);
                 this.drawMetalShine((lft2+edgeSize),(top2+edgeSize),(rgt2-edgeSize),(bot2-edgeSize),metalColor);
                 
-                sz=edgeSize+Math.trunc(edgeSize*0.2);
+                sz=edgeSize+Math.trunc(screwSize*0.5);
                 this.generateMetalScrews((lft+sz),(top+sz),(rgt-sz),(bot-sz),screwColor,screwSize);
                 break;
                 
@@ -134,9 +153,15 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 this.generateMetalCorrugation((lft+sz),(top+sz),(rgt-sz),(bot-sz),metalColor);
                 break;
                 
-                // empty
+                // wave
                 
             case 2:
+                this.drawNormalWaveVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),GenerateUtilityClass.randomInt(15,15));
+                break;
+                
+                // empty
+                
+            case 3:
                 sz=edgeSize+Math.trunc(edgeSize*0.2);
                 this.generateMetalScrews((lft+sz),(top+sz),(rgt-sz),(bot-sz),screwColor,screwSize);
                 break;

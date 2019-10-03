@@ -1,14 +1,14 @@
-- room meshes need extra one floor length mesh on top of every story
 - wood has moires
 - need to make statics for all generate_bitmap_base statics
-- metal vents
 - room uvs need to be better
 
+- door frames
+- second stories
 
-- streaks need to always be top to bottom
+- diamond needs raised edge
+- star (line) pattern for tiles?  raised squares?
 
 
-- need textures to stamp better
 
 - beach ball physics
    - bounce sound?

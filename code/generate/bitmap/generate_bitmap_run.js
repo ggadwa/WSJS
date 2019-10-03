@@ -1,5 +1,5 @@
 import GenerateBitmapBaseClass from './generate_bitmap_base.js';
-import GenerateBitmapBlockClass from './generate_bitmap_block.js';
+import GenerateBitmapConcreteClass from './generate_bitmap_concrete.js';
 import GenerateBitmapBrickClass from './generate_bitmap_brick.js';
 import GenerateBitmapStoneClass from './generate_bitmap_stone.js';
 import GenerateBitmapMetalClass from './generate_bitmap_metal.js';
@@ -28,7 +28,7 @@ export default class GenerateBitmapRun
                 genBitmap=new GenerateBitmapWoodClass(core,false,false,false);
                 break;
             case 3:
-                genBitmap=new GenerateBitmapBlockClass(core,false,false,false);
+                genBitmap=new GenerateBitmapConcreteClass(core,false,false,false);
                 break;
             case 4:
                 genBitmap=new GenerateBitmapMetalClass(core,false,false,false);
