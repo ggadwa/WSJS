@@ -20,7 +20,7 @@ export default class GenerateMapClass
         // mesh building utilities
         //
         
-    removeSharedWalls(rooms,roomSize,roomHigh)
+    removeSharedWalls(rooms,segmentSize)
     {
         let n,k,t,y,room,room2;
         let vIdx,vIdx2,nextIdx,nextIdx2,nVertex,nVertex2;
@@ -45,11 +45,11 @@ export default class GenerateMapClass
                     nextIdx=vIdx+1;
                     if (nextIdx===nVertex) nextIdx=0;
                                         
-                    ax=Math.trunc((room.piece.vertexes[vIdx][0]*0.1)*roomSize)+room.offset.x
-                    az=Math.trunc((room.piece.vertexes[vIdx][1]*0.1)*roomSize)+room.offset.z
+                    ax=Math.trunc(room.piece.vertexes[vIdx][0]*segmentSize)+room.offset.x
+                    az=Math.trunc(room.piece.vertexes[vIdx][1]*segmentSize)+room.offset.z
                     
-                    ax2=Math.trunc((room.piece.vertexes[nextIdx][0]*0.1)*roomSize)+room.offset.x
-                    az2=Math.trunc((room.piece.vertexes[nextIdx][1]*0.1)*roomSize)+room.offset.z
+                    ax2=Math.trunc(room.piece.vertexes[nextIdx][0]*segmentSize)+room.offset.x
+                    az2=Math.trunc(room.piece.vertexes[nextIdx][1]*segmentSize)+room.offset.z
                     
                     vIdx2=0;
                     
@@ -57,11 +57,11 @@ export default class GenerateMapClass
                         nextIdx2=vIdx2+1;
                         if (nextIdx2===nVertex2) nextIdx2=0;
                         
-                        bx=Math.trunc((room2.piece.vertexes[vIdx2][0]*0.1)*roomSize)+room2.offset.x
-                        bz=Math.trunc((room2.piece.vertexes[vIdx2][1]*0.1)*roomSize)+room2.offset.z
+                        bx=Math.trunc(room2.piece.vertexes[vIdx2][0]*segmentSize)+room2.offset.x
+                        bz=Math.trunc(room2.piece.vertexes[vIdx2][1]*segmentSize)+room2.offset.z
 
-                        bx2=Math.trunc((room2.piece.vertexes[nextIdx2][0]*0.1)*roomSize)+room2.offset.x
-                        bz2=Math.trunc((room2.piece.vertexes[nextIdx2][1]*0.1)*roomSize)+room2.offset.z
+                        bx2=Math.trunc(room2.piece.vertexes[nextIdx2][0]*segmentSize)+room2.offset.x
+                        bz2=Math.trunc(room2.piece.vertexes[nextIdx2][1]*segmentSize)+room2.offset.z
                         
                         if (((ax===bx) && (az===bz) && (ax2===bx2) && (az2===bz2)) || ((ax2===bx) && (az2===bz) && (ax===bx2) && (az===bz2))) {
                             
@@ -69,14 +69,14 @@ export default class GenerateMapClass
                                 // bounds of the other rooms y size
                                 
                             for (t=0;t!==room.storyCount;t++) {
-                                y=room.offset.y+(t*roomHigh);
-                                if ((y>=(room2.offset.y+(room2.storyCount*roomHigh))) || ((y+roomHigh)<=room2.offset.y)) continue;
+                                y=room.offset.y+(t*segmentSize);
+                                if ((y>=(room2.offset.y+(room2.storyCount*segmentSize))) || ((y+segmentSize)<=room2.offset.y)) continue;
                                 
                                 room.hideVertex(t,vIdx);
                             }
                             for (t=0;t!==room2.storyCount;t++) {
-                                y=room2.offset.y+(t*roomHigh);
-                                if ((y>=(room.offset.y+(room.storyCount*roomHigh))) || ((y+roomHigh)<=room.offset.y)) continue;
+                                y=room2.offset.y+(t*segmentSize);
+                                if ((y>=(room.offset.y+(room.storyCount*segmentSize))) || ((y+segmentSize)<=room.offset.y)) continue;
                                 
                                 room2.hideVertex(t,vIdx2);
                             }
@@ -91,38 +91,27 @@ export default class GenerateMapClass
         }
     }
     
-    hasTwoSharedWalls(room,room2,roomSize,sideRoom)
+    hasSharedWalls(room,room2,segmentSize)
     {
         let vIdx,vIdx2,nextIdx,nextIdx2,nVertex,nVertex2;
         let ax,az,ax2,az2,bx,bz,bx2,bz2;
-        let count;
         
-            // we note where these connections are
-            // in case we need stairs
-            
-        if (!sideRoom) {
-            room.stairVertexIdx=-1;
-            room.stairVertexIdx2=-1;
-        }
-        
-            // check to see if two rooms share at
-            // least two walls (so they can connect properly)
+            // check to see if two rooms share a wall segment
         
         nVertex=room.piece.vertexes.length;
         nVertex2=room2.piece.vertexes.length;
                 
         vIdx=0;
-        count=0;
 
         while (vIdx<nVertex) {
             nextIdx=vIdx+1;
             if (nextIdx===nVertex) nextIdx=0;
 
-            ax=Math.trunc((room.piece.vertexes[vIdx][0]*0.1)*roomSize)+room.offset.x
-            az=Math.trunc((room.piece.vertexes[vIdx][1]*0.1)*roomSize)+room.offset.z
+            ax=Math.trunc(room.piece.vertexes[vIdx][0]*segmentSize)+room.offset.x
+            az=Math.trunc(room.piece.vertexes[vIdx][1]*segmentSize)+room.offset.z
 
-            ax2=Math.trunc((room.piece.vertexes[nextIdx][0]*0.1)*roomSize)+room.offset.x
-            az2=Math.trunc((room.piece.vertexes[nextIdx][1]*0.1)*roomSize)+room.offset.z
+            ax2=Math.trunc(room.piece.vertexes[nextIdx][0]*segmentSize)+room.offset.x
+            az2=Math.trunc(room.piece.vertexes[nextIdx][1]*segmentSize)+room.offset.z
 
             vIdx2=0;
 
@@ -130,29 +119,13 @@ export default class GenerateMapClass
                 nextIdx2=vIdx2+1;
                 if (nextIdx2===nVertex2) nextIdx2=0;
 
-                bx=Math.trunc((room2.piece.vertexes[vIdx2][0]*0.1)*roomSize)+room2.offset.x
-                bz=Math.trunc((room2.piece.vertexes[vIdx2][1]*0.1)*roomSize)+room2.offset.z
+                bx=Math.trunc(room2.piece.vertexes[vIdx2][0]*segmentSize)+room2.offset.x
+                bz=Math.trunc(room2.piece.vertexes[vIdx2][1]*segmentSize)+room2.offset.z
 
-                bx2=Math.trunc((room2.piece.vertexes[nextIdx2][0]*0.1)*roomSize)+room2.offset.x
-                bz2=Math.trunc((room2.piece.vertexes[nextIdx2][1]*0.1)*roomSize)+room2.offset.z
+                bx2=Math.trunc(room2.piece.vertexes[nextIdx2][0]*segmentSize)+room2.offset.x
+                bz2=Math.trunc(room2.piece.vertexes[nextIdx2][1]*segmentSize)+room2.offset.z
 
-                    // as long as we have a count, keep
-                    // adding on so we get entire size of hole
-                    // if it's a normal room, remember where the steps
-                    // so go
-                    
-                if (((ax===bx) && (az===bz) && (ax2===bx2) && (az2===bz2)) || ((ax2===bx) && (az2===bz) && (ax===bx2) && (az===bz2))) {
-                    count++;
-                    if (!sideRoom) {
-                        if (room.stairVertexIdx===-1) {
-                            room.stairVertexIdx=vIdx;
-                        }
-                        else {
-                            room.stairVertexIdx2=vIdx+1;
-                            if (room.stairVertexIdx2===nVertex) room.stairVertexIdx2=0;
-                        }
-                    }
-                }
+                if (((ax===bx) && (az===bz) && (ax2===bx2) && (az2===bz2)) || ((ax2===bx) && (az2===bz) && (ax===bx2) && (az===bz2))) return(true);
 
                 vIdx2++;
             }
@@ -160,7 +133,7 @@ export default class GenerateMapClass
             vIdx++;
         }
         
-        return(count>=2);
+        return(false);
     }
     
         //
@@ -177,11 +150,12 @@ export default class GenerateMapClass
         // room positioning
         //
         
-    setNextRoomPosition(rooms,previousRoom,nextRoom,roomSize,pathXDeviation,pathTurnFactor,sideRoom)
+    setNextRoomPosition(rooms,previousRoom,nextRoom,segmentSize,pathXDeviation,forwardPath)
     {
-        let n,xAdd,zAdd,randAdd,origRandAdd,randShift,xShift,zShift;
+        let n,xAdd,zAdd;
+        let randShift,xShift,zShift,shiftStart,shiftEnd;
         let room,badSpot;
-        let tryCount;
+        let connectTryCount,segmentTryCount;
         
             // we want to always move in a single
             // direction (in this case +Z) with a deviation
@@ -189,47 +163,65 @@ export default class GenerateMapClass
             // we try to create a random offset so things aren't
             // in a straight line
 
-        tryCount=0;
+        connectTryCount=0;
         
-        while (tryCount!==20) {
+        while (connectTryCount!==20) {
             
                 // forward or turn
+
+            if (forwardPath) {
+                xAdd=0;
+                zAdd=previousRoom.size.z;
                 
-            if ((GenerateUtilityClass.randomPercentage(pathTurnFactor)) || (sideRoom)) {
-                xAdd=(pathXDeviation*roomSize);
+                xShift=pathXDeviation;
+                zShift=0;
+                shiftStart=-Math.trunc(nextRoom.size.x*0.5);
+                shiftEnd=Math.trunc(previousRoom.size.x*0.5);
+            }
+            else {
+                if (pathXDeviation>0) {
+                    xAdd=previousRoom.size.x;
+                }
+                else {
+                    xAdd=-nextRoom.size.x;
+                }
                 zAdd=0;
                 
                 xShift=0;
                 zShift=1;
+                shiftStart=-Math.trunc(nextRoom.size.z*0.5);
+                shiftEnd=Math.trunc(previousRoom.size.z*0.5);
             }
-            else {
-                xAdd=0;
-                zAdd=roomSize;
+            
+                // remember the path
                 
-                xShift=pathXDeviation;
-                zShift=0;
-            }
-                
+            nextRoom.forwardPath=forwardPath;
+            nextRoom.pathXDeviation=pathXDeviation;
+            
                 // find an shift so they aren't all connected
                 // on same x/z coords, we need to have at least
-                // two walls in common
-                
-            randAdd=GenerateUtilityClass.randomInt(-9,18);        // we can connect across the entire edge, which is 9 grid units off of each side
-            origRandAdd=randAdd;
+                // a wall in common, if we can't randomly find
+                // one default to connected directly with no offset
+             
+            segmentTryCount=0;
             
             while (true) {
-                randShift=randAdd*Math.trunc(roomSize*0.1);
+                randShift=GenerateUtilityClass.randomInBetween(-5,5)*segmentSize;
                 
                 nextRoom.offset.x=(previousRoom.offset.x+xAdd)+(randShift*xShift);
                 nextRoom.offset.y=previousRoom.offset.y;
                 nextRoom.offset.z=(previousRoom.offset.z+zAdd)+(randShift*zShift);
-
-                if (this.hasTwoSharedWalls(previousRoom,nextRoom,roomSize,sideRoom)) break;
                 
-                randAdd++;
-                if (randAdd===10) randAdd=-9;
-
-                if (randAdd===origRandAdd) return(false);
+                if (this.hasSharedWalls(previousRoom,nextRoom,segmentSize)) break;
+                
+                segmentTryCount++;
+                
+                if (segmentTryCount===20) {
+                    nextRoom.offset.x=previousRoom.offset.x+xAdd;
+                    nextRoom.offset.y=previousRoom.offset.y;
+                    nextRoom.offset.z=previousRoom.offset.z+zAdd;
+                    break;
+                }
             }
                 
                 // are we colliding with any previous rooms?
@@ -239,10 +231,10 @@ export default class GenerateMapClass
             for (n=0;n!==rooms.length;n++) {
                 room=rooms[n];
 
-                if (room.offset.x>=(nextRoom.offset.x+roomSize)) continue;
-                if ((room.offset.x+roomSize)<=nextRoom.offset.x) continue;
-                if (room.offset.z>=(nextRoom.offset.z+roomSize)) continue;
-                if ((room.offset.z+roomSize)<=nextRoom.offset.z) continue;
+                if (room.offset.x>=(nextRoom.offset.x+nextRoom.size.x)) continue;
+                if ((room.offset.x+room.size.x)<=nextRoom.offset.x) continue;
+                if (room.offset.z>=(nextRoom.offset.z+nextRoom.size.z)) continue;
+                if ((room.offset.z+room.size.z)<=nextRoom.offset.z) continue;
 
                 badSpot=true;
                 break;
@@ -250,7 +242,7 @@ export default class GenerateMapClass
                 
             if (!badSpot) return(true);
             
-            tryCount++;
+            connectTryCount++;
         }
             
         return(false);
@@ -264,9 +256,9 @@ export default class GenerateMapClass
     {
         let n;
         let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap;
-        let roomTopY;
-        let room,nextRoom,light,genPiece,centerPnt,intensity;
-        let roomCount,roomHigh,roomSize,piece,pathXDeviation;
+        let roomTopY,forwardPath;
+        let room,nextRoom,light,genPiece,centerPnt,intensity,isStairRoom;
+        let roomCount,segmentSize,pathXDeviation;
         let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
         let map=this.core.map;
         let rooms=[];
@@ -278,8 +270,7 @@ export default class GenerateMapClass
             // some global settings
             
         roomCount=importSettings.autoGenerate.roomCount;
-        roomSize=importSettings.autoGenerate.roomSize;
-        roomHigh=importSettings.autoGenerate.roomHeight;
+        segmentSize=importSettings.autoGenerate.segmentSize;
         
             // bitmaps
             
@@ -288,7 +279,7 @@ export default class GenerateMapClass
         floorBitmap=GenerateBitmapRun.generateWall(this.core,5);
         ceilingBitmap=GenerateBitmapRun.generateWall(this.core,4);
         stepBitmap=GenerateBitmapRun.generateWall(this.core,3);
-
+        
             // we always proceed in a path, so get
             // the deviation for the path
         
@@ -300,20 +291,48 @@ export default class GenerateMapClass
         genPiece=new GeneratePieceClass();
         
             // start room
-            
-        room=new GenerateRoomClass(genPiece.getRandomPiece(true),false);
+
+        room=new GenerateRoomClass(genPiece.getRandomPiece(true),segmentSize,false,false);
         rooms.push(room);
         
             // path rooms
         
         for (n=1;n<roomCount;n++) {
-            nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(false),false);
-            if (!this.setNextRoomPosition(rooms,room,nextRoom,roomSize,pathXDeviation,importSettings.autoGenerate.pathTurnFactor,false)) break;
             
-                // do we have a stair?
+                // are we going to change levels?
+            
+            isStairRoom=false;
+            
+            if ((room.storyCount>1) && (!room.stairRoom)) {
+                isStairRoom=(GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.stairFactor));
+            }
+
+                // create the next room
                 
-            if (room.storyCount>1) {
-                if (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.stairFactor)) nextRoom.offset.y+=roomHigh;
+            if (!isStairRoom) {
+                
+                    // pick the path, randomly forward or to side, but stay on
+                    // the stair path if we had one
+                    
+                forwardPath=GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.pathTurnFactor);
+                if (room.stairRoom) forwardPath=(room.piece.size.z>room.piece.size.x);
+                
+                    // create the room
+                        
+                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(false),segmentSize,false,false);
+                if (!this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,pathXDeviation,forwardPath)) break;
+                
+                if (room.stairRoom) nextRoom.offset.y+=segmentSize;     // last room was a step room, so this room needs to go up
+            }
+            else {
+                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                    nextRoom=new GenerateRoomClass(genPiece.getStairZPiece(),segmentSize,false,true);
+                    if (!this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,pathXDeviation,true)) break;
+                }
+                else {
+                    nextRoom=new GenerateRoomClass(genPiece.getStairXPiece(),segmentSize,false,true);
+                    if (!this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,pathXDeviation,false)) break;
+                }
             }
             
             rooms.push(nextRoom);
@@ -324,12 +343,14 @@ export default class GenerateMapClass
             // side rooms, always rooms off of
             // other rooms but to the opposite side of path
             // these are allowed to fail and are skipped if no space
-            
+
+        roomCount=rooms.length;
+        
         for (n=0;n!=roomCount;n++) {
             room=rooms[n];
             if (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.sideRoomFactor)) {
-                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(true),true);
-                if (this.setNextRoomPosition(rooms,room,nextRoom,roomSize,-pathXDeviation,importSettings.autoGenerate.pathTurnFactor,true)) {
+                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(true),segmentSize,true,false);
+                if (this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,-pathXDeviation,true)) {
                     nextRoom.offset.y=room.offset.y;
                     rooms.push(nextRoom);
                 }
@@ -338,37 +359,32 @@ export default class GenerateMapClass
 
             // eliminate all combined walls
             
-        this.removeSharedWalls(rooms,roomSize,roomHigh);
+        this.removeSharedWalls(rooms,segmentSize);
         
             // now create the meshes
-        
+            
         roomCount=rooms.length;
         
         for (n=0;n!=roomCount;n++) {
             room=rooms[n];
-            piece=room.piece;
             
-            roomTopY=room.offset.y+(room.storyCount*roomHigh);
-            centerPnt=new PointClass((room.offset.x+Math.trunc(roomSize*0.5)),(room.offset.y+Math.trunc((roomHigh*room.storyCount)*0.5)),(room.offset.z+Math.trunc(roomSize*0.5)));
+            roomTopY=room.offset.y+(room.storyCount*segmentSize);
+            centerPnt=new PointClass((room.offset.x+Math.trunc(room.size.x*0.5)),(room.offset.y+Math.trunc((segmentSize*room.storyCount)*0.5)),(room.offset.z+Math.trunc(room.size.z*0.5)));
                 
                 // meshes
-                
-            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),(piece.multistory?roomWallBitmap:hallWallBitmap),roomSize,roomHigh);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,roomSize,roomHigh);
-            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,roomSize,roomHigh);
+
+            GenerateMeshClass.buildRoomWalls(this.core,room,centerPnt,('wall_'+n),((room.piece.multistory&&(!room.piece.stair))?roomWallBitmap:hallWallBitmap),segmentSize);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,segmentSize);
+            GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,segmentSize);
             
-                // possible stairs
+                // stairs
                 
-            if (n<(roomCount-1)) {
-                if ((!room.sideRoom) && (!rooms[n+1].sideRoom)) {
-                    if (rooms[n+1].offset.y>room.offset.y) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),stepBitmap,stepBitmap,roomSize,roomHigh);
-                }
-            }
-            
+            if (room.stairRoom) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),stepBitmap,stepBitmap,segmentSize);
+
                 // room light
             
-            intensity=Math.trunc(roomSize*0.7)+((roomHigh*0.2)*(room.storyCount-1));
-            light=new LightClass(new PointClass((room.offset.x+(Math.trunc(roomSize*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(roomSize*0.5)))),new ColorClass(1,1,1),intensity,0.5);
+            intensity=Math.trunc(((room.size.x+room.size.z)*0.5)*0.7)+((segmentSize*0.2)*(room.storyCount-1));
+            light=new LightClass(new PointClass((room.offset.x+(Math.trunc(room.size.x*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(room.size.z*0.5)))),new ColorClass(1,1,1),intensity,0.5);
             map.lightList.add(light);
         }
         

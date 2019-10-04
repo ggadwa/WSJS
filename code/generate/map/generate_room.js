@@ -3,16 +3,24 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateRoomClass
 {
-    constructor(piece,sideRoom)
+    constructor(piece,segmentSize,sideRoom,stairRoom)
     {
         this.piece=piece;
         this.sideRoom=sideRoom;
+        this.stairRoom=stairRoom;
+        
+        this.forwardPath=false;     // be filled in later during construction
+        this.pathXDeviation=0;
         
         this.offset=new PointClass(0,0,0);
-        this.storyCount=(this.piece.multistory)?(Math.trunc(GenerateUtilityClass.randomInt(1,3))):1;
+        if (stairRoom) {
+            this.storyCount=2;
+        }
+        else {
+            this.storyCount=(this.piece.multistory)?(Math.trunc(GenerateUtilityClass.randomInt(1,3))):1;
+        }
         
-        this.stairVertexIdx=0;
-        this.stairVertexIdx2=0;
+        this.size=new PointClass((segmentSize*piece.size.x),(segmentSize*this.storyCount),(segmentSize*piece.size.z));
         
         this.vertexHideArray=new Uint8Array(this.piece.vertexes.length*3); // 3 possible stories
     }
@@ -26,5 +34,5 @@ export default class GenerateRoomClass
     {
         return(this.vertexHideArray[(story*this.piece.vertexes.length)+vIdx]===1);
     }
-        
+    
 }

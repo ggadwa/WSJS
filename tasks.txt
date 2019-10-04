@@ -3,7 +3,8 @@
 - room uvs need to be better
 
 - door frames
-- second stories
+- need more small rooms
+- diag/x pieces don't connect very well and often fail
 
 - diamond needs raised edge
 - star (line) pattern for tiles?  raised squares?
