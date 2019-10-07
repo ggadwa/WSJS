@@ -19,7 +19,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
         // tile bitmaps
         //
         
-    generateTilePiece(lft,top,rgt,bot,tileColor,splitCount,edgeSize,complex)
+    generateTilePiece(lft,top,rgt,bot,tileColor,designColor,splitCount,edgeSize,complex)
     {
         let x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh,tileStyle;
         let col,frameCol,padding;
@@ -52,7 +52,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
                 if ((complex) && (GenerateUtilityClass.randomPercentage(0.25))) {
                     tileStyle=GenerateUtilityClass.randomIndex(3);
-                    this.generateTilePiece(dLft,dTop,dRgt,dBot,tileColor,2,edgeSize,false);
+                    this.generateTilePiece(dLft,dTop,dRgt,dBot,tileColor,designColor,2,edgeSize,false);
                     continue;
                 }
 
@@ -90,15 +90,20 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     
                     switch (GenerateUtilityClass.randomIndex(3)) {
                         case 1:
-                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,frameCol,0.5,true,false,1,0);
+                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,designColor,0.5,true,false,1,0);
                             break;
                         case 2:
-                            this.drawDiamond((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),frameCol);
+                            this.drawDiamond((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),designColor);
                             break;
                     }
                 }
 
-                //                this.blur(this.colorImgData.data,0,0,this.colorCanvas.width,this.colorCanvas.height,1,false);
+                    // possible dirt
+                    
+                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                    this.drawStaticNoiseRect(dLft,dTop,dRgt,dBot,0.8,1.1);
+                    this.blur(this.colorImgData.data,dLft,dTop,dRgt,dBot,1,false);
+                }
                 
                     // possible crack
                     
@@ -109,7 +114,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
     generateInternal()
     {
-        let splitCount,groutColor;
+        let splitCount,designColor,groutColor;
         let complex,small,edgeSize;
         let tileColor=[];
         
@@ -133,15 +138,16 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
             
         tileColor[0]=this.getRandomColor();
         tileColor[1]=this.darkenColor(tileColor[0],0.85);
+        designColor=this.getRandomColor();
         groutColor=this.dullColor(tileColor[0],0.7);
 
             // original splits
 
-        this.generateTilePiece(0,0,this.colorImgData.width,this.colorImgData.height,tileColor,splitCount,edgeSize,complex);
+        this.generateTilePiece(0,0,this.colorImgData.width,this.colorImgData.height,tileColor,designColor,splitCount,edgeSize,complex);
 
             // finish with the specular
 
-        this.createSpecularMap(0.5);
+        this.createSpecularMap(0.4);
     }
 
 }

@@ -205,7 +205,7 @@ export default class GenerateMapClass
              
             segmentTryCount=0;
             
-            while (true) {
+            while (segmentTryCount<20) {
                 randShift=GenerateUtilityClass.randomInBetween(-5,5)*segmentSize;
                 
                 nextRoom.offset.x=(previousRoom.offset.x+xAdd)+(randShift*xShift);
@@ -215,12 +215,35 @@ export default class GenerateMapClass
                 if (this.hasSharedWalls(previousRoom,nextRoom,segmentSize)) break;
                 
                 segmentTryCount++;
+            }
+            
+                // if we can't find a connection, try 0,0 first
+                // and if not that, then go across the entire edge
+                // to find the first hit
                 
-                if (segmentTryCount===20) {
-                    nextRoom.offset.x=previousRoom.offset.x+xAdd;
-                    nextRoom.offset.y=previousRoom.offset.y;
-                    nextRoom.offset.z=previousRoom.offset.z+zAdd;
-                    break;
+            if (segmentTryCount===20) {
+                nextRoom.offset.x=previousRoom.offset.x+xAdd;
+                nextRoom.offset.y=previousRoom.offset.y;
+                nextRoom.offset.z=previousRoom.offset.z+zAdd;
+                
+                if (!this.hasSharedWalls(previousRoom,nextRoom,segmentSize)) {
+                    
+                    badSpot=true;
+                    
+                    for (n=-9;n!=9;n++) {           // assume largest is 10x10
+                        randShift=n*segmentSize;
+                
+                        nextRoom.offset.x=(previousRoom.offset.x+xAdd)+(randShift*xShift);
+                        nextRoom.offset.y=previousRoom.offset.y;
+                        nextRoom.offset.z=(previousRoom.offset.z+zAdd)+(randShift*zShift);
+                
+                        if (this.hasSharedWalls(previousRoom,nextRoom,segmentSize)) {
+                            badSpot=false;
+                            break;
+                        }                        
+                    }
+                    
+                    if (badSpot) console.log('failed connection, room='+previousRoom.piece.name+'; next='+nextRoom.piece.name+'; forwardPath='+forwardPath+'; dev='+pathXDeviation);
                 }
             }
                 
@@ -254,7 +277,7 @@ export default class GenerateMapClass
         
     build(importSettings)
     {
-        let n;
+        let n,seed;
         let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap;
         let roomTopY,forwardPath;
         let room,nextRoom,light,genPiece,centerPnt,intensity,isStairRoom;
@@ -265,7 +288,10 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        GenerateUtilityClass.setRandomSeed((importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed);
+        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        console.info('seed='+seed);
+        
+        GenerateUtilityClass.setRandomSeed(seed);
         
             // some global settings
             
@@ -356,6 +382,8 @@ export default class GenerateMapClass
                 }
             }
         }
+        
+        console.info('room count='+rooms.length);
 
             // eliminate all combined walls
             
@@ -380,6 +408,12 @@ export default class GenerateMapClass
                 // stairs
                 
             if (room.stairRoom) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),stepBitmap,stepBitmap,segmentSize);
+            
+                // second stories
+                
+            if ((room.piece.multistory) && (room.piece.starter) && (room.storyCount>1)) {
+                GenerateMeshClass.buildRoomSecondStory(this.core,room,('story_'+n),stepBitmap,segmentSize);
+            }
 
                 // room light
             

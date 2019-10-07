@@ -19,7 +19,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"small_box",
-                    "starter":true,
+                    "starter":false,
                     "size":{"x":5,"z":5},
                     "multistory":true,
                     "vertexes":
@@ -54,6 +54,18 @@ export default class GeneratePieceClass
                         ]
                 },
                 {
+                    "name":"half_circle_small",
+                    "starter":false,
+                    "size":{"x":10,"z":5},
+                    "multistory":true,
+                    "vertexes":
+                        [
+                            [4,0],[5,0],[6,0],[8,1],[9,2],[10,4],[10,5],
+                            [9,5],[8,5],[7,5],[6,5],[5,5],[4,5],[3,5],[2,5],[1,5],[0,5],
+                            [0,4],[1,2],[2,1]
+                        ]
+                },
+                {
                     "name":"slant_box",
                     "starter":true,
                     "size":{"x":10,"z":10},
@@ -81,7 +93,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"small_diamond",
-                    "starter":true,
+                    "starter":false,
                     "size":{"x":5,"z":5},
                     "multistory":true,
                     "vertexes":
@@ -206,16 +218,18 @@ export default class GeneratePieceClass
         piece=JSON.parse(JSON.stringify(origPiece));
         
             // and flip
+        
+        if (rotate) {
+            x=piece.size.x;
+            piece.size.x=piece.size.z;
+            piece.size.z=x;
+        }
             
         for (n=0;n!==piece.vertexes.length;n++) {
             if (rotate) {
                 x=piece.vertexes[n][0];
                 piece.vertexes[n][0]=piece.vertexes[n][1];
                 piece.vertexes[n][1]=x;
-                
-                x=piece.size.x;
-                piece.size.x=piece.size.z;
-                piece.size.z=x;
             }
             if (flipX) piece.vertexes[n][0]=piece.size.x-piece.vertexes[n][0];
             if (flipZ) piece.vertexes[n][1]=piece.size.z-piece.vertexes[n][1];

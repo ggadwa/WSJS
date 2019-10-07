@@ -271,5 +271,20 @@ export default class GenerateMeshClass
 
              */
     }
+    
+        //
+        // second story
+        //
+        
+    static buildRoomSecondStory(core,room,name,bitmap,segmentSize)
+    {
+        let x,z;
+        
+        x=room.offset.x+(GenerateUtilityClass.randomInt(0,room.piece.size.x)*segmentSize);
+        z=room.offset.z+(GenerateUtilityClass.randomInt(0,room.piece.size.z)*segmentSize);
+        
+        
+        this.addBox(core,(name+'_X'),bitmap,x,(x+segmentSize),(room.offset.y+(segmentSize+1000)),(room.offset.y+segmentSize),z,(z+segmentSize),true,true,true,true,true,true,segmentSize);
+    }
 }
 
