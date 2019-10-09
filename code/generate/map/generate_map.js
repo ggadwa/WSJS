@@ -278,7 +278,7 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n,seed;
-        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap;
+        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,platformBitmap;
         let roomTopY,forwardPath;
         let room,nextRoom,light,genPiece,centerPnt,intensity,isStairRoom;
         let roomCount,segmentSize,pathXDeviation;
@@ -288,7 +288,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=1570656244671; //(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('seed='+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -305,6 +305,7 @@ export default class GenerateMapClass
         floorBitmap=GenerateBitmapRun.generateWall(this.core,5);
         ceilingBitmap=GenerateBitmapRun.generateWall(this.core,4);
         stepBitmap=GenerateBitmapRun.generateWall(this.core,3);
+        platformBitmap=GenerateBitmapRun.generateWall(this.core,2);
         
             // we always proceed in a path, so get
             // the deviation for the path
@@ -412,7 +413,7 @@ export default class GenerateMapClass
                 // second stories
                 
             if ((room.piece.multistory) && (room.piece.starter) && (room.storyCount>1)) {
-                GenerateMeshClass.buildRoomSecondStory(this.core,room,('story_'+n),stepBitmap,segmentSize);
+                GenerateMeshClass.buildRoomSecondStory(this.core,room,('story_'+n),platformBitmap,segmentSize);
             }
 
                 // room light

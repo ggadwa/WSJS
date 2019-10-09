@@ -62,20 +62,20 @@ export default class GenerateBitmapBaseClass
 
         this.NORMAL_CLEAR=new PointClass(0.0,0.0,1.0);
 
-        this.NORMAL_LEFT_45=new PointClass(-0.60,0.02,0.70);
-        this.NORMAL_RIGHT_45=new PointClass(0.60,-0.02,0.70);
-        this.NORMAL_TOP_45=new PointClass(-0.02,0.60,0.70);
-        this.NORMAL_BOTTOM_45=new PointClass(0.02,-0.60,0.70);
+        this.NORMAL_LEFT_45=new PointClass(-0.65,0.02,0.75);
+        this.NORMAL_RIGHT_45=new PointClass(0.65,-0.02,0.75);
+        this.NORMAL_TOP_45=new PointClass(-0.02,0.65,0.75);
+        this.NORMAL_BOTTOM_45=new PointClass(0.02,-0.65,0.75);
 
         this.NORMAL_LEFT_10=new PointClass(-0.1,0.0,0.90);
         this.NORMAL_RIGHT_10=new PointClass(0.1,0.0,0.90);
         this.NORMAL_TOP_10=new PointClass(0.0,0.1,0.90);
         this.NORMAL_BOTTOM_10=new PointClass(0.0,-0.1,0.90);
         
-        this.NORMAL_TOP_LEFT_45=new PointClass(-0.30,0.30,0.70);
-        this.NORMAL_TOP_RIGHT_45=new PointClass(0.30,0.30,0.70);
-        this.NORMAL_BOTTOM_LEFT_45=new PointClass(-0.30,-0.30,0.70);
-        this.NORMAL_BOTTOM_RIGHT_45=new PointClass(0.30,-0.30,0.70);
+        this.NORMAL_TOP_LEFT_45=new PointClass(-0.48,0.48,0.72);
+        this.NORMAL_TOP_RIGHT_45=new PointClass(0.48,0.48,0.72);
+        this.NORMAL_BOTTOM_LEFT_45=new PointClass(-0.48,-0.48,0.72);
+        this.NORMAL_BOTTOM_RIGHT_45=new PointClass(0.48,-0.48,0.72);
         
             // the color, normal, specular, and glow
             
@@ -1069,8 +1069,11 @@ export default class GenerateBitmapBaseClass
         let x,y,lx,rx,f,idx;
         let mx,my,halfWid;
         let colorData=this.colorImgData.data;
+        let frameColor;
         
         if ((lft>=rgt) || (top>=bot)) return;
+        
+            // the fill
 
         mx=Math.trunc((lft+rgt)*0.5);
         my=Math.trunc((top+bot)*0.5);
@@ -1098,8 +1101,31 @@ export default class GenerateBitmapBaseClass
                 colorData[idx+1]=color.g*255.0;
                 colorData[idx+2]=color.b*255.0;
             }
-            
         }
+        
+            // the border
+            
+        frameColor=this.darkenColor(color,0.9);
+        
+        this.drawLineColor((mx+1),top,(lft+1),my,frameColor,true);
+        this.drawLineColor(mx,top,lft,my,frameColor,true);
+        this.drawLineNormal((mx+1),top,(lft+1),my,this.NORMAL_TOP_LEFT_45);
+        this.drawLineNormal(mx,top,lft,my,this.NORMAL_TOP_LEFT_45);
+
+        this.drawLineColor((mx-1),top,(rgt-1),my,frameColor,true);
+        this.drawLineColor(mx,top,rgt,my,frameColor,true);
+        this.drawLineNormal((mx-1),top,(rgt-1),my,this.NORMAL_TOP_RIGHT_45);
+        this.drawLineNormal(mx,top,rgt,my,this.NORMAL_TOP_RIGHT_45);
+        
+        this.drawLineColor((lft+1),my,(mx+1),bot,frameColor,true);
+        this.drawLineColor(lft,my,mx,bot,frameColor,true);
+        this.drawLineNormal((lft+1),my,(mx+1),bot,this.NORMAL_BOTTOM_LEFT_45);
+        this.drawLineNormal(lft,my,mx,bot,this.NORMAL_TOP_LEFT_45);
+
+        this.drawLineColor((rgt-1),my,(mx-1),bot,frameColor,true);
+        this.drawLineColor(lft,my,mx,bot,frameColor,true);
+        this.drawLineNormal((rgt-1),my,(mx-1),bot,this.NORMAL_BOTTOM_RIGHT_45);
+        this.drawLineNormal(rgt,my,mx,bot,this.NORMAL_TOP_RIGHT_45);
     }
     
         //
@@ -1269,119 +1295,106 @@ export default class GenerateBitmapBaseClass
         // color stripes, gradients, waves
         //
         
-    createRandomColorStripeArray(factor,baseColor)
-    {
-        let n,f,count;
-        let r,g,b,color;
-        let colors=[];
-
-            // make stripes of varying sizes and colors
-
-        count=0;
-
-        for (n=0;n!==100;n++) {
-            count--;
-
-            if (count<=0) {
-                count=1+Math.trunc(GenerateUtilityClass.random()*3);
-
-                f=1.0+((1.0-(GenerateUtilityClass.random()*2.0))*factor);
-
-                r=baseColor.r*f;
-                if (r<0.0) r=0.0;
-                if (r>1.0) r=1.0;
-
-                g=baseColor.g*f;
-                if (g<0.0) g=0.0;
-                if (g>1.0) g=1.0;
-
-                b=baseColor.b*f;
-                if (b<0.0) b=0.0;
-                if (b>1.0) b=1.0;
-                
-                color=new ColorClass(r,g,b);
-            }
-
-            colors.push(color);
-        }    
-
-        return(colors);
-    }
-        
     drawColorStripeHorizontal(lft,top,rgt,bot,factor,baseColor)
     {
-        let x,y,nx,nz,idx;
-        let color,redByte,greenByte,blueByte;
-        let colors=this.createRandomColorStripeArray(factor,baseColor);
+        let x,y,nx,ny,nz,idx;
+        let f,r,g,b,count,normal;
         let colorData=this.colorImgData.data;
         let normalData=this.normalImgData.data;
 
         if ((rgt<=lft) || (bot<=top)) return;
         
-            // write the stripes
+            // the rotating normal
+            
+        normal=new PointClass(0,0.1,0.9);
+        normal.normalize();
         
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
+        nx=(normal.x+1.0)*127.0;
+        ny=(normal.y+1.0)*127.0;
+        nz=(normal.z+1.0)*127.0;
+        
+            // write the stripes
+            
+        count=1;
 
         for (y=top;y!==bot;y++) {
 
-            color=colors[y%100];
-            redByte=Math.trunc(color.r*255.0);
-            greenByte=Math.trunc(color.g*255.0);
-            blueByte=Math.trunc(color.b*255.0);
+            count--;
+            if (count<=0) {
+                count=GenerateUtilityClass.randomInt(2,4);
+                
+                f=1.0+((1.0-(GenerateUtilityClass.random()*2.0))*factor);
+                
+                r=Math.trunc((baseColor.r*f)*255.0);
+                g=Math.trunc((baseColor.g*f)*255.0);
+                b=Math.trunc((baseColor.b*f)*255.0);
+                
+                ny=-ny;
+            }
 
             idx=(y*this.colorImgData.width)*4;
 
             for (x=lft;x!==rgt;x++) {
-                colorData[idx]=redByte;
-                colorData[idx+1]=greenByte;
-                colorData[idx+2]=blueByte;
+                colorData[idx]=r;
+                colorData[idx+1]=g;
+                colorData[idx+2]=b;
 
                 normalData[idx]=nx;
-                normalData[idx+1]=127.0;
+                normalData[idx+1]=ny;
                 normalData[idx+2]=nz;
 
                 idx+=4;
             }
-
-            nx=-nx;
         }
     }
 
     drawColorStripeVertical(lft,top,rgt,bot,factor,baseColor)
     {
-        let x,y,nx,nz,idx;
-        let color,redByte,greenByte,blueByte;
-        let colors=this.createRandomColorStripeArray(factor,baseColor);
+        let x,y,nx,ny,nz,idx;
+        let f,r,g,b,count,normal;
         let colorData=this.colorImgData.data;
         let normalData=this.normalImgData.data;
 
         if ((rgt<=lft) || (bot<=top)) return;
         
+            // the rotating normal
+            
+        normal=new PointClass(0.1,0,0.9);
+        normal.normalize();
+        
+        nx=(normal.x+1.0)*127.0;
+        ny=(normal.y+1.0)*127.0;
+        nz=(normal.z+1.0)*127.0;
+        
             // write the stripes
             
-        nx=Math.trunc((0.10+1.0)*127.0);
-        nz=Math.trunc((0.90+1.0)*127.0);
-
+        count=1;
+            
         for (x=lft;x!==rgt;x++) {
-
-            color=colors[x%100];
-            redByte=Math.trunc(color.r*255.0);
-            greenByte=Math.trunc(color.g*255.0);
-            blueByte=Math.trunc(color.b*255.0);
+            
+            count--;
+            if (count<=0) {
+                count=GenerateUtilityClass.randomInt(2,4);
+                
+                f=1.0+((1.0-(GenerateUtilityClass.random()*2.0))*factor);
+                
+                r=Math.trunc((baseColor.r*f)*255.0);
+                g=Math.trunc((baseColor.g*f)*255.0);
+                b=Math.trunc((baseColor.b*f)*255.0);
+                
+                nx=-nx;
+            }
 
             for (y=top;y!==bot;y++) {
                 idx=((y*this.colorImgData.width)+x)*4;
-                colorData[idx]=redByte;
-                colorData[idx+1]=greenByte;
-                colorData[idx+2]=blueByte;
+                colorData[idx]=r;
+                colorData[idx+1]=g;
+                colorData[idx+2]=b;
 
                 normalData[idx]=nx;
-                normalData[idx+1]=127.0;
+                normalData[idx+1]=ny;
                 normalData[idx+2]=nz;
             }
-
-            nx=-nx;
         }
     }
     
@@ -1602,6 +1615,53 @@ export default class GenerateBitmapBaseClass
                 
                 dx+=slope;
             }
+        }
+    }
+    
+    drawHorizontalCrack(y,x,x2,clipTop,clipBot,lineDir,lineVariant,color,canSplit)
+    {
+        let n,sx,sy,ex,ey;
+        let segCount=GenerateUtilityClass.randomInt(2,5);
+        let xAdd=Math.trunc((x2-x)/segCount);
+        
+        sx=x;
+        sy=y;
+        
+        for (n=0;n!==segCount;n++) {
+            
+            if ((n+1)===segCount) {
+                ex=x2;
+            }
+            else {
+                ey=sy+(GenerateUtilityClass.randomIndex(lineVariant)*lineDir);
+                ex=sx+xAdd;
+            }
+            
+            if (ey<clipTop) ey=clipTop;
+            if (ey>clipBot) ey=clipBot;
+            
+            if (sx===ex) return;
+            
+            this.drawLineColor(sx,sy,ex,ey,color,true);
+            this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
+            this.drawLineNormal(sx,(sy-1),ex,(ey-1),this.NORMAL_BOTTOM_45);
+            this.drawLineNormal(sx,(sy+1),ex,(ey+1),this.NORMAL_TOP_45);
+            
+            if ((ey===clipTop) || (ey===clipBot)) break;
+            
+            if ((canSplit) && (GenerateUtilityClass.randomPercentage(0.5))) {
+                if (lineDir>0) {
+                    this.drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
+                }
+                else {
+                    this.drawHorizontalCrack(ey,ex,x2,clipTop,clipBot,-lineDir,lineVariant,color,false);
+                }
+                
+                canSplit=false;
+            }
+            
+            sx=ex;
+            sy=ey;
         }
     }
             

@@ -5,6 +5,11 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 export default class GenerateMeshClass
 {
     static STAIR_STEP_COUNT=10;
+    
+    static PLATFORM_DIR_POS_Z=0;
+    static PLATFORM_DIR_NEG_Z=1;
+    static PLATFORM_DIR_POS_X=2;
+    static PLATFORM_DIR_NEG_X=3;
 
     constructor()
     {
@@ -278,13 +283,65 @@ export default class GenerateMeshClass
         
     static buildRoomSecondStory(core,room,name,bitmap,segmentSize)
     {
-        let x,z;
+        let x,z,gx,gz,sx,ex,sz,ez;
+        let dir;
         
-        x=room.offset.x+(GenerateUtilityClass.randomInt(0,room.piece.size.x)*segmentSize);
-        z=room.offset.z+(GenerateUtilityClass.randomInt(0,room.piece.size.z)*segmentSize);
+            // random start position
+            
+        gx=GenerateUtilityClass.randomInt(2,(room.piece.size.x-4));
+        gz=GenerateUtilityClass.randomInt(2,(room.piece.size.z-4));
         
+            // lift
+            
+        x=room.offset.x+(gx*segmentSize);
+        z=room.offset.z+(gz*segmentSize);
         
-        this.addBox(core,(name+'_X'),bitmap,x,(x+segmentSize),(room.offset.y+(segmentSize+1000)),(room.offset.y+segmentSize),z,(z+segmentSize),true,true,true,true,true,true,segmentSize);
+        this.addBox(core,(name+'_lift'),bitmap,x,(x+segmentSize),room.offset.y,(room.offset.y+(segmentSize+1000)),z,(z+segmentSize),true,true,true,true,true,true,segmentSize);
+        
+            // start direction
+        
+        dir=GenerateUtilityClass.randomIndex(4);
+        
+            // segments
+            
+        //while (true) {
+        
+            switch (dir) {
+                case GenerateMeshClass.PLATFORM_DIR_POS_Z:
+                    sx=gx;
+                    ex=gx+1;
+                    sz=gz+1;
+                    ez=room.piece.size.z;
+                    break;
+                case GenerateMeshClass.PLATFORM_DIR_NEG_Z:
+                    sx=gx;
+                    ex=gx+1;
+                    sz=0;
+                    ez=gz;
+                    break;
+                case GenerateMeshClass.PLATFORM_DIR_POS_X:
+                    sx=gx+1;
+                    ex=room.piece.size.x;
+                    sz=gz;
+                    ez=gz+1;
+                    break;
+                case GenerateMeshClass.PLATFORM_DIR_NEG_X:
+                    sx=0;
+                    ex=gx;
+                    sz=gz;
+                    ez=gz+1;
+                    break;
+            }
+            
+            sx=room.offset.x+(sx*segmentSize);
+            ex=room.offset.x+(ex*segmentSize);
+            sz=room.offset.z+(sz*segmentSize);
+            ez=room.offset.z+(ez*segmentSize);
+
+            this.addBox(core,(name+'_X'),bitmap,sx,ex,(room.offset.y+segmentSize),(room.offset.y+(segmentSize+1000)),sz,ez,true,true,true,true,true,true,segmentSize);
+
+            
+        //}
     }
 }
 

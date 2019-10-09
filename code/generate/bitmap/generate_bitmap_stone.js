@@ -38,8 +38,9 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         edgeSize=GenerateUtilityClass.randomInt(Math.trunc(wid*0.8),Math.trunc(wid*0.15));     // new edge size as stones aren't the same
         xRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
         yRoundFactor=GenerateUtilityClass.randomFloat(0.0,0.03);
+        normalZFactor=GenerateUtilityClass.randomFloat(0.4,0.2);        // different z depths
         
-        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,0.5,false,true,0.8,0.4);
+        this.drawOval(lft,top,rgt,bot,0,1,xRoundFactor,yRoundFactor,edgeSize,stoneColor,normalZFactor,false,true,0.8,0.4);
         
             // random chunks on stone
             // we make sure that the first 4 random

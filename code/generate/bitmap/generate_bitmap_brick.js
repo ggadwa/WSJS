@@ -23,10 +23,9 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
     {
         let n,seg,segments;
         let drawBrickColor,drawFrameColor,streakColor,f;
-        let lft,rgt,top,bot;
+        let lft,rgt,top,bot,edgeSize;
         let sx,ex,streakWid,lineColor;
         
-        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
         let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
         
         let brickColor=this.getRandomColor();
@@ -49,6 +48,10 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 
         for (n=0;n!==segments.length;n++) {
             seg=segments[n];
+                
+                // random heights
+                
+            edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
             
                 // the brick
                 

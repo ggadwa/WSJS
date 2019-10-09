@@ -21,12 +21,16 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
     
     generateWoodDrawBoard(lft,top,rgt,bot,edgeSize,woodColor)
     {
-        let col=this.darkenColor(woodColor,GenerateUtilityClass.randomFloat(0.8,0.2));
-        let frameColor=this.darkenColor(woodColor,0.9);
+        let col=this.darkenColor(woodColor,GenerateUtilityClass.randomFloat(0.7,0.3));
+        let frameColor=this.darkenColor(col,0.7);
         
+            // the board edge
+            
         this.drawRect(lft,top,rgt,bot,col);
         this.draw3DFrameRect(lft,top,rgt,bot,edgeSize,frameColor,true);
         
+            // stripes and a noise overlay
+            
         if ((bot-top)>(rgt-lft)) {
             this.drawColorStripeVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
         }
@@ -34,8 +38,12 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
             this.drawColorStripeHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
         }
         
-        this.drawStaticNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,1.1);
+        this.drawPerlinNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.8,1.0);
+        
+            // blur both the color and the normal
+            
         this.blur(this.colorImgData.data,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),2,true);
+        this.blur(this.normalImgData.data,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),5,true);
     }
 
     generateInternal()
@@ -48,6 +56,10 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
         let boardSize=Math.trunc(this.colorCanvas.width/boardCount);
         let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.005));
         let woodColor=this.getRandomColor();
+        
+            // perlin noise
+            
+        this.createPerlinNoiseData(32,32);
 
             // regular wood planking
 

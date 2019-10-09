@@ -19,14 +19,15 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
         // tile bitmaps
         //
         
-    generateTilePiece(lft,top,rgt,bot,tileColor,designColor,splitCount,edgeSize,complex)
+    generateTilePiece(lft,top,rgt,bot,tileColor,designColor,splitCount,complex)
     {
-        let x,y,dLft,dTop,dRgt,dBot,tileWid,tileHigh,tileStyle;
-        let col,frameCol,padding;
+        let x,y,sx,sy,dLft,dTop,dRgt,dBot,tileWid,tileHigh,tileStyle;
+        let col,frameCol,edgeSize,padding;
 
             // tile style
 
         tileStyle=GenerateUtilityClass.randomIndex(3);
+        edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.01));
 
             // splits
 
@@ -52,7 +53,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
                 if ((complex) && (GenerateUtilityClass.randomPercentage(0.25))) {
                     tileStyle=GenerateUtilityClass.randomIndex(3);
-                    this.generateTilePiece(dLft,dTop,dRgt,dBot,tileColor,designColor,2,edgeSize,false);
+                    this.generateTilePiece(dLft,dTop,dRgt,dBot,tileColor,designColor,2,false);
                     continue;
                 }
 
@@ -89,10 +90,10 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     padding=edgeSize+GenerateUtilityClass.randomInt(edgeSize,(edgeSize*10));
                     
                     switch (GenerateUtilityClass.randomIndex(3)) {
-                        case 1:
-                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,designColor,0.5,true,false,1,0);
+                        case 0:
+                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,designColor,0.5,false,false,1,0);
                             break;
-                        case 2:
+                        case 1:
                             this.drawDiamond((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),designColor);
                             break;
                     }
@@ -101,13 +102,22 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     // possible dirt
                     
                 if (GenerateUtilityClass.randomPercentage(0.2)) {
-                    this.drawStaticNoiseRect(dLft,dTop,dRgt,dBot,0.8,1.1);
-                    this.blur(this.colorImgData.data,dLft,dTop,dRgt,dBot,1,false);
+                    this.drawStaticNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.7,1.0);
+                    this.blur(this.colorImgData.data,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),2,false);
                 }
                 
                     // possible crack
                     
-                //this.drawSmallCrack(dLft,dTop,dRgt,dBot,edgeSize,col);
+                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                    if (GenerateUtilityClass.randomPercentage(0.5)) {
+                        sy=GenerateUtilityClass.randomInBetween((dTop+15),(dBot-15));
+                        this.drawHorizontalCrack(sy,(dLft+edgeSize),(dRgt-edgeSize),(dTop+edgeSize),(dBot-edgeSize),GenerateUtilityClass.randomSign(),10,frameCol,true);
+                    }
+                    else {
+                        sx=GenerateUtilityClass.randomInBetween((dLft+15),(dRgt-15));
+                        this.drawVerticalCrack(sx,(dTop+edgeSize),(dBot-edgeSize),(dLft+edgeSize),(dRgt-edgeSize),GenerateUtilityClass.randomSign(),10,frameCol,true);
+                    }
+                }
             }
         }
     }
@@ -115,7 +125,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
     generateInternal()
     {
         let splitCount,designColor,groutColor;
-        let complex,small,edgeSize;
+        let complex,small;
         let tileColor=[];
         
             // get splits
@@ -132,8 +142,6 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
             splitCount=GenerateUtilityClass.randomInt(6,4);
         }
         
-        edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.005));
-        
             // colors
             
         tileColor[0]=this.getRandomColor();
@@ -143,7 +151,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
             // original splits
 
-        this.generateTilePiece(0,0,this.colorImgData.width,this.colorImgData.height,tileColor,designColor,splitCount,edgeSize,complex);
+        this.generateTilePiece(0,0,this.colorImgData.width,this.colorImgData.height,tileColor,designColor,splitCount,complex);
 
             // finish with the specular
 

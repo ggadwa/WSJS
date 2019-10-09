@@ -7,7 +7,6 @@
 - 2nd stories
 - step function needs work
 
-- diamond needs raised edge
 - star (line) pattern for tiles?  raised squares?
 
 
