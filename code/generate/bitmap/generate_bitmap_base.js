@@ -345,6 +345,23 @@ export default class GenerateBitmapBaseClass
         let col=min+(GenerateUtilityClass.random()*(max-min));
         return(new ColorClass(col,col,col));
     }
+    
+    adjustColor(color,factor)
+    {
+        let col=new ColorClass((color.r*factor),(color.g*factor),(color.b*factor));
+        
+        col.fixOverflow();
+        return(col);
+    }
+    
+    adjustColorRandom(color,minFactor,maxFactor)
+    {
+        let f=GenerateUtilityClass.randomFloat(minFactor,(maxFactor-minFactor));
+        let col=new ColorClass((color.r*f),(color.g*f),(color.b*f));
+        
+        col.fixOverflow();
+        return(col);
+    }
 
         //
         // masking
@@ -1105,7 +1122,7 @@ export default class GenerateBitmapBaseClass
         
             // the border
             
-        frameColor=this.darkenColor(color,0.9);
+        frameColor=this.adjustColorRandom(color,0.85,0.95);
         
         this.drawLineColor((mx+1),top,(lft+1),my,frameColor,true);
         this.drawLineColor(mx,top,lft,my,frameColor,true);
@@ -1191,7 +1208,6 @@ export default class GenerateBitmapBaseClass
     {
         let x,shineWid,shineColor;
         let wid=rgt-lft;
-        let lite=GenerateUtilityClass.randomPercentage(0.5); 
         
         x=lft;
         
@@ -1202,14 +1218,7 @@ export default class GenerateBitmapBaseClass
                 // small % are no lines
                 
             if (GenerateUtilityClass.randomPercentage(0.9)) {
-                if (lite) {
-                    shineColor=this.lightenColor(metalColor,GenerateUtilityClass.randomFloat(0.05,0.1))
-                }
-                else {
-                    shineColor=this.darkenColor(metalColor,GenerateUtilityClass.randomFloat(0.7,0.3));
-                }
-                
-
+                shineColor=this.adjustColorRandom(metalColor,0.7,1.3);
                 this.drawMetalShineLine(x,top,bot,shineWid,shineColor);
             }
             
@@ -1217,7 +1226,7 @@ export default class GenerateBitmapBaseClass
             if (x>=rgt) break;
         }
         
-        this.blur(this.colorImgData.data,lft,top,rgt,bot,(lite?3:4),true);
+        this.blur(this.colorImgData.data,lft,top,rgt,bot,3,true);
     }
     
         //
@@ -1852,11 +1861,6 @@ export default class GenerateBitmapBaseClass
         return(new ColorClass((color.r*darkenFactor),(color.g*darkenFactor),(color.b*darkenFactor)));
     }
     
-    lightenColor(color,lightenFactor)
-    {
-        return(new ColorClass((color.r+(color.r*lightenFactor)),(color.g+(color.g*lightenFactor)),(color.b+(color.b*lightenFactor))));
-    }
-    
     boostColor(color,boostAdd)
     {
         return(new ColorClass((color.r+boostAdd),(color.g+boostAdd),(color.b+boostAdd)));
@@ -2056,7 +2060,7 @@ export default class GenerateBitmapBaseClass
     {
         if ((lft>=rgt) || (top>=bot)) return;
 
-        this.glowCTX.fillStyle=this.colorToRGBColor(this.darkenColor(color,0.5));
+        this.glowCTX.fillStyle=this.colorToRGBColor(this.adjustColorRandom(color,0.5,0.6));
         this.glowCTX.fillRect(lft,top,(rgt-lft),(bot-top));
     }
 

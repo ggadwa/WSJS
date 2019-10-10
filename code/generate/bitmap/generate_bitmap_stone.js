@@ -106,7 +106,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
     generateInternal()
     {
         let n,seg;
-        let drawStoneColor,f;
+        let drawStoneColor;
         
         let stoneColor=this.getRandomColor();
         let altStoneColor=this.getRandomColor();
@@ -130,11 +130,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 
         for (n=0;n!==segments.length;n++) {
             seg=segments[n];
-
-            f=GenerateUtilityClass.random()+0.5;
-            if (f>1.0) f=1.0;
-
-            drawStoneColor=this.darkenColor((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),f);
+            drawStoneColor=this.adjustColorRandom((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),0.7,1.2);
             this.drawSingleStone(seg.lft,seg.top,seg.rgt,seg.bot,drawStoneColor);
         }
         

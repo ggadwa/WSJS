@@ -1,5 +1,7 @@
 import PointClass from '../../utility/point.js';
 import MeshClass from '../../mesh/mesh.js';
+import MoveClass from '../../map/move.js';
+import MovementClass from '../../map/movement.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateMeshClass
@@ -62,7 +64,7 @@ export default class GenerateMeshClass
         uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
-        core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        return(core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
     }
     
         //
@@ -284,7 +286,8 @@ export default class GenerateMeshClass
     static buildRoomSecondStory(core,room,name,bitmap,segmentSize)
     {
         let x,z,gx,gz,sx,ex,sz,ez;
-        let dir;
+        let dir,liftName,segIdx,segCount;
+        let movement,meshIdx;
         
             // random start position
             
@@ -296,7 +299,16 @@ export default class GenerateMeshClass
         x=room.offset.x+(gx*segmentSize);
         z=room.offset.z+(gz*segmentSize);
         
-        this.addBox(core,(name+'_lift'),bitmap,x,(x+segmentSize),room.offset.y,(room.offset.y+(segmentSize+1000)),z,(z+segmentSize),true,true,true,true,true,true,segmentSize);
+        liftName=name+'_lift';
+        meshIdx=this.addBox(core,liftName,bitmap,x,(x+segmentSize),room.offset.y,(room.offset.y+(segmentSize+1000)),z,(z+segmentSize),true,true,true,true,true,true,segmentSize);
+                    
+        movement=new MovementClass(core,[meshIdx],null,new PointClass(0,0,0),new PointClass(0,0,0));
+        movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+        movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+        movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+        movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+
+        core.map.movementList.add(movement);
         
             // start direction
         
@@ -304,8 +316,13 @@ export default class GenerateMeshClass
         
             // segments
             
-        //while (true) {
+        segIdx=0;
+        segCount=GenerateUtilityClass.randomInt(2,5);
         
+        while (true) {
+        
+                // create a segment
+                
             switch (dir) {
                 case GenerateMeshClass.PLATFORM_DIR_POS_Z:
                     sx=gx;
@@ -333,15 +350,26 @@ export default class GenerateMeshClass
                     break;
             }
             
-            sx=room.offset.x+(sx*segmentSize);
-            ex=room.offset.x+(ex*segmentSize);
-            sz=room.offset.z+(sz*segmentSize);
-            ez=room.offset.z+(ez*segmentSize);
-
-            this.addBox(core,(name+'_X'),bitmap,sx,ex,(room.offset.y+segmentSize),(room.offset.y+(segmentSize+1000)),sz,ez,true,true,true,true,true,true,segmentSize);
-
+            if ((sx>=ex) || (sz>=ez)) return(false);
             
-        //}
+            this.addBox(core,(name+'_story_'+segIdx),bitmap,(room.offset.x+(sx*segmentSize)),(room.offset.x+(ex*segmentSize)),(room.offset.y+segmentSize),(room.offset.y+(segmentSize+1000)),(room.offset.z+(sz*segmentSize)),(room.offset.z+(ez*segmentSize)),true,true,true,true,true,true,segmentSize);
+
+                // next segment
+                
+            segIdx++;
+            if (segIdx>segCount) break;
+            
+            if ((dir===GenerateMeshClass.PLATFORM_DIR_POS_Z) || (dir===GenerateMeshClass.PLATFORM_DIR_NEG_Z)) {
+                gx=sx;
+                gz=GenerateUtilityClass.randomInBetween(sz,ez);
+                dir=GenerateUtilityClass.randomPercentage(0.5)?GenerateMeshClass.PLATFORM_DIR_POS_X:GenerateMeshClass.PLATFORM_DIR_NEG_X;
+            }
+            else {
+                gx=GenerateUtilityClass.randomInBetween(sx,ex);
+                gz=sz;
+                dir=GenerateUtilityClass.randomPercentage(0.5)?GenerateMeshClass.PLATFORM_DIR_POS_Z:GenerateMeshClass.PLATFORM_DIR_NEG_Z;
+            }
+        }
     }
 }
 

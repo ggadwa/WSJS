@@ -61,16 +61,16 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             }
             
             if (seg.isLarge) {
-                drawBrickColor=this.darkenColor(altBrickColor,f);
-                drawFrameColor=this.darkenColor(drawBrickColor,0.9);
+                drawBrickColor=this.adjustColor(altBrickColor,f);
+                drawFrameColor=this.adjustColorRandom(drawBrickColor,0.85,0.95);
                 this.drawRect(0,seg.top,this.colorCanvas.width,(seg.bot-paddingSize),drawBrickColor);
                 this.draw3DFrameRect(-edgeSize,seg.top,(this.colorCanvas.width+edgeSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
                 this.drawPerlinNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)),0.8,1.3);
                 this.drawNormalNoiseRect(0,(seg.top+edgeSize),this.colorCanvas.width,(seg.bot-(edgeSize+paddingSize)));
             }
             else {
-                drawBrickColor=this.darkenColor((seg.isSmall?altBrickColor:brickColor),f);
-                drawFrameColor=this.darkenColor(drawBrickColor,0.9);
+                drawBrickColor=this.adjustColor((seg.isSmall?altBrickColor:brickColor),f);
+                drawFrameColor=this.adjustColorRandom(drawBrickColor,0.85,0.95);
                 this.drawRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),drawBrickColor);
                 this.draw3DFrameRect(seg.lft,seg.top,(seg.rgt-paddingSize),(seg.bot-paddingSize),edgeSize,drawFrameColor,true);
                 this.drawPerlinNoiseRect((seg.lft+edgeSize),(seg.top+edgeSize),(seg.rgt-(edgeSize+paddingSize)),(seg.bot-(edgeSize+paddingSize)),0.8,1.3);
@@ -94,7 +94,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                         sx=GenerateUtilityClass.randomInBetween((lft+15),(rgt-15));
                         ex=sx+(GenerateUtilityClass.randomInt(5,25)-15);
 
-                        lineColor=this.darkenColor(drawBrickColor,0.7);
+                        lineColor=this.adjustColorRandom(drawBrickColor,0.65,0.75);
                         this.drawVerticalCrack(sx,top,bot,lft,rgt,GenerateUtilityClass.randomSign(),10,lineColor,true);
                     }
                 }
@@ -109,7 +109,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                     sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
                     ex=sx+streakWid;
 
-                    streakColor=this.darkenColor(drawBrickColor,0.6);
+                    streakColor=this.adjustColorRandom(drawBrickColor,0.65,0.75);
                     this.drawStreakDirt(sx,top,ex,bot,5,0.25,0.35,streakColor);
                 }
             }

@@ -21,8 +21,8 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
     
     generateWoodDrawBoard(lft,top,rgt,bot,edgeSize,woodColor)
     {
-        let col=this.darkenColor(woodColor,GenerateUtilityClass.randomFloat(0.7,0.3));
-        let frameColor=this.darkenColor(col,0.7);
+        let col=this.adjustColorRandom(woodColor,0.7,1.2);
+        let frameColor=this.adjustColorRandom(col,0.65,0.75);
         
             // the board edge
             
@@ -38,7 +38,8 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
             this.drawColorStripeHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.1,col);
         }
         
-        this.drawPerlinNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.8,1.0);
+        this.drawPerlinNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.8,1.2);
+        this.drawStaticNoiseRect((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),0.9,1.0);
         
             // blur both the color and the normal
             

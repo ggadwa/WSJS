@@ -36,7 +36,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
         if ((wid<=0) || (high<=0)) return;
         
-        metalCorrColor=this.darkenColor(metalColor,0.6);
+        metalCorrColor=this.adjustColorRandom(metalColor,0.6,0.7);
 
         corrCount=GenerateUtilityClass.randomInt(Math.trunc(wid*0.025),Math.trunc(wid*0.03));
         corrWid=Math.trunc(wid/corrCount);
@@ -122,7 +122,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         this.drawRect(lft,top,rgt,bot,metalColor);
         this.drawPerlinNoiseRect(lft,top,rgt,bot,0.5,1.3);
 
-        frameColor=this.darkenColor(metalColor,0.9);
+        frameColor=this.adjustColorRandom(metalColor,0.85,0.95);
         this.drawMetalShine(lft,top,rgt,bot,metalColor);
         this.draw3DFrameRect(lft,top,rgt,bot,edgeSize,frameColor,true);
         
@@ -138,7 +138,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 rgt2=rgt-sz;
                 top2=top+sz;
                 bot2=bot-sz;
-                frameColor=this.darkenColor(metalColor,0.8);
+                frameColor=this.adjustColorRandom(metalColor,0.75,0.85);
                 this.draw3DFrameRect(lft2,top2,rgt2,bot2,edgeSize,frameColor,false);
                 this.drawMetalShine((lft2+edgeSize),(top2+edgeSize),(rgt2-edgeSize),(bot2-edgeSize),metalColor);
                 

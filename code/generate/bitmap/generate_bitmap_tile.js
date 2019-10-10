@@ -59,7 +59,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
                     // make the tile
 
-                col=tileColor[0];
+                col=this.adjustColorRandom(tileColor[0],0.9,1.1);
 
                 switch (tileStyle) {
 
@@ -77,7 +77,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 
                 }
                 
-                frameCol=this.darkenColor(col,0.9);
+                frameCol=this.adjustColorRandom(col,0.85,0.95);
                 
                 this.drawRect(dLft,dTop,dRgt,dBot,col);
                 this.draw3DFrameRect(dLft,dTop,dRgt,dBot,edgeSize,frameCol,true);
@@ -86,7 +86,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     // 0 = nothing
 
                 if (complex) {
-                    col=this.darkenColor(col,0.8);
+                    col=this.adjustColorRandom(col,0.75,0.85);
                     padding=edgeSize+GenerateUtilityClass.randomInt(edgeSize,(edgeSize*10));
                     
                     switch (GenerateUtilityClass.randomIndex(3)) {
@@ -98,17 +98,19 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                             break;
                     }
                 }
+                
+                this.drawPerlinNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.8,1.1);
 
                     // possible dirt
                     
                 if (GenerateUtilityClass.randomPercentage(0.2)) {
-                    this.drawStaticNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.7,1.0);
-                    this.blur(this.colorImgData.data,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),2,false);
+                    this.drawStaticNoiseRect((dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),0.8,1.2);
+                    this.blur(this.colorImgData.data,(dLft+edgeSize),(dTop+edgeSize),(dRgt-edgeSize),(dBot-edgeSize),5,false);
                 }
                 
                     // possible crack
                     
-                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                if ((GenerateUtilityClass.randomPercentage(0.2)) && (!complex)) {
                     if (GenerateUtilityClass.randomPercentage(0.5)) {
                         sy=GenerateUtilityClass.randomInBetween((dTop+15),(dBot-15));
                         this.drawHorizontalCrack(sy,(dLft+edgeSize),(dRgt-edgeSize),(dTop+edgeSize),(dBot-edgeSize),GenerateUtilityClass.randomSign(),10,frameCol,true);
@@ -145,9 +147,11 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
             // colors
             
         tileColor[0]=this.getRandomColor();
-        tileColor[1]=this.darkenColor(tileColor[0],0.85);
+        tileColor[1]=this.getRandomColor();
         designColor=this.getRandomColor();
         groutColor=this.dullColor(tileColor[0],0.7);
+        
+        this.createPerlinNoiseData(16,16);
 
             // original splits
 

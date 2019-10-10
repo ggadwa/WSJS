@@ -21,7 +21,7 @@ export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
     generateInternal()
     {
         let concreteColor=this.getRandomColor();
-        let jointColor=this.darkenColor(concreteColor,0.8);
+        let jointColor=this.adjustColorRandom(concreteColor,0.75,0.85);
         
             // the concrete background
             

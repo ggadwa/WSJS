@@ -1,11 +1,11 @@
-- wood has moires
 - need to make statics for all generate_bitmap_base statics
 - room uvs need to be better
 
 - door frames
 - need more small rooms
-- 2nd stories
 - step function needs work
+
+- 2nd stories - draw into a grid and use grid to make floors
 
 - star (line) pattern for tiles?  raised squares?
 
