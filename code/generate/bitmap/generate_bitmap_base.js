@@ -53,10 +53,10 @@ export default class GenerateBitmapBaseClass
         this.BITMAP_STACKED_ODD_LINE_PERCENTAGE=0.2;
 
         this.BITMAP_GRID_DIVISION=100;
-        this.BITMAP_GRID_MIN_BLOCK_WIDTH=10;
-        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=30;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=8;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=8;
+        this.BITMAP_GRID_MIN_BLOCK_WIDTH=5;
+        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=20;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=4;
+        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=4;
 
             // some precalced normals
 
@@ -95,10 +95,8 @@ export default class GenerateBitmapBaseClass
         this.glowCTX=null;
         this.glowImgData=null;
         
-            // masking and noise
+            // noise
             
-        this.mask=null;
-        
         this.perlinNoiseColorFactor=null;
         this.noiseNormals=null;
         
@@ -264,15 +262,9 @@ export default class GenerateBitmapBaseClass
                 wid++;
             }
 
-                // next we move to the height, which is either
-                // a square or a rectangle, and see what can fit
+                // next we move to the height and see what can fit
             
-            if (GenerateUtilityClass.randomPercentage(0.5)) {
-                startHigh=wid;
-            }
-            else {
-                startHigh=Math.trunc(wid*(0.5+(GenerateUtilityClass.random()*0.2)));
-            }
+            startHigh=Math.trunc(wid*(0.5+(GenerateUtilityClass.random()*0.2)));
             if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
             if ((y+startHigh+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
 
@@ -363,39 +355,6 @@ export default class GenerateBitmapBaseClass
         return(col);
     }
 
-        //
-        // masking
-        //
-    
-    clearMask()
-    {
-        this.mask.fill(0);
-    }
-    
-    setMask(x,y)
-    {
-        this.mask[(y*this.colorCanvas.width)+x]=1;
-    }
-    
-    setStagedMask(x,y)
-    {
-        this.mask[(y*this.colorCanvas.width)+x]=2;      // this allows us to write into the mask but not change it until we swap the staging
-    }
-    
-    copyStagedMask()
-    {
-        let n;
-        
-        for (n=0;n!==this.mask.length;n++) {
-            if (this.mask[n]===2) this.mask[n]=1;
-        }
-    }
-    
-    checkMask(x,y)
-    {
-        return(this.mask[(y*this.colorCanvas.width)+x]===1);
-    }
-    
         //
         // blur
         //
@@ -953,17 +912,20 @@ export default class GenerateBitmapBaseClass
         }
     }
         
-    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,normalZFactor,flipNormals,addToMask,noiseMinDarken,noiseDarkenDif)
+    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,outlineColor,normalZFactor,flipNormals,addNoise,colorFactorMin,colorFactorMax)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
-        let rad,fx,fy,darkFactor,idx;
+        let rad,fx,fy,idx;
         let nFactor;
         let wid,high,edgeCount;
         let origNormalData;
-        let col=new ColorClass(0,0,0);
+        let colorFactorAdd=colorFactorMax-colorFactorMin;
         let normal=new PointClass(0,0,0);
         let colorData=this.colorImgData.data;
         let normalData=this.normalImgData.data;
+        let perlinColorData=this.perlinNoiseColorFactor;
+        let noiseNormalData=this.noiseNormals;
+        let colFactor;
         
         if ((lft>=rgt) || (top>=bot)) return;
         
@@ -1009,24 +971,24 @@ export default class GenerateBitmapBaseClass
                 
                 y=my-Math.trunc(halfHigh*fy);
                 if ((y<0) || (y>=this.colorImgData.height)) continue;
+
+                    // the color
                 
-                    // any noise
-                
-                col.setFromColor(color);
-
-                darkFactor=GenerateUtilityClass.randomFloat(noiseMinDarken,noiseDarkenDif);
-                col.r*=darkFactor;
-                col.g*=darkFactor;
-                col.b*=darkFactor;
-
-                    // the color pixel
-
                 idx=((y*this.colorImgData.width)+x)*4;
 
-                colorData[idx]=Math.trunc(col.r*255.0);
-                colorData[idx+1]=Math.trunc(col.g*255.0);
-                colorData[idx+2]=Math.trunc(col.b*255.0);
-                colorData[idx+3]=255;
+                if (!addNoise) {
+                    colorData[idx]=Math.trunc(color.r*255.0);
+                    colorData[idx+1]=Math.trunc(color.g*255.0);
+                    colorData[idx+2]=Math.trunc(color.b*255.0);
+                    colorData[idx+3]=255;
+                }
+                else {
+                    colFactor=colorFactorMin+(colorFactorAdd*perlinColorData[(y*this.colorImgData.width)+x]);
+                    colorData[idx]=Math.trunc((color.r*colFactor)*255.0);
+                    colorData[idx+1]=Math.trunc((color.g*colFactor)*255.0);
+                    colorData[idx+2]=Math.trunc((color.b*colFactor)*255.0);
+                    colorData[idx+3]=255;
+                }
                 
                     // get a normal for the pixel change
                     // if we are outside the edge, gradually fade it
@@ -1046,26 +1008,20 @@ export default class GenerateBitmapBaseClass
                         normal.y=-normal.y;
                     }
                 }
-
-                normal.normalize();
-                
-                    // if this is within the draw mask, then
-                    // mix the normals
-                
-                if (this.checkMask(x,y)) {
-                    normal.x=(((origNormalData[idx]/127.0)-1.0)+normal.x)*0.5;
-                    normal.y=(((origNormalData[idx+1]/127.0)-1.0)+normal.y)*0.5;
-                    normal.z=(((origNormalData[idx+2]/127.0)-1.0)+normal.z)*0.5;
-                    normal.normalize();
+              
+                    // add in noise normal
+                    
+                if (addNoise) {
+                    normal.x=(((noiseNormalData[idx]/127.0)-1.0)*0.3)+(normal.x*0.7);
+                    normal.y=(((noiseNormalData[idx+1]/127.0)-1.0)*0.3)+(normal.y*0.7);
+                    normal.z=(((noiseNormalData[idx+2]/127.0)-1.0)*0.3)+(normal.z*0.7);
                 }
                 
+                normal.normalize();
+
                 normalData[idx]=(normal.x+1.0)*127.0;           // normals are -1...1 packed into a byte
                 normalData[idx+1]=(normal.y+1.0)*127.0;
                 normalData[idx+2]=(normal.z+1.0)*127.0;
-                
-                    // and the mask
-                    
-                if (addToMask) this.setStagedMask(x,y);
             }
 
             if (edgeCount>0) edgeCount--;
@@ -1074,11 +1030,44 @@ export default class GenerateBitmapBaseClass
             high--;
         }
         
-            // we stage the mask so we don't start
-            // merging normals, so we need to make that the
-            // real mask now
+            // any outline
             
-        if (addToMask) this.copyStagedMask();
+        if (outlineColor!==null) {
+            wid=(rgt-lft)-1;
+            high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
+
+            halfWid=wid*0.5;
+            halfHigh=high*0.5;
+            
+            for (n=startArc;n<endArc;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
+
+                fx=Math.sin(rad);
+                fx+=(fx*xRoundFactor);
+                if (fx>1.0) fx=1.0;
+                if (fx<-1.0) fx=-1.0;
+                
+                x=mx+Math.trunc(halfWid*fx);
+                if ((x<0) || (x>=this.colorImgData.width)) continue;
+
+                fy=Math.cos(rad);
+                fy+=(fy*yRoundFactor);
+                if (fy>1.0) fy=1.0;
+                if (fy<-1.0) fy=-1.0;
+                
+                y=my-Math.trunc(halfHigh*fy);
+                if ((y<0) || (y>=this.colorImgData.height)) continue;
+                
+                    // the color pixel
+
+                idx=((y*this.colorImgData.width)+x)*4;
+
+                colorData[idx]=Math.trunc(outlineColor.r*255.0);
+                colorData[idx+1]=Math.trunc(outlineColor.g*255.0);
+                colorData[idx+2]=Math.trunc(outlineColor.b*255.0);
+                colorData[idx+3]=255;
+            }
+        }
     }
     
     drawDiamond(lft,top,rgt,bot,color)
@@ -2415,24 +2404,6 @@ export default class GenerateBitmapBaseClass
         }
     }
     
-    drawOval2(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
-    {
-        let mx,my,xRadius,yRadius;
-
-        mx=Math.trunc((lft+rgt)/2);
-        my=Math.trunc((top+bot)/2);
-        
-        xRadius=Math.trunc((rgt-lft)*0.5);
-        yRadius=Math.trunc((bot-top)*0.5);
-
-        this.colorCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
-        if (borderRGBColor!==null) this.colorCTX.strokeStyle=this.colorToRGBColor(borderRGBColor);
-        
-        this.colorCTX.beginPath();
-        this.colorCTX.ellipse(mx,my,xRadius,yRadius,0.0,0.0,(Math.PI*2));
-        this.colorCTX.fill();
-        if (borderRGBColor!==null) this.colorCTX.stroke();
-    }
     
     drawGlowOval(lft,top,rgt,bot,fillRGBColor,borderRGBColor)
     {
@@ -2453,30 +2424,7 @@ export default class GenerateBitmapBaseClass
         if (borderRGBColor!==null) this.glowCTX.stroke();
     }
     
-    drawWrappedOval(lft,top,rgt,bot,wid,high,fillRGBColor,borderRGBColor)
-    {
-        let         x,y;
-        
-        this.drawOval(this.colorCTX,lft,top,rgt,bot,fillRGBColor,borderRGBColor);
-        if (lft<0) {
-            x=wid+lft;
-            this.drawOval(this.colorCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
-        }
-        if (rgt>wid) {
-            x=-(rgt-wid);
-            this.drawOval(this.colorCTX,x,top,(x+(rgt-lft)),bot,fillRGBColor,borderRGBColor);
-        }
-        if (top<0) {
-            y=high+top;
-            this.drawOval(this.colorCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
-        }
-        if (bot>high) {
-            y=-(bot-high);
-            this.drawOval(this.colorCTX,lft,y,rgt,(y+(bot-top)),fillRGBColor,borderRGBColor);
-        }
-    }
-    
-    draw3DOval(lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
+     draw3DOval(lft,top,rgt,bot,startArc,endArc,edgeSize,flatInnerSize,fillRGBColor,edgeRGBColor)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,col,idx;
@@ -3360,12 +3308,6 @@ export default class GenerateBitmapBaseClass
         // face chunks
         //
         
-    generateFaceChunkEye(x,top,bot,eyeColor)
-    {
-        this.draw3DOval(this.normalCTX,x,(top+80),(x+30),(top+90),0.0,1.0,1,0,this.whiteColor,this.blackColor);
-        this.drawOval((x+10),(top+81),(x+20),(top+89),eyeColor,null);
-        this.drawGlowOval((x+10),(top+81),(x+20),(top+89),this.darkenColor(eyeColor,0.5),null);
-    }
     
     generateFaceChunk(lft,top,rgt,bot)
     {
@@ -3498,8 +3440,6 @@ export default class GenerateBitmapBaseClass
         this.glowCTX=this.glowCanvas.getContext('2d');
         this.glowImgData=this.glowCTX.getImageData(0,0,this.glowCanvas.width,this.glowCanvas.height);
         this.clearImageData(this.glowImgData,0,0,0,255);
-        
-        this.mask=new Uint8Array(this.colorCanvas.width*this.colorCanvas.height);
 
             // run the internal generator
 
@@ -3560,8 +3500,6 @@ export default class GenerateBitmapBaseClass
         this.glowCTX=this.glowCanvas.getContext('2d');
         this.glowImgData=this.glowCTX.getImageData(0,0,this.glowCanvas.width,this.glowCanvas.height);
         this.clearImageData(this.glowImgData,0,0,0,255);
-        
-        this.mask=new Uint8Array(this.colorCanvas.width*this.colorCanvas.height);
 
             // run the internal generator
 

@@ -6,9 +6,11 @@
 - step function needs work
 
 - 2nd stories - draw into a grid and use grid to make floors
+- if we have a hit failure than start again at lift?
 
 - star (line) pattern for tiles?  raised squares?
-
+- water-y specular look figure out algorithm for it
+- crack in tile across corner
 
 
 - beach ball physics

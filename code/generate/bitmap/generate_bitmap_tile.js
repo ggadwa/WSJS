@@ -91,7 +91,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     
                     switch (GenerateUtilityClass.randomIndex(3)) {
                         case 0:
-                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,designColor,0.5,false,false,1,0);
+                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,designColor,null,0.5,false,false,1,0);
                             break;
                         case 1:
                             this.drawDiamond((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),designColor);

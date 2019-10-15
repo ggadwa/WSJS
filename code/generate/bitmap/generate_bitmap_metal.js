@@ -88,14 +88,15 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
     {
         let mx,my;
         let edgeSize=Math.trunc(screwSize*0.5);
+        let outlineColor=this.adjustColor(screwColor,0.8);
         
             // corners
             
         if (GenerateUtilityClass.randomPercentage(0.33)) {
-            this.drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
-            this.drawOval((rgt-screwSize),top,rgt,(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
-            this.drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
-            this.drawOval(lft,(bot-screwSize),(lft+screwSize),bot,0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
+            this.drawOval((rgt-screwSize),top,rgt,(top+screwSize),0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
+            this.drawOval((rgt-screwSize),(bot-screwSize),rgt,bot,0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
+            this.drawOval(lft,(bot-screwSize),(lft+screwSize),bot,0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
         }
         
             // middles
@@ -103,10 +104,10 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         if (GenerateUtilityClass.randomPercentage(0.33)) {
             mx=Math.trunc((lft+rgt)*0.5)-Math.trunc(screwSize*0.5);
             my=Math.trunc((top+bot)*0.5)-Math.trunc(screwSize*0.5);
-            this.drawOval(mx,top,(mx+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
-            this.drawOval((rgt-screwSize),my,rgt,(my+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
-            this.drawOval(mx,(bot-screwSize),(mx+screwSize),bot,0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
-            this.drawOval(lft,my,(lft+screwSize),(my+screwSize),0,1,0,0,edgeSize,screwColor,0.5,false,false,1,0);
+            this.drawOval(mx,top,(mx+screwSize),(top+screwSize),0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
+            this.drawOval((rgt-screwSize),my,rgt,(my+screwSize),0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
+            this.drawOval(mx,(bot-screwSize),(mx+screwSize),bot,0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
+            this.drawOval(lft,my,(lft+screwSize),(my+screwSize),0,1,0,0,edgeSize,screwColor,outlineColor,0.5,false,false,1,0);
         }
     }
 
@@ -114,7 +115,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
     {
         let lft2,rgt2,top2,bot2,sz;
         let frameColor;
-        let screwColor=this.boostColor(metalColor,0.05);
+        let screwColor=this.adjustColor(metalColor,0.8,1.1);
         
             // the plate
             
