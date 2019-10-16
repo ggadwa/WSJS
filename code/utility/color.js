@@ -43,6 +43,13 @@ export default class ColorClass
         this.g+=(col.g*att);
         this.b+=(col.b*att);
     }
+    
+    factor(f)
+    {
+        this.r*=f;
+        this.g*=f;
+        this.b*=f;
+    }
                 
     fixOverflow()
     {

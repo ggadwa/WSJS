@@ -21,8 +21,9 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
         
     generateTilePiece(lft,top,rgt,bot,tileColor,designColor,splitCount,complex)
     {
-        let x,y,sx,sy,dLft,dTop,dRgt,dBot,tileWid,tileHigh,tileStyle;
+        let x,y,sx,sy,ex,ey,dLft,dTop,dRgt,dBot,tileWid,tileHigh,tileStyle;
         let col,frameCol,edgeSize,padding;
+        let crackSegCount,crackXVarient,crackYVarient;
 
             // tile style
 
@@ -91,7 +92,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     
                     switch (GenerateUtilityClass.randomIndex(3)) {
                         case 0:
-                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,designColor,null,0.5,false,false,1,0);
+                            this.drawOval((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),0,1,0,0,edgeSize,0.8,designColor,null,0.5,false,false,1,0);
                             break;
                         case 1:
                             this.drawDiamond((dLft+padding),(dTop+padding),(dRgt-padding),(dBot-padding),designColor);
@@ -111,14 +112,43 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
                     // possible crack
                     
                 if ((GenerateUtilityClass.randomPercentage(0.2)) && (!complex)) {
-                    if (GenerateUtilityClass.randomPercentage(0.5)) {
-                        sy=GenerateUtilityClass.randomInBetween((dTop+15),(dBot-15));
-                        this.drawHorizontalCrack(sy,(dLft+edgeSize),(dRgt-edgeSize),(dTop+edgeSize),(dBot-edgeSize),GenerateUtilityClass.randomSign(),10,frameCol,true);
+                    switch (GenerateUtilityClass.randomIndex(4)) {
+                        case 0:
+                            sy=dTop+edgeSize;
+                            ey=GenerateUtilityClass.randomInBetween((dTop+edgeSize),Math.trunc((dTop+dBot)*0.5));
+                            sx=GenerateUtilityClass.randomInBetween((dLft+edgeSize),Math.trunc((dLft+dRgt)*0.5));
+                            ex=dLft+edgeSize;
+                            crackXVarient=5;
+                            crackYVarient=5;
+                            break;
+                        case 1:
+                            sy=dTop+edgeSize;
+                            ey=GenerateUtilityClass.randomInBetween((dTop+edgeSize),Math.trunc((dTop+dBot)*0.5));
+                            sx=GenerateUtilityClass.randomInBetween(Math.trunc((dLft+dRgt)*0.5),(dRgt-edgeSize));
+                            ex=dRgt-edgeSize;
+                            crackXVarient=-5;
+                            crackYVarient=5;
+                            break;
+                        case 2:
+                            sy=dBot-edgeSize;
+                            ey=GenerateUtilityClass.randomInBetween(Math.trunc((dTop+dBot)*0.5),(dBot-edgeSize));
+                            sx=GenerateUtilityClass.randomInBetween((dLft+edgeSize),Math.trunc((dLft+dRgt)*0.5));
+                            ex=dLft+edgeSize;
+                            crackXVarient=-5;
+                            crackYVarient=5;
+                            break;
+                        default:
+                            sy=dBot-edgeSize;
+                            ey=GenerateUtilityClass.randomInBetween(Math.trunc((dTop+dBot)*0.5),(dBot-edgeSize));
+                            sx=GenerateUtilityClass.randomInBetween(Math.trunc((dLft+dRgt)*0.5),(dRgt-edgeSize));
+                            ex=dRgt-edgeSize;
+                            crackXVarient=-5;
+                            crackYVarient=-5;
+                            break;
                     }
-                    else {
-                        sx=GenerateUtilityClass.randomInBetween((dLft+15),(dRgt-15));
-                        this.drawVerticalCrack(sx,(dTop+edgeSize),(dBot-edgeSize),(dLft+edgeSize),(dRgt-edgeSize),GenerateUtilityClass.randomSign(),10,frameCol,true);
-                    }
+
+                    crackSegCount=GenerateUtilityClass.randomInt(2,2);
+                    this.drawSimpleCrack(sx,sy,ex,ey,crackSegCount,crackXVarient,crackYVarient,frameCol);
                 }
             }
         }

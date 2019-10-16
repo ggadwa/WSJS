@@ -5,24 +5,6 @@ import BitmapClass from '../../bitmap/bitmap.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 
 //
-// utility class for segment creation
-//
-
-class GeneratedSegmentClass
-{
-    constructor(lft,top,rgt,bot,isHalf,isSmall,isLarge)
-    {
-        this.lft=lft;
-        this.top=top;
-        this.rgt=rgt;
-        this.bot=bot;
-        this.isHalf=isHalf;
-        this.isSmall=isSmall;
-        this.isLarge=isLarge;
-    }
-}
-
-//
 // generate bitmap base class
 //
 
@@ -45,18 +27,6 @@ export default class GenerateBitmapBaseClass
             // constants
             
         this.BITMAP_MAP_TEXTURE_SIZE=512;
-        
-        this.BITMAP_STACKED_X_MIN_COUNT=4;
-        this.BITMAP_STACKED_X_EXTRA_COUNT=4;
-        this.BITMAP_STACKED_Y_MIN_COUNT=4;
-        this.BITMAP_STACKED_Y_EXTRA_COUNT=5;
-        this.BITMAP_STACKED_ODD_LINE_PERCENTAGE=0.2;
-
-        this.BITMAP_GRID_DIVISION=100;
-        this.BITMAP_GRID_MIN_BLOCK_WIDTH=5;
-        this.BITMAP_GRID_EXTRA_BLOCK_WIDTH=20;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH=4;
-        this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT=4;
 
             // some precalced normals
 
@@ -140,169 +110,7 @@ export default class GenerateBitmapBaseClass
                 
         // can't seal as this is a parent class
     }
-    
-        //
-        // segmenting routines
-        //
-
-    createStackedSegments()
-    {
-        let x,y;
-        let lft,top;
-        let halfBrick;
-        let segments=[];
-
-        let xCount=this.BITMAP_STACKED_X_MIN_COUNT+Math.trunc(GenerateUtilityClass.random()*this.BITMAP_STACKED_X_EXTRA_COUNT);
-        let wid=Math.trunc(this.colorCanvas.width/xCount);
-        let halfWid=Math.trunc(wid/2);
-
-        let yCount=this.BITMAP_STACKED_Y_MIN_COUNT+Math.trunc(GenerateUtilityClass.random()*this.BITMAP_STACKED_Y_EXTRA_COUNT);
-        let high=Math.trunc(this.colorCanvas.height/yCount);
-
-        top=0;
-        halfBrick=false;
-
-        for (y=0;y!==yCount;y++) {
-
-                // special lines (full line or double bricks)
-                
-            if (GenerateUtilityClass.randomPercentage(this.BITMAP_STACKED_ODD_LINE_PERCENTAGE)) {
-                if (GenerateUtilityClass.randomPercentage(0.5)) {
-                    segments.push(new GeneratedSegmentClass(0,top,(this.colorCanvas.width-1),(top+high),false,false,true));
-                }
-                else {
-                    lft=0;
-                    
-                    for (x=0;x!==xCount;x++) {
-                        segments.push(new GeneratedSegmentClass(lft,top,(lft+halfWid),(top+high),false,true,false));
-                        segments.push(new GeneratedSegmentClass((lft+halfWid),top,((x===(xCount-1))?(this.colorCanvas.width-1):(lft+wid)),(top+high),false,true,false));
-                        lft+=wid;
-                    }
-                }
-            }
-            
-                // regular lines
-                
-            else {
-                if (halfBrick) {
-                    lft=-halfWid;
-
-                    for (x=0;x!==(xCount+1);x++) {
-                        segments.push(new GeneratedSegmentClass(lft,top,(lft+wid),(top+high),((x===0)||(x===xCount)),false,false));
-                        lft+=wid;
-                    }
-                }
-                else {
-                   lft=0;
-
-                    for (x=0;x!==xCount;x++) {
-                        segments.push(new GeneratedSegmentClass(lft,top,((x===(xCount-1))?(this.colorCanvas.width-1):(lft+wid)),(top+high),(lft<0),false,false));
-                        lft+=wid;
-                    }
-                }
-            }
-            
-            top+=high;
-            halfBrick=!halfBrick;
-        }
-
-        return(segments);
-    }
-
-    createRandomSegments()
-    {
-        let x,y,x2,y2,hit;
-        let wid,high,startWid,startHigh;
-        let top,lft,bot,rgt;
-        let segments=[];
-
-            // create a grid to
-            // build segments in
-            // typed arrays initialize to 0
-
-        let grid=new Uint16Array(this.BITMAP_GRID_DIVISION*this.BITMAP_GRID_DIVISION);
-
-            // start making the segments
-
-        while (true) {
-
-                // find first open spot
-
-            x=y=0;
-            hit=false;
-
-            while (true) {
-                if (grid[(y*this.BITMAP_GRID_DIVISION)+x]===0) {
-                    hit=true;
-                    break;
-                }
-                x++;
-                if (x===this.BITMAP_GRID_DIVISION) {
-                    x=0;
-                    y++;
-                    if (y===this.BITMAP_GRID_DIVISION) break;
-                }
-            }
-
-                // no more open spots!
-
-            if (!hit) break;
-
-                // random size
-                // we start with the width, determining what can fit
-
-            startWid=GenerateUtilityClass.randomInt(this.BITMAP_GRID_MIN_BLOCK_WIDTH,this.BITMAP_GRID_EXTRA_BLOCK_WIDTH);
-            if ((x+startWid)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
-            if ((x+startWid+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH)>=this.BITMAP_GRID_DIVISION) startWid=this.BITMAP_GRID_DIVISION-x;
-            
-            wid=1;
-
-            while (wid<startWid) {
-                if (grid[(y*this.BITMAP_GRID_DIVISION)+(x+wid)]!==0) break;
-                wid++;
-            }
-
-                // next we move to the height and see what can fit
-            
-            startHigh=Math.trunc(wid*(0.5+(GenerateUtilityClass.random()*0.2)));
-            if ((y+startHigh)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
-            if ((y+startHigh+this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)>=this.BITMAP_GRID_DIVISION) startHigh=this.BITMAP_GRID_DIVISION-y;
-
-            high=1;
-
-            while (high<startHigh) {
-                if (grid[((y+high)*this.BITMAP_GRID_DIVISION)+x]!==0) break;
-                high++;
-            }
-
-                // if segment is too small, just block off
-                // the single grid item and try again
-
-            if ((wid<this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_WIDTH) || (high<this.BITMAP_GRID_ELIMINATE_BLOCK_MIN_HEIGHT)) {
-                grid[(y*this.BITMAP_GRID_DIVISION)+x]=1;
-                continue;
-            }
-
-                // create the segment and block off
-                // the grid
-
-            lft=Math.trunc(x*(this.colorCanvas.width/this.BITMAP_GRID_DIVISION));
-            top=Math.trunc(y*(this.colorCanvas.height/this.BITMAP_GRID_DIVISION));
-            rgt=Math.trunc((x+wid)*(this.colorCanvas.width/this.BITMAP_GRID_DIVISION));
-            bot=Math.trunc((y+high)*(this.colorCanvas.height/this.BITMAP_GRID_DIVISION));
-
-            segments.push(new GeneratedSegmentClass(lft,top,rgt,bot,false,false,false));
-
-            for (y2=0;y2!==high;y2++) {
-                for (x2=0;x2!==wid;x2++) {
-                    grid[((y+y2)*this.BITMAP_GRID_DIVISION)+(x+x2)]=1;
-                }
-            }
-        }
-
-        return(segments);
-    }
-    
+        
         //
         // colors
         //
@@ -912,7 +720,7 @@ export default class GenerateBitmapBaseClass
         }
     }
         
-    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,color,outlineColor,normalZFactor,flipNormals,addNoise,colorFactorMin,colorFactorMax)
+    drawOval(lft,top,rgt,bot,startArc,endArc,xRoundFactor,yRoundFactor,edgeSize,edgeColorFactor,color,outlineColor,normalZFactor,flipNormals,addNoise,colorFactorMin,colorFactorMax)
     {
         let n,x,y,mx,my,halfWid,halfHigh;
         let rad,fx,fy,idx;
@@ -926,6 +734,7 @@ export default class GenerateBitmapBaseClass
         let perlinColorData=this.perlinNoiseColorFactor;
         let noiseNormalData=this.noiseNormals;
         let colFactor;
+        let col=new ColorClass(0,0,0);
         
         if ((lft>=rgt) || (top>=bot)) return;
         
@@ -971,25 +780,30 @@ export default class GenerateBitmapBaseClass
                 
                 y=my-Math.trunc(halfHigh*fy);
                 if ((y<0) || (y>=this.colorImgData.height)) continue;
+                
+                    // edge darkening
+                    
+                col.setFromColor(color);
+                
+                if (edgeCount>0) {
+                    colFactor=edgeColorFactor+((1.0-(edgeCount/edgeSize))*(1.0-edgeColorFactor));
+                    col.factor(colFactor);
+                }
+                
+                if (addNoise) {
+                    colFactor=colorFactorMin+(colorFactorAdd*perlinColorData[(y*this.colorImgData.width)+x]);
+                    col.factor(colFactor);
+                }
 
                     // the color
                 
                 idx=((y*this.colorImgData.width)+x)*4;
 
-                if (!addNoise) {
-                    colorData[idx]=Math.trunc(color.r*255.0);
-                    colorData[idx+1]=Math.trunc(color.g*255.0);
-                    colorData[idx+2]=Math.trunc(color.b*255.0);
-                    colorData[idx+3]=255;
-                }
-                else {
-                    colFactor=colorFactorMin+(colorFactorAdd*perlinColorData[(y*this.colorImgData.width)+x]);
-                    colorData[idx]=Math.trunc((color.r*colFactor)*255.0);
-                    colorData[idx+1]=Math.trunc((color.g*colFactor)*255.0);
-                    colorData[idx+2]=Math.trunc((color.b*colFactor)*255.0);
-                    colorData[idx+3]=255;
-                }
-                
+                colorData[idx]=Math.trunc(col.r*255.0);
+                colorData[idx+1]=Math.trunc(col.g*255.0);
+                colorData[idx+2]=Math.trunc(col.b*255.0);
+                colorData[idx+3]=255;
+
                     // get a normal for the pixel change
                     // if we are outside the edge, gradually fade it
                     // to the default pointing out normal
@@ -1012,9 +826,9 @@ export default class GenerateBitmapBaseClass
                     // add in noise normal
                     
                 if (addNoise) {
-                    normal.x=(((noiseNormalData[idx]/127.0)-1.0)*0.3)+(normal.x*0.7);
-                    normal.y=(((noiseNormalData[idx+1]/127.0)-1.0)*0.3)+(normal.y*0.7);
-                    normal.z=(((noiseNormalData[idx+2]/127.0)-1.0)*0.3)+(normal.z*0.7);
+                    normal.x=(((noiseNormalData[idx]/127.0)-1.0)*0.4)+(normal.x*0.6);
+                    normal.y=(((noiseNormalData[idx+1]/127.0)-1.0)*0.4)+(normal.y*0.6);
+                    normal.z=(((noiseNormalData[idx+2]/127.0)-1.0)*0.4)+(normal.z*0.6);
                 }
                 
                 normal.normalize();
@@ -1710,7 +1524,33 @@ export default class GenerateBitmapBaseClass
         }
     }
     
+    drawSimpleCrack(sx,sy,ex,ey,segCount,lineXVariant,lineYVarient,color)
+    {
+        let n,dx,dy,dx2,dy2;
         
+        dx=sx;
+        dy=sy;
+        
+        for (n=0;n!==segCount;n++) {
+            
+            if ((n+1)===segCount) {
+                dx2=ex;
+                dy2=ey;
+            }
+            else {
+                dx2=Math.trunc(sx+(((ex-sx)*(n+1))/segCount))+GenerateUtilityClass.randomInt(0,lineXVariant);
+                dy2=Math.trunc(sy+(((ey-sy)*(n+1))/segCount))+GenerateUtilityClass.randomInt(0,lineYVarient);
+            }
+            
+            this.drawLineColor(dx,dy,dx2,dy2,color,true);
+            this.drawLineNormal(dx,dy,dx2,dy2,this.NORMAL_CLEAR);
+            this.drawLineNormal((dx-1),dy,(dx2-1),dy2,this.NORMAL_RIGHT_45);
+            this.drawLineNormal((dx+1),dy,(dx2+1),dy2,this.NORMAL_LEFT_45);
+             
+            dx=dx2;
+            dy=dy2;
+        }
+    }
     
     
     
