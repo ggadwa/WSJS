@@ -285,91 +285,129 @@ export default class GenerateMeshClass
         
     static buildRoomSecondStory(core,room,name,bitmap,segmentSize)
     {
-        let x,z,gx,gz,sx,ex,sz,ez;
-        let dir,liftName,segIdx,segCount;
+        let x,z,gx,gz,sx,sz,liftX,liftZ;
+        let dir,orgDir,liftName,segIdx;
         let movement,meshIdx;
+        let wallStop,xWallFlag,zWallFlag;
         
-            // random start position
+            // random start position with the lift
             
-        gx=GenerateUtilityClass.randomInt(2,(room.piece.size.x-4));
-        gz=GenerateUtilityClass.randomInt(2,(room.piece.size.z-4));
-        
-            // lift
-            
-        x=room.offset.x+(gx*segmentSize);
-        z=room.offset.z+(gz*segmentSize);
-        
-        liftName=name+'_lift';
-        meshIdx=this.addBox(core,liftName,bitmap,x,(x+segmentSize),room.offset.y,(room.offset.y+(segmentSize+1000)),z,(z+segmentSize),true,true,true,true,true,true,segmentSize);
-                    
-        movement=new MovementClass(core,[meshIdx],null,new PointClass(0,0,0),new PointClass(0,0,0));
-        movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-        movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-        movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-        movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+        liftX=GenerateUtilityClass.randomInt(2,(room.piece.size.x-4));
+        liftZ=GenerateUtilityClass.randomInt(2,(room.piece.size.z-4));
 
-        core.map.movementList.add(movement);
+        room.blockFloorGrid(liftX,liftZ);
+        room.blockStoryGrid(liftX,liftZ);
         
-            // start direction
-        
-        dir=GenerateUtilityClass.randomIndex(4);
-        
-            // segments
+            // start the random wander of segments
+
+        gx=liftX;
+        gz=liftZ;
             
-        segIdx=0;
-        segCount=GenerateUtilityClass.randomInt(2,5);
-        
         while (true) {
-        
-                // create a segment
-                
-            switch (dir) {
-                case GenerateMeshClass.PLATFORM_DIR_POS_Z:
-                    sx=gx;
-                    ex=gx+1;
-                    sz=gz+1;
-                    ez=room.piece.size.z;
-                    break;
-                case GenerateMeshClass.PLATFORM_DIR_NEG_Z:
-                    sx=gx;
-                    ex=gx+1;
-                    sz=0;
-                    ez=gz;
-                    break;
-                case GenerateMeshClass.PLATFORM_DIR_POS_X:
-                    sx=gx+1;
-                    ex=room.piece.size.x;
-                    sz=gz;
-                    ez=gz+1;
-                    break;
-                case GenerateMeshClass.PLATFORM_DIR_NEG_X:
-                    sx=0;
-                    ex=gx;
-                    sz=gz;
-                    ez=gz+1;
-                    break;
-            }
-            
-            if ((sx>=ex) || (sz>=ez)) return(false);
-            
-            this.addBox(core,(name+'_story_'+segIdx),bitmap,(room.offset.x+(sx*segmentSize)),(room.offset.x+(ex*segmentSize)),(room.offset.y+segmentSize),(room.offset.y+(segmentSize+1000)),(room.offset.z+(sz*segmentSize)),(room.offset.z+(ez*segmentSize)),true,true,true,true,true,true,segmentSize);
 
-                // next segment
+                // next random direction
                 
-            segIdx++;
-            if (segIdx>segCount) break;
+            dir=GenerateUtilityClass.randomIndex(4);
+            orgDir=dir;
             
-            if ((dir===GenerateMeshClass.PLATFORM_DIR_POS_Z) || (dir===GenerateMeshClass.PLATFORM_DIR_NEG_Z)) {
-                gx=sx;
-                gz=GenerateUtilityClass.randomInBetween(sz,ez);
-                dir=GenerateUtilityClass.randomPercentage(0.5)?GenerateMeshClass.PLATFORM_DIR_POS_X:GenerateMeshClass.PLATFORM_DIR_NEG_X;
+                // find open direction
+                
+            wallStop=false;
+            
+            while (true) {
+
+                switch (dir) {
+                    case GenerateMeshClass.PLATFORM_DIR_POS_Z:
+                        sx=gx;
+                        sz=gz+1;
+                        break;
+                    case GenerateMeshClass.PLATFORM_DIR_NEG_Z:
+                        sx=gx;
+                        sz=gz-1;
+                        break;
+                    case GenerateMeshClass.PLATFORM_DIR_POS_X:
+                        sx=gx+1;
+                        sz=gz;
+                        break;
+                    case GenerateMeshClass.PLATFORM_DIR_NEG_X:
+                        sx=gx-1;
+                        sz=gz;
+                        break;
+                }
+
+                if ((room.checkStoryGrid(sx,sz)) || (sx<0) || (sx>=room.piece.size.x) || (sz<0) || (sz>=room.piece.size.z)) {
+                    dir++;
+                    if (dir===4) dir=0;
+                    if (dir===orgDir) {
+                        wallStop=true;
+                        break;
+                    }
+                }
+                else {
+                    break;
+                }
             }
-            else {
-                gx=GenerateUtilityClass.randomInBetween(sx,ex);
-                gz=sz;
-                dir=GenerateUtilityClass.randomPercentage(0.5)?GenerateMeshClass.PLATFORM_DIR_POS_Z:GenerateMeshClass.PLATFORM_DIR_NEG_Z;
+            
+            if (wallStop) break;
+            
+                // add grid spot
+                
+            room.blockStoryGrid(sx,sz);
+            
+            gx=sx;
+            gz=sz;
+        }
+        
+            // randomly make stripes of the second floor into walls
+            
+        xWallFlag=new Uint8Array(room.piece.size.x);
+        
+        for (x=1;x<(room.piece.size.x-1);x++) {
+            xWallFlag[x]=GenerateUtilityClass.randomPercentage(0.2);
+        }
+            
+        zWallFlag=new Uint8Array(room.piece.size.z);
+        
+        for (z=1;z<(room.piece.size.z-1);z++) {
+            zWallFlag[z]=GenerateUtilityClass.randomPercentage(0.2);
+        }
+        
+            // make the segments
+        
+        for (z=0;z!==room.piece.size.z;z++) {
+            for (x=0;x!==room.piece.size.x;x++) {
+                if (!room.checkStoryGrid(x,z)) continue;
+                
+                    // is this the lift?
+
+                if ((x===liftX) && (z===liftZ)) {
+                    sx=room.offset.x+(liftX*segmentSize);
+                    sz=room.offset.z+(liftZ*segmentSize);
+
+                    liftName=name+'_lift';
+                    meshIdx=this.addBox(core,liftName,bitmap,sx,(sx+segmentSize),room.offset.y,(room.offset.y+(segmentSize+1000)),sz,(sz+segmentSize),true,true,true,true,true,true,segmentSize);
+
+                    movement=new MovementClass(core,[meshIdx],null,new PointClass(0,0,0),new PointClass(0,0,0));
+                    movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+                    movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+                    movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+                    movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
+
+                    core.map.movementList.add(movement);
+                    continue;
+                }
+
+                    // regular segment
+                    
+                if ((!xWallFlag[x]) && (!zWallFlag[z])) {
+                    this.addBox(core,(name+'_story_'+segIdx),bitmap,(room.offset.x+(x*segmentSize)),(room.offset.x+((x+1)*segmentSize)),(room.offset.y+segmentSize),(room.offset.y+(segmentSize+1000)),(room.offset.z+(z*segmentSize)),(room.offset.z+((z+1)*segmentSize)),true,true,true,true,true,true,segmentSize);
+                }
+                else {
+                    this.addBox(core,(name+'_story_'+segIdx),bitmap,(room.offset.x+(x*segmentSize)),(room.offset.x+((x+1)*segmentSize)),room.offset.y,(room.offset.y+(segmentSize+1000)),(room.offset.z+(z*segmentSize)),(room.offset.z+((z+1)*segmentSize)),true,true,true,true,true,true,segmentSize);
+                }
             }
         }
+        
     }
 }
 

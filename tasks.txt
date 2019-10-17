@@ -5,9 +5,8 @@
 - need more small rooms
 - step function needs work
 
-- 2nd stories - draw into a grid and use grid to make floors
-- random percent of upper floors draw as wall
-- if we have a hit failure than start again at lift?
+- second floor segments as one mesh
+- need to start player outside blocked grid
 
 - star (line) pattern for tiles?  raised squares?
 - better specs (generated with color?)

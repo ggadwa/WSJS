@@ -22,7 +22,14 @@ export default class GenerateRoomClass
         
         this.size=new PointClass((segmentSize*piece.size.x),(segmentSize*this.storyCount),(segmentSize*piece.size.z));
         
-        this.vertexHideArray=new Uint8Array(this.piece.vertexes.length*3); // 3 possible stories
+            // vertex hiding array, had 3 possible stories
+            
+        this.vertexHideArray=new Uint8Array(this.piece.vertexes.length*3);
+        
+            // grids for blocking off floor/stories
+            
+        this.floorGrid=new Uint8Array(this.piece.size.x*this.piece.size.z);
+        this.storyGrid=new Uint8Array(this.piece.size.x*this.piece.size.z);
     }
     
     hideVertex(story,vIdx)
@@ -33,6 +40,26 @@ export default class GenerateRoomClass
     isWallHidden(story,vIdx)
     {
         return(this.vertexHideArray[(story*this.piece.vertexes.length)+vIdx]===1);
+    }
+    
+    blockFloorGrid(x,z)
+    {
+        this.floorGrid[(z*this.piece.size.z)+x]=1;
+    }
+    
+    checkFloorGrid(x,z)
+    {
+        return(this.floorGrid[(z*this.piece.size.z)+x]!==0);
+    }
+    
+    blockStoryGrid(x,z)
+    {
+        this.storyGrid[(z*this.piece.size.z)+x]=1;
+    }
+    
+    checkStoryGrid(x,z)
+    {
+        return(this.storyGrid[(z*this.piece.size.z)+x]!==0);
     }
     
 }
