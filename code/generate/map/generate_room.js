@@ -26,10 +26,9 @@ export default class GenerateRoomClass
             
         this.vertexHideArray=new Uint8Array(this.piece.vertexes.length*3);
         
-            // grids for blocking off floor/stories
+            // grids for blocking off floor/stories/etc
             
-        this.floorGrid=new Uint8Array(this.piece.size.x*this.piece.size.z);
-        this.storyGrid=new Uint8Array(this.piece.size.x*this.piece.size.z);
+        this.grid=new Uint8Array((this.piece.size.x*this.piece.size.z)*this.storyCount);
     }
     
     hideVertex(story,vIdx)
@@ -42,24 +41,23 @@ export default class GenerateRoomClass
         return(this.vertexHideArray[(story*this.piece.vertexes.length)+vIdx]===1);
     }
     
-    blockFloorGrid(x,z)
+    blockGrid(storyIdx,x,z)
     {
-        this.floorGrid[(z*this.piece.size.z)+x]=1;
+        this.grid[((this.piece.size.x*this.piece.size.z)*storyIdx)+(z*this.piece.size.z)+x]=1;
     }
     
-    checkFloorGrid(x,z)
+    blockGridAllStories(x,z)
     {
-        return(this.floorGrid[(z*this.piece.size.z)+x]!==0);
+        let n;
+        
+        for (n=0;n!=this.storyCount;n++) {
+            this.blockGrid(n,x,z);
+        }
     }
     
-    blockStoryGrid(x,z)
+    checkGrid(storyIdx,x,z)
     {
-        this.storyGrid[(z*this.piece.size.z)+x]=1;
-    }
-    
-    checkStoryGrid(x,z)
-    {
-        return(this.storyGrid[(z*this.piece.size.z)+x]!==0);
+        return(this.grid[((this.piece.size.x*this.piece.size.z)*storyIdx)+(z*this.piece.size.z)+x]!==0);
     }
     
 }

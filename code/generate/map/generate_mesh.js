@@ -1,7 +1,5 @@
 import PointClass from '../../utility/point.js';
 import MeshClass from '../../mesh/mesh.js';
-import MoveClass from '../../map/move.js';
-import MovementClass from '../../map/movement.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateMeshClass
@@ -15,56 +13,6 @@ export default class GenerateMeshClass
 
     constructor()
     {
-    }
-    
-        //
-        // utilities
-        //
-        
-    static addQuadToIndexes(indexArray,trigIdx)
-    {
-        indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
-        return(trigIdx+4);
-    }
-    
-    static addBox(core,name,bitmap,negX,posX,negY,posY,negZ,posZ,isNegX,isPosX,isNegY,isPosY,isNegZ,isPosZ,segmentSize)
-    {
-        let vertexArray=[];
-        let indexArray=[];
-        let normalArray,uvArray,tangentArray;
-        let trigIdx=0;
-        let centerPnt=new PointClass(Math.trunc((negX+posX)*0.5),Math.trunc((negY+posY)*0.5),Math.trunc((negZ+posZ)*0.5));
-        
-        if (isNegX) {
-            vertexArray.push(negX,negY,negZ,negX,negY,posZ,negX,posY,posZ,negX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isPosX) {
-            vertexArray.push(posX,negY,negZ,posX,negY,posZ,posX,posY,posZ,posX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isNegY) {
-            vertexArray.push(negX,negY,negZ,negX,negY,posZ,posX,negY,posZ,posX,negY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isPosY) {
-            vertexArray.push(negX,posY,negZ,negX,posY,posZ,posX,posY,posZ,posX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isNegZ) {
-            vertexArray.push(negX,negY,negZ,posX,negY,negZ,posX,posY,negZ,negX,posY,negZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
-        }
-        if (isPosZ) {
-            vertexArray.push(negX,negY,posZ,posX,negY,posZ,posX,posY,posZ,negX,posY,posZ);
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
-        }
-            
-        normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,false);
-        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
-        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
-        
-        return(core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
     }
     
         //
@@ -84,7 +32,7 @@ export default class GenerateMeshClass
         vertexArray.push((room.offset.x+room.size.x),y,(room.offset.z+room.size.z));
         vertexArray.push(room.offset.x,y,(room.offset.z+room.size.z));
 
-        this.addQuadToIndexes(indexArray,0);
+        GenerateUtilityClass.addQuadToIndexes(indexArray,0);
         
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,true);
         uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
@@ -121,7 +69,7 @@ export default class GenerateMeshClass
                 vertexArray.push((Math.trunc(piece.vertexes[k2][0]*segmentSize)+room.offset.x),y,(Math.trunc(piece.vertexes[k2][1]*segmentSize)+room.offset.z));
                 vertexArray.push((Math.trunc(piece.vertexes[k][0]*segmentSize)+room.offset.x),y,(Math.trunc(piece.vertexes[k][1]*segmentSize)+room.offset.z));
 
-                trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
             }
 
             y+=segmentSize;
@@ -232,7 +180,7 @@ export default class GenerateMeshClass
             vertexArray.push(sx2,y,sz2);
             vertexArray.push(sx,y,sz2);
             
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
             
             if (zDir) {
                 vertexArray.push(x,y,sz);
@@ -247,7 +195,7 @@ export default class GenerateMeshClass
                 vertexArray.push(sx,(y-stepSize),z);
             }
             
-            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+            trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
             
             y+=stepHigh;
         }
@@ -277,137 +225,6 @@ export default class GenerateMeshClass
         }
 
              */
-    }
-    
-        //
-        // second story
-        //
-        
-    static buildRoomSecondStory(core,room,name,bitmap,segmentSize)
-    {
-        let x,z,gx,gz,sx,sz,liftX,liftZ;
-        let dir,orgDir,liftName,segIdx;
-        let movement,meshIdx;
-        let wallStop,xWallFlag,zWallFlag;
-        
-            // random start position with the lift
-            
-        liftX=GenerateUtilityClass.randomInt(2,(room.piece.size.x-4));
-        liftZ=GenerateUtilityClass.randomInt(2,(room.piece.size.z-4));
-
-        room.blockFloorGrid(liftX,liftZ);
-        room.blockStoryGrid(liftX,liftZ);
-        
-            // start the random wander of segments
-
-        gx=liftX;
-        gz=liftZ;
-            
-        while (true) {
-
-                // next random direction
-                
-            dir=GenerateUtilityClass.randomIndex(4);
-            orgDir=dir;
-            
-                // find open direction
-                
-            wallStop=false;
-            
-            while (true) {
-
-                switch (dir) {
-                    case GenerateMeshClass.PLATFORM_DIR_POS_Z:
-                        sx=gx;
-                        sz=gz+1;
-                        break;
-                    case GenerateMeshClass.PLATFORM_DIR_NEG_Z:
-                        sx=gx;
-                        sz=gz-1;
-                        break;
-                    case GenerateMeshClass.PLATFORM_DIR_POS_X:
-                        sx=gx+1;
-                        sz=gz;
-                        break;
-                    case GenerateMeshClass.PLATFORM_DIR_NEG_X:
-                        sx=gx-1;
-                        sz=gz;
-                        break;
-                }
-
-                if ((room.checkStoryGrid(sx,sz)) || (sx<0) || (sx>=room.piece.size.x) || (sz<0) || (sz>=room.piece.size.z)) {
-                    dir++;
-                    if (dir===4) dir=0;
-                    if (dir===orgDir) {
-                        wallStop=true;
-                        break;
-                    }
-                }
-                else {
-                    break;
-                }
-            }
-            
-            if (wallStop) break;
-            
-                // add grid spot
-                
-            room.blockStoryGrid(sx,sz);
-            
-            gx=sx;
-            gz=sz;
-        }
-        
-            // randomly make stripes of the second floor into walls
-            
-        xWallFlag=new Uint8Array(room.piece.size.x);
-        
-        for (x=1;x<(room.piece.size.x-1);x++) {
-            xWallFlag[x]=GenerateUtilityClass.randomPercentage(0.2);
-        }
-            
-        zWallFlag=new Uint8Array(room.piece.size.z);
-        
-        for (z=1;z<(room.piece.size.z-1);z++) {
-            zWallFlag[z]=GenerateUtilityClass.randomPercentage(0.2);
-        }
-        
-            // make the segments
-        
-        for (z=0;z!==room.piece.size.z;z++) {
-            for (x=0;x!==room.piece.size.x;x++) {
-                if (!room.checkStoryGrid(x,z)) continue;
-                
-                    // is this the lift?
-
-                if ((x===liftX) && (z===liftZ)) {
-                    sx=room.offset.x+(liftX*segmentSize);
-                    sz=room.offset.z+(liftZ*segmentSize);
-
-                    liftName=name+'_lift';
-                    meshIdx=this.addBox(core,liftName,bitmap,sx,(sx+segmentSize),room.offset.y,(room.offset.y+(segmentSize+1000)),sz,(sz+segmentSize),true,true,true,true,true,true,segmentSize);
-
-                    movement=new MovementClass(core,[meshIdx],null,new PointClass(0,0,0),new PointClass(0,0,0));
-                    movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-                    movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-                    movement.addMove(new MoveClass(2500,new PointClass(0,-segmentSize,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-                    movement.addMove(new MoveClass(2500,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
-
-                    core.map.movementList.add(movement);
-                    continue;
-                }
-
-                    // regular segment
-                    
-                if ((!xWallFlag[x]) && (!zWallFlag[z])) {
-                    this.addBox(core,(name+'_story_'+segIdx),bitmap,(room.offset.x+(x*segmentSize)),(room.offset.x+((x+1)*segmentSize)),(room.offset.y+segmentSize),(room.offset.y+(segmentSize+1000)),(room.offset.z+(z*segmentSize)),(room.offset.z+((z+1)*segmentSize)),true,true,true,true,true,true,segmentSize);
-                }
-                else {
-                    this.addBox(core,(name+'_story_'+segIdx),bitmap,(room.offset.x+(x*segmentSize)),(room.offset.x+((x+1)*segmentSize)),room.offset.y,(room.offset.y+(segmentSize+1000)),(room.offset.z+(z*segmentSize)),(room.offset.z+((z+1)*segmentSize)),true,true,true,true,true,true,segmentSize);
-                }
-            }
-        }
-        
     }
 }
 

@@ -17,7 +17,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
     
     generateInternal()
     {
-        let y,yCount,yAdd;
+        let n,y,yCount,yAdd;
         let lft,rgt,top,bot;
         let drawStoneColor;
         let edgeSize,xRoundFactor,yRoundFactor,normalZFactor;
@@ -46,7 +46,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
             // draw the stones
             
-        yCount=GenerateUtilityClass.randomInt(6,5);
+        yCount=GenerateUtilityClass.randomInt(5,4);
         yAdd=Math.trunc(this.colorImgData.height/yCount);
         
         top=0;
@@ -67,6 +67,8 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
                     rgt=this.colorImgData.width;
                 }
                 
+                    // the stone itself
+                    
                 drawStoneColor=this.adjustColorRandom((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),0.7,1.2);
 
                 paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.01));  // stones aren't lined up
@@ -79,6 +81,10 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
                 normalZFactor=GenerateUtilityClass.randomFloat(0.2,0.2);        // different z depths
 
                 this.drawOval((lft+xOff),(top+yOff),((rgt+xOff)-paddingSize),((bot+yOff)-paddingSize),0,1,xRoundFactor,yRoundFactor,edgeSize,0.5,drawStoneColor,null,normalZFactor,false,true,0.4,1.2);
+
+                    // gravity distortions to make stones unique
+                    
+                this.gravityDistortEdges((lft+xOff),(top+yOff),((rgt+xOff)-paddingSize),((bot+yOff)-paddingSize),5,20,5);
 
                 lft=rgt;
                 if (rgt===this.colorImgData.width) break;

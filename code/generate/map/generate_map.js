@@ -6,6 +6,7 @@ import LightClass from '../../light/light.js';
 import GeneratePieceClass from './generate_piece.js';
 import GenerateRoomClass from './generate_room.js';
 import GenerateMeshClass from './generate_mesh.js';
+import GenerateStoryClass from './generate_story.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 import GenerateBitmapRun from '../bitmap/generate_bitmap_run.js';
 
@@ -288,7 +289,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1350; //(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('seed='+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -413,7 +414,7 @@ export default class GenerateMapClass
                 // second stories
                 
             if ((room.piece.multistory) && (room.piece.starter) && (room.storyCount>1)) {
-                GenerateMeshClass.buildRoomSecondStory(this.core,room,('story_'+n),platformBitmap,segmentSize);
+                GenerateStoryClass.buildRoomStories(this.core,room,('story_'+n),platformBitmap,segmentSize);
             }
 
                 // room light

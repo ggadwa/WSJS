@@ -5,7 +5,7 @@
 - need more small rooms
 - step function needs work
 
-- second floor segments as one mesh
+- big room type (second stories, hole, empty)
 - need to start player outside blocked grid
 
 - star (line) pattern for tiles?  raised squares?

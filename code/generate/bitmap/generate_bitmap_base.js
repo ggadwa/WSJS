@@ -614,6 +614,84 @@ export default class GenerateBitmapBaseClass
              }
         }
     }
+    
+        //
+        // distortions
+        //
+    
+    gravityDistortEdges(lft,top,rgt,bot,distortCount,distortRadius,distortSize)
+    {
+        let n,x,y,d,dx,dy,gx,gy;
+        let sx,sy,idx,idx2;
+        let colorData=this.colorImgData.data;
+        let colorDataCopy=new Uint8Array(colorData);
+        let normalData=this.normalImgData.data;
+        let normalDataCopy=new Uint8Array(normalData);
+        
+            // run a number of gravity distortions
+            
+        for (n=0;n!==distortCount;n++) {
+
+                // find a gravity point on an edge
+
+            switch (GenerateUtilityClass.randomIndex(4)) {
+                case 0:
+                    gx=lft+distortSize;
+                    gy=GenerateUtilityClass.randomInBetween(top,bot);
+                    break;
+                case 1:
+                    gx=rgt-distortSize;
+                    gy=GenerateUtilityClass.randomInBetween(top,bot);
+                    break;
+                case 2:
+                    gx=GenerateUtilityClass.randomInBetween(lft,rgt);
+                    gy=top+distortSize;
+                    break;
+                default:
+                    gx=GenerateUtilityClass.randomInBetween(lft,rgt);
+                    gy=bot-distortSize;
+                    break;
+            }
+        
+                // distort bitmap
+                
+            for (y=top;y!==bot;y++) {
+                for (x=lft;x!==rgt;x++) {
+
+                    sx=x;
+                    sy=y;
+                        
+                    dx=gx-x;
+                    dy=gy-y;
+                    d=Math.sqrt((dx*dx)+(dy*dy));
+
+                    if (d<distortRadius) {
+                        d=1.0-(d/distortRadius);
+                        sx=sx-Math.trunc((Math.sign(dx)*distortSize)*d);
+                        sy=sy-Math.trunc((Math.sign(dy)*distortSize)*d);
+                        
+                        if (sx<0) sx=this.colorImgData.width+sx;
+                        if (sx>=this.colorImgData.width) sx=this.colorImgData.width-sx;
+                        if (sy<0) sy=this.colorImgData.height+sy;
+                        if (sy>=this.colorImgData.height) sy=this.colorImgData.height-sy;
+                    }
+                
+                        // shift the pixels
+
+                    idx=((y*this.colorImgData.width)+x)*4;
+                    idx2=((sy*this.colorImgData.width)+sx)*4;
+
+                    colorData[idx]=colorDataCopy[idx2];
+                    colorData[idx+1]=colorDataCopy[idx2+1];
+                    colorData[idx+2]=colorDataCopy[idx2+2];
+
+                    normalData[idx]=normalDataCopy[idx2];
+                    normalData[idx+1]=normalDataCopy[idx2+1];
+                    normalData[idx+2]=normalDataCopy[idx2+2];
+                }
+            }
+        }
+    }
 
         //
         // shape drawing
@@ -798,7 +876,7 @@ export default class GenerateBitmapBaseClass
                     // the color
                 
                 idx=((y*this.colorImgData.width)+x)*4;
-
+                
                 colorData[idx]=Math.trunc(col.r*255.0);
                 colorData[idx+1]=Math.trunc(col.g*255.0);
                 colorData[idx+2]=Math.trunc(col.b*255.0);

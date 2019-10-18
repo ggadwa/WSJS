@@ -1,4 +1,5 @@
 import PointClass from '../../utility/point.js';
+import MeshClass from '../../mesh/mesh.js';
 
 export default class GenerateUtilityClass
 {
@@ -375,5 +376,55 @@ export default class GenerateUtilityClass
         }
         
         return(tangentArray);
+    }
+    
+        //
+        // mesh utilities
+        //
+        
+    static addQuadToIndexes(indexArray,trigIdx)
+    {
+        indexArray.push(trigIdx,(trigIdx+1),(trigIdx+2),trigIdx,(trigIdx+2),(trigIdx+3));
+        return(trigIdx+4);
+    }
+    
+    static addBox(core,name,bitmap,negX,posX,negY,posY,negZ,posZ,isNegX,isPosX,isNegY,isPosY,isNegZ,isPosZ,segmentSize)
+    {
+        let vertexArray=[];
+        let indexArray=[];
+        let normalArray,uvArray,tangentArray;
+        let trigIdx=0;
+        let centerPnt=new PointClass(Math.trunc((negX+posX)*0.5),Math.trunc((negY+posY)*0.5),Math.trunc((negZ+posZ)*0.5));
+        
+        if (isNegX) {
+            vertexArray.push(negX,negY,negZ,negX,negY,posZ,negX,posY,posZ,negX,posY,negZ);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+        }
+        if (isPosX) {
+            vertexArray.push(posX,negY,negZ,posX,negY,posZ,posX,posY,posZ,posX,posY,negZ);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+        }
+        if (isNegY) {
+            vertexArray.push(negX,negY,negZ,negX,negY,posZ,posX,negY,posZ,posX,negY,negZ);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+        }
+        if (isPosY) {
+            vertexArray.push(negX,posY,negZ,negX,posY,posZ,posX,posY,posZ,posX,posY,negZ);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+        }
+        if (isNegZ) {
+            vertexArray.push(negX,negY,negZ,posX,negY,negZ,posX,posY,negZ,negX,posY,negZ);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+        }
+        if (isPosZ) {
+            vertexArray.push(negX,negY,posZ,posX,negY,posZ,posX,posY,posZ,negX,posY,posZ);
+            trigIdx=this.addQuadToIndexes(indexArray,trigIdx);
+        }
+            
+        normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,false);
+        uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
+        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
+        
+        return(core.map.meshList.add(new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),normalArray,tangentArray,uvArray,null,null,new Uint16Array(indexArray))));
     }
 }
