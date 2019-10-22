@@ -17,7 +17,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
     
     generateInternal()
     {
-        let n,y,yCount,yAdd;
+        let y,yCount,yAdd;
         let lft,rgt,top,bot;
         let drawStoneColor;
         let edgeSize,xRoundFactor,yRoundFactor,normalZFactor;
@@ -26,6 +26,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         let stoneColor=this.getRandomColor();
         let altStoneColor=this.getRandomColor();
         let groutColor=this.getRandomGray(0.7,0.2);
+        let outlineColor=null; // this.adjustColor(groutColor,0.95);        // this doesn't make it any better
         
             // the noise grout
             
@@ -41,12 +42,12 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
             // noise for stones
             
-        this.createPerlinNoiseData(32,32);
-        this.createNormalNoiseData(2.0,0.4);
+        this.createPerlinNoiseData(64,64);
+        this.createNormalNoiseData(5.0,0.3);
         
             // draw the stones
             
-        yCount=GenerateUtilityClass.randomInt(5,4);
+        yCount=GenerateUtilityClass.randomInt(6,6);
         yAdd=Math.trunc(this.colorImgData.height/yCount);
         
         top=0;
@@ -80,7 +81,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
                 yRoundFactor=GenerateUtilityClass.randomFloat(0.02,0.05);
                 normalZFactor=GenerateUtilityClass.randomFloat(0.2,0.2);        // different z depths
 
-                this.drawOval((lft+xOff),(top+yOff),((rgt+xOff)-paddingSize),((bot+yOff)-paddingSize),0,1,xRoundFactor,yRoundFactor,edgeSize,0.5,drawStoneColor,null,normalZFactor,false,true,0.4,1.2);
+                this.drawOval((lft+xOff),(top+yOff),((rgt+xOff)-paddingSize),((bot+yOff)-paddingSize),0,1,xRoundFactor,yRoundFactor,edgeSize,0.5,drawStoneColor,outlineColor,normalZFactor,false,true,0.4,1.2);
 
                     // gravity distortions to make stones unique
                     

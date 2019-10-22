@@ -28,7 +28,7 @@ export default class GenerateRoomClass
         
             // grids for blocking off floor/stories/etc
             
-        this.grid=new Uint8Array((this.piece.size.x*this.piece.size.z)*this.storyCount);
+        this.grid=new Uint8Array((this.piece.size.x*this.piece.size.z)*(this.storyCount+1));        // 0 = bottom floor
     }
     
     hideVertex(story,vIdx)
@@ -41,23 +41,23 @@ export default class GenerateRoomClass
         return(this.vertexHideArray[(story*this.piece.vertexes.length)+vIdx]===1);
     }
     
-    blockGrid(storyIdx,x,z)
+    setGrid(storyIdx,x,z,flag)
     {
-        this.grid[((this.piece.size.x*this.piece.size.z)*storyIdx)+(z*this.piece.size.z)+x]=1;
+        this.grid[((this.piece.size.x*this.piece.size.z)*storyIdx)+(z*this.piece.size.z)+x]=flag;
     }
     
-    blockGridAllStories(x,z)
+    setGridAllStories(x,z,flag)
     {
         let n;
         
-        for (n=0;n!=this.storyCount;n++) {
-            this.blockGrid(n,x,z);
+        for (n=0;n!=(this.storyCount+1);n++) {
+            this.setGrid(n,x,z,flag);
         }
     }
     
-    checkGrid(storyIdx,x,z)
+    getGrid(storyIdx,x,z)
     {
-        return(this.grid[((this.piece.size.x*this.piece.size.z)*storyIdx)+(z*this.piece.size.z)+x]!==0);
+        return(this.grid[((this.piece.size.x*this.piece.size.z)*storyIdx)+(z*this.piece.size.z)+x]);
     }
     
 }
