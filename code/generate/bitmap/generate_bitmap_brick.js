@@ -96,7 +96,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         
         let brickColor=this.getRandomColor();
         let altBrickColor=this.getRandomColor();
-        let groutColor=this.getRandomGray(0.8,0,2);
+        let groutColor=this.getRandomGray(0.4,0.6);
         
             // create noise data
         

@@ -289,7 +289,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1571778440933; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('seed='+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -384,8 +384,6 @@ export default class GenerateMapClass
                 }
             }
         }
-        
-        console.info('room count='+rooms.length);
 
             // eliminate all combined walls
             
@@ -409,17 +407,22 @@ export default class GenerateMapClass
             
                 // stairs
                 
-            if (room.stairRoom) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),stepBitmap,stepBitmap,segmentSize);
+            if (room.stairRoom) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),stepBitmap,segmentSize);
             
                 // second stories
                 
-            if ((room.piece.multistory) && (room.piece.starter) && (room.storyCount>1)) {
-                GenerateStoryClass.buildRoomStories(this.core,room,('story_'+n),platformBitmap,segmentSize);
+            if ((room.piece.multistory) && (room.piece.starter) && (room.storyCount>1) && (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.secondStoryFactor))) {
+                GenerateStoryClass.buildRoomStories(this.core,room,('story_'+n),roomWallBitmap,stepBitmap,platformBitmap,segmentSize);
             }
 
                 // room light
             
-            intensity=Math.trunc(((room.size.x+room.size.z)*0.5)*0.7)+((segmentSize*0.2)*(room.storyCount-1));
+            if (!room.stairRoom) {
+                intensity=Math.trunc(((room.size.x+room.size.z)*0.5)*0.7)+((segmentSize*0.2)*(room.storyCount-1));
+            }
+            else {
+                intensity=Math.trunc(segmentSize*2);
+            }
             light=new LightClass(new PointClass((room.offset.x+(Math.trunc(room.size.x*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(room.size.z*0.5)))),new ColorClass(1,1,1),intensity,0.5);
             map.lightList.add(light);
         }

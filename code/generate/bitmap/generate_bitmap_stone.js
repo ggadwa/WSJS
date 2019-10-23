@@ -25,7 +25,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
         let stoneColor=this.getRandomColor();
         let altStoneColor=this.getRandomColor();
-        let groutColor=this.getRandomGray(0.7,0.2);
+        let groutColor=this.getRandomGray(0.2,0.3);
         let outlineColor=null; // this.adjustColor(groutColor,0.95);        // this doesn't make it any better
         
             // the noise grout

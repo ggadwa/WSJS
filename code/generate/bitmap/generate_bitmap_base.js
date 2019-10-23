@@ -140,9 +140,9 @@ export default class GenerateBitmapBaseClass
         return(color);
     }
     
-    getRandomGray(min,max)
+    getRandomGray(minFactor,maxFactor)
     {
-        let col=min+(GenerateUtilityClass.random()*(max-min));
+        let col=GenerateUtilityClass.randomFloat(minFactor,(maxFactor-minFactor));
         return(new ColorClass(col,col,col));
     }
     
