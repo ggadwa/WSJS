@@ -90,10 +90,10 @@ export default class GenerateMeshClass
         // staircases
         //
         
-    static buildStairs(core,room,name,stepBitmap,segmentSize,x,z,dir)
+    static buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,sides)
     {
-        let n,y,trigIdx;
-        let sx,sx2,sz,sz2;
+        let n,trigIdx;
+        let sx,sx2,sy,sz,sz2;
         let centerPnt;
         let vertexArray=[];
         let normalArray;
@@ -123,10 +123,12 @@ export default class GenerateMeshClass
             // the steps
         
         trigIdx=0;
-        y=room.offset.y+stepHigh;
+        sy=y+stepHigh;
         
         for (n=0;n!==GenerateMeshClass.STAIR_STEP_COUNT;n++) { 
             
+                // step top
+                
             switch (dir) {
                 case GenerateMeshClass.STAIR_DIR_POS_Z:
                     sz=z+(n*stepSize);
@@ -146,33 +148,67 @@ export default class GenerateMeshClass
                     break;
             }
            
-            vertexArray.push(sx,y,sz);
-            vertexArray.push(sx2,y,sz);
-            vertexArray.push(sx2,y,sz2);
-            vertexArray.push(sx,y,sz2);
+            vertexArray.push(sx,sy,sz);
+            vertexArray.push(sx2,sy,sz);
+            vertexArray.push(sx2,sy,sz2);
+            vertexArray.push(sx,sy,sz2);
             
             trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
             
+                // step front
+                
             switch (dir) {
                 case GenerateMeshClass.STAIR_DIR_POS_Z:
                 case GenerateMeshClass.STAIR_DIR_NEG_Z:
-                    vertexArray.push(sx,y,sz);
-                    vertexArray.push(sx2,y,sz);
-                    vertexArray.push(sx2,(y-stepHigh),sz);
-                    vertexArray.push(sx,(y-stepHigh),sz);
+                    vertexArray.push(sx,sy,sz);
+                    vertexArray.push(sx2,sy,sz);
+                    vertexArray.push(sx2,(sy-stepHigh),sz);
+                    vertexArray.push(sx,(sy-stepHigh),sz);
                     break;
                 case GenerateMeshClass.STAIR_DIR_POS_X:
                 case GenerateMeshClass.STAIR_DIR_NEG_X:
-                    vertexArray.push(sx,y,sz);
-                    vertexArray.push(sx,y,sz2);
-                    vertexArray.push(sx,(y-stepHigh),sz2);
-                    vertexArray.push(sx,(y-stepHigh),sz);
+                    vertexArray.push(sx,sy,sz);
+                    vertexArray.push(sx,sy,sz2);
+                    vertexArray.push(sx,(sy-stepHigh),sz2);
+                    vertexArray.push(sx,(sy-stepHigh),sz);
                     break;
             }
             
             trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
             
-            y+=stepHigh;
+                // step sides
+                
+            if (sides) {
+                switch (dir) {
+                    case GenerateMeshClass.STAIR_DIR_POS_Z:
+                    case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                        vertexArray.push(sx,sy,sz);
+                        vertexArray.push(sx,sy,sz2);
+                        vertexArray.push(sx,y,sz2);
+                        vertexArray.push(sx,y,sz);
+                        vertexArray.push(sx2,sy,sz);
+                        vertexArray.push(sx2,sy,sz2);
+                        vertexArray.push(sx2,y,sz2);
+                        vertexArray.push(sx2,y,sz);
+                        break;
+                    case GenerateMeshClass.STAIR_DIR_POS_X:
+                    case GenerateMeshClass.STAIR_DIR_NEG_X:
+                        vertexArray.push(sx,sy,sz);
+                        vertexArray.push(sx2,sy,sz);
+                        vertexArray.push(sx2,y,sz);
+                        vertexArray.push(sx,y,sz);
+                        vertexArray.push(sx,sy,sz2);
+                        vertexArray.push(sx2,sy,sz2);
+                        vertexArray.push(sx2,y,sz2);
+                        vertexArray.push(sx,y,sz2);
+                        break;
+                }
+
+                trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
+                trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
+            }
+            
+            sy+=stepHigh;
         }
             // create the mesh
             
@@ -196,19 +232,19 @@ export default class GenerateMeshClass
             dir=(room.pathXDeviation>0)?GenerateMeshClass.STAIR_DIR_POS_X:GenerateMeshClass.STAIR_DIR_NEG_X;
         }
         
-        this.buildStairs(core,room,name,stepBitmap,segmentSize,room.offset.x,room.offset.z,dir);
+        this.buildStairs(core,room,name,stepBitmap,segmentSize,room.offset.x,room.offset.y,room.offset.z,dir,false);
     }
     
-    static buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z,dir)
+    static buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,y,z,dir)
     {
         let stepSize=Math.trunc((segmentSize*10)*0.02);
         
             // the steps
             
-        this.buildStairs(core,room,name,stepBitmap,segmentSize,x,z,dir);
+        this.buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,true);
         
             // the sides
-
+/*
         switch (dir) {
             case GenerateMeshClass.STAIR_DIR_POS_Z:
             case GenerateMeshClass.STAIR_DIR_NEG_Z:
@@ -221,6 +257,7 @@ export default class GenerateMeshClass
                 GenerateUtilityClass.addBox(core,(name+'_side1'),wallBitmap,x,(x+(segmentSize*2)),room.offset.y,(room.offset.y+segmentSize),(z+segmentSize),((z+segmentSize)+stepSize),true,true,false,true,true,true,segmentSize);
                 break;
         }
+ */
     }
 }
 

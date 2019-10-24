@@ -289,7 +289,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=1571928660249; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('seed='+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
