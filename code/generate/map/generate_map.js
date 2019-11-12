@@ -289,7 +289,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1571928660249; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('seed='+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -332,7 +332,7 @@ export default class GenerateMapClass
             isStairRoom=false;
             
             if ((room.storyCount>1) && (!room.stairRoom)) {
-                isStairRoom=(GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.stairFactor));
+                isStairRoom=GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.stairFactor);
             }
 
                 // create the next room
@@ -343,7 +343,7 @@ export default class GenerateMapClass
                     // the stair path if we had one
                     
                 forwardPath=GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.pathTurnFactor);
-                if (room.stairRoom) forwardPath=(room.piece.size.z>room.piece.size.x);
+                if (room.stairRoom) forwardPath=(room.stairDirection===GenerateRoomClass.STAIR_PATH_DIRECTION_Z);
                 
                     // create the room
                         
@@ -355,10 +355,12 @@ export default class GenerateMapClass
             else {
                 if (GenerateUtilityClass.randomPercentage(0.5)) {
                     nextRoom=new GenerateRoomClass(genPiece.getStairZPiece(),segmentSize,false,true);
+                    nextRoom.stairDirection=GenerateRoomClass.STAIR_PATH_DIRECTION_Z;
                     if (!this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,pathXDeviation,true)) break;
                 }
                 else {
                     nextRoom=new GenerateRoomClass(genPiece.getStairXPiece(),segmentSize,false,true);
+                    nextRoom.stairDirection=GenerateRoomClass.STAIR_PATH_DIRECTION_X;
                     if (!this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,pathXDeviation,false)) break;
                 }
             }
@@ -411,8 +413,8 @@ export default class GenerateMapClass
             
                 // second stories
                 
-            if ((room.piece.multistory) && (room.piece.starter) && (room.storyCount>1) && (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.secondStoryFactor))) {
-                GenerateStoryClass.buildRoomStories(this.core,room,('story_'+n),roomWallBitmap,stepBitmap,platformBitmap,segmentSize);
+            if ((room.piece.multistory) && (room.piece.size.x>=10) && (room.piece.size.z>=10) && (!room.piece.hallway) && (room.storyCount>1) && (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.secondStoryFactor))) {
+                GenerateStoryClass.buildRoomStories(this.core,room,genPiece,('story_'+n),roomWallBitmap,stepBitmap,platformBitmap,segmentSize);
             }
 
                 // room light

@@ -6,7 +6,7 @@ export default class GeneratePieceClass
             [
                 {
                     "name":"big_box",
-                    "starter":true,
+                    "hallways":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
                     "vertexes":
@@ -19,7 +19,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"small_box",
-                    "starter":false,
+                    "hallway":false,
                     "size":{"x":5,"z":5},
                     "multistory":true,
                     "vertexes":
@@ -32,7 +32,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"circle",
-                    "starter":true,
+                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
                     "vertexes":
@@ -43,7 +43,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"half_circle",
-                    "starter":true,
+                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
                     "vertexes":
@@ -55,7 +55,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"half_circle_small",
-                    "starter":false,
+                    "hallway":false,
                     "size":{"x":10,"z":5},
                     "multistory":true,
                     "vertexes":
@@ -67,7 +67,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"slant_box",
-                    "starter":true,
+                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
                     "vertexes":
@@ -80,7 +80,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"4_exit_box",
-                    "starter":true,
+                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
                     "vertexes":
@@ -93,7 +93,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"small_diamond",
-                    "starter":false,
+                    "hallway":false,
                     "size":{"x":5,"z":5},
                     "multistory":true,
                     "vertexes":
@@ -104,7 +104,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"cross_1",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
                     "vertexes":
@@ -115,7 +115,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"cross_2",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
                     "vertexes":
@@ -128,7 +128,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"corner_1",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":3,"z":3},
                     "multistory":false,
                     "vertexes":
@@ -138,7 +138,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"t_intersection",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":5,"z":3},
                     "multistory":false,
                     "vertexes":
@@ -149,7 +149,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"s_intersection",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
                     "vertexes":
@@ -163,7 +163,7 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"diagonal_hallway",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
                     "vertexes":
@@ -175,23 +175,203 @@ export default class GeneratePieceClass
 
             ];
             
-    stairZPiece=
+    stairZPieces=
+            [
                 {
                     "name":"stair_z",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":1,"z":2},
                     "multistory":false,
                     "vertexes":[[0,0],[1,0],[1,1],[1,2],[0,2],[0,1]]
-                };
+                },
+                {
+                    "name":"stair_z_2",
+                    "hallway":true,
+                    "size":{"x":2,"z":2},
+                    "multistory":false,
+                    "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]]
+                },
+                {
+                    "name":"stair_z_3",
+                    "hallway":true,
+                    "size":{"x":3,"z":2},
+                    "multistory":false,
+                    "vertexes":[[0,0],[1,0],[2,0],[3,0],[3,1],[3,2],[2,2],[1,2],[0,2],[0,1]]
+                }
+            ];
                 
-    stairXPiece=
+    stairXPieces=
+            [
                 {
                     "name":"stair_x",
-                    "starter":false,
+                    "hallway":true,
                     "size":{"x":2,"z":1},
                     "multistory":false,
                     "vertexes":[[0,0],[1,0],[2,0],[2,1],[1,1],[0,1]]
-                };
+                },
+                {
+                    "name":"stair_x_2",
+                    "hallway":true,
+                    "size":{"x":2,"z":2},
+                    "multistory":false,
+                    "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]]
+                },
+                {
+                    "name":"stair_x_3",
+                    "hallway":true,
+                    "size":{"x":2,"z":3},
+                    "multistory":false,
+                    "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[2,3],[1,3],[0,3],[0,2],[0,1]]
+                }
+            ];
+            
+    platformPieces=
+            [
+                {
+                    "name":"outside_ramps",
+                    "size":{"x":10,"z":10},
+                    "grid":[[1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1]]
+                },
+                {
+                    "name":"x_ramps",
+                    "size":{"x":10,"z":10},
+                    "grid":[[1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1]]
+                },
+                {
+                    "name":"x_crossover",
+                    "size":{"x":10,"z":10},
+                    "grid":[[1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1],
+                            [1,1,0,0,0,0,0,0,1,1]]
+                },
+                {
+                    "name":"z_ramps",
+                    "size":{"x":10,"z":10},
+                    "grid":[[1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [0,0,0,0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0,0,0,0],
+                            [0,0,0,0,0,0,0,0,0,0],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1]]
+                },
+                {
+                    "name":"z_crossover",
+                    "size":{"x":10,"z":10},
+                    "grid":[[1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1]]
+                },
+                {
+                    "name":"inside_pillar",
+                    "size":{"x":4,"z":4},
+                    "grid":[[1,1,1,1],
+                            [1,1,1,1],
+                            [1,1,1,1],
+                            [1,1,1,1]]
+                },
+                {
+                    "name":"outline_pillar",
+                    "size":{"x":6,"z":6},
+                    "grid":[[1,1,1,1,1,1],
+                            [1,1,1,1,1,1],
+                            [1,1,0,0,1,1],
+                            [1,1,0,0,1,1],
+                            [1,1,1,1,1,1],
+                            [1,1,1,1,1,1]]
+                },
+                {
+                    "name":"corner_1",
+                    "size":{"x":10,"z":10},
+                    "grid":[[1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,0,0,0,0,0,0,0,0],
+                            [1,1,0,0,0,0,0,0,0,0],
+                            [1,1,0,0,0,0,0,0,0,0],
+                            [1,1,0,0,0,0,0,0,0,0],
+                            [1,1,0,0,0,0,0,0,0,0],
+                            [1,1,0,0,0,0,0,0,0,0],
+                            [1,1,0,0,0,0,0,0,0,0],
+                            [1,1,0,0,0,0,0,0,0,0]]
+                },
+                {
+                    "name":"corner_2",
+                    "size":{"x":10,"z":10},
+                    "grid":[[1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [0,0,0,0,0,0,0,0,1,1],
+                            [0,0,0,0,0,0,0,0,1,1],
+                            [0,0,0,0,0,0,0,0,1,1],
+                            [0,0,0,0,0,0,0,0,1,1],
+                            [0,0,0,0,0,0,0,0,1,1],
+                            [0,0,0,0,0,0,0,0,1,1],
+                            [0,0,0,0,0,0,0,0,1,1],
+                            [0,0,0,0,0,0,0,0,1,1]]
+                },
+                {
+                    "name":"cross_1",
+                    "size":{"x":10,"z":10},
+                    "grid":[[0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0]]
+                },
+                {
+                    "name":"cross_2",
+                    "size":{"x":10,"z":10},
+                    "grid":[[0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,1,1,1,1,1,1,0,0],
+                            [0,0,1,1,1,1,1,1,0,0],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [1,1,1,1,1,1,1,1,1,1],
+                            [0,0,1,1,1,1,1,1,0,0],
+                            [0,0,1,1,1,1,1,1,0,0],
+                            [0,0,0,0,1,1,0,0,0,0],
+                            [0,0,0,0,1,1,0,0,0,0]]
+                }
+            ];
 
     constructor()
     {
@@ -238,25 +418,30 @@ export default class GeneratePieceClass
         return(piece);
     }
 
-    getRandomPiece(isStarter)
+    getRandomPiece(roomOnly)
     {
         let piece;
         
         while (true) {
             piece=this.pieces[GenerateUtilityClass.randomIndex(this.pieces.length)];
-            if (!isStarter) return(piece);
+            if (!roomOnly) return(piece);
             
-            if (piece.starter) return(piece);
+            if (!piece.hallway) return(piece);
         }
     }
     
     getStairZPiece()
     {
-        return(this.stairZPiece);
+        return(this.stairZPieces[GenerateUtilityClass.randomIndex(this.stairZPieces.length)]);
     }
     
     getStairXPiece()
     {
-        return(this.stairXPiece);
+        return(this.stairXPieces[GenerateUtilityClass.randomIndex(this.stairXPieces.length)]);
+    }
+    
+    getPlatformPiece()
+    {
+        return(this.platformPieces[GenerateUtilityClass.randomIndex(this.platformPieces.length)]);
     }
 }

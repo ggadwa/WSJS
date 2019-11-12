@@ -90,7 +90,7 @@ export default class GenerateMeshClass
         // staircases
         //
         
-    static buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,sides)
+    static buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,stepWidth,sides)
     {
         let n,trigIdx;
         let sx,sx2,sy,sz,sz2;
@@ -109,13 +109,13 @@ export default class GenerateMeshClass
             case GenerateMeshClass.STAIR_DIR_POS_Z:
             case GenerateMeshClass.STAIR_DIR_NEG_Z:
                 sx=x;
-                sx2=sx+segmentSize;
+                sx2=sx+(segmentSize*stepWidth);
                 centerPnt=new PointClass(Math.trunc(x+(segmentSize*0.5)),room.offset.y,Math.trunc(z+segmentSize));
                 break;
             case GenerateMeshClass.STAIR_DIR_POS_X:
             case GenerateMeshClass.STAIR_DIR_NEG_X:
                 sz=z;
-                sz2=sz+segmentSize;
+                sz2=sz+(segmentSize*stepWidth);
                 centerPnt=new PointClass(Math.trunc(x+segmentSize),room.offset.y,Math.trunc(z+(segmentSize*0.5)));
                 break;
         }
@@ -221,18 +221,20 @@ export default class GenerateMeshClass
     
     static buildRoomStairs(core,room,name,stepBitmap,segmentSize)
     {
-        let dir;
+        let dir,stepWidth;
         
             // determine room to room direction
             
         if (room.forwardPath) {
             dir=GenerateMeshClass.STAIR_DIR_POS_Z;
+            stepWidth=room.piece.size.x;
         }
         else {
             dir=(room.pathXDeviation>0)?GenerateMeshClass.STAIR_DIR_POS_X:GenerateMeshClass.STAIR_DIR_NEG_X;
+            stepWidth=room.piece.size.z;
         }
         
-        this.buildStairs(core,room,name,stepBitmap,segmentSize,room.offset.x,room.offset.y,room.offset.z,dir,false);
+        this.buildStairs(core,room,name,stepBitmap,segmentSize,room.offset.x,room.offset.y,room.offset.z,dir,stepWidth,false);
     }
     
     static buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,y,z,dir)
@@ -241,7 +243,7 @@ export default class GenerateMeshClass
         
             // the steps
             
-        this.buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,true);
+        this.buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,1,true);
         
             // the sides
 /*

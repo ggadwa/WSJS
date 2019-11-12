@@ -1,11 +1,14 @@
 - need to make statics for all generate_bitmap_base statics
 - room uvs need to be better
 
-- big room type (second stories, hole, empty)
 
-- door frames
+- light position is random, underneath platforms, or walls
+- need light model
+
+- second story steps need work
+- big room type (second stories, hole, empty)
 - need more small rooms
-- steps for stories 2nd stories
+- door frames
 - need to start player outside blocked grid
 
 - star (line) pattern for tiles?  raised squares?

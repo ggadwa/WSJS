@@ -3,6 +3,9 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateRoomClass
 {
+    static STAIR_PATH_DIRECTION_Z=0;
+    static STAIR_PATH_DIRECTION_X=1;
+    
     constructor(piece,segmentSize,sideRoom,stairRoom)
     {
         this.piece=piece;
@@ -11,6 +14,7 @@ export default class GenerateRoomClass
         
         this.forwardPath=false;     // be filled in later during construction
         this.pathXDeviation=0;
+        this.stairDirection=GenerateRoomClass.STAIR_PATH_DIRECTION_Z;
         
         this.offset=new PointClass(0,0,0);
         if (stairRoom) {
