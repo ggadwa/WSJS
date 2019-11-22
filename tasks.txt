@@ -2,7 +2,8 @@
 - room uvs need to be better
 
 
-- light position is random, underneath platforms, or walls
+- need light patterns (middle, cross, lines, corners, etc)
+- need story light spots
 - need light model
 
 - second story steps need work

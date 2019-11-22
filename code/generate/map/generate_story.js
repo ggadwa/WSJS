@@ -140,38 +140,35 @@ export default class GenerateStoryClass
         // second story segments
         //
         
-    static hasNegXWall(room,storyPiece,x,z,xOff,zOff)
+    static hasNegXWall(room,storyPiece,gridOn,x,z,xOff,zOff)
     {
-        if ((x+xOff)===0) return(false);
-        if (x===0) return(true);
-        return(storyPiece.grid[z][x-1]==0);
+        if (((x+xOff)===0) || (x===0)) return(true);
+        return(!gridOn[storyPiece.grid[z][x-1]]);
     }
     
-    static hasPosXWall(room,storyPiece,x,z,xOff,zOff)
+    static hasPosXWall(room,storyPiece,gridOn,x,z,xOff,zOff)
     {
-        if ((x+xOff)===(room.piece.size.x-1)) return(false);
-        if (x===(storyPiece.size.x-1)) return(true);
-        return(storyPiece.grid[z][x+1]==0);
+        if (((x+xOff)===(room.piece.size.x-1)) || (x===(storyPiece.size.x-1))) return(true);
+        return(!gridOn[storyPiece.grid[z][x+1]]);
     }
     
-    static hasNegZWall(room,storyPiece,x,z,xOff,zOff)
+    static hasNegZWall(room,storyPiece,gridOn,x,z,xOff,zOff)
     {
-        if ((z+zOff)===0) return(false);
-        if (z===0) return(true);
-        return(storyPiece.grid[z-1][x]==0);
+        if (((z+zOff)===0) || (z===0)) return(true);
+        return(!gridOn[storyPiece.grid[z-1][x]]);
     }
     
-    static hasPosZWall(room,storyPiece,x,z,xOff,zOff)
+    static hasPosZWall(room,storyPiece,gridOn,x,z,xOff,zOff)
     {
-        if ((z+zOff)===(room.piece.size.z-1)) return(false);
-        if (z===(storyPiece.size.z-1)) return(true);
-        return(storyPiece.grid[z+1][x]==0);
+        if (((z+zOff)===(room.piece.size.z-1)) || (z===(storyPiece.size.z-1))) return(true);
+        return(!gridOn[storyPiece.grid[z+1][x]]);
     }
 
-    static buildRoomSingleStory(core,room,name,storyPiece,segmentBitmap,segmentSize,storyIdx)
+    static buildRoomStories(core,room,genPiece,name,wallBitmap,stepBitmap,segmentBitmap,segmentSize)
     {
-        let x,z,ty,by,xOff,zOff;
-        let negX,posX,negZ,posZ;
+        let n,x,z,ty,by,xOff,zOff;
+        let negX,posX,negZ,posZ,storyPiece;
+        let gridOn=[];
         let vertexArray=[];
         let indexArray=[];
         let normalArray=[];
@@ -179,10 +176,25 @@ export default class GenerateStoryClass
         let trigIdx;
         let floorHigh=Math.trunc(segmentSize*0.1);
         
+            // set the second story piece
+            
+        storyPiece=genPiece.getPlatformPiece();
+        room.storyPiece=storyPiece;
+        
             // offset for story piece
             
         xOff=Math.trunc((room.piece.size.x-storyPiece.size.x)*0.5);
         zOff=Math.trunc((room.piece.size.z-storyPiece.size.z)*0.5);
+        
+            // grids 0 is always off, 1 always on
+            // grids 2-9 are randomly turned on/off
+            
+        gridOn.push(false);
+        gridOn.push(true);
+        
+        for (n=2;n!==10;n++) {
+            gridOn.push(GenerateUtilityClass.randomPercentage(0.5));
+        }
         
             // make the segments
         
@@ -190,25 +202,25 @@ export default class GenerateStoryClass
         
         for (z=0;z!==storyPiece.size.z;z++) {
             for (x=0;x!==storyPiece.size.x;x++) {
-                if (storyPiece.grid[z][x]===0) continue;
+                if (!gridOn[storyPiece.grid[z][x]]) continue;
 
                     // create the segments
                     
-                ty=room.offset.y+((segmentSize*storyIdx)+floorHigh);
-                by=room.offset.y+(segmentSize*storyIdx);
+                ty=room.offset.y+(segmentSize+floorHigh);
+                by=room.offset.y+segmentSize;
                 
                 negX=room.offset.x+((x+xOff)*segmentSize);
                 posX=room.offset.x+(((x+xOff)+1)*segmentSize);
                 negZ=room.offset.z+((z+zOff)*segmentSize);
                 posZ=room.offset.z+(((z+zOff)+1)*segmentSize);
                 
-                if (this.hasNegXWall(room,storyPiece,x,z,xOff,zOff)) {
+                if (this.hasNegXWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
                     vertexArray.push(negX,ty,negZ,negX,ty,posZ,negX,by,posZ,negX,by,negZ);
                     normalArray.push(-1,0,0,-1,0,0,-1,0,0,-1,0,0);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
-                if (this.hasPosXWall(room,storyPiece,x,z,xOff,zOff)) {
+                if (this.hasPosXWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
                     vertexArray.push(posX,ty,negZ,posX,ty,posZ,posX,by,posZ,posX,by,negZ);
                     normalArray.push(1,0,0,1,0,0,1,0,0,1,0,0);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
@@ -224,19 +236,21 @@ export default class GenerateStoryClass
                 normalArray.push(0,-1,0,0,-1,0,0,-1,0,0,-1,0);
                 trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 
-                if (this.hasNegZWall(room,storyPiece,x,z,xOff,zOff)) {
+                if (this.hasNegZWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
                     vertexArray.push(negX,ty,negZ,posX,ty,negZ,posX,by,negZ,negX,by,negZ);
                     normalArray.push(0,0,-1,0,0,-1,0,0,-1,0,0,-1);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
-                if (this.hasPosZWall(room,storyPiece,x,z,xOff,zOff)) {
+                if (this.hasPosZWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
                     vertexArray.push(negX,ty,posZ,posX,ty,posZ,posX,by,posZ,negX,by,posZ);
                     normalArray.push(0,0,1,0,0,1,0,0,1,0,0,1);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 }
             }
         }
+        
+        if (trigIdx===0) return;
         
         uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
@@ -247,19 +261,21 @@ export default class GenerateStoryClass
         //
         // second story mainline
         //
-        
+        /*
     static buildRoomStories(core,room,genPiece,name,wallBitmap,stepBitmap,segmentBitmap,segmentSize)
     {
         let n,storyPiece;
         
             // create the stories
             
-        for (n=1;n<room.storyCount;n++) {
+        //for (n=1;n<room.storyCount;n++) {
+        
+        n=1;
             
             storyPiece=genPiece.getPlatformPiece();
 
                 
-                /*
+
                 // build stairs or lifts
                 
             switch (storySide) {
@@ -282,13 +298,15 @@ export default class GenerateStoryClass
             }
                 
             this.buildRoomStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z,(n-1));
-            */
+
            
                 // and build the platform mesh
                 
             this.buildRoomSingleStory(core,room,name,storyPiece,segmentBitmap,segmentSize,n);
-        }
+        //}
             
     }
+        
+         */
 }
 

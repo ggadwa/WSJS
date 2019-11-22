@@ -7,6 +7,7 @@ import GeneratePieceClass from './generate_piece.js';
 import GenerateRoomClass from './generate_room.js';
 import GenerateMeshClass from './generate_mesh.js';
 import GenerateStoryClass from './generate_story.js';
+import GenerateLightClass from './generate_light.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 import GenerateBitmapRun from '../bitmap/generate_bitmap_run.js';
 
@@ -289,8 +290,8 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
-        console.info('seed='+seed);
+        seed=1573681354438; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        console.info('Random Seed: '+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
         
@@ -418,7 +419,7 @@ export default class GenerateMapClass
             }
 
                 // room light
-            
+            /*
             if (!room.stairRoom) {
                 intensity=Math.trunc(((room.size.x+room.size.z)*0.5)*0.7)+((segmentSize*0.2)*(room.storyCount-1));
             }
@@ -427,6 +428,8 @@ export default class GenerateMapClass
             }
             light=new LightClass(new PointClass((room.offset.x+(Math.trunc(room.size.x*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(room.size.z*0.5)))),new ColorClass(1,1,1),intensity,0.5);
             map.lightList.add(light);
+            */
+            if (!room.stairRoom) GenerateLightClass.buildRoomLight(this.core,room,('light_'+n),stepBitmap,segmentSize);
         }
         
             // entities

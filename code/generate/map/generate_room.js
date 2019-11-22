@@ -16,6 +16,8 @@ export default class GenerateRoomClass
         this.pathXDeviation=0;
         this.stairDirection=GenerateRoomClass.STAIR_PATH_DIRECTION_Z;
         
+        this.storyPiece=null;
+        
         this.offset=new PointClass(0,0,0);
         if (stairRoom) {
             this.storyCount=2;
