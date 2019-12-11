@@ -290,7 +290,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1573681354438; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -321,7 +321,7 @@ export default class GenerateMapClass
         
             // start room
 
-        room=new GenerateRoomClass(genPiece.getRandomPiece(true),segmentSize,false,false);
+        room=new GenerateRoomClass(genPiece.getRandomPiece(true,false,false),segmentSize,false,false);
         rooms.push(room);
         
             // path rooms
@@ -347,8 +347,9 @@ export default class GenerateMapClass
                 if (room.stairRoom) forwardPath=(room.stairDirection===GenerateRoomClass.STAIR_PATH_DIRECTION_Z);
                 
                     // create the room
+                    // no hallways if we just had one
                         
-                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(false),segmentSize,false,false);
+                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(true,false,(!room.piece.hallway)),segmentSize,false,false);
                 if (!this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,pathXDeviation,forwardPath)) break;
                 
                 if (room.stairRoom) nextRoom.offset.y+=segmentSize;     // last room was a step room, so this room needs to go up
@@ -380,7 +381,7 @@ export default class GenerateMapClass
         for (n=0;n!=roomCount;n++) {
             room=rooms[n];
             if (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.sideRoomFactor)) {
-                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(true),segmentSize,true,false);
+                nextRoom=new GenerateRoomClass(genPiece.getRandomPiece(true,true,false),segmentSize,true,false);
                 if (this.setNextRoomPosition(rooms,room,nextRoom,segmentSize,-pathXDeviation,true)) {
                     nextRoom.offset.y=room.offset.y;
                     rooms.push(nextRoom);

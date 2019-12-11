@@ -2,6 +2,8 @@
 - room uvs need to be better
 
 
+
+
 - need light patterns (middle, cross, lines, corners, etc)
 - need story light spots
 - need light model

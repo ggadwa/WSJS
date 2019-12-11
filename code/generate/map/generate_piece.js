@@ -6,9 +6,11 @@ export default class GeneratePieceClass
             [
                 {
                     "name":"big_box",
-                    "hallways":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
+                    "room":true,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
@@ -19,9 +21,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"small_box",
-                    "hallway":false,
                     "size":{"x":5,"z":5},
                     "multistory":true,
+                    "room":true,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
@@ -32,9 +36,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"circle",
-                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
+                    "room":false,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [4,0],[5,0],[6,0],[8,1],[9,2],[10,4],[10,5],[10,6],[9,8],[8,9],
@@ -43,9 +49,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"half_circle",
-                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
+                    "room":false,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [4,0],[5,0],[6,0],[8,1],[9,2],[10,4],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10],
@@ -55,9 +63,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"half_circle_small",
-                    "hallway":false,
                     "size":{"x":10,"z":5},
                     "multistory":true,
+                    "room":false,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [4,0],[5,0],[6,0],[8,1],[9,2],[10,4],[10,5],
@@ -67,9 +77,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"slant_box",
-                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
+                    "room":false,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,1],[10,2],
@@ -80,9 +92,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"4_exit_box",
-                    "hallway":false,
                     "size":{"x":10,"z":10},
                     "multistory":true,
+                    "room":false,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[6,0],[7,0],[8,0],[9,0],
@@ -93,9 +107,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"small_diamond",
-                    "hallway":false,
                     "size":{"x":5,"z":5},
                     "multistory":true,
+                    "room":false,
+                    "extraRoom":true,
+                    "hallway":false,
                     "vertexes":
                         [
                             [2,0],[3,0],[4,1],[5,2],[5,3],[4,4],[3,5],
@@ -104,9 +120,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"cross_1",
-                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":
                         [
                             [2,0],[3,0],[3,1],[3,2],[4,2],[5,2],[5,3],[4,3],[3,3],[3,4],[3,5],
@@ -115,9 +133,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"cross_2",
-                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":
                         [
                             [0,0],[1,0],[2,1],[3,1],[4,0],[5,0],
@@ -128,9 +148,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"corner_1",
-                    "hallway":true,
                     "size":{"x":3,"z":3},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[3,1],[2,1],[1,1],[1,2],[1,3],[0,3],[0,2],[0,1]
@@ -138,9 +160,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"t_intersection",
-                    "hallway":true,
                     "size":{"x":5,"z":3},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
@@ -149,9 +173,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"s_intersection",
-                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[5,1],
@@ -163,9 +189,11 @@ export default class GeneratePieceClass
                 },
                 {
                     "name":"diagonal_hallway",
-                    "hallway":true,
                     "size":{"x":5,"z":5},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":
                         [
                             [0,0],[1,0],[2,1],[3,2],[4,3],[5,4],[5,5],
@@ -179,23 +207,29 @@ export default class GeneratePieceClass
             [
                 {
                     "name":"stair_z",
-                    "hallway":true,
                     "size":{"x":1,"z":2},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":[[0,0],[1,0],[1,1],[1,2],[0,2],[0,1]]
                 },
                 {
                     "name":"stair_z_2",
-                    "hallway":true,
                     "size":{"x":2,"z":2},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]]
                 },
                 {
                     "name":"stair_z_3",
-                    "hallway":true,
                     "size":{"x":3,"z":2},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":[[0,0],[1,0],[2,0],[3,0],[3,1],[3,2],[2,2],[1,2],[0,2],[0,1]]
                 }
             ];
@@ -204,23 +238,29 @@ export default class GeneratePieceClass
             [
                 {
                     "name":"stair_x",
-                    "hallway":true,
                     "size":{"x":2,"z":1},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":[[0,0],[1,0],[2,0],[2,1],[1,1],[0,1]]
                 },
                 {
                     "name":"stair_x_2",
-                    "hallway":true,
                     "size":{"x":2,"z":2},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]]
                 },
                 {
                     "name":"stair_x_3",
-                    "hallway":true,
                     "size":{"x":2,"z":3},
                     "multistory":false,
+                    "room":false,
+                    "extraRoom":false,
+                    "hallway":true,
                     "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[2,3],[1,3],[0,3],[0,2],[0,1]]
                 }
             ];
@@ -390,17 +430,15 @@ export default class GeneratePieceClass
         return(piece);
     }
 
-    getRandomPiece(roomOnly)
+    getRandomPiece(room,extraRoom,hallway)
     {
         let piece;
         
-        return(this.pieces[0]);
-        
         while (true) {
             piece=this.pieces[GenerateUtilityClass.randomIndex(this.pieces.length)];
-            if (!roomOnly) return(piece);
-            
-            if (!piece.hallway) return(piece);
+            if ((room) && (piece.room)) return(piece);
+            if ((extraRoom) && (piece.extraRoom)) return(piece);
+            if ((hallway) && (piece.hallway)) return(piece);
         }
     }
     

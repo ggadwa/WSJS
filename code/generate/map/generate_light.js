@@ -15,7 +15,7 @@ export default class GenerateLightClass
     {
         let n,nLight;
         let x,y,z,gx,gz,lightSize;
-        let mapLight,intensity;
+        let mapLight,intensity,exponent;
         let gridCheck;
         
             // light sizes
@@ -30,10 +30,10 @@ export default class GenerateLightClass
             
         nLight=GenerateUtilityClass.randomInt(1,5);
         
-        intensity=Math.trunc((Math.max(room.size.x,room.size.z)*0.5)/1);
+        intensity=Math.trunc((Math.max(room.size.x,room.size.z)*0.7)/1);
         
             // create the lights
-        
+        /*
         for (n=0;n!==nLight;n++) {
             
             while (true) {
@@ -44,16 +44,23 @@ export default class GenerateLightClass
                 gridCheck[(gz*room.piece.size.x)+gx]=1;
                 break;
             }
-            
+            */
+           
+            gx=Math.trunc(room.piece.size.x*0.5);
+            gz=Math.trunc(room.piece.size.z*0.5);
+           
             x=room.offset.x+(gx*segmentSize);
             y=room.offset.y+(segmentSize*room.storyCount);
             z=room.offset.z+(gz*segmentSize);
             
             GenerateUtilityClass.addBox(core,(name+'_'+n),lightBitmap,(x-lightSize),(x+lightSize),(y-lightSize),(y+lightSize),(z-lightSize),(z+lightSize),true,true,true,true,true,true,segmentSize);
             
-            mapLight=new LightClass(new PointClass(x,(y-segmentSize),z),new ColorClass(1,1,1),intensity,0.5);
+            exponent=0.5;
+            exponent=0.25;
+            
+            mapLight=new LightClass(new PointClass(x,(y-segmentSize),z),new ColorClass(1,1,1),intensity,exponent);
             core.map.lightList.add(mapLight);
-        }
+    //    }
     }
 }
 
