@@ -7,6 +7,7 @@ import GeneratePieceClass from './generate_piece.js';
 import GenerateRoomClass from './generate_room.js';
 import GenerateMeshClass from './generate_mesh.js';
 import GenerateStoryClass from './generate_story.js';
+import GeneratePillarClass from './generate_pillar.js';
 import GenerateLightClass from './generate_light.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 import GenerateBitmapRun from '../bitmap/generate_bitmap_run.js';
@@ -280,7 +281,7 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n,seed;
-        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,platformBitmap;
+        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap;
         let roomTopY,forwardPath;
         let room,nextRoom,light,genPiece,centerPnt,intensity,isStairRoom;
         let roomCount,segmentSize,pathXDeviation;
@@ -302,12 +303,13 @@ export default class GenerateMapClass
         
             // bitmaps
             
-        roomWallBitmap=GenerateBitmapRun.generateWall(this.core,0);
-        hallWallBitmap=GenerateBitmapRun.generateWall(this.core,1);
-        floorBitmap=GenerateBitmapRun.generateWall(this.core,5);
-        ceilingBitmap=GenerateBitmapRun.generateWall(this.core,4);
-        stepBitmap=GenerateBitmapRun.generateWall(this.core,3);
-        platformBitmap=GenerateBitmapRun.generateWall(this.core,2);
+        roomWallBitmap=GenerateBitmapRun.generateWall(this.core);
+        hallWallBitmap=GenerateBitmapRun.generateWall(this.core);
+        floorBitmap=GenerateBitmapRun.generateFloorOrCeiling(this.core);
+        ceilingBitmap=GenerateBitmapRun.generateFloorOrCeiling(this.core);
+        stepBitmap=GenerateBitmapRun.generateStep(this.core);
+        pillarBitmap=GenerateBitmapRun.generateDecoration(this.core);
+        platformBitmap=GenerateBitmapRun.generatePlatform(this.core);
         
             // we always proceed in a path, so get
             // the deviation for the path
@@ -416,21 +418,23 @@ export default class GenerateMapClass
                 // second stories
                 
             if ((room.piece.multistory) && (room.piece.size.x>=10) && (room.piece.size.z>=10) && (!room.piece.hallway) && (room.storyCount>1) && (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.secondStoryFactor))) {
-                GenerateStoryClass.buildRoomStories(this.core,room,genPiece,('story_'+n),roomWallBitmap,stepBitmap,platformBitmap,segmentSize);
+            //    GenerateStoryClass.buildRoomStories(this.core,room,('story_'+n),roomWallBitmap,stepBitmap,platformBitmap,segmentSize);
             }
+            
+            GeneratePillarClass.buildRoomPillars(this.core,room,('pillar_'+n),pillarBitmap,segmentSize);
 
                 // room light
-            /*
+
             if (!room.stairRoom) {
-                intensity=Math.trunc(((room.size.x+room.size.z)*0.5)*0.7)+((segmentSize*0.2)*(room.storyCount-1));
+                intensity=Math.trunc(((room.size.x+room.size.z)*0.7)*0.8)+((segmentSize*0.2)*(room.storyCount-1));
             }
             else {
                 intensity=Math.trunc(segmentSize*2);
             }
             light=new LightClass(new PointClass((room.offset.x+(Math.trunc(room.size.x*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(room.size.z*0.5)))),new ColorClass(1,1,1),intensity,0.5);
             map.lightList.add(light);
-            */
-            if (!room.stairRoom) GenerateLightClass.buildRoomLight(this.core,room,('light_'+n),stepBitmap,segmentSize);
+
+            //if (!room.stairRoom) GenerateLightClass.buildRoomLight(this.core,room,('light_'+n),stepBitmap,segmentSize);
         }
         
             // entities

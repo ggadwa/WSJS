@@ -13,11 +13,11 @@ export default class GenerateBitmapRun
     {
     }
     
-    static generateWall(core,temp)
+    static generateWall(core)
     {
         let genBitmap;
         
-        switch (temp) {
+        switch (GenerateUtilityClass.randomIndex(4)) {
             case 0:
                 genBitmap=new GenerateBitmapBrickClass(core,false,false,false);
                 break;
@@ -28,13 +28,89 @@ export default class GenerateBitmapRun
                 genBitmap=new GenerateBitmapWoodClass(core,false,false,false);
                 break;
             case 3:
-                genBitmap=new GenerateBitmapConcreteClass(core,false,false,false);
-                break;
-            case 4:
                 genBitmap=new GenerateBitmapMetalClass(core,false,false,false);
                 break;
-            case 5:
+        }
+
+        return(genBitmap.generate());
+    }
+    
+    static generateFloorOrCeiling(core)
+    {
+        let genBitmap;
+        
+        switch(GenerateUtilityClass.randomIndex(4)) {
+            case 0:
+                genBitmap=new GenerateBitmapWoodClass(core,false,false,false);
+                break;
+            case 1:
+                genBitmap=new GenerateBitmapConcreteClass(core,false,false,false);
+                break;
+            case 2:
+                genBitmap=new GenerateBitmapMetalClass(core,false,false,false);
+                break;
+            case 3:
                 genBitmap=new GenerateBitmapTileClass(core,false,false,false);
+                break;
+        }
+        
+        return(genBitmap.generate());
+    }
+    
+    static generatePlatform(core)
+    {
+        let genBitmap;
+        
+        switch (GenerateUtilityClass.randomIndex(3)) {
+            case 0:
+                genBitmap=new GenerateBitmapBrickClass(core,false,false,false);
+                break;
+            case 1:
+                genBitmap=new GenerateBitmapWoodClass(core,false,false,false);
+                break;
+            case 2:
+                genBitmap=new GenerateBitmapMetalClass(core,false,false,false);
+                break;
+        }
+
+        return(genBitmap.generate());
+    }
+    
+    static generateStep(core)
+    {
+        let genBitmap;
+        
+        switch (GenerateUtilityClass.randomIndex(3)) {
+            case 0:
+                genBitmap=new GenerateBitmapBrickClass(core,false,false,false);
+                break;
+            case 1:
+                genBitmap=new GenerateBitmapConcreteClass(core,false,false,false);
+                break;
+            case 2:
+                genBitmap=new GenerateBitmapTileClass(core,false,false,false);
+                break;
+        }
+
+        return(genBitmap.generate());
+    }
+    
+    static generateDecoration(core)
+    {
+        let genBitmap;
+        
+        switch (GenerateUtilityClass.randomIndex(4)) {
+            case 0:
+                genBitmap=new GenerateBitmapBrickClass(core,false,false,false);
+                break;
+            case 1:
+                genBitmap=new GenerateBitmapStoneClass(core,false,false,false);
+                break;
+            case 2:
+                genBitmap=new GenerateBitmapConcreteClass(core,false,false,false);
+                break;
+            case 3:
+                genBitmap=new GenerateBitmapMetalClass(core,false,false,false);
                 break;
         }
 

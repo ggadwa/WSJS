@@ -7,10 +7,10 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateStoryClass
 {
-    static PLATFORM_POS_Z=0;
-    static PLATFORM_NEG_Z=1;
-    static PLATFORM_POS_X=2;
-    static PLATFORM_NEG_X=3;
+    static PLATFORM_DIR_POS_Z=0;
+    static PLATFORM_DIR_NEG_Z=1;
+    static PLATFORM_DIR_POS_X=2;
+    static PLATFORM_DIR_NEG_X=3;
     
     static FLAG_NONE=0;
     static FLAG_STEPS=1;
@@ -26,60 +26,79 @@ export default class GenerateStoryClass
         // steps and lifts
         //
         
-    static buildRoomStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z,storyIdx)
+    static buildRoomStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z)
     {
-        let px,pz;
-        let floorHigh=Math.trunc(segmentSize*0.1);
-        let y=room.offset.y+(storyIdx*segmentSize)+(floorHigh*storyIdx);
+        let n,k,px,pz;
+        let startPosList=[];
+        let y=room.offset.y;
         
-            // determine the direction from which wall is furthest away
-            // we block off the stairs and the block in front of the stairs
+            // steps for each level
+            
+        for (n=0;n<(room.storyCount-1);n++) {
+        
+                // top of steps is the path beginning and
+                // always a wall
 
-        px=room.piece.size.x-x;
-        pz=room.piece.size.z-z;
+            startPosList.push([x,z]);
+            room.setGrid(1,x,z,GenerateStoryClass.FLAG_WALL);
 
-            // pos x
+                // determine the direction from which wall is furthest away
+                // we block off the stairs and the block in front of the stairs
 
-        if ((x>px) && (x>z) && (x>pz)) {
-            room.setGridAllStories((x-1),z,GenerateStoryClass.FLAG_STEPS);
-            room.setGridAllStories((x-2),z,GenerateStoryClass.FLAG_STEPS);
-            room.setGridAllStories((x-3),z,GenerateStoryClass.FLAG_STEPS);
-            GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+((x-2)*segmentSize)),y,(room.offset.z+(z*segmentSize)),GenerateMeshClass.STAIR_DIR_POS_X);
-        }
+            px=room.piece.size.x-x;
+            pz=room.piece.size.z-z;
 
-        else {
+                // pos x
 
-                // neg x
-
-            if ((px>z) && (px>pz)) {
-                room.setGridAllStories((x+1),z,GenerateStoryClass.FLAG_STEPS);
-                room.setGridAllStories((x+2),z,GenerateStoryClass.FLAG_STEPS);
-                room.setGridAllStories((x+3),z,GenerateStoryClass.FLAG_STEPS);
-                GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+((x+1)*segmentSize)),y,(room.offset.z+(z*segmentSize)),GenerateMeshClass.STAIR_DIR_NEG_X);
+            if ((x>px) && (x>z) && (x>pz)) {
+                room.setGridAllStories((x-1),z,GenerateStoryClass.FLAG_STEPS);
+                room.setGridAllStories((x-2),z,GenerateStoryClass.FLAG_STEPS);
+                room.setGridAllStories((x-3),z,GenerateStoryClass.FLAG_STEPS);
+                GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+((x-2)*segmentSize)),y,(room.offset.z+(z*segmentSize)),GenerateMeshClass.STAIR_DIR_POS_X);
             }
 
             else {
+                
+                    // neg x
 
-                    // pos x
-
-                if (z>pz) {
-                    room.setGridAllStories(x,(z-1),GenerateStoryClass.FLAG_STEPS);
-                    room.setGridAllStories(x,(z-2),GenerateStoryClass.FLAG_STEPS);
-                    room.setGridAllStories(x,(z-3),GenerateStoryClass.FLAG_STEPS);
-                    GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+(x*segmentSize)),y,(room.offset.z+((z-2)*segmentSize)),GenerateMeshClass.STAIR_DIR_POS_Z);
+                if ((px>z) && (px>pz)) {
+                    room.setGridAllStories((x+1),z,GenerateStoryClass.FLAG_STEPS);
+                    room.setGridAllStories((x+2),z,GenerateStoryClass.FLAG_STEPS);
+                    room.setGridAllStories((x+3),z,GenerateStoryClass.FLAG_STEPS);
+                    GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+((x+1)*segmentSize)),y,(room.offset.z+(z*segmentSize)),GenerateMeshClass.STAIR_DIR_NEG_X);
                 }
-
+                
                 else {
 
-                        // neg z
+                        // pos x
 
-                    room.setGridAllStories(x,(z+1),GenerateStoryClass.FLAG_STEPS);
-                    room.setGridAllStories(x,(z+2),GenerateStoryClass.FLAG_STEPS);
-                    room.setGridAllStories(x,(z+3),GenerateStoryClass.FLAG_STEPS);
-                    GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+(x*segmentSize)),y,(room.offset.z+((z+1)*segmentSize)),GenerateMeshClass.STAIR_DIR_NEG_Z);
+                    if (z>pz) {
+                        room.setGridAllStories(x,(z-1),GenerateStoryClass.FLAG_STEPS);
+                        room.setGridAllStories(x,(z-2),GenerateStoryClass.FLAG_STEPS);
+                        room.setGridAllStories(x,(z-3),GenerateStoryClass.FLAG_STEPS);
+                        GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+(x*segmentSize)),y,(room.offset.z+((z-2)*segmentSize)),GenerateMeshClass.STAIR_DIR_POS_Z);
+                    }
+                    
+                    else {
+
+                            // neg z
+
+                        room.setGridAllStories(x,(z+1),GenerateStoryClass.FLAG_STEPS);
+                        room.setGridAllStories(x,(z+2),GenerateStoryClass.FLAG_STEPS);
+                        room.setGridAllStories(x,(z+3),GenerateStoryClass.FLAG_STEPS);
+                        GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+(x*segmentSize)),y,(room.offset.z+((z+1)*segmentSize)),GenerateMeshClass.STAIR_DIR_NEG_Z);
+                    }
                 }
             }
+            
+                // next level
+                
+                x+=2;
+                
+            y+=segmentSize;
         }
+        
+        return(startPosList);
     }
     
     static buildRoomLift(core,room,name,bitmap,segmentSize,x,z)
@@ -140,117 +159,225 @@ export default class GenerateStoryClass
         // second story segments
         //
         
-    static hasNegXWall(room,storyPiece,gridOn,x,z,xOff,zOff)
+    static hasNegXWall(room,storyIdx,x,z)
     {
-        if (((x+xOff)===0) || (x===0)) return(true);
-        return(!gridOn[storyPiece.grid[z][x-1]]);
-    }
-    
-    static hasPosXWall(room,storyPiece,gridOn,x,z,xOff,zOff)
-    {
-        if (((x+xOff)===(room.piece.size.x-1)) || (x===(storyPiece.size.x-1))) return(true);
-        return(!gridOn[storyPiece.grid[z][x+1]]);
-    }
-    
-    static hasNegZWall(room,storyPiece,gridOn,x,z,xOff,zOff)
-    {
-        if (((z+zOff)===0) || (z===0)) return(true);
-        return(!gridOn[storyPiece.grid[z-1][x]]);
-    }
-    
-    static hasPosZWall(room,storyPiece,gridOn,x,z,xOff,zOff)
-    {
-        if (((z+zOff)===(room.piece.size.z-1)) || (z===(storyPiece.size.z-1))) return(true);
-        return(!gridOn[storyPiece.grid[z+1][x]]);
-    }
+        let flag,flag2;
+        
+        if (x===0) return(false);
 
-    static buildRoomStories(core,room,genPiece,name,wallBitmap,stepBitmap,segmentBitmap,segmentSize)
+        flag=room.getGrid(storyIdx,x,z);
+        flag2=room.getGrid(storyIdx,(x-1),z);
+        
+        if ((flag2===GenerateStoryClass.FLAG_NONE) || (flag2===GenerateStoryClass.FLAG_STAIRS) || (flag2===GenerateStoryClass.FLAG_LIFT)) return(true);
+        if (flag===flag2) return(false);           // if both the same type of wall, eliminate
+        if ((flag===GenerateStoryClass.FLAG_PLATFORM) && (flag2===GenerateStoryClass.FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+        return(true);
+    }
+    
+    static hasPosXWall(room,storyIdx,x,z)
     {
-        let n,x,z,ty,by,xOff,zOff;
-        let negX,posX,negZ,posZ,storyPiece;
-        let gridOn=[];
+        let flag,flag2;
+        
+        if (x===(room.piece.size.x-1)) return(false);
+        
+        flag=room.getGrid(storyIdx,x,z);
+        flag2=room.getGrid(storyIdx,(x+1),z);
+        
+        if ((flag2===GenerateStoryClass.FLAG_NONE) || (flag2===GenerateStoryClass.FLAG_STAIRS) || (flag2===GenerateStoryClass.FLAG_LIFT)) return(true);
+        if (flag===flag2) return(false);           // if both the same type of wall, eliminate
+        if ((flag===GenerateStoryClass.FLAG_PLATFORM) && (flag2===GenerateStoryClass.FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+        return(true);
+    }
+    
+    static hasNegZWall(room,storyIdx,x,z)
+    {
+        let flag,flag2;
+        
+        if (z===0) return(false);
+        
+        flag=room.getGrid(storyIdx,x,z);
+        flag2=room.getGrid(storyIdx,x,(z-1));
+        
+        if ((flag2===GenerateStoryClass.FLAG_NONE) || (flag2===GenerateStoryClass.FLAG_STAIRS) || (flag2===GenerateStoryClass.FLAG_LIFT)) return(true);
+        if (flag===flag2) return(false);           // if both the same type of wall, eliminate
+        if ((flag===GenerateStoryClass.FLAG_PLATFORM) && (flag2===GenerateStoryClass.FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+        return(true);
+    }
+    
+    static hasPosZWall(room,storyIdx,x,z)
+    {
+        let flag,flag2;
+        
+        if (z===(room.piece.size.z-1)) return(false);
+        
+        flag=room.getGrid(storyIdx,x,z);
+        flag2=room.getGrid(storyIdx,x,(z+1));
+        
+        if ((flag2===GenerateStoryClass.FLAG_NONE) || (flag2===GenerateStoryClass.FLAG_STAIRS) || (flag2===GenerateStoryClass.FLAG_LIFT)) return(true);
+        if (flag===flag2) return(false);           // if both the same type of wall, eliminate
+        if ((flag===GenerateStoryClass.FLAG_PLATFORM) && (flag2===GenerateStoryClass.FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
+        return(true);
+    }
+            
+    static buildRoomSingleStory(core,room,name,segmentBitmap,segmentSize,startX,startZ,storyIdx)
+    {
+        let x,z,gx,gz,sx,sz,ty,by;
+        let negX,posX,negZ,posZ;
+        let dir,orgDir;
+        let wallStop,skipBottom;
         let vertexArray=[];
         let indexArray=[];
         let normalArray=[];
         let uvArray,tangentArray;
-        let trigIdx;
+        let trigIdx,flag;
         let floorHigh=Math.trunc(segmentSize*0.1);
         
-            // set the second story piece
-            
-        storyPiece=genPiece.getPlatformPiece();
-        room.storyPiece=storyPiece;
+        gx=startX;
+        gz=startZ;
         
-            // offset for story piece
+            // start the random wander of segments
+
+        while (true) {
+
+                // next random direction
+                
+            dir=GenerateUtilityClass.randomIndex(4);
+            orgDir=dir;
             
-        xOff=Math.trunc((room.piece.size.x-storyPiece.size.x)*0.5);
-        zOff=Math.trunc((room.piece.size.z-storyPiece.size.z)*0.5);
-        
-            // grids 0 is always off, 1 always on
-            // grids 2-9 are randomly turned on/off
+                // find open direction
+                
+            wallStop=false;
             
-        gridOn.push(false);
-        gridOn.push(true);
-        
-        for (n=2;n!==10;n++) {
-            gridOn.push(GenerateUtilityClass.randomPercentage(0.5));
+            while (true) {
+
+                switch (dir) {
+                    case GenerateStoryClass.PLATFORM_DIR_POS_Z:
+                        sx=gx;
+                        sz=gz+1;
+                        break;
+                    case GenerateStoryClass.PLATFORM_DIR_NEG_Z:
+                        sx=gx;
+                        sz=gz-1;
+                        break;
+                    case GenerateStoryClass.PLATFORM_DIR_POS_X:
+                        sx=gx+1;
+                        sz=gz;
+                        break;
+                    case GenerateStoryClass.PLATFORM_DIR_NEG_X:
+                        sx=gx-1;
+                        sz=gz;
+                        break;
+                }
+
+                if ((room.getGrid(storyIdx,sx,sz)!==GenerateStoryClass.FLAG_NONE) || (sx<0) || (sx>=room.piece.size.x) || (sz<0) || (sz>=room.piece.size.z)) {
+                    dir++;
+                    if (dir===4) dir=0;
+                    if (dir===orgDir) {
+                        wallStop=true;
+                        break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+            
+            if (wallStop) break;
+            
+                // add grid spot
+                
+            room.setGrid(storyIdx,sx,sz,GenerateStoryClass.FLAG_PLATFORM);
+            
+            gx=sx;
+            gz=sz;
+        }
+
+            // randomly make stripes where stories
+            // become solid walls instead of floating blocks
+            // only do it on first story
+            
+        if (storyIdx===1) {
+            for (x=1;x<(room.piece.size.x-1);x++) {
+                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                    for (z=1;z<(room.piece.size.z-1);z++) {
+                        if (room.getGrid(storyIdx,x,z)===GenerateStoryClass.FLAG_PLATFORM) room.setGrid(storyIdx,x,z,GenerateStoryClass.FLAG_WALL);
+                    }
+                }
+            }
+
+            for (z=1;z<(room.piece.size.z-1);z++) {
+                if (GenerateUtilityClass.randomPercentage(0.2)) {
+                    for (x=1;x<(room.piece.size.x-1);x++) {
+                        if (room.getGrid(storyIdx,x,z)===GenerateStoryClass.FLAG_PLATFORM) room.setGrid(storyIdx,x,z,GenerateStoryClass.FLAG_WALL);
+                    }
+                }
+            }
         }
         
             // make the segments
         
         trigIdx=0;
         
-        for (z=0;z!==storyPiece.size.z;z++) {
-            for (x=0;x!==storyPiece.size.x;x++) {
-                if (!gridOn[storyPiece.grid[z][x]]) continue;
+        for (z=0;z!==room.piece.size.z;z++) {
+            for (x=0;x!==room.piece.size.x;x++) {
+                flag=room.getGrid(storyIdx,x,z);
+                if ((flag!==GenerateStoryClass.FLAG_PLATFORM) && (flag!==GenerateStoryClass.FLAG_WALL)) continue;
 
                     // create the segments
                     
-                ty=room.offset.y+(segmentSize+floorHigh);
-                by=room.offset.y+segmentSize;
+                if (flag===GenerateStoryClass.FLAG_PLATFORM) {
+                    ty=room.offset.y+((segmentSize*storyIdx)+floorHigh);
+                    by=room.offset.y+(segmentSize*storyIdx);
+                    skipBottom=false;
+                }
+                else {
+                    ty=room.offset.y+((segmentSize*storyIdx)+floorHigh);
+                    by=room.offset.y+(segmentSize*(storyIdx-1));
+                    skipBottom=true;
+                }
                 
-                negX=room.offset.x+((x+xOff)*segmentSize);
-                posX=room.offset.x+(((x+xOff)+1)*segmentSize);
-                negZ=room.offset.z+((z+zOff)*segmentSize);
-                posZ=room.offset.z+(((z+zOff)+1)*segmentSize);
+                negX=room.offset.x+(x*segmentSize);
+                posX=room.offset.x+((x+1)*segmentSize);
+                negZ=room.offset.z+(z*segmentSize);
+                posZ=room.offset.z+((z+1)*segmentSize);
                 
-                if (this.hasNegXWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
+                if (this.hasNegXWall(room,storyIdx,x,z)) {
                     vertexArray.push(negX,ty,negZ,negX,ty,posZ,negX,by,posZ,negX,by,negZ);
                     normalArray.push(-1,0,0,-1,0,0,-1,0,0,-1,0,0);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
-                if (this.hasPosXWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
+                if (this.hasPosXWall(room,storyIdx,x,z)) {
                     vertexArray.push(posX,ty,negZ,posX,ty,posZ,posX,by,posZ,posX,by,negZ);
                     normalArray.push(1,0,0,1,0,0,1,0,0,1,0,0);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
-                    // top and bottom
+                    // always draw the top
                     
                 vertexArray.push(negX,ty,negZ,negX,ty,posZ,posX,ty,posZ,posX,ty,negZ);
                 normalArray.push(0,1,0,0,1,0,0,1,0,0,1,0);
                 trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
 
-                vertexArray.push(negX,by,negZ,negX,by,posZ,posX,by,posZ,posX,by,negZ);
-                normalArray.push(0,-1,0,0,-1,0,0,-1,0,0,-1,0);
-                trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
+                if (!skipBottom) {
+                    vertexArray.push(negX,by,negZ,negX,by,posZ,posX,by,posZ,posX,by,negZ);
+                    normalArray.push(0,-1,0,0,-1,0,0,-1,0,0,-1,0);
+                    trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
+                }
                 
-                if (this.hasNegZWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
+                if (this.hasNegZWall(room,storyIdx,x,z)) {
                     vertexArray.push(negX,ty,negZ,posX,ty,negZ,posX,by,negZ,negX,by,negZ);
                     normalArray.push(0,0,-1,0,0,-1,0,0,-1,0,0,-1);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 }
                 
-                if (this.hasPosZWall(room,storyPiece,gridOn,x,z,xOff,zOff)) {
+                if (this.hasPosZWall(room,storyIdx,x,z)) {
                     vertexArray.push(negX,ty,posZ,posX,ty,posZ,posX,by,posZ,negX,by,posZ);
                     normalArray.push(0,0,1,0,0,1,0,0,1,0,0,1);
                     trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
                 }
             }
         }
-        
-        if (trigIdx===0) return;
         
         uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
@@ -261,52 +388,40 @@ export default class GenerateStoryClass
         //
         // second story mainline
         //
-        /*
-    static buildRoomStories(core,room,genPiece,name,wallBitmap,stepBitmap,segmentBitmap,segmentSize)
+        
+    static buildRoomStories(core,room,name,wallBitmap,stepBitmap,segmentBitmap,segmentSize)
     {
-        let n,storyPiece;
+        let n,x,z,pos;
+        let startPosList;
         
-            // create the stories
+            // starting position
             
-        //for (n=1;n<room.storyCount;n++) {
+        x=GenerateUtilityClass.randomInt(2,(room.piece.size.x-4));
+        z=GenerateUtilityClass.randomInt(2,(room.piece.size.z-4));
         
-        n=1;
+            // stairs or lifts, lifts go up all levels
+            // stairs go up in a pattern
+            // random start position for stairs or lift
             
-            storyPiece=genPiece.getPlatformPiece();
-
-                
-
-                // build stairs or lifts
-                
-            switch (storySide) {
-                case GenerateStoryClass.PLATFORM_POS_Z:
-                    x=GenerateUtilityClass.randomInt(1,(room.piece.size.x-2));
-                    z=GenerateUtilityClass.randomInt((room.piece.size.z-storyWidth),storyWidth);
-                    break;
-                case GenerateStoryClass.PLATFORM_NEG_Z:
-                    x=GenerateUtilityClass.randomInt(1,(room.piece.size.x-2));
-                    z=GenerateUtilityClass.randomInt(0,storyWidth);
-                    break;
-                case GenerateStoryClass.PLATFORM_POS_X:
-                    x=GenerateUtilityClass.randomInt((room.piece.size.x-storyWidth),storyWidth);
-                    z=GenerateUtilityClass.randomInt(1,(room.piece.size.z-2));
-                    break;
-                case GenerateStoryClass.PLATFORM_NEG_X:
-                    x=GenerateUtilityClass.randomInt(0,storyWidth);
-                    z=GenerateUtilityClass.randomInt(1,(room.piece.size.z-2));
-                    break;
-            }
-                
-            this.buildRoomStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z,(n-1));
-
-           
-                // and build the platform mesh
-                
-            this.buildRoomSingleStory(core,room,name,storyPiece,segmentBitmap,segmentSize,n);
-        //}
+            // stairs
             
+        if (GenerateUtilityClass.randomPercentage(1.0)) {
+            startPosList=this.buildRoomStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z,n);
+        }
+
+            // lifts
+            // all lift stories start at same position
+            
+        else {
+            startPosList=this.buildRoomLift(core,room,name,stepBitmap,segmentSize,x,z);
+        }
+        
+            // build the story segments
+            
+        for (n=1;n<room.storyCount;n++) {
+            pos=startPosList[n-1];
+            this.buildRoomSingleStory(core,room,name,segmentBitmap,segmentSize,pos[0],pos[1],n);
+        }
     }
-        
-         */
 }
 

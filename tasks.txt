@@ -1,19 +1,32 @@
+
+- bitmaps
+   -> computer
+   -> hexagon
+   -> mosaic
+
+- items
+   -> pillars (working)
+   -> storage
+   -> computers (add, in grid)
+
+
+- Need ability to AG maps in all 4 directions
+- Need non-path type maps (circular, reverse direction?)
+- Need to be able to go up/down with stairs
+
+- network needs "master" (first in) for games
+
+
 - need to make statics for all generate_bitmap_base statics
 - room uvs need to be better
-
-
-
-
 - need light patterns (middle, cross, lines, corners, etc)
 - need story light spots
 - need light model
-
 - second story steps need work
 - big room type (second stories, hole, empty)
 - need more small rooms
 - door frames
 - need to start player outside blocked grid
-
 - star (line) pattern for tiles?  raised squares?
 - better specs (generated with color?)
 
