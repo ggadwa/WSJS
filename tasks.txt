@@ -5,6 +5,7 @@
    -> mosaic
 
 - items
+   -> lifts only for second stories
    -> pillars (working)
    -> storage
    -> computers (add, in grid)

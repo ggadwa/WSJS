@@ -23,90 +23,14 @@ export default class GenerateStoryClass
     }
     
         //
-        // steps and lifts
+        // lifts
         //
-        
-    static buildRoomStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z)
-    {
-        let n,k,px,pz;
-        let startPosList=[];
-        let y=room.offset.y;
-        
-            // steps for each level
-            
-        for (n=0;n<(room.storyCount-1);n++) {
-        
-                // top of steps is the path beginning and
-                // always a wall
-
-            startPosList.push([x,z]);
-            room.setGrid(1,x,z,GenerateStoryClass.FLAG_WALL);
-
-                // determine the direction from which wall is furthest away
-                // we block off the stairs and the block in front of the stairs
-
-            px=room.piece.size.x-x;
-            pz=room.piece.size.z-z;
-
-                // pos x
-
-            if ((x>px) && (x>z) && (x>pz)) {
-                room.setGridAllStories((x-1),z,GenerateStoryClass.FLAG_STEPS);
-                room.setGridAllStories((x-2),z,GenerateStoryClass.FLAG_STEPS);
-                room.setGridAllStories((x-3),z,GenerateStoryClass.FLAG_STEPS);
-                GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+((x-2)*segmentSize)),y,(room.offset.z+(z*segmentSize)),GenerateMeshClass.STAIR_DIR_POS_X);
-            }
-
-            else {
-                
-                    // neg x
-
-                if ((px>z) && (px>pz)) {
-                    room.setGridAllStories((x+1),z,GenerateStoryClass.FLAG_STEPS);
-                    room.setGridAllStories((x+2),z,GenerateStoryClass.FLAG_STEPS);
-                    room.setGridAllStories((x+3),z,GenerateStoryClass.FLAG_STEPS);
-                    GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+((x+1)*segmentSize)),y,(room.offset.z+(z*segmentSize)),GenerateMeshClass.STAIR_DIR_NEG_X);
-                }
-                
-                else {
-
-                        // pos x
-
-                    if (z>pz) {
-                        room.setGridAllStories(x,(z-1),GenerateStoryClass.FLAG_STEPS);
-                        room.setGridAllStories(x,(z-2),GenerateStoryClass.FLAG_STEPS);
-                        room.setGridAllStories(x,(z-3),GenerateStoryClass.FLAG_STEPS);
-                        GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+(x*segmentSize)),y,(room.offset.z+((z-2)*segmentSize)),GenerateMeshClass.STAIR_DIR_POS_Z);
-                    }
-                    
-                    else {
-
-                            // neg z
-
-                        room.setGridAllStories(x,(z+1),GenerateStoryClass.FLAG_STEPS);
-                        room.setGridAllStories(x,(z+2),GenerateStoryClass.FLAG_STEPS);
-                        room.setGridAllStories(x,(z+3),GenerateStoryClass.FLAG_STEPS);
-                        GenerateMeshClass.buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,(room.offset.x+(x*segmentSize)),y,(room.offset.z+((z+1)*segmentSize)),GenerateMeshClass.STAIR_DIR_NEG_Z);
-                    }
-                }
-            }
-            
-                // next level
-                
-                x+=2;
-                
-            y+=segmentSize;
-        }
-        
-        return(startPosList);
-    }
-    
-    static buildRoomLift(core,room,name,bitmap,segmentSize,x,z)
+  
+    static buildRoomLift(core,room,name,bitmap,segmentSize)
     {
         let n,sx,sz,y,meshIdx;
         let liftName,moveMilliSec,waitMilliSec;
         let movement;
-        let startPosList=[];
         let floorHigh=Math.trunc(segmentSize*0.1);
         
             // block off all the stories
@@ -145,14 +69,6 @@ export default class GenerateStoryClass
         movement.addMove(new MoveClass(moveMilliSec,new PointClass(0,0,0),new PointClass(0,0,0),MoveClass.PAUSE_NONE,null,null,null));
 
         core.map.movementList.add(movement);
-        
-            // lifts have the same start position on all stories
-            
-        for (n=0;n<(room.storyCount-1);n++) {
-            startPosList.push([x,z]);
-        }
-
-        return(startPosList);
     }
     
         //
@@ -391,36 +307,21 @@ export default class GenerateStoryClass
         
     static buildRoomStories(core,room,name,wallBitmap,stepBitmap,segmentBitmap,segmentSize)
     {
-        let n,x,z,pos;
-        let startPosList;
+        let n,x,z;
         
             // starting position
             
         x=GenerateUtilityClass.randomInt(2,(room.piece.size.x-4));
         z=GenerateUtilityClass.randomInt(2,(room.piece.size.z-4));
         
-            // stairs or lifts, lifts go up all levels
-            // stairs go up in a pattern
-            // random start position for stairs or lift
+            // lift
             
-            // stairs
-            
-        if (GenerateUtilityClass.randomPercentage(1.0)) {
-            startPosList=this.buildRoomStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,z,n);
-        }
-
-            // lifts
-            // all lift stories start at same position
-            
-        else {
-            startPosList=this.buildRoomLift(core,room,name,stepBitmap,segmentSize,x,z);
-        }
+        this.buildRoomLift(core,room,name,stepBitmap,segmentSize,x,z);
         
             // build the story segments
             
         for (n=1;n<room.storyCount;n++) {
-            pos=startPosList[n-1];
-            this.buildRoomSingleStory(core,room,name,segmentBitmap,segmentSize,pos[0],pos[1],n);
+            this.buildRoomSingleStory(core,room,name,segmentBitmap,segmentSize,x,z,n);
         }
     }
 }
