@@ -15,109 +15,104 @@ export default class GeneratePillarClass
     }
     
         //
-        // pillar types
+        // pillar patterns
         //
-        /*
-    addPillarSingle(core,room,name,pillarBitmap,x,z,segmentSize)
-    {
-        let x,z,yBound,pos,radius;
-        let platformXBound,platformYBound,platformZBound;
         
-            // check the grid to avoid blocking stairs
-            
-        if (room.checkBlockGrid(0,rect.lft,rect.top)) return;
-
-            // position
-            
-        x=room.xBound.min+Math.trunc(((rect.lft+rect.rgt)*constants.ROOM_BLOCK_WIDTH)*0.5);
-        z=room.zBound.min+Math.trunc(((rect.top+rect.bot)*constants.ROOM_BLOCK_WIDTH)*0.5);
-        yBound=room.getGroundFloorSpawnToFirstPlatformOrTopBound(rect.lft,rect.top);
-        
-            // possible platforms
-            
-        if (this.hasPlatform) {
-            platformXBound=new BoundClass((room.xBound.min+(rect.lft*constants.ROOM_BLOCK_WIDTH)),(room.xBound.min+(rect.rgt*constants.ROOM_BLOCK_WIDTH)));
-            platformZBound=new BoundClass((room.zBound.min+(rect.top*constants.ROOM_BLOCK_WIDTH)),(room.zBound.min+(rect.bot*constants.ROOM_BLOCK_WIDTH)));
-            
-            platformYBound=new BoundClass(yBound.min,(yBound.min+constants.ROOM_FLOOR_DEPTH));
-            this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,false,true,false,constants.MESH_FLAG_DECORATION));
-
-            platformYBound=new BoundClass((yBound.max-constants.ROOM_FLOOR_DEPTH),yBound.max);
-            this.map.meshList.add(MeshPrimitivesClass.createMeshCube(this.view,this.platformBitmap,platformXBound,platformYBound,platformZBound,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION));
-
-            yBound.min+=constants.ROOM_FLOOR_DEPTH;
-            yBound.max-=constants.ROOM_FLOOR_DEPTH;
-        }
-        
-            // the pillar itself
-            
-        pos=new PointClass(x,yBound.max,z);
-        radius=Math.trunc(((rect.rgt-rect.lft)*constants.ROOM_BLOCK_WIDTH)*0.3);
-        
-        this.map.meshList.add(MeshPrimitivesClass.createMeshCylinder(this.view,this.pillarBitmap,pos,yBound,this.segments,radius,false,false,constants.MESH_FLAG_DECORATION));
-    }
-        */
-    /*
-    addPillarLineX(room,rect)
+    static buildCheckboardPillarPattern(core,room)
     {
         let x,z;
-        let pillarRect=new RectClass(0,0,0,0);
+        let posList=[];
         
-        z=Math.trunc((rect.top+rect.bot)*0.5);
-        
-        for (x=rect.lft;x!==rect.rgt;x++) {
-            pillarRect.setFromValues(x,z,(x+1),(z+1));
-            this.addPillarSingle(room,pillarRect);
+        for (z=1;z<(room.piece.size.z-1);z+=2) {
+            for (x=1;x<(room.piece.size.x-1);x+=2) {
+                posList.push([x,z]);
+            }
         }
+        
+        return(posList);
     }
-    
-    addPillarLineZ(room,rect)
+
+    static buildHorizontalPillarPattern(core,room)
     {
         let x,z;
-        let pillarRect=new RectClass(0,0,0,0);
+        let posList=[];
         
-        x=Math.trunc((rect.lft+rect.rgt)*0.5);
+        z=Math.trunc(room.piece.size.z*0.5);
         
-        for (z=rect.top;z!==rect.bot;z++) {
-            pillarRect.setFromValues(x,z,(x+1),(z+1));
-            this.addPillarSingle(room,pillarRect);
+        for (x=1;x<(room.piece.size.x-1);x+=2) {
+            posList.push([x,z]);
         }
+        
+        return(posList);
     }
-    */
+
+    static buildVerticalPillarPattern(core,room)
+    {
+        let x,z;
+        let posList=[];
+        
+        x=Math.trunc(room.piece.size.x*0.5);
+        
+        for (z=1;z<(room.piece.size.z-1);z+=2) {
+            posList.push([x,z]);
+        }
+        
+        return(posList);
+    }
+
+    static buildCornerPillarPattern(core,room)
+    {
+        let x=room.piece.size.x-2;
+        let z=room.piece.size.z-2;
+        
+        return([[1,1],[x,1],[1,z],[x,z]]);
+    }
+   
         //
         // pillars
         //
     
     static buildRoomPillars(core,room,name,pillarBitmap,segmentSize)
     {
-        let centerPt=new PointClass(room.offset.x,0,room.offset.z);
-        let yBound=new BoundClass(room.offset.y,room.offset.y+8000);
+        let n,x,z,posList;
+        let offset,radius;
+        let centerPnt=new PointClass(0,0,0);
+        let yBound=new BoundClass(room.offset.y,room.offset.y+(room.storyCount*segmentSize));
+        let cylinderSegments=GenerateMeshClass.createCylinderSegmentList(1,(4*room.storyCount));
         
-        let segments=GenerateMeshClass.createCylinderSegmentList(1,4);
-        
-        GenerateMeshClass.createCylinder(core,room,name,pillarBitmap,centerPt,yBound,segments,2500,false,false);
-        
-        //this.addPillarSingle(core,room,name,pillarBitmap,3,3,segmentSize);
-        
-        /*
-            // determine if this is a square rect
-            // if so, one big pillar
+            // get pillar positions
             
-        if (rect.isSquare()) {
-            this.addPillarSingle(room,rect);
-            return;
-        }
-        
-            // otherwise a line across the rect
-        
-        if (rect.isXLarger()) {
-            this.addPillarLineX(room,rect);
-        }
-        else {
-            this.addPillarLineZ(room,rect);
-        }
+        switch(GenerateUtilityClass.randomIndex(4)) {
             
-         */
+            case 0:
+                posList=this.buildCheckboardPillarPattern(core,room);
+                break;
+            
+            case 1:
+                posList=this.buildHorizontalPillarPattern(core,room);
+                break;
+                
+            case 2:
+                posList=this.buildVerticalPillarPattern(core,room);
+                break;
+                
+            case 3:
+                posList=this.buildCornerPillarPattern(core,room);
+                break;
+            
+        }
+        
+            // build the pillars
+            
+        offset=Math.trunc(segmentSize*0.5);
+        radius=Math.trunc(offset*0.8);
+            
+        for (n=0;n!=posList.length;n++) {
+            x=room.offset.x+((posList[n][0]*segmentSize)+offset);
+            z=room.offset.z+((posList[n][1]*segmentSize)+offset);
+            centerPnt.setFromValues(x,0,z);
+            GenerateMeshClass.createCylinder(core,room,(name+'_'+n),pillarBitmap,centerPnt,yBound,cylinderSegments,radius,false,false);
+        }
     }
     
 }

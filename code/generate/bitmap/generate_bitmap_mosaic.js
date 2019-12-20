@@ -9,6 +9,8 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    
     constructor(core)
     {
         super(core,true,true,false);
@@ -19,11 +21,12 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
         // mosaic bitmaps
         //
 
-    generateInternal()
+    generateInternal(variationMode)
     {
-        let x,y,lft,rgt,top,bot,tileWid,tileHigh;
+        let x,y,lft,rgt,top,bot,lx,rx,ty,by,tileWid,tileHigh;
         let splitCount,borderSize,edgeSize;
-        let mortarColor,borderColor,mosaicColor,mosaic2Color,col;
+        let mortarColor,borderColor,mosaicColor,mosaic2Color;
+        let col,frameCol;
         
             // some random values
 
@@ -39,13 +42,20 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
         
             // tile sizes
             
-        tileWid=this.bitmapCanvas.width/splitCount;
-        tileHigh=this.bitmapCanvas.height/splitCount;
+        tileWid=this.colorImgData.width/splitCount;
+        tileHigh=this.colorImgData.height/splitCount;
 
             // clear canvases to mortar
 
-        this.drawRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,mortarColor);
-        this.addNoiseRect(0,0,this.bitmapCanvas.width,this.bitmapCanvas.height,0.6,0.8,0.9);
+        this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,mortarColor);
+        this.createPerlinNoiseData(16,16);
+        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.6,1.2);
+        this.drawStaticNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.7,1.1);
+        this.blur(this.colorImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,1,false);
+        
+        this.createNormalNoiseData(2.5,0.5);
+        this.drawNormalNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height);
+        this.blur(this.normalImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,1,false);
 
             // draw the tiles
         
@@ -69,17 +79,31 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
                 }
 
                 rgt=(lft+tileWid)-borderSize;
+                
+                    // position
+                    
+                lx=Math.trunc(lft);
+                rx=Math.trunc(rgt);
+                ty=Math.trunc(top);
+                by=Math.trunc(bot);
 
-                this.draw3DRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col,true);
+                //this.draw3DRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col,true);
+                
+                frameCol=this.adjustColorRandom(col,0.85,0.95);
+                
+                this.drawRect(lx,ty,rx,by,col);
+                this.draw3DFrameRect(lx,ty,rx,by,edgeSize,frameCol,true);
+                
+                
                 
                     // noise and blur
                 
-                this.addNoiseRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),1.1,1.3,0.5);
-                this.blur(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),3,false);
+                //this.addNoiseRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),1.1,1.3,0.5);
+                //this.blur(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),3,false);
                 
                     // any cracks
                     
-                this.drawSmallCrack(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
+                //this.drawSmallCrack(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
 
                 lft+=tileWid;
             }

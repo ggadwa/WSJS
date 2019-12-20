@@ -8,6 +8,9 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    static VARIATION_BOX=1;
+    
     static CORRUGATION_LINES=
             [
                 [[[0.0,1.0],[1.0,0.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,0.0],[1.0,1.0]],[[0.0,1.0],[1.0,0.0]]],  // diamonds
@@ -180,9 +183,10 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         }
     }
     
-    generateInternal()
+    generateInternal(variationMode)
     {
         let mx,my;
+        let panelType;
         
         let metalColor=this.getRandomColor();
         let altMetalColor=this.getRandomColor();
@@ -193,8 +197,10 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
             
         mx=Math.trunc(this.colorCanvas.width*0.5);
         my=Math.trunc(this.colorCanvas.height*0.5);
+        
+        panelType=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(3);
             
-        switch (GenerateUtilityClass.randomIndex(3)) {
+        switch (panelType) {
             case 0:
                 this.generateMetalPanel(0,0,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize);
                 break;

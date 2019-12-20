@@ -238,31 +238,130 @@ export default class GenerateMeshClass
         this.buildStairs(core,room,name,stepBitmap,segmentSize,room.offset.x,room.offset.y,room.offset.z,dir,stepWidth,false);
     }
     
-    static buildStoryStairs(core,room,name,wallBitmap,stepBitmap,segmentSize,x,y,z,dir)
+        //
+        // cubes
+        //
+
+    static createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,wholeUV,segmentSize)
     {
-        let stepSize=Math.trunc((segmentSize*10)*0.02);
+        let idx,centerPnt,rotPnt;
+        let n,mesh;
+        let vertexArray=[];
+        let uvArray=[];
+        let normalArray,tangentArray;
+        let indexArray=[];
         
-            // the steps
+        idx=0;
+
+            // left
+
+        if (left) {
+            vertexArray.push(xBound.min,yBound.min,zBound.min);
+            vertexArray.push(xBound.min,yBound.min,zBound.max);        
+            vertexArray.push(xBound.min,yBound.max,zBound.max);     
+            vertexArray.push(xBound.min,yBound.max,zBound.min);
             
-        this.buildStairs(core,room,name,stepBitmap,segmentSize,x,y,z,dir,1,true);
-        
-            // the sides
-/*
-        switch (dir) {
-            case GenerateMeshClass.STAIR_DIR_POS_Z:
-            case GenerateMeshClass.STAIR_DIR_NEG_Z:
-                GenerateUtilityClass.addBox(core,(name+'_side1'),wallBitmap,(x-stepSize),x,room.offset.y,(room.offset.y+segmentSize),z,(z+(segmentSize*2)),true,true,false,true,true,true,segmentSize);
-                GenerateUtilityClass.addBox(core,(name+'_side1'),wallBitmap,(x+segmentSize),((x+segmentSize)+stepSize),room.offset.y,(room.offset.y+segmentSize),z,(z+(segmentSize*2)),true,true,false,true,true,true,segmentSize);
-                break;
-            case GenerateMeshClass.STAIR_DIR_POS_X:
-            case GenerateMeshClass.STAIR_DIR_NEG_X:
-                GenerateUtilityClass.addBox(core,(name+'_side1'),wallBitmap,x,(x+(segmentSize*2)),room.offset.y,(room.offset.y+segmentSize),(z-stepSize),z,true,true,false,true,true,true,segmentSize);
-                GenerateUtilityClass.addBox(core,(name+'_side1'),wallBitmap,x,(x+(segmentSize*2)),room.offset.y,(room.offset.y+segmentSize),(z+segmentSize),((z+segmentSize)+stepSize),true,true,false,true,true,true,segmentSize);
-                break;
+            uvArray.push(0,0,0,1,1,1,1,0);
+            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            idx+=4;
         }
- */
+
+             // right
+
+        if (right) {
+            vertexArray.push(xBound.max,yBound.min,zBound.min);
+            vertexArray.push(xBound.max,yBound.min,zBound.max);
+            vertexArray.push(xBound.max,yBound.max,zBound.max);
+            vertexArray.push(xBound.max,yBound.max,zBound.min);
+            
+            uvArray.push(0,0,0,1,1,1,1,0);
+            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            idx+=4;
+        }
+
+            // front
+
+        if (front) {
+            vertexArray.push(xBound.min,yBound.min,zBound.min);
+            vertexArray.push(xBound.max,yBound.min,zBound.min);
+            vertexArray.push(xBound.max,yBound.max,zBound.min);
+            vertexArray.push(xBound.min,yBound.max,zBound.min);
+            
+            uvArray.push(0,0,0,1,1,1,1,0);
+            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            idx+=4;
+        }
+
+            // back
+
+        if (back) {
+            vertexArray.push(xBound.min,yBound.min,zBound.max);
+            vertexArray.push(xBound.max,yBound.min,zBound.max);
+            vertexArray.push(xBound.max,yBound.max,zBound.max);
+            vertexArray.push(xBound.min,yBound.max,zBound.max);
+            
+            uvArray.push(0,0,0,1,1,1,1,0);
+            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            idx+=4;
+        }
+
+            // top
+
+        if (top) {
+            vertexArray.push(xBound.min,yBound.max,zBound.min);
+            vertexArray.push(xBound.max,yBound.max,zBound.min);
+            vertexArray.push(xBound.max,yBound.max,zBound.max);
+            vertexArray.push(xBound.min,yBound.max,zBound.max);
+            
+            uvArray.push(0,0,0,1,1,1,1,0);
+            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            idx+=4;
+        }
+
+            // bottom
+
+        if (bottom) {
+            vertexArray.push(xBound.min,yBound.min,zBound.min);
+            vertexArray.push(xBound.max,yBound.min,zBound.min);
+            vertexArray.push(xBound.max,yBound.min,zBound.max);
+            vertexArray.push(xBound.min,yBound.min,zBound.max);
+            
+            uvArray.push(0,0,0,1,1,1,1,0);
+            indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
+            idx+=4;
+        }
+
+            // rotate
+        
+        centerPnt=new PointClass(xBound.getMidPoint(),yBound.getMidPoint(),zBound.getMidPoint());
+
+        if (rotAngle!==null) {
+            rotPnt=new PointClass(0,0,0);
+            
+            for (n=0;n<vertexArray.length;n+=3) {
+                rotPnt.setFromValues(vertexArray[n],vertexArray[n+1],vertexArray[n+2]);
+                rotPnt.rotateAroundPoint(centerPnt,rotAngle);
+                vertexArray[n]=rotPnt.x;
+                vertexArray[n+1]=rotPnt.y;
+                vertexArray[n+2]=rotPnt.z;
+            }
+        }
+
+            // create the mesh
+
+        normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
+        if (!wholeUV) uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
+        tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
+        
+        mesh=new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
+        mesh.simpleCollisions=true;
+        core.map.meshList.add(mesh);
     }
     
+    static createCube(core,room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,wholeUV,segmentSize)
+    {
+        return(this.createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,wholeUV,segmentSize));
+    }
     
         //
         // cylinders
@@ -277,7 +376,7 @@ export default class GenerateMeshClass
         segments.push(1.0);      // top always biggest
         
         for (n=0;n!==segCount;n++) {
-            segments.push(GenerateUtilityClass.randomFloat(0.5,0.5));
+            segments.push(GenerateUtilityClass.randomFloat(0.8,0.2));
         }
         
         segments.push(1.0);      // and bottom
@@ -285,7 +384,7 @@ export default class GenerateMeshClass
         return(segments);
     }
     
-    static createCylinder(core,room,name,bitmap,centerPt,yBound,segments,radius,top,bot)
+    static createCylinder(core,room,name,bitmap,centerPnt,yBound,segments,radius,top,bot)
     {
         let n,k,t,y,rd,tx,tz,tx2,tz2,bx,bz,bx2,bz2,mesh;
         let topRad,botRad;
@@ -334,22 +433,22 @@ export default class GenerateMeshClass
                 if (n===(sideCount-1)) ang2=0.0;
 
                 rd=ang*PointClass.DEGREE_TO_RAD;
-                tx=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
-                tz=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
+                tx=centerPnt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
+                tz=centerPnt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
                 
-                bx=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
-                bz=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
+                bx=centerPnt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
+                bz=centerPnt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
 
                 rd=ang2*PointClass.DEGREE_TO_RAD;
-                tx2=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
-                tz2=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
+                tx2=centerPnt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
+                tz2=centerPnt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
                 
-                bx2=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
-                bz2=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
+                bx2=centerPnt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
+                bz2=centerPnt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
                 
                     // the points
                     
-                vStartIdx=Math.trunc(vertexArray.length/3);
+                vStartIdx=vertexArray.length;
                 
                 vertexArray.push(tx,ySegBound.min,tz);
                 uvArray.push(u1,0.0);
@@ -380,9 +479,9 @@ export default class GenerateMeshClass
                 y=ySegBound.getMidPoint();
                 
                 for (t=0;t!==6;t++) {
-                    normal.x=vertexArray[vStartIdx]-centerPt.x;
+                    normal.x=vertexArray[vStartIdx++]-centerPnt.x;
                     normal.y=vertexArray[vStartIdx++]-y;
-                    normal.z=vertexArray[vStartIdx++]-centerPt.z;
+                    normal.z=vertexArray[vStartIdx++]-centerPnt.z;
                     normal.normalize();
                     normalArray.push(normal.x,normal.y,normal.z);
                 }
@@ -410,8 +509,8 @@ export default class GenerateMeshClass
                 u1=(Math.sin(rd)*0.5)+0.5;
                 u2=(Math.cos(rd)*0.5)+0.5;
 
-                tx=centerPt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
-                tz=centerPt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
+                tx=centerPnt.x+((topRad*Math.sin(rd))+(topRad*Math.cos(rd)));
+                tz=centerPnt.z+((topRad*Math.cos(rd))-(topRad*Math.sin(rd)));
                 
                     // the points
                 
@@ -441,8 +540,8 @@ export default class GenerateMeshClass
                 u1=(Math.sin(rd)*0.5)+0.5;
                 u2=(Math.cos(rd)*0.5)+0.5;
 
-                bx=centerPt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
-                bz=centerPt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
+                bx=centerPnt.x+((botRad*Math.sin(rd))+(botRad*Math.cos(rd)));
+                bz=centerPnt.z+((botRad*Math.cos(rd))-(botRad*Math.sin(rd)));
                 
                     // the points
                 
@@ -469,11 +568,11 @@ export default class GenerateMeshClass
         core.map.meshList.add(mesh);
     }
     
-    static createMeshCylinderSimple(core,room,name,bitmap,centerPt,yBound,radius,top,bot)
+    static createMeshCylinderSimple(core,room,name,bitmap,centerPnt,yBound,radius,top,bot)
     {
         let segments=[1.0,1.0];
         
-        this.createMeshCylinder(core,room,name,bitmap,centerPt,yBound,segments,radius,top,bot);
+        this.createCylinder(core,room,name,bitmap,centerPnt,yBound,segments,radius,top,bot);
     }
  
 }

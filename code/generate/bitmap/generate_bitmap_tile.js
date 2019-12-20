@@ -9,6 +9,8 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    
     constructor(view)
     {
         super(view,true,true,false);
@@ -154,7 +156,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
         }
     }
 
-    generateInternal()
+    generateInternal(variationMode)
     {
         let splitCount,designColor,groutColor;
         let complex,small;

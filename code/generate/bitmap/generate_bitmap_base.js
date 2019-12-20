@@ -1196,7 +1196,7 @@ export default class GenerateBitmapBaseClass
         
             // the rotating normal
             
-        normal=new PointClass(0,0.1,0.9);
+        normal=new PointClass(0,0.1,1.0);
         normal.normalize();
         
         nx=(normal.x+1.0)*127.0;
@@ -1219,10 +1219,11 @@ export default class GenerateBitmapBaseClass
                 g=Math.trunc((baseColor.g*f)*255.0);
                 b=Math.trunc((baseColor.b*f)*255.0);
                 
-                ny=-ny;
+                ny=(ny/127.0)-1.0;
+                ny=(1.0-ny)*127.0;
             }
 
-            idx=(y*this.colorImgData.width)*4;
+            idx=((y*this.colorImgData.width)+lft)*4;
 
             for (x=lft;x!==rgt;x++) {
                 colorData[idx]=r;
@@ -1249,7 +1250,7 @@ export default class GenerateBitmapBaseClass
         
             // the rotating normal
             
-        normal=new PointClass(0.1,0,0.9);
+        normal=new PointClass(0.1,0,1.0);
         normal.normalize();
         
         nx=(normal.x+1.0)*127.0;
@@ -1272,7 +1273,8 @@ export default class GenerateBitmapBaseClass
                 g=Math.trunc((baseColor.g*f)*255.0);
                 b=Math.trunc((baseColor.b*f)*255.0);
                 
-                nx=-nx;
+                nx=(nx/127.0)-1.0;
+                nx=(1.0-nx)*127.0;
             }
 
             for (y=top;y!==bot;y++) {
@@ -3333,7 +3335,7 @@ export default class GenerateBitmapBaseClass
         // for testing
         //
         
-    test()
+    test(variationMode)
     {
         GenerateUtilityClass.setRandomSeed(Date.now());
         
@@ -3361,7 +3363,7 @@ export default class GenerateBitmapBaseClass
 
             // run the internal generator
 
-        this.generateInternal();
+        this.generateInternal(variationMode);
         
             // write out the bitmaps
             
@@ -3375,7 +3377,7 @@ export default class GenerateBitmapBaseClass
         // generate mainline
         //
         
-    generateInternal()
+    generateInternal(variationMode)
     {
         let xMid=Math.trunc(this.colorCanvas.width*0.5);       // default internal is just the UV test
         let yMid=Math.trunc(this.colorCanvas.height*0.5);
@@ -3386,7 +3388,7 @@ export default class GenerateBitmapBaseClass
         this.drawRect(xMid,yMid,this.colorCanvas.width,this.colorCanvas.height,new ColorClass(0,0,1));
     }
     
-    generate()
+    generate(variationMode)
     {
             // setup all the bitmap parts
             // and get the image bytes for drawing
@@ -3421,7 +3423,7 @@ export default class GenerateBitmapBaseClass
 
             // run the internal generator
 
-        this.generateInternal();
+        this.generateInternal(variationMode);
         
             // write out the bitmaps
             

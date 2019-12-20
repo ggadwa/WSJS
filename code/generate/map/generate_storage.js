@@ -1,10 +1,8 @@
 import PointClass from '../../utility/point.js';
+import BoundClass from '../../utility/bound.js';
 import MeshClass from '../../mesh/mesh.js';
-import MoveClass from '../../map/move.js';
-import MovementClass from '../../map/movement.js';
 import GenerateMeshClass from './generate_mesh.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
-
 
 //
 // generate room storage decoration class
@@ -12,52 +10,30 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateStorageClass
 {
-    constructor(view,map,platformBitmap)
+    constructor()
     {
-        let genBitmap;
-        
-        super(view,map,platformBitmap);
-        
-            // bitmaps
-            
-        genBitmap=new GenBitmapWoodClass(this.view);
-        this.woodBitmap=genBitmap.generate(false);
-        
-        genBitmap=new GenBitmapMetalClass(this.view);
-        this.metalBitmap=genBitmap.generate(false);
-        
-            // give all these decorations the same general
-            // width and height no matter where in the map
-            
-        this.shelfHigh=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3));
-            
-        this.xShelfMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
-        this.zShelfMargin=genRandom.randomInt(0,Math.trunc(constants.ROOM_BLOCK_WIDTH/8));
-        
-        this.boxSize=genRandom.randomInt(Math.trunc(constants.ROOM_BLOCK_WIDTH*0.3),Math.trunc(constants.ROOM_BLOCK_WIDTH*0.2));
-
-        Object.seal(this);
     }
     
         //
         // boxes
         //
 
-    addBoxes(room,x,z)
+    static addBoxes(core,room,name,boxBitmap,x,z,segmentSize)
     {
-        let stackLevel,stackCount,mesh;
-        let boxHalfSize,boxXBound,boxYBound,boxZBound;
+        let stackLevel,stackCount;
+        let boxSize,boxHalfSize,boxXBound,boxYBound,boxZBound;
         let boxPos,rotAngle;
         
             // box size
             
-        x=(room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH))+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5);
-        z=(room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH))+Math.trunc(constants.ROOM_BLOCK_WIDTH*0.5);
+        x=(room.offset.x+(x*segmentSize))+Math.trunc(segmentSize*0.5);
+        z=(room.offset.z+(z*segmentSize))+Math.trunc(segmentSize*0.5);
         
-        boxHalfSize=Math.trunc(this.boxSize*0.5);
+        boxSize=GenerateUtilityClass.randomInt(Math.trunc(segmentSize*0.3),Math.trunc(segmentSize*0.4));
+        boxHalfSize=Math.trunc(boxSize*0.5);
             
         boxXBound=new BoundClass((x-boxHalfSize),(x+boxHalfSize));
-        boxYBound=new BoundClass((room.yBound.max-this.boxSize),room.yBound.max);
+        boxYBound=new BoundClass(room.offset.y,(room.offset.y+boxSize));
         boxZBound=new BoundClass((z-boxHalfSize),(z+boxHalfSize));
         
         boxPos=new PointClass(0,0,0);
@@ -65,149 +41,39 @@ export default class GenerateStorageClass
         
             // stacks of boxes
             
-        stackCount=genRandom.randomInt(1,3);
+        stackCount=GenerateUtilityClass.randomInt(1,3);
             
-            // the stacked shelves
+            // the stacks
             
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
-            rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-            mesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,this.woodBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,constants.MESH_FLAG_DECORATION);
-            MeshPrimitivesClass.meshCubeSetWholeUV(mesh);
-            this.map.meshList.add(mesh);
-
+            rotAngle.setFromValues(0.0,(GenerateUtilityClass.randomFloat(-10.0,20.0)),0.0);
+            GenerateMeshClass.createCubeRotated(core,room,(name+'_'+stackLevel),boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,true,segmentSize);
+            
                 // go up one level
 
-            boxYBound.add(-this.boxSize);
-            if (boxYBound.min<room.yBound.min) break;
+            boxYBound.add(boxSize);
+            if (boxYBound.max>(room.offset.y+(segmentSize*room.storyCount))) break;
         }
     }
             
         //
-        // shelves
-        //
-        
-    addShelf(room,x,z)
-    {
-        let legWid,mesh,mesh2;
-        let stackLevel,stackCount;
-        let n,nItem,bx,bz,boxSize,rotAngle,boxMesh,minBoxSize,extraBoxSize,minBoxHigh,extraBoxHigh;
-        let tableXBound,tableYBound,tableZBound;
-        let legXMinBound,legXMaxBound,legZMinBound,legZMaxBound,legYBound;
-        let boxXBound,boxYBound,boxZBound;
-        
-        x=room.xBound.min+(x*constants.ROOM_BLOCK_WIDTH);
-        z=room.zBound.min+(z*constants.ROOM_BLOCK_WIDTH);
-        
-        legWid=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.1);
-
-            // height and width
-
-        stackCount=genRandom.randomInt(1,3);
-        
-            // some preset bounds
-            
-        mesh=null;
-        rotAngle=new PointClass(0,0,0);
-        
-        tableXBound=new BoundClass((x+this.xShelfMargin),((x+constants.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
-        tableYBound=new BoundClass((room.yBound.max-this.shelfHigh),((room.yBound.max-this.shelfHigh)+constants.ROOM_FLOOR_DEPTH));
-        tableZBound=new BoundClass((z+this.zShelfMargin),((z+constants.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
-
-        legXMinBound=new BoundClass((x+this.xShelfMargin),((x+this.xShelfMargin)+legWid));
-        legXMaxBound=new BoundClass((((x+constants.ROOM_BLOCK_WIDTH)-this.xShelfMargin)-legWid),((x+constants.ROOM_BLOCK_WIDTH)-this.xShelfMargin));
-        legZMinBound=new BoundClass((z+this.zShelfMargin),((z+this.zShelfMargin)+legWid));
-        legZMaxBound=new BoundClass((((z+constants.ROOM_BLOCK_WIDTH)-this.zShelfMargin)-legWid),((z+constants.ROOM_BLOCK_WIDTH)-this.zShelfMargin));
-        
-        legYBound=new BoundClass(((room.yBound.max-this.shelfHigh)+constants.ROOM_FLOOR_DEPTH),room.yBound.max);
-        
-        boxXBound=new BoundClass(0,0,0);
-        boxYBound=new BoundClass(0,0,0);
-        boxZBound=new BoundClass(0,0,0);
-        
-        minBoxHigh=Math.trunc(this.shelfHigh*0.5);
-        extraBoxHigh=Math.trunc(this.shelfHigh*0.25);
-        
-        minBoxSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.05);
-        extraBoxSize=Math.trunc(constants.ROOM_BLOCK_WIDTH*0.15);
-
-            // the stacked shelves
-            
-        for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
-
-                // the table
-
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,tableXBound,tableYBound,tableZBound,true,true,true,true,true,true,false,constants.MESH_FLAG_DECORATION);
-            if (mesh===null) {
-                mesh=mesh2;
-            }
-            else {
-                mesh.combineMesh(mesh2);
-            }
-            
-                // legs
-
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMinBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-            mesh.combineMesh(mesh2);
-
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMinBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-            mesh.combineMesh(mesh2);
-
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMaxBound,legYBound,legZMinBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-            mesh.combineMesh(mesh2);
-
-            mesh2=MeshPrimitivesClass.createMeshCube(this.view,this.metalBitmap,legXMaxBound,legYBound,legZMaxBound,true,true,true,true,false,false,false,constants.MESH_FLAG_DECORATION);
-            mesh.combineMesh(mesh2);
-            
-                // items on self
-                
-            nItem=genRandom.randomIndex(3);
-            
-            for (n=0;n!==nItem;n++) {
-                boxSize=genRandom.randomInt(minBoxSize,extraBoxSize);
-                bx=genRandom.randomInt((tableXBound.min+boxSize),(tableXBound.getSize()-(boxSize*2)));
-                bz=genRandom.randomInt((tableZBound.min+boxSize),(tableZBound.getSize()-(boxSize*2)));
-                
-                boxXBound.setFromValues((bx-boxSize),(bx+boxSize));
-                boxYBound.setFromValues((tableYBound.min-genRandom.randomInt(minBoxHigh,extraBoxHigh)),tableYBound.min);
-                boxZBound.setFromValues((bz-boxSize),(bz+boxSize));
-
-                rotAngle.setFromValues(0.0,(genRandom.randomFloat(-10.0,20.0)),0.0);
-                boxMesh=MeshPrimitivesClass.createMeshRotatedCube(this.view,this.woodBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,false,false,constants.MESH_FLAG_DECORATION);
-                MeshPrimitivesClass.meshCubeSetWholeUV(boxMesh);
-                this.map.meshList.add(boxMesh);
-            }
-
-                // go up one level
-
-            tableYBound.add(-this.shelfHigh);
-            if (tableYBound.min<room.yBound.min) break;
-            
-            legYBound.add(-this.shelfHigh);
-        }
-        
-        this.map.meshList.add(mesh);
-    }
-    
-        //
-        // storage mainline
+        // storage
         //
 
-    create(room,rect)
+    static buildRoomStorage(core,room,name,boxBitmap,segmentSize)
     {
         let x,z;
-
+        let storageCount;
+        
             // create the pieces
             
-        for (x=rect.lft;x!==rect.rgt;x++) {
-            for (z=rect.top;z!==rect.bot;z++) {
-                
-                switch (genRandom.randomIndex(3)) {
-                    case 0:
-                        this.addBoxes(room,x,z);
-                        break;
-                    case 1:
-                        this.addShelf(room,x,z);
-                        break;
+        storageCount=0;
+            
+        for (z=1;z<(room.piece.size.z-1);z++) {
+            for (x=1;x<(room.piece.size.x-1);x++) {
+                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                    this.addBoxes(core,room,(name+'_'+storageCount),boxBitmap,x,z,segmentSize);
+                    storageCount++;
                 }
             }
         }

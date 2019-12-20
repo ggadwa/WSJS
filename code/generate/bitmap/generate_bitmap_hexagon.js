@@ -9,6 +9,8 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    
     constructor(core)
     {
         super(core,true,true,false);
@@ -19,7 +21,7 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
         // hexagonal
         //
         
-    generateInternal()
+    generateInternal(variationMode)
     {
         let color,edgeColor,edgeSize;
         let xCount,yCount,xSize,ySize;

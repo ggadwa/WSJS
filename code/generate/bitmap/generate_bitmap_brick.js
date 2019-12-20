@@ -9,6 +9,8 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    
     constructor(core)
     {
         super(core,true,true,false);
@@ -86,7 +88,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         }
     }
     
-    generateInternal()
+    generateInternal(variationMode)
     {
         let x,y,xCount,xAdd,yCount,yAdd;
         let halfWid,halfBrick,lft,top;

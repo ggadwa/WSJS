@@ -9,13 +9,15 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    
     constructor(core)
     {
         super(core,true,true,false);
         Object.seal(this);
     }
     
-    generateInternal()
+    generateInternal(variationMode)
     {
         let y,yCount,yAdd;
         let lft,rgt,top,bot;

@@ -8,6 +8,7 @@ import GenerateRoomClass from './generate_room.js';
 import GenerateMeshClass from './generate_mesh.js';
 import GenerateStoryClass from './generate_story.js';
 import GeneratePillarClass from './generate_pillar.js';
+import GenerateStorageClass from './generate_storage.js';
 import GenerateLightClass from './generate_light.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 import GenerateBitmapRun from '../bitmap/generate_bitmap_run.js';
@@ -273,6 +274,41 @@ export default class GenerateMapClass
             
         return(false);
     }
+    
+        //
+        // room decorations
+        //
+        
+    buildDecoration(room,roomIdx,platformBitmap,pillarBitmap,boxBitmap,segmentSize)
+    {
+        let decorationType,isPlatformOK;
+        
+            // random decoration, repeat if the room
+            // can't do certain decorations
+            
+        isPlatformOK=(room.piece.multistory) && (room.piece.size.x>=10) && (room.piece.size.z>=10) && (room.storyCount>1);
+        
+        while (true) {
+            decorationType=GenerateUtilityClass.randomIndex(3);
+            if ((decorationType===0) && (!isPlatformOK)) continue;
+            
+            break;
+        }
+        
+            // build the decoration
+            
+        switch (decorationType) {
+            case 0:
+                GenerateStoryClass.buildRoomStories(this.core,room,('story_'+roomIdx),platformBitmap,segmentSize);
+                break;
+            case 1:
+                GeneratePillarClass.buildRoomPillars(this.core,room,('pillar_'+roomIdx),pillarBitmap,segmentSize);
+                break;
+            case 2:
+                GenerateStorageClass.buildRoomStorage(this.core,room,('storage'+roomIdx),boxBitmap,segmentSize);
+                break;
+        }
+    }
 
         //
         // build a map
@@ -281,7 +317,7 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n,seed;
-        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap;
+        let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap;
         let roomTopY,forwardPath;
         let room,nextRoom,light,genPiece,centerPnt,intensity,isStairRoom;
         let roomCount,segmentSize,pathXDeviation;
@@ -310,6 +346,7 @@ export default class GenerateMapClass
         stepBitmap=GenerateBitmapRun.generateStep(this.core);
         pillarBitmap=GenerateBitmapRun.generateDecoration(this.core);
         platformBitmap=GenerateBitmapRun.generatePlatform(this.core);
+        boxBitmap=GenerateBitmapRun.generateBox(this.core);
         
             // we always proceed in a path, so get
             // the deviation for the path
@@ -415,18 +452,14 @@ export default class GenerateMapClass
                 
             if (room.stairRoom) GenerateMeshClass.buildRoomStairs(this.core,room,('stair_'+n),stepBitmap,segmentSize);
             
-                // second stories
+                // decorations
                 
-            if ((room.piece.multistory) && (room.piece.size.x>=10) && (room.piece.size.z>=10) && (!room.piece.hallway) && (room.storyCount>1) && (GenerateUtilityClass.randomPercentage(importSettings.autoGenerate.secondStoryFactor))) {
-            //    GenerateStoryClass.buildRoomStories(this.core,room,('story_'+n),roomWallBitmap,stepBitmap,platformBitmap,segmentSize);
-            }
-            
-            GeneratePillarClass.buildRoomPillars(this.core,room,('pillar_'+n),pillarBitmap,segmentSize);
+            if ((!room.stairRoom) && (!room.piece.hallway)) this.buildDecoration(room,n,platformBitmap,pillarBitmap,boxBitmap,segmentSize);
 
                 // room light
 
             if (!room.stairRoom) {
-                intensity=Math.trunc(((room.size.x+room.size.z)*0.7)*0.8)+((segmentSize*0.2)*(room.storyCount-1));
+                intensity=Math.trunc(((room.size.x+room.size.z)*0.5)*0.8)+((segmentSize*0.2)*(room.storyCount-1));
             }
             else {
                 intensity=Math.trunc(segmentSize*2);

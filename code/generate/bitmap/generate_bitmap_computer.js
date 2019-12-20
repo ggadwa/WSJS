@@ -9,6 +9,9 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    static VARIATION_CONTROL_PANEL=0;
+    
     constructor(core)
     {
         super(core,true,true,false);
@@ -208,7 +211,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         // computer
         //
         
-    generateInternal()
+    generateInternal(variationMode)
     {
         let mx,my,sz,lft,top,rgt,bot,rndTry;
         let componentType,hadBlank,hadWires,hadShutter,rndSuccess;

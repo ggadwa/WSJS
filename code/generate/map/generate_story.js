@@ -26,7 +26,7 @@ export default class GenerateStoryClass
         // lifts
         //
   
-    static buildRoomLift(core,room,name,bitmap,segmentSize)
+    static buildRoomLift(core,room,name,bitmap,segmentSize,x,z)
     {
         let n,sx,sz,y,meshIdx;
         let liftName,moveMilliSec,waitMilliSec;
@@ -135,7 +135,7 @@ export default class GenerateStoryClass
         return(true);
     }
             
-    static buildRoomSingleStory(core,room,name,segmentBitmap,segmentSize,startX,startZ,storyIdx)
+    static buildRoomSingleStory(core,room,name,bitmap,segmentSize,startX,startZ,storyIdx)
     {
         let x,z,gx,gz,sx,sz,ty,by;
         let negX,posX,negZ,posZ;
@@ -298,14 +298,14 @@ export default class GenerateStoryClass
         uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
-        core.map.meshList.add(new MeshClass(core,(name+'_story'),segmentBitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
+        core.map.meshList.add(new MeshClass(core,(name+'_story'),bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,uvArray,null,null,new Uint16Array(indexArray)));
     }
     
         //
         // second story mainline
         //
         
-    static buildRoomStories(core,room,name,wallBitmap,stepBitmap,segmentBitmap,segmentSize)
+    static buildRoomStories(core,room,name,platformBitmap,segmentSize)
     {
         let n,x,z;
         
@@ -316,12 +316,12 @@ export default class GenerateStoryClass
         
             // lift
             
-        this.buildRoomLift(core,room,name,stepBitmap,segmentSize,x,z);
+        this.buildRoomLift(core,room,name,platformBitmap,segmentSize,x,z);
         
             // build the story segments
             
         for (n=1;n<room.storyCount;n++) {
-            this.buildRoomSingleStory(core,room,name,segmentBitmap,segmentSize,x,z,n);
+            this.buildRoomSingleStory(core,room,name,platformBitmap,segmentSize,x,z,n);
         }
     }
 }

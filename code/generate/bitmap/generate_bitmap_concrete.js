@@ -8,6 +8,8 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    
     constructor(core)
     {
         super(core,true,true,false);
@@ -18,7 +20,7 @@ export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
         // concrete bitmaps
         //
 
-    generateInternal()
+    generateInternal(variationMode)
     {
         let concreteColor=this.getRandomColor();
         let jointColor=this.adjustColorRandom(concreteColor,0.75,0.85);

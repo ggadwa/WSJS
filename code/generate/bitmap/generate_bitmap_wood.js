@@ -7,8 +7,11 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 // generate wood bitmap class
 //
 
-export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
+export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
 {
+    static VARIATION_NONE=0;
+    static VARIATION_BOX=1;
+    
     constructor(core)
     {
         super(core,true,true,false);
@@ -47,9 +50,10 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
         this.blur(this.normalImgData.data,(lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),5,true);
     }
 
-    generateInternal()
+    generateInternal(variationMode)
     {
         let n,y,ty,by,lft,rgt;
+        let boardType;
         
             // some random values
 
@@ -74,7 +78,9 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
             rgt=lft+boardSize;
             if (n===(boardCount-1)) rgt=this.colorCanvas.width;
             
-            switch (GenerateUtilityClass.randomIndex(5)) {
+            boardType=(variationMode===GenerateBitmapWoodClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(5);
+            
+            switch (boardType) {
                 case 0:
                     this.generateWoodDrawBoard(lft,0,rgt,this.colorCanvas.height,edgeSize,woodColor);
                     break;
@@ -97,6 +103,16 @@ export default class GenerateBitmapBoxClass extends GenerateBitmapBaseClass
             }
             
             lft=rgt;
+        }
+
+            // box outlines
+            
+        if (variationMode===GenerateBitmapWoodClass.VARIATION_BOX) {
+            woodColor=this.adjustColor(woodColor,0.7);
+            this.generateWoodDrawBoard(0,0,boardSize,this.colorCanvas.height,edgeSize,woodColor);
+            this.generateWoodDrawBoard((this.colorCanvas.width-boardSize),0,this.colorCanvas.width,this.colorCanvas.height,edgeSize,woodColor);
+            this.generateWoodDrawBoard(boardSize,0,(this.colorCanvas.width-boardSize),boardSize,edgeSize,woodColor);
+            this.generateWoodDrawBoard(boardSize,(this.colorCanvas.height-boardSize),(this.colorCanvas.width-boardSize),this.colorCanvas.height,edgeSize,woodColor);
         }
         
             // finish with the specular
