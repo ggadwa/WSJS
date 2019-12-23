@@ -11,9 +11,14 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
 {
     static VARIATION_NONE=0;
     
-    constructor(view)
+    constructor(core,colorSchemeName)
     {
-        super(view,true,true,false);
+        super(core,colorSchemeName);
+        
+        this.hasNormal=true;
+        this.hasSpecular=true;
+        this.hasGlow=false;
+        
         Object.seal(this);
     }
         

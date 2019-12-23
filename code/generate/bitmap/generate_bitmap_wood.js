@@ -12,9 +12,14 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
     static VARIATION_NONE=0;
     static VARIATION_BOX=1;
     
-    constructor(core)
+    constructor(core,colorSchemeName)
     {
-        super(core,true,true,false);
+        super(core,colorSchemeName);
+        
+        this.hasNormal=true;
+        this.hasSpecular=true;
+        this.hasGlow=false;
+        
         Object.seal(this);
     }
     

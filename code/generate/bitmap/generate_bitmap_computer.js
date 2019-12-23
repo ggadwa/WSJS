@@ -12,9 +12,14 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
     static VARIATION_NONE=0;
     static VARIATION_CONTROL_PANEL=0;
     
-    constructor(core)
+    constructor(core,colorSchemeName)
     {
-        super(core,true,true,false);
+        super(core,colorSchemeName);
+        
+        this.hasNormal=true;
+        this.hasSpecular=true;
+        this.hasGlow=true;
+        
         Object.seal(this);
     }
     
@@ -215,17 +220,17 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
     {
         let mx,my,sz,lft,top,rgt,bot,rndTry;
         let componentType,hadBlank,hadWires,hadShutter,rndSuccess;
-        let offset=Math.trunc(this.bitmapCanvas.width*0.1);
+        let offset=Math.trunc(this.colorImgData.width*0.1);
         let panelColor=this.getRandomColor();
         let panelInsideColor=this.boostColor(panelColor,0.1);
        
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.draw3DRect(offset,0,this.bitmapCanvas.width,offset,8,panelColor,true);
-        this.draw3DRect(0,offset,offset,this.bitmapCanvas.height,8,panelColor,true);
+        this.draw3DRect(offset,0,this.colorImgData.width,offset,8,panelColor,true);
+        this.draw3DRect(0,offset,offset,this.colorImgData.height,8,panelColor,true);
         
-        this.draw3DRect(offset,offset,this.bitmapCanvas.width,this.bitmapCanvas.height,8,panelColor,true);
+        this.draw3DRect(offset,offset,this.colorImgData.width,this.colorImgData.height,8,panelColor,true);
         
             // inside components
             // these are stacks of vertical or horizontal chunks
@@ -247,8 +252,8 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
             if (GenerateUtilityClass.randomPercentage(0.5)) {
                 rgt=lft+sz;
-                if (rgt>(this.bitmapCanvas.width-15)) rgt=this.bitmapCanvas.width-15;
-                bot=this.bitmapCanvas.height-15;
+                if (rgt>(this.colorImgData.width-15)) rgt=this.colorImgData.width-15;
+                bot=this.colorImgData.height-15;
                 
                 mx+=(sz+5);
             }
@@ -257,8 +262,8 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
             else {
                 bot=top+sz;
-                if (bot>(this.bitmapCanvas.height-15)) bot=this.bitmapCanvas.height-15;
-                rgt=this.bitmapCanvas.width-15;
+                if (bot>(this.colorImgData.height-15)) bot=this.colorImgData.height-15;
+                rgt=this.colorImgData.width-15;
                 
                 my+=(sz+5);
             }
@@ -317,7 +322,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             
                 // are we finished?
                 
-            if ((mx>=(this.bitmapCanvas.width-15)) || (my>=(this.bitmapCanvas.height-15))) break;
+            if ((mx>=(this.colorImgData.width-15)) || (my>=(this.colorImgData.height-15))) break;
         }
         
             // finish with the specular

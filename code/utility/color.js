@@ -22,6 +22,15 @@ export default class ColorClass
         this.g=col.g;
         this.b=col.b;
     }
+    
+    setFromColorFactor(col1,col2,factor)
+    {
+        let f2=1.0-factor;
+        
+        this.r=(col1.r*factor)+(col2.r*f2);
+        this.g=(col1.g*factor)+(col2.g*f2);
+        this.b=(col1.b*factor)+(col2.b*f2);
+    }
                 
     add(col)
     {

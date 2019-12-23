@@ -11,9 +11,14 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
 {
     static VARIATION_NONE=0;
     
-    constructor(core)
+    constructor(core,colorSchemeName)
     {
-        super(core,true,true,false);
+        super(core,colorSchemeName);
+        
+        this.hasNormal=true;
+        this.hasSpecular=true;
+        this.hasGlow=false;
+        
         Object.seal(this);
     }
        
@@ -23,92 +28,68 @@ export default class GenerateBitmapMosaicClass extends GenerateBitmapBaseClass
 
     generateInternal(variationMode)
     {
-        let x,y,lft,rgt,top,bot,lx,rx,ty,by,tileWid,tileHigh;
-        let splitCount,borderSize,edgeSize;
-        let mortarColor,borderColor,mosaicColor,mosaic2Color;
-        let col,frameCol;
+        let x,y,lft,rgt,top,bot,tileWid,tileHigh;
+        let splitCount;
+        let groutColor,mosaicColor,mosaic2Color;
+        let col;
         
             // some random values
 
-        splitCount=GenerateUtilityClass.randomInt(5,5);
-        borderSize=GenerateUtilityClass.randomInt(2,5);
-        edgeSize=GenerateUtilityClass.randomInt(1,2);
+        splitCount=GenerateUtilityClass.randomInt(15,10);
         
-        borderColor=this.getRandomColor();
-        mortarColor=this.dullColor(borderColor,0.7);
-        
+        groutColor=this.getRandomGray(0.4,0.6);
         mosaicColor=this.getRandomColor();
-        mosaic2Color=this.darkenColor(mosaicColor,0.5);
+        mosaic2Color=this.getRandomColor();
+        
+        col=new ColorClass(0,0,0);
         
             // tile sizes
             
         tileWid=this.colorImgData.width/splitCount;
         tileHigh=this.colorImgData.height/splitCount;
 
-            // clear canvases to mortar
+            // clear canvases to grout
 
-        this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,mortarColor);
+        this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,groutColor);
         this.createPerlinNoiseData(16,16);
-        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.6,1.2);
-        this.drawStaticNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.7,1.1);
+        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.6,1.0);
+        this.drawStaticNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.7,1.0);
         this.blur(this.colorImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,1,false);
         
         this.createNormalNoiseData(2.5,0.5);
         this.drawNormalNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height);
         this.blur(this.normalImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,1,false);
 
+            // use a perlin noise rect for the colors
+        
+        this.createPerlinNoiseData(32,32);
+        
             // draw the tiles
         
-        top=0;
-        
         for (y=0;y!==splitCount;y++) {
-
-            bot=(top+tileHigh)-borderSize;
-            
-            lft=0;
-
             for (x=0;x!==splitCount;x++) {
                 
-                    // the tile
+                    // slightly random position
                     
-                if ((x===0) || (y===0) || (x===(splitCount-1)) || (y===(splitCount-1))) {
-                    col=borderColor;
-                }
-                else {
-                    col=(GenerateUtilityClass.randomPercentage(0.5))?mosaicColor:mosaic2Color;
-                }
-
-                rgt=(lft+tileWid)-borderSize;
+                lft=Math.trunc(x*tileWid)+GenerateUtilityClass.randomInt(0,3);
+                rgt=Math.trunc((x*tileWid)+tileWid)-GenerateUtilityClass.randomInt(0,3);
+                top=Math.trunc(y*tileHigh)+GenerateUtilityClass.randomInt(0,3);
+                bot=Math.trunc((y*tileHigh)+tileHigh)-GenerateUtilityClass.randomInt(0,3);
                 
-                    // position
+                    // the color
+
+                col.setFromColorFactor(mosaicColor,mosaic2Color,this.getPerlineColorFactorForPosition(lft,top));
+
+                    // draw
                     
-                lx=Math.trunc(lft);
-                rx=Math.trunc(rgt);
-                ty=Math.trunc(top);
-                by=Math.trunc(bot);
-
-                //this.draw3DRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col,true);
-                
-                frameCol=this.adjustColorRandom(col,0.85,0.95);
-                
-                this.drawRect(lx,ty,rx,by,col);
-                this.draw3DFrameRect(lx,ty,rx,by,edgeSize,frameCol,true);
-                
-                
+                this.drawRect(lft,top,rgt,bot,col);
+                this.draw3DFrameRect(lft,top,rgt,bot,1,col,true);
                 
                     // noise and blur
                 
-                //this.addNoiseRect(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),1.1,1.3,0.5);
-                //this.blur(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),3,false);
-                
-                    // any cracks
-                    
-                //this.drawSmallCrack(Math.trunc(lft),Math.trunc(top),Math.trunc(rgt),Math.trunc(bot),edgeSize,col);
-
-                lft+=tileWid;
+                this.drawStaticNoiseRect(lft,top,rgt,bot,1.1,1.3);
+                this.blur(lft,top,rgt,bot,1,true);
             }
-            
-            top+=tileHigh;
         }
 
             // finish with the specular

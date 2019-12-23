@@ -11,9 +11,14 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
 {
     static VARIATION_NONE=0;
     
-    constructor(core)
+    constructor(core,colorSchemeName)
     {
-        super(core,true,true,false);
+        super(core,colorSchemeName);
+        
+        this.hasNormal=true;
+        this.hasSpecular=true;
+        this.hasGlow=false;
+        
         Object.seal(this);
     }
     
@@ -30,7 +35,7 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
             // colors
             
         color=this.getRandomColor();
-        edgeColor=this.darkenColor(color,0.8);
+        edgeColor=this.adjustColor(color,0.8);
         
             // sizing
         
@@ -38,8 +43,8 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
         xCount=2+(2*GenerateUtilityClass.randomInt(0,2));
         yCount=2+(2*GenerateUtilityClass.randomInt(0,5));
         
-        xSize=Math.trunc(this.bitmapCanvas.width/xCount);
-        ySize=Math.trunc(this.bitmapCanvas.height/yCount);
+        xSize=Math.trunc(this.colorImgData.width/xCount);
+        ySize=Math.trunc(this.colorImgData.height/yCount);
         
         top=-Math.trunc(ySize/2);
         
@@ -48,7 +53,7 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
             lft=((y%2)===0)?0:xSize;
             
             for (x=0;x<=xCount;x+=2) {
-                this.draw3DHexagon(this.bitmapCanvas.width,this.bitmapCanvas.height,lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
+                this.drawHexagon(lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
                 lft+=(xSize*2);
             }
             

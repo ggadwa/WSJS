@@ -1,9 +1,10 @@
 - startup list needs to include bitmap building
+- clean up stuff at end of generate_bitmap_base
 
 - bitmaps
-   -> computer (panel variation)
+   -> computer (panel variation) - needs glow
    -> hexagon
-   -> mosaic (redo it all -- smaller, more variations, no borders, use perlin noise for color variations)
+   -> stone is still bad, need some more variations in stone work
 
 - decorations
    -> computers (grid)

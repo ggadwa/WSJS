@@ -18,9 +18,14 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 [[[0.5,0.0],[0.5,1.0]],[[0.0,0.5],[1.0,0.5]],[[0.0,0.5],[1.0,0.5]],[[0.5,0.0],[0.5,1.0]]]   // pluses
             ];
     
-    constructor(core)
+    constructor(core,colorSchemeName)
     {
-        super(core,true,true,false);
+        super(core,colorSchemeName);
+        
+        this.hasNormal=true;
+        this.hasSpecular=true;
+        this.hasGlow=false;
+        
         Object.seal(this);
     }
             
@@ -114,10 +119,10 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         }
     }
 
-    generateMetalPanel(lft,top,rgt,bot,metalColor,altMetalColor,edgeSize,screwSize)
+    generateMetalPanel(lft,top,rgt,bot,metalColor,altMetalColor,edgeSize,screwSize,variationMode)
     {
         let lft2,rgt2,top2,bot2,sz;
-        let color,frameColor,screwColor;
+        let color,frameColor,screwColor,panelType;
         
             // colors
             
@@ -134,16 +139,18 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
             // the plate
             
-        this.createPerlinNoiseData(8,8);
+        this.createPerlinNoiseData(16,16);
         this.drawRect(lft,top,rgt,bot,color);
-        this.drawPerlinNoiseRect(lft,top,rgt,bot,0.5,1.3);
+        this.drawPerlinNoiseRect(lft,top,rgt,bot,0.8,1.0);
         
         this.drawMetalShine(lft,top,rgt,bot,color);
         this.draw3DFrameRect(lft,top,rgt,bot,edgeSize,frameColor,true);
         
             // variations
             
-        switch (GenerateUtilityClass.randomIndex(4)) {
+        panelType=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(4);
+            
+        switch (panelType) {
             
                 // internal box
                 
@@ -186,7 +193,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
     generateInternal(variationMode)
     {
         let mx,my;
-        let panelType;
+        let panelCount;
         
         let metalColor=this.getRandomColor();
         let altMetalColor=this.getRandomColor();
@@ -198,21 +205,21 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         mx=Math.trunc(this.colorCanvas.width*0.5);
         my=Math.trunc(this.colorCanvas.height*0.5);
         
-        panelType=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(3);
+        panelCount=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(3);
             
-        switch (panelType) {
+        switch (panelCount) {
             case 0:
-                this.generateMetalPanel(0,0,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize);
+                this.generateMetalPanel(0,0,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
             case 1:
-                this.generateMetalPanel(0,0,mx,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize);
-                this.generateMetalPanel(mx,0,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize);
+                this.generateMetalPanel(0,0,mx,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+                this.generateMetalPanel(mx,0,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
             case 2:
-                this.generateMetalPanel(0,0,mx,my,metalColor,altMetalColor,edgeSize,screwSize);
-                this.generateMetalPanel(mx,0,this.colorCanvas.width,my,metalColor,altMetalColor,edgeSize,screwSize);
-                this.generateMetalPanel(0,my,mx,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize);
-                this.generateMetalPanel(mx,my,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize);
+                this.generateMetalPanel(0,0,mx,my,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+                this.generateMetalPanel(mx,0,this.colorCanvas.width,my,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+                this.generateMetalPanel(0,my,mx,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+                this.generateMetalPanel(mx,my,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
         }
         

@@ -10,12 +10,27 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapBaseClass
 {
-    constructor(core,hasNormal,hasSpecular,hasGlow)
+    static COLOR_SCHEME_RANDOM=0;
+    static COLOR_SCHEME_DOOM=1;
+    static COLOR_SCHEME_GRAY=2;
+    static COLOR_SCHEME_PASTEL=3;
+    
+    static COLOR_SCHEME_LIST=['random','doom','gray','pastel'];
+    
+    constructor(core,colorSchemeName)
     {
         this.core=core;
-        this.hasNormal=hasNormal;
-        this.hasSpecular=hasSpecular;
-        this.hasGlow=hasGlow;
+        
+            // lookup color scheme
+            
+        this.colorScheme=GenerateBitmapBaseClass.COLOR_SCHEME_LIST.indexOf(colorSchemeName);
+        if (this.colorScheme===-1) this.colorScheme=GenerateBitmapBaseClass.COLOR_SCHEME_RANDOM;
+        
+            // will be reset in children classes
+            
+        this.hasNormal=true;
+        this.hasSpecular=true;
+        this.hasGlow=false;
         
             // defaults
             
@@ -70,13 +85,6 @@ export default class GenerateBitmapBaseClass
         this.perlinNoiseColorFactor=null;
         this.noiseNormals=null;
         
-            // current clip rect
-            
-        this.clipLft=-1;
-        this.clipTop=-1;
-        this.clipRgt=-1;
-        this.clipBot=-1;
-        
             // some precalced colors
             
         this.blackColor=new ColorClass(0.0,0.0,0.0);
@@ -117,10 +125,53 @@ export default class GenerateBitmapBaseClass
         
     getRandomColor()
     {
-        let col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
-        let darken=0.1-(GenerateUtilityClass.random()*0.2);
-        
-        return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+        let col,darken;
+        let color,midPoint;
+                
+        switch (this.colorScheme) {
+            
+                // random primary colors
+                
+            case GenerateBitmapBaseClass.COLOR_SCHEME_RANDOM:
+                col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
+                darken=0.1-(GenerateUtilityClass.random()*0.2);
+                return(new ColorClass((col[0]-darken),(col[1]-darken),(col[2]-darken)));
+                
+                // doom browns with a bit of gray and green
+                
+            case GenerateBitmapBaseClass.COLOR_SCHEME_DOOM:
+                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                    color=new ColorClass(0.6,0.3,0.0);
+                    this.adjustColorRandom(color,0.7,1,0);
+                }
+                else {
+                    if (GenerateUtilityClass.randomPercentage(0.5)) {
+                        col=GenerateUtilityClass.randomFloat(0.0,0.1);
+                        color=new ColorClass(col,GenerateUtilityClass.randomFloat(0.4,0.2),col);
+                    }
+                    else {
+                        col=GenerateUtilityClass.randomFloat(0.3,0.7);
+                        return(new ColorClass(col,col,col));
+                    }
+                }
+                return(color);
+            
+                // black and white
+                
+            case GenerateBitmapBaseClass.COLOR_SCHEME_GRAY:
+                col=GenerateUtilityClass.randomFloat(0.3,0.7);
+                return(new ColorClass(col,col,col));
+                
+                // pastel primary colors
+                
+            case GenerateBitmapBaseClass.COLOR_SCHEME_PASTEL:
+                col=this.primaryColorList[GenerateUtilityClass.randomIndex(this.primaryColorList.length)];
+                midPoint=(col[0]+col[1]+col[2])/3.0;
+                color=new ColorClass((col[0]+(midPoint-col[0])*0.8),(col[1]+(midPoint-col[1])*0.8),(col[2]+(midPoint-col[2])*0.8));
+                color.fixOverflow();
+                return(color);
+                
+        }
     }
     
     getRandomColorDull(dullFactor)
@@ -354,6 +405,11 @@ export default class GenerateBitmapBaseClass
                 this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]=(this.lerp(ix0,ix1,sy)+1.0)*0.5;      // get it in 0..1
             }
         }
+    }
+    
+    getPerlineColorFactorForPosition(x,y)
+    {
+        return(this.perlinNoiseColorFactor[(y*this.colorCanvas.width)+x]);
     }
     
     drawPerlinNoiseRect(lft,top,rgt,bot,colorFactorMin,colorFactorMax)
@@ -1026,6 +1082,109 @@ export default class GenerateBitmapBaseClass
         this.drawLineNormal(rgt,my,mx,bot,this.NORMAL_TOP_RIGHT_45);
     }
     
+    drawHexagon(lft,top,rgt,bot,edgeSize,fillRGBColor,edgeColor)
+    {
+        let n,lx,rx,my,xAdd;
+        let darkenFactor,darkColor;
+
+            // build the polygon
+
+        xAdd=Math.trunc((rgt-lft)*0.1);
+        
+        lx=lft-xAdd;
+        rx=rgt;
+        rgt-=xAdd;
+        my=Math.trunc((top+bot)*0.5);
+        
+            // draw the edges
+            
+        for (n=0;n!==edgeSize;n++) {
+
+                // the colors
+
+            darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
+            darkColor=this.adjustColor(edgeColor,darkenFactor);
+            
+                // top-left to top to top-right
+            
+            this.drawLineColor(lx,my,lft,top,darkColor,true);
+            this.drawLineNormal(lx,my,lft,top,this.NORMAL_TOP_LEFT_45);
+/*
+            this.drawLineColor(lft,top,rgt,top,darkColor,true);
+            this.drawLineNormal(lft,top,rgt,top,this.NORMAL_TOP_45);
+
+            this.drawLineColor(rgt,top,rx,my,darkColor,true);
+            this.drawLineNormal(rgt,top,rx,my,this.NORMAL_TOP_RIGHT_45);
+            
+                // bottom-right to bottom to bottom-left
+
+            this.drawLineColor(lx,my,lft,bot,darkColor,true);
+            this.drawLineNormal(lx,my,lft,bot,this.NORMAL_BOTTOM_LEFT_45);
+                
+            this.drawLineColor(lft,bot,rgt,bot,darkColor,true);
+            this.drawLineNormal(lft,bot,rgt,bot,this.NORMAL_BOTTOM_45);
+
+            this.drawLineColor(rgt,bot,rx,my,darkColor,true);
+            this.drawLineNormal(rgt,bot,rx,my,this.NORMAL_BOTTOM_RIGHT_45);
+            */
+                // reduce it
+                
+            lx++;
+            lft++;
+            rx--;
+            rgt--;
+            top++;
+            bot--;
+        }
+        
+        /*
+        if (fillRGBColor===null) return;
+
+            // and the fills
+            // which we have to break up because canvases
+            // get confused with offscreen coordinates
+
+        this.colorCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
+        this.normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
+
+            // the box
+            
+        this.colorCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        this.normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
+        
+            // left triangle
+
+        if (lft>=0) {
+            this.colorCTX.beginPath();
+            this.colorCTX.moveTo(lx,my);
+            this.colorCTX.lineTo(lft,top);
+            this.colorCTX.lineTo(lft,bot);
+            this.colorCTX.fill();
+           
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(lx,my);
+            this.normalCTX.lineTo(lft,top);
+            this.normalCTX.lineTo(lft,bot);
+            this.normalCTX.fill();
+        }
+
+        if (rgt<wid) {
+            this.colorCTX.beginPath();
+            this.colorCTX.moveTo(rx,my);
+            this.colorCTX.lineTo(rgt,top);
+            this.colorCTX.lineTo(rgt,bot);
+            this.colorCTX.fill();
+           
+            this.normalCTX.beginPath();
+            this.normalCTX.moveTo(rx,my);
+            this.normalCTX.lineTo(rgt,top);
+            this.normalCTX.lineTo(rgt,bot);
+            this.normalCTX.fill();
+        }
+
+         */
+    }
+    
         //
         // metals
         //
@@ -1668,102 +1827,26 @@ export default class GenerateBitmapBaseClass
     
     
     
-        //
-        // clipping
-        //
-        
-    startClip(lft,top,rgt,bot)
-    {
-        this.colorCTX.save();
-        this.colorCTX.rect(lft,top,(rgt-lft),(bot-top));
-        this.colorCTX.clip();
-        
-        this.clipLft=lft;
-        this.clipTop=top;
-        this.clipRgt=rgt;
-        this.clipBot=bot;
-    }
     
-    endClip()
-    {
-        this.colorCTX.restore();
-        
-        this.clipLft=-1;
-        this.clipTop=-1;
-        this.clipRgt=-1;
-        this.clipBot=-1;
-    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // below this is old broken stuff from an early version, delete
+    // we when have enough of it replaced
+    
+    
 
-        //
-        // color routines
-        //
-
-    
-    getRandomWoodColor()
-    {
-        return(new ColorClass(GenerateUtilityClass.randomFloat(0.6,0.2),GenerateUtilityClass.randomFloat(0.3,0.2),0.0));
-    }
-    
-    getRandomGrassColor()
-    {
-        return(new ColorClass(GenerateUtilityClass.randomFloat(0.0,0.2),GenerateUtilityClass.randomFloat(0.8,0.2),GenerateUtilityClass.randomFloat(0.0,0.2)));
-    }
-    
-    
-    getRandomMetalColor()
-    {
-        let f;
-        
-        if (GenerateUtilityClass.randomPercentage(0.5)) {      // blue-ish
-            f=GenerateUtilityClass.randomFloat(0.2,0.3);
-            return(new ColorClass(f,(f+0.4),1.0));
-        }
-        
-        f=GenerateUtilityClass.randomFloat(0.7,0.2);           // silver-ish
-        return(new ColorClass(f,f,(f+0.1)))
-    }
-    
-    getRandomFurColor()
-    {
-        let f;
-        
-        switch (GenerateUtilityClass.randomIndex(5)) {
-            
-            case 0:         // blonde
-                f=GenerateUtilityClass.randomFloat(0.5,0.2);
-                return(new ColorClass(f,f,0.0));
-                
-            case 1:         // white
-                f=GenerateUtilityClass.randomFloat(0.7,0.1);
-                return(new ColorClass(f,f,f));
-                
-            case 2:         // black
-                f=GenerateUtilityClass.randomFloat(0.2,0.2);
-                return(new ColorClass(f,f,f));
-                
-            case 3:         // brown
-                f=GenerateUtilityClass.randomFloat(0.3,0.2);
-                return(new ColorClass((f+0.3),f,0.0));
-
-            case 4:         // red
-                f=GenerateUtilityClass.randomFloat(0.5,0.3);
-                return(new ColorClass(f,0.2,0.2));
-
-        }
-    }
-    
-    getRandomScaleColor()
-    {
-        let f;
-        
-        if (GenerateUtilityClass.randomPercentage(0.5)) {      // green-ish
-            f=GenerateUtilityClass.randomFloat(0.2,0.3);
-            return(new ColorClass(f,1.0,f));
-        }
-        
-        f=GenerateUtilityClass.randomFloat(0.7,0.2);           // purple-ish
-        return(new ColorClass(f,0.2,f))
-    }
     
     darkenColor(color,darkenFactor)
     {
@@ -2169,160 +2252,6 @@ export default class GenerateBitmapBaseClass
         this.normalCTX.fill();
     }
     
-    draw3DHexagon(wid,high,lft,top,rgt,bot,edgeSize,fillRGBColor,edgeRGBColor)
-    {
-        let n,lx,rx,my,xAdd;
-        let darkenFactor,darkColor;
-
-            // build the polygon
-
-        xAdd=Math.trunc((rgt-lft)*0.1);
-        
-        lx=lft-xAdd;
-        rx=rgt;
-        rgt-=xAdd;
-        my=Math.trunc((top+bot)/2);
-        
-            // draw the edges
-            
-        this.colorCTX.lineWidth=2;
-        this.normalCTX.lineWidth=2;
-
-        for (n=0;n!==edgeSize;n++) {
-
-                // the colors
-
-            darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
-            darkColor=this.darkenColor(edgeRGBColor,darkenFactor);
-            this.colorCTX.strokeStyle=this.colorToRGBColor(darkColor);
-            
-                // top-left to top to top-right
-            
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,my);
-            this.colorCTX.lineTo(lft,top);
-            this.colorCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_LEFT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,my);
-            this.normalCTX.lineTo(lft,top);
-            this.normalCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lft,top);
-            this.colorCTX.lineTo(rgt,top);
-            this.colorCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lft,top);
-            this.normalCTX.lineTo(rgt,top);
-            this.normalCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(rgt,top);
-            this.colorCTX.lineTo(rx,my);
-            this.colorCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_TOP_RIGHT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(rgt,top);
-            this.normalCTX.lineTo(rx,my);
-            this.normalCTX.stroke();
-            
-                // bottom-right to bottom to bottom-left
-            
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(rx,my);
-            this.colorCTX.lineTo(rgt,bot);
-            this.colorCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_RIGHT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(rx,my);
-            this.normalCTX.lineTo(rgt,bot);
-            this.normalCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(rgt,bot);
-            this.colorCTX.lineTo(lft,bot);
-            this.colorCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(rgt,bot);
-            this.normalCTX.lineTo(lft,bot);
-            this.normalCTX.stroke();
-
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lft,bot);
-            this.colorCTX.lineTo(lx,my);
-            this.colorCTX.stroke();
-
-            this.normalCTX.strokeStyle=this.normalToRGBColor(this.NORMAL_BOTTOM_LEFT_45);
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lft,bot);
-            this.normalCTX.lineTo(lx,my);
-            this.normalCTX.stroke();
-            
-                // reduce it
-                
-            lx++;
-            lft++;
-            rx--;
-            rgt--;
-            top++;
-            bot--;
-        }
-        
-        this.colorCTX.lineWidth=1;
-        this.normalCTX.lineWidth=1;
-        
-        if (fillRGBColor===null) return;
-
-            // and the fills
-            // which we have to break up because canvases
-            // get confused with offscreen coordinates
-
-        this.colorCTX.fillStyle=this.colorToRGBColor(fillRGBColor);
-        this.normalCTX.fillStyle=this.normalToRGBColor(this.NORMAL_CLEAR);
-
-            // the box
-            
-        this.colorCTX.fillRect(lft,top,(rgt-lft),(bot-top));
-        this.normalCTX.fillRect(lft,top,(rgt-lft),(bot-top));
-        
-            // left triangle
-
-        if (lft>=0) {
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(lx,my);
-            this.colorCTX.lineTo(lft,top);
-            this.colorCTX.lineTo(lft,bot);
-            this.colorCTX.fill();
-           
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(lx,my);
-            this.normalCTX.lineTo(lft,top);
-            this.normalCTX.lineTo(lft,bot);
-            this.normalCTX.fill();
-        }
-
-        if (rgt<wid) {
-            this.colorCTX.beginPath();
-            this.colorCTX.moveTo(rx,my);
-            this.colorCTX.lineTo(rgt,top);
-            this.colorCTX.lineTo(rgt,bot);
-            this.colorCTX.fill();
-           
-            this.normalCTX.beginPath();
-            this.normalCTX.moveTo(rx,my);
-            this.normalCTX.lineTo(rgt,top);
-            this.normalCTX.lineTo(rgt,bot);
-            this.normalCTX.fill();
-        }
-    }
     
     
     drawGlowOval(lft,top,rgt,bot,fillRGBColor,borderRGBColor)

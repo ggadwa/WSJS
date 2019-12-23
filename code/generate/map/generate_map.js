@@ -320,7 +320,7 @@ export default class GenerateMapClass
         let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap;
         let roomTopY,forwardPath;
         let room,nextRoom,light,genPiece,centerPnt,intensity,isStairRoom;
-        let roomCount,segmentSize,pathXDeviation;
+        let roomCount,segmentSize,colorSchemeName,pathXDeviation;
         let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
         let map=this.core.map;
         let rooms=[];
@@ -336,17 +336,18 @@ export default class GenerateMapClass
             
         roomCount=importSettings.autoGenerate.roomCount;
         segmentSize=importSettings.autoGenerate.segmentSize;
+        colorSchemeName=importSettings.autoGenerate.colorScheme;
         
             // bitmaps
             
-        roomWallBitmap=GenerateBitmapRun.generateWall(this.core);
-        hallWallBitmap=GenerateBitmapRun.generateWall(this.core);
-        floorBitmap=GenerateBitmapRun.generateFloorOrCeiling(this.core);
-        ceilingBitmap=GenerateBitmapRun.generateFloorOrCeiling(this.core);
-        stepBitmap=GenerateBitmapRun.generateStep(this.core);
-        pillarBitmap=GenerateBitmapRun.generateDecoration(this.core);
-        platformBitmap=GenerateBitmapRun.generatePlatform(this.core);
-        boxBitmap=GenerateBitmapRun.generateBox(this.core);
+        roomWallBitmap=GenerateBitmapRun.generateWall(this.core,colorSchemeName);
+        hallWallBitmap=GenerateBitmapRun.generateWall(this.core,colorSchemeName);
+        floorBitmap=GenerateBitmapRun.generateFloor(this.core,colorSchemeName);
+        ceilingBitmap=GenerateBitmapRun.generateCeiling(this.core,colorSchemeName);
+        stepBitmap=GenerateBitmapRun.generateStep(this.core,colorSchemeName);
+        pillarBitmap=GenerateBitmapRun.generateDecoration(this.core,colorSchemeName);
+        platformBitmap=GenerateBitmapRun.generatePlatform(this.core,colorSchemeName);
+        boxBitmap=GenerateBitmapRun.generateBox(this.core,colorSchemeName);
         
             // we always proceed in a path, so get
             // the deviation for the path
