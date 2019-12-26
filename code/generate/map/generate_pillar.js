@@ -78,7 +78,7 @@ export default class GeneratePillarClass
         let offset,radius;
         let centerPnt=new PointClass(0,0,0);
         let yBound=new BoundClass(room.offset.y,room.offset.y+(room.storyCount*segmentSize));
-        let cylinderSegments=GenerateMeshClass.createCylinderSegmentList(1,(4*room.storyCount));
+        let cylinderSegments=GenerateMeshClass.createCylinderSegmentList(1,(4*room.storyCount),0.5);
         
             // get pillar positions
             

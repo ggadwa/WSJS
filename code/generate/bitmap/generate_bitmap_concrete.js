@@ -10,9 +10,9 @@ export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
 {
     static VARIATION_NONE=0;
     
-    constructor(core,colorSchemeName)
+    constructor(core,colorScheme)
     {
-        super(core,colorSchemeName);
+        super(core,colorScheme);
         
         this.hasNormal=true;
         this.hasSpecular=true;

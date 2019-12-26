@@ -12,9 +12,9 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
     static VARIATION_NONE=0;
     static VARIATION_BOX=1;
     
-    constructor(core,colorSchemeName)
+    constructor(core,colorScheme)
     {
-        super(core,colorSchemeName);
+        super(core,colorScheme);
         
         this.hasNormal=true;
         this.hasSpecular=true;
@@ -62,7 +62,7 @@ export default class GenerateBitmapWoodClass extends GenerateBitmapBaseClass
         
             // some random values
 
-        let boardCount=GenerateUtilityClass.randomInt(4,8);
+        let boardCount=GenerateUtilityClass.randomInt(4,12);
         let boardSize=Math.trunc(this.colorCanvas.width/boardCount);
         let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.005));
         let woodColor=this.getRandomColor();

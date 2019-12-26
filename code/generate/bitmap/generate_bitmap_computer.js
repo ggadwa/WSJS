@@ -12,9 +12,9 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
     static VARIATION_NONE=0;
     static VARIATION_CONTROL_PANEL=0;
     
-    constructor(core,colorSchemeName)
+    constructor(core,colorScheme)
     {
-        super(core,colorSchemeName);
+        super(core,colorScheme);
         
         this.hasNormal=true;
         this.hasSpecular=true;
@@ -222,15 +222,19 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         let componentType,hadBlank,hadWires,hadShutter,rndSuccess;
         let offset=Math.trunc(this.colorImgData.width*0.1);
         let panelColor=this.getRandomColor();
-        let panelInsideColor=this.boostColor(panelColor,0.1);
+        let panelInsideColor=this.adjustColor(panelColor,1.1);
+        
+        let panelEdgeSize=GenerateUtilityClass.randomInt(4,4);
+        let panelInsideEdgeSize=GenerateUtilityClass.randomInt(2,3);
        
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.draw3DRect(offset,0,this.colorImgData.width,offset,8,panelColor,true);
-        this.draw3DRect(0,offset,offset,this.colorImgData.height,8,panelColor,true);
+        this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,panelColor);
         
-        this.draw3DRect(offset,offset,this.colorImgData.width,this.colorImgData.height,8,panelColor,true);
+        this.draw3DFrameRect(offset,0,this.colorImgData.width,offset,panelEdgeSize,panelColor,true);
+        this.draw3DFrameRect(0,offset,offset,this.colorImgData.height,panelEdgeSize,panelColor,true);
+        this.draw3DFrameRect(offset,offset,this.colorImgData.width,this.colorImgData.height,panelEdgeSize,panelColor,true);
         
             // inside components
             // these are stacks of vertical or horizontal chunks
@@ -271,11 +275,12 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 // box around components, can
                 // be randonly in or out
                 
-            this.draw3DRect(lft,top,rgt,bot,5,panelInsideColor,GenerateUtilityClass.randomPercentage(0.5));
+            this.drawRect(lft,top,rgt,bot,panelInsideColor);
+            this.draw3DFrameRect(lft,top,rgt,bot,panelInsideEdgeSize,panelInsideColor,GenerateUtilityClass.randomPercentage(0.5));
             
                 // draw the components
                 // we only allow one blank, wires, or shutter
-            
+            /*
             rndTry=0;
             
             while (rndTry<25) {
@@ -319,7 +324,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
                 rndTry++;
             }
-            
+            */
                 // are we finished?
                 
             if ((mx>=(this.colorImgData.width-15)) || (my>=(this.colorImgData.height-15))) break;

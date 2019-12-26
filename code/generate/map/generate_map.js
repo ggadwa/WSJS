@@ -11,7 +11,8 @@ import GeneratePillarClass from './generate_pillar.js';
 import GenerateStorageClass from './generate_storage.js';
 import GenerateLightClass from './generate_light.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
-import GenerateBitmapRun from '../bitmap/generate_bitmap_run.js';
+import GenerateBitmapBaseClass from '../bitmap/generate_bitmap_base.js';
+import GenerateBitmapRunClass from '../bitmap/generate_bitmap_run.js';
 
 export default class GenerateMapClass
 {
@@ -320,7 +321,7 @@ export default class GenerateMapClass
         let roomWallBitmap,hallWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap;
         let roomTopY,forwardPath;
         let room,nextRoom,light,genPiece,centerPnt,intensity,isStairRoom;
-        let roomCount,segmentSize,colorSchemeName,pathXDeviation;
+        let roomCount,segmentSize,colorScheme,pathXDeviation;
         let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
         let map=this.core.map;
         let rooms=[];
@@ -336,18 +337,19 @@ export default class GenerateMapClass
             
         roomCount=importSettings.autoGenerate.roomCount;
         segmentSize=importSettings.autoGenerate.segmentSize;
-        colorSchemeName=importSettings.autoGenerate.colorScheme;
+        colorScheme=GenerateUtilityClass.randomIndex(GenerateBitmapBaseClass.COLOR_SCHEME_COUNT);
+        colorScheme=GenerateBitmapBaseClass.COLOR_SCHEME_RANDOM;    // testing
         
             // bitmaps
             
-        roomWallBitmap=GenerateBitmapRun.generateWall(this.core,colorSchemeName);
-        hallWallBitmap=GenerateBitmapRun.generateWall(this.core,colorSchemeName);
-        floorBitmap=GenerateBitmapRun.generateFloor(this.core,colorSchemeName);
-        ceilingBitmap=GenerateBitmapRun.generateCeiling(this.core,colorSchemeName);
-        stepBitmap=GenerateBitmapRun.generateStep(this.core,colorSchemeName);
-        pillarBitmap=GenerateBitmapRun.generateDecoration(this.core,colorSchemeName);
-        platformBitmap=GenerateBitmapRun.generatePlatform(this.core,colorSchemeName);
-        boxBitmap=GenerateBitmapRun.generateBox(this.core,colorSchemeName);
+        roomWallBitmap=GenerateBitmapRunClass.generateWall(this.core,colorScheme);
+        hallWallBitmap=GenerateBitmapRunClass.generateWall(this.core,colorScheme);
+        floorBitmap=GenerateBitmapRunClass.generateFloor(this.core,colorScheme);
+        ceilingBitmap=GenerateBitmapRunClass.generateCeiling(this.core,colorScheme);
+        stepBitmap=GenerateBitmapRunClass.generateStep(this.core,colorScheme);
+        pillarBitmap=GenerateBitmapRunClass.generateDecoration(this.core,colorScheme);
+        platformBitmap=GenerateBitmapRunClass.generatePlatform(this.core,colorScheme);
+        boxBitmap=GenerateBitmapRunClass.generateBox(this.core,colorScheme);
         
             // we always proceed in a path, so get
             // the deviation for the path

@@ -367,7 +367,7 @@ export default class GenerateMeshClass
         // cylinders
         //
     
-    static createCylinderSegmentList(segmentCount,segmentExtra)
+    static createCylinderSegmentList(segmentCount,segmentExtra,segmentRoundPercentage)
     {
         let n;
         let segCount=GenerateUtilityClass.randomInt(segmentCount,segmentExtra);
@@ -376,7 +376,12 @@ export default class GenerateMeshClass
         segments.push(1.0);      // top always biggest
         
         for (n=0;n!==segCount;n++) {
-            segments.push(GenerateUtilityClass.randomFloat(0.8,0.2));
+            if (GenerateUtilityClass.randomPercentage(segmentRoundPercentage)) {
+                segments.push(segments[segments.length-1]);
+            }
+            else {
+                segments.push(GenerateUtilityClass.randomFloat(0.8,0.2));
+            }
         }
         
         segments.push(1.0);      // and bottom

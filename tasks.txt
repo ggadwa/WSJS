@@ -1,24 +1,30 @@
+- generate in a pattern (square, U, line, cross, square & cross, A)
+   - everything will need to start 10 by 10
+   - extensions need to find a spot
+
 - startup list needs to include bitmap building
 - clean up stuff at end of generate_bitmap_base
+- move all generate stuff to reaper project
 
 - bitmaps
    -> computer (panel variation) - needs glow
-   -> hexagon
+   -> hexagon (working) -> add noise like oval
    -> stone is still bad, need some more variations in stone work
 
 - decorations
+   -> second stories have different sets of decorations?
    -> computers (grid)
    -> pipes (force duck/jump)
+   -> pillars can have bases
+   -> go up and down stairs
+   -> outside platforms (random width) + lifts in corners
 
 - networking
+   - get rid of ./dist look up docs directory (new File(".").getAbsolutePath() -- test)
    - needs "master" (first in) for games
    - enter
    - leave
    - remotes and updates
-
-- Need ability to AG maps in all 4 directions
-- Need non-path type maps (circular, reverse direction?)
-- Need to be able to go up/down with stairs
 
 - need to make statics for all generate_bitmap_base statics
 - room uvs need to be better
