@@ -2,15 +2,14 @@ import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GeneratePieceClass
 {
-    pieces=
+    static pieces=
             [
                 {
                     "name":"big_box",
                     "size":{"x":10,"z":10},
-                    "multistory":true,
-                    "room":true,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":2,
+                    "margins":[0,0,0,0],
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,0],[10,0],
@@ -22,10 +21,9 @@ export default class GeneratePieceClass
                 {
                     "name":"small_box",
                     "size":{"x":5,"z":5},
-                    "multistory":true,
-                    "room":true,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":2,
+                    "margins":[0,0,0,0],
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
@@ -37,10 +35,9 @@ export default class GeneratePieceClass
                 {
                     "name":"circle",
                     "size":{"x":10,"z":10},
-                    "multistory":true,
-                    "room":false,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":2,
+                    "margins":[2,2,2,2],
                     "vertexes":
                         [
                             [4,0],[5,0],[6,0],[8,1],[9,2],[10,4],[10,5],[10,6],[9,8],[8,9],
@@ -50,10 +47,9 @@ export default class GeneratePieceClass
                 {
                     "name":"half_circle",
                     "size":{"x":10,"z":10},
-                    "multistory":true,
-                    "room":false,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":1,
+                    "margins":[2,2,2,0],
                     "vertexes":
                         [
                             [4,0],[5,0],[6,0],[8,1],[9,2],[10,4],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10],
@@ -64,10 +60,9 @@ export default class GeneratePieceClass
                 {
                     "name":"half_circle_small",
                     "size":{"x":10,"z":5},
-                    "multistory":true,
-                    "room":false,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":1,
+                    "margins":[2,2,2,0],
                     "vertexes":
                         [
                             [4,0],[5,0],[6,0],[8,1],[9,2],[10,4],[10,5],
@@ -78,10 +73,9 @@ export default class GeneratePieceClass
                 {
                     "name":"slant_box",
                     "size":{"x":10,"z":10},
-                    "multistory":true,
-                    "room":false,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":2,
+                    "margins":[1,1,1,1],
                     "vertexes":
                         [
                             [2,0],[3,0],[4,0],[5,0],[6,0],[7,0],[8,0],[9,1],[10,2],
@@ -91,12 +85,11 @@ export default class GeneratePieceClass
                         ]
                 },
                 {
-                    "name":"4_exit_box",
+                    "name":"ragged_box",
                     "size":{"x":10,"z":10},
-                    "multistory":true,
-                    "room":false,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":2,
+                    "margins":[1,1,1,1],
                     "vertexes":
                         [
                             [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[6,0],[7,0],[8,0],[9,0],
@@ -108,10 +101,9 @@ export default class GeneratePieceClass
                 {
                     "name":"small_diamond",
                     "size":{"x":5,"z":5},
-                    "multistory":true,
-                    "room":false,
-                    "extraRoom":true,
-                    "hallway":false,
+                    "decorate":true,
+                    "storyMinimum":1,
+                    "margins":[1,1,1,1],
                     "vertexes":
                         [
                             [2,0],[3,0],[4,1],[5,2],[5,3],[4,4],[3,5],
@@ -121,10 +113,9 @@ export default class GeneratePieceClass
                 {
                     "name":"cross_1",
                     "size":{"x":5,"z":5},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
+                    "decorate":false,
+                    "storyMinimum":1,
+                    "margins":[0,0,0,0],
                     "vertexes":
                         [
                             [2,0],[3,0],[3,1],[3,2],[4,2],[5,2],[5,3],[4,3],[3,3],[3,4],[3,5],
@@ -134,10 +125,9 @@ export default class GeneratePieceClass
                 {
                     "name":"cross_2",
                     "size":{"x":5,"z":5},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
+                    "decorate":false,
+                    "storyMinimum":1,
+                    "margins":[0,0,0,0],
                     "vertexes":
                         [
                             [0,0],[1,0],[2,1],[3,1],[4,0],[5,0],
@@ -147,37 +137,11 @@ export default class GeneratePieceClass
                         ]
                 },
                 {
-                    "name":"corner_1",
-                    "size":{"x":3,"z":3},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":
-                        [
-                            [0,0],[1,0],[2,0],[3,0],[3,1],[2,1],[1,1],[1,2],[1,3],[0,3],[0,2],[0,1]
-                        ]
-                },
-                {
-                    "name":"t_intersection",
-                    "size":{"x":5,"z":3},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":
-                        [
-                            [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],
-                            [5,1],[4,1],[3,1],[3,2],[3,3],[2,3],[2,2],[2,1],[1,1],[0,1]
-                        ]
-                },
-                {
-                    "name":"s_intersection",
+                    "name":"s_hallway",
                     "size":{"x":5,"z":5},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
+                    "decorate":false,
+                    "storyMinimum":1,
+                    "margins":[0,0,0,0],
                     "vertexes":
                         [
                             [0,0],[1,0],[2,0],[3,0],[4,0],[5,0],[5,1],
@@ -186,224 +150,20 @@ export default class GeneratePieceClass
                             [0,4],[1,4],[2,4],[3,4],[3,3],[2,3],[1,3],[0,3],
                             [0,2],[0,1]
                         ]
-                },
-                {
-                    "name":"diagonal_hallway",
-                    "size":{"x":5,"z":5},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":
-                        [
-                            [0,0],[1,0],[2,1],[3,2],[4,3],[5,4],[5,5],
-                            [4,5],[3,4],[2,3],[1,2],[0,1]
-                        ]
-                }
-
-            ];
-            
-    stairZPieces=
-            [
-                {
-                    "name":"stair_z",
-                    "size":{"x":1,"z":2},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":[[0,0],[1,0],[1,1],[1,2],[0,2],[0,1]]
-                },
-                {
-                    "name":"stair_z_2",
-                    "size":{"x":2,"z":2},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]]
-                },
-                {
-                    "name":"stair_z_3",
-                    "size":{"x":3,"z":2},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":[[0,0],[1,0],[2,0],[3,0],[3,1],[3,2],[2,2],[1,2],[0,2],[0,1]]
-                }
-            ];
-                
-    stairXPieces=
-            [
-                {
-                    "name":"stair_x",
-                    "size":{"x":2,"z":1},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":[[0,0],[1,0],[2,0],[2,1],[1,1],[0,1]]
-                },
-                {
-                    "name":"stair_x_2",
-                    "size":{"x":2,"z":2},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[1,2],[0,2],[0,1]]
-                },
-                {
-                    "name":"stair_x_3",
-                    "size":{"x":2,"z":3},
-                    "multistory":false,
-                    "room":false,
-                    "extraRoom":false,
-                    "hallway":true,
-                    "vertexes":[[0,0],[1,0],[2,0],[2,1],[2,2],[2,3],[1,3],[0,3],[0,2],[0,1]]
-                }
-            ];
-            
-    platformPieces=
-            [
-                {
-                    "name":"outside_ramps",
-                    "size":{"x":10,"z":10},
-                    "grid":[[1,1,1,1,1,1,1,1,1,1],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [1,1,0,0,2,2,0,0,1,1],
-                            [1,1,0,0,2,2,0,0,1,1],
-                            [1,1,2,2,2,2,2,2,1,1],
-                            [1,1,2,2,2,2,2,2,1,1],
-                            [1,1,0,0,2,2,0,0,1,1],
-                            [1,1,0,0,2,2,0,0,1,1],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [1,1,1,1,1,1,1,1,1,1]]
-                },
-                {
-                    "name":"x_ramps",
-                    "size":{"x":10,"z":10},
-                    "grid":[[1,1,3,3,3,3,3,3,1,1],
-                            [1,1,3,3,3,3,3,3,1,1],
-                            [1,1,0,0,0,0,0,0,1,1],
-                            [1,1,0,0,0,0,0,0,1,1],
-                            [1,1,2,2,2,2,2,2,1,1],
-                            [1,1,2,2,2,2,2,2,1,1],
-                            [1,1,0,0,0,0,0,0,1,1],
-                            [1,1,0,0,0,0,0,0,1,1],
-                            [1,1,4,4,4,4,4,4,1,1],
-                            [1,1,4,4,4,4,4,4,1,1]]
-                },
-                {
-                    "name":"z_ramps",
-                    "size":{"x":10,"z":10},
-                    "grid":[[1,1,1,1,1,1,1,1,1,1],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [3,3,0,0,2,2,0,0,4,4],
-                            [3,3,0,0,2,2,0,0,4,4],
-                            [3,3,0,0,2,2,0,0,4,4],
-                            [3,3,0,0,2,2,0,0,4,4],
-                            [3,3,0,0,2,2,0,0,4,4],
-                            [3,3,0,0,2,2,0,0,4,4],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [1,1,1,1,1,1,1,1,1,1]]
-                },
-                {
-                    "name":"inside_pillar",
-                    "size":{"x":4,"z":4},
-                    "grid":[[1,1,1,1],
-                            [1,1,1,1],
-                            [1,1,1,1],
-                            [1,1,1,1]]
-                },
-                {
-                    "name":"outline_pillar",
-                    "size":{"x":6,"z":6},
-                    "grid":[[1,1,1,1,1,1],
-                            [1,1,1,1,1,1],
-                            [1,1,0,0,1,1],
-                            [1,1,0,0,1,1],
-                            [1,1,1,1,1,1],
-                            [1,1,1,1,1,1]]
-                },
-                {
-                    "name":"corner_1",
-                    "size":{"x":10,"z":10},
-                    "grid":[[1,1,1,1,1,1,1,1,1,1],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [1,1,2,2,2,2,2,2,2,2],
-                            [1,1,2,3,3,4,4,0,0,0],
-                            [1,1,2,3,3,4,4,0,0,0],
-                            [1,1,2,4,4,4,4,0,0,0],
-                            [1,1,2,4,4,4,4,0,0,0],
-                            [1,1,2,0,0,0,0,0,0,0],
-                            [1,1,2,0,0,0,0,0,0,0],
-                            [1,1,2,0,0,0,0,0,0,0]]
-                },
-                {
-                    "name":"corner_2",
-                    "size":{"x":10,"z":10},
-                    "grid":[[0,0,0,0,0,0,0,2,1,1],
-                            [0,0,0,0,0,0,0,2,1,1],
-                            [0,0,0,0,0,0,0,2,1,1],
-                            [0,0,0,4,4,4,4,2,1,1],
-                            [0,0,0,4,4,4,4,2,1,1],
-                            [0,0,0,4,4,3,3,2,1,1],
-                            [0,0,0,4,4,3,3,2,1,1],
-                            [2,2,2,2,2,2,2,2,1,1],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [1,1,1,1,1,1,1,1,1,1]]
-                },
-                {
-                    "name":"cross_1",
-                    "size":{"x":10,"z":10},
-                    "grid":[[0,0,0,0,1,1,0,0,0,0],
-                            [0,0,0,0,1,1,0,0,0,0],
-                            [0,0,2,2,1,1,3,3,0,0],
-                            [0,0,2,2,1,1,3,3,0,0],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [1,1,1,1,1,1,1,1,1,1],
-                            [0,0,4,4,1,1,5,5,0,0],
-                            [0,0,4,4,1,1,5,5,0,0],
-                            [0,0,0,0,1,1,0,0,0,0],
-                            [0,0,0,0,1,1,0,0,0,0]]
-                },
-                {
-                    "name":"pattern",
-                    "size":{"x":10,"z":10},
-                    "grid":[[2,2,2,0,0,0,0,3,3,3],
-                            [2,2,2,0,0,0,0,3,3,3],
-                            [2,2,2,0,0,0,0,3,3,3],
-                            [0,0,1,1,1,1,1,1,0,0],
-                            [0,0,1,1,1,1,1,1,0,0],
-                            [0,0,1,1,1,1,1,1,0,0],
-                            [0,0,1,1,1,1,1,1,0,0],
-                            [4,4,4,0,0,0,0,5,5,5],
-                            [4,4,4,0,0,0,0,5,5,5],
-                            [4,4,4,0,0,0,0,5,5,5]]
                 }
             ];
 
     constructor()
     {
-        let n,nPiece;
-        
-            // when we construct this, make rotated versions
-            // of all the pieces
-            
-        nPiece=this.pieces.length;
-        
-        for (n=0;n!==nPiece;n++) {
-            this.pieces.push(this.dupTransformPiece(this.pieces[n],false,false,true));
-            this.pieces.push(this.dupTransformPiece(this.pieces[n],true,false,false));
-            this.pieces.push(this.dupTransformPiece(this.pieces[n],true,true,false));
-        }
     }
     
-    dupTransformPiece(origPiece,rotate,flipX,flipZ)
+    static dupTransformPiece(origPiece,rotate,flipX,flipZ)
     {
-        let n,x,piece;
+        let n,k,piece;
+        
+            // no change
+            
+        if ((!rotate) && (!flipX) && (!flipZ)) return(origPiece);
         
             // duplicate
             
@@ -412,48 +172,52 @@ export default class GeneratePieceClass
             // and flip
         
         if (rotate) {
-            x=piece.size.x;
+            k=piece.size.x;
             piece.size.x=piece.size.z;
-            piece.size.z=x;
+            piece.size.z=k;
+            
+            k=piece.margins[0];
+            piece.margins[0]=piece.margins[2];
+            piece.margins[2]=k;
+            
+            k=piece.margins[1];
+            piece.margins[1]=piece.margins[3];
+            piece.margins[3]=k;
         }
             
         for (n=0;n!==piece.vertexes.length;n++) {
             if (rotate) {
-                x=piece.vertexes[n][0];
+                k=piece.vertexes[n][0];
                 piece.vertexes[n][0]=piece.vertexes[n][1];
-                piece.vertexes[n][1]=x;
+                piece.vertexes[n][1]=k;
             }
             if (flipX) piece.vertexes[n][0]=piece.size.x-piece.vertexes[n][0];
             if (flipZ) piece.vertexes[n][1]=piece.size.z-piece.vertexes[n][1];
         }
         
+        if (flipX) {
+            k=piece.margins[0];
+            piece.margins[0]=piece.margins[2];
+            piece.margins[2]=k;
+        }
+        
+        if (flipZ) {
+            k=piece.margins[1];
+            piece.margins[1]=piece.margins[3];
+            piece.margins[3]=k;
+        }
+        
         return(piece);
     }
+    
+    static getDefaultPiece()
+    {
+        return(this.pieces[0]);
+    }
 
-    getRandomPiece(room,extraRoom,hallway)
+    static getRandomPiece()
     {
-        let piece;
         
-        while (true) {
-            piece=this.pieces[GenerateUtilityClass.randomIndex(this.pieces.length)];
-            if ((room) && (piece.room)) return(piece);
-            if ((extraRoom) && (piece.extraRoom)) return(piece);
-            if ((hallway) && (piece.hallway)) return(piece);
-        }
-    }
-    
-    getStairZPiece()
-    {
-        return(this.stairZPieces[GenerateUtilityClass.randomIndex(this.stairZPieces.length)]);
-    }
-    
-    getStairXPiece()
-    {
-        return(this.stairXPieces[GenerateUtilityClass.randomIndex(this.stairXPieces.length)]);
-    }
-    
-    getPlatformPiece()
-    {
-        return(this.platformPieces[GenerateUtilityClass.randomIndex(this.platformPieces.length)]);
+        return(this.dupTransformPiece(this.pieces[GenerateUtilityClass.randomIndex(this.pieces.length)],GenerateUtilityClass.randomPercentage(0.5),GenerateUtilityClass.randomPercentage(0.5),GenerateUtilityClass.randomPercentage(0.5)));
     }
 }

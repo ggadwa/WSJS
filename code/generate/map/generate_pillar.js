@@ -23,8 +23,8 @@ export default class GeneratePillarClass
         let x,z;
         let posList=[];
         
-        for (z=1;z<(room.piece.size.z-1);z+=2) {
-            for (x=1;x<(room.piece.size.x-1);x+=2) {
+        for (z=(room.piece.margins[1]+1);z<(room.piece.size.z-(room.piece.margins[3]+1));z+=2) {
+            for (x=(room.piece.margins[0]+1);x<(room.piece.size.x-(room.piece.margins[2]+1));x+=2) {
                 posList.push([x,z]);
             }
         }
@@ -39,7 +39,7 @@ export default class GeneratePillarClass
         
         z=Math.trunc(room.piece.size.z*0.5);
         
-        for (x=1;x<(room.piece.size.x-1);x+=2) {
+        for (x=(room.piece.margins[0]+1);x<(room.piece.size.x-(room.piece.margins[2]+1));x+=2) {
             posList.push([x,z]);
         }
         
@@ -53,7 +53,7 @@ export default class GeneratePillarClass
         
         x=Math.trunc(room.piece.size.x*0.5);
         
-        for (z=1;z<(room.piece.size.z-1);z+=2) {
+        for (z=(room.piece.margins[1]+1);z<(room.piece.size.z-(room.piece.margins[3]+1));z+=2) {
             posList.push([x,z]);
         }
         
@@ -62,10 +62,10 @@ export default class GeneratePillarClass
 
     static buildCornerPillarPattern(core,room)
     {
-        let x=room.piece.size.x-2;
-        let z=room.piece.size.z-2;
+        let x=room.piece.size.x-(room.piece.margins[2]+1);
+        let z=room.piece.size.z-(room.piece.margins[3]+1);
         
-        return([[1,1],[x,1],[1,z],[x,z]]);
+        return([[room.piece.margins[0],room.piece.margins[1]],[x,room.piece.margins[1]],[room.piece.margins[0],z],[x,z]]);
     }
    
         //

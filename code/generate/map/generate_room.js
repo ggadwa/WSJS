@@ -6,26 +6,13 @@ export default class GenerateRoomClass
     static STAIR_PATH_DIRECTION_Z=0;
     static STAIR_PATH_DIRECTION_X=1;
     
-    constructor(piece,segmentSize,sideRoom,stairRoom)
+    constructor(piece,segmentSize)
     {
         this.piece=piece;
-        this.sideRoom=sideRoom;
-        this.stairRoom=stairRoom;
-        
-        this.forwardPath=false;     // be filled in later during construction
-        this.pathXDeviation=0;
-        this.stairDirection=GenerateRoomClass.STAIR_PATH_DIRECTION_Z;
-        
-        this.storyPiece=null;
+
+        this.storyCount=GenerateUtilityClass.randomInt(this.piece.storyMinimum,3);
         
         this.offset=new PointClass(0,0,0);
-        if (stairRoom) {
-            this.storyCount=2;
-        }
-        else {
-            this.storyCount=(this.piece.multistory)?(Math.trunc(GenerateUtilityClass.randomInt(1,3))):1;
-        }
-        
         this.size=new PointClass((segmentSize*piece.size.x),(segmentSize*this.storyCount),(segmentSize*piece.size.z));
         
             // vertex hiding array, had 3 possible stories
@@ -34,7 +21,46 @@ export default class GenerateRoomClass
         
             // grids for blocking off floor/stories/etc
             
-        this.grid=new Uint8Array((this.piece.size.x*this.piece.size.z)*(this.storyCount+1));        // 0 = bottom floor
+        this.grid=new Uint8Array((this.piece.size.x*this.piece.size.z)*5);        // up to 5 stories
+    }
+    
+    collides(rooms)
+    {
+        let n,checkRoom;
+        
+        for (n=0;n!==rooms.length;n++) {
+            checkRoom=rooms[n];
+            if (this.offset.x>=(checkRoom.offset.x+checkRoom.size.x)) continue;
+            if ((this.offset.x+this.size.x)<=checkRoom.offset.x) continue;
+            if (this.offset.z>=(checkRoom.offset.z+checkRoom.size.z)) continue;
+            if ((this.offset.z+this.size.z)<=checkRoom.offset.z) continue;
+            
+            return(true);
+        }
+        
+        return(false);
+    }
+    
+    touches(rooms)
+    {
+        let n,checkRoom;
+        
+        for (n=0;n!==rooms.length;n++) {
+            checkRoom=rooms[n];
+            if ((this.offset.x===(checkRoom.offset.x+checkRoom.size.x)) || ((this.offset.x+this.size.x)===checkRoom.offset.x)) {
+                if (this.offset.z>=(checkRoom.offset.z+checkRoom.size.z)) continue;
+                if ((this.offset.z+this.size.z)<=checkRoom.offset.z) continue;
+                return(n);
+            }
+            
+            if ((this.offset.z===(checkRoom.offset.z+checkRoom.size.z)) || ((this.offset.z+this.size.z)===checkRoom.offset.z)) {
+                if (this.offset.x>=(checkRoom.offset.x+checkRoom.size.x)) continue;
+                if ((this.offset.x+this.size.x)<=checkRoom.offset.x) continue;
+                return(n);
+            }
+        }
+        
+        return(-1);
     }
     
     hideVertex(story,vIdx)
