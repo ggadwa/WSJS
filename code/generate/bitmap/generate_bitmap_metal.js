@@ -46,7 +46,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         
         metalCorrColor=this.adjustColorRandom(metalColor,0.6,0.7);
 
-        corrCount=GenerateUtilityClass.randomInt(Math.trunc(wid*0.04),Math.trunc(wid*0.04));
+        corrCount=GenerateUtilityClass.randomInt(Math.trunc(wid*0.06),Math.trunc(wid*0.03));
         corrWid=Math.trunc(wid/corrCount);
         corrHigh=Math.trunc(high/corrCount);
 
@@ -122,7 +122,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
     generateMetalPanel(lft,top,rgt,bot,metalColor,altMetalColor,edgeSize,screwSize,variationMode)
     {
         let lft2,rgt2,top2,bot2,sz;
-        let color,frameColor,screwColor,panelType;
+        let color,frameColor,screwColor,waveCount,panelType;
         
             // colors
             
@@ -178,7 +178,15 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 // wave
                 
             case 2:
-                this.drawNormalWaveVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),GenerateUtilityClass.randomInt(25,25));
+                frameColor=this.adjustColorRandom(color,0.75,0.85);
+                sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.075);
+                waveCount=GenerateUtilityClass.randomInt(sz,sz);
+                if (GenerateUtilityClass.randomPercentage(0.5)) {
+                    this.drawNormalWaveHorizontal((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color,frameColor,waveCount);
+                }
+                else {
+                    this.drawNormalWaveVertical((lft+edgeSize),(top+edgeSize),(rgt-edgeSize),(bot-edgeSize),color,frameColor,waveCount);
+                }
                 break;
                 
                 // empty

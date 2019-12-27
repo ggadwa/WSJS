@@ -3,17 +3,14 @@
 - need to start player outside blocked grid
 
 - bitmaps
-   -> computer (panel variation) - needs glow
+   -> computer (panel variation) - fix too small segments bug - wires get normals
    -> hexagon (working) -> add noise like oval
    -> stone is still bad, need some more variations in stone work
 
 - decorations
-   -> second stories have different sets of decorations?
-   -> computers (center)
+   -> computers (need UVs for this)
    -> pipes (force duck/jump)
    -> pillars can have bases
-   -> go up and down stairs
-   -> outside platforms (random width) + lifts in corners
 
 - networking
    - get rid of ./dist look up docs directory (new File(".").getAbsolutePath() -- test)

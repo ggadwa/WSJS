@@ -114,6 +114,10 @@ export default class BitmapClass
         this.specularFactor=specularFactor;
         this.glowImage=glowImage;
         
+        this.glowFrequency=glowFrequency;
+        this.glowMin=glowMin;
+        this.glowMax=glowMax;
+        
         this.buildSimpleName();
     }
     

@@ -27,7 +27,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         // components
         //
         
-    generateComputerComponentWires(lft,top,rgt,bot)
+    generateComputerComponentWires(lft,top,rgt,bot,edgeSize)
     {
         let n,nLine;
         let x,y;
@@ -35,10 +35,10 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         
             // wires background
             
-        lft+=5;
-        rgt-=5;
-        top+=5;
-        bot-=5;
+        lft+=edgeSize;
+        rgt-=edgeSize;
+        top+=edgeSize;
+        bot-=edgeSize;
             
         this.drawRect(lft,top,rgt,bot,this.blackColor);
         
@@ -54,7 +54,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 y=(top+5)+GenerateUtilityClass.randomInt(0,((bot-top)-10));
                 
                 lineColor=this.getRandomColor();
-                this.drawRandomLine(lft,y,rgt,y,lft,top,rgt,bot,5,lineColor,false);
+                this.drawRandomLine(lft,y,rgt,y,lft,top,rgt,bot,5,lineColor,true);
             }
         }
         else {
@@ -65,115 +65,131 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 x=(lft+5)+GenerateUtilityClass.randomInt(0,((rgt-lft)-10));
                 
                 lineColor=this.getRandomColor();
-                this.drawRandomLine(x,top,x,bot,lft,top,rgt,bot,5,lineColor,false);
+                this.drawRandomLine(x,top,x,bot,lft,top,rgt,bot,5,lineColor,true);
             }
         }
     }
     
-    generateComputerComponentShutter(lft,top,rgt,bot)
+    generateComputerComponentShutter(lft,top,rgt,bot,edgeSize)
     {
-        let y;
-        let n,nShutter,shutterSize,yAdd,shutterColor,shutterEdgeColor;
-        
-        lft+=5;
-        rgt-=5;
-        top+=5;
-        bot-=5;
+        let sz;
+        let shutterCount,shutterColor,shutterEdgeColor;
 
+        lft+=edgeSize;
+        rgt-=edgeSize;
+        top+=edgeSize;
+        bot-=edgeSize;
+       
         shutterColor=this.getRandomColor();
-        shutterEdgeColor=this.darkenColor(shutterColor,0.9);
-
-        this.drawRect(lft,top,rgt,bot,shutterColor);
-
-        nShutter=Math.trunc((bot-top)/20);
-
-        yAdd=(bot-top)/nShutter;
-        y=top+Math.trunc(yAdd/2);
-
-        shutterSize=GenerateUtilityClass.randomInt(5,Math.trunc(yAdd*0.2));
-
-        for (n=0;n!==nShutter;n++) {
-            this.drawSlope(lft,y,rgt,(y+shutterSize),shutterEdgeColor,false);
-            y+=yAdd;
+        shutterEdgeColor=this.adjustColor(shutterColor,0.9);
+        
+        sz=Math.trunc(Math.max((rgt-lft),(bot-top))*0.075);
+        shutterCount=GenerateUtilityClass.randomInt(sz,sz);
+        
+        if ((rgt-lft)>(bot-top)) {
+            this.drawNormalWaveHorizontal(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
+        }
+        else {
+            this.drawNormalWaveVertical(lft,top,rgt,bot,shutterColor,shutterEdgeColor,shutterCount);
         }
     }
     
-    generateComputerComponentLights(lft,top,rgt,bot)
+    generateComputerComponentLights(lft,top,rgt,bot,edgeSize)
     {
-        let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
+        let x,y,xCount,yCount,xOff,yOff,dx,dy,sz,margin;
         let color;
         
-        wid=GenerateUtilityClass.randomInt(20,20);
+        lft+=edgeSize;
+        rgt-=edgeSize;
+        top+=edgeSize;
+        bot-=edgeSize;
         
-        xCount=Math.trunc((rgt-lft)/wid);
-        yCount=Math.trunc((bot-top)/wid);
+        sz=GenerateUtilityClass.randomInt(20,20);
+        margin=GenerateUtilityClass.randomInt(2,3);
+        
+        xCount=Math.trunc((rgt-lft)/sz);
+        yCount=Math.trunc((bot-top)/sz);
         
         if ((xCount<=0) || (yCount<=0)) return;
         
-        xOff=(lft+2)+Math.trunc(((rgt-lft)-(xCount*wid))/2);
-        yOff=(top+2)+Math.trunc(((bot-top)-(yCount*wid))/2);
+        xOff=(lft+Math.trunc(margin*0.5))+Math.trunc(((rgt-lft)-(xCount*sz))*0.5);
+        yOff=(top+Math.trunc(margin*0.5))+Math.trunc(((bot-top)-(yCount*sz))*0.5);
         
         for (y=0;y!==yCount;y++) {
-            dy=yOff+(y*wid);
+            dy=yOff+(y*sz);
             
             for (x=0;x!==xCount;x++) {
-                dx=xOff+(x*wid);
+                dx=xOff+(x*sz);
                 
                     // the light
                     
                 color=this.getRandomColor();
-                if (GenerateUtilityClass.randomPercentage(0.5)) color=this.darkenColor(color,0.7);
-                this.draw3DOval(dx,dy,(dx+(wid-5)),(dy+(wid-5)),0.0,1.0,3,0,color,this.blackColor);
+                if (GenerateUtilityClass.randomPercentage(0.5)) color=this.adjustColor(color,0.7);
+                this.drawOval(dx,dy,(dx+(sz-margin)),(dy+(sz-margin)),0,1,0,0,2,0.8,color,this.blackColor,0.5,false,false,1,0);
                 
                     // the possible glow
                     
-                if (GenerateUtilityClass.randomPercentage(0.5)) this.drawGlowOval((dx+2),(dy+2),(dx+(wid-6)),(dy+(wid-6)),this.darkenColor(color,0.7),null);
+                if (GenerateUtilityClass.randomPercentage(0.5)) this.drawOvalGlow(dx,dy,(dx+(sz-margin)),(dy+(sz-margin)),this.adjustColor(color,0.7));
             }
         }
     }
     
-    generateComputerComponentButtons(lft,top,rgt,bot)
+    generateComputerComponentButtons(lft,top,rgt,bot,edgeSize)
     {
-        let x,y,xCount,yCount,xOff,yOff,dx,dy,wid;
-        let color;
+        let x,y,xCount,yCount,xOff,yOff,dx,dy,sz;
+        let color,outlineColor;
         
-        wid=GenerateUtilityClass.randomInt(30,25);
+        lft+=edgeSize;
+        rgt-=edgeSize;
+        top+=edgeSize;
+        bot-=edgeSize;
         
-        xCount=Math.trunc((rgt-lft)/wid);
-        yCount=Math.trunc((bot-top)/wid);
+        sz=GenerateUtilityClass.randomInt(30,25);
+        
+        xCount=Math.trunc((rgt-lft)/sz);
+        yCount=Math.trunc((bot-top)/sz);
         
         if ((xCount<=0) || (yCount<=0)) return;
         
-        xOff=(lft+2)+Math.trunc(((rgt-lft)-(xCount*wid))/2);
-        yOff=(top+2)+Math.trunc(((bot-top)-(yCount*wid))/2);
+        xOff=(lft+2)+Math.trunc(((rgt-lft)-(xCount*sz))/2);
+        yOff=(top+2)+Math.trunc(((bot-top)-(yCount*sz))/2);
+        
+        outlineColor=this.getRandomGray(0.1,0.3);
         
         for (y=0;y!==yCount;y++) {
-            dy=yOff+(y*wid);
+            dy=yOff+(y*sz);
             
             for (x=0;x!==xCount;x++) {
-                dx=xOff+(x*wid);
+                dx=xOff+(x*sz);
                 
                     // the button
                 
                 color=this.getRandomColor();
-                this.draw3DRect(dx,dy,(dx+wid),(dy+wid),2,color,false);
+                this.drawRect(dx,dy,(dx+sz),(dy+sz),color);
+                this.draw3DFrameRect(dx,dy,(dx+sz),(dy+sz),2,outlineColor,true);
                 
                     // the possible glow
                     
-                if (GenerateUtilityClass.randomPercentage(0.5)) this.drawGlowRect(dx,dy,(dx+wid),(dy+wid),color);
+                if (GenerateUtilityClass.randomPercentage(0.5)) this.drawRectGlow(dx,dy,(dx+sz),(dy+sz),color);
             }
         }
     }
     
-    generateComputerComponentDrives(lft,top,rgt,bot)
+    generateComputerComponentDrives(lft,top,rgt,bot,edgeSize)
     {
-        let x,y,xCount,yCount,dx,dy,bx,by,wid,high;
-        let color,ledColor;
+        let x,y,xCount,yCount,dx,dy,bx,by,wid,high,margin;
+        let color,outlineColor,ledColor;
         let ledColors=[new ColorClass(0.0,1.0,0.0),new ColorClass(1.0,1.0,0.0),new ColorClass(1.0,0.0,0.0)];
+        
+        lft+=edgeSize;
+        rgt-=edgeSize;
+        top+=edgeSize;
+        bot-=edgeSize;
         
             // the random color (always dark)
             
         color=this.getRandomGray(0.1,0.3);
+        outlineColor=this.adjustColor(color,0.8);
         
             // the drive sizes
             // pick randomly, but make sure they fill entire size
@@ -187,27 +203,30 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         if (xCount<=0) xCount=1;
         if (yCount<=0) yCount=1;
         
-        wid=Math.trunc(((rgt-lft)-10)/xCount);
-        high=Math.trunc(((bot-top)-10)/yCount);
+        margin=GenerateUtilityClass.randomInt(3,5);
+        
+        wid=Math.trunc(((rgt-lft)-(margin*2))/xCount);
+        high=Math.trunc(((bot-top)-(margin*2))/yCount);
         
         for (y=0;y!==yCount;y++) {
-            dy=(top+5)+(y*high);
+            dy=(top+margin)+(y*high);
             
             for (x=0;x!==xCount;x++) {
-                dx=(lft+5)+(x*wid);
+                dx=(lft+margin)+(x*wid);
                 
                     // the drive
                 
-                this.draw3DRect(dx,dy,(dx+wid),(dy+high),2,color,true);
+                this.drawRect(dx,dy,(dx+wid),(dy+high),color);
+                this.draw3DFrameRect(dx,dy,(dx+wid),(dy+high),2,outlineColor,true);
                 
                     // the glowing indicator
                 
                 ledColor=ledColors[GenerateUtilityClass.randomIndex(3)];
                 
-                bx=(dx+wid)-6;
-                by=(dy+high)-6;
-                this.drawRect(bx,by,(bx+3),(by+3),ledColor);
-                this.drawGlowRect(bx,by,(bx+3),(by+3),ledColor);
+                bx=(dx+wid)-10;
+                by=(dy+high)-8;
+                this.drawRect(bx,by,(bx+6),(by+3),ledColor);
+                this.drawRectGlow(bx,by,(bx+6),(by+3),ledColor);
             }
         }
     }
@@ -280,7 +299,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             
                 // draw the components
                 // we only allow one blank, wires, or shutter
-            /*
+
             rndTry=0;
             
             while (rndTry<25) {
@@ -297,25 +316,25 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                     case 1:
                         if (hadWires) break;
                         hadWires=true;
-                        this.generateComputerComponentWires(lft,top,rgt,bot);
+                        this.generateComputerComponentWires(lft,top,rgt,bot,panelInsideEdgeSize);
                         rndSuccess=true;
                         break;
                     case 2:
                         if (hadShutter) break;
                         hadShutter=true;
-                        this.generateComputerComponentShutter(lft,top,rgt,bot);
+                        this.generateComputerComponentShutter(lft,top,rgt,bot,panelInsideEdgeSize);
                         rndSuccess=true;
                         break;
                     case 3:
-                        this.generateComputerComponentLights(lft,top,rgt,bot);
+                        this.generateComputerComponentLights(lft,top,rgt,bot,panelInsideEdgeSize);
                         rndSuccess=true;
                         break;
                     case 4:
-                        this.generateComputerComponentButtons(lft,top,rgt,bot);
+                        this.generateComputerComponentButtons(lft,top,rgt,bot,panelInsideEdgeSize);
                         rndSuccess=true;
                         break;
                     case 5:
-                        this.generateComputerComponentDrives(lft,top,rgt,bot);
+                        this.generateComputerComponentDrives(lft,top,rgt,bot,panelInsideEdgeSize);
                         rndSuccess=true;
                         break;
                 }
@@ -324,11 +343,17 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
                 rndTry++;
             }
-            */
+
                 // are we finished?
                 
             if ((mx>=(this.colorImgData.width-15)) || (my>=(this.colorImgData.height-15))) break;
         }
+        
+            // set the glow frequency
+            
+        this.glowFrequency=500;
+        this.glowMin=0.6;
+        this.glowMax=0.8;
         
             // finish with the specular
 

@@ -211,6 +211,48 @@ export default class GenerateMeshClass
             
             sy+=stepHigh;
         }
+        
+            // step back
+        
+        if (sides) {
+            sy=y+segmentSize;
+            
+            switch (dir) {
+                case GenerateMeshClass.STAIR_DIR_POS_Z:
+                    sx=x+(segmentSize*stepWidth);
+                    sz=z+(segmentSize*2);
+                    vertexArray.push(x,y,sz);
+                    vertexArray.push(sx,y,sz);
+                    vertexArray.push(sx,sy,sz);
+                    vertexArray.push(x,sy,sz);
+                    break;
+                case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                    sx=x+(segmentSize*stepWidth);
+                    vertexArray.push(x,y,z);
+                    vertexArray.push(sx,y,z);
+                    vertexArray.push(sx,sy,z);
+                    vertexArray.push(x,sy,z);
+                    break;
+                case GenerateMeshClass.STAIR_DIR_POS_X:
+                    sx=x+(segmentSize*2);
+                    sz=z+(segmentSize*stepWidth);
+                    vertexArray.push(sx,y,z);
+                    vertexArray.push(sx,y,sz);
+                    vertexArray.push(sx,sy,sz);
+                    vertexArray.push(sx,sy,z);
+                    break;
+                case GenerateMeshClass.STAIR_DIR_NEG_X:
+                    sz=z+(segmentSize*stepWidth);
+                    vertexArray.push(x,y,z);
+                    vertexArray.push(x,y,sz);
+                    vertexArray.push(x,sy,sz);
+                    vertexArray.push(x,sy,z);
+                    break;
+            }
+
+            trigIdx=GenerateUtilityClass.addQuadToIndexes(indexArray,trigIdx);
+        }
+        
             // create the mesh
             
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,false);

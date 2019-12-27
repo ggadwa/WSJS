@@ -15,6 +15,10 @@ export default class GenerateRoomClass
         this.offset=new PointClass(0,0,0);
         this.size=new PointClass((segmentSize*piece.size.x),(segmentSize*this.storyCount),(segmentSize*piece.size.z));
         
+            // flags set during creation
+            
+        this.requiresExitPlatform=false;
+        
             // vertex hiding array, had 3 possible stories
             
         this.vertexHideArray=new Uint8Array(this.piece.vertexes.length*3);

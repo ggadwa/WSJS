@@ -751,8 +751,6 @@ export default class GenerateBitmapBaseClass
         
         if ((lft>=rgt) || (top>=bot)) return;
 
-            // draw the edges
-
         for (y=top;y<=bot;y++) {
             if ((y<0) || (y>=this.colorImgData.height)) continue;
             
@@ -768,6 +766,28 @@ export default class GenerateBitmapBaseClass
                 normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
                 normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
                 normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+            }
+        }
+    }
+    
+    drawRectGlow(lft,top,rgt,bot,color)
+    {
+        let x,y,idx;
+        let glowData=this.glowImgData.data;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+
+        for (y=top;y<=bot;y++) {
+            if ((y<0) || (y>=this.glowImgData.height)) continue;
+            
+            for (x=lft;x<=rgt;x++) {
+                if ((x<0) || (x>=this.glowImgData.width)) continue;
+                
+                idx=((y*this.glowImgData.width)+x)*4;
+                
+                glowData[idx]=color.r*255.0;
+                glowData[idx+1]=color.g*255.0;
+                glowData[idx+2]=color.b*255.0;
             }
         }
     }
@@ -1005,6 +1025,60 @@ export default class GenerateBitmapBaseClass
                 colorData[idx+2]=Math.trunc(outlineColor.b*255.0);
                 colorData[idx+3]=255;
             }
+        }
+    }
+    
+    drawOvalGlow(lft,top,rgt,bot,color)
+    {
+        let n,x,y,mx,my,halfWid,halfHigh;
+        let rad,fx,fy,idx;
+        let wid,high;
+        let glowData=this.glowImgData.data;
+        
+        if ((lft>=rgt) || (top>=bot)) return;
+        
+            // the drawing size
+            
+        wid=(rgt-lft)-1;
+        high=(bot-top)-1;         // avoids clipping on bottom from being on wid,high
+        mx=lft+Math.trunc(wid*0.5);
+        my=top+Math.trunc(high*0.5);
+        
+            // fill the oval
+
+        while ((wid>0) && (high>0)) {
+
+            halfWid=wid*0.5;
+            halfHigh=high*0.5;
+            
+            for (n=0;n<1000;n++) {
+                rad=(Math.PI*2.0)*(n*0.001);
+
+                fx=Math.sin(rad);
+                if (fx>1.0) fx=1.0;
+                if (fx<-1.0) fx=-1.0;
+                
+                x=mx+Math.trunc(halfWid*fx);
+                if ((x<0) || (x>=this.glowImgData.width)) continue;
+
+                fy=Math.cos(rad);
+                if (fy>1.0) fy=1.0;
+                if (fy<-1.0) fy=-1.0;
+                
+                y=my-Math.trunc(halfHigh*fy);
+                if ((y<0) || (y>=this.glowImgData.height)) continue;
+
+                    // the color
+                
+                idx=((y*this.glowImgData.width)+x)*4;
+                
+                glowData[idx]=Math.trunc(color.r*255.0);
+                glowData[idx+1]=Math.trunc(color.g*255.0);
+                glowData[idx+2]=Math.trunc(color.b*255.0);
+            }
+
+            wid--;
+            high--;
         }
     }
     
@@ -1520,14 +1594,93 @@ export default class GenerateBitmapBaseClass
         }
     }
     
-    drawNormalWaveVertical(lft,top,rgt,bot,waveCount)
+    drawNormalWaveHorizontal(lft,top,rgt,bot,color,lineColor,waveCount)
     {
         let x,y,idx;
         let waveIdx,wavePos,waveAdd;
         let xb,yb,zb;
+        let colorData=this.colorImgData.data;
         let normalData=this.normalImgData.data;
 
         if ((rgt<=lft) || (bot<=top)) return;
+        
+            // the background
+            
+        this.drawRect(lft,top,rgt,bot,color);
+        
+            // the waves
+            
+        waveAdd=Math.trunc((rgt-lft)/waveCount);
+        waveIdx=0;
+        wavePos=0;
+        
+        for (x=lft;x!==rgt;x++) {
+            
+            switch(waveIdx) {
+                case 0:
+                    xb=(this.NORMAL_RIGHT_45.x+1.0)*127.0;
+                    yb=(this.NORMAL_RIGHT_45.y+1.0)*127.0;
+                    zb=(this.NORMAL_RIGHT_45.z+1.0)*127.0;
+                    break;
+                case 1:
+                    xb=(this.NORMAL_CLEAR.x+1.0)*127.0;
+                    yb=(this.NORMAL_CLEAR.y+1.0)*127.0;
+                    zb=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                    break;
+                case 2:
+                    xb=(this.NORMAL_LEFT_45.x+1.0)*127.0;
+                    yb=(this.NORMAL_LEFT_45.y+1.0)*127.0;
+                    zb=(this.NORMAL_LEFT_45.z+1.0)*127.0;
+                    break;
+            }
+            
+            for (y=top;y!==bot;y++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                normalData[idx]=xb;
+                normalData[idx+1]=yb;
+                normalData[idx+2]=zb;
+            }
+            
+            wavePos++;
+            if (wavePos>=waveAdd) {
+                wavePos=0;
+                waveIdx=(waveIdx+1)%3;
+            }
+        }
+        
+            // extra lines
+        
+        waveAdd*=3;
+        
+        for (x=lft;x<rgt;x+=waveAdd) {
+            for (y=top;y!==bot;y++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
+                normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
+                normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                
+                colorData[idx]=lineColor.r*255.0;
+                colorData[idx+1]=lineColor.g*255.0;
+                colorData[idx+2]=lineColor.b*255.0;
+            }
+        }
+    }
+    
+    drawNormalWaveVertical(lft,top,rgt,bot,color,lineColor,waveCount)
+    {
+        let x,y,idx;
+        let waveIdx,wavePos,waveAdd;
+        let xb,yb,zb;
+        let colorData=this.colorImgData.data;
+        let normalData=this.normalImgData.data;
+
+        if ((rgt<=lft) || (bot<=top)) return;
+        
+            // the background
+            
+        this.drawRect(lft,top,rgt,bot,color);
+        
+            // the waves
         
         waveAdd=Math.trunc((bot-top)/waveCount);
         waveIdx=0;
@@ -1566,6 +1719,23 @@ export default class GenerateBitmapBaseClass
                 waveIdx=(waveIdx+1)%3;
             }
         }
+        
+            // extra lines
+        
+        waveAdd*=3;
+        
+        for (y=top;y<bot;y+=waveAdd) {
+            for (x=lft;x!==rgt;x++) {
+                idx=((y*this.colorImgData.width)+x)*4;
+                normalData[idx]=(this.NORMAL_CLEAR.x+1.0)*127.0;
+                normalData[idx+1]=(this.NORMAL_CLEAR.y+1.0)*127.0;
+                normalData[idx+2]=(this.NORMAL_CLEAR.z+1.0)*127.0;
+                
+                colorData[idx]=lineColor.r*255.0;
+                colorData[idx+1]=lineColor.g*255.0;
+                colorData[idx+2]=lineColor.b*255.0;
+            }
+        }   
     }
 
         //
@@ -1737,6 +1907,50 @@ export default class GenerateBitmapBaseClass
                 
                 dx+=slope;
             }
+        }
+    }
+    
+    drawRandomLine(x,y,x2,y2,clipLft,clipTop,clipRgt,clipBot,lineVariant,color,antiAlias)
+    {
+        let n,sx,sy,ex,ey,r;
+        let segCount=GenerateUtilityClass.randomInt(2,5);
+        let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
+        
+        let xAdd=Math.trunc((x2-x)/segCount);
+        let yAdd=Math.trunc((y2-y)/segCount);
+        
+        sx=x;
+        sy=y;
+        
+        for (n=0;n!==segCount;n++) {
+            
+            if ((n+1)===segCount) {
+                ex=x2;
+                ey=y2;
+            }
+            else {
+                ex=sx+xAdd;
+                ey=sy+yAdd;
+
+                r=lineVariant-GenerateUtilityClass.randomIndex(lineVariant*2);
+
+                if (horizontal) {
+                    ey+=r;
+                }
+                else {
+                    ex+=r;
+                }
+            }
+            
+            if (ex<clipLft) ex=clipLft;
+            if (ex>clipRgt) ex=clipRgt;
+            if (ey<clipTop) ey=clipTop;
+            if (ey>clipBot) ey=clipBot;
+            
+            this.drawLineColor(sx,sy,ex,ey,color,antiAlias);
+            
+            sx=ex;
+            sy=ey;
         }
     }
     
@@ -2610,49 +2824,6 @@ export default class GenerateBitmapBaseClass
 
    
     
-    drawRandomLine(x,y,x2,y2,clipLft,clipTop,clipRgt,clipBot,lineVariant,color,lightLine)
-    {
-        let n,sx,sy,ex,ey,r;
-        let segCount=GenerateUtilityClass.randomInt(2,5);
-        let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
-        
-        let xAdd=Math.trunc((x2-x)/segCount);
-        let yAdd=Math.trunc((y2-y)/segCount);
-        
-        sx=x;
-        sy=y;
-        
-        for (n=0;n!==segCount;n++) {
-            
-            if ((n+1)===segCount) {
-                ex=x2;
-                ey=y2;
-            }
-            else {
-                ex=sx+xAdd;
-                ey=sy+yAdd;
-
-                r=lineVariant-GenerateUtilityClass.randomIndex(lineVariant*2);
-
-                if (horizontal) {
-                    ey+=r;
-                }
-                else {
-                    ex+=r;
-                }
-            }
-            
-            if (ex<clipLft) ex=clipLft;
-            if (ex>clipRgt) ex=clipRgt;
-            if (ey<clipTop) ey=clipTop;
-            if (ey>clipBot) ey=clipBot;
-            
-            this.drawLine(sx,sy,ex,ey,color,lightLine);
-            
-            sx=ex;
-            sy=ey;
-        }
-    }
     
     drawBumpLine(x,y,x2,y2,wid,color)
     {

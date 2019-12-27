@@ -6,6 +6,7 @@ import GenerateBitmapMetalClass from './generate_bitmap_metal.js';
 import GenerateBitmapWoodClass from './generate_bitmap_wood.js';
 import GenerateBitmapTileClass from './generate_bitmap_tile.js';
 import GenerateBitmapMosaicClass from './generate_bitmap_mosaic.js';
+import GenerateBitmapComputerClass from './generate_bitmap_computer.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 
 export default class GenerateBitmapRunClass
@@ -160,5 +161,11 @@ export default class GenerateBitmapRunClass
         }
 
         return(genBitmap.generate(variationMode));
+    }
+    
+    static generateComputer(core,colorScheme)
+    {
+        let genBitmap=new GenerateBitmapComputerClass(core,colorScheme);
+        return(genBitmap.generate(0));
     }
 }

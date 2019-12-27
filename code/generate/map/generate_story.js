@@ -23,10 +23,10 @@ export default class GenerateStoryClass
     }
     
         //
-        // lifts
+        // lifts and stairs
         //
   
-    static buildRoomLift(core,room,name,bitmap,segmentSize,x,z)
+    static addLift(core,room,name,bitmap,segmentSize,x,z)
     {
         let n,sx,sz,y,meshIdx;
         let liftName,moveMilliSec,waitMilliSec;
@@ -71,6 +71,34 @@ export default class GenerateStoryClass
         core.map.movementList.add(movement);
     }
     
+    static addStairs(core,room,name,stepBitmap,segmentSize,x,z,dir,storyIdx)
+    {
+        let floorHigh=Math.trunc(segmentSize*0.1);
+        let y=room.offset.y+(storyIdx*segmentSize)+(floorHigh*storyIdx);
+        
+        switch (dir)
+        {
+            case GenerateMeshClass.STAIR_DIR_POS_Z:
+                room.setGridAllStories(x,z,GenerateStoryClass.FLAG_STEPS);
+                room.setGridAllStories(x,(z+1),GenerateStoryClass.FLAG_STEPS);
+                break;
+            case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                room.setGridAllStories(x,z,GenerateStoryClass.FLAG_STEPS);
+                room.setGridAllStories(x,(z-1),GenerateStoryClass.FLAG_STEPS);
+                break;
+            case GenerateMeshClass.STAIR_DIR_POS_X:
+                room.setGridAllStories(x,z,GenerateStoryClass.FLAG_STEPS);
+                room.setGridAllStories((x+1),z,GenerateStoryClass.FLAG_STEPS);
+                break;
+            case GenerateMeshClass.STAIR_DIR_NEG_X:
+                room.setGridAllStories(x,z,GenerateStoryClass.FLAG_STEPS);
+                room.setGridAllStories((x-1),z,GenerateStoryClass.FLAG_STEPS);
+                break;
+        }
+        
+        GenerateMeshClass.buildStairs(core,room,name,stepBitmap,segmentSize,(room.offset.x+(x*segmentSize)),y,(room.offset.z+(z*segmentSize)),dir,1,true);
+    }
+    
         //
         // second story segments
         //
@@ -79,7 +107,7 @@ export default class GenerateStoryClass
     {
         let flag,flag2;
         
-        if (x===0) return(false);
+        if (x===0) return(true);
 
         flag=room.getGrid(storyIdx,x,z);
         flag2=room.getGrid(storyIdx,(x-1),z);
@@ -94,7 +122,7 @@ export default class GenerateStoryClass
     {
         let flag,flag2;
         
-        if (x===(room.piece.size.x-1)) return(false);
+        if (x===(room.piece.size.x-1)) return(true);
         
         flag=room.getGrid(storyIdx,x,z);
         flag2=room.getGrid(storyIdx,(x+1),z);
@@ -109,7 +137,7 @@ export default class GenerateStoryClass
     {
         let flag,flag2;
         
-        if (z===0) return(false);
+        if (z===0) return(true);
         
         flag=room.getGrid(storyIdx,x,z);
         flag2=room.getGrid(storyIdx,x,(z-1));
@@ -124,7 +152,7 @@ export default class GenerateStoryClass
     {
         let flag,flag2;
         
-        if (z===(room.piece.size.z-1)) return(false);
+        if (z===(room.piece.size.z-1)) return(true);
         
         flag=room.getGrid(storyIdx,x,z);
         flag2=room.getGrid(storyIdx,x,(z+1));
@@ -134,19 +162,39 @@ export default class GenerateStoryClass
         if ((flag===GenerateStoryClass.FLAG_PLATFORM) && (flag2===GenerateStoryClass.FLAG_WALL)) return(false);     // if short wall and other is tall wall, then eliminate
         return(true);
     }
-            
-    static buildRoomSingleStory(core,room,name,bitmap,segmentSize,startX,startZ,storyIdx)
+    
+    static setupExitPlatform(core,room,wid)
     {
-        let x,z,gx,gz,sx,sz,ty,by;
-        let negX,posX,negZ,posZ;
+        let x,z;
+        
+            // x platforms
+    
+        for (z=0;z!==room.piece.size.z;z++) {
+            for (x=0;x!==wid;x++) {
+                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
+            }
+            for (x=(room.piece.size.x-wid);x!==room.piece.size.x;x++) {
+                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
+            }
+        }
+        
+            // z platforms
+            
+        for (x=0;x!==room.piece.size.x;x++) {
+            for (z=0;z!==wid;z++) {
+                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
+            }
+            for (z=(room.piece.size.z-wid);z!==room.piece.size.z;z++) {
+                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
+            }
+        }
+    }
+            
+    static setupRandomPlatforms(core,room,startX,startZ,storyIdx)
+    {
+        let x,z,gx,gz,sx,sz;
         let dir,orgDir;
-        let wallStop,skipBottom;
-        let vertexArray=[];
-        let indexArray=[];
-        let normalArray=[];
-        let uvArray,tangentArray;
-        let trigIdx,flag;
-        let floorHigh=Math.trunc(segmentSize*0.1);
+        let wallStop;
         
         gx=startX;
         gz=startZ;
@@ -229,6 +277,19 @@ export default class GenerateStoryClass
                 }
             }
         }
+    }
+    
+    static addPlatforms(core,room,name,bitmap,segmentSize,storyIdx)
+    {
+        let x,z,ty,by;
+        let negX,posX,negZ,posZ;
+        let skipBottom;
+        let vertexArray=[];
+        let indexArray=[];
+        let normalArray=[];
+        let uvArray,tangentArray;
+        let trigIdx,flag;
+        let floorHigh=Math.trunc(segmentSize*0.1);
         
             // make the segments
         
@@ -305,7 +366,7 @@ export default class GenerateStoryClass
         // second story mainline
         //
         
-    static buildRoomStories(core,room,name,platformBitmap,segmentSize)
+    static buildRoomStories(core,room,name,stepBitmap,platformBitmap,segmentSize)
     {
         let n,x,z;
         
@@ -316,13 +377,58 @@ export default class GenerateStoryClass
         
             // lift
             
-        this.buildRoomLift(core,room,name,platformBitmap,segmentSize,x,z);
+        this.addLift(core,room,name,stepBitmap,segmentSize,x,z);
         
             // build the story segments
             
         for (n=1;n<room.storyCount;n++) {
-            this.buildRoomSingleStory(core,room,name,platformBitmap,segmentSize,x,z,n);
+            this.setupRandomPlatforms(core,room,x,z,n);
+            this.addPlatforms(core,room,name,platformBitmap,segmentSize,n);
         }
+    }
+    
+        //
+        // exit platform mainline
+        //
+        
+    static buildRoomExitPlatform(core,room,name,stepBitmap,platformBitmap,segmentSize)
+    {
+        let x,z,dir,wid;
+        
+            // width of platforms
+            
+        wid=GenerateUtilityClass.randomInt(1,((room.piece.size.x>5)?2:1));
+
+            // stairs
+            
+        dir=GenerateUtilityClass.randomIndex(4);
+        
+        switch (dir)
+        {
+            case GenerateMeshClass.STAIR_DIR_POS_Z:
+                x=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.x-wid));
+                z=room.piece.size.z-(wid+2);
+                break;
+            case GenerateMeshClass.STAIR_DIR_NEG_Z:
+                x=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.x-wid));
+                z=wid;
+                break;
+            case GenerateMeshClass.STAIR_DIR_POS_X:
+                x=room.piece.size.x-(wid+2);
+                z=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.z-wid));
+                break;
+            case GenerateMeshClass.STAIR_DIR_NEG_X:
+                x=wid;
+                z=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.z-wid));
+                break;
+        }
+            
+        this.addStairs(core,room,name,stepBitmap,segmentSize,x,z,dir,0);
+        
+            // platforms
+            
+        this.setupExitPlatform(core,room,wid);
+        this.addPlatforms(core,room,name,platformBitmap,segmentSize,1);
     }
 }
 
