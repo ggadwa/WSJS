@@ -186,7 +186,7 @@ export default class GenerateBitmapTileClass extends GenerateBitmapBaseClass
         tileColor[0]=this.getRandomColor();
         tileColor[1]=this.getRandomColor();
         designColor=this.getRandomColor();
-        groutColor=this.dullColor(tileColor[0],0.7);
+        groutColor=this.RandomColorDull(tileColor[0],0.7);
         
         this.createPerlinNoiseData(16,16);
 
