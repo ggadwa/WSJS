@@ -15,55 +15,13 @@ export default class GenerateComputerClass
     }
     
         //
-        // boxes
-        //
-
-    static addBoxes(core,room,name,boxBitmap,x,z,segmentSize)
-    {
-        let stackLevel,stackCount;
-        let boxSize,boxHalfSize,boxXBound,boxYBound,boxZBound;
-        let boxPos,rotAngle;
-        
-            // box size
-            
-        x=(room.offset.x+(x*segmentSize))+Math.trunc(segmentSize*0.5);
-        z=(room.offset.z+(z*segmentSize))+Math.trunc(segmentSize*0.5);
-        
-        boxSize=GenerateUtilityClass.randomInt(Math.trunc(segmentSize*0.3),Math.trunc(segmentSize*0.4));
-        boxHalfSize=Math.trunc(boxSize*0.5);
-            
-        boxXBound=new BoundClass((x-boxHalfSize),(x+boxHalfSize));
-        boxYBound=new BoundClass(room.offset.y,(room.offset.y+boxSize));
-        boxZBound=new BoundClass((z-boxHalfSize),(z+boxHalfSize));
-        
-        boxPos=new PointClass(0,0,0);
-        rotAngle=new PointClass(0.0,0.0,0.0);
-        
-            // stacks of boxes
-            
-        stackCount=GenerateUtilityClass.randomInt(1,3);
-            
-            // the stacks
-            
-        for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
-            rotAngle.setFromValues(0.0,(GenerateUtilityClass.randomFloat(-10.0,20.0)),0.0);
-            GenerateMeshClass.createCubeRotated(core,room,(name+'_'+stackLevel),boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,true,segmentSize);
-            
-                // go up one level
-
-            boxYBound.add(boxSize);
-            if (boxYBound.max>(room.offset.y+(segmentSize*room.storyCount))) break;
-        }
-    }
-            
-        //
-        // storage
+        // computers
         //
 
     static buildRoomComputer(core,room,name,platformBitmap,computerBitmap,segmentSize)
     {
         let x,z,k,wid,widOffset,topY,botY;
-        let lx,rx,tz,bz;
+        let lx,rx,tz,bz,skipX,skipZ;
         let xBound,yBound,zBound,computerCount;
         
             // bounds with margins
@@ -88,6 +46,14 @@ export default class GenerateComputerClass
             
         GenerateMeshClass.createCube(core,room,(name+'_pedestal'),platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,true,segmentSize);
         
+            // if enough room, make a path
+            // through the computers
+        
+        skipX=-1;
+        if ((rx-lx)>2) skipX=GenerateUtilityClass.randomInBetween((lx+1),(rx-1));
+        skipZ=-1;
+        if ((bz-tz)>2) skipZ=GenerateUtilityClass.randomInBetween((tz+1),(bz-1));
+        
             // the computers
           
         computerCount=0;
@@ -95,14 +61,18 @@ export default class GenerateComputerClass
         yBound.setFromValues((room.offset.y+botY),(room.offset.y+topY));
         
         for (z=tz;z<bz;z++) {
+            if (z===skipZ) continue;
+            
             k=(room.offset.z+(z*segmentSize))+widOffset;
             zBound.setFromValues(k,(k+wid));
             
             for (x=lx;x<rx;x++) {
+                if (x===skipX) continue;
+                
                 k=(room.offset.x+(x*segmentSize))+widOffset;
                 xBound.setFromValues(k,(k+wid));
                 
-                GenerateMeshClass.createCube(core,room,(name+'_computer_'+computerCount),computerBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,true,segmentSize);
+                GenerateMeshClass.createCube(core,room,(name+'_computer_'+computerCount),computerBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,false,segmentSize);
                 
                 computerCount++;
             }

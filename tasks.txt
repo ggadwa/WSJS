@@ -1,22 +1,16 @@
 - move all generate stuff to reaper project
 - need to start player outside blocked grid
 
-- update fixed cart on other machine (addSound(...,0,0))
-
 - bitmaps
-   -> computer (panel variation) - fix too small segments bug - wires get normals
    -> hexagon (working) -> add noise like oval
    -> stone is still bad, need some more variations in stone work
 
 - decorations
    -> exit platforms need to have different widths on all sides
-   -> computers (need UVs for this)
    -> pipes (force duck/jump)
-   -> pillars can have bases
+   -> pillars can have bases - no pillars in small rooms?
 
 - networking
-   - get rid of ./dist look up docs directory (new File(".").getAbsolutePath() -- test)
-   - add a http server
    - needs "master" (first in) for games
    - enter
    - leave

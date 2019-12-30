@@ -104,7 +104,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=GenerateUtilityClass.randomInt(20,20);
+        sz=GenerateUtilityClass.randomInt(5,20);
         margin=GenerateUtilityClass.randomInt(2,3);
         
         xCount=Math.trunc((rgt-lft)/sz);
@@ -144,7 +144,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         top+=edgeSize;
         bot-=edgeSize;
         
-        sz=GenerateUtilityClass.randomInt(30,25);
+        sz=GenerateUtilityClass.randomInt(10,30);
         
         xCount=Math.trunc((rgt-lft)/sz);
         yCount=Math.trunc((bot-top)/sz);
@@ -254,6 +254,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         this.draw3DFrameRect(offset,0,this.colorImgData.width,offset,panelEdgeSize,panelColor,true);
         this.draw3DFrameRect(0,offset,offset,this.colorImgData.height,panelEdgeSize,panelColor,true);
         this.draw3DFrameRect(offset,offset,this.colorImgData.width,this.colorImgData.height,panelEdgeSize,panelColor,true);
+        this.draw3DFrameRect(0,0,offset,offset,panelEdgeSize,panelColor,true);
         
             // inside components
             // these are stacks of vertical or horizontal chunks
@@ -275,7 +276,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
             if (GenerateUtilityClass.randomPercentage(0.5)) {
                 rgt=lft+sz;
-                if (rgt>(this.colorImgData.width-15)) rgt=this.colorImgData.width-15;
+                if (rgt>(this.colorImgData.width-55)) rgt=this.colorImgData.width-15;
                 bot=this.colorImgData.height-15;
                 
                 mx+=(sz+5);
@@ -285,7 +286,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
             else {
                 bot=top+sz;
-                if (bot>(this.colorImgData.height-15)) bot=this.colorImgData.height-15;
+                if (bot>(this.colorImgData.height-55)) bot=this.colorImgData.height-15;
                 rgt=this.colorImgData.width-15;
                 
                 my+=(sz+5);
@@ -296,6 +297,10 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
             this.drawRect(lft,top,rgt,bot,panelInsideColor);
             this.draw3DFrameRect(lft,top,rgt,bot,panelInsideEdgeSize,panelInsideColor,GenerateUtilityClass.randomPercentage(0.5));
+            
+                // if too small than no items
+                
+            if ((mx>=(this.colorImgData.width-15)) || (my>=(this.colorImgData.height-15))) break;
             
                 // draw the components
                 // we only allow one blank, wires, or shutter
@@ -343,10 +348,6 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
                 rndTry++;
             }
-
-                // are we finished?
-                
-            if ((mx>=(this.colorImgData.width-15)) || (my>=(this.colorImgData.height-15))) break;
         }
         
             // set the glow frequency

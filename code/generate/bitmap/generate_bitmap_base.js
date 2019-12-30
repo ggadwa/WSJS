@@ -1948,6 +1948,16 @@ export default class GenerateBitmapBaseClass
             if (ey>clipBot) ey=clipBot;
             
             this.drawLineColor(sx,sy,ex,ey,color,antiAlias);
+            if (horizontal) {
+                this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
+                this.drawLineNormal(sx,(sy-1),ex,(ey-1),this.NORMAL_BOTTOM_45);
+                this.drawLineNormal(sx,(sy+1),ex,(ey+1),this.NORMAL_TOP_45);
+            }
+            else {
+                this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
+                this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_RIGHT_45);
+                this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_LEFT_45);
+            }
             
             sx=ex;
             sy=ey;

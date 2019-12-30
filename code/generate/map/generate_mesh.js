@@ -303,7 +303,12 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.min,yBound.max,zBound.max);     
             vertexArray.push(xBound.min,yBound.max,zBound.min);
             
-            uvArray.push(0,0,0,1,1,1,1,0);
+            if (wholeUV) {
+                uvArray.push(0,0,0,1,1,1,1,0);
+            }
+            else {
+                uvArray.push(0,0.1,0,0.1,0.1,0.1,0.1,0.1);
+            }
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -316,7 +321,12 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             vertexArray.push(xBound.max,yBound.max,zBound.min);
             
-            uvArray.push(0,0,0,1,1,1,1,0);
+            if (wholeUV) {
+                uvArray.push(0,0,0,1,1,1,1,0);
+            }
+            else {
+                uvArray.push(0,0.1,0,0.1,0.1,0.1,0.1,0.1);
+            }
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -329,7 +339,12 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.min);
             vertexArray.push(xBound.min,yBound.max,zBound.min);
             
-            uvArray.push(0,0,0,1,1,1,1,0);
+            if (wholeUV) {
+                uvArray.push(0,0,0,1,1,1,1,0);
+            }
+            else {
+                uvArray.push(0.1,0.1,0.1,1,1,1,1,0.1);
+            }
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -342,7 +357,12 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             vertexArray.push(xBound.min,yBound.max,zBound.max);
             
-            uvArray.push(0,0,0,1,1,1,1,0);
+            if (wholeUV) {
+                uvArray.push(0,0,0,1,1,1,1,0);
+            }
+            else {
+                uvArray.push(0.1,0.1,0.1,1,1,1,1,0.1);
+            }
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -355,7 +375,12 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             vertexArray.push(xBound.min,yBound.max,zBound.max);
             
-            uvArray.push(0,0,0,1,1,1,1,0);
+            if (wholeUV) {
+                uvArray.push(0,0,0,1,1,1,1,0);
+            }
+            else {
+                uvArray.push(0.1,0,0.1,0.1,0.1,0.1,0.1,0);
+            }
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -368,7 +393,12 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.min,zBound.max);
             vertexArray.push(xBound.min,yBound.min,zBound.max);
             
-            uvArray.push(0,0,0,1,1,1,1,0);
+            if (wholeUV) {
+                uvArray.push(0,0,0,1,1,1,1,0);
+            }
+            else {
+                uvArray.push(0.1,0,0.1,0.1,0.1,0.1,0.1,0);
+            }
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -392,7 +422,6 @@ export default class GenerateMeshClass
             // create the mesh
 
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
-        if (!wholeUV) uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
