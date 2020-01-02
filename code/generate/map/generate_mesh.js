@@ -11,6 +11,10 @@ export default class GenerateMeshClass
     static STAIR_DIR_NEG_Z=1;
     static STAIR_DIR_POS_X=2;
     static STAIR_DIR_NEG_X=3;
+    
+    static UV_WHOLE=0;
+    static UV_BOX=1;
+    static UV_MAP=2;
 
     constructor()
     {
@@ -284,7 +288,7 @@ export default class GenerateMeshClass
         // cubes
         //
 
-    static createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,wholeUV,segmentSize)
+    static createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,rotAngle,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
     {
         let idx,centerPnt,rotPnt;
         let n,mesh;
@@ -303,12 +307,15 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.min,yBound.max,zBound.max);     
             vertexArray.push(xBound.min,yBound.max,zBound.min);
             
-            if (wholeUV) {
-                uvArray.push(0,0,0,1,1,1,1,0);
+            switch (uvMode) {
+                case GenerateMeshClass.UV_WHOLE:
+                    uvArray.push(0,0,0,1,1,1,1,0);
+                    break;
+                case GenerateMeshClass.UV_BOX:
+                    uvArray.push(0,0,0,0.499,0.499,0.499,0.499,0);
+                    break;
             }
-            else {
-                uvArray.push(0,0.1,0,0.1,0.1,0.1,0.1,0.1);
-            }
+            
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -321,12 +328,15 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             vertexArray.push(xBound.max,yBound.max,zBound.min);
             
-            if (wholeUV) {
-                uvArray.push(0,0,0,1,1,1,1,0);
+            switch (uvMode) {
+                case GenerateMeshClass.UV_WHOLE:
+                    uvArray.push(0,0,0,1,1,1,1,0);
+                    break;
+                case GenerateMeshClass.UV_BOX:
+                    uvArray.push(0,0,0,0.499,0.499,0.499,0.499,0);
+                    break;
             }
-            else {
-                uvArray.push(0,0.1,0,0.1,0.1,0.1,0.1,0.1);
-            }
+            
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -339,12 +349,15 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.min);
             vertexArray.push(xBound.min,yBound.max,zBound.min);
             
-            if (wholeUV) {
-                uvArray.push(0,0,0,1,1,1,1,0);
+            switch (uvMode) {
+                case GenerateMeshClass.UV_WHOLE:
+                    uvArray.push(0,0,0,1,1,1,1,0);
+                    break;
+                case GenerateMeshClass.UV_BOX:
+                    uvArray.push(0.5,0,0.5,0.499,1,0.499,1,0);
+                    break;
             }
-            else {
-                uvArray.push(0.1,0.1,0.1,1,1,1,1,0.1);
-            }
+            
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -357,12 +370,15 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             vertexArray.push(xBound.min,yBound.max,zBound.max);
             
-            if (wholeUV) {
-                uvArray.push(0,0,0,1,1,1,1,0);
+            switch (uvMode) {
+                case GenerateMeshClass.UV_WHOLE:
+                    uvArray.push(0,0,0,1,1,1,1,0);
+                    break;
+                case GenerateMeshClass.UV_BOX:
+                    uvArray.push(0.5,0,0.5,0.499,1,0.499,1,0);
+                    break;
             }
-            else {
-                uvArray.push(0.1,0.1,0.1,1,1,1,1,0.1);
-            }
+            
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -375,12 +391,15 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.max,zBound.max);
             vertexArray.push(xBound.min,yBound.max,zBound.max);
             
-            if (wholeUV) {
-                uvArray.push(0,0,0,1,1,1,1,0);
+            switch (uvMode) {
+                case GenerateMeshClass.UV_WHOLE:
+                    uvArray.push(0,0,0,1,1,1,1,0);
+                    break;
+                case GenerateMeshClass.UV_BOX:
+                    uvArray.push(0,0.499,0,1,0.499,1,0.499,0.499);
+                    break;
             }
-            else {
-                uvArray.push(0.1,0,0.1,0.1,0.1,0.1,0.1,0);
-            }
+            
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -393,12 +412,15 @@ export default class GenerateMeshClass
             vertexArray.push(xBound.max,yBound.min,zBound.max);
             vertexArray.push(xBound.min,yBound.min,zBound.max);
             
-            if (wholeUV) {
-                uvArray.push(0,0,0,1,1,1,1,0);
+            switch (uvMode) {
+                case GenerateMeshClass.UV_WHOLE:
+                    uvArray.push(0,0,0,1,1,1,1,0);
+                    break;
+                case GenerateMeshClass.UV_BOX:
+                    uvArray.push(0,0.499,0,1,0.499,1,0.499,0.499);
+                    break;
             }
-            else {
-                uvArray.push(0.1,0,0.1,0.1,0.1,0.1,0.1,0);
-            }
+            
             indexArray.push(idx,(idx+1),(idx+2),idx,(idx+2),(idx+3));
             idx+=4;
         }
@@ -422,6 +444,7 @@ export default class GenerateMeshClass
             // create the mesh
 
         normalArray=GenerateUtilityClass.buildNormals(vertexArray,indexArray,centerPnt,normalsIn);
+        if (uvMode===GenerateMeshClass.UV_MAP) uvArray=GenerateUtilityClass.buildUVs(vertexArray,normalArray,(1/segmentSize));
         tangentArray=GenerateUtilityClass.buildTangents(vertexArray,uvArray,indexArray);
         
         mesh=new MeshClass(core,name,bitmap,-1,-1,new Float32Array(vertexArray),new Float32Array(normalArray),tangentArray,new Float32Array(uvArray),null,null,new Uint16Array(indexArray));
@@ -429,9 +452,9 @@ export default class GenerateMeshClass
         core.map.meshList.add(mesh);
     }
     
-    static createCube(core,room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,wholeUV,segmentSize)
+    static createCube(core,room,name,bitmap,xBound,yBound,zBound,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize)
     {
-        return(this.createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,wholeUV,segmentSize));
+        return(this.createCubeRotated(core,room,name,bitmap,xBound,yBound,zBound,null,left,right,front,back,top,bottom,normalsIn,uvMode,segmentSize));
     }
     
         //

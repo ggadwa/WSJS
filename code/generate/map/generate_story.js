@@ -163,17 +163,17 @@ export default class GenerateStoryClass
         return(true);
     }
     
-    static setupExitPlatform(core,room,wid)
+    static setupExitPlatform(core,room,posZWid,negZWid,posXWid,negXWid)
     {
         let x,z;
         
             // x platforms
     
         for (z=0;z!==room.piece.size.z;z++) {
-            for (x=0;x!==wid;x++) {
+            for (x=0;x!==posXWid;x++) {
                 room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
             }
-            for (x=(room.piece.size.x-wid);x!==room.piece.size.x;x++) {
+            for (x=(room.piece.size.x-negXWid);x!==room.piece.size.x;x++) {
                 room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
             }
         }
@@ -181,10 +181,10 @@ export default class GenerateStoryClass
             // z platforms
             
         for (x=0;x!==room.piece.size.x;x++) {
-            for (z=0;z!==wid;z++) {
+            for (z=0;z!==posZWid;z++) {
                 room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
             }
-            for (z=(room.piece.size.z-wid);z!==room.piece.size.z;z++) {
+            for (z=(room.piece.size.z-negZWid);z!==room.piece.size.z;z++) {
                 room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
             }
         }
@@ -393,11 +393,15 @@ export default class GenerateStoryClass
         
     static buildRoomExitPlatform(core,room,name,stepBitmap,platformBitmap,segmentSize)
     {
-        let x,z,dir,wid;
+        let x,z,dir;
+        let posZWid,negZWid,posXWid,negXWid;
         
             // width of platforms
             
-        wid=GenerateUtilityClass.randomInt(1,((room.piece.size.x>5)?2:1));
+        posZWid=GenerateUtilityClass.randomInt(1,((room.piece.size.z>5)?3:1));
+        negZWid=GenerateUtilityClass.randomInt(1,((room.piece.size.z>5)?3:1));
+        posXWid=GenerateUtilityClass.randomInt(1,((room.piece.size.x>5)?3:1));
+        negXWid=GenerateUtilityClass.randomInt(1,((room.piece.size.x>5)?3:1));
 
             // stairs
             
@@ -406,20 +410,20 @@ export default class GenerateStoryClass
         switch (dir)
         {
             case GenerateMeshClass.STAIR_DIR_POS_Z:
-                x=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.x-wid));
-                z=room.piece.size.z-(wid+2);
+                x=GenerateUtilityClass.randomInBetween(posXWid,(room.piece.size.x-negXWid));
+                z=room.piece.size.z-(negZWid+2);
                 break;
             case GenerateMeshClass.STAIR_DIR_NEG_Z:
-                x=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.x-wid));
-                z=wid;
+                x=GenerateUtilityClass.randomInBetween(posXWid,(room.piece.size.x-negXWid));
+                z=posZWid;
                 break;
             case GenerateMeshClass.STAIR_DIR_POS_X:
-                x=room.piece.size.x-(wid+2);
-                z=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.z-wid));
+                x=room.piece.size.x-(negXWid+2);
+                z=GenerateUtilityClass.randomInBetween(posZWid,(room.piece.size.z-negZWid));
                 break;
             case GenerateMeshClass.STAIR_DIR_NEG_X:
-                x=wid;
-                z=GenerateUtilityClass.randomInBetween(wid,(room.piece.size.z-wid));
+                x=posXWid;
+                z=GenerateUtilityClass.randomInBetween(posZWid,(room.piece.size.z-negZWid));
                 break;
         }
             
@@ -427,7 +431,7 @@ export default class GenerateStoryClass
         
             // platforms
             
-        this.setupExitPlatform(core,room,wid);
+        this.setupExitPlatform(core,room,posZWid,negZWid,posXWid,negXWid);
         this.addPlatforms(core,room,name,platformBitmap,segmentSize,1);
     }
 }

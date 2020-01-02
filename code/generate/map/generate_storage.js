@@ -47,7 +47,7 @@ export default class GenerateStorageClass
             
         for (stackLevel=0;stackLevel!==stackCount;stackLevel++) {
             rotAngle.setFromValues(0.0,(GenerateUtilityClass.randomFloat(-10.0,20.0)),0.0);
-            GenerateMeshClass.createCubeRotated(core,room,(name+'_'+stackLevel),boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,true,segmentSize);
+            GenerateMeshClass.createCubeRotated(core,room,(name+'_'+stackLevel),boxBitmap,boxXBound,boxYBound,boxZBound,rotAngle,true,true,true,true,true,(stackLevel!==0),false,GenerateMeshClass.UV_WHOLE,segmentSize);
             
                 // go up one level
 

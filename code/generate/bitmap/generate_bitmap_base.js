@@ -1932,13 +1932,15 @@ export default class GenerateBitmapBaseClass
                 ex=sx+xAdd;
                 ey=sy+yAdd;
 
-                r=lineVariant-GenerateUtilityClass.randomIndex(lineVariant*2);
+                if ((n&0x1)===0) {      // straighten out line every other variation
+                    r=lineVariant-GenerateUtilityClass.randomIndex(lineVariant*2);
 
-                if (horizontal) {
-                    ey+=r;
-                }
-                else {
-                    ex+=r;
+                    if (horizontal) {
+                        ey+=r;
+                    }
+                    else {
+                        ex+=r;
+                    }
                 }
             }
             

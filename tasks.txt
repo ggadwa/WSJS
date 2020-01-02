@@ -6,9 +6,10 @@
    -> stone is still bad, need some more variations in stone work
 
 - decorations
-   -> exit platforms need to have different widths on all sides
+   -> exit platforms more interesting?
    -> pipes (force duck/jump)
    -> pillars can have bases - no pillars in small rooms?
+   -> more room pieces
 
 - networking
    - needs "master" (first in) for games

@@ -28,8 +28,11 @@ export default class GenerateComputerClass
             
         lx=room.piece.margins[0]+1;
         rx=room.piece.size.x-(room.piece.margins[2]+1);
+        if (rx<=lx) rx=lx+1;
+        
         tz=room.piece.margins[1]+1;
         bz=room.piece.size.z-(room.piece.margins[3]+1);
+        if (bz<=tz) bz=tz+1;
         
             // size
             
@@ -44,7 +47,7 @@ export default class GenerateComputerClass
         yBound=new BoundClass(room.offset.y,(room.offset.y+botY));
         zBound=new BoundClass((room.offset.z+(tz*segmentSize)),(room.offset.z+(bz*segmentSize)));
             
-        GenerateMeshClass.createCube(core,room,(name+'_pedestal'),platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,true,segmentSize);
+        GenerateMeshClass.createCube(core,room,(name+'_pedestal'),platformBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_MAP,segmentSize);
         
             // if enough room, make a path
             // through the computers
@@ -72,7 +75,7 @@ export default class GenerateComputerClass
                 k=(room.offset.x+(x*segmentSize))+widOffset;
                 xBound.setFromValues(k,(k+wid));
                 
-                GenerateMeshClass.createCube(core,room,(name+'_computer_'+computerCount),computerBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,false,segmentSize);
+                GenerateMeshClass.createCube(core,room,(name+'_computer_'+computerCount),computerBitmap,xBound,yBound,zBound,true,true,true,true,true,false,false,GenerateMeshClass.UV_BOX,segmentSize);
                 
                 computerCount++;
             }
