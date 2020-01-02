@@ -10,6 +10,7 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
 {
     static VARIATION_NONE=0;
     static VARIATION_BOX=1;
+    static VARIATION_PIPE=2;
     
     static CORRUGATION_LINES=
             [
@@ -198,22 +199,16 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
         }
     }
     
-    generateInternal(variationMode)
+    generateMetalRegular(metalColor,altMetalColor,edgeSize,screwSize,variationMode)
     {
-        let mx,my;
-        let panelCount;
-        
-        let metalColor=this.getRandomColor();
-        let altMetalColor=this.getRandomColor();
-        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.005));
-        let screwSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.008),Math.trunc(this.colorCanvas.width*0.015));
+        let mx,my,panelCount;
         
             // either single, dual, or 4 panel
             
         mx=Math.trunc(this.colorCanvas.width*0.5);
         my=Math.trunc(this.colorCanvas.height*0.5);
         
-        panelCount=(variationMode===GenerateBitmapMetalClass.VARIATION_BOX)?0:GenerateUtilityClass.randomIndex(3);
+        panelCount=GenerateUtilityClass.randomIndex(3);
             
         switch (panelCount) {
             case 0:
@@ -228,6 +223,44 @@ export default class GenerateBitmapMetalClass extends GenerateBitmapBaseClass
                 this.generateMetalPanel(mx,0,this.colorCanvas.width,my,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 this.generateMetalPanel(0,my,mx,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 this.generateMetalPanel(mx,my,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+                break;
+        }
+    }
+    
+    generateMetalBox(metalColor,altMetalColor,edgeSize,screwSize,variationMode)
+    {
+        this.generateMetalPanel(0,0,this.colorCanvas.width,this.colorCanvas.height,metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+    }
+    
+    generateMetalPipe(metalColor,altMetalColor,edgeSize,screwSize,variationMode)
+    {
+        this.createPerlinNoiseData(16,16);
+        this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,metalColor);
+        this.drawPerlinNoiseRect(0,0,this.colorCanvas.width,this.colorCanvas.height,0.8,1.0);
+        this.drawMetalShine(0,0,this.colorCanvas.width,this.colorCanvas.height,metalColor);
+        
+        // this.drawOval(lft,top,(lft+screwSize),(top+screwSize),0,1,0,0,edgeSize,0.8,screwColor,outlineColor,0.5,false,false,1,0);
+    }
+    
+    generateInternal(variationMode)
+    {
+        let mx,my;
+        let panelCount;
+        
+        let metalColor=this.getRandomColor();
+        let altMetalColor=this.getRandomColor();
+        let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.005));
+        let screwSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.008),Math.trunc(this.colorCanvas.width*0.015));
+        
+        switch (variationMode) {
+            case GenerateBitmapMetalClass.VARIATION_NONE:
+                this.generateMetalRegular(metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+                break;
+            case GenerateBitmapMetalClass.VARIATION_BOX:
+                this.generateMetalBox(metalColor,altMetalColor,edgeSize,screwSize,variationMode);
+                break;
+            case GenerateBitmapMetalClass.VARIATION_PIPE:
+                this.generateMetalPipe(metalColor,altMetalColor,edgeSize,screwSize,variationMode);
                 break;
         }
         

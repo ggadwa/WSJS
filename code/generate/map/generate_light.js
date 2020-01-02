@@ -9,6 +9,7 @@ export default class GenerateLightClass
 {
     constructor()
     {
+        Object.seal(this);
     }
     
     static buildRoomLight(core,room,name,lightBitmap,segmentSize)

@@ -12,6 +12,7 @@ export default class GenerateComputerClass
 {
     constructor()
     {
+        Object.seal(this);
     }
     
         //

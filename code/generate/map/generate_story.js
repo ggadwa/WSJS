@@ -20,6 +20,7 @@ export default class GenerateStoryClass
 
     constructor()
     {
+        Object.seal(this);
     }
     
         //

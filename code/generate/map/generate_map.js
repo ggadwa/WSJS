@@ -10,6 +10,7 @@ import GenerateStoryClass from './generate_story.js';
 import GeneratePillarClass from './generate_pillar.js';
 import GenerateStorageClass from './generate_storage.js';
 import GenerateComputerClass from './generate_computer.js';
+import GeneratePipeClass from './generate_pipe.js';
 import GenerateLightClass from './generate_light.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 import GenerateBitmapBaseClass from '../bitmap/generate_bitmap_base.js';
@@ -146,11 +147,11 @@ export default class GenerateMapClass
         // room decorations
         //
         
-    buildDecoration(room,roomIdx,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,segmentSize)
+    buildDecoration(room,roomIdx,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize)
     {
             // build the decoration
             
-        switch (GenerateUtilityClass.randomIndex(4)) {
+        switch (4 /*GenerateUtilityClass.randomIndex(5)*/) {
             case 0:
                 GenerateStoryClass.buildRoomStories(this.core,room,('story_'+roomIdx),stepBitmap,platformBitmap,segmentSize);
                 break;
@@ -162,6 +163,9 @@ export default class GenerateMapClass
                 break;
             case 3:
                 GenerateComputerClass.buildRoomComputer(this.core,room,('computer_'+roomIdx),platformBitmap,computerBitmap,segmentSize);
+                break;
+            case 4:
+                GeneratePipeClass.buildRoomPipes(this.core,room,('pipe_'+roomIdx),pipeBitmap,segmentSize);
                 break;
         }
     }
@@ -197,7 +201,7 @@ export default class GenerateMapClass
     build(importSettings)
     {
         let n,seed;
-        let roomWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap,computerBitmap;
+        let roomWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap,computerBitmap,pipeBitmap;
         let roomTopY;
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
         let room,light,centerPnt,intensity;
@@ -208,7 +212,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1577913438270; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=1578004284672; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -230,6 +234,7 @@ export default class GenerateMapClass
         platformBitmap=GenerateBitmapRunClass.generatePlatform(this.core,colorScheme);
         boxBitmap=GenerateBitmapRunClass.generateBox(this.core,colorScheme);
         computerBitmap=GenerateBitmapRunClass.generateComputer(this.core,colorScheme);
+        pipeBitmap=GenerateBitmapRunClass.generatePipe(this.core,colorScheme);
         
             // first room in center of map
             
@@ -352,7 +357,7 @@ export default class GenerateMapClass
                 // otherwise regular decorations
                 
             else {
-                if ((room.piece.decorate) && (n!==0)) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,segmentSize);
+                if ((room.piece.decorate) && (n!==0)) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize);
             }
             
                 // room light

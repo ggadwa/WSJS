@@ -3,11 +3,12 @@
 
 - bitmaps
    -> hexagon (working) -> add noise like oval
+   -> pipe, needs random line & random screw line
    -> stone is still bad, need some more variations in stone work
 
 - decorations
    -> exit platforms more interesting?
-   -> pipes (force duck/jump)
+   -> pipes (middle of room?)
    -> pillars can have bases - no pillars in small rooms?
    -> more room pieces
 

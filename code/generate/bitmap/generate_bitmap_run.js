@@ -168,4 +168,10 @@ export default class GenerateBitmapRunClass
         let genBitmap=new GenerateBitmapComputerClass(core,colorScheme);
         return(genBitmap.generate(0));
     }
+    
+    static generatePipe(core,colorScheme)
+    {
+        let genBitmap=new GenerateBitmapMetalClass(core,colorScheme);
+        return(genBitmap.generate(GenerateBitmapMetalClass.VARIATION_PIPE));
+    }
 }
