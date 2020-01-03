@@ -151,7 +151,7 @@ export default class GenerateMapClass
     {
             // build the decoration
             
-        switch (4 /*GenerateUtilityClass.randomIndex(5)*/) {
+        switch (GenerateUtilityClass.randomIndex(5)) {
             case 0:
                 GenerateStoryClass.buildRoomStories(this.core,room,('story_'+roomIdx),stepBitmap,platformBitmap,segmentSize);
                 break;
@@ -212,7 +212,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1578004284672; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
