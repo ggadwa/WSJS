@@ -1,5 +1,6 @@
+- better light generation
 - move all generate stuff to reaper project
-- need to start player outside blocked grid
+- create random nodes for rooms, use grenades to test
 
 - bitmaps
    -> hexagon (working) -> add noise like oval
@@ -8,9 +9,7 @@
 
 - decorations
    -> exit platforms more interesting?
-   -> pipes (middle of room?)
    -> pillars can have bases - no pillars in small rooms?
-   -> more room pieces
 
 - networking
    - needs "master" (first in) for games
@@ -20,11 +19,7 @@
 
 - need to make statics for all generate_bitmap_base statics
 - room uvs need to be better
-- need light patterns (middle, cross, lines, corners, etc)
-- need story light spots
-- need light model
 - door frames
-- star (line) pattern for tiles?  raised squares?
 - better specs (generated with color?)
 
 - implement bot skill
