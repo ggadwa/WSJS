@@ -15,13 +15,14 @@ export default class GenerateLightClass
     static buildRoomLight(core,room,name,lightBitmap,segmentSize)
     {
         let n,nLight;
-        let x,y,z,gx,gz,lightSize;
+        let x,y,z,gx,gz,lightSize,lightOffset;
         let mapLight,intensity,exponent;
         let gridCheck;
         
             // light sizes
             
         lightSize=Math.trunc(segmentSize*0.1);
+        lightOffset=Math.trunc(segmentSize*0.5)+Math.trunc(lightSize*0.5);
         
             // only a single light on a single square
             
@@ -50,14 +51,14 @@ export default class GenerateLightClass
             gx=Math.trunc(room.piece.size.x*0.5);
             gz=Math.trunc(room.piece.size.z*0.5);
            
-            x=room.offset.x+(gx*segmentSize);
+            x=room.offset.x+((gx*segmentSize)+lightOffset);
             y=room.offset.y+(segmentSize*room.storyCount);
-            z=room.offset.z+(gz*segmentSize);
+            z=room.offset.z+((gz*segmentSize)+lightOffset);
             
             GenerateUtilityClass.addBox(core,(name+'_'+n),lightBitmap,(x-lightSize),(x+lightSize),(y-lightSize),(y+lightSize),(z-lightSize),(z+lightSize),true,true,true,true,true,true,segmentSize);
             
-            exponent=0.5;
-            exponent=0.25;
+            exponent=GenerateUtilityClass.randomFloat(0.25,0.25);
+            //exponent=0.25;
             
             mapLight=new LightClass(new PointClass(x,(y-segmentSize),z),new ColorClass(1,1,1),intensity,exponent);
             core.map.lightList.add(mapLight);

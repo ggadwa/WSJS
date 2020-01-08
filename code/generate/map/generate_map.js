@@ -151,7 +151,7 @@ export default class GenerateMapClass
     {
             // build the decoration
             
-        switch (GenerateUtilityClass.randomIndex(5)) {
+        switch (3 /* GenerateUtilityClass.randomIndex(5)*/) {
             case 0:
                 GenerateStoryClass.buildRoomStories(this.core,room,('story_'+roomIdx),stepBitmap,platformBitmap,segmentSize);
                 break;
@@ -204,7 +204,7 @@ export default class GenerateMapClass
         let roomWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap,computerBitmap,pipeBitmap;
         let roomTopY;
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
-        let room,light,centerPnt,intensity;
+        let room,centerPnt;
         let roomCount,segmentSize,colorScheme;
         let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
         let map=this.core.map;
@@ -357,16 +357,12 @@ export default class GenerateMapClass
                 // otherwise regular decorations
                 
             else {
-                if ((room.piece.decorate) && (n!==0)) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize);
+                if (room.piece.decorate) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize);
             }
             
-                // room light
+                // room lights
 
-            intensity=Math.trunc(((room.size.x+room.size.z)*0.5)*0.8)+((segmentSize*0.2)*(room.storyCount-1));
-            light=new LightClass(new PointClass((room.offset.x+(Math.trunc(room.size.x*0.5))),Math.trunc(roomTopY*0.9),(room.offset.z+(Math.trunc(room.size.z*0.5)))),new ColorClass(1,1,1),intensity,0.5);
-            map.lightList.add(light);
-
-            //if (!room.stairRoom) GenerateLightClass.buildRoomLight(this.core,room,('light_'+n),stepBitmap,segmentSize);
+            GenerateLightClass.buildRoomLight(this.core,room,('light_'+n),stepBitmap,segmentSize);
         }
         
             // entities

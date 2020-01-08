@@ -14,60 +14,6 @@ export default class GeneratePillarClass
     {
         Object.seal(this);
     }
-    
-        //
-        // pillar patterns
-        //
-        
-    static buildCheckboardPillarPattern(core,room)
-    {
-        let x,z;
-        let posList=[];
-        
-        for (z=(room.piece.margins[1]+1);z<(room.piece.size.z-(room.piece.margins[3]+1));z+=2) {
-            for (x=(room.piece.margins[0]+1);x<(room.piece.size.x-(room.piece.margins[2]+1));x+=2) {
-                posList.push([x,z]);
-            }
-        }
-        
-        return(posList);
-    }
-
-    static buildHorizontalPillarPattern(core,room)
-    {
-        let x,z;
-        let posList=[];
-        
-        z=Math.trunc(room.piece.size.z*0.5);
-        
-        for (x=(room.piece.margins[0]+1);x<(room.piece.size.x-(room.piece.margins[2]+1));x+=2) {
-            posList.push([x,z]);
-        }
-        
-        return(posList);
-    }
-
-    static buildVerticalPillarPattern(core,room)
-    {
-        let x,z;
-        let posList=[];
-        
-        x=Math.trunc(room.piece.size.x*0.5);
-        
-        for (z=(room.piece.margins[1]+1);z<(room.piece.size.z-(room.piece.margins[3]+1));z+=2) {
-            posList.push([x,z]);
-        }
-        
-        return(posList);
-    }
-
-    static buildCornerPillarPattern(core,room)
-    {
-        let x=room.piece.size.x-(room.piece.margins[2]+1);
-        let z=room.piece.size.z-(room.piece.margins[3]+1);
-        
-        return([[room.piece.margins[0],room.piece.margins[1]],[x,room.piece.margins[1]],[room.piece.margins[0],z],[x,z]]);
-    }
    
         //
         // pillars
@@ -75,44 +21,37 @@ export default class GeneratePillarClass
     
     static buildRoomPillars(core,room,name,pillarBitmap,segmentSize)
     {
-        let n,x,z,posList;
-        let offset,radius;
+        let n,x,z,gx,gz;
+        let offset,radius,baseRadius,baseHigh;
         let centerPnt=new PointClass(0,0,0);
-        let yBound=new BoundClass(room.offset.y,room.offset.y+(room.storyCount*segmentSize));
-        let cylinderSegments=GenerateMeshClass.createCylinderSegmentList(1,(4*room.storyCount),0.5);
+        let yBound,yBottomBaseBound,yTopBaseBound;
+        let cylinderSegments=GenerateMeshClass.createCylinderSegmentList(1,(3*room.storyCount),0.25);
         
-            // get pillar positions
-            
-        switch(GenerateUtilityClass.randomIndex(4)) {
-            
-            case 0:
-                posList=this.buildCheckboardPillarPattern(core,room);
-                break;
-            
-            case 1:
-                posList=this.buildHorizontalPillarPattern(core,room);
-                break;
-                
-            case 2:
-                posList=this.buildVerticalPillarPattern(core,room);
-                break;
-                
-            case 3:
-                posList=this.buildCornerPillarPattern(core,room);
-                break;
-            
-        }
+            // the y bounds
+         
+        baseHigh=Math.trunc(segmentSize*GenerateUtilityClass.randomFloat(0.1,0.2));
+        yBottomBaseBound=new BoundClass(room.offset.y,(room.offset.y+baseHigh));
+        yBound=new BoundClass(yBottomBaseBound.max,(room.offset.y+(room.storyCount*segmentSize)-baseHigh));
+        yTopBaseBound=new BoundClass(yBound.max,(room.offset.y+(room.storyCount*segmentSize)));
         
             // build the pillars
             
         offset=Math.trunc(segmentSize*0.5);
-        radius=Math.trunc(offset*0.8);
-            
-        for (n=0;n!=posList.length;n++) {
-            x=room.offset.x+((posList[n][0]*segmentSize)+offset);
-            z=room.offset.z+((posList[n][1]*segmentSize)+offset);
-            centerPnt.setFromValues(x,0,z);
-            GenerateMeshClass.createCylinder(core,room,(name+'_'+n),pillarBitmap,centerPnt,yBound,cylinderSegments,radius,false,false);
+        radius=Math.trunc(segmentSize*GenerateUtilityClass.randomFloat(0.1,0.1));
+        baseRadius=Math.trunc(radius*GenerateUtilityClass.randomFloat(1.1,0.3));
+        
+        for (gz=(room.piece.margins[1]+1);gz<(room.piece.size.z-(room.piece.margins[3]+1));gz++) {
+            for (gx=(room.piece.margins[0]+1);gx<(room.piece.size.x-(room.piece.margins[2]+1));gx++) {
+                if (GenerateUtilityClass.randomPercentage(0.3)) {
+                    x=room.offset.x+((gx*segmentSize)+offset);
+                    z=room.offset.z+((gz*segmentSize)+offset);
+                    centerPnt.setFromValues(x,0,z);
+                    
+                    GenerateMeshClass.createMeshCylinderSimple(core,room,(name+'_base_bot_'+n),pillarBitmap,centerPnt,yBottomBaseBound,baseRadius,true,false);
+                    GenerateMeshClass.createCylinder(core,room,(name+'_'+n),pillarBitmap,centerPnt,yBound,cylinderSegments,radius,false,false);
+                    GenerateMeshClass.createMeshCylinderSimple(core,room,(name+'_base_top_'+n),pillarBitmap,centerPnt,yTopBaseBound,baseRadius,false,true);
+                }
+            }
         }
     }
     

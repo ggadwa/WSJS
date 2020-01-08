@@ -23,7 +23,8 @@ export default class GenerateBitmapBaseClass
         this.colorScheme=colorScheme;
         
             // will be reset in children classes
-            
+           
+        this.bitmapTextureSize=512;
         this.hasNormal=true;
         this.hasSpecular=true;
         this.hasGlow=false;
@@ -34,10 +35,6 @@ export default class GenerateBitmapBaseClass
         this.glowFrequency=0;
         this.glowMin=0.0;
         this.glowMax=1.0;
-        
-            // constants
-            
-        this.BITMAP_MAP_TEXTURE_SIZE=512;
 
             // some precalced normals
 
@@ -2224,29 +2221,29 @@ export default class GenerateBitmapBaseClass
             // and get the image bytes for drawing
             
         this.colorCanvas=document.createElement('canvas');
-        this.colorCanvas.width=this.BITMAP_MAP_TEXTURE_SIZE;
-        this.colorCanvas.height=this.BITMAP_MAP_TEXTURE_SIZE;
+        this.colorCanvas.width=this.bitmapTextureSize;
+        this.colorCanvas.height=this.bitmapTextureSize;
         this.colorCTX=this.colorCanvas.getContext('2d');
         this.colorImgData=this.colorCTX.getImageData(0,0,this.colorCanvas.width,this.colorCanvas.height);
         this.clearImageData(this.colorImgData,255,255,255,255);
         
         this.normalCanvas=document.createElement('canvas');
-        this.normalCanvas.width=this.hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.normalCanvas.height=this.hasNormal?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.normalCanvas.width=this.hasNormal?this.bitmapTextureSize:2;
+        this.normalCanvas.height=this.hasNormal?this.bitmapTextureSize:2;
         this.normalCTX=this.normalCanvas.getContext('2d');
         this.normalImgData=this.normalCTX.getImageData(0,0,this.normalCanvas.width,this.normalCanvas.height);
         this.clearImageData(this.normalImgData,0,0,255,255);
 
         this.specularCanvas=document.createElement('canvas');
-        this.specularCanvas.width=this.hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.specularCanvas.height=this.hasSpecular?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.specularCanvas.width=this.hasSpecular?this.bitmapTextureSize:2;
+        this.specularCanvas.height=this.hasSpecular?this.bitmapTextureSize:2;
         this.specularCTX=this.specularCanvas.getContext('2d');
         this.specularImgData=this.specularCTX.getImageData(0,0,this.specularCanvas.width,this.specularCanvas.height);
         this.clearImageData(this.specularImgData,0,0,0,255);
         
         this.glowCanvas=document.createElement('canvas');
-        this.glowCanvas.width=this.hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
-        this.glowCanvas.height=this.hasGlow?this.BITMAP_MAP_TEXTURE_SIZE:2;
+        this.glowCanvas.width=this.hasGlow?this.bitmapTextureSize:2;
+        this.glowCanvas.height=this.hasGlow?this.bitmapTextureSize:2;
         this.glowCTX=this.glowCanvas.getContext('2d');
         this.glowImgData=this.glowCTX.getImageData(0,0,this.glowCanvas.width,this.glowCanvas.height);
         this.clearImageData(this.glowImgData,0,0,0,255);

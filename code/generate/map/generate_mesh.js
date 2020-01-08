@@ -302,17 +302,17 @@ export default class GenerateMeshClass
             // left
 
         if (left) {
+            vertexArray.push(xBound.min,yBound.max,zBound.min);
             vertexArray.push(xBound.min,yBound.min,zBound.min);
             vertexArray.push(xBound.min,yBound.min,zBound.max);        
             vertexArray.push(xBound.min,yBound.max,zBound.max);     
-            vertexArray.push(xBound.min,yBound.max,zBound.min);
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.push(0,1,0,0,1,0,1,1);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0,0,0,0.499,0.499,0.499,0.499,0);
+                    uvArray.push(0,0.499,0,0,0.499,0,0.499,0.499);
                     break;
             }
             
@@ -323,17 +323,17 @@ export default class GenerateMeshClass
              // right
 
         if (right) {
+            vertexArray.push(xBound.max,yBound.max,zBound.min);
             vertexArray.push(xBound.max,yBound.min,zBound.min);
             vertexArray.push(xBound.max,yBound.min,zBound.max);
             vertexArray.push(xBound.max,yBound.max,zBound.max);
-            vertexArray.push(xBound.max,yBound.max,zBound.min);
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.push(0,1,0,0,1,0,1,1);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0,0,0,0.499,0.499,0.499,0.499,0);
+                    uvArray.push(0,0.499,0,0,0.499,0,0.499,0.499);
                     break;
             }
             
@@ -344,17 +344,17 @@ export default class GenerateMeshClass
             // front
 
         if (front) {
+            vertexArray.push(xBound.min,yBound.max,zBound.min);
             vertexArray.push(xBound.min,yBound.min,zBound.min);
             vertexArray.push(xBound.max,yBound.min,zBound.min);
             vertexArray.push(xBound.max,yBound.max,zBound.min);
-            vertexArray.push(xBound.min,yBound.max,zBound.min);
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.push(0,1,0,0,1,0,1,1);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0.5,0,0.5,0.499,1,0.499,1,0);
+                    uvArray.push(0.5,0.499,0.5,0,1,0,1,0.499);
                     break;
             }
             
@@ -365,17 +365,17 @@ export default class GenerateMeshClass
             // back
 
         if (back) {
+            vertexArray.push(xBound.min,yBound.max,zBound.max);
             vertexArray.push(xBound.min,yBound.min,zBound.max);
             vertexArray.push(xBound.max,yBound.min,zBound.max);
             vertexArray.push(xBound.max,yBound.max,zBound.max);
-            vertexArray.push(xBound.min,yBound.max,zBound.max);
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,0,0,1,1,1,1,0);
+                    uvArray.push(0,1,0,0,1,0,1,1);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0.5,0,0.5,0.499,1,0.499,1,0);
+                    uvArray.push(0.5,0.499,0.5,0,1,0,1,0.499);
                     break;
             }
             
@@ -579,7 +579,7 @@ export default class GenerateMeshClass
                 
                 for (t=0;t!==6;t++) {
                     normal.x=vertexArray[vStartIdx++]-centerPnt.x;
-                    normal.y=vertexArray[vStartIdx++]-y;
+                    normal.y=(vertexArray[vStartIdx++]-y)*0.25;      // reduce the normal here so cylinders don't have heavy lighting
                     normal.z=vertexArray[vStartIdx++]-centerPnt.z;
                     normal.normalize();
                     normalArray.push(normal.x,normal.y,normal.z);
@@ -613,9 +613,9 @@ export default class GenerateMeshClass
                 
                     // the points
                 
-                vertexArray.push(tx,yBound.min,tz);
+                vertexArray.push(tx,yBound.max,tz);
                 uvArray.push(u1,u2);
-                normalArray.push(0.0,-1.0,0.0);
+                normalArray.push(0.0,1.0,0.0);
                 
                 ang+=angAdd;
             }
@@ -644,9 +644,9 @@ export default class GenerateMeshClass
                 
                     // the points
                 
-                vertexArray.push(bx,yBound.max,bz);
+                vertexArray.push(bx,yBound.min,bz);
                 uvArray.push(u1,u2);
-                normalArray.push(0.0,1.0,0.0);
+                normalArray.push(0.0,-1.0,0.0);
                 
                 ang+=angAdd;
             }
