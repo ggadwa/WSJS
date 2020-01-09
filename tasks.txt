@@ -1,16 +1,15 @@
 - flicker and pulsing lights (flicker is random SMALL flicker, time between flicker is random)
-- random color (small) in lights
 - move all generate stuff to reaper project
 - create random nodes for rooms, use grenades to test
 
 - bitmaps
-   - cube doesn't have proper UVs -- use color to test
-   - hexagon (working) -> add noise like oval
    - pipe, needs random line & random screw line
-   - stone is still bad, need some more variations in stone work
 
 - decorations
-   - exit platforms more interesting?
+   - finish work on stairs
+   - better uv for pillars
+   - panels for computers areas
+   - connectors for pipes
 
 - networking
    - needs "master" (first in) for games

@@ -14,7 +14,7 @@ export default class GenerateLightClass
     
     static buildRoomLight(core,room,name,lightBitmap,segmentSize)
     {
-        let n,nLight;
+        let n,nLight,color;
         let x,y,z,gx,gz,lightSize,lightOffset;
         let mapLight,intensity,exponent;
         let gridCheck;
@@ -57,10 +57,10 @@ export default class GenerateLightClass
             
             GenerateUtilityClass.addBox(core,(name+'_'+n),lightBitmap,(x-lightSize),(x+lightSize),(y-lightSize),(y+lightSize),(z-lightSize),(z+lightSize),true,true,true,true,true,true,segmentSize);
             
+            color=new ColorClass(GenerateUtilityClass.randomFloat(0.8,0.2),GenerateUtilityClass.randomFloat(0.8,0.2),GenerateUtilityClass.randomFloat(0.8,0.2));
             exponent=GenerateUtilityClass.randomFloat(0.25,0.25);
-            //exponent=0.25;
             
-            mapLight=new LightClass(new PointClass(x,(y-segmentSize),z),new ColorClass(1,1,1),intensity,exponent);
+            mapLight=new LightClass(new PointClass(x,(y-(lightSize*2)),z),color,intensity,exponent);
             core.map.lightList.add(mapLight);
     //    }
     }

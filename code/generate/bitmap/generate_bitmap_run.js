@@ -6,6 +6,7 @@ import GenerateBitmapMetalClass from './generate_bitmap_metal.js';
 import GenerateBitmapWoodClass from './generate_bitmap_wood.js';
 import GenerateBitmapTileClass from './generate_bitmap_tile.js';
 import GenerateBitmapMosaicClass from './generate_bitmap_mosaic.js';
+import GenerateBitmapHexagonClass from './generate_bitmap_hexagon.js';
 import GenerateBitmapComputerClass from './generate_bitmap_computer.js';
 import GenerateUtilityClass from '../utility/generate_utility.js';
 
@@ -43,7 +44,7 @@ export default class GenerateBitmapRunClass
         let variationMode=0;
         let genBitmap;
         
-        switch(GenerateUtilityClass.randomIndex(4)) {
+        switch(GenerateUtilityClass.randomIndex(5)) {
             case 0:
                 genBitmap=new GenerateBitmapWoodClass(core,colorScheme);
                 break;
@@ -55,6 +56,9 @@ export default class GenerateBitmapRunClass
                 break;
             case 3:
                 genBitmap=new GenerateBitmapMosaicClass(core,colorScheme);
+                break;
+            case 4:
+                genBitmap=new GenerateBitmapHexagonClass(core,colorScheme);
                 break;
         }
         

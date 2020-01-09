@@ -28,18 +28,18 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         let lft,rgt,top,bot;
         let drawStoneColor;
         let edgeSize,xRoundFactor,yRoundFactor,normalZFactor;
-        let paddingSize,xOff,yOff;
+        let xOff,yOff;
         
         let stoneColor=this.getRandomColor();
         let altStoneColor=this.getRandomColor();
-        let groutColor=this.getRandomGray(0.2,0.3);
+        let groutColor=this.getRandomGray(0.35,0.55);
         let outlineColor=null; // this.adjustColor(groutColor,0.95);        // this doesn't make it any better
         
             // the noise grout
             
         this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,groutColor);
         this.createPerlinNoiseData(16,16);
-        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.6,1.2);
+        this.drawPerlinNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.4,1.2);
         this.drawStaticNoiseRect(0,0,this.colorImgData.width,this.colorImgData.height,0.7,1.1);
         this.blur(this.colorImgData.data,0,0,this.colorImgData.width,this.colorImgData.height,1,false);
         
@@ -49,12 +49,12 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
         
             // noise for stones
             
-        this.createPerlinNoiseData(64,64);
+        this.createPerlinNoiseData(32,32);
         this.createNormalNoiseData(5.0,0.3);
         
             // draw the stones
             
-        yCount=GenerateUtilityClass.randomInt(6,6);
+        yCount=GenerateUtilityClass.randomInt(4,4);
         yAdd=Math.trunc(this.colorImgData.height/yCount);
         
         top=0;
@@ -65,7 +65,7 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
             lft=0;
             
             while (true) {
-                rgt=lft+GenerateUtilityClass.randomInt(yAdd,Math.trunc(yAdd*0.5));
+                rgt=lft+GenerateUtilityClass.randomInt(yAdd,Math.trunc(yAdd*0.8));
                 if (rgt>this.colorImgData.width) rgt=this.colorImgData.width;
 
                     // special check if next stone would be too small,
@@ -79,20 +79,19 @@ export default class GenerateBitmapStoneClass extends GenerateBitmapBaseClass
                     
                 drawStoneColor=this.adjustColorRandom((GenerateUtilityClass.randomPercentage(0.7)?stoneColor:altStoneColor),0.7,1.2);
 
-                paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.01));  // stones aren't lined up
-                xOff=GenerateUtilityClass.randomInt(0,paddingSize);
-                yOff=GenerateUtilityClass.randomInt(0,paddingSize);
+                xOff=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.01));
+                yOff=GenerateUtilityClass.randomInt(0,Math.trunc(this.colorImgData.width*0.01));
 
-                edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.05),Math.trunc(this.colorImgData.width*0.1));     // new edge size as stones aren't the same
+                edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.1),Math.trunc(this.colorImgData.width*0.2));     // new edge size as stones aren't the same
                 xRoundFactor=GenerateUtilityClass.randomFloat(0.02,0.05);
                 yRoundFactor=GenerateUtilityClass.randomFloat(0.02,0.05);
-                normalZFactor=GenerateUtilityClass.randomFloat(0.2,0.2);        // different z depths
+                normalZFactor=GenerateUtilityClass.randomFloat(0,0.2);        // different z depths
 
-                this.drawOval((lft+xOff),(top+yOff),((rgt+xOff)-paddingSize),((bot+yOff)-paddingSize),0,1,xRoundFactor,yRoundFactor,edgeSize,0.5,drawStoneColor,outlineColor,normalZFactor,false,true,0.4,1.2);
+                this.drawOval((lft+xOff),(top+yOff),(rgt+xOff),(bot+yOff),0,1,xRoundFactor,yRoundFactor,edgeSize,0.5,drawStoneColor,outlineColor,normalZFactor,false,true,0.4,1.2);
 
                     // gravity distortions to make stones unique
                     
-                this.gravityDistortEdges((lft+xOff),(top+yOff),((rgt+xOff)-paddingSize),((bot+yOff)-paddingSize),5,20,5);
+                this.gravityDistortEdges((lft+xOff),(top+yOff),(rgt+xOff),(bot+yOff),5,20,5);
 
                 lft=rgt;
                 if (rgt===this.colorImgData.width) break;

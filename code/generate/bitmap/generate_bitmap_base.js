@@ -802,10 +802,10 @@ export default class GenerateBitmapBaseClass
         for (n=0;n<=size;n++) {
             
             for (x=lft;x<=rgt;x++) {
-                if ((x<0) || (x>=this.colorCanvas.width)) continue;
+                if ((x<0) || (x>=this.colorImgData.width)) continue;
                 
-                if ((top>=0) && (top<this.colorCanvas.height)) {
-                    idx=((top*this.colorCanvas.width)+x)*4;
+                if ((top>=0) && (top<this.colorImgData.height)) {
+                    idx=((top*this.colorImgData.width)+x)*4;
                     colorData[idx]=color.r*255.0;
                     colorData[idx+1]=color.g*255.0;
                     colorData[idx+2]=color.b*255.0;
@@ -815,8 +815,8 @@ export default class GenerateBitmapBaseClass
                     normalData[idx+2]=((faceOut?this.NORMAL_TOP_45.z:this.NORMAL_BOTTOM_45.z)+1.0)*127.0;
                 }
                 
-                if ((bot>=0) && (bot<this.colorCanvas.height)) {
-                    idx=((bot*this.colorCanvas.width)+x)*4;
+                if ((bot>=0) && (bot<this.colorImgData.height)) {
+                    idx=((bot*this.colorImgData.width)+x)*4;
                     colorData[idx]=color.r*255.0;
                     colorData[idx+1]=color.g*255.0;
                     colorData[idx+2]=color.b*255.0;
@@ -828,10 +828,10 @@ export default class GenerateBitmapBaseClass
             }
             
             for (y=top;y<=bot;y++) {
-                if ((y<0) || (y>=this.colorCanvas.height)) continue;
+                if ((y<0) || (y>=this.colorImgData.height)) continue;
                 
-                if ((lft>=0) && (lft<this.colorCanvas.width)) {
-                    idx=((y*this.colorCanvas.width)+lft)*4;
+                if ((lft>=0) && (lft<this.colorImgData.width)) {
+                    idx=((y*this.colorImgData.width)+lft)*4;
                     colorData[idx]=color.r*255.0;
                     colorData[idx+1]=color.g*255.0;
                     colorData[idx+2]=color.b*255.0;
@@ -841,8 +841,8 @@ export default class GenerateBitmapBaseClass
                     normalData[idx+2]=((faceOut?this.NORMAL_LEFT_45.z:this.NORMAL_RIGHT_45.z)+1.0)*127.0;
                 }
                 
-                if ((rgt>=0) && (rgt<this.colorCanvas.width)) {
-                    idx=((y*this.colorCanvas.width)+rgt)*4;
+                if ((rgt>=0) && (rgt<this.colorImgData.width)) {
+                    idx=((y*this.colorImgData.width)+rgt)*4;
                     colorData[idx]=color.r*255.0;
                     colorData[idx+1]=color.g*255.0;
                     colorData[idx+2]=color.b*255.0;
@@ -1122,23 +1122,23 @@ export default class GenerateBitmapBaseClass
             
         frameColor=this.adjustColorRandom(color,0.85,0.95);
         
-        this.drawLineColor((mx+1),top,(lft+1),my,frameColor,true);
-        this.drawLineColor(mx,top,lft,my,frameColor,true);
+        this.drawLineColor((mx+1),top,(lft+1),my,frameColor);
+        this.drawLineColor(mx,top,lft,my,frameColor);
         this.drawLineNormal((mx+1),top,(lft+1),my,this.NORMAL_TOP_LEFT_45);
         this.drawLineNormal(mx,top,lft,my,this.NORMAL_TOP_LEFT_45);
 
-        this.drawLineColor((mx-1),top,(rgt-1),my,frameColor,true);
-        this.drawLineColor(mx,top,rgt,my,frameColor,true);
+        this.drawLineColor((mx-1),top,(rgt-1),my,frameColor);
+        this.drawLineColor(mx,top,rgt,my,frameColor);
         this.drawLineNormal((mx-1),top,(rgt-1),my,this.NORMAL_TOP_RIGHT_45);
         this.drawLineNormal(mx,top,rgt,my,this.NORMAL_TOP_RIGHT_45);
         
-        this.drawLineColor((lft+1),my,(mx+1),bot,frameColor,true);
-        this.drawLineColor(lft,my,mx,bot,frameColor,true);
+        this.drawLineColor((lft+1),my,(mx+1),bot,frameColor);
+        this.drawLineColor(lft,my,mx,bot,frameColor);
         this.drawLineNormal((lft+1),my,(mx+1),bot,this.NORMAL_BOTTOM_LEFT_45);
         this.drawLineNormal(lft,my,mx,bot,this.NORMAL_TOP_LEFT_45);
 
-        this.drawLineColor((rgt-1),my,(mx-1),bot,frameColor,true);
-        this.drawLineColor(lft,my,mx,bot,frameColor,true);
+        this.drawLineColor((rgt-1),my,(mx-1),bot,frameColor);
+        this.drawLineColor(lft,my,mx,bot,frameColor);
         this.drawLineNormal((rgt-1),my,(mx-1),bot,this.NORMAL_BOTTOM_RIGHT_45);
         this.drawLineNormal(rgt,my,mx,bot,this.NORMAL_TOP_RIGHT_45);
     }
@@ -1146,7 +1146,7 @@ export default class GenerateBitmapBaseClass
     drawTriangle(x0,y0,x1,y1,x2,y2,color)
     {
         let y,ty,my,by;
-        let x,fx1,fx2,lx,rx,tyX,myX,byX;
+        let x,lx,rx,tyX,myX,byX;
         let idx;
         let colorData=this.colorImgData.data;
         let normalData=this.normalImgData.data;
@@ -1203,19 +1203,22 @@ export default class GenerateBitmapBaseClass
         }
         
             // top half
-            
+
         for (y=ty;y<my;y++) {
-            fx1=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
-            fx2=tyX+Math.trunc(((myX-tyX)*(y-ty))/(my-ty));
+            if ((y<0) || (y>this.colorImgData.height)) continue;
             
-            if (fx1<fx2) {
-                lx=fx1;
-                rx=fx2;
+            if (myX<tyX) {
+                lx=tyX+Math.trunc(((myX-tyX)*(y-ty))/(my-ty));
+                rx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
             }
             else {
-                lx=fx2;
-                rx=fx1;
+                lx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
+                rx=tyX+Math.trunc(((myX-tyX)*(y-ty))/(my-ty));
             }
+            
+            if (lx<0) lx=0;
+            if (rx>this.colorImgData.width) rx=this.colorImgData.width;
+            if (lx>rx) continue;
             
             idx=((y*this.colorImgData.width)+lx)*4;
                 
@@ -1235,17 +1238,20 @@ export default class GenerateBitmapBaseClass
             // bottom half
         
         for (y=my;y<by;y++) {
-            fx1=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
-            fx2=myX+Math.trunc(((myX-tyX)*(y-my))/(by-my));
+            if ((y<0) || (y>this.colorImgData.height)) continue;
             
-            if (fx1<fx2) {
-                lx=fx1;
-                rx=fx2;
+            if (myX<tyX) {
+                lx=myX+Math.trunc(((byX-myX)*(y-my))/(by-my));
+                rx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
             }
             else {
-                lx=fx2;
-                rx=fx1;
+                lx=tyX+Math.trunc(((byX-tyX)*(y-ty))/(by-ty));
+                rx=myX+Math.trunc(((byX-myX)*(y-my))/(by-my));
             }
+            
+            if (lx<0) lx=0;
+            if (rx>this.colorImgData.width) rx=this.colorImgData.width;
+            if (lx>rx) continue;
             
             idx=((y*this.colorImgData.width)+lx)*4;
                 
@@ -1263,67 +1269,60 @@ export default class GenerateBitmapBaseClass
         }
     }
     
-    drawHexagon(lft,top,rgt,bot,edgeSize,color,outlineColor)
+    drawHexagon(lft,top,rgt,bot,pointSize,edgeSize,color)
     {
-        let n,lx,rx,my,xAdd;
+        let n,lx,rx,my;
         let darkenFactor,darkColor;
 
-            // build the polygon
+            // build the hexagon
 
-        xAdd=Math.trunc((rgt-lft)*0.1);
-        
-        lx=lft-xAdd;
-        rx=rgt;
-        rgt-=xAdd;
         my=Math.trunc((top+bot)*0.5);
+        
+        lx=lft;
+        rx=rgt;
+        lft-=pointSize;
+        rgt+=pointSize;
+        
+        if (lft>=rgt) return;
         
             // fill the hexagon
             
         if (color!==null) {
-            this.drawRect(lft,(top+edgeSize),rgt,(bot-edgeSize),color);
-            this.drawTriangle(lft,(top+edgeSize),(lx+edgeSize),my,lft,(bot-edgeSize),color);
-            this.drawTriangle(rgt,(top+edgeSize),(rx-edgeSize),my,rgt,(bot-edgeSize),color);
+            this.drawRect(lx,top,rx,bot,color);
+            this.drawTriangle(lx,top,lft,my,lx,bot,color);
+            this.drawTriangle(rx,top,rgt,my,rx,bot,color);
         }    
         
             // draw the edges
-            
-        if (outlineColor==null) return;
             
         for (n=0;n!==edgeSize;n++) {
 
                 // the colors
 
-            darkenFactor=(((n+1)/edgeSize)*0.2)+0.8;
-            darkColor=this.adjustColor(outlineColor,darkenFactor);
+            darkenFactor=(((n+1)/edgeSize)*0.3)+0.7;
+            darkColor=this.adjustColor(color,darkenFactor);
             
                 // top-left to top to top-right
-            
-            this.drawLineColor(lx,my,lft,top,darkColor,true);
-            this.drawLineNormal(lx,my,lft,top,this.NORMAL_TOP_LEFT_45);
 
-            this.drawLineColor(lft,top,rgt,top,darkColor,true);
-            this.drawLineNormal(lft,top,rgt,top,this.NORMAL_TOP_45);
+            this.drawLineColor((lft+n),my,(lx+n),(top+n),darkColor);
+            this.drawLineNormal((lft+n),my,(lx+n),(top+n),this.NORMAL_TOP_LEFT_45);
 
-            this.drawLineColor(rgt,top,rx,my,darkColor,true);
-            this.drawLineNormal(rgt,top,rx,my,this.NORMAL_TOP_RIGHT_45);
-            
+            this.drawLineColor((lx+n),(top+n),(rx-n),(top+n),darkColor);
+            this.drawLineNormal((lx+n),(top+n),(rx-n),(top+n),this.NORMAL_TOP_45);
+
+            this.drawLineColor((rx-n),(top+n),(rgt-n),my,darkColor);
+            this.drawLineNormal((rx-n),(top+n),(rgt-n),my,this.NORMAL_TOP_RIGHT_45);
+
                 // bottom-right to bottom to bottom-left
 
-            this.drawLineColor(lx,my,lft,bot,darkColor,true);
-            this.drawLineNormal(lx,my,lft,bot,this.NORMAL_BOTTOM_LEFT_45);
+            this.drawLineColor((lft+n),my,(lx+n),(bot-n),darkColor);
+            this.drawLineNormal((lft+n),my,(lx+n),(bot-n),this.NORMAL_BOTTOM_LEFT_45);
                 
-            this.drawLineColor(lft,bot,rgt,bot,darkColor,true);
-            this.drawLineNormal(lft,bot,rgt,bot,this.NORMAL_BOTTOM_45);
+            this.drawLineColor((lx+n),(bot-n),(rx-n),(bot-n),darkColor);
+            this.drawLineNormal((lx+n),(bot-n),(rx-n),(bot-n),this.NORMAL_BOTTOM_45);
 
-            this.drawLineColor(rgt,bot,rx,my,darkColor,true);
-            this.drawLineNormal(rgt,bot,rx,my,this.NORMAL_BOTTOM_RIGHT_45);
-
-                // reduce it
-                
-            lx++;
-            rx--;
-            top++;
-            bot--;
+            this.drawLineColor((rx-n),(bot-n),(rgt-n),my,darkColor);
+            this.drawLineNormal((rx-n),(bot-n),(rgt-n),my,this.NORMAL_BOTTOM_RIGHT_45);
         }
     }
     
@@ -1363,8 +1362,8 @@ export default class GenerateBitmapBaseClass
             for (y=top;y!==bot;y++) {
                 
                 if (GenerateUtilityClass.randomInt(0,100)<density) {
-                    if ((lx>=0) && (lx<this.colorCanvas.width)) {
-                        idx=((y*this.colorCanvas.width)+lx)*4;
+                    if ((lx>=0) && (lx<this.colorImgData.width)) {
+                        idx=((y*this.colorImgData.width)+lx)*4;
                         colorData[idx]=Math.trunc(baseColor.r*255.0);
                         colorData[idx+1]=Math.trunc(baseColor.g*255.0);
                         colorData[idx+2]=Math.trunc(baseColor.b*255.0);
@@ -1372,8 +1371,8 @@ export default class GenerateBitmapBaseClass
                 }
                 
                 if (GenerateUtilityClass.randomInt(0,100)<density) {
-                    if ((rx>=0) && (rx<this.colorCanvas.width)) {
-                        idx=((y*this.colorCanvas.width)+rx)*4;
+                    if ((rx>=0) && (rx<this.colorImgData.width)) {
+                        idx=((y*this.colorImgData.width)+rx)*4;
                         colorData[idx]=Math.trunc(baseColor.r*255.0);
                         colorData[idx+1]=Math.trunc(baseColor.g*255.0);
                         colorData[idx+2]=Math.trunc(baseColor.b*255.0);
@@ -1739,9 +1738,10 @@ export default class GenerateBitmapBaseClass
         // line drawings
         //
         
-    drawLineColor(x,y,x2,y2,color,antiAlias)
+    drawLineColor(x,y,x2,y2,color)
     {
-        let xLen,yLen,sp,ep,dx,dy,slope,idx,idx2;
+        let xLen,yLen,sp,ep,dx,dy,slope,idx;
+        let curX,curY,prevX,prevY;
         let colorData=this.colorImgData.data;
         let r=Math.trunc(color.r*255.0);
         let g=Math.trunc(color.g*255.0);
@@ -1770,25 +1770,28 @@ export default class GenerateBitmapBaseClass
                 slope*=Math.sign(y-y2);
             }
             
+            prevY=-1;
+            
             for (dx=sp;dx<ep;dx++) {
                 if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
-                    idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
+                    
+                    curY=Math.trunc(dy);
+                    
+                    idx=((curY*this.colorImgData.width)+dx)*4;
                     colorData[idx]=r;
                     colorData[idx+1]=g;
                     colorData[idx+2]=b;
                 
-                    if ((dy>0) && (antiAlias)) {
-                        idx2=idx-(this.colorImgData.width*4);
-                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    if (prevY!==-1) {
+                        if (curY!==prevY) {
+                            idx=((prevY*this.colorImgData.width)+dx)*4;
+                            colorData[idx]=(colorData[idx]*0.5)+(r*0.5);
+                            colorData[idx+1]=(colorData[idx+1]*0.5)+(g*0.5);
+                            colorData[idx+2]=(colorData[idx+2]*0.5)+(b*0.5);
+                        }
                     }
-                    if ((dy<(this.colorImgData-1)) && (antiAlias)) {
-                        idx2=idx+(this.colorImgData.width*4);
-                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                    }
+                    
+                    prevY=curY;
                 }
                 
                 dy+=slope;
@@ -1810,25 +1813,28 @@ export default class GenerateBitmapBaseClass
                 slope*=Math.sign(x-x2);
             }
             
+            prevX=-1;
+            
             for (dy=sp;dy<ep;dy++) {
                 if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
-                    idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
+                    
+                    curX=Math.trunc(dx);
+
+                    idx=((dy*this.colorImgData.width)+curX)*4;
                     colorData[idx]=r;
                     colorData[idx+1]=g;
                     colorData[idx+2]=b;
                 
-                    if ((dx>0) && (antiAlias)) {
-                        idx2=idx-4;
-                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
+                    if (prevX!==-1) {
+                        if (curX!==prevX) {
+                            idx=((dy*this.colorImgData.width)+prevX)*4;
+                            colorData[idx]=(colorData[idx]*0.5)+(r*0.5);
+                            colorData[idx+1]=(colorData[idx+1]*0.5)+(g*0.5);
+                            colorData[idx+2]=(colorData[idx+2]*0.5)+(b*0.5);
+                        }
                     }
-                    if ((dx<(this.colorImgData.width-1)) && (antiAlias)) {
-                        idx2=idx+4;
-                        colorData[idx2]=(colorData[idx2]*0.5)+(r*0.5);
-                        colorData[idx2+1]=(colorData[idx2+1]*0.5)+(g*0.5);
-                        colorData[idx2+2]=(colorData[idx2+2]*0.5)+(b*0.5);
-                    }
+                    
+                    prevX=curX;
                 }
                 
                 dx+=slope;
@@ -1839,6 +1845,7 @@ export default class GenerateBitmapBaseClass
     drawLineNormal(x,y,x2,y2,normal)
     {
         let xLen,yLen,sp,ep,dx,dy,slope,idx;
+        let curX,curY,prevX,prevY;
         let normalData=this.normalImgData.data;
         let r=Math.trunc((normal.x+1.0)*127.0);
         let g=Math.trunc((normal.y+1.0)*127.0);
@@ -1867,12 +1874,28 @@ export default class GenerateBitmapBaseClass
                 slope*=Math.sign(y-y2);
             }
             
+            prevY=-1;
+            
             for (dx=sp;dx<ep;dx++) {
                 if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
-                    idx=((Math.trunc(dy)*this.colorImgData.width)+dx)*4;
+                    
+                    curY=Math.trunc(dy);
+                    
+                    idx=((curY*this.colorImgData.width)+dx)*4;
                     normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
                     normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
                     normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                    
+                    if (prevY!==-1) {
+                        if (curY!==prevY) {
+                            idx=((prevY*this.colorImgData.width)+dx)*4;
+                            normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                            normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                            normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                        }
+                    }
+                    
+                    prevY=curY;
                 }
                 
                 dy+=slope;
@@ -1894,12 +1917,29 @@ export default class GenerateBitmapBaseClass
                 slope*=Math.sign(x-x2);
             }
             
+            prevX=-1;
+            
             for (dy=sp;dy<ep;dy++) {
                 if ((dx>=0) && (dx<this.colorImgData.width) && (dy>=0) && (dy<this.colorImgData.height)) {
-                    idx=((dy*this.colorImgData.width)+Math.trunc(dx))*4;
+                    
+                    curX=Math.trunc(dx);
+                    
+                    idx=((dy*this.colorImgData.width)+curX)*4;
                     normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
                     normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
                     normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                    
+                    if (prevX!==-1) {
+                        if (curX!==prevX) {
+                            idx=((dy*this.colorImgData.width)+prevX)*4;
+                            normalData[idx]=(normalData[idx]*0.5)+(r*0.5);
+                            normalData[idx+1]=(normalData[idx+1]*0.5)+(g*0.5);
+                            normalData[idx+2]=(normalData[idx+2]*0.5)+(b*0.5);
+                        }
+                    }
+                    
+                    prevX=curX;
+
                 }
                 
                 dx+=slope;
@@ -1910,6 +1950,7 @@ export default class GenerateBitmapBaseClass
     drawRandomLine(x,y,x2,y2,clipLft,clipTop,clipRgt,clipBot,lineVariant,color,antiAlias)
     {
         let n,sx,sy,ex,ey,r;
+        let aliasColor;
         let segCount=GenerateUtilityClass.randomInt(2,5);
         let horizontal=Math.abs(x2-x)>Math.abs(y2-y);
         
@@ -1946,16 +1987,27 @@ export default class GenerateBitmapBaseClass
             if (ey<clipTop) ey=clipTop;
             if (ey>clipBot) ey=clipBot;
             
-            this.drawLineColor(sx,sy,ex,ey,color,antiAlias);
+            this.drawLineColor(sx,sy,ex,ey,color);
+            
             if (horizontal) {
                 this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
-                this.drawLineNormal(sx,(sy-1),ex,(ey-1),this.NORMAL_BOTTOM_45);
-                this.drawLineNormal(sx,(sy+1),ex,(ey+1),this.NORMAL_TOP_45);
+                if (antiAlias) {
+                    aliasColor=this.adjustColor(color,0.9);
+                    this.drawLineColor(sx,(sy-1),ex,(ey-1),aliasColor);
+                    this.drawLineColor(sx,(sy+1),ex,(ey+1),aliasColor);
+                    this.drawLineNormal(sx,(sy-1),ex,(ey-1),this.NORMAL_BOTTOM_45);
+                    this.drawLineNormal(sx,(sy+1),ex,(ey+1),this.NORMAL_TOP_45);
+                }
             }
             else {
                 this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
-                this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_RIGHT_45);
-                this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_LEFT_45);
+                if (antiAlias) {
+                    aliasColor=this.adjustColor(color,0.9);
+                    this.drawLineColor((sx-1),sy,(ex-1),ey,aliasColor);
+                    this.drawLineColor((sx+1),sy,(ex+1),ey,aliasColor);
+                    this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_RIGHT_45);
+                    this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_LEFT_45);
+                }
             }
             
             sx=ex;
@@ -1987,7 +2039,7 @@ export default class GenerateBitmapBaseClass
             
             if (sx===ex) return;
             
-            this.drawLineColor(sx,sy,ex,ey,color,true);
+            this.drawLineColor(sx,sy,ex,ey,color);
             this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
             this.drawLineNormal(sx,(sy-1),ex,(ey-1),this.NORMAL_BOTTOM_45);
             this.drawLineNormal(sx,(sy+1),ex,(ey+1),this.NORMAL_TOP_45);
@@ -2034,7 +2086,7 @@ export default class GenerateBitmapBaseClass
             
             if (sy===ey) return;
             
-            this.drawLineColor(sx,sy,ex,ey,color,true);
+            this.drawLineColor(sx,sy,ex,ey,color);
             this.drawLineNormal(sx,sy,ex,ey,this.NORMAL_CLEAR);
             this.drawLineNormal((sx-1),sy,(ex-1),ey,this.NORMAL_RIGHT_45);
             this.drawLineNormal((sx+1),sy,(ex+1),ey,this.NORMAL_LEFT_45);
@@ -2075,7 +2127,7 @@ export default class GenerateBitmapBaseClass
                 dy2=Math.trunc(sy+(((ey-sy)*(n+1))/segCount))+GenerateUtilityClass.randomInt(0,lineYVarient);
             }
             
-            this.drawLineColor(dx,dy,dx2,dy2,color,true);
+            this.drawLineColor(dx,dy,dx2,dy2,color);
             this.drawLineNormal(dx,dy,dx2,dy2,this.NORMAL_CLEAR);
             this.drawLineNormal((dx-1),dy,(dx2-1),dy2,this.NORMAL_RIGHT_45);
             this.drawLineNormal((dx+1),dy,(dx2+1),dy2,this.NORMAL_LEFT_45);
@@ -2204,15 +2256,26 @@ export default class GenerateBitmapBaseClass
         // generate mainline
         //
         
+    generateInternalPiece(lft,top,rgt,bot)
+    {
+        let xMid=Math.trunc((lft+rgt)*0.5);
+        let yMid=Math.trunc((top+bot)*0.5);
+        
+        this.drawRect(lft,top,xMid,yMid,new ColorClass(1,1,0));
+        this.drawRect(xMid,top,rgt,yMid,new ColorClass(1,0,0));
+        this.drawRect(lft,yMid,xMid,bot,new ColorClass(0,1,0));
+        this.drawRect(xMid,yMid,rgt,bot,new ColorClass(0,0,1));
+    }
+        
     generateInternal(variationMode)
     {
-        let xMid=Math.trunc(this.colorCanvas.width*0.5);       // default internal is just the UV test
-        let yMid=Math.trunc(this.colorCanvas.height*0.5);
+        let mx=Math.trunc(this.colorImgData.width*0.5);       // default internal is just the UV test, repeated 4 times for textures that have parts
+        let my=Math.trunc(this.colorImgData.height*0.5);
         
-        this.drawRect(0,0,xMid,yMid,new ColorClass(1,1,0));
-        this.drawRect(xMid,0,this.colorCanvas.width,yMid,new ColorClass(1,0,0));
-        this.drawRect(0,yMid,xMid,this.colorCanvas.height,new ColorClass(0,1,0));
-        this.drawRect(xMid,yMid,this.colorCanvas.width,this.colorCanvas.height,new ColorClass(0,0,1));
+        this.generateInternalPiece(0,0,mx,my);
+        this.generateInternalPiece(mx,0,this.colorImgData.width,my);
+        this.generateInternalPiece(0,my,mx,this.colorImgData.height);
+        this.generateInternalPiece(mx,my,this.colorImgData.width,this.colorImgData.height);
     }
     
     generate(variationMode)

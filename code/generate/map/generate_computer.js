@@ -27,12 +27,12 @@ export default class GenerateComputerClass
         
             // bounds with margins
             
-        lx=room.piece.margins[0]+1;
-        rx=room.piece.size.x-(room.piece.margins[2]+1);
+        lx=room.piece.margins[0];
+        rx=room.piece.size.x-(room.piece.margins[2]);
         if (rx<=lx) rx=lx+1;
         
-        tz=room.piece.margins[1]+1;
-        bz=room.piece.size.z-(room.piece.margins[3]+1);
+        tz=room.piece.margins[1];
+        bz=room.piece.size.z-(room.piece.margins[3]);
         if (bz<=tz) bz=tz+1;
         
             // size

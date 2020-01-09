@@ -243,8 +243,8 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                 
                 ledColor=ledColors[GenerateUtilityClass.randomIndex(3)];
                 
-                bx=(dx+wid)-((ledWid*2)+2);
-                by=(dy+high)-((ledHigh*2)+2);
+                bx=(dx+wid)-(ledWid+5);
+                by=(dy+high)-(ledHigh+5);
                 this.drawRect(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
                 this.drawRectGlow(bx,by,(bx+ledWid),(by+ledHigh),ledColor);
             }
@@ -314,7 +314,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
     generateComputerComponents(lft,top,rgt,bot,panelColor,edgeSize)
     {
         let mx,my,sz,lx,ty,rx,by,rndTry;
-        let componentType,hadWires,hadShutter,hadScreen,rndSuccess;
+        let componentType,hadWires,hadShutter,hadScreen,hadBlank,rndSuccess;
         let lightCount,buttonCount;
         let minPanelSize,extraPanelSize,skipPanelSize;
         
@@ -327,6 +327,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
         hadWires=false;
         hadShutter=false;
         hadScreen=false;
+        hadBlank=false;
         lightCount=0;
         buttonCount=0;
         
@@ -372,7 +373,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             rndTry=0;
             
             while (rndTry<25) {
-                componentType=GenerateUtilityClass.randomIndex(6);
+                componentType=GenerateUtilityClass.randomIndex(7);
                 
                 rndSuccess=false;
 
@@ -413,6 +414,11 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
                         this.generateComputerComponentScreen(lx,ty,rx,by,edgeSize);
                         rndSuccess=true;
                         break;
+                    case 6:
+                        if (hadBlank) break;
+                        hadBlank=true;
+                        rndSuccess=true;
+                        break;
                 }
                 
                 if (rndSuccess) break;
@@ -442,7 +448,7 @@ export default class GenerateBitmapComputerClass extends GenerateBitmapBaseClass
             // this is a collection of plates that are
             // used to wrap the object around cubes
             
-        this.drawRect(0,0,this.colorCanvas.width,this.colorCanvas.height,panelColor);
+        this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,panelColor);
         
         this.generateComputerComponents(0,0,offset,offset,panelInsideColor,panelInsideEdgeSize);      // left and right
         this.generateComputerComponents(offset,0,this.colorImgData.width,offset,panelInsideColor,panelInsideEdgeSize);        // front and back

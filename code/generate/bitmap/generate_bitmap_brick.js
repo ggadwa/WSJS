@@ -41,10 +41,10 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         if (isLarge) {
             drawBrickColor=this.adjustColor(altBrickColor,f);
             drawFrameColor=this.adjustColorRandom(drawBrickColor,0.85,0.95);
-            this.drawRect(0,top,this.colorCanvas.width,(bot-paddingSize),drawBrickColor);
-            this.draw3DFrameRect(-edgeSize,top,(this.colorCanvas.width+edgeSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
-            this.drawPerlinNoiseRect(0,(top+edgeSize),this.colorCanvas.width,(bot-(edgeSize+paddingSize)),0.8,1.3);
-            this.drawNormalNoiseRect(0,(top+edgeSize),this.colorCanvas.width,(bot-(edgeSize+paddingSize)));
+            this.drawRect(0,top,this.colorImgData.width,(bot-paddingSize),drawBrickColor);
+            this.draw3DFrameRect(-edgeSize,top,(this.colorImgData.width+edgeSize),(bot-paddingSize),edgeSize,drawFrameColor,true);
+            this.drawPerlinNoiseRect(0,(top+edgeSize),this.colorImgData.width,(bot-(edgeSize+paddingSize)),0.8,1.3);
+            this.drawNormalNoiseRect(0,(top+edgeSize),this.colorImgData.width,(bot-(edgeSize+paddingSize)));
         }
         else {
             drawBrickColor=this.adjustColor((isSmall?altBrickColor:brickColor),f);
@@ -82,7 +82,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             if (GenerateUtilityClass.randomPercentage(0.2)) {
                 streakWid=GenerateUtilityClass.randomInBetween(Math.trunc((rgt-lft)*0.3),Math.trunc((rgt-lft)*0.6));
                 if (streakWid<10) streakWid=10;
-                if (streakWid>(this.colorCanvasWidth*0.1)) streakWid=this.colorCanvasWidth*0.1;
+                if (streakWid>(this.colorImgData.width*0.1)) streakWid=this.colorImgData.width*0.1;
 
                 sx=GenerateUtilityClass.randomInt(lft,((rgt-lft)-streakWid));
                 ex=sx+streakWid;
@@ -99,7 +99,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
         let halfWid,halfBrick,lft,top;
         
         let edgeSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
-        let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorCanvas.width*0.005),Math.trunc(this.colorCanvas.width*0.0125));
+        let paddingSize=GenerateUtilityClass.randomInt(Math.trunc(this.colorImgData.width*0.005),Math.trunc(this.colorImgData.width*0.0125));
         
         let brickColor=this.getRandomColor();
         let altBrickColor=this.getRandomColor();
@@ -119,11 +119,11 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
             // draw the bricks
             
         xCount=GenerateUtilityClass.randomInt(4,4);
-        xAdd=Math.trunc(this.colorCanvas.width/xCount);
+        xAdd=Math.trunc(this.colorImgData.width/xCount);
         halfWid=Math.trunc(xAdd/2);
 
         yCount=GenerateUtilityClass.randomInt(4,5);
-        yAdd=Math.trunc(this.colorCanvas.height/yCount);
+        yAdd=Math.trunc(this.colorImgData.height/yCount);
 
         top=0;
         halfBrick=false;
@@ -141,7 +141,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                     
                     for (x=0;x!==xCount;x++) {
                         this.generateSingleBrick(lft,top,(lft+halfWid),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
-                        this.generateSingleBrick((lft+halfWid),top,((x===(xCount-1))?(this.colorCanvas.width-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
+                        this.generateSingleBrick((lft+halfWid),top,((x===(xCount-1))?(this.colorImgData.width-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,false,true,false);
                         lft+=xAdd;
                     }
                 }
@@ -162,7 +162,7 @@ export default class GenerateBitmapBrickClass extends GenerateBitmapBaseClass
                    lft=0;
 
                     for (x=0;x!==xCount;x++) {
-                        this.generateSingleBrick(lft,top,((x===(xCount-1))?(this.colorCanvas.width-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,(lft<0),false,false);
+                        this.generateSingleBrick(lft,top,((x===(xCount-1))?(this.colorImgData.width-1):(lft+xAdd)),(top+yAdd),edgeSize,paddingSize,brickColor,altBrickColor,(lft<0),false,false);
                         lft+=xAdd;
                     }
                 }

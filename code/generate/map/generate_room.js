@@ -15,9 +15,9 @@ export default class GenerateRoomClass
         this.offset=new PointClass(0,0,0);
         this.size=new PointClass((segmentSize*piece.size.x),(segmentSize*this.storyCount),(segmentSize*piece.size.z));
         
-            // flags set during creation
+            // flags for staircases
             
-        this.requiresExitPlatform=false;
+        this.requiredStairs=[];
         
             // vertex hiding array, had 3 possible stories
             

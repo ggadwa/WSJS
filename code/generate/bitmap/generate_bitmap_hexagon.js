@@ -28,36 +28,36 @@ export default class GenerateBitmapHexagonClass extends GenerateBitmapBaseClass
         
     generateInternal(variationMode)
     {
-        let color,edgeColor,edgeSize;
+        let x,y,lft,top,pointSize;
+        let color,edgeSize;
         let xCount,yCount,xSize,ySize;
-        let x,y,lft,top;
-
+        
             // colors
             
         color=this.getRandomColor();
-        edgeColor=this.adjustColor(color,0.8);
         
             // sizing
         
-        edgeSize=GenerateUtilityClass.randomInt(2,3);
+        edgeSize=GenerateUtilityClass.randomInt(3,5);
         xCount=2+(2*GenerateUtilityClass.randomInt(0,2));
         yCount=2+(2*GenerateUtilityClass.randomInt(0,5));
         
         xSize=Math.trunc(this.colorImgData.width/xCount);
         ySize=Math.trunc(this.colorImgData.height/yCount);
         
-        top=-Math.trunc(ySize/2);
+        pointSize=Math.trunc(xSize*0.1);
         
-        for (y=0;y<=(yCount*2);y++) {
-            
-            lft=((y%2)===0)?0:xSize;
-            
-            for (x=0;x<=xCount;x+=2) {
-                this.drawHexagon(lft,top,Math.trunc(lft+xSize),Math.trunc(top+ySize),edgeSize,color,edgeColor);
-                lft+=(xSize*2);
+        lft=0;
+        
+        for (x=0;x<=xCount;x++) {
+            top=((x&0x1)===0)?0:-Math.trunc(ySize*0.5);
+        
+            for (y=0;y<=yCount;y++) {
+                this.drawHexagon(lft,top,(Math.trunc(lft+xSize)-pointSize),Math.trunc(top+ySize),pointSize,edgeSize,color);
+                top+=ySize;
             }
             
-            top+=(ySize/2);
+            lft+=xSize;
         }
         
             // finish with the specular

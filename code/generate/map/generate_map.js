@@ -151,7 +151,7 @@ export default class GenerateMapClass
     {
             // build the decoration
             
-        switch (3 /* GenerateUtilityClass.randomIndex(5)*/) {
+        switch (GenerateUtilityClass.randomIndex(5)) {
             case 0:
                 GenerateStoryClass.buildRoomStories(this.core,room,('story_'+roomIdx),stepBitmap,platformBitmap,segmentSize);
                 break;
@@ -174,6 +174,31 @@ export default class GenerateMapClass
         // add additional room
         //
         
+    buildSteps(core,room,name,toRoom,stepBitmap,segmentSize)
+    {
+        if (room.offset.z===(toRoom.offset.z+toRoom.size.z)) {
+            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,Math.trunc(room.piece.size.x*0.5),0,1,0);
+            return;
+        }
+        if ((room.offset.z+room.size.z)===toRoom.offset.z) {
+            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,Math.trunc(room.piece.size.x*0.5),room.piece.size.z-2,0,0);
+            return;
+        }
+        if (room.offset.x===(toRoom.offset.x+toRoom.size.x)) {
+            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,0,Math.trunc(room.piece.size.z*0.5),3,0);
+            return;
+        }
+        if ((room.offset.x+room.size.x)===toRoom.offset.x) {
+            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,room.piece.size.x-2,Math.trunc(room.piece.size.z*0.5),2,0);
+            return;
+        }
+        
+    }
+    
+        //
+        // add additional room
+        //
+    
     addAdditionalRoom(rooms,room,touchRoom,segmentSize)
     {
             // start at same height
@@ -185,7 +210,7 @@ export default class GenerateMapClass
         if ((room.offset.y===0) && (touchRoom.piece.decorate) && (touchRoom.storyCount>1)) {
             if (GenerateUtilityClass.randomPercentage(0.25)) {
                 room.offset.y+=segmentSize;
-                touchRoom.requiresExitPlatform=true;        // other room requires exit platform
+                touchRoom.requiredStairs.push(room);
             }
         }
                             
@@ -200,11 +225,11 @@ export default class GenerateMapClass
         
     build(importSettings)
     {
-        let n,seed;
+        let n,k,seed;
         let roomWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap,computerBitmap,pipeBitmap;
         let roomTopY;
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
-        let room,centerPnt;
+        let room,stepToRoom,centerPnt;
         let roomCount,segmentSize,colorScheme;
         let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
         let map=this.core.map;
@@ -212,7 +237,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=(importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=1578611079872; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -347,22 +372,25 @@ export default class GenerateMapClass
             GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,segmentSize);
             GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,segmentSize);
             
-                // some rooms require a platform to get
-                // to a room that has moved up
+                // skip decorations for rooms with steps
 
-            if (room.requiresExitPlatform) {
-                GenerateStoryClass.buildRoomExitPlatform(this.core,room,('exitplatform_'+n),stepBitmap,platformBitmap,segmentSize);
-            }
-            
-                // otherwise regular decorations
-                
-            else {
+            if (room.requiredStairs.length===0) {
                 if (room.piece.decorate) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize);
             }
             
                 // room lights
 
             GenerateLightClass.buildRoomLight(this.core,room,('light_'+n),stepBitmap,segmentSize);
+        }
+        
+            // any steps
+            
+        for (n=0;n!=roomCount;n++) {
+            room=rooms[n];
+            
+            for (k=0;k!==room.requiredStairs.length;k++) {
+                this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],stepBitmap,segmentSize);
+            }
         }
         
             // entities

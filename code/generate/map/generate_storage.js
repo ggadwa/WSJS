@@ -70,8 +70,8 @@ export default class GenerateStorageClass
             
         storageCount=0;
             
-        for (z=(room.piece.margins[1]+1);z<(room.piece.size.z-(room.piece.margins[3]+1));z++) {
-            for (x=(room.piece.margins[0]+1);x<(room.piece.size.x-(room.piece.margins[2]+1));x++) {
+        for (z=room.piece.margins[1];z<(room.piece.size.z-room.piece.margins[3]);z++) {
+            for (x=room.piece.margins[0];x<(room.piece.size.x-room.piece.margins[2]);x++) {
                 if (GenerateUtilityClass.randomPercentage(0.5)) {
                     this.addBoxes(core,room,(name+'_'+storageCount),boxBitmap,x,z,segmentSize);
                     storageCount++;

@@ -298,7 +298,7 @@ export default class GenerateMeshClass
         let indexArray=[];
         
         idx=0;
-
+        
             // left
 
         if (left) {
@@ -309,10 +309,10 @@ export default class GenerateMeshClass
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,1,0,0,1,0,1,1);
+                    uvArray.push(0,0,0,1,1,1,1,0);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0,0.499,0,0,0.499,0,0.499,0.499);
+                    uvArray.push(0,0,0,0.499,0.499,0.499,0.499,0);
                     break;
             }
             
@@ -330,10 +330,10 @@ export default class GenerateMeshClass
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,1,0,0,1,0,1,1);
+                    uvArray.push(1,0,0,1,1,0,1,0);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0,0.499,0,0,0.499,0,0.499,0.499);
+                    uvArray.push(0.499,0,0.499,0.499,0,0.499,0,0);
                     break;
             }
             
@@ -351,10 +351,10 @@ export default class GenerateMeshClass
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,1,0,0,1,0,1,1);
+                    uvArray.push(1,0,1,1,0,1,0,0);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0.5,0.499,0.5,0,1,0,1,0.499);
+                    uvArray.push(1,0,1,0.499,0.5,0.499,0.5,0);
                     break;
             }
             
@@ -372,10 +372,10 @@ export default class GenerateMeshClass
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
-                    uvArray.push(0,1,0,0,1,0,1,1);
+                    uvArray.push(0,0,0,1,1,1,1,0);
                     break;
                 case GenerateMeshClass.UV_BOX:
-                    uvArray.push(0.5,0.499,0.5,0,1,0,1,0.499);
+                    uvArray.push(0.5,0,0.5,0.499,1,0.499,1,0);
                     break;
             }
             
@@ -386,10 +386,10 @@ export default class GenerateMeshClass
             // top
 
         if (top) {
+            vertexArray.push(xBound.min,yBound.max,zBound.max);
             vertexArray.push(xBound.min,yBound.max,zBound.min);
             vertexArray.push(xBound.max,yBound.max,zBound.min);
             vertexArray.push(xBound.max,yBound.max,zBound.max);
-            vertexArray.push(xBound.min,yBound.max,zBound.max);
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:
@@ -407,10 +407,10 @@ export default class GenerateMeshClass
             // bottom
 
         if (bottom) {
+            vertexArray.push(xBound.min,yBound.min,zBound.max);
             vertexArray.push(xBound.min,yBound.min,zBound.min);
             vertexArray.push(xBound.max,yBound.min,zBound.min);
             vertexArray.push(xBound.max,yBound.min,zBound.max);
-            vertexArray.push(xBound.min,yBound.min,zBound.max);
             
             switch (uvMode) {
                 case GenerateMeshClass.UV_WHOLE:

@@ -31,7 +31,6 @@ export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
         let jointColor=this.adjustColorRandom(concreteColor,0.75,0.85);
         
             // the concrete background
-            
         
         this.drawRect(0,0,this.colorImgData.width,this.colorImgData.height,concreteColor);
         
@@ -44,14 +43,20 @@ export default class GenerateBitmapConcreteClass extends GenerateBitmapBaseClass
             // concrete expansion cuts
             
         if (GenerateUtilityClass.randomPercentage(0.5)) {
-            this.drawLineColor(1,0,1,this.colorImgData.height,jointColor,true);
+            this.drawLineColor(1,0,1,this.colorImgData.height,jointColor);
+            jointColor=this.adjustColor(jointColor,0.9);
+            this.drawLineColor(0,0,0,this.colorImgData.height,jointColor);
+            this.drawLineColor(2,0,2,this.colorImgData.height,jointColor);
             this.drawLineNormal(1,0,1,this.colorImgData.height,this.NORMAL_CLEAR);
             this.drawLineNormal(0,0,0,this.colorImgData.height,this.NORMAL_RIGHT_45);
             this.drawLineNormal(2,0,2,this.colorImgData.height,this.NORMAL_LEFT_45);
         }
 
         if (GenerateUtilityClass.randomPercentage(0.5)) {
-            this.drawLineColor(0,1,this.colorImgData.width,1,jointColor,true);
+            this.drawLineColor(0,1,this.colorImgData.width,1,jointColor);
+            jointColor=this.adjustColor(jointColor,0.9);
+            this.drawLineColor(0,0,this.colorImgData.width,0,jointColor);
+            this.drawLineColor(0,2,this.colorImgData.width,2,jointColor);
             this.drawLineNormal(0,1,this.colorImgData.width,1,this.NORMAL_CLEAR);
             this.drawLineNormal(0,0,this.colorImgData.width,0,this.NORMAL_BOTTOM_45);
             this.drawLineNormal(0,2,this.colorImgData.width,2,this.NORMAL_TOP_45);

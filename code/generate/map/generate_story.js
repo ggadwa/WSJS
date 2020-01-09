@@ -164,33 +164,6 @@ export default class GenerateStoryClass
         return(true);
     }
     
-    static setupExitPlatform(core,room,posZWid,negZWid,posXWid,negXWid)
-    {
-        let x,z;
-        
-            // x platforms
-    
-        for (z=0;z!==room.piece.size.z;z++) {
-            for (x=0;x!==posXWid;x++) {
-                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
-            }
-            for (x=(room.piece.size.x-negXWid);x!==room.piece.size.x;x++) {
-                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
-            }
-        }
-        
-            // z platforms
-            
-        for (x=0;x!==room.piece.size.x;x++) {
-            for (z=0;z!==posZWid;z++) {
-                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
-            }
-            for (z=(room.piece.size.z-negZWid);z!==room.piece.size.z;z++) {
-                room.setGrid(1,x,z,GenerateStoryClass.FLAG_PLATFORM);
-            }
-        }
-    }
-            
     static setupRandomPlatforms(core,room,startX,startZ,storyIdx)
     {
         let x,z,gx,gz,sx,sz;
@@ -388,52 +361,5 @@ export default class GenerateStoryClass
         }
     }
     
-        //
-        // exit platform mainline
-        //
-        
-    static buildRoomExitPlatform(core,room,name,stepBitmap,platformBitmap,segmentSize)
-    {
-        let x,z,dir;
-        let posZWid,negZWid,posXWid,negXWid;
-        
-            // width of platforms
-            
-        posZWid=GenerateUtilityClass.randomInt(1,((room.piece.size.z>5)?3:1));
-        negZWid=GenerateUtilityClass.randomInt(1,((room.piece.size.z>5)?3:1));
-        posXWid=GenerateUtilityClass.randomInt(1,((room.piece.size.x>5)?3:1));
-        negXWid=GenerateUtilityClass.randomInt(1,((room.piece.size.x>5)?3:1));
-
-            // stairs
-            
-        dir=GenerateUtilityClass.randomIndex(4);
-        
-        switch (dir)
-        {
-            case GenerateMeshClass.STAIR_DIR_POS_Z:
-                x=GenerateUtilityClass.randomInBetween(posXWid,(room.piece.size.x-negXWid));
-                z=room.piece.size.z-(negZWid+2);
-                break;
-            case GenerateMeshClass.STAIR_DIR_NEG_Z:
-                x=GenerateUtilityClass.randomInBetween(posXWid,(room.piece.size.x-negXWid));
-                z=posZWid;
-                break;
-            case GenerateMeshClass.STAIR_DIR_POS_X:
-                x=room.piece.size.x-(negXWid+2);
-                z=GenerateUtilityClass.randomInBetween(posZWid,(room.piece.size.z-negZWid));
-                break;
-            case GenerateMeshClass.STAIR_DIR_NEG_X:
-                x=posXWid;
-                z=GenerateUtilityClass.randomInBetween(posZWid,(room.piece.size.z-negZWid));
-                break;
-        }
-            
-        this.addStairs(core,room,name,stepBitmap,segmentSize,x,z,dir,0);
-        
-            // platforms
-            
-        this.setupExitPlatform(core,room,posZWid,negZWid,posXWid,negXWid);
-        this.addPlatforms(core,room,name,platformBitmap,segmentSize,1);
-    }
 }
 
