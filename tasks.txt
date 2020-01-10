@@ -6,7 +6,6 @@
    - pipe, needs random line & random screw line
 
 - decorations
-   - finish work on stairs
    - better uv for pillars
    - panels for computers areas
    - connectors for pipes
@@ -18,7 +17,6 @@
    - remotes and updates
 
 - need to make statics for all generate_bitmap_base statics
-- room uvs need to be better
 - door frames
 - better specs (generated with color?)
 

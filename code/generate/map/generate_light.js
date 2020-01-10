@@ -57,7 +57,7 @@ export default class GenerateLightClass
             
             GenerateUtilityClass.addBox(core,(name+'_'+n),lightBitmap,(x-lightSize),(x+lightSize),(y-lightSize),(y+lightSize),(z-lightSize),(z+lightSize),true,true,true,true,true,true,segmentSize);
             
-            color=new ColorClass(GenerateUtilityClass.randomFloat(0.8,0.2),GenerateUtilityClass.randomFloat(0.8,0.2),GenerateUtilityClass.randomFloat(0.8,0.2));
+            color=new ColorClass(GenerateUtilityClass.randomFloat(0.7,0.3),GenerateUtilityClass.randomFloat(0.7,0.3),GenerateUtilityClass.randomFloat(0.7,0.3));
             exponent=GenerateUtilityClass.randomFloat(0.25,0.25);
             
             mapLight=new LightClass(new PointClass(x,(y-(lightSize*2)),z),color,intensity,exponent);

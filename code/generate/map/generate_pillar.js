@@ -21,11 +21,29 @@ export default class GeneratePillarClass
     
     static buildRoomPillars(core,room,name,pillarBitmap,segmentSize)
     {
-        let n,x,z,gx,gz;
+        let n,x,z,gx,gz,lx,rx,tz,bz;
         let offset,radius,baseRadius,baseHigh;
         let centerPnt=new PointClass(0,0,0);
         let yBound,yBottomBaseBound,yTopBaseBound;
         let cylinderSegments=GenerateMeshClass.createCylinderSegmentList(1,(3*room.storyCount),0.25);
+        
+            // bounds with margins
+            
+        lx=room.piece.margins[0];
+        rx=room.piece.size.x-(room.piece.margins[2]);
+        if (room.requiredStairs.length!==0) {
+            if (lx<2) lx=2;
+            if (rx>(room.piece.size.x-2)) rx=room.piece.size.x-2;
+        }
+        if (rx<=lx) return;
+        
+        tz=room.piece.margins[1];
+        bz=room.piece.size.z-(room.piece.margins[3]);
+        if (room.requiredStairs.length!==0) {
+            if (tz<2) tz=2;
+            if (bz>(room.piece.size.z-2)) bz=room.piece.size.z-2;
+        }
+        if (bz<=tz) return;
         
             // the y bounds
          
@@ -40,8 +58,8 @@ export default class GeneratePillarClass
         radius=Math.trunc(segmentSize*GenerateUtilityClass.randomFloat(0.1,0.1));
         baseRadius=Math.trunc(radius*GenerateUtilityClass.randomFloat(1.1,0.3));
         
-        for (gz=(room.piece.margins[1]+1);gz<(room.piece.size.z-(room.piece.margins[3]+1));gz++) {
-            for (gx=(room.piece.margins[0]+1);gx<(room.piece.size.x-(room.piece.margins[2]+1));gx++) {
+        for (gz=tz;gz<bz;gz++) {
+            for (gx=lx;gx<rx;gx++) {
                 if (GenerateUtilityClass.randomPercentage(0.3)) {
                     x=room.offset.x+((gx*segmentSize)+offset);
                     z=room.offset.z+((gz*segmentSize)+offset);

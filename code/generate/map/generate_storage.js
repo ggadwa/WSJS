@@ -63,15 +63,33 @@ export default class GenerateStorageClass
 
     static buildRoomStorage(core,room,name,boxBitmap,segmentSize)
     {
-        let x,z;
+        let x,z,lx,rx,tz,bz;
         let storageCount;
+        
+            // bounds with margins
+            
+        lx=room.piece.margins[0];
+        rx=room.piece.size.x-(room.piece.margins[2]);
+        if (room.requiredStairs.length!==0) {
+            if (lx<2) lx=2;
+            if (rx>(room.piece.size.x-2)) rx=room.piece.size.x-2;
+        }
+        if (rx<=lx) return;
+        
+        tz=room.piece.margins[1];
+        bz=room.piece.size.z-(room.piece.margins[3]);
+        if (room.requiredStairs.length!==0) {
+            if (tz<2) tz=2;
+            if (bz>(room.piece.size.z-2)) bz=room.piece.size.z-2;
+        }
+        if (bz<=tz) return;
         
             // create the pieces
             
         storageCount=0;
             
-        for (z=room.piece.margins[1];z<(room.piece.size.z-room.piece.margins[3]);z++) {
-            for (x=room.piece.margins[0];x<(room.piece.size.x-room.piece.margins[2]);x++) {
+        for (z=tz;z<bz;z++) {
+            for (x=lx;x<rx;x++) {
                 if (GenerateUtilityClass.randomPercentage(0.5)) {
                     this.addBoxes(core,room,(name+'_'+storageCount),boxBitmap,x,z,segmentSize);
                     storageCount++;

@@ -29,11 +29,19 @@ export default class GenerateComputerClass
             
         lx=room.piece.margins[0];
         rx=room.piece.size.x-(room.piece.margins[2]);
-        if (rx<=lx) rx=lx+1;
+        if (room.requiredStairs.length!==0) {
+            if (lx<2) lx=2;
+            if (rx>(room.piece.size.x-2)) rx=room.piece.size.x-2;
+        }
+        if (rx<=lx) return;
         
         tz=room.piece.margins[1];
         bz=room.piece.size.z-(room.piece.margins[3]);
-        if (bz<=tz) bz=tz+1;
+        if (room.requiredStairs.length!==0) {
+            if (tz<2) tz=2;
+            if (bz>(room.piece.size.z-2)) bz=room.piece.size.z-2;
+        }
+        if (bz<=tz) return;
         
             // size
             

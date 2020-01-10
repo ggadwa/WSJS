@@ -98,51 +98,6 @@ export default class GenerateMapClass
         }
     }
     
-    hasSharedWalls(room,room2,segmentSize)
-    {
-        let vIdx,vIdx2,nextIdx,nextIdx2,nVertex,nVertex2;
-        let ax,az,ax2,az2,bx,bz,bx2,bz2;
-        
-            // check to see if two rooms share a wall segment
-        
-        nVertex=room.piece.vertexes.length;
-        nVertex2=room2.piece.vertexes.length;
-                
-        vIdx=0;
-
-        while (vIdx<nVertex) {
-            nextIdx=vIdx+1;
-            if (nextIdx===nVertex) nextIdx=0;
-
-            ax=Math.trunc(room.piece.vertexes[vIdx][0]*segmentSize)+room.offset.x
-            az=Math.trunc(room.piece.vertexes[vIdx][1]*segmentSize)+room.offset.z
-
-            ax2=Math.trunc(room.piece.vertexes[nextIdx][0]*segmentSize)+room.offset.x
-            az2=Math.trunc(room.piece.vertexes[nextIdx][1]*segmentSize)+room.offset.z
-
-            vIdx2=0;
-
-            while (vIdx2<nVertex2) {
-                nextIdx2=vIdx2+1;
-                if (nextIdx2===nVertex2) nextIdx2=0;
-
-                bx=Math.trunc(room2.piece.vertexes[vIdx2][0]*segmentSize)+room2.offset.x
-                bz=Math.trunc(room2.piece.vertexes[vIdx2][1]*segmentSize)+room2.offset.z
-
-                bx2=Math.trunc(room2.piece.vertexes[nextIdx2][0]*segmentSize)+room2.offset.x
-                bz2=Math.trunc(room2.piece.vertexes[nextIdx2][1]*segmentSize)+room2.offset.z
-
-                if (((ax===bx) && (az===bz) && (ax2===bx2) && (az2===bz2)) || ((ax2===bx) && (az2===bz) && (ax===bx2) && (az===bz2))) return(true);
-
-                vIdx2++;
-            }
-
-            vIdx++;
-        }
-        
-        return(false);
-    }
-    
         //
         // room decorations
         //
@@ -176,20 +131,55 @@ export default class GenerateMapClass
         
     buildSteps(core,room,name,toRoom,stepBitmap,segmentSize)
     {
+        let x,z,doAll,touchRange;
+        let noSkipX,noSkipZ;
+        
         if (room.offset.z===(toRoom.offset.z+toRoom.size.z)) {
-            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,Math.trunc(room.piece.size.x*0.5),0,1,0);
+            touchRange=room.getTouchWallRange(toRoom,true,segmentSize);
+            doAll=(touchRange.getSize()<=2);
+            noSkipX=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            
+            for (x=touchRange.min;x<=touchRange.max;x++) {
+                if ((GenerateUtilityClass.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
+                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,x,0,GenerateStoryClass.PLATFORM_DIR_NEG_Z,0);
+                }
+            }
             return;
         }
         if ((room.offset.z+room.size.z)===toRoom.offset.z) {
-            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,Math.trunc(room.piece.size.x*0.5),room.piece.size.z-2,0,0);
+            touchRange=room.getTouchWallRange(toRoom,true,segmentSize);
+            doAll=(touchRange.getSize()<=2);
+            noSkipX=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            
+            for (x=touchRange.min;x<=touchRange.max;x++) {
+                if ((GenerateUtilityClass.randomPercentage(0.5)) || (x===noSkipX) || (doAll)) {
+                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,x,room.piece.size.z-2,GenerateStoryClass.PLATFORM_DIR_POS_Z,0);
+                }
+            }
             return;
         }
         if (room.offset.x===(toRoom.offset.x+toRoom.size.x)) {
-            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,0,Math.trunc(room.piece.size.z*0.5),3,0);
+            touchRange=room.getTouchWallRange(toRoom,false,segmentSize);
+            doAll=(touchRange.getSize()<=2);
+            noSkipZ=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            
+            for (z=touchRange.min;z<=touchRange.max;z++) {
+                if ((GenerateUtilityClass.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
+                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,0,z,GenerateStoryClass.PLATFORM_DIR_NEG_X,0);
+                }
+            }
             return;
         }
         if ((room.offset.x+room.size.x)===toRoom.offset.x) {
-            GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,room.piece.size.x-2,Math.trunc(room.piece.size.z*0.5),2,0);
+            touchRange=room.getTouchWallRange(toRoom,false,segmentSize);
+            doAll=(touchRange.getSize()<=2);
+            noSkipZ=GenerateUtilityClass.randomInBetween(touchRange.min,(touchRange.max+1));
+            
+            for (z=touchRange.min;z<=touchRange.max;z++) {
+                if ((GenerateUtilityClass.randomPercentage(0.5)) || (z===noSkipZ) || (doAll)) {
+                    GenerateStoryClass.addStairs(core,room,name,stepBitmap,segmentSize,room.piece.size.x-2,z,GenerateStoryClass.PLATFORM_DIR_POS_X,0);
+                }
+            }
             return;
         }
         
@@ -229,7 +219,7 @@ export default class GenerateMapClass
         let roomWallBitmap,floorBitmap,ceilingBitmap,stepBitmap,pillarBitmap,platformBitmap,boxBitmap,computerBitmap,pipeBitmap;
         let roomTopY;
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
-        let room,stepToRoom,centerPnt;
+        let room,centerPnt;
         let roomCount,segmentSize,colorScheme;
         let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
         let map=this.core.map;
@@ -237,7 +227,7 @@ export default class GenerateMapClass
         
             // see the random number generator
             
-        seed=1578611079872; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
+        seed=1578699158947; // (importSettings.autoGenerate.randomSeed===undefined)?Date.now():importSettings.autoGenerate.randomSeed;
         console.info('Random Seed: '+seed);
         
         GenerateUtilityClass.setRandomSeed(seed);
@@ -318,7 +308,7 @@ export default class GenerateMapClass
                 else {
                     touchIdx=room.touches(rooms,n);
                     if (touchIdx!==-1) {
-                        if (this.hasSharedWalls(room,rooms[touchIdx],segmentSize)) {
+                        if (room.hasSharedWalls(rooms[touchIdx],segmentSize)) {
                             this.addAdditionalRoom(rooms,room,rooms[touchIdx],segmentSize);
                             break;
                         }
@@ -332,7 +322,7 @@ export default class GenerateMapClass
                 else {
                     touchIdx=room.touches(rooms,n);
                     if (touchIdx!==-1) {
-                        if (this.hasSharedWalls(room,rooms[touchIdx],segmentSize)) {
+                        if (room.hasSharedWalls(rooms[touchIdx],segmentSize)) {
                             this.addAdditionalRoom(rooms,room,rooms[touchIdx],segmentSize);
                             break;
                         }
@@ -372,11 +362,9 @@ export default class GenerateMapClass
             GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('floor_'+n),floorBitmap,room.offset.y,segmentSize);
             GenerateMeshClass.buildRoomFloorCeiling(this.core,room,centerPnt,('ceiling_'+n),ceilingBitmap,roomTopY,segmentSize);
             
-                // skip decorations for rooms with steps
+                // decorations
 
-            if (room.requiredStairs.length===0) {
-                if (room.piece.decorate) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize);
-            }
+            if (room.piece.decorate) this.buildDecoration(room,n,stepBitmap,platformBitmap,pillarBitmap,boxBitmap,computerBitmap,pipeBitmap,segmentSize);
             
                 // room lights
 
