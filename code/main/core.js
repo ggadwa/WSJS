@@ -327,6 +327,8 @@ export default class CoreClass
     
     setPauseState(pause,initState)
     {
+        let isNetworkGame;
+        
             // set the state
 
         this.paused=pause;
@@ -357,8 +359,11 @@ export default class CoreClass
         
             // always draw once if we
             // are going into a pause
+            // we don't need to do this if multiplayer because that
+            // doesn't pause drawing
             
-        if (pause) this.draw();
+        isNetworkGame=(this.isMultiplayer) && (!this.setup.localGame);
+        if ((pause) && (!isNetworkGame)) this.draw();
         
             // turn on/off the input
         
@@ -374,6 +379,7 @@ export default class CoreClass
             // suspend/resume the sound
             
         if (pause) {
+            if (isNetworkGame) this.soundList.stopAll();
             this.soundList.suspend();
         }
         else {

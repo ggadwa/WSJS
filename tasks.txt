@@ -1,6 +1,9 @@
-- flicker and pulsing lights (flicker is random SMALL flicker, time between flicker is random)
-- move all generate stuff to reaper project
 - create random nodes for rooms, use grenades to test
+
+- lights
+   - regular
+   - color changing
+   - chasing (4 that go on and off)
 
 - bitmaps
    - pipe, needs random line & random screw line
@@ -11,8 +14,6 @@
    - connectors for pipes
 
 - networking
-   - pause does not pause network game
-   - figure out app data problem
    - enter
    - leave
    - remotes and updates

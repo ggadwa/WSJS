@@ -142,8 +142,8 @@ export default class InputClass
             // stop pointer lock
             
         document.exitPointerLock();
-        document.addEventListener('pointerlockchange',this.pointerLockChangeListener,false);
-        document.addEventListener('pointerlockerror',this.pointerLockErrorListener,false);
+        document.removeEventListener('pointerlockchange',this.pointerLockChangeListener,false);
+        document.removeEventListener('pointerlockerror',this.pointerLockErrorListener,false);
     }
     
     mouseButtonClear()

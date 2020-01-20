@@ -231,6 +231,15 @@ export default class SoundListClass
         if (!soundPlay.free) soundPlay.stop();
     }
     
+    stopAll()
+    {
+        let n;
+        
+        for (n=0;n!==SoundListClass.MAX_CONCURRENT_SOUNDS;n++) {
+            if (!this.soundPlays[n].free) this.soundPlays[n].stop();
+        }
+    }
+    
     changeRate(playIdx,rate)
     {
         let soundPlay=this.soundPlays[playIdx];

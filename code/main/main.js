@@ -222,7 +222,7 @@ const BAIL_MILLISECONDS=5000;
 
 function mainLoop(timestamp)
 {
-    let fpsTime,tick;
+    let fpsTime,tick,isNetworkGame;
     let core=main.core;
     let map=core.map;
     
@@ -231,9 +231,11 @@ function mainLoop(timestamp)
     if (core.loopCancel) return;
     window.requestAnimationFrame(mainLoop);
     
-        // if paused, nothing to do
+        // if paused, and not in a network
+        // game than nothing to do
         
-    if (core.paused) return;
+    isNetworkGame=(core.isMultiplayer) && (!core.setup.localGame);
+    if ((core.paused) && (!isNetworkGame)) return;
     
         // recalculate the timestamp by adding
         // offset from last time we calculated it
@@ -279,7 +281,7 @@ function mainLoop(timestamp)
         // if multiplayer, update the server
         // with player information
         
-    if ((core.isMultiplayer) && (!core.setup.localGame)) core.network.sendEntityUpdate(map.entityList.getPlayer());
+    if (isNetworkGame) core.network.sendEntityUpdate(map.entityList.getPlayer());
     
         // drawing
         
