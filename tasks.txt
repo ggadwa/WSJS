@@ -11,7 +11,8 @@
    - connectors for pipes
 
 - networking
-   - needs "master" (first in) for games
+   - pause does not pause network game
+   - figure out app data problem
    - enter
    - leave
    - remotes and updates

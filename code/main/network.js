@@ -190,7 +190,7 @@ export default class NetworkClass
         id=dataView.getInt16(2);
         userName=this.getStringFromDataView(dataView,4,NetworkClass.USER_NAME_LENGTH);
         
-        //console.info('ENTER>'+id+'>'+userName);
+        console.info('ENTER>'+id+'>'+userName);
         
         //this.core.map.entityList.add(new entityDef.entity(this.core,entityDef.name,entityPosition,entityAngle,entityData));
 
@@ -202,7 +202,7 @@ export default class NetworkClass
         
         id=dataView.getInt16(2);
         
-        //console.info('LEAVE>'+id);
+        console.info('LEAVE>'+id);
         
     }
     
@@ -212,7 +212,7 @@ export default class NetworkClass
         
         id=dataView.getInt16(2);
         
-        //console.info('UPDATE>'+id);
+        console.info('UPDATE>'+id);
         
     }
     
