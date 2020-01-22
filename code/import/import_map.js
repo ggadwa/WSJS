@@ -237,13 +237,8 @@ export default class ImportMapClass
                 entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
                 this.core.map.entityList.add(entity);
                 
-                    // deactivate if a remote or a bot over bot count
+                    // deactivate if a bot over bot count
                     
-                if (entityDef.remote!==undefined) {
-                    entity.remote=true;
-                    entity.active=false;
-                }
-                
                 if (entityDef.bot!==undefined) {
                     entity.active=(botCount<this.core.setup.botCount);
                     botCount++;

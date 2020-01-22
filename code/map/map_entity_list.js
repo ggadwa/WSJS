@@ -104,6 +104,17 @@ export default class MapEntityListClass
         return(null);
     }
     
+    findRemoteById(remoteId)
+    {
+        let entity;
+         
+        for (entity of this.entities) {
+            if (entity.remoteId===remoteId) return(entity);
+        }
+        
+        return(null);
+    }
+    
     findHold(parentEntity,name)
     {
         let entity;

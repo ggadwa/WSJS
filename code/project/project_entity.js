@@ -26,8 +26,9 @@ export default class ProjectEntityClass
         this.angle=angle.copy();
         this.data=data;
         
+        this.remoteId=null;
+        
         this.active=true;
-        this.remote=false;
         this.show=true;
         this.heldBy=null;
         this.filter=null;
@@ -963,6 +964,64 @@ export default class ProjectEntityClass
     {
         this.core.soundList.changeRate(playIdx,rate);
     }
+    
+        //
+        // networking utilities
+        //
+        
+    getUpdateNetworkData()
+    {
+        let buffer=new ArrayBuffer(55);
+        let dataView=new DataView(buffer);
+        
+        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE);
+        dataView.setInt16(2,this.id);
+        dataView.setInt32(4,entity.position.x);
+        dataView.setInt32(8,entity.position.y);
+        dataView.setInt32(12,entity.position.z);
+        dataView.setFloat32(16,entity.angle.x);
+        dataView.setFloat32(20,entity.angle.y);
+        dataView.setFloat32(24,entity.angle.z);
+        dataView.setFloat32(28,entity.scale.x);
+        dataView.setFloat32(32,entity.scale.y);
+        dataView.setFloat32(36,entity.scale.z);
+        dataView.setInt16(40,entity.modelEntityAlter.currentAnimationIdx);
+        dataView.setInt32(42,entity.modelEntityAlter.currentAnimationStartTimestamp);
+        dataView.setInt32(46,entity.modelEntityAlter.currentAnimationLoopStartTick);
+        dataView.setInt32(50,entity.modelEntityAlter.currentAnimationLoopEndTick);
+        dataView.setInt8(54,(entity.modelEntityAlter.queuedAnimationStop?0:1));
+        
+        return(buffer);
+    }
+    
+    putUpdateNetworkData(dataView)
+    {
+        /*
+        
+        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE);
+        dataView.setInt16(2,this.id);
+        dataView.setInt32(4,entity.position.x);
+        dataView.setInt32(8,entity.position.y);
+        dataView.setInt32(12,entity.position.z);
+        dataView.setFloat32(16,entity.angle.x);
+        dataView.setFloat32(20,entity.angle.y);
+        dataView.setFloat32(24,entity.angle.z);
+        dataView.setFloat32(28,entity.scale.x);
+        dataView.setFloat32(32,entity.scale.y);
+        dataView.setFloat32(36,entity.scale.z);
+        dataView.setInt16(40,entity.modelEntityAlter.currentAnimationIdx);
+        dataView.setInt32(42,entity.modelEntityAlter.currentAnimationStartTimestamp);
+        dataView.setInt32(46,entity.modelEntityAlter.currentAnimationLoopStartTick);
+        dataView.setInt32(50,entity.modelEntityAlter.currentAnimationLoopEndTick);
+        dataView.setInt8(54,(entity.modelEntityAlter.queuedAnimationStop?0:1));
+        */
+       
+            // updates make remotes active and shown
+            
+        this.active=true;
+        this.show=true;
+    }
+
     
         //
         // ready entity

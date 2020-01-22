@@ -1,3 +1,5 @@
+import ProjectEntityClass from '../project/project_entity_remote.js';
+
 //
 // network class
 //
@@ -16,6 +18,7 @@ export default class NetworkClass
     
     core=null;
     socket=null;
+    queue=null;
     
     id=0;
     connectOKCallback=null;
@@ -38,6 +41,8 @@ export default class NetworkClass
         this.connectErrorCallback=errorCallback;
         this.inConnectWait=true;
         this.lastErrorMessage=null;
+        
+        this.queue=[];
         
             // now connect
             
@@ -120,8 +125,8 @@ export default class NetworkClass
     
     async message(event)
     {
-        let dataView=new DataView(await (new Response(event.data).arrayBuffer()));
-        let msgType=dataView.getInt16(0);
+        let buffer=await (new Response(event.data).arrayBuffer());
+        let dataView;
         
             // if we are waiting for a connect ok,
             // then look for the specific reply message,
@@ -131,7 +136,9 @@ export default class NetworkClass
         if (this.inConnectWait) {
             this.inConnectWait=false;
             
-            if (msgType!==NetworkClass.MESSAGE_TYPE_ENTITY_LOGON_REPLY) {
+            dataView=new DataView(buffer);
+            
+            if (dataView.getInt16(0)!==NetworkClass.MESSAGE_TYPE_ENTITY_LOGON_REPLY) {
                 this.connectErrorCallback();
                 return;
             }
@@ -146,19 +153,9 @@ export default class NetworkClass
             return;
         }
         
-            // handle the messages
+            // drop in queue
             
-        switch (msgType) {
-            case NetworkClass.MESSAGE_TYPE_ENTITY_ENTER:
-                this.handleEntityEnter(dataView);
-                return;
-            case NetworkClass.MESSAGE_TYPE_ENTITY_LEAVE:
-                this.handleEntityLeave(dataView);
-                return;
-            case NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE:
-                this.handleEntityUpdate(dataView);
-                return;
-        }
+        this.queue.push(buffer);
     }
     
     error(event)
@@ -183,37 +180,68 @@ export default class NetworkClass
         // server message handlers
         //
         
-    handleEntityEnter(dataView)
+    handleEntityEnter(remoteId,dataView)
     {
-        let id,userName;
+        let userName,entity;
         
-        id=dataView.getInt16(2);
         userName=this.getStringFromDataView(dataView,4,NetworkClass.USER_NAME_LENGTH);
         
-        console.info('ENTER>'+id+'>'+userName);
+        console.info('ENTER>'+remoteId+'>'+userName);
         
-        //this.core.map.entityList.add(new entityDef.entity(this.core,entityDef.name,entityPosition,entityAngle,entityData));
+        entity=new ProjectEntityRemoteClass(this.core,remoteId,userName);
+        this.core.map.entityList.add(entity);
+    }
+    
+    handleEntityLeave(remoteId,dataView)
+    {
+        let entity;
+        
+        console.info('LEAVE>'+remoteId);
+        
+        //entity=this.core.map.entityList.findRemoteById(remoteId);
+        //if (entity!==null) 
+    }
+    
+    handleEntityUpdate(remoteId,dataView)
+    {
+        let entity;
+        
+        console.info('UPDATE>'+remoteId);
+        
+        entity=this.core.map.entityList.findRemoteById(remoteId);
+        if (entity!==null) entity.putUpdateNetworkData(dataView);
+    }
+    
+    runMessageQueue()
+    {
+        let buffer,dataView,msgType,remoteId;
+        let updateIds=[];
+        
+        while (this.queue.length!==0) {
+            buffer=this.queue.pop();
+            
+            dataView=new DataView(buffer);
+            msgType=dataView.getInt16(0);
+            remoteId=dataView.getInt16(2);
 
-    }
-    
-    handleEntityLeave(dataView)
-    {
-        let id;
-        
-        id=dataView.getInt16(2);
-        
-        console.info('LEAVE>'+id);
-        
-    }
-    
-    handleEntityUpdate(dataView)
-    {
-        let id;
-        
-        id=dataView.getInt16(2);
-        
-        console.info('UPDATE>'+id);
-        
+            switch (msgType) {
+                
+                case NetworkClass.MESSAGE_TYPE_ENTITY_ENTER:
+                    this.handleEntityEnter(remoteId,dataView);
+                    break;
+                    
+                case NetworkClass.MESSAGE_TYPE_ENTITY_LEAVE:
+                    this.handleEntityLeave(remoteId,dataView);
+                    break;
+                    
+                case NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE:
+                    if (updateIds.indexOf(remoteId)!==-1) continue;     // coalesce updates
+                    
+                    updateIds.push(remoteId);
+                    this.handleEntityUpdate(remoteId,dataView);
+                    break;
+            }
+        }
     }
     
         //
@@ -222,26 +250,21 @@ export default class NetworkClass
         
     sendEntityUpdate(entity)
     {
-        let buffer=new ArrayBuffer(55);
-        let dataView=new DataView(buffer);
+        this.socket.send(entity.getUpdateNetworkData());
+    }
+    
+        //
+        // run networking
+        //
         
-        dataView.setInt16(0,NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE);
-        dataView.setInt16(2,this.id);
-        dataView.setInt32(4,entity.position.x);
-        dataView.setInt32(8,entity.position.y);
-        dataView.setInt32(12,entity.position.z);
-        dataView.setFloat32(16,entity.angle.x);
-        dataView.setFloat32(20,entity.angle.y);
-        dataView.setFloat32(24,entity.angle.z);
-        dataView.setFloat32(28,entity.scale.x);
-        dataView.setFloat32(32,entity.scale.y);
-        dataView.setFloat32(36,entity.scale.z);
-        dataView.setInt16(40,entity.modelEntityAlter.currentAnimationIdx);
-        dataView.setInt32(42,entity.modelEntityAlter.currentAnimationStartTimestamp);
-        dataView.setInt32(46,entity.modelEntityAlter.currentAnimationLoopStartTick);
-        dataView.setInt32(50,entity.modelEntityAlter.currentAnimationLoopEndTick);
-        dataView.setInt8(54,(entity.modelEntityAlter.queuedAnimationStop?0:1));
+    run()
+    {
+            // send my update to other players
+            
+        this.sendEntityUpdate(this.core.map.entityList.getPlayer());
         
-        this.socket.send(buffer);
+            // do all the remote updates
+            
+        this.runMessageQueue();
     }
 }
