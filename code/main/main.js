@@ -283,6 +283,10 @@ function mainLoop(timestamp)
         
     if (isNetworkGame) core.network.run();
     
+        // clean up deleted entities
+        
+    map.entityList.cleanUpMarkedAsDeleted();
+    
         // drawing
         
         // this timing is loose, as it's only there to

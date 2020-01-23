@@ -46,6 +46,19 @@ export default class MapEntityListClass
             if (entity.modelEntityAlter!==null) entity.modelEntityAlter.finishSetup();
         }
     }
+    
+        //
+        // setups network flags to tell if remotes got an update in a loop cycle
+        //
+        
+    clearEntityRemoteUpdateFlags()
+    {
+        let entity;
+        
+        for (entity of this.entities) {
+            entity.hadUpdateFlag=false;
+        }
+    }
 
         //
         // list items
@@ -92,7 +105,26 @@ export default class MapEntityListClass
     {
         return(this.entities[0]);
     }
+        
+    cleanUpMarkedAsDeleted()
+    {
+        /* todo
+        let idx,entity;
+         
+        idx=this.entities.length-1;
+        
+        for (n=(this.entities.length-1);n>=0;n--) {
+            entity=this.entities[idx];
+            if (entity.markDelete) this.entities.splice(idx,1);
+        }
+         */
+    }
+        
     
+        //
+        // finds
+        //
+        
     find(name)
     {
         let entity;

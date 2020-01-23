@@ -209,14 +209,23 @@ export default class NetworkClass
         console.info('UPDATE>'+remoteId);
         
         entity=this.core.map.entityList.findRemoteById(remoteId);
-        if (entity!==null) entity.putUpdateNetworkData(dataView);
+        if (entity!==null) {
+            if (!entity.hadRemoteUpdate) entity.putUpdateNetworkData(dataView);     // only use the first (the latest) update, skip all others
+        }
     }
     
     runMessageQueue()
     {
         let buffer,dataView,msgType,remoteId;
-        let updateIds=[];
         
+            // clear all the had update flag, we use this
+            // to only apply the latest update and check if
+            // we didn't have an update so need to predict
+            
+        this.core.map.entityList.clearEntityRemoteUpdateFlags();
+        
+            // run through the messages
+            
         while (this.queue.length!==0) {
             buffer=this.queue.pop();
             
@@ -235,9 +244,6 @@ export default class NetworkClass
                     break;
                     
                 case NetworkClass.MESSAGE_TYPE_ENTITY_UPDATE:
-                    if (updateIds.indexOf(remoteId)!==-1) continue;     // coalesce updates
-                    
-                    updateIds.push(remoteId);
                     this.handleEntityUpdate(remoteId,dataView);
                     break;
             }

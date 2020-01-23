@@ -32,13 +32,13 @@ export default class ModelListClass
         // add and get a bitmap
         //
         
-    add(name,importSettings)
+    async cache(name,importSettings)
     {
         let model;
             
             // already in list?
             
-        if (this.models.has(name)) return(this.models.get(name));
+        if (this.models.has(name)) return;
         
             // add new one to list, will be loaded
             // by another call that force loads unloaded
@@ -46,9 +46,9 @@ export default class ModelListClass
                     
         model=new ModelClass(this.core,importSettings);
         model.initialize();
-        this.models.set(name,model);
+        if (!(await model.load())) return;
         
-        return(model);
+        this.models.set(name,model);
     }
 
     get(name)
@@ -62,6 +62,9 @@ export default class ModelListClass
         
     async loadAllModels()
     {
+        return(true);
+        
+        /*
         let keyIter,rtn,model;
         let success,promises=[];
         
@@ -90,6 +93,8 @@ export default class ModelListClass
                 );
 
         return(success);
+             
+         */
     }
     
 }
