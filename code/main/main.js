@@ -129,39 +129,54 @@ class MainClass
         this.core.map.meshList.buildCollisionGeometry();
         
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Loading Entities');
+        this.core.loadingScreenAddString('Loading Models');
         this.core.loadingScreenDraw();
         
-        setTimeout(this.initLoadEntityModels.bind(this),1);
+        setTimeout(this.initLoadModels.bind(this),1);
     }
     
-    async initLoadEntityModels()
+    async initLoadModels()
     {
         if (!(await this.core.modelList.loadAllModels())) return;
         
-        this.core.map.entityList.setupModelEntityAlters();
-        
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Loading Images');
+        this.core.loadingScreenAddString('Load Sounds');
         this.core.loadingScreenDraw();
         
-        setTimeout(this.initLoadImages.bind(this),1);
-    }
-    
-    async initLoadImages()
-    {
-        if (!(await this.core.bitmapList.loadAllBitmaps())) return;
-        
-        this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Loading Sounds');
-        this.core.loadingScreenDraw();
-
         setTimeout(this.initLoadSounds.bind(this),1);
     }
     
     async initLoadSounds()
     {
         if (!(await this.core.soundList.loadAllSounds())) return;
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Create Entities');
+        this.core.loadingScreenDraw();
+
+        setTimeout(this.initLoadEntities.bind(this),1);
+    }
+    
+    initLoadEntities()
+    {
+        try {
+            this.core.map.entityList.loadMapEntities();
+        }
+        catch (ex) {
+            console.log(ex);
+            return;
+        }
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Loading Images');
+        this.core.loadingScreenDraw();
+
+        setTimeout(this.initLoadImages.bind(this),1);
+    }
+    
+    async initLoadImages()
+    {
+        if (!(await this.core.bitmapList.loadAllBitmaps())) return;
         
         this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Final Setup');

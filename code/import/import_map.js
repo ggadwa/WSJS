@@ -26,7 +26,6 @@ export default class ImportMapClass
         let liquid,liquidDef,liquidBitmap;
         let movement,meshIdxList,reverseMeshIdxList,movementDef;
         let moveDef,movePoint,moveRotate,rotateOffset,centerOffset;
-        let entity,entityDef,entityPosition,entityAngle,entityData,entityName,botCount;
         let pathNode,pathDef,altPosition;
         let cube,cubeDef;
         let bitmap;
@@ -151,8 +150,6 @@ export default class ImportMapClass
                     moveRotate=new PointClass(0,0,0);
                     if (moveDef.rotate!==undefined) moveRotate.setFromValues(moveDef.rotate.x,moveDef.rotate.y,moveDef.rotate.z);
                     
-                    if (moveDef.sound!==undefined) this.core.soundList.add(moveDef.sound,moveDef.soundMaxDistance,0,0)
-                    
                     movement.addMove(new MoveClass(moveDef.tick,movePoint,moveRotate,MoveClass.lookupPauseType(moveDef.pauseType),((moveDef.pauseData===undefined)?null:moveDef.pauseData),((moveDef.sound===undefined)?null:moveDef.sound),((moveDef.trigger===undefined)?null:moveDef.trigger)));
                 }
 
@@ -195,54 +192,6 @@ export default class ImportMapClass
                 
                 cube=new MapCubeClass(new BoundClass(cubeDef.xBound.min,cubeDef.xBound.max),new BoundClass(cubeDef.yBound.min,cubeDef.yBound.max),new BoundClass(cubeDef.zBound.min,cubeDef.zBound.max),cubeDef.key,cubeDef.data);
                 this.core.map.cubeList.add(cube);
-            }
-        }
-        
-            // entities
-            
-        if (importSettings.entities===undefined) {
-            console.log('no entities in JSON, at least one entity, the player (entity 0), is required');
-            return(false);
-        }
-        
-        botCount=0;
-        
-        for (n=0;n!==importSettings.entities.length;n++) {
-            entityDef=importSettings.entities[n];
-            
-            entityName=(entityDef.name===undefined)?'':entityDef.name;
-            
-            if (entityDef.position!==undefined) {
-                entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
-            }
-            else {
-                entityPosition=new PointClass(0,0,0);
-            }
-            if (entityDef.angle!==undefined) {
-                entityAngle=new PointClass(entityDef.angle.x,entityDef.angle.y,entityDef.angle.z);
-            }
-            else {
-                entityAngle=new PointClass(0,0,0);
-            }
-            
-            entityData=(entityDef.data===undefined)?null:entityDef.data;
-            
-                // first entity is always assumed to be the player, anything
-                // else is a map entity
-
-            if (n===0) {
-                this.core.map.entityList.setPlayer(new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData));
-            }
-            else {
-                entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
-                this.core.map.entityList.add(entity);
-                
-                    // deactivate if a bot over bot count
-                    
-                if (entityDef.bot!==undefined) {
-                    entity.active=(botCount<this.core.setup.botCount);
-                    botCount++;
-                }
             }
         }
         

@@ -77,7 +77,7 @@ export default class ModelEntityAlterClass
         // finish setting up the alter to prepare for animations
         //
         
-    finishSetup()
+    initialize()
     {
         let node,skin;
         
@@ -92,6 +92,10 @@ export default class ModelEntityAlterClass
         for (skin of this.entity.model.skeleton.skins) {
             this.skins.push(new ModelEntityAlterSkinClass(skin.joints.length));
         }
+    }
+    
+    release()
+    {
     }
     
         //

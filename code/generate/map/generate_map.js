@@ -221,7 +221,6 @@ export default class GenerateMapClass
         let xAdd,zAdd,origX,origZ,touchIdx,failCount,placeCount,moveCount;
         let room,centerPnt;
         let roomCount,segmentSize,colorScheme;
-        let entity,entityDef,entityName,entityPosition,entityAngle,entityData;
         let map=this.core.map;
         let rooms=[];
         
@@ -378,44 +377,6 @@ export default class GenerateMapClass
             
             for (k=0;k!==room.requiredStairs.length;k++) {
                 this.buildSteps(this.core,room,('room_'+n+'_step_'+k),room.requiredStairs[k],stepBitmap,segmentSize);
-            }
-        }
-        
-            // entities
-            
-        for (n=0;n!==importSettings.entities.length;n++) {
-            entityDef=importSettings.entities[n];
-            
-            entityName=(entityDef.name===undefined)?'':entityDef.name;
-            
-            if (entityDef.position!==undefined) {
-                entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
-            }
-            else {
-                entityPosition=new PointClass(0,0,0);
-            }
-            if (entityDef.angle!==undefined) {
-                entityAngle=new PointClass(entityDef.angle.x,entityDef.angle.y,entityDef.angle.z);
-            }
-            else {
-                entityAngle=new PointClass(0,0,0);
-            }
-            
-            entityData=(entityDef.data===undefined)?null:entityDef.data;
-            
-                // first entity is always assumed to be the player, anything
-                // else is a map entity
-
-            if (n===0) {
-                entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
-                entity.position.x=rooms[0].offset.x+Math.trunc(rooms[0].size.x*0.5);
-                entity.position.y=rooms[0].offset.y;
-                entity.position.z=rooms[0].offset.z+Math.trunc(rooms[0].size.z*0.5);
-                this.core.map.entityList.setPlayer(entity);
-            }
-            else {
-                entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
-                this.core.map.entityList.add(entity);
             }
         }
 

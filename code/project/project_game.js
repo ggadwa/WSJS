@@ -10,15 +10,38 @@ export default class ProjectGameClass
     {
     }
     
-        //
-        // override this to set the name of this game
-        // this is needed so local storage saves can have
-        // different names
-        //
-        
+    /*
+     * Override this to set the name of this game
+     * This is needed so local storage saves can have
+     * different names
+     * 
+     * @returns {String} Name of game
+     */
     getName()
     {
         return('unknown');
+    }
+    
+    /**
+     * Override this and return a entity class that will
+     * run any game bots
+     * 
+     * @returns {Class} ProjectEntityClass for bots 
+     */
+    getBotClass()
+    {
+        return(null);
+    }
+    
+    /**
+     * Override this to return a different name for each
+     * indexed bot.  Default just returns 'bot '+idx.
+     * 
+     * @returns {String} Name for a bot at idx index
+     */
+    getBotName(idx)
+    {
+        return('bot '+idx);
     }
     
         //

@@ -1,11 +1,15 @@
+import PointClass from '../utility/point.js';
+
 //
 // map class
 //
 
 export default class MapEntityListClass
 {
-    constructor()
+    constructor(core)
     {
+        this.core=core;
+        
         this.entityCurrentId=1;     // 0 is always the player
         this.entities=[];
 
@@ -33,21 +37,6 @@ export default class MapEntityListClass
     }
     
         //
-        // sets up the model entity alter which each
-        // entity has to track the animations/nodes/etc
-        // for their shared models
-        //
-        
-    setupModelEntityAlters()
-    {
-        let entity;
-        
-        for (entity of this.entities) {
-            if (entity.modelEntityAlter!==null) entity.modelEntityAlter.finishSetup();
-        }
-    }
-    
-        //
         // setups network flags to tell if remotes got an update in a loop cycle
         //
         
@@ -69,7 +58,7 @@ export default class MapEntityListClass
         entity.id=0;
         this.entities[0]=entity;
         
-        entity.initialize();
+        return(entity.initialize());
     }
 
     add(entity)
@@ -77,7 +66,7 @@ export default class MapEntityListClass
         entity.id=this.entityCurrentId++;
         this.entities.push(entity);
         
-        entity.initialize();
+        return(entity.initialize());
     }
     
     clear()
@@ -120,6 +109,72 @@ export default class MapEntityListClass
          */
     }
         
+        //
+        // load map entities
+        //
+        
+    loadMapEntities()
+    {
+        let importSettings=this.core.projectMap.getImportSettings();
+        let entityList=importSettings.entities;
+        let n,entityDef;
+        let entity,entityName,entityPosition,entityAngle,entityData;
+        let botClass;
+
+            // at least a player entity is required
+            
+        if (entityList===undefined) {
+            console.log('no entities in map setup, at least one entity, the player (entity 0), is required');
+            return(false);
+        }
+        
+            // load entities from map import settings
+            
+        for (n=0;n!==entityList.length;n++) {
+            entityDef=entityList[n];
+            
+            entityName=(entityDef.name===undefined)?'':entityDef.name;
+            
+            if (entityDef.position!==undefined) {
+                entityPosition=new PointClass(entityDef.position.x,entityDef.position.y,entityDef.position.z);
+            }
+            else {
+                entityPosition=new PointClass(0,0,0);
+            }
+            if (entityDef.angle!==undefined) {
+                entityAngle=new PointClass(entityDef.angle.x,entityDef.angle.y,entityDef.angle.z);
+            }
+            else {
+                entityAngle=new PointClass(0,0,0);
+            }
+            
+            entityData=(entityDef.data===undefined)?null:entityDef.data;
+            
+                // first entity is always assumed to be the player, anything
+                // else is a map entity
+
+            if (n===0) {
+                this.core.map.entityList.setPlayer(new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData));
+            }
+            else {
+                entity=new entityDef.entity(this.core,entityName,entityPosition,entityAngle,entityData);
+                this.core.map.entityList.add(entity);
+            }
+        }
+            
+            // load any bots if it's a local multiplayer game
+            
+        if (!((this.core.isMultiplayer) && (this.core.setup.localGame))) return;
+
+        botClass=this.core.projectGame.getBotClass();
+
+        for (n=0;n!==this.core.setup.botCount;n++) {
+            entity=new botClass(this.core,this.core.projectGame.getBotName(n),new PointClass(0,0,0),new PointClass(0,0,0),null);
+            this.core.map.entityList.add(entity);
+        }
+        
+        return(true);
+    }
     
         //
         // finds

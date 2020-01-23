@@ -29,28 +29,9 @@ export default class ModelListClass
     }
     
         //
-        // add and get a bitmap
+        // get a model
         //
         
-    async cache(name,importSettings)
-    {
-        let model;
-            
-            // already in list?
-            
-        if (this.models.has(name)) return;
-        
-            // add new one to list, will be loaded
-            // by another call that force loads unloaded
-            // models
-                    
-        model=new ModelClass(this.core,importSettings);
-        model.initialize();
-        if (!(await model.load())) return;
-        
-        this.models.set(name,model);
-    }
-
     get(name)
     {
         return(this.models.get(name));
@@ -62,22 +43,22 @@ export default class ModelListClass
         
     async loadAllModels()
     {
-        return(true);
+        let importSettings=this.core.projectMap.getImportSettings();
+        let loadModelList=importSettings.models;
+        let modelDef,model;
+        let success,promises;
         
-        /*
-        let keyIter,rtn,model;
-        let success,promises=[];
-        
-            // gather all the promises
+            // get all the models and wrap the
+            // loading into a list of promises
             
-        keyIter=this.models.keys();
+        promises=[];
         
-        while (true) {
-            rtn=keyIter.next();
-            if (rtn.done) break;
+        for (modelDef of loadModelList) {
+            model=new ModelClass(this.core,modelDef);
+            model.initialize();
+            promises.push(model.load());
             
-            model=this.models.get(rtn.value);
-            if (!model.loaded) promises.push(model.load());
+            this.models.set(modelDef.name,model);
         }
         
             // and await them all
@@ -93,8 +74,6 @@ export default class ModelListClass
                 );
 
         return(success);
-             
-         */
     }
     
 }

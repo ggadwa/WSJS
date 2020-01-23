@@ -90,26 +90,9 @@ export default class SoundListClass
     }
     
         //
-        // add and get a sound
+        // get a sound
         //
         
-    add(name,maxDistance,loopStart,loopEnd)
-    {
-        let sound;
-            
-            // already in list?
-            
-        if (this.sounds.has(name)) return;
-        
-            // add new one to list, will be loaded
-            // by another call that force loads unloaded
-            // sounds
-                    
-        sound=new SoundClass(this.core,this.ctx,name,maxDistance,loopStart,loopEnd);
-        sound.initialize();
-        this.sounds.set(name,sound);
-    }
-
     get(name)
     {
         return(this.sounds.get(name));
@@ -121,19 +104,22 @@ export default class SoundListClass
         
     async loadAllSounds()
     {
-        let keyIter,rtn,sound;
-        let success,promises=[];
+        let importSettings=this.core.projectMap.getImportSettings();
+        let loadSoundList=importSettings.sounds;
+        let soundDef,sound;
+        let success,promises;
         
-            // gather all the promises
-        
-        keyIter=this.sounds.keys();
-        
-        while (true) {
-            rtn=keyIter.next();
-            if (rtn.done) break;
+            // get all the models and wrap the
+            // loading into a list of promises
             
-            sound=this.sounds.get(rtn.value);
-            if (!sound.loaded) promises.push(sound.load());
+        promises=[];
+        
+        for (soundDef of loadSoundList) {
+            sound=new SoundClass(this.core,this.ctx,soundDef.name,soundDef.distance,soundDef.loopStart,soundDef.loopEnd);
+            sound.initialize();
+            promises.push(sound.load());
+            
+            this.sounds.set(soundDef.name,sound);
         }
 
             // and await them all

@@ -100,7 +100,7 @@ export default class ProjectEntityClass
     
     release()
     {
-        if (this.model!==null) this.model.release();
+        this.modelEntityAlter.release();
     }
     
         //
@@ -177,33 +177,19 @@ export default class ProjectEntityClass
         // models
         //
      
-    cacheModel(name,importSettings)
-    {
-            // need to add name to import settings
-            
-        if (importSettings===null) importSettings={};
-        importSettings.name=name;
-        
-            // load the model
-            // ignores if it already exist
-            
-        this.core.modelList.cache(name,importSettings);
-    }
-    
     setModel(name)
     {
-        if (this.model!==null) {
-            console.log('already set model once');
-            return;
-        }
+        if (this.model!==null) throw('already set model once');
         
+            // cached shared model
+            
         this.model=this.core.modelList.get(name);
-        if (this.model===null) {
-            console.log('model does not exist in model cache, load it with cacheModel: '+name);
-            return;
-        }
+        if (this.model===undefined) throw('model '+name+' does not exist, needs to be defined in map setup');
         
+            // this entities person model animation/altering data
+            
         this.modelEntityAlter=new ModelEntityAlterClass(this.core,this);
+        this.modelEntityAlter.initialize();
     }
     
     showModelMesh(name,show)
@@ -960,11 +946,6 @@ export default class ProjectEntityClass
         //
         // sounds
         //
-        
-    addSound(name,distance,loopStart,loopEnd)
-    {
-        this.core.soundList.add(name,distance,loopStart,loopEnd);
-    }
         
     playSound(name,rate,loop)
     {

@@ -114,11 +114,6 @@ export default class ProjectEffectClass
         // sounds
         //
         
-    addSound(name,distance,loopStart,loopEnd)
-    {
-        this.core.soundList.add(name,distance,loopStart,loopEnd);
-    }
-        
     playSound(name,rate,loop)
     {
         return(this.core.soundList.play(this,null,name,rate,loop));

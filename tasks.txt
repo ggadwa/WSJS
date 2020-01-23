@@ -1,12 +1,13 @@
 - create random nodes for rooms, use grenades to test
 
 - entities are now dynamic, have a delete marker and clear at end of loop
-   - have loadModel/loadSound/bitmaps, then pass the name to set/play
-   - get rid of initLoadEntityModels() initLoadImages() initLoadSounds()
-   - entity releases need to clean up sounds and models w/reference count
-   - bots by callbacks, not in map data
+   - bitmaps like new models/sounds
+   - dynamic effects
+   - does entity.active mean anything anymore?
 
-- figure out not-modified problem
+- need fall down noise for bots/players/monsters
+
+- make sure kart is updated on mac
 
 - lights
    - regular
@@ -27,6 +28,7 @@
    - remotes and updates
    - predictions
 
+- doc-ing
 - need to make statics for all generate_bitmap_base statics
 - door frames
 - better specs (generated with color?)

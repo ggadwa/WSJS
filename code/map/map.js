@@ -34,7 +34,7 @@ export default class MapClass
         this.meshList=new MeshListClass(core);
         this.liquidList=new MapLiquidListClass(core);
         this.lightList=new MapLightListClass(core);
-        this.entityList=new MapEntityListClass();
+        this.entityList=new MapEntityListClass(core);
         this.movementList=new MapMovementListClass();
         this.effectList=new MapEffectListClass(core);
         this.cubeList=new MapCubeListClass(core);
