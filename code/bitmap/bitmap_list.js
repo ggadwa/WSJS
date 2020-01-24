@@ -116,7 +116,7 @@ export default class BitmapListClass
         return(bitmap);
     }
     
-    getBitmap(colorURL)
+    get(colorURL)
     {
         return(this.bitmaps.get(colorURL));
     }

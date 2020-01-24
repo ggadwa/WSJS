@@ -97,16 +97,15 @@ export default class MapEntityListClass
         
     cleanUpMarkedAsDeleted()
     {
-        /* todo
-        let idx,entity;
+        let n,entity;
          
-        idx=this.entities.length-1;
-        
         for (n=(this.entities.length-1);n>=0;n--) {
-            entity=this.entities[idx];
-            if (entity.markDelete) this.entities.splice(idx,1);
+            entity=this.entities[n];
+            if (entity.markDelete) {
+                entity.release();
+                this.entities.splice(n,1);
+            }
         }
-         */
     }
         
         //
@@ -185,7 +184,7 @@ export default class MapEntityListClass
         let entity;
          
         for (entity of this.entities) {
-            if ((entity.active) && (entity.name===name)) return(entity);
+            if (entity.name===name) return(entity);
         }
         
         return(null);
@@ -207,7 +206,7 @@ export default class MapEntityListClass
         let entity;
          
         for (entity of this.entities) {
-            if ((entity.active) && (entity.heldBy===parentEntity)) {
+            if (entity.heldBy===parentEntity) {
                 if (entity.name===name) return(entity);
             }
         }
@@ -224,7 +223,7 @@ export default class MapEntityListClass
         let entity;
         
         for (entity of this.entities) {
-            if (entity.active) entity.meshPush(meshIdx,movePnt,rotateAng);
+            entity.meshPush(meshIdx,movePnt,rotateAng);
         }
     }
     
@@ -239,7 +238,7 @@ export default class MapEntityListClass
             // run the entities
             
         for (entity of this.entities) {
-            if (entity.active) entity.ready(this);
+            entity.ready(this);
         }
     }
     
@@ -254,7 +253,7 @@ export default class MapEntityListClass
             // run the entities
             
         for (entity of this.entities) {
-            if (entity.active) entity.run();
+            entity.run();
         }
     }
     
@@ -266,9 +265,7 @@ export default class MapEntityListClass
     {
         let entity;
 
-        for (entity of this.entities) {
-            if (!entity.active) continue;
-            
+        for (entity of this.entities) {            
             if (heldBy!==null) {
                 if (entity.heldBy!==heldBy) continue;
             }

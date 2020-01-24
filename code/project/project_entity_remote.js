@@ -18,8 +18,7 @@ export default class ProjectEntityRemoteClass extends ProjectEntityClass
         this.remoteId=remoteId;
         this.filter='remote';
         
-        this.active=false;
-        this.show=true;
+        this.show=false;
     }
 
 

@@ -44,6 +44,19 @@ export default class MapEffectListClass
         effect.initialize();
     }
     
+    cleanUpMarkedAsDeleted()
+    {
+        let n,effect;
+         
+        for (n=(this.effects.length-1);n>=0;n--) {
+            effect=this.effects[n];
+            if (effect.markDelete) {
+                effect.release();
+                this.effects.splice(n,1);
+            }
+        }
+    }
+    
         //
         // lights from effects
         // we need to run all the drawsetups before this

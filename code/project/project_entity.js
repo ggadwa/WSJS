@@ -27,10 +27,11 @@ export default class ProjectEntityClass
         this.angle=angle.copy();
         this.data=data;
         
-        this.active=true;
         this.show=true;
         this.heldBy=null;
+        this.spawnedBy=null;
         this.filter=null;
+        this.markDelete=false;
         
         this.model=null;
         this.modelEntityAlter=null;
@@ -288,9 +289,27 @@ export default class ProjectEntityClass
         let entity;
         
         entity=new entityClass(this.core,name,position,angle,data);
-        entity.show=show;
-        this.core.map.entityList.add(entity);
+        
+        entity.spawnedBy=this;
         if (hold) entity.heldBy=this;
+        entity.show=show;
+        
+        this.core.map.entityList.add(entity);
+        
+        return(entity);
+    }
+    
+    addEntityFromEntity(spawnedBy,entityClass,name,position,angle,data,show,hold)
+    {
+        let entity;
+        
+        entity=new entityClass(this.core,name,position,angle,data);
+        
+        entity.spawnedBy=spawnedBy;
+        if (hold) entity.heldBy=spawnedBy;
+        entity.show=show;
+        
+        this.core.map.entityList.add(entity);
         
         return(entity);
     }
@@ -315,7 +334,7 @@ export default class ProjectEntityClass
         let entity,dist,damage;
 
         for (entity of this.core.map.entityList.entities) {
-            if ((!entity.active) || (!entity.show)) continue;
+            if (!entity.show) continue;
             
             dist=centerPosition.distance(entity.position);
             if (dist>maxDistance) continue;
@@ -334,12 +353,11 @@ export default class ProjectEntityClass
         return(this.core.map.effectList);
     }
     
-    addEffect(effectClass,data,show)
+    addEffect(effectClass,position,data,show)
     {
         let effect;
-                
-        effect=new effectClass(this.core,data);
-        effect.show=show;
+        
+        effect=new effectClass(this.core,position,data,show)
         this.core.map.effectList.add(effect);
         
         return(effect);
@@ -349,11 +367,11 @@ export default class ProjectEntityClass
         // interface utilities
         //
         
-    addInterfaceElement(id,bitmapName,uvOffset,uvSize,rect,color,alpha)
+    addInterfaceElement(id,colorURL,uvOffset,uvSize,rect,color,alpha)
     {
-        let bitmap=this.core.bitmapList.getSimpleName(bitmapName);
+        let bitmap=this.core.bitmapList.get(colorURL);
         if (bitmap===null) {
-            console.log('Missing bitmap to add to interface: '+bitmapName);
+            console.log('Missing bitmap to add to interface: '+colorURL);
             return;
         }
                     
@@ -1036,9 +1054,8 @@ export default class ProjectEntityClass
         
         this.hadRemoteUpdate=true;
         
-            // updates make remotes active and shown
-            
-        this.active=true;
+            // updates show remote
+
         this.show=true;
     }
 

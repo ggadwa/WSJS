@@ -9,11 +9,11 @@ export default class ProjectGameDeveloprClass extends ProjectGameClass
         super(core,data);
     }
     
-    initialize()
+    createInterface()
     {
         let x=this.getInterfaceWidth()-5;
         
-        super.initialize();
+        super.createInterface();
         
         this.addInterfaceText('fps','',x,23,20,InterfaceTextClass.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);
         this.addInterfaceText('meshCount','',x,46,20,InterfaceTextClass.TEXT_ALIGN_RIGHT,new ColorClass(1,1,0),1);

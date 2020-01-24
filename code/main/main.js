@@ -294,16 +294,18 @@ function mainLoop(timestamp)
             // playing sound positions
 
         core.soundList.updateListener();
+    
+            // if multiplayer, handle all
+            // the network updates and messages
+        
+        if (isNetworkGame) core.network.run();
     }
     
-        // if multiplayer, update the server
-        // with player information
-        
-    if (isNetworkGame) core.network.run();
-    
         // clean up deleted entities
+        // and effects
         
     map.entityList.cleanUpMarkedAsDeleted();
+    map.effectList.cleanUpMarkedAsDeleted();
     
         // drawing
         

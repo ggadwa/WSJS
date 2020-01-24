@@ -24,13 +24,15 @@ export default class ProjectEffectClass
     static DRAW_MODE_TRANSPARENT=1;
     static DRAW_MODE_ADDITIVE=2;
     
-    constructor(core,data)
+    constructor(core,position,data,show)
     {
         this.core=core;
+        
+        this.position=position.copy();
         this.data=data;
         
-        this.position=new PointClass(0,0,0);
-        this.show=true;
+        this.show=show;
+        this.markDelete=false;
         
         this.setupOK=true;      // a flag to tell when drawSetup() returns FALSE as drawSetup and draw are done separately
         
@@ -52,6 +54,7 @@ export default class ProjectEffectClass
         this.motionPoint=new PointClass(0,0,0);
         
         this.light=new LightClass(this.position,new ColorClass(1.0,1.0,1.0),0,1.0);
+        this.light.position.setFromPoint(position);
     }
     
     initialize()
@@ -313,7 +316,7 @@ export default class ProjectEffectClass
     
     drawAddBillboardQuad(colorURL,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
     {
-        let bitmap=this.core.bitmapList.getBitmap(colorURL);
+        let bitmap=this.core.bitmapList.get(colorURL);
         if (bitmap!==undefined) this.drawAddBillboardQuadInternal(bitmap,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha);
     }
     
@@ -323,7 +326,7 @@ export default class ProjectEffectClass
         
             // lookup bitmap
             
-        bitmap=this.core.bitmapList.getBitmap(colorURL);
+        bitmap=this.core.bitmapList.get(colorURL);
         if (bitmap===undefined) return;
         
             // draw the particles
@@ -344,7 +347,7 @@ export default class ProjectEffectClass
         
             // lookup bitmap
             
-        bitmap=this.core.bitmapList.getBitmap(colorURL);
+        bitmap=this.core.bitmapList.get(colorURL);
         if (bitmap===undefined) return;
         
             // add in this chunk for drawing
@@ -456,18 +459,6 @@ export default class ProjectEffectClass
         gl.depthMask(true);
         
         shader.drawEnd();
-    }
-    
-        //
-        // override this to react when something is restarting
-        // this effect, i.e., starting it over in another location
-        //
-        
-    restart(position,show)
-    {
-        this.position.setFromPoint(position);
-        this.light.position.setFromPoint(position);
-        this.show=show;
     }
     
         //

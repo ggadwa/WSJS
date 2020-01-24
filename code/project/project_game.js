@@ -73,25 +73,16 @@ export default class ProjectGameClass
     }
     
         //
-        // bitmap utilities
-        //
-        
-    getBitmap(colorURL)
-    {
-        return(this.core.bitmapList.getBitmap(colorURL));
-    }
-    
-        //
         // call this to add an interface element to the interface,
         // use must have previously used addInterfaceBitmap to add
         // the bitmap
         //
         
-    addInterfaceElement(id,bitmapName,uvOffset,uvSize,rect,color,alpha)
+    addInterfaceElement(id,colorURL,uvOffset,uvSize,rect,color,alpha)
     {
-        let bitmap=this.core.bitmapList.getSimpleName(bitmapName);
+        let bitmap=this.core.bitmapList.get(colorURL);
         if (bitmap===null) {
-            console.log('Missing bitmap to add to interface: '+bitmapName);
+            console.log('Missing bitmap to add to interface: '+colorURL);
             return;
         }
                     

@@ -1,17 +1,9 @@
 - create random nodes for rooms, use grenades to test
 
-- entities are now dynamic, have a delete marker and clear at end of loop
-   - dynamic effects
-   - does entity.active mean anything anymore?
-
 - need fall down noise for bots/players/monsters (pause for monsters/bots to sync animation)
 - player hurt noise
 
 - make sure kart is updated on mac
-    *** get rid of addBitmap
-    *** effects by URL
-    *** put in bitmaps into map
-    *** move game initialize to createInterface
 
 - lights
    - regular

@@ -302,7 +302,7 @@ export default class CollisionClass
             for (n=0;n!==nEntity;n++) {
                 checkEntity=this.core.map.entityList.get(n);
                 if (checkEntity===entity) continue;
-                if ((!checkEntity.show) || (!checkEntity.active) || (checkEntity.heldBy!==null)) continue;
+                if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
                 
                     // skip if not in the Y of the line
 
@@ -396,7 +396,7 @@ export default class CollisionClass
         for (n=0;n!==nEntity;n++) {
             checkEntity=this.core.map.entityList.get(n);
             if (checkEntity===entity) continue;
-            if ((!checkEntity.show) || (!checkEntity.active) || (checkEntity.heldBy!==null)) continue;
+            if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
 
                 // skip if not in the Y of the line
 
@@ -514,7 +514,7 @@ export default class CollisionClass
             for (n=0;n!==nEntity;n++) {
                 checkEntity=this.core.map.entityList.get(n);
                 if (checkEntity===entity) continue;
-                if ((!checkEntity.show) || (!checkEntity.active) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
+                if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
                     // we can only hit the top of something if
                     // our bottom is within the check entity and our top
@@ -626,7 +626,7 @@ export default class CollisionClass
             for (n=0;n!==nEntity;n++) {
                 checkEntity=this.core.map.entityList.get(n);
                 if (checkEntity===entity) continue;
-                if ((!checkEntity.show) || (!checkEntity.active) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
+                if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
 
                     // we can only hit the bottom of something if
                     // our top is within the check entity and our bottom
@@ -749,7 +749,7 @@ export default class CollisionClass
             checkEntity=this.core.map.entityList.get(n);
             if (checkEntity===entity) continue;
             if (checkEntity===entity.heldBy) continue;         // skip source entity and anything holding source entity
-            if ((!checkEntity.show) || (!checkEntity.active) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
+            if ((!checkEntity.show) || (checkEntity.passThrough) || (checkEntity.heldBy!==null)) continue;
             
                 // filtering
             
@@ -965,7 +965,7 @@ export default class CollisionClass
         for (n=0;n!==nEntity;n++) {
             checkEntity=this.core.map.entityList.get(n);
             if (checkEntity===entity) continue;
-            if ((!checkEntity.show) || (!checkEntity.active) || (checkEntity.heldBy!==null)) continue;
+            if ((!checkEntity.show) || (checkEntity.heldBy!==null)) continue;
 
                 // skip if not in the Y of the line
 
