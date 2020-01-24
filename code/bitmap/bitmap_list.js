@@ -116,6 +116,11 @@ export default class BitmapListClass
         return(bitmap);
     }
     
+    getBitmap(colorURL)
+    {
+        return(this.bitmaps.get(colorURL));
+    }
+    
         //
         // we can search out bitmaps by a "simple" name which removes
         // any extra URL gunk -- this is basically used for interface elements
@@ -139,11 +144,29 @@ export default class BitmapListClass
         
     async loadAllBitmaps()
     {
+        let importSettings=this.core.projectMap.getImportSettings();
+        let loadBitmapList=importSettings.bitmaps;
+        let bitmapDef;
         let keyIter,rtn,bitmap;
-        let success,promises=[];
+        let success,promises;
+        
+            // we will already have bitmaps that
+            // were added by importing glTF models,
+            // so we only add the rest here
+        
+        for (bitmapDef of loadBitmapList) {
+            if (!this.bitmaps.has(bitmapDef.url)) {
+                bitmap=new BitmapClass(this.core);
+                bitmap.initializeSimpleURL(bitmapDef.url);
+
+                this.bitmaps.set(bitmapDef.url,bitmap);
+            }
+        }
         
             // gather all the promises
             
+        promises=[];
+        
         keyIter=this.bitmaps.keys();
         
         while (true) {

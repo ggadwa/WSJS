@@ -73,12 +73,12 @@ export default class ProjectGameClass
     }
     
         //
-        // call this to add a bitmap
+        // bitmap utilities
         //
         
-    addBitmap(url)
+    getBitmap(colorURL)
     {
-        this.core.bitmapList.addSimple(url);
+        return(this.core.bitmapList.getBitmap(colorURL));
     }
     
         //
@@ -158,6 +158,14 @@ export default class ProjectGameClass
         //
         
     getStartProjectMap()
+    {
+    }
+    
+    /**
+     * Override this to create the interface (bitmaps, text, etc.)  Do not do this in initialize
+     * as the bitmaps won't have been loaded yet.
+     */
+    createInterface()
     {
     }
     

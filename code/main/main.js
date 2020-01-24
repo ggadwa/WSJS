@@ -151,7 +151,18 @@ class MainClass
         if (!(await this.core.soundList.loadAllSounds())) return;
         
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Create Entities');
+        this.core.loadingScreenAddString('Load Images');
+        this.core.loadingScreenDraw();
+
+        setTimeout(this.initLoadImages.bind(this),1);
+    }
+    
+    async initLoadImages()
+    {
+        if (!(await this.core.bitmapList.loadAllBitmaps())) return;
+        
+        this.core.loadingScreenUpdate();
+        this.core.loadingScreenAddString('Creating Entities');
         this.core.loadingScreenDraw();
 
         setTimeout(this.initLoadEntities.bind(this),1);
@@ -168,17 +179,6 @@ class MainClass
         }
         
         this.core.loadingScreenUpdate();
-        this.core.loadingScreenAddString('Loading Images');
-        this.core.loadingScreenDraw();
-
-        setTimeout(this.initLoadImages.bind(this),1);
-    }
-    
-    async initLoadImages()
-    {
-        if (!(await this.core.bitmapList.loadAllBitmaps())) return;
-        
-        this.core.loadingScreenUpdate();
         this.core.loadingScreenAddString('Final Setup');
         this.core.loadingScreenDraw();
 
@@ -187,8 +187,11 @@ class MainClass
     
     initFinalSetup()
     {
-            // finish by setting up all the mesh
-            // buffers and indexes
+            // setup the interface
+
+        this.core.projectGame.createInterface();
+        
+            // setup draw buffers
 
         this.core.map.setupBuffers();
         

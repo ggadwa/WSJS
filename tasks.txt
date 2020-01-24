@@ -1,13 +1,17 @@
 - create random nodes for rooms, use grenades to test
 
 - entities are now dynamic, have a delete marker and clear at end of loop
-   - bitmaps like new models/sounds
    - dynamic effects
    - does entity.active mean anything anymore?
 
-- need fall down noise for bots/players/monsters
+- need fall down noise for bots/players/monsters (pause for monsters/bots to sync animation)
+- player hurt noise
 
 - make sure kart is updated on mac
+    *** get rid of addBitmap
+    *** effects by URL
+    *** put in bitmaps into map
+    *** move game initialize to createInterface
 
 - lights
    - regular
@@ -34,7 +38,6 @@
 - better specs (generated with color?)
 
 - implement bot skill
-- player hurt noise
 - swimming is broken
 - sort effects, will need a sort z call into the effect
 - liquids need to draw away from z
@@ -44,3 +47,7 @@
 
 - wait for public/private class fields to land in safari
 - work on touch controls (left side, move and turn) (right side, look and shoot, swipe left/right weapon change, swipe up for grenade)
+
+### FIREFOX ###
+
+- wait for static to be implemented

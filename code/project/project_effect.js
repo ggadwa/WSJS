@@ -78,15 +78,6 @@ export default class ProjectEffectClass
     }
     
         //
-        // bitmap utilities
-        //
-    
-    addBitmap(colorURL)
-    {
-        return(this.core.bitmapList.addSimple(colorURL));
-    }
-    
-        //
         // light utilities
         //
         
@@ -241,7 +232,7 @@ export default class ProjectEffectClass
         this.chunks.length=0;
     }
    
-    drawAddBillboardQuad(bitmap,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
+    drawAddBillboardQuadInternal(bitmap,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
     {
         let elementIdx=Math.trunc(this.vertexIdx/3);
         
@@ -320,22 +311,41 @@ export default class ProjectEffectClass
         this.indexes[this.indexIdx++]=elementIdx+3;
     }
     
-    drawAddBillboardQuadFromMotion(bitmap,motions,factor,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
+    drawAddBillboardQuad(colorURL,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
     {
-        let motion;
+        let bitmap=this.core.bitmapList.getBitmap(colorURL);
+        if (bitmap!==undefined) this.drawAddBillboardQuadInternal(bitmap,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha);
+    }
+    
+    drawAddBillboardQuadFromMotion(colorURL,motions,factor,centerPnt,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha)
+    {
+        let bitmap,motion;
         
+            // lookup bitmap
+            
+        bitmap=this.core.bitmapList.getBitmap(colorURL);
+        if (bitmap===undefined) return;
+        
+            // draw the particles
+            
         for (motion of motions) {
             this.motionPoint.setFromPoint(centerPnt);
             this.motionPoint.x+=(motion.x*factor);
             this.motionPoint.y+=(motion.y*factor);
             this.motionPoint.z+=(motion.z*factor);
-            this.drawAddBillboardQuad(bitmap,this.motionPoint,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha);
+            this.drawAddBillboardQuadInternal(bitmap,this.motionPoint,u,v,uSize,vSize,halfWid,halfHigh,rot,drawMode,color,alpha);
         }
     }
     
-    drawAddTriangle(bitmap,pnt0,u0,v0,pnt1,u1,v1,pnt2,u2,v2,drawMode,color,alpha)
+    drawAddTriangle(colorURL,pnt0,u0,v0,pnt1,u1,v1,pnt2,u2,v2,drawMode,color,alpha)
     {
+        let bitmap;
         let elementIdx=Math.trunc(this.vertexIdx/3);
+        
+            // lookup bitmap
+            
+        bitmap=this.core.bitmapList.getBitmap(colorURL);
+        if (bitmap===undefined) return;
         
             // add in this chunk for drawing
             

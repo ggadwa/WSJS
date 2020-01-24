@@ -48,6 +48,11 @@ export default class ModelListClass
         let modelDef,model;
         let success,promises;
         
+        if (loadModelList===undefined) {
+            console.log('the map json lacks a model list');
+            return(false);
+        }
+        
             // get all the models and wrap the
             // loading into a list of promises
             
