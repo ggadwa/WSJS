@@ -53,7 +53,7 @@ export default class ProjectEffectClass
         this.tempPoint=new PointClass(0,0,0);
         this.motionPoint=new PointClass(0,0,0);
         
-        this.light=new LightClass(new PointClass(0,0,0),new ColorClass(1.0,1.0,1.0),0,1.0);
+        this.light=new LightClass(new PointClass(0,0,0),new ColorClass(1.0,1.0,1.0),0,1.0,false);
         this.light.position.setFromPoint(position);
     }
     
@@ -461,22 +461,22 @@ export default class ProjectEffectClass
         shader.drawEnd();
     }
     
-        //
-        // override this for any draw setup, and return TRUE
-        // if the effect is within the view, you should always
-        // override this to improve performance
-        // 
-        
+    /*
+     * Override this for any draw setup, and return TRUE
+     * if the effect is within the view.  You should always
+     * override this to improve performance.
+     * 
+     * @returns {boolean} TRUE if this effect is within the view
+     */    
     drawSetup()
     {
         return(true);
     }
-    
-        //
-        // override this to draw the effect into
-        // the frame
-        //
-        
+      
+    /**
+     * The main drawing routine, override this to draw effects into the
+     * frame.
+     */
     draw()
     {
     }

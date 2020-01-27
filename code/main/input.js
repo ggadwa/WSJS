@@ -1,3 +1,49 @@
+import InputTouchClickClass from '../main/input_touch_click.js';
+import InputTouchSwipeClass from '../main/input_touch_swipe.js';
+
+//
+// touch utility classes
+//
+
+class TouchTrackClass
+{
+    static QUADRANT_TOPLEFT=0;
+    static QUADRANT_TOPRIGHT=1;
+    static QUADRANT_BOTTOMLEFT=2;
+    static QUADRANT_BOTTOMRIGHT=3;
+
+    static CLICK_TICK=300;
+    
+    id=null;
+    timestamp=0;
+    
+    x=0;
+    y=0;
+    lastX=0;
+    lastY=0;
+    
+    quadrant=TouchTrackClass.QUADRANT_TOPLEFT;
+    
+    constructor(core,id,timestamp,x,y)
+    {
+        this.id=id;
+        this.timestamp=timestamp;
+        
+        this.x=x;
+        this.y=y;
+                
+        if (y<Math.trunc(core.canvas.height*0.5)) {
+            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?TouchTrackClass.QUADRANT_TOPLEFT:TouchTrackClass.QUADRANT_TOPRIGHT;
+        }
+        else {
+            this.quadrant=(x<Math.trunc(core.canvas.width*0.5))?TouchTrackClass.QUADRANT_BOTTOMLEFT:TouchTrackClass.QUADRANT_BOTTOMRIGHT;
+        }
+        
+        this.lastX=x;
+        this.lastY=y;
+    }
+}
+
 //
 // input class
 //
@@ -38,6 +84,19 @@ export default class InputClass
         this.mouseWheelListener=this.mouseWheel.bind(this);
         this.mouseMovedListener=this.mouseMove.bind(this);
         
+        this.touchStartListener=this.touchStart.bind(this);
+        this.touchEndListener=this.touchEnd.bind(this);
+        this.touchCancelListener=this.touchCancel.bind(this);
+        this.touchMoveListener=this.touchMove.bind(this);
+        
+            // touches
+            
+        this.hasTouch=(navigator.maxTouchPoints>1);
+            
+        this.touchTrackList=[];
+        this.touchClickList=[];
+        this.touchSwipeList=[];
+        
         Object.seal(this);
     }
     
@@ -49,13 +108,14 @@ export default class InputClass
     {
         this.keyClear();
         this.mouseButtonClear();
+        this.touchClear();
     }
 
     release()
     {
         if (this.eventsAttached) {
             this.keyEnd();
-            this.mouseEnd();
+            this.pointerLockEnd();
         }
     }
     
@@ -70,7 +130,7 @@ export default class InputClass
             // attach events
 
         this.keyStart();
-        this.mouseStart();
+        this.pointerLockStart();    // activates mouse and touch
         this.eventsAttached=true;
     }
         
@@ -78,13 +138,13 @@ export default class InputClass
     {
         if (this.eventsAttached) {
             this.keyEnd();
-            this.mouseEnd();
+            this.pointerLockEnd();
             this.eventsAttached=false;
         }
     }
     
         //
-        // start/stop key events
+        // key events
         //
 
     keyStart()
@@ -101,11 +161,6 @@ export default class InputClass
         document.removeEventListener('keyup',this.keyUpListener,true);
     }
    
-    keyDownEvent(event)
-    {
-        this.keyFlags[event.keyCode]=1;
-    }
-    
     keyClear()
     {
         let n;
@@ -114,21 +169,26 @@ export default class InputClass
             this.keyFlags[n]=0;
         }
     }
+
+    keyDownEvent(event)
+    {
+        this.keyFlags[event.keyCode]=1;
+    }
     
-        //
-        // key event callbacks
-        //
         
     keyUpEvent(event)
     {
         this.keyFlags[event.keyCode]=0;
     }
     
-        // start/stop mouse events
-    
-    mouseStart()
+        //
+        // pointer lock
+        //
+        
+    pointerLockStart()
     {
         this.mouseButtonClear();
+        this.touchClear();
         
             // request the pointer lock
             
@@ -137,7 +197,7 @@ export default class InputClass
         this.core.canvas.requestPointerLock();
     }
     
-    mouseEnd()
+    pointerLockEnd()
     {
             // stop pointer lock
             
@@ -145,6 +205,49 @@ export default class InputClass
         document.removeEventListener('pointerlockchange',this.pointerLockChangeListener,false);
         document.removeEventListener('pointerlockerror',this.pointerLockErrorListener,false);
     }
+    
+    pointerLockChange(event)
+    {
+        if (document.pointerLockElement===this.core.canvas) {
+            if (!this.hasTouch) {
+                document.addEventListener('mousedown',this.mouseDownListener,false);
+                document.addEventListener('mouseup',this.mouseUpListener,false);
+                document.addEventListener('wheel',this.mouseWheelListener,false);
+                document.addEventListener('mousemove',this.mouseMovedListener,false);
+            }
+            else {
+                document.addEventListener('touchstart',this.touchStartListener,false);
+                document.addEventListener('touchend',this.touchEndListener,false);
+                document.addEventListener('touchcancel',this.touchCancelListener,false);
+                document.addEventListener('touchmove',this.touchMoveListener,false);
+            }
+        }
+        else {
+            if (!this.hasTouch) {
+                document.removeEventListener('mousedown',this.mouseDownListener,false);
+                document.removeEventListener('mouseup',this.mouseUpListener,false);
+                document.removeEventListener('wheel',this.mouseWheelListener,false);
+                document.removeEventListener('mousemove',this.mouseMovedListener,false);
+            }
+            else {
+                document.removeEventListener('touchstart',this.touchStartListener,false);
+                document.removeEventListener('touchend',this.touchEndListener,false);
+                document.removeEventListener('touchcancel',this.touchCancelListener,false);
+                document.removeEventListener('touchmove',this.touchMoveListener,false);
+            }
+            
+            this.core.setPauseState(true,false);            // a pointer lock release auto pauses the game
+        }
+    }
+    
+    pointerLockError(err)
+    {
+        console.log('PointerLock: '+err);
+    }
+    
+        //
+        // mouse events
+        //
     
     mouseButtonClear()
     {
@@ -174,32 +277,7 @@ export default class InputClass
         
         return(click);
     }
-    
-        // mouse event callbacks
-    
-    pointerLockChange(event)
-    {
-        if (document.pointerLockElement===this.core.canvas) {
-            document.addEventListener('mousedown',this.mouseDownListener,false);
-            document.addEventListener('mouseup',this.mouseUpListener,false);
-            document.addEventListener('wheel',this.mouseWheelListener,false);
-            document.addEventListener('mousemove',this.mouseMovedListener,false);
-        }
-        else {
-            document.removeEventListener('mousedown',this.mouseDownListener,false);
-            document.removeEventListener('mouseup',this.mouseUpListener,false);
-            document.removeEventListener('wheel',this.mouseWheelListener,false);
-            document.removeEventListener('mousemove',this.mouseMovedListener,false);
-            
-            this.core.setPauseState(true,false);            // a pointer lock release auto pauses the game
-        }
-    }
-    
-    pointerLockError(err)
-    {
-        console.log('PointerLock: '+err);
-    }
-    
+        
     mouseDown(event)
     {
         this.mouseButtonFlags[event.button]=1;
@@ -231,6 +309,120 @@ export default class InputClass
     {
         this.mouseChangeX+=event.movementX;
         this.mouseChangeY+=event.movementY;
+    }
+    
+        //
+        // touch events
+        //
+    
+    getNextTouchClick(quardent)
+    {
+        let n,touchClick;
+        
+        if (this.touchClickList.length===0) return(null);
+        if (quardent===InputTouchClickClass.QUADRANT_ANY) return(this.touchClickList.pop());
+        
+        for (n=0;n!==this.touchClickList.length;n++) {
+            touchClick=this.touchClickList[n];
+            if (touchClick.quadrant===quardent) {
+                this.touchClickList.splice(n,1);
+                return(touchClick);
+            }
+        }
+        
+        return(null);
+    }
+    
+    getNextTouchSwipe(quardent,direction)
+    {
+        let n,touchSwipe;
+        
+        if (this.touchSwipeList.length===0) return(null);
+        if (quardent===InputTouchSwipeClass.QUADRANT_ANY) return(this.touchSwipeList.pop());
+        
+        for (n=0;n!==this.touchSwipeList.length;n++) {
+            touchSwipe=this.touchSwipeList[n];
+            if (touchSwipe.quadrant!==quardent) continue;
+            
+            if ((direction===InputTouchSwipeClass.DIRECTION_ANY) || (direction===touchSwipe.getDirection())) {
+                this.touchSwipeList.splice(n,1);
+                return(touchSwipe);
+            }
+        }
+        
+        return(null);
+    }
+    
+    touchClear()
+    {
+        this.touchTrackList=[];
+        this.touchClickList=[];
+        this.touchSwipeList=[];
+    }
+    
+    touchStart(event)
+    {
+        let touch;
+        
+        event.preventDefault();
+        
+        for (touch of event.changedTouches) {
+            this.touchTrackList.push(new TouchTrackClass(this.core,touch.identifier,this.core.timestamp,event.pageX,event.pageY));
+        }
+    }
+    
+    touchEnd(event)
+    {
+        let n,idx,touch,touchTrack;
+        
+        event.preventDefault();
+        
+        for (touch of event.changedTouches) {
+            
+                // find the tracking object
+                
+            idx=-1;
+            
+            for (n=0;n!=this.touchTrackList.length;n++) {
+                if (this.touchTrackList[n].id===touch.identifier) {
+                    idx=n;
+                    break;
+                }
+            }
+            
+            if (idx===-1) continue;
+            
+                // figure if click and delete from tracking
+                
+            touchTrack=this.touchTrackList[idx];
+            if ((this.core.timestamp-touchTrack.timestamp)<=TouchTrackClass.CLICK_TICK) this.touchClickList.push(new TouchClickClass(touchTrack.id,touchTrack.x,touchTrack.y,touchTrack.quadrant));
+                
+            this.touchTrackList.splice(idx,1);
+        }
+    }
+    
+    touchCancel(event)
+    {
+        this.touchEnd(event);
+    }
+    
+    touchMove(event)
+    {
+        let touch,touchTrack;
+        
+        event.preventDefault();
+        
+        for (touch of event.changedTouches) {
+            
+            for (touchTrack of this.touchTrackList) {
+                if (touchTrack.id===touch.identifier) {
+                    this.touchSwipeList.push(new TouchSwipeClass(touchTrack.id,touchTrack.lastX,touchTrack.lastY,event.pageX,event.pageY,touchTrack.quadrant));
+                    touchTrack.lastX=event.pageX;
+                    touchTrack.lastY=event.pageY;
+                    break;
+                }
+            }
+        }
     }
 
 }

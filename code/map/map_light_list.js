@@ -97,10 +97,13 @@ export default class MapLightListClass
         }
         
             // find the CoreClass.MAX_LIGHT_COUNT closest lights
-            // and put them into the view list
+            // and put them into the view list, skipping ambients
+            // which we add to the list at the end so they
+            // always get into the list
 
         for (n=0;n!==nLight;n++) {
             light=this.lights[n];
+            if (light.ambient) continue;
             
                 // calculate if this lights bounds
                 // are within the frustrum and eliminate if they arent
@@ -130,5 +133,20 @@ export default class MapLightListClass
         }
     }
 
+    addLightsToViewLightsAmbients()
+    {
+        let n,light;
+        let nLight;
+
+        nLight=this.lights.length;
+        
+        for (n=0;n!==nLight;n++) {
+            light=this.lights[n];
+            if (!light.ambient) continue;
+            
+            this.core.lights.splice(0,0,light);
+            if (this.core.lights.length>CoreClass.MAX_LIGHT_COUNT) this.core.lights.pop();
+        }
+    }
     
 }

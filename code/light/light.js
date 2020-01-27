@@ -10,7 +10,7 @@ import ColorClass from '../utility/color.js';
 
 export default class LightClass
 {
-    constructor(position,color,intensity,exponent)
+    constructor(position,color,intensity,exponent,ambient)
     {
         this.position=position;                 // should be PointClass
         this.eyePosition=new PointClass(0,0,0);    // the eye position in the current render, set by the view
@@ -18,6 +18,7 @@ export default class LightClass
         this.intensity=intensity;
         this.invertIntensity=1.0/intensity;
         this.exponent=exponent;
+        this.ambient=ambient;                   // these lights always make it into the light list, so be careful with them, usually a single light source (like sun)
         
         this.dist=0.0;           // used to sort lights
         

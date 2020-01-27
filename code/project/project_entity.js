@@ -174,6 +174,16 @@ export default class ProjectEntityClass
         return(y);
     }
     
+    getNextTouchClick(quardent)
+    {
+        return(this.core.input.getNextTouchClick(quardent));
+    }
+    
+    getNextTouchSwipe(quardent,direction)
+    {
+        return(this.core.input.getNextTouchSwipe(quardent,direction));
+    }
+    
         //
         // models
         //
@@ -444,7 +454,7 @@ export default class ProjectEntityClass
      * Override this to setup a tinting color for the screen.
      * Return false if not tint.
      * 
-     * @argument {ColorClass} tintColor 
+     * @param {ColorClass} tintColor 
      */
     getScreenTint(tintColor)
     {
@@ -1059,53 +1069,54 @@ export default class ProjectEntityClass
         this.show=true;
     }
 
-    
-        //
-        // ready entity
-        // this is the first call before it starts running,
-        // after everything has been prepared and loaded
-        //
-    
+    /**
+     * Override to deal with final entity setup.  This is the first call
+     * before the main game starts running, after everything has been prepared
+     * and loaded.
+     */
     ready()
     {
     }
     
-        //
-        // run entity
-        // called during physics loops as entity is run
-        //
-        
+    /**
+     * The main entity run function, called during the physics loop.
+     * It is guarenteed to be called 60 times a second (about, actually
+     * every 16 milliseconds.)
+     */    
     run()
     {
     }
     
-        //
-        // override this when taking damage
-        //
-        
+    /**
+     * Override this to deal with the entity taking damage.
+     * 
+     * @param {EntityClass} The entity dealing the damage
+     * @param {number} Amount of damage
+     * @param {PointClass} The hit position (in world space)
+     */    
     damage(fromEntity,damage,hitPoint)
     {
     }
     
-        //
-        // override this if you want to make some alterations to bones after
-        // the animation has been calculated.  Use the setModelBoneXXX methods
-        // to alter bones
-        //
-        
+    /**
+     * Override this if you want to make some alterations to bones after
+     * the animation has been calculated.  Use the setModelBoneXXX methods
+     * to alter bones.
+     */    
     animatedBoneSetup()
     {
     }
     
-        //
-        // override this if you want to change how a model is setup
-        // or positioned in the scene.  the default is just to
-        // position the model the same as the entity's position and
-        // angle.  use setModelDrawPosition([PointClass],[PointClass],[PointClass],inCameraSpace) to change
-        // inside this method
-        // return TRUE to draw the model, FALSE to not draw
-        //
-        
+    /**
+     * Override this if you want to change how a model is setup
+     * or positioned in the scene.  The default is just to
+     * position the model the same as the entity's position and
+     * angle.  Use setModelDrawPosition([PointClass],[PointClass],[PointClass],inCameraSpace)
+     * inside this method to change how entity model draws.
+     * Return TRUE to draw the model, FALSE to not draw
+     * 
+     * @returns {boolean} TRUE to draw the model
+     */    
     drawSetup()
     {
         this.setModelDrawPosition(this.position,this.angle,this.scale,false);
@@ -1115,7 +1126,7 @@ export default class ProjectEntityClass
         //
         // draw entity
         //
-        
+    
     draw()
     {
         if (this.model===null) return;

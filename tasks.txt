@@ -1,19 +1,21 @@
-- create random nodes for rooms, use grenades to test
+- need ambient flag for lights, ambients always included in light list (add last)
+    - test on race track
 
-- need ambient flag for lights, ambients always included in light list
+- generator
+   - create random nodes for rooms, use shield pickup to test
 
-- lights
-   - regular
-   - color changing
-   - chasing (4 that go on and off)
+    - lights
+       - regular
+       - color changing
+       - chasing (4 that go on and off)
 
-- bitmaps
-   - pipe, needs random line & random screw line
+    - bitmaps
+       - pipe, needs random line & random screw line
 
-- decorations
-   - better uv for pillars
-   - panels for computers areas
-   - connectors for pipes
+    - decorations
+       - better uv for pillars
+       - panels for computers areas
+       - connectors for pipes
 
 - networking
    - enter
@@ -21,22 +23,14 @@
    - remotes and updates
    - predictions
 
-- doc-ing
-- need to make statics for all generate_bitmap_base statics
-- door frames
-- better specs (generated with color?)
+- js docs (especially in the project_ classes)
+- slowly transition to public/private fields (especially in the project_ classes)
+- SAFARI - wait for public/private class fields
+- FIREFOX - wait for static class fields
+- finish touch interface when iOS updated
 
+- better specs (generated with color?)
 - implement bot skill
 - swimming is broken
 - sort effects, will need a sort z call into the effect
 - liquids need to draw away from z
-- slowly transition to public/private fields
-
-### SAFARI ###
-
-- wait for public/private class fields to land in safari
-- work on touch controls (left side, move and turn) (right side, look and shoot, swipe left/right weapon change, swipe up for grenade)
-
-### FIREFOX ###
-
-- wait for static to be implemented

@@ -513,6 +513,7 @@ export default class CoreClass
 
         this.map.lightList.addLightsToViewLights();
         this.map.effectList.addLightsToViewLights();
+        this.map.lightList.addLightsToViewLightsAmbients();     // there is a special ambient flag, which always gets into the list
         
             // fill in any missing lights with NULL
 

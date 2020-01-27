@@ -22,7 +22,7 @@ export default class ImportMapClass
     {
         let n,k,scale,idx;
         let effect,effectDef,effectPosition,effectShow;
-        let light,lightDef;
+        let light,lightDef,lightAmbient;
         let liquid,liquidDef,liquidBitmap;
         let movement,meshIdxList,reverseMeshIdxList,movementDef;
         let moveDef,movePoint,moveRotate,rotateOffset,centerOffset;
@@ -77,10 +77,13 @@ export default class ImportMapClass
             for (n=0;n!==importSettings.lights.length;n++) {
                 lightDef=importSettings.lights[n];
                 
+                lightAmbient=false;
+                if (lightDef.ambient!==undefined) lightAmbient=lightDef.ambient;
+                
                     // positioned
                     
                 if (lightDef.position!==undefined) {
-                    light=new LightClass(new PointClass(lightDef.position.x,lightDef.position.y,lightDef.position.z),new ColorClass(lightDef.color.r,lightDef.color.g,lightDef.color.b),lightDef.intensity,lightDef.exponent);
+                    light=new LightClass(new PointClass(lightDef.position.x,lightDef.position.y,lightDef.position.z),new ColorClass(lightDef.color.r,lightDef.color.g,lightDef.color.b),lightDef.intensity,lightDef.exponent,lightAmbient);
                     this.core.map.lightList.add(light);
                     continue;
                 }
@@ -92,8 +95,8 @@ export default class ImportMapClass
                     console.log('Unknown mesh to attach light to: '+lightDef.mesh);
                     continue;
                 }
-
-                light=new LightClass(this.core.map.meshList.meshes[idx].center.copy(),new ColorClass(lightDef.color.r,lightDef.color.g,lightDef.color.b),lightDef.intensity,lightDef.exponent);
+                
+                light=new LightClass(this.core.map.meshList.meshes[idx].center.copy(),new ColorClass(lightDef.color.r,lightDef.color.g,lightDef.color.b),lightDef.intensity,lightDef.exponent,lightAmbient);
                 this.core.map.lightList.add(light);
             }
         }

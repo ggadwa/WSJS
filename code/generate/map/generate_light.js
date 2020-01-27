@@ -60,7 +60,7 @@ export default class GenerateLightClass
             color=new ColorClass(GenerateUtilityClass.randomFloat(0.7,0.3),GenerateUtilityClass.randomFloat(0.7,0.3),GenerateUtilityClass.randomFloat(0.7,0.3));
             exponent=GenerateUtilityClass.randomFloat(0.25,0.25);
             
-            mapLight=new LightClass(new PointClass(x,(y-(lightSize*2)),z),color,intensity,exponent);
+            mapLight=new LightClass(new PointClass(x,(y-(lightSize*2)),z),color,intensity,exponent,false);
             core.map.lightList.add(mapLight);
     //    }
     }
