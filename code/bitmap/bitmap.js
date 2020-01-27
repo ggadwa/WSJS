@@ -332,6 +332,13 @@ export default class BitmapClass
         
     loadImagePromise(url)
     {
+            // special check for embedded images, everything
+            // else needs to escape out of the current HTML folder
+            
+        if (!url.startsWith('data:image')) url='../'+url;
+        
+            // return a image load promise
+            
         return(
                 new Promise((resolve,reject) =>
                     {
@@ -363,7 +370,7 @@ export default class BitmapClass
                 this.colorImage=null;
 
                 if (this.colorBase===null) {
-                    await this.loadImagePromise('../'+this.colorURL)
+                    await this.loadImagePromise(this.colorURL)
                         .then
                             (
                                     // resolved
@@ -387,7 +394,11 @@ export default class BitmapClass
             // detect if there is any alpha
             
         this.hasColorImageAlpha=this.checkImageForAlpha(this.colorImage);
-
+        
+               
+            // force the alpha into the rgb so alphas
+            // don't muddy up during mipmapping
+            
         this.texture=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.texture);
         gl.texImage2D(gl.TEXTURE_2D,0,(this.hasColorImageAlpha?gl.RGBA:gl.RGB),(this.hasColorImageAlpha?gl.RGBA:gl.RGB),gl.UNSIGNED_BYTE,this.colorImage);
@@ -415,14 +426,18 @@ export default class BitmapClass
         else {
             maskImage=this.createSolidColorImage(0,0,0);      // alpha will be 1
         }
+        
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
             
         this.mask=gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D,this.mask);
         gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,maskImage);
         gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D,null);
+        
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
         
             // normal bitmap
         
@@ -430,7 +445,7 @@ export default class BitmapClass
             this.normalImage=null;
 
             if (this.normalURL!==null) {
-                await this.loadImagePromise('../'+this.normalURL)
+                await this.loadImagePromise(this.normalURL)
                     .then
                         (
                                 // resolved
@@ -441,8 +456,12 @@ export default class BitmapClass
 
                                 // rejected
 
-                            value=>{}
+                            value=>{
+                                console.log('Unable to load '+value);
+                            }
                         );
+                
+                if (this.normalImage===null) return(false);
             }
         }    
         
@@ -462,7 +481,7 @@ export default class BitmapClass
             this.specularImage=null;
 
             if (this.specularURL!==null) {
-                await this.loadImagePromise('../'+this.specularURL)
+                await this.loadImagePromise(this.specularURL)
                     .then
                         (
                                 // resolved
@@ -473,8 +492,12 @@ export default class BitmapClass
 
                                 // rejected
 
-                            value=>{}
+                            value=>{
+                                console.log('Unable to load '+value);
+                            }
                         );
+                
+                if (this.specularImage===null) return(false);
             }
         }
         
@@ -497,7 +520,7 @@ export default class BitmapClass
             this.glowImage=null;
 
             if (this.glowURL!==null) {
-                await this.loadImagePromise('../'+this.glowURL)
+                await this.loadImagePromise(this.glowURL)
                     .then
                         (
                                 // resolved
@@ -508,8 +531,12 @@ export default class BitmapClass
 
                                 // rejected
 
-                            ()=>{}
+                            value=>{
+                                console.log('Unable to load '+value);
+                            }
                         );
+                
+                if (this.glowImage===null) return(false);
             }
         }
         

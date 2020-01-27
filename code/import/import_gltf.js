@@ -564,7 +564,7 @@ export default class ImportGLTFClass
     
     findMaterialForMesh(meshNode,primitiveNode)
     {
-        let n,bitmap,diffuseTexture,diffuseFactor,glossTexture,specularFactorProp,glowDef;
+        let n,bitmap,uri,diffuseTexture,diffuseFactor,glossTexture,specularFactorProp,glowDef;
         let colorURL=null;
         let colorBase=null;
         let normalURL=null;
@@ -577,7 +577,8 @@ export default class ImportGLTFClass
             // first find any normal texture
             
         if (materialNode.normalTexture!==undefined) {
-            normalURL=prefixURL+this.jsonData.images[materialNode.normalTexture.index].uri;
+            uri=this.jsonData.images[materialNode.normalTexture.index].uri;
+            normalURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
         }
         
             // default specular
@@ -595,7 +596,8 @@ export default class ImportGLTFClass
 
                     diffuseTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.diffuseTexture;
                     if (diffuseTexture!==undefined) {
-                        colorURL=prefixURL+this.jsonData.images[diffuseTexture.index].uri;
+                        uri=this.jsonData.images[diffuseTexture.index].uri;
+                        colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
                         
                             // check for any scale
                             
@@ -618,7 +620,8 @@ export default class ImportGLTFClass
 
                     glossTexture=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.specularGlossinessTexture;
                     if (glossTexture!==undefined) {
-                        specularURL=prefixURL+this.jsonData.images[glossTexture.index].uri;
+                        uri=this.jsonData.images[glossTexture.index].uri;
+                        specularURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
 
                         specularFactorProp=materialNode.extensions.KHR_materials_pbrSpecularGlossiness.glossinessFactor;        // our specular factor comes from the gloss factor
                         if (specularFactorProp!==undefined) {
@@ -638,7 +641,8 @@ export default class ImportGLTFClass
                 
             if (materialNode.pbrMetallicRoughness!==undefined) {
                 if (materialNode.pbrMetallicRoughness.baseColorTexture!==undefined) {
-                    colorURL=prefixURL+this.jsonData.images[materialNode.pbrMetallicRoughness.baseColorTexture.index].uri;
+                    uri=this.jsonData.images[materialNode.pbrMetallicRoughness.baseColorTexture.index].uri;
+                    colorURL=uri.startsWith('data:image')?uri:(prefixURL+uri);
                 }
                 else {
                     if (materialNode.pbrMetallicRoughness.baseColorFactor!==undefined) {
@@ -663,6 +667,7 @@ export default class ImportGLTFClass
                 return(null);
             }
         }
+        
             // any glow subsitutions?
         
         if (this.importSettings.glows!==undefined) {

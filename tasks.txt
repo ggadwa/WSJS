@@ -1,9 +1,6 @@
 - create random nodes for rooms, use grenades to test
 
-- need fall down noise for bots/players/monsters (pause for monsters/bots to sync animation)
-- player hurt noise
-
-- make sure kart is updated on mac
+- need ambient flag for lights, ambients always included in light list
 
 - lights
    - regular

@@ -24,7 +24,7 @@ import DialogConnectClass from '../main/dialog_connect.js';
 
 export default class CoreClass
 {
-    static MAX_LIGHT_COUNT=24;
+    static MAX_LIGHT_COUNT=32;      // same as lights[x] in shaders
     
     static GL_OPTIONS={
             alpha:false,
@@ -228,7 +228,7 @@ export default class CoreClass
 
         this.gl.clearColor(0.0,0.0,0.0,1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
-        
+         
             // cache some values
 
         this.wid=this.canvas.width;

@@ -53,7 +53,7 @@ export default class ProjectEffectClass
         this.tempPoint=new PointClass(0,0,0);
         this.motionPoint=new PointClass(0,0,0);
         
-        this.light=new LightClass(this.position,new ColorClass(1.0,1.0,1.0),0,1.0);
+        this.light=new LightClass(new PointClass(0,0,0),new ColorClass(1.0,1.0,1.0),0,1.0);
         this.light.position.setFromPoint(position);
     }
     
